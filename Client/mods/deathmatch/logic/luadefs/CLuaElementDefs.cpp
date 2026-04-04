@@ -12,6 +12,7 @@
 
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
+#include "CLuaElementDefs.h"
 using std::list;
 
 void CLuaElementDefs::LoadFunctions()
@@ -53,7 +54,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementAttachedOffsets", GetElementAttachedOffsets},
         {"getElementAlpha", GetElementAlpha},
         {"getElementLighting", ArgumentParser<GetElementLighting>},
-        {"isElementOnScreen", IsElementOnScreen},
+        {"isElementOnScreen", ArgumentParser<IsElementOnScreen>},
         {"getElementHealth", GetElementHealth},
         {"getElementModel", GetElementModel},
         {"isElementStreamedIn", IsElementStreamedIn},
@@ -1363,6 +1364,14 @@ std::variant<bool, float> CLuaElementDefs::GetElementLighting(CClientEntity* ent
     return false;
 }
 
+bool CLuaElementDefs::IsElementOnScreen(CClientEntity* entity)
+{
+    if (entity->GetType() == CCLIENTMARKER)
+        return static_cast<CClientMarker*>(entity)->IsOnScreen();
+
+    return entity->IsOnScreen();
+}
+
 int CLuaElementDefs::GetElementHealth(lua_State* luaVM)
 {
     // Verify the argument
@@ -1636,30 +1645,6 @@ int CLuaElementDefs::IsElementStreamable(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // We failed
-    lua_pushnil(luaVM);
-    return 1;
-}
-
-int CLuaElementDefs::IsElementOnScreen(lua_State* luaVM)
-{
-    // Verify the argument
-    CClientEntity*   pEntity = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-
-    if (!argStream.HasErrors())
-    {
-        // Return whether we're on the screen or not
-        bool bOnScreen;
-        if (CStaticFunctionDefinitions::IsElementOnScreen(*pEntity, bOnScreen))
-        {
-            lua_pushboolean(luaVM, bOnScreen);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
     lua_pushnil(luaVM);
     return 1;
 }

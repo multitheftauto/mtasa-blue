@@ -21,5 +21,6 @@ public:
     virtual C3DMarker* CreateMarker(DWORD Identifier, T3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g, BYTE b,
                                     BYTE a) = 0;
     virtual C3DMarker* FindFreeMarker() = 0;
+    virtual C3DMarker* FindMarker(DWORD Identifier) = 0;
     virtual void       ReinitMarkers() = 0;
 };
