@@ -2698,6 +2698,9 @@ bool CServerBrowser::ProcessServerListRefreshBatch(ServerBrowserType type, size_
 
     state.pList->SetUpdated(false);
 
+    if (state.pList->GetRevision() != m_pServerListRevision[index])
+        state.pList->SetUpdated(true);
+
     if (type == ServerBrowserTypes::RECENTLY_PLAYED)
         m_pRemoveFromRecentIcon[index]->SetAlpha(0.3f);
 
