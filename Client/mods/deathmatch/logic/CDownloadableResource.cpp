@@ -65,7 +65,7 @@ CChecksum CDownloadableResource::GenerateClientChecksum()
 
     if (s_bChecksumBatchActive && s_checksumBatchAccumMs >= BATCH_BUDGET_MS)
     {
-        m_LastClientChecksum = CChecksum();
+        m_LastClientChecksum = m_ServerChecksum;
         return m_LastClientChecksum;
     }
 

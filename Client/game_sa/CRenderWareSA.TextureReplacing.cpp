@@ -1876,16 +1876,20 @@ namespace
             {
                 const std::uint16_t     prev = pStreamInfo->prevId;
                 const std::uint16_t     next = pStreamInfo->nextId;
-                constexpr std::uint16_t kInvalidLink = static_cast<std::uint16_t>(-1);
-
-                if (prev != kInvalidLink && next != kInvalidLink && pGame->GetStreaming())
+                if (pGame->GetStreaming())
                 {
-                    CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
-                    CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
-                    if (pPrev && pNext)
+                    constexpr std::uint16_t kInvalidLink = static_cast<std::uint16_t>(-1);
+                    if (prev != kInvalidLink)
                     {
-                        pPrev->nextId = next;
-                        pNext->prevId = prev;
+                        CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
+                        if (pPrev)
+                            pPrev->nextId = next;
+                    }
+                    if (next != kInvalidLink)
+                    {
+                        CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
+                        if (pNext)
+                            pNext->prevId = prev;
                     }
                 }
             }
@@ -1962,13 +1966,34 @@ namespace
 
         if (usTxdSlotId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
         {
-            // Isolated TXDs are never added to SA's streaming loaded list
-            // (SetStreamingInfoLoaded sets prevId/nextId to -1 at creation,
-            // and SA's streaming never touches this entry). The zeroing here
-            // is defensive cleanup of already-detached fields.
+            // SA's streaming I/O completion can re-insert this entry into the
+            // loaded list after MTA set its link fields to -1. Unlink before
+            // zeroing the link fields, or neighbors retain dangling pointers
+            // to this slot and corrupt list traversal.
             // Must NOT call RemoveModel: that triggers RemoveTxd which
-            // destroys the RW dictionary — but leaked slots still have
+            // destroys the RW dictionary - but leaked slots still have
             // live textures or external refs that must stay alive.
+            if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
+            {
+                const std::uint16_t prev = pStreamInfo->prevId;
+                const std::uint16_t next = pStreamInfo->nextId;
+                if (pGame->GetStreaming())
+                {
+                    constexpr std::uint16_t kInvalidLink = static_cast<std::uint16_t>(-1);
+                    if (prev != kInvalidLink)
+                    {
+                        CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
+                        if (pPrev)
+                            pPrev->nextId = next;
+                    }
+                    if (next != kInvalidLink)
+                    {
+                        CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
+                        if (pNext)
+                            pNext->prevId = prev;
+                    }
+                }
+            }
             pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
             pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
             pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
@@ -4281,13 +4306,11 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                                     // Pending non-priority requests run on the next streaming update.
                                     if (!pCurrentTxd && usTxdId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
                                     {
-                                        const unsigned int uiTxdDataStreamId =
-                                            usTxdId + static_cast<unsigned int>(iBaseIDforTXD);
-                                        CStreamingInfo* pStreamInfo = GetStreamingInfoSafe(uiTxdDataStreamId);
-                                        const bool bBusyOrLoaded = pStreamInfo &&
-                                            (pStreamInfo->loadState == eModelLoadState::LOADSTATE_READING ||
-                                             pStreamInfo->loadState == eModelLoadState::LOADSTATE_FINISHING ||
-                                             pStreamInfo->loadState == eModelLoadState::LOADSTATE_LOADED);
+                                        const unsigned int uiTxdDataStreamId = usTxdId + static_cast<unsigned int>(iBaseIDforTXD);
+                                        CStreamingInfo*    pStreamInfo = GetStreamingInfoSafe(uiTxdDataStreamId);
+                                        const bool         bBusyOrLoaded = pStreamInfo && (pStreamInfo->loadState == eModelLoadState::LOADSTATE_READING ||
+                                                                                           pStreamInfo->loadState == eModelLoadState::LOADSTATE_FINISHING ||
+                                                                                           pStreamInfo->loadState == eModelLoadState::LOADSTATE_LOADED);
                                         if (!bBusyOrLoaded)
                                             pGame->GetStreaming()->RequestModel(uiTxdDataStreamId, 0x16);
                                     }

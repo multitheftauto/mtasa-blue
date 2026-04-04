@@ -2304,6 +2304,60 @@ static void _declspec(naked) HOOK_CrashFix_VBInstWeightsNull()
 }
 
 ////////////////////////////////////////////////////////////////////////
+// __rpD3D9VertexDeclarationInstIndicesRemap
+//
+// Same NULL locked VB crash as InstV3d/InstV3dMorph and InstWeights,
+// but in the bone index remap path. Called only from __rpD3D9SkinGeometryReinstance
+// when rendering skinned meshes (peds, deformable vehicles).
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+// The caller adds a vertex element byte offset to the locked pointer, so mem
+// is typically a small non-zero value (e.g 0x28) rather than exact NULL.
+// Any address below 0x10000 (Windows null guard page) is invalid.
+//
+// __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src, [esp+10]=remap, [esp+14]=numVerts, [esp+18]=stride
+// Returns D3D9VertexTypeSize[type] in EAX.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_VBInstIndicesRemapNull   0x754C80
+#define HOOKSIZE_CrashFix_VBInstIndicesRemapNull  8
+#define HOOKCHECK_CrashFix_VBInstIndicesRemapNull 0x8B
+DWORD RETURN_CrashFix_VBInstIndicesRemapNull = 0x754C88;
+
+static void _declspec(naked) HOOK_CrashFix_VBInstIndicesRemapNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        cmp     dword ptr [esp+8], 10000h            // mem below 64KB null guard page?
+        jb      bail_out_remap
+
+        // Replicate overwritten prologue (8 bytes: mov edx,[esp+4]; mov eax,[esp+0Ch])
+        mov     edx, [esp+4]                         // type
+        mov     eax, [esp+0Ch]                       // src
+        jmp     RETURN_CrashFix_VBInstIndicesRemapNull
+
+    bail_out_remap:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    53
+        call    CrashAverted
+
+        // Return D3D9VertexTypeSize[type]
+        mov     ecx, [esp+4]                         // ecx = type
+        mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
+        mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
 // _RwD3D9DynamicVertexBufferCreate
 //
 // NULL VB pointer crash when reusing a DynamicVertexBuffer list entry
@@ -3627,6 +3681,86 @@ static void __fastcall HOOK_CColModel_MakeMultipleAlloc(CColModelSAInterface* pC
     reinterpret_cast<MakeMultipleAlloc_t>(0x1564A10)(pColModel);
 }
 
+////////////////////////////////////////////////////////////////////////
+// AreTexturesUsedByRequestedModels
+//
+// Null ms_modelInfoPtrs[modelId] during requested-list and channel iteration
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc50  0x156650D
+#define HOOKSIZE_CrashFix_Misc50 7
+DWORD                 RETURN_CrashFix_Misc50 = 0x1566514;
+DWORD                 RETURN_CrashFix_Misc50B = 0x1566552;
+void _declspec(naked) HOOK_CrashFix_Misc50()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        test    edx, edx
+        js      skip
+        mov     ecx, dword ptr [edx*4 + 0A9B0C8h]
+        test    ecx, ecx
+        jnz     cont
+    skip:
+        push    50
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc50B
+    cont:
+        jmp     RETURN_CrashFix_Misc50
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_CrashFix_Misc51  0x156658A
+#define HOOKSIZE_CrashFix_Misc51 7
+DWORD                 RETURN_CrashFix_Misc51 = 0x1566591;
+DWORD                 RETURN_CrashFix_Misc51B = 0x15665BB;
+void _declspec(naked) HOOK_CrashFix_Misc51()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        test    eax, eax
+        js      skip
+        mov     edx, dword ptr [eax*4 + 0A9B0C8h]
+        test    edx, edx
+        jnz     cont
+    skip:
+        push    51
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc51B
+    cont:
+        jmp     RETURN_CrashFix_Misc51
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_CrashFix_Misc52  0x15665C9
+#define HOOKSIZE_CrashFix_Misc52 7
+DWORD                 RETURN_CrashFix_Misc52 = 0x15665D0;
+DWORD                 RETURN_CrashFix_Misc52B = 0x1566600;
+void _declspec(naked) HOOK_CrashFix_Misc52()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        test    eax, eax
+        js      skip
+        mov     ecx, dword ptr [eax*4 + 0A9B0C8h]
+        test    ecx, ecx
+        jnz     cont
+    skip:
+        push    52
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc52B
+    cont:
+        jmp     RETURN_CrashFix_Misc52
+    }
+    // clang-format on
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for CrashFixHacks
@@ -3707,6 +3841,10 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CFire_ProcessFire);
 
     EZHookInstall(CColModel_MakeMultipleAlloc);
+
+    EZHookInstall(CrashFix_Misc50);
+    EZHookInstall(CrashFix_Misc51);
+    EZHookInstall(CrashFix_Misc52);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
