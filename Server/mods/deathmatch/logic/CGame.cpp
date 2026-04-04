@@ -2588,6 +2588,10 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     args.PushNumber(packet.m_start.fZ);
 
     player->CallEvent("onPlayerWeaponFire", args);
+
+    // Sim sync only relays bullet packets to zone-0 viewers. Relay to the rest of the
+    // near list here so zone-1/2 observers still receive long-range bullet sync.
+    RelayNearbyPacket(packet);
 }
 
 void CGame::Packet_WeaponBulletsync(CCustomWeaponBulletSyncPacket& packet)
