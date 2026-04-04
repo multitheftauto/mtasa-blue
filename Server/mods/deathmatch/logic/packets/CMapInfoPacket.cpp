@@ -297,6 +297,23 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
         WeaponProperty.data.anim2_loop_bullet_fire = pWeaponStat->GetWeaponAnim2LoopFireTime();
 
         WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
+
+        WeaponProperty.data.anim_group = pWeaponStat->GetAnimGroup();
+        WeaponProperty.data.fire_type = pWeaponStat->GetFireType();
+        WeaponProperty.data.model = pWeaponStat->GetModel();
+        WeaponProperty.data.model2 = pWeaponStat->GetModel2();
+        WeaponProperty.data.weapon_slot = pWeaponStat->GetSlot();
+        WeaponProperty.data.fire_offset = *pWeaponStat->GetFireOffset();
+        WeaponProperty.data.skill_level = pWeaponStat->GetSkill();
+        WeaponProperty.data.required_skill_level = pWeaponStat->GetRequiredStatLevel();
+        WeaponProperty.data.firing_speed = pWeaponStat->GetFiringSpeed();
+        WeaponProperty.data.radius = pWeaponStat->GetRadius();
+        WeaponProperty.data.life_span = pWeaponStat->GetLifeSpan();
+        WeaponProperty.data.spread = pWeaponStat->GetSpread();
+        WeaponProperty.data.aim_offset = pWeaponStat->GetAimOffsetIndex();
+        WeaponProperty.data.default_combo = pWeaponStat->GetDefaultCombo();
+        WeaponProperty.data.combos_available = pWeaponStat->GetCombosAvailable();
+
         BitStream.Write(&WeaponProperty);
 
         BitStream.WriteBit(g_pGame->GetJetpackWeaponEnabled((eWeaponType)i));
@@ -306,7 +323,7 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     {
         sWeaponPropertySync WeaponProperty;
         BitStream.WriteBit(true);
-        for (int j = 0; j <= 2; j++)
+        for (int j = 0; j <= 3; j++)
         {
             CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager()->GetWeaponStats((eWeaponType)i, (eWeaponSkill)j);
             WeaponProperty.data.weaponType = (int)pWeaponStat->GetWeaponType();
@@ -327,6 +344,23 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
             WeaponProperty.data.anim2_loop_bullet_fire = pWeaponStat->GetWeaponAnim2LoopFireTime();
 
             WeaponProperty.data.anim_breakout_time = pWeaponStat->GetWeaponAnimBreakoutTime();
+
+            WeaponProperty.data.anim_group = pWeaponStat->GetAnimGroup();
+            WeaponProperty.data.fire_type = pWeaponStat->GetFireType();
+            WeaponProperty.data.model = pWeaponStat->GetModel();
+            WeaponProperty.data.model2 = pWeaponStat->GetModel2();
+            WeaponProperty.data.weapon_slot = pWeaponStat->GetSlot();
+            WeaponProperty.data.fire_offset = *pWeaponStat->GetFireOffset();
+            WeaponProperty.data.skill_level = pWeaponStat->GetSkill();
+            WeaponProperty.data.required_skill_level = pWeaponStat->GetRequiredStatLevel();
+            WeaponProperty.data.firing_speed = pWeaponStat->GetFiringSpeed();
+            WeaponProperty.data.radius = pWeaponStat->GetRadius();
+            WeaponProperty.data.life_span = pWeaponStat->GetLifeSpan();
+            WeaponProperty.data.spread = pWeaponStat->GetSpread();
+            WeaponProperty.data.aim_offset = pWeaponStat->GetAimOffsetIndex();
+            WeaponProperty.data.default_combo = pWeaponStat->GetDefaultCombo();
+            WeaponProperty.data.combos_available = pWeaponStat->GetCombosAvailable();
+
             BitStream.Write(&WeaponProperty);
         }
 
