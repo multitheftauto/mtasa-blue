@@ -251,6 +251,8 @@ CServerBrowser::CServerBrowser()
     CServerCacheInterface* pCache = GetServerCache();
     if (pCache)
     {
+        pCache->GenerateServerList(&m_ServersInternet, true);
+        pCache->GetServerListCachedInfo(&m_ServersInternet);
         pCache->GetServerListCachedInfo(&m_ServersFavourites);
         pCache->GetServerListCachedInfo(&m_ServersRecent);
         pCache->GetServerListCachedInfo(&m_ServersHistory);
@@ -1138,16 +1140,6 @@ void CServerBrowser::SetVisible(bool bVisible)
     // Are we making this window visible?
     if (bVisible)
     {
-        // Load cache for Internet list on first view to ensure quick populating
-        if (m_bFirstTimeBrowseServer && m_ServersInternet.GetServerCount() == 0)
-        {
-            if (auto pCache = GetServerCache())
-            {
-                pCache->GenerateServerList(&m_ServersInternet, true);  // true = allow all cached servers
-                pCache->GetServerListCachedInfo(&m_ServersInternet);
-            }
-        }
-
         bool bAutoRefresh = false;
         CVARS_GET("auto_refresh_browser", bAutoRefresh);
         ServerBrowserType currentType = GetCurrentServerBrowserType();
