@@ -14,6 +14,9 @@
 #include "lua/CLuaMain.h"
 #include "CGame.h"
 #include "Utils.h"
+#include <array>
+#include <cstdint>
+#include <numeric>
 
 extern CNetServer* g_pRealNetServer;
 
@@ -21,19 +24,16 @@ namespace
 {
 #define TOP_COUNT (3)
 
-    constexpr size_t GetPacketIdCount()
+    const auto& GetAllPacketIds()
     {
-        return static_cast<size_t>(PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY) + 1;
-    }
-
-    std::vector<uchar> GetAllPacketIds()
-    {
-        std::vector<uchar> packetIds(GetPacketIdCount());
-
-        for (size_t index = 0; index < packetIds.size(); ++index)
+        // Cache the full packet id range once so packet usage stats track the
+        // shared enum automatically whenever new packet types are added.
+        static const auto packetIds = []
         {
-            packetIds[index] = static_cast<uchar>(index);
-        }
+            std::array<std::uint8_t, NUM_PACKETS> packetIds{};
+            std::iota(packetIds.begin(), packetIds.end(), std::uint8_t{0});
+            return packetIds;
+        }();
 
         return packetIds;
     }
@@ -240,14 +240,14 @@ void CPerfStatPlayerPacketUsageImpl::DoPulse()
 void CPerfStatPlayerPacketUsageImpl::UpdatePlayerPacketUsage()
 {
     // Get stats from net module
-    // Build the request from the shared packet enum so new packet types show up in
-    // getPerformanceStats automatically instead of being hidden behind a stale shortlist.
-    auto       packetIdList = GetAllPacketIds();
-    const uint uiNumPacketIds = static_cast<uint>(packetIdList.size());
-    const uint uiTopCount = TOP_COUNT;
+    const auto& packetIdList = GetAllPacketIds();
+    const uint  uiNumPacketIds = static_cast<uint>(packetIdList.size());
+    const uint  uiTopCount = TOP_COUNT;
 
     std::vector<SPlayerPacketUsage> stats(uiNumPacketIds * uiTopCount);
-    if (!g_pRealNetServer->GetPlayerPacketUsageStats(packetIdList.data(), uiNumPacketIds, stats.data(), uiTopCount))
+    // The net server API still takes a mutable pointer even though the packet id
+    // list is read-only, so keep the cast contained at this legacy boundary.
+    if (!g_pRealNetServer->GetPlayerPacketUsageStats(const_cast<std::uint8_t*>(packetIdList.data()), uiNumPacketIds, stats.data(), uiTopCount))
         return;
 
     uint uiPlayerCount = g_pGame->GetPlayerManager()->Count();
