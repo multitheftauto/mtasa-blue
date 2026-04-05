@@ -48,7 +48,7 @@ jobs:
             if [ "$run_id" != "$GITHUB_RUN_ID" ]; then
               gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/cancel" --method POST || true
             fi
-          done
+          done || true
 
           git fetch --unshallow
           git config user.name "github-actions[bot]"
