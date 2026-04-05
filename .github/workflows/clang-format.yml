@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          token: ${{ secrets.POT_CI_PAT || github.token }}
 
       - name: Run clang-format
         id: clang_format
