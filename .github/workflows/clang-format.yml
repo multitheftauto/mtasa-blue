@@ -11,8 +11,6 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Run clang-format
         id: clang_format
@@ -39,6 +37,7 @@ jobs:
             exit 1
           fi
 
+          git fetch --unshallow
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit --amend --no-edit
