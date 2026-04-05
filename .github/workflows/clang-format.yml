@@ -37,7 +37,7 @@ jobs:
             exit 1
           fi
 
-          git fetch --unshallow
+          git fetch --unshallow origin HEAD
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git log -1 --format='%B' | \
