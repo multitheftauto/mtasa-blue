@@ -7,6 +7,7 @@ jobs:
     runs-on: ubuntu-24.04
     permissions:
       contents: write
+      actions: write
 
     steps:
       - name: Checkout code
@@ -36,6 +37,16 @@ jobs:
             echo "::error::clang-format is not idempotent - cannot auto-fix"
             exit 1
           fi
+
+          # Cancel other in-progress runs on master to free up minutes for the replacement push
+          gh api "repos/$GITHUB_REPOSITORY/actions/runs" \
+            -f head_sha="$GITHUB_SHA" -f status=in_progress \
+            --jq '.workflow_runs[].id' | \
+          while read run_id; do
+            if [ "$run_id" != "$GITHUB_RUN_ID" ]; then
+              gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/cancel" --method POST || true
+            fi
+          done
 
           git fetch --unshallow
           git config user.name "github-actions[bot]"
