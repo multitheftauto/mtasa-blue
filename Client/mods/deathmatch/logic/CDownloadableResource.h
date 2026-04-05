@@ -40,6 +40,9 @@ public:
                           CChecksum serverChecksum, bool bAutoDownload);
     virtual ~CDownloadableResource();
 
+    static void BeginChecksumBatch();
+    static void EndChecksumBatch();
+
     bool DoesClientAndServerChecksumMatch();
 
     eResourceType GetResourceType() { return m_resourceType; };
@@ -53,6 +56,7 @@ public:
 
     CChecksum GenerateClientChecksum();
     CChecksum GenerateClientChecksum(CBuffer& outFileData);
+    CChecksum GetLastClientChecksum();
     CChecksum GetServerChecksum();
 
     bool IsAutoDownload() { return m_bAutoDownload; };

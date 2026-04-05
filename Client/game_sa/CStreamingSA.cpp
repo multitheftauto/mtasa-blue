@@ -485,15 +485,17 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
                         constexpr unsigned short kInvalid = static_cast<unsigned short>(-1);
                         const unsigned short     prev = pStreamInfo->prevId;
                         const unsigned short     next = pStreamInfo->nextId;
-                        if (prev != kInvalid && next != kInvalid)
+                        if (prev != kInvalid)
                         {
                             CStreamingInfo* pPrev = GetStreamingInfo(prev);
-                            CStreamingInfo* pNext = GetStreamingInfo(next);
-                            if (pPrev && pNext)
-                            {
+                            if (pPrev)
                                 pPrev->nextId = next;
+                        }
+                        if (next != kInvalid)
+                        {
+                            CStreamingInfo* pNext = GetStreamingInfo(next);
+                            if (pNext)
                                 pNext->prevId = prev;
-                            }
                         }
                     }
                     pStreamInfo->prevId = static_cast<unsigned short>(-1);

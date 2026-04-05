@@ -34,6 +34,7 @@ public:
     static bool       IsImportableModel(unsigned short usModelID);
     static bool       IsTXDData(const SString& strData);
     const SString&    GetLastError() const { return m_strLastError; }
+    bool              HasPendingRenderWareImport(unsigned short usModelID) const;
 
 private:
     bool ImportInternal(unsigned short usModelID, bool bAllowQueue);
