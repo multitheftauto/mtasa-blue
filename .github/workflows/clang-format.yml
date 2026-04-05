@@ -37,9 +37,15 @@ jobs:
             exit 1
           fi
 
+          # Required, otherwise the push will squash the entire history
           git fetch --unshallow origin HEAD
+
+          # Allow commit to work
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          # Include a reference to the original commit in the commit message,
+          # so that we can view the actions results from the original commit
           git log -1 --format='%B' | \
             git interpret-trailers --trailer "Original-Commit: https://github.com/$GITHUB_REPOSITORY/commit/$GITHUB_SHA" | \
             git commit --amend -F -
