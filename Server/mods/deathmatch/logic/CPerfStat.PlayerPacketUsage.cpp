@@ -21,6 +21,23 @@ namespace
 {
 #define TOP_COUNT (3)
 
+    constexpr size_t GetPacketIdCount()
+    {
+        return static_cast<size_t>(PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY) + 1;
+    }
+
+    std::vector<uchar> GetAllPacketIds()
+    {
+        std::vector<uchar> packetIds(GetPacketIdCount());
+
+        for (size_t index = 0; index < packetIds.size(); ++index)
+        {
+            packetIds[index] = static_cast<uchar>(index);
+        }
+
+        return packetIds;
+    }
+
     struct CTopValue
     {
         uint    uiPktsPerSec;
@@ -223,12 +240,14 @@ void CPerfStatPlayerPacketUsageImpl::DoPulse()
 void CPerfStatPlayerPacketUsageImpl::UpdatePlayerPacketUsage()
 {
     // Get stats from net module
-    uchar      packetIdList[] = {PACKET_ID_COMMAND, PACKET_ID_LUA_EVENT, PACKET_ID_CUSTOM_DATA};
-    const uint uiNumPacketIds = NUMELMS(packetIdList);
+    // Build the request from the shared packet enum so new packet types show up in
+    // getPerformanceStats automatically instead of being hidden behind a stale shortlist.
+    auto       packetIdList = GetAllPacketIds();
+    const uint uiNumPacketIds = static_cast<uint>(packetIdList.size());
     const uint uiTopCount = TOP_COUNT;
 
-    SPlayerPacketUsage stats[uiNumPacketIds * uiTopCount];
-    if (!g_pRealNetServer->GetPlayerPacketUsageStats(packetIdList, uiNumPacketIds, stats, uiTopCount))
+    std::vector<SPlayerPacketUsage> stats(uiNumPacketIds * uiTopCount);
+    if (!g_pRealNetServer->GetPlayerPacketUsageStats(packetIdList.data(), uiNumPacketIds, stats.data(), uiTopCount))
         return;
 
     uint uiPlayerCount = g_pGame->GetPlayerManager()->Count();
