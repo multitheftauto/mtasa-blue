@@ -799,7 +799,6 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
 
     // Special case for nullptr, as this is often used to indicate failure in lua functions
     // Example: A function returns bool if element is found, and returns nil if the function fails e.g. because of invalid element argument
-    template <>
     int PushResult(lua_State* L, const std::nullptr_t& value)
     {
         lua_pushnil(L);
