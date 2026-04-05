@@ -119,8 +119,8 @@ function Invoke-ClangFormat {
         Remove-Item $tmp
         Write-Verbose "Successfully formatted $($files.Count) files."
 
-        # Check git diff only in CI (checkout starts off clean)
-        if ($env:CI) {
+        # Check git diff only on Linux (CI's checkout starts off clean)
+        if ($isLinux) {
             $diffOutput = git diff --name-only
             if ($diffOutput.Count -eq 0) {
                 Write-Host "No formatting changes detected." -ForegroundColor Green
