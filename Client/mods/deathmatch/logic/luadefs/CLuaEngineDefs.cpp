@@ -1436,9 +1436,9 @@ uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 
 bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
 {
-    static uint32_t      uiLastPendingTargetLogTime = 0;
-    static uint          uiLastPendingTargetModelId = 0;
-    static unsigned short usLastPendingTargetTxdId = 0xFFFF;    // 0xFFFF = no previous TXD recorded
+    static uint32_t       uiLastPendingTargetLogTime = 0;
+    static uint           uiLastPendingTargetModelId = 0;
+    static unsigned short usLastPendingTargetTxdId = 0xFFFF;  // 0xFFFF = no previous TXD recorded
 
     const int32_t baseTxdId = g_pGame->GetBaseIDforTXD();
     if (baseTxdId <= 0 || uiModelID >= static_cast<uint>(baseTxdId))
@@ -1467,7 +1467,7 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
     {
         const unsigned short usCurrentTxdId = pModelInfo->GetTextureDictionaryID();
         const unsigned int   uiParentModelId = pModelInfo->GetParentID();
-        unsigned short       usParentTxdId = 0xFFFF;    // 0xFFFF = none
+        unsigned short       usParentTxdId = 0xFFFF;  // 0xFFFF = none
 
         if (uiParentModelId != 0)
         {
@@ -1490,9 +1490,9 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
             uiLastPendingTargetModelId = uiModelID;
             usLastPendingTargetTxdId = usTxdId;
 
-            AddReportLog(9401,
-                         SString("EngineSetModelTXDID: model %u assigned to TXD slot %u (%s band) with no RwTexDictionary; curTxd=%u parentModel=%u parentTxd=%u",
-                                 uiModelID, usTxdId, szTargetBand, usCurrentTxdId, uiParentModelId, usParentTxdId));
+            AddReportLog(
+                9401, SString("EngineSetModelTXDID: model %u assigned to TXD slot %u (%s band) with no RwTexDictionary; curTxd=%u parentModel=%u parentTxd=%u",
+                              uiModelID, usTxdId, szTargetBand, usCurrentTxdId, uiParentModelId, usParentTxdId));
         }
     }
 

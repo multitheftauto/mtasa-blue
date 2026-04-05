@@ -1797,11 +1797,11 @@ bool SharedUtil::GetFileAttributesExWithTimeout(const wchar_t* path, WIN32_FILE_
     if (!pathCopy)
         return false;
 
-#ifdef _MSC_VER
+    #ifdef _MSC_VER
     wcscpy_s(pathCopy, pathLen, path);
-#else
+    #else
     wcscpy(pathCopy, path);
-#endif
+    #endif
 
     auto* params = new (std::nothrow) GetAttributesParams{pathCopy, {}, FALSE, {false}};
     if (!params)

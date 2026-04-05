@@ -75,7 +75,6 @@ void CStreamingGC::Shutdown()
             // Continue releasing remaining references on exception
         }
     }
-
 }
 
 bool CStreamingGC::ProtectModel(std::uint32_t modelId)
@@ -251,7 +250,6 @@ void CStreamingGC::ClearAllProtections()
             }
         }
     }
-
 }
 
 ////////////////////////////////////////////////////////////////

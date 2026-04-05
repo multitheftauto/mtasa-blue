@@ -37,11 +37,11 @@ extern float      fLocalPlayerGravity;
 extern PreContextSwitchHandler*  m_pPreContextSwitchHandler;
 extern PostContextSwitchHandler* m_pPostContextSwitchHandler;
 
-#define NUM_FirstStreamEngineSlot            7
-#define NUM_LastStreamEngineSlot             16
-#define NUM_LocalVehicleAudioContext         0x0
-#define NUM_RemoteVehicleAudioContext        0x1
-#define VAR_VehicleAudioContext              0x50230C
+#define NUM_FirstStreamEngineSlot     7
+#define NUM_LastStreamEngineSlot      16
+#define NUM_LocalVehicleAudioContext  0x0
+#define NUM_RemoteVehicleAudioContext 0x1
+#define VAR_VehicleAudioContext       0x50230C
 
 namespace
 {
