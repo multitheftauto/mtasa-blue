@@ -24,6 +24,8 @@ jobs:
           steps.clang_format.outcome == 'failure' &&
           github.ref == 'refs/heads/master' &&
           github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
         shell: bash
         run: |
           # Stage the formatted files (clang-format.ps1 already ran in-place)
