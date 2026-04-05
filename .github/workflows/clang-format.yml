@@ -24,8 +24,7 @@ jobs:
         if: |
           steps.clang_format.outcome == 'failure' &&
           github.ref == 'refs/heads/master' &&
-          github.event_name == 'push' &&
-          github.event.repository.fork == false
+          github.event_name == 'push'
         shell: bash
         run: |
           # Stage the formatted files (clang-format.ps1 already ran in-place)
@@ -49,6 +48,6 @@ jobs:
       - name: Report formatting issues
         if: |
           steps.clang_format.outcome == 'failure' &&
-          !(github.ref == 'refs/heads/master' && github.event_name == 'push' && github.event.repository.fork == false)
+          !(github.ref == 'refs/heads/master' && github.event_name == 'push')
         shell: bash
         run: exit 1
