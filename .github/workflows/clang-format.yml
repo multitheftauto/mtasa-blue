@@ -43,7 +43,7 @@ jobs:
           # Cancel other in-progress runs on master to free up minutes for the replacement push
           gh api "repos/$GITHUB_REPOSITORY/actions/runs" \
             -f head_sha="$GITHUB_SHA" -f status=in_progress \
-            --jq '.workflow_runs[].id' | \
+            --jq '.workflow_runs[].id' | tr -d '\r' | grep -E '^[0-9]+$' | \
           while read run_id; do
             if [ "$run_id" != "$GITHUB_RUN_ID" ]; then
               gh api "repos/$GITHUB_REPOSITORY/actions/runs/$run_id/cancel" --method POST || true
