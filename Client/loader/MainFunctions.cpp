@@ -72,8 +72,7 @@ namespace
 [[nodiscard]] static bool IsHighIntegrityModule(const SString& moduleName) noexcept
 {
     const char* szFileName = PathFindFileNameA(moduleName.c_str());
-    return _stricmp(szFileName, "netc.dll") == 0 || _stricmp(szFileName, "core.dll") == 0 ||
-           _stricmp(szFileName, "client.dll") == 0;
+    return _stricmp(szFileName, "netc.dll") == 0 || _stricmp(szFileName, "core.dll") == 0 || _stricmp(szFileName, "client.dll") == 0;
 }
 
 struct DebuggerCrashCapture
@@ -2282,8 +2281,7 @@ int LaunchGame(SString strCmdLine)
                 if (!isAcDefense && IsFailFastException(rawExitCode))
                 {
                     isAcDefense = true;
-                    AddReportLog(7210, SString("Loader - AC integrity exit detected via exit code (code=0x%08X)",
-                                               static_cast<unsigned int>(rawExitCode)));
+                    AddReportLog(7210, SString("Loader - AC integrity exit detected via exit code (code=0x%08X)", static_cast<unsigned int>(rawExitCode)));
                     MessageBoxUTF8(nullptr,
                                    "MTA: San Andreas has been terminated due to an integrity violation.\n\n"
                                    "Make sure that no external program is modifying the game. Note that some unreliable "

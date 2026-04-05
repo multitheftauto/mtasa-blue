@@ -74,10 +74,10 @@ std::vector<DWORD> GetGTAProcessList();
 bool CommandLineContains(const SString& strText);
 void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "");
 
-auto GetMTARootDirectory() -> std::filesystem::path;
-auto GetGameBaseDirectory() -> std::filesystem::path;
-auto GetGameLaunchDirectory() -> std::filesystem::path;
-auto GetGameExecutablePath() -> std::filesystem::path;
+auto    GetMTARootDirectory() -> std::filesystem::path;
+auto    GetGameBaseDirectory() -> std::filesystem::path;
+auto    GetGameLaunchDirectory() -> std::filesystem::path;
+auto    GetGameExecutablePath() -> std::filesystem::path;
 SString GetInstallPathForLauncher();
 
 void            SetMTASAPathSource(bool bReadFromRegistry);

@@ -732,7 +732,7 @@ namespace
 
         const auto* pSnapshotEntry = FindPendingSnapshotEntry(usModelId, pReplacement);
         const bool  bMatchesSnapshotWaitCondition = pSnapshotEntry && pSnapshotEntry->uiExpectedParentModelId == uiExpectedParentModelId &&
-                                                    pSnapshotEntry->usExpectedParentTxdId == usExpectedParentTxdId;
+                                                   pSnapshotEntry->usExpectedParentTxdId == usExpectedParentTxdId;
 
         if (bMatchesSnapshotWaitCondition)
         {
@@ -1874,8 +1874,8 @@ namespace
             // Neighbors still reference this slot
             if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
             {
-                const std::uint16_t     prev = pStreamInfo->prevId;
-                const std::uint16_t     next = pStreamInfo->nextId;
+                const std::uint16_t prev = pStreamInfo->prevId;
+                const std::uint16_t next = pStreamInfo->nextId;
                 if (pGame->GetStreaming())
                 {
                     constexpr std::uint16_t kInvalidLink = static_cast<std::uint16_t>(-1);
@@ -4197,8 +4197,8 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
             unsigned int    uiTxdStreamId = usTxdId + pGame->GetBaseIDforTXD();
             CStreamingInfo* pStreamInfoBusyCheck = IsStreamingInfoSlot(usTxdId) ? GetStreamingInfoSafe(uiTxdStreamId) : nullptr;
             bool            bBusy = IsStreamingInfoSlot(usTxdId) && pStreamInfoBusyCheck &&
-                                    (pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_READING ||
-                                     pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_FINISHING);
+                         (pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_READING ||
+                          pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_FINISHING);
             if (bBusy && !pCurrentTxd)
                 return nullptr;
 
@@ -4309,8 +4309,8 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                                         const unsigned int uiTxdDataStreamId = usTxdId + static_cast<unsigned int>(iBaseIDforTXD);
                                         CStreamingInfo*    pStreamInfo = GetStreamingInfoSafe(uiTxdDataStreamId);
                                         const bool         bBusyOrLoaded = pStreamInfo && (pStreamInfo->loadState == eModelLoadState::LOADSTATE_READING ||
-                                                                                           pStreamInfo->loadState == eModelLoadState::LOADSTATE_FINISHING ||
-                                                                                           pStreamInfo->loadState == eModelLoadState::LOADSTATE_LOADED);
+                                                                                   pStreamInfo->loadState == eModelLoadState::LOADSTATE_FINISHING ||
+                                                                                   pStreamInfo->loadState == eModelLoadState::LOADSTATE_LOADED);
                                         if (!bBusyOrLoaded)
                                             pGame->GetStreaming()->RequestModel(uiTxdDataStreamId, 0x16);
                                     }

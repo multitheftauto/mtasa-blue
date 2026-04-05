@@ -45,10 +45,7 @@ public:
     class Guard
     {
     public:
-        explicit Guard(std::uint32_t modelId) : m_modelId(modelId), m_generation(0)
-        {
-            m_bActive = ProtectModelWithGeneration(m_modelId, &m_generation);
-        }
+        explicit Guard(std::uint32_t modelId) : m_modelId(modelId), m_generation(0) { m_bActive = ProtectModelWithGeneration(m_modelId, &m_generation); }
 
         ~Guard() noexcept
         {

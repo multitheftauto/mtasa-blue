@@ -24,11 +24,11 @@
 // from the RwTexDictionary before it is destroyed.
 static std::unordered_set<unsigned short> g_StreamingProtectedTxdSlots;
 
-#define VAR_CTxdStore_ms_pTxdPool   0xC8800C
-#define FUNC_CTxdStore__RemoveRef   0x731A30
+#define VAR_CTxdStore_ms_pTxdPool    0xC8800C
+#define FUNC_CTxdStore__RemoveRef    0x731A30
 #define FUNC_CTxdStore__SetTxdParent 0x7316E0
-#define FUNC_CStreaming__requestTxd 0x407100
-#define FUNC_CTxdStore__RemoveSlot  0x731E90
+#define FUNC_CStreaming__requestTxd  0x407100
+#define FUNC_CTxdStore__RemoveSlot   0x731E90
 
 // CMemoryMgr::MallocAlign / FreeAlign wrappers (hooked by MTA in
 // CMultiplayerSA_FixMallocAlign.cpp > SafeMallocAlign / SafeFreeAlign).
@@ -434,7 +434,7 @@ void CTxdPoolSA::RemoveTextureDictonarySlot(std::uint32_t uiTxdId)
     {
         using SetTxdParent_t = void(__cdecl*)(RwTexDictionary*, RwTexDictionary*);
 
-        auto* pool = *m_ppTxdPoolInterface;
+        auto*                pool = *m_ppTxdPoolInterface;
         const unsigned short parentVal = static_cast<unsigned short>(uiTxdId);
         for (int i = 0; i < pool->m_nSize; ++i)
         {

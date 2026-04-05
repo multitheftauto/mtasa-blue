@@ -22,7 +22,7 @@ namespace
             return false;
 
         uintptr_t dwThis = reinterpret_cast<uintptr_t>(pInterface);
-        DWORD dwFunc = FUNC_CColModel_Constructor;
+        DWORD     dwFunc = FUNC_CColModel_Constructor;
 
         __try
         {
@@ -48,7 +48,7 @@ namespace
             return;
 
         uintptr_t dwThis = reinterpret_cast<uintptr_t>(pInterface);
-        DWORD dwFunc = FUNC_CColModel_Destructor;
+        DWORD     dwFunc = FUNC_CColModel_Destructor;
 
         __try
         {
@@ -66,8 +66,7 @@ namespace
     }
 }
 
-CColModelSA::CColModelSA()
-    : m_pInterface(new CColModelSAInterface), m_bDestroyInterface(false), m_bValid(false)
+CColModelSA::CColModelSA() : m_pInterface(new CColModelSAInterface), m_bDestroyInterface(false), m_bValid(false)
 {
     if (!CallNativeColModelConstructor(m_pInterface))
     {

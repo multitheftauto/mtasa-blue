@@ -48,11 +48,11 @@ constexpr bool bFreezeWatchdogEnabled = false;
 // 1. Disable the watchdog
 // 2. Fix your mess (imagine what that would do to players in release builds)
 #ifdef MTA_DEBUG
-constexpr bool bFreezeWatchdogEnabledInCurrentBuild = true;
-constexpr DWORD uiFreezeWatchdogTimeoutSeconds = 20; // Already unacceptable. Strikes a balance: you'll still be able to a load heavy asseted local server
+constexpr bool  bFreezeWatchdogEnabledInCurrentBuild = true;
+constexpr DWORD uiFreezeWatchdogTimeoutSeconds = 20;  // Already unacceptable. Strikes a balance: you'll still be able to a load heavy asseted local server
 #else
-constexpr bool bFreezeWatchdogEnabledInCurrentBuild = bFreezeWatchdogEnabled;
-constexpr DWORD uiFreezeWatchdogTimeoutSeconds = 40; // Player won't be patient beyond this; we get no info
+constexpr bool  bFreezeWatchdogEnabledInCurrentBuild = bFreezeWatchdogEnabled;
+constexpr DWORD uiFreezeWatchdogTimeoutSeconds = 40;  // Player won't be patient beyond this; we get no info
 #endif
 
 static float fTest = 1;
