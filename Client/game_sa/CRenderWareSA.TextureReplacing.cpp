@@ -486,14 +486,22 @@ namespace
             }
         }
 
-#ifdef MTA_DEBUG
-        // Debug-only: verify fast path didbt miss any references.
-        // If usedInTxdIds bookkeeping is correct, no entry outside
-        // that set should contain this replacement.
-        for (const auto& entry : ms_ModelTexturesInfoMap)
+        // Backstop: remove any orphaned references left behind when
+        // usedInTxdIds tracking fell out of sync with usedByReplacements.
+        for (auto& entry : ms_ModelTexturesInfoMap)
         {
             if (pReplacementTextures->usedInTxdIds.count(entry.first) != 0)
                 continue;
+
+            auto& usedBy = entry.second.usedByReplacements;
+            if (!usedBy.empty())
+                ListRemove(usedBy, pReplacementTextures);
+        }
+
+#ifdef MTA_DEBUG
+        // Debug-only: verify no references remain after the fast path and backstop scan.
+        for (const auto& entry : ms_ModelTexturesInfoMap)
+        {
             const auto& usedBy = entry.second.usedByReplacements;
             dassert(std::find(usedBy.begin(), usedBy.end(), pReplacementTextures) == usedBy.end());
         }
@@ -732,7 +740,7 @@ namespace
 
         const auto* pSnapshotEntry = FindPendingSnapshotEntry(usModelId, pReplacement);
         const bool  bMatchesSnapshotWaitCondition = pSnapshotEntry && pSnapshotEntry->uiExpectedParentModelId == uiExpectedParentModelId &&
-                                                   pSnapshotEntry->usExpectedParentTxdId == usExpectedParentTxdId;
+                                                    pSnapshotEntry->usExpectedParentTxdId == usExpectedParentTxdId;
 
         if (bMatchesSnapshotWaitCondition)
         {
@@ -1852,6 +1860,33 @@ namespace
         return pStreaming->GetStreamingInfo(uiStreamId);
     }
 
+    static void UnlinkStreamingInfoNeighbors(CStreamingInfo* pStreamInfo)
+    {
+        if (!pStreamInfo || !pGame)
+            return;
+
+        if (pStreamInfo->loadState == eModelLoadState::LOADSTATE_NOT_LOADED)
+            return;
+
+        CStreaming* pStreaming = pGame->GetStreaming();
+        if (!pStreaming)
+            return;
+
+        constexpr std::uint16_t kInvalidLink = static_cast<std::uint16_t>(-1);
+        const std::uint16_t     prev = pStreamInfo->prevId;
+        const std::uint16_t     next = pStreamInfo->nextId;
+
+        CStreamingInfo* pPrev = (prev != kInvalidLink) ? pStreaming->GetStreamingInfo(prev) : nullptr;
+        CStreamingInfo* pNext = (next != kInvalidLink) ? pStreaming->GetStreamingInfo(next) : nullptr;
+
+        // If one side already points outside the streaming array, cut the
+        // reachable side instead of copying the bad link forward.
+        if (pPrev)
+            pPrev->nextId = (next == kInvalidLink || pNext) ? next : kInvalidLink;
+        if (pNext)
+            pNext->prevId = (prev == kInvalidLink || pPrev) ? prev : kInvalidLink;
+    }
+
     // Marks a TXD streaming entry as LOADED, zeroing disc-ref fields.
     // Only applies to standard-range slots [0, 5000). Overflow slots [5000, 6316)
     // have no dedicated streaming entry (they overlap COL/IPL), so we skip them.
@@ -1872,27 +1907,7 @@ namespace
         {
             // Unlink from SA's loaded-entry list before zeroing the link fields.
             // Neighbors still reference this slot
-            if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
-            {
-                const std::uint16_t prev = pStreamInfo->prevId;
-                const std::uint16_t next = pStreamInfo->nextId;
-                if (pGame->GetStreaming())
-                {
-                    constexpr std::uint16_t kInvalidLink = static_cast<std::uint16_t>(-1);
-                    if (prev != kInvalidLink)
-                    {
-                        CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
-                        if (pPrev)
-                            pPrev->nextId = next;
-                    }
-                    if (next != kInvalidLink)
-                    {
-                        CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
-                        if (pNext)
-                            pNext->prevId = prev;
-                    }
-                }
-            }
+            UnlinkStreamingInfoNeighbors(pStreamInfo);
 
             pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
             pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
@@ -1973,27 +1988,7 @@ namespace
             // Must NOT call RemoveModel: that triggers RemoveTxd which
             // destroys the RW dictionary - but leaked slots still have
             // live textures or external refs that must stay alive.
-            if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
-            {
-                const std::uint16_t prev = pStreamInfo->prevId;
-                const std::uint16_t next = pStreamInfo->nextId;
-                if (pGame->GetStreaming())
-                {
-                    constexpr std::uint16_t kInvalidLink = static_cast<std::uint16_t>(-1);
-                    if (prev != kInvalidLink)
-                    {
-                        CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
-                        if (pPrev)
-                            pPrev->nextId = next;
-                    }
-                    if (next != kInvalidLink)
-                    {
-                        CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
-                        if (pNext)
-                            pNext->prevId = prev;
-                    }
-                }
-            }
+            UnlinkStreamingInfoNeighbors(pStreamInfo);
             pStreamInfo->prevId = static_cast<std::uint16_t>(-1);
             pStreamInfo->nextId = static_cast<std::uint16_t>(-1);
             pStreamInfo->nextInImg = static_cast<std::uint16_t>(-1);
@@ -4197,8 +4192,8 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
             unsigned int    uiTxdStreamId = usTxdId + pGame->GetBaseIDforTXD();
             CStreamingInfo* pStreamInfoBusyCheck = IsStreamingInfoSlot(usTxdId) ? GetStreamingInfoSafe(uiTxdStreamId) : nullptr;
             bool            bBusy = IsStreamingInfoSlot(usTxdId) && pStreamInfoBusyCheck &&
-                         (pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_READING ||
-                          pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_FINISHING);
+                                    (pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_READING ||
+                                     pStreamInfoBusyCheck->loadState == eModelLoadState::LOADSTATE_FINISHING);
             if (bBusy && !pCurrentTxd)
                 return nullptr;
 
@@ -4309,8 +4304,8 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                                         const unsigned int uiTxdDataStreamId = usTxdId + static_cast<unsigned int>(iBaseIDforTXD);
                                         CStreamingInfo*    pStreamInfo = GetStreamingInfoSafe(uiTxdDataStreamId);
                                         const bool         bBusyOrLoaded = pStreamInfo && (pStreamInfo->loadState == eModelLoadState::LOADSTATE_READING ||
-                                                                                   pStreamInfo->loadState == eModelLoadState::LOADSTATE_FINISHING ||
-                                                                                   pStreamInfo->loadState == eModelLoadState::LOADSTATE_LOADED);
+                                                                                           pStreamInfo->loadState == eModelLoadState::LOADSTATE_FINISHING ||
+                                                                                           pStreamInfo->loadState == eModelLoadState::LOADSTATE_LOADED);
                                         if (!bBusyOrLoaded)
                                             pGame->GetStreaming()->RequestModel(uiTxdDataStreamId, 0x16);
                                     }
@@ -4431,7 +4426,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
             }
             info.usedByReplacements.clear();
 
-            auto restoreState = [&]()
+            auto restoreState = [usTxdId, &info, &originalUsed, &replacementsToReapply](bool bRestoreTxdTracking)
             {
                 for (SReplacementTextures* pReplacement : originalUsed)
                 {
@@ -4439,6 +4434,8 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                         continue;
                     if (std::find(info.usedByReplacements.begin(), info.usedByReplacements.end(), pReplacement) == info.usedByReplacements.end())
                         info.usedByReplacements.push_back(pReplacement);
+                    if (bRestoreTxdTracking)
+                        pReplacement->usedInTxdIds.insert(usTxdId);
                 }
                 for (auto& entry : replacementsToReapply)
                 {
@@ -4454,7 +4451,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
             {
                 info.pTxd = pCurrentTxd;
                 PopulateOriginalTextures(info, pCurrentTxd);
-                restoreState();
+                restoreState(true);
             }
             else if (usTxdId < CTxdPoolSA::SA_TXD_POOL_CAPACITY)
             {
@@ -4467,7 +4464,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
 
                 if (IsBusyStreaming(pStreamInfo))
                 {
-                    restoreState();
+                    restoreState(true);
                     return nullptr;
                 }
 
@@ -4482,7 +4479,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
 
                 if (uiNewTxdId != usTxdId)  // TXD slot reassigned
                 {
-                    restoreState();
+                    restoreState(false);
                     if (!info.bHasLeakedTextures && CTxdStore_GetNumRefs(usTxdId) > 0)
                         CRenderWareSA::DebugTxdRemoveRef(usTxdId, "GetModelTexturesInfo-stale-id-changed");
                     else if (info.bHasLeakedTextures)
@@ -4503,7 +4500,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     pStreamInfo = GetStreamingInfoSafe(uiTxdStreamId);
                     if (IsBusyStreaming(pStreamInfo))
                     {
-                        restoreState();
+                        restoreState(true);
                         return nullptr;
                     }
 
@@ -4517,11 +4514,11 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 {
                     info.pTxd = pCurrentTxd;
                     PopulateOriginalTextures(info, pCurrentTxd);
-                    restoreState();
+                    restoreState(true);
                 }
                 else
                 {
-                    restoreState();
+                    restoreState(false);
                     if (!info.bHasLeakedTextures && CTxdStore_GetNumRefs(usTxdId) > 0)
                         CRenderWareSA::DebugTxdRemoveRef(usTxdId, "GetModelTexturesInfo-blocking-fail");
                     else if (info.bHasLeakedTextures)
@@ -4543,11 +4540,11 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 {
                     info.pTxd = pCurrentTxd;
                     PopulateOriginalTextures(info, pCurrentTxd);
-                    restoreState();
+                    restoreState(true);
                 }
                 else
                 {
-                    restoreState();
+                    restoreState(false);
                     MapRemove(ms_ModelTexturesInfoMap, usTxdId);
                     return nullptr;
                 }

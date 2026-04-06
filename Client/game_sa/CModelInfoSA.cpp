@@ -655,6 +655,33 @@ bool CModelInfoSA::IsLoaded()
     return false;
 }
 
+static void UnlinkStreamingInfoNeighbors(CStreamingInfo* pStreamInfo)
+{
+    if (!pStreamInfo || !pGame)
+        return;
+
+    if (pStreamInfo->loadState == eModelLoadState::LOADSTATE_NOT_LOADED)
+        return;
+
+    CStreaming* pStreaming = pGame->GetStreaming();
+    if (!pStreaming)
+        return;
+
+    constexpr unsigned short kInvalid = static_cast<unsigned short>(-1);
+    const unsigned short     prev = pStreamInfo->prevId;
+    const unsigned short     next = pStreamInfo->nextId;
+
+    CStreamingInfo* pPrev = (prev != kInvalid) ? pStreaming->GetStreamingInfo(prev) : nullptr;
+    CStreamingInfo* pNext = (next != kInvalid) ? pStreaming->GetStreamingInfo(next) : nullptr;
+
+    // If one side already points outside the streaming array, cut the
+    // reachable side instead of copying the bad link forward.
+    if (pPrev)
+        pPrev->nextId = (next == kInvalid || pNext) ? next : kInvalid;
+    if (pNext)
+        pNext->prevId = (prev == kInvalid || pPrev) ? prev : kInvalid;
+}
+
 bool CModelInfoSA::DoIsLoaded()
 {
     // return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
@@ -673,24 +700,7 @@ bool CModelInfoSA::DoIsLoaded()
                 if (pStreamInfo)
                 {
                     // Unlink from SA's loaded-entry list before zeroing the link fields to avoid linked list corruptin
-                    if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
-                    {
-                        constexpr unsigned short kInvalid = static_cast<unsigned short>(-1);
-                        const unsigned short     prev = pStreamInfo->prevId;
-                        const unsigned short     next = pStreamInfo->nextId;
-                        if (prev != kInvalid)
-                        {
-                            CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
-                            if (pPrev)
-                                pPrev->nextId = next;
-                        }
-                        if (next != kInvalid)
-                        {
-                            CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
-                            if (pNext)
-                                pNext->prevId = prev;
-                        }
-                    }
+                    UnlinkStreamingInfoNeighbors(pStreamInfo);
                     pStreamInfo->prevId = static_cast<unsigned short>(-1);
                     pStreamInfo->nextId = static_cast<unsigned short>(-1);
                     pStreamInfo->nextInImg = static_cast<unsigned short>(-1);
@@ -2764,24 +2774,7 @@ static void UnlinkAndResetStreamingInfo(CStreamingInfo* pStreamInfo)
     if (!pStreamInfo)
         return;
 
-    if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED && pGame && pGame->GetStreaming())
-    {
-        constexpr unsigned short kInvalid = static_cast<unsigned short>(-1);
-        const unsigned short     prev = pStreamInfo->prevId;
-        const unsigned short     next = pStreamInfo->nextId;
-        if (prev != kInvalid)
-        {
-            CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
-            if (pPrev)
-                pPrev->nextId = next;
-        }
-        if (next != kInvalid)
-        {
-            CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
-            if (pNext)
-                pNext->prevId = prev;
-        }
-    }
+    UnlinkStreamingInfoNeighbors(pStreamInfo);
     *pStreamInfo = CStreamingInfo{};
     pStreamInfo->prevId = static_cast<unsigned short>(-1);
     pStreamInfo->nextId = static_cast<unsigned short>(-1);
