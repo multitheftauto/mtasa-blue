@@ -19,10 +19,10 @@
 
 extern CGameSA* pGame;
 
-#define NUM_MaxWorldSoundIndex                399
-#define NUM_FallbackWorldSoundBankSlotCount   (BANKSLOT_44 + 1)
-#define NUM_AudioHardwareBankLoaderOffset     0xD98
-#define NUM_BankLoaderSlotCountOffset         0x0C
+#define NUM_MaxWorldSoundIndex              399
+#define NUM_FallbackWorldSoundBankSlotCount (BANKSLOT_44 + 1)
+#define NUM_AudioHardwareBankLoaderOffset   0xD98
+#define NUM_BankLoaderSlotCountOffset       0x0C
 
 namespace
 {

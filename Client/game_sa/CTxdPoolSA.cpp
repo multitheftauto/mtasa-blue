@@ -24,11 +24,11 @@
 // from the RwTexDictionary before it is destroyed.
 static std::unordered_set<unsigned short> g_StreamingProtectedTxdSlots;
 
-#define VAR_CTxdStore_ms_pTxdPool   0xC8800C
-#define FUNC_CTxdStore__RemoveRef   0x731A30
+#define VAR_CTxdStore_ms_pTxdPool    0xC8800C
+#define FUNC_CTxdStore__RemoveRef    0x731A30
 #define FUNC_CTxdStore__SetTxdParent 0x7316E0
-#define FUNC_CStreaming__requestTxd 0x407100
-#define FUNC_CTxdStore__RemoveSlot  0x731E90
+#define FUNC_CStreaming__requestTxd  0x407100
+#define FUNC_CTxdStore__RemoveSlot   0x731E90
 
 // CMemoryMgr::MallocAlign / FreeAlign wrappers (hooked by MTA in
 // CMultiplayerSA_FixMallocAlign.cpp > SafeMallocAlign / SafeFreeAlign).
@@ -434,7 +434,7 @@ void CTxdPoolSA::RemoveTextureDictonarySlot(std::uint32_t uiTxdId)
     {
         using SetTxdParent_t = void(__cdecl*)(RwTexDictionary*, RwTexDictionary*);
 
-        auto* pool = *m_ppTxdPoolInterface;
+        auto*                pool = *m_ppTxdPoolInterface;
         const unsigned short parentVal = static_cast<unsigned short>(uiTxdId);
         for (int i = 0; i < pool->m_nSize; ++i)
         {
@@ -451,6 +451,12 @@ void CTxdPoolSA::RemoveTextureDictonarySlot(std::uint32_t uiTxdId)
     }
 
     (*m_ppTxdPoolInterface)->Release(uiTxdId);
+
+    // Lower the free-slot hints so the next search starts here
+    if (uiTxdId < m_uiFreeSlotHint)
+        m_uiFreeSlotHint = uiTxdId;
+    if (uiTxdId >= static_cast<std::uint32_t>(MAX_STREAMING_TXD_SLOT) && uiTxdId < m_uiFreeSlotHintAbove)
+        m_uiFreeSlotHintAbove = uiTxdId;
 }
 
 bool CTxdPoolSA::IsFreeTextureDictonarySlot(std::uint32_t uiTxdId)
@@ -458,7 +464,14 @@ bool CTxdPoolSA::IsFreeTextureDictonarySlot(std::uint32_t uiTxdId)
     if (!m_ppTxdPoolInterface || !(*m_ppTxdPoolInterface))
         return false;
 
-    return (*m_ppTxdPoolInterface)->IsEmpty(uiTxdId);
+    // IsContains is bounds-checked; returns false for out-of-range indices.
+    return !(*m_ppTxdPoolInterface)->IsContains(static_cast<std::int32_t>(uiTxdId));
+}
+
+bool CTxdPoolSA::IsTxdLoaded(std::uint32_t uiTxdId)
+{
+    auto* pSlot = GetTextureDictonarySlot(uiTxdId);
+    return pSlot && pSlot->rwTexDictonary != nullptr;
 }
 
 std::uint32_t CTxdPoolSA::GetFreeTextureDictonarySlot()
@@ -479,10 +492,26 @@ std::uint32_t CTxdPoolSA::GetFreeTextureDictonarySlotInRange(std::uint32_t maxEx
         return static_cast<std::uint32_t>(-1);
 
     const std::uint32_t limit = std::min(maxExclusive, static_cast<std::uint32_t>(pool->m_nSize));
-    for (std::uint32_t i = 0; i < limit; ++i)
+
+    // Start from the hint to skip known-occupied lower slots
+    std::uint32_t start = (m_uiFreeSlotHint < limit) ? m_uiFreeSlotHint : 0;
+    for (std::uint32_t i = start; i < limit; ++i)
     {
         if (pool->m_byteMap[i].bEmpty)
+        {
+            m_uiFreeSlotHint = i + 1;
             return i;
+        }
+    }
+
+    // Hint was stale; scan the range below the hint
+    for (std::uint32_t i = 0; i < start; ++i)
+    {
+        if (pool->m_byteMap[i].bEmpty)
+        {
+            m_uiFreeSlotHint = i + 1;
+            return i;
+        }
     }
 
     return static_cast<std::uint32_t>(-1);
@@ -498,10 +527,27 @@ std::uint32_t CTxdPoolSA::GetFreeTextureDictonarySlotAbove(std::uint32_t minIncl
     if (!pool->m_byteMap || pool->m_nSize <= static_cast<int>(minInclusive))
         return static_cast<std::uint32_t>(-1);
 
-    for (std::uint32_t i = minInclusive; i < static_cast<std::uint32_t>(pool->m_nSize); ++i)
+    const std::uint32_t poolSize = static_cast<std::uint32_t>(pool->m_nSize);
+
+    // Start from the hint to skip known-occupied lower slots
+    std::uint32_t start = (m_uiFreeSlotHintAbove >= minInclusive && m_uiFreeSlotHintAbove < poolSize) ? m_uiFreeSlotHintAbove : minInclusive;
+    for (std::uint32_t i = start; i < poolSize; ++i)
     {
         if (pool->m_byteMap[i].bEmpty)
+        {
+            m_uiFreeSlotHintAbove = i + 1;
             return i;
+        }
+    }
+
+    // Hint was stale; scan the range below the hint
+    for (std::uint32_t i = minInclusive; i < start; ++i)
+    {
+        if (pool->m_byteMap[i].bEmpty)
+        {
+            m_uiFreeSlotHintAbove = i + 1;
+            return i;
+        }
     }
 
     return static_cast<std::uint32_t>(-1);

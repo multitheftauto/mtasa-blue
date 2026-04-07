@@ -13,6 +13,7 @@
 #include "CExceptionInformation_Impl.h"
 
 #include <cstring>
+#include <new>
 
 #define MAX_MODULE_PATH 512
 
@@ -39,12 +40,31 @@ CExceptionInformation_Impl::CExceptionInformation_Impl()
     m_ulGS = 0;
     m_ulSS = 0;
     m_ulEFlags = 0;
+#ifdef WIN_x64
+    m_ullRAX = 0;
+    m_ullRBX = 0;
+    m_ullRCX = 0;
+    m_ullRDX = 0;
+    m_ullRSI = 0;
+    m_ullRDI = 0;
+    m_ullRBP = 0;
+    m_ullRSP = 0;
+    m_ullRIP = 0;
+    m_ullR8 = 0;
+    m_ullR9 = 0;
+    m_ullR10 = 0;
+    m_ullR11 = 0;
+    m_ullR12 = 0;
+    m_ullR13 = 0;
+    m_ullR14 = 0;
+    m_ullR15 = 0;
+#endif
 }
 
 CExceptionInformation_Impl::~CExceptionInformation_Impl()
 {
     if (m_szModulePathName)
-        delete m_szModulePathName;
+        delete[] m_szModulePathName;
 }
 
 void CExceptionInformation_Impl::Set(unsigned int iCode, _EXCEPTION_POINTERS* pException)
@@ -68,14 +88,43 @@ void CExceptionInformation_Impl::Set(unsigned int iCode, _EXCEPTION_POINTERS* pE
     m_ulGS = pException->ContextRecord->SegGs;
     m_ulSS = pException->ContextRecord->SegSs;
     m_ulEFlags = pException->ContextRecord->EFlags;
+#elif defined(WIN_x64)
+    m_ullRAX = pException->ContextRecord->Rax;
+    m_ullRBX = pException->ContextRecord->Rbx;
+    m_ullRCX = pException->ContextRecord->Rcx;
+    m_ullRDX = pException->ContextRecord->Rdx;
+    m_ullRSI = pException->ContextRecord->Rsi;
+    m_ullRDI = pException->ContextRecord->Rdi;
+    m_ullRBP = pException->ContextRecord->Rbp;
+    m_ullRSP = pException->ContextRecord->Rsp;
+    m_ullRIP = pException->ContextRecord->Rip;
+    m_ullR8 = pException->ContextRecord->R8;
+    m_ullR9 = pException->ContextRecord->R9;
+    m_ullR10 = pException->ContextRecord->R10;
+    m_ullR11 = pException->ContextRecord->R11;
+    m_ullR12 = pException->ContextRecord->R12;
+    m_ullR13 = pException->ContextRecord->R13;
+    m_ullR14 = pException->ContextRecord->R14;
+    m_ullR15 = pException->ContextRecord->R15;
+    m_ulCS = pException->ContextRecord->SegCs;
+    m_ulDS = pException->ContextRecord->SegDs;
+    m_ulES = pException->ContextRecord->SegEs;
+    m_ulFS = pException->ContextRecord->SegFs;
+    m_ulGS = pException->ContextRecord->SegGs;
+    m_ulSS = pException->ContextRecord->SegSs;
+    m_ulEFlags = pException->ContextRecord->EFlags;
 #endif
 
     void* pModuleBaseAddress = NULL;
-    m_szModulePathName = new char[MAX_MODULE_PATH];
-    GetModule(m_szModulePathName, MAX_MODULE_PATH, &pModuleBaseAddress);
-    m_szModuleBaseName = strrchr(m_szModulePathName, '\\');
-    m_szModuleBaseName = m_szModuleBaseName ? m_szModuleBaseName + 1 : m_szModulePathName;
-    m_uiAddressModuleOffset = static_cast<BYTE*>(GetAddress()) - static_cast<BYTE*>(pModuleBaseAddress);
+    m_szModulePathName = new (std::nothrow) char[MAX_MODULE_PATH];
+    if (m_szModulePathName)
+    {
+        GetModule(m_szModulePathName, MAX_MODULE_PATH, &pModuleBaseAddress);
+        m_szModuleBaseName = strrchr(m_szModulePathName, '\\');
+        m_szModuleBaseName = m_szModuleBaseName ? m_szModuleBaseName + 1 : m_szModulePathName;
+    }
+    if (pModuleBaseAddress)
+        m_uiAddressModuleOffset = static_cast<BYTE*>(GetAddress()) - static_cast<BYTE*>(pModuleBaseAddress);
 }
 
 /**

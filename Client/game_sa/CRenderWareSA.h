@@ -108,8 +108,8 @@ public:
     unsigned short GetTXDIDForModelID(unsigned short usModelID);
     void           PulseWorldTextureWatch();
     // Compatibility wrapper; uses per-model pending processing.
-    void        ProcessPendingIsolatedTxdParents();
-    void        ProcessPendingIsolatedModels();
+    void        ProcessPendingIsolatedTxdParents(bool bBlockingParentLoad = false) override;
+    void        ProcessPendingIsolatedModels(bool bBlockingParentLoad = false);
     void        GetModelTextureNames(std::vector<SString>& outNameList, unsigned short usModelID);
     bool        GetModelTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, unsigned short usModelID, std::vector<SString> vTextureNames);
     void        GetTxdTextures(std::vector<RwTexture*>& outTextureList, unsigned short usTxdId);

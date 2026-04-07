@@ -164,4 +164,11 @@ public:
     // Detaches all SReplacementTextures from this slot, orphans copy textures, and removes
     // the ms_ModelTexturesInfoMap entry so later CClientTXD cleanup won't access freed data.
     virtual void CleanupReplacementsInTxdSlot(unsigned short usTxdSlotId) = 0;
+
+    // Complete any deferred isolated-TXD parent setup and apply queued replacement textures.
+    // Must be called after a blocking model load when the model may have pending TXD work,
+    // so that ReadDFF resolves textures from the correct (child) TXD instead of vanilla.
+    // When bBlockingParentLoad is true, parent TXDs that are not yet streamed in are loaded
+    // synchronously so the setup can complete in a single call.
+    virtual void ProcessPendingIsolatedTxdParents(bool bBlockingParentLoad = false) = 0;
 };
