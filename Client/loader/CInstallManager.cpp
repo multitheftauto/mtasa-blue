@@ -328,7 +328,7 @@ SString CInstallManager::Continue()
 {
     // Initial report line
     DWORD   dwProcessId = GetCurrentProcessId();
-    SString GotPathFrom = (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far") ? "registry" : "module location";
+    SString GotPathFrom = (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far") ? "far-update resolver" : "module location";
     AddReportLog(1041, SString("* Launch * pid:%d '%s' MTASAPath set from %s '%s'", dwProcessId, GetLaunchPathFilename().c_str(), GotPathFrom.c_str(),
                                GetMTASAPath().c_str()));
 
@@ -1065,10 +1065,22 @@ SString CInstallManager::_SwitchBackFromTempExe()
     {
         m_pSequencer->SetVariable(INSTALL_LOCATION, "near");
 
+        SString strLauncherPathFilename = PathJoin(GetInstallPathForLauncher(), MTA_EXE_NAME);
+        if (!FileExists(strLauncherPathFilename))
+        {
+            strLauncherPathFilename = PathJoin(GetMTASAPath(), MTA_EXE_NAME);
+            if (!FileExists(strLauncherPathFilename))
+            {
+                AddReportLog(5055, SString("_SwitchBackFromTempExe: target launcher missing '%s'", strLauncherPathFilename.c_str()));
+                return "fail";
+            }
+        }
+
         ReleaseSingleInstanceMutex();
-        if (ShellExecuteNonBlocking("open", GetLauncherPathFilename(), GetSequencerSnapshot()))
+        if (ShellExecuteNonBlocking("open", strLauncherPathFilename, GetSequencerSnapshot()))
             ExitProcess(0);  // All done here
         CreateSingleInstanceMutex();
+        AddReportLog(5055, SString("_SwitchBackFromTempExe: failed to launch '%s'", strLauncherPathFilename.c_str()));
         return "fail";
     }
     return "ok";
@@ -1098,6 +1110,7 @@ SString CInstallManager::_InstallFiles()
     }
     else
     {
+        SetOnRestartCommand("");
         UpdateMTAVersionApplicationSetting();
         AddReportLog(2050, SString("_InstallFiles: ok %s", ""));
         return "ok";
@@ -1235,6 +1248,7 @@ SString CInstallManager::_ProcessGtaPatchCheck()
 
     if (!FileGenerator::IsPatchBase(patchBasePath))
     {
+        AddReportLog(5053, SString("_ProcessGtaPatchCheck: patch base invalid '%ls'", patchBasePath.wstring().c_str()));
         SString strMessage(_("MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"));
         strMessage += "\n\n" + UTF8FilePath(patchBasePath);
         BrowseToSolution("gengta_pakfiles", ASK_GO_ONLINE, strMessage);
@@ -1243,6 +1257,7 @@ SString CInstallManager::_ProcessGtaPatchCheck()
 
     if (!FileGenerator::IsPatchDiff(patchDiffPath))
     {
+        AddReportLog(5053, SString("_ProcessGtaPatchCheck: patch diff invalid '%ls'", patchDiffPath.wstring().c_str()));
         SString strMessage(_("MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"));
         strMessage += "\n\n" + UTF8FilePath(patchDiffPath);
         BrowseToSolution("mta-datafiles-missing", ASK_GO_ONLINE, strMessage);
@@ -1712,7 +1727,7 @@ SString CInstallManager::_ProcessAppCompatChecks()
     IsWow64Process(GetCurrentProcess(), &bIsWOW64);
     uint    uiHKLMFlags = bIsWOW64 ? KEY_WOW64_64KEY : 0;
     WString strGTAExePathFilename = GetGameExecutablePath().wstring();
-    WString strMTAExePathFilename = FromUTF8(GetLaunchPathFilename());
+    WString strMTAExePathFilename = FromUTF8(PathJoin(GetInstallPathForLauncher(), MTA_EXE_NAME));
     WString strCompatModeRegKey = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
     int     bWin816BitColorOption = GetApplicationSettingInt("Win8Color16");
     int     bWin8MouseOption = GetApplicationSettingInt("Win8MouseFix");

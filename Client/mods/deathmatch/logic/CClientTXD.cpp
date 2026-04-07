@@ -378,7 +378,14 @@ void CClientTXD::ProcessPendingImports()
 
     const HRESULT hr = pDevice->TestCooperativeLevel();
     if (hr != D3D_OK)
+    {
+        // Device loss is a wait state, not a failed import attempt.
+        // Keep queued entries fresh so they are retried after recovery
+        // instead of aging out while no retry can run.
+        for (SPendingTxdImport& pendingTxdImport : s_PendingTxdImports)
+            pendingTxdImport.uiQueuedTick = uiNow;
         return;
+    }
 
     const uint32_t kTimeoutMs = 30000;
     const uint8_t  kMaxRetries = 10;
@@ -416,7 +423,6 @@ void CClientTXD::ProcessPendingImports()
 
                 if (s_PendingRenderWareImports.size() >= MAX_PENDING_RENDER_WARE_IMPORTS)
                 {
-                    ++pendingTxdImport.ucRetryCount;
                     ++it;
                     continue;
                 }

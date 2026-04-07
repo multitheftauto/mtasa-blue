@@ -38,6 +38,7 @@ std::map<DWORD, CTimeInfoSAInterface>                                CModelInfoS
 std::unordered_map<DWORD, unsigned short>                            CModelInfoSA::ms_OriginalObjectPropertiesGroups;
 std::unordered_map<DWORD, std::pair<float, float>>                   CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
 std::map<unsigned short, int>                                        CModelInfoSA::ms_DefaultTxdIDMap;
+std::uint32_t                                                        CModelInfoSA::ms_uiTxdAssignmentGeneration = 0;
 
 void CModelInfoSA::ClearModelDefaults(DWORD modelId)
 {
@@ -654,6 +655,33 @@ bool CModelInfoSA::IsLoaded()
     return false;
 }
 
+static void UnlinkStreamingInfoNeighbors(CStreamingInfo* pStreamInfo)
+{
+    if (!pStreamInfo || !pGame)
+        return;
+
+    if (pStreamInfo->loadState == eModelLoadState::LOADSTATE_NOT_LOADED)
+        return;
+
+    CStreaming* pStreaming = pGame->GetStreaming();
+    if (!pStreaming)
+        return;
+
+    constexpr unsigned short kInvalid = static_cast<unsigned short>(-1);
+    const unsigned short     prev = pStreamInfo->prevId;
+    const unsigned short     next = pStreamInfo->nextId;
+
+    CStreamingInfo* pPrev = (prev != kInvalid) ? pStreaming->GetStreamingInfo(prev) : nullptr;
+    CStreamingInfo* pNext = (next != kInvalid) ? pStreaming->GetStreamingInfo(next) : nullptr;
+
+    // If one side already points outside the streaming array, cut the
+    // reachable side instead of copying the bad link forward.
+    if (pPrev)
+        pPrev->nextId = (next == kInvalid || pNext) ? next : kInvalid;
+    if (pNext)
+        pNext->prevId = (prev == kInvalid || pPrev) ? prev : kInvalid;
+}
+
 bool CModelInfoSA::DoIsLoaded()
 {
     // return (BOOL)*(BYTE *)(ARRAY_ModelLoaded + 20*dwModelID);
@@ -672,22 +700,7 @@ bool CModelInfoSA::DoIsLoaded()
                 if (pStreamInfo)
                 {
                     // Unlink from SA's loaded-entry list before zeroing the link fields to avoid linked list corruptin
-                    if (pStreamInfo->loadState != eModelLoadState::LOADSTATE_NOT_LOADED)
-                    {
-                        constexpr unsigned short kInvalid = static_cast<unsigned short>(-1);
-                        const unsigned short     prev = pStreamInfo->prevId;
-                        const unsigned short     next = pStreamInfo->nextId;
-                        if (prev != kInvalid && next != kInvalid)
-                        {
-                            CStreamingInfo* pPrev = pGame->GetStreaming()->GetStreamingInfo(prev);
-                            CStreamingInfo* pNext = pGame->GetStreaming()->GetStreamingInfo(next);
-                            if (pPrev && pNext)
-                            {
-                                pPrev->nextId = next;
-                                pNext->prevId = prev;
-                            }
-                        }
-                    }
+                    UnlinkStreamingInfoNeighbors(pStreamInfo);
                     pStreamInfo->prevId = static_cast<unsigned short>(-1);
                     pStreamInfo->nextId = static_cast<unsigned short>(-1);
                     pStreamInfo->nextInImg = static_cast<unsigned short>(-1);
@@ -1108,6 +1121,7 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
             if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
                 ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = usOldTxdId;
 
+            ++ms_uiTxdAssignmentGeneration;
             m_pInterface->usTextureDictionary = usID;
             return;
         }
@@ -1122,6 +1136,7 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
     if (!MapContains(ms_DefaultTxdIDMap, static_cast<unsigned short>(m_dwModelID)))
         ms_DefaultTxdIDMap[static_cast<unsigned short>(m_dwModelID)] = usOldTxdId;
 
+    ++ms_uiTxdAssignmentGeneration;
     m_pInterface->usTextureDictionary = usID;
 
     // Pin the new TXD before rebinding so textures remain valid during the switch
@@ -1198,6 +1213,8 @@ void CModelInfoSA::ResetTextureDictionaryID()
     if (pGame && pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(targetId))
     {
         ms_DefaultTxdIDMap.erase(it);
+        AddReportLog(9401, SString("ResetTextureDictionaryID: target TXD %u freed, model %u stays on TXD %u", targetId, static_cast<unsigned int>(m_dwModelID),
+                                   static_cast<unsigned int>(GetInterface()->usTextureDictionary)));
         return;
     }
 
@@ -1722,6 +1739,35 @@ void CModelInfoSA::ModelAddRef(EModelRequestType requestType, const char* szTag)
     m_dwReferences++;
 }
 
+void CModelInfoSA::ModelAddRefNonBlocking(const char* szTag)
+{
+    ModelAddRef(NON_BLOCKING, szTag);
+}
+
+bool CModelInfoSA::TryAddRefIfLoaded()
+{
+    if (!IsLoaded())
+        return false;
+
+    if (m_dwReferences == 0)
+    {
+        assert(!m_dwPendingInterfaceRef);
+
+        m_pInterface = ppModelInfo[m_dwModelID];
+        if (!IsValidModelInfoPtr(m_pInterface))
+        {
+            m_pInterface = nullptr;
+            return false;
+        }
+
+        m_pInterface->usNumberOfRefs++;
+        CTxdStore_AddRef(m_pInterface->usTextureDictionary);
+    }
+
+    m_dwReferences++;
+    return true;
+}
+
 int CModelInfoSA::GetRefCount()
 {
     return static_cast<int>(m_dwReferences);
@@ -2137,6 +2183,12 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
         pVehicleModel = static_cast<CVehicleModelInfoSAInterface*>(GetInterface());
         if (!pVehicleModel || !pVehicleModel->pVisualInfo)
         {
+            if (pVehicleModel && pVehicleModel->usNumberOfRefs > 0)
+            {
+                if (CTxdStore_GetTxd(pVehicleModel->usTextureDictionary) != nullptr)
+                    CTxdStore_RemoveRef(pVehicleModel->usTextureDictionary);
+                pVehicleModel->usNumberOfRefs--;
+            }
             if (bRemoveFromDummiesMap)
                 ms_ModelDefaultDummiesPosition.erase(iter);
             return;
@@ -2179,6 +2231,12 @@ void CModelInfoSA::ResetAllVehicleDummies()
             pVehicleModel = static_cast<CVehicleModelInfoSAInterface*>(pModelInfoSA->GetInterface());
             if (!pVehicleModel || !pVehicleModel->pVisualInfo)
             {
+                if (pVehicleModel && pVehicleModel->usNumberOfRefs > 0)
+                {
+                    if (CTxdStore_GetTxd(pVehicleModel->usTextureDictionary) != nullptr)
+                        CTxdStore_RemoveRef(pVehicleModel->usTextureDictionary);
+                    pVehicleModel->usNumberOfRefs--;
+                }
                 it = ms_ModelDefaultDummiesPosition.erase(it);
                 continue;
             }
@@ -2723,6 +2781,18 @@ void CModelInfoSA::SetVoice(const char* szVoiceType, const char* szVoice)
     SetVoice(sVoiceType, sVoiceID);
 }
 
+static void UnlinkAndResetStreamingInfo(CStreamingInfo* pStreamInfo)
+{
+    if (!pStreamInfo)
+        return;
+
+    UnlinkStreamingInfoNeighbors(pStreamInfo);
+    *pStreamInfo = CStreamingInfo{};
+    pStreamInfo->prevId = static_cast<unsigned short>(-1);
+    pStreamInfo->nextId = static_cast<unsigned short>(-1);
+    pStreamInfo->nextInImg = static_cast<unsigned short>(-1);
+}
+
 void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
 {
     CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(usBaseModelID);
@@ -2731,7 +2801,7 @@ void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
     if (!pBaseModelStreamingInfo || !pTargetModelStreamingInfo)
         return;
 
-    *pTargetModelStreamingInfo = CStreamingInfo{};
+    UnlinkAndResetStreamingInfo(pTargetModelStreamingInfo);
     pTargetModelStreamingInfo->archiveId = pBaseModelStreamingInfo->archiveId;
     pTargetModelStreamingInfo->offsetInBlocks = pBaseModelStreamingInfo->offsetInBlocks;
     pTargetModelStreamingInfo->sizeInBlocks = pBaseModelStreamingInfo->sizeInBlocks;
@@ -2746,6 +2816,35 @@ void CModelInfoSA::MakePedModel(const char* szTexture)
     pGame->GetStreaming()->RequestSpecialModel(m_dwModelID, szTexture, 0);
 }
 
+void CModelInfoSA::MakePedModel(ushort usParentID)
+{
+    CBaseModelInfoSAInterface* pParentInfo = ppModelInfo[usParentID];
+    if (!IsValidModelInfoPtr(pParentInfo))
+    {
+        ppModelInfo[m_dwModelID] = nullptr;
+        m_pInterface = nullptr;
+        m_dwParentID = 0;
+        ClearModelDefaults(m_dwModelID);
+
+        UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
+        return;
+    }
+
+    CPedModelInfoSAInterface* pNewInterface = new CPedModelInfoSAInterface();
+    MemCpyFast(pNewInterface, pParentInfo, sizeof(CPedModelInfoSAInterface));
+    pNewInterface->usNumberOfRefs = 0;
+    pNewInterface->pRwObject = nullptr;
+    pNewInterface->usUnknown = 65535;
+    pNewInterface->usDynamicIndex = 65535;
+    pNewInterface->pHitColModel = nullptr;
+    pNewInterface->bIsColLoaded = 0;
+
+    ppModelInfo[m_dwModelID] = pNewInterface;
+
+    m_dwParentID = usParentID;
+    CopyStreamingInfoFromModel(usParentID);
+}
+
 void CModelInfoSA::MakeObjectModel(ushort usBaseID)
 {
     CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];
@@ -2756,9 +2855,7 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
         m_dwParentID = 0;
         ClearModelDefaults(m_dwModelID);
 
-        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-        if (pStreamingInfo)
-            *pStreamingInfo = CStreamingInfo{};
+        UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
         return;
     }
 
@@ -2785,9 +2882,7 @@ void CModelInfoSA::MakeObjectDamageableModel(std::uint16_t baseModel)
         m_dwParentID = 0;
         ClearModelDefaults(m_dwModelID);
 
-        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-        if (pStreamingInfo)
-            *pStreamingInfo = CStreamingInfo{};
+        UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
         return;
     }
 
@@ -2815,9 +2910,7 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
         m_dwParentID = 0;
         ClearModelDefaults(m_dwModelID);
 
-        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-        if (pStreamingInfo)
-            *pStreamingInfo = CStreamingInfo{};
+        UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
         return;
     }
 
@@ -2845,9 +2938,7 @@ void CModelInfoSA::MakeClumpModel(ushort usBaseID)
         m_dwParentID = 0;
         ClearModelDefaults(m_dwModelID);
 
-        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-        if (pStreamingInfo)
-            *pStreamingInfo = CStreamingInfo{};
+        UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
         return;
     }
 
@@ -2874,9 +2965,7 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
         m_dwParentID = 0;
         ClearModelDefaults(m_dwModelID);
 
-        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-        if (pStreamingInfo)
-            *pStreamingInfo = CStreamingInfo{};
+        UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
         return;
     }
 
@@ -3052,9 +3141,7 @@ void CModelInfoSA::DeallocateModel()
             return;
     }
 
-    CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-    if (pStreamingInfo)
-        *pStreamingInfo = CStreamingInfo{};
+    UnlinkAndResetStreamingInfo(pGame->GetStreaming()->GetStreamingInfo(m_dwModelID));
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //
