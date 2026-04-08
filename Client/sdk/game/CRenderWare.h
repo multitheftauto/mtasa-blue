@@ -51,7 +51,7 @@ struct SReplacementTextures
     std::vector<RwTexture*>            textures;           // List of textures we want to inject into TXD's
     std::vector<SPerTxd>               perTxdList;         // TXD's which have been modified
     std::unordered_set<unsigned short> usedInTxdIds;       // contains/erase for streaming hot path
-    std::unordered_set<unsigned short> usedInModelIds;     // contains/erase for streaming hot path
+    std::unordered_set<unsigned short> usedInModelIds;     // All consuming models (explicit + shared TXD passive)
     std::unordered_set<unsigned short> pendingOnModelIds;  // Models waiting for a later apply
     uint32_t                           uiSessionId = 0;    // Texture-replacing session generation (used to ignore stale cross-session cleanup)
     SString                            strDebugName;       // Source path or description for logging
@@ -164,4 +164,11 @@ public:
     // Detaches all SReplacementTextures from this slot, orphans copy textures, and removes
     // the ms_ModelTexturesInfoMap entry so later CClientTXD cleanup won't access freed data.
     virtual void CleanupReplacementsInTxdSlot(unsigned short usTxdSlotId) = 0;
+
+    // Complete any deferred isolated-TXD parent setup and apply queued replacement textures.
+    // Must be called after a blocking model load when the model may have pending TXD work,
+    // so that ReadDFF resolves textures from the correct (child) TXD instead of vanilla.
+    // When bBlockingParentLoad is true, parent TXDs that are not yet streamed in are loaded
+    // synchronously so the setup can complete in a single call.
+    virtual void ProcessPendingIsolatedTxdParents(bool bBlockingParentLoad = false) = 0;
 };

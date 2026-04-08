@@ -90,6 +90,12 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
         if (!m_pManager->GetModelRequestManager()->RequestBlocking(usModelId, "CClientDFF::LoadDFF"))
             AddReportLog(8631, SString("GetLoadedClump: RequestBlocking failed for model %d", usModelId));
 
+        // If engineImportTXD was called before the parent TXD was loaded, the model's
+        // TXD assignment and replacement textures were deferred. Now that RequestBlocking
+        // has loaded the model (and its TXD dependency), complete any pending setup so
+        // ReadDFF resolves textures from the correct child TXD.
+        g_pGame->GetRenderWare()->ProcessPendingIsolatedTxdParents(true);
+
         // Attempt loading it
         if (!m_bIsRawData)  // We have file
         {
