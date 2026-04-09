@@ -26,7 +26,7 @@ CRendererSA::~CRendererSA()
 {
 }
 
-void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting)
+void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting, bool doubleSided)
 {
     CBaseModelInfoSAInterface* pModelInfoSAInterface = pModelInfo->GetInterface();
     if (!pModelInfoSAInterface)
@@ -67,6 +67,13 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
         // Setup ambient light multiplier
         SetLightColoursForPedsCarsAndObjects(lighting);
 
+        RwCullMode currentCullMode;
+        if (doubleSided)
+        {
+            RwRenderStateGet(rwRENDERSTATECULLMODE, &currentCullMode);
+            RwRenderStateSet(rwRENDERSTATECULLMODE, RWRSTATE(rwCULLMODECULLNONE));
+        }
+
         if (pRwObject->type == RP_TYPE_ATOMIC)
         {
             RpAtomic* pRpAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
@@ -77,6 +84,9 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
             RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
             RpClumpRender(pClump);
         }
+
+        if (doubleSided)
+            RwRenderStateSet(rwRENDERSTATECULLMODE, RWRSTATE(currentCullMode));
 
         // Restore ambient light
         SetAmbientColours();
