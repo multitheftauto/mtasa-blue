@@ -774,22 +774,9 @@ bool CLocalGUI::InputGoesToGUI()
     if (!pGUI)
         return false;
 
-    bool shouldShowCursorForGUI = false;
-    if (pGUI->GetGUIInputEnabled())
-    {
-        eInputMode inputMode = pGUI->GetGUIInputMode();
-        if (inputMode == INPUTMODE_NO_BINDS_ON_EDIT)
-        {
-            shouldShowCursorForGUI = true;
-        }
-        else if (inputMode == INPUTMODE_NO_BINDS)
-        {
-            shouldShowCursorForGUI = false;
-        }
-    }
-
-    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || shouldShowCursorForGUI ||
-            !CCore::GetSingleton().IsFocused() || IsWebRequestGUIVisible());
+    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible ||
+            pGUI->GetGUIInputEnabled() || !CCore::GetSingleton().IsFocused() ||
+            IsWebRequestGUIVisible());
 }
 
 void CLocalGUI::ForceCursorVisible(bool bVisible)
