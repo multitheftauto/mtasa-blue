@@ -1015,8 +1015,7 @@ void CClientEntity::FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_Stat
         // Only streamed in elements?
         if (!bStreamedIn || !IsStreamingCompatibleClass() || reinterpret_cast<CClientStreamElement*>(this)->IsStreamedIn())
         {
-            bool bVisibleOnScreen = false;
-            if (!bOnScreenOnly || (CStaticFunctionDefinitions::IsElementOnScreen(*this, bVisibleOnScreen) && bVisibleOnScreen))
+            if (!bOnScreenOnly || IsOnScreen())
             {
                 // Add it to the table
                 lua_pushnumber(luaVM, ++uiIndex);
@@ -1463,8 +1462,7 @@ void CClientEntity::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaV
                 if (!bStreamedIn || !pEntity->IsStreamingCompatibleClass() || reinterpret_cast<CClientStreamElement*>(pEntity)->IsStreamedIn())
                 {
                     // Only on screen elements?
-                    bool bVisibleOnScreen = false;
-                    if (!bOnScreenOnly || (CStaticFunctionDefinitions::IsElementOnScreen(*pEntity, bVisibleOnScreen) && bVisibleOnScreen))
+                    if (!bOnScreenOnly || pEntity->IsOnScreen())
                     {
                         // Add it to the table
                         lua_pushnumber(luaVM, ++uiIndex);
