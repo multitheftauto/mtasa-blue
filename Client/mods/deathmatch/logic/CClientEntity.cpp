@@ -1457,13 +1457,14 @@ void CClientEntity::GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaV
         {
             pEntity = *i;
 
-            // Only streamed in elements?
-            if (!bStreamedIn || !pEntity->IsStreamingCompatibleClass() || reinterpret_cast<CClientStreamElement*>(pEntity)->IsStreamedIn())
+            if (!pEntity->IsBeingDeleted())
             {
-                bool bVisibleOnScreen = false;
-                if (!bOnScreenOnly || (CStaticFunctionDefinitions::IsElementOnScreen(*pEntity, bVisibleOnScreen) && bVisibleOnScreen))
+                // Only streamed in elements?
+                if (!bStreamedIn || !pEntity->IsStreamingCompatibleClass() || reinterpret_cast<CClientStreamElement*>(pEntity)->IsStreamedIn())
                 {
-                    if (!pEntity->IsBeingDeleted())
+                    // Only on screen elements?
+                    bool bVisibleOnScreen = false;
+                    if (!bOnScreenOnly || (CStaticFunctionDefinitions::IsElementOnScreen(*pEntity, bVisibleOnScreen) && bVisibleOnScreen))
                     {
                         // Add it to the table
                         lua_pushnumber(luaVM, ++uiIndex);
