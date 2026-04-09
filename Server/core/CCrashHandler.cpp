@@ -56,7 +56,7 @@ typedef BOOL(WINAPI* MINIDUMPWRITEDUMP)(HANDLE hProcess, DWORD dwPid, HANDLE hFi
                                         CONST PMINIDUMP_EXCEPTION_INFORMATION ExceptionParam, CONST PMINIDUMP_USER_STREAM_INFORMATION UserStreamParam,
                                         CONST PMINIDUMP_CALLBACK_INFORMATION CallbackParam);
 
-static HMODULE          ms_hDbgHelp = NULL;
+static HMODULE           ms_hDbgHelp = NULL;
 static MINIDUMPWRITEDUMP ms_pMiniDumpWriteDump = nullptr;
 
 #endif
@@ -201,7 +201,8 @@ bool DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* c
         // Set final dump file name (Not so safe)
         time_t     pTime = time(NULL);
         struct tm* tm = localtime(&pTime);
-        SString strFilename("server_%s_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+        SString    strFilename("server_%s_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour,
+                               tm->tm_min);
         strFinalDumpPathFilename = PathJoin(ms_strDumpPath, strFilename);
         File::Rename(ms_strDumpPathFilename, strFinalDumpPathFilename);
     }
@@ -246,7 +247,7 @@ long WINAPI CCrashHandler::HandleExceptionGlobal(_EXCEPTION_POINTERS* pException
 // file handles and exit the process cleanly.
 static bool TryWriteDump(MINIDUMPWRITEDUMP pDump, HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE dumpType, _MINIDUMP_EXCEPTION_INFORMATION* pExInfo)
 {
-#ifdef _MSC_VER
+    #ifdef _MSC_VER
     BOOL bResult = FALSE;
     __try
     {
@@ -257,10 +258,10 @@ static bool TryWriteDump(MINIDUMPWRITEDUMP pDump, HANDLE hProcess, DWORD dwPid, 
         return false;
     }
     return bResult != FALSE;
-#else
+    #else
     BOOL bResult = pDump(hProcess, dwPid, hFile, dumpType, pExInfo, NULL, NULL);
     return bResult != FALSE;
-#endif
+    #endif
 }
 
 void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInformation* pExceptionInformation)
@@ -312,7 +313,7 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
                 SString strInfo;
                 strInfo += SString("Version = %s\n", strMTAVersionFull.c_str());
 
-                char szTimeBuf[64];
+                char      szTimeBuf[64];
                 struct tm tmLocal;
                 localtime_s(&tmLocal, &timeTemp);
                 strftime(szTimeBuf, sizeof(szTimeBuf), "%c\n", &tmLocal);
@@ -336,13 +337,11 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
                     "R14=%016llX  R15=%016llX  FLG=%08X\n"
                     "CS=%04X   DS=%04X  SS=%04X  ES=%04X   "
                     "FS=%04X  GS=%04X\n\n",
-                    pExceptionInformation->GetRAX(), pExceptionInformation->GetRBX(), pExceptionInformation->GetRCX(),
-                    pExceptionInformation->GetRDX(), pExceptionInformation->GetRSI(), pExceptionInformation->GetRDI(),
-                    pExceptionInformation->GetRBP(), pExceptionInformation->GetRSP(), pExceptionInformation->GetRIP(),
-                    pExceptionInformation->GetR8(), pExceptionInformation->GetR9(), pExceptionInformation->GetR10(),
-                    pExceptionInformation->GetR11(), pExceptionInformation->GetR12(), pExceptionInformation->GetR13(),
-                    pExceptionInformation->GetR14(), pExceptionInformation->GetR15(), pExceptionInformation->GetEFlags(),
-                    pExceptionInformation->GetCS(), pExceptionInformation->GetDS(),
+                    pExceptionInformation->GetRAX(), pExceptionInformation->GetRBX(), pExceptionInformation->GetRCX(), pExceptionInformation->GetRDX(),
+                    pExceptionInformation->GetRSI(), pExceptionInformation->GetRDI(), pExceptionInformation->GetRBP(), pExceptionInformation->GetRSP(),
+                    pExceptionInformation->GetRIP(), pExceptionInformation->GetR8(), pExceptionInformation->GetR9(), pExceptionInformation->GetR10(),
+                    pExceptionInformation->GetR11(), pExceptionInformation->GetR12(), pExceptionInformation->GetR13(), pExceptionInformation->GetR14(),
+                    pExceptionInformation->GetR15(), pExceptionInformation->GetEFlags(), pExceptionInformation->GetCS(), pExceptionInformation->GetDS(),
                     pExceptionInformation->GetSS(), pExceptionInformation->GetES(), pExceptionInformation->GetFS(), pExceptionInformation->GetGS());
     #else
                 strInfo += SString(
