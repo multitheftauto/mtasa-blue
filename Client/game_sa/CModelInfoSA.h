@@ -46,6 +46,7 @@ static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 #define FUNC_CText_Get      0x6A0050
 #define FUNC_GetBoundingBox 0x4082F0
 
+#define FUNC_AddRef                0x4C4BA0
 #define FUNC_RemoveRef             0x4C4BB0
 #define FUNC_IsBoatModel           0x4c5a70
 #define FUNC_IsCarModel            0x4c5aa0

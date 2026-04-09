@@ -36,12 +36,17 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     if (!pRwObject)
         return;
 
-    // Prevent GC from freeing RwObject during rendering by bumping GTA's own
-    // ref count directly.  We must NOT use ModelAddRef/RemoveRef here because
-    // RemoveRef triggers Remove() → RemoveModel() when the MTA ref count drops
-    // to 0, which unloads the model every frame for dxDrawModel3D models that
-    // have no persistent MTA-side reference -- causing visible flickering.
-    pModelInfoSAInterface->usNumberOfRefs++;
+    // Prevent GC from freeing RwObject/TXD during rendering by calling GTA's
+    // native CBaseModelInfo::AddRef/RemoveRef.  These manage usNumberOfRefs and
+    // texture dictionary refs without going through MTA's ref-counting (which
+    // triggers Remove() when m_dwReferences drops to 0, unloading the model
+    // every frame for dxDrawModel3D models with no persistent MTA-side reference
+    // -- causing visible flickering).
+    using BaseModelInfoMethod = void(__thiscall*)(CBaseModelInfoSAInterface*);
+    auto CBaseModelInfo_AddRef = reinterpret_cast<BaseModelInfoMethod>(FUNC_AddRef);
+    auto CBaseModelInfo_RemoveRef = reinterpret_cast<BaseModelInfoMethod>(FUNC_RemoveRef);
+
+    CBaseModelInfo_AddRef(pModelInfoSAInterface);
 
     RwFrame* pFrame = RpGetFrame(pRwObject);
 
@@ -73,9 +78,9 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     }
     catch (...)
     {
-        pModelInfoSAInterface->usNumberOfRefs--;
+        CBaseModelInfo_RemoveRef(pModelInfoSAInterface);
         throw;
     }
 
-    pModelInfoSAInterface->usNumberOfRefs--;
+    CBaseModelInfo_RemoveRef(pModelInfoSAInterface);
 }
