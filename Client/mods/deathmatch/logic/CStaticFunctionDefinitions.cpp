@@ -1067,25 +1067,23 @@ bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, CStrin
 
     bool          isSynced;
     CLuaArgument* currentVariable = Entity.GetCustomData(name, false, &isSynced);
-    if (currentVariable)
+    if (!currentVariable)
+        return false;
+
+    if (isSynced && !Entity.IsLocalEntity())
     {
-        if (isSynced && !Entity.IsLocalEntity())
-        {
-            NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-            // Write element ID, name length and name for server-side removal handling
-            pBitStream->Write(Entity.GetID());
-            pBitStream->WriteString(name.ToCString());
+        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+        // Write element ID, name length and name for server-side removal handling
+        pBitStream->Write(Entity.GetID());
+        pBitStream->WriteString(name.ToCString());
 
-            // Send RPC and deallocate
-            g_pClientGame->GetNetAPI()->RPC(REMOVE_ELEMENT_DATA_RPC, pBitStream);
-            g_pNet->DeallocateNetBitStream(pBitStream);
-        }
-
-        Entity.DeleteCustomData(name);
-        return true;
+        // Send RPC and deallocate
+        g_pClientGame->GetNetAPI()->RPC(REMOVE_ELEMENT_DATA_RPC, pBitStream);
+        g_pNet->DeallocateNetBitStream(pBitStream);
     }
 
-    return false;
+    Entity.DeleteCustomData(name);
+    return true;
 }
 
 bool CStaticFunctionDefinitions::SetElementMatrix(CClientEntity& Entity, const CMatrix& matrix)
