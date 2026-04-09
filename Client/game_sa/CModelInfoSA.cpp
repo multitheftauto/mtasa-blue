@@ -2951,7 +2951,7 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
     pNewInterface->pRwObject = nullptr;
     pNewInterface->usUnknown = 65535;
     pNewInterface->usDynamicIndex = 65535;
-    pNewInterface->timeInfo.m_wOtherTimeModel = 0;
+    pNewInterface->timeInfo.m_wOtherTimeModel = -1;
 
     ppModelInfo[m_dwModelID] = pNewInterface;
 
