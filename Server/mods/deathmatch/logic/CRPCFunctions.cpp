@@ -379,59 +379,54 @@ void CRPCFunctions::RemoveElementData(NetBitStreamInterface& bitStream)
         return;
     }
 
-    ElementID     elementId;
-    std::uint16_t nameLength;
-    if (bitStream.Read(elementId) && bitStream.ReadCompressed(nameLength) && nameLength > 0 && nameLength <= MAX_CUSTOMDATA_NAME_LENGTH)
+    ElementID   elementId;
+    std::string customDataName;
+    if (bitStream.Read(elementId) && bitStream.ReadString(customDataName) && !customDataName.empty() && customDataName.length() <= MAX_CUSTOMDATA_NAME_LENGTH)
     {
-        char customDataName[MAX_CUSTOMDATA_NAME_LENGTH + 1];
-        if (bitStream.Read(customDataName, nameLength))
+        CElement* element = CElementIDs::GetElement(elementId);
+        if (element)
         {
-            customDataName[nameLength] = 0;
+            ESyncType              lastSyncType = ESyncType::BROADCAST;
+            eCustomDataClientTrust clientChangesMode{};
+            element->GetCustomData(customDataName.c_str(), false, &lastSyncType, &clientChangesMode);
 
-            CElement* element = CElementIDs::GetElement(elementId);
-            if (element)
+            const bool changesAllowed = clientChangesMode == eCustomDataClientTrust::UNSET ? !g_pGame->GetConfig()->IsElementDataWhitelisted()
+                                                                                           : clientChangesMode == eCustomDataClientTrust::ALLOW;
+            if (!changesAllowed)
             {
-                ESyncType              lastSyncType = ESyncType::BROADCAST;
-                eCustomDataClientTrust clientChangesMode{};
-                element->GetCustomData(customDataName, false, &lastSyncType, &clientChangesMode);
+                CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)\n", m_pSourcePlayer->GetNick(), customDataName.c_str());
 
-                const bool changesAllowed = clientChangesMode == eCustomDataClientTrust::UNSET ? !g_pGame->GetConfig()->IsElementDataWhitelisted()
-                                                                                               : clientChangesMode == eCustomDataClientTrust::ALLOW;
-                if (!changesAllowed)
+                CLuaArguments arguments;
+                arguments.PushElement(element);
+                arguments.PushString(customDataName.c_str());
+                arguments.PushArgument(CLuaArgument());
+                m_pSourcePlayer->CallEvent("onPlayerChangesProtectedData", arguments);
+                UNCLOCK("NetServerPulse::RPC", "RemoveElementData");
+                return;
+            }
+
+            if (element->DeleteCustomData(customDataName.c_str(), m_pSourcePlayer))
+            {
+                if (lastSyncType != ESyncType::LOCAL)
                 {
-                    CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)\n", m_pSourcePlayer->GetNick(), customDataName);
+                    CBitStream    outBitStream;
+                    std::uint16_t nameLength = static_cast<std::uint16_t>(customDataName.length());
+                    outBitStream.pBitStream->WriteCompressed(nameLength);
+                    outBitStream.pBitStream->Write(customDataName.c_str(), nameLength);
+                    outBitStream.pBitStream->WriteBit(false);  // Unused (was recursive flag)
 
-                    CLuaArguments arguments;
-                    arguments.PushElement(element);
-                    arguments.PushString(customDataName);
-                    arguments.PushArgument(CLuaArgument());
-                    m_pSourcePlayer->CallEvent("onPlayerChangesProtectedData", arguments);
-                    UNCLOCK("NetServerPulse::RPC", "RemoveElementData");
-                    return;
+                    if (lastSyncType == ESyncType::BROADCAST)
+                        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *outBitStream.pBitStream), m_pSourcePlayer);
+                    else
+                        m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *outBitStream.pBitStream), element,
+                                                                  customDataName.c_str(), m_pSourcePlayer);
+
+                    CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(customDataName.c_str(), m_pPlayerManager->Count(),
+                                                                                             outBitStream.pBitStream->GetNumberOfBytesUsed());
                 }
 
-                if (element->DeleteCustomData(customDataName, m_pSourcePlayer))
-                {
-                    if (lastSyncType != ESyncType::LOCAL)
-                    {
-                        CBitStream outBitStream;
-                        outBitStream.pBitStream->WriteCompressed(nameLength);
-                        outBitStream.pBitStream->Write(customDataName, nameLength);
-                        outBitStream.pBitStream->WriteBit(false);  // Unused (was recursive flag)
-
-                        if (lastSyncType == ESyncType::BROADCAST)
-                            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *outBitStream.pBitStream), m_pSourcePlayer);
-                        else
-                            m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *outBitStream.pBitStream), element,
-                                                                      customDataName, m_pSourcePlayer);
-
-                        CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(customDataName, m_pPlayerManager->Count(),
-                                                                                                 outBitStream.pBitStream->GetNumberOfBytesUsed());
-                    }
-
-                    if (lastSyncType == ESyncType::SUBSCRIBE)
-                        m_pPlayerManager->ClearElementData(element, customDataName);
-                }
+                if (lastSyncType == ESyncType::SUBSCRIBE)
+                    m_pPlayerManager->ClearElementData(element, customDataName.c_str());
             }
         }
     }
