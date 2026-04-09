@@ -2948,22 +2948,24 @@ void CClientVehicle::Create()
             // We hide all of them by default and only show the ones that match the current variation.
             if (strTemp.rfind("extra", 0) == 0)
             {
-                unsigned int id = atoi(strTemp.substr(5).c_str());
+                unsigned int id = std::stoi(strTemp.substr(5));
+
+                auto& component = iter->second;
 
                 // Hide extras > 6 by default
                 if (id > 6)
                 {
-                    (*iter).second.m_bVisible = false;
+                    component.m_bVisible = false;
                 }
 
                 // Show if matches variant
                 if (m_ucVariation > 5 && m_ucVariation < 254 && id == static_cast<unsigned int>(m_ucVariation) + 1)
                 {
-                    (*iter).second.m_bVisible = true;
+                    component.m_bVisible = true;
                 }
                 if (m_ucVariation2 > 5 && m_ucVariation2 < 254 && id == static_cast<unsigned int>(m_ucVariation2) + 1)
                 {
-                    (*iter).second.m_bVisible = true;
+                    component.m_bVisible = true;
                 }
             }
             // set our visibility
