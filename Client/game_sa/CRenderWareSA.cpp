@@ -13,6 +13,7 @@
 
 #include "StdInc.h"
 #include <array>
+#include <cctype>
 #include <cstddef>
 #include <cstring>
 #include <unordered_map>
@@ -614,7 +615,8 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
 // to reference matching textures from the new TXD by name lookup.
 namespace
 {
-    // Hash functor for texture name lookup (bounded to RW_TEXTURE_NAME_LENGTH)
+    // Hash functor for texture name lookup (bounded to RW_TEXTURE_NAME_LENGTH).
+    // Case-insensitive to match GTA:SA's RwTexDictionaryFindNamedTexture (0x7F39F0).
     struct TxdTextureNameHash
     {
         static constexpr std::size_t HASH_INIT = 2166136261u;
@@ -627,7 +629,7 @@ namespace
             std::size_t h = HASH_INIT;
             for (std::size_t i = 0; i < RW_TEXTURE_NAME_LENGTH && s[i]; ++i)
             {
-                h ^= static_cast<unsigned char>(s[i]);
+                h ^= static_cast<unsigned char>(std::tolower(static_cast<unsigned char>(s[i])));
                 h *= HASH_MULTIPLIER;
             }
             return h;
@@ -642,7 +644,7 @@ namespace
                 return true;
             if (!a || !b)
                 return false;
-            return strncmp(a, b, RW_TEXTURE_NAME_LENGTH) == 0;
+            return _strnicmp(a, b, RW_TEXTURE_NAME_LENGTH) == 0;
         }
     };
 
@@ -836,7 +838,10 @@ void CRenderWareSA::RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usT
 
     TxdTextureMap mapTxdTextures = BuildTxdTextureMap(usTxdId);
     if (mapTxdTextures.empty())
+    {
+        AddReportLog(9403, SString("RebindClumpTexturesToTxd: empty texture map for TXD %u", usTxdId));
         return;
+    }
 
     std::vector<RpAtomic*> vecAtomics;
     GetClumpAtomicList(pClump, vecAtomics);
@@ -858,7 +863,10 @@ void CRenderWareSA::RebindAtomicTexturesToTxd(RpAtomic* pAtomic, unsigned short 
 
     TxdTextureMap txdTextureMap = BuildTxdTextureMap(usTxdId);
     if (txdTextureMap.empty())
+    {
+        AddReportLog(9403, SString("RebindAtomicTexturesToTxd: empty texture map for TXD %u", usTxdId));
         return;
+    }
 
     RebindAtomicMaterials(pAtomic, txdTextureMap);
 }

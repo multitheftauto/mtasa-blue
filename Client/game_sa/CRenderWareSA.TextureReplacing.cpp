@@ -58,8 +58,11 @@ static uint32_t                                     ms_uiTextureReplacingSession
 namespace
 {
     using TextureSwapMap = std::unordered_map<RwTexture*, RwTexture*>;
+    using TextureNameSet = std::unordered_set<std::string>;
 
-    // Content-hashed key avoids allocations
+    // Content-hashed key avoids allocations.
+    // Stores the name lowercased so lookups match GTA:SA's own
+    // case-insensitive RwTexDictionaryFindNamedTexture (0x7F39F0).
     struct SafeTextureName
     {
         char        m_name[RW_TEXTURE_NAME_LENGTH];
@@ -70,7 +73,8 @@ namespace
             if (str)
             {
                 m_len = strnlen(str, RW_TEXTURE_NAME_LENGTH);
-                memcpy(m_name, str, m_len);
+                for (std::size_t i = 0; i < m_len; ++i)
+                    m_name[i] = static_cast<char>(std::tolower(static_cast<unsigned char>(str[i])));
                 if (m_len < RW_TEXTURE_NAME_LENGTH)
                     m_name[m_len] = '\0';
             }
@@ -99,6 +103,17 @@ namespace
     };
 
     using TxdTextureMap = std::unordered_map<SafeTextureName, RwTexture*, SafeTextureNameHash>;
+
+    // Lowercase a texture name for use as a map key, matching GTA:SA's
+    // case-insensitive texture lookup.
+    std::string LowercaseTextureName(const char* name, std::size_t len)
+    {
+        std::string result(name, len);
+        for (auto& c : result)
+            c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+        return result;
+    }
+
     struct ReplacementShaderKey
     {
         SReplacementTextures* pReplacement;
@@ -359,6 +374,7 @@ namespace
     static void            AddVehicleTxdFallback(TxdTextureMap& outMap);
     static bool            ShouldUseVehicleTxdFallback(unsigned short usModelId);
     static bool            IsReadableTexture(RwTexture* pTexture);
+    static bool            CollectModelMaterialTextureNames(TextureNameSet& names, unsigned short usModelId);
     static void            RebindLoadedModelToCurrentTxd(CModelInfoSA* pModelInfo, unsigned short usTxdId);
     bool                   ReplaceTextureInModel(CModelInfoSA* pModelInfo, TextureSwapMap& swapMap);
     static void            RegisterReplacement(SReplacementTextures* pReplacement);
@@ -679,6 +695,141 @@ namespace
         }
     }
 
+    static bool HasUsableTargetTxdMap(CModelInfoSA* pModelInfo, unsigned short usModelId, unsigned short usTargetTxdId)
+    {
+        if (!pGame || !pModelInfo)
+            return false;
+
+        // Unloaded models can take the existing field-only path in SetTextureDictionaryID.
+        if (!pModelInfo->GetRwObject())
+            return true;
+
+        RwTexDictionary* pTargetTxd = CTxdStore_GetTxd(usTargetTxdId);
+        if (!pTargetTxd)
+            return false;
+
+        TxdTextureMap targetTxdMap;
+
+        constexpr std::size_t kMaxChainDepth = 16;
+        unsigned short        chain[kMaxChainDepth];
+        std::size_t           chainLen = 0;
+
+        CTxdPoolSA* pTxdPoolSA = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
+        for (unsigned short id = usTargetTxdId; pTxdPoolSA && chainLen < kMaxChainDepth;)
+        {
+            bool bCycle = false;
+            for (std::size_t j = 0; j < chainLen; ++j)
+            {
+                if (chain[j] == id)
+                {
+                    bCycle = true;
+                    break;
+                }
+            }
+            if (bCycle)
+                break;
+
+            chain[chainLen++] = id;
+
+            CTextureDictonarySAInterface* pSlot = pTxdPoolSA->GetTextureDictonarySlot(id);
+            if (!pSlot || pSlot->usParentIndex == static_cast<unsigned short>(-1))
+                break;
+
+            id = pSlot->usParentIndex;
+        }
+
+        for (std::size_t i = chainLen; i > 0; --i)
+        {
+            RwTexDictionary* pChainTxd = CTxdStore_GetTxd(chain[i - 1]);
+            if (pChainTxd)
+                MergeCachedTxdTextureMap(chain[i - 1], pChainTxd, targetTxdMap);
+        }
+
+        if (ShouldUseVehicleTxdFallback(usModelId))
+            AddVehicleTxdFallback(targetTxdMap);
+
+        if (!targetTxdMap.empty())
+            return true;
+
+        TextureNameSet modelTextureNames;
+        if (CollectModelMaterialTextureNames(modelTextureNames, usModelId) && modelTextureNames.empty())
+            return true;
+
+        return false;
+    }
+
+    static size_t AddModelSwitchGuardRefs(CModelInfoSA* pModelInfo)
+    {
+        if (!pGame || !pModelInfo)
+            return 0;
+
+        CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
+        if (!pInterface)
+            return 0;
+
+        const unsigned short usCurrentTxdId = pModelInfo->GetTextureDictionaryID();
+        if (pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usCurrentTxdId))
+            return 0;
+
+        size_t nExtra = pInterface->usNumberOfRefs;
+        if (pInterface->pRwObject)
+            nExtra++;
+
+        for (size_t i = 0; i < nExtra; i++)
+            CTxdStore_AddRef(usCurrentTxdId);
+
+        return nExtra;
+    }
+
+    static void RemoveModelSwitchGuardRefs(unsigned short usTxdId, size_t nRefs)
+    {
+        if (!pGame || nRefs == 0)
+            return;
+
+        if (pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usTxdId))
+            return;
+
+        for (size_t i = 0; i < nRefs; i++)
+            CTxdStore_RemoveRef(usTxdId);
+    }
+
+    static bool TrySwitchModelToTxd(CModelInfoSA* pModelInfo, unsigned short usModelId, unsigned short usTargetTxdId, bool bTargetMapAlreadyValidated = false)
+    {
+        if (!pModelInfo)
+            return false;
+
+        if (pModelInfo->GetTextureDictionaryID() == usTargetTxdId)
+            return true;
+
+        if (!bTargetMapAlreadyValidated && !HasUsableTargetTxdMap(pModelInfo, usModelId, usTargetTxdId))
+            return false;
+
+        const unsigned short usOriginalTxdId = pModelInfo->GetTextureDictionaryID();
+        const size_t         nGuardRefs = AddModelSwitchGuardRefs(pModelInfo);
+
+        pModelInfo->SetTextureDictionaryID(usTargetTxdId);
+
+        if (pModelInfo->GetTextureDictionaryID() == usTargetTxdId)
+            return true;
+
+        if (pModelInfo->GetTextureDictionaryID() == usOriginalTxdId)
+            RemoveModelSwitchGuardRefs(usOriginalTxdId, nGuardRefs);
+
+        return false;
+    }
+
+    static bool TryRestoreAndSwitchModelToTxd(CModelInfoSA* pModelInfo, unsigned short usModelId, unsigned short usOldTxdId, unsigned short usTargetTxdId)
+    {
+        if (!pModelInfo)
+            return false;
+
+        if (!HasUsableTargetTxdMap(pModelInfo, usModelId, usTargetTxdId))
+            return false;
+
+        RestoreModelTexturesToParent(pModelInfo, usModelId, usOldTxdId, usTargetTxdId);
+        return TrySwitchModelToTxd(pModelInfo, usModelId, usTargetTxdId, true);
+    }
+
     static void QueuePendingReplacement(unsigned short usModelId, SReplacementTextures* pReplacement, unsigned int uiExpectedParentModelId,
                                         unsigned short usExpectedParentTxdId)
     {
@@ -694,8 +845,30 @@ namespace
         {
             if (g_PendingReplacementByModel.size() >= MAX_PENDING_REPLACEMENT_MODELS)
             {
-                AddReportLog(9401, SString("Pending replacement queue is full while deferring model %u", usModelId));
-                return;
+                // Reclaim slots held by stale entries before rejecting the new one
+                const uint32_t uiEvictNow = GetTickCount32();
+                for (auto itEvict = g_PendingReplacementByModel.begin(); itEvict != g_PendingReplacementByModel.end();)
+                {
+                    auto& vec = itEvict->second;
+                    vec.erase(std::remove_if(vec.begin(), vec.end(),
+                                             [uiEvictNow](const SPendingReplacement& e)
+                                             {
+                                                 return e.uiSessionId != ms_uiTextureReplacingSession || !IsReplacementActive(e.pReplacement) ||
+                                                        (uiEvictNow - e.uiFirstQueueTick) > PENDING_REPLACEMENT_MAX_AGE_MS;
+                                             }),
+                              vec.end());
+
+                    if (vec.empty())
+                        itEvict = g_PendingReplacementByModel.erase(itEvict);
+                    else
+                        ++itEvict;
+                }
+
+                if (g_PendingReplacementByModel.size() >= MAX_PENDING_REPLACEMENT_MODELS)
+                {
+                    AddReportLog(9401, SString("Pending replacement queue is full while deferring model %u", usModelId));
+                    return;
+                }
             }
 
             itPendingReplacements = g_PendingReplacementByModel.emplace(usModelId, std::vector<SPendingReplacement>()).first;
@@ -733,8 +906,20 @@ namespace
 
         if (vecPending.size() >= MAX_PENDING_REPLACEMENTS_PER_MODEL)
         {
-            AddReportLog(9401, SString("Pending replacement list is full for model %u", usModelId));
-            return;
+            // Reclaim stale entries for this model before rejecting
+            vecPending.erase(std::remove_if(vecPending.begin(), vecPending.end(),
+                                            [uiNow](const SPendingReplacement& e)
+                                            {
+                                                return e.uiSessionId != ms_uiTextureReplacingSession || !IsReplacementActive(e.pReplacement) ||
+                                                       (uiNow - e.uiFirstQueueTick) > PENDING_REPLACEMENT_MAX_AGE_MS;
+                                            }),
+                             vecPending.end());
+
+            if (vecPending.size() >= MAX_PENDING_REPLACEMENTS_PER_MODEL)
+            {
+                AddReportLog(9401, SString("Pending replacement list is full for model %u", usModelId));
+                return;
+            }
         }
 
         SPendingReplacement entry;
@@ -1335,16 +1520,8 @@ namespace
 
             if (pModelInfo && pModelInfo->GetTextureDictionaryID() == usTxdId)
             {
-                CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                if (pInterface)
-                {
-                    size_t nExtra = pInterface->usNumberOfRefs;
-                    if (pInterface->pRwObject)
-                        nExtra++;
-                    for (size_t i = 0; i < nExtra; i++)
-                        CTxdStore_AddRef(usTxdId);
-                }
-                pModelInfo->SetTextureDictionaryID(usParentTxdId);
+                if (!TryRestoreAndSwitchModelToTxd(pModelInfo, usModelId, usTxdId, usParentTxdId))
+                    continue;
             }
 
             // Clean tracking entry before orphaning to prevent stale lookups
@@ -1509,8 +1686,6 @@ namespace
         bool                        bHasIncompatibleUsers = false;
         std::vector<unsigned short> otherUserModelIds;
     };
-
-    using TextureNameSet = std::unordered_set<std::string>;
 
     static std::string CopyTextureNameForCompare(const char* szTextureName)
     {
@@ -2153,11 +2328,11 @@ namespace
 
         for (RwTexture* pTex : allTextures)
         {
-            if (!pTex)
+            if (!IsReadableTexture(pTex))
                 continue;
 
             // Reject textures whose raster belongs to an MTA master or copy
-            if (!g_GlobalMtaRasterCache.empty() && pTex->raster && g_GlobalMtaRasterCache.count(pTex->raster) != 0)
+            if (!g_GlobalMtaRasterCache.empty() && g_GlobalMtaRasterCache.count(pTex->raster) != 0)
                 continue;
 
             info.originalTextures.insert(pTex);
@@ -2173,7 +2348,7 @@ namespace
             if (nameLen >= RW_TEXTURE_NAME_LENGTH)
                 continue;
 
-            info.originalTexturesByName[std::string(pTex->name, nameLen)] = pTex;
+            info.originalTexturesByName[LowercaseTextureName(pTex->name, nameLen)] = pTex;
         }
     }
 
@@ -2906,18 +3081,9 @@ namespace
                 // doesn't underflow. SA's AddRef may have bumped usNumberOfRefs after
                 // isolation without adding TXD refs, creating the same shortfall as
                 // the allocation path.
-                {
-                    CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                    if (pInterface)
-                    {
-                        size_t nExtra = pInterface->usNumberOfRefs;
-                        if (pInterface->pRwObject)
-                            nExtra++;
-                        for (size_t i = 0; i < nExtra; i++)
-                            CTxdStore_AddRef(oldTxdId);
-                    }
-                }
-                pModelInfo->SetTextureDictionaryID(oldParentTxdId);
+                if (!TrySwitchModelToTxd(pModelInfo, usModelId, oldParentTxdId))
+                    return false;
+
                 if (oldParentTxdId == usParentTxdId)
                     bXferredToParent = true;
             }
@@ -3022,20 +3188,11 @@ namespace
                     }
 
                     // Case 2: Another model's slot - restore to parent
-                    RestoreModelTexturesToParent(pModelInfo, usModelId, usCurrentTxdId, usParentTxdId);
-
                     if (pModelInfo->GetTextureDictionaryID() != usParentTxdId)
                     {
-                        CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                        if (pInterface)
-                        {
-                            size_t nExtra = pInterface->usNumberOfRefs;
-                            if (pInterface->pRwObject)
-                                nExtra++;
-                            for (size_t i = 0; i < nExtra; i++)
-                                CTxdStore_AddRef(usCurrentTxdId);
-                        }
-                        pModelInfo->SetTextureDictionaryID(usParentTxdId);
+                        if (!TryRestoreAndSwitchModelToTxd(pModelInfo, usModelId, usCurrentTxdId, usParentTxdId))
+                            return false;
+
                         bXferredToParent = true;
                     }
                 }
@@ -3180,21 +3337,13 @@ namespace
                 if (!bParentTxdLoaded && pModelInfo->IsLoaded())
                     pParentInfo->Request(NON_BLOCKING, "EnsureIsolatedTxdForRequestedModel-ParentTXD");
 
-                if (usCurrentTxdId != 0 && usCurrentTxdId != usParentTxdId)
-                    RestoreModelTexturesToParent(pModelInfo, usModelId, usCurrentTxdId, usParentTxdId);
-
                 if (pModelInfo->GetTextureDictionaryID() != usParentTxdId)
                 {
-                    CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                    if (pInterface)
+                    if (!TryRestoreAndSwitchModelToTxd(pModelInfo, usModelId, usCurrentTxdId, usParentTxdId))
                     {
-                        size_t nExtra = pInterface->usNumberOfRefs;
-                        if (pInterface->pRwObject)
-                            nExtra++;
-                        for (size_t i = 0; i < nExtra; i++)
-                            CTxdStore_AddRef(pModelInfo->GetTextureDictionaryID());
+                        MarkIsolationDenied();
+                        return false;
                     }
-                    pModelInfo->SetTextureDictionaryID(usParentTxdId);
                 }
 
                 MarkIsolationDenied();
@@ -3225,16 +3374,9 @@ namespace
         const unsigned short usModelTxdId = pModelInfo->GetTextureDictionaryID();
         if (usModelTxdId != usParentTxdId)
         {
-            CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-            if (pInterface)
-            {
-                size_t nExtra = pInterface->usNumberOfRefs;
-                if (pInterface->pRwObject)
-                    nExtra++;
-                for (size_t i = 0; i < nExtra; i++)
-                    CTxdStore_AddRef(usModelTxdId);
-            }
-            pModelInfo->SetTextureDictionaryID(usParentTxdId);
+            if (!TryRestoreAndSwitchModelToTxd(pModelInfo, usModelId, usModelTxdId, usParentTxdId))
+                return false;
+
             bXferredToParent = true;
         }
 
@@ -3478,18 +3620,9 @@ namespace
                 // doesn't underflow. SA's AddRef may have bumped usNumberOfRefs after
                 // isolation without adding TXD refs, creating the same shortfall as
                 // the allocation path.
-                {
-                    CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                    if (pInterface)
-                    {
-                        size_t nExtra = pInterface->usNumberOfRefs;
-                        if (pInterface->pRwObject)
-                            nExtra++;
-                        for (size_t i = 0; i < nExtra; i++)
-                            CTxdStore_AddRef(oldTxdId);
-                    }
-                }
-                pModelInfo->SetTextureDictionaryID(oldParentTxdId);
+                if (!TrySwitchModelToTxd(pModelInfo, usModelId, oldParentTxdId))
+                    return false;
+
                 if (oldParentTxdId == usParentTxdId)
                     bXferredToParent = true;
             }
@@ -3839,7 +3972,11 @@ namespace
             AddVehicleTxdFallback(txdTextureMap);
 
         if (txdTextureMap.empty())
+        {
+            AddReportLog(9402, SString("RebindLoadedModelToCurrentTxd: empty texture map for model %u TXD %u (chain length %u)", pModelInfo->GetModel(),
+                                       usTxdId, static_cast<unsigned int>(chainLen)));
             return;
+        }
 
         eModelInfoType modelType = pModelInfo->GetModelType();
         if (modelType == eModelInfoType::UNKNOWN)
@@ -4007,16 +4144,11 @@ void CRenderWareSA::ProcessPendingIsolatedModels(bool bBlockingParentLoad)
             // Try to revert model TXD if parent is valid
             if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(parentTxdId) != nullptr)
             {
-                CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                if (pInterface)
+                if (!TryRestoreAndSwitchModelToTxd(pModelInfo, usModelId, childTxdId, parentTxdId))
                 {
-                    size_t nExtra = pInterface->usNumberOfRefs;
-                    if (pInterface->pRwObject)
-                        nExtra++;
-                    for (size_t i = 0; i < nExtra; i++)
-                        CTxdStore_AddRef(childTxdId);
+                    itPendingTime->second = uiNow;
+                    continue;
                 }
-                pModelInfo->SetTextureDictionaryID(parentTxdId);
             }
 
             // If model still using a fully set-up isolated TXD, don't orphan it yet.
@@ -4173,16 +4305,8 @@ void CRenderWareSA::ProcessPendingIsolatedModels(bool bBlockingParentLoad)
             // Try to revert model TXD if parent is valid
             if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(parentTxdId) != nullptr)
             {
-                CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                if (pInterface)
-                {
-                    size_t nExtra = pInterface->usNumberOfRefs;
-                    if (pInterface->pRwObject)
-                        nExtra++;
-                    for (size_t i = 0; i < nExtra; i++)
-                        CTxdStore_AddRef(childTxdId);
-                }
-                pModelInfo->SetTextureDictionaryID(parentTxdId);
+                if (!TryRestoreAndSwitchModelToTxd(pModelInfo, usModelId, childTxdId, parentTxdId))
+                    continue;
             }
 
             // If model still using a valid isolated TXD, don't orphan it - wait for natural cleanup
@@ -4209,8 +4333,11 @@ void CRenderWareSA::ProcessPendingIsolatedModels(bool bBlockingParentLoad)
         const unsigned short usCurrentParentTxdId = pCurrentParentInfo ? pCurrentParentInfo->GetTextureDictionaryID() : 0;
         if (usCurrentParentTxdId == 0 || usCurrentParentTxdId != parentTxdId)
         {
-            if (usCurrentParentTxdId != 0)
-                RestoreModelTexturesToParent(pModelInfo, usModelId, childTxdId, usCurrentParentTxdId);
+            if (usCurrentParentTxdId != 0 && pModelInfo->GetTextureDictionaryID() == childTxdId)
+            {
+                if (!TryRestoreAndSwitchModelToTxd(pModelInfo, usModelId, childTxdId, usCurrentParentTxdId))
+                    continue;
+            }
 
             ClearIsolatedTxdLastUse(usModelId);
             ClearPendingIsolatedModel(usModelId);
@@ -4226,19 +4353,6 @@ void CRenderWareSA::ProcessPendingIsolatedModels(bool bBlockingParentLoad)
             if (bInserted && ShouldLog(g_uiLastOrphanLogTime))
                 AddReportLog(9401, SString("ProcessPendingIsolatedModels: Orphaned isolated TXD %u (parent changed)", childTxdId));
 
-            if (usCurrentParentTxdId != 0 && pModelInfo->GetTextureDictionaryID() != usCurrentParentTxdId)
-            {
-                CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                if (pInterface)
-                {
-                    size_t nExtra = pInterface->usNumberOfRefs;
-                    if (pInterface->pRwObject)
-                        nExtra++;
-                    for (size_t i = 0; i < nExtra; i++)
-                        CTxdStore_AddRef(pModelInfo->GetTextureDictionaryID());
-                }
-                pModelInfo->SetTextureDictionaryID(usCurrentParentTxdId);
-            }
             continue;
         }
 
@@ -4262,16 +4376,8 @@ void CRenderWareSA::ProcessPendingIsolatedModels(bool bBlockingParentLoad)
             // Try to revert model TXD if parent is valid
             if (pModelInfo->GetTextureDictionaryID() == childTxdId && CTxdStore_GetTxd(parentTxdId) != nullptr)
             {
-                CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                if (pInterface)
-                {
-                    size_t nExtra = pInterface->usNumberOfRefs;
-                    if (pInterface->pRwObject)
-                        nExtra++;
-                    for (size_t i = 0; i < nExtra; i++)
-                        CTxdStore_AddRef(childTxdId);
-                }
-                pModelInfo->SetTextureDictionaryID(parentTxdId);
+                if (!TryRestoreAndSwitchModelToTxd(pModelInfo, usModelId, childTxdId, parentTxdId))
+                    continue;
             }
 
             // If model still using a valid isolated TXD, don't orphan it - wait for natural cleanup
@@ -5429,16 +5535,11 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     // so the model doesn't remain pointed at a dead/disowned slot.
                     if (pModelInfo->GetTextureDictionaryID() == usCurrentTxdId)
                     {
-                        CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                        if (pInterface)
+                        if (!TryRestoreAndSwitchModelToTxd(pModelInfo, usModelId, usCurrentTxdId, usParentTxdId))
                         {
-                            size_t nExtra = pInterface->usNumberOfRefs;
-                            if (pInterface->pRwObject)
-                                nExtra++;
-                            for (size_t i = 0; i < nExtra; i++)
-                                CTxdStore_AddRef(usCurrentTxdId);
+                            QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                            return false;
                         }
-                        pModelInfo->SetTextureDictionaryID(usParentTxdId);
                     }
 
                     CTxdStore_RemoveRef(usParentTxdId);
@@ -5564,16 +5665,11 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                     }
                     if (pModelInfo->GetTextureDictionaryID() == usModelTxdId)
                     {
-                        CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-                        if (pInterface)
+                        if (!TryRestoreAndSwitchModelToTxd(pModelInfo, usModelId, usModelTxdId, usParentTxdId))
                         {
-                            size_t nExtra = pInterface->usNumberOfRefs;
-                            if (pInterface->pRwObject)
-                                nExtra++;
-                            for (size_t i = 0; i < nExtra; i++)
-                                CTxdStore_AddRef(usModelTxdId);
+                            QueuePendingReplacement(usModelId, pReplacementTextures, 0, 0);
+                            return false;
                         }
-                        pModelInfo->SetTextureDictionaryID(usParentTxdId);
                     }
                     CTxdStore_RemoveRef(usParentTxdId);
                     ClearIsolatedTxdLastUse(usModelId);
@@ -6166,7 +6262,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
                 const std::size_t nameLen = strnlen(pExistingTexture->name, RW_TEXTURE_NAME_LENGTH);
                 if (nameLen < RW_TEXTURE_NAME_LENGTH)
                 {
-                    auto itByName = pInfo->originalTexturesByName.find(std::string(pExistingTexture->name, nameLen));
+                    auto itByName = pInfo->originalTexturesByName.find(LowercaseTextureName(pExistingTexture->name, nameLen));
                     if (itByName != pInfo->originalTexturesByName.end() && itByName->second)
                     {
                         RwTexture* pFoundOriginal = itByName->second;
@@ -6862,6 +6958,14 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         }
 
         RemoveReplacementFromTracking(pReplacementTextures);
+
+        // Save master textures for deferred destruction, same as ModelInfoTXDDeferCleanup.
+        // Without this, masters leak permanently after session boundary.
+        for (RwTexture* pMaster : pReplacementTextures->textures)
+        {
+            if (pMaster && g_LeakedMasterTextures.insert(pMaster).second && pMaster->raster)
+                g_GlobalMtaRasterCache.insert(pMaster->raster);
+        }
 
         pReplacementTextures->textures.clear();
         pReplacementTextures->perTxdList.clear();
