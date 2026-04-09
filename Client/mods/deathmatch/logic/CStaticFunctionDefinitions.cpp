@@ -1073,7 +1073,7 @@ bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, CStrin
     if (isSynced && !Entity.IsLocalEntity())
     {
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-        // Write element ID, name length and name for server-side removal handling
+        // Write element ID and name for server-side removal handling
         pBitStream->Write(Entity.GetID());
         pBitStream->WriteString(name.ToCString());
 
