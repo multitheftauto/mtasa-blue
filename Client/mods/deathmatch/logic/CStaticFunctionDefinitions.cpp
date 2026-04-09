@@ -1075,7 +1075,7 @@ bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, CStrin
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
         // Write element ID and name for server-side removal handling
         pBitStream->Write(Entity.GetID());
-        pBitStream->WriteString(name.ToCString());
+        pBitStream->WriteString(name.ToString());
 
         // Send RPC and deallocate
         g_pClientGame->GetNetAPI()->RPC(REMOVE_ELEMENT_DATA_RPC, pBitStream);

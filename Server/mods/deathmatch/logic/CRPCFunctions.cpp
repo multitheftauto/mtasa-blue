@@ -391,9 +391,10 @@ void CRPCFunctions::RemoveElementData(NetBitStreamInterface& bitStream)
         return;
     }
 
+    const CStringName      customDataNameId(customDataName);
     ESyncType              lastSyncType = ESyncType::BROADCAST;
     eCustomDataClientTrust clientChangesMode{};
-    element->GetCustomData(customDataName.c_str(), false, &lastSyncType, &clientChangesMode);
+    element->GetCustomData(customDataNameId, false, &lastSyncType, &clientChangesMode);
 
     const bool changesAllowed = clientChangesMode == eCustomDataClientTrust::UNSET ? !g_pGame->GetConfig()->IsElementDataWhitelisted()
                                                                                    : clientChangesMode == eCustomDataClientTrust::ALLOW;
@@ -410,7 +411,7 @@ void CRPCFunctions::RemoveElementData(NetBitStreamInterface& bitStream)
         return;
     }
 
-    if (element->DeleteCustomData(customDataName.c_str(), m_pSourcePlayer))
+    if (element->DeleteCustomData(customDataNameId, m_pSourcePlayer))
     {
         if (lastSyncType != ESyncType::LOCAL)
         {
@@ -424,14 +425,14 @@ void CRPCFunctions::RemoveElementData(NetBitStreamInterface& bitStream)
                 m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *outBitStream.pBitStream), m_pSourcePlayer);
             else
                 m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *outBitStream.pBitStream), element,
-                                                          customDataName.c_str(), m_pSourcePlayer);
+                                                          customDataNameId.ToCString(), m_pSourcePlayer);
 
             CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(customDataName.c_str(), m_pPlayerManager->Count(),
                                                                                      outBitStream.pBitStream->GetNumberOfBytesUsed());
         }
 
         if (lastSyncType == ESyncType::SUBSCRIBE)
-            m_pPlayerManager->ClearElementData(element, customDataName.c_str());
+            m_pPlayerManager->ClearElementData(element, customDataNameId);
     }
 
     UNCLOCK("NetServerPulse::RPC", "RemoveElementData");
