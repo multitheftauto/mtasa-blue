@@ -42,11 +42,7 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     // triggers Remove() when m_dwReferences drops to 0, unloading the model
     // every frame for dxDrawModel3D models with no persistent MTA-side reference
     // -- causing visible flickering).
-    using BaseModelInfoMethod = void(__thiscall*)(CBaseModelInfoSAInterface*);
-    auto CBaseModelInfo_AddRef = reinterpret_cast<BaseModelInfoMethod>(FUNC_AddRef);
-    auto CBaseModelInfo_RemoveRef = reinterpret_cast<BaseModelInfoMethod>(FUNC_RemoveRef);
-
-    CBaseModelInfo_AddRef(pModelInfoSAInterface);
+    pModelInfoSAInterface->AddRef();
 
     RwFrame* pFrame = RpGetFrame(pRwObject);
 
@@ -78,9 +74,9 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     }
     catch (...)
     {
-        CBaseModelInfo_RemoveRef(pModelInfoSAInterface);
+        pModelInfoSAInterface->RemoveRef();
         throw;
     }
 
-    CBaseModelInfo_RemoveRef(pModelInfoSAInterface);
+    pModelInfoSAInterface->RemoveRef();
 }
