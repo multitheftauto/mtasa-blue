@@ -268,6 +268,7 @@ namespace
 
     RwTexDictionary* g_pCachedVehicleTxd = nullptr;
     RwListEntry*     g_pCachedVehicleTxdListHead = nullptr;  // textures.root.next at cache time; detects texture rebuild at same TXD address
+    RwListEntry*     g_pCachedVehicleTxdListTail = nullptr;  // textures.root.prev at cache time; detects changes at list tail
     TxdTextureMap    g_CachedVehicleTxdMap;
     unsigned short   g_usVehicleTxdSlotId = 0xFFFF;
 
@@ -370,7 +371,7 @@ namespace
         return nullptr;
     }
 
-    void                   BuildTxdTextureMapFast(RwTexDictionary* pTxd, TxdTextureMap& outMap);
+    bool                   BuildTxdTextureMapFast(RwTexDictionary* pTxd, TxdTextureMap& outMap);
     static void            AddVehicleTxdFallback(TxdTextureMap& outMap);
     static bool            ShouldUseVehicleTxdFallback(unsigned short usModelId);
     static bool            IsReadableTexture(RwTexture* pTexture);
@@ -417,17 +418,21 @@ namespace
     constexpr std::size_t   MAX_PENDING_ISOLATED_PER_TICK = 64;
 
     // Per-TXD texture map cache to avoid repeated linked list iteration.
-    // Keyed by TXD slot ID; validated by TXD pointer and texture list head
-    // (the list head catches TXD rebuilds at the same pool address).
+    // Keyed by TXD slot ID; validated by TXD pointer, list head, and list tail
+    // (head/tail catch TXD rebuilds and texture adds/removes at either end).
     struct SCachedTxdTextureMap
     {
         RwTexDictionary* pTxd = nullptr;       // TXD pointer at cache time (detects reload/slot reuse)
-        RwListEntry*     pListHead = nullptr;  // textures.root.next at cache time (detects texture rebuild at same TXD address)
+        RwListEntry*     pListHead = nullptr;  // textures.root.next at cache time (detects head change)
+        RwListEntry*     pListTail = nullptr;  // textures.root.prev at cache time (detects tail change)
         TxdTextureMap    textureMap;           // Cached texture name > texture map
 
         bool IsValid(RwTexDictionary* pCurrentTxd) const noexcept
         {
-            if (pTxd == nullptr || pTxd != pCurrentTxd || pListHead != pCurrentTxd->textures.root.next)
+            if (pTxd == nullptr || pTxd != pCurrentTxd)
+                return false;
+
+            if (pListHead != pCurrentTxd->textures.root.next || pListTail != pCurrentTxd->textures.root.prev)
                 return false;
 
             if (pListHead && pListHead != &pCurrentTxd->textures.root)
@@ -458,7 +463,7 @@ namespace
         g_TxdTextureMapCache.swap(temp);
     }
 
-    // Build or retrieve cached texture map and merge into output map
+    // Build or retrieve cached texture map and merge into output map.
     // Use when building combined maps (parent + child + vehicle fallback)
     static void MergeCachedTxdTextureMap(unsigned short usTxdId, RwTexDictionary* pTxd, TxdTextureMap& outMap)
     {
@@ -474,16 +479,25 @@ namespace
             return;
         }
 
+        // Rebuild: reset cached metadata before populating
         entry.pTxd = pTxd;
         entry.pListHead = pTxd->textures.root.next;
+        entry.pListTail = pTxd->textures.root.prev;
         // Use swap idiom to ensure complete memory release
         // (avoids reconnect leaks; safer than .clear() on potentially corrupted maps)
         TxdTextureMap temp;
         entry.textureMap.swap(temp);
-        BuildTxdTextureMapFast(pTxd, entry.textureMap);
+        bool bComplete = BuildTxdTextureMapFast(pTxd, entry.textureMap);
 
         for (const auto& kv : entry.textureMap)
             outMap[kv.first] = kv.second;
+
+        // Don't keep a partial map in the cache.. next call will rebuild from scratch
+        if (!bComplete)
+        {
+            g_TxdTextureMapCache.erase(usTxdId);
+            AddReportLog(9401, SString("BuildTxdTextureMapFast: partial walk for TXD %u, cache entry discarded", usTxdId));
+        }
     }
 
     // Remove pReplacementTextures from all usedByReplacements vectors in the map.
@@ -1235,7 +1249,10 @@ namespace
 
         const bool bProcessedAll = (pNode == pRoot);
         if (!bProcessedAll)
+        {
+            AddReportLog(9401, SString("OrphanTxdTexturesBounded: bailed after %u entries, TXD list too large or corrupt", (unsigned int)uiCount));
             return false;
+        }
 
         for (RwTexture* pTexture : vecTexturesToOrphan)
         {
@@ -2468,17 +2485,19 @@ namespace
         return true;
     }
 
-    // Fast name->texture map builder
-    void BuildTxdTextureMapFast(RwTexDictionary* pTxd, TxdTextureMap& outMap)
+    // Fast name->texture map builder. Returns true if the full list was walked,
+    // false if the walk bailed early (corrupt list, limit hit, null node).
+    // Callers that cache the result must not cache incomplete maps.
+    bool BuildTxdTextureMapFast(RwTexDictionary* pTxd, TxdTextureMap& outMap)
     {
         if (!pTxd)
-            return;
+            return false;
 
         RwListEntry* const pRoot = &pTxd->textures.root;
         RwListEntry*       pNode = pRoot->next;
 
         if (pNode == nullptr || pNode == pRoot)
-            return;
+            return true;
 
         if (outMap.empty())
             outMap.reserve(32);
@@ -2489,19 +2508,21 @@ namespace
         while (pNode != pRoot)
         {
             if (++count > kMaxTextures)
-                return;
+                return false;
 
             RwTexture* pTex = reinterpret_cast<RwTexture*>(reinterpret_cast<char*>(pNode) - offsetof(RwTexture, TXDList));
             if (!pTex)
-                return;
+                return false;
 
             if (strnlen(pTex->name, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
                 outMap[pTex->name] = pTex;
 
             pNode = pNode->next;
             if (!pNode)
-                return;
+                return false;
         }
+
+        return true;
     }
 
     RwTexDictionary* GetVehicleTxd()
@@ -2519,15 +2540,16 @@ namespace
         if (!pVehicleTxd)
             return;
 
-        // Check both TXD pointer and its texture list head.
+        // Check TXD pointer, texture list head and tail.
         // Streaming can destroy and reload a TXD at the same address (pool/allocator reuse),
         // which leaves the cache with dangling texture name pointers.
         RwListEntry* pListHead = pVehicleTxd->textures.root.next;
+        RwListEntry* pListTail = pVehicleTxd->textures.root.prev;
         RwTexture*   pFirstTex = nullptr;
         if (pListHead && pListHead != &pVehicleTxd->textures.root)
             pFirstTex = (RwTexture*)((char*)pListHead - offsetof(RwTexture, TXDList));
 
-        bool bInvalidate = (pVehicleTxd != g_pCachedVehicleTxd || pListHead != g_pCachedVehicleTxdListHead);
+        bool bInvalidate = (pVehicleTxd != g_pCachedVehicleTxd || pListHead != g_pCachedVehicleTxdListHead || pListTail != g_pCachedVehicleTxdListTail);
 
         if (!bInvalidate && pFirstTex && !g_CachedVehicleTxdMap.empty())
         {
@@ -2543,8 +2565,14 @@ namespace
             g_CachedVehicleTxdMap.clear();
             g_pCachedVehicleTxd = pVehicleTxd;
             g_pCachedVehicleTxdListHead = pListHead;
+            g_pCachedVehicleTxdListTail = pListTail;
             g_usVehicleTxdSlotId = 0xFFFF;
-            BuildTxdTextureMapFast(pVehicleTxd, g_CachedVehicleTxdMap);
+            if (!BuildTxdTextureMapFast(pVehicleTxd, g_CachedVehicleTxdMap))
+            {
+                // Incomplete build - use what we have but don't keep caching it
+                g_pCachedVehicleTxd = nullptr;
+                AddReportLog(9401, "BuildTxdTextureMapFast: partial walk for vehicle TXD, cache disabled");
+            }
         }
 
         for (const auto& entry : g_CachedVehicleTxdMap)
@@ -5058,6 +5086,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                     g_bInTxdReapply = true;
 
                     RwTexDictionary* txdAtStart = pCurrentTxd;
+                    bool             bTxdChangedMidReapply = false;
 
                     for (auto& reapplyEntry : replacementsToReapply)
                     {
@@ -5069,13 +5098,19 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                         if (!modelIds.empty())
                         {
                             if (CTxdStore_GetTxd(usTxdId) != txdAtStart)
+                            {
+                                bTxdChangedMidReapply = true;
                                 break;
+                            }
 
                             size_t uiAppliedIndex = modelIds.size();
                             for (size_t i = 0; i < modelIds.size(); ++i)
                             {
                                 if (CTxdStore_GetTxd(usTxdId) != txdAtStart)
+                                {
+                                    bTxdChangedMidReapply = true;
                                     break;
+                                }
 
                                 unsigned short usTestModelId = modelIds[i];
                                 const uint32_t uiStartSerial = g_uiIsolationDeniedSerial;
@@ -5091,10 +5126,16 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                                     break;
                             }
 
+                            if (bTxdChangedMidReapply)
+                                break;
+
                             if (bAppliedToFirstModel)
                             {
                                 if (CTxdStore_GetTxd(usTxdId) != txdAtStart)
+                                {
+                                    bTxdChangedMidReapply = true;
                                     break;
+                                }
 
                                 for (size_t i = 0; i < modelIds.size(); ++i)
                                 {
@@ -5109,6 +5150,19 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                                 }
                             }
                         }
+                    }
+
+                    // Queue un-applied replacements when a TXD change forced erly exit
+                    if (bTxdChangedMidReapply)
+                    {
+                        for (auto& remaining : replacementsToReapply)
+                        {
+                            if (!remaining.first)
+                                continue;
+                            for (unsigned short usModelId : remaining.second)
+                                QueuePendingReplacement(usModelId, remaining.first, 0, 0);
+                        }
+                        AddReportLog(9401, SString("GetModelTexturesInfo: TXD %u changed mid-reapply, queued remaining replacements", usTxdId));
                     }
 
                     g_bInTxdReapply = bPrevInReapply;
@@ -7971,6 +8025,7 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
 
     g_pCachedVehicleTxd = nullptr;
     g_pCachedVehicleTxdListHead = nullptr;
+    g_pCachedVehicleTxdListTail = nullptr;
     g_CachedVehicleTxdMap = TxdTextureMap{};
     g_usVehicleTxdSlotId = 0xFFFF;
     ClearTxdTextureMapCache();
