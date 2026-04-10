@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <cstdint>
 using std::list;
 
 void* CClientStreamer::pAddingElement = NULL;
@@ -375,6 +376,12 @@ bool CClientStreamer::IsActiveElement(CClientStreamElement* pElement)
 
 void CClientStreamer::Restream(bool bMovedFar)
 {
+    // Avoid swap ping-pong when two candidates are almost the same distance.
+    // Distances are squared, so compare against squared hysteresis too.
+    constexpr float         swapHysteresisDistanceSq = 10.0f * 10.0f;
+    constexpr std::uint32_t minStreamInDelayAfterOutMs = 1200u;
+    const std::uint32_t     currentTime = static_cast<std::uint32_t>(CClientTime::GetTime());
+
     // Limit distance stream in/out rate
     // Vehicles might have to ignore this to reduce blocking loads elsewhere.
     int iMaxOut = 6;
@@ -524,6 +531,10 @@ void CClientStreamer::Restream(bool bMovedFar)
                         continue;
                 }
 
+                // Prevent rapid in/out thrashing of the same element.
+                if (!bMovedFar && (currentTime - pElement->GetLastStreamOutTime()) < minStreamInDelayAfterOutMs)
+                    continue;
+
                 // Not room to stream in more elements?
                 if (bReachedLimit)
                 {
@@ -571,7 +582,7 @@ void CClientStreamer::Restream(bool bMovedFar)
             // See if ClosestStreamedOut is nearer than FurthestStreamedIn
             CClientStreamElement* pFurthestStreamedIn = FurthestStreamedInList[iFurthestStreamedInIndex];
             CClientStreamElement* pClosestStreamedOut = ClosestStreamedOutList[uiClosestStreamedOutIndex];
-            if (pClosestStreamedOut->GetExpDistance() >= pFurthestStreamedIn->GetExpDistance())
+            if ((pClosestStreamedOut->GetExpDistance() + swapHysteresisDistanceSq) >= pFurthestStreamedIn->GetExpDistance())
                 break;
 
             // Stream out FurthestStreamedIn candidate if possible
@@ -587,6 +598,9 @@ void CClientStreamer::Restream(bool bMovedFar)
             // Stream in ClosestStreamedOut candidate if possible
             if (!ReachedLimit())
             {
+                if (!bMovedFar && (currentTime - pClosestStreamedOut->GetLastStreamOutTime()) < minStreamInDelayAfterOutMs)
+                    continue;
+
                 // Stream in the new element. No need to do it instantly unless moved from far away.
                 pClosestStreamedOut->InternalStreamIn(bMovedFar);
                 iMaxIn--;

@@ -359,6 +359,7 @@ protected:
     static std::unordered_map<DWORD, unsigned short>                            ms_OriginalObjectPropertiesGroups;
     static std::unordered_map<DWORD, std::pair<float, float>>                   ms_VehicleModelDefaultWheelSizes;
     static std::map<unsigned short, int>                                        ms_DefaultTxdIDMap;
+    static std::uint32_t                                                        ms_uiTxdAssignmentGeneration;
     SVehicleSupportedUpgrades                                                   m_ModelSupportedUpgrades;
     static void                                                                 ClearModelDefaults(DWORD modelId);
 
@@ -390,41 +391,42 @@ public:
 
     char* GetNameIfVehicle();
 
-    BYTE               GetVehicleType() const noexcept;
-    void               Request(EModelRequestType requestType, const char* szTag);
-    void               Remove();
-    bool               UnloadUnused();
-    bool               IsLoaded();
-    bool               DoIsLoaded();
-    unsigned short     GetFlags();
-    unsigned short     GetOriginalFlags();
-    void               SetIdeFlags(unsigned int uiFlags);
-    void               SetIdeFlag(eModelIdeFlag eIdeFlag, bool bState);
-    bool               GetIdeFlag(eModelIdeFlag eIdeFlag);
-    void               SetFlags(unsigned short usFlags);
-    static void        StaticResetFlags();
-    CBoundingBox*      GetBoundingBox();
-    [[nodiscard]] bool IsCollisionLoaded() const noexcept;
-    [[nodiscard]] bool IsRwObjectLoaded() const noexcept;
-    void               WaitForModelFullyLoaded(std::chrono::milliseconds timeout);
-    bool               IsValid();
-    bool               IsAllocatedInArchive() const noexcept;
-    float              GetDistanceFromCentreOfMassToBaseOfModel();
-    unsigned short     GetTextureDictionaryID();
-    void               SetTextureDictionaryID(unsigned short usID);
-    void               ResetTextureDictionaryID();
-    static void        StaticResetTextureDictionaries();
-    float              GetLODDistance();
-    float              GetOriginalLODDistance();
-    void               SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
-    static void        StaticResetLodDistances();
-    void               RestreamIPL();
-    static void        StaticFlushPendingRestreamIPL();
-    static void        StaticSetHooks();
-    bool               GetTime(char& cHourOn, char& cHourOff);
-    bool               SetTime(char cHourOn, char cHourOff);
-    static void        StaticResetModelTimes();
-    static void        ClearModelDefaults();
+    BYTE                 GetVehicleType() const noexcept;
+    void                 Request(EModelRequestType requestType, const char* szTag);
+    void                 Remove();
+    bool                 UnloadUnused();
+    bool                 IsLoaded();
+    bool                 DoIsLoaded();
+    unsigned short       GetFlags();
+    unsigned short       GetOriginalFlags();
+    void                 SetIdeFlags(unsigned int uiFlags);
+    void                 SetIdeFlag(eModelIdeFlag eIdeFlag, bool bState);
+    bool                 GetIdeFlag(eModelIdeFlag eIdeFlag);
+    void                 SetFlags(unsigned short usFlags);
+    static void          StaticResetFlags();
+    CBoundingBox*        GetBoundingBox();
+    [[nodiscard]] bool   IsCollisionLoaded() const noexcept;
+    [[nodiscard]] bool   IsRwObjectLoaded() const noexcept;
+    void                 WaitForModelFullyLoaded(std::chrono::milliseconds timeout);
+    bool                 IsValid();
+    bool                 IsAllocatedInArchive() const noexcept;
+    float                GetDistanceFromCentreOfMassToBaseOfModel();
+    unsigned short       GetTextureDictionaryID();
+    void                 SetTextureDictionaryID(unsigned short usID);
+    void                 ResetTextureDictionaryID();
+    static void          StaticResetTextureDictionaries();
+    static std::uint32_t GetTxdAssignmentGeneration() noexcept { return ms_uiTxdAssignmentGeneration; }
+    float                GetLODDistance();
+    float                GetOriginalLODDistance();
+    void                 SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
+    static void          StaticResetLodDistances();
+    void                 RestreamIPL();
+    static void          StaticFlushPendingRestreamIPL();
+    static void          StaticSetHooks();
+    bool                 GetTime(char& cHourOn, char& cHourOff);
+    bool                 SetTime(char cHourOn, char cHourOff);
+    static void          StaticResetModelTimes();
+    static void          ClearModelDefaults();
 
     void        SetAlphaTransparencyEnabled(bool bEnabled);
     bool        IsAlphaTransparencyEnabled();
@@ -432,6 +434,8 @@ public:
     static void StaticResetAlphaTransparencies();
 
     void ModelAddRef(EModelRequestType requestType, const char* szTag);
+    void ModelAddRefNonBlocking(const char* szTag);
+    bool TryAddRefIfLoaded();
     int  GetRefCount();
     void RemoveRef(bool bRemoveExtraGTARef = false);
     bool ForceUnload();
@@ -485,6 +489,7 @@ public:
 
     // CModelInfoSA methods
     void         MakePedModel(const char* szTexture);
+    void         MakePedModel(ushort usParentID);
     void         MakeObjectModel(ushort usBaseModelID);
     void         MakeObjectDamageableModel(std::uint16_t usBaseModelID) override;
     void         MakeVehicleAutomobile(ushort usBaseModelID);

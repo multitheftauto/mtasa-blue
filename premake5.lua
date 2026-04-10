@@ -194,10 +194,14 @@ workspace "MTASA"
 		include "vendor/libspeex"
 		include "vendor/detours"
 		include "vendor/lunasvg"
+		include "vendor/googletest"
 
 		if MTA_MAETRO then
 			include "vendor/maetro32"
 		end
+
+		group "Tests"
+		include "Tests/client"
 	end
 
 	filter {}
