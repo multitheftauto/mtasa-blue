@@ -13,6 +13,7 @@
 
 #include "StdInc.h"
 #include <array>
+#include <cctype>
 #include <cstddef>
 #include <cstring>
 #include <unordered_map>
@@ -387,9 +388,6 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
         std::memcpy(&chunkType, headerData.data(), sizeof(chunkType));
         std::memcpy(&chunkSize, headerData.data() + 4, sizeof(chunkSize));
 
-        if (chunkType != RW_CHUNK_TYPE_DFF)
-            return nullptr;
-
         if (chunkSize > MAX_SANE_CHUNK_SIZE)
             return nullptr;
 
@@ -404,9 +402,6 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
 
         std::memcpy(&chunkType, buffer.data(), sizeof(chunkType));
         std::memcpy(&chunkSize, buffer.data() + 4, sizeof(chunkSize));
-
-        if (chunkType != RW_CHUNK_TYPE_DFF)
-            return nullptr;
 
         if (chunkSize > MAX_SANE_CHUNK_SIZE)
             return nullptr;
@@ -620,7 +615,8 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
 // to reference matching textures from the new TXD by name lookup.
 namespace
 {
-    // Hash functor for texture name lookup (bounded to RW_TEXTURE_NAME_LENGTH)
+    // Hash functor for texture name lookup (bounded to RW_TEXTURE_NAME_LENGTH).
+    // Case-insensitive to match GTA:SA's RwTexDictionaryFindNamedTexture (0x7F39F0).
     struct TxdTextureNameHash
     {
         static constexpr std::size_t HASH_INIT = 2166136261u;
@@ -633,7 +629,7 @@ namespace
             std::size_t h = HASH_INIT;
             for (std::size_t i = 0; i < RW_TEXTURE_NAME_LENGTH && s[i]; ++i)
             {
-                h ^= static_cast<unsigned char>(s[i]);
+                h ^= static_cast<unsigned char>(std::tolower(static_cast<unsigned char>(s[i])));
                 h *= HASH_MULTIPLIER;
             }
             return h;
@@ -648,7 +644,7 @@ namespace
                 return true;
             if (!a || !b)
                 return false;
-            return strncmp(a, b, RW_TEXTURE_NAME_LENGTH) == 0;
+            return _strnicmp(a, b, RW_TEXTURE_NAME_LENGTH) == 0;
         }
     };
 
@@ -705,11 +701,15 @@ namespace
         }
 
         // Iter from root (outermost parent) to child so child textures win on name conflict.
+        bool bChainComplete = true;
         for (std::size_t i = chainLen; i > 0; --i)
         {
             RwTexDictionary* pChainTxd = CTxdStore_GetTxd(chain[i - 1]);
             if (!pChainTxd)
+            {
+                bChainComplete = false;
                 continue;
+            }
 
             std::vector<RwTexture*> txdTextures;
             CRenderWareSA::GetTxdTextures(txdTextures, pChainTxd);
@@ -724,6 +724,12 @@ namespace
                     result[name] = pTexture;
             }
         }
+
+        // A partial chain means some ancestors were not loaded, so the map
+        // is missing their textures. Return empty to prevent partial rebinds
+        // that leave unresolved textures white.
+        if (!bChainComplete)
+            result.clear();
 
         return result;
     }
@@ -787,6 +793,52 @@ namespace
                 RpMaterialSetTexture(pMaterial, pNewTexture);
         }
     }
+
+    static RwObject* __cdecl RebindTexturesInFrameObjectCB(RwObject* pObject, void* pData)
+    {
+        if (pObject && pObject->type == RP_TYPE_ATOMIC)
+        {
+            auto* pAtomic = reinterpret_cast<RpAtomic*>(pObject);
+            if (pAtomic->clump == nullptr && pAtomic->geometry)
+            {
+                auto* pTxdTextureMap = static_cast<const TxdTextureMap*>(pData);
+                RebindAtomicMaterials(pAtomic, *pTxdTextureMap);
+            }
+        }
+
+        return pObject;
+    }
+
+    static void RebindTexturesInFrameHierarchy(RwFrame* pFrame, const TxdTextureMap& mapTxdTextures, std::vector<RwFrame*>& vecVisitedFrames, int iDepth = 0)
+    {
+        if (!pFrame)
+            return;
+
+        if (iDepth > 128)  // cap recursion depth
+            return;
+
+        for (RwFrame* pVisitedFrame : vecVisitedFrames)
+        {
+            if (pVisitedFrame == pFrame)
+                return;
+        }
+        vecVisitedFrames.push_back(pFrame);
+
+        RwFrameForAllObjects(pFrame, RebindTexturesInFrameObjectCB, const_cast<TxdTextureMap*>(&mapTxdTextures));
+
+        if (!pFrame->child)
+            return;
+
+        RwFrame* pChild = pFrame->child;
+        int      iChildCount = 0;
+        while (pChild)
+        {
+            RebindTexturesInFrameHierarchy(pChild, mapTxdTextures, vecVisitedFrames, iDepth + 1);
+            pChild = pChild->next;
+            if (++iChildCount > 1024)  // guard against corrupt frame linked lists
+                return;
+        }
+    }
 }
 
 void CRenderWareSA::RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usTxdId)
@@ -794,15 +846,24 @@ void CRenderWareSA::RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usT
     if (!pClump)
         return;
 
-    TxdTextureMap txdTextureMap = BuildTxdTextureMap(usTxdId);
-    if (txdTextureMap.empty())
+    TxdTextureMap mapTxdTextures = BuildTxdTextureMap(usTxdId);
+    if (mapTxdTextures.empty())
+    {
+        AddReportLog(9403, SString("RebindClumpTexturesToTxd: empty texture map for TXD %u", usTxdId));
         return;
+    }
 
-    std::vector<RpAtomic*> atomicList;
-    GetClumpAtomicList(pClump, atomicList);
+    std::vector<RpAtomic*> vecAtomics;
+    GetClumpAtomicList(pClump, vecAtomics);
 
-    for (RpAtomic* pAtomic : atomicList)
-        RebindAtomicMaterials(pAtomic, txdTextureMap);
+    for (RpAtomic* pAtomic : vecAtomics)
+        RebindAtomicMaterials(pAtomic, mapTxdTextures);
+
+    if (auto* pRootFrame = reinterpret_cast<RwFrame*>(pClump->object.parent))
+    {
+        std::vector<RwFrame*> vecVisitedFrames;
+        RebindTexturesInFrameHierarchy(pRootFrame, mapTxdTextures, vecVisitedFrames);
+    }
 }
 
 void CRenderWareSA::RebindAtomicTexturesToTxd(RpAtomic* pAtomic, unsigned short usTxdId)
@@ -812,7 +873,10 @@ void CRenderWareSA::RebindAtomicTexturesToTxd(RpAtomic* pAtomic, unsigned short 
 
     TxdTextureMap txdTextureMap = BuildTxdTextureMap(usTxdId);
     if (txdTextureMap.empty())
+    {
+        AddReportLog(9403, SString("RebindAtomicTexturesToTxd: empty texture map for TXD %u", usTxdId));
         return;
+    }
 
     RebindAtomicMaterials(pAtomic, txdTextureMap);
 }
@@ -981,7 +1045,23 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
     auto* pModelData = const_cast<unsigned char*>(reinterpret_cast<const unsigned char*>(buffer.data())) + sizeof(ColModelFileHeader);
 
     // Create a new CColModel
-    auto* pColModel = new CColModelSA();
+    CColModelSA* pColModel = nullptr;
+    try
+    {
+        pColModel = new CColModelSA();
+    }
+    catch (const std::exception& e)
+    {
+        AddReportLog(8625, SString("ReadCOL: Failed to construct col model for '%s': %s", header.name, e.what()));
+        return nullptr;
+    }
+
+    if (!pColModel->IsValid() || !pColModel->GetInterface())
+    {
+        AddReportLog(8626, SString("ReadCOL: Constructed invalid col model for '%s'", header.name));
+        delete pColModel;
+        return nullptr;
+    }
 
     // Load appropriate collision version
     switch (header.version[3])

@@ -69,9 +69,10 @@ namespace
     return exceptionCode == 0xC0000409 || exceptionCode == 0xC0000374;
 }
 
-[[nodiscard]] static bool IsNetcModule(const SString& moduleName) noexcept
+[[nodiscard]] static bool IsHighIntegrityModule(const SString& moduleName) noexcept
 {
-    return _stricmp(PathFindFileNameA(moduleName.c_str()), "netc.dll") == 0;
+    const char* szFileName = PathFindFileNameA(moduleName.c_str());
+    return _stricmp(szFileName, "netc.dll") == 0 || _stricmp(szFileName, "core.dll") == 0 || _stricmp(szFileName, "client.dll") == 0;
 }
 
 struct DebuggerCrashCapture
@@ -249,9 +250,9 @@ static DWORD RunDebuggerLoop(HANDLE hProcess, DWORD processId, DebuggerCrashCapt
                                 // This provides fallback if registry-based resolution fails
                                 capture.moduleInfo = ResolveModuleCrashAddress(capture.threadContext.Eip, hProcess);
 
-                                // Do not collect a dump or store registers for netc.dll crashes.
+                                // Do not collect a dump or store registers for high-integrity module crashes.
                                 // These are deliberate security fastfails.
-                                if (!IsNetcModule(capture.moduleInfo.moduleName))
+                                if (!IsHighIntegrityModule(capture.moduleInfo.moduleName))
                                 {
                                     WriteFailFastDump(hProcess, processId, debugEvent.dwThreadId, &debugEvent.u.Exception.ExceptionRecord,
                                                       &capture.threadContext, capture);
@@ -462,8 +463,10 @@ void InitLocalization(bool bShowErrors)
     if (bInitialized)
         return;
 
+    const SString strLaunchPath = GetLaunchPath();
+
     // Check for core.dll
-    const SString strCoreDLL = PathJoin(GetLaunchPath(), "mta", MTA_DLL_NAME);
+    const SString strCoreDLL = PathJoin(strLaunchPath, "mta", MTA_DLL_NAME);
     if (!FileExists(strCoreDLL))
     {
         if (!bShowErrors)
@@ -499,7 +502,7 @@ void InitLocalization(bool bShowErrors)
                 SString strSrc = PathJoin(strMTASAPath, "mta", SString("%s_mta.dll", xinputModules[i]));
                 if (!FileExists(strSrc))
                 {
-                    strSrc = PathJoin(GetLaunchPath(), "mta", SString("%s_mta.dll", xinputModules[i]));
+                    strSrc = PathJoin(strLaunchPath, "mta", SString("%s_mta.dll", xinputModules[i]));
                 }
                 FileCopy(strSrc, strDest);
             }
@@ -817,27 +820,12 @@ void ConfigureWerDumpPath()
 {
     using WerRegisterAppLocalDumpFn = HRESULT(WINAPI*)(PCWSTR);
 
-    // Get loader's own path directly - this is the install root where Multi Theft Auto.exe lives
-    wchar_t loaderPath[MAX_PATH * 2];
-    DWORD   len = GetModuleFileNameW(NULL, loaderPath, NUMELMS(loaderPath));
-    if (len == 0 || len >= NUMELMS(loaderPath))
-        return;
-
-    // Extract directory from full path
-    wchar_t* lastSlash = wcsrchr(loaderPath, L'\\');
-    if (!lastSlash)
-        lastSlash = wcsrchr(loaderPath, L'/');
-    if (!lastSlash)
-        return;  // No directory separator found - cannot determine install root
-    *lastSlash = L'\0';
-
-    // Sanity check - ensure we have a non-empty directory
-    if (loaderPath[0] == L'\0')
+    const SString strInstallPath = GetInstallPathForLauncher();
+    if (strInstallPath.empty())
         return;
 
     // Build dump path: <install root>\MTA\dumps\private
-    std::wstring dumpPathW = loaderPath;
-    dumpPathW += L"\\MTA\\dumps\\private";
+    std::wstring dumpPathW = FromUTF8(PathJoin(strInstallPath, "MTA", "dumps", "private"));
 
     SString mtaDumpPath = UTF16ToMbUTF8(dumpPathW);
     if (mtaDumpPath.empty())
@@ -1114,6 +1102,7 @@ void HandleDuplicateLaunching()
         ExitProcess(EXIT_ERROR);  // Max Windows command line length
 
     bool bIsCrashDialog = (cmdLineLen > 0 && strstr(lpCmdLine, "install_stage=crashed") != NULL);
+    bool bIsDetachedDialog = bIsCrashDialog;
 
     int recheckTime = 2000;  // 2 seconds recheck time
 
@@ -1122,7 +1111,7 @@ void HandleDuplicateLaunching()
     //
     // Normal behavior: Loop here if mutex is held, try to pass command line to existing instance
     // Crash dialog: Skip this entirely (bIsCrashDialog=true), proceed directly to showing dialog
-    while (!bIsCrashDialog && !CreateSingleInstanceMutex())
+    while (!bIsDetachedDialog && !CreateSingleInstanceMutex())
     {
         if (cmdLineLen > 0)
         {
@@ -1488,7 +1477,7 @@ void CheckDataFiles()
 
             // Check all 3 game roots
             const std::vector<SString> directoriesToCheck = {
-                GetLaunchPath(),                                // MTA installation folder root
+                GetInstallPathForLauncher(),                    // MTA installation folder root
                 strGTAPath,                                     // Real GTA:SA installation folder root. As chosen by DiscoverGTAPath()
                 PathJoin(GetMTADataPath(), "GTA San Andreas"),  // Proxy-mirror that MTA uses for core GTA data files (C:\ProgramData\MTA San Andreas All\<MTA
                                                                 // major version>\GTA San Andreas)
@@ -1586,6 +1575,7 @@ void CheckDataFiles()
         const SString filePath = PathJoin(strMTASAPath, dataFiles[i]);
         if (!ValidatePath(filePath) || !FileExists(filePath))
         {
+            AddReportLog(3211, SString("CheckDataFiles: missing required file '%s' (base='%s')", filePath.c_str(), strMTASAPath.c_str()));
             DisplayErrorMessageBox(_("Load failed. Please ensure that the latest data files have been installed correctly."), _E("CL16"),
                                    "mta-datafiles-missing");
             ExitProcess(EXIT_ERROR);
@@ -2094,7 +2084,7 @@ int LaunchGame(SString strCmdLine)
 
             if (debugCapture.captured)
             {
-                if (IsFailFastException(debugCapture.exceptionCode) && IsNetcModule(debugCapture.moduleInfo.moduleName))
+                if (IsFailFastException(debugCapture.exceptionCode) && IsHighIntegrityModule(debugCapture.moduleInfo.moduleName))
                 {
                     isAcDefense = true;
                     AddReportLog(7210, SString("Loader - AC integrity exit detected in debugger capture (module=%s code=0x%08X)",
@@ -2137,7 +2127,7 @@ int LaunchGame(SString strCmdLine)
             {
                 WerCrashInfo werInfo = QueryWerCrashInfo(rawExitCode);
 
-                if (werInfo.found && IsFailFastException(werInfo.exceptionCode) && IsNetcModule(werInfo.moduleName))
+                if (werInfo.found && IsFailFastException(werInfo.exceptionCode) && IsHighIntegrityModule(werInfo.moduleName))
                 {
                     isAcDefense = true;
                     AddReportLog(7210, SString("Loader - AC integrity exit detected via WER (module=%s code=0x%08X)", werInfo.moduleName.c_str(),
@@ -2290,8 +2280,16 @@ int LaunchGame(SString strCmdLine)
 
                 if (!isAcDefense && IsFailFastException(rawExitCode))
                 {
+                    isAcDefense = true;
+                    AddReportLog(7210, SString("Loader - AC integrity exit detected via exit code (code=0x%08X)", static_cast<unsigned int>(rawExitCode)));
+                    MessageBoxUTF8(nullptr,
+                                   "MTA: San Andreas has been terminated due to an integrity violation.\n\n"
+                                   "Make sure that no external program is modifying the game. Note that some unreliable "
+                                   "AV's (such as Bitdefender) are known to interfere in a way that can lead to this problem.",
+                                   "MTA: San Andreas", MB_OK | MB_ICONWARNING | MB_TOPMOST);
+
                     SetApplicationSetting("diagnostics", "debugger-crash-capture", "1");
-                    WriteDebugEvent(SString("Loader - Enabled one-shot debugger capture for next run (exit code 0x%08X)", rawExitCode));
+                    WriteDebugEvent(SString("Loader - AC integrity exit via exit code, one-shot debugger flag SET (exit code 0x%08X)", rawExitCode));
                     AddReportLog(7204, SString("Loader - One-shot debugger flag SET for next launch (exit code 0x%08X)", rawExitCode));
                 }
             }

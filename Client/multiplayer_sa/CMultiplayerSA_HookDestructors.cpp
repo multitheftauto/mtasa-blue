@@ -13,6 +13,8 @@
 #include <atomic>
 #include <mutex>
 
+extern CGame* pGameInterface;
+
 namespace
 {
     // Handler pointers for game destructors
@@ -765,10 +767,17 @@ static void CallGameModelRemoveHandlerSafe(GameModelRemoveHandler* handler, usho
     }
 }
 
-void _cdecl OnCStreamingRemoveModel(DWORD calledFrom, int modelId) noexcept
+bool _cdecl OnCStreamingRemoveModel(DWORD calledFrom, int modelId) noexcept
 {
+    if (pGameInterface)
+    {
+        StreamingRemoveModelCallback pCallback = pGameInterface->GetStreamingRemoveModelCallback();
+        if (pCallback && !pCallback(static_cast<unsigned int>(modelId)))
+            return false;
+    }
+
     if (g_bStreamingRemoveModelInProgress.exchange(true, std::memory_order_acquire))
-        return;
+        return true;
 
     bool bLockAcquired = false;
     bool bTimeout = false;
@@ -820,6 +829,8 @@ void _cdecl OnCStreamingRemoveModel(DWORD calledFrom, int modelId) noexcept
             // If SString allocation fails, skip logging (reentrancy flag already released above)
         }
     }
+
+    return true;
 }
 
 // Hook info
@@ -843,14 +854,19 @@ static void __declspec(naked) HOOK_CStreamingRemoveModel()
         push    edx
         call    OnCStreamingRemoveModel
         add     esp, 4*2
-        
+        mov     [esp+32], eax
         popfd
         popad
+        test    al, al
+        jz      skipRemoval
 
         push    esi
         mov     esi, [esp+8]
         push    edi
         jmp     RETURN_CStreamingRemoveModel
+
+skipRemoval:
+        ret
     }
     // clang-format on
 }

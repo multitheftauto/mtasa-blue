@@ -38,4 +38,7 @@ public:
 
     // Returns the number of occupied slots in [0, maxExclusive).
     virtual int GetUsedSlotCountInRange(std::uint32_t maxExclusive) const = 0;
+
+    // Returns true if the slot is allocated and its RwTexDictionary is in memory.
+    virtual bool IsTxdLoaded(std::uint32_t uiTxdId) = 0;
 };
