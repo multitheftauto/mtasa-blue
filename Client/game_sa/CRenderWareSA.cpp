@@ -701,11 +701,15 @@ namespace
         }
 
         // Iter from root (outermost parent) to child so child textures win on name conflict.
+        bool bChainComplete = true;
         for (std::size_t i = chainLen; i > 0; --i)
         {
             RwTexDictionary* pChainTxd = CTxdStore_GetTxd(chain[i - 1]);
             if (!pChainTxd)
+            {
+                bChainComplete = false;
                 continue;
+            }
 
             std::vector<RwTexture*> txdTextures;
             CRenderWareSA::GetTxdTextures(txdTextures, pChainTxd);
@@ -720,6 +724,12 @@ namespace
                     result[name] = pTexture;
             }
         }
+
+        // A partial chain means some ancestors were not loaded, so the map
+        // is missing their textures. Return empty to prevent partial rebinds
+        // that leave unresolved textures white.
+        if (!bChainComplete)
+            result.clear();
 
         return result;
     }
