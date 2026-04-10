@@ -585,6 +585,12 @@ static int RunInstall()
 
     const SString targetRoot = PathConform(GetMTASAPath());
 
+    if (sourceRoot.CompareI(targetRoot))
+    {
+        AddReportLog(5055, SString("RunInstall: Refusing to install from and to the same directory '%s'", sourceRoot.c_str()));
+        return 9;
+    }
+
     if (!DirectoryExists(targetRoot))
     {
         AddReportLog(5055, SString("RunInstall: MTA directory does not exist: '%s'", targetRoot.c_str()));
@@ -928,7 +934,11 @@ SString CheckOnRestartCommand()
             //
 
             if (strFile.empty() || !FileExists(strFile))
+            {
+                AddReportLog(4047, SString("CheckOnRestartCommand: update archive missing '%s'", strFile.c_str()));
+                SetOnRestartCommand("");
                 return "FileMissing";
+            }
 
             // Make temp path name and go there
             SString strArchivePath, strArchiveName;
@@ -937,12 +947,18 @@ SString CheckOnRestartCommand()
             const SString sourceRoot = MakeUniquePath(strArchivePath + "\\_" + strArchiveName + "_tmp_");
 
             if (!MkDir(sourceRoot))
+            {
+                AddReportLog(4047, SString("CheckOnRestartCommand: failed to create temp dir '%s'", sourceRoot.c_str()));
                 return "FileError1";
+            }
 
             DirectoryDeleteScope deleteSourceRoot(sourceRoot);
 
             if (!SetCurrentDirectory(sourceRoot))
+            {
+                AddReportLog(4047, SString("CheckOnRestartCommand: failed to enter temp dir '%s'", sourceRoot.c_str()));
                 return "FileError2";
+            }
 
             // Start progress bar
             if (!strParameters.Contains("hideprogress"))
@@ -962,7 +978,10 @@ SString CheckOnRestartCommand()
             StopPseudoProgress();
 
             if (!success)
+            {
+                AddReportLog(4047, SString("CheckOnRestartCommand: failed to extract or execute update '%s'", strFile.c_str()));
                 return "FileError3";
+            }
 
             deleteSourceRoot.Release();
 
@@ -976,6 +995,7 @@ SString CheckOnRestartCommand()
         else
         {
             AddReportLog(5052, SString("CheckOnRestartCommand: Unknown restart command %s", strOperation.c_str()));
+            SetOnRestartCommand("");
         }
     }
 

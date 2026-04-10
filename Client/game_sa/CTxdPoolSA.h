@@ -33,6 +33,7 @@ public:
     std::uint32_t GetFreeTextureDictonarySlotInRange(std::uint32_t maxExclusive) override;
     std::uint32_t GetFreeTextureDictonarySlotAbove(std::uint32_t minInclusive) override;
     int           GetUsedSlotCountInRange(std::uint32_t maxExclusive) const override;
+    bool          IsTxdLoaded(std::uint32_t uiTxdId) override;
 
     int GetPoolSize() const noexcept;
     int GetUsedSlotCount() const noexcept;
@@ -62,4 +63,13 @@ private:
     void InstallPoolHooks();
 
     CPoolSAInterface<CTextureDictonarySAInterface>** m_ppTxdPoolInterface;
+
+    // Hint for GetFreeTextureDictonarySlotInRange: slots below this index
+    // are likely occupied. Advanced past each slot the function returns,
+    // lowered when a slot below the hint is freed.
+    std::uint32_t m_uiFreeSlotHint = 0;
+
+    // Same hint for GetFreeTextureDictonarySlotAbove: slots below this
+    // index (within the above-range) are likely occupied.
+    std::uint32_t m_uiFreeSlotHintAbove = MAX_STREAMING_TXD_SLOT;
 };

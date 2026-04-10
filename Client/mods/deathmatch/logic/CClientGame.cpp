@@ -75,6 +75,8 @@ CVector             g_vecBulletFireEndPosition;
 #define DOUBLECLICK_TIMEOUT          330
 #define DOUBLECLICK_MOVE_THRESHOLD   10.0f
 
+#define MIN_CLIENT_REQ_ON_MOUSE_BUTTON_DOWN "1.7.0-7.26369"
+
 static constexpr long long TIME_DISCORD_UPDATE_RATE = 15000;
 
 CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
@@ -5740,7 +5742,7 @@ bool CClientGame::OnKeyDown(CGUIKeyEventArgs Args)
     return true;
 }
 
-void CClientGame::TriggerGUIClickEvent(CGUIMouseEventArgs Args, const char* szState)
+void CClientGame::TriggerGUIClickEvent(CGUIMouseEventArgs Args, const char* szState, const char* minClientVersion)
 {
     if (!Args.pWindow)
         return;
@@ -5770,14 +5772,14 @@ void CClientGame::TriggerGUIClickEvent(CGUIMouseEventArgs Args, const char* szSt
         CClientGUIElement* pGUIElement = CGUI_GET_CCLIENTGUIELEMENT(Args.pWindow);
         if (GetGUIManager()->Exists(pGUIElement))
         {
-            pGUIElement->CallEvent("onClientGUIClick", Arguments, true);
+            pGUIElement->CallEvent("onClientGUIClick", Arguments, true, minClientVersion);
         }
     }
 }
 
 bool CClientGame::OnMouseClick(CGUIMouseEventArgs Args)
 {
-    TriggerGUIClickEvent(Args, "up");
+    TriggerGUIClickEvent(Args, "up", nullptr);
     return true;
 }
 
@@ -5856,7 +5858,7 @@ bool CClientGame::OnMouseButtonDown(CGUIMouseEventArgs Args)
     }
 
     // Fire onClientGUIClick with state="down"
-    TriggerGUIClickEvent(Args, "down");
+    TriggerGUIClickEvent(Args, "down", MIN_CLIENT_REQ_ON_MOUSE_BUTTON_DOWN);
 
     return true;
 }

@@ -349,6 +349,8 @@ bool CRemoteMasterServer::ParseListVer0(CServerListItemList& itemList)
     uint uiNumServersBefore = itemList.size();
 #endif
 
+    uint uiTieBreakCounter = 0;
+
     while (!stream.AtEnd(6) && usCount--)
     {
         in_addr        Address;      // IP-address
@@ -362,6 +364,14 @@ bool CRemoteMasterServer::ParseListVer0(CServerListItemList& itemList)
 
         // Add or find item to update
         CServerListItem* pItem = GetServerListItem(itemList, Address, usQueryPort - SERVER_LIST_QUERY_PORT_OFFSET);
+
+        if (pItem->uiTieBreakPosition != uiTieBreakCounter)
+        {
+            pItem->uiTieBreakPosition = uiTieBreakCounter;
+            pItem->strTieBreakSortKey = SString("%04d", pItem->uiTieBreakPosition);
+            pItem->uiRevision++;
+        }
+        uiTieBreakCounter++;
 
         if (pItem->ShouldAllowDataQuality(SERVER_INFO_ASE_0))
         {
@@ -445,6 +455,8 @@ bool CRemoteMasterServer::ParseListVer2(CServerListItemList& itemList)
     uint uiNumServersBefore = itemList.size();
 #endif
 
+    uint uiTieBreakCounter = 0;
+
     // Add all servers until we hit the count or run out of data
     while (!stream.AtEnd(6) && uiCount--)
     {
@@ -460,6 +472,14 @@ bool CRemoteMasterServer::ParseListVer2(CServerListItemList& itemList)
 
         // Add or find item to update
         CServerListItem* pItem = GetServerListItem(itemList, Address, usGamePort);
+
+        if (pItem->uiTieBreakPosition != uiTieBreakCounter)
+        {
+            pItem->uiTieBreakPosition = uiTieBreakCounter;
+            pItem->strTieBreakSortKey = SString("%04d", pItem->uiTieBreakPosition);
+            pItem->uiRevision++;
+        }
+        uiTieBreakCounter++;
 
         if (pItem->ShouldAllowDataQuality(uiDataQuality))
         {
