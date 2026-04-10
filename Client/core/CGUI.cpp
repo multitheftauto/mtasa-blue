@@ -774,9 +774,8 @@ bool CLocalGUI::InputGoesToGUI()
     if (!pGUI)
         return false;
 
-    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible ||
-            pGUI->GetGUIInputEnabled() || !CCore::GetSingleton().IsFocused() ||
-            IsWebRequestGUIVisible());
+    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || pGUI->GetGUIInputEnabled() ||
+            !CCore::GetSingleton().IsFocused() || IsWebRequestGUIVisible());
 }
 
 void CLocalGUI::ForceCursorVisible(bool bVisible)
