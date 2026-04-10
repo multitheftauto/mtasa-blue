@@ -39,7 +39,21 @@ using namespace std;
 namespace fs = std::filesystem;
 
 // Set to true to enable the freeze watchdog (monitors main thread responsiveness)
+// Do NOT enable it unless you run a QA testing cycle (see commit desc: 3e54dcb2742bccf0319b9552b2ed5a2c0a012425)
 constexpr bool bFreezeWatchdogEnabled = false;
+
+// Watchdog active in debug builds
+// In debug builds, the contributor should get an early heads up if their changes are this level of blocking (it can't make it in).
+// If you freeze beyond 20 secs in a debug build, not due to a bug in your code changes but due to your local server assets, you have 2 options:
+// 1. Disable the watchdog
+// 2. Fix your mess (imagine what that would do to players in release builds)
+#ifdef MTA_DEBUG
+constexpr bool  bFreezeWatchdogEnabledInCurrentBuild = true;
+constexpr DWORD uiFreezeWatchdogTimeoutSeconds = 20;  // Already unacceptable. Strikes a balance: you'll still be able to a load heavy asseted local server
+#else
+constexpr bool  bFreezeWatchdogEnabledInCurrentBuild = bFreezeWatchdogEnabled;
+constexpr DWORD uiFreezeWatchdogTimeoutSeconds = 40;  // Player won't be patient beyond this; we get no info
+#endif
 
 static float fTest = 1;
 
@@ -186,7 +200,7 @@ CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
 
-    if constexpr (bFreezeWatchdogEnabled)
+    if constexpr (bFreezeWatchdogEnabledInCurrentBuild)
         StopWatchdogThread();
 
     // Reset Discord rich presence
@@ -953,7 +967,7 @@ void LoadModule(CModuleLoader& m_Loader, const SString& strName, const SString& 
     // Save current directory (shouldn't change anyway)
     SString strSavedCwd = GetSystemCurrentDirectory();
 
-    // Load approrpiate compilation-specific library.
+    // Load appropriate compilation-specific library.
 #ifdef MTA_DEBUG
     SString strModuleFileName = strModuleName + "_d.dll";
 #else
@@ -1056,6 +1070,19 @@ void CCore::DeinitGUI()
 void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
+
+    // Apply CPU affinity here (GTA allocates threads on startup, so we have to do it here instead of earlier)
+    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
+    if (!affinity)
+        return;
+
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+    HANDLE    process = GetCurrentProcess();
+    BOOL      result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (result)
+        SetProcessAffinityMask(process, mask & ~1);
 }
 
 void CCore::CreateGUI()
@@ -1290,7 +1317,7 @@ void CCore::DoPreFramePulse()
 {
     TIMING_CHECKPOINT("+CorePreFrame");
 
-    if constexpr (bFreezeWatchdogEnabled)
+    if constexpr (bFreezeWatchdogEnabledInCurrentBuild)
         UpdateWatchdogHeartbeat();
 
     m_pKeyBinds->DoPreFramePulse();
@@ -1350,10 +1377,9 @@ void CCore::DoPostFramePulse()
             WatchDogCompletedSection("L3");  // No hang on startup
 
             // Start watchdog thread now that initial loading is complete
-            // Use 120 second timeout to allow for large mod asset loading
-            if constexpr (bFreezeWatchdogEnabled)
+            if constexpr (bFreezeWatchdogEnabledInCurrentBuild)
             {
-                if (!StartWatchdogThread(GetCurrentThreadId(), 120))
+                if (!StartWatchdogThread(GetCurrentThreadId(), uiFreezeWatchdogTimeoutSeconds))
                 {
                     WriteDebugEvent("CCore: WARNING - Failed to start watchdog thread");
                 }
@@ -1929,18 +1955,6 @@ void CCore::ApplyCoreInitSettings()
     int       priority = CVARS_GET_VALUE<int>("process_priority") % 3;
 
     SetPriorityClass(process, priorities[priority]);
-
-    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
-
-    if (!affinity)
-        return;
-
-    DWORD_PTR mask;
-    DWORD_PTR sys;
-    BOOL      result = GetProcessAffinityMask(process, &mask, &sys);
-
-    if (result)
-        SetProcessAffinityMask(process, mask & ~1);
 }
 
 //

@@ -238,9 +238,50 @@ bool CResource::CallExportedFunction(const SString& name, CLuaArguments& args, C
     return false;
 }
 
+bool CResource::VerifyPendingClientChecksums()
+{
+    bool bQueuedDownload = false;
+
+    const auto queueDownloadForMismatch = [&bQueuedDownload](CDownloadableResource* pDownloadableResource)
+    {
+        if (!pDownloadableResource->IsAutoDownload() || pDownloadableResource->IsWaitingForDownload() || pDownloadableResource->HasVerifiedClientChecksum())
+            return;
+
+        const CChecksum clientChecksum = pDownloadableResource->GenerateClientChecksum();
+        if (clientChecksum == pDownloadableResource->GetServerChecksum())
+            return;
+
+        const SString strName = pDownloadableResource->GetName();
+        FileDelete(strName);
+        if (FileExists(strName))
+        {
+            SString strMessage("Unable to delete old file %s", *ConformResourcePath(strName));
+            g_pClientGame->TellServerSomethingImportant(1009, strMessage);
+        }
+
+        MakeSureDirExists(strName);
+        g_pClientGame->GetResourceFileDownloadManager()->AddPendingFileDownload(pDownloadableResource);
+        bQueuedDownload = true;
+    };
+
+    for (CResourceConfigItem* pConfigFile : m_ConfigFiles)
+        queueDownloadForMismatch(pConfigFile);
+
+    for (CResourceFile* pResourceFile : m_ResourceFiles)
+        queueDownloadForMismatch(pResourceFile);
+
+    return bQueuedDownload;
+}
+
 bool CResource::CanBeLoaded()
 {
-    return !IsActive() && !IsWaitingForInitialDownloads();
+    if (IsActive() || IsWaitingForInitialDownloads())
+        return false;
+
+    if (VerifyPendingClientChecksums())
+        return false;
+
+    return !IsWaitingForInitialDownloads();
 }
 
 bool CResource::IsWaitingForInitialDownloads()
@@ -317,25 +358,31 @@ void CResource::Load()
         {
             // Load the file
             std::vector<char> buffer;
-            FileLoad(pResourceFile->GetName(), buffer);
-            const char* pBufferData = buffer.empty() ? nullptr : &buffer.at(0);
+            const bool        bLoaded = FileLoad(pResourceFile->GetName(), buffer);
+            const char*       pBufferData = buffer.empty() ? nullptr : &buffer.at(0);
 
             DECLARE_PROFILER_SECTION(OnPreLoadScript)
             // Check the contents
-            if (CChecksum::GenerateChecksumFromBuffer(pBufferData, buffer.size()) == pResourceFile->GetServerChecksum())
+            if (bLoaded)
             {
-                m_pLuaVM->LoadScriptFromBuffer(pBufferData, buffer.size(), pResourceFile->GetName());
+                const CChecksum checksum = CChecksum::GenerateChecksumFromBuffer(pBufferData, buffer.size());
+                pResourceFile->SetLastClientChecksum(checksum);
+
+                if (checksum == pResourceFile->GetServerChecksum())
+                    m_pLuaVM->LoadScriptFromBuffer(pBufferData, buffer.size(), pResourceFile->GetName());
+                else
+                    HandleDownloadedFileTrouble(pResourceFile, true);
             }
             else
             {
+                pResourceFile->SetLastClientChecksum(CChecksum());
                 HandleDownloadedFileTrouble(pResourceFile, true);
             }
             DECLARE_PROFILER_SECTION(OnPostLoadScript)
         }
         else if (pResourceFile->IsAutoDownload())
         {
-            // Check the file contents
-            if (CChecksum::GenerateChecksumFromFileUnsafe(pResourceFile->GetName()) != pResourceFile->GetServerChecksum())
+            if (!pResourceFile->DoesClientAndServerChecksumMatch())
             {
                 HandleDownloadedFileTrouble(pResourceFile, false);
             }
@@ -525,20 +572,23 @@ void CResource::AddToElementGroup(CClientEntity* pElement)
 //
 void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool bScript)
 {
-    auto checksumResult = CChecksum::GenerateChecksumFromFile(pResourceFile->GetName());
-
     SString errorMessage;
-    if (std::holds_alternative<std::string>(checksumResult))
-        errorMessage = std::get<std::string>(checksumResult);
+
+    CChecksum clientChecksum = pResourceFile->GetLastClientChecksum();
+    if (!pResourceFile->HasVerifiedClientChecksum())
+    {
+        errorMessage = "Client checksum was not verified before load";
+    }
+    else if (clientChecksum == CChecksum())
+    {
+        errorMessage = SString("File not readable: %s", pResourceFile->GetName());
+    }
     else
     {
-        CChecksum checksum = std::get<CChecksum>(checksumResult);
-
-        // Compose message
-        uint    uiGotFileSize = (uint)FileSize(pResourceFile->GetName());
-        SString strGotMd5 = ConvertDataToHexString(checksum.md5.data, sizeof(MD5));
+        SString strGotMd5 = ConvertDataToHexString(clientChecksum.md5.data, sizeof(MD5));
         SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
-        errorMessage = SString("Got size:%d MD5:%s, wanted MD5:%s", uiGotFileSize, *strGotMd5, *strWantedMd5);
+        errorMessage =
+            SString("Got CRC:%08lX MD5:%s, wanted CRC:%08lX MD5:%s", clientChecksum.ulCRC, *strGotMd5, pResourceFile->GetServerChecksum().ulCRC, *strWantedMd5);
     }
 
     SString strFilename = ExtractFilename(PathConform(pResourceFile->GetShortName()));

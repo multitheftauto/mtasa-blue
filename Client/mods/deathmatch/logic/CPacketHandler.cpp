@@ -468,6 +468,12 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
 
     g_pCore->UpdateRecentlyPlayed();
 
+    // Update focus state after joining
+    // m_bFocused is set in the CClientGame constructor - immediately after clicking "join."
+    // This means that if the window loses focus while joining the game, the game still believes it has focus,
+    // and isMTAWindowFocused returns true even when the user is doing anything outside the MTA window.
+    g_pClientGame->m_bFocused = g_pCore->IsFocused();
+
     auto discord = g_pCore->GetDiscord();
     if (discord && discord->IsDiscordRPCEnabled())
     {
@@ -5150,6 +5156,8 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                                                                   strMinClientReq, bEnableOOP);
     if (pResource)
     {
+        CDownloadableResource::BeginChecksumBatch();
+
         pResource->SetRemainingNoClientCacheScripts(usNoClientCacheScriptCount);
         pResource->SetDownloadPriorityGroup(iDownloadPriorityGroup);
         pResource->SetStartCounter(startCounter);
@@ -5314,6 +5322,8 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
             // Are there any resources to being downloaded?
             if (!g_pClientGame->GetResourceFileDownloadManager()->IsTransferringInitialFiles())
             {
+                CDownloadableResource::EndChecksumBatch();
+
                 // Load the resource now
                 if (pResource->CanBeLoaded())
                 {
@@ -5328,6 +5338,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
 
     if (bFatalError)
     {
+        CDownloadableResource::EndChecksumBatch();
         g_pClientGame->m_pResourceManager->Remove(pResource);
         RaiseFatalError(2081);
     }
