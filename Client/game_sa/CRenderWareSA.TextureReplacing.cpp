@@ -2459,6 +2459,14 @@ namespace
             return;
 
         RwRaster* pRaster = pTexture->raster;
+
+        // If raster is shared with an orphaned copy, don't release it
+        if (pRaster && g_OrphanedCopyRasters.count(pRaster))
+        {
+            SafeDestroyTexture(pTexture);
+            return;
+        }
+
         if (pRaster)
         {
             // Release D3D texture before destroying to prevent double-free on shared rasters
@@ -2779,7 +2787,11 @@ namespace
             {
                 bool bIsActuallyCopy = perTxdInfo.bTexturesAreCopies;
                 if (!bIsActuallyCopy && pReplacementTextures && pMasterTextures)
+                {
                     bIsActuallyCopy = pMasterTextures->find(pTexture) == pMasterTextures->end();
+                    if (bIsActuallyCopy && g_LeakedMasterTextures.count(pTexture))
+                        bIsActuallyCopy = false;
+                }
 
                 if (bIsActuallyCopy)
                     outCopiesToDestroy.insert(pTexture);
@@ -5337,6 +5349,32 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                         if (info.originalTextures.find(pTex) == info.originalTextures.end())
                             return false;
                     }
+
+                    // If originalTextures was built while MTA textures were still linked
+                    // in the TXD, the pointer check above gives a false positive. Cross-check
+                    // against g_LeakedMasterTextures to catch masters or copies (shared raster)
+                    // that shouldnt be in a clean TXD.
+                    if (!g_LeakedMasterTextures.empty())
+                    {
+                        for (RwTexture* pTex : currentTextures)
+                        {
+                            if (!pTex)
+                                continue;
+
+                            if (g_LeakedMasterTextures.count(pTex) != 0)
+                                return false;
+
+                            if (pTex->raster)
+                            {
+                                for (RwTexture* pMaster : g_LeakedMasterTextures)
+                                {
+                                    if (pMaster && pMaster->raster == pTex->raster)
+                                        return false;
+                                }
+                            }
+                        }
+                    }
+
                     return true;
                 };
 
