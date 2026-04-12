@@ -52,8 +52,8 @@ jobs:
           fi
 
           # Allow commit to work
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git config user.name "multitheftauto[bot]"
+          git config user.email "274826127+multitheftauto[bot]@users.noreply.github.com"
 
           # Append a commit with a fix applied
           git commit -m "Fix formatting issues introduced by ${GITHUB_SHA}
