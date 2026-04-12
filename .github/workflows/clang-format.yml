@@ -23,7 +23,8 @@ jobs:
         if: |
           steps.clang_format.outcome == 'failure' &&
           github.ref == 'refs/heads/master' &&
-          github.event_name == 'push'
+          github.event_name == 'push' &&
+          !github.event.repository.fork
         uses: actions/create-github-app-token@v3
         with:
           client-id: ${{ secrets.GH_APP_MTA_CLIENT_ID }}
@@ -36,7 +37,8 @@ jobs:
         if: |
           steps.clang_format.outcome == 'failure' &&
           github.ref == 'refs/heads/master' &&
-          github.event_name == 'push'
+          github.event_name == 'push' &&
+          !github.event.repository.fork
         shell: bash
         run: |
           # Stage the formatted files (clang-format.ps1 already ran in-place)
