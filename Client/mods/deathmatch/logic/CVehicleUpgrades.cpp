@@ -42,14 +42,30 @@ CVehicleUpgrades::CVehicleUpgrades(CClientVehicle* pVehicle)
     m_usLastLocalAddNitroType = 0;
 }
 
+static unsigned short GetCustomUpgradeParentModelID(unsigned short usModelID)
+{
+    auto* upgradeModelInfo = g_pGame->GetModelInfo(usModelID);
+    if (upgradeModelInfo && upgradeModelInfo->GetParentID() != 0)
+    {
+        unsigned short parentID = upgradeModelInfo->GetParentID();
+        if (parentID >= 1000 && parentID <= 1193)
+        {
+            return parentID;
+        }
+    }
+    return usModelID;
+}
+
 bool CVehicleUpgrades::IsUpgrade(unsigned short usModel)
 {
+    usModel = GetCustomUpgradeParentModelID(usModel);
+
     return (usModel >= 1000 && usModel <= 1193);
 }
 
 bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
 {
-    unsigned short     us = usUpgrade;
+    unsigned short     us = GetCustomUpgradeParentModelID(usUpgrade);
     eClientVehicleType vehicleType = m_pVehicle->GetVehicleType();
 
     // No upgrades for trains/boats
@@ -451,6 +467,9 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
 
 bool CVehicleUpgrades::GetSlotFromUpgrade(unsigned short us, unsigned char& ucSlot)
 {
+    // Check if this is a custom upgrade model
+    us = GetCustomUpgradeParentModelID(us);
+
     if (us == 1011 || us == 1012 || us == 1111 || us == 1112 || us == 1142 || /* bonet */
         us == 1143 || us == 1144 || us == 1145)
     {
@@ -610,18 +629,53 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
         CVehicle* pVehicle = m_pVehicle->GetGameVehicle();
         if (pVehicle)
         {
-            // Grab the upgrade model
+            // Load the upgrade model
             CModelInfo* pModelInfo = g_pGame->GetModelInfo(usUpgrade);
             if (pModelInfo)
             {
                 if (!g_pGame->IsASyncLoadingEnabled() || !pModelInfo->IsLoaded())
                 {
-                    // Request and load now
                     pModelInfo->Request(BLOCKING, "CVehicleUpgrades::ForceAddUpgrade");
                 }
-                // Add the upgrade
-                pVehicle->AddVehicleUpgrade(usUpgrade);
+
+                // If this is a custom model with parent ID, swap RwObjects
+                unsigned short parentID = static_cast<unsigned short>(pModelInfo->GetParentID());
+                if (parentID != 0 && IsUpgrade(parentID))
+                {
+                    CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(parentID);
+                    if (pParentModelInfo)
+                    {
+                        if (!g_pGame->IsASyncLoadingEnabled() || !pParentModelInfo->IsLoaded())
+                        {
+                            pParentModelInfo->Request(BLOCKING, "CVehicleUpgrades::ForceAddUpgrade (parent)");
+                        }
+
+                        // Wait for both to be loaded
+                        if (pModelInfo->IsLoaded() && pParentModelInfo->IsLoaded())
+                        {
+                            RwObject* pCustomRwObject = pModelInfo->GetRwObject();
+                            RwObject* pParentRwObject = pParentModelInfo->GetRwObject();
+
+                            if (pCustomRwObject && pParentRwObject)
+                            {
+                                // Temporarily swap to custom RwObject ONLY during AddVehicleUpgrade call
+                                pParentModelInfo->SetRwObject(pCustomRwObject);
+                                pVehicle->AddVehicleUpgrade(usUpgrade);
+                                pParentModelInfo->SetRwObject(pParentRwObject);
+
+                                // Early return since we already added the upgrade
+                                m_SlotStates[ucSlot] = usUpgrade;
+                                if (ucSlot == 12)
+                                    m_pVehicle->ResetWheelScale();
+
+                                return;
+                            }
+                        }
+                    }
+                }
             }
+
+            pVehicle->AddVehicleUpgrade(usUpgrade);
         }
 
         // Add it to the slot
