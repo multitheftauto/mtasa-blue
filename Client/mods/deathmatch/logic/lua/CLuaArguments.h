@@ -69,8 +69,7 @@ public:
     void DeleteArguments();
     void Pop();
 
-    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL,
-                                   unsigned int uiDepth = 0);
+    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
     void         ValidateTableKeys();
     bool         ReadFromJSONString(const char* szJSON);
