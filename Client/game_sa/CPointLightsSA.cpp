@@ -32,25 +32,8 @@ void CPointLightsSA::AddLight(int iMode, const CVector vecPosition, CVector vecD
     float fDirX = vecDirection.fX, fDirY = vecDirection.fY, fDirZ = vecDirection.fZ;
     float fRed = (float)color.R / 255, fGreen = (float)color.G / 255, fBlue = (float)color.B / 255;
     // clang-format off
-    __asm
-    {
-        push    dwEntityInterface
-        push    bCreatesShadow
-        push    uc_8
-        push    fBlue
-        push    fGreen
-        push    fRed
-        push    fRadius
-        push    fDirZ
-        push    fDirY
-        push    fDirX
-        push    fPosZ
-        push    fPosY
-        push    fPosX
-        push    iMode
-        call    dwFunc
-        add     esp, 56
-    }
+    using func_t = void (__cdecl*)(decltype(iMode), decltype(fPosX), decltype(fPosY), decltype(fPosZ), decltype(fDirX), decltype(fDirY), decltype(fDirZ), decltype(fRadius), decltype(fRed), decltype(fGreen), decltype(fBlue), decltype(uc_8), decltype(bCreatesShadow), decltype(dwEntityInterface));
+    reinterpret_cast<func_t>(dwFunc)(iMode, fPosX, fPosY, fPosZ, fDirX, fDirY, fDirZ, fRadius, fRed, fGreen, fBlue, uc_8, bCreatesShadow, dwEntityInterface);
     // clang-format on
 }
 

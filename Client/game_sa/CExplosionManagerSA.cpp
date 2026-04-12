@@ -77,9 +77,10 @@ returnhere:
 
 void CExplosionManagerSA::RemoveAllExplosions()
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    for (int i = 0; i < MAX_EXPLOSIONS; i++) {
         if (Explosions[i]->IsActive())
             Explosions[i]->Remove();
+}
 }
 
 CExplosion* CExplosionManagerSA::GetExplosion(DWORD ID)
@@ -89,8 +90,9 @@ CExplosion* CExplosionManagerSA::GetExplosion(DWORD ID)
 
 CExplosion* CExplosionManagerSA::FindFreeExplosion()
 {
-    for (int i = 0; i < MAX_EXPLOSIONS; i++)
+    for (int i = 0; i < MAX_EXPLOSIONS; i++) {
         if (!Explosions[i]->IsActive())
             return Explosions[i];
+}
     return NULL;
 }

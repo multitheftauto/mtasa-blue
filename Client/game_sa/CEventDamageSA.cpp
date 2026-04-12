@@ -28,18 +28,8 @@ CEventDamageSA::CEventDamageSA(CEntity* pEntity, unsigned int i_1, eWeaponType w
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_Constructor;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    b_4
-        push    b_3
-        push    uc_2
-        push    hitZone
-        push    weaponType
-        push    i_1
-        push    dwEntityInterface
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(dwEntityInterface), decltype(i_1), decltype(weaponType), decltype(hitZone), decltype(uc_2), decltype(b_3), decltype(b_4));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, dwEntityInterface, i_1, weaponType, hitZone, uc_2, b_3, b_4);
     // clang-format on
 }
 
@@ -60,11 +50,8 @@ CEventDamageSA::~CEventDamageSA()
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CEventDamage_Destructor;
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
+        using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
         // clang-format on
         delete m_pInterface;
     }
@@ -88,12 +75,8 @@ bool CEventDamageSA::HasKilledPed()
     DWORD dwFunc = FUNC_CEventDamage_HasKilledPed;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
+    using func_t = decltype(bReturn) (__thiscall*)(decltype(dwThis) );
+bReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
     return bReturn;
 }
@@ -120,12 +103,8 @@ AssocGroupId CEventDamageSA::GetAnimGroup()
     DWORD        dwFunc = FUNC_CEventDamage_GetAnimGroup;
     AssocGroupId animGroup = 0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     animGroup, eax
-    }
+    using func_t = decltype(animGroup) (__thiscall*)(decltype(dwThis) );
+animGroup =     reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
     return animGroup;
 }
@@ -136,12 +115,8 @@ AnimationId CEventDamageSA::GetAnimId()
     DWORD       dwFunc = FUNC_CEventDamage_GetAnimId;
     AnimationId animID = 0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     animID, eax
-    }
+    using func_t = decltype(animID) (__thiscall*)(decltype(dwThis) );
+animID =     reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
     return animID;
 }
@@ -152,12 +127,8 @@ bool CEventDamageSA::GetAnimAdded()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_GetAnimAdded;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
+    using func_t = decltype(bReturn) (__thiscall*)(decltype(dwThis) );
+bReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
     return bReturn;
 }
@@ -168,13 +139,8 @@ void CEventDamageSA::ComputeDeathAnim(CPed* pPed, bool bUnk)
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CEventDamage_ComputeDeathAnim;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    bUnk
-        push    dwPed
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(dwPed), decltype(bUnk));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, dwPed, bUnk);
     // clang-format on
 }
 
@@ -184,13 +150,8 @@ void CEventDamageSA::ComputeDamageAnim(CPed* pPed, bool bUnk)
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CEventDamage_ComputeDamageAnim;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    bUnk
-        push    dwPed
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(dwPed), decltype(bUnk));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, dwPed, bUnk);
     // clang-format on
 }
 
@@ -201,13 +162,8 @@ bool CEventDamageSA::AffectsPed(CPed* pPed)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_AffectsPed;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    dwPedInterface
-        call    dwFunc
-        mov     bReturn, al
-    }
+    using func_t = decltype(bReturn) (__thiscall*)(decltype(dwThis), decltype(dwPedInterface));
+bReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis, dwPedInterface);
     // clang-format on
     return bReturn;
 }

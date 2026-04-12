@@ -247,12 +247,8 @@ void CSettingsSA::SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart)
     {
         DWORD dwFunc = FUNC_SetAntiAliasing;
         // clang-format off
-        __asm
-        {
-            push    uiAntiAliasing
-            call    dwFunc
-            add     esp, 4
-        }
+        using func_t = void (__cdecl*)(decltype(uiAntiAliasing));
+    reinterpret_cast<func_t>(dwFunc)(uiAntiAliasing);
         // clang-format on
         SetCurrentVideoMode(m_pInterface->dwVideoMode, false);
     }
@@ -273,12 +269,8 @@ void CSettingsSA::SetMipMappingEnabled(bool bEnable)
 void CSettingsSA::Save()
 {
     // clang-format off
-    __asm
-    {
-        mov ecx, CLASS_CMenuManager
-        mov eax, FUNC_CMenuManager_Save
-        call eax
-    }
+    using func_t = void (__thiscall*)(decltype(0xBA6748) );
+    reinterpret_cast<func_t>(0x57C660)(0xBA6748);
     // clang-format on
 }
 
@@ -460,10 +452,11 @@ void CSettingsSA::SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabl
     MemPutFast<float>(0xC3EFA4, fValue);
 
     // Adjust position and size of our HUD components
-    if (bAdjustmentEnabled)
+    if (bAdjustmentEnabled) {
         pGame->GetHud()->AdjustComponents(fValue);
-    else
+    } else {
         pGame->GetHud()->ResetComponentAdjustment();
+}
 }
 
 ////////////////////////////////////////////////
@@ -674,10 +667,11 @@ void CSettingsSA::ResetPedsLODDistance(bool bForceDefault)
     bool bHighDetailPeds;
     g_pCore->GetCVars()->Get("high_detail_peds", bHighDetailPeds);
 
-    if (bHighDetailPeds)
+    if (bHighDetailPeds) {
         ms_fPedsLODDistance = MAX_PEDS_LOD_DISTANCE;
-    else
+    } else {
         ms_fPedsLODDistance = DEFAULT_PEDS_LOD_DISTANCE;
+}
 
     ms_bMaxPedsLODDistanceFromScript = false;
 }

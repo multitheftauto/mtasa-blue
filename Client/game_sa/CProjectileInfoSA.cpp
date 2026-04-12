@@ -50,25 +50,16 @@ void CProjectileInfoSA::RemoveProjectile(CProjectileInfo* pProjectileInfo, CProj
             {
                 DWORD dwFunc = FUNC_RemoveProjectile;
                 // clang-format off
-                __asm
-                {
-                    push    projectileInterface
-                    push    projectileInfoInterface
-                    call    dwFunc
-                    add     esp, 8
-                }
+                using func_t = void (__cdecl*)(decltype(projectileInfoInterface), decltype(projectileInterface));
+    reinterpret_cast<func_t>(dwFunc)(projectileInfoInterface, projectileInterface);
                 // clang-format on
             }
             else
             {
                 DWORD dwFunc = FUNC_RemoveIfThisIsAProjectile;
                 // clang-format off
-                __asm
-                {
-                    push   projectileInterface
-                    call   dwFunc
-                    add    esp, 4
-                }
+                using func_t = void (__cdecl*)(decltype(projectileInterface));
+    reinterpret_cast<func_t>(dwFunc)(projectileInterface);
                 // clang-format on
             }
         }

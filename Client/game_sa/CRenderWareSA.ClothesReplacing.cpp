@@ -114,8 +114,9 @@ void CRenderWareSA::ClothesRemoveReplacement(char* pFileData)
             iter = ms_ReplacementClothesFileDataMap.erase(iter);
             clothesReplacementChanged = true;
         }
-        else
+        else {
             ++iter;
+}
     }
 }
 
@@ -192,8 +193,9 @@ bool CRenderWareSA::ClothesRemoveFile(char* fileData)
             clothesReplacementChanged = true;
             removed = true;
         }
-        else
+        else {
             ++iter;
+}
     }
 
     return removed;

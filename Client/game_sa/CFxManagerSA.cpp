@@ -22,16 +22,8 @@ CFxSystem* CFxManagerSA::CreateFxSystem(const char* szBlueprint, const CVector& 
     CFxSystemSAInterface* pFxSystem;
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    bSkipCameraFrustumCheck
-        push    pRwMatrixTag
-        push    pvecPosition
-        push    szBlueprint
-        call    dwFunc
-        mov     pFxSystem, eax
-    }
+    using func_t = decltype(pFxSystem) (__thiscall*)(decltype(dwThis), decltype(szBlueprint), decltype(pvecPosition), decltype(pRwMatrixTag), decltype(bSkipCameraFrustumCheck));
+pFxSystem =     reinterpret_cast<func_t>(dwFunc)(dwThis, szBlueprint, pvecPosition, pRwMatrixTag, bSkipCameraFrustumCheck);
     // clang-format on
 
     if (pFxSystem)
@@ -53,12 +45,8 @@ void CFxManagerSA::DestroyFxSystem(CFxSystem* pFxSystem)
     void* pFxSA = pFxSystem->GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pFxSA
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pFxSA));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pFxSA);
     // clang-format on
 }
 

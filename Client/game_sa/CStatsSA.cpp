@@ -36,13 +36,8 @@ void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
     DWORD dwStatIndex = usIndex;
 
     // clang-format off
-    __asm
-    {
-        push    fAmmount
-        push    dwStatIndex
-        call    dwFunc
-        add     esp, 8
-    }
+    using func_t = void (__cdecl*)(decltype(dwStatIndex), decltype(fAmmount));
+    reinterpret_cast<func_t>(dwFunc)(dwStatIndex, fAmmount);
     // clang-format on
 }
 
@@ -52,13 +47,8 @@ void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
     DWORD dwStatIndex = usIndex;
 
     // clang-format off
-    __asm
-    {
-        push    fAmmount
-        push    dwStatIndex
-        call    dwFunc
-        add     esp, 8
-    }
+    using func_t = void (__cdecl*)(decltype(dwStatIndex), decltype(fAmmount));
+    reinterpret_cast<func_t>(dwFunc)(dwStatIndex, fAmmount);
     // clang-format on
 }
 
@@ -68,13 +58,8 @@ unsigned short CStatsSA::GetSkillStatIndex(eWeaponType type)
     int   iIndex;
     DWORD dwFunc = FUNC_CWeaponInfo_GetSkillStatIndex;
     // clang-format off
-    __asm
-    {
-        push    weaponType
-        call    dwFunc
-        add     esp, 0x4
-        mov     iIndex, eax
-    }
+    using func_t = decltype(iIndex) (__cdecl*)(decltype(weaponType));
+iIndex =     reinterpret_cast<func_t>(dwFunc)(weaponType);
     // clang-format on
     return (unsigned short)iIndex;
 }

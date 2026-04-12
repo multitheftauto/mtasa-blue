@@ -102,13 +102,7 @@ void CTaskSimpleChokingSA::UpdateChoke(CPed* pPed, CPed* pAttacker, bool bIsTear
     DWORD dwThisInterface = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_CTaskSimpleChoking__UpdateChoke;
     // clang-format off
-    __asm
-    {
-        mov         ecx, dwThisInterface
-        push        bIsTearGas
-        push        pAttackerInterface
-        push        pPedInterface
-        call        dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThisInterface), decltype(pPedInterface), decltype(pAttackerInterface), decltype(bIsTearGas));
+    reinterpret_cast<func_t>(dwFunc)(dwThisInterface, pPedInterface, pAttackerInterface, bIsTearGas);
     // clang-format on
 }

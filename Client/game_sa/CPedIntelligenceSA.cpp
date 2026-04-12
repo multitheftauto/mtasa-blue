@@ -41,14 +41,8 @@ bool CPedIntelligenceSA::TestForStealthKill(CPed* pPed, bool bUnk)
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CPedIntelligence_TestForStealthKill;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    bUnk
-        push    dwPed
-        call    dwFunc
-        mov     bReturn, al
-    }
+    using func_t = decltype(bReturn) (__thiscall*)(decltype(dwThis), decltype(dwPed), decltype(bUnk));
+bReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis, dwPed, bUnk);
     // clang-format on
     return bReturn;
 }

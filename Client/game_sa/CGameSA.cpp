@@ -352,8 +352,9 @@ CWeaponInfo* CGameSA::GetWeaponInfo(eWeaponType weapon, eWeaponSkill skill)
         }
         return WeaponInfos[offset + weapon];
     }
-    else
+    else {
         return NULL;
+}
 }
 
 void CGameSA::Pause(bool bPaused)
@@ -1159,10 +1160,11 @@ bool CGameSA::SetBuildingPoolSize(size_t size)
         // World is active here, so continue with remove and restore flow.
     }
 
-    if (shouldRemoveWorld)
+    if (shouldRemoveWorld) {
         RemoveGameWorld();
-    else
-        static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
+    } else {
+        s
+}tatic_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
 
     bool status = m_Pools->GetBuildingsPool().Resize(size);
 

@@ -30,11 +30,7 @@ void CPedModelInfoSA::SetMotionAnimGroup(AssocGroupId animGroup)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = (DWORD)FUNC_SetMotionAnimGroup;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    animGroup
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(animGroup));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, animGroup);
     // clang-format on
 }

@@ -27,11 +27,8 @@ void CFireSA::Extinguish()
     DWORD dwFunction = FUNC_Extinguish;
     DWORD dwPointer = (DWORD)internalInterface;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwPointer
-        call    dwFunction
-    }
+    using func_t = void (__thiscall*)(decltype(dwPointer) );
+    reinterpret_cast<func_t>(dwFunction)(dwPointer);
     // clang-format on
     internalInterface->bActive = false;
 }
@@ -163,10 +160,11 @@ bool CFireSA::IsIgnited()
 
 bool CFireSA::IsFree()
 {
-    if (!internalInterface->bActive && !internalInterface->bCreatedByScript)
+    if (!internalInterface->bActive && !internalInterface->bCreatedByScript) {
         return true;
-    else
+    } else {
         return false;
+}
 }
 
 void CFireSA::SetSilent(bool bSilent)
@@ -187,13 +185,8 @@ void CFireSA::Ignite()
     DWORD    dwFunc = FUNC_CreateFxSysForStrength;
     DWORD    dwThis = (DWORD)internalInterface;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    0
-        push    vecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(vecPosition), decltype(0));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, vecPosition, 0);
     // clang-format on
 
     internalInterface->bBeingExtinguished = 0;

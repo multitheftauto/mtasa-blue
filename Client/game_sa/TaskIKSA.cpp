@@ -32,25 +32,8 @@ CTaskSimpleIKChainSA::CTaskSimpleIKChainSA(char* idString, int effectorBoneTag, 
     float fEffectorX = effectorVec.fX, fEffectorY = effectorVec.fY, fEffectorZ = effectorVec.fZ;
     float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    blendTime
-        push    time
-        push    speed
-        push    fZ
-        push    fY
-        push    fX
-        push    offsetBoneTag
-        push    dwEntityInterface
-        push    pivotBoneTag
-        push    fEffectorZ
-        push    fEffectorY
-        push    fEffectorX
-        push    effectorBoneTag
-        push    idString
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThisInterface), decltype(idString), decltype(effectorBoneTag), decltype(fEffectorX), decltype(fEffectorY), decltype(fEffectorZ), decltype(pivotBoneTag), decltype(dwEntityInterface), decltype(offsetBoneTag), decltype(fX), decltype(fY), decltype(fZ), decltype(speed), decltype(time), decltype(blendTime));
+    reinterpret_cast<func_t>(dwFunc)(dwThisInterface, idString, effectorBoneTag, fEffectorX, fEffectorY, fEffectorZ, pivotBoneTag, dwEntityInterface, offsetBoneTag, fX, fY, fZ, speed, time, blendTime);
     // clang-format on
 }
 
@@ -68,22 +51,8 @@ CTaskSimpleIKLookAtSA::CTaskSimpleIKLookAtSA(char* idString, CEntity* pEntity, i
         dwEntityInterface = (DWORD)pEntity->GetInterface();
     float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    m_priority
-        push    blendTime
-        push    speed
-        push    useTorso
-        push    fZ
-        push    fY
-        push    fX
-        push    offsetBoneTag
-        push    time
-        push    dwEntityInterface
-        push    idString
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThisInterface), decltype(idString), decltype(dwEntityInterface), decltype(time), decltype(offsetBoneTag), decltype(fX), decltype(fY), decltype(fZ), decltype(useTorso), decltype(speed), decltype(blendTime), decltype(m_priority));
+    reinterpret_cast<func_t>(dwFunc)(dwThisInterface, idString, dwEntityInterface, time, offsetBoneTag, fX, fY, fZ, useTorso, speed, blendTime, m_priority);
     // clang-format on
 }
 
@@ -162,20 +131,7 @@ CTaskSimpleTriggerLookAtSA::CTaskSimpleTriggerLookAtSA(CEntity* pEntity, int tim
         dwEntityInterface = (DWORD)pEntity->GetInterface();
     float fX = offsetPos.fX, fY = offsetPos.fY, fZ = offsetPos.fZ;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    priority
-        push    blendTime
-        push    speed
-        push    useTorso
-        push    fZ
-        push    fY
-        push    fX
-        push    offsetBoneTag
-        push    time
-        push    dwEntityInterface
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThisInterface), decltype(dwEntityInterface), decltype(time), decltype(offsetBoneTag), decltype(fX), decltype(fY), decltype(fZ), decltype(useTorso), decltype(speed), decltype(blendTime), decltype(priority));
+    reinterpret_cast<func_t>(dwFunc)(dwThisInterface, dwEntityInterface, time, offsetBoneTag, fX, fY, fZ, useTorso, speed, blendTime, priority);
     // clang-format on
 }

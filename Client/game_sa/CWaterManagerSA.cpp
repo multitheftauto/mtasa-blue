@@ -256,10 +256,11 @@ bool CWaterZoneSA::RemovePoly(EWaterPolyType type, WORD wID)
         {
             if (pEntries[0].m_wValue == MAKE_POLYENTRY(type, wID) || pEntries[1].m_wValue == MAKE_POLYENTRY(type, wID))
             {
-                if (pEntries[0].m_wValue == MAKE_POLYENTRY(type, wID))
+                if (pEntries[0].m_wValue == MAKE_POLYENTRY(type, wID)) {
                     m_pInterface->m_wValue = pEntries[1].m_wValue;
-                else
+                } else {
                     m_pInterface->m_wValue = pEntries[0].m_wValue;
+}
 
                 CWaterPolyEntrySAInterface* pEntry = pEntries + 3;
                 for (; pEntry < pEnd; pEntry++)
@@ -974,10 +975,11 @@ void CWaterManagerSA::UndoChanges(void* pChangeSource)
     {
         while (!m_Changes.empty())
         {
-            if (m_Changes.begin()->first)
+            if (m_Changes.begin()->first) {
                 UndoChanges(m_Changes.begin()->first);
-            else
-                m_Changes.erase(m_Changes.begin());
+            } else {
+                m
+}_Changes.erase(m_Changes.begin());
         }
     }
     else
@@ -1005,9 +1007,10 @@ void CWaterManagerSA::RebuildIndex()
 
 void CWaterManagerSA::ResetWorldWaterLevel()
 {
-    if (m_bInitializedVertices)
+    if (m_bInitializedVertices) {
         for (DWORD i = 0; i < NUM_DefWaterVertices; i++)
             m_Vertices[i].Reset();
+}
 
     SetOutsideWorldWaterLevel(DEFAULT_WATER_LEVEL);
 }

@@ -244,10 +244,11 @@ const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(st
     // Get our Handling ID, the default value will be HT_LANDSTAL
     const HandlingType eHandling = GetHandlingID(model);
     // Original GTA:SA behavior
-    if (eHandling < HandlingType::HT_SEAPLANE || eHandling > HandlingType::HT_RCRAIDER)
+    if (eHandling < HandlingType::HT_SEAPLANE || eHandling > HandlingType::HT_RCRAIDER) {
         return m_OriginalFlyingEntries[0].get();
-    else
-        return m_OriginalFlyingEntries[static_cast<std::size_t>(eHandling) - static_cast<std::size_t>(HandlingType::HT_SEAPLANE)].get();
+    } else {
+        r
+}eturn m_OriginalFlyingEntries[static_cast<std::size_t>(eHandling) - static_cast<std::size_t>(HandlingType::HT_SEAPLANE)].get();
 }
 
 const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(std::uint32_t model) const noexcept
@@ -259,10 +260,11 @@ const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(std::u
     // Get our Handling ID, the default value will be HT_LANDSTAL
     const HandlingType eHandling = GetHandlingID(model);
     // Original GTA:SA behavior
-    if (eHandling < HandlingType::HT_PREDATOR || eHandling > HandlingType::HT_SEAPLANE)
+    if (eHandling < HandlingType::HT_PREDATOR || eHandling > HandlingType::HT_SEAPLANE) {
         return m_OriginalBoatEntries[0].get();
-    else
-        return m_OriginalBoatEntries[static_cast<std::size_t>(eHandling) - static_cast<std::size_t>(HandlingType::HT_PREDATOR)].get();
+    } else {
+        r
+}eturn m_OriginalBoatEntries[static_cast<std::size_t>(eHandling) - static_cast<std::size_t>(HandlingType::HT_PREDATOR)].get();
 }
 
 const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(std::uint32_t model) const noexcept
@@ -273,12 +275,13 @@ const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(std::u
 
     // Get our Handling ID, the default value will be HT_LANDSTAL
     const HandlingType eHandling = GetHandlingID(model);
-    if (eHandling >= HandlingType::HT_BIKE && eHandling <= HandlingType::HT_FREEWAY)
+    if (eHandling >= HandlingType::HT_BIKE && eHandling <= HandlingType::HT_FREEWAY) {
         return m_OriginalBikeEntries[static_cast<std::size_t>(eHandling) - static_cast<std::size_t>(HandlingType::HT_BIKE)].get();
-    else if (eHandling == HandlingType::HT_FAGGIO)
+    } else if (eHandling == HandlingType::HT_FAGGIO) {
         return m_OriginalBikeEntries[13].get();
-    else
+    } else {
         return nullptr;
+}
 }
 
 // Return the handling manager id
@@ -9157,20 +9160,21 @@ void CHandlingManagerSA::CheckSuspensionChanges(const CHandlingEntry* const entr
     bool isChanged = false;
 
     // Find changes
-    if (entry->GetSuspensionAntiDiveMultiplier() != entries->GetSuspensionAntiDiveMultiplier())
+    if (entry->GetSuspensionAntiDiveMultiplier() != entries->GetSuspensionAntiDiveMultiplier()) {
         isChanged = true;
-    else if (entry->GetSuspensionDamping() != entries->GetSuspensionDamping())
+    } else if (entry->GetSuspensionDamping() != entries->GetSuspensionDamping()) {
         isChanged = true;
-    else if (entry->GetSuspensionForceLevel() != entries->GetSuspensionForceLevel())
+    } else if (entry->GetSuspensionForceLevel() != entries->GetSuspensionForceLevel()) {
         isChanged = true;
-    else if (entry->GetSuspensionFrontRearBias() != entries->GetSuspensionFrontRearBias())
+    } else if (entry->GetSuspensionFrontRearBias() != entries->GetSuspensionFrontRearBias()) {
         isChanged = true;
-    else if (entry->GetSuspensionHighSpeedDamping() != entries->GetSuspensionHighSpeedDamping())
+    } else if (entry->GetSuspensionHighSpeedDamping() != entries->GetSuspensionHighSpeedDamping()) {
         isChanged = true;
-    else if (entry->GetSuspensionLowerLimit() != entries->GetSuspensionLowerLimit())
+    } else if (entry->GetSuspensionLowerLimit() != entries->GetSuspensionLowerLimit()) {
         isChanged = true;
-    else if (entry->GetSuspensionUpperLimit() != entries->GetSuspensionUpperLimit())
+    } else if (entry->GetSuspensionUpperLimit() != entries->GetSuspensionUpperLimit()) {
         isChanged = true;
+}
 
     if (!isChanged)
         return;

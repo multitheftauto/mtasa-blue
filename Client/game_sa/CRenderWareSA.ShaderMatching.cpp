@@ -330,9 +330,10 @@ SShaderInfoLayers* CMatchChannelManager::GetShaderForTexAndEntity(STexInfo* pTex
         return nullptr;
 
     // Ignore unknown client entities
-    if (pClientEntity)
+    if (pClientEntity) {
         if (!MapContains(m_KnownClientEntities, pClientEntity))
             pClientEntity = nullptr;
+}
 
     if (pClientEntity)
     {
@@ -510,10 +511,11 @@ void CMatchChannelManager::PulseStaleEntityCacheCleanup()
                 continue;
             }
 
-            if (!MapContains(m_KnownClientEntities, pClientEntity))
+            if (!MapContains(m_KnownClientEntities, pClientEntity)) {
                 staleEntityList[uiStaleCount++] = pClientEntity;
-            else if (uiActiveCount < uiTargetBatch)
+            } else if (uiActiveCount < uiTargetBatch) {
                 activeCacheCleanupList[uiActiveCount++] = pClientEntity;
+}
         }
     }
 
@@ -889,10 +891,11 @@ void CMatchChannelManager::RemoveClientEntityRefs(CClientEntityBase* pClientEnti
                 }
             }
 
-            if (batch.empty())
+            if (batch.empty()) {
                 itBatch = m_StaleEntityChannelCleanupQueue.erase(itBatch);
-            else
+            } else {
                 ++itBatch;
+}
         }
         m_DeferredQueueEntityPresence.erase(pClientEntity);
     }
@@ -1040,10 +1043,11 @@ void CMatchChannelManager::RemoveShaderRefs(CSHADERDUMMY* pShaderData)
                 }
             }
 
-            if (batch.empty())
+            if (batch.empty()) {
                 itBatch = m_StaleEntityChannelCleanupQueue.erase(itBatch);
-            else
+            } else {
                 ++itBatch;
+}
         }
 
         m_DeferredQueueShaderPresence.erase(pShaderInfo);
@@ -1656,10 +1660,11 @@ void CMatchChannelManager::GetShaderReplacementStats(SShaderReplacementStats& ou
             const SMatchType& matchType = matchTypeList[i];
             if (i)
                 strResult += " ";
-            if (matchTypeList[i].bAdditive)
+            if (matchTypeList[i].bAdditive) {
                 strResult += "+";
-            else
+            } else {
                 strResult += "-";
+}
             strResult += matchTypeList[i].strMatch;
 
             if (strResult.length() > 25)

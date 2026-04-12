@@ -304,8 +304,9 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                                 }
                             }
                         }
-                        else
+                        else {
                             ++entityIter;
+}
                     }
                 }
                 // Start the iterator with the data remove list first item
@@ -356,11 +357,13 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                 // Success! don't return incase there are any others to delete
                 bSuccess = true;
             }
-            else
+            else {
                 iter++;
+}
         }
-        else
+        else {
             iter++;
+}
     }
     std::pair<std::multimap<uint16_t, sDataBuildingRemovalItem*>::iterator, std::multimap<uint16_t, sDataBuildingRemovalItem*>::iterator>
                                                                        dataBuildingIterators = m_pDataBuildings->equal_range(usModelToRestore);
@@ -624,8 +627,9 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
             m_pBuildingRemovals->erase(iter++);
             delete pFind;
         }
-        else
+        else {
             iter++;
+}
     }
     // Init some variables
     std::multimap<uint16_t, sDataBuildingRemovalItem*>::const_iterator iterator = m_pDataBuildings->begin();
@@ -776,8 +780,9 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
                         // remove it from the binary removed list for this removal
                         pFind->m_pBinaryRemoveList->erase(entityIter++);
                     }
-                    else
+                    else {
                         entityIter++;
+}
                 }
             }
             if (pFind->m_pDataRemoveList->empty() == false)
@@ -794,8 +799,9 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
                         // remove it from the data removed list for this removal
                         pFind->m_pDataRemoveList->erase(entityIter++);
                     }
-                    else
+                    else {
                         entityIter++;
+}
                 }
             }
         }
@@ -817,11 +823,13 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
                     // remove it from the data buildings list so we don't try and remove or add it again.
                     m_pDataBuildings->erase(iterator++);
                 }
-                else
+                else {
                     iterator++;
+}
             }
-            else
+            else {
                 iterator++;
+}
         }
     }
     {
@@ -841,11 +849,13 @@ void CBuildingRemovalSA::RemoveWorldBuildingFromLists(CEntitySAInterface* pInter
                     // remove it from the data buildings list so we don't try and remove or add it again.
                     m_pBinaryBuildings->erase(iteratorBinary++);
                 }
-                else
+                else {
                     iteratorBinary++;
+}
             }
-            else
+            else {
                 iteratorBinary++;
+}
         }
     }
     ClearEntityTracking(pInterface);
@@ -985,10 +995,11 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
         bool bMatchesIpl = false;
         if (bPoolSlotOccupied)
         {
-            if (!IsExpectedRemovalModel(pEntity, it->first))
+            if (!IsExpectedRemovalModel(pEntity, it->first)) {
                 bPoolSlotOccupied = false;
-            else
+            } else {
                 bMatchesIpl = canMatchByIpl && pEntity->m_iplIndex == iplIndex;
+}
         }
 
         if (!bPoolSlotOccupied || bMatchesIpl)
@@ -997,8 +1008,9 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
             delete pItem;
             it = m_pDataBuildings->erase(it);
         }
-        else
+        else {
             ++it;
+}
     }
 
     // Purge matching entries from the binary buildings catalog
@@ -1023,10 +1035,11 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
         bool bMatchesIpl = false;
         if (bPoolSlotOccupied)
         {
-            if (!IsExpectedRemovalModel(pEntity, it->first))
+            if (!IsExpectedRemovalModel(pEntity, it->first)) {
                 bPoolSlotOccupied = false;
-            else
+            } else {
                 bMatchesIpl = canMatchByIpl && pEntity->m_iplIndex == iplIndex;
+}
         }
 
         if (!bPoolSlotOccupied || bMatchesIpl)
@@ -1035,8 +1048,9 @@ void CBuildingRemovalSA::OnRemoveIpl(int iplSlotIndex)
             delete pItem;
             it = m_pBinaryBuildings->erase(it);
         }
-        else
+        else {
             ++it;
+}
     }
 }
 

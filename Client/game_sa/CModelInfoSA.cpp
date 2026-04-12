@@ -241,13 +241,8 @@ bool CModelInfoSA::IsBoat()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    using func_t = decltype(bReturn) (__cdecl*)(decltype(ModelID));
+bReturn =     reinterpret_cast<func_t>(dwFunction)(ModelID);
     // clang-format on
     return bReturn;
 }
@@ -258,13 +253,8 @@ bool CModelInfoSA::IsCar()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    using func_t = decltype(bReturn) (__cdecl*)(decltype(ModelID));
+bReturn =     reinterpret_cast<func_t>(dwFunction)(ModelID);
     // clang-format on
     return bReturn;
 }
@@ -275,13 +265,8 @@ bool CModelInfoSA::IsTrain()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    using func_t = decltype(bReturn) (__cdecl*)(decltype(ModelID));
+bReturn =     reinterpret_cast<func_t>(dwFunction)(ModelID);
     // clang-format on
     return bReturn;
 }
@@ -292,13 +277,8 @@ bool CModelInfoSA::IsHeli()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    using func_t = decltype(bReturn) (__cdecl*)(decltype(ModelID));
+bReturn =     reinterpret_cast<func_t>(dwFunction)(ModelID);
     // clang-format on
     return bReturn;
 }
@@ -309,13 +289,8 @@ bool CModelInfoSA::IsPlane()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    using func_t = decltype(bReturn) (__cdecl*)(decltype(ModelID));
+bReturn =     reinterpret_cast<func_t>(dwFunction)(ModelID);
     // clang-format on
     return bReturn;
 }
@@ -326,13 +301,8 @@ bool CModelInfoSA::IsBike()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    using func_t = decltype(bReturn) (__cdecl*)(decltype(ModelID));
+bReturn =     reinterpret_cast<func_t>(dwFunction)(ModelID);
     // clang-format on
     return bReturn;
 }
@@ -343,13 +313,8 @@ bool CModelInfoSA::IsFakePlane()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    using func_t = decltype(bReturn) (__cdecl*)(decltype(ModelID));
+bReturn =     reinterpret_cast<func_t>(dwFunction)(ModelID);
     // clang-format on
     return bReturn;
 }
@@ -360,13 +325,8 @@ bool CModelInfoSA::IsMonsterTruck()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    using func_t = decltype(bReturn) (__cdecl*)(decltype(ModelID));
+bReturn =     reinterpret_cast<func_t>(dwFunction)(ModelID);
     // clang-format on
     return bReturn;
 }
@@ -377,13 +337,8 @@ bool CModelInfoSA::IsQuadBike()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    using func_t = decltype(bReturn) (__cdecl*)(decltype(ModelID));
+bReturn =     reinterpret_cast<func_t>(dwFunction)(ModelID);
     // clang-format on
     return bReturn;
 }
@@ -394,13 +349,8 @@ bool CModelInfoSA::IsBmx()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    using func_t = decltype(bReturn) (__cdecl*)(decltype(ModelID));
+bReturn =     reinterpret_cast<func_t>(dwFunction)(ModelID);
     // clang-format on
     return bReturn;
 }
@@ -411,13 +361,8 @@ bool CModelInfoSA::IsTrailer()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    using func_t = decltype(bReturn) (__cdecl*)(decltype(ModelID));
+bReturn =     reinterpret_cast<func_t>(dwFunction)(ModelID);
     // clang-format on
     return bReturn;
 }
@@ -511,12 +456,8 @@ uint CModelInfoSA::GetAnimFileIndex()
     DWORD dwThis = (DWORD)m_pInterface;
     uint  uiReturn = 0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     uiReturn, eax
-    }
+    using func_t = decltype(uiReturn) (__thiscall*)(decltype(dwThis) );
+uiReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
     return uiReturn;
 }
@@ -795,24 +736,25 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
 
             m_pInterface->bDontCollideWithFlyer = ideFlags.bDontCollideWithFlyer;
 
-            if (ideFlags.bFlag20)
+            if (ideFlags.bFlag20) {
                 m_pInterface->eSpecialModelType = eModelSpecialType::CRANE;
-            else if (ideFlags.bFlag24)
+            } else if (ideFlags.bFlag24) {
                 m_pInterface->eSpecialModelType = eModelSpecialType::UNKNOW_1;
-            else if (ideFlags.bIsBreakableStatue)
+            } else if (ideFlags.bIsBreakableStatue) {
                 m_pInterface->eSpecialModelType = eModelSpecialType::BREAKABLE_STATUE;
-            else if (ideFlags.bIsTag)
+            } else if (ideFlags.bIsTag) {
                 m_pInterface->eSpecialModelType = eModelSpecialType::TAG;
-            else if (ideFlags.bIsPalm)
+            } else if (ideFlags.bIsPalm) {
                 m_pInterface->eSpecialModelType = eModelSpecialType::PALM;
-            else if (ideFlags.bIsTree)
+            } else if (ideFlags.bIsTree) {
                 m_pInterface->eSpecialModelType = eModelSpecialType::TREE;
-            else if (ideFlags.bIsGarageDoor)
+            } else if (ideFlags.bIsGarageDoor) {
                 m_pInterface->eSpecialModelType = eModelSpecialType::GARAGE_DOOR;
-            else if (ideFlags.bIsGlassType2)
+            } else if (ideFlags.bIsGlassType2) {
                 m_pInterface->eSpecialModelType = eModelSpecialType::GLASS_2;
-            else if (ideFlags.bIsGlassType1)
+            } else if (ideFlags.bIsGlassType1) {
                 m_pInterface->eSpecialModelType = eModelSpecialType::GLASS_1;
+}
             break;
         }
         case eModelInfoType::CLUMP:
@@ -945,10 +887,11 @@ bool CModelInfoSA::GetIdeFlag(eModelIdeFlag eIdeFlag)
 
 void CModelInfoSA::SetModelSpecialType(eModelSpecialType eType, bool bState)
 {
-    if (bState)
+    if (bState) {
         m_pInterface->eSpecialModelType = eType;
-    else if (m_pInterface->eSpecialModelType == eType)
+    } else if (m_pInterface->eSpecialModelType == eType) {
         m_pInterface->eSpecialModelType = eModelSpecialType::NONE;
+}
 }
 
 void CModelInfoSA::StaticResetFlags()
@@ -976,13 +919,8 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
     DWORD         ModelID = m_dwModelID;
     CBoundingBox* dwReturn = 0;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunc
-        add     esp, 4
-        mov     dwReturn, eax
-    }
+    using func_t = decltype(dwReturn) (__cdecl*)(decltype(ModelID));
+dwReturn =     reinterpret_cast<func_t>(dwFunc)(ModelID);
     // clang-format on
     return dwReturn;
 }
@@ -1641,8 +1579,9 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             timedOutTxdIDs.insert(it->first);
             it = ms_RestreamTxdIDMap.erase(it);
         }
-        else
+        else {
             ++it;
+}
     }
 
     // Force unload models for timed-out TXD IDs (entities that were always being rendered)
@@ -1744,11 +1683,13 @@ void CModelInfoSA::ModelAddRef(EModelRequestType requestType, const char* szTag)
                 m_pInterface->usNumberOfRefs++;
                 CTxdStore_AddRef(m_pInterface->usTextureDictionary);
             }
-            else
+            else {
                 m_pInterface = nullptr;
+}
         }
-        else
-            m_dwPendingInterfaceRef = 1;
+        else {
+            m
+}_dwPendingInterfaceRef = 1;
     }
 
     m_dwReferences++;
@@ -1808,11 +1749,8 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
         if (pInterface && pInterface->usNumberOfRefs > 1)
         {
             DWORD dwFunction = FUNC_RemoveRef;
-            _asm
-            {
-                mov     ecx, pInterface
-                call    dwFunction
-            }
+            using func_t = void (__thiscall*)(decltype(pInterface) );
+    reinterpret_cast<func_t>(dwFunction)(pInterface);
         }
     }
 
@@ -2407,10 +2345,11 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
             // Weapon models (321-372) may return UNKNOWN type during streaming. Using ReplaceAllAtomicsInModel
             // for weapons would skip CWeaponModelInfo::SetClump, leaving the frame plugin's m_modelInfo NULL,
             // which crashes in CVisibilityPlugins::RenderWeaponCB due to nullptr deref.
-            if (m_dwModelID >= 321 && m_dwModelID <= 372)
+            if (m_dwModelID >= 321 && m_dwModelID <= 372) {
                 success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
-            else
+            } else {
                 success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
+}
             break;
         default:
             AddReportLog(8634, SString("SetCustomModel: Unhandled model type %d for model %u", static_cast<int>(GetModelType()),
@@ -2601,10 +2540,11 @@ void CModelInfoSA::RestoreColModel()
             }
             else if (!pColData && m_dwReferences > 1)
             {
-                if (SafeReadColSlot(m_pInterface->pColModel, &slot))
+                if (SafeReadColSlot(m_pInterface->pColModel, &slot)) {
                     pGame->GetStreaming()->RemoveModel(RESOURCE_ID_COL + slot);
-                else
+                } else {
                     AddReportLog(5559, SString("RestoreColModel: ColSlot read failed for model %u", m_dwModelID), 10);
+}
             }
         }
     }
@@ -2649,15 +2589,16 @@ void CModelInfoSA::AddColRef()
 {
     CColModelSAInterface* originalColModel = nullptr;
 
-    if (m_pOriginalColModelInterface && m_pCustomColModel)
+    if (m_pOriginalColModelInterface && m_pCustomColModel) {
         originalColModel = m_pOriginalColModelInterface;
-    else
+    } else
     {
         CBaseModelInfoSAInterface* pInterface = GetInterface();
-        if (pInterface)
+        if (pInterface) {
             originalColModel = pInterface->pColModel;
-        else
+        } else {
             AddReportLog(5552, SString("AddColRef called with null/invalid interface for model %u", m_dwModelID), 10);
+}
     }
 
     unsigned short slot = m_usColSlot;
@@ -2703,9 +2644,9 @@ void CModelInfoSA::RemoveColRef()
 
     CColModelSAInterface* originalColModel = nullptr;
 
-    if (m_pOriginalColModelInterface && m_pCustomColModel)
+    if (m_pOriginalColModelInterface && m_pCustomColModel) {
         originalColModel = m_pOriginalColModelInterface;
-    else
+    } else
     {
         CBaseModelInfoSAInterface* pInterface = GetInterface();
         if (pInterface)
@@ -3484,11 +3425,8 @@ bool CModelInfoSA::ForceUnload()
     uint  uiLimit = 100;
     while (pInterface->usNumberOfRefs > 0 && uiLimit--)
     {
-        _asm
-        {
-            mov     ecx, pInterface
-            call    dwFunction
-        }
+        using func_t = void (__thiscall*)(decltype(pInterface) );
+    reinterpret_cast<func_t>(dwFunction)(pInterface);
     }
 
     if (pInterface->usNumberOfRefs > 0 || pInterface->pRwObject != nullptr)

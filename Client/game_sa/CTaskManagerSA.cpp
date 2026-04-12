@@ -66,19 +66,16 @@ CTask* CTaskManagerSA::GetActiveTask()
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    using func_t = decltype(dwReturn) (__thiscall*)(decltype(dwThis) );
+dwReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
 
     CTaskSAInterface* pActiveTask = (CTaskSAInterface*)dwReturn;
-    if (dwReturn)
+    if (dwReturn) {
         return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else
+    } else {
         return NULL;
+}
 }
 
 CTask* CTaskManagerSA::GetSimplestActiveTask()
@@ -88,12 +85,8 @@ CTask* CTaskManagerSA::GetSimplestActiveTask()
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    using func_t = decltype(dwReturn) (__thiscall*)(decltype(dwThis) );
+dwReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
 
     if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
@@ -106,13 +99,8 @@ CTask* CTaskManagerSA::GetSimplestTask(const int iPriority)
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    iPriority
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    using func_t = decltype(dwReturn) (__thiscall*)(decltype(dwThis), decltype(iPriority));
+dwReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis, iPriority);
     // clang-format on
 
     if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
@@ -125,13 +113,8 @@ CTask* CTaskManagerSA::FindActiveTaskByType(const int iTaskType)
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    iTaskType
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    using func_t = decltype(dwReturn) (__thiscall*)(decltype(dwThis), decltype(iTaskType));
+dwReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis, iTaskType);
     // clang-format on
 
     if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
@@ -144,14 +127,8 @@ CTask* CTaskManagerSA::FindTaskByType(const int iPriority, const int iTaskType)
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    iTaskType
-        push    iPriority
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    using func_t = decltype(dwReturn) (__thiscall*)(decltype(dwThis), decltype(iPriority), decltype(iTaskType));
+dwReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis, iPriority, iTaskType);
     // clang-format on
 
     if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
@@ -183,13 +160,8 @@ void CTaskManagerSA::SetTaskSecondary(CTaskSA* pTaskSecondary, const int iType)
         taskInterface = pTaskSecondary->GetInterface();
     DWORD dwInterface = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        push    iType
-        push    taskInterface
-        mov     ecx, dwInterface
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwInterface), decltype(taskInterface), decltype(iType));
+    reinterpret_cast<func_t>(dwFunc)(dwInterface, taskInterface, iType);
     // clang-format on
 }
 
@@ -198,10 +170,11 @@ void CTaskManagerSA::SetTaskSecondary(CTaskSA* pTaskSecondary, const int iType)
  */
 CTask* CTaskManagerSA::GetTaskSecondary(const int iType)
 {
-    if (iType < TASK_SECONDARY_MAX)
+    if (iType < TASK_SECONDARY_MAX) {
         return m_pTaskManagementSystem->GetTask(GetInterface()->m_tasksSecondary[iType]);
-    else
+    } else {
         return NULL;
+}
 }
 
 bool CTaskManagerSA::HasTaskSecondary(const CTask* pTaskSecondary)
@@ -209,12 +182,8 @@ bool CTaskManagerSA::HasTaskSecondary(const CTask* pTaskSecondary)
     DWORD dwFunc = FUNC_HasTaskSecondary;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    pTaskSecondary
-        call    dwFunc
-        mov     bReturn, al
-    }
+    using func_t = decltype(bReturn) (__cdecl*)(decltype(pTaskSecondary));
+bReturn =     reinterpret_cast<func_t>(dwFunc)(pTaskSecondary);
     // clang-format on
     return bReturn;
 }
@@ -223,10 +192,8 @@ void CTaskManagerSA::ClearTaskEventResponse()
 {
     DWORD dwFunc = FUNC_ClearTaskEventResponse;
     // clang-format off
-    __asm
-    {
-        call    dwFunc
-    }
+    using func_t = void (__cdecl*)();
+    reinterpret_cast<func_t>(dwFunc)();
     // clang-format on
 }
 

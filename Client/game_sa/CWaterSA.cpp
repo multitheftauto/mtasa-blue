@@ -70,10 +70,11 @@ void CWaterVertexSA::OnChangeLevel(float fOldZ, float fNewZ)
         bool bIsDefaultOrZero = (fNewZ == m_fDefaultZ) || (fNewZ == 0);
         if (bWasDefaultOrZero != bIsDefaultOrZero)
         {
-            if (bWasDefaultOrZero)
+            if (bWasDefaultOrZero) {
                 ms_iNumNonDefaultAndNonZeroVertices++;
-            else
+            } else {
                 ms_iNumNonDefaultAndNonZeroVertices--;
+}
 
             if (ms_iNumNonDefaultAndNonZeroVertices == 0 || ms_iNumNonDefaultAndNonZeroVertices == 1)
                 g_pWaterManager->UpdateRenderOrderRequirement();

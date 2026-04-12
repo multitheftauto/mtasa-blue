@@ -213,12 +213,13 @@ RwTexture* CRenderWareSA::RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit
     // Lock mip level 0 if required
     D3DLOCKED_RECT lockedRect = pD3DRaster->lockedRect;
     bool           bNeedOwnLock = (pD3DRaster->lockedLevel != 0) || !pD3DRaster->lockedSurface;
-    if (bNeedOwnLock)
+    if (bNeedOwnLock) {
         if (FAILED(pD3DRaster->texture->LockRect(0, &lockedRect, NULL, D3DLOCK_NO_DIRTY_UPDATE | D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
         {
             strError = "pD3DRaster->texture->LockRect failed";
             return NULL;
         }
+}
 
     // Try resize
     CBuffer newPixelBuffer;

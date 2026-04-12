@@ -24,16 +24,8 @@ CPedDamageResponseCalculatorSA::CPedDamageResponseCalculatorSA(CEntity* pEntity,
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CPedDamageResponseCalculator_Constructor;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    b_1
-        push    bodyPart
-        push    weaponType
-        push    fDamage
-        push    dwEntityInterface
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(dwEntityInterface), decltype(fDamage), decltype(weaponType), decltype(bodyPart), decltype(b_1));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, dwEntityInterface, fDamage, weaponType, bodyPart, b_1);
     // clang-format on
 }
 
@@ -50,11 +42,8 @@ CPedDamageResponseCalculatorSA::~CPedDamageResponseCalculatorSA()
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CPedDamageResponseCalculator_Destructor;
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
+        using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
         // clang-format on
         delete m_pInterface;
     }
@@ -67,13 +56,7 @@ void CPedDamageResponseCalculatorSA::ComputeDamageResponse(CPed* pPed, CPedDamag
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CPedDamageResponseCalculator_ComputeDamageResponse;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    bSpeak
-        push    dwResponseInterface
-        push    dwPedInterface
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(dwPedInterface), decltype(dwResponseInterface), decltype(bSpeak));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, dwPedInterface, dwResponseInterface, bSpeak);
     // clang-format on
 }

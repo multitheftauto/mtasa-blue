@@ -132,10 +132,11 @@ CVehicle* CPedSA::GetVehicle() const
 
 void CPedSA::Respawn(CVector* position, bool cameraCut)
 {
-    if (!cameraCut)
+    if (!cameraCut) {
         // CGameLogic::RestorePlayerStuffDuringResurrection
         // Disable calls to CCamera::SetCameraDirectlyBehindForFollowPed_CamOnAString & CCamera::RestoreWithJumpCut
         MemSet((void*)0x4422EA, 0x90, 20);
+}
 
     // void __cdecl CGameLogic::RestorePlayerStuffDuringResurrection(CPlayerPed *player, __int128 a2)
     ((void(__cdecl*)(CEntitySAInterface*, float, float, float, float))FUNC_RestorePlayerStuffDuringResurrection)(m_pInterface, position->fX, position->fY,
@@ -151,10 +152,11 @@ void CPedSA::Respawn(CVector* position, bool cameraCut)
     // BYTE *__thiscall CPed::RemoveGogglesModel(CPed *this)
     ((std::uint8_t*(__thiscall*)(CEntitySAInterface*))FUNC_RemoveGogglesModel)(m_pInterface);
 
-    if (!cameraCut)
+    if (!cameraCut) {
         // Re-enable calls to CCamera::SetCameraDirectlyBehindForFollowPed_CamOnAString & CCamera::RestoreWithJumpCut
         // Restore original bytes
         MemCpy((void*)0x4422EA, "\xB9\x28\xF0\xB6\x00\xE8\x4C\x9A\x0C\x00\xB9\x28\xF0\xB6\x00\xE8\xB2\x97\x0C\x00", 20);
+}
 }
 
 CWeapon* CPedSA::GiveWeapon(eWeaponType weaponType, std::uint32_t ammo, eWeaponSkill skill)
@@ -273,9 +275,10 @@ void CPedSA::SetCurrentWeaponSlot(eWeaponSlot weaponSlot)
         // void __thiscall CPlayerPed::MakeChangesForNewWeapon(CPlayerPed *this, int a3)
         changeWeaponFunc = FUNC_MakeChangesForNewWeapon_Slot;
     }
-    else
+    else {
         // void __thiscall CPed::SetCurrentWeapon(CPed *this, int slot)
         changeWeaponFunc = FUNC_SetCurrentWeapon;
+}
 
     ((void(__thiscall*)(CEntitySAInterface*, eWeaponSlot))changeWeaponFunc)(m_pInterface, weaponSlot);
 }
@@ -287,9 +290,10 @@ CVector* CPedSA::GetBonePosition(eBone bone, CVector* position)
 
     // NOTE(botder): A crash used to occur at 0x749B7B in RpClumpForAllAtomics, because the clump pointer might have been null
     // for a broken model.
-    if (entity->m_pRwObject)
+    if (entity->m_pRwObject) {
         // int __thiscall CPed::GetBonePosition(CPed *this, CVector *pPoint, int bone_id, bool bDynamic)
         ((void(__thiscall*)(CEntitySAInterface*, CVector*, eBone, bool))FUNC_GetBonePosition)(entity, position, bone, true);
+}
 
     // Clamp to a sane range as this function can occasionally return massive values,
     // which causes ProcessLineOfSight to effectively freeze
@@ -309,9 +313,10 @@ CVector* CPedSA::GetTransformedBonePosition(eBone bone, CVector* position)
     // NOTE: A further crash occurs at 0x7C51B9 in RpHAnimIDGetIndex when the clump exists but lacks animation hierarchy data,
     // because GTA:SA's GetTransformedBonePosition doesn't check if GetAnimHierarchyFromSkinClump returns NULL.
     RpClump* clump = reinterpret_cast<RpClump*>(entity->m_pRwObject);
-    if (clump && GetAnimHierarchyFromSkinClump(clump))
+    if (clump && GetAnimHierarchyFromSkinClump(clump)) {
         // RwV3D *__thiscall CPed::GetTransformedBonePosition(CPed *this, RwV3D *pointsIn, int boneId, char bUpdateBones)
         ((RwV3d * (__thiscall*)(CEntitySAInterface*, CVector*, eBone, bool)) FUNC_GetTransformedBonePosition)(entity, position, bone, true);
+}
 
     // Clamp to a sane range as this function can occasionally return massive values,
     // which causes ProcessLineOfSight to effectively freeze

@@ -22,17 +22,8 @@ CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntitySAInterface* pClimbEnt, const CVec
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    bForceClimb
-        push    nHeight
-        push    nSurfaceType
-        push    fHeading
-        push    vecTarget
-        push    pClimbEnt
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThisInterface), decltype(pClimbEnt), decltype(vecTarget), decltype(fHeading), decltype(nSurfaceType), decltype(nHeight), decltype(bForceClimb));
+    reinterpret_cast<func_t>(dwFunc)(dwThisInterface, pClimbEnt, vecTarget, fHeading, nSurfaceType, nHeight, bForceClimb);
     // clang-format on
 }
 
@@ -50,14 +41,7 @@ CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float f
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    0               // pTargetEnt - ignored for simplicity's sake (we really don't need it)
-        push    nHoverTime
-        push    fCruiseHeight
-        push    pVecTargetPos
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThisInterface), decltype(pVecTargetPos), decltype(fCruiseHeight), decltype(nHoverTime), decltype(0));
+    reinterpret_cast<func_t>(dwFunc)(dwThisInterface, pVecTargetPos, fCruiseHeight, nHoverTime, 0);
     // clang-format on
 }

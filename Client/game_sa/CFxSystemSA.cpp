@@ -44,11 +44,8 @@ void CFxSystemSA::PlayAndKill()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_FxSystem_c__PlayAndKill;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
 }
 
@@ -118,10 +115,11 @@ void CFxSystemSA::SetDrawDistance(float fDrawDistance)
 
 float CFxSystemSA::GetDrawDistance()
 {
-    if (HasCustomDrawDistance())
+    if (HasCustomDrawDistance()) {
         return m_fDrawDistance;
-    else
+    } else {
         return m_pInterface->pBlueprint->usCullDistance / 256.f;
+}
 }
 
 bool CFxSystemSA::HasCustomDrawDistance()
@@ -147,8 +145,9 @@ __declspec(noinline) void OnMY_FxSystem_c_Update_MidA_Pre(CFxSystemSAInterface* 
         pFxSystemSAInterface->pBlueprint->usCullDistance = (ushort)(ms_fUsingDrawDistance * 8);
         ms_fFxSystemUpdateCullDistMultiplier = 1 / 8.f;
     }
-    else
+    else {
         ms_fUsingDrawDistance = 0;
+}
 }
 
 __declspec(noinline) void OnMY_FxSystem_c_Update_MidA_Post()

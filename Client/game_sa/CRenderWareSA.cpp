@@ -85,10 +85,11 @@ static RwObject* ReplacePartsCB(RwObject* object, SReplaceParts* data)
     for (unsigned int i = 0; i < data->uiReplacements; i++)
     {
         // get the correct atomic name based on the object # in our parent frame
-        if (data->ucIndex == 0)
+        if (data->ucIndex == 0) {
             snprintf(&szAtomicName[0], 16, "%s_ok", data->szName);
-        else
+        } else {
             snprintf(&szAtomicName[0], 16, "%s_dam", data->szName);
+}
 
         // see if we have such an atomic in our replacement atomics array
         if (strncmp(&data->pReplacements[i].szName[0], &szAtomicName[0], 16) == 0)
@@ -598,9 +599,10 @@ bool CRenderWareSA::DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB,
         MapInsert(geometryListA, atomicListA[i]->geometry);
 
     uint uiInBoth = 0;
-    for (uint i = 0; i < atomicListB.size(); i++)
+    for (uint i = 0; i < atomicListB.size(); i++) {
         if (MapContains(geometryListA, atomicListB[i]->geometry))
             uiInBoth++;
+}
 
     // If less than 50% match then assume it is not the same
     if (uiInBoth * 2 < atomicListB.size() || atomicListB.size() == 0)
@@ -933,10 +935,11 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
             {
                 CBaseModelInfoSAInterface* fallback = nullptr;
                 auto*                      arrayEntry = ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID];
-                if (arrayEntry && SharedUtil::IsReadablePointer(arrayEntry, sizeof(*arrayEntry)))
+                if (arrayEntry && SharedUtil::IsReadablePointer(arrayEntry, sizeof(*arrayEntry))) {
                     fallback = arrayEntry;
-                else if (pInterfaceAfterSet && SharedUtil::IsReadablePointer(pInterfaceAfterSet, sizeof(*pInterfaceAfterSet)))
+                } else if (pInterfaceAfterSet && SharedUtil::IsReadablePointer(pInterfaceAfterSet, sizeof(*pInterfaceAfterSet))) {
                     fallback = pInterfaceAfterSet;
+}
                 bool       restored = false;
                 const bool oldClumpReadable = pOldClump && SharedUtil::IsReadablePointer(pOldClump, sizeof(*pOldClump));
                 if (fallback && oldClumpReadable && SharedUtil::IsReadablePointer(fallback->VFTBL, sizeof(*fallback->VFTBL)))

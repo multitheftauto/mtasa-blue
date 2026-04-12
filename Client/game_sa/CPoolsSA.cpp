@@ -307,8 +307,9 @@ CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool
                 // Set super hacky flag to indicate this is a special low lod object
                 pObject->m_pInterface->SetIsLowLodEntity();
             }
-            else
+            else {
                 pObject->m_pInterface->SetIsHighLodEntity();
+}
         }
         else
         {

@@ -23,11 +23,8 @@ void CAEVehicleAudioEntitySA::JustGotInVehicleAsDriver()
     DWORD dwFunc = FUNC_CAEVehicleAudioEntity__JustGotInVehicleAsDriver;
     DWORD dwThis = (DWORD)m_pInterface;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
 }
 
@@ -37,11 +34,8 @@ void CAEVehicleAudioEntitySA::JustGotOutOfVehicleAsDriver()
     DWORD dwFunc = FUNC_CAEVehicleAudioEntity__JustGotOutOfVehicleAsDriver;
     DWORD dwThis = (DWORD)m_pInterface;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
 }
 
@@ -50,11 +44,8 @@ void CAEVehicleAudioEntitySA::TurnOnRadioForVehicle()
     DWORD dwFunc = FUNC_CAEVehicleAudioEntity__TurnOnRadioForVehicle;
     DWORD dwThis = (DWORD)m_pInterface;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
 }
 
@@ -66,11 +57,8 @@ void CAEVehicleAudioEntitySA::StopVehicleEngineSound(unsigned char ucSlot)
     {
         DWORD dwThis = (DWORD)pVehicleSound->m_pSound;
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
+        using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
         // clang-format on
     }
 }

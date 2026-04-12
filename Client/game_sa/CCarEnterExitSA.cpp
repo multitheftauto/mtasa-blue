@@ -27,16 +27,8 @@ bool CCarEnterExitSA::GetNearestCarDoor(CPed* pPed, CVehicle* pVehicle, CVector*
         CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
         CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
         // clang-format off
-        __asm
-        {
-            push    pDoor
-            push    pVector
-            push    pVehicleInterface
-            push    pPedInterface
-            call    dwFunc
-            add     esp, 0x10
-            mov     bReturn, al
-        }
+        using func_t = decltype(bReturn) (__cdecl*)(decltype(pPedInterface), decltype(pVehicleInterface), decltype(pVector), decltype(pDoor));
+bReturn =     reinterpret_cast<func_t>(dwFunc)(pPedInterface, pVehicleInterface, pVector, pDoor);
         // clang-format on
     }
 
@@ -108,14 +100,8 @@ int CCarEnterExitSA::ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle)
         CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
         CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
         // clang-format off
-        __asm
-        {
-            push    pPedInterface
-            push    pVehicleInterface
-            call    dwFunc
-            add     esp, 8
-            mov     door, eax
-        }
+        using func_t = decltype(door) (__cdecl*)(decltype(pVehicleInterface), decltype(pPedInterface));
+door =     reinterpret_cast<func_t>(dwFunc)(pVehicleInterface, pPedInterface);
         // clang-format on
 
         switch (door)
@@ -192,15 +178,8 @@ bool CCarEnterExitSA::IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVec
         {
             CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
             // clang-format off
-            __asm
-            {
-                push    pUnknown
-                push    dwIdx
-                push    pVehicleInterface
-                call    dwFunc
-                add     esp, 12
-                mov     bRet, al
-            }
+            using func_t = decltype(bRet) (__cdecl*)(decltype(pVehicleInterface), decltype(dwIdx), decltype(pUnknown));
+bRet =     reinterpret_cast<func_t>(dwFunc)(pVehicleInterface, dwIdx, pUnknown);
             // clang-format on
         }
     }

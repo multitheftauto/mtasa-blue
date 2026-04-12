@@ -36,14 +36,8 @@ void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControlle
 {
     DWORD dwFunc = FUNC_SetControllerKeyAssociatedWithAction;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CControllerConfigManager
-        push    controllerType
-        push    iKey
-        push    action
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(0xB70198), decltype(action), decltype(iKey), decltype(controllerType));
+    reinterpret_cast<func_t>(dwFunc)(0xB70198, action, iKey, controllerType);
     // clang-format on
 }
 
@@ -52,14 +46,8 @@ int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eController
     int   iReturn = 0;
     DWORD dwFunc = FUNC_GetControllerKeyAssociatedWithAction;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CControllerConfigManager
-        push    controllerType
-        push    action
-        call    dwFunc
-        mov     iReturn, eax
-    }
+    using func_t = decltype(iReturn) (__thiscall*)(decltype(0xB70198), decltype(action), decltype(controllerType));
+iReturn =     reinterpret_cast<func_t>(dwFunc)(0xB70198, action, controllerType);
     // clang-format on
     return iReturn;
 }
@@ -69,13 +57,8 @@ int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction acti
     int   iReturn = 0;
     DWORD dwFunc = FUNC_GetNumOfSettingsForAction;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CControllerConfigManager
-        push    action
-        call    dwFunc
-        mov     iReturn, eax
-    }
+    using func_t = decltype(iReturn) (__thiscall*)(decltype(0xB70198), decltype(action));
+iReturn =     reinterpret_cast<func_t>(dwFunc)(0xB70198, action);
     // clang-format on
     return iReturn;
 }
@@ -84,13 +67,8 @@ void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAc
 {
     DWORD dwFunc = FUNC_ClearSettingsAssociatedWithAction;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CControllerConfigManager
-        push    controllerType
-        push    action
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(0xB70198), decltype(action), decltype(controllerType));
+    reinterpret_cast<func_t>(dwFunc)(0xB70198, action, controllerType);
     // clang-format on
 }
 

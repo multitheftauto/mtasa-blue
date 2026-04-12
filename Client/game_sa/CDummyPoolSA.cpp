@@ -76,10 +76,11 @@ void CDummyPoolSA::RestoreBackup()
 
 void CDummyPoolSA::UpdateBuildingLods(const std::uint32_t offset)
 {
-    if (m_pOriginalElementsBackup)
+    if (m_pOriginalElementsBackup) {
         UpdateBackupLodOffset(offset);
-    else
+    } else {
         UpdateLodsOffestInPool(offset);
+}
 }
 
 void CDummyPoolSA::UpdateBackupLodOffset(const std::uint32_t offset)

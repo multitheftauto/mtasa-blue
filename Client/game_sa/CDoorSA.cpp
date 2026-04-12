@@ -50,12 +50,8 @@ bool CDoorSA::IsClosed()
     if (dwPointer != 0)
     {
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwPointer
-            call    dwFunction
-            mov     bReturn, al
-        }
+        using func_t = decltype(bReturn) (__thiscall*)(decltype(dwPointer) );
+bReturn =     reinterpret_cast<func_t>(dwFunction)(dwPointer);
         // clang-format on
     }
 
@@ -76,12 +72,8 @@ bool CDoorSA::IsFullyOpen()
     if (dwPointer != 0)
     {
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwPointer
-            call    dwFunction
-            mov     bReturn, al
-        }
+        using func_t = decltype(bReturn) (__thiscall*)(decltype(dwPointer) );
+bReturn =     reinterpret_cast<func_t>(dwFunction)(dwPointer);
         // clang-format on
     }
 
@@ -101,12 +93,8 @@ void CDoorSA::Open(float fOpenRatio)
     if (dwPointer != 0)
     {
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwPointer
-            push    fOpenRatio
-            call    dwFunction
-        }
+        using func_t = void (__thiscall*)(decltype(dwPointer), decltype(fOpenRatio));
+    reinterpret_cast<func_t>(dwFunction)(dwPointer, fOpenRatio);
         // clang-format on
     }
 }

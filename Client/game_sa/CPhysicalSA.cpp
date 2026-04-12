@@ -83,12 +83,8 @@ CVector* CPhysicalSA::GetMoveSpeedInternal(CVector* vecMoveSpeed)
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    using func_t = decltype(dwReturn) (__thiscall*)(decltype(dwThis) );
+dwReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
     MemCpyFast(vecMoveSpeed, (void*)dwReturn, sizeof(CVector));
     return vecMoveSpeed;
@@ -100,12 +96,8 @@ CVector* CPhysicalSA::GetTurnSpeedInternal(CVector* vecTurnSpeed)
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    using func_t = decltype(dwReturn) (__thiscall*)(decltype(dwThis) );
+dwReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
     MemCpyFast(vecTurnSpeed, (void*)dwReturn, sizeof(CVector));
     return vecTurnSpeed;
@@ -118,12 +110,8 @@ void CPhysicalSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
     DWORD dwReturn = 0;
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    using func_t = decltype(dwReturn) (__thiscall*)(decltype(dwThis) );
+dwReturn =     reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
     MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
 
@@ -211,11 +199,8 @@ void CPhysicalSA::ProcessCollision()
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
 }
 
@@ -225,11 +210,8 @@ void CPhysicalSA::AddToMovingList()
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
 }
 
@@ -300,15 +282,8 @@ void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, 
         return;
 
     // clang-format off
-    __asm
-    {
-        push    bUnk
-        push    fUnkZ
-        push    fUnkY
-        push    fUnkX
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(fUnkX), decltype(fUnkY), decltype(fUnkZ), decltype(bUnk));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, fUnkX, fUnkY, fUnkZ, bUnk);
     // clang-format on
 }
 

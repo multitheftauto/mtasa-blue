@@ -23,10 +23,11 @@ namespace
     inline float WrapAngleRad(float angle) noexcept
     {
         angle -= kTwoPi * std::floor((angle + kPi) / kTwoPi);
-        if (angle <= -kPi)
+        if (angle <= -kPi) {
             angle += kTwoPi;
-        else if (angle > kPi)
+        } else if (angle > kPi) {
             angle -= kTwoPi;
+}
         return angle;
     }
 }

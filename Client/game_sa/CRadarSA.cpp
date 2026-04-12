@@ -51,10 +51,11 @@ CMarker* CRadarSA::GetFreeMarker()
     {
         Index++;
     }
-    if (Index >= MAX_MARKERS)
+    if (Index >= MAX_MARKERS) {
         return NULL;
-    else
+    } else {
         return Markers[Index];
+}
 }
 
 void CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SharedUtil::SColor color)

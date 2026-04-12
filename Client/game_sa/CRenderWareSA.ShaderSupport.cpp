@@ -284,8 +284,9 @@ void CRenderWareSA::StreamingRemovedTxd(ushort usTxdId)
             DestroyTexInfo(pTexInfo);
             iter = iterNext;
         }
-        else
+        else {
             ++iter;
+}
     }
 
     TIMING_CHECKPOINT("-StreamingRemovedTxd");
@@ -316,8 +317,9 @@ void CRenderWareSA::RemoveStreamingTexture(unsigned short usTxdId, CD3DDUMMY* pD
             DestroyTexInfo(pTexInfo);
             return;  // Only one entry per D3D data
         }
-        else
+        else {
             ++iter;
+}
     }
 }
 
@@ -520,10 +522,11 @@ STexInfo* CRenderWareSA::CreateTexInfo(const STexTag& texTag, const SString& str
                 bool       bSameTagValue = false;
                 if (bSameTagType)
                 {
-                    if (texTag.m_bUsingTxdId)
+                    if (texTag.m_bUsingTxdId) {
                         bSameTagValue = (pOldTexInfo->texTag.m_usTxdId == texTag.m_usTxdId);
-                    else
+                    } else {
                         bSameTagValue = (pOldTexInfo->texTag.m_pTex == texTag.m_pTex);
+}
                 }
 
                 if (bSameTagType && bSameTagValue && pOldTexInfo->pD3DData == pD3DData && pOldTexInfo->strTextureName == strTextureNameLower)
@@ -963,12 +966,13 @@ void CRenderWareSA::SetGTAVertexShadersEnabled(bool bEnable)
 __declspec(noinline) void OnMY_RwTextureSetName(DWORD dwAddrCalledFrom, RwTexture* pTexture, const char* szName)
 {
     SString strReplacementName;
-    if (dwAddrCalledFrom == ADDR_CCustomCarPlateMgr_CreatePlateTexture_TextureSetName)
+    if (dwAddrCalledFrom == ADDR_CCustomCarPlateMgr_CreatePlateTexture_TextureSetName) {
         strReplacementName = "custom_car_plate";
-    else if (dwAddrCalledFrom == ADDR_CCustomRoadsignMgr_CreateRoadsignTexture_TextureSetName)
+    } else if (dwAddrCalledFrom == ADDR_CCustomRoadsignMgr_CreateRoadsignTexture_TextureSetName) {
         strReplacementName = "custom_roadsign_text";
-    else if (dwAddrCalledFrom > ADDR_CClothesBuilder_ConstructTextures_Start && dwAddrCalledFrom < ADDR_CClothesBuilder_ConstructTextures_End)
+    } else if (dwAddrCalledFrom > ADDR_CClothesBuilder_ConstructTextures_Start && dwAddrCalledFrom < ADDR_CClothesBuilder_ConstructTextures_End) {
         strReplacementName = SString("cj_ped_%s", szName);
+}
 
     if (!strReplacementName.empty())
         pGame->GetRenderWareSA()->SpecialAddedTexture(pTexture, strReplacementName);

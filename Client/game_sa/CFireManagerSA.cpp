@@ -38,15 +38,8 @@ void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
     DWORD dwFunction = FUNC_ExtinguishPoint;
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CFireManager
-        push    fRadius
-        push    fZ
-        push    fY
-        push    fX
-        call    dwFunction
-    }
+    using func_t = void (__thiscall*)(decltype(0xB71F80), decltype(fX), decltype(fY), decltype(fZ), decltype(fRadius));
+    reinterpret_cast<func_t>(dwFunction)(0xB71F80, fX, fY, fZ, fRadius);
     // clang-format on
 }
 
@@ -95,10 +88,11 @@ void CFireManagerSA::ExtinguishAllFires()
 
 CFire* CFireManagerSA::GetFire(DWORD ID)
 {
-    if (ID < MAX_FIRES)
+    if (ID < MAX_FIRES) {
         return Fires[ID];
-    else
+    } else {
         return NULL;
+}
 }
 
 DWORD CFireManagerSA::GetFireCount()

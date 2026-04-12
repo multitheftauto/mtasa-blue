@@ -18,13 +18,8 @@ void CVisibilityPluginsSA::SetClumpAlpha(RpClump* pClump, int iAlpha)
 {
     DWORD dwFunc = FUNC_CVisiblityPlugins_SetClumpAlpha;
     // clang-format off
-    __asm
-    {
-        push    iAlpha
-        push    pClump
-        call    dwFunc
-        add     esp, 0x8
-    }
+    using func_t = void (__cdecl*)(decltype(pClump), decltype(iAlpha));
+    reinterpret_cast<func_t>(dwFunc)(pClump, iAlpha);
     // clang-format on
 }
 
@@ -47,13 +42,8 @@ int CVisibilityPluginsSA::GetAtomicId(RwObject* pAtomic)
     DWORD dwFunc = FUNC_CVisibilityPlugins_GetAtomicId;
     int   iResult = 0;
     // clang-format off
-    __asm
-    {
-        push    pAtomic
-        call    dwFunc
-        add     esp, 0x4
-        mov     iResult, eax
-    }
+    using func_t = decltype(iResult) (__cdecl*)(decltype(pAtomic));
+iResult =     reinterpret_cast<func_t>(dwFunc)(pAtomic);
     // clang-format on
     return iResult;
 }

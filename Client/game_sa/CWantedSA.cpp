@@ -43,12 +43,8 @@ void CWantedSA::SetWantedLevel(DWORD dwWantedLevel)
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_SetWantedLevel;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    dwWantedLevel
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(dwWantedLevel));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, dwWantedLevel);
     // clang-format on
 }
 void CWantedSA::SetWantedLevelNoFlash(DWORD dwWantedLevel)

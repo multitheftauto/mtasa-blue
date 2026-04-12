@@ -36,12 +36,8 @@ void CAnimBlendHierarchySA::SetName(const char* szName)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_SetName;
     // clang-format off
-    __asm
-    {
-        push    szName
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(szName));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, szName);
     // clang-format on
 }
 
@@ -50,11 +46,8 @@ void CAnimBlendHierarchySA::RemoveAnimSequences()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveAnimSequences;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
 }
 
@@ -63,11 +56,8 @@ void CAnimBlendHierarchySA::RemoveFromUncompressedCache()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveFromUncompressedCache;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
 }
 
@@ -76,11 +66,8 @@ void CAnimBlendHierarchySA::RemoveQuaternionFlips()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_RemoveQuaternionFlips;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
 }
 
@@ -89,11 +76,8 @@ void CAnimBlendHierarchySA::CalculateTotalTime()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendHierarchy_CalculateTotalTime;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis) );
+    reinterpret_cast<func_t>(dwFunc)(dwThis);
     // clang-format on
 }
 

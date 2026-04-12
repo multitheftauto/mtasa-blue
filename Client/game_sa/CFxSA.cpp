@@ -20,15 +20,8 @@ void CFxSA::AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, fl
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddBlood;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    fBrightness
-        push    iCount
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition), decltype(pvecDirection), decltype(iCount), decltype(fBrightness));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition, pvecDirection, iCount, fBrightness);
     // clang-format on
 }
 
@@ -39,15 +32,8 @@ void CFxSA::AddWood(CVector& vecPosition, CVector& vecDirection, int iCount, flo
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddWood;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    fBrightness
-        push    iCount
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition), decltype(pvecDirection), decltype(iCount), decltype(fBrightness));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition, pvecDirection, iCount, fBrightness);
     // clang-format on
 }
 
@@ -60,21 +46,8 @@ void CFxSA::AddSparks(CVector& vecPosition, CVector& vecDirection, float fForce,
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddSparks;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    fLife
-        push    fSpread
-        push    ucBlurIf0
-        push    fZ
-        push    fY
-        push    fX
-        push    iCount
-        push    fForce
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition), decltype(pvecDirection), decltype(fForce), decltype(iCount), decltype(fX), decltype(fY), decltype(fZ), decltype(ucBlurIf0), decltype(fSpread), decltype(fLife));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition, pvecDirection, fForce, iCount, fX, fY, fZ, ucBlurIf0, fSpread, fLife);
     // clang-format on
 }
 
@@ -85,13 +58,8 @@ void CFxSA::AddTyreBurst(CVector& vecPosition, CVector& vecDirection)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddTyreBurst;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition), decltype(pvecDirection));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition, pvecDirection);
     // clang-format on
 }
 
@@ -102,16 +70,8 @@ void CFxSA::AddBulletImpact(CVector& vecPosition, CVector& vecDirection, int iSm
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddBulletImpact;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    fSmokeIntensity
-        push    iSparkCount
-        push    iSmokeSize
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition), decltype(pvecDirection), decltype(iSmokeSize), decltype(iSparkCount), decltype(fSmokeIntensity));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition, pvecDirection, iSmokeSize, iSparkCount, fSmokeIntensity);
     // clang-format on
 }
 
@@ -122,14 +82,8 @@ void CFxSA::AddPunchImpact(CVector& vecPosition, CVector& vecDirection, int i)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddPunchImpact;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    i
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition), decltype(pvecDirection), decltype(i));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition, pvecDirection, i);
     // clang-format on
 }
 
@@ -140,15 +94,8 @@ void CFxSA::AddDebris(CVector& vecPosition, RwColor& rwColor, float fDebrisScale
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddDebris;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    iCount
-        push    fDebrisScale
-        push    pColor
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition), decltype(pColor), decltype(fDebrisScale), decltype(iCount));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition, pColor, fDebrisScale, iCount);
     // clang-format on
 }
 
@@ -159,15 +106,8 @@ void CFxSA::AddGlass(CVector& vecPosition, RwColor& rwColor, float fDebrisScale,
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddGlass;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    iCount
-        push    fDebrisScale
-        push    pColor
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition), decltype(pColor), decltype(fDebrisScale), decltype(iCount));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition, pColor, fDebrisScale, iCount);
     // clang-format on
 }
 
@@ -177,12 +117,8 @@ void CFxSA::TriggerWaterHydrant(CVector& vecPosition)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerWaterHydrant;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition);
     // clang-format on
 }
 
@@ -194,15 +130,8 @@ void CFxSA::TriggerGunshot(CEntity* pEntity, CVector& vecPosition, CVector& vecD
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerGunshot;
     // clang-format off
-        __asm
-    {
-        mov     ecx, dwThis
-        push    bIncludeSparks
-        push    pvecDirection
-        push    pvecPosition
-        push    dwEntity
-        call    dwFunc
-    }
+        using func_t = void (__thiscall*)(decltype(dwThis), decltype(dwEntity), decltype(pvecPosition), decltype(pvecDirection), decltype(bIncludeSparks));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, dwEntity, pvecPosition, pvecDirection, bIncludeSparks);
     // clang-format on
 }
 
@@ -213,13 +142,8 @@ void CFxSA::TriggerTankFire(CVector& vecPosition, CVector& vecDirection)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerTankFire;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition), decltype(pvecDirection));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition, pvecDirection);
     // clang-format on
 }
 
@@ -229,12 +153,8 @@ void CFxSA::TriggerWaterSplash(CVector& vecPosition)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerWaterSplash;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition);
     // clang-format on
 }
 
@@ -244,12 +164,8 @@ void CFxSA::TriggerBulletSplash(CVector& vecPosition)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerBulletSplash;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition);
     // clang-format on
 }
 
@@ -259,12 +175,8 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerFootSplash;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pvecPosition
-        call    dwFunc
-    }
+    using func_t = void (__thiscall*)(decltype(dwThis), decltype(pvecPosition));
+    reinterpret_cast<func_t>(dwFunc)(dwThis, pvecPosition);
     // clang-format on
 }
 
@@ -344,9 +256,10 @@ void CFxSA::AddParticle(FxParticleSystems eFxParticle, const CVector& vecPositio
             fxPrt.m_color.blue = (rand() % 10000) * 0.0001f * fB + 0.04f;
         }
 
-        if (bRandomizeSizes)
+        if (bRandomizeSizes) {
             // 0x49EF21 - Calculate random size for each particle
             fxPrt.m_fSize = (rand() % 10000) * 0.0001f * fSize + 0.3f;
+}
 
         // 0x49EF4C - Calculate random direction for each particle
         newDirection = CVector(vecDirection.fX * 4, vecDirection.fY * 4, vecDirection.fZ * 4);

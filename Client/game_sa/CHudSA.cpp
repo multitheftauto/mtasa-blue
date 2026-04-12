@@ -575,10 +575,11 @@ void CHudSA::ResetComponentColor(const eHudComponent& component, bool secondColo
 
     const auto& defaultRef = MapGet(defaultComponentProperties, component);
 
-    if (!secondColor)
+    if (!secondColor) {
         componentData.fillColor = defaultRef.fillColor;
-    else
+    } else {
         componentData.fillColorSecondary = defaultRef.fillColorSecondary;
+}
 }
 
 void CHudSA::SetComponentFontDropColor(const eHudComponent& component, std::uint32_t color) noexcept
@@ -755,10 +756,11 @@ void CHudSA::RenderText(float x, float y, const char* text, SHudComponentData& p
     float scaleX = useCustomSize ? properties.placement.customWidth : properties.placement.width;
     float scaleY = useCustomSize ? properties.placement.customHeight : properties.placement.height;
 
-    if (!scaleForLanguage)
+    if (!scaleForLanguage) {
         CFontSA::SetScale(scaleX, scaleY);
-    else
+    } else {
         CFontSA::SetScaleForCurrentLanguage(scaleX, scaleY);
+}
 
     CFontSA::SetProportional(properties.proportional);
 
@@ -802,10 +804,11 @@ void CHudSA::RenderText(float x, float y, const char* text, SHudComponentData& p
     float posX = useCustomPosition ? properties.placement.customX : x;
     float posY = useCustomPosition ? properties.placement.customY : y;
 
-    if (!drawFromBottom)
+    if (!drawFromBottom) {
         CFontSA::PrintString(posX, posY, text);
-    else
+    } else {
         CFontSA::PrintStringFromBottom(posX, posY, text);
+}
 }
 
 void CHudSA::RenderClock(float x, float y, const char* strTime)
@@ -957,12 +960,13 @@ static void __declspec(naked)   HOOK_RenderWanted()
 static void HOOK_RenderHudBar(int playerId, int x, int y)
 {
     void* returnAdress = _ReturnAddress();
-    if (returnAdress == (void*)0x58EE9F || returnAdress == (void*)0x58EF12)
+    if (returnAdress == (void*)0x58EE9F || returnAdress == (void*)0x58EF12) {
         CHudSA::RenderHealthBar(x, y);
-    else if (returnAdress == (void*)0x58F136 || returnAdress == (void*)0x58F1B2)
+    } else if (returnAdress == (void*)0x58F136 || returnAdress == (void*)0x58F1B2) {
         CHudSA::RenderBreathBar(x, y);
-    else if (returnAdress == (void*)0x58EF70 || returnAdress == (void*)0x58EFE3)
+    } else if (returnAdress == (void*)0x58EF70 || returnAdress == (void*)0x58EFE3) {
         CHudSA::RenderArmorBar(x, y);
+}
 }
 
 void CHudSA::StaticSetHooks()

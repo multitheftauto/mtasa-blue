@@ -130,8 +130,9 @@ bool CAudioContainerSA::GetRawAudioData(eAudioLookupIndex lookupIndex, int bankI
     {
         rawLength = lookupEntry->length - audioEntry->offset;
     }
-    else
+    else {
         return false;
+}
 
     // 2MB check in case of user modification errors (Max length of standard audio files is 560KB)
     if (rawLength > 2 * 1024 * 1024)

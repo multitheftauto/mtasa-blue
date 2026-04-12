@@ -552,10 +552,11 @@ namespace
                 vecPending.erase(std::remove_if(vecPending.begin(), vecPending.end(), [pReplacementTextures](const SPendingReplacement& entry)
                                                 { return entry.pReplacement == pReplacementTextures; }),
                                  vecPending.end());
-                if (vecPending.empty())
+                if (vecPending.empty()) {
                     it = g_PendingReplacementByModel.erase(it);
-                else
+                } else {
                     ++it;
+}
             }
         }
 
@@ -758,10 +759,11 @@ namespace
         for (std::size_t i = chainLen; i > 0; --i)
         {
             RwTexDictionary* pChainTxd = CTxdStore_GetTxd(chain[i - 1]);
-            if (pChainTxd)
+            if (pChainTxd) {
                 MergeCachedTxdTextureMap(chain[i - 1], pChainTxd, targetTxdMap);
-            else
+            } else {
                 bChainComplete = false;
+}
         }
 
         if (ShouldUseVehicleTxdFallback(usModelId))
@@ -881,10 +883,11 @@ namespace
                                              }),
                               vec.end());
 
-                    if (vec.empty())
+                    if (vec.empty()) {
                         itEvict = g_PendingReplacementByModel.erase(itEvict);
-                    else
+                    } else {
                         ++itEvict;
+}
                 }
 
                 if (g_PendingReplacementByModel.size() >= MAX_PENDING_REPLACEMENT_MODELS)
@@ -1481,10 +1484,11 @@ namespace
 
         // Batch size: more aggressive cleanup under higher pressure
         std::size_t uiMaxToProcess = 4;
-        if (iUsagePercent >= TXD_POOL_AGGRESSIVE_CLEANUP_PERCENT)
+        if (iUsagePercent >= TXD_POOL_AGGRESSIVE_CLEANUP_PERCENT) {
             uiMaxToProcess = 16;
-        else if (iUsagePercent >= TXD_POOL_MEDIUM_PRESSURE_PERCENT)
+        } else if (iUsagePercent >= TXD_POOL_MEDIUM_PRESSURE_PERCENT) {
             uiMaxToProcess = 8;
+}
 
         auto*       pTxdPoolSA = static_cast<CTxdPoolSA*>(&pGame->GetPools()->GetTxdPool());
         std::size_t uiProcessed = 0;
@@ -2401,10 +2405,11 @@ namespace
             CRenderWareSA::RwTexDictionaryRemoveTexture(pCurrentTxd, pTexture);
 
             // Invalidate texture map cache since TXD contents changed
-            if (usTxdIdHint != 0xFFFF)
+            if (usTxdIdHint != 0xFFFF) {
                 InvalidateTxdTextureMapCache(usTxdIdHint);
-            else
+            } else {
                 ClearTxdTextureMapCache();
+}
 
             pTexture->TXDList.next = &pTexture->TXDList;
             pTexture->TXDList.prev = &pTexture->TXDList;
@@ -3217,8 +3222,9 @@ namespace
                         }
                         pModelInfo->SetTextureDictionaryID(existingTxdId);
                     }
-                    else if (bParentLinkWasRepaired)
+                    else if (bParentLinkWasRepaired) {
                         RebindLoadedModelToCurrentTxd(pModelInfo, existingTxdId);
+}
 
                     UpdateIsolatedTxdLastUse(usModelId);
                     return true;
@@ -3413,10 +3419,11 @@ namespace
         {
             iReservedSlots = TXD_POOL_RESERVED_SLOTS;
             const int iPercentReserve = (iIsolationPoolSize * TXD_POOL_RESERVED_PERCENT) / 100;
-            if (iIsolationPoolSize < TXD_POOL_RESERVED_SLOTS)
+            if (iIsolationPoolSize < TXD_POOL_RESERVED_SLOTS) {
                 iReservedSlots = iPercentReserve;
-            else if (iPercentReserve > iReservedSlots)
+            } else if (iPercentReserve > iReservedSlots) {
                 iReservedSlots = iPercentReserve;
+}
             if (iReservedSlots < 0)
                 iReservedSlots = 0;
             if (iReservedSlots > iIsolationPoolSize - 1)
@@ -3761,8 +3768,9 @@ namespace
                         }
                         pModelInfo->SetTextureDictionaryID(existingTxdId);
                     }
-                    else if (bParentLinkWasRepaired)
+                    else if (bParentLinkWasRepaired) {
                         RebindLoadedModelToCurrentTxd(pModelInfo, existingTxdId);
+}
 
                     UpdateIsolatedTxdLastUse(usModelId);
                     return true;
@@ -3899,11 +3907,12 @@ namespace
         if (bParentAvailable)
             CTxdStore_SetupTxdParent(uiNewTxdId);
 
-        if (IsStreamingInfoSlot(static_cast<unsigned short>(uiNewTxdId)))
+        if (IsStreamingInfoSlot(static_cast<unsigned short>(uiNewTxdId))) {
             SetStreamingInfoLoaded(static_cast<unsigned short>(uiNewTxdId));
-        else if (ShouldLog(g_uiLastPoolDenyLogTime))
+        } else if (ShouldLog(g_uiLastPoolDenyLogTime)) {
             AddReportLog(9405, SString("AllocateIsolatedTxdForVanillaModel: overflow slot %u for model %u (parentTxd=%u)",
                                        static_cast<unsigned int>(uiNewTxdId), usModelId, usParentTxdId));
+}
 
         SIsolatedTxdInfo info;
         info.usTxdId = static_cast<unsigned short>(uiNewTxdId);
@@ -4128,18 +4137,19 @@ namespace
         for (std::size_t i = chainLen; i > 0; --i)
         {
             RwTexDictionary* pChainTxd = CTxdStore_GetTxd(chain[i - 1]);
-            if (pChainTxd)
+            if (pChainTxd) {
                 MergeCachedTxdTextureMap(chain[i - 1], pChainTxd, txdTextureMap);
-            else
+            } else {
                 bChainComplete = false;
+}
         }
 
         bool bNeedVehicleFallback = (usFirstParentId != static_cast<unsigned short>(-1)) && TxdChainContainsVehicleTxd(usFirstParentId);
         if (!bNeedVehicleFallback)
         {
-            if (pModelInfo->IsVehicle() || pModelInfo->IsUpgrade())
+            if (pModelInfo->IsVehicle() || pModelInfo->IsUpgrade()) {
                 bNeedVehicleFallback = true;
-            else
+            } else
             {
                 const unsigned int uiParentId = pModelInfo->GetParentID();
                 if (uiParentId != 0)
@@ -5129,14 +5139,15 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 if (uiNewTxdId != usTxdId)  // TXD slot reassigned
                 {
                     restoreState(false);
-                    if (!info.bHasLeakedTextures && CTxdStore_GetNumRefs(usTxdId) > 0)
+                    if (!info.bHasLeakedTextures && CTxdStore_GetNumRefs(usTxdId) > 0) {
                         CRenderWareSA::DebugTxdRemoveRef(usTxdId, "GetModelTexturesInfo-stale-id-changed");
-                    else if (info.bHasLeakedTextures)
+                    } else if (info.bHasLeakedTextures)
                     {
-                        if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT)
+                        if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT) {
                             g_PendingLeakedTxdRefs.insert(usTxdId);
-                        else if (ShouldLog(g_uiLastLeakCapacityLogTime))
+                        } else if (ShouldLog(g_uiLastLeakCapacityLogTime)) {
                             AddReportLog(9401, SString("g_PendingLeakedTxdRefs at capacity, TXD %u not tracked", usTxdId));
+}
                     }
                     MapRemove(ms_ModelTexturesInfoMap, usTxdId);
                     return nullptr;
@@ -5168,14 +5179,15 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(unsigned short usModelId
                 else
                 {
                     restoreState(false);
-                    if (!info.bHasLeakedTextures && CTxdStore_GetNumRefs(usTxdId) > 0)
+                    if (!info.bHasLeakedTextures && CTxdStore_GetNumRefs(usTxdId) > 0) {
                         CRenderWareSA::DebugTxdRemoveRef(usTxdId, "GetModelTexturesInfo-blocking-fail");
-                    else if (info.bHasLeakedTextures)
+                    } else if (info.bHasLeakedTextures)
                     {
-                        if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT)
+                        if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT) {
                             g_PendingLeakedTxdRefs.insert(usTxdId);
-                        else if (ShouldLog(g_uiLastLeakCapacityLogTime))
+                        } else if (ShouldLog(g_uiLastLeakCapacityLogTime)) {
                             AddReportLog(9401, SString("g_PendingLeakedTxdRefs at capacity, TXD %u not tracked", usTxdId));
+}
                     }
                     MapRemove(ms_ModelTexturesInfoMap, usTxdId);
                     return nullptr;
@@ -5494,10 +5506,11 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
 
     if (pReplacementTextures->strDebugName.empty())
     {
-        if (!strFilename.empty())
+        if (!strFilename.empty()) {
             pReplacementTextures->strDebugName = strFilename;
-        else
+        } else {
             pReplacementTextures->strDebugName = SString("<buffer:%u bytes>", static_cast<unsigned>(buffer.size()));
+}
     }
 
     if (pReplacementTextures->strDebugHash.empty())
@@ -8294,10 +8307,11 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                     {
                         if (IsStreamingInfoSlot(txdId))
                             SetStreamingInfoLeaked(txdId);
-                        if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT)
+                        if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT) {
                             g_PendingLeakedTxdRefs.insert(txdId);
-                        else if (ShouldLog(g_uiLastLeakCapacityLogTime))
+                        } else if (ShouldLog(g_uiLastLeakCapacityLogTime)) {
                             AddReportLog(9401, SString("g_PendingLeakedTxdRefs at capacity, TXD %u not tracked", txdId));
+}
                         g_PermanentlyLeakedTxdSlots.insert(txdId);
                         it = g_OrphanedIsolatedTxdSlots.erase(it);
                         continue;
@@ -8323,10 +8337,11 @@ void CRenderWareSA::StaticResetModelTextureReplacing()
                         // Keep streaming entry LOADED so SA doesn't try to re-stream.
                         if (IsStreamingInfoSlot(txdId))
                             SetStreamingInfoLeaked(txdId);
-                        if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT)
+                        if (g_PendingLeakedTxdRefs.size() < MAX_LEAK_RETRY_COUNT) {
                             g_PendingLeakedTxdRefs.insert(txdId);
-                        else if (ShouldLog(g_uiLastLeakCapacityLogTime))
+                        } else if (ShouldLog(g_uiLastLeakCapacityLogTime)) {
                             AddReportLog(9401, SString("g_PendingLeakedTxdRefs at capacity, TXD %u not tracked", txdId));
+}
                         g_PermanentlyLeakedTxdSlots.insert(txdId);
                         it = g_OrphanedIsolatedTxdSlots.erase(it);
                         continue;

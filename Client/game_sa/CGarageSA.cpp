@@ -53,10 +53,11 @@ void CGarageSA::GetBoundingBox(float& left, float& right, float& front, float& b
 
 void CGarageSA::SetOpen(bool bOpen)
 {
-    if (bOpen)
+    if (bOpen) {
         internalInterface->DoorState = 3;
-    else
+    } else {
         internalInterface->DoorState = 2;
+}
 }
 
 bool CGarageSA::IsOpen() const
