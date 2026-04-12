@@ -110,6 +110,7 @@ public:
                                            SFixedString<32>& strVersion);
     virtual void SetNetOptions(const SNetOptions& options);
     virtual void GenerateRandomData(void* pOutData, uint uiLength);
+    virtual void SetMinClientRequirement(const char* szVersion);
 
 //
 // Macros of doom to declare function argument structures
