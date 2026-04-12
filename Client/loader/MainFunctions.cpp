@@ -45,11 +45,11 @@ namespace
 {
     constexpr DWORD kLegacyCrashExitCode = 3;
 
-    if (   exitCode    == kLegacyCrashExitCode    )
+    if (exitCode == kLegacyCrashExitCode)
         return true;
 
     if (exitCode == EXIT_OK || exitCode == EXIT_ERROR || exitCode == STILL_ACTIVE)
-        return false   ;
+        return false;
 
     const DWORD kInformationalCrashCodes[] = {
         0x40000015u,  // STATUS_FATAL_APP_EXIT
