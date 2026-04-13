@@ -10,6 +10,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaPlayerDefs.h"
+#include "CPlayerMap.h"
 #include "lua/CLuaFunctionParser.h"
 
 void CLuaPlayerDefs::LoadFunctions()
@@ -53,6 +55,10 @@ void CLuaPlayerDefs::LoadFunctions()
         {"isPlayerMapVisible", IsPlayerMapVisible},
         {"getPlayerMapBoundingBox", GetPlayerMapBoundingBox},
         {"getPlayerMapOpacity", ArgumentParser<GetPlayerMapOpacity>},
+        {"setPlayerMapImage", ArgumentParser<SetPlayerMapImage>},
+        {"resetPlayerMapImage", ArgumentParser<ResetPlayerMapImage>},
+        {"setPlayerMapOpacity", ArgumentParser<SetPlayerMapOpacity>},
+        {"resetPlayerMapOpacity", ArgumentParser<ResetPlayerMapOpacity>},
         {"getPlayerHudComponentProperty", ArgumentParser<GetPlayerHudComponentProperty>},
     };
 
@@ -78,6 +84,10 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "forceMap", "forcePlayerMap");
     lua_classfunction(luaVM, "isMapForced", "isPlayerMapForced");
     lua_classfunction(luaVM, "isMapVisible", "isPlayerMapVisible");
+    lua_classfunction(luaVM, "setMapImage", "setPlayerMapImage");
+    lua_classfunction(luaVM, "resetMapImage", "resetPlayerMapImage");
+    lua_classfunction(luaVM, "setMapOpacity", "setPlayerMapOpacity");
+    lua_classfunction(luaVM, "resetMapOpacity", "resetPlayerMapOpacity");
     lua_classfunction(luaVM, "isHudComponentVisible", "isPlayerHudComponentVisible");
     lua_classfunction(luaVM, "toggleControl", "toggleControl");
     lua_classfunction(luaVM, "setHudComponentProperty", "setPlayerHudComponentProperty");
@@ -1054,4 +1064,62 @@ CLuaPlayerDefs::GetPlayerHudComponentProperty(eHudComponent component, eHudCompo
     }
 
     return false;
+}
+
+bool CLuaPlayerDefs::SetPlayerMapImage(lua_State* luaVM, std::variant<std::string, CClientTexture*> texturePathOrElement, std::optional<uint> size)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    CResource* pResource = pLuaMain->GetResource();
+
+    if (!size.has_value())
+        return false;
+
+    auto resolution = UIntToMapResolution(size.value());
+    if (!resolution.has_value())
+        throw std::invalid_argument("Invalid map size (must be 1024 or 2048)");
+
+    if (std::holds_alternative<CClientTexture*>(texturePathOrElement))
+    {
+        CClientTexture* pTexture = std::get<CClientTexture*>(texturePathOrElement);
+        return CStaticFunctionDefinitions::SetPlayerMapImageFromTexture(pTexture, resolution.value(), pResource);
+    }
+    else
+    {
+        std::string strPath = std::get<std::string>(texturePathOrElement);
+        return CStaticFunctionDefinitions::SetPlayerMapImage(strPath, resolution.value(), pResource);
+    }
+}
+
+bool CLuaPlayerDefs::ResetPlayerMapImage(std::optional<uint> size)
+{
+    if (size.has_value())
+    {
+        auto resolution = UIntToMapResolution(*size);
+        if (!resolution.has_value())
+            throw std::invalid_argument("Invalid map size (must be 1024 or 2048)");
+
+        return CStaticFunctionDefinitions::ResetPlayerMapImage(resolution.value());
+    }
+    else
+    {
+        return CStaticFunctionDefinitions::ResetPlayerMapImage(std::nullopt);
+    }
+}
+
+bool CLuaPlayerDefs::SetPlayerMapOpacity(lua_State* luaVM, uchar opacity)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    CResource* pResource = pLuaMain->GetResource();
+    return CStaticFunctionDefinitions::SetPlayerMapOpacity(opacity, pResource);
+}
+
+bool CLuaPlayerDefs::ResetPlayerMapOpacity()
+{
+    return CStaticFunctionDefinitions::ResetPlayerMapOpacity();
 }

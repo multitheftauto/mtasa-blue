@@ -16,6 +16,38 @@
 #include <CClientTextDisplay.h>
 #include <gui/CGUI.h>
 
+class CResource;
+class CClientTexture;
+
+enum class ECustomMapResolution : std::uint32_t
+{
+    Res_1024 = 1024,
+    Res_2048 = 2048
+};
+
+inline std::size_t MapResolutionToIndex(ECustomMapResolution resolution)
+{
+    return resolution == ECustomMapResolution::Res_1024 ? 0 : 1;
+}
+
+inline std::uint32_t MapResolutionToSize(ECustomMapResolution resolution)
+{
+    return static_cast<std::uint32_t>(resolution);
+}
+
+inline std::optional<ECustomMapResolution> UIntToMapResolution(std::uint32_t value)
+{
+    switch (value)
+    {
+        case static_cast<std::uint32_t>(ECustomMapResolution::Res_1024):
+            return ECustomMapResolution::Res_1024;
+        case static_cast<std::uint32_t>(ECustomMapResolution::Res_2048):
+            return ECustomMapResolution::Res_2048;
+        default:
+            return std::nullopt;
+    }
+}
+
 class CPlayerMap
 {
 public:
@@ -39,6 +71,15 @@ public:
     void MarkViewportRefreshPending();
     void ClearMovementFlags();
 
+    bool  SetCustomMapImage(const std::string& strTexturePath, ECustomMapResolution resolution, CResource* pResource = nullptr);
+    bool  SetCustomMapImageFromTexture(CClientTexture* pTexture, ECustomMapResolution resolution, CResource* pResource = nullptr);
+    void  ResetCustomMapImage(std::optional<ECustomMapResolution> resolution = std::nullopt);
+    bool  SetMapOpacity(uchar ucOpacity, CResource* pResource = nullptr);
+    void  ResetMapOpacity();
+    uchar GetMapOpacity() const;
+    bool  HasCustomMapImage(ECustomMapResolution resolution) const { return m_customMapData[MapResolutionToIndex(resolution)].bHasCustomMap; }
+    void  OnResourceStopping(CResource* pResource);
+
 protected:
     void InternalSetPlayerMapEnabled(bool bEnabled);
 
@@ -48,6 +89,7 @@ protected:
     void          CreateOrUpdateMapTexture();
     void          UpdateOrRevertMapTexture(std::size_t imageIndex);
     void          CreateAllTextures();
+    void          LoadUserCustomMapIfExists();
 
 public:
     bool IsAttachedToLocalPlayer() const { return m_bIsAttachedToLocal; };
@@ -128,4 +170,18 @@ private:
     bool m_bDebugVisible;
     bool m_bTextVisible;
     bool m_bPendingViewportRefresh = false;
+    struct CustomMapData
+    {
+        bool            bHasCustomMap = false;
+        CTextureItem*   pTexture = nullptr;
+        std::string     strPath = "";
+        CClientTexture* pTextureElement = nullptr;
+        CResource*      pResource = nullptr;
+    };
+    CustomMapData m_customMapData[2];  // [0] = 1024, [1] = 2048
+    std::size_t   m_defaultMapImageIndex;
+    uchar         m_ucCustomMapOpacity;
+    bool          m_bHasCustomMapOpacity;
+    CResource*    m_pCustomOpacityResource;
+    CResource*    m_pRadarMapDisabledResource;
 };

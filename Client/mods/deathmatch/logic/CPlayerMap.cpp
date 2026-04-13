@@ -12,6 +12,7 @@
 #include "StdInc.h"
 
 using SharedUtil::CalcMTASAPath;
+using SharedUtil::FileExists;
 using std::list;
 
 enum
@@ -61,6 +62,12 @@ CPlayerMap::CPlayerMap(CClientManager* pManager)
     m_mapImageTexture = nullptr;
     m_playerMarkerTexture = nullptr;
 
+    // Custom map image variables
+    m_ucCustomMapOpacity = 255;
+    m_bHasCustomMapOpacity = false;
+    m_pCustomOpacityResource = nullptr;
+    m_pRadarMapDisabledResource = nullptr;
+
     // Create all map textures
     CreateAllTextures();
 
@@ -108,6 +115,20 @@ CPlayerMap::~CPlayerMap()
     // Delete our images
     SAFE_RELEASE(m_mapImageTexture);
     SAFE_RELEASE(m_playerMarkerTexture);
+
+    // Release custom map textures
+    for (int i = 0; i < 2; i++)
+    {
+        if (m_customMapData[i].bHasCustomMap && m_customMapData[i].pTexture && !m_customMapData[i].pTextureElement)
+        {
+            SAFE_RELEASE(m_customMapData[i].pTexture);
+        }
+        m_customMapData[i].pTexture = nullptr;
+        m_customMapData[i].pTextureElement = nullptr;
+        m_customMapData[i].pResource = nullptr;
+        m_customMapData[i].bHasCustomMap = false;
+    }
+
     for (uint i = 0; i < m_markerTextureList.size(); i++)
         SAFE_RELEASE(m_markerTextureList[i]);
     m_markerTextureList.clear();
@@ -117,7 +138,7 @@ CPlayerMap::~CPlayerMap()
 void CPlayerMap::CreateOrUpdateMapTexture()
 {
     const std::uint32_t mapSize = MAP_IMAGE_SIZES[m_playerMapImageIndex];
-    const SString       fileName("MTA\\cgui\\images\\map_%d.png", mapSize);
+    const SString       fileName("MTA\\cgui\\images\\radar\\map_%d.png", mapSize);
 
     auto* newTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(CalcMTASAPath(fileName), nullptr, false, mapSize, mapSize, RFORMAT_DXT1);
     if (!newTexture)
@@ -155,6 +176,7 @@ void CPlayerMap::CreateAllTextures()
     {
         // Create the map texture
         m_playerMapImageIndex = g_pCore->GetCVars()->GetValue<std::size_t>("mapimage");
+        m_defaultMapImageIndex = m_playerMapImageIndex;
         CreateOrUpdateMapTexture();
 
         // Create the player blip texture
@@ -162,6 +184,9 @@ void CPlayerMap::CreateAllTextures()
 
         // Create the other marker textures
         CreateMarkerTextures();
+
+        // Try to load a user custom map if it exists
+        LoadUserCustomMapIfExists();
     }
     catch (const std::exception& e)
     {
@@ -332,38 +357,26 @@ void CPlayerMap::DoRender()
     // Render if showing and textures are all loaded
     if (isMapShowing && !m_failedToLoadTextures)
     {
-        IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
-        D3DVIEWPORT9      prevViewport = {};
-        RECT              prevScissor = {};
-        DWORD             prevScissorEnable = FALSE;
-        bool              restoreViewport = false;
-        bool              restoreScissor = false;
-
-        if (pDevice && m_uiWidth > 0 && m_uiHeight > 0)
+        // Check if the current size texture element is still valid
+        std::size_t currentIdx = m_playerMapImageIndex;
+        if (m_customMapData[currentIdx].bHasCustomMap && m_customMapData[currentIdx].pTextureElement)
         {
-            if (SUCCEEDED(pDevice->GetViewport(&prevViewport)))
-                restoreViewport = true;
-            if (SUCCEEDED(pDevice->GetScissorRect(&prevScissor)))
-                restoreScissor = true;
-            pDevice->GetRenderState(D3DRS_SCISSORTESTENABLE, &prevScissorEnable);
+            if (m_customMapData[currentIdx].pTextureElement->IsBeingDeleted())
+            {
+                // Delete the texture, reset
+                m_customMapData[currentIdx].pTexture = nullptr;
+                m_customMapData[currentIdx].bHasCustomMap = false;
+                m_customMapData[currentIdx].strPath = "";
+                m_customMapData[currentIdx].pResource = nullptr;
+                m_customMapData[currentIdx].pTextureElement = nullptr;
 
-            D3DVIEWPORT9 viewport = {};
-            viewport.X = 0;
-            viewport.Y = 0;
-            viewport.Width = m_uiWidth;
-            viewport.Height = m_uiHeight;
-            viewport.MinZ = 0.0f;
-            viewport.MaxZ = 1.0f;
-            pDevice->SetViewport(&viewport);
-
-            RECT fullRect = {0, 0, static_cast<LONG>(m_uiWidth), static_cast<LONG>(m_uiHeight)};
-            pDevice->SetScissorRect(&fullRect);
-            pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
+                // Try to load a user custom map if it exists
+                LoadUserCustomMapIfExists();
+            }
         }
 
         // Get the alpha value from the settings
-        int mapAlpha;
-        g_pCore->GetCVars()->Get("mapalpha", mapAlpha);
+        uchar            mapAlpha = GetMapOpacity();
         const SColorARGB mapColor(mapAlpha, 255, 255, 255);
 
         // Update the image if the user changed it via a setting
@@ -371,10 +384,14 @@ void CPlayerMap::DoRender()
         if (mapImageIndex != m_playerMapImageIndex)
         {
             UpdateOrRevertMapTexture(mapImageIndex);
+            if (!m_customMapData[m_playerMapImageIndex].bHasCustomMap)
+                LoadUserCustomMapIfExists();
         }
 
-        g_pCore->GetGraphics()->DrawTexture(m_mapImageTexture, static_cast<float>(m_iMapMinX), static_cast<float>(m_iMapMinY),
-                                            m_fMapSize / m_mapImageTexture->m_uiSizeX, m_fMapSize / m_mapImageTexture->m_uiSizeY, 0.0f, 0.0f, 0.0f, mapColor);
+        CTextureItem* pMapTexture = m_customMapData[m_playerMapImageIndex].bHasCustomMap ? m_customMapData[m_playerMapImageIndex].pTexture : m_mapImageTexture;
+
+        g_pCore->GetGraphics()->DrawTexture(pMapTexture, static_cast<float>(m_iMapMinX), static_cast<float>(m_iMapMinY), m_fMapSize / pMapTexture->m_uiSizeX,
+                                            m_fMapSize / pMapTexture->m_uiSizeY, 0.0f, 0.0f, 0.0f, mapColor);
 
         // Grab the info for the local player blip
         CVector2D vecLocalPos;
@@ -830,4 +847,166 @@ SString CPlayerMap::GetBoundKeyName(const SString& strCommand)
     if (!pCommandBind)
         return strCommand;
     return pCommandBind->boundKey->szKey;
+}
+bool CPlayerMap::SetCustomMapImage(const std::string& strTexturePath, ECustomMapResolution resolution, CResource* pResource)
+{
+    if (!pResource)
+        return false;
+
+    std::size_t   idx = MapResolutionToIndex(resolution);
+    std::uint32_t uiSize = MapResolutionToSize(resolution);
+    SString       strFullPath = pResource->GetResourceDirectoryPath() + strTexturePath;
+
+    CTextureItem* pNewTexture = g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(strFullPath, nullptr, false, uiSize, uiSize, RFORMAT_DXT1);
+
+    if (!pNewTexture)
+        throw std::invalid_argument("Failed to load texture from path: " + strTexturePath);
+
+    // Release old texture if it existed and was not element-based
+    if (!m_customMapData[idx].pTextureElement && m_customMapData[idx].pTexture)
+    {
+        SAFE_RELEASE(m_customMapData[idx].pTexture);
+        m_customMapData[idx].pTexture = nullptr;
+    }
+
+    m_customMapData[idx].pTexture = pNewTexture;
+    m_customMapData[idx].strPath = strFullPath;
+    m_customMapData[idx].bHasCustomMap = true;
+    m_customMapData[idx].pResource = pResource;
+    m_customMapData[idx].pTextureElement = nullptr;
+
+    return true;
+}
+
+bool CPlayerMap::SetCustomMapImageFromTexture(CClientTexture* pTexture, ECustomMapResolution resolution, CResource* pResource)
+{
+    if (!pTexture || !pResource)
+        return false;
+
+    CTextureItem* pTextureItem = pTexture->GetTextureItem();
+    if (!pTextureItem)
+        throw std::invalid_argument("Invalid texture element");
+
+    std::size_t idx = MapResolutionToIndex(resolution);
+
+    m_customMapData[idx].pTexture = pTextureItem;
+    m_customMapData[idx].strPath = "";
+    m_customMapData[idx].bHasCustomMap = true;
+    m_customMapData[idx].pResource = pResource;
+    m_customMapData[idx].pTextureElement = pTexture;
+
+    return true;
+}
+
+void CPlayerMap::ResetCustomMapImage(std::optional<ECustomMapResolution> resolution)
+{
+    // If resolution is not provided, reset both sizes
+    if (!resolution.has_value())
+    {
+        ResetCustomMapImage(ECustomMapResolution::Res_1024);
+        ResetCustomMapImage(ECustomMapResolution::Res_2048);
+        return;
+    }
+
+    std::size_t idx = MapResolutionToIndex(resolution.value());
+
+    if (!m_customMapData[idx].pTextureElement && m_customMapData[idx].pTexture)
+    {
+        SAFE_RELEASE(m_customMapData[idx].pTexture);
+        m_customMapData[idx].pTexture = nullptr;
+    }
+
+    m_customMapData[idx].bHasCustomMap = false;
+    m_customMapData[idx].strPath = "";
+    m_customMapData[idx].pResource = nullptr;
+    m_customMapData[idx].pTextureElement = nullptr;
+
+    // Try to load the user custom map if it exists
+    if (idx == m_playerMapImageIndex)
+        LoadUserCustomMapIfExists();
+}
+
+bool CPlayerMap::SetMapOpacity(uchar ucOpacity, CResource* pResource)
+{
+    m_ucCustomMapOpacity = static_cast<uchar>(Clamp(0, static_cast<int>(ucOpacity), 255));
+    m_bHasCustomMapOpacity = true;
+    m_pCustomOpacityResource = pResource;
+    return true;
+}
+
+void CPlayerMap::ResetMapOpacity()
+{
+    m_bHasCustomMapOpacity = false;
+    m_ucCustomMapOpacity = 255;
+    m_pCustomOpacityResource = nullptr;
+}
+
+uchar CPlayerMap::GetMapOpacity() const
+{
+    if (m_bHasCustomMapOpacity)
+        return m_ucCustomMapOpacity;
+
+    int mapAlpha;
+    g_pCore->GetCVars()->Get("mapalpha", mapAlpha);
+    return static_cast<uchar>(Clamp(0, mapAlpha, 255));
+}
+
+void CPlayerMap::LoadUserCustomMapIfExists()
+{
+    std::size_t idx = m_playerMapImageIndex;
+
+    // If already has a script-set custom map for this size, do not override
+    if (m_customMapData[idx].bHasCustomMap && m_customMapData[idx].pResource != nullptr)
+        return;
+
+    const std::uint32_t mapSize = MAP_IMAGE_SIZES[idx];
+    const SString       customFileName = CalcMTASAPath(SString("MTA\\cgui\\images\\radar\\map_%d-custom.png", mapSize));
+
+    if (FileExists(customFileName))
+    {
+        CTextureItem* pCustomTexture =
+            g_pCore->GetGraphics()->GetRenderItemManager()->CreateTexture(customFileName, nullptr, false, mapSize, mapSize, RFORMAT_DXT1);
+
+        if (pCustomTexture)
+        {
+            // Release old texture if it existed and was not element-based
+            if (!m_customMapData[idx].pTextureElement && m_customMapData[idx].pTexture)
+                SAFE_RELEASE(m_customMapData[idx].pTexture);
+
+            m_customMapData[idx].pTexture = pCustomTexture;
+            m_customMapData[idx].strPath = customFileName;
+            m_customMapData[idx].bHasCustomMap = true;
+            m_customMapData[idx].pResource = nullptr;
+            m_customMapData[idx].pTextureElement = nullptr;
+        }
+    }
+}
+
+void CPlayerMap::OnResourceStopping(CResource* pResource)
+{
+    // Check both size custom maps
+    for (int i = 0; i < 2; i++)
+    {
+        if (m_customMapData[i].bHasCustomMap && m_customMapData[i].pResource == pResource)
+        {
+            if (!m_customMapData[i].pTextureElement && m_customMapData[i].pTexture)
+                SAFE_RELEASE(m_customMapData[i].pTexture);
+
+            m_customMapData[i].pTexture = nullptr;
+            m_customMapData[i].pTextureElement = nullptr;
+            m_customMapData[i].bHasCustomMap = false;
+            m_customMapData[i].strPath = "";
+            m_customMapData[i].pResource = nullptr;
+        }
+    }
+
+    // If the current map size had a custom map, try to load the user custom map
+    LoadUserCustomMapIfExists();
+
+    if (m_bHasCustomMapOpacity && m_pCustomOpacityResource == pResource)
+    {
+        m_bHasCustomMapOpacity = false;
+        m_ucCustomMapOpacity = 255;
+        m_pCustomOpacityResource = nullptr;
+    }
 }

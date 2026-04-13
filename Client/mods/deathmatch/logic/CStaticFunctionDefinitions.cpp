@@ -8002,6 +8002,33 @@ bool CStaticFunctionDefinitions::GetPlayerMapBoundingBox(CVector& vecMin, CVecto
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetPlayerMapImage(const std::string& strTexturePath, ECustomMapResolution resolution, CResource* pResource)
+{
+    return m_pPlayerMap->SetCustomMapImage(strTexturePath, resolution, pResource);
+}
+
+bool CStaticFunctionDefinitions::SetPlayerMapImageFromTexture(CClientTexture* pTexture, ECustomMapResolution resolution, CResource* pResource)
+{
+    return m_pPlayerMap->SetCustomMapImageFromTexture(pTexture, resolution, pResource);
+}
+
+bool CStaticFunctionDefinitions::ResetPlayerMapImage(std::optional<ECustomMapResolution> resolution)
+{
+    m_pPlayerMap->ResetCustomMapImage(resolution);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetPlayerMapOpacity(uchar ucOpacity, CResource* pResource)
+{
+    return m_pPlayerMap->SetMapOpacity(ucOpacity, pResource);
+}
+
+bool CStaticFunctionDefinitions::ResetPlayerMapOpacity()
+{
+    m_pPlayerMap->ResetMapOpacity();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::FxAddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness)
 {
     g_pGame->GetFx()->AddBlood(vecPosition, vecDirection, iCount, fBrightness);
