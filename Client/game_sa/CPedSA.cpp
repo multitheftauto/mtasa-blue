@@ -641,7 +641,7 @@ void CPedSAInterface::RemoveWeaponWhenEnteringVehicle(bool jetpack)
             {
                 newSlot = WEAPONSLOT_TYPE_SMG;
             }
-            else if (hasSawnoff) // Bugfix - the default here was WEAPONSLOT_TYPE_HANDGUN
+            else if (hasSawnoff)  // Bugfix - the default here was WEAPONSLOT_TYPE_HANDGUN
             {
                 newSlot = WEAPONSLOT_TYPE_SHOTGUN;
             }
@@ -657,7 +657,7 @@ void CPedSAInterface::RemoveWeaponWhenEnteringVehicle(bool jetpack)
         savedWeapon = Weapons[bCurrentWeaponSlot].m_eWeaponType;
         SetCurrentWeapon(newSlot);
     }
-    else if (!jetpack) // Bugfix #508 (weapons are invisible when wearing jetpack - see PR #3559)
+    else if (!jetpack)  // Bugfix #508 (weapons are invisible when wearing jetpack - see PR #3559)
     {
         auto weaponType = Weapons[bCurrentWeaponSlot].m_eWeaponType;
         auto model = pGame->GetWeaponInfo(weaponType, eWeaponSkill::WEAPONSKILL_STD)->GetModel();
@@ -754,7 +754,7 @@ void CPedSA::StaticSetHooks()
     EZHookInstall(CPed_PreRenderAfterTest);
     EZHookInstall(CPed_PreRenderAfterTest_Mid);
 
-    HookInstallCall(0x68025A, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle); // CTaskSimpleJetPack::ProcessPed
+    HookInstallCall(0x68025A, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleJetPack::ProcessPed
     HookInstallCall(0x64DB4D, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleCarGetIn::ProcessPed
     HookInstallCall(0x64BCA3, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleCarSetPedInAsDriver::ProcessPed
     HookInstallCall(0x64B876, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleCarSetPedInAsPassenger::ProcessPed

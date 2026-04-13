@@ -231,10 +231,7 @@ class CPedSAInterface : public CPhysicalSAInterface
 public:
     bool IsPlayer() const noexcept { return bPedType < 2; }
 
-    void SetCurrentWeapon(eWeaponSlot slot)
-    {
-        ((void(__thiscall*)(CPedSAInterface*, eWeaponSlot))FUNC_SetCurrentWeapon)(this, slot);
-    }
+    void SetCurrentWeapon(eWeaponSlot slot) { ((void(__thiscall*)(CPedSAInterface*, eWeaponSlot))FUNC_SetCurrentWeapon)(this, slot); }
 
     void RemoveWeaponModel(std::uint32_t model) { ((void(__thiscall*)(CEntitySAInterface*, std::uint32_t))FUNC_RemoveWeaponModel)(this, model); }
 
@@ -490,7 +487,7 @@ public:
     void SetInWaterFlags(bool inWater) override;
 
     static void __fastcall RemoveWeaponWhenEnteringVehicle(CPedSAInterface* pedInterface, void*, int jetpack);
-    static void StaticSetHooks();
+    static void            StaticSetHooks();
 
 private:
     void ApplySwimAndSlopeRotations();
