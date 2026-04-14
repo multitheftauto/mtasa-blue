@@ -32,23 +32,17 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     if (!pModelInfoSAInterface)
         return;
 
-    // Prevent GC from freeing RwObject during rendering
-    pModelInfo->ModelAddRef(NON_BLOCKING, "CRendererSA::RenderModel");
+    // Use GTA's native CBaseModelInfoSAInterface::AddRef/RemoveRef to hold the
+    // model during rendering. This increments GTA's usNumberOfRefs without going
+    // through MTA's ModelAddRef/RemoveRef, which triggers Remove() and model
+    // unloading when m_dwReferences drops to 0 — causing dxDrawModel3D to flicker
+    // every other frame for models with no persistent MTA-side reference.
+    pModelInfoSAInterface->AddRef();
 
-    // Revalidate interface after AddRef
-    pModelInfoSAInterface = pModelInfo->GetInterface();
-    if (!pModelInfoSAInterface)
-    {
-        pModelInfo->RemoveRef();
-        return;
-    }
-
-    // Check and cache pRwObject
     RwObject* pRwObject = pModelInfoSAInterface->pRwObject;
     if (!pRwObject)
     {
-        // Release reference before early return to prevent leak
-        pModelInfo->RemoveRef();
+        pModelInfoSAInterface->RemoveRef();
         return;
     }
 
@@ -61,31 +55,23 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     rwMatrix.pos = (RwV3d&)matrix.vPos;
     RwFrameTransform(pFrame, &rwMatrix, rwCOMBINEREPLACE);
 
-    // Ensure reference released on exception
-    try
+    // Setup ambient light multiplier
+    SetLightColoursForPedsCarsAndObjects(lighting);
+
+    if (pRwObject->type == RP_TYPE_ATOMIC)
     {
-        // Setup ambient light multiplier
-        SetLightColoursForPedsCarsAndObjects(lighting);
-
-        if (pRwObject->type == RP_TYPE_ATOMIC)
-        {
-            RpAtomic* pRpAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
-            pRpAtomic->renderCallback(reinterpret_cast<RpAtomic*>(pRwObject));
-        }
-        else
-        {
-            RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
-            RpClumpRender(pClump);
-        }
-
-        // Restore ambient light
-        SetAmbientColours();
+        RpAtomic* pRpAtomic = reinterpret_cast<RpAtomic*>(pRwObject);
+        pRpAtomic->renderCallback(reinterpret_cast<RpAtomic*>(pRwObject));
     }
-    catch (...)
+    else
     {
-        // Release reference on rendering exception
-        pModelInfo->RemoveRef();
-        throw;
-    }  // Release reference - allow GC
-    pModelInfo->RemoveRef();
+        RpClump* pClump = reinterpret_cast<RpClump*>(pRwObject);
+        RpClumpRender(pClump);
+    }
+
+    // Restore ambient light
+    SetAmbientColours();
+
+    // Release GTA-native reference
+    pModelInfoSAInterface->RemoveRef();
 }

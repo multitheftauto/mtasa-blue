@@ -417,6 +417,7 @@ static void _declspec(naked) HOOK_CTimer_Suspend()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     _asm
     {
         // Check if _timerFunction is NULL
@@ -434,6 +435,7 @@ static void _declspec(naked) HOOK_CTimer_Suspend()
         xor     edx, edx
         jmp     CONTINUE_CTimer_Suspend
     }
+    // clang-format on
 }
 
 #define HOOKPOS_CTimer_Resume  0x561A11
@@ -443,6 +445,7 @@ static void _declspec(naked) HOOK_CTimer_Resume()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     _asm
     {
         // Check if _timerFunction is NULL
@@ -460,6 +463,7 @@ static void _declspec(naked) HOOK_CTimer_Resume()
         xor     edx, edx
         jmp     CONTINUE_CTimer_Resume
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

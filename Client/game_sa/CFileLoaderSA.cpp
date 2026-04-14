@@ -129,14 +129,6 @@ static void CVehicleModelInfo_StopUsingCommonVehicleTexDicationary()
 static auto          CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 static unsigned int& gAtomicModelId = *reinterpret_cast<unsigned int*>(DWORD_AtomicsReplacerModelID);
 
-namespace
-{
-    bool RelatedModelInfoShim(RpAtomic* atomic, void* context)
-    {
-        return CFileLoader_SetRelatedModelInfoCB(atomic, static_cast<SRelatedModelInfo*>(context)) != nullptr;
-    }
-}
-
 bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
 {
     CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[modelId];
@@ -167,7 +159,7 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
         relatedModelInfo.pClump = pReadClump;
         relatedModelInfo.bDeleteOldRwObject = false;
 
-        RpClumpForAllAtomics(pReadClump, RelatedModelInfoShim, &relatedModelInfo);
+        RpClumpForAllAtomics(pReadClump, reinterpret_cast<RpClumpForAllAtomicsCB_t>(CFileLoader_SetRelatedModelInfoCB), &relatedModelInfo);
         RpClumpDestroy(pReadClump);
     }
 

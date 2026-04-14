@@ -202,6 +202,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
         vecOffset.fY = 0.5f;
         vecOffset.fX = 0.5f;*/
     /*  DWORD dwFunc = 0x50BEC0;
+        // clang-format off
         __asm
         {
             mov ecx, cameraInterface
@@ -210,6 +211,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
             push    position
             call    dwFunc
         }*/
+    // clang-format on
 
     DWORD CCamera__TakeControlNoEntity = FUNC_TakeControlNoEntity;
     // clang-format off
