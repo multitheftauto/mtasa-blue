@@ -557,7 +557,7 @@ bool CClientMarker::IsOnScreen() const
 
     // The above check for atomic visibility may return false at certain camera angles, even though the marker is partially visible on the screen
     // This happens because the sphere of its atomic is no fully visible on the screen.
-    // So instead, we check whether the marker’s position along with its size is visible on the screen.
+    // So instead, we check whether the marker's position along with its size is visible on the screen.
     if (!isVisible)
     {
         CVector pos;
@@ -571,12 +571,12 @@ bool CClientMarker::IsOnScreen() const
     }
 
     // The above camera check returns a false positive even when the corona is not visible on the screen,
-    // because the area with that radius is within the camera’s range.
+    // because the area with that radius is within the camera's range.
     // To eliminate this false positive, we check whether the corona is actually visible on the screen.
     // The point is that you can move away from the corona and completely lose sight of it,
-    // yet the area is still within the camera’s range.
+    // yet the area is still within the camera's range.
 
-    // For coronas, we need to check if they are within the camera’s view because simply checking the screen coordinates
+    // For coronas, we need to check if they are within the camera's view because simply checking the screen coordinates
     // is insufficient and often returns true even when the corona is not visible on the screen.
     // (GTA renders coronas with some offset outside the screen area).
     if (isVisible && isCorona)
