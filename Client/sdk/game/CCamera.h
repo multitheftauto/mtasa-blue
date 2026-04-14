@@ -154,4 +154,6 @@ public:
     virtual bool         IsInTransition() const = 0;
     virtual float        GetTransitionFOV() const = 0;
     virtual bool         GetTransitionMatrix(CMatrix& matrix) const = 0;
+
+    virtual bool IsSphereVisible(CVector* center, float radius) const = 0;
 };

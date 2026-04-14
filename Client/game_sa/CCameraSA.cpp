@@ -202,6 +202,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
         vecOffset.fY = 0.5f;
         vecOffset.fX = 0.5f;*/
     /*  DWORD dwFunc = 0x50BEC0;
+        // clang-format off
         __asm
         {
             mov ecx, cameraInterface
@@ -210,6 +211,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
             push    position
             call    dwFunc
         }*/
+    // clang-format on
 
     DWORD CCamera__TakeControlNoEntity = FUNC_TakeControlNoEntity;
     // clang-format off
@@ -737,4 +739,13 @@ bool CCameraSA::GetTransitionMatrix(CMatrix& matrix) const
     matrix.OrthoNormalize(CMatrix::AXIS_FRONT, CMatrix::AXIS_UP);
 
     return true;
+}
+
+bool CCameraSA::IsSphereVisible(CVector* center, float radius) const
+{
+    CCameraSAInterface* cameraInterface = GetInterface();
+    if (!cameraInterface)
+        return false;
+
+    return ((bool(__thiscall*)(CCameraSAInterface*, CVector*, float))0x420D40)(cameraInterface, center, radius);
 }

@@ -20,16 +20,9 @@ extern CGameSA* pGame;
 
 CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
 {
-    // Validate collision model before accessing radius
     CVector boundCentre;
     CEntitySAInterface::GetBoundCentre(&boundCentre);
-    CBaseModelInfoSAInterface* pModelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex);
-
-    // Validate model info and collision model before accessing
-    if (!pModelInfo || !pModelInfo->pColModel)
-        return pRect;
-
-    float fRadius = pModelInfo->pColModel->m_sphere.m_radius;
+    float fRadius = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel->m_sphere.m_radius;
     *pRect = CRect(boundCentre.fX - fRadius, boundCentre.fY - fRadius, boundCentre.fX + fRadius, boundCentre.fY + fRadius);
     pRect->FixIncorrectTopLeft();  // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
     return pRect;
@@ -254,8 +247,6 @@ CEntity* CPhysicalSA::GetDamageEntity()
     return nullptr;
 }
 
-// Stores a raw pointer to the entity. Call ResetLastDamage() when the entity
-// is destroyed to prevent dangling pointer access.
 void CPhysicalSA::SetDamageEntity(CEntity* pEntity)
 {
     CEntitySA* pEntitySA = dynamic_cast<CEntitySA*>(pEntity);
@@ -263,7 +254,6 @@ void CPhysicalSA::SetDamageEntity(CEntity* pEntity)
         ((CPhysicalSAInterface*)GetInterface())->m_pCollidedEntity = pEntitySA->GetInterface();
 }
 
-// Clears the damage entity pointer and magnitude
 void CPhysicalSA::ResetLastDamage()
 {
     ((CPhysicalSAInterface*)GetInterface())->m_fDamageImpulseMagnitude = 0.0f;
