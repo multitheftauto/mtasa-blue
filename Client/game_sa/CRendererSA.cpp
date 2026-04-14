@@ -32,22 +32,17 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     if (!pModelInfoSAInterface)
         return;
 
-    // Prevent GC from freeing RwObject during rendering, which can cause
-    // invisible or corrupt draws (manifesting as alpha/transparency glitches).
-    pModelInfo->ModelAddRef(NON_BLOCKING, "CRendererSA::RenderModel");
-
-    // Revalidate interface after AddRef (the request may have triggered streaming)
-    pModelInfoSAInterface = pModelInfo->GetInterface();
-    if (!pModelInfoSAInterface)
-    {
-        pModelInfo->RemoveRef();
-        return;
-    }
+    // Use GTA's native CBaseModelInfoSAInterface::AddRef/RemoveRef to hold the
+    // model during rendering. This increments GTA's usNumberOfRefs without going
+    // through MTA's ModelAddRef/RemoveRef, which triggers Remove() and model
+    // unloading when m_dwReferences drops to 0 — causing dxDrawModel3D to flicker
+    // every other frame for models with no persistent MTA-side reference.
+    pModelInfoSAInterface->AddRef();
 
     RwObject* pRwObject = pModelInfoSAInterface->pRwObject;
     if (!pRwObject)
     {
-        pModelInfo->RemoveRef();
+        pModelInfoSAInterface->RemoveRef();
         return;
     }
 
@@ -77,6 +72,6 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     // Restore ambient light
     SetAmbientColours();
 
-    // Release reference - allow GC to reclaim if no longer needed
-    pModelInfo->RemoveRef();
+    // Release GTA-native reference
+    pModelInfoSAInterface->RemoveRef();
 }
