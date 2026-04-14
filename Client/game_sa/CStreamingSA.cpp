@@ -474,13 +474,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     {
         DWORD dwFunc = FUNC_RequestVehicleUpgrade;
         // clang-format off
-        __asm
-        {
-            push    dwFlags
-            push    dwModelID
-            call    dwFunc
-            add     esp, 8
-        }
+        gta_call_address(dwFunc, dwModelID, dwFlags);
         // clang-format on
     }
     else
@@ -516,13 +510,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
 
         DWORD dwFunction = FUNC_CStreaming__RequestModel;
         // clang-format off
-        __asm
-        {
-            push    dwFlags
-            push    dwModelID
-            call    dwFunction
-            add     esp, 8
-        }
+        gta_call_address(dwFunction, dwModelID, dwFlags);
         // clang-format on
     }
 }
@@ -547,12 +535,7 @@ void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* 
     DWORD dwFunction = FUNC_LoadAllRequestedModels;
     DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
     // clang-format off
-    __asm
-    {
-        push    dwOnlyPriorityModels
-        call    dwFunction
-        add     esp, 4
-    }
+    gta_call_address(dwFunction, dwOnlyPriorityModels);
     // clang-format on
 
     if (IS_TIMING_CHECKPOINTS())
@@ -570,13 +553,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
         bool  bReturn;
         DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
         // clang-format off
-        __asm
-        {
-            push    dwModelID
-            call    dwFunc
-            add     esp, 0x4
-            mov     bReturn, al
-        }
+        bReturn = gta_call_address<decltype(bReturn)>(dwFunc, dwModelID);
         // clang-format on
         return bReturn;
     }
@@ -602,14 +579,7 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
 {
     DWORD dwFunc = FUNC_CStreaming_RequestSpecialModel;
     // clang-format off
-    __asm
-    {
-        push    channel
-        push    szTexture
-        push    model
-        call    dwFunc
-        add     esp, 0xC
-    }
+    gta_call_address(dwFunc, model, szTexture, channel);
     // clang-format on
 }
 

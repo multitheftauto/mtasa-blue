@@ -165,12 +165,7 @@ void CPlayerPedSA::SetInitialState()
     DWORD dwFunction = FUNC_SetInitialState;
     DWORD dwThis = (DWORD)m_pInterface;
     // clang-format off
-    __asm
-    {
-        push    dwUnknown
-        mov     ecx, dwThis
-        call    dwFunction
-    }
+    gta_thiscall_address(dwFunction, dwThis, dwUnknown);
     // clang-format on
 
     // Avoid direction locks for respawning after a jump
@@ -298,11 +293,7 @@ void CPlayerPedSA::SetMoveAnim(eMoveAnim iAnimGroup)
     DWORD dwThis = (DWORD)pedInterface;
     DWORD dwFunc = FUNC_CPlayerPed_ReApplyMoveAnims;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis);
     // clang-format on
 }
 

@@ -36,14 +36,7 @@ void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControlle
 {
     DWORD dwFunc = FUNC_SetControllerKeyAssociatedWithAction;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CControllerConfigManager
-        push    controllerType
-        push    iKey
-        push    action
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, 0xB70198, action, iKey, controllerType);
     // clang-format on
 }
 
@@ -52,14 +45,7 @@ int CControllerConfigManagerSA::GetControllerKeyAssociatedWithAction(eController
     int   iReturn = 0;
     DWORD dwFunc = FUNC_GetControllerKeyAssociatedWithAction;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CControllerConfigManager
-        push    controllerType
-        push    action
-        call    dwFunc
-        mov     iReturn, eax
-    }
+    iReturn = gta_thiscall_address<decltype(iReturn)>(dwFunc, 0xB70198, action, controllerType);
     // clang-format on
     return iReturn;
 }
@@ -69,13 +55,7 @@ int CControllerConfigManagerSA::GetNumOfSettingsForAction(eControllerAction acti
     int   iReturn = 0;
     DWORD dwFunc = FUNC_GetNumOfSettingsForAction;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CControllerConfigManager
-        push    action
-        call    dwFunc
-        mov     iReturn, eax
-    }
+    iReturn = gta_thiscall_address<decltype(iReturn)>(dwFunc, 0xB70198, action);
     // clang-format on
     return iReturn;
 }
@@ -84,13 +64,7 @@ void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAc
 {
     DWORD dwFunc = FUNC_ClearSettingsAssociatedWithAction;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CControllerConfigManager
-        push    controllerType
-        push    action
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, 0xB70198, action, controllerType);
     // clang-format on
 }
 

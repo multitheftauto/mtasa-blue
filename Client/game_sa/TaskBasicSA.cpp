@@ -42,12 +42,7 @@ CTaskComplexUseMobilePhoneSA::CTaskComplexUseMobilePhoneSA(const int iDuration)
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    iDuration
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface, iDuration);
     // clang-format on
 }
 
@@ -62,17 +57,7 @@ CTaskSimpleRunAnimSA::CTaskSimpleRunAnimSA(const AssocGroupId animGroup, const A
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    bHoldLastFrame
-        push    pTaskName
-        push    iTaskType
-        push    fBlendDelta
-        push    animID
-        push    animGroup
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface, animGroup, animID, fBlendDelta, iTaskType, pTaskName, bHoldLastFrame);
     // clang-format on
 }
 
@@ -88,20 +73,7 @@ CTaskSimpleRunNamedAnimSA::CTaskSimpleRunNamedAnimSA(const char* pAnimName, cons
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    bHoldLastFrame
-        push    bOffsetPed
-        push    bRunInSequence
-        push    bDontInterrupt
-        push    iTime
-        push    fBlendDelta
-        push    flags
-        push    pAnimGroupName
-        push    pAnimName
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface, pAnimName, pAnimGroupName, flags, fBlendDelta, iTime, bDontInterrupt, bRunInSequence, bOffsetPed, bHoldLastFrame);
     // clang-format on
 }
 
@@ -117,20 +89,7 @@ CTaskComplexDieSA::CTaskComplexDieSA(const eWeaponType eMeansOfDeath, const Asso
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    bFallToDeathOverRailing
-        push    iFallToDeathDir
-        push    bFallingToDeath
-        push    bBeingKilledByStealth
-        push    fAnimSpeed
-        push    fBlendDelta
-        push    anim
-        push    animGroup
-        push    eMeansOfDeath
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface, eMeansOfDeath, animGroup, anim, fBlendDelta, fAnimSpeed, bBeingKilledByStealth, bFallingToDeath, iFallToDeathDir, bFallToDeathOverRailing);
     // clang-format on
 }
 
@@ -145,14 +104,7 @@ CTaskSimpleStealthKillSA::CTaskSimpleStealthKillSA(bool bKiller, CPed* pPed, con
     DWORD dwPedInterface = (DWORD)pPed->GetPedInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    animGroup
-        push    dwPedInterface
-        push    bKiller
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface, bKiller, dwPedInterface, animGroup);
     // clang-format on
 }
 
@@ -165,13 +117,7 @@ CTaskSimpleDeadSA::CTaskSimpleDeadSA(unsigned int uiDeathTimeMS, bool bUnk2)
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    bUnk2
-        push    uiDeathTimeMS
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface, uiDeathTimeMS, bUnk2);
     // clang-format on
 }
 
@@ -185,15 +131,7 @@ CTaskSimpleBeHitSA::CTaskSimpleBeHitSA(CPed* pPedAttacker, ePedPieceTypes hitBod
     DWORD dwPedInterface = (DWORD)pPedAttacker->GetPedInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    weaponId
-        push    hitBodySide
-        push    hitBodyPart
-        push    dwPedInterface
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface, dwPedInterface, hitBodyPart, hitBodySide, weaponId);
     // clang-format on
 }
 
@@ -210,13 +148,7 @@ CTaskComplexSunbatheSA::CTaskComplexSunbatheSA(CObject* pTowel, const bool bStar
         dwObjectInterface = (DWORD)pTowel->GetObjectInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    bStartStanding
-        push    dwObjectInterface;
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface, dwObjectInterface, bStartStanding);
     // clang-format on
 }
 
@@ -238,11 +170,7 @@ CTaskSimplePlayerOnFootSA::CTaskSimplePlayerOnFootSA()
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface);
     // clang-format on
 }
 
@@ -258,11 +186,7 @@ CTaskComplexFacialSA::CTaskComplexFacialSA()
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface);
     // clang-format on
 }
 

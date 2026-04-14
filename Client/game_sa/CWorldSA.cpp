@@ -149,12 +149,7 @@ void CWorldSA::Add(CEntity* pEntity, eDebugCaller CallerId)
         DWORD dwEntity = (DWORD)pEntitySA->GetInterface();
         DWORD dwFunction = FUNC_Add;
         // clang-format off
-        __asm
-        {
-            push    dwEntity
-            call    dwFunction
-            add     esp, 4
-        }
+        gta_call_address(dwFunction, dwEntity);
         // clang-format on
     }
 }
@@ -168,12 +163,7 @@ void CWorldSA::Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId)
         LogEvent(506, "CWorld::Add ( CEntitySAInterface * ) Crash", "", strMessage);
     }
     // clang-format off
-    __asm
-    {
-        push    entityInterface
-        call    dwFunction
-        add     esp, 4
-    }
+    gta_call_address(dwFunction, entityInterface);
     // clang-format on
 }
 
@@ -192,12 +182,7 @@ void CWorldSA::Remove(CEntity* pEntity, eDebugCaller CallerId)
         DWORD dwEntity = (DWORD)pInterface;
         DWORD dwFunction = FUNC_Remove;
         // clang-format off
-        __asm
-        {
-            push    dwEntity
-            call    dwFunction
-            add     esp, 4
-        }
+        gta_call_address(dwFunction, dwEntity);
         // clang-format on
     }
 }
@@ -211,17 +196,7 @@ void CWorldSA::Remove(CEntitySAInterface* entityInterface, eDebugCaller CallerId
     }
     DWORD dwFunction = FUNC_Remove;
     // clang-format off
-    __asm
-    {
-        push    entityInterface
-        call    dwFunction
-        add     esp, 4
-
-    /*  mov     ecx, entityInterface
-        mov     esi, [ecx]
-        push    1
-        call    dword ptr [esi+8]*/
-    }
+    gta_call_address(dwFunction, entityInterface);
     // clang-format on
 }
 
@@ -230,12 +205,7 @@ void CWorldSA::RemoveReferencesToDeletedObject(CEntitySAInterface* entity)
     DWORD dwFunc = FUNC_RemoveReferencesToDeletedObject;
     DWORD dwEntity = (DWORD)entity;
     // clang-format off
-    __asm
-    {
-        push    dwEntity
-        call    dwFunc
-        add     esp, 4
-    }
+    gta_call_address(dwFunc, dwEntity);
     // clang-format on
 }
 
@@ -253,15 +223,7 @@ void ConvertMatrixToEulerAngles(const CMatrix_Padded& matrixPadded, float& fX, f
     float* pfZ = &fZ;
     int    iUnknown = 21;
     // clang-format off
-    __asm
-    {
-        push    iUnknown
-            push    pfZ
-            push    pfY
-            push    pfX
-            mov     ecx, pMatrixPadded
-            call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, pMatrixPadded, pfX, pfY, pfZ, iUnknown);
     // clang-format on
 }
 
@@ -615,17 +577,7 @@ float CWorldSA::FindGroundZFor3DPosition(CVector* vecPosition)
     float fY = vecPosition->fY;
     float fZ = vecPosition->fZ;
     // clang-format off
-    __asm
-    {
-        push    0
-        push    0
-        push    fZ
-        push    fY
-        push    fX
-        call    dwFunc
-        fstp    fReturn
-        add     esp, 0x14
-    }
+    fReturn = gta_call_address<decltype(fReturn)>(dwFunc, fX, fY, fZ, 0, 0);
     // clang-format on
     return fReturn;
 }
@@ -669,14 +621,7 @@ bool CWorldSA::HasCollisionBeenLoaded(CVector* vecPosition)
     DWORD dwFunc = FUNC_HasCollisionBeenLoaded;
     bool  bRet = false;
     // clang-format off
-    __asm
-    {
-        push    0
-        push    vecPosition
-        call    dwFunc
-        mov     bRet, al
-        add     esp, 8
-    }
+    bRet = gta_call_address<decltype(bRet)>(dwFunc, vecPosition, 0);
     // clang-format on
     return bRet;
 }
@@ -692,12 +637,7 @@ void CWorldSA::SetCurrentArea(DWORD dwArea)
 
     DWORD dwFunc = FUNC_RemoveBuildingsNotInArea;
     // clang-format off
-    __asm
-    {
-        push    dwArea
-        call    dwFunc
-        add     esp, 4
-    }
+    gta_call_address(dwFunc, dwArea);
     // clang-format on
 }
 
@@ -758,14 +698,7 @@ void CWorldSA::FindWorldPositionForRailTrackPosition(float fRailTrackPosition, i
     DWORD dwFunc = FUNC_CWorld_FindPositionForTrackPosition;  // __cdecl
 
     // clang-format off
-    __asm
-    {
-        push pOutVecPosition
-        push iTrackId
-        push fRailTrackPosition
-        call dwFunc
-        add  esp, 3*4
-    }
+    gta_call_address(dwFunc, fRailTrackPosition, iTrackId, pOutVecPosition);
     // clang-format on
 }
 

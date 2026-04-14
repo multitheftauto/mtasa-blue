@@ -196,14 +196,7 @@ void CAudioEngineSA::PlayFrontEndSound(DWORD dwEventID)
         float fSpeed = 1.0f;
         float fVolumeChange = 0.0f;
         // clang-format off
-        __asm
-        {
-            push    fSpeed
-            push    fVolumeChange
-            push    dwEventID
-            mov     ecx, CLASS_CAudioEngine
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, 0xB6BC90, dwEventID, fVolumeChange, fSpeed);
         // clang-format on
     }
 }
@@ -213,12 +206,7 @@ void CAudioEngineSA::SetEffectsMasterVolume(BYTE bVolume)
     DWORD dwFunc = FUNC_SetEffectsMasterVolume;
     DWORD dwVolume = bVolume;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    dwVolume
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, 0xB6BC90, dwVolume);
     // clang-format on
 }
 
@@ -227,12 +215,7 @@ void CAudioEngineSA::SetMusicMasterVolume(BYTE bVolume)
     DWORD dwFunc = FUNC_SetMusicMasterVolume;
     DWORD dwVolume = bVolume;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    dwVolume
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, 0xB6BC90, dwVolume);
     // clang-format on
 
     //
@@ -267,22 +250,12 @@ void CAudioEngineSA::PlayBeatTrack(short iTrack)
         DWORD dwFunc = FUNC_PreloadBeatTrack;
         DWORD dwTrack = iTrack;
         // clang-format off
-        __asm
-        {
-            mov     ecx, CLASS_CAudioEngine
-            push    dwTrack
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, 0xB6BC90, dwTrack);
         // clang-format on
 
         dwFunc = FUNC_PlayPreloadedBeatTrack;
         // clang-format off
-        __asm
-        {
-            mov     ecx, CLASS_CAudioEngine
-            push    1
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, 0xB6BC90, 1);
         // clang-format on
     }
 }
@@ -291,12 +264,7 @@ void CAudioEngineSA::ClearMissionAudio(int slot)
 {
     DWORD dwFunc = 0x5072F0;  // CAudioEngine::ClearMissionAudio(unsigned char)
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    slot // sound bank slot?
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, 0xB6BC90, slot);
     // clang-format on
 }
 
@@ -305,13 +273,7 @@ bool CAudioEngineSA::IsMissionAudioSampleFinished(int slot)
     DWORD dwFunc = 0x5072C0;  // CAudioEngine::IsMissionAudioSampleFinished
     bool  cret = 0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    slot
-        call    dwFunc
-        mov     cret, al
-    }
+    cret = gta_thiscall_address<decltype(cret)>(dwFunc, 0xB6BC90, slot);
     // clang-format on
     return cret;
 }
@@ -321,13 +283,7 @@ void CAudioEngineSA::PreloadMissionAudio(unsigned short usAudioEvent, int slot)
     DWORD dwFunc = 0x507290;  // CAudioEngine__PreloadMissionAudio
     DWORD AudioEvent = usAudioEvent;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    AudioEvent
-        push    slot
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, 0xB6BC90, slot, AudioEvent);
     // clang-format on
 }
 
@@ -336,13 +292,7 @@ unsigned char CAudioEngineSA::GetMissionAudioLoadingStatus(int slot)
     DWORD         dwFunc = 0x5072A0;  // get load status
     unsigned char cret = 0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    slot
-        call    dwFunc
-        mov     cret, al
-    }
+    cret = gta_thiscall_address<decltype(cret)>(dwFunc, 0xB6BC90, slot);
     // clang-format on
     return cret;
 }
@@ -359,13 +309,7 @@ void CAudioEngineSA::AttachMissionAudioToPhysical(CPhysical* physical, int slot)
 
     DWORD dwFunc = 0x507330;  // AttachMissionAudioToPhysical
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    entity
-        push    slot
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, 0xB6BC90, slot, entity);
     // clang-format on
 }
 
@@ -373,13 +317,7 @@ void CAudioEngineSA::SetMissionAudioPosition(CVector* position, int slot)
 {
     DWORD dwFunc = 0x507300;  // CAudioEngine__SetMissionAudioPosition
     // clang-format off
-    __asm
-    {
-        mov     ecx, CLASS_CAudioEngine
-        push    position
-        push    slot
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, 0xB6BC90, slot, position);
     // clang-format on
 }
 
@@ -389,12 +327,7 @@ bool CAudioEngineSA::PlayLoadedMissionAudio(int slot)
     {
         DWORD dwFunc = 0x5072B0;  // CAudioEngine::PlayLoadedMissionAudio(unsigned char)
         // clang-format off
-        __asm
-        {
-            mov     ecx, CLASS_CAudioEngine
-            push    slot
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, 0xB6BC90, slot);
         // clang-format on
         return true;
     }
@@ -407,22 +340,14 @@ void CAudioEngineSA::PauseAllSound(bool bPaused)
     {
         DWORD dwFunc = FUNC_PauseAllSounds;
         // clang-format off
-        __asm
-        {
-            mov     ecx, CLASS_CAudioEngine
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, 0xB6BC90);
         // clang-format on
     }
     else
     {
         DWORD dwFunc = FUNC_ResumeAllSounds;
         // clang-format off
-        __asm
-        {
-            mov     ecx, CLASS_CAudioEngine
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, 0xB6BC90);
         // clang-format on
     }
 }
@@ -613,15 +538,7 @@ void CAudioEngineSA::ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceTy
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAudioEngine_ReportBulletHit;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    f_2
-        push    pvecPosition
-        push    ucSurfaceType
-        push    dwEntityInterface
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, dwEntityInterface, ucSurfaceType, pvecPosition, f_2);
     // clang-format on
 }
 
@@ -633,13 +550,6 @@ void CAudioEngineSA::ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhys
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAudioEngine_ReportWeaponEvent;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    dwPhysicalInterface
-        push    weaponType
-        push    iEvent
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, iEvent, weaponType, dwPhysicalInterface);
     // clang-format on
 }

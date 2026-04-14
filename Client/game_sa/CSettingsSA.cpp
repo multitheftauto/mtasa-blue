@@ -247,12 +247,7 @@ void CSettingsSA::SetAntiAliasing(unsigned int uiAntiAliasing, bool bOnRestart)
     {
         DWORD dwFunc = FUNC_SetAntiAliasing;
         // clang-format off
-        __asm
-        {
-            push    uiAntiAliasing
-            call    dwFunc
-            add     esp, 4
-        }
+        gta_call_address(dwFunc, uiAntiAliasing);
         // clang-format on
         SetCurrentVideoMode(m_pInterface->dwVideoMode, false);
     }
@@ -273,12 +268,7 @@ void CSettingsSA::SetMipMappingEnabled(bool bEnable)
 void CSettingsSA::Save()
 {
     // clang-format off
-    __asm
-    {
-        mov ecx, CLASS_CMenuManager
-        mov eax, FUNC_CMenuManager_Save
-        call eax
-    }
+    gta_thiscall_address(0x57C660, 0xBA6748);
     // clang-format on
 }
 

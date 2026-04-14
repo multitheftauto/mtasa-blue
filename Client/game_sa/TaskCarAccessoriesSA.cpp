@@ -31,13 +31,7 @@ CTaskSimpleCarSetPedInAsDriverSA::CTaskSimpleCarSetPedInAsDriverSA(CVehicle* pTa
         DWORD dwThisInterface = (DWORD)GetInterface();
 
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwThisInterface
-            push    pUtility
-            push    dwVehiclePtr
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, dwThisInterface, dwVehiclePtr, pUtility);
         // clang-format on
     }
 }
@@ -75,14 +69,7 @@ CTaskSimpleCarSetPedInAsPassengerSA::CTaskSimpleCarSetPedInAsPassengerSA(CVehicl
         DWORD dwVehiclePtr = (DWORD)pTargetVehicleSA->GetInterface();
         DWORD dwThisInterface = (DWORD)GetInterface();
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwThisInterface
-            push    pUtility
-            push    iTargetDoor
-            push    dwVehiclePtr
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, dwThisInterface, dwVehiclePtr, iTargetDoor, pUtility);
         // clang-format on
     }
 }
@@ -161,12 +148,6 @@ void CTaskSimpleCarSetPedOutSA::PositionPedOutOfCollision(CPed* ped, CVehicle* v
     DWORD dwVehiclePtr = (DWORD)((CEntitySA*)vehicle)->GetInterface();
     DWORD dwPedPtr = (DWORD)((CEntitySA*)ped)->GetInterface();
     // clang-format off
-    __asm
-    {
-        push    nDoor
-        push    dwVehiclePtr
-        push    dwPedPtr
-        call    dwFunc
-    }
+    gta_call_address(dwFunc, dwPedPtr, dwVehiclePtr, nDoor);
     // clang-format on
 }

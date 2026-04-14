@@ -17,12 +17,6 @@ void CAnimBlendStaticAssociationSA::Initialize(RpClump* pClump, CAnimBlendHierar
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendStaticAssociation_Initialize;
     // clang-format off
-    __asm
-    {
-        push    pAnimBlendHierarchyInterface
-        push    pClump
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pClump, pAnimBlendHierarchyInterface);
     // clang-format on
 }

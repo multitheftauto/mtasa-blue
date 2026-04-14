@@ -24,13 +24,7 @@ int CRopesSA::CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration)
     // First Push @ 0x558D1D is the duration.
     MemPut((void*)(dwDurationAddress), dwDuration);
     // clang-format off
-    __asm
-    {
-        push    pvecPosition
-        call    dwFunc
-        add     esp, 0x4
-        mov     iReturn, eax
-    }
+    iReturn = gta_call_address<decltype(iReturn)>(dwFunc, pvecPosition);
     // clang-format on
     //   Set it back for SA in case we ever do some other implementation.
     MemPut((DWORD*)(dwDurationAddress), 4000);

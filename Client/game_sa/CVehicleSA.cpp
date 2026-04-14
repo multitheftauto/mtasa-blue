@@ -388,11 +388,7 @@ CVehicleSA::~CVehicleSA()
             DWORD dwThis = (DWORD)m_pInterface;
             DWORD dwFunc = 0x6D2460;  // CVehicle::ExtinguishCarFire
             // clang-format off
-            __asm
-            {
-                mov     ecx, dwThis
-                call    dwFunc
-            }
+            gta_thiscall_address(dwFunc, dwThis);
             // clang-format on
 
             CWorldSA* pWorld = (CWorldSA*)pGame->GetWorld();
@@ -413,12 +409,7 @@ void CVehicleSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwReturn = 0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    dwReturn = gta_thiscall_address<decltype(dwReturn)>(dwFunc, dwThis);
     // clang-format on
     MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
 
@@ -629,11 +620,7 @@ void CVehicleSA::SetDerailed(bool bDerailed)
                 // Recalculate the on-rail distance from the start node (train position parameter, m_fTrainRailDistance)
                 DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
                 // clang-format off
-                __asm
-                {
-                    mov     ecx, dwThis
-                        call    dwFunc
-                }
+                gta_thiscall_address(dwFunc, dwThis);
                 // clang-format on
 
                 // Reset the speed
@@ -752,11 +739,7 @@ void CVehicleSA::SetRailTrack(BYTE ucTrackID)
         {
             DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
             // clang-format off
-            __asm
-            {
-                mov ecx, pInterf
-                call dwFunc
-            }
+            gta_thiscall_address(dwFunc, pInterf);
             // clang-format on
         }
     }
@@ -778,11 +761,7 @@ void CVehicleSA::SetTrainPosition(float fPosition, bool bRecalcOnRailDistance)
         {
             DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
             // clang-format off
-            __asm
-            {
-                mov ecx, pInterface
-                call dwFunc
-            }
+            gta_thiscall_address(dwFunc, pInterface);
             // clang-format on
         }
     }
@@ -847,12 +826,7 @@ void CVehicleSA::AddVehicleUpgrade(DWORD dwModelID)
 
         DWORD dwFunc = FUNC_CVehicle_AddVehicleUpgrade;
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwThis
-            push    dwModelID
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, dwThis, dwModelID);
         // clang-format on
     }
 }
@@ -863,12 +837,7 @@ void CVehicleSA::RemoveVehicleUpgrade(DWORD dwModelID)
     DWORD dwFunc = FUNC_CVehicle_RemoveVehicleUpgrade;
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    dwModelID
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, dwModelID);
     // clang-format on
 
     // GTA SA only does this when CVehicle::ClearVehicleUpgradeFlags returns false.
@@ -902,13 +871,7 @@ DWORD CVehicleSA::GetBaseVehicleType()
     DWORD dwReturn = 0;
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-
-    }
+    dwReturn = gta_thiscall_address<decltype(dwReturn)>(dwFunc, dwThis);
     // clang-format on
 
     return dwReturn;
@@ -951,12 +914,7 @@ bool CVehicleSA::IsUpsideDown()
     bool  bReturn = false;
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
+    bReturn = gta_thiscall_address<decltype(bReturn)>(dwFunc, dwThis);
     // clang-format on
 
     return bReturn;
@@ -969,12 +927,7 @@ void CVehicleSA::SetEngineOn(bool bEngineOn)
     DWORD dwFunc = FUNC_CVehicle_SetEngineOn;
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    dwEngineOn
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, dwEngineOn);
     // clang-format on
 }
 
@@ -1028,11 +981,7 @@ void CVehicleSA::PlaceBikeOnRoadProperly()
     DWORD dwBike = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwBike
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwBike);
     // clang-format on
 }
 
@@ -1042,11 +991,7 @@ void CVehicleSA::PlaceAutomobileOnRoadProperly()
     DWORD dwAutomobile = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwAutomobile
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwAutomobile);
     // clang-format on
 }
 
@@ -1233,11 +1178,7 @@ void CVehicleSA::Fix()
         if (dwFunc)
         {
             // clang-format off
-            __asm
-            {
-                mov     ecx, dwThis
-                call    dwFunc
-            }
+            gta_thiscall_address(dwFunc, dwThis);
             // clang-format on
         }
     }
@@ -1334,12 +1275,7 @@ void CVehicleSA::PickupEntityWithWinch(CEntity* pEntity)
         DWORD dwEntityInterface = (DWORD)pEntitySA->GetInterface();
 
         // clang-format off
-        __asm
-        {
-            push    dwEntityInterface
-            mov     ecx, dwThis
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, dwThis, dwEntityInterface);
         // clang-format on
     }
 }
@@ -1350,11 +1286,7 @@ void CVehicleSA::ReleasePickedUpEntityWithWinch()
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis);
     // clang-format on
 }
 
@@ -1364,12 +1296,7 @@ void CVehicleSA::SetRopeHeightForHeli(float fRopeHeight)
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        push    fRopeHeight
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, fRopeHeight);
     // clang-format on
 }
 
@@ -1380,12 +1307,7 @@ CPhysical* CVehicleSA::QueryPickedUpEntityWithWinch()
 
     CPhysicalSAInterface* phys;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     phys, eax
-    }
+    phys = gta_thiscall_address<decltype(phys)>(dwFunc, dwThis);
     // clang-format on
 
     if (phys)
@@ -1401,12 +1323,7 @@ void CVehicleSA::SetRemap(int iRemap)
     DWORD dwFunc = FUNC_CVehicle__SetRemap;
     DWORD dwThis = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    iRemap
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, iRemap);
     // clang-format on
 }
 
@@ -1416,12 +1333,7 @@ int CVehicleSA::GetRemapIndex()
     DWORD dwThis = (DWORD)GetInterface();
     int   iReturn = 0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     iReturn, eax
-    }
+    iReturn = gta_thiscall_address<decltype(iReturn)>(dwFunc, dwThis);
     // clang-format on
     return iReturn;
 }
@@ -1431,12 +1343,7 @@ void CVehicleSA::SetRemapTexDictionary(int iRemapTextureDictionary)
     DWORD dwFunc = FUNC_CVehicle__SetRemapTexDictionary;
     DWORD dwThis = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    iRemapTextureDictionary
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, iRemapTextureDictionary);
     // clang-format on
 }
 
@@ -1603,12 +1510,7 @@ void CVehicleSA::SetTaxiLightOn(bool bLightOn)
     DWORD dwFunc = FUNC_CAutomobile_SetTaxiLight;
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    dwState
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, dwState);
     // clang-format on
 }
 
@@ -1866,13 +1768,7 @@ bool CVehicleSA::UpdateMovingCollision(float fAngle)
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwFunc = FUNC_CAutomobile__UpdateMovingCollision;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    fAngle
-        call    dwFunc
-        mov     bReturn, al
-    }
+    bReturn = gta_thiscall_address<decltype(bReturn)>(dwFunc, dwThis, fAngle);
     // clang-format on
 
     // Restore our driver
@@ -2098,15 +1994,7 @@ namespace
         {
             DWORD dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
             // clang-format off
-            __asm
-            {
-                push    iUnknown
-                push    fZ
-                push    fY
-                push    fX
-                mov     ecx, matrixPadded
-                call    dwFunc
-            }
+            gta_thiscall_address(dwFunc, matrixPadded, fX, fY, fZ, iUnknown);
             // clang-format on
         }
     }
@@ -2117,15 +2005,7 @@ namespace
         {
             DWORD dwFunc = FUNC_CMatrix__ConvertToEulerAngles;
             // clang-format off
-            __asm
-            {
-                push    iUnknown
-                push    fZ
-                push    fY
-                push    fX
-                mov     ecx, matrixPadded
-                call    dwFunc
-            }
+            gta_thiscall_address(dwFunc, matrixPadded, fX, fY, fZ, iUnknown);
             // clang-format on
         }
     }
@@ -2586,13 +2466,7 @@ bool CVehicleSA::SetPlateText(const SString& strText)
     DWORD dwFunc = FUNC_CVehicle_CustomCarPlate_TextureCreate;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pVehicleModelInfo
-        call    dwFunc
-        mov     bReturn, al
-    }
+    bReturn = gta_thiscall_address<decltype(bReturn)>(dwFunc, dwThis, pVehicleModelInfo);
     // clang-format on
     return bReturn;
 }
@@ -2617,13 +2491,7 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
     bool bReturn = false;
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    ucWindow
-        call    dwFunc
-        mov     bReturn, al
-    }
+    bReturn = gta_thiscall_address<decltype(bReturn)>(dwFunc, dwThis, ucWindow);
     // clang-format on
     return bReturn;
 }

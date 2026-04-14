@@ -27,16 +27,7 @@ bool CCarEnterExitSA::GetNearestCarDoor(CPed* pPed, CVehicle* pVehicle, CVector*
         CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
         CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
         // clang-format off
-        __asm
-        {
-            push    pDoor
-            push    pVector
-            push    pVehicleInterface
-            push    pPedInterface
-            call    dwFunc
-            add     esp, 0x10
-            mov     bReturn, al
-        }
+        bReturn = gta_call_address<decltype(bReturn)>(dwFunc, pPedInterface, pVehicleInterface, pVector, pDoor);
         // clang-format on
     }
 
@@ -108,14 +99,7 @@ int CCarEnterExitSA::ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle)
         CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
         CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
         // clang-format off
-        __asm
-        {
-            push    pPedInterface
-            push    pVehicleInterface
-            call    dwFunc
-            add     esp, 8
-            mov     door, eax
-        }
+        door = gta_call_address<decltype(door)>(dwFunc, pVehicleInterface, pPedInterface);
         // clang-format on
 
         switch (door)
@@ -192,15 +176,7 @@ bool CCarEnterExitSA::IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVec
         {
             CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
             // clang-format off
-            __asm
-            {
-                push    pUnknown
-                push    dwIdx
-                push    pVehicleInterface
-                call    dwFunc
-                add     esp, 12
-                mov     bRet, al
-            }
+            bRet = gta_call_address<decltype(bRet)>(dwFunc, pVehicleInterface, dwIdx, pUnknown);
             // clang-format on
         }
     }

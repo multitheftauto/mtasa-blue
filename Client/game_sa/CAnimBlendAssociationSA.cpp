@@ -33,12 +33,7 @@ CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::Constructor(CAnimBlen
     DWORD DwFunc = 0x4CF080;
     DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
     // clang-format off
-    __asm
-    {
-        mov     ecx, DwThisInterface
-        push    staticAssociationByReference
-        call    DwFunc
-    }
+    gta_thiscall_address(DwFunc, DwThisInterface, staticAssociationByReference);
     // clang-format on;
 }
 
@@ -47,13 +42,7 @@ CAnimBlendAssociationSAInterface* CAnimBlendAssociationSA::Constructor(RpClump* 
     DWORD DwFunc = 0x4CEFC0;
     DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
     // clang-format off
-    __asm
-    {
-        mov     ecx, DwThisInterface
-        push    pAnimHierarchy
-        push    pClump
-        call    DwFunc
-    }
+    gta_thiscall_address(DwFunc, DwThisInterface, pClump, pAnimHierarchy);
     // clang-format on;
 }
 
@@ -81,13 +70,7 @@ void CAnimBlendAssociationSA::Init(RpClump* pClump, CAnimBlendHierarchySAInterfa
     DWORD DwFunc = 0x4CED50;
     DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
     // clang-format off
-    __asm
-    {
-        mov     ecx, DwThisInterface
-        push    pAnimHierarchy
-        push    pClump
-        call    DwFunc
-    }
+    gta_thiscall_address(DwFunc, DwThisInterface, pClump, pAnimHierarchy);
     // clang-format on;
 }
 
@@ -96,12 +79,7 @@ void CAnimBlendAssociationSA::AllocateAnimBlendNodeArray(int iCount)
     DWORD DwFunc = 0x4CE9F0;
     DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
     // clang-format off
-    __asm
-    {
-        mov     ecx, DwThisInterface
-        push    iCount
-        call    DwFunc
-    }
+    gta_thiscall_address(DwFunc, DwThisInterface, iCount);
     // clang-format on;
 }
 
@@ -110,11 +88,7 @@ void CAnimBlendAssociationSA::FreeAnimBlendNodeArray()
     DWORD DwFunc = 0x4CEA40;
     DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
     // clang-format off
-    __asm
-    {
-        mov     ecx, DwThisInterface
-        call    DwFunc
-    }
+    gta_thiscall_address(DwFunc, DwThisInterface);
     // clang-format on;
 }
 
@@ -135,11 +109,6 @@ void CAnimBlendAssociationSA::SetCurrentProgress(float fProgress)
     DWORD DwFunc = 0x4CEA80;
     DWORD DwThisInterface = reinterpret_cast<DWORD>(m_pInterface);
     // clang-format off
-    __asm
-    {
-        mov     ecx, DwThisInterface
-        push    fTime
-        call    DwFunc
-    }
+    gta_thiscall_address(DwFunc, DwThisInterface, fTime);
     // clang-format on;
 }

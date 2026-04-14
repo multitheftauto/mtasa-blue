@@ -25,12 +25,7 @@ void CAnimBlendSequenceSA::SetName(const char* szName)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendSequence_SetName;
     // clang-format off
-    __asm
-    {
-        push    szName
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, szName);
     // clang-format on
 }
 
@@ -39,12 +34,7 @@ void CAnimBlendSequenceSA::SetBoneTag(int32_t i32BoneID)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendSequence_SetBoneTag;
     // clang-format off
-    __asm
-    {
-        push    i32BoneID
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, i32BoneID);
     // clang-format on
 }
 
@@ -53,15 +43,7 @@ void CAnimBlendSequenceSA::SetKeyFrames(size_t cKeyFrames, bool bRoot, bool bCom
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendSequence_SetKeyFrames;
     // clang-format off
-    __asm
-    {
-        push    pKeyFrames
-        push    bCompressed
-        push    bRoot
-        push    cKeyFrames
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, cKeyFrames, bRoot, bCompressed, pKeyFrames);
     // clang-format on
 }
 

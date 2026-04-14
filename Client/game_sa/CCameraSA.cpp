@@ -113,11 +113,7 @@ void CCameraSA::Restore()
 
     DWORD dwFunc = FUNC_Restore;
     // clang-format off
-    __asm
-    {
-        mov     ecx, cameraInterface
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, cameraInterface);
     // clang-format on
 }
 
@@ -128,19 +124,11 @@ void CCameraSA::RestoreWithJumpCut()
         return;
     DWORD dwFunc = 0x50BD40;
     // clang-format off
-    __asm
-    {
-        mov     ecx, cameraInterface
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, cameraInterface);
     // clang-format on
     dwFunc = 0x50BAB0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, cameraInterface
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, cameraInterface);
     // clang-format on
 }
 
@@ -171,15 +159,7 @@ void CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyl
 
     DWORD CCamera__TakeControl = FUNC_TakeControl;
     // clang-format off
-    __asm
-    {
-        mov ecx, cameraInterface
-        push 1
-        push CamSwitchStyle
-        push CamMode
-        push entityInterface
-        call CCamera__TakeControl
-    }
+    gta_thiscall_address(CCamera__TakeControl, cameraInterface, entityInterface, CamMode, CamSwitchStyle, 1);
     // clang-format on
 }
 
@@ -213,14 +193,7 @@ void CCameraSA::TakeControl(CVector* position, int CamSwitchStyle)
 
     DWORD CCamera__TakeControlNoEntity = FUNC_TakeControlNoEntity;
     // clang-format off
-    __asm
-        {
-        mov ecx, cameraInterface
-        push 1
-        push CamSwitchStyle
-        push position
-        call CCamera__TakeControlNoEntity
-        }
+    gta_thiscall_address(CCamera__TakeControlNoEntity, cameraInterface, position, CamSwitchStyle, 1);
     // clang-format on
 
     DWORD dwFunc = 0x50BEC0;
@@ -363,17 +336,7 @@ void CCameraSA::Find3rdPersonCamTargetVector(float fDistance, CVector* vecGunMuz
         return;
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, cameraInterface
-        push    vecTarget
-        push    vecSource
-        push    fOriginZ
-        push    fOriginY
-        push    fOriginX
-        push    fDistance
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, cameraInterface, fDistance, fOriginX, fOriginY, fOriginZ, vecSource, vecTarget);
     // clang-format on
 }
 
@@ -386,12 +349,7 @@ float CCameraSA::Find3rdPersonQuickAimPitch()
     float fReturn;
     DWORD dwFunc = FUNC_Find3rdPersonQuickAimPitch;
     // clang-format off
-    __asm
-    {
-        mov     ecx, cameraInterface
-        call    dwFunc
-        fstp    fReturn
-    }
+    fReturn = gta_thiscall_address<decltype(fReturn)>(dwFunc, cameraInterface);
     // clang-format on
     return fReturn;
 }
@@ -449,12 +407,7 @@ bool CCameraSA::IsFading()
         return false;
     bool bRet = false;
     // clang-format off
-    __asm
-    {
-        mov     ecx, cameraInterface
-        call    dwFunc
-        mov     bRet, al
-    }
+    bRet = gta_thiscall_address<decltype(bRet)>(dwFunc, cameraInterface);
     // clang-format on
     return bRet;
 }
@@ -467,12 +420,7 @@ int CCameraSA::GetFadingDirection()
         return 0;
     int dwRet = false;
     // clang-format off
-    __asm
-    {
-        mov     ecx, cameraInterface
-        call    dwFunc
-        mov     dwRet, eax
-    }
+    dwRet = gta_thiscall_address<decltype(dwRet)>(dwFunc, cameraInterface);
     // clang-format on
     return dwRet;
 }
@@ -499,13 +447,7 @@ void CCameraSA::Fade(float fFadeOutTime, int iOutOrIn)
         return;
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, cameraInterface
-        push    iOutOrIn
-        push    fFadeOutTime
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, cameraInterface, fFadeOutTime, iOutOrIn);
     // clang-format on
 }
 
@@ -519,14 +461,7 @@ void CCameraSA::SetFadeColor(unsigned char ucRed, unsigned char ucGreen, unsigne
     DWORD dwGreen = ucGreen;
     DWORD dwBlue = ucBlue;
     // clang-format off
-    __asm
-    {
-        mov     ecx, cameraInterface
-        push    dwBlue
-        push    dwGreen
-        push    dwRed
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, cameraInterface, dwRed, dwGreen, dwBlue);
     // clang-format on
 }
 

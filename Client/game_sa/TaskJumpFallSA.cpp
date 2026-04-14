@@ -22,17 +22,7 @@ CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntitySAInterface* pClimbEnt, const CVec
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    bForceClimb
-        push    nHeight
-        push    nSurfaceType
-        push    fHeading
-        push    vecTarget
-        push    pClimbEnt
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface, pClimbEnt, vecTarget, fHeading, nSurfaceType, nHeight, bForceClimb);
     // clang-format on
 }
 
@@ -50,14 +40,6 @@ CTaskSimpleJetPackSA::CTaskSimpleJetPackSA(const CVector* pVecTargetPos, float f
     DWORD dwThisInterface = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    0               // pTargetEnt - ignored for simplicity's sake (we really don't need it)
-        push    nHoverTime
-        push    fCruiseHeight
-        push    pVecTargetPos
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface, pVecTargetPos, fCruiseHeight, nHoverTime, 0);
     // clang-format on
 }

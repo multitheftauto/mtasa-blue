@@ -94,14 +94,7 @@ CObjectSA::CObjectSA(DWORD dwModel, bool bBreakingDisabled)
     DWORD CObjectCreate = FUNC_CObject_Create;
     DWORD dwObjectPtr = 0;
     // clang-format off
-    __asm
-    {
-        push    1
-        push    dwModel
-        call    CObjectCreate
-        add     esp, 8
-        mov     dwObjectPtr, eax
-    }
+    dwObjectPtr = gta_call_address<decltype(dwObjectPtr)>(CObjectCreate, dwModel, 1);
     // clang-format on
 
     if (dwObjectPtr)
@@ -172,11 +165,7 @@ void CObjectSA::Explode()
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis);
     // clang-format on
 }
 
@@ -188,16 +177,7 @@ void CObjectSA::Break()
     float fHitVelocity = 1000.0f;  // has no direct influence, but should be high enough to trigger the break (effect)
 
     // clang-format off
-    __asm
-    {
-        push    32h // most cases: between 30 and 37
-        push    0 // colliding entity. To ignore it, we can set it to 0
-        push    0B73710h // vecCollisionImpactVelocity
-        push    0 // vecCollisionLastPos
-        push    fHitVelocity
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, fHitVelocity, 0, 0x0B73710, 0, 0x32);
     // clang-format on
 
     if (IsGlass())
@@ -208,20 +188,7 @@ void CObjectSA::Break()
         dwFunc = FUNC_CGlass_WindowRespondsToCollision;
 
         // clang-format off
-        __asm
-        {
-            push 0
-            push fZ
-            push fY
-            push fX
-            push 0
-            push 0
-            push 0
-            push fHitVelocity
-            push dwThis
-            call dwFunc
-            add esp, 24h
-        }
+        gta_call_address(dwFunc, dwThis, fHitVelocity, 0, 0, 0, fX, fY, fZ, 0);
         // clang-format on
     }
 }
@@ -274,13 +241,7 @@ bool CObjectSA::IsGlass()
     bool  bResult;
 
     // clang-format off
-    __asm
-    {
-        push dwThis
-        call dwFunc
-        mov bResult, al
-        add esp, 4
-    }
+    bResult = gta_call_address<decltype(bResult)>(dwFunc, dwThis);
     // clang-format on
     return bResult;
 }

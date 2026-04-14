@@ -44,12 +44,7 @@ CTaskComplexEnterCarAsDriverSA::CTaskComplexEnterCarAsDriverSA(CVehicle* pTarget
         DWORD dwThisInterface = (DWORD)GetInterface();
 
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwThisInterface
-            push    dwVehiclePtr
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, dwThisInterface, dwVehiclePtr);
         // clang-format on
     }
 }
@@ -109,12 +104,7 @@ CTaskComplexEnterBoatAsDriverSA::CTaskComplexEnterBoatAsDriverSA(CVehicle* pTarg
         DWORD dwThisInterface = (DWORD)GetInterface();
 
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwThisInterface
-            push    dwVehiclePtr
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, dwThisInterface, dwVehiclePtr);
         // clang-format on
     }
 }

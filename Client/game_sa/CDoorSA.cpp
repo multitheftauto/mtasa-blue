@@ -25,12 +25,7 @@ float CDoorSA::GetAngleOpenRatio()
     if (dwPointer != 0)
     {
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwPointer
-            call    dwFunction
-            fstp    fReturn
-        }
+        fReturn = gta_thiscall_address<decltype(fReturn)>(dwFunction, dwPointer);
         // clang-format on
     }
 
@@ -50,12 +45,7 @@ bool CDoorSA::IsClosed()
     if (dwPointer != 0)
     {
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwPointer
-            call    dwFunction
-            mov     bReturn, al
-        }
+        bReturn = gta_thiscall_address<decltype(bReturn)>(dwFunction, dwPointer);
         // clang-format on
     }
 
@@ -76,12 +66,7 @@ bool CDoorSA::IsFullyOpen()
     if (dwPointer != 0)
     {
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwPointer
-            call    dwFunction
-            mov     bReturn, al
-        }
+        bReturn = gta_thiscall_address<decltype(bReturn)>(dwFunction, dwPointer);
         // clang-format on
     }
 
@@ -101,12 +86,7 @@ void CDoorSA::Open(float fOpenRatio)
     if (dwPointer != 0)
     {
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwPointer
-            push    fOpenRatio
-            call    dwFunction
-        }
+        gta_thiscall_address(dwFunction, dwPointer, fOpenRatio);
         // clang-format on
     }
 }

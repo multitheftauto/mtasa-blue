@@ -66,12 +66,7 @@ CTask* CTaskManagerSA::GetActiveTask()
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    dwReturn = gta_thiscall_address<decltype(dwReturn)>(dwFunc, dwThis);
     // clang-format on
 
     CTaskSAInterface* pActiveTask = (CTaskSAInterface*)dwReturn;
@@ -88,16 +83,13 @@ CTask* CTaskManagerSA::GetSimplestActiveTask()
     DWORD dwThis = (DWORD)GetInterface();
 
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    dwReturn = gta_thiscall_address<decltype(dwReturn)>(dwFunc, dwThis);
     // clang-format on
 
-    if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else return NULL;
+    if (dwReturn)
+        return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
+    else
+        return NULL;
 }
 
 CTask* CTaskManagerSA::GetSimplestTask(const int iPriority)
@@ -106,17 +98,13 @@ CTask* CTaskManagerSA::GetSimplestTask(const int iPriority)
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    iPriority
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    dwReturn = gta_thiscall_address<decltype(dwReturn)>(dwFunc, dwThis, iPriority);
     // clang-format on
 
-    if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else return NULL;
+    if (dwReturn)
+        return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
+    else
+        return NULL;
 }
 
 CTask* CTaskManagerSA::FindActiveTaskByType(const int iTaskType)
@@ -125,17 +113,13 @@ CTask* CTaskManagerSA::FindActiveTaskByType(const int iTaskType)
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    iTaskType
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    dwReturn = gta_thiscall_address<decltype(dwReturn)>(dwFunc, dwThis, iTaskType);
     // clang-format on
 
-    if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else return NULL;
+    if (dwReturn)
+        return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
+    else
+        return NULL;
 }
 
 CTask* CTaskManagerSA::FindTaskByType(const int iPriority, const int iTaskType)
@@ -144,18 +128,13 @@ CTask* CTaskManagerSA::FindTaskByType(const int iPriority, const int iTaskType)
     DWORD dwReturn = 0;
     DWORD dwThis = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    iTaskType
-        push    iPriority
-        call    dwFunc
-        mov     dwReturn, eax
-    }
+    dwReturn = gta_thiscall_address<decltype(dwReturn)>(dwFunc, dwThis, iPriority, iTaskType);
     // clang-format on
 
-    if (dwReturn) return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
-    else return NULL;
+    if (dwReturn)
+        return m_pTaskManagementSystem->GetTask((CTaskSAInterface*)dwReturn);
+    else
+        return NULL;
 }
 
 void CTaskManagerSA::RemoveTaskSecondary(const int iTaskPriority)
@@ -183,13 +162,7 @@ void CTaskManagerSA::SetTaskSecondary(CTaskSA* pTaskSecondary, const int iType)
         taskInterface = pTaskSecondary->GetInterface();
     DWORD dwInterface = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        push    iType
-        push    taskInterface
-        mov     ecx, dwInterface
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwInterface, taskInterface, iType);
     // clang-format on
 }
 
@@ -209,12 +182,7 @@ bool CTaskManagerSA::HasTaskSecondary(const CTask* pTaskSecondary)
     DWORD dwFunc = FUNC_HasTaskSecondary;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    pTaskSecondary
-        call    dwFunc
-        mov     bReturn, al
-    }
+    bReturn = gta_call_address<decltype(bReturn)>(dwFunc, pTaskSecondary);
     // clang-format on
     return bReturn;
 }
@@ -223,10 +191,7 @@ void CTaskManagerSA::ClearTaskEventResponse()
 {
     DWORD dwFunc = FUNC_ClearTaskEventResponse;
     // clang-format off
-    __asm
-    {
-        call    dwFunc
-    }
+    gta_call_address(dwFunc);
     // clang-format on
 }
 

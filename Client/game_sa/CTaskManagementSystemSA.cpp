@@ -139,12 +139,7 @@ CTaskSA* CTaskManagementSystemSA::GetTask(CTaskSAInterface* pTaskInterface)
     if (dwFunc && dwFunc != 0x82263A)
     {
         // clang-format off
-        __asm
-        {
-            mov     ecx, pTaskInterface
-            call    dwFunc
-            mov     iTaskType, eax
-        }
+        iTaskType = gta_thiscall_address<decltype(iTaskType)>(dwFunc, pTaskInterface);
         // clang-format on
     }
 

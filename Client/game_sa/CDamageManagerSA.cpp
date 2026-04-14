@@ -54,13 +54,7 @@ void CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnF
                 int   iCarNodeIndex = s_iCarNodeIndexes[bDoor];
                 DWORD dwDoor = (DWORD)bDoor;
                 // clang-format off
-                __asm
-                {
-                    mov     ecx, dwThis
-                    push    dwDoor
-                    push    iCarNodeIndex
-                    call    dwFunc
-                }
+                gta_thiscall_address(dwFunc, dwThis, iCarNodeIndex, dwDoor);
                 // clang-format on
             }
             else
@@ -71,13 +65,7 @@ void CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnF
                 DWORD dwDoor = (DWORD)bDoor;
                 bool  bQuiet = !spawnFlyingComponent;
                 // clang-format off
-                __asm
-                {
-                    mov     ecx, dwThis
-                    push    bQuiet
-                    push    dwDoor
-                    call    dwFunc
-                }
+                gta_thiscall_address(dwFunc, dwThis, dwDoor, bQuiet);
                 // clang-format on
             }
         }
@@ -117,13 +105,7 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
             DWORD dwPanel = bPanel;
             DWORD dwStatus = bPanelStatus;
             // clang-format off
-            __asm
-            {
-                mov     ecx, dwThis
-                push    dwStatus
-                push    dwPanel
-                call    dwFunction
-            }
+            gta_thiscall_address(dwFunction, dwThis, dwPanel, dwStatus);
             // clang-format on
 
             // Intact?
@@ -137,16 +119,11 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
                     return;
 
                 // clang-format off
-                __asm
-                {
-                    mov     ecx, dwThis
-                    push    dwPanel
-                    push    carNodeIndex
-                    call    dwFunction
-                }
+                gta_thiscall_address(dwFunction, dwThis, carNodeIndex, dwPanel);
                 // clang-format on
             }
-            else reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface)->SetPanelDamage(bPanel, breakGlass, spawnFlyingComponent);
+            else
+                reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface)->SetPanelDamage(bPanel, breakGlass, spawnFlyingComponent);
         }
     }
 }
@@ -178,13 +155,7 @@ void CDamageManagerSA::SetLightStatus(BYTE bLight, BYTE bLightStatus)
     DWORD dwLight = bLight;
     DWORD dwStatus = bLightStatus;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwPointer
-        push    dwStatus
-        push    dwLight
-        call    dwFunction
-    }
+    gta_thiscall_address(dwFunction, dwPointer, dwLight, dwStatus);
     // clang-format on
 }
 
@@ -200,13 +171,7 @@ BYTE CDamageManagerSA::GetLightStatus(BYTE bLight)
     BYTE  bReturn = 0;
     DWORD dwLight = bLight;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwPointer
-        push    dwLight
-        call    dwFunction
-        mov     bReturn, al
-    }
+    bReturn = gta_thiscall_address<decltype(bReturn)>(dwFunction, dwPointer, dwLight);
     // clang-format on
     return bReturn;
 }
@@ -222,13 +187,7 @@ void CDamageManagerSA::SetAeroplaneCompStatus(BYTE CompID, BYTE Status)
     DWORD dwPointer = (DWORD)internalInterface;
     DWORD dwPannel = CompID;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwPointer
-        push    Status
-        push    dwPannel
-        call    dwFunction
-    }
+    gta_thiscall_address(dwFunction, dwPointer, dwPannel, Status);
     // clang-format on
 }
 
@@ -239,13 +198,7 @@ BYTE CDamageManagerSA::GetAeroplaneCompStatus(BYTE CompID)
     BYTE  bReturn = 0;
     DWORD dwPannel = CompID;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwPointer
-        push    dwPannel
-        call    dwFunction
-        mov     bReturn, al
-    }
+    bReturn = gta_thiscall_address<decltype(bReturn)>(dwFunction, dwPointer, dwPannel);
     // clang-format on
     return bReturn;
 }
@@ -255,12 +208,7 @@ void CDamageManagerSA::FuckCarCompletely(bool bKeepWheels)
     DWORD dwFunc = FUNC_FuckCarCompletely;
     DWORD dwPointer = (DWORD)internalInterface;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwPointer
-        push    bKeepWheels
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwPointer, bKeepWheels);
     // clang-format on
 }
 

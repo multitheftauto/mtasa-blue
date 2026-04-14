@@ -27,12 +27,7 @@ int CTaskComplexWanderSA::GetWanderType()
     if (dwFunc && dwFunc != 0x82263A)  // some tasks have no wander type 0x82263A is purecal (assert?)
     {
         // clang-format off
-        __asm
-        {
-            mov     ecx, pTaskInterface
-            call    dwFunc
-            mov     iReturn, eax
-        }
+        iReturn = gta_thiscall_address<decltype(iReturn)>(dwFunc, pTaskInterface);
         // clang-format on
     }
     return iReturn;
@@ -61,13 +56,6 @@ CTaskComplexWanderStandardSA::CTaskComplexWanderStandardSA(const int iMoveState,
     DWORD dwFunc = FUNC_CTaskComplexWanderStandard__Constructor;
     DWORD dwThisInterface = (DWORD)GetInterface();
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThisInterface
-        push    bWanderSensibly
-        push    iDir
-        push    iMoveState
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThisInterface, iMoveState, iDir, bWanderSensibly);
     // clang-format on
 }

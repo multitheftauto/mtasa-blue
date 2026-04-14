@@ -28,18 +28,7 @@ CEventDamageSA::CEventDamageSA(CEntity* pEntity, unsigned int i_1, eWeaponType w
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_Constructor;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    b_4
-        push    b_3
-        push    uc_2
-        push    hitZone
-        push    weaponType
-        push    i_1
-        push    dwEntityInterface
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, dwEntityInterface, i_1, weaponType, hitZone, uc_2, b_3, b_4);
     // clang-format on
 }
 
@@ -60,11 +49,7 @@ CEventDamageSA::~CEventDamageSA()
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CEventDamage_Destructor;
         // clang-format off
-        __asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
+        gta_thiscall_address(dwFunc, dwThis);
         // clang-format on
         delete m_pInterface;
     }
@@ -88,12 +73,7 @@ bool CEventDamageSA::HasKilledPed()
     DWORD dwFunc = FUNC_CEventDamage_HasKilledPed;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
+    bReturn = gta_thiscall_address<decltype(bReturn)>(dwFunc, dwThis);
     // clang-format on
     return bReturn;
 }
@@ -104,12 +84,7 @@ float CEventDamageSA::GetDamageApplied()
     DWORD dwFunc = FUNC_CEventDamage_GetDamageApplied;
     float fReturn = 0.0f;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        fstp    fReturn
-    }
+    fReturn = gta_thiscall_address<decltype(fReturn)>(dwFunc, dwThis);
     // clang-format on
     return fReturn;
 }
@@ -120,12 +95,7 @@ AssocGroupId CEventDamageSA::GetAnimGroup()
     DWORD        dwFunc = FUNC_CEventDamage_GetAnimGroup;
     AssocGroupId animGroup = 0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     animGroup, eax
-    }
+    animGroup = gta_thiscall_address<decltype(animGroup)>(dwFunc, dwThis);
     // clang-format on
     return animGroup;
 }
@@ -136,12 +106,7 @@ AnimationId CEventDamageSA::GetAnimId()
     DWORD       dwFunc = FUNC_CEventDamage_GetAnimId;
     AnimationId animID = 0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     animID, eax
-    }
+    animID = gta_thiscall_address<decltype(animID)>(dwFunc, dwThis);
     // clang-format on
     return animID;
 }
@@ -152,12 +117,7 @@ bool CEventDamageSA::GetAnimAdded()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_GetAnimAdded;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
+    bReturn = gta_thiscall_address<decltype(bReturn)>(dwFunc, dwThis);
     // clang-format on
     return bReturn;
 }
@@ -168,13 +128,7 @@ void CEventDamageSA::ComputeDeathAnim(CPed* pPed, bool bUnk)
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CEventDamage_ComputeDeathAnim;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    bUnk
-        push    dwPed
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, dwPed, bUnk);
     // clang-format on
 }
 
@@ -184,13 +138,7 @@ void CEventDamageSA::ComputeDamageAnim(CPed* pPed, bool bUnk)
     DWORD dwPed = (DWORD)pPed->GetInterface();
     DWORD dwFunc = FUNC_CEventDamage_ComputeDamageAnim;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    bUnk
-        push    dwPed
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, dwPed, bUnk);
     // clang-format on
 }
 
@@ -201,13 +149,7 @@ bool CEventDamageSA::AffectsPed(CPed* pPed)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CEventDamage_AffectsPed;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    dwPedInterface
-        call    dwFunc
-        mov     bReturn, al
-    }
+    bReturn = gta_thiscall_address<decltype(bReturn)>(dwFunc, dwThis, dwPedInterface);
     // clang-format on
     return bReturn;
 }

@@ -241,13 +241,7 @@ bool CModelInfoSA::IsBoat()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    bReturn = gta_call_address<decltype(bReturn)>(dwFunction, ModelID);
     // clang-format on
     return bReturn;
 }
@@ -258,13 +252,7 @@ bool CModelInfoSA::IsCar()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    bReturn = gta_call_address<decltype(bReturn)>(dwFunction, ModelID);
     // clang-format on
     return bReturn;
 }
@@ -275,13 +263,7 @@ bool CModelInfoSA::IsTrain()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    bReturn = gta_call_address<decltype(bReturn)>(dwFunction, ModelID);
     // clang-format on
     return bReturn;
 }
@@ -292,13 +274,7 @@ bool CModelInfoSA::IsHeli()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    bReturn = gta_call_address<decltype(bReturn)>(dwFunction, ModelID);
     // clang-format on
     return bReturn;
 }
@@ -309,13 +285,7 @@ bool CModelInfoSA::IsPlane()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    bReturn = gta_call_address<decltype(bReturn)>(dwFunction, ModelID);
     // clang-format on
     return bReturn;
 }
@@ -326,13 +296,7 @@ bool CModelInfoSA::IsBike()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    bReturn = gta_call_address<decltype(bReturn)>(dwFunction, ModelID);
     // clang-format on
     return bReturn;
 }
@@ -343,13 +307,7 @@ bool CModelInfoSA::IsFakePlane()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    bReturn = gta_call_address<decltype(bReturn)>(dwFunction, ModelID);
     // clang-format on
     return bReturn;
 }
@@ -360,13 +318,7 @@ bool CModelInfoSA::IsMonsterTruck()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    bReturn = gta_call_address<decltype(bReturn)>(dwFunction, ModelID);
     // clang-format on
     return bReturn;
 }
@@ -377,13 +329,7 @@ bool CModelInfoSA::IsQuadBike()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    bReturn = gta_call_address<decltype(bReturn)>(dwFunction, ModelID);
     // clang-format on
     return bReturn;
 }
@@ -394,13 +340,7 @@ bool CModelInfoSA::IsBmx()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    bReturn = gta_call_address<decltype(bReturn)>(dwFunction, ModelID);
     // clang-format on
     return bReturn;
 }
@@ -411,13 +351,7 @@ bool CModelInfoSA::IsTrailer()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunction
-        mov     bReturn, al
-        add     esp, 4
-    }
+    bReturn = gta_call_address<decltype(bReturn)>(dwFunction, ModelID);
     // clang-format on
     return bReturn;
 }
@@ -511,12 +445,7 @@ uint CModelInfoSA::GetAnimFileIndex()
     DWORD dwThis = (DWORD)m_pInterface;
     uint  uiReturn = 0;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     uiReturn, eax
-    }
+    uiReturn = gta_thiscall_address<decltype(uiReturn)>(dwFunc, dwThis);
     // clang-format on
     return uiReturn;
 }
@@ -976,13 +905,7 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
     DWORD         ModelID = m_dwModelID;
     CBoundingBox* dwReturn = 0;
     // clang-format off
-    __asm
-    {
-        push    ModelID
-        call    dwFunc
-        add     esp, 4
-        mov     dwReturn, eax
-    }
+    dwReturn = gta_call_address<decltype(dwReturn)>(dwFunc, ModelID);
     // clang-format on
     return dwReturn;
 }
@@ -1808,11 +1731,7 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
         if (pInterface && pInterface->usNumberOfRefs > 1)
         {
             DWORD dwFunction = FUNC_RemoveRef;
-            _asm
-            {
-                mov     ecx, pInterface
-                call    dwFunction
-            }
+            gta_thiscall_address(dwFunction, pInterface);
         }
     }
 
@@ -3484,11 +3403,7 @@ bool CModelInfoSA::ForceUnload()
     uint  uiLimit = 100;
     while (pInterface->usNumberOfRefs > 0 && uiLimit--)
     {
-        _asm
-        {
-            mov     ecx, pInterface
-            call    dwFunction
-        }
+        gta_thiscall_address(dwFunction, pInterface);
     }
 
     if (pInterface->usNumberOfRefs > 0 || pInterface->pRwObject != nullptr)

@@ -44,12 +44,7 @@ bool CPedSoundSA::IsSpeechDisabled()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAEPedSound__IsSpeedDisabled;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-        mov     bReturn, al
-    }
+    bReturn = gta_thiscall_address<decltype(bReturn)>(dwFunc, dwThis);
     // clang-format on
     return bReturn;
 }
@@ -59,11 +54,7 @@ void CPedSoundSA::EnablePedSpeech()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAEPedSound__EnablePedSpeech;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis);
     // clang-format on
 }
 
@@ -72,12 +63,7 @@ void CPedSoundSA::DisablePedSpeech(bool bStopCurrent)
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAEPedSound__DisablePedSpeech;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    bStopCurrent
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, bStopCurrent);
     // clang-format on
 }
 
@@ -87,13 +73,7 @@ short CPedSoundSA::GetVoiceTypeIDFromName(const char* szVoiceTypeName)
     short sVoiceTypeID;
 
     // clang-format off
-    __asm
-    {
-        push    szVoiceTypeName
-        call    dwFunc
-        add     esp, 4
-        mov     sVoiceTypeID, ax
-    }
+    sVoiceTypeID = gta_call_address<decltype(sVoiceTypeID)>(dwFunc, szVoiceTypeName);
     // clang-format on
     return sVoiceTypeID;
 }

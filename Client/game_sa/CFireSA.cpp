@@ -27,11 +27,7 @@ void CFireSA::Extinguish()
     DWORD dwFunction = FUNC_Extinguish;
     DWORD dwPointer = (DWORD)internalInterface;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwPointer
-        call    dwFunction
-    }
+    gta_thiscall_address(dwFunction, dwPointer);
     // clang-format on
     internalInterface->bActive = false;
 }
@@ -187,13 +183,7 @@ void CFireSA::Ignite()
     DWORD    dwFunc = FUNC_CreateFxSysForStrength;
     DWORD    dwThis = (DWORD)internalInterface;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    0
-        push    vecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, vecPosition, 0);
     // clang-format on
 
     internalInterface->bBeingExtinguished = 0;

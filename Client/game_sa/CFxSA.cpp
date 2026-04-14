@@ -20,15 +20,7 @@ void CFxSA::AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, fl
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddBlood;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    fBrightness
-        push    iCount
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition, pvecDirection, iCount, fBrightness);
     // clang-format on
 }
 
@@ -39,15 +31,7 @@ void CFxSA::AddWood(CVector& vecPosition, CVector& vecDirection, int iCount, flo
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddWood;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    fBrightness
-        push    iCount
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition, pvecDirection, iCount, fBrightness);
     // clang-format on
 }
 
@@ -60,21 +44,7 @@ void CFxSA::AddSparks(CVector& vecPosition, CVector& vecDirection, float fForce,
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddSparks;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    fLife
-        push    fSpread
-        push    ucBlurIf0
-        push    fZ
-        push    fY
-        push    fX
-        push    iCount
-        push    fForce
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition, pvecDirection, fForce, iCount, fX, fY, fZ, ucBlurIf0, fSpread, fLife);
     // clang-format on
 }
 
@@ -85,13 +55,7 @@ void CFxSA::AddTyreBurst(CVector& vecPosition, CVector& vecDirection)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddTyreBurst;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition, pvecDirection);
     // clang-format on
 }
 
@@ -102,16 +66,7 @@ void CFxSA::AddBulletImpact(CVector& vecPosition, CVector& vecDirection, int iSm
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddBulletImpact;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    fSmokeIntensity
-        push    iSparkCount
-        push    iSmokeSize
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition, pvecDirection, iSmokeSize, iSparkCount, fSmokeIntensity);
     // clang-format on
 }
 
@@ -122,14 +77,7 @@ void CFxSA::AddPunchImpact(CVector& vecPosition, CVector& vecDirection, int i)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddPunchImpact;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    i
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition, pvecDirection, i);
     // clang-format on
 }
 
@@ -140,15 +88,7 @@ void CFxSA::AddDebris(CVector& vecPosition, RwColor& rwColor, float fDebrisScale
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddDebris;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    iCount
-        push    fDebrisScale
-        push    pColor
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition, pColor, fDebrisScale, iCount);
     // clang-format on
 }
 
@@ -159,15 +99,7 @@ void CFxSA::AddGlass(CVector& vecPosition, RwColor& rwColor, float fDebrisScale,
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_AddGlass;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    iCount
-        push    fDebrisScale
-        push    pColor
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition, pColor, fDebrisScale, iCount);
     // clang-format on
 }
 
@@ -177,12 +109,7 @@ void CFxSA::TriggerWaterHydrant(CVector& vecPosition)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerWaterHydrant;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition);
     // clang-format on
 }
 
@@ -194,15 +121,7 @@ void CFxSA::TriggerGunshot(CEntity* pEntity, CVector& vecPosition, CVector& vecD
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerGunshot;
     // clang-format off
-        __asm
-    {
-        mov     ecx, dwThis
-        push    bIncludeSparks
-        push    pvecDirection
-        push    pvecPosition
-        push    dwEntity
-        call    dwFunc
-    }
+        gta_thiscall_address(dwFunc, dwThis, dwEntity, pvecPosition, pvecDirection, bIncludeSparks);
     // clang-format on
 }
 
@@ -213,13 +132,7 @@ void CFxSA::TriggerTankFire(CVector& vecPosition, CVector& vecDirection)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerTankFire;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pvecDirection
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition, pvecDirection);
     // clang-format on
 }
 
@@ -229,12 +142,7 @@ void CFxSA::TriggerWaterSplash(CVector& vecPosition)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerWaterSplash;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition);
     // clang-format on
 }
 
@@ -244,12 +152,7 @@ void CFxSA::TriggerBulletSplash(CVector& vecPosition)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerBulletSplash;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition);
     // clang-format on
 }
 
@@ -259,12 +162,7 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
     DWORD    dwThis = (DWORD)m_pInterface;
     DWORD    dwFunc = FUNC_CFx_TriggerFootSplash;
     // clang-format off
-    __asm
-    {
-        mov     ecx, dwThis
-        push    pvecPosition
-        call    dwFunc
-    }
+    gta_thiscall_address(dwFunc, dwThis, pvecPosition);
     // clang-format on
 }
 
