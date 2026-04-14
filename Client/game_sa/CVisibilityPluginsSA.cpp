@@ -65,6 +65,14 @@ int CVisibilityPluginsSA::GetAtomicId(RwObject* pAtomic)
     return iResult;
 }
 
+bool CVisibilityPluginsSA::IsAtomicVisible(RpAtomic* atomic) const
+{
+    if (!atomic)
+        return false;
+
+    return ((bool(__cdecl*)(RpAtomic*))0x732990)(atomic);
+}
+
 bool CVisibilityPluginsSA::InsertEntityIntoEntityList(void* entity, float distance, void* callback)
 {
     return ((bool(_cdecl*)(void*, float, void*))FUNC_CVisibilityPlugins_InsertEntityIntoEntityList)(entity, distance, callback);

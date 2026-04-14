@@ -19,6 +19,7 @@
 #define DEFAULT_MAX_UNDERWATER_ENTITIES 100
 
 struct RpClump;
+struct RpAtomic;
 struct RwObject;
 
 class CVisibilityPlugins
@@ -27,6 +28,8 @@ public:
     virtual void SetClumpAlpha(RpClump* pClump, int iAlpha) = 0;
     virtual int  GetAtomicId(RwObject* pAtomic) = 0;
 
+    virtual bool IsAtomicVisible(RpAtomic* atomic) const = 0;
+  
     virtual bool InsertEntityIntoEntityList(void* entity, float distance, void* callback) = 0;
     virtual void SetRenderingListSize(RenderingEntityListType listType, std::size_t elementsCount) = 0;
 };

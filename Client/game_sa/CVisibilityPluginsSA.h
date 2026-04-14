@@ -37,6 +37,8 @@ public:
     void SetClumpAlpha(RpClump* pClump, int iAlpha);
     int  GetAtomicId(RwObject* pAtomic);
 
+    bool IsAtomicVisible(RpAtomic* atomic) const override;
+
     bool InsertEntityIntoEntityList(void* entity, float distance, void* callback);
     void SetRenderingListSize(RenderingEntityListType listType, std::size_t elementsCount) override;
 
