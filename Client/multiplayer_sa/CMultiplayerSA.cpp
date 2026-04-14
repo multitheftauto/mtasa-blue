@@ -1590,14 +1590,6 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x6A2EAB, 0x90, 6);
     MemSet((void*)0x6ABC81, 0x90, 6);
 
-    // Disable Z position changes in the matrix in the C3dMarkers::PlaceMarker (#4000, #536)
-    // To prevent arrow-type markers from snapping to the ground
-    MemCpy((void*)0x725844, "\xDD\xD8\x90", 3);
-    MemCpy((void*)0x725619, "\xDD\xD8\x90", 3);
-    MemCpy((void*)0x72565A, "\xDD\xD8\x90", 3);
-    MemCpy((void*)0x7259B0, "\xDD\xD8\x90", 3);
-    MemSet((void*)0x7258B8, 0x90, 6);
-
     // Disable spreading fires (Moved from multiplayer_shotsync)
     MemCpy((void*)0x53A23F, "\x33\xC0\x90\x90\x90", 5);
     MemCpy((void*)0x53A00A, "\x33\xC0\x90\x90\x90", 5);
