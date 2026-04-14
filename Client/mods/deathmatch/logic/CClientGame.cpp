@@ -84,6 +84,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Init the global var with ourself
     g_pClientGame = this;
 
+    CStaticFunctionDefinitions::PreInitialize(g_pCore, g_pGame, this, &m_Events);
+
     // Packet handler
     m_pPacketHandler = new CPacketHandler();
 
@@ -6867,6 +6869,10 @@ bool CClientGame::RestreamModel(std::uint16_t model)
 
 void CClientGame::RestreamWorld()
 {
+    // If game is shutting down, do nothing for avoid crashes
+    if (g_bClientShuttingDown)
+        return;
+
     unsigned int numberOfFileIDs = g_pGame->GetCountOfAllFileIDs();
 
     for (unsigned int uiModelID = 0; uiModelID < numberOfFileIDs; uiModelID++)
@@ -6897,7 +6903,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
 
         m_pManager->GetVehicleManager()->RestreamAllVehicles();
     }
-    
+
     if (option == RestreamOption::ALL || option == RestreamOption::PEDS)
     {
         for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::PED))
