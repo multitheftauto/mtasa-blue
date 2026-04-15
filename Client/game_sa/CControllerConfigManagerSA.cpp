@@ -100,14 +100,14 @@ void CControllerConfigManagerSA::SetClassicControls(bool bClassicControls)
     MemPutFast<unsigned char>(VAR_InputType, bClassicControls ? 0 : 1);
 }
 
-void CControllerConfigManagerSA::SetMouseInvertedVertical(bool bInverted)
+void CControllerConfigManagerSA::SetMouseInvertedVertical(bool bInvertedVertical)
 {
-    MemPutFast<BYTE>(VAR_MouseInverted, (bInverted) ? 0 : 1);
+    MemPutFast<BYTE>(VAR_MouseInverted, (bInvertedVertical) ? 0 : 1);
 }
 
-void CControllerConfigManagerSA::SetMouseInvertedHorizontal(bool bInverted)
+void CControllerConfigManagerSA::SetMouseInvertedHorizontal(bool bInvertedHorizontal)
 {
-    MemPutFast<BYTE>(VAR_MouseInvertedHorizontal, (bInverted) ? 0 : 1);
+    MemPutFast<BYTE>(VAR_MouseInvertedHorizontal, (bInvertedHorizontal) ? 0 : 1);
 }
 
 void CControllerConfigManagerSA::SetFlyWithMouse(bool bFlyWithMouse)
