@@ -350,6 +350,7 @@ void CSettings::ResetGuiPointers()
 
     m_pControlsMouseLabel = NULL;
     m_pInvertMouse = NULL;
+    m_pInvertMouseHorizontal = NULL;
     m_pSteerWithMouse = NULL;
     m_pFlyWithMouse = NULL;
     m_pLabelMouseSensitivity = NULL;
@@ -605,6 +606,10 @@ void CSettings::CreateGUI()
     m_pInvertMouse = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabControls, _("Invert mouse vertically"), true));
     m_pInvertMouse->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pInvertMouse->AutoSize(NULL, 20.0f);
+
+    m_pInvertMouseHorizontal = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabControls, _("Invert mouse horizontally"), true));
+    m_pInvertMouseHorizontal->SetPosition(CVector2D(vecTemp.fX + 170.0f, vecTemp.fY));
+    m_pInvertMouseHorizontal->AutoSize(NULL, 20.0f);
 
     m_pSteerWithMouse = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabControls, _("Steer with mouse"), true));
     m_pSteerWithMouse->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 16.0f));
@@ -2836,6 +2841,7 @@ bool CSettings::OnControlsDefaultClick(CGUIElement* pElement)
     // Load the default settings
     GetJoystickManager()->SetDefaults();
     CVARS_SET("invert_mouse", false);
+    CVARS_SET("invert_mouse_horizontal", false);
     CVARS_SET("fly_with_mouse", false);
     CVARS_SET("steer_with_mouse", false);
     CVARS_SET("classic_controls", false);
@@ -2844,7 +2850,8 @@ bool CSettings::OnControlsDefaultClick(CGUIElement* pElement)
     gameSettings->SetMouseSensitivity(0.5f);
 
     // Set game vars
-    pController->SetMouseInverted(CVARS_GET_VALUE<bool>("invert_mouse"));
+    pController->SetMouseInvertedVertical(CVARS_GET_VALUE<bool>("invert_mouse"));
+    pController->SetMouseInvertedHorizontal(CVARS_GET_VALUE<bool>("invert_mouse_horizontal"));
     pController->SetFlyWithMouse(CVARS_GET_VALUE<bool>("fly_with_mouse"));
     pController->SetSteerWithMouse(CVARS_GET_VALUE<bool>("steer_with_mouse"));
     pController->SetClassicControls(CVARS_GET_VALUE<bool>("classic_controls"));
@@ -2853,6 +2860,7 @@ bool CSettings::OnControlsDefaultClick(CGUIElement* pElement)
     // Update the GUI
     UpdateJoypadTab();
     m_pInvertMouse->SetSelected(CVARS_GET_VALUE<bool>("invert_mouse"));
+    m_pInvertMouseHorizontal->SetSelected(CVARS_GET_VALUE<bool>("invert_mouse_horizontal"));
     m_pFlyWithMouse->SetSelected(CVARS_GET_VALUE<bool>("fly_with_mouse"));
     m_pSteerWithMouse->SetSelected(CVARS_GET_VALUE<bool>("steer_with_mouse"));
     m_pStandardControls->SetSelected(!CVARS_GET_VALUE<bool>("classic_controls"));
@@ -3950,6 +3958,8 @@ void CSettings::LoadData()
     // Controls
     CVARS_GET("invert_mouse", bVar);
     m_pInvertMouse->SetSelected(bVar);
+    CVARS_GET("invert_mouse_horizontal", bVar);
+    m_pInvertMouseHorizontal->SetSelected(bVar);
     CVARS_GET("steer_with_mouse", bVar);
     m_pSteerWithMouse->SetSelected(bVar);
     CVARS_GET("fly_with_mouse", bVar);
@@ -4285,7 +4295,9 @@ void CSettings::SaveData()
     // Very hacky
     CControllerConfigManager* pController = g_pCore->GetGame()->GetControllerConfigManager();
     CVARS_SET("invert_mouse", m_pInvertMouse->GetSelected());
-    pController->SetMouseInverted(m_pInvertMouse->GetSelected());
+    pController->SetMouseInvertedVertical(m_pInvertMouse->GetSelected());
+    CVARS_SET("invert_mouse_horizontal", m_pInvertMouseHorizontal->GetSelected());
+    pController->SetMouseInvertedHorizontal(m_pInvertMouseHorizontal->GetSelected());
     CVARS_SET("steer_with_mouse", m_pSteerWithMouse->GetSelected());
     pController->SetSteerWithMouse(m_pSteerWithMouse->GetSelected());
     CVARS_SET("fly_with_mouse", m_pFlyWithMouse->GetSelected());

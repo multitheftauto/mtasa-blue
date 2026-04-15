@@ -681,7 +681,9 @@ void CCore::ApplyGameSettings()
     CGameSettings*            pGameSettings = m_pGame->GetSettings();
 
     CVARS_GET("invert_mouse", bVal);
-    pController->SetMouseInverted(bVal);
+    pController->SetMouseInvertedVertical(bVal);
+    CVARS_GET("invert_mouse_horizontal", bVal);
+    pController->SetMouseInvertedHorizontal(bVal);
     CVARS_GET("fly_with_mouse", bVal);
     pController->SetFlyWithMouse(bVal);
     CVARS_GET("steer_with_mouse", bVal);

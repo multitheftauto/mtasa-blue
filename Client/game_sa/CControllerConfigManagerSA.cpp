@@ -14,6 +14,7 @@
 
 #define VAR_InputType                  ((BYTE*)(0xB6EC2E))
 #define VAR_MouseInverted              ((BYTE*)(0xBA6745))
+#define VAR_MouseInvertedHorizontal    ((BYTE*)(0xBA6744))
 #define VAR_FlyWithMouse               ((BYTE*)(0xC1CC03))
 #define VAR_SteerWithMouse             ((BYTE*)(0xC1CC02))
 #define VAR_VerticalAimSensitivity     ((float*)(0xB6EC18))
@@ -99,9 +100,14 @@ void CControllerConfigManagerSA::SetClassicControls(bool bClassicControls)
     MemPutFast<unsigned char>(VAR_InputType, bClassicControls ? 0 : 1);
 }
 
-void CControllerConfigManagerSA::SetMouseInverted(bool bInverted)
+void CControllerConfigManagerSA::SetMouseInvertedVertical(bool bInverted)
 {
     MemPutFast<BYTE>(VAR_MouseInverted, (bInverted) ? 0 : 1);
+}
+
+void CControllerConfigManagerSA::SetMouseInvertedHorizontal(bool bInverted)
+{
+    MemPutFast<BYTE>(VAR_MouseInvertedHorizontal, (bInverted) ? 0 : 1);
 }
 
 void CControllerConfigManagerSA::SetFlyWithMouse(bool bFlyWithMouse)

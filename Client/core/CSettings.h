@@ -297,6 +297,7 @@ protected:
 
     CGUILabel*     m_pControlsMouseLabel;
     CGUICheckBox*  m_pInvertMouse;
+    CGUICheckBox*  m_pInvertMouseHorizontal;
     CGUICheckBox*  m_pSteerWithMouse;
     CGUICheckBox*  m_pFlyWithMouse;
     CGUILabel*     m_pLabelMouseSensitivity;

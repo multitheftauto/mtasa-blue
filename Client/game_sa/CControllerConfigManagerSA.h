@@ -29,7 +29,8 @@ public:
     int   GetNumOfSettingsForAction(eControllerAction action);
     void  ClearSettingsAssociatedWithAction(eControllerAction action, eControllerType controllerType);
     void  SetClassicControls(bool bClassicControls);
-    void  SetMouseInverted(bool bInverted);
+    void  SetMouseInvertedVertical(bool bInvertedVertical);
+    void  SetMouseInvertedHorizontal(bool bInvertedHorizontal);
     void  SetFlyWithMouse(bool bFlyWithMouse);
     void  SetSteerWithMouse(bool bSteerWithMouse);
     void  SuspendSteerAndFlyWithMouse(bool bSuspend);

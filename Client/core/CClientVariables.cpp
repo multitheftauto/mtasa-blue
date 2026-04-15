@@ -321,7 +321,8 @@ void CClientVariables::LoadDefaults()
     DEFAULT("server_can_flash_window", true);                               // allow server to flash the window
     DEFAULT("allow_tray_notifications", true);                              // allow scripts to create tray balloon notifications
     DEFAULT("text_scale", 1.0f);                                            // text scale
-    DEFAULT("invert_mouse", false);                                         // mouse inverting
+    DEFAULT("invert_mouse", false);                                         // mouse inverting (vertical, kept the naming as it's due to backwards compatibility)
+    DEFAULT("invert_mouse_horizontal", true);                               // mouse inverting (horizontal)
     DEFAULT("fly_with_mouse", false);                                       // flying with mouse controls
     DEFAULT("steer_with_mouse", false);                                     // steering with mouse controls
     DEFAULT("classic_controls", false);                                     // classic/standard controls
