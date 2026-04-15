@@ -81,45 +81,44 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
     if (m_vehiclePool.ulCount >= MAX_VEHICLES)
         return nullptr;
 
+    // Ensure collision model is fully loaded to prevent crash at 0x002a65ef in SetupSuspensionLines
     CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(model));
-    if (!pModelInfo)
+    if (!pModelInfo || !pModelInfo->GetInterface())
         return nullptr;
-
-    if (!pModelInfo->GetInterface())
-    {
-        pGame->GetStreaming()->RequestModel(model, 0x16);
-        pGame->GetStreaming()->LoadAllRequestedModels(true, "CPoolsSA::AddVehicle");
-        if (!pModelInfo->GetInterface())
-            return nullptr;
-    }
 
     CBaseModelInfoSAInterface* pModelInterface = pModelInfo->GetInterface();
 
     if (!pModelInterface->pColModel)
     {
+        // Collision model pointer is NULL - try loading
         pGame->GetStreaming()->LoadAllRequestedModels(false, "CPoolsSA::AddVehicle");
 
-        pModelInterface = pModelInfo->GetInterface();
-        if (!pModelInterface)
-            return nullptr;
-
+        // Re-check after loading - still NULL means loading failed
         if (!pModelInterface->pColModel)
             return nullptr;
     }
 
-    // Note: Vehicles with custom DFFs (no embedded collision) are handled in CModelInfoSA::SetCustomModel
-    // where collision is reloaded after SetClump to restore pool-managed collision data
+    // Check if collision data (m_pColData) is loaded
+    if (!pModelInterface->pColModel->m_data)
+    {
+        // Collision data not loaded - force load
+        pGame->GetStreaming()->LoadAllRequestedModels(false, "CPoolsSA::AddVehicle");
+
+        // Re-check after loading - still not loaded means loading failed
+        if (!pModelInterface->pColModel->m_data)
+            return nullptr;
+    }
 
     MemSetFast((void*)VAR_CVehicle_Variation1, variation, 1);
     MemSetFast((void*)VAR_CVehicle_Variation2, variation2, 1);
 
-    // Valid model?
-    if (!CModelInfoSA::IsVehicleModel(model))
-        return nullptr;
-
     // CCarCtrl::CreateCarForScript
     auto* pInterface = ((CVehicleSAInterface * (__cdecl*)(int, CVector, std::uint8_t)) FUNC_CCarCtrlCreateCarForScript)(model, CVector(), 0);
     if (!pInterface)
+        return nullptr;
+
+    // Valid model?
+    if (!CModelInfoSA::IsVehicleModel(model))
         return nullptr;
 
     auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(model)->GetVehicleType());
@@ -223,8 +222,6 @@ SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
             if (dwElementIndexInPool < MAX_VEHICLES)
             {
                 // Return only if MTA has an entity for this slot
-                // This filters out non-MTA managed vehicles (where pEntity is null) without
-                // being overly strict about GTA pool state during timing edge cases or internal transitions from GTA-side to MTA vehicles
                 SClientEntity<CVehicleSA>* pSlot = &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
                 if (!pSlot->pEntity)
                     return nullptr;
@@ -281,21 +278,6 @@ CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool
 
     if (m_objectPool.ulCount < MAX_OBJECTS)
     {
-        CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(dwModelID));
-        if (!pModelInfo)
-            return nullptr;
-
-        if (!pModelInfo->GetInterface())
-        {
-            pGame->GetStreaming()->RequestModel(dwModelID, 0x16);
-            pGame->GetStreaming()->LoadAllRequestedModels(true, "CPoolsSA::AddObject");
-            if (!pModelInfo->GetInterface())
-            {
-                AddReportLog(5552, SString("Failed to create object with model %d - model invalid or deallocated", dwModelID));
-                return nullptr;
-            }
-        }
-
         pObject = new (std::nothrow) CObjectSA(dwModelID, bBreakingDisabled);
 
         if (pObject && AddObjectToPool(pClientObject, pObject))
@@ -567,6 +549,7 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetPed;
 
+    // clang-format off
     __asm {
         mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
         push    dwGameRef
@@ -574,6 +557,7 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
         add     esp, 0x4
         mov     dwReturn, eax
     }
+    // clang-format on
 
     CPedSAInterface* pInterface = (CPedSAInterface*)dwReturn;
     return pInterface;
@@ -667,8 +651,6 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
 
         if (model == 449 || model == 537 || model == 538 || model == 569 || model == 590 || model == 570)
         {
-            if (count >= 32)
-                return nullptr;
             MemPutFast<DWORD>(VAR_TrainModelArray + count * 4, model);
             count += 1;
         }
@@ -695,15 +677,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
 
     std::size_t vehicleIndex = 0;
 
-    std::unique_ptr<CVehicleSA> train;
-    try
-    {
-        train = std::make_unique<CTrainSA>(pTrainBeginning);
-    }
-    catch (...)
-    {
-        return nullptr;
-    }
+    std::unique_ptr<CVehicleSA> train = std::make_unique<CTrainSA>(pTrainBeginning);
     if (!train || !AddVehicleToPool(pClientVehicle, train.get()))
         return nullptr;
 
@@ -716,15 +690,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
         if (!pVehCarriage)
             break;
 
-        std::unique_ptr<CTrainSA> newCarriage;
-        try
-        {
-            newCarriage = std::make_unique<CTrainSA>(pVehCarriage);
-        }
-        catch (...)
-        {
-            break;
-        }
+        auto newCarriage = std::make_unique<CTrainSA>(pVehCarriage);
         if (!newCarriage || !AddVehicleToPool(pClientVehicle, newCarriage.get()))
         {
             newCarriage.reset();
@@ -819,38 +785,10 @@ uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
 
     unsigned int NUMBER_OF_MODELS = pGame->GetBaseIDforTXD();
 
-    auto isValidPtr = [](const void* ptr) noexcept -> bool
-    {
-        if (!ptr)
-            return false;
-
-        __try
-        {
-            const auto* p = static_cast<const CBaseModelInfoSAInterface*>(ptr);
-            const auto* v = p->VFTBL;
-            if (!v)
-                return false;
-
-            volatile DWORD test = v->Destructor;
-            static_cast<void>(test);
-            return true;
-        }
-        __except (EXCEPTION_EXECUTE_HANDLER)
-        {
-            return false;
-        }
-    };
-
     for (uint i = 1; i < NUMBER_OF_MODELS; i++)
     {
-        CBaseModelInfoSAInterface* pInterface = ppModelInfo[i];
-        if (!pInterface)
-            continue;
-
-        if (!isValidPtr(pInterface))
-            continue;
-
-        if (pInterface->pRwObject == (RwObject*)pRpClump)
+        CBaseModelInfoSAInterface* m_pInterface = ppModelInfo[i];
+        if (m_pInterface && m_pInterface->pRwObject == (RwObject*)pRpClump)
         {
             return i;
         }
@@ -1100,7 +1038,7 @@ void CPoolsSA::SetPoolCapacity(ePools pool, int iValue)
         MemPut(iPtr, iValue);
 
     if (cPtr)
-        MemPut<char>(cPtr, static_cast<char>(iValue));
+        MemPut(cPtr, static_cast<char>(iValue));
 }
 
 int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)

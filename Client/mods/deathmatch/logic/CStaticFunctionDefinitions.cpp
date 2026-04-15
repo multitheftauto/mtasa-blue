@@ -725,12 +725,6 @@ bool CStaticFunctionDefinitions::GetElementAlpha(CClientEntity& Entity, unsigned
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsElementOnScreen(CClientEntity& Entity, bool& bOnScreen)
-{
-    bOnScreen = Entity.IsOnScreen();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::GetElementHealth(CClientEntity& Entity, float& fHealth)
 {
     switch (Entity.GetType())

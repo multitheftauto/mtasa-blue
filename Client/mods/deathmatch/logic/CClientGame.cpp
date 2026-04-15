@@ -84,8 +84,6 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Init the global var with ourself
     g_pClientGame = this;
 
-    g_pCore->UpdateWerCrashModuleBases();
-
     CStaticFunctionDefinitions::PreInitialize(g_pCore, g_pGame, this, &m_Events);
 
     // Packet handler
@@ -476,9 +474,6 @@ CClientGame::~CClientGame()
     // Singular file download manager
     SAFE_DELETE(m_pSingularFileDownloadManager);
 
-    // Clear cached clothes from this session
-    g_pMultiplayer->FlushClothesCache();
-
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler(NULL);
     g_pMultiplayer->SetPostContextSwitchHandler(NULL);
@@ -558,13 +553,8 @@ CClientGame::~CClientGame()
         discord->UpdatePresence();
     }
 
-    // Destruction order matters: destroy CClientTXD entities (via m_pManager) BEFORE
-    // StaticReset calls. TXD destructors need intact bookkeeping to clean up propery.
-
     // Destroy our stuff
-    CClientTXD::ClearPendingImports();
     SAFE_DELETE(m_pManager);  // Will trigger onClientResourceStop
-
     SAFE_DELETE(m_pNametags);
     SAFE_DELETE(m_pSyncDebug);
     SAFE_DELETE(m_pNetworkStats);
@@ -584,19 +574,6 @@ CClientGame::~CClientGame()
     SAFE_DELETE(m_pResourceFileDownloadManager);
 
     SAFE_DELETE(m_pRootEntity);
-
-    // Unload models that had custom DFF geometry cleared during DoDeleteAll.
-    // Must run after m_pRootEntity is gone and before StaticResetModelTextureReplacing.
-    CClientDFF::FlushDeferredModelRestores();
-
-    // Clear any remaining texture replacement/shader state after destroying entities.
-    // This ordering prevents global reset from running before late element destructors
-    // (e.g. CClientTXD) have a chance to clean up using RenderWare bookkeeping.
-    if (g_pGame && g_pGame->GetRenderWare())
-    {
-        g_pGame->GetRenderWare()->StaticResetModelTextureReplacing();
-        g_pGame->GetRenderWare()->StaticResetShaderSupport();
-    }
 
     SAFE_DELETE(m_pModelCacheManager);
     // SAFE_DELETE(m_pGameEntityXRefManager);
@@ -830,35 +807,26 @@ bool CClientGame::OnCancelLocalGameClick(CGUIElement* pElement)
 
 void CClientGame::DoPulsePreFrame()
 {
-    CLOCK_SET_SECTION("CClientGame::DoPulsePreFrame");
-    CLOCK1("Total");
-
     if (m_Status == CClientGame::STATUS_JOINED)
     {
         if (m_pVoiceRecorder && m_pVoiceRecorder->IsEnabled())
         {
-            CLOCK_CALL1(m_pVoiceRecorder->DoPulse(););
+            m_pVoiceRecorder->DoPulse();
         }
     }
-    UNCLOCK1("Total");
 }
 
 void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRenderTargets)
 {
-    CLOCK_SET_SECTION("CClientGame::DoPulsePreHUDRender");
-    CLOCK1("Total");
-
     // Allow scripted dxSetRenderTarget for old scripts
     g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(true);
-
-    CLOCK_CALL1(CClientTXD::ProcessPendingImports(););
 
     // If appropriate, call onClientRestore
     if (bDidUnminimize)
     {
         CLuaArguments Arguments;
         Arguments.PushBoolean(bDidRecreateRenderTargets);
-        CLOCK_CALL1(m_pRootEntity->CallEvent("onClientRestore", Arguments, false););
+        m_pRootEntity->CallEvent("onClientRestore", Arguments, false);
         m_bWasMinimized = false;
 
         // Reverse any mute on minimize effects
@@ -869,7 +837,7 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
 
     // Call onClientHUDRender LUA event
     CLuaArguments Arguments;
-    CLOCK_CALL1(m_pRootEntity->CallEvent("onClientHUDRender", Arguments, false););
+    m_pRootEntity->CallEvent("onClientHUDRender", Arguments, false);
 
     // Disallow scripted dxSetRenderTarget for old scripts
     g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(false);
@@ -877,14 +845,11 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
     // Restore in case script forgets
     g_pCore->GetGraphics()->GetRenderItemManager()->RestoreDefaultRenderTarget();
 
-    CLOCK_CALL1(DebugElementRender(););
-    UNCLOCK1("Total");
+    DebugElementRender();
 }
 
 void CClientGame::DoPulsePostFrame()
 {
-    CLOCK_SET_SECTION("CClientGame::DoPulsePostFrame");
-    CLOCK1("Total");
     TIMING_CHECKPOINT("+CClientGame::DoPulsePostFrame");
 #ifdef DEBUG_KEYSTATES
     // Get the controller state
@@ -934,16 +899,16 @@ void CClientGame::DoPulsePostFrame()
         // If nametags are enabled, pulse the nametag manager
         if (m_bShowNametags)
         {
-            CLOCK_CALL1(m_pNametags->DoPulse(););
+            m_pNametags->DoPulse();
         }
 
         // Sync debug
-        CLOCK_CALL1(m_pSyncDebug->OnPulse(););
+        m_pSyncDebug->OnPulse();
 
         // Also eventually draw FPS
         if (m_bShowFPS)
         {
-            CLOCK_CALL1(DrawFPS(););
+            DrawFPS();
         }
 
         CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
@@ -1116,9 +1081,7 @@ void CClientGame::DoPulsePostFrame()
                         const int stateCount = taskStates.size();
                         if (stateCount > 0)
                         {
-                            const std::uint64_t tickCount = static_cast<std::uint64_t>(GetTickCount64_());
-                            const unsigned int  seed = static_cast<unsigned int>(tickCount ^ (tickCount >> 32));
-                            std::srand(seed);
+                            std::srand(static_cast<unsigned int>(GetTickCount64_()));
                             const int   index = (std::rand() % stateCount);
                             const auto& taskState = taskStates[index];
 
@@ -1144,19 +1107,18 @@ void CClientGame::DoPulsePostFrame()
             }
         }
 
-        CLOCK_CALL1(CClientPerfStatManager::GetSingleton()->DoPulse(););
+        CClientPerfStatManager::GetSingleton()->DoPulse();
     }
 
-    CLOCK_CALL1(m_pPlayerMap->DoRender(););
-    CLOCK_CALL1(m_pManager->DoRender(););
-    CLOCK_CALL1(DoPulses(););
+    m_pPlayerMap->DoRender();
+    m_pManager->DoRender();
+    DoPulses();
 
     // If we're supposed to show netstat, draw them infront of everything else
     if (m_bShowNetstat)
     {
-        CLOCK_CALL1(m_pNetworkStats->Draw(););
+        m_pNetworkStats->Draw();
     }
-    UNCLOCK1("Total");
 }
 
 void CClientGame::DoPulses()
@@ -1165,8 +1127,6 @@ void CClientGame::DoPulses()
 
     // TODO: (pxd) Useless, cleanup checkpoints on #4428
     TIMING_CHECKPOINT("+CClientGame::DoPulses");
-
-    CLOCK_SET_SECTION("CClientGame::DoPulses");
 
     m_BuiltCollisionMapThisFrame = false;
 
@@ -1178,7 +1138,7 @@ void CClientGame::DoPulses()
     }
 
     // Output stuff from our server eventually
-    CLOCK_CALL1(m_Server.Pulse(););
+    m_Server.Pulse();
 
     if (m_pManager->IsGameLoaded() && m_Status == CClientGame::STATUS_JOINED && GetTickCount64_() - m_llLastTransgressionTime > 60000)
     {
@@ -1251,18 +1211,18 @@ void CClientGame::DoPulses()
     // Pulse the network interface
 
     // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
-    CLOCK_CALL1(DoPulses2(false););
+    DoPulses2(false);
 
-    CLOCK_CALL1(m_pUnoccupiedVehicleSync->DoPulse(););
-    CLOCK_CALL1(m_pPedSync->DoPulse(););
+    m_pUnoccupiedVehicleSync->DoPulse();
+    m_pPedSync->DoPulse();
 #ifdef WITH_OBJECT_SYNC
-    CLOCK_CALL1(m_pObjectSync->DoPulse(););
+    m_pObjectSync->DoPulse();
 #endif
-    CLOCK_CALL1(m_pLatentTransferManager->DoPulse(););
-    CLOCK_CALL1(m_pLuaManager->DoPulse(););
-    CLOCK_CALL1(m_pScriptDebugging->UpdateLogOutput(););
+    m_pLatentTransferManager->DoPulse();
+    m_pLuaManager->DoPulse();
+    m_pScriptDebugging->UpdateLogOutput();
 
-    CLOCK_CALL1(GetModelCacheManager()->DoPulse(););
+    GetModelCacheManager()->DoPulse();
 
 #ifdef MTA_DEBUG
     UpdateMimics();
@@ -1324,7 +1284,7 @@ void CClientGame::DoPulses()
     if (m_pManager->IsGameLoaded())
     {
         // Pulse the blended weather manager
-        CLOCK_CALL1(m_pBlendedWeather->DoPulse(););
+        m_pBlendedWeather->DoPulse();
 
         // If we weren't ingame last frame; call the on ingame event
         if (!m_bGameLoaded)
@@ -1341,21 +1301,21 @@ void CClientGame::DoPulses()
         DoVehicleInKeyCheck();
 
         // Pulse some stuff
-        CLOCK_CALL1(m_pMovingObjectsManager->DoPulse(););
+        m_pMovingObjectsManager->DoPulse();
 
         // Get rid of our deleted elements
-        CLOCK_CALL1(m_ElementDeleter.DoDeleteAll(););
-        CLOCK_CALL1(m_pLuaManager->ProcessPendingDeleteList(););
+        m_ElementDeleter.DoDeleteAll();
+        m_pLuaManager->ProcessPendingDeleteList();
 
         // Get rid of deleted GUI elements
-        CLOCK_CALL1(g_pCore->GetGUI()->CleanDeadPool(););
+        g_pCore->GetGUI()->CleanDeadPool();
 
         // Allow scripted dxSetRenderTarget for old scripts
         g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(true);
 
         // Call onClientRender LUA event
         CLuaArguments Arguments;
-        CLOCK_CALL1(m_pRootEntity->CallEvent("onClientRender", Arguments, false););
+        m_pRootEntity->CallEvent("onClientRender", Arguments, false);
 
         // Disallow scripted dxSetRenderTarget for old scripts
         g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(false);
@@ -1364,10 +1324,10 @@ void CClientGame::DoPulses()
         g_pCore->GetGraphics()->GetRenderItemManager()->RestoreDefaultRenderTarget();
 
         // Ensure replaced/restored textures for models in the GTA map are correct
-        CLOCK_CALL1(g_pGame->FlushPendingRestreamIPL(););
+        g_pGame->FlushPendingRestreamIPL();
 
         // Respawn objects in respawn pool
-        CLOCK_CALL1(m_ObjectRespawner.DoRespawnAll(););
+        m_ObjectRespawner.DoRespawnAll();
     }
 
     // Are we connecting?
@@ -1390,9 +1350,9 @@ void CClientGame::DoPulses()
     else if (m_Status == CClientGame::STATUS_JOINED)
     {
         // Pulse DownloadFiles if we're transferring stuff
-        CLOCK_CALL1(GetResourceFileDownloadManager()->DoPulse(););
-        CLOCK_CALL1(DownloadSingularResourceFiles(););
-        CLOCK_CALL1(GetRemoteCalls()->ProcessQueuedFiles(););
+        GetResourceFileDownloadManager()->DoPulse();
+        DownloadSingularResourceFiles();
+        GetRemoteCalls()->ProcessQueuedFiles();
     }
 
     // Not waiting for local connect?
@@ -1487,7 +1447,7 @@ void CClientGame::DoPulses()
     }
 
     // Check for radar input
-    CLOCK_CALL1(m_pPlayerMap->DoPulse(););
+    m_pPlayerMap->DoPulse();
     g_pCore->GetGraphics()->SetAspectRatioAdjustmentSuspended(m_pPlayerMap->IsPlayerMapShowing());
 
     // Got a local player?
@@ -1534,13 +1494,13 @@ void CClientGame::DoPulses()
     // reset weapon logs (for preventing quickreload)
 
     // Update streaming
-    CLOCK_CALL1(m_pManager->UpdateStreamers(););
+    m_pManager->UpdateStreamers();
 
     // Send screen shot data
-    CLOCK_CALL1(ProcessDelayedSendList(););
+    ProcessDelayedSendList();
 
     // Collect async task scheduler results
-    CLOCK_CALL1(m_pAsyncTaskScheduler->CollectResults(););
+    m_pAsyncTaskScheduler->CollectResults();
 
     TIMING_CHECKPOINT("-CClientGame::DoPulses");
 }
@@ -1548,7 +1508,6 @@ void CClientGame::DoPulses()
 // Extrapolation test
 void CClientGame::DoPulses2(bool bCalledFromIdle)
 {
-    CLOCK_SET_SECTION("CClientGame::DoPulses2");
     bool bIsUsingAlternatePulseOrder = IsUsingAlternatePulseOrder(!bCalledFromIdle);
 
     // Figure out which pulses to do
@@ -1581,7 +1540,7 @@ void CClientGame::DoPulses2(bool bCalledFromIdle)
 
         // Pulse the network interface
         TIMING_CHECKPOINT("+NetPulse");
-        CLOCK_CALL1(g_pNet->DoPulse(););
+        g_pNet->DoPulse();
         TIMING_CHECKPOINT("-NetPulse");
 
         // Change precision back, and check we are in low precision mode 4 sure
@@ -1589,11 +1548,11 @@ void CClientGame::DoPulses2(bool bCalledFromIdle)
         assert(!IsHighFloatPrecision());
     }
 
-    CLOCK_CALL1(m_pManager->DoPulse(bDoStandardPulses, bDoVehicleManagerPulse););
+    m_pManager->DoPulse(bDoStandardPulses, bDoVehicleManagerPulse);
 
     if (bDoStandardPulses)
     {
-        CLOCK_CALL1(m_pNetAPI->DoPulse(););
+        m_pNetAPI->DoPulse();
     }
 }
 
@@ -3688,9 +3647,6 @@ void CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler()
 
 void CClientGame::StaticPreFxRenderHandler()
 {
-    // RenderFadingInEntities is done at this point, so alpha entity list callbacks
-    // no longer reference CModelRenderer's queue elements.
-    g_pClientGame->GetModelRenderer()->NotifyFrameEnd();
     g_pCore->OnPreFxRender();
 }
 
@@ -3787,11 +3743,6 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         CClientEntity* pClientEntity = pPools->GetClientEntity((DWORD*)pGameEntity);
         if (pClientEntity)
         {
-            if (pClientEntity->IsBeingDeleted())
-            {
-                g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
-                return;
-            }
             int    iTypeMask;
             ushort usModelId = 0xFFFF;
             switch (pClientEntity->GetType())
@@ -3819,7 +3770,7 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         }
     }
 
-    g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
+    g_pGame->GetRenderWare()->SetRenderingClientEntity(NULL, 0xFFFF, TYPE_MASK_WORLD);
 }
 
 void CClientGame::StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -3941,8 +3892,7 @@ void CClientGame::Render3DStuffHandler()
 
 void CClientGame::PreRenderSkyHandler()
 {
-    CLOCK_SET_SECTION("CClientGame::PreRenderSkyHandler");
-    CLOCK_CALL1(g_pCore->GetGraphics()->GetRenderItemManager()->PreDrawWorld(););
+    g_pCore->GetGraphics()->GetRenderItemManager()->PreDrawWorld();
 }
 
 void CClientGame::PreWorldProcessHandler()
@@ -3951,11 +3901,9 @@ void CClientGame::PreWorldProcessHandler()
 
 void CClientGame::PostWorldProcessHandler()
 {
-    CLOCK_SET_SECTION("CClientGame::PostWorldProcessHandler");
-    CLOCK1("Total");
-    CLOCK_CALL1(m_pManager->GetMarkerManager()->DoPulse(););
-    CLOCK_CALL1(m_pManager->GetPointLightsManager()->DoPulse(););
-    CLOCK_CALL1(m_pManager->GetObjectManager()->DoPulse(););
+    m_pManager->GetMarkerManager()->DoPulse();
+    m_pManager->GetPointLightsManager()->DoPulse();
+    m_pManager->GetObjectManager()->DoPulse();
 
     double dTimeSlice = m_TimeSliceTimer.Get();
     m_TimeSliceTimer.Reset();
@@ -3964,27 +3912,19 @@ void CClientGame::PostWorldProcessHandler()
     // Call onClientPreRender LUA event
     CLuaArguments Arguments;
     Arguments.PushNumber(dTimeSlice);
-    CLOCK_CALL1(m_pRootEntity->CallEvent("onClientPreRender", Arguments, false););
-    UNCLOCK1("Total");
+    m_pRootEntity->CallEvent("onClientPreRender", Arguments, false);
 }
 
 void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
 {
-    CLOCK_SET_SECTION("CClientGame::PostWorldProcessPedsAfterPreRenderHandler");
-    CLOCK1("Total");
-
     CLuaArguments Arguments;
-    CLOCK_CALL1(m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false););
+    m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
 
-    CLOCK_CALL1(g_pClientGame->GetModelRenderer()->Update(););
-    UNCLOCK1("Total");
+    g_pClientGame->GetModelRenderer()->Update();
 }
 
 void CClientGame::IdleHandler()
 {
-    CLOCK_SET_SECTION("CClientGame::IdleHandler");
-    CLOCK1("Total");
-
     // If we are minimized we do the pulsing here
     if (g_pCore->IsWindowMinimized())
     {
@@ -3993,7 +3933,7 @@ void CClientGame::IdleHandler()
             m_bWasMinimized = true;
             // Call onClientMinimize LUA event
             CLuaArguments Arguments;
-            CLOCK_CALL1(m_pRootEntity->CallEvent("onClientMinimize", Arguments, false););
+            m_pRootEntity->CallEvent("onClientMinimize", Arguments, false);
 
             bool bMuteAll = g_pCore->GetCVars()->GetValue<bool>("mute_master_when_minimized");
 
@@ -4013,10 +3953,9 @@ void CClientGame::IdleHandler()
     g_pCore->SetDummyProgressUpdateAlways(true);
 
     // Extrapolation test - Change the pulse order to reduce latency (Has side effects for peds)
-    CLOCK_CALL1(DoPulses2(true););
+    DoPulses2(true);
 
     g_pCore->SetDummyProgressUpdateAlways(false);
-    UNCLOCK1("Total");
 }
 
 bool CClientGame::ChokingHandler(unsigned char ucWeaponType)
@@ -5014,9 +4953,6 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
 
 // Called when GTA:SA destroys an entity (e.g., during map streaming).
 // Clear stale pool entries to prevent dangling pointer crashes in GetClientEntity/GetEntity.
-// Note: This may leak the CObjectSA/CVehicleSA/CPedSA wrapper if MTA created it, but we cannot
-// safely delete it here since the game entity is mid-destruction. The leak is acceptable
-// as this is an abnormal code path (GTA destroying MTA-managed entities).
 void CClientGame::GameObjectDestructHandler(CEntitySAInterface* pObject)
 {
     if (auto* pSlot = g_pGame->GetPools()->GetObject(reinterpret_cast<DWORD*>(pObject)))
@@ -6464,8 +6400,8 @@ void CClientGame::GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpen
     {
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
 
-        ushort usPartNumber = static_cast<ushort>(i);
-        ushort usBytesThisPart = static_cast<ushort>(std::min(uiBytesRemaining, uiBytesPerPart));
+        auto usPartNumber = static_cast<ushort>(i);
+        auto usBytesThisPart = static_cast<ushort>(std::min(uiBytesRemaining, uiBytesPerPart));
         assert(usBytesThisPart != 0);
 
         pBitStream->Write((uchar)EPlayerScreenShotResult::SUCCESS);
@@ -6678,7 +6614,7 @@ void CClientGame::OutputServerInfo()
 
         for (unsigned char i = 0; i < NUM_GLITCHES; i++)
         {
-            if (IsGlitchEnabled(static_cast<unsigned char>(i)))
+            if (IsGlitchEnabled(i))
             {
                 if (!strEnabledGlitches.empty())
                     strEnabledGlitches += ", ";
@@ -6962,7 +6898,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
     {
         for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::VEHICLE))
         {
-            g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(model->GetModelID()));
+            g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
         }
 
         m_pManager->GetVehicleManager()->RestreamAllVehicles();
@@ -6972,7 +6908,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
     {
         for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::PED))
         {
-            g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(model->GetModelID()));
+            g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
         }
 
         m_pManager->GetPedManager()->RestreamAllPeds();
@@ -6987,7 +6923,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
         {
             for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(type))
             {
-                g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(model->GetModelID()));
+                g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
             }
         }
 
@@ -7162,18 +7098,6 @@ void CClientGame::OnWindowFocusChange(bool state)
         return;
 
     m_bFocused = state;
-    if (m_pPlayerMap)
-    {
-        if (state)
-        {
-            g_pCore->GetGraphics()->MarkViewportRefreshPending();
-            m_pPlayerMap->MarkViewportRefreshPending();
-        }
-        else
-        {
-            m_pPlayerMap->ClearMovementFlags();
-        }
-    }
 
     CLuaArguments Arguments;
     Arguments.PushBoolean(state);
