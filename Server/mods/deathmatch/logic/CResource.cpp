@@ -31,6 +31,7 @@
 #include "CHTTPD.h"
 #include "Utils.h"
 #include "packets/CResourceClientScriptsPacket.h"
+#include "packets/CEntityRemoveTreePacket.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include <net/SimHeaders.h>
 #include <zip.h>
@@ -1190,26 +1191,26 @@ bool CResource::Stop(bool bManualStop)
     // Destroy the virtual machine for this resource
     DestroyVM();
 
-    // Remove the resource element from the client
-    CEntityRemovePacket removePacket;
+    // Remove resource elements using bulk tree deletion
+    CEntityRemoveTreePacket removeTreePacket;
 
     if (m_pResourceElement)
     {
-        removePacket.Add(m_pResourceElement);
-        g_pGame->GetElementDeleter()->Delete(m_pResourceElement);
+        removeTreePacket.AddRootElement(m_pResourceElement);
+        g_pGame->GetElementDeleter()->DeleteTree(m_pResourceElement);
         m_pResourceElement = nullptr;
     }
 
-    // Remove the dynamic resource element from the client
     if (m_pResourceDynamicElementRoot)
     {
-        removePacket.Add(m_pResourceDynamicElementRoot);
-        g_pGame->GetElementDeleter()->Delete(m_pResourceDynamicElementRoot);
+        removeTreePacket.AddRootElement(m_pResourceDynamicElementRoot);
+        g_pGame->GetElementDeleter()->DeleteTree(m_pResourceDynamicElementRoot);
         m_pResourceDynamicElementRoot = nullptr;
     }
 
-    // Broadcast the packet to joined players
-    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
+    // Broadcast single packet for entire resource cleanup
+    if (!removeTreePacket.IsEmpty())
+        g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removeTreePacket);
 
     // Clear the list of players where this resource is running
     std::exchange(m_isRunningForPlayer, {});
