@@ -1862,7 +1862,12 @@ void* CVehicleSA::GetPrivateSuspensionLines()
     if (m_pSuspensionLines == NULL)
     {
         CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-        CColDataSA* pColData = pModelInfo->GetInterface()->pColModel->m_data;
+        // Validate the model/collision chain before deref. During streaming
+        // GC races any of these pointers can be transiently null while a
+        // CAutomobile still runs a tick on the entity.
+        CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+        CColModelSAInterface*      pColModel = pInterface ? pInterface->pColModel : nullptr;
+        CColDataSA*                pColData = pColModel ? pColModel->m_data : nullptr;
         if (pModelInfo->IsMonsterTruck())
         {
             // Monster truck suspension data is 0x90 BYTES rather than 0x80 (some extra stuff I guess)
@@ -1875,8 +1880,11 @@ void* CVehicleSA::GetPrivateSuspensionLines()
         }
         else
         {
-            // CAutomobile allocates wheels * 32 (0x20)
-            m_pSuspensionLines = new BYTE[pColData->m_numSuspensionLines * 0x20];
+            // CAutomobile allocates wheels * 32 (0x20). Fall back to a safe
+            // default count when col data is unavailable so we never allocate
+            // from a garbage size and never deref a null pColData.
+            const std::size_t numLines = pColData ? pColData->m_numSuspensionLines : 4;
+            m_pSuspensionLines = new BYTE[numLines * 0x20];
         }
     }
 
@@ -1886,24 +1894,28 @@ void* CVehicleSA::GetPrivateSuspensionLines()
 void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-    CColDataSA* pColData = pModelInfo->GetInterface()->pColModel->m_data;
+    // Same guard as GetPrivateSuspensionLines: the streaming GC can yank
+    // collision data out from under us, leaving dangling pointers here.
+    CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+    CColModelSAInterface*      pColModel = pInterface ? pInterface->pColModel : nullptr;
+    CColDataSA*                pColData = pColModel ? pColModel->m_data : nullptr;
+    if (!pColData || !pColData->m_suspensionLines)
+        return;
+
     if (pModelInfo->IsMonsterTruck())
     {
         // Monster trucks are 0x90 bytes not 0x80
-        if (pColData->m_suspensionLines)
-            memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, 0x90);
+        memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, 0x90);
     }
     else if (pModelInfo->IsBike())
     {
         // Bikes are 0x80 bytes not 0x40
-        if (pColData->m_suspensionLines)
-            memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, 0x80);
+        memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, 0x80);
     }
     else
     {
         // CAutomobile allocates wheels * 32 (0x20)
-        if (pColData->m_suspensionLines)
-            memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, pColData->m_numSuspensionLines * 0x20);
+        memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, pColData->m_numSuspensionLines * 0x20);
     }
 }
 
@@ -1913,7 +1925,14 @@ void CVehicleSA::RecalculateSuspensionLines()
 
     DWORD       dwModel = GetModelIndex();
     CModelInfo* pModelInfo = pGame->GetModelInfo(dwModel);
-    if (pModelInfo && pModelInfo->IsMonsterTruck() || pModelInfo->IsCar())
+    if (!pModelInfo)
+        return;
+
+    // Parenthesise the precedence to match the original intent: only proceed
+    // for monster trucks or cars. The bareword `pModelInfo && X || Y` parsed
+    // as `(pModelInfo && X) || Y`, which let a null pModelInfo fall through
+    // to the IsCar() deref below on pure-car paths.
+    if ((pModelInfo->IsMonsterTruck() || pModelInfo->IsCar()))
     {
         // Trains (Their trailers do as well!)
         if (pModelInfo->IsTrain() || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590)
