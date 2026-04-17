@@ -2258,13 +2258,16 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         if (strBlockName && szAnimName)
         {
+            bool success = false;
+
             std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
             if (pBlock)
             {
                 Ped.SetCurrentAnimationCustom(false);
                 Ped.SetNextAnimationNormal();
                 Ped.RunNamedAnimation(pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
-                return true;
+
+                success = true;
             }
             else
             {
@@ -2283,12 +2286,16 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
 
                         const char* szGateWayAnimationName = g_pGame->GetAnimManager()->GetGateWayAnimationName();
                         Ped.RunNamedAnimation(pBlock, szGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
-                        return true;
+
+                        success = true;
                     }
                 }
             }
 
-            Ped.m_AnimationCache.startTime = GetTimestamp();
+            if (success)
+                Ped.m_AnimationCache.startTime = GetTimestamp();
+
+            return success;
         }
         else
         {
