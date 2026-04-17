@@ -1083,6 +1083,12 @@ static void __declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
         test    eax, eax
         jz      continueWithOriginalCode
 
+        // Check if VEH_GUN dummy (offset 0x9C) is uninitialized
+        mov     edx, [eax+9Ch]
+        or      edx, [eax+0A0h]
+        or      edx, [eax+0A4h]
+        jz      continueWithOriginalCode
+
         popad
         movsx   ecx, dx
         mov     eax, vehicleDummiesPositionArray
@@ -1128,6 +1134,12 @@ static void __declspec(naked) HOOK_CVehicle_GetPlaneOrdnancePosition()
 
         mov     eax, vehicleDummiesPositionArray
         test    eax, eax
+        jz      continueWithOriginalCode
+
+        // Check if VEH_GUN dummy (offset 0x9C) is uninitialized
+        mov     edx, [eax+9Ch]
+        or      edx, [eax+0A0h]
+        or      edx, [eax+0A4h]
         jz      continueWithOriginalCode
 
         popad

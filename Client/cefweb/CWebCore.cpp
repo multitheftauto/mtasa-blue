@@ -440,7 +440,20 @@ void CWebCore::DoEventQueuePulse()
         event.callback();
     }
 
-    // Invoke paint method if necessary on the main thread
+    // Request new frames from CEF using external begin frame scheduling
+    // This synchronizes CEF rendering with MTA's render loop, eliminating
+    // the previous 250ms blocking wait in OnPaint
+    for (auto& view : m_WebViews)
+    {
+        if (view->IsBeingDestroyed() || view->GetRenderingPaused())
+            continue;
+
+        auto browser = view->GetCefBrowser();
+        if (browser)
+            browser->GetHost()->SendExternalBeginFrame();
+    }
+
+    // Copy rendered data to D3D textures on the main thread
     for (auto& view : m_WebViews)
     {
         view->UpdateTexture();

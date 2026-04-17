@@ -22,11 +22,7 @@
 //! By passing `nil`/no value the original values are restored
 void EngineStreamingSetModelCacheLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds)
 {
-    size_t        vehicleValue = numVehicles.value_or(0);
-    size_t        pedValue = numPeds.value_or(0);
-    const size_t* pVehicles = numVehicles.has_value() ? &vehicleValue : nullptr;
-    const size_t* pPeds = numPeds.has_value() ? &pedValue : nullptr;
-    g_pClientGame->GetModelCacheManager()->SetCustomLimits(pVehicles, pPeds);
+    g_pClientGame->GetModelCacheManager()->SetCustomLimits(numVehicles, numPeds);
 }
 
 void EngineStreamingFreeUpMemory(std::uint32_t bytes)
@@ -472,15 +468,8 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
 
                 if (bIsRawData || CResourceManager::ParseResourcePathInput(input, pResource, &filePath))
                 {
-                    // TXD must have parent to ensure cleanup before global reset
+                    // Grab the resource root entity
                     CClientEntity* pRoot = pResource->GetResourceTXDRoot();
-                    if (!pRoot)
-                    {
-                        argStream.SetCustomError(bIsRawData ? SString("raw data", 8) : SString(input), "Resource TXD root not available");
-                        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-                        lua_pushboolean(luaVM, false);
-                        return 1;
-                    }
 
                     // Create a TXD element
                     CClientTXD* pTXD = new CClientTXD(m_pManager, INVALID_ELEMENT_ID);
@@ -497,14 +486,9 @@ int CLuaEngineDefs::EngineLoadTXD(lua_State* luaVM)
                     }
                     else
                     {
-                        // Get specific error from CClientTXD if available
-                        SString strError = pTXD->GetLastError();
-                        if (strError.empty())
-                            strError = "Error loading TXD";
-
                         // Delete it again
                         delete pTXD;
-                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, strError);
+                        argStream.SetCustomError(bIsRawData ? SStringX("raw data") : input, "Error loading TXD");
                     }
                 }
                 else
@@ -671,20 +655,11 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
-            else
-            {
-                // Get specific error from CClientTXD if available
-                SString strError = pTXD->GetLastError();
-                if (strError.empty())
-                    strError = "Failed to import TXD";
-                argStream.SetCustomError(strModelName, strError);
-            }
         }
         else
             m_pScriptDebugging->LogBadPointer(luaVM, "number", 2);
     }
-
-    if (argStream.HasErrors())
+    else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // Failed
@@ -698,12 +673,7 @@ bool CLuaEngineDefs::EngineAddClothingTXD(CClientTXD* pTXD, std::string strModel
         throw std::invalid_argument(SString("Invalid file name specified (%*s)", (int)strModelName.length(), strModelName.data()));
 
     if (!pTXD->AddClothingTexture(strModelName))
-    {
-        SString strError = pTXD->GetLastError();
-        if (strError.empty())
-            strError = SString("Failed to add clothing texture (%*s)", (int)strModelName.length(), strModelName.data());
-        throw std::invalid_argument(strError);
-    }
+        throw std::invalid_argument(SString("Texture already added (%*s)", (int)strModelName.length(), strModelName.data()));
 
     return true;
 }
@@ -803,7 +773,7 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, s
 
     size_t      fileID = ResolveIMGFileID(pIMG, file);
     std::string buffer;
-    if (!pIMG->GetFile(fileID, buffer))
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
         throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
 
     if (!g_pCore->GetNetwork()->CheckFile("dff", "", buffer.data(), buffer.size()))
@@ -814,32 +784,18 @@ bool CLuaEngineDefs::EngineImageLinkDFF(CClientIMG* pIMG, std::variant<size_t, s
 
 bool CLuaEngineDefs::EngineImageLinkTXD(CClientIMG* pIMG, std::variant<size_t, std::string_view> file, uint uiTxdID)
 {
+    if (uiTxdID >= 5000)
+        throw std::invalid_argument(SString("Expected txdid in range 0 - 4999, got %d", uiTxdID));
+
     size_t      fileID = ResolveIMGFileID(pIMG, file);
     std::string buffer;
-    if (!pIMG->GetFile(fileID, buffer))
+    if (!pIMG->GetFile(ResolveIMGFileID(pIMG, file), buffer))
         throw std::invalid_argument("Failed to read file. Probably EOF reached, make sure the archieve isn't corrupted.");
 
     if (!g_pCore->GetNetwork()->CheckFile("txd", "", buffer.data(), buffer.size()))
         throw std::invalid_argument("Failed to link file. Make sure the archieve isn't corrupted.");
 
-    // Standard TXD slots [0, SA_TXD_POOL_CAPACITY) have dedicated streaming
-    // entries (model IDs 20000-24999) and can use deferred IMG streaming
-    if (uiTxdID < static_cast<uint>(CTxdPool::SA_TXD_POOL_CAPACITY))
-        return pIMG->LinkModel(20000 + uiTxdID, fileID);
-
-    // Slots [SA_TXD_POOL_CAPACITY, MAX_STREAMING_TXD_SLOT) have streaming IDs
-    // that overlap with non-TXD resources (COL/IPL/DAT/IFP). engineRequestTXD
-    // never allocates from this range.
-    if (uiTxdID < static_cast<uint>(CTxdPool::MAX_STREAMING_TXD_SLOT))
-        throw std::invalid_argument(SString("Invalid TXD slot ID %u (reserved range)", uiTxdID));
-
-    // Overflow TXD slots (>= MAX_STREAMING_TXD_SLOT, from engineRequestTXD
-    // fallback) have no streaming entry, so we parse and load the TXD data
-    // directly into the pool slot.
-    if (!g_pGame->GetRenderWare()->LoadTxdSlotFromBuffer(uiTxdID, buffer))
-        throw std::invalid_argument(SString("Failed to load TXD data into slot %u", uiTxdID));
-
-    return true;
+    return pIMG->LinkModel(20000 + uiTxdID, fileID);
 }
 
 bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
@@ -855,10 +811,8 @@ bool CLuaEngineDefs::EngineRestoreDFFImage(uint uiModelID)
 
 bool CLuaEngineDefs::EngineRestoreTXDImage(uint uiModelID)
 {
-    // Only standard TXD slots [0, SA_TXD_POOL_CAPACITY) can have streaming
-    // IMG links to restore. Higher slots don't have TXD streaming entries.
-    if (uiModelID >= static_cast<uint>(CTxdPool::SA_TXD_POOL_CAPACITY))
-        return false;
+    if (uiModelID >= 5000)
+        throw std::invalid_argument("Expected TXD ID in range [0-4999] at argument 1");
 
     if (CClientIMGManager::IsLinkableModel(uiModelID))
         return m_pImgManager->RestoreModel(20000 + uiModelID);
@@ -961,83 +915,53 @@ int CLuaEngineDefs::EngineRequestModel(lua_State* luaVM)
         {
             if (!argStream.HasErrors())
             {
-                auto modelManager = m_pManager->GetModelManager();
-
-                int iModelID = modelManager->GetFirstFreeModelID();
+                int iModelID = m_pManager->GetModelManager()->GetFirstFreeModelID();
                 if (iModelID != INVALID_MODEL_ID)
                 {
-                    int iParentID = -1;
+                    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eModelType);
+                    m_pManager->GetModelManager()->Add(pModel);
+
+                    ushort usParentID = -1;
 
                     if (argStream.NextIsNumber())
-                        argStream.ReadNumber(iParentID);
+                        argStream.ReadNumber(usParentID);
                     else
                     {
-                        constexpr int defaultPedParentId = 7;
-                        constexpr int defaultTimedObjectParentId = 4715;
-                        constexpr int defaultClumpParentId = 3425;
-                        constexpr int defaultObjectParentId = 1337;
-                        constexpr int defaultDamageableObjectParentId = 994;
-
                         switch (eModelType)
                         {
                             case eClientModelType::PED:
-                                iParentID = defaultPedParentId;
+                                usParentID = 7;  // male01
                                 break;
                             case eClientModelType::TIMED_OBJECT:
-                                iParentID = defaultTimedObjectParentId;
+                                usParentID = 4715;  // LTSLAsky1_LAn2
                                 break;
                             case eClientModelType::CLUMP:
-                                iParentID = defaultClumpParentId;
+                                usParentID = 3425;  // nt_windmill (windmill)
                                 break;
                             case eClientModelType::OBJECT:
-                                iParentID = defaultObjectParentId;
+                                usParentID = 1337;  // BinNt07_LA (trash can)
                                 break;
                             case eClientModelType::OBJECT_DAMAGEABLE:
-                                iParentID = defaultDamageableObjectParentId;
+                                usParentID = 994;  // lhouse_barrier2
                                 break;
                             case eClientModelType::VEHICLE:
-                                iParentID = static_cast<int>(VehicleType::VT_LANDSTAL);
+                                usParentID = static_cast<ushort>(VehicleType::VT_LANDSTAL);
                                 break;
                             default:
                                 break;
                         }
                     }
 
-                    if (iParentID < 0 || iParentID >= MAX_MODEL_DFF_ID)
+                    if (pModel->Allocate(usParentID))
                     {
-                        argStream.SetCustomError("Expected valid original model ID at argument 2");
-                        modelManager->ReleaseModelID(iModelID);
-                    }
-                    else
-                    {
-                        std::shared_ptr<CClientModel> pModel = modelManager->Request(m_pManager, iModelID, eModelType);
-                        if (!pModel)
-                        {
-                            modelManager->ReleaseModelID(iModelID);
-                            argStream.SetCustomError("Failed to create model");
-                        }
-                        else
-                        {
-                            pModel->SetParentResource(pResource);
+                        pModel->SetParentResource(pResource);
 
-                            if (!modelManager->TryAdd(pModel))
-                            {
-                                modelManager->ReleaseModelID(iModelID);
-                                argStream.SetCustomError("Model ID already in use");
-                            }
-                            else
-                            {
-                                if (pModel->Allocate(static_cast<ushort>(iParentID)))
-                                {
-                                    lua_pushinteger(luaVM, iModelID);
-                                    return 1;
-                                }
-
-                                modelManager->Remove(pModel);
-                                argStream.SetCustomError("Allocation failed");
-                            }
-                        }
+                        lua_pushinteger(luaVM, iModelID);
+                        return 1;
                     }
+
+                    m_pManager->GetModelManager()->Remove(pModel);
+                    argStream.SetCustomError("Expected valid original model ID at argument 2");
                 }
             }
         }
@@ -1423,12 +1347,9 @@ int CLuaEngineDefs::EngineRemoveShaderFromWorldTexture(lua_State* luaVM)
 
 uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 {
-    const int32_t baseTxdId = g_pGame->GetBaseIDforTXD();
-    if (baseTxdId <= 0 || uiModelID >= static_cast<uint>(baseTxdId))
-        throw std::invalid_argument("Expected a valid model ID at argument 1");
-
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
-    if (!pModelInfo)
+
+    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     return pModelInfo->GetTextureDictionaryID();
@@ -1436,65 +1357,10 @@ uint CLuaEngineDefs::EngineGetModelTXDID(uint uiModelID)
 
 bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
 {
-    static uint32_t       uiLastPendingTargetLogTime = 0;
-    static uint           uiLastPendingTargetModelId = 0;
-    static unsigned short usLastPendingTargetTxdId = 0xFFFF;  // 0xFFFF = no previous TXD recorded
-
-    const int32_t baseTxdId = g_pGame->GetBaseIDforTXD();
-    if (baseTxdId <= 0 || uiModelID >= static_cast<uint>(baseTxdId))
-        throw std::invalid_argument("Expected a valid model ID at argument 1");
-
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
-    if (!pModelInfo)
+
+    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
-
-    // TXD pool indices range from 0 to (MAX_MODEL_TXD_ID - MAX_MODEL_DFF_ID - 1),
-    // covering both standard SA slots and overflow slots.
-    const unsigned short usMaxTxdSlots = static_cast<unsigned short>(MAX_MODEL_TXD_ID - MAX_MODEL_DFF_ID);
-    if (usTxdId >= usMaxTxdSlots)
-        throw std::invalid_argument("Expected a valid TXD ID at argument 2");
-
-    // Clean up any existing isolation entry before changing the model's TXD.
-    // This applies to clone and vanilla models; the cleanup is a no-op when
-    // theh model has no isolated TXD.
-    if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
-        pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(uiModelID));
-
-    const bool bModelLoaded = pModelInfo->IsLoaded();
-    const bool bTargetSlotAllocated = !g_pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usTxdId);
-    const bool bTargetTxdLoaded = g_pGame->GetPools()->GetTxdPool().IsTxdLoaded(usTxdId);
-    if (bModelLoaded && bTargetSlotAllocated && !bTargetTxdLoaded)
-    {
-        const unsigned short usCurrentTxdId = pModelInfo->GetTextureDictionaryID();
-        const unsigned int   uiParentModelId = pModelInfo->GetParentID();
-        unsigned short       usParentTxdId = 0xFFFF;  // 0xFFFF = none
-
-        if (uiParentModelId != 0)
-        {
-            if (CModelInfo* pParentModelInfo = g_pGame->GetModelInfo(uiParentModelId))
-                usParentTxdId = pParentModelInfo->GetTextureDictionaryID();
-        }
-
-        const char* szTargetBand = "standard";
-        if (usTxdId >= static_cast<unsigned short>(CTxdPool::MAX_STREAMING_TXD_SLOT))
-            szTargetBand = "overflow";
-        else if (usTxdId >= static_cast<unsigned short>(CTxdPool::SA_TXD_POOL_CAPACITY))
-            szTargetBand = "overlap-reserved";
-
-        const uint32_t uiNow = GetTickCount32();
-        const bool     bSameModelAndTxdPair = (uiLastPendingTargetModelId == uiModelID && usLastPendingTargetTxdId == usTxdId);
-        // 1000 ms - log at most once per second for the same model/TXD pair
-        if (!bSameModelAndTxdPair || uiNow - uiLastPendingTargetLogTime >= 1000)
-        {
-            uiLastPendingTargetLogTime = uiNow;
-            uiLastPendingTargetModelId = uiModelID;
-            usLastPendingTargetTxdId = usTxdId;
-
-            AddReportLog(
-                9401, SString("EngineSetModelTXDID: model %u assigned to TXD slot %u (%s band) with no RwTexDictionary; curTxd=%u parentModel=%u parentTxd=%u",
-                              uiModelID, usTxdId, szTargetBand, usCurrentTxdId, uiParentModelId, usParentTxdId));
-        }
-    }
 
     pModelInfo->SetTextureDictionaryID(usTxdId);
     return true;
@@ -1502,19 +1368,10 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
 
 bool CLuaEngineDefs::EngineResetModelTXDID(uint uiModelID)
 {
-    const int32_t baseTxdId = g_pGame->GetBaseIDforTXD();
-    if (baseTxdId <= 0 || uiModelID >= static_cast<uint>(baseTxdId))
-        throw std::invalid_argument("Expected a valid model ID at argument 1");
-
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID);
-    if (!pModelInfo)
-        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
-    // Clean up any existing isolation entry before resetting the model TXD.
-    // This applies to clone and vanilla models; the cleanup is a no-op when
-    // the model has no isolated TXD.
-    if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
-        pRenderWare->CleanupIsolatedTxdForModel(static_cast<unsigned short>(uiModelID));
+    if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
+        throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     pModelInfo->ResetTextureDictionaryID();
     return true;
@@ -2641,7 +2498,7 @@ bool CLuaEngineDefs::EngineRestreamWorld()
     return true;
 }
 
-std::variant<bool, uint> CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxdName)
+uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxdName)
 {
     if (strTxdName.size() > 24)
         throw std::invalid_argument("TXD name length shoudn't be more than 24 characters");
@@ -2650,33 +2507,19 @@ std::variant<bool, uint> CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM
     if (iModelID == INVALID_MODEL_ID)
         return false;
 
-    auto                          modelManager = m_pManager->GetModelManager();
-    std::shared_ptr<CClientModel> pModel = modelManager->Request(m_pManager, iModelID, eClientModelType::TXD);
+    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->Request(m_pManager, iModelID, eClientModelType::TXD);
 
-    if (!pModel)
-        return false;
-
+    pModel->AllocateTXD(strTxdName);
     pModel->SetParentResource(m_pLuaManager->GetVirtualMachine(luaVM)->GetResource());
+    m_pManager->GetModelManager()->Add(pModel);
 
-    if (!modelManager->TryAdd(pModel))
-        return false;
-
-    if (!pModel->AllocateTXD(strTxdName))
-    {
-        modelManager->Remove(pModel);
-        return false;
-    }
-
-    return static_cast<uint>(iModelID - MAX_MODEL_DFF_ID);
+    return iModelID - MAX_MODEL_DFF_ID;
 }
 
 bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
 {
-    auto                          modelManager = m_pManager->GetModelManager();
-    std::shared_ptr<CClientModel> pModel = modelManager->FindModelByID(MAX_MODEL_DFF_ID + txdID);
-
-    // Use the manager removal path so RestoreTXD runs and the TXD slot is actually freed.
-    return pModel && modelManager->Remove(pModel);
+    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(MAX_MODEL_DFF_ID + txdID);
+    return pModel && pModel->Deallocate();
 }
 
 size_t CLuaEngineDefs::EngineGetPoolCapacity(ePools pool)
@@ -2764,11 +2607,7 @@ eModelLoadState CLuaEngineDefs::EngineStreamingGetModelLoadState(std::uint16_t m
     if (modelId >= g_pGame->GetCountOfAllFileIDs())
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
-    auto* pStreamingInfo = g_pGame->GetStreaming()->GetStreamingInfo(modelId);
-    if (!pStreamingInfo)
-        return eModelLoadState::LOADSTATE_NOT_LOADED;
-
-    return pStreamingInfo->loadState;
+    return g_pGame->GetStreaming()->GetStreamingInfo(modelId)->loadState;
 }
 
 void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option)

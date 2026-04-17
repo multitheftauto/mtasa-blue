@@ -1858,11 +1858,13 @@ int LaunchGame(SString strCmdLine)
 
     SetDllDirectory(PathJoin(strMTASAPath, "mta"));
 
+#if MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
     if (!CheckService(CHECK_SERVICE_PRE_CREATE) && !IsUserAdmin())
     {
         RelaunchAsAdmin(strCmdLine, _("Fix configuration issue"));
         ExitProcess(EXIT_OK);
     }
+#endif
 
     // Do some D3D things
     BeginD3DStuff();

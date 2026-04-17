@@ -193,7 +193,8 @@ const char* const szNouns[] = {
     "Crook",      "Hijacker",   "Carjacker",  "Villain",    "Convict",    "Fugitive",   "Mug",        "Outlaw",     "Ruffian",     "Cutthroat",  "Devil",
     "Murderer",   "Psycho",     "Punk",       "ASBO",       "Offender",   "Drifter",    "Rioter",     "Goon",       "Roughneck",   "Brute",      "Hacker",
     "Cabbie",     "Wheeler",    "Driver",     "Rider",      "Cyclist",    "Cowboy",     "Operative",  "Carrier",    "Transporter", "Trucker",    "Wheelman",
-    "Vampire",    "Parasite",   "Tramp",      "Bum",        "Hobo",       "Hitchhiker", "Deadbeat",   "Acrobat",
+    "Vampire",    "Parasite",   "Tramp",      "Bum",        "Hobo",       "Hitchhiker", "Deadbeat",   "Acrobat",    "Tourist",     "Candidate",  "Basket",
+    "Kitty",      "Puppy",
 };
 
 constexpr auto numAdjectives = std::size(szAdjectives);
