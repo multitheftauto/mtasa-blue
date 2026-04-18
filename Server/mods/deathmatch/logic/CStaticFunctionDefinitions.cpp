@@ -4537,18 +4537,10 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(fProgress);
 
-                if (fProgress == 0.0f)
-                {
-                    SPlayerAnimData data = pPed->GetAnimationData();
-                    data.startTime = GetLocalTick();
-                    pPed->SetAnimationData(data);
-                }
-                else
-                {
-                    SPlayerAnimData data = pPed->GetAnimationData();
-                    data.startTime = GetLocalTick() - static_cast<std::int64_t>((GetAnimationLength(animName) * 1000.0f) * fProgress);
-                    pPed->SetAnimationData(data);
-                }
+                // Update animation startTime
+                SPlayerAnimData data = pPed->GetAnimationData();
+                data.startTime = GetLocalTick() - static_cast<std::int64_t>((GetAnimationLength(animName) * 1000.0f) * fProgress);
+                pPed->SetAnimationData(data);
             }
             else
             {
