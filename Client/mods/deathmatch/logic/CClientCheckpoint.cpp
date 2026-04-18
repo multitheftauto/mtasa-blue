@@ -11,6 +11,7 @@
 #include <StdInc.h>
 #include <game/CCheckpoint.h>
 #include <game/CCheckpoints.h>
+#include <game/C3DMarkers.h>
 
 CClientCheckpoint::CClientCheckpoint(CClientMarker* pThis)
 {
@@ -407,6 +408,12 @@ void CClientCheckpoint::SetTargetArrowProperties(const SColor& arrowColor, float
     m_TargetArrowSize = size;
 
     ApplyCheckpointTargetArrowProperties();
+}
+
+RpAtomic* CClientCheckpoint::GetAtomic() const
+{
+    C3DMarker* marker = g_pGame->Get3DMarkers()->FindMarker(m_dwIdentifier);
+    return marker ? reinterpret_cast<RpAtomic*>(marker->GetRwObject()) : nullptr;
 }
 
 void CClientCheckpoint::ApplyCheckpointTargetArrowProperties() noexcept

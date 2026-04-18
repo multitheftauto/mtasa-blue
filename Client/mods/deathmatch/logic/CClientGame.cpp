@@ -84,8 +84,6 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Init the global var with ourself
     g_pClientGame = this;
 
-    g_pCore->UpdateWerCrashModuleBases();
-
     CStaticFunctionDefinitions::PreInitialize(g_pCore, g_pGame, this, &m_Events);
 
     // Packet handler
@@ -476,9 +474,6 @@ CClientGame::~CClientGame()
     // Singular file download manager
     SAFE_DELETE(m_pSingularFileDownloadManager);
 
-    // Clear cached clothes from this session
-    g_pMultiplayer->FlushClothesCache();
-
     // NULL the message/net stuff
     g_pMultiplayer->SetPreContextSwitchHandler(NULL);
     g_pMultiplayer->SetPostContextSwitchHandler(NULL);
@@ -558,13 +553,8 @@ CClientGame::~CClientGame()
         discord->UpdatePresence();
     }
 
-    // Destruction order matters: destroy CClientTXD entities (via m_pManager) BEFORE
-    // StaticReset calls. TXD destructors need intact bookkeeping to clean up propery.
-
     // Destroy our stuff
-    CClientTXD::ClearPendingImports();
     SAFE_DELETE(m_pManager);  // Will trigger onClientResourceStop
-
     SAFE_DELETE(m_pNametags);
     SAFE_DELETE(m_pSyncDebug);
     SAFE_DELETE(m_pNetworkStats);
@@ -584,19 +574,6 @@ CClientGame::~CClientGame()
     SAFE_DELETE(m_pResourceFileDownloadManager);
 
     SAFE_DELETE(m_pRootEntity);
-
-    // Unload models that had custom DFF geometry cleared during DoDeleteAll.
-    // Must run after m_pRootEntity is gone and before StaticResetModelTextureReplacing.
-    CClientDFF::FlushDeferredModelRestores();
-
-    // Clear any remaining texture replacement/shader state after destroying entities.
-    // This ordering prevents global reset from running before late element destructors
-    // (e.g. CClientTXD) have a chance to clean up using RenderWare bookkeeping.
-    if (g_pGame && g_pGame->GetRenderWare())
-    {
-        g_pGame->GetRenderWare()->StaticResetModelTextureReplacing();
-        g_pGame->GetRenderWare()->StaticResetShaderSupport();
-    }
 
     SAFE_DELETE(m_pModelCacheManager);
     // SAFE_DELETE(m_pGameEntityXRefManager);
@@ -843,8 +820,6 @@ void CClientGame::DoPulsePreHUDRender(bool bDidUnminimize, bool bDidRecreateRend
 {
     // Allow scripted dxSetRenderTarget for old scripts
     g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(true);
-
-    CClientTXD::ProcessPendingImports();
 
     // If appropriate, call onClientRestore
     if (bDidUnminimize)
@@ -1106,9 +1081,7 @@ void CClientGame::DoPulsePostFrame()
                         const int stateCount = taskStates.size();
                         if (stateCount > 0)
                         {
-                            const std::uint64_t tickCount = static_cast<std::uint64_t>(GetTickCount64_());
-                            const unsigned int  seed = static_cast<unsigned int>(tickCount ^ (tickCount >> 32));
-                            std::srand(seed);
+                            std::srand(static_cast<unsigned int>(GetTickCount64_()));
                             const int   index = (std::rand() % stateCount);
                             const auto& taskState = taskStates[index];
 
@@ -3512,7 +3485,7 @@ void CClientGame::Event_OnIngame()
     ResetMapInfo();
     g_pGame->GetWaterManager()->Reset();  // Deletes all custom water elements, ResetMapInfo only reverts changes to water level
     g_pGame->GetWaterManager()->SetWaterDrawnLast(true);
-    m_pCamera->SetCameraClip(true, true);
+    m_pCamera->ResetCameraClip();
 
     // Deallocate all custom models
     m_pManager->GetModelManager()->RemoveAll();
@@ -3621,7 +3594,6 @@ void CClientGame::StaticRenderHeliLightHandler()
 
 void CClientGame::StaticRenderEverythingBarRoadsHandler()
 {
-    g_pClientGame->GetModelRenderer()->Render();
 }
 
 bool CClientGame::StaticChokingHandler(unsigned char ucWeaponType)
@@ -3674,9 +3646,6 @@ void CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler()
 
 void CClientGame::StaticPreFxRenderHandler()
 {
-    // RenderFadingInEntities is done at this point, so alpha entity list callbacks
-    // no longer reference CModelRenderer's queue elements.
-    g_pClientGame->GetModelRenderer()->NotifyFrameEnd();
     g_pCore->OnPreFxRender();
 }
 
@@ -3773,11 +3742,6 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         CClientEntity* pClientEntity = pPools->GetClientEntity((DWORD*)pGameEntity);
         if (pClientEntity)
         {
-            if (pClientEntity->IsBeingDeleted())
-            {
-                g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
-                return;
-            }
             int    iTypeMask;
             ushort usModelId = 0xFFFF;
             switch (pClientEntity->GetType())
@@ -3805,7 +3769,7 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         }
     }
 
-    g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
+    g_pGame->GetRenderWare()->SetRenderingClientEntity(NULL, 0xFFFF, TYPE_MASK_WORLD);
 }
 
 void CClientGame::StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -3923,6 +3887,12 @@ void CClientGame::ProjectileInitiateHandler(CClientProjectile* pProjectile)
 
 void CClientGame::Render3DStuffHandler()
 {
+    // Render models enqueued by scripts during the previous frame's
+    // onClientRender. This hook fires after GTA's full scene render,
+    // which is the earliest point where the queue is populated.
+    CModelRenderer* pModelRenderer = GetModelRenderer();
+    pModelRenderer->Render();
+    pModelRenderer->NotifyFrameEnd();
 }
 
 void CClientGame::PreRenderSkyHandler()
@@ -3954,8 +3924,6 @@ void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
 {
     CLuaArguments Arguments;
     m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
-
-    g_pClientGame->GetModelRenderer()->Update();
 }
 
 void CClientGame::IdleHandler()
@@ -4988,9 +4956,6 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
 
 // Called when GTA:SA destroys an entity (e.g., during map streaming).
 // Clear stale pool entries to prevent dangling pointer crashes in GetClientEntity/GetEntity.
-// Note: This may leak the CObjectSA/CVehicleSA/CPedSA wrapper if MTA created it, but we cannot
-// safely delete it here since the game entity is mid-destruction. The leak is acceptable
-// as this is an abnormal code path (GTA destroying MTA-managed entities).
 void CClientGame::GameObjectDestructHandler(CEntitySAInterface* pObject)
 {
     if (auto* pSlot = g_pGame->GetPools()->GetObject(reinterpret_cast<DWORD*>(pObject)))
@@ -6438,8 +6403,8 @@ void CClientGame::GottenPlayerScreenShot(const CBuffer* pBuffer, uint uiTimeSpen
     {
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
 
-        ushort usPartNumber = static_cast<ushort>(i);
-        ushort usBytesThisPart = static_cast<ushort>(std::min(uiBytesRemaining, uiBytesPerPart));
+        auto usPartNumber = static_cast<ushort>(i);
+        auto usBytesThisPart = static_cast<ushort>(std::min(uiBytesRemaining, uiBytesPerPart));
         assert(usBytesThisPart != 0);
 
         pBitStream->Write((uchar)EPlayerScreenShotResult::SUCCESS);
@@ -6652,7 +6617,7 @@ void CClientGame::OutputServerInfo()
 
         for (unsigned char i = 0; i < NUM_GLITCHES; i++)
         {
-            if (IsGlitchEnabled(static_cast<unsigned char>(i)))
+            if (IsGlitchEnabled(i))
             {
                 if (!strEnabledGlitches.empty())
                     strEnabledGlitches += ", ";
@@ -6936,7 +6901,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
     {
         for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::VEHICLE))
         {
-            g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(model->GetModelID()));
+            g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
         }
 
         m_pManager->GetVehicleManager()->RestreamAllVehicles();
@@ -6946,7 +6911,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
     {
         for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(eClientModelType::PED))
         {
-            g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(model->GetModelID()));
+            g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
         }
 
         m_pManager->GetPedManager()->RestreamAllPeds();
@@ -6961,7 +6926,7 @@ void CClientGame::Restream(std::optional<RestreamOption> option)
         {
             for (const auto& model : m_pManager->GetModelManager()->GetModelsByType(type))
             {
-                g_pClientGame->GetModelCacheManager()->OnRestreamModel(static_cast<ushort>(model->GetModelID()));
+                g_pClientGame->GetModelCacheManager()->OnRestreamModel(model->GetModelID());
             }
         }
 
@@ -7136,18 +7101,6 @@ void CClientGame::OnWindowFocusChange(bool state)
         return;
 
     m_bFocused = state;
-    if (m_pPlayerMap)
-    {
-        if (state)
-        {
-            g_pCore->GetGraphics()->MarkViewportRefreshPending();
-            m_pPlayerMap->MarkViewportRefreshPending();
-        }
-        else
-        {
-            m_pPlayerMap->ClearMovementFlags();
-        }
-    }
 
     CLuaArguments Arguments;
     Arguments.PushBoolean(state);

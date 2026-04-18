@@ -45,6 +45,7 @@ protected:
     bool                              m_bEnabled;
     std::map<SString, SGraphStatLine> m_LineList;
     TIMEUS                            m_StartTime;
+    int                               m_iGraphSizeX;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -112,15 +113,12 @@ void CGraphStats::AddTimingPoint(const char* szName)
     if (!IsEnabled())
         return;
 
-    CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
-
-    std::uint32_t viewportWidth = pGraphics->GetViewportWidth();
-    std::uint32_t sizeX = viewportWidth / 4;  // one quarter of screen width
-
-    if (sizeX == 0)
+    // Use the cached graph width from Draw(), which runs in MTA's render zone
+    // with the real viewport. AddTimingPoint runs from OnBeginScene where GTA SA
+    // may have set a smaller internal viewport (water reflections, radar, etc.).
+    const int iSizeX = m_iGraphSizeX;
+    if (iSizeX <= 0)
         return;
-
-    const int iSizeX = static_cast<int>(sizeX);
 
     // Start of next frame?
     if (szName[0] == 0)
@@ -162,7 +160,7 @@ void CGraphStats::AddTimingPoint(const char* szName)
         // Add new line
         MapSet(m_LineList, szName, SGraphStatLine());
         pLine = MapFind(m_LineList, szName);
-        pLine->dataHistory.resize(sizeX);
+        pLine->dataHistory.resize(iSizeX);
         pLine->iDataPos = 0;
         pLine->prevData = 0;
         pLine->strName = szName;
@@ -237,6 +235,14 @@ void CGraphStats::Draw()
         return;
 
     const int iSizeX = static_cast<int>(sizeX);
+
+    // Cache the graph width for AddTimingPoint, which may run outside MTA's render zone
+    // where GTA SA has temporarily changed the D3D viewport (water reflections, radar, etc.)
+    if (m_iGraphSizeX != iSizeX)
+    {
+        m_LineList.clear();
+        m_iGraphSizeX = iSizeX;
+    }
 
     originY = originY + sizeY + 30;  // add graph height plus a little gap to the overall Y position
 
