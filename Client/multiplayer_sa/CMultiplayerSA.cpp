@@ -5025,9 +5025,9 @@ bool _cdecl VehicleCamLookDir2(DWORD dwCam)
     {
         auto badf = [](float v) { return !std::isfinite(v); };
 
-        const float rawBeta    = *(float*)(dwCam + 0xBC);
+        const float rawBeta = *(float*)(dwCam + 0xBC);
         const float rawBetaSpd = *(float*)(dwCam + 0xC0);
-        const float rawAlpha   = *(float*)(dwCam + 0xAC);
+        const float rawAlpha = *(float*)(dwCam + 0xAC);
         const bool  badBeta = badf(rawBeta);
         const bool  badBetaSpd = badf(rawBetaSpd);
         const bool  badAlpha = badf(rawAlpha);
@@ -5037,8 +5037,8 @@ bool _cdecl VehicleCamLookDir2(DWORD dwCam)
         {
             // Preserve live beta when only beta speed is invalid to avoid
             // snapping camera input to stale history.
-            float       fallbackBeta = std::isfinite(rawBeta) ? rawBeta : 0.0f;
-            float       fallbackAlpha = std::isfinite(rawAlpha) ? rawAlpha : 0.0f;
+            float fallbackBeta = std::isfinite(rawBeta) ? rawBeta : 0.0f;
+            float fallbackAlpha = std::isfinite(rawAlpha) ? rawAlpha : 0.0f;
 
             if (!std::isfinite(rawBeta) && s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.beta))
             {
@@ -5054,8 +5054,8 @@ bool _cdecl VehicleCamLookDir2(DWORD dwCam)
             if (!std::isfinite(rawAlpha) && s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.alpha))
                 fallbackAlpha = s_lastGoodAngles.alpha;
 
-            *(float*)(dwCam + 0xBC) = fallbackBeta;   // m_fHorizontalAngle (beta)
-            *(float*)(dwCam + 0xC0) = 0.0f;           // m_fBetaSpeed
+            *(float*)(dwCam + 0xBC) = fallbackBeta;  // m_fHorizontalAngle (beta)
+            *(float*)(dwCam + 0xC0) = 0.0f;          // m_fBetaSpeed
 
             // Rewrite TargetBeta only when beta itself is invalid.
             if (badBeta)
@@ -5066,7 +5066,7 @@ bool _cdecl VehicleCamLookDir2(DWORD dwCam)
 
         if (!needRecover && std::isfinite(rawBeta) && std::isfinite(rawAlpha))
         {
-            s_lastGoodAngles = FollowCamLastGoodAngles{ true, rawBeta, rawAlpha };
+            s_lastGoodAngles = FollowCamLastGoodAngles{true, rawBeta, rawAlpha};
         }
     }
 
@@ -5106,7 +5106,7 @@ static void __declspec(naked) HOOK_VehicleCamLookDir2()
 
 void _cdecl VehicleCamHistory(DWORD dwCam, CVector* pvecTarget, float fTargetTheta, float fRadius, float fZoom)
 {
-    float   fPhi = *(float*)(dwCam + 0xBC);
+    float fPhi = *(float*)(dwCam + 0xBC);
 
     CVector vecDir = -gravcam_matGravity.vRight * cos(fPhi) * cos(fTargetTheta) - gravcam_matGravity.vFront * sin(fPhi) * cos(fTargetTheta) +
                      gravcam_matGravity.vUp * sin(fTargetTheta);

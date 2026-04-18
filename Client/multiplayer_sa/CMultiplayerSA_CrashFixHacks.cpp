@@ -3990,7 +3990,7 @@ static void __declspec(naked) HOOK_CStreaming__ConvertBufferToObject_NullTxdDef(
 //////////////////////////////////////////////////////////////////////////////////////////
 
 // Address of the "call sscanf" instruction inside CFileLoader::LoadVehicleObject
-#define CALL_CFileLoader_LoadVehicleObject_sscanf  0x5B6FC7
+#define CALL_CFileLoader_LoadVehicleObject_sscanf 0x5B6FC7
 
 // The sscanf call in LoadVehicleObject has this exact signature at the call site:
 //   sscanf(line, "%d %s %s %s %s %s %s %s %d %d %x %d %f %f %d",
@@ -3999,20 +3999,18 @@ static void __declspec(naked) HOOK_CStreaming__ConvertBufferToObject_NullTxdDef(
 //
 // Parameters 12-15 (&wheelModelID through &wheelUpgradeClass) are optional — sscanf only
 // writes them if the input line has enough fields. We set safe defaults before sscanf runs.
-static int _cdecl CFileLoader_LoadVehicleObject_sscanf(
-    const char* s, const char* format,
-    int* modelId, char* modelName, char* texName, char* type, char* handlingName, char* gameName, char* anims, char* vehClass,
-    int* frq, int* flags, int* comprules,
-    int* wheelModelID, float* frontWheelSize, float* rearWheelSize, int* wheelUpgradeClass)
+static int _cdecl CFileLoader_LoadVehicleObject_sscanf(const char* s, const char* format, int* modelId, char* modelName, char* texName, char* type,
+                                                       char* handlingName, char* gameName, char* anims, char* vehClass, int* frq, int* flags, int* comprules,
+                                                       int* wheelModelID, float* frontWheelSize, float* rearWheelSize, int* wheelUpgradeClass)
 {
     // Pre-initialize the optional fields that sscanf may not write
-    *wheelModelID    = -1;
-    *frontWheelSize  = 0.7f;
-    *rearWheelSize   = 0.7f;
+    *wheelModelID = -1;
+    *frontWheelSize = 0.7f;
+    *rearWheelSize = 0.7f;
     *wheelUpgradeClass = -1;
 
-    return sscanf(s, format, modelId, modelName, texName, type, handlingName, gameName, anims, vehClass,
-                  frq, flags, comprules, wheelModelID, frontWheelSize, rearWheelSize, wheelUpgradeClass);
+    return sscanf(s, format, modelId, modelName, texName, type, handlingName, gameName, anims, vehClass, frq, flags, comprules, wheelModelID, frontWheelSize,
+                  rearWheelSize, wheelUpgradeClass);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
