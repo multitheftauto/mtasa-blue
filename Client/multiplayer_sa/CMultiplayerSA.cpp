@@ -5040,15 +5040,13 @@ bool _cdecl VehicleCamLookDir2(DWORD dwCam)
             float fallbackBeta = std::isfinite(rawBeta) ? rawBeta : 0.0f;
             float fallbackAlpha = std::isfinite(rawAlpha) ? rawAlpha : 0.0f;
 
-            if (!std::isfinite(rawBeta) && s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.beta))
-            {
-                fallbackBeta = s_lastGoodAngles.beta;
-            }
-            else
+            if (!std::isfinite(rawBeta))
             {
                 const float trueBeta = *(float*)(dwCam + 0xA0);
-                if (!std::isfinite(rawBeta) && std::isfinite(trueBeta))
+                if (std::isfinite(trueBeta))
                     fallbackBeta = trueBeta;
+                else if (s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.beta))
+                    fallbackBeta = s_lastGoodAngles.beta;
             }
 
             if (!std::isfinite(rawAlpha) && s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.alpha))
