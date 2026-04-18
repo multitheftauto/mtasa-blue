@@ -198,7 +198,8 @@ public:
     virtual void  SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType) = 0;
     virtual int   GetControllerKeyAssociatedWithAction(eControllerAction action, eControllerType controllerType) = 0;
     virtual void  SetClassicControls(bool bClassicControls) = 0;
-    virtual void  SetMouseInverted(bool bInverted) = 0;
+    virtual void  SetMouseInvertedVertical(bool bInvertedVertical) = 0;
+    virtual void  SetMouseInvertedHorizontal(bool bInvertedHorizontal) = 0;
     virtual void  SetFlyWithMouse(bool bFlyWithMouse) = 0;
     virtual void  SetSteerWithMouse(bool bSteerWithMouse) = 0;
     virtual void  SuspendSteerAndFlyWithMouse(bool bSuspend) = 0;

@@ -321,51 +321,52 @@ void CClientVariables::LoadDefaults()
     DEFAULT("server_can_flash_window", true);                               // allow server to flash the window
     DEFAULT("allow_tray_notifications", true);                              // allow scripts to create tray balloon notifications
     DEFAULT("text_scale", 1.0f);                                            // text scale
-    DEFAULT("invert_mouse", false);                                         // mouse inverting
-    DEFAULT("fly_with_mouse", false);                                       // flying with mouse controls
-    DEFAULT("steer_with_mouse", false);                                     // steering with mouse controls
-    DEFAULT("classic_controls", false);                                     // classic/standard controls
-    DEFAULT("mastervolume", 1.0f);                                          // master volume
-    DEFAULT("mtavolume", 1.0f);                                             // custom sound's volume
-    DEFAULT("voicevolume", 1.0f);                                           // voice chat output volume
-    DEFAULT("mapalpha", 155);                                               // player map alpha
-    DEFAULT("mapimage", 0);                                                 // player map image
-    DEFAULT("browser_speed", 1);                                            // Browser speed
-    DEFAULT("single_download", 0);                                          // Single connection for downloads
-    DEFAULT("packet_tag", 0);                                               // Tag network packets
-    DEFAULT("progress_animation", 1);                                       // Progress spinner at the bottom of the screen
-    DEFAULT("update_build_type", 0);                                        // 0-stable 1-test 2-nightly
-    DEFAULT("update_auto_install", 1);                                      // 0-off 1-on
-    DEFAULT("volumetric_shadows", 0);                                       // Enable volumetric shadows
-    DEFAULT("aspect_ratio", 0);                                             // Display aspect ratio
-    DEFAULT("hud_match_aspect_ratio", 1);                                   // GTA HUD should match the display aspect ratio
-    DEFAULT("anisotropic", 0);                                              // Anisotropic filtering
-    DEFAULT("grass", 1);                                                    // Enable grass
-    DEFAULT("heat_haze", 1);                                                // Enable heat haze
-    DEFAULT("tyre_smoke_enabled", 1);                                       // Enable tyre smoke
-    DEFAULT("high_detail_vehicles", 0);                                     // Disable rendering high detail vehicles all the time
-    DEFAULT("high_detail_peds", 0);                                         // Disable rendering high detail peds all the time
-    DEFAULT("blur", 1);                                                     // Enable blur
-    DEFAULT("corona_reflections", 0);                                       // Disable corona rain reflections
-    DEFAULT("dynamic_ped_shadows", 0);                                      // Disable dynamic ped shadows
-    DEFAULT("fast_clothes_loading", 1);                                     // 0-off 1-auto 2-on
-    DEFAULT("allow_screen_upload", 1);                                      // 0-off 1-on
-    DEFAULT("allow_external_sounds", 1);                                    // 0-off 1-on
-    DEFAULT("max_clientscript_log_kb", 5000);                               // Max size in KB (0-No limit)
-    DEFAULT("display_fullscreen_style", 0);                                 // 0-standard 1-borderless 2-borderless keep res 3-borderless stretch
-    DEFAULT("display_windowed", 0);                                         // 0-off 1-on
-    DEFAULT("multimon_fullscreen_minimize", 1);                             // 0-off 1-on
-    DEFAULT("borderless_gamma_power", 0.95f);                               // Gamma exponent applied to windowed gamma ramp (1.0 = unchanged)
-    DEFAULT("borderless_brightness_scale", 1.03f);                          // Brightness multiplier for windowed gamma ramp (1.0 = unchanged)
-    DEFAULT("borderless_contrast_scale", 1.0f);                             // Contrast multiplier for borderless presentation (1.0 = unchanged)
-    DEFAULT("borderless_saturation_scale", 1.0f);                           // Saturation multiplier for borderless presentation (1.0 = unchanged)
-    DEFAULT("borderless_enable_srgb", false);                               // Enable sRGB correction when running borderless
-    DEFAULT("borderless_gamma_enabled", false);                             // Apply gamma adjustment while borderless tuning active
-    DEFAULT("borderless_brightness_enabled", false);                        // Apply brightness adjustment while borderless tuning active
-    DEFAULT("borderless_contrast_enabled", false);                          // Apply contrast adjustment while borderless tuning active
-    DEFAULT("borderless_saturation_enabled", false);                        // Apply saturation adjustment while borderless tuning active
-    DEFAULT("borderless_apply_windowed", false);                            // Apply display adjustments while windowed/borderless
-    DEFAULT("borderless_apply_fullscreen", false);                          // Apply display adjustments while in exclusive fullscreen
+    DEFAULT("invert_mouse", false);                   // mouse inverting (vertical, kept the naming as it's due to backwards compatibility)
+    DEFAULT("invert_mouse_horizontal", true);         // mouse inverting (horizontal)
+    DEFAULT("fly_with_mouse", false);                 // flying with mouse controls
+    DEFAULT("steer_with_mouse", false);               // steering with mouse controls
+    DEFAULT("classic_controls", false);               // classic/standard controls
+    DEFAULT("mastervolume", 1.0f);                    // master volume
+    DEFAULT("mtavolume", 1.0f);                       // custom sound's volume
+    DEFAULT("voicevolume", 1.0f);                     // voice chat output volume
+    DEFAULT("mapalpha", 155);                         // player map alpha
+    DEFAULT("mapimage", 0);                           // player map image
+    DEFAULT("browser_speed", 1);                      // Browser speed
+    DEFAULT("single_download", 0);                    // Single connection for downloads
+    DEFAULT("packet_tag", 0);                         // Tag network packets
+    DEFAULT("progress_animation", 1);                 // Progress spinner at the bottom of the screen
+    DEFAULT("update_build_type", 0);                  // 0-stable 1-test 2-nightly
+    DEFAULT("update_auto_install", 1);                // 0-off 1-on
+    DEFAULT("volumetric_shadows", 0);                 // Enable volumetric shadows
+    DEFAULT("aspect_ratio", 0);                       // Display aspect ratio
+    DEFAULT("hud_match_aspect_ratio", 1);             // GTA HUD should match the display aspect ratio
+    DEFAULT("anisotropic", 0);                        // Anisotropic filtering
+    DEFAULT("grass", 1);                              // Enable grass
+    DEFAULT("heat_haze", 1);                          // Enable heat haze
+    DEFAULT("tyre_smoke_enabled", 1);                 // Enable tyre smoke
+    DEFAULT("high_detail_vehicles", 0);               // Disable rendering high detail vehicles all the time
+    DEFAULT("high_detail_peds", 0);                   // Disable rendering high detail peds all the time
+    DEFAULT("blur", 1);                               // Enable blur
+    DEFAULT("corona_reflections", 0);                 // Disable corona rain reflections
+    DEFAULT("dynamic_ped_shadows", 0);                // Disable dynamic ped shadows
+    DEFAULT("fast_clothes_loading", 1);               // 0-off 1-auto 2-on
+    DEFAULT("allow_screen_upload", 1);                // 0-off 1-on
+    DEFAULT("allow_external_sounds", 1);              // 0-off 1-on
+    DEFAULT("max_clientscript_log_kb", 5000);         // Max size in KB (0-No limit)
+    DEFAULT("display_fullscreen_style", 0);           // 0-standard 1-borderless 2-borderless keep res 3-borderless stretch
+    DEFAULT("display_windowed", 0);                   // 0-off 1-on
+    DEFAULT("multimon_fullscreen_minimize", 1);       // 0-off 1-on
+    DEFAULT("borderless_gamma_power", 0.95f);         // Gamma exponent applied to windowed gamma ramp (1.0 = unchanged)
+    DEFAULT("borderless_brightness_scale", 1.03f);    // Brightness multiplier for windowed gamma ramp (1.0 = unchanged)
+    DEFAULT("borderless_contrast_scale", 1.0f);       // Contrast multiplier for borderless presentation (1.0 = unchanged)
+    DEFAULT("borderless_saturation_scale", 1.0f);     // Saturation multiplier for borderless presentation (1.0 = unchanged)
+    DEFAULT("borderless_enable_srgb", false);         // Enable sRGB correction when running borderless
+    DEFAULT("borderless_gamma_enabled", false);       // Apply gamma adjustment while borderless tuning active
+    DEFAULT("borderless_brightness_enabled", false);  // Apply brightness adjustment while borderless tuning active
+    DEFAULT("borderless_contrast_enabled", false);    // Apply contrast adjustment while borderless tuning active
+    DEFAULT("borderless_saturation_enabled", false);  // Apply saturation adjustment while borderless tuning active
+    DEFAULT("borderless_apply_windowed", false);      // Apply display adjustments while windowed/borderless
+    DEFAULT("borderless_apply_fullscreen", false);    // Apply display adjustments while in exclusive fullscreen
 
     if (Exists("borderless_enable_srgb"))
     {
