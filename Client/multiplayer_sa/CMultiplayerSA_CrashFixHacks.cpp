@@ -631,7 +631,7 @@ void _cdecl DoWait(HANDLE hHandle)
 
     // After a consecutive timeout, use a short wait so
     // LoadAllRequestedModels doesn't accumulate multi-second freezes
-    // when the same I/O issue keeps re-ocurring
+    // when the same I/O issue keeps recurring
     DWORD dwWait = (s_consecutiveTimeouts >= 1) ? 100 : 4000;
 
     DWORD dwResult = WaitForSingleObject(hHandle, dwWait);
