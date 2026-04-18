@@ -45,6 +45,7 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket(ElementID PlayerID, Element
     m_ucQuality = ucVoiceQuality;
     m_uiBitrate = uiBitrate;
     m_szServerName = szServerName;
+    m_serverTime = GetLocalTick();
 
     switch (m_ucHTTPDownloadType)
     {
@@ -120,6 +121,7 @@ bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
     }
 
     BitStream.WriteString(m_szServerName);
+    BitStream.Write(m_serverTime);
 
     return true;
 }

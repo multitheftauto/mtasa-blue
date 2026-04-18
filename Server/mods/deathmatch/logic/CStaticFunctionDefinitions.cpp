@@ -54,6 +54,7 @@
 #include "CUnoccupiedVehicleSync.h"
 #include "Utils.h"
 #include "CameraScriptShared.h"
+#include <CAnimationsData.h>
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "packets/CLuaPacket.h"
 #include "packets/CElementRPCPacket.h"
@@ -78,6 +79,7 @@
     #ifndef MAX_PATH
         #define MAX_PATH PATH_MAX
     #endif
+
 #endif
 
 extern CGame*            g_pGame;
@@ -4491,7 +4493,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
 
                 // Store anim data
                 pPed->SetAnimationData(SPlayerAnimData{blockName, animName, iTime, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame, iBlend,
-                                                       bTaskToBeRestoredOnAnimEnd, GetTickCount64_()});
+                                                       bTaskToBeRestoredOnAnimEnd, GetLocalTick()});
 
                 BitStream.pBitStream->WriteString<unsigned char>(blockName);
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
@@ -4535,7 +4537,18 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(fProgress);
 
-                pPed->SetAnimationProgress(fProgress);
+                if (fProgress == 0.0f)
+                {
+                    SPlayerAnimData data = pPed->GetAnimationData();
+                    data.startTime = GetLocalTick();
+                    pPed->SetAnimationData(data);
+                }
+                else
+                {
+                    SPlayerAnimData data = pPed->GetAnimationData();
+                    data.startTime = GetLocalTick() - static_cast<std::int64_t>((GetAnimationLength(animName) * 1000.0f) * fProgress);
+                    pPed->SetAnimationData(data);
+                }
             }
             else
             {

@@ -95,6 +95,18 @@ std::int64_t SharedUtil::GetTimestamp()
     return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 }
 
+// Returns a monotonic time value in milliseconds since application start.
+// This uses std::chrono::steady_clock, which is guaranteed to be
+// steady (non-decreasing) and not affected by system clock changes,
+// daylight saving adjustments, or manual time modifications.
+// Unlike system_clock-based timestamps, this value is not tied to
+// real-world calendar time.
+std::int64_t SharedUtil::GetLocalTick()
+{
+    static const auto start = std::chrono::steady_clock::now();
+    return std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::steady_clock::now() - start).count();
+}
+
 //
 // Get the time as a sortable string.
 // Set bDate to include the date, bMs to include milliseconds

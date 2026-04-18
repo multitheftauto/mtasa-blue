@@ -237,7 +237,7 @@ bool CPlayerListPacket::Write(NetBitStreamInterface& BitStream) const
                 BitStream.WriteBit(animData.freezeLastFrame);
                 BitStream.Write(animData.blendTime);
                 BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
-                BitStream.Write(static_cast<double>(animData.startTime));
+                BitStream.Write(animData.startTime);
                 BitStream.Write(animData.speed);
             }
         }

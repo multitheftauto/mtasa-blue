@@ -105,20 +105,17 @@ enum eBone
 
 struct SPlayerAnimData
 {
-    std::string blockName{};
-    std::string animName{};
-    int         time{-1};
-    bool        loop{true};
-    bool        updatePosition{true};
-    bool        interruptable{true};
-    bool        freezeLastFrame{true};
-    int         blendTime{250};
-    bool        taskToBeRestoredOnAnimEnd{false};
-
+    std::string  blockName{};
+    std::string  animName{};
+    int          time{-1};
+    bool         loop{true};
+    bool         updatePosition{true};
+    bool         interruptable{true};
+    bool         freezeLastFrame{true};
+    int          blendTime{250};
+    bool         taskToBeRestoredOnAnimEnd{false};
     std::int64_t startTime{0};
-
-    float progress{0.0f};
-    float speed{1.0f};
+    float        speed{1.0f};
 
     bool IsAnimating() const noexcept { return !blockName.empty() && !animName.empty(); }
 };
@@ -304,9 +301,9 @@ public:
     std::vector<CPlayer*>::const_iterator NearPlayersIterBegin() { return m_nearPlayersList.begin(); }
     std::vector<CPlayer*>::const_iterator NearPlayersIterEnd() { return m_nearPlayersList.end(); }
 
-    const SPlayerAnimData& GetAnimationData() const noexcept { return m_animData; };
-    void                   SetAnimationData(const SPlayerAnimData& animData) { m_animData = animData; };
-    void                   SetAnimationProgress(float progress) { m_animData.progress = progress; };
+    const SPlayerAnimData& GetAnimationData() const noexcept { return m_animData; }
+    SPlayerAnimData        GetAnimationData() noexcept { return m_animData; }
+    void                   SetAnimationData(const SPlayerAnimData& animData) { m_animData = animData; }
     void                   SetAnimationSpeed(float speed) { m_animData.speed = speed; };
 
     void SetHanging(bool hanging) noexcept { m_hanging = hanging; }
