@@ -30,7 +30,12 @@ CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
     // without a guard here can write into arbitrary memory.
     CBaseModelInfoSAInterface* pModelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex);
     if (!pModelInfo || !pModelInfo->pColModel)
+    {
+        // Always initialize output rect to avoid leaking stale caller data.
+        *pRect = CRect(boundCentre.fX, boundCentre.fY, boundCentre.fX, boundCentre.fY);
+        pRect->FixIncorrectTopLeft();
         return pRect;
+    }
 
     float fRadius = pModelInfo->pColModel->m_sphere.m_radius;
     *pRect = CRect(boundCentre.fX - fRadius, boundCentre.fY - fRadius, boundCentre.fX + fRadius, boundCentre.fY + fRadius);
