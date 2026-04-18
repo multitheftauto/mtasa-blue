@@ -5055,7 +5055,8 @@ bool _cdecl VehicleCamLookDir2(DWORD dwCam)
                 fallbackAlpha = s_lastGoodAngles.alpha;
 
             *(float*)(dwCam + 0xBC) = fallbackBeta;  // m_fHorizontalAngle (beta)
-            *(float*)(dwCam + 0xC0) = 0.0f;          // m_fBetaSpeed
+            if (badBetaSpd)
+                *(float*)(dwCam + 0xC0) = 0.0f;  // m_fBetaSpeed
 
             // Rewrite TargetBeta only when beta itself is invalid.
             if (badBeta)
@@ -5064,7 +5065,7 @@ bool _cdecl VehicleCamLookDir2(DWORD dwCam)
                 *(float*)(dwCam + 0xAC) = fallbackAlpha;
         }
 
-        if (!needRecover && std::isfinite(rawBeta) && std::isfinite(rawAlpha))
+        if (std::isfinite(rawBeta) && std::isfinite(rawAlpha))
         {
             s_lastGoodAngles = FollowCamLastGoodAngles{true, rawBeta, rawAlpha};
         }
