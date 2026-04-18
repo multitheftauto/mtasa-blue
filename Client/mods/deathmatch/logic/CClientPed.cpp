@@ -5941,7 +5941,8 @@ void CClientPed::UpdateAnimationProgressAndSpeed()
     if (!animAssoc)
         return;
 
-    //
+    // Animation progress is calculated based on the animation duration
+    // The cached value is only set when setPedAnimationProgress is called by the client, and is then reset to NaN
     float progress = 0.0f;
     if (std::isnan(m_AnimationCache.progress))
     {
