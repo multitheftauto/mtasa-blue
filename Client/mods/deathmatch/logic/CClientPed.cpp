@@ -5920,7 +5920,7 @@ void CClientPed::RunAnimationFromCache()
         return;
 
     // Copy our name & startTime incase it gets deleted
-    std::string animName = m_AnimationCache.strName;
+    std::string  animName = m_AnimationCache.strName;
     std::int64_t startTime = m_AnimationCache.startTime;
 
     // Run our animation

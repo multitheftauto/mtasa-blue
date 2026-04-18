@@ -372,15 +372,9 @@ public:
         return ReadStringCharacters(result, uiLength);
     }
 
-    void Write(std::int64_t input)
-    {
-        WriteBits<std::int64_t>(&input, sizeof(input) * 8);
-    }
+    void Write(std::int64_t input) { WriteBits<std::int64_t>(&input, sizeof(input) * 8); }
 
-    bool Read(std::int64_t& output)
-    {
-        return ReadBits<std::int64_t>(&output, sizeof(output) * 8);
-    }
+    bool Read(std::int64_t& output) { return ReadBits<std::int64_t>(&output, sizeof(output) * 8); }
 
 #ifdef MTA_CLIENT
     #define MAX_ELEMENTS MAX_CLIENT_ELEMENTS
