@@ -16,6 +16,8 @@
 #include <game/CPedDamageResponse.h>
 #include <game/CEventList.h>
 #include <game/CEventDamage.h>
+#include "../game_sa/CCamSA.h"
+#include <cmath>
 
 class CEventDamageSAInterface;
 
@@ -806,7 +808,7 @@ void CMultiplayerSA::InitHooks()
     // Disable CPopulation::RemovePed
     MemPut<BYTE>(0x610F20, 0xC3);
 
-    // Temporary hack for disabling hand up
+    // Legacy disabled hand-up patch retained as commented reference.
     /*
     MemPut < BYTE > ( 0x62AEE7, 0x90 );
     MemPut < BYTE > ( 0x62AEE8, 0x90 );
@@ -4886,12 +4888,19 @@ CMatrix gravcam_matInvertGravity;
 CMatrix gravcam_matVehicleTransform;
 CVector gravcam_vecVehicleVelocity;
 
+// Last finite follow-camera angles observed in VehicleCamLookDir2.
+// Used only when Process_FollowCar yields non-finite beta/betaSpeed/alpha
+// so camera mode stays unchanged and look-direction reconstruction is valid.
+struct FollowCamLastGoodAngles
+{
+    bool  valid;
+    float beta;
+    float alpha;
+};
+static FollowCamLastGoodAngles s_lastGoodAngles{};
+
 bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
 {
-    // Inverse transform some things so that they match a downward pointing gravity.
-    // This way SA's gravity-goes-downward assumptive code can calculate the camera
-    // spherical coords correctly. Of course we restore these after the camera function
-    // completes.
     SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
     CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (!pVehicle)
@@ -4912,6 +4921,7 @@ bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
     pVehicle->GetMoveSpeed(&gravcam_vecVehicleVelocity);
     CVector vecVelocityInverted = gravcam_matInvertGravity * gravcam_vecVehicleVelocity;
     pVehicle->SetMoveSpeed(vecVelocityInverted);
+
     return true;
 }
 
@@ -4982,8 +4992,8 @@ static void __declspec(naked) HOOK_VehicleCamTargetZTweak()
 
 void _cdecl VehicleCamLookDir1(DWORD dwCam, DWORD pVehicleInterface)
 {
-    // For the same reason as in VehicleCamStart, inverse transform the camera's lookdir
-    // at this point
+    // For the same reason as in VehicleCamStart, inverse transform the
+    // camera look direction at this point.
     CVector* pvecLookDir = (CVector*)(dwCam + 0x190);
     *pvecLookDir = gravcam_matInvertGravity * (*pvecLookDir);
 }
@@ -5008,10 +5018,58 @@ static void __declspec(naked) HOOK_VehicleCamLookDir1()
     // clang-format on
 }
 
-// ---------------------------------------------------
-
 bool _cdecl VehicleCamLookDir2(DWORD dwCam)
 {
+    // Recover non-finite follow-camera angles before lookdir reconstruction
+    // would propagate them into the camera direction vector.
+    {
+        auto badf = [](float v) { return !std::isfinite(v); };
+
+        const float rawBeta    = *(float*)(dwCam + 0xBC);
+        const float rawBetaSpd = *(float*)(dwCam + 0xC0);
+        const float rawAlpha   = *(float*)(dwCam + 0xAC);
+        const bool  badBeta = badf(rawBeta);
+        const bool  badBetaSpd = badf(rawBetaSpd);
+        const bool  badAlpha = badf(rawAlpha);
+        const bool  needRecover = badBeta || badBetaSpd || badAlpha;
+
+        if (needRecover)
+        {
+            // Preserve live beta when only beta speed is invalid to avoid
+            // snapping camera input to stale history.
+            float       fallbackBeta = std::isfinite(rawBeta) ? rawBeta : 0.0f;
+            float       fallbackAlpha = std::isfinite(rawAlpha) ? rawAlpha : 0.0f;
+
+            if (!std::isfinite(rawBeta) && s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.beta))
+            {
+                fallbackBeta = s_lastGoodAngles.beta;
+            }
+            else
+            {
+                const float trueBeta = *(float*)(dwCam + 0xA0);
+                if (!std::isfinite(rawBeta) && std::isfinite(trueBeta))
+                    fallbackBeta = trueBeta;
+            }
+
+            if (!std::isfinite(rawAlpha) && s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.alpha))
+                fallbackAlpha = s_lastGoodAngles.alpha;
+
+            *(float*)(dwCam + 0xBC) = fallbackBeta;   // m_fHorizontalAngle (beta)
+            *(float*)(dwCam + 0xC0) = 0.0f;           // m_fBetaSpeed
+
+            // Rewrite TargetBeta only when beta itself is invalid.
+            if (badBeta)
+                *(float*)(dwCam + 0x8C) = fallbackBeta;
+            if (badAlpha)
+                *(float*)(dwCam + 0xAC) = fallbackAlpha;
+        }
+
+        if (!needRecover && std::isfinite(rawBeta) && std::isfinite(rawAlpha))
+        {
+            s_lastGoodAngles = FollowCamLastGoodAngles{ true, rawBeta, rawAlpha };
+        }
+    }
+
     // Calculates the look direction vector for the vehicle camera. This vector
     // is later multiplied by a factor and added to the vehicle position by SA
     // to obtain the final camera position.
@@ -5049,6 +5107,7 @@ static void __declspec(naked) HOOK_VehicleCamLookDir2()
 void _cdecl VehicleCamHistory(DWORD dwCam, CVector* pvecTarget, float fTargetTheta, float fRadius, float fZoom)
 {
     float   fPhi = *(float*)(dwCam + 0xBC);
+
     CVector vecDir = -gravcam_matGravity.vRight * cos(fPhi) * cos(fTargetTheta) - gravcam_matGravity.vFront * sin(fPhi) * cos(fTargetTheta) +
                      gravcam_matGravity.vUp * sin(fTargetTheta);
     ((CVector*)(dwCam + 0x1D8))[0] = *pvecTarget - vecDir * fRadius;
@@ -5122,7 +5181,7 @@ docustom:
 
 // ---------------------------------------------------
 
-void _cdecl VehicleCamEnd(DWORD pVehicleInterface)
+void _cdecl VehicleCamEnd(DWORD dwCam, DWORD pVehicleInterface)
 {
     // Restore the things that we inverse transformed in VehicleCamStart
     SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
@@ -5143,9 +5202,11 @@ static void __declspec(naked) HOOK_VehicleCamEnd()
     {
         mov ds:[0xB6F020], edx
 
+        // esi = CCam*, edi = pVehicleInterface at this hook site
         push edi
+        push esi
         call VehicleCamEnd
-        add esp, 4
+        add esp, 8
 
         jmp RETURN_VehicleCamEnd
     }
