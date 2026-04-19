@@ -3240,6 +3240,7 @@ namespace
         int iOut = -2;
         if (*(DWORD*)dwThis != 0)
         {
+            // clang-format off
             _asm
             {
                 mov     ecx, dwThis
@@ -3247,6 +3248,7 @@ namespace
                 call    dwFunc
                 mov     iOut, eax
             }
+            // clang-format on
         }
 
         return iOut;

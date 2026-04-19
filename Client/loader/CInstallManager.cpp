@@ -1703,6 +1703,7 @@ SString CInstallManager::_ProcessLangFileChecks()
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ProcessServiceChecks()
 {
+#if MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
     if (!CheckService(CHECK_SERVICE_PRE_GAME))
     {
         if (!IsNativeArm64Host() && !IsUserAdmin())
@@ -1711,6 +1712,7 @@ SString CInstallManager::_ProcessServiceChecks()
             return "fail";
         }
     }
+#endif
     return "ok";
 }
 
