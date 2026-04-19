@@ -104,6 +104,13 @@ namespace
         return width;
     }
 
+    int QuantizeVolumePercent(float& value)
+    {
+        const int iPercent = std::clamp(static_cast<int>(value * 100.0f + 0.5f), 0, 100);
+        value = iPercent / 100.0f;
+        return iPercent;
+    }
+
     void FinalizeSliderRow(float tabWidth, CGUIScrollBar* slider, CGUILabel* valueLabel, float preferredWidth, float labelSpacing = kSliderLabelSpacing,
                            CGUILabel* textLabel = nullptr)
     {
@@ -430,9 +437,48 @@ CSettings::CSettings()
 {
     ResetGuiPointers();
 
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
-    m_fRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
-    m_fSFXVolume = (float)gameSettings->GetSFXVolume() / 64.0f;
+    CClientVariables& clientVars = CClientVariables::GetSingleton();
+    CGameSettings*    gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+
+    float fRadioVolume = 0.0f;
+    float fSFXVolume = 0.0f;
+
+    // Keep exact slider values in CVARs. Fall back to reconstructed values for
+    // one-time migration when those keys do not exist yet.
+    if (clientVars.Exists("radiovolume") && clientVars.Exists("sfxvolume"))
+    {
+        CVARS_GET("radiovolume", fRadioVolume);
+        CVARS_GET("sfxvolume", fSFXVolume);
+    }
+    else
+    {
+        // GTA stores radio/SFX as values already multiplied by master volume.
+        // The UI sliders represent the unscaled channel volumes, so recover them
+        // by dividing by the persisted master value during startup.
+        const float fMasterVolume = std::max(0.0f, std::min(CVARS_GET_VALUE<float>("mastervolume"), 1.0f));
+        const float fStoredRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
+        const float fStoredSFXVolume = (float)gameSettings->GetSFXVolume() / 64.0f;
+
+        if (fMasterVolume > 0.0001f)
+        {
+            fRadioVolume = fStoredRadioVolume / fMasterVolume;
+            fSFXVolume = fStoredSFXVolume / fMasterVolume;
+        }
+        else
+        {
+            // If master was zero we cannot recover hidden channel values.
+            fRadioVolume = fStoredRadioVolume;
+            fSFXVolume = fStoredSFXVolume;
+        }
+
+        CVARS_SET("radiovolume", fRadioVolume);
+        CVARS_SET("sfxvolume", fSFXVolume);
+    }
+
+    m_fRadioVolume = std::max(0.0f, std::min(fRadioVolume, 1.0f));
+    m_fSFXVolume = std::max(0.0f, std::min(fSFXVolume, 1.0f));
+    QuantizeVolumePercent(m_fRadioVolume);
+    QuantizeVolumePercent(m_fSFXVolume);
 
     m_iMaxAnisotropic = g_pDeviceState->AdapterState.MaxAnisotropicSetting;
     m_bBrowserListsChanged = false;
@@ -5446,20 +5492,30 @@ bool CSettings::OnMasterVolumeChanged(CGUIElement* pElement)
 
 bool CSettings::OnRadioVolumeChanged(CGUIElement* pElement)
 {
-    int iVolume = m_pAudioRadioVolume->GetScrollPosition() * 100.0f;
+    float fVolume = m_pAudioRadioVolume->GetScrollPosition();
+    int   iVolume = QuantizeVolumePercent(fVolume);
     m_pLabelRadioVolumeValue->SetText(SString("%i%%", iVolume).c_str());
 
-    SetRadioVolume(m_pAudioRadioVolume->GetScrollPosition());
+    if (std::abs(m_pAudioRadioVolume->GetScrollPosition() - fVolume) > 0.0001f)
+        m_pAudioRadioVolume->SetScrollPosition(fVolume);
+
+    CVARS_SET("radiovolume", fVolume);
+    SetRadioVolume(fVolume);
 
     return true;
 }
 
 bool CSettings::OnSFXVolumeChanged(CGUIElement* pElement)
 {
-    int iVolume = m_pAudioSFXVolume->GetScrollPosition() * 100.0f;
+    float fVolume = m_pAudioSFXVolume->GetScrollPosition();
+    int   iVolume = QuantizeVolumePercent(fVolume);
     m_pLabelSFXVolumeValue->SetText(SString("%i%%", iVolume).c_str());
 
-    SetSFXVolume(m_pAudioSFXVolume->GetScrollPosition());
+    if (std::abs(m_pAudioSFXVolume->GetScrollPosition() - fVolume) > 0.0001f)
+        m_pAudioSFXVolume->SetScrollPosition(fVolume);
+
+    CVARS_SET("sfxvolume", fVolume);
+    SetSFXVolume(fVolume);
 
     return true;
 }

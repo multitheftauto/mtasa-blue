@@ -22,7 +22,22 @@ CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
 {
     CVector boundCentre;
     CEntitySAInterface::GetBoundCentre(&boundCentre);
-    float fRadius = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel->m_sphere.m_radius;
+
+    // Validate model info and collision model before deref. The streaming
+    // system can strip a model's collision data while leaving pColModel
+    // non-null (dangling), or release the model info entirely when entities
+    // from a recycled sector are re-added via building removal. Dereferencing
+    // without a guard here can write into arbitrary memory.
+    CBaseModelInfoSAInterface* pModelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex);
+    if (!pModelInfo || !pModelInfo->pColModel)
+    {
+        // Always initialize output rect to avoid leaking stale caller data.
+        *pRect = CRect(boundCentre.fX, boundCentre.fY, boundCentre.fX, boundCentre.fY);
+        pRect->FixIncorrectTopLeft();
+        return pRect;
+    }
+
+    float fRadius = pModelInfo->pColModel->m_sphere.m_radius;
     *pRect = CRect(boundCentre.fX - fRadius, boundCentre.fY - fRadius, boundCentre.fX + fRadius, boundCentre.fY + fRadius);
     pRect->FixIncorrectTopLeft();  // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
     return pRect;

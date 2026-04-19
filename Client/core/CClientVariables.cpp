@@ -258,6 +258,8 @@ void CClientVariables::ValidateValues()
     ClampValue("chat_text_alignment", Chat::Text::Align::LEFT, Chat::Text::Align::RIGHT);
     ClampValue("text_scale", 0.8f, 3.0f);
     ClampValue("mastervolume", 0.0f, 1.0f);
+    ClampValue("radiovolume", 0.0f, 1.0f);
+    ClampValue("sfxvolume", 0.0f, 1.0f);
     ClampValue("mtavolume", 0.0f, 1.0f);
     ClampValue("voicevolume", 0.0f, 1.0f);
     ClampValue("mapalpha", 0, 255);
@@ -326,6 +328,8 @@ void CClientVariables::LoadDefaults()
     DEFAULT("steer_with_mouse", false);                                     // steering with mouse controls
     DEFAULT("classic_controls", false);                                     // classic/standard controls
     DEFAULT("mastervolume", 1.0f);                                          // master volume
+    DEFAULT("radiovolume", 1.0f);                                           // radio volume (unscaled)
+    DEFAULT("sfxvolume", 1.0f);                                             // sfx volume (unscaled)
     DEFAULT("mtavolume", 1.0f);                                             // custom sound's volume
     DEFAULT("voicevolume", 1.0f);                                           // voice chat output volume
     DEFAULT("mapalpha", 155);                                               // player map alpha

@@ -40,20 +40,8 @@ namespace fs = std::filesystem;
 
 // Set to true to enable the freeze watchdog (monitors main thread responsiveness)
 // Do NOT enable it unless you run a QA testing cycle (see commit desc: 3e54dcb2742bccf0319b9552b2ed5a2c0a012425)
-constexpr bool bFreezeWatchdogEnabled = false;
-
-// Watchdog active in debug builds
-// In debug builds, the contributor should get an early heads up if their changes are this level of blocking (it can't make it in).
-// If you freeze beyond 20 secs in a debug build, not due to a bug in your code changes but due to your local server assets, you have 2 options:
-// 1. Disable the watchdog
-// 2. Fix your mess (imagine what that would do to players in release builds)
-#ifdef MTA_DEBUG
-constexpr bool  bFreezeWatchdogEnabledInCurrentBuild = true;
-constexpr DWORD uiFreezeWatchdogTimeoutSeconds = 20;  // Already unacceptable. Strikes a balance: you'll still be able to a load heavy asseted local server
-#else
-constexpr bool  bFreezeWatchdogEnabledInCurrentBuild = bFreezeWatchdogEnabled;
-constexpr DWORD uiFreezeWatchdogTimeoutSeconds = 40;  // Player won't be patient beyond this; we get no info
-#endif
+constexpr bool  bFreezeWatchdogEnabled = false;
+constexpr DWORD uiFreezeWatchdogTimeoutSeconds = 30;  // Player won't be patient beyond this; we get no info
 
 static float fTest = 1;
 
@@ -200,7 +188,7 @@ CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
 
-    if constexpr (bFreezeWatchdogEnabledInCurrentBuild)
+    if constexpr (bFreezeWatchdogEnabled)
         StopWatchdogThread();
 
     // Reset Discord rich presence
@@ -1317,7 +1305,7 @@ void CCore::DoPreFramePulse()
 {
     TIMING_CHECKPOINT("+CorePreFrame");
 
-    if constexpr (bFreezeWatchdogEnabledInCurrentBuild)
+    if constexpr (bFreezeWatchdogEnabled)
         UpdateWatchdogHeartbeat();
 
     m_pKeyBinds->DoPreFramePulse();
@@ -1377,7 +1365,7 @@ void CCore::DoPostFramePulse()
             WatchDogCompletedSection("L3");  // No hang on startup
 
             // Start watchdog thread now that initial loading is complete
-            if constexpr (bFreezeWatchdogEnabledInCurrentBuild)
+            if constexpr (bFreezeWatchdogEnabled)
             {
                 if (!StartWatchdogThread(GetCurrentThreadId(), uiFreezeWatchdogTimeoutSeconds))
                 {

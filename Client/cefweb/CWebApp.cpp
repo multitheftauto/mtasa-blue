@@ -101,9 +101,12 @@ namespace
         if (disableGpu)
         {
             commandLine->AppendSwitch("disable-gpu");
-            // Also disable GPU compositing when GPU is disabled
-            commandLine->AppendSwitch("disable-gpu-compositing");
         }
+
+        // Disable GPU compositing in all cases.
+        // This keeps Chromium's compositor on the software path even when GPU
+        // rendering stays enabled for other browser pipelines.
+        commandLine->AppendSwitch("disable-gpu-compositing");
 
         // Hardware video decoding - enable when GPU is enabled and video acceleration is requested
         if (!disableGpu && enableVideoAccel)

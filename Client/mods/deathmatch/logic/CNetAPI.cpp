@@ -381,9 +381,12 @@ void CNetAPI::DoPulse()
             }
 
             // Time to freeze because of lack of return sync?
+            // Only treat missing return-sync as network trouble while the local player is alive.
+            // During expected dead/spectate periods (e.g. race map voting), return-sync can pause
+            // by design and would otherwise show a misleading "NETWORK TROUBLE" warning.
             if (!g_pClientGame->IsDownloadingBigPacket() && (m_bStoredReturnSync) && (m_ulLastPuresyncTime != 0) && (m_ulLastSyncReturnTime != 0) &&
-                (ulCurrentTime <= m_ulLastPuresyncTime + 5000) && (ulCurrentTime >= m_ulLastSyncReturnTime + 10000) &&
-                (!g_pClientGame->GetLocalPlayer()->m_bIsGettingIntoVehicle) && (!m_bIncreaseTimeoutTime))
+                (ulCurrentTime <= m_ulLastPuresyncTime + 5000) && (ulCurrentTime >= m_ulLastSyncReturnTime + 10000) && !pPlayer->IsDead() &&
+                !pPlayer->IsDying() && (!g_pClientGame->GetLocalPlayer()->m_bIsGettingIntoVehicle) && (!m_bIncreaseTimeoutTime))
             {
                 // No vehicle or vehicle in seat 0?
                 if (!pVehicle || pPlayer->GetOccupiedVehicleSeat() == 0)
