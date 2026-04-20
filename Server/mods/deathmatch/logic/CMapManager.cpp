@@ -282,7 +282,7 @@ void CMapManager::SendMapInformation(CPlayer& Player)
     marker.Set("Water");
 
     // Add the buildings to the packet
-    CBuildingManager*                pBuildingManager = g_pGame->GetBuildingManager();
+    CBuildingManager*                     pBuildingManager = g_pGame->GetBuildingManager();
     CFastList<CBuilding*>::const_iterator iterBuilding = pBuildingManager->IterBegin();
     for (; iterBuilding != pBuildingManager->IterEnd(); iterBuilding++)
     {

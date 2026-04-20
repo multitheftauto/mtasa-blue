@@ -3991,7 +3991,7 @@ retry:
 
                         // Server sends elapsed time rather than start time due to bitstream limitations regarding 64 bit integers.
                         const uint64_t nowTick = GetTickCount64_();
-                        const int64_t startTime = nowTick - elapsedTime;
+                        const int64_t  startTime = nowTick - elapsedTime;
 
                         // Run anim
                         CStaticFunctionDefinitions::SetPedAnimation(*pPed, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable,
