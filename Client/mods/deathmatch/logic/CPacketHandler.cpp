@@ -4198,8 +4198,6 @@ retry:
                     if (!CClientBuildingManager::IsValidModel(modelId))
                         modelId = 1700;
 
-                    bitStream.ReadCompressed(ucInterior);
-
                     bitStream.Read(LowLodObjectID);
                     CClientBuilding* pBuilding = new CClientBuilding(g_pClientGame->m_pManager, EntityID, modelId, position.data.vecPosition,
                                                                      rotationRadians.data.vecRotation, ucInterior);
