@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-20 01:50+0000\n"
-"PO-Revision-Date: 2026-04-20 02:40\n"
+"PO-Revision-Date: 2026-04-20 03:40\n"
 "Last-Translator: \n"
 "Language-Team: Romanian\n"
 "Language: ro_RO\n"
@@ -2483,7 +2483,7 @@ msgstr "Activează randarea GPU"
 
 #: Client/core/CSettings.cpp:1605
 msgid "Enable video acceleration"
-msgstr ""
+msgstr "Activează accelerarea video"
 
 #: Client/core/CSettings.cpp:1609
 msgid "Custom blacklist"
