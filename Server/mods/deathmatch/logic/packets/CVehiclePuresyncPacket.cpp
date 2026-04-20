@@ -275,7 +275,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 }
             }
 
-            if (BitStream.ReadBit() == true)
+            if (BitStream.ReadBit())
             {
                 ElementID DamagerID;
                 if (!BitStream.Read(DamagerID))
