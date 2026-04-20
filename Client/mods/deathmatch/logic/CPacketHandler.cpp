@@ -3990,7 +3990,7 @@ retry:
                         bitStream.ReadBit(freezeLastFrame);
                         bitStream.Read(blendTime);
                         bitStream.ReadBit(taskRestore);
-                        bitStream.Read(elapsedTime);
+                        bitStream.Read(startTime);
                         bitStream.Read(speed);
 
                         // Run anim
