@@ -3,7 +3,7 @@ msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2026-04-20 01:50+0000\n"
-"PO-Revision-Date: 2026-04-20 02:40\n"
+"PO-Revision-Date: 2026-04-20 20:00\n"
 "Last-Translator: \n"
 "Language-Team: French\n"
 "Language: fr_FR\n"
@@ -2459,7 +2459,7 @@ msgstr "Saturation:"
 
 #: Client/core/CSettings.cpp:1547
 msgid "Apply adjustments in windowed/borderless mode"
-msgstr ""
+msgstr "Appliquer les réglages en mode fenêtré/sans bordure"
 
 #: Client/core/CSettings.cpp:1553
 msgid "Apply adjustments in fullscreen mode"
@@ -2479,7 +2479,7 @@ msgstr "Activer le rendu GPU"
 
 #: Client/core/CSettings.cpp:1605
 msgid "Enable video acceleration"
-msgstr ""
+msgstr "Activer l'accélération vidéo"
 
 #: Client/core/CSettings.cpp:1609
 msgid "Custom blacklist"
