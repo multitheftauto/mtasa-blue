@@ -1687,7 +1687,6 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         BitStream.WriteBit(false);
     }
 
-
     if (!g_pClientGame->GetDamageSent())
     {
         g_pClientGame->SetDamageSent(true);
