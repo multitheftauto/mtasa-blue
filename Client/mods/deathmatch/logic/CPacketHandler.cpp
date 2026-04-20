@@ -3225,16 +3225,16 @@ retry:
                         {
                             case CClientPickup::ARMOR:
                             {
-                                SPlayerHealthSync health;
-                                if (bitStream.Read(&health))
-                                    pPickup->m_fAmount = health.data.fValue;
+                                SPlayerArmorSync armor;
+                                if (bitStream.Read(&armor))
+                                    pPickup->m_fAmount = armor.data.fValue;
                                 break;
                             }
                             case CClientPickup::HEALTH:
                             {
-                                SPlayerArmorSync armor;
-                                if (bitStream.Read(&armor))
-                                    pPickup->m_fAmount = armor.data.fValue;
+                                SPlayerHealthSync health;
+                                if (bitStream.Read(&health))
+                                    pPickup->m_fAmount = health.data.fValue;
                                 break;
                             }
                             case CClientPickup::WEAPON:
@@ -3990,7 +3990,7 @@ retry:
                         bitStream.ReadBit(freezeLastFrame);
                         bitStream.Read(blendTime);
                         bitStream.ReadBit(taskRestore);
-                        bitStream.Read(startTime);
+                        bitStream.Read(elapsedTime);
                         bitStream.Read(speed);
 
                         // Run anim

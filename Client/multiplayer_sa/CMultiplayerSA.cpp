@@ -16,7 +16,6 @@
 #include <game/CPedDamageResponse.h>
 #include <game/CEventList.h>
 #include <game/CEventDamage.h>
-#include "../game_sa/CCamSA.h"
 #include <cmath>
 
 class CEventDamageSAInterface;
@@ -4899,6 +4898,81 @@ struct FollowCamLastGoodAngles
 };
 static FollowCamLastGoodAngles s_lastGoodAngles{};
 
+static void RecoverFollowCamState(DWORD dwCam)
+{
+    auto badf = [](float v) { return !std::isfinite(v); };
+
+    const float rawBeta = *(float*)(dwCam + 0xBC);
+    const float rawTargetBeta = *(float*)(dwCam + 0x8C);
+    const float rawBetaSpd = *(float*)(dwCam + 0xC0);
+    const float rawAlpha = *(float*)(dwCam + 0xAC);
+    const float rawTrueBeta = *(float*)(dwCam + 0xA0);
+
+    const bool badBeta = badf(rawBeta);
+    const bool badTargetBeta = badf(rawTargetBeta);
+    const bool badBetaSpd = badf(rawBetaSpd);
+    const bool badAlpha = badf(rawAlpha);
+
+    if (!badBeta && !badTargetBeta && !badBetaSpd && !badAlpha)
+    {
+        s_lastGoodAngles = FollowCamLastGoodAngles{true, rawBeta, rawAlpha};
+        return;
+    }
+
+    // Prefer live SA values first, then a recent finite snapshot.
+    float safeBeta = rawBeta;
+    if (badf(safeBeta))
+    {
+        if (std::isfinite(rawTrueBeta))
+            safeBeta = rawTrueBeta;
+        else if (std::isfinite(rawTargetBeta))
+            safeBeta = rawTargetBeta;
+        else if (s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.beta))
+            safeBeta = s_lastGoodAngles.beta;
+        else
+            safeBeta = 0.0f;
+    }
+
+    float safeAlpha = rawAlpha;
+    if (badf(safeAlpha))
+    {
+        if (s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.alpha))
+            safeAlpha = s_lastGoodAngles.alpha;
+        else
+            safeAlpha = 0.0f;
+    }
+
+    // Only touch fields that are invalid. Keeping valid fields untouched avoids
+    // fighting SA's own follow-cam smoothing and mouse input handling.
+    if (badBeta)
+        *(float*)(dwCam + 0xBC) = safeBeta;
+
+    if (badTargetBeta)
+        *(float*)(dwCam + 0x8C) = safeBeta;
+
+    if (badBetaSpd)
+        *(float*)(dwCam + 0xC0) = 0.0f;
+
+    if (badAlpha)
+        *(float*)(dwCam + 0xAC) = safeAlpha;
+
+    if (std::isfinite(safeBeta) && std::isfinite(safeAlpha))
+        s_lastGoodAngles = FollowCamLastGoodAngles{true, safeBeta, safeAlpha};
+}
+
+static void GetSafeFollowCamAngles(DWORD dwCam, float& outBeta, float& outAlpha)
+{
+    RecoverFollowCamState(dwCam);
+
+    outBeta = *(float*)(dwCam + 0xBC);
+    outAlpha = *(float*)(dwCam + 0xAC);
+
+    if (!std::isfinite(outBeta))
+        outBeta = 0.0f;
+    if (!std::isfinite(outAlpha))
+        outAlpha = 0.0f;
+}
+
 bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
 {
     SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
@@ -5020,61 +5094,15 @@ static void __declspec(naked) HOOK_VehicleCamLookDir1()
 
 bool _cdecl VehicleCamLookDir2(DWORD dwCam)
 {
-    // Recover non-finite follow-camera angles before lookdir reconstruction
-    // would propagate them into the camera direction vector.
-    {
-        auto badf = [](float v) { return !std::isfinite(v); };
-
-        const float rawBeta = *(float*)(dwCam + 0xBC);
-        const float rawBetaSpd = *(float*)(dwCam + 0xC0);
-        const float rawAlpha = *(float*)(dwCam + 0xAC);
-        const bool  badBeta = badf(rawBeta);
-        const bool  badBetaSpd = badf(rawBetaSpd);
-        const bool  badAlpha = badf(rawAlpha);
-        const bool  needRecover = badBeta || badBetaSpd || badAlpha;
-
-        if (needRecover)
-        {
-            // Preserve live beta when only beta speed is invalid to avoid
-            // snapping camera input to stale history.
-            float fallbackBeta = std::isfinite(rawBeta) ? rawBeta : 0.0f;
-            float fallbackAlpha = std::isfinite(rawAlpha) ? rawAlpha : 0.0f;
-
-            if (!std::isfinite(rawBeta))
-            {
-                const float trueBeta = *(float*)(dwCam + 0xA0);
-                if (std::isfinite(trueBeta))
-                    fallbackBeta = trueBeta;
-                else if (s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.beta))
-                    fallbackBeta = s_lastGoodAngles.beta;
-            }
-
-            if (!std::isfinite(rawAlpha) && s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.alpha))
-                fallbackAlpha = s_lastGoodAngles.alpha;
-
-            *(float*)(dwCam + 0xBC) = fallbackBeta;  // m_fHorizontalAngle (beta)
-            if (badBetaSpd)
-                *(float*)(dwCam + 0xC0) = 0.0f;  // m_fBetaSpeed
-
-            // Rewrite TargetBeta only when beta itself is invalid.
-            if (badBeta)
-                *(float*)(dwCam + 0x8C) = fallbackBeta;
-            if (badAlpha)
-                *(float*)(dwCam + 0xAC) = fallbackAlpha;
-        }
-
-        if (std::isfinite(rawBeta) && std::isfinite(rawAlpha))
-        {
-            s_lastGoodAngles = FollowCamLastGoodAngles{true, rawBeta, rawAlpha};
-        }
-    }
+    // Repair only invalid follow-cam internals, then use the sanitized angles
+    // for output reconstruction.
+    float fPhi = 0.0f;
+    float fTheta = 0.0f;
+    GetSafeFollowCamAngles(dwCam, fPhi, fTheta);
 
     // Calculates the look direction vector for the vehicle camera. This vector
     // is later multiplied by a factor and added to the vehicle position by SA
     // to obtain the final camera position.
-    float fPhi = *(float*)(dwCam + 0xBC);
-    float fTheta = *(float*)(dwCam + 0xAC);
-
     MemPutFast<CVector>(dwCam + 0x190, -gravcam_matGravity.vRight * cos(fPhi) * cos(fTheta) - gravcam_matGravity.vFront * sin(fPhi) * cos(fTheta) +
                                            gravcam_matGravity.vUp * sin(fTheta));
 
@@ -5105,7 +5133,9 @@ static void __declspec(naked) HOOK_VehicleCamLookDir2()
 
 void _cdecl VehicleCamHistory(DWORD dwCam, CVector* pvecTarget, float fTargetTheta, float fRadius, float fZoom)
 {
-    float fPhi = *(float*)(dwCam + 0xBC);
+    float fPhi = 0.0f;
+    float fAlphaIgnored = 0.0f;
+    GetSafeFollowCamAngles(dwCam, fPhi, fAlphaIgnored);
 
     CVector vecDir = -gravcam_matGravity.vRight * cos(fPhi) * cos(fTargetTheta) - gravcam_matGravity.vFront * sin(fPhi) * cos(fTargetTheta) +
                      gravcam_matGravity.vUp * sin(fTargetTheta);
