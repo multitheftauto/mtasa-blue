@@ -1592,6 +1592,16 @@ int CLuaElementDefs::IsElementStreamedIn(lua_State* luaVM)
         // Is this a streaming compatible class?
         if (pEntity->IsStreamingCompatibleClass())
         {
+            // Local player is always streamed in from its own perspective.
+            // Its entity is created via _CreateLocalModel() which doesn't go through
+            // InternalStreamIn(), so m_bStreamedIn can stay false even though the player
+            // is fully active — breaking scripts that filter handlers with isElementStreamedIn(source).
+            if (IS_PLAYER(pEntity) && static_cast<CClientPlayer*>(pEntity)->IsLocalPlayer())
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+
             CClientStreamElement* pStreamElement = static_cast<CClientStreamElement*>(pEntity);
 
             // Return whether or not this class is streamed in
