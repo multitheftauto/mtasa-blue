@@ -34,7 +34,12 @@ CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool b
 
     m_pEventsInterface = nullptr;
     m_bBeingDestroyed = false;
+    m_bIsRenderingPaused = false;
     m_fVolume = 1.0f;
+    m_bHasInputFocus = false;
+    m_vecMousePosition = {0, 0};
+    m_vecPendingMousePosition = {0, 0};
+    m_lastMouseMoveTime = std::chrono::steady_clock::now();
     memset(m_mouseButtonStates, 0, sizeof(m_mouseButtonStates));
 
     // Initialise properties
@@ -279,10 +284,13 @@ const SString& CWebView::GetTitle()
 
 void CWebView::SetRenderingPaused(bool bPaused)
 {
+    // Store pause state even when the host is not created yet so async
+    // browser creation cannot lose the requested visibility state.
+    m_bIsRenderingPaused = bPaused;
+
     if (m_pWebView)
     {
         m_pWebView->GetHost()->WasHidden(bPaused);
-        m_bIsRenderingPaused = bPaused;
 
         if (bPaused)
         {
@@ -357,9 +365,17 @@ void CWebView::UpdateTexture()
     }
 
     auto* const pSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
-    if (m_bBeingDestroyed || !pSurface) [[unlikely]]
+    if (m_bBeingDestroyed) [[unlikely]]
     {
         m_RenderData.changed = m_RenderData.popupShown = false;
+        return;
+    }
+
+    if (!pSurface) [[unlikely]]
+    {
+        // Keep pending frame flags intact. Surface recreation can lag one or
+        // more pulses; clearing flags here can permanently drop the only paint
+        // we received for static pages and leave the browser visually blank.
         return;
     }
 
@@ -367,6 +383,14 @@ void CWebView::UpdateTexture()
     // This happens when resizing the browser as OnPaint is called asynchronously
     if (m_RenderData.changed && (m_pWebBrowserRenderItem->m_uiSizeX != m_RenderData.width || m_pWebBrowserRenderItem->m_uiSizeY != m_RenderData.height))
     {
+        // Request a fresh paint at the current render size. Without this,
+        // we can drop the only buffered frame and remain visually blank
+        // until the page generates another update on its own.
+        if (m_pWebView)
+        {
+            m_pWebView->GetHost()->WasResized();
+            m_pWebView->GetHost()->Invalidate(PET_VIEW);
+        }
         m_RenderData.changed = false;
     }
 
@@ -514,8 +538,8 @@ void CWebView::UpdateTexture()
         else
         {
             OutputDebugLine("[CWebView] UpdateTexture: LockRect failed");
-            m_RenderData.changed = false;
-            m_RenderData.popupShown = false;
+            // Keep pending frame flags so we retry on the next pulse instead
+            // of dropping the frame after a transient D3D lock failure.
         }
     }
 }
@@ -1322,6 +1346,15 @@ void CWebView::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 
     // Set web view reference
     m_pWebView = browser;
+
+    // Sync host visibility with the stored rendering state. This prevents
+    // newly created browsers from becoming permanently hidden when pause
+    // state changes race against async host creation.
+    m_pWebView->GetHost()->WasHidden(m_bIsRenderingPaused);
+
+    // Force an initial repaint to populate the texture even for pages that
+    // become visually static immediately after load.
+    m_pWebView->GetHost()->Invalidate(PET_VIEW);
 
     // If we have a pending URL from lazy loading, load it now
     if (!m_strPendingURL.empty())

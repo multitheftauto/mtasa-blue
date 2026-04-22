@@ -30,6 +30,8 @@ CNetAPI::CNetAPI(CClientManager* pManager)
     m_ulLastSyncReturnTime = 0;
     m_bStoredReturnSync = false;
     m_bIncreaseTimeoutTime = false;
+    m_ulDeadSyncGraceEndTime = 0;
+    m_bWasDeadOnNetwork = false;
 }
 
 bool CNetAPI::ProcessPacket(unsigned char bytePacketID, NetBitStreamInterface& BitStream)
@@ -297,7 +299,20 @@ void CNetAPI::DoPulse()
         CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
         if (pPlayer)
         {
-            unsigned long ulCurrentTime = CClientTime::GetTime();
+            unsigned long           ulCurrentTime = CClientTime::GetTime();
+            constexpr unsigned long DEAD_SYNC_GRACE_MS = 1000;
+
+            const bool bIsDeadOnNetwork = pPlayer->IsDeadOnNetwork();
+            if (bIsDeadOnNetwork && !m_bWasDeadOnNetwork)
+                m_ulDeadSyncGraceEndTime = ulCurrentTime + DEAD_SYNC_GRACE_MS;
+            m_bWasDeadOnNetwork = bIsDeadOnNetwork;
+
+            const auto inOutState = pPlayer->GetVehicleInOutState();
+            const bool bIsTransitioningVehicle =
+                inOutState == VEHICLE_INOUT_GETTING_IN || inOutState == VEHICLE_INOUT_GETTING_OUT || inOutState == VEHICLE_INOUT_JACKING;
+            // Keep dead-player sync for a short period after death and during vehicle transitions.
+            // This preserves corpse/fall settle updates without keeping full puresync active indefinitely.
+            const bool bAllowDeadStateSync = !bIsDeadOnNetwork || ulCurrentTime <= m_ulDeadSyncGraceEndTime || bIsTransitioningVehicle;
 
             // Grab the player vehicle
             CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
@@ -306,7 +321,7 @@ void CNetAPI::DoPulse()
             m_pManager->GetPacketRecorder()->RecordLocalData(pPlayer);
 
             // We should do a puresync?
-            if (IsPureSyncNeeded() && !g_pClientGame->IsDownloadingBigPacket())
+            if (bAllowDeadStateSync && IsPureSyncNeeded() && !g_pClientGame->IsDownloadingBigPacket())
             {
                 // Are in a vehicle?
                 if (pVehicle)
@@ -364,7 +379,7 @@ void CNetAPI::DoPulse()
             else
             {
                 // We should do a keysync?
-                if (IsSmallKeySyncNeeded(pPlayer) && !g_pClientGame->IsDownloadingBigPacket())
+                if (bAllowDeadStateSync && IsSmallKeySyncNeeded(pPlayer) && !g_pClientGame->IsDownloadingBigPacket())
                 {
                     // Send a keysync packet
                     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();

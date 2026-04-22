@@ -3240,16 +3240,16 @@ retry:
                         {
                             case CClientPickup::ARMOR:
                             {
-                                SPlayerHealthSync health;
-                                if (bitStream.Read(&health))
-                                    pPickup->m_fAmount = health.data.fValue;
+                                SPlayerArmorSync armor;
+                                if (bitStream.Read(&armor))
+                                    pPickup->m_fAmount = armor.data.fValue;
                                 break;
                             }
                             case CClientPickup::HEALTH:
                             {
-                                SPlayerArmorSync armor;
-                                if (bitStream.Read(&armor))
-                                    pPickup->m_fAmount = armor.data.fValue;
+                                SPlayerHealthSync health;
+                                if (bitStream.Read(&health))
+                                    pPickup->m_fAmount = health.data.fValue;
                                 break;
                             }
                             case CClientPickup::WEAPON:
@@ -3993,7 +3993,7 @@ retry:
                         int         time, blendTime;
                         bool        looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
                         float       speed;
-                        double      startTime;
+                        float       elapsedTime;
 
                         // Read data
                         bitStream.ReadString(blockName);
@@ -4005,13 +4005,17 @@ retry:
                         bitStream.ReadBit(freezeLastFrame);
                         bitStream.Read(blendTime);
                         bitStream.ReadBit(taskRestore);
-                        bitStream.Read(startTime);
+                        bitStream.Read(elapsedTime);
                         bitStream.Read(speed);
+
+                        // Server sends elapsed time rather than start time due to bitstream limitations regarding 64 bit integers.
+                        const uint64_t nowTick = GetTickCount64_();
+                        const int64_t  startTime = nowTick - elapsedTime;
 
                         // Run anim
                         CStaticFunctionDefinitions::SetPedAnimation(*pPed, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable,
                                                                     freezeLastFrame);
-                        pPed->m_AnimationCache.startTime = static_cast<std::int64_t>(startTime);
+                        pPed->m_AnimationCache.startTime = startTime;
                         pPed->m_AnimationCache.speed = speed;
                         pPed->m_AnimationCache.progress = 0.0f;
 

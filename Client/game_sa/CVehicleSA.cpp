@@ -2327,11 +2327,21 @@ bool CVehicleSA::SetComponentVisible(const SString& vehicleComponent, bool bRequ
                 RwObject* pAtomic = atomicList[i];
                 int       AtomicId = pGame->GetVisibilityPlugins()->GetAtomicId(pAtomic);
 
-                if ((isComponentDamaged && (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED)) ||
-                    (!isComponentDamaged && (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_UNDAMAGED)))
-                {
+                const bool bHasDamagedVersion = (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED) != 0;
+                const bool bHasUndamagedVersion = (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_UNDAMAGED) != 0;
+
+                // If this atomic has no two-version flags, it is a single-version component and
+                // should always be shown when visibility is requested.
+                bool bShouldShow = (!bHasDamagedVersion && !bHasUndamagedVersion);
+
+                // For two-version components, show the matching damage state.
+                if (isComponentDamaged)
+                    bShouldShow = bShouldShow || bHasDamagedVersion;
+                else
+                    bShouldShow = bShouldShow || bHasUndamagedVersion;
+
+                if (bShouldShow)
                     pAtomic->flags |= 0x04;
-                }
             }
         }
         else if (!bRequestVisible && uiNumAtomicsCurrentlyVisible > 0)

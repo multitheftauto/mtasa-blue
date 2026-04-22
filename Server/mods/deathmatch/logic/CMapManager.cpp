@@ -15,6 +15,7 @@
 #include "CWaterManager.h"
 #include "CPlayerManager.h"
 #include "CMarkerManager.h"
+#include "CBuildingManager.h"
 #include "CWater.h"
 #include "CMarker.h"
 #include "CBlip.h"
@@ -279,6 +280,17 @@ void CMapManager::SendMapInformation(CPlayer& Player)
     }
 
     marker.Set("Water");
+
+    // Add the buildings to the packet
+    CBuildingManager*                     pBuildingManager = g_pGame->GetBuildingManager();
+    CFastList<CBuilding*>::const_iterator iterBuilding = pBuildingManager->IterBegin();
+    for (; iterBuilding != pBuildingManager->IterEnd(); iterBuilding++)
+    {
+        CBuilding* pBuilding = *iterBuilding;
+        EntityPacket.Add(pBuilding);
+    }
+
+    marker.Set("Building");
 
     // Send it
     Player.Send(EntityPacket);

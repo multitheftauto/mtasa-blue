@@ -5079,6 +5079,27 @@ bool CStaticFunctionDefinitions::SetCameraMatrix(const CVector& vecPosition, CVe
 
     if (!m_pCamera->IsInFixedMode())
     {
+        // Some scripts call setCameraMatrix(getCameraMatrix()) while dead to preserve the current frame.
+        // Treat this as a no-op so we don't switch into fixed mode and block later spectate target updates.
+        CMatrix currentMatrix;
+        if (m_pCamera->GetMatrix(currentMatrix))
+        {
+            const CVector currentLookAt = currentMatrix.vPos + currentMatrix.vFront;
+            const CVector requestedLookAt = pvecLookAt ? *pvecLookAt : currentLookAt;
+
+            constexpr float kCameraNoOpEpsilon = 0.01f;
+            const float     posDeltaSq = (currentMatrix.vPos - vecPosition).LengthSquared();
+            const float     lookDeltaSq = (currentLookAt - requestedLookAt).LengthSquared();
+            const float     epsilonSq = kCameraNoOpEpsilon * kCameraNoOpEpsilon;
+
+            if (posDeltaSq <= epsilonSq && lookDeltaSq <= epsilonSq)
+            {
+                if (std::isfinite(fFOV) && fFOV > 0.0f && fFOV < 180.0f)
+                    m_pCamera->SetFOV(fFOV);
+                return true;
+            }
+        }
+
         m_pCamera->ToggleCameraFixedMode(true);
     }
 
