@@ -73,7 +73,7 @@ static bool HasWriteAccess(DWORD dwProtect) noexcept
     return dwProtect == PAGE_READWRITE || dwProtect == PAGE_WRITECOPY || dwProtect == PAGE_EXECUTE_READWRITE || dwProtect == PAGE_EXECUTE_WRITECOPY;
 }
 
-static constexpr std::size_t    REGION_CACHE_SIZE = 8;
+static constexpr std::size_t    REGION_CACHE_SIZE = 64;
 static constexpr std::uintptr_t NUM_LOWMEM_THRESHOLD = 0x10000;
 
 #define NUM_LOWMEM_THRESHOLD_ASM 0x10000
@@ -84,23 +84,59 @@ struct CachedRegion
     std::uintptr_t end{};
     DWORD          state{};
     DWORD          protect{};
+    std::uint32_t  uiAge{};
 };
 
 static bool QueryRegionCached(std::uintptr_t address, DWORD& outState, DWORD& outProtect, std::uintptr_t& outEnd) noexcept
 {
     static thread_local CachedRegion s_cache[REGION_CACHE_SIZE]{};
-    static thread_local std::size_t  s_nextSlot{};
+    static thread_local std::uint32_t s_ageCounter{};
+    static thread_local std::size_t   s_scanStart{};
 
-    for (const auto& entry : s_cache)
+    ++s_ageCounter;
+    if (s_ageCounter == 0)
     {
+        for (auto& entry : s_cache)
+            entry = CachedRegion{};
+        s_ageCounter = 1;
+    }
+
+    std::size_t   uiReplacementIndex = 0;
+    std::size_t   uiFirstEmptyIndex = REGION_CACHE_SIZE;
+    std::uint32_t uiOldestAge = UINT32_MAX;
+    bool          bHaveReplacementCandidate = false;
+
+    // Scan the full cache so gaps dont hide later hits.
+    for (std::size_t uiOffset = 0; uiOffset < REGION_CACHE_SIZE; ++uiOffset)
+    {
+        const std::size_t uiIndex = (s_scanStart + uiOffset) % REGION_CACHE_SIZE;
+        auto& entry = s_cache[uiIndex];
         if (entry.start != 0 && address >= entry.start && address <= entry.end)
         {
+            entry.uiAge = s_ageCounter;
             outState = entry.state;
             outProtect = entry.protect;
             outEnd = entry.end;
             return true;
         }
+
+        if (entry.start == 0)
+        {
+            if (uiFirstEmptyIndex == REGION_CACHE_SIZE)
+                uiFirstEmptyIndex = uiIndex;
+            continue;
+        }
+
+        if (!bHaveReplacementCandidate || entry.uiAge < uiOldestAge)
+        {
+            uiOldestAge = entry.uiAge;
+            uiReplacementIndex = uiIndex;
+            bHaveReplacementCandidate = true;
+        }
     }
+
+    if (uiFirstEmptyIndex != REGION_CACHE_SIZE)
+        uiReplacementIndex = uiFirstEmptyIndex;
 
     MEMORY_BASIC_INFORMATION mbi{};
     if (VirtualQuery(reinterpret_cast<LPCVOID>(address), &mbi, sizeof(mbi)) != sizeof(mbi))
@@ -110,15 +146,16 @@ static bool QueryRegionCached(std::uintptr_t address, DWORD& outState, DWORD& ou
     if (regionSize == 0)
         return false;
 
-    auto& slot = s_cache[s_nextSlot];
-    s_nextSlot = (s_nextSlot + 1) % REGION_CACHE_SIZE;
+    auto& slot = s_cache[uiReplacementIndex];
 
     slot.start = reinterpret_cast<std::uintptr_t>(mbi.BaseAddress);
     slot.state = mbi.State;
     slot.protect = mbi.Protect;
+    slot.uiAge = s_ageCounter;
 
     const auto endPlusOne = slot.start + regionSize;
     slot.end = (endPlusOne <= slot.start) ? static_cast<std::uintptr_t>(-1) : (endPlusOne - 1);
+    s_scanStart = (uiReplacementIndex + 1) % REGION_CACHE_SIZE;
 
     outState = slot.state;
     outProtect = slot.protect;

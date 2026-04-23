@@ -649,6 +649,41 @@ namespace
     };
 
     using TxdTextureMap = std::unordered_map<const char*, RwTexture*, TxdTextureNameHash, TxdTextureNameEq>;
+    constexpr std::size_t MAX_REASONABLE_TXD_TEXTURES = 8192;
+
+    template <typename AppendFn>
+    static bool TryEnumerateTxdTextures(RwTexDictionary* pTXD, AppendFn&& appendTexture)
+    {
+        __try
+        {
+            RwListEntry* const pRoot = &pTXD->textures.root;
+            RwListEntry*       pNode = pRoot->next;
+
+            if (pNode == nullptr || pNode == pRoot)
+                return true;
+
+            std::size_t iterations = 0;
+            while (pNode != pRoot)
+            {
+                if (++iterations > MAX_REASONABLE_TXD_TEXTURES)
+                    return false;
+
+                auto* pTexture = reinterpret_cast<RwTexture*>(reinterpret_cast<char*>(pNode) - offsetof(RwTexture, TXDList));
+                if (!appendTexture(pTexture))
+                    return false;
+
+                pNode = pNode->next;
+                if (!pNode)
+                    return false;
+            }
+
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
 
     // Build name->texture map for a TXD slot, including textures from parent TXDs.
     // Walks the parent chain via the pool-level usParentIndex (the TXD parent linkage in SA).
@@ -711,23 +746,28 @@ namespace
                 continue;
             }
 
-            std::vector<RwTexture*> txdTextures;
-            CRenderWareSA::GetTxdTextures(txdTextures, pChainTxd);
+            const bool bEnumeratedAll = TryEnumerateTxdTextures(
+                pChainTxd,
+                [&result, pChainTxd](RwTexture* pTexture)
+                {
+                    if (!pTexture || pTexture->txd != pChainTxd)
+                        return false;
 
-            for (RwTexture* pTexture : txdTextures)
-            {
-                if (!pTexture)
-                    continue;
+                    const char* name = pTexture->name;
+                    if (strnlen(name, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
+                        result[name] = pTexture;
 
-                const char* name = pTexture->name;
-                if (strnlen(name, RW_TEXTURE_NAME_LENGTH) < RW_TEXTURE_NAME_LENGTH)
-                    result[name] = pTexture;
-            }
+                    return true;
+                });
+
+            if (!bEnumeratedAll)
+                bChainComplete = false;
         }
 
-        // A partial chain means some ancestors were not loaded, so the map
-        // is missing their textures. Return empty to prevent partial rebinds
-        // that leave unresolved textures white.
+        // A partial chain or aborted texture walk means the map is missing
+        // textures that the live model can still resolve through inheritance.
+        // Return empty to prevent partial rebinds that leave unresolved
+        // materials white.
         if (!bChainComplete)
             result.clear();
 
@@ -809,7 +849,8 @@ namespace
         return pObject;
     }
 
-    static void RebindTexturesInFrameHierarchy(RwFrame* pFrame, const TxdTextureMap& mapTxdTextures, std::vector<RwFrame*>& vecVisitedFrames, int iDepth = 0)
+    static void RebindTexturesInFrameHierarchy(RwFrame* pFrame, const TxdTextureMap& mapTxdTextures, std::unordered_set<RwFrame*>& setVisitedFrames,
+                                               int iDepth = 0)
     {
         if (!pFrame)
             return;
@@ -817,12 +858,8 @@ namespace
         if (iDepth > 128)  // cap recursion depth
             return;
 
-        for (RwFrame* pVisitedFrame : vecVisitedFrames)
-        {
-            if (pVisitedFrame == pFrame)
-                return;
-        }
-        vecVisitedFrames.push_back(pFrame);
+        if (!setVisitedFrames.insert(pFrame).second)
+            return;
 
         RwFrameForAllObjects(pFrame, RebindTexturesInFrameObjectCB, const_cast<TxdTextureMap*>(&mapTxdTextures));
 
@@ -833,7 +870,7 @@ namespace
         int      iChildCount = 0;
         while (pChild)
         {
-            RebindTexturesInFrameHierarchy(pChild, mapTxdTextures, vecVisitedFrames, iDepth + 1);
+            RebindTexturesInFrameHierarchy(pChild, mapTxdTextures, setVisitedFrames, iDepth + 1);
             pChild = pChild->next;
             if (++iChildCount > 1024)  // guard against corrupt frame linked lists
                 return;
@@ -861,8 +898,8 @@ void CRenderWareSA::RebindClumpTexturesToTxd(RpClump* pClump, unsigned short usT
 
     if (auto* pRootFrame = reinterpret_cast<RwFrame*>(pClump->object.parent))
     {
-        std::vector<RwFrame*> vecVisitedFrames;
-        RebindTexturesInFrameHierarchy(pRootFrame, mapTxdTextures, vecVisitedFrames);
+        std::unordered_set<RwFrame*> setVisitedFrames;
+        RebindTexturesInFrameHierarchy(pRootFrame, mapTxdTextures, setVisitedFrames);
     }
 }
 
@@ -1809,9 +1846,6 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, usho
     if (!pTXD)
         return;
 
-    if (!SharedUtil::IsReadablePointer(pTXD, sizeof(*pTXD)))
-        return;
-
     GetTxdTextures(outTextureList, pTXD);
 }
 
@@ -1827,56 +1861,36 @@ void CRenderWareSA::GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTe
     if (!pTXD)
         return;
 
-    // Validate TXD structure is readable (includes textures member)
-    if (!SharedUtil::IsReadablePointer(pTXD, sizeof(*pTXD)))
-        return;
-
-    constexpr std::size_t kMaxReasonableTextures = 8192;
-    if (outTextureList.size() >= kMaxReasonableTextures)
+    if (outTextureList.size() >= MAX_REASONABLE_TXD_TEXTURES)
     {
         LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
-                 SString("Texture list already contains %zu textures (limit: %zu)", outTextureList.size(), kMaxReasonableTextures), 5422);
+                 SString("Texture list already contains %zu textures (limit: %zu)", outTextureList.size(), MAX_REASONABLE_TXD_TEXTURES), 5422);
         return;
     }
 
     if (outTextureList.empty())
         outTextureList.reserve(16);
 
-    // Manual iteration avoids freezes on bad TXD lists.
-    RwListEntry* const pRoot = &pTXD->textures.root;
-    RwListEntry*       pNode = pRoot->next;
+    const std::size_t uiStartSize = outTextureList.size();
 
-    if (pNode == nullptr)
-        return;
-
-    if (pNode == pRoot)
-        return;  // Empty TXD
-
-    std::size_t iterations = 0;
-    while (pNode != pRoot)
-    {
-        if (++iterations > kMaxReasonableTextures)
+    // Use a single SEH-protected walk so valid TXDs avoid per-node VirtualQuery calls.
+    const bool bComplete = TryEnumerateTxdTextures(
+        pTXD,
+        [&outTextureList, pTXD](RwTexture* pTexture)
         {
-            LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
-                     SString("Texture list enumeration exceeded %zu iterations (possible TXD corruption/cycle)", kMaxReasonableTextures), 5422);
-            return;
-        }
+            if (!pTexture || pTexture->txd != pTXD)
+                return false;
+            if (outTextureList.size() >= MAX_REASONABLE_TXD_TEXTURES)
+                return false;
+            outTextureList.push_back(pTexture);
+            return true;
+        });
 
-        if (!SharedUtil::IsReadablePointer(pNode, sizeof(RwListEntry)))
-            return;
-
-        RwTexture* pTexture = reinterpret_cast<RwTexture*>(reinterpret_cast<char*>(pNode) - offsetof(RwTexture, TXDList));
-        if (!SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
-            return;
-
-        outTextureList.push_back(pTexture);
-        if (outTextureList.size() >= kMaxReasonableTextures)
-            return;
-
-        if (!SharedUtil::IsReadablePointer(pNode->next, sizeof(RwListEntry)))
-            return;
-
-        pNode = pNode->next;
+    if (!bComplete)
+    {
+        outTextureList.resize(uiStartSize);
+        LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
+                 SString("Texture list walk failed or exceeded %zu iterations (possible TXD corruption/cycle)", MAX_REASONABLE_TXD_TEXTURES), 5422);
     }
 }
 
@@ -1892,57 +1906,39 @@ void CRenderWareSA::GetTxdTextures(std::unordered_set<RwTexture*>& outTextureSet
     if (!pTXD)
         return;
 
-    if (!SharedUtil::IsReadablePointer(pTXD, sizeof(*pTXD)))
-        return;
-
-    constexpr std::size_t kMaxReasonableTextures = 8192;
-    if (outTextureSet.size() >= kMaxReasonableTextures)
+    if (outTextureSet.size() >= MAX_REASONABLE_TXD_TEXTURES)
     {
         LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
-                 SString("Texture set already contains %zu textures (limit: %zu)", outTextureSet.size(), kMaxReasonableTextures), 5422);
+                 SString("Texture set already contains %zu textures (limit: %zu)", outTextureSet.size(), MAX_REASONABLE_TXD_TEXTURES), 5422);
         return;
     }
 
     if (outTextureSet.empty())
         outTextureSet.reserve(16);
 
-    // Manual iteration avoids freezes on bad TXD lists.
-    RwListEntry* const pRoot = &pTXD->textures.root;
-    RwListEntry*       pNode = pRoot->next;
+    std::vector<RwTexture*> vecAddedTextures;
+    vecAddedTextures.reserve(16);
 
-    if (pNode == nullptr)
-        return;
-
-    if (pNode == pRoot)
-        return;  // Empty TXD
-
-    // The set size doesnt grow on duplicates; cap iterations separately.
-    std::size_t iterations = 0;
-    while (pNode != pRoot)
-    {
-        if (++iterations > kMaxReasonableTextures)
+    const bool bComplete = TryEnumerateTxdTextures(
+        pTXD,
+        [&outTextureSet, &vecAddedTextures, pTXD](RwTexture* pTexture)
         {
-            LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
-                     SString("Texture set enumeration exceeded %zu iterations (possible TXD corruption/cycle)", kMaxReasonableTextures), 5422);
-            return;
-        }
+            if (!pTexture || pTexture->txd != pTXD)
+                return false;
+            if (outTextureSet.size() >= MAX_REASONABLE_TXD_TEXTURES)
+                return false;
+            auto pair = outTextureSet.insert(pTexture);
+            if (pair.second)
+                vecAddedTextures.push_back(pTexture);
+            return true;
+        });
 
-        if (!SharedUtil::IsReadablePointer(pNode, sizeof(RwListEntry)))
-            return;
-
-        RwTexture* pTexture = reinterpret_cast<RwTexture*>(reinterpret_cast<char*>(pNode) - offsetof(RwTexture, TXDList));
-        if (!SharedUtil::IsReadablePointer(pTexture, sizeof(RwTexture)))
-            return;
-
-        if (outTextureSet.size() >= kMaxReasonableTextures)
-            return;
-
-        outTextureSet.insert(pTexture);
-
-        if (!SharedUtil::IsReadablePointer(pNode->next, sizeof(RwListEntry)))
-            return;
-
-        pNode = pNode->next;
+    if (!bComplete)
+    {
+        for (RwTexture* pTexture : vecAddedTextures)
+            outTextureSet.erase(pTexture);
+        LogEvent(852, "Texture enumeration aborted", "CRenderWareSA::GetTxdTextures",
+                 SString("Texture set walk failed or exceeded %zu iterations (possible TXD corruption/cycle)", MAX_REASONABLE_TXD_TEXTURES), 5422);
     }
 }
 
