@@ -638,7 +638,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
                                             // Send it to the player
                                             pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, false, MESSAGE_TYPE_PRIVATE));
 
-                                            // Send a reponse to the player who sent it
+                                            // Send a response to the player who sent it
                                             pEchoClient->SendEcho(SString("-> %s: %s", pPlayer->GetNick(), szMessage));
                                         }
                                         break;
@@ -788,7 +788,7 @@ bool CConsoleCommands::Nick(CConsole* pConsole, const char* szArguments, CClient
                         const char* szNick = pClient->GetNick();
                         if (!szNick || strcmp(szNewNick, szNick) != 0)
                         {
-                            // Check that it doesn't already exist, or if it matches our current nick case-independantly (means we changed to the same nick but
+                            // Check that it doesn't already exist, or if it matches our current nick case-independently (means we changed to the same nick but
                             // in a different case)
                             if ((szNick && stricmp(szNick, szNewNick) == 0) || !pConsole->GetPlayerManager()->Get(szNewNick))
                             {

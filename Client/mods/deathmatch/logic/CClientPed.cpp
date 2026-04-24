@@ -2482,7 +2482,7 @@ eMovementState CClientPed::GetMovementState()
         }
         else
         {
-            // Is he moving the contoller at all?
+            // Is he moving the controller at all?
             if (cs.LeftStickX == 0 && cs.LeftStickY == 0)
                 return MOVEMENTSTATE_CROUCH;
             else
@@ -4108,7 +4108,7 @@ void CClientPed::RebuildModel(bool bDelayChange)
         // We are CJ?
         if (m_ulModel == 0)
         {
-            // Adds only the neccesary textures
+            // Adds only the necessary textures
             m_pClothes->RefreshClothes();
             m_pClothes->AddAllToModel();
 
@@ -5836,7 +5836,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
                 flags |= 0x80;
             }
 
-            // Kill any higher priority tasks if we dont want this anim interuptable
+            // Kill any higher priority tasks if we dont want this anim interruptible
             if (!bInterruptable)
             {
                 KillTask(TASK_PRIORITY_PHYSICAL_RESPONSE);
@@ -6336,7 +6336,7 @@ void CClientPed::RestoreAllAnimations()
                 auto pAnimStaticAssociation = pAnimationManager->GetAnimStaticAssociation(iGroupID, iAnimID);
                 if (pAnimStaticAssociation && pAnimHierarchy->IsCustom())
                 {
-                    auto pAnimHierarchyInterface = pAnimStaticAssociation->GetAnimHierachyInterface();
+                    auto pAnimHierarchyInterface = pAnimStaticAssociation->GetAnimHierarchyInterface();
                     CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface, pAnimHierarchyInterface);
                 }
             }

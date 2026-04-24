@@ -2203,7 +2203,7 @@ bool CResource::IncludedFileExists(const char* szName, int iType)
         // Is it the required type?
         if (iType == CResourceFile::RESOURCE_FILE_TYPE_NONE || pResourceFile->GetType() == iType)
         {
-            // Check if the name compares equal (case independant)
+            // Check if the name compares equal (case independent)
             if (!stricmp(pResourceFile->GetName(), szName))
                 return true;
         }

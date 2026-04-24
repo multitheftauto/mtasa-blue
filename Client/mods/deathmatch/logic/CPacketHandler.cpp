@@ -30,7 +30,7 @@ class CCore;
 std::wstring utf8_mbstowcs(const std::string& str);
 std::string  utf8_wcstombs(const std::wstring& wstr);
 
-// TODO: Make this independant of g_pClientGame. Just moved it here to get it out of the
+// TODO: Make this independent of g_pClientGame. Just moved it here to get it out of the
 //       horribly big CClientGame file.
 bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream)
 {

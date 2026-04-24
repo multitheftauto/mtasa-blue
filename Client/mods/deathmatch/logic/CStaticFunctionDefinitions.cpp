@@ -9998,7 +9998,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
         if (pPed->IsDead() || pVehicle->GetHealth() <= 0.0f)
             return false;
 
-        // Toss the previous player out of it if neccessary
+        // Toss the previous player out of it if necessary
         if (CClientPed* pPreviousOccupant = pVehicle->GetOccupant(uiSeat))
             RemovePedFromVehicle(pPreviousOccupant);
 

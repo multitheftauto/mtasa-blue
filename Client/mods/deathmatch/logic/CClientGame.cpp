@@ -679,7 +679,7 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
         if (pBitStream)
         {
-            // Hash the password if neccessary
+            // Hash the password if necessary
             MD5 Password;
             memset(Password.data, 0, sizeof(MD5));
             if (szPassword)
@@ -1680,7 +1680,7 @@ void CClientGame::SetMimic(unsigned int uiMimicCount)
     if (uiMimicCount > MAX_MIMICS)
         return;
 
-    // Create neccessary players
+    // Create necessary players
     while (m_Mimics.size() < uiMimicCount)
     {
         CClientPlayer* pPlayer = new CClientPlayer(m_pManager, static_cast<ElementID>(MAX_NET_PLAYERS_REAL + (int)m_Mimics.size()));
@@ -1688,7 +1688,7 @@ void CClientGame::SetMimic(unsigned int uiMimicCount)
         m_Mimics.push_back(pPlayer);
     }
 
-    // Destroy neccessary players
+    // Destroy necessary players
     while (m_Mimics.size() > uiMimicCount)
     {
         CClientPlayer*  pPlayer = m_Mimics.back();
@@ -4019,7 +4019,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     }
 
     auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(iGroupID, animID);
-    auto pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
+    auto pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierarchyInterface();
     auto pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
 
     CClientPed* pClientPed = GetClientPedByClump(*pClump);
@@ -4036,7 +4036,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
                     (iGroupID >= eAnimGroup::ANIM_GROUP_PLAYER && iGroupID <= eAnimGroup::ANIM_GROUP_PLAYERJETPACK) || iGroupID >= eAnimGroup::ANIM_GROUP_MAN)
                 {
                     auto pDuckAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(eAnimGroup::ANIM_GROUP_DEFAULT, eAnimID::ANIM_ID_WEAPON_CROUCH);
-                    pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pDuckAnimStaticAssoc->GetAnimHierachyInterface());
+                    pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pDuckAnimStaticAssoc->GetAnimHierarchyInterface());
                     isCustomAnimationToPlay = true;
                 }
             }

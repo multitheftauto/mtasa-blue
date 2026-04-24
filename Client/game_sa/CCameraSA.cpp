@@ -146,7 +146,7 @@ void CCameraSA::RestoreWithJumpCut()
 }
 
 /**
- * \todo Find out what the last two paramters are
+ * \todo Find out what the last two parameters are
  */
 void CCameraSA::TakeControl(CEntity* entity, eCamMode CamMode, int CamSwitchStyle)
 {

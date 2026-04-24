@@ -2176,7 +2176,7 @@ bool CStaticFunctionDefinitions::SetPlayerName(CElement* pElement, const char* s
                     const char* szNick = pPlayer->GetNick();
                     if (szNick == NULL || strcmp(szName, szNick) != 0)
                     {
-                        // Check that it doesn't already exist, or if it matches our current nick case-independantly (means we changed to the same nick but in a
+                        // Check that it doesn't already exist, or if it matches our current nick case-independently (means we changed to the same nick but in a
                         // different case)
                         if ((szNick && stricmp(szNick, szName) == 0) || m_pPlayerManager->Get(szName) == NULL)
                         {
@@ -4297,7 +4297,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
                 // Make sure no one is entering or he will get stuck in the entry packet handshaking and network trouble
                 if (pPreviousOccupant == NULL || (pPreviousOccupant && pPreviousOccupant->GetVehicleAction() == CPed::VEHICLEACTION_NONE))
                 {
-                    // Toss the previous player out of it if neccessary
+                    // Toss the previous player out of it if necessary
                     if (pPreviousOccupant)
                     {
                         // Remove him from the vehicle

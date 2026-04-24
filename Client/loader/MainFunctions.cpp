@@ -898,7 +898,7 @@ void ConfigureWerDumpPath()
 // Commands are often stored in the registry by the installer and client.
 //
 // "L0" is opened before the launch sequence and is closed if MTA shutsdown with no error
-// "L1" is opened before the launch sequence and is closed if GTA is succesfully started
+// "L1" is opened before the launch sequence and is closed if GTA is successfully started
 // "CR1" is a counter which is incremented if GTA was not started and MTA shutsdown with an error
 //
 // "L2" is opened before the launch sequence and is closed if the GTA loading screen is shown
