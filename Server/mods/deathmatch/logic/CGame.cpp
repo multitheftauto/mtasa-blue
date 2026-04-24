@@ -2084,6 +2084,13 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
     CPed* pPed = GetElementFromId<CPed>(Packet.m_PedID);
     if (pPed && !pPed->IsDead())
     {
+        CVehicle* pVehicle = pPed->GetOccupiedVehicle();
+
+        // Non syncable peds should be ignored unless in vehicle (Fix for 3598)
+        // We allow it when the ped is in the vehicle to avoid breaking a case where the ped should actually die (vehicle explosion)
+        if (!pPed->IsSyncable() && !pVehicle)
+            return;
+
         pPed->SetIsDead(true);
         pPed->SetHealth(0.0f);
         pPed->SetArmor(0.0f);
@@ -2096,7 +2103,6 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
             pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
         // Remove him from any occupied vehicle
-        CVehicle* pVehicle = pPed->GetOccupiedVehicle();
         if (pVehicle)
         {
             pVehicle->SetOccupant(NULL, pPed->GetOccupiedVehicleSeat());
