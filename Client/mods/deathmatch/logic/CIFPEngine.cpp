@@ -120,8 +120,8 @@ bool CIFPEngine::EngineApplyAnimation(CClientPed& Ped, CAnimBlendHierarchySAInte
         if (pCurrentAnimAssociation)
         {
             auto pCurrentAnimHierarchy = pCurrentAnimAssociation->GetAnimHierarchy();
-            auto pAssocHierachyInterface = pCurrentAnimHierarchy->GetInterface();
-            if (pAssocHierachyInterface == pAnimHierarchyInterface)
+            auto pAssocHierarchyInterface = pCurrentAnimHierarchy->GetInterface();
+            if (pAssocHierarchyInterface == pAnimHierarchyInterface)
             {
                 return true;
             }
