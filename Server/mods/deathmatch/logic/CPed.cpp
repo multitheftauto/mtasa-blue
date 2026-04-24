@@ -208,6 +208,14 @@ bool CPed::ReadSpecialData(const int iLine)
     {
         // Is it valid?
         unsigned short usModel = static_cast<unsigned short>(iTemp);
+        if (usModel == 271)
+        {
+            // Reject the duplicate Ryder entry at map-load time so map data cannot silently
+            // keep reviving a skin ID that was intentionally removed from the supported set.
+            CLogger::ErrorPrintf("Removed 'model' id 271 specified in <ped>; use 300 instead (line %d)\n", iLine);
+            return false;
+        }
+
         if (CPedManager::IsValidModel(usModel))
         {
             // Remember it and generate a new random color

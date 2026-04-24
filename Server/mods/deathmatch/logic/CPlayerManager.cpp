@@ -345,6 +345,7 @@ bool CPlayerManager::IsValidPlayerModel(unsigned short model)
         case 74:  // Missing skin
         case 149:
         case 208:
+        case 271:  // Removed duplicate Ryder skin, use 300 instead
             return false;
         default:
             return true;

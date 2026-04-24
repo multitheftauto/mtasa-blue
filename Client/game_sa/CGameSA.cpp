@@ -1015,7 +1015,6 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[268].MakePedModel("DWAYNE");
     ModelInfo[269].MakePedModel("SMOKE");
     ModelInfo[270].MakePedModel("SWEET");
-    ModelInfo[271].MakePedModel("RYDER");
     ModelInfo[272].MakePedModel("FORELLI");
     ModelInfo[273].MakePedModel("MEDIATR");
     ModelInfo[289].MakePedModel("SOMYAP");
@@ -1029,6 +1028,8 @@ void CGameSA::SetupSpecialCharacters()
     ModelInfo[297].MakePedModel("MADDOGG");
     ModelInfo[298].MakePedModel("CAT");
     ModelInfo[299].MakePedModel("CLAUDE");
+    // Keep Ryder available through the canonical 300 entry only so scripts and tools no longer
+    // see 271 as a separate selectable skin.
     ModelInfo[300].MakePedModel("RYDER2");
     ModelInfo[301].MakePedModel("RYDER3");
     ModelInfo[302].MakePedModel("EMMET");
