@@ -2088,14 +2088,8 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
 
         // Non syncable peds should be fully ignored unless in vehicle (Fix for 3598)
         // We allow it only if the ped should die from their occupied vehicle exploding or drowning
-        if (!pPed->IsSyncable())
-        {
-            if (!pVehicle)
-                return;
-        
-            if (Packet.m_ucKillerWeapon != 51 && Packet.m_ucKillerWeapon != 53)
-                return;
-        }
+        if (!pPed->IsSyncable() && (!pVehicle || (Packet.m_ucKillerWeapon != 51 && Packet.m_ucKillerWeapon != 53)))
+            return;
 
         pPed->SetIsDead(true);
         pPed->SetHealth(0.0f);
