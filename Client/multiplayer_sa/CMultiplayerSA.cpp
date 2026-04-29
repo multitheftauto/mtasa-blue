@@ -16,7 +16,6 @@
 #include <game/CPedDamageResponse.h>
 #include <game/CEventList.h>
 #include <game/CEventDamage.h>
-#include <cmath>
 
 class CEventDamageSAInterface;
 
@@ -807,7 +806,7 @@ void CMultiplayerSA::InitHooks()
     // Disable CPopulation::RemovePed
     MemPut<BYTE>(0x610F20, 0xC3);
 
-    // Legacy disabled hand-up patch retained as commented reference.
+    // Temporary hack for disabling hand up
     /*
     MemPut < BYTE > ( 0x62AEE7, 0x90 );
     MemPut < BYTE > ( 0x62AEE8, 0x90 );
@@ -4887,94 +4886,12 @@ CMatrix gravcam_matInvertGravity;
 CMatrix gravcam_matVehicleTransform;
 CVector gravcam_vecVehicleVelocity;
 
-// Last finite follow-camera angles observed in VehicleCamLookDir2.
-// Used only when Process_FollowCar yields non-finite beta/betaSpeed/alpha
-// so camera mode stays unchanged and look-direction reconstruction is valid.
-struct FollowCamLastGoodAngles
-{
-    bool  valid;
-    float beta;
-    float alpha;
-};
-static FollowCamLastGoodAngles s_lastGoodAngles{};
-
-static void RecoverFollowCamState(DWORD dwCam)
-{
-    auto badf = [](float v) { return !std::isfinite(v); };
-
-    const float rawBeta = *(float*)(dwCam + 0xBC);
-    const float rawTargetBeta = *(float*)(dwCam + 0x8C);
-    const float rawBetaSpd = *(float*)(dwCam + 0xC0);
-    const float rawAlpha = *(float*)(dwCam + 0xAC);
-    const float rawTrueBeta = *(float*)(dwCam + 0xA0);
-
-    const bool badBeta = badf(rawBeta);
-    const bool badTargetBeta = badf(rawTargetBeta);
-    const bool badBetaSpd = badf(rawBetaSpd);
-    const bool badAlpha = badf(rawAlpha);
-
-    if (!badBeta && !badTargetBeta && !badBetaSpd && !badAlpha)
-    {
-        s_lastGoodAngles = FollowCamLastGoodAngles{true, rawBeta, rawAlpha};
-        return;
-    }
-
-    // Prefer live SA values first, then a recent finite snapshot.
-    float safeBeta = rawBeta;
-    if (badf(safeBeta))
-    {
-        if (std::isfinite(rawTrueBeta))
-            safeBeta = rawTrueBeta;
-        else if (std::isfinite(rawTargetBeta))
-            safeBeta = rawTargetBeta;
-        else if (s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.beta))
-            safeBeta = s_lastGoodAngles.beta;
-        else
-            safeBeta = 0.0f;
-    }
-
-    float safeAlpha = rawAlpha;
-    if (badf(safeAlpha))
-    {
-        if (s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.alpha))
-            safeAlpha = s_lastGoodAngles.alpha;
-        else
-            safeAlpha = 0.0f;
-    }
-
-    // Only touch fields that are invalid. Keeping valid fields untouched avoids
-    // fighting SA's own follow-cam smoothing and mouse input handling.
-    if (badBeta)
-        *(float*)(dwCam + 0xBC) = safeBeta;
-
-    if (badTargetBeta)
-        *(float*)(dwCam + 0x8C) = safeBeta;
-
-    if (badBetaSpd)
-        *(float*)(dwCam + 0xC0) = 0.0f;
-
-    if (badAlpha)
-        *(float*)(dwCam + 0xAC) = safeAlpha;
-
-    if (std::isfinite(safeBeta) && std::isfinite(safeAlpha))
-        s_lastGoodAngles = FollowCamLastGoodAngles{true, safeBeta, safeAlpha};
-}
-
-static void GetSafeFollowCamAngles(DWORD dwCam, float& outBeta, float& outAlpha)
-{
-    RecoverFollowCamState(dwCam);
-
-    outBeta = *(float*)(dwCam + 0xBC);
-    outAlpha = *(float*)(dwCam + 0xAC);
-
-    if (!std::isfinite(outBeta))
-        outBeta = 0.0f;
-    if (!std::isfinite(outAlpha))
-        outAlpha = 0.0f;
-}
-
 bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
 {
+    // Inverse transform some things so that they match a downward pointing gravity.
+    // This way SA's gravity-goes-downward assumptive code can calculate the camera
+    // spherical coords correctly. Of course we restore these after the camera function
+    // completes.
     SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
     CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (!pVehicle)
@@ -4995,7 +4912,6 @@ bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
     pVehicle->GetMoveSpeed(&gravcam_vecVehicleVelocity);
     CVector vecVelocityInverted = gravcam_matInvertGravity * gravcam_vecVehicleVelocity;
     pVehicle->SetMoveSpeed(vecVelocityInverted);
-
     return true;
 }
 
@@ -5066,8 +4982,8 @@ static void __declspec(naked) HOOK_VehicleCamTargetZTweak()
 
 void _cdecl VehicleCamLookDir1(DWORD dwCam, DWORD pVehicleInterface)
 {
-    // For the same reason as in VehicleCamStart, inverse transform the
-    // camera look direction at this point.
+    // For the same reason as in VehicleCamStart, inverse transform the camera's lookdir
+    // at this point
     CVector* pvecLookDir = (CVector*)(dwCam + 0x190);
     *pvecLookDir = gravcam_matInvertGravity * (*pvecLookDir);
 }
@@ -5110,17 +5026,16 @@ static void __declspec(naked) HOOK_VehicleCamLookDir1()
     // clang-format on
 }
 
+// ---------------------------------------------------
+
 bool _cdecl VehicleCamLookDir2(DWORD dwCam)
 {
-    // Repair only invalid follow-cam internals, then use the sanitized angles
-    // for output reconstruction.
-    float fPhi = 0.0f;
-    float fTheta = 0.0f;
-    GetSafeFollowCamAngles(dwCam, fPhi, fTheta);
-
     // Calculates the look direction vector for the vehicle camera. This vector
     // is later multiplied by a factor and added to the vehicle position by SA
     // to obtain the final camera position.
+    float fPhi = *(float*)(dwCam + 0xBC);
+    float fTheta = *(float*)(dwCam + 0xAC);
+
     MemPutFast<CVector>(dwCam + 0x190, -gravcam_matGravity.vRight * cos(fPhi) * cos(fTheta) - gravcam_matGravity.vFront * sin(fPhi) * cos(fTheta) +
                                            gravcam_matGravity.vUp * sin(fTheta));
 
@@ -5151,10 +5066,7 @@ static void __declspec(naked) HOOK_VehicleCamLookDir2()
 
 void _cdecl VehicleCamHistory(DWORD dwCam, CVector* pvecTarget, float fTargetTheta, float fRadius, float fZoom)
 {
-    float fPhi = 0.0f;
-    float fAlphaIgnored = 0.0f;
-    GetSafeFollowCamAngles(dwCam, fPhi, fAlphaIgnored);
-
+    float   fPhi = *(float*)(dwCam + 0xBC);
     CVector vecDir = -gravcam_matGravity.vRight * cos(fPhi) * cos(fTargetTheta) - gravcam_matGravity.vFront * sin(fPhi) * cos(fTargetTheta) +
                      gravcam_matGravity.vUp * sin(fTargetTheta);
     ((CVector*)(dwCam + 0x1D8))[0] = *pvecTarget - vecDir * fRadius;
@@ -5228,7 +5140,7 @@ docustom:
 
 // ---------------------------------------------------
 
-void _cdecl VehicleCamEnd(DWORD dwCam, DWORD pVehicleInterface)
+void _cdecl VehicleCamEnd(DWORD pVehicleInterface)
 {
     // Restore the things that we inverse transformed in VehicleCamStart
     SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
@@ -5249,11 +5161,9 @@ static void __declspec(naked) HOOK_VehicleCamEnd()
     {
         mov ds:[0xB6F020], edx
 
-        // esi = CCam*, edi = pVehicleInterface at this hook site
         push edi
-        push esi
         call VehicleCamEnd
-        add esp, 8
+        add esp, 4
 
         jmp RETURN_VehicleCamEnd
     }
