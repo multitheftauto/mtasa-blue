@@ -311,6 +311,14 @@ bool CBassAudio::BeginLoadingMedia()
         }
         m_pSound = pReversed;
         BASS_ChannelSetAttribute(m_pSound, BASS_ATTRIB_REVERSE_DIR, BASS_FX_RVS_FORWARD);
+
+        // Loop on the reverse (pre-tempo) stream so the time-stretch wrapper
+        // above sees a continuous source and never flushes its internal state
+        // at the loop boundary. Looping only on the outer tempo stream causes
+        // an audible seam for OGG iterations (#4084).
+        if (m_bLoop && BASS_ChannelFlags(m_pSound, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP) == -1)
+            g_pCore->GetConsole()->Printf("BASS ERROR %d in LoadMedia ChannelFlags LOOP (reverse)  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath,
+                                          m_b3D, m_bLoop);
         // Sucks.
         /*if ( BASS_FX_BPM_CallbackSet ( m_pSound, (BPMPROC*)&BPMCallback, 1, 0, 0, m_uiCallbackId ) == false )
         {
@@ -955,6 +963,11 @@ bool CBassAudio::SetLooped(bool bLoop)
         return false;
 
     m_bLoop = bLoop;
+
+    // Keep the reverse (pre-tempo) source in sync; the tempo wrapper relies on
+    // looping happening one layer below it to avoid an audible seam (#4084).
+    if (HSTREAM hSource = BASS_FX_TempoGetSource(m_pSound))
+        BASS_ChannelFlags(hSource, bLoop ? BASS_SAMPLE_LOOP : 0, BASS_SAMPLE_LOOP);
 
     return BASS_ChannelFlags(m_pSound, bLoop ? BASS_SAMPLE_LOOP : 0, BASS_SAMPLE_LOOP);
 }
