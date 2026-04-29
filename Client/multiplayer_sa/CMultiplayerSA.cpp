@@ -5087,6 +5087,24 @@ static void __declspec(naked) HOOK_VehicleCamLookDir1()
         call VehicleCamLookDir1
         add esp, 8
 
+        // The lateral-velocity sqrt at 0x524F23/0x524F29 inside
+        // CCam::Process_FollowCar_SA peaks at depth 8 on the x87 stack with
+        // zero margin. If MSVC's codegen for the matInvertGravity * vec
+        // expression above leaves any tagged register behind, that block
+        // overflows and (with IM masked) writes the floating-point
+        // indefinite into the lateral magnitude, which then propagates
+        // through the NaN-blind fcom/jp/jnz clamps into m_fBetaSpeed and
+        // m_fHorizontalAngle. Empty the x87 stack here so vanilla SA
+        // resumes at depth 0 like it was authored to expect (#3979).
+        ffree st(0)
+        ffree st(1)
+        ffree st(2)
+        ffree st(3)
+        ffree st(4)
+        ffree st(5)
+        ffree st(6)
+        ffree st(7)
+
         jmp RETURN_VehicleCamLookDir1
     }
     // clang-format on
