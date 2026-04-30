@@ -2673,6 +2673,10 @@ void CClientVehicle::Create()
             m_pVehicle->SetHeliRotorSpeed(m_fHeliRotorSpeed);
             m_pVehicle->SetHeliSearchLightVisible(m_bHeliSearchLightVisible);
         }
+        else if (m_eVehicleType == CLIENTVEHICLE_PLANE)
+        {
+            m_pVehicle->SetPlaneRotorSpeed(m_fPlaneRotorSpeed);
+        }
 
         m_pVehicle->SetUnderwater(IsBelowWater());
 
@@ -2995,6 +2999,7 @@ void CClientVehicle::Destroy()
         m_bEngineOn = m_pVehicle->IsEngineOn();
         m_bIsOnGround = IsOnGround();
         m_fHeliRotorSpeed = GetHeliRotorSpeed();
+        m_fPlaneRotorSpeed = GetPlaneRotorSpeed();
         m_bHeliSearchLightVisible = IsHeliSearchLightVisible();
         m_HandlingEntry->Assign(m_pVehicle->GetHandlingData());
         m_FlyingHandlingEntry->Assign(m_pVehicle->GetFlyingHandlingData());
