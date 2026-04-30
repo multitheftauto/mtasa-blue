@@ -267,4 +267,5 @@ extern "C"
 namespace CrashHandler
 {
     [[nodiscard]] bool ProcessHasLocalDebugSymbols();
+    [[nodiscard]] bool InitializeSymbolHandler();
 }

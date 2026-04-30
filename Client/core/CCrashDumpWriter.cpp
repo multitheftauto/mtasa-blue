@@ -282,61 +282,7 @@ static bool InvokeClientHandleExceptionSafe(CClientBase* pClient, CExceptionInfo
 
 namespace
 {
-    void ConfigureDbgHelpOptions()
-    {
-        static std::atomic_flag configured = ATOMIC_FLAG_INIT;
-        if (!configured.test_and_set(std::memory_order_acq_rel))
-        {
-            SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS | SYMOPT_DEFERRED_LOADS);
-        }
-    }
-
-    std::mutex& GetSymInitMutex()
-    {
-        static std::mutex symMutex;
-        return symMutex;
-    }
 }  // namespace
-
-class SymbolHandlerGuard
-{
-public:
-    explicit SymbolHandlerGuard(HANDLE process, bool enableSymbols) : m_process(process), m_initialized(false)
-    {
-        if (!enableSymbols)
-            return;
-
-        if (m_process != nullptr)
-        {
-            std::lock_guard<std::mutex> lock{GetSymInitMutex()};
-
-            ConfigureDbgHelpOptions();
-
-            const SString& processDir = SharedUtil::GetMTAProcessBaseDir();
-            const char*    searchPath = processDir.empty() ? nullptr : processDir.c_str();
-
-            if (SymInitialize(m_process, searchPath, TRUE) != FALSE)
-                m_initialized = true;
-        }
-    }
-
-    ~SymbolHandlerGuard()
-    {
-        if (m_initialized)
-            SymCleanup(m_process);
-    }
-
-    SymbolHandlerGuard(const SymbolHandlerGuard&) = delete;
-    SymbolHandlerGuard& operator=(const SymbolHandlerGuard&) = delete;
-    SymbolHandlerGuard(SymbolHandlerGuard&&) = delete;
-    SymbolHandlerGuard& operator=(SymbolHandlerGuard&&) = delete;
-
-    bool IsInitialized() const { return m_initialized; }
-
-private:
-    HANDLE m_process;
-    bool   m_initialized;
-};
 
 [[nodiscard]] static bool NormalizePathForValidation(const SString& inputPath, SString& outputPath)
 {
@@ -767,9 +713,11 @@ static void AppendCrashDiagnostics(const SString& text)
     frame.AddrFrame.Mode = AddrModeFlat;
     frame.AddrStack.Mode = AddrModeFlat;
 
-    SymbolHandlerGuard symbolGuard(hProcess, hasSymbols);
-
-    const bool useDbgHelp = symbolGuard.IsInitialized();
+    bool useDbgHelp = false;
+    if (hasSymbols)
+    {
+        useDbgHelp = CrashHandler::InitializeSymbolHandler();
+    }
     const auto routines = useDbgHelp ? StackTraceHelpers::MakeStackWalkRoutines(true) : StackTraceHelpers::MakeStackWalkRoutines(false);
 
     static_assert(MAX_SYM_NAME > 1, "MAX_SYM_NAME must include room for a terminator");
@@ -1473,20 +1421,6 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::HandleExceptionGlobal - NULL or invalid exception\n");
         TerminateCurrentProcessWithExitCode(crashExitCode);
         return EXCEPTION_EXECUTE_HANDLER;
-    }
-
-    if (IsFatalException(exceptionCode) == FALSE)
-    {
-        std::array<char, DEBUG_BUFFER_SIZE> szDebug;
-        SAFE_DEBUG_PRINT_C(szDebug.data(), szDebug.size(), "CCrashDumpWriter: Non-fatal exception 0x%08X - ignoring\n", exceptionCode);
-        ms_bInCrashHandler.store(false, std::memory_order_release);
-        return EXCEPTION_CONTINUE_SEARCH;
-    }
-
-    const BOOL exceptionLogged = LogExceptionDetails(pException);
-    if (exceptionLogged == FALSE)
-    {
-        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: WARNING - LogExceptionDetails failed\n");
     }
 
     SAFE_DEBUG_OUTPUT("CCrashDumpWriter: ======================================\n");
