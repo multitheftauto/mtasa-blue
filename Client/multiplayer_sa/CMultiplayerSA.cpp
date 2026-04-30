@@ -3512,20 +3512,25 @@ static void __declspec(naked) HOOK_Render3DStuff()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // Run GTA's Render3DStuff first (it draws sun/moon flare, coronas, etc.
+    // with loose depth testing). Invoking the handler afterwards lets it
+    // render on top, so script-drawn models aren't bled through by the moon.
     // clang-format off
     __asm
     {
         pushad
+        mov  eax, FUNC_Render3DStuff
+        call eax
     }
     // clang-format on
+
     if (m_pRender3DStuffHandler) m_pRender3DStuffHandler();
 
     // clang-format off
     __asm
     {
         popad
-        mov eax, FUNC_Render3DStuff
-        jmp eax
+        ret
     }
     // clang-format on
 }

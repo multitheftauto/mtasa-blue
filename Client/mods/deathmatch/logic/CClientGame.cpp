@@ -3888,8 +3888,8 @@ void CClientGame::ProjectileInitiateHandler(CClientProjectile* pProjectile)
 void CClientGame::Render3DStuffHandler()
 {
     // Render models enqueued by scripts during the previous frame's
-    // onClientRender. This hook fires after GTA's full scene render,
-    // which is the earliest point where the queue is populated.
+    // onClientRender. This hook fires after GTA's Render3DStuff pass
+    // (sun/moon flare, coronas), so those don't bleed through our models.
     CModelRenderer* pModelRenderer = GetModelRenderer();
     pModelRenderer->Render();
     pModelRenderer->NotifyFrameEnd();
