@@ -106,6 +106,15 @@ void OutputDebugStringSafeImpl(const char* message)
     if (message == nullptr)
         return;
 
+    // Skip OutputDebugStringA when no debugger is attached.
+    //
+    // OutputDebugStringA raises an exception under the hood so a debugger
+    // can read the message; with no debugger attached the call is just
+    // unnecessary work and an extra exception-dispatch site. Suppressing it
+    // here is a robustness improvement on a path that runs frequently.
+    if (!IsDebuggerPresent())
+        return;
+
     __try
     {
         OutputDebugStringA(message);
@@ -1174,11 +1183,16 @@ public:
     CleanUpCrashHandler() = default;
     ~CleanUpCrashHandler()
     {
-        std::scoped_lock lock{g_handlerStateMutex};
+        // Minimal teardown for process-exit/DLL-unload path.
+        // Avoid restoring detours/CRT handlers here: teardown order during
+        // shutdown is unstable, and touching patched global handler state
+        // late can itself fault. Keep SymCleanup for dbghelp resources, and
+        // avoid taking g_handlerStateMutex in this destructor.
 
         g_bStackCookieCaptureEnabled.store(false, std::memory_order_release);
         g_pfnCrashCallback.store(nullptr, std::memory_order_release);
 
+        // Release dbghelp symbol resources
         if (g_symbolsInitialized.exchange(false, std::memory_order_acq_rel))
         {
             if (HANDLE hProcess = g_symbolProcess.exchange(nullptr, std::memory_order_acq_rel); hProcess != nullptr)
@@ -1188,44 +1202,14 @@ public:
             }
         }
 
-        if (auto terminateHandler = g_pfnOrigTerminate.exchange(nullptr, std::memory_order_acq_rel); terminateHandler != nullptr)
-        {
-            std::set_terminate(terminateHandler);
-        }
-
-        if (auto newHandler = g_pfnOrigNewHandler.exchange(nullptr, std::memory_order_acq_rel); newHandler != nullptr)
-        {
-#if defined(_MSC_VER)
-            _set_new_handler(newHandler);
-#else
-            std::set_new_handler(newHandler);
-#endif
-        }
-
-        if (auto abortHandler = g_pfnOrigAbortHandler.exchange(nullptr, std::memory_order_acq_rel); abortHandler != nullptr)
-        {
-            signal(SIGABRT, abortHandler);
-        }
-
-        if (auto pureCallHandler = g_pfnOrigPureCall.exchange(nullptr, std::memory_order_acq_rel); pureCallHandler != nullptr)
-        {
-            _set_purecall_handler(pureCallHandler);
-        }
-
-        if (auto previousFilter = g_pfnOrigFilt.exchange(nullptr, std::memory_order_acq_rel); previousFilter != nullptr)
-        {
-            SetUnhandledExceptionFilter(previousFilter);
-        }
-
-        if (auto kernelSetUnhandled = g_pfnKernelSetUnhandledExceptionFilter.exchange(nullptr, std::memory_order_acq_rel); kernelSetUnhandled != nullptr)
-        {
-            g_kernelSetUnhandledExceptionFilterTrampoline = kernelSetUnhandled;
-            if (!SharedUtil::UndoFunctionDetour(g_kernelSetUnhandledExceptionFilterTrampoline, reinterpret_cast<void*>(RedirectedSetUnhandledExceptionFilter)))
-            {
-                SafeDebugOutput("CrashHandler: WARNING - Failed to undo SEH detour during cleanup\n");
-            }
-            g_kernelSetUnhandledExceptionFilterTrampoline = nullptr;
-        }
+        // Clear cached state without restoration in teardown path
+        g_pfnOrigTerminate.store(nullptr, std::memory_order_release);
+        g_pfnOrigNewHandler.store(nullptr, std::memory_order_release);
+        g_pfnOrigAbortHandler.store(nullptr, std::memory_order_release);
+        g_pfnOrigPureCall.store(nullptr, std::memory_order_release);
+        g_pfnOrigFilt.store(nullptr, std::memory_order_release);
+        g_pfnKernelSetUnhandledExceptionFilter.store(nullptr, std::memory_order_release);
+        g_kernelSetUnhandledExceptionFilterTrampoline = nullptr;
     }
 };
 
@@ -2820,6 +2804,7 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
             SafeDebugOutput("SEH: FATAL - Stack overflow detected - _resetstkoflw() failed\n");
             // If we can't reset the stack, we can't safely do anything else.
             // Attempting to log or call handlers will likely trigger another overflow immediately.
+            bHandlerActive.store(false, std::memory_order_release);
             return EXCEPTION_CONTINUE_SEARCH;
         }
     }

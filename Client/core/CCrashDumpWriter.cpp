@@ -1479,6 +1479,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     {
         std::array<char, DEBUG_BUFFER_SIZE> szDebug;
         SAFE_DEBUG_PRINT_C(szDebug.data(), szDebug.size(), "CCrashDumpWriter: Non-fatal exception 0x%08X - ignoring\n", exceptionCode);
+        ms_bInCrashHandler.store(false, std::memory_order_release);
         return EXCEPTION_CONTINUE_SEARCH;
     }
 
@@ -1557,6 +1558,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
             {
                 SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Client handled exception - continuing execution\n");
                 delete pExceptionInformation;
+                ms_bInCrashHandler.store(false, std::memory_order_release);
                 return EXCEPTION_CONTINUE_SEARCH;
             }
 
