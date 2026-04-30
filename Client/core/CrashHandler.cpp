@@ -1183,10 +1183,9 @@ public:
     ~CleanUpCrashHandler()
     {
         // Minimal teardown for process-exit/DLL-unload path.
-        // Avoid restoring detours/CRT handlers here: teardown order during
-        // shutdown is unstable, and touching patched global handler state
-        // late can itself fault. Keep SymCleanup for dbghelp resources, and
-        // avoid taking g_handlerStateMutex in this destructor.
+        // Avoid restoring detours/CRT handlers here: teardown order is unstable, and touching
+        // patched/global handler state late can crash (including /GS 0xC0000409 on exit).
+        // Keep SymCleanup for dbghelp resources, and avoid g_handlerStateMutex in this destructor.
 
         g_bStackCookieCaptureEnabled.store(false, std::memory_order_release);
         g_pfnCrashCallback.store(nullptr, std::memory_order_release);
