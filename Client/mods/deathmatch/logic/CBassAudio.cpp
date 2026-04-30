@@ -1167,7 +1167,13 @@ void CBassAudio::ApplyFxEffects()
             // Switch on
             m_FxEffects[i] = BASS_ChannelSetFX(m_pSound, i, 0);
             if (!m_FxEffects[i])
+            {
+                // Effect could not be wired up by BASS. Notable case: Windows 11
+                // 24H2 removed BASS_FX_DX8_I3DL2REVERB at the OS level (#4259), so
+                // BASS_ChannelSetFX returns 0 with BASS_ERROR_NOFX.
+                g_pCore->GetConsole()->Printf("BASS ERROR %d in BASS_ChannelSetFX (effect %u)", BASS_ErrorGetCode(), i);
                 m_FxEffects[i] = INVALID_FX_HANDLE;
+            }
         }
         else if (!m_EnabledEffects[i] && m_FxEffects[i])
         {
@@ -1176,6 +1182,11 @@ void CBassAudio::ApplyFxEffects()
                 BASS_ChannelRemoveFX(m_pSound, m_FxEffects[i]);
             m_FxEffects[i] = 0;
         }
+
+        // Mirror failure into m_EnabledEffects so IsFxEffectEnabled() reports the
+        // truth and re-enable requests don't silently leave a dangling handle.
+        if (m_FxEffects[i] == INVALID_FX_HANDLE)
+            m_EnabledEffects[i] = 0;
     }
 }
 
