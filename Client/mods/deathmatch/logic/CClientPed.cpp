@@ -5794,7 +5794,7 @@ bool CClientPed::IsAnimationInProgress()
 }
 
 void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
-                                   bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
+                                   bool bInterruptible, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -5837,7 +5837,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
             }
 
             // Kill any higher priority tasks if we dont want this anim interruptible
-            if (!bInterruptable)
+            if (!bInterruptible)
             {
                 KillTask(TASK_PRIORITY_PHYSICAL_RESPONSE);
                 KillTask(TASK_PRIORITY_EVENT_RESPONSE_TEMP);
@@ -5847,7 +5847,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
             if (!bFreezeLastFrame)
                 flags |= 0x08;  // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
             float  fBlendDelta = 1 / std::max((float)iBlend, 1.0f) * 1000;
-            CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleRunNamedAnim(szAnimName, pBlock->GetName(), flags, fBlendDelta, iTime, !bInterruptable,
+            CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleRunNamedAnim(szAnimName, pBlock->GetName(), flags, fBlendDelta, iTime, !bInterruptible,
                                                                              bRunInSequence, bOffsetPed, bHoldLastFrame);
             if (pTask)
             {
@@ -5876,7 +5876,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     m_AnimationCache.iBlend = iBlend;
     m_AnimationCache.bLoop = bLoop;
     m_AnimationCache.bUpdatePosition = bUpdatePosition;
-    m_AnimationCache.bInterruptable = bInterruptable;
+    m_AnimationCache.bInterruptible = bInterruptible;
     m_AnimationCache.bFreezeLastFrame = bFreezeLastFrame;
 }
 
@@ -5921,7 +5921,7 @@ void CClientPed::RunAnimationFromCache()
 
     // Run our animation
     RunNamedAnimation(m_pAnimationBlock, animName.c_str(), m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
-                      m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
+                      m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptible, m_AnimationCache.bFreezeLastFrame);
 
     // Set anim progress & speed
     m_AnimationCache.progressWaitForStreamIn = true;
