@@ -1594,8 +1594,13 @@ void CModelInfoSA::RestoreOriginalModel()
 
 void CModelInfoSA::SetColModel(CColModel* pColModel)
 {
+    if (!pColModel)
+        return;
+
     // Grab the interfaces
     CColModelSAInterface* pColModelInterface = pColModel->GetInterface();
+    if (!pColModelInterface)
+        return;
 
     // Skip setting if already done
     if (m_pCustomColModel == pColModel)
@@ -1619,7 +1624,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         // Apply some low-level hacks
         pColModelInterface->m_sphere.m_collisionSlot = 0xA9;
 
-        CBaseModelInfo_SetColModel(m_pInterface, pColModelInterface, true);
+        CBaseModelInfo_SetColModel(m_pInterface, pColModelInterface, false);
         CColAccel_addCacheCol(m_dwModelID, pColModelInterface);
 
         // SetColModel sets bDoWeOwnTheColModel if the last parameter is truthy
@@ -1645,6 +1650,37 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
                 }
             }
         }
+
+        // Handle paired time models explicitly so MTA tracking stays in sync.
+        if (GetModelType() == eModelInfoType::TIME)
+        {
+            const short pairedModelId = static_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo.m_wOtherTimeModel;
+            CModelInfo* pairedModel = pairedModelId >= 0 ? pGame->GetModelInfo(pairedModelId) : nullptr;
+            auto*       pairedModelSA = static_cast<CModelInfoSA*>(pairedModel);
+
+            if (pairedModelSA && pairedModelSA != this)
+            {
+                CBaseModelInfoSAInterface* pairedInterface = pairedModelSA->GetInterface();
+
+                if (pairedInterface)
+                {
+                    if (!pairedModelSA->m_pOriginalColModelInterface)
+                    {
+                        pairedModelSA->m_pOriginalColModelInterface = pairedInterface->pColModel;
+                        pairedModelSA->m_originalFlags = pairedModelSA->GetOriginalFlags();
+                    }
+
+                    pairedModelSA->m_pCustomColModel = pColModel;
+                    CBaseModelInfo_SetColModel(pairedInterface, pColModelInterface, false);
+                    CColAccel_addCacheCol(pairedModelId, pColModelInterface);
+                    pairedInterface->bDoWeOwnTheColModel = false;
+                    pairedInterface->bIsColLoaded = false;
+
+                    // Fix random foliage on custom collisions for the paired model
+                    (reinterpret_cast<void(__cdecl*)(CBaseModelInfoSAInterface*)>(0x5DB650))(pairedInterface);
+                }
+            }
+        }
     }
 }
 
@@ -1655,16 +1691,49 @@ void CModelInfoSA::RestoreColModel()
     // Restore original collision model and flags
     if (m_pInterface && m_pOriginalColModelInterface && m_pCustomColModel)
     {
-        CBaseModelInfo_SetColModel(m_pInterface, m_pOriginalColModelInterface, true);
+        CBaseModelInfo_SetColModel(m_pInterface, m_pOriginalColModelInterface, false);
         CColAccel_addCacheCol(m_dwModelID, m_pInterface->pColModel);
 
         m_pInterface->usFlags = m_originalFlags;
 
         // Force the game to load the original collision model data, if we applied a custom collision model before
         // there was any object/building, which would've provoked CColStore to request it.
-        if (!m_pInterface->pColModel->m_data && m_dwReferences > 1)
+        if (m_pInterface->pColModel && !m_pInterface->pColModel->m_data && m_dwReferences > 1)
         {
             pGame->GetStreaming()->RemoveModel(RESOURCE_ID_COL + m_pInterface->pColModel->m_sphere.m_collisionSlot);
+        }
+
+        // Handle paired time models explicitly so MTA tracking stays in sync.
+        if (GetModelType() == eModelInfoType::TIME)
+        {
+            const short pairedModelId = static_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo.m_wOtherTimeModel;
+            CModelInfo* pairedModel = pairedModelId >= 0 ? pGame->GetModelInfo(pairedModelId) : nullptr;
+            auto*       pairedModelSA = static_cast<CModelInfoSA*>(pairedModel);
+
+            if (pairedModelSA && pairedModelSA != this)
+            {
+                bool                       pairedRestored = false;
+                CBaseModelInfoSAInterface* pairedInterface = pairedModelSA->GetInterface();
+                if (pairedInterface && pairedModelSA->m_pOriginalColModelInterface && pairedModelSA->m_pCustomColModel)
+                {
+                    CBaseModelInfo_SetColModel(pairedInterface, pairedModelSA->m_pOriginalColModelInterface, false);
+                    CColAccel_addCacheCol(pairedModelId, pairedInterface->pColModel);
+                    pairedInterface->usFlags = pairedModelSA->m_originalFlags;
+                    pairedRestored = true;
+
+                    if (pairedInterface->pColModel && !pairedInterface->pColModel->m_data && pairedModelSA->m_dwReferences > 1)
+                    {
+                        pGame->GetStreaming()->RemoveModel(RESOURCE_ID_COL + pairedInterface->pColModel->m_sphere.m_collisionSlot);
+                    }
+                }
+
+                if (pairedRestored)
+                {
+                    pairedModelSA->m_pCustomColModel = nullptr;
+                    pairedModelSA->m_pOriginalColModelInterface = nullptr;
+                    pairedModelSA->m_originalFlags = 0;
+                }
+            }
         }
     }
 
