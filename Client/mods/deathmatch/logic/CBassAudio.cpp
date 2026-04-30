@@ -311,6 +311,14 @@ bool CBassAudio::BeginLoadingMedia()
         }
         m_pSound = pReversed;
         BASS_ChannelSetAttribute(m_pSound, BASS_ATTRIB_REVERSE_DIR, BASS_FX_RVS_FORWARD);
+
+        // Loop on the reverse (pre-tempo) stream so the time-stretch wrapper
+        // above sees a continuous source and never flushes its internal state
+        // at the loop boundary. Looping only on the outer tempo stream causes
+        // an audible seam for OGG iterations (#4084).
+        if (m_bLoop && BASS_ChannelFlags(m_pSound, BASS_SAMPLE_LOOP, BASS_SAMPLE_LOOP) == -1)
+            g_pCore->GetConsole()->Printf("BASS ERROR %d in LoadMedia ChannelFlags LOOP (reverse)  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath,
+                                          m_b3D, m_bLoop);
         // Sucks.
         /*if ( BASS_FX_BPM_CallbackSet ( m_pSound, (BPMPROC*)&BPMCallback, 1, 0, 0, m_uiCallbackId ) == false )
         {
@@ -956,6 +964,11 @@ bool CBassAudio::SetLooped(bool bLoop)
 
     m_bLoop = bLoop;
 
+    // Keep the reverse (pre-tempo) source in sync; the tempo wrapper relies on
+    // looping happening one layer below it to avoid an audible seam (#4084).
+    if (HSTREAM hSource = BASS_FX_TempoGetSource(m_pSound))
+        BASS_ChannelFlags(hSource, bLoop ? BASS_SAMPLE_LOOP : 0, BASS_SAMPLE_LOOP);
+
     return BASS_ChannelFlags(m_pSound, bLoop ? BASS_SAMPLE_LOOP : 0, BASS_SAMPLE_LOOP);
 }
 
@@ -1154,7 +1167,13 @@ void CBassAudio::ApplyFxEffects()
             // Switch on
             m_FxEffects[i] = BASS_ChannelSetFX(m_pSound, i, 0);
             if (!m_FxEffects[i])
+            {
+                // Effect could not be wired up by BASS. Notable case: Windows 11
+                // 24H2 removed BASS_FX_DX8_I3DL2REVERB at the OS level (#4259), so
+                // BASS_ChannelSetFX returns 0 with BASS_ERROR_NOFX.
+                g_pCore->GetConsole()->Printf("BASS ERROR %d in BASS_ChannelSetFX (effect %u)", BASS_ErrorGetCode(), i);
                 m_FxEffects[i] = INVALID_FX_HANDLE;
+            }
         }
         else if (!m_EnabledEffects[i] && m_FxEffects[i])
         {
@@ -1163,6 +1182,11 @@ void CBassAudio::ApplyFxEffects()
                 BASS_ChannelRemoveFX(m_pSound, m_FxEffects[i]);
             m_FxEffects[i] = 0;
         }
+
+        // Mirror failure into m_EnabledEffects so IsFxEffectEnabled() reports the
+        // truth and re-enable requests don't silently leave a dangling handle.
+        if (m_FxEffects[i] == INVALID_FX_HANDLE)
+            m_EnabledEffects[i] = 0;
     }
 }
 

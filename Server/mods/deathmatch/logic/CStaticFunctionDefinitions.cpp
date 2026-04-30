@@ -1788,7 +1788,25 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
             if (pPed->IsDead() && fHealth > 0.0f)
                 pPed->SetIsDead(false);
             else if (fHealth <= 0.0f && !pPed->IsDead())
-                KillPed(pElement, nullptr, 0xFF, 0xFF, false);
+            {
+                // Preserve #4482 (onPlayerWasted fires server-side from setElementHealth(p, 0)) without
+                // regressing instant-respawn flows (e.g. race respawntime=0). Two things matter:
+                //   1) Skip the WASTED broadcast to the dying player so the originator isn't forced into
+                //      CClientPed::Kill() / TaskComplexDie - that traps the camera in GTA's death cam
+                //      because the immediately-following PLAYER_SPAWN can't cleanly cancel the transition.
+                //   2) Send SET_ELEMENT_HEALTH=0 BEFORE KillPed and return early. KillPed fires
+                //      onPlayerWasted, whose handlers commonly call spawnPlayer; if the trailing health
+                //      RPC ran after that PLAYER_SPAWN, all clients would reset the freshly-spawned
+                //      player back to 0 health.
+                CBitStream BitStream;
+                BitStream.pBitStream->Write(fHealth);
+                BitStream.pBitStream->Write(pElement->GenerateSyncTimeContext());
+                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_HEALTH, *BitStream.pBitStream));
+
+                CPlayer* pSkipBroadcastPlayer = IS_PLAYER(pPed) ? static_cast<CPlayer*>(pPed) : nullptr;
+                KillPed(pElement, nullptr, 0xFF, 0xFF, false, pSkipBroadcastPlayer);
+                return true;
+            }
 
             break;
         }
@@ -3808,9 +3826,13 @@ bool CStaticFunctionDefinitions::SetPedArmor(CElement* pElement, float armor)
     return true;
 }
 
-bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, unsigned char ucKillerWeapon, unsigned char ucBodyPart, bool bStealth)
+bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, unsigned char ucKillerWeapon, unsigned char ucBodyPart, bool bStealth,
+                                         CPlayer* pSkipBroadcastPlayer)
 {
     assert(pElement);
+    // Note: pSkipBroadcastPlayer is intentionally NOT propagated through RUN_CHILDREN. It only ever applies
+    // to a single, specific player in the SetElementHealth auto-kill path, not to recursive kills on element
+    // hierarchies (which historically broadcast the wasted packet to everyone).
     RUN_CHILDREN(KillPed(*iter, pKiller, ucKillerWeapon, ucBodyPart))
 
     if (IS_PED(pElement))
@@ -3868,9 +3890,11 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
             // TODO: change to onPedWasted
             if (IS_PLAYER(pPed))
             {
-                // Tell everyone to kill this player
+                // Tell everyone to kill this player. pSkipBroadcastPlayer (when set) is excluded so that
+                // server-initiated kills via SetElementHealth do not push the dying player into a forced
+                // client-side TaskComplexDie. See header comment on KillPed for the full rationale.
                 CPlayerWastedPacket WastedPacket(pPed, pKiller, ucKillerWeapon, ucBodyPart, bStealth);
-                m_pPlayerManager->BroadcastOnlyJoined(WastedPacket);
+                m_pPlayerManager->BroadcastOnlyJoined(WastedPacket, pSkipBroadcastPlayer);
                 pPed->CallEvent("onPlayerWasted", Arguments);
             }
             else
