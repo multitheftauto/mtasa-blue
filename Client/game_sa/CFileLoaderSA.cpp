@@ -26,6 +26,20 @@ void CFileLoaderSA::StaticSetHooks()
     HookInstall(0x5371F0, (DWORD)CFileLoader_LoadAtomicFile, 5);
     HookInstall(0x537150, (DWORD)CFileLoader_SetRelatedModelInfoCB, 5);
     HookInstall(0x538690, (DWORD)CFileLoader_LoadObjectInstance, 5);
+
+    // Preserve m_pLod for buildings sharing one LOD entity at scene-load time.
+    // Vanilla _LinkLods (0x5B51E0) walks the IPL instance list and, when several
+    // high-detail buildings reference the same LOD instance, deregisters all but
+    // the last sibling by writing 0 to their m_pLod field at 0x5B52F8
+    // (mov dword ptr [esi+30h], 0). The decrement of the LOD's numChildren a few
+    // bytes earlier is what brings the count down to 1 so the final sibling can
+    // pick up the shared-collision path; that is intentional and is left intact.
+    // Nulling m_pLod is order-dependent and visibly strands many shared-LOD
+    // billboards (e.g. BillBd3 / model 1260) with no LOD reference at runtime,
+    // which breaks LOD-aware lookups (collision queries, processLineOfSight LOD
+    // model id, etc.). NOPing the 7-byte store keeps every sibling linked while
+    // the per-model collision swap still happens exactly once.
+    MemSet((void*)0x5B52F8, 0x90, 7);
 }
 
 CEntitySAInterface* CFileLoaderSA::LoadObjectInstance(SFileObjectInstance* obj)
