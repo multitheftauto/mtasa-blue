@@ -597,18 +597,24 @@ void CCameraSA::GetCameraClip(bool& bObjects, bool& bVehicles)
     bVehicles = (mask & static_cast<uint8_t>(CameraClipFlags::Vehicles)) != 0;
 }
 
-// Replicates GTA:SA's CCamera::CameraVehicleModeSpecialCases (0x50CDE0):
-// when the player's vehicle is moving faster than 0.2 speed units, camera
-// collision with objects/buildings is disabled so it doesn't jerk around
-// obstacles while driving.
+// At speed, relax camera collision against dynamic (script-created) objects only.
+// Static world geometry always keeps collision so default GTA world/buildings still block the camera.
 static void ApplyVehicleSpeedCameraClip()
 {
+    // Static-world clip stays on regardless of speed.
+    MemPutFast<char>(VAR_CameraClipStaticObjects, 1);
+
     using FindPlayerVehicle_t = void*(__cdecl*)(int playerId, bool bIncludeRemote);
     auto FindPlayerVehicle = reinterpret_cast<FindPlayerVehicle_t>(0x56E0D0);
 
     void* pVehicle = FindPlayerVehicle(-1, false);
     if (!pVehicle)
+    {
+        // No player vehicle: restore stock defaults.
+        MemPutFast<float>(VAR_RelVelCamCollisionVehSqr, 1.0f);
+        MemPutFast<char>(VAR_CameraClipDynamicObjects, 1);
         return;
+    }
 
     // CPhysicalSAInterface::m_vecLinearVelocity at offset 0x44 (CVector: 3 floats)
     float* pSpeed = reinterpret_cast<float*>(static_cast<char*>(pVehicle) + 0x44);
@@ -617,17 +623,13 @@ static void ApplyVehicleSpeedCameraClip()
 
     MemPutFast<float>(VAR_RelVelCamCollisionVehSqr, slow ? 0.1f : 1.0f);
     MemPutFast<char>(VAR_CameraClipDynamicObjects, slow ? 1 : 0);
-    MemPutFast<char>(VAR_CameraClipStaticObjects, slow ? 1 : 0);
 }
 
 static void _cdecl DoCameraCollisionDetectionPokes()
 {
     const uint8_t mask = s_cameraClipMask.load(std::memory_order_relaxed);
 
-    // Handle objects: when clip=true (the default), use GTA's native
-    // speed-dependent logic. When clip=false, force off unconditionally.
-    // This preserves backward compatibility: setCameraClip(true, false)
-    // means "objects = GTA default (speed-dependent), vehicles = off".
+    // Objects clip on = GTA default (speed-dependent dynamic, always-on static); off = force off.
     if (mask & static_cast<uint8_t>(CameraClipFlags::Objects))
         ApplyVehicleSpeedCameraClip();
     else
@@ -636,7 +638,7 @@ static void _cdecl DoCameraCollisionDetectionPokes()
         MemPutFast<char>(VAR_CameraClipStaticObjects, 0);
     }
 
-    // Handle vehicles: true = GTA default (always on), false = force off.
+    // Vehicles clip on = GTA default (always on); off = force off.
     if (mask & static_cast<uint8_t>(CameraClipFlags::Vehicles))
         MemPutFast<char>(VAR_CameraClipVehicles, 1);
     else
