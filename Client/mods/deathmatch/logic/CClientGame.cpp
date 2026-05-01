@@ -3902,6 +3902,14 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWorldProcessHandler()
 {
+    // Fix #4803: Re-apply MTA's weather state before CTimeCycle::CalcColoursForPoint()
+    // reads the weather globals for rendering. The engine's CWeather::Update() (0x53BFC2)
+    // runs earlier in CGame::Process() and can overwrite OldWeatherType/NewWeatherType
+    // when setTime() causes a clock wrap. This hook (at CWorld::Process, 0x53C095) runs
+    // after that overwrite but before CalcColoursForPoint (0x53C0DA) consumes the values,
+    // ensuring the rendered frame always uses MTA's intended weather.
+    if (m_pManager->IsGameLoaded() && m_pBlendedWeather)
+        m_pBlendedWeather->DoPulse();
 }
 
 void CClientGame::PostWorldProcessHandler()
