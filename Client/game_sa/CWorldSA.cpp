@@ -499,8 +499,17 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
             {
                 pBuildingResult->bValid = true;
                 pBuildingResult->usModelID = targetEntity->m_nModelIndex;
+                // Report the LOD model id that the hit is associated with.
+                // - If the entity has an HD->LOD link, surface the LOD it points at.
+                // - If the entity is itself a LOD (numLodChildren > 0 because one or
+                //   more high-detail siblings link to it), surface its own model id
+                //   so the caller still sees a meaningful LOD when the line-of-sight
+                //   ray happens to hit the LOD entity instead of the HD entity at a
+                //   shared placement (e.g. BillBd3 / LODbillbd03 1260/1266 clusters).
                 if (targetEntity->m_pLod)
                     pBuildingResult->usLODModelID = targetEntity->m_pLod->m_nModelIndex;
+                else if (targetEntity->numLodChildren > 0)
+                    pBuildingResult->usLODModelID = targetEntity->m_nModelIndex;
                 else
                     pBuildingResult->usLODModelID = 0;
 
@@ -517,8 +526,11 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
             {
                 pBuildingResult->bValid = true;
                 pBuildingResult->usModelID = targetEntity->m_nModelIndex;
+                // Same LOD reporting rule as the building branch above.
                 if (targetEntity->m_pLod)
                     pBuildingResult->usLODModelID = targetEntity->m_pLod->m_nModelIndex;
+                else if (targetEntity->numLodChildren > 0)
+                    pBuildingResult->usLODModelID = targetEntity->m_nModelIndex;
                 else
                     pBuildingResult->usLODModelID = 0;
 
@@ -591,7 +603,15 @@ CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float rad
         result.entityRotation.fZ = entity->m_transform.m_heading * (180.0f / std::numbers::pi);
     }
     result.entityRotation = -result.entityRotation;
-    result.lodID = entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0;
+    // Mirror processLineOfSight: if the hit entity is itself a LOD with linked
+    // HD siblings, surface its own model id so callers see the LOD id even when
+    // the sphere test lands on the LOD entity instead of an HD child.
+    if (entity->m_pLod)
+        result.lodID = entity->m_pLod->m_nModelIndex;
+    else if (entity->numLodChildren > 0)
+        result.lodID = entity->m_nModelIndex;
+    else
+        result.lodID = 0;
     result.type = static_cast<eEntityType>(entity->nType);
 
     return pGame->GetPools()->GetEntity(reinterpret_cast<DWORD*>(entity));
