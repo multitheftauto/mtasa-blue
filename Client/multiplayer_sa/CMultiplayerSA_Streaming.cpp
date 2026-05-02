@@ -12,15 +12,8 @@
 
 void OnModelLoaded(unsigned int uiModelID)
 {
-    const int32_t baseTxdId = pGameInterface->GetBaseIDforTXD();
-    if (baseTxdId <= 0)
-        return;
-
-    if (uiModelID < static_cast<unsigned int>(baseTxdId))
-    {
-        if (auto* pModelInfo = pGameInterface->GetModelInfo(uiModelID))
-            pModelInfo->MakeCustomModel();
-    }
+    if (uiModelID < pGameInterface->GetBaseIDforTXD())
+        pGameInterface->GetModelInfo(uiModelID)->MakeCustomModel();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -35,9 +28,7 @@ void OnModelLoaded(unsigned int uiModelID)
 
 static void _declspec(naked) HOOK_CStreaming__ConvertBufferToObject()
 {
-    // clang-format off
-    __asm
-    {
+    _asm {
         push    esi
         call    OnModelLoaded
         pop esi
@@ -50,7 +41,6 @@ static void _declspec(naked) HOOK_CStreaming__ConvertBufferToObject()
         add     esp, 20h
         retn
     }
-    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -47,7 +47,6 @@
 #include "CRopesSA.h"
 #include "CSettingsSA.h"
 #include "CStatsSA.h"
-#include "CStreamingGC.h"
 #include "CTaskManagementSystemSA.h"
 #include "CTasksSA.h"
 #include "CVisibilityPluginsSA.h"
@@ -100,7 +99,7 @@ CGameSA::CGameSA()
         // Prepare all object dynamic infos for CObjectGroupPhysicalPropertiesSA instances
         for (unsigned int i = 0; i < OBJECTDYNAMICINFO_MAX; i++)
         {
-            ObjectGroupsInfo[i].SetGroup(static_cast<unsigned char>(i));
+            ObjectGroupsInfo[i].SetGroup(i);
         }
 
         m_pAudioEngine = new CAudioEngineSA((CAudioEngineSAInterface*)CLASS_CAudioEngine);
@@ -251,7 +250,6 @@ CGameSA::CGameSA()
         CFireSA::StaticSetHooks();
         CPtrNodeSingleLinkPoolSA::StaticSetHooks();
         CVehicleAudioSettingsManagerSA::StaticSetHooks();
-        CBuildingRemovalSA::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)
     {
@@ -279,9 +277,6 @@ CGameSA::CGameSA()
 
 CGameSA::~CGameSA()
 {
-    // Shutdown streaming GC hooks
-    CStreamingGC::Shutdown();
-
     delete reinterpret_cast<CPlayerInfoSA*>(m_pPlayerInfo);
 
     for (int i = 0; i < NUM_WeaponInfosTotal; i++)
@@ -362,11 +357,7 @@ void CGameSA::Pause(bool bPaused)
 
 CModelInfo* CGameSA::GetModelInfo(DWORD dwModelID, bool bCanBeInvalid)
 {
-    const int32_t count = GetCountOfAllFileIDs();
-    if (count <= 0)
-        return nullptr;
-
-    if (dwModelID < static_cast<DWORD>(count))
+    if (dwModelID < GetCountOfAllFileIDs())
     {
         if (ModelInfo[dwModelID].IsValid() || bCanBeInvalid)
         {
@@ -480,10 +471,6 @@ void CGameSA::Reset()
 
         // Restore default world state
         RestoreGameWorld();
-
-        // Reset building pool to default capacity if a server enlarged it
-        if (m_Pools->GetBuildingsPool().GetSize() != MAX_BUILDINGS)
-            SetBuildingPoolSize(MAX_BUILDINGS);
     }
 }
 
@@ -500,28 +487,14 @@ void CGameSA::Terminate()
 
 void CGameSA::Initialize()
 {
-    // Expand TXD pool from SA's default 5000 to our maximum capacity.
-    // Can't run in CTxdPoolSA's constructor (pool at 0xC8800C doesn't
-    // exist yet). Safe here: pool access is main-thread only and SA
-    // derefs m_pObjects on every access (no cached pointers).
-    static_cast<CTxdPoolSA&>(m_Pools->GetTxdPool()).InitialisePool();
-
     // Initialize garages
     m_pGarages->Initialize();
     SetupSpecialCharacters();
     SetupBrokenModels();
     m_pRenderWare->Initialize();
 
-    // Initialize streaming GC protection hooks
-    CStreamingGC::Initialize();
-
     // *Sebas* Hide the GTA:SA Main menu.
     MemPutFast<BYTE>(CLASS_CMenuManager + 0x5C, 0);
-}
-
-StreamingRemoveModelCallback CGameSA::GetStreamingRemoveModelCallback() const noexcept
-{
-    return &CStreamingGC::OnRemoveModel;
 }
 
 eGameVersion CGameSA::GetGameVersion()
@@ -555,47 +528,47 @@ eGameVersion CGameSA::FindGameVersion()
 
 float CGameSA::GetFPS()
 {
-    return *(float*)0xB7CB50;  // CTimer::game_FPS
+    return *(float*)0xB7CB50; // CTimer::game_FPS
 }
 
 float CGameSA::GetTimeStep()
 {
-    return *(float*)0xB7CB5C;  // CTimer::ms_fTimeStep
+    return *(float*)0xB7CB5C; // CTimer::ms_fTimeStep
 }
 
 float CGameSA::GetOldTimeStep()
 {
-    return *(float*)0xB7CB54;  // CTimer::ms_fOldTimeStep
+    return *(float*)0xB7CB54; // CTimer::ms_fOldTimeStep
 }
 
 float CGameSA::GetTimeScale()
 {
-    return *(float*)0xB7CB64;  // CTimer::ms_fTimeScale
+    return *(float*)0xB7CB64; // CTimer::ms_fTimeScale
 }
 
 void CGameSA::SetTimeScale(float fTimeScale)
 {
-    MemPutFast<float>(0xB7CB64, fTimeScale);  // CTimer::ms_fTimeScale
+    MemPutFast<float>(0xB7CB64, fTimeScale); // CTimer::ms_fTimeScale
 }
 
 unsigned char CGameSA::GetBlurLevel()
 {
-    return *(unsigned char*)0x8D5104;  // CPostEffects::m_SpeedFXAlpha
+    return *(unsigned char*)0x8D5104;            // CPostEffects::m_SpeedFXAlpha
 }
 
 void CGameSA::SetBlurLevel(unsigned char ucLevel)
 {
-    MemPutFast<unsigned char>(0x8D5104, ucLevel);  // CPostEffects::m_SpeedFXAlpha
+    MemPutFast<unsigned char>(0x8D5104, ucLevel);            // CPostEffects::m_SpeedFXAlpha
 }
 
 unsigned long CGameSA::GetMinuteDuration()
 {
-    return *(unsigned long*)0xB7015C;  // CClock::ms_nMillisecondsPerGameMinute
+    return *(unsigned long*)0xB7015C;            // CClock::ms_nMillisecondsPerGameMinute
 }
 
 void CGameSA::SetMinuteDuration(unsigned long ulTime)
 {
-    MemPutFast<unsigned long>(0xB7015C, ulTime);  // CClock::ms_nMillisecondsPerGameMinute
+    MemPutFast<unsigned long>(0xB7015C, ulTime);            // CClock::ms_nMillisecondsPerGameMinute
 }
 
 bool CGameSA::IsCheatEnabled(const char* szCheatName)
@@ -724,7 +697,7 @@ void CGameSA::SetCoronaZTestEnabled(bool isEnabled)
     m_isCoronaZTestEnabled = isEnabled;
 }
 
-void CGameSA::SetWaterCreaturesEnabled(bool isEnabled)
+void CGameSA::SetWaterCreaturesEnabled(bool isEnabled) 
 {
     if (isEnabled == m_areWaterCreaturesEnabled)
         return;
@@ -749,20 +722,20 @@ void CGameSA::SetTunnelWeatherBlendEnabled(bool isEnabled)
     if (isEnabled == m_isTunnelWeatherBlendEnabled)
         return;
     // CWeather::UpdateInTunnelness
-    DWORD functionAddress = 0x72B630;
+    DWORD functionAddress = 0x72B630; 
     if (isEnabled)
     {
         // Restore original bytes: 83 EC 20
-        MemPut<BYTE>(functionAddress, 0x83);      // Restore 83
-        MemPut<BYTE>(functionAddress + 1, 0xEC);  // Restore EC
-        MemPut<BYTE>(functionAddress + 2, 0x20);  // Restore 20
+        MemPut<BYTE>(functionAddress, 0x83);                // Restore 83
+        MemPut<BYTE>(functionAddress + 1, 0xEC);            // Restore EC
+        MemPut<BYTE>(functionAddress + 2, 0x20);            // Restore 20
     }
     else
     {
         // Patch CWeather::UpdateInTunnelness               (Found By AlexTMjugador)
-        MemPut<BYTE>(functionAddress, 0xC3);      // Write C3 (RET)
-        MemPut<BYTE>(functionAddress + 1, 0x90);  // Write 90 (NOP)
-        MemPut<BYTE>(functionAddress + 2, 0x90);  // Write 90 (NOP)
+        MemPut<BYTE>(functionAddress, 0xC3);                // Write C3 (RET)
+        MemPut<BYTE>(functionAddress + 1, 0x90);            // Write 90 (NOP)
+        MemPut<BYTE>(functionAddress + 2, 0x90);            // Write 90 (NOP)
     }
     m_isTunnelWeatherBlendEnabled = isEnabled;
 }
@@ -807,13 +780,13 @@ void CGameSA::SetFireballDestructEnabled(bool isEnabled)
     if (isEnabled)
     {
         BYTE originalCodes[7] = {0x81, 0x66, 0x1C, 0x7E, 0xFF, 0xFF, 0xFF};
-        MemCpy((void*)0x6CCE45, &originalCodes, 7);  // CPlane::BlowUpCar
-        MemCpy((void*)0x6C6E01, &originalCodes, 7);  // CHeli::BlowUpCar
+        MemCpy((void*)0x6CCE45, &originalCodes, 7); // CPlane::BlowUpCar
+        MemCpy((void*)0x6C6E01, &originalCodes, 7); // CHeli::BlowUpCar
     }
     else
     {
-        MemSet((void*)0x6CCE45, 0x90, 7);  // CPlane::BlowUpCar
-        MemSet((void*)0x6C6E01, 0x90, 7);  // CHeli::BlowUpCar
+        MemSet((void*)0x6CCE45, 0x90, 7); // CPlane::BlowUpCar
+        MemSet((void*)0x6C6E01, 0x90, 7); // CHeli::BlowUpCar
     }
 
     m_isFireballDestructEnabled = isEnabled;
@@ -827,8 +800,8 @@ void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
     // Allocate memory for new bigger array or use default aCannons array
     void* aCannons = isEnabled ? malloc(MAX_WATER_CANNONS * SIZE_CWaterCannon) : (void*)ARRAY_aCannons;
 
-    int newLimit = isEnabled ? MAX_WATER_CANNONS : NUM_CWaterCannon_DefaultLimit;  // default: 3
-    MemSetFast(aCannons, 0, newLimit * SIZE_CWaterCannon);                         // clear aCannons array
+    int newLimit = isEnabled ? MAX_WATER_CANNONS : NUM_CWaterCannon_DefaultLimit; // default: 3
+    MemSetFast(aCannons, 0, newLimit * SIZE_CWaterCannon); // clear aCannons array
 
     // Get current limit
     int currentLimit = *(int*)NUM_WaterCannon_Limit;
@@ -841,10 +814,8 @@ void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
     {
         char* currentCannon = (char*)currentACannons + i * SIZE_CWaterCannon;
 
-        ((void(__thiscall*)(int, void*, bool))FUNC_CAESoundManager_CancelSoundsOwnedByAudioEntity)(
-            STRUCT_CAESoundManager, currentCannon + NUM_CWaterCannon_Audio_Offset,
-            true);  // CAESoundManager::CancelSoundsOwnedByAudioEntity to prevent random crashes from CAESound::UpdateParameters
-        ((void(__thiscall*)(void*))FUNC_CWaterCannon_Destructor)(currentCannon);  // CWaterCannon::~CWaterCannon
+        ((void(__thiscall*)(int, void*, bool))FUNC_CAESoundManager_CancelSoundsOwnedByAudioEntity)(STRUCT_CAESoundManager, currentCannon + NUM_CWaterCannon_Audio_Offset, true); // CAESoundManager::CancelSoundsOwnedByAudioEntity to prevent random crashes from CAESound::UpdateParameters
+        ((void(__thiscall*)(void*))FUNC_CWaterCannon_Destructor)(currentCannon); // CWaterCannon::~CWaterCannon
     }
 
     // Call CWaterCannon constructor & CWaterCannon::Init
@@ -852,41 +823,41 @@ void CGameSA::SetExtendedWaterCannonsEnabled(bool isEnabled)
     {
         char* currentCannon = (char*)aCannons + i * SIZE_CWaterCannon;
 
-        ((void(__thiscall*)(void*))FUNC_CWaterCannon_Constructor)(currentCannon);  // CWaterCannon::CWaterCannon
-        ((void(__thiscall*)(void*))FUNC_CWaterCannon_Init)(currentCannon);         // CWaterCannon::Init
+        ((void(__thiscall*)(void*))FUNC_CWaterCannon_Constructor)(currentCannon); // CWaterCannon::CWaterCannon
+        ((void(__thiscall*)(void*))FUNC_CWaterCannon_Init)(currentCannon); // CWaterCannon::Init
     }
 
     // Patch references to array
-    MemPut((void*)0x728C83, aCannons);      // CWaterCannons::Init
-    MemPut((void*)0x728CCB, aCannons);      // CWaterCannons::UpdateOne
-    MemPut((void*)0x728CEB, aCannons);      // CWaterCannons::UpdateOne
-    MemPut((void*)0x728D0D, aCannons);      // CWaterCannons::UpdateOne
-    MemPut((void*)0x728D71, aCannons);      // CWaterCannons::UpdateOne
-    MemPutFast((void*)0x729B33, aCannons);  // CWaterCannons::Render
-    MemPut((void*)0x72A3C5, aCannons);      // CWaterCannons::UpdateOne
-    MemPut((void*)0x855432, aCannons);      // 0x855431
-    MemPut((void*)0x856BFD, aCannons);      // 0x856BFC
+    MemPut((void*)0x728C83, aCannons);                // CWaterCannons::Init
+    MemPut((void*)0x728CCB, aCannons);                // CWaterCannons::UpdateOne
+    MemPut((void*)0x728CEB, aCannons);                // CWaterCannons::UpdateOne
+    MemPut((void*)0x728D0D, aCannons);                // CWaterCannons::UpdateOne
+    MemPut((void*)0x728D71, aCannons);                // CWaterCannons::UpdateOne
+    MemPutFast((void*)0x729B33, aCannons);            // CWaterCannons::Render
+    MemPut((void*)0x72A3C5, aCannons);                // CWaterCannons::UpdateOne
+    MemPut((void*)0x855432, aCannons);                // 0x855431
+    MemPut((void*)0x856BFD, aCannons);                // 0x856BFC
 
     // CWaterCannons::Init
-    MemPut<BYTE>(0x728C88, static_cast<BYTE>(newLimit));
+    MemPut<BYTE>(0x728C88, newLimit);
 
     // CWaterCannons::Update
-    MemPut<BYTE>(0x72A3F2, static_cast<BYTE>(newLimit));
+    MemPut<BYTE>(0x72A3F2, newLimit);
 
     // CWaterCanons::UpdateOne
-    MemPut<BYTE>(0x728CD4, static_cast<BYTE>(newLimit));
-    MemPut<BYTE>(0x728CF6, static_cast<BYTE>(newLimit));
-    MemPut<BYTE>(0x728CFF, static_cast<BYTE>(newLimit));
-    MemPut<BYTE>(0x728D62, static_cast<BYTE>(newLimit));
+    MemPut<BYTE>(0x728CD4, newLimit);
+    MemPut<BYTE>(0x728CF6, newLimit);
+    MemPut<BYTE>(0x728CFF, newLimit);
+    MemPut<BYTE>(0x728D62, newLimit);
 
     // CWaterCannons::Render
-    MemPutFast<BYTE>(0x729B38, static_cast<BYTE>(newLimit));
+    MemPutFast<BYTE>(0x729B38, newLimit);
 
     // 0x85542A
-    MemPut<BYTE>(0x85542B, static_cast<BYTE>(newLimit));
+    MemPut<BYTE>(0x85542B, newLimit);
 
     // 0x856BF5
-    MemPut<BYTE>(0x856BF6, static_cast<BYTE>(newLimit));
+    MemPut<BYTE>(0x856BF6, newLimit);
 
     // Free previous allocated memory
     if (!isEnabled && currentACannons != nullptr)
@@ -913,16 +884,15 @@ void CGameSA::SetIgnoreFireStateEnabled(bool isEnabled)
 
     if (isEnabled)
     {
-        // All these patches disable fire state checks (m_pFire != nullptr)
-        // Related crash protection is handled by checks in TaskSA.cpp and CTaskManagementSystemSA.cpp
-        MemSet((void*)0x6511B9, 0x90, 10);  // CCarEnterExit::IsVehicleStealable - fire check
-        MemSet((void*)0x643A95, 0x90, 14);  // CTaskComplexEnterCar::CreateFirstSubTask - fire check
-        MemSet((void*)0x6900B5, 0x90, 14);  // CTaskComplexCopInCar::ControlSubTask - fire check
-        MemSet((void*)0x64F3DB, 0x90, 14);  // CCarEnterExit::IsPlayerToQuitCarEnter - fire check
-        MemSet((void*)0x685A7F, 0x90, 14);  // CTaskSimplePlayerOnFoot::ProcessPlayerWeapon - fire check
+        MemSet((void*)0x6511B9, 0x90, 10);            // CCarEnterExit::IsVehicleStealable
+        MemSet((void*)0x643A95, 0x90, 14);            // CTaskComplexEnterCar::CreateFirstSubTask
+        MemSet((void*)0x6900B5, 0x90, 14);            // CTaskComplexCopInCar::ControlSubTask
+        MemSet((void*)0x64F3DB, 0x90, 14);            // CCarEnterExit::IsPlayerToQuitCarEnter
 
-        MemSet((void*)0x53A899, 0x90, 5);  // CFire::ProcessFire
-        MemSet((void*)0x53A990, 0x90, 5);  // CFire::ProcessFire
+        MemSet((void*)0x685A7F, 0x90, 14);            // CTaskSimplePlayerOnFoot::ProcessPlayerWeapon
+
+        MemSet((void*)0x53A899, 0x90, 5);             // CFire::ProcessFire
+        MemSet((void*)0x53A990, 0x90, 5);             // CFire::ProcessFire
     }
     else
     {
@@ -948,8 +918,8 @@ void CGameSA::SetVehicleBurnExplosionsEnabled(bool isEnabled)
 
     if (isEnabled)
     {
-        MemCpy((void*)0x6A74EA, "\xE8\x61\xF5\x08\x00", 5);  // CAutomobile::ProcessCarOnFireAndExplode
-        MemCpy((void*)0x737929, "\xE8\x22\xF1\xFF\xFF", 5);  // CExplosion::Update
+        MemCpy((void*)0x6A74EA, "\xE8\x61\xF5\x08\x00", 5);            // CAutomobile::ProcessCarOnFireAndExplode
+        MemCpy((void*)0x737929, "\xE8\x22\xF1\xFF\xFF", 5);            // CExplosion::Update
     }
     else
     {
@@ -1141,21 +1111,6 @@ void CGameSA::RestoreGameWorld()
 bool CGameSA::SetBuildingPoolSize(size_t size)
 {
     const bool shouldRemoveWorld = !m_isGameWorldRemoved;
-
-    const int iCurrentBuildingPoolSize = m_Pools->GetBuildingsPool().GetSize();
-    if (iCurrentBuildingPoolSize >= 0 && static_cast<size_t>(iCurrentBuildingPoolSize) == size)
-    {
-        // Keep same-size behavior unchanged while world is active.
-        // If world is already removed, skip no-op resize and only drop caches.
-        if (!shouldRemoveWorld)
-        {
-            static_cast<CBuildingRemovalSA*>(m_pBuildingRemoval)->DropCaches();
-            return true;
-        }
-
-        // World is active here, so continue with remove and restore flow.
-    }
-
     if (shouldRemoveWorld)
         RemoveGameWorld();
     else
@@ -1195,7 +1150,7 @@ void CGameSA::ResetAlphaTransparencies()
 // Note #2: Some players do not need this to disable VSync. (Possibly because their video card driver settings override it somewhere)
 void CGameSA::DisableVSync()
 {
-    MemPutFast<BYTE>(0xBAB318, 0);  // CLoadingScreen::m_bActive
+    MemPutFast<BYTE>(0xBAB318, 0);            // CLoadingScreen::m_bActive
 }
 CWeapon* CGameSA::CreateWeapon()
 {
@@ -1215,9 +1170,9 @@ void CGameSA::SetWeaponRenderEnabled(bool enabled)
     if (!enabled)
     {
         // Disable calls to CVisibilityPlugins::RenderWeaponPedsForPC
-        MemSet((void*)0x53EAC4, 0x90, 5);  // Idle
-        MemSet((void*)0x705322, 0x90, 5);  // CPostEffects::Render
-        MemSet((void*)0x7271E3, 0x90, 5);  // CMirrors::BeforeMainRender
+        MemSet((void*)0x53EAC4, 0x90, 5); // Idle
+        MemSet((void*)0x705322, 0x90, 5); // CPostEffects::Render
+        MemSet((void*)0x7271E3, 0x90, 5); // CMirrors::BeforeMainRender
     }
     else
     {
