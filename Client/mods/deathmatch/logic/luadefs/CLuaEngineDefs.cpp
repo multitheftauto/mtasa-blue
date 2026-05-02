@@ -21,7 +21,12 @@
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
 void EngineStreamingSetModelCacheLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds) {
-    g_pClientGame->GetModelCacheManager()->SetCustomLimits(numVehicles, numPeds);
+    const size_t veh = numVehicles.value_or(0);
+    const size_t ped = numPeds.value_or(0);
+    g_pClientGame->GetModelCacheManager()->SetCustomLimits(
+        numVehicles.has_value() ? &veh : nullptr,
+        numPeds.has_value() ? &ped : nullptr
+    );
 }
 
 void EngineStreamingFreeUpMemory(std::uint32_t bytes)
@@ -150,7 +155,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetPoolUsedCapacity", ArgumentParser<EngineGetPoolUsedCapacity>},
         {"engineSetPoolCapacity", ArgumentParser<EngineSetPoolCapacity>},
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
-        
+
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
         // CLuaCFunctions::AddFunction ( "enginePositionAtomic", EnginePositionAtomic );

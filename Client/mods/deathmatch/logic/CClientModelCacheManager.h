@@ -15,7 +15,7 @@ public:
     // CClientModelCacheManager interface
     virtual void DoPulse() = 0;
     virtual void OnRestreamModel(ushort usModelId) = 0;
-    virtual void SetCustomLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds) = 0;
+    virtual void SetCustomLimits(const size_t* numVehicles, const size_t* numPeds) = 0;
 };
 
 CClientModelCacheManager* NewClientModelCacheManager();

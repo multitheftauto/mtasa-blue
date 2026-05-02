@@ -47,7 +47,7 @@ public:
     virtual void OnClientClose();
     virtual void UpdatePedModelCaching(const std::map<ushort, float>& newNeedCacheList);
     virtual void UpdateVehicleModelCaching(const std::map<ushort, float>& newNeedCacheList);
-    virtual void SetCustomLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds);
+    virtual void SetCustomLimits(const size_t* numVehicles, const size_t* numPeds);
 
     // CModelCacheManagerImpl methods
     CModelCacheManagerImpl();
@@ -224,13 +224,13 @@ void CModelCacheManagerImpl::GetStats(SModelCacheStats& outStats)
 // Function to set custom limits, instead of calculating them automatically.
 // If the optional is empty, the value is restored to the automatic one
 // otherwise it is set to whatever value the opt contains
-// 
+//
 ///////////////////////////////////////////////////////////////
-void CModelCacheManagerImpl::SetCustomLimits(std::optional<size_t> numVehicles, std::optional<size_t> numPeds) {
-    if (m_IsUsingCustomPedCacheLimit = numPeds.has_value()) {
+void CModelCacheManagerImpl::SetCustomLimits(const size_t* numVehicles, const size_t* numPeds) {
+    if (m_IsUsingCustomPedCacheLimit = (numPeds != nullptr)) {
         m_uiMaxCachedPedModels = *numPeds;
     }
-    if (m_IsUsingCustomVehicleCacheLimit = numVehicles.has_value()) {
+    if (m_IsUsingCustomVehicleCacheLimit = (numVehicles != nullptr)) {
         m_uiMaxCachedVehicleModels = *numVehicles;
     }
 }
@@ -524,5 +524,5 @@ void CModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
                 OutputDebugLine(SString("[Cache] End caching model %d  (OnRestreamModel)", usModelId));
             }
         }
-    }   
+    }
 }
