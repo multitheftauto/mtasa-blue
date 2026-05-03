@@ -79,8 +79,6 @@ auto    GetGameBaseDirectory() -> std::filesystem::path;
 auto    GetGameLaunchDirectory() -> std::filesystem::path;
 auto    GetGameExecutablePath() -> std::filesystem::path;
 SString GetInstallPathForLauncher();
-bool    IsUsableMtasaInstallRoot(const SString& strPath);
-bool    IsTemporaryUpdateLaunchPath(const SString& strLaunchPath);
 
 void            SetMTASAPathSource(bool bReadFromRegistry);
 SString         GetMTASAPath();

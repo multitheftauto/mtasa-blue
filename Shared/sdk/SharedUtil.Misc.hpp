@@ -383,7 +383,7 @@ void SharedUtil::SetMTASABaseDirOverride(const SString& strPath)
     strInstallRootOverride = strPath;
 }
 
-static bool IsUsableMtasaInstallRoot(const SString& strPath)
+bool SharedUtil::IsUsableMtasaInstallRoot(const SString& strPath)
 {
     if (strPath.empty())
         return false;
@@ -393,22 +393,23 @@ static bool IsUsableMtasaInstallRoot(const SString& strPath)
            FileExists(PathJoin(strPath, "mta", "core_d.dll")) || FileExists(PathJoin(strPath, "MTA", "core_d.dll"));
 }
 
-// A path inside upcache\_<archive>_tmp_<n> is a transient extraction directory used by the auto-update
-// flow. Such a path can satisfy IsUsableMtasaInstallRoot while it still exists, but it must never be
-// accepted as the durable MTA install root. The launcher-side helper in Client/loader/Utils.cpp uses
-// the same shape; if either copy changes, update both.
-static bool IsTemporaryUpdateLaunchPath(const SString& strLaunchPath)
+// A path inside upcache\_<archive>_tmp_<n> is an auto-update extraction directory.
+// It can look like a usable install root while it exists, but it must not be kept as the real install root.
+bool SharedUtil::IsTemporaryUpdateLaunchPath(const SString& strLaunchPath)
 {
     if (strLaunchPath.empty())
         return false;
 
-    if (!strLaunchPath.ContainsI("\\upcache\\"))
+    const SString strNormalizedLaunchPath = PathConform(strLaunchPath).TrimEnd("\\");
+    if (strNormalizedLaunchPath.empty())
         return false;
 
-    // The auto-update flow creates the extraction directory in Install.cpp::CheckOnRestartCommand
-    // as MakeUniquePath("...\\upcache\\_<archiveName>_tmp_"), so the leaf always begins with '_'.
-    const SString strLeaf = ExtractFilename(strLaunchPath);
-    return strLeaf.BeginsWith("_") && strLeaf.ContainsI("_tmp_");
+    const SString strLeaf = ExtractFilename(strNormalizedLaunchPath);
+    if (!strLeaf.BeginsWith("_") || !strLeaf.ContainsI("_tmp_"))
+        return false;
+
+    const SString strParent = ExtractFilename(ExtractPath(strNormalizedLaunchPath));
+    return strParent.CompareI("upcache");
 }
 
 // Read Last Run Location from a specific registry view. viewFlag should be one of
@@ -430,7 +431,8 @@ static SString ReadInstallRootRegistryValueView(REGSAM viewFlag)
     DWORD dwType = REG_SZ;
     DWORD dwSize = 0;
     LONG  result = RegQueryValueExW(hkTemp, wstrValue, NULL, &dwType, NULL, &dwSize);
-    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize == 0 || dwSize > kMaxRegistryValueBytes)
+    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize == 0 || dwSize > kMaxRegistryValueBytes ||
+        (dwSize % sizeof(wchar_t)) != 0)
     {
         RegCloseKey(hkTemp);
         return "";
@@ -440,13 +442,10 @@ static SString ReadInstallRootRegistryValueView(REGSAM viewFlag)
     result = RegQueryValueExW(hkTemp, wstrValue, NULL, &dwType, reinterpret_cast<LPBYTE>(buffer.data()), &dwSize);
     RegCloseKey(hkTemp);
 
-    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize > kMaxRegistryValueBytes)
+    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize > kMaxRegistryValueBytes || (dwSize % sizeof(wchar_t)) != 0)
         return "";
 
-    if (dwSize >= sizeof(wchar_t))
-        buffer[(dwSize / sizeof(wchar_t)) - 1u] = L'\0';
-    else
-        buffer[0] = L'\0';
+    buffer[dwSize / sizeof(wchar_t)] = L'\0';
 
     // Expand environment variable references for REG_EXPAND_SZ values so callers see a real
     // filesystem path. Without this, a value like "%ProgramFiles%\..." would fail validation.
@@ -486,7 +485,7 @@ SString SharedUtil::GetMTASABaseDir()
             // install-root checks used elsewhere and reject temp update paths so the parent-process
             // branch cannot point this process at a directory that is about to be deleted.
             SString strParentDir = ExtractPath(GetParentProcessPathFilename(GetCurrentProcessId()));
-            if (IsUsableMtasaInstallRoot(strParentDir) && !IsTemporaryUpdateLaunchPath(strParentDir))
+            if (SharedUtil::IsUsableMtasaInstallRoot(strParentDir) && !SharedUtil::IsTemporaryUpdateLaunchPath(strParentDir))
             {
                 strInstallRoot = strParentDir;
                 strInstallRootSource = "parent process";
@@ -530,7 +529,7 @@ SString SharedUtil::GetMTASABaseDir()
                     continue;
                 if (strFirstNonEmptyRegistryValue.empty())
                     strFirstNonEmptyRegistryValue = strCandidate;
-                if (IsUsableMtasaInstallRoot(strCandidate) && !IsTemporaryUpdateLaunchPath(strCandidate))
+                if (SharedUtil::IsUsableMtasaInstallRoot(strCandidate) && !SharedUtil::IsTemporaryUpdateLaunchPath(strCandidate))
                 {
                     strInstallRoot = strCandidate;
                     strInstallRootSource = (viewFlags[i] == 0) ? "registry" :

@@ -150,7 +150,7 @@ namespace
 
         // A temp updater shouldnt load the install root's core.dll before RunInstall;
         // the localization module stays loaded and would block replacement.
-        if (!IsTemporaryUpdateLaunchPath(GetLaunchPath()))
+        if (!SharedUtil::IsTemporaryUpdateLaunchPath(GetLaunchPath()))
             InitLocalization(false);
 
         // Handle commands from the installer

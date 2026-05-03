@@ -579,7 +579,8 @@ namespace
         DWORD valueType = REG_SZ;
         DWORD valueSize = 0;
         LONG  result = RegQueryValueExW(hKey, wstrValueName.c_str(), nullptr, &valueType, nullptr, &valueSize);
-        if (result != ERROR_SUCCESS || (valueType != REG_SZ && valueType != REG_EXPAND_SZ) || valueSize == 0 || valueSize > kMaxRegistryValueBytes)
+        if (result != ERROR_SUCCESS || (valueType != REG_SZ && valueType != REG_EXPAND_SZ) || valueSize == 0 || valueSize > kMaxRegistryValueBytes ||
+            (valueSize % sizeof(wchar_t)) != 0)
         {
             RegCloseKey(hKey);
             return "";
@@ -589,13 +590,11 @@ namespace
         result = RegQueryValueExW(hKey, wstrValueName.c_str(), nullptr, &valueType, reinterpret_cast<LPBYTE>(buffer.data()), &valueSize);
         RegCloseKey(hKey);
 
-        if (result != ERROR_SUCCESS || (valueType != REG_SZ && valueType != REG_EXPAND_SZ) || valueSize > kMaxRegistryValueBytes)
+        if (result != ERROR_SUCCESS || (valueType != REG_SZ && valueType != REG_EXPAND_SZ) || valueSize > kMaxRegistryValueBytes ||
+            (valueSize % sizeof(wchar_t)) != 0)
             return "";
 
-        if (valueSize >= sizeof(wchar_t))
-            buffer[(valueSize / sizeof(wchar_t)) - 1u] = L'\0';
-        else
-            buffer[0] = L'\0';
+        buffer[valueSize / sizeof(wchar_t)] = L'\0';
 
         // Expand environment variable references for REG_EXPAND_SZ values so callers see a real
         // filesystem path. Without this, a value like "%ProgramFiles%\..." would fail validation.
@@ -620,7 +619,7 @@ namespace
 SString GetInstallPathForLauncher()
 {
     const SString strLaunchPath = GetLaunchPath();
-    if (!IsTemporaryUpdateLaunchPath(strLaunchPath))
+    if (!SharedUtil::IsTemporaryUpdateLaunchPath(strLaunchPath))
         return strLaunchPath;
 
     // Prefer the resolved base dir over the registry when one was already established. In the
@@ -633,7 +632,7 @@ SString GetInstallPathForLauncher()
     // back into GetInstallPathForLauncher() and would recurse for any temp launcher whose g_strMTASAPath
     // has not yet been populated by the far-update sequencer path. Empty string falls through to the
     // per-view registry loop below, preserving the temp-launcher-without-far-update fallback.
-    if (!g_strMTASAPath.empty() && IsUsableMtasaInstallRoot(g_strMTASAPath) && !IsTemporaryUpdateLaunchPath(g_strMTASAPath) &&
+    if (!g_strMTASAPath.empty() && SharedUtil::IsUsableMtasaInstallRoot(g_strMTASAPath) && !SharedUtil::IsTemporaryUpdateLaunchPath(g_strMTASAPath) &&
         !g_strMTASAPath.CompareI(strLaunchPath))
         return g_strMTASAPath;
 
@@ -651,7 +650,7 @@ SString GetInstallPathForLauncher()
     for (int i = 0; i < viewCount; ++i)
     {
         const SString strSavedInstallPath = ReadInstallRootRegistryView(viewFlags[i]);
-        if (IsUsableMtasaInstallRoot(strSavedInstallPath) && !IsTemporaryUpdateLaunchPath(strSavedInstallPath))
+        if (SharedUtil::IsUsableMtasaInstallRoot(strSavedInstallPath) && !SharedUtil::IsTemporaryUpdateLaunchPath(strSavedInstallPath))
             return strSavedInstallPath;
     }
 
@@ -659,30 +658,6 @@ SString GetInstallPathForLauncher()
     // (such as a base-dir override carried forward from the parent launcher) instead of treating a temp
     // update directory as the real install location.
     return SString();
-}
-
-bool IsUsableMtasaInstallRoot(const SString& strPath)
-{
-    if (strPath.empty())
-        return false;
-
-    return FileExists(PathJoin(strPath, "Multi Theft Auto.exe")) || FileExists(PathJoin(strPath, "Multi Theft Auto_d.exe")) ||
-           FileExists(PathJoin(strPath, "mta", "core.dll")) || FileExists(PathJoin(strPath, "MTA", "core.dll")) ||
-           FileExists(PathJoin(strPath, "mta", "core_d.dll")) || FileExists(PathJoin(strPath, "MTA", "core_d.dll"));
-}
-
-bool IsTemporaryUpdateLaunchPath(const SString& strLaunchPath)
-{
-    if (strLaunchPath.empty())
-        return false;
-
-    if (!strLaunchPath.ContainsI("\\upcache\\"))
-        return false;
-
-    // The auto-update flow creates the extraction directory in Install.cpp::CheckOnRestartCommand
-    // as MakeUniquePath("...\\upcache\\_<archiveName>_tmp_"), so the leaf always begins with '_'.
-    const SString strLeaf = ExtractFilename(strLaunchPath);
-    return strLeaf.BeginsWith("_") && strLeaf.ContainsI("_tmp_");
 }
 
 void SetMTASAPathSource(bool bReadFromRegistry)
@@ -718,7 +693,7 @@ void SetMTASAPathSource(bool bReadFromRegistry)
         // values. A temp launcher started without the far-update sequencer state would otherwise
         // contaminate Last Run Location with an upcache\_*_tmp_* path that gets deleted later by
         // CleanDownloadCache, leaving a stale registry pointer that produces U01 on the next launch.
-        if (IsTemporaryUpdateLaunchPath(strLaunchPath))
+        if (SharedUtil::IsTemporaryUpdateLaunchPath(strLaunchPath))
         {
             AddReportLog(1063, SString("SetMTASAPathSource: refusing to record temp launch path '%s' in registry", strLaunchPath.c_str()));
             g_strMTASAPath = strLaunchPath;
@@ -1391,7 +1366,7 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
     bool    bFreeModule = false;
 
     const SString strInstallPath = GetInstallPathForLauncher();
-    if (IsUsableMtasaInstallRoot(strInstallPath))
+    if (SharedUtil::IsUsableMtasaInstallRoot(strInstallPath))
     {
         hModule = LoadVersionModule(strInstallPath, dwLastError);
         bFreeModule = hModule != NULL;
@@ -1404,7 +1379,7 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
     if (!hModule)
     {
         const SString strBaseDirPath = GetMTASAPath();
-        if (IsUsableMtasaInstallRoot(strBaseDirPath) && !strBaseDirPath.CompareI(strInstallPath))
+        if (SharedUtil::IsUsableMtasaInstallRoot(strBaseDirPath) && !strBaseDirPath.CompareI(strInstallPath))
         {
             hModule = LoadVersionModule(strBaseDirPath, dwLastError);
             bFreeModule = hModule != NULL;

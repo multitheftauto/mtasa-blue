@@ -249,14 +249,16 @@ static bool TerminateFileLockingProcesses(const SString& absolutePath, const SSt
     std::vector<DWORD> processIds = GetProcessListUsingFile(filePath);
     const DWORD        currentProcessId = GetCurrentProcessId();
 
-    const auto RemoveCurrentProcessId = [&]() {
+    const auto RemoveCurrentProcessId = [&]()
+    {
         const auto newEnd = std::remove(processIds.begin(), processIds.end(), currentProcessId);
         const bool removedCurrentProcess = newEnd != processIds.end();
         processIds.erase(newEnd, processIds.end());
         return removedCurrentProcess;
     };
 
-    const auto FailOnCurrentProcessLock = [&]() {
+    const auto FailOnCurrentProcessLock = [&]()
+    {
         AddReportLog(5055, SString("TerminateFileLockingProcesses: current process %lu is locking '%s'", currentProcessId, absolutePath.c_str()));
         return false;
     };
