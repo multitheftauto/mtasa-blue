@@ -304,17 +304,28 @@ void CInstallManager::InitSequencer()
 //////////////////////////////////////////////////////////
 void CInstallManager::SetMTASAPathSource(const SString& strCommandLineIn)
 {
-    // Update some settings which are used by ReportLog
-    UpdateSettingsForReportLog();
-
     InitSequencer();
     RestoreSequencerFromSnapshot(strCommandLineIn);
 
     // If command line says we're not running from the launch directory, get the launch directory location from the registry
     if (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far")
+    {
+        // Process B carried the real install root through the sequencer state. Honor it here so this
+        // temp launcher process can resolve its base dir without depending only on the registry.
+        // The override must be installed before UpdateSettingsForReportLog runs, because that helper
+        // reaches GetInstallPathForLauncher / GetMTASAPath through UpdateMTAVersionApplicationSetting.
+        const SString strRealInstallRoot = m_pSequencer->GetVariable(INSTALL_ROOT);
+        if (!strRealInstallRoot.empty() && IsUsableMtasaInstallRoot(strRealInstallRoot) && !IsTemporaryUpdateLaunchPath(strRealInstallRoot))
+            SharedUtil::SetMTASABaseDirOverride(strRealInstallRoot);
+
         ::SetMTASAPathSource(true);
+    }
     else
         ::SetMTASAPathSource(false);
+
+    // Update some settings which are used by ReportLog. Must run after the path source is resolved
+    // so that report-log helpers see the real install root rather than a temp extraction directory.
+    UpdateSettingsForReportLog();
 }
 
 //////////////////////////////////////////////////////////
@@ -1042,6 +1053,11 @@ SString CInstallManager::_MaybeSwitchToTempExe()
     // If a new "Multi Theft Auto.exe" exists, let that complete the install
     if (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far")
     {
+        // Carry the current real install root forward to the temp launcher so it can set a base-dir
+        // override before reading the registry. Without this, the temp launcher has only Last Run
+        // Location to fall back on, which can be missing, stale, or denied by HKLM write failures.
+        m_pSequencer->SetVariable(INSTALL_ROOT, GetMTASAPath());
+
         ReleaseSingleInstanceMutex();
         if (ShellExecuteNonBlocking("open", GetLauncherPathFilename(), GetSequencerSnapshot()))
             ExitProcess(0);  // All done here
@@ -1065,8 +1081,13 @@ SString CInstallManager::_SwitchBackFromTempExe()
     {
         m_pSequencer->SetVariable(INSTALL_LOCATION, "near");
 
-        SString strLauncherPathFilename = PathJoin(GetInstallPathForLauncher(), MTA_EXE_NAME);
-        if (!FileExists(strLauncherPathFilename))
+        // GetInstallPathForLauncher returns empty when running from a temp update directory and no
+        // usable non-temp install root could be resolved. PathJoin would then produce a root-relative
+        // probe like "\Multi Theft Auto.exe", which could match an unrelated file on the current drive
+        // and cause us to launch the wrong executable. Skip straight to the GetMTASAPath() fallback.
+        const SString strRealInstallRoot = GetInstallPathForLauncher();
+        SString       strLauncherPathFilename = strRealInstallRoot.empty() ? SString() : PathJoin(strRealInstallRoot, MTA_EXE_NAME);
+        if (strLauncherPathFilename.empty() || !FileExists(strLauncherPathFilename))
         {
             strLauncherPathFilename = PathJoin(GetMTASAPath(), MTA_EXE_NAME);
             if (!FileExists(strLauncherPathFilename))
@@ -1729,7 +1750,10 @@ SString CInstallManager::_ProcessAppCompatChecks()
     IsWow64Process(GetCurrentProcess(), &bIsWOW64);
     uint    uiHKLMFlags = bIsWOW64 ? KEY_WOW64_64KEY : 0;
     WString strGTAExePathFilename = GetGameExecutablePath().wstring();
-    WString strMTAExePathFilename = FromUTF8(PathJoin(GetInstallPathForLauncher(), MTA_EXE_NAME));
+    SString strMTAInstallPath = GetInstallPathForLauncher();
+    if (strMTAInstallPath.empty())
+        strMTAInstallPath = GetMTASAPath();
+    WString strMTAExePathFilename = FromUTF8(PathJoin(strMTAInstallPath, MTA_EXE_NAME));
     WString strCompatModeRegKey = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
     int     bWin816BitColorOption = GetApplicationSettingInt("Win8Color16");
     int     bWin8MouseOption = GetApplicationSettingInt("Win8MouseFix");

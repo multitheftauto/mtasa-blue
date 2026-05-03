@@ -464,9 +464,17 @@ void InitLocalization(bool bShowErrors)
         return;
 
     const SString strLaunchPath = GetLaunchPath();
+    const SString strMTASAPath = GetMTASAPath();
 
-    // Check for core.dll
-    const SString strCoreDLL = PathJoin(strLaunchPath, "mta", MTA_DLL_NAME);
+    // Probe the install root first and only fall back to the launch path. In the auto-update flow,
+    // Process C runs from a temp directory under \upcache\_*_tmp_*\ which does not contain mta\core.dll;
+    // the real install root is carried into g_strMTASAPath via the install manager's SetMTASABaseDirOverride
+    // path, so GetMTASAPath returns it even though GetLaunchPath still points at the temp tree. On a normal
+    // non-temp launch the two paths are equal and the first probe succeeds.
+    SString strCoreDLL = PathJoin(strMTASAPath, "mta", MTA_DLL_NAME);
+    if (!FileExists(strCoreDLL))
+        strCoreDLL = PathJoin(strLaunchPath, "mta", MTA_DLL_NAME);
+
     if (!FileExists(strCoreDLL))
     {
         if (!bShowErrors)
@@ -477,7 +485,6 @@ void InitLocalization(bool bShowErrors)
     }
 
     // Setup DLL search paths
-    const SString strMTASAPath = GetMTASAPath();
     SetDllDirectory(PathJoin(strMTASAPath, "mta"));
 
     // See if xinput is loadable (XInput9_1_0.dll or xinput1_3.dll)
@@ -820,7 +827,9 @@ void ConfigureWerDumpPath()
 {
     using WerRegisterAppLocalDumpFn = HRESULT(WINAPI*)(PCWSTR);
 
-    const SString strInstallPath = GetInstallPathForLauncher();
+    SString strInstallPath = GetInstallPathForLauncher();
+    if (strInstallPath.empty())
+        strInstallPath = GetMTASAPath();
     if (strInstallPath.empty())
         return;
 
