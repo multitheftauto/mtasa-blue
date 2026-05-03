@@ -315,8 +315,20 @@ void CInstallManager::SetMTASAPathSource(const SString& strCommandLineIn)
         // The override must be installed before UpdateSettingsForReportLog runs, because that helper
         // reaches GetInstallPathForLauncher / GetMTASAPath through UpdateMTAVersionApplicationSetting.
         const SString strRealInstallRoot = m_pSequencer->GetVariable(INSTALL_ROOT);
-        if (!strRealInstallRoot.empty() && IsUsableMtasaInstallRoot(strRealInstallRoot) && !IsTemporaryUpdateLaunchPath(strRealInstallRoot))
+        if (strRealInstallRoot.empty())
+        {
+            AddReportLog(1063, "CInstallManager::SetMTASAPathSource: no sequencer install root, falling back to registry");
+        }
+        else if (SharedUtil::IsUsableMtasaInstallRoot(strRealInstallRoot) && !SharedUtil::IsTemporaryUpdateLaunchPath(strRealInstallRoot))
+        {
+            AddReportLog(1063, SString("CInstallManager::SetMTASAPathSource: honoring sequencer install root '%s'", strRealInstallRoot.c_str()));
             SharedUtil::SetMTASABaseDirOverride(strRealInstallRoot);
+        }
+        else
+        {
+            AddReportLog(1063, SString("CInstallManager::SetMTASAPathSource: rejecting unusable sequencer install root '%s', falling back to registry",
+                                       strRealInstallRoot.c_str()));
+        }
 
         ::SetMTASAPathSource(true);
     }
