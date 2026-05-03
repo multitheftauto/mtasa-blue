@@ -418,7 +418,10 @@ static bool IsTemporaryUpdateLaunchPath(const SString& strLaunchPath)
     if (!strLaunchPath.ContainsI("\\upcache\\"))
         return false;
 
-    return ExtractFilename(strLaunchPath).ContainsI("_tmp_");
+    // The auto-update flow creates the extraction directory in Install.cpp::CheckOnRestartCommand
+    // as MakeUniquePath("...\\upcache\\_<archiveName>_tmp_"), so the leaf always begins with '_'.
+    const SString strLeaf = ExtractFilename(strLaunchPath);
+    return strLeaf.BeginsWith("_") && strLeaf.ContainsI("_tmp_");
 }
 
 // Read Last Run Location from a specific registry view. viewFlag should be one of
