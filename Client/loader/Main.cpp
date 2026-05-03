@@ -148,8 +148,10 @@ namespace
         // Start logging.....now
         BeginEventLog();
 
-        // Start localization if possible
-        InitLocalization(false);
+        // A temp updater shouldnt load the install root's core.dll before RunInstall;
+        // the localization module stays loaded and would block replacement.
+        if (!IsTemporaryUpdateLaunchPath(GetLaunchPath()))
+            InitLocalization(false);
 
         // Handle commands from the installer
         HandleSpecialLaunchOptions();
