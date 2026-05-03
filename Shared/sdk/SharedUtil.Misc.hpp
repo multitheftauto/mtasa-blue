@@ -406,20 +406,41 @@ static bool IsUsableMtasaInstallRoot(const SString& strPath)
            FileExists(PathJoin(strPath, "mta", "core_d.dll")) || FileExists(PathJoin(strPath, "MTA", "core_d.dll"));
 }
 
-static SString ReadInstallRootRegistryValue64()
+// A path inside upcache\_<archive>_tmp_<n> is a transient extraction directory used by the auto-update
+// flow. Such a path can satisfy IsUsableMtasaInstallRoot while it still exists, but it must never be
+// accepted as the durable MTA install root. The launcher-side helper in Client/loader/Utils.cpp uses
+// the same shape; if either copy changes, update both.
+static bool IsTemporaryUpdateLaunchPath(const SString& strLaunchPath)
 {
-    #if defined(KEY_WOW64_64KEY)
+    if (strLaunchPath.empty())
+        return false;
+
+    if (!strLaunchPath.ContainsI("\\upcache\\"))
+        return false;
+
+    return ExtractFilename(strLaunchPath).ContainsI("_tmp_");
+}
+
+// Read Last Run Location from a specific registry view. viewFlag should be one of
+// KEY_WOW64_64KEY, KEY_WOW64_32KEY, or 0 (no view override). Returns empty on any failure.
+// Oversized values are rejected without allocation so a malformed registry entry on the U01
+// recovery path cannot turn into a large allocation; the same 1 MB cap is used by the generic
+// ReadRegistryStringValue helper later in this file.
+static SString ReadInstallRootRegistryValueView(REGSAM viewFlag)
+{
+    constexpr DWORD kMaxRegistryValueBytes = 1024u * 1024u;
+
     const WString wstrSubKey = FromUTF8(PathJoin(GetProductRegistryPath(), GetMajorVersionString()).TrimEnd("\\"));
     const WString wstrValue = FromUTF8("Last Run Location");
 
     HKEY hkTemp = NULL;
-    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, wstrSubKey, 0, KEY_READ | KEY_WOW64_64KEY, &hkTemp) != ERROR_SUCCESS || !hkTemp)
+    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, wstrSubKey, 0, KEY_READ | viewFlag, &hkTemp) != ERROR_SUCCESS || !hkTemp)
         return "";
 
     DWORD dwType = REG_SZ;
     DWORD dwSize = 0;
     LONG  result = RegQueryValueExW(hkTemp, wstrValue, NULL, &dwType, NULL, &dwSize);
-    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize == 0)
+    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize == 0 || dwSize > kMaxRegistryValueBytes)
     {
         RegCloseKey(hkTemp);
         return "";
@@ -429,7 +450,7 @@ static SString ReadInstallRootRegistryValue64()
     result = RegQueryValueExW(hkTemp, wstrValue, NULL, &dwType, reinterpret_cast<LPBYTE>(buffer.data()), &dwSize);
     RegCloseKey(hkTemp);
 
-    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ))
+    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize > kMaxRegistryValueBytes)
         return "";
 
     if (dwSize >= sizeof(wchar_t))
@@ -437,10 +458,23 @@ static SString ReadInstallRootRegistryValue64()
     else
         buffer[0] = L'\0';
 
+    // Expand environment variable references for REG_EXPAND_SZ values so callers see a real
+    // filesystem path. Without this, a value like "%ProgramFiles%\..." would fail validation.
+    // The expansion is bounded by the same 1 MB cap so a value containing a self-referential or
+    // explosive expansion cannot trigger a large allocation here.
+    if (dwType == REG_EXPAND_SZ)
+    {
+        constexpr DWORD kMaxExpandChars = kMaxRegistryValueBytes / sizeof(wchar_t);
+        const DWORD     expandedChars = ExpandEnvironmentStringsW(buffer.data(), nullptr, 0);
+        if (expandedChars > 0 && expandedChars <= kMaxExpandChars)
+        {
+            std::vector<wchar_t> expanded(expandedChars, L'\0');
+            if (ExpandEnvironmentStringsW(buffer.data(), expanded.data(), expandedChars))
+                return ToUTF8(expanded.data());
+        }
+    }
+
     return ToUTF8(buffer.data());
-    #else
-    return "";
-    #endif
 }
 
 //
@@ -458,9 +492,11 @@ SString SharedUtil::GetMTASABaseDir()
     {
         if (IsGTAProcess())
         {
-            // Try to get base dir from parent process
+            // Try to get base dir from parent process. Validate the candidate against the same
+            // install-root checks used elsewhere and reject temp update paths so the parent-process
+            // branch cannot point this process at a directory that is about to be deleted.
             SString strParentDir = ExtractPath(GetParentProcessPathFilename(GetCurrentProcessId()));
-            if (FileExists(PathJoin(strParentDir, "mta", "core.dll")) || FileExists(PathJoin(strParentDir, "MTA", "core.dll")))
+            if (IsUsableMtasaInstallRoot(strParentDir) && !IsTemporaryUpdateLaunchPath(strParentDir))
             {
                 strInstallRoot = strParentDir;
                 strInstallRootSource = "parent process";
@@ -483,34 +519,48 @@ SString SharedUtil::GetMTASABaseDir()
         }
         if (strInstallRoot.empty())
         {
-            strInstallRoot = GetRegistryValue("", "Last Run Location");
-            if (!IsUsableMtasaInstallRoot(strInstallRoot))
+            // Read each registry view independently and apply install-root validation per view, so a
+            // stale or temp-path value in one view cannot shadow a usable real install root in
+            // another. Order: 64-bit view, 32-bit view, default view.
+            REGSAM viewFlags[3] = {0, 0, 0};
+            int    viewCount = 0;
+    #if defined(KEY_WOW64_64KEY)
+            viewFlags[viewCount++] = KEY_WOW64_64KEY;
+    #endif
+    #if defined(KEY_WOW64_32KEY)
+            viewFlags[viewCount++] = KEY_WOW64_32KEY;
+    #endif
+            viewFlags[viewCount++] = 0;
+
+            SString strFirstNonEmptyRegistryValue;
+            for (int i = 0; i < viewCount && strInstallRoot.empty(); ++i)
             {
-                const SString strRegistry32InstallRoot = strInstallRoot;
-                const SString strRegistry64InstallRoot = ReadInstallRootRegistryValue64();
-                if (IsUsableMtasaInstallRoot(strRegistry64InstallRoot))
+                const SString strCandidate = ReadInstallRootRegistryValueView(viewFlags[i]);
+                if (strCandidate.empty())
+                    continue;
+                if (strFirstNonEmptyRegistryValue.empty())
+                    strFirstNonEmptyRegistryValue = strCandidate;
+                if (IsUsableMtasaInstallRoot(strCandidate) && !IsTemporaryUpdateLaunchPath(strCandidate))
                 {
-                    strInstallRoot = strRegistry64InstallRoot;
-                    strInstallRootSource = "registry64";
-                }
-                else
-                {
-                    if (!strRegistry32InstallRoot.empty())
-                    {
-                        AddReportLog(1042, SString("GetMTASABaseDir: ignoring unusable registry path '%s'", strRegistry32InstallRoot.c_str()), 1);
-                    }
-                    strInstallRoot.clear();
+                    strInstallRoot = strCandidate;
+                    strInstallRootSource = (viewFlags[i] == 0) ? "registry" :
+    #if defined(KEY_WOW64_64KEY)
+                                           (viewFlags[i] == KEY_WOW64_64KEY) ? "registry64" :
+    #endif
+                                                                               "registry32";
                 }
             }
             if (strInstallRoot.empty())
             {
+                if (!strFirstNonEmptyRegistryValue.empty())
+                {
+                    AddReportLog(1042, SString("GetMTASABaseDir: ignoring unusable registry path '%s'", strFirstNonEmptyRegistryValue.c_str()), 1);
+                }
                 AddReportLog(1042, "GetMTASABaseDir: unable to resolve install root", 1);
                 MessageBoxUTF8(0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error") + _E("U01"),
                                MB_OK | MB_ICONERROR | MB_TOPMOST);
                 TerminateProcess(GetCurrentProcess(), 9);
             }
-            if (strInstallRootSource.empty())
-                strInstallRootSource = "registry";
         }
 
         if (!strInstallRoot.empty())
