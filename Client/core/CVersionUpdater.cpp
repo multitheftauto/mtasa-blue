@@ -1918,7 +1918,7 @@ void CVersionUpdater::_DialogServerSaysUpdateQuestion()
     GetQuestionBox().Reset();
     GetQuestionBox().SetTitle(_("MANDATORY UPDATE"));
     GetQuestionBox().SetMessage(
-        SString(_("To join this server, you must update MTA.\n\nMinimum version: %s\n Do you want to update now ?"), *m_strServerSaysData));
+        SString(_("To join this server, you must update MTA to version %s.\n Do you want to update now?"), *m_strServerSaysData));
     GetQuestionBox().SetButton(0, _("No"));
     GetQuestionBox().SetButton(1, _("Yes"));
     GetQuestionBox().Show();
