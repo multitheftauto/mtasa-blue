@@ -1069,9 +1069,6 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     SendNoClientCacheScripts();
     m_bClientSync = true;
 
-    // HACK?: stops resources getting loaded twice when you change them then manually restart
-    GenerateChecksums();
-
     // Add us to the running resources list
     m_StartedResources.push_back(this);
 
