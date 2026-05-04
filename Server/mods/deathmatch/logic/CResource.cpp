@@ -81,6 +81,108 @@ static unzFile unzOpenUtf8(const char* path)
 #endif
 }
 
+namespace
+{
+    struct SHttpCacheCopyResult
+    {
+        CChecksum checksum;
+        uint64    size = 0;
+        SString   tempPath;
+        SString   error;
+    };
+
+    bool ReplaceHttpCacheFile(const SString& strTempPath, const SString& strCachedFilePath, int* pOutErrorCode)
+    {
+#ifdef WIN32
+        if (MoveFileExW(FromUTF8(strTempPath), FromUTF8(strCachedFilePath), MOVEFILE_REPLACE_EXISTING | MOVEFILE_WRITE_THROUGH) == 0)
+        {
+            if (pOutErrorCode)
+                *pOutErrorCode = GetLastError();
+            return false;
+        }
+
+        return true;
+#else
+        if (rename(strTempPath, strCachedFilePath) != 0)
+        {
+            if (pOutErrorCode)
+                *pOutErrorCode = errno;
+            return false;
+        }
+
+        return true;
+#endif
+    }
+
+    SHttpCacheCopyResult CopyToHttpCacheAndChecksum(const SString& strPath, const SString& strCachedFilePath)
+    {
+        SHttpCacheCopyResult result;
+        SString              strTempPath = MakeUniquePath(SString("%s.tmp", *strCachedFilePath));
+
+        MakeSureDirExists(strTempPath);
+
+        FILE* pSource = File::FopenExclusive(strPath, "rb");
+        if (!pSource)
+        {
+            result.error = SString("Could not read '%s' for HTTP cache\n", *strPath);
+            return result;
+        }
+
+        FILE* pTemp = File::Fopen(strTempPath, "wb");
+        if (!pTemp)
+        {
+            fclose(pSource);
+            result.error = SString("Could not write temporary HTTP cache file '%s'\n", *strTempPath);
+            return result;
+        }
+
+        CMD5Hasher    md5;
+        unsigned long crc = 0;
+        char          buffer[65536];
+        bool          ok = true;
+
+        md5.Init();
+
+        while (true)
+        {
+            size_t bytesRead = fread(buffer, 1, sizeof(buffer), pSource);
+            if (bytesRead == 0)
+            {
+                if (ferror(pSource))
+                    ok = false;
+                break;
+            }
+
+            if (fwrite(buffer, 1, bytesRead, pTemp) != bytesRead)
+            {
+                ok = false;
+                break;
+            }
+
+            crc = CRCGenerator::GetCRCFromBuffer(buffer, bytesRead, crc);
+            md5.Update(reinterpret_cast<unsigned char*>(buffer), static_cast<unsigned int>(bytesRead));
+            result.size += bytesRead;
+        }
+
+        bool closeOk = fclose(pTemp) == 0;
+        fclose(pSource);
+
+        if (!ok || !closeOk)
+        {
+            FileDelete(strTempPath);
+            result.error = SString("Could not copy '%s' to temporary HTTP cache file '%s'\n", *strPath, *strTempPath);
+            return result;
+        }
+
+        md5.Finalize();
+        result.checksum.ulCRC = crc;
+        memcpy(result.checksum.md5.data, md5.GetResult(), sizeof(result.checksum.md5.data));
+        result.tempPath = strTempPath;
+
+        return result;
+    }
+}  // namespace
+
 CResource::CResource(CResourceManager* pResourceManager, bool bIsZipped, const char* szAbsPath, const char* szResourceName)
     : m_pResourceManager(pResourceManager), m_bResourceIsZip(bIsZipped), m_strResourceName(SStringX(szResourceName)), m_strAbsPath(SStringX(szAbsPath))
 {
@@ -535,12 +637,12 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
                 return SString(std::get<std::string>(checksumOrError));
             }
 
-            pResourceFile->SetLastChecksum(std::get<CChecksum>(checksumOrError));
-            pResourceFile->SetLastFileSizeHint(static_cast<uint>(FileSize(strPath)));
+            CChecksum checksum = std::get<CChecksum>(checksumOrError);
+            uint64    fileSize = FileSize(strPath);
 
             // Check if file is blocked
             char szHashResult[33];
-            CMD5Hasher::ConvertToHex(pResourceFile->GetLastChecksum().md5, szHashResult);
+            CMD5Hasher::ConvertToHex(checksum.md5, szHashResult);
             SString strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
 
             if (!strBlockReason.empty())
@@ -565,12 +667,31 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
 
                     CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
 
-                    if (pResourceFile->GetLastChecksum() != cachedChecksum)
+                    if (checksum != cachedChecksum)
                     {
-                        if (!FileCopy(strPath, strCachedFilePath))
+                        SHttpCacheCopyResult copyResult = CopyToHttpCacheAndChecksum(strPath, strCachedFilePath);
+                        if (!copyResult.error.empty())
+                            return copyResult.error;
+
+                        CMD5Hasher::ConvertToHex(copyResult.checksum.md5, szHashResult);
+                        strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
+
+                        if (!strBlockReason.empty())
                         {
-                            return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
+                            FileDelete(copyResult.tempPath);
+                            return SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
                         }
+
+                        // Publish only after the complete cached file matches the checksum we will advertise.
+                        int replaceError = 0;
+                        if (!ReplaceHttpCacheFile(copyResult.tempPath, strCachedFilePath, &replaceError))
+                        {
+                            FileDelete(copyResult.tempPath);
+                            return SString("Could not replace HTTP cache file '%s' (error %d)\n", *strCachedFilePath, replaceError);
+                        }
+
+                        checksum = copyResult.checksum;
+                        fileSize = copyResult.size;
 
                         // If script is 'no client cache', make sure there is no trace of it in the output dir
                         if (pResourceFile->IsNoClientCache())
@@ -582,6 +703,9 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
                 default:
                     break;
             }
+
+            pResourceFile->SetLastChecksum(checksum);
+            pResourceFile->SetLastFileSizeHint(fileSize);
 
             return SString();
         });
