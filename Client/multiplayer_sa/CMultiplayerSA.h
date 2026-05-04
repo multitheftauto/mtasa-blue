@@ -118,6 +118,7 @@ public:
     void SetBreakTowLinkHandler(BreakTowLinkHandler* pBreakTowLinkHandler);
     void SetProcessCamHandler(ProcessCamHandler* pProcessCamHandler);
     void SetChokingHandler(ChokingHandler* pChokingHandler);
+    void SetPreWeatherUpdateHandler(PreWeatherUpdateHandler* pHandler);
     void SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler);
     void SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler);
     void SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler);
