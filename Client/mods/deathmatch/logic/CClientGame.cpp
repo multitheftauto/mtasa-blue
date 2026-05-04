@@ -285,6 +285,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetRenderHeliLightHandler(CClientGame::StaticRenderHeliLightHandler);
     g_pMultiplayer->SetRenderEverythingBarRoadsHandler(CClientGame::StaticRenderEverythingBarRoadsHandler);
     g_pMultiplayer->SetChokingHandler(CClientGame::StaticChokingHandler);
+    g_pMultiplayer->SetPreWeatherUpdateHandler(CClientGame::StaticPreWeatherUpdateHandler);
     g_pMultiplayer->SetPreWorldProcessHandler(CClientGame::StaticPreWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler);
@@ -494,6 +495,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetRenderHeliLightHandler(nullptr);
     g_pMultiplayer->SetRenderEverythingBarRoadsHandler(nullptr);
     g_pMultiplayer->SetChokingHandler(NULL);
+    g_pMultiplayer->SetPreWeatherUpdateHandler(NULL);
     g_pMultiplayer->SetPreWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(nullptr);
@@ -3629,6 +3631,11 @@ bool CClientGame::StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAIn
     return g_pClientGame->BlendAnimationHierarchyHandler(pAnimAssoc, pOutAnimHierarchy, pFlags, pClump);
 }
 
+void CClientGame::StaticPreWeatherUpdateHandler()
+{
+    g_pClientGame->PreWeatherUpdateHandler();
+}
+
 void CClientGame::StaticPreWorldProcessHandler()
 {
     g_pClientGame->PreWorldProcessHandler();
@@ -3898,6 +3905,20 @@ void CClientGame::Render3DStuffHandler()
 void CClientGame::PreRenderSkyHandler()
 {
     g_pCore->GetGraphics()->GetRenderItemManager()->PreDrawWorld();
+}
+
+void CClientGame::PreWeatherUpdateHandler()
+{
+    // Fix #4803 (building light flicker): Re-apply MTA's weather state BEFORE
+    // CWeather::Update runs. CWeather::Update detects a clock wrap when setTime()
+    // jumps the game clock past InterpolationValue and re-derives Rain, Foggyness,
+    // CloudCoverage, ExtraSunnyness, SunGlare, HeatHaze, etc. from a freshly-picked
+    // weather pair. Those globals drive cloud, fog and night-time building light
+    // rendering for the rest of the frame, and PreWorldProcessHandler runs too late
+    // to undo the damage. Pre-syncing Old/New/InterpolationValue here keeps the
+    // wrap branch from firing.
+    if (m_pManager->IsGameLoaded() && m_pBlendedWeather)
+        m_pBlendedWeather->DoPulse();
 }
 
 void CClientGame::PreWorldProcessHandler()
