@@ -226,6 +226,8 @@ bool CLocalServer::OnUpdateResourcesButtonClick(CGUIElement* pElement)
                 if (unzOpenCurrentFile(zipFile) != UNZ_OK)
                     continue;
 
+                // Note: "wb" mode overwrites existing files if they have the same name
+                // Any other custom resources on disk that aren't in the zip are left untouched.
                 FILE* file = fopen(filePath.c_str(), "wb");
                 if (file)
                 {
