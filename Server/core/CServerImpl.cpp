@@ -551,7 +551,7 @@ void CServerImpl::HandlePulseSleep()
     // regardless of how full the queue already was (#4853). busy_sleep_time
     // is no longer consulted on this path; server_logic_fps_limit is the
     // existing knob for a hard cap.
-    const int iSleepMs = Clamp(0, iSleepIdleMs, 50);
+    const int        iSleepMs = Clamp(0, iSleepIdleMs, 50);
     const CTickCount deadline = CTickCount::Now() + CTickCount((long long)iSleepMs);
     while (CTickCount::Now() < deadline)
     {
