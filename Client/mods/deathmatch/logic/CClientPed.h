@@ -141,7 +141,7 @@ struct SAnimationCache
     int          iTime{-1};
     bool         bLoop{false};
     bool         bUpdatePosition{false};
-    bool         bInterruptable{false};
+    bool         bInterruptible{false};
     bool         bFreezeLastFrame{true};
     int          iBlend{250};
     float        progress{0.0f};
@@ -469,7 +469,7 @@ public:
     bool IsAnimationInProgress();
 
     void RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true,
-                           bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false,
+                           bool bUpdatePosition = true, bool bInterruptible = false, bool bFreezeLastFrame = true, bool bRunInSequence = false,
                            bool bOffsetPed = false, bool bHoldLastFrame = false);
     void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();

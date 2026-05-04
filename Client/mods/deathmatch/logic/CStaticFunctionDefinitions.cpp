@@ -2249,9 +2249,9 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike(CClientEntity& Entity
 }
 
 bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
-                                                 bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame)
+                                                 bool bUpdatePosition, bool bInterruptible, bool bFreezeLastFrame)
 {
-    RUN_CHILDREN(SetPedAnimation(**iter, strBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
+    RUN_CHILDREN(SetPedAnimation(**iter, strBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame))
 
     if (IS_PED(&Entity))
     {
@@ -2263,7 +2263,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
             {
                 Ped.SetCurrentAnimationCustom(false);
                 Ped.SetNextAnimationNormal();
-                Ped.RunNamedAnimation(pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
+                Ped.RunNamedAnimation(pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame);
                 return true;
             }
             else
@@ -2282,7 +2282,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                         Ped.SetNextAnimationCustom(pIFP, szAnimName);
 
                         const char* szGateWayAnimationName = g_pGame->GetAnimManager()->GetGateWayAnimationName();
-                        Ped.RunNamedAnimation(pBlock, szGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
+                        Ped.RunNamedAnimation(pBlock, szGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame);
                         return true;
                     }
                 }
@@ -9975,7 +9975,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
         if (pPed->IsDead() || pVehicle->GetHealth() <= 0.0f)
             return false;
 
-        // Toss the previous player out of it if neccessary
+        // Toss the previous player out of it if necessary
         if (CClientPed* pPreviousOccupant = pVehicle->GetOccupant(uiSeat))
             RemovePedFromVehicle(pPreviousOccupant);
 

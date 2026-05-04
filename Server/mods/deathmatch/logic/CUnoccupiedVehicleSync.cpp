@@ -345,7 +345,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
                                 }
                             }
                             pVehicle->SetHealth(vehicle.data.fHealth);
-                            // Stops sync + fixVehicle/setElementHealth conflicts triggering onVehicleDamage by having a seperate stored float keeping track of
+                            // Stops sync + fixVehicle/setElementHealth conflicts triggering onVehicleDamage by having a separate stored float keeping track of
                             // ONLY what comes in via sync
                             // - Caz
                             pVehicle->SetLastSyncedHealth(vehicle.data.fHealth);

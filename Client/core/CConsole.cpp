@@ -123,7 +123,7 @@ bool CConsole::IsEnabled()
 
 void CConsole::SetEnabled(bool bEnabled)
 {
-    // Hide it if neccessary
+    // Hide it if necessary
     if (!bEnabled && m_pWindow->IsVisible())
     {
         SetVisible(false);

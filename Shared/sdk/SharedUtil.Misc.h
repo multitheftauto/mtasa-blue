@@ -147,6 +147,9 @@ namespace SharedUtil
     //
     void SetMTASABaseDirOverride(const SString& strPath);
 
+    bool IsUsableMtasaInstallRoot(const SString& strPath);
+    bool IsTemporaryUpdateLaunchPath(const SString& strLaunchPath);
+
     //
     // Get startup directory as saved in the registry by the launcher
     // Used in the Win32 Client only

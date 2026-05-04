@@ -745,7 +745,7 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 return true;
             case WM_IME_KEYDOWN:
             {
-                // Handle space/return seperately in this case
+                // Handle space/return separately in this case
                 if (wParam == VK_SPACE)
                     pGUI->ProcessCharacter(MapVirtualKey(wParam, MAPVK_VK_TO_CHAR));
 

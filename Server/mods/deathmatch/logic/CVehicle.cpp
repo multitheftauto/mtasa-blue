@@ -175,7 +175,7 @@ CVehicle::~CVehicle()
 
     CElementRefManager::RemoveElementRefs(ELEMENT_REF_DEBUG(this, "CVehicle"), &m_pTowedVehicle, &m_pTowedByVehicle, &m_pSyncer, &m_pJackingPed, NULL);
 
-    // Notify the vehicle manager that we are not to be respawned anymore if neccessary
+    // Notify the vehicle manager that we are not to be respawned anymore if necessary
     if (m_bRespawnEnabled)
         m_pVehicleManager->GetRespawnEnabledVehicles().remove(this);
 

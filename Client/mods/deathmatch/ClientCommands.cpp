@@ -717,7 +717,7 @@ void COMMAND_DumpPlayers(const char* szCmdLine)
 
         // End of the dump. Close it
         fclose(pFile);
-        g_pCore->GetConsole()->Print("dumpplayers: Dumping successfull");
+        g_pCore->GetConsole()->Print("dumpplayers: Dumping successful");
     }
     else
         g_pCore->GetConsole()->Print("dumpplayers: Unable to create file");

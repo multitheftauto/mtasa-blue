@@ -2192,12 +2192,12 @@ int CLuaEngineDefs::EngineSetObjectGroupPhysicalProperty(lua_State* luaVM)
         }
         case ObjectGroupPhysicalProperties::Modifiable::SPECIALCOLRESPONSE:
         {
-            ObjectGroupPhysicalProperties::CollisionResponse eColRepsonse;
-            argStream.ReadEnumString(eColRepsonse);
+            ObjectGroupPhysicalProperties::CollisionResponse eColResponse;
+            argStream.ReadEnumString(eColResponse);
             if (argStream.HasErrors())
                 break;
 
-            pGroup->SetCollisionSpecialResponseCase(eColRepsonse);
+            pGroup->SetCollisionSpecialResponseCase(eColResponse);
             lua_pushboolean(luaVM, true);
             return 1;
         }
@@ -2359,11 +2359,11 @@ int CLuaEngineDefs::EngineGetObjectGroupPhysicalProperty(lua_State* luaVM)
         }
         case ObjectGroupPhysicalProperties::Modifiable::SPECIALCOLRESPONSE:
         {
-            ObjectGroupPhysicalProperties::CollisionResponse eColRepsonse = pGroup->GetCollisionSpecialResponseCase();
-            if (!EnumValueValid(eColRepsonse))
+            ObjectGroupPhysicalProperties::CollisionResponse eColResponse = pGroup->GetCollisionSpecialResponseCase();
+            if (!EnumValueValid(eColResponse))
                 break;
 
-            lua_pushstring(luaVM, EnumToString(eColRepsonse));
+            lua_pushstring(luaVM, EnumToString(eColResponse));
             return 1;
         }
         case ObjectGroupPhysicalProperties::Modifiable::FXTYPE:

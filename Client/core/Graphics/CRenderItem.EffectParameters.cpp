@@ -1076,7 +1076,7 @@ bool CEffectParameters::TryParseSpecialParameter(D3DXHANDLE hParameter, const D3
 //
 // CEffectParameters::IsSecondaryRenderTarget
 //
-// Return true if paramter is flagged for use as a secondary render target texture
+// Return true if parameter is flagged for use as a secondary render target texture
 //
 ////////////////////////////////////////////////////////////////
 bool CEffectParameters::IsSecondaryRenderTarget(D3DXHANDLE hParameter, const D3DXPARAMETER_DESC& ParameterDesc)

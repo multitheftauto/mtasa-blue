@@ -65,7 +65,7 @@ public:
     unsigned int bIsStanding : 1;           // is ped standing on something
     unsigned int bWasStanding : 1;          // was ped standing on something
     unsigned int bIsLooking : 1;            // is ped looking at something or in a direction
-    unsigned int bIsRestoringLook : 1;      // is ped restoring head postion from a look
+    unsigned int bIsRestoringLook : 1;      // is ped restoring head position from a look
     unsigned int bIsAimingGun : 1;          // is ped aiming gun
     unsigned int bIsRestoringGun : 1;       // is ped moving gun back to default posn
     unsigned int bCanPointGunAtTarget : 1;  // can ped point gun at target

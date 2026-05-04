@@ -211,7 +211,7 @@ bool IsBlendAssocGroupValid(int iGroup)
         CAnimBlendStaticAssociationSAInterface* pAssociation = pBlendAssocGroup->pAssociationsArray + iUseAnimId;
         if (pAssociation == NULL)
             return false;
-        if (pAssociation->pAnimHeirarchy == NULL)
+        if (pAssociation->pAnimHierarchy == NULL)
             return false;
     }
     return true;
