@@ -15,6 +15,7 @@
 // Common command line keys
 #define INSTALL_STAGE    "install_stage"
 #define INSTALL_LOCATION "install_loc"
+#define INSTALL_ROOT     "install_root"
 #define HIDE_PROGRESS    "hide_prog"
 
 typedef CBadLang<class CInstallManager> CSequencerType;

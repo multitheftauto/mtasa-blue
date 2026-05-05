@@ -285,7 +285,7 @@ static void Event_BulletImpact()
             }
             else
             {
-                // Correct start postion if remote player
+                // Correct start position if remote player
                 CRemoteDataStorageSA* data = CRemoteDataSA::GetRemoteDataStorage(pBulletImpactInitiator);
                 if (data)
                 {
@@ -374,7 +374,7 @@ static void __declspec(naked) HOOK_SkipAim()
         // If this is the local player
         if (IsLocalPlayer(pATargetingPed))
         {
-            // Store wheter he's aiming up or not
+            // Store whether he's aiming up or not
             pMultiplayer->m_bAkimboTargetUp = *pSkipAim;
         }
         else
@@ -395,7 +395,7 @@ static void __declspec(naked) HOOK_SkipAim()
         }
     }
 
-    // Return to the correct place wheter we put our arms up or not
+    // Return to the correct place whether we put our arms up or not
     if (*pSkipAim)
     {
         // clang-format off

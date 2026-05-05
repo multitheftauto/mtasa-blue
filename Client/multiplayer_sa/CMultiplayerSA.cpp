@@ -16,7 +16,6 @@
 #include <game/CPedDamageResponse.h>
 #include <game/CEventList.h>
 #include <game/CEventDamage.h>
-#include <cmath>
 
 class CEventDamageSAInterface;
 
@@ -88,6 +87,9 @@ DWORD RETURN_CTrafficLights_DisplayActualLight = 0x49E1FF;
 
 #define HOOKPOS_CGame_Process 0x53C095
 DWORD RETURN_CGame_Process = 0x53C09F;
+
+#define CALL_CWeather_Update_FromCGameProcess 0x53BFC2
+DWORD FUNC_CWeather_Update = 0x72B850;
 
 #define HOOKPOS_Idle 0x53E981
 DWORD RETURN_Idle = 0x53E98B;
@@ -399,6 +401,7 @@ ExplosionHandler*                          m_pExplosionHandler = NULL;
 BreakTowLinkHandler*                       m_pBreakTowLinkHandler = NULL;
 DrawRadarAreasHandler*                     m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler*                      m_pRender3DStuffHandler = NULL;
+PreWeatherUpdateHandler*                   m_pPreWeatherUpdateHandler = NULL;
 PreWorldProcessHandler*                    m_pPreWorldProcessHandler = NULL;
 PostWorldProcessHandler*                   m_pPostWorldProcessHandler = NULL;
 PostWorldProcessPedsAfterPreRenderHandler* m_postWorldProcessPedsAfterPreRenderHandler = nullptr;
@@ -462,6 +465,7 @@ void HOOK_CFire_ProcessFire();
 void HOOK_CExplosion_Update();
 void HOOK_CWeapon_FireAreaEffect();
 void HOOK_CGame_Process();
+void HOOK_CWeather_Update();
 void HOOK_Idle();
 void HOOK_RenderScene_Plants();
 void HOOK_RenderScene_end();
@@ -664,6 +668,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CExplosion_Update, (DWORD)HOOK_CExplosion_Update, 5);
     HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
+    HookInstallCall(CALL_CWeather_Update_FromCGameProcess, (DWORD)HOOK_CWeather_Update);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
@@ -807,7 +812,7 @@ void CMultiplayerSA::InitHooks()
     // Disable CPopulation::RemovePed
     MemPut<BYTE>(0x610F20, 0xC3);
 
-    // Legacy disabled hand-up patch retained as commented reference.
+    // Temporary hack for disabling hand up
     /*
     MemPut < BYTE > ( 0x62AEE7, 0x90 );
     MemPut < BYTE > ( 0x62AEE8, 0x90 );
@@ -2653,6 +2658,11 @@ void CMultiplayerSA::SetChokingHandler(ChokingHandler* pChokingHandler)
     m_pChokingHandler = pChokingHandler;
 }
 
+void CMultiplayerSA::SetPreWeatherUpdateHandler(PreWeatherUpdateHandler* pHandler)
+{
+    m_pPreWeatherUpdateHandler = pHandler;
+}
+
 void CMultiplayerSA::SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler)
 {
     m_pPreWorldProcessHandler = pHandler;
@@ -3513,20 +3523,25 @@ static void __declspec(naked) HOOK_Render3DStuff()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // Run GTA's Render3DStuff first (it draws sun/moon flare, coronas, etc.
+    // with loose depth testing). Invoking the handler afterwards lets it
+    // render on top, so script-drawn models aren't bled through by the moon.
     // clang-format off
     __asm
     {
         pushad
+        mov  eax, FUNC_Render3DStuff
+        call eax
     }
     // clang-format on
+
     if (m_pRender3DStuffHandler) m_pRender3DStuffHandler();
 
     // clang-format off
     __asm
     {
         popad
-        mov eax, FUNC_Render3DStuff
-        jmp eax
+        ret
     }
     // clang-format on
 }
@@ -4887,94 +4902,12 @@ CMatrix gravcam_matInvertGravity;
 CMatrix gravcam_matVehicleTransform;
 CVector gravcam_vecVehicleVelocity;
 
-// Last finite follow-camera angles observed in VehicleCamLookDir2.
-// Used only when Process_FollowCar yields non-finite beta/betaSpeed/alpha
-// so camera mode stays unchanged and look-direction reconstruction is valid.
-struct FollowCamLastGoodAngles
-{
-    bool  valid;
-    float beta;
-    float alpha;
-};
-static FollowCamLastGoodAngles s_lastGoodAngles{};
-
-static void RecoverFollowCamState(DWORD dwCam)
-{
-    auto badf = [](float v) { return !std::isfinite(v); };
-
-    const float rawBeta = *(float*)(dwCam + 0xBC);
-    const float rawTargetBeta = *(float*)(dwCam + 0x8C);
-    const float rawBetaSpd = *(float*)(dwCam + 0xC0);
-    const float rawAlpha = *(float*)(dwCam + 0xAC);
-    const float rawTrueBeta = *(float*)(dwCam + 0xA0);
-
-    const bool badBeta = badf(rawBeta);
-    const bool badTargetBeta = badf(rawTargetBeta);
-    const bool badBetaSpd = badf(rawBetaSpd);
-    const bool badAlpha = badf(rawAlpha);
-
-    if (!badBeta && !badTargetBeta && !badBetaSpd && !badAlpha)
-    {
-        s_lastGoodAngles = FollowCamLastGoodAngles{true, rawBeta, rawAlpha};
-        return;
-    }
-
-    // Prefer live SA values first, then a recent finite snapshot.
-    float safeBeta = rawBeta;
-    if (badf(safeBeta))
-    {
-        if (std::isfinite(rawTrueBeta))
-            safeBeta = rawTrueBeta;
-        else if (std::isfinite(rawTargetBeta))
-            safeBeta = rawTargetBeta;
-        else if (s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.beta))
-            safeBeta = s_lastGoodAngles.beta;
-        else
-            safeBeta = 0.0f;
-    }
-
-    float safeAlpha = rawAlpha;
-    if (badf(safeAlpha))
-    {
-        if (s_lastGoodAngles.valid && std::isfinite(s_lastGoodAngles.alpha))
-            safeAlpha = s_lastGoodAngles.alpha;
-        else
-            safeAlpha = 0.0f;
-    }
-
-    // Only touch fields that are invalid. Keeping valid fields untouched avoids
-    // fighting SA's own follow-cam smoothing and mouse input handling.
-    if (badBeta)
-        *(float*)(dwCam + 0xBC) = safeBeta;
-
-    if (badTargetBeta)
-        *(float*)(dwCam + 0x8C) = safeBeta;
-
-    if (badBetaSpd)
-        *(float*)(dwCam + 0xC0) = 0.0f;
-
-    if (badAlpha)
-        *(float*)(dwCam + 0xAC) = safeAlpha;
-
-    if (std::isfinite(safeBeta) && std::isfinite(safeAlpha))
-        s_lastGoodAngles = FollowCamLastGoodAngles{true, safeBeta, safeAlpha};
-}
-
-static void GetSafeFollowCamAngles(DWORD dwCam, float& outBeta, float& outAlpha)
-{
-    RecoverFollowCamState(dwCam);
-
-    outBeta = *(float*)(dwCam + 0xBC);
-    outAlpha = *(float*)(dwCam + 0xAC);
-
-    if (!std::isfinite(outBeta))
-        outBeta = 0.0f;
-    if (!std::isfinite(outAlpha))
-        outAlpha = 0.0f;
-}
-
 bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
 {
+    // Inverse transform some things so that they match a downward pointing gravity.
+    // This way SA's gravity-goes-downward assumptive code can calculate the camera
+    // spherical coords correctly. Of course we restore these after the camera function
+    // completes.
     SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
     CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
     if (!pVehicle)
@@ -4995,7 +4928,6 @@ bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
     pVehicle->GetMoveSpeed(&gravcam_vecVehicleVelocity);
     CVector vecVelocityInverted = gravcam_matInvertGravity * gravcam_vecVehicleVelocity;
     pVehicle->SetMoveSpeed(vecVelocityInverted);
-
     return true;
 }
 
@@ -5066,8 +4998,8 @@ static void __declspec(naked) HOOK_VehicleCamTargetZTweak()
 
 void _cdecl VehicleCamLookDir1(DWORD dwCam, DWORD pVehicleInterface)
 {
-    // For the same reason as in VehicleCamStart, inverse transform the
-    // camera look direction at this point.
+    // For the same reason as in VehicleCamStart, inverse transform the camera's lookdir
+    // at this point
     CVector* pvecLookDir = (CVector*)(dwCam + 0x190);
     *pvecLookDir = gravcam_matInvertGravity * (*pvecLookDir);
 }
@@ -5087,22 +5019,39 @@ static void __declspec(naked) HOOK_VehicleCamLookDir1()
         call VehicleCamLookDir1
         add esp, 8
 
+        // The lateral-velocity sqrt at 0x524F23/0x524F29 inside
+        // CCam::Process_FollowCar_SA peaks at depth 8 on the x87 stack with
+        // zero margin. If MSVC's codegen for the matInvertGravity * vec
+        // expression above leaves any tagged register behind, that block
+        // overflows and (with IM masked) writes the floating-point
+        // indefinite into the lateral magnitude, which then propagates
+        // through the NaN-blind fcom/jp/jnz clamps into m_fBetaSpeed and
+        // m_fHorizontalAngle. Empty the x87 stack here so vanilla SA
+        // resumes at depth 0 like it was authored to expect (#3979).
+        ffree st(0)
+        ffree st(1)
+        ffree st(2)
+        ffree st(3)
+        ffree st(4)
+        ffree st(5)
+        ffree st(6)
+        ffree st(7)
+
         jmp RETURN_VehicleCamLookDir1
     }
     // clang-format on
 }
 
+// ---------------------------------------------------
+
 bool _cdecl VehicleCamLookDir2(DWORD dwCam)
 {
-    // Repair only invalid follow-cam internals, then use the sanitized angles
-    // for output reconstruction.
-    float fPhi = 0.0f;
-    float fTheta = 0.0f;
-    GetSafeFollowCamAngles(dwCam, fPhi, fTheta);
-
     // Calculates the look direction vector for the vehicle camera. This vector
     // is later multiplied by a factor and added to the vehicle position by SA
     // to obtain the final camera position.
+    float fPhi = *(float*)(dwCam + 0xBC);
+    float fTheta = *(float*)(dwCam + 0xAC);
+
     MemPutFast<CVector>(dwCam + 0x190, -gravcam_matGravity.vRight * cos(fPhi) * cos(fTheta) - gravcam_matGravity.vFront * sin(fPhi) * cos(fTheta) +
                                            gravcam_matGravity.vUp * sin(fTheta));
 
@@ -5133,10 +5082,7 @@ static void __declspec(naked) HOOK_VehicleCamLookDir2()
 
 void _cdecl VehicleCamHistory(DWORD dwCam, CVector* pvecTarget, float fTargetTheta, float fRadius, float fZoom)
 {
-    float fPhi = 0.0f;
-    float fAlphaIgnored = 0.0f;
-    GetSafeFollowCamAngles(dwCam, fPhi, fAlphaIgnored);
-
+    float   fPhi = *(float*)(dwCam + 0xBC);
     CVector vecDir = -gravcam_matGravity.vRight * cos(fPhi) * cos(fTargetTheta) - gravcam_matGravity.vFront * sin(fPhi) * cos(fTargetTheta) +
                      gravcam_matGravity.vUp * sin(fTargetTheta);
     ((CVector*)(dwCam + 0x1D8))[0] = *pvecTarget - vecDir * fRadius;
@@ -5210,7 +5156,7 @@ docustom:
 
 // ---------------------------------------------------
 
-void _cdecl VehicleCamEnd(DWORD dwCam, DWORD pVehicleInterface)
+void _cdecl VehicleCamEnd(DWORD pVehicleInterface)
 {
     // Restore the things that we inverse transformed in VehicleCamStart
     SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleInterface);
@@ -5231,11 +5177,9 @@ static void __declspec(naked) HOOK_VehicleCamEnd()
     {
         mov ds:[0xB6F020], edx
 
-        // esi = CCam*, edi = pVehicleInterface at this hook site
         push edi
-        push esi
         call VehicleCamEnd
-        add esp, 8
+        add esp, 4
 
         jmp RETURN_VehicleCamEnd
     }
@@ -5404,6 +5348,36 @@ static void __declspec(naked) HOOK_ApplyCarBlowHop()
 }
 
 // ---------------------------------------------------
+
+static void Pre_CWeather_Update()
+{
+    if (m_pPreWeatherUpdateHandler)
+        m_pPreWeatherUpdateHandler();
+}
+
+// Replaces the `call CWeather::Update` site at 0x53BFC2 inside CGame::Process so that
+// MTA can re-apply its blended weather state before the engine reads it. CWeather::Update
+// detects a clock wrap when setTime() jumps the game clock past InterpolationValue and
+// derives Rain/Foggyness/CloudCoverage/SunGlare/etc. from a freshly-picked weather pair —
+// values that drive cloud, fog and night-time building light rendering. Restoring MTA's
+// state here keeps that wrap branch from firing.
+static void __declspec(naked) HOOK_CWeather_Update()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        call    Pre_CWeather_Update
+        popad
+
+        mov     eax, FUNC_CWeather_Update
+        call    eax
+        ret
+    }
+    // clang-format on
+}
 
 static void Pre_CGame_Process()
 {

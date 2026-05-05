@@ -53,8 +53,14 @@ void CBlendedWeather::DoPulse()
         }
     }
 
-    // Force the weather
-    m_pWeather->Set(static_cast<unsigned char>(m_ucPrimaryWeather), static_cast<unsigned char>(m_ucSecondaryWeather));
+    const auto ucPrimary = static_cast<unsigned char>(m_ucPrimaryWeather);
+    const auto ucSecondary = static_cast<unsigned char>(m_ucSecondaryWeather);
+
+    m_pWeather->Set(ucPrimary, ucSecondary);
+    // CWeather::Update (before this pulse) advances InterpolationValue for its own Old/New pair.
+    // After we overwrite Old/New with MTA's state, keep the blend weight aligned with the game
+    // clock so reflective/translucent materials (e.g. glass windows) match the sky (#4803).
+    m_pWeather->ResyncInterpolationWithGameClock(ucPrimary, ucSecondary);
 }
 
 void CBlendedWeather::SetWeather(unsigned char ucWeather)

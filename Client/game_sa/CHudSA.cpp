@@ -82,7 +82,7 @@ CHudSA::CHudSA()
     MemPut<DWORD>(0x53E488 + 2, (DWORD)&m_fSniperCrosshairScale);
     MemPut<DWORD>(0x53E4BF + 2, (DWORD)&m_fSniperCrosshairScale);
 
-    // Initalize default data
+    // Initialize default data
     componentProperties.hpBar = MapGet(defaultComponentProperties, HUD_HEALTH);
     componentProperties.breathBar = MapGet(defaultComponentProperties, HUD_BREATH);
     componentProperties.armorBar = MapGet(defaultComponentProperties, HUD_ARMOUR);
@@ -130,7 +130,7 @@ void CHudSA::InitComponentList()
         {1, HUD_VEHICLE_NAME, 1, FUNC_DrawVehicleName, 1, 0xCC, 0xC3},
         {1, HUD_AREA_NAME, 1, FUNC_DrawAreaName, 1, 0xCC, 0xC3},
         {1, HUD_RADAR, 1, FUNC_DrawRadar, 1, 0xCC, 0xC3},
-        {1, HUD_RADAR_MAP, 1, FUNC_CRadar_DrawMap, 1, 0xCC, 0xC3},
+        {1, HUD_RADAR_MAP, 1, FUNC_CRadar_DrawRadarMap, 1, 0xCC, 0xC3},
         {1, HUD_RADAR_BLIPS, 1, FUNC_CRadar_DrawBlips, 1, 0xCC, 0xC3},
         {1, HUD_RADAR_ALTIMETER, 1, CODE_ShowRadarAltimeter, 2, 0xCC, 0xEB30},
         {1, HUD_CLOCK, 0, VAR_DisableClock, 1, 1, 0},
@@ -169,7 +169,7 @@ void CHudSA::SetComponentVisible(eHudComponent component, bool bVisible)
     SHudComponent* pComponent = MapFind(m_HudComponentMap, component);
     if (pComponent)
     {
-        // Save original bytes if requred
+        // Save original bytes if required
         if (pComponent->bSaveOriginalBytes)
         {
             pComponent->origData = *(DWORD*)pComponent->uiDataAddr;

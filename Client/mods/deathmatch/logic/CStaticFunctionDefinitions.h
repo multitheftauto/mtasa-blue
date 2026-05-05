@@ -171,7 +171,7 @@ public:
     static bool SetPedRotation(CClientEntity& Entity, float fRotation, bool bNewWay);
     static bool SetPedCanBeKnockedOffBike(CClientEntity& Entity, bool bCanBeKnockedOffBike);
     static bool SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
-                                bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame);
+                                bool bUpdatePosition, bool bInterruptible, bool bFreezeLastFrame);
 
     static bool SetPedAnimationProgress(CClientEntity& Entity, const SString& strAnimName, float fProgress);
     static bool SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed);

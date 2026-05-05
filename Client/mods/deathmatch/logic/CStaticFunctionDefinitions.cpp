@@ -2249,9 +2249,9 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike(CClientEntity& Entity
 }
 
 bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
-                                                 bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame)
+                                                 bool bUpdatePosition, bool bInterruptible, bool bFreezeLastFrame)
 {
-    RUN_CHILDREN(SetPedAnimation(**iter, strBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
+    RUN_CHILDREN(SetPedAnimation(**iter, strBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame))
 
     if (IS_PED(&Entity))
     {
@@ -5087,30 +5087,7 @@ bool CStaticFunctionDefinitions::SetCameraMatrix(const CVector& vecPosition, CVe
         return false;
 
     if (!m_pCamera->IsInFixedMode())
-    {
-        // Some scripts call setCameraMatrix(getCameraMatrix()) while dead to preserve the current frame.
-        // Treat this as a no-op so we don't switch into fixed mode and block later spectate target updates.
-        CMatrix currentMatrix;
-        if (m_pCamera->GetMatrix(currentMatrix))
-        {
-            const CVector currentLookAt = currentMatrix.vPos + currentMatrix.vFront;
-            const CVector requestedLookAt = pvecLookAt ? *pvecLookAt : currentLookAt;
-
-            constexpr float kCameraNoOpEpsilon = 0.01f;
-            const float     posDeltaSq = (currentMatrix.vPos - vecPosition).LengthSquared();
-            const float     lookDeltaSq = (currentLookAt - requestedLookAt).LengthSquared();
-            const float     epsilonSq = kCameraNoOpEpsilon * kCameraNoOpEpsilon;
-
-            if (posDeltaSq <= epsilonSq && lookDeltaSq <= epsilonSq)
-            {
-                if (std::isfinite(fFOV) && fFOV > 0.0f && fFOV < 180.0f)
-                    m_pCamera->SetFOV(fFOV);
-                return true;
-            }
-        }
-
         m_pCamera->ToggleCameraFixedMode(true);
-    }
 
     // Put the camera there
     m_pCamera->SetPosition(vecPosition);
@@ -10007,7 +9984,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
         if (pPed->IsDead() || pVehicle->GetHealth() <= 0.0f)
             return false;
 
-        // Toss the previous player out of it if neccessary
+        // Toss the previous player out of it if necessary
         if (CClientPed* pPreviousOccupant = pVehicle->GetOccupant(uiSeat))
             RemovePedFromVehicle(pPreviousOccupant);
 
