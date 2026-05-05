@@ -2831,12 +2831,12 @@ inner:
 
 ////////////////////////////////////////////////////////////////////////
 // CAnimManager::CreateAnimAssocGroups
-// 
+//
 // Missing model info or RwObject before the clump is used for associations
 ////////////////////////////////////////////////////////////////////////
 bool OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 {
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(uiModelId);
+    CModelInfo*                pModelInfo = pGameInterface->GetModelInfo(uiModelId);
     CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
     if (!pInterface || !pInterface->pRwObject)
     {
@@ -2852,11 +2852,11 @@ bool OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 }
 
 // Hook info
-#define HOOKPOS_CAnimManager_CreateAnimAssocGroups                 0x4D3D52
-#define HOOKSIZE_CAnimManager_CreateAnimAssocGroups                5
-#define HOOKCHECK_CAnimManager_CreateAnimAssocGroups               0x8B
-DWORD RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
-DWORD RETURN_CAnimManager_CreateAnimAssocGroups_Skip = 0x4D3D71;
+#define HOOKPOS_CAnimManager_CreateAnimAssocGroups   0x4D3D52
+#define HOOKSIZE_CAnimManager_CreateAnimAssocGroups  5
+#define HOOKCHECK_CAnimManager_CreateAnimAssocGroups 0x8B
+DWORD                 RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
+DWORD                 RETURN_CAnimManager_CreateAnimAssocGroups_Skip = 0x4D3D71;
 void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -2891,9 +2891,9 @@ void OnMY_CAnimBlendAssocGroup_CreateAssociations(CBaseModelInfoSAInterface* pMo
 {
     OnCrashAverted(816);
 
-    int iModelId = -1;
+    int                         iModelId = -1;
     CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
-    const int maximumModelId = pGameInterface->GetBaseIDforTXD();
+    const int                   maximumModelId = pGameInterface->GetBaseIDforTXD();
     for (int i = 0; i < maximumModelId; i++)
     {
         if (ppModelInfo[i] == pModelInfo)
@@ -2910,11 +2910,11 @@ void OnMY_CAnimBlendAssocGroup_CreateAssociations(CBaseModelInfoSAInterface* pMo
     SetApplicationSetting("diagnostics", "gta-model-fail", argMap.ToString());
 }
 
-#define HOOKPOS_CAnimBlendAssocGroup_CreateAssociations              0x4CE2F7
-#define HOOKSIZE_CAnimBlendAssocGroup_CreateAssociations             7
-#define HOOKCHECK_CAnimBlendAssocGroup_CreateAssociations            0x8B
-DWORD RETURN_CAnimBlendAssocGroup_CreateAssociations = 0x4CE2FE;
-DWORD RETURN_CAnimBlendAssocGroup_CreateAssociations_Skip = 0x4CE36F;
+#define HOOKPOS_CAnimBlendAssocGroup_CreateAssociations   0x4CE2F7
+#define HOOKSIZE_CAnimBlendAssocGroup_CreateAssociations  7
+#define HOOKCHECK_CAnimBlendAssocGroup_CreateAssociations 0x8B
+DWORD                 RETURN_CAnimBlendAssocGroup_CreateAssociations = 0x4CE2FE;
+DWORD                 RETURN_CAnimBlendAssocGroup_CreateAssociations_Skip = 0x4CE36F;
 void _declspec(naked) HOOK_CAnimBlendAssocGroup_CreateAssociations()
 {
     // clang-format off
