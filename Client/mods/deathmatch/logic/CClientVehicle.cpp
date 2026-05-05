@@ -2951,6 +2951,9 @@ void CClientVehicle::Create()
             // set our visibility
             SetComponentVisible(strTemp, (*iter).second.m_bVisible);
         }
+
+        m_pVehicle->SetCacheDataMap(&m_ComponentData);
+
         // store our spawn position in case we fall through the map
         m_matCreate = m_Matrix;
 
