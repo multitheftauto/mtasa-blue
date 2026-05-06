@@ -107,29 +107,28 @@ bool CClientTXD::Import(unsigned short usModelID)
         // Ensure loaded for replacing model textures
         if (m_ReplacementTextures.textures.empty())
         {
-            if (!m_bIsRawData)
+            // Decode from the buffer kept since Load. Falls back to a fresh
+            // disk read for the file path only if the buffer was already freed
+            // (e.g. after an earlier non-clothes import).
+            if (m_FileData.empty())
             {
+                if (m_bIsRawData)
+                    return false;
                 SString strUseFilename;
                 if (!GetFilenameToUse(strUseFilename))
                     return false;
-                g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled);
-                if (m_ReplacementTextures.textures.empty())
+                if (!FileLoad(std::nothrow, strUseFilename, m_FileData))
                     return false;
             }
-            else
-            {
-                g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, NULL, m_FileData, m_bFilteringEnabled);
-                if (m_ReplacementTextures.textures.empty())
-                    return false;
-            }
+            g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, NULL, m_FileData, m_bFilteringEnabled);
+            if (m_ReplacementTextures.textures.empty())
+                return false;
         }
 
-        // If raw data and not used as clothes textures yet, then free raw data buffer to save RAM
-        if (m_bIsRawData && !m_bUsingFileDataForClothes)
-        {
-            // This means the texture can't be used for clothes now
+        // Free the raw buffer once textures are decoded, unless it's also
+        // referenced by the clothes system (which holds m_FileData by ptr).
+        if (!m_bUsingFileDataForClothes)
             SString().swap(m_FileData);
-        }
 
         // Have we got textures and haven't already imported into this model?
         if (g_pGame->GetRenderWare()->ModelInfoTXDAddTextures(&m_ReplacementTextures, usModelID))
@@ -158,14 +157,20 @@ bool CClientTXD::LoadFromFile(SString filePath)
     if (!GetFilenameToUse(strUseFilename))
         return false;
 
-    // engineLoadTXD only needs to validate the TXD and create an element.
-    // Keep decoded textures out of memory until engineImportTXD applies them.
-    if (!g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled))
+    // Read once into memory and validate from that buffer so engineImportTXD
+    // decodes the same bytes that were validated here. Closes the rewrite-on-disk
+    // window between Load and Import.
+    SString fileData;
+    if (!FileLoad(std::nothrow, strUseFilename, fileData))
+        return false;
+
+    if (!g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, NULL, fileData, m_bFilteringEnabled))
         return false;
 
     g_pGame->GetRenderWare()->ModelInfoTXDRemoveTextures(&m_ReplacementTextures);
     m_ReplacementTextures = SReplacementTextures();
 
+    m_FileData = std::move(fileData);
     return true;
 }
 
@@ -176,8 +181,8 @@ bool CClientTXD::LoadFromBuffer(SString buffer)
 
     m_FileData = std::move(buffer);
 
-    // Raw-data TXDs may still need the original bytes for clothes streaming, so keep m_FileData.
-    // Keep decoded textures out of memory until engineImportTXD applies them.
+    // Validate the bytes once and discard the decoded textures; engineImportTXD
+    // will decode the same m_FileData buffer on demand.
     if (!g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, NULL, m_FileData, m_bFilteringEnabled))
         return false;
 
