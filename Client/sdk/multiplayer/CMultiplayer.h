@@ -97,6 +97,7 @@ typedef void(Render3DStuffHandler)();
 typedef void(PreRenderSkyHandler)();
 typedef void(RenderHeliLightHandler)();
 typedef bool(ChokingHandler)(unsigned char ucWeaponType);
+typedef void(PreWeatherUpdateHandler)();
 typedef void(PreWorldProcessHandler)();
 typedef void(PostWorldProcessHandler)();
 typedef void(PostWorldProcessPedsAfterPreRenderHandler)();
@@ -228,6 +229,7 @@ public:
     virtual void  SetChokingHandler(ChokingHandler* pChokingHandler) = 0;
     virtual void  SetProjectileHandler(ProjectileHandler* pProjectileHandler) = 0;
     virtual void  SetProjectileStopHandler(ProjectileStopHandler* pProjectileHandler) = 0;
+    virtual void  SetPreWeatherUpdateHandler(PreWeatherUpdateHandler* pHandler) = 0;
     virtual void  SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler) = 0;
     virtual void  SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler) = 0;
     virtual void  SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler) = 0;
