@@ -25,6 +25,22 @@ void CWeatherSA::Set(unsigned char primary, unsigned char secondary)
     MemPutFast<unsigned char>(0xC8131C, secondary);  // CWeather::NewWeatherType
 }
 
+void CWeatherSA::ResyncInterpolationWithGameClock(unsigned char primary, unsigned char secondary)
+{
+    // CWeather::InterpolationValue — see plugin_sa CWeather.cpp (0xC8130C)
+    constexpr DWORD VAR_InterpolationValue = 0xC8130C;
+    constexpr DWORD VAR_TimeMinutes = 0xB70152;
+
+    if (primary == secondary)
+        MemPutFast<float>(VAR_InterpolationValue, 0.0f);
+    else
+    {
+        const auto  ucMinute = *reinterpret_cast<unsigned char*>(VAR_TimeMinutes);
+        const float fInterp = std::min(1.f, static_cast<float>(ucMinute) / 60.f);
+        MemPutFast<float>(VAR_InterpolationValue, fInterp);
+    }
+}
+
 void CWeatherSA::Release()
 {
     MemPutFast<unsigned char>(0xC81318, 0xFF);  // CWeather::ForcedWeatherType

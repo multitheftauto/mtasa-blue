@@ -59,7 +59,7 @@ void CLuaArgument::CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLua
     // Clear the string
     m_strString = "";
 
-    // Destroy our old tabledata if neccessary
+    // Destroy our old tabledata if necessary
     DeleteTableData();
 
 #ifdef MTA_DEBUG
@@ -730,7 +730,7 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
             }
             else
             {
-                // Jax: this just spams the script debugger, it's not really neccesary
+                // Jax: this just spams the script debugger, it's not really necessary
                 // LogUnableToPacketize ( "Couldn't packetize argument list, invalid element specified." );
 
                 // Write a nil though so other side won't get out of sync

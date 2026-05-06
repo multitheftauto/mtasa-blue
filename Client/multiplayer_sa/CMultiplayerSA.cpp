@@ -88,6 +88,9 @@ DWORD RETURN_CTrafficLights_DisplayActualLight = 0x49E1FF;
 #define HOOKPOS_CGame_Process 0x53C095
 DWORD RETURN_CGame_Process = 0x53C09F;
 
+#define CALL_CWeather_Update_FromCGameProcess 0x53BFC2
+DWORD FUNC_CWeather_Update = 0x72B850;
+
 #define HOOKPOS_Idle 0x53E981
 DWORD RETURN_Idle = 0x53E98B;
 
@@ -398,6 +401,7 @@ ExplosionHandler*                          m_pExplosionHandler = NULL;
 BreakTowLinkHandler*                       m_pBreakTowLinkHandler = NULL;
 DrawRadarAreasHandler*                     m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler*                      m_pRender3DStuffHandler = NULL;
+PreWeatherUpdateHandler*                   m_pPreWeatherUpdateHandler = NULL;
 PreWorldProcessHandler*                    m_pPreWorldProcessHandler = NULL;
 PostWorldProcessHandler*                   m_pPostWorldProcessHandler = NULL;
 PostWorldProcessPedsAfterPreRenderHandler* m_postWorldProcessPedsAfterPreRenderHandler = nullptr;
@@ -461,6 +465,7 @@ void HOOK_CFire_ProcessFire();
 void HOOK_CExplosion_Update();
 void HOOK_CWeapon_FireAreaEffect();
 void HOOK_CGame_Process();
+void HOOK_CWeather_Update();
 void HOOK_Idle();
 void HOOK_RenderScene_Plants();
 void HOOK_RenderScene_end();
@@ -663,6 +668,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CExplosion_Update, (DWORD)HOOK_CExplosion_Update, 5);
     HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
+    HookInstallCall(CALL_CWeather_Update_FromCGameProcess, (DWORD)HOOK_CWeather_Update);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
@@ -2650,6 +2656,11 @@ void CMultiplayerSA::SetProcessCamHandler(ProcessCamHandler* pProcessCamHandler)
 void CMultiplayerSA::SetChokingHandler(ChokingHandler* pChokingHandler)
 {
     m_pChokingHandler = pChokingHandler;
+}
+
+void CMultiplayerSA::SetPreWeatherUpdateHandler(PreWeatherUpdateHandler* pHandler)
+{
+    m_pPreWeatherUpdateHandler = pHandler;
 }
 
 void CMultiplayerSA::SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler)
@@ -5337,6 +5348,36 @@ static void __declspec(naked) HOOK_ApplyCarBlowHop()
 }
 
 // ---------------------------------------------------
+
+static void Pre_CWeather_Update()
+{
+    if (m_pPreWeatherUpdateHandler)
+        m_pPreWeatherUpdateHandler();
+}
+
+// Replaces the `call CWeather::Update` site at 0x53BFC2 inside CGame::Process so that
+// MTA can re-apply its blended weather state before the engine reads it. CWeather::Update
+// detects a clock wrap when setTime() jumps the game clock past InterpolationValue and
+// derives Rain/Foggyness/CloudCoverage/SunGlare/etc. from a freshly-picked weather pair —
+// values that drive cloud, fog and night-time building light rendering. Restoring MTA's
+// state here keeps that wrap branch from firing.
+static void __declspec(naked) HOOK_CWeather_Update()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        call    Pre_CWeather_Update
+        popad
+
+        mov     eax, FUNC_CWeather_Update
+        call    eax
+        ret
+    }
+    // clang-format on
+}
 
 static void Pre_CGame_Process()
 {

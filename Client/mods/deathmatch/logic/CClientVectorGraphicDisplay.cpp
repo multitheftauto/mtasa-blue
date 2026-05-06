@@ -56,37 +56,6 @@ void CClientVectorGraphicDisplay::Render()
     }
 }
 
-void CClientVectorGraphicDisplay::UnpremultiplyBitmap(Bitmap& bitmap)
-{
-    auto width = bitmap.width();
-    auto height = bitmap.height();
-    auto stride = bitmap.stride();
-    auto rowData = bitmap.data();
-
-    for (decltype(height) y = 0; y < height; y++)
-    {
-        auto data = rowData;
-        for (decltype(width) x = 0; x < width; x++)
-        {
-            auto& b = data[0];
-            auto& g = data[1];
-            auto& r = data[2];
-            auto& a = data[3];
-
-            if (a != 0)
-            {
-                r = (r * 255) / a;
-                g = (g * 255) / a;
-                b = (b * 255) / a;
-            }
-
-            data += 4;
-        }
-
-        rowData += stride;
-    }
-}
-
 void CClientVectorGraphicDisplay::UpdateTexture()
 {
     if (!m_pVectorGraphic || m_pVectorGraphic->IsDestroyed())
@@ -144,7 +113,10 @@ void CClientVectorGraphicDisplay::UpdateTexture()
             return;
         }
 
-        UnpremultiplyBitmap(bitmap);
+        // The surface stays in lunasvg's native premultiplied ARGB layout.
+        // CGraphics::DrawTextureQueued routes the draw to a PM blend so we
+        // avoid the precision loss caused by an integer unpremultiply
+        // (see issue #4891 banding on translucent SVG gradients).
 
         // Unlock surface
         surface->UnlockRect();

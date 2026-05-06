@@ -137,7 +137,7 @@ struct CVehicleFlags
     unsigned char bLowVehicle : 1;        // Need this for sporty type cars to use low getting-in/out anims
     unsigned char bComedyControls : 1;    // Will make the car hard to control (hopefully in a funny way)
     unsigned char bWarnedPeds : 1;        // Has scan and warn peds of danger been processed?
-    unsigned char bCraneMessageDone : 1;  // A crane message has been printed for this car allready
+    unsigned char bCraneMessageDone : 1;  // A crane message has been printed for this car already
     // unsigned char bExtendedRange: 1; // This vehicle needs to be a bit further away to get deleted
     unsigned char bTakeLessDamage : 1;  // This vehicle is stronger (takes about 1/4 of damage)
 

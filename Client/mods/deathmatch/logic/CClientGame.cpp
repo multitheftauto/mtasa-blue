@@ -285,6 +285,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetRenderHeliLightHandler(CClientGame::StaticRenderHeliLightHandler);
     g_pMultiplayer->SetRenderEverythingBarRoadsHandler(CClientGame::StaticRenderEverythingBarRoadsHandler);
     g_pMultiplayer->SetChokingHandler(CClientGame::StaticChokingHandler);
+    g_pMultiplayer->SetPreWeatherUpdateHandler(CClientGame::StaticPreWeatherUpdateHandler);
     g_pMultiplayer->SetPreWorldProcessHandler(CClientGame::StaticPreWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler);
@@ -494,6 +495,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetRenderHeliLightHandler(nullptr);
     g_pMultiplayer->SetRenderEverythingBarRoadsHandler(nullptr);
     g_pMultiplayer->SetChokingHandler(NULL);
+    g_pMultiplayer->SetPreWeatherUpdateHandler(NULL);
     g_pMultiplayer->SetPreWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(nullptr);
@@ -679,7 +681,7 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
         NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
         if (pBitStream)
         {
-            // Hash the password if neccessary
+            // Hash the password if necessary
             MD5 Password;
             memset(Password.data, 0, sizeof(MD5));
             if (szPassword)
@@ -1680,7 +1682,7 @@ void CClientGame::SetMimic(unsigned int uiMimicCount)
     if (uiMimicCount > MAX_MIMICS)
         return;
 
-    // Create neccessary players
+    // Create necessary players
     while (m_Mimics.size() < uiMimicCount)
     {
         CClientPlayer* pPlayer = new CClientPlayer(m_pManager, static_cast<ElementID>(MAX_NET_PLAYERS_REAL + (int)m_Mimics.size()));
@@ -1688,7 +1690,7 @@ void CClientGame::SetMimic(unsigned int uiMimicCount)
         m_Mimics.push_back(pPlayer);
     }
 
-    // Destroy neccessary players
+    // Destroy necessary players
     while (m_Mimics.size() > uiMimicCount)
     {
         CClientPlayer*  pPlayer = m_Mimics.back();
@@ -3629,6 +3631,11 @@ bool CClientGame::StaticBlendAnimationHierarchyHandler(CAnimBlendAssociationSAIn
     return g_pClientGame->BlendAnimationHierarchyHandler(pAnimAssoc, pOutAnimHierarchy, pFlags, pClump);
 }
 
+void CClientGame::StaticPreWeatherUpdateHandler()
+{
+    g_pClientGame->PreWeatherUpdateHandler();
+}
+
 void CClientGame::StaticPreWorldProcessHandler()
 {
     g_pClientGame->PreWorldProcessHandler();
@@ -3900,6 +3907,20 @@ void CClientGame::PreRenderSkyHandler()
     g_pCore->GetGraphics()->GetRenderItemManager()->PreDrawWorld();
 }
 
+void CClientGame::PreWeatherUpdateHandler()
+{
+    // Fix #4803 (building light flicker): Re-apply MTA's weather state BEFORE
+    // CWeather::Update runs. CWeather::Update detects a clock wrap when setTime()
+    // jumps the game clock past InterpolationValue and re-derives Rain, Foggyness,
+    // CloudCoverage, ExtraSunnyness, SunGlare, HeatHaze, etc. from a freshly-picked
+    // weather pair. Those globals drive cloud, fog and night-time building light
+    // rendering for the rest of the frame, and PreWorldProcessHandler runs too late
+    // to undo the damage. Pre-syncing Old/New/InterpolationValue here keeps the
+    // wrap branch from firing.
+    if (m_pManager->IsGameLoaded() && m_pBlendedWeather)
+        m_pBlendedWeather->DoPulse();
+}
+
 void CClientGame::PreWorldProcessHandler()
 {
     // Fix #4803: Re-apply MTA's weather state before CTimeCycle::CalcColoursForPoint()
@@ -4027,7 +4048,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
     }
 
     auto pOriginalAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(iGroupID, animID);
-    auto pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierachyInterface();
+    auto pOriginalAnimHierarchyInterface = pOriginalAnimStaticAssoc->GetAnimHierarchyInterface();
     auto pAnimAssociation = pAnimationManager->GetAnimBlendAssociation(pAnimAssocInterface);
 
     CClientPed* pClientPed = GetClientPedByClump(*pClump);
@@ -4044,7 +4065,7 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
                     (iGroupID >= eAnimGroup::ANIM_GROUP_PLAYER && iGroupID <= eAnimGroup::ANIM_GROUP_PLAYERJETPACK) || iGroupID >= eAnimGroup::ANIM_GROUP_MAN)
                 {
                     auto pDuckAnimStaticAssoc = pAnimationManager->GetAnimStaticAssociation(eAnimGroup::ANIM_GROUP_DEFAULT, eAnimID::ANIM_ID_WEAPON_CROUCH);
-                    pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pDuckAnimStaticAssoc->GetAnimHierachyInterface());
+                    pAnimHierarchy = pAnimationManager->GetCustomAnimBlendHierarchy(pDuckAnimStaticAssoc->GetAnimHierarchyInterface());
                     isCustomAnimationToPlay = true;
                 }
             }
