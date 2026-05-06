@@ -58,8 +58,9 @@ void CBlendedWeather::DoPulse()
 
     m_pWeather->Set(ucPrimary, ucSecondary);
     // CWeather::Update (before this pulse) advances InterpolationValue for its own Old/New pair.
-    // After we overwrite Old/New with MTA's state, keep the blend weight aligned with the game
-    // clock so reflective/translucent materials (e.g. glass windows) match the sky (#4803).
+    // After we overwrite Old/New with MTA's state, mirror the value CWeather::Update would derive
+    // (seconds/3600 + minutes/60) so CTimeCycle::CalcColoursForPoint blends m_CurrentColours
+    // smoothly per frame instead of stepping per game-minute (#4803).
     m_pWeather->ResyncInterpolationWithGameClock(ucPrimary, ucSecondary);
 }
 
