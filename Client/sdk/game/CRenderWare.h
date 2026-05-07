@@ -23,6 +23,7 @@ class CColModel;
 struct RpAtomicContainer;
 struct RwFrame;
 struct RwMatrix;
+struct RwRaster;
 struct RwTexDictionary;
 struct RwTexture;
 struct RpClump;
@@ -43,6 +44,23 @@ struct SReplacementTextures
     std::vector<SPerTxd>    perTxdList;  // TXD's which have been modified
     std::vector<ushort>     usedInTxdIds;
     std::vector<ushort>     usedInModelIds;
+};
+
+// Called by CRenderWare when the D3D device is reset and a replacement TXD's
+// D3DPOOL_DEFAULT textures need to be re-decoded from their original source.
+//
+// Only owners that successfully re-imported their TXD bytes (file path with the
+// source still on disk) can recover. Owners that cannot rebuild should return
+// false; their replacements are then permanently lost for this session and the
+// underlying GTA TXDs are reverted to the unreplaced state.
+class CRwReplacementOwner
+{
+public:
+    virtual ~CRwReplacementOwner() = default;
+
+    // Re-decode and re-apply this owner's replacement textures using whatever
+    // source it has (file on disk or kept buffer). Returns true on success.
+    virtual bool RebuildReplacementsAfterDeviceReset() = 0;
 };
 
 // Shader layers to render
@@ -115,6 +133,16 @@ public:
     virtual RwFrame* GetFrameFromName(RpClump* pRoot, SString strName) = 0;
     virtual bool     RightSizeTxd(const SString& strInTxdFilename, const SString& strOutTxdFilename, uint uiSizeLimit) = 0;
     virtual void     TxdForceUnload(ushort usTxdId, bool bDestroyTextures) = 0;
+
+    // Pool-conversion / device-reset hooks for engineLoadTXD replacement textures.
+    // OnDeviceLost is called from CGraphics during a D3D9 cooperative-level loss; it
+    // must release every D3DPOOL_DEFAULT replacement texture before IDirect3DDevice9::Reset.
+    // OnDeviceReset is called once Reset succeeds and asks each registered owner to
+    // re-decode its replacement textures.
+    virtual void OnDeviceLost() = 0;
+    virtual void OnDeviceReset() = 0;
+    virtual void RegisterReplacementOwner(CRwReplacementOwner* pOwner) = 0;
+    virtual void UnregisterReplacementOwner(CRwReplacementOwner* pOwner) = 0;
 
     virtual void CMatrixToRwMatrix(const CMatrix& mat, RwMatrix& rwOutMatrix) = 0;
     virtual void RwMatrixToCMatrix(const RwMatrix& rwMatrix, CMatrix& matOut) = 0;

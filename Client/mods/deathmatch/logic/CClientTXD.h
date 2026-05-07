@@ -14,7 +14,7 @@
 #include <game/CRenderWare.h>
 #include "CClientEntity.h"
 
-class CClientTXD final : public CClientEntity
+class CClientTXD final : public CClientEntity, public CRwReplacementOwner
 {
     DECLARE_CLASS(CClientTXD, CClientEntity)
 public:
@@ -31,6 +31,11 @@ public:
     bool              Import(unsigned short usModelID);
     static bool       IsImportableModel(unsigned short usModelID);
     static bool       IsTXDData(const SString& strData);
+
+    // CRwReplacementOwner: re-decode this TXD after a D3D9 device reset.
+    // Returns true if rebuild succeeded, false if the source bytes are unrecoverable
+    // (raw-data TXDs whose buffer was freed at Import).
+    bool RebuildReplacementsAfterDeviceReset() override;
 
 private:
     bool LoadFromFile(SString filePath);

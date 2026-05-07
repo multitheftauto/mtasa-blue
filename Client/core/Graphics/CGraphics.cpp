@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 #include <game/CSettings.h>
+#include <game/CGame.h>
+#include <game/CRenderWare.h>
 #include <memory>
 #include "DXHook/CProxyDirect3DDevice9.h"
 #include "CTileBatcher.h"
@@ -1727,6 +1729,13 @@ void CGraphics::OnDeviceInvalidate(IDirect3DDevice9* pDevice)
     SAFE_RELEASE(m_pSavedFrontBufferData);
     SAFE_RELEASE(m_pTempBackBufferData);
 
+    // Release D3DPOOL_DEFAULT replacement textures owned by engineLoadTXD before
+    // IDirect3DDevice9::Reset is attempted; per the D3D9 contract, every DEFAULT-pool
+    // resource must be gone first. The game module rebuilds these in OnDeviceRestore.
+    if (CGame* pGame = g_pCore->GetGame())
+        if (CRenderWare* pRenderWare = pGame->GetRenderWare())
+            pRenderWare->OnDeviceLost();
+
     // Reset render zone tracking on device loss
     m_MTARenderZone = MTA_RZONE_NONE;
     m_iOutsideZoneCount = 0;
@@ -1756,6 +1765,13 @@ void CGraphics::OnDeviceRestore(IDirect3DDevice9* pDevice)
 
     m_pRenderItemManager->OnResetDevice();
     m_pScreenGrabber->OnResetDevice();
+
+    // Re-create the D3DPOOL_DEFAULT replacement textures we released in OnDeviceInvalidate.
+    // File-path TXDs re-read from disk; raw-data TXDs use the m_FileData buffer kept by
+    // CClientTXD since LoadFromBuffer.
+    if (CGame* pGame = g_pCore->GetGame())
+        if (CRenderWare* pRenderWare = pGame->GetRenderWare())
+            pRenderWare->OnDeviceReset();
 
     const uint uiViewportWidth = GetViewportWidth();
     const uint uiViewportHeight = GetViewportHeight();

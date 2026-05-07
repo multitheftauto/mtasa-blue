@@ -15,10 +15,16 @@ CClientTXD::CClientTXD(class CClientManager* pManager, ElementID ID) : ClassInit
     // Init
     m_pManager = pManager;
     SetTypeName("txd");
+
+    // Subscribe so the renderware module can re-decode our replacement textures
+    // after a D3D9 device reset (DEFAULT-pool textures are auto-destroyed on Reset).
+    g_pGame->GetRenderWare()->RegisterReplacementOwner(this);
 }
 
 CClientTXD::~CClientTXD()
 {
+    g_pGame->GetRenderWare()->UnregisterReplacementOwner(this);
+
     // Remove us from all the models
     g_pGame->GetRenderWare()->ModelInfoTXDRemoveTextures(&m_ReplacementTextures);
 
@@ -124,12 +130,15 @@ bool CClientTXD::Import(unsigned short usModelID)
             }
         }
 
-        // If raw data and not used as clothes textures yet, then free raw data buffer to save RAM
-        if (m_bIsRawData && !m_bUsingFileDataForClothes)
-        {
-            // This means the texture can't be used for clothes now
-            SString().swap(m_FileData);
-        }
+        // The replacement textures live in D3DPOOL_DEFAULT after the conversion done by
+        // CRenderWareSA::ReadTXD (issue #4062). DEFAULT-pool resources are auto-destroyed
+        // on a D3D9 device reset, so we need the original TXD bytes to re-decode them in
+        // CRenderWareSA::OnDeviceReset:
+        //   - file-path TXDs re-read from disk via GetFilenameToUse,
+        //   - raw-data TXDs use the m_FileData buffer kept since LoadFromBuffer.
+        // We deliberately don't drop m_FileData here for raw-data TXDs (master used to)
+        // because the system-memory cost is the same as the MANAGED shadow we saved by
+        // converting the textures, and keeping it lets us recover from any device reset.
 
         // Have we got textures and haven't already imported into this model?
         if (g_pGame->GetRenderWare()->ModelInfoTXDAddTextures(&m_ReplacementTextures, usModelID))
@@ -262,4 +271,53 @@ bool CClientTXD::GetFilenameToUse(SString& strOutFilename)
 bool CClientTXD::IsTXDData(const SString& strData)
 {
     return strData.length() > 32 && memcmp(strData, "\x16\x00\x00\x00", 4) == 0;
+}
+
+bool CClientTXD::RebuildReplacementsAfterDeviceReset()
+{
+    // CRenderWareSA::OnDeviceLost has already released our IDirect3DTexture9 instances
+    // (DEFAULT pool) and NULLed rasterExt->texture. The RwTextures themselves are still
+    // alive inside their respective GTA TXDs, but they now wrap rasters with no backing
+    // D3D resource, so we must tear them down before re-decoding fresh ones.
+
+    // Snapshot the set of models we were applied to so we can replay the imports.
+    std::vector<unsigned short> savedModelIds = m_ReplacementTextures.usedInModelIds;
+
+    // Walk the full perTxdList: removes our textures from each GTA TXD (originals come
+    // back), destroys the cloned copies, and cascades through DestroyTexture for the
+    // originals (which calls ReleaseTrackedDefaultPoolTexture, a no-op in this state
+    // because the D3D pointer was already cleared in OnDeviceLost).
+    g_pGame->GetRenderWare()->ModelInfoTXDRemoveTextures(&m_ReplacementTextures);
+    m_ReplacementTextures = SReplacementTextures();
+
+    // Buffer-path TXDs whose source bytes were freed cannot be rebuilt; the
+    // replacements stay gone for the rest of the session and the script must
+    // re-call engineLoadTXD to recover.
+    if (m_bIsRawData && m_FileData.empty())
+        return false;
+
+    bool bLoaded = false;
+    if (m_bIsRawData)
+    {
+        bLoaded = g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, NULL, m_FileData, m_bFilteringEnabled);
+    }
+    else
+    {
+        SString strUseFilename;
+        if (!GetFilenameToUse(strUseFilename))
+            return false;
+        bLoaded = g_pGame->GetRenderWare()->ModelInfoTXDLoadTextures(&m_ReplacementTextures, strUseFilename, SString(), m_bFilteringEnabled);
+    }
+
+    if (!bLoaded || m_ReplacementTextures.textures.empty())
+        return false;
+
+    // Re-apply to every model the script had previously imported this TXD onto.
+    for (unsigned short modelId : savedModelIds)
+    {
+        if (g_pGame->GetRenderWare()->ModelInfoTXDAddTextures(&m_ReplacementTextures, modelId))
+            Restream(modelId);
+    }
+
+    return true;
 }

@@ -32,6 +32,14 @@ public:
     bool ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementTextures, const SString& strFilename, const SString& buffer, bool bFilteringEnabled);
     bool ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTextures, ushort usModelId);
     void ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures);
+
+    // Pool-conversion / device-reset support (see CRenderWareSA.PoolMemorySaver.cpp)
+    void OnDeviceLost() override;
+    void OnDeviceReset() override;
+    void RegisterReplacementOwner(CRwReplacementOwner* pOwner) override;
+    void UnregisterReplacementOwner(CRwReplacementOwner* pOwner) override;
+    void ConvertScriptTxdToDefaultPool(RwTexDictionary* pTxd);
+    bool ReleaseTrackedDefaultPoolTexture(RwRaster* pRaster);
     void ClothesAddReplacement(char* pFileData, size_t fileSize, ushort usFileId);
     void ClothesRemoveReplacement(char* pFileData);
     bool HasClothesReplacementChanged();
@@ -167,4 +175,20 @@ public:
     bool                                m_bGTAVertexShadersEnabled;
     std::set<RwTexture*>                m_SpecialTextures;
     static int                          ms_iRenderingType;
+
+    // Replacement-texture pool memory saver state.
+    //
+    // m_DefaultPoolRasters tracks every RwRaster whose underlying IDirect3DTexture9
+    // we converted from D3DPOOL_MANAGED to D3DPOOL_DEFAULT. Lookups happen on the
+    // texture-destruction hot path so a vector with linear scan would be unwise; an
+    // unordered_set keyed by the (stable) raster pointer is the right tool.
+    std::unordered_set<RwRaster*> m_DefaultPoolRasters;
+    // m_ReplacementOwners is the list of CClientTXD-side objects we call back to
+    // re-decode after a device reset. CClientTXD subscribes itself in its ctor and
+    // unsubscribes in its dtor.
+    std::vector<CRwReplacementOwner*> m_ReplacementOwners;
+    // True between OnDeviceLost and OnDeviceReset. Protects against re-entrant
+    // raster destruction during Restore (we'd call Release on an already-NULL ptr,
+    // which is harmless but easier to reason about with a flag).
+    bool m_bDeviceLost = false;
 };

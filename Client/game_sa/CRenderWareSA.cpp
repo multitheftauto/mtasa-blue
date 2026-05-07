@@ -239,6 +239,13 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
     // close the stream
     RwStreamClose(streamTexture, NULL);
 
+    // Replacement TXDs are static for the lifetime of the script that loaded them, so the
+    // D3DPOOL_MANAGED system-memory shadow GTA's RW loader created is dead weight (issue
+    // #4062). Convert each raster to D3DPOOL_DEFAULT before ScriptAddedTxd runs so the
+    // texinfo shader-matching map is keyed against the new IDirect3DTexture9 pointer.
+    if (pTex)
+        ConvertScriptTxdToDefaultPool(pTex);
+
     ScriptAddedTxd(pTex);
 
     return pTex;
@@ -649,6 +656,13 @@ void CRenderWareSA::DestroyTexture(RwTexture* pTex)
     if (pTex)
     {
         ScriptRemovedTexture(pTex);
+
+        // If we previously converted this raster's D3D resource to D3DPOOL_DEFAULT,
+        // release it ourselves and clear rasterExt->texture so _rwD3D9RasterDestroy
+        // hits its NULL-pointer early-out and skips D3DResourceSystem::DestroyTexture
+        // (which caches MANAGED textures for reuse and would corrupt with a DEFAULT one).
+        ReleaseTrackedDefaultPoolTexture(pTex->raster);
+
         RwTextureDestroy(pTex);
     }
 }
