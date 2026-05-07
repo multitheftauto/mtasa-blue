@@ -30,13 +30,20 @@ void CWeatherSA::ResyncInterpolationWithGameClock(unsigned char primary, unsigne
     // CWeather::InterpolationValue — see plugin_sa CWeather.cpp (0xC8130C)
     constexpr DWORD VAR_InterpolationValue = 0xC8130C;
     constexpr DWORD VAR_TimeMinutes = 0xB70152;
+    constexpr DWORD VAR_TimeSeconds = 0xB70150;
 
     if (primary == secondary)
         MemPutFast<float>(VAR_InterpolationValue, 0.0f);
     else
     {
+        // Match the value CWeather::Update derives at 0x72B897:
+        //   v0 = (seconds / 60 + minutes) / 60
+        // Snapping to minutes only would drop seconds and make CTimeCycle::CalcColoursForPoint
+        // step m_CurrentColours per game-minute, which surfaces as flicker on vehicle coronas
+        // (m_fSpriteBrightness) and shadows (m_wShadowStrength) when the clock runs fast.
         const auto  ucMinute = *reinterpret_cast<unsigned char*>(VAR_TimeMinutes);
-        const float fInterp = std::min(1.f, static_cast<float>(ucMinute) / 60.f);
+        const auto  ucSecond = *reinterpret_cast<unsigned char*>(VAR_TimeSeconds);
+        const float fInterp = std::min(1.f, static_cast<float>(ucMinute) / 60.f + static_cast<float>(ucSecond) / 3600.f);
         MemPutFast<float>(VAR_InterpolationValue, fInterp);
     }
 }
