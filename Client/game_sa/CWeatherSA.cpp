@@ -39,8 +39,8 @@ void CWeatherSA::ResyncInterpolationWithGameClock(unsigned char primary, unsigne
         // Match the value CWeather::Update derives at 0x72B897:
         //   v0 = ((double)seconds * 0.016666668 + (double)minutes) * 0.016666668
         // Keep this <= engine v0 to avoid triggering the wrap branch on precision mismatches.
-        const auto  ucMinute = *reinterpret_cast<unsigned char*>(VAR_TimeMinutes);
-        const auto  ucSecond = *reinterpret_cast<unsigned char*>(VAR_TimeSeconds);
+        const auto   ucMinute = *reinterpret_cast<unsigned char*>(VAR_TimeMinutes);
+        const auto   ucSecond = *reinterpret_cast<unsigned char*>(VAR_TimeSeconds);
         const double dInterp = std::min(1.0, (static_cast<double>(ucSecond) * 0.016666668 + static_cast<double>(ucMinute)) * 0.016666668);
         float        fInterp = static_cast<float>(dInterp);
 
