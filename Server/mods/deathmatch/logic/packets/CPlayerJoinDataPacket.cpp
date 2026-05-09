@@ -24,7 +24,8 @@ bool CPlayerJoinDataPacket::Read(NetBitStreamInterface& BitStream)
     if (!BitStream.ReadString(m_strPlayerVersion))
         return false;
 
-    m_bOptionalUpdateInfoRequired = BitStream.ReadBit();
+    if (!BitStream.ReadBit(m_bOptionalUpdateInfoRequired))
+        return false;
 
     if (BitStream.Read(m_ucGameVersion) && BitStream.ReadStringCharacters(m_strNick, MAX_PLAYER_NICK_LENGTH) &&
         BitStream.Read(reinterpret_cast<char*>(&m_Password), 16))
