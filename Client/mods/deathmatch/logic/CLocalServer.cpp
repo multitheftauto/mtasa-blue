@@ -257,10 +257,13 @@ bool CLocalServer::OnUpdateResourcesButtonClick(CGUIElement* pElement)
                 m_pButtonUpdate->SetEnabled(true);
             }
 
-            Load();
-            g_pCore->ShowMessageBox(success ? _("Local Server") : _("Error") + _E("CC90"),
-                                    success ? _("Server resources updated successfully!") : _("Failed to download or extract resources."),
-                                    success ? MB_BUTTON_OK | MB_ICON_INFO : MB_BUTTON_OK | MB_ICON_ERROR);
+            if (success)
+            {
+                Load();
+                g_pCore->ShowMessageBox(_("Local Server"), _("Server resources updated successfully!"), MB_BUTTON_OK | MB_ICON_INFO);
+            }
+            else
+                g_pCore->ShowMessageBox(_("Error") + _E("CC90"), _("Failed to download or extract resources."), MB_BUTTON_OK | MB_ICON_ERROR);
         }
     );
 
