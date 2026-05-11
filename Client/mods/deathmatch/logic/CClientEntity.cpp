@@ -498,14 +498,14 @@ void CClientEntity::SetCustomData(const CStringName& name, const CLuaArgument& V
     CallEvent("onClientElementDataChange", Arguments, true);
 }
 
-void CClientEntity::DeleteCustomData(const CStringName& name)
+bool CClientEntity::DeleteCustomData(const CStringName& name)
 {
     // Grab the old variable
-    SCustomData* pData = m_pCustomData->Get(name);
-    if (pData)
+    auto* data = m_pCustomData->Get(name);
+    if (data)
     {
         CLuaArgument oldVariable;
-        oldVariable = pData->Variable;
+        oldVariable = data->Variable;
 
         // Delete the custom data
         m_pCustomData->Delete(name);
@@ -516,7 +516,10 @@ void CClientEntity::DeleteCustomData(const CStringName& name)
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(CLuaArgument());  // Use nil as the new value to indicate the data has been removed
         CallEvent("onClientElementDataChange", Arguments, true);
+        return true;
     }
+
+    return false;
 }
 
 bool CClientEntity::GetMatrix(CMatrix& matrix) const

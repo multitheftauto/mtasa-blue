@@ -1059,25 +1059,28 @@ bool CStaticFunctionDefinitions::RemoveElementData(CClientEntity& Entity, CStrin
     assert(name);
     assert(name->length() <= MAX_CUSTOMDATA_NAME_LENGTH);
 
-    bool          isSynced;
-    CLuaArgument* currentVariable = Entity.GetCustomData(name, false, &isSynced);
+    if (Entity.IsLocalEntity())
+        return Entity.DeleteCustomData(name);
+
+    bool  isSynced = false;
+    auto* currentVariable = Entity.GetCustomData(name, false, &isSynced);
     if (!currentVariable)
         return false;
 
-    if (isSynced && !Entity.IsLocalEntity())
+    if (isSynced)
     {
-        NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
-        // Write element ID and name for server-side removal handling
-        pBitStream->Write(Entity.GetID());
-        pBitStream->WriteString(name.ToString());
+        auto bitStream = g_pNet->AllocateNetBitStream();
+        // Omitting the value reuses the custom data packet for removals without adding another client-to-server RPC.
+        bitStream->Write(Entity.GetID());
+        std::uint16_t nameLength = static_cast<std::uint16_t>(name->length());
+        bitStream->WriteCompressed(nameLength);
+        bitStream->Write(name.ToCString(), nameLength);
 
-        // Send RPC and deallocate
-        g_pClientGame->GetNetAPI()->RPC(REMOVE_ELEMENT_DATA_RPC, pBitStream);
-        g_pNet->DeallocateNetBitStream(pBitStream);
+        g_pNet->SendPacket(PACKET_ID_CUSTOM_DATA, bitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+        g_pNet->DeallocateNetBitStream(bitStream);
     }
 
-    Entity.DeleteCustomData(name);
-    return true;
+    return Entity.DeleteCustomData(name);
 }
 
 bool CStaticFunctionDefinitions::SetElementMatrix(CClientEntity& Entity, const CMatrix& matrix)

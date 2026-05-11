@@ -50,7 +50,6 @@ protected:
     DECLARE_RPC(KeyBind);
     DECLARE_RPC(CursorEvent);
     DECLARE_RPC(RequestStealthKill);
-    DECLARE_RPC(RemoveElementData);
 
 protected:
     static CPlayer* m_pSourcePlayer;
@@ -67,6 +66,5 @@ public:
         KEY_BIND,
         CURSOR_EVENT,
         REQUEST_STEALTH_KILL,
-        REMOVE_ELEMENT_DATA_RPC,
     };
 };

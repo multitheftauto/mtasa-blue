@@ -34,7 +34,6 @@ enum eServerRPCFunctions
     KEY_BIND,
     CURSOR_EVENT,
     REQUEST_STEALTH_KILL,
-    REMOVE_ELEMENT_DATA_RPC,
 };
 
 class CNetAPI

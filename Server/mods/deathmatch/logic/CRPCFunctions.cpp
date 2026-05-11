@@ -58,7 +58,6 @@ void CRPCFunctions::AddHandlers()
     AddHandler(KEY_BIND, KeyBind);
     AddHandler(CURSOR_EVENT, CursorEvent);
     AddHandler(REQUEST_STEALTH_KILL, RequestStealthKill);
-    AddHandler(REMOVE_ELEMENT_DATA_RPC, RemoveElementData);
 }
 
 void CRPCFunctions::AddHandler(unsigned char ucID, pfnRPCHandler Callback)
@@ -367,73 +366,4 @@ void CRPCFunctions::RequestStealthKill(NetBitStreamInterface& bitStream)
         }
     }
     UNCLOCK("NetServerPulse::RPC", "RequestStealthKill");
-}
-
-void CRPCFunctions::RemoveElementData(NetBitStreamInterface& bitStream)
-{
-    if (!m_pSourcePlayer->IsJoined())
-        return;
-
-    CLOCK("NetServerPulse::RPC", "RemoveElementData");
-
-    ElementID   elementId;
-    std::string customDataName;
-    if (!bitStream.Read(elementId) || !bitStream.ReadString(customDataName) || customDataName.empty() || customDataName.length() > MAX_CUSTOMDATA_NAME_LENGTH)
-    {
-        UNCLOCK("NetServerPulse::RPC", "RemoveElementData");
-        return;
-    }
-
-    CElement* element = CElementIDs::GetElement(elementId);
-    if (!element)
-    {
-        UNCLOCK("NetServerPulse::RPC", "RemoveElementData");
-        return;
-    }
-
-    const CStringName      customDataNameId(customDataName);
-    ESyncType              lastSyncType = ESyncType::BROADCAST;
-    eCustomDataClientTrust clientChangesMode{};
-    element->GetCustomData(customDataNameId, false, &lastSyncType, &clientChangesMode);
-
-    const bool changesAllowed = clientChangesMode == eCustomDataClientTrust::UNSET ? !g_pGame->GetConfig()->IsElementDataWhitelisted()
-                                                                                   : clientChangesMode == eCustomDataClientTrust::ALLOW;
-    if (!changesAllowed)
-    {
-        CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)\n", m_pSourcePlayer->GetNick(), customDataName.c_str());
-
-        CLuaArguments arguments;
-        arguments.PushElement(element);
-        arguments.PushString(customDataName.c_str());
-        arguments.PushArgument(CLuaArgument());
-        m_pSourcePlayer->CallEvent("onPlayerChangesProtectedData", arguments);
-        UNCLOCK("NetServerPulse::RPC", "RemoveElementData");
-        return;
-    }
-
-    if (element->DeleteCustomData(customDataNameId, m_pSourcePlayer))
-    {
-        if (lastSyncType != ESyncType::LOCAL)
-        {
-            CBitStream    outBitStream;
-            std::uint16_t nameLength = static_cast<std::uint16_t>(customDataName.length());
-            outBitStream.pBitStream->WriteCompressed(nameLength);
-            outBitStream.pBitStream->Write(customDataName.c_str(), nameLength);
-            outBitStream.pBitStream->WriteBit(false);  // Unused (was recursive flag)
-
-            if (lastSyncType == ESyncType::BROADCAST)
-                m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *outBitStream.pBitStream), m_pSourcePlayer);
-            else
-                m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *outBitStream.pBitStream), element,
-                                                          customDataNameId.ToCString(), m_pSourcePlayer);
-
-            CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(customDataName.c_str(), m_pPlayerManager->Count(),
-                                                                                     outBitStream.pBitStream->GetNumberOfBytesUsed());
-        }
-
-        if (lastSyncType == ESyncType::SUBSCRIBE)
-            m_pPlayerManager->ClearElementData(element, customDataNameId);
-    }
-
-    UNCLOCK("NetServerPulse::RPC", "RemoveElementData");
 }
