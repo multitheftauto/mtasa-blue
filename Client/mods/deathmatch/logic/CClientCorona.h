@@ -44,6 +44,9 @@ public:
     void SetIgnoreAlphaLimits(bool ignore) noexcept {};
     bool AreAlphaLimitsIgnored() const noexcept override { return true; };
 
+    unsigned long   GetIdentifier() const noexcept { return m_ulIdentifier; }
+    class RpAtomic* GetAtomic() const override { return nullptr; }
+
 protected:
     bool IsStreamedIn() { return m_bStreamedIn; };
     void StreamIn();

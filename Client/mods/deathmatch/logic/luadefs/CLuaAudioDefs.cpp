@@ -226,7 +226,7 @@ int CLuaAudioDefs::PlaySound3D(lua_State* luaVM)
                 SString strFilename;
                 bool    bIsURL = false;
                 bool    bIsRawData = false;
-                if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename))
+                if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename, nullptr, true))
                     strSound = strFilename;
                 else
                 {
@@ -1442,7 +1442,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                           EnumToString(effectParam).c_str(), CBassAudio::ErrorGetMessage());
 
         // Do not use `luaL_error` here and pass in `msg` as the format string,
-        // user could inject paramters into the format string, and that would be bad :D
+        // user could inject parameters into the format string, and that would be bad :D
         // The below code is based on the code from `luaL_error`
         luaL_where(luaVM, 1);
         lua::Push(luaVM, msg);

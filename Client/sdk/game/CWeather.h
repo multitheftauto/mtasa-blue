@@ -18,7 +18,11 @@ class CWeather
 public:
     virtual unsigned char Get() = 0;
     virtual void          Set(unsigned char primary, unsigned char secondary) = 0;
-    virtual void          Release() = 0;
+    // After Set(), if the engine had diverged from MTA's intended types (e.g. CWeather::Update
+    // clock-wrap in #4803), realign InterpolationValue with the game clock so materials that blend
+    // weather heavily (glass / reflections) match the sky.
+    virtual void ResyncInterpolationWithGameClock(unsigned char primary, unsigned char secondary) = 0;
+    virtual void Release() = 0;
 
     virtual float GetAmountOfRain() = 0;
     virtual void  SetAmountOfRain(float fAmount) = 0;

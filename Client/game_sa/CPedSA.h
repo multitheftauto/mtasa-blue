@@ -65,7 +65,7 @@ public:
     unsigned int bIsStanding : 1;           // is ped standing on something
     unsigned int bWasStanding : 1;          // was ped standing on something
     unsigned int bIsLooking : 1;            // is ped looking at something or in a direction
-    unsigned int bIsRestoringLook : 1;      // is ped restoring head postion from a look
+    unsigned int bIsRestoringLook : 1;      // is ped restoring head position from a look
     unsigned int bIsAimingGun : 1;          // is ped aiming gun
     unsigned int bIsRestoringGun : 1;       // is ped moving gun back to default posn
     unsigned int bCanPointGunAtTarget : 1;  // can ped point gun at target
@@ -229,6 +229,15 @@ static_assert(sizeof(CPedStatSAInterface) == 0x34, "Invalid size for CPedStatSAI
 class CPedSAInterface : public CPhysicalSAInterface
 {
 public:
+    bool IsPlayer() const noexcept { return bPedType < 2; }
+
+    void SetCurrentWeapon(eWeaponSlot slot) { ((void(__thiscall*)(CPedSAInterface*, eWeaponSlot))FUNC_SetCurrentWeapon)(this, slot); }
+
+    void RemoveWeaponModel(std::uint32_t model) { ((void(__thiscall*)(CEntitySAInterface*, std::uint32_t))FUNC_RemoveWeaponModel)(this, model); }
+
+    void RemoveWeaponWhenEnteringVehicle(bool jetpack);
+
+public:
     CPedSoundEntitySAInterface       pedAudio;           // CAEPedAudioEntity
     CPedSoundSAInterface             pedSound;           // CAEPedSpeechAudioEntity
     CPedWeaponAudioEntitySAInterface weaponAudioEntity;  // CAEPedWeaponAudioEntity
@@ -286,7 +295,7 @@ public:
     CVehicleSAInterface* vehicleDeadInFrontOf;
 
     int                  unk_594;
-    int                  bPedType;  // ped type? 0 = player, >1 = ped?
+    int                  bPedType;  // 0 = player, 1 = player2, > 1 = ped
     CPedStatSAInterface* pPedStats;
     CWeaponSAInterface   Weapons[WEAPONSLOT_MAX];
     eWeaponType          savedWeapon;
@@ -477,7 +486,8 @@ public:
 
     void SetInWaterFlags(bool inWater) override;
 
-    static void StaticSetHooks();
+    static void __fastcall RemoveWeaponWhenEnteringVehicle(CPedSAInterface* pedInterface, void*, int jetpack);
+    static void            StaticSetHooks();
 
 private:
     void ApplySwimAndSlopeRotations();

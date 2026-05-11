@@ -745,7 +745,7 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 return true;
             case WM_IME_KEYDOWN:
             {
-                // Handle space/return seperately in this case
+                // Handle space/return separately in this case
                 if (wParam == VK_SPACE)
                     pGUI->ProcessCharacter(MapVirtualKey(wParam, MAPVK_VK_TO_CHAR));
 
@@ -774,21 +774,7 @@ bool CLocalGUI::InputGoesToGUI()
     if (!pGUI)
         return false;
 
-    bool shouldShowCursorForGUI = false;
-    if (pGUI->GetGUIInputEnabled())
-    {
-        eInputMode inputMode = pGUI->GetGUIInputMode();
-        if (inputMode == INPUTMODE_NO_BINDS_ON_EDIT)
-        {
-            shouldShowCursorForGUI = true;
-        }
-        else if (inputMode == INPUTMODE_NO_BINDS)
-        {
-            shouldShowCursorForGUI = false;
-        }
-    }
-
-    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || shouldShowCursorForGUI ||
+    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || pGUI->GetGUIInputEnabled() ||
             !CCore::GetSingleton().IsFocused() || IsWebRequestGUIVisible());
 }
 

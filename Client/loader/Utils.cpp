@@ -466,27 +466,6 @@ namespace
         return PathJoin(GetProductRegistryPath(), GetMajorVersionString(), strPath).TrimEnd("\\");
     }
 
-    bool IsTemporaryUpdateLaunchPath(const SString& strLaunchPath)
-    {
-        if (strLaunchPath.empty())
-            return false;
-
-        if (!strLaunchPath.ContainsI("\\upcache\\"))
-            return false;
-
-        return ExtractFilename(strLaunchPath).ContainsI("_tmp_");
-    }
-
-    bool IsUsableMtasaInstallRoot(const SString& strPath)
-    {
-        if (strPath.empty())
-            return false;
-
-        return FileExists(PathJoin(strPath, "Multi Theft Auto.exe")) || FileExists(PathJoin(strPath, "Multi Theft Auto_d.exe")) ||
-               FileExists(PathJoin(strPath, "mta", "core.dll")) || FileExists(PathJoin(strPath, "MTA", "core.dll")) ||
-               FileExists(PathJoin(strPath, "mta", "core_d.dll")) || FileExists(PathJoin(strPath, "MTA", "core_d.dll"));
-    }
-
     bool HasDistinct64BitRegistryView()
     {
 #if defined(_WIN64)
@@ -580,23 +559,105 @@ namespace
                        static_cast<DWORD>((wstrValue.length() + 1) * sizeof(wchar_t)));
         RegCloseKey(hKey);
     }
+
+    // Read Last Run Location from a specific registry view. viewFlag should be one of
+    // KEY_WOW64_64KEY, KEY_WOW64_32KEY, or 0 (no view override). Returns empty string on any failure.
+    // Oversized values are rejected without allocation so a malformed registry entry on the U01
+    // recovery path cannot turn into a large allocation; the same 1 MB cap is used by the generic
+    // ReadRegistryStringValue helper in SharedUtil.Misc.hpp.
+    SString ReadInstallRootRegistryView(REGSAM viewFlag)
+    {
+        constexpr DWORD kMaxRegistryValueBytes = 1024u * 1024u;
+
+        const WString wstrSubKey = FromUTF8(MakeCurrentVersionRegistryPath(""));
+        const WString wstrValueName = FromUTF8("Last Run Location");
+
+        HKEY hKey = nullptr;
+        if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, wstrSubKey.c_str(), 0, KEY_READ | viewFlag, &hKey) != ERROR_SUCCESS || !hKey)
+            return "";
+
+        DWORD valueType = REG_SZ;
+        DWORD valueSize = 0;
+        LONG  result = RegQueryValueExW(hKey, wstrValueName.c_str(), nullptr, &valueType, nullptr, &valueSize);
+        if (result != ERROR_SUCCESS || (valueType != REG_SZ && valueType != REG_EXPAND_SZ) || valueSize == 0 || valueSize > kMaxRegistryValueBytes ||
+            (valueSize % sizeof(wchar_t)) != 0)
+        {
+            RegCloseKey(hKey);
+            return "";
+        }
+
+        std::vector<wchar_t> buffer((valueSize / sizeof(wchar_t)) + 1u, L'\0');
+        result = RegQueryValueExW(hKey, wstrValueName.c_str(), nullptr, &valueType, reinterpret_cast<LPBYTE>(buffer.data()), &valueSize);
+        RegCloseKey(hKey);
+
+        if (result != ERROR_SUCCESS || (valueType != REG_SZ && valueType != REG_EXPAND_SZ) || valueSize > kMaxRegistryValueBytes ||
+            (valueSize % sizeof(wchar_t)) != 0)
+            return "";
+
+        buffer[valueSize / sizeof(wchar_t)] = L'\0';
+
+        // Expand environment variable references for REG_EXPAND_SZ values so callers see a real
+        // filesystem path. Without this, a value like "%ProgramFiles%\..." would fail validation.
+        // The expansion is bounded by the same 1 MB cap so a value containing a self-referential or
+        // explosive expansion cannot trigger a large allocation here.
+        if (valueType == REG_EXPAND_SZ)
+        {
+            constexpr DWORD kMaxExpandChars = kMaxRegistryValueBytes / sizeof(wchar_t);
+            const DWORD     expandedChars = ExpandEnvironmentStringsW(buffer.data(), nullptr, 0);
+            if (expandedChars > 0 && expandedChars <= kMaxExpandChars)
+            {
+                std::vector<wchar_t> expanded(expandedChars, L'\0');
+                if (ExpandEnvironmentStringsW(buffer.data(), expanded.data(), expandedChars))
+                    return ToUTF8(expanded.data());
+            }
+        }
+
+        return ToUTF8(buffer.data());
+    }
 }
 
 SString GetInstallPathForLauncher()
 {
     const SString strLaunchPath = GetLaunchPath();
-    if (!IsTemporaryUpdateLaunchPath(strLaunchPath))
+    if (!SharedUtil::IsTemporaryUpdateLaunchPath(strLaunchPath))
         return strLaunchPath;
 
-    const SString strSavedInstallPath = GetRegistryValue("", "Last Run Location");
-    if (IsUsableMtasaInstallRoot(strSavedInstallPath) && !IsTemporaryUpdateLaunchPath(strSavedInstallPath))
-        return strSavedInstallPath;
+    // Prefer the resolved base dir over the registry when one was already established. In the
+    // far-update Process C, CInstallManager applies SetMTASABaseDirOverride from the sequencer
+    // carried INSTALL_ROOT and runs ::SetMTASAPathSource(true) before any consumer reaches here,
+    // so g_strMTASAPath holds the validated real install root that Process B was updating. A stale
+    // or differently-installed registry "Last Run Location" must not win over that carried root and
+    // aim consumers at a different MTA install. Read g_strMTASAPath directly rather than calling
+    // GetMTASAPath(), because GetMTASAPath() lazy-inits via SetMTASAPathSource(false), which calls
+    // back into GetInstallPathForLauncher() and would recurse for any temp launcher whose g_strMTASAPath
+    // has not yet been populated by the far-update sequencer path. Empty string falls through to the
+    // per-view registry loop below, preserving the temp-launcher-without-far-update fallback.
+    if (!g_strMTASAPath.empty() && SharedUtil::IsUsableMtasaInstallRoot(g_strMTASAPath) && !SharedUtil::IsTemporaryUpdateLaunchPath(g_strMTASAPath) &&
+        !g_strMTASAPath.CompareI(strLaunchPath))
+        return g_strMTASAPath;
 
-    const SString strSavedInstallPath64 = GetRegistryValue64("", "Last Run Location");
-    if (IsUsableMtasaInstallRoot(strSavedInstallPath64) && !IsTemporaryUpdateLaunchPath(strSavedInstallPath64))
-        return strSavedInstallPath64;
+    // Read each registry view independently so a stale value in one view cannot shadow a usable value in another.
+    REGSAM viewFlags[3] = {0, 0, 0};
+    int    viewCount = 0;
+#if defined(KEY_WOW64_64KEY)
+    viewFlags[viewCount++] = KEY_WOW64_64KEY;
+#endif
+#if defined(KEY_WOW64_32KEY)
+    viewFlags[viewCount++] = KEY_WOW64_32KEY;
+#endif
+    viewFlags[viewCount++] = 0;
 
-    return strLaunchPath;
+    for (int i = 0; i < viewCount; ++i)
+    {
+        const SString strSavedInstallPath = ReadInstallRootRegistryView(viewFlags[i]);
+        if (SharedUtil::IsUsableMtasaInstallRoot(strSavedInstallPath) && !SharedUtil::IsTemporaryUpdateLaunchPath(strSavedInstallPath))
+            return strSavedInstallPath;
+    }
+
+    // No usable non-temp install root resolved. Returning empty forces callers to use their own fallbacks
+    // (such as a base-dir override carried forward from the parent launcher) instead of treating a temp
+    // update directory as the real install location.
+    return SString();
 }
 
 void SetMTASAPathSource(bool bReadFromRegistry)
@@ -612,11 +673,30 @@ void SetMTASAPathSource(bool bReadFromRegistry)
         SString strLaunchPath = GetLaunchPath();
         SString strInstallPath = GetInstallPathForLauncher();
 
+        // GetInstallPathForLauncher returns empty when running from a temp update directory and no
+        // usable non-temp install root could be resolved. In that case the safest local fallback is
+        // the launch path itself, which preserves the prior behavior for non-update launches without
+        // contaminating the registry from the auto-update flow (Process C now goes through the far
+        // branch with a base-dir override carried forward by CInstallManager).
+        if (strInstallPath.empty())
+            strInstallPath = strLaunchPath;
+
         if (!strInstallPath.CompareI(strLaunchPath))
         {
             AddReportLog(1063, SString("SetMTASAPathSource: preserving install path '%s' for temp launcher '%s'", strInstallPath.c_str(),
                                        strLaunchPathFilename.c_str()));
             g_strMTASAPath = strInstallPath;
+            return;
+        }
+
+        // Refuse to write a temp update extraction directory into the install-location registry
+        // values. A temp launcher started without the far-update sequencer state would otherwise
+        // contaminate Last Run Location with an upcache\_*_tmp_* path that gets deleted later by
+        // CleanDownloadCache, leaving a stale registry pointer that produces U01 on the next launch.
+        if (SharedUtil::IsTemporaryUpdateLaunchPath(strLaunchPath))
+        {
+            AddReportLog(1063, SString("SetMTASAPathSource: refusing to record temp launch path '%s' in registry", strLaunchPath.c_str()));
+            g_strMTASAPath = strLaunchPath;
             return;
         }
 
@@ -1286,10 +1366,24 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
     bool    bFreeModule = false;
 
     const SString strInstallPath = GetInstallPathForLauncher();
-    if (IsUsableMtasaInstallRoot(strInstallPath))
+    if (SharedUtil::IsUsableMtasaInstallRoot(strInstallPath))
     {
         hModule = LoadVersionModule(strInstallPath, dwLastError);
         bFreeModule = hModule != NULL;
+    }
+
+    // GetInstallPathForLauncher returns empty when running from a temp update directory and no
+    // usable non-temp install root could be resolved. GetMTASAPath consults SetMTASABaseDirOverride
+    // (which the install manager populates from the sequencer-carried INSTALL_ROOT in the far branch),
+    // so this attempt covers the recovered far-update case before falling back to the launch dir.
+    if (!hModule)
+    {
+        const SString strBaseDirPath = GetMTASAPath();
+        if (SharedUtil::IsUsableMtasaInstallRoot(strBaseDirPath) && !strBaseDirPath.CompareI(strInstallPath))
+        {
+            hModule = LoadVersionModule(strBaseDirPath, dwLastError);
+            bFreeModule = hModule != NULL;
+        }
     }
 
     if (!hModule)

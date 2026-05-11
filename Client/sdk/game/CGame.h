@@ -74,8 +74,6 @@ class CVehicleAudioSettingsManager;
 enum eEntityType;
 enum ePedPieceTypes;
 
-using StreamingRemoveModelCallback = bool (*)(unsigned int modelId);
-
 typedef bool(PreWeaponFireHandler)(class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync);
 typedef void(PostWeaponFireHandler)();
 typedef void(TaskSimpleBeHitHandler)(class CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
@@ -272,8 +270,6 @@ public:
     virtual void SetPreWeaponFireHandler(PreWeaponFireHandler* pPreWeaponFireHandler) = 0;
     virtual void SetPostWeaponFireHandler(PostWeaponFireHandler* pPostWeaponFireHandler) = 0;
     virtual void SetTaskSimpleBeHitHandler(TaskSimpleBeHitHandler* pTaskSimpleBeHitHandler) = 0;
-
-    virtual StreamingRemoveModelCallback GetStreamingRemoveModelCallback() const noexcept = 0;
 
     virtual CObjectGroupPhysicalProperties* GetObjectGroupPhysicalProperties(unsigned char ucObjectGroup) = 0;
 

@@ -203,7 +203,7 @@ CXMLNode* CXMLFileImpl::CreateRootNode(const std::string& strTagName)
     // Make sure we always have a root node
     if (!m_pRootNode)
     {
-        // Grab the document's root, create it if neccessary
+        // Grab the document's root, create it if necessary
         TiXmlElement* pRootNode = m_pDocument->RootElement();
         if (!pRootNode)
         {

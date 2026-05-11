@@ -37,7 +37,7 @@ CTaskSA::~CTaskSA()
     dwTasksAlive--;
 }
 
-// alocate memory for the task (ammount nSize)
+// allocate memory for the task (amount nSize)
 void CTaskSA::CreateTaskInterface(size_t nSize)
 {
     // Safety margin. I see GTA allocate more than we do for some tasks. We could create

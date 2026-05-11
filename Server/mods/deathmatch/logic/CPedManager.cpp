@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CPedManager.h"
 #include "CPed.h"
+#include "CPlayerManager.h"
 #include "Utils.h"
 
 CPedManager::CPedManager()
@@ -74,5 +75,7 @@ bool CPedManager::Exists(CPed* pPed)
 
 bool CPedManager::IsValidModel(unsigned short usModel)
 {
-    return true;
+    // Peds created from maps/XML also end up here, so keep this aligned with the
+    // script-facing validator and reject unused GTA skin IDs before they can be synced.
+    return CPlayerManager::IsValidPlayerModel(usModel);
 }

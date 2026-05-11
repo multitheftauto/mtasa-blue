@@ -1439,7 +1439,7 @@ int CLuaPedDefs::GetPedAnimation(lua_State* luaVM)
             lua_setfield(luaVM, -2, "loop");
             lua_pushboolean(luaVM, animationCache.bUpdatePosition);
             lua_setfield(luaVM, -2, "updatePosition");
-            lua_pushboolean(luaVM, animationCache.bInterruptable);
+            lua_pushboolean(luaVM, animationCache.bInterruptible);
             lua_setfield(luaVM, -2, "interruptable");
             lua_pushboolean(luaVM, animationCache.bFreezeLastFrame);
             lua_setfield(luaVM, -2, "freezeLastFrame");
@@ -2235,7 +2235,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     int            iBlend = 250;
     bool           bLoop = true;
     bool           bUpdatePosition = true;
-    bool           bInterruptable = true;
+    bool           bInterruptible = true;
     bool           bFreezeLastFrame = true;
     bool           bTaskToBeRestoredOnAnimEnd = false;
 
@@ -2251,7 +2251,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     argStream.ReadNumber(iTime, -1);
     argStream.ReadBool(bLoop, true);
     argStream.ReadBool(bUpdatePosition, true);
-    argStream.ReadBool(bInterruptable, true);
+    argStream.ReadBool(bInterruptible, true);
     argStream.ReadBool(bFreezeLastFrame, true);
     argStream.ReadNumber(iBlend, 250);
     argStream.ReadBool(bTaskToBeRestoredOnAnimEnd, false);
@@ -2259,7 +2259,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         if (CStaticFunctionDefinitions::SetPedAnimation(*pEntity, strBlockName == "" ? NULL : strBlockName.c_str(),
-                                                        strAnimName == "" ? NULL : strAnimName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptable,
+                                                        strAnimName == "" ? NULL : strAnimName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptible,
                                                         bFreezeLastFrame))
         {
             CClientPed* pPed = static_cast<CClientPed*>(pEntity);

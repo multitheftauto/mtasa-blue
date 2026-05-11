@@ -20,14 +20,22 @@ extern CGameSA* pGame;
 
 CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
 {
-    // Validate collision model before accessing radius
     CVector boundCentre;
     CEntitySAInterface::GetBoundCentre(&boundCentre);
-    CBaseModelInfoSAInterface* pModelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex);
 
-    // Validate model info and collision model before accessing
+    // Validate model info and collision model before deref. The streaming
+    // system can strip a model's collision data while leaving pColModel
+    // non-null (dangling), or release the model info entirely when entities
+    // from a recycled sector are re-added via building removal. Dereferencing
+    // without a guard here can write into arbitrary memory.
+    CBaseModelInfoSAInterface* pModelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex);
     if (!pModelInfo || !pModelInfo->pColModel)
+    {
+        // Always initialize output rect to avoid leaking stale caller data.
+        *pRect = CRect(boundCentre.fX, boundCentre.fY, boundCentre.fX, boundCentre.fY);
+        pRect->FixIncorrectTopLeft();
         return pRect;
+    }
 
     float fRadius = pModelInfo->pColModel->m_sphere.m_radius;
     *pRect = CRect(boundCentre.fX - fRadius, boundCentre.fY - fRadius, boundCentre.fX + fRadius, boundCentre.fY + fRadius);
@@ -254,8 +262,6 @@ CEntity* CPhysicalSA::GetDamageEntity()
     return nullptr;
 }
 
-// Stores a raw pointer to the entity. Call ResetLastDamage() when the entity
-// is destroyed to prevent dangling pointer access.
 void CPhysicalSA::SetDamageEntity(CEntity* pEntity)
 {
     CEntitySA* pEntitySA = dynamic_cast<CEntitySA*>(pEntity);
@@ -263,7 +269,6 @@ void CPhysicalSA::SetDamageEntity(CEntity* pEntity)
         ((CPhysicalSAInterface*)GetInterface())->m_pCollidedEntity = pEntitySA->GetInterface();
 }
 
-// Clears the damage entity pointer and magnitude
 void CPhysicalSA::ResetLastDamage()
 {
     ((CPhysicalSAInterface*)GetInterface())->m_fDamageImpulseMagnitude = 0.0f;

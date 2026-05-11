@@ -3,16 +3,13 @@
 <!-- When changing Lua APIs, consider including code samples and documentation. -->
 
 
-
 #### Motivation
 <!-- Why are you making this change? Which GitHub issue does this resolve, if any? Any additional context? -->
 
 
-
 #### Test plan
-<!-- How have you tested this change? This should give confidence to the reviewer  -->
+<!-- How have you tested this change? This should give confidence to the reviewer that your change is safe. -->
 <!-- If someone makes changes to this code in the future, what steps can they follow to check that it's still working correctly? -->
-
 
 
 #### Checklist

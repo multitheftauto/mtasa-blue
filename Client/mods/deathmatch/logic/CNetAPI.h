@@ -125,4 +125,6 @@ private:
     float            m_fLastSentAimY;
     uchar            m_ucBulletSyncOrderCounter;
     uchar            m_ucCustomWeaponBulletSyncOrderCounter;
+    unsigned long    m_ulDeadSyncGraceEndTime;
+    bool             m_bWasDeadOnNetwork;
 };

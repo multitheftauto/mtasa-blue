@@ -126,7 +126,8 @@ bool CPixelsManager::GetTexturePixels(IDirect3DBaseTexture9* pD3DBaseTexture, CP
             bResult = SetPlainDimensions(outPixels, uiPixelsWidth, uiPixelsHeight);
         }
     }
-    else if (Desc.Usage == 0)
+    // Handle any non-rendertarget usage so D3DUSAGE_DYNAMIC textures (e.g. CEF browsers since PR #4634) go through the lockable path.
+    else if ((Desc.Usage & D3DUSAGE_RENDERTARGET) == 0)
     {
         if (pixelsFormat != EPixelsFormat::PLAIN)
             return D3DXGetSurfacePixels(pD3DSurface, outPixels, pixelsFormat, renderFormat, bMipMaps, pRect);
@@ -204,7 +205,8 @@ bool CPixelsManager::SetTexturePixels(IDirect3DBaseTexture9* pD3DBaseTexture, co
             if (FAILED(D3DXLoadSurfaceFromSurface(pD3DSurface, NULL, NULL, pLockableSurface, NULL, NULL, D3DX_FILTER_NONE, 0)))
                 return false;
     }
-    else if (Desc.Usage == 0)
+    // Handle any non-rendertarget usage so D3DUSAGE_DYNAMIC textures (e.g. CEF browsers since PR #4634) go through the lockable path.
+    else if ((Desc.Usage & D3DUSAGE_RENDERTARGET) == 0)
     {
         if (Desc.Format == D3DFMT_A8R8G8B8 || Desc.Format == D3DFMT_X8R8G8B8 || Desc.Format == D3DFMT_R5G6B5)
         {

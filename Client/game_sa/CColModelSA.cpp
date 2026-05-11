@@ -12,92 +12,40 @@
 #include "StdInc.h"
 #include "CColModelSA.h"
 
-#include <stdexcept>
-
-namespace
+CColModelSA::CColModelSA()
 {
-    bool CallNativeColModelConstructor(CColModelSAInterface* pInterface) noexcept
+    m_pInterface = new CColModelSAInterface;
+    DWORD dwThis = (DWORD)m_pInterface;
+    DWORD dwFunc = FUNC_CColModel_Constructor;
+    // clang-format off
+    __asm
     {
-        if (!pInterface)
-            return false;
-
-        uintptr_t dwThis = reinterpret_cast<uintptr_t>(pInterface);
-        DWORD     dwFunc = FUNC_CColModel_Constructor;
-
-        __try
-        {
-            // clang-format off
-            __asm
-            {
-                mov     ecx, dwThis
-                call    dwFunc
-            }
-            // clang-format on
-        }
-        __except (EXCEPTION_EXECUTE_HANDLER)
-        {
-            return false;
-        }
-
-        return true;
+        mov     ecx, dwThis
+        call    dwFunc
     }
-
-    void CallNativeColModelDestructor(CColModelSAInterface* pInterface) noexcept
-    {
-        if (!pInterface)
-            return;
-
-        uintptr_t dwThis = reinterpret_cast<uintptr_t>(pInterface);
-        DWORD     dwFunc = FUNC_CColModel_Destructor;
-
-        __try
-        {
-            // clang-format off
-            __asm
-            {
-                mov     ecx, dwThis
-                call    dwFunc
-            }
-            // clang-format on
-        }
-        __except (EXCEPTION_EXECUTE_HANDLER)
-        {
-        }
-    }
-}
-
-CColModelSA::CColModelSA() : m_pInterface(new CColModelSAInterface), m_bDestroyInterface(false), m_bValid(false)
-{
-    if (!CallNativeColModelConstructor(m_pInterface))
-    {
-        delete m_pInterface;
-        m_pInterface = nullptr;
-        throw std::runtime_error("CColModelSA native constructor failed");
-    }
+    // clang-format on
     m_bDestroyInterface = true;
-    m_bValid = true;
 }
 
 CColModelSA::CColModelSA(CColModelSAInterface* pInterface)
 {
     m_pInterface = pInterface;
     m_bDestroyInterface = false;
-    m_bValid = true;
 }
 
 CColModelSA::~CColModelSA()
 {
-    m_bValid = false;
-
-    if (m_bDestroyInterface && m_pInterface)
+    if (m_bDestroyInterface)
     {
-        CallNativeColModelDestructor(m_pInterface);
+        DWORD dwThis = (DWORD)m_pInterface;
+        DWORD dwFunc = FUNC_CColModel_Destructor;
+        // clang-format off
+        __asm
+        {
+            mov     ecx, dwThis
+            call    dwFunc
+        }
+        // clang-format on
         delete m_pInterface;
-        m_pInterface = nullptr;
     }
-}
-
-void CColModelSA::Destroy()
-{
-    delete this;
 }
