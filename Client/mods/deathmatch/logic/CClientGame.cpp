@@ -7008,6 +7008,7 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
         m_pVehicleManager->SetSpawnFlyingComponentEnabled(true);
         g_pGame->SetVehicleBurnExplosionsEnabled(true);
         SetVehicleEngineAutoStartEnabled(true);
+        g_pMultiplayer->SetVehicleHierarchyTypoFixesEnabled(false);
     }
 
     // Reset all setWorldProperty to default

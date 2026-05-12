@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CMultiplayerSA_VehicleHierarchyTypoFixes.h"
 
 static bool __fastcall AreVehicleDoorsUndamageable(CVehicleSAInterface* vehicle)
 {
@@ -72,4 +73,7 @@ static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 void CMultiplayerSA::InitHooks_Vehicles()
 {
     EZHookInstall(CDamageManager__ProgressDoorDamage);
+
+    // SilentPatch-style optional matching for typo'd vehicle component frame names (see CMultiplayerSA_VehicleHierarchyTypoFixes.cpp).
+    InitVehicleHierarchyTypoFixesHook();
 }
