@@ -356,6 +356,9 @@ public:
     void SetBoatWaterSplashEnabled(bool bEnabled);
     void SetTyreSmokeEnabled(bool bEnabled);
 
+    void SetVehicleHierarchyTypoFixesEnabled(bool bEnabled) override;
+    bool GetVehicleHierarchyTypoFixesEnabled() const override;
+
     void SetLastStaticAnimationPlayed(eAnimGroup dwGroupID, eAnimID dwAnimID, DWORD dwAnimArrayAddress)
     {
         m_dwLastStaticAnimGroupID = dwGroupID;
