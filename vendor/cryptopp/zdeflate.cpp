@@ -418,7 +418,7 @@ unsigned int Deflator::LongestMatch(unsigned int &bestMatch) const
 #else
 				std::mismatch
 #endif
-#if CRYPTOPP_MSC_VERSION >= 1600
+#if defined(_STDEXT_BEGIN) && CRYPTOPP_MSC_VERSION >= 1600
 				(stdext::make_unchecked_array_iterator(scan)+3, stdext::make_unchecked_array_iterator(scanEnd), stdext::make_unchecked_array_iterator(match)+3).first - stdext::make_unchecked_array_iterator(scan));
 #else
 				(scan+3, scanEnd, match+3).first - scan);
