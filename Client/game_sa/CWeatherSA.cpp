@@ -37,13 +37,16 @@ void CWeatherSA::ResyncInterpolationWithGameClock(unsigned char primary, unsigne
     else
     {
         // Match the value CWeather::Update derives at 0x72B897:
-        //   v0 = (seconds / 60 + minutes) / 60
-        // Snapping to minutes only would drop seconds and make CTimeCycle::CalcColoursForPoint
-        // step m_CurrentColours per game-minute, which surfaces as flicker on vehicle coronas
-        // (m_fSpriteBrightness) and shadows (m_wShadowStrength) when the clock runs fast.
-        const auto  ucMinute = *reinterpret_cast<unsigned char*>(VAR_TimeMinutes);
-        const auto  ucSecond = *reinterpret_cast<unsigned char*>(VAR_TimeSeconds);
-        const float fInterp = std::min(1.f, static_cast<float>(ucMinute) / 60.f + static_cast<float>(ucSecond) / 3600.f);
+        //   v0 = ((double)seconds * 0.016666668 + (double)minutes) * 0.016666668
+        // Keep this <= engine v0 to avoid triggering the wrap branch on precision mismatches.
+        const auto   ucMinute = *reinterpret_cast<unsigned char*>(VAR_TimeMinutes);
+        const auto   ucSecond = *reinterpret_cast<unsigned char*>(VAR_TimeSeconds);
+        const double dInterp = std::min(1.0, (static_cast<double>(ucSecond) * 0.016666668 + static_cast<double>(ucMinute)) * 0.016666668);
+        float        fInterp = static_cast<float>(dInterp);
+
+        if (static_cast<double>(fInterp) > dInterp)
+            fInterp = std::nextafterf(fInterp, 0.0f);
+
         MemPutFast<float>(VAR_InterpolationValue, fInterp);
     }
 }
