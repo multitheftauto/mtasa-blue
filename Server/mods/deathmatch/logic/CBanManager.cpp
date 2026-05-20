@@ -276,7 +276,7 @@ unsigned int CBanManager::GetBansWithBanner(const char* szBanner)
     list<CBan*>::const_iterator iter = m_BanManager.begin();
     for (; iter != m_BanManager.end(); iter++)
     {
-        if ((*iter)->GetBanner(), szBanner)
+        if ((*iter)->GetBanner() == szBanner)
         {
             uiOccurrances++;
         }
@@ -316,185 +316,17 @@ bool CBanManager::LoadBanList()
     if (pRootNode->GetTagName().compare("banlist") != 0)
     {
         CLogger::ErrorPrintf("Wrong root node ('banlist')\n");
+        delete pFile;
         return false;
     }
 
-    // Iterate the nodes
-    CXMLNode*    pNode = NULL;
-    unsigned int uiCount = pRootNode->GetSubNodeCount();
-
-    for (unsigned int i = 0; i < uiCount; i++)
+    CXMLNode* pBanNode = NULL;
+    while ((pBanNode = pRootNode->FindChild("ban", pBanNode)))
     {
-        // Grab the node
-        pNode = pRootNode->GetSubNode(i);
-
-        if (pNode)
-        {
-            if (pNode->GetTagName().compare("ban") == 0)
-            {
-                std::string strIP = SafeGetValue(pNode, "ip"), strSerial = SafeGetValue(pNode, "serial");
-                if (!strIP.empty() || !strSerial.empty())
-                {
-                    CBan* pBan = AddBan();
-                    if (IsValidIP(strIP.c_str()))
-                    {
-                        pBan->SetIP(strIP);
-                    }
-                    pBan->SetSerial(strSerial);
-                    pBan->SetBanner(SafeGetValue(pNode, "banner"));
-                    pBan->SetNick(SafeGetValue(pNode, "nick"));
-                    pBan->SetReason(SafeGetValue(pNode, "reason"));
-
-                    std::string strTime = SafeGetValue(pNode, "time");
-                    if (!strTime.empty())
-                        pBan->SetTimeOfBan((time_t)atoi(strTime.c_str()));
-
-                    strTime = SafeGetValue(pNode, "unban");
-                    if (!strTime.empty())
-                        pBan->SetTimeOfUnban((time_t)atoi(strTime.c_str()));
-                }
-            }
-        }
+        CBan* pBan = new CBan(pBanNode);
+        m_BanManager.push_back(pBan);
     }
 
     delete pFile;
-    ms_bSaveRequired = false;
     return true;
-}
-
-bool CBanManager::ReloadBanList()
-{
-    // Flush any pending saves - This is ok because reloadbans is for loading manual changes to banlist.xml
-    // and manual changes are subject to being overwritten by server actions at any time.
-    if (ms_bSaveRequired)
-        SaveBanList();
-
-    list<CBan*>::const_iterator iter = m_BanManager.begin();
-    for (; iter != m_BanManager.end(); iter++)
-    {
-        CBan* pBan = *iter;
-        MapInsert(m_BansBeingDeleted, pBan);
-        pBan->SetBeingDeleted();
-    }
-    m_BanManager.clear();
-
-    return LoadBanList();
-}
-
-void CBanManager::SaveBanList()
-{
-    // Only allow save after a load was attempted
-    if (!m_bAllowSave)
-        return;
-
-    // Create the XML file
-    CXMLFile* pFile = g_pServerInterface->GetXML()->CreateXML(m_strPath);
-    if (pFile)
-    {
-        // create the root node again as you are outputting all the bans again not just new ones
-        CXMLNode* pRootNode = pFile->CreateRootNode("banlist");
-
-        // Check it was created
-        if (pRootNode)
-        {
-            // Iterate the ban list adding it to the XML tree
-            CXMLNode*                   pNode;
-            list<CBan*>::const_iterator iter = m_BanManager.begin();
-            for (; iter != m_BanManager.end(); iter++)
-            {
-                pNode = pRootNode->CreateSubNode("ban");
-
-                if (pNode)
-                {
-                    SafeSetValue(pNode, "nick", (*iter)->GetNick());
-                    SafeSetValue(pNode, "ip", (*iter)->GetIP());
-                    SafeSetValue(pNode, "serial", (*iter)->GetSerial());
-                    SafeSetValue(pNode, "banner", (*iter)->GetBanner());
-                    SafeSetValue(pNode, "reason", (*iter)->GetReason());
-                    SafeSetValue(pNode, "time", (unsigned int)(*iter)->GetTimeOfBan());
-                    if ((*iter)->GetTimeOfUnban() > 0)
-                    {
-                        SafeSetValue(pNode, "unban", (unsigned int)(*iter)->GetTimeOfUnban());
-                    }
-                }
-            }
-
-            // Write the XML file
-            if (!pFile->Write())
-                CLogger::ErrorPrintf("Error saving '%s'\n", FILENAME_BANLIST);
-        }
-
-        // Delete the file pointer
-        delete pFile;
-    }
-    ms_bSaveRequired = false;
-}
-
-void CBanManager::SafeSetValue(CXMLNode* pNode, const char* szKey, const std::string& strValue)
-{
-    if (!strValue.empty())
-    {
-        CXMLAttribute* pAttribute = pNode->GetAttributes().Create(szKey);
-        if (pAttribute)
-        {
-            pAttribute->SetValue(strValue.c_str());
-        }
-    }
-}
-
-void CBanManager::SafeSetValue(CXMLNode* pNode, const char* szKey, unsigned int uiValue)
-{
-    if (uiValue)
-    {
-        CXMLAttribute* pAttribute = pNode->GetAttributes().Create(szKey);
-        if (pAttribute)
-        {
-            pAttribute->SetValue(uiValue);
-        }
-    }
-}
-
-std::string CBanManager::SafeGetValue(CXMLNode* pNode, const char* szKey)
-{
-    CXMLAttribute* pAttribute = pNode->GetAttributes().Find(szKey);
-
-    if (pAttribute)
-    {
-        return pAttribute->GetValue();
-    }
-    return std::string();
-}
-
-bool CBanManager::IsValidIP(const char* szIP)
-{
-    char strIP[256] = {'\0'};
-    strncpy(strIP, szIP, 255);
-    strIP[255] = '\0';
-
-    char* szIP1 = strtok(strIP, ".");
-    char* szIP2 = strtok(NULL, ".");
-    char* szIP3 = strtok(NULL, ".");
-    char* szIP4 = strtok(NULL, "\r");
-
-    if (szIP1 && szIP2 && szIP3 && szIP4)
-    {
-        if (IsValidIPPart(szIP1) && IsValidIPPart(szIP2) && IsValidIPPart(szIP3) && IsValidIPPart(szIP4))
-            return true;
-    }
-
-    return false;
-}
-
-bool CBanManager::IsValidIPPart(const char* szIP)
-{
-    if (IsNumericString(szIP))
-    {
-        int iIP = atoi(szIP);
-        if (iIP >= 0 && iIP < 256)
-            return true;
-    }
-    else if (strcmp(szIP, "*") == 0)
-        return true;
-
-    return false;
 }
