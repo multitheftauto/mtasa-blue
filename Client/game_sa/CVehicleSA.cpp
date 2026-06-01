@@ -41,7 +41,7 @@ static BOOL m_bVehicleSunGlare = false;
 // it stays the last write of the frame and the wheels remain invisible like in vanilla.
 static RwObject* __cdecl ClearAtomicRenderFlagCB(RwObject* object, void* /*data*/)
 {
-    object->flags &= ~0x04; // rpATOMICRENDER
+    object->flags &= ~0x04;  // rpATOMICRENDER
     return object;
 }
 
@@ -50,7 +50,7 @@ static void __fastcall RehideRhinoMiddleWheels(CAutomobileSAInterface* vehicle)
     if (!vehicle || vehicle->m_nModelIndex != 432 /* Rhino */)
         return;
 
-    for (auto comp : { eCarNodes::WHEEL_LM, eCarNodes::WHEEL_RM })
+    for (auto comp : {eCarNodes::WHEEL_LM, eCarNodes::WHEEL_RM})
     {
         if (RwFrame* frame = vehicle->m_aCarNodes[static_cast<std::size_t>(comp)])
             RwFrameForAllObjects(frame, (void*)ClearAtomicRenderFlagCB, nullptr);
