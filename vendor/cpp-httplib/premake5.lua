@@ -24,7 +24,6 @@ project "httplib"
 
 	files {
 		"premake5.lua",
-		"*.h",
 	}
 
 	filter "system:windows"
