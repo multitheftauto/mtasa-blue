@@ -13,6 +13,25 @@
 #include <map>
 #include <string>
 #include <list>
+#include <vector>
+#include <algorithm>
+#include <utility>
+
+// ---------------------------------------------------------------------------
+// Backward compatibility: EHS headers polluted the global namespace with
+// common STL names. Existing MTA code relies on map, string, list, vector
+// and multimap being available without std:: qualification. These using
+// declarations keep Types.h a drop-in replacement for <ehs/ehs.h>.
+// ---------------------------------------------------------------------------
+
+using std::list;
+using std::make_pair;
+using std::map;
+using std::max;
+using std::multimap;
+using std::pair;
+using std::string;
+using std::vector;
 
 // ---------------------------------------------------------------------------
 // Common typedefs
