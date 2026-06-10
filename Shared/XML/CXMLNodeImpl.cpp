@@ -73,8 +73,9 @@ CXMLNodeImpl::~CXMLNodeImpl()
         XMLNode* pParent = m_pNode->Parent();
         if (pParent)
             pParent->DeleteChild(m_pNode);
-        else
-            delete m_pNode;
+        // When there is no parent, the element is owned by its document
+        // (m_standaloneDocument, the CXMLFileImpl, or an SXMLStringImpl).
+        // Let the document handle cleanup; don't double-delete.
     }
 }
 
@@ -168,7 +169,7 @@ CXMLNode* CXMLNodeImpl::FindSubNode(const char* szTagName, unsigned int uiIndex)
     list<CXMLNode*>::iterator iter;
     for (iter = m_Children.begin(); iter != m_Children.end(); iter++)
     {
-        if (dynamic_cast<CXMLNodeImpl*>((*iter))->GetNode()->ValueStr() == szTagName)
+        if (dynamic_cast<CXMLNodeImpl*>((*iter))->GetNode()->Value() == szTagName)
         {
             if (uiTemp == uiIndex)
             {
@@ -358,7 +359,8 @@ XMLElement* CXMLNodeImpl::GetNode()
 
 CXMLNode* CXMLNodeImpl::CopyNode(CXMLNode* pParent)
 {
-    CXMLNodeImpl* pNew = new CXMLNodeImpl(NULL, reinterpret_cast<CXMLNodeImpl*>(pParent),\n * m_pNode->DeepClone(m_pNode->GetDocument())->ToElement());
+    CXMLNodeImpl* pNew =
+        new CXMLNodeImpl(NULL, reinterpret_cast<CXMLNodeImpl*>(pParent), *m_pNode->DeepClone(m_pNode->GetDocument())->ToElement());
 
     // Copy the list, so we don't end up in an endless loop
     std::list<CXMLNode*> ChildrenCopy(m_Children);
