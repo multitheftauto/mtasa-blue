@@ -32,6 +32,10 @@
 /* Enable Unicode and UTF support */
 #define SUPPORT_UNICODE     1
 
+/* Export annotation for shared library symbols.
+ * Empty for static builds on all platforms. */
+#define PCRE2_EXPORT
+
 /* Version info (from pcre2.h) */
 #define PACKAGE             "pcre2"
 #define PACKAGE_NAME        "PCRE2"
