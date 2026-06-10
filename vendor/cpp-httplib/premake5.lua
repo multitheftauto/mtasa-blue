@@ -20,11 +20,13 @@ project "httplib"
 
 	vpaths {
 		["Headers/*"] = "*.h",
+		["Sources/*"] = "*.cpp",
 		["*"] = "premake5.lua"
 	}
 
 	files {
 		"premake5.lua",
+		"stub.cpp",
 	}
 
 	filter "system:windows"
