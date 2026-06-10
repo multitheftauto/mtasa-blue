@@ -7,8 +7,9 @@ project "httplib"
 	targetname "httplib"
 	warnings "Off"
 
-	-- httplib can optionally use OpenSSL; we don't enable it here
-	-- as SSL is handled separately via EHS's existing OpenSSL setup
+	-- httplib can optionally use OpenSSL for HTTPS, enabled via the
+	-- CPPHTTPLIB_OPENSSL_SUPPORT define. We don't enable it: the built-in web
+	-- server serves plain HTTP only (same as the previous EHS-based server).
 	defines {
 		"CPPHTTPLIB_USE_POLL",
 	}
@@ -27,7 +28,7 @@ project "httplib"
 	}
 
 	filter "system:windows"
-		links { "ws2_32", "crypt32" }
+		links { "ws2_32" }
 
 	filter "system:linux"
 		links { "pthread" }
