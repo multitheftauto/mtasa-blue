@@ -225,16 +225,18 @@ namespace pcrecpp
                 goto retry;
             }
 
-            if (rc >= 0)
+            if (rc > 0)
             {
+                // pcre2_substitute returns the number of substitutions made.
+                // We return true only if at least one replacement occurred,
+                // matching the old pcrecpp::RE::GlobalReplace behavior.
                 output.resize(outlen);
                 *pStr = output;
                 return true;
             }
 
             // rc == 0 means no substitutions were made (but no error)
-            // For compatibility with old pcrecpp::GlobalReplace, we return
-            // true only if substitutions were made (rc > 0).
+            // rc < 0 means an error occurred
             return false;
         }
 
