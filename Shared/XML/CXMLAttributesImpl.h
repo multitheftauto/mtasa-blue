@@ -45,8 +45,8 @@ private:
     void CreateAttributes();
     void DeleteAttributes();
 
-    const bool    m_bUsingIDs;
-    bool          m_bCanRemoveFromList;
+    const bool            m_bUsingIDs;
+    bool                  m_bCanRemoveFromList;
     tinyxml2::XMLElement& m_Node;
 
     std::list<CXMLAttribute*> m_Attributes;

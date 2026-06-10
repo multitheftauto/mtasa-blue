@@ -99,9 +99,7 @@ CXMLNode* CXMLNodeImpl::CreateSubNode(const char* szTagName, CXMLNode* pInsertAf
     if (pInsertAfter)
     {
         // Insert after supplied node
-        pNewNode = static_cast<XMLElement*>(
-            m_pNode->InsertAfterChild(((CXMLNodeImpl*)pInsertAfter)->GetNode(),
-                                       m_pNode->GetDocument()->NewElement(szTagName)));
+        pNewNode = static_cast<XMLElement*>(m_pNode->InsertAfterChild(((CXMLNodeImpl*)pInsertAfter)->GetNode(), m_pNode->GetDocument()->NewElement(szTagName)));
     }
     else
     {
@@ -360,7 +358,7 @@ XMLElement* CXMLNodeImpl::GetNode()
 
 CXMLNode* CXMLNodeImpl::CopyNode(CXMLNode* pParent)
 {
-    CXMLNodeImpl* pNew = new CXMLNodeImpl(NULL, reinterpret_cast<CXMLNodeImpl*>(pParent),\n                                          *m_pNode->DeepClone(m_pNode->GetDocument())->ToElement());
+    CXMLNodeImpl* pNew = new CXMLNodeImpl(NULL, reinterpret_cast<CXMLNodeImpl*>(pParent),\n * m_pNode->DeepClone(m_pNode->GetDocument())->ToElement());
 
     // Copy the list, so we don't end up in an endless loop
     std::list<CXMLNode*> ChildrenCopy(m_Children);
@@ -516,7 +514,7 @@ SString CXMLNodeImpl::GetAttributeValue(const SString& strAttributeName)
 
 SString CXMLNodeImpl::GetCommentText()
 {
-    SString   strComment;
+    SString  strComment;
     XMLNode* pCommentNode = m_pNode->PreviousSibling();
     if (pCommentNode && pCommentNode->ToComment())
     {

@@ -15,11 +15,7 @@ using namespace tinyxml2;
 #define XML_ATTRIBUTE_VALUE_BUFFER 40
 
 CXMLAttributeImpl::CXMLAttributeImpl(CXMLAttributesImpl& Attributes, XMLElement& Node, const std::string& strName)
-    : m_ulID(INVALID_XML_ID),
-      m_bUsingIDs(Attributes.IsUsingIDs()),
-      m_Attributes(Attributes),
-      m_Node(Node),
-      m_strName(strName)
+    : m_ulID(INVALID_XML_ID), m_bUsingIDs(Attributes.IsUsingIDs()), m_Attributes(Attributes), m_Node(Node), m_strName(strName)
 {
     // Init and create the attribute on the node
     m_bDeleteAttribute = true;

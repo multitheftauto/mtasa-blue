@@ -74,7 +74,7 @@ public:
     bool      CopyChildrenInto(CXMLNode* pDestination, bool bRecursive);
 
     tinyxml2::XMLElement* GetNode();
-    void          DeleteWrapper();
+    void                  DeleteWrapper();
 
     void AddToList(CXMLNode* pNode);
     void RemoveFromList(CXMLNode* pNode);
@@ -94,11 +94,11 @@ private:
     unsigned long m_ulID;
     const bool    m_bUsingIDs;
 
-    class CXMLFileImpl* m_pFile;
-    CXMLNodeImpl*       m_pParent;
+    class CXMLFileImpl*    m_pFile;
+    CXMLNodeImpl*          m_pParent;
     tinyxml2::XMLElement*  m_pNode;
     tinyxml2::XMLDocument* m_pDocument;
-    mutable std::string     m_strTagNameCache;
+    mutable std::string    m_strTagNameCache;
 
     std::list<CXMLNode*> m_Children;
     bool                 m_bCanRemoveFromList;
