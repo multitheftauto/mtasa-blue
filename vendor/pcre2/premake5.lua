@@ -6,7 +6,6 @@ project "pcre2"
 	defines {
 		"HAVE_CONFIG_H",
 		"PCRE2_CODE_UNIT_WIDTH=8",
-		"PCRE2_STATIC",
 		"_CRT_SECURE_NO_WARNINGS"
 	}
 
@@ -29,6 +28,8 @@ project "pcre2"
 		"pcre2test.c",
 		"pcre2grep.c",
 		"pcre2posix_test.c",
+		"pcre2posix.c",
+		"pcre2posix.h",
 		"pcre2_fuzzsupport.c",
 		"pcre2_dftables.c",
 		"pcre2_jit_test.c"
@@ -53,7 +54,7 @@ project "pcre2"
 		targetdir(buildpath("server/arm64"))
 
 	filter "system:not windows"
-		defines { "HAVE_STRTOLL" }
+		defines { "PCRE2_STATIC", "HAVE_STRTOLL" }
 		kind "StaticLib"
 
 	filter "system:windows"
