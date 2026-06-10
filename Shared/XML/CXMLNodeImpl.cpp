@@ -169,7 +169,7 @@ CXMLNode* CXMLNodeImpl::FindSubNode(const char* szTagName, unsigned int uiIndex)
     list<CXMLNode*>::iterator iter;
     for (iter = m_Children.begin(); iter != m_Children.end(); iter++)
     {
-        if (dynamic_cast<CXMLNodeImpl*>((*iter))->GetNode()->Value() == szTagName)
+        if (dynamic_cast<CXMLNodeImpl*>((*iter))->GetNode()->Value() == TagName)
         {
             if (uiTemp == uiIndex)
             {
