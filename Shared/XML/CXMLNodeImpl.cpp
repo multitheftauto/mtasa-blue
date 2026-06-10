@@ -359,8 +359,7 @@ XMLElement* CXMLNodeImpl::GetNode()
 
 CXMLNode* CXMLNodeImpl::CopyNode(CXMLNode* pParent)
 {
-    CXMLNodeImpl* pNew =
-        new CXMLNodeImpl(NULL, reinterpret_cast<CXMLNodeImpl*>(pParent), *m_pNode->DeepClone(m_pNode->GetDocument())->ToElement());
+    CXMLNodeImpl* pNew = new CXMLNodeImpl(NULL, reinterpret_cast<CXMLNodeImpl*>(pParent), *m_pNode->DeepClone(m_pNode->GetDocument())->ToElement());
 
     // Copy the list, so we don't end up in an endless loop
     std::list<CXMLNode*> ChildrenCopy(m_Children);

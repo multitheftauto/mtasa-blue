@@ -21,6 +21,7 @@
 class CXMLNodeImpl : public CXMLNode
 {
     friend class CXMLImpl;
+
 public:
     CXMLNodeImpl(class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, tinyxml2::XMLElement& Node);
     ~CXMLNodeImpl();
@@ -103,8 +104,8 @@ private:
     // When there is no owning CXMLFileImpl (dummy nodes), the standalone
     // document owns the element. Set by CXMLImpl::CreateDummyNode.
     std::unique_ptr<tinyxml2::XMLDocument> m_standaloneDocument;
-    std::list<CXMLNode*> m_Children;
-    bool                 m_bCanRemoveFromList;
+    std::list<CXMLNode*>                   m_Children;
+    bool                                   m_bCanRemoveFromList;
 
     CXMLAttributesImpl m_Attributes;
 };

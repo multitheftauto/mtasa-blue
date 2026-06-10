@@ -70,8 +70,8 @@ CXMLNode* CXMLImpl::CreateDummyNode()
 {
     // Create a document to own the dummy element. CXMLNodeImpl will take
     // ownership of the document and clean it up on destruction.
-    auto* doc = new tinyxml2::XMLDocument();
-    auto* elem = doc->NewElement("dummy_storage");
+    auto*         doc = new tinyxml2::XMLDocument();
+    auto*         elem = doc->NewElement("dummy_storage");
     CXMLNodeImpl* xmlNode = new CXMLNodeImpl(nullptr, nullptr, *elem);
     xmlNode->m_standaloneDocument.reset(doc);
     if (xmlNode->IsValid())
