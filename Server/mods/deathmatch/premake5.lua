@@ -10,6 +10,11 @@ project "Deathmatch"
 
 	filter "system:windows"
 		includedirs { "../../../vendor/sparsehash/src/windows" }
+		-- cpp-httplib (included via CHTTPD.cpp) requires Windows 10+ APIs and
+		-- enforces _WIN32_WINNT >= 0x0A00. Raise it for this project only so the
+		-- rest of the build (notably the client) keeps its Windows 7 baseline.
+		removedefines { "_WIN32_WINNT=0x601" }
+		defines { "_WIN32_WINNT=0x0A00" }
 
 	filter {}
 		includedirs {

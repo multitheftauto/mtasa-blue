@@ -130,7 +130,7 @@ workspace "MTASA"
 		toolset "v145"
 		preferredtoolarchitecture "x86_64"
 		staticruntime "On"
-		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x0A00", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
+		defines { "WIN32", "_WIN32", "_WIN32_WINNT=0x601", "_MSC_PLATFORM_TOOLSET=$(PlatformToolsetVersion)" }
 		buildoptions { "/Zc:__cplusplus", "/permissive-" }
 		includedirs {
 			path.join(dxdir, "Include")
