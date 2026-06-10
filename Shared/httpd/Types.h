@@ -171,6 +171,30 @@ public:
 };
 
 // ---------------------------------------------------------------------------
+// Datum — simple variant type used for cookie values.
+// Originally from EHS. For MTA's purposes, only string assignment is needed.
+// ---------------------------------------------------------------------------
+
+class Datum
+{
+public:
+    Datum() = default;
+    Datum(const char* s) : m_strValue(s ? s : "") {}
+    Datum(const std::string& s) : m_strValue(s) {}
+
+    Datum& operator=(const char* s) { m_strValue = s ? s : ""; return *this; }
+    Datum& operator=(const std::string& s) { m_strValue = s; return *this; }
+    Datum& operator=(int n) { m_strValue = std::to_string(n); return *this; }
+
+    operator const char*() const { return m_strValue.c_str(); }
+
+private:
+    std::string m_strValue;
+};
+
+typedef std::map<std::string, Datum> CookieParameters;
+
+// ---------------------------------------------------------------------------
 // HttpResponse — outgoing HTTP response, populated by resource handlers
 // ---------------------------------------------------------------------------
 
@@ -198,7 +222,14 @@ public:
     /// Response headers (name → value). Things like content-type, content-length.
     StringMap oResponseHeaders;
 
-    /// Cookies to send back.
+    /// Cookies to send back. Store the structured params then CHTTPD flattens them.
+    void SetCookie(CookieParameters& iroCookieParameters)
+    {
+        for (const auto& pair : iroCookieParameters)
+            oCookieList.push_back(pair.first + "=" + static_cast<const char*>(pair.second));
+    }
+
+    /// Cookies to send back (raw list of "name=value" strings).
     StringList oCookieList;
 
     /// Response sequence number (for ordering).
