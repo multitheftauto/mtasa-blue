@@ -18,8 +18,10 @@ MTAEXPORT CXML* InitXMLInterface(const char* szSaveFlagDirectory)
     // Initialize and do any file recovery as necessary
     CXMLFileImpl::InitFileRecovery(szSaveFlagDirectory);
 
-    // this is required during parsing, see resources project fallout/help.xml @r659
-    TiXmlBase::SetCondenseWhiteSpace(false);
+    // Whitespace is handled differently in tinyxml2 (PRESERVE_WHITESPACE is
+    // the default, and COLLAPSE_WHITESPACE from the old SetCondenseWhiteSpace
+    // call matches tinyxml2's PRESERVE_WHITESPACE more closely than it does
+    // the old behavior, so the call is simply removed).
 
     pXMLInterface = new CXMLImpl;
     return pXMLInterface;

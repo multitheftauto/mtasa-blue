@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 SString CXMLFileImpl::ms_strSaveFlagFile;
+using namespace tinyxml2;
 
 CXMLFileImpl::CXMLFileImpl(const char* szFilename, bool bUseIDs, bool bReadOnly) : m_ulID(INVALID_XML_ID), m_bUsingIDs(bUseIDs), m_bReadOnly(bReadOnly)
 {
@@ -20,7 +21,7 @@ CXMLFileImpl::CXMLFileImpl(const char* szFilename, bool bUseIDs, bool bReadOnly)
     ResetLastError();
 
     // Create the document
-    m_pDocument = new TiXmlDocument;
+    m_pDocument = new XMLDocument;
 
     // Set the filename
     if (szFilename)
@@ -69,22 +70,13 @@ bool CXMLFileImpl::Parse(std::vector<char>* pOutFileContents)
         Reset();
 
         // Parse from the current file
-        FILE* file;
-        if (m_pDocument->LoadFile(m_strFilename.c_str(), TIXML_DEFAULT_ENCODING, &file))
+        if (m_pDocument->LoadFile(m_strFilename.c_str()) == XML_SUCCESS)
         {
             // Also read the file bytes to a buffer if requested
             if (pOutFileContents)
             {
-                fseek(file, 0, SEEK_END);
-                long size = ftell(file);
-                fseek(file, 0, SEEK_SET);
-                if (size > 0)
-                {
-                    pOutFileContents->resize(size);
-                    fread(&pOutFileContents->at(0), 1, size, file);
-                }
+                FileLoad(m_strFilename, *pOutFileContents);
             }
-            fclose(file);
 
             // Build our wrapper
             if (BuildWrapperTree())
@@ -101,7 +93,7 @@ bool CXMLFileImpl::Parse(std::vector<char>* pOutFileContents)
 
         SString strErrorDesc;
         if (m_pDocument->Error())
-            strErrorDesc = SString("Line %d: %s", m_pDocument->ErrorRow(), m_pDocument->ErrorDesc());
+            strErrorDesc = SString("Line %d: %s", m_pDocument->ErrorLineNum(), m_pDocument->ErrorStr());
         else
             strErrorDesc = "Invalid file";
         SetLastError(CXMLErrorCodes::OtherError, strErrorDesc);
@@ -195,7 +187,7 @@ void CXMLFileImpl::Reset()
 
     // Delete our document and recreate it
     delete m_pDocument;
-    m_pDocument = new TiXmlDocument;
+    m_pDocument = new XMLDocument;
 }
 
 CXMLNode* CXMLFileImpl::CreateRootNode(const std::string& strTagName)
@@ -204,11 +196,11 @@ CXMLNode* CXMLFileImpl::CreateRootNode(const std::string& strTagName)
     if (!m_pRootNode)
     {
         // Grab the document's root, create it if necessary
-        TiXmlElement* pRootNode = m_pDocument->RootElement();
+        XMLElement* pRootNode = m_pDocument->RootElement();
         if (!pRootNode)
         {
-            pRootNode = new TiXmlElement(strTagName);
-            m_pDocument->LinkEndChild(pRootNode);
+            pRootNode = m_pDocument->NewElement(strTagName.c_str());
+            m_pDocument->InsertEndChild(pRootNode);
         }
 
         m_pRootNode = new CXMLNodeImpl(this, NULL, *pRootNode);
@@ -246,7 +238,7 @@ void CXMLFileImpl::SetLastError(CXMLErrorCodes::Code errCode, const std::string&
     m_strLastError = strDescription;
 }
 
-TiXmlDocument* CXMLFileImpl::GetDocument()
+XMLDocument* CXMLFileImpl::GetDocument()
 {
     return m_pDocument;
 }
@@ -257,7 +249,7 @@ bool CXMLFileImpl::BuildWrapperTree()
     ClearWrapperTree();
 
     // Grab the root element
-    TiXmlElement* pRootNode = m_pDocument->RootElement();
+    XMLElement* pRootNode = m_pDocument->RootElement();
     if (pRootNode)
     {
         // Create an XML node for it
@@ -277,13 +269,13 @@ bool CXMLFileImpl::BuildWrapperTree()
 bool CXMLFileImpl::BuildSubElements(CXMLNodeImpl* pNode)
 {
     // Grab the node
-    TiXmlElement* pRawNode = pNode->GetNode();
+    XMLElement* pRawNode = pNode->GetNode();
     if (pRawNode)
     {
         // Iterate the children
-        TiXmlNode*    pChild = NULL;
-        TiXmlElement* pElement;
-        while ((pChild = pRawNode->IterateChildren(pChild)))
+        XMLNode*    pChild = pRawNode->FirstChild();
+        XMLElement* pElement;
+        while (pChild)
         {
             // If it's not a comment or something else, build it to our tree
             // TODO: Support comments
@@ -305,6 +297,7 @@ bool CXMLFileImpl::BuildSubElements(CXMLNodeImpl* pNode)
                     return false;
                 }
             }
+            pChild = pChild->NextSibling();
         }
     }
     return true;

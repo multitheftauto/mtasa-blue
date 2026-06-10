@@ -10,19 +10,20 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+using namespace tinyxml2;
 
 #define XML_ATTRIBUTE_VALUE_BUFFER 40
 
-CXMLAttributeImpl::CXMLAttributeImpl(CXMLAttributesImpl& Attributes, TiXmlElement& Node, const std::string& strName)
+CXMLAttributeImpl::CXMLAttributeImpl(CXMLAttributesImpl& Attributes, XMLElement& Node, const std::string& strName)
     : m_ulID(INVALID_XML_ID),
       m_bUsingIDs(Attributes.IsUsingIDs()),
       m_Attributes(Attributes),
       m_Node(Node),
-      m_Attribute(*new TiXmlAttribute(strName.c_str(), ""))
+      m_strName(strName)
 {
-    // Init and link it to the node
+    // Init and create the attribute on the node
     m_bDeleteAttribute = true;
-    Node.AddAttribute(m_Attribute);
+    Node.SetAttribute(strName.c_str(), "");
 
     // Add us to parent list, if any
     m_Attributes.AddToList(this);
@@ -32,8 +33,8 @@ CXMLAttributeImpl::CXMLAttributeImpl(CXMLAttributesImpl& Attributes, TiXmlElemen
         m_ulID = CXMLArray::PopUniqueID(this);
 }
 
-CXMLAttributeImpl::CXMLAttributeImpl(CXMLAttributesImpl& Attributes, TiXmlElement& Node, TiXmlAttribute& Attribute)
-    : m_ulID(INVALID_XML_ID), m_bUsingIDs(Attributes.IsUsingIDs()), m_Attributes(Attributes), m_Node(Node), m_Attribute(Attribute)
+CXMLAttributeImpl::CXMLAttributeImpl(CXMLAttributesImpl& Attributes, XMLElement& Node, const XMLAttribute& Attribute)
+    : m_ulID(INVALID_XML_ID), m_bUsingIDs(Attributes.IsUsingIDs()), m_Attributes(Attributes), m_Node(Node), m_strName(Attribute.Name())
 {
     // Init
     m_bDeleteAttribute = true;
@@ -55,7 +56,7 @@ CXMLAttributeImpl::~CXMLAttributeImpl()
     // Delete the attribute from the node aswell if we're supposed to
     if (m_bDeleteAttribute)
     {
-        m_Node.RemoveAttribute(GetName());
+        m_Node.DeleteAttribute(m_strName.c_str());
     }
 
     // Remove us from parent list
@@ -64,17 +65,24 @@ CXMLAttributeImpl::~CXMLAttributeImpl()
 
 const std::string CXMLAttributeImpl::GetName() const
 {
-    return std::string(m_Attribute.Name());
+    return m_strName;
 }
 
 const std::string& CXMLAttributeImpl::GetValue() const
 {
-    return m_Attribute.ValueStr();
+    const char* szValue = m_Node.Attribute(m_strName.c_str());
+    if (szValue)
+    {
+        m_strValueCache = szValue;
+        return m_strValueCache;
+    }
+    static std::string empty;
+    return empty;
 }
 
 void CXMLAttributeImpl::SetValue(const char* szValue)
 {
-    m_Attribute.SetValue(szValue);
+    m_Node.SetAttribute(m_strName.c_str(), szValue);
 }
 
 void CXMLAttributeImpl::SetValue(bool bValue)

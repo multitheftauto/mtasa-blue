@@ -12,7 +12,7 @@
 #pragma once
 
 #include "CXMLAttributesImpl.h"
-#include <tinyxml.h>
+#include <tinyxml2.h>
 #include <xml/CXMLNode.h>
 
 #include <list>
@@ -21,10 +21,10 @@
 class CXMLNodeImpl : public CXMLNode
 {
 public:
-    CXMLNodeImpl(class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node);
+    CXMLNodeImpl(class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, tinyxml2::XMLElement& Node);
     ~CXMLNodeImpl();
 
-    // BuildFromDocument recursively builds child CXMLNodeImpl from the underlying TiXmlElement.
+    // BuildFromDocument recursively builds child CXMLNodeImpl from the underlying XMLElement.
     //
     // This is **only** used for xmlLoadString right now.
     // Look elsewhere if you're thinking about XML files. It does things a different way.
@@ -73,7 +73,7 @@ public:
     CXMLNode* CopyNode(CXMLNode* pParent = NULL);
     bool      CopyChildrenInto(CXMLNode* pDestination, bool bRecursive);
 
-    TiXmlElement* GetNode();
+    tinyxml2::XMLElement* GetNode();
     void          DeleteWrapper();
 
     void AddToList(CXMLNode* pNode);
@@ -96,8 +96,9 @@ private:
 
     class CXMLFileImpl* m_pFile;
     CXMLNodeImpl*       m_pParent;
-    TiXmlElement*       m_pNode;
-    TiXmlDocument*      m_pDocument;
+    tinyxml2::XMLElement*  m_pNode;
+    tinyxml2::XMLDocument* m_pDocument;
+    mutable std::string     m_strTagNameCache;
 
     std::list<CXMLNode*> m_Children;
     bool                 m_bCanRemoveFromList;
