@@ -166,19 +166,19 @@ public:
 
     RequestMethod nRequestMethod = REQUESTMETHOD_UNKNOWN;
 
-    std::string sUri;             // Request URI (may be shortened by routing)
-    std::string sOriginalUri;     // Original URI before any routing
-    std::string sBody;            // Request body (POST data, etc.)
+    std::string sUri;          // Request URI (may be shortened by routing)
+    std::string sOriginalUri;  // Original URI before any routing
+    std::string sBody;         // Request body (POST data, etc.)
     std::string sHttpVersionNumber;
 
-    StringMap   oRequestHeaders;  // Request headers (name → value)
-    FormValueMap oFormValueMap;   // Parsed form fields
-    FormValueMap oQueryValueMap;  // Parsed query string fields
-    CookieMap   oCookieMap;       // Parsed cookies
+    StringMap    oRequestHeaders;  // Request headers (name → value)
+    FormValueMap oFormValueMap;    // Parsed form fields
+    FormValueMap oQueryValueMap;   // Parsed query string fields
+    CookieMap    oCookieMap;       // Parsed cookies
 
-    int  m_nRequestId = 0;        // Request sequence number
-    int  nSecure = 0;             // Whether request came over HTTPS
-    bool m_bDisconnected = false; // Client has disconnected
+    int  m_nRequestId = 0;         // Request sequence number
+    int  nSecure = 0;              // Whether request came over HTTPS
+    bool m_bDisconnected = false;  // Client has disconnected
 
     std::string GetAddress() const { return m_strAddress; }
     int         GetPort() const { return m_nPort; }
@@ -201,9 +201,21 @@ public:
     Datum(const char* s) : m_strValue(s ? s : "") {}
     Datum(const std::string& s) : m_strValue(s) {}
 
-    Datum& operator=(const char* s) { m_strValue = s ? s : ""; return *this; }
-    Datum& operator=(const std::string& s) { m_strValue = s; return *this; }
-    Datum& operator=(int n) { m_strValue = std::to_string(n); return *this; }
+    Datum& operator=(const char* s)
+    {
+        m_strValue = s ? s : "";
+        return *this;
+    }
+    Datum& operator=(const std::string& s)
+    {
+        m_strValue = s;
+        return *this;
+    }
+    Datum& operator=(int n)
+    {
+        m_strValue = std::to_string(n);
+        return *this;
+    }
 
     operator const char*() const { return m_strValue.c_str(); }
 
@@ -255,5 +267,5 @@ public:
     int m_nResponseId = 0;
 
 private:
-    std::string m_strBody;        // Internal storage for SetBody
+    std::string m_strBody;  // Internal storage for SetBody
 };

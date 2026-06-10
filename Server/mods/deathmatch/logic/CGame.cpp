@@ -573,6 +573,11 @@ void CGame::DoPulse()
     if (m_pHqComms)
         m_pHqComms->Pulse();
 
+    // Periodic maintenance for the built-in HTTP server (login session and
+    // connection cache upkeep).
+    if (m_pHTTPD)
+        m_pHTTPD->HttpPulse();
+
     CLOCK_CALL1(m_pFunctionUseLogger->Pulse(););
     CLOCK_CALL1(m_lightsyncManager.DoPulse(););
 

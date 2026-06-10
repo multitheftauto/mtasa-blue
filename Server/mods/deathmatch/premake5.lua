@@ -17,6 +17,7 @@ project "Deathmatch"
 			"../../sdk",
 			"../../../vendor/bochs",
 			"../../../vendor/pme",
+			"../../../vendor/cpp-httplib",
 			"../../../vendor/zip",
 			"../../../vendor/glob/include",
 			"../../../vendor/zlib",
@@ -27,6 +28,7 @@ project "Deathmatch"
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",
 			"../../../Shared/publicsdk/include",
+			"../../../Shared",
 			"../../../vendor/sparsehash/src/",
 			"logic",
 			"utils",
@@ -35,7 +37,7 @@ project "Deathmatch"
 
 	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt",
+		"Lua_Server", "sqlite", "cryptopp", "pme", "pcre", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt",
 	}
 
 	vpaths {
