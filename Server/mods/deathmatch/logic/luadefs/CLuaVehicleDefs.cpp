@@ -69,7 +69,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getTrainPosition", GetTrainPosition},
         {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
-        {"getVehicleNitroColor", GetVehicleNitroColor},
+        {"getVehicleNitroColor", ArgumentParser<GetVehicleNitroColor>},
         {"getVehicleDoorOpenRatio", GetVehicleDoorOpenRatio},
 
         // Vehicle set funcs
@@ -119,8 +119,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setTrainSpeed", SetTrainSpeed},
         {"setTrainPosition", SetTrainPosition},
         {"setVehicleHeadLightColor", SetVehicleHeadLightColor},
-        {"setVehicleNitroColor", SetVehicleNitroColor},
-        {"resetVehicleNitroColor", ResetVehicleNitroColor},
+        {"setVehicleNitroColor", ArgumentParser<SetVehicleNitroColor>},
+        {"resetVehicleNitroColor", ArgumentParser<ResetVehicleNitroColor>},
         {"setVehicleTurretPosition", SetVehicleTurretPosition},
         {"setVehicleDoorOpenRatio", SetVehicleDoorOpenRatio},
         {"setVehicleVariant", SetVehicleVariant},
@@ -2899,79 +2899,23 @@ int CLuaVehicleDefs::SetVehicleHeadLightColor(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::SetVehicleNitroColor(lua_State* luaVM)
+bool CLuaVehicleDefs::SetVehicleNitroColor(CVehicle* vehicle, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::optional<std::uint8_t> a)
 {
-    CVehicle* pVehicle;
-    SColor    color;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-    argStream.ReadNumber(color.R);
-    argStream.ReadNumber(color.G);
-    argStream.ReadNumber(color.B);
-    argStream.ReadNumber(color.A, 255);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetVehicleNitroColor(pVehicle, color))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetVehicleNitroColor(vehicle, SColorRGBA(r, g, b, a.value_or(255)));
 }
 
-int CLuaVehicleDefs::ResetVehicleNitroColor(lua_State* luaVM)
+bool CLuaVehicleDefs::ResetVehicleNitroColor(CVehicle* vehicle)
 {
-    CVehicle* pVehicle;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetVehicleNitroColor(pVehicle, std::nullopt))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetVehicleNitroColor(vehicle, std::nullopt);
 }
 
-int CLuaVehicleDefs::GetVehicleNitroColor(lua_State* luaVM)
+std::variant<bool, CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>> CLuaVehicleDefs::GetVehicleNitroColor(CVehicle* vehicle)
 {
-    CVehicle* pVehicle;
+    std::optional<SColor> color;
+    if (!CStaticFunctionDefinitions::GetVehicleNitroColor(vehicle, color) || !color.has_value())
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
-
-    if (!argStream.HasErrors())
-    {
-        std::optional<SColor> color;
-        if (CStaticFunctionDefinitions::GetVehicleNitroColor(pVehicle, color) && color.has_value())
-        {
-            lua_pushnumber(luaVM, color->R);
-            lua_pushnumber(luaVM, color->G);
-            lua_pushnumber(luaVM, color->B);
-            lua_pushnumber(luaVM, color->A);
-            return 4;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>{color->R, color->G, color->B, color->A};
 }
 
 int CLuaVehicleDefs::SetVehicleTurretPosition(lua_State* luaVM)

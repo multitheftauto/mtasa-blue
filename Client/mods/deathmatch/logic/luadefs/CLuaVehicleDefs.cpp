@@ -72,7 +72,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
         {"isVehicleTaxiLightOn", IsVehicleTaxiLightOn},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
-        {"getVehicleNitroColor", GetVehicleNitroColor},
+        {"getVehicleNitroColor", ArgumentParser<GetVehicleNitroColor>},
         {"getVehicleCurrentGear", GetVehicleCurrentGear},
         {"getVehicleHandling", GetVehicleHandling},
         {"getOriginalHandling", GetOriginalHandling},
@@ -142,8 +142,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleTaxiLightOn", SetVehicleTaxiLightOn},
         {"setVehicleGravity", SetVehicleGravity},
         {"setVehicleHeadLightColor", SetVehicleHeadLightColor},
-        {"setVehicleNitroColor", SetVehicleNitroColor},
-        {"resetVehicleNitroColor", ResetVehicleNitroColor},
+        {"setVehicleNitroColor", ArgumentParser<SetVehicleNitroColor>},
+        {"resetVehicleNitroColor", ArgumentParser<ResetVehicleNitroColor>},
         {"setVehicleTurretPosition", SetVehicleTurretPosition},
         {"setVehicleDoorOpenRatio", SetVehicleDoorOpenRatio},
         {"setVehicleHandling", SetVehicleHandling},
@@ -1638,29 +1638,13 @@ int CLuaVehicleDefs::GetVehicleHeadLightColor(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::GetVehicleNitroColor(lua_State* luaVM)
+std::variant<bool, CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>> CLuaVehicleDefs::GetVehicleNitroColor(CClientVehicle* vehicle)
 {
-    CClientVehicle*  pVehicle = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
+    std::optional<SColor> color;
+    if (!CStaticFunctionDefinitions::GetVehicleNitroColor(*vehicle, color) || !color.has_value())
+        return false;
 
-    if (!argStream.HasErrors())
-    {
-        std::optional<SColor> color;
-        if (CStaticFunctionDefinitions::GetVehicleNitroColor(*pVehicle, color) && color.has_value())
-        {
-            lua_pushnumber(luaVM, color->R);
-            lua_pushnumber(luaVM, color->G);
-            lua_pushnumber(luaVM, color->B);
-            lua_pushnumber(luaVM, color->A);
-            return 4;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>{color->R, color->G, color->B, color->A};
 }
 
 int CLuaVehicleDefs::GetVehicleCurrentGear(lua_State* luaVM)
@@ -2527,51 +2511,14 @@ int CLuaVehicleDefs::SetVehicleHeadLightColor(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::SetVehicleNitroColor(lua_State* luaVM)
+bool CLuaVehicleDefs::SetVehicleNitroColor(CClientEntity* entity, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::optional<std::uint8_t> a)
 {
-    CClientEntity*   pEntity = NULL;
-    SColor           color;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-    argStream.ReadNumber(color.R);
-    argStream.ReadNumber(color.G);
-    argStream.ReadNumber(color.B);
-    argStream.ReadNumber(color.A, 255);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetVehicleNitroColor(*pEntity, color))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetVehicleNitroColor(*entity, SColorRGBA(r, g, b, a.value_or(255)));
 }
 
-int CLuaVehicleDefs::ResetVehicleNitroColor(lua_State* luaVM)
+bool CLuaVehicleDefs::ResetVehicleNitroColor(CClientEntity* entity)
 {
-    CClientEntity*   pEntity = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetVehicleNitroColor(*pEntity, std::nullopt))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetVehicleNitroColor(*entity, std::nullopt);
 }
 
 int CLuaVehicleDefs::SetVehicleTurretPosition(lua_State* luaVM)
