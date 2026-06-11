@@ -361,6 +361,10 @@ CVehicleSA::~CVehicleSA()
 {
     if (!BeingDeleted)
     {
+        // The game destroys this vehicle's nitro FX systems deferred (they fade out first),
+        // so the nitro colour render hook must not be able to reach this vehicle anymore
+        pGame->GetFxManagerSA()->UnregisterVehicleNitroSystems(this);
+
         if (!m_pInterface->IsPlaceableVTBL())
         {
             GetVehicleInterface()->m_pVehicle = nullptr;

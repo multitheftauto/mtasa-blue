@@ -77,6 +77,7 @@ public:
 
     void      RegisterNitroSystem(CFxSystemSAInterface* pFxSystemSAInterface, CVehicle* pVehicle);
     CVehicle* GetVehicleFromNitroSystem(CFxSystemSAInterface* pFxSystemSAInterface);
+    void      UnregisterVehicleNitroSystems(CVehicle* pVehicle);
 
 private:
     CFxManagerSAInterface*                            m_pInterface;

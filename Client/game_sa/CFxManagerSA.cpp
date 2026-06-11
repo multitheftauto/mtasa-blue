@@ -118,3 +118,8 @@ CVehicle* CFxManagerSA::GetVehicleFromNitroSystem(CFxSystemSAInterface* pFxSyste
 {
     return MapFindRef(m_NitroSystemMap, pFxSystemSAInterface);
 }
+
+void CFxManagerSA::UnregisterVehicleNitroSystems(CVehicle* pVehicle)
+{
+    MapRemoveByValue(m_NitroSystemMap, pVehicle);
+}
