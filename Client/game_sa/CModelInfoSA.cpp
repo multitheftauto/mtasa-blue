@@ -17,6 +17,7 @@
 #include "CModelInfoSA.h"
 #include "CPedModelInfoSA.h"
 #include "CPedSA.h"
+#include "CPoolsSA.h"
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
 
@@ -1962,6 +1963,9 @@ void CModelInfoSA::DeallocateModel(void)
     switch (GetModelType())
     {
         case eModelInfoType::VEHICLE:
+            // Stop detached car parts referencing this model (they keep their source vehicle's
+            // model index for repainting, and would dereference the freed model info)
+            static_cast<CPoolsSA*>(pGame->GetPools())->ResetDetachedCarPartsRefModel(static_cast<std::uint16_t>(m_dwModelID));
             delete reinterpret_cast<CVehicleModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         case eModelInfoType::PED:
