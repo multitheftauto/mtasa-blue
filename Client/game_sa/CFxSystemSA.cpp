@@ -23,7 +23,7 @@ extern CGameSA* pGame;
 static constexpr uint32_t FX_BLUEPRINT_HASH_NITRO = 0x3D591CC6;
 
 // One animated colour block ("FX_INFO_COLOUR_DATA"/"FX_INFO_COLOURBRIGHT_DATA"/
-// "FX_INFO_COLOURRANGE_DATA") of the "nitro" blueprint's R/G/B(/Range) channels, plus their
+// "FX_INFO_COLOURRANGE_DATA") of the "nitro" blueprint's R/G/B/A(/Range) channels, plus their
 // original (unmodified) keyframe values so a per-vehicle tint can be re-derived from scratch
 // every time a different vehicle's nitro particles are about to be rendered.
 struct SNitroColorBlock
@@ -31,24 +31,37 @@ struct SNitroColorBlock
     uint8_t nNumKeyframes;
     uint8_t nStride;  // 1 = single value per component, 2 = value + randomisation range per component
 
-    // Indexed by [component (0=R, 1=G, 2=B)][stride slot (0=value, 1=range)]; null if the
+    // Indexed by [component (0=R, 1=G, 2=B, 3=A)][stride slot (0=value, 1=range)]; null if the
     // blueprint has no such channel.
-    uint16_t*             pChannelValues[3][2]{};
-    std::vector<uint16_t> originalValues[3][2];
+    uint16_t*             pChannelValues[4][2]{};
+    std::vector<uint16_t> originalValues[4][2];
 };
 
-static std::vector<SNitroColorBlock> ms_NitroColorBlocks;
-static bool                          ms_bNitroColorChannelsCached = false;
-static CFxSystemSAInterface*         ms_pLastNitroFxSystem = nullptr;
-static std::optional<SColor>         ms_LastAppliedNitroColor;
+// Original destination blend mode id of a "nitro" emitter, so ApplyNitroColor can switch
+// between the effect's original (additive) blending and standard alpha blending.
+struct SNitroEmitterBlend
+{
+    CFxEmitterBPSAInterface* pEmitterBP;
+    uint8_t                  nOriginalDstBlendId;
+};
+
+// Blend mode ids index a table (0x8A6230) that maps id -> RwBlendFunction(id + 1),
+// so id 5 = rwBLENDINVSRCALPHA
+static constexpr uint8_t FX_BLEND_ID_INVSRCALPHA = 5;
+
+static std::vector<SNitroColorBlock>   ms_NitroColorBlocks;
+static std::vector<SNitroEmitterBlend> ms_NitroEmitterBlends;
+static bool                            ms_bNitroColorChannelsCached = false;
+static CFxSystemSAInterface*           ms_pLastNitroFxSystem = nullptr;
+static std::optional<SColor>           ms_LastAppliedNitroColor;
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CacheNitroColorChannels
 //
-// Collects every R/G/B(/Range) keyframe channel of the "nitro" blueprint's colour data, so
-// that ApplyNitroColor can later re-tint or restore them on a per-vehicle basis without
-// losing precision.
+// Collects every R/G/B/A(/Range) keyframe channel of the "nitro" blueprint's colour data
+// and each emitter's original blend mode, so that ApplyNitroColor can later re-tint or
+// restore them on a per-vehicle basis without losing precision.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 static void CacheNitroColorChannels(CFxSystemBPSAInterface* pBlueprint)
@@ -59,6 +72,9 @@ static void CacheNitroColorChannels(CFxSystemBPSAInterface* pBlueprint)
     for (uint8_t i = 0; i < (uint8_t)pBlueprint->cNumOfPrims; ++i)
     {
         CFxEmitterBPSAInterface* pEmitterBP = (CFxEmitterBPSAInterface*)pBlueprint->pPrims[i];
+
+        ms_NitroEmitterBlends.push_back({pEmitterBP, pEmitterBP->m_nDstBlendId});
+
         for (uint32_t j = 0; j < pEmitterBP->m_infoManager.m_nNumInfos; ++j)
         {
             FxInfoSAInterface* pInfo = pEmitterBP->m_infoManager.m_pInfos[j];
@@ -72,15 +88,15 @@ static void CacheNitroColorChannels(CFxSystemBPSAInterface* pBlueprint)
             if (stride == 0)
                 continue;
 
-            // Each colour component spans `stride` consecutive channels (e.g. ColourRange
-            // stores R, RRange, G, GRange, B, BRange).
+            // Each colour component spans `stride` consecutive channels, with alpha last and
+            // never randomised (e.g. ColourRange stores R, RRange, G, GRange, B, BRange, A).
             FxInfoColorSAInterface* pColorInfo = (FxInfoColorSAInterface*)pInfo;
 
             SNitroColorBlock block;
             block.nNumKeyframes = (uint8_t)pColorInfo->nNumKeyframes;
             block.nStride = stride;
 
-            for (int component = 0; component < 3; ++component)
+            for (int component = 0; component < 4; ++component)
             {
                 for (int s = 0; s < stride; ++s)
                 {
@@ -103,14 +119,21 @@ static void CacheNitroColorChannels(CFxSystemBPSAInterface* pBlueprint)
 //
 // ApplyNitroColor
 //
-// If `color` has no value, restores every cached "nitro" colour channel to its original
-// keyframe values (i.e. the game's default cyan effect).
+// If `color` has no value, restores every cached "nitro" colour channel and the emitters'
+// blend modes to their original values (i.e. the game's default additive cyan effect).
 //
-// Otherwise, re-tints every cached channel using `color`. Rather than multiplying the
-// original (cyan) values by the requested colour - which would mix the two hues together -
-// the brightest of a block's original R/G/B values at each keyframe is used as a brightness
-// envelope, and every channel is recoloured from scratch using that envelope. This allows
-// any colour, including white, to fully replace the original hue.
+// Otherwise, re-tints every cached channel using `color` and switches the emitters to
+// standard alpha blending, so dark colours (including black) remain visible instead of
+// fading out as the additive blending's contribution approaches zero. For R/G/B, rather
+// than multiplying the original (cyan) values by the requested colour - which would mix the
+// two hues together - the brightest of a block's original R/G/B values at each keyframe is
+// used as a brightness envelope, and every channel is recoloured from scratch using that
+// envelope. This allows any colour, including white, to fully replace the original hue.
+// Alpha and the randomisation ranges instead scale the original keyframes, preserving the
+// flame's fade animation.
+//
+// The blend mode is shared by every nitro particle rendered in a frame, so vehicles using
+// the original colours share it whenever both kinds are on screen at once.
 //
 // Always derived from the cached originals, so it can be called repeatedly for different
 // vehicles without ever needing to restore the blueprint first.
@@ -118,11 +141,14 @@ static void CacheNitroColorChannels(CFxSystemBPSAInterface* pBlueprint)
 //////////////////////////////////////////////////////////////////////////////////////////
 static void ApplyNitroColor(const std::optional<SColor>& color)
 {
+    for (auto& blend : ms_NitroEmitterBlends)
+        blend.pEmitterBP->m_nDstBlendId = color.has_value() ? FX_BLEND_ID_INVSRCALPHA : blend.nOriginalDstBlendId;
+
     for (auto& block : ms_NitroColorBlocks)
     {
         if (!color.has_value())
         {
-            for (int component = 0; component < 3; ++component)
+            for (int component = 0; component < 4; ++component)
             {
                 for (int s = 0; s < block.nStride; ++s)
                 {
@@ -133,7 +159,7 @@ static void ApplyNitroColor(const std::optional<SColor>& color)
             continue;
         }
 
-        const uint32_t components[3] = {color->R, color->G, color->B};
+        const uint32_t components[4] = {color->R, color->G, color->B, color->A};
 
         for (uint8_t keyframe = 0; keyframe < block.nNumKeyframes; ++keyframe)
         {
@@ -141,7 +167,7 @@ static void ApplyNitroColor(const std::optional<SColor>& color)
             for (int component = 0; component < 3; ++component)
                 brightness = std::max(brightness, block.originalValues[component][0][keyframe]);
 
-            for (int component = 0; component < 3; ++component)
+            for (int component = 0; component < 4; ++component)
             {
                 for (int s = 0; s < block.nStride; ++s)
                 {
@@ -149,7 +175,7 @@ static void ApplyNitroColor(const std::optional<SColor>& color)
                     if (!pValues)
                         continue;
 
-                    const uint16_t source = (s == 0) ? brightness : block.originalValues[component][s][keyframe];
+                    const uint16_t source = (component < 3 && s == 0) ? brightness : block.originalValues[component][s][keyframe];
                     pValues[keyframe] = (uint16_t)(source * components[component] / 255);
                 }
             }

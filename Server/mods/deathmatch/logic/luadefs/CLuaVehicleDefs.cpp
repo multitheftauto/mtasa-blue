@@ -2909,7 +2909,7 @@ int CLuaVehicleDefs::SetVehicleNitroColor(lua_State* luaVM)
     argStream.ReadNumber(color.R);
     argStream.ReadNumber(color.G);
     argStream.ReadNumber(color.B);
-    color.A = 0xFF;
+    argStream.ReadNumber(color.A, 255);
 
     if (!argStream.HasErrors())
     {
@@ -2963,7 +2963,8 @@ int CLuaVehicleDefs::GetVehicleNitroColor(lua_State* luaVM)
             lua_pushnumber(luaVM, color->R);
             lua_pushnumber(luaVM, color->G);
             lua_pushnumber(luaVM, color->B);
-            return 3;
+            lua_pushnumber(luaVM, color->A);
+            return 4;
         }
     }
     else

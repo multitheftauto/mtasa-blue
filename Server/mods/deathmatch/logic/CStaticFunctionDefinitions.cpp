@@ -7513,6 +7513,7 @@ bool CStaticFunctionDefinitions::SetVehicleNitroColor(CVehicle* pVehicle, const 
             BitStream.pBitStream->Write(color->R);
             BitStream.pBitStream->Write(color->G);
             BitStream.pBitStream->Write(color->B);
+            BitStream.pBitStream->Write(color->A);
         }
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_NITRO_COLOR, *BitStream.pBitStream));
     }

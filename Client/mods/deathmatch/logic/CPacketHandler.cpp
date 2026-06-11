@@ -3587,6 +3587,17 @@ retry:
                         pVehicle->SetSirenOrAlarmActive(bSirenesActive);
                     }
 
+                    // Read out the nitro colour
+                    if (bitStream.ReadBit() == true)
+                    {
+                        SColorRGBA nitroColor(255, 255, 255, 255);
+                        bitStream.Read(nitroColor.R);
+                        bitStream.Read(nitroColor.G);
+                        bitStream.Read(nitroColor.B);
+                        bitStream.Read(nitroColor.A);
+                        pVehicle->SetNitroColor(nitroColor);
+                    }
+
                     pVehicle->ApplyHandling();
 
                     // Set the matrix

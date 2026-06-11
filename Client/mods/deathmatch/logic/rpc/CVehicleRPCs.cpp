@@ -571,7 +571,7 @@ void CVehicleRPCs::SetVehicleNitroColor(CClientEntity* pSource, NetBitStreamInte
         if (bHasColor)
         {
             SColorRGBA rgba(255, 255, 255, 255);
-            if (!bitStream.Read(rgba.R) || !bitStream.Read(rgba.G) || !bitStream.Read(rgba.B))
+            if (!bitStream.Read(rgba.R) || !bitStream.Read(rgba.G) || !bitStream.Read(rgba.B) || !bitStream.Read(rgba.A))
                 return;
 
             color = rgba;
