@@ -66,6 +66,7 @@ public:
     LUA_DECLARE(GetTrainPosition);
     static bool IsVehicleBlown(CVehicle* vehicle);
     LUA_DECLARE(GetVehicleHeadLightColor);
+    LUA_DECLARE(GetVehicleNitroColor);
     LUA_DECLARE(GetVehicleDoorOpenRatio);
 
     // Vehicle set functions
@@ -116,6 +117,8 @@ public:
     static bool SetTrainTrack(CVehicle* pVehicle, CTrainTrack* pTrack);
     LUA_DECLARE(SetTrainPosition);
     LUA_DECLARE(SetVehicleHeadLightColor);
+    LUA_DECLARE(SetVehicleNitroColor);
+    LUA_DECLARE(ResetVehicleNitroColor);
     LUA_DECLARE(SetVehicleTurretPosition);
     LUA_DECLARE(SetVehicleDoorOpenRatio);
     LUA_DECLARE(SetVehicleVariant);

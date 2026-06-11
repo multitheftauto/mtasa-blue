@@ -69,6 +69,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"getTrainPosition", GetTrainPosition},
         {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
+        {"getVehicleNitroColor", GetVehicleNitroColor},
         {"getVehicleDoorOpenRatio", GetVehicleDoorOpenRatio},
 
         // Vehicle set funcs
@@ -118,6 +119,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setTrainSpeed", SetTrainSpeed},
         {"setTrainPosition", SetTrainPosition},
         {"setVehicleHeadLightColor", SetVehicleHeadLightColor},
+        {"setVehicleNitroColor", SetVehicleNitroColor},
+        {"resetVehicleNitroColor", ResetVehicleNitroColor},
         {"setVehicleTurretPosition", SetVehicleTurretPosition},
         {"setVehicleDoorOpenRatio", SetVehicleDoorOpenRatio},
         {"setVehicleVariant", SetVehicleVariant},
@@ -186,6 +189,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
         lua_classfunction(luaVM, "getTrainTrack", "getTrainTrack");
     lua_classfunction(luaVM, "getTrainPosition", "getTrainPosition");
     lua_classfunction(luaVM, "getHeadLightColor", "getVehicleHeadLightColor");
+    lua_classfunction(luaVM, "getNitroColor", "getVehicleNitroColor");
     lua_classfunction(luaVM, "getColor", "getVehicleColor");
     lua_classfunction(luaVM, "getCompatibleUpgrades", "getVehicleCompatibleUpgrades");
     lua_classfunction(luaVM, "getController", "getVehicleController");
@@ -241,6 +245,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setTurnVelocity", "setVehicleTurnVelocity");
     lua_classfunction(luaVM, "setWheelStates", "setVehicleWheelStates");
     lua_classfunction(luaVM, "setHeadLightColor", "setVehicleHeadLightColor");
+    lua_classfunction(luaVM, "setNitroColor", "setVehicleNitroColor");
+    lua_classfunction(luaVM, "resetNitroColor", "resetVehicleNitroColor");
     lua_classfunction(luaVM, "setTaxiLightOn", "setVehicleTaxiLightOn");
     lua_classfunction(luaVM, "setVariant", "setVehicleVariant");
     lua_classfunction(luaVM, "setSirens", "setVehicleSirens");
@@ -2884,6 +2890,80 @@ int CLuaVehicleDefs::SetVehicleHeadLightColor(lua_State* luaVM)
         {
             lua_pushboolean(luaVM, true);
             return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::SetVehicleNitroColor(lua_State* luaVM)
+{
+    CVehicle* pVehicle;
+    SColor    color;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+    argStream.ReadNumber(color.R);
+    argStream.ReadNumber(color.G);
+    argStream.ReadNumber(color.B);
+    color.A = 0xFF;
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetVehicleNitroColor(pVehicle, color))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::ResetVehicleNitroColor(lua_State* luaVM)
+{
+    CVehicle* pVehicle;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetVehicleNitroColor(pVehicle, std::nullopt))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVehicleDefs::GetVehicleNitroColor(lua_State* luaVM)
+{
+    CVehicle* pVehicle;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pVehicle);
+
+    if (!argStream.HasErrors())
+    {
+        std::optional<SColor> color;
+        if (CStaticFunctionDefinitions::GetVehicleNitroColor(pVehicle, color) && color.has_value())
+        {
+            lua_pushnumber(luaVM, color->R);
+            lua_pushnumber(luaVM, color->G);
+            lua_pushnumber(luaVM, color->B);
+            return 3;
         }
     }
     else

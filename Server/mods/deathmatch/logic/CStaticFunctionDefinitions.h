@@ -285,6 +285,7 @@ public:
     static bool  GetTrainSpeed(CVehicle* pVehicle, float& fSpeed);
     static bool  GetTrainPosition(CVehicle* pVehicle, float& fPosition);
     static bool  GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor);
+    static bool  GetVehicleNitroColor(CVehicle* pVehicle, std::optional<SColor>& outColor);
     static bool  GetVehicleDoorOpenRatio(CVehicle* pVehicle, unsigned char ucDoor, float& fRatio);
 
     static bool GetVehicleHandling(CVehicle* pVehicle, eHandlingProperty eProperty, float& fValue);
@@ -347,6 +348,7 @@ public:
     static bool SetTrainSpeed(CVehicle* pVehicle, float fSpeed);
     static bool SetTrainPosition(CVehicle* pVehicle, float fPosition);
     static bool SetVehicleHeadLightColor(CVehicle* pVehicle, const SColor color);
+    static bool SetVehicleNitroColor(CVehicle* pVehicle, const std::optional<SColor> color);
     static bool SetVehicleTurretPosition(CVehicle* pVehicle, float fHorizontal, float fVertical);
     static bool SetVehicleDoorOpenRatio(CElement* pElement, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0);
     static bool SetVehiclePlateText(CElement* pElement, const SString& strPlateText);

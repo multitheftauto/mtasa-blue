@@ -2967,6 +2967,12 @@ bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CClientVehicle& Vehicl
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleNitroColor(CClientVehicle& Vehicle, std::optional<SColor>& outColor)
+{
+    outColor = Vehicle.GetNitroColor();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetVehicleCurrentGear(CClientVehicle& Vehicle, unsigned short& currentGear)
 {
     currentGear = static_cast<unsigned short>(Vehicle.GetCurrentGear());
@@ -3531,6 +3537,20 @@ bool CStaticFunctionDefinitions::SetVehicleHeadLightColor(CClientEntity& Entity,
     {
         CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
         Vehicle.SetHeadLightColor(color);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleNitroColor(CClientEntity& Entity, const std::optional<SColor> color)
+{
+    RUN_CHILDREN(SetVehicleNitroColor(**iter, color))
+
+    if (IS_VEHICLE(&Entity))
+    {
+        CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
+        Vehicle.SetNitroColor(color);
         return true;
     }
 

@@ -13,6 +13,8 @@ class CVehicle;
 
 #pragma once
 
+#include <optional>
+
 #include "CCommon.h"
 #include "packets/CPacket.h"
 #include "CElement.h"
@@ -348,6 +350,9 @@ public:
     SColor GetHeadLightColor() { return m_HeadLightColor; }
     void   SetHeadLightColor(const SColor color) { m_HeadLightColor = color; }
 
+    std::optional<SColor> GetNitroColor() { return m_NitroColor; }
+    void                  SetNitroColor(const std::optional<SColor> color) { m_NitroColor = color; }
+
     bool IsHeliSearchLightVisible() { return m_bHeliSearchLightVisible; }
     void SetHeliSearchLightVisible(bool bVisible) { m_bHeliSearchLightVisible = bVisible; }
 
@@ -460,6 +465,7 @@ private:
     bool                  m_bInWater;
     CPed*                 m_pJackingPed;
     SColor                m_HeadLightColor;
+    std::optional<SColor> m_NitroColor;
     bool                  m_bHeliSearchLightVisible;
 
     // Train specific data

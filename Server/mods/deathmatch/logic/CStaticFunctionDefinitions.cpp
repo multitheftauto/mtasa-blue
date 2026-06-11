@@ -5644,6 +5644,14 @@ bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CVehicle* pVehicle, SC
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetVehicleNitroColor(CVehicle* pVehicle, std::optional<SColor>& outColor)
+{
+    assert(pVehicle);
+
+    outColor = pVehicle->GetNitroColor();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::GetVehicleDoorOpenRatio(CVehicle* pVehicle, unsigned char ucDoor, float& fRatio)
 {
     if (ucDoor <= 5 && pVehicle != NULL)
@@ -7485,6 +7493,28 @@ bool CStaticFunctionDefinitions::SetVehicleHeadLightColor(CVehicle* pVehicle, co
         BitStream.pBitStream->Write(color.G);
         BitStream.pBitStream->Write(color.B);
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_HEADLIGHT_COLOR, *BitStream.pBitStream));
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetVehicleNitroColor(CVehicle* pVehicle, const std::optional<SColor> color)
+{
+    assert(pVehicle);
+
+    if (color != pVehicle->GetNitroColor())
+    {
+        pVehicle->SetNitroColor(color);
+
+        CBitStream BitStream;
+        BitStream.pBitStream->WriteBit(color.has_value());
+        if (color.has_value())
+        {
+            BitStream.pBitStream->Write(color->R);
+            BitStream.pBitStream->Write(color->G);
+            BitStream.pBitStream->Write(color->B);
+        }
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_NITRO_COLOR, *BitStream.pBitStream));
     }
 
     return true;
