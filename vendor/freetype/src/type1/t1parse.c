@@ -4,7 +4,7 @@
  *
  *   Type 1 parser (body).
  *
- * Copyright (C) 1996-2025 by
+ * Copyright (C) 1996-2026 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -339,11 +339,8 @@
       FT_Bool     test_cr;
 
 
-      parser->root.cursor = parser->base_dict;
-      parser->root.limit  = parser->base_dict + parser->base_len;
-
-      cur   = parser->root.cursor;
-      limit = parser->root.limit;
+      parser->root.cursor = cur;
+      parser->root.limit  = limit;
 
       while ( cur < limit )
       {
