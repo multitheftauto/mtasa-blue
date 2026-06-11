@@ -118,7 +118,7 @@ bool CXMLFileImpl::Write()
         {
             return true;
         }
-        if (m_pDocument->SaveFile(m_strFilename.c_str()))
+        if (m_pDocument->SaveFile(m_strFilename.c_str()) == XML_SUCCESS)
         {
             return true;
         }
@@ -137,7 +137,7 @@ bool CXMLFileImpl::WriteSafer()
         SString strBackup = strFilename + "_old_";
 
         // Save to temp
-        if (!m_pDocument->SaveFile(strTemp))
+        if (m_pDocument->SaveFile(strTemp) != XML_SUCCESS)
         {
             SetLastError(CXMLErrorCodes::OtherError, "Could not save temporary file");
             return false;
