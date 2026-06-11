@@ -66,16 +66,15 @@ CXMLNodeImpl::~CXMLNodeImpl()
     }
 
     // Need to delete the node?
+    // The underlying XML element is owned by its document (either a CXMLFileImpl,
+    // an SXMLStringImpl, or a m_standaloneDocument). The document will clean up
+    // all elements when it is destroyed. We only handle wrapper-level cleanup here;
+    // deleting elements from inside their wrapper destructors triggers recursive
+    // deletion in tinyxml2's ~XMLNode() which conflicts with our wrapper tree
+    // deletion order.
     if (m_pNode)
     {
-        // Grab the parent of our node and delete it using that if any to prevent crashing.
-        // Otherwize delete it directly.
-        XMLNode* pParent = m_pNode->Parent();
-        if (pParent)
-            pParent->DeleteChild(m_pNode);
-        // When there is no parent, the element is owned by its document
-        // (m_standaloneDocument, the CXMLFileImpl, or an SXMLStringImpl).
-        // Let the document handle cleanup; don't double-delete.
+        (void)m_pNode;
     }
 }
 
@@ -169,7 +168,8 @@ CXMLNode* CXMLNodeImpl::FindSubNode(const char* szTagName, unsigned int uiIndex)
     list<CXMLNode*>::iterator iter;
     for (iter = m_Children.begin(); iter != m_Children.end(); iter++)
     {
-        if (dynamic_cast<CXMLNodeImpl*>((*iter))->GetNode()->Value() == TagName)
+        CXMLNodeImpl* pChild = dynamic_cast<CXMLNodeImpl*>(*iter);
+        if (pChild && pChild->GetNode() && (pChild->GetNode()->Value() == TagName))
         {
             if (uiTemp == uiIndex)
             {
@@ -196,11 +196,16 @@ CXMLNode* CXMLNodeImpl::GetParent()
 
 int CXMLNodeImpl::GetLine()
 {
-    return m_pNode->GetLineNum();
+    return m_pNode ? m_pNode->GetLineNum() : 0;
 }
 
 const std::string& CXMLNodeImpl::GetTagName()
 {
+    if (!m_pNode)
+    {
+        m_strTagNameCache.clear();
+        return m_strTagNameCache;
+    }
     const char* szValue = m_pNode->Value();
     if (szValue)
         m_strTagNameCache = szValue;
@@ -211,7 +216,8 @@ const std::string& CXMLNodeImpl::GetTagName()
 
 void CXMLNodeImpl::SetTagName(const std::string& strString)
 {
-    m_pNode->SetValue(strString.c_str());
+    if (m_pNode)
+        m_pNode->SetValue(strString.c_str());
     m_strTagNameCache = strString;
 }
 
@@ -359,19 +365,22 @@ XMLElement* CXMLNodeImpl::GetNode()
 
 CXMLNode* CXMLNodeImpl::CopyNode(CXMLNode* pParent)
 {
-    CXMLNodeImpl* pNew = new CXMLNodeImpl(NULL, reinterpret_cast<CXMLNodeImpl*>(pParent), *m_pNode->DeepClone(m_pNode->GetDocument())->ToElement());
+    // Create a standalone document to own the deep clone.
+    // tinyxml2's DeepClone inserts the clone into the target document, so we
+    // must use a new document; cloning into the source document would result in
+    // a dangling pointer when the source CXMLFile is deleted.
+    auto* newDoc = new tinyxml2::XMLDocument;
+    auto* clone = m_pNode->DeepClone(newDoc)->ToElement();
+    newDoc->InsertEndChild(clone);
 
-    // Copy the list, so we don't end up in an endless loop
-    std::list<CXMLNode*> ChildrenCopy(m_Children);
+    CXMLNodeImpl* pNew = new CXMLNodeImpl(NULL, reinterpret_cast<CXMLNodeImpl*>(pParent), *clone);
+    pNew->m_standaloneDocument.reset(newDoc);
 
-    // Recursively copy each child
-    list<CXMLNode*>::iterator iter;
-    for (iter = ChildrenCopy.begin(); iter != ChildrenCopy.end(); iter++)
-    {
-        (*iter)->CopyNode(pNew);
-    }
+    // DeepClone already recursively cloned all descendant elements into newDoc.
+    // BuildFromDocument creates the CXMLNodeImpl wrapper tree from the XML tree.
+    pNew->BuildFromDocument();
 
-    return dynamic_cast<CXMLNode*>(pNew);
+    return pNew;
 }
 
 bool CXMLNodeImpl::CopyChildrenInto(CXMLNode* pDestination, bool bRecursive)

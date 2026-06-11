@@ -45,8 +45,8 @@ private:
     const bool    m_bUsingIDs;
     bool          m_bDeleteAttribute;
 
-    CXMLAttributesImpl&   m_Attributes;
-    tinyxml2::XMLElement& m_Node;
-    std::string           m_strName;
-    mutable std::string   m_strValueCache;
+    CXMLAttributesImpl&           m_Attributes;
+    tinyxml2::XMLElement&         m_Node;
+    const tinyxml2::XMLAttribute* m_pAttribute;
+    mutable std::string           m_strValueCache;
 };
