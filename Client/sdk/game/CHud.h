@@ -34,6 +34,9 @@ enum eHudComponent
     HUD_RADAR_MAP,
     HUD_RADAR_BLIPS,
     HUD_RADAR_ALTIMETER,
+    HUD_RADAR_DISC,
+    HUD_RADAR_HORIZON,
+    HUD_RADAR_AIRSTRIP_BLIP,
 };
 
 enum class eHudComponentProperty
