@@ -136,6 +136,7 @@ void CHudSA::InitComponentList()
         {1, HUD_RADAR_DISC, 1, CODE_ShowRadarDisc, 5, 0xCC, HudMakeRelativeJump(CODE_ShowRadarDisc, CODE_DrawRadarBlipsPart)},
         {1, HUD_RADAR_HORIZON, 1, CODE_ShowRadarHorizon, 2, 0xCC, 0xE990, CODE_ShowRadarMapHorizon, 2, 0xCC, 0xE990},
         {1, HUD_RADAR_AIRSTRIP_BLIP, 1, CODE_ShowRadarAirstripBlip, 2, 0xCC, 0xE990},
+        {1, HUD_SNIPER_BACKGROUND, 1, CODE_ShowSniperBackground, 1, 0xCC, 0xFF},
         {1, HUD_CLOCK, 0, VAR_DisableClock, 1, 1, 0},
         {1, HUD_RADIO, 1, FUNC_DrawRadioName, 1, 0xCC, 0xC3},
         {1, HUD_WANTED, 1, FUNC_DrawWantedLevel, 1, 0xCC, 0xC3},

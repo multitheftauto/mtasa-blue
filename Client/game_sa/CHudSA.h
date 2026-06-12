@@ -61,6 +61,8 @@
 #define CODE_DrawRadarBlipsPart    0x58AA2A
 #define CODE_ShowRadarAirstripBlip 0x587D35
 
+#define CODE_ShowSniperBackground 0x53E31D
+
 #define VAR_CTheScripts_bDrawCrossHair 0xA44490
 #define VAR_RSGlobal                   0xC17040
 #define VAR_ItemToFlash                0xBAB1DC
