@@ -301,6 +301,8 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
 #define HOOKPOS_CCollision__CheckCameraCollisionObjects 0x41AB8E
 
+#define HOOKPOS_CMirrors__CreateBuffer 0x72701D
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -570,6 +572,8 @@ void HOOK_CWeapon__TakePhotograph();
 
 void HOOK_CCollision__CheckCameraCollisionObjects();
 
+void HOOK_CMirrors__CreateBuffer();
+
 CMultiplayerSA::CMultiplayerSA()
 {
     // Unprotect all of the GTASA code at once and leave it that way
@@ -769,6 +773,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWeapon__TakePhotograph, (DWORD)HOOK_CWeapon__TakePhotograph, 3 + 2);
 
     HookInstall(HOOKPOS_CCollision__CheckCameraCollisionObjects, (DWORD)HOOK_CCollision__CheckCameraCollisionObjects, 6 + 4);
+
+    // Fix mirror rendering when anti-aliasing is enabled
+    HookInstall(HOOKPOS_CMirrors__CreateBuffer, (DWORD)HOOK_CMirrors__CreateBuffer, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, 10);
@@ -8200,4 +8207,38 @@ static void __declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
     out2: jmp   RETURN_CCollision__CheckCameraCollisionObjects_2
     }
     // clang-format on
+}
+
+const DWORD RETURN_CMirrors__CreateBuffer = 0x727022;
+
+void CreateMirrorBuffer()
+{
+    // preserve the MSAA values
+    DWORD oldMSAAValues[2] = {*reinterpret_cast<DWORD*>(0xC9C050), *reinterpret_cast<DWORD*>(0xC9C054)};
+
+    // set them to 0 so that the Rw raster textures create correctly
+    MemPutFast<DWORD>(0xC9C050, 0);
+    MemPutFast<DWORD>(0xC9C054, 0);
+
+    // CMirrors::CreateBuffer
+    reinterpret_cast<void(__cdecl*)()>(0x7230A0)();
+
+    // restore the MSAA values
+    MemPutFast<DWORD>(0xC9C050, oldMSAAValues[0]);
+    MemPutFast<DWORD>(0xC9C054, oldMSAAValues[1]);
+}
+
+static void __declspec(naked) HOOK_CMirrors__CreateBuffer()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad;
+        call CreateMirrorBuffer;
+        popad;
+
+        jmp RETURN_CMirrors__CreateBuffer;
+    }
 }
