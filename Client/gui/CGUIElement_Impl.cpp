@@ -733,3 +733,15 @@ inline void CGUIElement_Impl::ForceRedraw()
 {
     m_pWindow->forceRedraw();
 }
+
+void CGUIElement_Impl::SetColorCodesEnabled(bool bEnabled)
+{
+    m_pWindow->setUserString("ColorCodesEnabled", bEnabled ? "True" : "False");
+    m_pWindow->forceRedraw();
+}
+
+bool CGUIElement_Impl::GetColorCodesEnabled()
+{
+    return m_pWindow->isUserStringDefined("ColorCodesEnabled") &&
+           m_pWindow->getUserString("ColorCodesEnabled") == "True";
+}

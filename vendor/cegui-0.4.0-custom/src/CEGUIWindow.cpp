@@ -29,6 +29,7 @@
 #include "CEGUIWindowManager.h"
 #include "CEGUISystem.h"
 #include "CEGUIFontManager.h"
+#include "CEGUIFont.h"
 #include "CEGUIImagesetManager.h"
 #include "CEGUIImageset.h"
 #include "CEGUIMouseCursor.h"
@@ -1998,8 +1999,13 @@ void Window::drawSelf(float z)
     {
         // dispose of already cached imagery.
         d_renderCache.clearCachedImagery();
+        // Set per-window color codes flag before text geometry is generated.
+        Font::s_colorCodesEnabled = isUserStringDefined("ColorCodesEnabled") &&
+                                    getUserString("ColorCodesEnabled") == "True";
         // get derived class to re-populate cache.
         populateRenderCache();
+        // Reset so other windows default to no color parsing.
+        Font::s_colorCodesEnabled = false;
         // mark ourselves as no longer needed a redraw.
         d_needsRedraw = false;
     }

@@ -139,6 +139,8 @@ void CLuaGUIDefs::LoadFunctions()
         {"guiGetProperty", GUIGetProperty},
         {"guiGetProperties", GUIGetProperties},
         {"guiGetAlpha", GUIGetAlpha},
+        {"guiSetColorCodesEnabled", GUISetColorCodesEnabled},
+        {"guiGetColorCodesEnabled", GUIGetColorCodesEnabled},
         {"guiGetText", GUIGetText},
         {"guiGetFont", GUIGetFont},
         {"guiGetSize", GUIGetSize},
@@ -249,6 +251,7 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getScreenSize", "guiGetScreenSize");
     lua_classfunction(luaVM, "getProperties", "guiGetProperties");
     lua_classfunction(luaVM, "getAlpha", "guiGetAlpha");
+    lua_classfunction(luaVM, "getColorCodesEnabled", "guiGetColorCodesEnabled");
     lua_classfunction(luaVM, "getFont", "guiGetFont");
     lua_classfunction(luaVM, "getEnabled", "guiGetEnabled");
     lua_classfunction(luaVM, "getVisible", "guiGetVisible");
@@ -259,6 +262,7 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "setInputEnabled", "guiSetInputEnabled");
     lua_classfunction(luaVM, "setAlpha", "guiSetAlpha");
+    lua_classfunction(luaVM, "setColorCodesEnabled", "guiSetColorCodesEnabled");
     lua_classfunction(luaVM, "setEnabled", "guiSetEnabled");
     lua_classfunction(luaVM, "setFont", "guiSetFont");
     lua_classfunction(luaVM, "setVisible", "guiSetVisible");
@@ -282,6 +286,7 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classvariable(luaVM, "visible", "guiSetVisible", "guiGetVisible");
     lua_classvariable(luaVM, "properties", NULL, "guiGetProperties");
     lua_classvariable(luaVM, "alpha", "guiSetAlpha", "guiGetAlpha");
+    lua_classvariable(luaVM, "colorCodesEnabled", "guiSetColorCodesEnabled", "guiGetColorCodesEnabled");
     lua_classvariable(luaVM, "enabled", "guiSetEnabled", "guiGetEnabled");
     lua_classvariable(luaVM, "text", "guiSetText", "guiGetText");
     lua_classvariable(luaVM, "size", "guiSetSize", "guiGetSize");
@@ -1855,6 +1860,49 @@ int CLuaGUIDefs::GUIGetAlpha(lua_State* luaVM)
     {
         float fAlpha = !bEffectiveAlpha ? guiElement->GetCGUIElement()->GetAlpha() : guiElement->GetCGUIElement()->GetEffectiveAlpha();
         lua_pushnumber(luaVM, fAlpha);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUISetColorCodesEnabled(lua_State* luaVM)
+{
+    //  bool guiSetColorCodesEnabled ( element guiElement, bool enabled )
+    CClientGUIElement* guiElement;
+    bool               bEnabled;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+    argStream.ReadBool(bEnabled);
+
+    if (!argStream.HasErrors())
+    {
+        guiElement->GetCGUIElement()->SetColorCodesEnabled(bEnabled);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::GUIGetColorCodesEnabled(lua_State* luaVM)
+{
+    //  bool guiGetColorCodesEnabled ( element guiElement )
+    CClientGUIElement* guiElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+
+    if (!argStream.HasErrors())
+    {
+        lua_pushboolean(luaVM, guiElement->GetCGUIElement()->GetColorCodesEnabled());
         return 1;
     }
     else

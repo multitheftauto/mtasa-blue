@@ -57,6 +57,7 @@ namespace CEGUI
 	static data definitions
 *************************************************************************/
 const argb_t Font::DefaultColour					= 0xFFFFFFFF;
+bool         Font::s_colorCodesEnabled              = false;
 const uint	Font::InterGlyphPadSpace			= 2;
 
 // XML related strings
@@ -760,6 +761,8 @@ size_t Font::getNextWord(const String& in_string, size_t start_idx, String& out_
 // but the following chars are not all hex digits, the '#' is treated as a literal char.
 static bool ParseColorCode(const String& text, size_t c, float& r, float& g, float& b)
 {
+    if (!Font::s_colorCodesEnabled)
+        return false;
     if (text[c] != '#' || c + 7 > text.length())
         return false;
 
