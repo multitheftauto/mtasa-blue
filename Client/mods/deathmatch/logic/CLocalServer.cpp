@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../../../vendor/zip/unzip.h"
+#include <urlmon.h>
+#pragma comment(lib, "urlmon.lib")
+#include "SharedUtil.AsyncTaskScheduler.h"
 
 using std::list;
 
@@ -91,6 +95,11 @@ CLocalServer::CLocalServer(const char* szConfig)
     m_pBroadcastInternet->SetPosition(CVector2D(0.4f, 0.38f), true);
     m_pBroadcastInternet->SetSize(CVector2D(0.45f, 0.08f), true);
 
+    m_pButtonUpdate = reinterpret_cast<CGUIButton*>(m_pGUI->CreateButton(m_pTabGeneral, _("Update server resources")));
+    m_pButtonUpdate->SetPosition(CVector2D(0.45f, 0.91f), true);
+    m_pButtonUpdate->SetSize(CVector2D(0.52f, 0.06f), true);
+    m_pButtonUpdate->SetZOrderingEnabled(false);
+
     m_pResourcesCur = reinterpret_cast<CGUIGridList*>(m_pGUI->CreateGridList(m_pTabResources, false));
     m_pResourcesCur->SetPosition(CVector2D(0.03f, 0.06f), true);
     m_pResourcesCur->SetSize(CVector2D(0.45f, 0.5f), true);
@@ -125,6 +134,7 @@ CLocalServer::CLocalServer(const char* szConfig)
     m_pButtonCancel->SetSize(CVector2D(0.3f, 0.05f), true);
     m_pButtonCancel->SetZOrderingEnabled(false);
 
+    m_pButtonUpdate->SetClickHandler(GUI_CALLBACK(&CLocalServer::OnUpdateResourcesButtonClick, this));
     m_pResourceAdd->SetClickHandler(GUI_CALLBACK(&CLocalServer::OnAddButtonClick, this));
     m_pResourceDel->SetClickHandler(GUI_CALLBACK(&CLocalServer::OnDelButtonClick, this));
     m_pButtonStart->SetClickHandler(GUI_CALLBACK(&CLocalServer::OnStartButtonClick, this));
@@ -159,6 +169,104 @@ bool CLocalServer::OnDelButtonClick(CGUIElement* pElement)
         m_pResourcesAll->SetItemText(m_pResourcesAll->AddRow(), m_hResourcesAll, &pItem->GetText().c_str()[3]);
         m_pResourcesCur->RemoveRow(m_pResourcesCur->GetItemRowIndex(pItem));
     }
+    return true;
+}
+
+bool CLocalServer::OnUpdateResourcesButtonClick(CGUIElement* pElement)
+{
+    SString url = "https://mirror-cdn.multitheftauto.com/mtasa/resources/mtasa-resources-latest.zip";
+    SString path = CalcMTASAPath(PathJoin("server", "mods", "deathmatch", "mtasa-resources-latest.zip"));
+    MakeSureDirExists(ExtractPath(path));
+
+    if (m_pButtonUpdate)
+    {
+        m_pButtonUpdate->SetText(_("Downloading..."));
+        m_pButtonUpdate->SetEnabled(false);
+    }
+
+    g_pClientGame->GetAsyncTaskScheduler()->PushTask(
+        [url, path]() -> bool
+        {
+            HRESULT result = URLDownloadToFileA(NULL, url.c_str(), path.c_str(), 0, NULL);
+            if (result != S_OK)
+                return false;
+
+            SString destPath = CalcMTASAPath(PathJoin("server", "mods", "deathmatch", "resources"));
+            unzFile zipFile = unzOpen(path.c_str());
+
+            if (!zipFile)
+            {
+                FileDelete(path);
+                return false;
+            }
+
+            if (unzGoToFirstFile(zipFile) != UNZ_OK)
+            {
+                unzClose(zipFile);
+                FileDelete(path);
+                return false;
+            }
+
+            do
+            {
+                char fileName[256];
+                unz_file_info fileInfo;
+
+                if (unzGetCurrentFileInfo(zipFile, &fileInfo, fileName, sizeof(fileName), nullptr, 0, nullptr, 0) != UNZ_OK)
+                    continue;
+
+                SString filePath = PathJoin(destPath, fileName);
+                if (fileName[fileInfo.size_filename - 1] == '/')
+                {
+                    MakeSureDirExists(filePath.c_str());
+                    continue;
+                }
+
+                MakeSureDirExists(ExtractPath(filePath).c_str());
+                if (unzOpenCurrentFile(zipFile) != UNZ_OK)
+                    continue;
+
+                // Note: "wb" mode overwrites existing files if they have the same name
+                // Any other custom resources on disk that aren't in the zip are left untouched.
+                FILE* file = fopen(filePath.c_str(), "wb");
+                if (file)
+                {
+                    char buffer[8192];
+                    int read = 0;
+
+                    while ((read = unzReadCurrentFile(zipFile, buffer, sizeof(buffer))) > 0)
+                    {
+                        fwrite(buffer, 1, read, file);
+                    }
+
+                    fclose(file);
+                }
+
+                unzCloseCurrentFile(zipFile);
+            } while (unzGoToNextFile(zipFile) != UNZ_END_OF_LIST_OF_FILE);
+
+            unzClose(zipFile);
+            FileDelete(path);
+
+            return true;
+        },
+        [this](bool success) {
+            if (m_pButtonUpdate)
+            {
+                m_pButtonUpdate->SetText(_("Update server resources"));
+                m_pButtonUpdate->SetEnabled(true);
+            }
+
+            if (success)
+            {
+                Load();
+                g_pCore->ShowMessageBox(_("Local Server"), _("Server resources updated successfully!"), MB_BUTTON_OK | MB_ICON_INFO);
+            }
+            else
+                g_pCore->ShowMessageBox(_("Error") + _E("CC90"), _("Failed to download or extract resources."), MB_BUTTON_OK | MB_ICON_ERROR);
+        }
+    );
+
     return true;
 }
 

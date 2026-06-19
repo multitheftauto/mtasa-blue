@@ -25,6 +25,7 @@ protected:
     bool OnCancelButtonClick(CGUIElement* pElement);
     bool OnAddButtonClick(CGUIElement* pElement);
     bool OnDelButtonClick(CGUIElement* pElement);
+    bool OnUpdateResourcesButtonClick(CGUIElement* pElement);
 
     // Server config
     bool Load();
@@ -71,6 +72,7 @@ private:
     CGUIButton* m_pResourceAdd;
     CGUIButton* m_pResourceDel;
 
+    CGUIButton* m_pButtonUpdate;
     CGUIButton* m_pButtonStart;
     CGUIButton* m_pButtonCancel;
 };
