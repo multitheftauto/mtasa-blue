@@ -1869,19 +1869,43 @@ int CLuaGUIDefs::GUIGetAlpha(lua_State* luaVM)
     return 1;
 }
 
+static void RecursivelySetColorCodesEnabled(CClientGUIElement* pElement, bool bEnabled)
+{
+    pElement->GetCGUIElement()->SetColorCodesEnabled(bEnabled);
+    CElementListSnapshotRef pSnapshot = pElement->GetChildrenListSnapshot();
+    for (CClientEntity* pChild : *pSnapshot)
+    {
+        if (pChild->GetType() == CCLIENTGUI)
+        {
+            RecursivelySetColorCodesEnabled(static_cast<CClientGUIElement*>(pChild), bEnabled);
+        }
+    }
+}
+
 int CLuaGUIDefs::GUISetColorCodesEnabled(lua_State* luaVM)
 {
-    //  bool guiSetColorCodesEnabled ( element guiElement, bool enabled )
+    //  bool guiSetColorCodesEnabled ( element guiElement, bool enabled [, bool includeChildren = false ] )
     CClientGUIElement* guiElement;
     bool               bEnabled;
+    bool               bIncludeChildren = false;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(guiElement);
     argStream.ReadBool(bEnabled);
+    if (argStream.NextIsBool())
+        argStream.ReadBool(bIncludeChildren);
 
     if (!argStream.HasErrors())
     {
-        guiElement->GetCGUIElement()->SetColorCodesEnabled(bEnabled);
+        if (bIncludeChildren)
+        {
+            RecursivelySetColorCodesEnabled(guiElement, bEnabled);
+        }
+        else
+        {
+            guiElement->GetCGUIElement()->SetColorCodesEnabled(bEnabled);
+        }
+        
         lua_pushboolean(luaVM, true);
         return 1;
     }

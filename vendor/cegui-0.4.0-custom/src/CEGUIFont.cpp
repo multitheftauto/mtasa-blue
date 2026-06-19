@@ -53,6 +53,9 @@
 // Start of CEGUI namespace section
 namespace CEGUI
 {
+// Forward declaration of ParseColorCode to allow calls in early member functions (e.g. getTextExtent, getCharAtPixel) before its definition.
+static bool ParseColorCode(const String& text, size_t c, float& r, float& g, float& b);
+
 /*************************************************************************
 	static data definitions
 *************************************************************************/
