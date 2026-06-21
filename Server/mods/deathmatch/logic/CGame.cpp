@@ -4384,7 +4384,10 @@ void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
     {
         // event cancelled, disconnect the player
         CLogger::LogPrintf("CONNECT: %s failed to connect. (onPlayerConnect event cancelled) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str());
-        const char* szError = g_pGame->GetEvents()->GetLastError();
+        // Use WasLastError() rather than GetLastError(): CallEvent() above already restored
+        // m_strLastError to the outer (pre-call) value once it returned, so the reason set via
+        // cancelEvent() inside the onPlayerConnect handler is only available through this getter.
+        const char* szError = g_pGame->GetEvents()->WasLastError();
         if (szError && szError[0])
         {
             DisconnectPlayer(g_pGame, *pPlayer, szError);
