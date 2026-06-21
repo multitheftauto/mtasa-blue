@@ -5272,6 +5272,8 @@ void CClientGame::PostWeaponFire()
                 }
                 else
                     pPed->CallEvent("onClientPedWeaponFire", Arguments, true);
+
+                // Make sure to reset the weapon fire event state
                 pPed->SetProcessingWeaponFireEvent(false);
             }
             pPed->PostWeaponFire();
