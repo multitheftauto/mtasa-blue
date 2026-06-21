@@ -64,18 +64,6 @@ CXMLNodeImpl::~CXMLNodeImpl()
             m_pFile->m_pRootNode = NULL;
         }
     }
-
-    // Need to delete the node?
-    // The underlying XML element is owned by its document (either a CXMLFileImpl,
-    // an SXMLStringImpl, or a m_standaloneDocument). The document will clean up
-    // all elements when it is destroyed. We only handle wrapper-level cleanup here;
-    // deleting elements from inside their wrapper destructors triggers recursive
-    // deletion in tinyxml2's ~XMLNode() which conflicts with our wrapper tree
-    // deletion order.
-    if (m_pNode)
-    {
-        (void)m_pNode;
-    }
 }
 
 void CXMLNodeImpl::BuildFromDocument()
