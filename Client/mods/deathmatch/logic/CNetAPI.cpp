@@ -2255,7 +2255,12 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
 {
     SVehicleDamageSyncMethodeB damage;
     BitStream.Read(&damage);
-    bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
+
+    // Do not spawn flying components when applying damage to already-blown
+    // vehicles. Physics collisions and burn explosions can trigger repeated
+    // damage syncs on destroyed vehicles, each of which would spawn new
+    // flying components even though the vehicle is already wrecked.
+    bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled() && !pVehicle->IsBlown();
 
     if (damage.data.bSyncDoors)
         for (unsigned char i = 0; i < MAX_DOORS; ++i)

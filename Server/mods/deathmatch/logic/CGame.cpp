@@ -2435,6 +2435,13 @@ void CGame::Packet_VehicleDamageSync(CVehicleDamageSyncPacket& Packet)
             // Is this guy the driver or syncer?
             if (pVehicle->GetSyncer() == pPlayer || pVehicle->GetOccupant(0) == pPlayer)
             {
+                // Ignore damage syncs for already-blown vehicles. Once a vehicle
+                // is destroyed, further damage changes (from physics collisions or
+                // burn explosions) only cause repeated flying component spawns and
+                // excess explosions on clients.
+                if (pVehicle->IsBlown())
+                    return;
+
                 // Set the new damage model
                 for (unsigned int i = 0; i < MAX_DOORS; ++i)
                 {
