@@ -53,8 +53,15 @@ void CBlendedWeather::DoPulse()
         }
     }
 
-    // Force the weather
-    m_pWeather->Set(static_cast<unsigned char>(m_ucPrimaryWeather), static_cast<unsigned char>(m_ucSecondaryWeather));
+    const auto ucPrimary = static_cast<unsigned char>(m_ucPrimaryWeather);
+    const auto ucSecondary = static_cast<unsigned char>(m_ucSecondaryWeather);
+
+    m_pWeather->Set(ucPrimary, ucSecondary);
+    // CWeather::Update (before this pulse) advances InterpolationValue for its own Old/New pair.
+    // After we overwrite Old/New with MTA's state, mirror the value CWeather::Update would derive
+    // (seconds/3600 + minutes/60) so CTimeCycle::CalcColoursForPoint blends m_CurrentColours
+    // smoothly per frame instead of stepping per game-minute (#4803).
+    m_pWeather->ResyncInterpolationWithGameClock(ucPrimary, ucSecondary);
 }
 
 void CBlendedWeather::SetWeather(unsigned char ucWeather)

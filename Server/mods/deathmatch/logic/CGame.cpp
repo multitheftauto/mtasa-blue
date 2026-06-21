@@ -658,14 +658,20 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         return false;
     }
 
-    // Check pcre has been built correctly
-    int iPcreConfigUtf8 = 0;
-    pcre_config(PCRE_CONFIG_UTF8, &iPcreConfigUtf8);
-    if (iPcreConfigUtf8 == 0)
+    // Check pcre2 has been built correctly with Unicode/UTF support
+    uint32_t uiPcre2Unicode = 0;
+    pcre2_config(PCRE2_CONFIG_UNICODE, &uiPcre2Unicode);
+    if (uiPcre2Unicode == 0)
     {
-        CLogger::ErrorPrintf("PCRE built without UTF8 support\n");
+        CLogger::ErrorPrintf("PCRE2 built without Unicode support\n");
         return false;
     }
+
+    // Set json-c double serialization to 16 significant digits instead of the
+    // default %.17g. At 17 digits, IEEE 754 rounding artifacts from the least
+    // significant bit become visible (e.g. 5.1 becomes "5.1000000000000001").
+    // This API survives json-c upgrades so the source files don't need patching.
+    json_c_set_serialization_double_format("%.16g", JSON_C_OPTION_GLOBAL);
 
     // Check json has precision mod - #8853 (toJSON passes wrong floats)
     json_object* pJsonObject = json_object_new_double(5.12345678901234);
