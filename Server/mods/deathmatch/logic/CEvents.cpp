@@ -141,7 +141,8 @@ void CEvents::PostEventPulse()
     m_bWasEventCancelled = m_bEventCancelled;
     m_bEventCancelled = m_CancelledList.back() ? true : false;
     m_CancelledList.pop_back();
-    // Restore the outer event's cancel reason that was active before this pulse.
+    // Mirrors m_bWasEventCancelled above, before restoring the outer reason.
+    m_strWasLastError = m_strLastError;
     m_strLastError = m_LastErrorList.back();
     m_LastErrorList.pop_back();
 }
@@ -165,4 +166,9 @@ bool CEvents::WasEventCancelled()
 const char* CEvents::GetLastError()
 {
     return m_strLastError;
+}
+
+const char* CEvents::WasLastError()
+{
+    return m_strWasLastError;
 }
