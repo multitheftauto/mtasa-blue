@@ -183,7 +183,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_menuItems.push_back(CreateItem(MENU_ITEM_QUICK_CONNECT, "menu_quick_connect.png", CVector2D(0.168f, fBase + fGap * iMenuItemIndex++)));
     m_menuItems.push_back(CreateItem(MENU_ITEM_BROWSE_SERVERS, "menu_browse_servers.png", CVector2D(0.168f, fBase + fGap * iMenuItemIndex++)));
 
-    // Only add Host Game and Map Editor if server folder and MTA Server.exe exist
+    // Only add Host Game and Map Editor if server folder exists
     if (DirectoryExists(CalcMTASAPath("server")))
     {
         m_menuItems.push_back(CreateItem(MENU_ITEM_HOST_GAME, "menu_host_game.png", CVector2D(0.168f, fBase + fGap * iMenuItemIndex++)));
@@ -1017,6 +1017,9 @@ bool CMainMenu::OnHostGameButtonClick()
     if (m_ucFade != FADE_VISIBLE)
         return false;
 
+    if (!WarnIfLocalServerUnsupported())
+        return false;
+
     // Load deathmatch, but with local play
     CModManager::GetSingleton().RequestLoad("local");
 
@@ -1027,6 +1030,9 @@ bool CMainMenu::OnEditorButtonClick()
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
+        return false;
+
+    if (!WarnIfLocalServerUnsupported())
         return false;
 
     // Load deathmatch, but with local play
@@ -1265,6 +1271,26 @@ void CMainMenu::ShowNetworkNotReadyWindow()
     window.SetButton(0, _("OK"));
     window.SetCallback(HideQuestionWindow, &window);
     window.Show();
+}
+
+/////////////////////////////////////////////////////////////
+//
+// CMainMenu::WarnIfLocalServerUnsupported
+//
+// Returns true if the local server can run on this OS.
+// Returns false and shows a dialog if unsupported (e.g. 32-bit OS).
+//
+/////////////////////////////////////////////////////////////
+bool CMainMenu::WarnIfLocalServerUnsupported()
+{
+    if (!Is64BitOS())
+    {
+        CCore::GetSingleton().ShowMessageBox(_("Error"), _("Local server is not supported on 32-bit OS, please upgrade"),
+                                             MB_BUTTON_OK | MB_ICON_ERROR);
+        return false;
+    }
+
+    return true;
 }
 
 /////////////////////////////////////////////////////////////
