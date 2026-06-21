@@ -667,6 +667,12 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         return false;
     }
 
+    // Set json-c double serialization to 16 significant digits instead of the
+    // default %.17g. At 17 digits, IEEE 754 rounding artifacts from the least
+    // significant bit become visible (e.g. 5.1 becomes "5.1000000000000001").
+    // This API survives json-c upgrades so the source files don't need patching.
+    json_c_set_serialization_double_format("%.16g", JSON_C_OPTION_GLOBAL);
+
     // Check json has precision mod - #8853 (toJSON passes wrong floats)
     json_object* pJsonObject = json_object_new_double(5.12345678901234);
     SString      strJsonResult = json_object_to_json_string_ext(pJsonObject, JSON_C_TO_STRING_PLAIN);
