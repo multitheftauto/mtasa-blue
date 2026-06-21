@@ -8241,4 +8241,5 @@ static void __declspec(naked) HOOK_CMirrors__CreateBuffer()
 
         jmp RETURN_CMirrors__CreateBuffer;
     }
+    // clang-format on
 }
