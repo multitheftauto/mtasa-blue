@@ -21,23 +21,30 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
 #include "curl_setup.h"
 
 #if !defined(CURL_DISABLE_HTTP) && defined(USE_SPNEGO)
 
 #include "urldata.h"
 #include "cfilters.h"
-#include "sendf.h"
+#include "curl_trc.h"
 #include "http_negotiate.h"
 #include "vauth/vauth.h"
 #include "vtls/vtls.h"
 #include "curlx/strparse.h"
 
-/* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
-#include "memdebug.h"
+
+static void http_auth_nego_reset(struct connectdata *conn,
+                                 struct negotiatedata *neg_ctx,
+                                 bool proxy)
+{
+  if(proxy)
+    conn->proxy_negotiate_state = GSS_AUTHNONE;
+  else
+    conn->http_negotiate_state = GSS_AUTHNONE;
+  if(neg_ctx)
+    Curl_auth_cleanup_spnego(neg_ctx);
+}
 
 CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
                               bool proxy, const char *header)
@@ -62,7 +69,6 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
     service = data->set.str[STRING_PROXY_SERVICE_NAME] ?
               data->set.str[STRING_PROXY_SERVICE_NAME] : "HTTP";
     host = conn->http_proxy.host.name;
-    neg_ctx = &conn->proxyneg;
     state = conn->proxy_negotiate_state;
 #else
     return CURLE_NOT_BUILT_IN;
@@ -74,9 +80,12 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
     service = data->set.str[STRING_SERVICE_NAME] ?
               data->set.str[STRING_SERVICE_NAME] : "HTTP";
     host = conn->host.name;
-    neg_ctx = &conn->negotiate;
     state = conn->http_negotiate_state;
   }
+
+  neg_ctx = Curl_auth_nego_get(conn, proxy);
+  if(!neg_ctx)
+    return CURLE_OUT_OF_MEMORY;
 
   /* Not set means empty */
   if(!userp)
@@ -94,12 +103,12 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
   if(!len) {
     if(state == GSS_AUTHSUCC) {
       infof(data, "Negotiate auth restarted");
-      Curl_http_auth_cleanup_negotiate(conn);
+      http_auth_nego_reset(conn, neg_ctx, proxy);
     }
     else if(state != GSS_AUTHNONE) {
       /* The server rejected our authentication and has not supplied any more
       negotiation mechanisms */
-      Curl_http_auth_cleanup_negotiate(conn);
+      http_auth_nego_reset(conn, neg_ctx, proxy);
       return CURLE_LOGIN_DENIED;
     }
   }
@@ -109,32 +118,32 @@ CURLcode Curl_input_negotiate(struct Curl_easy *data, struct connectdata *conn,
   neg_ctx->sslContext = conn->sslContext;
 #endif
   /* Check if the connection is using SSL and get the channel binding data */
-#ifdef HAVE_GSSAPI
+#ifdef GSS_C_CHANNEL_BOUND_FLAG
 #ifdef USE_SSL
   curlx_dyn_init(&neg_ctx->channel_binding_data, SSL_CB_MAX_SIZE + 1);
   if(Curl_conn_is_ssl(conn, FIRSTSOCKET)) {
-    result = Curl_ssl_get_channel_binding(
-      data, FIRSTSOCKET, &neg_ctx->channel_binding_data);
+    result = Curl_ssl_get_channel_binding(data, FIRSTSOCKET,
+                                          &neg_ctx->channel_binding_data);
     if(result) {
-      Curl_http_auth_cleanup_negotiate(conn);
+      http_auth_nego_reset(conn, neg_ctx, proxy);
       return result;
     }
   }
 #else
   curlx_dyn_init(&neg_ctx->channel_binding_data, 1);
 #endif /* USE_SSL */
-#endif /* HAVE_GSSAPI */
+#endif /* GSS_C_CHANNEL_BOUND_FLAG */
 
   /* Initialize the security context and decode our challenge */
   result = Curl_auth_decode_spnego_message(data, userp, passwdp, service,
                                            host, header, neg_ctx);
 
-#ifdef HAVE_GSSAPI
+#ifdef GSS_C_CHANNEL_BOUND_FLAG
   curlx_dyn_free(&neg_ctx->channel_binding_data);
 #endif
 
   if(result)
-    Curl_http_auth_cleanup_negotiate(conn);
+    http_auth_nego_reset(conn, neg_ctx, proxy);
 
   return result;
 }
@@ -152,7 +161,6 @@ CURLcode Curl_output_negotiate(struct Curl_easy *data,
 
   if(proxy) {
 #ifndef CURL_DISABLE_PROXY
-    neg_ctx = &conn->proxyneg;
     authp = &data->state.authproxy;
     state = &conn->proxy_negotiate_state;
 #else
@@ -160,10 +168,12 @@ CURLcode Curl_output_negotiate(struct Curl_easy *data,
 #endif
   }
   else {
-    neg_ctx = &conn->negotiate;
     authp = &data->state.authhost;
     state = &conn->http_negotiate_state;
   }
+  neg_ctx = Curl_auth_nego_get(conn, proxy);
+  if(!neg_ctx)
+    return CURLE_OUT_OF_MEMORY;
 
   authp->done = FALSE;
 
@@ -184,7 +194,7 @@ CURLcode Curl_output_negotiate(struct Curl_easy *data,
     if(neg_ctx->noauthpersist && *state == GSS_AUTHSUCC) {
       infof(data, "Curl_output_negotiate, "
             "no persistent authentication: cleanup existing context");
-      Curl_http_auth_cleanup_negotiate(conn);
+      http_auth_nego_reset(conn, neg_ctx, proxy);
     }
     if(!neg_ctx->context) {
       result = Curl_input_negotiate(data, conn, proxy, "Negotiate");
@@ -202,40 +212,40 @@ CURLcode Curl_output_negotiate(struct Curl_easy *data,
     if(result)
       return result;
 
-    userp = aprintf("%sAuthorization: Negotiate %s\r\n", proxy ? "Proxy-" : "",
-                    base64);
+    userp = curl_maprintf("%sAuthorization: Negotiate %s\r\n",
+                          proxy ? "Proxy-" : "", base64);
 
     if(proxy) {
 #ifndef CURL_DISABLE_PROXY
-      free(data->state.aptr.proxyuserpwd);
-      data->state.aptr.proxyuserpwd = userp;
+      curlx_free(data->req.proxyuserpwd);
+      data->req.proxyuserpwd = userp;
 #endif
     }
     else {
-      free(data->state.aptr.userpwd);
-      data->state.aptr.userpwd = userp;
+      curlx_free(data->req.userpwd);
+      data->req.userpwd = userp;
     }
 
-    free(base64);
+    curlx_free(base64);
 
     if(!userp) {
       return CURLE_OUT_OF_MEMORY;
     }
 
     *state = GSS_AUTHSENT;
-  #ifdef HAVE_GSSAPI
+#ifdef HAVE_GSSAPI
     if(neg_ctx->status == GSS_S_COMPLETE ||
        neg_ctx->status == GSS_S_CONTINUE_NEEDED) {
       *state = GSS_AUTHDONE;
     }
-  #else
-  #ifdef USE_WINDOWS_SSPI
+#else
+#ifdef USE_WINDOWS_SSPI
     if(neg_ctx->status == SEC_E_OK ||
        neg_ctx->status == SEC_I_CONTINUE_NEEDED) {
       *state = GSS_AUTHDONE;
     }
-  #endif
-  #endif
+#endif
+#endif
   }
 
   if(*state == GSS_AUTHDONE || *state == GSS_AUTHSUCC) {
@@ -247,15 +257,6 @@ CURLcode Curl_output_negotiate(struct Curl_easy *data,
   neg_ctx->havenegdata = FALSE;
 
   return CURLE_OK;
-}
-
-void Curl_http_auth_cleanup_negotiate(struct connectdata *conn)
-{
-  conn->http_negotiate_state = GSS_AUTHNONE;
-  conn->proxy_negotiate_state = GSS_AUTHNONE;
-
-  Curl_auth_cleanup_spnego(&conn->negotiate);
-  Curl_auth_cleanup_spnego(&conn->proxyneg);
 }
 
 #endif /* !CURL_DISABLE_HTTP && USE_SPNEGO */

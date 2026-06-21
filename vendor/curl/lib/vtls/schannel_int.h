@@ -24,39 +24,14 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "../curl_setup.h"
+#include "curl_setup.h"
 
 #ifdef USE_SCHANNEL
 
-#include "vtls.h"
+#include "vtls/vtls.h"
+#include "curl_sha256.h"
 
-#if (defined(__MINGW32__) || defined(CERT_CHAIN_REVOCATION_CHECK_CHAIN)) \
-  && !defined(CURL_WINDOWS_UWP)
-#define HAS_MANUAL_VERIFY_API
-#endif
-
-#if defined(CryptStringToBinary) && defined(CRYPT_STRING_HEX)   \
-  && !defined(DISABLE_SCHANNEL_CLIENT_CERT)
-#define HAS_CLIENT_CERT_PATH
-#endif
-
-#ifndef CRYPT_DECODE_NOCOPY_FLAG
-#define CRYPT_DECODE_NOCOPY_FLAG 0x1
-#endif
-
-#ifndef CRYPT_DECODE_ALLOC_FLAG
-#define CRYPT_DECODE_ALLOC_FLAG 0x8000
-#endif
-
-#ifndef CERT_ALT_NAME_DNS_NAME
-#define CERT_ALT_NAME_DNS_NAME 3
-#endif
-
-#ifndef CERT_ALT_NAME_IP_ADDRESS
-#define CERT_ALT_NAME_IP_ADDRESS 8
-#endif
-
-#if defined(_MSC_VER) && (_MSC_VER <= 1600)
+#if defined(_MSC_VER) && (_MSC_VER < 1700)
 /* Workaround for warning:
    'type cast' : conversion from 'int' to 'LPCSTR' of greater size */
 #undef CERT_STORE_PROV_MEMORY
@@ -67,104 +42,100 @@
 #define CERT_STORE_PROV_SYSTEM_W  ((LPCSTR)(size_t)10)
 #endif
 
+/* Offered by mingw-w64 v8+, MS SDK ~10+/~VS2022+ */
 #ifndef SCH_CREDENTIALS_VERSION
-
 #define SCH_CREDENTIALS_VERSION  0x00000005
 
-typedef enum _eTlsAlgorithmUsage
-{
-    TlsParametersCngAlgUsageKeyExchange,
-    TlsParametersCngAlgUsageSignature,
-    TlsParametersCngAlgUsageCipher,
-    TlsParametersCngAlgUsageDigest,
-    TlsParametersCngAlgUsageCertSig
+typedef enum _eTlsAlgorithmUsage {
+  TlsParametersCngAlgUsageKeyExchange,
+  TlsParametersCngAlgUsageSignature,
+  TlsParametersCngAlgUsageCipher,
+  TlsParametersCngAlgUsageDigest,
+  TlsParametersCngAlgUsageCertSig
 } eTlsAlgorithmUsage;
 
-typedef struct _CRYPTO_SETTINGS
-{
-    eTlsAlgorithmUsage  eAlgorithmUsage;
-    UNICODE_STRING      strCngAlgId;
-    DWORD               cChainingModes;
-    PUNICODE_STRING     rgstrChainingModes;
-    DWORD               dwMinBitLength;
-    DWORD               dwMaxBitLength;
+/* !checksrc! disable TYPEDEFSTRUCT 1 */
+typedef struct _CRYPTO_SETTINGS {
+  eTlsAlgorithmUsage  eAlgorithmUsage;
+  UNICODE_STRING      strCngAlgId;
+  DWORD               cChainingModes;
+  PUNICODE_STRING     rgstrChainingModes; /* spellchecker:disable-line */
+  DWORD               dwMinBitLength;
+  DWORD               dwMaxBitLength;
 } CRYPTO_SETTINGS, * PCRYPTO_SETTINGS;
 
-typedef struct _TLS_PARAMETERS
-{
-    DWORD               cAlpnIds;
-    PUNICODE_STRING     rgstrAlpnIds;
-    DWORD               grbitDisabledProtocols;
-    DWORD               cDisabledCrypto;
-    PCRYPTO_SETTINGS    pDisabledCrypto;
-    DWORD               dwFlags;
+/* !checksrc! disable TYPEDEFSTRUCT 1 */
+typedef struct _TLS_PARAMETERS {
+  DWORD               cAlpnIds;
+  PUNICODE_STRING     rgstrAlpnIds; /* spellchecker:disable-line */
+  DWORD               grbitDisabledProtocols;
+  DWORD               cDisabledCrypto;
+  PCRYPTO_SETTINGS    pDisabledCrypto;
+  DWORD               dwFlags;
 } TLS_PARAMETERS, * PTLS_PARAMETERS;
 
-typedef struct _SCH_CREDENTIALS
-{
-    DWORD               dwVersion;
-    DWORD               dwCredFormat;
-    DWORD               cCreds;
-    PCCERT_CONTEXT* paCred;
-    HCERTSTORE          hRootStore;
+/* !checksrc! disable TYPEDEFSTRUCT 1 */
+typedef struct _SCH_CREDENTIALS {
+  DWORD               dwVersion;
+  DWORD               dwCredFormat;
+  DWORD               cCreds;
+  PCCERT_CONTEXT* paCred;
+  HCERTSTORE          hRootStore;
 
-    DWORD               cMappers;
-    struct _HMAPPER **aphMappers;
+  DWORD               cMappers;
+  struct _HMAPPER **aphMappers;
 
-    DWORD               dwSessionLifespan;
-    DWORD               dwFlags;
-    DWORD               cTlsParameters;
-    PTLS_PARAMETERS     pTlsParameters;
+  DWORD               dwSessionLifespan;
+  DWORD               dwFlags;
+  DWORD               cTlsParameters;
+  PTLS_PARAMETERS     pTlsParameters;
 } SCH_CREDENTIALS, * PSCH_CREDENTIALS;
-
-#define SCH_CRED_MAX_SUPPORTED_PARAMETERS 16
-#define SCH_CRED_MAX_SUPPORTED_ALPN_IDS 16
-#define SCH_CRED_MAX_SUPPORTED_CRYPTO_SETTINGS 16
-#define SCH_CRED_MAX_SUPPORTED_CHAINING_MODES 16
 
 #endif /* SCH_CREDENTIALS_VERSION */
 
 struct Curl_schannel_cred {
   CredHandle cred_handle;
-  TimeStamp time_stamp;
   TCHAR *sni_hostname;
-#ifdef HAS_CLIENT_CERT_PATH
   HCERTSTORE client_cert_store;
-#endif
   int refcount;
 };
 
 struct Curl_schannel_ctxt {
   CtxtHandle ctxt_handle;
-  TimeStamp time_stamp;
+};
+
+/* handle encoding/decoding buffers */
+struct sbuffer {
+  size_t length;
+  size_t offset;
+  unsigned char *buffer;
 };
 
 struct schannel_ssl_backend_data {
+  struct sbuffer encdata;
+  struct sbuffer decdata;
   struct Curl_schannel_cred *cred;
   struct Curl_schannel_ctxt *ctxt;
   SecPkgContext_StreamSizes stream_sizes;
-  size_t encdata_length, decdata_length;
-  size_t encdata_offset, decdata_offset;
-  unsigned char *encdata_buffer, *decdata_buffer;
-  /* encdata_is_incomplete: if encdata contains only a partial record that
-     cannot be decrypted without another recv() (that is, status is
-     SEC_E_INCOMPLETE_MESSAGE) then set this true. after an recv() adds
-     more bytes into encdata then set this back to false. */
   unsigned long req_flags, ret_flags;
   CURLcode recv_unrecoverable_err; /* schannel_recv had an unrecoverable err */
+  struct schannel_renegotiate_state {
+    bool started;
+    struct curltime start_time;
+    int io_need;
+  } renegotiate_state;
   BIT(recv_sspi_close_notify); /* true if connection closed by close_notify */
   BIT(recv_connection_closed); /* true if connection closed, regardless how */
   BIT(recv_renegotiating);     /* true if recv is doing renegotiation */
   BIT(use_alpn); /* true if ALPN is used for this connection */
-#ifdef HAS_MANUAL_VERIFY_API
   BIT(use_manual_cred_validation); /* true if manual cred validation is used */
-#endif
   BIT(sent_shutdown);
+  /* encdata_is_incomplete: if encdata contains only a partial record that
+     cannot be decrypted without another recv() (that is, status is
+     SEC_E_INCOMPLETE_MESSAGE) then set this true. after recv() adds more
+     bytes into encdata then set this back to false. */
   BIT(encdata_is_incomplete);
 };
-
-/* key to use at `multi->proto_hash` */
-#define MPROTO_SCHANNEL_CERT_SHARE_KEY   "tls:schannel:cert:share"
 
 struct schannel_cert_share {
   unsigned char CAinfo_blob_digest[CURL_SHA256_DIGEST_LENGTH];
@@ -188,10 +159,10 @@ struct num_ip_data {
 };
 
 HCERTSTORE Curl_schannel_get_cached_cert_store(struct Curl_cfilter *cf,
-                                               const struct Curl_easy *data);
+                                               struct Curl_easy *data);
 
 bool Curl_schannel_set_cached_cert_store(struct Curl_cfilter *cf,
-                                         const struct Curl_easy *data,
+                                         struct Curl_easy *data,
                                          HCERTSTORE cert_store);
 
 #endif /* USE_SCHANNEL */
