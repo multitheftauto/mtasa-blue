@@ -99,8 +99,7 @@ static void PopulateHttpRequest(HttpRequest& httpReq, const httplib::Request& re
     for (const auto& h : req.headers)
     {
         std::string key = h.first;
-        for (auto& c : key)
-            c = static_cast<char>(::tolower(static_cast<unsigned char>(c)));
+        std::transform(key.begin(), key.end(), key.begin(), ::tolower);
         httpReq.oRequestHeaders[key] = h.second;
     }
 
