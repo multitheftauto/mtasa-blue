@@ -824,7 +824,10 @@ void CClientVehicleManager::ResetNotControlledRotors(bool engineAutoStart)
     eEntityStatus status = engineAutoStart ? eEntityStatus::STATUS_ABANDONED : eEntityStatus::STATUS_PHYSICS;
     for (auto& pVehicle : m_List)
     {
-        if (pVehicle->GetGameEntity() && pVehicle->GetVehicleRotorState() && !pVehicle->IsDriven())
+        // Blown aircraft should stay out of the unattended rotor workaround. For
+        // engine autostart off, putting wrecks into STATUS_PHYSICS lets later
+        // contacts keep producing detached components and explosion effects.
+        if (pVehicle->GetGameEntity() && pVehicle->GetVehicleRotorState() && !pVehicle->IsDriven() && !pVehicle->IsBlown())
         {
             float speed = (!engineAutoStart && pVehicle->IsEngineOn()) ? 0.001f : 0.0f;
             pVehicle->GetGameEntity()->SetEntityStatus(status);
