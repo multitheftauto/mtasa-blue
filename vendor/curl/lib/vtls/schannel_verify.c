@@ -23,61 +23,60 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
 /*
  * Source file for Schannel-specific certificate verification. This code should
  * only be invoked by code in schannel.c.
  */
-
-#include "../curl_setup.h"
+#include "curl_setup.h"
 
 #ifdef USE_SCHANNEL
+
 #ifndef USE_WINDOWS_SSPI
-#  error "cannot compile SCHANNEL support without SSPI."
+#error "cannot compile Schannel support without SSPI."
 #endif
 
-#include "schannel.h"
-#include "schannel_int.h"
+#include "vtls/schannel.h"
+#include "vtls/schannel_int.h"
 
-#include "../curlx/inet_pton.h"
-#include "vtls.h"
-#include "vtls_int.h"
-#include "../sendf.h"
-#include "../strerror.h"
-#include "../curlx/winapi.h"
-#include "../curlx/multibyte.h"
-#include "../curl_printf.h"
-#include "hostcheck.h"
-#include "../curlx/version_win32.h"
-
-/* The last #include file should be: */
-#include "../curl_memory.h"
-#include "../memdebug.h"
+#include "vtls/hostcheck.h"
+#include "vtls/vtls.h"
+#include "vtls/vtls_int.h"
+#include "curl_trc.h"
+#include "strerror.h"
+#include "curlx/fopen.h"
+#include "curlx/inet_pton.h"
+#include "curlx/multibyte.h"
+#include "curlx/version_win32.h"
+#include "curlx/winapi.h"
 
 #define BACKEND ((struct schannel_ssl_backend_data *)connssl->backend)
 
-#ifdef HAS_MANUAL_VERIFY_API
+#define MAX_CAFILE_SIZE (1024 * 1024) /* 1 MiB */
+#define BEGIN_CERT      "-----BEGIN CERTIFICATE-----"
+#define END_CERT        "\n-----END CERTIFICATE-----"
 
-#ifdef __MINGW32CE__
-#define CERT_QUERY_OBJECT_BLOB 0x00000002
-#define CERT_QUERY_CONTENT_CERT 1
-#define CERT_QUERY_CONTENT_FLAG_CERT (1 << CERT_QUERY_CONTENT_CERT)
-#define CERT_QUERY_FORMAT_BINARY 1
-#define CERT_QUERY_FORMAT_BASE64_ENCODED 2
-#define CERT_QUERY_FORMAT_ASN_ASCII_HEX_ENCODED 3
-#define CERT_QUERY_FORMAT_FLAG_ALL               \
-  (1 << CERT_QUERY_FORMAT_BINARY) |              \
-  (1 << CERT_QUERY_FORMAT_BASE64_ENCODED) |      \
-  (1 << CERT_QUERY_FORMAT_ASN_ASCII_HEX_ENCODED)
-#define CERT_CHAIN_REVOCATION_CHECK_CHAIN 0x20000000
-#define CERT_NAME_DISABLE_IE4_UTF8_FLAG 0x00010000
-#define CERT_TRUST_IS_OFFLINE_REVOCATION 0x01000000
-#endif /* __MINGW32CE__ */
+struct cert_chain_engine_config_win8 {
+  DWORD cbSize;
+  HCERTSTORE hRestrictedRoot;
+  HCERTSTORE hRestrictedTrust;
+  HCERTSTORE hRestrictedOther;
+  DWORD cAdditionalStore;
+  HCERTSTORE *rghAdditionalStore;
+  DWORD dwFlags;
+  DWORD dwUrlRetrievalTimeout;
+  DWORD MaximumCachedCertificates;
+  DWORD CycleDetectionModulus;
+  HCERTSTORE hExclusiveRoot;
+  HCERTSTORE hExclusiveTrustedPeople;
+  DWORD dwExclusiveFlags;
+};
 
-#define MAX_CAFILE_SIZE 1048576 /* 1 MiB */
-#define BEGIN_CERT "-----BEGIN CERTIFICATE-----"
-#define END_CERT "\n-----END CERTIFICATE-----"
+/* Offered by mingw-w64 v4+. MS SDK ~10+/~VS2017+. */
+#ifndef CERT_CHAIN_EXCLUSIVE_ENABLE_CA_FLAG
+#define CERT_CHAIN_EXCLUSIVE_ENABLE_CA_FLAG 0x00000001
+#endif
 
+/* Legacy structure to supply size to Win7 clients */
 struct cert_chain_engine_config_win7 {
   DWORD cbSize;
   HCERTSTORE hRestrictedRoot;
@@ -93,7 +92,6 @@ struct cert_chain_engine_config_win7 {
   HCERTSTORE hExclusiveTrustedPeople;
 };
 
-#ifndef UNDER_CE
 static int is_cr_or_lf(char c)
 {
   return c == '\r' || c == '\n';
@@ -159,11 +157,12 @@ static CURLcode add_certs_data_to_store(HCERTSTORE trust_store,
         const CERT_CONTEXT *cert_context = NULL;
         BOOL add_cert_result = FALSE;
         DWORD actual_content_type = 0;
-        DWORD cert_size = (DWORD)
-          ((end_cert_ptr + end_cert_len) - begin_cert_ptr);
+        DWORD cert_size =
+          (DWORD)((end_cert_ptr + end_cert_len) - begin_cert_ptr);
 
         cert_blob.pbData = (BYTE *)CURL_UNCONST(begin_cert_ptr);
         cert_blob.cbData = cert_size;
+        /* Caution: CryptQueryObject() is deprecated */
         if(!CryptQueryObject(CERT_QUERY_OBJECT_BLOB,
                              &cert_blob,
                              CERT_QUERY_CONTENT_FLAG_CERT,
@@ -202,7 +201,6 @@ static CURLcode add_certs_data_to_store(HCERTSTORE trust_store,
                                                cert_context,
                                                CERT_STORE_ADD_ALWAYS,
                                                NULL);
-            CertFreeCertificateContext(cert_context);
             if(!add_cert_result) {
               char buffer[WINAPI_ERROR_LEN];
               failf(data,
@@ -218,6 +216,21 @@ static CURLcode add_certs_data_to_store(HCERTSTORE trust_store,
               num_certs++;
             }
           }
+
+          switch(actual_content_type) {
+          case CERT_QUERY_CONTENT_CERT:
+          case CERT_QUERY_CONTENT_SERIALIZED_CERT:
+            CertFreeCertificateContext(cert_context);
+            break;
+          case CERT_QUERY_CONTENT_CRL:
+          case CERT_QUERY_CONTENT_SERIALIZED_CRL:
+            CertFreeCRLContext((PCCRL_CONTEXT)cert_context);
+            break;
+          case CERT_QUERY_CONTENT_CTL:
+          case CERT_QUERY_CONTENT_SERIALIZED_CTL:
+            CertFreeCTLContext((PCCTL_CONTEXT)cert_context);
+            break;
+          }
         }
       }
     }
@@ -225,13 +238,11 @@ static CURLcode add_certs_data_to_store(HCERTSTORE trust_store,
 
   if(result == CURLE_OK) {
     if(!num_certs) {
-      infof(data,
-            "schannel: did not add any certificates from CA file '%s'",
+      infof(data, "schannel: did not add any certificates from CA file '%s'",
             ca_file_text);
     }
     else {
-      infof(data,
-            "schannel: added %d certificate(s) from CA file '%s'",
+      infof(data, "schannel: added %d certificate(s) from CA file '%s'",
             num_certs, ca_file_text);
     }
   }
@@ -243,41 +254,27 @@ static CURLcode add_certs_file_to_store(HCERTSTORE trust_store,
                                         struct Curl_easy *data)
 {
   CURLcode result;
-  HANDLE ca_file_handle = INVALID_HANDLE_VALUE;
+  HANDLE ca_file_handle;
   LARGE_INTEGER file_size;
   char *ca_file_buffer = NULL;
-  TCHAR *ca_file_tstr = NULL;
   size_t ca_file_bufsize = 0;
   DWORD total_bytes_read = 0;
 
-  ca_file_tstr = curlx_convert_UTF8_to_tchar(ca_file);
-  if(!ca_file_tstr) {
-    char buffer[WINAPI_ERROR_LEN];
-    failf(data,
-          "schannel: invalid path name for CA file '%s': %s",
-          ca_file,
-          curlx_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
-    result = CURLE_SSL_CACERT_BADFILE;
-    goto cleanup;
-  }
-
   /*
    * Read the CA file completely into memory before parsing it. This
-   * optimizes for the common case where the CA file will be relatively
+   * optimizes for the common case where the CA file is relatively
    * small ( < 1 MiB ).
    */
-  ca_file_handle = CreateFile(ca_file_tstr,
-                              GENERIC_READ,
-                              FILE_SHARE_READ,
-                              NULL,
-                              OPEN_EXISTING,
-                              FILE_ATTRIBUTE_NORMAL,
-                              NULL);
+  ca_file_handle = curlx_CreateFile(ca_file,
+                                    GENERIC_READ,
+                                    FILE_SHARE_READ,
+                                    NULL,
+                                    OPEN_EXISTING,
+                                    FILE_ATTRIBUTE_NORMAL,
+                                    NULL);
   if(ca_file_handle == INVALID_HANDLE_VALUE) {
     char buffer[WINAPI_ERROR_LEN];
-    failf(data,
-          "schannel: failed to open CA file '%s': %s",
-          ca_file,
+    failf(data, "schannel: failed to open CA file '%s': %s", ca_file,
           curlx_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
     result = CURLE_SSL_CACERT_BADFILE;
     goto cleanup;
@@ -285,8 +282,7 @@ static CURLcode add_certs_file_to_store(HCERTSTORE trust_store,
 
   if(!GetFileSizeEx(ca_file_handle, &file_size)) {
     char buffer[WINAPI_ERROR_LEN];
-    failf(data,
-          "schannel: failed to determine size of CA file '%s': %s",
+    failf(data, "schannel: failed to determine size of CA file '%s': %s",
           ca_file,
           curlx_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
     result = CURLE_SSL_CACERT_BADFILE;
@@ -294,15 +290,14 @@ static CURLcode add_certs_file_to_store(HCERTSTORE trust_store,
   }
 
   if(file_size.QuadPart > MAX_CAFILE_SIZE) {
-    failf(data,
-          "schannel: CA file exceeds max size of %u bytes",
+    failf(data, "schannel: CA file exceeds max size of %d bytes",
           MAX_CAFILE_SIZE);
     result = CURLE_SSL_CACERT_BADFILE;
     goto cleanup;
   }
 
   ca_file_bufsize = (size_t)file_size.QuadPart;
-  ca_file_buffer = (char *)malloc(ca_file_bufsize + 1);
+  ca_file_buffer = (char *)curlx_malloc(ca_file_bufsize + 1);
   if(!ca_file_buffer) {
     result = CURLE_OUT_OF_MEMORY;
     goto cleanup;
@@ -315,9 +310,7 @@ static CURLcode add_certs_file_to_store(HCERTSTORE trust_store,
     if(!ReadFile(ca_file_handle, ca_file_buffer + total_bytes_read,
                  bytes_to_read, &bytes_read, NULL)) {
       char buffer[WINAPI_ERROR_LEN];
-      failf(data,
-            "schannel: failed to read from CA file '%s': %s",
-            ca_file,
+      failf(data, "schannel: failed to read from CA file '%s': %s", ca_file,
             curlx_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
       result = CURLE_SSL_CACERT_BADFILE;
       goto cleanup;
@@ -343,16 +336,11 @@ cleanup:
   if(ca_file_handle != INVALID_HANDLE_VALUE) {
     CloseHandle(ca_file_handle);
   }
-  Curl_safefree(ca_file_buffer);
-  curlx_unicodefree(ca_file_tstr);
+  curlx_safefree(ca_file_buffer);
 
   return result;
 }
-#endif
 
-#endif /* HAS_MANUAL_VERIFY_API */
-
-#ifndef UNDER_CE
 /*
  * Returns the number of characters necessary to populate all the host_names.
  * If host_names is not NULL, populate it with all the hostnames. Each string
@@ -368,22 +356,17 @@ static DWORD cert_get_name_string(struct Curl_easy *data,
                                   BOOL Win8_compat)
 {
   DWORD actual_length = 0;
-#if defined(CURL_WINDOWS_UWP)
-  (void)data;
-  (void)cert_context;
-  (void)host_names;
-  (void)length;
-  (void)alt_name_info;
-  (void)Win8_compat;
-#else
   BOOL compute_content = FALSE;
   LPTSTR current_pos = NULL;
   DWORD i;
 
-#ifdef CERT_NAME_SEARCH_ALL_NAMES_FLAG
   /* CERT_NAME_SEARCH_ALL_NAMES_FLAG is available from Windows 8 onwards. */
   if(Win8_compat) {
-    /* CertGetNameString will provide the 8-bit character string without
+/* Offered by mingw-w64 v4+. MS SDK ~10+/~VS2017+. */
+#ifndef CERT_NAME_SEARCH_ALL_NAMES_FLAG
+#define CERT_NAME_SEARCH_ALL_NAMES_FLAG 0x2
+#endif
+    /* CertGetNameString provides the 8-bit character string without
      * any decoding */
     DWORD name_flags =
       CERT_NAME_DISABLE_IE4_UTF8_FLAG | CERT_NAME_SEARCH_ALL_NAMES_FLAG;
@@ -395,10 +378,6 @@ static DWORD cert_get_name_string(struct Curl_easy *data,
                                       length);
     return actual_length;
   }
-#else
-  (void)cert_context;
-  (void)Win8_compat;
-#endif
 
   if(!alt_name_info)
     return 0;
@@ -449,37 +428,33 @@ static DWORD cert_get_name_string(struct Curl_easy *data,
     /* Last string has double null-terminator. */
     *current_pos = '\0';
   }
-#endif
   return actual_length;
 }
 
 /*
-* Returns TRUE if the hostname is a numeric IPv4/IPv6 Address,
-* and populates the buffer with IPv4/IPv6 info.
-*/
+ * Returns TRUE if the hostname is a numeric IPv4/IPv6 Address,
+ * and populates the buffer with IPv4/IPv6 info.
+ */
 
-static bool get_num_host_info(struct num_ip_data *ip_blob,
-                              LPCSTR hostname)
+static bool get_num_host_info(struct num_ip_data *ip_blob, LPCSTR hostname)
 {
   struct in_addr ia;
-  struct in6_addr ia6;
-  bool result = FALSE;
-
   int res = curlx_inet_pton(AF_INET, hostname, &ia);
   if(res) {
     ip_blob->size = sizeof(struct in_addr);
     memcpy(&ip_blob->bData.ia, &ia, sizeof(struct in_addr));
-    result = TRUE;
+    return TRUE;
   }
   else {
+    struct in6_addr ia6;
     res = curlx_inet_pton(AF_INET6, hostname, &ia6);
     if(res) {
       ip_blob->size = sizeof(struct in6_addr);
       memcpy(&ip_blob->bData.ia6, &ia6, sizeof(struct in6_addr));
-      result = TRUE;
+      return TRUE;
     }
   }
-  return result;
+  return FALSE;
 }
 
 static bool get_alt_name_info(struct Curl_easy *data,
@@ -487,26 +462,19 @@ static bool get_alt_name_info(struct Curl_easy *data,
                               PCERT_ALT_NAME_INFO *alt_name_info,
                               LPDWORD alt_name_info_size)
 {
-  bool result = FALSE;
-#if defined(CURL_WINDOWS_UWP)
-  (void)data;
-  (void)ctx;
-  (void)alt_name_info;
-  (void)alt_name_info_size;
-#else
   PCERT_INFO cert_info = NULL;
   PCERT_EXTENSION extension = NULL;
   CRYPT_DECODE_PARA decode_para = { sizeof(CRYPT_DECODE_PARA), NULL, NULL };
 
   if(!ctx) {
     failf(data, "schannel: Null certificate context.");
-    return result;
+    return FALSE;
   }
 
   cert_info = ctx->pCertInfo;
   if(!cert_info) {
     failf(data, "schannel: Null certificate info.");
-    return result;
+    return FALSE;
   }
 
   extension = CertFindExtension(szOID_SUBJECT_ALT_NAME2,
@@ -514,7 +482,7 @@ static bool get_alt_name_info(struct Curl_easy *data,
                                 cert_info->rgExtension);
   if(!extension) {
     failf(data, "schannel: CertFindExtension() returned no extension.");
-    return result;
+    return FALSE;
   }
 
   if(!CryptDecodeObjectEx(X509_ASN_ENCODING | PKCS_7_ASN_ENCODING,
@@ -525,76 +493,19 @@ static bool get_alt_name_info(struct Curl_easy *data,
                           &decode_para,
                           alt_name_info,
                           alt_name_info_size)) {
-    failf(data,
-          "schannel: CryptDecodeObjectEx() returned no alternate name "
+    failf(data, "schannel: CryptDecodeObjectEx() returned no alternate name "
           "information.");
-    return result;
+    return FALSE;
   }
-  result = TRUE;
-#endif
-  return result;
+  return TRUE;
 }
-#endif /* !UNDER_CE */
 
 /* Verify the server's hostname */
-CURLcode Curl_verify_host(struct Curl_cfilter *cf,
-                          struct Curl_easy *data)
+CURLcode Curl_verify_host(struct Curl_cfilter *cf, struct Curl_easy *data)
 {
   CURLcode result = CURLE_PEER_FAILED_VERIFICATION;
   struct ssl_connect_data *connssl = cf->ctx;
   CERT_CONTEXT *pCertContextServer = NULL;
-#ifdef UNDER_CE
-  TCHAR cert_hostname_buff[256];
-  DWORD len;
-
-  /* This code does not support certificates with multiple alternative names.
-   * Right now we are only asking for the first preferred alternative name.
-   * Instead we would need to do all via CERT_NAME_SEARCH_ALL_NAMES_FLAG
-   * (If Windows CE supports that?) and run this section in a loop for each.
-   * https://msdn.microsoft.com/en-us/library/windows/desktop/aa376086.aspx
-   * curl: (51) schannel: CertGetNameString() certificate hostname
-   * (.google.com) did not match connection (google.com)
-   */
-  len = CertGetNameString(pCertContextServer,
-                          CERT_NAME_DNS_TYPE,
-                          CERT_NAME_DISABLE_IE4_UTF8_FLAG,
-                          NULL,
-                          cert_hostname_buff,
-                          256);
-  if(len > 0) {
-    /* Comparing the cert name and the connection hostname encoded as UTF-8
-     * is acceptable since both values are assumed to use ASCII
-     * (or some equivalent) encoding
-     */
-    char *cert_hostname = curlx_convert_tchar_to_UTF8(cert_hostname_buff);
-    if(!cert_hostname) {
-      result = CURLE_OUT_OF_MEMORY;
-    }
-    else{
-      const char *conn_hostname = connssl->peer.hostname;
-      if(Curl_cert_hostcheck(cert_hostname, strlen(cert_hostname),
-                             conn_hostname, strlen(conn_hostname))) {
-        infof(data,
-              "schannel: connection hostname (%s) validated "
-              "against certificate name (%s)\n",
-              conn_hostname, cert_hostname);
-        result = CURLE_OK;
-      }
-      else{
-        failf(data,
-              "schannel: connection hostname (%s) "
-              "does not match certificate name (%s)",
-              conn_hostname, cert_hostname);
-      }
-      Curl_safefree(cert_hostname);
-    }
-  }
-  else {
-    failf(data,
-          "schannel: CertGetNameString did not provide any "
-          "certificate name information");
-  }
-#else
   SECURITY_STATUS sspi_status;
   TCHAR *cert_hostname_buff = NULL;
   size_t cert_hostname_buff_index = 0;
@@ -611,8 +522,8 @@ CURLcode Curl_verify_host(struct Curl_cfilter *cf,
 
   sspi_status =
     Curl_pSecFn->QueryContextAttributes(&BACKEND->ctxt->ctxt_handle,
-                                     SECPKG_ATTR_REMOTE_CERT_CONTEXT,
-                                     &pCertContextServer);
+                                        SECPKG_ATTR_REMOTE_CERT_CONTEXT,
+                                        &pCertContextServer);
 
   if((sspi_status != SEC_E_OK) || !pCertContextServer) {
     char buffer[WINAPI_ERROR_LEN];
@@ -658,22 +569,23 @@ CURLcode Curl_verify_host(struct Curl_cfilter *cf,
       goto cleanup;
     }
 
-    /* CertGetNameString guarantees that the returned name will not contain
+    /* CertGetNameString guarantees that the returned name does not contain
      * embedded null bytes. This appears to be undocumented behavior.
      */
-    cert_hostname_buff = (LPTSTR)malloc(len * sizeof(TCHAR));
+    cert_hostname_buff = (LPTSTR)curlx_malloc(len * sizeof(TCHAR));
     if(!cert_hostname_buff) {
       result = CURLE_OUT_OF_MEMORY;
       goto cleanup;
     }
     actual_len = cert_get_name_string(data, pCertContextServer,
-                 (LPTSTR)cert_hostname_buff, len, alt_name_info, Win8_compat);
+                                      (LPTSTR)cert_hostname_buff, len,
+                                      alt_name_info, Win8_compat);
 
     /* Sanity check */
     if(actual_len != len) {
       failf(data,
-      "schannel: CertGetNameString() returned certificate "
-      "name information of unexpected size");
+            "schannel: CertGetNameString() returned certificate "
+            "name information of unexpected size");
       goto cleanup;
     }
 
@@ -684,7 +596,6 @@ CURLcode Curl_verify_host(struct Curl_cfilter *cf,
     while(cert_hostname_buff_index < len &&
           cert_hostname_buff[cert_hostname_buff_index] != TEXT('\0') &&
           result == CURLE_PEER_FAILED_VERIFICATION) {
-
       char *cert_hostname;
 
       /* Comparing the cert name and the connection hostname encoded as UTF-8
@@ -692,15 +603,14 @@ CURLcode Curl_verify_host(struct Curl_cfilter *cf,
        * (or some equivalent) encoding
        */
       cert_hostname = curlx_convert_tchar_to_UTF8(
-      &cert_hostname_buff[cert_hostname_buff_index]);
+        &cert_hostname_buff[cert_hostname_buff_index]);
       if(!cert_hostname) {
         result = CURLE_OUT_OF_MEMORY;
       }
       else {
         if(Curl_cert_hostcheck(cert_hostname, strlen(cert_hostname),
                                conn_hostname, hostlen)) {
-          infof(data,
-                "schannel: connection hostname (%s) validated "
+          infof(data, "schannel: connection hostname (%s) validated "
                 "against certificate name (%s)",
                 conn_hostname, cert_hostname);
           result = CURLE_OK;
@@ -721,7 +631,7 @@ CURLcode Curl_verify_host(struct Curl_cfilter *cf,
 
           result = CURLE_PEER_FAILED_VERIFICATION;
         }
-        curlx_unicodefree(cert_hostname);
+        curlx_free(cert_hostname);
       }
     }
 
@@ -736,16 +646,15 @@ CURLcode Curl_verify_host(struct Curl_cfilter *cf,
   }
 
 cleanup:
-  Curl_safefree(cert_hostname_buff);
+  LocalFree(alt_name_info);
+  curlx_safefree(cert_hostname_buff);
 
   if(pCertContextServer)
     CertFreeCertificateContext(pCertContextServer);
-#endif /* !UNDER_CE */
 
   return result;
 }
 
-#ifdef HAS_MANUAL_VERIFY_API
 /* Verify the server's certificate and hostname */
 CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
                                  struct Curl_easy *data)
@@ -758,10 +667,8 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
   CERT_CONTEXT *pCertContextServer = NULL;
   const CERT_CHAIN_CONTEXT *pChainContext = NULL;
   HCERTCHAINENGINE cert_chain_engine = NULL;
-#ifndef UNDER_CE
   HCERTSTORE trust_store = NULL;
   HCERTSTORE own_trust_store = NULL;
-#endif /* !UNDER_CE */
 
   DEBUGASSERT(BACKEND);
 
@@ -777,10 +684,9 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
     result = CURLE_PEER_FAILED_VERIFICATION;
   }
 
-#ifndef UNDER_CE
   if(result == CURLE_OK &&
-      (conn_config->CAfile || conn_config->ca_info_blob) &&
-      BACKEND->use_manual_cred_validation) {
+     (conn_config->CAfile || conn_config->ca_info_blob) &&
+     BACKEND->use_manual_cred_validation) {
     /*
      * Create a chain engine that uses the certificates in the CA file as
      * trusted certificates. This is only supported on Windows 7+.
@@ -838,14 +744,23 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
     }
 
     if(result == CURLE_OK) {
-      struct cert_chain_engine_config_win7 engine_config;
+      struct cert_chain_engine_config_win8 engine_config;
       BOOL create_engine_result;
 
       memset(&engine_config, 0, sizeof(engine_config));
-      engine_config.cbSize = sizeof(engine_config);
       engine_config.hExclusiveRoot = trust_store;
 
-      /* CertCreateCertificateChainEngine will check the expected size of the
+      /* Win8/Server2012 allows us to match partial chains */
+      if(curlx_verify_windows_version(6, 2, 0, PLATFORM_WINNT,
+                                      VERSION_GREATER_THAN_EQUAL) &&
+         !ssl_config->no_partialchain) {
+        engine_config.cbSize = sizeof(engine_config);
+        engine_config.dwExclusiveFlags = CERT_CHAIN_EXCLUSIVE_ENABLE_CA_FLAG;
+      }
+      else
+        engine_config.cbSize = sizeof(struct cert_chain_engine_config_win7);
+
+      /* CertCreateCertificateChainEngine checks the expected size of the
        * CERT_CHAIN_ENGINE_CONFIG structure and fail if the specified size
        * does not match the expected size. When this occurs, it indicates that
        * CAINFO is not supported on the version of Windows in use.
@@ -862,7 +777,6 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
       }
     }
   }
-#endif /* !UNDER_CE */
 
   if(result == CURLE_OK) {
     CERT_CHAIN_PARA ChainPara;
@@ -880,7 +794,7 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
                                 NULL,
                                 &pChainContext)) {
       char buffer[WINAPI_ERROR_LEN];
-      failf(data, "schannel: CertGetCertificateChain failed: %s",
+      failf(data, "schannel: failed to get the certificate chain: %s",
             curlx_winapi_strerror(GetLastError(), buffer, sizeof(buffer)));
       pChainContext = NULL;
       result = CURLE_PEER_FAILED_VERIFICATION;
@@ -896,28 +810,25 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
          * list URL, or when the list could not be downloaded because the
          * server is currently unreachable. */
         dwTrustErrorMask &= ~(DWORD)(CERT_TRUST_REVOCATION_STATUS_UNKNOWN |
-          CERT_TRUST_IS_OFFLINE_REVOCATION);
+                                     CERT_TRUST_IS_OFFLINE_REVOCATION);
       }
 
       if(dwTrustErrorMask) {
         if(dwTrustErrorMask & CERT_TRUST_IS_REVOKED)
-          failf(data, "schannel: CertGetCertificateChain trust error"
-                " CERT_TRUST_IS_REVOKED");
+          failf(data, "schannel: trust for this certificate or one of "
+                "the certificates in the certificate chain has been revoked");
         else if(dwTrustErrorMask & CERT_TRUST_IS_PARTIAL_CHAIN)
-          failf(data, "schannel: CertGetCertificateChain trust error"
-                " CERT_TRUST_IS_PARTIAL_CHAIN");
+          failf(data, "schannel: the certificate chain is incomplete");
         else if(dwTrustErrorMask & CERT_TRUST_IS_UNTRUSTED_ROOT)
-          failf(data, "schannel: CertGetCertificateChain trust error"
-                " CERT_TRUST_IS_UNTRUSTED_ROOT");
+          failf(data, "schannel: the certificate or certificate chain is "
+                "based on an untrusted root");
         else if(dwTrustErrorMask & CERT_TRUST_IS_NOT_TIME_VALID)
-          failf(data, "schannel: CertGetCertificateChain trust error"
-                " CERT_TRUST_IS_NOT_TIME_VALID");
+          failf(data, "schannel: this certificate or one of the certificates "
+                "in the certificate chain is not time valid");
         else if(dwTrustErrorMask & CERT_TRUST_REVOCATION_STATUS_UNKNOWN)
-          failf(data, "schannel: CertGetCertificateChain trust error"
-                " CERT_TRUST_REVOCATION_STATUS_UNKNOWN");
+          failf(data, "schannel: the revocation status is unknown");
         else
-          failf(data, "schannel: CertGetCertificateChain error mask: 0x%08lx",
-                dwTrustErrorMask);
+          failf(data, "schannel: error 0x%08lx", dwTrustErrorMask);
         result = CURLE_PEER_FAILED_VERIFICATION;
       }
     }
@@ -929,7 +840,6 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
     }
   }
 
-#ifndef UNDER_CE
   if(cert_chain_engine) {
     CertFreeCertificateChainEngine(cert_chain_engine);
   }
@@ -937,7 +847,6 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
   if(own_trust_store) {
     CertCloseStore(own_trust_store, 0);
   }
-#endif /* !UNDER_CE */
 
   if(pChainContext)
     CertFreeCertificateChain(pChainContext);
@@ -948,5 +857,4 @@ CURLcode Curl_verify_certificate(struct Curl_cfilter *cf,
   return result;
 }
 
-#endif /* HAS_MANUAL_VERIFY_API */
 #endif /* USE_SCHANNEL */
