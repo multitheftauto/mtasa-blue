@@ -23,6 +23,7 @@ class CPlayer;
 #include "CObject.h"
 #include "packets/CPacket.h"
 #include "packets/CPlayerStatsPacket.h"
+#include "packets/CProjectileSyncPacket.h"
 #include "CStringName.h"
 class CKeyBinds;
 class CPlayerCamera;
@@ -166,6 +167,16 @@ public:
     unsigned int                        CountSyncingObjects() { return static_cast<unsigned int>(m_SyncingObjects.size()); };
     std::list<CObject*>::const_iterator IterSyncingObjectBegin() { return m_SyncingObjects.begin(); };
     std::list<CObject*>::const_iterator IterSyncingObjectEnd() { return m_SyncingObjects.end(); };
+
+    // Projectiles with a lasting world presence (satchels, teargas clouds, molotov fires) planted/thrown by this
+    // player, kept so players who come into range later still see them (https://github.com/multitheftauto/mtasa-blue/issues/369, #368)
+    struct SPersistentProjectileInfo
+    {
+        CProjectileSyncPacket        packet;             // Original creation packet data (source element re-applied on resend)
+        std::unordered_set<CPlayer*> notifiedPlayers;
+        CTickCount                   expiryTime;            // Default (zero) means it never expires on its own (e.g. satchels, cleared explicitly instead)
+    };
+    std::vector<SPersistentProjectileInfo>& GetPersistentProjectilesList() { return m_PersistentProjectilesList; };
 
     unsigned int GetScriptDebugLevel() { return m_uiScriptDebugLevel; };
     bool         SetScriptDebugLevel(std::uint8_t level);
@@ -384,6 +395,8 @@ private:
     std::list<CVehicle*> m_SyncingVehicles;
     std::list<CPed*>     m_SyncingPeds;
     std::list<CObject*>  m_SyncingObjects;
+
+    std::vector<SPersistentProjectileInfo> m_PersistentProjectilesList;
 
     unsigned int m_uiScriptDebugLevel;
 

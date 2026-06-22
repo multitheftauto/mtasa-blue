@@ -532,6 +532,7 @@ void CGame::DoPulse()
 #ifdef WITH_OBJECT_SYNC
     CLOCK_CALL1(m_pObjectSync->DoPulse(););
 #endif
+    CLOCK_CALL1(ProcessProjectileStreamIn(););
     CLOCK_CALL1(m_pBanManager->DoPulse(););
     CLOCK_CALL1(m_pAccountManager->DoPulse(););
     CLOCK_CALL1(m_pRegistryManager->DoPulse(););
@@ -2818,6 +2819,8 @@ void CGame::Packet_DetonateSatchels(CDetonateSatchelsPacket& Packet)
         m_pPlayerManager->BroadcastOnlyJoined(Packet);
         // Take away their detonator
         CStaticFunctionDefinitions::TakeWeapon(pPlayer, 40);
+        // They're gone now, stop tracking them for stream-in
+        pPlayer->GetPersistentProjectilesList().clear();
     }
 }
 
@@ -2831,6 +2834,8 @@ void CGame::Packet_DestroySatchels(CDestroySatchelsPacket& Packet)
         m_pPlayerManager->BroadcastOnlyJoined(Packet);
         // Take away their detonator
         CStaticFunctionDefinitions::TakeWeapon(pPlayer, 40);
+        // They're gone now, stop tracking them for stream-in
+        pPlayer->GetPersistentProjectilesList().clear();
     }
 }
 
@@ -3018,6 +3023,87 @@ void CGame::Packet_ProjectileSync(CProjectileSyncPacket& Packet)
             }
         }
         CPlayerManager::Broadcast(Packet, sendList);
+
+        // Some projectiles have a lasting world presence (satchels stay until detonated/destroyed, teargas leaves
+        // a lingering gas cloud, molotovs leave a burning fire) so players who weren't close enough at creation time
+        // never see them, even after walking right up to them. Remember these and keep checking for players who
+        // come into range later (https://github.com/multitheftauto/mtasa-blue/issues/369, #368).
+        // PERSISTENT_PROJECTILE_LIFETIME (20s) comfortably outlasts the native gas/fire visual effect, while satchels
+        // (expiryTime left at zero) are only ever removed explicitly, since they have no lifespan of their own.
+        constexpr unsigned long PERSISTENT_PROJECTILE_LIFETIME = 20000;
+
+        bool bIsPersistentProjectile = false;
+        CTickCount expiryTime;            // Zero means "doesn't expire on its own"
+        if (Packet.m_ucWeaponType == WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
+            bIsPersistentProjectile = true;
+        else if (Packet.m_ucWeaponType == WEAPONTYPE_TEARGAS || Packet.m_ucWeaponType == WEAPONTYPE_MOLOTOV)
+        {
+            bIsPersistentProjectile = true;
+            expiryTime = CTickCount::Now() + CTickCount(static_cast<long long>(PERSISTENT_PROJECTILE_LIFETIME));
+        }
+
+        if (bIsPersistentProjectile)
+        {
+            CPlayer::SPersistentProjectileInfo info;
+            info.packet = Packet;
+            info.expiryTime = expiryTime;
+            info.notifiedPlayers.insert(pPlayer);
+            for (const auto& [usBitStreamVersion, pSendPlayer] : sendList)
+                info.notifiedPlayers.insert(pSendPlayer);
+            pPlayer->GetPersistentProjectilesList().push_back(std::move(info));
+        }
+    }
+}
+
+void CGame::ProcessProjectileStreamIn()
+{
+    if (m_ProjectileStreamInTimer.Get() < 500)
+        return;
+    m_ProjectileStreamInTimer.Reset();
+
+    const CTickCount now = CTickCount::Now();
+
+    for (auto iter = m_pPlayerManager->IterBegin(); iter != m_pPlayerManager->IterEnd(); ++iter)
+    {
+        CPlayer* pOwner = *iter;
+
+        auto& projectilesList = pOwner->GetPersistentProjectilesList();
+        if (projectilesList.empty())
+            continue;
+
+        // Drop expired entries (teargas/molotov) before doing any range checks
+        projectilesList.erase(std::remove_if(projectilesList.begin(), projectilesList.end(),
+                                              [&](const CPlayer::SPersistentProjectileInfo& info)
+                                              { return info.expiryTime != CTickCount() && now >= info.expiryTime; }),
+                               projectilesList.end());
+
+        for (auto& projectileInfo : projectilesList)
+        {
+            CVector vecPosition = projectileInfo.packet.m_vecOrigin;
+            if (projectileInfo.packet.m_OriginID != INVALID_ELEMENT_ID)
+            {
+                if (CElement* pOriginSource = CElementIDs::GetElement(projectileInfo.packet.m_OriginID))
+                    vecPosition += pOriginSource->GetPosition();
+            }
+
+            for (auto playerIter = m_pPlayerManager->IterBegin(); playerIter != m_pPlayerManager->IterEnd(); ++playerIter)
+            {
+                CPlayer* pOther = *playerIter;
+                if (pOther == pOwner || !pOther->IsJoined() || projectileInfo.notifiedPlayers.count(pOther) > 0)
+                    continue;
+
+                CVector vecCameraPosition;
+                pOther->GetCamera()->GetPosition(vecCameraPosition);
+
+                if (IsPointNearPoint3D(vecPosition, vecCameraPosition, MAX_PROJECTILE_SYNC_DISTANCE))
+                {
+                    CProjectileSyncPacket sendPacket = projectileInfo.packet;
+                    sendPacket.SetSourceElement(pOwner);
+                    pOther->Send(sendPacket);
+                    projectileInfo.notifiedPlayers.insert(pOther);
+                }
+            }
+        }
     }
 }
 

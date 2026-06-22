@@ -500,6 +500,7 @@ private:
     void Packet_DestroySatchels(class CDestroySatchelsPacket& Packet);
     void Packet_ExplosionSync(class CExplosionSyncPacket& Packet);
     void Packet_ProjectileSync(class CProjectileSyncPacket& Packet);
+    void ProcessProjectileStreamIn();
     void Packet_Command(class CCommandPacket& Packet);
     void Packet_VehicleDamageSync(class CVehicleDamageSyncPacket& Packet);
     void Packet_VehiclePuresync(class CVehiclePuresyncPacket& Packet);
@@ -557,6 +558,7 @@ private:
 #ifdef WITH_OBJECT_SYNC
     CObjectSync* m_pObjectSync;
 #endif
+    CElapsedTime m_ProjectileStreamInTimer;
     CMarkerManager*                   m_pMarkerManager;
     CClock*                           m_pClock;
     CBanManager*                      m_pBanManager;
