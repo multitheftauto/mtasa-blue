@@ -289,7 +289,7 @@ protected:
     int   m_iCaretIndex = 0;
     int   m_iSelectionAnchor = 0;
     bool  m_bMouseSelecting = false;
-    float m_fCaretBlinkTimer = 0.0f;
+    float m_fCaretBlinkTimer = 0.0f;            // GetSecondCount() value the blink phase is measured from
 
     // Contains a saved copy of initial input text when navigating history entries
     std::string m_strSavedInputText;
