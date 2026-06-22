@@ -2021,7 +2021,7 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 #endif  // MTA_CLIENT
 
 #ifdef SHAREDUTIL_PLATFORM_WINDOWS
-    #define _WIN32_WINNT_WIN8 0x0602
+    #define _WIN32_WINNT_WIN8  0x0602
     #define _WIN32_WINNT_WIN10 0x0A00
 ///////////////////////////////////////////////////////////////////////////
 //
