@@ -2832,29 +2832,32 @@ inner:
 ////////////////////////////////////////////////////////////////////////
 // CAnimManager::CreateAnimAssocGroups
 //
-// CModelInfo::ms_modelInfoPtrs at the given index is a null pointer
+// Missing model info or RwObject before the clump is used for associations
 ////////////////////////////////////////////////////////////////////////
-void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
+bool OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 {
     CModelInfo*                pModelInfo = pGameInterface->GetModelInfo(uiModelId);
     CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
-    if (!pInterface || pInterface->pRwObject == nullptr)
+    if (!pInterface || !pInterface->pRwObject)
     {
-        // Crash will occur at offset 00349b7b
+        OnCrashAverted(816);
         LogEvent(816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString("No RwObject for model:%d", uiModelId), 5416);
         CArgMap argMap;
         argMap.Set("id", uiModelId);
         argMap.Set("reason", "createanim");
         SetApplicationSetting("diagnostics", "gta-model-fail", argMap.ToString());
+        return false;
     }
+    return true;
 }
 
 // Hook info
 #define HOOKPOS_CAnimManager_CreateAnimAssocGroups   0x4D3D52
 #define HOOKSIZE_CAnimManager_CreateAnimAssocGroups  5
 #define HOOKCHECK_CAnimManager_CreateAnimAssocGroups 0x8B
-DWORD                         RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
-static void __declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
+DWORD                 RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
+DWORD                 RETURN_CAnimManager_CreateAnimAssocGroups_Skip = 0x4D3D71;
+void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
@@ -2865,15 +2868,80 @@ static void __declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
         push    eax
         call    OnMY_CAnimManager_CreateAnimAssocGroups
         add     esp, 4*1
+        test    al, al
         popad
+        jz      skipCreateInstance
 
-             // Replaced code
+        // Replaced code
         push    ecx
         mov     ecx, dword ptr[ARRAY_ModelInfo]
         mov     eax, dword ptr[ecx + eax*4]
         pop     ecx
 
         jmp     RETURN_CAnimManager_CreateAnimAssocGroups
+
+    skipCreateInstance:
+        xor     ebx, ebx
+        jmp     RETURN_CAnimManager_CreateAnimAssocGroups_Skip
+    }
+    // clang-format on
+}
+
+void OnMY_CAnimBlendAssocGroup_CreateAssociations(CBaseModelInfoSAInterface* pModelInfo)
+{
+    OnCrashAverted(816);
+
+    int                         iModelId = -1;
+    CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
+    const int                   maximumModelId = pGameInterface->GetBaseIDforTXD();
+    for (int i = 0; i < maximumModelId; i++)
+    {
+        if (ppModelInfo[i] == pModelInfo)
+        {
+            iModelId = i;
+            break;
+        }
+    }
+
+    LogEvent(816, "Model not loaded", "CAnimBlendAssocGroup_CreateAssociations", SString("No RwObject for model:%d", iModelId), 5416);
+    CArgMap argMap;
+    argMap.Set("id", iModelId);
+    argMap.Set("reason", "createassoc");
+    SetApplicationSetting("diagnostics", "gta-model-fail", argMap.ToString());
+}
+
+#define HOOKPOS_CAnimBlendAssocGroup_CreateAssociations   0x4CE2F7
+#define HOOKSIZE_CAnimBlendAssocGroup_CreateAssociations  7
+#define HOOKCHECK_CAnimBlendAssocGroup_CreateAssociations 0x8B
+DWORD                 RETURN_CAnimBlendAssocGroup_CreateAssociations = 0x4CE2FE;
+DWORD                 RETURN_CAnimBlendAssocGroup_CreateAssociations_Skip = 0x4CE36F;
+void _declspec(naked) HOOK_CAnimBlendAssocGroup_CreateAssociations()
+{
+    // clang-format off
+
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    __asm
+    {
+        test    eax, eax
+        jz      skipCreateAssociation
+        cmp     dword ptr[eax+1Ch], 0
+        jnz     continueCreateAssociation
+
+        pushad
+        push    eax
+        call    OnMY_CAnimBlendAssocGroup_CreateAssociations
+        add     esp, 4*1
+        popad
+        jmp     skipCreateAssociation
+
+    continueCreateAssociation:
+        mov     edx, [eax]
+        mov     ecx, eax
+        call    dword ptr[edx+2Ch]
+        jmp     RETURN_CAnimBlendAssocGroup_CreateAssociations
+
+    skipCreateAssociation:
+        jmp     RETURN_CAnimBlendAssocGroup_CreateAssociations_Skip
     }
     // clang-format on
 }
