@@ -878,7 +878,7 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         SectionIn 1 RO
         SetOutPath "$INSTDIR\mods\deathmatch"
         File "${FILES_ROOT}\mods\deathmatch\client.dll"
-        File "${FILES_ROOT}\mods\deathmatch\pcre3.dll"
+        File "${FILES_ROOT}\mods\deathmatch\pcre2.dll"
         SetOutPath "$INSTDIR\mods\deathmatch\resources"
         ${LogText} "-Section end - CLIENT GAME"
     SectionEnd
@@ -910,7 +910,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         SetOverwrite on
         File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
         File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
-        File "${FILES_ROOT}\mods\deathmatch\pcre3.dll"
+        File "${FILES_ROOT}\mods\deathmatch\pcre2.dll"
         File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
         !ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
