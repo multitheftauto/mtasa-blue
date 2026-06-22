@@ -204,7 +204,7 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
 ;@INSERT_TRANSLATIONS@
 
 LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "Multi Theft Auto does not support Windows XP or Vista.  Please upgrade your computer."
-LangString	GET_WIN81_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded does not support Windows 7, 8 or 8.1.  Please download an alternative version from www.multitheftauto.com."
+LangString	GET_WIN81_PLEASE	${LANG_ENGLISH} "This version of MTA:SA requires Windows 10 or later. Please upgrade your computer."
 LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
 LangString  WELCOME_TEXT  ${LANG_ENGLISH}   "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
 It is recommended that you close all other applications before starting Setup.\n\n\
@@ -654,21 +654,6 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         #############################################################
 
         #############################################################
-        # Install SHA2 support for older Win7 x64
-        ${If} ${IsWin7}
-            ${If} ${RunningX64}
-                ${GetDLLVersionNumbers} "$SYSDIR\crypt32.dll" $0 $1 $2 $3
-                ${If} $2 == 7601
-                    ${If} $3 < 18741
-                        ${InstallKB} "KB3035131" "Windows6.1-KB3035131-x64" "https://download.microsoft.com/download/3/D/F/3DF6B0B1-D849-4272-AA98-3AA8BB456CCC/Windows6.1-KB3035131-x64.msu"
-                        ${InstallKB} "KB3033929" "Windows6.1-KB3033929-x64" "https://download.microsoft.com/download/C/8/7/C87AE67E-A228-48FB-8F02-B2A9A1238099/Windows6.1-KB3033929-x64.msu"
-                    ${EndIf}
-                ${EndIf}
-            ${EndIf}
-        ${EndIf}
-        #############################################################
-
-        #############################################################
         # Delete existing winmm.dll to prevent GTA process start conflicts
         Delete "$INSTDIR\MTA\winmm.dll"
         #############################################################
@@ -893,7 +878,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         SetOverwrite on
         File "${SERVER_FILES_ROOT}\core.dll"
         File "${FILES_ROOT}\mta\xmll.dll"
-        File "${SERVER_FILES_ROOT}\MTA Server.exe"
         File "${SERVER_FILES_ROOT}\net.dll"
         File "${FILES_ROOT}\mta\pthread.dll"
         !ifdef MTA_MAETRO
