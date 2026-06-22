@@ -29,7 +29,7 @@
     #define SHAREDUTIL_PLATFORM_WINDOWS 1
 #endif
 
-#if defined(__linux__) || defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+#if defined(__linux__) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
     #include <fstream>
     #include <string>
     #include <sstream>
@@ -636,7 +636,7 @@ bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
     }
 
     return true;
-    #elif defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+    #elif defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
     static_assert(sizeof(uintptr_t) <= sizeof(unsigned long long), "Unexpected uintptr_t size");
 
     std::ifstream maps("/proc/self/maps");
@@ -2022,6 +2022,7 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 
 #ifdef SHAREDUTIL_PLATFORM_WINDOWS
     #define _WIN32_WINNT_WIN8 0x0602
+    #define _WIN32_WINNT_WIN10 0x0A00
 ///////////////////////////////////////////////////////////////////////////
 //
 // SharedUtil::IsWindowsVersionOrGreater
@@ -2062,6 +2063,11 @@ bool SharedUtil::IsWindows7OrGreater()
 bool SharedUtil::IsWindows8OrGreater()
 {
     return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN8), LOBYTE(_WIN32_WINNT_WIN8), 0);
+}
+
+bool SharedUtil::IsWindows10OrGreater()
+{
+    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 0);
 }
 #endif  // SHAREDUTIL_PLATFORM_WINDOWS
 
