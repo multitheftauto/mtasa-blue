@@ -2389,7 +2389,14 @@ void CGame::Packet_PlayerPuresync(CPlayerPuresyncPacket& Packet)
         {
             // Allow it if he's exiting
             if (pPlayer->GetVehicleAction() != CPed::VEHICLEACTION_EXITING)
+            {
+                // Still acknowledge so the client's network-trouble watchdog doesn't trip while it catches up
+                // to the new vehicle-occupied state (e.g. just after warpPedIntoVehicle, before it starts
+                // sending vehicle puresync packets instead of these on-foot ones)
+                if ((pPlayer->GetPuresyncCount() % 4) == 0)
+                    pPlayer->Send(CReturnSyncPacket(pPlayer));
                 return;
+            }
         }
 
         // Send a returnsync packet to the player that sent it
