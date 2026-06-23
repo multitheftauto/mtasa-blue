@@ -815,7 +815,7 @@ void CChat::SetCaretPosition(int iNewCaret, bool bExtendSelection)
     m_iCaretIndex = ClampCaretIndex(iNewCaret);
     if (!bExtendSelection)
         m_iSelectionAnchor = m_iCaretIndex;
-    m_fCaretBlinkTimer = GetSecondCount();            // Reset blink phase so the caret is solid right after moving
+    m_fCaretBlinkTimer = GetSecondCount();  // Reset blink phase so the caret is solid right after moving
 }
 
 // Finds the index you land on when skipping one word, starting from iFromIndex, in the given direction.
@@ -1047,8 +1047,8 @@ int CChat::MapScreenPosToCaretIndex(const CVector2D& vecScreenPos) const
     float fLocalX = vecScreenPos.fX - fLineBaseX;
 
     const std::wstring& wstrLine = lines[iLineIndex];
-    int                  iBestIndex = static_cast<int>(wstrLine.size());
-    float                fBestX = GetTextExtent(UTF16ToMbUTF8(wstrLine).c_str(), m_vecScale.fX);
+    int                 iBestIndex = static_cast<int>(wstrLine.size());
+    float               fBestX = GetTextExtent(UTF16ToMbUTF8(wstrLine).c_str(), m_vecScale.fX);
 
     for (int i = 0; i <= static_cast<int>(wstrLine.size()); i++)
     {
@@ -1109,8 +1109,8 @@ void CChat::DrawInputCaretAndSelection()
     if (!m_bInputVisible || g_pChat->m_InputTextColor.A == 0)
         return;
 
-    const unsigned long ulSelectionHighlightColor = COLOR_ARGB(110, 51, 153, 255);            // Translucent selection blue
-    constexpr float     fCaretWidth = 1.0f;                                                   // In unscaled (800x600) pixels
+    const unsigned long ulSelectionHighlightColor = COLOR_ARGB(110, 51, 153, 255);  // Translucent selection blue
+    constexpr float     fCaretWidth = 1.0f;                                         // In unscaled (800x600) pixels
 
     float fLineDifference = CChat::GetFontHeight(m_vecScale.fY);
     float fBaseX = m_vecInputPosition.fX + (5.0f * m_vecScale.fX) + m_InputLine.m_Prefix.GetWidth();
@@ -1144,7 +1144,7 @@ void CChat::DrawInputCaretAndSelection()
 
     // Caret (blinks at a constant rate regardless of framerate; phase resets whenever the caret moves)
     constexpr float fCaretBlinkPeriod = 1.0f;
-    float            fBlinkPhase = std::fmod(GetSecondCount() - m_fCaretBlinkTimer, fCaretBlinkPeriod);
+    float           fBlinkPhase = std::fmod(GetSecondCount() - m_fCaretBlinkTimer, fCaretBlinkPeriod);
     if (fBlinkPhase < fCaretBlinkPeriod * 0.5f)
     {
         int   iCaretLine;
@@ -1154,8 +1154,8 @@ void CChat::DrawInputCaretAndSelection()
         float fLineBaseX = (iCaretLine == 0) ? fBaseX : (m_vecInputPosition.fX + (5.0f * m_vecScale.fX));
         float fY = fBaseY + (iCaretLine * fLineDifference);
 
-        unsigned long ulCaretColor = COLOR_ARGB(g_pChat->m_InputTextColor.A, g_pChat->m_InputTextColor.R, g_pChat->m_InputTextColor.G,
-                                                 g_pChat->m_InputTextColor.B);
+        unsigned long ulCaretColor =
+            COLOR_ARGB(g_pChat->m_InputTextColor.A, g_pChat->m_InputTextColor.R, g_pChat->m_InputTextColor.G, g_pChat->m_InputTextColor.B);
         g_pCore->GetGraphics()->DrawRectQueued(fLineBaseX + fCaretX, fY, fCaretWidth * m_vecScale.fX, fLineDifference, ulCaretColor, true);
     }
 }
