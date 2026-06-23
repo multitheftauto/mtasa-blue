@@ -36,6 +36,27 @@ extern CGameSA*        pGame;
 
 static BOOL m_bVehicleSunGlare = false;
 
+// PreRender re-asserts rpATOMICRENDER on all wheel atomics every frame, which re-shows
+// the Rhino's middle wheels that SetupModelNodes hides at init. Re-clear the flag here so
+// it stays the last write of the frame and the wheels remain invisible like in vanilla.
+static RwObject* __cdecl ClearAtomicRenderFlagCB(RwObject* object, void* /*data*/)
+{
+    object->flags &= ~0x04;  // rpATOMICRENDER
+    return object;
+}
+
+static void __fastcall RehideRhinoMiddleWheels(CAutomobileSAInterface* vehicle)
+{
+    if (!vehicle || vehicle->m_nModelIndex != 432 /* Rhino */)
+        return;
+
+    for (auto comp : {eCarNodes::WHEEL_LM, eCarNodes::WHEEL_RM})
+    {
+        if (RwFrame* frame = vehicle->m_aCarNodes[static_cast<std::size_t>(comp)])
+            RwFrameForAllObjects(frame, (void*)ClearAtomicRenderFlagCB, nullptr);
+    }
+}
+
 static void __declspec(naked) HOOK_Vehicle_PreRender(void)
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -51,6 +72,13 @@ static void __declspec(naked) HOOK_Vehicle_PreRender(void)
         call    eax
 
         noglare:
+        // Re-hide Rhino middle wheels after PreRender's generic-car block re-shows them.
+        // esi still points to the CAutomobileSAInterface at this hook site.
+        pushad
+        mov     ecx, esi
+        call    RehideRhinoMiddleWheels
+        popad
+
         mov     [esp+0D4h], edi
         push    6ABD04h
         retn
@@ -67,6 +95,13 @@ static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleI
 
     if (vehicle->pEntity->GetVehicleRotorState())
     {
+        // Blown aircraft must not re-enter the custom rotor processing path. With
+        // vehicle_engine_autostart disabled this path moves unattended aircraft to
+        // STATUS_PHYSICS, which lets wreck contacts repeatedly create GTA flying
+        // components/explosions after the vehicle has already blown up.
+        if (vehicle->pEntity->GetHealth() <= 0.0f)
+            return false;
+
         if (g_pCore->GetMultiplayer()->IsVehicleEngineAutoStartEnabled())  // keep default behavior
             return true;
 

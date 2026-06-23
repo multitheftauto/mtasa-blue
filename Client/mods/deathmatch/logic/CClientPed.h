@@ -462,6 +462,9 @@ public:
     bool IsDoingGangDriveby();
     void SetDoingGangDriveby(bool bDriveby);
 
+    // Set while onClientPlayerWeaponFire/onClientPedWeaponFire is dispatched.
+    void SetProcessingWeaponFireEvent(bool bProcessing) noexcept { m_bProcessingWeaponFireEvent = bProcessing; }
+
     bool GetRunningAnimationName(SString& strBlockName, SString& strAnimName);
     bool IsRunningAnimation();
 
@@ -722,6 +725,8 @@ public:
     CClientPad                               m_Pad;
     bool                                     m_bDestroyingSatchels;
     bool                                     m_bDoingGangDriveby;
+    bool                                     m_bProcessingWeaponFireEvent;
+    bool                                     m_bDeferredGangDrivebyAbort;
     std::unique_ptr<CAnimBlock>              m_pAnimationBlock;
     bool                                     m_bRequestedAnimation;
     SAnimationCache                          m_AnimationCache;

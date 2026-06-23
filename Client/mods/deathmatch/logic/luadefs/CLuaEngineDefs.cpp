@@ -1000,6 +1000,14 @@ int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        // destroyElement() only defers the actual native entity deletion to the next pulse
+        // (see CElementDeleter). If a script destroys an entity using this model and calls
+        // engineFreeModel in the same tick, the entity's native CEntity is still alive and
+        // can still be found by other entities' collision processing the moment this model's
+        // collision data is freed below, crashing the game. Flush pending deletions first so
+        // any such entity is fully gone from the game world before the model is freed.
+        g_pClientGame->GetElementDeleter()->DoDeleteAll();
+
         auto                          modelManager = m_pManager->GetModelManager();
         std::shared_ptr<CClientModel> pModel = modelManager->FindModelByID(iModelID);
         if (pModel && modelManager->Remove(pModel))

@@ -6,7 +6,7 @@ project "ehs"
 
 	includedirs {
 		"../../Shared/sdk",
-		"../pcre",
+		"../pcre2",
 		"../pme",
 	}
 

@@ -37,15 +37,21 @@ void CWeatherSA::ResyncInterpolationWithGameClock(unsigned char primary, unsigne
     else
     {
         // Match the value CWeather::Update derives at 0x72B897:
-        //   v0 = ((double)seconds * 0.016666668 + (double)minutes) * 0.016666668
-        // Keep this <= engine v0 to avoid triggering the wrap branch on precision mismatches.
+        //   v0 = ((double)seconds * 0.016666668f + (double)minutes) * 0.016666668f
+        // The engine loads 0.016666668f as a 32-bit float (0x3C888889); using a
+        // double literal (0.016666668) produces a slightly larger constant, making
+        // our InterpolationValue exceed the engine's v0 and triggering the wrap
+        // branch that corrupts Foggyness and causes building-light flicker (#4803).
+        // Always round InterpolationValue down by one ULP so it is <= engine v0
+        // even when 64-bit double intermediates differ from the engine's 80-bit x87 path.
         const auto   ucMinute = *reinterpret_cast<unsigned char*>(VAR_TimeMinutes);
         const auto   ucSecond = *reinterpret_cast<unsigned char*>(VAR_TimeSeconds);
-        const double dInterp = std::min(1.0, (static_cast<double>(ucSecond) * 0.016666668 + static_cast<double>(ucMinute)) * 0.016666668);
+        const double dInterp = std::min(1.0, (static_cast<double>(ucSecond) * 0.016666668f + static_cast<double>(ucMinute)) * 0.016666668f);
         float        fInterp = static_cast<float>(dInterp);
 
-        if (static_cast<double>(fInterp) > dInterp)
-            fInterp = std::nextafterf(fInterp, 0.0f);
+        // Round down unconditionally: ensures InterpolationValue <= engine v0
+        // regardless of whether float->double conversion rounded up or down.
+        fInterp = std::nextafterf(fInterp, 0.0f);
 
         MemPutFast<float>(VAR_InterpolationValue, fInterp);
     }
