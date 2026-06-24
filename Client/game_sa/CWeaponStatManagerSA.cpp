@@ -14,6 +14,7 @@
 sWeaponInfo CWeaponStatManagerSA::OriginalPoorWeaponData[WEAPONTYPE_MAX + 1];
 sWeaponInfo CWeaponStatManagerSA::OriginalNormalWeaponData[WEAPONTYPE_MAX + 1];
 sWeaponInfo CWeaponStatManagerSA::OriginalHitmanWeaponData[WEAPONTYPE_MAX + 1];
+sWeaponInfo CWeaponStatManagerSA::OriginalSpecialWeaponData[WEAPONTYPE_MAX + 1];
 
 CWeaponStatManagerSA::CWeaponStatManagerSA()
 {
@@ -35,7 +36,7 @@ void CWeaponStatManagerSA::InitLists()
         LoadDefaultInternal(pWeaponStat, weaponType);
     }
 
-    for (int skill = 0; skill < 3; skill++)
+    for (int skill = 0; skill < WEAPONSKILL_MAX_NUMBER; skill++)
     {
         for (int i = 0; i < NUM_WeaponInfosOtherSkill; i++)
         {
@@ -124,21 +125,17 @@ CWeaponStat* CWeaponStatManagerSA::GetWeaponStatsFromSkillLevel(eWeaponType type
     CWeaponStat* pPoor = GetWeaponStats(type, WEAPONSKILL_POOR);
     CWeaponStat* pStd = GetWeaponStats(type, WEAPONSKILL_STD);
     CWeaponStat* pPro = GetWeaponStats(type, WEAPONSKILL_PRO);
-    if (pStd)
-    {
-        if (pPoor && pPro)
-        {
-            if (fSkillLevel >= pPro->GetRequiredStatLevel())
-                return pPro;
-            else if (fSkillLevel >= pStd->GetRequiredStatLevel())
-                return pStd;
-            else
-                return pPoor;
-        }
-        else
-            return pStd;
-    }
-    return nullptr;
+    CWeaponStat* pSpec = GetWeaponStats(type, WEAPONSKILL_SPECIAL);
+    if (pSpec && fSkillLevel >= pSpec->GetRequiredStatLevel())
+        return pSpec;
+    else if (pPro && fSkillLevel >= pPro->GetRequiredStatLevel())
+        return pPro;
+    else if (pStd && fSkillLevel >= pStd->GetRequiredStatLevel())
+        return pStd;
+    else if (pPoor && fSkillLevel >= pPoor->GetRequiredStatLevel())
+        return pPoor;
+    else
+        return pStd;
 }
 
 CWeaponStat* CWeaponStatManagerSA::GetOriginalWeaponStats(eWeaponType type, eWeaponSkill skill)
@@ -1510,6 +1507,71 @@ void CWeaponStatManagerSA::Init()
     OriginalHitmanWeaponData[32].aim_offset = 4;
     OriginalHitmanWeaponData[32].default_combo = 4;
     OriginalHitmanWeaponData[32].combos_available = 1;
+
+    // 22 - Colt 45 Stat: 3
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].weapon_range = 35.0f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].target_range = 30.0f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].accuracy = 1.0f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].damage = 25;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].life_span = 0.0f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].firing_speed = 0.0f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].spread = 0.0f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].maximum_clip_ammo = 17;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].move_speed = 1.0f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].flags = 28721;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].anim_group = 14;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].fire_type = (eFireType)1;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].model = 346;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].model2 = -1;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].weapon_slot = (eWeaponSlot)2;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].fire_offset = CVector(0.25f, 0.050000000745058f, 0.090000003576279f);
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].skill_level = (eWeaponSkill)3;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].required_skill_level = 5000;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].anim_loop_start = 0.20000001788139f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].anim_loop_stop = 0.49399998784065f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].anim_loop_bullet_fire = 0.20000001788139f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].anim2_loop_start = 0.20000001788139f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].anim2_loop_stop = 0.49399998784065f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].anim2_loop_bullet_fire = 0.20000001788139f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].anim_breakout_time = 3.3000001907349f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].radius = 0.0f;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].aim_offset = 2;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].default_combo = 4;
+    OriginalSpecialWeaponData[WEAPONTYPE_PISTOL].combos_available = 1;
+
+    for (int i = WEAPONTYPE_PISTOL + 1; i <= WEAPONTYPE_EXTINGUISHER; ++i)
+    {
+        OriginalSpecialWeaponData[i].weapon_range = OriginalHitmanWeaponData[i].weapon_range;
+        OriginalSpecialWeaponData[i].target_range = OriginalHitmanWeaponData[i].target_range;
+        OriginalSpecialWeaponData[i].accuracy = OriginalHitmanWeaponData[i].accuracy;
+        OriginalSpecialWeaponData[i].damage = OriginalHitmanWeaponData[i].damage;
+        OriginalSpecialWeaponData[i].life_span = OriginalHitmanWeaponData[i].life_span;
+        OriginalSpecialWeaponData[i].firing_speed = OriginalHitmanWeaponData[i].firing_speed;
+        OriginalSpecialWeaponData[i].spread = OriginalHitmanWeaponData[i].spread;
+        OriginalSpecialWeaponData[i].maximum_clip_ammo = OriginalHitmanWeaponData[i].maximum_clip_ammo;
+        OriginalSpecialWeaponData[i].move_speed = OriginalHitmanWeaponData[i].move_speed;
+        OriginalSpecialWeaponData[i].flags = OriginalHitmanWeaponData[i].flags;
+        OriginalSpecialWeaponData[i].anim_group = OriginalHitmanWeaponData[i].anim_group;
+        OriginalSpecialWeaponData[i].fire_type = OriginalHitmanWeaponData[i].fire_type;
+        OriginalSpecialWeaponData[i].model = OriginalHitmanWeaponData[i].model;
+        OriginalSpecialWeaponData[i].model2 = OriginalHitmanWeaponData[i].model2;
+        OriginalSpecialWeaponData[i].weapon_slot = OriginalHitmanWeaponData[i].weapon_slot;
+        OriginalSpecialWeaponData[i].fire_offset = OriginalHitmanWeaponData[i].fire_offset;
+        OriginalSpecialWeaponData[i].skill_level = (eWeaponSkill)3;
+        OriginalSpecialWeaponData[i].required_skill_level = 5000;
+        OriginalSpecialWeaponData[i].anim_loop_start = OriginalHitmanWeaponData[i].anim_loop_start;
+        OriginalSpecialWeaponData[i].anim_loop_stop = OriginalHitmanWeaponData[i].anim_loop_stop;
+        OriginalSpecialWeaponData[i].anim_loop_bullet_fire = OriginalHitmanWeaponData[i].anim_loop_bullet_fire;
+        OriginalSpecialWeaponData[i].anim2_loop_start = OriginalHitmanWeaponData[i].anim2_loop_start;
+        OriginalSpecialWeaponData[i].anim2_loop_stop = OriginalHitmanWeaponData[i].anim2_loop_stop;
+        OriginalSpecialWeaponData[i].anim2_loop_bullet_fire = OriginalHitmanWeaponData[i].anim2_loop_bullet_fire;
+        OriginalSpecialWeaponData[i].anim_breakout_time = OriginalHitmanWeaponData[i].anim_breakout_time;
+        OriginalSpecialWeaponData[i].radius = OriginalHitmanWeaponData[i].radius;
+        OriginalSpecialWeaponData[i].aim_offset = OriginalHitmanWeaponData[i].aim_offset;
+        OriginalSpecialWeaponData[i].default_combo = OriginalHitmanWeaponData[i].default_combo;
+        OriginalSpecialWeaponData[i].combos_available = OriginalHitmanWeaponData[i].combos_available;
+    }
+
     // End of Skill Level Weapons
 }
 
@@ -1555,6 +1617,39 @@ bool CWeaponStatManagerSA::LoadDefault(CWeaponStat* pDest, eWeaponType weaponTyp
                     pDest->SetCombosAvailable(OriginalPoorWeaponData[iVal].combos_available);
                     break;
                 }
+                case WEAPONSKILL_STD:
+                {
+                    pDest->SetWeaponRange(OriginalNormalWeaponData[iVal].weapon_range);
+                    pDest->SetTargetRange(OriginalNormalWeaponData[iVal].target_range);
+                    pDest->SetAccuracy(OriginalNormalWeaponData[iVal].accuracy);
+                    pDest->SetDamagePerHit(OriginalNormalWeaponData[iVal].damage);
+                    pDest->SetLifeSpan(OriginalNormalWeaponData[iVal].life_span);
+                    pDest->SetFiringSpeed(OriginalNormalWeaponData[iVal].firing_speed);
+                    pDest->SetSpread(OriginalNormalWeaponData[iVal].spread);
+                    pDest->SetMaximumClipAmmo(OriginalNormalWeaponData[iVal].maximum_clip_ammo);
+                    pDest->SetMoveSpeed(OriginalNormalWeaponData[iVal].move_speed);
+                    pDest->SetFlags(OriginalNormalWeaponData[iVal].flags);
+                    pDest->SetAnimGroup(OriginalNormalWeaponData[iVal].anim_group);
+                    pDest->SetFireType(OriginalNormalWeaponData[iVal].fire_type);
+                    pDest->SetModel(OriginalNormalWeaponData[iVal].model);
+                    pDest->SetModel2(OriginalNormalWeaponData[iVal].model2);
+                    pDest->SetSlot(OriginalNormalWeaponData[iVal].weapon_slot);
+                    pDest->SetFireOffset(&OriginalNormalWeaponData[iVal].fire_offset);
+                    pDest->SetSkill(OriginalNormalWeaponData[iVal].skill_level);
+                    pDest->SetRequiredStatLevel(OriginalNormalWeaponData[iVal].required_skill_level);
+                    pDest->SetWeaponAnimLoopStart(OriginalNormalWeaponData[iVal].anim_loop_start);
+                    pDest->SetWeaponAnimLoopStop(OriginalNormalWeaponData[iVal].anim_loop_stop);
+                    pDest->SetWeaponAnimLoopFireTime(OriginalNormalWeaponData[iVal].anim_loop_bullet_fire);
+                    pDest->SetWeaponAnim2LoopStart(OriginalNormalWeaponData[iVal].anim2_loop_start);
+                    pDest->SetWeaponAnim2LoopStop(OriginalNormalWeaponData[iVal].anim2_loop_stop);
+                    pDest->SetWeaponAnim2LoopFireTime(OriginalNormalWeaponData[iVal].anim2_loop_bullet_fire);
+                    pDest->SetWeaponAnimBreakoutTime(OriginalNormalWeaponData[iVal].anim_breakout_time);
+                    pDest->SetWeaponRadius(OriginalNormalWeaponData[iVal].radius);
+                    pDest->SetAimOffsetIndex(OriginalNormalWeaponData[iVal].aim_offset);
+                    pDest->SetDefaultCombo(OriginalNormalWeaponData[iVal].default_combo);
+                    pDest->SetCombosAvailable(OriginalNormalWeaponData[iVal].combos_available);
+                    break;
+                }
                 case WEAPONSKILL_PRO:
                 {
                     pDest->SetWeaponRange(OriginalHitmanWeaponData[iVal].weapon_range);
@@ -1588,37 +1683,37 @@ bool CWeaponStatManagerSA::LoadDefault(CWeaponStat* pDest, eWeaponType weaponTyp
                     pDest->SetCombosAvailable(OriginalHitmanWeaponData[iVal].combos_available);
                     break;
                 }
-                case WEAPONSKILL_STD:
+                case WEAPONSKILL_SPECIAL:
                 {
-                    pDest->SetWeaponRange(OriginalNormalWeaponData[iVal].weapon_range);
-                    pDest->SetTargetRange(OriginalNormalWeaponData[iVal].target_range);
-                    pDest->SetAccuracy(OriginalNormalWeaponData[iVal].accuracy);
-                    pDest->SetDamagePerHit(OriginalNormalWeaponData[iVal].damage);
-                    pDest->SetLifeSpan(OriginalNormalWeaponData[iVal].life_span);
-                    pDest->SetFiringSpeed(OriginalNormalWeaponData[iVal].firing_speed);
-                    pDest->SetSpread(OriginalNormalWeaponData[iVal].spread);
-                    pDest->SetMaximumClipAmmo(OriginalNormalWeaponData[iVal].maximum_clip_ammo);
-                    pDest->SetMoveSpeed(OriginalNormalWeaponData[iVal].move_speed);
-                    pDest->SetFlags(OriginalNormalWeaponData[iVal].flags);
-                    pDest->SetAnimGroup(OriginalNormalWeaponData[iVal].anim_group);
-                    pDest->SetFireType(OriginalNormalWeaponData[iVal].fire_type);
-                    pDest->SetModel(OriginalNormalWeaponData[iVal].model);
-                    pDest->SetModel2(OriginalNormalWeaponData[iVal].model2);
-                    pDest->SetSlot(OriginalNormalWeaponData[iVal].weapon_slot);
-                    pDest->SetFireOffset(&OriginalNormalWeaponData[iVal].fire_offset);
-                    pDest->SetSkill(OriginalNormalWeaponData[iVal].skill_level);
-                    pDest->SetRequiredStatLevel(OriginalNormalWeaponData[iVal].required_skill_level);
-                    pDest->SetWeaponAnimLoopStart(OriginalNormalWeaponData[iVal].anim_loop_start);
-                    pDest->SetWeaponAnimLoopStop(OriginalNormalWeaponData[iVal].anim_loop_stop);
-                    pDest->SetWeaponAnimLoopFireTime(OriginalNormalWeaponData[iVal].anim_loop_bullet_fire);
-                    pDest->SetWeaponAnim2LoopStart(OriginalNormalWeaponData[iVal].anim2_loop_start);
-                    pDest->SetWeaponAnim2LoopStop(OriginalNormalWeaponData[iVal].anim2_loop_stop);
-                    pDest->SetWeaponAnim2LoopFireTime(OriginalNormalWeaponData[iVal].anim2_loop_bullet_fire);
-                    pDest->SetWeaponAnimBreakoutTime(OriginalNormalWeaponData[iVal].anim_breakout_time);
-                    pDest->SetWeaponRadius(OriginalNormalWeaponData[iVal].radius);
-                    pDest->SetAimOffsetIndex(OriginalNormalWeaponData[iVal].aim_offset);
-                    pDest->SetDefaultCombo(OriginalNormalWeaponData[iVal].default_combo);
-                    pDest->SetCombosAvailable(OriginalNormalWeaponData[iVal].combos_available);
+                    pDest->SetWeaponRange(OriginalSpecialWeaponData[iVal].weapon_range);
+                    pDest->SetTargetRange(OriginalSpecialWeaponData[iVal].target_range);
+                    pDest->SetAccuracy(OriginalSpecialWeaponData[iVal].accuracy);
+                    pDest->SetDamagePerHit(OriginalSpecialWeaponData[iVal].damage);
+                    pDest->SetLifeSpan(OriginalSpecialWeaponData[iVal].life_span);
+                    pDest->SetFiringSpeed(OriginalSpecialWeaponData[iVal].firing_speed);
+                    pDest->SetSpread(OriginalSpecialWeaponData[iVal].spread);
+                    pDest->SetMaximumClipAmmo(OriginalSpecialWeaponData[iVal].maximum_clip_ammo);
+                    pDest->SetMoveSpeed(OriginalSpecialWeaponData[iVal].move_speed);
+                    pDest->SetFlags(OriginalSpecialWeaponData[iVal].flags);
+                    pDest->SetAnimGroup(OriginalSpecialWeaponData[iVal].anim_group);
+                    pDest->SetFireType(OriginalSpecialWeaponData[iVal].fire_type);
+                    pDest->SetModel(OriginalSpecialWeaponData[iVal].model);
+                    pDest->SetModel2(OriginalSpecialWeaponData[iVal].model2);
+                    pDest->SetSlot(OriginalSpecialWeaponData[iVal].weapon_slot);
+                    pDest->SetFireOffset(&OriginalSpecialWeaponData[iVal].fire_offset);
+                    pDest->SetSkill(OriginalSpecialWeaponData[iVal].skill_level);
+                    pDest->SetRequiredStatLevel(OriginalSpecialWeaponData[iVal].required_skill_level);
+                    pDest->SetWeaponAnimLoopStart(OriginalSpecialWeaponData[iVal].anim_loop_start);
+                    pDest->SetWeaponAnimLoopStop(OriginalSpecialWeaponData[iVal].anim_loop_stop);
+                    pDest->SetWeaponAnimLoopFireTime(OriginalSpecialWeaponData[iVal].anim_loop_bullet_fire);
+                    pDest->SetWeaponAnim2LoopStart(OriginalSpecialWeaponData[iVal].anim2_loop_start);
+                    pDest->SetWeaponAnim2LoopStop(OriginalSpecialWeaponData[iVal].anim2_loop_stop);
+                    pDest->SetWeaponAnim2LoopFireTime(OriginalSpecialWeaponData[iVal].anim2_loop_bullet_fire);
+                    pDest->SetWeaponAnimBreakoutTime(OriginalSpecialWeaponData[iVal].anim_breakout_time);
+                    pDest->SetWeaponRadius(OriginalSpecialWeaponData[iVal].radius);
+                    pDest->SetAimOffsetIndex(OriginalSpecialWeaponData[iVal].aim_offset);
+                    pDest->SetDefaultCombo(OriginalSpecialWeaponData[iVal].default_combo);
+                    pDest->SetCombosAvailable(OriginalSpecialWeaponData[iVal].combos_available);
                     break;
                 }
             }
@@ -1669,39 +1764,6 @@ bool CWeaponStatManagerSA::LoadDefaultInternal(CWeaponStatSA* pDest, eWeaponType
                     pDest->SetCombosAvailable(OriginalPoorWeaponData[iVal].combos_available);
                     break;
                 }
-                case WEAPONSKILL_PRO:
-                {
-                    pDest->SetWeaponRange(OriginalHitmanWeaponData[iVal].weapon_range);
-                    pDest->SetTargetRange(OriginalHitmanWeaponData[iVal].target_range);
-                    pDest->SetAccuracy(OriginalHitmanWeaponData[iVal].accuracy);
-                    pDest->SetDamagePerHit(OriginalHitmanWeaponData[iVal].damage);
-                    pDest->SetLifeSpan(OriginalHitmanWeaponData[iVal].life_span);
-                    pDest->SetFiringSpeed(OriginalHitmanWeaponData[iVal].firing_speed);
-                    pDest->SetSpread(OriginalHitmanWeaponData[iVal].spread);
-                    pDest->SetMaximumClipAmmo(OriginalHitmanWeaponData[iVal].maximum_clip_ammo);
-                    pDest->SetMoveSpeed(OriginalHitmanWeaponData[iVal].move_speed);
-                    pDest->SetFlags(OriginalHitmanWeaponData[iVal].flags);
-                    pDest->SetAnimGroup(OriginalHitmanWeaponData[iVal].anim_group);
-                    pDest->SetFireType(OriginalHitmanWeaponData[iVal].fire_type);
-                    pDest->SetModel(OriginalHitmanWeaponData[iVal].model);
-                    pDest->SetModel2(OriginalHitmanWeaponData[iVal].model2);
-                    pDest->SetSlot(OriginalHitmanWeaponData[iVal].weapon_slot);
-                    pDest->SetFireOffset(&OriginalHitmanWeaponData[iVal].fire_offset);
-                    pDest->SetSkill(OriginalHitmanWeaponData[iVal].skill_level);
-                    pDest->SetRequiredStatLevel(OriginalHitmanWeaponData[iVal].required_skill_level);
-                    pDest->SetWeaponAnimLoopStart(OriginalHitmanWeaponData[iVal].anim_loop_start);
-                    pDest->SetWeaponAnimLoopStop(OriginalHitmanWeaponData[iVal].anim_loop_stop);
-                    pDest->SetWeaponAnimLoopFireTime(OriginalHitmanWeaponData[iVal].anim_loop_bullet_fire);
-                    pDest->SetWeaponAnim2LoopStart(OriginalHitmanWeaponData[iVal].anim2_loop_start);
-                    pDest->SetWeaponAnim2LoopStop(OriginalHitmanWeaponData[iVal].anim2_loop_stop);
-                    pDest->SetWeaponAnim2LoopFireTime(OriginalHitmanWeaponData[iVal].anim2_loop_bullet_fire);
-                    pDest->SetWeaponAnimBreakoutTime(OriginalHitmanWeaponData[iVal].anim_breakout_time);
-                    pDest->SetWeaponRadius(OriginalHitmanWeaponData[iVal].radius);
-                    pDest->SetAimOffsetIndex(OriginalHitmanWeaponData[iVal].aim_offset);
-                    pDest->SetDefaultCombo(OriginalHitmanWeaponData[iVal].default_combo);
-                    pDest->SetCombosAvailable(OriginalHitmanWeaponData[iVal].combos_available);
-                    break;
-                }
                 case WEAPONSKILL_STD:
                 {
                     pDest->SetWeaponRange(OriginalNormalWeaponData[iVal].weapon_range);
@@ -1735,6 +1797,72 @@ bool CWeaponStatManagerSA::LoadDefaultInternal(CWeaponStatSA* pDest, eWeaponType
                     pDest->SetCombosAvailable(OriginalNormalWeaponData[iVal].combos_available);
                     break;
                 }
+                case WEAPONSKILL_PRO:
+                {
+                    pDest->SetWeaponRange(OriginalHitmanWeaponData[iVal].weapon_range);
+                    pDest->SetTargetRange(OriginalHitmanWeaponData[iVal].target_range);
+                    pDest->SetAccuracy(OriginalHitmanWeaponData[iVal].accuracy);
+                    pDest->SetDamagePerHit(OriginalHitmanWeaponData[iVal].damage);
+                    pDest->SetLifeSpan(OriginalHitmanWeaponData[iVal].life_span);
+                    pDest->SetFiringSpeed(OriginalHitmanWeaponData[iVal].firing_speed);
+                    pDest->SetSpread(OriginalHitmanWeaponData[iVal].spread);
+                    pDest->SetMaximumClipAmmo(OriginalHitmanWeaponData[iVal].maximum_clip_ammo);
+                    pDest->SetMoveSpeed(OriginalHitmanWeaponData[iVal].move_speed);
+                    pDest->SetFlags(OriginalHitmanWeaponData[iVal].flags);
+                    pDest->SetAnimGroup(OriginalHitmanWeaponData[iVal].anim_group);
+                    pDest->SetFireType(OriginalHitmanWeaponData[iVal].fire_type);
+                    pDest->SetModel(OriginalHitmanWeaponData[iVal].model);
+                    pDest->SetModel2(OriginalHitmanWeaponData[iVal].model2);
+                    pDest->SetSlot(OriginalHitmanWeaponData[iVal].weapon_slot);
+                    pDest->SetFireOffset(&OriginalHitmanWeaponData[iVal].fire_offset);
+                    pDest->SetSkill(OriginalHitmanWeaponData[iVal].skill_level);
+                    pDest->SetRequiredStatLevel(OriginalHitmanWeaponData[iVal].required_skill_level);
+                    pDest->SetWeaponAnimLoopStart(OriginalHitmanWeaponData[iVal].anim_loop_start);
+                    pDest->SetWeaponAnimLoopStop(OriginalHitmanWeaponData[iVal].anim_loop_stop);
+                    pDest->SetWeaponAnimLoopFireTime(OriginalHitmanWeaponData[iVal].anim_loop_bullet_fire);
+                    pDest->SetWeaponAnim2LoopStart(OriginalHitmanWeaponData[iVal].anim2_loop_start);
+                    pDest->SetWeaponAnim2LoopStop(OriginalHitmanWeaponData[iVal].anim2_loop_stop);
+                    pDest->SetWeaponAnim2LoopFireTime(OriginalHitmanWeaponData[iVal].anim2_loop_bullet_fire);
+                    pDest->SetWeaponAnimBreakoutTime(OriginalHitmanWeaponData[iVal].anim_breakout_time);
+                    pDest->SetWeaponRadius(OriginalHitmanWeaponData[iVal].radius);
+                    pDest->SetAimOffsetIndex(OriginalHitmanWeaponData[iVal].aim_offset);
+                    pDest->SetDefaultCombo(OriginalHitmanWeaponData[iVal].default_combo);
+                    pDest->SetCombosAvailable(OriginalHitmanWeaponData[iVal].combos_available);
+                    break;
+                }
+                case WEAPONSKILL_SPECIAL:
+                {
+                    pDest->SetWeaponRange(OriginalSpecialWeaponData[iVal].weapon_range);
+                    pDest->SetTargetRange(OriginalSpecialWeaponData[iVal].target_range);
+                    pDest->SetAccuracy(OriginalSpecialWeaponData[iVal].accuracy);
+                    pDest->SetDamagePerHit(OriginalSpecialWeaponData[iVal].damage);
+                    pDest->SetLifeSpan(OriginalSpecialWeaponData[iVal].life_span);
+                    pDest->SetFiringSpeed(OriginalSpecialWeaponData[iVal].firing_speed);
+                    pDest->SetSpread(OriginalSpecialWeaponData[iVal].spread);
+                    pDest->SetMaximumClipAmmo(OriginalSpecialWeaponData[iVal].maximum_clip_ammo);
+                    pDest->SetMoveSpeed(OriginalSpecialWeaponData[iVal].move_speed);
+                    pDest->SetFlags(OriginalSpecialWeaponData[iVal].flags);
+                    pDest->SetAnimGroup(OriginalSpecialWeaponData[iVal].anim_group);
+                    pDest->SetFireType(OriginalSpecialWeaponData[iVal].fire_type);
+                    pDest->SetModel(OriginalSpecialWeaponData[iVal].model);
+                    pDest->SetModel2(OriginalSpecialWeaponData[iVal].model2);
+                    pDest->SetSlot(OriginalSpecialWeaponData[iVal].weapon_slot);
+                    pDest->SetFireOffset(&OriginalSpecialWeaponData[iVal].fire_offset);
+                    pDest->SetSkill(OriginalSpecialWeaponData[iVal].skill_level);
+                    pDest->SetRequiredStatLevel(OriginalSpecialWeaponData[iVal].required_skill_level);
+                    pDest->SetWeaponAnimLoopStart(OriginalSpecialWeaponData[iVal].anim_loop_start);
+                    pDest->SetWeaponAnimLoopStop(OriginalSpecialWeaponData[iVal].anim_loop_stop);
+                    pDest->SetWeaponAnimLoopFireTime(OriginalSpecialWeaponData[iVal].anim_loop_bullet_fire);
+                    pDest->SetWeaponAnim2LoopStart(OriginalSpecialWeaponData[iVal].anim2_loop_start);
+                    pDest->SetWeaponAnim2LoopStop(OriginalSpecialWeaponData[iVal].anim2_loop_stop);
+                    pDest->SetWeaponAnim2LoopFireTime(OriginalSpecialWeaponData[iVal].anim2_loop_bullet_fire);
+                    pDest->SetWeaponAnimBreakoutTime(OriginalSpecialWeaponData[iVal].anim_breakout_time);
+                    pDest->SetWeaponRadius(OriginalSpecialWeaponData[iVal].radius);
+                    pDest->SetAimOffsetIndex(OriginalSpecialWeaponData[iVal].aim_offset);
+                    pDest->SetDefaultCombo(OriginalSpecialWeaponData[iVal].default_combo);
+                    pDest->SetCombosAvailable(OriginalSpecialWeaponData[iVal].combos_available);
+                    break;
+                }
             }
         }
     }
@@ -1746,19 +1874,15 @@ eWeaponSkill CWeaponStatManagerSA::GetWeaponSkillFromSkillLevel(eWeaponType type
     CWeaponStat* pPoor = GetWeaponStats(type, WEAPONSKILL_POOR);
     CWeaponStat* pStd = GetWeaponStats(type, WEAPONSKILL_STD);
     CWeaponStat* pPro = GetWeaponStats(type, WEAPONSKILL_PRO);
-    if (pStd)
-    {
-        if (pPoor && pPro)
-        {
-            if (fSkillLevel >= pPro->GetRequiredStatLevel())
-                return WEAPONSKILL_PRO;
-            else if (fSkillLevel >= pStd->GetRequiredStatLevel())
-                return WEAPONSKILL_STD;
-            else
-                return WEAPONSKILL_POOR;
-        }
-        else
-            return WEAPONSKILL_STD;
-    }
-    return WEAPONSKILL_STD;
+    CWeaponStat* pSpec = GetWeaponStats(type, WEAPONSKILL_SPECIAL);
+    if (pSpec && fSkillLevel >= pSpec->GetRequiredStatLevel())
+        return WEAPONSKILL_SPECIAL;
+    else if (pPro && fSkillLevel >= pPro->GetRequiredStatLevel())
+        return WEAPONSKILL_PRO;
+    else if (pStd && fSkillLevel >= pStd->GetRequiredStatLevel())
+        return WEAPONSKILL_STD;
+    else if (pPoor && fSkillLevel >= pPoor->GetRequiredStatLevel())
+        return WEAPONSKILL_POOR;
+    else
+        return WEAPONSKILL_STD;
 }

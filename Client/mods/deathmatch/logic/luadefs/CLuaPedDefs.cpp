@@ -2119,8 +2119,22 @@ int CLuaPedDefs::SetPedStat(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Check the stat and value
-        if (usStat > NUM_PLAYER_STATS - 1 || fValue < 0.0f || fValue > 1000.0f)
-            argStream.SetCustomError("Stat must be 0 to 342 and value must be 0 to 1000.");
+        if (usStat > NUM_PLAYER_STATS - 1)
+        {
+            argStream.SetCustomError("Stat must be 0 to 342 and value must be 0 to 5000.");
+        }
+        else if (fValue < 0.0f)
+        {
+            argStream.SetCustomError("Value must be greater than 0.");
+        }
+        else if ((usStat >= WEAPONTYPE_PISTOL_SKILL && usStat <= WEAPONTYPE_SNIPERRIFLE_SKILL) && fValue > 5000.0f)
+        {
+            argStream.SetCustomError("Value must be at most 5000 (for weapon stats).");
+        }
+        else if ((usStat < WEAPONTYPE_PISTOL_SKILL || usStat > WEAPONTYPE_SNIPERRIFLE_SKILL) && fValue > 1000.0f)
+        {
+            argStream.SetCustomError("Value must be at most 1000 (for non-weapon stats).");
+        }
         else if (CStaticFunctionDefinitions::SetPedStat(*pEntity, usStat, fValue))
         {
             lua_pushboolean(luaVM, true);

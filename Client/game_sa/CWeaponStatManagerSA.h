@@ -100,4 +100,5 @@ private:
     static sWeaponInfo      OriginalPoorWeaponData[WEAPONTYPE_MAX + 1];
     static sWeaponInfo      OriginalNormalWeaponData[WEAPONTYPE_MAX + 1];
     static sWeaponInfo      OriginalHitmanWeaponData[WEAPONTYPE_MAX + 1];
+    static sWeaponInfo      OriginalSpecialWeaponData[WEAPONTYPE_MAX + 1];
 };
