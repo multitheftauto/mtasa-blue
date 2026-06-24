@@ -24,6 +24,12 @@ enum class MultiCommandHandlerPolicy : std::uint8_t
     ALLOW = 2
 };
 
+struct CommandExecutionResult
+{
+    bool wasCancelled = false;
+    bool wasExecuted = false;
+};
+
 class CRegisteredCommands
 {
     struct SCommand
@@ -48,7 +54,7 @@ public:
     void GetCommands(lua_State* luaVM);
     void GetCommands(lua_State* luaVM, CLuaMain* pTargetLuaMain);
 
-    bool ProcessCommand(const char* szKey, const char* szArguments);
+    CommandExecutionResult ProcessCommand(const char* szKey, const char* szArguments, bool executedByFunction = false);
 
 private:
     SCommand* GetCommand(const char* szKey, class CLuaMain* pLuaMain = NULL);
