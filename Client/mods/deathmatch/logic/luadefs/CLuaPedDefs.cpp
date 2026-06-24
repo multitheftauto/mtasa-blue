@@ -104,6 +104,11 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedTotalAmmo", GetPedTotalAmmo},
         {"getPedOccupiedVehicle", GetPedOccupiedVehicle},
         {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
+        {"isPedEnteringToVehicle", ArgumentParser<IsPedEnteringToVehicle>},
+        {"isPedExitingFromVehicle", ArgumentParser<IsPedExitingFromVehicle>},
+        {"getPedVehicleEnteringTo", ArgumentParser<GetPedVehicleEnteringTo>},
+        {"getPedVehicleEnteringToSeat", ArgumentParser<GetPedVehicleEnteringToSeat>},
+
         {"getPedBonePosition", GetPedBonePosition},
         {"getPedClothes", GetPedClothes},
         {"getPedMoveState", GetPedMoveState},
@@ -155,6 +160,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getMoveState", "getPedMoveState");
     lua_classfunction(luaVM, "getOccupiedVehicle", "getPedOccupiedVehicle");
     lua_classfunction(luaVM, "getOccupiedVehicleSeat", "getPedOccupiedVehicleSeat");
+    lua_classfunction(luaVM, "getVehicleEnteringTo", "getPedVehicleEnteringTo");
+    lua_classfunction(luaVM, "getVehicleEnteringToSeat", "getPedVehicleEnteringToSeat");
     lua_classfunction(luaVM, "getOxygenLevel", "getPedOxygenLevel");
     lua_classfunction(luaVM, "getStat", "getPedStat");
     lua_classfunction(luaVM, "getTarget", "getPedTarget");
@@ -213,6 +220,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setExitVehicle", "setPedExitVehicle");
     lua_classfunction(luaVM, "setBleeding", "setPedBleeding");
     lua_classfunction(luaVM, "playVoiceLine", "playPedVoiceLine");
+    lua_classfunction(luaVM, "isEnteringToVehicle", "isPedEnteringToVehicle");
+    lua_classfunction(luaVM, "isExitingFromVehicle", "isPedExitingFromVehicle");
 
     lua_classvariable(luaVM, "vehicle", OOP_WarpPedIntoVehicle, GetPedOccupiedVehicle);
     lua_classvariable(luaVM, "vehicleSeat", NULL, "getPedOccupiedVehicleSeat");
@@ -232,6 +241,10 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "ducked", NULL, "isPedDucked");
     lua_classvariable(luaVM, "headless", "setPedHeadless", "isPedHeadless");
     lua_classvariable(luaVM, "inVehicle", NULL, "isPedInVehicle");
+    lua_classvariable(luaVM, "enteringToVehicle", NULL, "isPedEnteringToVehicle");
+    lua_classvariable(luaVM, "exitingFromVehicle", NULL, "isPedExitingFromVehicle");
+    lua_classvariable(luaVM, "vehicleEnteringTo", NULL, "getPedVehicleEnteringTo");
+    lua_classvariable(luaVM, "vehicleEnteringToSeat", NULL, "getPedVehicleEnteringToSeat");
     lua_classvariable(luaVM, "onFire", "setPedOnFire", "isPedOnFire");
     lua_classvariable(luaVM, "onGround", NULL, "isPedOnGround");
     lua_classvariable(luaVM, "dead", NULL, "isPedDead");
@@ -2584,4 +2597,24 @@ void CLuaPedDefs::PlayPedVoiceLine(CClientPed* ped, int speechId, std::optional<
         throw LuaFunctionError("The argument probability cannot have a negative value.");
 
     ped->Say(speechContextId, probability.value_or(1.0f));
+}
+
+bool CLuaPedDefs::IsPedEnteringToVehicle(CClientPed* const ped) noexcept
+{
+    return ped->IsEnteringToVehicle();
+}
+
+bool CLuaPedDefs::IsPedExitingFromVehicle(CClientPed* const ped) noexcept
+{
+    return ped->IsExitingFromVehicle();
+}
+
+CClientVehicle* CLuaPedDefs::GetPedVehicleEnteringTo(CClientPed* const ped)
+{
+    return ped->GetOccupyingVehicle();
+}
+
+int CLuaPedDefs::GetPedVehicleEnteringToSeat(CClientPed* const ped)
+{
+    return ped->GetOccupyingVehicleSeat();
 }

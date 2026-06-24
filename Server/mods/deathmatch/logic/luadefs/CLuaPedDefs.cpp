@@ -48,6 +48,8 @@ void CLuaPedDefs::LoadFunctions()
         {"getPedOccupiedVehicle", GetPedOccupiedVehicle},
         {"getPedOccupiedVehicleSeat", GetPedOccupiedVehicleSeat},
         {"isPedInVehicle", IsPedInVehicle},
+        {"isPedEnteringToVehicle", ArgumentParser<IsPedEnteringToVehicle>},
+        {"isPedExitingFromVehicle", ArgumentParser<IsPedExitingFromVehicle>},
         {"isPedReloadingWeapon", ArgumentParser<IsPedReloadingWeapon>},
 
         // Ped set functions
@@ -120,6 +122,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isHeadless", "isPedHeadless");
     lua_classfunction(luaVM, "isWearingJetpack", "isPedWearingJetpack");  // introduced in 1.5.5-9.13846
     lua_classfunction(luaVM, "isReloadingWeapon", "isPedReloadingWeapon");
+    lua_classfunction(luaVM, "isEnteringToVehicle", "isPedEnteringToVehicle");
+    lua_classfunction(luaVM, "isExitingFromVehicle", "isPedExitingFromVehicle");
 
     lua_classfunction(luaVM, "getArmor", "getPedArmor");
     lua_classfunction(luaVM, "getFightingStyle", "getPedFightingStyle");
@@ -153,6 +157,8 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setWearingJetpack", "setPedWearingJetpack");  // introduced in 1.5.5-9.13846
 
     lua_classvariable(luaVM, "inVehicle", NULL, "isPedInVehicle");
+    lua_classvariable(luaVM, "enteringToVehicle", NULL, "isPedEnteringToVehicle");
+    lua_classvariable(luaVM, "exitingFromVehicle", NULL, "isPedExitingFromVehicle");
     lua_classvariable(luaVM, "ducked", NULL, "isPedDucked");
     lua_classvariable(luaVM, "inWater", NULL, "isPedInWater");
     lua_classvariable(luaVM, "onGround", NULL, "isPedOnGround");
@@ -1556,4 +1562,14 @@ int CLuaPedDefs::TakeAllWeapons(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaPedDefs::IsPedEnteringToVehicle(CPed* const ped) noexcept
+{
+    return ped->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING;
+}
+
+bool CLuaPedDefs::IsPedExitingFromVehicle(CPed* const ped) noexcept
+{
+    return ped->GetVehicleAction() == CPed::VEHICLEACTION_EXITING;
 }
