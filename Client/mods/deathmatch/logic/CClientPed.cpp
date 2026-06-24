@@ -1796,6 +1796,13 @@ void CClientPed::InternalSetHealth(float fHealth)
                 WarpIntoVehicle(pVehicle, uiVehicleSeat);
             }
         }
+        else if (m_pPlayerPed->GetHealth() > 0.0f && fHealth <= 0.0f)
+        {
+            // Remove from vehicle in MTA scope
+            // Fix issue GH #4017
+            m_vehicleWithoutPairAllowed = true;
+            CClientVehicle::UnpairPedAndVehicle(this);
+        }
 
         // Recheck we have a ped, ReCreateModel might destroy it
         if (m_pPlayerPed)
@@ -1969,6 +1976,11 @@ void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bSt
     // Remove goggles #9477
     if (IsWearingGoggles())
         SetWearingGoggles(false, false);
+
+    // Remove from vehicle in MTA scope
+    // Fix issue GH #4017
+    m_vehicleWithoutPairAllowed = true;
+    CClientVehicle::UnpairPedAndVehicle(this);
 
     m_bDead = true;
 }
@@ -2743,6 +2755,9 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 
     // Grab some vars here, saves getting them twice
     CClientVehicle* pVehicle = GetOccupiedVehicle();
+
+    if (m_vehicleWithoutPairAllowed && (IsDead() || !GetRealOccupiedVehicle()))
+        m_vehicleWithoutPairAllowed = false;
 
     // Do we have a player? (streamed in)
     if (m_pPlayerPed)
@@ -7167,7 +7182,7 @@ void CClientPed::UpdateVehicleInOut()
 
         // Jax: this was commented, re-comment if it was there for a reason (..and give the reason!)
         // Are we in a vehicle we aren't supposed to be in?
-        if (pVehicle && !pOccupiedVehicle)
+        if (pVehicle && !pOccupiedVehicle && !m_vehicleWithoutPairAllowed)
         {
             g_pCore->GetConsole()->Print("You shouldn't be in this vehicle");
             RemoveFromVehicle();
