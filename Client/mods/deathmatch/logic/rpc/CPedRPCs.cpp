@@ -274,9 +274,8 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                         pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
                         pPed->SetTaskTypeToBeRestoredOnAnimEnd((eTaskType)TASK_SIMPLE_DUCK);
 
-                        pPed->m_AnimationCache.startTime = GetTimestamp();
+                        pPed->m_AnimationCache.startTime = g_pClientGame->GetSyncedTime();
                         pPed->m_AnimationCache.speed = 1.0f;
-                        pPed->m_AnimationCache.progress = 0.0f;
 
                         pPed->SetHasSyncedAnim(true);
                     }
@@ -308,9 +307,11 @@ void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInter
                 {
                     auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), animName.c_str());
                     if (pAnimAssociation)
-                    {
                         pAnimAssociation->SetCurrentProgress(fProgress);
+                    else
+                    {
                         pPed->m_AnimationCache.progress = fProgress;
+                        pPed->m_AnimationCache.updateInNextFrame = true;
                     }
                 }
             }

@@ -2928,8 +2928,8 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         }
 
         // Are we need to update anim speed & progress?
-        // We need to do it here because the anim starts on the next frame after calling RunNamedAnimation
-        if (m_pAnimationBlock && m_AnimationCache.progressWaitForStreamIn && IsAnimationInProgress())
+        // We need to do it here because the anim starts in the next frame after calling RunNamedAnimation
+        if (m_pAnimationBlock && m_AnimationCache.updateInNextFrame && IsAnimationInProgress())
             UpdateAnimationProgressAndSpeed();
 
         // Update our alpha
@@ -5803,7 +5803,7 @@ bool CClientPed::IsAnimationInProgress()
     if (!m_pAnimationBlock)
         return constAnim;
 
-    float elapsedTime = static_cast<float>(GetTimestamp() - m_AnimationCache.startTime) / 1000.0f;
+    float elapsedTime = static_cast<float>(g_pClientGame->GetSyncedTime() - m_AnimationCache.startTime) / 1000.0f;
 
     auto animBlendHierarchy = g_pGame->GetAnimManager()->GetAnimation(m_AnimationCache.strName.c_str(), m_pAnimationBlock);
     if (!animBlendHierarchy)
@@ -5890,6 +5890,9 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     {
         m_pAnimationBlock = g_pGame->GetAnimManager()->GetAnimBlock(pBlock->GetInterface());
     }
+
+    m_AnimationCache = SAnimationCache{};
+
     m_AnimationCache.strName = szAnimName;
     m_AnimationCache.iTime = iTime;
     m_AnimationCache.iBlend = iBlend;
@@ -5916,7 +5919,7 @@ void CClientPed::KillAnimation()
         }
     }
     m_pAnimationBlock = NULL;
-    m_AnimationCache.strName = "";
+    m_AnimationCache = SAnimationCache{};
     m_bRequestedAnimation = false;
     SetNextAnimationNormal();
 }
@@ -5935,46 +5938,57 @@ void CClientPed::RunAnimationFromCache()
     if (!m_pAnimationBlock)
         return;
 
-    // Copy our name incase it gets deleted
-    std::string animName = m_AnimationCache.strName;
+    // Copy our name & startTime incase it gets deleted
+    std::string  animName = m_AnimationCache.strName;
+    std::int64_t startTime = m_AnimationCache.startTime;
 
     // Run our animation
     RunNamedAnimation(m_pAnimationBlock, animName.c_str(), m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
                       m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptible, m_AnimationCache.bFreezeLastFrame);
 
-    // Set anim progress & speed
-    m_AnimationCache.progressWaitForStreamIn = true;
+    // Restore our startTime
+    m_AnimationCache.startTime = startTime;
+
+    // Let's update animation progress & speed
+    m_AnimationCache.updateInNextFrame = true;
 }
 
 void CClientPed::UpdateAnimationProgressAndSpeed()
 {
-    if (!m_AnimationCache.progressWaitForStreamIn)
-        return;
-
     // Get current anim
     auto animAssoc = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(GetClump(), m_AnimationCache.strName.c_str());
     if (!animAssoc)
         return;
 
-    float animLength = animAssoc->GetLength();
+    // Animation progress is calculated based on the animation duration
+    // The cached value is only set when setPedAnimationProgress is called by the client, and is then reset to NaN
     float progress = 0.0f;
-    float elapsedTime = static_cast<float>(GetTimestamp() - m_AnimationCache.startTime) / 1000.0f;
+    if (std::isnan(m_AnimationCache.progress))
+    {
+        float animLength = animAssoc->GetLength();
+        float elapsedTime = static_cast<float>(g_pClientGame->GetSyncedTime() - m_AnimationCache.startTime) / 1000.0f;
 
-    if (m_AnimationCache.bFreezeLastFrame)  // time and loop is ignored if freezeLastFrame is true
-        progress = (elapsedTime / animLength) * m_AnimationCache.speed;
+        if (m_AnimationCache.bFreezeLastFrame)  // time and loop is ignored if freezeLastFrame is true
+            progress = (elapsedTime / animLength) * m_AnimationCache.speed;
+        else
+        {
+            if (m_AnimationCache.bLoop)
+                progress = std::fmod(elapsedTime * m_AnimationCache.speed, animLength) / animLength;
+            else
+                // For non-looped animations, limit duration to animLength if time exceeds it
+                progress = (elapsedTime / (m_AnimationCache.iTime <= animLength ? m_AnimationCache.iTime : animLength)) * m_AnimationCache.speed;
+        }
+    }
     else
     {
-        if (m_AnimationCache.bLoop)
-            progress = std::fmod(elapsedTime * m_AnimationCache.speed, animLength) / animLength;
-        else
-            // For non-looped animations, limit duration to animLength if time exceeds it
-            progress = (elapsedTime / (m_AnimationCache.iTime <= animLength ? m_AnimationCache.iTime : animLength)) * m_AnimationCache.speed;
+        progress = m_AnimationCache.progress;
+        m_AnimationCache.progress = std::numeric_limits<float>::quiet_NaN();
     }
 
     animAssoc->SetCurrentProgress(std::clamp(progress, 0.0f, 1.0f));
     animAssoc->SetCurrentSpeed(m_AnimationCache.speed);
 
-    m_AnimationCache.progressWaitForStreamIn = false;
+    m_AnimationCache.updateInNextFrame = false;
 }
 
 void CClientPed::PostWeaponFire()
