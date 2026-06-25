@@ -577,6 +577,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.WriteBit(pVehicle->IsDerailable());
                     BitStream.WriteBit(pVehicle->GetTrainDirection());
                     BitStream.WriteBit(pVehicle->IsTaxiLightOn());
+                    BitStream.WriteBit(pVehicle->IsSmokeTrailEnabled());
 
                     // Write alpha
                     SEntityAlphaSync alpha;
