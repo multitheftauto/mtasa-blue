@@ -600,8 +600,15 @@ void CClientObject::Create()
                 UpdateVisibility();
                 if (!m_bUsesCollision)
                     SetCollisionEnabled(false);
+                // Apply the visual scale directly on the freshly created game object, instead of going
+                // through CClientObject::SetScale(). That method can acquire or release a scaled
+                // collision clone and call SetModel(), which destroys and recursively re-creates this
+                // very object, so if the resulting model needs to stream in asynchronously, m_pObject
+                // ends up null here and everything below crashes on a null pointer. The collision
+                // clone bookkeeping is already settled by the time Create() runs, since it's what got
+                // us streaming m_usModel in the first place, so only the visual scale is needed here.
                 if (m_vecScale.fX != 1.0f || m_vecScale.fY != 1.0f || m_vecScale.fZ != 1.0f)
-                    SetScale(m_vecScale);
+                    m_pObject->SetScale(m_vecScale.fX, m_vecScale.fY, m_vecScale.fZ);
                 m_pObject->SetAreaCode(m_ucInterior);
                 SetAlpha(m_ucAlpha);
                 m_pObject->SetHealth(m_fHealth);
