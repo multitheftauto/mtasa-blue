@@ -8385,20 +8385,22 @@ bool CStaticFunctionDefinitions::SetObjectRotation(CElement* pElement, const CVe
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetObjectScale(CElement* pElement, const CVector& vecScale)
+bool CStaticFunctionDefinitions::SetObjectScale(CElement* pElement, const CVector& vecScale, bool bScaleCollision)
 {
-    RUN_CHILDREN(SetObjectScale(*iter, vecScale))
+    RUN_CHILDREN(SetObjectScale(*iter, vecScale, bScaleCollision))
 
     if (IS_OBJECT(pElement))
     {
         CObject* pObject = static_cast<CObject*>(pElement);
 
         pObject->SetScale(vecScale);
+        pObject->SetScaleCollisionEnabled(bScaleCollision);
 
         CBitStream BitStream;
         BitStream.pBitStream->Write(vecScale.fX);
         BitStream.pBitStream->Write(vecScale.fY);  // Ignored by clients with bitstream version < 0x41
         BitStream.pBitStream->Write(vecScale.fZ);  // Ignored by clients with bitstream version < 0x41
+        BitStream.pBitStream->WriteBit(bScaleCollision);
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, SET_OBJECT_SCALE, *BitStream.pBitStream));
         return true;
     }

@@ -195,8 +195,10 @@ int CLuaObjectDefs::SetObjectRotation(lua_State* luaVM)
 
 int CLuaObjectDefs::SetObjectScale(lua_State* luaVM)
 {
+    //  bool setObjectScale ( object theObject, float scale [, float scaleY = scale, float scaleZ = scale, bool scaleCollision = false ] )
     CObject* pObject;
     CVector  vecScale;
+    bool     bScaleCollision = false;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pObject);
@@ -217,10 +219,11 @@ int CLuaObjectDefs::SetObjectScale(lua_State* luaVM)
         argStream.ReadNumber(vecScale.fY, vecScale.fX);
         argStream.ReadNumber(vecScale.fZ, vecScale.fX);
     }
+    argStream.ReadBool(bScaleCollision, false);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetObjectScale(pObject, vecScale))
+        if (CStaticFunctionDefinitions::SetObjectScale(pObject, vecScale, bScaleCollision))
         {
             lua_pushboolean(luaVM, true);
             return 1;
