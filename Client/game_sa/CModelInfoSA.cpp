@@ -1744,6 +1744,12 @@ void CModelInfoSA::RestoreColModel()
     m_originalFlags = 0;
 }
 
+CColModelSAInterface* CModelInfoSA::GetColModelInterface()
+{
+    m_pInterface = ppModelInfo[m_dwModelID];
+    return m_pInterface ? m_pInterface->pColModel : nullptr;
+}
+
 void CModelInfoSA::MakeCustomModel()
 {
     // We have a custom model?

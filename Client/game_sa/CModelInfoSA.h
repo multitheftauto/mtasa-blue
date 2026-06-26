@@ -458,6 +458,7 @@ public:
     void SetColModel(CColModel* pColModel) override;
     void RestoreColModel() override;
     void MakeCustomModel() override;
+    CColModelSAInterface* GetColModelInterface() override;
 
     // Increases the collision slot reference counter for the original collision model
     void AddColRef() override;
