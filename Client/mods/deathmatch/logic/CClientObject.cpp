@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <cmath>
 
 #define MTA_BUILDINGS
 #define CCLIENTOBJECT_MAX 250
@@ -64,8 +65,17 @@ CClientObject::~CClientObject()
     // Detach us from anything
     AttachTo(NULL);
 
-    // Destroy the object
+    // Destroy the object (this releases our reference to whatever model we're currently using,
+    // clone or not - must happen before we release the clone below, otherwise the clone's model
+    // info could be freed while m_pObject is still referencing it)
     Destroy();
+
+    // Release any scaled-collision model clone we were using
+    if (m_iScaleCollisionModelID != -1)
+    {
+        g_pClientGame->GetManager()->GetModelManager()->ReleaseScaledCollisionModel(m_iScaleCollisionModelID);
+        m_iScaleCollisionModelID = -1;
+    }
 
     // Remove us from the list
     Unlink();
@@ -407,8 +417,51 @@ void CClientObject::GetScale(CVector& vecScale) const
     }
 }
 
-void CClientObject::SetScale(const CVector& vecScale)
+void CClientObject::SetScale(const CVector& vecScale, bool bScaleCollision)
 {
+    constexpr float kUnitScaleEpsilon = 0.0001f;
+    const bool      bIsUnitScale = std::fabs(vecScale.fX - 1.0f) < kUnitScaleEpsilon && std::fabs(vecScale.fY - 1.0f) < kUnitScaleEpsilon &&
+                              std::fabs(vecScale.fZ - 1.0f) < kUnitScaleEpsilon;
+    // Scaling collision to (1,1,1) would just be a wasteful clone of the original - skip it
+    const bool bWantScaledCollision = bScaleCollision && !bIsUnitScale;
+
+    CClientModelManager* pModelManager = g_pClientGame->GetManager()->GetModelManager();
+
+    if (bWantScaledCollision)
+    {
+        // Capture the true base model the first time collision scaling is enabled, so
+        // re-scaling (or later disabling it) can always find its way back to it.
+        const unsigned short usBaseModel = (m_iScaleCollisionModelID != -1) ? m_usScaleCollisionBaseModel : m_usModel;
+
+        const int iNewCloneID = pModelManager->AcquireScaledCollisionModel(usBaseModel, vecScale);
+        if (iNewCloneID != -1)
+        {
+            const int iOldCloneID = m_iScaleCollisionModelID;
+
+            m_usScaleCollisionBaseModel = usBaseModel;
+            m_iScaleCollisionModelID = iNewCloneID;
+            SetModel(static_cast<unsigned short>(iNewCloneID));
+
+            if (iOldCloneID != -1 && iOldCloneID != iNewCloneID)
+                pModelManager->ReleaseScaledCollisionModel(iOldCloneID);
+        }
+        // Else: couldn't get scaled collision (no free model slot, or unsupported geometry
+        // for this scale - e.g. non-uniform scale on a model with collision spheres). Leave
+        // whatever collision state we already had and just fall through to the visual scale.
+    }
+    else if (m_iScaleCollisionModelID != -1)
+    {
+        // Turning collision scaling back off - restore the real model and release our clone
+        const int            iOldCloneID = m_iScaleCollisionModelID;
+        const unsigned short usBaseModel = m_usScaleCollisionBaseModel;
+
+        m_iScaleCollisionModelID = -1;
+        m_usScaleCollisionBaseModel = 0;
+        SetModel(usBaseModel);
+
+        pModelManager->ReleaseScaledCollisionModel(iOldCloneID);
+    }
+
     if (m_pObject)
     {
         m_pObject->SetScale(vecScale.fX, vecScale.fY, vecScale.fZ);
