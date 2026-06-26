@@ -424,9 +424,10 @@ int CLuaObjectDefs::StopObject(lua_State* luaVM)
 
 int CLuaObjectDefs::SetObjectScale(lua_State* luaVM)
 {
-    //  bool setObjectScale ( object theObject, float scale )
+    //  bool setObjectScale ( object theObject, float scale [, float scaleY = scale, float scaleZ = scale, bool scaleCollision = false ] )
     CClientEntity* pEntity;
     CVector        vecScale;
+    bool           bScaleCollision = false;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -447,9 +448,11 @@ int CLuaObjectDefs::SetObjectScale(lua_State* luaVM)
         argStream.ReadNumber(vecScale.fY, vecScale.fX);
         argStream.ReadNumber(vecScale.fZ, vecScale.fX);
     }
+    argStream.ReadBool(bScaleCollision, false);
+
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetObjectScale(*pEntity, vecScale))
+        if (CStaticFunctionDefinitions::SetObjectScale(*pEntity, vecScale, bScaleCollision))
         {
             lua_pushboolean(luaVM, true);
             return 1;
