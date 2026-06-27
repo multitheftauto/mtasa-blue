@@ -588,8 +588,22 @@ CColModel* CRenderWareSA::CreateScaledColModel(CColModelSAInterface* pOriginalIn
     CColDataSA* pOriginalData = pOriginalInterface->m_data;
     if (!pOriginalData)
     {
-        // No collision volumes at all (e.g. a purely visual/LOD model) - nothing to scale
-        return nullptr;
+        // The collision interface exists, but its actual data arrays (spheres/boxes/faces) aren't
+        // resident yet: the collision slot hasn't been streamed in. This is exactly what happens
+        // when an object is scaled the same frame it's created - it (and therefore its collision)
+        // hasn't streamed in. Force-load the collision slot now, the same way the engine streams
+        // collision, then re-read. Without this we'd fail and silently leave the object unscaled.
+        constexpr unsigned int RESOURCE_ID_COL = 25000;
+        const unsigned int     colStreamId = RESOURCE_ID_COL + pOriginalInterface->m_sphere.m_collisionSlot;
+        pGame->GetStreaming()->RequestModel(colStreamId, 0x16);
+        pGame->GetStreaming()->LoadAllRequestedModels(true, "CRenderWareSA::CreateScaledColModel");
+
+        pOriginalData = pOriginalInterface->m_data;
+        if (!pOriginalData)
+        {
+            // Genuinely no collision volumes (e.g. a purely visual/LOD model) - nothing to scale
+            return nullptr;
+        }
     }
 
     const bool bUsesDisks = pOriginalData->m_usesDisks;
