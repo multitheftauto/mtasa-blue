@@ -162,12 +162,20 @@ void CClientProjectile::DoPulse()
             CVector vecRestPosition;
             GetPosition(vecRestPosition);
 
-            // Did it stick to a vehicle/ped? Report that too, so the resync can keep it glued to it rather than
-            // leaving it behind at a position that's stale the moment that vehicle/ped moves.
+            // Did it stick to a vehicle/ped? Report that too, along with exactly where on it (GTA's own attach
+            // offset, e.g. the hood instead of the vehicle's centre), so the resync keeps it glued to the same
+            // spot instead of leaving it behind - or snapping it to the vehicle's origin - the moment it moves.
             CClientEntity* pAttachedTo = GetSatchelAttachedTo();
-            ElementID      attachedToID = pAttachedTo ? pAttachedTo->GetID() : INVALID_ELEMENT_ID;
+            ElementID      attachedToID = INVALID_ELEMENT_ID;
+            CVector        vecAttachOffsetPosition, vecAttachOffsetRotation;
+            if (pAttachedTo)
+            {
+                attachedToID = pAttachedTo->GetID();
+                GetSatchelAttachOffsets(vecAttachOffsetPosition, vecAttachOffsetRotation);
+            }
 
-            g_pClientGame->SendProjectileRestPosition(GetWeaponType(), *GetOrigin(), vecRestPosition, attachedToID);
+            g_pClientGame->SendProjectileRestPosition(GetWeaponType(), *GetOrigin(), vecRestPosition, attachedToID, vecAttachOffsetPosition,
+                                                       vecAttachOffsetRotation);
         }
     }
 }

@@ -3144,11 +3144,18 @@ void CGame::Packet_ProjectileRestPosition(CProjectileRestPositionPacket& Packet)
         {
             info.packet.m_OriginID = Packet.m_AttachedToID;
             info.packet.m_vecOrigin = Packet.m_vecRestPosition - pAttachedTo->GetPosition();
+
+            // GTA's own attach offset on that entity (e.g. the hood, not its centre) - passed through as-is so the
+            // resync can re-attach at the exact same spot instead of snapping it to the entity's origin.
+            info.packet.m_bHasAttachOffset = true;
+            info.packet.m_vecAttachOffsetPosition = Packet.m_vecAttachOffsetPosition;
+            info.packet.m_vecAttachOffsetRotation = Packet.m_vecAttachOffsetRotation;
         }
         else
         {
             info.packet.m_OriginID = INVALID_ELEMENT_ID;
             info.packet.m_vecOrigin = Packet.m_vecRestPosition;
+            info.packet.m_bHasAttachOffset = false;
         }
         info.packet.m_vecMoveSpeed = CVector();
         info.packet.m_fForce = 0.0f;

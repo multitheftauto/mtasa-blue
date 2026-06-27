@@ -31,5 +31,7 @@ public:
     unsigned char m_ucWeaponType;
     CVector       m_vecOrigin;             // Matches the original throw's m_vecOrigin, used to find the tracked entry
     CVector       m_vecRestPosition;
-    ElementID     m_AttachedToID;          // INVALID_ELEMENT_ID if it didn't stick to anything
+    ElementID     m_AttachedToID;            // INVALID_ELEMENT_ID if it didn't stick to anything
+    CVector       m_vecAttachOffsetPosition;  // Only valid if m_AttachedToID is set - GTA's own attach offset (e.g. the hood, not the centre)
+    CVector       m_vecAttachOffsetRotation;
 };

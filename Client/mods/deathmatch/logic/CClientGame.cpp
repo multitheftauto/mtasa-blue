@@ -5467,6 +5467,18 @@ void CClientGame::SendProjectileSync(CClientProjectile* pProjectile)
             case WEAPONTYPE_GRENADE:
             case WEAPONTYPE_TEARGAS:
             case WEAPONTYPE_MOLOTOV:
+            {
+                SFloatSync<7, 17> projectileForce;
+                projectileForce.data.fValue = pProjectile->GetForce();
+                pBitStream->Write(&projectileForce);
+
+                SVelocitySync velocity;
+                pProjectile->GetVelocity(velocity.data.vecVelocity);
+                pBitStream->Write(&velocity);
+
+                break;
+            }
+
             case WEAPONTYPE_REMOTE_SATCHEL_CHARGE:
             {
                 SFloatSync<7, 17> projectileForce;
@@ -5476,6 +5488,10 @@ void CClientGame::SendProjectileSync(CClientProjectile* pProjectile)
                 SVelocitySync velocity;
                 pProjectile->GetVelocity(velocity.data.vecVelocity);
                 pBitStream->Write(&velocity);
+
+                // No attach offset at throw time - that's only ever added later by a server resync
+                // (CGame::Packet_ProjectileRestPosition) once it's known whether/where it stuck to something
+                pBitStream->WriteBit(false);
 
                 break;
             }
@@ -5511,7 +5527,8 @@ void CClientGame::SendProjectileSync(CClientProjectile* pProjectile)
     }
 }
 
-void CClientGame::SendProjectileRestPosition(eWeaponType weaponType, const CVector& vecOrigin, const CVector& vecRestPosition, ElementID attachedToID)
+void CClientGame::SendProjectileRestPosition(eWeaponType weaponType, const CVector& vecOrigin, const CVector& vecRestPosition, ElementID attachedToID,
+                                             const CVector& vecAttachOffsetPosition, const CVector& vecAttachOffsetRotation)
 {
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
     if (pBitStream)
@@ -5530,6 +5547,14 @@ void CClientGame::SendProjectileRestPosition(eWeaponType weaponType, const CVect
         {
             pBitStream->WriteBit(true);
             pBitStream->Write(attachedToID);
+
+            pBitStream->Write(vecAttachOffsetPosition.fX);
+            pBitStream->Write(vecAttachOffsetPosition.fY);
+            pBitStream->Write(vecAttachOffsetPosition.fZ);
+
+            pBitStream->Write(vecAttachOffsetRotation.fX);
+            pBitStream->Write(vecAttachOffsetRotation.fY);
+            pBitStream->Write(vecAttachOffsetRotation.fZ);
         }
         else
             pBitStream->WriteBit(false);

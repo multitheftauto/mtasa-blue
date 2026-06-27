@@ -61,7 +61,8 @@ void CClientProjectileManager::DoPulse()
 
 void CClientProjectileManager::QueuePendingCreation(ElementID creatorID, eWeaponType eWeapon, const CVector& vecOrigin, float fForce, ElementID targetID,
                                                     ElementID originSourceID, const CVector& vecRotation, const CVector& vecVelocity,
-                                                    unsigned short usModel)
+                                                    unsigned short usModel, bool bHasAttachOffset, const CVector& vecAttachOffsetPosition,
+                                                    const CVector& vecAttachOffsetRotation)
 {
     SPendingProjectileCreation pending;
     pending.creatorID = creatorID;
@@ -73,12 +74,16 @@ void CClientProjectileManager::QueuePendingCreation(ElementID creatorID, eWeapon
     pending.vecRotation = vecRotation;
     pending.vecVelocity = vecVelocity;
     pending.usModel = usModel;
+    pending.bHasAttachOffset = bHasAttachOffset;
+    pending.vecAttachOffsetPosition = vecAttachOffsetPosition;
+    pending.vecAttachOffsetRotation = vecAttachOffsetRotation;
     pending.llCreationTime = GetTickCount64_();
     m_PendingCreations.push_back(pending);
 }
 
 void CClientProjectileManager::SettleResyncedSatchel(CClientProjectile* pProjectile, eWeaponType weaponType, float fForce, const CVector& vecVelocity,
-                                                     CClientEntity* pOriginSource)
+                                                     CClientEntity* pOriginSource, const CVector& vecAttachOffsetPosition,
+                                                     const CVector& vecAttachOffsetRotation)
 {
     // A live throw always has some non-zero force/velocity - zero on both is only ever seen on a satchel resync
     // packet (CGame::Packet_ProjectileRestPosition), which deliberately zeroes them once the satchel has settled.
@@ -88,7 +93,7 @@ void CClientProjectileManager::SettleResyncedSatchel(CClientProjectile* pProject
     pProjectile->SetStaticUntilCollisionLoaded();
 
     if (pOriginSource)
-        pProjectile->AttachSatchelToEntity(pOriginSource, CVector(), CVector());
+        pProjectile->AttachSatchelToEntity(pOriginSource, vecAttachOffsetPosition, vecAttachOffsetRotation);
 }
 
 void CClientProjectileManager::ProcessPendingCreations()
@@ -128,7 +133,8 @@ void CClientProjectileManager::ProcessPendingCreations()
                 CClientEntity* pOriginSource = NULL;
                 if (pending.originSourceID != INVALID_ELEMENT_ID)
                     pOriginSource = CElementIDs::GetElement(pending.originSourceID);
-                SettleResyncedSatchel(pProjectile, pending.weaponType, pending.fForce, pending.vecVelocity, pOriginSource);
+                SettleResyncedSatchel(pProjectile, pending.weaponType, pending.fForce, pending.vecVelocity, pOriginSource, pending.vecAttachOffsetPosition,
+                                      pending.vecAttachOffsetRotation);
 
                 bResolved = true;
             }

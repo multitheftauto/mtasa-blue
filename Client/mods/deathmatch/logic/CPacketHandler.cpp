@@ -4846,12 +4846,29 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
     CClientEntity*       pTargetEntity = NULL;
     SVelocitySync        velocity;
     SRotationRadiansSync rotation(true);
+    bool                 bHasAttachOffset = false;
+    CVector              vecAttachOffsetPosition, vecAttachOffsetRotation;
 
     switch (weaponType)
     {
         case WEAPONTYPE_GRENADE:
         case WEAPONTYPE_TEARGAS:
         case WEAPONTYPE_MOLOTOV:
+        {
+            // Read the force
+            SFloatSync<7, 17> projectileForce;
+            if (!bitStream.Read(&projectileForce))
+                return;
+            fForce = projectileForce.data.fValue;
+
+            // Read the velocity
+            if (!bitStream.Read(&velocity))
+                return;
+            bCreateProjectile = true;
+
+            break;
+        }
+
         case WEAPONTYPE_REMOTE_SATCHEL_CHARGE:
         {
             // Read the force
@@ -4863,6 +4880,23 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
             // Read the velocity
             if (!bitStream.Read(&velocity))
                 return;
+
+            // Only ever set on a resync (CGame::Packet_ProjectileRestPosition) - where on the entity it was stuck,
+            // in GTA's own native attach offset terms (e.g. the hood, not the entity's centre)
+            if (!bitStream.ReadBit(bHasAttachOffset))
+                return;
+
+            if (bHasAttachOffset)
+            {
+                if (!bitStream.Read(vecAttachOffsetPosition.fX) || !bitStream.Read(vecAttachOffsetPosition.fY) ||
+                    !bitStream.Read(vecAttachOffsetPosition.fZ))
+                    return;
+
+                if (!bitStream.Read(vecAttachOffsetRotation.fX) || !bitStream.Read(vecAttachOffsetRotation.fY) ||
+                    !bitStream.Read(vecAttachOffsetRotation.fZ))
+                    return;
+            }
+
             bCreateProjectile = true;
 
             break;
@@ -4926,7 +4960,7 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
             {
                 pProjectile->Initiate(origin.data.vecPosition, rotation.data.vecRotation, velocity.data.vecVelocity, usModel);
                 g_pClientGame->m_pManager->GetProjectileManager()->SettleResyncedSatchel(pProjectile, weaponType, fForce, velocity.data.vecVelocity,
-                                                                                         pOriginSource);
+                                                                                         pOriginSource, vecAttachOffsetPosition, vecAttachOffsetRotation);
                 bCreated = true;
             }
         }
@@ -4938,7 +4972,8 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
         {
             ElementID TargetID = pTargetEntity ? pTargetEntity->GetID() : INVALID_ELEMENT_ID;
             g_pClientGame->m_pManager->GetProjectileManager()->QueuePendingCreation(CreatorID, weaponType, origin.data.vecPosition, fForce, TargetID,
-                                                                                    OriginID, rotation.data.vecRotation, velocity.data.vecVelocity, usModel);
+                                                                                    OriginID, rotation.data.vecRotation, velocity.data.vecVelocity, usModel,
+                                                                                    bHasAttachOffset, vecAttachOffsetPosition, vecAttachOffsetRotation);
         }
     }
 }

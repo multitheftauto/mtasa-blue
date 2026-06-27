@@ -35,4 +35,11 @@ public:
     CVector        m_vecRotation;
     CVector        m_vecMoveSpeed;
     unsigned short m_usModel;
+
+    // Only ever set on a satchel resync (CGame::Packet_ProjectileRestPosition) when it was stuck to m_OriginID -
+    // GTA's own native attach offset on that entity (e.g. the hood, not its centre), so the receiving client can
+    // re-attach it at the exact same spot instead of the entity's origin (https://github.com/multitheftauto/mtasa-blue/issues/369, #368)
+    bool    m_bHasAttachOffset;
+    CVector m_vecAttachOffsetPosition;
+    CVector m_vecAttachOffsetRotation;
 };

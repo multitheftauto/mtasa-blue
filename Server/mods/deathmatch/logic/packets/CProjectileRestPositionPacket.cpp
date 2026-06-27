@@ -34,8 +34,19 @@ bool CProjectileRestPositionPacket::Read(NetBitStreamInterface& BitStream)
         return false;
 
     m_AttachedToID = INVALID_ELEMENT_ID;
-    if (bHasAttachedTo && !BitStream.Read(m_AttachedToID))
-        return false;
+    if (bHasAttachedTo)
+    {
+        if (!BitStream.Read(m_AttachedToID))
+            return false;
+
+        if (!BitStream.Read(m_vecAttachOffsetPosition.fX) || !BitStream.Read(m_vecAttachOffsetPosition.fY) ||
+            !BitStream.Read(m_vecAttachOffsetPosition.fZ))
+            return false;
+
+        if (!BitStream.Read(m_vecAttachOffsetRotation.fX) || !BitStream.Read(m_vecAttachOffsetRotation.fY) ||
+            !BitStream.Read(m_vecAttachOffsetRotation.fZ))
+            return false;
+    }
 
     return true;
 }
@@ -56,6 +67,14 @@ bool CProjectileRestPositionPacket::Write(NetBitStreamInterface& BitStream) cons
     {
         BitStream.WriteBit(true);
         BitStream.Write(m_AttachedToID);
+
+        BitStream.Write(m_vecAttachOffsetPosition.fX);
+        BitStream.Write(m_vecAttachOffsetPosition.fY);
+        BitStream.Write(m_vecAttachOffsetPosition.fZ);
+
+        BitStream.Write(m_vecAttachOffsetRotation.fX);
+        BitStream.Write(m_vecAttachOffsetRotation.fY);
+        BitStream.Write(m_vecAttachOffsetRotation.fZ);
     }
     else
         BitStream.WriteBit(false);
