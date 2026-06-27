@@ -2440,6 +2440,9 @@ bool CLuaPedDefs::SetPedArmor(CClientPed* const ped, const float armor)
     if (armor > 100.0f)
         throw std::invalid_argument("Armor must be less than or equal to 100");
 
+    if (ped->IsLocalPlayer())
+        throw LuaFunctionError("The client-side setPedArmor function for localPlayer is deprecated. Use the corresponding server-side function instead", true);
+
     ped->SetArmor(armor);
     return true;
 }
