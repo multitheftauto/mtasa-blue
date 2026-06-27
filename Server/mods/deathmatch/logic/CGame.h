@@ -24,6 +24,7 @@ class CGame;
 #include "packets/CCommandPacket.h"
 #include "packets/CExplosionSyncPacket.h"
 #include "packets/CProjectileSyncPacket.h"
+#include "packets/CProjectileRestPositionPacket.h"
 #include "packets/CPedWastedPacket.h"
 #include "packets/CPlayerJoinDataPacket.h"
 #include "packets/CPlayerQuitPacket.h"
@@ -500,6 +501,7 @@ private:
     void Packet_DestroySatchels(class CDestroySatchelsPacket& Packet);
     void Packet_ExplosionSync(class CExplosionSyncPacket& Packet);
     void Packet_ProjectileSync(class CProjectileSyncPacket& Packet);
+    void Packet_ProjectileRestPosition(class CProjectileRestPositionPacket& Packet);
     void ProcessProjectileStreamIn();
     void Packet_Command(class CCommandPacket& Packet);
     void Packet_VehicleDamageSync(class CVehicleDamageSyncPacket& Packet);

@@ -685,6 +685,7 @@ public:
                            std::optional<VehicleBlowState> vehicleBlowState = std::nullopt);
     void SendFireSync(CFire* pFire);
     void SendProjectileSync(CClientProjectile* pProjectile);
+    void SendProjectileRestPosition(eWeaponType weaponType, const CVector& vecOrigin, const CVector& vecRestPosition);
 
     void           SetServerVersionSortable(const SString& strVersion) { m_strServerVersionSortable = strVersion; }
     const SString& GetServerVersionSortable() { return m_strServerVersionSortable; }

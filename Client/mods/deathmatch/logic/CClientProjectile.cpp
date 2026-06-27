@@ -154,6 +154,15 @@ void CClientProjectile::DoPulse()
     if (m_bCorrected == false && m_pProjectile != NULL && GetWeaponType() == eWeaponType::WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
     {
         m_bCorrected = m_pProjectile->CorrectPhysics();
+
+        // Tell the server where we actually settled, once, so a player who streams in later gets placed here
+        // directly instead of having the whole throw replayed at them (https://github.com/multitheftauto/mtasa-blue/issues/369, #368)
+        if (m_bCorrected && IsLocal() && GetCreator() == g_pClientGame->GetLocalPlayer())
+        {
+            CVector vecRestPosition;
+            GetPosition(vecRestPosition);
+            g_pClientGame->SendProjectileRestPosition(GetWeaponType(), *GetOrigin(), vecRestPosition);
+        }
     }
 }
 

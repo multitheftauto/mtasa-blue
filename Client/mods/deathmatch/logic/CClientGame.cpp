@@ -5511,6 +5511,27 @@ void CClientGame::SendProjectileSync(CClientProjectile* pProjectile)
     }
 }
 
+void CClientGame::SendProjectileRestPosition(eWeaponType weaponType, const CVector& vecOrigin, const CVector& vecRestPosition)
+{
+    NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
+    if (pBitStream)
+    {
+        pBitStream->Write(static_cast<unsigned char>(weaponType));
+
+        pBitStream->Write(vecOrigin.fX);
+        pBitStream->Write(vecOrigin.fY);
+        pBitStream->Write(vecOrigin.fZ);
+
+        pBitStream->Write(vecRestPosition.fX);
+        pBitStream->Write(vecRestPosition.fY);
+        pBitStream->Write(vecRestPosition.fZ);
+
+        g_pNet->SendPacket(PACKET_ID_PROJECTILE_REST_POSITION, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED);
+
+        g_pNet->DeallocateNetBitStream(pBitStream);
+    }
+}
+
 void CClientGame::ResetAmmoInClip()
 {
     memset(&m_wasWeaponAmmoInClip[0], 0, sizeof(m_wasWeaponAmmoInClip));

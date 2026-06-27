@@ -1251,6 +1251,10 @@ bool CGame::ProcessPacket(CPacket& Packet)
             Packet_ProjectileSync(static_cast<CProjectileSyncPacket&>(Packet));
             return true;
 
+        case PACKET_ID_PROJECTILE_REST_POSITION:
+            Packet_ProjectileRestPosition(static_cast<CProjectileRestPositionPacket&>(Packet));
+            return true;
+
         case PACKET_ID_COMMAND:
         {
             Packet_Command(static_cast<CCommandPacket&>(Packet));
@@ -3104,6 +3108,39 @@ void CGame::ProcessProjectileStreamIn()
                 }
             }
         }
+    }
+}
+
+void CGame::Packet_ProjectileRestPosition(CProjectileRestPositionPacket& Packet)
+{
+    // Sent by the owning client once a satchel charge has settled (CClientProjectile::CorrectPhysics finished).
+    // Until now, ProcessProjectileStreamIn resent late-joining players the original throw packet (origin + velocity),
+    // which replays the whole toss client-side - looking like it was just thrown, and since physics replay isn't
+    // perfectly deterministic, occasionally settling somewhere slightly different (floating, or in a different spot)
+    // than the satchel everyone else has been looking at for the last while. Swap the tracked entry over to the
+    // actual resting spot with no velocity so future stream-ins just place it there directly
+    // (https://github.com/multitheftauto/mtasa-blue/issues/369, #368).
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if (!pPlayer || !pPlayer->IsJoined())
+        return;
+
+    if (Packet.m_ucWeaponType != WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
+        return;
+
+    for (auto& info : pPlayer->GetPersistentProjectilesList())
+    {
+        if (info.packet.m_ucWeaponType != Packet.m_ucWeaponType)
+            continue;
+
+        // Match against the throw's original origin (the key the client knows the entry by)
+        if (!IsPointNearPoint3D(info.packet.m_vecOrigin, Packet.m_vecOrigin, 1.0f))
+            continue;
+
+        info.packet.m_vecOrigin = Packet.m_vecRestPosition;
+        info.packet.m_OriginID = INVALID_ELEMENT_ID;
+        info.packet.m_vecMoveSpeed = CVector();
+        info.packet.m_fForce = 0.0f;
+        break;
     }
 }
 
