@@ -86,8 +86,8 @@ public:
     void          GetScale(CVector& vecScale) const;
     // scaleCollision left unspecified (nullopt) preserves whatever collision-scaling state this
     // object already has, instead of silently turning it off.
-    void          SetScale(const CVector& vecScale, std::optional<bool> scaleCollision = std::nullopt);
-    bool          IsCollisionScaled() const { return m_iScaleCollisionModelID != -1; }
+    void SetScale(const CVector& vecScale, std::optional<bool> scaleCollision = std::nullopt);
+    bool IsCollisionScaled() const { return m_iScaleCollisionModelID != -1; }
 
     bool IsCollisionEnabled() { return m_bUsesCollision; };
     void SetCollisionEnabled(bool bCollisionEnabled);

@@ -577,11 +577,11 @@ namespace
         {
             const CColTriangleSA& triangle = pData->m_triangles[i];
             maxIndex = std::max({maxIndex, static_cast<std::uint32_t>(triangle.m_indices[0]), static_cast<std::uint32_t>(triangle.m_indices[1]),
-                                  static_cast<std::uint32_t>(triangle.m_indices[2])});
+                                 static_cast<std::uint32_t>(triangle.m_indices[2])});
         }
         return pData->m_numTriangles > 0 ? maxIndex + 1 : 0;
     }
-}            // namespace
+}  // namespace
 
 // Builds a new CColModel with the same geometry as pOriginalInterface, scaled by vecScale.
 // Used to give scaled objects (setObjectScale with scaleCollision=true) their own
@@ -599,8 +599,7 @@ CColModel* CRenderWareSA::CreateScaledColModel(CColModelSAInterface* pOriginalIn
     }
 
     const bool bUsesDisks = pOriginalData->m_usesDisks;
-    const bool bHasNonUniformScaleHazard =
-        (pOriginalData->m_numSpheres > 0 || pOriginalData->m_numSuspensionLines > 0) && !IsScaleUniform(vecScale);
+    const bool bHasNonUniformScaleHazard = (pOriginalData->m_numSpheres > 0 || pOriginalData->m_numSuspensionLines > 0) && !IsScaleUniform(vecScale);
     if (bHasNonUniformScaleHazard)
     {
         // Spheres/disks/lines carry a single radius value that can't be represented correctly

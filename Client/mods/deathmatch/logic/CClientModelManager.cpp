@@ -143,13 +143,15 @@ void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResour
 
 namespace
 {
-    int QuantizeScaleComponent(float fValue) { return static_cast<int>(std::lround(fValue * 1000.0f)); }
-}            // namespace
+    int QuantizeScaleComponent(float fValue)
+    {
+        return static_cast<int>(std::lround(fValue * 1000.0f));
+    }
+}  // namespace
 
 int CClientModelManager::AcquireScaledCollisionModel(unsigned short usBaseModelID, const CVector& vecScale)
 {
-    const SScaledColModelKey key{usBaseModelID, QuantizeScaleComponent(vecScale.fX), QuantizeScaleComponent(vecScale.fY),
-                                  QuantizeScaleComponent(vecScale.fZ)};
+    const SScaledColModelKey key{usBaseModelID, QuantizeScaleComponent(vecScale.fX), QuantizeScaleComponent(vecScale.fY), QuantizeScaleComponent(vecScale.fZ)};
 
     auto it = m_ScaledColModels.find(key);
     if (it != m_ScaledColModels.end())
