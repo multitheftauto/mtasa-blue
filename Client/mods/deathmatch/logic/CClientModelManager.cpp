@@ -35,6 +35,19 @@ void CClientModelManager::RemoveAll(void)
         m_Models[i] = nullptr;
     }
     m_modelCount = 0;
+
+    // The loop above already drops every clone's CClientModel slot, but our own scaled-collision
+    // cache isn't aware of that - without clearing it too, a later AcquireScaledCollisionModel()
+    // call (e.g. reapplying scale on reconnect) would think it can reuse a clone that no longer
+    // really exists, handing out a model ID with the visual scale applied but no scaled collision
+    // actually attached to it.
+    for (auto& [key, entry] : m_ScaledColModels)
+    {
+        if (entry.pScaledColModel)
+            entry.pScaledColModel->Destroy();
+    }
+    m_ScaledColModels.clear();
+    m_ScaledColModelKeyByID.clear();
 }
 
 void CClientModelManager::Add(const std::shared_ptr<CClientModel>& pModel)
@@ -164,7 +177,14 @@ int CClientModelManager::AcquireScaledCollisionModel(unsigned short usBaseModelI
     if (!pBaseModelInfo || !pBaseModelInfo->IsValid())
         return -1;
 
+    // GetColModelInterface() only returns whatever's already resident - it doesn't stream
+    // anything in. If this is called right after creating an object of this model (before the
+    // model's own streaming request has finished), the collision data may not be loaded yet and
+    // we'd silently fail here. Force a blocking load so it's guaranteed to be ready, then drop
+    // our temporary reference - whatever already (or will) reference this model keeps it loaded.
+    pBaseModelInfo->ModelAddRef(BLOCKING, "AcquireScaledCollisionModel");
     CColModelSAInterface* pOriginalColModelInterface = pBaseModelInfo->GetColModelInterface();
+    pBaseModelInfo->RemoveRef();
     if (!pOriginalColModelInterface)
         return -1;
 

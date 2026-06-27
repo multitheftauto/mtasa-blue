@@ -558,12 +558,6 @@ namespace
         return result;
     }
 
-    bool IsScaleUniform(const CVector& vecScale)
-    {
-        constexpr float kEpsilon = 0.0001f;
-        return std::fabs(vecScale.fX - vecScale.fY) < kEpsilon && std::fabs(vecScale.fY - vecScale.fZ) < kEpsilon;
-    }
-
     // CColDataSA has no explicit vertex count - like the engine's own shadow-mesh loader
     // (see GetNoOfShdwVerts), the number of vertices is derived from the highest index any
     // triangle references.
@@ -599,13 +593,6 @@ CColModel* CRenderWareSA::CreateScaledColModel(CColModelSAInterface* pOriginalIn
     }
 
     const bool bUsesDisks = pOriginalData->m_usesDisks;
-    const bool bHasNonUniformScaleHazard = (pOriginalData->m_numSpheres > 0 || pOriginalData->m_numSuspensionLines > 0) && !IsScaleUniform(vecScale);
-    if (bHasNonUniformScaleHazard)
-    {
-        // Spheres/disks/lines carry a single radius value that can't be represented correctly
-        // under a non-uniform scale. Reject rather than silently producing wrong collision.
-        return nullptr;
-    }
 
     // Compute each array's byte size and offset (relative to right after the 88 byte header)
     const std::uint32_t sphereBytes = pOriginalData->m_numSpheres * sizeof(CColSphereSA);

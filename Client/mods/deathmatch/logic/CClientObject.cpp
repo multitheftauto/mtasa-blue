@@ -450,6 +450,20 @@ void CClientObject::SetScale(const CVector& vecScale, std::optional<bool> scaleC
 
             m_usScaleCollisionBaseModel = usBaseModel;
             m_iScaleCollisionModelID = iNewCloneID;
+
+            // The clone is a freshly minted model slot, so CClientModelRequestManager::Request()
+            // (called inside SetModel() below) would normally see it as "not loaded" and only
+            // queue an async callback to Create() once it streams in. That callback never actually
+            // fires for these clones (they don't reference new disk data, just the parent's already-
+            // loaded geometry, so nothing ever marks them "loaded"), leaving the object stuck with
+            // its old, unscaled collision until something else happens to retry. Force a blocking
+            // load first so Request() sees it as already loaded and Create() runs synchronously.
+            if (CModelInfo* pCloneModelInfo = g_pGame->GetModelInfo(iNewCloneID, true))
+            {
+                pCloneModelInfo->ModelAddRef(BLOCKING, "CClientObject::SetScale");
+                pCloneModelInfo->RemoveRef();
+            }
+
             SetModel(static_cast<unsigned short>(iNewCloneID));
 
             if (iOldCloneID != -1 && iOldCloneID != iNewCloneID)

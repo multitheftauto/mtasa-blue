@@ -1603,8 +1603,14 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
     if (!pColModelInterface)
         return;
 
-    // Skip setting if already done
-    if (m_pCustomColModel == pColModel)
+    // Skip only if this col is both already recorded as our custom one AND still actually applied to
+    // the live model interface. We must NOT early-out merely because m_pCustomColModel matches:
+    // MakeCustomModel() re-invokes us right after the model streams in specifically to re-apply the
+    // custom col over whatever the reload reset the interface's pColModel back to, and that re-apply
+    // has to actually run. (Without this, a freshly streamed model - e.g. a scaled-collision clone -
+    // keeps the original disk collision the reload restored, ignoring our custom one.)
+    CBaseModelInfoSAInterface* pLiveInterface = ppModelInfo[m_dwModelID];
+    if (m_pCustomColModel == pColModel && pLiveInterface && pLiveInterface->pColModel == pColModelInterface)
         return;
 
     // Store the col model we set
