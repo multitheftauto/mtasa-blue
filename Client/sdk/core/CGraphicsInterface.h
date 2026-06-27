@@ -92,6 +92,7 @@ namespace EBlendMode
         ADD,           // Color add                          (used for making composite textures with a premultiplied source)
         MODULATE_ADD,  // Modulate color with alpha then add (used for making composite textures with a non-premultiplied source)
         OVERWRITE,     // Blat everything
+        RT_TEXTURE,    // Draw render target texture to screen (premultiplied-alpha source, avoids double-alpha compositing)
     };
 }
 using EBlendMode::EBlendModeType;
