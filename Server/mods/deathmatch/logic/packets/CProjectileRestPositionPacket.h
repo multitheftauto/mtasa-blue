@@ -31,4 +31,5 @@ public:
     unsigned char m_ucWeaponType;
     CVector       m_vecOrigin;             // Matches the original throw's m_vecOrigin, used to find the tracked entry
     CVector       m_vecRestPosition;
+    ElementID     m_AttachedToID;          // INVALID_ELEMENT_ID if it didn't stick to anything
 };

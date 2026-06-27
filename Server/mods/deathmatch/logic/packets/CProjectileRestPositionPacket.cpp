@@ -15,6 +15,7 @@
 CProjectileRestPositionPacket::CProjectileRestPositionPacket()
 {
     m_ucWeaponType = 0;
+    m_AttachedToID = INVALID_ELEMENT_ID;
 }
 
 bool CProjectileRestPositionPacket::Read(NetBitStreamInterface& BitStream)
@@ -26,6 +27,14 @@ bool CProjectileRestPositionPacket::Read(NetBitStreamInterface& BitStream)
         return false;
 
     if (!BitStream.Read(m_vecRestPosition.fX) || !BitStream.Read(m_vecRestPosition.fY) || !BitStream.Read(m_vecRestPosition.fZ))
+        return false;
+
+    bool bHasAttachedTo;
+    if (!BitStream.ReadBit(bHasAttachedTo))
+        return false;
+
+    m_AttachedToID = INVALID_ELEMENT_ID;
+    if (bHasAttachedTo && !BitStream.Read(m_AttachedToID))
         return false;
 
     return true;
@@ -42,6 +51,14 @@ bool CProjectileRestPositionPacket::Write(NetBitStreamInterface& BitStream) cons
     BitStream.Write(m_vecRestPosition.fX);
     BitStream.Write(m_vecRestPosition.fY);
     BitStream.Write(m_vecRestPosition.fZ);
+
+    if (m_AttachedToID != INVALID_ELEMENT_ID)
+    {
+        BitStream.WriteBit(true);
+        BitStream.Write(m_AttachedToID);
+    }
+    else
+        BitStream.WriteBit(false);
 
     return true;
 }

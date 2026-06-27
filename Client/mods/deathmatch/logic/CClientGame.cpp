@@ -5511,7 +5511,7 @@ void CClientGame::SendProjectileSync(CClientProjectile* pProjectile)
     }
 }
 
-void CClientGame::SendProjectileRestPosition(eWeaponType weaponType, const CVector& vecOrigin, const CVector& vecRestPosition)
+void CClientGame::SendProjectileRestPosition(eWeaponType weaponType, const CVector& vecOrigin, const CVector& vecRestPosition, ElementID attachedToID)
 {
     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
     if (pBitStream)
@@ -5525,6 +5525,14 @@ void CClientGame::SendProjectileRestPosition(eWeaponType weaponType, const CVect
         pBitStream->Write(vecRestPosition.fX);
         pBitStream->Write(vecRestPosition.fY);
         pBitStream->Write(vecRestPosition.fZ);
+
+        if (attachedToID != INVALID_ELEMENT_ID)
+        {
+            pBitStream->WriteBit(true);
+            pBitStream->Write(attachedToID);
+        }
+        else
+            pBitStream->WriteBit(false);
 
         g_pNet->SendPacket(PACKET_ID_PROJECTILE_REST_POSITION, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_RELIABLE_ORDERED);
 

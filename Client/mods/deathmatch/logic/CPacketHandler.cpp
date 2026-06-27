@@ -4824,9 +4824,11 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
     CClientEntity* pCreator = NULL;
     if (CreatorID != INVALID_ELEMENT_ID)
         pCreator = CElementIDs::GetElement(CreatorID);
+
+    CClientEntity* pOriginSource = NULL;
     if (OriginID != INVALID_ELEMENT_ID)
     {
-        CClientEntity* pOriginSource = CElementIDs::GetElement(OriginID);
+        pOriginSource = CElementIDs::GetElement(OriginID);
         if (pOriginSource)
         {
             CVector vecTemp;
@@ -4923,6 +4925,8 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
             if (pProjectile)
             {
                 pProjectile->Initiate(origin.data.vecPosition, rotation.data.vecRotation, velocity.data.vecVelocity, usModel);
+                g_pClientGame->m_pManager->GetProjectileManager()->SettleResyncedSatchel(pProjectile, weaponType, fForce, velocity.data.vecVelocity,
+                                                                                         pOriginSource);
                 bCreated = true;
             }
         }
@@ -4934,7 +4938,7 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
         {
             ElementID TargetID = pTargetEntity ? pTargetEntity->GetID() : INVALID_ELEMENT_ID;
             g_pClientGame->m_pManager->GetProjectileManager()->QueuePendingCreation(CreatorID, weaponType, origin.data.vecPosition, fForce, TargetID,
-                                                                                    rotation.data.vecRotation, velocity.data.vecVelocity, usModel);
+                                                                                    OriginID, rotation.data.vecRotation, velocity.data.vecVelocity, usModel);
         }
     }
 }

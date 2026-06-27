@@ -3136,8 +3136,20 @@ void CGame::Packet_ProjectileRestPosition(CProjectileRestPositionPacket& Packet)
         if (!IsPointNearPoint3D(info.packet.m_vecOrigin, Packet.m_vecOrigin, 1.0f))
             continue;
 
-        info.packet.m_vecOrigin = Packet.m_vecRestPosition;
-        info.packet.m_OriginID = INVALID_ELEMENT_ID;
+        // If it stuck to a vehicle/ped, store the position relative to it instead of an absolute world position,
+        // so a late stream-in places it correctly even if that vehicle/ped has since moved
+        // (m_OriginID/m_vecOrigin is the same relative-origin mechanism WEAPONTYPE_ROCKET_HS already uses).
+        CElement* pAttachedTo = (Packet.m_AttachedToID != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_AttachedToID) : nullptr;
+        if (pAttachedTo)
+        {
+            info.packet.m_OriginID = Packet.m_AttachedToID;
+            info.packet.m_vecOrigin = Packet.m_vecRestPosition - pAttachedTo->GetPosition();
+        }
+        else
+        {
+            info.packet.m_OriginID = INVALID_ELEMENT_ID;
+            info.packet.m_vecOrigin = Packet.m_vecRestPosition;
+        }
         info.packet.m_vecMoveSpeed = CVector();
         info.packet.m_fForce = 0.0f;
         break;

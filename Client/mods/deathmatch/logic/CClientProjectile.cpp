@@ -161,7 +161,13 @@ void CClientProjectile::DoPulse()
         {
             CVector vecRestPosition;
             GetPosition(vecRestPosition);
-            g_pClientGame->SendProjectileRestPosition(GetWeaponType(), *GetOrigin(), vecRestPosition);
+
+            // Did it stick to a vehicle/ped? Report that too, so the resync can keep it glued to it rather than
+            // leaving it behind at a position that's stale the moment that vehicle/ped moves.
+            CClientEntity* pAttachedTo = GetSatchelAttachedTo();
+            ElementID      attachedToID = pAttachedTo ? pAttachedTo->GetID() : INVALID_ELEMENT_ID;
+
+            g_pClientGame->SendProjectileRestPosition(GetWeaponType(), *GetOrigin(), vecRestPosition, attachedToID);
         }
     }
 }
@@ -339,4 +345,29 @@ CClientEntity* CClientProjectile::GetSatchelAttachedTo()
 
     CPools* pPools = g_pGame->GetPools();
     return pPools->GetClientEntity((DWORD*)pAttachedToSA->GetInterface());
+}
+
+void CClientProjectile::GetSatchelAttachOffsets(CVector& vecOffsetPosition, CVector& vecOffsetRotation)
+{
+    if (m_pProjectile)
+        m_pProjectile->GetAttachedOffsets(vecOffsetPosition, vecOffsetRotation);
+}
+
+void CClientProjectile::AttachSatchelToEntity(CClientEntity* pEntity, const CVector& vecOffsetPosition, const CVector& vecOffsetRotation)
+{
+    if (!m_pProjectile || !pEntity)
+        return;
+
+    CPhysical* pGamePhysical = dynamic_cast<CPhysical*>(pEntity->GetGameEntity());
+    if (pGamePhysical)
+        m_pProjectile->AttachEntityToEntity(*pGamePhysical, vecOffsetPosition, vecOffsetRotation);
+}
+
+void CClientProjectile::SetStaticUntilCollisionLoaded()
+{
+    // Used when this satchel was just placed by a resync (CGame::Packet_ProjectileRestPosition) rather than thrown
+    // locally - the area's collision might not be streamed in yet, so without this it falls through the world
+    // until something already-loaded catches it (https://github.com/multitheftauto/mtasa-blue/issues/369, #368)
+    if (m_pProjectile)
+        m_pProjectile->SetStaticWaitingForCollision(true);
 }
