@@ -4908,6 +4908,7 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
 
     if (bCreateProjectile)
     {
+        bool bCreated = false;
         if (pCreator)
         {
             if (pCreator->GetType() == CCLIENTPED || pCreator->GetType() == CCLIENTPLAYER)
@@ -4922,7 +4923,18 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
             if (pProjectile)
             {
                 pProjectile->Initiate(origin.data.vecPosition, rotation.data.vecRotation, velocity.data.vecVelocity, usModel);
+                bCreated = true;
             }
+        }
+
+        // The creator's in-game ped/vehicle might not have streamed in yet (e.g. they just connected, or we only
+        // just came into sync range of a projectile they planted earlier while we were out of view - see
+        // CGame::ProcessProjectileStreamIn on the server). Keep retrying instead of silently dropping it.
+        if (!bCreated && CreatorID != INVALID_ELEMENT_ID)
+        {
+            ElementID TargetID = pTargetEntity ? pTargetEntity->GetID() : INVALID_ELEMENT_ID;
+            g_pClientGame->m_pManager->GetProjectileManager()->QueuePendingCreation(CreatorID, weaponType, origin.data.vecPosition, fForce, TargetID,
+                                                                                    rotation.data.vecRotation, velocity.data.vecVelocity, usModel);
         }
     }
 }

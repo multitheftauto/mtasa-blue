@@ -12,6 +12,7 @@
 
 #include "CClientProjectile.h"
 #include <list>
+#include <vector>
 
 typedef void(ProjectileInitiateHandler)(CClientProjectile*);
 class CClientManager;
@@ -41,6 +42,12 @@ public:
                                  float fForce, CVector* target, CEntity* pGameTarget);
     CClientProjectile* Create(CClientEntity* pCreator, eWeaponType eWeapon, CVector& vecOrigin, float fForce, CVector* target, CClientEntity* pTargetEntity);
 
+    // The creator's in-game ped/vehicle may not have streamed in yet (e.g. they just connected, or we only just came
+    // into range of a projectile they planted earlier while out of view). Queue the creation and keep retrying for a
+    // while instead of silently dropping it.
+    void QueuePendingCreation(ElementID creatorID, eWeaponType eWeapon, const CVector& vecOrigin, float fForce, ElementID targetID,
+                              const CVector& vecRotation, const CVector& vecVelocity, unsigned short usModel);
+
 protected:
     void AddToList(CClientProjectile* pProjectile) { m_List.push_back(pProjectile); }
     void RemoveFromList(CClientProjectile* pProjectile);
@@ -48,6 +55,8 @@ protected:
     void TakeOutTheTrash();
 
 private:
+    void ProcessPendingCreations();
+
     CClientManager*               m_pManager;
     std::list<CClientProjectile*> m_List;
 
@@ -56,4 +65,18 @@ private:
 
     bool                 m_bCreating;
     CClientProjectilePtr m_pLastCreated;
+
+    struct SPendingProjectileCreation
+    {
+        ElementID      creatorID;
+        eWeaponType    weaponType;
+        CVector        vecOrigin;
+        float          fForce;
+        ElementID      targetID;
+        CVector        vecRotation;
+        CVector        vecVelocity;
+        unsigned short usModel;
+        long long      llCreationTime;
+    };
+    std::vector<SPendingProjectileCreation> m_PendingCreations;
 };

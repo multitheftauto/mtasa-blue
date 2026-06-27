@@ -55,6 +55,68 @@ void CClientProjectileManager::DoPulse()
             pProjectile->DoPulse();
         }
     }
+
+    ProcessPendingCreations();
+}
+
+void CClientProjectileManager::QueuePendingCreation(ElementID creatorID, eWeaponType eWeapon, const CVector& vecOrigin, float fForce, ElementID targetID,
+                                                    const CVector& vecRotation, const CVector& vecVelocity, unsigned short usModel)
+{
+    SPendingProjectileCreation pending;
+    pending.creatorID = creatorID;
+    pending.weaponType = eWeapon;
+    pending.vecOrigin = vecOrigin;
+    pending.fForce = fForce;
+    pending.targetID = targetID;
+    pending.vecRotation = vecRotation;
+    pending.vecVelocity = vecVelocity;
+    pending.usModel = usModel;
+    pending.llCreationTime = GetTickCount64_();
+    m_PendingCreations.push_back(pending);
+}
+
+void CClientProjectileManager::ProcessPendingCreations()
+{
+    if (m_PendingCreations.empty())
+        return;
+
+    // Generous timeout: the creator's ped/vehicle just needs to come within the game's own streaming distance,
+    // which can take a while if whoever it belongs to is approaching on foot from the edge of sync range.
+    constexpr long long PENDING_CREATION_TIMEOUT = 60000;
+    const long long      llNow = GetTickCount64_();
+
+    for (auto iter = m_PendingCreations.begin(); iter != m_PendingCreations.end();)
+    {
+        SPendingProjectileCreation& pending = *iter;
+
+        bool           bResolved = false;
+        CClientEntity* pCreator = CElementIDs::GetElement(pending.creatorID);
+        if (pCreator)
+        {
+            if (pCreator->GetType() == CCLIENTPED || pCreator->GetType() == CCLIENTPLAYER)
+            {
+                CClientVehicle* pVehicle = static_cast<CClientPed*>(pCreator)->GetOccupiedVehicle();
+                if (pVehicle)
+                    pCreator = pVehicle;
+            }
+
+            CClientEntity* pTargetEntity = NULL;
+            if (pending.targetID != INVALID_ELEMENT_ID)
+                pTargetEntity = CElementIDs::GetElement(pending.targetID);
+
+            CClientProjectile* pProjectile = Create(pCreator, pending.weaponType, pending.vecOrigin, pending.fForce, NULL, pTargetEntity);
+            if (pProjectile)
+            {
+                pProjectile->Initiate(pending.vecOrigin, pending.vecRotation, pending.vecVelocity, pending.usModel);
+                bResolved = true;
+            }
+        }
+
+        if (bResolved || (llNow - pending.llCreationTime) > PENDING_CREATION_TIMEOUT)
+            iter = m_PendingCreations.erase(iter);
+        else
+            ++iter;
+    }
 }
 
 void CClientProjectileManager::RemoveAll()
