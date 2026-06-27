@@ -60,9 +60,8 @@ void CClientProjectileManager::DoPulse()
 }
 
 void CClientProjectileManager::QueuePendingCreation(ElementID creatorID, eWeaponType eWeapon, const CVector& vecOrigin, float fForce, ElementID targetID,
-                                                    ElementID originSourceID, const CVector& vecRotation, const CVector& vecVelocity,
-                                                    unsigned short usModel, bool bHasAttachOffset, const CVector& vecAttachOffsetPosition,
-                                                    const CVector& vecAttachOffsetRotation)
+                                                    ElementID originSourceID, const CVector& vecRotation, const CVector& vecVelocity, unsigned short usModel,
+                                                    bool bHasAttachOffset, const CVector& vecAttachOffsetPosition, const CVector& vecAttachOffsetRotation)
 {
     SPendingProjectileCreation pending;
     pending.creatorID = creatorID;
@@ -104,7 +103,7 @@ void CClientProjectileManager::ProcessPendingCreations()
     // Generous timeout: the creator's ped/vehicle just needs to come within the game's own streaming distance,
     // which can take a while if whoever it belongs to is approaching on foot from the edge of sync range.
     constexpr long long PENDING_CREATION_TIMEOUT = 60000;
-    const long long      llNow = GetTickCount64_();
+    const long long     llNow = GetTickCount64_();
 
     for (auto iter = m_PendingCreations.begin(); iter != m_PendingCreations.end();)
     {

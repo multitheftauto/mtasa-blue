@@ -3036,8 +3036,8 @@ void CGame::Packet_ProjectileSync(CProjectileSyncPacket& Packet)
         // (expiryTime left at zero) are only ever removed explicitly, since they have no lifespan of their own.
         constexpr unsigned long PERSISTENT_PROJECTILE_LIFETIME = 20000;
 
-        bool bIsPersistentProjectile = false;
-        CTickCount expiryTime;            // Zero means "doesn't expire on its own"
+        bool       bIsPersistentProjectile = false;
+        CTickCount expiryTime;  // Zero means "doesn't expire on its own"
         if (Packet.m_ucWeaponType == WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
             bIsPersistentProjectile = true;
         else if (Packet.m_ucWeaponType == WEAPONTYPE_TEARGAS || Packet.m_ucWeaponType == WEAPONTYPE_MOLOTOV)
@@ -3076,10 +3076,9 @@ void CGame::ProcessProjectileStreamIn()
             continue;
 
         // Drop expired entries (teargas/molotov) before doing any range checks
-        projectilesList.erase(std::remove_if(projectilesList.begin(), projectilesList.end(),
-                                              [&](const CPlayer::SPersistentProjectileInfo& info)
-                                              { return info.expiryTime != CTickCount() && now >= info.expiryTime; }),
-                               projectilesList.end());
+        projectilesList.erase(std::remove_if(projectilesList.begin(), projectilesList.end(), [&](const CPlayer::SPersistentProjectileInfo& info)
+                                             { return info.expiryTime != CTickCount() && now >= info.expiryTime; }),
+                              projectilesList.end());
 
         for (auto& projectileInfo : projectilesList)
         {

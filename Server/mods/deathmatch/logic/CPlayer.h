@@ -172,9 +172,9 @@ public:
     // player, kept so players who come into range later still see them (https://github.com/multitheftauto/mtasa-blue/issues/369, #368)
     struct SPersistentProjectileInfo
     {
-        CProjectileSyncPacket        packet;             // Original creation packet data (source element re-applied on resend)
+        CProjectileSyncPacket        packet;  // Original creation packet data (source element re-applied on resend)
         std::unordered_set<CPlayer*> notifiedPlayers;
-        CTickCount                   expiryTime;            // Default (zero) means it never expires on its own (e.g. satchels, cleared explicitly instead)
+        CTickCount                   expiryTime;  // Default (zero) means it never expires on its own (e.g. satchels, cleared explicitly instead)
     };
     std::vector<SPersistentProjectileInfo>& GetPersistentProjectilesList() { return m_PersistentProjectilesList; };
 

@@ -560,7 +560,7 @@ private:
 #ifdef WITH_OBJECT_SYNC
     CObjectSync* m_pObjectSync;
 #endif
-    CElapsedTime m_ProjectileStreamInTimer;
+    CElapsedTime                      m_ProjectileStreamInTimer;
     CMarkerManager*                   m_pMarkerManager;
     CClock*                           m_pClock;
     CBanManager*                      m_pBanManager;

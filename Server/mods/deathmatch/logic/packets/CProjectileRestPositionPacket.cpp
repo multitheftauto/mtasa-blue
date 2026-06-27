@@ -39,12 +39,10 @@ bool CProjectileRestPositionPacket::Read(NetBitStreamInterface& BitStream)
         if (!BitStream.Read(m_AttachedToID))
             return false;
 
-        if (!BitStream.Read(m_vecAttachOffsetPosition.fX) || !BitStream.Read(m_vecAttachOffsetPosition.fY) ||
-            !BitStream.Read(m_vecAttachOffsetPosition.fZ))
+        if (!BitStream.Read(m_vecAttachOffsetPosition.fX) || !BitStream.Read(m_vecAttachOffsetPosition.fY) || !BitStream.Read(m_vecAttachOffsetPosition.fZ))
             return false;
 
-        if (!BitStream.Read(m_vecAttachOffsetRotation.fX) || !BitStream.Read(m_vecAttachOffsetRotation.fY) ||
-            !BitStream.Read(m_vecAttachOffsetRotation.fZ))
+        if (!BitStream.Read(m_vecAttachOffsetRotation.fX) || !BitStream.Read(m_vecAttachOffsetRotation.fY) || !BitStream.Read(m_vecAttachOffsetRotation.fZ))
             return false;
     }
 

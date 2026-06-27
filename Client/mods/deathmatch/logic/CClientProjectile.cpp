@@ -175,7 +175,7 @@ void CClientProjectile::DoPulse()
             }
 
             g_pClientGame->SendProjectileRestPosition(GetWeaponType(), *GetOrigin(), vecRestPosition, attachedToID, vecAttachOffsetPosition,
-                                                       vecAttachOffsetRotation);
+                                                      vecAttachOffsetRotation);
         }
     }
 }

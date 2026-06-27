@@ -4888,12 +4888,10 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
 
             if (bHasAttachOffset)
             {
-                if (!bitStream.Read(vecAttachOffsetPosition.fX) || !bitStream.Read(vecAttachOffsetPosition.fY) ||
-                    !bitStream.Read(vecAttachOffsetPosition.fZ))
+                if (!bitStream.Read(vecAttachOffsetPosition.fX) || !bitStream.Read(vecAttachOffsetPosition.fY) || !bitStream.Read(vecAttachOffsetPosition.fZ))
                     return;
 
-                if (!bitStream.Read(vecAttachOffsetRotation.fX) || !bitStream.Read(vecAttachOffsetRotation.fY) ||
-                    !bitStream.Read(vecAttachOffsetRotation.fZ))
+                if (!bitStream.Read(vecAttachOffsetRotation.fX) || !bitStream.Read(vecAttachOffsetRotation.fY) || !bitStream.Read(vecAttachOffsetRotation.fZ))
                     return;
             }
 
@@ -4971,8 +4969,8 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
         if (!bCreated && CreatorID != INVALID_ELEMENT_ID)
         {
             ElementID TargetID = pTargetEntity ? pTargetEntity->GetID() : INVALID_ELEMENT_ID;
-            g_pClientGame->m_pManager->GetProjectileManager()->QueuePendingCreation(CreatorID, weaponType, origin.data.vecPosition, fForce, TargetID,
-                                                                                    OriginID, rotation.data.vecRotation, velocity.data.vecVelocity, usModel,
+            g_pClientGame->m_pManager->GetProjectileManager()->QueuePendingCreation(CreatorID, weaponType, origin.data.vecPosition, fForce, TargetID, OriginID,
+                                                                                    rotation.data.vecRotation, velocity.data.vecVelocity, usModel,
                                                                                     bHasAttachOffset, vecAttachOffsetPosition, vecAttachOffsetRotation);
         }
     }
