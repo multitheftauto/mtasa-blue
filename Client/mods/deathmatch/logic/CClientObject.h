@@ -12,6 +12,7 @@ class CClientObject;
 
 #pragma once
 
+#include <optional>
 #include <game/CObject.h>
 #include "CClientStreamElement.h"
 #include "CClientModel.h"
@@ -83,7 +84,9 @@ public:
     unsigned char GetAlpha() { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha);
     void          GetScale(CVector& vecScale) const;
-    void          SetScale(const CVector& vecScale, bool bScaleCollision = false);
+    // scaleCollision left unspecified (nullopt) preserves whatever collision-scaling state this
+    // object already has, instead of silently turning it off.
+    void          SetScale(const CVector& vecScale, std::optional<bool> scaleCollision = std::nullopt);
     bool          IsCollisionScaled() const { return m_iScaleCollisionModelID != -1; }
 
     bool IsCollisionEnabled() { return m_bUsesCollision; };

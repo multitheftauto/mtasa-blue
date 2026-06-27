@@ -10,6 +10,7 @@
 
 #include <StdInc.h>
 #include <cmath>
+#include <optional>
 
 #define MTA_BUILDINGS
 #define CCLIENTOBJECT_MAX 250
@@ -417,11 +418,14 @@ void CClientObject::GetScale(CVector& vecScale) const
     }
 }
 
-void CClientObject::SetScale(const CVector& vecScale, bool bScaleCollision)
+void CClientObject::SetScale(const CVector& vecScale, std::optional<bool> scaleCollision)
 {
     constexpr float kUnitScaleEpsilon = 0.0001f;
     const bool      bIsUnitScale = std::fabs(vecScale.fX - 1.0f) < kUnitScaleEpsilon && std::fabs(vecScale.fY - 1.0f) < kUnitScaleEpsilon &&
                               std::fabs(vecScale.fZ - 1.0f) < kUnitScaleEpsilon;
+    // If the caller didn't specify, keep whatever collision-scaling state this object already has,
+    // instead of silently turning it off whenever someone just wants to nudge the visual scale.
+    const bool bScaleCollision = scaleCollision.value_or(m_iScaleCollisionModelID != -1);
     // Scaling collision to (1,1,1) would just be a wasteful clone of the original - skip it
     const bool bWantScaledCollision = bScaleCollision && !bIsUnitScale;
 

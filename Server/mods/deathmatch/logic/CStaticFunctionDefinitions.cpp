@@ -8385,16 +8385,21 @@ bool CStaticFunctionDefinitions::SetObjectRotation(CElement* pElement, const CVe
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetObjectScale(CElement* pElement, const CVector& vecScale, bool bScaleCollision)
+bool CStaticFunctionDefinitions::SetObjectScale(CElement* pElement, const CVector& vecScale, std::optional<bool> scaleCollision)
 {
-    RUN_CHILDREN(SetObjectScale(*iter, vecScale, bScaleCollision))
+    RUN_CHILDREN(SetObjectScale(*iter, vecScale, scaleCollision))
 
     if (IS_OBJECT(pElement))
     {
         CObject* pObject = static_cast<CObject*>(pElement);
 
         pObject->SetScale(vecScale);
-        pObject->SetScaleCollisionEnabled(bScaleCollision);
+        // Leaving scaleCollision unspecified preserves whatever collision-scaling state the object
+        // already has, instead of silently turning it off every time the scale is just nudged.
+        if (scaleCollision.has_value())
+            pObject->SetScaleCollisionEnabled(*scaleCollision);
+
+        const bool bScaleCollision = pObject->IsScaleCollisionEnabled();
 
         CBitStream BitStream;
         BitStream.pBitStream->Write(vecScale.fX);
