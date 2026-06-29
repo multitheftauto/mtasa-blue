@@ -30,6 +30,33 @@ void HOOK_CEventHitByWaterCannon();
 #define HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeSingle 0x6AB366
 DWORD RETN_CVehicle_ProcessStuff_TestSirenTypeSingle = 0x6AB36D;
 
+// GTA's CAutomobile::PreRender only renders siren coronas for models 407-599
+// (gate at 0x6AB350 skips when (modelIndex - 407) > 0xC0). This hook lets custom
+// (engineRequestModel) and out-of-range stock vehicles with scripted sirens render too.
+#define HOOKPOS_CAutomobile_PreRender_SirenModelGate 0x6AB350
+DWORD RETN_CAutomobile_PreRender_SirenRender = 0x6AB366;  // continue into the siren type dispatch
+DWORD RETN_CAutomobile_PreRender_SirenSkip = 0x6ABC71;    // original "no siren" path
+
+// Bikes, BMX, boats, planes and helis don't draw scripted sirens natively. Each of these PreRender
+// methods starts with the same 13-byte SEH prologue (push -1; push <handler>; mov eax, fs:[0]); we
+// hook the entry, draw our sirens, then replay it and continue at entry+0xD so the body is untouched.
+#define HOOKPOS_CBike_PreRender_Siren 0x6BD090
+#define HOOKPOS_CBmx_PreRender_Siren 0x6C0810
+#define HOOKPOS_CBoat_PreRender_Siren 0x6F1180
+#define HOOKPOS_CPlane_PreRender_Siren 0x6C94A0
+#define HOOKPOS_CHeli_PreRender_Siren 0x6C5420
+DWORD RETN_CBike_PreRender_Siren = 0x6BD09D;
+DWORD RETN_CBmx_PreRender_Siren = 0x6C081D;
+DWORD RETN_CBoat_PreRender_Siren = 0x6F118D;
+DWORD RETN_CPlane_PreRender_Siren = 0x6C94AD;
+DWORD RETN_CHeli_PreRender_Siren = 0x6C542D;
+
+// CTrain::PreRender (0x6F5570) overrides CVehicle::PreRender but has a plain prologue
+// (push esi; mov esi, ecx; call CVehicle::PreRender), so it needs its own entry hook.
+#define HOOKPOS_CTrain_PreRender_Siren 0x6F5570
+DWORD CALL_CVehicle_PreRender = 0x6D6480;
+DWORD RETN_CTrain_PreRender_Siren = 0x6F5578;
+
 #define HOOKPOS_CVehicle_ProcessStuff_SetSirenPositionSingle 0x6ABC51
 DWORD RETN_CVehicle_ProcessStuff_PostPushSirenPositionSingle = 0x6ABC64;
 
@@ -69,6 +96,10 @@ DWORD RETN_CVehicleAudio_ProcessSirenSound3 = 0x5021B3;
 
 #define HOOKPOS_CVehicleAudio_ProcessSirenSound 0x4F62BB
 DWORD RETN_CVehicleAudio_GetVehicleSirenType = 0x4F62C1;
+
+// CAEVehicleAudioEntity::ProcessVehicle only runs the siren sound for car/bike/bmx audio types. Hook
+// the switch dispatch so boats, aircraft and trains with scripted sirens also play it.
+#define HOOKPOS_CAEVehicleAudioEntity_ProcessVehicle_SirenSound 0x501EEB
 
 #define HOOKPOS_CVehicle_ProcessStuff_PushRGBPointLights 0x6AB7A5
 DWORD RETN_CVehicle_ProcessStuff_PushRGBPointLights = 0x6AB7D5;
@@ -112,6 +143,13 @@ DWORD RETURN_CProjectile_FixTearGasCrash_Cont = 0x4C0409;
 DWORD RETURN_CProjectile_FixExplosionLocation = 0x738A86;
 
 void          HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle();
+void          HOOK_CAutomobile_PreRender_SirenModelGate();
+void          HOOK_CBike_PreRender_Siren();
+void          HOOK_CBmx_PreRender_Siren();
+void          HOOK_CBoat_PreRender_Siren();
+void          HOOK_CPlane_PreRender_Siren();
+void          HOOK_CHeli_PreRender_Siren();
+void          HOOK_CTrain_PreRender_Siren();
 void          HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle();
 void          HOOK_CVehicle_ProcessStuff_TestSirenTypeDual();
 void          HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualRed();
@@ -119,6 +157,7 @@ void          HOOK_CVehicle_ProcessStuff_PostPushSirenPositionDualBlue();
 void          HOOK_CVehicle_DoesVehicleUseSiren();
 void          HOOK_CVehicle_ProcessStuff_TestCameraPosition();
 void          HOOK_CVehicleAudio_ProcessSirenSound();
+void          HOOK_CAEVehicleAudioEntity_ProcessVehicle_SirenSound();
 void          HOOK_CVehicleAudio_ProcessSirenSound1();
 void          HOOK_CVehicleAudio_ProcessSirenSound2();
 void          HOOK_CVehicleAudio_ProcessSirenSound3();
@@ -154,6 +193,15 @@ void CMultiplayerSA::InitHooks_13()
     // Siren hooks
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeSingle, (DWORD)HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle,
                 7);  // Test siren type is single for a jump
+    HookInstall(HOOKPOS_CAutomobile_PreRender_SirenModelGate, (DWORD)HOOK_CAutomobile_PreRender_SirenModelGate,
+                22);  // model-id siren gate (movsx+lea+cmp+ja) - allow scripted sirens on any model
+    // Draw scripted sirens for vehicle classes GTA never renders them for (bikes, BMX, boats, planes, helis, trains)
+    HookInstall(HOOKPOS_CBike_PreRender_Siren, (DWORD)HOOK_CBike_PreRender_Siren, 13);
+    HookInstall(HOOKPOS_CBmx_PreRender_Siren, (DWORD)HOOK_CBmx_PreRender_Siren, 13);
+    HookInstall(HOOKPOS_CBoat_PreRender_Siren, (DWORD)HOOK_CBoat_PreRender_Siren, 13);
+    HookInstall(HOOKPOS_CPlane_PreRender_Siren, (DWORD)HOOK_CPlane_PreRender_Siren, 13);
+    HookInstall(HOOKPOS_CHeli_PreRender_Siren, (DWORD)HOOK_CHeli_PreRender_Siren, 13);
+    HookInstall(HOOKPOS_CTrain_PreRender_Siren, (DWORD)HOOK_CTrain_PreRender_Siren, 8);
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_SetSirenPositionSingle, (DWORD)HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle,
                 19);  // mov before Push for the siren position (overhook so we can get RGBA)
     HookInstall(HOOKPOS_CVehicle_ProcessStuff_TestSirenTypeDual, (DWORD)HOOK_CVehicle_ProcessStuff_TestSirenTypeDual,
@@ -178,6 +226,8 @@ void CMultiplayerSA::InitHooks_13()
     HookInstall(HOOKPOS_CVehicleAudio_ProcessSirenSound2, (DWORD)HOOK_CVehicleAudio_ProcessSirenSound2, 5);
     HookInstall(HOOKPOS_CVehicleAudio_ProcessSirenSound3, (DWORD)HOOK_CVehicleAudio_ProcessSirenSound3, 5);
     HookInstall(HOOKPOS_CVehicleAudio_ProcessSirenSound, (DWORD)HOOK_CVehicleAudio_ProcessSirenSound, 6);
+    HookInstall(HOOKPOS_CAEVehicleAudioEntity_ProcessVehicle_SirenSound, (DWORD)HOOK_CAEVehicleAudioEntity_ProcessVehicle_SirenSound,
+                7);  // boats/aircraft/trains: process the siren sound too
 
     HookInstall(HOOKPOS_CTaskSimpleJetpack_ProcessInput, (DWORD)HOOK_CTaskSimpleJetpack_ProcessInput, 5);
     HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessWeaponFire, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessWeaponFire, 5);
@@ -326,6 +376,72 @@ void GetVehicleSirenType()
     {
         dwSirenType2 = 5;
     }
+}
+
+// Index used for the native siren-type table reads when a vehicle is outside the stock
+// 407-599 range. 596 (police) - 407; its value is discarded by the TestSirenType* override
+// hooks, so any in-range index works - it only keeps the table reads in bounds.
+#define SIREN_SAFE_MODEL_INDEX_ADJ 189
+
+int g_iSirenModelIndexAdj = 0;
+int g_iRenderCustomSiren = 0;
+
+// Decide whether the siren block in CAutomobile::PreRender should run for this
+// vehicle. Stock models 407-599 keep the original behaviour; anything else (custom
+// engineRequestModel ids, stock 400-406 / 600-611) renders only when it has scripted sirens.
+void ProcessCustomSirenModelGate()
+{
+    // Native siren range: behave exactly like the original code (keep edi = modelIndex - 407).
+    if (static_cast<unsigned int>(g_iSirenModelIndexAdj) <= 0xC0)
+    {
+        g_iRenderCustomSiren = 1;
+        return;
+    }
+
+    // Out of native range: only render when the vehicle has scripted sirens, and clamp the
+    // index so the native siren-type table reads stay in bounds.
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+    if (pVehicle && pVehicle->DoesVehicleHaveSirens())
+    {
+        g_iSirenModelIndexAdj = SIREN_SAFE_MODEL_INDEX_ADJ;
+        g_iRenderCustomSiren = 1;
+    }
+    else
+    {
+        g_iRenderCustomSiren = 0;
+    }
+}
+
+static void __declspec(naked) HOOK_CAutomobile_PreRender_SirenModelGate()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // Replicate the original index calculation: eax = modelIndex - 407
+        movsx eax, word ptr [esi+0x22]
+        sub   eax, 0x197
+        mov   g_iSirenModelIndexAdj, eax
+        mov   pVehicleWithTheSiren, esi
+        pushad
+    }
+    // clang-format on
+    ProcessCustomSirenModelGate();
+    // clang-format off
+    __asm
+    {
+        popad
+        cmp   g_iRenderCustomSiren, 0
+        je    skip_sirens
+        // edi = (possibly clamped) modelIndex - 407, consumed by the native siren-type table reads
+        mov   edi, g_iSirenModelIndexAdj
+        jmp   RETN_CAutomobile_PreRender_SirenRender
+    skip_sirens:
+        jmp   RETN_CAutomobile_PreRender_SirenSkip
+    }
+    // clang-format on
 }
 
 static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle()
@@ -563,6 +679,201 @@ bool ProcessVehicleSirenPosition()
     bPointLights = false;
     // Return false
     return false;
+}
+
+// CCoronas::RegisterCorona (texture overload). With attachTo set, pos is treated as relative to the
+// entity (the corona system transforms it by the entity matrix at render time).
+using RegisterCorona_t = void(__cdecl*)(unsigned int id, void* attachTo, unsigned char r, unsigned char g, unsigned char b, unsigned char intensity,
+                                        const CVector& pos, float size, float range, void* texture, int flareType, int reflType, int losCheck, int trail,
+                                        float normalAngle, bool neonFade, float pullTowardsCam, bool fullBright, float fadeSpeed, bool onlyFromBelow,
+                                        bool whiteCore);
+#define FUNC_CCoronas_RegisterCorona 0x6FC580
+
+// Draw the scripted sirens (addVehicleSirens) for a vehicle whose game class doesn't
+// render sirens natively. Called from the PreRender entry hooks of CBike/CBmx/CBoat/CPlane/CHeli.
+// Reuses ProcessVehicleSirenPosition() for the per-frame slot pick / randomiser / LOS / colour,
+// then registers one corona attached to the vehicle (so the relative position is transformed for us).
+void RenderCustomVehicleSirens()
+{
+    if (!pVehicleWithTheSiren)
+        return;
+
+    // The HPV1000 (523) draws its siren through the native bike code; don't double up.
+    if (DoesVehicleHaveSiren())
+        return;
+
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+    if (!pVehicle || !pVehicle->DoesVehicleHaveSirens() || pVehicle->GetVehicleSirenCount() == 0)
+        return;
+
+    // Pick the siren slot for this frame and fill in dwRed/dwGreen/dwBlue + the relative position.
+    CVector vecRelative;
+    vecRelativeSirenPosition = &vecRelative;
+    bPointLights = false;
+    dwRed = dwGreen = dwBlue = 0;
+    if (!ProcessVehicleSirenPosition())
+        return;
+
+    // Nothing to draw this frame (off phase of the flash, or hidden by the line-of-sight check).
+    if ((dwRed | dwGreen | dwBlue) == 0)
+        return;
+
+    // Match the native vehicle-siren corona look (size 0.4, far clip = corona brightness * 150).
+    float fRange = *reinterpret_cast<float*>(0xB6F118) * 150.0f;
+    reinterpret_cast<RegisterCorona_t>(FUNC_CCoronas_RegisterCorona)(reinterpret_cast<unsigned int>(pVehicleWithTheSiren) + 0x15, pVehicleWithTheSiren,
+                                                                     static_cast<unsigned char>(dwRed), static_cast<unsigned char>(dwGreen),
+                                                                     static_cast<unsigned char>(dwBlue), 0xFF, vecRelative, 0.4f, fRange, nullptr, 0, 0, 0,
+                                                                     0, 0.0f, false, 1.5f, false, 15.0f, false, true);
+}
+
+// Each of these five hooks stashes 'this' (ecx), draws the custom sirens, then replays the original
+// SEH prologue (push -1; push <handler>; mov eax, fs:[0]) and continues at PreRender+0xD. They only
+// differ in the per-function SEH handler address and the return address.
+static void __declspec(naked) HOOK_CBike_PreRender_Siren()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov pVehicleWithTheSiren, ecx
+        pushad
+    }
+    // clang-format on
+    RenderCustomVehicleSirens();
+    // clang-format off
+    __asm
+    {
+        popad
+        push 0FFFFFFFFh
+        push 848321h
+        mov  eax, dword ptr fs:[0]
+        jmp  RETN_CBike_PreRender_Siren
+    }
+    // clang-format on
+}
+
+static void __declspec(naked) HOOK_CBmx_PreRender_Siren()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov pVehicleWithTheSiren, ecx
+        pushad
+    }
+    // clang-format on
+    RenderCustomVehicleSirens();
+    // clang-format off
+    __asm
+    {
+        popad
+        push 0FFFFFFFFh
+        push 848401h
+        mov  eax, dword ptr fs:[0]
+        jmp  RETN_CBmx_PreRender_Siren
+    }
+    // clang-format on
+}
+
+static void __declspec(naked) HOOK_CBoat_PreRender_Siren()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov pVehicleWithTheSiren, ecx
+        pushad
+    }
+    // clang-format on
+    RenderCustomVehicleSirens();
+    // clang-format off
+    __asm
+    {
+        popad
+        push 0FFFFFFFFh
+        push 848918h
+        mov  eax, dword ptr fs:[0]
+        jmp  RETN_CBoat_PreRender_Siren
+    }
+    // clang-format on
+}
+
+static void __declspec(naked) HOOK_CPlane_PreRender_Siren()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov pVehicleWithTheSiren, ecx
+        pushad
+    }
+    // clang-format on
+    RenderCustomVehicleSirens();
+    // clang-format off
+    __asm
+    {
+        popad
+        push 0FFFFFFFFh
+        push 8485ABh
+        mov  eax, dword ptr fs:[0]
+        jmp  RETN_CPlane_PreRender_Siren
+    }
+    // clang-format on
+}
+
+static void __declspec(naked) HOOK_CHeli_PreRender_Siren()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov pVehicleWithTheSiren, ecx
+        pushad
+    }
+    // clang-format on
+    RenderCustomVehicleSirens();
+    // clang-format off
+    __asm
+    {
+        popad
+        push 0FFFFFFFFh
+        push 848488h
+        mov  eax, dword ptr fs:[0]
+        jmp  RETN_CHeli_PreRender_Siren
+    }
+    // clang-format on
+}
+
+// CTrain::PreRender has a plain (non-SEH) prologue, so it gets its own hook that replays
+// push esi; mov esi, ecx; call CVehicle::PreRender before continuing at PreRender+8.
+static void __declspec(naked) HOOK_CTrain_PreRender_Siren()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov pVehicleWithTheSiren, ecx
+        pushad
+    }
+    // clang-format on
+    RenderCustomVehicleSirens();
+    // clang-format off
+    __asm
+    {
+        popad
+        push esi
+        mov esi, ecx
+        call CALL_CVehicle_PreRender
+        jmp RETN_CTrain_PreRender_Siren
+    }
+    // clang-format on
 }
 
 static void __declspec(naked) HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle()
@@ -973,6 +1284,56 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound()
     }
 }
 DWORD                         CALL_CVehicleAudio_ProcessCarHorn = 0x5002C0;
+
+// CAEVehicleAudioEntity::ProcessVehicle only calls ProcessVehicleSirenAlarmHorn for the car/bike/bmx
+// audio types, so boats/aircraft/trains never play the siren wail. Run it ourselves (once, before the
+// type switch) for those audio types when the vehicle carries scripted sirens.
+void* g_pSirenAudioEntity = nullptr;   // CAEVehicleAudioEntity* (this)
+void* g_pSirenAudioVehicle = nullptr;  // vehicle interface being processed
+void* g_pSirenAudioParams = nullptr;   // &tVehicleParams (built on ProcessVehicle's stack)
+
+void ProcessCustomSirenSound()
+{
+    // m_AuSettings.VehicleAudioType @ +0x80: 0 car / 1 bike / 2 bmx already handle the siren;
+    // 3 boat, 4 heli, 5 plane, 6 seaplane, 7 one-gear, 8 train, 9 special; 10 none has no case.
+    signed char audioType = *(reinterpret_cast<signed char*>(g_pSirenAudioEntity) + 0x80);
+    if (audioType < 3 || audioType > 9)
+        return;
+
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)g_pSirenAudioVehicle);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+    if (!pVehicle || !pVehicle->DoesVehicleHaveSirens())
+        return;
+
+    // CAEVehicleAudioEntity::ProcessVehicleSirenAlarmHorn(tVehicleParams&) - thiscall
+    reinterpret_cast<void(__thiscall*)(void*, void*)>(CALL_CVehicleAudio_ProcessCarHorn)(g_pSirenAudioEntity, g_pSirenAudioParams);
+}
+
+static void __declspec(naked) HOOK_CAEVehicleAudioEntity_ProcessVehicle_SirenSound()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        lea eax, [esp+0Ch]              // &vp
+        mov g_pSirenAudioParams, eax
+        mov g_pSirenAudioEntity, esi    // this (CAEVehicleAudioEntity)
+        mov g_pSirenAudioVehicle, edi   // vehicle interface
+        pushad
+    }
+    // clang-format on
+    ProcessCustomSirenSound();
+    // clang-format off
+    __asm
+    {
+        popad
+        // original switch dispatch on ecx = VehicleAudioType
+        jmp dword ptr [ecx*4 + 50224Ch]
+    }
+    // clang-format on
+}
+
 static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
