@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CCameraSA.h"
 #include "CGameSA.h"
+#include "CPedSA.h"
 #include <atomic>
 #include <cmath>
 #include <cstdint>
@@ -35,6 +36,79 @@ namespace
     inline bool IsFiniteVector(const CVector& vec) noexcept
     {
         return std::isfinite(vec.fX) && std::isfinite(vec.fY) && std::isfinite(vec.fZ);
+    }
+
+    // Per-weapon aiming camera state. A zero offset or zero zoom means disabled.
+    CVector s_aimOffset[WEAPONTYPE_LAST_WEAPONTYPE]{};
+    float   s_aimZoom[WEAPONTYPE_LAST_WEAPONTYPE]{};
+
+    // Blend-in state: ramps from 0 to 1 over ~0.15s when entering aim mode.
+    float           s_aimBlend = 0.0f;
+    int             s_lastAimFrame = -999;
+    constexpr float kAimBlendSpeed = 1.0f / (0.15f * 30.0f);
+
+    constexpr DWORD HOOKSITE_AimWeapon = 0x527A95;            // CALL CCam::Process_AimWeapon
+    constexpr DWORD FUNC_AimWeapon_Orig = 0x521500;
+
+    static void __fastcall Hook_Process_AimWeapon(CCamSAInterface* cam, int /*edx*/, const CVector& vec, float arg3, float arg4, float arg5)
+    {
+        using Orig_t = void(__thiscall*)(CCamSAInterface*, const CVector&, float, float, float);
+        static const auto s_orig = reinterpret_cast<Orig_t>(FUNC_AimWeapon_Orig);
+
+        // Let GTA compute Source/Front/Up first, then layer overrides on top.
+        s_orig(cam, vec, arg3, arg4, arg5);
+
+        using FindPed_t = CPedSAInterface*(__cdecl*)(int);
+        static const auto s_findPed = reinterpret_cast<FindPed_t>(0x56E210);
+
+        CPedSAInterface* pPed = s_findPed(-1);
+        if (!pPed || pPed->pedFlags.bInVehicle)
+            return;
+
+        const std::uint8_t slot = pPed->bCurrentWeaponSlot;
+        if (slot >= WEAPONSLOT_MAX)
+            return;
+
+        const eWeaponType wtype = pPed->Weapons[slot].m_eWeaponType;
+        if (wtype <= WEAPONTYPE_UNARMED || wtype >= WEAPONTYPE_LAST_WEAPONTYPE)
+            return;
+
+        const CVector& off = s_aimOffset[wtype];
+        const float    zoom = s_aimZoom[wtype];
+        const bool     hasOffset = (off.fX != 0.0f || off.fY != 0.0f || off.fZ != 0.0f);
+        const bool     hasZoom = (zoom > 0.0f);
+
+        if (!hasOffset && !hasZoom)
+            return;
+
+        // CTimer::m_FrameCounter at 0xB7CB4C, ms_fTimeStep at 0xB7CB5C.
+        const int   curFrame = *(const int*)0xB7CB4C;
+        const float timeStep = *(const float*)0xB7CB5C;
+
+        // Reset the blend if the hook went idle for more than one frame.
+        if (curFrame > s_lastAimFrame + 2)
+            s_aimBlend = 0.0f;
+        s_lastAimFrame = curFrame;
+
+        s_aimBlend = std::min(1.0f, s_aimBlend + kAimBlendSpeed * timeStep);
+
+        if (hasOffset)
+        {
+            // Right = Front cross Up
+            CVector right;
+            right.fX = cam->Front.fY * cam->Up.fZ - cam->Front.fZ * cam->Up.fY;
+            right.fY = cam->Front.fZ * cam->Up.fX - cam->Front.fX * cam->Up.fZ;
+            right.fZ = cam->Front.fX * cam->Up.fY - cam->Front.fY * cam->Up.fX;
+
+            const float b = s_aimBlend;
+            cam->Source.fX += (right.fX * off.fX + cam->Up.fX * off.fY + cam->Front.fX * off.fZ) * b;
+            cam->Source.fY += (right.fY * off.fX + cam->Up.fY * off.fY + cam->Front.fY * off.fZ) * b;
+            cam->Source.fZ += (right.fZ * off.fX + cam->Up.fZ * off.fY + cam->Front.fZ * off.fZ) * b;
+            cam->SourceBeforeLookBehind = cam->Source;
+        }
+
+        if (hasZoom)
+            cam->FOV += (zoom - cam->FOV) * s_aimBlend;
     }
 }
 
@@ -92,6 +166,9 @@ CCameraSA::CCameraSA(CCameraSAInterface* cameraInterface)
     s_cameraClipMask.store(static_cast<uint8_t>(CameraClipFlags::Objects) | static_cast<uint8_t>(CameraClipFlags::Vehicles), std::memory_order_relaxed);
 
     HookInstall(HOOKPOS_Camera_CollisionDetection, (DWORD)HOOK_Camera_CollisionDetection, 5);
+
+    // Redirect the CALL at HOOKSITE_AimWeapon (E8 opcode + 4-byte relative offset).
+    MemPut<DWORD>(HOOKSITE_AimWeapon + 1, reinterpret_cast<DWORD>(&Hook_Process_AimWeapon) - (HOOKSITE_AimWeapon + 5));
 }
 
 CCameraSA::~CCameraSA()
@@ -782,4 +859,61 @@ bool CCameraSA::IsSphereVisible(CVector* center, float radius) const
         return false;
 
     return ((bool(__thiscall*)(CCameraSAInterface*, CVector*, float))0x420D40)(cameraInterface, center, radius);
+}
+
+void CCameraSA::SetWeaponAimCameraOffset(eWeaponType weaponType, float fX, float fY, float fZ)
+{
+    if (weaponType > WEAPONTYPE_UNARMED && weaponType < WEAPONTYPE_LAST_WEAPONTYPE)
+        s_aimOffset[weaponType] = CVector(fX, fY, fZ);
+}
+
+void CCameraSA::GetWeaponAimCameraOffset(eWeaponType weaponType, float& fX, float& fY, float& fZ)
+{
+    if (weaponType > WEAPONTYPE_UNARMED && weaponType < WEAPONTYPE_LAST_WEAPONTYPE)
+    {
+        fX = s_aimOffset[weaponType].fX;
+        fY = s_aimOffset[weaponType].fY;
+        fZ = s_aimOffset[weaponType].fZ;
+    }
+    else
+    {
+        fX = fY = fZ = 0.0f;
+    }
+}
+
+void CCameraSA::ResetWeaponAimCameraOffset(eWeaponType weaponType)
+{
+    if (weaponType > WEAPONTYPE_UNARMED && weaponType < WEAPONTYPE_LAST_WEAPONTYPE)
+        s_aimOffset[weaponType] = CVector(0.0f, 0.0f, 0.0f);
+}
+
+void CCameraSA::SetWeaponAimCameraZoom(eWeaponType weaponType, float fFOV)
+{
+    // FOV outside (0, 180) would produce a degenerate projection matrix.
+    if (weaponType > WEAPONTYPE_UNARMED && weaponType < WEAPONTYPE_LAST_WEAPONTYPE && fFOV > 0.0f && fFOV < 180.0f)
+        s_aimZoom[weaponType] = fFOV;
+}
+
+float CCameraSA::GetWeaponAimCameraZoom(eWeaponType weaponType)
+{
+    if (weaponType > WEAPONTYPE_UNARMED && weaponType < WEAPONTYPE_LAST_WEAPONTYPE)
+        return s_aimZoom[weaponType];
+    return 0.0f;
+}
+
+void CCameraSA::ResetWeaponAimCameraZoom(eWeaponType weaponType)
+{
+    if (weaponType > WEAPONTYPE_UNARMED && weaponType < WEAPONTYPE_LAST_WEAPONTYPE)
+        s_aimZoom[weaponType] = 0.0f;
+}
+
+void CCameraSA::ResetAllWeaponAimCameraOverrides()
+{
+    for (int i = 0; i < WEAPONTYPE_LAST_WEAPONTYPE; ++i)
+    {
+        s_aimOffset[i] = CVector(0.0f, 0.0f, 0.0f);
+        s_aimZoom[i]   = 0.0f;
+    }
+    s_aimBlend     = 0.0f;
+    s_lastAimFrame = -999;
 }
