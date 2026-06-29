@@ -53,10 +53,14 @@
 // Start of CEGUI namespace section
 namespace CEGUI
 {
+// Forward declaration of ParseColorCode to allow calls in early member functions (e.g. getTextExtent, getCharAtPixel) before its definition.
+static bool ParseColorCode(const String& text, size_t c, float& r, float& g, float& b);
+
 /*************************************************************************
 	static data definitions
 *************************************************************************/
 const argb_t Font::DefaultColour					= 0xFFFFFFFF;
+bool         Font::s_colorCodesEnabled              = false;
 const uint	Font::InterGlyphPadSpace			= 2;
 
 // XML related strings
@@ -223,6 +227,13 @@ float Font::getTextExtent(const String& text, float x_scale) const
 
     for (size_t c = 0; c < char_count; ++c)
     {
+        float cr, cg, cb;
+        if (ParseColorCode(text, c, cr, cg, cb))
+        {
+            c += 6;
+            continue;
+        }
+
         const SCharSize* pCharSize = MapFind ( d_sizes_map, text[c] ); // Ask sub font if not
         if ( !pCharSize && !d_is_subfont )
         {
@@ -284,6 +295,13 @@ size_t Font::getCharAtPixel(const String& text, size_t start_char, float pixel, 
 
 	for (size_t c = start_char; c < char_count; ++c)
 	{
+        float cr, cg, cb;
+        if (ParseColorCode(text, c, cr, cg, cb))
+        {
+            c += 6;
+            continue;
+        }
+
 		pos = d_cp_map.find(text[c]);
 
 		if (pos != end)
@@ -741,6 +759,32 @@ size_t Font::getNextWord(const String& in_string, size_t start_idx, String& out_
 /*************************************************************************
 	Draw a line of text.  No formatting is applied.
 *************************************************************************/
+// Returns true and fills r/g/b (0.0-1.0) if text[c] begins a valid #RRGGBB color code.
+// A color code is exactly 7 chars: '#' followed by 6 hex digits.  If text[c] is '#'
+// but the following chars are not all hex digits, the '#' is treated as a literal char.
+static bool ParseColorCode(const String& text, size_t c, float& r, float& g, float& b)
+{
+    if (!Font::s_colorCodesEnabled)
+        return false;
+    if (text[c] != '#' || c + 7 > text.length())
+        return false;
+
+    int digits[6];
+    for (int k = 0; k < 6; ++k)
+    {
+        utf32 ch = text[c + 1 + k];
+        if      (ch >= '0' && ch <= '9') digits[k] = ch - '0';
+        else if (ch >= 'a' && ch <= 'f') digits[k] = ch - 'a' + 10;
+        else if (ch >= 'A' && ch <= 'F') digits[k] = ch - 'A' + 10;
+        else return false;
+    }
+
+    r = static_cast<float>((digits[0] << 4) | digits[1]) / 255.0f;
+    g = static_cast<float>((digits[2] << 4) | digits[3]) / 255.0f;
+    b = static_cast<float>((digits[4] << 4) | digits[5]) / 255.0f;
+    return true;
+}
+
 void Font::drawTextLine(const String& text, const Vector3& position, const Rect& clip_rect, const ColourRect& colours, float x_scale, float y_scale) const
 {
 	Vector3	cur_pos(position);
@@ -752,8 +796,19 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
 
     const_cast < Font* > ( this )->refreshStringForGlyphs ( text ); // Refresh our glyph set if there are new characters
 
+    ColourRect current_colours = colours;
+
 	for (size_t c = 0; c < char_count; ++c)
 	{
+        // Handle inline #RRGGBB color codes — skip the 7-char sequence and update color.
+        float cr, cg, cb;
+        if (ParseColorCode(text, c, cr, cg, cb))
+        {
+            current_colours = ColourRect(colour(cr, cg, cb, colours.d_top_left.getAlpha()));
+            c += 6;
+            continue;
+        }
+
 		pos = d_cp_map.find(text[c]);
 
         const Image* img;
@@ -792,7 +847,7 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
         }
 		cur_pos.d_y = base_y - (img->getOffsetY() - img->getOffsetY() * y_scale);
 		Size sz(img->getWidth() * x_scale, img->getHeight() * y_scale);
-		img->draw(cur_pos, sz, clip_rect, colours);
+		img->draw(cur_pos, sz, clip_rect, current_colours);
 		cur_pos.d_x += horz_advance * x_scale;
 
 	}
@@ -818,7 +873,11 @@ void Font::drawTextLineJustified(const String& text, const Rect& draw_area, cons
 	uint space_count = 0;
     size_t c;
 	for (c = 0; c < char_count; ++c)
+    {
+        float cr, cg, cb;
+        if (ParseColorCode(text, c, cr, cg, cb)) { c += 6; continue; }
 		if ((text[c] == ' ') || (text[c] == '\t')) ++space_count;
+    }
 
 	// The width that must be added to each space character in order to transform the left aligned text in justified text
 	float shared_lost_space = 0.0;
@@ -826,8 +885,18 @@ void Font::drawTextLineJustified(const String& text, const Rect& draw_area, cons
 
     const_cast < Font* > ( this )->refreshStringForGlyphs ( text ); // Refresh our glyph set if there are new characters
 
+    ColourRect current_colours = colours;
+
     for (c = 0; c < char_count; ++c)
 	{
+        float cr, cg, cb;
+        if (ParseColorCode(text, c, cr, cg, cb))
+        {
+            current_colours = ColourRect(colour(cr, cg, cb, colours.d_top_left.getAlpha()));
+            c += 6;
+            continue;
+        }
+
 		pos = d_cp_map.find(text[c]);
 
 		if (pos != end)
@@ -835,7 +904,7 @@ void Font::drawTextLineJustified(const String& text, const Rect& draw_area, cons
 			const Image* img = pos->second.d_image;
 			cur_pos.d_y = base_y - (img->getOffsetY() - img->getOffsetY() * y_scale);
 			Size sz(img->getWidth() * x_scale, img->getHeight() * y_scale);
-			img->draw(cur_pos, sz, clip_rect, colours);
+			img->draw(cur_pos, sz, clip_rect, current_colours);
 			cur_pos.d_x += (float)pos->second.d_horz_advance * x_scale;
 			// That's where we adjust the size of each space character
 			if ((text[c] == ' ') || (text[c] == '\t')) cur_pos.d_x += shared_lost_space;
