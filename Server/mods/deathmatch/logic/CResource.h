@@ -20,6 +20,7 @@
 #include <unzip.h>
 #include <list>
 #include <vector>
+#include <functional>
 #include <ehs/ehs.h>
 #include <time.h>
 
@@ -228,6 +229,19 @@ public:
 
     bool IsClientSynced() const noexcept { return m_bClientSync; }
 
+    // Runs the callback now if our elements have already reached the clients, otherwise holds onto it and runs it
+    // right after they do (see Start()). Used for things that need to tell clients about an element created moments
+    // earlier in onResourceStart, which wouldn't make sense to the client yet (e.g. warpPedIntoVehicle on a vehicle
+    // created in the same event) - dropping it outright would leave the server and clients permanently disagreeing
+    // about that element's state instead.
+    void RunOrDeferUntilClientSynced(std::function<void()> callback)
+    {
+        if (m_bClientSync)
+            callback();
+        else
+            m_PendingClientSyncCallbacks.push_back(std::move(callback));
+    }
+
     const SString& GetName() const noexcept { return m_strResourceName; }
 
     CLuaMain*       GetVirtualMachine() { return m_pVM; }
@@ -371,6 +385,8 @@ private:
 private:
     EResourceState m_eState = EResourceState::None;
     bool           m_bClientSync = false;
+
+    std::vector<std::function<void()>> m_PendingClientSyncCallbacks;
 
     unsigned short m_usNetID = -1;
     uint           m_uiScriptID = -1;

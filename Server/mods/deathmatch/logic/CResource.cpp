@@ -1069,6 +1069,13 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     SendNoClientCacheScripts();
     m_bClientSync = true;
 
+    // Run anything that got held back during onResourceStart because it depended on clients already knowing
+    // about elements we've just finished broadcasting above (see RunOrDeferUntilClientSynced)
+    std::vector<std::function<void()>> pendingCallbacks = std::move(m_PendingClientSyncCallbacks);
+    m_PendingClientSyncCallbacks.clear();
+    for (const auto& callback : pendingCallbacks)
+        callback();
+
     // Add us to the running resources list
     m_StartedResources.push_back(this);
 
