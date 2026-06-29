@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include "lua/CLuaMultiReturn.h"
 
 class CLuaVehicleDefs : public CLuaDefs
 {
@@ -66,6 +67,7 @@ public:
     LUA_DECLARE(GetTrainPosition);
     static bool IsVehicleBlown(CVehicle* vehicle);
     LUA_DECLARE(GetVehicleHeadLightColor);
+    static std::variant<bool, CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>> GetVehicleNitroColor(CVehicle* vehicle);
     LUA_DECLARE(GetVehicleDoorOpenRatio);
 
     // Vehicle set functions
@@ -116,6 +118,8 @@ public:
     static bool SetTrainTrack(CVehicle* pVehicle, CTrainTrack* pTrack);
     LUA_DECLARE(SetTrainPosition);
     LUA_DECLARE(SetVehicleHeadLightColor);
+    static bool SetVehicleNitroColor(CVehicle* vehicle, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::optional<std::uint8_t> a);
+    static bool ResetVehicleNitroColor(CVehicle* vehicle);
     LUA_DECLARE(SetVehicleTurretPosition);
     LUA_DECLARE(SetVehicleDoorOpenRatio);
     LUA_DECLARE(SetVehicleVariant);

@@ -677,6 +677,17 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                             BitStream.Write(&syncData);
                         }
                     }
+
+                    // Write nitro colour
+                    const std::optional<SColor> nitroColor = pVehicle->GetNitroColor();
+                    BitStream.WriteBit(nitroColor.has_value());
+                    if (nitroColor.has_value())
+                    {
+                        BitStream.Write(nitroColor->R);
+                        BitStream.Write(nitroColor->G);
+                        BitStream.Write(nitroColor->B);
+                        BitStream.Write(nitroColor->A);
+                    }
                     break;
                 }
 

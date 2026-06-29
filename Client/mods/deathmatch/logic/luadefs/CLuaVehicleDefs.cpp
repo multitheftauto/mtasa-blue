@@ -72,6 +72,7 @@ void CLuaVehicleDefs::LoadFunctions()
         {"isVehicleBlown", ArgumentParserWarn<false, IsVehicleBlown>},
         {"isVehicleTaxiLightOn", IsVehicleTaxiLightOn},
         {"getVehicleHeadLightColor", GetVehicleHeadLightColor},
+        {"getVehicleNitroColor", ArgumentParser<GetVehicleNitroColor>},
         {"getVehicleCurrentGear", GetVehicleCurrentGear},
         {"getVehicleHandling", GetVehicleHandling},
         {"getOriginalHandling", GetOriginalHandling},
@@ -141,6 +142,8 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setVehicleTaxiLightOn", SetVehicleTaxiLightOn},
         {"setVehicleGravity", SetVehicleGravity},
         {"setVehicleHeadLightColor", SetVehicleHeadLightColor},
+        {"setVehicleNitroColor", ArgumentParser<SetVehicleNitroColor>},
+        {"resetVehicleNitroColor", ArgumentParser<ResetVehicleNitroColor>},
         {"setVehicleTurretPosition", SetVehicleTurretPosition},
         {"setVehicleDoorOpenRatio", SetVehicleDoorOpenRatio},
         {"setVehicleHandling", SetVehicleHandling},
@@ -247,6 +250,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isTaxiLightOn", "isVehicleTaxiLightOn");
     lua_classfunction(luaVM, "getComponents", "getVehicleComponents");
     lua_classfunction(luaVM, "getHeadLightColor", "getVehicleHeadLightColor");
+    lua_classfunction(luaVM, "getNitroColor", "getVehicleNitroColor");
     lua_classfunction(luaVM, "getColor", "getVehicleColor");
     lua_classfunction(luaVM, "getGravity", OOP_GetVehicleGravity);
     lua_classfunction(luaVM, "getSirenParams", "getVehicleSirenParams");
@@ -309,6 +313,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setDerailable", "setTrainDerailable");
     lua_classfunction(luaVM, "setDerailed", "setTrainDerailed");
     lua_classfunction(luaVM, "setHeadLightColor", "setVehicleHeadLightColor");
+    lua_classfunction(luaVM, "setNitroColor", "setVehicleNitroColor");
+    lua_classfunction(luaVM, "resetNitroColor", "resetVehicleNitroColor");
     lua_classfunction(luaVM, "setColor", "setVehicleColor");
     lua_classfunction(luaVM, "setPlateText", "setVehiclePlateText");
     lua_classfunction(luaVM, "setGravity", "setVehicleGravity");
@@ -1632,6 +1638,15 @@ int CLuaVehicleDefs::GetVehicleHeadLightColor(lua_State* luaVM)
     return 1;
 }
 
+std::variant<bool, CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>> CLuaVehicleDefs::GetVehicleNitroColor(CClientVehicle* vehicle)
+{
+    std::optional<SColor> color;
+    if (!CStaticFunctionDefinitions::GetVehicleNitroColor(*vehicle, color) || !color.has_value())
+        return false;
+
+    return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>{color->R, color->G, color->B, color->A};
+}
+
 int CLuaVehicleDefs::GetVehicleCurrentGear(lua_State* luaVM)
 {
     CClientVehicle*  pVehicle = NULL;
@@ -2494,6 +2509,16 @@ int CLuaVehicleDefs::SetVehicleHeadLightColor(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaVehicleDefs::SetVehicleNitroColor(CClientEntity* entity, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::optional<std::uint8_t> a)
+{
+    return CStaticFunctionDefinitions::SetVehicleNitroColor(*entity, SColorRGBA(r, g, b, a.value_or(255)));
+}
+
+bool CLuaVehicleDefs::ResetVehicleNitroColor(CClientEntity* entity)
+{
+    return CStaticFunctionDefinitions::SetVehicleNitroColor(*entity, std::nullopt);
 }
 
 int CLuaVehicleDefs::SetVehicleTurretPosition(lua_State* luaVM)

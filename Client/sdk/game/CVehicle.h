@@ -13,6 +13,7 @@
 
 #include <vector>
 #include <map>
+#include <optional>
 #include <CVector.h>
 #include "Common.h"
 #include "CPhysical.h"
@@ -277,6 +278,10 @@ public:
 
     virtual SColor GetHeadLightColor() = 0;
     virtual void   SetHeadLightColor(const SColor color) = 0;
+
+    // No value means the nitro effect uses its original (unmodified) colours.
+    virtual std::optional<SColor> GetNitroColor() = 0;
+    virtual void                  SetNitroColor(const std::optional<SColor> color) = 0;
 
     virtual bool    SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1) = 0;
     virtual void    SetWheelVisibility(eWheelPosition wheel, bool bVisible) = 0;

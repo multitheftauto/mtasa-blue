@@ -396,6 +396,10 @@ CVehicleSA::~CVehicleSA()
 {
     if (!BeingDeleted)
     {
+        // The game destroys this vehicle's nitro FX systems deferred (they fade out first),
+        // so the nitro colour render hook must not be able to reach this vehicle anymore
+        pGame->GetFxManagerSA()->UnregisterVehicleNitroSystems(this);
+
         if (!m_pInterface->IsPlaceableVTBL())
         {
             GetVehicleInterface()->m_pVehicle = nullptr;
@@ -2074,6 +2078,43 @@ bool CVehicleSA::SetOnFire(bool onFire)
     return true;
 }
 
+// CAutomobile::DoNitroEffect, hooked at a point that every code path through the function
+// passes through, right after the first exhaust's nitro FX system has been created/updated
+// (ESI still holds the CAutomobileSAInterface this pointer).
+#define HOOKPOS_CAutomobile_DoNitroEffect_Mid  0x6A3D81
+#define HOOKSIZE_CAutomobile_DoNitroEffect_Mid 6
+static constexpr DWORD        RETURN_CAutomobile_DoNitroEffect_Mid = HOOKPOS_CAutomobile_DoNitroEffect_Mid + HOOKSIZE_CAutomobile_DoNitroEffect_Mid;
+static void __declspec(naked) HOOK_CAutomobile_DoNitroEffect_Mid()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    esi
+        call    CVehicleSA::OnDoNitroEffectMid
+        add     esp, 4
+        popad
+
+        // Overwritten instruction
+        mov     eax, dword ptr [esi + 0x384]
+
+        jmp     RETURN_CAutomobile_DoNitroEffect_Mid
+    }
+    // clang-format on
+}
+
+void CVehicleSA::OnDoNitroEffectMid(CVehicleSAInterface* pInterface)
+{
+    if (pInterface && pInterface->m_pVehicle)
+    {
+        auto pAutomobile = (CAutomobileSAInterface*)pInterface;
+        pGame->GetFxManagerSA()->RegisterNitroSystem(pAutomobile->pNitroParticle[0], pInterface->m_pVehicle);
+        pGame->GetFxManagerSA()->RegisterNitroSystem(pAutomobile->pNitroParticle[1], pInterface->m_pVehicle);
+    }
+}
+
 void CVehicleSA::StaticSetHooks()
 {
     // Setup vehicle sun glare hook
@@ -2082,6 +2123,9 @@ void CVehicleSA::StaticSetHooks()
     // Setup hooks to handle setVehicleRotorState function
     HookInstall(FUNC_CHeli_ProcessFlyingCarStuff, (DWORD)HOOK_CHeli_ProcessFlyingCarStuff, 5);
     HookInstall(FUNC_CPlane_ProcessFlyingCarStuff, (DWORD)HOOK_CPlane_ProcessFlyingCarStuff, 5);
+
+    // Setup hook to capture nitro effects
+    HookInstall(HOOKPOS_CAutomobile_DoNitroEffect_Mid, (DWORD)HOOK_CAutomobile_DoNitroEffect_Mid, HOOKSIZE_CAutomobile_DoNitroEffect_Mid);
 }
 
 void CVehicleSA::SetVehiclesSunGlareEnabled(bool bEnabled)
