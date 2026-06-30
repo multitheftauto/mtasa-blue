@@ -68,6 +68,12 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             SPositionSync position(false);
             if (!BitStream.Read(&position))
                 return false;
+
+            // Reject NaN/Inf coordinates: SPositionSync only range-checks, so a non-finite value would
+            // otherwise be applied to the player and vehicle and relayed to everyone.
+            if (!position.data.vecPosition.IsValid())
+                return false;
+
             pSourcePlayer->SetPosition(position.data.vecPosition);
 
             // If the remote vehicle is a train, we want to read special train-specific data

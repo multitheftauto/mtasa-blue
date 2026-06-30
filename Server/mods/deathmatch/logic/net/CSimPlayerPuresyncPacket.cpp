@@ -10,17 +10,21 @@
 #include "StdInc.h"
 #include "SimHeaders.h"
 #include "Utils.h"
+#include "SyncPuresyncValidation.h"
 #include "CWeaponNames.h"
+#include "CTickRateSettings.h"
+#include "CElementIDs.h"
 
 CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket(ElementID PlayerID, ushort PlayerLatency, uchar PlayerSyncTimeContext, uchar PlayerGotWeaponType,
-                                                   float WeaponRange, CControllerState& sharedControllerState)
+                                                   float WeaponRange, CControllerState& sharedControllerState, CSimPlayer* pSimPlayer)
 
     : m_PlayerID(PlayerID),
       m_PlayerLatency(PlayerLatency),
       m_PlayerSyncTimeContext(PlayerSyncTimeContext),
       m_PlayerGotWeaponType(PlayerGotWeaponType),
       m_WeaponRange(WeaponRange),
-      m_sharedControllerState(sharedControllerState)
+      m_sharedControllerState(sharedControllerState),
+      m_pSimPlayer(pSimPlayer)
 {
 }
 
@@ -62,7 +66,44 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
     SPositionSync position(false);
     if (!BitStream.Read(&position))
         return false;
+
+    // Reject NaN/Inf coordinates before relaying them to nearby players (SPositionSync only range-checks).
+    if (!position.data.vecPosition.IsValid())
+        return false;
+
     m_Cache.Position = position.data.vecPosition;
+
+    CVector   vecAbsolutePosition = position.data.vecPosition;
+    CElement* pContactElement = nullptr;
+    if (m_Cache.flags.data.bHasContact)
+    {
+        pContactElement = CElementIDs::GetElement(m_Cache.ContactElementID);
+        if (pContactElement && m_pSimPlayer && m_pSimPlayer->m_pRealPlayer)
+        {
+            CPlayer* pSourcePlayer = m_pSimPlayer->m_pRealPlayer;
+            int32_t  radius = -1;
+
+            if (pContactElement->GetType() == CElement::VEHICLE)
+            {
+                if (((CVehicle*)pContactElement)->GetSyncer() != pSourcePlayer)
+                    radius = g_TickRateSettings.iVehicleContactSyncRadius;
+            }
+
+            if (radius > -1 && (!IsPointNearPoint3D(pSourcePlayer->GetPosition(), pContactElement->GetPosition(), static_cast<float>(radius)) ||
+                                pSourcePlayer->GetDimension() != pContactElement->GetDimension()))
+            {
+                pContactElement = nullptr;
+                vecAbsolutePosition = pSourcePlayer->GetPosition();
+            }
+        }
+    }
+
+    if (m_Cache.flags.data.bHasContact && pContactElement == nullptr && m_pSimPlayer && m_pSimPlayer->m_pRealPlayer)
+        vecAbsolutePosition = m_pSimPlayer->m_pRealPlayer->GetPosition();
+    else if (pContactElement)
+        vecAbsolutePosition += pContactElement->GetPosition();
+
+    m_Cache.AbsolutePosition = vecAbsolutePosition;
 
     // Player rotation
     SPedRotationSync rotation;
@@ -76,7 +117,39 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         SVelocitySync velocity;
         if (!BitStream.Read(&velocity))
             return false;
+
         m_Cache.Velocity = velocity.data.vecVelocity;
+    }
+
+    if (m_pSimPlayer)
+    {
+        const bool bVehicleContact = pContactElement && pContactElement->GetType() == CElement::VEHICLE;
+        CVector    vecServerContactRelative;
+        CElement*  pServerContactElement = nullptr;
+        if (m_pSimPlayer->m_pRealPlayer)
+        {
+            m_pSimPlayer->m_pRealPlayer->GetContactPosition(vecServerContactRelative);
+            pServerContactElement = m_pSimPlayer->m_pRealPlayer->GetContactElement();
+        }
+
+        CVector vecReferencePosition;
+        CVector vecNewPosition;
+        ResolvePuresyncMovementDelta(
+            bVehicleContact, m_Cache.flags.data.bHasContact ? m_Cache.ContactElementID : INVALID_ELEMENT_ID,
+            m_pSimPlayer->m_LastAcceptedPuresyncContactElementID, m_Cache.Position, vecAbsolutePosition,
+            m_pSimPlayer->m_vecLastAcceptedPuresyncContactRelative, m_pSimPlayer->m_vecLastAcceptedPuresyncPosition, vecServerContactRelative,
+            pServerContactElement, pContactElement, m_pSimPlayer->m_bHasLastAcceptedPuresyncPosition,
+            m_pSimPlayer->m_pRealPlayer ? m_pSimPlayer->m_pRealPlayer->GetPosition() : vecAbsolutePosition, vecReferencePosition, vecNewPosition);
+
+        const unsigned long long ullElapsedMs =
+            m_pSimPlayer->m_bHasLastAcceptedPuresyncPosition ? GetTickCount64_() - m_pSimPlayer->m_ullLastAcceptedPuresyncTick : 0;
+
+        if (!IsPlayerPuresyncMovementAcceptable(vecReferencePosition, ullElapsedMs, g_TickRateSettings.iPureSync, vecNewPosition,
+                                                m_Cache.flags.data.bSyncingVelocity, m_Cache.Velocity, g_TickRateSettings.iPlayerMaxSyncSpeed,
+                                                m_pSimPlayer->m_bTeleported))
+        {
+            return false;
+        }
     }
 
     // Health ( stored with damage )

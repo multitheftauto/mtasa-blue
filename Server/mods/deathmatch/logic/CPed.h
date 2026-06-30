@@ -257,7 +257,7 @@ public:
 
     CVehicle*    GetOccupiedVehicle() { return m_pVehicle; };
     unsigned int GetOccupiedVehicleSeat() { return m_uiVehicleSeat; };
-    CVehicle*    SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat);
+    virtual CVehicle* SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat);
 
     unsigned int GetVehicleAction() { return m_uiVehicleAction; };
     void         SetVehicleAction(unsigned int uiAction);
