@@ -9,6 +9,8 @@
 
 #include "StdInc.h"
 #include "SimHeaders.h"
+#include "SyncBulletsyncValidation.h"
+#include "CWeaponNames.h"
 
 //
 // CSimPlayer object is created on CPlayer construction
@@ -343,7 +345,15 @@ bool CSimPlayerManager::HandleBulletSync(const NetServerPlayerID& socket, NetBit
     LockSimSystem();
 
     auto* player = Get(socket);
-    if (!player || !player->IsJoined())
+    if (!player || !player->IsJoined() || !player->m_pRealPlayer)
+    {
+        UnlockSimSystem();
+        return true;
+    }
+
+    CPlayer* pRealPlayer = player->m_pRealPlayer;
+
+    if (!pRealPlayer->IsSpawned() || pRealPlayer->IsDead())
     {
         UnlockSimSystem();
         return true;
@@ -356,7 +366,31 @@ bool CSimPlayerManager::HandleBulletSync(const NetServerPlayerID& socket, NetBit
         return true;
     }
 
-    if (!player->m_pRealPlayer->HasWeaponType(packet->m_cache.weapon))
+    const auto weaponType = static_cast<std::uint8_t>(packet->m_cache.weapon);
+    if (!pRealPlayer->HasWeaponType(weaponType))
+    {
+        UnlockSimSystem();
+        return true;
+    }
+
+    const auto slot = CWeaponNames::GetSlotFromWeapon(weaponType);
+    if (pRealPlayer->GetWeaponTotalAmmo(slot) <= 0)
+    {
+        UnlockSimSystem();
+        return true;
+    }
+
+    const bool bInVehicle = pRealPlayer->GetOccupiedVehicle() != nullptr;
+    const float fWeaponRange = pRealPlayer->GetWeaponRangeFromSlot(slot);
+
+    if (!SyncBulletsyncValidation::IsSyncedBulletsyncPacketAcceptable(pRealPlayer->GetPosition(), bInVehicle, packet->m_cache.start, packet->m_cache.end,
+                                                                     packet->m_cache.damage, packet->m_cache.zone, packet->m_cache.damaged, fWeaponRange))
+    {
+        UnlockSimSystem();
+        return true;
+    }
+
+    if (!pRealPlayer->TryAcceptBulletsync())
     {
         UnlockSimSystem();
         return true;
