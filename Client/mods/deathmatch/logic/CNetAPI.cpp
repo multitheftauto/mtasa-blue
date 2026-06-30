@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <SyncBulletsyncValidation.h>
 #include <net/SyncStructures.h>
 #include <game/CWeapon.h>
 #include <game/CWeaponStat.h>
@@ -2293,6 +2294,15 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
     CVector end;
     if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)) || !start.IsValid() ||
         !end.IsValid())
+        return;
+
+    if (!SyncBulletsyncValidation::IsSyncedBulletSegmentNonDegenerate(start, end))
+        return;
+
+    CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(type);
+    const float  fWeaponRange = pWeaponStat ? pWeaponStat->GetWeaponRange() : 0.0f;
+    if (!SyncBulletsyncValidation::IsSyncedBulletsyncGeometryAcceptable(player->GetPosition(), player->GetOccupiedVehicle() != nullptr, start, end,
+                                                                          fWeaponRange))
         return;
 
     std::uint8_t order = 0;

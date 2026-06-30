@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "SyncBulletsyncValidation.h"
 #include "CPlayer.h"
 #include "CElementRefManager.h"
 #include "CGame.h"
@@ -1110,6 +1111,25 @@ void CPlayer::SetPosition(const CVector& vecPosition)
         MarkPositionAsChanged();
     }
     CElement::SetPosition(vecPosition);
+}
+
+bool CPlayer::TryAcceptBulletsync() noexcept
+{
+    using namespace SyncBulletsyncValidation;
+
+    const unsigned long long ullNow = GetTickCount64_();
+
+    if (m_ullBulletsyncWindowStartMs == 0 || ullNow - m_ullBulletsyncWindowStartMs >= RATE_WINDOW_MS)
+    {
+        m_ullBulletsyncWindowStartMs = ullNow;
+        m_uiBulletsyncCountInWindow = 0;
+    }
+
+    if (m_uiBulletsyncCountInWindow >= MAX_PACKETS_PER_SECOND)
+        return false;
+
+    ++m_uiBulletsyncCountInWindow;
+    return true;
 }
 
 void CPlayer::SetPlayerStat(unsigned short usStat, float fValue)

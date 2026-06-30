@@ -11,6 +11,8 @@
 #include "SimHeaders.h"
 #include "CPickupManager.h"
 #include "CWeaponStatManager.h"
+#include "CElementIDs.h"
+#include "SyncBulletsyncValidation.h"
 
 CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID id) : m_id(id)
 {
@@ -27,17 +29,26 @@ bool CSimBulletsyncPacket::Read(NetBitStreamInterface& stream)
     if (!stream.Read(reinterpret_cast<char*>(&m_cache.start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&m_cache.end), sizeof(CVector)))
         return false;
 
-    if (!m_cache.start.IsValid() || !m_cache.end.IsValid())
+    if (!SyncBulletsyncValidation::IsSyncedBulletSegmentNonDegenerate(m_cache.start, m_cache.end))
         return false;
 
     if (!stream.Read(m_cache.order))
         return false;
 
+    m_cache.damage = 0.0f;
+    m_cache.zone = 0;
+    m_cache.damaged = INVALID_ELEMENT_ID;
+
     if (stream.ReadBit())
     {
-        stream.Read(m_cache.damage);
-        stream.Read(m_cache.zone);
-        stream.Read(m_cache.damaged);
+        if (!stream.Read(m_cache.damage) || !stream.Read(m_cache.zone) || !stream.Read(m_cache.damaged))
+            return false;
+
+        if (!SyncBulletsyncValidation::IsSyncedBulletDamageAcceptable(m_cache.damage, m_cache.zone, m_cache.damaged))
+            return false;
+
+        if (m_cache.damaged != INVALID_ELEMENT_ID && !CElementIDs::GetElement(m_cache.damaged))
+            return false;
     }
 
     return true;

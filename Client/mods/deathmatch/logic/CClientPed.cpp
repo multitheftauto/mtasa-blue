@@ -1014,6 +1014,9 @@ void CClientPed::SetTargetTarget(unsigned long ulDelay, const CVector& vecSource
 {
     if (!m_bIsLocalPlayer)
     {
+        if (!vecSource.IsValid() || !vecTarget.IsValid())
+            return;
+
         m_ulBeginTarget = CClientTime::GetTime();
         m_ulEndTarget = m_ulBeginTarget + ulDelay;
         m_vecBeginSource = m_shotSyncData->m_vecShotOrigin;
@@ -1021,8 +1024,9 @@ void CClientPed::SetTargetTarget(unsigned long ulDelay, const CVector& vecSource
         m_vecTargetSource = vecSource;
         m_vecTargetTarget = vecTarget;
 
-        // Grab the radius of the target circle
-        float fRadius = DistanceBetweenPoints3D(m_vecTargetSource, m_vecTargetTarget);
+        const float fRadius = DistanceBetweenPoints3D(m_vecTargetSource, m_vecTargetTarget);
+        if (fRadius < 0.01f)
+            return;
 
         // Grab the angle of the source vector and the angle of the target vector relative to the source vector that applies
         m_vecBeginTargetAngle.fX = acos(Clamp(-1.0f, (m_vecBeginTarget.fX - m_vecBeginSource.fX) / fRadius, 1.0f));

@@ -14,6 +14,7 @@
 #include "CElementIDs.h"
 #include "CWeaponNames.h"
 #include "Utils.h"
+#include "SyncBulletsyncValidation.h"
 #include "CTickRateSettings.h"
 #include <net/SyncStructures.h>
 
@@ -279,6 +280,11 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     // Read the aim data only if he's shooting or aiming
                     if (sync.isFull())
                     {
+                        if (!SyncBulletsyncValidation::IsSyncedWeaponAimAcceptable(
+                                position.data.vecPosition, sync.data.vecOrigin, sync.data.vecTarget, fWeaponRange,
+                                pSourcePlayer->GetOccupiedVehicle() != nullptr))
+                            return false;
+
                         pSourcePlayer->SetSniperSourceVector(sync.data.vecOrigin);
                         pSourcePlayer->SetTargettingVector(sync.data.vecTarget);
                     }
