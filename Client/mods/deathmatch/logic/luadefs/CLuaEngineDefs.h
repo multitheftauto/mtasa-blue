@@ -99,6 +99,8 @@ public:
     static bool EngineRestreamModel(std::uint16_t modelId);
     static void EngineRestream(std::optional<RestreamOption> option);
 
+    static void EngineSetRenderingListSize(RenderingEntityListType listType, std::size_t elementsCount);
+
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);

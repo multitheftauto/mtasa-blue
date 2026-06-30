@@ -992,6 +992,11 @@ ADD_ENUM(PostFXType::CONTRAST, "contrast")
 ADD_ENUM(PostFXType::SATURATION, "saturation")
 IMPLEMENT_ENUM_CLASS_END("postfx-type")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(RenderingEntityListType)
+ADD_ENUM(RenderingEntityListType::ENTITY_LIST_TYPE_ALPHA, "alpha")
+ADD_ENUM(RenderingEntityListType::ENTITY_LIST_TYPE_UNDERWATER, "underwater")
+IMPLEMENT_ENUM_CLASS_END("rendering-entity-list-type")
+
 //
 // CResource from userdata
 //
