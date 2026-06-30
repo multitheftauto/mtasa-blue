@@ -7,7 +7,7 @@
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
- *****************************************************************************/
+ ****************************************************************************/
 
 #include "StdInc.h"
 #include "CLuaEventPacket.h"
@@ -37,6 +37,16 @@ bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream)
             if (!m_ArgumentsStore.ReadFromBitStream(BitStream))
                 return false;
             m_pArguments = &m_ArgumentsStore;
+
+            // Optional monotonic sequence appended by the client (anti-replay; see README.event-sync-guard.md)
+            m_bHasClientSequence = false;
+            m_uiClientSequence = 0;
+            if (BitStream.Can(eBitStreamVersion::ClientLuaEventSequence) && BitStream.CanReadNumberOfBytes(4))
+            {
+                if (!BitStream.Read(m_uiClientSequence))
+                    return false;
+                m_bHasClientSequence = true;
+            }
 
             return true;
         }

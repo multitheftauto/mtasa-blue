@@ -45,6 +45,13 @@ public:
     void CancelEvent(bool bCancelled = true);
     bool WasEventCancelled();
 
+    void PushRemoteServerEventPulse();
+    void PopRemoteServerEventPulse();
+    bool IsRemoteServerEventPulse() const noexcept { return m_iRemoteServerEventPulseDepth > 0; }
+
+    void      SetActiveEventHandlerLuaMain(class CLuaMain* pLuaMain) noexcept { m_pActiveEventHandlerLuaMain = pLuaMain; }
+    CLuaMain* GetActiveEventHandlerLuaMain() const noexcept { return m_pActiveEventHandlerLuaMain; }
+
 private:
     void RemoveAllEvents();
 
@@ -52,4 +59,6 @@ private:
     std::vector<int>               m_CancelledList;
     bool                           m_bEventCancelled;
     bool                           m_bWasEventCancelled;
+    int                            m_iRemoteServerEventPulseDepth = 0;
+    class CLuaMain*                m_pActiveEventHandlerLuaMain = nullptr;
 };

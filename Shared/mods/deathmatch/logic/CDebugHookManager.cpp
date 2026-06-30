@@ -355,6 +355,12 @@ void CDebugHookManager::GetFunctionCallHookArguments(CLuaArguments& NewArguments
 ///////////////////////////////////////////////////////////////
 bool CDebugHookManager::OnPreEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
 {
+#ifdef MTA_CLIENT
+    // preEvent debug hooks can return "skip" and block server triggerClientEvent delivery.
+    if (g_pClientGame->GetEvents()->IsRemoteServerEventPulse())
+        return true;
+#endif
+
     if (m_PreEventHookList.empty())
         return true;
 
@@ -433,6 +439,11 @@ void CDebugHookManager::GetEventCallHookArguments(CLuaArguments& NewArguments, c
 ///////////////////////////////////////////////////////////////
 bool CDebugHookManager::OnPreEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
 {
+#ifdef MTA_CLIENT
+    if (g_pClientGame->GetEvents()->IsRemoteServerEventPulse())
+        return true;
+#endif
+
     if (m_PreEventFunctionHookList.empty())
         return true;
 

@@ -1155,6 +1155,28 @@ CPlayer* GetDeletedMapKey(CPlayer**)
     return (CPlayer*)2;
 }
 
+bool CPlayer::TryAcceptClientLuaEvent(bool bHasSequence, uint32_t uiSequence) noexcept
+{
+    // Server-side anti-replay. The sequence is plain client state, but the *expected* value lives only on
+    // the server, so a captured packet resent verbatim (its sequence is stale) is rejected. Deliberately
+    // monotonic rather than strict-equality so reliable-ordered + latent event interleaving never drops a
+    // legitimate packet. This is the only guarantee we can give on an open-source client: no client-side
+    // secret can stop a recompiled cheat, so we avoid security-through-obscurity entirely.
+    if (!bHasSequence)
+        return true;
+
+    if (uiSequence < m_uiNextExpectedClientLuaEventSequence)
+        return false;
+
+    m_uiNextExpectedClientLuaEventSequence = uiSequence + 1;
+    return true;
+}
+
+void CPlayer::ResetClientLuaEventSequence() noexcept
+{
+    m_uiNextExpectedClientLuaEventSequence = 1;
+}
+
 /////////////////////////////////////////////////////////////////
 //
 // CPlayerBitStream::CPlayerBitStream

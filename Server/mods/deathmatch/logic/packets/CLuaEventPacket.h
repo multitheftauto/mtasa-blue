@@ -30,9 +30,14 @@ public:
     ElementID      GetElementID() { return m_ElementID; }
     CLuaArguments* GetArguments() { return m_pArguments; }
 
+    bool     HasClientSequence() const noexcept { return m_bHasClientSequence; }
+    uint32_t GetClientSequence() const noexcept { return m_uiClientSequence; }
+
 private:
     SString        m_strName;
     ElementID      m_ElementID;
     CLuaArguments  m_ArgumentsStore;
     CLuaArguments* m_pArguments;
+    uint32_t       m_uiClientSequence = 0;
+    bool           m_bHasClientSequence = false;
 };

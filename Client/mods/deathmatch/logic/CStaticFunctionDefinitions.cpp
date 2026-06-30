@@ -37,6 +37,26 @@
 
 using std::list;
 
+namespace
+{
+    // Append a per-client monotonic sequence so the server can drop verbatim packet replays.
+    // No client-side secret is used: the client is open source, so any "signature" would be
+    // trivially reproducible by a recompiled cheat. The only real guarantee is the server-side
+    // expected-sequence state, which the client cannot observe or rewind.
+    bool AppendClientLuaEventSequence(NetBitStreamInterface& bitStream)
+    {
+        if (!bitStream.Can(eBitStreamVersion::ClientLuaEventSequence))
+            return true;
+
+        return bitStream.Write(g_pClientGame->GetNextClientLuaEventSequence());
+    }
+
+    void CommitClientLuaEventSequence()
+    {
+        g_pClientGame->AdvanceClientLuaEventSequence();
+    }
+}
+
 static CLuaManager*              m_pLuaManager;
 static CEvents*                  m_pEvents;
 static CCoreInterface*           m_pCore;
@@ -192,8 +212,14 @@ bool CStaticFunctionDefinitions::TriggerServerEvent(const char* szName, CClientE
             g_pNet->DeallocateNetBitStream(pBitStream);
             return false;
         }
+        if (!AppendClientLuaEventSequence(*pBitStream))
+        {
+            g_pNet->DeallocateNetBitStream(pBitStream);
+            return false;
+        }
         g_pNet->SendPacket(PACKET_ID_LUA_EVENT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
         g_pNet->DeallocateNetBitStream(pBitStream);
+        CommitClientLuaEventSequence();
 
         return true;
     }
@@ -221,10 +247,16 @@ bool CStaticFunctionDefinitions::TriggerLatentServerEvent(const char* szName, CC
             g_pNet->DeallocateNetBitStream(pBitStream);
             return false;
         }
+        if (!AppendClientLuaEventSequence(*pBitStream))
+        {
+            g_pNet->DeallocateNetBitStream(pBitStream);
+            return false;
+        }
         g_pClientGame->GetLatentTransferManager()->AddSendBatchBegin(PACKET_ID_LUA_EVENT, pBitStream);
         g_pClientGame->GetLatentTransferManager()->AddSend(0, pBitStream->Version(), iBandwidth, pLuaMain, usResourceNetId);
         g_pClientGame->GetLatentTransferManager()->AddSendBatchEnd();
         g_pNet->DeallocateNetBitStream(pBitStream);
+        CommitClientLuaEventSequence();
 
         return true;
     }
