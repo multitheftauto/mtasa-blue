@@ -14,6 +14,7 @@
 #include "CElementIDs.h"
 #include "CWeaponNames.h"
 #include "Utils.h"
+#include "SyncPuresyncValidation.h"
 #include "CTickRateSettings.h"
 #include <net/SyncStructures.h>
 
@@ -83,6 +84,12 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         bool          positionRead = BitStream.Read(&position);
         const CVector vecRelativePosition = position.data.vecPosition;
 
+        // Reject NaN/Inf coordinates outright. SPositionSync only range-checks the position, but a
+        // non-finite value slips past that (comparisons against NaN are always false) and would be
+        // applied/relayed verbatim, corrupting the element and other clients.
+        if (positionRead && !vecRelativePosition.IsValid())
+            return false;
+
         if (positionRead && pContactElement != nullptr)
         {
             int32_t radius = -1;
@@ -133,6 +140,8 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         if (!positionRead)
             return false;
 
+        const CVector vecSyncRelativePosition = position.data.vecPosition;
+
         if (pContactElement)
         {
             pSourcePlayer->SetContactPosition(position.data.vecPosition);
@@ -159,27 +168,58 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     arguments.PushNumber(position.data.vecPosition.fZ);
                     pSourcePlayer->CallEvent("onPlayerTeleport", arguments, nullptr);
                 }
-
-                pSourcePlayer->SetTeleported(false);
             }
         }
 
-        pSourcePlayer->SetPosition(position.data.vecPosition);
-
-        // Player rotation
+        // Read rotation and optional velocity before applying movement so forged sync can be
+        // rejected before it touches server state or is relayed to other clients.
         SPedRotationSync rotation;
         if (!BitStream.Read(&rotation))
             return false;
-        pSourcePlayer->SetRotation(rotation.data.fRotation);
 
-        // Move speed vector
-        if (flags.data.bSyncingVelocity)
+        CVector vecPacketVelocity;
+        const bool bSyncingVelocity = flags.data.bSyncingVelocity;
+        if (bSyncingVelocity)
         {
             SVelocitySync velocity;
             if (!BitStream.Read(&velocity))
                 return false;
-            pSourcePlayer->SetVelocity(velocity.data.vecVelocity);
+            vecPacketVelocity = velocity.data.vecVelocity;
         }
+
+        const bool bOnFoot = !pSourcePlayer->GetOccupiedVehicle() || pSourcePlayer->GetVehicleAction() == CPed::VEHICLEACTION_EXITING;
+        if (bOnFoot)
+        {
+            const bool bVehicleContact = pContactElement && pContactElement->GetType() == CElement::VEHICLE;
+            CVector    vecServerContactRelative;
+            pSourcePlayer->GetContactPosition(vecServerContactRelative);
+
+            CVector vecReferencePosition;
+            CVector vecNewPosition;
+            ResolvePuresyncMovementDelta(bVehicleContact, pContactElement ? pContactElement->GetID() : INVALID_ELEMENT_ID,
+                                         pSourcePlayer->GetLastAcceptedPuresyncContactElementID(), vecSyncRelativePosition, position.data.vecPosition,
+                                         pSourcePlayer->GetLastAcceptedPuresyncContactRelative(), pSourcePlayer->GetLastAcceptedPuresyncPosition(),
+                                         vecServerContactRelative, pSourcePlayer->GetContactElement(), pContactElement,
+                                         pSourcePlayer->HasLastAcceptedPuresyncPosition(), pSourcePlayer->GetPosition(), vecReferencePosition,
+                                         vecNewPosition);
+
+            const unsigned long long ullElapsedMs = pSourcePlayer->HasLastAcceptedPuresyncPosition()
+                                                        ? GetTickCount64_() - pSourcePlayer->GetLastAcceptedPuresyncTick()
+                                                        : 0;
+
+            if (!IsPlayerPuresyncMovementAcceptable(vecReferencePosition, ullElapsedMs, g_TickRateSettings.iPureSync, vecNewPosition,
+                                                    bSyncingVelocity, vecPacketVelocity, g_TickRateSettings.iPlayerMaxSyncSpeed,
+                                                    pSourcePlayer->GetTeleported()))
+            {
+                return false;
+            }
+        }
+
+        pSourcePlayer->SetPosition(position.data.vecPosition);
+        pSourcePlayer->SetRotation(rotation.data.fRotation);
+
+        if (bSyncingVelocity)
+            pSourcePlayer->SetVelocity(vecPacketVelocity);
 
         // Health ( stored with damage )
         SPlayerHealthSync health;
@@ -348,6 +388,9 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
             pSourcePlayer->CallEvent("onPlayerDamage", Arguments);
         }
+
+        if (bOnFoot)
+            pSourcePlayer->NoteAcceptedPuresyncPosition(position.data.vecPosition, pContactElement, vecSyncRelativePosition);
 
         // Success
         return true;

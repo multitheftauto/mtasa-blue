@@ -1527,6 +1527,9 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {true, true, 50, 130, 400, "unoccupied_vehicle_syncer_distance", &g_TickRateSettings.iUnoccupiedVehicleSyncerDistance, &CMainConfig::OnTickRateChange},
         {true, true, 0, 30, 130, "vehicle_contact_sync_radius", &g_TickRateSettings.iVehicleContactSyncRadius, &CMainConfig::OnTickRateChange},
         {true, true, 5, 100, 500, "player_teleport_alert", &g_TickRateSettings.playerTeleportAlert, &CMainConfig::OnTickRateChange},
+        // Highest believable synced speed (km/h) for on-foot players. Puresync packets above this are
+        // dropped to stop injected ped velocities being relayed (remote vehicle launch cheats). 0 = off.
+        {true, true, 0, 360, 100000, "player_max_sync_speed", &g_TickRateSettings.iPlayerMaxSyncSpeed, nullptr},
         {false, false, 0, 1, 2, "compact_internal_databases", &m_iCompactInternalDatabases, NULL},
         {true, true, 0, 1, 2, "minclientversion_auto_update", &m_iMinClientVersionAutoUpdate, NULL},
         {true, true, 0, 0, 100, "server_logic_fps_limit", &m_iServerLogicFpsLimit, NULL},

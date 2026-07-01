@@ -141,6 +141,12 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
         pSim->m_ucOccupiedVehicleSeat = uiSeat <= 0xFF ? static_cast<unsigned char>(uiSeat) : 0xFF;
     }
     pSim->m_fWeaponRange = pPlayer->GetWeaponRangeFromSlot();
+    pSim->m_bTeleported = pPlayer->GetTeleported();
+    pSim->m_bHasLastAcceptedPuresyncPosition = pPlayer->HasLastAcceptedPuresyncPosition();
+    pSim->m_vecLastAcceptedPuresyncPosition = pPlayer->GetLastAcceptedPuresyncPosition();
+    pSim->m_ullLastAcceptedPuresyncTick = pPlayer->GetLastAcceptedPuresyncTick();
+    pSim->m_LastAcceptedPuresyncContactElementID = pPlayer->GetLastAcceptedPuresyncContactElementID();
+    pSim->m_vecLastAcceptedPuresyncContactRelative = pPlayer->GetLastAcceptedPuresyncContactRelative();
     pSim->m_bVehicleHasHydraulics = pVehicle ? pVehicle->GetUpgrades()->HasUpgrade(1087) : false;
     pSim->m_bVehicleIsPlaneOrHeli = pVehicle ? pVehicle->GetVehicleType() == VEHICLE_PLANE || pVehicle->GetVehicleType() == VEHICLE_HELI : false;
     pSim->m_sharedControllerState.Copy(pPlayer->GetPad()->GetCurrentControllerState());
@@ -239,10 +245,22 @@ bool CSimPlayerManager::HandlePlayerPureSync(const NetServerPlayerID& Socket, Ne
     // Check is good for player pure sync
     if (pSourceSimPlayer && pSourceSimPlayer->IsJoined() && (!pSourceSimPlayer->m_bHasOccupiedVehicle || pSourceSimPlayer->m_bIsExitingVehicle))
     {
+        // Keep sim-thread validation aligned with the main thread's last accepted puresync state.
+        if (CPlayer* pRealPlayer = pSourceSimPlayer->m_pRealPlayer)
+        {
+            pSourceSimPlayer->m_bHasLastAcceptedPuresyncPosition = pRealPlayer->HasLastAcceptedPuresyncPosition();
+            pSourceSimPlayer->m_vecLastAcceptedPuresyncPosition = pRealPlayer->GetLastAcceptedPuresyncPosition();
+            pSourceSimPlayer->m_ullLastAcceptedPuresyncTick = pRealPlayer->GetLastAcceptedPuresyncTick();
+            pSourceSimPlayer->m_LastAcceptedPuresyncContactElementID = pRealPlayer->GetLastAcceptedPuresyncContactElementID();
+            pSourceSimPlayer->m_vecLastAcceptedPuresyncContactRelative = pRealPlayer->GetLastAcceptedPuresyncContactRelative();
+            pSourceSimPlayer->m_bTeleported = pRealPlayer->GetTeleported();
+        }
+
         // Read the incoming packet data
         CSimPlayerPuresyncPacket* pPacket =
             new CSimPlayerPuresyncPacket(pSourceSimPlayer->m_PlayerID, pSourceSimPlayer->m_usLatency, pSourceSimPlayer->m_ucSyncTimeContext,
-                                         pSourceSimPlayer->m_ucWeaponType, pSourceSimPlayer->m_fWeaponRange, pSourceSimPlayer->m_sharedControllerState);
+                                         pSourceSimPlayer->m_ucWeaponType, pSourceSimPlayer->m_fWeaponRange, pSourceSimPlayer->m_sharedControllerState,
+                                         pSourceSimPlayer);
         if (pPacket->Read(*BitStream))
         {
             // Relay it to nearbyers

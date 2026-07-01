@@ -27,6 +27,12 @@ public:
         iUnoccupiedVehicleSyncerDistance = 130;
         iVehicleContactSyncRadius = 30;
         playerTeleportAlert = 100;
+        // Anti-cheat: highest physically believable speed (km/h) a synced on-foot player may report.
+        // The exploit case is a cheater injecting a non-physical ped move speed while on foot so their
+        // remote ped can ram/tunnel into nearby vehicles on other clients and launch them.
+        // Packets above this limit are dropped server-side. 0 disables the check.
+        // (getElementVelocity: 1 GTA-unit == 180 km/h.)
+        iPlayerMaxSyncSpeed = 360;
     }
 
     int iPureSync;
@@ -43,6 +49,7 @@ public:
     int iUnoccupiedVehicleSyncerDistance;
     int iVehicleContactSyncRadius;
     int playerTeleportAlert;
+    int iPlayerMaxSyncSpeed;
 };
 
 extern CTickRateSettings g_TickRateSettings;
