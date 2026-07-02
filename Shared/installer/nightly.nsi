@@ -876,6 +876,7 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
 
         SetOutPath "$INSTDIR\server"
         SetOverwrite on
+        File "${SERVER_FILES_ROOT}\MTA Server64.exe"
         File "${SERVER_FILES_ROOT}\core.dll"
         File "${FILES_ROOT}\mta\xmll.dll"
         File "${SERVER_FILES_ROOT}\net.dll"
@@ -883,6 +884,13 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         !ifdef MTA_MAETRO
             File "${FILES_ROOT}\maetro32.dll"
         !endif
+
+        ; x64 server binaries
+        SetOutPath "$INSTDIR\server\x64"
+        File "${SERVER_FILES_ROOT}\x64\core.dll"
+        File "${SERVER_FILES_ROOT}\x64\net.dll"
+        File "${SERVER_FILES_ROOT}\x64\xmll.dll"
+        File "${SERVER_FILES_ROOT}\x64\pthread.dll"
         ${LogText} "-Section end - SERVER CORE"
     SectionEnd
 
@@ -902,6 +910,18 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
             File "${SERVER_FILES_ROOT}\mods\deathmatch\libssl-3.dll"
         !endif
         File "${SERVER_FILES_ROOT}\mods\deathmatch\mtaserver.conf.template"
+
+        ; x64 server game module binaries
+        SetOutPath "$INSTDIR\server\x64"
+        File "${SERVER_FILES_ROOT}\x64\deathmatch.dll"
+        File "${SERVER_FILES_ROOT}\x64\lua5.1.dll"
+        File "${SERVER_FILES_ROOT}\x64\pcre2.dll"
+        File "${SERVER_FILES_ROOT}\x64\dbconmy.dll"
+        !ifndef LIGHTBUILD
+            File "${SERVER_FILES_ROOT}\x64\libmysql.dll"
+            File "${SERVER_FILES_ROOT}\x64\libcrypto-3-x64.dll"
+            File "${SERVER_FILES_ROOT}\x64\libssl-3-x64.dll"
+        !endif
 
         ;Only overwrite the following files if previous versions were bugged and explicitly need replacing
         !insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "711185d8f4ebb355542053ce408b82b3"
