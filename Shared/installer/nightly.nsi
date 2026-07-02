@@ -907,6 +907,9 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
             File "${SERVER_FILES_ROOT}\x64\libssl-3-x64.dll"
         !endif
 
+        ; Config files are architecture-independent, install under server\mods\deathmatch
+        SetOutPath "$INSTDIR\server\mods\deathmatch"
+
         ;Only overwrite the following files if previous versions were bugged and explicitly need replacing
         !insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "711185d8f4ebb355542053ce408b82b3"
         !insertmacro FileIfMD5 "${SERVER_FILES_ROOT}\mods\deathmatch\editor_acl.xml" "706869E53F508919F987A2F7F2653AD2"
