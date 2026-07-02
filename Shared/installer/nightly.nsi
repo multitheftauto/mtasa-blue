@@ -1124,10 +1124,6 @@ Section Uninstall
 
     preservemapsfolder:
         Call un.DoServiceUninstall
-        ; server files
-        Delete "$INSTDIR\server\MTA Server.exe"
-        Delete "$INSTDIR\server\*.dll"
-        Delete "$INSTDIR\server\mods\deathmatch\*.dll"
 
         ; server x64 files
         Delete "$INSTDIR\server\MTA Server64.exe"
@@ -1201,13 +1197,10 @@ Section Uninstall
         DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\Multi Theft Auto.exe.ApplicationCompany"
         DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\MTA\wow64_helper.exe.FriendlyAppName"
         DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\MTA\wow64_helper.exe.ApplicationCompany"
-        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\server\MTA Server.exe.FriendlyAppName"
-        DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\server\MTA Server.exe.ApplicationCompany"
         DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\server\MTA Server64.exe.FriendlyAppName"
         DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$INSTDIR\server\MTA Server64.exe.ApplicationCompany"
         DeleteRegValue HKCR "Local Settings\Software\Microsoft\Windows\Shell\MuiCache" "$APPDATA\MTA San Andreas All\${0.0}\GTA San Andreas\gta_sa.exe.FriendlyAppName"
         DeleteRegValue HKCU "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store" "$INSTDIR\Multi Theft Auto.exe"
-        DeleteRegValue HKCU "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store" "$INSTDIR\server\MTA Server.exe"
         DeleteRegValue HKCU "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store" "$INSTDIR\server\MTA Server64.exe"
         DeleteRegValue HKCU "Software\Microsoft\Windows NT\CurrentVersion\AppCompatFlags\Compatibility Assistant\Store" "$INSTDIR\Uninstall.exe"
 
@@ -1224,20 +1217,7 @@ Section Uninstall
             Goto loop
         ${EndIf}
 
-        ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$INSTDIR\server\MTA Server.exe" $9
-        ${If} $9 != ""
-            DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
-            Goto loop
-        ${EndIf}
-
         ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$INSTDIR\Uninstall.exe" $9
-        ${If} $9 != ""
-            DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
-            Goto loop
-        ${EndIf}
-
-        ; Clean up after old bugged path
-        ${ReadRegStrMultiSz} ${HKEY_CURRENT_USER} "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8 "$INSTDIR\MTA Server.exe" $9
         ${If} $9 != ""
             DeleteRegValue HKCU "Software\Microsoft\Windows\CurrentVersion\UFH\SHC" $8
             Goto loop
@@ -1254,7 +1234,6 @@ Section Uninstall
         Goto loop
     done:
         SimpleFC::RemoveApplication "$INSTDIR\Multi Theft Auto.exe"
-        SimpleFC::RemoveApplication "$INSTDIR\server\MTA Server.exe"
         SimpleFC::RemoveApplication "$INSTDIR\server\MTA Server64.exe"
         SimpleFC::RemoveApplication "$INSTDIR\Uninstall.exe"
         SimpleFC::RemoveApplication "$APPDATA\MTA San Andreas All\${0.0}\GTA San Andreas\gta_sa.exe"
