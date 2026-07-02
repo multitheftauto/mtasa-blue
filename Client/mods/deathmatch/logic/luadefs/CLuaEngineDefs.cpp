@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <multiplayer/CMultiplayer.h>
 #include <game/CColPoint.h>
 #include <game/CObjectGroupPhysicalProperties.h>
 #include <game/CStreaming.h>
@@ -81,6 +82,17 @@ void EngineStreamingRestoreBufferSize()
 size_t EngineStreamingGetBufferSize()
 {
     return g_pGame->GetStreaming()->GetStreamingBufferSize();
+}
+
+// Opt-in SilentPatch-style fixes for stock vehicle.dff hierarchy typos (wheel_lm_dummy vs wheel_lm, etc.).
+void EngineSetVehicleHierarchyTypoFixesEnabled(bool enabled)
+{
+    g_pCore->GetMultiplayer()->SetVehicleHierarchyTypoFixesEnabled(enabled);
+}
+
+bool EngineGetVehicleHierarchyTypoFixesEnabled()
+{
+    return g_pCore->GetMultiplayer()->GetVehicleHierarchyTypoFixesEnabled();
 }
 
 void CLuaEngineDefs::LoadFunctions()
@@ -163,6 +175,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
         {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
         {"engineRestream", ArgumentParser<EngineRestream>},
+        {"engineSetVehicleHierarchyTypoFixesEnabled", ArgumentParser<EngineSetVehicleHierarchyTypoFixesEnabled>},
+        {"engineGetVehicleHierarchyTypoFixesEnabled", ArgumentParser<EngineGetVehicleHierarchyTypoFixesEnabled>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -211,6 +225,9 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelTXDID", "engineGetModelTXDID");
     lua_classfunction(luaVM, "setModelTXDID", "engineSetModelTXDID");
     lua_classfunction(luaVM, "resetModelTXDID", "engineResetModelTXDID");
+
+    lua_classfunction(luaVM, "setVehicleHierarchyTypoFixesEnabled", "engineSetVehicleHierarchyTypoFixesEnabled");
+    lua_classfunction(luaVM, "getVehicleHierarchyTypoFixesEnabled", "engineGetVehicleHierarchyTypoFixesEnabled");
 
     lua_registerstaticclass(luaVM, "Engine");
 
