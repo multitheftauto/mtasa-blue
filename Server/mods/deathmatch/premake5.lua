@@ -24,12 +24,13 @@ project "Deathmatch"
 			"../../../vendor/zip",
 			"../../../vendor/glob/include",
 			"../../../vendor/zlib",
-			"../../../vendor/pcre",
+			"../../../vendor/pcre2",
 			"../../../vendor/json-c",
 			"../../../vendor/lua/src",
 			"../../../Shared/gta",
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",
+			"../../../Shared",
 			"../../../Shared/publicsdk/include",
 			"../../../Shared",
 			"../../../vendor/sparsehash/src/",
@@ -40,7 +41,7 @@ project "Deathmatch"
 
 	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "sqlite", "cryptopp", "pme", "pcre", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt",
+		"Lua_Server", "sqlite", "cryptopp", "pme", "pcre2", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt",
 	}
 
 	vpaths {
@@ -82,3 +83,7 @@ project "Deathmatch"
 
 	filter "platforms:arm64"
 		targetdir(buildpath("server/arm64"))
+
+	-- 32-bit Windows server is no longer supported
+	filter { "system:windows", "platforms:x86" }
+		flags { "ExcludeFromBuild" }

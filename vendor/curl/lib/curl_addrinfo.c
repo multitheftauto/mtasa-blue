@@ -21,10 +21,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
 #include "curl_setup.h"
-
-#include <curl/curl.h>
 
 #ifdef HAVE_NETINET_IN_H
 #  include <netinet/in.h>
@@ -47,16 +44,11 @@
 #  include <inet.h>
 #endif
 
-#include <stddef.h>
+#include <stddef.h>  /* for offsetof() */
 
 #include "curl_addrinfo.h"
 #include "fake_addrinfo.h"
 #include "curlx/inet_pton.h"
-#include "curlx/warnless.h"
-/* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
-#include "memdebug.h"
 
 /*
  * Curl_freeaddrinfo()
@@ -68,25 +60,23 @@
  */
 
 #if defined(__INTEL_COMPILER) && (__INTEL_COMPILER == 910) && \
-    defined(__OPTIMIZE__) && defined(__unix__) &&  defined(__i386__)
+  defined(__OPTIMIZE__) && defined(__unix__) && defined(__i386__)
   /* workaround icc 9.1 optimizer issue */
-# define vqualifier volatile
+#  define vqualifier volatile
 #else
-# define vqualifier
+#  define vqualifier
 #endif
 
-void
-Curl_freeaddrinfo(struct Curl_addrinfo *cahead)
+void Curl_freeaddrinfo(struct Curl_addrinfo *cahead)
 {
   struct Curl_addrinfo *vqualifier canext;
   struct Curl_addrinfo *ca;
 
   for(ca = cahead; ca; ca = canext) {
     canext = ca->ai_next;
-    free(ca);
+    curlx_free(ca);
   }
 }
-
 
 #ifdef HAVE_GETADDRINFO
 /*
@@ -102,12 +92,10 @@ Curl_freeaddrinfo(struct Curl_addrinfo *cahead)
  * There should be no single call to system's getaddrinfo() in the
  * whole library, any such call should be 'routed' through this one.
  */
-
-int
-Curl_getaddrinfo_ex(const char *nodename,
-                    const char *servname,
-                    const struct addrinfo *hints,
-                    struct Curl_addrinfo **result)
+int Curl_getaddrinfo_ex(const char *nodename,
+                        const char *servname,
+                        const struct addrinfo *hints,
+                        struct Curl_addrinfo **result)
 {
   const struct addrinfo *ai;
   struct addrinfo *aihead;
@@ -127,8 +115,8 @@ Curl_getaddrinfo_ex(const char *nodename,
 
   for(ai = aihead; ai != NULL; ai = ai->ai_next) {
     size_t namelen = ai->ai_canonname ? strlen(ai->ai_canonname) + 1 : 0;
-    /* ignore elements with unsupported address family, */
-    /* settle family-specific sockaddr structure size.  */
+    /* ignore elements with unsupported address family,
+       settle family-specific sockaddr structure size. */
     if(ai->ai_family == AF_INET)
       ss_size = sizeof(struct sockaddr_in);
 #ifdef USE_IPV6
@@ -146,14 +134,14 @@ Curl_getaddrinfo_ex(const char *nodename,
     if((size_t)ai->ai_addrlen < ss_size)
       continue;
 
-    ca = malloc(sizeof(struct Curl_addrinfo) + ss_size + namelen);
+    ca = curlx_malloc(sizeof(struct Curl_addrinfo) + ss_size + namelen);
     if(!ca) {
       error = EAI_MEMORY;
       break;
     }
 
-    /* copy each structure member individually, member ordering, */
-    /* size, or padding might be different for each platform.    */
+    /* copy each structure member individually, member ordering,
+       size, or padding might be different for each platform. */
 
     ca->ai_flags     = ai->ai_flags;
     ca->ai_family    = ai->ai_family;
@@ -180,7 +168,6 @@ Curl_getaddrinfo_ex(const char *nodename,
     if(calast)
       calast->ai_next = ca;
     calast = ca;
-
   }
 
   /* destroy the addrinfo list */
@@ -211,7 +198,6 @@ Curl_getaddrinfo_ex(const char *nodename,
   return error;
 }
 #endif /* HAVE_GETADDRINFO */
-
 
 /*
  * Curl_he2ai()
@@ -252,10 +238,8 @@ Curl_getaddrinfo_ex(const char *nodename,
  *
  *     #define h_addr  h_addr_list[0]
  */
-
 #if !(defined(HAVE_GETADDRINFO) && defined(HAVE_GETADDRINFO_THREADSAFE))
-struct Curl_addrinfo *
-Curl_he2ai(const struct hostent *he, int port)
+struct Curl_addrinfo *Curl_he2ai(const struct hostent *he, int port)
 {
   struct Curl_addrinfo *ai;
   struct Curl_addrinfo *prevai = NULL;
@@ -285,7 +269,7 @@ Curl_he2ai(const struct hostent *he, int port)
       ss_size = sizeof(struct sockaddr_in);
 
     /* allocate memory to hold the struct, the address and the name */
-    ai = calloc(1, sizeof(struct Curl_addrinfo) + ss_size + namelen);
+    ai = curlx_calloc(1, sizeof(struct Curl_addrinfo) + ss_size + namelen);
     if(!ai) {
       result = CURLE_OUT_OF_MEMORY;
       break;
@@ -347,16 +331,15 @@ Curl_he2ai(const struct hostent *he, int port)
 #endif
 
 /*
- * Curl_ip2addr()
+ * ip2addr()
  *
  * This function takes an Internet address, in binary form, as input parameter
  * along with its address family and the string version of the address, and it
  * returns a Curl_addrinfo chain filled in correctly with information for the
  * given address/host
  */
-
-struct Curl_addrinfo *
-Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
+static CURLcode ip2addr(struct Curl_addrinfo **addrp, int af,
+                        const void *inaddr, const char *hostname, int port)
 {
   struct Curl_addrinfo *ai;
   size_t addrsize;
@@ -369,6 +352,7 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
   DEBUGASSERT(inaddr && hostname);
 
   namelen = strlen(hostname) + 1;
+  *addrp = NULL;
 
   if(af == AF_INET)
     addrsize = sizeof(struct sockaddr_in);
@@ -377,12 +361,12 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
     addrsize = sizeof(struct sockaddr_in6);
 #endif
   else
-    return NULL;
+    return CURLE_BAD_FUNCTION_ARGUMENT;
 
   /* allocate memory to hold the struct, the address and the name */
-  ai = calloc(1, sizeof(struct Curl_addrinfo) + addrsize + namelen);
+  ai = curlx_calloc(1, sizeof(struct Curl_addrinfo) + addrsize + namelen);
   if(!ai)
-    return NULL;
+    return CURLE_OUT_OF_MEMORY;
   /* put the address after the struct */
   ai->ai_addr = (void *)((char *)ai + sizeof(struct Curl_addrinfo));
   /* then put the name after the address */
@@ -398,11 +382,7 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
     addr = (void *)ai->ai_addr; /* storage area for this info */
 
     memcpy(&addr->sin_addr, inaddr, sizeof(struct in_addr));
-#ifdef __MINGW32__
-    addr->sin_family = (short)af;
-#else
     addr->sin_family = (CURL_SA_FAMILY_T)af;
-#endif
     addr->sin_port = htons((unsigned short)port);
     break;
 
@@ -411,70 +391,86 @@ Curl_ip2addr(int af, const void *inaddr, const char *hostname, int port)
     addr6 = (void *)ai->ai_addr; /* storage area for this info */
 
     memcpy(&addr6->sin6_addr, inaddr, sizeof(struct in6_addr));
-#ifdef __MINGW32__
-    addr6->sin6_family = (short)af;
-#else
     addr6->sin6_family = (CURL_SA_FAMILY_T)af;
-#endif
     addr6->sin6_port = htons((unsigned short)port);
     break;
 #endif
   }
-
-  return ai;
+  *addrp = ai;
+  return CURLE_OK;
 }
 
 /*
  * Given an IPv4 or IPv6 dotted string address, this converts it to a proper
  * allocated Curl_addrinfo struct and returns it.
  */
-struct Curl_addrinfo *Curl_str2addr(char *address, int port)
+CURLcode Curl_str2addr(const char *dotted, uint16_t port,
+                       struct Curl_addrinfo **addrp)
 {
   struct in_addr in;
-  if(curlx_inet_pton(AF_INET, address, &in) > 0)
+  if(curlx_inet_pton(AF_INET, dotted, &in) > 0)
     /* This is a dotted IP address 123.123.123.123-style */
-    return Curl_ip2addr(AF_INET, &in, address, port);
+    return ip2addr(addrp, AF_INET, &in, dotted, port);
+#ifdef USE_IPV6
+  {
+    struct in6_addr in6;
+    if(curlx_inet_pton(AF_INET6, dotted, &in6) > 0)
+      /* This is a dotted IPv6 address ::1-style */
+      return ip2addr(addrp, AF_INET6, &in6, dotted, port);
+  }
+#endif
+  return CURLE_BAD_FUNCTION_ARGUMENT; /* bad input format */
+}
+
+bool Curl_is_ipv4addr(const char *address)
+{
+  struct in_addr in;
+  return (curlx_inet_pton(AF_INET, address, &in) > 0);
+}
+
+bool Curl_is_ipaddr(const char *address)
+{
+  if(Curl_is_ipv4addr(address))
+    return TRUE;
 #ifdef USE_IPV6
   {
     struct in6_addr in6;
     if(curlx_inet_pton(AF_INET6, address, &in6) > 0)
       /* This is a dotted IPv6 address ::1-style */
-      return Curl_ip2addr(AF_INET6, &in6, address, port);
+      return TRUE;
   }
 #endif
-  return NULL; /* bad input format */
+  return FALSE;
 }
 
 #ifdef USE_UNIX_SOCKETS
 /**
  * Given a path to a Unix domain socket, return a newly allocated Curl_addrinfo
  * struct initialized with this path.
- * Set '*longpath' to TRUE if the error is a too long path.
+ * Returns CURLE_TOO_LARGE when path is too long.
  */
-struct Curl_addrinfo *Curl_unix2addr(const char *path, bool *longpath,
-                                     bool abstract)
+CURLcode Curl_unix2addr(const char *path, bool abstract,
+                        struct Curl_addrinfo **paddr)
 {
   struct Curl_addrinfo *ai;
   struct sockaddr_un *sa_un;
   size_t path_len;
 
-  *longpath = FALSE;
-
-  ai = calloc(1, sizeof(struct Curl_addrinfo) + sizeof(struct sockaddr_un));
-  if(!ai)
-    return NULL;
-  ai->ai_addr = (void *)((char *)ai + sizeof(struct Curl_addrinfo));
-
-  sa_un = (void *) ai->ai_addr;
-  sa_un->sun_family = AF_UNIX;
+  *paddr = NULL;
 
   /* sun_path must be able to store the null-terminated path */
   path_len = strlen(path) + 1;
-  if(path_len > sizeof(sa_un->sun_path)) {
-    free(ai);
-    *longpath = TRUE;
-    return NULL;
-  }
+  if(path_len > sizeof(sa_un->sun_path))
+    return CURLE_TOO_LARGE;
+
+  ai = curlx_calloc(1,
+                    sizeof(struct Curl_addrinfo) + sizeof(struct sockaddr_un));
+  if(!ai)
+    return CURLE_OUT_OF_MEMORY;
+
+  ai->ai_addr = (void *)((char *)ai + sizeof(struct Curl_addrinfo));
+  sa_un = (void *)ai->ai_addr;
+  sa_un->sun_family = AF_UNIX;
 
   ai->ai_family = AF_UNIX;
   ai->ai_socktype = SOCK_STREAM; /* assume reliable transport for HTTP */
@@ -487,11 +483,12 @@ struct Curl_addrinfo *Curl_unix2addr(const char *path, bool *longpath,
   else
     memcpy(sa_un->sun_path, path, path_len); /* copy NUL byte */
 
-  return ai;
+  *paddr = ai;
+  return CURLE_OK;
 }
 #endif
 
-#if defined(CURLDEBUG) && defined(HAVE_GETADDRINFO) &&  \
+#if defined(CURL_MEMDEBUG) && defined(HAVE_GETADDRINFO) && \
   defined(HAVE_FREEADDRINFO)
 /*
  * curl_dbg_freeaddrinfo()
@@ -500,10 +497,8 @@ struct Curl_addrinfo *Curl_unix2addr(const char *path, bool *longpath,
  * family otherwise present in memdebug.c. I put these ones here since they
  * require a bunch of structs I did not want to include in memdebug.c
  */
-
-void
-curl_dbg_freeaddrinfo(struct addrinfo *freethis,
-                      int line, const char *source)
+void curl_dbg_freeaddrinfo(struct addrinfo *freethis,
+                           int line, const char *source)
 {
   curl_dbg_log("ADDR %s:%d freeaddrinfo(%p)\n",
                source, line, (void *)freethis);
@@ -515,16 +510,17 @@ curl_dbg_freeaddrinfo(struct addrinfo *freethis,
     if(env)
       r_freeaddrinfo(freethis);
     else
+      /* !checksrc! disable BANNEDFUNC 1 */
       freeaddrinfo(freethis);
   }
 #else
+  /* !checksrc! disable BANNEDFUNC 1 */
   freeaddrinfo(freethis);
 #endif
 }
-#endif /* defined(CURLDEBUG) && defined(HAVE_FREEADDRINFO) */
+#endif /* CURL_MEMDEBUG && HAVE_FREEADDRINFO */
 
-
-#if defined(CURLDEBUG) && defined(HAVE_GETADDRINFO)
+#if defined(CURL_MEMDEBUG) && defined(HAVE_GETADDRINFO)
 /*
  * curl_dbg_getaddrinfo()
  *
@@ -532,13 +528,11 @@ curl_dbg_freeaddrinfo(struct addrinfo *freethis,
  * family otherwise present in memdebug.c. I put these ones here since they
  * require a bunch of structs I did not want to include in memdebug.c
  */
-
-int
-curl_dbg_getaddrinfo(const char *hostname,
-                     const char *service,
-                     const struct addrinfo *hints,
-                     struct addrinfo **result,
-                     int line, const char *source)
+int curl_dbg_getaddrinfo(const char *hostname,
+                         const char *service,
+                         const struct addrinfo *hints,
+                         struct addrinfo **result,
+                         int line, const char *source)
 {
 #ifdef USE_LWIPSOCK
   int res = lwip_getaddrinfo(hostname, service, hints, result);
@@ -548,20 +542,21 @@ curl_dbg_getaddrinfo(const char *hostname,
   if(env)
     res = r_getaddrinfo(hostname, service, hints, result);
   else
+    /* !checksrc! disable BANNEDFUNC 1 */
     res = getaddrinfo(hostname, service, hints, result);
 #else
+  /* !checksrc! disable BANNEDFUNC 1 */
   int res = getaddrinfo(hostname, service, hints, result);
 #endif
-  if(0 == res)
+  if(res == 0)
     /* success */
-    curl_dbg_log("ADDR %s:%d getaddrinfo() = %p\n",
-                 source, line, (void *)*result);
+    curl_dbg_log("ADDR %s:%d getaddrinfo() = %p\n", source, line,
+                 (void *)*result);
   else
-    curl_dbg_log("ADDR %s:%d getaddrinfo() failed\n",
-                 source, line);
+    curl_dbg_log("ADDR %s:%d getaddrinfo() failed\n", source, line);
   return res;
 }
-#endif /* defined(CURLDEBUG) && defined(HAVE_GETADDRINFO) */
+#endif /* CURL_MEMDEBUG && HAVE_GETADDRINFO */
 
 #if defined(HAVE_GETADDRINFO) && defined(USE_RESOLVE_ON_IPS)
 /*

@@ -472,7 +472,25 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
                     // to prevent DoWastedCheck from firing with stale local damage data
                     if (fHealth == 0.0f && pPed->IsLocalPlayer())
                     {
+                        CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pPed);
+                        bool           bWasAlreadyDead = pPlayer->IsDeadOnNetwork();
+
                         g_pClientGame->ClearDamageData();
+                        pPlayer->SetDeadOnNetwork(true);
+
+                        // Fire onClientPlayerWasted to compensate for the server intentionally
+                        // skipping the CPlayerWastedPacket broadcast to the dying player.
+                        if (!bWasAlreadyDead)
+                        {
+                            CLuaArguments Arguments;
+                            Arguments.PushBoolean(false);  // killer = none
+                            Arguments.PushBoolean(false);  // weapon = unknown
+                            Arguments.PushBoolean(false);  // bodypart = unknown
+                            Arguments.PushBoolean(false);  // isStealth = false
+                            Arguments.PushNumber(0);       // animGroup
+                            Arguments.PushNumber(15);      // animID
+                            pPlayer->CallEvent("onClientPlayerWasted", Arguments, true);
+                        }
                     }
                 }
                 break;

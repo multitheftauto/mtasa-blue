@@ -549,21 +549,20 @@ void CServerImpl::HandlePulseSleep()
         return;
     }
 
-    CTickCount sleepLimit = CTickCount::Now() + CTickCount((long long)iSleepIdleMs);
-
-    // Initial sleep period
-    int iInitialMs = std::min(iSleepIdleMs, iSleepBusyMs);
-    Sleep(Clamp(1, iInitialMs, 50));
-
-    // Remaining idle sleep period
-    int iFinalMs = Clamp(1, iSleepIdleMs - iInitialMs, 50);
-    for (int i = 0; i < iFinalMs; i++)
+    // Sleep up to idle_sleep_time in 1ms ticks, exiting the moment the sync
+    // thread queues a packet. The previous code did a blind Sleep for
+    // busy_sleep_time at the top of every pulse before checking the inbound
+    // queue, which capped logic FPS near 1000/busy_sleep_time on busy servers
+    // regardless of how full the queue already was (#4853). busy_sleep_time
+    // is no longer consulted on this path; server_logic_fps_limit is the
+    // existing knob for a hard cap.
+    const int        iSleepMs = Clamp(0, iSleepIdleMs, 50);
+    const CTickCount deadline = CTickCount::Now() + CTickCount((long long)iSleepMs);
+    while (CTickCount::Now() < deadline)
     {
         if (m_pModManager->PendingWorkToDo())
-            break;
+            return;
         Sleep(1);
-        if (CTickCount::Now() >= sleepLimit)
-            break;
     }
 }
 

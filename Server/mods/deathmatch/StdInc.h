@@ -59,7 +59,7 @@
 #include <CMatrix.h>
 #include "CStringName.h"
 #include <bochs_internal/bochs_crc32.h>
-#include <pcrecpp.h>
+#include <pcrecpp_compat.h>
 #include <pthread.h>
 #include "version.h"
 
