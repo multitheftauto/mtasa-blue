@@ -54,6 +54,7 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     m_usModel = Copy.m_usModel;
     m_ucAlpha = Copy.m_ucAlpha;
     m_vecScale = CVector(Copy.m_vecScale.fX, Copy.m_vecScale.fY, Copy.m_vecScale.fZ);
+    m_bScaleCollision = Copy.m_bScaleCollision;
     m_fHealth = Copy.m_fHealth;
     m_bSyncable = Copy.m_bSyncable;
     m_pSyncer = Copy.m_pSyncer;

@@ -281,6 +281,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.Write(vecScale.fY);
                         BitStream.Write(vecScale.fZ);
                     }
+                    BitStream.WriteBit(pObject->IsScaleCollisionEnabled());
 
                     // Frozen
                     bool bFrozen = pObject->IsFrozen();

@@ -56,6 +56,9 @@ public:
     const CVector& GetScale() { return m_vecScale; }
     void           SetScale(const CVector& vecScale) { m_vecScale = vecScale; }
 
+    bool IsScaleCollisionEnabled() { return m_bScaleCollision; }
+    void SetScaleCollisionEnabled(bool bScaleCollision) { m_bScaleCollision = bScaleCollision; }
+
     bool GetCollisionEnabled() { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) { m_bCollisionsEnabled = bCollisionEnabled; }
 
@@ -93,6 +96,7 @@ private:
     unsigned char   m_ucAlpha;
     unsigned short  m_usModel;
     CVector         m_vecScale;
+    bool            m_bScaleCollision = false;
     bool            m_bIsFrozen;
     float           m_fHealth;
     bool            m_bBreakable;

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <optional>
 #include <lua/CLuaFunctionParser.h>
 
 void CLuaObjectDefs::LoadFunctions()
@@ -424,9 +425,10 @@ int CLuaObjectDefs::StopObject(lua_State* luaVM)
 
 int CLuaObjectDefs::SetObjectScale(lua_State* luaVM)
 {
-    //  bool setObjectScale ( object theObject, float scale )
-    CClientEntity* pEntity;
-    CVector        vecScale;
+    //  bool setObjectScale ( object theObject, float scale [, float scaleY = scale, float scaleZ = scale, bool scaleCollision ] )
+    CClientEntity*      pEntity;
+    CVector             vecScale;
+    std::optional<bool> scaleCollision;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -447,9 +449,18 @@ int CLuaObjectDefs::SetObjectScale(lua_State* luaVM)
         argStream.ReadNumber(vecScale.fY, vecScale.fX);
         argStream.ReadNumber(vecScale.fZ, vecScale.fX);
     }
+    // Leaving scaleCollision unspecified preserves whatever collision-scaling state the object
+    // already has, instead of silently turning it off every time the scale is just nudged.
+    if (argStream.NextIsBool())
+    {
+        bool bValue;
+        argStream.ReadBool(bValue);
+        scaleCollision = bValue;
+    }
+
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetObjectScale(*pEntity, vecScale))
+        if (CStaticFunctionDefinitions::SetObjectScale(*pEntity, vecScale, scaleCollision))
         {
             lua_pushboolean(luaVM, true);
             return 1;

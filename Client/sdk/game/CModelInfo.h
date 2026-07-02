@@ -22,6 +22,7 @@ constexpr std::uint16_t MODEL_PROPERTIES_GROUP_STATIC = 0xFFFF;
 class CBaseModelInfoSAInterface;
 class CColModel;
 class CPedModelInfo;
+struct CColModelSAInterface;
 struct RpClump;
 struct RwObject;
 
@@ -226,6 +227,9 @@ public:
     virtual void RestoreOriginalModel() = 0;
     virtual void SetColModel(CColModel* pColModel) = 0;
     virtual void RestoreColModel() = 0;
+
+    // Raw collision interface currently assigned to this model (custom or original). May be nullptr.
+    virtual CColModelSAInterface* GetColModelInterface() = 0;
 
     // Increases the collision slot reference counter for this model
     virtual void AddColRef() = 0;

@@ -12,6 +12,7 @@ class CClientObject;
 
 #pragma once
 
+#include <optional>
 #include <game/CObject.h>
 #include "CClientStreamElement.h"
 #include "CClientModel.h"
@@ -83,7 +84,10 @@ public:
     unsigned char GetAlpha() { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha);
     void          GetScale(CVector& vecScale) const;
-    void          SetScale(const CVector& vecScale);
+    // scaleCollision left unspecified (nullopt) preserves whatever collision-scaling state this
+    // object already has, instead of silently turning it off.
+    void SetScale(const CVector& vecScale, std::optional<bool> scaleCollision = std::nullopt);
+    bool IsCollisionScaled() const { return m_iScaleCollisionModelID != -1; }
 
     bool IsCollisionEnabled() { return m_bUsesCollision; };
     void SetCollisionEnabled(bool bCollisionEnabled);
@@ -157,6 +161,12 @@ protected:
     float         m_fBuoyancyConstant;
     CVector       m_vecCenterOfMass;
     bool          m_bVisibleInAllDimensions = false;
+
+    // Tracks the per-scale collision clone acquired from CClientModelManager when SetScale is
+    // called with bScaleCollision=true. -1 means no clone is currently in use (normal shared
+    // collision). m_usScaleCollisionBaseModel remembers the real model so it can be restored.
+    int            m_iScaleCollisionModelID = -1;
+    unsigned short m_usScaleCollisionBaseModel = 0;
 
     CVector m_vecMoveSpeed;
     CVector m_vecTurnSpeed;

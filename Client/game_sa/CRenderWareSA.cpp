@@ -12,6 +12,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <algorithm>
+#include <cmath>
+#include <cstring>
 #include <CMatrix.h>
 #include <core/CCoreInterface.h>
 #define RWFUNC_IMPLEMENT
@@ -484,6 +487,221 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
     }
 
     return NULL;
+}
+
+namespace
+{
+    // Mirrors the on-disk COL3 version-specific header (gtamods.com/wiki/Collision_File).
+    // Field order/sizes must match exactly: natural struct alignment produces the correct
+    // 88 byte layout (verified by the static_assert below), so no #pragma pack is used here.
+    struct SColV3HeaderSA
+    {
+        CBoundingBoxSA m_bounds;
+        CSphereSA      m_boundSphere;
+        std::uint16_t  m_numSpheres;
+        std::uint16_t  m_numBoxes;
+        std::uint16_t  m_numFaces;
+        std::uint8_t   m_numLines;
+        std::uint32_t  m_flags;
+        std::uint32_t  m_offSpheres;
+        std::uint32_t  m_offBoxes;
+        std::uint32_t  m_offLines;
+        std::uint32_t  m_offVerts;
+        std::uint32_t  m_offFaces;
+        std::uint32_t  m_offPlanes;
+        std::uint32_t  m_numShadowFaces;
+        std::uint32_t  m_offShadowVerts;
+        std::uint32_t  m_offShadowFaces;
+    };
+    static_assert(sizeof(SColV3HeaderSA) == 88, "Invalid size for SColV3HeaderSA");
+
+    constexpr std::uint8_t COLFLAG_USESDISKS = 1;
+    constexpr std::uint8_t COLFLAG_NOTEMPTY = 2;
+
+    // LoadCollisionModelVer3's pointer-fixup math expects offsets relative to a buffer that
+    // includes a 32 byte file header + 4 byte fourcc that we never actually build (we call the
+    // parser directly with just the V3 header + arrays). This constant compensates for that
+    // missing preamble so our payload-relative offsets resolve to the right addresses.
+    constexpr std::uint32_t COL_OFFSET_FIXUP = 116;
+
+    constexpr float COL_VERTEX_SCALE = 128.0f;
+
+    CCompressedVectorSA ScaleCompressedVertex(const CCompressedVectorSA& vertex, const CVector& vecScale)
+    {
+        auto scaleAxis = [](short comp, float scale) -> short
+        {
+            float fValue = (static_cast<float>(comp) / COL_VERTEX_SCALE) * scale;
+            float fScaled = std::round(fValue * COL_VERTEX_SCALE);
+            fScaled = std::clamp(fScaled, -32768.0f, 32767.0f);
+            return static_cast<short>(fScaled);
+        };
+        return {scaleAxis(vertex.x, vecScale.fX), scaleAxis(vertex.y, vecScale.fY), scaleAxis(vertex.z, vecScale.fZ)};
+    }
+
+    CVector ScaleVector(const CVector& vec, const CVector& vecScale)
+    {
+        return CVector(vec.fX * vecScale.fX, vec.fY * vecScale.fY, vec.fZ * vecScale.fZ);
+    }
+
+    CBoxSA ScaleBox(const CBoxSA& box, const CVector& vecScale)
+    {
+        CVector vecA = ScaleVector(box.m_vecMin, vecScale);
+        CVector vecB = ScaleVector(box.m_vecMax, vecScale);
+
+        // A negative scale component can flip which corner is the min/max on that axis
+        CVector vecMin(std::min(vecA.fX, vecB.fX), std::min(vecA.fY, vecB.fY), std::min(vecA.fZ, vecB.fZ));
+        CVector vecMax(std::max(vecA.fX, vecB.fX), std::max(vecA.fY, vecB.fY), std::max(vecA.fZ, vecB.fZ));
+
+        CBoxSA result;
+        result.m_vecMin = vecMin;
+        result.m_vecMax = vecMax;
+        return result;
+    }
+
+    // CColDataSA has no explicit vertex count - like the engine's own shadow-mesh loader
+    // (see GetNoOfShdwVerts), the number of vertices is derived from the highest index any
+    // triangle references.
+    std::uint32_t CountReferencedVertices(const CColDataSA* pData)
+    {
+        if (!pData->m_triangles || !pData->m_vertices)
+            return 0;
+
+        std::uint32_t maxIndex = 0;
+        for (std::uint32_t i = 0; i < pData->m_numTriangles; i++)
+        {
+            const CColTriangleSA& triangle = pData->m_triangles[i];
+            maxIndex = std::max({maxIndex, static_cast<std::uint32_t>(triangle.m_indices[0]), static_cast<std::uint32_t>(triangle.m_indices[1]),
+                                 static_cast<std::uint32_t>(triangle.m_indices[2])});
+        }
+        return pData->m_numTriangles > 0 ? maxIndex + 1 : 0;
+    }
+}  // namespace
+
+// Builds a new CColModel with the same geometry as pOriginalInterface, scaled by vecScale.
+// Used to give scaled objects (setObjectScale with scaleCollision=true) their own
+// per-scale collision instead of sharing (and corrupting) the original model's collision.
+CColModel* CRenderWareSA::CreateScaledColModel(CColModelSAInterface* pOriginalInterface, const CVector& vecScale)
+{
+    if (!pOriginalInterface)
+        return nullptr;
+
+    CColDataSA* pOriginalData = pOriginalInterface->m_data;
+    if (!pOriginalData)
+    {
+        // The collision interface exists, but its actual data arrays (spheres/boxes/faces) aren't
+        // resident yet: the collision slot hasn't been streamed in. This is exactly what happens
+        // when an object is scaled the same frame it's created - it (and therefore its collision)
+        // hasn't streamed in. Force-load the collision slot now, the same way the engine streams
+        // collision, then re-read. Without this we'd fail and silently leave the object unscaled.
+        constexpr unsigned int RESOURCE_ID_COL = 25000;
+        const unsigned int     colStreamId = RESOURCE_ID_COL + pOriginalInterface->m_sphere.m_collisionSlot;
+        pGame->GetStreaming()->RequestModel(colStreamId, 0x16);
+        pGame->GetStreaming()->LoadAllRequestedModels(true, "CRenderWareSA::CreateScaledColModel");
+
+        pOriginalData = pOriginalInterface->m_data;
+        if (!pOriginalData)
+        {
+            // Genuinely no collision volumes (e.g. a purely visual/LOD model) - nothing to scale
+            return nullptr;
+        }
+    }
+
+    const bool bUsesDisks = pOriginalData->m_usesDisks;
+
+    // Compute each array's byte size and offset (relative to right after the 88 byte header)
+    const std::uint32_t sphereBytes = pOriginalData->m_numSpheres * sizeof(CColSphereSA);
+    const std::uint32_t boxBytes = pOriginalData->m_numBoxes * sizeof(CColBoxSA);
+    const std::uint32_t lineBytes = pOriginalData->m_numSuspensionLines * (bUsesDisks ? sizeof(CColDiskSA) : sizeof(CColLineSA));
+    const std::uint32_t numVertices = CountReferencedVertices(pOriginalData);
+    const std::uint32_t vertBytes = numVertices * sizeof(CCompressedVectorSA);
+    const std::uint32_t faceBytes = pOriginalData->m_numTriangles * sizeof(CColTriangleSA);
+
+    const std::uint32_t sphereOffset = 0;
+    const std::uint32_t boxOffset = sphereOffset + sphereBytes;
+    const std::uint32_t lineOffset = boxOffset + boxBytes;
+    const std::uint32_t vertOffset = lineOffset + lineBytes;
+    const std::uint32_t faceOffset = vertOffset + vertBytes;
+    const std::uint32_t totalArrayBytes = faceOffset + faceBytes;
+
+    std::vector<unsigned char> buffer(sizeof(SColV3HeaderSA) + totalArrayBytes, 0);
+    SColV3HeaderSA*            pHeader = reinterpret_cast<SColV3HeaderSA*>(buffer.data());
+
+    static_cast<CBoxSA&>(pHeader->m_bounds) = ScaleBox(pOriginalInterface->m_bounds, vecScale);
+
+    // The bounding sphere is only used for fast broad-phase rejection, so under non-uniform
+    // scale we conservatively grow it using the largest scale axis rather than trying to
+    // represent a squashed sphere exactly.
+    const float fMaxScale = std::max({std::fabs(vecScale.fX), std::fabs(vecScale.fY), std::fabs(vecScale.fZ)});
+    pHeader->m_boundSphere.m_center = ScaleVector(pOriginalInterface->m_sphere.m_center, vecScale);
+    pHeader->m_boundSphere.m_radius = pOriginalInterface->m_sphere.m_radius * fMaxScale;
+
+    pHeader->m_numSpheres = pOriginalData->m_numSpheres;
+    pHeader->m_numBoxes = pOriginalData->m_numBoxes;
+    pHeader->m_numFaces = pOriginalData->m_numTriangles;
+    pHeader->m_numLines = pOriginalData->m_numSuspensionLines;
+    pHeader->m_flags = COLFLAG_NOTEMPTY | (bUsesDisks ? COLFLAG_USESDISKS : 0);
+    pHeader->m_offSpheres = sphereBytes ? (sphereOffset + COL_OFFSET_FIXUP) : 0;
+    pHeader->m_offBoxes = boxBytes ? (boxOffset + COL_OFFSET_FIXUP) : 0;
+    pHeader->m_offLines = lineBytes ? (lineOffset + COL_OFFSET_FIXUP) : 0;
+    pHeader->m_offVerts = vertBytes ? (vertOffset + COL_OFFSET_FIXUP) : 0;
+    pHeader->m_offFaces = faceBytes ? (faceOffset + COL_OFFSET_FIXUP) : 0;
+    pHeader->m_offPlanes = 0;
+    pHeader->m_numShadowFaces = 0;
+    pHeader->m_offShadowVerts = 0;
+    pHeader->m_offShadowFaces = 0;
+
+    unsigned char* pArrays = buffer.data() + sizeof(SColV3HeaderSA);
+
+    for (std::uint32_t i = 0; i < pOriginalData->m_numSpheres; i++)
+    {
+        CColSphereSA sphere = pOriginalData->m_spheres[i];
+        sphere.m_center = ScaleVector(sphere.m_center, vecScale);
+        sphere.m_radius *= fMaxScale;
+        std::memcpy(pArrays + sphereOffset + i * sizeof(CColSphereSA), &sphere, sizeof(CColSphereSA));
+    }
+
+    for (std::uint32_t i = 0; i < pOriginalData->m_numBoxes; i++)
+    {
+        CColBoxSA box = pOriginalData->m_boxes[i];
+        static_cast<CBoxSA&>(box) = ScaleBox(box, vecScale);
+        std::memcpy(pArrays + boxOffset + i * sizeof(CColBoxSA), &box, sizeof(CColBoxSA));
+    }
+
+    for (std::uint32_t i = 0; i < pOriginalData->m_numSuspensionLines; i++)
+    {
+        if (bUsesDisks)
+        {
+            CColDiskSA disk = pOriginalData->m_disks[i];
+            disk.m_startPosition = ScaleVector(disk.m_startPosition, vecScale);
+            disk.m_stopPosition = ScaleVector(disk.m_stopPosition, vecScale);
+            disk.m_startRadius *= fMaxScale;
+            disk.m_stopRadius *= fMaxScale;
+            std::memcpy(pArrays + lineOffset + i * sizeof(CColDiskSA), &disk, sizeof(CColDiskSA));
+        }
+        else
+        {
+            CColLineSA line = pOriginalData->m_suspensionLines[i];
+            line.m_vecStart = ScaleVector(line.m_vecStart, vecScale);
+            line.m_vecStop = ScaleVector(line.m_vecStop, vecScale);
+            line.m_startSize *= fMaxScale;
+            line.m_stopSize *= fMaxScale;
+            std::memcpy(pArrays + lineOffset + i * sizeof(CColLineSA), &line, sizeof(CColLineSA));
+        }
+    }
+
+    for (std::uint32_t i = 0; i < numVertices; i++)
+    {
+        CCompressedVectorSA scaled = ScaleCompressedVertex(pOriginalData->m_vertices[i], vecScale);
+        std::memcpy(pArrays + vertOffset + i * sizeof(CCompressedVectorSA), &scaled, sizeof(CCompressedVectorSA));
+    }
+
+    for (std::uint32_t i = 0; i < pOriginalData->m_numTriangles; i++)
+        std::memcpy(pArrays + faceOffset + i * sizeof(CColTriangleSA), &pOriginalData->m_triangles[i], sizeof(CColTriangleSA));
+
+    CColModelSA* pScaledColModel = new CColModelSA();
+    LoadCollisionModelVer3(buffer.data(), static_cast<unsigned int>(buffer.size()), pScaledColModel->GetInterface(), NULL);
+
+    return pScaledColModel;
 }
 
 // Loads all atomics from a clump into a container struct and returns the number of atomics it loaded

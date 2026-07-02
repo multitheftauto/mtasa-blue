@@ -8385,20 +8385,27 @@ bool CStaticFunctionDefinitions::SetObjectRotation(CElement* pElement, const CVe
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetObjectScale(CElement* pElement, const CVector& vecScale)
+bool CStaticFunctionDefinitions::SetObjectScale(CElement* pElement, const CVector& vecScale, std::optional<bool> scaleCollision)
 {
-    RUN_CHILDREN(SetObjectScale(*iter, vecScale))
+    RUN_CHILDREN(SetObjectScale(*iter, vecScale, scaleCollision))
 
     if (IS_OBJECT(pElement))
     {
         CObject* pObject = static_cast<CObject*>(pElement);
 
         pObject->SetScale(vecScale);
+        // Leaving scaleCollision unspecified preserves whatever collision-scaling state the object
+        // already has, instead of silently turning it off every time the scale is just nudged.
+        if (scaleCollision.has_value())
+            pObject->SetScaleCollisionEnabled(*scaleCollision);
+
+        const bool bScaleCollision = pObject->IsScaleCollisionEnabled();
 
         CBitStream BitStream;
         BitStream.pBitStream->Write(vecScale.fX);
         BitStream.pBitStream->Write(vecScale.fY);  // Ignored by clients with bitstream version < 0x41
         BitStream.pBitStream->Write(vecScale.fZ);  // Ignored by clients with bitstream version < 0x41
+        BitStream.pBitStream->WriteBit(bScaleCollision);
         m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pObject, SET_OBJECT_SCALE, *BitStream.pBitStream));
         return true;
     }

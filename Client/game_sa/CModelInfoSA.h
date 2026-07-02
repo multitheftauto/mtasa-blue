@@ -453,11 +453,12 @@ public:
     void SetVoice(const char* szVoiceType, const char* szVoice);
 
     // Custom collision related functions
-    bool SetCustomModel(RpClump* pClump) override;
-    void RestoreOriginalModel() override;
-    void SetColModel(CColModel* pColModel) override;
-    void RestoreColModel() override;
-    void MakeCustomModel() override;
+    bool                  SetCustomModel(RpClump* pClump) override;
+    void                  RestoreOriginalModel() override;
+    void                  SetColModel(CColModel* pColModel) override;
+    void                  RestoreColModel() override;
+    void                  MakeCustomModel() override;
+    CColModelSAInterface* GetColModelInterface() override;
 
     // Increases the collision slot reference counter for the original collision model
     void AddColRef() override;

@@ -9,6 +9,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CColModel.h>
+#include <game/CRenderWare.h>
+#include <cmath>
+
 CClientModelManager::CClientModelManager() : m_Models(std::make_unique<std::shared_ptr<CClientModel>[]>(g_pGame->GetBaseIDforCOL()))
 {
     const unsigned int uiMaxModelID = g_pGame->GetBaseIDforCOL();
@@ -31,6 +35,19 @@ void CClientModelManager::RemoveAll(void)
         m_Models[i] = nullptr;
     }
     m_modelCount = 0;
+
+    // The loop above already drops every clone's CClientModel slot, but our own scaled-collision
+    // cache isn't aware of that - without clearing it too, a later AcquireScaledCollisionModel()
+    // call (e.g. reapplying scale on reconnect) would think it can reuse a clone that no longer
+    // really exists, handing out a model ID with the visual scale applied but no scaled collision
+    // actually attached to it.
+    for (auto& [key, entry] : m_ScaledColModels)
+    {
+        if (entry.pScaledColModel)
+            entry.pScaledColModel->Destroy();
+    }
+    m_ScaledColModels.clear();
+    m_ScaledColModelKeyByID.clear();
 }
 
 void CClientModelManager::Add(const std::shared_ptr<CClientModel>& pModel)
@@ -135,4 +152,106 @@ void CClientModelManager::DeallocateModelsAllocatedByResource(CResource* pResour
         if (m_Models[i] != nullptr && m_Models[i]->GetParentResource() == pResource)
             Remove(m_Models[i]);
     }
+}
+
+namespace
+{
+    int QuantizeScaleComponent(float fValue)
+    {
+        return static_cast<int>(std::lround(fValue * 1000.0f));
+    }
+}  // namespace
+
+int CClientModelManager::AcquireScaledCollisionModel(unsigned short usBaseModelID, const CVector& vecScale)
+{
+    const SScaledColModelKey key{usBaseModelID, QuantizeScaleComponent(vecScale.fX), QuantizeScaleComponent(vecScale.fY), QuantizeScaleComponent(vecScale.fZ)};
+
+    auto it = m_ScaledColModels.find(key);
+    if (it != m_ScaledColModels.end())
+    {
+        it->second.uiRefCount++;
+        return it->second.pClonedModel->GetModelID();
+    }
+
+    CModelInfo* pBaseModelInfo = g_pGame->GetModelInfo(usBaseModelID, true);
+    if (!pBaseModelInfo || !pBaseModelInfo->IsValid())
+        return -1;
+
+    // GetColModelInterface() only returns whatever's already resident - it doesn't stream
+    // anything in. If this is called right after creating an object of this model (before the
+    // model's own streaming request has finished), the collision data may not be loaded yet and
+    // we'd silently fail here. Force a blocking load so it's guaranteed to be ready, then drop
+    // our temporary reference - whatever already (or will) reference this model keeps it loaded.
+    pBaseModelInfo->ModelAddRef(BLOCKING, "AcquireScaledCollisionModel");
+    CColModelSAInterface* pOriginalColModelInterface = pBaseModelInfo->GetColModelInterface();
+    pBaseModelInfo->RemoveRef();
+    if (!pOriginalColModelInterface)
+        return -1;
+
+    CColModel* pScaledColModel = g_pGame->GetRenderWare()->CreateScaledColModel(pOriginalColModelInterface, vecScale);
+    if (!pScaledColModel)
+        return -1;
+
+    const int iCloneID = GetFirstFreeModelID();
+    if (iCloneID == INVALID_MODEL_ID)
+    {
+        pScaledColModel->Destroy();
+        return -1;
+    }
+
+    auto pClonedModel = std::make_shared<CClientModel>(g_pClientGame->GetManager(), iCloneID, eClientModelType::OBJECT);
+    if (!pClonedModel->Allocate(static_cast<ushort>(usBaseModelID)))
+    {
+        pScaledColModel->Destroy();
+        return -1;
+    }
+
+    Add(pClonedModel);
+
+    CModelInfo* pCloneModelInfo = g_pGame->GetModelInfo(iCloneID, true);
+    pCloneModelInfo->SetColModel(pScaledColModel);
+
+    SScaledColModelEntry entry;
+    entry.pClonedModel = pClonedModel;
+    entry.pScaledColModel = pScaledColModel;
+    entry.uiRefCount = 1;
+
+    m_ScaledColModels[key] = entry;
+    m_ScaledColModelKeyByID[iCloneID] = key;
+
+    return iCloneID;
+}
+
+void CClientModelManager::ReleaseScaledCollisionModel(int iClonedModelID)
+{
+    auto keyIt = m_ScaledColModelKeyByID.find(iClonedModelID);
+    if (keyIt == m_ScaledColModelKeyByID.end())
+        return;
+
+    auto entryIt = m_ScaledColModels.find(keyIt->second);
+    if (entryIt == m_ScaledColModels.end())
+    {
+        m_ScaledColModelKeyByID.erase(keyIt);
+        return;
+    }
+
+    SScaledColModelEntry& entry = entryIt->second;
+    if (--entry.uiRefCount > 0)
+        return;
+
+    // Last user gone - detach our collision from the model info first (same order
+    // engineReplaceCOL/CClientColModel use), THEN free it, THEN free the model slot.
+    // Detaching first matters: CModelInfoSA::Remove() refuses to actually unload the
+    // model while it still thinks a custom col model is assigned.
+    CModelInfo* pCloneModelInfo = g_pGame->GetModelInfo(iClonedModelID, true);
+    if (pCloneModelInfo)
+        pCloneModelInfo->RestoreColModel();
+
+    if (entry.pScaledColModel)
+        entry.pScaledColModel->Destroy();
+
+    Remove(entry.pClonedModel);
+
+    m_ScaledColModels.erase(entryIt);
+    m_ScaledColModelKeyByID.erase(keyIt);
 }
