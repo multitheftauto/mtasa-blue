@@ -14,6 +14,12 @@
 
 #include <cstring>
 
+#ifndef WIN32
+    // For dlopen/dlsym/dlclose/RTLD_NOW. Previously pulled in transitively via
+    // the EHS headers; include it directly now that EHS has been removed.
+    #include <dlfcn.h>
+#endif
+
 #ifdef WIN32
 template <typename T>
 static T GetProcAddressAs(HMODULE module, const char* procName)

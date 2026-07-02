@@ -233,13 +233,18 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 
         if (g_isChildProcess)
         {
-            DWORD bytesRead{};
+            // Read the ready-event handle value as uint64_t to correctly receive it from both
+            // 32-bit and 64-bit parent processes (HANDLE is 4 bytes on x86, 8 bytes on x64).
+            DWORD    bytesRead{};
+            uint64_t handleValue = 0;
 
-            if (!ReadFile(m_hConsoleInput, &g_readyEvent, sizeof(HANDLE), &bytesRead, nullptr) || bytesRead != sizeof(HANDLE))
+            if (!ReadFile(m_hConsoleInput, &handleValue, sizeof(handleValue), &bytesRead, nullptr) || bytesRead != sizeof(handleValue))
             {
                 Print("ERROR: Failed to read ready-event handle from input (%08x)\n", GetLastError());
                 return ERROR_OTHER;
             }
+
+            g_readyEvent = reinterpret_cast<HANDLE>(handleValue);
         }
 #else
         // support user locales

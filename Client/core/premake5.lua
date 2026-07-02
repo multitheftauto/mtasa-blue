@@ -5,6 +5,11 @@ project "Client Core"
 	targetdir(buildpath("mta"))
 	clangtidy "On"
 
+	-- Disable MSVC incremental linking for Debug.
+	filter "configurations:Debug"
+		flags { "NoIncrementalLink" }
+	filter {}
+
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
 		buildoptions { "-Zm130" }

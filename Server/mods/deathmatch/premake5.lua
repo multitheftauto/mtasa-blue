@@ -10,6 +10,9 @@ project "Deathmatch"
 
 	filter "system:windows"
 		includedirs { "../../../vendor/sparsehash/src/windows" }
+		-- cpp-httplib (included via CHTTPD.cpp) requires Windows 10+ APIs and enforces _WIN32_WINNT >= 0x0A00
+		removedefines { "_WIN32_WINNT=0x601" }
+		defines { "_WIN32_WINNT=0x0A00" }
 
 	filter {}
 		includedirs {
@@ -17,6 +20,7 @@ project "Deathmatch"
 			"../../sdk",
 			"../../../vendor/bochs",
 			"../../../vendor/pme",
+			"../../../vendor/cpp-httplib",
 			"../../../vendor/zip",
 			"../../../vendor/glob/include",
 			"../../../vendor/zlib",
@@ -28,6 +32,7 @@ project "Deathmatch"
 			"../../../Shared/animation",
 			"../../../Shared",
 			"../../../Shared/publicsdk/include",
+			"../../../Shared",
 			"../../../vendor/sparsehash/src/",
 			"logic",
 			"utils",
@@ -36,7 +41,7 @@ project "Deathmatch"
 
 	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre2", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt",
+		"Lua_Server", "sqlite", "cryptopp", "pme", "pcre2", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt",
 	}
 
 	vpaths {
@@ -78,3 +83,7 @@ project "Deathmatch"
 
 	filter "platforms:arm64"
 		targetdir(buildpath("server/arm64"))
+
+	-- 32-bit Windows server is no longer supported
+	filter { "system:windows", "platforms:x86" }
+		flags { "ExcludeFromBuild" }
