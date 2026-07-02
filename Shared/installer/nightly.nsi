@@ -877,13 +877,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         SetOutPath "$INSTDIR\server"
         SetOverwrite on
         File "${SERVER_FILES_ROOT}\MTA Server64.exe"
-        File "${SERVER_FILES_ROOT}\core.dll"
-        File "${FILES_ROOT}\mta\xmll.dll"
-        File "${SERVER_FILES_ROOT}\net.dll"
-        File "${FILES_ROOT}\mta\pthread.dll"
-        !ifdef MTA_MAETRO
-            File "${FILES_ROOT}\maetro32.dll"
-        !endif
 
         ; x64 server binaries
         SetOutPath "$INSTDIR\server\x64"
@@ -900,15 +893,6 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         SetOutPath "$INSTDIR\server\mods\deathmatch"
 
         SetOverwrite on
-        File "${SERVER_FILES_ROOT}\mods\deathmatch\deathmatch.dll"
-        File "${SERVER_FILES_ROOT}\mods\deathmatch\lua5.1.dll"
-        File "${FILES_ROOT}\mods\deathmatch\pcre2.dll"
-        File "${SERVER_FILES_ROOT}\mods\deathmatch\dbconmy.dll"
-        !ifndef LIGHTBUILD
-            File "${SERVER_FILES_ROOT}\mods\deathmatch\libmysql.dll"
-            File "${SERVER_FILES_ROOT}\mods\deathmatch\libcrypto-3.dll"
-            File "${SERVER_FILES_ROOT}\mods\deathmatch\libssl-3.dll"
-        !endif
         File "${SERVER_FILES_ROOT}\mods\deathmatch\mtaserver.conf.template"
 
         ; x64 server game module binaries
