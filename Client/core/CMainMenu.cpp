@@ -1267,8 +1267,7 @@ bool CMainMenu::WarnIfLocalServerUnsupported()
 {
     if (!Is64BitOS())
     {
-        CCore::GetSingleton().ShowMessageBox(_("Error"), _("Local server is not supported on 32-bit OS, please upgrade"),
-                                             MB_BUTTON_OK | MB_ICON_ERROR);
+        CCore::GetSingleton().ShowMessageBox(_("Error"), _("Local server is not supported on 32-bit OS, please upgrade"), MB_BUTTON_OK | MB_ICON_ERROR);
         return false;
     }
 
