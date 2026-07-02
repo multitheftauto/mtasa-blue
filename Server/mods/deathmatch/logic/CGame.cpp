@@ -1411,6 +1411,7 @@ void CGame::InitialDataStream(CPlayer& Player)
 
     // He's joined now
     Player.SetJoined();
+    Player.ResetClientLuaEventSequence();
     m_pPlayerManager->OnPlayerJoin(&Player);
 
     // Console
@@ -2686,6 +2687,17 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
     const char*    szName = Packet.GetName();
     ElementID      ElementID = Packet.GetElementID();
     CLuaArguments* pArguments = Packet.GetArguments();
+
+    if (!pCaller)
+        return;
+
+    // Reject verbatim packet replays (e.g. captured-and-resent Lua events) before dispatching the event.
+    // A modern client must include the sequence; if it is missing the packet was not produced by stock code.
+    if (pCaller->CanBitStream(eBitStreamVersion::ClientLuaEventSequence) && !Packet.HasClientSequence())
+        return;
+
+    if (!pCaller->TryAcceptClientLuaEvent(Packet.HasClientSequence(), Packet.GetClientSequence()))
+        return;
 
     // Grab the element
     CElement* pElement = CElementIDs::GetElement(ElementID);

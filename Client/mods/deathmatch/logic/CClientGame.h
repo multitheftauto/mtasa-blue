@@ -261,6 +261,9 @@ public:
 
     uint GetFrameCount() { return m_uiFrameCount; }
 
+    uint32_t GetNextClientLuaEventSequence() const noexcept { return m_uiNextClientLuaEventSequence; }
+    void     AdvanceClientLuaEventSequence() noexcept { ++m_uiNextClientLuaEventSequence; }
+
     void        HandleException(CExceptionInformation* pExceptionInformation);
     static void HandleRadioNext(CControlFunctionBind*);
     static void HandleRadioPrevious(CControlFunctionBind*);
@@ -856,6 +859,7 @@ private:
 
     CElapsedTimeHD m_TimeSliceTimer;
     uint           m_uiFrameCount;
+    uint32_t       m_uiNextClientLuaEventSequence = 1;
 
     long long m_llLastTransgressionTime;
     SString   m_strLastDiagnosticStatus;

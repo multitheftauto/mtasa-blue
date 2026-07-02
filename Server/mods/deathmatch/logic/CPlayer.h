@@ -263,6 +263,9 @@ public:
     bool GetTeleported() const noexcept { return m_teleported; }
     void SetTeleported(bool state) noexcept { m_teleported = state; }
 
+    bool TryAcceptClientLuaEvent(bool bHasSequence, uint32_t uiSequence) noexcept;
+    void ResetClientLuaEventSequence() noexcept;
+
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
 
@@ -463,4 +466,6 @@ private:
     SString m_strQuitReasonForLog;
 
     bool m_teleported = false;
+
+    uint32_t m_uiNextExpectedClientLuaEventSequence = 1;
 };

@@ -40,6 +40,10 @@ enum class eBitStreamVersion : unsigned short
     // YYYY-MM-DD
     // Name,
 
+    // 2026-06-30
+    // Monotonic sequence on client->server PACKET_ID_LUA_EVENT (replay guard)
+    ClientLuaEventSequence,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
