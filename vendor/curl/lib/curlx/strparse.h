@@ -23,7 +23,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "../curl_setup.h"
+#include "curl_setup.h"
 
 #define STRE_OK       0
 #define STRE_BIG      1
@@ -44,8 +44,9 @@ struct Curl_str {
 
 void curlx_str_init(struct Curl_str *out);
 void curlx_str_assign(struct Curl_str *out, const char *str, size_t len);
+void curlx_str_trim(struct Curl_str *out, size_t len);
 
-#define curlx_str(x) ((x)->str)
+#define curlx_str(x)    ((x)->str)
 #define curlx_strlen(x) ((x)->len)
 
 /* Get a word until the first space
@@ -55,17 +56,17 @@ int curlx_str_word(const char **linep, struct Curl_str *out, const size_t max);
 /* Get a word until the first DELIM or end of string
    return non-zero on error */
 int curlx_str_until(const char **linep, struct Curl_str *out, const size_t max,
-                   char delim);
+                    char delim);
 
 /* Get a word until a newline byte or end of string. At least one byte long.
    return non-zero on error */
 int curlx_str_untilnl(const char **linep, struct Curl_str *out,
-                     const size_t max);
+                      const size_t max);
 
-/* Get a "quoted" word. No escaping possible.
+/* Get a "quoted" word. Escaped quotes are supported.
    return non-zero on error */
 int curlx_str_quotedword(const char **linep, struct Curl_str *out,
-                        const size_t max);
+                         const size_t max);
 
 /* Advance over a single character.
    return non-zero on error */
@@ -98,7 +99,8 @@ int curlx_str_cmp(struct Curl_str *str, const char *check);
 
 int curlx_str_nudge(struct Curl_str *str, size_t num);
 
-int curlx_str_cspn(const char **linep, struct Curl_str *out, const char *cspn);
+int curlx_str_cspn(const char **linep, struct Curl_str *out,
+                   const char *reject);
 void curlx_str_trimblanks(struct Curl_str *out);
 void curlx_str_passblanks(const char **linep);
 
@@ -106,7 +108,7 @@ void curlx_str_passblanks(const char **linep);
    returns 10. THIS ONLY WORKS ON VALID HEXADECIMAL LETTER INPUT. Verify
    before calling this!
 */
-extern const unsigned char Curl_hexasciitable[];
-#define Curl_hexval(x) (unsigned char)(Curl_hexasciitable[(x) - '0'] & 0x0f)
+extern const unsigned char curlx_hexasciitable[];
+#define curlx_hexval(x) (unsigned char)(curlx_hexasciitable[(x) - '0'] & 0x0f)
 
 #endif /* HEADER_CURL_STRPARSE_H */

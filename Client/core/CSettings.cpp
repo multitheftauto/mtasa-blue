@@ -296,9 +296,6 @@ void CSettings::ResetGuiPointers()
     m_pProgressAnimationCombo = NULL;
     m_pDebugSettingLabel = NULL;
     m_pDebugSettingCombo = NULL;
-    m_pWin8Label = NULL;
-    m_pWin8ColorCheckBox = NULL;
-    m_pWin8MouseCheckBox = NULL;
     m_pPhotoSavingCheckbox = NULL;
     m_pCheckBoxAskBeforeDisconnect = NULL;
     m_pProcessAffinityCheckbox = NULL;
@@ -1864,33 +1861,6 @@ void CSettings::CreateGUI()
     vecTemp.fX = 22.f;
     vecTemp.fY += fLineHeight;
 
-    // Windows 8 compatibility
-    m_pWin8Label = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Windows 8 compatibility:")));
-    m_pWin8Label->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
-    m_pWin8Label->AutoSize();
-
-    m_pWin8ColorCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("16-bit color")));
-    m_pWin8ColorCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
-    m_pWin8ColorCheckBox->AutoSize(NULL, 20.0f);
-    vecTemp.fX += 140;
-
-    m_pWin8MouseCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Mouse fix")));
-    m_pWin8MouseCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
-    m_pWin8MouseCheckBox->AutoSize(NULL, 20.0f);
-    vecTemp.fY += fLineHeight;
-    vecTemp.fX -= 140;
-
-    // Hide if not Win8
-    if (atoi(GetApplicationSetting("real-os-version")) != 8)
-    {
-#ifndef MTA_DEBUG  // Don't hide when debugging
-        m_pWin8Label->SetVisible(false);
-        m_pWin8ColorCheckBox->SetVisible(false);
-        m_pWin8MouseCheckBox->SetVisible(false);
-        vecTemp.fY -= fLineHeight;
-#endif
-    }
-
     // Cache path info
     m_pCachePathLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Client resource files:")));
     m_pCachePathLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
@@ -2086,12 +2056,6 @@ void CSettings::CreateGUI()
 
     m_pUpdateBuildTypeCombo->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pUpdateBuildTypeCombo->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
-
-    m_pWin8ColorCheckBox->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
-    m_pWin8ColorCheckBox->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
-
-    m_pWin8MouseCheckBox->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
-    m_pWin8MouseCheckBox->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
 
     m_pUpdateAutoInstallLabel->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pUpdateAutoInstallLabel->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
@@ -4144,14 +4108,6 @@ void CSettings::LoadData()
     else if (iVar == 1)
         m_pProgressAnimationCombo->SetText(_("Default"));
 
-    // Windows 8 16-bit color
-    iVar = GetApplicationSettingInt("Win8Color16");
-    m_pWin8ColorCheckBox->SetSelected(iVar != 0);
-
-    // Windows 8 mouse fix
-    iVar = GetApplicationSettingInt("Win8MouseFix");
-    m_pWin8MouseCheckBox->SetSelected(iVar != 0);
-
     // Save camera photos inside user documents folder
     CVARS_GET("photosaving", bVar);
     m_pPhotoSavingCheckbox->SetSelected(bVar);
@@ -4593,12 +4549,6 @@ void CSettings::SaveData()
         int iSelected = (int)pSelected->GetData();
         CVARS_SET("progress_animation", iSelected);
     }
-
-    // Windows 8 16-bit color
-    SetApplicationSettingInt("Win8Color16", m_pWin8ColorCheckBox->GetSelected());
-
-    // Windows 8 mouse fix
-    SetApplicationSettingInt("Win8MouseFix", m_pWin8MouseCheckBox->GetSelected());
 
     // Save photos in documents folder
     bool photoSaving = m_pPhotoSavingCheckbox->GetSelected();
@@ -6119,10 +6069,6 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
         strText = std::string(_("Auto updater:")) + " " + std::string(_("Select default unless you like filling out bug reports."));
     else if (pLabel && pLabel == m_pUpdateAutoInstallLabel || pComboBox && pComboBox == m_pUpdateAutoInstallCombo)
         strText = std::string(_("Auto updater:")) + " " + std::string(_("Select default to automatically install important updates."));
-    else if (pCheckBox && pCheckBox == m_pWin8ColorCheckBox)
-        strText = std::string(_("16-bit color:")) + " " + std::string(_("Enable 16 bit color modes - Requires MTA restart"));
-    else if (pCheckBox && pCheckBox == m_pWin8MouseCheckBox)
-        strText = std::string(_("Mouse fix:")) + " " + std::string(_("Mouse movement fix - May need PC restart"));
     else if (pCheckBox && pCheckBox == m_pProcessAffinityCheckbox)
         strText = std::string(_("CPU affinity:")) + " " + std::string(_("Only change if you're having stability issues."));
 

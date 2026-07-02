@@ -1659,7 +1659,11 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
         CDeathmatchVehicle* pVehicle = static_cast<CDeathmatchVehicle*>(g_pClientGame->m_pVehicleManager->Get(ID));
         if (pVehicle)
         {
-            bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
+            // Do not spawn flying components for already-blown vehicles.
+            // Physics collisions and burn explosions can trigger repeated
+            // damage syncs which would each spawn flying components on an
+            // already-destroyed vehicle.
+            bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS) && !pVehicle->IsBlown();
 
             for (unsigned char i = 0; i < MAX_DOORS; ++i)
             {
@@ -3368,7 +3372,9 @@ retry:
                     pVehicle->SetPaintjob(paintjob.data.ucPaintjob);
                     pVehicle->SetColor(vehColor);
 
-                    bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
+                    // Do not spawn flying components for already-blown vehicles
+                    // when applying damage states.
+                    bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS) && !pVehicle->IsBlown();
                     // Setup our damage model
                     for (unsigned char i = 0; i < MAX_DOORS; i++)
                         pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], flyingComponents);
