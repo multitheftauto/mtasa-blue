@@ -93,6 +93,9 @@ public:
     float          GetForce() { return m_fForce; }
     bool           IsLocal() { return m_bLocal; }
     CClientEntity* GetSatchelAttachedTo();
+    void           GetSatchelAttachOffsets(CVector& vecOffsetPosition, CVector& vecOffsetRotation);
+    void           AttachSatchelToEntity(CClientEntity* pEntity, const CVector& vecOffsetPosition, const CVector& vecOffsetRotation);
+    void           SetStaticUntilCollisionLoaded();
 
 protected:
     CClientProjectileManager* m_pProjectileManager;
