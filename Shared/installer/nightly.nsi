@@ -2715,7 +2715,7 @@ Function MTAInitFileNamesAndPaths
 	StrCpy $DesktopClientShortcutPath "$DESKTOP\$ClientShortcutName ${0.0}.lnk"
 	# Exe names
 	StrCpy $ClientExeName "Multi Theft Auto.exe"
-	StrCpy $ServerExeName "MTA Server.exe"
+	StrCpy $ServerExeName "MTA Server64.exe"
 	StrCpy $UninstallExeName "Uninstall.exe"
 	# Exe paths
 	StrCpy $ClientExePath "$INSTDIR\$ClientExeName"
