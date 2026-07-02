@@ -78,6 +78,9 @@ public:
 
     void ShowNetworkNotReadyWindow();
 
+    // Returns false and shows a dialog if the local server cannot run on this OS (e.g. 32-bit).
+    bool WarnIfLocalServerUnsupported();
+
 private:
     sMenuItem* CreateItem(unsigned char menuType, const char* szFilename, CVector2D vecRelPosition);
     bool       SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHovering);

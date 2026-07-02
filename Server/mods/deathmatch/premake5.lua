@@ -10,7 +10,8 @@ project "Deathmatch"
 
 	filter "system:windows"
 		includedirs { "../../../vendor/sparsehash/src/windows" }
-		-- Server requires Windows 10+ (cpp-httplib)
+		-- cpp-httplib (included via CHTTPD.cpp) requires Windows 10+ APIs and enforces _WIN32_WINNT >= 0x0A00
+		removedefines { "_WIN32_WINNT=0x601" }
 		defines { "_WIN32_WINNT=0x0A00" }
 
 	filter {}
@@ -19,6 +20,7 @@ project "Deathmatch"
 			"../../sdk",
 			"../../../vendor/bochs",
 			"../../../vendor/pme",
+			"../../../vendor/cpp-httplib",
 			"../../../vendor/zip",
 			"../../../vendor/glob/include",
 			"../../../vendor/zlib",
@@ -30,6 +32,7 @@ project "Deathmatch"
 			"../../../Shared/animation",
 			"../../../Shared",
 			"../../../Shared/publicsdk/include",
+			"../../../Shared",
 			"../../../vendor/sparsehash/src/",
 			"logic",
 			"utils",
@@ -38,7 +41,7 @@ project "Deathmatch"
 
 	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre2", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt",
+		"Lua_Server", "sqlite", "cryptopp", "pme", "pcre2", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt",
 	}
 
 	vpaths {
