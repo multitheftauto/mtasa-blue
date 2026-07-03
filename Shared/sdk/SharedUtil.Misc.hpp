@@ -2026,7 +2026,6 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 
 bool SharedUtil::IsWindows10OrGreater()
 {
-    // Use RtlGetVersion() instead of VerifyVersionInfo() to bypass the manifest compatibility shim.
     using RtlGetVersionFn = LONG(WINAPI*)(OSVERSIONINFOEXW*);
     if (HMODULE ntdll = GetModuleHandleW(L"ntdll.dll"))
     {
@@ -2039,6 +2038,8 @@ bool SharedUtil::IsWindows10OrGreater()
                 return info.dwMajorVersion >= 10;
         }
     }
+
+    return false;
 }
 #endif  // SHAREDUTIL_PLATFORM_WINDOWS
 
