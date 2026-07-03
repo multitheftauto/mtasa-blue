@@ -14,6 +14,8 @@
 #include <game/CWeapon.h>
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
+#include <game/CTaskManager.h>
+#include <game/Task.h>
 #include <enums/VehicleType.h>
 
 extern CClientGame* g_pClientGame;
@@ -1112,6 +1114,20 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     // Write the full player keys
     CControllerState ControllerState;
     pPlayerModel->GetControllerState(ControllerState);
+
+    // The aim/fire buttons may still be held from before we received our current weapon.
+    // GTA:SA only starts TASK_SIMPLE_USE_GUN on a fresh button press, so clear stale bits
+    // here to keep the aim sync below consistent with our own pose.
+    if (ControllerState.RightShoulder1 || ControllerState.ButtonCircle)
+    {
+        CTask* pAttackTask = pPlayerModel->GetTaskManager()->GetTaskSecondary(TASK_SECONDARY_ATTACK);
+        if (!pAttackTask || pAttackTask->GetTaskType() != TASK_SIMPLE_USE_GUN)
+        {
+            ControllerState.RightShoulder1 = 0;
+            ControllerState.ButtonCircle = 0;
+        }
+    }
+
     WriteFullKeysync(ControllerState, BitStream);
 
     // Get the contact entity
