@@ -419,6 +419,7 @@ namespace SharedUtil
     bool IsWindowsVistaOrGreater();
     bool IsWindows7OrGreater();
     bool IsWindows8OrGreater();
+    bool IsWindows10OrGreater();
 
     bool QueryThreadEntryPointAddress(void* thread, DWORD* entryPointAddress);
 
