@@ -2023,51 +2023,23 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 #ifdef SHAREDUTIL_PLATFORM_WINDOWS
     #define _WIN32_WINNT_WIN8  0x0602
     #define _WIN32_WINNT_WIN10 0x0A00
-///////////////////////////////////////////////////////////////////////////
-//
-// SharedUtil::IsWindowsVersionOrGreater
-//
-// From Windows Kits\8.1 VersionHelpers.h
-// (Ignores compatibility mode)
-//
-///////////////////////////////////////////////////////////////////////////
-bool SharedUtil::IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor)
-{
-    OSVERSIONINFOEXW osvi = {sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0};
-    DWORDLONG const  dwlConditionMask =
-        VerSetConditionMask(VerSetConditionMask(VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL), VER_MINORVERSION, VER_GREATER_EQUAL),
-                            VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
-
-    osvi.dwMajorVersion = wMajorVersion;
-    osvi.dwMinorVersion = wMinorVersion;
-    osvi.wServicePackMajor = wServicePackMajor;
-
-    return VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR, dwlConditionMask) != FALSE;
-}
-
-bool SharedUtil::IsWindowsXPSP3OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP), LOBYTE(_WIN32_WINNT_WINXP), 3);
-}
-
-bool SharedUtil::IsWindowsVistaOrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA), LOBYTE(_WIN32_WINNT_VISTA), 0);
-}
-
-bool SharedUtil::IsWindows7OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN7), LOBYTE(_WIN32_WINNT_WIN7), 0);
-}
-
-bool SharedUtil::IsWindows8OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN8), LOBYTE(_WIN32_WINNT_WIN8), 0);
-}
 
 bool SharedUtil::IsWindows10OrGreater()
 {
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 0);
+    using RtlGetVersionFn = LONG(WINAPI*)(OSVERSIONINFOEXW*);
+    if (HMODULE ntdll = GetModuleHandleW(L"ntdll.dll"))
+    {
+        RtlGetVersionFn pfnRtlGetVersion = reinterpret_cast<RtlGetVersionFn>(GetProcAddress(ntdll, "RtlGetVersion"));
+        if (pfnRtlGetVersion)
+        {
+            OSVERSIONINFOEXW info{};
+            info.dwOSVersionInfoSize = sizeof(info);
+            if (pfnRtlGetVersion(&info) == 0 /* STATUS_SUCCESS */)
+                return info.dwMajorVersion >= 10;
+        }
+    }
+
+    return false;
 }
 #endif  // SHAREDUTIL_PLATFORM_WINDOWS
 
