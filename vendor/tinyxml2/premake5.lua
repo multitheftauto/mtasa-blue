@@ -1,14 +1,12 @@
-project "tinyxml"
+project "tinyxml2"
 	language "C++"
 	kind "StaticLib"
-	targetname "tinyxml"
+	targetname "tinyxml2"
 	warnings "Off"
 
 	includedirs {
 		"../../Shared/sdk",
 	}
-
-	defines { "TIXML_USE_STL" }
 
 	vpaths {
 		["Headers/*"] = "**.h",

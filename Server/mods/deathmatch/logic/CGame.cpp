@@ -573,6 +573,11 @@ void CGame::DoPulse()
     if (m_pHqComms)
         m_pHqComms->Pulse();
 
+    // Periodic maintenance for the built-in HTTP server (login session and
+    // connection cache upkeep).
+    if (m_pHTTPD)
+        m_pHTTPD->HttpPulse();
+
     CLOCK_CALL1(m_pFunctionUseLogger->Pulse(););
     CLOCK_CALL1(m_lightsyncManager.DoPulse(););
 
@@ -2090,6 +2095,13 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
     CPed* pPed = GetElementFromId<CPed>(Packet.m_PedID);
     if (pPed && !pPed->IsDead())
     {
+        CVehicle* pVehicle = pPed->GetOccupiedVehicle();
+
+        // Non syncable peds should be fully ignored unless in vehicle (Fix for 3598)
+        // We allow it only if the ped should die from their occupied vehicle exploding or drowning
+        if (!pPed->IsSyncable() && (!pVehicle || (Packet.m_ucKillerWeapon != 51 && Packet.m_ucKillerWeapon != 53)))
+            return;
+
         pPed->SetIsDead(true);
         pPed->SetHealth(0.0f);
         pPed->SetArmor(0.0f);
@@ -2102,7 +2114,6 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
             pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
         // Remove him from any occupied vehicle
-        CVehicle* pVehicle = pPed->GetOccupiedVehicle();
         if (pVehicle)
         {
             pVehicle->SetOccupant(NULL, pPed->GetOccupiedVehicleSeat());
@@ -2442,6 +2453,13 @@ void CGame::Packet_VehicleDamageSync(CVehicleDamageSyncPacket& Packet)
             // Is this guy the driver or syncer?
             if (pVehicle->GetSyncer() == pPlayer || pVehicle->GetOccupant(0) == pPlayer)
             {
+                // Ignore damage syncs for already-blown vehicles. Once a vehicle
+                // is destroyed, further damage changes (from physics collisions or
+                // burn explosions) only cause repeated flying component spawns and
+                // excess explosions on clients.
+                if (pVehicle->IsBlown())
+                    return;
+
                 // Set the new damage model
                 for (unsigned int i = 0; i < MAX_DOORS; ++i)
                 {
@@ -4391,7 +4409,10 @@ void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
     {
         // event cancelled, disconnect the player
         CLogger::LogPrintf("CONNECT: %s failed to connect. (onPlayerConnect event cancelled) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str());
-        const char* szError = g_pGame->GetEvents()->GetLastError();
+        // Use WasLastError() rather than GetLastError(): CallEvent() above already restored
+        // m_strLastError to the outer (pre-call) value once it returned, so the reason set via
+        // cancelEvent() inside the onPlayerConnect handler is only available through this getter.
+        const char* szError = g_pGame->GetEvents()->WasLastError();
         if (szError && szError[0])
         {
             DisconnectPlayer(g_pGame, *pPlayer, szError);

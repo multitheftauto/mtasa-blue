@@ -360,7 +360,7 @@ void CheckLibVersions()
                                 "MTA\\game_sa.dll",
                                 "MTA\\" LOADER_PROXY_DLL_NAME,
                                 "mods\\deathmatch\\client.dll",
-                                "mods\\deathmatch\\pcre3.dll"};
+                                "mods\\deathmatch\\pcre2.dll"};
 
     SString strReqFileVersion;
     for (uint i = 0; i < NUMELMS(moduleList); i++)
