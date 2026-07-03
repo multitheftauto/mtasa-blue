@@ -683,19 +683,25 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29);
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9);
 
-    // CVehicleModelInfo::SetEditableMaterialsCB stores ms_currentCol[n] (a palette index) in esi before
-    // applying the color. MTA's HOOK_VehColCB indexes vehColors[esi], so esi must be the color slot
-    // (0-3), not a palette index. Quaternary used ms_currentCol[3]==0, so slot 4 was read as slot 1.
+    // CVehicleModelInfo::SetEditableMaterialsCB (0x4C8220) matches each editable material against one of
+    // 4 marker colors, then does "movzx esi, ms_currentCol[n]" to fetch the chosen GTA palette index
+    // (0-255) for that slot. MTA's HOOK_VehColCB (0x4C838D, installed above) instead indexes its own
+    // vehColors[esi] RGB cache, which requires esi to be the slot number (0-3), not a palette index.
+    // Quaternary's ms_currentCol[3] is very often 0 for standard 2-color vehicles, so esi silently
+    // aliased to vehColors[0] (primary), and tertiary was similarly at the mercy of whatever palette
+    // index the player/model happened to use. Each of the 4 movzx instructions (verified via disassembly
+    // of gta_sa.exe 1.0 US, since MTA only supports this build) is replaced with "mov esi, <slot>; nop"
+    // of the exact same 7-byte length, so the surrounding cmp/jne/jmp branch logic is untouched.
     static const std::uint8_t aSetVehicleColorSlot[] = {
         0xC7, 0xC6, 0x00, 0x00, 0x00, 0x00, 0x90,  // mov esi, 0; nop  (primary)
         0xC7, 0xC6, 0x01, 0x00, 0x00, 0x00, 0x90,  // mov esi, 1; nop  (secondary)
         0xC7, 0xC6, 0x02, 0x00, 0x00, 0x00, 0x90,  // mov esi, 2; nop  (tertiary)
         0xC7, 0xC6, 0x03, 0x00, 0x00, 0x00, 0x90,  // mov esi, 3; nop  (quaternary)
     };
-    MemCpy((void*)0x4C8338, aSetVehicleColorSlot + 0, 7);
+    MemCpy((void*)0x4C833F, aSetVehicleColorSlot + 0, 7);
     MemCpy((void*)0x4C8350, aSetVehicleColorSlot + 7, 7);
-    MemCpy((void*)0x4C8362, aSetVehicleColorSlot + 14, 7);
-    MemCpy((void*)0x4C8376, aSetVehicleColorSlot + 21, 7);
+    MemCpy((void*)0x4C8361, aSetVehicleColorSlot + 14, 7);
+    MemCpy((void*)0x4C8372, aSetVehicleColorSlot + 21, 7);
     HookInstall(HOOKPOS_PreFxRender, (DWORD)HOOK_PreFxRender, 5);
     HookInstall(HOOKPOS_PostColorFilterRender, (DWORD)HOOK_PostColorFilterRender, 5);
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5);
