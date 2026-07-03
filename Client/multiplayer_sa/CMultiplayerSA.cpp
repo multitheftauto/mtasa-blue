@@ -682,6 +682,20 @@ void CMultiplayerSA::InitHooks()
 
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29);
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9);
+
+    // CVehicleModelInfo::SetEditableMaterialsCB stores ms_currentCol[n] (a palette index) in esi before
+    // applying the color. MTA's HOOK_VehColCB indexes vehColors[esi], so esi must be the color slot
+    // (0-3), not a palette index. Quaternary used ms_currentCol[3]==0, so slot 4 was read as slot 1.
+    static const std::uint8_t aSetVehicleColorSlot[] = {
+        0xC7, 0xC6, 0x00, 0x00, 0x00, 0x00, 0x90,  // mov esi, 0; nop  (primary)
+        0xC7, 0xC6, 0x01, 0x00, 0x00, 0x00, 0x90,  // mov esi, 1; nop  (secondary)
+        0xC7, 0xC6, 0x02, 0x00, 0x00, 0x00, 0x90,  // mov esi, 2; nop  (tertiary)
+        0xC7, 0xC6, 0x03, 0x00, 0x00, 0x00, 0x90,  // mov esi, 3; nop  (quaternary)
+    };
+    MemCpy((void*)0x4C8338, aSetVehicleColorSlot + 0, 7);
+    MemCpy((void*)0x4C8350, aSetVehicleColorSlot + 7, 7);
+    MemCpy((void*)0x4C8362, aSetVehicleColorSlot + 14, 7);
+    MemCpy((void*)0x4C8376, aSetVehicleColorSlot + 21, 7);
     HookInstall(HOOKPOS_PreFxRender, (DWORD)HOOK_PreFxRender, 5);
     HookInstall(HOOKPOS_PostColorFilterRender, (DWORD)HOOK_PostColorFilterRender, 5);
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5);
@@ -6527,6 +6541,15 @@ void _cdecl SaveVehColors(DWORD dwThis)
     if (pVehicle)
     {
         pVehicle->GetColor(&vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], true);
+    }
+    else
+    {
+        // vehColors is shared between all vehicles; do not reuse the previous vehicle's colors when
+        // SetupRender runs for a non-MTA vehicle (or before the pool entry exists during creation).
+        vehColors[0] = 0;
+        vehColors[1] = 0;
+        vehColors[2] = 0;
+        vehColors[3] = 0;
     }
 }
 
