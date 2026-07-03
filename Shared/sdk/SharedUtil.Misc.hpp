@@ -2031,18 +2031,40 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 // (Ignores compatibility mode)
 //
 ///////////////////////////////////////////////////////////////////////////
+// Use the extended structure which contains wServicePackMajor
+typedef NTSTATUS(WINAPI* RtlGetVersionPtr)(PRTL_OSVERSIONINFOEXW);
+
 bool SharedUtil::IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor)
 {
-    OSVERSIONINFOEXW osvi = {sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0};
-    DWORDLONG const  dwlConditionMask =
-        VerSetConditionMask(VerSetConditionMask(VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL), VER_MINORVERSION, VER_GREATER_EQUAL),
-                            VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
+    HMODULE hMod = GetModuleHandleW(L"ntdll.dll");
+    if (hMod)
+    {
+        RtlGetVersionPtr pRtlGetVersion = (RtlGetVersionPtr)GetProcAddress(hMod, "RtlGetVersion");
+        if (pRtlGetVersion)
+        {
+            RTL_OSVERSIONINFOEXW rovi = {0};
+            rovi.dwOSVersionInfoSize = sizeof(rovi);
 
-    osvi.dwMajorVersion = wMajorVersion;
-    osvi.dwMinorVersion = wMinorVersion;
-    osvi.wServicePackMajor = wServicePackMajor;
+            // RtlGetVersion bypasses any compatibility shims and returns the true OS version
+            if (pRtlGetVersion(&rovi) == 0)  // STATUS_SUCCESS
+            {
+                if (rovi.dwMajorVersion > wMajorVersion)
+                    return true;
 
-    return VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR, dwlConditionMask) != FALSE;
+                if (rovi.dwMajorVersion == wMajorVersion)
+                {
+                    if (rovi.dwMinorVersion > wMinorVersion)
+                        return true;
+
+                    if (rovi.dwMinorVersion == wMinorVersion)
+                    {
+                        return rovi.wServicePackMajor >= wServicePackMajor;
+                    }
+                }
+            }
+        }
+    }
+    return false;
 }
 
 bool SharedUtil::IsWindowsXPSP3OrGreater()
