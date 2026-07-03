@@ -2067,6 +2067,20 @@ bool SharedUtil::IsWindows8OrGreater()
 
 bool SharedUtil::IsWindows10OrGreater()
 {
+    // Use RtlGetVersion() instead of VerifyVersionInfo() to bypass the manifest compatibility shim.
+    using RtlGetVersionFn = LONG(WINAPI*)(OSVERSIONINFOEXW*);
+    if (HMODULE ntdll = GetModuleHandleW(L"ntdll.dll"))
+    {
+        RtlGetVersionFn pfnRtlGetVersion = reinterpret_cast<RtlGetVersionFn>(GetProcAddress(ntdll, "RtlGetVersion"));
+        if (pfnRtlGetVersion)
+        {
+            OSVERSIONINFOEXW info{};
+            info.dwOSVersionInfoSize = sizeof(info);
+            if (pfnRtlGetVersion(&info) == 0 /* STATUS_SUCCESS */)
+                return info.dwMajorVersion >= 10;
+        }
+    }
+    // Fallback: manifest-aware check (may return false on Windows 10/11 without a proper manifest)
     return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN10), LOBYTE(_WIN32_WINNT_WIN10), 0);
 }
 #endif  // SHAREDUTIL_PLATFORM_WINDOWS
