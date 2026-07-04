@@ -166,21 +166,28 @@ inner:
 // entity only: ref' = ref * A / 255. both sides of the compare scale equally, cutouts
 // keep their shape and ref' < A so the object never fully vanishes. restored in the
 // Post handler. player peds, cars and bikes set ref 1 and restore it inside their
-// own Render fns, they were never affected by the world refs.
+// own Render fns. boats and trains never did, so vehicles get the same scaling,
+// for cars and bikes it's a no-op since their own ref write lands after ours.
 static bool  ms_bAlphaTestRefOverridden = false;
 static DWORD ms_dwSavedAlphaTestRef = 0;
 
 static void OverrideAlphaTestRefForElementAlpha(CEntitySAInterface* pEntity)
 {
-    if (pEntity->nType != ENTITY_TYPE_OBJECT)
-        return;
+    unsigned char ucAlpha = 255;
 
-    SClientEntity<CObjectSA>* pObjectClientEntity = pGameInterface->GetPools()->GetObject((DWORD*)pEntity);
-    CObject*                  pObject = pObjectClientEntity ? pObjectClientEntity->pEntity : nullptr;
-    if (!pObject)
-        return;
+    if (pEntity->nType == ENTITY_TYPE_OBJECT)
+    {
+        SClientEntity<CObjectSA>* pObjectClientEntity = pGameInterface->GetPools()->GetObject((DWORD*)pEntity);
+        if (pObjectClientEntity && pObjectClientEntity->pEntity)
+            ucAlpha = pObjectClientEntity->pEntity->GetAlpha();
+    }
+    else if (pEntity->nType == ENTITY_TYPE_VEHICLE)
+    {
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pEntity);
+        if (pVehicleClientEntity && pVehicleClientEntity->pEntity)
+            ucAlpha = pVehicleClientEntity->pEntity->GetAlpha();
+    }
 
-    unsigned char ucAlpha = pObject->GetAlpha();
     if (ucAlpha == 255)
         return;
 
