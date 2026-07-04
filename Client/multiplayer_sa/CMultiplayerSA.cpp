@@ -683,15 +683,15 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29);
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9);
 
-    // CVehicleModelInfo::SetEditableMaterialsCB (0x4C8220) matches each editable material against one of
-    // 4 marker colors, then does "movzx esi, ms_currentCol[n]" to fetch the chosen GTA palette index
-    // (0-255) for that slot. MTA's HOOK_VehColCB (0x4C838D, installed above) instead indexes its own
-    // vehColors[esi] RGB cache, which requires esi to be the slot number (0-3), not a palette index.
-    // Quaternary's ms_currentCol[3] is very often 0 for standard 2-color vehicles, so esi silently
-    // aliased to vehColors[0] (primary), and tertiary was similarly at the mercy of whatever palette
-    // index the player/model happened to use. Each of the 4 movzx instructions (verified via disassembly
-    // of gta_sa.exe 1.0 US, since MTA only supports this build) is replaced with "mov esi, <slot>; nop"
-    // of the exact same 7-byte length, so the surrounding cmp/jne/jmp branch logic is untouched.
+    // CVehicleModelInfo::SetEditableMaterialsCB (0x4C8220) uses "movzx esi, ms_currentCol[n]" before
+    // applying a matched paint slot. MTA's HOOK_VehColCB (0x4C838D, installed above) treats esi as a
+    // vehColors slot index (0-3), not a GTA palette index (0-255). HOOK_VehCol (CVehicle::SetupRender)
+    // already forces ms_currentCol to {0,1,2,3}, so on that path esi is already correct and this patch
+    // is a no-op. SetEditableMaterialsCB can still run on paths that bypass SetupRender, leaving
+    // ms_currentCol holding palette indices; esi then indexes vehColors out of bounds or reads the wrong
+    // slot (notably tertiary/quaternary on default 2-color vehicles where ms_currentCol[3] is often 0).
+    // Replace each movzx with "mov esi, <slot>; nop" (7 bytes, verified on gta_sa.exe 1.0 US) so esi is
+    // always the intended color slot regardless of which path invoked the callback.
     static const std::uint8_t aSetVehicleColorSlot[] = {
         0xC7, 0xC6, 0x00, 0x00, 0x00, 0x00, 0x90,  // mov esi, 0; nop  (primary)
         0xC7, 0xC6, 0x01, 0x00, 0x00, 0x00, 0x90,  // mov esi, 1; nop  (secondary)
@@ -6551,7 +6551,7 @@ void _cdecl SaveVehColors(DWORD dwThis)
     else
     {
         // vehColors is shared between all vehicles; do not reuse the previous vehicle's colors when
-        // SetupRender runs for a non-MTA vehicle (or before the pool entry exists during creation).
+        // SetupRender runs for a non-MTA vehicle.
         vehColors[0] = 0;
         vehColors[1] = 0;
         vehColors[2] = 0;

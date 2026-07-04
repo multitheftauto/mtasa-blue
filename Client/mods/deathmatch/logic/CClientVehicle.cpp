@@ -2582,11 +2582,6 @@ void CClientVehicle::Create()
         // Put our pointer in its custom data
         m_pVehicle->SetStoredPointer(this);
 
-        // Apply MTA colors before any other setup that may render the vehicle. Without this, the first
-        // SetupRender after stream-in can run while CVehicleSA still holds GTA's default palette colors.
-        if (m_bColorSaved)
-            m_pVehicle->SetColor(m_Color.GetRGBColor(0), m_Color.GetRGBColor(1), m_Color.GetRGBColor(2), m_Color.GetRGBColor(3), 0);
-
         /*if ( DoesNeedToWaitForGroundToLoad() )
         {
             // waiting for ground to load

@@ -1090,14 +1090,6 @@ void CVehicleSA::SetColor(SharedUtil::SColor color1, SharedUtil::SColor color2, 
     m_RGBColors[2] = color3;
     m_RGBColors[3] = color4;
 
-    // Keep GTA's per-vehicle palette indices in sync for SetupRender and other engine paths that read
-    // m_colour1-4 instead of MTA's RGB cache (e.g. after stream-in recreation).
-    CVehicleSAInterface* pInterface = GetVehicleInterface();
-    pInterface->m_colour1 = CVehicleColor::GetPaletteIndexFromRGB(color1);
-    pInterface->m_colour2 = CVehicleColor::GetPaletteIndexFromRGB(color2);
-    pInterface->m_colour3 = CVehicleColor::GetPaletteIndexFromRGB(color3);
-    pInterface->m_colour4 = CVehicleColor::GetPaletteIndexFromRGB(color4);
-
     // Some colors result in black for unknown reason
     for (uint i = 0; i < NUMELMS(m_RGBColors); i++)
     {
