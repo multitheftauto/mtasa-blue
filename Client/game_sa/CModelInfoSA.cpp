@@ -90,6 +90,129 @@ static void CColAccel_addCacheCol(int idx, const CColModelSAInterface* colModel)
     function(idx, colModel);
 }
 
+namespace
+{
+    CColModelSAInterface* CreateOwnedColModelCopy(CColModelSAInterface* pSource)
+    {
+        if (!pSource)
+            return nullptr;
+
+        CColModelSAInterface* pOwned = new CColModelSAInterface();
+        const DWORD           dwThis = reinterpret_cast<DWORD>(pOwned);
+        const DWORD           dwFunc = FUNC_CColModel_Constructor;
+        // clang-format off
+        __asm
+        {
+            mov     ecx, dwThis
+            call    dwFunc
+        }
+        // clang-format on
+
+        // Copy only the bounding data from the parent. Collision geometry must not be shared
+        // because custom model bounds are updated independently after DFF replacement.
+        pOwned->m_bounds = pSource->m_bounds;
+        pOwned->m_sphere = pSource->m_sphere;
+        pOwned->m_data = nullptr;
+        return pOwned;
+    }
+
+    void DestroyColModelInterface(CColModelSAInterface* pColModel)
+    {
+        if (!pColModel)
+            return;
+
+        const DWORD dwThis = reinterpret_cast<DWORD>(pColModel);
+        const DWORD dwFunc = FUNC_CColModel_Destructor;
+        // clang-format off
+        __asm
+        {
+            mov     ecx, dwThis
+            call    dwFunc
+        }
+        // clang-format on
+        delete pColModel;
+    }
+
+    struct SBoundsAccum
+    {
+        bool    bValid = false;
+        CVector vecMin;
+        CVector vecMax;
+    };
+
+    void IncludeSphereInBounds(SBoundsAccum& accum, const CVector& vecCenter, float fRadius)
+    {
+        if (fRadius <= 0.0f)
+            return;
+
+        const CVector vecSphereMin = vecCenter - CVector(fRadius, fRadius, fRadius);
+        const CVector vecSphereMax = vecCenter + CVector(fRadius, fRadius, fRadius);
+
+        if (!accum.bValid)
+        {
+            accum.vecMin = vecSphereMin;
+            accum.vecMax = vecSphereMax;
+            accum.bValid = true;
+            return;
+        }
+
+        accum.vecMin.fX = std::min(accum.vecMin.fX, vecSphereMin.fX);
+        accum.vecMin.fY = std::min(accum.vecMin.fY, vecSphereMin.fY);
+        accum.vecMin.fZ = std::min(accum.vecMin.fZ, vecSphereMin.fZ);
+        accum.vecMax.fX = std::max(accum.vecMax.fX, vecSphereMax.fX);
+        accum.vecMax.fY = std::max(accum.vecMax.fY, vecSphereMax.fY);
+        accum.vecMax.fZ = std::max(accum.vecMax.fZ, vecSphereMax.fZ);
+    }
+
+    float GetMatrixMaxScale(const CMatrix& matrix)
+    {
+        const CVector vecScale = matrix.GetScale();
+        return std::max({vecScale.fX, vecScale.fY, vecScale.fZ});
+    }
+
+    bool AccumulateAtomicBounds(RpAtomic* pAtomic, void* pData)
+    {
+        if (!pAtomic || !pAtomic->geometry)
+            return true;
+
+        RwSphere* pSphere = RpAtomicGetBoundingSphere(pAtomic);
+        if (!pSphere || pSphere->radius <= 0.0f)
+            return true;
+
+        CMatrix matrixLTM;
+        RwFrame* pFrame = RpAtomicGetFrame(pAtomic);
+        if (pFrame)
+            pGame->GetRenderWare()->RwMatrixToCMatrix(pFrame->ltm, matrixLTM);
+
+        const CVector vecCenter =
+            matrixLTM.TransformVector(CVector(pSphere->position.x, pSphere->position.y, pSphere->position.z));
+        const float fRadius = pSphere->radius * GetMatrixMaxScale(matrixLTM);
+
+        IncludeSphereInBounds(*static_cast<SBoundsAccum*>(pData), vecCenter, fRadius);
+        return true;
+    }
+
+    bool AccumulateRwObjectBounds(RwObject* pRwObject, SBoundsAccum& accum)
+    {
+        if (!pRwObject)
+            return false;
+
+        if (pRwObject->type == RP_TYPE_CLUMP)
+        {
+            RpClumpForAllAtomics(reinterpret_cast<RpClump*>(pRwObject), AccumulateAtomicBounds, &accum);
+            return accum.bValid;
+        }
+
+        if (pRwObject->type == RP_TYPE_ATOMIC)
+        {
+            AccumulateAtomicBounds(reinterpret_cast<RpAtomic*>(pRwObject), &accum);
+            return accum.bValid;
+        }
+
+        return false;
+    }
+}            // namespace
+
 CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
@@ -97,6 +220,7 @@ CModelInfoSA::CModelInfoSA()
     m_dwReferences = 0;
     m_dwPendingInterfaceRef = 0;
     m_pOriginalColModelInterface = NULL;
+    m_pOwnedColModel = NULL;
     m_pCustomClump = NULL;
     m_pCustomColModel = NULL;
 }
@@ -1578,6 +1702,9 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
     }
 
     m_pCustomClump = success ? pClump : nullptr;
+    if (success)
+        UpdateBoundsFromRwObject();
+
     return success;
 }
 
@@ -1849,6 +1976,56 @@ void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
     pTargetModelStreamingInfo->sizeInBlocks = pBaseModelStreamingInfo->sizeInBlocks;
 }
 
+void CModelInfoSA::CloneParentColModel(CBaseModelInfoSAInterface* pInterface)
+{
+    if (!pInterface || !pInterface->pColModel)
+        return;
+
+    DestroyOwnedColModel();
+
+    m_pOwnedColModel = CreateOwnedColModelCopy(pInterface->pColModel);
+    pInterface->pColModel = m_pOwnedColModel;
+}
+
+void CModelInfoSA::DestroyOwnedColModel()
+{
+    if (!m_pOwnedColModel)
+        return;
+
+    CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
+    if (pInterface && pInterface->pColModel == m_pOwnedColModel)
+        pInterface->pColModel = nullptr;
+
+    DestroyColModelInterface(m_pOwnedColModel);
+    m_pOwnedColModel = nullptr;
+}
+
+void CModelInfoSA::UpdateBoundsFromRwObject()
+{
+    // Custom collision data is authoritative when supplied by script.
+    if (m_pCustomColModel)
+        return;
+
+    CBaseModelInfoSAInterface* pInterface = GetInterface();
+    if (!pInterface || !pInterface->pColModel || !pInterface->pRwObject)
+        return;
+
+    SBoundsAccum accum;
+    if (!AccumulateRwObjectBounds(pInterface->pRwObject, accum))
+        return;
+
+    CColModelSAInterface* pColModel = pInterface->pColModel;
+    const CVector           vecCenter = (accum.vecMin + accum.vecMax) * 0.5f;
+    const CVector           vecHalfSize = (accum.vecMax - accum.vecMin) * 0.5f;
+
+    pColModel->m_bounds.m_vecMin = accum.vecMin;
+    pColModel->m_bounds.m_vecMax = accum.vecMax;
+    pColModel->m_sphere.m_center = vecCenter;
+    pColModel->m_sphere.m_radius = vecHalfSize.Length();
+
+    CColAccel_addCacheCol(static_cast<int>(m_dwModelID), pColModel);
+}
+
 void CModelInfoSA::MakePedModel(const char* szTexture)
 {
     // Create a new CPedModelInfo
@@ -1876,6 +2053,8 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
 
     ppModelInfo[m_dwModelID] = m_pInterface;
 
+    CloneParentColModel(m_pInterface);
+
     m_dwParentID = usBaseID;
     CopyStreamingInfoFromModel(usBaseID);
 }
@@ -1893,6 +2072,8 @@ void CModelInfoSA::MakeObjectDamageableModel(std::uint16_t baseModel)
     m_pInterface->m_damagedAtomic = nullptr;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
+
+    CloneParentColModel(m_pInterface);
 
     m_dwParentID = baseModel;
     CopyStreamingInfoFromModel(baseModel);
@@ -1912,6 +2093,8 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
 
     ppModelInfo[m_dwModelID] = m_pInterface;
 
+    CloneParentColModel(m_pInterface);
+
     m_dwParentID = usBaseID;
     CopyStreamingInfoFromModel(usBaseID);
 }
@@ -1927,6 +2110,8 @@ void CModelInfoSA::MakeClumpModel(ushort usBaseID)
     pNewInterface->usDynamicIndex = 65535;
 
     ppModelInfo[m_dwModelID] = pNewInterface;
+
+    CloneParentColModel(pNewInterface);
 
     m_dwParentID = usBaseID;
     CopyStreamingInfoFromModel(usBaseID);
@@ -1946,6 +2131,8 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 
     ppModelInfo[m_dwModelID] = m_pInterface;
 
+    CloneParentColModel(m_pInterface);
+
     m_dwParentID = usBaseID;
     CopyStreamingInfoFromModel(usBaseID);
 }
@@ -1953,6 +2140,8 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 void CModelInfoSA::DeallocateModel(void)
 {
     Remove();
+
+    DestroyOwnedColModel();
 
     // Clean up stored defaults so stale entries don't leak to a model that reuses this ID.
     // Without this, a freed model ID could retain alpha transparency / flag overrides
