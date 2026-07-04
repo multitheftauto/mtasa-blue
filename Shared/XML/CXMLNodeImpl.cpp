@@ -47,8 +47,19 @@ CXMLNodeImpl::~CXMLNodeImpl()
     if (m_bUsingIDs)
         CXMLArray::PushUniqueID(this);
 
-    // Delete our children
+    // Delete wrapper children first so each child unlinks its own tinyxml2 node
+    // before this node is removed from the document.
     DeleteAllSubNodes();
+
+    // Keep the underlying document in sync when nodes are destroyed via
+    // xmlDestroyNode. DeleteWrapper nulls m_pNode before delete to avoid
+    // unlinking during full file teardown.
+    if (m_pNode)
+    {
+        if (XMLNode* pXmlParent = m_pNode->Parent())
+            pXmlParent->DeleteChild(m_pNode);
+        m_pNode = nullptr;
+    }
 
     // We need a parent to delete the node
     if (m_pParent)
