@@ -325,34 +325,6 @@ void CWebView::Focus(bool state)
         pWebCore->SetFocusedWebView(nullptr);
 }
 
-void CWebView::ClearTexture()
-{
-    if (!m_pWebBrowserRenderItem) [[unlikely]]
-        return;
-
-    auto* const pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
-    if (!pD3DSurface) [[unlikely]]
-        return;
-
-    D3DSURFACE_DESC SurfaceDesc;
-    if (FAILED(pD3DSurface->GetDesc(&SurfaceDesc))) [[unlikely]]
-        return;
-
-    D3DLOCKED_RECT LockedRect;
-    if (SUCCEEDED(pD3DSurface->LockRect(&LockedRect, nullptr, D3DLOCK_DISCARD)))
-    {
-        // Check for integer overflow in size calculation: height * pitch must fit in size_t
-        // Ensure both are positive and that multiplication won't overflow
-        if (SurfaceDesc.Height > 0 && LockedRect.Pitch > 0 && static_cast<size_t>(SurfaceDesc.Height) <= SIZE_MAX / static_cast<size_t>(LockedRect.Pitch))
-            [[likely]]
-        {
-            const auto memsetSize = static_cast<size_t>(SurfaceDesc.Height) * static_cast<size_t>(LockedRect.Pitch);
-            std::memset(LockedRect.pBits, 0xFF, memsetSize);
-        }
-        pD3DSurface->UnlockRect();
-    }
-}
-
 void CWebView::UpdateTexture()
 {
     const std::scoped_lock lock(m_RenderData.dataMutex);

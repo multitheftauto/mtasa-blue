@@ -94,13 +94,9 @@ public:
     CWebViewInterface* GetFocusedWebView();
     void               SetFocusedWebView(CWebView* pWebView) { m_pFocusedWebView = pWebView; };
     void               ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam);
-    void               ClearTextures();
 
     bool GetRemotePagesEnabled();
     bool GetRemoteJavascriptEnabled();
-
-    void OnPreScreenshot();
-    void OnPostScreenshot();
 
     void OnFPSLimitChange(std::uint16_t fps) override;
 
