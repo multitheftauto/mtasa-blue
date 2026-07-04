@@ -5076,13 +5076,21 @@ CVehicleAudioSettingsEntry& CClientVehicle::GetOrCreateAudioSettings()
 
 bool CClientVehicle::GetDummyPosition(VehicleDummies dummy, CVector& position) const
 {
-    if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
+    if (dummy < VehicleDummies::LIGHT_FRONT_MAIN || dummy >= VehicleDummies::VEHICLE_DUMMY_COUNT)
+        return false;
+
+    position = m_dummyPositions[(std::size_t)dummy];
+
+    // Most models have no second exhaust dummy, in which case the game mirrors the primary
+    // exhaust on the X axis (see ApplyExhaustParticlesPosition). Reflect that here, so the
+    // reported position matches where the effects actually appear
+    if (dummy == VehicleDummies::EXHAUST_SECONDARY && position == CVector())
     {
-        position = m_dummyPositions[(std::size_t)dummy];
-        return true;
+        position = m_dummyPositions[(std::size_t)VehicleDummies::EXHAUST];
+        position.fX = -position.fX;
     }
 
-    return false;
+    return true;
 }
 
 bool CClientVehicle::SetDummyPosition(VehicleDummies dummy, const CVector& position)
