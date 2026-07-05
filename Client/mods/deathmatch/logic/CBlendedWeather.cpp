@@ -57,11 +57,15 @@ void CBlendedWeather::DoPulse()
     const auto ucSecondary = static_cast<unsigned char>(m_ucSecondaryWeather);
 
     m_pWeather->Set(ucPrimary, ucSecondary);
-    // CWeather::Update (before this pulse) advances InterpolationValue for its own Old/New pair.
-    // After we overwrite Old/New with MTA's state, mirror the value CWeather::Update would derive
-    // (seconds/3600 + minutes/60) so CTimeCycle::CalcColoursForPoint blends m_CurrentColours
-    // smoothly per frame instead of stepping per game-minute (#4803).
+    // Set InterpolationValue to 0 so CWeather::Update's wrap branch cannot fire.
+    // The engine will compute its own InterpolationValue from the game clock and
+    // use it consistently for all weather globals.
     m_pWeather->ResyncInterpolationWithGameClock(ucPrimary, ucSecondary);
+}
+
+void CBlendedWeather::ReapplyWeatherTypes()
+{
+    m_pWeather->Set(static_cast<unsigned char>(m_ucPrimaryWeather), static_cast<unsigned char>(m_ucSecondaryWeather));
 }
 
 void CBlendedWeather::SetWeather(unsigned char ucWeather)

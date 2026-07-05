@@ -4293,7 +4293,7 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot(CElement* pElement, unsigned c
     return false;
 }
 
-bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat)
+bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat, CResource* pCallingResource)
 {
     assert(pPed);
     assert(pVehicle);
@@ -4347,12 +4347,24 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
                     if (uiSeat == 0 && g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART))
                         pVehicle->SetEngineOn(true);
 
-                    // Tell all the players
-                    CBitStream BitStream;
-                    BitStream.pBitStream->Write(pVehicle->GetID());
-                    BitStream.pBitStream->Write(static_cast<unsigned char>(uiSeat));
-                    BitStream.pBitStream->Write(pPed->GenerateSyncTimeContext());
-                    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream));
+                    // Tell all the players. If the calling resource's elements haven't reached the clients yet
+                    // (e.g. called from onResourceStart on a vehicle created in the same event), hold off until
+                    // they have instead of just dropping it - the vehicle itself isn't synced to clients yet
+                    // either, and an RPC referencing an unknown element there would leave the server and clients
+                    // permanently disagreeing about whether this ped is in a vehicle.
+                    auto sendWarpRpc = [pPed, pVehicle, uiSeat]()
+                    {
+                        CBitStream BitStream;
+                        BitStream.pBitStream->Write(pVehicle->GetID());
+                        BitStream.pBitStream->Write(static_cast<unsigned char>(uiSeat));
+                        BitStream.pBitStream->Write(pPed->GenerateSyncTimeContext());
+                        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream));
+                    };
+
+                    if (pCallingResource)
+                        pCallingResource->RunOrDeferUntilClientSynced(sendWarpRpc);
+                    else
+                        sendWarpRpc();
 
                     // Call the player->vehicle event
                     CLuaArguments PlayerVehicleArguments;

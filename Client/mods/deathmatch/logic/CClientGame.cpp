@@ -3922,28 +3922,22 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWeatherUpdateHandler()
 {
-    // Fix #4803 (building light flicker): Re-apply MTA's weather state BEFORE
-    // CWeather::Update runs. CWeather::Update detects a clock wrap when setTime()
-    // jumps the game clock past InterpolationValue and re-derives Rain, Foggyness,
-    // CloudCoverage, ExtraSunnyness, SunGlare, HeatHaze, etc. from a freshly-picked
-    // weather pair. Those globals drive cloud, fog and night-time building light
-    // rendering for the rest of the frame, and PreWorldProcessHandler runs too late
-    // to undo the damage. Pre-syncing Old/New/InterpolationValue here keeps the
-    // wrap branch from firing.
+    // Fix #4803: Set MTA's weather types and zero InterpolationValue BEFORE
+    // CWeather::Update runs. Zeroing InterpolationValue prevents the wrap branch
+    // from ever firing (engine_interp >= 0 is always true), so the engine computes
+    // all weather globals (Foggyness, Rain, etc.) from MTA's weather pair.
     if (m_pManager->IsGameLoaded() && m_pBlendedWeather)
         m_pBlendedWeather->DoPulse();
 }
 
 void CClientGame::PreWorldProcessHandler()
 {
-    // Fix #4803: Re-apply MTA's weather state before CTimeCycle::CalcColoursForPoint()
-    // reads the weather globals for rendering. The engine's CWeather::Update() (0x53BFC2)
-    // runs earlier in CGame::Process() and can overwrite OldWeatherType/NewWeatherType
-    // when setTime() causes a clock wrap. This hook (at CWorld::Process, 0x53C095) runs
-    // after that overwrite but before CalcColoursForPoint (0x53C0DA) consumes the values,
-    // ensuring the rendered frame always uses MTA's intended weather.
+    // Re-apply MTA's weather types before CTimeCycle::CalcColoursForPoint() (0x53C0DA).
+    // Only set OldWeatherType/NewWeatherType — do NOT touch InterpolationValue here,
+    // so CalcColoursForPoint uses the same engine-computed value that CWeather::Update
+    // used for weather globals (Foggyness, etc.), keeping everything consistent.
     if (m_pManager->IsGameLoaded() && m_pBlendedWeather)
-        m_pBlendedWeather->DoPulse();
+        m_pBlendedWeather->ReapplyWeatherTypes();
 }
 
 void CClientGame::PostWorldProcessHandler()
