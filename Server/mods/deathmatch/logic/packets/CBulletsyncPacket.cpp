@@ -132,8 +132,8 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
         if (pPlayer->GetWeaponTotalAmmo(slot) <= 0)
             return false;
 
-        if (!SyncBulletsyncValidation::IsSyncedBulletsyncGeometryAcceptable(pPlayer->GetPosition(), pPlayer->GetOccupiedVehicle() != nullptr, m_start,
-                                                                              m_end, pPlayer->GetWeaponRangeFromSlot(slot)))
+        if (!SyncBulletsyncValidation::IsSyncedBulletsyncGeometryAcceptable(pPlayer->GetPosition(), pPlayer->GetOccupiedVehicle() != nullptr, m_start, m_end,
+                                                                            pPlayer->GetWeaponRangeFromSlot(slot)))
             return false;
     }
 

@@ -380,11 +380,11 @@ bool CSimPlayerManager::HandleBulletSync(const NetServerPlayerID& socket, NetBit
         return true;
     }
 
-    const bool bInVehicle = pRealPlayer->GetOccupiedVehicle() != nullptr;
+    const bool  bInVehicle = pRealPlayer->GetOccupiedVehicle() != nullptr;
     const float fWeaponRange = pRealPlayer->GetWeaponRangeFromSlot(slot);
 
     if (!SyncBulletsyncValidation::IsSyncedBulletsyncPacketAcceptable(pRealPlayer->GetPosition(), bInVehicle, packet->m_cache.start, packet->m_cache.end,
-                                                                     packet->m_cache.damage, packet->m_cache.zone, packet->m_cache.damaged, fWeaponRange))
+                                                                      packet->m_cache.damage, packet->m_cache.zone, packet->m_cache.damaged, fWeaponRange))
     {
         UnlockSimSystem();
         return true;

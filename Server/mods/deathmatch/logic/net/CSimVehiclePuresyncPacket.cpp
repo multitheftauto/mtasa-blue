@@ -218,8 +218,8 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 if (!BitStream.Read(&aim))
                     return false;
 
-                if (!SyncBulletsyncValidation::IsSyncedWeaponAimAcceptable(m_Cache.PlrPosition, aim.data.vecOrigin, aim.data.vecTarget,
-                                                                           m_fPlayerGotWeaponRange, true))
+                if (!SyncBulletsyncValidation::IsSyncedWeaponAimAcceptable(m_Cache.PlrPosition, aim.data.vecOrigin, aim.data.vecTarget, m_fPlayerGotWeaponRange,
+                                                                           true))
                     return false;
 
                 m_Cache.fAimDirection = aim.data.fArm;

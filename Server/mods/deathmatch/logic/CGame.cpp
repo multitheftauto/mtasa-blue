@@ -2572,13 +2572,13 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     if (player->GetWeaponTotalAmmo(slot) <= 0)
         return;
 
-    const auto stat = CWeaponStatManager::GetSkillStatIndex(packet.m_weapon);
-    const auto level = player->GetPlayerStat(stat);
-    auto*      stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
+    const auto  stat = CWeaponStatManager::GetSkillStatIndex(packet.m_weapon);
+    const auto  level = player->GetPlayerStat(stat);
+    auto*       stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
     const float fWeaponRange = stats->GetWeaponRange();
 
     if (!SyncBulletsyncValidation::IsSyncedBulletsyncPacketAcceptable(player->GetPosition(), player->GetOccupiedVehicle() != nullptr, packet.m_start,
-                                                                        packet.m_end, packet.m_damage, packet.m_zone, packet.m_damaged, fWeaponRange))
+                                                                      packet.m_end, packet.m_damage, packet.m_zone, packet.m_damaged, fWeaponRange))
         return;
 
     CLuaArguments args;
@@ -2622,7 +2622,7 @@ void CGame::Packet_WeaponBulletsync(CCustomWeaponBulletSyncPacket& packet)
     CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(weapon->GetWeaponType());
     const float  fWeaponRange = pWeaponStat ? pWeaponStat->GetWeaponRange() : 0.0f;
     if (!SyncBulletsyncValidation::IsSyncedBulletsyncGeometryAcceptable(player->GetPosition(), player->GetOccupiedVehicle() != nullptr, packet.m_start,
-                                                                          packet.m_end, fWeaponRange))
+                                                                        packet.m_end, fWeaponRange))
         return;
 
     CLuaArguments args;

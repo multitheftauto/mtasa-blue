@@ -24,10 +24,10 @@ namespace SyncBulletsyncValidation
     inline constexpr float PED_WEAPON_ORIGIN_MAX_OFFSET = 5.0f;
     inline constexpr float VEHICLE_WEAPON_ORIGIN_MAX_OFFSET = 25.0f;
 
-    inline constexpr float         MAX_DAMAGE = 200.0f;
-    inline constexpr unsigned char MAX_BODY_ZONE = 9;
-    inline constexpr float         WEAPON_RANGE_TOLERANCE = 1.15f;
-    inline constexpr unsigned int  MAX_PACKETS_PER_SECOND = 25;
+    inline constexpr float              MAX_DAMAGE = 200.0f;
+    inline constexpr unsigned char      MAX_BODY_ZONE = 9;
+    inline constexpr float              WEAPON_RANGE_TOLERANCE = 1.15f;
+    inline constexpr unsigned int       MAX_PACKETS_PER_SECOND = 25;
     inline constexpr unsigned long long RATE_WINDOW_MS = 1000;
 
     inline float DistanceSquared3D(const CVector& vecA, const CVector& vecB) noexcept
