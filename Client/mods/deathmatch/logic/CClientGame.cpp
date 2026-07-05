@@ -3942,6 +3942,9 @@ void CClientGame::PreWorldProcessHandler()
 
 void CClientGame::PostWorldProcessHandler()
 {
+    if (m_pManager->IsGameLoaded())
+        m_pManager->GetPedManager()->ReapplyScriptRotations();
+
     m_pManager->GetMarkerManager()->DoPulse();
     m_pManager->GetPointLightsManager()->DoPulse();
     m_pManager->GetObjectManager()->DoPulse();
@@ -3958,6 +3961,9 @@ void CClientGame::PostWorldProcessHandler()
 
 void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
 {
+    if (m_pManager->IsGameLoaded())
+        m_pManager->GetPedManager()->ReapplyScriptRotations();
+
     CLuaArguments Arguments;
     m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
 }
