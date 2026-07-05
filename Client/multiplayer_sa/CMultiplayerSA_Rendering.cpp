@@ -157,32 +157,60 @@ inner:
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 
-// Returns the alpha of the first material in the entity's first atomic geometry.
-// MTA's setElementAlpha (via FUNC_SetRwObjectAlpha) sets material alpha on all
-// materials. Checking just the first is sufficient to detect the low-alpha case.
-static BYTE GetEntityFirstMaterialAlpha(CEntitySAInterface* pEntity)
+// #425: the game sets ALPHAREF before the entity render call (140 in
+// RenderEverythingBarRoads, 100 in CVisibilityPlugins::RenderEntity), alpha func is
+// GREATER. MTA applies setElementAlpha by scaling material alpha during the render,
+// so at element alpha A every pixel lands at (texel * A / 255) and the object drops
+// below the ref once A <= 140 or A <= 100 depending on path. lowering the refs
+// globally is what smeared the LV neon textures (#4996), so scale the ref for this
+// entity only: ref' = ref * A / 255. both sides of the compare scale equally, cutouts
+// keep their shape and ref' < A so the object never fully vanishes. restored in the
+// Post handler. player peds, cars and bikes set ref 1 and restore it inside their
+// own Render fns. boats and trains never did, so vehicles get the same scaling,
+// for cars and bikes it's a no-op since their own ref write lands after ours.
+static bool  ms_bAlphaTestRefOverridden = false;
+static DWORD ms_dwSavedAlphaTestRef = 0;
+
+static void OverrideAlphaTestRefForElementAlpha(CEntitySAInterface* pEntity)
 {
-    RwObject* pRwObj = reinterpret_cast<RwObject*>(pEntity->m_pRwObject);
-    if (!pRwObj)
-        return 255;
+    unsigned char ucAlpha = 255;
 
-    RpAtomic* pAtomic = nullptr;
-    if (pRwObj->type == 1)  // rpATOMIC
+    if (pEntity->nType == ENTITY_TYPE_OBJECT)
     {
-        pAtomic = reinterpret_cast<RpAtomic*>(pRwObj);
+        SClientEntity<CObjectSA>* pObjectClientEntity = pGameInterface->GetPools()->GetObject((DWORD*)pEntity);
+        if (pObjectClientEntity && pObjectClientEntity->pEntity)
+            ucAlpha = pObjectClientEntity->pEntity->GetAlpha();
     }
-    else if (pRwObj->type == 2)  // rpCLUMP
+    else if (pEntity->nType == ENTITY_TYPE_VEHICLE)
     {
-        RpClump*     pClump = reinterpret_cast<RpClump*>(pRwObj);
-        RwListEntry* pEntry = pClump->atomics.root.next;
-        if (pEntry != &pClump->atomics.root)
-            pAtomic = reinterpret_cast<RpAtomic*>(reinterpret_cast<BYTE*>(pEntry) - offsetof(RpAtomic, globalClumps));
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pEntity);
+        if (pVehicleClientEntity && pVehicleClientEntity->pEntity)
+            ucAlpha = pVehicleClientEntity->pEntity->GetAlpha();
     }
 
-    if (pAtomic && pAtomic->geometry && pAtomic->geometry->materials.entries > 0)
-        return pAtomic->geometry->materials.materials[0]->color.a;
+    if (ucAlpha == 255)
+        return;
 
-    return 255;
+    // RwEngineInstance->dOpenDevice.fpRenderStateGet/fpRenderStateSet
+    DWORD engine = *(DWORD*)0xC97B24;
+    auto  fpGet = reinterpret_cast<BOOL(__cdecl*)(DWORD, void*)>(*(DWORD*)(engine + 0x24));
+    auto  fpSet = reinterpret_cast<BOOL(__cdecl*)(DWORD, void*)>(*(DWORD*)(engine + 0x20));
+
+    fpGet(0x1e /*rwRENDERSTATEALPHATESTFUNCTIONREF*/, &ms_dwSavedAlphaTestRef);
+    fpSet(0x1e /*rwRENDERSTATEALPHATESTFUNCTIONREF*/, reinterpret_cast<void*>(ms_dwSavedAlphaTestRef * ucAlpha / 255));
+    ms_bAlphaTestRefOverridden = true;
+}
+
+static void RestoreAlphaTestRef()
+{
+    if (!ms_bAlphaTestRefOverridden)
+        return;
+
+    ms_bAlphaTestRefOverridden = false;
+
+    DWORD engine = *(DWORD*)0xC97B24;
+    auto  fpSet = reinterpret_cast<BOOL(__cdecl*)(DWORD, void*)>(*(DWORD*)(engine + 0x20));
+    fpSet(0x1e /*rwRENDERSTATEALPHATESTFUNCTIONREF*/, reinterpret_cast<void*>(ms_dwSavedAlphaTestRef));
 }
 
 bool OnMY_CEntity_RenderOneNonRoad_Pre(CEntitySAInterface* pEntity)
@@ -190,22 +218,15 @@ bool OnMY_CEntity_RenderOneNonRoad_Pre(CEntitySAInterface* pEntity)
     ms_RenderingOneNonRoad = pEntity;
     CallGameEntityRenderHandler(ms_RenderingOneNonRoad);
 
-    // CVisibilityPlugins::RenderEntity just set ALPHAREF=100 (SA's original value) for
-    // this non-fading entity. If MTA's setElementAlpha assigned material alpha < 100,
-    // the entity would be invisible with ALPHAREF=100. Override to 0 in that case so
-    // the entity renders normally under alpha blending.
-    if (GetEntityFirstMaterialAlpha(pEntity) < 100)
-    {
-        DWORD engine = *(DWORD*)0xC97B24;
-        auto  fpSet = reinterpret_cast<BOOL(__cdecl*)(DWORD, void*)>(*(DWORD*)(engine + 0x20));
-        fpSet(0x1e /*rwRENDERSTATEALPHATESTFUNCTIONREF*/, nullptr);
-    }
+    OverrideAlphaTestRefForElementAlpha(pEntity);
 
     return IsEntityRenderable(pEntity);
 }
 
 void OnMY_CEntity_RenderOneNonRoad_Post(CEntitySAInterface* pEntity)
 {
+    RestoreAlphaTestRef();
+
     if (ms_RenderingOneNonRoad)
     {
         ms_RenderingOneNonRoad = NULL;
