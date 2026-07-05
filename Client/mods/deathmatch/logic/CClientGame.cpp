@@ -6160,6 +6160,9 @@ bool CClientGame::SetWorldSpecialProperty(const WorldSpecialProperty property, c
         case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
             SetVehicleEngineAutoStartEnabled(enabled);
             break;
+        case WorldSpecialProperty::PS2SCORCHEDVEHICLES:
+            g_pMultiplayer->SetPs2ScorchedVehiclesEnabled(enabled);
+            break;
         default:
             return false;
     }
@@ -6208,6 +6211,8 @@ bool CClientGame::IsWorldSpecialProperty(const WorldSpecialProperty property)
             return g_pGame->IsVehicleBurnExplosionsEnabled();
         case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
             return IsVehicleEngineAutoStartEnabled();
+        case WorldSpecialProperty::PS2SCORCHEDVEHICLES:
+            return g_pMultiplayer->IsPs2ScorchedVehiclesEnabled();
     }
 
     return false;
@@ -7013,6 +7018,7 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
         m_pVehicleManager->SetSpawnFlyingComponentEnabled(true);
         g_pGame->SetVehicleBurnExplosionsEnabled(true);
         SetVehicleEngineAutoStartEnabled(true);
+        g_pMultiplayer->SetPs2ScorchedVehiclesEnabled(false);
     }
 
     // Reset all setWorldProperty to default

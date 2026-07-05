@@ -120,6 +120,7 @@ ADD_ENUM(WorldSpecialProperty::IGNOREFIRESTATE, "ignorefirestate")
 ADD_ENUM(WorldSpecialProperty::FLYINGCOMPONENTS, "flyingcomponents")
 ADD_ENUM(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS, "vehicleburnexplosions")
 ADD_ENUM(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART, "vehicle_engine_autostart")
+ADD_ENUM(WorldSpecialProperty::PS2SCORCHEDVEHICLES, "ps2scorchedvehicles")
 IMPLEMENT_ENUM_CLASS_END("world-special-property")
 
 IMPLEMENT_ENUM_BEGIN(ePacketID)

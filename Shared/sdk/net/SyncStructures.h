@@ -1962,7 +1962,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
 {
     enum
     {
-        BITCOUNT = 20
+        BITCOUNT = 21
     };
 
     bool Read(NetBitStreamInterface& bitStream)
@@ -2009,6 +2009,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bool flyingcomponents : 1;
         bool vehicleburnexplosions : 1;
         bool vehicleEngineAutoStart : 1;
+        bool ps2ScorchedVehicles : 1;
     } data;
 
     // Add new ones in separate structs
@@ -2036,6 +2037,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data.flyingcomponents = true;
         data.vehicleburnexplosions = true;
         data.vehicleEngineAutoStart = true;
+        data.ps2ScorchedVehicles = false;
     }
 };
 

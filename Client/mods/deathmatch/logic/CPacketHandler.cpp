@@ -2438,6 +2438,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS, wsProps.data.flyingcomponents);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS, wsProps.data.vehicleburnexplosions);
     g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART, wsProps.data.vehicleEngineAutoStart);
+    g_pClientGame->SetWorldSpecialProperty(WorldSpecialProperty::PS2SCORCHEDVEHICLES, wsProps.data.ps2ScorchedVehicles);
 
     float fJetpackMaxHeight = 100;
     if (!bitStream.Read(fJetpackMaxHeight))
