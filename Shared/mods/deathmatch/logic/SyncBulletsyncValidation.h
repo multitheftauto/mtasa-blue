@@ -11,8 +11,8 @@
 
 #pragma once
 
-#include "CCommon.h"
-#include "CVector.h"
+#include <Common.h>
+#include <CVector.h>
 #include <cmath>
 
 namespace SyncBulletsyncValidation
