@@ -6641,8 +6641,8 @@ void SetModelSuspensionLines(CVehicleSAInterface* pVehicleIntf, void* pSuspensio
     pModelInfo->SetVehicleSuspensionData(pSuspensionLines);
 }
 
-static void*                     g_pPreRenderSavedSuspensionLines = nullptr;
-static CVehicleSAInterface*      g_pPreRenderSuspensionVehicle = nullptr;
+static void*                g_pPreRenderSavedSuspensionLines = nullptr;
+static CVehicleSAInterface* g_pPreRenderSuspensionVehicle = nullptr;
 
 static bool ShouldUsePrivateSuspensionLinesForPreRender(CVehicleSAInterface* pVehicleIntf)
 {
