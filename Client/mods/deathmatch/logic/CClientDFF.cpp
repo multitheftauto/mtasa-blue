@@ -335,6 +335,8 @@ void CClientDFF::ResetVehicleModelSpecialAbilities(unsigned short usModel)
     // Model special abilities depend on the current DFF/COL component layout. Clear explicit
     // overrides when that layout is replaced or restored so a reused model ID does not inherit
     // towtruck/packer behavior from the previous asset.
+    CClientVehicle::ResetModelSpecialAbilityDefault(usModel);
+
     CClientVehicleManager* vehicleManager = m_pManager->GetVehicleManager();
     for (auto iter = vehicleManager->IterBegin(); iter != vehicleManager->IterEnd(); ++iter)
     {

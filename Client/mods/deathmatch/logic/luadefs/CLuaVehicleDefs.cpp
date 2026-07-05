@@ -326,9 +326,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setSmokeTrailEnabled", "setVehicleSmokeTrailEnabled");
     lua_classfunction(luaVM, "setRotorState", "setVehicleRotorState");
     lua_classfunction(luaVM, "setSpecialAbility", "setVehicleSpecialAbility");
-    lua_classfunction(luaVM, "setModelSpecialAbility", "setVehicleModelSpecialAbility");
     lua_classfunction(luaVM, "getSpecialAbility", "getVehicleSpecialAbility");
-    lua_classfunction(luaVM, "getModelSpecialAbility", "getVehicleModelSpecialAbility");
     lua_classfunction(luaVM, "resetAudioSettings", "resetVehicleAudioSettings");
     lua_classfunction(luaVM, "setAudioSetting", "setVehicleAudioSetting");
 
@@ -2280,22 +2278,22 @@ bool CLuaVehicleDefs::SetVehicleWheelsRotation(CClientVehicle* pVehicle, float f
 
 bool CLuaVehicleDefs::SetVehicleSpecialAbility(CClientVehicle* pVehicle, std::string ability)
 {
-    return SetVehicleModelSpecialAbility(pVehicle, ability);
+    return pVehicle->SetModelSpecialAbility(SString(ability));
 }
 
-bool CLuaVehicleDefs::SetVehicleModelSpecialAbility(CClientVehicle* pVehicle, std::string ability)
+bool CLuaVehicleDefs::SetVehicleModelSpecialAbility(unsigned short model, std::string ability)
 {
-    return pVehicle->SetModelSpecialAbility(SString(ability));
+    return CClientVehicle::SetModelSpecialAbilityDefault(model, SString(ability));
 }
 
 std::string CLuaVehicleDefs::GetVehicleSpecialAbility(CClientVehicle* pVehicle)
 {
-    return GetVehicleModelSpecialAbility(pVehicle);
+    return pVehicle->GetModelSpecialAbility().c_str();
 }
 
-std::string CLuaVehicleDefs::GetVehicleModelSpecialAbility(CClientVehicle* pVehicle)
+std::string CLuaVehicleDefs::GetVehicleModelSpecialAbility(unsigned short model)
 {
-    return pVehicle->GetModelSpecialAbility().c_str();
+    return CClientVehicle::GetModelSpecialAbilityDefault(model).c_str();
 }
 
 int CLuaVehicleDefs::SetTrainDerailed(lua_State* luaVM)

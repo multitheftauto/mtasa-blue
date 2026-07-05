@@ -50,6 +50,7 @@ namespace
     };
 
     std::unordered_map<CClientVehicle*, SCustomPackerRampAudioState> g_customPackerRampAudioStates;
+    std::unordered_map<WORD, std::optional<WORD>>                   g_modelSpecialAbilityOverrides;
 
     CVector DecompressCollisionVector(const CCompressedVectorSA& vector)
     {
@@ -81,6 +82,29 @@ namespace
         vehicle->SetModelSpecialAbilityModel(model.value_or(0), model.has_value());
     }
 
+    bool ResolveModelSpecialAbility(const SString& ability, std::optional<WORD>& model)
+    {
+        const SString normalizedAbility = ability.ToLower();
+        if (normalizedAbility.empty() || normalizedAbility == "none")
+        {
+            model = std::nullopt;
+            return true;
+        }
+
+        if (normalizedAbility == "towtruck")
+            model = static_cast<WORD>(VehicleType::VT_TOWTRUCK);
+        else if (normalizedAbility == "packer")
+            model = static_cast<WORD>(VehicleType::VT_PACKER);
+        else if (normalizedAbility == "firetruckwater")
+            model = static_cast<WORD>(VehicleType::VT_FIRETRUK);
+        else if (normalizedAbility == "firetruckladder")
+            model = static_cast<WORD>(VehicleType::VT_FIRELA);
+        else
+            return false;
+
+        return true;
+    }
+
     const char* GetModelSpecialAbilityName(WORD model)
     {
         switch (static_cast<VehicleType>(model))
@@ -96,6 +120,29 @@ namespace
             default:
                 return "none";
         }
+    }
+
+    std::optional<WORD> GetNativeModelSpecialAbility(WORD model)
+    {
+        switch (static_cast<VehicleType>(model))
+        {
+            case VehicleType::VT_TOWTRUCK:
+            case VehicleType::VT_PACKER:
+            case VehicleType::VT_FIRETRUK:
+            case VehicleType::VT_FIRELA:
+                return model;
+            default:
+                return std::nullopt;
+        }
+    }
+
+    std::optional<WORD> GetModelSpecialAbilityOverride(WORD model)
+    {
+        const auto iter = g_modelSpecialAbilityOverrides.find(model);
+        if (iter != g_modelSpecialAbilityOverrides.end())
+            return iter->second;
+
+        return GetNativeModelSpecialAbility(model);
     }
 
     void StopCustomPackerRampSound(CClientVehicle* clientVehicle, CVehicle* vehicle)
@@ -1723,7 +1770,7 @@ void CClientVehicle::_SetAdjustablePropertyValue(unsigned short usValue)
                 // Resource-defined model abilities enter GTA's native moving-collision path through
                 // the ProcessControl hook. Calling UpdateMovingCollision here during stream-in can
                 // run before the custom model has all native state ready.
-                if (!m_modelSpecialAbilityModel)
+                if (!GetEffectiveModelSpecialAbilityModel())
                 {
                     float fAngle = (float)usValue / 2499.0f;
                     m_pVehicle->UpdateMovingCollision(fAngle);
@@ -2742,10 +2789,11 @@ void CClientVehicle::StreamedInPulse()
 
         Interpolate();
         ProcessDoorInterpolation();
-        UpdateCustomPackerRampAngle(this, m_pVehicle, m_modelSpecialAbilityModel);
-        UpdateCustomFireTruckWaterCannon(m_pVehicle, m_modelSpecialAbilityModel);
-        UpdateCustomFireTruckLadder(m_pVehicle, m_modelSpecialAbilityModel);
-        DrawModelSpecialAbilityDebug(this, m_pVehicle, m_modelSpecialAbilityModel);
+        const auto effectiveModelSpecialAbility = GetEffectiveModelSpecialAbilityModel();
+        UpdateCustomPackerRampAngle(this, m_pVehicle, effectiveModelSpecialAbility);
+        UpdateCustomFireTruckWaterCannon(m_pVehicle, effectiveModelSpecialAbility);
+        UpdateCustomFireTruckLadder(m_pVehicle, effectiveModelSpecialAbility);
+        DrawModelSpecialAbilityDebug(this, m_pVehicle, effectiveModelSpecialAbility);
 
         // Grab our current position
         CVector vecPosition = *m_pVehicle->GetPosition();
@@ -2903,7 +2951,7 @@ void CClientVehicle::Create()
             m_pVehicle = g_pGame->GetPools()->AddVehicle(this, m_usModel, m_ucVariation, m_ucVariation2);
         }
 
-        UpdateModelSpecialAbilityRegistration(m_pVehicle, m_modelSpecialAbilityModel);
+        UpdateModelSpecialAbilityRegistration(m_pVehicle, GetEffectiveModelSpecialAbilityModel());
 
         // Failed. Remove our reference to the vehicle model and return
         if (!m_pVehicle)
@@ -4981,8 +5029,11 @@ void CClientVehicle::RemoveVehicleSirens()
 
 bool CClientVehicle::SetModelSpecialAbility(const SString& ability)
 {
-    const SString normalizedAbility = ability.ToLower();
-    if (normalizedAbility.empty() || normalizedAbility == "none")
+    std::optional<WORD> specialAbilityModel;
+    if (!ResolveModelSpecialAbility(ability, specialAbilityModel))
+        return false;
+
+    if (!specialAbilityModel)
     {
         StopCustomPackerRampSound(this, m_pVehicle);
         m_hasModelSpecialAbilityOverride = true;
@@ -4998,18 +5049,6 @@ bool CClientVehicle::SetModelSpecialAbility(const SString& ability)
         return true;
     }
 
-    std::optional<WORD> specialAbilityModel;
-    if (normalizedAbility == "towtruck")
-        specialAbilityModel = static_cast<WORD>(VehicleType::VT_TOWTRUCK);
-    else if (normalizedAbility == "packer")
-        specialAbilityModel = static_cast<WORD>(VehicleType::VT_PACKER);
-    else if (normalizedAbility == "firetruckwater")
-        specialAbilityModel = static_cast<WORD>(VehicleType::VT_FIRETRUK);
-    else if (normalizedAbility == "firetruckladder")
-        specialAbilityModel = static_cast<WORD>(VehicleType::VT_FIRELA);
-    else
-        return false;
-
     // GTA gates these special component behaviors behind hard-coded model checks. Store the
     // original model that should drive those native paths, while keeping this vehicle's real
     // model ID intact for rendering and streaming.
@@ -5018,7 +5057,7 @@ bool CClientVehicle::SetModelSpecialAbility(const SString& ability)
     // ramp that can push the follow camera far above custom meshes.
     m_hasModelSpecialAbilityOverride = true;
     m_modelSpecialAbilityModel = specialAbilityModel;
-    UpdateModelSpecialAbilityRegistration(m_pVehicle, m_modelSpecialAbilityModel);
+    UpdateModelSpecialAbilityRegistration(m_pVehicle, GetEffectiveModelSpecialAbilityModel());
     return true;
 }
 
@@ -5028,7 +5067,7 @@ void CClientVehicle::ResetModelSpecialAbility()
     m_hasModelSpecialAbilityOverride = false;
     m_modelSpecialAbilityModel = std::nullopt;
     m_bHasAdjustableProperty = CClientVehicleManager::HasAdjustableProperty(m_usModel);
-    UpdateModelSpecialAbilityRegistration(m_pVehicle, std::nullopt);
+    UpdateModelSpecialAbilityRegistration(m_pVehicle, GetEffectiveModelSpecialAbilityModel());
 
     if (m_pVehicle)
     {
@@ -5045,7 +5084,63 @@ SString CClientVehicle::GetModelSpecialAbility() const
     if (m_hasModelSpecialAbilityOverride && !m_modelSpecialAbilityModel)
         return "none";
 
-    return GetModelSpecialAbilityName(m_modelSpecialAbilityModel.value_or(m_usModel));
+    const auto model = GetEffectiveModelSpecialAbilityModel();
+    return model ? GetModelSpecialAbilityName(*model) : "none";
+}
+
+std::optional<WORD> CClientVehicle::GetEffectiveModelSpecialAbilityModel() const
+{
+    if (m_hasModelSpecialAbilityOverride)
+        return m_modelSpecialAbilityModel;
+
+    return GetModelSpecialAbilityOverride(m_usModel);
+}
+
+bool CClientVehicle::SetModelSpecialAbilityDefault(WORD model, const SString& ability)
+{
+    std::optional<WORD> specialAbilityModel;
+    if (!ResolveModelSpecialAbility(ability, specialAbilityModel))
+        return false;
+
+    // Model-level abilities work like model handling: they are the default for vehicles with
+    // this model ID. Per-vehicle overrides stay authoritative for vehicles that already opted
+    // into a different behavior explicitly.
+    g_modelSpecialAbilityOverrides[model] = specialAbilityModel;
+
+    CClientVehicleManager* vehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
+    for (auto iter = vehicleManager->IterBegin(); iter != vehicleManager->IterEnd(); ++iter)
+    {
+        CClientVehicle* vehicle = *iter;
+        if (vehicle && vehicle->GetModel() == model && !vehicle->m_hasModelSpecialAbilityOverride)
+        {
+            StopCustomPackerRampSound(vehicle, vehicle->m_pVehicle);
+            UpdateModelSpecialAbilityRegistration(vehicle->m_pVehicle, vehicle->GetEffectiveModelSpecialAbilityModel());
+        }
+    }
+
+    return true;
+}
+
+void CClientVehicle::ResetModelSpecialAbilityDefault(WORD model)
+{
+    g_modelSpecialAbilityOverrides.erase(model);
+
+    CClientVehicleManager* vehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
+    for (auto iter = vehicleManager->IterBegin(); iter != vehicleManager->IterEnd(); ++iter)
+    {
+        CClientVehicle* vehicle = *iter;
+        if (vehicle && vehicle->GetModel() == model && !vehicle->m_hasModelSpecialAbilityOverride)
+        {
+            StopCustomPackerRampSound(vehicle, vehicle->m_pVehicle);
+            UpdateModelSpecialAbilityRegistration(vehicle->m_pVehicle, vehicle->GetEffectiveModelSpecialAbilityModel());
+        }
+    }
+}
+
+SString CClientVehicle::GetModelSpecialAbilityDefault(WORD model)
+{
+    const auto specialAbilityModel = GetModelSpecialAbilityOverride(model);
+    return specialAbilityModel ? GetModelSpecialAbilityName(*specialAbilityModel) : "none";
 }
 
 bool CClientVehicle::SetComponentPosition(const SString& vehicleComponent, CVector vecPosition, EComponentBaseType inputBase)

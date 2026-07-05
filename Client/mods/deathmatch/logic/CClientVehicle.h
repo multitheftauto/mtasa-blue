@@ -555,6 +555,11 @@ public:
     bool SetModelSpecialAbility(const SString& ability);
     void ResetModelSpecialAbility();
     SString GetModelSpecialAbility() const;
+    std::optional<WORD> GetEffectiveModelSpecialAbilityModel() const;
+
+    static bool    SetModelSpecialAbilityDefault(WORD model, const SString& ability);
+    static void    ResetModelSpecialAbilityDefault(WORD model);
+    static SString GetModelSpecialAbilityDefault(WORD model);
 
     bool SpawnFlyingComponent(const eCarNodes& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime);
 

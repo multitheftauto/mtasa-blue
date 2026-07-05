@@ -995,6 +995,7 @@ int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
         std::shared_ptr<CClientModel> pModel = modelManager->FindModelByID(iModelID);
         if (pModel && modelManager->Remove(pModel))
         {
+            CClientVehicle::ResetModelSpecialAbilityDefault(static_cast<WORD>(iModelID));
             lua_pushboolean(luaVM, true);
             return 1;
         }
