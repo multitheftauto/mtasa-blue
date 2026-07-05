@@ -48,7 +48,8 @@ namespace
         if (!bitStream.Can(eBitStreamVersion::ClientLuaEventSequence))
             return true;
 
-        return bitStream.Write(g_pClientGame->GetNextClientLuaEventSequence());
+        bitStream.Write(g_pClientGame->GetNextClientLuaEventSequence());
+        return true;
     }
 
     void CommitClientLuaEventSequence()
