@@ -79,6 +79,8 @@ void CPedRPCs::SetPedRotation(CClientEntity* pSource, NetBitStreamInterface& bit
 
             if (!IS_PLAYER(pPed))
                 pPed->SetCameraRotation(rotation.data.fRotation);
+            else if (pPed->IsLocalPlayer() && g_pClientGame && !g_pClientGame->GetCamera()->IsInFixedMode())
+                pPed->SetCameraRotation(rotation.data.fRotation);
             pPed->SetSyncTimeContext(ucTimeContext);
         }
     }
