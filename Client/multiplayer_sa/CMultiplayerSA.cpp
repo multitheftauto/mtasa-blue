@@ -1576,23 +1576,6 @@ void CMultiplayerSA::InitHooks()
     MemCpy((void*)0x53A23F, "\x33\xC0\x90\x90\x90", 5);
     MemCpy((void*)0x53A00A, "\x33\xC0\x90\x90\x90", 5);
 
-    // Fix objects with alpha below 141 are invisible (#425)
-    // Original SA values: 0x553AD9=140, 0x732C2F=100. These are passed to
-    // RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, value).
-    //
-    // 0x553AD9 (RenderEverythingBarRoads initial ALPHAREF): set to 1 so
-    // fully-transparent pixels are rejected without breaking low-alpha objects
-    // that don't pass through RenderEntity's per-entity override.
-    //
-    // 0x732C2F (RenderEntity non-fading path): restored to SA's original 100.
-    // MTA's prior patch of 1 made neon light texture gradients (alpha 1-99) pass
-    // the test and render as a wide blurry band instead of a thin bright line.
-    // Entities with MTA custom material alpha < 100 (set via setElementAlpha) are
-    // handled per-entity in OnMY_CEntity_RenderOneNonRoad_Pre, which overrides
-    // ALPHAREF to 0 for those entities so they remain visible.
-    MemPut<BYTE>(0x553AD9, 1);
-    MemPut<BYTE>(0x732C2F, 100);
-
     InitHooks_CrashFixHacks();
     InitHooks_DeviceSelection();
 
