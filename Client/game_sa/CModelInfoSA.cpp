@@ -179,14 +179,13 @@ namespace
         if (!pSphere || pSphere->radius <= 0.0f)
             return true;
 
-        CMatrix matrixLTM;
+        CMatrix  matrixLTM;
         RwFrame* pFrame = RpAtomicGetFrame(pAtomic);
         if (pFrame)
             pGame->GetRenderWare()->RwMatrixToCMatrix(pFrame->ltm, matrixLTM);
 
-        const CVector vecCenter =
-            matrixLTM.TransformVector(CVector(pSphere->position.x, pSphere->position.y, pSphere->position.z));
-        const float fRadius = pSphere->radius * GetMatrixMaxScale(matrixLTM);
+        const CVector vecCenter = matrixLTM.TransformVector(CVector(pSphere->position.x, pSphere->position.y, pSphere->position.z));
+        const float   fRadius = pSphere->radius * GetMatrixMaxScale(matrixLTM);
 
         IncludeSphereInBounds(*static_cast<SBoundsAccum*>(pData), vecCenter, fRadius);
         return true;
@@ -211,7 +210,7 @@ namespace
 
         return false;
     }
-}            // namespace
+}  // namespace
 
 CModelInfoSA::CModelInfoSA()
 {
@@ -2015,8 +2014,8 @@ void CModelInfoSA::UpdateBoundsFromRwObject()
         return;
 
     CColModelSAInterface* pColModel = pInterface->pColModel;
-    const CVector           vecCenter = (accum.vecMin + accum.vecMax) * 0.5f;
-    const CVector           vecHalfSize = (accum.vecMax - accum.vecMin) * 0.5f;
+    const CVector         vecCenter = (accum.vecMin + accum.vecMax) * 0.5f;
+    const CVector         vecHalfSize = (accum.vecMax - accum.vecMin) * 0.5f;
 
     pColModel->m_bounds.m_vecMin = accum.vecMin;
     pColModel->m_bounds.m_vecMax = accum.vecMax;
