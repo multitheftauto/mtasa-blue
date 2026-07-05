@@ -257,10 +257,9 @@ bool CSimPlayerManager::HandlePlayerPureSync(const NetServerPlayerID& Socket, Ne
         }
 
         // Read the incoming packet data
-        CSimPlayerPuresyncPacket* pPacket =
-            new CSimPlayerPuresyncPacket(pSourceSimPlayer->m_PlayerID, pSourceSimPlayer->m_usLatency, pSourceSimPlayer->m_ucSyncTimeContext,
-                                         pSourceSimPlayer->m_ucWeaponType, pSourceSimPlayer->m_fWeaponRange, pSourceSimPlayer->m_sharedControllerState,
-                                         pSourceSimPlayer);
+        CSimPlayerPuresyncPacket* pPacket = new CSimPlayerPuresyncPacket(
+            pSourceSimPlayer->m_PlayerID, pSourceSimPlayer->m_usLatency, pSourceSimPlayer->m_ucSyncTimeContext, pSourceSimPlayer->m_ucWeaponType,
+            pSourceSimPlayer->m_fWeaponRange, pSourceSimPlayer->m_sharedControllerState, pSourceSimPlayer);
         if (pPacket->Read(*BitStream))
         {
             // Relay it to nearbyers

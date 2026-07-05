@@ -39,8 +39,8 @@ inline bool IsSyncedVelocityAcceptable(const CVector& vecVelocity, int iMaxSpeed
 // Anti-cheat: validate that an on-foot player could not have moved vecLast->vecNew in ullElapsedMs.
 // Cheats forge position in outgoing puresync without moving locally; this catches position-only
 // launches even when the velocity field is omitted from the packet.
-inline bool IsSyncedPositionDeltaAcceptable(const CVector& vecLastPosition, const CVector& vecNewPosition, unsigned long long ullElapsedMs,
-                                            int iMaxSpeedKmh, float fMarginMultiplier = 1.35f)
+inline bool IsSyncedPositionDeltaAcceptable(const CVector& vecLastPosition, const CVector& vecNewPosition, unsigned long long ullElapsedMs, int iMaxSpeedKmh,
+                                            float fMarginMultiplier = 1.35f)
 {
     if (iMaxSpeedKmh <= 0)
         return true;

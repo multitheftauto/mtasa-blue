@@ -255,8 +255,8 @@ public:
     float GetGravity() { return m_fGravity; }
     void  SetGravity(float fGravity) { m_fGravity = fGravity; }
 
-    CVehicle*    GetOccupiedVehicle() { return m_pVehicle; };
-    unsigned int GetOccupiedVehicleSeat() { return m_uiVehicleSeat; };
+    CVehicle*         GetOccupiedVehicle() { return m_pVehicle; };
+    unsigned int      GetOccupiedVehicleSeat() { return m_uiVehicleSeat; };
     virtual CVehicle* SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat);
 
     unsigned int GetVehicleAction() { return m_uiVehicleAction; };

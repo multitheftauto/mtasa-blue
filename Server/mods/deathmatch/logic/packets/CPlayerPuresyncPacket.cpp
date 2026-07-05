@@ -177,7 +177,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         if (!BitStream.Read(&rotation))
             return false;
 
-        CVector vecPacketVelocity;
+        CVector    vecPacketVelocity;
         const bool bSyncingVelocity = flags.data.bSyncingVelocity;
         if (bSyncingVelocity)
         {
@@ -200,16 +200,13 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
                                          pSourcePlayer->GetLastAcceptedPuresyncContactElementID(), vecSyncRelativePosition, position.data.vecPosition,
                                          pSourcePlayer->GetLastAcceptedPuresyncContactRelative(), pSourcePlayer->GetLastAcceptedPuresyncPosition(),
                                          vecServerContactRelative, pSourcePlayer->GetContactElement(), pContactElement,
-                                         pSourcePlayer->HasLastAcceptedPuresyncPosition(), pSourcePlayer->GetPosition(), vecReferencePosition,
-                                         vecNewPosition);
+                                         pSourcePlayer->HasLastAcceptedPuresyncPosition(), pSourcePlayer->GetPosition(), vecReferencePosition, vecNewPosition);
 
-            const unsigned long long ullElapsedMs = pSourcePlayer->HasLastAcceptedPuresyncPosition()
-                                                        ? GetTickCount64_() - pSourcePlayer->GetLastAcceptedPuresyncTick()
-                                                        : 0;
+            const unsigned long long ullElapsedMs =
+                pSourcePlayer->HasLastAcceptedPuresyncPosition() ? GetTickCount64_() - pSourcePlayer->GetLastAcceptedPuresyncTick() : 0;
 
-            if (!IsPlayerPuresyncMovementAcceptable(vecReferencePosition, ullElapsedMs, g_TickRateSettings.iPureSync, vecNewPosition,
-                                                    bSyncingVelocity, vecPacketVelocity, g_TickRateSettings.iPlayerMaxSyncSpeed,
-                                                    pSourcePlayer->GetTeleported()))
+            if (!IsPlayerPuresyncMovementAcceptable(vecReferencePosition, ullElapsedMs, g_TickRateSettings.iPureSync, vecNewPosition, bSyncingVelocity,
+                                                    vecPacketVelocity, g_TickRateSettings.iPlayerMaxSyncSpeed, pSourcePlayer->GetTeleported()))
             {
                 return false;
             }

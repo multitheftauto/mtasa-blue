@@ -134,12 +134,12 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
         CVector vecReferencePosition;
         CVector vecNewPosition;
-        ResolvePuresyncMovementDelta(
-            bVehicleContact, m_Cache.flags.data.bHasContact ? m_Cache.ContactElementID : INVALID_ELEMENT_ID,
-            m_pSimPlayer->m_LastAcceptedPuresyncContactElementID, m_Cache.Position, vecAbsolutePosition,
-            m_pSimPlayer->m_vecLastAcceptedPuresyncContactRelative, m_pSimPlayer->m_vecLastAcceptedPuresyncPosition, vecServerContactRelative,
-            pServerContactElement, pContactElement, m_pSimPlayer->m_bHasLastAcceptedPuresyncPosition,
-            m_pSimPlayer->m_pRealPlayer ? m_pSimPlayer->m_pRealPlayer->GetPosition() : vecAbsolutePosition, vecReferencePosition, vecNewPosition);
+        ResolvePuresyncMovementDelta(bVehicleContact, m_Cache.flags.data.bHasContact ? m_Cache.ContactElementID : INVALID_ELEMENT_ID,
+                                     m_pSimPlayer->m_LastAcceptedPuresyncContactElementID, m_Cache.Position, vecAbsolutePosition,
+                                     m_pSimPlayer->m_vecLastAcceptedPuresyncContactRelative, m_pSimPlayer->m_vecLastAcceptedPuresyncPosition,
+                                     vecServerContactRelative, pServerContactElement, pContactElement, m_pSimPlayer->m_bHasLastAcceptedPuresyncPosition,
+                                     m_pSimPlayer->m_pRealPlayer ? m_pSimPlayer->m_pRealPlayer->GetPosition() : vecAbsolutePosition, vecReferencePosition,
+                                     vecNewPosition);
 
         const unsigned long long ullElapsedMs =
             m_pSimPlayer->m_bHasLastAcceptedPuresyncPosition ? GetTickCount64_() - m_pSimPlayer->m_ullLastAcceptedPuresyncTick : 0;
