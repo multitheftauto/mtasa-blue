@@ -1192,6 +1192,16 @@ void CClientEntity::DoAttaching()
 
         if (!SetMatrix(returnMatrix))
             SetPosition(returnMatrix.vPos);
+
+        // The game only recalculates an entity's surface brightness from its surroundings
+        // while it's not attached to anything (see CObject::PreRender), so an attached
+        // entity would otherwise stay stuck at its default (too bright) value forever.
+        // Keep it in sync with whatever it's attached to every frame, same as vanilla
+        // hand-held objects already do with their owning ped.
+        CPhysical* pThisPhysical = dynamic_cast<CPhysical*>(GetGameEntity());
+        CPhysical* pAttachedToPhysical = dynamic_cast<CPhysical*>(m_pAttachedToEntity->GetGameEntity());
+        if (pThisPhysical && pAttachedToPhysical)
+            pThisPhysical->SetLighting(pAttachedToPhysical->GetLighting());
     }
 }
 
