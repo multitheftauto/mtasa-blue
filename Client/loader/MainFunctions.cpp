@@ -2005,6 +2005,15 @@ int LaunchGame(SString strCmdLine)
                 }
             }
 
+            // Diagnostic: detect rapid process exit before loading screen appeared
+            if (status != WAIT_TIMEOUT && WatchDogIsSectionOpen("L3"))
+            {
+                DWORD dwEarlyExitCode = 0;
+                GetExitCodeProcess(piLoadee.hProcess, &dwEarlyExitCode);
+                WriteDebugEvent(SString("Loader - Process exited (code %lu) before loading screen appeared", dwEarlyExitCode));
+                AddReportLog(7103, SString("Loader - Premature exit (code %lu) - possible missing runtime dependencies or injection failure", dwEarlyExitCode));
+            }
+
             HideSplash();
 
             // Handle process if stuck at startup
