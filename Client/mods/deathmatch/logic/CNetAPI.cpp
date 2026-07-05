@@ -2319,8 +2319,7 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
     const float  fWeaponRange = pWeaponStat ? pWeaponStat->GetWeaponRange() : 0.0f;
     CVector      playerPosition;
     player->GetPosition(playerPosition);
-    if (!SyncBulletsyncValidation::IsSyncedBulletsyncGeometryAcceptable(playerPosition, player->GetOccupiedVehicle() != nullptr, start, end,
-                                                                        fWeaponRange))
+    if (!SyncBulletsyncValidation::IsSyncedBulletsyncGeometryAcceptable(playerPosition, player->GetOccupiedVehicle() != nullptr, start, end, fWeaponRange))
         return;
 
     std::uint8_t order = 0;
