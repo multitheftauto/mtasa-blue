@@ -205,6 +205,7 @@ static void RestoreAlphaTestRef()
 {
     if (!ms_bAlphaTestRefOverridden)
         return;
+
     ms_bAlphaTestRefOverridden = false;
 
     DWORD engine = *(DWORD*)0xC97B24;

@@ -1576,10 +1576,6 @@ void CMultiplayerSA::InitHooks()
     MemCpy((void*)0x53A23F, "\x33\xC0\x90\x90\x90", 5);
     MemCpy((void*)0x53A00A, "\x33\xC0\x90\x90\x90", 5);
 
-    // SA alpha test refs (0x553AD9=140, 0x732C2F=100) stay at stock values, lowering them
-    // smears alpha gradient textures (LV neon, #4996). low alpha elements are handled per
-    // entity in OnMY_CEntity_RenderOneNonRoad_Pre (#425).
-
     InitHooks_CrashFixHacks();
     InitHooks_DeviceSelection();
 
