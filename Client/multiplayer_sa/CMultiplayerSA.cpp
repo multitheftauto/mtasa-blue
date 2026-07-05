@@ -189,6 +189,12 @@ DWORD RETURN_CHandlingData_isNotFWD = 0x6A04C3;
 #define CALL_CMonsterTruck_ProcessEntityCollision 0x6C8B9E
 DWORD RETURN_ProcessEntityCollision = 0x4185C0;
 
+// CAutomobile::PreRender entry - swap per-model suspension lines to per-vehicle private
+// data before the wheel positioning block reads them (same pattern as collision hook).
+#define HOOKPOS_CAutomobile_PreRender  0x6AAB50
+#define HOOKSIZE_CAutomobile_PreRender 5
+DWORD RETURN_CAutomobile_PreRender = 0x6AAB55;
+
 #define HOOKPOS_PreFxRender 0x049E650
 DWORD RETURN_PreFxRender = 0x0404D1E;
 
@@ -418,6 +424,7 @@ ObjectBreakHandler*                        m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler*                m_pFxSystemDestructionHandler = NULL;
 DrivebyAnimationHandler*                   m_pDrivebyAnimationHandler = NULL;
 AudioZoneRadioSwitchHandler*               m_pAudioZoneRadioSwitchHandler = NULL;
+VehicleAutomobilePostPreRenderHandler*     m_pVehicleAutomobilePostPreRenderHandler = nullptr;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
 CEntitySAInterface* activeEntityForStreaming = 0;  // the entity that the streaming system considers active
@@ -2727,6 +2734,11 @@ void CMultiplayerSA::SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandle
 void CMultiplayerSA::SetAudioZoneRadioSwitchHandler(AudioZoneRadioSwitchHandler* pHandler)
 {
     m_pAudioZoneRadioSwitchHandler = pHandler;
+}
+
+void CMultiplayerSA::SetVehicleAutomobilePostPreRenderHandler(VehicleAutomobilePostPreRenderHandler* pHandler)
+{
+    m_pVehicleAutomobilePostPreRenderHandler = pHandler;
 }
 
 // What we do here is check if the idle handler has been set
@@ -6628,6 +6640,55 @@ void SetModelSuspensionLines(CVehicleSAInterface* pVehicleIntf, void* pSuspensio
     CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicleIntf->m_pVehicle->GetModelIndex());
     pModelInfo->SetVehicleSuspensionData(pSuspensionLines);
 }
+
+static void*                     g_pPreRenderSavedSuspensionLines = nullptr;
+static CVehicleSAInterface*      g_pPreRenderSuspensionVehicle = nullptr;
+
+static bool ShouldUsePrivateSuspensionLinesForPreRender(CVehicleSAInterface* pVehicleIntf)
+{
+    if (!pVehicleIntf)
+        return false;
+
+    CVehicle* pVehicle = pVehicleIntf->m_pVehicle;
+    if (!pVehicle)
+        return false;
+
+    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
+    return pModelInfo && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck());
+}
+
+static void __cdecl BeginAutomobilePreRenderSuspension(CVehicleSAInterface* pVehicleIntf)
+{
+    if (!ShouldUsePrivateSuspensionLinesForPreRender(pVehicleIntf))
+        return;
+
+    g_pPreRenderSavedSuspensionLines = SetModelSuspensionLinesToVehiclePrivate(pVehicleIntf);
+    g_pPreRenderSuspensionVehicle = pVehicleIntf;
+}
+
+static void __declspec(naked) HOOK_CAutomobile_PreRenderStart()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // Replaced bytes at 0x6AAB50: sub esp, 74h; push ebx; push esi
+    // clang-format off
+    __asm
+    {
+        sub     esp, 74h
+        push    ebx
+        push    esi
+
+        pushad
+        push    ecx
+        call    BeginAutomobilePreRenderSuspension
+        add     esp, 4
+        popad
+
+        jmp     RETURN_CAutomobile_PreRender
+    }
+    // clang-format on
+}
+
 // Some variables.
 DWORD                dwSuspensionChangedJump = 0x4185C0;
 bool                 bSuspensionChanged = false;
@@ -6722,6 +6783,23 @@ void CMultiplayerSA::UpdateVehicleSuspension() const noexcept
 {
     HookInstallCall(CALL_CAutomobile_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
     HookInstallCall(CALL_CMonsterTruck_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
+    HookInstall(HOOKPOS_CAutomobile_PreRender, reinterpret_cast<DWORD>(HOOK_CAutomobile_PreRenderStart), HOOKSIZE_CAutomobile_PreRender);
+}
+
+void CMultiplayerSA::RestoreVehicleSuspensionAfterAutomobilePreRender(CEntitySAInterface* pVehicleIntf)
+{
+    auto* pVehicle = static_cast<CVehicleSAInterface*>(pVehicleIntf);
+
+    // Restore the per-model suspension lines that were swapped at PreRender entry.
+    if (pVehicle && pVehicle == g_pPreRenderSuspensionVehicle && g_pPreRenderSavedSuspensionLines)
+    {
+        SetModelSuspensionLines(pVehicle, g_pPreRenderSavedSuspensionLines);
+        g_pPreRenderSavedSuspensionLines = nullptr;
+        g_pPreRenderSuspensionVehicle = nullptr;
+    }
+
+    if (m_pVehicleAutomobilePostPreRenderHandler)
+        m_pVehicleAutomobilePostPreRenderHandler(pVehicleIntf);
 }
 
 // Variables

@@ -4641,6 +4641,26 @@ void CClientVehicle::RemoveVehicleSirens()
     m_tSirenBeaconInfo.m_ucSirenCount = 0;
 }
 
+void CClientVehicle::ApplyWheelComponentPositionsAfterPreRender()
+{
+    if (!m_pVehicle)
+        return;
+
+    // PreRender overwrites wheel dummy Z from suspension lines every frame; re-apply
+    // script offsets after the wheel block so setVehicleComponentPosition Z sticks.
+    static const char* wheelComponents[] = {"wheel_lf_dummy", "wheel_rf_dummy", "wheel_lb_dummy", "wheel_rb_dummy"};
+
+    for (const char* componentName : wheelComponents)
+    {
+        const auto it = m_ComponentData.find(componentName);
+        if (it == m_ComponentData.end() || !it->second.m_bPositionChanged)
+            continue;
+
+        if (it->second.m_vecOriginalComponentPosition != it->second.m_vecComponentPosition)
+            SetComponentPosition(componentName, it->second.m_vecComponentPosition);
+    }
+}
+
 bool CClientVehicle::SetComponentPosition(const SString& vehicleComponent, CVector vecPosition, EComponentBaseType inputBase)
 {
     // Ensure position is parent relative

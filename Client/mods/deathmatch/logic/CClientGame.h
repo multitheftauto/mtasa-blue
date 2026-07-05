@@ -581,6 +581,7 @@ private:
     static void                              StaticPreWorldProcessHandler();
     static void                              StaticPostWorldProcessHandler();
     static void                              StaticPostWorldProcessPedsAfterPreRenderHandler();
+    static void                              StaticVehicleAutomobilePostPreRenderHandler(CEntitySAInterface* pVehicle);
     static void                              StaticPreFxRenderHandler();
     static void                              StaticPostColorFilterRenderHandler();
     static void                              StaticPreHudRenderHandler();

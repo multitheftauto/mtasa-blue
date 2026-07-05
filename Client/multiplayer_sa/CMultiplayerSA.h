@@ -320,6 +320,8 @@ public:
     CLimits* GetLimits() { return &m_limits; }
 
     void UpdateVehicleSuspension() const noexcept;
+    void RestoreVehicleSuspensionAfterAutomobilePreRender(CEntitySAInterface* pVehicleIntf) override;
+    void SetVehicleAutomobilePostPreRenderHandler(VehicleAutomobilePostPreRenderHandler* pHandler) override;
 
     virtual void FlushClothesCache();
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading);
