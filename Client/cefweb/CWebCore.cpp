@@ -167,9 +167,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
 
     if (bIsElevated && !std::getenv("WINE"))
     {
-        AddReportLog(8021, "WARNING: Process is running with elevated privileges (Administrator)");
-        AddReportLog(8022, "CEF browser features may not work correctly when running as Administrator");
-        AddReportLog(8023, "Consider running MTA without Administrator privileges for full browser functionality");
         g_pCore->GetConsole()->Printf("WARNING: Running as Administrator - browser features may be limited");
     }
 
@@ -443,7 +440,20 @@ void CWebCore::DoEventQueuePulse()
         event.callback();
     }
 
-    // Invoke paint method if necessary on the main thread
+    // Request new frames from CEF using external begin frame scheduling
+    // This synchronizes CEF rendering with MTA's render loop, eliminating
+    // the previous 250ms blocking wait in OnPaint
+    for (auto& view : m_WebViews)
+    {
+        if (view->IsBeingDestroyed() || view->GetRenderingPaused())
+            continue;
+
+        auto browser = view->GetCefBrowser();
+        if (browser)
+            browser->GetHost()->SendExternalBeginFrame();
+    }
+
+    // Copy rendered data to D3D textures on the main thread
     for (auto& view : m_WebViews)
     {
         view->UpdateTexture();

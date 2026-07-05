@@ -184,6 +184,8 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_bSunbathing = false;
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
+    m_bProcessingWeaponFireEvent = false;
+    m_bDeferredGangDrivebyAbort = false;
 
     m_pAnimationBlock = NULL;
     m_bRequestedAnimation = false;
@@ -2417,8 +2419,13 @@ eMovementState CClientPed::GetMovementState()
         GetControllerState(cs);
 
         // Get his current task(s)
-        const char* szComplexTaskName = GetTaskManager()->GetActiveTask()->GetTaskName();
-        const char* szSimpleTaskName = GetTaskManager()->GetSimplestActiveTask()->GetTaskName();
+        CTask* pActiveTask = GetTaskManager()->GetActiveTask();
+        CTask* pSimplestTask = GetTaskManager()->GetSimplestActiveTask();
+        if (!pActiveTask || !pSimplestTask)
+            return MOVEMENTSTATE_UNKNOWN;
+
+        const char* szComplexTaskName = pActiveTask->GetTaskName();
+        const char* szSimpleTaskName = pSimplestTask->GetTaskName();
 
         // Check tasks
         if (strcmp(szSimpleTaskName, "TASK_SIMPLE_CLIMB") == 0)  // Is he climbing?
@@ -2477,7 +2484,7 @@ eMovementState CClientPed::GetMovementState()
         }
         else
         {
-            // Is he moving the contoller at all?
+            // Is he moving the controller at all?
             if (cs.LeftStickX == 0 && cs.LeftStickY == 0)
                 return MOVEMENTSTATE_CROUCH;
             else
@@ -2758,6 +2765,15 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 
         if (m_bPendingRebuildPlayer)
             ProcessRebuildPlayer(true);
+
+        // Run any gang driveby abort deferred by SetDoingGangDriveby(false).
+        if (m_bDeferredGangDrivebyAbort)
+        {
+            m_bDeferredGangDrivebyAbort = false;
+            CTask* primaryTask = m_pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
+            if (primaryTask && primaryTask->GetTaskType() == TASK_SIMPLE_GANG_DRIVEBY)
+                primaryTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
+        }
 
         CControllerState Current;
         GetControllerState(Current);
@@ -4103,7 +4119,7 @@ void CClientPed::RebuildModel(bool bDelayChange)
         // We are CJ?
         if (m_ulModel == 0)
         {
-            // Adds only the neccesary textures
+            // Adds only the necessary textures
             m_pClothes->RefreshClothes();
             m_pClothes->AddAllToModel();
 
@@ -5700,7 +5716,15 @@ void CClientPed::SetDoingGangDriveby(bool bDriveby)
     {
         if (!bDriveby)
         {
-            primaryTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
+            if (m_bProcessingWeaponFireEvent)
+            {
+                // Aborting now would re-enter the task's own native ProcessPed() and crash.
+                m_bDeferredGangDrivebyAbort = true;
+            }
+            else
+            {
+                primaryTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
+            }
         }
     }
     else if (bDriveby)
@@ -5789,7 +5813,7 @@ bool CClientPed::IsAnimationInProgress()
 }
 
 void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
-                                   bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
+                                   bool bInterruptible, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -5831,8 +5855,8 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
                 flags |= 0x80;
             }
 
-            // Kill any higher priority tasks if we dont want this anim interuptable
-            if (!bInterruptable)
+            // Kill any higher priority tasks if we dont want this anim interruptible
+            if (!bInterruptible)
             {
                 KillTask(TASK_PRIORITY_PHYSICAL_RESPONSE);
                 KillTask(TASK_PRIORITY_EVENT_RESPONSE_TEMP);
@@ -5842,7 +5866,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
             if (!bFreezeLastFrame)
                 flags |= 0x08;  // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
             float  fBlendDelta = 1 / std::max((float)iBlend, 1.0f) * 1000;
-            CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleRunNamedAnim(szAnimName, pBlock->GetName(), flags, fBlendDelta, iTime, !bInterruptable,
+            CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleRunNamedAnim(szAnimName, pBlock->GetName(), flags, fBlendDelta, iTime, !bInterruptible,
                                                                              bRunInSequence, bOffsetPed, bHoldLastFrame);
             if (pTask)
             {
@@ -5871,7 +5895,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     m_AnimationCache.iBlend = iBlend;
     m_AnimationCache.bLoop = bLoop;
     m_AnimationCache.bUpdatePosition = bUpdatePosition;
-    m_AnimationCache.bInterruptable = bInterruptable;
+    m_AnimationCache.bInterruptible = bInterruptible;
     m_AnimationCache.bFreezeLastFrame = bFreezeLastFrame;
 }
 
@@ -5916,7 +5940,7 @@ void CClientPed::RunAnimationFromCache()
 
     // Run our animation
     RunNamedAnimation(m_pAnimationBlock, animName.c_str(), m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
-                      m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
+                      m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptible, m_AnimationCache.bFreezeLastFrame);
 
     // Set anim progress & speed
     m_AnimationCache.progressWaitForStreamIn = true;
@@ -6331,7 +6355,7 @@ void CClientPed::RestoreAllAnimations()
                 auto pAnimStaticAssociation = pAnimationManager->GetAnimStaticAssociation(iGroupID, iAnimID);
                 if (pAnimStaticAssociation && pAnimHierarchy->IsCustom())
                 {
-                    auto pAnimHierarchyInterface = pAnimStaticAssociation->GetAnimHierachyInterface();
+                    auto pAnimHierarchyInterface = pAnimStaticAssociation->GetAnimHierarchyInterface();
                     CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface, pAnimHierarchyInterface);
                 }
             }
@@ -7241,7 +7265,8 @@ void CClientPed::RunClimbingTask()
     if (!climbEntity)
         return;
 
-    CTaskSimpleClimb* climbTask = g_pGame->GetTasks()->CreateTaskSimpleClimb(climbEntity, climbPos, climbAngle, surfaceType, eClimbHeights::CLIMB_GRAB, false);
+    CTaskSimpleClimb* climbTask = g_pGame->GetTasks()->CreateTaskSimpleClimb(climbEntity, climbPos, climbAngle, static_cast<unsigned char>(surfaceType),
+                                                                             eClimbHeights::CLIMB_GRAB, false);
     if (!climbTask)
         return;
 

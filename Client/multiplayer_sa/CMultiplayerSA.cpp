@@ -23,8 +23,6 @@ class CEventDamageSAInterface;
 extern CCoreInterface* g_pCore;
 extern CMultiplayerSA* pMultiplayer;
 
-void ProcessDeferredStreamingMemoryRelief();
-
 using namespace std;
 
 char* CMultiplayerSA::ms_PlayerImgCachePtr = NULL;
@@ -90,6 +88,9 @@ DWORD RETURN_CTrafficLights_DisplayActualLight = 0x49E1FF;
 
 #define HOOKPOS_CGame_Process 0x53C095
 DWORD RETURN_CGame_Process = 0x53C09F;
+
+#define CALL_CWeather_Update_FromCGameProcess 0x53BFC2
+DWORD FUNC_CWeather_Update = 0x72B850;
 
 #define HOOKPOS_Idle 0x53E981
 DWORD RETURN_Idle = 0x53E98B;
@@ -301,6 +302,8 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
 #define HOOKPOS_CCollision__CheckCameraCollisionObjects 0x41AB8E
 
+#define HOOKPOS_CMirrors__CreateBuffer 0x72701D
+
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
 FLOAT         fFalseHeading;
@@ -401,6 +404,7 @@ ExplosionHandler*                          m_pExplosionHandler = NULL;
 BreakTowLinkHandler*                       m_pBreakTowLinkHandler = NULL;
 DrawRadarAreasHandler*                     m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler*                      m_pRender3DStuffHandler = NULL;
+PreWeatherUpdateHandler*                   m_pPreWeatherUpdateHandler = NULL;
 PreWorldProcessHandler*                    m_pPreWorldProcessHandler = NULL;
 PostWorldProcessHandler*                   m_pPostWorldProcessHandler = NULL;
 PostWorldProcessPedsAfterPreRenderHandler* m_postWorldProcessPedsAfterPreRenderHandler = nullptr;
@@ -464,6 +468,7 @@ void HOOK_CFire_ProcessFire();
 void HOOK_CExplosion_Update();
 void HOOK_CWeapon_FireAreaEffect();
 void HOOK_CGame_Process();
+void HOOK_CWeather_Update();
 void HOOK_Idle();
 void HOOK_RenderScene_Plants();
 void HOOK_RenderScene_end();
@@ -568,6 +573,8 @@ void HOOK_CWeapon__TakePhotograph();
 
 void HOOK_CCollision__CheckCameraCollisionObjects();
 
+void HOOK_CMirrors__CreateBuffer();
+
 CMultiplayerSA::CMultiplayerSA()
 {
     // Unprotect all of the GTASA code at once and leave it that way
@@ -599,13 +606,6 @@ CMultiplayerSA::CMultiplayerSA()
     m_dwLastStaticAnimID = eAnimID::ANIM_ID_WALK;
     m_grassCloseDistance = DEFAULT_GRASS_CLOSE_DISTANCE;
     m_grassFarDistance = DEFAULT_GRASS_FAR_DISTANCE;
-}
-
-CMultiplayerSA::~CMultiplayerSA()
-{
-    // Cleanup hooks that require explicit resource deallocation
-    // This is to prevent resource leaks
-    CleanupHooks_HookDestructors();
 }
 
 void CMultiplayerSA::InitHooks()
@@ -675,6 +675,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CExplosion_Update, (DWORD)HOOK_CExplosion_Update, 5);
     HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
+    HookInstallCall(CALL_CWeather_Update_FromCGameProcess, (DWORD)HOOK_CWeather_Update);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
@@ -775,6 +776,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWeapon__TakePhotograph, (DWORD)HOOK_CWeapon__TakePhotograph, 3 + 2);
 
     HookInstall(HOOKPOS_CCollision__CheckCameraCollisionObjects, (DWORD)HOOK_CCollision__CheckCameraCollisionObjects, 6 + 4);
+
+    // Fix mirror rendering when anti-aliasing is enabled
+    HookInstall(HOOKPOS_CMirrors__CreateBuffer, (DWORD)HOOK_CMirrors__CreateBuffer, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, 10);
@@ -1032,8 +1036,8 @@ void CMultiplayerSA::InitHooks()
     MemPut<BYTE>(0x44C39A + 4, 0x00);
     MemPut<BYTE>(0x44C39A + 5, 0x00);
 
-    // Avoid garage doors closing when you change your model
-    MemSet((LPVOID)0x4486F7, 0x90, 4);
+    // Disable CGarages::PlayerArrestedOrDied to stop the game from automatically closing/opening garages
+    MemSet((void*)0x442303, 0x90, 5);
 
     // Disable CStats::IncrementStat (returns at start of function)
     MemPut<BYTE>(0x55C180, 0xC3);
@@ -1567,17 +1571,30 @@ void CMultiplayerSA::InitHooks()
     MemSet((void*)0x6C444B, 0x90, 6);
     MemSet((void*)0x6C4453, 0x90, 0x68);
 
-    // Disable Z position changes in the matrix in the C3dMarkers::PlaceMarker (#4000, #536)
-    // To prevent arrow-type markers from snapping to the ground
-    MemCpy((void*)0x725844, "\xDD\xD8\x90", 3);
-    MemCpy((void*)0x725619, "\xDD\xD8\x90", 3);
-    MemCpy((void*)0x72565A, "\xDD\xD8\x90", 3);
-    MemCpy((void*)0x7259B0, "\xDD\xD8\x90", 3);
-    MemSet((void*)0x7258B8, 0x90, 6);
+    // Allow model ID 432 (Rhino) to render headlight cones and coronas
+    MemSet((void*)0x6A2EAB, 0x90, 6);
+    MemSet((void*)0x6ABC81, 0x90, 6);
 
     // Disable spreading fires (Moved from multiplayer_shotsync)
     MemCpy((void*)0x53A23F, "\x33\xC0\x90\x90\x90", 5);
     MemCpy((void*)0x53A00A, "\x33\xC0\x90\x90\x90", 5);
+
+    // Fix objects with alpha below 141 are invisible (#425)
+    // Original SA values: 0x553AD9=140, 0x732C2F=100. These are passed to
+    // RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, value).
+    //
+    // 0x553AD9 (RenderEverythingBarRoads initial ALPHAREF): set to 1 so
+    // fully-transparent pixels are rejected without breaking low-alpha objects
+    // that don't pass through RenderEntity's per-entity override.
+    //
+    // 0x732C2F (RenderEntity non-fading path): restored to SA's original 100.
+    // MTA's prior patch of 1 made neon light texture gradients (alpha 1-99) pass
+    // the test and render as a wide blurry band instead of a thin bright line.
+    // Entities with MTA custom material alpha < 100 (set via setElementAlpha) are
+    // handled per-entity in OnMY_CEntity_RenderOneNonRoad_Pre, which overrides
+    // ALPHAREF to 0 for those entities so they remain visible.
+    MemPut<BYTE>(0x553AD9, 1);
+    MemPut<BYTE>(0x732C2F, 100);
 
     InitHooks_CrashFixHacks();
     InitHooks_DeviceSelection();
@@ -2705,6 +2722,11 @@ void CMultiplayerSA::SetChokingHandler(ChokingHandler* pChokingHandler)
     m_pChokingHandler = pChokingHandler;
 }
 
+void CMultiplayerSA::SetPreWeatherUpdateHandler(PreWeatherUpdateHandler* pHandler)
+{
+    m_pPreWeatherUpdateHandler = pHandler;
+}
+
 void CMultiplayerSA::SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler)
 {
     m_pPreWorldProcessHandler = pHandler;
@@ -3565,20 +3587,25 @@ static void __declspec(naked) HOOK_Render3DStuff()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // Run GTA's Render3DStuff first (it draws sun/moon flare, coronas, etc.
+    // with loose depth testing). Invoking the handler afterwards lets it
+    // render on top, so script-drawn models aren't bled through by the moon.
     // clang-format off
     __asm
     {
         pushad
+        mov  eax, FUNC_Render3DStuff
+        call eax
     }
     // clang-format on
+
     if (m_pRender3DStuffHandler) m_pRender3DStuffHandler();
 
     // clang-format off
     __asm
     {
         popad
-        mov eax, FUNC_Render3DStuff
-        jmp eax
+        ret
     }
     // clang-format on
 }
@@ -4213,7 +4240,7 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
         // Get weapon type before pushad to avoid stack offset corruption
         mov     al, [esp+0x8]
         mov     ucChokingWeaponType, al
-        
+
         pushad
 
         mov     ebx, [m_pChokingHandler]
@@ -4230,7 +4257,7 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
         jnz     continueWithOriginalCode
         popad
         jmp     dwChokingDontchoke
-    
+
         continueWithOriginalCode:
         popad
         mov     ecx, [edi]
@@ -5056,6 +5083,24 @@ static void __declspec(naked) HOOK_VehicleCamLookDir1()
         call VehicleCamLookDir1
         add esp, 8
 
+        // The lateral-velocity sqrt at 0x524F23/0x524F29 inside
+        // CCam::Process_FollowCar_SA peaks at depth 8 on the x87 stack with
+        // zero margin. If MSVC's codegen for the matInvertGravity * vec
+        // expression above leaves any tagged register behind, that block
+        // overflows and (with IM masked) writes the floating-point
+        // indefinite into the lateral magnitude, which then propagates
+        // through the NaN-blind fcom/jp/jnz clamps into m_fBetaSpeed and
+        // m_fHorizontalAngle. Empty the x87 stack here so vanilla SA
+        // resumes at depth 0 like it was authored to expect (#3979).
+        ffree st(0)
+        ffree st(1)
+        ffree st(2)
+        ffree st(3)
+        ffree st(4)
+        ffree st(5)
+        ffree st(6)
+        ffree st(7)
+
         jmp RETURN_VehicleCamLookDir1
     }
     // clang-format on
@@ -5368,6 +5413,36 @@ static void __declspec(naked) HOOK_ApplyCarBlowHop()
 
 // ---------------------------------------------------
 
+static void Pre_CWeather_Update()
+{
+    if (m_pPreWeatherUpdateHandler)
+        m_pPreWeatherUpdateHandler();
+}
+
+// Replaces the `call CWeather::Update` site at 0x53BFC2 inside CGame::Process so that
+// MTA can re-apply its blended weather state before the engine reads it. CWeather::Update
+// detects a clock wrap when setTime() jumps the game clock past InterpolationValue and
+// derives Rain/Foggyness/CloudCoverage/SunGlare/etc. from a freshly-picked weather pair —
+// values that drive cloud, fog and night-time building light rendering. Restoring MTA's
+// state here keeps that wrap branch from firing.
+static void __declspec(naked) HOOK_CWeather_Update()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        call    Pre_CWeather_Update
+        popad
+
+        mov     eax, FUNC_CWeather_Update
+        call    eax
+        ret
+    }
+    // clang-format on
+}
+
 static void Pre_CGame_Process()
 {
     TIMING_CHECKPOINT("+CWorld_Process");
@@ -5415,9 +5490,6 @@ void __cdecl HandleIdle()
         LogEvent(567, "aAnimAssocGroups", "CAnimManager::ms_aAnimAssocGroups Address",
                  SString("CAnimManager::ms_aAnimAssocGroups = %#.8x", *(DWORD*)dwAnimGroupArrayAddress), 567);
     }
-
-    ProcessDeferredStreamingMemoryRelief();
-
     m_pIdleHandler();
 }
 
@@ -6614,39 +6686,14 @@ void* SetModelSuspensionLinesToVehiclePrivate(CVehicleSAInterface* pVehicleIntf)
 {
     // Set the per-model suspension line data of the vehicle's model to the per-vehicle
     // suspension line data so that collision processing will use that instead.
-    CVehicle* pVehicle = pVehicleIntf->m_pVehicle;
-    if (!pVehicle)
-        return nullptr;
-
+    CVehicle*   pVehicle = pVehicleIntf->m_pVehicle;
     CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
-    if (!pModelInfo)
-        return nullptr;
-
-    void* pOriginalSuspensionLines = pModelInfo->GetVehicleSuspensionData();
-    if (!pOriginalSuspensionLines)
-        return nullptr;
-
-    void* pPrivateSuspensionLines = pVehicle->GetPrivateSuspensionLines();
-    if (!pPrivateSuspensionLines)
-        return nullptr;
-
-    pModelInfo->SetVehicleSuspensionData(pPrivateSuspensionLines);
-    return pOriginalSuspensionLines;
+    return pModelInfo->SetVehicleSuspensionData(pVehicle->GetPrivateSuspensionLines());
 }
 
 void SetModelSuspensionLines(CVehicleSAInterface* pVehicleIntf, void* pSuspensionLines)
 {
-    if (!pVehicleIntf || !pSuspensionLines)
-        return;
-
-    CVehicle* pVehicle = pVehicleIntf->m_pVehicle;
-    if (!pVehicle)
-        return;
-
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
-    if (!pModelInfo)
-        return;
-
+    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicleIntf->m_pVehicle->GetModelIndex());
     pModelInfo->SetVehicleSuspensionData(pSuspensionLines);
 }
 // Some variables.
@@ -6664,7 +6711,7 @@ bool                 CheckHasSuspensionChanged()
             return false;
 
         CModelInfo* pModelInfo = pGameInterface->GetModelInfo(pVehicle->GetModelIndex());
-        if (pModelInfo && pModelInfo->GetInterface() && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck()))
+        if (pModelInfo && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck()))
             return true;
         else
             return false;
@@ -8215,6 +8262,41 @@ static void __declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
 
     out1: jmp   RETURN_CCollision__CheckCameraCollisionObjects
     out2: jmp   RETURN_CCollision__CheckCameraCollisionObjects_2
+    }
+    // clang-format on
+}
+
+const DWORD RETURN_CMirrors__CreateBuffer = 0x727022;
+
+void CreateMirrorBuffer()
+{
+    // preserve the MSAA values
+    DWORD oldMSAAValues[2] = {*reinterpret_cast<DWORD*>(0xC9C050), *reinterpret_cast<DWORD*>(0xC9C054)};
+
+    // set them to 0 so that the Rw raster textures create correctly
+    MemPutFast<DWORD>(0xC9C050, 0);
+    MemPutFast<DWORD>(0xC9C054, 0);
+
+    // CMirrors::CreateBuffer
+    reinterpret_cast<void(__cdecl*)()>(0x7230A0)();
+
+    // restore the MSAA values
+    MemPutFast<DWORD>(0xC9C050, oldMSAAValues[0]);
+    MemPutFast<DWORD>(0xC9C054, oldMSAAValues[1]);
+}
+
+static void __declspec(naked) HOOK_CMirrors__CreateBuffer()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad;
+        call CreateMirrorBuffer;
+        popad;
+
+        jmp RETURN_CMirrors__CreateBuffer;
     }
     // clang-format on
 }

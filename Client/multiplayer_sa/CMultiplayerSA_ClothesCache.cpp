@@ -138,24 +138,10 @@ public:
     uint GetNumCached()
     {
         uint uiNumCached = 0;
-        for (SSavedClumpInfo& info : savedClumpList)
+        for (std::vector<SSavedClumpInfo>::iterator iter = savedClumpList.begin(); iter != savedClumpList.end(); ++iter)
         {
-            if (!info.pClump || !info.pClump->atomics.root.next) [[unlikely]]
-                continue;
-
-            if (info.pClump->atomics.root.next == &info.pClump->atomics.root) [[unlikely]]
-                continue;
-
-            // Container_of pattern: RwLLLink at offset 0x8 in RpAtomic
-            char*     pListNode = reinterpret_cast<char*>(info.pClump->atomics.root.next);
-            RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pListNode - 0x8);
-
-            if (!SharedUtil::IsReadablePointer(pAtomic, sizeof(RpAtomic))) [[unlikely]]
-                continue;
-
-            RpGeometry* pGeometry = pAtomic->geometry;
-            if (!pGeometry) [[unlikely]]
-                continue;
+            SSavedClumpInfo& info = *iter;
+            RpGeometry*      pGeometry = ((RpAtomic*)((info.pClump->atomics.root.next) - 0x8))->geometry;
 #ifdef CLOTHES_REF_TEST
             if (pGeometry->refs < 21)
             {
@@ -203,17 +189,8 @@ public:
         SSavedClumpInfo info;
         info.pClump = pClumpCopy;
 #ifdef CLOTHES_REF_TEST
-        if (info.pClump && info.pClump->atomics.root.next && info.pClump->atomics.root.next != &info.pClump->atomics.root)
-        {
-            char*     pListNode = reinterpret_cast<char*>(info.pClump->atomics.root.next);
-            RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pListNode - 0x8);
-            if (SharedUtil::IsReadablePointer(pAtomic, sizeof(RpAtomic)))
-            {
-                RpGeometry* pGeometry = pAtomic->geometry;
-                if (pGeometry)
-                    pGeometry->refs += 20;
-            }
-        }
+        RpGeometry* pGeometry = ((RpAtomic*)((info.pClump->atomics.root.next) - 0x8))->geometry;
+        pGeometry->refs += 20;
 #endif
 
         info.clothedDesc = *pClothesDesc;
@@ -249,54 +226,42 @@ public:
     ///////////////////////////////////////
     bool RemoveOldestUnused()
     {
-        uint        uiBestAge = static_cast<uint>(-1);
-        std::size_t bestIndex = savedClumpList.size();
+        uint                                   uiBestAge = -1;
+        std::vector<SSavedClumpInfo>::iterator uiBestIndex;
 
         CTickCount timeNow = CTickCount::Now();
-        for (std::size_t i = 0; i < savedClumpList.size(); ++i)
+        for (std::vector<SSavedClumpInfo>::iterator iter = savedClumpList.begin(); iter != savedClumpList.end(); ++iter)
         {
-            const SSavedClumpInfo& info = savedClumpList[i];
+            const SSavedClumpInfo& info = *iter;
             if (info.bUnused)
             {
                 uint uiAge = (timeNow - info.timeUnused).ToInt();
                 if (uiAge > m_uiMinCacheTime)
                 {
-                    const bool isFirstCandidate = (bestIndex == savedClumpList.size());
-                    if (isFirstCandidate || uiAge > uiBestAge)
+                    if (uiAge > uiBestAge || uiBestAge == -1)
                     {
                         uiBestAge = uiAge;
-                        bestIndex = i;
+                        uiBestIndex = iter;
                     }
                 }
             }
         }
 
-        if (bestIndex == savedClumpList.size())
+        if (uiBestAge == -1)
             return false;
 
-        const SSavedClumpInfo& info = savedClumpList[bestIndex];
-
-        if (!info.bUnused)
-            return false;
+        const SSavedClumpInfo& info = *uiBestIndex;
 
 #ifdef CLOTHES_REF_TEST
-        if (info.pClump && info.pClump->atomics.root.next && info.pClump->atomics.root.next != &info.pClump->atomics.root)
-        {
-            char*     pListNode = reinterpret_cast<char*>(info.pClump->atomics.root.next);
-            RpAtomic* pAtomic = reinterpret_cast<RpAtomic*>(pListNode - 0x8);
-            if (SharedUtil::IsReadablePointer(pAtomic, sizeof(RpAtomic)))
-            {
-                RpGeometry* pGeometry = pAtomic->geometry;
-                if (pGeometry && pGeometry->refs >= 20)
-                    pGeometry->refs -= 20;
-            }
-        }
+        RpGeometry* pGeometry = ((RpAtomic*)((info.pClump->atomics.root.next) - 0x8))->geometry;
+        pGeometry->refs -= 20;
 #endif
         RpClumpDestroy(info.pClump);
+        assert(info.bUnused);
         m_Stats.uiNumTotal--;
         m_Stats.uiNumUnused--;
         m_Stats.uiNumRemoved++;
-        savedClumpList.erase(savedClumpList.begin() + static_cast<std::ptrdiff_t>(bestIndex));
+        savedClumpList.erase(uiBestIndex);
         return true;
     }
 
@@ -308,8 +273,9 @@ public:
     ///////////////////////////////////////
     RpClump* FindMatchAndUse(CPedClothesDesc* pClothesDesc)
     {
-        for (SSavedClumpInfo& info : savedClumpList)
+        for (std::vector<SSavedClumpInfo>::iterator iter = savedClumpList.begin(); iter != savedClumpList.end(); ++iter)
         {
+            SSavedClumpInfo& info = *iter;
             if (info.iCacheRevision != m_iCacheRevision)
                 continue;  // Don't match if it was generated with different custom clothes textures
 

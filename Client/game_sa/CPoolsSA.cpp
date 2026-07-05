@@ -81,34 +81,33 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
     if (m_vehiclePool.ulCount >= MAX_VEHICLES)
         return nullptr;
 
+    // Ensure collision model is fully loaded to prevent crash at 0x002a65ef in SetupSuspensionLines
     CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(model));
-    if (!pModelInfo)
+    if (!pModelInfo || !pModelInfo->GetInterface())
         return nullptr;
-
-    if (!pModelInfo->GetInterface())
-    {
-        pGame->GetStreaming()->RequestModel(model, 0x16);
-        pGame->GetStreaming()->LoadAllRequestedModels(true, "CPoolsSA::AddVehicle");
-        if (!pModelInfo->GetInterface())
-            return nullptr;
-    }
 
     CBaseModelInfoSAInterface* pModelInterface = pModelInfo->GetInterface();
 
     if (!pModelInterface->pColModel)
     {
+        // Collision model pointer is NULL - try loading
         pGame->GetStreaming()->LoadAllRequestedModels(false, "CPoolsSA::AddVehicle");
 
-        pModelInterface = pModelInfo->GetInterface();
-        if (!pModelInterface)
-            return nullptr;
-
+        // Re-check after loading - still NULL means loading failed
         if (!pModelInterface->pColModel)
             return nullptr;
     }
 
-    // Note: Vehicles with custom DFFs (no embedded collision) are handled in CModelInfoSA::SetCustomModel
-    // where collision is reloaded after SetClump to restore pool-managed collision data
+    // Check if collision data (m_pColData) is loaded
+    if (!pModelInterface->pColModel->m_data)
+    {
+        // Collision data not loaded - force load
+        pGame->GetStreaming()->LoadAllRequestedModels(false, "CPoolsSA::AddVehicle");
+
+        // Re-check after loading - still not loaded means loading failed
+        if (!pModelInterface->pColModel->m_data)
+            return nullptr;
+    }
 
     MemSetFast((void*)VAR_CVehicle_Variation1, variation, 1);
     MemSetFast((void*)VAR_CVehicle_Variation2, variation2, 1);
@@ -222,7 +221,12 @@ SClientEntity<CVehicleSA>* CPoolsSA::GetVehicle(DWORD* pGameInterface)
 
             if (dwElementIndexInPool < MAX_VEHICLES)
             {
-                return &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
+                // Return only if MTA has an entity for this slot
+                SClientEntity<CVehicleSA>* pSlot = &m_vehiclePool.arrayOfClientEntities[dwElementIndexInPool];
+                if (!pSlot->pEntity)
+                    return nullptr;
+
+                return pSlot;
             }
         }
     }
@@ -274,21 +278,6 @@ CObject* CPoolsSA::AddObject(CClientObject* pClientObject, DWORD dwModelID, bool
 
     if (m_objectPool.ulCount < MAX_OBJECTS)
     {
-        CModelInfoSA* pModelInfo = static_cast<CModelInfoSA*>(pGame->GetModelInfo(dwModelID));
-        if (!pModelInfo)
-            return nullptr;
-
-        if (!pModelInfo->GetInterface())
-        {
-            pGame->GetStreaming()->RequestModel(dwModelID, 0x16);
-            pGame->GetStreaming()->LoadAllRequestedModels(true, "CPoolsSA::AddObject");
-            if (!pModelInfo->GetInterface())
-            {
-                AddReportLog(5552, SString("Failed to create object with model %d - model invalid or deallocated", dwModelID));
-                return nullptr;
-            }
-        }
-
         pObject = new (std::nothrow) CObjectSA(dwModelID, bBreakingDisabled);
 
         if (pObject && AddObjectToPool(pClientObject, pObject))
@@ -354,7 +343,12 @@ SClientEntity<CObjectSA>* CPoolsSA::GetObject(DWORD* pGameInterface)
 
         if (dwElementIndexInPool < MAX_OBJECTS)
         {
-            return &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
+            // Return only if MTA has an entity for this slot
+            SClientEntity<CObjectSA>* pSlot = &m_objectPool.arrayOfClientEntities[dwElementIndexInPool];
+            if (!pSlot->pEntity)
+                return nullptr;
+
+            return pSlot;
         }
     }
     return nullptr;
@@ -384,6 +378,30 @@ void CPoolsSA::DeleteAllObjects()
         CObjectSA* pObject = m_objectPool.arrayOfClientEntities[m_objectPool.ulCount - 1].pEntity;
 
         RemoveObject(pObject);
+    }
+}
+
+//
+// Detached car parts (e.g. doors spawned by CAutomobile::SpawnFlyingComponent) keep the model
+// index of the vehicle they came from, so CObject::Render can repaint them with that vehicle's
+// colours and CObject's destructor can release its model reference. Called when a vehicle model
+// info is deallocated, so the parts can't dereference the freed model info anymore.
+//
+void CPoolsSA::ResetDetachedCarPartsRefModel(std::uint16_t usModelID) noexcept
+{
+    CPoolSAInterface<CObjectSAInterface>* pObjectPool = *m_ppObjectPoolInterface;
+
+    for (int i = 0; i < pObjectPool->m_nSize; i++)
+    {
+        if (pObjectPool->IsEmpty(i))
+            continue;
+
+        CObjectSAInterface* pObject = pObjectPool->GetObject(i);
+        if (pObject->sRefModelIndex == static_cast<short>(usModelID))
+        {
+            pObject->sRefModelIndex = -1;
+            pObject->bChangesVehColor = false;
+        }
     }
 }
 
@@ -523,7 +541,12 @@ SClientEntity<CPedSA>* CPoolsSA::GetPed(DWORD* pGameInterface)
 
         if (dwElementIndexInPool < MAX_PEDS)
         {
-            return &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
+            // Return only if MTA has an entity for this slot
+            SClientEntity<CPedSA>* pSlot = &m_pedPool.arrayOfClientEntities[dwElementIndexInPool];
+            if (!pSlot->pEntity)
+                return nullptr;
+
+            return pSlot;
         }
     }
     return nullptr;
@@ -550,6 +573,7 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetPed;
 
+    // clang-format off
     __asm {
         mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
         push    dwGameRef
@@ -557,6 +581,7 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
         add     esp, 0x4
         mov     dwReturn, eax
     }
+    // clang-format on
 
     CPedSAInterface* pInterface = (CPedSAInterface*)dwReturn;
     return pInterface;
@@ -784,38 +809,10 @@ uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
 
     unsigned int NUMBER_OF_MODELS = pGame->GetBaseIDforTXD();
 
-    auto isValidPtr = [](const void* ptr) noexcept -> bool
-    {
-        if (!ptr)
-            return false;
-
-        __try
-        {
-            const auto* p = static_cast<const CBaseModelInfoSAInterface*>(ptr);
-            const auto* v = p->VFTBL;
-            if (!v)
-                return false;
-
-            volatile DWORD test = v->Destructor;
-            static_cast<void>(test);
-            return true;
-        }
-        __except (EXCEPTION_EXECUTE_HANDLER)
-        {
-            return false;
-        }
-    };
-
     for (uint i = 1; i < NUMBER_OF_MODELS; i++)
     {
-        CBaseModelInfoSAInterface* pInterface = ppModelInfo[i];
-        if (!pInterface)
-            continue;
-
-        if (!isValidPtr(pInterface))
-            continue;
-
-        if (pInterface->pRwObject == (RwObject*)pRpClump)
+        CBaseModelInfoSAInterface* m_pInterface = ppModelInfo[i];
+        if (m_pInterface && m_pInterface->pRwObject == (RwObject*)pRpClump)
         {
             return i;
         }

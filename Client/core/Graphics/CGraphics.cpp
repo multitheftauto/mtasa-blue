@@ -27,6 +27,40 @@ extern std::atomic<bool> g_bInMTAScene;
 
 using namespace std;
 
+namespace
+{
+    // Convert a straight-alpha ARGB tint into its premultiplied form:
+    //
+    //     (R, G, B, A)  ->  (R*A/255, G*A/255, B*A/255, A)
+    //
+    // Needed when routing a translucent draw onto the (ONE, INVSRCALPHA)
+    // pipeline. That pipeline computes
+    //
+    //     out.rgb = src.rgb + dst.rgb * (1 - src.a)
+    //
+    // with src.rgb = tex.rgb * diff.rgb and src.a = tex.a * diff.a, so
+    // diff.a never enters the source rgb term. For a PM texel tex.rgb =
+    // R*A_tex, that leaves
+    //
+    //     out.rgb = R * A_tex * diff.rgb + dst.rgb * (1 - A_tex * diff.a)
+    //
+    // which is brighter than the correct PM composite by a factor of
+    // 1/diff.a during a fade. Premultiplying the diffuse here
+    // (diff.rgb *= diff.a) restores the missing factor and the equation
+    // reduces exactly to the PM "over" operator.
+    inline SColor PremultiplyAlpha(SColor c) noexcept
+    {
+        if (c.A == 0xFF)
+            return c;
+
+        const uint a = c.A;
+        c.R = static_cast<unsigned char>((c.R * a + 127) / 255);
+        c.G = static_cast<unsigned char>((c.G * a + 127) / 255);
+        c.B = static_cast<unsigned char>((c.B * a + 127) / 255);
+        return c;
+    }
+}  // namespace
+
 template <>
 CGraphics* CSingleton<CGraphics>::m_pSingleton = NULL;
 
@@ -53,6 +87,7 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_ActiveBlendMode = EBlendMode::BLEND;
     m_CurDrawMode = EDrawMode::NONE;
     m_CurBlendMode = EBlendMode::BLEND;
+    m_bSkipMTARenderThisFrame = false;
     auto renderItemManager = std::make_unique<CRenderItemManager>();
     auto tileBatcher = std::make_unique<CTileBatcher>();
     auto line3DPreGUI = std::make_unique<CLine3DBatcher>(true);
@@ -783,7 +818,17 @@ void CGraphics::GetDXTextSize(CVector2D& vecSize, const char* szText, float fWid
             ulFormat |= DT_WORDBREAK;
 
         // Calculate the size of the text
-        RECT rect = {0, 0, static_cast<LONG>(fWidth / fScaleX), 0};
+        const float fRectRight = fWidth / fScaleX;
+        LONG        rectRight = 0;
+        if (fRectRight > 0.0f)
+        {
+            if (fRectRight >= static_cast<float>(LONG_MAX))
+                rectRight = LONG_MAX;
+            else
+                rectRight = static_cast<LONG>(fRectRight);
+        }
+
+        RECT rect = {0, 0, rectRight, 0};
         pDXFont->DrawTextW(nullptr, strText.c_str(), strText.length(), &rect, ulFormat, D3DCOLOR_XRGB(0, 0, 0));
 
         vecSize.fX = (rect.right - rect.left) * fScaleX;
@@ -1069,6 +1114,15 @@ void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice
     sDrawQueueItem Item;
     Item.eType = QUEUE_PRIMITIVEMATERIAL;
     Item.blendMode = m_ActiveBlendMode;
+    // Same PM auto-route as DrawTextureQueued, so dxDrawMaterialPrimitive
+    // composites SVG (premultiplied) textures correctly under default blend.
+    if (Item.blendMode == EBlendMode::BLEND && pMaterial && pMaterial->m_bPremultipliedAlpha)
+    {
+        Item.blendMode = EBlendMode::ADD;
+        // See PremultiplyAlpha for the diffuse premultiply rationale (#3828).
+        for (auto& vert : *pVecVertices)
+            vert.Color = PremultiplyAlpha(vert.Color);
+    }
     Item.PrimitiveMaterial.eType = eType;
     Item.PrimitiveMaterial.pMaterial = pMaterial;
     Item.PrimitiveMaterial.pVecVertices = pVecVertices;
@@ -1123,6 +1177,16 @@ void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeigh
     // Set up a queue item
     sDrawQueueItem Item;
     Item.blendMode = m_ActiveBlendMode;
+    // Premultiplied-alpha textures (SVG) need the (ONE, INVSRCALPHA) pipeline,
+    // not the straight-alpha BLEND mode. Route the default blend to ADD when
+    // the script hasn't asked for a specific mode (issue #4891), and convert
+    // the diffuse tint to PM so a translucent dxDrawImage call still fades
+    // correctly through that pipeline (issue #3828).
+    if (Item.blendMode == EBlendMode::BLEND && pMaterial && pMaterial->m_bPremultipliedAlpha)
+    {
+        Item.blendMode = EBlendMode::ADD;
+        ulColor = PremultiplyAlpha(ulColor);
+    }
     Item.Texture.fX = fX;
     Item.Texture.fY = fY;
     Item.Texture.fWidth = fWidth;
@@ -1553,6 +1617,17 @@ void CGraphics::DrawTexture(CTextureItem* pTexture, float fX, float fY, float fS
     if (!pTexture)
         return;
 
+    if (CRenderTargetItem* pRenderTarget = DynamicCast<CRenderTargetItem>(pTexture))
+    {
+        if (!pRenderTarget->TryEnsureValid())
+            return;
+    }
+    else if (CScreenSourceItem* pScreenSource = DynamicCast<CScreenSourceItem>(pTexture))
+    {
+        if (!pScreenSource->TryEnsureValid())
+            return;
+    }
+
     const float fSurfaceWidth = pTexture->m_uiSurfaceSizeX;
     const float fSurfaceHeight = pTexture->m_uiSurfaceSizeY;
     const float fFileWidth = pTexture->m_uiSizeX;
@@ -1648,8 +1723,15 @@ void CGraphics::OnDeviceInvalidate(IDirect3DDevice9* pDevice)
 
     m_pRenderItemManager->OnLostDevice();
     m_pScreenGrabber->OnLostDevice();
+    SAFE_RELEASE(m_pSavedStateBlock);
     SAFE_RELEASE(m_pSavedFrontBufferData);
     SAFE_RELEASE(m_pTempBackBufferData);
+
+    // Reset render zone tracking on device loss
+    m_MTARenderZone = MTA_RZONE_NONE;
+    m_iOutsideZoneCount = 0;
+    m_bRestoreViewportAfterMTA = false;
+    m_bRestoreScissorAfterMTA = false;
 }
 
 void CGraphics::OnDeviceRestore(IDirect3DDevice9* pDevice)
@@ -1674,6 +1756,19 @@ void CGraphics::OnDeviceRestore(IDirect3DDevice9* pDevice)
 
     m_pRenderItemManager->OnResetDevice();
     m_pScreenGrabber->OnResetDevice();
+
+    const uint uiViewportWidth = GetViewportWidth();
+    const uint uiViewportHeight = GetViewportHeight();
+    if (uiViewportWidth > 0 && uiViewportHeight > 0)
+    {
+        m_pRenderItemManager->OnViewportSizeChanged(uiViewportWidth, uiViewportHeight);
+        UpdateRenderTargetMatrices(uiViewportWidth, uiViewportHeight);
+        m_pAspectRatioConverter->Init(uiViewportHeight);
+    }
+    else
+    {
+        m_bPendingViewportRefresh = true;
+    }
 }
 
 void CGraphics::OnZBufferModified()
@@ -1846,6 +1941,29 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
         {
             if (CTextureItem* pTexture = DynamicCast<CTextureItem>(Item.Texture.pMaterial))
             {
+                if (CRenderTargetItem* pRenderTarget = DynamicCast<CRenderTargetItem>(pTexture))
+                {
+                    if (!pRenderTarget->TryEnsureValid())
+                    {
+                        RemoveQueueRef(Item.Texture.pMaterial);
+                        break;
+                    }
+                }
+                else if (CScreenSourceItem* pScreenSource = DynamicCast<CScreenSourceItem>(pTexture))
+                {
+                    if (!pScreenSource->TryEnsureValid())
+                    {
+                        RemoveQueueRef(Item.Texture.pMaterial);
+                        break;
+                    }
+                }
+
+                if (!pTexture->m_pD3DTexture)
+                {
+                    RemoveQueueRef(Item.Texture.pMaterial);
+                    break;
+                }
+
                 const sDrawQueueTexture& t = Item.Texture;
                 RECT                     cutImagePos;
                 const float              fSurfaceWidth = pTexture->m_uiSurfaceSizeX;
@@ -2000,9 +2118,162 @@ void CGraphics::OnChangingRenderTarget(uint uiNewViewportSizeX, uint uiNewViewpo
     // Flush dx draws
     DrawPreGUIQueue();
     // Inform batchers
+    UpdateRenderTargetMatrices(uiNewViewportSizeX, uiNewViewportSizeY);
+}
+
+void CGraphics::UpdateRenderTargetMatrices(uint uiNewViewportSizeX, uint uiNewViewportSizeY)
+{
     m_pTileBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
     m_pPrimitiveBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
     m_pPrimitiveMaterialBatcher->OnChangingRenderTarget(uiNewViewportSizeX, uiNewViewportSizeY);
+}
+
+void CGraphics::MarkViewportRefreshPending()
+{
+    m_bPendingViewportRefresh = true;
+    m_uiPendingViewportRefreshTries = 0;
+    m_bPendingBackbufferOverrideAttempted = false;
+    ++m_uiViewportRefreshSerial;
+    m_bForceFullViewportInMTA = false;
+    m_bForceFullScissorInMTA = false;
+}
+
+void CGraphics::RefreshViewportIfNeeded()
+{
+    if (m_pDevice == nullptr)
+        return;
+
+    const HRESULT hrCoop = m_pDevice->TestCooperativeLevel();
+    if (hrCoop != D3D_OK)
+    {
+        return;
+    }
+
+    D3DVIEWPORT9 viewport = {};
+    if (FAILED(m_pDevice->GetViewport(&viewport)) || viewport.Width == 0 || viewport.Height == 0)
+    {
+        return;
+    }
+
+    if (!m_pRenderItemManager || !m_pAspectRatioConverter)
+        return;
+
+    const uint uiCachedWidth = GetViewportWidth();
+    const uint uiCachedHeight = GetViewportHeight();
+    if (!m_bPendingViewportRefresh && viewport.Width == uiCachedWidth && viewport.Height == uiCachedHeight)
+        return;
+
+    constexpr uint kMinValidViewportSize = 16;
+    constexpr uint kMaxPendingRefreshTries = 60;
+    if (m_bPendingViewportRefresh && viewport.Width == uiCachedWidth && viewport.Height == uiCachedHeight)
+    {
+        if (m_uiPendingViewportRefreshTries++ < kMaxPendingRefreshTries)
+            return;
+    }
+
+    uint targetWidth = viewport.Width;
+    uint targetHeight = viewport.Height;
+    if (m_bPendingViewportRefresh && (viewport.Width <= kMinValidViewportSize || viewport.Height <= kMinValidViewportSize))
+    {
+        D3DSURFACE_DESC    backBufferDesc = {};
+        IDirect3DSurface9* pBackBuffer = nullptr;
+        if (SUCCEEDED(m_pDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer)) && pBackBuffer)
+        {
+            if (SUCCEEDED(pBackBuffer->GetDesc(&backBufferDesc)) && backBufferDesc.Width > 0 && backBufferDesc.Height > 0)
+            {
+                targetWidth = backBufferDesc.Width;
+                targetHeight = backBufferDesc.Height;
+            }
+            pBackBuffer->Release();
+        }
+    }
+    else if (m_bPendingViewportRefresh && !m_bPendingBackbufferOverrideAttempted && m_uiViewportLastAppliedSerial < m_uiViewportRefreshSerial &&
+             viewport.Width == uiCachedWidth && viewport.Height == uiCachedHeight)
+    {
+        D3DSURFACE_DESC    backBufferDesc = {};
+        IDirect3DSurface9* pBackBuffer = nullptr;
+        if (SUCCEEDED(m_pDevice->GetBackBuffer(0, 0, D3DBACKBUFFER_TYPE_MONO, &pBackBuffer)) && pBackBuffer)
+        {
+            if (SUCCEEDED(pBackBuffer->GetDesc(&backBufferDesc)) && backBufferDesc.Width > 0 && backBufferDesc.Height > 0 &&
+                (backBufferDesc.Width != viewport.Width || backBufferDesc.Height != viewport.Height))
+            {
+                targetWidth = backBufferDesc.Width;
+                targetHeight = backBufferDesc.Height;
+            }
+            pBackBuffer->Release();
+        }
+        m_bPendingBackbufferOverrideAttempted = true;
+    }
+
+    if (m_bPendingViewportRefresh && (viewport.X != 0 || viewport.Y != 0))
+    {
+        m_bForceFullViewportInMTA = true;
+        m_uiForceViewportWidth = targetWidth;
+        m_uiForceViewportHeight = targetHeight;
+    }
+
+    const bool wasPending = m_bPendingViewportRefresh;
+    CDirect3DData::GetSingleton().StoreViewport(viewport.X, viewport.Y, targetWidth, targetHeight);
+    m_pRenderItemManager->OnViewportSizeChanged(targetWidth, targetHeight);
+    UpdateRenderTargetMatrices(targetWidth, targetHeight);
+    m_pAspectRatioConverter->Init(targetHeight);
+    m_bPendingViewportRefresh = false;
+    m_uiPendingViewportRefreshTries = 0;
+    m_uiViewportLastAppliedSerial = m_uiViewportRefreshSerial;
+    if (wasPending)
+    {
+        m_uiForceViewportWidth = targetWidth;
+        m_uiForceViewportHeight = targetHeight;
+        m_bForceFullScissorInMTA = true;
+    }
+}
+
+void CGraphics::ApplyMTARenderViewportIfNeeded()
+{
+    if ((!m_bForceFullViewportInMTA && !m_bForceFullScissorInMTA) || !m_pDevice)
+        return;
+
+    const HRESULT hrCoop = m_pDevice->TestCooperativeLevel();
+    if (hrCoop != D3D_OK)
+        return;
+
+    uint targetWidth = m_uiForceViewportWidth;
+    uint targetHeight = m_uiForceViewportHeight;
+    if (targetWidth == 0 || targetHeight == 0)
+    {
+        D3DVIEWPORT9 viewport = {};
+        if (FAILED(m_pDevice->GetViewport(&viewport)) || viewport.Width == 0 || viewport.Height == 0)
+            return;
+        targetWidth = viewport.Width;
+        targetHeight = viewport.Height;
+    }
+
+    if (m_bForceFullViewportInMTA)
+    {
+        if (SUCCEEDED(m_pDevice->GetViewport(&m_prevViewportForMTA)))
+            m_bRestoreViewportAfterMTA = true;
+
+        D3DVIEWPORT9 viewport = {};
+        viewport.X = 0;
+        viewport.Y = 0;
+        viewport.Width = targetWidth;
+        viewport.Height = targetHeight;
+        viewport.MinZ = 0.0f;
+        viewport.MaxZ = 1.0f;
+        m_pDevice->SetViewport(&viewport);
+        m_bForceFullViewportInMTA = false;
+    }
+
+    if (m_bForceFullScissorInMTA)
+    {
+        RECT fullRect = {0, 0, static_cast<LONG>(targetWidth), static_cast<LONG>(targetHeight)};
+        if (SUCCEEDED(m_pDevice->GetScissorRect(&m_prevScissorForMTA)))
+            m_bRestoreScissorAfterMTA = true;
+        m_pDevice->GetRenderState(D3DRS_SCISSORTESTENABLE, &m_prevScissorEnableForMTA);
+        m_pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+        m_pDevice->SetScissorRect(&fullRect);
+        m_bForceFullScissorInMTA = false;
+    }
 }
 
 ////////////////////////////////////////////////////////////////
@@ -2029,6 +2300,20 @@ void CGraphics::EnteringMTARenderZone()
 void CGraphics::LeavingMTARenderZone()
 {
     RestoreGTARenderStates();
+    if (m_pDevice && m_pDevice->TestCooperativeLevel() == D3D_OK)
+    {
+        if (m_bRestoreViewportAfterMTA)
+        {
+            m_pDevice->SetViewport(&m_prevViewportForMTA);
+            m_bRestoreViewportAfterMTA = false;
+        }
+        if (m_bRestoreScissorAfterMTA)
+        {
+            m_pDevice->SetScissorRect(&m_prevScissorForMTA);
+            m_pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, m_prevScissorEnableForMTA);
+            m_bRestoreScissorAfterMTA = false;
+        }
+    }
     m_MTARenderZone = MTA_RZONE_NONE;
     m_iOutsideZoneCount = 0;
 }
@@ -2093,6 +2378,7 @@ void CGraphics::SaveGTARenderStates()
     // Prevent GPU driver hang by checking device state before creating state blocks
     if (m_pDevice->TestCooperativeLevel() != D3D_OK)
     {
+        m_bSkipMTARenderThisFrame = true;
         return;
     }
 
@@ -2104,6 +2390,7 @@ void CGraphics::SaveGTARenderStates()
     {
         WriteDebugEvent(SString("CGraphics::SaveGTARenderStates - Failed to create state block: %08x", hr));
         m_pSavedStateBlock = nullptr;
+        m_bSkipMTARenderThisFrame = true;
         return;
     }
 
@@ -2284,6 +2571,12 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
     if (!bEnabled)
         return;
 
+    struct CacheSuspendScope
+    {
+        CacheSuspendScope() { SetSuspendDeviceStateCache(true); }
+        ~CacheSuspendScope() { SetSuspendDeviceStateCache(false); }
+    } cacheSuspendScope;
+
     //
     // Save stuff
     //
@@ -2416,7 +2709,16 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
 
             // Flip backbuffer onto front buffer
             SAFE_RELEASE(pD3DBackBufferSurface);
-            hr = m_pDevice->Present(NULL, NULL, NULL, NULL);
+            IDirect3DDevice9*        pPresentDevice = m_pDevice;
+            CScopedActiveProxyDevice proxyDevice;
+            if (proxyDevice && pPresentDevice == static_cast<IDirect3DDevice9*>(proxyDevice.Get()))
+            {
+                hr = proxyDevice->PresentWithoutProxy(nullptr, nullptr, nullptr, nullptr);
+            }
+            else
+            {
+                hr = pPresentDevice->Present(nullptr, nullptr, nullptr, nullptr);
+            }
             if (FAILED(hr))
                 break;
 

@@ -234,6 +234,41 @@ HRESULT CProxyDirect3DVertexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, voi
         }
     }
 
+    // Lock returned a failure HRESULT (device lost, out of vmem, etc.) and ppbData is still null.
+    // RenderWare discards the HRESULT and will write to the null pointer, so provide a fallback
+    // buffer to absorb the writes and prevent a crash.
+    // See also CrashFix_VBInstV3dNull and CrashFix_VBInstV3dMorphNull in CrashFixHacks
+    if (FAILED(hr) && *ppbData == nullptr)
+    {
+        WriteDebugEvent(SString("Lock VertexBuffer: HRESULT failed (%08x), providing fallback to prevent null write (Usage:%08x Flags:%08x Offset:%x Size:%x)",
+                                hr, m_dwUsage, Flags, OffsetToLock, SizeToLock));
+
+        UINT fallbackOffset = std::min(OffsetToLock, m_iMemUsed);
+        UINT fallbackSize = SizeToLock;
+        if (fallbackOffset + fallbackSize > m_iMemUsed)
+            fallbackSize = m_iMemUsed - fallbackOffset;
+        if (fallbackSize == 0 && fallbackOffset < m_iMemUsed)
+            fallbackSize = m_iMemUsed - fallbackOffset;
+
+        size_t requiredStorage = std::max<size_t>(static_cast<size_t>(fallbackSize), static_cast<size_t>(1));
+        if (m_fallbackStorage.size() < requiredStorage)
+            m_fallbackStorage.resize(requiredStorage);
+
+        memset(m_fallbackStorage.data(), 0, requiredStorage);
+
+        *ppbData = m_fallbackStorage.data();
+        m_bFallbackActive = true;
+        m_fallbackOffset = fallbackOffset;
+        m_fallbackSize = fallbackSize;
+        m_fallbackFlags = Flags;
+        bFallbackUsed = true;
+
+        // Override the failed hr so we report the fallback, and the caller
+        // (which may actually check hr unlike RW) doesn't propagate failure
+        originalHr = hr;
+        hr = D3D_OK;
+    }
+
     // Report problems
     if (FAILED(hr) || bPointerNullEvent)
     {

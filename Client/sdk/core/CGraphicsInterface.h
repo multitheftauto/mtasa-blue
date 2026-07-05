@@ -69,16 +69,10 @@ enum eFontQuality
     FONT_QUALITY_DEFAULT = DEFAULT_QUALITY,
     FONT_QUALITY_DRAFT = DRAFT_QUALITY,
     FONT_QUALITY_PROOF = PROOF_QUALITY,
-
-#if (WINVER >= 0x0400)
     FONT_QUALITY_NONANTIALIASED = NONANTIALIASED_QUALITY,
     FONT_QUALITY_ANTIALIASED = ANTIALIASED_QUALITY,
-#endif
-
-#if (_WIN32_WINNT >= _WIN32_WINNT_WINXP)
     FONT_QUALITY_CLEARTYPE = CLEARTYPE_QUALITY,
     FONT_QUALITY_CLEARTYPE_NATURAL = CLEARTYPE_NATURAL_QUALITY,
-#endif
 
     NUM_QUALITIES
 };
@@ -195,6 +189,9 @@ public:
     virtual void LeavingMTARenderZone() = 0;
     virtual void MaybeEnteringMTARenderZone() = 0;
     virtual void MaybeLeavingMTARenderZone() = 0;
+    virtual void MarkViewportRefreshPending() = 0;
+    virtual void RefreshViewportIfNeeded() = 0;
+    virtual void ApplyMTARenderViewportIfNeeded() = 0;
 
     // Texture data manipulation
     virtual bool ResizeTextureData(const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight,

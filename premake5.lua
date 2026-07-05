@@ -14,8 +14,13 @@ if ci and ci:lower() == "true" then
 else
 	CI_BUILD = false
 end
+
 GLIBC_COMPAT = os.getenv("GLIBC_COMPAT") == "true"
 MTA_MAETRO = os.getenv("MTA_MAETRO") == "true"
+
+if MTA_MAETRO then
+	require "maetro"
+end
 
 newoption {
 	trigger     = "gccprefix",
@@ -31,7 +36,7 @@ workspace "MTASA"
 	elseif os.host() == "windows" then
 		platforms { "x86", "x64", "arm64" }
 	else
-		platforms { "x86", "x64", "arm", "arm64" }
+		platforms { "x64", "arm", "arm64" }
 	end
 
 	if _OPTIONS["gccprefix"] then
@@ -71,13 +76,10 @@ workspace "MTASA"
 	copy = function(p) return "{COPY} %{cfg.buildtarget.abspath} \"%{wks.location}../Bin/"..p.."/\"" end
 
 	if GLIBC_COMPAT then
-		filter { "system:linux", "platforms:x86 or x64" }
+		filter { "system:linux", "platforms:x64" }
 			includedirs "/compat"
 			linkoptions "-static-libstdc++ -static-libgcc"
 			forceincludes  { "glibc_version.h" }
-		filter { "system:linux", "platforms:x86" }
-			libdirs { "/compat/x86" }
-		filter { "system:linux", "platforms:x64" }
 			libdirs { "/compat/x64" }
 	end
 
@@ -134,9 +136,17 @@ workspace "MTASA"
 			path.join(dxdir, "Lib/x86")
 		}
 
+		if MTA_MAETRO then
+			flags { "NoImplicitLink" }
+		end
+
 	filter {"system:windows", "configurations:Debug"}
 		runtime "Release" -- Always use Release runtime
 		defines { "DEBUG" } -- Using DEBUG as _DEBUG is not available with /MT
+
+	-- Disable Edit and Continue on x86 Debug to avoid conflict with /SAFESEH
+	filter {"system:windows", "configurations:Debug", "platforms:x86"}
+		editandcontinue "Off"
 
 	filter { "system:linux or macosx", "configurations:not Debug" }
 		buildoptions { "-fvisibility=hidden" }
@@ -144,7 +154,7 @@ workspace "MTASA"
 	filter { "system:linux or macosx", "configurations:not Debug", "files:*.cpp" }
 		buildoptions { "-fvisibility-inlines-hidden" }
 
-	filter { "system:linux", "platforms:x86 or x64" }
+	filter { "system:linux", "platforms:x64" }
 		vectorextensions "SSE2"
 
 	-- Only build the client on Windows
@@ -181,6 +191,14 @@ workspace "MTASA"
 		include "vendor/libspeex"
 		include "vendor/detours"
 		include "vendor/lunasvg"
+		include "vendor/googletest"
+
+		if MTA_MAETRO then
+			include "vendor/maetro32"
+		end
+
+		group "Tests"
+		include "Tests/client"
 	end
 
 	filter {}
@@ -199,15 +217,15 @@ workspace "MTASA"
 		include "vendor/bcrypt"
 		include "vendor/cryptopp"
 		include "vendor/curl"
-		include "vendor/ehs"
+		include "vendor/cpp-httplib"
 		include "vendor/google-breakpad"
 		include "vendor/json-c"
 		include "vendor/lua"
 		include "vendor/mbedtls"
-		include "vendor/pcre"
+		include "vendor/pcre2"
 		include "vendor/pme"
 		include "vendor/sqlite"
-		include "vendor/tinyxml"
+		include "vendor/tinyxml2"
 		include "vendor/unrar"
 		include "vendor/zip"
 		include "vendor/zlib"

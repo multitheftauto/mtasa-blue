@@ -22,7 +22,7 @@ CWanted* CPlayerInfoSA::GetWanted()
 
 /**
  * Gets the amount of money the player has
- * @return DWORD containing the ammount of money the player has
+ * @return DWORD containing the amount of money the player has
  */
 long CPlayerInfoSA::GetPlayerMoney()
 {
@@ -32,7 +32,7 @@ long CPlayerInfoSA::GetPlayerMoney()
 
 /**
  * Sets the amount of money the player has
- * @param dwMoney DWORD containing the ammount of money you wish the player to have
+ * @param dwMoney DWORD containing the amount of money you wish the player to have
  */
 void CPlayerInfoSA::SetPlayerMoney(long lMoney, bool bInstant)
 {

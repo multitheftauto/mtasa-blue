@@ -50,7 +50,7 @@
 #include "Enums.h"
 #include "net/SyncStructures.h"
 #include "CIdArray.h"
-#include "pcrecpp.h"
+#include <pcrecpp_compat.h>
 
 // Shared logic includes
 #include <Utils.h>

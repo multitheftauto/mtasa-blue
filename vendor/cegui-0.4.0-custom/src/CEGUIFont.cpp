@@ -2,7 +2,7 @@
 	filename: 	CEGUIFont.cpp
 	created:	21/2/2004
 	author:		Paul D Turner
-	
+
 	purpose:	Implements Font class
 *************************************************************************/
 /*************************************************************************
@@ -38,10 +38,13 @@
 #include "CEGUIResourceProvider.h"
 #include "CEGUIXMLParser.h"
 
+#include <limits>
+
 #include <ft2build.h>
 #include FT_FREETYPE_H
 
 #include <algorithm>
+#include <limits>
 #include <sstream>
 #include "time.h"
 
@@ -236,7 +239,7 @@ float Font::getTextExtent(const String& text, float x_scale) const
                         continue;
                     pCharSize = MapFind ( subfont->getSizesMap(), text[c] );
                 }
-                else 
+                else
                 {
                     if ( !( const_cast<Font*>(this)->loadGlyph( text[c], true )) )
                         continue;
@@ -249,12 +252,12 @@ float Font::getTextExtent(const String& text, float x_scale) const
         }
 
         width = (pCharSize->width + pCharSize->offsetX) * x_scale;
-        
+
         if (adv_extent + width > cur_extent)
         {
             cur_extent = adv_extent + width;
         }
-        
+
         adv_extent += pCharSize->horz_advance * x_scale;
     }
 
@@ -461,9 +464,22 @@ void* Font::loadGlyph ( unsigned long glyphID, bool bCacheSize ) //Only use this
     if ( bCacheSize )
     {
         // Record size info for this character
+		const auto glyphWidth = glyph->bitmap.width;
+		const auto glyphHeight = glyph->bitmap.rows;
+		const auto maxCharSize = std::numeric_limits<ushort>::max();
+
+		if (glyphWidth > maxCharSize || glyphHeight > maxCharSize)
+		{
+			std::stringstream err;
+			err << "Font::loadGlyph - Glyph dimensions out of range for ushort for codepoint: ";
+			err << static_cast<unsigned int>(glyphID);
+			Logger::getSingleton().logEvent(err.str(), Errors);
+			return NULL;
+		}
+
         SCharSize item;
-        item.width = (ushort)glyph->bitmap.width;
-        item.height = (ushort)glyph->bitmap.rows;
+		item.width = static_cast<ushort>(glyphWidth);
+		item.height = static_cast<ushort>(glyphHeight);
         item.offsetX = (float)(glyph->metrics.horiBearingX >> 6);
         item.horz_advance = (float)(glyph->advance.x >> 6);
         MapSet ( d_sizes_map, glyphID, item );
@@ -618,9 +634,20 @@ void Font::drawGlyphToBuffer(void* glyph, argb_t* buffer, uint buf_width)
     FT_GlyphSlot thisGlyph = (FT_GlyphSlot)glyph;
 	FT_Bitmap* glyph_bitmap = &thisGlyph->bitmap;
 
-	for (int i = 0; i < (int)glyph_bitmap->rows; ++i)
+	const auto rows = glyph_bitmap->rows;
+	const auto width = glyph_bitmap->width;
+
+	if (rows > static_cast<unsigned int>(std::numeric_limits<int>::max()) ||
+		width > static_cast<unsigned int>(std::numeric_limits<int>::max()))
 	{
-		for (int j = 0; j < (int)glyph_bitmap->width; ++j)
+		throw InvalidRequestException((utf8*)"Font::drawGlyphToBuffer - The glyph could not be drawn because the bitmap dimensions are unsupported.");
+	}
+
+	const int iRows = static_cast<int>(rows);
+	const int iWidth = static_cast<int>(width);
+	for (int i = 0; i < iRows; ++i)
+	{
+		for (int j = 0; j < iWidth; ++j)
 		{
 			switch (glyph_bitmap->pixel_mode)
 			{
@@ -741,7 +768,7 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
             {
                 if ( text[c] < 32 )
                     continue;
-    
+
                 pos = d_cp_map.find('*');
         		if (pos == end)
                 {
@@ -755,13 +782,13 @@ void Font::drawTextLine(const String& text, const Vector3& position, const Rect&
             else
             {
                 img = pos_sub->second.d_image;
-                horz_advance = (float)pos_sub->second.d_horz_advance;                
+                horz_advance = (float)pos_sub->second.d_horz_advance;
             }
         }
         else
         {
             img = pos->second.d_image;
-            horz_advance = (float)pos->second.d_horz_advance;  
+            horz_advance = (float)pos->second.d_horz_advance;
         }
 		cur_pos.d_y = base_y - (img->getOffsetY() - img->getOffsetY() * y_scale);
 		Size sz(img->getWidth() * x_scale, img->getHeight() * y_scale);
@@ -798,7 +825,7 @@ void Font::drawTextLineJustified(const String& text, const Rect& draw_area, cons
 	if (space_count > 0) shared_lost_space = lost_space / (float)space_count;
 
     const_cast < Font* > ( this )->refreshStringForGlyphs ( text ); // Refresh our glyph set if there are new characters
-    
+
     for (c = 0; c < char_count; ++c)
 	{
 		pos = d_cp_map.find(text[c]);
@@ -839,11 +866,11 @@ void Font::constructor_impl(const String& name, const String& fontname, const St
     System::getSingleton().getResourceProvider()->loadRawDataContainer(fontname, d_impldat->fontData, resourceGroup);
 
 	// create face using input font
-	if (FT_New_Memory_Face(d_impldat->library, d_impldat->fontData.getDataPtr(), 
+	if (FT_New_Memory_Face(d_impldat->library, d_impldat->fontData.getDataPtr(),
                 (FT_Long)d_impldat->fontData.getSize(), 0, &d_impldat->fontFace) == 0)
 	{
 		// check that default Unicode character map is available
-		if (d_impldat->fontFace->charmap != NULL)	
+		if (d_impldat->fontFace->charmap != NULL)
 		{
 			try
 			{
@@ -1169,7 +1196,7 @@ void Font::createFontFromFT_Face(uint size, uint horzDpi, uint vertDpi)
 
 
 /*************************************************************************
-	Return the number of lines the given text would be formatted to.	
+	Return the number of lines the given text would be formatted to.
 *************************************************************************/
 size_t Font::getFormattedLineCount(const String& text, const Rect& format_area, TextFormatting fmt, float x_scale) const
 {
@@ -1258,7 +1285,7 @@ void Font::setAntiAliased(bool setting)
 
 
 /*************************************************************************
-	Return the horizontal pixel extent given text would be formatted to.	
+	Return the horizontal pixel extent given text would be formatted to.
 *************************************************************************/
 float Font::getFormattedTextExtent(const String& text, const Rect& format_area, TextFormatting fmt, float x_scale) const
 {
@@ -1340,7 +1367,7 @@ float Font::getWrappedTextExtent(const String& text, float wrapWidth, float x_sc
 
 		// if the new word would make the string too long
 		if ((lineWidth + wordWidth) > wrapWidth) {
-			
+
 			if (lineWidth > widest)
 			{
 				widest = lineWidth;
@@ -1701,7 +1728,7 @@ void Font::writeXMLToStream(OutStream& out_stream) const
 
             start = ++idx;
         }
-    } 
+    }
     // static font, so output glyph to imageset mappings
     else
     {

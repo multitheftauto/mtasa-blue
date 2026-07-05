@@ -28,16 +28,21 @@ bool CResourceModelStreamer::RequestModel(std::uint16_t modelId, bool addRef, bo
         if (refsCount == 1)
         {
             model->ModelAddRef(blocking ? EModelRequestType::BLOCKING : EModelRequestType::NON_BLOCKING, "CResourceModelStreamer::RequestModel With reference");
+            return true;
         }
-        return true;
+        return false;
     }
     else
     {
         if (model->IsLoaded())
+        {
+            return false;
+        }
+        else
+        {
+            model->Request(blocking ? EModelRequestType::BLOCKING : EModelRequestType::NON_BLOCKING, "CResourceModelStreamer::RequestModel With out reference");
             return true;
-
-        model->Request(blocking ? EModelRequestType::BLOCKING : EModelRequestType::NON_BLOCKING, "CResourceModelStreamer::RequestModel With out reference");
-        return true;
+        }
     }
 }
 

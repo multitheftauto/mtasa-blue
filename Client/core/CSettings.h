@@ -186,23 +186,20 @@ protected:
     CGUIScrollBar* m_pBrightness;
     CGUILabel*     m_pBrightnessValueLabel;
     CGUICheckBox*  m_pBorderlessGammaToggle;
-    CGUILabel*     m_pBorderlessGammaLabel;
     CGUIScrollBar* m_pBorderlessGamma;
     CGUILabel*     m_pBorderlessGammaValueLabel;
     CGUICheckBox*  m_pBorderlessBrightnessToggle;
-    CGUILabel*     m_pBorderlessBrightnessLabel;
     CGUIScrollBar* m_pBorderlessBrightness;
     CGUILabel*     m_pBorderlessBrightnessValueLabel;
     CGUICheckBox*  m_pBorderlessContrastToggle;
-    CGUILabel*     m_pBorderlessContrastLabel;
     CGUIScrollBar* m_pBorderlessContrast;
     CGUILabel*     m_pBorderlessContrastValueLabel;
     CGUICheckBox*  m_pBorderlessSaturationToggle;
-    CGUILabel*     m_pBorderlessSaturationLabel;
     CGUIScrollBar* m_pBorderlessSaturation;
     CGUILabel*     m_pBorderlessSaturationValueLabel;
     CGUICheckBox*  m_pCheckBoxApplyBorderless;
     CGUICheckBox*  m_pCheckBoxApplyFullscreen;
+    CGUIButton*    m_pPostFXDefButton;
     CGUILabel*     m_pAnisotropicLabel;
     CGUIScrollBar* m_pAnisotropic;
     CGUILabel*     m_pAnisotropicValueLabel;
@@ -240,9 +237,6 @@ protected:
     CGUIComboBox*  m_pProgressAnimationCombo;
     CGUILabel*     m_pDebugSettingLabel;
     CGUIComboBox*  m_pDebugSettingCombo;
-    CGUILabel*     m_pWin8Label;
-    CGUICheckBox*  m_pWin8ColorCheckBox;
-    CGUICheckBox*  m_pWin8MouseCheckBox;
     CGUICheckBox*  m_pPhotoSavingCheckbox;
     CGUICheckBox*  m_pCheckBoxAskBeforeDisconnect;
     CGUICheckBox*  m_pProcessAffinityCheckbox;
@@ -375,6 +369,7 @@ protected:
     CGUIButton*   m_pButtonBrowserWhitelistRemove;
     CGUIButton*   m_pButtonBrowserWhitelistRemoveAll;
     CGUICheckBox* m_pCheckBoxBrowserGPUEnabled;
+    CGUICheckBox* m_pCheckBoxBrowserVideoAccelEnabled;
     bool          m_bBrowserListsChanged;
     bool          m_bBrowserListsLoadEnabled;
 
@@ -401,6 +396,7 @@ protected:
     bool OnBorderlessSaturationToggleClicked(CGUIElement* pElement);
     bool OnBorderlessApplyBorderlessClicked(CGUIElement* pElement);
     bool OnBorderlessApplyFullscreenClicked(CGUIElement* pElement);
+    bool OnPostFXDefaultClick(CGUIElement* pElement);
     bool OnAnisotropicChanged(CGUIElement* pElement);
     bool OnMapAlphaChanged(CGUIElement* pElement);
     bool OnMasterVolumeChanged(CGUIElement* pElement);

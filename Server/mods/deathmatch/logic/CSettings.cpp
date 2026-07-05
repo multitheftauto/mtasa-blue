@@ -433,7 +433,7 @@ inline const char* CSettings::GetResourceName(const char* szSetting, char* szBuf
     // Get the position of the delimiter
     unsigned int uiPos = (unsigned int)(szChr - szSetting);
 
-    // Locate the first occurence of the delimiter in the name and use it to substring the name
+    // Locate the first occurrence of the delimiter in the name and use it to substring the name
     strncpy(szBuffer, szSetting, (uiPos > uiLength) ? uiLength : uiPos);
     szBuffer[(uiPos > uiLength) ? uiLength : uiPos] = 0;
 

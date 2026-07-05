@@ -71,7 +71,6 @@ public:
     static bool           GetElementDistanceFromCentreOfMassToBaseOfModel(CClientEntity& Entity, float& fDistance);
     static bool           GetElementAttachedOffsets(CClientEntity& Entity, CVector& vecPosition, CVector& vecRotation);
     static bool           GetElementAlpha(CClientEntity& Entity, unsigned char& ucAlpha);
-    static bool           IsElementOnScreen(CClientEntity& Entity, bool& bOnScreen);
     static bool           GetElementHealth(CClientEntity& Entity, float& fHealth);
     static bool           GetElementModel(CClientEntity& Entity, unsigned short& usModel);
     static bool           IsElementInWater(CClientEntity& Entity, bool& bInWater);
@@ -172,7 +171,7 @@ public:
     static bool SetPedRotation(CClientEntity& Entity, float fRotation, bool bNewWay);
     static bool SetPedCanBeKnockedOffBike(CClientEntity& Entity, bool bCanBeKnockedOffBike);
     static bool SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
-                                bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame);
+                                bool bUpdatePosition, bool bInterruptible, bool bFreezeLastFrame);
 
     static bool SetPedAnimationProgress(CClientEntity& Entity, const SString& strAnimName, float fProgress);
     static bool SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed);
@@ -180,7 +179,7 @@ public:
     static bool SetPedMoveAnim(CClientEntity& Entity, unsigned int iMoveAnim);
     static bool AddPedClothes(CClientEntity& Entity, const char* szTexture, const char* szModel, unsigned char ucType);
     static bool RemovePedClothes(CClientEntity& Entity, unsigned char ucType);
-    static bool SetPedControlState(CClientPed& ped, const std::string& control, const bool state) noexcept;
+    static bool SetPedControlState(CClientPed& ped, const std::string& control, bool state) noexcept;
     static bool SetPedAnalogControlState(CClientEntity& Entity, const char* szControl, float fState);
     static bool SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby);
     static bool SetPedFightingStyle(CClientEntity& Entity, unsigned char ucStyle);
@@ -544,10 +543,13 @@ public:
     };
     static inline void GUIGridListSetItemColor(CClientGUIElement& GUIElement, int iRow, int iColumn, int iRed, int iGreen, int iBlue, int iAlpha)
     {
-        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())
-            ->SetItemColor(iRow, iColumn, static_cast<unsigned char>(iRed), static_cast<unsigned char>(iGreen), static_cast<unsigned char>(iBlue),
-                           static_cast<unsigned char>(iAlpha));
-    }
+        const unsigned char ucRed = static_cast<unsigned char>(Clamp<int>(0, iRed, 255));
+        const unsigned char ucGreen = static_cast<unsigned char>(Clamp<int>(0, iGreen, 255));
+        const unsigned char ucBlue = static_cast<unsigned char>(Clamp<int>(0, iBlue, 255));
+        const unsigned char ucAlpha = static_cast<unsigned char>(Clamp<int>(0, iAlpha, 255));
+
+        static_cast<CGUIGridList*>(GUIElement.GetCGUIElement())->SetItemColor(iRow, iColumn, ucRed, ucGreen, ucBlue, ucAlpha);
+    };
     static void GUIGridListSetHorizontalScrollPosition(CClientEntity& Element, float fPosition);
     static void GUIGridListSetVerticalScrollPosition(CClientEntity& Element, float fPosition);
 

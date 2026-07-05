@@ -746,7 +746,7 @@ void CClientPad::ProcessControl(short& usControlValue, unsigned int uiIndex)
     //
     // usControlValue                       is the updated input value we get from the player
     // m_sScriptedStates                    contains our script value
-    // m_bScriptedStatesNextFrameOverride   if the player input should be forcefully overriden for the next frame
+    // m_bScriptedStatesNextFrameOverride   if the player input should be forcefully overridden for the next frame
     //
     //
     // old behavior or (override == false)

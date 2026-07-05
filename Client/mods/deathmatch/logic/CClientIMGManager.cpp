@@ -87,7 +87,11 @@ CClientIMG* CClientIMGManager::GetElementThatLinked(unsigned int uiModel)
 
 bool CClientIMGManager::IsLinkableModel(unsigned int uiModel)
 {
-    return uiModel < g_pGame->GetCountOfAllFileIDs();
+    const int32_t count = g_pGame->GetCountOfAllFileIDs();
+    if (count <= 0)
+        return false;
+
+    return uiModel < static_cast<unsigned int>(count);
 }
 
 bool CClientIMGManager::RestoreModel(unsigned int uiModel)

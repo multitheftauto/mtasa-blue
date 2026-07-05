@@ -67,7 +67,7 @@ bool CVehicleUpgrades::IsUpgradeCompatible(unsigned short usUpgrade)
     auto*          modelInfo = g_pGame->GetModelInfo(usModel);
 
     if (modelInfo && modelInfo->GetParentID() != 0)
-        usModel = modelInfo->GetParentID();
+        usModel = static_cast<unsigned short>(modelInfo->GetParentID());
 
     // Wheels should be compatible with any vehicle which have wheels, except
     // bike/bmx (they're buggy). Vortex is technically a car, but it has no
@@ -610,6 +610,20 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
         CVehicle* pVehicle = m_pVehicle->GetGameVehicle();
         if (pVehicle)
         {
+            // Spoiler upgrades (slot 2) must not be applied if the vehicle model
+            // doesn't have the "ug_spoiler" frame. Otherwise, SA's AddUpgrade will
+            // call GetFrameFromId and get NULL, triggering the crash-fix fallback
+            // that attaches the spoiler to the wrong frame.
+            if (ucSlot == 2)
+            {
+                CModelInfo* pVehicleModelInfo = g_pGame->GetModelInfo(m_pVehicle->GetModel());
+                if (!pVehicleModelInfo || !pVehicleModelInfo->GetVehicleSupportedUpgrades().m_bSpoiler)
+                {
+                    // Vehicle doesn't support this spoiler upgrade - skip it
+                    return;
+                }
+            }
+
             // Grab the upgrade model
             CModelInfo* pModelInfo = g_pGame->GetModelInfo(usUpgrade);
             if (pModelInfo)

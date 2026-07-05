@@ -91,7 +91,8 @@ void CPedSync::UpdateAllSyncer()
         const SPlayerAnimData& animData = (*iter)->GetAnimationData();
         if (animData.IsAnimating())
         {
-            float deltaTime = static_cast<float>(currentTimestamp - animData.startTime);
+            const std::int64_t elapsedMs = currentTimestamp >= animData.startTime ? (currentTimestamp - animData.startTime) : 0;
+            const float        deltaTime = static_cast<float>(elapsedMs);
             if (!animData.freezeLastFrame && animData.time > 0 && deltaTime >= animData.time)
                 (*iter)->SetAnimationData({});
         }

@@ -43,9 +43,33 @@ void CEntitySAInterface::UpdateRpHAnim()
     ((void(__thiscall*)(CEntitySAInterface*))0x532B20)(this);
 }
 
+// Probes a CColModel pointer for accessibility via SEH.
+// Building removal can re-add entities whose collision sector was unloaded,
+// leaving pColModel as a non-null dangling pointer (the streaming system
+// strips collision data but doesnt null the pointer in model info).
+// SEH costs only a few instructions for frame setup (unless there's exceptions), don't consider using IsReadablePointer here as its expensive.
+static bool IsColModelAccessible(CColModelSAInterface* pColModel)
+{
+    __try
+    {
+        volatile auto probe = pColModel->m_bounds.m_vecMin.fX;
+        (void)probe;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
 CRect* CEntitySAInterface::GetBoundRect_(CRect* pRect)
 {
-    CColModelSAInterface* colModel = CModelInfoSAInterface::GetModelInfo(m_nModelIndex)->pColModel;
+    CBaseModelInfoSAInterface* pModelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex);
+
+    if (!pModelInfo || !pModelInfo->pColModel || !IsColModelAccessible(pModelInfo->pColModel))
+        return pRect;
+
+    CColModelSAInterface* colModel = pModelInfo->pColModel;
     CVector               vecMin = colModel->m_bounds.m_vecMin;
     CVector               vecMax = colModel->m_bounds.m_vecMax;
     CRect                 rect;

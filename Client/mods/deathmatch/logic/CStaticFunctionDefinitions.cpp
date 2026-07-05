@@ -725,12 +725,6 @@ bool CStaticFunctionDefinitions::GetElementAlpha(CClientEntity& Entity, unsigned
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsElementOnScreen(CClientEntity& Entity, bool& bOnScreen)
-{
-    bOnScreen = Entity.IsOnScreen();
-    return true;
-}
-
 bool CStaticFunctionDefinitions::GetElementHealth(CClientEntity& Entity, float& fHealth)
 {
     switch (Entity.GetType())
@@ -2255,9 +2249,9 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike(CClientEntity& Entity
 }
 
 bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
-                                                 bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame)
+                                                 bool bUpdatePosition, bool bInterruptible, bool bFreezeLastFrame)
 {
-    RUN_CHILDREN(SetPedAnimation(**iter, strBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame))
+    RUN_CHILDREN(SetPedAnimation(**iter, strBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame))
 
     if (IS_PED(&Entity))
     {
@@ -2269,7 +2263,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
             {
                 Ped.SetCurrentAnimationCustom(false);
                 Ped.SetNextAnimationNormal();
-                Ped.RunNamedAnimation(pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
+                Ped.RunNamedAnimation(pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame);
                 return true;
             }
             else
@@ -2288,7 +2282,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                         Ped.SetNextAnimationCustom(pIFP, szAnimName);
 
                         const char* szGateWayAnimationName = g_pGame->GetAnimManager()->GetGateWayAnimationName();
-                        Ped.RunNamedAnimation(pBlock, szGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptable, bFreezeLastFrame);
+                        Ped.RunNamedAnimation(pBlock, szGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame);
                         return true;
                     }
                 }
@@ -2413,12 +2407,15 @@ bool CStaticFunctionDefinitions::RemovePedClothes(CClientEntity& Entity, unsigne
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& ped, const std::string& control, const bool state) noexcept
+bool CStaticFunctionDefinitions::SetPedControlState(CClientPed& ped, const std::string& control, bool state) noexcept
 {
     if (&ped == GetLocalPlayer())
         return SetControlState(control.c_str(), state);
 
-    return ped.m_Pad.SetControlState(control.c_str(), state);
+    if (ped.m_Pad.SetControlState(control.c_str(), state))
+        return true;
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetPedDoingGangDriveby(CClientEntity& Entity, bool bGangDriveby)
@@ -4846,8 +4843,7 @@ CClientMarker* CStaticFunctionDefinitions::CreateMarker(CResource& Resource, con
     assert(szType);
 
     // Grab the type id
-    auto ucType = static_cast<unsigned char>(CClientMarker::StringToType(szType));
-
+    unsigned char ucType = static_cast<unsigned char>(CClientMarker::StringToType(szType));
     if (ucType != CClientMarker::MARKER_INVALID)
     {
         // Create the marker
@@ -4892,7 +4888,7 @@ bool CStaticFunctionDefinitions::SetMarkerType(CClientEntity& Entity, const char
     RUN_CHILDREN(SetMarkerType(**iter, szType))
 
     // Grab the new type ID
-    const auto ucType = static_cast<unsigned char>(CClientMarker::StringToType(szType));
+    unsigned char ucType = static_cast<unsigned char>(CClientMarker::StringToType(szType));
     if (ucType != CClientMarker::MARKER_INVALID)
     {
         // Is this a marker?
@@ -5082,9 +5078,7 @@ bool CStaticFunctionDefinitions::SetCameraMatrix(const CVector& vecPosition, CVe
         return false;
 
     if (!m_pCamera->IsInFixedMode())
-    {
         m_pCamera->ToggleCameraFixedMode(true);
-    }
 
     // Put the camera there
     m_pCamera->SetPosition(vecPosition);
@@ -7251,7 +7245,6 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, const char* szHitS
 
     CKeyBindsInterface* pKeyBinds = g_pCore->GetKeyBinds();
     bool                bKey = pKeyBinds->IsKey(szKey);
-    CCommandBind*       pBind;
 
     if (bKey)
     {
@@ -9982,7 +9975,7 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CClientPed* pPed, CClientVeh
         if (pPed->IsDead() || pVehicle->GetHealth() <= 0.0f)
             return false;
 
-        // Toss the previous player out of it if neccessary
+        // Toss the previous player out of it if necessary
         if (CClientPed* pPreviousOccupant = pVehicle->GetOccupant(uiSeat))
             RemovePedFromVehicle(pPreviousOccupant);
 

@@ -165,6 +165,8 @@ bool CConnectManager::Reconnect(const char* szHost, unsigned short usPort, const
     unsigned int uiPort = 0;
     CVARS_GET("host", m_strHost);
     CVARS_GET("port", uiPort);
+    if (uiPort == 0 || uiPort > 0xFFFF)
+        uiPort = 22003;
     m_usPort = static_cast<unsigned short>(uiPort);
 
     // If keeping the same host & port, retrieve the password as well
@@ -447,6 +449,8 @@ bool CConnectManager::CheckNickProvided(const char* szNick)
     if (stricmp(szNick, "console") == 0)
         return false;
     if (stricmp(szNick, "server") == 0)
+        return false;
+    if (strchr(szNick, '`') != nullptr)
         return false;
     return true;
 }

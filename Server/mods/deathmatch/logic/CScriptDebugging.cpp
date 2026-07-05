@@ -149,7 +149,7 @@ void CScriptDebugging::Broadcast(const CPacket& Packet, unsigned int uiMinimumDe
     for (const auto& pPlayer : m_Players)
     {
         bool sufficientDebugLevel =
-            CheckForSufficientDebugLevel(static_cast<uint8_t>(pPlayer->m_uiScriptDebugLevel), static_cast<uint8_t>(uiMinimumDebugLevel));
+            CheckForSufficientDebugLevel(static_cast<std::uint8_t>(pPlayer->m_uiScriptDebugLevel), static_cast<std::uint8_t>(uiMinimumDebugLevel));
 
         if (sufficientDebugLevel)
         {

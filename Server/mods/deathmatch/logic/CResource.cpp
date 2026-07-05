@@ -122,9 +122,8 @@ bool CResource::Load()
     time(&m_timeLoaded);
     m_timeStarted = 0;
 
-    // Register us in the EHS stuff
-    g_pGame->GetHTTPD()->RegisterEHS(this, m_strResourceName.c_str());
-    this->m_oEHSServerParameters["norouterequest"] = true;
+    // Register us in the HTTP server
+    g_pGame->GetHTTPD()->RegisterResource(this, m_strResourceName.c_str());
 
     // Store the actual directory and zip paths for fast access
     m_strResourceDirectoryPath = PathJoin(m_strAbsPath, m_strResourceName, "/");
@@ -136,7 +135,7 @@ bool CResource::Load()
         if (!UnzipResource())
         {
             // Unregister EHS stuff
-            g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+            g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
 
             return false;
         }
@@ -147,7 +146,7 @@ bool CResource::Load()
     if (!GetFilePath("meta.xml", strMeta))
     {
         // Unregister the EHS stuff
-        g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+        g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
 
         // Show error
         m_strFailureReason = SString("Couldn't find meta.xml file for resource '%s'\n", m_strResourceName.c_str());
@@ -274,7 +273,7 @@ bool CResource::Load()
                 !ReadIncludedHTML(pRoot) || !ReadIncludedExports(pRoot) || !ReadIncludedConfigs(pRoot))
             {
                 delete pMetaFile;
-                g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+                g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
                 return false;
             }
         }
@@ -298,7 +297,7 @@ bool CResource::Load()
         if (pMetaFile)
             delete pMetaFile;
 
-        g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+        g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
         return false;
     }
 
@@ -425,7 +424,7 @@ void CResource::TidyUp()
     for (CResource* pDependent : m_Dependents)
         pDependent->InvalidateIncludedResourceReference(this);
 
-    g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+    g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
 }
 
 bool CResource::GetInfoValue(const char* szKey, std::string& strValue) const
@@ -1069,8 +1068,12 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     SendNoClientCacheScripts();
     m_bClientSync = true;
 
-    // HACK?: stops resources getting loaded twice when you change them then manually restart
-    GenerateChecksums();
+    // Run anything that got held back during onResourceStart because it depended on clients already knowing
+    // about elements we've just finished broadcasting above (see RunOrDeferUntilClientSynced)
+    std::vector<std::function<void()>> pendingCallbacks = std::move(m_PendingClientSyncCallbacks);
+    m_PendingClientSyncCallbacks.clear();
+    for (const auto& callback : pendingCallbacks)
+        callback();
 
     // Add us to the running resources list
     m_StartedResources.push_back(this);
@@ -2203,7 +2206,7 @@ bool CResource::IncludedFileExists(const char* szName, int iType)
         // Is it the required type?
         if (iType == CResourceFile::RESOURCE_FILE_TYPE_NONE || pResourceFile->GetType() == iType)
         {
-            // Check if the name compares equal (case independant)
+            // Check if the name compares equal (case independent)
             if (!stricmp(pResourceFile->GetName(), szName))
                 return true;
         }
@@ -2581,14 +2584,14 @@ HttpStatusCode CResource::HandleRequest(HttpRequest* ipoHttpRequest, HttpRespons
 std::string Unescape(std::string_view sv)
 {
     // Converts a character to a hexadecimal value
-    auto toHex = [](char c) -> unsigned char
+    auto toHex = [](char c) -> uint8_t
     {
         if (c >= '0' && c <= '9')
-            return c - '0';
+            return static_cast<uint8_t>(c - '0');
         if (c >= 'a' && c <= 'f')
-            return c - 'a' + 10;
+            return static_cast<uint8_t>(c - 'a' + 10);
         if (c >= 'A' && c <= 'F')
-            return c - 'A' + 10;
+            return static_cast<uint8_t>(c - 'A' + 10);
         return 0;
     };
 
@@ -2911,7 +2914,8 @@ static HttpStatusCode ParseLuaHttpRouterResponse(CLuaArguments& luaResponse, Htt
         {
             if (std::string_view body; argValue->TryGetString(body))
             {
-                if (body.size() <= (size_t)std::numeric_limits<int>::max())
+                const auto maxInt = static_cast<size_t>(std::numeric_limits<int>::max());
+                if (body.size() <= maxInt)
                 {
                     hasBody = true;
                     httpResponse.SetBody(body.data(), body.size());

@@ -8278,29 +8278,20 @@ void CHandlingManagerSA::InitializeDefaultHandlings() noexcept
     m_OriginalHandlingData[209].ucTailLight = 1;
     m_OriginalHandlingData[209].ucAnimGroup = 0;
 
-    m_OriginalHandlingData[210] = m_OriginalHandlingData[69];  // HT_HOTRINA = HT_HOTRING
-    m_OriginalHandlingData[210].iVehicleID = 210;
-
-    m_OriginalHandlingData[211] = m_OriginalHandlingData[69];  // HT_HOTRINB = HT_HOTRING
-    m_OriginalHandlingData[211].iVehicleID = 211;
-
+    // These vehicles share handling lines with other models in the original game.
+    // We give them separate MTA entries so scripts can customize each independently,
+    // but we preserve the source entry's iVehicleID because GTA:SA engine code may
+    // use it to index into the global handling array (which only has 210 entries).
+    // Using out-of-range IDs (210+) would cause out-of-bounds reads and incorrect
+    // vehicle physics (e.g. wrong reverse speed).
+    m_OriginalHandlingData[210] = m_OriginalHandlingData[69];   // HT_HOTRINA = HT_HOTRING
+    m_OriginalHandlingData[211] = m_OriginalHandlingData[69];   // HT_HOTRINB = HT_HOTRING
     m_OriginalHandlingData[212] = m_OriginalHandlingData[103];  // HT_SADLSHIT = HT_SADLER
-    m_OriginalHandlingData[212].iVehicleID = 212;
-
-    m_OriginalHandlingData[213] = m_OriginalHandlingData[52];  // HT_GLENSHIT = HT_GLENDALE
-    m_OriginalHandlingData[213].iVehicleID = 213;
-
+    m_OriginalHandlingData[213] = m_OriginalHandlingData[52];   // HT_GLENSHIT = HT_GLENDALE
     m_OriginalHandlingData[214] = m_OriginalHandlingData[163];  // HT_FAGGIO = HT_PIZZABOY
-    m_OriginalHandlingData[214].iVehicleID = 214;
-
-    m_OriginalHandlingData[215] = m_OriginalHandlingData[7];  // HT_FIRELA = HT_FIRETRUK
-    m_OriginalHandlingData[215].iVehicleID = 215;
-
-    m_OriginalHandlingData[216] = m_OriginalHandlingData[65];  // HT_RNCHLURE = HT_RANCHER
-    m_OriginalHandlingData[216].iVehicleID = 216;
-
+    m_OriginalHandlingData[215] = m_OriginalHandlingData[7];    // HT_FIRELA = HT_FIRETRUK
+    m_OriginalHandlingData[216] = m_OriginalHandlingData[65];   // HT_RNCHLURE = HT_RANCHER
     m_OriginalHandlingData[217] = m_OriginalHandlingData[126];  // HT_FREIBOX = HT_FREIFLAT
-    m_OriginalHandlingData[217].iVehicleID = 217;
 
     // Aircrafts handling
 
@@ -9130,7 +9121,6 @@ void CHandlingManagerSA::InitializeDefaultHandlings() noexcept
     m_OriginalBikeHandlingData[12].fStoppieStabMult = 0.3f;
 
     m_OriginalBikeHandlingData[13] = m_OriginalBikeHandlingData[1];  // HT_FAGGIO = HT_PIZZABOY
-    m_OriginalBikeHandlingData[13].iVehicleID = 214;
 }
 
 void CHandlingManagerSA::CheckSuspensionChanges(const CHandlingEntry* const entry) const noexcept

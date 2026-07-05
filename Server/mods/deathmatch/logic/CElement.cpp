@@ -438,11 +438,10 @@ bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPl
     if (!g_pGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, pCaller))
         return false;
 
-    CEvents*      pEvents = g_pGame->GetEvents();
-    CEventContext eventContext;
+    CEvents* pEvents = g_pGame->GetEvents();
 
     // Make sure our event-manager knows we're about to call an event
-    pEvents->PreEventPulse(&eventContext);
+    pEvents->PreEventPulse();
 
     // Call the event on our parents/us first
     CallParentEvent(szName, Arguments, this, pCaller);
@@ -451,12 +450,12 @@ bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPl
     CallEventNoParent(szName, Arguments, this, pCaller);
 
     // Tell the event manager that we're done calling the event
-    pEvents->PostEventPulse(&eventContext);
+    pEvents->PostEventPulse();
 
     g_pGame->GetDebugHookManager()->OnPostEvent(szName, Arguments, this, pCaller);
 
     // Return whether our event was cancelled or not
-    return !eventContext.IsCancelled();
+    return (!pEvents->WasEventCancelled());
 }
 
 bool CElement::DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction)
@@ -1256,14 +1255,15 @@ void CElement::GetAttachedPosition(CVector& vecPosition)
 {
     if (m_pAttachedTo)
     {
-        CVector vecRotation;
+        // Get the position of the element we're attached to
         vecPosition = m_pAttachedTo->GetPosition();
-        m_pAttachedTo->GetRotation(vecRotation);
 
-        CVector vecPositionOffset = m_vecAttachedPosition;
-        // This works when rotating around z axis. Other axes need testing.
-        RotateVector(vecPositionOffset, CVector(vecRotation.fX, vecRotation.fY, -vecRotation.fZ));
-        vecPosition += vecPositionOffset;
+        // Get the parent's matrix
+        CMatrix matParent;
+        m_pAttachedTo->GetMatrix(matParent);
+
+        // Apply the transformation
+        vecPosition += matParent.TransformVectorByRotation(m_vecAttachedPosition);
     }
 }
 
@@ -1272,7 +1272,9 @@ void CElement::GetAttachedRotation(CVector& vecRotation)
     if (m_pAttachedTo)
     {
         m_pAttachedTo->GetRotation(vecRotation);
+        ConvertRadiansToDegrees(vecRotation);
         vecRotation += m_vecAttachedRotation;
+        ConvertDegreesToRadians(vecRotation);
     }
 }
 

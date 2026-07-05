@@ -77,6 +77,7 @@ public:
     void    SetFxEffects(int* pEnabledEffects, uint iNumElements);
     BOOL    SetFxParameters(uint iFxEffect, void* params);
     BOOL    GetFxParameters(uint iFxEffect, void* params);
+    bool    IsFxEffectEnabled(uint iFxEffect) const { return iFxEffect < NUMELMS(m_EnabledEffects) && m_EnabledEffects[iFxEffect] != 0; }
     SString GetMetaTags(const SString& strFormat);
     uint    GetReachedEndCount();
     bool    IsFreed();

@@ -1389,7 +1389,7 @@ public:
         if (NextIsNumber())
             ReadNumber(outValue, defaultValue);
         else
-            outValue = defaultValue;
+            outValue = static_cast<T>(defaultValue);
     }
 
     void ReadIfNextIsString(SString& outValue, const char* defaultValue)

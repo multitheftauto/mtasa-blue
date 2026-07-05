@@ -10,6 +10,7 @@
  *****************************************************************************/
 #include <StdInc.h>
 #include "CPrimitiveMaterialBatcher.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 ////////////////////////////////////////////////////////////////
 //
 // CPrimitiveMaterialBatcher::CPrimitiveMaterialBatcher
@@ -42,6 +43,7 @@ CPrimitiveMaterialBatcher::~CPrimitiveMaterialBatcher()
 void CPrimitiveMaterialBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY)
 {
     m_pDevice = pDevice;
+
     // Cache matrices
     UpdateMatrices(fViewportSizeX, fViewportSizeY);
 }
@@ -160,6 +162,20 @@ void CPrimitiveMaterialBatcher::Flush()
         if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
         {
             // Draw using texture
+            if (CRenderTargetItem* pRenderTarget = DynamicCast<CRenderTargetItem>(pTextureItem))
+            {
+                if (!pRenderTarget->TryEnsureValid())
+                    continue;
+            }
+            else if (CScreenSourceItem* pScreenSource = DynamicCast<CScreenSourceItem>(pTextureItem))
+            {
+                if (!pScreenSource->TryEnsureValid())
+                    continue;
+            }
+
+            if (!pTextureItem->m_pD3DTexture)
+                continue;
+
             if (pMaterial != pLastMaterial)
             {
                 m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);

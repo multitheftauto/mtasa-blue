@@ -3,6 +3,7 @@ project "Multiplayer SA"
 	kind "SharedLib"
 	targetname "multiplayer_sa"
 	targetdir(buildpath("mta"))
+	clangtidy "On"
 
 	-- DO NOT REMOVE OR TURN THIS OPTION ON
 	-- See details in game_sa/premake5.lua

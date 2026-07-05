@@ -83,7 +83,7 @@ CLuaArgument::~CLuaArgument()
 
 const CLuaArgument& CLuaArgument::operator=(const CLuaArgument& Argument)
 {
-    // Destroy our old string if neccessary
+    // Destroy our old string if necessary
     if (m_szString)
     {
         delete[] m_szString;

@@ -48,6 +48,7 @@
 #include <stdio.h>
 #include <string>
 #include <string_view>
+#include <TlHelp32.h>
 #include <variant>
 #include <vector>
 #if defined(_MSC_VER)
@@ -62,6 +63,7 @@
 
 using WerRegisterAppLocalDumpFn = HRESULT(WINAPI*)(PCWSTR);
 static std::atomic<bool> g_bWerLocalDumpConfigured{false};
+thread_local bool        g_bCrashHandlerStackOverflow{false};
 
 [[nodiscard]] constexpr bool IsMemoryException(DWORD code)
 {
@@ -99,7 +101,18 @@ static std::atomic<bool> g_bWerLocalDumpConfigured{false};
 // Helpers to isolate __try usage and prevent crashes in debug output itself
 void OutputDebugStringSafeImpl(const char* message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     if (message == nullptr)
+        return;
+
+    // Skip OutputDebugStringA when no debugger is attached.
+    //
+    // OutputDebugStringA raises an exception under the hood so a debugger
+    // can read the message; with no debugger attached the call is just
+    // unnecessary work and an extra exception-dispatch site. Suppressing it
+    // here is a robustness improvement on a path that runs frequently.
+    if (!IsDebuggerPresent())
         return;
 
     __try
@@ -113,6 +126,8 @@ void OutputDebugStringSafeImpl(const char* message)
 
 void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     if (buffer == nullptr || bufferSize == 0 || format == nullptr)
         return;
 
@@ -134,6 +149,8 @@ void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format
 
 void SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     char buffer[DEBUG_BUFFER_SIZE] = {};
 
     std::size_t offset = 0;
@@ -778,7 +795,14 @@ using EnumProcessModulesExFn = BOOL(WINAPI*)(HANDLE, HMODULE*, DWORD, LPDWORD, D
     const HMODULE          psapiModule = GetModuleHandleW(L"Psapi.dll");
     EnumProcessModulesExFn enumModulesEx = nullptr;
     if (psapiModule != nullptr)
-        enumModulesEx = reinterpret_cast<EnumProcessModulesExFn>(GetProcAddress(psapiModule, "EnumProcessModulesEx"));
+    {
+        const auto procAddr = GetProcAddress(psapiModule, "EnumProcessModulesEx");
+        if (procAddr)
+        {
+            static_assert(sizeof(enumModulesEx) == sizeof(procAddr), "Unexpected function pointer size");
+            std::memcpy(&enumModulesEx, &procAddr, sizeof(enumModulesEx));
+        }
+    }
 
     auto enumModules = [&](HMODULE* buffer, DWORD bufferSize, DWORD* bytesNeeded) -> BOOL
     {
@@ -1158,11 +1182,15 @@ public:
     CleanUpCrashHandler() = default;
     ~CleanUpCrashHandler()
     {
-        std::scoped_lock lock{g_handlerStateMutex};
+        // Minimal teardown for process-exit/DLL-unload path.
+        // Avoid restoring detours/CRT handlers here: teardown order is unstable, and touching
+        // patched/global handler state late can crash (including /GS 0xC0000409 on exit).
+        // Keep SymCleanup for dbghelp resources, and avoid g_handlerStateMutex in this destructor.
 
         g_bStackCookieCaptureEnabled.store(false, std::memory_order_release);
         g_pfnCrashCallback.store(nullptr, std::memory_order_release);
 
+        // Release dbghelp symbol resources
         if (g_symbolsInitialized.exchange(false, std::memory_order_acq_rel))
         {
             if (HANDLE hProcess = g_symbolProcess.exchange(nullptr, std::memory_order_acq_rel); hProcess != nullptr)
@@ -1172,44 +1200,14 @@ public:
             }
         }
 
-        if (auto terminateHandler = g_pfnOrigTerminate.exchange(nullptr, std::memory_order_acq_rel); terminateHandler != nullptr)
-        {
-            std::set_terminate(terminateHandler);
-        }
-
-        if (auto newHandler = g_pfnOrigNewHandler.exchange(nullptr, std::memory_order_acq_rel); newHandler != nullptr)
-        {
-#if defined(_MSC_VER)
-            _set_new_handler(newHandler);
-#else
-            std::set_new_handler(newHandler);
-#endif
-        }
-
-        if (auto abortHandler = g_pfnOrigAbortHandler.exchange(nullptr, std::memory_order_acq_rel); abortHandler != nullptr)
-        {
-            signal(SIGABRT, abortHandler);
-        }
-
-        if (auto pureCallHandler = g_pfnOrigPureCall.exchange(nullptr, std::memory_order_acq_rel); pureCallHandler != nullptr)
-        {
-            _set_purecall_handler(pureCallHandler);
-        }
-
-        if (auto previousFilter = g_pfnOrigFilt.exchange(nullptr, std::memory_order_acq_rel); previousFilter != nullptr)
-        {
-            SetUnhandledExceptionFilter(previousFilter);
-        }
-
-        if (auto kernelSetUnhandled = g_pfnKernelSetUnhandledExceptionFilter.exchange(nullptr, std::memory_order_acq_rel); kernelSetUnhandled != nullptr)
-        {
-            g_kernelSetUnhandledExceptionFilterTrampoline = kernelSetUnhandled;
-            if (!SharedUtil::UndoFunctionDetour(g_kernelSetUnhandledExceptionFilterTrampoline, reinterpret_cast<void*>(RedirectedSetUnhandledExceptionFilter)))
-            {
-                SafeDebugOutput("CrashHandler: WARNING - Failed to undo SEH detour during cleanup\n");
-            }
-            g_kernelSetUnhandledExceptionFilterTrampoline = nullptr;
-        }
+        // Clear cached state without restoration in teardown path
+        g_pfnOrigTerminate.store(nullptr, std::memory_order_release);
+        g_pfnOrigNewHandler.store(nullptr, std::memory_order_release);
+        g_pfnOrigAbortHandler.store(nullptr, std::memory_order_release);
+        g_pfnOrigPureCall.store(nullptr, std::memory_order_release);
+        g_pfnOrigFilt.store(nullptr, std::memory_order_release);
+        g_pfnKernelSetUnhandledExceptionFilter.store(nullptr, std::memory_order_release);
+        g_kernelSetUnhandledExceptionFilterTrampoline = nullptr;
     }
 };
 
@@ -1305,7 +1303,7 @@ namespace CrashHandler
         return !GetPdbDirectories().empty();
     }
 
-    [[nodiscard]] static bool InitializeSymbolHandler()
+    [[nodiscard]] bool InitializeSymbolHandler()
     {
         std::scoped_lock lock{g_symbolMutex};
 
@@ -1772,7 +1770,7 @@ static bool ConfigureWerLocalDumps()
     HMODULE hWer = LoadLibraryW(L"wer.dll");
     if (hWer)
     {
-        auto pfnWerRegisterAppLocalDump = reinterpret_cast<WerRegisterAppLocalDumpFn>(GetProcAddress(hWer, "WerRegisterAppLocalDump"));
+        auto pfnWerRegisterAppLocalDump = reinterpret_cast<WerRegisterAppLocalDumpFn>(reinterpret_cast<void*>(GetProcAddress(hWer, "WerRegisterAppLocalDump")));
 
         if (pfnWerRegisterAppLocalDump)
         {
@@ -1791,93 +1789,21 @@ static bool ConfigureWerLocalDumps()
             }
 
             std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CrashHandler: WerRegisterAppLocalDump failed with 0x%08X, trying registry fallback\n",
+            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(),
+                               "CrashHandler: WerRegisterAppLocalDump failed with 0x%08X, registry fallback handled by loader\n",
                                static_cast<unsigned int>(hr));
         }
         else
         {
-            SafeDebugOutput("CrashHandler: WerRegisterAppLocalDump not available (Windows 10 1709+ required), trying registry fallback\n");
+            SafeDebugOutput("CrashHandler: WerRegisterAppLocalDump not available (Windows 10 1709+ required), registry fallback handled by loader\n");
         }
+        FreeLibrary(hWer);
     }
     else
     {
-        SafeDebugOutput("CrashHandler: Could not load wer.dll, trying registry fallback\n");
+        SafeDebugOutput("CrashHandler: Could not load wer.dll, registry fallback handled by loader\n");
     }
 
-    std::array<char, DEBUG_BUFFER_SIZE> debugBuffer{};
-
-    HKEY           hKey = nullptr;
-    const wchar_t* exeName = wcsrchr(modulePath, L'\\');
-    exeName = exeName ? exeName + 1 : modulePath;
-
-    wchar_t regPath[512]{};
-    _snwprintf_s(regPath, _countof(regPath), _TRUNCATE, L"SOFTWARE\\Microsoft\\Windows\\Windows Error Reporting\\LocalDumps\\%s", exeName);
-
-    // LocalDumps registry settings are only supported in HKEY_LOCAL_MACHINE (requires admin to write)
-    // First try to create/open with write access - succeeds if running as admin
-    // Use KEY_WOW64_64KEY to write to the 64-bit registry view.
-    // WER is a 64-bit system service that reads from the native 64-bit registry,
-    // not the WOW6432Node that 32-bit apps normally access.
-    LONG result = RegCreateKeyExW(HKEY_LOCAL_MACHINE, regPath, 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_SET_VALUE | KEY_WOW64_64KEY, nullptr, &hKey, nullptr);
-    if (result == ERROR_SUCCESS)
-    {
-        // We have write access (running as admin) - update values to ensure correct path
-        // DumpType: 0=Custom, 1=MiniDump, 2=FullDump - use 1 for smaller dumps
-        DWORD dumpType = 1;
-        RegSetValueExW(hKey, L"DumpType", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&dumpType), sizeof(dumpType));
-
-        DWORD dumpCount = 10;
-        RegSetValueExW(hKey, L"DumpCount", 0, REG_DWORD, reinterpret_cast<const BYTE*>(&dumpCount), sizeof(dumpCount));
-
-        RegSetValueExW(hKey, L"DumpFolder", 0, REG_EXPAND_SZ, reinterpret_cast<const BYTE*>(dumpPathW.c_str()),
-                       static_cast<DWORD>((dumpPathW.length() + 1) * sizeof(wchar_t)));
-
-        RegCloseKey(hKey);
-
-        SafeDebugOutput("CrashHandler: WER LocalDumps configured via registry (admin access)\n");
-        SafeDebugOutput("CrashHandler: Fail-fast exceptions should now generate dumps in mta\\dumps\\private\n");
-        return true;
-    }
-
-    // Can't write - check if key already exists and has correct values
-    result = RegOpenKeyExW(HKEY_LOCAL_MACHINE, regPath, 0, KEY_READ | KEY_WOW64_64KEY, &hKey);
-    if (result == ERROR_SUCCESS)
-    {
-        wchar_t existingPath[MAX_PATH]{};
-        DWORD   pathSize = sizeof(existingPath);
-        DWORD   pathType = 0;
-
-        bool pathCorrect = false;
-        if (RegQueryValueExW(hKey, L"DumpFolder", nullptr, &pathType, reinterpret_cast<BYTE*>(existingPath), &pathSize) == ERROR_SUCCESS)
-        {
-            if (pathType == REG_SZ || pathType == REG_EXPAND_SZ)
-            {
-                std::wstring existingPathStr(existingPath);
-                pathCorrect = (existingPathStr == dumpPathW);
-            }
-        }
-
-        RegCloseKey(hKey);
-
-        if (pathCorrect)
-        {
-            SafeDebugOutput("CrashHandler: WER LocalDumps registry key exists with correct path\n");
-            SafeDebugOutput("CrashHandler: Fail-fast exceptions should generate dumps in mta\\dumps\\private\n");
-            return true;
-        }
-        else
-        {
-            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CrashHandler: WARNING - WER LocalDumps exists but points to wrong path!\n");
-            SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CrashHandler: Expected: %s\n", ToUTF8(dumpPathW).c_str());
-            SafeDebugOutput("CrashHandler: Run MTA as admin once OR reinstall to fix WER dump path\n");
-            return false;
-        }
-    }
-
-    // Neither write nor read succeeded - WER dumps won't work
-    SAFE_DEBUG_PRINT_C(debugBuffer.data(), debugBuffer.size(), "CrashHandler: Failed to access WER registry key in HKLM (error %ld)\n", result);
-    SafeDebugOutput("CrashHandler: WER LocalDumps requires either admin privileges or installer setup\n");
-    SafeDebugOutput("CrashHandler: NOTE: Reinstall MTA or run as admin once to enable WER crash dumps\n");
     return false;
 }
 
@@ -2741,6 +2667,21 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
     }
 
     const DWORD dwExceptionCode{pExPtrs->ExceptionRecord->ExceptionCode};
+    const bool  isStackOverflow = (dwExceptionCode == EXCEPTION_STACK_OVERFLOW);
+    struct StackOverflowScope
+    {
+        bool active;
+        explicit StackOverflowScope(bool enable) : active(enable)
+        {
+            if (active)
+                g_bCrashHandlerStackOverflow = true;
+        }
+        ~StackOverflowScope()
+        {
+            if (active)
+                g_bCrashHandlerStackOverflow = false;
+        }
+    } stackOverflowScope(isStackOverflow);
 
     // Special handling for release build-affecting assertions from 3rd-party libs (e.g CEF) that overuse them
     if (IsDebuggerPresent() == FALSE && pExPtrs->ContextRecord != nullptr)
@@ -2788,6 +2729,7 @@ LONG __stdcall CrashHandlerExceptionFilter(EXCEPTION_POINTERS* pExPtrs)
             SafeDebugOutput("SEH: FATAL - Stack overflow detected - _resetstkoflw() failed\n");
             // If we can't reset the stack, we can't safely do anything else.
             // Attempting to log or call handlers will likely trigger another overflow immediately.
+            bHandlerActive.store(false, std::memory_order_release);
             return EXCEPTION_CONTINUE_SEARCH;
         }
     }
@@ -2970,17 +2912,26 @@ namespace
         alignas(hardware_destructive_interference_size) std::atomic<DWORD> targetThreadId{0};
         alignas(hardware_destructive_interference_size) std::atomic<DWORD> timeoutSeconds{20};
 
-        // Non-atomic handle doesn't need cache-line alignment
+        // Non-atomic handles don't need cache-line alignment
         HANDLE watchdogThreadHandle{nullptr};
+        // Manual-reset event used to wake the watchdog from its check-interval wait so it can
+        // observe shouldStop immediately. Without this, the thread polls every 500 ms and
+        // shutdown could otherwise wait close to a full interval before the thread exits.
+        HANDLE stopEvent{nullptr};
 
         ~WatchdogState()
         {
-            // Note: watchdogThreadHandle should be closed by StopWatchdogThread,
-            // but we close it here as a safety measure in case of abnormal termination
+            // Note: handles should be closed by StopWatchdogThread,
+            // but we close them here as a safety measure in case of abnormal termination
             if (watchdogThreadHandle != nullptr && watchdogThreadHandle != INVALID_HANDLE_VALUE)
             {
                 CloseHandle(watchdogThreadHandle);
                 watchdogThreadHandle = nullptr;
+            }
+            if (stopEvent != nullptr && stopEvent != INVALID_HANDLE_VALUE)
+            {
+                CloseHandle(stopEvent);
+                stopEvent = nullptr;
             }
         }
     };
@@ -2998,7 +2949,21 @@ namespace
 
     inline WatchdogState g_watchdogState{};
 
-    [[nodiscard]] static bool TriggerWatchdogException(HANDLE targetThread, DWORD targetThreadId)
+    static bool TryGenerateWatchdogDump(EXCEPTION_POINTERS* pExPtrs, CExceptionInformation_Impl* pExInfo)
+    {
+        __try
+        {
+            CCrashDumpWriter::DumpCoreLog(pExPtrs, pExInfo);
+            CCrashDumpWriter::DumpMiniDump(pExPtrs, pExInfo);
+            return true;
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return false;
+        }
+    }
+
+    [[nodiscard]] static bool TriggerWatchdogException(HANDLE targetThread, DWORD targetThreadId, bool dumpOnly = false)
     {
         AddReportLog(9300, SString("Watchdog freeze detected after %u seconds (thread %u)", g_watchdogState.timeoutSeconds.load(std::memory_order_relaxed),
                                    targetThreadId));
@@ -3050,6 +3015,7 @@ namespace
         // Now we can safely resume the thread - we have everything we need
         if (ResumeThread(targetThread) == static_cast<DWORD>(-1))
         {
+            OutputDebugStringA("WATCHDOG: Failed to resume thread after stack capture\n");
             AddReportLog(9304, SString("Watchdog failed to resume thread %u after stack capture", targetThreadId));
             // Continue anyway - we still want the crash dump even if resume failed
         }
@@ -3122,6 +3088,25 @@ namespace
             }
         }
 
+        if (dumpOnly)
+        {
+            // Write dump without dialog or termination so the
+            // contributor can continue debugging after a breakpoint pause.
+            auto* pExInfo = new (std::nothrow) CExceptionInformation_Impl;
+            if (pExInfo)
+            {
+                pExInfo->Set(exceptionRecord.ExceptionCode, &exceptionPointers);
+
+                if (!TryGenerateWatchdogDump(&exceptionPointers, pExInfo))
+                {
+                    AddReportLog(9316, "Watchdog: SEH exception caught during dump generation");
+                }
+
+                delete pExInfo;
+            }
+            return true;
+        }
+
         // Trigger the global exception handler
         CCrashDumpWriter::HandleExceptionGlobal(&exceptionPointers);
 
@@ -3134,6 +3119,19 @@ namespace
 
         constexpr auto kCheckInterval = std::chrono::milliseconds{500};
         static_assert(kCheckInterval.count() > 0, "Check interval must be positive");
+        constexpr DWORD kCheckIntervalMs = static_cast<DWORD>(kCheckInterval.count());
+
+        // Helper that sleeps for kCheckInterval but wakes immediately when StopWatchdogThread
+        // signals stopEvent. Returns true if the thread should exit (stop requested), false to continue.
+        const auto waitOrStop = [&]() -> bool
+        {
+            HANDLE ev = g_watchdogState.stopEvent;
+            if (ev != nullptr && ev != INVALID_HANDLE_VALUE)
+                return WaitForSingleObject(ev, kCheckIntervalMs) == WAIT_OBJECT_0;
+            // Fallback if the event somehow wasn't created: keep prior polling behavior
+            std::this_thread::sleep_for(kCheckInterval);
+            return g_watchdogState.shouldStop.load(std::memory_order_acquire);
+        };
 
         const auto targetThreadId = g_watchdogState.targetThreadId.load(std::memory_order_acquire);
 
@@ -3160,6 +3158,59 @@ namespace
 
             if (elapsed.count() >= static_cast<std::chrono::seconds::rep>(timeoutSecs))
             {
+#ifdef MTA_DEBUG
+                BOOL isDebuggerAttached = FALSE;
+                if (IsDebuggerPresent() != FALSE)
+                    isDebuggerAttached = TRUE;
+
+                if (isDebuggerAttached == FALSE)
+                    CheckRemoteDebuggerPresent(GetCurrentProcess(), &isDebuggerAttached);
+
+                if (isDebuggerAttached == FALSE)
+                {
+                    // Check if parent process (e.g. VS attached to the launcher) has a debugger
+                    if (HANDLE hSnapshot = CreateToolhelp32Snapshot(TH32CS_SNAPPROCESS, 0); hSnapshot != INVALID_HANDLE_VALUE)
+                    {
+                        PROCESSENTRY32 pe32{};
+                        pe32.dwSize = sizeof(pe32);
+                        if (Process32First(hSnapshot, &pe32))
+                        {
+                            const DWORD currentPid = GetCurrentProcessId();
+                            do
+                            {
+                                if (pe32.th32ProcessID == currentPid)
+                                {
+                                    if (HANDLE hParent = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, pe32.th32ParentProcessID))
+                                    {
+                                        CheckRemoteDebuggerPresent(hParent, &isDebuggerAttached);
+                                        CloseHandle(hParent);
+                                    }
+                                    break;
+                                }
+                            } while (Process32Next(hSnapshot, &pe32));
+                        }
+                        CloseHandle(hSnapshot);
+                    }
+                }
+
+                if (isDebuggerAttached != FALSE)
+                {
+                    // In debug builds with a debugger attached, the stall may just be a breakpoint pause.
+                    // Generate a dump so the frozen stack is collected, then
+                    // reset the heartbeat and keep monitoring instead of terminating.
+                    OutputDebugStringA("WATCHDOG: Freeze detected - generating dump (no termination)\n");
+
+                    AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u, debugger attached)",
+                                               static_cast<long long>(elapsed.count()), timeoutSecs));
+
+                    TriggerWatchdogException(targetThread.get(), targetThreadId, true);
+
+                    g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
+                    if (waitOrStop())
+                        break;
+                    continue;
+                }
+#endif
                 AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u)", static_cast<long long>(elapsed.count()), timeoutSecs));
 
                 const bool triggered = TriggerWatchdogException(targetThread.get(), targetThreadId);
@@ -3172,7 +3223,8 @@ namespace
                 break;
             }
 
-            std::this_thread::sleep_for(kCheckInterval);
+            if (waitOrStop())
+                break;
         }
 
         AddReportLog(9313, "Watchdog thread stopping");
@@ -3211,6 +3263,21 @@ namespace
     g_watchdogState.shouldStop.store(false, std::memory_order_release);
     g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
 
+    // Create (or reset) the stop event used to wake the watchdog from its wait on shutdown.
+    // Manual-reset so all wait sites see the signal until the thread exits.
+    if (g_watchdogState.stopEvent == nullptr)
+    {
+        g_watchdogState.stopEvent = CreateEventW(nullptr, TRUE, FALSE, nullptr);
+        if (g_watchdogState.stopEvent == nullptr)
+        {
+            AddReportLog(9321, SString("Watchdog failed to create stop event (error %lu) - falling back to polling", GetLastError()));
+        }
+    }
+    else
+    {
+        ResetEvent(g_watchdogState.stopEvent);
+    }
+
     constexpr unsigned int kStackSize = 0;
     const auto             threadHandle{reinterpret_cast<HANDLE>(_beginthreadex(nullptr, kStackSize, WatchdogThreadProc, nullptr, 0, nullptr))};
 
@@ -3241,18 +3308,32 @@ void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread()
     AddReportLog(9318, "Stopping watchdog thread");
     g_watchdogState.shouldStop.store(true, std::memory_order_release);
 
+    // Signal the stop event so the watchdog's interval-wait wakes immediately instead of
+    // sleeping up to kCheckInterval (~500 ms). Set after shouldStop so the wakeup observes it.
+    if (g_watchdogState.stopEvent != nullptr && g_watchdogState.stopEvent != INVALID_HANDLE_VALUE)
+    {
+        SetEvent(g_watchdogState.stopEvent);
+    }
+
     if (g_watchdogState.watchdogThreadHandle != nullptr && g_watchdogState.watchdogThreadHandle != INVALID_HANDLE_VALUE)
     {
-        constexpr DWORD kWaitTimeout = 5000;
+        // With the stop event the thread should exit within a single check cycle. Keep a 2 s
+        // safety cap to bound shutdown if the thread is genuinely wedged. We do not use
+        // TerminateThread here because it can leave CRT locks held, causing deadlocks during shutdown.
+        constexpr DWORD kWaitTimeout = 2000;
         if (const auto waitResult = WaitForSingleObject(g_watchdogState.watchdogThreadHandle, kWaitTimeout); waitResult != WAIT_OBJECT_0)
         {
-            AddReportLog(9319, "Watchdog thread forced termination");
-            TerminateThread(g_watchdogState.watchdogThreadHandle, 1);
-            WaitForSingleObject(g_watchdogState.watchdogThreadHandle, INFINITE);
+            AddReportLog(9319, "Watchdog thread did not exit in time, abandoning (no forced termination)");
         }
 
         CloseHandle(g_watchdogState.watchdogThreadHandle);
         g_watchdogState.watchdogThreadHandle = nullptr;
+    }
+
+    if (g_watchdogState.stopEvent != nullptr && g_watchdogState.stopEvent != INVALID_HANDLE_VALUE)
+    {
+        CloseHandle(g_watchdogState.stopEvent);
+        g_watchdogState.stopEvent = nullptr;
     }
 
     AddReportLog(9320, "Watchdog thread stopped");

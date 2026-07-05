@@ -172,7 +172,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
 
     float fBase = 0.613f;
     float fGap = 0.043f;
-    // Our disconnect item is shown/hidden dynamically, so we store it seperately
+    // Our disconnect item is shown/hidden dynamically, so we store it separately
     m_pDisconnect = CreateItem(MENU_ITEM_DISCONNECT, "menu_disconnect.png", CVector2D(0.168f, fBase + fGap * 0));
     m_pDisconnect->image->SetVisible(false);
 
@@ -183,7 +183,7 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_menuItems.push_back(CreateItem(MENU_ITEM_QUICK_CONNECT, "menu_quick_connect.png", CVector2D(0.168f, fBase + fGap * iMenuItemIndex++)));
     m_menuItems.push_back(CreateItem(MENU_ITEM_BROWSE_SERVERS, "menu_browse_servers.png", CVector2D(0.168f, fBase + fGap * iMenuItemIndex++)));
 
-    // Only add Host Game and Map Editor if server folder and MTA Server.exe exist
+    // Only add Host Game and Map Editor if server folder exists
     if (DirectoryExists(CalcMTASAPath("server")))
     {
         m_menuItems.push_back(CreateItem(MENU_ITEM_HOST_GAME, "menu_host_game.png", CVector2D(0.168f, fBase + fGap * iMenuItemIndex++)));
@@ -343,24 +343,6 @@ CMainMenu::CMainMenu(CGUI* pManager)
     m_pFeatureBranchAlertLabel->SetFont("clear-normal");
     m_pFeatureBranchAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
     m_pFeatureBranchAlertLabel->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
-#endif
-
-#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
-    // Add annonying alert
-    m_pAlertTexture.reset(reinterpret_cast<CGUITexture*>(m_pManager->CreateTexture()));
-    std::int32_t buffer = 0xFFFF0000;
-    m_pAlertTexture->LoadFromMemory(&buffer, 1, 1);  // HACK: Load red dot
-
-    m_pAlertImage.reset(reinterpret_cast<CGUIStaticImage*>(m_pManager->CreateStaticImage(m_pBackground)));
-    m_pAlertImage->LoadFromTexture(m_pAlertTexture.get());
-    m_pAlertImage->SetPosition({0.0f, 0.0f}, false);
-    m_pAlertImage->SetSize({ScreenSize.fX, 20.0f});
-
-    #define XP_VISTA_WARNING _("MTA will not receive updates on XP/Vista after July 2019.\n\nUpgrade Windows to play on the latest servers.")
-    m_pAlertLabel.reset(reinterpret_cast<CGUILabel*>(m_pManager->CreateLabel(m_pAlertImage.get(), XP_VISTA_WARNING)));
-    m_pAlertLabel->SetPosition({0.0f, 2.0f}, false);
-    m_pAlertLabel->SetSize({ScreenSize.fX, 20.0f});
-    m_pAlertLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
 #endif
 }
 
@@ -575,7 +557,7 @@ void CMainMenu::Update()
         while (it != m_unhoveredItems.end())
         {
             // Let's work out what the target progress should be by working out the time passed
-            // Min of 0.5 progress fixes occasional graphical glitchekal
+            // Min of 0.5 progress fixes occasional graphical glitches
             float newProgress =
                 (*it)->animProgress - std::min(0.5f, ((float)ulTimePassed / CORE_MTA_ANIMATION_TIME_OUT) * (CORE_MTA_HOVER_ALPHA - CORE_MTA_NORMAL_ALPHA));
             if (SetItemHoverProgress((*it), newProgress, false))
@@ -1017,6 +999,9 @@ bool CMainMenu::OnHostGameButtonClick()
     if (m_ucFade != FADE_VISIBLE)
         return false;
 
+    if (!WarnIfLocalServerUnsupported())
+        return false;
+
     // Load deathmatch, but with local play
     CModManager::GetSingleton().RequestLoad("local");
 
@@ -1027,6 +1012,9 @@ bool CMainMenu::OnEditorButtonClick()
 {
     // Return if we haven't faded in yet
     if (m_ucFade != FADE_VISIBLE)
+        return false;
+
+    if (!WarnIfLocalServerUnsupported())
         return false;
 
     // Load deathmatch, but with local play
@@ -1265,6 +1253,25 @@ void CMainMenu::ShowNetworkNotReadyWindow()
     window.SetButton(0, _("OK"));
     window.SetCallback(HideQuestionWindow, &window);
     window.Show();
+}
+
+/////////////////////////////////////////////////////////////
+//
+// CMainMenu::WarnIfLocalServerUnsupported
+//
+// Returns true if the local server can run on this OS.
+// Returns false and shows a dialog if unsupported (e.g. 32-bit OS).
+//
+/////////////////////////////////////////////////////////////
+bool CMainMenu::WarnIfLocalServerUnsupported()
+{
+    if (!Is64BitOS())
+    {
+        CCore::GetSingleton().ShowMessageBox(_("Error"), _("Local server is not supported on 32-bit OS, please upgrade"), MB_BUTTON_OK | MB_ICON_ERROR);
+        return false;
+    }
+
+    return true;
 }
 
 /////////////////////////////////////////////////////////////

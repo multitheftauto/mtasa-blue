@@ -98,9 +98,9 @@ int main(int argc, char* argv[])
     }
 
 #ifdef WIN32
-    if (!IsWindowsXPSP3OrGreater())
+    if (!IsWindows10OrGreater())
     {
-        printf("This version of MTA requires Windows XP SP3 or later\n");
+        printf("This version of MTA requires Windows 10 or later\n");
 
         // Wait for a key then exit
         printf("Press enter to continue...\n");
@@ -131,7 +131,10 @@ int main(int argc, char* argv[])
     {
         // Grab the entrypoint
         typedef int(Main_t)(int, char*[]);
-        Main_t* pfnEntryPoint = reinterpret_cast<Main_t*>(Core.GetProcedureAddress("Run"));
+        Main_t*    pfnEntryPoint = nullptr;
+        const auto procAddr = Core.GetProcedureAddress("Run");
+        static_assert(sizeof(pfnEntryPoint) == sizeof(procAddr), "Unexpected function pointer size");
+        std::memcpy(&pfnEntryPoint, &procAddr, sizeof(pfnEntryPoint));
         if (pfnEntryPoint)
         {
             // Call it and return what it returns
@@ -147,7 +150,7 @@ int main(int argc, char* argv[])
         printf("ERROR: Could not load %s\n", LIB_CORE);
         printf("* Check installed data files.\n");
 #ifdef WIN32
-        printf("* Check installed Microsoft Visual C++ Redistributable Package (x86).\n");
+        printf("* Check installed Microsoft Visual C++ Redistributable Package (x64).\n");
 #endif
     }
 

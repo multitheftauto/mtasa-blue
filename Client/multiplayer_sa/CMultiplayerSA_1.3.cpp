@@ -111,9 +111,6 @@ DWORD RETURN_CProjectile_FixTearGasCrash_Cont = 0x4C0409;
 #define HOOKPOS_CProjectile_FixExplosionLocation 0x738A77
 DWORD RETURN_CProjectile_FixExplosionLocation = 0x738A86;
 
-#define HOOKPOS_CPed_RemoveWeaponWhenEnteringVehicle 0x5E6370
-DWORD RETURN_CPed_RemoveWeaponWhenEnteringVehicle = 0x5E6379;
-
 void          HOOK_CVehicle_ProcessStuff_TestSirenTypeSingle();
 void          HOOK_CVehicle_ProcessStuff_PostPushSirenPositionSingle();
 void          HOOK_CVehicle_ProcessStuff_TestSirenTypeDual();
@@ -140,7 +137,6 @@ void          HOOK_CVehicleModelInterface_SetClump();
 void          HOOK_CBoat_ApplyDamage();
 void          HOOK_CProjectile_FixTearGasCrash();
 void          HOOK_CProjectile_FixExplosionLocation();
-void          HOOK_CPed_RemoveWeaponWhenEnteringVehicle();
 void* __cdecl HOOK_CMemoryMgr_MallocAlign(int size, int alignment, int nHint);
 void __cdecl  HOOK_CMemoryMgr_FreeAlign(void* ptr);
 
@@ -197,9 +193,6 @@ void CMultiplayerSA::InitHooks_13()
     HookInstall(HOOKPOS_CProjectile_FixTearGasCrash, (DWORD)HOOK_CProjectile_FixTearGasCrash, 6);
 
     HookInstall(HOOKPOS_CProjectile_FixExplosionLocation, (DWORD)HOOK_CProjectile_FixExplosionLocation, 12);
-
-    // Fix invisible weapons during jetpack task
-    HookInstall(HOOKPOS_CPed_RemoveWeaponWhenEnteringVehicle, (DWORD)HOOK_CPed_RemoveWeaponWhenEnteringVehicle, 9);
 
     InitHooks_ClothesSpeedUp();
     EnableHooks_ClothesMemFix(true);
@@ -1869,55 +1862,6 @@ static void __declspec(naked) HOOK_CProjectile_FixExplosionLocation()
 skip:
         lea eax, [esi+4]
         jmp RETURN_CProjectile_FixExplosionLocation
-    }
-    // clang-format on
-}
-
-DWORD                         CPed_RemoveWeaponWhenEnteringVehicle_CalledFrom = 0;
-static void __declspec(naked) HOOK_CPed_RemoveWeaponWhenEnteringVehicle()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        push eax
-        mov eax, [esp+4]
-        mov CPed_RemoveWeaponWhenEnteringVehicle_CalledFrom, eax
-        pop eax
-
-        push esi
-        mov esi, ecx
-        mov eax, [esi+480h]
-    }
-    // clang-format on
-
-    // Called from CTaskSimpleJetPack::ProcessPed
-    if (CPed_RemoveWeaponWhenEnteringVehicle_CalledFrom == 0x68025F)
-    {
-        // clang-format off
-        __asm
-        {
-            mov pPedUsingJetpack, esi
-        }
-        // clang-format on
-
-        if (AllowJetPack())
-        {
-            // clang-format off
-            __asm
-            {
-                pop esi
-                retn 4
-            }
-            // clang-format on
-        }
-    }
-
-    // clang-format off
-    __asm
-    {
-        jmp RETURN_CPed_RemoveWeaponWhenEnteringVehicle
     }
     // clang-format on
 }

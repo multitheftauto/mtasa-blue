@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/RenderWare.h>
 extern CCoreInterface*           g_pCore;
 GameEntityRenderHandler*         pGameEntityRenderHandler = nullptr;
 PreRenderSkyHandler*             pPreRenderSkyHandlerHandler = nullptr;
@@ -155,10 +156,51 @@ inner:
 // Detect entity rendering
 //
 //////////////////////////////////////////////////////////////////////////////////////////
+
+// Returns the alpha of the first material in the entity's first atomic geometry.
+// MTA's setElementAlpha (via FUNC_SetRwObjectAlpha) sets material alpha on all
+// materials. Checking just the first is sufficient to detect the low-alpha case.
+static BYTE GetEntityFirstMaterialAlpha(CEntitySAInterface* pEntity)
+{
+    RwObject* pRwObj = reinterpret_cast<RwObject*>(pEntity->m_pRwObject);
+    if (!pRwObj)
+        return 255;
+
+    RpAtomic* pAtomic = nullptr;
+    if (pRwObj->type == 1)  // rpATOMIC
+    {
+        pAtomic = reinterpret_cast<RpAtomic*>(pRwObj);
+    }
+    else if (pRwObj->type == 2)  // rpCLUMP
+    {
+        RpClump*     pClump = reinterpret_cast<RpClump*>(pRwObj);
+        RwListEntry* pEntry = pClump->atomics.root.next;
+        if (pEntry != &pClump->atomics.root)
+            pAtomic = reinterpret_cast<RpAtomic*>(reinterpret_cast<BYTE*>(pEntry) - offsetof(RpAtomic, globalClumps));
+    }
+
+    if (pAtomic && pAtomic->geometry && pAtomic->geometry->materials.entries > 0)
+        return pAtomic->geometry->materials.materials[0]->color.a;
+
+    return 255;
+}
+
 bool OnMY_CEntity_RenderOneNonRoad_Pre(CEntitySAInterface* pEntity)
 {
     ms_RenderingOneNonRoad = pEntity;
     CallGameEntityRenderHandler(ms_RenderingOneNonRoad);
+
+    // CVisibilityPlugins::RenderEntity just set ALPHAREF=100 (SA's original value) for
+    // this non-fading entity. If MTA's setElementAlpha assigned material alpha < 100,
+    // the entity would be invisible with ALPHAREF=100. Override to 0 in that case so
+    // the entity renders normally under alpha blending.
+    if (GetEntityFirstMaterialAlpha(pEntity) < 100)
+    {
+        DWORD engine = *(DWORD*)0xC97B24;
+        auto  fpSet = reinterpret_cast<BOOL(__cdecl*)(DWORD, void*)>(*(DWORD*)(engine + 0x20));
+        fpSet(0x1e /*rwRENDERSTATEALPHATESTFUNCTIONREF*/, nullptr);
+    }
+
     return IsEntityRenderable(pEntity);
 }
 
@@ -417,6 +459,7 @@ static void _declspec(naked) HOOK_CTimer_Suspend()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     _asm
     {
         // Check if _timerFunction is NULL
@@ -434,6 +477,7 @@ static void _declspec(naked) HOOK_CTimer_Suspend()
         xor     edx, edx
         jmp     CONTINUE_CTimer_Suspend
     }
+    // clang-format on
 }
 
 #define HOOKPOS_CTimer_Resume  0x561A11
@@ -443,6 +487,7 @@ static void _declspec(naked) HOOK_CTimer_Resume()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     _asm
     {
         // Check if _timerFunction is NULL
@@ -460,6 +505,7 @@ static void _declspec(naked) HOOK_CTimer_Resume()
         xor     edx, edx
         jmp     CONTINUE_CTimer_Resume
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

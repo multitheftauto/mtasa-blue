@@ -11,7 +11,6 @@
 
 #pragma once
 #include <array>
-#include <chrono>
 #include <CVector.h>
 #include "CAnimBlock.h"
 #include "enums/VehicleDummies.h"
@@ -170,9 +169,6 @@ public:
     virtual bool           GetIdeFlag(eModelIdeFlag eFlag) = 0;
     virtual void           SetIdeFlag(eModelIdeFlag eFlag, bool bState) = 0;
     virtual CBoundingBox*  GetBoundingBox() = 0;
-    virtual bool           IsCollisionLoaded() const noexcept = 0;
-    virtual bool           IsRwObjectLoaded() const noexcept = 0;
-    virtual void           WaitForModelFullyLoaded(std::chrono::milliseconds timeout) = 0;
     virtual bool           IsValid() = 0;
     virtual bool           IsAllocatedInArchive() const noexcept = 0;
     virtual unsigned short GetTextureDictionaryID() = 0;

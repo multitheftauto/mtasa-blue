@@ -40,6 +40,9 @@ public:
                           CChecksum serverChecksum, bool bAutoDownload);
     virtual ~CDownloadableResource();
 
+    static void BeginChecksumBatch();
+    static void EndChecksumBatch();
+
     bool DoesClientAndServerChecksumMatch();
 
     eResourceType GetResourceType() { return m_resourceType; };
@@ -53,7 +56,14 @@ public:
 
     CChecksum GenerateClientChecksum();
     CChecksum GenerateClientChecksum(CBuffer& outFileData);
+    CChecksum GetLastClientChecksum();
     CChecksum GetServerChecksum();
+    bool      HasVerifiedClientChecksum() { return m_bClientChecksumVerified; };
+    void      SetLastClientChecksum(CChecksum checksum)
+    {
+        m_LastClientChecksum = checksum;
+        m_bClientChecksumVerified = true;
+    }
 
     bool IsAutoDownload() { return m_bAutoDownload; };
     void SetDownloaded() { m_bDownloaded = true; };
@@ -79,4 +89,5 @@ protected:
     uint m_uiDownloadSize;
     uint m_uiHttpServerIndex;
     bool m_bModifedByScript;
+    bool m_bClientChecksumVerified;
 };

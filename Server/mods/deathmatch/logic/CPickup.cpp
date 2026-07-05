@@ -130,11 +130,15 @@ bool CPickup::ReadSpecialData(const int iLine)
         }
         else if (IsNumericString(szBuffer))
         {  // could be a weapon
-            usBuffer = static_cast<unsigned short>(atoi(szBuffer));
-            if (CPickupManager::IsValidWeaponID(usBuffer))
-            {  // its a weapon
-                m_ucType = WEAPON;
-                m_usModel = CPickupManager::GetWeaponModel(m_ucWeaponType);
+            const int iWeaponId = atoi(szBuffer);
+            if (iWeaponId >= 0 && iWeaponId <= 0xFFFF)
+            {
+                usBuffer = static_cast<unsigned short>(iWeaponId);
+                if (CPickupManager::IsValidWeaponID(usBuffer))
+                {  // it's a weapon
+                    m_ucType = WEAPON;
+                    m_usModel = CPickupManager::GetWeaponModel(static_cast<unsigned char>(usBuffer));
+                }
             }
         }
         else if (stricmp(szBuffer, "custom") == 0)
@@ -430,7 +434,7 @@ void CPickup::Use(CPlayer& Player)
             // Tell him to play the sound and hide/show it
             Player.Send(CPickupHitConfirmPacket(this, true));
 
-            // Tell everyone else to hide/show it as neccessary
+            // Tell everyone else to hide/show it as necessary
             g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CPickupHitConfirmPacket(this, false), &Player);
 
             // Handle it depending on the type

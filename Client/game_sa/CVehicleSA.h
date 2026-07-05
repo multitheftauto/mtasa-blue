@@ -32,12 +32,6 @@ struct RwTexture;
 
 #define SIZEOF_CHELI 2584
 
-// Suspension line sizes for different vehicle types
-#define MAX_SUSPENSION_LINES          6
-#define SUSPENSION_SIZE_STANDARD      0x20  // Standard wheel: 32 bytes
-#define SUSPENSION_SIZE_BIKE          0x80  // Bike: 128 bytes (2 wheels with extra data)
-#define SUSPENSION_SIZE_MONSTER_TRUCK 0x90  // Monster truck: 144 bytes
-
 #define FUNC_CCarCtrlCreateCarForScript          0x431f80
 #define FUNC_CVehicle_AddVehicleUpgrade          0x6E3290
 #define FUNC_CVehicle_RemoveVehicleUpgrade       0x6DF930
@@ -143,7 +137,7 @@ struct CVehicleFlags
     unsigned char bLowVehicle : 1;        // Need this for sporty type cars to use low getting-in/out anims
     unsigned char bComedyControls : 1;    // Will make the car hard to control (hopefully in a funny way)
     unsigned char bWarnedPeds : 1;        // Has scan and warn peds of danger been processed?
-    unsigned char bCraneMessageDone : 1;  // A crane message has been printed for this car allready
+    unsigned char bCraneMessageDone : 1;  // A crane message has been printed for this car already
     // unsigned char bExtendedRange: 1; // This vehicle needs to be a bit further away to get deleted
     unsigned char bTakeLessDamage : 1;  // This vehicle is stronger (takes about 1/4 of damage)
 
@@ -454,7 +448,6 @@ public:
     ~CVehicleSA();
 
     CVehicleSAInterface* GetVehicleInterface() { return reinterpret_cast<CVehicleSAInterface*>(GetInterface()); }
-    CVehicleSAInterface* GetVehicleInterface() const { return reinterpret_cast<CVehicleSAInterface*>(m_pInterface); }
 
     void Init();
 

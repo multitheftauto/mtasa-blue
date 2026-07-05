@@ -531,6 +531,7 @@ private:
     bool OnSize(CGUIElement* pElement);
     bool OnFocusGain(CGUIFocusEventArgs Args);
     bool OnFocusLoss(CGUIFocusEventArgs Args);
+    void TriggerGUIClickEvent(CGUIMouseEventArgs Args, const char* szState, const char* minClientVersion);
 
     // Network update functions
     void DoVehicleInKeyCheck();
@@ -576,6 +577,7 @@ private:
     static void                              StaticRenderHeliLightHandler();
     static void                              StaticRenderEverythingBarRoadsHandler();
     static bool                              StaticChokingHandler(unsigned char ucWeaponType);
+    static void                              StaticPreWeatherUpdateHandler();
     static void                              StaticPreWorldProcessHandler();
     static void                              StaticPostWorldProcessHandler();
     static void                              StaticPostWorldProcessPedsAfterPreRenderHandler();
@@ -625,6 +627,7 @@ private:
     void                              Render3DStuffHandler();
     void                              PreRenderSkyHandler();
     bool                              ChokingHandler(unsigned char ucWeaponType);
+    void                              PreWeatherUpdateHandler();
     void                              PreWorldProcessHandler();
     void                              PostWorldProcessHandler();
     void                              PostWorldProcessPedsAfterPreRenderHandler();

@@ -129,59 +129,6 @@ struct StackFrameInfo
 };
 constexpr std::size_t MAX_FILE_NAME = 260;
 
-class SymbolHandlerGuard
-{
-public:
-    explicit SymbolHandlerGuard(HANDLE process, bool enableSymbols) : m_process(process), m_initialized(false), m_uncaughtExceptions(std::uncaught_exceptions())
-    {
-        if (!enableSymbols)
-        {
-            return;
-        }
-
-        if (m_process != nullptr)
-        {
-            SymSetOptions(SYMOPT_LOAD_LINES | SYMOPT_UNDNAME | SYMOPT_FAIL_CRITICAL_ERRORS);
-
-            if (SymInitialize(m_process, nullptr, TRUE) != FALSE)
-            {
-                m_initialized = true;
-            }
-            else
-            {
-                const DWORD dwError = GetLastError();
-                char        debugBuffer[DEBUG_BUFFER_SIZE] = {};
-                SAFE_DEBUG_PRINT_C(debugBuffer, DEBUG_BUFFER_SIZE, "%.*sSymbolHandlerGuard: SymInitialize failed, error: %u\n",
-                                   static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), dwError);
-            }
-        }
-    }
-
-    ~SymbolHandlerGuard()
-    {
-        if (m_initialized)
-        {
-            if (std::uncaught_exceptions() <= m_uncaughtExceptions)
-            {
-                SymCleanup(m_process);
-            }
-            m_initialized = false;
-        }
-    }
-
-    SymbolHandlerGuard(const SymbolHandlerGuard&) = delete;
-    SymbolHandlerGuard& operator=(const SymbolHandlerGuard&) = delete;
-    SymbolHandlerGuard(SymbolHandlerGuard&&) = delete;
-    SymbolHandlerGuard& operator=(SymbolHandlerGuard&&) = delete;
-
-    bool IsInitialized() const { return m_initialized; }
-
-private:
-    HANDLE m_process;
-    bool   m_initialized;
-    int    m_uncaughtExceptions;
-};
-
 [[nodiscard]] static std::optional<std::vector<std::string>> CaptureEnhancedStackTrace(_EXCEPTION_POINTERS* pException)
 {
     if (pException == nullptr || pException->ContextRecord == nullptr)
@@ -214,9 +161,11 @@ private:
     frame.AddrFrame.Mode = AddrModeFlat;
     frame.AddrStack.Mode = AddrModeFlat;
 
-    SymbolHandlerGuard symbolGuard(hProcess, hasSymbols);
-
-    const bool useDbgHelp = symbolGuard.IsInitialized();
+    bool useDbgHelp = false;
+    if (hasSymbols)
+    {
+        useDbgHelp = CrashHandler::InitializeSymbolHandler();
+    }
 
     const auto                        routines = useDbgHelp ? StackTraceHelpers::MakeStackWalkRoutines(true) : StackTraceHelpers::MakeStackWalkRoutines(false);
     alignas(SYMBOL_INFO) std::uint8_t symbolBuffer[sizeof(SYMBOL_INFO) + MAX_SYMBOL_NAME];

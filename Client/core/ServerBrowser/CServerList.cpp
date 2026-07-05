@@ -267,7 +267,9 @@ void CServerListInternet::Refresh()
 
 static bool SortByASEVersionCallback(const CServerListItem* const d1, const CServerListItem* const d2)
 {
-    return d1->strVersionSortKey < d2->strVersionSortKey;
+    if (d1->strVersionSortKey != d2->strVersionSortKey)
+        return d1->strVersionSortKey < d2->strVersionSortKey;
+    return d1->uiTieBreakPosition < d2->uiTieBreakPosition;
 };
 
 //
@@ -318,6 +320,7 @@ void CServerListInternet::Pulse()
                 GetServerCache()->SetServerListCachedInfo(this);
                 GetServerCache()->GetServerListCachedInfo(this);
                 SortByASEVersion();
+                m_iRevision++;
             }
             else
             {
@@ -347,6 +350,7 @@ void CServerListInternet::Pulse()
             RetryNonRespondingServers();
 
             SortByASEVersion();
+            m_iRevision++;
             m_strStatus2 = "  " + _("(Backup server list)");
             m_iPass = 2;
         }
