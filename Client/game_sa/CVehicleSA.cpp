@@ -36,6 +36,49 @@ extern CGameSA*        pGame;
 
 static BOOL m_bVehicleSunGlare = false;
 
+static WORD GetRegisteredVehicleModelSpecialAbility(CVehicleSAInterface* vehicleInterface, WORD currentModel, int preRenderHook)
+{
+    if (!vehicleInterface)
+        return currentModel;
+
+    auto* const clientVehicle = pGame->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicleInterface));
+    auto* const vehicle = clientVehicle ? clientVehicle->pEntity : nullptr;
+    if (!vehicle)
+        return currentModel;
+
+    const WORD resolvedModel = vehicle->GetModelSpecialAbilityModel(currentModel);
+    if (auto* const vehicleSA = dynamic_cast<CVehicleSA*>(vehicle))
+        vehicleSA->NoteModelSpecialAbilityHookResolve(currentModel, resolvedModel, preRenderHook != 0);
+    return resolvedModel;
+}
+
+static WORD GetRegisteredVehicleProcessControlSpecialAbility(CVehicleSAInterface* vehicleInterface, WORD currentModel)
+{
+    if (!vehicleInterface)
+        return currentModel;
+
+    auto* const clientVehicle = pGame->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicleInterface));
+    auto* const vehicle = clientVehicle ? clientVehicle->pEntity : nullptr;
+    if (!vehicle)
+        return currentModel;
+
+    const WORD resolvedModel = vehicle->GetModelSpecialAbilityModel(currentModel);
+
+    // Custom packers keep GTA's native PreRender ramp rotation, but skip native
+    // UpdateMovingCollision. The generated moving collision can push the camera far above custom
+    // ramp meshes, so CClientVehicle updates only the misc angle for custom packers.
+    if (resolvedModel == 443 /* Packer */ && currentModel != resolvedModel)
+    {
+        if (auto* const vehicleSA = dynamic_cast<CVehicleSA*>(vehicle))
+            vehicleSA->NoteModelSpecialAbilityHookResolve(currentModel, currentModel, false);
+        return currentModel;
+    }
+
+    if (auto* const vehicleSA = dynamic_cast<CVehicleSA*>(vehicle))
+        vehicleSA->NoteModelSpecialAbilityHookResolve(currentModel, resolvedModel, false);
+    return resolvedModel;
+}
+
 // PreRender re-asserts rpATOMICRENDER on all wheel atomics every frame, which re-shows
 // the Rhino's middle wheels that SetupModelNodes hides at init. Re-clear the flag here so
 // it stays the last write of the frame and the wheels remain invisible like in vanilla.
@@ -55,6 +98,157 @@ static void __fastcall RehideRhinoMiddleWheels(CAutomobileSAInterface* vehicle)
         if (RwFrame* frame = vehicle->m_aCarNodes[static_cast<std::size_t>(comp)])
             RwFrameForAllObjects(frame, (void*)ClearAtomicRenderFlagCB, nullptr);
     }
+}
+
+static const DWORD HOOKPOS_CAutomobile_PreRender_MiscModelCheck = 0x6AC4D9;
+static const DWORD HOOKSIZE_CAutomobile_PreRender_MiscModelCheck = 6;
+static const DWORD RETURN_CAutomobile_PreRender_MiscModelCheckPacker = 0x6AC4DF;
+static const DWORD RETURN_CAutomobile_PreRender_MiscModelCheckNext = 0x6AC507;
+
+static const DWORD HOOKPOS_CAutomobile_ProcessControl_ModelSwitch = 0x6B1F77;
+static const DWORD HOOKSIZE_CAutomobile_ProcessControl_ModelSwitch = 8;
+static const DWORD RETURN_CAutomobile_ProcessControl_ModelSwitch = 0x6B1F7F;
+
+static const DWORD HOOKPOS_CAutomobile_GetTowBarPos_ModelCheck = 0x6AF250;
+static const DWORD HOOKSIZE_CAutomobile_GetTowBarPos_ModelCheck = 11;
+static const DWORD RETURN_CAutomobile_GetTowBarPos_ModelCheck = 0x6AF25B;
+
+static const DWORD HOOKPOS_CVehicle_UpdateTrailerLink_ModelCheck = 0x6DFDB2;
+static const DWORD HOOKSIZE_CVehicle_UpdateTrailerLink_ModelCheck = 8;
+static const DWORD RETURN_CVehicle_UpdateTrailerLink_ModelCheck = 0x6DFDBA;
+
+static const DWORD HOOKPOS_CVehicle_UpdateTractorLink_ModelCheck = 0x6E00D0;
+static const DWORD HOOKSIZE_CVehicle_UpdateTractorLink_ModelCheck = 8;
+static const DWORD RETURN_CVehicle_UpdateTractorLink_ModelCheck = 0x6E00D8;
+
+static void __declspec(naked) HOOK_CVehicle_UpdateTrailerLink_ModelCheck(void)
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // The tow line/drop physics path has its own towtruck/tractor model check. Resolve the
+        // transient comparison value here so custom towtrucks keep the original trailer-link logic.
+        pushad
+        movzx   eax, word ptr [ebx+22h]
+        push    0
+        push    eax
+        push    ebx
+        call    GetRegisteredVehicleModelSpecialAbility
+        add     esp, 12
+        mov     word ptr [esp+28], ax
+        popad
+
+        cmp     ax, 20Dh
+        jmp     RETURN_CVehicle_UpdateTrailerLink_ModelCheck
+    }
+    // clang-format on
+}
+
+static void __declspec(naked) HOOK_CVehicle_UpdateTractorLink_ModelCheck(void)
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // UpdateTractorLink repeats the same model-specific towtruck/tractor handling after
+        // computing link offsets. Keep that native branch available to configured custom models.
+        pushad
+        movzx   eax, word ptr [esi+22h]
+        push    eax
+        push    esi
+        call    GetRegisteredVehicleProcessControlSpecialAbility
+        add     esp, 8
+        mov     word ptr [esp+28], ax
+        popad
+
+        cmp     ax, 20Dh
+        jmp     RETURN_CVehicle_UpdateTractorLink_ModelCheck
+    }
+    // clang-format on
+}
+
+static void __declspec(naked) HOOK_CAutomobile_GetTowBarPos_ModelCheck(void)
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // Towbar lookup is also model-gated. Resolve the same ability model here so native
+        // TowTruckControl can find a towbar on resource-defined towtrucks.
+        pushad
+        movzx   eax, word ptr [ecx+22h]
+        push    0
+        push    eax
+        push    ecx
+        call    GetRegisteredVehicleModelSpecialAbility
+        add     esp, 12
+        mov     word ptr [esp+28], ax
+        popad
+
+        sub     esp, 0Ch
+        cmp     ax, 20Dh
+        jmp     RETURN_CAutomobile_GetTowBarPos_ModelCheck
+    }
+    // clang-format on
+}
+
+static void __declspec(naked) HOOK_CAutomobile_ProcessControl_ModelSwitch(void)
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // Original code loads m_nModelIndex into AX before the model switch that calls
+        // UpdateMovingCollision and TowTruckControl. Use a ProcessControl-specific resolver so
+        // custom packers can keep visual misc_a rotation without GTA's moving-collision camera push.
+        pushad
+        movzx   eax, word ptr [esi+22h]
+        push    eax
+        push    esi
+        call    GetRegisteredVehicleProcessControlSpecialAbility
+        add     esp, 8
+        mov     word ptr [esp+28], ax
+        popad
+
+        cmp     ax, 1B0h
+        jmp     RETURN_CAutomobile_ProcessControl_ModelSwitch
+    }
+    // clang-format on
+}
+
+static void __declspec(naked) HOOK_CAutomobile_PreRender_MiscModelCheck(void)
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // Original code checks AX against MODEL_PACKER, then falls through to MODEL_TOWTRUCK.
+        // Replace only that transient comparison value so the native misc_a rotation block can
+        // handle resource-defined special abilities without changing the vehicle's real model ID.
+        pushad
+        movzx   eax, word ptr [esp+28]
+        push    1
+        push    eax
+        push    esi
+        call    GetRegisteredVehicleModelSpecialAbility
+        add     esp, 12
+        mov     word ptr [esp+28], ax
+        popad
+
+        cmp     ax, 1BBh
+        jne     not_packer
+        jmp     RETURN_CAutomobile_PreRender_MiscModelCheckPacker
+
+not_packer:
+        jmp     RETURN_CAutomobile_PreRender_MiscModelCheckNext
+    }
+    // clang-format on
 }
 
 static void __declspec(naked) HOOK_Vehicle_PreRender(void)
@@ -969,7 +1163,17 @@ float CVehicleSA::GetGasPedal()
 
 bool CVehicleSA::GetTowBarPos(CVector* pVector, CVehicle* pTrailer)
 {
-    return GetVehicleInterface()->GetTowbarPos(pVector, true, pTrailer ? pTrailer->GetVehicleInterface() : nullptr);
+    auto* const vehicleInterface = GetVehicleInterface();
+    const WORD  originalModel = vehicleInterface->m_nModelIndex;
+    const WORD  resolvedModel = GetModelSpecialAbilityModel(originalModel);
+
+    // GTA restricts towbar lookup for towtrucks/tractors by hard-coded model ID. Temporarily
+    // expose the configured ability model so native tow attachment uses the original towtruck
+    // geometry rules without permanently changing this custom model.
+    vehicleInterface->m_nModelIndex = resolvedModel;
+    const bool result = vehicleInterface->GetTowbarPos(pVector, true, pTrailer ? pTrailer->GetVehicleInterface() : nullptr);
+    vehicleInterface->m_nModelIndex = originalModel;
+    return result;
 }
 
 bool CVehicleSA::GetTowHitchPos(CVector* pVector)
@@ -1914,6 +2118,75 @@ bool CVehicleSA::UpdateMovingCollision(float fAngle)
     return bReturn;
 }
 
+void CVehicleSA::SetModelSpecialAbilityModel(unsigned short model, bool enabled)
+{
+    const WORD previousModel = m_modelSpecialAbilityModel;
+
+    // Store this on the SA wrapper so native hooks can resolve the ability through
+    // CVehicleSAInterface::m_pVehicle even if the underlying game entity is recreated.
+    m_modelSpecialAbilityEnabled = enabled;
+    m_modelSpecialAbilityModel = model;
+
+    if (!enabled && previousModel == 544 /* Fire Truck Ladder */)
+    {
+        auto* const automobile = dynamic_cast<CAutomobileSA*>(this);
+        auto* const automobileInterface = automobile ? automobile->GetAutomobileInterface() : nullptr;
+        if (automobileInterface)
+            automobileInterface->m_swingingChassis = {};
+    }
+    else if (enabled && model == 525 /* Towtruck */)
+    {
+        auto* const automobile = dynamic_cast<CAutomobileSA*>(this);
+        auto* const automobileInterface = automobile ? automobile->GetAutomobileInterface() : nullptr;
+        if (automobileInterface && automobileInterface->m_aCarNodes[static_cast<std::size_t>(eCarNodes::MISC_B)])
+        {
+            auto& towHookPanel = automobileInterface->m_panels[FRONT_LEFT_PANEL];
+            if (towHookPanel.m_nFrameId == 0xFFFF)
+                towHookPanel.SetPanel(static_cast<std::int16_t>(eCarNodes::MISC_B), 2, 1.0f);
+        }
+    }
+    else if (enabled && model == 544 /* Fire Truck Ladder */)
+    {
+        auto* const automobile = dynamic_cast<CAutomobileSA*>(this);
+        auto* const automobileInterface = automobile ? automobile->GetAutomobileInterface() : nullptr;
+        if (automobileInterface)
+        {
+            // MODEL_FIRELA initializes this special chassis door in CAutomobile's constructor.
+            // Custom models skip that constructor branch, so mirror the native setup when a
+            // resource opts into ladder behavior.
+            auto& swingingChassis = automobileInterface->m_swingingChassis;
+            swingingChassis.m_fOpenAngle = 0.1f * 3.14159265358979323846f;
+            swingingChassis.m_fClosedAngle = -0.1f * 3.14159265358979323846f;
+            swingingChassis.m_nDirn = 0x184;      // DOOR_AXIS_NEG_Y | DOOR_EXTRA_FIXEDSTATE | DOOR_EXTRA_FIRETRUCK
+            swingingChassis.m_nAxis = 2;          // DOOR_AXIS_Z
+            swingingChassis.m_nDoorState = 1;     // DOOR_HIT_MAX_END
+        }
+    }
+}
+
+WORD CVehicleSA::GetModelSpecialAbilityModel(WORD currentModel) const
+{
+    return m_modelSpecialAbilityEnabled ? m_modelSpecialAbilityModel : currentModel;
+}
+
+void CVehicleSA::NoteModelSpecialAbilityHookResolve(WORD currentModel, WORD resolvedModel, bool preRenderHook)
+{
+    // Keep a tiny live trace for diagnosing custom models that do not enter GTA's native special
+    // vehicle branches. This records the hook input/output without changing the native path.
+    if (preRenderHook)
+    {
+        m_modelSpecialAbilityLastPreRenderCurrentModel = currentModel;
+        m_modelSpecialAbilityLastPreRenderResolvedModel = resolvedModel;
+        ++m_modelSpecialAbilityPreRenderResolveCount;
+    }
+    else
+    {
+        m_modelSpecialAbilityLastProcessCurrentModel = currentModel;
+        m_modelSpecialAbilityLastProcessResolvedModel = resolvedModel;
+        ++m_modelSpecialAbilityProcessResolveCount;
+    }
+}
+
 void* CVehicleSA::GetPrivateSuspensionLines()
 {
     if (m_pSuspensionLines == NULL)
@@ -2076,6 +2349,26 @@ bool CVehicleSA::SetOnFire(bool onFire)
 
 void CVehicleSA::StaticSetHooks()
 {
+    // Trailer-link updates use separate model checks for towtruck line physics and drop/release
+    // behavior, so extend those checks as well as TowTruckControl and towbar lookup.
+    HookInstall(HOOKPOS_CVehicle_UpdateTrailerLink_ModelCheck, (DWORD)HOOK_CVehicle_UpdateTrailerLink_ModelCheck,
+                HOOKSIZE_CVehicle_UpdateTrailerLink_ModelCheck);
+    HookInstall(HOOKPOS_CVehicle_UpdateTractorLink_ModelCheck, (DWORD)HOOK_CVehicle_UpdateTractorLink_ModelCheck,
+                HOOKSIZE_CVehicle_UpdateTractorLink_ModelCheck);
+
+    // Let GTA's own towbar lookup treat configured custom models as towtrucks/tractors.
+    HookInstall(HOOKPOS_CAutomobile_GetTowBarPos_ModelCheck, (DWORD)HOOK_CAutomobile_GetTowBarPos_ModelCheck,
+                HOOKSIZE_CAutomobile_GetTowBarPos_ModelCheck);
+
+    // Extend GTA's native ProcessControl model switch so custom models enter the original
+    // towtruck/packer logic instead of calling those routines from MTA's post-frame pulse.
+    HookInstall(HOOKPOS_CAutomobile_ProcessControl_ModelSwitch, (DWORD)HOOK_CAutomobile_ProcessControl_ModelSwitch,
+                HOOKSIZE_CAutomobile_ProcessControl_ModelSwitch);
+
+    // Extend GTA's native misc_a PreRender model checks for resource-defined vehicle abilities.
+    HookInstall(HOOKPOS_CAutomobile_PreRender_MiscModelCheck, (DWORD)HOOK_CAutomobile_PreRender_MiscModelCheck,
+                HOOKSIZE_CAutomobile_PreRender_MiscModelCheck);
+
     // Setup vehicle sun glare hook
     HookInstall(FUNC_CAutomobile_OnVehiclePreRender, (DWORD)HOOK_Vehicle_PreRender, 5);
 

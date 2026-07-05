@@ -178,7 +178,10 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
         // Is this a vehicle ID?
         if (CClientVehicleManager::IsValidModel(usModel))
         {
-            return ReplaceVehicleModel(pClump, usModel, bAlphaTransparency);
+            const bool wasReplaced = ReplaceVehicleModel(pClump, usModel, bAlphaTransparency);
+            if (wasReplaced)
+                ResetVehicleModelSpecialAbilities(usModel);
+            return wasReplaced;
         }
         else if (CClientPlayerManager::IsValidModel(usModel))
         {
@@ -261,6 +264,8 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
     // Is this a vehicle ID?
     if (CClientVehicleManager::IsValidModel(usModel))
     {
+        ResetVehicleModelSpecialAbilities(usModel);
+
         // Stream the vehicles of that model out so we have no
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
@@ -322,6 +327,20 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
         if (pInfo->pClump)
             g_pGame->GetRenderWare()->DestroyDFF(pInfo->pClump);
         MapRemove(m_LoadedClumpInfoMap, usModel);
+    }
+}
+
+void CClientDFF::ResetVehicleModelSpecialAbilities(unsigned short usModel)
+{
+    // Model special abilities depend on the current DFF/COL component layout. Clear explicit
+    // overrides when that layout is replaced or restored so a reused model ID does not inherit
+    // towtruck/packer behavior from the previous asset.
+    CClientVehicleManager* vehicleManager = m_pManager->GetVehicleManager();
+    for (auto iter = vehicleManager->IterBegin(); iter != vehicleManager->IterEnd(); ++iter)
+    {
+        CClientVehicle* vehicle = *iter;
+        if (vehicle && vehicle->GetModel() == usModel)
+            vehicle->ResetModelSpecialAbility();
     }
 }
 

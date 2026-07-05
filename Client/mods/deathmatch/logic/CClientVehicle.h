@@ -27,6 +27,8 @@ class CClientVehicle;
 #include "CVehicleUpgrades.h"
 #include "CClientModel.h"
 
+#include <optional>
+
 class CBikeHandlingEntry;
 class CBoatHandlingEntry;
 class CClientProjectile;
@@ -550,6 +552,10 @@ public:
     bool SetDummyPosition(VehicleDummies dummy, const CVector& position);
     bool ResetDummyPositions();
 
+    bool SetModelSpecialAbility(const SString& ability);
+    void ResetModelSpecialAbility();
+    SString GetModelSpecialAbility() const;
+
     bool SpawnFlyingComponent(const eCarNodes& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime);
 
     CVector GetEntryPoint(std::uint32_t entryPointIndex);
@@ -743,6 +749,8 @@ protected:
     unsigned char                  m_ucFellThroughMapCount;
     SFixedArray<bool, MAX_WINDOWS> m_bWindowOpen;
     std::shared_ptr<CClientModel>  m_clientModel;
+    std::optional<WORD>            m_modelSpecialAbilityModel;
+    bool                           m_hasModelSpecialAbilityOverride = false;
 
 public:
 #ifdef MTA_DEBUG

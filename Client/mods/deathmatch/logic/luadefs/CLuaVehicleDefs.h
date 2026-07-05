@@ -122,6 +122,10 @@ public:
     LUA_DECLARE(SetHelicopterRotorSpeed);
     static bool SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpeed);
     static bool SetVehicleWheelsRotation(CClientVehicle* pVehicle, float fRotation) noexcept;
+    static bool SetVehicleSpecialAbility(CClientVehicle* pVehicle, std::string ability);
+    static bool SetVehicleModelSpecialAbility(CClientVehicle* pVehicle, std::string ability);
+    static std::string GetVehicleSpecialAbility(CClientVehicle* pVehicle);
+    static std::string GetVehicleModelSpecialAbility(CClientVehicle* pVehicle);
     LUA_DECLARE(SetTrainDerailed);
     LUA_DECLARE(SetTrainDerailable);
     LUA_DECLARE(SetTrainDirection);
