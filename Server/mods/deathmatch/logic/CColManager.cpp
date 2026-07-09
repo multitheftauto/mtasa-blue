@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CColCallback.h"
 #include "CColManager.h"
 #include "CSpatialDatabase.h"
 #include "Utils.h"

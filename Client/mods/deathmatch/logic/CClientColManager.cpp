@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CClientColCallback.h"
 
 using std::list;
 using std::vector;
