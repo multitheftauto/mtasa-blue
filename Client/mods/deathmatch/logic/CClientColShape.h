@@ -57,6 +57,7 @@ public:
 
     void                CallHitCallback(CClientEntity& Entity);
     void                CallLeaveCallback(CClientEntity& Entity);
+    CClientColCallback* GetHitCallback() { return m_pCallback; };
     CClientColCallback* SetHitCallback(CClientColCallback* pCallback) { return (m_pCallback = pCallback); };
 
     bool GetAutoCallEvent() { return m_bAutoCallEvent; };

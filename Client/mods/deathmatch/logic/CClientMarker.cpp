@@ -423,9 +423,6 @@ void CClientMarker::StreamOut()
 
 void CClientMarker::Callback_OnCollision(CClientColShape& shape, CClientEntity& entity)
 {
-    if (GetInterior() != entity.GetInterior())
-        return;
-
     // Call the marker hit event
     CLuaArguments arguments;
     arguments.PushElement(&entity);                                  // Hit element
@@ -443,9 +440,6 @@ void CClientMarker::Callback_OnCollision(CClientColShape& shape, CClientEntity& 
 
 void CClientMarker::Callback_OnLeave(CClientColShape& shape, CClientEntity& entity)
 {
-    if (GetInterior() != entity.GetInterior())
-        return;
-
     // Call the marker leave event
     CLuaArguments arguments;
     arguments.PushElement(&entity);                                  // Hit element
@@ -459,6 +453,11 @@ void CClientMarker::Callback_OnLeave(CClientColShape& shape, CClientEntity& enti
     arguments2.PushElement(this);                                     // marker
     arguments2.PushBoolean(GetDimension() == entity.GetDimension());  // Matching dimension?
     entity.CallEvent("onPlayerMarkerLeave", arguments2, false);
+}
+
+bool CClientMarker::ShouldTrackCollision(CClientColShape& shape, CClientEntity& entity)
+{
+    return GetInterior() == entity.GetInterior();
 }
 
 void CClientMarker::CreateOfType(int iType)

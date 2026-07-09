@@ -16,6 +16,7 @@
 class CColCallback
 {
 public:
+    virtual bool ShouldTrackCollision(CColShape& Shape, CElement& Element) = 0;
     virtual void Callback_OnCollision(CColShape& Shape, CElement& Element) = 0;
     virtual void Callback_OnLeave(CColShape& Shape, CElement& Element) = 0;
     virtual void Callback_OnCollisionDestroy(CColShape* pShape) = 0;

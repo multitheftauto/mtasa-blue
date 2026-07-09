@@ -15,6 +15,7 @@
 class CClientColCallback
 {
 public:
+    virtual bool ShouldTrackCollision(CClientColShape& Shape, CClientEntity& Entity) = 0;
     virtual void Callback_OnCollision(CClientColShape& Shape, CClientEntity& Entity) = 0;
     virtual void Callback_OnLeave(CClientColShape& Shape, CClientEntity& Entity) = 0;
 };

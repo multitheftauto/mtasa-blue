@@ -1507,6 +1507,34 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
     {
         pElement->SetInterior(ucInterior);
 
+        // Re-evaluate marker/pickup collisions after interior changes
+        switch (pElement->GetType())
+        {
+            case CElement::PLAYER:
+            case CElement::PED:
+            case CElement::VEHICLE:
+                m_pColManager->DoHitDetection(pElement->GetPosition(), pElement);
+                break;
+            case CElement::MARKER:
+            {
+                CMarker*   pMarker = static_cast<CMarker*>(pElement);
+                CColShape* pColShape = pMarker->GetColShape();
+                if (pColShape)
+                    RefreshColShapeColliders(pColShape);
+                break;
+            }
+            case CElement::PICKUP:
+            {
+                CPickup*   pPickup = static_cast<CPickup*>(pElement);
+                CColShape* pColShape = pPickup->GetColShape();
+                if (pColShape)
+                    RefreshColShapeColliders(pColShape);
+                break;
+            }
+            default:
+                break;
+        }
+
         // Tell everyone
         CBitStream BitStream;
         BitStream.pBitStream->Write(ucInterior);
@@ -7910,6 +7938,10 @@ CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CV
                 pMarker->RemoveVisibleToReference(m_pMapManager->GetRootElement());
                 pMarker->AddVisibleToReference(pVisibleTo);
             }
+
+            CColShape* pColShape = pMarker->GetColShape();
+            if (pColShape)
+                RefreshColShapeColliders(pColShape);
 
             // Tell everyone about it
             if (pResource->IsClientSynced())
