@@ -14,12 +14,29 @@
 #include "lua/CLuaMain.h"
 #include "CGame.h"
 #include "Utils.h"
+#include <array>
+#include <cstdint>
+#include <numeric>
 
 extern CNetServer* g_pRealNetServer;
 
 namespace
 {
 #define TOP_COUNT (3)
+
+    const auto& GetAllPacketIds()
+    {
+        // Cache the full packet id range once so packet usage stats track the
+        // shared enum automatically whenever new packet types are added.
+        static const auto packetIds = []
+        {
+            std::array<std::uint8_t, NUM_PACKETS> packetIds{};
+            std::iota(packetIds.begin(), packetIds.end(), std::uint8_t{0});
+            return packetIds;
+        }();
+
+        return packetIds;
+    }
 
     struct CTopValue
     {
@@ -223,12 +240,14 @@ void CPerfStatPlayerPacketUsageImpl::DoPulse()
 void CPerfStatPlayerPacketUsageImpl::UpdatePlayerPacketUsage()
 {
     // Get stats from net module
-    uchar      packetIdList[] = {PACKET_ID_COMMAND, PACKET_ID_LUA_EVENT, PACKET_ID_CUSTOM_DATA};
-    const uint uiNumPacketIds = NUMELMS(packetIdList);
-    const uint uiTopCount = TOP_COUNT;
+    const auto& packetIdList = GetAllPacketIds();
+    const uint  uiNumPacketIds = static_cast<uint>(packetIdList.size());
+    const uint  uiTopCount = TOP_COUNT;
 
-    SPlayerPacketUsage stats[uiNumPacketIds * uiTopCount];
-    if (!g_pRealNetServer->GetPlayerPacketUsageStats(packetIdList, uiNumPacketIds, stats, uiTopCount))
+    std::vector<SPlayerPacketUsage> stats(uiNumPacketIds * uiTopCount);
+    // The net server API still takes a mutable pointer even though the packet id
+    // list is read-only, so keep the cast contained at this legacy boundary.
+    if (!g_pRealNetServer->GetPlayerPacketUsageStats(const_cast<std::uint8_t*>(packetIdList.data()), uiNumPacketIds, stats.data(), uiTopCount))
         return;
 
     uint uiPlayerCount = g_pGame->GetPlayerManager()->Count();
