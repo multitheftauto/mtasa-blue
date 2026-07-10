@@ -599,6 +599,7 @@ void CCameraSA::GetCameraClip(bool& bObjects, bool& bVehicles)
 
 // At speed, relax camera collision against dynamic (script-created) objects only.
 // Static world geometry always keeps collision so default GTA world/buildings still block the camera.
+// When the camera target is another player's vehicle, use that vehicle's speed rather than the local player
 static void ApplyVehicleSpeedCameraClip()
 {
     // Static-world clip stays on regardless of speed.
@@ -607,15 +608,35 @@ static void ApplyVehicleSpeedCameraClip()
     using FindPlayerVehicle_t = void*(__cdecl*)(int playerId, bool bIncludeRemote);
     auto FindPlayerVehicle = reinterpret_cast<FindPlayerVehicle_t>(0x56E0D0);
 
-    void* pVehicle = FindPlayerVehicle(-1, false);
+    void* pVehicle = nullptr;
+
+    // Check the camera's actual target entity first: when spectating another player who is driving,
+    // the camera target is their vehicle, not the local player's.
+    CCamera* pCamera = pGame->GetCamera();
+    if (pCamera)
+    {
+        CEntity* pTargetEntity = pCamera->GetTargetEntity();
+        if (pTargetEntity && pTargetEntity->GetEntityType() == ENTITY_TYPE_VEHICLE)
+        {
+            pVehicle = pTargetEntity->GetInterface();
+        }
+    }
+
+    // Fall back to local player's vehicle if the camera isn't targeting a vehicle.
     if (!pVehicle)
     {
-        // No player vehicle: restore stock defaults.
+        pVehicle = FindPlayerVehicle(-1, false);
+    }
+
+    // No vehicle to derive speed from: restore stock defaults so the camera collides with everything.
+    if (!pVehicle)
+    {
         MemPutFast<float>(VAR_RelVelCamCollisionVehSqr, 1.0f);
         MemPutFast<char>(VAR_CameraClipDynamicObjects, 1);
         return;
     }
 
+    // Apply camera clipping for dynamic objects
     // CPhysicalSAInterface::m_vecLinearVelocity at offset 0x44 (CVector: 3 floats)
     float* pSpeed = reinterpret_cast<float*>(static_cast<char*>(pVehicle) + 0x44);
     float  speedSq = pSpeed[0] * pSpeed[0] + pSpeed[1] * pSpeed[1] + pSpeed[2] * pSpeed[2];
