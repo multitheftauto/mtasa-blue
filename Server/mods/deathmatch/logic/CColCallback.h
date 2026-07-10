@@ -17,7 +17,7 @@ class CColCallback
 {
 public:
     // Whether a geometric hit should be stored in collision state. Callbacks can defer
-    // tracking until interior/dimension checks pass, so stale hits are cleared. #5018
+    // tracking until interior/dimension checks pass, so stale hits are cleared.
     virtual bool ShouldTrackCollision(CColShape& Shape, CElement& Element) = 0;
     virtual void Callback_OnCollision(CColShape& Shape, CElement& Element) = 0;
     virtual void Callback_OnLeave(CColShape& Shape, CElement& Element) = 0;
