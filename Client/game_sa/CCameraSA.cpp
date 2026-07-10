@@ -612,7 +612,7 @@ static void ApplyVehicleSpeedCameraClip()
 
     // Check the camera's actual target entity first: when spectating another player who is driving,
     // the camera target is their vehicle, not the local player's.
-    CCamera* pCamera = pGame->GetCamera();
+    CCamera* pCamera = pGame ? pGame->GetCamera() : nullptr;
     if (pCamera)
     {
         CEntity* pTargetEntity = pCamera->GetTargetEntity();
