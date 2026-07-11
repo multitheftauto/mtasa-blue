@@ -57,6 +57,13 @@ enum class eHudComponentProperty
     ALL_PROPERTIES,
 };
 
+enum class eHudSuppressionReason : std::uint8_t
+{
+    PLAYER_MAP,
+
+    COUNT,
+};
+
 enum class eFontStyle : std::uint8_t
 {
     FONT_GOTHIC,
@@ -133,4 +140,9 @@ public:
     virtual bool GetComponentUseCustomAlpha(const eHudComponent& component) const noexcept = 0;
 
     virtual CVector2D GetComponentTextSize(const eHudComponent& component) const = 0;
+
+    // Keep new methods at the end so existing CHud virtual method positions remain stable across client modules.
+    virtual bool IsEnabled() const noexcept = 0;
+    virtual void SetSuppressed(eHudSuppressionReason reason, bool suppressed) = 0;
+    virtual void ResetVisibilityState() = 0;
 };

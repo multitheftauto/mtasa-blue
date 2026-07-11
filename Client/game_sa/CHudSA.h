@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <bitset>
 #include <game/CHud.h>
 #include <CVector.h>
 #include <game/RenderWare.h>
@@ -68,6 +69,8 @@ struct SHudComponent
     DWORD         uiDataSize;
     DWORD         origData;
     DWORD         disabledData;
+    // Components rendered inside another HUD component inherit their parent's visibility.
+    eHudComponent parent = HUD_ALL;
 };
 
 enum class eHudColour
@@ -176,13 +179,17 @@ class CHudSA : public CHud
 {
 public:
     CHudSA();
-    void Disable(bool bDisabled);
-    bool IsDisabled();
-    void SetComponentVisible(eHudComponent component, bool bVisible);
-    bool IsComponentVisible(eHudComponent component);
+    void Disable(bool disabled) override;
+    bool IsDisabled() override;
+    void SetComponentVisible(eHudComponent component, bool bVisible) override;
+    bool IsComponentVisible(eHudComponent component) override;
     void AdjustComponents(float fAspectRatio);
     void ResetComponentAdjustment();
     bool IsCrosshairVisible();
+
+    bool IsEnabled() const noexcept override { return m_isEnabled; }
+    void SetSuppressed(eHudSuppressionReason reason, bool suppressed) override;
+    void ResetVisibilityState() override;
 
     bool IsComponentBar(const eHudComponent& component) const noexcept override;
     bool IsComponentText(const eHudComponent& component) const noexcept override;
@@ -276,6 +283,7 @@ public:
 
 private:
     void InitComponentList();
+    void ApplyVisibilityState();
     void UpdateStreetchCalculations();
     void ResetComponent(SComponentPlacement& placement, bool resetSize) noexcept;
     void ResetComponentFontData(const eHudComponent& component, const eHudComponentProperty& property) noexcept;
@@ -299,6 +307,11 @@ private:
 
 private:
     std::map<eHudComponent, SHudComponent> m_HudComponentMap;
+
+    bool m_isEnabled = true;
+    bool m_isAppliedDisabled = false;
+    // Each temporary owner releases only its own suppression, preserving the state requested through showhud.
+    std::bitset<static_cast<std::size_t>(eHudSuppressionReason::COUNT)> m_suppressionReasons;
 
     float* m_pfAspectRatioMultiplicator;
     float* m_pfCameraCrosshairScale;

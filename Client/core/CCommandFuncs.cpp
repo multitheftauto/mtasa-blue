@@ -366,9 +366,10 @@ void CCommandFuncs::CopyGTAControls(const char* szParameters)
 
 void CCommandFuncs::HUD(const char* szParameters)
 {
-    int  iCmd = (szParameters && szParameters[0]) ? atoi(szParameters) : -1;
-    bool bShow = (iCmd == 1) ? true : (iCmd == 0) ? false : g_pCore->GetGame()->GetHud()->IsDisabled();
-    g_pCore->GetGame()->GetHud()->Disable(!bShow);
+    const int  command = (szParameters && szParameters[0]) ? atoi(szParameters) : -1;
+    auto*      hud = g_pCore->GetGame()->GetHud();
+    const bool show = (command == 1) ? true : (command == 0) ? false : !hud->IsEnabled();
+    hud->Disable(!show);
 }
 
 void CCommandFuncs::SaveConfig(const char* szParameters)

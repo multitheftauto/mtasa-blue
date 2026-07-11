@@ -5523,6 +5523,7 @@ void CClientGame::ResetMapInfo()
 
     // Player map
     m_pPlayerMap->SetForcedState(false);
+    m_pPlayerMap->SetPlayerMapEnabled(false);
 
     // Camera
     m_pCamera->FadeOut(0.0f, 0, 0, 0);

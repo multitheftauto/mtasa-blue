@@ -96,23 +96,57 @@ CHudSA::CHudSA()
     componentProperties.wanted = MapGet(defaultComponentProperties, HUD_WANTED);
 }
 
-void CHudSA::Disable(bool bDisabled)
+void CHudSA::Disable(bool disabled)
 {
-    if (bDisabled)
-        MemPut<BYTE>(FUNC_Draw, 0xC3);
-    else
-        MemPut<BYTE>(FUNC_Draw, 0x80);
+    const bool enabled = !disabled;
+    if (m_isEnabled == enabled)
+        return;
 
-    // Also disable the radar as the above code will not hide it before the local player has spawned
-    if (bDisabled)
-        MemPut<BYTE>(FUNC_DrawRadarPlanB, 0xC3);
-    else
-        MemPut<BYTE>(FUNC_DrawRadarPlanB, 0x83);
+    m_isEnabled = enabled;
+    ApplyVisibilityState();
 }
 
 bool CHudSA::IsDisabled()
 {
-    return *(BYTE*)FUNC_Draw == 0xC3;
+    return !m_isEnabled || m_suppressionReasons.any();
+}
+
+void CHudSA::SetSuppressed(eHudSuppressionReason reason, bool suppressed)
+{
+    const std::size_t index = static_cast<std::size_t>(reason);
+    if (index >= m_suppressionReasons.size() || m_suppressionReasons[index] == suppressed)
+        return;
+
+    m_suppressionReasons.set(index, suppressed);
+    ApplyVisibilityState();
+}
+
+void CHudSA::ResetVisibilityState()
+{
+    m_isEnabled = true;
+    m_suppressionReasons.reset();
+    ApplyVisibilityState();
+}
+
+void CHudSA::ApplyVisibilityState()
+{
+    const bool disabled = IsDisabled();
+    // Avoid rewriting GTA code when overlapping owners do not change the effective HUD state.
+    if (m_isAppliedDisabled == disabled)
+        return;
+
+    if (disabled)
+        MemPut<BYTE>(FUNC_Draw, 0xC3);
+    else
+        MemPut<BYTE>(FUNC_Draw, 0x80);
+
+    // The regular HUD draw patch does not cover the fallback radar path used before the local player spawns.
+    if (disabled)
+        MemPut<BYTE>(FUNC_DrawRadarPlanB, 0xC3);
+    else
+        MemPut<BYTE>(FUNC_DrawRadarPlanB, 0x83);
+
+    m_isAppliedDisabled = disabled;
 }
 
 //
@@ -130,9 +164,9 @@ void CHudSA::InitComponentList()
         {1, HUD_VEHICLE_NAME, 1, FUNC_DrawVehicleName, 1, 0xCC, 0xC3},
         {1, HUD_AREA_NAME, 1, FUNC_DrawAreaName, 1, 0xCC, 0xC3},
         {1, HUD_RADAR, 1, FUNC_DrawRadar, 1, 0xCC, 0xC3},
-        {1, HUD_RADAR_MAP, 1, FUNC_CRadar_DrawRadarMap, 1, 0xCC, 0xC3},
-        {1, HUD_RADAR_BLIPS, 1, FUNC_CRadar_DrawBlips, 1, 0xCC, 0xC3},
-        {1, HUD_RADAR_ALTIMETER, 1, CODE_ShowRadarAltimeter, 2, 0xCC, 0xEB30},
+        {1, HUD_RADAR_MAP, 1, FUNC_CRadar_DrawRadarMap, 1, 0xCC, 0xC3, HUD_RADAR},
+        {1, HUD_RADAR_BLIPS, 1, FUNC_CRadar_DrawBlips, 1, 0xCC, 0xC3, HUD_RADAR},
+        {1, HUD_RADAR_ALTIMETER, 1, CODE_ShowRadarAltimeter, 2, 0xCC, 0xEB30, HUD_RADAR},
         {1, HUD_CLOCK, 0, VAR_DisableClock, 1, 1, 0},
         {1, HUD_RADIO, 1, FUNC_DrawRadioName, 1, 0xCC, 0xC3},
         {1, HUD_WANTED, 1, FUNC_DrawWantedLevel, 1, 0xCC, 0xC3},
@@ -194,16 +228,25 @@ void CHudSA::SetComponentVisible(eHudComponent component, bool bVisible)
 //
 bool CHudSA::IsComponentVisible(eHudComponent component)
 {
-    SHudComponent* pComponent = MapFind(m_HudComponentMap, component);
-    if (pComponent)
+    if (IsDisabled())
+        return false;
+
+    // A child component cannot render when any containing component in its draw path is disabled.
+    auto* currentComponent = MapFind(m_HudComponentMap, component);
+    for (std::size_t depth = 0; currentComponent && depth < m_HudComponentMap.size(); ++depth)
     {
-        // Determine if invisible by matching data with disabled values
-        uchar* pSrc = (uchar*)(&pComponent->disabledData);
-        uchar* pDest = (uchar*)(pComponent->uiDataAddr);
-        if (memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
-            return false;  // Matches disabled bytes
-        return true;
+        const auto* disabledData = reinterpret_cast<const uchar*>(&currentComponent->disabledData);
+        const auto* currentData = reinterpret_cast<const uchar*>(currentComponent->uiDataAddr);
+        if (memcmp(currentData, disabledData, currentComponent->uiDataSize) == 0)
+            return false;
+
+        if (currentComponent->parent == HUD_ALL)
+            return true;
+
+        currentComponent = MapFind(m_HudComponentMap, currentComponent->parent);
     }
+
+    // Bound parent traversal so malformed component metadata cannot make a visibility query loop forever.
     return false;
 }
 
