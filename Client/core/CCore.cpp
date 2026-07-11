@@ -1489,7 +1489,7 @@ void CCore::OnModUnload()
 void CCore::RegisterCommands()
 {
     // m_pCommands->Add ( "e", CCommandFuncs::Editor );
-    m_pCommands->Add("clear", _("clears the console"), CCommandFuncs::Clear);
+    m_pCommands->Add("clearconsole", _("clears the console"), CCommandFuncs::Clear);
     m_pCommands->Add("help", _("this help screen"), CCommandFuncs::Help);
     m_pCommands->Add("exit", _("exits the application"), CCommandFuncs::Exit);
     m_pCommands->Add("quit", _("exits the application"), CCommandFuncs::Exit);
