@@ -106,14 +106,12 @@ void CConsole::Printf(const char* szFormat, ...)
 
 void CConsole::Clear()
 {
-    // Clear the history buffer.
-    // This crashes if there is more than one line in the console
+    // Discard queued output first so clearing a hidden console cannot restore old text when it is reopened.
+    m_strPendingAdd.clear();
+
+    // Command input history and the persistent console log are intentionally retained.
     if (m_pHistory)
-    {
         m_pHistory->SetText("");
-        m_strPendingAdd.clear();
-        m_strSavedInputText.clear();
-    }
 }
 
 bool CConsole::IsEnabled()
