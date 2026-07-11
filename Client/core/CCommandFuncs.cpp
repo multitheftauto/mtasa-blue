@@ -368,9 +368,10 @@ void CCommandFuncs::HUD(const char* szParameters)
 {
     // Toggle based on the user's own showhud preference only, so temporary suppression
     // (e.g. the F11 player map) does not flip the toggle in an unexpected direction
-    int  iCmd = (szParameters && szParameters[0]) ? atoi(szParameters) : -1;
-    bool bShow = (iCmd == 1) ? true : (iCmd == 0) ? false : g_pCore->GetGame()->GetHud()->HasDisableReason(HUD_DISABLE_USER);
-    g_pCore->GetGame()->GetHud()->Disable(!bShow);
+    CHud*      pHud = g_pCore->GetGame()->GetHud();
+    const int  iCmd = (szParameters && szParameters[0]) ? atoi(szParameters) : -1;
+    const bool bShow = (iCmd == 1) ? true : (iCmd == 0) ? false : !pHud->IsEnabled();
+    pHud->Disable(!bShow);
 }
 
 void CCommandFuncs::SaveConfig(const char* szParameters)

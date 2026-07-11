@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <bitset>
 #include <game/CHud.h>
 #include <CVector.h>
 #include <game/RenderWare.h>
@@ -68,6 +69,8 @@ struct SHudComponent
     DWORD         uiDataSize;
     DWORD         origData;
     DWORD         disabledData;
+    // Components rendered inside another HUD component cannot draw while their parent is hidden
+    eHudComponent parent = HUD_ALL;
 };
 
 enum class eHudColour
@@ -176,16 +179,19 @@ class CHudSA : public CHud
 {
 public:
     CHudSA();
-    void Disable(bool bDisabled);
-    void SetDisableReason(eHudDisableReason reason, bool bDisabled);
-    void ResetDisableReasons();
-    bool IsDisabled();
-    bool HasDisableReason(eHudDisableReason reason);
-    void SetComponentVisible(eHudComponent component, bool bVisible);
-    bool IsComponentVisible(eHudComponent component);
-    void AdjustComponents(float fAspectRatio);
-    void ResetComponentAdjustment();
-    bool IsCrosshairVisible();
+    void Disable(bool bDisabled) override;
+    bool IsDisabled() override;
+    void SetComponentVisible(eHudComponent component, bool bVisible) override;
+    bool IsComponentVisible(eHudComponent component) override;
+    void AdjustComponents(float fAspectRatio) override;
+    void ResetComponentAdjustment() override;
+    bool IsCrosshairVisible() override;
+
+    bool IsEnabled() const noexcept override { return m_isEnabled; }
+    void SetSuppressed(eHudSuppressionReason reason, bool bSuppressed) override;
+    bool IsSuppressed(eHudSuppressionReason reason) const noexcept override;
+    void ResetVisibilityState() override;
+    bool IsComponentEffectivelyVisible(eHudComponent component) override;
 
     bool IsComponentBar(const eHudComponent& component) const noexcept override;
     bool IsComponentText(const eHudComponent& component) const noexcept override;
@@ -279,7 +285,7 @@ public:
 
 private:
     void InitComponentList();
-    void ApplyDisableState();
+    void ApplyVisibilityState();
     void UpdateStreetchCalculations();
     void ResetComponent(SComponentPlacement& placement, bool resetSize) noexcept;
     void ResetComponentFontData(const eHudComponent& component, const eHudComponentProperty& property) noexcept;
@@ -304,7 +310,12 @@ private:
 private:
     std::map<eHudComponent, SHudComponent> m_HudComponentMap;
 
-    unsigned int m_uiDisableReasons = 0;
+    // Persistent visibility requested through the showhud command
+    bool m_isEnabled = true;
+    // Last state actually written into GTA code, used to avoid redundant memory patching
+    bool m_isAppliedDisabled = false;
+    // Temporary suppression owners (e.g. the fullscreen player map); each owner releases only its own bit
+    std::bitset<static_cast<std::size_t>(eHudSuppressionReason::COUNT)> m_suppressionReasons;
 
     float* m_pfAspectRatioMultiplicator;
     float* m_pfCameraCrosshairScale;

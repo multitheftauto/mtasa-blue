@@ -2066,12 +2066,14 @@ bool CStaticFunctionDefinitions::ShowPlayerHudComponent(eHudComponent component,
 
 bool CStaticFunctionDefinitions::IsPlayerHudComponentVisible(eHudComponent component, bool& bOutIsVisible, bool bCheckEnabled)
 {
-    bOutIsVisible = g_pGame->GetHud()->IsComponentVisible(component);
-
-    // showhud (and the F11 map) disable the HUD globally; when checking actual on-screen
-    // visibility, report the component as hidden even if it is still enabled by script
-    if (!bCheckEnabled && g_pGame->GetHud()->IsDisabled())
-        bOutIsVisible = false;
+    // By default report the state requested through setPlayerHudComponentVisible, so existing
+    // scripts keep working. With checkEnabled = false report the effective on-screen visibility,
+    // which accounts for the global HUD state (showhud command, fullscreen player map) and
+    // parent components in the draw path (e.g. radar_blips inside radar)
+    if (bCheckEnabled)
+        bOutIsVisible = g_pGame->GetHud()->IsComponentVisible(component);
+    else
+        bOutIsVisible = g_pGame->GetHud()->IsComponentEffectivelyVisible(component);
 
     return true;
 }

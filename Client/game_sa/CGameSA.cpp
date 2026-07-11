@@ -452,7 +452,7 @@ void CGameSA::Reset()
         m_pCamera->Fade(0, FADE_OUT);
 
         Pause(false);  // We don't have to pause as the fadeout will stop the sound. Pausing it will make the fadein next start ugly
-        m_pHud->ResetDisableReasons();
+        m_pHud->ResetVisibilityState();
         m_pHud->SetComponentVisible(HUD_ALL, true);
 
         // Restore model dummies' positions

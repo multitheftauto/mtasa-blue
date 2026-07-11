@@ -5522,7 +5522,10 @@ void CClientGame::ResetMapInfo()
     g_pCore->GetKeyBinds()->SetAllControlsEnabled(true, true, true);
 
     // Player map
+    // Close the map as well, so a map left open at reset releases its HUD suppression
+    // and does not leave chat/debug visibility in a stale state
     m_pPlayerMap->SetForcedState(false);
+    m_pPlayerMap->SetPlayerMapEnabled(false);
 
     // Camera
     m_pCamera->FadeOut(0.0f, 0, 0, 0);
