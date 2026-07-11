@@ -505,14 +505,14 @@ void CPlayerMap::InternalSetPlayerMapEnabled(bool enable)
         m_bChatInputBlocked = g_pCore->IsChatInputBlocked();
         m_bDebugVisible = g_pCore->IsDebugVisible();
 
-        g_pGame->GetHud()->Disable(true);
+        g_pGame->GetHud()->SetDisableReason(HUD_DISABLE_PLAYER_MAP, true);
         g_pMultiplayer->HideRadar(true);
         g_pCore->SetChatVisible(false);
         g_pCore->SetDebugVisible(false);
     }
     else
     {
-        g_pGame->GetHud()->Disable(false);
+        g_pGame->GetHud()->SetDisableReason(HUD_DISABLE_PLAYER_MAP, false);
         g_pMultiplayer->HideRadar(false);
         g_pCore->SetChatVisible(m_bChatVisible, m_bChatInputBlocked);
         g_pCore->SetDebugVisible(m_bDebugVisible);

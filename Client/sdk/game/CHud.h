@@ -72,11 +72,20 @@ enum class eFontAlignment : std::uint8_t
     ALIGN_RIGHT,
 };
 
+enum eHudDisableReason : unsigned int
+{
+    HUD_DISABLE_USER = 1,  // showhud command
+    HUD_DISABLE_PLAYER_MAP = 2,
+};
+
 class CHud
 {
 public:
     virtual void Disable(bool bDisabled) = 0;
+    virtual void SetDisableReason(eHudDisableReason reason, bool bDisabled) = 0;
+    virtual void ResetDisableReasons() = 0;
     virtual bool IsDisabled() = 0;
+    virtual bool HasDisableReason(eHudDisableReason reason) = 0;
     virtual void SetComponentVisible(eHudComponent component, bool bVisible) = 0;
     virtual bool IsComponentVisible(eHudComponent component) = 0;
     virtual void AdjustComponents(float fAspectRatio) = 0;

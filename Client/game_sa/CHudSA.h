@@ -177,7 +177,10 @@ class CHudSA : public CHud
 public:
     CHudSA();
     void Disable(bool bDisabled);
+    void SetDisableReason(eHudDisableReason reason, bool bDisabled);
+    void ResetDisableReasons();
     bool IsDisabled();
+    bool HasDisableReason(eHudDisableReason reason);
     void SetComponentVisible(eHudComponent component, bool bVisible);
     bool IsComponentVisible(eHudComponent component);
     void AdjustComponents(float fAspectRatio);
@@ -276,6 +279,7 @@ public:
 
 private:
     void InitComponentList();
+    void ApplyDisableState();
     void UpdateStreetchCalculations();
     void ResetComponent(SComponentPlacement& placement, bool resetSize) noexcept;
     void ResetComponentFontData(const eHudComponent& component, const eHudComponentProperty& property) noexcept;
@@ -299,6 +303,8 @@ private:
 
 private:
     std::map<eHudComponent, SHudComponent> m_HudComponentMap;
+
+    unsigned int m_uiDisableReasons = 0;
 
     float* m_pfAspectRatioMultiplicator;
     float* m_pfCameraCrosshairScale;

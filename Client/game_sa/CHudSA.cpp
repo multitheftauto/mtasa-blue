@@ -98,6 +98,29 @@ CHudSA::CHudSA()
 
 void CHudSA::Disable(bool bDisabled)
 {
+    SetDisableReason(HUD_DISABLE_USER, bDisabled);
+}
+
+void CHudSA::SetDisableReason(eHudDisableReason reason, bool bDisabled)
+{
+    if (bDisabled)
+        m_uiDisableReasons |= reason;
+    else
+        m_uiDisableReasons &= ~reason;
+
+    ApplyDisableState();
+}
+
+void CHudSA::ResetDisableReasons()
+{
+    m_uiDisableReasons = 0;
+    ApplyDisableState();
+}
+
+void CHudSA::ApplyDisableState()
+{
+    const bool bDisabled = m_uiDisableReasons != 0;
+
     if (bDisabled)
         MemPut<BYTE>(FUNC_Draw, 0xC3);
     else
@@ -112,7 +135,12 @@ void CHudSA::Disable(bool bDisabled)
 
 bool CHudSA::IsDisabled()
 {
-    return *(BYTE*)FUNC_Draw == 0xC3;
+    return m_uiDisableReasons != 0;
+}
+
+bool CHudSA::HasDisableReason(eHudDisableReason reason)
+{
+    return (m_uiDisableReasons & reason) != 0;
 }
 
 //
