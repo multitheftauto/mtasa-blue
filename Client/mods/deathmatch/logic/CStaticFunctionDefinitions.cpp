@@ -2064,9 +2064,15 @@ bool CStaticFunctionDefinitions::ShowPlayerHudComponent(eHudComponent component,
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsPlayerHudComponentVisible(eHudComponent component, bool& bOutIsVisible)
+bool CStaticFunctionDefinitions::IsPlayerHudComponentVisible(eHudComponent component, bool& bOutIsVisible, bool bCheckEnabled)
 {
     bOutIsVisible = g_pGame->GetHud()->IsComponentVisible(component);
+
+    // showhud (and the F11 map) disable the HUD globally; when checking actual on-screen
+    // visibility, report the component as hidden even if it is still enabled by script
+    if (!bCheckEnabled && g_pGame->GetHud()->IsDisabled())
+        bOutIsVisible = false;
+
     return true;
 }
 
