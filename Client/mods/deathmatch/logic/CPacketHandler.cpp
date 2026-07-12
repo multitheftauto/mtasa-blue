@@ -5381,33 +5381,37 @@ void CPacketHandler::Packet_ResourceClientScripts(NetBitStreamInterface& bitStre
 
                 // Read the script compressed chunk
                 unsigned int len;
-                if (!bitStream.Read(len) || len < 4)
+                if (!bitStream.Read(len) || len < 4 || !bitStream.CanReadNumberOfBytes(len))
                     return;
-                char* data = new char[len];
-                if (!bitStream.Read(data, len))
-                {
-                    memset(data, 0, len);
-                    delete[] data;
+                std::vector<char> data(len);
+                if (!bitStream.Read(data.data(), len))
                     return;
-                }
 
                 // First grab the original length from the data chunk
-                const unsigned char* uData = (const unsigned char*)data;
-                unsigned long        originalLength = uData[0] << 24 | uData[1] << 16 | uData[2] << 8 | uData[3];
-                char*                uncompressedBuffer = new char[originalLength];
-
-                // Uncompress it
-                if (uncompress((Bytef*)uncompressedBuffer, &originalLength, (const Bytef*)&data[4], len - 4) == Z_OK)
+                const auto*         uData = reinterpret_cast<const unsigned char*>(data.data());
+                const unsigned long originalLength = static_cast<unsigned long>(uData[0]) << 24 | static_cast<unsigned long>(uData[1]) << 16 |
+                                                     static_cast<unsigned long>(uData[2]) << 8 | static_cast<unsigned long>(uData[3]);
+                constexpr unsigned long MAX_CLIENT_SCRIPT_SIZE = 50 * 1024 * 1024;
+                if (originalLength == 0 || originalLength > MAX_CLIENT_SCRIPT_SIZE)
                 {
-                    // Load the script!
-                    pResource->LoadNoClientCacheScript(uncompressedBuffer, originalLength, strFilename);
+                    memset(data.data(), 0, data.size());
+                    return;
                 }
 
-                memset(uncompressedBuffer, 0, originalLength);
-                memset(data, 0, len);
+                std::vector<char> uncompressedBuffer(originalLength);
+                unsigned long     uncompressedLength = originalLength;
 
-                delete[] uncompressedBuffer;
-                delete[] data;
+                // Uncompress it
+                if (uncompress(reinterpret_cast<Bytef*>(uncompressedBuffer.data()), &uncompressedLength, reinterpret_cast<const Bytef*>(&data[4]), len - 4) ==
+                        Z_OK &&
+                    uncompressedLength == originalLength)
+                {
+                    // Load the script!
+                    pResource->LoadNoClientCacheScript(uncompressedBuffer.data(), uncompressedLength, strFilename);
+                }
+
+                memset(uncompressedBuffer.data(), 0, uncompressedBuffer.size());
+                memset(data.data(), 0, data.size());
             }
         }
     }
