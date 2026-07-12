@@ -787,7 +787,10 @@ void CWebCore::OnPostScreenshot()
     // Re-draw textures
     for (auto& pWebView : m_WebViews)
     {
-        pWebView->GetCefBrowser()->GetHost()->Invalidate(CefBrowserHost::PaintElementType::PET_VIEW);
+        pWebView->RestoreTexture();
+
+        if (auto browser = pWebView->GetCefBrowser(); browser)
+            browser->GetHost()->Invalidate(CefBrowserHost::PaintElementType::PET_VIEW);
     }
 }
 
