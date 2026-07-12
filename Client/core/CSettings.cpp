@@ -4165,9 +4165,10 @@ void CSettings::LoadData()
     {
         CVARS_GET("chat_scale", strVar);
         stringstream ss(strVar);
-        m_pChatScaleX->SetText(SString("%1.1f", atof(strVar.c_str())));
         ss >> strVar;
-        m_pChatScaleY->SetText(SString("%1.1f", atof(strVar.c_str())));
+        m_pChatScaleX->SetText(strVar.c_str());
+        ss >> strVar;
+        m_pChatScaleY->SetText(strVar.c_str());
     }
     catch (...)
     {
