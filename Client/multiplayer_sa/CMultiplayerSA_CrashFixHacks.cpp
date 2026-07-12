@@ -2922,11 +2922,18 @@ void _declspec(naked) HOOK_CAnimBlendAssocGroup_CreateAssociations()
     MTA_VERIFY_HOOK_LOCAL_SIZE;
     __asm
     {
+        // CModelInfo::GetModelInfoFromHashKey returned the model info for
+        // this animation. SA already skips the entry when it returns null.
         test    eax, eax
         jz      skipCreateAssociation
+
+        // CBaseModelInfo::pRwObject is at +0x1C. The original instructions
+        // immediately call CBaseModelInfo::CreateInstance at vtable+0x2C.
         cmp     dword ptr[eax+1Ch], 0
         jnz     continueCreateAssociation
 
+        // CreateInstance requires the RenderWare object. Record its absence
+        // and follow SA's existing per-animation skip path.
         pushad
         push    eax
         call    OnMY_CAnimBlendAssocGroup_CreateAssociations
@@ -2935,12 +2942,16 @@ void _declspec(naked) HOOK_CAnimBlendAssocGroup_CreateAssociations()
         jmp     skipCreateAssociation
 
     continueCreateAssociation:
+        // Restore the seven overwritten bytes: load the vtable, pass the
+        // model info as this, then call CreateInstance.
         mov     edx, [eax]
         mov     ecx, eax
         call    dword ptr[edx+2Ch]
         jmp     RETURN_CAnimBlendAssocGroup_CreateAssociations
 
     skipCreateAssociation:
+        // 0x4CE36F increments the created-association count and advances
+        // the animation and static-association indices for the next entry.
         jmp     RETURN_CAnimBlendAssocGroup_CreateAssociations_Skip
     }
     // clang-format on
