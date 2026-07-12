@@ -4656,8 +4656,6 @@ void CGame::HandleBackup()
             return;  // No backup required
     }
 
-    m_pMainConfig->NotifyDidBackup();
-
     // Make target file name
     tm*  tmp = gmtime(&secondsNow);
     char outstr[200] = {0};
@@ -4697,10 +4695,14 @@ void CGame::HandleBackup()
     zipMaker.InsertFile(pModManager->GetAbsolutePath("internal.db"), PathJoin("databases", "other", "internal.db"));
     zipMaker.InsertFile(pModManager->GetAbsolutePath("registry.db"), PathJoin("databases", "other", "registry.db"));
 
-    zipMaker.Close();
+    // Finalize the new backup before marking it complete or pruning older copies
+    if (!zipMaker.Close() || !FileRename(strTempZip, strBackupZip))
+    {
+        FileDelete(strTempZip);
+        return;
+    }
 
-    // Rename temp file to final name
-    FileRename(strTempZip, strBackupZip);
+    m_pMainConfig->NotifyDidBackup();
 
     // Remove backups over min required
     while (fileList.size() >= uiBackupAmount)
