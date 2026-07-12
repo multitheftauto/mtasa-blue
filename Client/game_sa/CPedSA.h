@@ -49,7 +49,9 @@ class CVehicleSAInterface;
 
 // CPedClothesDesc && CClothes
 #define FUNC_CPedClothesDesc__SetTextureAndModel 0x5A8080  // CPedClothesDesc::SetTextureAndModel
+#define FUNC_CPedClothesDesc__Initialise         0x5A78F0  // CPedClothesDesc::Initialise
 #define FUNC_CClothes__RebuildPlayer             0x5A82C0  // CClothes::RebuildPlayer
+#define SIZEOF_CPedClothesDesc                   0x78
 
 // CAEPedWeaponAudioEntity
 #define FUNC_CAEPedWeaponAudioEntity__AddAudioEvent 0x4E69F0  // CAEPedWeaponAudioEntity::AddAudioEvent

@@ -1805,10 +1805,13 @@ int CLuaPedDefs::IsPedDead(lua_State* luaVM)
         // Grab his dead state and return it
         bool bDead = pPed->IsDead() || pPed->IsDying();
 
-        // Check player is already dead on network (#4147)
+        // Cover the window between network death and GTA processing it (#4147).
+        // Don't apply if GTA has already processed a revival (health > 0 and not
+        // in a death task) - IsDeadOnNetwork would be a stale server-side artifact.
         if (auto pPlayer = dynamic_cast<CClientPlayer*>(pPed))
         {
-            bDead = bDead || pPlayer->IsDeadOnNetwork();
+            if (pPlayer->IsDeadOnNetwork() && (pPed->GetHealth() <= 0.0f || bDead))
+                bDead = true;
         }
 
         lua_pushboolean(luaVM, bDead);

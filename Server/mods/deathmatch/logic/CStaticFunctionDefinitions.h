@@ -213,7 +213,7 @@ public:
     static bool SetPedGravity(CElement* pElement, float fGravity);
     static bool SetPedChoking(CElement* pElement, bool bChoking);
     static bool SetPedWeaponSlot(CElement* pElement, unsigned char ucWeaponSlot);
-    static bool WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat = 0);
+    static bool WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat = 0, CResource* pCallingResource = nullptr);
     static bool RemovePedFromVehicle(CElement* pElement);
     static bool SetPedDoingGangDriveby(CElement* pElement, bool bGangDriveby);
     static bool SetPedAnimation(CElement* pElement, const SString& blockName, const SString& animName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,

@@ -25,6 +25,17 @@ void CWeatherSA::Set(unsigned char primary, unsigned char secondary)
     MemPutFast<unsigned char>(0xC8131C, secondary);  // CWeather::NewWeatherType
 }
 
+void CWeatherSA::ResyncInterpolationWithGameClock(unsigned char primary, unsigned char secondary)
+{
+    // Set InterpolationValue to 0 so CWeather::Update's wrap branch never fires.
+    // The wrap condition is (engine_computed_interp < stored_InterpolationValue);
+    // since the engine's value is always >= 0, this is always false.
+    // CWeather::Update then computes its own InterpolationValue from the game clock
+    // and uses it consistently for all weather globals (Foggyness, Rain, etc.).
+    constexpr DWORD VAR_InterpolationValue = 0xC8130C;
+    MemPutFast<float>(VAR_InterpolationValue, 0.0f);
+}
+
 void CWeatherSA::Release()
 {
     MemPutFast<unsigned char>(0xC81318, 0xFF);  // CWeather::ForcedWeatherType

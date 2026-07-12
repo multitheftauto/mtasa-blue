@@ -381,6 +381,30 @@ void CPoolsSA::DeleteAllObjects()
     }
 }
 
+//
+// Detached car parts (e.g. doors spawned by CAutomobile::SpawnFlyingComponent) keep the model
+// index of the vehicle they came from, so CObject::Render can repaint them with that vehicle's
+// colours and CObject's destructor can release its model reference. Called when a vehicle model
+// info is deallocated, so the parts can't dereference the freed model info anymore.
+//
+void CPoolsSA::ResetDetachedCarPartsRefModel(std::uint16_t usModelID) noexcept
+{
+    CPoolSAInterface<CObjectSAInterface>* pObjectPool = *m_ppObjectPoolInterface;
+
+    for (int i = 0; i < pObjectPool->m_nSize; i++)
+    {
+        if (pObjectPool->IsEmpty(i))
+            continue;
+
+        CObjectSAInterface* pObject = pObjectPool->GetObject(i);
+        if (pObject->sRefModelIndex == static_cast<short>(usModelID))
+        {
+            pObject->sRefModelIndex = -1;
+            pObject->bChangesVehColor = false;
+        }
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //                                       PEDS POOL                                      //
 //////////////////////////////////////////////////////////////////////////////////////////
