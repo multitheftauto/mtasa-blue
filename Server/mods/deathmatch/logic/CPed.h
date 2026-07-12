@@ -30,8 +30,8 @@ struct SHealthArmorAuth
 };
 
 static constexpr long long HEALTH_ARMOR_AUTH_TIMEOUT_MS = 3000;
-static constexpr float    HEALTH_AUTH_EPSILON = 1.5f;
-static constexpr float    ARMOR_AUTH_EPSILON = 1.0f;
+static constexpr float     HEALTH_AUTH_EPSILON = 1.5f;
+static constexpr float     ARMOR_AUTH_EPSILON = 1.0f;
 
 enum ePedMoveAnim
 {
@@ -206,8 +206,8 @@ public:
     float GetArmor() const noexcept { return m_armor; }
     void  SetArmor(float armor) noexcept { m_armor = std::clamp(armor, 0.0f, 100.0f); }
 
-    void AuthorizeHealthChange(float fExpectedValue) noexcept;
-    void AuthorizeArmorChange(float fExpectedValue) noexcept;
+    void  AuthorizeHealthChange(float fExpectedValue) noexcept;
+    void  AuthorizeArmorChange(float fExpectedValue) noexcept;
     float ValidateIncomingSyncHealth(float fIncomingHealth) noexcept;
     float ValidateIncomingSyncArmor(float fIncomingArmor) noexcept;
 
