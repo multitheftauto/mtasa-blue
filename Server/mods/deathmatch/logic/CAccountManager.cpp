@@ -979,13 +979,10 @@ void CAccountManager::GetAccountsByIP(const SString& strIP, std::vector<CAccount
 
 CAccount* CAccountManager::GetAccountByID(int ID)
 {
-    CRegistryResult result;
-    m_pDatabaseManager->QueryWithResultf(m_hDbConnection, &result, "SELECT name FROM accounts WHERE id = ?", SQLITE_INTEGER, ID);
-
-    for (const auto& row : result->Data)
-    {
-        return Get(reinterpret_cast<const char*>(row[0].pVal));
-    }
+    // Failure callbacks must not query the same database that just failed.
+    for (CAccount* pAccount : m_List)
+        if (pAccount->GetID() == ID)
+            return pAccount;
 
     return nullptr;
 }
