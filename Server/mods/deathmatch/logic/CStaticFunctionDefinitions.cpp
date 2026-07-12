@@ -1783,6 +1783,7 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
                 return false;
 
             fHealth = Clamp(0.0f, fHealth, pPed->GetMaxHealth());
+            pPed->AuthorizeHealthChange(fHealth);
             pPed->SetHealth(fHealth);
 
             if (pPed->IsDead() && fHealth > 0.0f)
@@ -2279,6 +2280,7 @@ CPed* CStaticFunctionDefinitions::CreatePed(CResource* pResource, unsigned short
             pPed->SetPosition(vecPosition);
             pPed->SetIsDead(false);
             pPed->SetSpawned(true);
+            pPed->AuthorizeHealthChange(100.0f);
             pPed->SetHealth(100.0f);
             pPed->SetSyncable(bSynced);
 
@@ -3814,6 +3816,7 @@ bool CStaticFunctionDefinitions::SetPedArmor(CElement* pElement, float armor)
     if (armor > 100.0f)
         armor = 100.0f;
 
+    ped->AuthorizeArmorChange(armor);
     ped->SetArmor(armor);
 
     std::uint8_t armorUnsigned = static_cast<std::uint8_t>(armor * 1.25);
@@ -3824,6 +3827,36 @@ bool CStaticFunctionDefinitions::SetPedArmor(CElement* pElement, float armor)
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(ped, SET_PED_ARMOR, *stream.pBitStream));
 
     return true;
+}
+
+void CStaticFunctionDefinitions::SendHealthCorrectionToPlayer(CPed* pPed, CPlayer* pPlayer, float fHealth)
+{
+    if (!pPed || !pPlayer)
+        return;
+
+    fHealth = Clamp(0.0f, fHealth, pPed->GetMaxHealth());
+    pPed->AuthorizeHealthChange(fHealth);
+
+    CBitStream stream;
+    stream.pBitStream->Write(fHealth);
+    stream.pBitStream->Write(pPed->GenerateSyncTimeContext());
+    pPlayer->Send(CElementRPCPacket(pPed, SET_ELEMENT_HEALTH, *stream.pBitStream));
+}
+
+void CStaticFunctionDefinitions::SendArmorCorrectionToPlayer(CPed* pPed, CPlayer* pPlayer, float fArmor)
+{
+    if (!pPed || !pPlayer)
+        return;
+
+    fArmor = Clamp(0.0f, fArmor, 100.0f);
+    pPed->AuthorizeArmorChange(fArmor);
+
+    const std::uint8_t armorUnsigned = static_cast<std::uint8_t>(fArmor * 1.25f);
+
+    CBitStream stream;
+    stream.pBitStream->Write(armorUnsigned);
+    stream.pBitStream->Write(pPed->GenerateSyncTimeContext());
+    pPlayer->Send(CElementRPCPacket(pPed, SET_PED_ARMOR, *stream.pBitStream));
 }
 
 bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, unsigned char ucKillerWeapon, unsigned char ucBodyPart, bool bStealth,

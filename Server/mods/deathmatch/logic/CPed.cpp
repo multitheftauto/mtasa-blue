@@ -382,6 +382,66 @@ float CPed::GetMaxHealth()
     return fMaxHealth;
 }
 
+void CPed::AuthorizeHealthChange(float fExpectedValue) noexcept
+{
+    m_healthAuth.fExpectedValue = std::clamp(fExpectedValue, 0.0f, GetMaxHealth());
+    m_healthAuth.llAuthorizeTime = GetTickCount64_();
+}
+
+void CPed::AuthorizeArmorChange(float fExpectedValue) noexcept
+{
+    m_armorAuth.fExpectedValue = std::clamp(fExpectedValue, 0.0f, 100.0f);
+    m_armorAuth.llAuthorizeTime = GetTickCount64_();
+}
+
+static bool TryConsumeHealthArmorAuth(SHealthArmorAuth& auth, float fIncomingValue, float fEpsilon) noexcept
+{
+    if (auth.fExpectedValue < 0.0f)
+        return false;
+
+    if (GetTickCount64_() - auth.llAuthorizeTime > HEALTH_ARMOR_AUTH_TIMEOUT_MS)
+    {
+        auth.fExpectedValue = -1.0f;
+        return false;
+    }
+
+    if (std::abs(fIncomingValue - auth.fExpectedValue) <= fEpsilon)
+    {
+        auth.fExpectedValue = -1.0f;
+        return true;
+    }
+
+    return false;
+}
+
+float CPed::ValidateIncomingSyncHealth(float fIncomingHealth) noexcept
+{
+    const float fOldHealth = m_fHealth;
+    fIncomingHealth = std::clamp(fIncomingHealth, 0.0f, GetMaxHealth());
+
+    if (fIncomingHealth > fOldHealth + FLOAT_EPSILON)
+    {
+        if (!TryConsumeHealthArmorAuth(m_healthAuth, fIncomingHealth, HEALTH_AUTH_EPSILON))
+            return fOldHealth;
+    }
+
+    return fIncomingHealth;
+}
+
+float CPed::ValidateIncomingSyncArmor(float fIncomingArmor) noexcept
+{
+    const float fOldArmor = m_armor;
+    fIncomingArmor = std::clamp(fIncomingArmor, 0.0f, 100.0f);
+
+    if (fIncomingArmor > fOldArmor + FLOAT_EPSILON)
+    {
+        if (!TryConsumeHealthArmorAuth(m_armorAuth, fIncomingArmor, ARMOR_AUTH_EPSILON))
+            return fOldArmor;
+    }
+
+    return fIncomingArmor;
+}
+
 const char* CPed::GetBodyPartName(unsigned char ucID)
 {
     if (ucID <= NUMELMS(BodyPartNames))
