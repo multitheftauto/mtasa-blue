@@ -2276,7 +2276,12 @@ void CServerBrowser::LoadOptions(CXMLNode* pNode)
 
                     CXMLAttribute* pDisabled = pSubNode->GetAttributes().Find("disabled");
                     if (pDisabled)
-                        m_pTab[listIndex]->SetEnabled(pDisabled->GetValue().compare("1") == 0);
+                    {
+                        const bool bDisabled = pDisabled->GetValue().compare("1") == 0;
+
+                        // The persisted attribute describes the disabled state, while the widget API expects the enabled state.
+                        m_pTab[listIndex]->SetEnabled(!bDisabled);
+                    }
 
                     // restore the active tab
                     CXMLAttribute* pActiveTab = pSubNode->GetAttributes().Find("active");
