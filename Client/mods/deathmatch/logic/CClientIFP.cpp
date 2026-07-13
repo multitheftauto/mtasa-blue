@@ -84,8 +84,10 @@ bool CClientIFP::ReadIFPByVersion()
 
     if (bAnp2 || bAnp3)
     {
-        ReadIFPVersion2(bAnp3);
-        return true;
+        if (!ValidateIFPVersion2(bAnp3))
+            return false;
+
+        return ReadIFPVersion2(bAnp3);
     }
     else if (bAnpk)
     {
@@ -94,6 +96,59 @@ bool CClientIFP::ReadIFPByVersion()
         return true;
     }
     return false;
+}
+
+bool CClientIFP::ValidateIFPVersion2(bool bAnp3) const
+{
+    const SString& buffer = GetBuffer();
+    size_t         offset = GetReadOffset();
+
+    const auto Read = [&buffer, &offset](void* destination, size_t size)
+    {
+        if (offset > buffer.size() || size > buffer.size() - offset)
+            return false;
+
+        std::memcpy(destination, buffer.data() + offset, size);
+        offset += size;
+        return true;
+    };
+
+    SIFPHeaderV2 header{};
+    if (!Read(&header, sizeof(header)) || header.TotalAnimations < 0)
+        return false;
+
+    for (std::int32_t animationIndex = 0; animationIndex < header.TotalAnimations; ++animationIndex)
+    {
+        SAnimationHeaderV2 animation{};
+        if (!Read(animation.Name, sizeof(animation.Name)) || !Read(&animation.TotalObjects, sizeof(animation.TotalObjects)))
+            return false;
+
+        if (bAnp3 && (!Read(&animation.FrameSize, sizeof(animation.FrameSize)) || !Read(&animation.isCompressed, sizeof(animation.isCompressed))))
+            return false;
+
+        if (animation.TotalObjects < 0 || animation.TotalObjects > std::numeric_limits<unsigned short>::max() - m_kcIFPSequences)
+            return false;
+
+        for (std::int32_t sequenceIndex = 0; sequenceIndex < animation.TotalObjects; ++sequenceIndex)
+        {
+            SSequenceHeaderV2 sequence{};
+            if (!Read(&sequence, sizeof(sequence)))
+                return false;
+
+            const eFrameType frameType = static_cast<eFrameType>(sequence.FrameType);
+            const size_t     frameSize = GetSourceFrameDataSize(frameType);
+            if (sequence.TotalFrames < 0 || frameSize == 0)
+                return false;
+
+            const size_t frameCount = static_cast<size_t>(sequence.TotalFrames);
+            if (frameCount > (buffer.size() - offset) / frameSize)
+                return false;
+
+            offset += frameCount * frameSize;
+        }
+    }
+
+    return true;
 }
 
 void CClientIFP::ReadIFPVersion1()
@@ -119,12 +174,21 @@ void CClientIFP::ReadIFPVersion1()
     }
 }
 
-void CClientIFP::ReadIFPVersion2(bool bAnp3)
+bool CClientIFP::ReadIFPVersion2(bool bAnp3)
 {
     SIFPHeaderV2 Header;
     ReadBuffer<SIFPHeaderV2>(&Header);
 
-    m_pVecAnimations->resize(Header.TotalAnimations);
+    try
+    {
+        m_pVecAnimations->resize(Header.TotalAnimations);
+    }
+    catch (const std::exception&)
+    {
+        // Allocation failures must not escape through the Lua C boundary.
+        return false;
+    }
+
     for (auto& Animation : m_pIFPAnimations->vecAnimations)
     {
         SAnimationHeaderV2 AnimationNode;
@@ -141,6 +205,8 @@ void CClientIFP::ReadIFPVersion2(bool bAnp3)
         *(DWORD*)Animation.pSequencesMemory = ReadSequencesWithDummies(Animation.pHierarchy);
         PreProcessAnimationHierarchy(Animation.pHierarchy);
     }
+
+    return true;
 }
 
 WORD CClientIFP::ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy)
@@ -458,7 +524,7 @@ size_t CClientIFP::GetSizeOfCompressedFrame(eFrameType iFrameType)
     return 0;
 }
 
-size_t CClientIFP::GetSourceFrameDataSize(eFrameType iFrameType)
+size_t CClientIFP::GetSourceFrameDataSize(eFrameType iFrameType) const
 {
     switch (iFrameType)
     {

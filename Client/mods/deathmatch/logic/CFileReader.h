@@ -48,6 +48,10 @@ public:
             return 0;
     }
 
+protected:
+    const SString& GetBuffer() const noexcept { return m_buffer; }
+    std::uint32_t  GetReadOffset() const noexcept { return m_u32BytesReadFromBuffer; }
+
 private:
     SString       m_buffer;
     std::uint32_t m_u32BytesReadFromBuffer;
