@@ -394,6 +394,11 @@ void CPed::AuthorizeArmorChange(float fExpectedValue) noexcept
     m_armorAuth.llAuthorizeTime = GetTickCount64_();
 }
 
+static void InvalidateHealthArmorAuth(SHealthArmorAuth& auth) noexcept
+{
+    auth.fExpectedValue = -1.0f;
+}
+
 static bool TryConsumeHealthArmorAuth(SHealthArmorAuth& auth, float fIncomingValue, float fEpsilon) noexcept
 {
     if (auth.fExpectedValue < 0.0f)
@@ -401,13 +406,13 @@ static bool TryConsumeHealthArmorAuth(SHealthArmorAuth& auth, float fIncomingVal
 
     if (GetTickCount64_() - auth.llAuthorizeTime > HEALTH_ARMOR_AUTH_TIMEOUT_MS)
     {
-        auth.fExpectedValue = -1.0f;
+        InvalidateHealthArmorAuth(auth);
         return false;
     }
 
     if (std::abs(fIncomingValue - auth.fExpectedValue) <= fEpsilon)
     {
-        auth.fExpectedValue = -1.0f;
+        InvalidateHealthArmorAuth(auth);
         return true;
     }
 
@@ -418,6 +423,12 @@ float CPed::ValidateIncomingSyncHealth(float fIncomingHealth) noexcept
 {
     const float fOldHealth = m_fHealth;
     fIncomingHealth = std::clamp(fIncomingHealth, 0.0f, GetMaxHealth());
+
+    // A pending increase authorization must not survive meaningful damage. Use the
+    // same epsilon as auth matching so wire quantization (~0.78 per health step)
+    // does not consume the token before the authorized increase is confirmed.
+    if (fIncomingHealth < fOldHealth - HEALTH_AUTH_EPSILON)
+        InvalidateHealthArmorAuth(m_healthAuth);
 
     if (fIncomingHealth > fOldHealth + FLOAT_EPSILON)
     {
@@ -432,6 +443,9 @@ float CPed::ValidateIncomingSyncArmor(float fIncomingArmor) noexcept
 {
     const float fOldArmor = m_armor;
     fIncomingArmor = std::clamp(fIncomingArmor, 0.0f, 100.0f);
+
+    if (fIncomingArmor < fOldArmor - ARMOR_AUTH_EPSILON)
+        InvalidateHealthArmorAuth(m_armorAuth);
 
     if (fIncomingArmor > fOldArmor + FLOAT_EPSILON)
     {
