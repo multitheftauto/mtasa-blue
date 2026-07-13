@@ -725,13 +725,15 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, CLuaArgument>)
         {
             CLuaArgument argument;
-            argument.Read(L, index++);
+            if (!argument.Read(L, index++))
+                strError = SString("Bad argument @ '%s' [Lua table nesting depth exceeds the supported limit]", lua_tostring(L, lua_upvalueindex(1)));
             return argument;
         }
         else if constexpr (std::is_same_v<T, CLuaArguments>)
         {
             CLuaArguments argument;
-            argument.ReadArguments(L, index);
+            if (!argument.ReadArguments(L, index))
+                strError = SString("Bad argument @ '%s' [Lua table nesting depth exceeds the supported limit]", lua_tostring(L, lua_upvalueindex(1)));
             return argument;
         }
         else if constexpr (std::is_same_v<T, std::monostate>)

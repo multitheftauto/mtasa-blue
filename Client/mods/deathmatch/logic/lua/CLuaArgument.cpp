@@ -205,7 +205,7 @@ bool CLuaArgument::CompareRecursive(const CLuaArgument& Argument, std::set<CLuaA
     return true;
 }
 
-void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables)
+bool CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables, unsigned int uiDepth)
 {
     // Store debug data for later retrieval
 #ifdef MTA_DEBUG
@@ -250,9 +250,20 @@ void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
                 }
                 else
                 {
+                    if (uiDepth >= CLuaArguments::MaxLuaTableReadDepth)
+                    {
+                        m_iType = LUA_TNIL;
+                        return false;
+                    }
+
                     m_pTableData = new CLuaArguments();
-                    m_pTableData->ReadTable(luaVM, iArgument, pKnownTables);
                     m_bWeakTableRef = false;
+                    if (!m_pTableData->ReadTable(luaVM, iArgument, pKnownTables, uiDepth))
+                    {
+                        DeleteTableData();
+                        m_iType = LUA_TNIL;
+                        return false;
+                    }
                 }
                 break;
             }
@@ -306,6 +317,8 @@ void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
             }
         }
     }
+
+    return true;
 }
 
 void CLuaArgument::ReadBool(bool bBool)
