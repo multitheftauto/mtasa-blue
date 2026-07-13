@@ -167,26 +167,31 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
     {
         // Have someone already replaced that model?
         CClientDFF* pReplaced = m_pDFFManager->GetElementThatReplaced(usModel);
-        if (pReplaced)
+        const auto  finalizeReplacement = [this, pReplaced, usModel](bool succeeded)
         {
-            // Remove it from its list so it won't restore the object if
-            // it's destroyed or its resource is when it's been replaced
-            // again by an another resource.
+            if (!succeeded || !pReplaced)
+                return succeeded;
+
+            // Transfer ownership only after the new model is installed. A rejected replacement must leave
+            // the previous owner responsible for restoring the custom model that is still active.
             pReplaced->m_Replaced.remove(usModel);
-        }
+            if (pReplaced == this)
+                m_Replaced.push_back(usModel);
+            return true;
+        };
 
         // Is this a vehicle ID?
         if (CClientVehicleManager::IsValidModel(usModel))
         {
-            return ReplaceVehicleModel(pClump, usModel, bAlphaTransparency);
+            return finalizeReplacement(ReplaceVehicleModel(pClump, usModel, bAlphaTransparency));
         }
         else if (CClientPlayerManager::IsValidModel(usModel))
         {
-            return ReplacePedModel(pClump, usModel, bAlphaTransparency);
+            return finalizeReplacement(ReplacePedModel(pClump, usModel, bAlphaTransparency));
         }
         else if (CClientMarkerManager::IsMarkerModel(usModel))
         {
-            bool wasReplaced = ReplaceObjectModel(pClump, usModel, bAlphaTransparency);
+            bool wasReplaced = finalizeReplacement(ReplaceObjectModel(pClump, usModel, bAlphaTransparency));
 
             // 'Restream' 3D markers
             if (wasReplaced)
@@ -198,16 +203,16 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
         {
             if (CVehicleUpgrades::IsUpgrade(usModel))
             {
-                bool bResult = ReplaceObjectModel(pClump, usModel, bAlphaTransparency);
+                bool bResult = finalizeReplacement(ReplaceObjectModel(pClump, usModel, bAlphaTransparency));
                 // 'Restream' upgrades after model replacement
                 m_pManager->GetVehicleManager()->RestreamVehicleUpgrades(usModel);
                 return bResult;
             }
             if (CClientPedManager::IsValidWeaponModel(usModel))
             {
-                return ReplaceWeaponModel(pClump, usModel, bAlphaTransparency);
+                return finalizeReplacement(ReplaceWeaponModel(pClump, usModel, bAlphaTransparency));
             }
-            return ReplaceObjectModel(pClump, usModel, bAlphaTransparency);
+            return finalizeReplacement(ReplaceObjectModel(pClump, usModel, bAlphaTransparency));
         }
     }
 

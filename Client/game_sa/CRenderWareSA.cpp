@@ -23,6 +23,8 @@
 #include "CRenderWareSA.ShaderMatching.h"
 #include "gamesa_renderware.h"
 #include "gamesa_renderware.hpp"
+#include <enums/VehicleClass.h>
+#include <enums/VehicleType.h>
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -427,6 +429,33 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
 // Replaces a vehicle model
 bool CRenderWareSA::ReplaceVehicleModel(RpClump* pNew, unsigned short usModelID)
 {
+    CModelInfo* pModelInfo = pGame->GetModelInfo(usModelID);
+    if (!pModelInfo)
+        return false;
+
+    const auto vehicleClass = static_cast<VehicleClass>(pModelInfo->GetVehicleType());
+    RwFrame*   pRootFrame = RpGetFrame(pNew);
+    const auto requireFrame = [pRootFrame, usModelID, vehicleClass](const char* frameName)
+    {
+        if (pRootFrame && RwFrameFindFrame(pRootFrame, frameName))
+            return true;
+
+        // GTA dereferences these frames without null checks while constructing or pre-rendering the vehicle.
+        // Rejecting the replacement here preserves the original model and gives scripts a clean failure instead of a delayed native crash.
+        LogEvent(852, "Model not replaced", "CRenderWareSA::ReplaceVehicleModel",
+                 SString("Vehicle model:%u class:%u is missing required frame:%s", usModelID, static_cast<unsigned int>(vehicleClass), frameName), 5432);
+        return false;
+    };
+
+    if ((vehicleClass == VehicleClass::BIKE || vehicleClass == VehicleClass::BMX) && (!requireFrame("wheel_front") || !requireFrame("wheel_rear")))
+    {
+        return false;
+    }
+
+    // Vortex initializes a bouncing panel for PLANE_GEAR_L (hierarchy id 21). CPlane::PreRender passes that frame to CMatrix without checking it.
+    if (usModelID == static_cast<unsigned short>(VehicleType::VT_VORTEX) && !requireFrame("gear_l"))
+        return false;
+
     return ReplaceModel(pNew, usModelID, FUNC_LoadVehicleModel);
 }
 
