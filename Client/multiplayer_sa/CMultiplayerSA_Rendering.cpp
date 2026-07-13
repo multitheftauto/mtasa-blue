@@ -27,6 +27,20 @@ namespace
     int                 ms_iSavedNumMirrorZones = 0;
 }  // namespace
 
+// === Raise the visible-entity / visible-LOD render list capacity =============
+// GTA's render lists (CRenderer::ms_aVisibleEntityPtrs @ 0xB75898,
+// ms_aVisibleLodPtrs @ 0xB748F8) are fixed 1000-entry arrays; the two
+// Check_NoOfVisible* hooks clamp the counters at 999. When more than ~1000
+// entities are visible (dense custom maps once the object streaming limits are
+// raised, see engineSetObjectStreamingLimits), the engine drops the excess and,
+// because which entities get dropped shifts per frame, the world flickers.
+// We relocate both arrays to larger buffers and raise the clamp. This is inert
+// with the default limits (a scene rarely exceeds 1000 visible entities), so it
+// does not change stock behaviour. Related: issues #869, #5054.
+#define RENDERLIST_LIMIT 10000           // capacity (stock game: 1000)
+static void* g_relocatedVisibleEntityPtrs[RENDERLIST_LIMIT] = {};
+static void* g_relocatedVisibleLodPtrs[RENDERLIST_LIMIT] = {};
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CallIdle
@@ -361,7 +375,7 @@ static void __declspec(naked) HOOK_Check_NoOfVisibleLods()
     // clang-format off
     __asm
     {
-        cmp     eax, 999            // Array limit is 1000
+        cmp     eax, RENDERLIST_LIMIT - 1           // clamp to the render-list capacity
         jge     limit
         inc     eax
 limit:
@@ -389,7 +403,7 @@ static void __declspec(naked) HOOK_Check_NoOfVisibleEntities()
     // clang-format off
     __asm
     {
-        cmp     eax, 999        // Array limit is 1000
+        cmp     eax, RENDERLIST_LIMIT - 1           // clamp to the render-list capacity
         jge     limit
         inc     eax
 limit:
@@ -944,6 +958,18 @@ void CMultiplayerSA::InitHooks_Rendering()
     EZHookInstall(CVisibilityPlugins_RenderPedCB);
     EZHookInstall(Check_NoOfVisibleLods);
     EZHookInstall(Check_NoOfVisibleEntities);
+
+    // Relocate the two render-list arrays to our larger buffers (see RENDERLIST_LIMIT).
+    // Each site is a `[reg*4 + base]` access; we rewrite the 4-byte base immediate.
+    // ms_aVisibleLodPtrs (0xB748F8): 1 write + 2 reads
+    MemPut<DWORD>(0x5534F5, (DWORD)&g_relocatedVisibleLodPtrs[0]);
+    MemPut<DWORD>(0x553923, (DWORD)&g_relocatedVisibleLodPtrs[0]);
+    MemPut<DWORD>(0x553CB3, (DWORD)&g_relocatedVisibleLodPtrs[0]);
+    // ms_aVisibleEntityPtrs (0xB75898): 1 write + 3 reads
+    MemPut<DWORD>(0x553529, (DWORD)&g_relocatedVisibleEntityPtrs[0]);
+    MemPut<DWORD>(0x553944, (DWORD)&g_relocatedVisibleEntityPtrs[0]);
+    MemPut<DWORD>(0x553A53, (DWORD)&g_relocatedVisibleEntityPtrs[0]);
+    MemPut<DWORD>(0x553B03, (DWORD)&g_relocatedVisibleEntityPtrs[0]);
     EZHookInstall(WinLoop);
     EZHookInstall(CTimer_Update);
     EZHookInstall(CTimer_Suspend);
