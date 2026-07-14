@@ -220,7 +220,8 @@ public:
 
 private:
     bool ReadIFPByVersion();
-    void ReadIFPVersion1();
+    bool ValidateIFPVersion1() const;
+    bool ReadIFPVersion1();
     void ReadIFPVersion2(bool bAnp3);
 
     WORD         ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);

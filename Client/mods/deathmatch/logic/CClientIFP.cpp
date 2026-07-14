@@ -90,18 +90,164 @@ bool CClientIFP::ReadIFPByVersion()
     else if (bAnpk)
     {
         m_bVersion1 = true;
-        ReadIFPVersion1();
-        return true;
+        if (!ValidateIFPVersion1())
+            return false;
+
+        return ReadIFPVersion1();
     }
     return false;
 }
 
-void CClientIFP::ReadIFPVersion1()
+bool CClientIFP::ValidateIFPVersion1() const
 {
-    SInfo Info;
+    const SString& buffer = GetBuffer();
+    size_t         offset = GetReadOffset();
+
+    const auto Read = [&buffer, &offset](void* destination, size_t size)
+    {
+        if (offset > buffer.size() || size > buffer.size() - offset)
+            return false;
+
+        std::memcpy(destination, buffer.data() + offset, size);
+        offset += size;
+        return true;
+    };
+
+    const auto ReadSpan = [&buffer, &offset](const char*& data, size_t size)
+    {
+        if (offset > buffer.size() || size > buffer.size() - offset)
+            return false;
+
+        data = buffer.data() + offset;
+        offset += size;
+        return true;
+    };
+
+    const auto GetPaddedSize = [](std::uint32_t size, size_t capacity, size_t& paddedSize)
+    {
+        const std::uint64_t paddedSize64 = (static_cast<std::uint64_t>(size) + 3u) & ~std::uint64_t{3u};
+        if (paddedSize64 > capacity)
+            return false;
+
+        paddedSize = static_cast<size_t>(paddedSize64);
+        return true;
+    };
+
+    std::uint32_t offsetEOF;
+    SBase         infoBase;
+    if (!Read(&offsetEOF, sizeof(offsetEOF)) || !Read(&infoBase, sizeof(infoBase)))
+        return false;
+
+    size_t infoSize;
+    if (!GetPaddedSize(infoBase.Size, sizeof(SInfo) - offsetof(SInfo, Entries), infoSize) || infoSize < sizeof(std::int32_t))
+        return false;
+
+    const char* infoData;
+    if (!ReadSpan(infoData, infoSize))
+        return false;
+
+    std::int32_t totalAnimations;
+    std::memcpy(&totalAnimations, infoData, sizeof(totalAnimations));
+    if (totalAnimations < 0)
+        return false;
+
+    for (std::int32_t animationIndex = 0; animationIndex < totalAnimations; ++animationIndex)
+    {
+        SBase nameBase;
+        if (!Read(&nameBase, sizeof(nameBase)))
+            return false;
+
+        size_t nameSize;
+        if (!GetPaddedSize(nameBase.Size, sizeof(SAnimationHeaderV2::Name), nameSize) || nameSize == 0)
+            return false;
+
+        const char* nameData;
+        if (!ReadSpan(nameData, nameSize))
+            return false;
+
+        SBase dganBase;
+        SBase dganInfoBase;
+        if (!Read(&dganBase, sizeof(dganBase)) || !Read(&dganInfoBase, sizeof(dganInfoBase)))
+            return false;
+
+        size_t dganInfoSize;
+        if (!GetPaddedSize(dganInfoBase.Size, sizeof(SInfo) - offsetof(SInfo, Entries), dganInfoSize) || dganInfoSize < sizeof(std::int32_t))
+            return false;
+
+        const char* dganInfoData;
+        if (!ReadSpan(dganInfoData, dganInfoSize))
+            return false;
+
+        std::int32_t totalSequences;
+        std::memcpy(&totalSequences, dganInfoData, sizeof(totalSequences));
+        if (totalSequences < 0 || totalSequences > std::numeric_limits<unsigned short>::max() - m_kcIFPSequences)
+            return false;
+
+        for (std::int32_t sequenceIndex = 0; sequenceIndex < totalSequences; ++sequenceIndex)
+        {
+            SBase cpanBase;
+            SBase animBase;
+            if (!Read(&cpanBase, sizeof(cpanBase)) || !Read(&animBase, sizeof(animBase)))
+                return false;
+
+            constexpr size_t animDataCapacity = sizeof(SAnim) - offsetof(SAnim, Name);
+            constexpr size_t framesOffset = offsetof(SAnim, Frames) - offsetof(SAnim, Name);
+
+            size_t animDataSize;
+            if (!GetPaddedSize(animBase.Size, animDataCapacity, animDataSize) || animDataSize < framesOffset + sizeof(std::int32_t))
+                return false;
+
+            const char* animData;
+            if (!ReadSpan(animData, animDataSize) || std::memchr(animData, '\0', sizeof(SAnim::Name)) == nullptr)
+                return false;
+
+            std::int32_t totalFrames;
+            std::memcpy(&totalFrames, animData + framesOffset, sizeof(totalFrames));
+            if (totalFrames < 0)
+                return false;
+            if (totalFrames == 0)
+                continue;
+
+            SBase kfrmBase;
+            if (!Read(&kfrmBase, sizeof(kfrmBase)))
+                return false;
+
+            size_t frameSize = 0;
+            if (std::memcmp(kfrmBase.FourCC, "KRTS", sizeof(kfrmBase.FourCC)) == 0)
+                frameSize = sizeof(SKrts);
+            else if (std::memcmp(kfrmBase.FourCC, "KRT0", sizeof(kfrmBase.FourCC)) == 0)
+                frameSize = sizeof(SKrt0);
+            else if (std::memcmp(kfrmBase.FourCC, "KR00", sizeof(kfrmBase.FourCC)) == 0)
+                frameSize = sizeof(SKr00);
+            else
+                return false;
+
+            const size_t frameCount = static_cast<size_t>(totalFrames);
+            if (offset > buffer.size() || frameCount > (buffer.size() - offset) / frameSize)
+                return false;
+
+            offset += frameCount * frameSize;
+        }
+    }
+
+    return true;
+}
+
+bool CClientIFP::ReadIFPVersion1()
+{
+    SInfo Info{};
     ReadHeaderVersion1(Info);
 
-    m_pVecAnimations->resize(Info.Entries);
+    try
+    {
+        m_pVecAnimations->resize(Info.Entries);
+    }
+    catch (const std::exception&)
+    {
+        // Allocation failures must not escape through the Lua C boundary.
+        return false;
+    }
+
     for (auto& Animation : m_pIFPAnimations->vecAnimations)
     {
         ReadAnimationNameVersion1(Animation);
@@ -117,6 +263,8 @@ void CClientIFP::ReadIFPVersion1()
         *(DWORD*)Animation.pSequencesMemory = ReadSequencesWithDummies(Animation.pHierarchy);
         PreProcessAnimationHierarchy(Animation.pHierarchy);
     }
+
+    return true;
 }
 
 void CClientIFP::ReadIFPVersion2(bool bAnp3)
