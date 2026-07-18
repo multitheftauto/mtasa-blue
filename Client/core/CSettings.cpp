@@ -1699,7 +1699,7 @@ void CSettings::CreateGUI()
      *  Advanced tab
      **/
     vecTemp = CVector2D(12.f, 12.f);
-    float fComboWidth = 170.f;
+    float fComboWidth;
     float fHeaderHeight = 20;
     float fLineHeight = 27;
 
@@ -1716,6 +1716,7 @@ void CSettings::CreateGUI()
                5.0f;
 
     vecTemp.fX += 10.0f;
+    fComboWidth = std::clamp(tabPanelSize.fX - vecTemp.fX - fIndentX - 15.0f, 100.0f, 400.0f);
 
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Fast CJ clothes loading:")));
@@ -1926,23 +1927,25 @@ void CSettings::CreateGUI()
     m_pUpdateBuildTypeCombo->AddItem(_("Default"))->SetData((void*)0);
     m_pUpdateBuildTypeCombo->AddItem("Nightly")->SetData((void*)2);
     m_pUpdateBuildTypeCombo->SetReadOnly(true);
-    vecTemp.fX += fComboWidth + 15;
 
-    // Check for updates
+    // Check for updates (place to right of combo, clamped to fit)
     m_pButtonUpdate = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabAdvanced, _("Check for update now")));
-    m_pButtonUpdate->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
+    {
+        const float fComboEndX = vecTemp.fX + fIndentX + fComboWidth;
+        const float fButtonX = std::min(fComboEndX + 15.0f, tabPanelSize.fX - 150.0f);
+        m_pButtonUpdate->SetPosition(CVector2D(fButtonX, vecTemp.fY));
+    }
     m_pButtonUpdate->AutoSize(NULL, 20.0f, 8.0f);
     m_pButtonUpdate->SetClickHandler(GUI_CALLBACK(&CSettings::OnUpdateButtonClick, this));
     m_pButtonUpdate->SetZOrderingEnabled(false);
     vecTemp.fY += fLineHeight;
-    vecTemp.fX -= fComboWidth + 15;
 
     // Description label
     vecTemp.fY += 15.0f;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, ""));
     m_pAdvancedSettingDescriptionLabel->SetPosition(CVector2D(vecTemp.fX + 10.f, vecTemp.fY));
     m_pAdvancedSettingDescriptionLabel->SetFont("default-bold-small");
-    m_pAdvancedSettingDescriptionLabel->SetSize(CVector2D(500.0f, 95.0f));
+    m_pAdvancedSettingDescriptionLabel->SetSize(CVector2D(tabPanelSize.fX - 40.0f, 95.0f));
     m_pAdvancedSettingDescriptionLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP);
 
     // Set up the events
