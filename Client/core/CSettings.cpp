@@ -45,8 +45,8 @@ namespace
     constexpr float kBorderlessSaturationMax = 2.0f;
     constexpr float kBorderlessSaturationDefault = 1.0f;
 
-    constexpr float kSettingsContentWidth = 720.0f;
-    constexpr float kSettingsBaseContentHeight = 520.0f;
+    constexpr float kSettingsContentWidth = 760.0f;
+    constexpr float kSettingsBaseContentHeight = 560.0f;
     constexpr float kSettingsWindowFrameHorizontal = 18.0f;  // 9px left + 9px right
     constexpr float kSettingsWindowFrameVertical = 22.0f;    // 20px top + 2px bottom
     constexpr float kSettingsBottomButtonAreaHeight = 38.0f;
@@ -1921,23 +1921,25 @@ void CSettings::CreateGUI()
     m_pUpdateBuildTypeLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pUpdateBuildTypeLabel->AutoSize();
 
-    m_pUpdateBuildTypeCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
-    m_pUpdateBuildTypeCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
-    m_pUpdateBuildTypeCombo->SetSize(CVector2D(fComboWidth, 95.0f));
-    m_pUpdateBuildTypeCombo->AddItem(_("Default"))->SetData((void*)0);
-    m_pUpdateBuildTypeCombo->AddItem("Nightly")->SetData((void*)2);
-    m_pUpdateBuildTypeCombo->SetReadOnly(true);
-
-    // Check for updates (place to right of combo, clamped to fit)
-    m_pButtonUpdate = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabAdvanced, _("Check for update now")));
     {
-        const float fComboEndX = vecTemp.fX + fIndentX + fComboWidth;
-        const float fButtonX = std::min(fComboEndX + 15.0f, tabPanelSize.fX - 150.0f);
-        m_pButtonUpdate->SetPosition(CVector2D(fButtonX, vecTemp.fY));
+        // Reserve space for "Check for update now" button on the same line
+        const float fButtonTextWidth = pManager->GetTextExtent(_("Check for update now"));
+        const float fUpdateButtonReserve = fButtonTextWidth + 30.0f;
+        const float fUpdateComboWidth = std::clamp(tabPanelSize.fX - (vecTemp.fX + fIndentX) - fUpdateButtonReserve, 100.0f, fComboWidth);
+        m_pUpdateBuildTypeCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
+        m_pUpdateBuildTypeCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
+        m_pUpdateBuildTypeCombo->SetSize(CVector2D(fUpdateComboWidth, 95.0f));
+        m_pUpdateBuildTypeCombo->AddItem(_("Default"))->SetData((void*)0);
+        m_pUpdateBuildTypeCombo->AddItem("Nightly")->SetData((void*)2);
+        m_pUpdateBuildTypeCombo->SetReadOnly(true);
+
+        // Check for updates (place to right of combo)
+        m_pButtonUpdate = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabAdvanced, _("Check for update now")));
+        m_pButtonUpdate->SetPosition(CVector2D(vecTemp.fX + fIndentX + fUpdateComboWidth + 15.0f, vecTemp.fY));
+        m_pButtonUpdate->AutoSize(NULL, 20.0f, 8.0f);
+        m_pButtonUpdate->SetClickHandler(GUI_CALLBACK(&CSettings::OnUpdateButtonClick, this));
+        m_pButtonUpdate->SetZOrderingEnabled(false);
     }
-    m_pButtonUpdate->AutoSize(NULL, 20.0f, 8.0f);
-    m_pButtonUpdate->SetClickHandler(GUI_CALLBACK(&CSettings::OnUpdateButtonClick, this));
-    m_pButtonUpdate->SetZOrderingEnabled(false);
     vecTemp.fY += fLineHeight;
 
     // Description label
