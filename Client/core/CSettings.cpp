@@ -45,8 +45,8 @@ namespace
     constexpr float kBorderlessSaturationMax = 2.0f;
     constexpr float kBorderlessSaturationDefault = 1.0f;
 
-    constexpr float kSettingsContentWidth = 680.0f;
-    constexpr float kSettingsBaseContentHeight = 480.0f;
+    constexpr float kSettingsContentWidth = 720.0f;
+    constexpr float kSettingsBaseContentHeight = 520.0f;
     constexpr float kSettingsWindowFrameHorizontal = 18.0f;  // 9px left + 9px right
     constexpr float kSettingsWindowFrameVertical = 22.0f;    // 20px top + 2px bottom
     constexpr float kSettingsBottomButtonAreaHeight = 38.0f;
