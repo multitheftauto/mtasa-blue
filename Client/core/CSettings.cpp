@@ -1924,7 +1924,7 @@ void CSettings::CreateGUI()
     {
         // Reserve space for "Check for update now" button on the same line
         const float fButtonTextWidth = pManager->GetTextExtent(_("Check for update now"));
-        const float fUpdateButtonReserve = fButtonTextWidth + 30.0f;
+        const float fUpdateButtonReserve = fButtonTextWidth + 35.0f;
         const float fUpdateComboWidth = std::clamp(tabPanelSize.fX - (vecTemp.fX + fIndentX) - fUpdateButtonReserve, 100.0f, fComboWidth);
         m_pUpdateBuildTypeCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
         m_pUpdateBuildTypeCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
@@ -1933,10 +1933,18 @@ void CSettings::CreateGUI()
         m_pUpdateBuildTypeCombo->AddItem("Nightly")->SetData((void*)2);
         m_pUpdateBuildTypeCombo->SetReadOnly(true);
 
-        // Check for updates (place to right of combo)
+        // Check for updates (place to right of combo, clamped to tab boundary)
         m_pButtonUpdate = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabAdvanced, _("Check for update now")));
         m_pButtonUpdate->SetPosition(CVector2D(vecTemp.fX + fIndentX + fUpdateComboWidth + 15.0f, vecTemp.fY));
         m_pButtonUpdate->AutoSize(NULL, 20.0f, 8.0f);
+        {
+            // Ensure button doesn't extend beyond tab
+            CVector2D btnSize;
+            m_pButtonUpdate->GetSize(btnSize);
+            const float maxBtnX = tabPanelSize.fX - btnSize.fX - 4.0f;
+            if (vecTemp.fX + fIndentX + fUpdateComboWidth + 15.0f > maxBtnX)
+                m_pButtonUpdate->SetPosition(CVector2D(maxBtnX, vecTemp.fY));
+        }
         m_pButtonUpdate->SetClickHandler(GUI_CALLBACK(&CSettings::OnUpdateButtonClick, this));
         m_pButtonUpdate->SetZOrderingEnabled(false);
     }
