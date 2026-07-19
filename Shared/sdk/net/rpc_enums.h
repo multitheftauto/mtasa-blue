@@ -293,5 +293,7 @@ enum eElementRPCFunctions
 
     SET_ELEMENT_ON_FIRE,
 
+    SET_VEHICLE_SMOKE_TRAIL_ENABLED,
+
     NUM_RPC_FUNCS  // Add above this line
 };
