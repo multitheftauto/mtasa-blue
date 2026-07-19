@@ -13,49 +13,44 @@
 #include "CVoiceDataPacket.h"
 #include "CPlayer.h"
 
-CVoiceDataPacket::CVoiceDataPacket()
-{
-    m_voiceBuffer.reserve(2048);
-}
-
 bool CVoiceDataPacket::Read(NetBitStreamInterface& BitStream)
 {
+    if (!m_pSourceElement)
+        return false;
+
+    auto player = GetSourcePlayer();
+
+    auto now = GetTickCount64_(), last = player->GetLastSendVoiceData();
+    if (now - last < 100)
+        return false;
+
+    player->SetLastSendVoiceData(now);
+
     unsigned short voiceBufferLength{};
+    if (!BitStream.Read(voiceBufferLength))
+        return false;
+    
+    if (voiceBufferLength > MAX_VOICE_BUFFER)
+        return false;
 
-    if (BitStream.Read(voiceBufferLength) && voiceBufferLength <= m_voiceBuffer.capacity())
-    {
-        m_voiceBuffer.resize(voiceBufferLength);
-        return BitStream.Read(reinterpret_cast<char*>(m_voiceBuffer.data()), m_voiceBuffer.size());
-    }
-
-    return false;
+    m_voiceBuffer.resize(voiceBufferLength);
+    return BitStream.Read(reinterpret_cast<char*>(m_voiceBuffer.data()), m_voiceBuffer.size());
 }
 
 bool CVoiceDataPacket::Write(NetBitStreamInterface& BitStream) const
 {
-    if (!m_voiceBuffer.empty())
-    {
-        const auto voiceBuffer = reinterpret_cast<const char*>(m_voiceBuffer.data());
-        const auto voiceBufferLength = static_cast<uint16_t>(m_voiceBuffer.size());
+    if (m_voiceBuffer.empty())
+        return false;
 
-        // Write the source player
-        BitStream.Write(m_pSourceElement->GetID());
-        // Write the length as an unsigned short and then write the string
-        BitStream.Write(voiceBufferLength);
-        BitStream.Write(voiceBuffer, voiceBufferLength);
-        return true;
-    }
+    const auto voiceBuffer = reinterpret_cast<const char*>(m_voiceBuffer.data());
+    const auto voiceBufferLength = static_cast<uint16_t>(m_voiceBuffer.size());
 
-    return false;
-}
+    // Write the source player
+    BitStream.Write(m_pSourceElement->GetID());
 
-void CVoiceDataPacket::SetVoiceData(const unsigned char* voiceBuffer, unsigned short voiceBufferLength)
-{
-    m_voiceBuffer.clear();
+    // Write the length as an unsigned short and then write the string
+    BitStream.Write(voiceBufferLength);
+    BitStream.Write(voiceBuffer, voiceBufferLength);
 
-    if (!voiceBuffer || !voiceBufferLength || voiceBufferLength > m_voiceBuffer.capacity())
-        return;
-
-    m_voiceBuffer.resize(voiceBufferLength);
-    std::copy_n(voiceBuffer, voiceBufferLength, m_voiceBuffer.data());
+    return true;
 }
