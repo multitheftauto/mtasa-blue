@@ -1,4 +1,4 @@
-msgid ""
+﻿msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
@@ -20,186 +20,186 @@ msgstr ""
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr "Запустите Grand Theft Auto: San Andreas.\n"
-"Убедитесь, что игра помещена в папку \"Program Files (x86)\"."
+msgstr "Р—Р°РїСѓСЃС‚РёС‚Рµ Grand Theft Auto: San Andreas.\n"
+"РЈР±РµРґРёС‚РµСЃСЊ, С‡С‚Рѕ РёРіСЂР° РїРѕРјРµС‰РµРЅР° РІ РїР°РїРєСѓ \"Program Files (x86)\"."
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
-msgstr "Поиск игрового процесса: GTA: San Andreas"
+msgstr "РџРѕРёСЃРє РёРіСЂРѕРІРѕРіРѕ РїСЂРѕС†РµСЃСЃР°: GTA: San Andreas"
 
 #: Client/loader/Utils.cpp:548
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr "Извините, игра не найдена.\n"
-"Запустите Grand Theft Auto: San Andreas и нажмите повторить попытку.\n"
-"Убедитесь, что игра находится в папке \"Program Files (x86)\"."
+msgstr "РР·РІРёРЅРёС‚Рµ, РёРіСЂР° РЅРµ РЅР°Р№РґРµРЅР°.\n"
+"Р—Р°РїСѓСЃС‚РёС‚Рµ Grand Theft Auto: San Andreas Рё РЅР°Р¶РјРёС‚Рµ РїРѕРІС‚РѕСЂРёС‚СЊ РїРѕРїС‹С‚РєСѓ.\n"
+"РЈР±РµРґРёС‚РµСЃСЊ, С‡С‚Рѕ РёРіСЂР° РЅР°С…РѕРґРёС‚СЃСЏ РІ РїР°РїРєРµ \"Program Files (x86)\"."
 
 #: Client/loader/Utils.cpp:606
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Выберите директорию с Grand Theft Auto: San Andreas"
+msgstr "Р’С‹Р±РµСЂРёС‚Рµ РґРёСЂРµРєС‚РѕСЂРёСЋ СЃ Grand Theft Auto: San Andreas"
 
 #: Client/loader/Utils.cpp:974 Client/loader/CInstallManager.cpp:376
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
 "Please confirm in the next window."
-msgstr "MTA:SA нужны права Администратора для следующей задачи:\n\n"
+msgstr "MTA:SA РЅСѓР¶РЅС‹ РїСЂР°РІР° РђРґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР° РґР»СЏ СЃР»РµРґСѓСЋС‰РµР№ Р·Р°РґР°С‡Рё:\n\n"
 "'%s'\n\n"
-"Пожалуйста, подтвердите в следующем окне."
+"РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РїРѕРґС‚РІРµСЂРґРёС‚Рµ РІ СЃР»РµРґСѓСЋС‰РµРј РѕРєРЅРµ."
 
 #: Client/loader/Utils.cpp:1075
 #, c-format
 msgid "Error loading %s module! (%s)"
-msgstr "Ошибка загрузки %s модуля! (%s)"
+msgstr "РћС€РёР±РєР° Р·Р°РіСЂСѓР·РєРё %s РјРѕРґСѓР»СЏ! (%s)"
 
 #: Client/loader/Utils.cpp:1400 Client/loader/Dialogs.cpp:1048
 msgid "Copying files..."
-msgstr "Копирование файлов..."
+msgstr "РљРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»РѕРІ..."
 
 #: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:1053
 msgid "Copy finished early. Everything OK."
-msgstr "Копирование завершено. Все в порядке."
+msgstr "РљРѕРїРёСЂРѕРІР°РЅРёРµ Р·Р°РІРµСЂС€РµРЅРѕ. Р’СЃРµ РІ РїРѕСЂСЏРґРєРµ."
 
 #: Client/loader/Utils.cpp:1466 Client/loader/Dialogs.cpp:1058
 msgid "Finishing..."
-msgstr "Завершение..."
+msgstr "Р—Р°РІРµСЂС€РµРЅРёРµ..."
 
 #: Client/loader/Utils.cpp:1468 Client/loader/Dialogs.cpp:1062
 msgid "Done!"
-msgstr "Готово!"
+msgstr "Р“РѕС‚РѕРІРѕ!"
 
 #: Client/loader/Utils.cpp:1508
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
-msgstr "Новая версия клиента %s обнаружена.\n\n"
-"Вы хотите скопировать ваши настройки из %s ?"
+msgstr "РќРѕРІР°СЏ РІРµСЂСЃРёСЏ РєР»РёРµРЅС‚Р° %s РѕР±РЅР°СЂСѓР¶РµРЅР°.\n\n"
+"Р’С‹ С…РѕС‚РёС‚Рµ СЃРєРѕРїРёСЂРѕРІР°С‚СЊ РІР°С€Рё РЅР°СЃС‚СЂРѕР№РєРё РёР· %s ?"
 
 #: Client/loader/Utils.cpp:1547
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA не смогла открыть файл '%s'"
+msgstr "GTA:SA РЅРµ СЃРјРѕРіР»Р° РѕС‚РєСЂС‹С‚СЊ С„Р°Р№Р» '%s'"
 
 #: Client/loader/Utils.cpp:1569
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA не нашла файл '%s'"
+msgstr "GTA:SA РЅРµ РЅР°С€Р»Р° С„Р°Р№Р» '%s'"
 
 #: Client/loader/Utils.cpp:1594
 msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA не смогла загрузить модель."
+msgstr "GTA:SA РЅРµ СЃРјРѕРіР»Р° Р·Р°РіСЂСѓР·РёС‚СЊ РјРѕРґРµР»СЊ."
 
 #: Client/loader/Utils.cpp:1596
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Если вы недавно модифицировали gta3.img, попробуйте переустановить GTA:SA."
+msgstr "Р•СЃР»Рё РІС‹ РЅРµРґР°РІРЅРѕ РјРѕРґРёС„РёС†РёСЂРѕРІР°Р»Рё gta3.img, РїРѕРїСЂРѕР±СѓР№С‚Рµ РїРµСЂРµСѓСЃС‚Р°РЅРѕРІРёС‚СЊ GTA:SA."
 
 #: Client/loader/Utils.cpp:1621
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA не смогла добавить апгрейд транспортному средству."
+msgstr "GTA:SA РЅРµ СЃРјРѕРіР»Р° РґРѕР±Р°РІРёС‚СЊ Р°РїРіСЂРµР№Рґ С‚СЂР°РЅСЃРїРѕСЂС‚РЅРѕРјСѓ СЃСЂРµРґСЃС‚РІСѓ."
 
 #: Client/loader/Utils.cpp:1640
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA нашла ошибки в файле '%s'"
+msgstr "GTA:SA РЅР°С€Р»Р° РѕС€РёР±РєРё РІ С„Р°Р№Р»Рµ '%s'"
 
 #: Client/loader/Utils.cpp:1722
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Ваш компьютер перезагрузился во время игры в MTA:SA?"
+msgstr "Р’Р°С€ РєРѕРјРїСЊСЋС‚РµСЂ РїРµСЂРµР·Р°РіСЂСѓР·РёР»СЃСЏ РІРѕ РІСЂРµРјСЏ РёРіСЂС‹ РІ MTA:SA?"
 
 #: Client/loader/Utils.cpp:1787
 msgid "Please terminate the following programs before continuing:"
-msgstr "Завершите следующие программы для продолжения:"
+msgstr "Р—Р°РІРµСЂС€РёС‚Рµ СЃР»РµРґСѓСЋС‰РёРµ РїСЂРѕРіСЂР°РјРјС‹ РґР»СЏ РїСЂРѕРґРѕР»Р¶РµРЅРёСЏ:"
 
 #: Client/loader/MainFunctions.cpp:321
 msgid "Invalid module path detected.\n"
-msgstr "Обнаружен недопустимый путь к модулю."
+msgstr "РћР±РЅР°СЂСѓР¶РµРЅ РЅРµРґРѕРїСѓСЃС‚РёРјС‹Р№ РїСѓС‚СЊ Рє РјРѕРґСѓР»СЋ."
 
 #: Client/loader/MainFunctions.cpp:348
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Ошибка версий файлов. Переустановите MTA:SA для решения проблемы.\n"
+msgstr "РћС€РёР±РєР° РІРµСЂСЃРёР№ С„Р°Р№Р»РѕРІ. РџРµСЂРµСѓСЃС‚Р°РЅРѕРІРёС‚Рµ MTA:SA РґР»СЏ СЂРµС€РµРЅРёСЏ РїСЂРѕР±Р»РµРјС‹.\n"
 
 #: Client/loader/MainFunctions.cpp:356
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Некоторые файлы повреждены. Переустановите MTA во избежание проблем.\n"
+msgstr "РќРµРєРѕС‚РѕСЂС‹Рµ С„Р°Р№Р»С‹ РїРѕРІСЂРµР¶РґРµРЅС‹. РџРµСЂРµСѓСЃС‚Р°РЅРѕРІРёС‚Рµ MTA РІРѕ РёР·Р±РµР¶Р°РЅРёРµ РїСЂРѕР±Р»РµРј.\n"
 
 #: Client/loader/MainFunctions.cpp:367
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
-msgstr "MTA:SA не работает в 'Безопасном режиме'.\n\n"
-"Перезапустите ваш компьютер.\n"
+msgstr "MTA:SA РЅРµ СЂР°Р±РѕС‚Р°РµС‚ РІ 'Р‘РµР·РѕРїР°СЃРЅРѕРј СЂРµР¶РёРјРµ'.\n\n"
+"РџРµСЂРµР·Р°РїСѓСЃС‚РёС‚Рµ РІР°С€ РєРѕРјРїСЊСЋС‚РµСЂ.\n"
 
 #: Client/loader/MainFunctions.cpp:546
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
-msgstr "У вас есть проблемы с запуском MTA:SA?.\n\n"
-"Попробовать откатиться к ранней версии?"
+msgstr "РЈ РІР°СЃ РµСЃС‚СЊ РїСЂРѕР±Р»РµРјС‹ СЃ Р·Р°РїСѓСЃРєРѕРј MTA:SA?.\n\n"
+"РџРѕРїСЂРѕР±РѕРІР°С‚СЊ РѕС‚РєР°С‚РёС‚СЊСЃСЏ Рє СЂР°РЅРЅРµР№ РІРµСЂСЃРёРё?"
 
 #: Client/loader/MainFunctions.cpp:574
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
-msgstr "Возникли проблемы с запуском MTA:SA. \n"
-"Сброс настроек GTA, возможно, устранит эту проблему..\n\n"
-"Вы хотите сбросить настройки GTA?"
+msgstr "Р’РѕР·РЅРёРєР»Рё РїСЂРѕР±Р»РµРјС‹ СЃ Р·Р°РїСѓСЃРєРѕРј MTA:SA. \n"
+"РЎР±СЂРѕСЃ РЅР°СЃС‚СЂРѕРµРє GTA, РІРѕР·РјРѕР¶РЅРѕ, СѓСЃС‚СЂР°РЅРёС‚ СЌС‚Сѓ РїСЂРѕР±Р»РµРјСѓ..\n\n"
+"Р’С‹ С…РѕС‚РёС‚Рµ СЃР±СЂРѕСЃРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё GTA?"
 
 #: Client/loader/MainFunctions.cpp:589
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
-msgstr "Настройки GTA сброшены.\n\n"
-"Нажмите OK, чтобы продолжить."
+msgstr "РќР°СЃС‚СЂРѕР№РєРё GTA СЃР±СЂРѕС€РµРЅС‹.\n\n"
+"РќР°Р¶РјРёС‚Рµ OK, С‡С‚РѕР±С‹ РїСЂРѕРґРѕР»Р¶РёС‚СЊ."
 
 #: Client/loader/MainFunctions.cpp:594
 #, c-format
 msgid "File could not be deleted: '%s'"
-msgstr "Файл не может быть удален. '%s'"
+msgstr "Р¤Р°Р№Р» РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ СѓРґР°Р»РµРЅ. '%s'"
 
 #. No settings to delete, or can't find them
 #: Client/loader/MainFunctions.cpp:602
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
-msgstr "Возникли проблемы с запуском MTA:SA? .\n\n"
-"Хотите посмотреть онлайн помощь?"
+msgstr "Р’РѕР·РЅРёРєР»Рё РїСЂРѕР±Р»РµРјС‹ СЃ Р·Р°РїСѓСЃРєРѕРј MTA:SA? .\n\n"
+"РҐРѕС‚РёС‚Рµ РїРѕСЃРјРѕС‚СЂРµС‚СЊ РѕРЅР»Р°Р№РЅ РїРѕРјРѕС‰СЊ?"
 
 #. Inform user
 #: Client/loader/MainFunctions.cpp:639
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
-msgstr "У вас проблемы с загрузкой MTA:SA?\n\n"
-"Вы хотите изменить текущие настройки?"
+msgstr "РЈ РІР°СЃ РїСЂРѕР±Р»РµРјС‹ СЃ Р·Р°РіСЂСѓР·РєРѕР№ MTA:SA?\n\n"
+"Р’С‹ С…РѕС‚РёС‚Рµ РёР·РјРµРЅРёС‚СЊ С‚РµРєСѓС‰РёРµ РЅР°СЃС‚СЂРѕР№РєРё?"
 
 #: Client/loader/MainFunctions.cpp:640 Client/core/CSettings.cpp:1161
 #: Client/core/CSettings.cpp:1672
 msgid "Fullscreen mode:"
-msgstr "Полноэкранный режим:"
+msgstr "РџРѕР»РЅРѕСЌРєСЂР°РЅРЅС‹Р№ СЂРµР¶РёРј:"
 
 #: Client/loader/MainFunctions.cpp:640 Client/core/CSettings.cpp:1171
 #: Client/core/CSettings.cpp:2337
 msgid "Borderless window"
-msgstr "Окно в рамке"
+msgstr "РћРєРЅРѕ РІ СЂР°РјРєРµ"
 
 #: Client/loader/MainFunctions.cpp:711
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
-msgstr "У вас возникли проблемы с запуском MTA:SA?\n\n"
-"Попробуйте выключить следующие продукты для MTA и GTA:"
+msgstr "РЈ РІР°СЃ РІРѕР·РЅРёРєР»Рё РїСЂРѕР±Р»РµРјС‹ СЃ Р·Р°РїСѓСЃРєРѕРј MTA:SA?\n\n"
+"РџРѕРїСЂРѕР±СѓР№С‚Рµ РІС‹РєР»СЋС‡РёС‚СЊ СЃР»РµРґСѓСЋС‰РёРµ РїСЂРѕРґСѓРєС‚С‹ РґР»СЏ MTA Рё GTA:"
 
 #: Client/loader/MainFunctions.cpp:744
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
-msgstr "ВНИМАНИЕ\n\n"
-"MTA:SA обнаружил подозрительную активность.\n"
-"Проверьте вашу систему на наличие вирусов, чтобы убедиться в безопасности.\n\n"
+msgstr "Р’РќРРњРђРќРР•\n\n"
+"MTA:SA РѕР±РЅР°СЂСѓР¶РёР» РїРѕРґРѕР·СЂРёС‚РµР»СЊРЅСѓСЋ Р°РєС‚РёРІРЅРѕСЃС‚СЊ.\n"
+"РџСЂРѕРІРµСЂСЊС‚Рµ РІР°С€Сѓ СЃРёСЃС‚РµРјСѓ РЅР° РЅР°Р»РёС‡РёРµ РІРёСЂСѓСЃРѕРІ, С‡С‚РѕР±С‹ СѓР±РµРґРёС‚СЊСЃСЏ РІ Р±РµР·РѕРїР°СЃРЅРѕСЃС‚Рё.\n\n"
 
 #: Client/loader/MainFunctions.cpp:747
 #, c-format
 msgid "The detected file was:  %s\n"
-msgstr "Был обнаружен файл:       %s\n"
+msgstr "Р‘С‹Р» РѕР±РЅР°СЂСѓР¶РµРЅ С„Р°Р№Р»:       %s\n"
 
 #: Client/loader/MainFunctions.cpp:995
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr "Необходимо завершить процесс GTA: San Andreas перед запуском MTA:SA. Сделать это сейчас?"
+msgstr "РќРµРѕР±С…РѕРґРёРјРѕ Р·Р°РІРµСЂС€РёС‚СЊ РїСЂРѕС†РµСЃСЃ GTA: San Andreas РїРµСЂРµРґ Р·Р°РїСѓСЃРєРѕРј MTA:SA. РЎРґРµР»Р°С‚СЊ СЌС‚Рѕ СЃРµР№С‡Р°СЃ?"
 
 #: Client/loader/MainFunctions.cpp:996 Client/loader/MainFunctions.cpp:1003
 #: Client/loader/MainFunctions.cpp:1969
@@ -207,20 +207,20 @@ msgstr "Необходимо завершить процесс GTA: San Andreas 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1708
 #: Client/game_sa/CGameSA.cpp:270
 msgid "Information"
-msgstr "Информация"
+msgstr "РРЅС„РѕСЂРјР°С†РёСЏ"
 
 #: Client/loader/MainFunctions.cpp:1002
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
-msgstr "Невозможно завершить процесс GTA: San Andreas. Если проблема сохранилась, то попробуйте перезагрузить ваш компьютер."
+msgstr "РќРµРІРѕР·РјРѕР¶РЅРѕ Р·Р°РІРµСЂС€РёС‚СЊ РїСЂРѕС†РµСЃСЃ GTA: San Andreas. Р•СЃР»Рё РїСЂРѕР±Р»РµРјР° СЃРѕС…СЂР°РЅРёР»Р°СЃСЊ, С‚Рѕ РїРѕРїСЂРѕР±СѓР№С‚Рµ РїРµСЂРµР·Р°РіСЂСѓР·РёС‚СЊ РІР°С€ РєРѕРјРїСЊСЋС‚РµСЂ."
 
 #: Client/loader/MainFunctions.cpp:1131
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
 "Try to launch MTA:SA again?"
-msgstr "Проблема перезапуска MTA:SA\n\n"
-"Если проблема сохранилась, то откройте диспетчер задач и остановите процессы 'gta_sa.exe' и 'Multi Theft Auto.exe' \n\n\n"
-"Попробовать запустить MTA:SA снова?"
+msgstr "РџСЂРѕР±Р»РµРјР° РїРµСЂРµР·Р°РїСѓСЃРєР° MTA:SA\n\n"
+"Р•СЃР»Рё РїСЂРѕР±Р»РµРјР° СЃРѕС…СЂР°РЅРёР»Р°СЃСЊ, С‚Рѕ РѕС‚РєСЂРѕР№С‚Рµ РґРёСЃРїРµС‚С‡РµСЂ Р·Р°РґР°С‡ Рё РѕСЃС‚Р°РЅРѕРІРёС‚Рµ РїСЂРѕС†РµСЃСЃС‹ 'gta_sa.exe' Рё 'Multi Theft Auto.exe' \n\n\n"
+"РџРѕРїСЂРѕР±РѕРІР°С‚СЊ Р·Р°РїСѓСЃС‚РёС‚СЊ MTA:SA СЃРЅРѕРІР°?"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
@@ -257,105 +257,105 @@ msgstr "Проблема перезапуска MTA:SA\n\n"
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:381
 msgid "Error"
-msgstr "Ошибка"
+msgstr "РћС€РёР±РєР°"
 
 #: Client/loader/MainFunctions.cpp:1155
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
-msgstr "Другой процесс с MTA уже запущен.\n\n"
-"Если проблема не решена, попробуйте перезагрузить ваш компьютер"
+msgstr "Р”СЂСѓРіРѕР№ РїСЂРѕС†РµСЃСЃ СЃ MTA СѓР¶Рµ Р·Р°РїСѓС‰РµРЅ.\n\n"
+"Р•СЃР»Рё РїСЂРѕР±Р»РµРјР° РЅРµ СЂРµС€РµРЅР°, РїРѕРїСЂРѕР±СѓР№С‚Рµ РїРµСЂРµР·Р°РіСЂСѓР·РёС‚СЊ РІР°С€ РєРѕРјРїСЊСЋС‚РµСЂ"
 
 #: Client/loader/MainFunctions.cpp:1159
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
-msgstr "Другой процесс MTA уже запущен.\n\n"
-"Вы хотите завершить этот процесс?"
+msgstr "Р”СЂСѓРіРѕР№ РїСЂРѕС†РµСЃСЃ MTA СѓР¶Рµ Р·Р°РїСѓС‰РµРЅ.\n\n"
+"Р’С‹ С…РѕС‚РёС‚Рµ Р·Р°РІРµСЂС€РёС‚СЊ СЌС‚РѕС‚ РїСЂРѕС†РµСЃСЃ?"
 
 #: Client/loader/MainFunctions.cpp:1196
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
-msgstr "Отсутствуют необходимые записи в реестре. Переустановите Multi Theft Auto: San Andreas."
+msgstr "РћС‚СЃСѓС‚СЃС‚РІСѓСЋС‚ РЅРµРѕР±С…РѕРґРёРјС‹Рµ Р·Р°РїРёСЃРё РІ СЂРµРµСЃС‚СЂРµ. РџРµСЂРµСѓСЃС‚Р°РЅРѕРІРёС‚Рµ Multi Theft Auto: San Andreas."
 
 #: Client/loader/MainFunctions.cpp:1202
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr "Путь к папке с вашей GTA: San Andreas имеет неподдерживаемые  символы (юникод). Измените путь к Grand Theft Auto: San Andreas, чтобы в нём были только ASCII символы и переустановите Multi Theft Auto: San Andreas."
+msgstr "РџСѓС‚СЊ Рє РїР°РїРєРµ СЃ РІР°С€РµР№ GTA: San Andreas РёРјРµРµС‚ РЅРµРїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Рµ  СЃРёРјРІРѕР»С‹ (СЋРЅРёРєРѕРґ). РР·РјРµРЅРёС‚Рµ РїСѓС‚СЊ Рє Grand Theft Auto: San Andreas, С‡С‚РѕР±С‹ РІ РЅС‘Рј Р±С‹Р»Рё С‚РѕР»СЊРєРѕ ASCII СЃРёРјРІРѕР»С‹ Рё РїРµСЂРµСѓСЃС‚Р°РЅРѕРІРёС‚Рµ Multi Theft Auto: San Andreas."
 
 #: Client/loader/MainFunctions.cpp:1215
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
 "move your installation(s) to a path that does not contain a semicolon."
-msgstr "Путь к вашей установке MTA:SA или GTA: San Andreas\n"
-"содержит символ ';' (точка с запятой).\n\n"
-"Если у вас возникнут проблемы при запуске MTA:SA,\n"
-"переместите вашу установку в путь, который не содержит точки с запятой."
+msgstr "РџСѓС‚СЊ Рє РІР°С€РµР№ СѓСЃС‚Р°РЅРѕРІРєРµ MTA:SA РёР»Рё GTA: San Andreas\n"
+"СЃРѕРґРµСЂР¶РёС‚ СЃРёРјРІРѕР» ';' (С‚РѕС‡РєР° СЃ Р·Р°РїСЏС‚РѕР№).\n\n"
+"Р•СЃР»Рё Сѓ РІР°СЃ РІРѕР·РЅРёРєРЅСѓС‚ РїСЂРѕР±Р»РµРјС‹ РїСЂРё Р·Р°РїСѓСЃРєРµ MTA:SA,\n"
+"РїРµСЂРµРјРµСЃС‚РёС‚Рµ РІР°С€Сѓ СѓСЃС‚Р°РЅРѕРІРєСѓ РІ РїСѓС‚СЊ, РєРѕС‚РѕСЂС‹Р№ РЅРµ СЃРѕРґРµСЂР¶РёС‚ С‚РѕС‡РєРё СЃ Р·Р°РїСЏС‚РѕР№."
 
 #: Client/loader/MainFunctions.cpp:1398
 msgid "Invalid installation paths detected."
-msgstr "Обнаружены недопустимые пути установки."
+msgstr "РћР±РЅР°СЂСѓР¶РµРЅС‹ РЅРµРґРѕРїСѓСЃС‚РёРјС‹Рµ РїСѓС‚Рё СѓСЃС‚Р°РЅРѕРІРєРё."
 
 #: Client/loader/MainFunctions.cpp:1529
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr "Ошибка запуска, проверьте правильность установки последних data-файлов."
+msgstr "РћС€РёР±РєР° Р·Р°РїСѓСЃРєР°, РїСЂРѕРІРµСЂСЊС‚Рµ РїСЂР°РІРёР»СЊРЅРѕСЃС‚СЊ СѓСЃС‚Р°РЅРѕРІРєРё РїРѕСЃР»РµРґРЅРёС… data-С„Р°Р№Р»РѕРІ."
 
 #: Client/loader/MainFunctions.cpp:1538
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "Загрузка не удалась. Убедитесь что %s установлен правильно."
+msgstr "Р—Р°РіСЂСѓР·РєР° РЅРµ СѓРґР°Р»Р°СЃСЊ. РЈР±РµРґРёС‚РµСЃСЊ С‡С‚Рѕ %s СѓСЃС‚Р°РЅРѕРІР»РµРЅ РїСЂР°РІРёР»СЊРЅРѕ."
 
 #: Client/loader/MainFunctions.cpp:1547
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr "Загрузка не удалась, поскольку gta_sa.exe не был найден в %s"
+msgstr "Р—Р°РіСЂСѓР·РєР° РЅРµ СѓРґР°Р»Р°СЃСЊ, РїРѕСЃРєРѕР»СЊРєСѓ gta_sa.exe РЅРµ Р±С‹Р» РЅР°Р№РґРµРЅ РІ %s"
 
 #: Client/loader/MainFunctions.cpp:1561
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
-msgstr "Загрузка не удалась. Удалите файл %s в папке GTA перед запуском."
+msgstr "Р—Р°РіСЂСѓР·РєР° РЅРµ СѓРґР°Р»Р°СЃСЊ. РЈРґР°Р»РёС‚Рµ С„Р°Р№Р» %s РІ РїР°РїРєРµ GTA РїРµСЂРµРґ Р·Р°РїСѓСЃРєРѕРј."
 
 #: Client/loader/MainFunctions.cpp:1571
 #, c-format
 msgid "Main file has an incorrect name (%s)"
-msgstr "У основного файла неверное имя (%s)"
+msgstr "РЈ РѕСЃРЅРѕРІРЅРѕРіРѕ С„Р°Р№Р»Р° РЅРµРІРµСЂРЅРѕРµ РёРјСЏ (%s)"
 
 #: Client/loader/MainFunctions.cpp:1618
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
-msgstr "Отсутствует файл %s. Возможна вирусная активность."
+msgstr "РћС‚СЃСѓС‚СЃС‚РІСѓРµС‚ С„Р°Р№Р» %s. Р’РѕР·РјРѕР¶РЅР° РІРёСЂСѓСЃРЅР°СЏ Р°РєС‚РёРІРЅРѕСЃС‚СЊ."
 
 #: Client/loader/MainFunctions.cpp:1626
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
-msgstr "Файл %s изменён. Возможна вирусная активность."
+msgstr "Р¤Р°Р№Р» %s РёР·РјРµРЅС‘РЅ. Р’РѕР·РјРѕР¶РЅР° РІРёСЂСѓСЃРЅР°СЏ Р°РєС‚РёРІРЅРѕСЃС‚СЊ."
 
 #: Client/loader/MainFunctions.cpp:1650
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
-msgstr "В каталоге установки найдены файлы .asi.\n\n"
-"Удалите файлы .asi, если у вас возникают проблемы."
+msgstr "Р’ РєР°С‚Р°Р»РѕРіРµ СѓСЃС‚Р°РЅРѕРІРєРё РЅР°Р№РґРµРЅС‹ С„Р°Р№Р»С‹ .asi.\n\n"
+"РЈРґР°Р»РёС‚Рµ С„Р°Р№Р»С‹ .asi, РµСЃР»Рё Сѓ РІР°СЃ РІРѕР·РЅРёРєР°СЋС‚ РїСЂРѕР±Р»РµРјС‹."
 
 #: Client/loader/MainFunctions.cpp:1819
 msgid "Invalid game paths detected."
-msgstr "Обнаружены недопустимые пути к игре."
+msgstr "РћР±РЅР°СЂСѓР¶РµРЅС‹ РЅРµРґРѕРїСѓСЃС‚РёРјС‹Рµ РїСѓС‚Рё Рє РёРіСЂРµ."
 
 #: Client/loader/MainFunctions.cpp:1827
 msgid "Fix configuration issue"
-msgstr "Исправить проблему конфигурации"
+msgstr "РСЃРїСЂР°РІРёС‚СЊ РїСЂРѕР±Р»РµРјСѓ РєРѕРЅС„РёРіСѓСЂР°С†РёРё"
 
 #: Client/loader/MainFunctions.cpp:1969
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
-msgstr "GTA: San Andreas возможно запустилась некорректно. Завершить её работу?"
+msgstr "GTA: San Andreas РІРѕР·РјРѕР¶РЅРѕ Р·Р°РїСѓСЃС‚РёР»Р°СЃСЊ РЅРµРєРѕСЂСЂРµРєС‚РЅРѕ. Р—Р°РІРµСЂС€РёС‚СЊ РµС‘ СЂР°Р±РѕС‚Сѓ?"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr "Неизвестно"
+msgstr "РќРµРёР·РІРµСЃС‚РЅРѕ"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr "Файл %s используется %zu.\n\n"
-"Вы хотите завершить этот процесс и продолжить обновление?\n\n"
+msgstr "Р¤Р°Р№Р» %s РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ %zu.\n\n"
+"Р’С‹ С…РѕС‚РёС‚Рµ Р·Р°РІРµСЂС€РёС‚СЊ СЌС‚РѕС‚ РїСЂРѕС†РµСЃСЃ Рё РїСЂРѕРґРѕР»Р¶РёС‚СЊ РѕР±РЅРѕРІР»РµРЅРёРµ?\n\n"
 "%s"
 
 #: Client/loader/Install.cpp:479
@@ -364,35 +364,35 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr "Установка может быть повреждена.\n\n"
-"%zu из %zu файлов не удалось восстановить из резервной копии.\n"
-"Переустановите Multi Theft Auto с сайта www.multitheftauto.com\n"
-"или запустите обновление от имени администратора."
+msgstr "РЈСЃС‚Р°РЅРѕРІРєР° РјРѕР¶РµС‚ Р±С‹С‚СЊ РїРѕРІСЂРµР¶РґРµРЅР°.\n\n"
+"%zu РёР· %zu С„Р°Р№Р»РѕРІ РЅРµ СѓРґР°Р»РѕСЃСЊ РІРѕСЃСЃС‚Р°РЅРѕРІРёС‚СЊ РёР· СЂРµР·РµСЂРІРЅРѕР№ РєРѕРїРёРё.\n"
+"РџРµСЂРµСѓСЃС‚Р°РЅРѕРІРёС‚Рµ Multi Theft Auto СЃ СЃР°Р№С‚Р° www.multitheftauto.com\n"
+"РёР»Рё Р·Р°РїСѓСЃС‚РёС‚Рµ РѕР±РЅРѕРІР»РµРЅРёРµ РѕС‚ РёРјРµРЅРё Р°РґРјРёРЅРёСЃС‚СЂР°С‚РѕСЂР°."
 
 #: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:1035
 msgid "Installing update..."
-msgstr "Установка обновления..."
+msgstr "РЈСЃС‚Р°РЅРѕРІРєР° РѕР±РЅРѕРІР»РµРЅРёСЏ..."
 
 #: Client/loader/Install.cpp:934 Client/loader/Dialogs.cpp:1043
 msgid "Extracting files..."
-msgstr "Извлечение файлов..."
+msgstr "РР·РІР»РµС‡РµРЅРёРµ С„Р°Р№Р»РѕРІ..."
 
 #: Client/loader/CInstallManager.cpp:391
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
-msgstr "MTA:SA не может выполнить следующую задачу:\n\n"
+msgstr "MTA:SA РЅРµ РјРѕР¶РµС‚ РІС‹РїРѕР»РЅРёС‚СЊ СЃР»РµРґСѓСЋС‰СѓСЋ Р·Р°РґР°С‡Сѓ:\n\n"
 "  '%s'\n"
 
 #: Client/loader/CInstallManager.cpp:460
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
-msgstr "** Вылет был вызван ошибкой графического драйвера **\n\n"
-"** Обновите драйвера вашей видеокарты **"
+msgstr "** Р’С‹Р»РµС‚ Р±С‹Р» РІС‹Р·РІР°РЅ РѕС€РёР±РєРѕР№ РіСЂР°С„РёС‡РµСЃРєРѕРіРѕ РґСЂР°Р№РІРµСЂР° **\n\n"
+"** РћР±РЅРѕРІРёС‚Рµ РґСЂР°Р№РІРµСЂР° РІР°С€РµР№ РІРёРґРµРѕРєР°СЂС‚С‹ **"
 
 #: Client/loader/CInstallManager.cpp:470
 msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
-msgstr "** Недостаточно памяти — сбой вызван нехваткой свободной или фрагментированной памяти. **"
+msgstr "** РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РїР°РјСЏС‚Рё вЂ” СЃР±РѕР№ РІС‹Р·РІР°РЅ РЅРµС…РІР°С‚РєРѕР№ СЃРІРѕР±РѕРґРЅРѕР№ РёР»Рё С„СЂР°РіРјРµРЅС‚РёСЂРѕРІР°РЅРЅРѕР№ РїР°РјСЏС‚Рё. **"
 
 #: Client/loader/CInstallManager.cpp:476
 msgid "** Enhanced crash capture will be attempted on next launch. **"
@@ -400,88 +400,88 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:1059
 msgid "Install updated MTA:SA files"
-msgstr "Установка обновлённых MTA:SA файлов"
+msgstr "РЈСЃС‚Р°РЅРѕРІРєР° РѕР±РЅРѕРІР»С‘РЅРЅС‹С… MTA:SA С„Р°Р№Р»РѕРІ"
 
 #: Client/loader/CInstallManager.cpp:1079
 msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Невозможно обновиться, так как файлы заняты другими приложениями, закройте их и попробуйте снова"
+msgstr "РќРµРІРѕР·РјРѕР¶РЅРѕ РѕР±РЅРѕРІРёС‚СЊСЃСЏ, С‚Р°Рє РєР°Рє С„Р°Р№Р»С‹ Р·Р°РЅСЏС‚С‹ РґСЂСѓРіРёРјРё РїСЂРёР»РѕР¶РµРЅРёСЏРјРё, Р·Р°РєСЂРѕР№С‚Рµ РёС… Рё РїРѕРїСЂРѕР±СѓР№С‚Рµ СЃРЅРѕРІР°"
 
 #: Client/loader/CInstallManager.cpp:1088
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto установлена неправильно, переустановите. %s"
+msgstr "Multi Theft Auto СѓСЃС‚Р°РЅРѕРІР»РµРЅР° РЅРµРїСЂР°РІРёР»СЊРЅРѕ, РїРµСЂРµСѓСЃС‚Р°РЅРѕРІРёС‚Рµ. %s"
 
 #: Client/loader/CInstallManager.cpp:1140
 msgid "Create GTA:SA junctions"
-msgstr "Создание GTA:SA соединения"
+msgstr "РЎРѕР·РґР°РЅРёРµ GTA:SA СЃРѕРµРґРёРЅРµРЅРёСЏ"
 
 #: Client/loader/CInstallManager.cpp:1184
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr "MTA:SA не может запуститься, потому что копирование файлов неудачно:"
+msgstr "MTA:SA РЅРµ РјРѕР¶РµС‚ Р·Р°РїСѓСЃС‚РёС‚СЊСЃСЏ, РїРѕС‚РѕРјСѓ С‡С‚Рѕ РєРѕРїРёСЂРѕРІР°РЅРёРµ С„Р°Р№Р»РѕРІ РЅРµСѓРґР°С‡РЅРѕ:"
 
 #: Client/loader/CInstallManager.cpp:1190
 #: Client/loader/CInstallManager.cpp:1230
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "MTA:SA не может запуститься потому что MTA:SA файл некорректен или отсутствует:"
+msgstr "MTA:SA РЅРµ РјРѕР¶РµС‚ Р·Р°РїСѓСЃС‚РёС‚СЊСЃСЏ РїРѕС‚РѕРјСѓ С‡С‚Рѕ MTA:SA С„Р°Р№Р» РЅРµРєРѕСЂСЂРµРєС‚РµРЅ РёР»Рё РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚:"
 
 #: Client/loader/CInstallManager.cpp:1199
 msgid "Copy MTA:SA files"
-msgstr "Копирование MTA:SA файлов"
+msgstr "РљРѕРїРёСЂРѕРІР°РЅРёРµ MTA:SA С„Р°Р№Р»РѕРІ"
 
 #: Client/loader/CInstallManager.cpp:1222
 #: Client/loader/CInstallManager.cpp:1300
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr "MTA:SA не может запуститься потому что GTA:SA файл некорректен или пропал:"
+msgstr "MTA:SA РЅРµ РјРѕР¶РµС‚ Р·Р°РїСѓСЃС‚РёС‚СЊСЃСЏ РїРѕС‚РѕРјСѓ С‡С‚Рѕ GTA:SA С„Р°Р№Р» РЅРµРєРѕСЂСЂРµРєС‚РµРЅ РёР»Рё РїСЂРѕРїР°Р»:"
 
 #: Client/loader/CInstallManager.cpp:1307
 msgid "Patch GTA:SA dependency"
-msgstr "Зависимость от исправлений GTA:SA"
+msgstr "Р—Р°РІРёСЃРёРјРѕСЃС‚СЊ РѕС‚ РёСЃРїСЂР°РІР»РµРЅРёР№ GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1355
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr "MTA:SA не может запуститься потому что GTA:SA исполняемый файл неверен или отсутствует:"
+msgstr "MTA:SA РЅРµ РјРѕР¶РµС‚ Р·Р°РїСѓСЃС‚РёС‚СЊСЃСЏ РїРѕС‚РѕРјСѓ С‡С‚Рѕ GTA:SA РёСЃРїРѕР»РЅСЏРµРјС‹Р№ С„Р°Р№Р» РЅРµРІРµСЂРµРЅ РёР»Рё РѕС‚СЃСѓС‚СЃС‚РІСѓРµС‚:"
 
 #: Client/loader/CInstallManager.cpp:1359
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "Пожалуйста, проверьте антивирус на предмет ложного обнаружения, попробуйте добавить gta_sa.exe в исключения и перезапустить MTA:SA."
+msgstr "РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РїСЂРѕРІРµСЂСЊС‚Рµ Р°РЅС‚РёРІРёСЂСѓСЃ РЅР° РїСЂРµРґРјРµС‚ Р»РѕР¶РЅРѕРіРѕ РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ, РїРѕРїСЂРѕР±СѓР№С‚Рµ РґРѕР±Р°РІРёС‚СЊ gta_sa.exe РІ РёСЃРєР»СЋС‡РµРЅРёСЏ Рё РїРµСЂРµР·Р°РїСѓСЃС‚РёС‚СЊ MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:1365
 msgid "Generate GTA:SA"
-msgstr "Сгенерировать GTA:SA"
+msgstr "РЎРіРµРЅРµСЂРёСЂРѕРІР°С‚СЊ GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1380
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr "MTA:SA не удается запустить, поскольку исполняемый файл GTA:SA недоступен для загрузки:"
+msgstr "MTA:SA РЅРµ СѓРґР°РµС‚СЃСЏ Р·Р°РїСѓСЃС‚РёС‚СЊ, РїРѕСЃРєРѕР»СЊРєСѓ РёСЃРїРѕР»РЅСЏРµРјС‹Р№ С„Р°Р№Р» GTA:SA РЅРµРґРѕСЃС‚СѓРїРµРЅ РґР»СЏ Р·Р°РіСЂСѓР·РєРё:"
 
 #: Client/loader/CInstallManager.cpp:1387
 #: Client/loader/CInstallManager.cpp:1410
 msgid "Patch GTA:SA"
-msgstr "Патч GTA:SA"
+msgstr "РџР°С‚С‡ GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1403
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr "MTA:SA не удается запустить из-за сбоя установки патча GTA:SA:"
+msgstr "MTA:SA РЅРµ СѓРґР°РµС‚СЃСЏ Р·Р°РїСѓСЃС‚РёС‚СЊ РёР·-Р·Р° СЃР±РѕСЏ СѓСЃС‚Р°РЅРѕРІРєРё РїР°С‚С‡Р° GTA:SA:"
 
 #: Client/loader/CInstallManager.cpp:1584 Client/core/CCore.cpp:846
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "Недостаточно места на диске %s для установки MTA:SA."
+msgstr "РќРµРґРѕСЃС‚Р°С‚РѕС‡РЅРѕ РјРµСЃС‚Р° РЅР° РґРёСЃРєРµ %s РґР»СЏ СѓСЃС‚Р°РЅРѕРІРєРё MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:1640
 msgid "Missing file:"
-msgstr "Не найден файл:"
+msgstr "РќРµ РЅР°Р№РґРµРЅ С„Р°Р№Р»:"
 
 #: Client/loader/CInstallManager.cpp:1644
 msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Переустановите GTA:SA, если MTA не запускается"
+msgstr "РџРµСЂРµСѓСЃС‚Р°РЅРѕРІРёС‚Рµ GTA:SA, РµСЃР»Рё MTA РЅРµ Р·Р°РїСѓСЃРєР°РµС‚СЃСЏ"
 
 #: Client/loader/CInstallManager.cpp:1679
 msgid "Update install settings"
-msgstr "Обновление настроек установки"
+msgstr "РћР±РЅРѕРІР»РµРЅРёРµ РЅР°СЃС‚СЂРѕРµРє СѓСЃС‚Р°РЅРѕРІРєРё"
 
 #: Client/loader/CInstallManager.cpp:1832
 msgid "Update compatibility settings"
-msgstr "Обновить настройки совместимости"
+msgstr "РћР±РЅРѕРІРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё СЃРѕРІРјРµСЃС‚РёРјРѕСЃС‚Рё"
 
 #. /////////////////////////////////////////////////////////////////////////
 #.
@@ -499,7 +499,7 @@ msgstr "Обновить настройки совместимости"
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 #: Client/gui/CGUIMessageBox_Impl.cpp:72
 msgid "Yes"
-msgstr "Да"
+msgstr "Р”Р°"
 
 #: Client/loader/Dialogs.cpp:64 Client/core/CVersionUpdater.cpp:1634
 #: Client/core/CVersionUpdater.cpp:1652 Client/core/CVersionUpdater.cpp:1921
@@ -510,7 +510,7 @@ msgstr "Да"
 #: Client/core/CMainMenu.cpp:1237 Client/core/CQuestionBox.cpp:194
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 msgid "No"
-msgstr "Нет"
+msgstr "РќРµС‚"
 
 #. Create buttons
 #. OK button
@@ -523,16 +523,16 @@ msgstr "Нет"
 #: Client/core/CSettings.cpp:6003 Client/core/CMainMenu.cpp:1258
 #: Client/gui/CGUIMessageBox_Impl.cpp:64
 msgid "OK"
-msgstr "ОК"
+msgstr "РћРљ"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "Quit"
-msgstr "Выйти"
+msgstr "Р’С‹Р№С‚Рё"
 
 #: Client/loader/Dialogs.cpp:67
 #: Client/core/ServerBrowser/CServerBrowser.cpp:717
 msgid "Help"
-msgstr "Помощь"
+msgstr "РџРѕРјРѕС‰СЊ"
 
 #. Cancel button
 #: Client/loader/Dialogs.cpp:68 Client/core/CVersionUpdater.cpp:1853
@@ -541,105 +541,105 @@ msgstr "Помощь"
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
-msgstr "Отмена"
+msgstr "РћС‚РјРµРЅР°"
 
 #: Client/loader/Dialogs.cpp:83
 msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas обнаружила ошибку"
+msgstr "MTA: San Andreas РѕР±РЅР°СЂСѓР¶РёР»Р° РѕС€РёР±РєСѓ"
 
 #: Client/loader/Dialogs.cpp:84
 msgid "Crash information"
-msgstr "Информация об аварийном завершении программы"
+msgstr "РРЅС„РѕСЂРјР°С†РёСЏ РѕР± Р°РІР°СЂРёР№РЅРѕРј Р·Р°РІРµСЂС€РµРЅРёРё РїСЂРѕРіСЂР°РјРјС‹"
 
 #: Client/loader/Dialogs.cpp:85
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Поставьте галочку для отправки разработчикам информации через интернет о падении MTA."
+msgstr "РџРѕСЃС‚Р°РІСЊС‚Рµ РіР°Р»РѕС‡РєСѓ РґР»СЏ РѕС‚РїСЂР°РІРєРё СЂР°Р·СЂР°Р±РѕС‚С‡РёРєР°Рј РёРЅС„РѕСЂРјР°С†РёРё С‡РµСЂРµР· РёРЅС‚РµСЂРЅРµС‚ Рѕ РїР°РґРµРЅРёРё MTA."
 
 #: Client/loader/Dialogs.cpp:86
 msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Это повысит шансы на устранение данной ошибки"
+msgstr "Р­С‚Рѕ РїРѕРІС‹СЃРёС‚ С€Р°РЅСЃС‹ РЅР° СѓСЃС‚СЂР°РЅРµРЅРёРµ РґР°РЅРЅРѕР№ РѕС€РёР±РєРё"
 
 #: Client/loader/Dialogs.cpp:87
 msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "Вы хотите перезапустить MTA: San Andreas ?"
+msgstr "Р’С‹ С…РѕС‚РёС‚Рµ РїРµСЂРµР·Р°РїСѓСЃС‚РёС‚СЊ MTA: San Andreas ?"
 
 #: Client/loader/Dialogs.cpp:94
 msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas - Предупреждение"
+msgstr "MTA: San Andreas - РџСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ"
 
 #: Client/loader/Dialogs.cpp:95
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Директория с Grand Theft Auto: San Andreas содержит файл:"
+msgstr "Р”РёСЂРµРєС‚РѕСЂРёСЏ СЃ Grand Theft Auto: San Andreas СЃРѕРґРµСЂР¶РёС‚ С„Р°Р№Р»:"
 
 #: Client/loader/Dialogs.cpp:97
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr "Эти файлы не являются обязательными и могут мешать работе графических функций данной версии MTA:SA.\n\n"
-"Рекомендуется переименовать или удалить эти файлы."
+msgstr "Р­С‚Рё С„Р°Р№Р»С‹ РЅРµ СЏРІР»СЏСЋС‚СЃСЏ РѕР±СЏР·Р°С‚РµР»СЊРЅС‹РјРё Рё РјРѕРіСѓС‚ РјРµС€Р°С‚СЊ СЂР°Р±РѕС‚Рµ РіСЂР°С„РёС‡РµСЃРєРёС… С„СѓРЅРєС†РёР№ РґР°РЅРЅРѕР№ РІРµСЂСЃРёРё MTA:SA.\n\n"
+"Р РµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ РїРµСЂРµРёРјРµРЅРѕРІР°С‚СЊ РёР»Рё СѓРґР°Р»РёС‚СЊ СЌС‚Рё С„Р°Р№Р»С‹."
 
 #: Client/loader/Dialogs.cpp:99
 msgid "Keep these files, but also show this warning on next start"
-msgstr "Оставить данные файлы, а также отобразить это предупреждение при следующем запуске"
+msgstr "РћСЃС‚Р°РІРёС‚СЊ РґР°РЅРЅС‹Рµ С„Р°Р№Р»С‹, Р° С‚Р°РєР¶Рµ РѕС‚РѕР±СЂР°Р·РёС‚СЊ СЌС‚Рѕ РїСЂРµРґСѓРїСЂРµР¶РґРµРЅРёРµ РїСЂРё СЃР»РµРґСѓСЋС‰РµРј Р·Р°РїСѓСЃРєРµ"
 
 #: Client/loader/Dialogs.cpp:100
 msgid "Do not remind me about these files again"
-msgstr "Больше не спрашивать об этих файлах"
+msgstr "Р‘РѕР»СЊС€Рµ РЅРµ СЃРїСЂР°С€РёРІР°С‚СЊ РѕР± СЌС‚РёС… С„Р°Р№Р»Р°С…"
 
 #: Client/loader/Dialogs.cpp:101
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "Переименовать данные файлы из *.dll в *.dll.bak"
+msgstr "РџРµСЂРµРёРјРµРЅРѕРІР°С‚СЊ РґР°РЅРЅС‹Рµ С„Р°Р№Р»С‹ РёР· *.dll РІ *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:102
 msgid "Show me these files"
-msgstr "Показать эти файлы"
+msgstr "РџРѕРєР°Р·Р°С‚СЊ СЌС‚Рё С„Р°Р№Р»С‹"
 
 #: Client/loader/Dialogs.cpp:103
 msgid "Play MTA:SA"
-msgstr "Играть в MTA:SA"
+msgstr "РРіСЂР°С‚СЊ РІ MTA:SA"
 
 #: Client/loader/Dialogs.cpp:109
 msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - Сбитые настройки"
+msgstr "MTA: San Andreas - РЎР±РёС‚С‹Рµ РЅР°СЃС‚СЂРѕР№РєРё"
 
 #: Client/loader/Dialogs.cpp:110
 msgid "NVidia Optimus detected!"
-msgstr "Обнаружен NVidia Optimus!"
+msgstr "РћР±РЅР°СЂСѓР¶РµРЅ NVidia Optimus!"
 
 #: Client/loader/Dialogs.cpp:111
 msgid "Try each option and see what works:"
-msgstr "Попробуйте каждую опцию и посмотрите, что работает:"
+msgstr "РџРѕРїСЂРѕР±СѓР№С‚Рµ РєР°Р¶РґСѓСЋ РѕРїС†РёСЋ Рё РїРѕСЃРјРѕС‚СЂРёС‚Рµ, С‡С‚Рѕ СЂР°Р±РѕС‚Р°РµС‚:"
 
 #: Client/loader/Dialogs.cpp:112
 msgid "A - Standard NVidia"
-msgstr "A - Стандартный NVidia"
+msgstr "A - РЎС‚Р°РЅРґР°СЂС‚РЅС‹Р№ NVidia"
 
 #: Client/loader/Dialogs.cpp:113
 msgid "B - Alternate NVidia"
-msgstr "B - Альтернативный NVidia"
+msgstr "B - РђР»СЊС‚РµСЂРЅР°С‚РёРІРЅС‹Р№ NVidia"
 
 #: Client/loader/Dialogs.cpp:114
 msgid "C - Standard Intel"
-msgstr "C - Стандарт Intel"
+msgstr "C - РЎС‚Р°РЅРґР°СЂС‚ Intel"
 
 #: Client/loader/Dialogs.cpp:115
 msgid "D - Alternate Intel"
-msgstr "D - Альтернативный Intel"
+msgstr "D - РђР»СЊС‚РµСЂРЅР°С‚РёРІРЅС‹Р№ Intel"
 
 #: Client/loader/Dialogs.cpp:116
 msgid "If you get desperate, this might help:"
-msgstr "Если вы отчаялись, то это может помочь: "
+msgstr "Р•СЃР»Рё РІС‹ РѕС‚С‡Р°СЏР»РёСЃСЊ, С‚Рѕ СЌС‚Рѕ РјРѕР¶РµС‚ РїРѕРјРѕС‡СЊ: "
 
 #: Client/loader/Dialogs.cpp:117
 msgid "If you have already selected an option that works, this might help:"
-msgstr "Если вы уже выбирали работающую опцию, это может помочь:"
+msgstr "Р•СЃР»Рё РІС‹ СѓР¶Рµ РІС‹Р±РёСЂР°Р»Рё СЂР°Р±РѕС‚Р°СЋС‰СѓСЋ РѕРїС†РёСЋ, СЌС‚Рѕ РјРѕР¶РµС‚ РїРѕРјРѕС‡СЊ:"
 
 #: Client/loader/Dialogs.cpp:118
 msgid "Force windowed mode"
-msgstr "Принудительный оконный режим"
+msgstr "РџСЂРёРЅСѓРґРёС‚РµР»СЊРЅС‹Р№ РѕРєРѕРЅРЅС‹Р№ СЂРµР¶РёРј"
 
 #: Client/loader/Dialogs.cpp:119
 msgid "Don't show again"
-msgstr "Не показывать снова"
+msgstr "РќРµ РїРѕРєР°Р·С‹РІР°С‚СЊ СЃРЅРѕРІР°"
 
 #: Client/loader/Dialogs.cpp:126 Client/game_sa/CSettingsSA.cpp:910
 msgid "MTA: San Andreas"
@@ -647,535 +647,584 @@ msgstr "MTA: San Andreas"
 
 #: Client/loader/Dialogs.cpp:127
 msgid "Warning: Could not detect anti-virus product"
-msgstr "Внимание: Не удалось обнаружить антивирус"
+msgstr "Р’РЅРёРјР°РЅРёРµ: РќРµ СѓРґР°Р»РѕСЃСЊ РѕР±РЅР°СЂСѓР¶РёС‚СЊ Р°РЅС‚РёРІРёСЂСѓСЃ"
 
 #: Client/loader/Dialogs.cpp:129
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
-msgstr "MTA не может обнаружить антивирус на вашем ПК.\n\n"
-"Вирусы могут вмешиваться в работу MTA и портить вам игру.\n\n"
-"Нажмите 'Помощь' для подробной информации."
+msgstr "MTA РЅРµ РјРѕР¶РµС‚ РѕР±РЅР°СЂСѓР¶РёС‚СЊ Р°РЅС‚РёРІРёСЂСѓСЃ РЅР° РІР°С€РµРј РџРљ.\n\n"
+"Р’РёСЂСѓСЃС‹ РјРѕРіСѓС‚ РІРјРµС€РёРІР°С‚СЊСЃСЏ РІ СЂР°Р±РѕС‚Сѓ MTA Рё РїРѕСЂС‚РёС‚СЊ РІР°Рј РёРіСЂСѓ.\n\n"
+"РќР°Р¶РјРёС‚Рµ 'РџРѕРјРѕС‰СЊ' РґР»СЏ РїРѕРґСЂРѕР±РЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё."
 
 #: Client/loader/Dialogs.cpp:132
 msgid "I have already installed an anti-virus"
-msgstr "Я уже установил антивирус"
+msgstr "РЇ СѓР¶Рµ СѓСЃС‚Р°РЅРѕРІРёР» Р°РЅС‚РёРІРёСЂСѓСЃ"
 
 #: Client/loader/Dialogs.cpp:134
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
-msgstr "Я не буду устанавливать антивирус.\n"
-"Я готов к риску стать частью бот-сети и лагов."
+msgstr "РЇ РЅРµ Р±СѓРґСѓ СѓСЃС‚Р°РЅР°РІР»РёРІР°С‚СЊ Р°РЅС‚РёРІРёСЂСѓСЃ.\n"
+"РЇ РіРѕС‚РѕРІ Рє СЂРёСЃРєСѓ СЃС‚Р°С‚СЊ С‡Р°СЃС‚СЊСЋ Р±РѕС‚-СЃРµС‚Рё Рё Р»Р°РіРѕРІ."
 
 #: Client/loader/Dialogs.cpp:667
 msgid "The crash you experienced is due to memory abuse by servers.\n\n"
 "Even with plenty of RAM, this is a x86 game with address space limits up to 3.6GB and some highly unoptimized servers with a lot of mods (or just a few poorly written scripts) can make this happen, as well as lag your game.\n\n"
 "Contact the server owner or MTA support in the MTA official discord (https://discord.gg/mtasa) for more information."
-msgstr "Сбой произошёл из-за чрезмерного использования памяти серверами.\n\n"
-"Даже при наличии большого объёма оперативной памяти эта игра x86 с ограниченным адресным пространством до 3,6 ГБ, и некоторые сильно неоптимизированные серверы с большим количеством модов/ресурсов (или даже с несколькими плохо написанными скриптами) могут вызвать такую проблему, а также вызывать лаги в игре.\n\n"
-"Свяжитесь с владельцем сервера или поддержкой MTA в официальном Discord (https://discord.gg/mtasa\n"
-") для получения дополнительной информации."
+msgstr "РЎР±РѕР№ РїСЂРѕРёР·РѕС€С‘Р» РёР·-Р·Р° С‡СЂРµР·РјРµСЂРЅРѕРіРѕ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РїР°РјСЏС‚Рё СЃРµСЂРІРµСЂР°РјРё.\n\n"
+"Р”Р°Р¶Рµ РїСЂРё РЅР°Р»РёС‡РёРё Р±РѕР»СЊС€РѕРіРѕ РѕР±СЉС‘РјР° РѕРїРµСЂР°С‚РёРІРЅРѕР№ РїР°РјСЏС‚Рё СЌС‚Р° РёРіСЂР° x86 СЃ РѕРіСЂР°РЅРёС‡РµРЅРЅС‹Рј Р°РґСЂРµСЃРЅС‹Рј РїСЂРѕСЃС‚СЂР°РЅСЃС‚РІРѕРј РґРѕ 3,6 Р“Р‘, Рё РЅРµРєРѕС‚РѕСЂС‹Рµ СЃРёР»СЊРЅРѕ РЅРµРѕРїС‚РёРјРёР·РёСЂРѕРІР°РЅРЅС‹Рµ СЃРµСЂРІРµСЂС‹ СЃ Р±РѕР»СЊС€РёРј РєРѕР»РёС‡РµСЃС‚РІРѕРј РјРѕРґРѕРІ/СЂРµСЃСѓСЂСЃРѕРІ (РёР»Рё РґР°Р¶Рµ СЃ РЅРµСЃРєРѕР»СЊРєРёРјРё РїР»РѕС…Рѕ РЅР°РїРёСЃР°РЅРЅС‹РјРё СЃРєСЂРёРїС‚Р°РјРё) РјРѕРіСѓС‚ РІС‹Р·РІР°С‚СЊ С‚Р°РєСѓСЋ РїСЂРѕР±Р»РµРјСѓ, Р° С‚Р°РєР¶Рµ РІС‹Р·С‹РІР°С‚СЊ Р»Р°РіРё РІ РёРіСЂРµ.\n\n"
+"РЎРІСЏР¶РёС‚РµСЃСЊ СЃ РІР»Р°РґРµР»СЊС†РµРј СЃРµСЂРІРµСЂР° РёР»Рё РїРѕРґРґРµСЂР¶РєРѕР№ MTA РІ РѕС„РёС†РёР°Р»СЊРЅРѕРј Discord (https://discord.gg/mtasa\n"
+") РґР»СЏ РїРѕР»СѓС‡РµРЅРёСЏ РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕР№ РёРЅС„РѕСЂРјР°С†РёРё."
 
 #: Client/loader/Dialogs.cpp:673
 msgid "MTA: San Andreas - Out of Memory Information"
-msgstr "MTA: San Andreas - информация о нехватке памяти"
+msgstr "MTA: San Andreas - РёРЅС„РѕСЂРјР°С†РёСЏ Рѕ РЅРµС…РІР°С‚РєРµ РїР°РјСЏС‚Рё"
 
 #: Client/loader/Dialogs.cpp:1024
 msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "Поиск Grand Theft Auto San Andreas"
+msgstr "РџРѕРёСЃРє Grand Theft Auto San Andreas"
 
 #: Client/loader/Dialogs.cpp:1027
 msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Запустите Grand Theft Auto San Andreas"
+msgstr "Р—Р°РїСѓСЃС‚РёС‚Рµ Grand Theft Auto San Andreas"
 
 #: Client/core/CConnectManager.cpp:85
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "Подключение не удалось. Некорректное имя пользователя!"
+msgstr "РџРѕРґРєР»СЋС‡РµРЅРёРµ РЅРµ СѓРґР°Р»РѕСЃСЊ. РќРµРєРѕСЂСЂРµРєС‚РЅРѕРµ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ!"
 
 #: Client/core/CConnectManager.cpp:116
 msgid "Connecting failed. Invalid host provided!"
-msgstr "Не удалось подключится. Неверный адрес сервера!"
+msgstr "РќРµ СѓРґР°Р»РѕСЃСЊ РїРѕРґРєР»СЋС‡РёС‚СЃСЏ. РќРµРІРµСЂРЅС‹Р№ Р°РґСЂРµСЃ СЃРµСЂРІРµСЂР°!"
 
 #: Client/core/CConnectManager.cpp:132
 #, c-format
 msgid "Connecting to %s at port %u failed!"
-msgstr "Подключение на %s с портом %u не удалось!"
+msgstr "РџРѕРґРєР»СЋС‡РµРЅРёРµ РЅР° %s СЃ РїРѕСЂС‚РѕРј %u РЅРµ СѓРґР°Р»РѕСЃСЊ!"
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:153
 #, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "Подключение к %s:%u ..."
+msgstr "РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє %s:%u ..."
 
 #: Client/core/CConnectManager.cpp:155
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr "Повторное подключение к %s:%u ..."
+msgstr "РџРѕРІС‚РѕСЂРЅРѕРµ РїРѕРґРєР»СЋС‡РµРЅРёРµ Рє %s:%u ..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:156
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
 msgid "CONNECTING"
-msgstr "ПОДКЛЮЧЕНИЕ"
+msgstr "РџРћР”РљР›Р®Р§Р•РќРР•"
 
 #: Client/core/CConnectManager.cpp:271
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1358
 msgid "Connection timed out"
-msgstr "Время подключения истекло"
+msgstr "Р’СЂРµРјСЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ РёСЃС‚РµРєР»Рѕ"
 
 #: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1406
 msgid "Disconnected: unknown protocol error"
-msgstr "Отключено: неизвестная ошибка протокола"
+msgstr "РћС‚РєР»СЋС‡РµРЅРѕ: РЅРµРёР·РІРµСЃС‚РЅР°СЏ РѕС€РёР±РєР° РїСЂРѕС‚РѕРєРѕР»Р°"
 
 #: Client/core/CConnectManager.cpp:293
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1410
 msgid "Disconnected: disconnected remotely"
-msgstr "Отключено: удалённое отключение"
+msgstr "РћС‚РєР»СЋС‡РµРЅРѕ: СѓРґР°Р»С‘РЅРЅРѕРµ РѕС‚РєР»СЋС‡РµРЅРёРµ"
 
 #: Client/core/CConnectManager.cpp:297
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1414
 msgid "Disconnected: connection lost remotely"
-msgstr "Отключение: потеряно удаленное соединение"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: РїРѕС‚РµСЂСЏРЅРѕ СѓРґР°Р»РµРЅРЅРѕРµ СЃРѕРµРґРёРЅРµРЅРёРµ"
 
 #: Client/core/CConnectManager.cpp:301
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1418
 msgid "Disconnected: you are banned from this server"
-msgstr "Отключение: вы забанены на этом сервере"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: РІС‹ Р·Р°Р±Р°РЅРµРЅС‹ РЅР° СЌС‚РѕРј СЃРµСЂРІРµСЂРµ"
 
 #: Client/core/CConnectManager.cpp:308
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1426
 msgid "Disconnected: disconnected from the server"
-msgstr "Отключено: отключен от сервера"
+msgstr "РћС‚РєР»СЋС‡РµРЅРѕ: РѕС‚РєР»СЋС‡РµРЅ РѕС‚ СЃРµСЂРІРµСЂР°"
 
 #: Client/core/CConnectManager.cpp:312
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1430
 msgid "Disconnected: connection to the server was lost"
-msgstr "Отключено: связь с сервером была потеряна"
+msgstr "РћС‚РєР»СЋС‡РµРЅРѕ: СЃРІСЏР·СЊ СЃ СЃРµСЂРІРµСЂРѕРј Р±С‹Р»Р° РїРѕС‚РµСЂСЏРЅР°"
 
 #: Client/core/CConnectManager.cpp:319
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1438
 msgid "Disconnected: connection was refused"
-msgstr "Отключено: соединение было сброшено"
+msgstr "РћС‚РєР»СЋС‡РµРЅРѕ: СЃРѕРµРґРёРЅРµРЅРёРµ Р±С‹Р»Рѕ СЃР±СЂРѕС€РµРЅРѕ"
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:414
 #, c-format
 msgid "No such mod installed (%s)"
-msgstr "Не установлен модуль (%s)"
+msgstr "РќРµ СѓСЃС‚Р°РЅРѕРІР»РµРЅ РјРѕРґСѓР»СЊ (%s)"
 
 #: Client/core/CConnectManager.cpp:422
 msgid "Bad server response (2)"
-msgstr "Неверный ответ сервера (2)"
+msgstr "РќРµРІРµСЂРЅС‹Р№ РѕС‚РІРµС‚ СЃРµСЂРІРµСЂР° (2)"
 
 #: Client/core/CConnectManager.cpp:432
 msgid "Bad server response (1)"
-msgstr "Неверный ответ сервера (1)"
+msgstr "РќРµРІРµСЂРЅС‹Р№ РѕС‚РІРµС‚ СЃРµСЂРІРµСЂР° (1)"
 
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
 msgid "English"
-msgstr "Русский"
+msgstr "Р СѓСЃСЃРєРёР№"
 
 #: Client/core/CVersionUpdater.cpp:627
 msgid "Busy"
-msgstr "Занято"
+msgstr "Р—Р°РЅСЏС‚Рѕ"
 
 #: Client/core/CVersionUpdater.cpp:627
 msgid "Can't check for updates right now"
-msgstr "Невозможно проверить обновления в данный момент"
+msgstr "РќРµРІРѕР·РјРѕР¶РЅРѕ РїСЂРѕРІРµСЂРёС‚СЊ РѕР±РЅРѕРІР»РµРЅРёСЏ РІ РґР°РЅРЅС‹Р№ РјРѕРјРµРЅС‚"
 
 #: Client/core/CVersionUpdater.cpp:1630 Client/core/CVersionUpdater.cpp:1650
 #: Client/core/CVersionUpdater.cpp:1668
 #, c-format
 msgid "MTA:SA %s required"
-msgstr "Требуется MTA:SA %s"
+msgstr "РўСЂРµР±СѓРµС‚СЃСЏ MTA:SA %s"
 
 #: Client/core/CVersionUpdater.cpp:1631
 #, c-format
 msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
 "Do you want to download and install MTA:SA %s ?"
-msgstr "Требуется обновление до MTA:SA %s, чтобы присоединиться к выбранному серверу.\n\n"
-"Вы хотите загрузить и установить MTA:SA %s?"
+msgstr "РўСЂРµР±СѓРµС‚СЃСЏ РѕР±РЅРѕРІР»РµРЅРёРµ РґРѕ MTA:SA %s, С‡С‚РѕР±С‹ РїСЂРёСЃРѕРµРґРёРЅРёС‚СЊСЃСЏ Рє РІС‹Р±СЂР°РЅРЅРѕРјСѓ СЃРµСЂРІРµСЂСѓ.\n\n"
+"Р’С‹ С…РѕС‚РёС‚Рµ Р·Р°РіСЂСѓР·РёС‚СЊ Рё СѓСЃС‚Р°РЅРѕРІРёС‚СЊ MTA:SA %s?"
 
 #: Client/core/CVersionUpdater.cpp:1651
 #, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "Вы уверены, что хотите запустить MTA:SA %s и присоединиться к этому серверу?"
+msgstr "Р’С‹ СѓРІРµСЂРµРЅС‹, С‡С‚Рѕ С…РѕС‚РёС‚Рµ Р·Р°РїСѓСЃС‚РёС‚СЊ MTA:SA %s Рё РїСЂРёСЃРѕРµРґРёРЅРёС‚СЊСЃСЏ Рє СЌС‚РѕРјСѓ СЃРµСЂРІРµСЂСѓ?"
 
 #: Client/core/CVersionUpdater.cpp:1669
 msgid "It is not possible to connect at this time.\n\n"
 "Please try later."
-msgstr "Подключение сейчас невозможно.\n\n"
-"Повторите попытку позже."
+msgstr "РџРѕРґРєР»СЋС‡РµРЅРёРµ СЃРµР№С‡Р°СЃ РЅРµРІРѕР·РјРѕР¶РЅРѕ.\n\n"
+"РџРѕРІС‚РѕСЂРёС‚Рµ РїРѕРїС‹С‚РєСѓ РїРѕР·Р¶Рµ."
 
 #: Client/core/CVersionUpdater.cpp:1851
 msgid "Connecting"
-msgstr "Подключение"
+msgstr "РџРѕРґРєР»СЋС‡РµРЅРёРµ"
 
 #: Client/core/CVersionUpdater.cpp:1852 Client/core/CVersionUpdater.cpp:1868
 msgid "Please wait..."
-msgstr "Пожалуйста, подождите..."
+msgstr "РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РїРѕРґРѕР¶РґРёС‚Рµ..."
 
 #: Client/core/CVersionUpdater.cpp:1867
 msgid "CHECKING"
-msgstr "ПРОВЕРКА"
+msgstr "РџР РћР’Р•Р РљРђ"
 
 #: Client/core/CVersionUpdater.cpp:1884 Client/core/CVersionUpdater.cpp:1977
 msgid "UPDATE CHECK"
-msgstr "ПРОВЕРКА ОБНОВЛЕНИЙ"
+msgstr "РџР РћР’Р•Р РљРђ РћР‘РќРћР’Р›Р•РќРР™"
 
 #: Client/core/CVersionUpdater.cpp:1885
 msgid "No update needed"
-msgstr "В обновлении нет необходимости"
+msgstr "Р’ РѕР±РЅРѕРІР»РµРЅРёРё РЅРµС‚ РЅРµРѕР±С…РѕРґРёРјРѕСЃС‚Рё"
 
 #: Client/core/CVersionUpdater.cpp:1902
 msgid "DOWNLOADING"
-msgstr "ЗАГРУЗКА"
+msgstr "Р—РђР“Р РЈР—РљРђ"
 
 #: Client/core/CVersionUpdater.cpp:1903
 msgid "waiting..."
-msgstr "ожидание..."
+msgstr "РѕР¶РёРґР°РЅРёРµ..."
 
 #: Client/core/CVersionUpdater.cpp:1919
 msgid "MANDATORY UPDATE"
-msgstr "ОБЯЗАТЕЛЬНОЕ ОБНОВЛЕНИЕ"
+msgstr "РћР‘РЇР—РђРўР•Р›Р¬РќРћР• РћР‘РќРћР’Р›Р•РќРР•"
 
 #: Client/core/CVersionUpdater.cpp:1920
 msgid "To join this server, you must update MTA.\n\n"
 " Do you want to update now ?"
-msgstr "Чтобы войти на сервер, вы должны обновить MTA.\n\n"
-" Обновить сейчас?"
+msgstr "Р§С‚РѕР±С‹ РІРѕР№С‚Рё РЅР° СЃРµСЂРІРµСЂ, РІС‹ РґРѕР»Р¶РЅС‹ РѕР±РЅРѕРІРёС‚СЊ MTA.\n\n"
+" РћР±РЅРѕРІРёС‚СЊ СЃРµР№С‡Р°СЃ?"
 
 #: Client/core/CVersionUpdater.cpp:1938
 msgid "OPTIONAL UPDATE"
-msgstr "ДОПОЛНИТЕЛЬНОЕ ОБНОВЛЕНИЕ"
+msgstr "Р”РћРџРћР›РќРРўР•Р›Р¬РќРћР• РћР‘РќРћР’Р›Р•РќРР•"
 
 #: Client/core/CVersionUpdater.cpp:1939
 msgid "Server says an update is recommended, but not essential.\n\n"
 " Do you want to update now ?"
-msgstr "Сервер предлагает обновить клиент, но это не обязательно.\n\n"
-"Вы хотите обновить?"
+msgstr "РЎРµСЂРІРµСЂ РїСЂРµРґР»Р°РіР°РµС‚ РѕР±РЅРѕРІРёС‚СЊ РєР»РёРµРЅС‚, РЅРѕ СЌС‚Рѕ РЅРµ РѕР±СЏР·Р°С‚РµР»СЊРЅРѕ.\n\n"
+"Р’С‹ С…РѕС‚РёС‚Рµ РѕР±РЅРѕРІРёС‚СЊ?"
 
 #: Client/core/CVersionUpdater.cpp:1978
 msgid "An update is currently not available.\n\n"
 "Please check www.multitheftauto.com"
-msgstr "В настоящее время обновление недоступно.\n\n"
-"Пожалуйста, проверьте www.multitheftauto.com"
+msgstr "Р’ РЅР°СЃС‚РѕСЏС‰РµРµ РІСЂРµРјСЏ РѕР±РЅРѕРІР»РµРЅРёРµ РЅРµРґРѕСЃС‚СѓРїРЅРѕ.\n\n"
+"РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РїСЂРѕРІРµСЂСЊС‚Рµ www.multitheftauto.com"
 
 #: Client/core/CVersionUpdater.cpp:1999 Client/core/CVersionUpdater.cpp:2181
 msgid "ERROR SAVING"
-msgstr "ОШИБКА СОХРАНЕНИЯ"
+msgstr "РћРЁРР‘РљРђ РЎРћРҐР РђРќР•РќРРЇ"
 
 #: Client/core/CVersionUpdater.cpp:2000 Client/core/CVersionUpdater.cpp:2182
 msgid "Unable to create the file."
-msgstr "Не удаётся создать файл."
+msgstr "РќРµ СѓРґР°С‘С‚СЃСЏ СЃРѕР·РґР°С‚СЊ С„Р°Р№Р»."
 
 #: Client/core/CVersionUpdater.cpp:2008 Client/core/CVersionUpdater.cpp:2017
 #: Client/core/CVersionUpdater.cpp:2190 Client/core/CVersionUpdater.cpp:2199
 msgid "ERROR DOWNLOADING"
-msgstr "ОШИБКА ЗАГРУЗКИ"
+msgstr "РћРЁРР‘РљРђ Р—РђР“Р РЈР—РљР"
 
 #: Client/core/CVersionUpdater.cpp:2009 Client/core/CVersionUpdater.cpp:2191
 msgid "The downloaded file appears to be incorrect."
-msgstr "Загруженный файл некорректен."
+msgstr "Р—Р°РіСЂСѓР¶РµРЅРЅС‹Р№ С„Р°Р№Р» РЅРµРєРѕСЂСЂРµРєС‚РµРЅ."
 
 #: Client/core/CVersionUpdater.cpp:2018 Client/core/CVersionUpdater.cpp:2200
 msgid "For some reason."
-msgstr "По некоторым причинам."
+msgstr "РџРѕ РЅРµРєРѕС‚РѕСЂС‹Рј РїСЂРёС‡РёРЅР°Рј."
 
 #: Client/core/CVersionUpdater.cpp:2029 Client/core/CVersionUpdater.cpp:2213
 msgid "DOWNLOAD COMPLETE"
-msgstr "ЗАГРУЗКА ЗАВЕРШЕНА"
+msgstr "Р—РђР“Р РЈР—РљРђ Р—РђР’Р•Р РЁР•РќРђ"
 
 #: Client/core/CVersionUpdater.cpp:2053
 msgid " - Unknown problem in _DialogUpdateResult"
-msgstr " - Неизвестная проблема в _DialogUpdateResult"
+msgstr " - РќРµРёР·РІРµСЃС‚РЅР°СЏ РїСЂРѕР±Р»РµРјР° РІ _DialogUpdateResult"
 
 #: Client/core/CVersionUpdater.cpp:2144 Client/core/CSettings.cpp:5731
 msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "МОДИФИЦИРОВАННЫЕ ФАЙЛЫ GTA:SA"
+msgstr "РњРћР”РР¤РР¦РР РћР’РђРќРќР«Р• Р¤РђР™Р›Р« GTA:SA"
 
 #: Client/core/CVersionUpdater.cpp:2151 Client/core/CVersionUpdater.cpp:2161
 msgid "Ok"
-msgstr "Ок"
+msgstr "РћРє"
 
 #: Client/core/CVersionUpdater.cpp:2159
 msgid "ERROR"
-msgstr "ОШИБКА"
+msgstr "РћРЁРР‘РљРђ"
 
 #: Client/core/CVersionUpdater.cpp:2160
 msgid "Some MTA:SA data files are missing.\n\n\n"
 "Please reinstall MTA:SA"
-msgstr "Некоторые MTA:SA файлы отсутствуют.\n\n\n"
-"Переустановите MTA:SA."
+msgstr "РќРµРєРѕС‚РѕСЂС‹Рµ MTA:SA С„Р°Р№Р»С‹ РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‚.\n\n\n"
+"РџРµСЂРµСѓСЃС‚Р°РЅРѕРІРёС‚Рµ MTA:SA."
 
 #: Client/core/CVersionUpdater.cpp:2837
 #, c-format
 msgid "%3d %% completed"
-msgstr "Загружено %3d %%"
+msgstr "Р—Р°РіСЂСѓР¶РµРЅРѕ %3d %%"
 
 #: Client/core/CVersionUpdater.cpp:2840
 #, c-format
 msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
-" Ожидание ответа - %-3d"
+" РћР¶РёРґР°РЅРёРµ РѕС‚РІРµС‚Р° - %-3d"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ ПОМОЩЬ ПО КОМАНДАМ ]***\n"
+msgstr "***[ РџРћРњРћР©Р¬ РџРћ РљРћРњРђРќР”РђРњ ]***\n"
 
 #: Client/core/CCommandFuncs.cpp:158
 #, c-format
 msgid "* The time is %d:%02d:%02d"
-msgstr "* Время: %d:%02d:%02d"
+msgstr "* Р’СЂРµРјСЏ: %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr "Соединение: Сеть не готова, пожалуйста, подождите немного"
+msgstr "РЎРѕРµРґРёРЅРµРЅРёРµ: РЎРµС‚СЊ РЅРµ РіРѕС‚РѕРІР°, РїРѕР¶Р°Р»СѓР№СЃС‚Р°, РїРѕРґРѕР¶РґРёС‚Рµ РЅРµРјРЅРѕРіРѕ"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "Используйте 'connect <адрес> [<порт> <ник> <пароль>]' для подключения"
+msgstr "РСЃРїРѕР»СЊР·СѓР№С‚Рµ 'connect <Р°РґСЂРµСЃ> [<РїРѕСЂС‚> <РЅРёРє> <РїР°СЂРѕР»СЊ>]' РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ"
 
 #: Client/core/CCommandFuncs.cpp:233
 msgid "connect: Bad port number"
-msgstr "подключение: Неверный порт"
+msgstr "РїРѕРґРєР»СЋС‡РµРЅРёРµ: РќРµРІРµСЂРЅС‹Р№ РїРѕСЂС‚"
 
 #: Client/core/CCommandFuncs.cpp:255
 #, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "Подключение: Подключение к %s:%u..."
+msgstr "РџРѕРґРєР»СЋС‡РµРЅРёРµ: РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:259
 #, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "Подключение к %s:%u не удалось!"
+msgstr "РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє %s:%u РЅРµ СѓРґР°Р»РѕСЃСЊ!"
 
 #: Client/core/CCommandFuncs.cpp:264
 msgid "connect: Failed to unload current mod"
-msgstr "подключение: Не удалось выгрузить текущий мод"
+msgstr "РїРѕРґРєР»СЋС‡РµРЅРёРµ: РќРµ СѓРґР°Р»РѕСЃСЊ РІС‹РіСЂСѓР·РёС‚СЊ С‚РµРєСѓС‰РёР№ РјРѕРґ"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr "Переподключение: Сеть не готова, пожалуйста, подождите немного"
+msgstr "РџРµСЂРµРїРѕРґРєР»СЋС‡РµРЅРёРµ: РЎРµС‚СЊ РЅРµ РіРѕС‚РѕРІР°, РїРѕР¶Р°Р»СѓР№СЃС‚Р°, РїРѕРґРѕР¶РґРёС‚Рµ РЅРµРјРЅРѕРіРѕ"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr "Переподключение: неверный номер порта"
+msgstr "РџРµСЂРµРїРѕРґРєР»СЋС‡РµРЅРёРµ: РЅРµРІРµСЂРЅС‹Р№ РЅРѕРјРµСЂ РїРѕСЂС‚Р°"
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr "Переподключение: Подключение к %s:%u..."
+msgstr "РџРµСЂРµРїРѕРґРєР»СЋС‡РµРЅРёРµ: РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:329
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr "Переподключение: к %s:%u не удалось!"
+msgstr "РџРµСЂРµРїРѕРґРєР»СЋС‡РµРЅРёРµ: Рє %s:%u РЅРµ СѓРґР°Р»РѕСЃСЊ!"
 
 #: Client/core/CCommandFuncs.cpp:363
 msgid "Bound all controls from GTA"
-msgstr "Скопировать управление из GTA"
+msgstr "РЎРєРѕРїРёСЂРѕРІР°С‚СЊ СѓРїСЂР°РІР»РµРЅРёРµ РёР· GTA"
 
 #: Client/core/CCommandFuncs.cpp:377
 msgid "Saved configuration file"
-msgstr "Файл конфигурации сохранен"
+msgstr "Р¤Р°Р№Р» РєРѕРЅС„РёРіСѓСЂР°С†РёРё СЃРѕС…СЂР°РЅРµРЅ"
 
 #. Print it
 #: Client/core/CCommandFuncs.cpp:456
 #, c-format
 msgid "* Your serial is: %s"
-msgstr "* Ваш серийный номер: %s"
+msgstr "* Р’Р°С€ СЃРµСЂРёР№РЅС‹Р№ РЅРѕРјРµСЂ: %s"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:503
 msgid "SETTINGS"
-msgstr "НАСТРОЙКИ"
+msgstr "РќРђРЎРўР РћР™РљР"
 
 #: Client/core/CSettings.cpp:549
 msgid "Multiplayer"
-msgstr "Мультиплеер"
+msgstr "РњСѓР»СЊС‚РёРїР»РµРµСЂ"
 
 #: Client/core/CSettings.cpp:550
 msgid "Video"
-msgstr "Графика"
+msgstr "Р“СЂР°С„РёРєР°"
 
 #: Client/core/CSettings.cpp:551
 msgid "PostFX"
-msgstr "Пост эффекты"
+msgstr "РџРѕСЃС‚ СЌС„С„РµРєС‚С‹"
 
 #: Client/core/CSettings.cpp:552
 msgid "Audio"
-msgstr "Звук"
+msgstr "Р—РІСѓРє"
 
 #: Client/core/CSettings.cpp:553
 msgid "Binds"
-msgstr "Клавиши"
+msgstr "РљР»Р°РІРёС€Рё"
 
 #: Client/core/CSettings.cpp:554
 msgid "Controls"
-msgstr "Управление"
+msgstr "РЈРїСЂР°РІР»РµРЅРёРµ"
 
 #: Client/core/CSettings.cpp:555
 msgid "Interface"
-msgstr "Интерфейс"
+msgstr "РРЅС‚РµСЂС„РµР№СЃ"
 
 #: Client/core/CSettings.cpp:556
 msgid "Web Browser"
-msgstr "Браузер"
+msgstr "Р‘СЂР°СѓР·РµСЂ"
 
 #: Client/core/CSettings.cpp:557
 msgid "Advanced"
-msgstr "Дополнительные"
+msgstr "Р”РѕРїРѕР»РЅРёС‚РµР»СЊРЅС‹Рµ"
 
 #: Client/core/CSettings.cpp:582 Client/core/CSettings.cpp:790
 #: Client/core/CSettings.cpp:1119 Client/core/CSettings.cpp:1415
 msgid "Load defaults"
-msgstr "Загрузить стандартные"
+msgstr "Р—Р°РіСЂСѓР·РёС‚СЊ СЃС‚Р°РЅРґР°СЂС‚РЅС‹Рµ"
 
 #. *
 #. *  Controls tab
 #. *
 #: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:623
 msgid "Mouse sensitivity:"
-msgstr "Чувствительность мыши:"
+msgstr "Р§СѓРІСЃС‚РІРёС‚РµР»СЊРЅРѕСЃС‚СЊ РјС‹С€Рё:"
 
 #. VerticalAimSensitivity
 #: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:644
 msgid "Vertical aim sensitivity:"
-msgstr "Вертикальная чувствительность мыши:"
+msgstr "Р’РµСЂС‚РёРєР°Р»СЊРЅР°СЏ С‡СѓРІСЃС‚РІРёС‚РµР»СЊРЅРѕСЃС‚СЊ РјС‹С€Рё:"
 
 #. Mouse Options
 #: Client/core/CSettings.cpp:602
 msgid "Mouse options"
-msgstr "Настройки мыши"
+msgstr "РќР°СЃС‚СЂРѕР№РєРё РјС‹С€Рё"
 
 #: Client/core/CSettings.cpp:609
 msgid "Invert mouse vertically"
-msgstr "Инверсия мыши по вертикали"
+msgstr "РРЅРІРµСЂСЃРёСЏ РјС‹С€Рё РїРѕ РІРµСЂС‚РёРєР°Р»Рё"
 
 #: Client/core/CSettings.cpp:613
 msgid "Steer with mouse"
-msgstr "Управление транспортом с мыши"
+msgstr "РЈРїСЂР°РІР»РµРЅРёРµ С‚СЂР°РЅСЃРїРѕСЂС‚РѕРј СЃ РјС‹С€Рё"
 
 #: Client/core/CSettings.cpp:617
 msgid "Fly with mouse"
-msgstr "Управление полётом с мыши"
+msgstr "РЈРїСЂР°РІР»РµРЅРёРµ РїРѕР»С‘С‚РѕРј СЃ РјС‹С€Рё"
 
 #: Client/core/CSettings.cpp:663
 msgid "Use mouse sensitivity for aiming"
-msgstr "Использовать чувствительность мыши при прицеливании"
+msgstr "РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‡СѓРІСЃС‚РІРёС‚РµР»СЊРЅРѕСЃС‚СЊ РјС‹С€Рё РїСЂРё РїСЂРёС†РµР»РёРІР°РЅРёРё"
 
 #. Joypad options
 #: Client/core/CSettings.cpp:669
 msgid "Joypad options"
-msgstr "Настройки джойстика"
+msgstr "РќР°СЃС‚СЂРѕР№РєРё РґР¶РѕР№СЃС‚РёРєР°"
 
 #: Client/core/CSettings.cpp:682
 msgid "Standard controls (Mouse + Keyboard)"
-msgstr "Стандартное управление (Мышь + Клавиатура)"
+msgstr "РЎС‚Р°РЅРґР°СЂС‚РЅРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ (РњС‹С€СЊ + РљР»Р°РІРёР°С‚СѓСЂР°)"
 
 #: Client/core/CSettings.cpp:689
 msgid "Classic controls (Joypad)"
-msgstr "Классическое управление (Джойстик)"
+msgstr "РљР»Р°СЃСЃРёС‡РµСЃРєРѕРµ СѓРїСЂР°РІР»РµРЅРёРµ (Р”Р¶РѕР№СЃС‚РёРє)"
 
 #: Client/core/CSettings.cpp:726
 msgid "Dead Zone"
-msgstr "Мертвая зона"
+msgstr "РњРµСЂС‚РІР°СЏ Р·РѕРЅР°"
 
 #: Client/core/CSettings.cpp:731
 msgid "Saturation"
-msgstr "Насыщенность"
+msgstr "РќР°СЃС‹С‰РµРЅРЅРѕСЃС‚СЊ"
 
 #: Client/core/CSettings.cpp:737
 msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "Зайдите во вкладку 'Клавиши' для настройки джойстика."
+msgstr "Р—Р°Р№РґРёС‚Рµ РІРѕ РІРєР»Р°РґРєСѓ 'РљР»Р°РІРёС€Рё' РґР»СЏ РЅР°СЃС‚СЂРѕР№РєРё РґР¶РѕР№СЃС‚РёРєР°."
 
 #: Client/core/CSettings.cpp:776
 msgid "Left Stick"
-msgstr "Левый стик"
+msgstr "Р›РµРІС‹Р№ СЃС‚РёРє"
 
 #: Client/core/CSettings.cpp:782
 msgid "Right Stick"
-msgstr "Правый стик"
+msgstr "РџСЂР°РІС‹Р№ СЃС‚РёРє"
 
 #: Client/core/CSettings.cpp:797
 msgid "DESCRIPTION"
-msgstr "ОПИСАНИЕ"
+msgstr "РћРџРРЎРђРќРР•"
 
 #: Client/core/CSettings.cpp:798
 msgid "KEY"
-msgstr "КЛАВИША"
+msgstr "РљР›РђР’РРЁРђ"
 
 #: Client/core/CSettings.cpp:800
 msgid "ALT. KEY"
-msgstr "ДОП. КЛАВИША"
+msgstr "Р”РћРџ. РљР›РђР’РРЁРђ"
 
 #. *
 #. *    Multiplayer tab
 #. *
 #: Client/core/CSettings.cpp:805 Client/core/CSettings.cpp:808
 msgid "Nick:"
-msgstr "Имя пользователя:"
+msgstr "РРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ:"
 
 #: Client/core/CSettings.cpp:830
 msgid "Save server passwords"
-msgstr "Сохранять пароли серверов"
+msgstr "РЎРѕС…СЂР°РЅСЏС‚СЊ РїР°СЂРѕР»Рё СЃРµСЂРІРµСЂРѕРІ"
 
 #: Client/core/CSettings.cpp:835
 msgid "Auto-refresh server browser"
-msgstr "Автоматическое обновление списка серверов"
+
+#: Client/core/CSettings.cpp:900
+msgid "History"
+msgstr ""
+
+#: Client/core/CSettings.cpp:910
+msgid "Nickname history"
+msgstr ""
+
+#: Client/core/CSettings.cpp:927
+msgid "Nickname"
+msgstr ""
+
+#: Client/core/CSettings.cpp:928
+msgid "Date"
+msgstr ""
+
+#: Client/core/CSettings.cpp:934
+msgid "Paste to nick"
+msgstr ""
+
+#: Client/core/CSettings.cpp:940
+msgid "Copy"
+msgstr ""
+
+#: Client/core/CSettings.cpp:946
+msgid "Delete"
+msgstr ""
+
+#: Client/core/CSettings.cpp:952
+msgid "Delete All"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4152
+msgid "DELETE NICKNAME"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4153
+msgid "Delete nickname "%s" from history?"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4168
+msgid "DELETE ALL"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4169
+msgid "Delete all nicknames from history?"
+msgstr ""
+
+msgstr "РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ РѕР±РЅРѕРІР»РµРЅРёРµ СЃРїРёСЃРєР° СЃРµСЂРІРµСЂРѕРІ"
 
 #: Client/core/CSettings.cpp:840
 msgid "Allow screen upload"
-msgstr "Разрешить загрузку скриншотов"
+msgstr "Р Р°Р·СЂРµС€РёС‚СЊ Р·Р°РіСЂСѓР·РєСѓ СЃРєСЂРёРЅС€РѕС‚РѕРІ"
 
 #: Client/core/CSettings.cpp:845
 msgid "Allow external sounds"
-msgstr "Разрешить сторонние звуки"
+msgstr "Р Р°Р·СЂРµС€РёС‚СЊ СЃС‚РѕСЂРѕРЅРЅРёРµ Р·РІСѓРєРё"
 
 #: Client/core/CSettings.cpp:850
 msgid "Always show download window"
-msgstr "Всегда показывать окно загрузки"
+msgstr "Р’СЃРµРіРґР° РїРѕРєР°Р·С‹РІР°С‚СЊ РѕРєРЅРѕ Р·Р°РіСЂСѓР·РєРё"
 
 #: Client/core/CSettings.cpp:855
 msgid "Allow connecting with Discord Rich Presence"
-msgstr "Разрешить соединение с Discord Rich Presence"
+msgstr "Р Р°Р·СЂРµС€РёС‚СЊ СЃРѕРµРґРёРЅРµРЅРёРµ СЃ Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:860
 msgid "Allow GTA:SA ingame status on Steam"
-msgstr "Разрешите внутриигровой статус GTA:SA в Steam"
+msgstr "Р Р°Р·СЂРµС€РёС‚Рµ РІРЅСѓС‚СЂРёРёРіСЂРѕРІРѕР№ СЃС‚Р°С‚СѓСЃ GTA:SA РІ Steam"
 
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:866
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr "Сохранять фотографии, сделанные камерой, в папку GTA San Andreas User Files folder"
+msgstr "РЎРѕС…СЂР°РЅСЏС‚СЊ С„РѕС‚РѕРіСЂР°С„РёРё, СЃРґРµР»Р°РЅРЅС‹Рµ РєР°РјРµСЂРѕР№, РІ РїР°РїРєСѓ GTA San Andreas User Files folder"
 
 #: Client/core/CSettings.cpp:871
 msgid "Ask before disconnecting from server using main menu"
-msgstr "Спросите перед отключением от сервера с помощью главного меню"
+msgstr "РЎРїСЂРѕСЃРёС‚Рµ РїРµСЂРµРґ РѕС‚РєР»СЋС‡РµРЅРёРµРј РѕС‚ СЃРµСЂРІРµСЂР° СЃ РїРѕРјРѕС‰СЊСЋ РіР»Р°РІРЅРѕРіРѕ РјРµРЅСЋ"
 
 #: Client/core/CSettings.cpp:876
 msgid "Use customized GTA:SA files"
-msgstr "Использовать модифицированные файлы GTA:SA"
+msgstr "РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РјРѕРґРёС„РёС†РёСЂРѕРІР°РЅРЅС‹Рµ С„Р°Р№Р»С‹ GTA:SA"
 
 #: Client/core/CSettings.cpp:881
 msgid "Map rendering options"
-msgstr "Настройки отображения карты"
+msgstr "РќР°СЃС‚СЂРѕР№РєРё РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ РєР°СЂС‚С‹"
 
 #: Client/core/CSettings.cpp:889
 msgid "Opacity:"
-msgstr "Непрозрачность:"
+msgstr "РќРµРїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ:"
 
 #: Client/core/CSettings.cpp:912
 msgid "Image resolution:"
-msgstr "Разрешение изображения:"
+msgstr "Р Р°Р·СЂРµС€РµРЅРёРµ РёР·РѕР±СЂР°Р¶РµРЅРёСЏ:"
 
 #: Client/core/CSettings.cpp:919
 msgid "1024 x 1024 (Default)"
-msgstr "1024 x 1024 (Стандарт)"
+msgstr "1024 x 1024 (РЎС‚Р°РЅРґР°СЂС‚)"
 
 #. index 0
 #: Client/core/CSettings.cpp:920
@@ -1187,166 +1236,166 @@ msgstr "2048 x 2048"
 #. *
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:935
 msgid "Master volume:"
-msgstr "Общая громкость:"
+msgstr "РћР±С‰Р°СЏ РіСЂРѕРјРєРѕСЃС‚СЊ:"
 
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:957
 msgid "Radio volume:"
-msgstr "Громкость радио:"
+msgstr "Р“СЂРѕРјРєРѕСЃС‚СЊ СЂР°РґРёРѕ:"
 
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:979
 msgid "SFX volume:"
-msgstr "Громкость эффектов:"
+msgstr "Р“СЂРѕРјРєРѕСЃС‚СЊ СЌС„С„РµРєС‚РѕРІ:"
 
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:1001
 msgid "MTA volume:"
-msgstr "Громкость MTA:"
+msgstr "Р“СЂРѕРјРєРѕСЃС‚СЊ MTA:"
 
 #: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1023
 msgid "Voice volume:"
-msgstr "Громкость речи:"
+msgstr "Р“СЂРѕРјРєРѕСЃС‚СЊ СЂРµС‡Рё:"
 
 #: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1067
 msgid "Play mode:"
-msgstr "Режим воспроизведения:"
+msgstr "Р РµР¶РёРј РІРѕСЃРїСЂРѕРёР·РІРµРґРµРЅРёСЏ:"
 
 #: Client/core/CSettings.cpp:929 Client/core/CSettings.cpp:1548
 #: Client/core/CSettings.cpp:2916
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:51
 msgid "General"
-msgstr "Общие"
+msgstr "РћР±С‰РёРµ"
 
 #: Client/core/CSettings.cpp:1045
 msgid "Radio options"
-msgstr "Настройки радио"
+msgstr "РќР°СЃС‚СЂРѕР№РєРё СЂР°РґРёРѕ"
 
 #: Client/core/CSettings.cpp:1051
 msgid "Radio Equalizer"
-msgstr "Эквалайзер радио"
+msgstr "Р­РєРІР°Р»Р°Р№Р·РµСЂ СЂР°РґРёРѕ"
 
 #: Client/core/CSettings.cpp:1056
 msgid "Radio Auto-tune"
-msgstr "Автонастройка радио"
+msgstr "РђРІС‚РѕРЅР°СЃС‚СЂРѕР№РєР° СЂР°РґРёРѕ"
 
 #: Client/core/CSettings.cpp:1061
 msgid "Usertrack options"
-msgstr "Настройки пользовательской музыки"
+msgstr "РќР°СЃС‚СЂРѕР№РєРё РїРѕР»СЊР·РѕРІР°С‚РµР»СЊСЃРєРѕР№ РјСѓР·С‹РєРё"
 
 #: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:4001
 msgid "Radio"
-msgstr "Радио"
+msgstr "Р Р°РґРёРѕ"
 
 #: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:4003
 msgid "Random"
-msgstr "Случайно"
+msgstr "РЎР»СѓС‡Р°Р№РЅРѕ"
 
 #: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:4005
 msgid "Sequential"
-msgstr "Последовательно"
+msgstr "РџРѕСЃР»РµРґРѕРІР°С‚РµР»СЊРЅРѕ"
 
 #: Client/core/CSettings.cpp:1080
 msgid "Automatic Media Scan"
-msgstr "Автопоиск музыки"
+msgstr "РђРІС‚РѕРїРѕРёСЃРє РјСѓР·С‹РєРё"
 
 #: Client/core/CSettings.cpp:1087
 msgid "Mute options"
-msgstr "Настройки заглушения"
+msgstr "РќР°СЃС‚СЂРѕР№РєРё Р·Р°РіР»СѓС€РµРЅРёСЏ"
 
 #: Client/core/CSettings.cpp:1093
 msgid "Mute All sounds when minimized"
-msgstr "Заглушить все звуки, когда игра свёрнута"
+msgstr "Р—Р°РіР»СѓС€РёС‚СЊ РІСЃРµ Р·РІСѓРєРё, РєРѕРіРґР° РёРіСЂР° СЃРІС‘СЂРЅСѓС‚Р°"
 
 #: Client/core/CSettings.cpp:1098
 msgid "Mute Radio sounds when minimized"
-msgstr "Заглушить радио, когда игра свернута"
+msgstr "Р—Р°РіР»СѓС€РёС‚СЊ СЂР°РґРёРѕ, РєРѕРіРґР° РёРіСЂР° СЃРІРµСЂРЅСѓС‚Р°"
 
 #: Client/core/CSettings.cpp:1103
 msgid "Mute SFX sounds when minimized"
-msgstr "Заглушить звуки эффектов, когда игра свёрнута"
+msgstr "Р—Р°РіР»СѓС€РёС‚СЊ Р·РІСѓРєРё СЌС„С„РµРєС‚РѕРІ, РєРѕРіРґР° РёРіСЂР° СЃРІС‘СЂРЅСѓС‚Р°"
 
 #: Client/core/CSettings.cpp:1108
 msgid "Mute MTA sounds when minimized"
-msgstr "Выключать звук при сворачивании"
+msgstr "Р’С‹РєР»СЋС‡Р°С‚СЊ Р·РІСѓРє РїСЂРё СЃРІРѕСЂР°С‡РёРІР°РЅРёРё"
 
 #: Client/core/CSettings.cpp:1113
 msgid "Mute Voice sounds when minimized"
-msgstr "Выключать голосовой чат при сворачивании"
+msgstr "Р’С‹РєР»СЋС‡Р°С‚СЊ РіРѕР»РѕСЃРѕРІРѕР№ С‡Р°С‚ РїСЂРё СЃРІРѕСЂР°С‡РёРІР°РЅРёРё"
 
 #. *
 #. *  Video tab
 #. *
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1135
 msgid "Resolution:"
-msgstr "Разрешение:"
+msgstr "Р Р°Р·СЂРµС€РµРЅРёРµ:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1190
 msgid "FOV:"
-msgstr "Угол обзора:"
+msgstr "РЈРіРѕР» РѕР±Р·РѕСЂР°:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1209
 msgid "Draw Distance:"
-msgstr "Дальность прорисовки:"
+msgstr "Р”Р°Р»СЊРЅРѕСЃС‚СЊ РїСЂРѕСЂРёСЃРѕРІРєРё:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1230
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1461
 msgid "Brightness:"
-msgstr "Яркость:"
+msgstr "РЇСЂРєРѕСЃС‚СЊ:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1251
 msgid "FX Quality:"
-msgstr "Качество эффектов:"
+msgstr "РљР°С‡РµСЃС‚РІРѕ СЌС„С„РµРєС‚РѕРІ:"
 
 #: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1265
 msgid "Anisotropic filtering:"
-msgstr "Анизотропная фильтрация:"
+msgstr "РђРЅРёР·РѕС‚СЂРѕРїРЅР°СЏ С„РёР»СЊС‚СЂР°С†РёСЏ:"
 
 #: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1302
 msgid "Anti-aliasing:"
-msgstr "Сглаживание:"
+msgstr "РЎРіР»Р°Р¶РёРІР°РЅРёРµ:"
 
 #: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1316
 msgid "Aspect Ratio:"
-msgstr "Соотношение сторон:"
+msgstr "РЎРѕРѕС‚РЅРѕС€РµРЅРёРµ СЃС‚РѕСЂРѕРЅ:"
 
 #: Client/core/CSettings.cpp:1147
 msgid "Windowed"
-msgstr "Оконный режим"
+msgstr "РћРєРѕРЅРЅС‹Р№ СЂРµР¶РёРј"
 
 #: Client/core/CSettings.cpp:1153
 msgid "DPI aware"
-msgstr "DPI адаптация"
+msgstr "DPI Р°РґР°РїС‚Р°С†РёСЏ"
 
 #: Client/core/CSettings.cpp:1170 Client/core/CSettings.cpp:2335
 msgid "Standard"
-msgstr "Стандарт"
+msgstr "РЎС‚Р°РЅРґР°СЂС‚"
 
 #: Client/core/CSettings.cpp:1172 Client/core/CSettings.cpp:2339
 msgid "Borderless keep res"
-msgstr "Окно без рамки"
+msgstr "РћРєРЅРѕ Р±РµР· СЂР°РјРєРё"
 
 #: Client/core/CSettings.cpp:1175
 msgid "Mip Mapping"
-msgstr "Детализация"
+msgstr "Р”РµС‚Р°Р»РёР·Р°С†РёСЏ"
 
 #: Client/core/CSettings.cpp:1182
 msgid "V-Sync"
-msgstr "Вертикальная синхронизация"
+msgstr "Р’РµСЂС‚РёРєР°Р»СЊРЅР°СЏ СЃРёРЅС…СЂРѕРЅРёР·Р°С†РёСЏ"
 
 #: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2239
 msgid "Low"
-msgstr "Низкое"
+msgstr "РќРёР·РєРѕРµ"
 
 #: Client/core/CSettings.cpp:1260 Client/core/CSettings.cpp:2241
 msgid "Medium"
-msgstr "Среднее"
+msgstr "РЎСЂРµРґРЅРµРµ"
 
 #: Client/core/CSettings.cpp:1261 Client/core/CSettings.cpp:1755
 #: Client/core/CSettings.cpp:2243 Client/core/CSettings.cpp:4059
 msgid "High"
-msgstr "Высокое"
+msgstr "Р’С‹СЃРѕРєРѕРµ"
 
 #: Client/core/CSettings.cpp:1262 Client/core/CSettings.cpp:2245
 msgid "Very high"
-msgstr "Очень высокое"
+msgstr "РћС‡РµРЅСЊ РІС‹СЃРѕРєРѕРµ"
 
 #: Client/core/CSettings.cpp:1279 Client/core/CSettings.cpp:1282
 #: Client/core/CSettings.cpp:1310 Client/core/CSettings.cpp:1686
@@ -1355,7 +1404,7 @@ msgstr "Очень высокое"
 #: Client/core/CSettings.cpp:4098 Client/core/CSettings.cpp:4144
 #: Client/core/CSettings.cpp:5375
 msgid "Off"
-msgstr "Отключено"
+msgstr "РћС‚РєР»СЋС‡РµРЅРѕ"
 
 #: Client/core/CSettings.cpp:1311 Client/core/CSettings.cpp:2251
 msgid "1x"
@@ -1372,7 +1421,7 @@ msgstr "3x"
 #: Client/core/CSettings.cpp:1326 Client/core/CSettings.cpp:1688
 #: Client/core/CSettings.cpp:2261 Client/core/CSettings.cpp:4068
 msgid "Auto"
-msgstr "Авто"
+msgstr "РђРІС‚Рѕ"
 
 #: Client/core/CSettings.cpp:1327 Client/core/CSettings.cpp:2263
 msgid "4:3"
@@ -1388,193 +1437,193 @@ msgstr "16:9"
 
 #: Client/core/CSettings.cpp:1332
 msgid "HUD Match Aspect Ratio"
-msgstr "Адаптировать интерфейс под соотношение сторон экрана"
+msgstr "РђРґР°РїС‚РёСЂРѕРІР°С‚СЊ РёРЅС‚РµСЂС„РµР№СЃ РїРѕРґ СЃРѕРѕС‚РЅРѕС€РµРЅРёРµ СЃС‚РѕСЂРѕРЅ СЌРєСЂР°РЅР°"
 
 #: Client/core/CSettings.cpp:1338
 msgid "Volumetric Shadows"
-msgstr "Динамические тени"
+msgstr "Р”РёРЅР°РјРёС‡РµСЃРєРёРµ С‚РµРЅРё"
 
 #: Client/core/CSettings.cpp:1342
 msgid "Grass effect"
-msgstr "Улучшенная трава"
+msgstr "РЈР»СѓС‡С€РµРЅРЅР°СЏ С‚СЂР°РІР°"
 
 #: Client/core/CSettings.cpp:1346
 msgid "Heat haze"
-msgstr "Эффект жары"
+msgstr "Р­С„С„РµРєС‚ Р¶Р°СЂС‹"
 
 #: Client/core/CSettings.cpp:1350
 msgid "Tyre Smoke etc"
-msgstr "Дым шин и т.д."
+msgstr "Р”С‹Рј С€РёРЅ Рё С‚.Рґ."
 
 #: Client/core/CSettings.cpp:1354
 msgid "Dynamic ped shadows"
-msgstr "Динамические тени от персонажа"
+msgstr "Р”РёРЅР°РјРёС‡РµСЃРєРёРµ С‚РµРЅРё РѕС‚ РїРµСЂСЃРѕРЅР°Р¶Р°"
 
 #: Client/core/CSettings.cpp:1358
 msgid "Motion blur"
-msgstr "Размытие в движении"
+msgstr "Р Р°Р·РјС‹С‚РёРµ РІ РґРІРёР¶РµРЅРёРё"
 
 #: Client/core/CSettings.cpp:1362
 msgid "Corona rain reflections"
-msgstr "Отражения дождя"
+msgstr "РћС‚СЂР°Р¶РµРЅРёСЏ РґРѕР¶РґСЏ"
 
 #: Client/core/CSettings.cpp:1367
 msgid "Full Screen Minimize"
-msgstr "Сворачивание в полноэкранном режиме"
+msgstr "РЎРІРѕСЂР°С‡РёРІР°РЅРёРµ РІ РїРѕР»РЅРѕСЌРєСЂР°РЅРЅРѕРј СЂРµР¶РёРјРµ"
 
 #: Client/core/CSettings.cpp:1379
 msgid "Enable Device Selection Dialog"
-msgstr "Включить диалог выбора дисплея"
+msgstr "Р’РєР»СЋС‡РёС‚СЊ РґРёР°Р»РѕРі РІС‹Р±РѕСЂР° РґРёСЃРїР»РµСЏ"
 
 #: Client/core/CSettings.cpp:1391
 msgid "Show unsafe resolutions"
-msgstr "Показывать неподдерживаемые разрешения"
+msgstr "РџРѕРєР°Р·С‹РІР°С‚СЊ РЅРµРїРѕРґРґРµСЂР¶РёРІР°РµРјС‹Рµ СЂР°Р·СЂРµС€РµРЅРёСЏ"
 
 #: Client/core/CSettings.cpp:1403
 msgid "Render vehicles always in high detail"
-msgstr "Всегда отображать транспорт в высоком качестве "
+msgstr "Р’СЃРµРіРґР° РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ С‚СЂР°РЅСЃРїРѕСЂС‚ РІ РІС‹СЃРѕРєРѕРј РєР°С‡РµСЃС‚РІРµ "
 
 #: Client/core/CSettings.cpp:1407
 msgid "Render peds always in high detail"
-msgstr "Всегда отображать персонажей в высоком качестве"
+msgstr "Р’СЃРµРіРґР° РѕС‚РѕР±СЂР°Р¶Р°С‚СЊ РїРµСЂСЃРѕРЅР°Р¶РµР№ РІ РІС‹СЃРѕРєРѕРј РєР°С‡РµСЃС‚РІРµ"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1441
 msgid "Gamma:"
-msgstr "Гамма:"
+msgstr "Р“Р°РјРјР°:"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1481
 msgid "Contrast:"
-msgstr "Контраст:"
+msgstr "РљРѕРЅС‚СЂР°СЃС‚:"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1501
 msgid "Saturation:"
-msgstr "Насыщенность:"
+msgstr "РќР°СЃС‹С‰РµРЅРЅРѕСЃС‚СЊ:"
 
 #: Client/core/CSettings.cpp:1517
 msgid "Apply adjustments in windowed mode"
-msgstr "Применять настройки в оконном режиме"
+msgstr "РџСЂРёРјРµРЅСЏС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё РІ РѕРєРѕРЅРЅРѕРј СЂРµР¶РёРјРµ"
 
 #: Client/core/CSettings.cpp:1523
 msgid "Apply adjustments in fullscreen mode"
-msgstr "Применять настройки в полноэкранном режиме"
+msgstr "РџСЂРёРјРµРЅСЏС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё РІ РїРѕР»РЅРѕСЌРєСЂР°РЅРЅРѕРј СЂРµР¶РёРјРµ"
 
 #: Client/core/CSettings.cpp:1554
 msgid "Enable remote websites"
-msgstr "Разрешить сторонние сайты"
+msgstr "Р Р°Р·СЂРµС€РёС‚СЊ СЃС‚РѕСЂРѕРЅРЅРёРµ СЃР°Р№С‚С‹"
 
 #: Client/core/CSettings.cpp:1559
 msgid "Enable Javascript on remote websites"
-msgstr "Разрешить Javascript на сторонних сайтах"
+msgstr "Р Р°Р·СЂРµС€РёС‚СЊ Javascript РЅР° СЃС‚РѕСЂРѕРЅРЅРёС… СЃР°Р№С‚Р°С…"
 
 #: Client/core/CSettings.cpp:1564
 msgid "Enable GPU rendering"
-msgstr "Включить рендеринг через GPU"
+msgstr "Р’РєР»СЋС‡РёС‚СЊ СЂРµРЅРґРµСЂРёРЅРі С‡РµСЂРµР· GPU"
 
 #: Client/core/CSettings.cpp:1568
 msgid "Custom blacklist"
-msgstr "Чёрный список"
+msgstr "Р§С‘СЂРЅС‹Р№ СЃРїРёСЃРѕРє"
 
 #: Client/core/CSettings.cpp:1579 Client/core/CSettings.cpp:1625
 msgid "Enter a domain e.g. google.com"
-msgstr "Введите адрес, например google.com"
+msgstr "Р’РІРµРґРёС‚Рµ Р°РґСЂРµСЃ, РЅР°РїСЂРёРјРµСЂ google.com"
 
 #: Client/core/CSettings.cpp:1587
 msgid "Block"
-msgstr "Запретить"
+msgstr "Р—Р°РїСЂРµС‚РёС‚СЊ"
 
 #: Client/core/CSettings.cpp:1602 Client/core/CSettings.cpp:1646
 msgid "Domain"
-msgstr "Адрес"
+msgstr "РђРґСЂРµСЃ"
 
 #: Client/core/CSettings.cpp:1604 Client/core/CSettings.cpp:1648
 msgid "Remove domain"
-msgstr "Удалить адрес"
+msgstr "РЈРґР°Р»РёС‚СЊ Р°РґСЂРµСЃ"
 
 #: Client/core/CSettings.cpp:1608 Client/core/CSettings.cpp:1652
 msgid "Remove all"
-msgstr "Убрать всё"
+msgstr "РЈР±СЂР°С‚СЊ РІСЃС‘"
 
 #. Reset vecTemp
 #: Client/core/CSettings.cpp:1614
 msgid "Custom whitelist"
-msgstr "Белый список"
+msgstr "Р‘РµР»С‹Р№ СЃРїРёСЃРѕРє"
 
 #: Client/core/CSettings.cpp:1633 Client/cefweb/CWebsiteRequests.cpp:51
 msgid "Allow"
-msgstr "Разрешить"
+msgstr "Р Р°Р·СЂРµС€РёС‚СЊ"
 
 #. Misc section label
 #: Client/core/CSettings.cpp:1665
 msgid "Misc"
-msgstr "Разное"
+msgstr "Р Р°Р·РЅРѕРµ"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1679
 #: Client/core/CSettings.cpp:6021
 msgid "Fast CJ clothes loading:"
-msgstr "Быстрая загрузка одежды CJ:"
+msgstr "Р‘С‹СЃС‚СЂР°СЏ Р·Р°РіСЂСѓР·РєР° РѕРґРµР¶РґС‹ CJ:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1693
 #: Client/core/CSettings.cpp:6023
 msgid "Browser speed:"
-msgstr "Скорость обновления списка серверов:"
+msgstr "РЎРєРѕСЂРѕСЃС‚СЊ РѕР±РЅРѕРІР»РµРЅРёСЏ СЃРїРёСЃРєР° СЃРµСЂРІРµСЂРѕРІ:"
 
 #. Single download
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1707
 #: Client/core/CSettings.cpp:6025
 msgid "Single connection:"
-msgstr "Однопоточное подключение:"
+msgstr "РћРґРЅРѕРїРѕС‚РѕС‡РЅРѕРµ РїРѕРґРєР»СЋС‡РµРЅРёРµ:"
 
 #. Packet tag
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1720
 #: Client/core/CSettings.cpp:6027
 msgid "Packet tag:"
-msgstr "Тег пакета:"
+msgstr "РўРµРі РїР°РєРµС‚Р°:"
 
 #. Progress animation
 #: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1733
 #: Client/core/CSettings.cpp:6029
 msgid "Progress animation:"
-msgstr "Анимация индикатора загрузки:"
+msgstr "РђРЅРёРјР°С†РёСЏ РёРЅРґРёРєР°С‚РѕСЂР° Р·Р°РіСЂСѓР·РєРё:"
 
 #. Process priority
 #: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1746
 #: Client/core/CSettings.cpp:6019
 msgid "Process priority:"
-msgstr "Приоритет процесса"
+msgstr "РџСЂРёРѕСЂРёС‚РµС‚ РїСЂРѕС†РµСЃСЃР°"
 
 #. Debug setting
 #: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1760
 #: Client/core/CSettings.cpp:6031
 msgid "Debug setting:"
-msgstr "Настройка отладчика:"
+msgstr "РќР°СЃС‚СЂРѕР№РєР° РѕС‚Р»Р°РґС‡РёРєР°:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1783
 #: Client/core/CSettings.cpp:6033
 msgid "Streaming memory:"
-msgstr "Видеопамять:"
+msgstr "Р’РёРґРµРѕРїР°РјСЏС‚СЊ:"
 
 #. Update build type
 #: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1903
 msgid "Update build type:"
-msgstr "Тип обновления:"
+msgstr "РўРёРї РѕР±РЅРѕРІР»РµРЅРёСЏ:"
 
 #. UpdateAutoInstall
 #: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1882
 msgid "Install important updates:"
-msgstr "Установить важные обновления:"
+msgstr "РЈСЃС‚Р°РЅРѕРІРёС‚СЊ РІР°Р¶РЅС‹Рµ РѕР±РЅРѕРІР»РµРЅРёСЏ:"
 
 #: Client/core/CSettings.cpp:1687 Client/core/CSettings.cpp:1715
 #: Client/core/CSettings.cpp:1728 Client/core/CSettings.cpp:4070
 #: Client/core/CSettings.cpp:4086 Client/core/CSettings.cpp:4093
 msgid "On"
-msgstr "Включить"
+msgstr "Р’РєР»СЋС‡РёС‚СЊ"
 
 #: Client/core/CSettings.cpp:1700 Client/core/CSettings.cpp:4075
 msgid "Very slow"
-msgstr "Очень медленно"
+msgstr "РћС‡РµРЅСЊ РјРµРґР»РµРЅРЅРѕ"
 
 #: Client/core/CSettings.cpp:1701 Client/core/CSettings.cpp:1714
 #: Client/core/CSettings.cpp:1727 Client/core/CSettings.cpp:1741
@@ -1584,259 +1633,259 @@ msgstr "Очень медленно"
 #: Client/core/CSettings.cpp:4091 Client/core/CSettings.cpp:4100
 #: Client/core/CSettings.cpp:4137
 msgid "Default"
-msgstr "По умолчанию"
+msgstr "РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ"
 
 #: Client/core/CSettings.cpp:1702 Client/core/CSettings.cpp:4079
 msgid "Fast"
-msgstr "Быстро"
+msgstr "Р‘С‹СЃС‚СЂРѕ"
 
 #: Client/core/CSettings.cpp:1753 Client/core/CSettings.cpp:4055
 msgid "Normal"
-msgstr "Средне"
+msgstr "РЎСЂРµРґРЅРµ"
 
 #: Client/core/CSettings.cpp:1754 Client/core/CSettings.cpp:4057
 msgid "Above normal"
-msgstr "Выше среднего"
+msgstr "Р’С‹С€Рµ СЃСЂРµРґРЅРµРіРѕ"
 
 #: Client/core/CSettings.cpp:1790
 msgid "Min"
-msgstr "Мин"
+msgstr "РњРёРЅ"
 
 #: Client/core/CSettings.cpp:1815
 msgid "Max"
-msgstr "Макс"
+msgstr "РњР°РєСЃ"
 
 #. Windows 8 compatibility
 #: Client/core/CSettings.cpp:1823
 msgid "Windows 8 compatibility:"
-msgstr "Совместимость с Windows 8:"
+msgstr "РЎРѕРІРјРµСЃС‚РёРјРѕСЃС‚СЊ СЃ Windows 8:"
 
 #: Client/core/CSettings.cpp:1827
 msgid "16-bit color"
-msgstr "16-битные цвета"
+msgstr "16-Р±РёС‚РЅС‹Рµ С†РІРµС‚Р°"
 
 #: Client/core/CSettings.cpp:1832
 msgid "Mouse fix"
-msgstr "Исправление мыши"
+msgstr "РСЃРїСЂР°РІР»РµРЅРёРµ РјС‹С€Рё"
 
 #. Cache path info
 #: Client/core/CSettings.cpp:1850
 msgid "Client resource files:"
-msgstr "Путь загрузки ресурсов:"
+msgstr "РџСѓС‚СЊ Р·Р°РіСЂСѓР·РєРё СЂРµСЃСѓСЂСЃРѕРІ:"
 
 #: Client/core/CSettings.cpp:1854
 msgid "Show in Explorer"
-msgstr "Открыть папку"
+msgstr "РћС‚РєСЂС‹С‚СЊ РїР°РїРєСѓ"
 
 #. Process affinity
 #: Client/core/CSettings.cpp:1869
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr "Установите соответствие CPU 0 для повышения производительности игры"
+msgstr "РЈСЃС‚Р°РЅРѕРІРёС‚Рµ СЃРѕРѕС‚РІРµС‚СЃС‚РІРёРµ CPU 0 РґР»СЏ РїРѕРІС‹С€РµРЅРёСЏ РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚Рё РёРіСЂС‹"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1875 Client/core/CSettings.cpp:1878
 msgid "Auto updater"
-msgstr "Автоматическое обновление"
+msgstr "РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ РѕР±РЅРѕРІР»РµРЅРёРµ"
 
 #. Check for updates
 #: Client/core/CSettings.cpp:1916
 msgid "Check for update now"
-msgstr "Проверить обновления"
+msgstr "РџСЂРѕРІРµСЂРёС‚СЊ РѕР±РЅРѕРІР»РµРЅРёСЏ"
 
 #: Client/core/CSettings.cpp:2102
 msgid "Some settings will be changed when you next start MTA"
-msgstr "Настройки изменятся при следующем запуске MTA"
+msgstr "РќР°СЃС‚СЂРѕР№РєРё РёР·РјРµРЅСЏС‚СЃСЏ РїСЂРё СЃР»РµРґСѓСЋС‰РµРј Р·Р°РїСѓСЃРєРµ MTA"
 
 #: Client/core/CSettings.cpp:2103
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
-"Вы хотите перезапустить?"
+"Р’С‹ С…РѕС‚РёС‚Рµ РїРµСЂРµР·Р°РїСѓСЃС‚РёС‚СЊ?"
 
 #: Client/core/CSettings.cpp:2106
 msgid "RESTART REQUIRED"
-msgstr "НЕОБХОДИМ ПЕРЕЗАПУСК"
+msgstr "РќР•РћР‘РҐРћР”РРњ РџР•Р Р•Р—РђРџРЈРЎРљ"
 
 #: Client/core/CSettings.cpp:2126
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr "Некоторые настройки будут изменены после того, как вы отключитесь от текущего сервера"
+msgstr "РќРµРєРѕС‚РѕСЂС‹Рµ РЅР°СЃС‚СЂРѕР№РєРё Р±СѓРґСѓС‚ РёР·РјРµРЅРµРЅС‹ РїРѕСЃР»Рµ С‚РѕРіРѕ, РєР°Рє РІС‹ РѕС‚РєР»СЋС‡РёС‚РµСЃСЊ РѕС‚ С‚РµРєСѓС‰РµРіРѕ СЃРµСЂРІРµСЂР°"
 
 #: Client/core/CSettings.cpp:2127
 msgid "\n\n"
 "Do you want to disconnect now?"
 msgstr "\n\n"
-"Вы хотите отключиться?"
+"Р’С‹ С…РѕС‚РёС‚Рµ РѕС‚РєР»СЋС‡РёС‚СЊСЃСЏ?"
 
 #: Client/core/CSettings.cpp:2130
 msgid "DISCONNECT REQUIRED"
-msgstr "НЕОБХОДИМО ОТКЛЮЧЕНИЕ"
+msgstr "РќР•РћР‘РҐРћР”РРњРћ РћРўРљР›Р®Р§Р•РќРР•"
 
 #. Update the joystick name
 #: Client/core/CSettings.cpp:2572
 msgid "Joypad not detected  -  Check connections and restart game"
-msgstr "Джостик не найден. Проверьте, подключен ли он и перезапустите игру"
+msgstr "Р”Р¶РѕСЃС‚РёРє РЅРµ РЅР°Р№РґРµРЅ. РџСЂРѕРІРµСЂСЊС‚Рµ, РїРѕРґРєР»СЋС‡РµРЅ Р»Рё РѕРЅ Рё РїРµСЂРµР·Р°РїСѓСЃС‚РёС‚Рµ РёРіСЂСѓ"
 
 #: Client/core/CSettings.cpp:2828
 msgid "Binding axis"
-msgstr "Настройка осей"
+msgstr "РќР°СЃС‚СЂРѕР№РєР° РѕСЃРµР№"
 
 #: Client/core/CSettings.cpp:2828
 msgid "Move an axis to bind, or escape to clear"
-msgstr "Перемещайте джойстик для настройки или escape для очистки"
+msgstr "РџРµСЂРµРјРµС‰Р°Р№С‚Рµ РґР¶РѕР№СЃС‚РёРє РґР»СЏ РЅР°СЃС‚СЂРѕР№РєРё РёР»Рё escape РґР»СЏ РѕС‡РёСЃС‚РєРё"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Language:"
-msgstr "Язык:"
+msgstr "РЇР·С‹Рє:"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Skin:"
-msgstr "Тема:"
+msgstr "РўРµРјР°:"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Presets:"
-msgstr "Предустановки:"
+msgstr "РџСЂРµРґСѓСЃС‚Р°РЅРѕРІРєРё:"
 
 #: Client/core/CSettings.cpp:2956
 msgid "Chat"
-msgstr "Чат"
+msgstr "Р§Р°С‚"
 
 #: Client/core/CSettings.cpp:2973
 msgid "Load"
-msgstr "Загрузить"
+msgstr "Р—Р°РіСЂСѓР·РёС‚СЊ"
 
 #: Client/core/CSettings.cpp:2985
 msgid "Colors"
-msgstr "Цвета"
+msgstr "Р¦РІРµС‚Р°"
 
 #: Client/core/CSettings.cpp:2986
 msgid "Layout"
-msgstr "Макет чата"
+msgstr "РњР°РєРµС‚ С‡Р°С‚Р°"
 
 #: Client/core/CSettings.cpp:2987 Client/core/CSettings.cpp:3233
 msgid "Options"
-msgstr "Настройки:"
+msgstr "РќР°СЃС‚СЂРѕР№РєРё:"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Chat Background"
-msgstr "Фон чата"
+msgstr "Р¤РѕРЅ С‡Р°С‚Р°"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Chat Text"
-msgstr "Текст чата"
+msgstr "РўРµРєСЃС‚ С‡Р°С‚Р°"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Input Background"
-msgstr "Фон поля ввода"
+msgstr "Р¤РѕРЅ РїРѕР»СЏ РІРІРѕРґР°"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Input Text"
-msgstr "Цвет строки ввода"
+msgstr "Р¦РІРµС‚ СЃС‚СЂРѕРєРё РІРІРѕРґР°"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Lines:"
-msgstr "Строки:"
+msgstr "РЎС‚СЂРѕРєРё:"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Scale:"
-msgstr "Масштаб:"
+msgstr "РњР°СЃС€С‚Р°Р±:"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Width:"
-msgstr "Ширина:"
+msgstr "РЁРёСЂРёРЅР°:"
 
 #: Client/core/CSettings.cpp:3019
 msgid "Size"
-msgstr "Размер"
+msgstr "Р Р°Р·РјРµСЂ"
 
 #: Client/core/CSettings.cpp:3068
 msgid "after"
-msgstr "после"
+msgstr "РїРѕСЃР»Рµ"
 
 #: Client/core/CSettings.cpp:3068
 msgid "for"
-msgstr "за"
+msgstr "Р·Р°"
 
 #: Client/core/CSettings.cpp:3068
 msgid "sec"
-msgstr "сек"
+msgstr "СЃРµРє"
 
 #: Client/core/CSettings.cpp:3071
 msgid "Fading"
-msgstr "Затухание"
+msgstr "Р—Р°С‚СѓС…Р°РЅРёРµ"
 
 #: Client/core/CSettings.cpp:3077
 msgid "Fade out old lines"
-msgstr "Затухание сообщений"
+msgstr "Р—Р°С‚СѓС…Р°РЅРёРµ СЃРѕРѕР±С‰РµРЅРёР№"
 
 #: Client/core/CSettings.cpp:3117
 msgid "Horizontal:"
-msgstr "Горизонтально"
+msgstr "Р“РѕСЂРёР·РѕРЅС‚Р°Р»СЊРЅРѕ"
 
 #: Client/core/CSettings.cpp:3117
 msgid "Vertical:"
-msgstr "Вертикально"
+msgstr "Р’РµСЂС‚РёРєР°Р»СЊРЅРѕ"
 
 #: Client/core/CSettings.cpp:3117
 msgid "Text-Align:"
-msgstr "Выравнивание текста:"
+msgstr "Р’С‹СЂР°РІРЅРёРІР°РЅРёРµ С‚РµРєСЃС‚Р°:"
 
 #: Client/core/CSettings.cpp:3117
 msgid "X-Offset:"
-msgstr "Смещение по оси X:"
+msgstr "РЎРјРµС‰РµРЅРёРµ РїРѕ РѕСЃРё X:"
 
 #: Client/core/CSettings.cpp:3118
 msgid "Y-Offset:"
-msgstr "Смещение по оси Y:"
+msgstr "РЎРјРµС‰РµРЅРёРµ РїРѕ РѕСЃРё Y:"
 
 #: Client/core/CSettings.cpp:3124
 msgid "Position"
-msgstr "Позиция"
+msgstr "РџРѕР·РёС†РёСЏ"
 
 #: Client/core/CSettings.cpp:3138 Client/core/CSettings.cpp:3166
 #: Client/core/CKeyBinds.cpp:191
 msgid "Left"
-msgstr "Влево"
+msgstr "Р’Р»РµРІРѕ"
 
 #: Client/core/CSettings.cpp:3139 Client/core/CSettings.cpp:3153
 msgid "Center"
-msgstr "Центр"
+msgstr "Р¦РµРЅС‚СЂ"
 
 #: Client/core/CSettings.cpp:3140 Client/core/CSettings.cpp:3167
 #: Client/core/CKeyBinds.cpp:192
 msgid "Right"
-msgstr "Вправо"
+msgstr "Р’РїСЂР°РІРѕ"
 
 #: Client/core/CSettings.cpp:3152
 msgid "Top"
-msgstr "Верх"
+msgstr "Р’РµСЂС…"
 
 #: Client/core/CSettings.cpp:3154
 msgid "Bottom"
-msgstr "Низ"
+msgstr "РќРёР·"
 
 #: Client/core/CSettings.cpp:3202
 msgid "Font"
-msgstr "Шрифт:"
+msgstr "РЁСЂРёС„С‚:"
 
 #: Client/core/CSettings.cpp:3239
 msgid "Hide background when not typing"
-msgstr "Отображать задний фон только при вводе"
+msgstr "РћС‚РѕР±СЂР°Р¶Р°С‚СЊ Р·Р°РґРЅРёР№ С„РѕРЅ С‚РѕР»СЊРєРѕ РїСЂРё РІРІРѕРґРµ"
 
 #: Client/core/CSettings.cpp:3244
 msgid "Nickname completion using the \"Tab\" key"
-msgstr "Вставлять ник по кнопке \"Tab\""
+msgstr "Р’СЃС‚Р°РІР»СЏС‚СЊ РЅРёРє РїРѕ РєРЅРѕРїРєРµ \"Tab\""
 
 #: Client/core/CSettings.cpp:3249
 msgid "Allow server to flash the window"
-msgstr "Разрешить серверу моргать окном приложения"
+msgstr "Р Р°Р·СЂРµС€РёС‚СЊ СЃРµСЂРІРµСЂСѓ РјРѕСЂРіР°С‚СЊ РѕРєРЅРѕРј РїСЂРёР»РѕР¶РµРЅРёСЏ"
 
 #: Client/core/CSettings.cpp:3254
 msgid "Allow tray balloon notifications"
-msgstr "Показывать сообщения в области уведомлений"
+msgstr "РџРѕРєР°Р·С‹РІР°С‚СЊ СЃРѕРѕР±С‰РµРЅРёСЏ РІ РѕР±Р»Р°СЃС‚Рё СѓРІРµРґРѕРјР»РµРЅРёР№"
 
 #: Client/core/CSettings.cpp:3259
 msgid "Chat text black/white outline"
-msgstr "Чёрная/белая обводка текста чата"
+msgstr "Р§С‘СЂРЅР°СЏ/Р±РµР»Р°СЏ РѕР±РІРѕРґРєР° С‚РµРєСЃС‚Р° С‡Р°С‚Р°"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
@@ -1844,103 +1893,103 @@ msgstr "Чёрная/белая обводка текста чата"
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #: Client/core/CSettings.cpp:3508 Client/core/CSettings.cpp:3515
 msgid "Press a key to bind, or escape to clear"
-msgstr "Нажмите клавишу для настройки или escape для очистки"
+msgstr "РќР°Р¶РјРёС‚Рµ РєР»Р°РІРёС€Сѓ РґР»СЏ РЅР°СЃС‚СЂРѕР№РєРё РёР»Рё escape РґР»СЏ РѕС‡РёСЃС‚РєРё"
 
 #: Client/core/CSettings.cpp:3509
 msgid "Binding a primary key"
-msgstr "Настройка основной клавиши"
+msgstr "РќР°СЃС‚СЂРѕР№РєР° РѕСЃРЅРѕРІРЅРѕР№ РєР»Р°РІРёС€Рё"
 
 #: Client/core/CSettings.cpp:3516
 msgid "Binding a secondary key"
-msgstr "Настройка дополнительной клавиши"
+msgstr "РќР°СЃС‚СЂРѕР№РєР° РґРѕРїРѕР»РЅРёС‚РµР»СЊРЅРѕР№ РєР»Р°РІРёС€Рё"
 
 #: Client/core/CSettings.cpp:3592
 msgid "GTA GAME CONTROLS"
-msgstr "УПРАВЛЕНИЕ GTA"
+msgstr "РЈРџР РђР’Р›Р•РќРР• GTA"
 
 #: Client/core/CSettings.cpp:3594
 msgid "MULTIPLAYER CONTROLS"
-msgstr "УПРАВЛЕНИЕ МУЛЬТИПЛЕЕРА"
+msgstr "РЈРџР РђР’Р›Р•РќРР• РњРЈР›Р¬РўРРџР›Р•Р•Р Рђ"
 
 #: Client/core/CSettings.cpp:3839 Client/core/CSettings.cpp:5982
 msgid "Your nickname contains invalid characters!"
-msgstr "Ваш никнейм содержит недопустимые символы."
+msgstr "Р’Р°С€ РЅРёРєРЅРµР№Рј СЃРѕРґРµСЂР¶РёС‚ РЅРµРґРѕРїСѓСЃС‚РёРјС‹Рµ СЃРёРјРІРѕР»С‹."
 
 #: Client/core/CSettings.cpp:4441 Client/core/CCore.cpp:709
 #: Client/core/CMainMenu.cpp:303
 #: Client/mods/deathmatch/logic/CClientGame.cpp:552
 msgid "Main menu"
-msgstr "Главное меню"
+msgstr "Р“Р»Р°РІРЅРѕРµ РјРµРЅСЋ"
 
 #: Client/core/CSettings.cpp:4445 Client/core/CCore.cpp:709
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1115
 #: Client/mods/deathmatch/logic/CResource.cpp:384
 msgid "In-game"
-msgstr "В игре"
+msgstr "Р’ РёРіСЂРµ"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Red:"
-msgstr "Красный:"
+msgstr "РљСЂР°СЃРЅС‹Р№:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Green:"
-msgstr "Зелёный:"
+msgstr "Р—РµР»С‘РЅС‹Р№:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Blue:"
-msgstr "Синий:"
+msgstr "РЎРёРЅРёР№:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Transparency:"
-msgstr "Прозрачность:"
+msgstr "РџСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ:"
 
 #: Client/core/CSettings.cpp:4801
 msgid "Color"
-msgstr "Цвет"
+msgstr "Р¦РІРµС‚"
 
 #: Client/core/CSettings.cpp:4907
 msgid "Preview"
-msgstr "Предпросмотр"
+msgstr "РџСЂРµРґРїСЂРѕСЃРјРѕС‚СЂ"
 
 #: Client/core/CSettings.cpp:5215
 msgid "Please disconnect before changing language"
-msgstr "Пожалуйста, отключитесь перед сменой языка"
+msgstr "РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РѕС‚РєР»СЋС‡РёС‚РµСЃСЊ РїРµСЂРµРґ СЃРјРµРЅРѕР№ СЏР·С‹РєР°"
 
 #: Client/core/CSettings.cpp:5243
 msgid "Please disconnect before changing skin"
-msgstr "Пожалуйста, отключитесь перед сменой темы"
+msgstr "РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РѕС‚РєР»СЋС‡РёС‚РµСЃСЊ РїРµСЂРµРґ СЃРјРµРЅРѕР№ С‚РµРјС‹"
 
 #: Client/core/CSettings.cpp:5623
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
-msgstr "Динамические тени могут вызвать падение производительности.\n\n"
-"Вы уверены, что хотите активировать их?"
+msgstr "Р”РёРЅР°РјРёС‡РµСЃРєРёРµ С‚РµРЅРё РјРѕРіСѓС‚ РІС‹Р·РІР°С‚СЊ РїР°РґРµРЅРёРµ РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚Рё.\n\n"
+"Р’С‹ СѓРІРµСЂРµРЅС‹, С‡С‚Рѕ С…РѕС‚РёС‚Рµ Р°РєС‚РёРІРёСЂРѕРІР°С‚СЊ РёС…?"
 
 #: Client/core/CSettings.cpp:5627
 msgid "PERFORMANCE WARNING"
-msgstr "ПРЕДУПРЕЖДЕНИЕ ПРОИЗВОДИТЕЛЬНОСТИ"
+msgstr "РџР Р•Р”РЈРџР Р•Р–Р”Р•РќРР• РџР РћРР—Р’РћР”РРўР•Р›Р¬РќРћРЎРўР"
 
 #: Client/core/CSettings.cpp:5647
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
-msgstr "Загрузка скриншотов требуется многими серверами для анти-чит системы.\n\n"
-"(Область чата и элементы интерфейса будут скрыты)\n"
+msgstr "Р—Р°РіСЂСѓР·РєР° СЃРєСЂРёРЅС€РѕС‚РѕРІ С‚СЂРµР±СѓРµС‚СЃСЏ РјРЅРѕРіРёРјРё СЃРµСЂРІРµСЂР°РјРё РґР»СЏ Р°РЅС‚Рё-С‡РёС‚ СЃРёСЃС‚РµРјС‹.\n\n"
+"(РћР±Р»Р°СЃС‚СЊ С‡Р°С‚Р° Рё СЌР»РµРјРµРЅС‚С‹ РёРЅС‚РµСЂС„РµР№СЃР° Р±СѓРґСѓС‚ СЃРєСЂС‹С‚С‹)\n"
 
 #: Client/core/CSettings.cpp:5649
 msgid "SCREEN UPLOAD INFORMATION"
-msgstr "ИНФОРМАЦИЯ О ЗАГРУЗКЕ СКРИНШОТОВ"
+msgstr "РРќР¤РћР РњРђР¦РРЇ Рћ Р—РђР“Р РЈР—РљР• РЎРљР РРќРЁРћРўРћР’"
 
 #: Client/core/CSettings.cpp:5664
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
-msgstr "Некоторые скрипты могут воспроизводить звуки. Например, радио из интернета.\n\n"
-"Отключение этой настройки может снизить потребление \n"
-"пропускной способности сети.\n"
+msgstr "РќРµРєРѕС‚РѕСЂС‹Рµ СЃРєСЂРёРїС‚С‹ РјРѕРіСѓС‚ РІРѕСЃРїСЂРѕРёР·РІРѕРґРёС‚СЊ Р·РІСѓРєРё. РќР°РїСЂРёРјРµСЂ, СЂР°РґРёРѕ РёР· РёРЅС‚РµСЂРЅРµС‚Р°.\n\n"
+"РћС‚РєР»СЋС‡РµРЅРёРµ СЌС‚РѕР№ РЅР°СЃС‚СЂРѕР№РєРё РјРѕР¶РµС‚ СЃРЅРёР·РёС‚СЊ РїРѕС‚СЂРµР±Р»РµРЅРёРµ \n"
+"РїСЂРѕРїСѓСЃРєРЅРѕР№ СЃРїРѕСЃРѕР±РЅРѕСЃС‚Рё СЃРµС‚Рё.\n"
 
 #: Client/core/CSettings.cpp:5667
 msgid "EXTERNAL SOUNDS"
-msgstr "ВНЕШНИЕ ЗВУКИ"
+msgstr "Р’РќР•РЁРќРР• Р—Р’РЈРљР"
 
 #: Client/core/CSettings.cpp:5696
 msgid "Rich Presence is currently enabled.\n"
@@ -1950,570 +1999,570 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:5701
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr "СОГЛАСИЕ ДЛЯ РАЗРЕШЕНИЯ ОБМЕНА ДАННЫМИ"
+msgstr "РЎРћР“Р›РђРЎРР• Р”Р›РЇ Р РђР—Р Р•РЁР•РќРРЇ РћР‘РњР•РќРђ Р”РђРќРќР«РњР"
 
 #: Client/core/CSettings.cpp:5725
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
 "Are you sure you want to use them?"
-msgstr "Некоторые файлы в директории GTA:SA изменены.\n"
-"MTA будет использовать эти файлы, если соответствующий параметр активирован.\n\n"
-"Тем не менее, модифицированные файлы блокируются большинством серверов\n\n"
-"Вы действительно хотите использовать их?"
+msgstr "РќРµРєРѕС‚РѕСЂС‹Рµ С„Р°Р№Р»С‹ РІ РґРёСЂРµРєС‚РѕСЂРёРё GTA:SA РёР·РјРµРЅРµРЅС‹.\n"
+"MTA Р±СѓРґРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЌС‚Рё С„Р°Р№Р»С‹, РµСЃР»Рё СЃРѕРѕС‚РІРµС‚СЃС‚РІСѓСЋС‰РёР№ РїР°СЂР°РјРµС‚СЂ Р°РєС‚РёРІРёСЂРѕРІР°РЅ.\n\n"
+"РўРµРј РЅРµ РјРµРЅРµРµ, РјРѕРґРёС„РёС†РёСЂРѕРІР°РЅРЅС‹Рµ С„Р°Р№Р»С‹ Р±Р»РѕРєРёСЂСѓСЋС‚СЃСЏ Р±РѕР»СЊС€РёРЅСЃС‚РІРѕРј СЃРµСЂРІРµСЂРѕРІ\n\n"
+"Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РёС…?"
 
 #: Client/core/CSettings.cpp:5774
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
 "Are you sure you want to enable this option?"
-msgstr "Включение DPI адаптации является экспериментальной функцией, и\n"
-"мы рекомендуем ее использовать только тогда, когда вы играете в MTA:SA на масштабированном мониторе.\n"
-"Вы можете столкнуться с графическими проблемами, если включите эту опцию.\n\n"
-"Вы уверены, что хотите включить эту опцию?"
+msgstr "Р’РєР»СЋС‡РµРЅРёРµ DPI Р°РґР°РїС‚Р°С†РёРё СЏРІР»СЏРµС‚СЃСЏ СЌРєСЃРїРµСЂРёРјРµРЅС‚Р°Р»СЊРЅРѕР№ С„СѓРЅРєС†РёРµР№, Рё\n"
+"РјС‹ СЂРµРєРѕРјРµРЅРґСѓРµРј РµРµ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ С‚РѕР»СЊРєРѕ С‚РѕРіРґР°, РєРѕРіРґР° РІС‹ РёРіСЂР°РµС‚Рµ РІ MTA:SA РЅР° РјР°СЃС€С‚Р°Р±РёСЂРѕРІР°РЅРЅРѕРј РјРѕРЅРёС‚РѕСЂРµ.\n"
+"Р’С‹ РјРѕР¶РµС‚Рµ СЃС‚РѕР»РєРЅСѓС‚СЊСЃСЏ СЃ РіСЂР°С„РёС‡РµСЃРєРёРјРё РїСЂРѕР±Р»РµРјР°РјРё, РµСЃР»Рё РІРєР»СЋС‡РёС‚Рµ СЌС‚Сѓ РѕРїС†РёСЋ.\n\n"
+"Р’С‹ СѓРІРµСЂРµРЅС‹, С‡С‚Рѕ С…РѕС‚РёС‚Рµ РІРєР»СЋС‡РёС‚СЊ СЌС‚Сѓ РѕРїС†РёСЋ?"
 
 #: Client/core/CSettings.cpp:5780 Client/core/CSettings.cpp:5835
 msgid "EXPERIMENTAL FEATURE"
-msgstr "ЭКСПЕРИМЕНТАЛЬНАЯ ФУНКЦИЯ"
+msgstr "Р­РљРЎРџР•Р РРњР•РќРўРђР›Р¬РќРђРЇ Р¤РЈРќРљР¦РРЇ"
 
 #: Client/core/CSettings.cpp:5837
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
-msgstr "Отключать эту опцию не рекомендуется, если у вас нет проблем с производительностью.\n\n"
-"Вы уверены, что хотите отключить ее?"
+msgstr "РћС‚РєР»СЋС‡Р°С‚СЊ СЌС‚Сѓ РѕРїС†РёСЋ РЅРµ СЂРµРєРѕРјРµРЅРґСѓРµС‚СЃСЏ, РµСЃР»Рё Сѓ РІР°СЃ РЅРµС‚ РїСЂРѕР±Р»РµРј СЃ РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚СЊСЋ.\n\n"
+"Р’С‹ СѓРІРµСЂРµРЅС‹, С‡С‚Рѕ С…РѕС‚РёС‚Рµ РѕС‚РєР»СЋС‡РёС‚СЊ РµРµ?"
 
 #: Client/core/CSettings.cpp:6000
 msgid "Please enter a nickname"
-msgstr "Введите никнейм"
+msgstr "Р’РІРµРґРёС‚Рµ РЅРёРєРЅРµР№Рј"
 
 #: Client/core/CSettings.cpp:6001
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
-msgstr "Введите никнейм, который будет использован в игре  \n"
-"Это будет вашем именем, когда вы подключитесь к серверу"
+msgstr "Р’РІРµРґРёС‚Рµ РЅРёРєРЅРµР№Рј, РєРѕС‚РѕСЂС‹Р№ Р±СѓРґРµС‚ РёСЃРїРѕР»СЊР·РѕРІР°РЅ РІ РёРіСЂРµ  \n"
+"Р­С‚Рѕ Р±СѓРґРµС‚ РІР°С€РµРј РёРјРµРЅРµРј, РєРѕРіРґР° РІС‹ РїРѕРґРєР»СЋС‡РёС‚РµСЃСЊ Рє СЃРµСЂРІРµСЂСѓ"
 
 #: Client/core/CSettings.cpp:6019
 msgid "Very experimental feature."
-msgstr "Очень экспериментальная функция"
+msgstr "РћС‡РµРЅСЊ СЌРєСЃРїРµСЂРёРјРµРЅС‚Р°Р»СЊРЅР°СЏ С„СѓРЅРєС†РёСЏ"
 
 #: Client/core/CSettings.cpp:6021
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr "Оптимизация смены одежды CJ (Требуются доп. 65Мб ОЗУ)"
+msgstr "РћРїС‚РёРјРёР·Р°С†РёСЏ СЃРјРµРЅС‹ РѕРґРµР¶РґС‹ CJ (РўСЂРµР±СѓСЋС‚СЃСЏ РґРѕРї. 65РњР± РћР—РЈ)"
 
 #: Client/core/CSettings.cpp:6023
 msgid "Older routers may require a slower scan speed."
-msgstr "Старые роутеры будут лучше работать с медленной скоростью сканирования"
+msgstr "РЎС‚Р°СЂС‹Рµ СЂРѕСѓС‚РµСЂС‹ Р±СѓРґСѓС‚ Р»СѓС‡С€Рµ СЂР°Р±РѕС‚Р°С‚СЊ СЃ РјРµРґР»РµРЅРЅРѕР№ СЃРєРѕСЂРѕСЃС‚СЊСЋ СЃРєР°РЅРёСЂРѕРІР°РЅРёСЏ"
 
 #: Client/core/CSettings.cpp:6025
 msgid "Switch on to use only one connection when downloading."
-msgstr "Использовать однопоточное подключение при загрузке файлов."
+msgstr "РСЃРїРѕР»СЊР·РѕРІР°С‚СЊ РѕРґРЅРѕРїРѕС‚РѕС‡РЅРѕРµ РїРѕРґРєР»СЋС‡РµРЅРёРµ РїСЂРё Р·Р°РіСЂСѓР·РєРµ С„Р°Р№Р»РѕРІ."
 
 #: Client/core/CSettings.cpp:6027
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr "Помечать сетевые пакеты для упрощения идентификации трафика MTA"
+msgstr "РџРѕРјРµС‡Р°С‚СЊ СЃРµС‚РµРІС‹Рµ РїР°РєРµС‚С‹ РґР»СЏ СѓРїСЂРѕС‰РµРЅРёСЏ РёРґРµРЅС‚РёС„РёРєР°С†РёРё С‚СЂР°С„РёРєР° MTA"
 
 #: Client/core/CSettings.cpp:6029
 msgid "Spinning circle animation at the bottom of the screen"
-msgstr "Анимация вращающегося круга внизу экрана"
+msgstr "РђРЅРёРјР°С†РёСЏ РІСЂР°С‰Р°СЋС‰РµРіРѕСЃСЏ РєСЂСѓРіР° РІРЅРёР·Сѓ СЌРєСЂР°РЅР°"
 
 #: Client/core/CSettings.cpp:6031
 msgid "Select default always. (This setting is not saved)"
-msgstr "Всегда по умолчанию. (Эта настройка не сохраняется)"
+msgstr "Р’СЃРµРіРґР° РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ. (Р­С‚Р° РЅР°СЃС‚СЂРѕР№РєР° РЅРµ СЃРѕС…СЂР°РЅСЏРµС‚СЃСЏ)"
 
 #: Client/core/CSettings.cpp:6033
 msgid "Maximum is usually best"
-msgstr "Лучше всего выделить максимальный объем"
+msgstr "Р›СѓС‡С€Рµ РІСЃРµРіРѕ РІС‹РґРµР»РёС‚СЊ РјР°РєСЃРёРјР°Р»СЊРЅС‹Р№ РѕР±СЉРµРј"
 
 #: Client/core/CSettings.cpp:6035 Client/core/CSettings.cpp:6037
 msgid "Auto updater:"
-msgstr "Автоматическое обновление:"
+msgstr "РђРІС‚РѕРјР°С‚РёС‡РµСЃРєРѕРµ РѕР±РЅРѕРІР»РµРЅРёРµ:"
 
 #: Client/core/CSettings.cpp:6035
 msgid "Select default unless you like filling out bug reports."
-msgstr "Используйте \"По умолчанию\" если желаете загружать только стабильные версии"
+msgstr "РСЃРїРѕР»СЊР·СѓР№С‚Рµ \"РџРѕ СѓРјРѕР»С‡Р°РЅРёСЋ\" РµСЃР»Рё Р¶РµР»Р°РµС‚Рµ Р·Р°РіСЂСѓР¶Р°С‚СЊ С‚РѕР»СЊРєРѕ СЃС‚Р°Р±РёР»СЊРЅС‹Рµ РІРµСЂСЃРёРё"
 
 #: Client/core/CSettings.cpp:6037
 msgid "Select default to automatically install important updates."
-msgstr "Выберите значение по умолчанию для автоматической установки важных обновлений."
+msgstr "Р’С‹Р±РµСЂРёС‚Рµ Р·РЅР°С‡РµРЅРёРµ РїРѕ СѓРјРѕР»С‡Р°РЅРёСЋ РґР»СЏ Р°РІС‚РѕРјР°С‚РёС‡РµСЃРєРѕР№ СѓСЃС‚Р°РЅРѕРІРєРё РІР°Р¶РЅС‹С… РѕР±РЅРѕРІР»РµРЅРёР№."
 
 #: Client/core/CSettings.cpp:6039
 msgid "16-bit color:"
-msgstr "16-битные цвета:"
+msgstr "16-Р±РёС‚РЅС‹Рµ С†РІРµС‚Р°:"
 
 #: Client/core/CSettings.cpp:6039
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr "Включить режим 16-битных цветов. Требует перезапуска MTA."
+msgstr "Р’РєР»СЋС‡РёС‚СЊ СЂРµР¶РёРј 16-Р±РёС‚РЅС‹С… С†РІРµС‚РѕРІ. РўСЂРµР±СѓРµС‚ РїРµСЂРµР·Р°РїСѓСЃРєР° MTA."
 
 #: Client/core/CSettings.cpp:6041
 msgid "Mouse fix:"
-msgstr "Исправление мыши:"
+msgstr "РСЃРїСЂР°РІР»РµРЅРёРµ РјС‹С€Рё:"
 
 #: Client/core/CSettings.cpp:6041
 msgid "Mouse movement fix - May need PC restart"
-msgstr "Исправить движения мыши - Необходим перезапуск ПК"
+msgstr "РСЃРїСЂР°РІРёС‚СЊ РґРІРёР¶РµРЅРёСЏ РјС‹С€Рё - РќРµРѕР±С…РѕРґРёРј РїРµСЂРµР·Р°РїСѓСЃРє РџРљ"
 
 #: Client/core/CSettings.cpp:6043
 msgid "CPU affinity:"
-msgstr "Сходство с процессором CPU:"
+msgstr "РЎС…РѕРґСЃС‚РІРѕ СЃ РїСЂРѕС†РµСЃСЃРѕСЂРѕРј CPU:"
 
 #: Client/core/CSettings.cpp:6043
 msgid "Only change if you're having stability issues."
-msgstr "Смените только в том случае, если у вас возникли проблемы со стабильностью."
+msgstr "РЎРјРµРЅРёС‚Рµ С‚РѕР»СЊРєРѕ РІ С‚РѕРј СЃР»СѓС‡Р°Рµ, РµСЃР»Рё Сѓ РІР°СЃ РІРѕР·РЅРёРєР»Рё РїСЂРѕР±Р»РµРјС‹ СЃРѕ СЃС‚Р°Р±РёР»СЊРЅРѕСЃС‚СЊСЋ."
 
 #: Client/core/CCore.cpp:848 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
-msgstr "Критическая ошибка"
+msgstr "РљСЂРёС‚РёС‡РµСЃРєР°СЏ РѕС€РёР±РєР°"
 
 #: Client/core/CCore.cpp:969
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "ДЛЯ ИСПРАВЛЕНИЯ УДАЛИТЕ ФАЙЛ: "
+msgstr "Р”Р›РЇ РРЎРџР РђР’Р›Р•РќРРЇ РЈР”РђР›РРўР• Р¤РђР™Р›: "
 
 #: Client/core/CCore.cpp:1001
 #, c-format
 msgid "%s module is incorrect!"
-msgstr "Модуль %s некорректен!"
+msgstr "РњРѕРґСѓР»СЊ %s РЅРµРєРѕСЂСЂРµРєС‚РµРЅ!"
 
 #: Client/core/CCore.cpp:1375
 msgid "Error executing URL"
-msgstr "Ошибка выполнения URL"
+msgstr "РћС€РёР±РєР° РІС‹РїРѕР»РЅРµРЅРёСЏ URL"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: Client/core/CCore.cpp:1470
 msgid "this help screen"
-msgstr "эта страница помощи"
+msgstr "СЌС‚Р° СЃС‚СЂР°РЅРёС†Р° РїРѕРјРѕС‰Рё"
 
 #: Client/core/CCore.cpp:1471 Client/core/CCore.cpp:1472
 msgid "exits the application"
-msgstr "выйти из приложения"
+msgstr "РІС‹Р№С‚Рё РёР· РїСЂРёР»РѕР¶РµРЅРёСЏ"
 
 #: Client/core/CCore.cpp:1473
 msgid "shows the version"
-msgstr "показать версию MTA"
+msgstr "РїРѕРєР°Р·Р°С‚СЊ РІРµСЂСЃРёСЋ MTA"
 
 #: Client/core/CCore.cpp:1474
 msgid "shows the time"
-msgstr "показать текущее время"
+msgstr "РїРѕРєР°Р·Р°С‚СЊ С‚РµРєСѓС‰РµРµ РІСЂРµРјСЏ"
 
 #: Client/core/CCore.cpp:1475
 msgid "shows the hud"
-msgstr "показать интерфейс игрока"
+msgstr "РїРѕРєР°Р·Р°С‚СЊ РёРЅС‚РµСЂС„РµР№СЃ РёРіСЂРѕРєР°"
 
 #: Client/core/CCore.cpp:1476
 msgid "shows all the binds"
-msgstr "показать все настройки клавиш"
+msgstr "РїРѕРєР°Р·Р°С‚СЊ РІСЃРµ РЅР°СЃС‚СЂРѕР№РєРё РєР»Р°РІРёС€"
 
 #: Client/core/CCore.cpp:1477
 msgid "shows your serial"
-msgstr "показать ваш серийный номер"
+msgstr "РїРѕРєР°Р·Р°С‚СЊ РІР°С€ СЃРµСЂРёР№РЅС‹Р№ РЅРѕРјРµСЂ"
 
 #: Client/core/CCore.cpp:1486
 msgid "connects to a server (host port nick pass)"
-msgstr "подключиться к серверу (адрес, порт, ник, пароль)"
+msgstr "РїРѕРґРєР»СЋС‡РёС‚СЊСЃСЏ Рє СЃРµСЂРІРµСЂСѓ (Р°РґСЂРµСЃ, РїРѕСЂС‚, РЅРёРє, РїР°СЂРѕР»СЊ)"
 
 #: Client/core/CCore.cpp:1487
 msgid "connects to a previous server"
-msgstr "подключиться к последнему посещённому серверу"
+msgstr "РїРѕРґРєР»СЋС‡РёС‚СЊСЃСЏ Рє РїРѕСЃР»РµРґРЅРµРјСѓ РїРѕСЃРµС‰С‘РЅРЅРѕРјСѓ СЃРµСЂРІРµСЂСѓ"
 
 #: Client/core/CCore.cpp:1488
 msgid "binds a key (key control)"
-msgstr "назначить клавишу управления"
+msgstr "РЅР°Р·РЅР°С‡РёС‚СЊ РєР»Р°РІРёС€Сѓ СѓРїСЂР°РІР»РµРЅРёСЏ"
 
 #: Client/core/CCore.cpp:1489
 msgid "unbinds a key (key)"
-msgstr "удалить задачу с клавиши"
+msgstr "СѓРґР°Р»РёС‚СЊ Р·Р°РґР°С‡Сѓ СЃ РєР»Р°РІРёС€Рё"
 
 #: Client/core/CCore.cpp:1490
 msgid "copies the default gta controls"
-msgstr "скопировать настройки из GTA:SA"
+msgstr "СЃРєРѕРїРёСЂРѕРІР°С‚СЊ РЅР°СЃС‚СЂРѕР№РєРё РёР· GTA:SA"
 
 #: Client/core/CCore.cpp:1491
 msgid "outputs a screenshot"
-msgstr "сделать скриншот"
+msgstr "СЃРґРµР»Р°С‚СЊ СЃРєСЂРёРЅС€РѕС‚"
 
 #: Client/core/CCore.cpp:1492
 msgid "immediately saves the config"
-msgstr "сохранить настройки"
+msgstr "СЃРѕС…СЂР°РЅРёС‚СЊ РЅР°СЃС‚СЂРѕР№РєРё"
 
 #: Client/core/CCore.cpp:1494
 msgid "clears the debug view"
-msgstr "очистить окно отладки (debug)"
+msgstr "РѕС‡РёСЃС‚РёС‚СЊ РѕРєРЅРѕ РѕС‚Р»Р°РґРєРё (debug)"
 
 #: Client/core/CCore.cpp:1495
 msgid "scrolls the chatbox upwards"
-msgstr "прокрутить чат вверх"
+msgstr "РїСЂРѕРєСЂСѓС‚РёС‚СЊ С‡Р°С‚ РІРІРµСЂС…"
 
 #: Client/core/CCore.cpp:1496
 msgid "scrolls the chatbox downwards"
-msgstr "прокрутить чат вниз"
+msgstr "РїСЂРѕРєСЂСѓС‚РёС‚СЊ С‡Р°С‚ РІРЅРёР·"
 
 #: Client/core/CCore.cpp:1497
 msgid "scrolls the debug view upwards"
-msgstr "прокрутить окно отладки вверх"
+msgstr "РїСЂРѕРєСЂСѓС‚РёС‚СЊ РѕРєРЅРѕ РѕС‚Р»Р°РґРєРё РІРІРµСЂС…"
 
 #: Client/core/CCore.cpp:1498
 msgid "scrolls the debug view downwards"
-msgstr "прокрутить окно отладки вниз"
+msgstr "РїСЂРѕРєСЂСѓС‚РёС‚СЊ РѕРєРЅРѕ РѕС‚Р»Р°РґРєРё РІРЅРёР·"
 
 #: Client/core/CCore.cpp:1501
 msgid "shows the memory statistics"
-msgstr "показать статистику использования памяти"
+msgstr "РїРѕРєР°Р·Р°С‚СЊ СЃС‚Р°С‚РёСЃС‚РёРєСѓ РёСЃРїРѕР»СЊР·РѕРІР°РЅРёСЏ РїР°РјСЏС‚Рё"
 
 #: Client/core/CCore.cpp:1502
 msgid "shows the frame timing graph"
-msgstr "показать график производительности"
+msgstr "РїРѕРєР°Р·Р°С‚СЊ РіСЂР°С„РёРє РїСЂРѕРёР·РІРѕРґРёС‚РµР»СЊРЅРѕСЃС‚Рё"
 
 #: Client/core/CCore.cpp:1506
 msgid "for developers: reload news"
-msgstr "Для разработчиков: обновите новости"
+msgstr "Р”Р»СЏ СЂР°Р·СЂР°Р±РѕС‚С‡РёРєРѕРІ: РѕР±РЅРѕРІРёС‚Рµ РЅРѕРІРѕСЃС‚Рё"
 
 #: Client/core/CMainMenu.cpp:332
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Вы используете feature-branch разработку! Это тестовая сборка, которая не может использоваться для подключения к публичным серверам!"
+msgstr "Р’С‹ РёСЃРїРѕР»СЊР·СѓРµС‚Рµ feature-branch СЂР°Р·СЂР°Р±РѕС‚РєСѓ! Р­С‚Рѕ С‚РµСЃС‚РѕРІР°СЏ СЃР±РѕСЂРєР°, РєРѕС‚РѕСЂР°СЏ РЅРµ РјРѕР¶РµС‚ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊСЃСЏ РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє РїСѓР±Р»РёС‡РЅС‹Рј СЃРµСЂРІРµСЂР°Рј!"
 
 #: Client/core/CMainMenu.cpp:351
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
-msgstr "MTA не будет получать обновления на XP/Vista после июля 2019.\n\n"
-"Обновите Windows, чтобы играть на серверах с последним обновлением."
+msgstr "MTA РЅРµ Р±СѓРґРµС‚ РїРѕР»СѓС‡Р°С‚СЊ РѕР±РЅРѕРІР»РµРЅРёСЏ РЅР° XP/Vista РїРѕСЃР»Рµ РёСЋР»СЏ 2019.\n\n"
+"РћР±РЅРѕРІРёС‚Рµ Windows, С‡С‚РѕР±С‹ РёРіСЂР°С‚СЊ РЅР° СЃРµСЂРІРµСЂР°С… СЃ РїРѕСЃР»РµРґРЅРёРј РѕР±РЅРѕРІР»РµРЅРёРµРј."
 
 #: Client/core/CMainMenu.cpp:1231
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
-msgstr "Это действие приведёт к отключению от текущего сервера.\n\n"
-"Вы действительно хотите отключиться?"
+msgstr "Р­С‚Рѕ РґРµР№СЃС‚РІРёРµ РїСЂРёРІРµРґС‘С‚ Рє РѕС‚РєР»СЋС‡РµРЅРёСЋ РѕС‚ С‚РµРєСѓС‰РµРіРѕ СЃРµСЂРІРµСЂР°.\n\n"
+"Р’С‹ РґРµР№СЃС‚РІРёС‚РµР»СЊРЅРѕ С…РѕС‚РёС‚Рµ РѕС‚РєР»СЋС‡РёС‚СЊСЃСЏ?"
 
 #: Client/core/CMainMenu.cpp:1235
 msgid "DISCONNECT WARNING"
-msgstr "ПРЕДУПРЕЖДЕНИЕ ОТКЛЮЧЕНИЯ"
+msgstr "РџР Р•Р”РЈРџР Р•Р–Р”Р•РќРР• РћРўРљР›Р®Р§Р•РќРРЇ"
 
 #: Client/core/CMainMenu.cpp:1256
 msgid "INFORMATION"
-msgstr "ИНФОРМАЦИЯ"
+msgstr "РРќР¤РћР РњРђР¦РРЇ"
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:154
 msgid "NEWS"
-msgstr "НОВОСТИ"
+msgstr "РќРћР’РћРЎРўР"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:172 Client/core/CNewsBrowser.cpp:173
 msgid "Visit latest news article"
-msgstr "Посмотреть последние новости"
+msgstr "РџРѕСЃРјРѕС‚СЂРµС‚СЊ РїРѕСЃР»РµРґРЅРёРµ РЅРѕРІРѕСЃС‚Рё"
 
 #: Client/core/CScreenShot.cpp:200
 #, c-format
 msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Размер скриншота %d байт, но ожидалось %d "
+msgstr "Р Р°Р·РјРµСЂ СЃРєСЂРёРЅС€РѕС‚Р° %d Р±Р°Р№С‚, РЅРѕ РѕР¶РёРґР°Р»РѕСЃСЊ %d "
 
 #: Client/core/CScreenShot.cpp:206
 msgid "Screenshot failed"
-msgstr "Не удалось сделать скриншот"
+msgstr "РќРµ СѓРґР°Р»РѕСЃСЊ СЃРґРµР»Р°С‚СЊ СЃРєСЂРёРЅС€РѕС‚"
 
 #: Client/core/CScreenShot.cpp:256
 #, c-format
 msgid "Screenshot taken: '%s'"
-msgstr "Скриншот сделан: '%s'"
+msgstr "РЎРєСЂРёРЅС€РѕС‚ СЃРґРµР»Р°РЅ: '%s'"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:233
 msgid "Unknown command or cvar: "
-msgstr "Неизвестная команда или переменная: "
+msgstr "РќРµРёР·РІРµСЃС‚РЅР°СЏ РєРѕРјР°РЅРґР° РёР»Рё РїРµСЂРµРјРµРЅРЅР°СЏ: "
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
-msgstr "Огонь"
+msgstr "РћРіРѕРЅСЊ"
 
 #: Client/core/CKeyBinds.cpp:187
 msgid "Next weapon"
-msgstr "Следующее оружие"
+msgstr "РЎР»РµРґСѓСЋС‰РµРµ РѕСЂСѓР¶РёРµ"
 
 #: Client/core/CKeyBinds.cpp:188
 msgid "Previous weapon"
-msgstr "Предыдущее оружие"
+msgstr "РџСЂРµРґС‹РґСѓС‰РµРµ РѕСЂСѓР¶РёРµ"
 
 #: Client/core/CKeyBinds.cpp:189
 msgid "Forwards"
-msgstr "Вперёд"
+msgstr "Р’РїРµСЂС‘Рґ"
 
 #: Client/core/CKeyBinds.cpp:190
 msgid "Backwards"
-msgstr "Назад"
+msgstr "РќР°Р·Р°Рґ"
 
 #: Client/core/CKeyBinds.cpp:193
 msgid "Zoom in"
-msgstr "Увеличить"
+msgstr "РЈРІРµР»РёС‡РёС‚СЊ"
 
 #: Client/core/CKeyBinds.cpp:194
 msgid "Zoom out"
-msgstr "Уменьшить"
+msgstr "РЈРјРµРЅСЊС€РёС‚СЊ"
 
 #: Client/core/CKeyBinds.cpp:195
 msgid "Enter/Exit"
-msgstr "Вход/Выход"
+msgstr "Р’С…РѕРґ/Р’С‹С…РѕРґ"
 
 #: Client/core/CKeyBinds.cpp:196
 msgid "Change camera"
-msgstr "Сменить камеру вида"
+msgstr "РЎРјРµРЅРёС‚СЊ РєР°РјРµСЂСѓ РІРёРґР°"
 
 #. 10
 #: Client/core/CKeyBinds.cpp:197
 msgid "Jump"
-msgstr "Прыжок"
+msgstr "РџСЂС‹Р¶РѕРє"
 
 #: Client/core/CKeyBinds.cpp:198
 msgid "Sprint"
-msgstr "Бег"
+msgstr "Р‘РµРі"
 
 #: Client/core/CKeyBinds.cpp:199
 msgid "Look behind"
-msgstr "Смотреть назад"
+msgstr "РЎРјРѕС‚СЂРµС‚СЊ РЅР°Р·Р°Рґ"
 
 #: Client/core/CKeyBinds.cpp:200
 msgid "Crouch"
-msgstr "Присесть"
+msgstr "РџСЂРёСЃРµСЃС‚СЊ"
 
 #: Client/core/CKeyBinds.cpp:201
 msgid "Action"
-msgstr "Действие"
+msgstr "Р”РµР№СЃС‚РІРёРµ"
 
 #: Client/core/CKeyBinds.cpp:202
 msgid "Walk"
-msgstr "Шаг"
+msgstr "РЁР°Рі"
 
 #: Client/core/CKeyBinds.cpp:203
 msgid "Vehicle fire"
-msgstr "Транспорт: Огонь"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: РћРіРѕРЅСЊ"
 
 #: Client/core/CKeyBinds.cpp:204
 msgid "Vehicle secondary fire"
-msgstr "Транспорт: Огонь вторичный"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: РћРіРѕРЅСЊ РІС‚РѕСЂРёС‡РЅС‹Р№"
 
 #: Client/core/CKeyBinds.cpp:205
 msgid "Vehicle left"
-msgstr "Транспорт: Влево"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: Р’Р»РµРІРѕ"
 
 #: Client/core/CKeyBinds.cpp:206
 msgid "Vehicle right"
-msgstr "Транспорт: Вправо"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: Р’РїСЂР°РІРѕ"
 
 #. 20
 #: Client/core/CKeyBinds.cpp:207
 msgid "Steer forwards/down"
-msgstr "Транспорт: Наклон вперед/Вниз"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: РќР°РєР»РѕРЅ РІРїРµСЂРµРґ/Р’РЅРёР·"
 
 #: Client/core/CKeyBinds.cpp:208
 msgid "Steer backwards/up"
-msgstr "Транспорт: Наклон назад/Вверх"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: РќР°РєР»РѕРЅ РЅР°Р·Р°Рґ/Р’РІРµСЂС…"
 
 #: Client/core/CKeyBinds.cpp:209
 msgid "Accelerate"
-msgstr "Транспорт: Газ"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: Р“Р°Р·"
 
 #: Client/core/CKeyBinds.cpp:210
 msgid "Brake/Reverse"
-msgstr "Транспорт: Тормоз/Задний ход"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: РўРѕСЂРјРѕР·/Р—Р°РґРЅРёР№ С…РѕРґ"
 
 #: Client/core/CKeyBinds.cpp:211
 msgid "Radio next"
-msgstr "След. радиостанция"
+msgstr "РЎР»РµРґ. СЂР°РґРёРѕСЃС‚Р°РЅС†РёСЏ"
 
 #: Client/core/CKeyBinds.cpp:212
 msgid "Radio previous"
-msgstr "Пред. радиостанция"
+msgstr "РџСЂРµРґ. СЂР°РґРёРѕСЃС‚Р°РЅС†РёСЏ"
 
 #: Client/core/CKeyBinds.cpp:213
 msgid "Radio user track skip"
-msgstr "Пропустить трек "
+msgstr "РџСЂРѕРїСѓСЃС‚РёС‚СЊ С‚СЂРµРє "
 
 #: Client/core/CKeyBinds.cpp:214
 msgid "Horn"
-msgstr "Транспорт: Сигнал"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: РЎРёРіРЅР°Р»"
 
 #: Client/core/CKeyBinds.cpp:215
 msgid "Sub-mission"
-msgstr "Транспорт: Подмиссия/Шасси"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: РџРѕРґРјРёСЃСЃРёСЏ/РЁР°СЃСЃРё"
 
 #: Client/core/CKeyBinds.cpp:216
 msgid "Handbrake"
-msgstr "Транспорт: Ручной тормоз"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: Р СѓС‡РЅРѕР№ С‚РѕСЂРјРѕР·"
 
 #. 30
 #: Client/core/CKeyBinds.cpp:217
 msgid "Vehicle look left"
-msgstr "Транспорт: Взгляд налево"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: Р’Р·РіР»СЏРґ РЅР°Р»РµРІРѕ"
 
 #: Client/core/CKeyBinds.cpp:218
 msgid "Vehicle look right"
-msgstr "Транспорт: Взгляд направо"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: Р’Р·РіР»СЏРґ РЅР°РїСЂР°РІРѕ"
 
 #: Client/core/CKeyBinds.cpp:219
 msgid "Vehicle look behind"
-msgstr "Транспорт: Смотреть назад"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: РЎРјРѕС‚СЂРµС‚СЊ РЅР°Р·Р°Рґ"
 
 #: Client/core/CKeyBinds.cpp:220
 msgid "Vehicle mouse look"
-msgstr "Транспорт: Обзор мышью"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: РћР±Р·РѕСЂ РјС‹С€СЊСЋ"
 
 #: Client/core/CKeyBinds.cpp:221
 msgid "Special control left"
-msgstr "Транспорт: Доп. влево"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: Р”РѕРї. РІР»РµРІРѕ"
 
 #: Client/core/CKeyBinds.cpp:222
 msgid "Special control right"
-msgstr "Транспорт: Доп. вправо"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: Р”РѕРї. РІРїСЂР°РІРѕ"
 
 #: Client/core/CKeyBinds.cpp:223
 msgid "Special control down"
-msgstr "Транспорт: Доп. вниз"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: Р”РѕРї. РІРЅРёР·"
 
 #: Client/core/CKeyBinds.cpp:224
 msgid "Special control up"
-msgstr "Транспорт: Доп. вверх"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: Р”РѕРї. РІРІРµСЂС…"
 
 #: Client/core/CKeyBinds.cpp:225
 msgid "Aim weapon"
-msgstr "Прицел оружия"
+msgstr "РџСЂРёС†РµР» РѕСЂСѓР¶РёСЏ"
 
 #: Client/core/CKeyBinds.cpp:226
 msgid "Conversation yes"
-msgstr "Группа: согласиться"
+msgstr "Р“СЂСѓРїРїР°: СЃРѕРіР»Р°СЃРёС‚СЊСЃСЏ"
 
 #. 40
 #: Client/core/CKeyBinds.cpp:227
 msgid "Conversation no"
-msgstr "Группа: отказаться"
+msgstr "Р“СЂСѓРїРїР°: РѕС‚РєР°Р·Р°С‚СЊСЃСЏ"
 
 #: Client/core/CKeyBinds.cpp:228
 msgid "Group control forwards"
-msgstr "Группа: вперёд"
+msgstr "Р“СЂСѓРїРїР°: РІРїРµСЂС‘Рґ"
 
 #: Client/core/CKeyBinds.cpp:229
 msgid "Group control backwards"
-msgstr "Группа: назад"
+msgstr "Р“СЂСѓРїРїР°: РЅР°Р·Р°Рґ"
 
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:93
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Выбранная вами графическая тема не может быть загружена, тема по-умолчанию также не может быть загружена, переустановите MTA для решения проблемы."
+msgstr "Р’С‹Р±СЂР°РЅРЅР°СЏ РІР°РјРё РіСЂР°С„РёС‡РµСЃРєР°СЏ С‚РµРјР° РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ Р·Р°РіСЂСѓР¶РµРЅР°, С‚РµРјР° РїРѕ-СѓРјРѕР»С‡Р°РЅРёСЋ С‚Р°РєР¶Рµ РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ Р·Р°РіСЂСѓР¶РµРЅР°, РїРµСЂРµСѓСЃС‚Р°РЅРѕРІРёС‚Рµ MTA РґР»СЏ СЂРµС€РµРЅРёСЏ РїСЂРѕР±Р»РµРјС‹."
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1462
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Хотите ли вы посмотреть помощь по этой проблеме онлайн?"
+msgstr "РҐРѕС‚РёС‚Рµ Р»Рё РІС‹ РїРѕСЃРјРѕС‚СЂРµС‚СЊ РїРѕРјРѕС‰СЊ РїРѕ СЌС‚РѕР№ РїСЂРѕР±Р»РµРјРµ РѕРЅР»Р°Р№РЅ?"
 
 #. Create window
 #: Client/core/CConsole.cpp:417
 msgid "CONSOLE"
-msgstr "КОНСОЛЬ"
+msgstr "РљРћРќРЎРћР›Р¬"
 
 #: Client/core/CCredits.cpp:34
 msgid "Programming"
-msgstr "Программирование"
+msgstr "РџСЂРѕРіСЂР°РјРјРёСЂРѕРІР°РЅРёРµ"
 
 #: Client/core/CCredits.cpp:65
 msgid "Contributors"
-msgstr "Участники"
+msgstr "РЈС‡Р°СЃС‚РЅРёРєРё"
 
 #: Client/core/CCredits.cpp:85
 msgid "Game Design / Scripting"
-msgstr "Игровой дизайн / Скриптинг"
+msgstr "РРіСЂРѕРІРѕР№ РґРёР·Р°Р№РЅ / РЎРєСЂРёРїС‚РёРЅРі"
 
 #: Client/core/CCredits.cpp:105
 msgid "Language Localization"
-msgstr "Язык"
+msgstr "РЇР·С‹Рє"
 
 #: Client/core/CCredits.cpp:111
 msgid "Patch contributors"
-msgstr "Авторы исправлений"
+msgstr "РђРІС‚РѕСЂС‹ РёСЃРїСЂР°РІР»РµРЅРёР№"
 
 #: Client/core/CCredits.cpp:234
 msgid "Special Thanks"
-msgstr "Отдельная благодарность"
+msgstr "РћС‚РґРµР»СЊРЅР°СЏ Р±Р»Р°РіРѕРґР°СЂРЅРѕСЃС‚СЊ"
 
 #: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
-msgstr "Это программное обеспечение и проект используют следующие библиотеки и программное обеспечение:"
+msgstr "Р­С‚Рѕ РїСЂРѕРіСЂР°РјРјРЅРѕРµ РѕР±РµСЃРїРµС‡РµРЅРёРµ Рё РїСЂРѕРµРєС‚ РёСЃРїРѕР»СЊР·СѓСЋС‚ СЃР»РµРґСѓСЋС‰РёРµ Р±РёР±Р»РёРѕС‚РµРєРё Рё РїСЂРѕРіСЂР°РјРјРЅРѕРµ РѕР±РµСЃРїРµС‡РµРЅРёРµ:"
 
 #: Client/core/CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
-msgstr "Ось ускорения"
+msgstr "РћСЃСЊ СѓСЃРєРѕСЂРµРЅРёСЏ"
 
 #: Client/core/CJoystickManager.cpp:1580
 msgid "Brake Axis"
-msgstr "Ось торможения"
+msgstr "РћСЃСЊ С‚РѕСЂРјРѕР¶РµРЅРёСЏ"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:125
 msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
-msgstr "Невозможно инициализировать Direct3D9.\n\n"
-"Установите DirectX End-User Runtime\n"
-"и самую свежую версию Windows Service Packs."
+msgstr "РќРµРІРѕР·РјРѕР¶РЅРѕ РёРЅРёС†РёР°Р»РёР·РёСЂРѕРІР°С‚СЊ Direct3D9.\n\n"
+"РЈСЃС‚Р°РЅРѕРІРёС‚Рµ DirectX End-User Runtime\n"
+"Рё СЃР°РјСѓСЋ СЃРІРµР¶СѓСЋ РІРµСЂСЃРёСЋ Windows Service Packs."
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
 #: Client/core/ServerBrowser/CServerList.cpp:63
 msgid "Idle"
-msgstr "Неактивный"
+msgstr "РќРµР°РєС‚РёРІРЅС‹Р№"
 
 #: Client/core/ServerBrowser/CServerList.cpp:168
 #: Client/core/ServerBrowser/CServerBrowser.cpp:3158
 msgid "player"
 msgid_plural "players"
-msgstr[0] "игрок"
-msgstr[1] "игроков"
-msgstr[2] "игроков"
-msgstr[3] "игроки"
+msgstr[0] "РёРіСЂРѕРє"
+msgstr[1] "РёРіСЂРѕРєРѕРІ"
+msgstr[2] "РёРіСЂРѕРєРѕРІ"
+msgstr[3] "РёРіСЂРѕРєРё"
 
 #: Client/core/ServerBrowser/CServerList.cpp:169
 msgid "on"
-msgstr "на"
+msgstr "РЅР°"
 
 #: Client/core/ServerBrowser/CServerList.cpp:172
 #: Client/core/ServerBrowser/CServerBrowser.cpp:3164
 msgid "server"
 msgid_plural "servers"
-msgstr[0] "сервере"
-msgstr[1] "серверах"
-msgstr[2] "серверах"
-msgstr[3] "серверы"
+msgstr[0] "СЃРµСЂРІРµСЂРµ"
+msgstr[1] "СЃРµСЂРІРµСЂР°С…"
+msgstr[2] "СЃРµСЂРІРµСЂР°С…"
+msgstr[3] "СЃРµСЂРІРµСЂС‹"
 
 #. We are polling for the master server list (first pass)
 #: Client/core/ServerBrowser/CServerList.cpp:306
 #, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Получение списка серверов (%lu мс прошло)"
+msgstr "РџРѕР»СѓС‡РµРЅРёРµ СЃРїРёСЃРєР° СЃРµСЂРІРµСЂРѕРІ (%lu РјСЃ РїСЂРѕС€Р»Рѕ)"
 
 #. Abort
 #: Client/core/ServerBrowser/CServerList.cpp:324
 msgid "Master server list could not be parsed."
-msgstr "Мастер-сервер не отвечает."
+msgstr "РњР°СЃС‚РµСЂ-СЃРµСЂРІРµСЂ РЅРµ РѕС‚РІРµС‡Р°РµС‚."
 
 #. Abort
 #: Client/core/ServerBrowser/CServerList.cpp:334
 msgid "Master server list could not be retrieved."
-msgstr "Мастер-сервер не может получить данные."
+msgstr "РњР°СЃС‚РµСЂ-СЃРµСЂРІРµСЂ РЅРµ РјРѕР¶РµС‚ РїРѕР»СѓС‡РёС‚СЊ РґР°РЅРЅС‹Рµ."
 
 #: Client/core/ServerBrowser/CServerList.cpp:349
 msgid "(Backup server list)"
-msgstr "(Резервная копия списка серверов)"
+msgstr "(Р РµР·РµСЂРІРЅР°СЏ РєРѕРїРёСЏ СЃРїРёСЃРєР° СЃРµСЂРІРµСЂРѕРІ)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:419
 msgid "Cannot create LAN-broadcast socket"
-msgstr "Невозможно создать сокет широковещательной рассылки в локальной сети (LAN)"
+msgstr "РќРµРІРѕР·РјРѕР¶РЅРѕ СЃРѕР·РґР°С‚СЊ СЃРѕРєРµС‚ С€РёСЂРѕРєРѕРІРµС‰Р°С‚РµР»СЊРЅРѕР№ СЂР°СЃСЃС‹Р»РєРё РІ Р»РѕРєР°Р»СЊРЅРѕР№ СЃРµС‚Рё (LAN)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:429
 msgid "Cannot bind LAN-broadcast socket"
-msgstr "Не удалось привязать локальный сокет"
+msgstr "РќРµ СѓРґР°Р»РѕСЃСЊ РїСЂРёРІСЏР·Р°С‚СЊ Р»РѕРєР°Р»СЊРЅС‹Р№ СЃРѕРєРµС‚"
 
 #: Client/core/ServerBrowser/CServerList.cpp:472
 msgid "Attempting to discover LAN servers"
-msgstr "Попытка обнаружения локальных серверов"
+msgstr "РџРѕРїС‹С‚РєР° РѕР±РЅР°СЂСѓР¶РµРЅРёСЏ Р»РѕРєР°Р»СЊРЅС‹С… СЃРµСЂРІРµСЂРѕРІ"
 
 #. Create queue window
 #: Client/core/ServerBrowser/CServerInfo.cpp:32
 #: Client/core/ServerBrowser/CServerInfo.cpp:302
 msgid "SERVER IS FULL"
-msgstr "СЕРВЕР ЗАПОЛНЕН"
+msgstr "РЎР•Р Р’Р•Р  Р—РђРџРћР›РќР•Рќ"
 
 #. Determine our label draw position for L10n
 #. Start position
@@ -2521,905 +2570,905 @@ msgstr "СЕРВЕР ЗАПОЛНЕН"
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:53
 msgid "Name:"
-msgstr "Название:"
+msgstr "РќР°Р·РІР°РЅРёРµ:"
 
 #. Server IP
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:64
 msgid "Server Address:"
-msgstr "Адрес сервера:"
+msgstr "РђРґСЂРµСЃ СЃРµСЂРІРµСЂР°:"
 
 #. Gamemode
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:75
 msgid "Gamemode:"
-msgstr "Игровой режим:"
+msgstr "РРіСЂРѕРІРѕР№ СЂРµР¶РёРј:"
 
 #. Map
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:86
 msgid "Map:"
-msgstr "Карта:"
+msgstr "РљР°СЂС‚Р°:"
 
 #. Players
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:97
 msgid "Players:"
-msgstr "Игроки:"
+msgstr "РРіСЂРѕРєРё:"
 
 #. Passworded
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:108
 msgid "Passworded:"
-msgstr "Пароль:"
+msgstr "РџР°СЂРѕР»СЊ:"
 
 #. Latency
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:119
 msgid "Latency:"
-msgstr "Задержка:"
+msgstr "Р—Р°РґРµСЂР¶РєР°:"
 
 #. Column for player names
 #. Player List Columns
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
 #: Client/core/ServerBrowser/CServerBrowser.cpp:635
 msgid "Player list"
-msgstr "Список игроков"
+msgstr "РЎРїРёСЃРѕРє РёРіСЂРѕРєРѕРІ"
 
 #. Close button
 #: Client/core/ServerBrowser/CServerInfo.cpp:144
 msgid "Close"
-msgstr "Закрыть"
+msgstr "Р—Р°РєСЂС‹С‚СЊ"
 
 #. Join Game button
 #: Client/core/ServerBrowser/CServerInfo.cpp:152
 msgid "Join Game"
-msgstr "Подключиться"
+msgstr "РџРѕРґРєР»СЋС‡РёС‚СЊСЃСЏ"
 
 #. Please enter password label
 #: Client/core/ServerBrowser/CServerInfo.cpp:166
 msgid "Please enter the password to the server:"
-msgstr "Введите пароль для входа на сервер:"
+msgstr "Р’РІРµРґРёС‚Рµ РїР°СЂРѕР»СЊ РґР»СЏ РІС…РѕРґР° РЅР° СЃРµСЂРІРµСЂ:"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
-msgstr "Подключиться, как освободится место."
+msgstr "РџРѕРґРєР»СЋС‡РёС‚СЊСЃСЏ, РєР°Рє РѕСЃРІРѕР±РѕРґРёС‚СЃСЏ РјРµСЃС‚Рѕ."
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "ВВЕДИТЕ ПАРОЛЬ СЕРВЕРА:"
+msgstr "Р’Р’Р•Р”РРўР• РџРђР РћР›Р¬ РЎР•Р Р’Р•Р Рђ:"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Timed Out"
-msgstr "Время ожидания вышло"
+msgstr "Р’СЂРµРјСЏ РѕР¶РёРґР°РЅРёСЏ РІС‹С€Р»Рѕ"
 
 #. Set every GUI elements text to blank
 #: Client/core/ServerBrowser/CServerInfo.cpp:515
 msgid "Querying..."
-msgstr "Идет запрос..."
+msgstr "РРґРµС‚ Р·Р°РїСЂРѕСЃ..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:189
 msgid "SERVER BROWSER"
-msgstr "СПИСОК СЕРВЕРОВ"
+msgstr "РЎРџРРЎРћРљ РЎР•Р Р’Р•Р РћР’"
 
 #. Create the tabs
 #: Client/core/ServerBrowser/CServerBrowser.cpp:237
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:90
 msgid "Internet"
-msgstr "Интернет"
+msgstr "РРЅС‚РµСЂРЅРµС‚"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:238
 msgid "Local"
-msgstr "Локальная сеть"
+msgstr "Р›РѕРєР°Р»СЊРЅР°СЏ СЃРµС‚СЊ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:239
 msgid "Favourites"
-msgstr "Избранное"
+msgstr "РР·Р±СЂР°РЅРЅРѕРµ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:240
 msgid "Recent"
-msgstr "Последние"
+msgstr "РџРѕСЃР»РµРґРЅРёРµ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:309
 msgid "FOR QUICK CONNECT:\n\n"
 "Type the address and port into the address bar.\n"
 "Or select a server from the history list and press 'Connect'"
-msgstr "ДЛЯ БЫСТРОГО ПОДКЛЮЧЕНИЯ:\n\n"
-"Введите адрес и порт сервера в адресную строку.\n"
-"Или выберите сервер из истории последних и нажмите 'Подключиться'"
+msgstr "Р”Р›РЇ Р‘Р«РЎРўР РћР“Рћ РџРћР”РљР›Р®Р§Р•РќРРЇ:\n\n"
+"Р’РІРµРґРёС‚Рµ Р°РґСЂРµСЃ Рё РїРѕСЂС‚ СЃРµСЂРІРµСЂР° РІ Р°РґСЂРµСЃРЅСѓСЋ СЃС‚СЂРѕРєСѓ.\n"
+"РР»Рё РІС‹Р±РµСЂРёС‚Рµ СЃРµСЂРІРµСЂ РёР· РёСЃС‚РѕСЂРёРё РїРѕСЃР»РµРґРЅРёС… Рё РЅР°Р¶РјРёС‚Рµ 'РџРѕРґРєР»СЋС‡РёС‚СЊСЃСЏ'"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:321
 msgid "HELP"
-msgstr "ПОМОЩЬ"
+msgstr "РџРћРњРћР©Р¬"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:371
 msgid "Refresh"
-msgstr "Обновить"
+msgstr "РћР±РЅРѕРІРёС‚СЊ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:372
 msgid "Add Favorite"
-msgstr "Добавить в Избранное"
+msgstr "Р”РѕР±Р°РІРёС‚СЊ РІ РР·Р±СЂР°РЅРЅРѕРµ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:373
 #: Client/core/ServerBrowser/CServerBrowser.cpp:457
 #: Client/core/ServerBrowser/CServerBrowser.cpp:528
 msgid "Connect"
-msgstr "Подключиться"
+msgstr "РџРѕРґРєР»СЋС‡РёС‚СЊСЃСЏ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:374
 msgid "Server information"
-msgstr "Информация о сервере"
+msgstr "РРЅС„РѕСЂРјР°С†РёСЏ Рѕ СЃРµСЂРІРµСЂРµ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:375
 msgid "Search servers"
-msgstr "Поиск по серверам"
+msgstr "РџРѕРёСЃРє РїРѕ СЃРµСЂРІРµСЂР°Рј"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:376
 msgid "Search players"
-msgstr "Поиск по игрокам"
+msgstr "РџРѕРёСЃРє РїРѕ РёРіСЂРѕРєР°Рј"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:377
 msgid "Start search"
-msgstr "Начать поиск"
+msgstr "РќР°С‡Р°С‚СЊ РїРѕРёСЃРє"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:378
 msgid "Delete from recent"
-msgstr "Удалить из недавних"
+msgstr "РЈРґР°Р»РёС‚СЊ РёР· РЅРµРґР°РІРЅРёС…"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2086
 msgid "Search players..."
-msgstr "Поиск по игрокам..."
+msgstr "РџРѕРёСЃРє РїРѕ РёРіСЂРѕРєР°Рј..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:578
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2084
 msgid "Search servers..."
-msgstr "Поиск по серверам..."
+msgstr "РџРѕРёСЃРє РїРѕ СЃРµСЂРІРµСЂР°Рј..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:610
 msgid "Name"
-msgstr "Название"
+msgstr "РќР°Р·РІР°РЅРёРµ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:611
 msgid "Players"
-msgstr "Игроки"
+msgstr "РРіСЂРѕРєРё"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:612
 msgid "Ping"
-msgstr "Пинг"
+msgstr "РџРёРЅРі"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:613
 msgid "Gamemode"
-msgstr "Игровой режим"
+msgstr "РРіСЂРѕРІРѕР№ СЂРµР¶РёРј"
 
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:647
 msgid "Include:"
-msgstr "Показать:"
+msgstr "РџРѕРєР°Р·Р°С‚СЊ:"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:653
 msgid "Empty"
-msgstr "Пустые"
+msgstr "РџСѓСЃС‚С‹Рµ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:659
 msgid "Full"
-msgstr "Заполненные"
+msgstr "Р—Р°РїРѕР»РЅРµРЅРЅС‹Рµ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:665
 msgid "Locked"
-msgstr "Под паролем"
+msgstr "РџРѕРґ РїР°СЂРѕР»РµРј"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:677
 msgid "Offline"
-msgstr "Отключенные"
+msgstr "РћС‚РєР»СЋС‡РµРЅРЅС‹Рµ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:690
 msgid "Other Versions"
-msgstr "Другие версии"
+msgstr "Р”СЂСѓРіРёРµ РІРµСЂСЃРёРё"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:711
 msgid "Back"
-msgstr "Назад"
+msgstr "РќР°Р·Р°Рґ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1012
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1026
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1718
 msgid "Loading..."
-msgstr "Загрузка..."
+msgstr "Р—Р°РіСЂСѓР·РєР°..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1563
 #: Client/core/ServerBrowser/CServerBrowser.cpp:3039
 msgid "  ..loading.."
-msgstr "..загрузка.."
+msgstr "..Р·Р°РіСЂСѓР·РєР°.."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1601
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1758
 msgid "No address specified!"
-msgstr "Адрес сервера не указан!"
+msgstr "РђРґСЂРµСЃ СЃРµСЂРІРµСЂР° РЅРµ СѓРєР°Р·Р°РЅ!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1614
 msgid "Unknown protocol"
-msgstr "Неизвестный протокол"
+msgstr "РќРµРёР·РІРµСЃС‚РЅС‹Р№ РїСЂРѕС‚РѕРєРѕР»"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1614
 msgid "Please use the mtasa:// protocol!"
-msgstr "Пожалуйста, используйте протокол mtasa://"
+msgstr "РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РёСЃРїРѕР»СЊР·СѓР№С‚Рµ РїСЂРѕС‚РѕРєРѕР» mtasa://"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1623
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1682
 #: Client/mods/deathmatch/logic/CClientGame.cpp:673
 #: Client/mods/deathmatch/logic/CClientGame.cpp:765
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Неверное имя пользователя! Пожалуйста, откройте настройки и измените его!"
+msgstr "РќРµРІРµСЂРЅРѕРµ РёРјСЏ РїРѕР»СЊР·РѕРІР°С‚РµР»СЏ! РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РѕС‚РєСЂРѕР№С‚Рµ РЅР°СЃС‚СЂРѕР№РєРё Рё РёР·РјРµРЅРёС‚Рµ РµРіРѕ!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1708
 msgid "You have to select a server to connect to."
-msgstr "Выберите сервер для подключения."
+msgstr "Р’С‹Р±РµСЂРёС‚Рµ СЃРµСЂРІРµСЂ РґР»СЏ РїРѕРґРєР»СЋС‡РµРЅРёСЏ."
 
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:2225
 msgid "Problem with graphics driver"
-msgstr "Проблема с графическим драйвером"
+msgstr "РџСЂРѕР±Р»РµРјР° СЃ РіСЂР°С„РёС‡РµСЃРєРёРј РґСЂР°Р№РІРµСЂРѕРј"
 
 #: Client/game_sa/CSettingsSA.cpp:832
 msgid "Can't find valid screen resolution."
-msgstr "Невозможно подобрать подходящее разрешение экрана."
+msgstr "РќРµРІРѕР·РјРѕР¶РЅРѕ РїРѕРґРѕР±СЂР°С‚СЊ РїРѕРґС…РѕРґСЏС‰РµРµ СЂР°Р·СЂРµС€РµРЅРёРµ СЌРєСЂР°РЅР°."
 
 #. Confirm that res should be used
 #: Client/game_sa/CSettingsSA.cpp:908
 msgid "Are you sure you want to use this screen resolution?"
-msgstr "Вы уверены, что хотите использовать это разрешение экрана?"
+msgstr "Р’С‹ СѓРІРµСЂРµРЅС‹, С‡С‚Рѕ С…РѕС‚РёС‚Рµ РёСЃРїРѕР»СЊР·РѕРІР°С‚СЊ СЌС‚Рѕ СЂР°Р·СЂРµС€РµРЅРёРµ СЌРєСЂР°РЅР°?"
 
 #: Client/game_sa/CGameSA.cpp:257 Client/game_sa/CGameSA.cpp:268
 msgid "Failed initialization game_sa"
-msgstr "Неудачная инициализация game_sa"
+msgstr "РќРµСѓРґР°С‡РЅР°СЏ РёРЅРёС†РёР°Р»РёР·Р°С†РёСЏ game_sa"
 
 #: Client/game_sa/CGameSA.cpp:259
 msgid "Memory allocations failed"
-msgstr "Ошибка выделения памяти"
+msgstr "РћС€РёР±РєР° РІС‹РґРµР»РµРЅРёСЏ РїР°РјСЏС‚Рё"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
-msgstr "Запрос к сайту"
+msgstr "Р—Р°РїСЂРѕСЃ Рє СЃР°Р№С‚Сѓ"
 
 #: Client/cefweb/CWebsiteRequests.cpp:27
 msgid "The server requests the following websites in order to load them (later):"
-msgstr "Сервер делает запросы к следующим сайтам, для того чтобы загрузить их позднее:"
+msgstr "РЎРµСЂРІРµСЂ РґРµР»Р°РµС‚ Р·Р°РїСЂРѕСЃС‹ Рє СЃР»РµРґСѓСЋС‰РёРј СЃР°Р№С‚Р°Рј, РґР»СЏ С‚РѕРіРѕ С‡С‚РѕР±С‹ Р·Р°РіСЂСѓР·РёС‚СЊ РёС… РїРѕР·РґРЅРµРµ:"
 
 #: Client/cefweb/CWebsiteRequests.cpp:33
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "НЕ ВВОДИТЕ КОНФИДЕНЦИАЛЬНЫХ ДАННЫХ, ДАБЫ ЗАЩИТИТЬ ИХ ОТ КРАЖИ"
+msgstr "РќР• Р’Р’РћР”РРўР• РљРћРќР¤РР”Р•РќР¦РРђР›Р¬РќР«РҐ Р”РђРќРќР«РҐ, Р”РђР‘Р« Р—РђР©РРўРРўР¬ РРҐ РћРў РљР РђР–Р"
 
 #: Client/cefweb/CWebsiteRequests.cpp:46
 msgid "Remember decision"
-msgstr "Запомнить решение"
+msgstr "Р—Р°РїРѕРјРЅРёС‚СЊ СЂРµС€РµРЅРёРµ"
 
 #: Client/cefweb/CWebsiteRequests.cpp:57
 msgid "Deny"
-msgstr "Запретить"
+msgstr "Р—Р°РїСЂРµС‚РёС‚СЊ"
 
 #: Client/mods/deathmatch/CClient.cpp:38
 msgid "This version has expired."
-msgstr "Эта версия устарела."
+msgstr "Р­С‚Р° РІРµСЂСЃРёСЏ СѓСЃС‚Р°СЂРµР»Р°."
 
 #: Client/mods/deathmatch/CClient.cpp:58
 msgid "disconnect from the game"
-msgstr "отключение от игры"
+msgstr "РѕС‚РєР»СЋС‡РµРЅРёРµ РѕС‚ РёРіСЂС‹"
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the nametags"
-msgstr "показывать неймтеги"
+msgstr "РїРѕРєР°Р·С‹РІР°С‚СЊ РЅРµР№РјС‚РµРіРё"
 
 #: Client/mods/deathmatch/CClient.cpp:60
 msgid "shows the chatbox"
-msgstr "показать чат"
+msgstr "РїРѕРєР°Р·Р°С‚СЊ С‡Р°С‚"
 
 #: Client/mods/deathmatch/CClient.cpp:61
 msgid "shows the network statistics"
-msgstr "Показывать статистику соединения"
+msgstr "РџРѕРєР°Р·С‹РІР°С‚СЊ СЃС‚Р°С‚РёСЃС‚РёРєСѓ СЃРѕРµРґРёРЅРµРЅРёСЏ"
 
 #. Key commands (registered as 'mod commands', can be disabled)
 #: Client/mods/deathmatch/CClient.cpp:64
 msgid "open the chat input"
-msgstr "Открыть чат"
+msgstr "РћС‚РєСЂС‹С‚СЊ С‡Р°С‚"
 
 #: Client/mods/deathmatch/CClient.cpp:65
 msgid "transmits voice to other players"
-msgstr "Передавать голос всем игрокам"
+msgstr "РџРµСЂРµРґР°РІР°С‚СЊ РіРѕР»РѕСЃ РІСЃРµРј РёРіСЂРѕРєР°Рј"
 
 #: Client/mods/deathmatch/CClient.cpp:66
 msgid "enters a car as passenger"
-msgstr "Транспорт: Пассажир"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: РџР°СЃСЃР°Р¶РёСЂ"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "next radio channel"
-msgstr "След. радиостанция"
+msgstr "РЎР»РµРґ. СЂР°РґРёРѕСЃС‚Р°РЅС†РёСЏ"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "previous radio channel"
-msgstr "Пред. радиостанция"
+msgstr "РџСЂРµРґ. СЂР°РґРёРѕСЃС‚Р°РЅС†РёСЏ"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "enables the player-map view"
-msgstr "радар: Отобразить/Спрятать"
+msgstr "СЂР°РґР°СЂ: РћС‚РѕР±СЂР°Р·РёС‚СЊ/РЎРїСЂСЏС‚Р°С‚СЊ"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the player-map in"
-msgstr "увеличивает масштаб карты игрока в"
+msgstr "СѓРІРµР»РёС‡РёРІР°РµС‚ РјР°СЃС€С‚Р°Р± РєР°СЂС‚С‹ РёРіСЂРѕРєР° РІ"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "zooms the player-map out"
-msgstr "увеличивает масштаб карты игрока из"
+msgstr "СѓРІРµР»РёС‡РёРІР°РµС‚ РјР°СЃС€С‚Р°Р± РєР°СЂС‚С‹ РёРіСЂРѕРєР° РёР·"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map north"
-msgstr "перемещает карту игрока север"
+msgstr "РїРµСЂРµРјРµС‰Р°РµС‚ РєР°СЂС‚Сѓ РёРіСЂРѕРєР° СЃРµРІРµСЂ"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map south"
-msgstr "перемещает карту игрока на юг"
+msgstr "РїРµСЂРµРјРµС‰Р°РµС‚ РєР°СЂС‚Сѓ РёРіСЂРѕРєР° РЅР° СЋРі"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the player-map east"
-msgstr "перемещает карту игрока на восток"
+msgstr "РїРµСЂРµРјРµС‰Р°РµС‚ РєР°СЂС‚Сѓ РёРіСЂРѕРєР° РЅР° РІРѕСЃС‚РѕРє"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "moves the player-map west"
-msgstr "перемещает карту игрока на запад"
+msgstr "РїРµСЂРµРјРµС‰Р°РµС‚ РєР°СЂС‚Сѓ РёРіСЂРѕРєР° РЅР° Р·Р°РїР°Рґ"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "attaches the player-map"
-msgstr "прикрепляет карту игрока"
+msgstr "РїСЂРёРєСЂРµРїР»СЏРµС‚ РєР°СЂС‚Сѓ РёРіСЂРѕРєР°"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "reduces player-map opacity"
-msgstr "уменьшает непрозрачность карты игрока"
+msgstr "СѓРјРµРЅСЊС€Р°РµС‚ РЅРµРїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РєР°СЂС‚С‹ РёРіСЂРѕРєР°"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "increases player-map opacity"
-msgstr "увеличивает непрозрачность карты игрока"
+msgstr "СѓРІРµР»РёС‡РёРІР°РµС‚ РЅРµРїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ РєР°СЂС‚С‹ РёРіСЂРѕРєР°"
 
 #: Client/mods/deathmatch/CClient.cpp:79
 msgid "toggles player-map help text"
-msgstr "карта: Вкл/откл помощь"
+msgstr "РєР°СЂС‚Р°: Р’РєР»/РѕС‚РєР» РїРѕРјРѕС‰СЊ"
 
 #: Client/mods/deathmatch/CClient.cpp:80
 msgid "sends a message to the targetted player"
-msgstr "Сообщение выбранному игроку"
+msgstr "РЎРѕРѕР±С‰РµРЅРёРµ РІС‹Р±СЂР°РЅРЅРѕРјСѓ РёРіСЂРѕРєСѓ"
 
 #: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr "Транспорт: След. оружие"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: РЎР»РµРґ. РѕСЂСѓР¶РёРµ"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "Транспорт: Пред. оружие"
+msgstr "РўСЂР°РЅСЃРїРѕСЂС‚: РџСЂРµРґ. РѕСЂСѓР¶РёРµ"
 
 #: Client/mods/deathmatch/CClient.cpp:83
 msgid "outputs info about the current server"
-msgstr "Отобразить информацию о сервере"
+msgstr "РћС‚РѕР±СЂР°Р·РёС‚СЊ РёРЅС„РѕСЂРјР°С†РёСЋ Рѕ СЃРµСЂРІРµСЂРµ"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:86
 msgid "defines the scale multiplier of all text-displays"
-msgstr "Определение масштаба отображения текста"
+msgstr "РћРїСЂРµРґРµР»РµРЅРёРµ РјР°СЃС€С‚Р°Р±Р° РѕС‚РѕР±СЂР°Р¶РµРЅРёСЏ С‚РµРєСЃС‚Р°"
 
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) shows the colshapes"
-msgstr "(Режим разработки) показывать colshapes"
+msgstr "(Р РµР¶РёРј СЂР°Р·СЂР°Р±РѕС‚РєРё) РїРѕРєР°Р·С‹РІР°С‚СЊ colshapes"
 
 #: Client/mods/deathmatch/CClient.cpp:94
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Режим разработки) писать идентификаторы игровых звуков в окно отладчика"
+msgstr "(Р РµР¶РёРј СЂР°Р·СЂР°Р±РѕС‚РєРё) РїРёСЃР°С‚СЊ РёРґРµРЅС‚РёС„РёРєР°С‚РѕСЂС‹ РёРіСЂРѕРІС‹С… Р·РІСѓРєРѕРІ РІ РѕРєРЅРѕ РѕС‚Р»Р°РґС‡РёРєР°"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
-msgstr "СОЗДАТЬ СЕРВЕР"
+msgstr "РЎРћР—Р”РђРўР¬ РЎР•Р Р’Р•Р "
 
 #. m_pTabs->CreateTab ( "Gamemode" );
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:53
 msgid "Resources"
-msgstr "Ресурсы"
+msgstr "Р РµСЃСѓСЂСЃС‹"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:55
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:57
 msgid "Server name:"
-msgstr "Имя сервера:"
+msgstr "РРјСЏ СЃРµСЂРІРµСЂР°:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:64
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:66
 msgid "Password:"
-msgstr "Пароль:"
+msgstr "РџР°СЂРѕР»СЊ:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:73
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:75
 msgid "Max players:"
-msgstr "Макс. кол-во игроков:"
+msgstr "РњР°РєСЃ. РєРѕР»-РІРѕ РёРіСЂРѕРєРѕРІ:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:82
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:84
 msgid "Broadcast:"
-msgstr "Видимость в:"
+msgstr "Р’РёРґРёРјРѕСЃС‚СЊ РІ:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:86
 msgid "LAN"
-msgstr "Локальная сеть"
+msgstr "Р›РѕРєР°Р»СЊРЅР°СЏ СЃРµС‚СЊ"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:99
 msgid "Selected"
-msgstr "Выбрано"
+msgstr "Р’С‹Р±СЂР°РЅРѕ"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:116
 msgid "All"
-msgstr "Всё"
+msgstr "Р’СЃС‘"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:118
 msgid "Start"
-msgstr "Запустить"
+msgstr "Р—Р°РїСѓСЃС‚РёС‚СЊ"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
 msgid "Change mode: %s"
-msgstr "Изменить режим: %s"
+msgstr "РР·РјРµРЅРёС‚СЊ СЂРµР¶РёРј: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr "Масштаб: %s /%s  Перемещение: %s, %s, %s, %s Непрозрачность: %s/%s"
+msgstr "РњР°СЃС€С‚Р°Р±: %s /%s  РџРµСЂРµРјРµС‰РµРЅРёРµ: %s, %s, %s, %s РќРµРїСЂРѕР·СЂР°С‡РЅРѕСЃС‚СЊ: %s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr "Переключить карту: %s Переключить текст помощи: %s"
+msgstr "РџРµСЂРµРєР»СЋС‡РёС‚СЊ РєР°СЂС‚Сѓ: %s РџРµСЂРµРєР»СЋС‡РёС‚СЊ С‚РµРєСЃС‚ РїРѕРјРѕС‰Рё: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
 msgid "Following Player"
-msgstr "Следующий игрок"
+msgstr "РЎР»РµРґСѓСЋС‰РёР№ РёРіСЂРѕРє"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
-msgstr "Свободное передвижение"
+msgstr "РЎРІРѕР±РѕРґРЅРѕРµ РїРµСЂРµРґРІРёР¶РµРЅРёРµ"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
-msgstr "Прогресс загрузки карты:"
+msgstr "РџСЂРѕРіСЂРµСЃСЃ Р·Р°РіСЂСѓР·РєРё РєР°СЂС‚С‹:"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:28
 msgid "Download Progress:"
-msgstr "Прогресс загрузки:"
+msgstr "РџСЂРѕРіСЂРµСЃСЃ Р·Р°РіСЂСѓР·РєРё:"
 
 #. Find our largest piece of text, so we can size accordingly
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:42
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:105
 #, c-format
 msgid "%s of %s"
-msgstr "%s из %s"
+msgstr "%s РёР· %s"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:44
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:65
 msgid "Disconnect to cancel download"
-msgstr "Отключитесь, чтобы остановить загрузку"
+msgstr "РћС‚РєР»СЋС‡РёС‚РµСЃСЊ, С‡С‚РѕР±С‹ РѕСЃС‚Р°РЅРѕРІРёС‚СЊ Р·Р°РіСЂСѓР·РєСѓ"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:503
 msgid "Disconnected: Invalid nickname"
-msgstr "Отключение: неверный никнейм."
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: РЅРµРІРµСЂРЅС‹Р№ РЅРёРєРЅРµР№Рј."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
 msgid "Disconnect from server"
-msgstr "Отключение от сервера"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ РѕС‚ СЃРµСЂРІРµСЂР°"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:511
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
-msgstr "Отключение: Серийный номер заблокирован. \n"
-"Причина: %s"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: РЎРµСЂРёР№РЅС‹Р№ РЅРѕРјРµСЂ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ. \n"
+"РџСЂРёС‡РёРЅР°: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
-msgstr "Отключение: Вы забанены. \n"
-"Причина: %s"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: Р’С‹ Р·Р°Р±Р°РЅРµРЅС‹. \n"
+"РџСЂРёС‡РёРЅР°: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:523
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
-msgstr "Отключение: Аккаунт заблокирован. \n"
-"Причина: %s"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: РђРєРєР°СѓРЅС‚ Р·Р°Р±Р»РѕРєРёСЂРѕРІР°РЅ. \n"
+"РџСЂРёС‡РёРЅР°: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
 msgid "Disconnected: Version mismatch"
-msgstr "Отключение: Версии не совпадают"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: Р’РµСЂСЃРёРё РЅРµ СЃРѕРІРїР°РґР°СЋС‚"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "Отключение: Флуд подключениями. Подождите минуту перед новой попыткой."
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: Р¤Р»СѓРґ РїРѕРґРєР»СЋС‡РµРЅРёСЏРјРё. РџРѕРґРѕР¶РґРёС‚Рµ РјРёРЅСѓС‚Сѓ РїРµСЂРµРґ РЅРѕРІРѕР№ РїРѕРїС‹С‚РєРѕР№."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:536
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
-msgstr "Отключение: Сервер другой версии.\n"
-"Информация: %s"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: РЎРµСЂРІРµСЂ РґСЂСѓРіРѕР№ РІРµСЂСЃРёРё.\n"
+"РРЅС„РѕСЂРјР°С†РёСЏ: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
-msgstr "Отключение: Неподходящая версия.\n"
-"Информация: %s"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: РќРµРїРѕРґС…РѕРґСЏС‰Р°СЏ РІРµСЂСЃРёСЏ.\n"
+"РРЅС„РѕСЂРјР°С†РёСЏ: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:546
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
-msgstr "Отсоединен: Сервер работает на более новой версии.\n"
-"Информация: %s"
+msgstr "РћС‚СЃРѕРµРґРёРЅРµРЅ: РЎРµСЂРІРµСЂ СЂР°Р±РѕС‚Р°РµС‚ РЅР° Р±РѕР»РµРµ РЅРѕРІРѕР№ РІРµСЂСЃРёРё.\n"
+"РРЅС„РѕСЂРјР°С†РёСЏ: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:551
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
-msgstr "Отсоединен: Сервер работает на более старой версии.\n"
-"Информация: %s"
+msgstr "РћС‚СЃРѕРµРґРёРЅРµРЅ: РЎРµСЂРІРµСЂ СЂР°Р±РѕС‚Р°РµС‚ РЅР° Р±РѕР»РµРµ СЃС‚Р°СЂРѕР№ РІРµСЂСЃРёРё.\n"
+"РРЅС„РѕСЂРјР°С†РёСЏ: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:556
 msgid "Disconnected: Nick already in use"
-msgstr "Отключение: Такой никнейм уже используется"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: РўР°РєРѕР№ РЅРёРєРЅРµР№Рј СѓР¶Рµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:560
 msgid "Disconnected: Player element could not be created."
-msgstr "Отключение: \"Элемент\" игрок не может быть создан."
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: \"Р­Р»РµРјРµРЅС‚\" РёРіСЂРѕРє РЅРµ РјРѕР¶РµС‚ Р±С‹С‚СЊ СЃРѕР·РґР°РЅ."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:564
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
-msgstr "Отключение: Сервер сбросил подключение: %s"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: РЎРµСЂРІРµСЂ СЃР±СЂРѕСЃРёР» РїРѕРґРєР»СЋС‡РµРЅРёРµ: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:569
 msgid "Disconnected: Serial verification failed"
-msgstr "Отключение: не удалась проверка серийного ключа."
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: РЅРµ СѓРґР°Р»Р°СЃСЊ РїСЂРѕРІРµСЂРєР° СЃРµСЂРёР№РЅРѕРіРѕ РєР»СЋС‡Р°."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:573
 msgid "Disconnected: Serial already in use"
-msgstr "Отключено: Серийный номер уже используется"
+msgstr "РћС‚РєР»СЋС‡РµРЅРѕ: РЎРµСЂРёР№РЅС‹Р№ РЅРѕРјРµСЂ СѓР¶Рµ РёСЃРїРѕР»СЊР·СѓРµС‚СЃСЏ"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:577
 #, c-format
 msgid "Disconnected: Connection desync %s"
-msgstr "Отключение: подключение десинхронизировано %s"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: РїРѕРґРєР»СЋС‡РµРЅРёРµ РґРµСЃРёРЅС…СЂРѕРЅРёР·РёСЂРѕРІР°РЅРѕ %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:586
 #, c-format
 msgid "Disconnected: You were kicked by %s"
-msgstr "Отключение: %s кикнул вас"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: %s РєРёРєРЅСѓР» РІР°СЃ"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:591
 #, c-format
 msgid "Disconnected: You were banned by %s"
-msgstr "Отключение: %s заблокировал вас"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: %s Р·Р°Р±Р»РѕРєРёСЂРѕРІР°Р» РІР°СЃ"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
 msgid "Disconnected: Server shutdown or restarting"
-msgstr "Отключено: Сервер выключен или перезапущен"
+msgstr "РћС‚РєР»СЋС‡РµРЅРѕ: РЎРµСЂРІРµСЂ РІС‹РєР»СЋС‡РµРЅ РёР»Рё РїРµСЂРµР·Р°РїСѓС‰РµРЅ"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
 msgid "You were kicked from the game"
-msgstr "Вас кикнули с сервера"
+msgstr "Р’Р°СЃ РєРёРєРЅСѓР»Рё СЃ СЃРµСЂРІРµСЂР°"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "Этот сервер требует не изменённый gta_sa.exe"
+msgstr "Р­С‚РѕС‚ СЃРµСЂРІРµСЂ С‚СЂРµР±СѓРµС‚ РЅРµ РёР·РјРµРЅС‘РЅРЅС‹Р№ gta_sa.exe"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
 msgid "Please replace gta_sa.exe"
-msgstr "Пожалуйста, замените gta_sa.exe"
+msgstr "РџРѕР¶Р°Р»СѓР№СЃС‚Р°, Р·Р°РјРµРЅРёС‚Рµ gta_sa.exe"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr "Этот сервер не разрешает собственные D3D9.DLL"
+msgstr "Р­С‚РѕС‚ СЃРµСЂРІРµСЂ РЅРµ СЂР°Р·СЂРµС€Р°РµС‚ СЃРѕР±СЃС‚РІРµРЅРЅС‹Рµ D3D9.DLL"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "Удалите D3D9.DLL из директории GTA и перезапустите MTA"
+msgstr "РЈРґР°Р»РёС‚Рµ D3D9.DLL РёР· РґРёСЂРµРєС‚РѕСЂРёРё GTA Рё РїРµСЂРµР·Р°РїСѓСЃС‚РёС‚Рµ MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
 msgid "This server does not allow virtual machines"
-msgstr "Этот сервер не разрешает виртуальные машины"
+msgstr "Р­С‚РѕС‚ СЃРµСЂРІРµСЂ РЅРµ СЂР°Р·СЂРµС€Р°РµС‚ РІРёСЂС‚СѓР°Р»СЊРЅС‹Рµ РјР°С€РёРЅС‹"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server requires driver signing to be enabled"
-msgstr "Этот сервер требует, чтобы подпись драйверов была включена"
+msgstr "Р­С‚РѕС‚ СЃРµСЂРІРµСЂ С‚СЂРµР±СѓРµС‚, С‡С‚РѕР±С‹ РїРѕРґРїРёСЃСЊ РґСЂР°Р№РІРµСЂРѕРІ Р±С‹Р»Р° РІРєР»СЋС‡РµРЅР°"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 msgid "Please restart your PC"
-msgstr "Пожалуйста, перезапустите ваш компьютер"
+msgstr "РџРѕР¶Р°Р»СѓР№СЃС‚Р°, РїРµСЂРµР·Р°РїСѓСЃС‚РёС‚Рµ РІР°С€ РєРѕРјРїСЊСЋС‚РµСЂ"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server has detected missing anti-cheat components"
-msgstr "Этот сервер обнаружил отсутствующие компоненты анти-чита"
+msgstr "Р­С‚РѕС‚ СЃРµСЂРІРµСЂ РѕР±РЅР°СЂСѓР¶РёР» РѕС‚СЃСѓС‚СЃС‚РІСѓСЋС‰РёРµ РєРѕРјРїРѕРЅРµРЅС‚С‹ Р°РЅС‚Рё-С‡РёС‚Р°"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Try restarting MTA"
-msgstr "Попробуйте перезапустить MTA"
+msgstr "РџРѕРїСЂРѕР±СѓР№С‚Рµ РїРµСЂРµР·Р°РїСѓСЃС‚РёС‚СЊ MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "Этот сервер требует не изменённый gta3.img и gta_int.img"
+msgstr "Р­С‚РѕС‚ СЃРµСЂРІРµСЂ С‚СЂРµР±СѓРµС‚ РЅРµ РёР·РјРµРЅС‘РЅРЅС‹Р№ gta3.img Рё gta_int.img"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
 msgid "Please replace gta3.img or gta_int.img"
-msgstr "Пожалуйста, замените gta3.img или gta_int.img"
+msgstr "РџРѕР¶Р°Р»СѓР№СЃС‚Р°, Р·Р°РјРµРЅРёС‚Рµ gta3.img РёР»Рё gta_int.img"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:636
 msgid "This server does not allow Wine"
-msgstr "Этот сервер не разрешает Wine"
+msgstr "Р­С‚РѕС‚ СЃРµСЂРІРµСЂ РЅРµ СЂР°Р·СЂРµС€Р°РµС‚ Wine"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:637
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr "Убедитесь, что никакая другая программа не изменяет MTA:SA"
+msgstr "РЈР±РµРґРёС‚РµСЃСЊ, С‡С‚Рѕ РЅРёРєР°РєР°СЏ РґСЂСѓРіР°СЏ РїСЂРѕРіСЂР°РјРјР° РЅРµ РёР·РјРµРЅСЏРµС‚ MTA:SA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
 msgid "Time Remaining: "
-msgstr "Оставшееся время: "
+msgstr "РћСЃС‚Р°РІС€РµРµСЃСЏ РІСЂРµРјСЏ: "
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%d день"
-msgstr[1] "%d дня"
-msgstr[2] "%d дней"
-msgstr[3] "%d дней"
+msgstr[0] "%d РґРµРЅСЊ"
+msgstr[1] "%d РґРЅСЏ"
+msgstr[2] "%d РґРЅРµР№"
+msgstr[3] "%d РґРЅРµР№"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] "%d час"
-msgstr[1] "%d часа"
-msgstr[2] "%d часов"
-msgstr[3] "%d часа"
+msgstr[0] "%d С‡Р°СЃ"
+msgstr[1] "%d С‡Р°СЃР°"
+msgstr[2] "%d С‡Р°СЃРѕРІ"
+msgstr[3] "%d С‡Р°СЃР°"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d минут"
-msgstr[1] "%d минута"
-msgstr[2] "%d минуты"
-msgstr[3] "%d мин"
+msgstr[0] "%d РјРёРЅСѓС‚"
+msgstr[1] "%d РјРёРЅСѓС‚Р°"
+msgstr[2] "%d РјРёРЅСѓС‚С‹"
+msgstr[3] "%dВ РјРёРЅ"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:667
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] "%d секунд"
-msgstr[1] "%d секунда"
-msgstr[2] "%d секунды"
-msgstr[3] "%d секунды"
+msgstr[0] "%d СЃРµРєСѓРЅРґ"
+msgstr[1] "%d СЃРµРєСѓРЅРґР°"
+msgstr[2] "%d СЃРµРєСѓРЅРґС‹"
+msgstr[3] "%d СЃРµРєСѓРЅРґС‹"
 
 #. Display the error
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:671
 msgid "Disconnected"
-msgstr "Отключение"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Flying a UFO around"
-msgstr "Летает на НЛО вокруг"
+msgstr "Р›РµС‚Р°РµС‚ РЅР° РќР›Рћ РІРѕРєСЂСѓРі"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Cruising around"
-msgstr "Путешествует вокруг"
+msgstr "РџСѓС‚РµС€РµСЃС‚РІСѓРµС‚ РІРѕРєСЂСѓРі"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Riding the waves of"
-msgstr "Плавает по волнам в"
+msgstr "РџР»Р°РІР°РµС‚ РїРѕ РІРѕР»РЅР°Рј РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Riding the train in"
-msgstr "Ездит на поезде в"
+msgstr "Р•Р·РґРёС‚ РЅР° РїРѕРµР·РґРµ РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Flying around"
-msgstr "Летает вокруг"
+msgstr "Р›РµС‚Р°РµС‚ РІРѕРєСЂСѓРі"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Riding around"
-msgstr "Ездит вокруг"
+msgstr "Р•Р·РґРёС‚ РІРѕРєСЂСѓРі"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Monster truckin' around"
-msgstr "Крушит все вокруг"
+msgstr "РљСЂСѓС€РёС‚ РІСЃРµ РІРѕРєСЂСѓРі"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Quaddin' around"
-msgstr "Катаюсь на квадроциклах по округе"
+msgstr "РљР°С‚Р°СЋСЃСЊ РЅР° РєРІР°РґСЂРѕС†РёРєР»Р°С… РїРѕ РѕРєСЂСѓРіРµ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Bunny hopping around"
-msgstr "Кролик прыгает вокруг"
+msgstr "РљСЂРѕР»РёРє РїСЂС‹РіР°РµС‚ РІРѕРєСЂСѓРі"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Doing weird stuff in"
-msgstr "Творит странные вещи в"
+msgstr "РўРІРѕСЂРёС‚ СЃС‚СЂР°РЅРЅС‹Рµ РІРµС‰Рё РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Climbing around in"
-msgstr "Взбирается рядом с"
+msgstr "Р’Р·Р±РёСЂР°РµС‚СЃСЏ СЂСЏРґРѕРј СЃ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:396
 #: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Doing a drive-by in"
-msgstr "Давит кого-то в"
+msgstr "Р”Р°РІРёС‚ РєРѕРіРѕ-С‚Рѕ РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Blub blub..."
-msgstr "Рыдания, рыдания..."
+msgstr "Р С‹РґР°РЅРёСЏ, СЂС‹РґР°РЅРёСЏ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Breathing water"
-msgstr "Дышит водой"
+msgstr "Р”С‹С€РёС‚ РІРѕРґРѕР№"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Drowning in"
-msgstr "Тонет в"
+msgstr "РўРѕРЅРµС‚ РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:401
 msgid "Ducking for cover in"
-msgstr "Ищет укрытие в"
+msgstr "РС‰РµС‚ СѓРєСЂС‹С‚РёРµ РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:402
 msgid "Fighting in"
-msgstr "Летает в"
+msgstr "Р›РµС‚Р°РµС‚ РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:403
 msgid "Throwing fists in"
-msgstr "Машет кулаками в"
+msgstr "РњР°С€РµС‚ РєСѓР»Р°РєР°РјРё РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:404
 msgid "Blastin' fools in"
-msgstr "Взрывает дураков в"
+msgstr "Р’Р·СЂС‹РІР°РµС‚ РґСѓСЂР°РєРѕРІ РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:405
 msgid "Shooting up"
-msgstr "Стреляет вверх"
+msgstr "РЎС‚СЂРµР»СЏРµС‚ РІРІРµСЂС…"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:406
 msgid "Jetpacking in"
-msgstr "Реактивный ранец в"
+msgstr "Р РµР°РєС‚РёРІРЅС‹Р№ СЂР°РЅРµС† РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:407
 msgid "Literally on fire in"
-msgstr "Буквально горит в"
+msgstr "Р‘СѓРєРІР°Р»СЊРЅРѕ РіРѕСЂРёС‚ РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:408
 msgid "Burning up in"
-msgstr "Сгорает в"
+msgstr "РЎРіРѕСЂР°РµС‚ РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:409
 msgid "Swimming in"
-msgstr "Плавает в"
+msgstr "РџР»Р°РІР°РµС‚ РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:410
 msgid "Floating around in"
-msgstr "Плавает вокруг"
+msgstr "РџР»Р°РІР°РµС‚ РІРѕРєСЂСѓРі"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:411
 msgid "Being chased by a shark"
-msgstr "Преследуется акулой"
+msgstr "РџСЂРµСЃР»РµРґСѓРµС‚СЃСЏ Р°РєСѓР»РѕР№"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:412
 msgid "Choking to death in"
-msgstr "Задыхается до смерти в"
+msgstr "Р—Р°РґС‹С…Р°РµС‚СЃСЏ РґРѕ СЃРјРµСЂС‚Рё РІ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
 msgid "Entering the game ..."
-msgstr "Подключение к серверу ..."
+msgstr "РџРѕРґРєР»СЋС‡РµРЅРёРµ Рє СЃРµСЂРІРµСЂСѓ ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:741
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Не подключен; пожалуйста, используйте ПОДКЛЮЧЕНИЕ или команду 'connect', чтобы зайти на сервер."
+msgstr "РќРµ РїРѕРґРєР»СЋС‡РµРЅ; РїРѕР¶Р°Р»СѓР№СЃС‚Р°, РёСЃРїРѕР»СЊР·СѓР№С‚Рµ РџРћР”РљР›Р®Р§Р•РќРР• РёР»Рё РєРѕРјР°РЅРґСѓ 'connect', С‡С‚РѕР±С‹ Р·Р°Р№С‚Рё РЅР° СЃРµСЂРІРµСЂ."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:787
 msgid "Could not start the local server. See console for details."
-msgstr "Невозможно запустить локальный сервер. Проверьте окно консоли на наличие информации."
+msgstr "РќРµРІРѕР·РјРѕР¶РЅРѕ Р·Р°РїСѓСЃС‚РёС‚СЊ Р»РѕРєР°Р»СЊРЅС‹Р№ СЃРµСЂРІРµСЂ. РџСЂРѕРІРµСЂСЊС‚Рµ РѕРєРЅРѕ РєРѕРЅСЃРѕР»Рё РЅР° РЅР°Р»РёС‡РёРµ РёРЅС„РѕСЂРјР°С†РёРё."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:797
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1268
 msgid "Local Server"
-msgstr "Локальный Сервер"
+msgstr "Р›РѕРєР°Р»СЊРЅС‹Р№ РЎРµСЂРІРµСЂ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:797
 msgid "Starting local server ..."
-msgstr "Запуск локального сервера ..."
+msgstr "Р—Р°РїСѓСЃРє Р»РѕРєР°Р»СЊРЅРѕРіРѕ СЃРµСЂРІРµСЂР° ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1045
 msgid "Area 51"
-msgstr "Зона 51"
+msgstr "Р—РѕРЅР° 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1054
 msgid "Walking around "
-msgstr "Ходит вокруг "
+msgstr "РҐРѕРґРёС‚ РІРѕРєСЂСѓРі "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1199
 #, c-format
 msgid "You were kicked from the game ( %s )"
-msgstr "Вас кикнули с сервера ( %s )"
+msgstr "Р’Р°СЃ РєРёРєРЅСѓР»Рё СЃ СЃРµСЂРІРµСЂР° ( %s )"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1268
 msgid "Connecting to local server..."
-msgstr "Соединение с локальным сервером..."
+msgstr "РЎРѕРµРґРёРЅРµРЅРёРµ СЃ Р»РѕРєР°Р»СЊРЅС‹Рј СЃРµСЂРІРµСЂРѕРј..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1279
 msgid "Error connecting to server."
-msgstr "Ошибка подключения к серверу."
+msgstr "РћС€РёР±РєР° РїРѕРґРєР»СЋС‡РµРЅРёСЏ Рє СЃРµСЂРІРµСЂСѓ."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1289
 msgid "Connecting to local server timed out. See console for details."
-msgstr "Время подключение к локальному серверу истекло. Откройте консоль, чтобы узнать подробности."
+msgstr "Р’СЂРµРјСЏ РїРѕРґРєР»СЋС‡РµРЅРёРµ Рє Р»РѕРєР°Р»СЊРЅРѕРјСѓ СЃРµСЂРІРµСЂСѓ РёСЃС‚РµРєР»Рѕ. РћС‚РєСЂРѕР№С‚Рµ РєРѕРЅСЃРѕР»СЊ, С‡С‚РѕР±С‹ СѓР·РЅР°С‚СЊ РїРѕРґСЂРѕР±РЅРѕСЃС‚Рё."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1395
 msgid "Connection with the server was lost"
-msgstr "Соединение с сервером потеряно"
+msgstr "РЎРѕРµРґРёРЅРµРЅРёРµ СЃ СЃРµСЂРІРµСЂРѕРј РїРѕС‚РµСЂСЏРЅРѕ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1422
 msgid "Disconnected: the server is currently full"
-msgstr "Отключение: сервер переполнен."
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: СЃРµСЂРІРµСЂ РїРµСЂРµРїРѕР»РЅРµРЅ."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1434
 msgid "Disconnected: invalid password specified"
-msgstr "Отключение: неверный пароль"
+msgstr "РћС‚РєР»СЋС‡РµРЅРёРµ: РЅРµРІРµСЂРЅС‹Р№ РїР°СЂРѕР»СЊ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1456
 msgid "MTA Client verification failed!"
-msgstr "Проверка клиента MTA не удалась!"
+msgstr "РџСЂРѕРІРµСЂРєР° РєР»РёРµРЅС‚Р° MTA РЅРµ СѓРґР°Р»Р°СЃСЊ!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "In a ditch"
-msgstr "в канаве"
+msgstr "РІ РєР°РЅР°РІРµ"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "En-route to hospital"
-msgstr "В пути до больницы"
+msgstr "Р’ РїСѓС‚Рё РґРѕ Р±РѕР»СЊРЅРёС†С‹"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "Meeting their maker"
-msgstr "Встреча с создателем"
+msgstr "Р’СЃС‚СЂРµС‡Р° СЃ СЃРѕР·РґР°С‚РµР»РµРј"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "Regretting their decisions"
-msgstr "Сожалеет о своих решениях"
+msgstr "РЎРѕР¶Р°Р»РµРµС‚ Рѕ СЃРІРѕРёС… СЂРµС€РµРЅРёСЏС…"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "Wasted"
-msgstr "Потрачено"
+msgstr "РџРѕС‚СЂР°С‡РµРЅРѕ"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
 #, c-format
 msgid "Download error: %s"
-msgstr "Ошибка скачивания: %s"
+msgstr "РћС€РёР±РєР° СЃРєР°С‡РёРІР°РЅРёСЏ: %s"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr "Неустранимая ошибка (%u). Если проблема сохранится, пожалуйста, проверьте multitheftauto.com для поддержки."
+msgstr "РќРµСѓСЃС‚СЂР°РЅРёРјР°СЏ РѕС€РёР±РєР° (%u). Р•СЃР»Рё РїСЂРѕР±Р»РµРјР° СЃРѕС…СЂР°РЅРёС‚СЃСЏ, РїРѕР¶Р°Р»СѓР№СЃС‚Р°, РїСЂРѕРІРµСЂСЊС‚Рµ multitheftauto.com РґР»СЏ РїРѕРґРґРµСЂР¶РєРё."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3428,19 +3477,19 @@ msgstr "Неустранимая ошибка (%u). Если проблема с
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr "Ошибка протокола (%u). Если проблема сохранится, пожалуйста, проверьте multitheftauto.com для поддержки."
+msgstr "РћС€РёР±РєР° РїСЂРѕС‚РѕРєРѕР»Р° (%u). Р•СЃР»Рё РїСЂРѕР±Р»РµРјР° СЃРѕС…СЂР°РЅРёС‚СЃСЏ, РїРѕР¶Р°Р»СѓР№СЃС‚Р°, РїСЂРѕРІРµСЂСЊС‚Рµ multitheftauto.com РґР»СЏ РїРѕРґРґРµСЂР¶РєРё."
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
-msgstr "Ошибка соединения"
+msgstr "РћС€РёР±РєР° СЃРѕРµРґРёРЅРµРЅРёСЏ"
 
 #: Shared/sdk/SharedUtil.Misc.hpp:381
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr "Multi Theft Auto установлена неправильно, пожалуйста, переустановите."
+msgstr "Multi Theft Auto СѓСЃС‚Р°РЅРѕРІР»РµРЅР° РЅРµРїСЂР°РІРёР»СЊРЅРѕ, РїРѕР¶Р°Р»СѓР№СЃС‚Р°, РїРµСЂРµСѓСЃС‚Р°РЅРѕРІРёС‚Рµ."
 
 #: Shared/sdk/SharedUtil.Misc.hpp:1476
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
-msgstr "Посетите веб-страницу, чтобы получить больше информации.\n\n"
-"(если страница не грузится, нажмите ctrl+v для вставки ссылки в браузер)"
+msgstr "РџРѕСЃРµС‚РёС‚Рµ РІРµР±-СЃС‚СЂР°РЅРёС†Сѓ, С‡С‚РѕР±С‹ РїРѕР»СѓС‡РёС‚СЊ Р±РѕР»СЊС€Рµ РёРЅС„РѕСЂРјР°С†РёРё.\n\n"
+"(РµСЃР»Рё СЃС‚СЂР°РЅРёС†Р° РЅРµ РіСЂСѓР·РёС‚СЃСЏ, РЅР°Р¶РјРёС‚Рµ ctrl+v РґР»СЏ РІСЃС‚Р°РІРєРё СЃСЃС‹Р»РєРё РІ Р±СЂР°СѓР·РµСЂ)"
 

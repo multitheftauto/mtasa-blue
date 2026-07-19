@@ -1,4 +1,4 @@
-msgid ""
+﻿msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
@@ -239,7 +239,7 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:381
 msgid "Error"
-msgstr "შეცდომა"
+msgstr "бѓЁбѓ”бѓЄбѓ“бѓќбѓ›бѓђ"
 
 #: Client/loader/MainFunctions.cpp:1155
 msgid "Another instance of MTA is already running.\n\n"
@@ -434,7 +434,7 @@ msgstr ""
 #: Client/loader/CInstallManager.cpp:1584 Client/core/CCore.cpp:846
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA ვერ გაგრძელდება, რადგან %s დისკზე არ არის საკმარისი სივრცე."
+msgstr "MTA:SA бѓ•бѓ”бѓ  бѓ’бѓђбѓ’бѓ бѓ«бѓ”бѓљбѓ“бѓ”бѓ‘бѓђ, бѓ бѓђбѓ“бѓ’бѓђбѓњ %s бѓ“бѓбѓЎбѓ™бѓ–бѓ” бѓђбѓ  бѓђбѓ бѓбѓЎ бѓЎбѓђбѓ™бѓ›бѓђбѓ бѓбѓЎбѓ бѓЎбѓбѓ•бѓ бѓЄбѓ”."
 
 #: Client/loader/CInstallManager.cpp:1640
 msgid "Missing file:"
@@ -468,7 +468,7 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 #: Client/gui/CGUIMessageBox_Impl.cpp:72
 msgid "Yes"
-msgstr "დიახ"
+msgstr "бѓ“бѓбѓђбѓ®"
 
 #: Client/loader/Dialogs.cpp:64 Client/core/CVersionUpdater.cpp:1634
 #: Client/core/CVersionUpdater.cpp:1652 Client/core/CVersionUpdater.cpp:1921
@@ -479,7 +479,7 @@ msgstr "დიახ"
 #: Client/core/CMainMenu.cpp:1237 Client/core/CQuestionBox.cpp:194
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 msgid "No"
-msgstr "არა"
+msgstr "бѓђбѓ бѓђ"
 
 #. Create buttons
 #. OK button
@@ -501,7 +501,7 @@ msgstr ""
 #: Client/loader/Dialogs.cpp:67
 #: Client/core/ServerBrowser/CServerBrowser.cpp:717
 msgid "Help"
-msgstr "დახმარება"
+msgstr "бѓ“бѓђбѓ®бѓ›бѓђбѓ бѓ”бѓ‘бѓђ"
 
 #. Cancel button
 #: Client/loader/Dialogs.cpp:68 Client/core/CVersionUpdater.cpp:1853
@@ -510,7 +510,7 @@ msgstr "დახმარება"
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
-msgstr "გაუქმება"
+msgstr "бѓ’бѓђбѓЈбѓҐбѓ›бѓ”бѓ‘бѓђ"
 
 #: Client/loader/Dialogs.cpp:83
 msgid "MTA: San Andreas has encountered a problem"
@@ -667,7 +667,7 @@ msgstr ""
 #: Client/core/CConnectManager.cpp:153
 #, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "უკავშირდება სერვერს %s:%u ..."
+msgstr "бѓЈбѓ™бѓђбѓ•бѓЁбѓбѓ бѓ“бѓ”бѓ‘бѓђ бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓЎ %s:%u ..."
 
 #: Client/core/CConnectManager.cpp:155
 #, c-format
@@ -678,61 +678,61 @@ msgstr ""
 #: Client/core/CConnectManager.cpp:156
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
 msgid "CONNECTING"
-msgstr "დაკავშირება"
+msgstr "бѓ“бѓђбѓ™бѓђбѓ•бѓЁбѓбѓ бѓ”бѓ‘бѓђ"
 
 #: Client/core/CConnectManager.cpp:271
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1358
 msgid "Connection timed out"
-msgstr "კავშირის დრო ამოიწურა"
+msgstr "бѓ™бѓђбѓ•бѓЁбѓбѓ бѓбѓЎ бѓ“бѓ бѓќ бѓђбѓ›бѓќбѓбѓ¬бѓЈбѓ бѓђ"
 
 #: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1406
 msgid "Disconnected: unknown protocol error"
-msgstr "კავშირი გაწყვეტილია: უცნობი პროტოკოლი"
+msgstr "бѓ™бѓђбѓ•бѓЁбѓбѓ бѓ бѓ’бѓђбѓ¬бѓ§бѓ•бѓ”бѓўбѓбѓљбѓбѓђ: бѓЈбѓЄбѓњбѓќбѓ‘бѓ бѓћбѓ бѓќбѓўбѓќбѓ™бѓќбѓљбѓ"
 
 #: Client/core/CConnectManager.cpp:293
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1410
 msgid "Disconnected: disconnected remotely"
-msgstr "კავშირი გაწყვეტილია: გათიშულია დისტანციურათ"
+msgstr "бѓ™бѓђбѓ•бѓЁбѓбѓ бѓ бѓ’бѓђбѓ¬бѓ§бѓ•бѓ”бѓўбѓбѓљбѓбѓђ: бѓ’бѓђбѓ—бѓбѓЁбѓЈбѓљбѓбѓђ бѓ“бѓбѓЎбѓўбѓђбѓњбѓЄбѓбѓЈбѓ бѓђбѓ—"
 
 #: Client/core/CConnectManager.cpp:297
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1414
 msgid "Disconnected: connection lost remotely"
-msgstr "კავშირი გაწყვეტილია: კავშირი დაიკარგა დისტანციურად"
+msgstr "бѓ™бѓђбѓ•бѓЁбѓбѓ бѓ бѓ’бѓђбѓ¬бѓ§бѓ•бѓ”бѓўбѓбѓљбѓбѓђ: бѓ™бѓђбѓ•бѓЁбѓбѓ бѓ бѓ“бѓђбѓбѓ™бѓђбѓ бѓ’бѓђ бѓ“бѓбѓЎбѓўбѓђбѓњбѓЄбѓбѓЈбѓ бѓђбѓ“"
 
 #: Client/core/CConnectManager.cpp:301
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1418
 msgid "Disconnected: you are banned from this server"
-msgstr "კავშირი გაწყვეტილია: თქვენ გადევთ ბანი აღნიშნულ სერვერზე"
+msgstr "бѓ™бѓђбѓ•бѓЁбѓбѓ бѓ бѓ’бѓђбѓ¬бѓ§бѓ•бѓ”бѓўбѓбѓљбѓбѓђ: бѓ—бѓҐбѓ•бѓ”бѓњ бѓ’бѓђбѓ“бѓ”бѓ•бѓ— бѓ‘бѓђбѓњбѓ бѓђбѓ¦бѓњбѓбѓЁбѓњбѓЈбѓљ бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓ–бѓ”"
 
 #: Client/core/CConnectManager.cpp:308
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1426
 msgid "Disconnected: disconnected from the server"
-msgstr "კავშირი გაწყვეტილია: კავშირი გაწყვეტილია სერვერთან"
+msgstr "бѓ™бѓђбѓ•бѓЁбѓбѓ бѓ бѓ’бѓђбѓ¬бѓ§бѓ•бѓ”бѓўбѓбѓљбѓбѓђ: бѓ™бѓђбѓ•бѓЁбѓбѓ бѓ бѓ’бѓђбѓ¬бѓ§бѓ•бѓ”бѓўбѓбѓљбѓбѓђ бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓ—бѓђбѓњ"
 
 #: Client/core/CConnectManager.cpp:312
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1430
 msgid "Disconnected: connection to the server was lost"
-msgstr "კავშირი გაწყვეტილია: თქვენ დაკარგეტ კონტაქტი სერვერთან"
+msgstr "бѓ™бѓђбѓ•бѓЁбѓбѓ бѓ бѓ’бѓђбѓ¬бѓ§бѓ•бѓ”бѓўбѓбѓљбѓбѓђ: бѓ—бѓҐбѓ•бѓ”бѓњ бѓ“бѓђбѓ™бѓђбѓ бѓ’бѓ”бѓў бѓ™бѓќбѓњбѓўбѓђбѓҐбѓўбѓ бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓ—бѓђбѓњ"
 
 #: Client/core/CConnectManager.cpp:319
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1438
 msgid "Disconnected: connection was refused"
-msgstr "კავშირი გაწყვეთილია: კავშირზე უარი მიიღეთ"
+msgstr "бѓ™бѓђбѓ•бѓЁбѓбѓ бѓ бѓ’бѓђбѓ¬бѓ§бѓ•бѓ”бѓ—бѓбѓљбѓбѓђ: бѓ™бѓђбѓ•бѓЁбѓбѓ бѓ–бѓ” бѓЈбѓђбѓ бѓ бѓ›бѓбѓбѓ¦бѓ”бѓ—"
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:414
 #, c-format
 msgid "No such mod installed (%s)"
-msgstr "ასეთი რეჟიმი არ არის დაყენებული (%s)"
+msgstr "бѓђбѓЎбѓ”бѓ—бѓ бѓ бѓ”бѓџбѓбѓ›бѓ бѓђбѓ  бѓђбѓ бѓбѓЎ бѓ“бѓђбѓ§бѓ”бѓњбѓ”бѓ‘бѓЈбѓљбѓ (%s)"
 
 #: Client/core/CConnectManager.cpp:422
 msgid "Bad server response (2)"
-msgstr "ცუდ სერვერზე პასუხი (2)"
+msgstr "бѓЄбѓЈбѓ“ бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓ–бѓ” бѓћбѓђбѓЎбѓЈбѓ®бѓ (2)"
 
 #: Client/core/CConnectManager.cpp:432
 msgid "Bad server response (1)"
-msgstr "სერვერი მიუწვდომელია (1)"
+msgstr "бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓ бѓ›бѓбѓЈбѓ¬бѓ•бѓ“бѓќбѓ›бѓ”бѓљбѓбѓђ (1)"
 
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
@@ -884,7 +884,7 @@ msgstr ""
 #: Client/core/CCommandFuncs.cpp:158
 #, c-format
 msgid "* The time is %d:%02d:%02d"
-msgstr "დრო: %d:%02d:%02d"
+msgstr "бѓ“бѓ бѓќ: %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
@@ -892,25 +892,25 @@ msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "დაკავშირება: სინტაქსი არის 'დაკავშირება <host> [<port> <nick> <pass>]"
+msgstr "бѓ“бѓђбѓ™бѓђбѓ•бѓЁбѓбѓ бѓ”бѓ‘бѓђ: бѓЎбѓбѓњбѓўбѓђбѓҐбѓЎбѓ бѓђбѓ бѓбѓЎ 'бѓ“бѓђбѓ™бѓђбѓ•бѓЁбѓбѓ бѓ”бѓ‘бѓђ <host> [<port> <nick> <pass>]"
 
 #: Client/core/CCommandFuncs.cpp:233
 msgid "connect: Bad port number"
-msgstr "დაკავშირება: არასწორი პორტი"
+msgstr "бѓ“бѓђбѓ™бѓђбѓ•бѓЁбѓбѓ бѓ”бѓ‘бѓђ: бѓђбѓ бѓђбѓЎбѓ¬бѓќбѓ бѓ бѓћбѓќбѓ бѓўбѓ"
 
 #: Client/core/CCommandFuncs.cpp:255
 #, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "დაკავშირება: თქვენ შედიხართ %s:%u..."
+msgstr "бѓ“бѓђбѓ™бѓђбѓ•бѓЁбѓбѓ бѓ”бѓ‘бѓђ: бѓ—бѓҐбѓ•бѓ”бѓњ бѓЁбѓ”бѓ“бѓбѓ®бѓђбѓ бѓ— %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:259
 #, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "დაკავშირება: თქვენ ვერ დაუკავშირდით სერვერს %s:%u!"
+msgstr "бѓ“бѓђбѓ™бѓђбѓ•бѓЁбѓбѓ бѓ”бѓ‘бѓђ: бѓ—бѓҐбѓ•бѓ”бѓњ бѓ•бѓ”бѓ  бѓ“бѓђбѓЈбѓ™бѓђбѓ•бѓЁбѓбѓ бѓ“бѓбѓ— бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓЎ %s:%u!"
 
 #: Client/core/CCommandFuncs.cpp:264
 msgid "connect: Failed to unload current mod"
-msgstr "დაკავშირება: ვერ მოხერხდა განტვირთვა მიმდინარე რეჟიმში"
+msgstr "бѓ“бѓђбѓ™бѓђбѓ•бѓЁбѓбѓ бѓ”бѓ‘бѓђ: бѓ•бѓ”бѓ  бѓ›бѓќбѓ®бѓ”бѓ бѓ®бѓ“бѓђ бѓ’бѓђбѓњбѓўбѓ•бѓбѓ бѓ—бѓ•бѓђ бѓ›бѓбѓ›бѓ“бѓбѓњбѓђбѓ бѓ” бѓ бѓ”бѓџбѓбѓ›бѓЁбѓ"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
@@ -932,30 +932,30 @@ msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:363
 msgid "Bound all controls from GTA"
-msgstr "ყველა სავალდებულო კონტროლი GTA-დან"
+msgstr "бѓ§бѓ•бѓ”бѓљбѓђ бѓЎбѓђбѓ•бѓђбѓљбѓ“бѓ”бѓ‘бѓЈбѓљбѓќ бѓ™бѓќбѓњбѓўбѓ бѓќбѓљбѓ GTA-бѓ“бѓђбѓњ"
 
 #: Client/core/CCommandFuncs.cpp:377
 msgid "Saved configuration file"
-msgstr "შეინახა კონფიგურაციის ფაილი"
+msgstr "бѓЁбѓ”бѓбѓњбѓђбѓ®бѓђ бѓ™бѓќбѓњбѓ¤бѓбѓ’бѓЈбѓ бѓђбѓЄбѓбѓбѓЎ бѓ¤бѓђбѓбѓљбѓ"
 
 #. Print it
 #: Client/core/CCommandFuncs.cpp:456
 #, c-format
 msgid "* Your serial is: %s"
-msgstr "თქვენი სერიული ნომერი არის: %s"
+msgstr "бѓ—бѓҐбѓ•бѓ”бѓњбѓ бѓЎбѓ”бѓ бѓбѓЈбѓљбѓ бѓњбѓќбѓ›бѓ”бѓ бѓ бѓђбѓ бѓбѓЎ: %s"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:503
 msgid "SETTINGS"
-msgstr "პარამეტრები"
+msgstr "бѓћбѓђбѓ бѓђбѓ›бѓ”бѓўбѓ бѓ”бѓ‘бѓ"
 
 #: Client/core/CSettings.cpp:549
 msgid "Multiplayer"
-msgstr "ონლაინ თამაში"
+msgstr "бѓќбѓњбѓљбѓђбѓбѓњ бѓ—бѓђбѓ›бѓђбѓЁбѓ"
 
 #: Client/core/CSettings.cpp:550
 msgid "Video"
-msgstr "ვიდეო"
+msgstr "бѓ•бѓбѓ“бѓ”бѓќ"
 
 #: Client/core/CSettings.cpp:551
 msgid "PostFX"
@@ -963,19 +963,19 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:552
 msgid "Audio"
-msgstr "აუდიო"
+msgstr "бѓђбѓЈбѓ“бѓбѓќ"
 
 #: Client/core/CSettings.cpp:553
 msgid "Binds"
-msgstr "კონტროლები"
+msgstr "бѓ™бѓќбѓњбѓўбѓ бѓќбѓљбѓ”бѓ‘бѓ"
 
 #: Client/core/CSettings.cpp:554
 msgid "Controls"
-msgstr "კონტროლები"
+msgstr "бѓ™бѓќбѓњбѓўбѓ бѓќбѓљбѓ”бѓ‘бѓ"
 
 #: Client/core/CSettings.cpp:555
 msgid "Interface"
-msgstr "ინტერფეისი"
+msgstr "бѓбѓњбѓўбѓ”бѓ бѓ¤бѓ”бѓбѓЎбѓ"
 
 #: Client/core/CSettings.cpp:556
 msgid "Web Browser"
@@ -983,7 +983,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:557
 msgid "Advanced"
-msgstr "დამატებითი"
+msgstr "бѓ“бѓђбѓ›бѓђбѓўбѓ”бѓ‘бѓбѓ—бѓ"
 
 #: Client/core/CSettings.cpp:582 Client/core/CSettings.cpp:790
 #: Client/core/CSettings.cpp:1119 Client/core/CSettings.cpp:1415
@@ -1017,7 +1017,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:617
 msgid "Fly with mouse"
-msgstr "მაუსით ფრენა"
+msgstr "бѓ›бѓђбѓЈбѓЎбѓбѓ— бѓ¤бѓ бѓ”бѓњбѓђ"
 
 #: Client/core/CSettings.cpp:663
 msgid "Use mouse sensitivity for aiming"
@@ -1026,39 +1026,39 @@ msgstr ""
 #. Joypad options
 #: Client/core/CSettings.cpp:669
 msgid "Joypad options"
-msgstr "ჯოისტიკის პარამეტრები"
+msgstr "бѓЇбѓќбѓбѓЎбѓўбѓбѓ™бѓбѓЎ бѓћбѓђбѓ бѓђбѓ›бѓ”бѓўбѓ бѓ”бѓ‘бѓ"
 
 #: Client/core/CSettings.cpp:682
 msgid "Standard controls (Mouse + Keyboard)"
-msgstr "სტანდარტული კონტროლი (მაუსი + კლავიატურა)"
+msgstr "бѓЎбѓўбѓђбѓњбѓ“бѓђбѓ бѓўбѓЈбѓљбѓ бѓ™бѓќбѓњбѓўбѓ бѓќбѓљбѓ (бѓ›бѓђбѓЈбѓЎбѓ + бѓ™бѓљбѓђбѓ•бѓбѓђбѓўбѓЈбѓ бѓђ)"
 
 #: Client/core/CSettings.cpp:689
 msgid "Classic controls (Joypad)"
-msgstr "კლასიკური კონტროლი (ჯოისტიკი)"
+msgstr "бѓ™бѓљбѓђбѓЎбѓбѓ™бѓЈбѓ бѓ бѓ™бѓќбѓњбѓўбѓ бѓќбѓљбѓ (бѓЇбѓќбѓбѓЎбѓўбѓбѓ™бѓ)"
 
 #: Client/core/CSettings.cpp:726
 msgid "Dead Zone"
-msgstr "მკვდარი ზონა"
+msgstr "бѓ›бѓ™бѓ•бѓ“бѓђбѓ бѓ бѓ–бѓќбѓњбѓђ"
 
 #: Client/core/CSettings.cpp:731
 msgid "Saturation"
-msgstr "ნაჯერობა"
+msgstr "бѓњбѓђбѓЇбѓ”бѓ бѓќбѓ‘бѓђ"
 
 #: Client/core/CSettings.cpp:737
 msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "გამოიყენე 'ღილაკები' კოისტიკისთვის."
+msgstr "бѓ’бѓђбѓ›бѓќбѓбѓ§бѓ”бѓњбѓ” 'бѓ¦бѓбѓљбѓђбѓ™бѓ”бѓ‘бѓ' бѓ™бѓќбѓбѓЎбѓўбѓбѓ™бѓбѓЎбѓ—бѓ•бѓбѓЎ."
 
 #: Client/core/CSettings.cpp:776
 msgid "Left Stick"
-msgstr "მარცხენა ჯოხი"
+msgstr "бѓ›бѓђбѓ бѓЄбѓ®бѓ”бѓњбѓђ бѓЇбѓќбѓ®бѓ"
 
 #: Client/core/CSettings.cpp:782
 msgid "Right Stick"
-msgstr "მარჯვენა ჯოხი"
+msgstr "бѓ›бѓђбѓ бѓЇбѓ•бѓ”бѓњбѓђ бѓЇбѓќбѓ®бѓ"
 
 #: Client/core/CSettings.cpp:797
 msgid "DESCRIPTION"
-msgstr "აღწერა"
+msgstr "бѓђбѓ¦бѓ¬бѓ”бѓ бѓђ"
 
 #: Client/core/CSettings.cpp:798
 msgid "KEY"
@@ -1073,7 +1073,7 @@ msgstr ""
 #. *
 #: Client/core/CSettings.cpp:805 Client/core/CSettings.cpp:808
 msgid "Nick:"
-msgstr "ნიკნეიმი:"
+msgstr "бѓњбѓбѓ™бѓњбѓ”бѓбѓ›бѓ:"
 
 #: Client/core/CSettings.cpp:830
 msgid "Save server passwords"
@@ -1081,11 +1081,60 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:835
 msgid "Auto-refresh server browser"
-msgstr "სერვერის ბრაუზერის ავტომატური განახლება"
+
+#: Client/core/CSettings.cpp:900
+msgid "History"
+msgstr ""
+
+#: Client/core/CSettings.cpp:910
+msgid "Nickname history"
+msgstr ""
+
+#: Client/core/CSettings.cpp:927
+msgid "Nickname"
+msgstr ""
+
+#: Client/core/CSettings.cpp:928
+msgid "Date"
+msgstr ""
+
+#: Client/core/CSettings.cpp:934
+msgid "Paste to nick"
+msgstr ""
+
+#: Client/core/CSettings.cpp:940
+msgid "Copy"
+msgstr ""
+
+#: Client/core/CSettings.cpp:946
+msgid "Delete"
+msgstr ""
+
+#: Client/core/CSettings.cpp:952
+msgid "Delete All"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4152
+msgid "DELETE NICKNAME"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4153
+msgid "Delete nickname "%s" from history?"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4168
+msgid "DELETE ALL"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4169
+msgid "Delete all nicknames from history?"
+msgstr ""
+
+msgstr "бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓбѓЎ бѓ‘бѓ бѓђбѓЈбѓ–бѓ”бѓ бѓбѓЎ бѓђбѓ•бѓўбѓќбѓ›бѓђбѓўбѓЈбѓ бѓ бѓ’бѓђбѓњбѓђбѓ®бѓљбѓ”бѓ‘бѓђ"
 
 #: Client/core/CSettings.cpp:840
 msgid "Allow screen upload"
-msgstr "დაუშვით ეკრანის ატვირთვა"
+msgstr "бѓ“бѓђбѓЈбѓЁбѓ•бѓбѓ— бѓ”бѓ™бѓ бѓђбѓњбѓбѓЎ бѓђбѓўбѓ•бѓбѓ бѓ—бѓ•бѓђ"
 
 #: Client/core/CSettings.cpp:845
 msgid "Allow external sounds"
@@ -1114,7 +1163,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:876
 msgid "Use customized GTA:SA files"
-msgstr "გამოიყენეთ მორგებული GTA:SA ფაილები"
+msgstr "бѓ’бѓђбѓ›бѓќбѓбѓ§бѓ”бѓњбѓ”бѓ— бѓ›бѓќбѓ бѓ’бѓ”бѓ‘бѓЈбѓљбѓ GTA:SA бѓ¤бѓђбѓбѓљбѓ”бѓ‘бѓ"
 
 #: Client/core/CSettings.cpp:881
 msgid "Map rendering options"
@@ -1122,7 +1171,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:889
 msgid "Opacity:"
-msgstr "გამჭვირვალობა:"
+msgstr "бѓ’бѓђбѓ›бѓ­бѓ•бѓбѓ бѓ•бѓђбѓљбѓќбѓ‘бѓђ:"
 
 #: Client/core/CSettings.cpp:912
 msgid "Image resolution:"
@@ -1146,29 +1195,29 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:957
 msgid "Radio volume:"
-msgstr "რადიოს ხმა"
+msgstr "бѓ бѓђбѓ“бѓбѓќбѓЎ бѓ®бѓ›бѓђ"
 
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:979
 msgid "SFX volume:"
-msgstr "თამაშის ხმა"
+msgstr "бѓ—бѓђбѓ›бѓђбѓЁбѓбѓЎ бѓ®бѓ›бѓђ"
 
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:1001
 msgid "MTA volume:"
-msgstr "MTA-ს ხმა"
+msgstr "MTA-бѓЎ бѓ®бѓ›бѓђ"
 
 #: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1023
 msgid "Voice volume:"
-msgstr "მიკროფონის ხმა"
+msgstr "бѓ›бѓбѓ™бѓ бѓќбѓ¤бѓќбѓњбѓбѓЎ бѓ®бѓ›бѓђ"
 
 #: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1067
 msgid "Play mode:"
-msgstr "თამაშის რეჟიმი"
+msgstr "бѓ—бѓђбѓ›бѓђбѓЁбѓбѓЎ бѓ бѓ”бѓџбѓбѓ›бѓ"
 
 #: Client/core/CSettings.cpp:929 Client/core/CSettings.cpp:1548
 #: Client/core/CSettings.cpp:2916
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:51
 msgid "General"
-msgstr "მთავარი"
+msgstr "бѓ›бѓ—бѓђбѓ•бѓђбѓ бѓ"
 
 #: Client/core/CSettings.cpp:1045
 msgid "Radio options"
@@ -1188,19 +1237,19 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:4001
 msgid "Radio"
-msgstr "რადიო"
+msgstr "бѓ бѓђбѓ“бѓбѓќ"
 
 #: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:4003
 msgid "Random"
-msgstr "შემთხვევითი"
+msgstr "бѓЁбѓ”бѓ›бѓ—бѓ®бѓ•бѓ”бѓ•бѓбѓ—бѓ"
 
 #: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:4005
 msgid "Sequential"
-msgstr "თანმიმდევრული"
+msgstr "бѓ—бѓђбѓњбѓ›бѓбѓ›бѓ“бѓ”бѓ•бѓ бѓЈбѓљбѓ"
 
 #: Client/core/CSettings.cpp:1080
 msgid "Automatic Media Scan"
-msgstr "მედიის სკანირება ავტომატურად"
+msgstr "бѓ›бѓ”бѓ“бѓбѓбѓЎ бѓЎбѓ™бѓђбѓњбѓбѓ бѓ”бѓ‘бѓђ бѓђбѓ•бѓўбѓќбѓ›бѓђбѓўбѓЈбѓ бѓђбѓ“"
 
 #: Client/core/CSettings.cpp:1087
 msgid "Mute options"
@@ -1231,7 +1280,7 @@ msgstr ""
 #. *
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1135
 msgid "Resolution:"
-msgstr "გარჩევადობა"
+msgstr "бѓ’бѓђбѓ бѓ©бѓ”бѓ•бѓђбѓ“бѓќбѓ‘бѓђ"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1190
 msgid "FOV:"
@@ -1239,20 +1288,20 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1209
 msgid "Draw Distance:"
-msgstr "მხედველობის რადიუსი:"
+msgstr "бѓ›бѓ®бѓ”бѓ“бѓ•бѓ”бѓљбѓќбѓ‘бѓбѓЎ бѓ бѓђбѓ“бѓбѓЈбѓЎбѓ:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1230
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1461
 msgid "Brightness:"
-msgstr "განათება:"
+msgstr "бѓ’бѓђбѓњбѓђбѓ—бѓ”бѓ‘бѓђ:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1251
 msgid "FX Quality:"
-msgstr "გრაფიკის ხარისხი"
+msgstr "бѓ’бѓ бѓђбѓ¤бѓбѓ™бѓбѓЎ бѓ®бѓђбѓ бѓбѓЎбѓ®бѓ"
 
 #: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1265
 msgid "Anisotropic filtering:"
-msgstr "ფილტრაცია"
+msgstr "бѓ¤бѓбѓљбѓўбѓ бѓђбѓЄбѓбѓђ"
 
 #: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1302
 msgid "Anti-aliasing:"
@@ -1288,20 +1337,20 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2239
 msgid "Low"
-msgstr "დაბალი"
+msgstr "бѓ“бѓђбѓ‘бѓђбѓљбѓ"
 
 #: Client/core/CSettings.cpp:1260 Client/core/CSettings.cpp:2241
 msgid "Medium"
-msgstr "საშუალო"
+msgstr "бѓЎбѓђбѓЁбѓЈбѓђбѓљбѓќ"
 
 #: Client/core/CSettings.cpp:1261 Client/core/CSettings.cpp:1755
 #: Client/core/CSettings.cpp:2243 Client/core/CSettings.cpp:4059
 msgid "High"
-msgstr "მაღალი"
+msgstr "бѓ›бѓђбѓ¦бѓђбѓљбѓ"
 
 #: Client/core/CSettings.cpp:1262 Client/core/CSettings.cpp:2245
 msgid "Very high"
-msgstr "ძალიან მაღალი"
+msgstr "бѓ«бѓђбѓљбѓбѓђбѓњ бѓ›бѓђбѓ¦бѓђбѓљбѓ"
 
 #: Client/core/CSettings.cpp:1279 Client/core/CSettings.cpp:1282
 #: Client/core/CSettings.cpp:1310 Client/core/CSettings.cpp:1686
@@ -1310,7 +1359,7 @@ msgstr "ძალიან მაღალი"
 #: Client/core/CSettings.cpp:4098 Client/core/CSettings.cpp:4144
 #: Client/core/CSettings.cpp:5375
 msgid "Off"
-msgstr "გამორთ"
+msgstr "бѓ’бѓђбѓ›бѓќбѓ бѓ—"
 
 #: Client/core/CSettings.cpp:1311 Client/core/CSettings.cpp:2251
 msgid "1x"
@@ -1327,7 +1376,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:1326 Client/core/CSettings.cpp:1688
 #: Client/core/CSettings.cpp:2261 Client/core/CSettings.cpp:4068
 msgid "Auto"
-msgstr "ავტომატური"
+msgstr "бѓђбѓ•бѓўбѓќбѓ›бѓђбѓўбѓЈбѓ бѓ"
 
 #: Client/core/CSettings.cpp:1327 Client/core/CSettings.cpp:2263
 msgid "4:3"
@@ -1347,11 +1396,11 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1338
 msgid "Volumetric Shadows"
-msgstr "მოცულობითი ჩრდილები"
+msgstr "бѓ›бѓќбѓЄбѓЈбѓљбѓќбѓ‘бѓбѓ—бѓ бѓ©бѓ бѓ“бѓбѓљбѓ”бѓ‘бѓ"
 
 #: Client/core/CSettings.cpp:1342
 msgid "Grass effect"
-msgstr "ბალახის ეფექტი"
+msgstr "бѓ‘бѓђбѓљбѓђбѓ®бѓбѓЎ бѓ”бѓ¤бѓ”бѓҐбѓўбѓ"
 
 #: Client/core/CSettings.cpp:1346
 msgid "Heat haze"
@@ -1435,15 +1484,15 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1587
 msgid "Block"
-msgstr "დაბლოკვა"
+msgstr "бѓ“бѓђбѓ‘бѓљбѓќбѓ™бѓ•бѓђ"
 
 #: Client/core/CSettings.cpp:1602 Client/core/CSettings.cpp:1646
 msgid "Domain"
-msgstr "დომენი"
+msgstr "бѓ“бѓќбѓ›бѓ”бѓњбѓ"
 
 #: Client/core/CSettings.cpp:1604 Client/core/CSettings.cpp:1648
 msgid "Remove domain"
-msgstr "დომეინის წაშლა"
+msgstr "бѓ“бѓќбѓ›бѓ”бѓбѓњбѓбѓЎ бѓ¬бѓђбѓЁбѓљбѓђ"
 
 #: Client/core/CSettings.cpp:1608 Client/core/CSettings.cpp:1652
 msgid "Remove all"
@@ -1456,12 +1505,12 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1633 Client/cefweb/CWebsiteRequests.cpp:51
 msgid "Allow"
-msgstr "დაშვება"
+msgstr "бѓ“бѓђбѓЁбѓ•бѓ”бѓ‘бѓђ"
 
 #. Misc section label
 #: Client/core/CSettings.cpp:1665
 msgid "Misc"
-msgstr "სხვადასხვა"
+msgstr "бѓЎбѓ®бѓ•бѓђбѓ“бѓђбѓЎбѓ®бѓ•бѓђ"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1679
@@ -1525,11 +1574,11 @@ msgstr ""
 #: Client/core/CSettings.cpp:1728 Client/core/CSettings.cpp:4070
 #: Client/core/CSettings.cpp:4086 Client/core/CSettings.cpp:4093
 msgid "On"
-msgstr "ჩართ"
+msgstr "бѓ©бѓђбѓ бѓ—"
 
 #: Client/core/CSettings.cpp:1700 Client/core/CSettings.cpp:4075
 msgid "Very slow"
-msgstr "ძალიან ნელი"
+msgstr "бѓ«бѓђбѓљбѓбѓђбѓњ бѓњбѓ”бѓљбѓ"
 
 #: Client/core/CSettings.cpp:1701 Client/core/CSettings.cpp:1714
 #: Client/core/CSettings.cpp:1727 Client/core/CSettings.cpp:1741
@@ -1543,23 +1592,23 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1702 Client/core/CSettings.cpp:4079
 msgid "Fast"
-msgstr "სწრაფი"
+msgstr "бѓЎбѓ¬бѓ бѓђбѓ¤бѓ"
 
 #: Client/core/CSettings.cpp:1753 Client/core/CSettings.cpp:4055
 msgid "Normal"
-msgstr "საშუალო"
+msgstr "бѓЎбѓђбѓЁбѓЈбѓђбѓљбѓќ"
 
 #: Client/core/CSettings.cpp:1754 Client/core/CSettings.cpp:4057
 msgid "Above normal"
-msgstr "საშუალოზე მაღალი"
+msgstr "бѓЎбѓђбѓЁбѓЈбѓђбѓљбѓќбѓ–бѓ” бѓ›бѓђбѓ¦бѓђбѓљбѓ"
 
 #: Client/core/CSettings.cpp:1790
 msgid "Min"
-msgstr "მინ"
+msgstr "бѓ›бѓбѓњ"
 
 #: Client/core/CSettings.cpp:1815
 msgid "Max"
-msgstr "მაქს"
+msgstr "бѓ›бѓђбѓҐбѓЎ"
 
 #. Windows 8 compatibility
 #: Client/core/CSettings.cpp:1823
@@ -1639,23 +1688,23 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:2907
 msgid "Language:"
-msgstr "ენა:"
+msgstr "бѓ”бѓњбѓђ:"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Skin:"
-msgstr "სკინი:"
+msgstr "бѓЎбѓ™бѓбѓњбѓ:"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Presets:"
-msgstr "მომართვა:"
+msgstr "бѓ›бѓќбѓ›бѓђбѓ бѓ—бѓ•бѓђ:"
 
 #: Client/core/CSettings.cpp:2956
 msgid "Chat"
-msgstr "ჩათი"
+msgstr "бѓ©бѓђбѓ—бѓ"
 
 #: Client/core/CSettings.cpp:2973
 msgid "Load"
-msgstr "ჩატვირთვა"
+msgstr "бѓ©бѓђбѓўбѓ•бѓбѓ бѓ—бѓ•бѓђ"
 
 #: Client/core/CSettings.cpp:2985
 msgid "Colors"
@@ -1667,7 +1716,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:2987 Client/core/CSettings.cpp:3233
 msgid "Options"
-msgstr "პარამეტრები"
+msgstr "бѓћбѓђбѓ бѓђбѓ›бѓ”бѓўбѓ бѓ”бѓ‘бѓ"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Chat Background"
@@ -1675,7 +1724,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:2993
 msgid "Chat Text"
-msgstr "ჩათის ტექსტი:"
+msgstr "бѓ©бѓђбѓ—бѓбѓЎ бѓўбѓ”бѓҐбѓЎбѓўбѓ:"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Input Background"
@@ -1683,11 +1732,11 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:2993
 msgid "Input Text"
-msgstr "ჩასვით ტექსტი"
+msgstr "бѓ©бѓђбѓЎбѓ•бѓбѓ— бѓўбѓ”бѓҐбѓЎбѓўбѓ"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Lines:"
-msgstr "ხაზები"
+msgstr "бѓ®бѓђбѓ–бѓ”бѓ‘бѓ"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Scale:"
@@ -1748,7 +1797,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:3138 Client/core/CSettings.cpp:3166
 #: Client/core/CKeyBinds.cpp:191
 msgid "Left"
-msgstr "მარცხნივ"
+msgstr "бѓ›бѓђбѓ бѓЄбѓ®бѓњбѓбѓ•"
 
 #: Client/core/CSettings.cpp:3139 Client/core/CSettings.cpp:3153
 msgid "Center"
@@ -1757,7 +1806,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:3140 Client/core/CSettings.cpp:3167
 #: Client/core/CKeyBinds.cpp:192
 msgid "Right"
-msgstr "მარჯვნივ"
+msgstr "бѓ›бѓђбѓ бѓЇбѓ•бѓњбѓбѓ•"
 
 #: Client/core/CSettings.cpp:3152
 msgid "Top"
@@ -1769,7 +1818,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:3202
 msgid "Font"
-msgstr "ფონტი"
+msgstr "бѓ¤бѓќбѓњбѓўбѓ"
 
 #: Client/core/CSettings.cpp:3239
 msgid "Hide background when not typing"
@@ -1833,27 +1882,27 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:4798
 msgid "Red:"
-msgstr "წითელი:"
+msgstr "бѓ¬бѓбѓ—бѓ”бѓљбѓ:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Green:"
-msgstr "მწვანე:"
+msgstr "бѓ›бѓ¬бѓ•бѓђбѓњбѓ”:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Blue:"
-msgstr "ლურჯი:"
+msgstr "бѓљбѓЈбѓ бѓЇбѓ:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Transparency:"
-msgstr "გამჭირვალე:"
+msgstr "бѓ’бѓђбѓ›бѓ­бѓбѓ бѓ•бѓђбѓљбѓ”:"
 
 #: Client/core/CSettings.cpp:4801
 msgid "Color"
-msgstr "ფერი"
+msgstr "бѓ¤бѓ”бѓ бѓ"
 
 #: Client/core/CSettings.cpp:4907
 msgid "Preview"
-msgstr "გადახედვა"
+msgstr "бѓ’бѓђбѓ“бѓђбѓ®бѓ”бѓ“бѓ•бѓђ"
 
 #: Client/core/CSettings.cpp:5215
 msgid "Please disconnect before changing language"
@@ -2003,16 +2052,16 @@ msgstr ""
 
 #: Client/core/CCore.cpp:848 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
-msgstr "შეცდომა"
+msgstr "бѓЁбѓ”бѓЄбѓ“бѓќбѓ›бѓђ"
 
 #: Client/core/CCore.cpp:969
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "გამოსასწორებლად, წაშალეთ შემდეგი ფაილი:"
+msgstr "бѓ’бѓђбѓ›бѓќбѓЎбѓђбѓЎбѓ¬бѓќбѓ бѓ”бѓ‘бѓљбѓђбѓ“, бѓ¬бѓђбѓЁбѓђбѓљбѓ”бѓ— бѓЁбѓ”бѓ›бѓ“бѓ”бѓ’бѓ бѓ¤бѓђбѓбѓљбѓ:"
 
 #: Client/core/CCore.cpp:1001
 #, c-format
 msgid "%s module is incorrect!"
-msgstr "%s მოდული არასწორია!"
+msgstr "%s бѓ›бѓќбѓ“бѓЈбѓљбѓ бѓђбѓ бѓђбѓЎбѓ¬бѓќбѓ бѓбѓђ!"
 
 #: Client/core/CCore.cpp:1375
 msgid "Error executing URL"
@@ -2022,11 +2071,11 @@ msgstr ""
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: Client/core/CCore.cpp:1470
 msgid "this help screen"
-msgstr "ეს დამხმარე გვერდი"
+msgstr "бѓ”бѓЎ бѓ“бѓђбѓ›бѓ®бѓ›бѓђбѓ бѓ” бѓ’бѓ•бѓ”бѓ бѓ“бѓ"
 
 #: Client/core/CCore.cpp:1471 Client/core/CCore.cpp:1472
 msgid "exits the application"
-msgstr "თამაშიდან გასვლა"
+msgstr "бѓ—бѓђбѓ›бѓђбѓЁбѓбѓ“бѓђбѓњ бѓ’бѓђбѓЎбѓ•бѓљбѓђ"
 
 #: Client/core/CCore.cpp:1473
 msgid "shows the version"
@@ -2038,39 +2087,39 @@ msgstr ""
 
 #: Client/core/CCore.cpp:1475
 msgid "shows the hud"
-msgstr "აჩვენებს hud-ს"
+msgstr "бѓђбѓ©бѓ•бѓ”бѓњбѓ”бѓ‘бѓЎ hud-бѓЎ"
 
 #: Client/core/CCore.cpp:1476
 msgid "shows all the binds"
-msgstr "ყველა კონტროლის ჩვენება"
+msgstr "бѓ§бѓ•бѓ”бѓљбѓђ бѓ™бѓќбѓњбѓўбѓ бѓќбѓљбѓбѓЎ бѓ©бѓ•бѓ”бѓњбѓ”бѓ‘бѓђ"
 
 #: Client/core/CCore.cpp:1477
 msgid "shows your serial"
-msgstr "თქვენი სერიული ნომრის ჩვენება"
+msgstr "бѓ—бѓҐбѓ•бѓ”бѓњбѓ бѓЎбѓ”бѓ бѓбѓЈбѓљбѓ бѓњбѓќбѓ›бѓ бѓбѓЎ бѓ©бѓ•бѓ”бѓњбѓ”бѓ‘бѓђ"
 
 #: Client/core/CCore.cpp:1486
 msgid "connects to a server (host port nick pass)"
-msgstr "უკავშირდება სერვერს (host port nick pass)"
+msgstr "бѓЈбѓ™бѓђбѓ•бѓЁбѓбѓ бѓ“бѓ”бѓ‘бѓђ бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓЎ (host port nick pass)"
 
 #: Client/core/CCore.cpp:1487
 msgid "connects to a previous server"
-msgstr "უკავშირდება წინა სერვერს"
+msgstr "бѓЈбѓ™бѓђбѓ•бѓЁбѓбѓ бѓ“бѓ”бѓ‘бѓђ бѓ¬бѓбѓњбѓђ бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓЎ"
 
 #: Client/core/CCore.cpp:1488
 msgid "binds a key (key control)"
-msgstr "დააყენეთ კონტროლი"
+msgstr "бѓ“бѓђбѓђбѓ§бѓ”бѓњбѓ”бѓ— бѓ™бѓќбѓњбѓўбѓ бѓќбѓљбѓ"
 
 #: Client/core/CCore.cpp:1489
 msgid "unbinds a key (key)"
-msgstr "გააუქმეთ კონტროლი (key)"
+msgstr "бѓ’бѓђбѓђбѓЈбѓҐбѓ›бѓ”бѓ— бѓ™бѓќбѓњбѓўбѓ бѓќбѓљбѓ (key)"
 
 #: Client/core/CCore.cpp:1490
 msgid "copies the default gta controls"
-msgstr "დააყენეთ სტანდარტული კონტროლი"
+msgstr "бѓ“бѓђбѓђбѓ§бѓ”бѓњбѓ”бѓ— бѓЎбѓўбѓђбѓњбѓ“бѓђбѓ бѓўбѓЈбѓљбѓ бѓ™бѓќбѓњбѓўбѓ бѓќбѓљбѓ"
 
 #: Client/core/CCore.cpp:1491
 msgid "outputs a screenshot"
-msgstr "შედეგები სკრინშოტი-ზე"
+msgstr "бѓЁбѓ”бѓ“бѓ”бѓ’бѓ”бѓ‘бѓ бѓЎбѓ™бѓ бѓбѓњбѓЁбѓќбѓўбѓ-бѓ–бѓ”"
 
 #: Client/core/CCore.cpp:1492
 msgid "immediately saves the config"
@@ -2120,12 +2169,12 @@ msgstr ""
 #: Client/core/CMainMenu.cpp:1231
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
-msgstr "ეს გაგიწყვითავთ კავშირს აღნიშნულ სერვერთან.\n\n"
-"დარწმუნებული ხართ რომ გსურთ კავშირის გაწყვეტა?"
+msgstr "бѓ”бѓЎ бѓ’бѓђбѓ’бѓбѓ¬бѓ§бѓ•бѓбѓ—бѓђбѓ•бѓ— бѓ™бѓђбѓ•бѓЁбѓбѓ бѓЎ бѓђбѓ¦бѓњбѓбѓЁбѓњбѓЈбѓљ бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓ—бѓђбѓњ.\n\n"
+"бѓ“бѓђбѓ бѓ¬бѓ›бѓЈбѓњбѓ”бѓ‘бѓЈбѓљбѓ бѓ®бѓђбѓ бѓ— бѓ бѓќбѓ› бѓ’бѓЎбѓЈбѓ бѓ— бѓ™бѓђбѓ•бѓЁбѓбѓ бѓбѓЎ бѓ’бѓђбѓ¬бѓ§бѓ•бѓ”бѓўбѓђ?"
 
 #: Client/core/CMainMenu.cpp:1235
 msgid "DISCONNECT WARNING"
-msgstr "გაფრთხილება კავშირის გაწყვეტის შესახებ"
+msgstr "бѓ’бѓђбѓ¤бѓ бѓ—бѓ®бѓбѓљбѓ”бѓ‘бѓђ бѓ™бѓђбѓ•бѓЁбѓбѓ бѓбѓЎ бѓ’бѓђбѓ¬бѓ§бѓ•бѓ”бѓўбѓбѓЎ бѓЁбѓ”бѓЎбѓђбѓ®бѓ”бѓ‘"
 
 #: Client/core/CMainMenu.cpp:1256
 msgid "INFORMATION"
@@ -2144,11 +2193,11 @@ msgstr ""
 #: Client/core/CScreenShot.cpp:200
 #, c-format
 msgid "Screenshot got %d bytes, but expected %d"
-msgstr "სქრინშოთი იშოვა %d ბაიტებში, მაგრამ მოსალოდნელია %d"
+msgstr "бѓЎбѓҐбѓ бѓбѓњбѓЁбѓќбѓ—бѓ бѓбѓЁбѓќбѓ•бѓђ %d бѓ‘бѓђбѓбѓўбѓ”бѓ‘бѓЁбѓ, бѓ›бѓђбѓ’бѓ бѓђбѓ› бѓ›бѓќбѓЎбѓђбѓљбѓќбѓ“бѓњбѓ”бѓљбѓбѓђ %d"
 
 #: Client/core/CScreenShot.cpp:206
 msgid "Screenshot failed"
-msgstr "სქრინშოთი ვერ მოხერხდა"
+msgstr "бѓЎбѓҐбѓ бѓбѓњбѓЁбѓќбѓ—бѓ бѓ•бѓ”бѓ  бѓ›бѓќбѓ®бѓ”бѓ бѓ®бѓ“бѓђ"
 
 #: Client/core/CScreenShot.cpp:256
 #, c-format
@@ -2158,7 +2207,7 @@ msgstr ""
 #. Unknown command
 #: Client/core/CCommands.cpp:233
 msgid "Unknown command or cvar: "
-msgstr "უცნობი ბრძანება"
+msgstr "бѓЈбѓЄбѓњбѓќбѓ‘бѓ бѓ‘бѓ бѓ«бѓђбѓњбѓ”бѓ‘бѓђ"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
@@ -2182,32 +2231,32 @@ msgstr ""
 
 #: Client/core/CKeyBinds.cpp:193
 msgid "Zoom in"
-msgstr "გადიდება"
+msgstr "бѓ’бѓђбѓ“бѓбѓ“бѓ”бѓ‘бѓђ"
 
 #: Client/core/CKeyBinds.cpp:194
 msgid "Zoom out"
-msgstr "დაპატარავება"
+msgstr "бѓ“бѓђбѓћбѓђбѓўбѓђбѓ бѓђбѓ•бѓ”бѓ‘бѓђ"
 
 #: Client/core/CKeyBinds.cpp:195
 msgid "Enter/Exit"
-msgstr "შესვლა/გამოსვლა"
+msgstr "бѓЁбѓ”бѓЎбѓ•бѓљбѓђ/бѓ’бѓђбѓ›бѓќбѓЎбѓ•бѓљбѓђ"
 
 #: Client/core/CKeyBinds.cpp:196
 msgid "Change camera"
-msgstr "კამერის შეცვლა"
+msgstr "бѓ™бѓђбѓ›бѓ”бѓ бѓбѓЎ бѓЁбѓ”бѓЄбѓ•бѓљбѓђ"
 
 #. 10
 #: Client/core/CKeyBinds.cpp:197
 msgid "Jump"
-msgstr "ნახტომი"
+msgstr "бѓњбѓђбѓ®бѓўбѓќбѓ›бѓ"
 
 #: Client/core/CKeyBinds.cpp:198
 msgid "Sprint"
-msgstr "მოკლე დისტანციაზე სირბილი"
+msgstr "бѓ›бѓќбѓ™бѓљбѓ” бѓ“бѓбѓЎбѓўбѓђбѓњбѓЄбѓбѓђбѓ–бѓ” бѓЎбѓбѓ бѓ‘бѓбѓљбѓ"
 
 #: Client/core/CKeyBinds.cpp:199
 msgid "Look behind"
-msgstr "უკან იყურეთ"
+msgstr "бѓЈбѓ™бѓђбѓњ бѓбѓ§бѓЈбѓ бѓ”бѓ—"
 
 #: Client/core/CKeyBinds.cpp:200
 msgid "Crouch"
@@ -2248,40 +2297,40 @@ msgstr ""
 
 #: Client/core/CKeyBinds.cpp:209
 msgid "Accelerate"
-msgstr "აჩქარება"
+msgstr "бѓђбѓ©бѓҐбѓђбѓ бѓ”бѓ‘бѓђ"
 
 #: Client/core/CKeyBinds.cpp:210
 msgid "Brake/Reverse"
-msgstr "დატორმუზება/შემობრუნება"
+msgstr "бѓ“бѓђбѓўбѓќбѓ бѓ›бѓЈбѓ–бѓ”бѓ‘бѓђ/бѓЁбѓ”бѓ›бѓќбѓ‘бѓ бѓЈбѓњбѓ”бѓ‘бѓђ"
 
 #: Client/core/CKeyBinds.cpp:211
 msgid "Radio next"
-msgstr "შემდეგი რადიო"
+msgstr "бѓЁбѓ”бѓ›бѓ“бѓ”бѓ’бѓ бѓ бѓђбѓ“бѓбѓќ"
 
 #: Client/core/CKeyBinds.cpp:212
 msgid "Radio previous"
-msgstr "წინა რადიო"
+msgstr "бѓ¬бѓбѓњбѓђ бѓ бѓђбѓ“бѓбѓќ"
 
 #: Client/core/CKeyBinds.cpp:213
 msgid "Radio user track skip"
-msgstr "რადიოს მომხმარებლის სიმღერის გამოტოვება"
+msgstr "бѓ бѓђбѓ“бѓбѓќбѓЎ бѓ›бѓќбѓ›бѓ®бѓ›бѓђбѓ бѓ”бѓ‘бѓљбѓбѓЎ бѓЎбѓбѓ›бѓ¦бѓ”бѓ бѓбѓЎ бѓ’бѓђбѓ›бѓќбѓўбѓќбѓ•бѓ”бѓ‘бѓђ"
 
 #: Client/core/CKeyBinds.cpp:214
 msgid "Horn"
-msgstr "ჰორნი"
+msgstr "бѓ°бѓќбѓ бѓњбѓ"
 
 #: Client/core/CKeyBinds.cpp:215
 msgid "Sub-mission"
-msgstr "მისსის შეცვლა"
+msgstr "бѓ›бѓбѓЎбѓЎбѓбѓЎ бѓЁбѓ”бѓЄбѓ•бѓљбѓђ"
 
 #: Client/core/CKeyBinds.cpp:216
 msgid "Handbrake"
-msgstr "ხელის მუხრუჭი"
+msgstr "бѓ®бѓ”бѓљбѓбѓЎ бѓ›бѓЈбѓ®бѓ бѓЈбѓ­бѓ"
 
 #. 30
 #: Client/core/CKeyBinds.cpp:217
 msgid "Vehicle look left"
-msgstr "ტრანსპორტის ყურება მარცხნიდან"
+msgstr "бѓўбѓ бѓђбѓњбѓЎбѓћбѓќбѓ бѓўбѓбѓЎ бѓ§бѓЈбѓ бѓ”бѓ‘бѓђ бѓ›бѓђбѓ бѓЄбѓ®бѓњбѓбѓ“бѓђбѓњ"
 
 #: Client/core/CKeyBinds.cpp:218
 msgid "Vehicle look right"
@@ -2322,15 +2371,15 @@ msgstr ""
 #. 40
 #: Client/core/CKeyBinds.cpp:227
 msgid "Conversation no"
-msgstr "საუბრები არ არის"
+msgstr "бѓЎбѓђбѓЈбѓ‘бѓ бѓ”бѓ‘бѓ бѓђбѓ  бѓђбѓ бѓбѓЎ"
 
 #: Client/core/CKeyBinds.cpp:228
 msgid "Group control forwards"
-msgstr "ჯგუფური კონტროლი ეხმარება"
+msgstr "бѓЇбѓ’бѓЈбѓ¤бѓЈбѓ бѓ бѓ™бѓќбѓњбѓўбѓ бѓќбѓљбѓ бѓ”бѓ®бѓ›бѓђбѓ бѓ”бѓ‘бѓђ"
 
 #: Client/core/CKeyBinds.cpp:229
 msgid "Group control backwards"
-msgstr "ჯგუფური კონტროლი უკან"
+msgstr "бѓЇбѓ’бѓЈбѓ¤бѓЈбѓ бѓ бѓ™бѓќбѓњбѓўбѓ бѓќбѓљбѓ бѓЈбѓ™бѓђбѓњ"
 
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:93
@@ -2344,31 +2393,31 @@ msgstr ""
 #. Create window
 #: Client/core/CConsole.cpp:417
 msgid "CONSOLE"
-msgstr "კონსოლი"
+msgstr "бѓ™бѓќбѓњбѓЎбѓќбѓљбѓ"
 
 #: Client/core/CCredits.cpp:34
 msgid "Programming"
-msgstr "პროგრამირება"
+msgstr "бѓћбѓ бѓќбѓ’бѓ бѓђбѓ›бѓбѓ бѓ”бѓ‘бѓђ"
 
 #: Client/core/CCredits.cpp:65
 msgid "Contributors"
-msgstr "დამხმარეები"
+msgstr "бѓ“бѓђбѓ›бѓ®бѓ›бѓђбѓ бѓ”бѓ”бѓ‘бѓ"
 
 #: Client/core/CCredits.cpp:85
 msgid "Game Design / Scripting"
-msgstr "თამაშის დიზაინი / კოდირება"
+msgstr "бѓ—бѓђбѓ›бѓђбѓЁбѓбѓЎ бѓ“бѓбѓ–бѓђбѓбѓњбѓ / бѓ™бѓќбѓ“бѓбѓ бѓ”бѓ‘бѓђ"
 
 #: Client/core/CCredits.cpp:105
 msgid "Language Localization"
-msgstr "ენის ლოკალიზაცია"
+msgstr "бѓ”бѓњбѓбѓЎ бѓљбѓќбѓ™бѓђбѓљбѓбѓ–бѓђбѓЄбѓбѓђ"
 
 #: Client/core/CCredits.cpp:111
 msgid "Patch contributors"
-msgstr "პატჩის დამხმარეები"
+msgstr "бѓћбѓђбѓўбѓ©бѓбѓЎ бѓ“бѓђбѓ›бѓ®бѓ›бѓђбѓ бѓ”бѓ”бѓ‘бѓ"
 
 #: Client/core/CCredits.cpp:234
 msgid "Special Thanks"
-msgstr "განსაკუთრებული მადლობა"
+msgstr "бѓ’бѓђбѓњбѓЎбѓђбѓ™бѓЈбѓ—бѓ бѓ”бѓ‘бѓЈбѓљбѓ бѓ›бѓђбѓ“бѓљбѓќбѓ‘бѓђ"
 
 #: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
@@ -2441,7 +2490,7 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerList.cpp:472
 msgid "Attempting to discover LAN servers"
-msgstr "მიმდინარეობს სერვერების აღმოჩენა LAN-ში"
+msgstr "бѓ›бѓбѓ›бѓ“бѓбѓњбѓђбѓ бѓ”бѓќбѓ‘бѓЎ бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓ”бѓ‘бѓбѓЎ бѓђбѓ¦бѓ›бѓќбѓ©бѓ”бѓњбѓђ LAN-бѓЁбѓ"
 
 #. Create queue window
 #: Client/core/ServerBrowser/CServerInfo.cpp:32
@@ -2485,13 +2534,13 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:108
 msgid "Passworded:"
-msgstr "პაროლი:"
+msgstr "бѓћбѓђбѓ бѓќбѓљбѓ:"
 
 #. Latency
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:119
 msgid "Latency:"
-msgstr "შეყოვნება"
+msgstr "бѓЁбѓ”бѓ§бѓќбѓ•бѓњбѓ”бѓ‘бѓђ"
 
 #. Column for player names
 #. Player List Columns
@@ -2503,34 +2552,34 @@ msgstr ""
 #. Close button
 #: Client/core/ServerBrowser/CServerInfo.cpp:144
 msgid "Close"
-msgstr "დახურვა"
+msgstr "бѓ“бѓђбѓ®бѓЈбѓ бѓ•бѓђ"
 
 #. Join Game button
 #: Client/core/ServerBrowser/CServerInfo.cpp:152
 msgid "Join Game"
-msgstr "თამაშის დაწყება"
+msgstr "бѓ—бѓђбѓ›бѓђбѓЁбѓбѓЎ бѓ“бѓђбѓ¬бѓ§бѓ”бѓ‘бѓђ"
 
 #. Please enter password label
 #: Client/core/ServerBrowser/CServerInfo.cpp:166
 msgid "Please enter the password to the server:"
-msgstr "გთხოვთ შეიყვანოთ პაროლი სერვერზე:"
+msgstr "бѓ’бѓ—бѓ®бѓќбѓ•бѓ— бѓЁбѓ”бѓбѓ§бѓ•бѓђбѓњбѓќбѓ— бѓћбѓђбѓ бѓќбѓљбѓ бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓ–бѓ”:"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
-msgstr "შედით სერვერზე მალე როგორც კი მოთამაშეები დაიშვებიან"
+msgstr "бѓЁбѓ”бѓ“бѓбѓ— бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓ–бѓ” бѓ›бѓђбѓљбѓ” бѓ бѓќбѓ’бѓќбѓ бѓЄ бѓ™бѓ бѓ›бѓќбѓ—бѓђбѓ›бѓђбѓЁбѓ”бѓ”бѓ‘бѓ бѓ“бѓђбѓбѓЁбѓ•бѓ”бѓ‘бѓбѓђбѓњ"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "გთხოვთ შეიყვანოთ სერვერის პაროლი"
+msgstr "бѓ’бѓ—бѓ®бѓќбѓ•бѓ— бѓЁбѓ”бѓбѓ§бѓ•бѓђбѓњбѓќбѓ— бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓбѓЎ бѓћбѓђбѓ бѓќбѓљбѓ"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Timed Out"
-msgstr "ვადაგასულია"
+msgstr "бѓ•бѓђбѓ“бѓђбѓ’бѓђбѓЎбѓЈбѓљбѓбѓђ"
 
 #. Set every GUI elements text to blank
 #: Client/core/ServerBrowser/CServerInfo.cpp:515
 msgid "Querying..."
-msgstr "ეკითხება..."
+msgstr "бѓ”бѓ™бѓбѓ—бѓ®бѓ”бѓ‘бѓђ..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:189
@@ -2563,44 +2612,44 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:321
 msgid "HELP"
-msgstr "დახმარება"
+msgstr "бѓ“бѓђбѓ®бѓ›бѓђбѓ бѓ”бѓ‘бѓђ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:371
 msgid "Refresh"
-msgstr "განახლება"
+msgstr "бѓ’бѓђбѓњбѓђбѓ®бѓљбѓ”бѓ‘бѓђ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:372
 msgid "Add Favorite"
-msgstr "ფავორითებში დამატება"
+msgstr "бѓ¤бѓђбѓ•бѓќбѓ бѓбѓ—бѓ”бѓ‘бѓЁбѓ бѓ“бѓђбѓ›бѓђбѓўбѓ”бѓ‘бѓђ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:373
 #: Client/core/ServerBrowser/CServerBrowser.cpp:457
 #: Client/core/ServerBrowser/CServerBrowser.cpp:528
 msgid "Connect"
-msgstr "დაკავშირება"
+msgstr "бѓ“бѓђбѓ™бѓђбѓ•бѓЁбѓбѓ бѓ”бѓ‘бѓђ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:374
 msgid "Server information"
-msgstr "ინფორმაცია სერვერის შესახებ"
+msgstr "бѓбѓњбѓ¤бѓќбѓ бѓ›бѓђбѓЄбѓбѓђ бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓбѓЎ бѓЁбѓ”бѓЎбѓђбѓ®бѓ”бѓ‘"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:375
 msgid "Search servers"
-msgstr "მოძებნე სერვერები"
+msgstr "бѓ›бѓќбѓ«бѓ”бѓ‘бѓњбѓ” бѓЎбѓ”бѓ бѓ•бѓ”бѓ бѓ”бѓ‘бѓ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:376
 msgid "Search players"
-msgstr "მოძებნეთ მოთამაშეები"
+msgstr "бѓ›бѓќбѓ«бѓ”бѓ‘бѓњбѓ”бѓ— бѓ›бѓќбѓ—бѓђбѓ›бѓђбѓЁбѓ”бѓ”бѓ‘бѓ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:377
 msgid "Start search"
-msgstr "ძიების დაწყება"
+msgstr "бѓ«бѓбѓ”бѓ‘бѓбѓЎ бѓ“бѓђбѓ¬бѓ§бѓ”бѓ‘бѓђ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:378
@@ -2610,7 +2659,7 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2086
 msgid "Search players..."
-msgstr "მოთამაშეების ძიება..."
+msgstr "бѓ›бѓќбѓ—бѓђбѓ›бѓђбѓЁбѓ”бѓ”бѓ‘бѓбѓЎ бѓ«бѓбѓ”бѓ‘бѓђ..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:578
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2084
@@ -2648,39 +2697,39 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:665
 msgid "Locked"
-msgstr "დაბლოკილია"
+msgstr "бѓ“бѓђбѓ‘бѓљбѓќбѓ™бѓбѓљбѓбѓђ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:677
 msgid "Offline"
-msgstr "კავშირგარეშე"
+msgstr "бѓ™бѓђбѓ•бѓЁбѓбѓ бѓ’бѓђбѓ бѓ”бѓЁбѓ”"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:690
 msgid "Other Versions"
-msgstr "სხვა ვერსიები"
+msgstr "бѓЎбѓ®бѓ•бѓђ бѓ•бѓ”бѓ бѓЎбѓбѓ”бѓ‘бѓ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:711
 msgid "Back"
-msgstr "უკან"
+msgstr "бѓЈбѓ™бѓђбѓњ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1012
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1026
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1718
 msgid "Loading..."
-msgstr "იტვირთება..."
+msgstr "бѓбѓўбѓ•бѓбѓ бѓ—бѓ”бѓ‘бѓђ..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1563
 #: Client/core/ServerBrowser/CServerBrowser.cpp:3039
 msgid "  ..loading.."
-msgstr "..იტვირთება.."
+msgstr "..бѓбѓўбѓ•бѓбѓ бѓ—бѓ”бѓ‘бѓђ.."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1601
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1758
 msgid "No address specified!"
-msgstr "მისამართი არ არის მითითებული!"
+msgstr "бѓ›бѓбѓЎбѓђбѓ›бѓђбѓ бѓ—бѓ бѓђбѓ  бѓђбѓ бѓбѓЎ бѓ›бѓбѓ—бѓбѓ—бѓ”бѓ‘бѓЈбѓљбѓ!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1614
 msgid "Unknown protocol"
-msgstr "უცნობი პროტოკოლი"
+msgstr "бѓЈбѓЄбѓњбѓќбѓ‘бѓ бѓћбѓ бѓќбѓўбѓќбѓ™бѓќбѓљбѓ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1614
 msgid "Please use the mtasa:// protocol!"
@@ -2733,11 +2782,11 @@ msgstr ""
 
 #: Client/cefweb/CWebsiteRequests.cpp:46
 msgid "Remember decision"
-msgstr "დამახსოვრება"
+msgstr "бѓ“бѓђбѓ›бѓђбѓ®бѓЎбѓќбѓ•бѓ бѓ”бѓ‘бѓђ"
 
 #: Client/cefweb/CWebsiteRequests.cpp:57
 msgid "Deny"
-msgstr "უარყოფა"
+msgstr "бѓЈбѓђбѓ бѓ§бѓќбѓ¤бѓђ"
 
 #: Client/mods/deathmatch/CClient.cpp:38
 msgid "This version has expired."

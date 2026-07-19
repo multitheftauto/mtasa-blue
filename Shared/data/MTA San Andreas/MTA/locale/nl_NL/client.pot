@@ -1,4 +1,4 @@
-msgid ""
+﻿msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
@@ -52,7 +52,7 @@ msgstr "Fout bij het laden van %s module! (%s)"
 
 #: Client/loader/Utils.cpp:1400 Client/loader/Dialogs.cpp:1048
 msgid "Copying files..."
-msgstr "Bestanden kopiëren..."
+msgstr "Bestanden kopiГ«ren..."
 
 #: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:1053
 msgid "Copy finished early. Everything OK."
@@ -71,7 +71,7 @@ msgstr "Klaar!"
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
 msgstr "Nieuwe installatie van %s ontdekt.\n\n"
-"Wilt u uw instelling van %s kopiëren?"
+"Wilt u uw instelling van %s kopiГ«ren?"
 
 #: Client/loader/Utils.cpp:1547
 #, c-format
@@ -106,7 +106,7 @@ msgstr "Is uw computer herstart tijdens het spelen van MTA:SA?"
 
 #: Client/loader/Utils.cpp:1787
 msgid "Please terminate the following programs before continuing:"
-msgstr "Gelieve de volgende programma's te beëindigen voor u verdergaat:"
+msgstr "Gelieve de volgende programma's te beГ«indigen voor u verdergaat:"
 
 #: Client/loader/MainFunctions.cpp:321
 msgid "Invalid module path detected.\n"
@@ -208,7 +208,7 @@ msgstr "Informatie"
 
 #: Client/loader/MainFunctions.cpp:1002
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
-msgstr "Kan GTA: San Andreas niet beëindigen. Als dit probleem aanhoudt, gelieve uw computer te herstarten."
+msgstr "Kan GTA: San Andreas niet beГ«indigen. Als dit probleem aanhoudt, gelieve uw computer te herstarten."
 
 #: Client/loader/MainFunctions.cpp:1131
 msgid "Trouble restarting MTA:SA\n\n"
@@ -267,7 +267,7 @@ msgstr "Een ander exemplaar van MTA is al actief.\n\n"
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
 msgstr "Een ander exemplaar van MTA is al actief.\n\n"
-"Wilt u het beëindigen?"
+"Wilt u het beГ«indigen?"
 
 #: Client/loader/MainFunctions.cpp:1196
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
@@ -290,12 +290,12 @@ msgstr ""
 
 #: Client/loader/MainFunctions.cpp:1529
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr "Laden mislukt. Gelieve te verzekeren dat de laatste data bestanden correct zijn geïnstalleerd."
+msgstr "Laden mislukt. Gelieve te verzekeren dat de laatste data bestanden correct zijn geГЇnstalleerd."
 
 #: Client/loader/MainFunctions.cpp:1538
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "Laden mislukt. Gelieve te verzekeren dat %s correct is geïnstalleerd."
+msgstr "Laden mislukt. Gelieve te verzekeren dat %s correct is geГЇnstalleerd."
 
 #: Client/loader/MainFunctions.cpp:1547
 #, c-format
@@ -349,7 +349,7 @@ msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
 msgstr "Het bestand '%s' is momenteel vergrendeld door %zu processen.\n\n"
-"Wilt u de volgende processen beëindigen en doorgaan met updaten?\n\n"
+"Wilt u de volgende processen beГ«indigen en doorgaan met updaten?\n\n"
 "%s"
 
 #: Client/loader/Install.cpp:479
@@ -394,7 +394,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:1059
 msgid "Install updated MTA:SA files"
-msgstr "Geüpdatet MTA:SA bestanden installeren"
+msgstr "GeГјpdatet MTA:SA bestanden installeren"
 
 #: Client/loader/CInstallManager.cpp:1079
 msgid "Could not update due to file conflicts. Please close other applications and retry"
@@ -403,7 +403,7 @@ msgstr "Kon niet updaten door bestandsconflicten. Gelieve andere toepassingen te
 #: Client/loader/CInstallManager.cpp:1088
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto werd niet correct geïnstalleerd, gelieve te herinstalleren. %s"
+msgstr "Multi Theft Auto werd niet correct geГЇnstalleerd, gelieve te herinstalleren. %s"
 
 #: Client/loader/CInstallManager.cpp:1140
 msgid "Create GTA:SA junctions"
@@ -411,7 +411,7 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:1184
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr "MTA:SA kan niet worden gestart omdat het kopiëren van een bestand is mislukt:"
+msgstr "MTA:SA kan niet worden gestart omdat het kopiГ«ren van een bestand is mislukt:"
 
 #: Client/loader/CInstallManager.cpp:1190
 #: Client/loader/CInstallManager.cpp:1230
@@ -753,7 +753,7 @@ msgstr "Verbinding verbroken: verbinding geweigerd"
 #: Client/core/CConnectManager.cpp:414
 #, c-format
 msgid "No such mod installed (%s)"
-msgstr "Geen dergelijke mod geïnstalleerd (%s)"
+msgstr "Geen dergelijke mod geГЇnstalleerd (%s)"
 
 #: Client/core/CConnectManager.cpp:422
 msgid "Bad server response (2)"
@@ -888,7 +888,7 @@ msgstr "GEWIJZIGDE GTA:SA BESTANDEN"
 
 #: Client/core/CVersionUpdater.cpp:2151 Client/core/CVersionUpdater.cpp:2161
 msgid "Ok"
-msgstr "Oké"
+msgstr "OkГ©"
 
 #: Client/core/CVersionUpdater.cpp:2159
 msgid "ERROR"
@@ -1116,6 +1116,55 @@ msgstr "Server wachtwoorden opslaan"
 
 #: Client/core/CSettings.cpp:835
 msgid "Auto-refresh server browser"
+
+#: Client/core/CSettings.cpp:900
+msgid "History"
+msgstr ""
+
+#: Client/core/CSettings.cpp:910
+msgid "Nickname history"
+msgstr ""
+
+#: Client/core/CSettings.cpp:927
+msgid "Nickname"
+msgstr ""
+
+#: Client/core/CSettings.cpp:928
+msgid "Date"
+msgstr ""
+
+#: Client/core/CSettings.cpp:934
+msgid "Paste to nick"
+msgstr ""
+
+#: Client/core/CSettings.cpp:940
+msgid "Copy"
+msgstr ""
+
+#: Client/core/CSettings.cpp:946
+msgid "Delete"
+msgstr ""
+
+#: Client/core/CSettings.cpp:952
+msgid "Delete All"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4152
+msgid "DELETE NICKNAME"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4153
+msgid "Delete nickname "%s" from history?"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4168
+msgid "DELETE ALL"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4169
+msgid "Delete all nicknames from history?"
+msgstr ""
+
 msgstr "Automatisch serverlijst vernieuwen"
 
 #: Client/core/CSettings.cpp:840
@@ -1913,7 +1962,7 @@ msgstr "PRESTATIE WAARSCHUWING"
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
 msgstr "Het uploaden van je scherm is soms vereist in servers omdat ze anti-cheat programma's hebben.\n\n"
-"(De chat box en GUI worden niet geüpload)\n"
+"(De chat box en GUI worden niet geГјpload)\n"
 
 #: Client/core/CSettings.cpp:5649
 msgid "SCREEN UPLOAD INFORMATION"
@@ -2433,7 +2482,7 @@ msgid "Could not initialize Direct3D9.\n\n"
 "latest Windows Service Packs are installed correctly."
 msgstr "Was niet in staat om Direct3D9 te initialiseren.\n\n"
 "Gelieve ervoor te zorgen dat de DirectX End-User Runtime en\n"
-"laatste Windows Service Packs correct geïnstalleerd zijn."
+"laatste Windows Service Packs correct geГЇnstalleerd zijn."
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
 #: Client/core/ServerBrowser/CServerList.cpp:63
@@ -2577,7 +2626,7 @@ msgstr "Tijd Verlopen"
 #. Set every GUI elements text to blank
 #: Client/core/ServerBrowser/CServerInfo.cpp:515
 msgid "Querying..."
-msgstr "Opvragen…"
+msgstr "OpvragenвЂ¦"
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:189
@@ -3409,7 +3458,7 @@ msgstr "Verbindingsfout"
 
 #: Shared/sdk/SharedUtil.Misc.hpp:381
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr "Multi Theft Auto werd niet correct geïnstalleerd, gelieve te herinstalleren."
+msgstr "Multi Theft Auto werd niet correct geГЇnstalleerd, gelieve te herinstalleren."
 
 #: Shared/sdk/SharedUtil.Misc.hpp:1476
 msgid "Your browser will now display a web page with some help infomation.\n\n"

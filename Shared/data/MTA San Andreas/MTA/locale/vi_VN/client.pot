@@ -1,4 +1,4 @@
-msgid ""
+﻿msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
@@ -34,33 +34,33 @@ msgstr ""
 
 #: Client/loader/Utils.cpp:606
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Chọn thư mục nơi cài đặt Grand Theft Auto: San Andreas"
+msgstr "Chб»Ќn thЖ° mб»Ґc nЖЎi cГ i Д‘бє·t Grand Theft Auto: San Andreas"
 
 #: Client/loader/Utils.cpp:974 Client/loader/CInstallManager.cpp:376
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
 "Please confirm in the next window."
-msgstr "MTA:SA cần quyền Administrator để thực hiện task sau:\n\n"
+msgstr "MTA:SA cбє§n quyб»Ѓn Administrator Д‘б»ѓ thб»±c hiб»‡n task sau:\n\n"
 "  '%s'\n\n"
-"Vui lòng xác nhận ở hộp thoại tiếp theo."
+"Vui lГІng xГЎc nhбє­n б»џ hб»™p thoбєЎi tiбєїp theo."
 
 #: Client/loader/Utils.cpp:1075
 #, c-format
 msgid "Error loading %s module! (%s)"
-msgstr "Lỗi khi tải module %s ! (%s)"
+msgstr "Lб»—i khi tбєЈi module %s ! (%s)"
 
 #: Client/loader/Utils.cpp:1400 Client/loader/Dialogs.cpp:1048
 msgid "Copying files..."
-msgstr "Đang sao chép file..."
+msgstr "Дђang sao chГ©p file..."
 
 #: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:1053
 msgid "Copy finished early. Everything OK."
-msgstr "Việc sao chép được hoàn thành sớm. Mọi thứ đều TỐT."
+msgstr "Viб»‡c sao chГ©p Д‘Ж°б»Јc hoГ n thГ nh sб»›m. Mб»Ќi thб»© Д‘б»Ѓu Tб»ђT."
 
 #: Client/loader/Utils.cpp:1466 Client/loader/Dialogs.cpp:1058
 msgid "Finishing..."
-msgstr "Đang hoàn thành..."
+msgstr "Дђang hoГ n thГ nh..."
 
 #: Client/loader/Utils.cpp:1468 Client/loader/Dialogs.cpp:1062
 msgid "Done!"
@@ -70,43 +70,43 @@ msgstr "Xong!"
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
-msgstr "Đã phát hiện cài đặt mới của %s.\n\n"
-"Bạn có muốn sao chép các tùy chỉnh cài đặt của mình từ %s không?"
+msgstr "ДђГЈ phГЎt hiб»‡n cГ i Д‘бє·t mб»›i cб»§a %s.\n\n"
+"BбєЎn cГі muб»‘n sao chГ©p cГЎc tГ№y chб»‰nh cГ i Д‘бє·t cб»§a mГ¬nh tб»« %s khГґng?"
 
 #: Client/loader/Utils.cpp:1547
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA bị lỗi khi mở file '%s'"
+msgstr "GTA:SA bб»‹ lб»—i khi mб»џ file '%s'"
 
 #: Client/loader/Utils.cpp:1569
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA bị thiếu file '%s'."
+msgstr "GTA:SA bб»‹ thiбєїu file '%s'."
 
 #: Client/loader/Utils.cpp:1594
 msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA bị lỗi khi load model."
+msgstr "GTA:SA bб»‹ lб»—i khi load model."
 
 #: Client/loader/Utils.cpp:1596
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Nếu như bạn đã chỉnh sửa file gta3.img, Hãy thử cài đặt lại GTA:SA."
+msgstr "Nбєїu nhЖ° bбєЎn Д‘ГЈ chб»‰nh sб»­a file gta3.img, HГЈy thб»­ cГ i Д‘бє·t lбєЎi GTA:SA."
 
 #: Client/loader/Utils.cpp:1621
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA bị lỗi khi thêm một nâng cấp cho xe cộ."
+msgstr "GTA:SA bб»‹ lб»—i khi thГЄm mб»™t nГўng cбєҐp cho xe cб»™."
 
 #: Client/loader/Utils.cpp:1640
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA tìm thấy lỗi ở file '%s'"
+msgstr "GTA:SA tГ¬m thбєҐy lб»—i б»џ file '%s'"
 
 #: Client/loader/Utils.cpp:1722
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "Máy tính bạn đã khởi động lại khi đang chơi MTA:SA?"
+msgstr "MГЎy tГ­nh bбєЎn Д‘ГЈ khб»џi Д‘б»™ng lбєЎi khi Д‘ang chЖЎi MTA:SA?"
 
 #: Client/loader/Utils.cpp:1787
 msgid "Please terminate the following programs before continuing:"
-msgstr "Vui lòng tắt hẳn các chương trình sau trước khi tiếp tục:"
+msgstr "Vui lГІng tбєЇt hбєіn cГЎc chЖ°ЖЎng trГ¬nh sau trЖ°б»›c khi tiбєїp tб»Ґc:"
 
 #: Client/loader/MainFunctions.cpp:321
 msgid "Invalid module path detected.\n"
@@ -114,89 +114,89 @@ msgstr ""
 
 #: Client/loader/MainFunctions.cpp:348
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Lỗi phiên bản file không trùng khớp. Cài đặt lại MTA:SA nếu bạn có bất kì lỗi gì.\n"
+msgstr "Lб»—i phiГЄn bбєЈn file khГґng trГ№ng khб»›p. CГ i Д‘бє·t lбєЎi MTA:SA nбєїu bбєЎn cГі bбєҐt kГ¬ lб»—i gГ¬.\n"
 
 #: Client/loader/MainFunctions.cpp:356
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Một số file bị thiếu. Cài đặt lại MTA:SA nếu bạn gặp lỗi.\n"
+msgstr "Mб»™t sб»‘ file bб»‹ thiбєїu. CГ i Д‘бє·t lбєЎi MTA:SA nбєїu bбєЎn gбє·p lб»—i.\n"
 
 #: Client/loader/MainFunctions.cpp:367
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
-msgstr "MTA: SA không tương thích với Chế độ an toàn của Windows.\n\n"
-"Vui lòng khởi động lại PC của bạn.\n"
+msgstr "MTA: SA khГґng tЖ°ЖЎng thГ­ch vб»›i Chбєї Д‘б»™ an toГ n cб»§a Windows.\n\n"
+"Vui lГІng khб»џi Д‘б»™ng lбєЎi PC cб»§a bбєЎn.\n"
 
 #: Client/loader/MainFunctions.cpp:546
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
-msgstr "Bạn bị lỗi khi chạy MTA:SA?.\n\n"
-"Bạn có muốn trở về phiên bản cũ hơn không?"
+msgstr "BбєЎn bб»‹ lб»—i khi chбєЎy MTA:SA?.\n\n"
+"BбєЎn cГі muб»‘n trб»џ vб»Ѓ phiГЄn bбєЈn cЕ© hЖЎn khГґng?"
 
 #: Client/loader/MainFunctions.cpp:574
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
-msgstr "Có vẻ như đang xảy ra lỗi khi chạy MTA:SA.\n"
-"Khôi phục lại thiết lập GTA có thể sửa được lỗi này.\n\n"
-"Bạn có muốn khôi phục lại thiết lập GTA không?"
+msgstr "CГі vбє» nhЖ° Д‘ang xбєЈy ra lб»—i khi chбєЎy MTA:SA.\n"
+"KhГґi phб»Ґc lбєЎi thiбєїt lбє­p GTA cГі thб»ѓ sб»­a Д‘Ж°б»Јc lб»—i nГ y.\n\n"
+"BбєЎn cГі muб»‘n khГґi phб»Ґc lбєЎi thiбєїt lбє­p GTA khГґng?"
 
 #: Client/loader/MainFunctions.cpp:589
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
-msgstr "Các thiết lập của GTA đã được khôi phục như ban đầu.\n\n"
-"Nhấn OK để tiếp tục."
+msgstr "CГЎc thiбєїt lбє­p cб»§a GTA Д‘ГЈ Д‘Ж°б»Јc khГґi phб»Ґc nhЖ° ban Д‘бє§u.\n\n"
+"NhбєҐn OK Д‘б»ѓ tiбєїp tб»Ґc."
 
 #: Client/loader/MainFunctions.cpp:594
 #, c-format
 msgid "File could not be deleted: '%s'"
-msgstr "Không thể tìm thấy file: '%s'"
+msgstr "KhГґng thб»ѓ tГ¬m thбєҐy file: '%s'"
 
 #. No settings to delete, or can't find them
 #: Client/loader/MainFunctions.cpp:602
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
-msgstr "Bạn đang bị lỗi khi chơi MTA:SA?.\n\n"
-"Bạn có muốn tìm trợ giúp về lỗi này ở trên mạng không?"
+msgstr "BбєЎn Д‘ang bб»‹ lб»—i khi chЖЎi MTA:SA?.\n\n"
+"BбєЎn cГі muб»‘n tГ¬m trб»Ј giГєp vб»Ѓ lб»—i nГ y б»џ trГЄn mбєЎng khГґng?"
 
 #. Inform user
 #: Client/loader/MainFunctions.cpp:639
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
-msgstr "Bạn đang bị lỗi khi chạy MTA:SA?.\n\n"
-"Bạn có muốn thay đổi thiết lập sau không?"
+msgstr "BбєЎn Д‘ang bб»‹ lб»—i khi chбєЎy MTA:SA?.\n\n"
+"BбєЎn cГі muб»‘n thay Д‘б»•i thiбєїt lбє­p sau khГґng?"
 
 #: Client/loader/MainFunctions.cpp:640 Client/core/CSettings.cpp:1161
 #: Client/core/CSettings.cpp:1672
 msgid "Fullscreen mode:"
-msgstr "Toàn màn hình:"
+msgstr "ToГ n mГ n hГ¬nh:"
 
 #: Client/loader/MainFunctions.cpp:640 Client/core/CSettings.cpp:1171
 #: Client/core/CSettings.cpp:2337
 msgid "Borderless window"
-msgstr "Cửa sổ không viền"
+msgstr "Cб»­a sб»• khГґng viб»Ѓn"
 
 #: Client/loader/MainFunctions.cpp:711
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
-msgstr "Bạn đang gặp trục trặc khi chơi MTA: SA?. \n\n"
-"Hãy thử vô hiệu hóa các phần mềm(services) sau:"
+msgstr "BбєЎn Д‘ang gбє·p trб»Ґc trбє·c khi chЖЎi MTA: SA?. \n\n"
+"HГЈy thб»­ vГґ hiб»‡u hГіa cГЎc phбє§n mб»Ѓm(services) sau:"
 
 #: Client/loader/MainFunctions.cpp:744
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
-msgstr "CẢNH BÁO\n\n"
-"MTA:SA đã phát hiện một hoạt động bất thường không được an toàn.\n"
-"Hãy thử quét vi-rút một lần xem để đảm bảo máy tính bạn được an toàn.\n\n"
+msgstr "CбєўNH BГЃO\n\n"
+"MTA:SA Д‘ГЈ phГЎt hiб»‡n mб»™t hoбєЎt Д‘б»™ng bбєҐt thЖ°б»ќng khГґng Д‘Ж°б»Јc an toГ n.\n"
+"HГЈy thб»­ quГ©t vi-rГєt mб»™t lбє§n xem Д‘б»ѓ Д‘бєЈm bбєЈo mГЎy tГ­nh bбєЎn Д‘Ж°б»Јc an toГ n.\n\n"
 
 #: Client/loader/MainFunctions.cpp:747
 #, c-format
 msgid "The detected file was:  %s\n"
-msgstr "File đã được phát hiện:  %s\n"
+msgstr "File Д‘ГЈ Д‘Ж°б»Јc phГЎt hiб»‡n:  %s\n"
 
 #: Client/loader/MainFunctions.cpp:995
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr "Hình như GTA: San Andreas đang chạy. Bạn cần phải tắt GTA: San Andreas đi thì mới có thể chơi MTA:SA. Bạn có muốn tắt GTA: San Andreas không?"
+msgstr "HГ¬nh nhЖ° GTA: San Andreas Д‘ang chбєЎy. BбєЎn cбє§n phбєЈi tбєЇt GTA: San Andreas Д‘i thГ¬ mб»›i cГі thб»ѓ chЖЎi MTA:SA. BбєЎn cГі muб»‘n tбєЇt GTA: San Andreas khГґng?"
 
 #: Client/loader/MainFunctions.cpp:996 Client/loader/MainFunctions.cpp:1003
 #: Client/loader/MainFunctions.cpp:1969
@@ -204,21 +204,21 @@ msgstr "Hình như GTA: San Andreas đang chạy. Bạn cần phải tắt GTA: 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1708
 #: Client/game_sa/CGameSA.cpp:270
 msgid "Information"
-msgstr "Thông tin"
+msgstr "ThГґng tin"
 
 #: Client/loader/MainFunctions.cpp:1002
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
-msgstr "Không tắt được GTA: San Andreas. Nếu vẫn bị lỗi, hãy thử khởi động lại máy tính."
+msgstr "KhГґng tбєЇt Д‘Ж°б»Јc GTA: San Andreas. Nбєїu vбє«n bб»‹ lб»—i, hГЈy thб»­ khб»џi Д‘б»™ng lбєЎi mГЎy tГ­nh."
 
 #: Client/loader/MainFunctions.cpp:1131
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
 "Try to launch MTA:SA again?"
-msgstr "Lỗi khi khởi động lại MTA:SA\n\n"
-"Nếu vẫn còn bị lỗi, hãy mở Task Manager và\n"
-"tắt(stop) 'gta_sa.exe' và 'Multi Theft Auto.exe'\n\n\n"
-"Sau đó thử chạy lại MTA:SA?"
+msgstr "Lб»—i khi khб»џi Д‘б»™ng lбєЎi MTA:SA\n\n"
+"Nбєїu vбє«n cГІn bб»‹ lб»—i, hГЈy mб»џ Task Manager vГ \n"
+"tбєЇt(stop) 'gta_sa.exe' vГ  'Multi Theft Auto.exe'\n\n\n"
+"Sau Д‘Гі thб»­ chбєЎy lбєЎi MTA:SA?"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
@@ -255,27 +255,27 @@ msgstr "Lỗi khi khởi động lại MTA:SA\n\n"
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:381
 msgid "Error"
-msgstr "Lỗi"
+msgstr "Lб»—i"
 
 #: Client/loader/MainFunctions.cpp:1155
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
-msgstr "MTA đang chạy.\n\n"
-"Nếu bạn vẫn bị lỗi, hãy thử khởi động lại máy tính"
+msgstr "MTA Д‘ang chбєЎy.\n\n"
+"Nбєїu bбєЎn vбє«n bб»‹ lб»—i, hГЈy thб»­ khб»џi Д‘б»™ng lбєЎi mГЎy tГ­nh"
 
 #: Client/loader/MainFunctions.cpp:1159
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
-msgstr "MTA đang chạy.\n\n"
-"Bạn có muốn tắt nó không?"
+msgstr "MTA Д‘ang chбєЎy.\n\n"
+"BбєЎn cГі muб»‘n tбєЇt nГі khГґng?"
 
 #: Client/loader/MainFunctions.cpp:1196
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
-msgstr "Các entry của Registry bị thiếu. Vui lòng cài đặt lại Multi Theft Auto: San Andreas."
+msgstr "CГЎc entry cб»§a Registry bб»‹ thiбєїu. Vui lГІng cГ i Д‘бє·t lбєЎi Multi Theft Auto: San Andreas."
 
 #: Client/loader/MainFunctions.cpp:1202
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr "Đường dẫn đến thư mục cài đặt GTA: San Andreas chứa các ký tự (unicode) không được hỗ trợ. Vui lòng di chuyển thư mục cài đặt Grand Theft Auto: San Andreas của bạn sang một đường dẫn sử dụng ký tự chuẩn ASCII và cài đặt lại Multi Theft Auto: San Andreas."
+msgstr "ДђЖ°б»ќng dбє«n Д‘бєїn thЖ° mб»Ґc cГ i Д‘бє·t GTA: San Andreas chб»©a cГЎc kГЅ tб»± (unicode) khГґng Д‘Ж°б»Јc hб»— trб»Ј. Vui lГІng di chuyб»ѓn thЖ° mб»Ґc cГ i Д‘бє·t Grand Theft Auto: San Andreas cб»§a bбєЎn sang mб»™t Д‘Ж°б»ќng dбє«n sб»­ dб»Ґng kГЅ tб»± chuбє©n ASCII vГ  cГ i Д‘бє·t lбєЎi Multi Theft Auto: San Andreas."
 
 #: Client/loader/MainFunctions.cpp:1215
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
@@ -290,27 +290,27 @@ msgstr ""
 
 #: Client/loader/MainFunctions.cpp:1529
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr "Không thể load. Hãy chắc chắn các file mới nhất đã được cài đặt đúng cách."
+msgstr "KhГґng thб»ѓ load. HГЈy chбєЇc chбєЇn cГЎc file mб»›i nhбєҐt Д‘ГЈ Д‘Ж°б»Јc cГ i Д‘бє·t Д‘Гєng cГЎch."
 
 #: Client/loader/MainFunctions.cpp:1538
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "Không thể load. Hãy chắc chắn bạn đã cài đặt %s đúng cách."
+msgstr "KhГґng thб»ѓ load. HГЈy chбєЇc chбєЇn bбєЎn Д‘ГЈ cГ i Д‘бє·t %s Д‘Гєng cГЎch."
 
 #: Client/loader/MainFunctions.cpp:1547
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr "Không thể load. Không tìm thấy file gta_sa.exe trong %s."
+msgstr "KhГґng thб»ѓ load. KhГґng tГ¬m thбєҐy file gta_sa.exe trong %s."
 
 #: Client/loader/MainFunctions.cpp:1561
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
-msgstr "Không thể load. %s đang trong thư mục GTA. Vui lòng xóa nó đi trước khi tiếp tục."
+msgstr "KhГґng thб»ѓ load. %s Д‘ang trong thЖ° mб»Ґc GTA. Vui lГІng xГіa nГі Д‘i trЖ°б»›c khi tiбєїp tб»Ґc."
 
 #: Client/loader/MainFunctions.cpp:1571
 #, c-format
 msgid "Main file has an incorrect name (%s)"
-msgstr "File chính có tên không hợp lệ (%s)"
+msgstr "File chГ­nh cГі tГЄn khГґng hб»Јp lб»‡ (%s)"
 
 #: Client/loader/MainFunctions.cpp:1618
 #, c-format
@@ -333,7 +333,7 @@ msgstr ""
 
 #: Client/loader/MainFunctions.cpp:1827
 msgid "Fix configuration issue"
-msgstr "Khắc phục sự cố cấu hình"
+msgstr "KhбєЇc phб»Ґc sб»± cб»‘ cбєҐu hГ¬nh"
 
 #: Client/loader/MainFunctions.cpp:1969
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
@@ -360,24 +360,24 @@ msgstr ""
 
 #: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:1035
 msgid "Installing update..."
-msgstr "Đang cài đặt bản cập nhật..."
+msgstr "Дђang cГ i Д‘бє·t bбєЈn cбє­p nhбє­t..."
 
 #: Client/loader/Install.cpp:934 Client/loader/Dialogs.cpp:1043
 msgid "Extracting files..."
-msgstr "Đang giải nén file..."
+msgstr "Дђang giбєЈi nГ©n file..."
 
 #: Client/loader/CInstallManager.cpp:391
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
-msgstr "MTA:SA không thể thực hiện task sau:\n\n"
+msgstr "MTA:SA khГґng thб»ѓ thб»±c hiб»‡n task sau:\n\n"
 "  '%s'\n"
 
 #: Client/loader/CInstallManager.cpp:460
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
-msgstr "** Lỗi xung đột được gây ra bởi driver đồ họa **\n\n"
-"** Hãy cập nhật driver đồ họa của bạn **"
+msgstr "** Lб»—i xung Д‘б»™t Д‘Ж°б»Јc gГўy ra bб»џi driver Д‘б»“ hб»Ќa **\n\n"
+"** HГЈy cбє­p nhбє­t driver Д‘б»“ hб»Ќa cб»§a bбєЎn **"
 
 #: Client/loader/CInstallManager.cpp:470
 msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
@@ -389,16 +389,16 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:1059
 msgid "Install updated MTA:SA files"
-msgstr "Cài đặt những file MTA:SA đã cập nhật"
+msgstr "CГ i Д‘бє·t nhб»Їng file MTA:SA Д‘ГЈ cбє­p nhбє­t"
 
 #: Client/loader/CInstallManager.cpp:1079
 msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Không thể cập nhật do xung đột tệp. Vui lòng đóng các ứng dụng khác và thử lại"
+msgstr "KhГґng thб»ѓ cбє­p nhбє­t do xung Д‘б»™t tб»‡p. Vui lГІng Д‘Гіng cГЎc б»©ng dб»Ґng khГЎc vГ  thб»­ lбєЎi"
 
 #: Client/loader/CInstallManager.cpp:1088
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto không được cài đặt đúng cách, vui lòng cài đặt lại. %s"
+msgstr "Multi Theft Auto khГґng Д‘Ж°б»Јc cГ i Д‘бє·t Д‘Гєng cГЎch, vui lГІng cГ i Д‘бє·t lбєЎi. %s"
 
 #: Client/loader/CInstallManager.cpp:1140
 msgid "Create GTA:SA junctions"
@@ -454,23 +454,23 @@ msgstr ""
 #: Client/loader/CInstallManager.cpp:1584 Client/core/CCore.cpp:846
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA không thể tiếp tục vì ổ đĩa %s không đủ bộ nhớ lưu trữ."
+msgstr "MTA:SA khГґng thб»ѓ tiбєїp tб»Ґc vГ¬ б»• Д‘Д©a %s khГґng Д‘б»§ bб»™ nhб»› lЖ°u trб»Ї."
 
 #: Client/loader/CInstallManager.cpp:1640
 msgid "Missing file:"
-msgstr "File bị mất:"
+msgstr "File bб»‹ mбєҐt:"
 
 #: Client/loader/CInstallManager.cpp:1644
 msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Nếu MTA không chạy được, vui lòng cài đặt lại GTA:SA"
+msgstr "Nбєїu MTA khГґng chбєЎy Д‘Ж°б»Јc, vui lГІng cГ i Д‘бє·t lбєЎi GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1679
 msgid "Update install settings"
-msgstr "Cập nhật cài đặt cài đặt"
+msgstr "Cбє­p nhбє­t cГ i Д‘бє·t cГ i Д‘бє·t"
 
 #: Client/loader/CInstallManager.cpp:1832
 msgid "Update compatibility settings"
-msgstr "Cập nhật cài đặt tương thích"
+msgstr "Cбє­p nhбє­t cГ i Д‘бє·t tЖ°ЖЎng thГ­ch"
 
 #. /////////////////////////////////////////////////////////////////////////
 #.
@@ -488,7 +488,7 @@ msgstr "Cập nhật cài đặt tương thích"
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 #: Client/gui/CGUIMessageBox_Impl.cpp:72
 msgid "Yes"
-msgstr "Có"
+msgstr "CГі"
 
 #: Client/loader/Dialogs.cpp:64 Client/core/CVersionUpdater.cpp:1634
 #: Client/core/CVersionUpdater.cpp:1652 Client/core/CVersionUpdater.cpp:1921
@@ -499,7 +499,7 @@ msgstr "Có"
 #: Client/core/CMainMenu.cpp:1237 Client/core/CQuestionBox.cpp:194
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 msgid "No"
-msgstr "Không"
+msgstr "KhГґng"
 
 #. Create buttons
 #. OK button
@@ -512,16 +512,16 @@ msgstr "Không"
 #: Client/core/CSettings.cpp:6003 Client/core/CMainMenu.cpp:1258
 #: Client/gui/CGUIMessageBox_Impl.cpp:64
 msgid "OK"
-msgstr "Đồng ý"
+msgstr "Дђб»“ng ГЅ"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "Quit"
-msgstr "Thoát"
+msgstr "ThoГЎt"
 
 #: Client/loader/Dialogs.cpp:67
 #: Client/core/ServerBrowser/CServerBrowser.cpp:717
 msgid "Help"
-msgstr "Trợ giúp"
+msgstr "Trб»Ј giГєp"
 
 #. Cancel button
 #: Client/loader/Dialogs.cpp:68 Client/core/CVersionUpdater.cpp:1853
@@ -530,31 +530,31 @@ msgstr "Trợ giúp"
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
-msgstr "Hủy"
+msgstr "Hб»§y"
 
 #: Client/loader/Dialogs.cpp:83
 msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas đã gặp sự cố"
+msgstr "MTA: San Andreas Д‘ГЈ gбє·p sб»± cб»‘"
 
 #: Client/loader/Dialogs.cpp:84
 msgid "Crash information"
-msgstr "Thông tin lỗi xung đột"
+msgstr "ThГґng tin lб»—i xung Д‘б»™t"
 
 #: Client/loader/Dialogs.cpp:85
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "Tích vào ô để gửi thông tin lỗi xung đột này đến nhà phát triển MTA thông qua 'internet'"
+msgstr "TГ­ch vГ o Гґ Д‘б»ѓ gб»­i thГґng tin lб»—i xung Д‘б»™t nГ y Д‘бєїn nhГ  phГЎt triб»ѓn MTA thГґng qua 'internet'"
 
 #: Client/loader/Dialogs.cpp:86
 msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Bằng việc làm vậy thì lỗi xung đột sẽ được sửa sớm nhất có thể."
+msgstr "Bбє±ng viб»‡c lГ m vбє­y thГ¬ lб»—i xung Д‘б»™t sбєЅ Д‘Ж°б»Јc sб»­a sб»›m nhбєҐt cГі thб»ѓ."
 
 #: Client/loader/Dialogs.cpp:87
 msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "Bạn có muốn khởi động lại MTA: San Andreas ?"
+msgstr "BбєЎn cГі muб»‘n khб»џi Д‘б»™ng lбєЎi MTA: San Andreas ?"
 
 #: Client/loader/Dialogs.cpp:94
 msgid "MTA: San Andreas - Warning"
-msgstr "MTA: San Andreas - Cảnh báo"
+msgstr "MTA: San Andreas - CбєЈnh bГЎo"
 
 #: Client/loader/Dialogs.cpp:95
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
@@ -583,11 +583,11 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:103
 msgid "Play MTA:SA"
-msgstr "Chơi MTA:SA"
+msgstr "ChЖЎi MTA:SA"
 
 #: Client/loader/Dialogs.cpp:109
 msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - Các tùy chọn dễ gây nhầm lẫn"
+msgstr "MTA: San Andreas - CГЎc tГ№y chб»Ќn dб»… gГўy nhбє§m lбє«n"
 
 #: Client/loader/Dialogs.cpp:110
 msgid "NVidia Optimus detected!"
@@ -595,7 +595,7 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:111
 msgid "Try each option and see what works:"
-msgstr "Hãy thử từng tùy chọn và xem xem cái nào chạy được:"
+msgstr "HГЈy thб»­ tб»«ng tГ№y chб»Ќn vГ  xem xem cГЎi nГ o chбєЎy Д‘Ж°б»Јc:"
 
 #: Client/loader/Dialogs.cpp:112
 msgid "A - Standard NVidia"
@@ -615,7 +615,7 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:116
 msgid "If you get desperate, this might help:"
-msgstr "Nếu bạn không tìm ra cách giải quyết, cái này có thể giúp ích cho bạn:"
+msgstr "Nбєїu bбєЎn khГґng tГ¬m ra cГЎch giбєЈi quyбєїt, cГЎi nГ y cГі thб»ѓ giГєp Г­ch cho bбєЎn:"
 
 #: Client/loader/Dialogs.cpp:117
 msgid "If you have already selected an option that works, this might help:"
@@ -623,7 +623,7 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:118
 msgid "Force windowed mode"
-msgstr "Bắt buộc ở chế độ cửa sổ"
+msgstr "BбєЇt buб»™c б»џ chбєї Д‘б»™ cб»­a sб»•"
 
 #: Client/loader/Dialogs.cpp:119
 msgid "Don't show again"
@@ -635,25 +635,25 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:127
 msgid "Warning: Could not detect anti-virus product"
-msgstr "Cảnh báo: Không tìm thấy chương trình diệt vi-rút"
+msgstr "CбєЈnh bГЎo: KhГґng tГ¬m thбєҐy chЖ°ЖЎng trГ¬nh diб»‡t vi-rГєt"
 
 #: Client/loader/Dialogs.cpp:129
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
-msgstr "MTA không tìm thấy phần mềm diệt vi-rút trong máy tính của bạn.\n\n"
-"Vi-rút có thể làm ảnh hưởng đến MTA và làm giảm trải nghiệm khi chơi game.\n\n"
-"Nhấn 'Trợ giúp' để xem thêm."
+msgstr "MTA khГґng tГ¬m thбєҐy phбє§n mб»Ѓm diб»‡t vi-rГєt trong mГЎy tГ­nh cб»§a bбєЎn.\n\n"
+"Vi-rГєt cГі thб»ѓ lГ m бєЈnh hЖ°б»џng Д‘бєїn MTA vГ  lГ m giбєЈm trбєЈi nghiб»‡m khi chЖЎi game.\n\n"
+"NhбєҐn 'Trб»Ј giГєp' Д‘б»ѓ xem thГЄm."
 
 #: Client/loader/Dialogs.cpp:132
 msgid "I have already installed an anti-virus"
-msgstr "Tôi đã cài đặt phần mềm diệt vi-rút"
+msgstr "TГґi Д‘ГЈ cГ i Д‘бє·t phбє§n mб»Ѓm diб»‡t vi-rГєt"
 
 #: Client/loader/Dialogs.cpp:134
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
-msgstr "Tôi sẽ không cài đặt phầm mềm diệt vi-rút.\n"
-"Tôi muốn máy tính của tôi bị lag và là một phần của botnet."
+msgstr "TГґi sбєЅ khГґng cГ i Д‘бє·t phбє§m mб»Ѓm diб»‡t vi-rГєt.\n"
+"TГґi muб»‘n mГЎy tГ­nh cб»§a tГґi bб»‹ lag vГ  lГ  mб»™t phбє§n cб»§a botnet."
 
 #: Client/loader/Dialogs.cpp:667
 msgid "The crash you experienced is due to memory abuse by servers.\n\n"
@@ -667,30 +667,30 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:1024
 msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "Đang tìm Grand Theft Auto San Andreas"
+msgstr "Дђang tГ¬m Grand Theft Auto San Andreas"
 
 #: Client/loader/Dialogs.cpp:1027
 msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Hãy bắt đầu khởi động Grand Theft Auto San Andreas"
+msgstr "HГЈy bбєЇt Д‘бє§u khб»џi Д‘б»™ng Grand Theft Auto San Andreas"
 
 #: Client/core/CConnectManager.cpp:85
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "Kết nối thất bại. Tài khoản không hợp lệ!"
+msgstr "Kбєїt nб»‘i thбєҐt bбєЎi. TГ i khoбєЈn khГґng hб»Јp lб»‡!"
 
 #: Client/core/CConnectManager.cpp:116
 msgid "Connecting failed. Invalid host provided!"
-msgstr "Kết nối thất bại. Địa chỉ server không hợp lệ!"
+msgstr "Kбєїt nб»‘i thбєҐt bбєЎi. Дђб»‹a chб»‰ server khГґng hб»Јp lб»‡!"
 
 #: Client/core/CConnectManager.cpp:132
 #, c-format
 msgid "Connecting to %s at port %u failed!"
-msgstr "Kết nối đến %s tại port %u không thành công!"
+msgstr "Kбєїt nб»‘i Д‘бєїn %s tбєЎi port %u khГґng thГ nh cГґng!"
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:153
 #, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "Đang kết nối đến %s:%u ..."
+msgstr "Дђang kбєїt nб»‘i Д‘бєїn %s:%u ..."
 
 #: Client/core/CConnectManager.cpp:155
 #, c-format
@@ -701,146 +701,146 @@ msgstr ""
 #: Client/core/CConnectManager.cpp:156
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
 msgid "CONNECTING"
-msgstr "ĐANG KẾT NỐI"
+msgstr "ДђANG KбєѕT Nб»ђI"
 
 #: Client/core/CConnectManager.cpp:271
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1358
 msgid "Connection timed out"
-msgstr "Hết thời gian kết nối"
+msgstr "Hбєїt thб»ќi gian kбєїt nб»‘i"
 
 #: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1406
 msgid "Disconnected: unknown protocol error"
-msgstr "Ngắt kết nối: giao thức không hợp lệ"
+msgstr "NgбєЇt kбєїt nб»‘i: giao thб»©c khГґng hб»Јp lб»‡"
 
 #: Client/core/CConnectManager.cpp:293
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1410
 msgid "Disconnected: disconnected remotely"
-msgstr "Ngắt kết nối: ngắt kết nối từ xa"
+msgstr "NgбєЇt kбєїt nб»‘i: ngбєЇt kбєїt nб»‘i tб»« xa"
 
 #: Client/core/CConnectManager.cpp:297
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1414
 msgid "Disconnected: connection lost remotely"
-msgstr "Ngắt kết nối: mất kết nối từ xa"
+msgstr "NgбєЇt kбєїt nб»‘i: mбєҐt kбєїt nб»‘i tб»« xa"
 
 #: Client/core/CConnectManager.cpp:301
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1418
 msgid "Disconnected: you are banned from this server"
-msgstr "Ngắt kết nối: bạn bị cấm khỏi server này"
+msgstr "NgбєЇt kбєїt nб»‘i: bбєЎn bб»‹ cбєҐm khб»Џi server nГ y"
 
 #: Client/core/CConnectManager.cpp:308
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1426
 msgid "Disconnected: disconnected from the server"
-msgstr "Ngắt kết nối: ngắt kết nối khỏi server"
+msgstr "NgбєЇt kбєїt nб»‘i: ngбєЇt kбєїt nб»‘i khб»Џi server"
 
 #: Client/core/CConnectManager.cpp:312
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1430
 msgid "Disconnected: connection to the server was lost"
-msgstr "Đã ngắt kết nối: không thể kết nối đến server"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: khГґng thб»ѓ kбєїt nб»‘i Д‘бєїn server"
 
 #: Client/core/CConnectManager.cpp:319
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1438
 msgid "Disconnected: connection was refused"
-msgstr "Đã ngắt kết nối: kết nối đã bị từ chối"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: kбєїt nб»‘i Д‘ГЈ bб»‹ tб»« chб»‘i"
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:414
 #, c-format
 msgid "No such mod installed (%s)"
-msgstr "Chưa cài đặt bản mod nào (%s)"
+msgstr "ChЖ°a cГ i Д‘бє·t bбєЈn mod nГ o (%s)"
 
 #: Client/core/CConnectManager.cpp:422
 msgid "Bad server response (2)"
-msgstr "Phản hồi của server kém (2)"
+msgstr "PhбєЈn hб»“i cб»§a server kГ©m (2)"
 
 #: Client/core/CConnectManager.cpp:432
 msgid "Bad server response (1)"
-msgstr "Phản hồi của server kém (1)"
+msgstr "PhбєЈn hб»“i cб»§a server kГ©m (1)"
 
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
 msgid "English"
-msgstr "Tiếng Việt"
+msgstr "Tiбєїng Viб»‡t"
 
 #: Client/core/CVersionUpdater.cpp:627
 msgid "Busy"
-msgstr "Bận"
+msgstr "Bбє­n"
 
 #: Client/core/CVersionUpdater.cpp:627
 msgid "Can't check for updates right now"
-msgstr "Không thể kiểm tra các bản cập nhật ngay bây giờ"
+msgstr "KhГґng thб»ѓ kiб»ѓm tra cГЎc bбєЈn cбє­p nhбє­t ngay bГўy giб»ќ"
 
 #: Client/core/CVersionUpdater.cpp:1630 Client/core/CVersionUpdater.cpp:1650
 #: Client/core/CVersionUpdater.cpp:1668
 #, c-format
 msgid "MTA:SA %s required"
-msgstr "yêu cầu MTA: SA %s"
+msgstr "yГЄu cбє§u MTA: SA %s"
 
 #: Client/core/CVersionUpdater.cpp:1631
 #, c-format
 msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
 "Do you want to download and install MTA:SA %s ?"
-msgstr "Để kết nối đến server đã chọn, bạn buộc phải cài đặt một phiên bản cập nhật của MTA:SA %s.\n\n"
-"Bạn có muốn tải xuống và cài đặt MTA:SA %s không?"
+msgstr "Дђб»ѓ kбєїt nб»‘i Д‘бєїn server Д‘ГЈ chб»Ќn, bбєЎn buб»™c phбєЈi cГ i Д‘бє·t mб»™t phiГЄn bбєЈn cбє­p nhбє­t cб»§a MTA:SA %s.\n\n"
+"BбєЎn cГі muб»‘n tбєЈi xuб»‘ng vГ  cГ i Д‘бє·t MTA:SA %s khГґng?"
 
 #: Client/core/CVersionUpdater.cpp:1651
 #, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "Bạn có muốn chạy MTA: SA %s và kết nối với server này không?"
+msgstr "BбєЎn cГі muб»‘n chбєЎy MTA: SA %s vГ  kбєїt nб»‘i vб»›i server nГ y khГґng?"
 
 #: Client/core/CVersionUpdater.cpp:1669
 msgid "It is not possible to connect at this time.\n\n"
 "Please try later."
-msgstr "Hiện tại không thể kết nối.\n\n"
-"Vui lòng thử lại sau."
+msgstr "Hiб»‡n tбєЎi khГґng thб»ѓ kбєїt nб»‘i.\n\n"
+"Vui lГІng thб»­ lбєЎi sau."
 
 #: Client/core/CVersionUpdater.cpp:1851
 msgid "Connecting"
-msgstr "Đang kết nối"
+msgstr "Дђang kбєїt nб»‘i"
 
 #: Client/core/CVersionUpdater.cpp:1852 Client/core/CVersionUpdater.cpp:1868
 msgid "Please wait..."
-msgstr "Vui lòng chờ..."
+msgstr "Vui lГІng chб»ќ..."
 
 #: Client/core/CVersionUpdater.cpp:1867
 msgid "CHECKING"
-msgstr "ĐANG KIỂM TRA"
+msgstr "ДђANG KIб»‚M TRA"
 
 #: Client/core/CVersionUpdater.cpp:1884 Client/core/CVersionUpdater.cpp:1977
 msgid "UPDATE CHECK"
-msgstr "KIỂM TRA CẬP NHẬT"
+msgstr "KIб»‚M TRA Cбє¬P NHбє¬T"
 
 #: Client/core/CVersionUpdater.cpp:1885
 msgid "No update needed"
-msgstr "Không có bản cập nhật nào cả"
+msgstr "KhГґng cГі bбєЈn cбє­p nhбє­t nГ o cбєЈ"
 
 #: Client/core/CVersionUpdater.cpp:1902
 msgid "DOWNLOADING"
-msgstr "ĐANG TẢI XUỐNG"
+msgstr "ДђANG TбєўI XUб»ђNG"
 
 #: Client/core/CVersionUpdater.cpp:1903
 msgid "waiting..."
-msgstr "đợi..."
+msgstr "Д‘б»Јi..."
 
 #: Client/core/CVersionUpdater.cpp:1919
 msgid "MANDATORY UPDATE"
-msgstr "BẮT BUỘC CẬP NHẬT"
+msgstr "Bбє®T BUб»C Cбє¬P NHбє¬T"
 
 #: Client/core/CVersionUpdater.cpp:1920
 msgid "To join this server, you must update MTA.\n\n"
 " Do you want to update now ?"
-msgstr "Để kết nối với server này, bạn cần phải cập nhật MTA.\n\n"
-" Bạn có muốn cập nhật luôn không?"
+msgstr "Дђб»ѓ kбєїt nб»‘i vб»›i server nГ y, bбєЎn cбє§n phбєЈi cбє­p nhбє­t MTA.\n\n"
+" BбєЎn cГі muб»‘n cбє­p nhбє­t luГґn khГґng?"
 
 #: Client/core/CVersionUpdater.cpp:1938
 msgid "OPTIONAL UPDATE"
-msgstr "CẬP NHẬT KHÔNG BẮT BUỘC"
+msgstr "Cбє¬P NHбє¬T KHГ”NG Bбє®T BUб»C"
 
 #: Client/core/CVersionUpdater.cpp:1939
 msgid "Server says an update is recommended, but not essential.\n\n"
 " Do you want to update now ?"
-msgstr "Server cho biết bạn nên cài đặt một bản cập nhật, nhưng có vẻ không cần thiết cho lắm.\n\n"
-" Bạn có muốn cập nhật không?"
+msgstr "Server cho biбєїt bбєЎn nГЄn cГ i Д‘бє·t mб»™t bбєЈn cбє­p nhбє­t, nhЖ°ng cГі vбє» khГґng cбє§n thiбєїt cho lбєЇm.\n\n"
+" BбєЎn cГі muб»‘n cбє­p nhбє­t khГґng?"
 
 #: Client/core/CVersionUpdater.cpp:1978
 msgid "An update is currently not available.\n\n"
@@ -849,36 +849,36 @@ msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:1999 Client/core/CVersionUpdater.cpp:2181
 msgid "ERROR SAVING"
-msgstr "LỖI KHI LƯU"
+msgstr "Lб»–I KHI LЖЇU"
 
 #: Client/core/CVersionUpdater.cpp:2000 Client/core/CVersionUpdater.cpp:2182
 msgid "Unable to create the file."
-msgstr "Không thể tạo được file."
+msgstr "KhГґng thб»ѓ tбєЎo Д‘Ж°б»Јc file."
 
 #: Client/core/CVersionUpdater.cpp:2008 Client/core/CVersionUpdater.cpp:2017
 #: Client/core/CVersionUpdater.cpp:2190 Client/core/CVersionUpdater.cpp:2199
 msgid "ERROR DOWNLOADING"
-msgstr "LỖI KHI TẢI XUỐNG"
+msgstr "Lб»–I KHI TбєўI XUб»ђNG"
 
 #: Client/core/CVersionUpdater.cpp:2009 Client/core/CVersionUpdater.cpp:2191
 msgid "The downloaded file appears to be incorrect."
-msgstr "File đã tải xuống không đúng."
+msgstr "File Д‘ГЈ tбєЈi xuб»‘ng khГґng Д‘Гєng."
 
 #: Client/core/CVersionUpdater.cpp:2018 Client/core/CVersionUpdater.cpp:2200
 msgid "For some reason."
-msgstr "Vì một số lý do."
+msgstr "VГ¬ mб»™t sб»‘ lГЅ do."
 
 #: Client/core/CVersionUpdater.cpp:2029 Client/core/CVersionUpdater.cpp:2213
 msgid "DOWNLOAD COMPLETE"
-msgstr "ĐÃ TẢI XONG"
+msgstr "ДђГѓ TбєўI XONG"
 
 #: Client/core/CVersionUpdater.cpp:2053
 msgid " - Unknown problem in _DialogUpdateResult"
-msgstr " - Lỗi không xác định _DialogUpdateResult"
+msgstr " - Lб»—i khГґng xГЎc Д‘б»‹nh _DialogUpdateResult"
 
 #: Client/core/CVersionUpdater.cpp:2144 Client/core/CSettings.cpp:5731
 msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "FILE GTA:SA ĐÃ TÙY CHỈNH"
+msgstr "FILE GTA:SA ДђГѓ TГ™Y CHб»€NH"
 
 #: Client/core/CVersionUpdater.cpp:2151 Client/core/CVersionUpdater.cpp:2161
 msgid "Ok"
@@ -886,34 +886,34 @@ msgstr ""
 
 #: Client/core/CVersionUpdater.cpp:2159
 msgid "ERROR"
-msgstr "LỖI"
+msgstr "Lб»–I"
 
 #: Client/core/CVersionUpdater.cpp:2160
 msgid "Some MTA:SA data files are missing.\n\n\n"
 "Please reinstall MTA:SA"
-msgstr "Một vài file dữ liệu MTA:SA đã bị xóa.\n\n\n"
-"Hãy cài đặt lại MTA:SA"
+msgstr "Mб»™t vГ i file dб»Ї liб»‡u MTA:SA Д‘ГЈ bб»‹ xГіa.\n\n\n"
+"HГЈy cГ i Д‘бє·t lбєЎi MTA:SA"
 
 #: Client/core/CVersionUpdater.cpp:2837
 #, c-format
 msgid "%3d %% completed"
-msgstr "%3d %% đã hoàn thành"
+msgstr "%3d %% Д‘ГЈ hoГ n thГ nh"
 
 #: Client/core/CVersionUpdater.cpp:2840
 #, c-format
 msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
-"Đang chờ phản hồi  -  %-3d"
+"Дђang chб»ќ phбєЈn hб»“i  -  %-3d"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ LỆNH TRỢ GIÚP ]***\n"
+msgstr "***[ Lб»†NH TRб»ў GIГљP ]***\n"
 
 #: Client/core/CCommandFuncs.cpp:158
 #, c-format
 msgid "* The time is %d:%02d:%02d"
-msgstr "* Thời gian %d:%02d:%02d"
+msgstr "* Thб»ќi gian %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
@@ -921,25 +921,25 @@ msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "kết nối: Cú pháp là 'connect <host> [<port> <nick> <pass>]'"
+msgstr "kбєїt nб»‘i: CГє phГЎp lГ  'connect <host> [<port> <nick> <pass>]'"
 
 #: Client/core/CCommandFuncs.cpp:233
 msgid "connect: Bad port number"
-msgstr "Kết nối: Số port nguy hiểm"
+msgstr "Kбєїt nб»‘i: Sб»‘ port nguy hiб»ѓm"
 
 #: Client/core/CCommandFuncs.cpp:255
 #, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "kết nối: Đang kết nối đến %s:%u..."
+msgstr "kбєїt nб»‘i: Дђang kбєїt nб»‘i Д‘бєїn %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:259
 #, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "kết nối : không thể kết nối đến %s:%u!"
+msgstr "kбєїt nб»‘i : khГґng thб»ѓ kбєїt nб»‘i Д‘бєїn %s:%u!"
 
 #: Client/core/CCommandFuncs.cpp:264
 msgid "connect: Failed to unload current mod"
-msgstr "kết nối: Không thể gỡ bản mod hiện tại"
+msgstr "kбєїt nб»‘i: KhГґng thб»ѓ gб»Ў bбєЈn mod hiб»‡n tбєЎi"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
@@ -961,30 +961,30 @@ msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:363
 msgid "Bound all controls from GTA"
-msgstr "Ràng buộc tất cả các điều khiển từ GTA"
+msgstr "RГ ng buб»™c tбєҐt cбєЈ cГЎc Д‘iб»Ѓu khiб»ѓn tб»« GTA"
 
 #: Client/core/CCommandFuncs.cpp:377
 msgid "Saved configuration file"
-msgstr "Đã lưu file cấu hình"
+msgstr "ДђГЈ lЖ°u file cбєҐu hГ¬nh"
 
 #. Print it
 #: Client/core/CCommandFuncs.cpp:456
 #, c-format
 msgid "* Your serial is: %s"
-msgstr "* Mã serial của bạn: %s"
+msgstr "* MГЈ serial cб»§a bбєЎn: %s"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:503
 msgid "SETTINGS"
-msgstr "CÀI ĐẶT"
+msgstr "CГЂI Дђбє¶T"
 
 #: Client/core/CSettings.cpp:549
 msgid "Multiplayer"
-msgstr "Nhiều người chơi"
+msgstr "Nhiб»Ѓu ngЖ°б»ќi chЖЎi"
 
 #: Client/core/CSettings.cpp:550
 msgid "Video"
-msgstr "Đồ họa"
+msgstr "Дђб»“ hб»Ќa"
 
 #: Client/core/CSettings.cpp:551
 msgid "PostFX"
@@ -992,19 +992,19 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:552
 msgid "Audio"
-msgstr "Âm thanh"
+msgstr "Г‚m thanh"
 
 #: Client/core/CSettings.cpp:553
 msgid "Binds"
-msgstr "Phím"
+msgstr "PhГ­m"
 
 #: Client/core/CSettings.cpp:554
 msgid "Controls"
-msgstr "Điều khiển"
+msgstr "Дђiб»Ѓu khiб»ѓn"
 
 #: Client/core/CSettings.cpp:555
 msgid "Interface"
-msgstr "Thiết lập giao diện"
+msgstr "Thiбєїt lбє­p giao diб»‡n"
 
 #: Client/core/CSettings.cpp:556
 msgid "Web Browser"
@@ -1012,41 +1012,41 @@ msgstr "Web"
 
 #: Client/core/CSettings.cpp:557
 msgid "Advanced"
-msgstr "Thiết lập nâng cao"
+msgstr "Thiбєїt lбє­p nГўng cao"
 
 #: Client/core/CSettings.cpp:582 Client/core/CSettings.cpp:790
 #: Client/core/CSettings.cpp:1119 Client/core/CSettings.cpp:1415
 msgid "Load defaults"
-msgstr "Khôi phục mặc định"
+msgstr "KhГґi phб»Ґc mбє·c Д‘б»‹nh"
 
 #. *
 #. *  Controls tab
 #. *
 #: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:623
 msgid "Mouse sensitivity:"
-msgstr "Tốc độ chuột:"
+msgstr "Tб»‘c Д‘б»™ chuб»™t:"
 
 #. VerticalAimSensitivity
 #: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:644
 msgid "Vertical aim sensitivity:"
-msgstr "Tốc độ chuột di chuyển khi ngắm theo chiều trên xuống:"
+msgstr "Tб»‘c Д‘б»™ chuб»™t di chuyб»ѓn khi ngбєЇm theo chiб»Ѓu trГЄn xuб»‘ng:"
 
 #. Mouse Options
 #: Client/core/CSettings.cpp:602
 msgid "Mouse options"
-msgstr "Thiết lập chuột"
+msgstr "Thiбєїt lбє­p chuб»™t"
 
 #: Client/core/CSettings.cpp:609
 msgid "Invert mouse vertically"
-msgstr "Đảo ngược góc nhìn lên xuống khi dùng chuột"
+msgstr "ДђбєЈo ngЖ°б»Јc gГіc nhГ¬n lГЄn xuб»‘ng khi dГ№ng chuб»™t"
 
 #: Client/core/CSettings.cpp:613
 msgid "Steer with mouse"
-msgstr "Điều khiển xe bằng chuột"
+msgstr "Дђiб»Ѓu khiб»ѓn xe bбє±ng chuб»™t"
 
 #: Client/core/CSettings.cpp:617
 msgid "Fly with mouse"
-msgstr "Điều khiển báy bay bằng chuột"
+msgstr "Дђiб»Ѓu khiб»ѓn bГЎy bay bбє±ng chuб»™t"
 
 #: Client/core/CSettings.cpp:663
 msgid "Use mouse sensitivity for aiming"
@@ -1055,47 +1055,47 @@ msgstr ""
 #. Joypad options
 #: Client/core/CSettings.cpp:669
 msgid "Joypad options"
-msgstr "Thiết lập Joypad"
+msgstr "Thiбєїt lбє­p Joypad"
 
 #: Client/core/CSettings.cpp:682
 msgid "Standard controls (Mouse + Keyboard)"
-msgstr "Điều khiển tiêu chuẩn (Chuột + Bàn phím)"
+msgstr "Дђiб»Ѓu khiб»ѓn tiГЄu chuбє©n (Chuб»™t + BГ n phГ­m)"
 
 #: Client/core/CSettings.cpp:689
 msgid "Classic controls (Joypad)"
-msgstr "Điều khiển bằng tay cầm (Joypad)"
+msgstr "Дђiб»Ѓu khiб»ѓn bбє±ng tay cбє§m (Joypad)"
 
 #: Client/core/CSettings.cpp:726
 msgid "Dead Zone"
-msgstr "Vùng chết"
+msgstr "VГ№ng chбєїt"
 
 #: Client/core/CSettings.cpp:731
 msgid "Saturation"
-msgstr "Độ bão hòa"
+msgstr "Дђб»™ bГЈo hГІa"
 
 #: Client/core/CSettings.cpp:737
 msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "Sử dụng tab 'Phím(Binds)' cho các nút joypad"
+msgstr "Sб»­ dб»Ґng tab 'PhГ­m(Binds)' cho cГЎc nГєt joypad"
 
 #: Client/core/CSettings.cpp:776
 msgid "Left Stick"
-msgstr "Phía bên trái tay cầm"
+msgstr "PhГ­a bГЄn trГЎi tay cбє§m"
 
 #: Client/core/CSettings.cpp:782
 msgid "Right Stick"
-msgstr "Phía bên phải tay cầm"
+msgstr "PhГ­a bГЄn phбєЈi tay cбє§m"
 
 #: Client/core/CSettings.cpp:797
 msgid "DESCRIPTION"
-msgstr "MÔ TẢ"
+msgstr "MГ” Tбєў"
 
 #: Client/core/CSettings.cpp:798
 msgid "KEY"
-msgstr "Phím"
+msgstr "PhГ­m"
 
 #: Client/core/CSettings.cpp:800
 msgid "ALT. KEY"
-msgstr "Phím ALT"
+msgstr "PhГ­m ALT"
 
 #. *
 #. *    Multiplayer tab
@@ -1106,23 +1106,72 @@ msgstr "Nickname:"
 
 #: Client/core/CSettings.cpp:830
 msgid "Save server passwords"
-msgstr "Lưu mật khẩu của server"
+msgstr "LЖ°u mбє­t khбє©u cб»§a server"
 
 #: Client/core/CSettings.cpp:835
 msgid "Auto-refresh server browser"
-msgstr "Tự động làm mới trình duyệt server"
+
+#: Client/core/CSettings.cpp:900
+msgid "History"
+msgstr ""
+
+#: Client/core/CSettings.cpp:910
+msgid "Nickname history"
+msgstr ""
+
+#: Client/core/CSettings.cpp:927
+msgid "Nickname"
+msgstr ""
+
+#: Client/core/CSettings.cpp:928
+msgid "Date"
+msgstr ""
+
+#: Client/core/CSettings.cpp:934
+msgid "Paste to nick"
+msgstr ""
+
+#: Client/core/CSettings.cpp:940
+msgid "Copy"
+msgstr ""
+
+#: Client/core/CSettings.cpp:946
+msgid "Delete"
+msgstr ""
+
+#: Client/core/CSettings.cpp:952
+msgid "Delete All"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4152
+msgid "DELETE NICKNAME"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4153
+msgid "Delete nickname "%s" from history?"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4168
+msgid "DELETE ALL"
+msgstr ""
+
+#: Client/core/CSettings.cpp:4169
+msgid "Delete all nicknames from history?"
+msgstr ""
+
+msgstr "Tб»± Д‘б»™ng lГ m mб»›i trГ¬nh duyб»‡t server"
 
 #: Client/core/CSettings.cpp:840
 msgid "Allow screen upload"
-msgstr "Cho phép tải lên ảnh màn hình"
+msgstr "Cho phГ©p tбєЈi lГЄn бєЈnh mГ n hГ¬nh"
 
 #: Client/core/CSettings.cpp:845
 msgid "Allow external sounds"
-msgstr "Cho phép âm thanh bên ngoài"
+msgstr "Cho phГ©p Гўm thanh bГЄn ngoГ i"
 
 #: Client/core/CSettings.cpp:850
 msgid "Always show download window"
-msgstr "Luôn hiển thị cửa sổ tải xuống"
+msgstr "LuГґn hiб»ѓn thб»‹ cб»­a sб»• tбєЈi xuб»‘ng"
 
 #: Client/core/CSettings.cpp:855
 msgid "Allow connecting with Discord Rich Presence"
@@ -1143,15 +1192,15 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:876
 msgid "Use customized GTA:SA files"
-msgstr "Sử dụng các file GTA:SA đã tùy chỉnh"
+msgstr "Sб»­ dб»Ґng cГЎc file GTA:SA Д‘ГЈ tГ№y chб»‰nh"
 
 #: Client/core/CSettings.cpp:881
 msgid "Map rendering options"
-msgstr "Tùy chọn xem bản đồ"
+msgstr "TГ№y chб»Ќn xem bбєЈn Д‘б»“"
 
 #: Client/core/CSettings.cpp:889
 msgid "Opacity:"
-msgstr "Độ mờ:"
+msgstr "Дђб»™ mб»ќ:"
 
 #: Client/core/CSettings.cpp:912
 msgid "Image resolution:"
@@ -1171,27 +1220,27 @@ msgstr ""
 #. *
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:935
 msgid "Master volume:"
-msgstr "Âm lượng tổng:"
+msgstr "Г‚m lЖ°б»Јng tб»•ng:"
 
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:957
 msgid "Radio volume:"
-msgstr "Âm lượng Radio:"
+msgstr "Г‚m lЖ°б»Јng Radio:"
 
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:979
 msgid "SFX volume:"
-msgstr "Âm lượng hiệu ứng:"
+msgstr "Г‚m lЖ°б»Јng hiб»‡u б»©ng:"
 
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:1001
 msgid "MTA volume:"
-msgstr "Âm lượng MTA:"
+msgstr "Г‚m lЖ°б»Јng MTA:"
 
 #: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1023
 msgid "Voice volume:"
-msgstr "Âm lượng đàm thoại:"
+msgstr "Г‚m lЖ°б»Јng Д‘Г m thoбєЎi:"
 
 #: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1067
 msgid "Play mode:"
-msgstr "Chế độ:"
+msgstr "Chбєї Д‘б»™:"
 
 #: Client/core/CSettings.cpp:929 Client/core/CSettings.cpp:1548
 #: Client/core/CSettings.cpp:2916
@@ -1201,19 +1250,19 @@ msgstr "Chung"
 
 #: Client/core/CSettings.cpp:1045
 msgid "Radio options"
-msgstr "Tùy chọn Radio"
+msgstr "TГ№y chб»Ќn Radio"
 
 #: Client/core/CSettings.cpp:1051
 msgid "Radio Equalizer"
-msgstr "Tần số radio"
+msgstr "Tбє§n sб»‘ radio"
 
 #: Client/core/CSettings.cpp:1056
 msgid "Radio Auto-tune"
-msgstr "Tự động điều chỉnh radio"
+msgstr "Tб»± Д‘б»™ng Д‘iб»Ѓu chб»‰nh radio"
 
 #: Client/core/CSettings.cpp:1061
 msgid "Usertrack options"
-msgstr "Tùy chọn nhạc riêng"
+msgstr "TГ№y chб»Ќn nhбєЎc riГЄng"
 
 #: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:4001
 msgid "Radio"
@@ -1221,79 +1270,79 @@ msgstr "Radio"
 
 #: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:4003
 msgid "Random"
-msgstr "Ngẫu nhiên"
+msgstr "Ngбє«u nhiГЄn"
 
 #: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:4005
 msgid "Sequential"
-msgstr "Liên tiếp"
+msgstr "LiГЄn tiбєїp"
 
 #: Client/core/CSettings.cpp:1080
 msgid "Automatic Media Scan"
-msgstr "Tự động quét nhạc"
+msgstr "Tб»± Д‘б»™ng quГ©t nhбєЎc"
 
 #: Client/core/CSettings.cpp:1087
 msgid "Mute options"
-msgstr "Tùy chọn tắt tiếng"
+msgstr "TГ№y chб»Ќn tбєЇt tiбєїng"
 
 #: Client/core/CSettings.cpp:1093
 msgid "Mute All sounds when minimized"
-msgstr "Tắt tất cả âm thanh khi thu nhỏ cửa sổ (Alt + Tab)"
+msgstr "TбєЇt tбєҐt cбєЈ Гўm thanh khi thu nhб»Џ cб»­a sб»• (Alt + Tab)"
 
 #: Client/core/CSettings.cpp:1098
 msgid "Mute Radio sounds when minimized"
-msgstr "Tắt âm thanh Radio khi thu nhỏ cửa sổ (Alt + Tab)"
+msgstr "TбєЇt Гўm thanh Radio khi thu nhб»Џ cб»­a sб»• (Alt + Tab)"
 
 #: Client/core/CSettings.cpp:1103
 msgid "Mute SFX sounds when minimized"
-msgstr "Tắt âm thanh hiệu ứng game khi thu nhỏ cửa sổ (Alt + Tab)"
+msgstr "TбєЇt Гўm thanh hiб»‡u б»©ng game khi thu nhб»Џ cб»­a sб»• (Alt + Tab)"
 
 #: Client/core/CSettings.cpp:1108
 msgid "Mute MTA sounds when minimized"
-msgstr "Tắt âm thanh MTA khi thu nhỏ cửa sổ (Alt + Tab)"
+msgstr "TбєЇt Гўm thanh MTA khi thu nhб»Џ cб»­a sб»• (Alt + Tab)"
 
 #: Client/core/CSettings.cpp:1113
 msgid "Mute Voice sounds when minimized"
-msgstr "Tắt âm thanh đàm thoại khi thu nhỏ cửa sổ (Alt + Tab)"
+msgstr "TбєЇt Гўm thanh Д‘Г m thoбєЎi khi thu nhб»Џ cб»­a sб»• (Alt + Tab)"
 
 #. *
 #. *  Video tab
 #. *
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1135
 msgid "Resolution:"
-msgstr "Độ phân giải:"
+msgstr "Дђб»™ phГўn giбєЈi:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1190
 msgid "FOV:"
-msgstr "Góc nhìn thứ nhất"
+msgstr "GГіc nhГ¬n thб»© nhбєҐt"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1209
 msgid "Draw Distance:"
-msgstr "Load map ở khoảng cách:"
+msgstr "Load map б»џ khoбєЈng cГЎch:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1230
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1461
 msgid "Brightness:"
-msgstr "Độ sáng:"
+msgstr "Дђб»™ sГЎng:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1251
 msgid "FX Quality:"
-msgstr "Chất lượng hiệu ứng:"
+msgstr "ChбєҐt lЖ°б»Јng hiб»‡u б»©ng:"
 
 #: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1265
 msgid "Anisotropic filtering:"
-msgstr "Lọc bất đẳng hướng:"
+msgstr "Lб»Ќc bбєҐt Д‘бєіng hЖ°б»›ng:"
 
 #: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1302
 msgid "Anti-aliasing:"
-msgstr "Khử răng cưa:"
+msgstr "Khб»­ rДѓng cЖ°a:"
 
 #: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1316
 msgid "Aspect Ratio:"
-msgstr "Tỷ lệ khung hình"
+msgstr "Tб»· lб»‡ khung hГ¬nh"
 
 #: Client/core/CSettings.cpp:1147
 msgid "Windowed"
-msgstr "Cửa sổ"
+msgstr "Cб»­a sб»•"
 
 #: Client/core/CSettings.cpp:1153
 msgid "DPI aware"
@@ -1301,11 +1350,11 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1170 Client/core/CSettings.cpp:2335
 msgid "Standard"
-msgstr "Mặc định"
+msgstr "Mбє·c Д‘б»‹nh"
 
 #: Client/core/CSettings.cpp:1172 Client/core/CSettings.cpp:2339
 msgid "Borderless keep res"
-msgstr "Không viền"
+msgstr "KhГґng viб»Ѓn"
 
 #: Client/core/CSettings.cpp:1175
 msgid "Mip Mapping"
@@ -1317,11 +1366,11 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2239
 msgid "Low"
-msgstr "Thấp"
+msgstr "ThбєҐp"
 
 #: Client/core/CSettings.cpp:1260 Client/core/CSettings.cpp:2241
 msgid "Medium"
-msgstr "Trung bình"
+msgstr "Trung bГ¬nh"
 
 #: Client/core/CSettings.cpp:1261 Client/core/CSettings.cpp:1755
 #: Client/core/CSettings.cpp:2243 Client/core/CSettings.cpp:4059
@@ -1330,7 +1379,7 @@ msgstr "Cao"
 
 #: Client/core/CSettings.cpp:1262 Client/core/CSettings.cpp:2245
 msgid "Very high"
-msgstr "Rất cao"
+msgstr "RбєҐt cao"
 
 #: Client/core/CSettings.cpp:1279 Client/core/CSettings.cpp:1282
 #: Client/core/CSettings.cpp:1310 Client/core/CSettings.cpp:1686
@@ -1339,7 +1388,7 @@ msgstr "Rất cao"
 #: Client/core/CSettings.cpp:4098 Client/core/CSettings.cpp:4144
 #: Client/core/CSettings.cpp:5375
 msgid "Off"
-msgstr "Tắt"
+msgstr "TбєЇt"
 
 #: Client/core/CSettings.cpp:1311 Client/core/CSettings.cpp:2251
 msgid "1x"
@@ -1356,7 +1405,7 @@ msgstr "3x"
 #: Client/core/CSettings.cpp:1326 Client/core/CSettings.cpp:1688
 #: Client/core/CSettings.cpp:2261 Client/core/CSettings.cpp:4068
 msgid "Auto"
-msgstr "Tự động"
+msgstr "Tб»± Д‘б»™ng"
 
 #: Client/core/CSettings.cpp:1327 Client/core/CSettings.cpp:2263
 msgid "4:3"
@@ -1372,23 +1421,23 @@ msgstr "16:9"
 
 #: Client/core/CSettings.cpp:1332
 msgid "HUD Match Aspect Ratio"
-msgstr "HUD thay đổi theo tỉ lệ khung hình"
+msgstr "HUD thay Д‘б»•i theo tб»‰ lб»‡ khung hГ¬nh"
 
 #: Client/core/CSettings.cpp:1338
 msgid "Volumetric Shadows"
-msgstr "Hiệu ứng đổ bóng"
+msgstr "Hiб»‡u б»©ng Д‘б»• bГіng"
 
 #: Client/core/CSettings.cpp:1342
 msgid "Grass effect"
-msgstr "Hiệu ứng cỏ lá"
+msgstr "Hiб»‡u б»©ng cб»Џ lГЎ"
 
 #: Client/core/CSettings.cpp:1346
 msgid "Heat haze"
-msgstr "Hiệu ứng nhiệt độ khi trời nóng nóng"
+msgstr "Hiб»‡u б»©ng nhiб»‡t Д‘б»™ khi trб»ќi nГіng nГіng"
 
 #: Client/core/CSettings.cpp:1350
 msgid "Tyre Smoke etc"
-msgstr "Khói từ lốp xe v.v..."
+msgstr "KhГіi tб»« lб»‘p xe v.v..."
 
 #: Client/core/CSettings.cpp:1354
 msgid "Dynamic ped shadows"
@@ -1404,23 +1453,23 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1367
 msgid "Full Screen Minimize"
-msgstr "Thu nhỏ toàn màn hình"
+msgstr "Thu nhб»Џ toГ n mГ n hГ¬nh"
 
 #: Client/core/CSettings.cpp:1379
 msgid "Enable Device Selection Dialog"
-msgstr "Bật hộp thoại lựa chọn thiết bị"
+msgstr "Bбє­t hб»™p thoбєЎi lб»±a chб»Ќn thiбєїt bб»‹"
 
 #: Client/core/CSettings.cpp:1391
 msgid "Show unsafe resolutions"
-msgstr "Hiển thị các độ phân giải không phù hợp"
+msgstr "Hiб»ѓn thб»‹ cГЎc Д‘б»™ phГўn giбєЈi khГґng phГ№ hб»Јp"
 
 #: Client/core/CSettings.cpp:1403
 msgid "Render vehicles always in high detail"
-msgstr "Chi tiết đồ họa của xe cộ ở mức cao"
+msgstr "Chi tiбєїt Д‘б»“ hб»Ќa cб»§a xe cб»™ б»џ mб»©c cao"
 
 #: Client/core/CSettings.cpp:1407
 msgid "Render peds always in high detail"
-msgstr "Chi tiết đồ họa nhân vật ở mức cao"
+msgstr "Chi tiбєїt Д‘б»“ hб»Ќa nhГўn vбє­t б»џ mб»©c cao"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1441
 msgid "Gamma:"
@@ -1444,11 +1493,11 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1554
 msgid "Enable remote websites"
-msgstr "Bật trang web từ xa"
+msgstr "Bбє­t trang web tб»« xa"
 
 #: Client/core/CSettings.cpp:1559
 msgid "Enable Javascript on remote websites"
-msgstr "Bật Javascript trên remote websites"
+msgstr "Bбє­t Javascript trГЄn remote websites"
 
 #: Client/core/CSettings.cpp:1564
 msgid "Enable GPU rendering"
@@ -1456,15 +1505,15 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1568
 msgid "Custom blacklist"
-msgstr "Danh sách trang web không cho phép"
+msgstr "Danh sГЎch trang web khГґng cho phГ©p"
 
 #: Client/core/CSettings.cpp:1579 Client/core/CSettings.cpp:1625
 msgid "Enter a domain e.g. google.com"
-msgstr "Nhập một địa chỉ web (ví dụ: google.com)"
+msgstr "Nhбє­p mб»™t Д‘б»‹a chб»‰ web (vГ­ dб»Ґ: google.com)"
 
 #: Client/core/CSettings.cpp:1587
 msgid "Block"
-msgstr "Chặn"
+msgstr "Chбє·n"
 
 #: Client/core/CSettings.cpp:1602 Client/core/CSettings.cpp:1646
 msgid "Domain"
@@ -1472,7 +1521,7 @@ msgstr "Trang web"
 
 #: Client/core/CSettings.cpp:1604 Client/core/CSettings.cpp:1648
 msgid "Remove domain"
-msgstr "Xóa trang web"
+msgstr "XГіa trang web"
 
 #: Client/core/CSettings.cpp:1608 Client/core/CSettings.cpp:1652
 msgid "Remove all"
@@ -1481,34 +1530,34 @@ msgstr ""
 #. Reset vecTemp
 #: Client/core/CSettings.cpp:1614
 msgid "Custom whitelist"
-msgstr "Danh sách trang web cho phép"
+msgstr "Danh sГЎch trang web cho phГ©p"
 
 #: Client/core/CSettings.cpp:1633 Client/cefweb/CWebsiteRequests.cpp:51
 msgid "Allow"
-msgstr "Cho phép"
+msgstr "Cho phГ©p"
 
 #. Misc section label
 #: Client/core/CSettings.cpp:1665
 msgid "Misc"
-msgstr "Các tùy chọn"
+msgstr "CГЎc tГ№y chб»Ќn"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1679
 #: Client/core/CSettings.cpp:6021
 msgid "Fast CJ clothes loading:"
-msgstr "Tốc độ load áo quần của CJ:"
+msgstr "Tб»‘c Д‘б»™ load ГЎo quбє§n cб»§a CJ:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1693
 #: Client/core/CSettings.cpp:6023
 msgid "Browser speed:"
-msgstr "Tốc độ duyệt web:"
+msgstr "Tб»‘c Д‘б»™ duyб»‡t web:"
 
 #. Single download
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1707
 #: Client/core/CSettings.cpp:6025
 msgid "Single connection:"
-msgstr "Kết nối đơn:"
+msgstr "Kбєїt nб»‘i Д‘ЖЎn:"
 
 #. Packet tag
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1720
@@ -1520,7 +1569,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1733
 #: Client/core/CSettings.cpp:6029
 msgid "Progress animation:"
-msgstr "Hiệu ứng khi Load:"
+msgstr "Hiб»‡u б»©ng khi Load:"
 
 #. Process priority
 #: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1746
@@ -1532,33 +1581,33 @@ msgstr ""
 #: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1760
 #: Client/core/CSettings.cpp:6031
 msgid "Debug setting:"
-msgstr "Cài đặt debug:"
+msgstr "CГ i Д‘бє·t debug:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1783
 #: Client/core/CSettings.cpp:6033
 msgid "Streaming memory:"
-msgstr "Bộ nhớ streaming:"
+msgstr "Bб»™ nhб»› streaming:"
 
 #. Update build type
 #: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1903
 msgid "Update build type:"
-msgstr "Thể loại cập nhật:"
+msgstr "Thб»ѓ loбєЎi cбє­p nhбє­t:"
 
 #. UpdateAutoInstall
 #: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1882
 msgid "Install important updates:"
-msgstr "Cài đặt các cập nhật quan trọng:"
+msgstr "CГ i Д‘бє·t cГЎc cбє­p nhбє­t quan trб»Ќng:"
 
 #: Client/core/CSettings.cpp:1687 Client/core/CSettings.cpp:1715
 #: Client/core/CSettings.cpp:1728 Client/core/CSettings.cpp:4070
 #: Client/core/CSettings.cpp:4086 Client/core/CSettings.cpp:4093
 msgid "On"
-msgstr "Bật"
+msgstr "Bбє­t"
 
 #: Client/core/CSettings.cpp:1700 Client/core/CSettings.cpp:4075
 msgid "Very slow"
-msgstr "Rất chậm"
+msgstr "RбєҐt chбє­m"
 
 #: Client/core/CSettings.cpp:1701 Client/core/CSettings.cpp:1714
 #: Client/core/CSettings.cpp:1727 Client/core/CSettings.cpp:1741
@@ -1568,7 +1617,7 @@ msgstr "Rất chậm"
 #: Client/core/CSettings.cpp:4091 Client/core/CSettings.cpp:4100
 #: Client/core/CSettings.cpp:4137
 msgid "Default"
-msgstr "Mặc định"
+msgstr "Mбє·c Д‘б»‹nh"
 
 #: Client/core/CSettings.cpp:1702 Client/core/CSettings.cpp:4079
 msgid "Fast"
@@ -1576,32 +1625,32 @@ msgstr "Nhanh"
 
 #: Client/core/CSettings.cpp:1753 Client/core/CSettings.cpp:4055
 msgid "Normal"
-msgstr "Bình thường"
+msgstr "BГ¬nh thЖ°б»ќng"
 
 #: Client/core/CSettings.cpp:1754 Client/core/CSettings.cpp:4057
 msgid "Above normal"
-msgstr "Trên mức bình thường"
+msgstr "TrГЄn mб»©c bГ¬nh thЖ°б»ќng"
 
 #: Client/core/CSettings.cpp:1790
 msgid "Min"
-msgstr "Nhỏ nhất"
+msgstr "Nhб»Џ nhбєҐt"
 
 #: Client/core/CSettings.cpp:1815
 msgid "Max"
-msgstr "Tối đa"
+msgstr "Tб»‘i Д‘a"
 
 #. Windows 8 compatibility
 #: Client/core/CSettings.cpp:1823
 msgid "Windows 8 compatibility:"
-msgstr "Tương thích Windows 8:"
+msgstr "TЖ°ЖЎng thГ­ch Windows 8:"
 
 #: Client/core/CSettings.cpp:1827
 msgid "16-bit color"
-msgstr "Màu 16 bit"
+msgstr "MГ u 16 bit"
 
 #: Client/core/CSettings.cpp:1832
 msgid "Mouse fix"
-msgstr "Sửa chuột"
+msgstr "Sб»­a chuб»™t"
 
 #. Cache path info
 #: Client/core/CSettings.cpp:1850
@@ -1610,7 +1659,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1854
 msgid "Show in Explorer"
-msgstr "Hiển thị trong Explorer"
+msgstr "Hiб»ѓn thб»‹ trong Explorer"
 
 #. Process affinity
 #: Client/core/CSettings.cpp:1869
@@ -1620,117 +1669,117 @@ msgstr ""
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1875 Client/core/CSettings.cpp:1878
 msgid "Auto updater"
-msgstr "Tự động cập nhật"
+msgstr "Tб»± Д‘б»™ng cбє­p nhбє­t"
 
 #. Check for updates
 #: Client/core/CSettings.cpp:1916
 msgid "Check for update now"
-msgstr "Kiểm tra cập nhật"
+msgstr "Kiб»ѓm tra cбє­p nhбє­t"
 
 #: Client/core/CSettings.cpp:2102
 msgid "Some settings will be changed when you next start MTA"
-msgstr "Một vài thiết lập sẽ được áp dụng vào lần tiếp theo bạn chạy MTA"
+msgstr "Mб»™t vГ i thiбєїt lбє­p sбєЅ Д‘Ж°б»Јc ГЎp dб»Ґng vГ o lбє§n tiбєїp theo bбєЎn chбєЎy MTA"
 
 #: Client/core/CSettings.cpp:2103
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
-"Bạn có muốn khởi động lại không?"
+"BбєЎn cГі muб»‘n khб»џi Д‘б»™ng lбєЎi khГґng?"
 
 #: Client/core/CSettings.cpp:2106
 msgid "RESTART REQUIRED"
-msgstr "CẦN KHỞI ĐỘNG LẠI"
+msgstr "Cбє¦N KHб»ћI Дђб»NG Lбє I"
 
 #: Client/core/CSettings.cpp:2126
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr "Một vài cài đặt sẽ bị thay đổi khi bạn ngắt kết nối máy chủ hiện tại"
+msgstr "Mб»™t vГ i cГ i Д‘бє·t sбєЅ bб»‹ thay Д‘б»•i khi bбєЎn ngбєЇt kбєїt nб»‘i mГЎy chб»§ hiб»‡n tбєЎi"
 
 #: Client/core/CSettings.cpp:2127
 msgid "\n\n"
 "Do you want to disconnect now?"
 msgstr "\n\n"
-"Bạn có muốn ngắt kết nối ngay?"
+"BбєЎn cГі muб»‘n ngбєЇt kбєїt nб»‘i ngay?"
 
 #: Client/core/CSettings.cpp:2130
 msgid "DISCONNECT REQUIRED"
-msgstr "CẦN NGẮT KẾT NỐI"
+msgstr "Cбє¦N NGбє®T KбєѕT Nб»ђI"
 
 #. Update the joystick name
 #: Client/core/CSettings.cpp:2572
 msgid "Joypad not detected  -  Check connections and restart game"
-msgstr "Không tìm thấy Joypad  -  Kiểm tra đầu cắm và thử khởi động lại game"
+msgstr "KhГґng tГ¬m thбєҐy Joypad  -  Kiб»ѓm tra Д‘бє§u cбєЇm vГ  thб»­ khб»џi Д‘б»™ng lбєЎi game"
 
 #: Client/core/CSettings.cpp:2828
 msgid "Binding axis"
-msgstr "Nút joystick"
+msgstr "NГєt joystick"
 
 #: Client/core/CSettings.cpp:2828
 msgid "Move an axis to bind, or escape to clear"
-msgstr "Di chuyển joystick để gán nút, hoặc nhấn escape để xóa"
+msgstr "Di chuyб»ѓn joystick Д‘б»ѓ gГЎn nГєt, hoбє·c nhбєҐn escape Д‘б»ѓ xГіa"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Language:"
-msgstr "Ngôn ngữ:"
+msgstr "NgГґn ngб»Ї:"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Skin:"
-msgstr "Giao diện:"
+msgstr "Giao diб»‡n:"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Presets:"
-msgstr "Thiết lập có sẵn:"
+msgstr "Thiбєїt lбє­p cГі sбєµn:"
 
 #: Client/core/CSettings.cpp:2956
 msgid "Chat"
-msgstr "Trò chuyện"
+msgstr "TrГІ chuyб»‡n"
 
 #: Client/core/CSettings.cpp:2973
 msgid "Load"
-msgstr "Tải"
+msgstr "TбєЈi"
 
 #: Client/core/CSettings.cpp:2985
 msgid "Colors"
-msgstr "Màu"
+msgstr "MГ u"
 
 #: Client/core/CSettings.cpp:2986
 msgid "Layout"
-msgstr "Bố trí"
+msgstr "Bб»‘ trГ­"
 
 #: Client/core/CSettings.cpp:2987 Client/core/CSettings.cpp:3233
 msgid "Options"
-msgstr "Tùy chọn khác"
+msgstr "TГ№y chб»Ќn khГЎc"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Chat Background"
-msgstr "Màu nền khung chat"
+msgstr "MГ u nб»Ѓn khung chat"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Chat Text"
-msgstr "Màu chữ chat"
+msgstr "MГ u chб»Ї chat"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Input Background"
-msgstr "Màu nền ô gõ chữ chat"
+msgstr "MГ u nб»Ѓn Гґ gГµ chб»Ї chat"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Input Text"
-msgstr "Màu chữ gõ chat"
+msgstr "MГ u chб»Ї gГµ chat"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Lines:"
-msgstr "Dòng:"
+msgstr "DГІng:"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Scale:"
-msgstr "Tỉ lệ:"
+msgstr "Tб»‰ lб»‡:"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Width:"
-msgstr "Chiều rộng:"
+msgstr "Chiб»Ѓu rб»™ng:"
 
 #: Client/core/CSettings.cpp:3019
 msgid "Size"
-msgstr "Kích cỡ"
+msgstr "KГ­ch cб»Ў"
 
 #: Client/core/CSettings.cpp:3068
 msgid "after"
@@ -1742,85 +1791,85 @@ msgstr "trong"
 
 #: Client/core/CSettings.cpp:3068
 msgid "sec"
-msgstr "giây"
+msgstr "giГўy"
 
 #: Client/core/CSettings.cpp:3071
 msgid "Fading"
-msgstr "Mờ dần"
+msgstr "Mб»ќ dбє§n"
 
 #: Client/core/CSettings.cpp:3077
 msgid "Fade out old lines"
-msgstr "Làm mờ các dòng cũ"
+msgstr "LГ m mб»ќ cГЎc dГІng cЕ©"
 
 #: Client/core/CSettings.cpp:3117
 msgid "Horizontal:"
-msgstr "Chiều ngang:"
+msgstr "Chiб»Ѓu ngang:"
 
 #: Client/core/CSettings.cpp:3117
 msgid "Vertical:"
-msgstr "Chiều dọc:"
+msgstr "Chiб»Ѓu dб»Ќc:"
 
 #: Client/core/CSettings.cpp:3117
 msgid "Text-Align:"
-msgstr "Căn chỉnh văn bản:"
+msgstr "CДѓn chб»‰nh vДѓn bбєЈn:"
 
 #: Client/core/CSettings.cpp:3117
 msgid "X-Offset:"
-msgstr "Tọa độ X:"
+msgstr "Tб»Ќa Д‘б»™ X:"
 
 #: Client/core/CSettings.cpp:3118
 msgid "Y-Offset:"
-msgstr "Tọa độ Y:"
+msgstr "Tб»Ќa Д‘б»™ Y:"
 
 #: Client/core/CSettings.cpp:3124
 msgid "Position"
-msgstr "Vị trí"
+msgstr "Vб»‹ trГ­"
 
 #: Client/core/CSettings.cpp:3138 Client/core/CSettings.cpp:3166
 #: Client/core/CKeyBinds.cpp:191
 msgid "Left"
-msgstr "Trái"
+msgstr "TrГЎi"
 
 #: Client/core/CSettings.cpp:3139 Client/core/CSettings.cpp:3153
 msgid "Center"
-msgstr "Trung tâm"
+msgstr "Trung tГўm"
 
 #: Client/core/CSettings.cpp:3140 Client/core/CSettings.cpp:3167
 #: Client/core/CKeyBinds.cpp:192
 msgid "Right"
-msgstr "Phải"
+msgstr "PhбєЈi"
 
 #: Client/core/CSettings.cpp:3152
 msgid "Top"
-msgstr "Trên"
+msgstr "TrГЄn"
 
 #: Client/core/CSettings.cpp:3154
 msgid "Bottom"
-msgstr "Dưới"
+msgstr "DЖ°б»›i"
 
 #: Client/core/CSettings.cpp:3202
 msgid "Font"
-msgstr "Phông chữ"
+msgstr "PhГґng chб»Ї"
 
 #: Client/core/CSettings.cpp:3239
 msgid "Hide background when not typing"
-msgstr "Ẩn nền khi không gõ chữ"
+msgstr "бєЁn nб»Ѓn khi khГґng gГµ chб»Ї"
 
 #: Client/core/CSettings.cpp:3244
 msgid "Nickname completion using the \"Tab\" key"
-msgstr "Gợi ý nickname sử dụng phím \"Tab\""
+msgstr "Gб»Јi ГЅ nickname sб»­ dб»Ґng phГ­m \"Tab\""
 
 #: Client/core/CSettings.cpp:3249
 msgid "Allow server to flash the window"
-msgstr "Cho phép server nháy màn hình"
+msgstr "Cho phГ©p server nhГЎy mГ n hГ¬nh"
 
 #: Client/core/CSettings.cpp:3254
 msgid "Allow tray balloon notifications"
-msgstr "Cho phép thông báo trên tray"
+msgstr "Cho phГ©p thГґng bГЎo trГЄn tray"
 
 #: Client/core/CSettings.cpp:3259
 msgid "Chat text black/white outline"
-msgstr "Viền chữ chat màu đen/trắng"
+msgstr "Viб»Ѓn chб»Ї chat mГ u Д‘en/trбєЇng"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
@@ -1828,27 +1877,27 @@ msgstr "Viền chữ chat màu đen/trắng"
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #: Client/core/CSettings.cpp:3508 Client/core/CSettings.cpp:3515
 msgid "Press a key to bind, or escape to clear"
-msgstr "Nhấn một phím để gán, hoặc escape để xóa"
+msgstr "NhбєҐn mб»™t phГ­m Д‘б»ѓ gГЎn, hoбє·c escape Д‘б»ѓ xГіa"
 
 #: Client/core/CSettings.cpp:3509
 msgid "Binding a primary key"
-msgstr "Ràng buộc một key chính"
+msgstr "RГ ng buб»™c mб»™t key chГ­nh"
 
 #: Client/core/CSettings.cpp:3516
 msgid "Binding a secondary key"
-msgstr "Ràng buộc một key phụ"
+msgstr "RГ ng buб»™c mб»™t key phб»Ґ"
 
 #: Client/core/CSettings.cpp:3592
 msgid "GTA GAME CONTROLS"
-msgstr "ĐIỀU KHIỂN GAME GTA"
+msgstr "ДђIб»ЂU KHIб»‚N GAME GTA"
 
 #: Client/core/CSettings.cpp:3594
 msgid "MULTIPLAYER CONTROLS"
-msgstr "ĐIỀU KHIỂN MULTIPLAYER"
+msgstr "ДђIб»ЂU KHIб»‚N MULTIPLAYER"
 
 #: Client/core/CSettings.cpp:3839 Client/core/CSettings.cpp:5982
 msgid "Your nickname contains invalid characters!"
-msgstr "Nickname của bạn chứa các ký tự không hợp lệ!"
+msgstr "Nickname cб»§a bбєЎn chб»©a cГЎc kГЅ tб»± khГґng hб»Јp lб»‡!"
 
 #: Client/core/CSettings.cpp:4441 Client/core/CCore.cpp:709
 #: Client/core/CMainMenu.cpp:303
@@ -1864,55 +1913,55 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:4798
 msgid "Red:"
-msgstr "Đỏ:"
+msgstr "Дђб»Џ:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Green:"
-msgstr "Xanh lục:"
+msgstr "Xanh lб»Ґc:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Blue:"
-msgstr "Xanh dương:"
+msgstr "Xanh dЖ°ЖЎng:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Transparency:"
-msgstr "Độ trong suốt:"
+msgstr "Дђб»™ trong suб»‘t:"
 
 #: Client/core/CSettings.cpp:4801
 msgid "Color"
-msgstr "Màu sắc"
+msgstr "MГ u sбєЇc"
 
 #: Client/core/CSettings.cpp:4907
 msgid "Preview"
-msgstr "Xem trước"
+msgstr "Xem trЖ°б»›c"
 
 #: Client/core/CSettings.cpp:5215
 msgid "Please disconnect before changing language"
-msgstr "Hãy ngắt kết nối trước khi thay đổi ngôn ngữ"
+msgstr "HГЈy ngбєЇt kбєїt nб»‘i trЖ°б»›c khi thay Д‘б»•i ngГґn ngб»Ї"
 
 #: Client/core/CSettings.cpp:5243
 msgid "Please disconnect before changing skin"
-msgstr "Hãy ngắt kết nối trước khi thay đổi giao diện"
+msgstr "HГЈy ngбєЇt kбєїt nб»‘i trЖ°б»›c khi thay Д‘б»•i giao diб»‡n"
 
 #: Client/core/CSettings.cpp:5623
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
-msgstr "Hiệu ứng đổ bóng có thể làm cho máy bạn chậm đi.\n\n"
-"Bạn có chắc muốn bật không?"
+msgstr "Hiб»‡u б»©ng Д‘б»• bГіng cГі thб»ѓ lГ m cho mГЎy bбєЎn chбє­m Д‘i.\n\n"
+"BбєЎn cГі chбєЇc muб»‘n bбє­t khГґng?"
 
 #: Client/core/CSettings.cpp:5627
 msgid "PERFORMANCE WARNING"
-msgstr "CẢNH BÁO HIỆU SUẤT"
+msgstr "CбєўNH BГЃO HIб»†U SUбє¤T"
 
 #: Client/core/CSettings.cpp:5647
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
-msgstr "Tự động upload ảnh màn hình có thể được một số server sử dụng nhằm mục đích chống gian lận.\n\n"
-"(Chatbox và Hud sẽ không kèm theo khi chụp màn hình)\n"
+msgstr "Tб»± Д‘б»™ng upload бєЈnh mГ n hГ¬nh cГі thб»ѓ Д‘Ж°б»Јc mб»™t sб»‘ server sб»­ dб»Ґng nhбє±m mб»Ґc Д‘Г­ch chб»‘ng gian lбє­n.\n\n"
+"(Chatbox vГ  Hud sбєЅ khГґng kГЁm theo khi chб»Ґp mГ n hГ¬nh)\n"
 
 #: Client/core/CSettings.cpp:5649
 msgid "SCREEN UPLOAD INFORMATION"
-msgstr "THÔNG TIN TẢI LÊN ẢNH CHỤP MÀN HÌNH"
+msgstr "THГ”NG TIN TбєўI LГЉN бєўNH CHб»¤P MГЂN HГЊNH"
 
 #: Client/core/CSettings.cpp:5664
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
@@ -1939,10 +1988,10 @@ msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
 "Are you sure you want to use them?"
-msgstr "Một số file trong thư mục dữ liệu GTA:SA của bạn đã được tùy chỉnh.\n"
-"Nếu bạn tick vào hộp này thì MTA sẽ sử dụng những file đã được tùy chỉnh này.\n\n"
-"Tuy nhiên, CÁC FILE DỮ LIỆU GTA:SA ĐÃ TÙY BIẾN BỊ CẤM BỞI NHIỀU SERVER\n\n"
-"Bạn có muốn sử dụng chúng không?"
+msgstr "Mб»™t sб»‘ file trong thЖ° mб»Ґc dб»Ї liб»‡u GTA:SA cб»§a bбєЎn Д‘ГЈ Д‘Ж°б»Јc tГ№y chб»‰nh.\n"
+"Nбєїu bбєЎn tick vГ o hб»™p nГ y thГ¬ MTA sбєЅ sб»­ dб»Ґng nhб»Їng file Д‘ГЈ Д‘Ж°б»Јc tГ№y chб»‰nh nГ y.\n\n"
+"Tuy nhiГЄn, CГЃC FILE Dб»® LIб»†U GTA:SA ДђГѓ TГ™Y BIбєѕN Bб»Љ Cбє¤M Bб»ћI NHIб»ЂU SERVER\n\n"
+"BбєЎn cГі muб»‘n sб»­ dб»Ґng chГєng khГґng?"
 
 #: Client/core/CSettings.cpp:5774
 msgid "Enabling DPI awareness is an experimental feature and\n"
@@ -1962,73 +2011,73 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:6000
 msgid "Please enter a nickname"
-msgstr "Hãy nhập một nickname"
+msgstr "HГЈy nhбє­p mб»™t nickname"
 
 #: Client/core/CSettings.cpp:6001
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
-msgstr "Nhập vào một nickname để sử dụng trong game.  \n"
-"Đây sẽ là tên của bạn khi kết nối đến và chơi tại server bất kỳ"
+msgstr "Nhбє­p vГ o mб»™t nickname Д‘б»ѓ sб»­ dб»Ґng trong game.  \n"
+"ДђГўy sбєЅ lГ  tГЄn cб»§a bбєЎn khi kбєїt nб»‘i Д‘бєїn vГ  chЖЎi tбєЎi server bбєҐt kб»і"
 
 #: Client/core/CSettings.cpp:6019
 msgid "Very experimental feature."
-msgstr "Tính năng thử nghiệm."
+msgstr "TГ­nh nДѓng thб»­ nghiб»‡m."
 
 #: Client/core/CSettings.cpp:6021
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr "Dựng các quầy hàng với các tùy chọn của CJ (Sử dụng thêm 65MB RAM)"
+msgstr "Dб»±ng cГЎc quбє§y hГ ng vб»›i cГЎc tГ№y chб»Ќn cб»§a CJ (Sб»­ dб»Ґng thГЄm 65MB RAM)"
 
 #: Client/core/CSettings.cpp:6023
 msgid "Older routers may require a slower scan speed."
-msgstr "Các bộ định tuyến cũ hơn có thể yêu cầu tốc độ quét chậm hơn."
+msgstr "CГЎc bб»™ Д‘б»‹nh tuyбєїn cЕ© hЖЎn cГі thб»ѓ yГЄu cбє§u tб»‘c Д‘б»™ quГ©t chбє­m hЖЎn."
 
 #: Client/core/CSettings.cpp:6025
 msgid "Switch on to use only one connection when downloading."
-msgstr "Bật để sử dụng duy nhất một đường truyền kết nối khi tải xuống."
+msgstr "Bбє­t Д‘б»ѓ sб»­ dб»Ґng duy nhбєҐt mб»™t Д‘Ж°б»ќng truyб»Ѓn kбєїt nб»‘i khi tбєЈi xuб»‘ng."
 
 #: Client/core/CSettings.cpp:6027
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr "Gắn thẻ gói mạng để giúp ISP xác định lưu lượng truy cập MTA."
+msgstr "GбєЇn thбє» gГіi mбєЎng Д‘б»ѓ giГєp ISP xГЎc Д‘б»‹nh lЖ°u lЖ°б»Јng truy cбє­p MTA."
 
 #: Client/core/CSettings.cpp:6029
 msgid "Spinning circle animation at the bottom of the screen"
-msgstr "Biểu tượng loading xoay vòng ở dưới màn hình"
+msgstr "Biб»ѓu tЖ°б»Јng loading xoay vГІng б»џ dЖ°б»›i mГ n hГ¬nh"
 
 #: Client/core/CSettings.cpp:6031
 msgid "Select default always. (This setting is not saved)"
-msgstr "Luôn luôn chọn mặc định. (Tùy chọn này sẽ không được lưu)"
+msgstr "LuГґn luГґn chб»Ќn mбє·c Д‘б»‹nh. (TГ№y chб»Ќn nГ y sбєЅ khГґng Д‘Ж°б»Јc lЖ°u)"
 
 #: Client/core/CSettings.cpp:6033
 msgid "Maximum is usually best"
-msgstr "Càng cao càng tốt"
+msgstr "CГ ng cao cГ ng tб»‘t"
 
 #: Client/core/CSettings.cpp:6035 Client/core/CSettings.cpp:6037
 msgid "Auto updater:"
-msgstr "Tự động cập nhật:"
+msgstr "Tб»± Д‘б»™ng cбє­p nhбє­t:"
 
 #: Client/core/CSettings.cpp:6035
 msgid "Select default unless you like filling out bug reports."
-msgstr "Chọn mặc định trừ khi bạn muốn điền vào các phản hồi về lỗi."
+msgstr "Chб»Ќn mбє·c Д‘б»‹nh trб»« khi bбєЎn muб»‘n Д‘iб»Ѓn vГ o cГЎc phбєЈn hб»“i vб»Ѓ lб»—i."
 
 #: Client/core/CSettings.cpp:6037
 msgid "Select default to automatically install important updates."
-msgstr "Chọn mặc định để tự động cài đặt các cập nhật quan trọng."
+msgstr "Chб»Ќn mбє·c Д‘б»‹nh Д‘б»ѓ tб»± Д‘б»™ng cГ i Д‘бє·t cГЎc cбє­p nhбє­t quan trб»Ќng."
 
 #: Client/core/CSettings.cpp:6039
 msgid "16-bit color:"
-msgstr "Màu 16-bit:"
+msgstr "MГ u 16-bit:"
 
 #: Client/core/CSettings.cpp:6039
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr "Bật chế độ 16-bit - Yêu cầu khởi động lại MTA"
+msgstr "Bбє­t chбєї Д‘б»™ 16-bit - YГЄu cбє§u khб»џi Д‘б»™ng lбєЎi MTA"
 
 #: Client/core/CSettings.cpp:6041
 msgid "Mouse fix:"
-msgstr "Sửa chuột:"
+msgstr "Sб»­a chuб»™t:"
 
 #: Client/core/CSettings.cpp:6041
 msgid "Mouse movement fix - May need PC restart"
-msgstr "Sửa lỗi di chuyển chuột - Có thể cần khởi động lại máy tính"
+msgstr "Sб»­a lб»—i di chuyб»ѓn chuб»™t - CГі thб»ѓ cбє§n khб»џi Д‘б»™ng lбєЎi mГЎy tГ­nh"
 
 #: Client/core/CSettings.cpp:6043
 msgid "CPU affinity:"
@@ -2040,106 +2089,106 @@ msgstr ""
 
 #: Client/core/CCore.cpp:848 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
-msgstr "Lỗi nghiêm trọng"
+msgstr "Lб»—i nghiГЄm trб»Ќng"
 
 #: Client/core/CCore.cpp:969
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "ĐỂ SỬA, XÓA TỆP NÀY:"
+msgstr "Дђб»‚ Sб»¬A, XГ“A Tб»†P NГЂY:"
 
 #: Client/core/CCore.cpp:1001
 #, c-format
 msgid "%s module is incorrect!"
-msgstr "%s mô-đun không hợp lệ!"
+msgstr "%s mГґ-Д‘un khГґng hб»Јp lб»‡!"
 
 #: Client/core/CCore.cpp:1375
 msgid "Error executing URL"
-msgstr "Lỗi thực thi URL"
+msgstr "Lб»—i thб»±c thi URL"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: Client/core/CCore.cpp:1470
 msgid "this help screen"
-msgstr "màn hình trợ giúp này"
+msgstr "mГ n hГ¬nh trб»Ј giГєp nГ y"
 
 #: Client/core/CCore.cpp:1471 Client/core/CCore.cpp:1472
 msgid "exits the application"
-msgstr "thoát khỏi ứng dụng"
+msgstr "thoГЎt khб»Џi б»©ng dб»Ґng"
 
 #: Client/core/CCore.cpp:1473
 msgid "shows the version"
-msgstr "hiển thị phiên bản"
+msgstr "hiб»ѓn thб»‹ phiГЄn bбєЈn"
 
 #: Client/core/CCore.cpp:1474
 msgid "shows the time"
-msgstr "hiển thị thời gian"
+msgstr "hiб»ѓn thб»‹ thб»ќi gian"
 
 #: Client/core/CCore.cpp:1475
 msgid "shows the hud"
-msgstr "hiển thị hud"
+msgstr "hiб»ѓn thб»‹ hud"
 
 #: Client/core/CCore.cpp:1476
 msgid "shows all the binds"
-msgstr "hiển thị tất cả các phím"
+msgstr "hiб»ѓn thб»‹ tбєҐt cбєЈ cГЎc phГ­m"
 
 #: Client/core/CCore.cpp:1477
 msgid "shows your serial"
-msgstr "hiển thị mã serial của bạn"
+msgstr "hiб»ѓn thб»‹ mГЈ serial cб»§a bбєЎn"
 
 #: Client/core/CCore.cpp:1486
 msgid "connects to a server (host port nick pass)"
-msgstr "kết nối đến một server (host port nick pass)"
+msgstr "kбєїt nб»‘i Д‘бєїn mб»™t server (host port nick pass)"
 
 #: Client/core/CCore.cpp:1487
 msgid "connects to a previous server"
-msgstr "kết nối với server trước đó đã dùng"
+msgstr "kбєїt nб»‘i vб»›i server trЖ°б»›c Д‘Гі Д‘ГЈ dГ№ng"
 
 #: Client/core/CCore.cpp:1488
 msgid "binds a key (key control)"
-msgstr "gán một phím (điều khiển phím)"
+msgstr "gГЎn mб»™t phГ­m (Д‘iб»Ѓu khiб»ѓn phГ­m)"
 
 #: Client/core/CCore.cpp:1489
 msgid "unbinds a key (key)"
-msgstr "bỏ gán một key (key)"
+msgstr "bб»Џ gГЎn mб»™t key (key)"
 
 #: Client/core/CCore.cpp:1490
 msgid "copies the default gta controls"
-msgstr "Sao chép các phím điều khiển mặc định của gta"
+msgstr "Sao chГ©p cГЎc phГ­m Д‘iб»Ѓu khiб»ѓn mбє·c Д‘б»‹nh cб»§a gta"
 
 #: Client/core/CCore.cpp:1491
 msgid "outputs a screenshot"
-msgstr "Xuất ra một ảnh chụp màn hình"
+msgstr "XuбєҐt ra mб»™t бєЈnh chб»Ґp mГ n hГ¬nh"
 
 #: Client/core/CCore.cpp:1492
 msgid "immediately saves the config"
-msgstr "Lưu các thông tin tùy chỉnh ngay"
+msgstr "LЖ°u cГЎc thГґng tin tГ№y chб»‰nh ngay"
 
 #: Client/core/CCore.cpp:1494
 msgid "clears the debug view"
-msgstr "xóa các chế độ xem gỡ lỗi"
+msgstr "xГіa cГЎc chбєї Д‘б»™ xem gб»Ў lб»—i"
 
 #: Client/core/CCore.cpp:1495
 msgid "scrolls the chatbox upwards"
-msgstr "kéo khung trò chuyện lên"
+msgstr "kГ©o khung trГІ chuyб»‡n lГЄn"
 
 #: Client/core/CCore.cpp:1496
 msgid "scrolls the chatbox downwards"
-msgstr "kéo khung trò chuyện xuống"
+msgstr "kГ©o khung trГІ chuyб»‡n xuб»‘ng"
 
 #: Client/core/CCore.cpp:1497
 msgid "scrolls the debug view upwards"
-msgstr "kéo khung xem debug lên"
+msgstr "kГ©o khung xem debug lГЄn"
 
 #: Client/core/CCore.cpp:1498
 msgid "scrolls the debug view downwards"
-msgstr "kéo khung xem debug xuống"
+msgstr "kГ©o khung xem debug xuб»‘ng"
 
 #: Client/core/CCore.cpp:1501
 msgid "shows the memory statistics"
-msgstr "hiển thị thống kê bộ nhớ"
+msgstr "hiб»ѓn thб»‹ thб»‘ng kГЄ bб»™ nhб»›"
 
 #: Client/core/CCore.cpp:1502
 msgid "shows the frame timing graph"
-msgstr "hiển thị biểu đồ khung thời gian"
+msgstr "hiб»ѓn thб»‹ biб»ѓu Д‘б»“ khung thб»ќi gian"
 
 #: Client/core/CCore.cpp:1506
 msgid "for developers: reload news"
@@ -2147,23 +2196,23 @@ msgstr ""
 
 #: Client/core/CMainMenu.cpp:332
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "Bạn đang sử dụng một feature-branch build! Đây là bản build thử nghiệm không thể kết nối đến một server mở!"
+msgstr "BбєЎn Д‘ang sб»­ dб»Ґng mб»™t feature-branch build! ДђГўy lГ  bбєЈn build thб»­ nghiб»‡m khГґng thб»ѓ kбєїt nб»‘i Д‘бєїn mб»™t server mб»џ!"
 
 #: Client/core/CMainMenu.cpp:351
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
-msgstr "MTA hiện tại sẽ không phát hành các bản cập nhật dành cho XP/Vista sau Tháng 7/2019.\n"
-"Hãy nâng cấp Windows để chơi trên các máy chủ có phiên bản mới nhất."
+msgstr "MTA hiб»‡n tбєЎi sбєЅ khГґng phГЎt hГ nh cГЎc bбєЈn cбє­p nhбє­t dГ nh cho XP/Vista sau ThГЎng 7/2019.\n"
+"HГЈy nГўng cбєҐp Windows Д‘б»ѓ chЖЎi trГЄn cГЎc mГЎy chб»§ cГі phiГЄn bбєЈn mб»›i nhбєҐt."
 
 #: Client/core/CMainMenu.cpp:1231
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
-msgstr "Thao tác này sẽ ngắt kết nối bạn khỏi server đang kết nối hiện tại.\n\n"
-"Bạn có chắc chắn muốn ngắt kết nối không?"
+msgstr "Thao tГЎc nГ y sбєЅ ngбєЇt kбєїt nб»‘i bбєЎn khб»Џi server Д‘ang kбєїt nб»‘i hiб»‡n tбєЎi.\n\n"
+"BбєЎn cГі chбєЇc chбєЇn muб»‘n ngбєЇt kбєїt nб»‘i khГґng?"
 
 #: Client/core/CMainMenu.cpp:1235
 msgid "DISCONNECT WARNING"
-msgstr "CẢNH BÁO NGẮT KẾT NỐI"
+msgstr "CбєўNH BГЃO NGбє®T KбєѕT Nб»ђI"
 
 #: Client/core/CMainMenu.cpp:1256
 msgid "INFORMATION"
@@ -2177,140 +2226,140 @@ msgstr ""
 #. News link
 #: Client/core/CNewsBrowser.cpp:172 Client/core/CNewsBrowser.cpp:173
 msgid "Visit latest news article"
-msgstr "Cập nhật các thông tin mới nhất"
+msgstr "Cбє­p nhбє­t cГЎc thГґng tin mб»›i nhбєҐt"
 
 #: Client/core/CScreenShot.cpp:200
 #, c-format
 msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Ảnh chụp màn hình có dung lượng %d bytes, nhưng yêu cầu phải đạt %d"
+msgstr "бєўnh chб»Ґp mГ n hГ¬nh cГі dung lЖ°б»Јng %d bytes, nhЖ°ng yГЄu cбє§u phбєЈi Д‘бєЎt %d"
 
 #: Client/core/CScreenShot.cpp:206
 msgid "Screenshot failed"
-msgstr "Lỗi! không thể chụp màn hình"
+msgstr "Lб»—i! khГґng thб»ѓ chб»Ґp mГ n hГ¬nh"
 
 #: Client/core/CScreenShot.cpp:256
 #, c-format
 msgid "Screenshot taken: '%s'"
-msgstr "Ảnh đã được chụp: '%s'"
+msgstr "бєўnh Д‘ГЈ Д‘Ж°б»Јc chб»Ґp: '%s'"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:233
 msgid "Unknown command or cvar: "
-msgstr "Lệnh không hợp lệ được hoặc cvar: ~"
+msgstr "Lб»‡nh khГґng hб»Јp lб»‡ Д‘Ж°б»Јc hoбє·c cvar: ~"
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
-msgstr "Bắn"
+msgstr "BбєЇn"
 
 #: Client/core/CKeyBinds.cpp:187
 msgid "Next weapon"
-msgstr "Vũ khí tiếp theo"
+msgstr "VЕ© khГ­ tiбєїp theo"
 
 #: Client/core/CKeyBinds.cpp:188
 msgid "Previous weapon"
-msgstr "Vũ khí trước"
+msgstr "VЕ© khГ­ trЖ°б»›c"
 
 #: Client/core/CKeyBinds.cpp:189
 msgid "Forwards"
-msgstr "Tiến"
+msgstr "Tiбєїn"
 
 #: Client/core/CKeyBinds.cpp:190
 msgid "Backwards"
-msgstr "Lùi"
+msgstr "LГ№i"
 
 #: Client/core/CKeyBinds.cpp:193
 msgid "Zoom in"
-msgstr "Phóng to"
+msgstr "PhГіng to"
 
 #: Client/core/CKeyBinds.cpp:194
 msgid "Zoom out"
-msgstr "Phóng nhỏ"
+msgstr "PhГіng nhб»Џ"
 
 #: Client/core/CKeyBinds.cpp:195
 msgid "Enter/Exit"
-msgstr "Đi vào/Thoát"
+msgstr "Дђi vГ o/ThoГЎt"
 
 #: Client/core/CKeyBinds.cpp:196
 msgid "Change camera"
-msgstr "Thay đổi góc nhìn"
+msgstr "Thay Д‘б»•i gГіc nhГ¬n"
 
 #. 10
 #: Client/core/CKeyBinds.cpp:197
 msgid "Jump"
-msgstr "Nhảy"
+msgstr "NhбєЈy"
 
 #: Client/core/CKeyBinds.cpp:198
 msgid "Sprint"
-msgstr "Chạy"
+msgstr "ChбєЎy"
 
 #: Client/core/CKeyBinds.cpp:199
 msgid "Look behind"
-msgstr "Nhìn phía sau"
+msgstr "NhГ¬n phГ­a sau"
 
 #: Client/core/CKeyBinds.cpp:200
 msgid "Crouch"
-msgstr "Ngồi"
+msgstr "Ngб»“i"
 
 #: Client/core/CKeyBinds.cpp:201
 msgid "Action"
-msgstr "Cử chỉ"
+msgstr "Cб»­ chб»‰"
 
 #: Client/core/CKeyBinds.cpp:202
 msgid "Walk"
-msgstr "Đi bộ"
+msgstr "Дђi bб»™"
 
 #: Client/core/CKeyBinds.cpp:203
 msgid "Vehicle fire"
-msgstr "Bắn (trên xe)"
+msgstr "BбєЇn (trГЄn xe)"
 
 #: Client/core/CKeyBinds.cpp:204
 msgid "Vehicle secondary fire"
-msgstr "Vũ khi phụ bắn (trên xe)"
+msgstr "VЕ© khi phб»Ґ bбєЇn (trГЄn xe)"
 
 #: Client/core/CKeyBinds.cpp:205
 msgid "Vehicle left"
-msgstr "Bên trái xe"
+msgstr "BГЄn trГЎi xe"
 
 #: Client/core/CKeyBinds.cpp:206
 msgid "Vehicle right"
-msgstr "Bên phải xe"
+msgstr "BГЄn phбєЈi xe"
 
 #. 20
 #: Client/core/CKeyBinds.cpp:207
 msgid "Steer forwards/down"
-msgstr "Hướng lên/xuống"
+msgstr "HЖ°б»›ng lГЄn/xuб»‘ng"
 
 #: Client/core/CKeyBinds.cpp:208
 msgid "Steer backwards/up"
-msgstr "Hướng lùi/tiến"
+msgstr "HЖ°б»›ng lГ№i/tiбєїn"
 
 #: Client/core/CKeyBinds.cpp:209
 msgid "Accelerate"
-msgstr "Tăng tốc"
+msgstr "TДѓng tб»‘c"
 
 #: Client/core/CKeyBinds.cpp:210
 msgid "Brake/Reverse"
-msgstr "Phanh/Đi lùi"
+msgstr "Phanh/Дђi lГ№i"
 
 #: Client/core/CKeyBinds.cpp:211
 msgid "Radio next"
-msgstr "Radio tiếp theo"
+msgstr "Radio tiбєїp theo"
 
 #: Client/core/CKeyBinds.cpp:212
 msgid "Radio previous"
-msgstr "Radio trước"
+msgstr "Radio trЖ°б»›c"
 
 #: Client/core/CKeyBinds.cpp:213
 msgid "Radio user track skip"
-msgstr "Bỏ qua radio của người dùng"
+msgstr "Bб»Џ qua radio cб»§a ngЖ°б»ќi dГ№ng"
 
 #: Client/core/CKeyBinds.cpp:214
 msgid "Horn"
-msgstr "Còi"
+msgstr "CГІi"
 
 #: Client/core/CKeyBinds.cpp:215
 msgid "Sub-mission"
-msgstr "Nhiệm vụ nhỏ"
+msgstr "Nhiб»‡m vб»Ґ nhб»Џ"
 
 #: Client/core/CKeyBinds.cpp:216
 msgid "Handbrake"
@@ -2319,65 +2368,65 @@ msgstr "Phanh tay"
 #. 30
 #: Client/core/CKeyBinds.cpp:217
 msgid "Vehicle look left"
-msgstr "Nhìn bên trái xe"
+msgstr "NhГ¬n bГЄn trГЎi xe"
 
 #: Client/core/CKeyBinds.cpp:218
 msgid "Vehicle look right"
-msgstr "Nhìn bên phải xe"
+msgstr "NhГ¬n bГЄn phбєЈi xe"
 
 #: Client/core/CKeyBinds.cpp:219
 msgid "Vehicle look behind"
-msgstr "Nhìn đằng sau xe"
+msgstr "NhГ¬n Д‘бє±ng sau xe"
 
 #: Client/core/CKeyBinds.cpp:220
 msgid "Vehicle mouse look"
-msgstr "Góc nhìn của chuột khi trên xe"
+msgstr "GГіc nhГ¬n cб»§a chuб»™t khi trГЄn xe"
 
 #: Client/core/CKeyBinds.cpp:221
 msgid "Special control left"
-msgstr "Điều khiển bên trái riêng"
+msgstr "Дђiб»Ѓu khiб»ѓn bГЄn trГЎi riГЄng"
 
 #: Client/core/CKeyBinds.cpp:222
 msgid "Special control right"
-msgstr "Điều khiển phải riêng"
+msgstr "Дђiб»Ѓu khiб»ѓn phбєЈi riГЄng"
 
 #: Client/core/CKeyBinds.cpp:223
 msgid "Special control down"
-msgstr "Điều khiển xuống riêng"
+msgstr "Дђiб»Ѓu khiб»ѓn xuб»‘ng riГЄng"
 
 #: Client/core/CKeyBinds.cpp:224
 msgid "Special control up"
-msgstr "Điều khiển tiến riêng"
+msgstr "Дђiб»Ѓu khiб»ѓn tiбєїn riГЄng"
 
 #: Client/core/CKeyBinds.cpp:225
 msgid "Aim weapon"
-msgstr "Tầm ngắm"
+msgstr "Tбє§m ngбєЇm"
 
 #: Client/core/CKeyBinds.cpp:226
 msgid "Conversation yes"
-msgstr "Cuộc trò chuyện có"
+msgstr "Cuб»™c trГІ chuyб»‡n cГі"
 
 #. 40
 #: Client/core/CKeyBinds.cpp:227
 msgid "Conversation no"
-msgstr "Cuộc trò chuyện không"
+msgstr "Cuб»™c trГІ chuyб»‡n khГґng"
 
 #: Client/core/CKeyBinds.cpp:228
 msgid "Group control forwards"
-msgstr "Điều khiển nhóm tiến"
+msgstr "Дђiб»Ѓu khiб»ѓn nhГіm tiбєїn"
 
 #: Client/core/CKeyBinds.cpp:229
 msgid "Group control backwards"
-msgstr "Nhóm điều khiển ngược"
+msgstr "NhГіm Д‘iб»Ѓu khiб»ѓn ngЖ°б»Јc"
 
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:93
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Giao diện mà bạn chọn không thể sử dụng, và đồng thời giao diện mặc định cũng không hoạt động luôn, vui lòng cài đặt lại MTA."
+msgstr "Giao diб»‡n mГ  bбєЎn chб»Ќn khГґng thб»ѓ sб»­ dб»Ґng, vГ  Д‘б»“ng thб»ќi giao diб»‡n mбє·c Д‘б»‹nh cЕ©ng khГґng hoбєЎt Д‘б»™ng luГґn, vui lГІng cГ i Д‘бє·t lбєЎi MTA."
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1462
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "Bạn có muốn tìm kiếm trợ giúp về vẫn đề này ở trên mạng không?"
+msgstr "BбєЎn cГі muб»‘n tГ¬m kiбєїm trб»Ј giГєp vб»Ѓ vбє«n Д‘б»Ѓ nГ y б»џ trГЄn mбєЎng khГґng?"
 
 #. Create window
 #: Client/core/CConsole.cpp:417
@@ -2386,27 +2435,27 @@ msgstr "CONSOLE"
 
 #: Client/core/CCredits.cpp:34
 msgid "Programming"
-msgstr "Lập trình"
+msgstr "Lбє­p trГ¬nh"
 
 #: Client/core/CCredits.cpp:65
 msgid "Contributors"
-msgstr "Cộng tác viên"
+msgstr "Cб»™ng tГЎc viГЄn"
 
 #: Client/core/CCredits.cpp:85
 msgid "Game Design / Scripting"
-msgstr "Thiết kế Game / Scripting"
+msgstr "Thiбєїt kбєї Game / Scripting"
 
 #: Client/core/CCredits.cpp:105
 msgid "Language Localization"
-msgstr "Ngôn ngữ bản địa hóa"
+msgstr "NgГґn ngб»Ї bбєЈn Д‘б»‹a hГіa"
 
 #: Client/core/CCredits.cpp:111
 msgid "Patch contributors"
-msgstr "Người trợ giúp bản patch"
+msgstr "NgЖ°б»ќi trб»Ј giГєp bбєЈn patch"
 
 #: Client/core/CCredits.cpp:234
 msgid "Special Thanks"
-msgstr "Lời cảm ơn sâu sắc"
+msgstr "Lб»ќi cбєЈm ЖЎn sГўu sбєЇc"
 
 #: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
@@ -2414,34 +2463,34 @@ msgstr ""
 
 #: Client/core/CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
-msgstr "Nút tăng tốc"
+msgstr "NГєt tДѓng tб»‘c"
 
 #: Client/core/CJoystickManager.cpp:1580
 msgid "Brake Axis"
-msgstr "Nút phanh"
+msgstr "NГєt phanh"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:125
 msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
-msgstr "Không thể thiết lập Direct3D9.\n\n"
-"Hãy chắc chắn rằng DirectX End-User Runtime và\n"
-"bản Windows Service Packs mới nhất đã được cài đặt."
+msgstr "KhГґng thб»ѓ thiбєїt lбє­p Direct3D9.\n\n"
+"HГЈy chбєЇc chбєЇn rбє±ng DirectX End-User Runtime vГ \n"
+"bбєЈn Windows Service Packs mб»›i nhбєҐt Д‘ГЈ Д‘Ж°б»Јc cГ i Д‘бє·t."
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
 #: Client/core/ServerBrowser/CServerList.cpp:63
 msgid "Idle"
-msgstr "Trạng thái chờ"
+msgstr "TrбєЎng thГЎi chб»ќ"
 
 #: Client/core/ServerBrowser/CServerList.cpp:168
 #: Client/core/ServerBrowser/CServerBrowser.cpp:3158
 msgid "player"
 msgid_plural "players"
-msgstr[0] "người chơi"
+msgstr[0] "ngЖ°б»ќi chЖЎi"
 
 #: Client/core/ServerBrowser/CServerList.cpp:169
 msgid "on"
-msgstr "trên"
+msgstr "trГЄn"
 
 #: Client/core/ServerBrowser/CServerList.cpp:172
 #: Client/core/ServerBrowser/CServerBrowser.cpp:3164
@@ -2453,21 +2502,21 @@ msgstr[0] "server"
 #: Client/core/ServerBrowser/CServerList.cpp:306
 #, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Đang lấy danh sách server chính (%lu mili giây đã trôi qua)"
+msgstr "Дђang lбєҐy danh sГЎch server chГ­nh (%lu mili giГўy Д‘ГЈ trГґi qua)"
 
 #. Abort
 #: Client/core/ServerBrowser/CServerList.cpp:324
 msgid "Master server list could not be parsed."
-msgstr "Không thể phân tích cú pháp danh sách server chính."
+msgstr "KhГґng thб»ѓ phГўn tГ­ch cГє phГЎp danh sГЎch server chГ­nh."
 
 #. Abort
 #: Client/core/ServerBrowser/CServerList.cpp:334
 msgid "Master server list could not be retrieved."
-msgstr "Không thể lấy danh sách server chính."
+msgstr "KhГґng thб»ѓ lбєҐy danh sГЎch server chГ­nh."
 
 #: Client/core/ServerBrowser/CServerList.cpp:349
 msgid "(Backup server list)"
-msgstr "(Danh sách server sao lưu)"
+msgstr "(Danh sГЎch server sao lЖ°u)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:419
 msgid "Cannot create LAN-broadcast socket"
@@ -2475,17 +2524,17 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerList.cpp:429
 msgid "Cannot bind LAN-broadcast socket"
-msgstr "Không thể ràng buộc socket LAN-broadcast"
+msgstr "KhГґng thб»ѓ rГ ng buб»™c socket LAN-broadcast"
 
 #: Client/core/ServerBrowser/CServerList.cpp:472
 msgid "Attempting to discover LAN servers"
-msgstr "Đang tìm kiếm các server trong mạng LAN"
+msgstr "Дђang tГ¬m kiбєїm cГЎc server trong mбєЎng LAN"
 
 #. Create queue window
 #: Client/core/ServerBrowser/CServerInfo.cpp:32
 #: Client/core/ServerBrowser/CServerInfo.cpp:302
 msgid "SERVER IS FULL"
-msgstr "SERVER ĐÃ ĐẦY"
+msgstr "SERVER ДђГѓ Дђбє¦Y"
 
 #. Determine our label draw position for L10n
 #. Start position
@@ -2493,87 +2542,87 @@ msgstr "SERVER ĐÃ ĐẦY"
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:53
 msgid "Name:"
-msgstr "Tên:"
+msgstr "TГЄn:"
 
 #. Server IP
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:64
 msgid "Server Address:"
-msgstr "Địa chỉ server:"
+msgstr "Дђб»‹a chб»‰ server:"
 
 #. Gamemode
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:75
 msgid "Gamemode:"
-msgstr "Thể loại:"
+msgstr "Thб»ѓ loбєЎi:"
 
 #. Map
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:86
 msgid "Map:"
-msgstr "Bản đồ:"
+msgstr "BбєЈn Д‘б»“:"
 
 #. Players
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:97
 msgid "Players:"
-msgstr "Người chơi:"
+msgstr "NgЖ°б»ќi chЖЎi:"
 
 #. Passworded
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:108
 msgid "Passworded:"
-msgstr "Yêu cầu mật khẩu:"
+msgstr "YГЄu cбє§u mбє­t khбє©u:"
 
 #. Latency
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:119
 msgid "Latency:"
-msgstr "Độ trễ:"
+msgstr "Дђб»™ trб»…:"
 
 #. Column for player names
 #. Player List Columns
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
 #: Client/core/ServerBrowser/CServerBrowser.cpp:635
 msgid "Player list"
-msgstr "Người chơi"
+msgstr "NgЖ°б»ќi chЖЎi"
 
 #. Close button
 #: Client/core/ServerBrowser/CServerInfo.cpp:144
 msgid "Close"
-msgstr "Đóng"
+msgstr "ДђГіng"
 
 #. Join Game button
 #: Client/core/ServerBrowser/CServerInfo.cpp:152
 msgid "Join Game"
-msgstr "Vào Game"
+msgstr "VГ o Game"
 
 #. Please enter password label
 #: Client/core/ServerBrowser/CServerInfo.cpp:166
 msgid "Please enter the password to the server:"
-msgstr "Nhập mật khẩu để kết nối server:"
+msgstr "Nhбє­p mбє­t khбє©u Д‘б»ѓ kбєїt nб»‘i server:"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
-msgstr "Kết nối server ngay sau khi có chỗ trống."
+msgstr "Kбєїt nб»‘i server ngay sau khi cГі chб»— trб»‘ng."
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "HÃY NHẬP MẬT KHẨU MÁY CHỦ"
+msgstr "HГѓY NHбє¬P Mбє¬T KHбєЁU MГЃY CHб»¦"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Timed Out"
-msgstr "Hết thời gian kết nối"
+msgstr "Hбєїt thб»ќi gian kбєїt nб»‘i"
 
 #. Set every GUI elements text to blank
 #: Client/core/ServerBrowser/CServerInfo.cpp:515
 msgid "Querying..."
-msgstr "Đang tải..."
+msgstr "Дђang tбєЈi..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:189
 msgid "SERVER BROWSER"
-msgstr "TRÌNH DUYỆT CỦA SERVER"
+msgstr "TRГЊNH DUYб»†T Cб»¦A SERVER"
 
 #. Create the tabs
 #: Client/core/ServerBrowser/CServerBrowser.cpp:237
@@ -2583,64 +2632,64 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:238
 msgid "Local"
-msgstr "Cục bộ"
+msgstr "Cб»Ґc bб»™"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:239
 msgid "Favourites"
-msgstr "Yêu thích"
+msgstr "YГЄu thГ­ch"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:240
 msgid "Recent"
-msgstr "Gần đây"
+msgstr "Gбє§n Д‘Гўy"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:309
 msgid "FOR QUICK CONNECT:\n\n"
 "Type the address and port into the address bar.\n"
 "Or select a server from the history list and press 'Connect'"
-msgstr "ĐỂ KẾT NỐI NGAY:\n\n"
-"Nhập địa chỉ server và port vào thanh địa chỉ.\n"
-"Hoặc bạn có thể chọn một server đã kết nối trước đó ở trong danh sách lịch sử server đã kết nối và nhấn 'Kết nối'"
+msgstr "Дђб»‚ KбєѕT Nб»ђI NGAY:\n\n"
+"Nhбє­p Д‘б»‹a chб»‰ server vГ  port vГ o thanh Д‘б»‹a chб»‰.\n"
+"Hoбє·c bбєЎn cГі thб»ѓ chб»Ќn mб»™t server Д‘ГЈ kбєїt nб»‘i trЖ°б»›c Д‘Гі б»џ trong danh sГЎch lб»‹ch sб»­ server Д‘ГЈ kбєїt nб»‘i vГ  nhбєҐn 'Kбєїt nб»‘i'"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:321
 msgid "HELP"
-msgstr "TRỢ GIÚP"
+msgstr "TRб»ў GIГљP"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:371
 msgid "Refresh"
-msgstr "Làm mới"
+msgstr "LГ m mб»›i"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:372
 msgid "Add Favorite"
-msgstr "Thêm vào mục yêu thích"
+msgstr "ThГЄm vГ o mб»Ґc yГЄu thГ­ch"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:373
 #: Client/core/ServerBrowser/CServerBrowser.cpp:457
 #: Client/core/ServerBrowser/CServerBrowser.cpp:528
 msgid "Connect"
-msgstr "Kết nối"
+msgstr "Kбєїt nб»‘i"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:374
 msgid "Server information"
-msgstr "Thông tin server"
+msgstr "ThГґng tin server"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:375
 msgid "Search servers"
-msgstr "Tìm kiếm server"
+msgstr "TГ¬m kiбєїm server"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:376
 msgid "Search players"
-msgstr "Tìm kiếm người chơi"
+msgstr "TГ¬m kiбєїm ngЖ°б»ќi chЖЎi"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:377
 msgid "Start search"
-msgstr "Tìm kiếm"
+msgstr "TГ¬m kiбєїm"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:378
@@ -2650,20 +2699,20 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2086
 msgid "Search players..."
-msgstr "Đang tìm kiếm người chơi..."
+msgstr "Дђang tГ¬m kiбєїm ngЖ°б»ќi chЖЎi..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:578
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2084
 msgid "Search servers..."
-msgstr "Tìm kiếm server..."
+msgstr "TГ¬m kiбєїm server..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:610
 msgid "Name"
-msgstr "Tên"
+msgstr "TГЄn"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:611
 msgid "Players"
-msgstr "Người chơi"
+msgstr "NgЖ°б»ќi chЖЎi"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:612
 msgid "Ping"
@@ -2671,24 +2720,24 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:613
 msgid "Gamemode"
-msgstr "Thể loại"
+msgstr "Thб»ѓ loбєЎi"
 
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:647
 msgid "Include:"
-msgstr "Bao gồm:"
+msgstr "Bao gб»“m:"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:653
 msgid "Empty"
-msgstr "Còn trống"
+msgstr "CГІn trб»‘ng"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:659
 msgid "Full"
-msgstr "Đầy"
+msgstr "Дђбє§y"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:665
 msgid "Locked"
-msgstr "Đã khóa"
+msgstr "ДђГЈ khГіa"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:677
 msgid "Offline"
@@ -2696,60 +2745,60 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:690
 msgid "Other Versions"
-msgstr "Các phiên bản khác"
+msgstr "CГЎc phiГЄn bбєЈn khГЎc"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:711
 msgid "Back"
-msgstr "Quay lại"
+msgstr "Quay lбєЎi"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1012
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1026
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1718
 msgid "Loading..."
-msgstr "Đang tải..."
+msgstr "Дђang tбєЈi..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1563
 #: Client/core/ServerBrowser/CServerBrowser.cpp:3039
 msgid "  ..loading.."
-msgstr "  ..đang tải.."
+msgstr "  ..Д‘ang tбєЈi.."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1601
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1758
 msgid "No address specified!"
-msgstr "Không có địa chỉ truy cập cụ thể!"
+msgstr "KhГґng cГі Д‘б»‹a chб»‰ truy cбє­p cб»Ґ thб»ѓ!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1614
 msgid "Unknown protocol"
-msgstr "Giao thức không xác định"
+msgstr "Giao thб»©c khГґng xГЎc Д‘б»‹nh"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1614
 msgid "Please use the mtasa:// protocol!"
-msgstr "Hãy sử dụng giao thức mtasa:// !"
+msgstr "HГЈy sб»­ dб»Ґng giao thб»©c mtasa:// !"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1623
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1682
 #: Client/mods/deathmatch/logic/CClientGame.cpp:673
 #: Client/mods/deathmatch/logic/CClientGame.cpp:765
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Nickname không hợp lệ! Hãy vào Cài Đặt và tạo cái mới!"
+msgstr "Nickname khГґng hб»Јp lб»‡! HГЈy vГ o CГ i Дђбє·t vГ  tбєЎo cГЎi mб»›i!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1708
 msgid "You have to select a server to connect to."
-msgstr "Bạn phải chọn một server nào đó để có thể kết nối."
+msgstr "BбєЎn phбєЈi chб»Ќn mб»™t server nГ o Д‘Гі Д‘б»ѓ cГі thб»ѓ kбєїt nб»‘i."
 
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:2225
 msgid "Problem with graphics driver"
-msgstr "Vấn đề với trình điều khiển đồ họa"
+msgstr "VбєҐn Д‘б»Ѓ vб»›i trГ¬nh Д‘iб»Ѓu khiб»ѓn Д‘б»“ hб»Ќa"
 
 #: Client/game_sa/CSettingsSA.cpp:832
 msgid "Can't find valid screen resolution."
-msgstr "Không thấy độ phân giải màn hình hợp lệ."
+msgstr "KhГґng thбєҐy Д‘б»™ phГўn giбєЈi mГ n hГ¬nh hб»Јp lб»‡."
 
 #. Confirm that res should be used
 #: Client/game_sa/CSettingsSA.cpp:908
 msgid "Are you sure you want to use this screen resolution?"
-msgstr "Bạn có chắc chắn muốn sử dụng độ phân giải màn hình này không?"
+msgstr "BбєЎn cГі chбєЇc chбєЇn muб»‘n sб»­ dб»Ґng Д‘б»™ phГўn giбєЈi mГ n hГ¬nh nГ y khГґng?"
 
 #: Client/game_sa/CGameSA.cpp:257 Client/game_sa/CGameSA.cpp:268
 msgid "Failed initialization game_sa"
@@ -2761,64 +2810,64 @@ msgstr ""
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
-msgstr "Yêu cầu trang web"
+msgstr "YГЄu cбє§u trang web"
 
 #: Client/cefweb/CWebsiteRequests.cpp:27
 msgid "The server requests the following websites in order to load them (later):"
-msgstr "Server yêu cầu các địa chỉ trang web sau để load chúng (sau):"
+msgstr "Server yГЄu cбє§u cГЎc Д‘б»‹a chб»‰ trang web sau Д‘б»ѓ load chГєng (sau):"
 
 #: Client/cefweb/CWebsiteRequests.cpp:33
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "KHÔNG CUNG CẤP CÁC THÔNG TIN NHẠY CẢM ĐỂ TRÁNH BỊ ĐÁNH CẮP"
+msgstr "KHГ”NG CUNG Cбє¤P CГЃC THГ”NG TIN NHбє Y CбєўM Дђб»‚ TRГЃNH Bб»Љ ДђГЃNH Cбє®P"
 
 #: Client/cefweb/CWebsiteRequests.cpp:46
 msgid "Remember decision"
-msgstr "Ghi nhớ quyết định"
+msgstr "Ghi nhб»› quyбєїt Д‘б»‹nh"
 
 #: Client/cefweb/CWebsiteRequests.cpp:57
 msgid "Deny"
-msgstr "Từ chối"
+msgstr "Tб»« chб»‘i"
 
 #: Client/mods/deathmatch/CClient.cpp:38
 msgid "This version has expired."
-msgstr "Phiên bản này đã hết hạn."
+msgstr "PhiГЄn bбєЈn nГ y Д‘ГЈ hбєїt hбєЎn."
 
 #: Client/mods/deathmatch/CClient.cpp:58
 msgid "disconnect from the game"
-msgstr "ngắt kết nối khỏi game"
+msgstr "ngбєЇt kбєїt nб»‘i khб»Џi game"
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the nametags"
-msgstr "hiển thị thẻ gắn tên"
+msgstr "hiб»ѓn thб»‹ thбє» gбєЇn tГЄn"
 
 #: Client/mods/deathmatch/CClient.cpp:60
 msgid "shows the chatbox"
-msgstr "hiển thị chatbox"
+msgstr "hiб»ѓn thб»‹ chatbox"
 
 #: Client/mods/deathmatch/CClient.cpp:61
 msgid "shows the network statistics"
-msgstr "hiển thị thống kê mạng"
+msgstr "hiб»ѓn thб»‹ thб»‘ng kГЄ mбєЎng"
 
 #. Key commands (registered as 'mod commands', can be disabled)
 #: Client/mods/deathmatch/CClient.cpp:64
 msgid "open the chat input"
-msgstr "mở khung nhập chữ chat"
+msgstr "mб»џ khung nhбє­p chб»Ї chat"
 
 #: Client/mods/deathmatch/CClient.cpp:65
 msgid "transmits voice to other players"
-msgstr "truyền giọng nói cho người chơi khác"
+msgstr "truyб»Ѓn giб»Ќng nГіi cho ngЖ°б»ќi chЖЎi khГЎc"
 
 #: Client/mods/deathmatch/CClient.cpp:66
 msgid "enters a car as passenger"
-msgstr "đi vào xe hơi như hành khách"
+msgstr "Д‘i vГ o xe hЖЎi nhЖ° hГ nh khГЎch"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "next radio channel"
-msgstr "kênh radio tiếp theo"
+msgstr "kГЄnh radio tiбєїp theo"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "previous radio channel"
-msgstr "kênh radio trước"
+msgstr "kГЄnh radio trЖ°б»›c"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "enables the player-map view"
@@ -2866,33 +2915,33 @@ msgstr ""
 
 #: Client/mods/deathmatch/CClient.cpp:80
 msgid "sends a message to the targetted player"
-msgstr "gửi tin nhắn đến trình phát được nhắm mục tiêu"
+msgstr "gб»­i tin nhбєЇn Д‘бєїn trГ¬nh phГЎt Д‘Ж°б»Јc nhбєЇm mб»Ґc tiГЄu"
 
 #: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr "thay đổi vũ khí tiếp theo khi đang ở trong xe"
+msgstr "thay Д‘б»•i vЕ© khГ­ tiбєїp theo khi Д‘ang б»џ trong xe"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "thay đổi vũ khí trước đó khi đang ở trong xe"
+msgstr "thay Д‘б»•i vЕ© khГ­ trЖ°б»›c Д‘Гі khi Д‘ang б»џ trong xe"
 
 #: Client/mods/deathmatch/CClient.cpp:83
 msgid "outputs info about the current server"
-msgstr "thông tin đầu ra của server hiện tại"
+msgstr "thГґng tin Д‘бє§u ra cб»§a server hiб»‡n tбєЎi"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:86
 msgid "defines the scale multiplier of all text-displays"
-msgstr "xác định tỉ lệ số nhân của tất cả các chữ hiển thị"
+msgstr "xГЎc Д‘б»‹nh tб»‰ lб»‡ sб»‘ nhГўn cб»§a tбєҐt cбєЈ cГЎc chб»Ї hiб»ѓn thб»‹"
 
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) shows the colshapes"
-msgstr "(Chế độ dev) hiển thị colshapes"
+msgstr "(Chбєї Д‘б»™ dev) hiб»ѓn thб»‹ colshapes"
 
 #: Client/mods/deathmatch/CClient.cpp:94
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Chế độ phát triển) in id âm thanh thế giới vào cửa sổ gỡ lỗi"
+msgstr "(Chбєї Д‘б»™ phГЎt triб»ѓn) in id Гўm thanh thбєї giб»›i vГ o cб»­a sб»• gб»Ў lб»—i"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
@@ -2906,17 +2955,17 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:55
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:57
 msgid "Server name:"
-msgstr "Tên server:"
+msgstr "TГЄn server:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:64
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:66
 msgid "Password:"
-msgstr "Mật khẩu:"
+msgstr "Mбє­t khбє©u:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:73
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:75
 msgid "Max players:"
-msgstr "Người chơi tối đa:"
+msgstr "NgЖ°б»ќi chЖЎi tб»‘i Д‘a:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:82
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:84
@@ -2929,15 +2978,15 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:99
 msgid "Selected"
-msgstr "Đã chọn"
+msgstr "ДђГЈ chб»Ќn"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:116
 msgid "All"
-msgstr "Tất cả"
+msgstr "TбєҐt cбєЈ"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:118
 msgid "Start"
-msgstr "Bắt đầu"
+msgstr "BбєЇt Д‘бє§u"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
@@ -2964,92 +3013,92 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
-msgstr "Tiến trình tải xuống bản đồ:"
+msgstr "Tiбєїn trГ¬nh tбєЈi xuб»‘ng bбєЈn Д‘б»“:"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:28
 msgid "Download Progress:"
-msgstr "Tiến độ tải xuống:"
+msgstr "Tiбєїn Д‘б»™ tбєЈi xuб»‘ng:"
 
 #. Find our largest piece of text, so we can size accordingly
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:42
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:105
 #, c-format
 msgid "%s of %s"
-msgstr "%s trong số %s"
+msgstr "%s trong sб»‘ %s"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:44
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:65
 msgid "Disconnect to cancel download"
-msgstr "Ngắt kết nối để hủy tải xuống"
+msgstr "NgбєЇt kбєїt nб»‘i Д‘б»ѓ hб»§y tбєЈi xuб»‘ng"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:503
 msgid "Disconnected: Invalid nickname"
-msgstr "Đã ngắt kết nối: nickname không hợp lệ"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: nickname khГґng hб»Јp lб»‡"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
 msgid "Disconnect from server"
-msgstr "Ngắt kết nối khỏi server"
+msgstr "NgбєЇt kбєїt nб»‘i khб»Џi server"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:511
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
-msgstr "Đã ngắt kết nối: Serial đã bị cấm.\n"
-"Lý do: %s"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: Serial Д‘ГЈ bб»‹ cбєҐm.\n"
+"LГЅ do: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
-msgstr "Đã ngắt kết nối: Bạn đã bị cấm.\n"
-"Lý do: %s"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: BбєЎn Д‘ГЈ bб»‹ cбєҐm.\n"
+"LГЅ do: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:523
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
-msgstr "Đã ngắt kết nối: Tài khoản đã bị cấm.\n"
-"Lý do: %s"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: TГ i khoбєЈn Д‘ГЈ bб»‹ cбєҐm.\n"
+"LГЅ do: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
 msgid "Disconnected: Version mismatch"
-msgstr "Đã ngắt kết nối: Phiên bản không khớp"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: PhiГЄn bбєЈn khГґng khб»›p"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "Đã ngắt kết nối: Join flood. Vui lòng chờ trong giây lát, rồi thử lại sau."
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: Join flood. Vui lГІng chб»ќ trong giГўy lГЎt, rб»“i thб»­ lбєЎi sau."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:536
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
-msgstr "Đã ngắt kết nối: Server từ các nhánh khác nhau.\n"
-"Thông tin: %s"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: Server tб»« cГЎc nhГЎnh khГЎc nhau.\n"
+"ThГґng tin: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
-msgstr "Đã ngắt kết nối: Phiên bản không hợp lệ.\n"
-"Thông tin: %s"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: PhiГЄn bбєЈn khГґng hб»Јp lб»‡.\n"
+"ThГґng tin: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:546
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
-msgstr "Đã ngắt kết nối: Server đang sử dụng phiên bản MTA mới hơn.\n"
-"Thông tin: %s"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: Server Д‘ang sб»­ dб»Ґng phiГЄn bбєЈn MTA mб»›i hЖЎn.\n"
+"ThГґng tin: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:551
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
-msgstr "Đã ngắt kết nối: Server đang sử dụng phiên bản MTA cũ hơn.\n"
-"Thông tin: %s"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: Server Д‘ang sб»­ dб»Ґng phiГЄn bбєЈn MTA cЕ© hЖЎn.\n"
+"ThГґng tin: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:556
 msgid "Disconnected: Nick already in use"
-msgstr "Đã ngắt kết nối: Nickname đã được sử dụng"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: Nickname Д‘ГЈ Д‘Ж°б»Јc sб»­ dб»Ґng"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:560
 msgid "Disconnected: Player element could not be created."
@@ -3058,11 +3107,11 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:564
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
-msgstr "Đã ngắt kết nối: Server hủy kết nối: %s"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: Server hб»§y kбєїt nб»‘i: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:569
 msgid "Disconnected: Serial verification failed"
-msgstr "Đã ngắt kết nối: Không thể xác minh serial"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: KhГґng thб»ѓ xГЎc minh serial"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:573
 msgid "Disconnected: Serial already in use"
@@ -3071,25 +3120,25 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:577
 #, c-format
 msgid "Disconnected: Connection desync %s"
-msgstr "Đã ngắt kết nối: Kết nối không đồng bộ %s"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: Kбєїt nб»‘i khГґng Д‘б»“ng bб»™ %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:586
 #, c-format
 msgid "Disconnected: You were kicked by %s"
-msgstr "Đã ngắt kết nối: Bạn đã bị kick bởi %s"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: BбєЎn Д‘ГЈ bб»‹ kick bб»џi %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:591
 #, c-format
 msgid "Disconnected: You were banned by %s"
-msgstr "Đã ngắt kết nối: Bạn đã bị cấm bởi %s"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: BбєЎn Д‘ГЈ bб»‹ cбєҐm bб»џi %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
 msgid "Disconnected: Server shutdown or restarting"
-msgstr "Đã ngắt kết nối: Server bảo trì hoặc đang khởi động lại"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: Server bбєЈo trГ¬ hoбє·c Д‘ang khб»џi Д‘б»™ng lбєЎi"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
 msgid "You were kicked from the game"
-msgstr "Bạn đã bị kick khỏi game"
+msgstr "BбєЎn Д‘ГЈ bб»‹ kick khб»Џi game"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
@@ -3147,36 +3196,36 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
 msgid "Time Remaining: "
-msgstr "Thời gian còn lại:"
+msgstr "Thб»ќi gian cГІn lбєЎi:"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%d ngày"
+msgstr[0] "%d ngГ y"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] "%d giờ"
+msgstr[0] "%d giб»ќ"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "% d phút%d phút"
+msgstr[0] "% d phГєt%d phГєt"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:667
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] "%d giây"
+msgstr[0] "%d giГўy"
 
 #. Display the error
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:671
 msgid "Disconnected"
-msgstr "Đã ngắt kết nối"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Flying a UFO around"
@@ -3289,24 +3338,24 @@ msgstr ""
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
 msgid "Entering the game ..."
-msgstr "Đang vào game ..."
+msgstr "Дђang vГ o game ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:741
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Không thể kết nối; Chọn Kết nối server hoặc dùng lệnh 'kết nối' để kết nối đến server."
+msgstr "KhГґng thб»ѓ kбєїt nб»‘i; Chб»Ќn Kбєїt nб»‘i server hoбє·c dГ№ng lб»‡nh 'kбєїt nб»‘i' Д‘б»ѓ kбєїt nб»‘i Д‘бєїn server."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:787
 msgid "Could not start the local server. See console for details."
-msgstr "Không thể khởi động server cục bộ. Xem console để biết thêm thông tin."
+msgstr "KhГґng thб»ѓ khб»џi Д‘б»™ng server cб»Ґc bб»™. Xem console Д‘б»ѓ biбєїt thГЄm thГґng tin."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:797
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1268
 msgid "Local Server"
-msgstr "Server cục bộ"
+msgstr "Server cб»Ґc bб»™"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:797
 msgid "Starting local server ..."
-msgstr "Đang khởi động server cục bộ ..."
+msgstr "Дђang khб»џi Д‘б»™ng server cб»Ґc bб»™ ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1045
 msgid "Area 51"
@@ -3319,35 +3368,35 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1199
 #, c-format
 msgid "You were kicked from the game ( %s )"
-msgstr "Bạn đã bị kick khỏi game ( %s )"
+msgstr "BбєЎn Д‘ГЈ bб»‹ kick khб»Џi game ( %s )"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1268
 msgid "Connecting to local server..."
-msgstr "Đang kết nối đến server cục bộ..."
+msgstr "Дђang kбєїt nб»‘i Д‘бєїn server cб»Ґc bб»™..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1279
 msgid "Error connecting to server."
-msgstr "Lỗi khi kết nối đến server."
+msgstr "Lб»—i khi kбєїt nб»‘i Д‘бєїn server."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1289
 msgid "Connecting to local server timed out. See console for details."
-msgstr "Hết thời gian kết nối đến server cục bộ. Xem console để biết thêm thông tin."
+msgstr "Hбєїt thб»ќi gian kбєїt nб»‘i Д‘бєїn server cб»Ґc bб»™. Xem console Д‘б»ѓ biбєїt thГЄm thГґng tin."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1395
 msgid "Connection with the server was lost"
-msgstr "Không thể kết nối đến server"
+msgstr "KhГґng thб»ѓ kбєїt nб»‘i Д‘бєїn server"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1422
 msgid "Disconnected: the server is currently full"
-msgstr "Đã ngắt kết nối: server hiện đã đầy người chơi"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: server hiб»‡n Д‘ГЈ Д‘бє§y ngЖ°б»ќi chЖЎi"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1434
 msgid "Disconnected: invalid password specified"
-msgstr "Đã ngắt kết nối: mật khẩu không hợp lệ được chỉ định"
+msgstr "ДђГЈ ngбєЇt kбєїt nб»‘i: mбє­t khбє©u khГґng hб»Јp lб»‡ Д‘Ж°б»Јc chб»‰ Д‘б»‹nh"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1456
 msgid "MTA Client verification failed!"
-msgstr "Không thể xác minh Client MTA!"
+msgstr "KhГґng thб»ѓ xГЎc minh Client MTA!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "In a ditch"
@@ -3373,7 +3422,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
 #, c-format
 msgid "Download error: %s"
-msgstr "Lỗi tải xuống: %s"
+msgstr "Lб»—i tбєЈi xuб»‘ng: %s"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
@@ -3392,15 +3441,15 @@ msgstr ""
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
-msgstr "Lỗi kết nối"
+msgstr "Lб»—i kбєїt nб»‘i"
 
 #: Shared/sdk/SharedUtil.Misc.hpp:381
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr "Multi Theft Auto chưa được cài đặt đúng cách, vui lòng cài đặt lại."
+msgstr "Multi Theft Auto chЖ°a Д‘Ж°б»Јc cГ i Д‘бє·t Д‘Гєng cГЎch, vui lГІng cГ i Д‘бє·t lбєЎi."
 
 #: Shared/sdk/SharedUtil.Misc.hpp:1476
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
-msgstr "Trình duyệt của bạn bây giờ sẽ hiển thị một trang web với một số thông tin trợ giúp.\n\n"
-"(Nếu trang web không load được, hãy dán (CTRL-V) URL vào trình duyệt web của bạn)"
+msgstr "TrГ¬nh duyб»‡t cб»§a bбєЎn bГўy giб»ќ sбєЅ hiб»ѓn thб»‹ mб»™t trang web vб»›i mб»™t sб»‘ thГґng tin trб»Ј giГєp.\n\n"
+"(Nбєїu trang web khГґng load Д‘Ж°б»Јc, hГЈy dГЎn (CTRL-V) URL vГ o trГ¬nh duyб»‡t web cб»§a bбєЎn)"
 
