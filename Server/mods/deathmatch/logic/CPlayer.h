@@ -263,6 +263,9 @@ public:
     bool GetTeleported() const noexcept { return m_teleported; }
     void SetTeleported(bool state) noexcept { m_teleported = state; }
 
+    std::time_t GetLastSendVoiceData() const noexcept { return m_lastSendVoiceData; }
+    void        SetLastSendVoiceData(std::time_t lastSendVoiceData) noexcept { m_lastSendVoiceData = lastSendVoiceData; }
+
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
 
@@ -463,4 +466,6 @@ private:
     SString m_strQuitReasonForLog;
 
     bool m_teleported = false;
+
+    std::time_t m_lastSendVoiceData{};
 };
