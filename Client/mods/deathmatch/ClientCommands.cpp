@@ -101,7 +101,27 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
         {
             // Call the onClientCoreCommand event
             CLuaArguments Arguments;
+            CLuaArguments LuaTable;
+            std::istringstream iss(szArguments);
+            std::string arguments;
+            int i = 0;
+
+            while (iss >> arguments)
+            {
+                ++i;
+                if (stricmp(szCommand, "connect") == 0 && i == 4)
+                {
+                    LuaTable.PushNumber(i);
+                    LuaTable.PushString("***");
+                }
+                else
+                {
+                    LuaTable.PushNumber(i);
+                    LuaTable.PushString(arguments.c_str());
+                }
+            }
             Arguments.PushString(szCommand);
+            Arguments.PushTable(&LuaTable);
 
             localPlayer->CallEvent("onClientCoreCommand", Arguments, true);
         }
