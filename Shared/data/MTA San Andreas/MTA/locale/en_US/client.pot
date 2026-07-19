@@ -1,4 +1,4 @@
-﻿# SOME DESCRIPTIVE TITLE.
+# SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the MTA San Andreas package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
@@ -362,6 +362,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:876
 msgid "Auto-refresh server browser"
+msgstr ""
 
 #: Client/core/CSettings.cpp:900
 msgid "History"
@@ -400,7 +401,7 @@ msgid "DELETE NICKNAME"
 msgstr ""
 
 #: Client/core/CSettings.cpp:4153
-msgid "Delete nickname "%s" from history?"
+msgid "Delete nickname \"%s\" from history?"
 msgstr ""
 
 #: Client/core/CSettings.cpp:4168
@@ -409,8 +410,6 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:4169
 msgid "Delete all nicknames from history?"
-msgstr ""
-
 msgstr ""
 
 #: Client/core/CSettings.cpp:881

@@ -1,4 +1,4 @@
-﻿msgid ""
+msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
@@ -20,186 +20,186 @@ msgstr ""
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr "ШЁШ§ШІЫЊ Grand Theft Auto: San Andreas Ш±Ш§ Ш§Ш¬Ш±Ш§ Ъ©Щ†ЫЊШЇ.\n"
-"Ш§Ш·Щ…ЫЊЩ†Ш§Щ† Ш­Ш§ШµЩ„ Ъ©Щ†ЫЊШЇ Ъ©Щ‡ ШЁШ§ШІЫЊ ШЇШ± ЩѕЩ€ШґЩ‡ 'Program Files (x86)' Щ‚Ш±Ш§Ш± ШЇШ§Ш±ШЇ."
+msgstr "بازی Grand Theft Auto: San Andreas را اجرا کنید.\n"
+"اطمینان حاصل کنید که بازی در پوشه 'Program Files (x86)' قرار دارد."
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
-msgstr "ШЇШ±Ш­Ш§Щ„ Ш¬ШіШЄШ¬Щ€ GTA: San Andreas"
+msgstr "درحال جستجو GTA: San Andreas"
 
 #: Client/loader/Utils.cpp:548
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr "Щ…ШЄШ§ШіЩЃЩ…ШЊ ШЁШ§ШІЫЊ ЩѕЫЊШЇШ§ Щ†ШґШЇ.\n"
-"ШЁШ§ШІЫЊ Grand Theft Auto: San Andreas Ш±Ш§ Ш§Ш¬Ш±Ш§ Ъ©Щ†ЫЊШЇ Щ€ Ш±Щ€ЫЊ \"ШЄЩ„Ш§Шґ Щ…Ш¬ШЇШЇ\" Ъ©Щ„ЫЊЪ© Ъ©Щ†ЫЊШЇ.\n"
-"Ш§Ш·Щ…ЫЊЩ†Ш§Щ† Ш­Ш§ШµЩ„ Ъ©Щ†ЫЊШЇ Ъ©Щ‡ ШЁШ§ШІЫЊ ШЇШ± ЩѕЩ€ШґЩ‡ 'Program Files (x86)' Щ‚Ш±Ш§Ш± ШЇШ§Ш±ШЇ."
+msgstr "متاسفم، بازی پیدا نشد.\n"
+"بازی Grand Theft Auto: San Andreas را اجرا کنید و روی \"تلاش مجدد\" کلیک کنید.\n"
+"اطمینان حاصل کنید که بازی در پوشه 'Program Files (x86)' قرار دارد."
 
 #: Client/loader/Utils.cpp:606
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "Щ„Ш·ЩЃШ§Щ‹ Щ…Ш­Щ„ Щ†ШµШЁ ШЁШ§ШІЫЊ Grand Theft Auto: San Andreas Ш±Ш§ Ш§Щ†ШЄШ®Ш§ШЁ Ъ©Щ†ЫЊШЇ"
+msgstr "لطفاً محل نصب بازی Grand Theft Auto: San Andreas را انتخاب کنید"
 
 #: Client/loader/Utils.cpp:974 Client/loader/CInstallManager.cpp:376
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
 "Please confirm in the next window."
-msgstr "MTA:SA ШЁШ±Ш§ЫЊ Ш№Щ…Щ„ЫЊШ§ШЄ Щ‡Ш§ЫЊ ШІЫЊШ± Щ†ЫЊШ§ШІ ШЁЩ‡ ШЇШіШЄШ±ШіЫЊ Щ†Ш§ШёШ± ШЇШ§Ш±ШЇ:\n\n"
+msgstr "MTA:SA برای عملیات های زیر نیاز به دسترسی ناظر دارد:\n\n"
 "'%s'\n\n"
-"Щ„Ш·ЩЃШ§ ШЇШ± ЩѕЩ†Ш¬Ш±Щ‡ ШЁШ№ШЇЫЊ ШЄШ§ЫЊЫЊШЇ Ъ©Щ†ЫЊШЇ."
+"لطفا در پنجره بعدی تایید کنید."
 
 #: Client/loader/Utils.cpp:1075
 #, c-format
 msgid "Error loading %s module! (%s)"
-msgstr "Ш®Ш·Ш§ ШЇШ± ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ %s Щ…Ш§ЪЩ€Щ„! (%s)"
+msgstr "خطا در بارگذاری %s ماژول! (%s)"
 
 #: Client/loader/Utils.cpp:1400 Client/loader/Dialogs.cpp:1048
 msgid "Copying files..."
-msgstr "ШЇШ± Ш­Ш§Щ„ Ъ©ЩѕЫЊ ЩЃШ§ЫЊЩ„ Щ‡Ш§..."
+msgstr "در حال کپی فایل ها..."
 
 #: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:1053
 msgid "Copy finished early. Everything OK."
-msgstr "Ъ©ЩѕЫЊ ШІЩ€ШЇ ШЄЩ…Ш§Щ… ШґШЇ. Щ‡Щ…Щ‡ Ъ†ЫЊ Ш§Щ€Ъ©ЫЊЩ‡."
+msgstr "کپی زود تمام شد. همه چی اوکیه."
 
 #: Client/loader/Utils.cpp:1466 Client/loader/Dialogs.cpp:1058
 msgid "Finishing..."
-msgstr "ШЇШ± Ш­Ш§Щ„ Ш§ШЄЩ…Ш§Щ…..."
+msgstr "در حال اتمام..."
 
 #: Client/loader/Utils.cpp:1468 Client/loader/Dialogs.cpp:1062
 msgid "Done!"
-msgstr "Ш§Щ†Ш¬Ш§Щ… ШґШЇ!"
+msgstr "انجام شد!"
 
 #: Client/loader/Utils.cpp:1508
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
-msgstr "Щ†ШіШ®Щ‡ Щ†ШµШЁЫЊ Ш¬ШЇЫЊШЇ %s ШґЩ†Ш§ШіШ§ЫЊЫЊ ШґШЇ.\n\n"
-"ШўЫЊШ§ Щ…ЫЊШ®Щ€Ш§Щ‡ЫЊШЇ ШЄЩ†ШёЫЊЩ…Ш§ШЄ Ш®Щ€ШЇ Ш±Ш§ Ш§ШІ %s ШЁШ§ШІЫЊШ§ШЁЫЊ Ъ©Щ†ЫЊШЇ Шџ"
+msgstr "نسخه نصبی جدید %s شناسایی شد.\n\n"
+"آیا میخواهید تنظیمات خود را از %s بازیابی کنید ؟"
 
 #: Client/loader/Utils.cpp:1547
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA Щ…ШґЪ©Щ„ ШЇШ± ШЁШ§ШІ Ъ©Ш±ШЇЩ† ЩЃШ§ЫЊЩ„ '%s' ШЇШ§Ш±ШЇ"
+msgstr "GTA:SA مشکل در باز کردن فایل '%s' دارد"
 
 #: Client/loader/Utils.cpp:1569
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
-msgstr "ЩЃШ§ЫЊЩ„ '%s' ШЇШ± GTA:SA Щ€Ш¬Щ€ШЇ Щ†ШЇШ§Ш±ШЇ."
+msgstr "فایل '%s' در GTA:SA وجود ندارد."
 
 #: Client/loader/Utils.cpp:1594
 msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA ШЇШ± ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ Ш§ЫЊЩ† Щ…ШЇЩ„ Щ…ШґЪ©Щ„ ШЇШ§ШґШЄ."
+msgstr "GTA:SA در بارگذاری این مدل مشکل داشت."
 
 #: Client/loader/Utils.cpp:1596
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "Ш§ЪЇШ± ШЁЩ‡ ШЄШ§ШІЪЇЫЊ gta3.img Ш±Ш§ ШЇШіШЄЪ©Ш§Ш±ЫЊ Ъ©Ш±ШЇЫЊШЇШЊ GTA:SA Ш±Ш§ Щ…Ш¬ШЇШЇШ§ Щ†ШµШЁ Ъ©Щ†ЫЊШЇ."
+msgstr "اگر به تازگی gta3.img را دستکاری کردید، GTA:SA را مجددا نصب کنید."
 
 #: Client/loader/Utils.cpp:1621
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA Щ…ШґЪ©Щ„ ШЇШ± Ш§ЩЃШІЩ€ШЇЩ† ЫЊЪ© Ш§Ш±ШЄЩ‚Ш§ШЎ ШЁЩ‡ ЫЊЪ© Щ€ШіЫЊЩ„Щ‡ Щ†Щ‚Щ„ЫЊЩ‡ ШЇШ§ШґШЄ."
+msgstr "GTA:SA مشکل در افزودن یک ارتقاء به یک وسیله نقلیه داشت."
 
 #: Client/loader/Utils.cpp:1640
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA Ш®Ш·Ш§Щ‡Ш§ЫЊЫЊ Ш±Ш§ ШЇШ± ЩЃШ§ЫЊЩ„ '%s' ЩѕЫЊШЇШ§ Ъ©Ш±ШЇ"
+msgstr "GTA:SA خطاهایی را در فایل '%s' پیدا کرد"
 
 #: Client/loader/Utils.cpp:1722
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "ШўЫЊШ§ Ъ©Ш§Щ…ЩѕЫЊЩ€ШЄШ± ШґЩ…Ш§ Щ‡Щ†ЪЇШ§Щ… ШЁШ§ШІЫЊ Ъ©Ш±ШЇЩ† ШЇШ± MTA:SA ШЇЩ€ШЁШ§Ш±Щ‡ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ ШґШЇШџ"
+msgstr "آیا کامپیوتر شما هنگام بازی کردن در MTA:SA دوباره راه‌اندازی شد؟"
 
 #: Client/loader/Utils.cpp:1787
 msgid "Please terminate the following programs before continuing:"
-msgstr "Щ„Ш·ЩЃШ§Щ‹ Щ‚ШЁЩ„ Ш§ШІ Ш§ШЇШ§Щ…Щ‡ШЊ Ш§ШІ ШЁШ±Щ†Ш§Щ…Щ‡ Щ‡Ш§ЫЊ ШІЫЊШ± Ш®Ш§Ш±Ш¬ ШґЩ€ЫЊШЇ:"
+msgstr "لطفاً قبل از ادامه، از برنامه های زیر خارج شوید:"
 
 #: Client/loader/MainFunctions.cpp:321
 msgid "Invalid module path detected.\n"
-msgstr "Щ…ШіЫЊШ± Щ…Ш§ЪЩ€Щ„ Щ†Ш§Щ…Ш№ШЄШЁШ± ШґЩ†Ш§ШіШ§ЫЊЫЊ ШґШЇ.\n"
+msgstr "مسیر ماژول نامعتبر شناسایی شد.\n"
 
 #: Client/loader/MainFunctions.cpp:348
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Ш№ШЇЩ… ШіШ§ШІЪЇШ§Ш±ЫЊ Щ†ШіШ®Щ‡ ЩЃШ§ЫЊЩ„вЂЊ. Ш§ЪЇШ± Щ…ШґЪ©Щ„Ш§ШЄЫЊ ШЇШ§Ш±ЫЊШЇ MTA:SA Ш±Ш§ ШЇЩ€ШЁШ§Ш±Щ‡ Щ†ШµШЁ Ъ©Щ†ЫЊШЇ.\n"
+msgstr "عدم سازگاری نسخه فایل‌. اگر مشکلاتی دارید MTA:SA را دوباره نصب کنید.\n"
 
 #: Client/loader/MainFunctions.cpp:356
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "ШЁШ±Ш®ЫЊ Ш§ШІ ЩЃШ§ЫЊЩ„ Щ‡Ш§ Щ€Ш¬Щ€ШЇ Щ†ШЇШ§Ш±Щ†ШЇ. Ш§ЪЇШ± Щ…ШґЪ©Щ„Ш§ШЄЫЊ ШЇШ§Ш±ЫЊШЇ MTA:SA Ш±Ш§ ШЇЩ€ШЁШ§Ш±Щ‡ Щ†ШµШЁ Ъ©Щ†ЫЊШЇ.\n"
+msgstr "برخی از فایل ها وجود ندارند. اگر مشکلاتی دارید MTA:SA را دوباره نصب کنید.\n"
 
 #: Client/loader/MainFunctions.cpp:367
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
-msgstr "MTA:SA ШЁШ§ 'Safe Mode' Щ€ЫЊЩ†ШЇЩ€ШІ ШіШ§ШІЪЇШ§Ш± Щ†ЫЊШіШЄ.\n\n"
-"Щ„Ш·ЩЃШ§ Ъ©Ш§Щ…ЩѕЫЊЩ€ШЄШ± Ш®Щ€ШЇ Ш±Ш§ ШЇЩ€ШЁШ§Ш±Щ‡ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Ъ©Щ†ЫЊШЇ.\n"
+msgstr "MTA:SA با 'Safe Mode' ویندوز سازگار نیست.\n\n"
+"لطفا کامپیوتر خود را دوباره راه‌اندازی کنید.\n"
 
 #: Client/loader/MainFunctions.cpp:546
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
-msgstr "ШўЫЊШ§ ШЇШ± Ш§Ш¬Ш±Ш§ЫЊ MTA:SA Ш§ЫЊ ШЁЩ‡ Щ…ШґЪ©Щ„ ШЁШ±Ш®Щ€Ш±ШЇЫЊШЇШџ\n\n"
-"ШўЫЊШ§ Щ…ЫЊ Ш®Щ€Ш§Щ‡ШЇ ШЁЩ‡ Щ†ШіШ®Щ‡ Щ‚ШЁЩ„ЫЊ ШЁШ±ЪЇШ±ШЇЫЊШЇШџ"
+msgstr "آیا در اجرای MTA:SA ای به مشکل برخوردید؟\n\n"
+"آیا می خواهد به نسخه قبلی برگردید؟"
 
 #: Client/loader/MainFunctions.cpp:574
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
-msgstr "ШЁЩ‡ Щ†ШёШ± Щ…ЫЊ Ш±ШіШЇ ШЇШ± Ш§Ш¬Ш±Ш§ЫЊ MTA:SA Щ…ШґЪ©Щ„ЫЊ ШЁЩ‡ Щ€Ш¬Щ€ШЇ ШўЩ…ШЇЩ‡ Ш§ШіШЄ.\n"
-"ШЁШ§ШІЩ†ШґШ§ЫЊЫЊ ШЄЩ†ШёЫЊЩ…Ш§ШЄ GTA Щ…Щ…Ъ©Щ† Ш§ШіШЄ Щ…ШґЪ©Щ„ Ш±Ш§ Ш­Щ„ Ъ©Щ†ШЇ.\n\n"
-"ШўЫЊШ§ Щ…ЫЊ Ш®Щ€Ш§Щ‡ЫЊШЇ ШЄЩ†ШёЫЊЩ…Ш§ШЄ GTA Ш±Ш§ ШЁШ§ШІЩ†ШґШ§ЫЊЫЊ Ъ©Щ†ЫЊШЇШџ"
+msgstr "به نظر می رسد در اجرای MTA:SA مشکلی به وجود آمده است.\n"
+"بازنشایی تنظیمات GTA ممکن است مشکل را حل کند.\n\n"
+"آیا می خواهید تنظیمات GTA را بازنشایی کنید؟"
 
 #: Client/loader/MainFunctions.cpp:589
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
-msgstr "ШЄЩ†ШёЫЊЩ…Ш§ШЄ GTA ШЁШ§ШІЩ†ШґШ§Щ†ЫЊ ШґШЇ.\n\n"
-"ШЁШ± Ш±Щ€ЫЊ ШЇЪ©Щ…Щ‡ 'ШЁШіЫЊШ§Ш± Ш®ШЁ' ШЁШ±Ш§ЫЊ Ш§ШЇШ§Щ…Щ‡ Ъ©Щ„ЫЊЪ© Ъ©Щ†ЫЊШЇ."
+msgstr "تنظیمات GTA بازنشانی شد.\n\n"
+"بر روی دکمه 'بسیار خب' برای ادامه کلیک کنید."
 
 #: Client/loader/MainFunctions.cpp:594
 #, c-format
 msgid "File could not be deleted: '%s'"
-msgstr "Ш­Ш°ЩЃ ЩЃШ§ЫЊЩ„ Ш§Щ†Ш¬Ш§Щ… Щ†ШґШЇ: '%s'"
+msgstr "حذف فایل انجام نشد: '%s'"
 
 #. No settings to delete, or can't find them
 #: Client/loader/MainFunctions.cpp:602
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
-msgstr "ШўЫЊШ§ ШЇШ± Ш§Ш¬Ш±Ш§ЫЊ MTA:SA Щ…ШґЪ©Щ„ ШЇШ§Ш±ЫЊШЇШџ\n\n"
-"ШўЫЊШ§ ШЄЩ…Ш§ЫЊЩ„ ШЁЩ‡ Щ…ШґШ§Щ‡ШЇЩ‡ Ъ©Щ…Ъ© ШўЩ†Щ„Ш§ЫЊЩ† ШЇШ§Ш±ЫЊШЇШџ"
+msgstr "آیا در اجرای MTA:SA مشکل دارید؟\n\n"
+"آیا تمایل به مشاهده کمک آنلاین دارید؟"
 
 #. Inform user
 #: Client/loader/MainFunctions.cpp:639
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
-msgstr "ШўЫЊШ§ ШЇШ± Ш§Ш¬Ш±Ш§ЫЊ MTA:SA Щ…ШґЪ©Щ„ ШЇШ§Ш±ЫЊШЇШџ \n\n"
-"ШўЫЊШ§ Щ…ЫЊШ®Щ€Ш§Щ‡ЫЊШЇ ШЄЩ†ШёЫЊЩ…Ш§ШЄ ШІЫЊШ± Ш±Ш§ ШЄШєЫЊЫЊШ± ШЇЩ‡ЫЊШЇШџ"
+msgstr "آیا در اجرای MTA:SA مشکل دارید؟ \n\n"
+"آیا میخواهید تنظیمات زیر را تغییر دهید؟"
 
 #: Client/loader/MainFunctions.cpp:640 Client/core/CSettings.cpp:1161
 #: Client/core/CSettings.cpp:1672
 msgid "Fullscreen mode:"
-msgstr "Ш­Ш§Щ„ШЄ ШЄЩ…Ш§Щ… ШµЩЃШ­Щ‡:"
+msgstr "حالت تمام صفحه:"
 
 #: Client/loader/MainFunctions.cpp:640 Client/core/CSettings.cpp:1171
 #: Client/core/CSettings.cpp:2337
 msgid "Borderless window"
-msgstr "ЩѕЩ†Ш¬Ш±Щ‡ ШЁШЇЩ€Щ† Щ…Ш±ШІ"
+msgstr "پنجره بدون مرز"
 
 #: Client/loader/MainFunctions.cpp:711
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
-msgstr "ШўЫЊШ§ ШЇШ± Ш§Ш¬Ш±Ш§ЫЊ MTA:SA Щ…ШґЪ©Щ„ ШЇШ§Ш±ЫЊШЇШџ\n\n"
-"Щ…ЫЊ ШЄЩ€Ш§Щ†ЫЊШЇ ШєЫЊШ±ЩЃШ№Ш§Щ„ Ъ©Ш±ШЇЩ† ШЄЩ†ШёЫЊЩ…Ш§ШЄ/ЪЇШІЫЊЩ†Щ‡ Щ‡Ш§ЫЊ ШІЫЊШ± Ш±Ш§ ШЁШ±Ш§ЫЊ GTA Щ€ MTA Ш§Щ…ШЄШ­Ш§Щ† Ъ©Щ†ЫЊШЇ:"
+msgstr "آیا در اجرای MTA:SA مشکل دارید؟\n\n"
+"می توانید غیرفعال کردن تنظیمات/گزینه های زیر را برای GTA و MTA امتحان کنید:"
 
 #: Client/loader/MainFunctions.cpp:744
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
-msgstr "Щ‡ШґШЇШ§Ш±\n\n"
-"MTA:SA ЩЃШ№Ш§Щ„ЫЊШЄ Щ‡Ш§ЫЊ ШєЫЊШ±Щ…Ш№Щ…Щ€Щ„ЫЊ Ш±Ш§ ШґЩ†Ш§ШіШ§ЫЊЫЊ Ъ©Ш±ШЇЩ‡ Ш§ШіШЄ.\n"
-"Щ„Ш·ЩЃШ§ 'Virus Scan' Ш±Ш§ ЩЃШ№Ш§Щ„ Ъ©Щ†ЫЊШЇ ШЄШ§ Ш§ШІ Ш§Щ…Щ†ЫЊШЄ ШіЫЊШіШЄЩ… Ш®Щ€ШЇ Щ…Ш·Щ…Ш¦Щ† ШґЩ€ЫЊШЇ.\n\n"
+msgstr "هشدار\n\n"
+"MTA:SA فعالیت های غیرمعمولی را شناسایی کرده است.\n"
+"لطفا 'Virus Scan' را فعال کنید تا از امنیت سیستم خود مطمئن شوید.\n\n"
 
 #: Client/loader/MainFunctions.cpp:747
 #, c-format
 msgid "The detected file was:  %s\n"
-msgstr "ЩЃШ§ЫЊЩ„ ШґЩ†Ш§ШіШ§ЫЊЫЊ ШґШЇЩ‡:  %s\n"
+msgstr "فایل شناسایی شده:  %s\n"
 
 #: Client/loader/MainFunctions.cpp:995
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr "ЫЊЪ© Щ†Щ…Щ€Щ†Щ‡ Ш§ШІ GTA: San Andreas ШЇШ± Ш­Ш§Щ„ Ш­Ш§Ш¶Ш± ШЇШ± Ш­Ш§Щ„ Ш§Ш¬Ш±Ш§ Ш§ШіШЄ. Щ‚ШЁЩ„ Ш§ШІ Ш§Ш¬Ш±Ш§ЫЊ MTA:SA Щ†ЫЊШ§ШІ ШЁЩ‡ ШЄЩ€Щ‚ЩЃ ШўЩ† Ш§ШіШЄ. Ш§Щ„Ш§Щ† Щ…ЫЊШ®Щ€Ш§Щ‡ЫЊШЇ Ш§ЫЊЩ† Ъ©Ш§Ш± Ш±Ш§ Ш§Щ†Ш¬Ш§Щ… ШЇЩ‡ЫЊШЇШџ"
+msgstr "یک نمونه از GTA: San Andreas در حال حاضر در حال اجرا است. قبل از اجرای MTA:SA نیاز به توقف آن است. الان میخواهید این کار را انجام دهید؟"
 
 #: Client/loader/MainFunctions.cpp:996 Client/loader/MainFunctions.cpp:1003
 #: Client/loader/MainFunctions.cpp:1969
@@ -207,21 +207,21 @@ msgstr "ЫЊЪ© Щ†Щ…Щ€Щ†Щ‡ Ш§ШІ GTA: San Andreas ШЇШ± Ш
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1708
 #: Client/game_sa/CGameSA.cpp:270
 msgid "Information"
-msgstr "Ш§Ш·Щ„Ш§Ш№Ш§ШЄ"
+msgstr "اطلاعات"
 
 #: Client/loader/MainFunctions.cpp:1002
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
-msgstr "ШЁШіШЄЩ† GTA: San Andreas Щ†Ш§Щ…Щ€ЩЃЩ‚ ШЁЩ€ШЇШЊ Ш§ЪЇШ± Щ…ШґЪ©Щ„ Щ‡Щ…Ъ†Щ†Ш§Щ† Ш§ШЇШ§Щ…Щ‡ ШЇШ§ШґШЄШЊ Ъ©Ш§Щ…ЩѕЫЊЩ€ШЄШ± Ш®Щ€ШЇ Ш±Ш§ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Щ…Ш¬ШЇШЇ Ъ©Щ†ЫЊШЇ."
+msgstr "بستن GTA: San Andreas ناموفق بود، اگر مشکل همچنان ادامه داشت، کامپیوتر خود را راه‌اندازی مجدد کنید."
 
 #: Client/loader/MainFunctions.cpp:1131
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
 "Try to launch MTA:SA again?"
-msgstr "Щ…ШґЪ©Щ„ ШЇШ± Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Щ…Ш¬ШЇШЇЫЊ MTA:SA\n\n"
-"Ш§ЪЇШ± Щ…ШґЪ©Щ„ Ш§ШЇШ§Щ…Щ‡ ЫЊШ§ЩЃШЄШЊ 'Task Manager' Ш±Ш§ ШЁШ§ШІ Ъ©Ш±ШЇЩ‡\n"
-"Щ€ 'gta_sa.exe' Щ€ 'Multi Theft Auto.exe' Ш±Ш§ Щ…ШЄЩ€Щ‚ЩЃ Ъ©Щ†ЫЊШЇ\n\n\n"
-"ШЄЩ„Ш§Шґ Щ…Ш¬ШЇШЇ ШЁШ±Ш§ЫЊ Ш§Ш¬Ш±Ш§ЫЊ MTA:SA Шџ"
+msgstr "مشکل در راه‌اندازی مجددی MTA:SA\n\n"
+"اگر مشکل ادامه یافت، 'Task Manager' را باز کرده\n"
+"و 'gta_sa.exe' و 'Multi Theft Auto.exe' را متوقف کنید\n\n\n"
+"تلاش مجدد برای اجرای MTA:SA ؟"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
@@ -258,27 +258,27 @@ msgstr "Щ…ШґЪ©Щ„ ШЇШ± Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:381
 msgid "Error"
-msgstr "Ш®Ш·Ш§"
+msgstr "خطا"
 
 #: Client/loader/MainFunctions.cpp:1155
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
-msgstr "ЫЊЪ© Щ†ШіШ®Щ‡ ШЇЫЊЪЇШ± Ш§ШІ MTA Ш§ШІ Щ‚ШЁЩ„ ШЇШ± Ш­Ш§Щ„ Ш§Ш¬Ш±Ш§ Щ…ЫЊ ШЁШ§ШґШЇ.\n\n"
-"Ш§ЪЇШ± Ш§ЫЊЩ† Щ…ШґЪ©Щ„ ЩѕШ§ШЁШ±Ш¬Ш§ Щ…Ш§Щ†ШЇШЊ Щ„Ш·ЩЃШ§ Ъ©Ш§Щ…ЩѕЫЊЩ€ШЄШ± Ш®Щ€ШЇ Ш±Ш§ ШЇЩ€ШЁШ§Ш±Щ‡ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Ъ©Щ†ЫЊШЇ"
+msgstr "یک نسخه دیگر از MTA از قبل در حال اجرا می باشد.\n\n"
+"اگر این مشکل پابرجا ماند، لطفا کامپیوتر خود را دوباره راه‌اندازی کنید"
 
 #: Client/loader/MainFunctions.cpp:1159
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
-msgstr "ЫЊЪ© Щ†ШіШ®Щ‡ Ш§ШІ MTA ШЇШ± Ш­Ш§Щ„ Ш­Ш§Ш¶Ш± ШЇШ± Ш­Ш§Щ„ Ш§Ш¬Ш±Ш§ Ш§ШіШЄ.\n\n"
-"ШўЫЊШ§ Щ…ЫЊ Ш®Щ€Ш§Щ‡ЫЊШЇ ШўЩ† Ш±Ш§ Щ…ШЄЩ€Щ‚ЩЃ Ъ©Щ†ЫЊШЇШџ"
+msgstr "یک نسخه از MTA در حال حاضر در حال اجرا است.\n\n"
+"آیا می خواهید آن را متوقف کنید؟"
 
 #: Client/loader/MainFunctions.cpp:1196
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
-msgstr "Щ€Ш±Щ€ШЇЫЊ Щ‡Ш§ЫЊ Ш±Ш¬ЫЊШіШЄШ±ЫЊ Щ€Ш¬Щ€ШЇ Щ†ШЇШ§Ш±ШЇ. Щ„Ш·ЩЃШ§ Multi Theft Auto: San Andreas Ш±Ш§ Щ…Ш¬ШЇШЇ Щ†ШµШЁ Щ†Щ…Ш§ЫЊЫЊШЇ."
+msgstr "ورودی های رجیستری وجود ندارد. لطفا Multi Theft Auto: San Andreas را مجدد نصب نمایید."
 
 #: Client/loader/MainFunctions.cpp:1202
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr "Щ…ШіЫЊШ± Щ†ШµШЁ GTA: San Andreas ШґЩ…Ш§ Ш­Ш§Щ€ЫЊ Ъ©Ш§Ш±Ш§Ъ©ШЄШ± Щ‡Ш§ЫЊ ШєЫЊШ±Щ…Ш¬Ш§ШІ (unicode) Щ…ЫЊ ШЁШ§ШґШЇ. Щ„Ш·ЩЃШ§ Grand Theft Auto: San Andreas Ш±Ш§ ШЁЩ‡ ЫЊЪ© Щ…ШіЫЊШ± ЩѕШґШЄЫЊШЁШ§Щ†ЫЊ ШґШЇЩ‡ Ъ©Щ‡ Ш­Ш§Щ€ЫЊ Ъ©Ш§Ш±Ш§Ъ©ШЄШ± Щ‡Ш§ЫЊ Ш§ШіШЄШ§Щ†ШЇШ§Ш±ШЇ (ASCII) Ш§ШіШЄ Ш§Щ†ШЄЩ‚Ш§Щ„ ШЇШ§ШЇЩ‡ Щ€ Multi Theft Auto: San Andreas Ш±Ш§ Щ…Ш¬ШЇШЇ Щ†ШµШЁ Щ†Щ…Ш§ЫЊЫЊШЇ."
+msgstr "مسیر نصب GTA: San Andreas شما حاوی کاراکتر های غیرمجاز (unicode) می باشد. لطفا Grand Theft Auto: San Andreas را به یک مسیر پشتیبانی شده که حاوی کاراکتر های استاندارد (ASCII) است انتقال داده و Multi Theft Auto: San Andreas را مجدد نصب نمایید."
 
 #: Client/loader/MainFunctions.cpp:1215
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
@@ -289,41 +289,41 @@ msgstr ""
 
 #: Client/loader/MainFunctions.cpp:1398
 msgid "Invalid installation paths detected."
-msgstr "Щ…ШіЫЊШ±Щ‡Ш§ЫЊ Щ†ШµШЁ Щ†Ш§Щ…Ш№ШЄШЁШ± ШґЩ†Ш§ШіШ§ЫЊЫЊ ШґШЇЩ†ШЇ."
+msgstr "مسیرهای نصب نامعتبر شناسایی شدند."
 
 #: Client/loader/MainFunctions.cpp:1529
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr "Ш®Ш·Ш§ ШЇШ± ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ. Щ„Ш·ЩЃШ§ Щ…Ш·Щ…Ш¦Щ† ШґЩ€ЫЊШЇ ШўШ®Ш±ЫЊЩ† ЩЃШ§ЫЊЩ„ Щ‡Ш§ЫЊ ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ ШЁЩ‡ ШЇШ±ШіШЄЫЊ Щ†ШµШЁ ШґШЇЩ‡ Ш§Щ†ШЇ."
+msgstr "خطا در بارگذاری. لطفا مطمئن شوید آخرین فایل های بروزرسانی به درستی نصب شده اند."
 
 #: Client/loader/MainFunctions.cpp:1538
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "Ш®Ш·Ш§ ШЇШ± ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ Щ„Ш·ЩЃШ§ Щ…Ш·Щ…Ш¦Щ† ШґЩ€ЫЊШЇ ЩЃШ§ЫЊЩ„ %s ШЁЩ‡ ШЇШ±ШіШЄЫЊ Щ†ШµШЁ ШґШЇЩ‡ ШЁШ§ШґШЇ."
+msgstr "خطا در بارگذاری لطفا مطمئن شوید فایل %s به درستی نصب شده باشد."
 
 #: Client/loader/MainFunctions.cpp:1547
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr "Ш®Ш·Ш§ ШЇШ± ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ. ЩЃШ§ЫЊЩ„ gta_sa.exe ШЇШ± Щ…ШіЫЊШ± %s ЩѕЫЊШЇШ§ Щ†ШґШЇ."
+msgstr "خطا در بارگذاری. فایل gta_sa.exe در مسیر %s پیدا نشد."
 
 #: Client/loader/MainFunctions.cpp:1561
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
-msgstr "Ш®Ш·Ш§ ШЇШ± ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ. ЩЃШ§ЫЊЩ„ %s ШЇШ± ЩѕЩ€ШґЩ‡ GTA Щ€Ш¬Щ€ШЇ ШЇШ§Ш±ШЇ. Щ‚ШЁЩ„ Ш§ШІ Ш§ШЇШ§Щ…Щ‡ Ш§ЫЊЩ† ЩЃШ§ЫЊЩ„ Ш±Ш§ Ш­Ш°ЩЃ Ъ©Щ†ЫЊШЇ."
+msgstr "خطا در بارگذاری. فایل %s در پوشه GTA وجود دارد. قبل از ادامه این فایل را حذف کنید."
 
 #: Client/loader/MainFunctions.cpp:1571
 #, c-format
 msgid "Main file has an incorrect name (%s)"
-msgstr "ЩЃШ§ЫЊЩ„ Ш§ШµЩ„ЫЊ Щ†Ш§Щ… Ш§ШґШЄШЁШ§Щ‡ЫЊ ШЇШ§Ш±ШЇ (%s)"
+msgstr "فایل اصلی نام اشتباهی دارد (%s)"
 
 #: Client/loader/MainFunctions.cpp:1618
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
-msgstr "ЩЃШ§ЫЊЩ„ ШЇШ§ШЇЩ‡ %s ЪЇЩ… ШґШЇЩ‡ Ш§ШіШЄ. Ш§Ш­ШЄЩ…Ш§Щ„ ЩЃШ№Ш§Щ„ЫЊШЄ Щ€ЫЊШ±Щ€ШіЫЊ Щ€Ш¬Щ€ШЇ ШЇШ§Ш±ШЇ."
+msgstr "فایل داده %s گم شده است. احتمال فعالیت ویروسی وجود دارد."
 
 #: Client/loader/MainFunctions.cpp:1626
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
-msgstr "ЩЃШ§ЫЊЩ„ ШЇШ§ШЇЩ‡ %s ШЄШєЫЊЫЊШ± Ъ©Ш±ШЇЩ‡ Ш§ШіШЄ. Ш§Ш­ШЄЩ…Ш§Щ„ ЩЃШ№Ш§Щ„ЫЊШЄ Щ€ЫЊШ±Щ€ШіЫЊ Щ€Ш¬Щ€ШЇ ШЇШ§Ш±ШЇ."
+msgstr "فایل داده %s تغییر کرده است. احتمال فعالیت ویروسی وجود دارد."
 
 #: Client/loader/MainFunctions.cpp:1650
 msgid ".asi files are in the installation directory.\n\n"
@@ -336,7 +336,7 @@ msgstr ""
 
 #: Client/loader/MainFunctions.cpp:1827
 msgid "Fix configuration issue"
-msgstr "Ш±ЩЃШ№ Щ…ШґЪ©Щ„ ЩѕЫЊЪ©Ш±ШЁЩ†ШЇЫЊ"
+msgstr "رفع مشکل پیکربندی"
 
 #: Client/loader/MainFunctions.cpp:1969
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
@@ -344,15 +344,15 @@ msgstr ""
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
-msgstr "Щ†Ш§ШґЩ†Ш§Ш®ШЄЩ‡"
+msgstr "ناشناخته"
 
 #: Client/loader/Install.cpp:272
 #, c-format
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr "ЩЃШ§ЫЊЩ„ '%s' ШЇШ± Ш­Ш§Щ„ Ш­Ш§Ш¶Ш± ШЄЩ€ШіШ· ЩЃШ±ШўЫЊЩ†ШЇЩ‡Ш§ЫЊ %zu Щ‚ЩЃЩ„ ШґШЇЩ‡ Ш§ШіШЄ.\n\n"
-"ШўЫЊШ§ Щ…ЫЊ Ш®Щ€Ш§Щ‡ЫЊШЇ ЩЃШ№Ш§Щ„ЫЊШЄ ШІЫЊШ± Ш±Ш§ Ш®Ш§ШЄЩ…Щ‡ ШЇЩ‡ЫЊШЇ Щ€ ШЁЩ‡ ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Ш§ШЇШ§Щ…Щ‡ ШЇЩ‡ЫЊШЇШџ\n\n"
+msgstr "فایل '%s' در حال حاضر توسط فرآیندهای %zu قفل شده است.\n\n"
+"آیا می خواهید فعالیت زیر را خاتمه دهید و به بروزرسانی ادامه دهید؟\n\n"
 "%s"
 
 #: Client/loader/Install.cpp:479
@@ -361,35 +361,35 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr "ЩЃШ±Ш§ЫЊЩ†ШЇ Щ†ШµШЁ ШґЩ…Ш§ Щ…Щ…Ъ©Щ† Ш§ШіШЄ ШЇШ± Ш­Ш§Щ„ Ш­Ш§Ш¶Ш± Ш®Ш±Ш§ШЁ ШЁШ§ШґШЇ.\n\n"
-"ЩЃШ§ЫЊЩ„ %zu Ш§ШІ %zu Ш§ШІ Щ†ШіШ®Щ‡ ЩѕШґШЄЫЊШЁШ§Щ† Щ†Щ…ЫЊШЄЩ€Ш§Щ†ШЇ ШЁШ§ШІЫЊШ§ШЁЫЊ ШґЩ€ШЇ.\n\n"
-"Щ…ЫЊШЁШ§ЫЊШіШЄ Multi Theft Auto Ш±Ш§ Ш§ШІ www.multitheftauto.com ШЇЩ€ШЁШ§Ш±Щ‡ Щ†ШµШЁ Ъ©Щ†ЫЊШЇ\n"
-"ЫЊШ§ ШіШ№ЫЊ Ъ©Щ†ЫЊШЇ ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Ш±Ш§ ШЁШ§ ШЇШіШЄШ±ШіЫЊ administrator Ш§Ш¬Ш±Ш§ Ъ©Щ†ЫЊШЇ."
+msgstr "فرایند نصب شما ممکن است در حال حاضر خراب باشد.\n\n"
+"فایل %zu از %zu از نسخه پشتیبان نمیتواند بازیابی شود.\n\n"
+"میبایست Multi Theft Auto را از www.multitheftauto.com دوباره نصب کنید\n"
+"یا سعی کنید بروزرسانی را با دسترسی administrator اجرا کنید."
 
 #: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:1035
 msgid "Installing update..."
-msgstr "ШЇШ± Ш­Ш§Щ„ Щ†ШµШЁ ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ..."
+msgstr "در حال نصب بروزرسانی..."
 
 #: Client/loader/Install.cpp:934 Client/loader/Dialogs.cpp:1043
 msgid "Extracting files..."
-msgstr "ШЇШ± Ш­Ш§Щ„ Ш§ШіШЄШ®Ш±Ш§Ш¬ ЩЃШ§ЫЊЩ„ Щ‡Ш§..."
+msgstr "در حال استخراج فایل ها..."
 
 #: Client/loader/CInstallManager.cpp:391
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
-msgstr "MTA:SA Щ†ШЄЩ€Ш§Щ†ШіШЄ Ш№Щ…Щ„ЫЊШ§ШЄ Щ‡Ш§ЫЊ ШІЫЊШ± Ш±Ш§ Ш§Щ†Ш¬Ш§Щ… ШЇЩ‡ШЇ:\n\n"
+msgstr "MTA:SA نتوانست عملیات های زیر را انجام دهد:\n\n"
 "'%s'\n"
 
 #: Client/loader/CInstallManager.cpp:460
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
-msgstr "** ШЇЩ„ЫЊЩ„ Ш®Ш±Ш§ШЁЫЊ ШЁЩ‡ Ш®Ш§Ш·Ш± Ш®Ш·Ш§ЫЊ ШЇШ±Ш§ЫЊЩ€Ш± Ъ©Ш§Ш±ШЄ ЪЇШ±Ш§ЩЃЫЊЪ© Ш§ШіШЄ **\n\n"
-"** Щ„Ш·ЩЃШ§ ШЇШ±Ш§ЫЊЩ€Ш± Ъ©Ш§Ш±ШЄ ЪЇШ±Ш§ЩЃЫЊЪ© Ш®Щ€ШЇ Ш±Ш§ ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Щ†Щ…Ш§ЫЊЫЊШЇ **"
+msgstr "** دلیل خرابی به خاطر خطای درایور کارت گرافیک است **\n\n"
+"** لطفا درایور کارت گرافیک خود را بروزرسانی نمایید **"
 
 #: Client/loader/CInstallManager.cpp:470
 msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
-msgstr "** Ш®Ш§Ш±Ш¬ Ш§ШІ Ш­Ш§ЩЃШёЩ‡ вЂ“ Ш§ЫЊЩ† Ш®Ш±Ш§ШЁЫЊ ШЁЩ‡вЂЊШ®Ш§Ш·Ш± Ъ©Щ…ШЁЩ€ШЇ ЫЊШ§ ШЁЩ‡вЂЊЩ‡Щ…вЂЊШ±ЫЊШ®ШЄЪЇЫЊ Ш­Ш§ЩЃШёЩ‡ ШўШІШ§ШЇ Ш±Ш® ШЇШ§ШЇЩ‡ Ш§ШіШЄ. **"
+msgstr "** خارج از حافظه – این خرابی به‌خاطر کمبود یا به‌هم‌ریختگی حافظه آزاد رخ داده است. **"
 
 #: Client/loader/CInstallManager.cpp:476
 msgid "** Enhanced crash capture will be attempted on next launch. **"
@@ -397,89 +397,89 @@ msgstr ""
 
 #: Client/loader/CInstallManager.cpp:1059
 msgid "Install updated MTA:SA files"
-msgstr "Щ†ШµШЁ ЩЃШ§ЫЊЩ„ Щ‡Ш§ЫЊ ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ ШґШЇЩ‡ MTA:SA"
+msgstr "نصب فایل های بروزرسانی شده MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1079
 msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "ШЁЩ‡ ШЇЩ„ЫЊЩ„ ШЇШ±ЪЇЫЊШ± ШЁЩ€ШЇЩ† ЩЃШ§ЫЊЩ„ Щ‡Ш§ Щ†Щ…ЫЊ ШЄЩ€Ш§Щ† ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Ъ©Ш±ШЇ. Щ„Ш·ЩЃШ§ ШЁШ±Щ†Ш§Щ…Щ‡ Щ‡Ш§ЫЊ ШЇЫЊЪЇШ± Ш±Ш§ ШЁШіШЄЩ‡ Щ€ Щ…Ш¬ШЇШЇШ§ ШЄЩ„Ш§Шґ Ъ©Щ†ЫЊШЇ"
+msgstr "به دلیل درگیر بودن فایل ها نمی توان بروزرسانی کرد. لطفا برنامه های دیگر را بسته و مجددا تلاش کنید"
 
 #: Client/loader/CInstallManager.cpp:1088
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Щ…Щ€Щ„ШЄЫЊ ШЇЩЃШЄ ШўШЄЩ€ ШЁЩ‡ ШЇШ±ШіШЄЫЊ Щ†ШµШЁ Щ†ШґШЇЩ‡ Ш§ШіШЄ, Щ„Ш·ЩЃШ§ ШЇЩ€ШЁШ§Ш±Щ‡ Щ†ШµШЁ Ъ©Щ†ЫЊШЇ. %s"
+msgstr "مولتی دفت آتو به درستی نصب نشده است, لطفا دوباره نصب کنید. %s"
 
 #: Client/loader/CInstallManager.cpp:1140
 msgid "Create GTA:SA junctions"
-msgstr "Ш§ШЄШµШ§Щ„Ш§ШЄ GTA:SA Ш±Ш§ ШЁШіШ§ШІЫЊШЇ"
+msgstr "اتصالات GTA:SA را بسازید"
 
 #: Client/loader/CInstallManager.cpp:1184
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr "MTA:SA Ш§Ш¬Ш±Ш§ Щ†ШґШЇ ШІЫЊШ±Ш§ Ъ©ЩѕЫЊ ЫЊЪ© ЩЃШ§ЫЊЩ„ ШЁШ§ ШґЪ©ШіШЄ Щ…Щ€Ш§Ш¬Щ‡ ШґШЇ:"
+msgstr "MTA:SA اجرا نشد زیرا کپی یک فایل با شکست مواجه شد:"
 
 #: Client/loader/CInstallManager.cpp:1190
 #: Client/loader/CInstallManager.cpp:1230
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "MTA:SA Ш§Ш¬Ш±Ш§ Щ†ШґШЇ ШІЫЊШ±Ш§ ШЁШ±Ш®ЫЊ ЩЃШ§ЫЊЩ„ Щ‡Ш§ Ш®Ш±Ш§ШЁ ЫЊШ§ Щ€Ш¬Щ€ШЇ Щ†ШЇШ§Ш±Щ†ШЇ:"
+msgstr "MTA:SA اجرا نشد زیرا برخی فایل ها خراب یا وجود ندارند:"
 
 #: Client/loader/CInstallManager.cpp:1199
 msgid "Copy MTA:SA files"
-msgstr "Ъ©ЩѕЫЊ Ъ©Ш±ШЇЩ† ЩЃШ§ЫЊЩ„ Щ‡Ш§ЫЊ MTA:SA"
+msgstr "کپی کردن فایل های MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1222
 #: Client/loader/CInstallManager.cpp:1300
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr "MTA:SA Ш§Ш¬Ш±Ш§ Щ†ШґШЇ ШІЫЊШ±Ш§ ШЁШ±Ш®ЫЊ ЩЃШ§ЫЊЩ„ Щ‡Ш§ЫЊ GTA:SA Ш®Ш±Ш§ШЁ ЫЊШ§ Щ€Ш¬Щ€ШЇ Щ†ШЇШ§Ш±Щ†ШЇ:"
+msgstr "MTA:SA اجرا نشد زیرا برخی فایل های GTA:SA خراب یا وجود ندارند:"
 
 #: Client/loader/CInstallManager.cpp:1307
 msgid "Patch GTA:SA dependency"
-msgstr "ШЁШіШЄЩ‡ ШЄЪ©Щ…ЫЊЩ„ЫЊ ЩѕЫЊШґЩ†ЫЊШ§ШІ Щ‡Ш§ЫЊ GTA:SA"
+msgstr "بسته تکمیلی پیشنیاز های GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1355
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr "MTA:SA Ш§Ш¬Ш±Ш§ Щ†ШґШЇ ШІЫЊШ±Ш§ ЩЃШ§ЫЊЩ„ Ш§Ш¬Ш±Ш§ЫЊЫЊ GTA:SA Щ€Ш¬Щ€ШЇ Щ†ШЇШ§Ш±ШЇ ЫЊШ§ Ш®Ш±Ш§ШЁ Ш§ШіШЄ:\n"
-"ШЁЩ‡ ШЇЩ„ЫЊЩ„ Щ…ШґЪ©Щ„ ШЇШ± Щ†Щ‚Шµ ЫЊШ§ Ъ©Щ…ШЁЩ€ШЇ ЩЃШ§ЫЊЩ„ Щ‡Ш§ЫЊ Ш§Ш¬Ш±Ш§ЫЊЫЊ GTA:SA, Щ„Ш§Щ†Ъ†Ш± MTA:SA Щ†Щ…ЫЊ ШЄЩ€Ш§Щ†ШЇ Ш§Ш¬Ш±Ш§ ШґЩ€ШЇ:"
+msgstr "MTA:SA اجرا نشد زیرا فایل اجرایی GTA:SA وجود ندارد یا خراب است:\n"
+"به دلیل مشکل در نقص یا کمبود فایل های اجرایی GTA:SA, لانچر MTA:SA نمی تواند اجرا شود:"
 
 #: Client/loader/CInstallManager.cpp:1359
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "ШЁШ±Ш±ШіЫЊ Ъ©Щ†ЫЊШЇ Ъ©Щ‡ ШўЩ†ШЄЫЊ Щ€ЫЊШ±Щ€Ші ШґЩ…Ш§ ШЁЩ‡ Ш§ШґШЄШЁШ§Щ‡ ЩЃШ§ЫЊЩ„ Ш§Ш¬Ш±Ш§ЫЊЫЊ GTA:SA ШЁШ№Щ†Щ€Ш§Щ† Щ€ЫЊШ±Щ€Ші ШґЩ†Ш§ШіШ§ЫЊЫЊ Щ†Ъ©Ш±ШЇЩ‡ ШЁШ§ШґШЇ ШіШ№ЫЊ Ъ©Щ†ЫЊШЇ ЩЃШ§ЫЊЩ„ Ш§Ш¬Ш±Ш§ЫЊЫЊ GTA:SA Ш±Ш§ ШЇШ± Щ„ЫЊШіШЄ Ш§ШіШЄШ«Щ†Ш§Щ‡Ш§ Щ‚Ш±Ш§Ш±ШЇЩ‡ЫЊШЇ Щ€ MTA:SA Ш±Ш§ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Щ…Ш¬ШЇШЇ Ъ©Щ†ЫЊШЇ."
+msgstr "بررسی کنید که آنتی ویروس شما به اشتباه فایل اجرایی GTA:SA بعنوان ویروس شناسایی نکرده باشد سعی کنید فایل اجرایی GTA:SA را در لیست استثناها قراردهید و MTA:SA را راه‌اندازی مجدد کنید."
 
 #: Client/loader/CInstallManager.cpp:1365
 msgid "Generate GTA:SA"
-msgstr "ШіШ§Ш®ШЄЩ† GTA:SA"
+msgstr "ساختن GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1380
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr "MTA:SA Ш§Ш¬Ш±Ш§ Щ†ШґШЇ ШІЫЊШ±Ш§ ЩЃШ§ЫЊЩ„ Ш§Ш¬Ш±Ш§ЫЊЫЊ GTA:SA Щ‚Ш§ШЁЩ„ ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ Щ†ЫЊШіШЄ:"
+msgstr "MTA:SA اجرا نشد زیرا فایل اجرایی GTA:SA قابل بارگذاری نیست:"
 
 #: Client/loader/CInstallManager.cpp:1387
 #: Client/loader/CInstallManager.cpp:1410
 msgid "Patch GTA:SA"
-msgstr "ШЁШіШЄЩ‡ ШЄЪ©Щ…ЫЊЩ„ЫЊ GTA:SA"
+msgstr "بسته تکمیلی GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1403
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr "MTA:SA Ш§Ш¬Ш±Ш§ Щ†ШґШЇ ШІЫЊШ±Ш§ Ш§Ш№Щ…Ш§Щ„ ШЁШіШЄЩ‡ ШЄЪ©Щ…ЫЊЩ„ЫЊ GTA:SA ШЁШ§ ШґЪ©ШіШЄ Щ…Щ€Ш§Ш¬Щ‡ ШґШЇ:"
+msgstr "MTA:SA اجرا نشد زیرا اعمال بسته تکمیلی GTA:SA با شکست مواجه شد:"
 
 #: Client/loader/CInstallManager.cpp:1584 Client/core/CCore.cpp:846
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA Щ†Щ…ЫЊ ШЄЩ€Ш§Щ†ШЇ Ш§ШЇШ§Щ…Щ‡ ШЇЩ‡ШЇ ШІЫЊШ±Ш§ Щ…Ш­Щ„ Ш°Ш®ЫЊШ±Щ‡ ШіШ§ЫЊШІЫЊ %s ЩЃШ¶Ш§ЫЊ Ъ©Ш§ЩЃЫЊ Щ†ШЇШ§Ш±ШЇвЂЋвЂЏвЂЋвЂЄвЂЋвЂЏ."
+msgstr "MTA:SA نمی تواند ادامه دهد زیرا محل ذخیره سایزی %s فضای کافی ندارد‎‏‎‪‎‏."
 
 #: Client/loader/CInstallManager.cpp:1640
 msgid "Missing file:"
-msgstr "ЩЃШ§ЫЊЩ„ ЫЊШ§ЩЃШЄ Щ†ШґШЇЩ‡:"
+msgstr "فایل یافت نشده:"
 
 #: Client/loader/CInstallManager.cpp:1644
 msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "Ш§ЪЇШ± MTA ШЇШ± ШЁШ§Ш±ЪЇШІШ§Ш±ЫЊ ШґЪ©ШіШЄ Ш®Щ€Ш±ШЇШЊ Щ„Ш·ЩЃШ§ GTA:SA Ш±Ш§ Щ…Ш¬ШЇШЇ Щ†ШµШЁ Ъ©Щ†ЫЊШЇ"
+msgstr "اگر MTA در بارگزاری شکست خورد، لطفا GTA:SA را مجدد نصب کنید"
 
 #: Client/loader/CInstallManager.cpp:1679
 msgid "Update install settings"
-msgstr "ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ ШЄЩ†ШёЫЊЩ…Ш§ШЄ Щ†ШµШЁ"
+msgstr "بروزرسانی تنظیمات نصب"
 
 #: Client/loader/CInstallManager.cpp:1832
 msgid "Update compatibility settings"
-msgstr "ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ ШЄЩ†ШёЫЊЩ…Ш§ШЄ ШіШ§ШІЪЇШ§Ш±ЫЊ"
+msgstr "بروزرسانی تنظیمات سازگاری"
 
 #. /////////////////////////////////////////////////////////////////////////
 #.
@@ -497,7 +497,7 @@ msgstr "ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ ШЄЩ†ШёЫЊЩ…Ш§ШЄ Ш
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 #: Client/gui/CGUIMessageBox_Impl.cpp:72
 msgid "Yes"
-msgstr "ШЁЩ„Щ‡"
+msgstr "بله"
 
 #: Client/loader/Dialogs.cpp:64 Client/core/CVersionUpdater.cpp:1634
 #: Client/core/CVersionUpdater.cpp:1652 Client/core/CVersionUpdater.cpp:1921
@@ -508,7 +508,7 @@ msgstr "ШЁЩ„Щ‡"
 #: Client/core/CMainMenu.cpp:1237 Client/core/CQuestionBox.cpp:194
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 msgid "No"
-msgstr "Ш®ЫЊШ±"
+msgstr "خیر"
 
 #. Create buttons
 #. OK button
@@ -521,16 +521,16 @@ msgstr "Ш®ЫЊШ±"
 #: Client/core/CSettings.cpp:6003 Client/core/CMainMenu.cpp:1258
 #: Client/gui/CGUIMessageBox_Impl.cpp:64
 msgid "OK"
-msgstr "ШЄШ§ЫЊЫЊШЇ"
+msgstr "تایید"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "Quit"
-msgstr "Ш®Ш±Щ€Ш¬"
+msgstr "خروج"
 
 #: Client/loader/Dialogs.cpp:67
 #: Client/core/ServerBrowser/CServerBrowser.cpp:717
 msgid "Help"
-msgstr "Ъ©Щ…Ъ©"
+msgstr "کمک"
 
 #. Cancel button
 #: Client/loader/Dialogs.cpp:68 Client/core/CVersionUpdater.cpp:1853
@@ -539,105 +539,105 @@ msgstr "Ъ©Щ…Ъ©"
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
-msgstr "Щ„ШєЩ€"
+msgstr "لغو"
 
 #: Client/loader/Dialogs.cpp:83
 msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas ШЁЩ‡ Щ…ШґЪ©Щ„ ШЁШ±Ш®Щ€Ш±ШЇЩ‡ Ш§ШіШЄ."
+msgstr "MTA: San Andreas به مشکل برخورده است."
 
 #: Client/loader/Dialogs.cpp:84
 msgid "Crash information"
-msgstr "Ш§Ш·Щ„Ш§Ш№Ш§ШЄ Ъ©Ш±Шґ"
+msgstr "اطلاعات کرش"
 
 #: Client/loader/Dialogs.cpp:85
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "ШЁШ±Ш§ЫЊ Ш§Ш±ШіШ§Щ„ Ш§Ш·Щ„Ш§Ш№Ш§ШЄ Ш§ЫЊЩ† Ъ©Ш±Шґ ШЁЩ‡ ШЄЩ€ШіШ№Щ‡ ШЇЩ‡Щ†ШЇЪЇШ§Щ† Ш§Щ… ШЄЫЊ Ш§ЫЊ Ш§ШІ Ш·Ш±ЫЊЩ‚ Ш§ЫЊЩ†ШЄШ±Щ†ШЄ Ъ†Ъ© ШЁШ§Ъ©Ші Ш±Ш§ ШЄЫЊЪ© ШЁШІЩ†ЫЊШЇ"
+msgstr "برای ارسال اطلاعات این کرش به توسعه دهندگان ام تی ای از طریق اینترنت چک باکس را تیک بزنید"
 
 #: Client/loader/Dialogs.cpp:86
 msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Ш§Щ†Ш¬Ш§Щ… Ш§ЫЊЩ†Ъ©Ш§Ш± Ш§Ш­ШЄЩ…Ш§Щ„ Ъ©Ш±Шґ ШґШЇЩ† Ш±Ш§ ШІЫЊШ§ШЇ Щ…ЫЊ Ъ©Щ†ШЇ."
+msgstr "انجام اینکار احتمال کرش شدن را زیاد می کند."
 
 #: Client/loader/Dialogs.cpp:87
 msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "ШўЫЊШ§ Щ…ЫЊ Ш®Щ€Ш§Щ‡ЫЊШЇ MTA: San Andreas Ш±Ш§ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Щ…Ш¬ШЇШЇ Ъ©Щ†ЫЊШЇШџ"
+msgstr "آیا می خواهید MTA: San Andreas را راه‌اندازی مجدد کنید؟"
 
 #: Client/loader/Dialogs.cpp:94
 msgid "MTA: San Andreas - Warning"
-msgstr "Ш§Щ… ШЄЫЊ Ш§ЫЊ: ШіЩ† ШўЩ†ШЇШ±ЫЊШ§Ші - Ш§Ш®Ш·Ш§Ш±"
+msgstr "ام تی ای: سن آندریاس - اخطار"
 
 #: Client/loader/Dialogs.cpp:95
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Щ…Ш­Щ„ Щ†ШµШЁ Grand Theft Auto: San Andreas ШґЩ…Ш§ ШґШ§Щ…Щ„ Ш§ЫЊЩ† ЩЃШ§ЫЊЩ„вЂЊЩ‡Ш§ Ш§ШіШЄ:"
+msgstr "محل نصب Grand Theft Auto: San Andreas شما شامل این فایل‌ها است:"
 
 #: Client/loader/Dialogs.cpp:97
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr "Щ€Ш¬Щ€ШЇ Ш§ЫЊЩ† ЩЃШ§ЫЊЩ„ Щ‡Ш§ Ш§Щ„ШІШ§Щ…ЫЊ Щ†ЫЊШіШЄ Щ€ Щ…Щ…Ъ©Щ† Ш§ШіШЄ ШЁШ§ Ш№Щ…Щ„Ъ©Ш±ШЇ Щ‡Ш§ЫЊ ЪЇШ±Ш§ЩЃЫЊЪ©ЫЊ Ш§ЫЊЩ† Щ†ШіШ®Щ‡ MTA:SA ШЄШЇШ§Ш®Щ„ Ш§ЫЊШ¬Ш§ШЇ Ъ©Щ†ШЇ.\n\n"
-"ЩѕЫЊШґЩ†Щ‡Ш§ШЇ Щ…ЫЊШґЩ€ШЇ Ъ©Щ‡ Ш§ЫЊЩ† ЩЃШ§ЫЊЩ„ Щ‡Ш§ Ш±Ш§ Ш­Ш°ЩЃ ЫЊШ§ ШЄШєЫЊЫЊШ± Щ†Ш§Щ… ШЇЩ‡ЫЊШЇ."
+msgstr "وجود این فایل ها الزامی نیست و ممکن است با عملکرد های گرافیکی این نسخه MTA:SA تداخل ایجاد کند.\n\n"
+"پیشنهاد میشود که این فایل ها را حذف یا تغییر نام دهید."
 
 #: Client/loader/Dialogs.cpp:99
 msgid "Keep these files, but also show this warning on next start"
-msgstr "ЩЃШ§ЫЊЩ„ Щ‡Ш§ Ш±Ш§ Щ†ЪЇЩ‡ШЇШ§Ш± Ш§Щ…Ш§ Щ‡Щ…Ъ†Щ†Ш§Щ† ШЇШ± Ш§Ш¬Ш±Ш§ЫЊ ШЁШ№ШЇЫЊ Ш§ЫЊЩ† Щ‡ШґШЇШ§Ш± Ш±Ш§ Щ†ШґШ§Щ† ШЁШЇЩ‡"
+msgstr "فایل ها را نگهدار اما همچنان در اجرای بعدی این هشدار را نشان بده"
 
 #: Client/loader/Dialogs.cpp:100
 msgid "Do not remind me about these files again"
-msgstr "Ш§ЫЊЩ† ЩЃШ§ЫЊЩ„ Щ‡Ш§ Ш±Ш§ ШЁЩ‡ Щ…Щ† ЫЊШ§ШЇШ§Щ€Ш±ЫЊ Щ†Ъ©Щ†"
+msgstr "این فایل ها را به من یاداوری نکن"
 
 #: Client/loader/Dialogs.cpp:101
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "Щ†Ш§Щ… Ш§ЫЊЩ† ЩЃШ§ЫЊЩ„ Щ‡Ш§ Ш±Ш§ Ш§ШІ.dll ШЁЩ‡.dll.bak ШЄШєЫЊЫЊШ± ШЁШЇЩ‡"
+msgstr "نام این فایل ها را از.dll به.dll.bak تغییر بده"
 
 #: Client/loader/Dialogs.cpp:102
 msgid "Show me these files"
-msgstr "Ш§ЫЊЩ† ЩЃШ§ЫЊЩ„ Щ‡Ш§ Ш±Ш§ ШЁЩ‡ Щ…Щ† Щ†ШґШ§Щ† ШЁШЇЩ‡"
+msgstr "این فایل ها را به من نشان بده"
 
 #: Client/loader/Dialogs.cpp:103
 msgid "Play MTA:SA"
-msgstr "Ш§Ш¬Ш±Ш§ЫЊ MTA:SA"
+msgstr "اجرای MTA:SA"
 
 #: Client/loader/Dialogs.cpp:109
 msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - ШЄЩ†ШёЫЊЩ…Ш§ШЄ ЪЇЫЊШ¬ Ъ©Щ†Щ†ШЇЩ‡"
+msgstr "MTA: San Andreas - تنظیمات گیج کننده"
 
 #: Client/loader/Dialogs.cpp:110
 msgid "NVidia Optimus detected!"
-msgstr "NVidia Optimus ШґЩ†Ш§ШіШ§ЫЊЫЊ ШґШЇ!"
+msgstr "NVidia Optimus شناسایی شد!"
 
 #: Client/loader/Dialogs.cpp:111
 msgid "Try each option and see what works:"
-msgstr "ЪЇШІЫЊЩ†Щ‡ Щ‡Ш§ЫЊ ШІЫЊШ± Ш±Ш§ Ш§Щ…ШЄШ­Ш§Щ† Ъ©Щ†ЫЊШЇ Щ€ ШЁШЁЫЊЩ†ШЇ Ъ©ШЇШ§Щ… Ш¬Щ€Ш§ШЁ Щ…ЫЊШЇЩ‡ШЇ:"
+msgstr "گزینه های زیر را امتحان کنید و ببیند کدام جواب میدهد:"
 
 #: Client/loader/Dialogs.cpp:112
 msgid "A - Standard NVidia"
-msgstr "Ш§Щ„ЩЃ - Nvidia Ш§ШіШЄШ§Щ†ШЇШ§Ш±ШЇ"
+msgstr "الف - Nvidia استاندارد"
 
 #: Client/loader/Dialogs.cpp:113
 msgid "B - Alternate NVidia"
-msgstr "ШЁ - NVidia Ш¬Ш§ЫЊЪЇШІЫЊЩ†"
+msgstr "ب - NVidia جایگزین"
 
 #: Client/loader/Dialogs.cpp:114
 msgid "C - Standard Intel"
-msgstr "Щѕ - Intel Ш§ШіШЄШ§Щ†ШЇШ§Ш±ШЇ"
+msgstr "پ - Intel استاندارد"
 
 #: Client/loader/Dialogs.cpp:115
 msgid "D - Alternate Intel"
-msgstr "ШЄ - Intel Ш¬Ш§ЫЊЪЇШІЫЊЩ†"
+msgstr "ت - Intel جایگزین"
 
 #: Client/loader/Dialogs.cpp:116
 msgid "If you get desperate, this might help:"
-msgstr "Ш§ЪЇШ± Щ†Ш§Ш§Щ…ЫЊШЇ ШґШЇЫЊШЇШЊ Щ…Щ…Ъ©Щ† Ш§ШіШЄ Ш§ЫЊЩ† Ъ©Щ…Ъ©ШЄШ§Щ† Ъ©Щ†ШЇ:"
+msgstr "اگر ناامید شدید، ممکن است این کمکتان کند:"
 
 #: Client/loader/Dialogs.cpp:117
 msgid "If you have already selected an option that works, this might help:"
-msgstr "Ш§ЪЇШ± ШЄШ§ ШЁЩ‡ Ш­Ш§Щ„ ЪЇШІЫЊЩ†Щ‡ Ш§ЫЊ Ш±Ш§ Ъ©Щ‡ Ъ©Ш§Ш± Щ…ЫЊЪ©Щ†ШЇ Ш±Ш§ Ш§Щ†ШЄШ®Ш§ШЁ Ъ©Ш±ШЇЫЊШЇШЊ Ш§ЫЊЩ† Щ…Щ…Ъ©Щ† Ш§ШіШЄ Ъ©Щ…Ъ©ШЄШ§Щ† Ъ©Щ†ШЇ:"
+msgstr "اگر تا به حال گزینه ای را که کار میکند را انتخاب کردید، این ممکن است کمکتان کند:"
 
 #: Client/loader/Dialogs.cpp:118
 msgid "Force windowed mode"
-msgstr "Ш­Ш§Щ„ШЄ ЩѕЩ†Ш¬Ш±Щ‡ Ш§ЫЊ Ш§Ш¬ШЁШ§Ш±ЫЊ"
+msgstr "حالت پنجره ای اجباری"
 
 #: Client/loader/Dialogs.cpp:119
 msgid "Don't show again"
-msgstr "ШЇЫЊЪЇШ± Щ†Щ…Ш§ЫЊШґ Щ†ШЇЩ‡"
+msgstr "دیگر نمایش نده"
 
 #: Client/loader/Dialogs.cpp:126 Client/game_sa/CSettingsSA.cpp:910
 msgid "MTA: San Andreas"
@@ -645,25 +645,25 @@ msgstr "MTA: San Andreas"
 
 #: Client/loader/Dialogs.cpp:127
 msgid "Warning: Could not detect anti-virus product"
-msgstr "Щ‡ШґШЇШ§Ш±: ШЁШ±Щ†Ш§Щ…Щ‡ ШўЩ†ШЄЫЊ Щ€ЫЊШ±Щ€Ші ШґЩ†Ш§ШіШ§ЫЊЫЊ Щ†ШґШЇ"
+msgstr "هشدار: برنامه آنتی ویروس شناسایی نشد"
 
 #: Client/loader/Dialogs.cpp:129
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
-msgstr "MTA Щ†ШЄЩ€Ш§Щ†ШіШЄ ШўЩ†ШЄЫЊ Щ€ЫЊШ±Щ€ШіЫЊ Ш±Щ€ЫЊ Ъ©Ш§Щ…ЩѕЫЊЩ€ШЄШ± ШґЩ…Ш§ ШґЩ†Ш§ШіШ§ЫЊЫЊ Ъ©Щ†ШЇ.\n\n"
-"Щ€ЫЊШ±Щ€Ші Щ‡Ш§ Щ…ЫЊ ШЄЩ€Ш§Щ†Щ†ШЇ ШЇШ± ШЄШ¬Ш±ШЁЩ‡ MTA Щ€ ШЁШ§ШІЫЊ Ъ©Ш±ШЇЩ† ШґЩ…Ш§ Ш§Ш®ШЄЩ„Ш§Щ„ Ш§ЫЊШ¬Ш§ШЇ Ъ©Щ†Щ†ШЇ.\n\n"
-"ШЁШ±Ш§ЫЊ ШЇЫЊШЇЩ† Ш§Ш·Щ„Ш§Ш№Ш§ШЄ ШЁЫЊШґШЄШ± Ш±Щ€ЫЊ ШЇЪ©Щ…Щ‡ 'Ъ©Щ…Ъ©' Ъ©Щ„ЫЊЪ© Ъ©Щ†ЫЊШЇ."
+msgstr "MTA نتوانست آنتی ویروسی روی کامپیوتر شما شناسایی کند.\n\n"
+"ویروس ها می توانند در تجربه MTA و بازی کردن شما اختلال ایجاد کنند.\n\n"
+"برای دیدن اطلاعات بیشتر روی دکمه 'کمک' کلیک کنید."
 
 #: Client/loader/Dialogs.cpp:132
 msgid "I have already installed an anti-virus"
-msgstr "Щ…Щ† Ш§ШІ Щ‚ШЁЩ„ ШўЩ†ШЄЫЊ Щ€ЫЊШ±Щ€Ші Щ†ШµШЁ Ъ©Ш±ШЇЩ‡ Ш§Щ…"
+msgstr "من از قبل آنتی ویروس نصب کرده ام"
 
 #: Client/loader/Dialogs.cpp:134
 msgid "I will not install an anti-virus.\n"
 "I want my PC to lag and be part of a botnet."
-msgstr "Щ…Щ† ШўЩ†ШЄЫЊ Щ€ЫЊШ±Щ€Ші Щ†ШµШЁ Щ†Щ…ЫЊвЂЊЪ©Щ†Щ….\n"
-"Щ…Щ† Щ…ЫЊвЂЊШ®Щ€Ш§Щ‡Щ… Ъ©Ш§Щ…ЩѕЫЊЩ€ШЄШ±Щ… Ъ©Щ†ШЇ ШґЩ€ШЇ Щ€ Щ‚ШіЩ…ШЄЫЊ Ш§ШІ ЫЊЪ© ШЁШ§ШЄвЂЊЩ†ШЄ ШЁШ§ШґШЇ."
+msgstr "من آنتی ویروس نصب نمی‌کنم.\n"
+"من می‌خواهم کامپیوترم کند شود و قسمتی از یک بات‌نت باشد."
 
 #: Client/loader/Dialogs.cpp:667
 msgid "The crash you experienced is due to memory abuse by servers.\n\n"
@@ -677,387 +677,387 @@ msgstr ""
 
 #: Client/loader/Dialogs.cpp:1024
 msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "ШЇШ± Ш­Ш§Щ„ Ш¬ШіШЄШ¬Щ€ЫЊ Grand Theft Auto San Andreas"
+msgstr "در حال جستجوی Grand Theft Auto San Andreas"
 
 #: Client/loader/Dialogs.cpp:1027
 msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Щ„Ш·ЩЃШ§ Grand Theft Auto San Andreas Ш±Ш§ Ш§Ш¬Ш±Ш§ Ъ©Щ†ЫЊШЇ"
+msgstr "لطفا Grand Theft Auto San Andreas را اجرا کنید"
 
 #: Client/core/CConnectManager.cpp:85
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "Ш§ШЄШµШ§Щ„ Щ†Ш§Щ…Щ€ЩЃЩ‚. Щ„Щ‚ШЁ Щ€Ш§Ш±ШЇ ШґШЇЩ‡ Щ†Ш§Щ…Ш№ШЄШЁШ± Ш§ШіШЄ!"
+msgstr "اتصال ناموفق. لقب وارد شده نامعتبر است!"
 
 #: Client/core/CConnectManager.cpp:116
 msgid "Connecting failed. Invalid host provided!"
-msgstr "Ш§ШЄШµШ§Щ„ Щ†Ш§Щ…Щ€ЩЃЩ‚. ШўШЇШ±Ші Щ€Ш§Ш±ШЇ ШґШЇЩ‡ Щ†Ш§Щ…Ш№ШЄШЁШ± Ш§ШіШЄ!"
+msgstr "اتصال ناموفق. آدرس وارد شده نامعتبر است!"
 
 #: Client/core/CConnectManager.cpp:132
 #, c-format
 msgid "Connecting to %s at port %u failed!"
-msgstr "Ш§ШЄШµШ§Щ„ ШЁЩ‡ %s ШЁШ§ ЩѕЩ€Ш±ШЄ %u Щ†Ш§Щ…Щ€ЩЃЩ‚ ШЁЩ€ШЇ!"
+msgstr "اتصال به %s با پورت %u ناموفق بود!"
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:153
 #, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "ШЇШ± Ш­Ш§Щ„ Ш§ШЄШµШ§Щ„ ШЁЩ‡ %s:%u ..."
+msgstr "در حال اتصال به %s:%u ..."
 
 #: Client/core/CConnectManager.cpp:155
 #, c-format
 msgid "Reconnecting to %s:%u ..."
-msgstr "Ш§ШЄШµШ§Щ„ Щ…Ш¬ШЇШЇ ШЁЩ‡ %s:%u..."
+msgstr "اتصال مجدد به %s:%u..."
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:156
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
 msgid "CONNECTING"
-msgstr "ШЇШ± Ш­Ш§Щ„ Ш§ШЄШµШ§Щ„"
+msgstr "در حال اتصال"
 
 #: Client/core/CConnectManager.cpp:271
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1358
 msgid "Connection timed out"
-msgstr "Ш§ШЄШµШ§Щ„ Щ…Щ†Щ‚Ш¶ЫЊ ШґШЇ"
+msgstr "اتصال منقضی شد"
 
 #: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1406
 msgid "Disconnected: unknown protocol error"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: Ш®Ш·Ш§ЫЊ ЩѕШ±Щ€ШЄЩ€Ъ©Щ„ Щ†Ш§ШґЩ†Ш§Ш®ШЄЩ‡"
+msgstr "اتصال قطع شد: خطای پروتوکل ناشناخته"
 
 #: Client/core/CConnectManager.cpp:293
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1410
 msgid "Disconnected: disconnected remotely"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„ Ш§ШІ Ш±Ш§Щ‡ ШЇЩ€Ш±"
+msgstr "اتصال قطع شد: قطع اتصال از راه دور"
 
 #: Client/core/CConnectManager.cpp:297
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1414
 msgid "Disconnected: connection lost remotely"
-msgstr "Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„: Ш§Ш±ШЄШЁШ§Ш· Ш§ШІ Ш±Ш§Щ‡ ШЇЩ€Ш± Щ‚Ш·Ш№ ШґШЇ"
+msgstr "قطع اتصال: ارتباط از راه دور قطع شد"
 
 #: Client/core/CConnectManager.cpp:301
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1418
 msgid "Disconnected: you are banned from this server"
-msgstr "Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„: ШґЩ…Ш§ Ш§ШІ Ш§ЫЊЩ† ШіШ±Щ€Ш± Щ…Ш­Ш±Щ€Щ… ШґШЇЩ‡ Ш§ЫЊШЇ"
+msgstr "قطع اتصال: شما از این سرور محروم شده اید"
 
 #: Client/core/CConnectManager.cpp:308
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1426
 msgid "Disconnected: disconnected from the server"
-msgstr "Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„: ШґЩ…Ш§ Ш§ШІ ШіШ±Щ€Ш± Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„ Ъ©Ш±ШЇЫЊШЇ"
+msgstr "قطع اتصال: شما از سرور قطع اتصال کردید"
 
 #: Client/core/CConnectManager.cpp:312
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1430
 msgid "Disconnected: connection to the server was lost"
-msgstr "Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„: Ш§Ш±ШЄШЁШ§Ш· ШЁШ§ ШіШ±Щ€Ш± Щ‚Ш·Ш№ ШґШЇ"
+msgstr "قطع اتصال: ارتباط با سرور قطع شد"
 
 #: Client/core/CConnectManager.cpp:319
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1438
 msgid "Disconnected: connection was refused"
-msgstr "Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„: Ш§Ш±ШЄШЁШ§Ш· ШЁШ§ ШіШ±Щ€Ш± Ш±ШЇ ШґШЇ"
+msgstr "قطع اتصال: ارتباط با سرور رد شد"
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:414
 #, c-format
 msgid "No such mod installed (%s)"
-msgstr "Щ…Щ€ШЇ Щ…Щ€Ш±ШЇ Щ†ШёШ± Щ†ШµШЁ Щ†ШґШЇЩ‡ Ш§ШіШЄ (%s)"
+msgstr "مود مورد نظر نصب نشده است (%s)"
 
 #: Client/core/CConnectManager.cpp:422
 msgid "Bad server response (2)"
-msgstr "ЩѕШ§ШіШ® ШЁШЇ Ш§ШІ ШіШ±Щ€Ш± (2)"
+msgstr "پاسخ بد از سرور (2)"
 
 #: Client/core/CConnectManager.cpp:432
 msgid "Bad server response (1)"
-msgstr "ЩѕШ§ШіШ® ШЁШЇ Ш§ШІ ШіШ±Щ€Ш± (1)"
+msgstr "پاسخ بد از سرور (1)"
 
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
 msgid "English"
-msgstr "ЩѕШ§Ш±ШіЫЊ"
+msgstr "پارسی"
 
 #: Client/core/CVersionUpdater.cpp:627
 msgid "Busy"
-msgstr "Щ…ШґШєЩ€Щ„"
+msgstr "مشغول"
 
 #: Client/core/CVersionUpdater.cpp:627
 msgid "Can't check for updates right now"
-msgstr "ШЇШ± Ш­Ш§Щ„ Ш­Ш§Ш¶Ш± Щ†Щ…ЫЊ ШЄЩ€Ш§Щ† ШЁШ±Ш§ЫЊ ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ ШЁШ±Ш±ШіЫЊ Ъ©Ш±ШЇ."
+msgstr "در حال حاضر نمی توان برای بروزرسانی بررسی کرد."
 
 #: Client/core/CVersionUpdater.cpp:1630 Client/core/CVersionUpdater.cpp:1650
 #: Client/core/CVersionUpdater.cpp:1668
 #, c-format
 msgid "MTA:SA %s required"
-msgstr "Щ†ШіШ®Щ‡ %s MTA:SA Щ†ЫЊШ§Ш± Ш§ШіШЄ"
+msgstr "نسخه %s MTA:SA نیار است"
 
 #: Client/core/CVersionUpdater.cpp:1631
 #, c-format
 msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
 "Do you want to download and install MTA:SA %s ?"
-msgstr "ШЁШ±Ш§ЫЊ Ш§ШЄШµШ§Щ„ ШЁЩ‡ Ш§ЫЊЩ† ШіШ±Щ€Ш± Щ†ШіШ®Щ‡ MTA:SA %s Щ„Ш§ШІЩ… Ш§ШіШЄ. \n\n"
-"ШўЫЊШ§ Щ…ЫЊ Ш®Щ€Ш§Щ‡ЫЊШЇ Ш§ЫЊЩ† Щ†ШіШ®Щ‡ Ш±Ш§ ШЇШ§Щ†Щ„Щ€ШЇ Щ€ Щ†ШµШЁ Щ†Щ…Ш§ЫЊЫЊШЇШџ"
+msgstr "برای اتصال به این سرور نسخه MTA:SA %s لازم است. \n\n"
+"آیا می خواهید این نسخه را دانلود و نصب نمایید؟"
 
 #: Client/core/CVersionUpdater.cpp:1651
 #, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "ШўЫЊШ§ Щ…ЫЊ Ш®Щ€Ш§Щ‡ЫЊШЇ MTA:SA %s Ш§Ш¬Ш±Ш§ Щ€ ШЁЩ‡ Ш§ЫЊЩ† ШіШ±Щ€Ш± Щ…ШЄШµЩ„ ШґЩ€ШЇШџ"
+msgstr "آیا می خواهید MTA:SA %s اجرا و به این سرور متصل شود؟"
 
 #: Client/core/CVersionUpdater.cpp:1669
 msgid "It is not possible to connect at this time.\n\n"
 "Please try later."
-msgstr "ШЁШ±Щ‚Ш±Ш§Ш±ЫЊ Ш§ШЄШµШ§Щ„ ШЇШ± Ш­Ш§Щ„ Ш­Ш§Ш¶Ш± Ш§Щ…Ъ©Ш§Щ† ЩѕШ°ЫЊШ± Щ†Щ…ЫЊ ШЁШ§ШґШЇ.\n\n"
-"Щ„Ш·ЩЃШ§ ШЁШ№ШЇШ§ ШЄЩ„Ш§Шґ Щ†Щ…Ш§ЫЊЫЊШЇ."
+msgstr "برقراری اتصال در حال حاضر امکان پذیر نمی باشد.\n\n"
+"لطفا بعدا تلاش نمایید."
 
 #: Client/core/CVersionUpdater.cpp:1851
 msgid "Connecting"
-msgstr "ШЇШ± Ш­Ш§Щ„ Ш§ШЄШµШ§Щ„"
+msgstr "در حال اتصال"
 
 #: Client/core/CVersionUpdater.cpp:1852 Client/core/CVersionUpdater.cpp:1868
 msgid "Please wait..."
-msgstr "Щ„Ш·ЩЃШ§ Щ…Щ†ШЄШёШ± ШЁЩ…Ш§Щ†ЫЊШЇ..."
+msgstr "لطفا منتظر بمانید..."
 
 #: Client/core/CVersionUpdater.cpp:1867
 msgid "CHECKING"
-msgstr "ШЇШ± Ш­Ш§Щ„ ШЁШ±Ш±ШіЫЊ"
+msgstr "در حال بررسی"
 
 #: Client/core/CVersionUpdater.cpp:1884 Client/core/CVersionUpdater.cpp:1977
 msgid "UPDATE CHECK"
-msgstr "ШЁШ±Ш±ШіЫЊ ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ"
+msgstr "بررسی بروزرسانی"
 
 #: Client/core/CVersionUpdater.cpp:1885
 msgid "No update needed"
-msgstr "Щ†ЫЊШ§ШІЫЊ ШЁЩ‡ ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Щ†ЫЊШіШЄ"
+msgstr "نیازی به بروزرسانی نیست"
 
 #: Client/core/CVersionUpdater.cpp:1902
 msgid "DOWNLOADING"
-msgstr "ШЇШ± Ш­Ш§Щ„ ШЇШ§Щ†Щ„Щ€ШЇ"
+msgstr "در حال دانلود"
 
 #: Client/core/CVersionUpdater.cpp:1903
 msgid "waiting..."
-msgstr "ШЇШ± Ш­Ш§Щ„ Ш§Щ†ШЄШёШ§Ш±..."
+msgstr "در حال انتظار..."
 
 #: Client/core/CVersionUpdater.cpp:1919
 msgid "MANDATORY UPDATE"
-msgstr "ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Ш§Ш¬ШЁШ§Ш±ЫЊ"
+msgstr "بروزرسانی اجباری"
 
 #: Client/core/CVersionUpdater.cpp:1920
 msgid "To join this server, you must update MTA.\n\n"
 " Do you want to update now ?"
-msgstr "ШЁШ±Ш§ЫЊ Щ€Ш±Щ€ШЇ ШЁЩ‡ Ш§ЫЊЩ† ШіШ±Щ€Ш± ШЁШ§ЫЊШЇ MTA Ш®Щ€ШЇ Ш±Ш§ ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Щ†Щ…Ш§ЫЊЫЊШЇ.\n\n"
-"ШўЫЊШ§ Щ…ЫЊ Ш®Щ€Ш§Щ‡ЫЊШЇ Щ‡Щ…ЫЊЩ† Ш§Щ„Ш§Щ† ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Ъ©Щ†ЫЊШЇШџ"
+msgstr "برای ورود به این سرور باید MTA خود را بروزرسانی نمایید.\n\n"
+"آیا می خواهید همین الان بروزرسانی کنید؟"
 
 #: Client/core/CVersionUpdater.cpp:1938
 msgid "OPTIONAL UPDATE"
-msgstr "ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Ш§Ш®ШЄЫЊШ§Ш±ЫЊ"
+msgstr "بروزرسانی اختیاری"
 
 #: Client/core/CVersionUpdater.cpp:1939
 msgid "Server says an update is recommended, but not essential.\n\n"
 " Do you want to update now ?"
-msgstr "ШіШ±Щ€Ш±: ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ MTA ЩѕЫЊШґЩ†Щ‡Ш§ШЇ Щ…ЫЊ ШґЩ€ШЇ Ш§Щ…Ш§ Ш§Ш¬ШЁШ§Ш±ЫЊ Щ†ЫЊШіШЄ.\n\n"
-"ШўЫЊШ§ Щ…ЫЊ Ш®Щ€Ш§Щ‡ЫЊШЇ Щ‡Щ…ЫЊЩ† Ш§Щ„Ш§Щ† ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Ъ©Щ†ЫЊШЇШџ"
+msgstr "سرور: بروزرسانی MTA پیشنهاد می شود اما اجباری نیست.\n\n"
+"آیا می خواهید همین الان بروزرسانی کنید؟"
 
 #: Client/core/CVersionUpdater.cpp:1978
 msgid "An update is currently not available.\n\n"
 "Please check www.multitheftauto.com"
-msgstr "Щ‡Щ…вЂЊШ§Ъ©Щ†Щ€Щ† ШЁЩ‡вЂЊШ±Щ€ШІШ±ШіШ§Щ†ЫЊ ШЇШ± ШЇШіШЄШ±Ші Щ†ЫЊШіШЄ.\n\n"
-"Щ„Ш·ЩЃШ§ www.multitheftauto.com Ш±Ш§ ШЁШ±Ш±ШіЫЊ Ъ©Щ†ЫЊШЇ"
+msgstr "هم‌اکنون به‌روزرسانی در دسترس نیست.\n\n"
+"لطفا www.multitheftauto.com را بررسی کنید"
 
 #: Client/core/CVersionUpdater.cpp:1999 Client/core/CVersionUpdater.cpp:2181
 msgid "ERROR SAVING"
-msgstr "Ш®Ш·Ш§ ШЇШ± Ш°Ш®ЫЊШ±Щ‡вЂЊШіШ§ШІЫЊ"
+msgstr "خطا در ذخیره‌سازی"
 
 #: Client/core/CVersionUpdater.cpp:2000 Client/core/CVersionUpdater.cpp:2182
 msgid "Unable to create the file."
-msgstr "Ш®Ш·Ш§ ШЇШ± Ш§ЫЊШ¬Ш§ШЇ ЩЃШ§ЫЊЩ„."
+msgstr "خطا در ایجاد فایل."
 
 #: Client/core/CVersionUpdater.cpp:2008 Client/core/CVersionUpdater.cpp:2017
 #: Client/core/CVersionUpdater.cpp:2190 Client/core/CVersionUpdater.cpp:2199
 msgid "ERROR DOWNLOADING"
-msgstr "Ш®Ш·Ш§ ШЇШ± ШЇШ§Щ†Щ„Щ€ШЇ Ъ©Ш±ШЇЩ†"
+msgstr "خطا در دانلود کردن"
 
 #: Client/core/CVersionUpdater.cpp:2009 Client/core/CVersionUpdater.cpp:2191
 msgid "The downloaded file appears to be incorrect."
-msgstr "ЩЃШ§ЫЊЩ„ ШЇШ§Щ†Щ„Щ€ШЇ ШґШЇЩ‡ ШЁЩ‡ Щ†ШёШ± Щ†Ш§ШЇШ±ШіШЄ Ш§ШіШЄ."
+msgstr "فایل دانلود شده به نظر نادرست است."
 
 #: Client/core/CVersionUpdater.cpp:2018 Client/core/CVersionUpdater.cpp:2200
 msgid "For some reason."
-msgstr "ШЁЩ†Ш§ ШЁЩ‡ ШЇЩ„Ш§ЫЊЩ„ЫЊ."
+msgstr "بنا به دلایلی."
 
 #: Client/core/CVersionUpdater.cpp:2029 Client/core/CVersionUpdater.cpp:2213
 msgid "DOWNLOAD COMPLETE"
-msgstr "ШЇШ§Щ†Щ„Щ€ШЇ Ш§Щ†Ш¬Ш§Щ… ШґШЇ"
+msgstr "دانلود انجام شد"
 
 #: Client/core/CVersionUpdater.cpp:2053
 msgid " - Unknown problem in _DialogUpdateResult"
-msgstr " - Щ…ШґЪ©Щ„ Щ†Ш§ШґЩ†Ш§Ш®ШЄЩ‡ ШЇШ± _DialogUpdateResult"
+msgstr " - مشکل ناشناخته در _DialogUpdateResult"
 
 #: Client/core/CVersionUpdater.cpp:2144 Client/core/CSettings.cpp:5731
 msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "ЩЃШ§ЫЊЩ„ Щ‡Ш§ЫЊ ШЇШіШЄЪ©Ш§Ш±ЫЊ ШґШЇЩ‡ GTA:SA"
+msgstr "فایل های دستکاری شده GTA:SA"
 
 #: Client/core/CVersionUpdater.cpp:2151 Client/core/CVersionUpdater.cpp:2161
 msgid "Ok"
-msgstr "ШЄШ§ЫЊЫЊШЇ"
+msgstr "تایید"
 
 #: Client/core/CVersionUpdater.cpp:2159
 msgid "ERROR"
-msgstr "Ш®Ш·Ш§"
+msgstr "خطا"
 
 #: Client/core/CVersionUpdater.cpp:2160
 msgid "Some MTA:SA data files are missing.\n\n\n"
 "Please reinstall MTA:SA"
-msgstr "ШЄШ№ШЇШ§ШЇЫЊ Ш§ШІ ЩЃШ§ЫЊЩ„ Щ‡Ш§ЫЊ MTA:SA Щ…Щ€Ш¬Щ€ШЇ Щ†Щ…ЫЊ ШЁШ§ШґЩ†ШЇ.\n\n\n"
-"Щ„Ш·ЩЃШ§ MTA:SA Ш±Ш§ Щ…Ш¬ШЇШЇШ§ Щ†ШµШЁ ЩЃШ±Щ…Ш§ЫЊЫЊШЇ"
+msgstr "تعدادی از فایل های MTA:SA موجود نمی باشند.\n\n\n"
+"لطفا MTA:SA را مجددا نصب فرمایید"
 
 #: Client/core/CVersionUpdater.cpp:2837
 #, c-format
 msgid "%3d %% completed"
-msgstr "%3d %% ШЄЪ©Щ…ЫЊЩ„ ШґШЇ"
+msgstr "%3d %% تکمیل شد"
 
 #: Client/core/CVersionUpdater.cpp:2840
 #, c-format
 msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
-"Щ…Щ†ШЄШёШ± ЩѕШ§ШіШ® - %-3d"
+"منتظر پاسخ - %-3d"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ Ъ©Щ…Ъ© ШЇШіШЄЩ€Ш± ]***\n"
+msgstr "***[ کمک دستور ]***\n"
 
 #: Client/core/CCommandFuncs.cpp:158
 #, c-format
 msgid "* The time is %d:%02d:%02d"
-msgstr "ШІЩ…Ш§Щ† %d:%02d:%02d Щ…ЫЊ ШЁШ§ШґШЇ"
+msgstr "زمان %d:%02d:%02d می باشد"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr "Ш§ШЄШµШ§Щ„: ШґШЁЪ©Щ‡ ШўЩ…Ш§ШЇЩ‡ Щ†Щ…ЫЊвЂЊШЁШ§ШґШЇ Щ„Ш­ШёЩ‡ Ш§ЫЊ ШµШЁШ± Ъ©Щ†ЫЊШЇ"
+msgstr "اتصال: شبکه آماده نمی‌باشد لحظه ای صبر کنید"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "Ш§ШЄШµШ§Щ„: Щ†Ш­Щ€ 'connect <ШўШЇШ±Ші> [<ЩѕЩ€Ш±ШЄ> <Щ„Щ‚ШЁ> <ЪЇШ°Ш±Щ€Ш§ЪЩ‡>]'"
+msgstr "اتصال: نحو 'connect <آدرس> [<پورت> <لقب> <گذرواژه>]'"
 
 #: Client/core/CCommandFuncs.cpp:233
 msgid "connect: Bad port number"
-msgstr "Ш§ШЄШµШ§Щ„: ШґЩ…Ш§Ш±Щ‡ ЩѕЩ€Ш±ШЄ Щ†Ш§ШЇШ±ШіШЄ"
+msgstr "اتصال: شماره پورت نادرست"
 
 #: Client/core/CCommandFuncs.cpp:255
 #, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "Ш§ШЄШµШ§Щ„: ШЇШ± Ш­Ш§Щ„ Ш§ШЄШµШ§Щ„ ШЁЩ‡ %s:%u..."
+msgstr "اتصال: در حال اتصال به %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:259
 #, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "Ш§ШЄШµШ§Щ„: Ш§ШЄШµШ§Щ„ ШЁЩ‡ %s:%u Щ†Ш§Щ…Щ€ЩЃЩ‚!"
+msgstr "اتصال: اتصال به %s:%u ناموفق!"
 
 #: Client/core/CCommandFuncs.cpp:264
 msgid "connect: Failed to unload current mod"
-msgstr "Ш§ШЄШµШ§Щ„: ШўЩ†Щ„Щ€ШЇ ШіШ§ШІЫЊ Щ…Щ€ШЇ ЩЃШ№Щ„ЫЊ Щ†Ш§Щ…Щ€ЩЃЩ‚"
+msgstr "اتصال: آنلود سازی مود فعلی ناموفق"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr "Ш§ШЄШµШ§Щ„ Щ…Ш¬ШЇШЇ: ШґШЁЪ©Щ‡ ШўЩ…Ш§ШЇЩ‡ Щ†Щ…ЫЊвЂЊШЁШ§ШґШЇ Щ„Ш­ШёЩ‡ Ш§ЫЊ ШµШЁШ± Ъ©Щ†ЫЊШЇ"
+msgstr "اتصال مجدد: شبکه آماده نمی‌باشد لحظه ای صبر کنید"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr "Ш§ШЄШµШ§Щ„ Щ…Ш¬ШЇШЇ: ШґЩ…Ш§Ш±Щ‡ ЩѕЩ€Ш±ШЄ Щ†Ш§ШЇШ±ШіШЄ Ш§ШіШЄ"
+msgstr "اتصال مجدد: شماره پورت نادرست است"
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr "Ш§ШЄШµШ§Щ„ Щ…Ш¬ШЇШЇ: Ш§ШЄШµШ§Щ„ Щ…Ш¬ШЇШЇ ШЁЩ‡ %s:%u..."
+msgstr "اتصال مجدد: اتصال مجدد به %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:329
 #, c-format
 msgid "reconnect: could not connect to %s:%u!"
-msgstr "Ш§ШЄШµШ§Щ„ Щ…Ш¬ШЇШЇ: Щ†ШЄЩ€Ш§Щ†ШіШЄ ШЁЩ‡ %s Щ€ШµЩ„ ШґЩ€ШЇ:%u!"
+msgstr "اتصال مجدد: نتوانست به %s وصل شود:%u!"
 
 #: Client/core/CCommandFuncs.cpp:363
 msgid "Bound all controls from GTA"
-msgstr "Ш§ШіШЄЩЃШ§ШЇЩ‡ Ш§ШІ ШЄЩ†ШёЫЊЩ…Ш§ШЄ Ъ©Щ†ШЄШ±Щ„ GTA"
+msgstr "استفاده از تنظیمات کنترل GTA"
 
 #: Client/core/CCommandFuncs.cpp:377
 msgid "Saved configuration file"
-msgstr "ЩЃШ§ЫЊЩ„ ШЄЩ†ШёЫЊЩ…Ш§ШЄ Ш°Ш®ЫЊШ±Щ‡ ШґШЇ"
+msgstr "فایل تنظیمات ذخیره شد"
 
 #. Print it
 #: Client/core/CCommandFuncs.cpp:456
 #, c-format
 msgid "* Your serial is: %s"
-msgstr "* ШіШ±ЫЊШ§Щ„ ШґЩ…Ш§: %s"
+msgstr "* سریال شما: %s"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:503
 msgid "SETTINGS"
-msgstr "ШЄЩ†ШёЫЊЩ…Ш§ШЄ"
+msgstr "تنظیمات"
 
 #: Client/core/CSettings.cpp:549
 msgid "Multiplayer"
-msgstr "Ъ†Щ†ШЇЩ†ЩЃШ±Щ‡"
+msgstr "چندنفره"
 
 #: Client/core/CSettings.cpp:550
 msgid "Video"
-msgstr "ШЄШµЩ€ЫЊШ±"
+msgstr "تصویر"
 
 #: Client/core/CSettings.cpp:551
 msgid "PostFX"
-msgstr "ЩѕШіШЄ Ш§ЩЃвЂЊШ§Ъ©Ші"
+msgstr "پست اف‌اکس"
 
 #: Client/core/CSettings.cpp:552
 msgid "Audio"
-msgstr "ШµШЇШ§"
+msgstr "صدا"
 
 #: Client/core/CSettings.cpp:553
 msgid "Binds"
-msgstr "ШЁШ§ЫЊЩ†ШЇ Щ‡Ш§"
+msgstr "بایند ها"
 
 #: Client/core/CSettings.cpp:554
 msgid "Controls"
-msgstr "Ъ©Щ†ШЄШ±Щ„ Щ‡Ш§"
+msgstr "کنترل ها"
 
 #: Client/core/CSettings.cpp:555
 msgid "Interface"
-msgstr "Ш±Ш§ШЁШ· Ъ©Ш§Ш±ШЁШ±ЫЊ"
+msgstr "رابط کاربری"
 
 #: Client/core/CSettings.cpp:556
 msgid "Web Browser"
-msgstr "Щ…Ш±Щ€Ш±ЪЇШ± Щ€ШЁ"
+msgstr "مرورگر وب"
 
 #: Client/core/CSettings.cpp:557
 msgid "Advanced"
-msgstr "ЩѕЫЊШґШ±ЩЃШЄЩ‡"
+msgstr "پیشرفته"
 
 #: Client/core/CSettings.cpp:582 Client/core/CSettings.cpp:790
 #: Client/core/CSettings.cpp:1119 Client/core/CSettings.cpp:1415
 msgid "Load defaults"
-msgstr "ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ ЩѕЫЊШґЩЃШ±Ш¶ Щ‡Ш§"
+msgstr "بارگذاری پیشفرض ها"
 
 #. *
 #. *  Controls tab
 #. *
 #: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:623
 msgid "Mouse sensitivity:"
-msgstr "Ш­ШіШ§ШіЫЊШЄ Щ…Щ€Ші:"
+msgstr "حساسیت موس:"
 
 #. VerticalAimSensitivity
 #: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:644
 msgid "Vertical aim sensitivity:"
-msgstr "Ш­ШіШ§ШіЫЊШЄ Ш№Щ…Щ€ШЇЫЊ Щ†ШґШ§Щ†Щ‡ ЪЇЫЊШ±ЫЊ:"
+msgstr "حساسیت عمودی نشانه گیری:"
 
 #. Mouse Options
 #: Client/core/CSettings.cpp:602
 msgid "Mouse options"
-msgstr "ЪЇШІЫЊЩ†Щ‡ Щ‡Ш§ЫЊ Щ…Щ€Ші"
+msgstr "گزینه های موس"
 
 #: Client/core/CSettings.cpp:609
 msgid "Invert mouse vertically"
-msgstr "Ш­ШіШ§ШіЫЊШЄ Ш№Щ…Щ€ШЇЫЊ Щ…Щ€Ші"
+msgstr "حساسیت عمودی موس"
 
 #: Client/core/CSettings.cpp:613
 msgid "Steer with mouse"
-msgstr "ЩЃШ±Щ…Ш§Щ† ШЇШ§ШЇЩ† ШЁШ§ Щ…Щ€Ші"
+msgstr "فرمان دادن با موس"
 
 #: Client/core/CSettings.cpp:617
 msgid "Fly with mouse"
-msgstr "ЩѕШ±Щ€Ш§ШІ ШЁШ§ Щ…Щ€Ші"
+msgstr "پرواز با موس"
 
 #: Client/core/CSettings.cpp:663
 msgid "Use mouse sensitivity for aiming"
@@ -1066,61 +1066,62 @@ msgstr ""
 #. Joypad options
 #: Client/core/CSettings.cpp:669
 msgid "Joypad options"
-msgstr "ЪЇШІЫЊЩ†Щ‡ Щ‡Ш§ЫЊ Joypad"
+msgstr "گزینه های Joypad"
 
 #: Client/core/CSettings.cpp:682
 msgid "Standard controls (Mouse + Keyboard)"
-msgstr "Ъ©Щ†ШЄШ±Щ„ Щ‡Ш§ЫЊ Ш§ШіШЄШ§Щ†ШЇШ§Ш±ШЇ (Щ…Щ€Ші + Ъ©ЫЊШЁЩ€Ш±ШЇ)"
+msgstr "کنترل های استاندارد (موس + کیبورد)"
 
 #: Client/core/CSettings.cpp:689
 msgid "Classic controls (Joypad)"
-msgstr "Ъ©Щ†ШЄШ±Щ„ Щ‡Ш§ЫЊ Ъ©Щ„Ш§ШіЫЊЪ© (Ш¬Щ€ЫЊ ЩѕШЇ)"
+msgstr "کنترل های کلاسیک (جوی پد)"
 
 #: Client/core/CSettings.cpp:726
 msgid "Dead Zone"
-msgstr "ШЇШЇ ШІЩ€Щ†"
+msgstr "دد زون"
 
 #: Client/core/CSettings.cpp:731
 msgid "Saturation"
-msgstr "Ш§ШґШЁШ§Ш№"
+msgstr "اشباع"
 
 #: Client/core/CSettings.cpp:737
 msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "Ш§ШІ ШЄШЁ 'ШЁШ§ЫЊЩ†ШЇ Щ‡Ш§' ШЁШ±Ш§ЫЊ ШЇЪ©Щ…Щ‡ Щ‡Ш§ЫЊ Ш¬Щ€ЫЊ ЩѕШЇ Ш§ШіШЄЩЃШ§ШЇЩ‡ Щ†Щ…Ш§ЫЊЫЊШЇ."
+msgstr "از تب 'بایند ها' برای دکمه های جوی پد استفاده نمایید."
 
 #: Client/core/CSettings.cpp:776
 msgid "Left Stick"
-msgstr "Ш§ШіШЄЫЊЪ© Ъ†Щѕ"
+msgstr "استیک چپ"
 
 #: Client/core/CSettings.cpp:782
 msgid "Right Stick"
-msgstr "Ш§ШіШЄЫЊЪ© Ш±Ш§ШіШЄ"
+msgstr "استیک راست"
 
 #: Client/core/CSettings.cpp:797
 msgid "DESCRIPTION"
-msgstr "ШЄЩ€Ш¶ЫЊШ­Ш§ШЄ"
+msgstr "توضیحات"
 
 #: Client/core/CSettings.cpp:798
 msgid "KEY"
-msgstr "Ъ©Щ„ЫЊШЇ"
+msgstr "کلید"
 
 #: Client/core/CSettings.cpp:800
 msgid "ALT. KEY"
-msgstr "Ъ©Щ„ЫЊШЇ ШЇЩ€Щ…"
+msgstr "کلید دوم"
 
 #. *
 #. *    Multiplayer tab
 #. *
 #: Client/core/CSettings.cpp:805 Client/core/CSettings.cpp:808
 msgid "Nick:"
-msgstr "Щ„Щ‚ШЁ:"
+msgstr "لقب:"
 
 #: Client/core/CSettings.cpp:830
 msgid "Save server passwords"
-msgstr "Ш°Ш®ЫЊШ±Щ‡ ЪЇШ°Ш±Щ€Ш§ЪЩ‡ ШіШ±Щ€Ш± Щ‡Ш§"
+msgstr "ذخیره گذرواژه سرور ها"
 
 #: Client/core/CSettings.cpp:835
 msgid "Auto-refresh server browser"
+msgstr "بروزرسانی خودکار مرورگر سرور ها"
 
 #: Client/core/CSettings.cpp:900
 msgid "History"
@@ -1159,7 +1160,7 @@ msgid "DELETE NICKNAME"
 msgstr ""
 
 #: Client/core/CSettings.cpp:4153
-msgid "Delete nickname "%s" from history?"
+msgid "Delete nickname \"%s\" from history?"
 msgstr ""
 
 #: Client/core/CSettings.cpp:4168
@@ -1170,56 +1171,54 @@ msgstr ""
 msgid "Delete all nicknames from history?"
 msgstr ""
 
-msgstr "ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Ш®Щ€ШЇЪ©Ш§Ш± Щ…Ш±Щ€Ш±ЪЇШ± ШіШ±Щ€Ш± Щ‡Ш§"
-
 #: Client/core/CSettings.cpp:840
 msgid "Allow screen upload"
-msgstr "Ш§Ш¬Ш§ШІЩ‡ ШўЩѕЩ„Щ€ШЇ ШµЩЃШ­Щ‡"
+msgstr "اجازه آپلود صفحه"
 
 #: Client/core/CSettings.cpp:845
 msgid "Allow external sounds"
-msgstr "Щ…Ш¬Ш§ШІ Ъ©Ш±ШЇЩ† ШµШЇШ§Щ‡Ш§ЫЊ Ш®Ш§Ш±Ш¬ЫЊ"
+msgstr "مجاز کردن صداهای خارجی"
 
 #: Client/core/CSettings.cpp:850
 msgid "Always show download window"
-msgstr "Щ‡Щ…ЫЊШґЩ‡ ЩѕЩ†Ш¬Ш±Щ‡ ШЇШ§Щ†Щ„Щ€ШЇ Ш±Ш§ Щ†ШґШ§Щ† ШЁШЇЩ‡"
+msgstr "همیشه پنجره دانلود را نشان بده"
 
 #: Client/core/CSettings.cpp:855
 msgid "Allow connecting with Discord Rich Presence"
-msgstr "Ш§Ш¬Ш§ШІЩ‡ ШЁШ±Щ‚Ш±Ш§Ш±ЫЊ Ш§Ш±ШЄШЁШ§Ш· ШЁШ§ Discord Rich Presence"
+msgstr "اجازه برقراری ارتباط با Discord Rich Presence"
 
 #: Client/core/CSettings.cpp:860
 msgid "Allow GTA:SA ingame status on Steam"
-msgstr "Щ†Щ…Ш§ЫЊШґ \"Щ€Ш¶Ш№ЫЊШЄ ШЇШ±Щ€Щ†вЂЊШЁШ§ШІЫЊ\" GTA:SA Ш±Ш§ ШЇШ± Ш§ШіШЄЫЊЩ… ЩЃШ№Ш§Щ„ Ъ©Щ†"
+msgstr "نمایش \"وضعیت درون‌بازی\" GTA:SA را در استیم فعال کن"
 
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:866
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr "Ш№Ъ©ШівЂЊЩ‡Ш§ЫЊ ЪЇШ±ЩЃШЄЩ‡вЂЊШґШЇЩ‡ ШЁШ§ ШЇЩ€Ш±ШЁЫЊЩ† Ш±Ш§ ШЇШ± ЩѕЩ€ШґЩ‡вЂЊЫЊ ЩЃШ§ЫЊЩ„вЂЊЩ‡Ш§ЫЊ Ъ©Ш§Ш±ШЁШ±ЫЊ GTA San Andreas Ш°Ш®ЫЊШ±Щ‡ Ъ©Щ†ЫЊШЇ"
+msgstr "عکس‌های گرفته‌شده با دوربین را در پوشه‌ی فایل‌های کاربری GTA San Andreas ذخیره کنید"
 
 #: Client/core/CSettings.cpp:871
 msgid "Ask before disconnecting from server using main menu"
-msgstr "ЩѕЫЊШґ Ш§ШІ Щ‚Ш·Ш№ Ш§Ш±ШЄШЁШ§Ш· ШЁШ§ ШіШ±Щ€Ш± Ш§ШІ Ш±Ш§Щ‡ ЩЃЩ‡Ш±ШіШЄ Ш§ШµЩ„ЫЊШЊ ЩѕШ±ШівЂЊЩ€Ш¬Щ€ ШґЩ€ШЇ"
+msgstr "پیش از قطع ارتباط با سرور از راه فهرست اصلی، پرس‌وجو شود"
 
 #: Client/core/CSettings.cpp:876
 msgid "Use customized GTA:SA files"
-msgstr "Ш§ШіШЄЩЃШ§ШЇЩ‡ Ш§ШІ ЩЃШ§ЫЊЩ„ Щ‡Ш§ЫЊ ШіЩЃШ§Ш±ШґЫЊ ШґШЇЩ‡ GTA:SA"
+msgstr "استفاده از فایل های سفارشی شده GTA:SA"
 
 #: Client/core/CSettings.cpp:881
 msgid "Map rendering options"
-msgstr "ЪЇШІЫЊЩ†Щ‡ Щ‡Ш§ЫЊ Ш±Щ†ШЇШ±ЫЊЩ†ЪЇ Щ†Щ‚ШґЩ‡"
+msgstr "گزینه های رندرینگ نقشه"
 
 #: Client/core/CSettings.cpp:889
 msgid "Opacity:"
-msgstr "ШґЩЃШ§ЩЃЫЊШЄ:"
+msgstr "شفافیت:"
 
 #: Client/core/CSettings.cpp:912
 msgid "Image resolution:"
-msgstr "Щ€Ш¶Щ€Ш­ ШЄШµЩ€ЫЊШ±:"
+msgstr "وضوح تصویر:"
 
 #: Client/core/CSettings.cpp:919
 msgid "1024 x 1024 (Default)"
-msgstr "1024x1024 (ЩѕЫЊШґ ЩЃШ±Ш¶)"
+msgstr "1024x1024 (پیش فرض)"
 
 #. index 0
 #: Client/core/CSettings.cpp:920
@@ -1231,145 +1230,145 @@ msgstr "2048x2048"
 #. *
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:935
 msgid "Master volume:"
-msgstr "ШµШЇШ§ЫЊ Ш§ШµЩ„ЫЊ:"
+msgstr "صدای اصلی:"
 
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:957
 msgid "Radio volume:"
-msgstr "Щ…ЫЊШІШ§Щ† ШµШЇШ§ЫЊ Ш±Ш§ШЇЫЊЩ€:"
+msgstr "میزان صدای رادیو:"
 
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:979
 msgid "SFX volume:"
-msgstr "Щ…ЫЊШІШ§Щ† ШµШЇШ§ЫЊ Ш§ЩЃЪ©ШЄ Щ‡Ш§:"
+msgstr "میزان صدای افکت ها:"
 
 #: Client/core/CSettings.cpp:926 Client/core/CSettings.cpp:1001
 msgid "MTA volume:"
-msgstr "Щ…ЫЊШІШ§Щ† ШµШЇШ§ЫЊ MTA:"
+msgstr "میزان صدای MTA:"
 
 #: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1023
 msgid "Voice volume:"
-msgstr "ШµШЇШ§ЫЊ ШЁШ§ШІЫЊЪ©Щ†Ш§Щ†:"
+msgstr "صدای بازیکنان:"
 
 #: Client/core/CSettings.cpp:927 Client/core/CSettings.cpp:1067
 msgid "Play mode:"
-msgstr "Ш­Ш§Щ„ШЄ ЩѕШ®Шґ:"
+msgstr "حالت پخش:"
 
 #: Client/core/CSettings.cpp:929 Client/core/CSettings.cpp:1548
 #: Client/core/CSettings.cpp:2916
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:51
 msgid "General"
-msgstr "Ш№Щ…Щ€Щ…ЫЊ"
+msgstr "عمومی"
 
 #: Client/core/CSettings.cpp:1045
 msgid "Radio options"
-msgstr "ЪЇШІЫЊЩ†Щ‡ Щ‡Ш§ЫЊ Ш±Ш§ШЇЫЊЩ€"
+msgstr "گزینه های رادیو"
 
 #: Client/core/CSettings.cpp:1051
 msgid "Radio Equalizer"
-msgstr "Ш§Ъ©Щ€Щ„Ш§ЫЊШІШ± Ш±Ш§ШЇЫЊЩ€"
+msgstr "اکولایزر رادیو"
 
 #: Client/core/CSettings.cpp:1056
 msgid "Radio Auto-tune"
-msgstr "ШЄШёЫЊЩ… Ш®Щ€ШЇЪ©Ш§Ш± Ш±Ш§ШЇЫЊЩ€"
+msgstr "تظیم خودکار رادیو"
 
 #: Client/core/CSettings.cpp:1061
 msgid "Usertrack options"
-msgstr "ЪЇШІЫЊЩ†Щ‡ Щ‡Ш§ЫЊ ШўЩ‡Щ†ЪЇ Ъ©Ш§Ш±ШЁШ±"
+msgstr "گزینه های آهنگ کاربر"
 
 #: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:4001
 msgid "Radio"
-msgstr "Ш±Ш§ШЇЫЊЩ€"
+msgstr "رادیو"
 
 #: Client/core/CSettings.cpp:1076 Client/core/CSettings.cpp:4003
 msgid "Random"
-msgstr "ШЄШµШ§ШЇЩЃЫЊ"
+msgstr "تصادفی"
 
 #: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:4005
 msgid "Sequential"
-msgstr "ЩѕШґШЄ ШіШ± Щ‡Щ…"
+msgstr "پشت سر هم"
 
 #: Client/core/CSettings.cpp:1080
 msgid "Automatic Media Scan"
-msgstr "Ш§ШіЪ©Щ† Ш§ШЄЩ€Щ…Ш§ШЄЫЊЪ© Ш±ШіШ§Щ†Щ‡"
+msgstr "اسکن اتوماتیک رسانه"
 
 #: Client/core/CSettings.cpp:1087
 msgid "Mute options"
-msgstr "ЪЇШІЫЊЩ†Щ‡ Щ‡Ш§ЫЊ Щ…ЫЊЩ€ШЄ"
+msgstr "گزینه های میوت"
 
 #: Client/core/CSettings.cpp:1093
 msgid "Mute All sounds when minimized"
-msgstr "ШЁЫЊ ШµШЇШ§ ШЁЩ€ШЇЩ† ШЄЩ…Ш§Щ…ЫЊ ШµШЇШ§Щ‡Ш§ Щ‡Щ†ЪЇШ§Щ… Щ…ЫЊЩ†Щ…Ш§ЫЊШІ"
+msgstr "بی صدا بودن تمامی صداها هنگام مینمایز"
 
 #: Client/core/CSettings.cpp:1098
 msgid "Mute Radio sounds when minimized"
-msgstr "ШЁЫЊ ШµШЇШ§ ШЁЩ€ШЇЩ† Ш±Ш§ШЇЫЊЩ€ Щ‡Щ†ЪЇШ§Щ… Щ…ЫЊЩ†Щ…Ш§ЫЊШІ"
+msgstr "بی صدا بودن رادیو هنگام مینمایز"
 
 #: Client/core/CSettings.cpp:1103
 msgid "Mute SFX sounds when minimized"
-msgstr "ШЁЫЊ ШµШЇШ§ ШЁЩ€ШЇЩ† Ш§ЩЃЪ©ШЄ Щ‡Ш§ Щ‡Щ†ЪЇШ§Щ… Щ…ЫЊЩ†Щ…Ш§ЫЊШІ"
+msgstr "بی صدا بودن افکت ها هنگام مینمایز"
 
 #: Client/core/CSettings.cpp:1108
 msgid "Mute MTA sounds when minimized"
-msgstr "ШЁЫЊ ШµШЇШ§ Ъ©Ш±ШЇЩ† MTA Щ‡Щ†ЪЇШ§Щ… Щ…ЫЊЩ†ЫЊЩ…Ш§ЫЊШІ"
+msgstr "بی صدا کردن MTA هنگام مینیمایز"
 
 #: Client/core/CSettings.cpp:1113
 msgid "Mute Voice sounds when minimized"
-msgstr "ШЁЫЊ ШµШЇШ§ ШЁЩ€ШЇЩ† ШЄЩ…Ш§Щ…ЫЊ ШµШЇШ§Щ‡Ш§ Щ‡Щ†ЪЇШ§Щ… Щ…ЫЊЩ†Щ…Ш§ЫЊШІ ШЁЩ€ШЇЩ†"
+msgstr "بی صدا بودن تمامی صداها هنگام مینمایز بودن"
 
 #. *
 #. *  Video tab
 #. *
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1135
 msgid "Resolution:"
-msgstr "Щ€Ш¶Щ€Ш­ ШЄШµЩ€ЫЊШ±:"
+msgstr "وضوح تصویر:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1190
 msgid "FOV:"
-msgstr "Ш§ЩЃ Ш§Щ€ Щ€ЫЊ:"
+msgstr "اف او وی:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1209
 msgid "Draw Distance:"
-msgstr "Щ…Ш­ШЇЩ€ШЇЩ‡ ШЇЫЊШЇ:"
+msgstr "محدوده دید:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1230
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1461
 msgid "Brightness:"
-msgstr "Ш±Щ€ШґЩ†Ш§ЫЊЫЊ:"
+msgstr "روشنایی:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1251
 msgid "FX Quality:"
-msgstr "Ъ©ЫЊЩЃЫЊШЄ Ш§ЩЃ Ш§Ъ©Ші:"
+msgstr "کیفیت اف اکس:"
 
 #: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1265
 msgid "Anisotropic filtering:"
-msgstr "ЩЃЫЊЩ„ШЄШ± ШЁЫЊЩ†ШёЫЊШ± Ъ©Ш±ШЇЩ†:"
+msgstr "فیلتر بینظیر کردن:"
 
 #: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1302
 msgid "Anti-aliasing:"
-msgstr "ШґЩЃШ§ЩЃ ШіШ§ШІЫЊ:"
+msgstr "شفاف سازی:"
 
 #: Client/core/CSettings.cpp:1130 Client/core/CSettings.cpp:1316
 msgid "Aspect Ratio:"
-msgstr "Щ†ШіШЁШЄ Ш§ШЁШ№Ш§ШЇ:"
+msgstr "نسبت ابعاد:"
 
 #: Client/core/CSettings.cpp:1147
 msgid "Windowed"
-msgstr "ЩѕЩ†Ш¬Ш±Щ‡ Ш§ЫЊ"
+msgstr "پنجره ای"
 
 #: Client/core/CSettings.cpp:1153
 msgid "DPI aware"
-msgstr "ШўЪЇШ§Щ‡ DPI"
+msgstr "آگاه DPI"
 
 #: Client/core/CSettings.cpp:1170 Client/core/CSettings.cpp:2335
 msgid "Standard"
-msgstr "Ш§ШіШЄШ§Щ†ШЇШ§Ш±ШЇ"
+msgstr "استاندارد"
 
 #: Client/core/CSettings.cpp:1172 Client/core/CSettings.cpp:2339
 msgid "Borderless keep res"
-msgstr "ШЁЫЊ Ш­ШЇ Щ€ Щ…Ш±ШІ Щ€ Ш±ШІЩ€Щ„Щ€ШґЩ† Ш«Ш§ШЁШЄ"
+msgstr "بی حد و مرز و رزولوشن ثابت"
 
 #: Client/core/CSettings.cpp:1175
 msgid "Mip Mapping"
-msgstr "Щ†Щ‚ШґЩ‡ ШЁШ±ШЇШ§Ш±ЫЊ Mip"
+msgstr "نقشه برداری Mip"
 
 #: Client/core/CSettings.cpp:1182
 msgid "V-Sync"
@@ -1377,20 +1376,20 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2239
 msgid "Low"
-msgstr "Ъ©Щ…"
+msgstr "کم"
 
 #: Client/core/CSettings.cpp:1260 Client/core/CSettings.cpp:2241
 msgid "Medium"
-msgstr "Щ…ШЄЩ€ШіШ·"
+msgstr "متوسط"
 
 #: Client/core/CSettings.cpp:1261 Client/core/CSettings.cpp:1755
 #: Client/core/CSettings.cpp:2243 Client/core/CSettings.cpp:4059
 msgid "High"
-msgstr "ШІЫЊШ§ШЇ"
+msgstr "زیاد"
 
 #: Client/core/CSettings.cpp:1262 Client/core/CSettings.cpp:2245
 msgid "Very high"
-msgstr "Ш®ЫЊЩ„ЫЊ ШІЫЊШ§ШЇ"
+msgstr "خیلی زیاد"
 
 #: Client/core/CSettings.cpp:1279 Client/core/CSettings.cpp:1282
 #: Client/core/CSettings.cpp:1310 Client/core/CSettings.cpp:1686
@@ -1399,24 +1398,24 @@ msgstr "Ш®ЫЊЩ„ЫЊ ШІЫЊШ§ШЇ"
 #: Client/core/CSettings.cpp:4098 Client/core/CSettings.cpp:4144
 #: Client/core/CSettings.cpp:5375
 msgid "Off"
-msgstr "Ш®Ш§Щ…Щ€Шґ"
+msgstr "خاموش"
 
 #: Client/core/CSettings.cpp:1311 Client/core/CSettings.cpp:2251
 msgid "1x"
-msgstr "1 ШЁШ±Ш§ШЁШ±"
+msgstr "1 برابر"
 
 #: Client/core/CSettings.cpp:1312 Client/core/CSettings.cpp:2253
 msgid "2x"
-msgstr "ШЇЩ€ ШЁШ±Ш§ШЁШ±"
+msgstr "دو برابر"
 
 #: Client/core/CSettings.cpp:1313 Client/core/CSettings.cpp:2255
 msgid "3x"
-msgstr "3 ШЁШ±Ш§ШЁШ±"
+msgstr "3 برابر"
 
 #: Client/core/CSettings.cpp:1326 Client/core/CSettings.cpp:1688
 #: Client/core/CSettings.cpp:2261 Client/core/CSettings.cpp:4068
 msgid "Auto"
-msgstr "Ш®Щ€ШЇЪ©Ш§Ш±"
+msgstr "خودکار"
 
 #: Client/core/CSettings.cpp:1327 Client/core/CSettings.cpp:2263
 msgid "4:3"
@@ -1432,107 +1431,107 @@ msgstr "16:9"
 
 #: Client/core/CSettings.cpp:1332
 msgid "HUD Match Aspect Ratio"
-msgstr "Щ‡Щ…Ш®Щ€Ш§Щ†ЫЊ Щ†ШіШЁШЄ Ш§ШЁШ№Ш§ШЇ ШЁШ§ HUD"
+msgstr "همخوانی نسبت ابعاد با HUD"
 
 #: Client/core/CSettings.cpp:1338
 msgid "Volumetric Shadows"
-msgstr "ШіШ§ЫЊЩ‡ Щ‡Ш§ЫЊ Ш­Ш¬Щ…ЫЊ"
+msgstr "سایه های حجمی"
 
 #: Client/core/CSettings.cpp:1342
 msgid "Grass effect"
-msgstr "Ш§ЩЃЪ©ШЄ Ъ†Щ…Щ†"
+msgstr "افکت چمن"
 
 #: Client/core/CSettings.cpp:1346
 msgid "Heat haze"
-msgstr "ЪЇШ±Щ…Ш§ЫЊ Щ‡Щ€Ш§"
+msgstr "گرمای هوا"
 
 #: Client/core/CSettings.cpp:1350
 msgid "Tyre Smoke etc"
-msgstr "ШЇЩ€ШЇ ШЄШ§ЫЊШ± Щ€ ШєЫЊШ±Щ‡"
+msgstr "دود تایر و غیره"
 
 #: Client/core/CSettings.cpp:1354
 msgid "Dynamic ped shadows"
-msgstr "ШіШ§ЫЊЩ‡ Щ…ШЄШ­Ш±Ъ© Ъ©Ш§Ш±Ъ©ШЄШ±Щ‡Ш§"
+msgstr "سایه متحرک کارکترها"
 
 #: Client/core/CSettings.cpp:1358
 msgid "Motion blur"
-msgstr "Ъ©ШЇШ±ЫЊ Щ…ШЄШ­Ш±Ъ©"
+msgstr "کدری متحرک"
 
 #: Client/core/CSettings.cpp:1362
 msgid "Corona rain reflections"
-msgstr "ШЁШ§ШІШЄШ§ШЁ Щ„Ш§Щ…Щѕ Щ‡Ш§ЫЊ Ъ©Ш±Щ€Щ†Ш§ ШЄЩ€ШіШ· ШЁШ§Ш±Ш§Щ†"
+msgstr "بازتاب لامپ های کرونا توسط باران"
 
 #: Client/core/CSettings.cpp:1367
 msgid "Full Screen Minimize"
-msgstr "ШЄЩ…Ш§Щ… ШµЩЃШ­Щ‡ Щ…ЫЊЩ†ЫЊЩ…Ш§ЫЊШІ"
+msgstr "تمام صفحه مینیمایز"
 
 #: Client/core/CSettings.cpp:1379
 msgid "Enable Device Selection Dialog"
-msgstr "ЩЃШ№Ш§Щ„вЂЊШіШ§ШІЫЊ ШµЩЃШ­Щ‡Щ” Ш§Щ†ШЄШ®Ш§ШЁ ШЇШіШЄЪЇШ§Щ‡"
+msgstr "فعال‌سازی صفحهٔ انتخاب دستگاه"
 
 #: Client/core/CSettings.cpp:1391
 msgid "Show unsafe resolutions"
-msgstr "Щ†Щ…Ш§ЫЊШґ Щ€Ш¶Щ€Ш­ Щ‡Ш§ЫЊ ШєЫЊШ± Ш§Щ…Щ†"
+msgstr "نمایش وضوح های غیر امن"
 
 #: Client/core/CSettings.cpp:1403
 msgid "Render vehicles always in high detail"
-msgstr "Щ†Щ…Ш§ЫЊШґ Щ€ШіШ§ЫЊЩ„ Щ†Щ‚Щ„ЫЊЩ‡ ШЁШ§ Ш¬ШІШ¦ЫЊШ§ШЄ ШІЫЊШ§ШЇ"
+msgstr "نمایش وسایل نقلیه با جزئیات زیاد"
 
 #: Client/core/CSettings.cpp:1407
 msgid "Render peds always in high detail"
-msgstr "Щ†Щ…Ш§ЫЊШґ ЩѕШЇЩ‡Ш§ ШЁШ§ Ш¬ШІШ¦ЫЊШ§ШЄ ШІЫЊШ§ШЇ"
+msgstr "نمایش پدها با جزئیات زیاد"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1441
 msgid "Gamma:"
-msgstr "ЪЇШ§Щ…Ш§:"
+msgstr "گاما:"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1481
 msgid "Contrast:"
-msgstr "Ъ©Щ†ШЄШ±Ш§ШіШЄ:"
+msgstr "کنتراست:"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1501
 msgid "Saturation:"
-msgstr "ШєЩ„ШёШЄ Ш±Щ†ЪЇ:"
+msgstr "غلظت رنگ:"
 
 #: Client/core/CSettings.cpp:1517
 msgid "Apply adjustments in windowed mode"
-msgstr "Ш§Ш№Щ…Ш§Щ„ ШЄЩ†ШёЫЊЩ…Ш§ШЄ ШЇШ± Ш­Ш§Щ„ШЄ ЩѕЩ†Ш¬Ш±Щ‡вЂЊШ§ЫЊ"
+msgstr "اعمال تنظیمات در حالت پنجره‌ای"
 
 #: Client/core/CSettings.cpp:1523
 msgid "Apply adjustments in fullscreen mode"
-msgstr "Ш§Ш№Щ…Ш§Щ„ ШЄЩ†ШёЫЊЩ…Ш§ШЄ ШЇШ± Ш­Ш§Щ„ШЄ ШЄЩ…Ш§Щ…вЂЊШµЩЃШ­Щ‡"
+msgstr "اعمال تنظیمات در حالت تمام‌صفحه"
 
 #: Client/core/CSettings.cpp:1554
 msgid "Enable remote websites"
-msgstr "ЩЃШ№Ш§Щ„ Ъ©Ш±ШЇЩ† Щ€ШЁШіШ§ЫЊШЄ Щ‡Ш§ЫЊ Ш§ШІ Ш®Ш§Ш±Ш¬ЫЊ"
+msgstr "فعال کردن وبسایت های از خارجی"
 
 #: Client/core/CSettings.cpp:1559
 msgid "Enable Javascript on remote websites"
-msgstr "ЩЃШ№Ш§Щ„ ШіШ§ШІЫЊ Javascript ШЁШ± Ш±Щ€ЫЊ Щ€ШЁШіШ§ЫЊШЄ Щ‡Ш§ЫЊ Ш®Ш§Ш±Ш¬ЫЊ"
+msgstr "فعال سازی Javascript بر روی وبسایت های خارجی"
 
 #: Client/core/CSettings.cpp:1564
 msgid "Enable GPU rendering"
-msgstr "ЩЃШ№Ш§Щ„ Ъ©Ш±ШЇЩ† Ш±Щ†ШЇШ± GPU"
+msgstr "فعال کردن رندر GPU"
 
 #: Client/core/CSettings.cpp:1568
 msgid "Custom blacklist"
-msgstr "Щ„ЫЊШіШЄ ШіЫЊШ§Щ‡ ШіЩЃШ§Ш±ШґЫЊ"
+msgstr "لیست سیاه سفارشی"
 
 #: Client/core/CSettings.cpp:1579 Client/core/CSettings.cpp:1625
 msgid "Enter a domain e.g. google.com"
-msgstr "ЫЊЪ© ШЇШ§Щ…Щ†Щ‡ Ш±Ш§ Щ€Ш§Ш±ШЇ Ъ©Щ†ЫЊШЇ. Щ…Ш«Ш§Щ„: google.com"
+msgstr "یک دامنه را وارد کنید. مثال: google.com"
 
 #: Client/core/CSettings.cpp:1587
 msgid "Block"
-msgstr "Щ…ШіШЇЩ€ШЇ Ъ©Ш±ШЇЩ†"
+msgstr "مسدود کردن"
 
 #: Client/core/CSettings.cpp:1602 Client/core/CSettings.cpp:1646
 msgid "Domain"
-msgstr "ШЇШ§Щ…Щ†Щ‡"
+msgstr "دامنه"
 
 #: Client/core/CSettings.cpp:1604 Client/core/CSettings.cpp:1648
 msgid "Remove domain"
-msgstr "Ш­Ш°ЩЃ ШЇШ§Щ…Щ†Щ‡"
+msgstr "حذف دامنه"
 
 #: Client/core/CSettings.cpp:1608 Client/core/CSettings.cpp:1652
 msgid "Remove all"
@@ -1541,84 +1540,84 @@ msgstr ""
 #. Reset vecTemp
 #: Client/core/CSettings.cpp:1614
 msgid "Custom whitelist"
-msgstr "Щ„ЫЊШіШЄ ШіЩЃЫЊШЇ ШіЩЃШ§Ш±ШґЫЊ"
+msgstr "لیست سفید سفارشی"
 
 #: Client/core/CSettings.cpp:1633 Client/cefweb/CWebsiteRequests.cpp:51
 msgid "Allow"
-msgstr "Ш§Ш¬Ш§ШІЩ‡ ШЁШЇЩ‡"
+msgstr "اجازه بده"
 
 #. Misc section label
 #: Client/core/CSettings.cpp:1665
 msgid "Misc"
-msgstr "ШєЫЊШ±Щ‡"
+msgstr "غیره"
 
 #. Fast clothes loading
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1679
 #: Client/core/CSettings.cpp:6021
 msgid "Fast CJ clothes loading:"
-msgstr "ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ ШіШ±ЫЊШ№ Щ„ШЁШ§Ші Щ‡Ш§ЫЊ CJ:"
+msgstr "بارگذاری سریع لباس های CJ:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1693
 #: Client/core/CSettings.cpp:6023
 msgid "Browser speed:"
-msgstr "ШіШ±Ш№ШЄ Щ…Ш±Щ€Ш±ЪЇШ±:"
+msgstr "سرعت مرورگر:"
 
 #. Single download
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1707
 #: Client/core/CSettings.cpp:6025
 msgid "Single connection:"
-msgstr "Ш§ШЄШµШ§Щ„ ШЄЪ©ЫЊ:"
+msgstr "اتصال تکی:"
 
 #. Packet tag
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1720
 #: Client/core/CSettings.cpp:6027
 msgid "Packet tag:"
-msgstr "ШЁШ±Ъ†ШіШЁ ЩѕЪ©ШЄ:"
+msgstr "برچسب پکت:"
 
 #. Progress animation
 #: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1733
 #: Client/core/CSettings.cpp:6029
 msgid "Progress animation:"
-msgstr "Ш§Щ†ЫЊЩ…ЫЊШґЩ† ЩѕЫЊШґШ±Щ€ЫЊ:"
+msgstr "انیمیشن پیشروی:"
 
 #. Process priority
 #: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1746
 #: Client/core/CSettings.cpp:6019
 msgid "Process priority:"
-msgstr "Ш§Щ€Щ„Щ€ЫЊШЄ ЩѕШ±ШЇШ§ШІШґ:"
+msgstr "اولویت پردازش:"
 
 #. Debug setting
 #: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1760
 #: Client/core/CSettings.cpp:6031
 msgid "Debug setting:"
-msgstr "ШЄЩ†ШёЫЊЩ…Ш§ШЄ Ш§ШґЪ©Ш§Щ„ ШІШЇШ§ЫЊЫЊ:"
+msgstr "تنظیمات اشکال زدایی:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1783
 #: Client/core/CSettings.cpp:6033
 msgid "Streaming memory:"
-msgstr "Ш­Ш§ЩЃШёЩ‡ Ш§ШіШЄШ±ЫЊЩ…:"
+msgstr "حافظه استریم:"
 
 #. Update build type
 #: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1903
 msgid "Update build type:"
-msgstr "Щ†Щ€Ш№ ШіШ§Ш®ШЄШ§Ш± ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ:"
+msgstr "نوع ساختار بروزرسانی:"
 
 #. UpdateAutoInstall
 #: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1882
 msgid "Install important updates:"
-msgstr "Щ†ШµШЁ ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Щ‡Ш§ЫЊ Щ…Щ‡Щ…:"
+msgstr "نصب بروزرسانی های مهم:"
 
 #: Client/core/CSettings.cpp:1687 Client/core/CSettings.cpp:1715
 #: Client/core/CSettings.cpp:1728 Client/core/CSettings.cpp:4070
 #: Client/core/CSettings.cpp:4086 Client/core/CSettings.cpp:4093
 msgid "On"
-msgstr "Ш±Щ€ШґЩ†"
+msgstr "روشن"
 
 #: Client/core/CSettings.cpp:1700 Client/core/CSettings.cpp:4075
 msgid "Very slow"
-msgstr "Ш®ЫЊЩ„ЫЊ Ъ©Щ†ШЇ"
+msgstr "خیلی کند"
 
 #: Client/core/CSettings.cpp:1701 Client/core/CSettings.cpp:1714
 #: Client/core/CSettings.cpp:1727 Client/core/CSettings.cpp:1741
@@ -1628,259 +1627,259 @@ msgstr "Ш®ЫЊЩ„ЫЊ Ъ©Щ†ШЇ"
 #: Client/core/CSettings.cpp:4091 Client/core/CSettings.cpp:4100
 #: Client/core/CSettings.cpp:4137
 msgid "Default"
-msgstr "ЩѕЫЊШґЩЃШ±Ш¶"
+msgstr "پیشفرض"
 
 #: Client/core/CSettings.cpp:1702 Client/core/CSettings.cpp:4079
 msgid "Fast"
-msgstr "ШіШ±ЫЊШ№"
+msgstr "سریع"
 
 #: Client/core/CSettings.cpp:1753 Client/core/CSettings.cpp:4055
 msgid "Normal"
-msgstr "Ш№Ш§ШЇЫЊ"
+msgstr "عادی"
 
 #: Client/core/CSettings.cpp:1754 Client/core/CSettings.cpp:4057
 msgid "Above normal"
-msgstr "ШЁШ§Щ„Ш§ШЄШ± Ш§ШІ Щ…Ш№Щ…Щ€Щ„"
+msgstr "بالاتر از معمول"
 
 #: Client/core/CSettings.cpp:1790
 msgid "Min"
-msgstr "Ш­ШЇШ§Щ‚Щ„"
+msgstr "حداقل"
 
 #: Client/core/CSettings.cpp:1815
 msgid "Max"
-msgstr "Ш­ШЇШ§Ъ©Ш«Ш±"
+msgstr "حداکثر"
 
 #. Windows 8 compatibility
 #: Client/core/CSettings.cpp:1823
 msgid "Windows 8 compatibility:"
-msgstr "ШіШ§ШІЪЇШ§Ш±ЫЊ ШЁШ§ Windows 8:"
+msgstr "سازگاری با Windows 8:"
 
 #: Client/core/CSettings.cpp:1827
 msgid "16-bit color"
-msgstr "Ш±Щ†ЪЇ 16 ШЁЫЊШЄ"
+msgstr "رنگ 16 بیت"
 
 #: Client/core/CSettings.cpp:1832
 msgid "Mouse fix"
-msgstr "Ш±ЩЃШ№ Щ…ШґЪ©Щ„ Щ…Щ€Ші"
+msgstr "رفع مشکل موس"
 
 #. Cache path info
 #: Client/core/CSettings.cpp:1850
 msgid "Client resource files:"
-msgstr "ЩЃШ§ЫЊЩ„вЂЊЩ‡Ш§ЫЊ Щ…Щ†ШЁШ№ Ъ©Щ„Ш§ЫЊЩ†ШЄ:"
+msgstr "فایل‌های منبع کلاینت:"
 
 #: Client/core/CSettings.cpp:1854
 msgid "Show in Explorer"
-msgstr "Щ†Щ…Ш§ЫЊШґ ШЇШ± Ш§Ъ©ШіЩѕЩ„Щ€Ш±Ш±"
+msgstr "نمایش در اکسپلورر"
 
 #. Process affinity
 #: Client/core/CSettings.cpp:1869
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr "ШЁШ±Ш§ЫЊ ШЁЩ‡ШЁЩ€ШЇ Ш№Щ…Щ„Ъ©Ш±ШЇ ШЁШ§ШІЫЊШЊ Щ€Ш§ШЁШіШЄЪЇЫЊ ЩѕШ±ШЇШ§ШІЩ†ШЇЩ‡ Ш±Ш§ Ш±Щ€ЫЊ 0 ШЄЩ†ШёЫЊЩ… Ъ©Щ†ЫЊШЇ"
+msgstr "برای بهبود عملکرد بازی، وابستگی پردازنده را روی 0 تنظیم کنید"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1875 Client/core/CSettings.cpp:1878
 msgid "Auto updater"
-msgstr "ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Ъ©Щ†Щ†ШЇЩ‡ Ш®Щ€ШЇЪ©Ш§Ш±"
+msgstr "بروزرسانی کننده خودکار"
 
 #. Check for updates
 #: Client/core/CSettings.cpp:1916
 msgid "Check for update now"
-msgstr "Щ‡Щ…вЂЊШ§Ъ©Щ†Щ€Щ† ШЁШ±Ш±ШіЫЊ ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Ш±Ш§ Ш§Щ†Ш¬Ш§Щ… ШЇЩ‡ЫЊШЇ"
+msgstr "هم‌اکنون بررسی بروزرسانی را انجام دهید"
 
 #: Client/core/CSettings.cpp:2102
 msgid "Some settings will be changed when you next start MTA"
-msgstr "ШЁШ№Ш¶ЫЊ ШЄЩ†ШёЫЊЩ…Ш§ШЄ Щ‡Щ†ЪЇШ§Щ… Ш§Ш¬Ш±Ш§ЫЊ ШЁШ№ШЇЫЊ MTA ШЄШєЫЊЫЊШ± Ш®Щ€Ш§Щ‡Щ†ШЇ ЫЊШ§ЩЃШЄ"
+msgstr "بعضی تنظیمات هنگام اجرای بعدی MTA تغییر خواهند یافت"
 
 #: Client/core/CSettings.cpp:2103
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
-"ШўЫЊШ§ Щ…ЫЊ Ш®Щ€Ш§Щ‡ЫЊШЇ Щ‡Щ…ЫЊЩ† Ш§Щ„Ш§Щ† Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Щ…Ш¬ШЇШЇ Ъ©Щ†ЫЊШЇШџ"
+"آیا می خواهید همین الان راه‌اندازی مجدد کنید؟"
 
 #: Client/core/CSettings.cpp:2106
 msgid "RESTART REQUIRED"
-msgstr "Щ†ЫЊШ§ШІЩ…Щ†ШЇ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Щ…Ш¬ШЇШЇ"
+msgstr "نیازمند راه‌اندازی مجدد"
 
 #: Client/core/CSettings.cpp:2126
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr "ШЁШ§ Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„ ШіШ±Щ€Ш± ЩЃШ№Щ„ЫЊШЊ ШЁШ±Ш®ЫЊ Ш§ШІ ШЄЩ†ШёЫЊЩ…Ш§ШЄ ШЄШєЫЊЫЊШ± Ш®Щ€Ш§Щ‡Щ†ШЇ Ъ©Ш±ШЇ"
+msgstr "با قطع اتصال سرور فعلی، برخی از تنظیمات تغییر خواهند کرد"
 
 #: Client/core/CSettings.cpp:2127
 msgid "\n\n"
 "Do you want to disconnect now?"
 msgstr "\n\n"
-"ШўЫЊШ§ Щ…ЫЊ Ш®Щ€Ш§Щ‡ЫЊШЇ Щ‡Щ…ЫЊЩ† Ш§Щ„Ш§Щ† Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„ Ъ©Щ†ЫЊШЇШџ"
+"آیا می خواهید همین الان قطع اتصال کنید؟"
 
 #: Client/core/CSettings.cpp:2130
 msgid "DISCONNECT REQUIRED"
-msgstr "Щ†ЫЊШ§ШІ ШЁЩ‡ Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„"
+msgstr "نیاز به قطع اتصال"
 
 #. Update the joystick name
 #: Client/core/CSettings.cpp:2572
 msgid "Joypad not detected  -  Check connections and restart game"
-msgstr "Joypad ЫЊШ§ЩЃШЄ Щ†ШґШЇ - Ш§ШЄШµШ§Щ„Ш§ШЄ Ш±Ш§ ШЁШ±Ш±ШіЫЊ Щ†Щ…Щ€ШЇЩ‡ Щ€ ШЁШ§ШІЫЊ Ш±Ш§ Щ…Ш¬ШЇШЇШ§ Ш§Ш¬Ш±Ш§ ЩЃШ±Щ…Ш§ЫЊЫЊШЇ"
+msgstr "Joypad یافت نشد - اتصالات را بررسی نموده و بازی را مجددا اجرا فرمایید"
 
 #: Client/core/CSettings.cpp:2828
 msgid "Binding axis"
-msgstr "Щ…Ш­Щ€Ш± ШЁШ§ЫЊЩ†ШЇ"
+msgstr "محور بایند"
 
 #: Client/core/CSettings.cpp:2828
 msgid "Move an axis to bind, or escape to clear"
-msgstr "ШЁШ±Ш§ЫЊ ШЁШ§ЫЊЩ†ШЇШЊ ЫЊЪ© Щ…Ш­Щ€Ш± Ш±Ш§ ШЄЪ©Ш§Щ† ШЇЩ‡ЫЊШЇ ЫЊШ§ Esc Ш±Ш§ ШЁШ±Ш§ЫЊ ЩѕШ§Ъ© Ъ©Ш±ШЇЩ† ЩЃШґШ§Ш± ШЇЩ‡ЫЊШЇ"
+msgstr "برای بایند، یک محور را تکان دهید یا Esc را برای پاک کردن فشار دهید"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Language:"
-msgstr "ШІШЁШ§Щ†:"
+msgstr "زبان:"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Skin:"
-msgstr "Ш§ШіЪ©ЫЊЩ†:"
+msgstr "اسکین:"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Presets:"
-msgstr "Щ†Щ…Щ€Щ†Щ‡ Щ‡Ш§:"
+msgstr "نمونه ها:"
 
 #: Client/core/CSettings.cpp:2956
 msgid "Chat"
-msgstr "ЪЇЩЃШЄвЂЊЩ€ЪЇЩ€"
+msgstr "گفت‌وگو"
 
 #: Client/core/CSettings.cpp:2973
 msgid "Load"
-msgstr "ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ"
+msgstr "بارگذاری"
 
 #: Client/core/CSettings.cpp:2985
 msgid "Colors"
-msgstr "Ш±Щ†ЪЇ Щ‡Ш§"
+msgstr "رنگ ها"
 
 #: Client/core/CSettings.cpp:2986
 msgid "Layout"
-msgstr "Ш·Ш±Ш­"
+msgstr "طرح"
 
 #: Client/core/CSettings.cpp:2987 Client/core/CSettings.cpp:3233
 msgid "Options"
-msgstr "ЪЇШІЫЊЩ†Щ‡ Щ‡Ш§"
+msgstr "گزینه ها"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Chat Background"
-msgstr "ЩѕШі ШІЩ…ЫЊЩ†Щ‡ ЪЇЩЃШЄ Щ€ ЪЇЩ€"
+msgstr "پس زمینه گفت و گو"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Chat Text"
-msgstr "Щ…ШЄЩ† ЪЇЩЃШЄ Щ€ ЪЇЩ€"
+msgstr "متن گفت و گو"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Input Background"
-msgstr "ЩѕШі ШІЩ…ЫЊЩ†Щ‡ Щ€Ш±Щ€ШЇЫЊ"
+msgstr "پس زمینه ورودی"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Input Text"
-msgstr "Щ€Ш±Щ€ШЇЫЊ Щ…ШЄЩ†"
+msgstr "ورودی متن"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Lines:"
-msgstr "Ш®Ш· Щ‡Ш§:"
+msgstr "خط ها:"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Scale:"
-msgstr "Щ…Щ‚ЫЊШ§Ші:"
+msgstr "مقیاس:"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Width:"
-msgstr "Ш№Ш±Ш¶:"
+msgstr "عرض:"
 
 #: Client/core/CSettings.cpp:3019
 msgid "Size"
-msgstr "Ш§Щ†ШЇШ§ШІЩ‡"
+msgstr "اندازه"
 
 #: Client/core/CSettings.cpp:3068
 msgid "after"
-msgstr "ЩѕШі Ш§ШІ"
+msgstr "پس از"
 
 #: Client/core/CSettings.cpp:3068
 msgid "for"
-msgstr "ШЁШ±Ш§ЫЊ"
+msgstr "برای"
 
 #: Client/core/CSettings.cpp:3068
 msgid "sec"
-msgstr "Ш«Ш§Щ†ЫЊЩ‡"
+msgstr "ثانیه"
 
 #: Client/core/CSettings.cpp:3071
 msgid "Fading"
-msgstr "Щ…Ш­Щ€ ШіШ§ШІЫЊ"
+msgstr "محو سازی"
 
 #: Client/core/CSettings.cpp:3077
 msgid "Fade out old lines"
-msgstr "Щ…Ш­Щ€ ШіШ§ШІЫЊ Ш®Ш· Щ‡Ш§ЫЊ Щ‚ШЇЫЊЩ…ЫЊ"
+msgstr "محو سازی خط های قدیمی"
 
 #: Client/core/CSettings.cpp:3117
 msgid "Horizontal:"
-msgstr "Ш§ЩЃЩ‚ЫЊ:"
+msgstr "افقی:"
 
 #: Client/core/CSettings.cpp:3117
 msgid "Vertical:"
-msgstr "Ш№Щ…Щ€ШЇЫЊ:"
+msgstr "عمودی:"
 
 #: Client/core/CSettings.cpp:3117
 msgid "Text-Align:"
-msgstr "ШЄШ±Ш§ШІ-Щ…ШЄЩ†:"
+msgstr "تراز-متن:"
 
 #: Client/core/CSettings.cpp:3117
 msgid "X-Offset:"
-msgstr "X-ШўЩЃШіШЄ:"
+msgstr "X-آفست:"
 
 #: Client/core/CSettings.cpp:3118
 msgid "Y-Offset:"
-msgstr "Y-ШўЩЃШіШЄ:"
+msgstr "Y-آفست:"
 
 #: Client/core/CSettings.cpp:3124
 msgid "Position"
-msgstr "Щ…Щ€Щ‚Ш№ЫЊШЄ"
+msgstr "موقعیت"
 
 #: Client/core/CSettings.cpp:3138 Client/core/CSettings.cpp:3166
 #: Client/core/CKeyBinds.cpp:191
 msgid "Left"
-msgstr "Ъ†Щѕ"
+msgstr "چپ"
 
 #: Client/core/CSettings.cpp:3139 Client/core/CSettings.cpp:3153
 msgid "Center"
-msgstr "Щ€ШіШ·"
+msgstr "وسط"
 
 #: Client/core/CSettings.cpp:3140 Client/core/CSettings.cpp:3167
 #: Client/core/CKeyBinds.cpp:192
 msgid "Right"
-msgstr "Ш±Ш§ШіШЄ"
+msgstr "راست"
 
 #: Client/core/CSettings.cpp:3152
 msgid "Top"
-msgstr "ШЁШ§Щ„Ш§"
+msgstr "بالا"
 
 #: Client/core/CSettings.cpp:3154
 msgid "Bottom"
-msgstr "ЩѕШ§ЫЊЫЊЩ†"
+msgstr "پایین"
 
 #: Client/core/CSettings.cpp:3202
 msgid "Font"
-msgstr "ЩЃЩ€Щ†ШЄ"
+msgstr "فونت"
 
 #: Client/core/CSettings.cpp:3239
 msgid "Hide background when not typing"
-msgstr "Щ…Ш®ЩЃЫЊ Ъ©Ш±ШЇЩ† ЩѕШі ШІЩ…ЫЊЩ†Щ‡ Щ‡Щ†ЪЇШ§Щ… Щ†Щ†Щ€ШґШЄЩ† Щ†Ъ©Ш±ШЇЩ†"
+msgstr "مخفی کردن پس زمینه هنگام ننوشتن نکردن"
 
 #: Client/core/CSettings.cpp:3244
 msgid "Nickname completion using the \"Tab\" key"
-msgstr "ШЄЪ©Щ…ЫЊЩ„ Ъ©Ш±ШЇЩ† Щ†Ш§Щ… Щ…ШіШЄШ№Ш§Ш± Щ‡Щ†ЪЇШ§Щ… Ш§ШіШЄЩЃШ§ШЇЩ‡ Ш§ШІ Ъ©Щ„ЫЊШЇ \"TAB\""
+msgstr "تکمیل کردن نام مستعار هنگام استفاده از کلید \"TAB\""
 
 #: Client/core/CSettings.cpp:3249
 msgid "Allow server to flash the window"
-msgstr "Ш§Ш¬Ш§ШІЩ‡ ШЁЩ‡ ШіШ±Щ€Ш± ШЁШ±Ш§ЫЊ Ъ†ШґЩ…Ъ© ШІШЇЩ† ЩѕЩ†Ш¬Ш±Щ‡"
+msgstr "اجازه به سرور برای چشمک زدن پنجره"
 
 #: Client/core/CSettings.cpp:3254
 msgid "Allow tray balloon notifications"
-msgstr "Ш§Ш¬Ш§ШІЩ‡Щ” Щ†Щ…Ш§ЫЊШґ Щ†Щ€Ш§Ш± Ш§Ш№Щ„Ш§Щ†вЂЊЩ‡Ш§"
+msgstr "اجازهٔ نمایش نوار اعلان‌ها"
 
 #: Client/core/CSettings.cpp:3259
 msgid "Chat text black/white outline"
-msgstr "Щ‡Ш§ЫЊЩ„Ш§ЫЊШЄ ШіЫЊШ§Щ‡ Щ€ ШіЩЃЫЊШЇ Щ…ШЄЩ† ЪЇЩЃШЄ Щ€ ЪЇЩ€"
+msgstr "هایلایت سیاه و سفید متن گفت و گو"
 
 #. Create a messagebox to notify the user
 #. SString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
@@ -1888,102 +1887,102 @@ msgstr "Щ‡Ш§ЫЊЩ„Ш§ЫЊШЄ ШіЫЊШ§Щ‡ Щ€ ШіЩЃЫЊШЇ 
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #: Client/core/CSettings.cpp:3508 Client/core/CSettings.cpp:3515
 msgid "Press a key to bind, or escape to clear"
-msgstr "ШЁШ±Ш§ЫЊ ШЁШ§ЫЊЩ†ШЇ Ъ©Ш±ШЇЩ† Ъ©Щ„ЫЊШЇ Щ…Щ€Ш±ШЇ Щ†ШёШ± ЩЃШґШ§Ш± ШЇЩ‡ЫЊШЇ ЫЊШ§ ШЁШ±Ш§ЫЊ ЩѕШ§Ъ© Ъ©Ш±ШЇЩ† Escape Ш±Ш§ ЩЃШґШ§Ш± ШЇЩ‡ЫЊШЇ"
+msgstr "برای بایند کردن کلید مورد نظر فشار دهید یا برای پاک کردن Escape را فشار دهید"
 
 #: Client/core/CSettings.cpp:3509
 msgid "Binding a primary key"
-msgstr "ШЁШ§ЫЊЩ†ШЇ Ъ©Ш±ШЇЩ† ЫЊЪ© Ъ©Щ„ЫЊШЇ Ш§ШµЩ„ЫЊ"
+msgstr "بایند کردن یک کلید اصلی"
 
 #: Client/core/CSettings.cpp:3516
 msgid "Binding a secondary key"
-msgstr "ШЁШ§ЫЊЩ†ШЇ Ъ©Ш±ШЇЩ† ЫЊЪ© Ъ©Щ„ЫЊШЇ ЩЃШ±Ш№ЫЊ"
+msgstr "بایند کردن یک کلید فرعی"
 
 #: Client/core/CSettings.cpp:3592
 msgid "GTA GAME CONTROLS"
-msgstr "Ъ©Щ†ШЄШ±Щ„ Щ‡Ш§ЫЊ ШЁШ§ШІЫЊ GTA"
+msgstr "کنترل های بازی GTA"
 
 #: Client/core/CSettings.cpp:3594
 msgid "MULTIPLAYER CONTROLS"
-msgstr "Ъ©Щ†ШЄШ±Щ„ Щ‡Ш§ЫЊ ШўЩ†Щ„Ш§ЫЊЩ†"
+msgstr "کنترل های آنلاین"
 
 #: Client/core/CSettings.cpp:3839 Client/core/CSettings.cpp:5982
 msgid "Your nickname contains invalid characters!"
-msgstr "Щ†Ш§Щ… Щ…ШіШЄШ№Ш§Ш± Щ€Ш§Ш±ШЇ ШґШЇЩ‡ Ш­Ш§Щ€ЫЊ Ъ©Ш§Ш±Ш§Ъ©ШЄШ± Щ‡Ш§ЫЊ ШєЫЊШ±Щ…Ш¬Ш§ШІ Ш§ШіШЄ!"
+msgstr "نام مستعار وارد شده حاوی کاراکتر های غیرمجاز است!"
 
 #: Client/core/CSettings.cpp:4441 Client/core/CCore.cpp:709
 #: Client/core/CMainMenu.cpp:303
 #: Client/mods/deathmatch/logic/CClientGame.cpp:552
 msgid "Main menu"
-msgstr "ЩЃЩ‡Ш±ШіШЄ Ш§ШµЩ„ЫЊ"
+msgstr "فهرست اصلی"
 
 #: Client/core/CSettings.cpp:4445 Client/core/CCore.cpp:709
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1115
 #: Client/mods/deathmatch/logic/CResource.cpp:384
 msgid "In-game"
-msgstr "ШЇШ± ШЁШ§ШІЫЊ"
+msgstr "در بازی"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Red:"
-msgstr "Щ‚Ш±Щ…ШІ:"
+msgstr "قرمز:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Green:"
-msgstr "ШіШЁШІ:"
+msgstr "سبز:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Blue:"
-msgstr "ШўШЁЫЊ:"
+msgstr "آبی:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Transparency:"
-msgstr "ШґЩЃШ§ЩЃЫЊШЄ:"
+msgstr "شفافیت:"
 
 #: Client/core/CSettings.cpp:4801
 msgid "Color"
-msgstr "Ш±Щ†ЪЇ"
+msgstr "رنگ"
 
 #: Client/core/CSettings.cpp:4907
 msgid "Preview"
-msgstr "ЩѕЫЊШґ Щ†Щ…Ш§ЫЊШґ"
+msgstr "پیش نمایش"
 
 #: Client/core/CSettings.cpp:5215
 msgid "Please disconnect before changing language"
-msgstr "Щ„Ш·ЩЃШ§ Щ‚ШЁЩ„ Ш§ШІ ШЄШєЫЊЫЊШ± ШІШЁШ§Щ† Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„ Ъ©Щ†ЫЊШЇ"
+msgstr "لطفا قبل از تغییر زبان قطع اتصال کنید"
 
 #: Client/core/CSettings.cpp:5243
 msgid "Please disconnect before changing skin"
-msgstr "Щ„Ш·ЩЃШ§ Щ‚ШЁЩ„ Ш§ШІ ШЄШєЫЊЫЊШ± Ш§ШіЪ©ЫЊЩ† Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„ Ъ©Щ†ЫЊШЇ"
+msgstr "لطفا قبل از تغییر اسکین قطع اتصال کنید"
 
 #: Client/core/CSettings.cpp:5623
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
-msgstr "ШіШ§ЫЊЩ‡ Щ‡Ш§ЫЊ Ш­Ш¬Щ…ЫЊ Щ…ЫЊ ШЄЩ€Ш§Щ†ШЇ ШЁШ§Ш№Ш« Ъ©Щ†ШЇ ШЇШ± ШЁШ№Ш¶ЫЊ ШіЫЊШіШЄЩ… Щ‡Ш§ЫЊ ШґЩ€ШЇ. \n\n"
-"ШўЫЊШ§ ШЁШ±Ш§ЫЊ ЩЃШ№Ш§Щ„ ШіШ§ШІЫЊ Ш§Ш·Щ…ЫЊЩ†Ш§Щ† ШЇШ§Ш±ЫЊШЇШџ"
+msgstr "سایه های حجمی می تواند باعث کند در بعضی سیستم های شود. \n\n"
+"آیا برای فعال سازی اطمینان دارید؟"
 
 #: Client/core/CSettings.cpp:5627
 msgid "PERFORMANCE WARNING"
-msgstr "Щ‡ШґШЇШ§Ш± Ш№Щ…Щ„Ъ©Ш±ШЇ"
+msgstr "هشدار عملکرد"
 
 #: Client/core/CSettings.cpp:5647
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
-msgstr "ШўЩѕЩ„Щ€ШЇ ШµЩЃШ­Щ‡ ШЁШ±Ш§ЫЊ ШЁШ±Ш®ЫЊ Ш§ШІ ШіШ±Щ€Ш± Щ‡Ш§ ШЁЩ‡ Щ…Щ†ШёЩ€Ш± ШўЩ†ШЄЫЊ-Ъ†ЫЊШЄ Щ†ЫЊШ§ШІ Ш§ШіШЄ.\n\n"
-"(Щ…Ш­ШЇЩ€ШЇЩ‡ ЪЇЩЃШЄ Щ€ ЪЇЩ€ Щ€ Ш±Ш§ШЁШ· Ъ©Ш§Ш±ШЁШ±ЫЊ ШўЩѕЩ„Щ€ШЇ Щ†Ш®Щ€Ш§Щ‡Щ†ШЇ ШґШЇ)\n"
+msgstr "آپلود صفحه برای برخی از سرور ها به منظور آنتی-چیت نیاز است.\n\n"
+"(محدوده گفت و گو و رابط کاربری آپلود نخواهند شد)\n"
 
 #: Client/core/CSettings.cpp:5649
 msgid "SCREEN UPLOAD INFORMATION"
-msgstr "Щ…ШґШ®ШµШ§ШЄ ШўЩѕЩ„Щ€ШЇ ШµЩЃШ­Щ‡"
+msgstr "مشخصات آپلود صفحه"
 
 #: Client/core/CSettings.cpp:5664
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
-msgstr "ШЁШ№Ш¶ЫЊ Ш§ШІ Ш§ШіЪ©Ш±ЫЊЩѕШЄ Щ‡Ш§ Щ…Щ…Ъ©Щ† Ш§ШіШЄ ШµШЇШ§Щ‡Ш§ЫЊЫЊ Ш±Ш§ Ш§ШІ Ш§ЫЊЩ†ШЄШ±Щ†ШЄ ЩѕШ®Шґ Ъ©Щ†Щ†ШЇ. Щ…Ш§Щ†Щ†ШЇ Ш±Ш§ШЇЫЊЩ€ Щ€ ШєЫЊШ±Щ‡.\n\n"
-"ШєЫЊШ±ЩЃШ№Ш§Щ„ Ъ©Ш±ШЇЩ† Ш§ЫЊЩ† ШЄЩ†ШёЫЊЩ…Ш§ШЄ Щ…Щ…Ъ©Щ† Ш§ШіШЄ ШЁШ§Ш№Ш« Ъ©Ш§Щ‡Шґ Щ…ШµШ±ЩЃ ЩѕЩ‡Щ†Ш§ЫЊ ШЁШ§Щ†ШЇ ШґШЁЪ©Щ‡ Ш§Ш±ШЄШЁШ§Ш·ЫЊ ШґЩ€ШЇ."
+msgstr "بعضی از اسکریپت ها ممکن است صداهایی را از اینترنت پخش کنند. مانند رادیو و غیره.\n\n"
+"غیرفعال کردن این تنظیمات ممکن است باعث کاهش مصرف پهنای باند شبکه ارتباطی شود."
 
 #: Client/core/CSettings.cpp:5667
 msgid "EXTERNAL SOUNDS"
-msgstr "ШµШЇШ§Щ‡Ш§ЫЊ Ш®Ш§Ш±Ш¬ЫЊ"
+msgstr "صداهای خارجی"
 
 #: Client/core/CSettings.cpp:5696
 msgid "Rich Presence is currently enabled.\n"
@@ -1993,545 +1992,545 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:5701
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr "Ш±Ш¶Ш§ЫЊШЄ ШЁШ±Ш§ЫЊ Ш§Ш¬Ш§ШІЩ‡ ШЁЩ‡ Ш§ШґШЄШ±Ш§Ъ© ЪЇШ°Ш§Ш±ЫЊ ШЇШ§ШЇЩ‡вЂЊЩ‡Ш§"
+msgstr "رضایت برای اجازه به اشتراک گذاری داده‌ها"
 
 #: Client/core/CSettings.cpp:5725
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
 "Are you sure you want to use them?"
-msgstr "ШЁШ№Ш¶ЫЊ Ш§ШІ ЩЃШ§ЫЊЩ„ Щ‡Ш§ GTA:SA ШґЩ…Ш§ ШЇШіШЄЪ©Ш§Ш±ЫЊ ШґШЇЩ‡ Ш§Щ†ШЇ.\n"
-"MTA ШЄЩ†Щ‡Ш§ ШЇШ± ШµЩ€Ш±ШЄ ШЄЫЊЪ© Ш®Щ€Ш±ШЇЩ† Ш§ЫЊЩ† Ъ†Ъ© ШЁШ§Ъ©Ші Ш§ШІ Ш§ЫЊЩ† ЩЃШ§ЫЊЩ„ Щ‡Ш§ Ш§ШіШЄЩЃШ§ШЇЩ‡ Щ…ЫЊ Ъ©Щ†ШЇ.\n\n"
-"ШЁШ§ Ш§ЫЊЩ† Ш­Ш§Щ„ШЊ Ш®ЫЊЩ„ЫЊ Ш§ШІ ШіШ±Щ€Ш± Щ‡Ш§ ШЇШіШЄЪ©Ш§Ш±ЫЊ ЩЃШ§ЫЊЩ„ Щ‡Ш§ЫЊ GTA:SA Ш±Ш§ ШЁЩ„Ш§Ъ© Ъ©Ш±ШЇЩ‡ Ш§Щ†ШЇ.\n\n"
-"ШўЫЊШ§ ШЁШ±Ш§ЫЊ Ш§ШіШЄЩЃШ§ШЇЩ‡ Ш§ШІ Ш§ЫЊЩ† ЩЃШ§ЫЊЩ„ Щ‡Ш§ Ш§Ш·Щ…ЫЊЩ†Ш§Щ† ШЇШ§Ш±ЫЊШЇШџ"
+msgstr "بعضی از فایل ها GTA:SA شما دستکاری شده اند.\n"
+"MTA تنها در صورت تیک خوردن این چک باکس از این فایل ها استفاده می کند.\n\n"
+"با این حال، خیلی از سرور ها دستکاری فایل های GTA:SA را بلاک کرده اند.\n\n"
+"آیا برای استفاده از این فایل ها اطمینان دارید؟"
 
 #: Client/core/CSettings.cpp:5774
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
 "Are you sure you want to enable this option?"
-msgstr "ЩЃШ№Ш§Щ„ Ъ©Ш±ШЇЩ† DPI Awareness Ш§ЫЊЩ† Щ‚Ш§ШЁЩ„ЫЊШЄ ШЄШіШЄЫЊ Ш§ШіШЄ Щ€ Ш§ШіШЄЩЃШ§ШЇЩ‡ ШўЩ† Ш±Ш§ ШЇШ± Щ…Ш§Щ†ЫЊШЄЩ€Ш± Щ…Щ‚ЫЊШ§Ші ШґШЇЩ‡ ЩѕЫЊШґЩ†Щ‡Ш§ШЇ Щ…ЫЊЪ©Щ†ЫЊЩ…. Ш§Ш­ШЄЩ…Ш§Щ„ ШЁШ±Щ€ШІ Щ…ШґЪ©Щ„Ш§ШЄ ЪЇШ±Ш§ЩЃЫЊЪ©ЫЊ ЩѕШі Ш§ШІ ЩЃШ№Ш§Щ„ ШіШ§ШІЫЊ Ш§Щ…Ъ©Ш§Щ† ЩѕШ°ШЁШ± Ш§ШіШЄ.\n\n"
-"ШўЫЊШ§ Ш§ШІ ЩЃШ№Ш§Щ„ ШіШ§ШІЫЊ Ш§Ш·Щ…ЫЊЩ†Ш§Щ† ШЇШ§Ш±ЫЊШЇШџ"
+msgstr "فعال کردن DPI Awareness این قابلیت تستی است و استفاده آن را در مانیتور مقیاس شده پیشنهاد میکنیم. احتمال بروز مشکلات گرافیکی پس از فعال سازی امکان پذبر است.\n\n"
+"آیا از فعال سازی اطمینان دارید؟"
 
 #: Client/core/CSettings.cpp:5780 Client/core/CSettings.cpp:5835
 msgid "EXPERIMENTAL FEATURE"
-msgstr "Щ‚Ш§ШЁЩ„ЫЊШЄ ШўШІЩ…Ш§ЫЊШґЫЊ"
+msgstr "قابلیت آزمایشی"
 
 #: Client/core/CSettings.cpp:5837
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
-msgstr "ШєЫЊШ±ЩЃШ№Ш§Щ„ Ъ©Ш±ШЇЩ† Ш§ЫЊЩ† ЪЇШІЫЊЩ†Щ‡ ШЄЩ€ШµЫЊЩ‡ Щ†Щ…ЫЊШґЩ€ШЇ Ш¬ШІ ШЇШ± Щ…Щ€Ш§Ш±ШЇЫЊ Ъ©Щ‡ ШЇЪ†Ш§Ш± Щ…ШґЪ©Щ„Ш§ШЄЫЊ ШЇШ± Ш№Щ…Щ„Ъ©Ш±ШЇ ШЁШ§ШІЫЊ Щ‡ШіШЄЫЊШЇ.\n\n"
-"Ш§ШІ ШєЫЊШ±ЩЃШ№Ш§Щ„ Ъ©Ш±ШЇЩ† ШўЩ† Щ…Ш·Щ…Ш¦Щ†ЫЊШЇШџ"
+msgstr "غیرفعال کردن این گزینه توصیه نمیشود جز در مواردی که دچار مشکلاتی در عملکرد بازی هستید.\n\n"
+"از غیرفعال کردن آن مطمئنید؟"
 
 #: Client/core/CSettings.cpp:6000
 msgid "Please enter a nickname"
-msgstr "Щ„Ш·ЩЃШ§ ЫЊЪ© Щ†Ш§Щ… Щ…ШіШЄШ№Ш§Ш± Щ€Ш§Ш±ШЇ Щ†Щ…Ш§ЫЊЫЊШЇ"
+msgstr "لطفا یک نام مستعار وارد نمایید"
 
 #: Client/core/CSettings.cpp:6001
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
-msgstr "Щ„Ш·ЩЃШ§Щ‹ ЫЊЪ© Щ†Ш§Щ… Щ…ШіШЄШ№Ш§Ш± ШЁШ±Ш§ЫЊ Ш§ШіШЄЩЃШ§ШЇЩ‡ ШЇШ± ШЁШ§ШІЫЊ Щ€Ш§Ш±ШЇ Щ†Щ…Ш§ЫЊЫЊШЇ.\n"
-"Ш§ЫЊЩ† Щ†Ш§Щ…ШЊ ШІЩ…Ш§Щ†ЫЊ Ъ©Щ‡ ШЁЩ‡ ШіШ±Щ€Ш± Щ…ШЄШµЩ„ Щ…ЫЊвЂЊШґЩ€ЫЊШЇ Щ€ ШЁШ§ШІЫЊ Щ…ЫЊвЂЊЪ©Щ†ЫЊШЇШЊ Щ†Щ…Ш§ЫЊШґ ШЇШ§ШЇЩ‡ Щ…ЫЊвЂЊШґЩ€ШЇ"
+msgstr "لطفاً یک نام مستعار برای استفاده در بازی وارد نمایید.\n"
+"این نام، زمانی که به سرور متصل می‌شوید و بازی می‌کنید، نمایش داده می‌شود"
 
 #: Client/core/CSettings.cpp:6019
 msgid "Very experimental feature."
-msgstr "Щ‚Ш§ШЁЩ„ЫЊШЄ ШЁШіЫЊШ§Ш± ШўШІЩ…Ш§ЫЊШґЫЊ."
+msgstr "قابلیت بسیار آزمایشی."
 
 #: Client/core/CSettings.cpp:6021
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr "ШЄЩ€Щ‚ЩЃ Щ„ЪЇ Ш§Ш­ШЄЩ…Ш§Щ„ЫЊ CJ (65 Щ…ЪЇШ§ШЁШ§ЫЊШЄ Ш±Щ… ШЁЫЊШґШЄШ± Щ…ШµШ±ЩЃ Щ…ЫЊ Ъ©Щ†ШЇ)"
+msgstr "توقف لگ احتمالی CJ (65 مگابایت رم بیشتر مصرف می کند)"
 
 #: Client/core/CSettings.cpp:6023
 msgid "Older routers may require a slower scan speed."
-msgstr "Щ…Щ…Ъ©Щ† Ш§ШіШЄ Ш±Щ€ШЄШ± Щ‡Ш§ЫЊ Щ‚ШЇЫЊЩ…ЫЊ Щ†ЫЊШ§ШІ ШЁЩ‡ ШіШ±Ш№ШЄ Ш¬ШіШЄШ¬Щ€ЫЊ ЩѕШ§ЫЊЫЊЩ†вЂЊШЄШ± ШЇШ§ШґШЄЩ‡ ШЁШ§ШґЩ†ШЇ."
+msgstr "ممکن است روتر های قدیمی نیاز به سرعت جستجوی پایین‌تر داشته باشند."
 
 #: Client/core/CSettings.cpp:6025
 msgid "Switch on to use only one connection when downloading."
-msgstr "ШЄЩ†Щ‡Ш§ ШЁШ±Ш§ЫЊ ШЇШ§Щ†Щ„Щ€ШЇ ШЄЪ© Ш§ШЄШµШ§Щ„ЫЊ Ш±Щ€ШґЩ† Щ†Щ…Ш§ЫЊЫЊШЇ."
+msgstr "تنها برای دانلود تک اتصالی روشن نمایید."
 
 #: Client/core/CSettings.cpp:6027
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr "ШЁШіШЄЩ‡ Щ‡Ш§ЫЊ ШґШЁЪ©Щ‡ Ш±Ш§ ШЁШ±Ш§ЫЊ Ъ©Щ…Ъ© ШЁЩ‡ ISP Щ‡Ш§ ШЇШ± ШґЩ†Ш§ШіШ§ЫЊЫЊ ШЄШ±Ш§ЩЃЫЊЪ© MTA ШЁШ±Ъ†ШіШЁ ЪЇШ°Ш§Ш±ЫЊ Ъ©Щ†ЫЊШЇ."
+msgstr "بسته های شبکه را برای کمک به ISP ها در شناسایی ترافیک MTA برچسب گذاری کنید."
 
 #: Client/core/CSettings.cpp:6029
 msgid "Spinning circle animation at the bottom of the screen"
-msgstr "ШЇШ§ЫЊШ±Щ‡ ШЇШ± Ш­Ш§Щ„ Ъ†Ш±Ш®Шґ ЩѕШ§ЫЊЫЊЩ† ШµЩЃШ­Щ‡"
+msgstr "دایره در حال چرخش پایین صفحه"
 
 #: Client/core/CSettings.cpp:6031
 msgid "Select default always. (This setting is not saved)"
-msgstr "Ш§Щ†ШЄШ®Ш§ШЁ ЩѕЫЊШґЩЃШ±Шґ Щ‡Щ…ЫЊШґЩ‡. (Ш§ЫЊЩ† ШЄШёЫЊЩ…Ш§ШЄ Ш°Ш®ЫЊШ±Щ‡ Щ†ШґШЇЩ‡ Ш§ШіШЄ)"
+msgstr "انتخاب پیشفرش همیشه. (این تظیمات ذخیره نشده است)"
 
 #: Client/core/CSettings.cpp:6033
 msgid "Maximum is usually best"
-msgstr "Ш­ШЇШ§Ъ©Ш«Ш± Щ‡Щ…ЫЊШґЩ‡ ШЁЩ‡ШЄШ± Ш§ШіШЄ"
+msgstr "حداکثر همیشه بهتر است"
 
 #: Client/core/CSettings.cpp:6035 Client/core/CSettings.cpp:6037
 msgid "Auto updater:"
-msgstr "ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Ъ©Щ†Щ†ШЇЩ‡ Ш®Щ€ШЇЪ©Ш§Ш±:"
+msgstr "بروزرسانی کننده خودکار:"
 
 #: Client/core/CSettings.cpp:6035
 msgid "Select default unless you like filling out bug reports."
-msgstr "ЩѕЫЊШґЩЃШ±Ш¶ Ш±Ш§ Ш§Щ†ШЄШ­Ш§ШЁ Щ†Щ…Ш§ЫЊЫЊШЇ Щ…ЪЇШ± ШўЩ†Ъ©Щ‡ ШЄЩ…Ш§ЫЊЩ„ ШЁЩ‡ ЩѕШ± Ъ©Ш±ШЇЩ† ЩЃШ±Щ… ЪЇШІШ§Ш±Шґ Ш®Ш±Ш§ШЁЫЊ Ш±Ш§ ШЇШ§Ш±ЫЊШЇ."
+msgstr "پیشفرض را انتحاب نمایید مگر آنکه تمایل به پر کردن فرم گزارش خرابی را دارید."
 
 #: Client/core/CSettings.cpp:6037
 msgid "Select default to automatically install important updates."
-msgstr "ШЁШ±Ш§ЫЊ ШЇШ±ЫЊШ§ЩЃШЄ Ш®Щ€ШЇЪ©Ш§Ш± ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊвЂЊЩ‡Ш§ЫЊ Щ…Щ‡Щ… ЩѕЫЊШґЩЃШ±Ш¶ Ш±Ш§ Ш§Щ†ШЄШ®Ш§ШЁ Щ†Щ…Ш§ЫЊЫЊШЇ."
+msgstr "برای دریافت خودکار بروزرسانی‌های مهم پیشفرض را انتخاب نمایید."
 
 #: Client/core/CSettings.cpp:6039
 msgid "16-bit color:"
-msgstr "Ш±Щ†ЪЇ 16 ШЁЫЊШЄ:"
+msgstr "رنگ 16 بیت:"
 
 #: Client/core/CSettings.cpp:6039
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr "ЩЃШ№Ш§Щ„ШіШ§ШІЫЊ Ш­Ш§Щ„ШЄ Ш±Щ†ЪЇ 16 ШЁЫЊШЄ - MTA Щ†ЫЊШ§ШІ ШЁЩ‡ Ш±Ш§Щ‡ Ш§Щ†ШЇШ§ШІЫЊ Щ…Ш¬ШЇШЇ ШЇШ§Ш±ШЇ"
+msgstr "فعالسازی حالت رنگ 16 بیت - MTA نیاز به راه اندازی مجدد دارد"
 
 #: Client/core/CSettings.cpp:6041
 msgid "Mouse fix:"
-msgstr "Ш±ЩЃШ№ Ш§ШґЪ©Ш§Щ„ Щ…Щ€Ші:"
+msgstr "رفع اشکال موس:"
 
 #: Client/core/CSettings.cpp:6041
 msgid "Mouse movement fix - May need PC restart"
-msgstr "Ш±ЩЃШ№ Ш§ШґЪ©Ш§Щ„ Щ…Щ€Ші - Щ…Щ…Ъ©Щ† Ш§ШіШЄ Щ†ЫЊШ§ШІ ШЁЩ‡ Ш±Ш§Щ‡ Ш§Щ†ШЇШ§Ш±ЫЊ Щ…Ш¬ШЇШЇ Ш±Ш§ЫЊШ§Щ†Щ‡ ШЁШ§ШґШЇ"
+msgstr "رفع اشکال موس - ممکن است نیاز به راه انداری مجدد رایانه باشد"
 
 #: Client/core/CSettings.cpp:6043
 msgid "CPU affinity:"
-msgstr "Щ€Ш§ШЁШіШЄЪЇЫЊ ЩѕШ±ШЇШ§ШІЩ†ШЇЩ‡ (CPU):"
+msgstr "وابستگی پردازنده (CPU):"
 
 #: Client/core/CSettings.cpp:6043
 msgid "Only change if you're having stability issues."
-msgstr "ЩЃЩ‚Ш· ШЇШ± ШµЩ€Ш±ШЄЫЊ Ъ©Щ‡ ШЇЪ†Ш§Ш± Щ…ШґЪ©Щ„Ш§ШЄ ЩѕШ§ЫЊШЇШ§Ш±ЫЊ Ш№Щ…Щ„Ъ©Ш±ШЇ ШЁШ§ШІЫЊ Щ‡ШіШЄЫЊШЇШЊ ШўЩ† Ш±Ш§ ШЄШєЫЊЫЊШ± ШЇЩ‡ЫЊШЇ."
+msgstr "فقط در صورتی که دچار مشکلات پایداری عملکرد بازی هستید، آن را تغییر دهید."
 
 #: Client/core/CCore.cpp:848 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
-msgstr "Ш®Ш·Ш§ЫЊ Ш¬ШЇЫЊ"
+msgstr "خطای جدی"
 
 #: Client/core/CCore.cpp:969
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "ШЁШ±Ш§ЫЊ ШЇШ±ШіШЄ Ъ©Ш±ШЇЩ†ШЊ Ш§ЫЊЩ† ЩЃШ§ЫЊЩ„ Ш±Ш§ Ш­Ш°ЩЃ Ъ©Щ†ЫЊШЇ:"
+msgstr "برای درست کردن، این فایل را حذف کنید:"
 
 #: Client/core/CCore.cpp:1001
 #, c-format
 msgid "%s module is incorrect!"
-msgstr "Щ…Ш§ЪЩ€Щ„ %s Щ†Ш§ШЇШ±ШіШЄ Ш§ШіШЄ!"
+msgstr "ماژول %s نادرست است!"
 
 #: Client/core/CCore.cpp:1375
 msgid "Error executing URL"
-msgstr "Ш®Ш·Ш§ ШЇШ± Ш§Ш¬Ш±Ш§ЫЊ Щ„ЫЊЩ†Ъ©"
+msgstr "خطا در اجرای لینک"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: Client/core/CCore.cpp:1470
 msgid "this help screen"
-msgstr "Ш§ЫЊЩ† ШµЩЃШ­Щ‡ Ш±Ш§Щ‡Щ†Щ…Ш§"
+msgstr "این صفحه راهنما"
 
 #: Client/core/CCore.cpp:1471 Client/core/CCore.cpp:1472
 msgid "exits the application"
-msgstr "Ш§ШІ ШЁШ±Щ†Ш§Щ…Щ‡ Ш®Ш§Ш±Ш¬ Щ…ЫЊ ШґЩ€ШЇ"
+msgstr "از برنامه خارج می شود"
 
 #: Client/core/CCore.cpp:1473
 msgid "shows the version"
-msgstr "Щ†ШіШ®Щ‡ Ш±Ш§ Щ†ШґШ§Щ† Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "نسخه را نشان می دهد"
 
 #: Client/core/CCore.cpp:1474
 msgid "shows the time"
-msgstr "ШІЩ…Ш§Щ† Ш±Ш§ Щ†ШґШ§Щ† Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "زمان را نشان می دهد"
 
 #: Client/core/CCore.cpp:1475
 msgid "shows the hud"
-msgstr "HUD Ш±Ш§ Щ†ШґШ§Щ† Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "HUD را نشان می دهد"
 
 #: Client/core/CCore.cpp:1476
 msgid "shows all the binds"
-msgstr "ШЄЩ…Ш§Щ…ЫЊ ШЁШ§ЫЊЩ†ШЇ Щ‡Ш§ Ш±Ш§ Щ†ШґШ§Щ† Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "تمامی بایند ها را نشان می دهد"
 
 #: Client/core/CCore.cpp:1477
 msgid "shows your serial"
-msgstr "ШіШ±ЫЊШ§Щ„ ШґЩ…Ш§ Ш±Ш§ Щ†ШґШ§Щ† Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "سریال شما را نشان می دهد"
 
 #: Client/core/CCore.cpp:1486
 msgid "connects to a server (host port nick pass)"
-msgstr "Ш§ШЄШµШ§Щ„ ШЁЩ‡ ЫЊЪ© ШіШ±Щ€Ш± (ШўШЇШ±Ші ЩѕЩ€Ш±ШЄ Щ„Щ‚ШЁ Ш±Щ…ШІ)"
+msgstr "اتصال به یک سرور (آدرس پورت لقب رمز)"
 
 #: Client/core/CCore.cpp:1487
 msgid "connects to a previous server"
-msgstr "Ш§ШЄШµШ§Щ„ ШЁЩ‡ ШіШ±Щ€Ш± ЩѕЫЊШґЫЊЩ†"
+msgstr "اتصال به سرور پیشین"
 
 #: Client/core/CCore.cpp:1488
 msgid "binds a key (key control)"
-msgstr "ЫЊЪ© Ъ©Щ„ЫЊШЇ Ш±Ш§ ШЁШ§ЫЊЩ†ШЇ Щ…ЫЊ Ъ©Щ†ШЇ (Ъ©Щ„ЫЊШЇ Ъ©Щ†ШЄШ±Щ„)"
+msgstr "یک کلید را بایند می کند (کلید کنترل)"
 
 #: Client/core/CCore.cpp:1489
 msgid "unbinds a key (key)"
-msgstr "ЫЊЪ© Ъ©Щ„ЫЊШЇ Ш±Ш§ ШўЩ†ШЁШ§ЫЊШЇ Щ…ЫЊ Ъ©Щ†ШЇ (Ъ©Щ„ЫЊШЇ)"
+msgstr "یک کلید را آنباید می کند (کلید)"
 
 #: Client/core/CCore.cpp:1490
 msgid "copies the default gta controls"
-msgstr "ШЄЩ†ШёЫЊЩ…Ш§ШЄ Ъ©Щ†ШЄШ±Щ„ ЩѕЫЊШґЩЃШ±Ш¶ GTA Ш±Ш§ Ъ©ЩѕЫЊ Щ…ЫЊ Ъ©Щ†ШЇ"
+msgstr "تنظیمات کنترل پیشفرض GTA را کپی می کند"
 
 #: Client/core/CCore.cpp:1491
 msgid "outputs a screenshot"
-msgstr "ЫЊЪ© Ш§ШіЪ©Ш±ЫЊЩ† ШґШ§ШЄ Ш±Ш§ Ш®Ш±Щ€Ш¬ЫЊ Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "یک اسکرین شات را خروجی می دهد"
 
 #: Client/core/CCore.cpp:1492
 msgid "immediately saves the config"
-msgstr "ШЁЩ„Ш§ЩЃШ§ШµЩ„Щ‡ ШЄЩ†ШёЫЊЩ…Ш§ШЄ Ш±Ш§ Ш°Ш®ЫЊШ±Щ‡ Щ…ЫЊ Ъ©Щ†ШЇ"
+msgstr "بلافاصله تنظیمات را ذخیره می کند"
 
 #: Client/core/CCore.cpp:1494
 msgid "clears the debug view"
-msgstr "Щ†Щ…Ш§ЫЊ Ш§ШґЪ©Ш§Щ„ ШІШЇШ§ЫЊЫЊ Ш±Ш§ ЩѕШ§Ъ© Щ…ЫЊ Ъ©Щ†ШЇ"
+msgstr "نمای اشکال زدایی را پاک می کند"
 
 #: Client/core/CCore.cpp:1495
 msgid "scrolls the chatbox upwards"
-msgstr "Щ…Ш­ШЇЩ€ШЇЩ‡ ЪЇЩЃШЄ Щ€ ЪЇЩ€ Ш±Ш§ ШЁЩ‡ ШіЩ…ШЄ ШЁШ§Щ„Ш§ Ш§ШіЪ©Ш±Щ€Щ„ Щ…ЫЊ Ъ©Щ†ШЇ"
+msgstr "محدوده گفت و گو را به سمت بالا اسکرول می کند"
 
 #: Client/core/CCore.cpp:1496
 msgid "scrolls the chatbox downwards"
-msgstr "Щ…Ш­ШЇЩ€ШЇЩ‡ ЪЇЩЃШЄ Щ€ ЪЇЩ€ Ш±Ш§ ШЁЩ‡ ШіЩ…ШЄ ЩѕШ§ЫЊЫЊЩ† Ш§ШіЪ©Ш±Щ€Щ„ Щ…ЫЊ Ъ©Щ†ШЇ"
+msgstr "محدوده گفت و گو را به سمت پایین اسکرول می کند"
 
 #: Client/core/CCore.cpp:1497
 msgid "scrolls the debug view upwards"
-msgstr "Ш§ШґЪ©Ш§Щ„ ШІШЇШ§ЫЊЫЊ Ш±Ш§ ШЁЩ‡ ШіЩ…ШЄ ШЁШ§Щ„Ш§ Ш§ШіЪ©Ш±Щ€Щ„ Щ…ЫЊ Ъ©Щ†ШЇ"
+msgstr "اشکال زدایی را به سمت بالا اسکرول می کند"
 
 #: Client/core/CCore.cpp:1498
 msgid "scrolls the debug view downwards"
-msgstr "Ш§ШґЪ©Ш§Щ„ ШІШЇШ§ЫЊЫЊ Ш±Ш§ ШЁЩ‡ ШіЩ…ШЄ ЩѕШ§ЫЊЫЊЩ† Ш§ШіЪ©Ш±Щ€Щ„ Щ…ЫЊ Ъ©Щ†ШЇ"
+msgstr "اشکال زدایی را به سمت پایین اسکرول می کند"
 
 #: Client/core/CCore.cpp:1501
 msgid "shows the memory statistics"
-msgstr "Ш¬ШІЫЊЫЊШ§ШЄ Ш­Ш§ЩЃШёЩ‡ Ш±Ш§ Щ†ШґШ§Щ† Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "جزییات حافظه را نشان می دهد"
 
 #: Client/core/CCore.cpp:1502
 msgid "shows the frame timing graph"
-msgstr "ШІЩ…Ш§Щ†ШЁЩ†ШЇЫЊ ЩЃШ±ЫЊЩ… Ш±Ш§ ШЁЩ‡ ШµЩ€Ш±ШЄ Щ†Щ…Щ€ШЇШ§Ш± Щ†ШґШ§Щ† Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "زمانبندی فریم را به صورت نمودار نشان می دهد"
 
 #: Client/core/CCore.cpp:1506
 msgid "for developers: reload news"
-msgstr "ШЁШ±Ш§ЫЊ ШЄЩ€ШіШ№Щ‡ ШЇЩ‡Щ†ШЇЪЇШ§Щ†: ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Ш§Ш®ШЁШ§Ш±"
+msgstr "برای توسعه دهندگان: بروزرسانی اخبار"
 
 #: Client/core/CMainMenu.cpp:332
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "ШґЩ…Ш§ Ш§ШІ Щ†ШіШ®Щ‡ (Щ†Щ…Ш§ЫЊШґ Щ‚Ш§ШЁЩ„ЫЊШЄ Ш¬ШЇЫЊШЇ) Ш§ШіШЄЩЃШ§ШЇЩ‡ Щ…ЫЊ Ъ©Щ†ЫЊШЇ! Ш§ЫЊЩ† Щ†ШіШ®Щ‡ ШЄШіШЄ Щ…ЫЊ ШЁШ§ШґШЇ Щ€ Щ†Щ…ЫЊ ШЄЩ€Ш§Щ† Ш§ШІ ШўЩ† ШЁШ±Ш§ЫЊ Ш§ШЄШµШ§Щ„ ШЁЩ‡ ШіШ±Щ€Ш± Щ‡Ш§ЫЊ Ш№Щ…Щ€Щ…ЫЊ Ш§ШіШЄЩЃШ§ШЇЩ‡ Ъ©Ш±ШЇ."
+msgstr "شما از نسخه (نمایش قابلیت جدید) استفاده می کنید! این نسخه تست می باشد و نمی توان از آن برای اتصال به سرور های عمومی استفاده کرد."
 
 #: Client/core/CMainMenu.cpp:351
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
-msgstr "MTA ШЁШ№ШЇ Ш§ШІ ЪЩ€Ш¦ЫЊЩ‡ 2019 ШЁЩ‡вЂЊШ±Щ€ШІШ±ШіШ§Щ†ЫЊвЂЊЩ‡Ш§ЫЊ XP/Vista Ш±Ш§ ШЇШ±ЫЊШ§ЩЃШЄ Щ†Ш®Щ€Ш§Щ‡ШЇ Ъ©Ш±ШЇ.\n\n"
-"ШЁШ±Ш§ЫЊ ШЁШ§ШІЫЊ Ъ©Ш±ШЇЩ† ШЇШ± ШіШ±Щ€Ш± Щ‡Ш§ЫЊ Ш¬ШЇЫЊШЇ Щ€ЫЊЩ†ШЇЩ€ШІ Ш®Щ€ШЇ Ш±Ш§ Ш§Ш±ШЄЩ‚Ш§ ШЇЩ‡ЫЊШЇ."
+msgstr "MTA بعد از ژوئیه 2019 به‌روزرسانی‌های XP/Vista را دریافت نخواهد کرد.\n\n"
+"برای بازی کردن در سرور های جدید ویندوز خود را ارتقا دهید."
 
 #: Client/core/CMainMenu.cpp:1231
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
-msgstr "Ш§ЫЊЩ† Ъ©Ш§Ш± ШґЩ…Ш§ Ш±Ш§ Ш§ШІ ШіШ±Щ€Ш± ЩЃШ№Щ„ЫЊ Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„ Щ…ЫЊ Ъ©Щ†ШЇ.\n\n"
-"ШўЫЊШ§ Щ…Ш·Щ…Ш¦Щ† Щ‡ШіШЄЫЊШЇ Ъ©Щ‡ Щ…ЫЊ Ш®Щ€Ш§Щ‡ЫЊШЇ Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„ Ъ©Щ†ЫЊШЇШџ"
+msgstr "این کار شما را از سرور فعلی قطع اتصال می کند.\n\n"
+"آیا مطمئن هستید که می خواهید قطع اتصال کنید؟"
 
 #: Client/core/CMainMenu.cpp:1235
 msgid "DISCONNECT WARNING"
-msgstr "Ш§Ш®Ш·Ш§Ш± Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„"
+msgstr "اخطار قطع اتصال"
 
 #: Client/core/CMainMenu.cpp:1256
 msgid "INFORMATION"
-msgstr "Ш§Ш·Щ„Ш§Ш№Ш§ШЄ"
+msgstr "اطلاعات"
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:154
 msgid "NEWS"
-msgstr "Ш§Ш®ШЁШ§Ш±"
+msgstr "اخبار"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:172 Client/core/CNewsBrowser.cpp:173
 msgid "Visit latest news article"
-msgstr "Щ…ШґШ§Щ‡ШЇЩ‡ ШўШ®Ш±ЫЊЩ† Щ…Щ‚Ш§Щ„Щ‡ Ш®ШЁШ±ЫЊ"
+msgstr "مشاهده آخرین مقاله خبری"
 
 #: Client/core/CScreenShot.cpp:200
 #, c-format
 msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Ш­Ш¬Щ… Ш§ШіЪ©Ш±ЫЊЩ† ШґШ§ШЄ %d ШЁШ§ЫЊШЄ Щ…ЫЊ ШЁШ§ШґШЇШЊ Щ€Щ„ЫЊ ШЁШ§ЫЊШЇ %d ШЁШ§ЫЊШЄ Щ…ЫЊ ШЁЩ€ШЇ"
+msgstr "حجم اسکرین شات %d بایت می باشد، ولی باید %d بایت می بود"
 
 #: Client/core/CScreenShot.cpp:206
 msgid "Screenshot failed"
-msgstr "Ш®Ш·Ш§ЫЊ Ш§ШіЪ©Ш±ЫЊЩ† ШґШ§ШЄ"
+msgstr "خطای اسکرین شات"
 
 #: Client/core/CScreenShot.cpp:256
 #, c-format
 msgid "Screenshot taken: '%s'"
-msgstr "Ш§ШіЪ©Ш±ЫЊЩ† ШґШ§ШЄ ЪЇШ±ЩЃШЄЩ‡ ШґШЇ: '%s'"
+msgstr "اسکرین شات گرفته شد: '%s'"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:233
 msgid "Unknown command or cvar: "
-msgstr "ЩЃШ±Щ…Ш§Щ† ЫЊШ§ ШЇШіШЄЩ€Ш± Щ†Ш§ШґЩ†Ш§Ш®ШЄЩ‡: "
+msgstr "فرمان یا دستور ناشناخته: "
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
-msgstr "ЩЋШґЩ„ЫЊЪ©"
+msgstr "َشلیک"
 
 #: Client/core/CKeyBinds.cpp:187
 msgid "Next weapon"
-msgstr "Ш§ШіЩ„Ш­Щ‡ ШЁШ№ШЇЫЊ"
+msgstr "اسلحه بعدی"
 
 #: Client/core/CKeyBinds.cpp:188
 msgid "Previous weapon"
-msgstr "Ш§ШіЩ„Ш­Щ‡ Щ‚ШЁЩ„ЫЊ"
+msgstr "اسلحه قبلی"
 
 #: Client/core/CKeyBinds.cpp:189
 msgid "Forwards"
-msgstr "Ш¬Щ„Щ€"
+msgstr "جلو"
 
 #: Client/core/CKeyBinds.cpp:190
 msgid "Backwards"
-msgstr "Ш№Щ‚ШЁ"
+msgstr "عقب"
 
 #: Client/core/CKeyBinds.cpp:193
 msgid "Zoom in"
-msgstr "ШЁШІШ±ЪЇ Щ†Щ…Ш§ЫЊЫЊ"
+msgstr "بزرگ نمایی"
 
 #: Client/core/CKeyBinds.cpp:194
 msgid "Zoom out"
-msgstr "Ъ©Щ€Ъ†Ъ© Щ†Щ…Ш§ЫЊЫЊ"
+msgstr "کوچک نمایی"
 
 #: Client/core/CKeyBinds.cpp:195
 msgid "Enter/Exit"
-msgstr "Щ€Ш±Щ€ШЇ/Ш®Ш±Щ€Ш¬"
+msgstr "ورود/خروج"
 
 #: Client/core/CKeyBinds.cpp:196
 msgid "Change camera"
-msgstr "ШЄШ№Щ€ЫЊШ¶ ШЇЩ€Ш±ШЁЫЊЩ†"
+msgstr "تعویض دوربین"
 
 #. 10
 #: Client/core/CKeyBinds.cpp:197
 msgid "Jump"
-msgstr "ЩѕШ±Шґ"
+msgstr "پرش"
 
 #: Client/core/CKeyBinds.cpp:198
 msgid "Sprint"
-msgstr "ШЇЩ€ЫЊШЇЩ†"
+msgstr "دویدن"
 
 #: Client/core/CKeyBinds.cpp:199
 msgid "Look behind"
-msgstr "Щ†ЪЇШ§Щ‡ ШЁЩ‡ ЩѕШґШЄ ШіШ±"
+msgstr "نگاه به پشت سر"
 
 #: Client/core/CKeyBinds.cpp:200
 msgid "Crouch"
-msgstr "Ш®Щ… ШґШЇЩ†"
+msgstr "خم شدن"
 
 #: Client/core/CKeyBinds.cpp:201
 msgid "Action"
-msgstr "Ш­Ш±Ъ©ШЄ"
+msgstr "حرکت"
 
 #: Client/core/CKeyBinds.cpp:202
 msgid "Walk"
-msgstr "Ш±Ш§Щ‡ Ш±ЩЃШЄЩ†"
+msgstr "راه رفتن"
 
 #: Client/core/CKeyBinds.cpp:203
 msgid "Vehicle fire"
-msgstr "ШґЩ„ЫЊЪ© Щ€ШіЫЊЩ„Щ‡ Щ†Щ‚Щ„ЫЊЩ‡"
+msgstr "شلیک وسیله نقلیه"
 
 #: Client/core/CKeyBinds.cpp:204
 msgid "Vehicle secondary fire"
-msgstr "ШґЩ„ЫЊЪ© Ш«Ш§Щ†Щ€ЫЊЩ‡ Щ€ШіЫЊЩ„Щ‡ Щ†Щ‚Щ„ЫЊЩ‡"
+msgstr "شلیک ثانویه وسیله نقلیه"
 
 #: Client/core/CKeyBinds.cpp:205
 msgid "Vehicle left"
-msgstr "Щ€ШіЫЊЩ„Щ‡ Щ†Щ‚Щ„ЫЊЩ‡ Ъ†Щѕ"
+msgstr "وسیله نقلیه چپ"
 
 #: Client/core/CKeyBinds.cpp:206
 msgid "Vehicle right"
-msgstr "Щ€ШіЫЊЩ„Щ‡ Щ†Щ‚Щ„ЫЊЩ‡ Ш±Ш§ШіШЄ"
+msgstr "وسیله نقلیه راست"
 
 #. 20
 #: Client/core/CKeyBinds.cpp:207
 msgid "Steer forwards/down"
-msgstr "ЩЃШ±Щ…Ш§Щ† ШЁЩ‡ Ш№Щ‚ШЁ/Ш¬Щ„Щ€"
+msgstr "فرمان به عقب/جلو"
 
 #: Client/core/CKeyBinds.cpp:208
 msgid "Steer backwards/up"
-msgstr "ЩЃШ±Щ…Ш§Щ† ШЁЩ‡ ЩѕШ§ЫЊЫЊЩ†/ШЁШ§Щ„Ш§"
+msgstr "فرمان به پایین/بالا"
 
 #: Client/core/CKeyBinds.cpp:209
 msgid "Accelerate"
-msgstr "ЪЇШ§ШІ"
+msgstr "گاز"
 
 #: Client/core/CKeyBinds.cpp:210
 msgid "Brake/Reverse"
-msgstr "ШЄШ±Щ…ШІ/ШЇЩ†ШЇЩ‡ Ш№Щ‚ШЁ"
+msgstr "ترمز/دنده عقب"
 
 #: Client/core/CKeyBinds.cpp:211
 msgid "Radio next"
-msgstr "Ш±Ш§ШЇЫЊЩ€ ШЁШ№ШЇЫЊ"
+msgstr "رادیو بعدی"
 
 #: Client/core/CKeyBinds.cpp:212
 msgid "Radio previous"
-msgstr "Ш±Ш§ШЇЫЊЩ€ Щ‚ШЁЩ„ЫЊ"
+msgstr "رادیو قبلی"
 
 #: Client/core/CKeyBinds.cpp:213
 msgid "Radio user track skip"
-msgstr "ЩѕШ±ЫЊШЇЩ† ШЁЩ‡ ШўЩ‡Щ†ЪЇ ШЁШ№ШЇЫЊ"
+msgstr "پریدن به آهنگ بعدی"
 
 #: Client/core/CKeyBinds.cpp:214
 msgid "Horn"
-msgstr "ШЁЩ€Щ‚"
+msgstr "بوق"
 
 #: Client/core/CKeyBinds.cpp:215
 msgid "Sub-mission"
-msgstr "Щ…Ш±Ш­Щ„Щ‡ ЩЃШ±Ш№ЫЊ"
+msgstr "مرحله فرعی"
 
 #: Client/core/CKeyBinds.cpp:216
 msgid "Handbrake"
-msgstr "ШЄШ±Щ…ШІ ШЇШіШЄЫЊ"
+msgstr "ترمز دستی"
 
 #. 30
 #: Client/core/CKeyBinds.cpp:217
 msgid "Vehicle look left"
-msgstr "Щ€ШіЫЊЩ„Щ‡ Щ†Щ‚Щ„ЫЊЩ‡ Щ†ЪЇШ§Щ‡ ШЁЩ‡ Ъ†Щѕ"
+msgstr "وسیله نقلیه نگاه به چپ"
 
 #: Client/core/CKeyBinds.cpp:218
 msgid "Vehicle look right"
-msgstr "Щ€ШіЫЊЩ„Щ‡ Щ†Щ‚Щ„ЫЊЩ‡ Щ†ЪЇШ§Щ‡ ШЁЩ‡ Ш±Ш§ШіШЄ"
+msgstr "وسیله نقلیه نگاه به راست"
 
 #: Client/core/CKeyBinds.cpp:219
 msgid "Vehicle look behind"
-msgstr "Щ€ШіЫЊЩ„Щ‡ Щ†Щ‚Щ„ЫЊЩ‡ Щ†ЪЇШ§Щ‡ ШЁЩ‡ Ш№Щ‚ШЁ"
+msgstr "وسیله نقلیه نگاه به عقب"
 
 #: Client/core/CKeyBinds.cpp:220
 msgid "Vehicle mouse look"
-msgstr "Щ€ШіЫЊЩ„Щ‡ Щ†Щ‚Щ„ЫЊЩ‡ Щ†ЪЇШ§Щ‡ ШЁШ§ Щ…Щ€Ші"
+msgstr "وسیله نقلیه نگاه با موس"
 
 #: Client/core/CKeyBinds.cpp:221
 msgid "Special control left"
-msgstr "Ъ©Щ†ШЄШ±Щ„ Щ€ЫЊЪЩ‡ Ъ†Щѕ"
+msgstr "کنترل ویژه چپ"
 
 #: Client/core/CKeyBinds.cpp:222
 msgid "Special control right"
-msgstr "Ъ©Щ†ШЄШ±Щ„ Щ€ЫЊЪЩ‡ Ш±Ш§ШіШЄ"
+msgstr "کنترل ویژه راست"
 
 #: Client/core/CKeyBinds.cpp:223
 msgid "Special control down"
-msgstr "Ъ©Щ†ШЄШ±Щ„ Щ€ЫЊЪЩ‡ ЩѕШ§ЫЊЫЊЩ†"
+msgstr "کنترل ویژه پایین"
 
 #: Client/core/CKeyBinds.cpp:224
 msgid "Special control up"
-msgstr "Ъ©Щ†ШЄШ±Щ„ Щ€ЫЊЪЩ‡ ШЁШ§Щ„Ш§"
+msgstr "کنترل ویژه بالا"
 
 #: Client/core/CKeyBinds.cpp:225
 msgid "Aim weapon"
-msgstr "Щ†ШґШ§Щ†Щ‡ ЪЇЫЊШ±ЫЊ"
+msgstr "نشانه گیری"
 
 #: Client/core/CKeyBinds.cpp:226
 msgid "Conversation yes"
-msgstr "Щ…Ъ©Ш§Щ„Щ…Щ‡ ШЁЩ„Щ‡"
+msgstr "مکالمه بله"
 
 #. 40
 #: Client/core/CKeyBinds.cpp:227
 msgid "Conversation no"
-msgstr "Щ…Ъ©Ш§Щ…Щ„Щ‡ Ш®ЫЊШ±"
+msgstr "مکامله خیر"
 
 #: Client/core/CKeyBinds.cpp:228
 msgid "Group control forwards"
-msgstr "Ъ©Щ†ШЄШ±Щ„ ЪЇШ±Щ€Щ‡ Ш¬Щ„Щ€"
+msgstr "کنترل گروه جلو"
 
 #: Client/core/CKeyBinds.cpp:229
 msgid "Group control backwards"
-msgstr "Ъ©Щ†ШЄШ±Щ„ ЪЇШ±Щ€Щ‡ Ш№Щ‚ШЁ"
+msgstr "کنترل گروه عقب"
 
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:93
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Ш§ШіЪ©ЫЊЩ† Ш§Щ†ШЄШ®Ш§ШЁЫЊ ШґЩ…Ш§ Щ†Щ…ЫЊ ШЄЩ€Ш§Щ†ШЇ ШЁШ§ЪЇШ°Ш§Ш±ЫЊ ШґЩ€ШЇШЊ Щ‡Щ…Ъ†Щ†ЫЊЩ† Ш§ШіЪ©ЫЊЩ† Щ‡Ш§ЫЊ ЩѕЫЊШґЩЃШ±Ш¶ШЊ Щ„Ш·ЩЃШ§ Щ…Ш¬ШЇШЇШ§ MTA Ш±Ш§ Щ†ШµШЁ Щ†Щ…Ш§ЫЊЫЊШЇ."
+msgstr "اسکین انتخابی شما نمی تواند باگذاری شود، همچنین اسکین های پیشفرض، لطفا مجددا MTA را نصب نمایید."
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1462
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "ШўЫЊШ§ Щ…ЫЊ Ш®Щ€Ш§Щ‡ЫЊШЇ ШЇШ± Щ…Щ€Ш±ШЇ Ш§ЫЊЩ† Щ…ШґЪ©Щ„ Ш±Ш§Щ‡Щ†Щ…Ш§ЫЊ ШўЩ†Щ„Ш§ЫЊЩ† Ш±Ш§ Щ…ШґШ§Щ‡ШЇЩ‡ Щ†Щ…Ш§ЫЊЫЊШЇШџ"
+msgstr "آیا می خواهید در مورد این مشکل راهنمای آنلاین را مشاهده نمایید؟"
 
 #. Create window
 #: Client/core/CConsole.cpp:417
 msgid "CONSOLE"
-msgstr "Ъ©Щ†ШіЩ€Щ„"
+msgstr "کنسول"
 
 #: Client/core/CCredits.cpp:34
 msgid "Programming"
-msgstr "ШЁШ±Щ†Ш§Щ…Щ‡ Щ†Щ€ЫЊШіЫЊ"
+msgstr "برنامه نویسی"
 
 #: Client/core/CCredits.cpp:65
 msgid "Contributors"
-msgstr "Щ…ШґШ§Ш±Ъ©ШЄ Ъ©Щ†Щ†ШЇЪЇШ§Щ†"
+msgstr "مشارکت کنندگان"
 
 #: Client/core/CCredits.cpp:85
 msgid "Game Design / Scripting"
-msgstr "Ш·Ш±Ш§Ш­ЫЊ ШЁШ§ШІЫЊ / Ш§ШіЪ©Ш±ЫЊЩѕ Щ†Щ€ЫЊШіЫЊ"
+msgstr "طراحی بازی / اسکریپ نویسی"
 
 #: Client/core/CCredits.cpp:105
 msgid "Language Localization"
-msgstr "ШЁЩ€Щ…ЫЊ ШіШ§ШІЫЊ ШІШЁШ§Щ†"
+msgstr "بومی سازی زبان"
 
 #: Client/core/CCredits.cpp:111
 msgid "Patch contributors"
-msgstr "Ш§Щ‡ШЇШ§ Ъ©Щ†Щ†ШЇЪЇШ§Щ† ШЁШіШЄЩ‡ ШЄЪ©Щ…ЫЊЩ„ЫЊ"
+msgstr "اهدا کنندگان بسته تکمیلی"
 
 #: Client/core/CCredits.cpp:234
 msgid "Special Thanks"
-msgstr "ШЄШґЪ©Ш± Щ€ЫЊЪЩ‡"
+msgstr "تشکر ویژه"
 
 #: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
-msgstr "Ш§ЫЊЩ† ШЁШ±Щ†Ш§Щ…Щ‡ Щ€ ЩѕШ±Щ€ЪЩ‡ Ш§ШІ Ъ©ШЄШ§ШЁШ®Ш§Щ†Щ‡ Щ‡Ш§ Щ€ Щ†Ш±Щ…вЂЊШ§ЩЃШІШ§Ш± Щ‡Ш§ЫЊ ШІЫЊШ± Ш§ШіШЄЩЃШ§ШЇЩ‡ Щ…ЫЊ Ъ©Щ†ШЇ:"
+msgstr "این برنامه و پروژه از کتابخانه ها و نرم‌افزار های زیر استفاده می کند:"
 
 #: Client/core/CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
-msgstr "Щ…Ш­Щ€Ш± ЪЇШ§ШІ"
+msgstr "محور گاز"
 
 #: Client/core/CJoystickManager.cpp:1580
 msgid "Brake Axis"
-msgstr "Щ…Ш­Щ€Ш± ШЄШ±Щ…ШІ"
+msgstr "محور ترمز"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:125
 msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
-msgstr "Direct3D9 Ш§Ш¬Ш±Ш§ Щ†ШґШЇ.\n\n"
-"Щ„Ш·ЩЃШ§ Ш§ШІ ШўШ®Ш±ЫЊЩ† Щ†ШіШ®Щ‡ ШЁЩ€ШЇЩ† DirectX Щ€ ШіШ±Щ€ЫЊШі ЩѕЪ©/ШЁШ±Щ€ШІШ±ШіШ§Щ†ЫЊ Щ€ЫЊЩ†ШЇЩ€ШІ Ш®Щ€ШЇ Ш§Ш·Щ…ЫЊЩ†Ш§Щ† Ш­Ш§ШµЩ„ ЩЃШ±Щ…Ш§ЫЊЫЊШЇ."
+msgstr "Direct3D9 اجرا نشد.\n\n"
+"لطفا از آخرین نسخه بودن DirectX و سرویس پک/بروزرسانی ویندوز خود اطمینان حاصل فرمایید."
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
 #: Client/core/ServerBrowser/CServerList.cpp:63
 msgid "Idle"
-msgstr "ШЁЫЊЪ©Ш§Ш±"
+msgstr "بیکار"
 
 #: Client/core/ServerBrowser/CServerList.cpp:168
 #: Client/core/ServerBrowser/CServerBrowser.cpp:3158
 msgid "player"
 msgid_plural "players"
-msgstr[0] "ШЁШ§ШІЫЊЪ©Щ†"
-msgstr[1] "ШЁШ§ШІЫЊЪ©Щ†Ш§Щ†"
+msgstr[0] "بازیکن"
+msgstr[1] "بازیکنان"
 
 #: Client/core/ServerBrowser/CServerList.cpp:169
 msgid "on"
-msgstr "Ш±Щ€ШґЩ†"
+msgstr "روشن"
 
 #: Client/core/ServerBrowser/CServerList.cpp:172
 #: Client/core/ServerBrowser/CServerBrowser.cpp:3164
 msgid "server"
 msgid_plural "servers"
-msgstr[0] "ШіШ±Щ€Ш±"
-msgstr[1] "ШіШ±Щ€Ш±Щ‡Ш§"
+msgstr[0] "سرور"
+msgstr[1] "سرورها"
 
 #. We are polling for the master server list (first pass)
 #: Client/core/ServerBrowser/CServerList.cpp:306
 #, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "ШЇШ± Ш­Ш§Щ„ ШЇШ±Ш®Щ€Ш§ШіШЄ ЩЃЩ‡Ш±ШіШЄ ШіШ±Щ€Ш± Ш§ШµЩ„ЫЊ (%lu Щ…ЫЊЩ„ЫЊ Ш«Ш§Щ†ЫЊЩ‡ ЪЇШ°ШґШЄЩ‡)"
+msgstr "در حال درخواست فهرست سرور اصلی (%lu میلی ثانیه گذشته)"
 
 #. Abort
 #: Client/core/ServerBrowser/CServerList.cpp:324
 msgid "Master server list could not be parsed."
-msgstr "Щ†Щ…ЫЊ ШЄЩ€Ш§Щ† ЩЃЩ‡Ш±ШіШЄ ШіШ±Щ€Ш± Ш±Ш§ ШЄШ­Щ„ЫЊЩ„ Ъ©Ш±ШЇ."
+msgstr "نمی توان فهرست سرور را تحلیل کرد."
 
 #. Abort
 #: Client/core/ServerBrowser/CServerList.cpp:334
 msgid "Master server list could not be retrieved."
-msgstr "Щ†Щ…ЫЊ ШЄЩ€Ш§Щ† ЩЃЩ‡Ш±ШіШЄ ШіШ±Щ€Ш± Ш±Ш§ ШЇШ±ЫЊШ§ЩЃШЄ Ъ©Ш±ШЇ."
+msgstr "نمی توان فهرست سرور را دریافت کرد."
 
 #: Client/core/ServerBrowser/CServerList.cpp:349
 msgid "(Backup server list)"
-msgstr "(ЩѕШґШЄЫЊШЁШ§Щ†ЫЊ ЩЃЩ‡Ш±ШіШЄ ШіШ±Щ€Ш±)"
+msgstr "(پشتیبانی فهرست سرور)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:419
 msgid "Cannot create LAN-broadcast socket"
@@ -2539,17 +2538,17 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerList.cpp:429
 msgid "Cannot bind LAN-broadcast socket"
-msgstr "Щ†Щ…ЫЊ ШЄЩ€Ш§Щ† ЩѕШ®Шґ ШґШЁЪ©Щ‡ Щ„Щ† Ш±Ш§ ШЁШ§ЫЊЩ†ШЇ ШіЩ€Ъ©ШЄ Ъ©Ш±ШЇ"
+msgstr "نمی توان پخش شبکه لن را بایند سوکت کرد"
 
 #: Client/core/ServerBrowser/CServerList.cpp:472
 msgid "Attempting to discover LAN servers"
-msgstr "ШЄЩ„Ш§Шґ ШЁШ±Ш§ЫЊ ЫЊШ§ЩЃШЄЩ† ШіШ±Щ€Ш± Щ‡Ш§ЫЊ Щ„Щ†"
+msgstr "تلاش برای یافتن سرور های لن"
 
 #. Create queue window
 #: Client/core/ServerBrowser/CServerInfo.cpp:32
 #: Client/core/ServerBrowser/CServerInfo.cpp:302
 msgid "SERVER IS FULL"
-msgstr "ШіШ±Щ€Ш± ЩѕШ± Ш§ШіШЄ"
+msgstr "سرور پر است"
 
 #. Determine our label draw position for L10n
 #. Start position
@@ -2557,154 +2556,154 @@ msgstr "ШіШ±Щ€Ш± ЩѕШ± Ш§ШіШЄ"
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:53
 msgid "Name:"
-msgstr "Щ†Ш§Щ…:"
+msgstr "نام:"
 
 #. Server IP
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:64
 msgid "Server Address:"
-msgstr "ШўШЇШ±Ші ШіШ±Щ€Ш±:"
+msgstr "آدرس سرور:"
 
 #. Gamemode
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:75
 msgid "Gamemode:"
-msgstr "ЪЇЫЊЩ… Щ…Щ€ШЇ:"
+msgstr "گیم مود:"
 
 #. Map
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:86
 msgid "Map:"
-msgstr "Щ†Щ‚ШґЩ‡:"
+msgstr "نقشه:"
 
 #. Players
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:97
 msgid "Players:"
-msgstr "ШЁШ§ШІЫЊЪ©Щ†Ш§Щ†:"
+msgstr "بازیکنان:"
 
 #. Passworded
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:108
 msgid "Passworded:"
-msgstr "ШЇШ§Ш±Ш§ЫЊ ЪЇШ°Ш±Щ€Ш§ЪЩ‡:"
+msgstr "دارای گذرواژه:"
 
 #. Latency
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:119
 msgid "Latency:"
-msgstr "ШЄШ§Ш®ЫЊШ±:"
+msgstr "تاخیر:"
 
 #. Column for player names
 #. Player List Columns
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
 #: Client/core/ServerBrowser/CServerBrowser.cpp:635
 msgid "Player list"
-msgstr "ЩЃЩ‡Ш±ШіШЄ ШЁШ§ШІЫЊЪ©Щ†вЂЊЩ‡Ш§"
+msgstr "فهرست بازیکن‌ها"
 
 #. Close button
 #: Client/core/ServerBrowser/CServerInfo.cpp:144
 msgid "Close"
-msgstr "ШЁШіШЄЩ†"
+msgstr "بستن"
 
 #. Join Game button
 #: Client/core/ServerBrowser/CServerInfo.cpp:152
 msgid "Join Game"
-msgstr "Щ€Ш±Щ€ШЇ ШЁЩ‡ ШЁШ§ШІЫЊ"
+msgstr "ورود به بازی"
 
 #. Please enter password label
 #: Client/core/ServerBrowser/CServerInfo.cpp:166
 msgid "Please enter the password to the server:"
-msgstr "Щ„Ш·ЩЃШ§ ЪЇШ°Ш±Щ€Ш§ЪЩ‡ Щ€Ш±Щ€ШЇ ШЁЩ‡ ШіШ±Щ€Ш± Ш±Ш§ Щ€Ш§Ш±ШЇ Щ†Щ…Ш§ЫЊЫЊШЇ:"
+msgstr "لطفا گذرواژه ورود به سرور را وارد نمایید:"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
-msgstr "Щ€Ш±Щ€ШЇ ШЁЩ‡ ШіШ±Щ€Ш± ШЇШ± Ш§Щ€Щ„ЫЊЩ† Щ…Щ€Щ‚Ш№ЫЊШЄЫЊ Ъ©Щ‡ ШіШ±Щ€Ш± Ш¬Ш§ЫЊ Ш®Ш§Щ„ЫЊ ШЇШ§ШґШЄ."
+msgstr "ورود به سرور در اولین موقعیتی که سرور جای خالی داشت."
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
-msgstr "Щ„Ш·ЩЃШ§ ЪЇШ°Ш±Щ€Ш§ЪЩ‡ ШіШ±Щ€Ш± Ш±Ш§ Щ€Ш§Ш±ШЇ Щ†Щ…Ш§ЫЊЫЊШЇ"
+msgstr "لطفا گذرواژه سرور را وارد نمایید"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:479
 msgid "Timed Out"
-msgstr "ШЄШ§ЫЊЩ… Ш§Щ€ШЄ ШґШЇ"
+msgstr "تایم اوت شد"
 
 #. Set every GUI elements text to blank
 #: Client/core/ServerBrowser/CServerInfo.cpp:515
 msgid "Querying..."
-msgstr "ШЇШ±ЫЊШ§ЩЃШЄ Ш§Ш·Щ„Ш§Ш№Ш§ШЄ..."
+msgstr "دریافت اطلاعات..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:189
 msgid "SERVER BROWSER"
-msgstr "ШіШ±Щ€Ш±Щ‡Ш§"
+msgstr "سرورها"
 
 #. Create the tabs
 #: Client/core/ServerBrowser/CServerBrowser.cpp:237
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:90
 msgid "Internet"
-msgstr "Ш§ЫЊЩ†ШЄШ±Щ†ШЄ"
+msgstr "اینترنت"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:238
 msgid "Local"
-msgstr "Щ…Ш­Щ„ЫЊ"
+msgstr "محلی"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:239
 msgid "Favourites"
-msgstr "Щ…Щ€Ш±ШЇ Ш№Щ„Ш§Щ‚Щ‡ Щ‡Ш§"
+msgstr "مورد علاقه ها"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:240
 msgid "Recent"
-msgstr "Ш§Ш®ЫЊШ±"
+msgstr "اخیر"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:309
 msgid "FOR QUICK CONNECT:\n\n"
 "Type the address and port into the address bar.\n"
 "Or select a server from the history list and press 'Connect'"
-msgstr "ШЁШ±Ш§ЫЊ Ш§ШЄШµШ§Щ„ ШіШ±ЫЊШ№\n\n"
-"ШўШЇШ±Ші Щ€ ЩѕЩ€Ш±ШЄ Ш±Ш§ Щ€Ш§Ш±ШЇ Щ†Щ…Ш§ЫЊЫЊШЇ.\n"
-"ЫЊШ§ ШіШ±Щ€Ш± Щ…Щ€Ш±ШЇ Щ†ШёШ± Ш±Ш§ Ш§ШІ Щ„ЫЊШіШЄ ШіЩ€Ш§ШЁЩ‚ Ш§Щ†ШЄШ­Ш§ШЁ Щ†Щ…Щ€ШЇЩ‡ Щ€ 'Ш§ШЄШµШ§Щ„' Ш±Ш§ ЩЃШґШ§Ш± ШЇЩ‡ЫЊШЇ."
+msgstr "برای اتصال سریع\n\n"
+"آدرس و پورت را وارد نمایید.\n"
+"یا سرور مورد نظر را از لیست سوابق انتحاب نموده و 'اتصال' را فشار دهید."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:321
 msgid "HELP"
-msgstr "Ъ©Щ…Ъ©"
+msgstr "کمک"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:371
 msgid "Refresh"
-msgstr "ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ Щ…Ш¬ШЇШЇ"
+msgstr "بارگذاری مجدد"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:372
 msgid "Add Favorite"
-msgstr "Ш§Ш¶Ш§ЩЃЩ‡ ШЁЩ‡ Щ…Щ€Ш±ШЇ Ш№Щ„Ш§Щ‚Щ‡ Щ‡Ш§"
+msgstr "اضافه به مورد علاقه ها"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:373
 #: Client/core/ServerBrowser/CServerBrowser.cpp:457
 #: Client/core/ServerBrowser/CServerBrowser.cpp:528
 msgid "Connect"
-msgstr "Ш§ШЄШµШ§Щ„"
+msgstr "اتصال"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:374
 msgid "Server information"
-msgstr "Ш§Ш·Щ„Ш§Ш№Ш§ШЄ ШіШ±Щ€Ш±"
+msgstr "اطلاعات سرور"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:375
 msgid "Search servers"
-msgstr "Ш¬ШіШЄШ¬Щ€ЫЊ ШіШ±Щ€Ш±Щ‡Ш§"
+msgstr "جستجوی سرورها"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:376
 msgid "Search players"
-msgstr "Ш¬ШіШЄШ¬Щ€ЫЊ ШЁШ§ШІЫЊЪ©Щ†Ш§Щ†"
+msgstr "جستجوی بازیکنان"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:377
 msgid "Start search"
-msgstr "ШґШ±Щ€Ш№ Ш¬ШіШЄШ¬Щ€"
+msgstr "شروع جستجو"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:378
@@ -2714,740 +2713,740 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2086
 msgid "Search players..."
-msgstr "Ш¬ШіШЄШ¬Щ€ЫЊ ШЁШ§ШІЫЊЪ©Щ†Ш§Щ†..."
+msgstr "جستجوی بازیکنان..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:578
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2084
 msgid "Search servers..."
-msgstr "Ш¬ШіШЄШ¬Щ€ЫЊ ШіШ±Щ€Ш±Щ‡Ш§..."
+msgstr "جستجوی سرورها..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:610
 msgid "Name"
-msgstr "Щ†Ш§Щ…"
+msgstr "نام"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:611
 msgid "Players"
-msgstr "ШЁШ§ШІЫЊЪ©Щ†Ш§Щ†"
+msgstr "بازیکنان"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:612
 msgid "Ping"
-msgstr "ЩѕЫЊЩ†ЪЇ"
+msgstr "پینگ"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:613
 msgid "Gamemode"
-msgstr "ЪЇЫЊЩ… Щ…Щ€ШЇ"
+msgstr "گیم مود"
 
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:647
 msgid "Include:"
-msgstr "ШґШ§Щ…Щ„:"
+msgstr "شامل:"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:653
 msgid "Empty"
-msgstr "Ш®Ш§Щ„ЫЊ"
+msgstr "خالی"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:659
 msgid "Full"
-msgstr "ЩѕШ±"
+msgstr "پر"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:665
 msgid "Locked"
-msgstr "Щ‚ЩЃЩ„ ШґШЇЩ‡"
+msgstr "قفل شده"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:677
 msgid "Offline"
-msgstr "ШўЩЃЩ„Ш§ЫЊЩ†"
+msgstr "آفلاین"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:690
 msgid "Other Versions"
-msgstr "Щ†ШіШ®Щ‡ Щ‡Ш§ЫЊ ШЇЫЊЪЇШ±"
+msgstr "نسخه های دیگر"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:711
 msgid "Back"
-msgstr "ШЁШ§ШІЪЇШґШЄ"
+msgstr "بازگشت"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1012
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1026
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1718
 msgid "Loading..."
-msgstr "ШЇШ±Ш­Ш§Щ„ ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ..."
+msgstr "درحال بارگذاری..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1563
 #: Client/core/ServerBrowser/CServerBrowser.cpp:3039
 msgid "  ..loading.."
-msgstr "..ШЇШ±Ш­Ш§Щ„ ШЁШ§Ш±ЪЇШ°Ш§Ш±ЫЊ.."
+msgstr "..درحال بارگذاری.."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1601
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1758
 msgid "No address specified!"
-msgstr "Щ‡ЫЊЪ† ШўШЇШ±ШіЫЊ Щ€Ш§Ш±ШЇ Щ†ШґШЇЩ‡ Ш§ШіШЄ!"
+msgstr "هیچ آدرسی وارد نشده است!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1614
 msgid "Unknown protocol"
-msgstr "ЩѕШ±Щ€ШЄЩ€Ъ©Щ„ Щ†Ш§ШґЩ†Ш§Ш®ШЄЩ‡"
+msgstr "پروتوکل ناشناخته"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1614
 msgid "Please use the mtasa:// protocol!"
-msgstr "Щ„Ш·ЩЃШ§ Ш§ШІ ЩѕШ±Щ€ШЄЩ€Ъ©Щ„ mtasa:// Ш§ШіШЄЩЃШ§ШЇЩ‡ Щ†Щ…Ш§ЫЊЫЊШЇ!"
+msgstr "لطفا از پروتوکل mtasa:// استفاده نمایید!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1623
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1682
 #: Client/mods/deathmatch/logic/CClientGame.cpp:673
 #: Client/mods/deathmatch/logic/CClientGame.cpp:765
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Щ†Ш§Щ… Щ…ШіШЄШ№Ш§Ш± Щ†Ш§ШЇШ±ШіШЄ! Щ„Ш·ЩЃШ§ ШЁЩ‡ ШЄЩ†ШёЫЊЩ…Ш§ШЄ Ш±ЩЃШЄЩ‡ Щ€ Щ†Ш§Щ… Щ…ШіШЄШ№Ш§Ш± Ш¬ШЇЫЊШЇЫЊ Ш«ШЁШЄ Щ†Щ…Ш§ЫЊЫЊШЇ!"
+msgstr "نام مستعار نادرست! لطفا به تنظیمات رفته و نام مستعار جدیدی ثبت نمایید!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1708
 msgid "You have to select a server to connect to."
-msgstr "ШЁШ±Ш§ЫЊ Ш§ШЄШµШ§Щ„ ШіШ±Щ€Ш±ЫЊ Ш±Ш§ Ш§Щ†ШЄШ®Ш§ШЁ Щ†Щ…Ш§ЫЊЫЊШЇ."
+msgstr "برای اتصال سروری را انتخاب نمایید."
 
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:2225
 msgid "Problem with graphics driver"
-msgstr "Щ…ШґЪ©Щ„ ШЁШ§ ШЇШ±Ш§ЫЊЩ€Ш± ЪЇШ±Ш§ЩЃЫЊЪ©"
+msgstr "مشکل با درایور گرافیک"
 
 #: Client/game_sa/CSettingsSA.cpp:832
 msgid "Can't find valid screen resolution."
-msgstr "Ш§Щ†ШЇШ§ШІЩ‡вЂЊЫЊ ШµЩЃШ­Щ‡ Щ…ШЄЩ†Ш§ШіШЁ ЩѕЫЊШЇШ§ Щ†ШґШЇ."
+msgstr "اندازه‌ی صفحه متناسب پیدا نشد."
 
 #. Confirm that res should be used
 #: Client/game_sa/CSettingsSA.cpp:908
 msgid "Are you sure you want to use this screen resolution?"
-msgstr "ШўЫЊШ§ Щ…Ш·Щ…Ш¦Щ†ЫЊШЇ Щ…ЫЊШ®Щ€Ш§Щ‡ЫЊШЇ Ш§ШІ Ш§ЫЊЩ† Ш§Щ†ШЇШ§ШІЩ‡вЂЊЫЊ ШµЩЃШ­Щ‡ Ш§ШіШЄЩЃШ§ШЇЩ‡ Ъ©Щ†ЫЊШЇШџ"
+msgstr "آیا مطمئنید میخواهید از این اندازه‌ی صفحه استفاده کنید؟"
 
 #: Client/game_sa/CGameSA.cpp:257 Client/game_sa/CGameSA.cpp:268
 msgid "Failed initialization game_sa"
-msgstr "Ш№ШЇЩ… Щ…Щ€ЩЃЩ‚ЫЊШЄ ШЇШ± Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ ШЁШ§ШІЫЊ game_sa"
+msgstr "عدم موفقیت در راه‌اندازی بازی game_sa"
 
 #: Client/game_sa/CGameSA.cpp:259
 msgid "Memory allocations failed"
-msgstr "Ш№ШЇЩ… Щ…Щ€ЩЃЩ‚ЫЊШЄ ШЇШ± Ш§Ш®ШЄШµШ§Шµ ШЇШ§ШЇЩ† Ш­Ш§ЩЃШёЩ‡"
+msgstr "عدم موفقیت در اختصاص دادن حافظه"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
-msgstr "ШЇШ±Ш®Щ€Ш§ШіШЄ Щ‡Ш§ЫЊ Щ€ШЁШіШ§ЫЊШЄвЂ«"
+msgstr "درخواست های وبسایت‫"
 
 #: Client/cefweb/CWebsiteRequests.cpp:27
 msgid "The server requests the following websites in order to load them (later):"
-msgstr "ШіШ±Щ€Ш± Щ€ШЁШіШ§ЫЊШЄ Щ‡Ш§ЫЊ ШІЫЊШ± Ш±Ш§ ШЁШ±Ш§ЫЊ Щ„Щ€ШЇ Ъ©Ш±ШЇЩ† ШЇШ±Ш®Щ€Ш§ШіШЄ Ъ©Ш±ШЇЩ‡ Ш§ШіШЄ (ШЁШ№ШЇШ§):"
+msgstr "سرور وبسایت های زیر را برای لود کردن درخواست کرده است (بعدا):"
 
 #: Client/cefweb/CWebsiteRequests.cpp:33
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "Ш¬Щ‡ШЄ Ш­ЩЃШё Ш§Ш·Щ„Ш§Ш№Ш§ШЄ Ш­ШіШ§Ші Ш®Щ€ШЇ Ш§ШІ ШЇШІШЇЫЊШЇЩ‡ ШґШЇЩ† ШЁЩ‡ Щ‡ЫЊЪ† Ш№Щ†Щ€Ш§Щ† ШўЩ† Щ‡Ш§ Ш±Ш§ Щ€Ш§Ш±ШЇ Щ†Щ†Щ…Ш§ЫЊШЇ"
+msgstr "جهت حفظ اطلاعات حساس خود از دزدیده شدن به هیچ عنوان آن ها را وارد ننماید"
 
 #: Client/cefweb/CWebsiteRequests.cpp:46
 msgid "Remember decision"
-msgstr "ШЁЫЊШ§ШЇ ШЁШіЩѕШ§Ш±"
+msgstr "بیاد بسپار"
 
 #: Client/cefweb/CWebsiteRequests.cpp:57
 msgid "Deny"
-msgstr "Ш±ШЇ Ъ©Щ†"
+msgstr "رد کن"
 
 #: Client/mods/deathmatch/CClient.cpp:38
 msgid "This version has expired."
-msgstr "Ш§ЫЊЩ† Щ†ШіШ®Щ‡ Щ…Щ†Щ‚Ш¶ЫЊ ШґШЇЩ‡ Ш§ШіШЄ."
+msgstr "این نسخه منقضی شده است."
 
 #: Client/mods/deathmatch/CClient.cpp:58
 msgid "disconnect from the game"
-msgstr "Ш§ШІ ШЁШ§ШІЫЊ Щ‚Ш·Ш№ Ш§ШЄШµШ§Щ„ Щ…ЫЊЪ©Щ†ШЇ"
+msgstr "از بازی قطع اتصال میکند"
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the nametags"
-msgstr "Щ†Щ…Ш§ЫЊШґ ШЁШ±Ш¬ШіШЁвЂЊЩ‡Ш§ЫЊ Щ†Ш§Щ…"
+msgstr "نمایش برجسب‌های نام"
 
 #: Client/mods/deathmatch/CClient.cpp:60
 msgid "shows the chatbox"
-msgstr "Щ…Ш­ШЇЩ€ШЇЩ‡ ЪЇЩЃШЄ Щ€ ЪЇЩ€ Ш±Ш§ Щ†ШґШ§Щ† Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "محدوده گفت و گو را نشان می دهد"
 
 #: Client/mods/deathmatch/CClient.cpp:61
 msgid "shows the network statistics"
-msgstr "Ш¬ШІЫЊЫЊШ§ШЄ ШґШЁЪ©Щ‡ Ш±Ш§ Щ†ШґШ§Щ† Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "جزییات شبکه را نشان می دهد"
 
 #. Key commands (registered as 'mod commands', can be disabled)
 #: Client/mods/deathmatch/CClient.cpp:64
 msgid "open the chat input"
-msgstr "Щ€Ш±Щ€ШЇЫЊ ЪЇЩЃШЄ Щ€ ЪЇЩ€ Ш±Ш§ ШЁШ§ШІ Щ…ЫЊЪ©Щ†ШЇ"
+msgstr "ورودی گفت و گو را باز میکند"
 
 #: Client/mods/deathmatch/CClient.cpp:65
 msgid "transmits voice to other players"
-msgstr "ШµШЇШ§ Ш±Ш§ ШЁЩ‡ ШЁШ§ШІЫЊЪ©Щ†Ш§Щ† ШЇЫЊЪЇШ± Щ…Щ†ШЄЩ‚Щ„ Щ…ЫЊ Ъ©Щ†ШЇ"
+msgstr "صدا را به بازیکنان دیگر منتقل می کند"
 
 #: Client/mods/deathmatch/CClient.cpp:66
 msgid "enters a car as passenger"
-msgstr "ШЁЩ‡ Ш№Щ†Щ€Ш§Щ† Щ…ШіШ§ЩЃШ± Щ€Ш§Ш±ШЇ Щ…Ш§ШґЫЊЩ† Щ…ЫЊ ШґЩ€ШЇ"
+msgstr "به عنوان مسافر وارد ماشین می شود"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "next radio channel"
-msgstr "Ъ©Ш§Щ†Ш§Щ„ Ш±Ш§ШЇЫЊЩ€ЫЊЫЊ ШЁШ№ШЇЫЊ"
+msgstr "کانال رادیویی بعدی"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "previous radio channel"
-msgstr "Ъ©Ш§Щ†Ш§Щ„ Ш±Ш§ШЇЫЊЩ€ЫЊЫЊ Щ‚ШЁЩ„ЫЊ"
+msgstr "کانال رادیویی قبلی"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "enables the player-map view"
-msgstr "ЩЃШ№Ш§Щ„ ШіШ§ШІЫЊ Щ†Щ…Ш§ЫЊШґ Щ†Щ‚ШґЩ‡ ШЁШ§ШІЫЊЪ©Щ†"
+msgstr "فعال سازی نمایش نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the player-map in"
-msgstr "ШЁШІШ±ЪЇ Щ†Щ…Ш§ЫЊЫЊ Щ†Щ‚ШґЩ‡ ШЁШ§ШІЫЊЪ©Щ†"
+msgstr "بزرگ نمایی نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "zooms the player-map out"
-msgstr "Ъ©Щ€Ъ†Ъ© Щ†Щ…Ш§ЫЊЫЊ Щ†Щ‚ШґЩ‡ ШЁШ§ШІЫЊЪ©Щ†"
+msgstr "کوچک نمایی نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map north"
-msgstr "Ш­Ш±Ъ©ШЄ Щ†Щ‚ШґЩ‡ ШЁШ§ШІЫЊЪ©Щ† ШЁЩ‡ ШіЩ…ШЄ ШґЩ…Ш§Щ„"
+msgstr "حرکت نقشه بازیکن به سمت شمال"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map south"
-msgstr "Ш­Ш±Ъ©ШЄ Щ†Щ‚ШґЩ‡ ШЁШ§ШІЫЊЪ©Щ† ШЁЩ‡ ШіЩ…ШЄ Ш¬Щ†Щ€ШЁ"
+msgstr "حرکت نقشه بازیکن به سمت جنوب"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the player-map east"
-msgstr "Ш­Ш±Ъ©ШЄ Щ†Щ‚ШґЩ‡ ШЁШ§ШІЫЊЪ©Щ† ШЁЩ‡ ШіЩ…ШЄ ШґШ±Щ‚"
+msgstr "حرکت نقشه بازیکن به سمت شرق"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "moves the player-map west"
-msgstr "Ш­Ш±Ъ©ШЄ Щ†Щ‚ШґЩ‡ ШЁШ§ШІЫЊЪ©Щ† ШЁЩ‡ ШіЩ…ШЄ ШєШ±ШЁ"
+msgstr "حرکت نقشه بازیکن به سمت غرب"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "attaches the player-map"
-msgstr "Щ…ШЄШµЩ„ Ъ©Ш±ШЇЩ† Щ†Щ‚ШґЩ‡ ШЁШ§ШІЫЊЪ©Щ†"
+msgstr "متصل کردن نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "reduces player-map opacity"
-msgstr "Ъ©Ш§Щ‡Шґ ШґЩЃШ§ЩЃЫЊШЄ Щ†Щ‚ШґЩ‡ ШЁШ§ШІЫЊЪ©Щ†"
+msgstr "کاهش شفافیت نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "increases player-map opacity"
-msgstr "Ш§ЩЃШІШ§ЫЊШґ ШґЩЃШ§ЩЃЫЊШЄ Щ†Щ‚ШґЩ‡ ШЁШ§ШІЫЊЪ©Щ†"
+msgstr "افزایش شفافیت نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:79
 msgid "toggles player-map help text"
-msgstr "ШЄШєЫЊЫЊШ± Щ€Ш¶Ш№ЫЊШЄ Щ…ШЄЩ† Ш±Ш§Щ‡Щ†Щ…Ш§ЫЊ Щ†Щ‚ШґЩ‡ ШЁШ§ШІЫЊЪ©Щ†"
+msgstr "تغییر وضعیت متن راهنمای نقشه بازیکن"
 
 #: Client/mods/deathmatch/CClient.cpp:80
 msgid "sends a message to the targetted player"
-msgstr "ЩѕЫЊШ§Щ…ЫЊ Ш±Ш§ ШЁЩ‡ ШЁШ§ШІЫЊЪ©Щ† Щ…Щ€Ш±ШЇ Щ†ШёШ± Ш§Ш±ШіШ§Щ„ Щ…ЫЊвЂЊЪ©Щ†ШЇ"
+msgstr "پیامی را به بازیکن مورد نظر ارسال می‌کند"
 
 #: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr "ШЇШ±Щ€Щ† Щ…Ш§ШґЫЊЩ† Ш§ШіЩ„Ш­Щ‡ Ш±Ш§ ШЁЩ‡ ШЁШ№ШЇЫЊ ШЄШєЫЊЫЊШ± Щ…ЫЊШЇЩ‡ШЇ"
+msgstr "درون ماشین اسلحه را به بعدی تغییر میدهد"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "ШЇШ±Щ€Щ† Щ…Ш§ШґЫЊЩ† Ш§ШіЩ„Ш­Щ‡ Ш±Ш§ ШЁЩ‡ Щ‚ШЁЩ„ЫЊ ШЄШєЫЊЫЊШ± Щ…ЫЊШЇЩ‡ШЇ"
+msgstr "درون ماشین اسلحه را به قبلی تغییر میدهد"
 
 #: Client/mods/deathmatch/CClient.cpp:83
 msgid "outputs info about the current server"
-msgstr "Ш§Ш·Щ„Ш§Ш№Ш§ШЄ Щ…Ш±ШЁЩ€Ш· ШЁЩ‡ ШіШ±Щ€Ш± ЩЃШ№Щ„ЫЊ Ш±Ш§ Ш®Ш±Щ€Ш¬ЫЊ Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "اطلاعات مربوط به سرور فعلی را خروجی می دهد"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:86
 msgid "defines the scale multiplier of all text-displays"
-msgstr "Щ…Щ‚ЫЊШ§Ші ШЄЩ…Ш§Щ… Щ†Щ…Ш§ЫЊШґЪЇШ±Щ‡Ш§ЫЊ Щ…ШЄЩ†ЫЊ Ш±Ш§ ШЄШ№Ш±ЫЊЩЃ Щ…ЫЊвЂЊЪ©Щ†ШЇ"
+msgstr "مقیاس تمام نمایشگرهای متنی را تعریف می‌کند"
 
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) shows the colshapes"
-msgstr "(Ш­Ш§Щ„ШЄ ШЁШ±Щ†Ш§Щ…Щ‡вЂЊЩ†Щ€ЫЊШі) ШЄЩ…Ш§Щ… colshape Щ‡Ш§ Ш±Ш§ Щ‚Ш§ШЁЩ„ Щ…ШґШ§Щ‡ШЇЩ‡ Щ…ЫЊЪ©Щ†ШЇ"
+msgstr "(حالت برنامه‌نویس) تمام colshape ها را قابل مشاهده میکند"
 
 #: Client/mods/deathmatch/CClient.cpp:94
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Ш­Ш§Щ„ШЄ ШЁШ±Щ†Ш§Щ…Щ‡вЂЊЩ†Щ€ЫЊШі) ШґЩ†Ш§ШіЩ‡ Щ‡Ш§ЫЊ ШµШЇШ§ЫЊ Щ…Ш­ЫЊШ· Ш±Ш§ ШЇШ± ЩѕЩ†Ш¬Ш±Щ‡ Ш§ШґЪ©Ш§Щ„ ШІШЇШ§ЫЊЫЊ Ъ†Ш§Щѕ Щ…ЫЊ Ъ©Щ†ШЇ"
+msgstr "(حالت برنامه‌نویس) شناسه های صدای محیط را در پنجره اشکال زدایی چاپ می کند"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
-msgstr "Щ…ЫЊШІШЁШ§Щ†ЫЊ ШЁШ§ШІЫЊ"
+msgstr "میزبانی بازی"
 
 #. m_pTabs->CreateTab ( "Gamemode" );
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:53
 msgid "Resources"
-msgstr "Щ…Щ†Ш§ШЁШ№"
+msgstr "منابع"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:55
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:57
 msgid "Server name:"
-msgstr "Щ†Ш§Щ… ШіШ±Щ€Ш±:"
+msgstr "نام سرور:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:64
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:66
 msgid "Password:"
-msgstr "ЪЇШ°Ш±Щ€Ш§ЪЩ‡:"
+msgstr "گذرواژه:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:73
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:75
 msgid "Max players:"
-msgstr "Ш­ШЇШ§Ъ©Ш«Ш± ШЁШ§ШІЫЊЪ©Щ†Ш§Щ†:"
+msgstr "حداکثر بازیکنان:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:82
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:84
 msgid "Broadcast:"
-msgstr "Ш§Ш±Ш§Ш¦Щ‡:"
+msgstr "ارائه:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:86
 msgid "LAN"
-msgstr "ШґШЁЪ©Щ‡ Ш®Ш§Щ†ЪЇЫЊ"
+msgstr "شبکه خانگی"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:99
 msgid "Selected"
-msgstr "Ш§Щ†ШЄШ®Ш§ШЁ ШґШЇЩ‡"
+msgstr "انتخاب شده"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:116
 msgid "All"
-msgstr "Щ‡Щ…Щ‡"
+msgstr "همه"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:118
 msgid "Start"
-msgstr "ШґШ±Щ€Ш№"
+msgstr "شروع"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
 msgid "Change mode: %s"
-msgstr "ШЄШєЫЊЫЊШ±ШЇ Ш­Ш§Щ„ШЄ: %s"
+msgstr "تغییرد حالت: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr "ШЁШІШ±ЪЇЩ†Щ…Ш§ЫЊЫЊ: %s/%s Ш­Ш±Ъ©ШЄ: %sШЊ %sШЊ %sШЊ %s Ъ©ШЇЩ€Ш±ШЄ: %s/%s"
+msgstr "بزرگنمایی: %s/%s حرکت: %s، %s، %s، %s کدورت: %s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr "ШЄШєЫЊЫЊШ± Щ†Щ‚ШґЩ‡: %s     ШЄШєЫЊЫЊШ± Щ…ШЄЩ† Ш±Ш§Щ‡Щ†Щ…Ш§: %s"
+msgstr "تغییر نقشه: %s     تغییر متن راهنما: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
 msgid "Following Player"
-msgstr "ШЇЩ†ШЁШ§Щ„ Ъ©Ш±ШЇЩ† ШЁШ§ШІЫЊЪ©Щ†"
+msgstr "دنبال کردن بازیکن"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
-msgstr "Ш­Ш±Ъ©ШЄ ШўШІШ§ШЇ"
+msgstr "حرکت آزاد"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
-msgstr "ЩѕЫЊШґШ±ЩЃШЄ ШЇШ§Щ†Щ„Щ€ШЇ Щ†Щ‚ШґЩ‡:"
+msgstr "پیشرفت دانلود نقشه:"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:28
 msgid "Download Progress:"
-msgstr "ЩѕЫЊШґШ±Щ€ЫЊ ШЇШ§Щ†Щ„Щ€ШЇ:"
+msgstr "پیشروی دانلود:"
 
 #. Find our largest piece of text, so we can size accordingly
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:42
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:105
 #, c-format
 msgid "%s of %s"
-msgstr "%s Ш§ШІ %s"
+msgstr "%s از %s"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:44
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:65
 msgid "Disconnect to cancel download"
-msgstr "ШЁШ±Ш§ЫЊ Щ„ШєЩ€ ШЇШ§Щ†Щ„Щ€ШЇШЊ Ш§ШЄШµШ§Щ„ Ш±Ш§ Щ‚Ш·Ш№ Ъ©Щ†ЫЊШЇ"
+msgstr "برای لغو دانلود، اتصال را قطع کنید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:503
 msgid "Disconnected: Invalid nickname"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: Щ†Ш§Щ… Щ…ШіШЄШ№Ш§Ш± Щ†Ш§Щ…Ш№ШЄШЁШ±"
+msgstr "اتصال قطع شد: نام مستعار نامعتبر"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
 msgid "Disconnect from server"
-msgstr "Щ‚Ш·Ш№ Ш§Ш±ШЄШЁШ§Ш· Ш§ШІ ШіШ±Щ€Ш±"
+msgstr "قطع ارتباط از سرور"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:511
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: ШіШ±ЫЊШ§Щ„ ШґЩ…Ш§ Щ…Ш­Ш±Щ€Щ… ШґШЇЩ‡ Ш§ШіШЄ.\n"
-"ШЇЩ„ЫЊЩ„: %s"
+msgstr "اتصال قطع شد: سریال شما محروم شده است.\n"
+"دلیل: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: ШґЩ…Ш§ Щ…Ш­Ш±Щ€Щ… ШґШЇЩ‡ Ш§ЫЊШЇ.\n"
-"ШЇЩ„ЫЊЩ„:%s"
+msgstr "اتصال قطع شد: شما محروم شده اید.\n"
+"دلیل:%s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:523
 #, c-format
 msgid "Disconnected: Account is banned.\n"
 "Reason: %s"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: Ш­ШіШ§ШЁ ШґЩ…Ш§ Щ…Ш­Ш±Щ€Щ… ШґШЇЩ‡ Ш§ШіШЄ.\n"
-"ШЇЩ„ЫЊЩ„: %s"
+msgstr "اتصال قطع شد: حساب شما محروم شده است.\n"
+"دلیل: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:528
 msgid "Disconnected: Version mismatch"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: Ш№ШЇЩ… ШЄШ·Ш§ШЁЩ‚ Щ†ШіШ®Щ‡"
+msgstr "اتصال قطع شد: عدم تطابق نسخه"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: Щ„Ш·ЩЃШ§Щ‹ ЫЊЪ© ШЇЩ‚ЫЊЩ‚Щ‡ ШµШЁШ± Ъ©Щ†ЫЊШЇШЊ ШіЩѕШі ШіШ№ЫЊ Ъ©Щ†ЫЊШЇ Ъ©Щ‡ ШЇЩ€ШЁШ§Ш±Щ‡ Щ…ШЄШµЩ„ ШґЩ€ЫЊШЇ."
+msgstr "اتصال قطع شد: لطفاً یک دقیقه صبر کنید، سپس سعی کنید که دوباره متصل شوید."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:536
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: ШіШ±Щ€Ш± Ш§ШІ ШґШ§Ш®Щ‡ Щ‡Ш§ЫЊ Щ…Ш®ШЄЩ„ЩЃ.\n"
-"Ш§Ш·Щ„Ш§Ш№Ш§ШЄ: %s"
+msgstr "اتصال قطع شد: سرور از شاخه های مختلف.\n"
+"اطلاعات: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: Щ†ШіШ®Щ‡ ШЁШЇ.\n"
-"Ш§Ш·Щ„Ш§Ш№Ш§ШЄ: %s"
+msgstr "اتصال قطع شد: نسخه بد.\n"
+"اطلاعات: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:546
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: ШіШ±Щ€Ш± ШЇШ± Ш­Ш§Щ„ Ш§Ш¬Ш±Ш§ЫЊ ЫЊЪ© Щ†ШіШ®Щ‡ Ш¬ШЇЫЊШЇШЄШ± Ш§ШіШЄ.\n"
-"Ш§Ш·Щ„Ш§Ш№Ш§ШЄ: %s"
+msgstr "اتصال قطع شد: سرور در حال اجرای یک نسخه جدیدتر است.\n"
+"اطلاعات: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:551
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: ШіШ±Щ€Ш± ШЇШ± Ш­Ш§Щ„ Ш§Ш¬Ш±Ш§ЫЊ ЫЊЪ© Щ†ШіШ®Щ‡ Щ‚ШЇЫЊЩ…ЫЊ ШЄШ± Ш§ШіШЄ.\n"
-"Ш§Ш·Щ„Ш§Ш№Ш§ШЄ: %s"
+msgstr "اتصال قطع شد: سرور در حال اجرای یک نسخه قدیمی تر است.\n"
+"اطلاعات: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:556
 msgid "Disconnected: Nick already in use"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: Ш§ЫЊЩ† Ш§ШіЩ… ШЇШ± Ш­Ш§Щ„ Ш­Ш§Ш¶Ш± ШЇШ± Ш­Ш§Щ„ Ш§ШіШЄЩЃШ§ШЇЩ‡ Щ…ЫЊШЁШ§ШґШЇ"
+msgstr "اتصال قطع شد: این اسم در حال حاضر در حال استفاده میباشد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:560
 msgid "Disconnected: Player element could not be created."
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: Ш№Щ†ШµШ± (Element) ШЁШ§ШІЫЊЪ©Щ† ШіШ§Ш®ШЄЩ‡ Щ†ШґШЇ."
+msgstr "اتصال قطع شد: عنصر (Element) بازیکن ساخته نشد."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:564
 #, c-format
 msgid "Disconnected: Server refused the connection: %s"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: ШіШ±Щ€Ш± Ш§ШЄШµШ§Щ„ Ш±Ш§ Ш±ШЇ Ъ©Ш±ШЇ: %s"
+msgstr "اتصال قطع شد: سرور اتصال را رد کرد: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:569
 msgid "Disconnected: Serial verification failed"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: ШЄШЈЫЊЫЊШЇ ШіШ±ЫЊШ§Щ„ Щ†Ш§Щ…Щ€ЩЃЩ‚ ШЁЩ€ШЇ"
+msgstr "اتصال قطع شد: تأیید سریال ناموفق بود"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:573
 msgid "Disconnected: Serial already in use"
-msgstr "Щ‚Ш·Ш№ Ш§Ш±ШЄШЁШ§Ш·: ШіШ±ЫЊШ§Щ„ Ш§ШІ Щ‚ШЁЩ„ ШЇШ± Ш­Ш§Щ„ Ш§ШіШЄЩЃШ§ШЇЩ‡ Ш§ШіШЄ"
+msgstr "قطع ارتباط: سریال از قبل در حال استفاده است"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:577
 #, c-format
 msgid "Disconnected: Connection desync %s"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: Ш№ШЇЩ… Щ‡Щ…ЪЇШ§Щ… ШіШ§ШІЫЊ Ш§ШЄШµШ§Щ„ %s"
+msgstr "اتصال قطع شد: عدم همگام سازی اتصال %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:586
 #, c-format
 msgid "Disconnected: You were kicked by %s"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: ШґЩ…Ш§ ШЄЩ€ШіШ· %s Ш§ШІ ШЁШ§ШІЫЊ Ш§Ш®Ш±Ш§Ш¬ ШґШЇЫЊШЇ"
+msgstr "اتصال قطع شد: شما توسط %s از بازی اخراج شدید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:591
 #, c-format
 msgid "Disconnected: You were banned by %s"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: ШґЩ…Ш§ ШЄЩ€ШіШ· %s Щ…Ш­Ш±Щ€Щ… ШґШЇЫЊШЇ"
+msgstr "اتصال قطع شد: شما توسط %s محروم شدید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
 msgid "Disconnected: Server shutdown or restarting"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: ШіШ±Щ€Ш± Ш®Ш§Щ…Щ€Шґ ЫЊШ§ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Щ…Ш¬ШЇШЇ ШґШЇ"
+msgstr "اتصال قطع شد: سرور خاموش یا راه‌اندازی مجدد شد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
 msgid "You were kicked from the game"
-msgstr "ШґЩ…Ш§ Ш§ШІ ШЁШ§ШІЫЊ Ш§Ш®Ш±Ш§Ш¬ ШґШЇЫЊШЇ"
+msgstr "شما از بازی اخراج شدید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "Ш§ЫЊЩ† ШіШ±Щ€Ш± ШЁЩ‡ ЫЊЪ© gta_sa.exe ШЄШєЫЊЫЊШ± ЫЊШ§ЩЃШЄЩ‡ Щ†ШґШЇЩ‡ Щ†ЫЊШ§ШІ ШЇШ§Ш±ШЇ"
+msgstr "این سرور به یک gta_sa.exe تغییر یافته نشده نیاز دارد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
 msgid "Please replace gta_sa.exe"
-msgstr "Щ„Ш·ЩЃШ§ gta_sa.exe Ш±Ш§ Ш¬Ш§ЫЊЪЇШІЫЊЩ† Ъ©Щ†ЫЊШЇ"
+msgstr "لطفا gta_sa.exe را جایگزین کنید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr "Ш§ЫЊЩ† ШіШ±Щ€Ш± ШЁЩ‡ D3D9.DLL Щ‡Ш§ЫЊ ШіЩЃШ§Ш±ШґЫЊ Ш§Ш¬Ш§ШІЩ‡ Щ€Ш±Щ€ШЇ Щ†Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "این سرور به D3D9.DLL های سفارشی اجازه ورود نمی دهد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "D3D9.DLL Ш±Ш§ Ш§ШІ Щ…Ш­Щ„ Щ†ШµШЁ GTA Ш®Щ€ШЇ Ш­Ш°ЩЃ Ъ©Ш±ШЇЩ‡ Щ€ MTA Ш±Ш§ Щ…Ш¬ШЇШЇШ§ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Ъ©Щ†ЫЊШЇ"
+msgstr "D3D9.DLL را از محل نصب GTA خود حذف کرده و MTA را مجددا راه‌اندازی کنید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
 msgid "This server does not allow virtual machines"
-msgstr "Ш§ЫЊЩ† ШіШ±Щ€Ш± ШЁЩ‡ Щ…Ш§ШґЫЊЩ† Щ‡Ш§ЫЊ Щ…Ш¬Ш§ШІЫЊ Ш§Ш¬Ш§ШІЩ‡ Щ€Ш±Щ€ШЇ Щ†Щ…ЫЊ ШЇЩ‡ШЇ"
+msgstr "این سرور به ماشین های مجازی اجازه ورود نمی دهد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server requires driver signing to be enabled"
-msgstr "ШЁШ±Ш§ЫЊ Щ€Ш±Щ€ШЇ ШЁЩ‡ Ш§ЫЊЩ† ШіШ±Щ€Ш± Щ†ЫЊШ§ШІ ШЁЩ‡ driver signing ШЇШ§Ш±ЫЊШЇ"
+msgstr "برای ورود به این سرور نیاز به driver signing دارید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 msgid "Please restart your PC"
-msgstr "Щ„Ш·ЩЃШ§ Ъ©Ш§Щ…ЩѕЫЊЩ€ШЄШ± Ш®Щ€ШЇ Ш±Ш§ Щ…Ш¬ШЇШЇШ§ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Ъ©Щ†ЫЊШЇ"
+msgstr "لطفا کامپیوتر خود را مجددا راه‌اندازی کنید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server has detected missing anti-cheat components"
-msgstr "ШіШ±Щ€Ш± ШЁШ±Ш±ШіЫЊ Ъ©Ш±ШЇ Щ€ Щ…ШЄЩ€Ш¬Щ‡ ШґШЇЩ‡ Ъ©Щ‡ ШЁШ№Ш¶ЫЊ Щ‚ШіЩ…ШЄвЂЊЩ‡Ш§ЫЊ Ш¶ШЇ ШЄЩ‚Щ„ШЁ (Anti-Cheat) Щ€Ш¬Щ€ШЇ Щ†ШЇШ§Ш±Щ†ШЇ"
+msgstr "سرور بررسی کرد و متوجه شده که بعضی قسمت‌های ضد تقلب (Anti-Cheat) وجود ندارند"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Try restarting MTA"
-msgstr "MTA Ш±Ш§ ШЇЩ€ШЁШ§Ш±Щ‡ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Ъ©Щ†ЫЊШЇ"
+msgstr "MTA را دوباره راه‌اندازی کنید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "Ш§ЫЊЩ† ШіШ±Щ€Ш± ШЁЩ‡ gta3.img Щ€ gta_int.img ШЄШєЫЊЫЊШ± ЫЊШ§ЩЃШЄЩ‡ Щ†ШґШЇЩ‡ Щ†ЫЊШ§ШІ ШЇШ§Ш±ШЇ"
+msgstr "این سرور به gta3.img و gta_int.img تغییر یافته نشده نیاز دارد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
 msgid "Please replace gta3.img or gta_int.img"
-msgstr "Щ„Ш·ЩЃШ§Щ‹ gta3.img ЫЊШ§ gta_int.img Ш±Ш§ Ш¬Ш§ЫЊЪЇШІЫЊЩ† Ъ©Щ†ЫЊШЇ"
+msgstr "لطفاً gta3.img یا gta_int.img را جایگزین کنید"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:636
 msgid "This server does not allow Wine"
-msgstr "Ш§ЫЊЩ† ШіШ±Щ€Ш± Ш§Ш¬Ш§ШІЩ‡ Щ€Ш±Щ€ШЇ Ш§ЩЃШ±Ш§ШЇ ШЄЩ€ШіШ· ШЁШ±Щ†Ш§Щ…Щ‡ Wine Ш±Ш§ Щ†Щ…ЫЊШЇЩ‡ШЇ"
+msgstr "این سرور اجازه ورود افراد توسط برنامه Wine را نمیدهد"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:637
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr "Ш§Ш·Щ…ЫЊЩ†Ш§Щ† Ш­Ш§ШµЩ„ Ъ©Щ†ЫЊШЇ Ъ©Щ‡ Щ‡ЫЊЪ† ШЁШ±Щ†Ш§Щ…Щ‡Щ” ШЇЫЊЪЇШ±ЫЊ ШЇШ± Ш­Ш§Щ„ ШЄШєЫЊЫЊШ± MTA: SA Щ†ЫЊШіШЄ"
+msgstr "اطمینان حاصل کنید که هیچ برنامهٔ دیگری در حال تغییر MTA: SA نیست"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
 msgid "Time Remaining: "
-msgstr "ШІЩ…Ш§Щ† ШЁШ§Щ‚ЫЊ Щ…Ш§Щ†ШЇЩ‡: "
+msgstr "زمان باقی مانده: "
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
 #, c-format
 msgid "%d day"
 msgid_plural "%d days"
-msgstr[0] "%d Ш±Щ€ШІ"
-msgstr[1] "Ш±Щ€ШІЩ‡Ш§ %d"
+msgstr[0] "%d روز"
+msgstr[1] "روزها %d"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:663
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] "%d ШіШ§Ш№ШЄ"
-msgstr[1] "%d ШіШ§Ш№ШЄ Щ‡Ш§"
+msgstr[0] "%d ساعت"
+msgstr[1] "%d ساعت ها"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:665
 #, c-format
 msgid "%d minute"
 msgid_plural "%d minutes"
-msgstr[0] "%d ШЇЩ‚ЫЊЩ‚Щ‡"
-msgstr[1] "%d ШЇЩ‚ЫЊЩ‚Щ‡ Щ‡Ш§"
+msgstr[0] "%d دقیقه"
+msgstr[1] "%d دقیقه ها"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:667
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] "%d Ш«Ш§Щ†ЫЊЩ‡"
-msgstr[1] "%d Ш«Ш§Щ†ЫЊЩ‡ Щ‡Ш§"
+msgstr[0] "%d ثانیه"
+msgstr[1] "%d ثانیه ها"
 
 #. Display the error
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:671
 msgid "Disconnected"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ"
+msgstr "اتصال قطع شد"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Flying a UFO around"
-msgstr "ЩѕШ±Щ€Ш§ШІ ЫЊЪ© ШЁШґЩ‚Ш§ШЁ ЩѕШ±Щ†ШЇЩ‡ ШЇШ± Ш§Ш·Ш±Ш§ЩЃ"
+msgstr "پرواز یک بشقاب پرنده در اطراف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Cruising around"
-msgstr "ЪЇШґШЄ Щ€ ЪЇШ°Ш§Ш± ШЇШ± Ш§Ш·Ш±Ш§ЩЃ"
+msgstr "گشت و گذار در اطراف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Riding the waves of"
-msgstr "Щ…Щ€Ш¬ ШіЩ€Ш§Ш±ЫЊ"
+msgstr "موج سواری"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Riding the train in"
-msgstr "ШіЩ€Ш§Ш± Щ‚Ш·Ш§Ш± ШЇШ±"
+msgstr "سوار قطار در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Flying around"
-msgstr "ЩѕШ±Щ€Ш§ШІ ШЇШ± Ш§Ш·Ш±Ш§ЩЃ"
+msgstr "پرواز در اطراف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Riding around"
-msgstr "Ш±Ш§Щ†ШЇЩ† ШЇШ± Ш§Ш·Ш±Ш§ЩЃ"
+msgstr "راندن در اطراف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Monster truckin' around"
-msgstr "Ъ©Ш§Щ…ЫЊЩ€Щ† Щ‡ЫЊЩ€Щ„Ш§ ШЇШ± Ш§Ш·Ш±Ш§ЩЃ"
+msgstr "کامیون هیولا در اطراف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Quaddin' around"
-msgstr "Ъ©Щ€ШўШЇ ШіЩ€Ш§Ш±ЫЊ ШЇШ± Ш§Ш·Ш±Ш§ЩЃ"
+msgstr "کوآد سواری در اطراف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Bunny hopping around"
-msgstr "ЩѕШ±ЫЊШЇЩ† ШЁЩ‡ Ш§Ш·Ш±Ш§ЩЃ"
+msgstr "پریدن به اطراف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:390
 msgid "Doing weird stuff in"
-msgstr "Ш§Щ†Ш¬Ш§Щ… Ъ©Ш§Ш±Щ‡Ш§ЫЊ Ш№Ш¬ЫЊШЁ Щ€ ШєШ±ЫЊШЁ ШЇШ±"
+msgstr "انجام کارهای عجیب و غریب در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Climbing around in"
-msgstr "ШЁШ§Щ„Ш§ Ш±ЩЃШЄЩ† Ш§ШІ Ш§Ш·Ш±Ш§ЩЃ"
+msgstr "بالا رفتن از اطراف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:396
 #: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Doing a drive-by in"
-msgstr "ШґЩ„ЫЊЪ© Ш§ШІ ШЇШ§Ш®Щ„ Щ…Ш§ШґЫЊЩ† ШЇШ±"
+msgstr "شلیک از داخل ماشین در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Blub blub..."
-msgstr "Ш­ШЁШ§ШЁ Ш­ШЁШ§ШЁ..."
+msgstr "حباب حباب..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Breathing water"
-msgstr "ШЄЩ†ЩЃШі ШўШЁЫЊ"
+msgstr "تنفس آبی"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Drowning in"
-msgstr "ШєШ±Щ‚ ШґШЇЩ† ШЇШ±"
+msgstr "غرق شدن در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:401
 msgid "Ducking for cover in"
-msgstr "Ш®Щ… ШґШЇЩ† ШЁШ±Ш§ЫЊ ЩѕЩ†Ш§Щ‡ ЪЇШ±ЩЃШЄЩ† ШЇШ±"
+msgstr "خم شدن برای پناه گرفتن در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:402
 msgid "Fighting in"
-msgstr "Щ…ШЁШ§Ш±ШІЩ‡ Ъ©Ш±ШЇЩ† ШЇШ±"
+msgstr "مبارزه کردن در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:403
 msgid "Throwing fists in"
-msgstr "Ш­Щ…Щ„Щ‡ ШЁШ§ Щ…ШґШЄ ШЇШ±"
+msgstr "حمله با مشت در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:404
 msgid "Blastin' fools in"
-msgstr "Ш§Ш­Щ…Щ‚ Щ‡Ш§ЫЊ ШЁШ§Щ„ШіШЄЫЊЩ† ШЇШ±"
+msgstr "احمق های بالستین در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:405
 msgid "Shooting up"
-msgstr "ШЄЫЊШ±Ш§Щ†ШЇШ§ШІЫЊ Ъ©Ш±ШЇЩ†"
+msgstr "تیراندازی کردن"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:406
 msgid "Jetpacking in"
-msgstr "Ш¬ШЄ ЩѕЪ© ШіЩ€Ш§Ш±ЫЊ ШЇШ±"
+msgstr "جت پک سواری در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:407
 msgid "Literally on fire in"
-msgstr "ШЁЩ‡ Щ…Ш№Щ†Ш§ЫЊ Щ€Ш§Щ‚Ш№ЫЊ Ъ©Щ„Щ…Щ‡ ШЇШ±Ш­Ш§Щ„ ШіЩ€Ш®ШЄЩ†"
+msgstr "به معنای واقعی کلمه درحال سوختن"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:408
 msgid "Burning up in"
-msgstr "ШіЩ€Ш®ШЄЩ† ШЇШ±"
+msgstr "سوختن در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:409
 msgid "Swimming in"
-msgstr "ШґЩ†Ш§ ШЇШ±"
+msgstr "شنا در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:410
 msgid "Floating around in"
-msgstr "ШґЩ†Ш§Щ€Ш± ШЇШ± Ш§Ш·Ш±Ш§ЩЃ"
+msgstr "شناور در اطراف"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:411
 msgid "Being chased by a shark"
-msgstr "ШЄШ№Щ‚ЫЊШЁ ШґШЇЩ† ШЄЩ€ШіШ· Ъ©Щ€ШіЩ‡"
+msgstr "تعقیب شدن توسط کوسه"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:412
 msgid "Choking to death in"
-msgstr "Ш®ЩЃЪЇЫЊ ШЄШ§ Ш­ШЇ Щ…Ш±ЪЇ ШЇШ±"
+msgstr "خفگی تا حد مرگ در"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
 msgid "Entering the game ..."
-msgstr "ШЇШ± Ш­Ш§Щ„ Щ€Ш±Щ€ШЇ ШЁЩ‡ ШЁШ§ШІЫЊ ..."
+msgstr "در حال ورود به بازی ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:741
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Ш§ШЄШµШ§Щ„ ШЁШ±Щ‚Ш±Ш§Ш± Щ†ШґШЇШ› Щ„Ш·ЩЃШ§ Ш§ШІ Ш§ШЄШµШ§Щ„ ШіШ±ЫЊШ№ ЫЊШ§ ЩЃШ±Щ…Ш§Щ† 'connect' ШЁШ±Ш§ЫЊ Ш§ШЄШµШ§Щ„ ШЁЩ‡ ШіШ±Щ€Ш± Ш§ШіШЄЩЃШ§ШЇЩ‡ Ъ©Щ†ЫЊШЇ."
+msgstr "اتصال برقرار نشد؛ لطفا از اتصال سریع یا فرمان 'connect' برای اتصال به سرور استفاده کنید."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:787
 msgid "Could not start the local server. See console for details."
-msgstr "ШіШ±Щ€Ш± Щ…Ш­Щ„ЫЊ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ Щ†ШґШЇ. ШЁШ±Ш§ЫЊ Ш¬ШІШ¦ЫЊШ§ШЄ ШЁЫЊШґШЄШ± ШЁЩ‡ Ъ©Щ†ШіЩ€Щ„ Щ…Ш±Ш§Ш¬Ш№Щ‡ Ъ©Щ†ЫЊШЇ."
+msgstr "سرور محلی راه‌اندازی نشد. برای جزئیات بیشتر به کنسول مراجعه کنید."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:797
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1268
 msgid "Local Server"
-msgstr "ШіШ±Щ€Ш± Щ…Ш­Щ„ЫЊ"
+msgstr "سرور محلی"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:797
 msgid "Starting local server ..."
-msgstr "ШЇШ± Ш­Ш§Щ„ Ш±Ш§Щ‡вЂЊШ§Щ†ШЇШ§ШІЫЊ ШіШ±Щ€Ш± Щ…Ш­Щ„ЫЊ ..."
+msgstr "در حال راه‌اندازی سرور محلی ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1045
 msgid "Area 51"
-msgstr "Щ…Щ†Ш·Щ‚Щ‡ 51"
+msgstr "منطقه 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1054
 msgid "Walking around "
-msgstr "Щ‚ШЇЩ… ШІШЇЩ† ШЇШ± Ш§Ш·Ш±Ш§ЩЃ "
+msgstr "قدم زدن در اطراف "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1199
 #, c-format
 msgid "You were kicked from the game ( %s )"
-msgstr "ШґЩ…Ш§ Ш§ШІ ШЁШ§ШІЫЊ Ш§Ш®Ш±Ш§Ш¬ ШґШЇЫЊШЇ ( %s )"
+msgstr "شما از بازی اخراج شدید ( %s )"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1268
 msgid "Connecting to local server..."
-msgstr "ШЇШ± Ш­Ш§Щ„ Ш§ШЄШµШ§Щ„ ШЁЩ‡ ШіШ±Щ€Ш± Щ…Ш­Щ„ЫЊ..."
+msgstr "در حال اتصال به سرور محلی..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1279
 msgid "Error connecting to server."
-msgstr "Ш®Ш·Ш§ ШЇШ± Ш§ШЄШµШ§Щ„ ШЁЩ‡ ШіШ±Щ€Ш±."
+msgstr "خطا در اتصال به سرور."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1289
 msgid "Connecting to local server timed out. See console for details."
-msgstr "Щ…ШґЪ©Щ„ЫЊ ШЇШ± Ш§ШЄШµШ§Щ„ ШЁЩ‡ ШіШ±Щ€Ш± Щ…Ш­Щ„ЫЊ Щ€Ш¬Щ€ШЇ ШЇШ§ШґШЄ. ШЁШ±Ш§ЫЊ Ш¬ШІШ¦ЫЊШ§ШЄ ШЁЫЊШґШЄШ± ШЁЩ‡ Ъ©Щ†ШіЩ€Щ„ Щ…Ш±Ш§Ш¬Ш№Щ‡ Ъ©Щ†ЫЊШЇ."
+msgstr "مشکلی در اتصال به سرور محلی وجود داشت. برای جزئیات بیشتر به کنسول مراجعه کنید."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1395
 msgid "Connection with the server was lost"
-msgstr "Ш§Ш±ШЄШЁШ§Ш· ШЁШ§ ШіШ±Щ€Ш± Щ‚Ш·Ш№ ШґШЇ"
+msgstr "ارتباط با سرور قطع شد"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1422
 msgid "Disconnected: the server is currently full"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: ШіШ±Щ€Ш± ШЇШ± Ш­Ш§Щ„ Ш­Ш§Ш¶Ш± ЩѕШ± Ш§ШіШЄ"
+msgstr "اتصال قطع شد: سرور در حال حاضر پر است"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1434
 msgid "Disconnected: invalid password specified"
-msgstr "Ш§ШЄШµШ§Щ„ Щ‚Ш·Ш№ ШґШЇ: ЪЇШ°Ш±Щ€Ш§ЪЩ‡ Ш§ШґШЄШЁШ§Щ‡ Щ…ЫЊШЁШ§ШґШЇ"
+msgstr "اتصال قطع شد: گذرواژه اشتباه میباشد"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1456
 msgid "MTA Client verification failed!"
-msgstr "ШЁШ±Ш±ШіЫЊ MTA Client ШЁШ§ ШґЪ©ШіШЄ Щ…Щ€Ш§Ш¬Щ‡ ШґШЇ!"
+msgstr "بررسی MTA Client با شکست مواجه شد!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "In a ditch"
-msgstr "ШЄЩ€ЫЊ ЫЊЩ‡ ЪЇЩ€ШЇШ§Щ„"
+msgstr "توی یه گودال"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "En-route to hospital"
-msgstr "ШЇШ± Щ…ШіЫЊШ± ШЁЫЊЩ…Ш§Ш±ШіШЄШ§Щ†"
+msgstr "در مسیر بیمارستان"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "Meeting their maker"
-msgstr "Щ…Щ„Ш§Щ‚Ш§ШЄ ШЁШ§ Ш®Ш§Щ„Щ‚ШґШ§Щ†"
+msgstr "ملاقات با خالقشان"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "Regretting their decisions"
-msgstr "ЩѕШґЫЊЩ…Ш§Щ†ЫЊ Ш§ШІ ШЄШµЩ…ЫЊЩ…Ш§ШЄ"
+msgstr "پشیمانی از تصمیمات"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "Wasted"
-msgstr "Ш§ШІ ШЇШіШЄ Ш±ЩЃШЄЩ†"
+msgstr "از دست رفتن"
 
 #. Throw the error and disconnect
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
 #, c-format
 msgid "Download error: %s"
-msgstr "Ш®Ш·Ш§ЫЊ ШЇШ§Щ†Щ„Щ€ШЇ: %s"
+msgstr "خطای دانلود: %s"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr "Ш®Ш·Ш§ЫЊ Ш¬ШЇЫЊ (%u). ШЇШ± ШµЩ€Ш±ШЄ Ш­Щ„ Щ†ШґШЇЩ† Щ…ШґЪ©Щ„ШЊ ШЁШ±Ш§ЫЊ ШЇШ±ЫЊШ§ЩЃШЄ ЩѕШґШЄЫЊШЁШ§Щ†ЫЊ ШЁЩ‡ multitheftauto.com Щ…Ш±Ш§Ш¬Ш№Щ‡ Ъ©Щ†ЫЊШЇ."
+msgstr "خطای جدی (%u). در صورت حل نشدن مشکل، برای دریافت پشتیبانی به multitheftauto.com مراجعه کنید."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3456,19 +3455,19 @@ msgstr "Ш®Ш·Ш§ЫЊ Ш¬ШЇЫЊ (%u). ШЇШ± ШµЩ€Ш±ШЄ Ш­Щ„
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr "Ш®Ш·Ш§ЫЊ ЩѕШ±Щ€ШЄЪ©Щ„ (%u). ШЇШ± ШµЩ€Ш±ШЄ Ш­Щ„ Щ†ШґШЇЩ† Щ…ШґЪ©Щ„ШЊ ШЁШ±Ш§ЫЊ ШЇШ±ЫЊШ§ЩЃШЄ ЩѕШґШЄЫЊШЁШ§Щ†ЫЊ ШЁЩ‡ multitheftauto.com Щ…Ш±Ш§Ш¬Ш№Щ‡ Ъ©Щ†ЫЊШЇ."
+msgstr "خطای پروتکل (%u). در صورت حل نشدن مشکل، برای دریافت پشتیبانی به multitheftauto.com مراجعه کنید."
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
-msgstr "Ш®Ш·Ш§ЫЊ Ш§ШЄШµШ§Щ„"
+msgstr "خطای اتصال"
 
 #: Shared/sdk/SharedUtil.Misc.hpp:381
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr "Щ…Щ€Щ„ШЄЫЊ ШЇЩЃШЄ ШўШЄЩ€ ШЁЩ‡ ШЇШ±ШіШЄЫЊ Щ†ШµШЁ Щ†ШґШЇЩ‡ Ш§ШіШЄ, Щ„Ш·ЩЃШ§ ШЇЩ€ШЁШ§Ш±Щ‡ Щ†ШµШЁ Щ†Щ…Ш§ЫЊЫЊШЇ."
+msgstr "مولتی دفت آتو به درستی نصب نشده است, لطفا دوباره نصب نمایید."
 
 #: Shared/sdk/SharedUtil.Misc.hpp:1476
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
-msgstr "Щ…Ш±Щ€Ш±ЪЇШ± ШґЩ…Ш§ Ш§Ъ©Щ†Щ€Щ† ЫЊЪ© ШµЩЃШ­Щ‡ Щ€ШЁ ШЁШ§ ШЁШ±Ш®ЫЊ Ш§Ш·Щ„Ш§Ш№Ш§ШЄ Ш±Ш§Щ‡Щ†Щ…Ш§ Щ†Щ…Ш§ЫЊШґ Щ…ЫЊ ШЇЩ‡ШЇ.\n\n"
-"(Ш§ЪЇШ± ШµЩЃШ­Щ‡ ШЁШ§Ш±ЪЇЫЊШ±ЫЊ Щ†ШґШЇШЊ Щ„ЫЊЩ†Ъ© Ш±Ш§ ШЇШ± Щ…Ш±Щ€Ш±ЪЇШ± Ш®Щ€ШЇ Ш¬Ш§ЫЊЪЇШ°Ш§Ш±ЫЊ (CTRL-V) Ъ©Щ†ЫЊШЇ)"
+msgstr "مرورگر شما اکنون یک صفحه وب با برخی اطلاعات راهنما نمایش می دهد.\n\n"
+"(اگر صفحه بارگیری نشد، لینک را در مرورگر خود جایگذاری (CTRL-V) کنید)"
 

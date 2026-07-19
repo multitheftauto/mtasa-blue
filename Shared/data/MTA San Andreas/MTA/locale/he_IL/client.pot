@@ -1,4 +1,4 @@
-﻿msgid ""
+msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
@@ -239,7 +239,7 @@ msgstr ""
 #: Shared/mods/deathmatch/logic/CLatentTransferManager.cpp:378
 #: Shared/sdk/SharedUtil.Misc.hpp:381
 msgid "Error"
-msgstr "Ч©Ч’Ч™ЧђЧ”"
+msgstr "שגיאה"
 
 #: Client/loader/MainFunctions.cpp:1155
 msgid "Another instance of MTA is already running.\n\n"
@@ -434,7 +434,7 @@ msgstr ""
 #: Client/loader/CInstallManager.cpp:1584 Client/core/CCore.cpp:846
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA ЧњЧђ Ч™Ч›Ч•ЧњЧ” ЧњЧ”ЧћЧ©Ч™Чљ Ч›Ч™ Ч›Ч•Ч Чџ %s ЧђЧ™Чџ Ч‘Ч• ЧћЧЎЧ¤Ч™Ч§ Ч–Ч™Ч›ЧЁЧ•Чџ."
+msgstr "MTA:SA לא יכולה להמשיך כי כונן %s אין בו מספיק זיכרון."
 
 #: Client/loader/CInstallManager.cpp:1640
 msgid "Missing file:"
@@ -468,7 +468,7 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 #: Client/gui/CGUIMessageBox_Impl.cpp:72
 msgid "Yes"
-msgstr "Ч›Чџ"
+msgstr "כן"
 
 #: Client/loader/Dialogs.cpp:64 Client/core/CVersionUpdater.cpp:1634
 #: Client/core/CVersionUpdater.cpp:1652 Client/core/CVersionUpdater.cpp:1921
@@ -479,7 +479,7 @@ msgstr "Ч›Чџ"
 #: Client/core/CMainMenu.cpp:1237 Client/core/CQuestionBox.cpp:194
 #: Client/core/ServerBrowser/CServerInfo.cpp:565
 msgid "No"
-msgstr "ЧњЧђ"
+msgstr "לא"
 
 #. Create buttons
 #. OK button
@@ -492,7 +492,7 @@ msgstr "ЧњЧђ"
 #: Client/core/CSettings.cpp:6003 Client/core/CMainMenu.cpp:1258
 #: Client/gui/CGUIMessageBox_Impl.cpp:64
 msgid "OK"
-msgstr "ЧђЧ™Ч©Ч•ЧЁ"
+msgstr "אישור"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "Quit"
@@ -501,7 +501,7 @@ msgstr ""
 #: Client/loader/Dialogs.cpp:67
 #: Client/core/ServerBrowser/CServerBrowser.cpp:717
 msgid "Help"
-msgstr "ЧўЧ–ЧЁЧ”"
+msgstr "עזרה"
 
 #. Cancel button
 #: Client/loader/Dialogs.cpp:68 Client/core/CVersionUpdater.cpp:1853
@@ -510,7 +510,7 @@ msgstr "ЧўЧ–ЧЁЧ”"
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
-msgstr "Ч‘Ч™ЧЧ•Чњ"
+msgstr "ביטול"
 
 #: Client/loader/Dialogs.cpp:83
 msgid "MTA: San Andreas has encountered a problem"
@@ -652,7 +652,7 @@ msgstr ""
 
 #: Client/core/CConnectManager.cpp:85
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "Ч”Ч”ЧЄЧ—Ч‘ЧЁЧ•ЧЄ Ч Ч›Ч©ЧњЧ”. Ч”Ч›Ч™Ч Ч•Ч™ ЧђЧ™Ч Ч• ЧЄЧ§Ч™Чџ!"
+msgstr "ההתחברות נכשלה. הכינוי אינו תקין!"
 
 #: Client/core/CConnectManager.cpp:116
 msgid "Connecting failed. Invalid host provided!"
@@ -667,7 +667,7 @@ msgstr ""
 #: Client/core/CConnectManager.cpp:153
 #, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "ЧћЧЄЧ—Ч‘ЧЁ Чњ-%s:%u..."
+msgstr "מתחבר ל-%s:%u..."
 
 #: Client/core/CConnectManager.cpp:155
 #, c-format
@@ -678,17 +678,17 @@ msgstr ""
 #: Client/core/CConnectManager.cpp:156
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
 msgid "CONNECTING"
-msgstr "ЧћЧЄЧ—Ч‘ЧЁ"
+msgstr "מתחבר"
 
 #: Client/core/CConnectManager.cpp:271
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1358
 msgid "Connection timed out"
-msgstr "Ч¤Ч’ Ч–ЧћЧ Ч” Ч©Чњ Ч”Ч”ЧЄЧ—Ч‘ЧЁЧ•ЧЄ"
+msgstr "פג זמנה של ההתחברות"
 
 #: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1406
 msgid "Disconnected: unknown protocol error"
-msgstr "Ч”ЧЄЧ ЧЄЧ§Ч•ЧЄ: Ч©Ч’Ч™ЧђЧ” ЧњЧђ Ч™Ч“Ч•ЧўЧ” Ч‘Ч¤ЧЁЧ•ЧЧ•Ч§Ч•Чњ"
+msgstr "התנתקות: שגיאה לא ידועה בפרוטוקול"
 
 #: Client/core/CConnectManager.cpp:293
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1410
@@ -703,28 +703,28 @@ msgstr ""
 #: Client/core/CConnectManager.cpp:301
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1418
 msgid "Disconnected: you are banned from this server"
-msgstr "Ч”ЧЄЧ ЧЄЧ§Ч•ЧЄ: Ч Ч—ЧЎЧћЧЄ ЧћЧџ Ч”Ч©ЧЁЧЄ"
+msgstr "התנתקות: נחסמת מן השרת"
 
 #: Client/core/CConnectManager.cpp:308
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1426
 msgid "Disconnected: disconnected from the server"
-msgstr "Ч”ЧЄЧ ЧЄЧ§Ч•ЧЄ: Ч”ЧЄЧ ЧЄЧ§Ч•ЧЄ ЧћЧ”Ч©ЧЁЧЄ"
+msgstr "התנתקות: התנתקות מהשרת"
 
 #: Client/core/CConnectManager.cpp:312
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1430
 msgid "Disconnected: connection to the server was lost"
-msgstr "Ч”Ч—Ч™Ч‘Ч•ЧЁ ЧђЧњ Ч”Ч©ЧЁЧЄ Ч Ч•ЧЄЧ§."
+msgstr "החיבור אל השרת נותק."
 
 #: Client/core/CConnectManager.cpp:319
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1438
 msgid "Disconnected: connection was refused"
-msgstr "Ч”ЧЄЧ ЧЄЧ§Ч•ЧЄ: Ч”Ч”ЧЄЧ—Ч‘ЧЁЧ•ЧЄ Ч Ч“Ч—ЧЄЧ”"
+msgstr "התנתקות: ההתחברות נדחתה"
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:414
 #, c-format
 msgid "No such mod installed (%s)"
-msgstr "ЧћЧ•Ч“ Ч©Ч›Ч–Ч” ЧђЧ™Ч Ч• ЧћЧ•ЧЄЧ§Чџ (%s)"
+msgstr "מוד שכזה אינו מותקן (%s)"
 
 #: Client/core/CConnectManager.cpp:422
 msgid "Bad server response (2)"
@@ -737,7 +737,7 @@ msgstr ""
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
 msgid "English"
-msgstr "ЧђЧ Ч’ЧњЧ™ЧЄ"
+msgstr "אנגלית"
 
 #: Client/core/CVersionUpdater.cpp:627
 msgid "Busy"
@@ -879,12 +879,12 @@ msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
-msgstr "***[ ЧўЧ–ЧЁЧ” Ч‘Ч¤Ч§Ч•Ч“Ч” ]***\n"
+msgstr "***[ עזרה בפקודה ]***\n"
 
 #: Client/core/CCommandFuncs.cpp:158
 #, c-format
 msgid "* The time is %d:%02d:%02d"
-msgstr "* Ч”Ч©ЧўЧ” Ч”Ч™Чђ %d:%02d:%02d"
+msgstr "* השעה היא %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
@@ -892,25 +892,25 @@ msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "Ч”ЧЄЧ—Ч‘ЧЁЧ•ЧЄ: Ч”ЧЎЧ™Ч ЧЧ§ЧЎ Ч”Ч•Чђ 'Ч”ЧЄЧ—Ч‘ЧЁЧ•ЧЄ <Ч”Ч•ЧЎЧ> [<Ч¤Ч•ЧЁЧ> <Ч©Чќ> <ЧЎЧ™ЧЎЧћЧ”>]'"
+msgstr "התחברות: הסינטקס הוא 'התחברות <הוסט> [<פורט> <שם> <סיסמה>]'"
 
 #: Client/core/CCommandFuncs.cpp:233
 msgid "connect: Bad port number"
-msgstr "Ч”ЧЄЧ—Ч‘ЧЁЧ•ЧЄ: Ч¤Ч•ЧЁЧ Ч©Ч’Ч•Ч™"
+msgstr "התחברות: פורט שגוי"
 
 #: Client/core/CCommandFuncs.cpp:255
 #, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "Ч”ЧЄЧ—Ч‘ЧЁЧ•ЧЄ: ЧћЧЄЧ—Ч‘ЧЁ Чњ-%s:%u..."
+msgstr "התחברות: מתחבר ל-%s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:259
 #, c-format
 msgid "connect: could not connect to %s:%u!"
-msgstr "Ч”ЧЄЧ—Ч‘ЧЁЧ•ЧЄ: Ч Ч›Ч©ЧњЧ” Ч”Ч”ЧЄЧ—Ч‘ЧЁЧ•ЧЄ ЧђЧњ %s:%u!"
+msgstr "התחברות: נכשלה ההתחברות אל %s:%u!"
 
 #: Client/core/CCommandFuncs.cpp:264
 msgid "connect: Failed to unload current mod"
-msgstr "Ч”ЧЄЧ—Ч‘ЧЁЧ•ЧЄ: Ч Ч›Ч©ЧњЧ” Ч”Ч¤ЧЁЧ™Ч§Ч” Ч©Чњ ЧћЧ¦Ч‘ Ч”ЧћЧ©Ч—Ч§ Ч”Ч Ч•Ч›Ч—Ч™"
+msgstr "התחברות: נכשלה הפריקה של מצב המשחק הנוכחי"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
@@ -932,22 +932,22 @@ msgstr ""
 
 #: Client/core/CCommandFuncs.cpp:363
 msgid "Bound all controls from GTA"
-msgstr "Ч—Ч•Ч‘ЧЁЧ• Ч›Чњ Ч”ЧћЧ¤ЧЄЧ—Ч•ЧЄ ЧћGTA"
+msgstr "חוברו כל המפתחות מGTA"
 
 #: Client/core/CCommandFuncs.cpp:377
 msgid "Saved configuration file"
-msgstr "Ч”ЧЄЧ¦Ч•ЧЁЧ” Ч”Ч Ч•Ч›Ч—Ч™ЧЄ Ч Ч©ЧћЧЁЧ”"
+msgstr "התצורה הנוכחית נשמרה"
 
 #. Print it
 #: Client/core/CCommandFuncs.cpp:456
 #, c-format
 msgid "* Your serial is: %s"
-msgstr "* ЧћЧЎЧ¤ЧЁЧљ Ч”ЧЎЧ™Ч“Ч•ЧЁЧ™ Ч”Ч•Чђ: %s"
+msgstr "* מספרך הסידורי הוא: %s"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:503
 msgid "SETTINGS"
-msgstr "Ч”Ч’Ч“ЧЁЧ•ЧЄ"
+msgstr "הגדרות"
 
 #: Client/core/CSettings.cpp:549
 msgid "Multiplayer"
@@ -955,7 +955,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:550
 msgid "Video"
-msgstr "Ч•Ч™Ч“ЧђЧ•"
+msgstr "וידאו"
 
 #: Client/core/CSettings.cpp:551
 msgid "PostFX"
@@ -988,14 +988,14 @@ msgstr ""
 #: Client/core/CSettings.cpp:582 Client/core/CSettings.cpp:790
 #: Client/core/CSettings.cpp:1119 Client/core/CSettings.cpp:1415
 msgid "Load defaults"
-msgstr "ЧЧўЧџ Ч‘ЧЁЧ™ЧЁЧ•ЧЄ ЧћЧ—Ч“Чњ"
+msgstr "טען ברירות מחדל"
 
 #. *
 #. *  Controls tab
 #. *
 #: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:623
 msgid "Mouse sensitivity:"
-msgstr "ЧЁЧ’Ч™Ч©Ч•ЧЄ ЧўЧ›Ч‘ЧЁ:"
+msgstr "רגישות עכבר:"
 
 #. VerticalAimSensitivity
 #: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:644
@@ -1058,15 +1058,15 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:797
 msgid "DESCRIPTION"
-msgstr "ЧЄЧ™ЧђЧ•ЧЁ"
+msgstr "תיאור"
 
 #: Client/core/CSettings.cpp:798
 msgid "KEY"
-msgstr "ЧћЧ§Ч©"
+msgstr "מקש"
 
 #: Client/core/CSettings.cpp:800
 msgid "ALT. KEY"
-msgstr "ЧћЧ§Ч© ALT"
+msgstr "מקש ALT"
 
 #. *
 #. *    Multiplayer tab
@@ -1081,6 +1081,7 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:835
 msgid "Auto-refresh server browser"
+msgstr ""
 
 #: Client/core/CSettings.cpp:900
 msgid "History"
@@ -1119,7 +1120,7 @@ msgid "DELETE NICKNAME"
 msgstr ""
 
 #: Client/core/CSettings.cpp:4153
-msgid "Delete nickname "%s" from history?"
+msgid "Delete nickname \"%s\" from history?"
 msgstr ""
 
 #: Client/core/CSettings.cpp:4168
@@ -1128,8 +1129,6 @@ msgstr ""
 
 #: Client/core/CSettings.cpp:4169
 msgid "Delete all nicknames from history?"
-msgstr ""
-
 msgstr ""
 
 #: Client/core/CSettings.cpp:840
@@ -1588,7 +1587,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:4091 Client/core/CSettings.cpp:4100
 #: Client/core/CSettings.cpp:4137
 msgid "Default"
-msgstr "Ч‘ЧЁЧ™ЧЁЧЄ ЧћЧ—Ч“Чњ"
+msgstr "ברירת מחדל"
 
 #: Client/core/CSettings.cpp:1702 Client/core/CSettings.cpp:4079
 msgid "Fast"
@@ -1797,7 +1796,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:3138 Client/core/CSettings.cpp:3166
 #: Client/core/CKeyBinds.cpp:191
 msgid "Left"
-msgstr "Ч©ЧћЧђЧњ"
+msgstr "שמאל"
 
 #: Client/core/CSettings.cpp:3139 Client/core/CSettings.cpp:3153
 msgid "Center"
@@ -1806,7 +1805,7 @@ msgstr ""
 #: Client/core/CSettings.cpp:3140 Client/core/CSettings.cpp:3167
 #: Client/core/CKeyBinds.cpp:192
 msgid "Right"
-msgstr "Ч™ЧћЧ™Чџ"
+msgstr "ימין"
 
 #: Client/core/CSettings.cpp:3152
 msgid "Top"
@@ -1872,13 +1871,13 @@ msgstr ""
 #: Client/core/CMainMenu.cpp:303
 #: Client/mods/deathmatch/logic/CClientGame.cpp:552
 msgid "Main menu"
-msgstr "ЧЄЧ¤ЧЁЧ™Ч ЧЁЧђЧ©Ч™"
+msgstr "תפריט ראשי"
 
 #: Client/core/CSettings.cpp:4445 Client/core/CCore.cpp:709
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1115
 #: Client/mods/deathmatch/logic/CResource.cpp:384
 msgid "In-game"
-msgstr "Ч‘Ч–ЧћЧџ ЧћЧ©Ч—Ч§"
+msgstr "בזמן משחק"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Red:"
@@ -2052,50 +2051,50 @@ msgstr ""
 
 #: Client/core/CCore.cpp:848 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
-msgstr "Ч©Ч’Ч™ЧђЧЄ ЧћЧўЧЁЧ›ЧЄ"
+msgstr "שגיאת מערכת"
 
 #: Client/core/CCore.cpp:969
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "Ч›Ч“Ч™ ЧњЧЄЧ§Чџ, Ч”ЧЎЧ™ЧЁ Ч§Ч•Ч‘ЧҐ Ч–Ч”:"
+msgstr "כדי לתקן, הסיר קובץ זה:"
 
 #: Client/core/CCore.cpp:1001
 #, c-format
 msgid "%s module is incorrect!"
-msgstr "ЧћЧ•Ч“Ч•Чњ Ч©Чњ %s ЧђЧ™Ч Ч• Ч Ч›Ч•Чџ!"
+msgstr "מודול של %s אינו נכון!"
 
 #: Client/core/CCore.cpp:1375
 msgid "Error executing URL"
-msgstr "Ч©Ч’Ч™ЧђЧ” Ч‘Ч”ЧўЧњЧђЧЄ URL"
+msgstr "שגיאה בהעלאת URL"
 
 #. m_pCommands->Add ( "e", CCommandFuncs::Editor );
 #. m_pCommands->Add ( "clear", CCommandFuncs::Clear );
 #: Client/core/CCore.cpp:1470
 msgid "this help screen"
-msgstr "Ч—ЧњЧ•Чџ ЧўЧ–ЧЁЧ” Ч–Ч”"
+msgstr "חלון עזרה זה"
 
 #: Client/core/CCore.cpp:1471 Client/core/CCore.cpp:1472
 msgid "exits the application"
-msgstr "Ч™Ч•Ч¦Чђ ЧћЧ”Ч™Ч™Ч©Ч•Чќ"
+msgstr "יוצא מהיישום"
 
 #: Client/core/CCore.cpp:1473
 msgid "shows the version"
-msgstr "ЧћЧ¦Ч™Ч’ ЧђЧЄ Ч”Ч’ЧЁЧЎЧђ"
+msgstr "מציג את הגרסא"
 
 #: Client/core/CCore.cpp:1474
 msgid "shows the time"
-msgstr "ЧћЧ¦Ч™Ч’ ЧђЧЄ Ч”Ч©ЧўЧ”"
+msgstr "מציג את השעה"
 
 #: Client/core/CCore.cpp:1475
 msgid "shows the hud"
-msgstr "ЧћЧ¦Ч™Ч’ ЧђЧЄ Ч”-HUD"
+msgstr "מציג את ה-HUD"
 
 #: Client/core/CCore.cpp:1476
 msgid "shows all the binds"
-msgstr "ЧњЧЁЧђЧ•ЧЄ ЧђЧЄ Ч›Чњ Ч”ЧћЧ¤ЧЄЧ—Ч•ЧЄ"
+msgstr "לראות את כל המפתחות"
 
 #: Client/core/CCore.cpp:1477
 msgid "shows your serial"
-msgstr "ЧћЧЁЧђЧ” ЧђЧЄ Ч”ЧћЧЎЧ¤ЧЁ Ч”ЧЎЧ™ЧЁЧ™ЧђЧњЧ™ Ч©ЧњЧљ"
+msgstr "מראה את המספר הסיריאלי שלך"
 
 #: Client/core/CCore.cpp:1486
 msgid "connects to a server (host port nick pass)"
@@ -2103,7 +2102,7 @@ msgstr ""
 
 #: Client/core/CCore.cpp:1487
 msgid "connects to a previous server"
-msgstr "ЧћЧЄЧ—Ч‘ЧЁ ЧњЧ©ЧЁЧЄ Ч§Ч•Ч“Чќ"
+msgstr "מתחבר לשרת קודם"
 
 #: Client/core/CCore.cpp:1488
 msgid "binds a key (key control)"
@@ -2115,7 +2114,7 @@ msgstr ""
 
 #: Client/core/CCore.cpp:1490
 msgid "copies the default gta controls"
-msgstr "ЧћЧўЧЄЧ™Ч§ ЧђЧЄ Ч‘Ч§ЧЁЧЄ Ч”ЧћЧ—Ч“Чњ Ч©Чњ GTA"
+msgstr "מעתיק את בקרת המחדל של GTA"
 
 #: Client/core/CCore.cpp:1491
 msgid "outputs a screenshot"
@@ -2123,7 +2122,7 @@ msgstr ""
 
 #: Client/core/CCore.cpp:1492
 msgid "immediately saves the config"
-msgstr "Ч©Ч•ЧћЧЁ ЧђЧЄ Ч”ЧЄЧ¦Ч•ЧЁЧ” ЧћЧ™Ч™Ч“Ч™ЧЄ"
+msgstr "שומר את התצורה מיידית"
 
 #: Client/core/CCore.cpp:1494
 msgid "clears the debug view"
@@ -2147,7 +2146,7 @@ msgstr ""
 
 #: Client/core/CCore.cpp:1501
 msgid "shows the memory statistics"
-msgstr "ЧћЧ¦Ч™Ч’ ЧђЧЄ ЧЎЧЧЧ™ЧЎЧЧ™Ч§Ч•ЧЄ Ч”Ч–Ч™Ч›ЧЁЧ•Чџ"
+msgstr "מציג את סטטיסטיקות הזיכרון"
 
 #: Client/core/CCore.cpp:1502
 msgid "shows the frame timing graph"
@@ -2169,12 +2168,12 @@ msgstr ""
 #: Client/core/CMainMenu.cpp:1231
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
-msgstr "ЧЄЧ Ч•ЧЄЧ§ ЧћЧ”Ч©ЧЁЧЄ Ч”Ч Ч•Ч›Ч—Ч™.\n\n"
-"ЧђЧЄЧ” Ч‘ЧЧ•Ч— Ч©ЧђЧЄЧ” ЧћЧўЧ•Ч Ч™Ч™Чџ ЧњЧ”ЧЄЧ ЧЄЧ§?"
+msgstr "תנותק מהשרת הנוכחי.\n\n"
+"אתה בטוח שאתה מעוניין להתנתק?"
 
 #: Client/core/CMainMenu.cpp:1235
 msgid "DISCONNECT WARNING"
-msgstr "ЧђЧ–Ч”ЧЁЧЄ Ч”ЧЄЧ ЧЄЧ§Ч•ЧЄ"
+msgstr "אזהרת התנתקות"
 
 #: Client/core/CMainMenu.cpp:1256
 msgid "INFORMATION"
@@ -2183,12 +2182,12 @@ msgstr ""
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:154
 msgid "NEWS"
-msgstr "ЧўЧ“Ч›Ч•Ч Ч™Чќ"
+msgstr "עדכונים"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:172 Client/core/CNewsBrowser.cpp:173
 msgid "Visit latest news article"
-msgstr "ЧњЧ‘Ч§ЧЁ ЧђЧЄ ЧўЧћЧ•Ч“ Ч”ЧўЧ“Ч›Ч•Ч Ч™Чќ Ч”ЧЁЧђЧ—ЧЁЧ•Чџ"
+msgstr "לבקר את עמוד העדכונים הראחרון"
 
 #: Client/core/CScreenShot.cpp:200
 #, c-format
@@ -2197,7 +2196,7 @@ msgstr ""
 
 #: Client/core/CScreenShot.cpp:206
 msgid "Screenshot failed"
-msgstr "Ч¦Ч™ЧњЧ•Чќ-ЧћЧЎЧљ Ч Ч›Ч©Чњ"
+msgstr "צילום-מסך נכשל"
 
 #: Client/core/CScreenShot.cpp:256
 #, c-format
@@ -2211,201 +2210,201 @@ msgstr ""
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
-msgstr "ЧђЧ©"
+msgstr "אש"
 
 #: Client/core/CKeyBinds.cpp:187
 msgid "Next weapon"
-msgstr "Ч”Ч Ч©Ч§ Ч”Ч‘Чђ"
+msgstr "הנשק הבא"
 
 #: Client/core/CKeyBinds.cpp:188
 msgid "Previous weapon"
-msgstr "Ч”Ч Ч©Ч§ Ч”Ч§Ч•Ч“Чќ"
+msgstr "הנשק הקודם"
 
 #: Client/core/CKeyBinds.cpp:189
 msgid "Forwards"
-msgstr "Ч§Ч“Ч™ЧћЧ”"
+msgstr "קדימה"
 
 #: Client/core/CKeyBinds.cpp:190
 msgid "Backwards"
-msgstr "ЧђЧ—Ч•ЧЁЧ”"
+msgstr "אחורה"
 
 #: Client/core/CKeyBinds.cpp:193
 msgid "Zoom in"
-msgstr "Ч–Ч•Чќ Ч¤Ч Ч™ЧћЧ”"
+msgstr "זום פנימה"
 
 #: Client/core/CKeyBinds.cpp:194
 msgid "Zoom out"
-msgstr "Ч”ЧЄЧЁЧ—Ч§Ч•ЧЄ"
+msgstr "התרחקות"
 
 #: Client/core/CKeyBinds.cpp:195
 msgid "Enter/Exit"
-msgstr "Ч”Ч™Ч›Ч ЧЎ\\Ч¦Чђ"
+msgstr "היכנס\\צא"
 
 #: Client/core/CKeyBinds.cpp:196
 msgid "Change camera"
-msgstr "Ч©Ч Ч” ЧћЧ¦ЧњЧћЧ”"
+msgstr "שנה מצלמה"
 
 #. 10
 #: Client/core/CKeyBinds.cpp:197
 msgid "Jump"
-msgstr "Ч§Ч¤Ч™Ч¦Ч”"
+msgstr "קפיצה"
 
 #: Client/core/CKeyBinds.cpp:198
 msgid "Sprint"
-msgstr "ЧЎЧ¤ЧЁЧ™Ч Ч"
+msgstr "ספרינט"
 
 #: Client/core/CKeyBinds.cpp:199
 msgid "Look behind"
-msgstr "ЧњЧ”ЧЎЧЄЧ›Чњ ЧђЧ—Ч•ЧЁЧ”"
+msgstr "להסתכל אחורה"
 
 #: Client/core/CKeyBinds.cpp:200
 msgid "Crouch"
-msgstr "ЧњЧ”ЧЄЧ›Ч•Ч¤ЧЈ"
+msgstr "להתכופף"
 
 #: Client/core/CKeyBinds.cpp:201
 msgid "Action"
-msgstr "Ч¤ЧўЧ•ЧњЧ”"
+msgstr "פעולה"
 
 #: Client/core/CKeyBinds.cpp:202
 msgid "Walk"
-msgstr "Ч”ЧњЧ™Ч›Ч”"
+msgstr "הליכה"
 
 #: Client/core/CKeyBinds.cpp:203
 msgid "Vehicle fire"
-msgstr "Ч™ЧЁЧ™Ч™ЧЄ ЧЁЧ›Ч‘"
+msgstr "יריית רכב"
 
 #: Client/core/CKeyBinds.cpp:204
 msgid "Vehicle secondary fire"
-msgstr "Ч™ЧЁЧ™Ч™ЧЄ ЧЁЧ›Ч‘ Ч©Ч Ч™Ч”"
+msgstr "יריית רכב שניה"
 
 #: Client/core/CKeyBinds.cpp:205
 msgid "Vehicle left"
-msgstr "ЧЁЧ›Ч‘ Ч©ЧћЧђЧњ"
+msgstr "רכב שמאל"
 
 #: Client/core/CKeyBinds.cpp:206
 msgid "Vehicle right"
-msgstr "ЧЁЧ›Ч‘ Ч™ЧћЧ™Чџ"
+msgstr "רכב ימין"
 
 #. 20
 #: Client/core/CKeyBinds.cpp:207
 msgid "Steer forwards/down"
-msgstr "ЧњЧ”ЧЧ•ЧЄ Ч§Ч“Ч™ЧћЧ”\\ЧњЧћЧЧ”"
+msgstr "להטות קדימה\\למטה"
 
 #: Client/core/CKeyBinds.cpp:208
 msgid "Steer backwards/up"
-msgstr "ЧњЧ”Ч•ЧЧ•ЧЄ ЧђЧ—Ч•ЧЁЧ”\\ЧњЧћЧўЧњЧ”"
+msgstr "להוטות אחורה\\למעלה"
 
 #: Client/core/CKeyBinds.cpp:209
 msgid "Accelerate"
-msgstr "Ч”ЧђЧ¦Ч”"
+msgstr "האצה"
 
 #: Client/core/CKeyBinds.cpp:210
 msgid "Brake/Reverse"
-msgstr "Ч‘ЧњЧ™ЧћЧ”\\ЧЁЧ™Ч•Ч•ЧЁЧЎ"
+msgstr "בלימה\\ריוורס"
 
 #: Client/core/CKeyBinds.cpp:211
 msgid "Radio next"
-msgstr "ЧЁЧ“Ч™Ч• Ч”Ч‘Чђ"
+msgstr "רדיו הבא"
 
 #: Client/core/CKeyBinds.cpp:212
 msgid "Radio previous"
-msgstr "ЧЁЧ“Ч™Ч• Ч”Ч§Ч•Ч“Чќ"
+msgstr "רדיו הקודם"
 
 #: Client/core/CKeyBinds.cpp:213
 msgid "Radio user track skip"
-msgstr "ЧЁЧ“Ч™Ч• Ч©Чњ Ч”ЧћЧ©ЧЄЧћЧ© ЧњЧ“ЧњЧ’"
+msgstr "רדיו של המשתמש לדלג"
 
 #: Client/core/CKeyBinds.cpp:214
 msgid "Horn"
-msgstr "Ч¦Ч•Ч¤ЧЁ"
+msgstr "צופר"
 
 #: Client/core/CKeyBinds.cpp:215
 msgid "Sub-mission"
-msgstr "ЧћЧ©Ч™ЧћЧЄ-ЧћЧ©Ч Ч”"
+msgstr "משימת-משנה"
 
 #: Client/core/CKeyBinds.cpp:216
 msgid "Handbrake"
-msgstr "Ч‘ЧњЧќ-Ч™Ч“"
+msgstr "בלם-יד"
 
 #. 30
 #: Client/core/CKeyBinds.cpp:217
 msgid "Vehicle look left"
-msgstr "ЧЁЧ›Ч‘ ЧњЧ”ЧЎЧЄЧ›Чњ Ч©ЧћЧђЧњ"
+msgstr "רכב להסתכל שמאל"
 
 #: Client/core/CKeyBinds.cpp:218
 msgid "Vehicle look right"
-msgstr "ЧЁЧ›Ч‘ ЧњЧ”ЧЎЧЄЧ›Чњ Ч™ЧћЧ™Чџ"
+msgstr "רכב להסתכל ימין"
 
 #: Client/core/CKeyBinds.cpp:219
 msgid "Vehicle look behind"
-msgstr "ЧЁЧ›Ч‘ ЧњЧ”ЧЎЧЄЧ›Чњ ЧђЧ—Ч•ЧЁЧ”"
+msgstr "רכב להסתכל אחורה"
 
 #: Client/core/CKeyBinds.cpp:220
 msgid "Vehicle mouse look"
-msgstr "ЧњЧ”ЧЎЧЄЧ›Чњ Ч‘ЧўЧ›Ч‘ЧЁ Ч‘ЧЁЧ›Ч‘"
+msgstr "להסתכל בעכבר ברכב"
 
 #: Client/core/CKeyBinds.cpp:221
 msgid "Special control left"
-msgstr "ЧћЧ¤ЧЄЧ— ЧћЧ™Ч•Ч—Ч“ Ч©ЧћЧђЧњ"
+msgstr "מפתח מיוחד שמאל"
 
 #: Client/core/CKeyBinds.cpp:222
 msgid "Special control right"
-msgstr "ЧћЧ¤ЧЄЧ— ЧћЧ™Ч•Ч—Ч“ Ч™ЧћЧ™Чџ"
+msgstr "מפתח מיוחד ימין"
 
 #: Client/core/CKeyBinds.cpp:223
 msgid "Special control down"
-msgstr "ЧћЧ¤ЧЄЧ— ЧћЧ™Ч•Ч—Ч“ ЧњЧћЧЧ”"
+msgstr "מפתח מיוחד למטה"
 
 #: Client/core/CKeyBinds.cpp:224
 msgid "Special control up"
-msgstr "ЧћЧ¤ЧЄЧ— ЧћЧ™Ч•Ч—Ч“ ЧњЧћЧўЧњЧ”"
+msgstr "מפתח מיוחד למעלה"
 
 #: Client/core/CKeyBinds.cpp:225
 msgid "Aim weapon"
-msgstr "Ч›Ч•Ч•Чџ"
+msgstr "כוון"
 
 #: Client/core/CKeyBinds.cpp:226
 msgid "Conversation yes"
-msgstr "Ч“Ч™ЧђЧњЧ•Ч’ Ч›Чџ"
+msgstr "דיאלוג כן"
 
 #. 40
 #: Client/core/CKeyBinds.cpp:227
 msgid "Conversation no"
-msgstr "Ч“Ч™ЧђЧњЧ•Ч’ ЧњЧђ"
+msgstr "דיאלוג לא"
 
 #: Client/core/CKeyBinds.cpp:228
 msgid "Group control forwards"
-msgstr "ЧћЧ¤ЧЄЧ— Ч§Ч‘Ч•Ч¦Ч” Ч§Ч“Ч™ЧћЧ”"
+msgstr "מפתח קבוצה קדימה"
 
 #: Client/core/CKeyBinds.cpp:229
 msgid "Group control backwards"
-msgstr "ЧћЧ¤ЧЄЧ— Ч§Ч‘Ч•Ч¦Ч” ЧђЧ—Ч•ЧЁЧ”"
+msgstr "מפתח קבוצה אחורה"
 
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:93
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Ч”Ч“ЧћЧ•ЧЄ Ч©Ч‘Ч—ЧЁЧЄ ЧњЧђ Ч ЧЧўЧ Ч”, Ч•Ч›Чџ Ч“ЧћЧ•ЧЄ Ч‘ЧЁЧ™ЧЁЧЄ Ч”ЧћЧ—Ч“Чњ, ЧђЧ Чђ Ч”ЧЄЧ§Чџ ЧћЧ—Ч“Ч© ЧђЧЄ MTA."
+msgstr "הדמות שבחרת לא נטענה, וכן דמות ברירת המחדל, אנא התקן מחדש את MTA."
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1462
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "ЧЁЧ•Ч¦Ч™Чќ ЧўЧ–ЧЁЧ” ЧњЧ’Ч‘Ч™ Ч‘ЧўЧ™Ч” Ч–Ч• Ч‘ЧђЧ™Ч ЧЧЁЧ Ч?"
+msgstr "רוצים עזרה לגבי בעיה זו באינטרנט?"
 
 #. Create window
 #: Client/core/CConsole.cpp:417
 msgid "CONSOLE"
-msgstr "Ч§Ч•Ч ЧЎЧ•ЧњЧ”"
+msgstr "קונסולה"
 
 #: Client/core/CCredits.cpp:34
 msgid "Programming"
-msgstr "ЧЄЧ›Ч Ч•ЧЄ"
+msgstr "תכנות"
 
 #: Client/core/CCredits.cpp:65
 msgid "Contributors"
-msgstr "ЧЄЧ•ЧЁЧћЧ™Чќ"
+msgstr "תורמים"
 
 #: Client/core/CCredits.cpp:85
 msgid "Game Design / Scripting"
-msgstr "ЧўЧ™Ч¦Ч•Ч‘ ЧћЧ©Ч—Ч§ \\ ЧЎЧ§ЧЁЧ™Ч¤ЧЧ™Чќ"
+msgstr "עיצוב משחק \\ סקריפטים"
 
 #: Client/core/CCredits.cpp:105
 msgid "Language Localization"
@@ -2413,11 +2412,11 @@ msgstr ""
 
 #: Client/core/CCredits.cpp:111
 msgid "Patch contributors"
-msgstr "ЧЄЧ•ЧЁЧћЧ™Чќ ЧњЧЧњЧђЧ™"
+msgstr "תורמים לטלאי"
 
 #: Client/core/CCredits.cpp:234
 msgid "Special Thanks"
-msgstr "ЧЄЧ•Ч“Ч” ЧћЧ™Ч•Ч—Ч“ЧЄ"
+msgstr "תודה מיוחדת"
 
 #: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
@@ -2425,11 +2424,11 @@ msgstr ""
 
 #: Client/core/CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
-msgstr "Ч¦Ч™ЧЁ Ч”ЧђЧ¦Ч”"
+msgstr "ציר האצה"
 
 #: Client/core/CJoystickManager.cpp:1580
 msgid "Brake Axis"
-msgstr "Ч¦Ч™ЧЁ Ч‘ЧњЧ™ЧћЧ”"
+msgstr "ציר בלימה"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:125
 msgid "Could not initialize Direct3D9.\n\n"
@@ -2482,7 +2481,7 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerList.cpp:349
 msgid "(Backup server list)"
-msgstr "(Ч’Ч‘Ч” ЧЁЧ©Ч™ЧћЧЄ Ч©ЧЁЧЄЧ™Чќ)"
+msgstr "(גבה רשימת שרתים)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:419
 msgid "Cannot create LAN-broadcast socket"
@@ -2514,25 +2513,25 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:64
 msgid "Server Address:"
-msgstr "Ч›ЧЄЧ•Ч‘ЧЄ Ч©ЧЁЧЄ:"
+msgstr "כתובת שרת:"
 
 #. Gamemode
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:75
 msgid "Gamemode:"
-msgstr "ЧћЧ¦Ч‘ ЧћЧ©Ч—Ч§:"
+msgstr "מצב משחק:"
 
 #. Map
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:86
 msgid "Map:"
-msgstr "ЧћЧ¤Ч”:"
+msgstr "מפה:"
 
 #. Players
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:97
 msgid "Players:"
-msgstr "Ч©Ч—Ч§Ч Ч™Чќ:"
+msgstr "שחקנים:"
 
 #. Passworded
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
@@ -2551,22 +2550,22 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
 #: Client/core/ServerBrowser/CServerBrowser.cpp:635
 msgid "Player list"
-msgstr "ЧЁЧ©Ч™ЧћЧЄ Ч©Ч—Ч§Ч Ч™Чќ"
+msgstr "רשימת שחקנים"
 
 #. Close button
 #: Client/core/ServerBrowser/CServerInfo.cpp:144
 msgid "Close"
-msgstr "ЧЎЧ’Ч•ЧЁ"
+msgstr "סגור"
 
 #. Join Game button
 #: Client/core/ServerBrowser/CServerInfo.cpp:152
 msgid "Join Game"
-msgstr "Ч”Ч¦ЧЧЁЧЈ ЧњЧћЧ©Ч—Ч§"
+msgstr "הצטרף למשחק"
 
 #. Please enter password label
 #: Client/core/ServerBrowser/CServerInfo.cpp:166
 msgid "Please enter the password to the server:"
-msgstr "ЧђЧ Чђ ЧћЧњЧђ ЧђЧЄ ЧЎЧ™ЧЎЧћЧЄ Ч”Ч©ЧЁЧЄ:"
+msgstr "אנא מלא את סיסמת השרת:"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
@@ -2594,7 +2593,7 @@ msgstr ""
 #: Client/core/ServerBrowser/CServerBrowser.cpp:237
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:90
 msgid "Internet"
-msgstr "ЧђЧ™Ч ЧЧЁЧ Ч"
+msgstr "אינטרנט"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:238
 msgid "Local"
@@ -2616,44 +2615,44 @@ msgstr ""
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:321
 msgid "HELP"
-msgstr "ЧўЧ–ЧЁЧ”"
+msgstr "עזרה"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:371
 msgid "Refresh"
-msgstr "ЧЁЧўЧ Чџ"
+msgstr "רענן"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:372
 msgid "Add Favorite"
-msgstr "Ч”Ч•ЧЎЧЈ ЧњЧћЧ•ЧўЧ“Ч¤Ч™Чќ"
+msgstr "הוסף למועדפים"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:373
 #: Client/core/ServerBrowser/CServerBrowser.cpp:457
 #: Client/core/ServerBrowser/CServerBrowser.cpp:528
 msgid "Connect"
-msgstr "Ч”ЧЄЧ—Ч‘ЧЁЧ•ЧЄ"
+msgstr "התחברות"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:374
 msgid "Server information"
-msgstr "ЧћЧ™Ч“Чў Ч©ЧЁЧЄ"
+msgstr "מידע שרת"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:375
 msgid "Search servers"
-msgstr "Ч—Ч¤Ч© Ч©ЧЁЧЄЧ™Чќ"
+msgstr "חפש שרתים"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:376
 msgid "Search players"
-msgstr "Ч—Ч¤Ч© Ч©Ч—Ч§Ч Ч™Чќ"
+msgstr "חפש שחקנים"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:377
 msgid "Start search"
-msgstr "Ч”ЧЄЧ—Чњ Ч‘Ч—Ч™Ч¤Ч•Ч©"
+msgstr "התחל בחיפוש"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:378
@@ -2689,27 +2688,27 @@ msgstr ""
 #. Include label
 #: Client/core/ServerBrowser/CServerBrowser.cpp:647
 msgid "Include:"
-msgstr "Ч›ЧњЧ•Чњ:"
+msgstr "כלול:"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:653
 msgid "Empty"
-msgstr "ЧЁЧ™Ч§"
+msgstr "ריק"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:659
 msgid "Full"
-msgstr "ЧћЧњЧђ"
+msgstr "מלא"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:665
 msgid "Locked"
-msgstr "Ч ЧўЧ•Чњ"
+msgstr "נעול"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:677
 msgid "Offline"
-msgstr "ЧћЧ Ч•ЧЄЧ§"
+msgstr "מנותק"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:690
 msgid "Other Versions"
-msgstr "Ч’ЧЁЧЎЧђЧ•ЧЄ ЧђЧ—ЧЁЧ•ЧЄ"
+msgstr "גרסאות אחרות"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:711
 msgid "Back"
@@ -2744,7 +2743,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CClientGame.cpp:673
 #: Client/mods/deathmatch/logic/CClientGame.cpp:765
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Ч›Ч™Ч Ч•Ч™ Ч©Ч’Ч•Ч™! ЧђЧ Чђ Ч©Ч Ч” ЧђЧ•ЧЄЧ• Ч“ЧЁЧљ ЧњЧ•Ч— Ч”Ч”Ч’Ч“ЧЁЧ•ЧЄ!"
+msgstr "כינוי שגוי! אנא שנה אותו דרך לוח ההגדרות!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1708
 msgid "You have to select a server to connect to."
@@ -2924,7 +2923,7 @@ msgstr ""
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:64
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:66
 msgid "Password:"
-msgstr "ЧЎЧ™ЧЎЧћЧђ:"
+msgstr "סיסמא:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:73
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:75

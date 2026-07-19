@@ -1,4 +1,4 @@
-﻿msgid ""
+msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
@@ -20,42 +20,42 @@ msgstr ""
 #: Client/loader/Utils.cpp:535
 msgid "Start Grand Theft Auto: San Andreas.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr "PorneИ™te Grand Theft Auto: San Andreas.\n"
-"AsigurДѓ-te cДѓ jocul este localizat Г®n dosarul 'Program Files (x86)'."
+msgstr "Pornește Grand Theft Auto: San Andreas.\n"
+"Asigură-te că jocul este localizat în dosarul 'Program Files (x86)'."
 
 #: Client/loader/Utils.cpp:535 Client/loader/Utils.cpp:548
 msgid "Searching for GTA: San Andreas"
-msgstr "ГЋn cДѓutarea GTA: San Andreas"
+msgstr "În căutarea GTA: San Andreas"
 
 #: Client/loader/Utils.cpp:548
 msgid "Sorry, game not found.\n"
 "Start Grand Theft Auto: San Andreas and click retry.\n"
 "Ensure the game is placed in the 'Program Files (x86)' folder."
-msgstr "Ne pare rДѓu, jocul nu a fost gДѓsit.\n"
-"PorneИ™te Grand Theft Auto: San Andreas И™i apasДѓ reГ®ncearcДѓ.\n"
-"AsigurДѓ-te cДѓ jocul este localizat Г®n dosarul 'Program Files (x86)'."
+msgstr "Ne pare rău, jocul nu a fost găsit.\n"
+"Pornește Grand Theft Auto: San Andreas și apasă reîncearcă.\n"
+"Asigură-te că jocul este localizat în dosarul 'Program Files (x86)'."
 
 #: Client/loader/Utils.cpp:606
 msgid "Select your Grand Theft Auto: San Andreas Installation Directory"
-msgstr "SelecteazДѓ directorul de instalare al Grand Theft Auto: San Andreas"
+msgstr "Selectează directorul de instalare al Grand Theft Auto: San Andreas"
 
 #: Client/loader/Utils.cpp:974 Client/loader/CInstallManager.cpp:376
 #, c-format
 msgid "MTA:SA needs Administrator access for the following task:\n\n"
 "  '%s'\n\n"
 "Please confirm in the next window."
-msgstr "MTA:SA necesitДѓ acces de administrator pentru urmДѓtoarea sarcinДѓ:\n\n"
+msgstr "MTA:SA necesită acces de administrator pentru următoarea sarcină:\n\n"
 "'%s'\n\n"
-"Te rugДѓm confirmДѓ Г®n fereastra urmДѓtoare."
+"Te rugăm confirmă în fereastra următoare."
 
 #: Client/loader/Utils.cpp:1075
 #, c-format
 msgid "Error loading %s module! (%s)"
-msgstr "Eroare la Г®ncДѓrcarea modulului %s! (%s)"
+msgstr "Eroare la încărcarea modulului %s! (%s)"
 
 #: Client/loader/Utils.cpp:1400 Client/loader/Dialogs.cpp:1048
 msgid "Copying files..."
-msgstr "Se copiazДѓ fiИ™ierele..."
+msgstr "Se copiază fișierele..."
 
 #: Client/loader/Utils.cpp:1460 Client/loader/Dialogs.cpp:1053
 msgid "Copy finished early. Everything OK."
@@ -63,7 +63,7 @@ msgstr "Copierea s-a terminat rapid. Totul este OK."
 
 #: Client/loader/Utils.cpp:1466 Client/loader/Dialogs.cpp:1058
 msgid "Finishing..."
-msgstr "Se finalizeazДѓ..."
+msgstr "Se finalizează..."
 
 #: Client/loader/Utils.cpp:1468 Client/loader/Dialogs.cpp:1062
 msgid "Done!"
@@ -73,100 +73,100 @@ msgstr "Finalizat!"
 #, c-format
 msgid "New installation of %s detected.\n\n"
 "Do you want to copy your settings from %s ?"
-msgstr "O nouДѓ instalare a %s a fost detectatДѓ.\n\n"
-"DoreИ™ti sДѓ copiezi setДѓrile din %s?"
+msgstr "O nouă instalare a %s a fost detectată.\n\n"
+"Dorești să copiezi setările din %s?"
 
 #: Client/loader/Utils.cpp:1547
 #, c-format
 msgid "GTA:SA had trouble opening the file '%s'"
-msgstr "GTA:SA a Г®ntГўmpinat probleme la deschiderea fiИ™ierului '%s'"
+msgstr "GTA:SA a întâmpinat probleme la deschiderea fișierului '%s'"
 
 #: Client/loader/Utils.cpp:1569
 #, c-format
 msgid "GTA:SA is missing the file '%s'."
-msgstr "GTA:SA duce lipsДѓ de fiИ™ierul '%s'."
+msgstr "GTA:SA duce lipsă de fișierul '%s'."
 
 #: Client/loader/Utils.cpp:1594
 msgid "GTA:SA had trouble loading a model."
-msgstr "GTA:SA a Г®ntГўmpinat probleme la Г®ncДѓrcarea unui model."
+msgstr "GTA:SA a întâmpinat probleme la încărcarea unui model."
 
 #: Client/loader/Utils.cpp:1596
 msgid "If you recently modified gta3.img, then try reinstalling GTA:SA."
-msgstr "DacДѓ aИ›i modificat recent gta3.img, Г®ncercaИ›i sДѓ reinstalaИ›i GTA:SA."
+msgstr "Dacă ați modificat recent gta3.img, încercați să reinstalați GTA:SA."
 
 #: Client/loader/Utils.cpp:1621
 msgid "GTA:SA had trouble adding an upgrade to a vehicle."
-msgstr "GTA:SA a Г®ntГўmpinat probleme la adДѓugarea de Г®mbunДѓtДѓИ›iri unui vehicul."
+msgstr "GTA:SA a întâmpinat probleme la adăugarea de îmbunătățiri unui vehicul."
 
 #: Client/loader/Utils.cpp:1640
 #, c-format
 msgid "GTA:SA found errors in the file '%s'"
-msgstr "GTA:SA a gДѓsit erori Г®n fiИ™ierul '%s'"
+msgstr "GTA:SA a găsit erori în fișierul '%s'"
 
 #: Client/loader/Utils.cpp:1722
 msgid "Did your computer restart when playing MTA:SA?"
-msgstr "S-a restartat calculatorul tДѓu Г®n timp ce jucai MTA:SA?"
+msgstr "S-a restartat calculatorul tău în timp ce jucai MTA:SA?"
 
 #: Client/loader/Utils.cpp:1787
 msgid "Please terminate the following programs before continuing:"
-msgstr "Te rugДѓm Г®nchide urmДѓtoarele programe Г®nainte de a continua:"
+msgstr "Te rugăm închide următoarele programe înainte de a continua:"
 
 #: Client/loader/MainFunctions.cpp:321
 msgid "Invalid module path detected.\n"
-msgstr "DetectatДѓ o adresДѓ de modul nevalidДѓ.\n"
+msgstr "Detectată o adresă de modul nevalidă.\n"
 
 #: Client/loader/MainFunctions.cpp:348
 msgid "File version mismatch error. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Eroare de nepotrivire a versiunilor fiИ™ierelor. ReinstaleazДѓ MTA:SA dacДѓ Г®ntГўmpini probleme.\n"
+msgstr "Eroare de nepotrivire a versiunilor fișierelor. Reinstalează MTA:SA dacă întâmpini probleme.\n"
 
 #: Client/loader/MainFunctions.cpp:356
 msgid "Some files are missing. Reinstall MTA:SA if you experience problems.\n"
-msgstr "Unele fiИ™iere lipsesc. ReinstaleazДѓ MTA:SA dacДѓ Г®ntГўmpini probleme.\n"
+msgstr "Unele fișiere lipsesc. Reinstalează MTA:SA dacă întâmpini probleme.\n"
 
 #: Client/loader/MainFunctions.cpp:367
 msgid "MTA:SA is not compatible with Windows 'Safe Mode'.\n\n"
 "Please restart your PC.\n"
 msgstr "MTA:SA nu este compatibil cu Windows 'Safe Mode'.\n\n"
-"VДѓ rugДѓm sДѓ reporniИ›i computerul.\n"
+"Vă rugăm să reporniți computerul.\n"
 
 #: Client/loader/MainFunctions.cpp:546
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to revert to an earlier version?"
 msgstr "Ai probleme la rularea MTA:SA?\n\n"
-"Vrei sДѓ revi la o versiune anterioarДѓ?"
+"Vrei să revi la o versiune anterioară?"
 
 #: Client/loader/MainFunctions.cpp:574
 msgid "There seems to be a problem launching MTA:SA.\n"
 "Resetting GTA settings can sometimes fix this problem.\n\n"
 "Do you want to reset GTA settings now?"
-msgstr "Se pare cДѓ o problemДѓ Г®mpiedicДѓ lansarea MTA:SA.\n"
-"Restabilirea setДѓrilor iniИ›iale a GTA poate rezolva uneori problema.\n\n"
-"Vrei sДѓ restabileИ™ti setДѓrile GTA acum?"
+msgstr "Se pare că o problemă împiedică lansarea MTA:SA.\n"
+"Restabilirea setărilor inițiale a GTA poate rezolva uneori problema.\n\n"
+"Vrei să restabilești setările GTA acum?"
 
 #: Client/loader/MainFunctions.cpp:589
 msgid "GTA settings have been reset.\n\n"
 "Press OK to continue."
-msgstr "SetДѓrile GTA au fost restabilite.\n\n"
-"ApasДѓ OK pentru a continua."
+msgstr "Setările GTA au fost restabilite.\n\n"
+"Apasă OK pentru a continua."
 
 #: Client/loader/MainFunctions.cpp:594
 #, c-format
 msgid "File could not be deleted: '%s'"
-msgstr "FiИ™ierul nu a putut fi И™ters: '%s'"
+msgstr "Fișierul nu a putut fi șters: '%s'"
 
 #. No settings to delete, or can't find them
 #: Client/loader/MainFunctions.cpp:602
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to see some online help?"
 msgstr "Ai probleme la rularea MTA:SA?\n\n"
-"Vrei sДѓ vezi niИ™te ajutor on-line?"
+"Vrei să vezi niște ajutor on-line?"
 
 #. Inform user
 #: Client/loader/MainFunctions.cpp:639
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Do you want to change the following setting?"
-msgstr "AveИ›i probleme atunci cГўnd rulaИ›i MTA:SA?\n\n"
-"DoriИ›i sДѓ schimbaИ›i urmДѓtoarele setДѓri?"
+msgstr "Aveți probleme atunci când rulați MTA:SA?\n\n"
+"Doriți să schimbați următoarele setări?"
 
 #: Client/loader/MainFunctions.cpp:640 Client/core/CSettings.cpp:1161
 #: Client/core/CSettings.cpp:1672
@@ -176,30 +176,30 @@ msgstr "Mod ecran complet:"
 #: Client/loader/MainFunctions.cpp:640 Client/core/CSettings.cpp:1171
 #: Client/core/CSettings.cpp:2337
 msgid "Borderless window"
-msgstr "FereastrДѓ fДѓrДѓ margini"
+msgstr "Fereastră fără margini"
 
 #: Client/loader/MainFunctions.cpp:711
 msgid "Are you having problems running MTA:SA?.\n\n"
 "Try disabling the following products for GTA and MTA:"
-msgstr "AveИ›i probleme atunci cГўnd rulaИ›i MTA:SA?\n\n"
-"ГЋncercaИ›i sДѓ dezactivaИ›i urmДѓtoarele produse pentru GTA И™i MTA:"
+msgstr "Aveți probleme atunci când rulați MTA:SA?\n\n"
+"Încercați să dezactivați următoarele produse pentru GTA și MTA:"
 
 #: Client/loader/MainFunctions.cpp:744
 msgid "WARNING\n\n"
 "MTA:SA has detected unusual activity.\n"
 "Please run a virus scan to ensure your system is secure.\n\n"
 msgstr "AVERTISMENT\n\n"
-"MTA:SA a detectat activitДѓИ›i neobiИ™nuite.\n"
-"Te rugДѓm ruleazДѓ o scanare de detectare a viruИ™ilor pentru a te asigura cДѓ sistemul tДѓu este Г®n siguranИ›Дѓ.\n\n"
+"MTA:SA a detectat activități neobișnuite.\n"
+"Te rugăm rulează o scanare de detectare a virușilor pentru a te asigura că sistemul tău este în siguranță.\n\n"
 
 #: Client/loader/MainFunctions.cpp:747
 #, c-format
 msgid "The detected file was:  %s\n"
-msgstr "FiИ™ierul detectat a fost: %s\n"
+msgstr "Fișierul detectat a fost: %s\n"
 
 #: Client/loader/MainFunctions.cpp:995
 msgid "An instance of GTA: San Andreas is already running. It needs to be terminated before MTA:SA can be started. Do you want to do that now?"
-msgstr "O instanИ›Дѓ a GTA: San Andreas ruleazДѓ deja. Ea trebuie Г®nchisДѓ Г®nainte ca MTA:SA sДѓ file lansat. Vrei sДѓ o Г®nchizi acum?"
+msgstr "O instanță a GTA: San Andreas rulează deja. Ea trebuie închisă înainte ca MTA:SA să file lansat. Vrei să o închizi acum?"
 
 #: Client/loader/MainFunctions.cpp:996 Client/loader/MainFunctions.cpp:1003
 #: Client/loader/MainFunctions.cpp:1969
@@ -207,21 +207,21 @@ msgstr "O instanИ›Дѓ a GTA: San Andreas ruleazДѓ deja. Ea trebuie Г®nch
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1708
 #: Client/game_sa/CGameSA.cpp:270
 msgid "Information"
-msgstr "InformaЕЈii"
+msgstr "Informaţii"
 
 #: Client/loader/MainFunctions.cpp:1002
 msgid "Unable to terminate GTA: San Andreas. If the problem persists, please restart your computer."
-msgstr "GTA: San Andreas nu poate fi Г®nchis. DacДѓ problema persistДѓ te rugДѓm restarteazДѓ-И›i calculatorul."
+msgstr "GTA: San Andreas nu poate fi închis. Dacă problema persistă te rugăm restartează-ți calculatorul."
 
 #: Client/loader/MainFunctions.cpp:1131
 msgid "Trouble restarting MTA:SA\n\n"
 "If the problem persists, open Task Manager and\n"
 "stop the 'gta_sa.exe' and 'Multi Theft Auto.exe' processes\n\n\n"
 "Try to launch MTA:SA again?"
-msgstr "A apДѓrut o problemДѓ la repornirea MTA:SA\n\n"
-"DacДѓ problema persistДѓ, deschide Managerul de activitДѓИ›i И™i\n"
-"opreИ™te procesele 'gta_sa.exe' И™i 'Multi Theft Auto.exe'.\n\n\n"
-"ГЋncearcДѓ sДѓ relansezi MTA:SA?"
+msgstr "A apărut o problemă la repornirea MTA:SA\n\n"
+"Dacă problema persistă, deschide Managerul de activități și\n"
+"oprește procesele 'gta_sa.exe' și 'Multi Theft Auto.exe'.\n\n\n"
+"Încearcă să relansezi MTA:SA?"
 
 #. Show a message that the connection timed out and abort
 #. Show failed message and abort the attempt
@@ -263,76 +263,76 @@ msgstr "Eroare"
 #: Client/loader/MainFunctions.cpp:1155
 msgid "Another instance of MTA is already running.\n\n"
 "If this problem persists, please restart your computer"
-msgstr "O altДѓ instanИ›Дѓ a MTA ruleazДѓ deja.\n\n"
-"DacДѓ aceastДѓ problemДѓ persistДѓ, te rugДѓm restarteazДѓ-И›i calculatorul"
+msgstr "O altă instanță a MTA rulează deja.\n\n"
+"Dacă această problemă persistă, te rugăm restartează-ți calculatorul"
 
 #: Client/loader/MainFunctions.cpp:1159
 msgid "Another instance of MTA is already running.\n\n"
 "Do you want to terminate it?"
-msgstr "O altДѓ instanИ›Дѓ a MTA ruleazДѓ deja.\n\n"
-"DoreИ™ti sДѓ o Г®nchizi?"
+msgstr "O altă instanță a MTA rulează deja.\n\n"
+"Dorești să o închizi?"
 
 #: Client/loader/MainFunctions.cpp:1196
 msgid "Registry entries are missing. Please reinstall Multi Theft Auto: San Andreas."
-msgstr "IntrДѓrile din registru lipsesc. Te rugДѓm reinstaleazДѓ Multi Theft Auto: San Andreas."
+msgstr "Intrările din registru lipsesc. Te rugăm reinstalează Multi Theft Auto: San Andreas."
 
 #: Client/loader/MainFunctions.cpp:1202
 msgid "The path to your installation of GTA: San Andreas contains unsupported (unicode) characters. Please move your Grand Theft Auto: San Andreas installation to a compatible path that contains only standard ASCII characters and reinstall Multi Theft Auto: San Andreas."
-msgstr "Calea cДѓtre dosarul tДѓu cu instalarea GTA: San Andreas conИ›ine caractere nesuportate (unicode). Te rugДѓm mutДѓ instalarea Grand Theft Auto: San Andreas Г®ntr-un loc compatibil care conИ›ine numai caractere standard de tip ASCII И™i reinstaleazДѓ Multi Theft Auto: San Andreas."
+msgstr "Calea către dosarul tău cu instalarea GTA: San Andreas conține caractere nesuportate (unicode). Te rugăm mută instalarea Grand Theft Auto: San Andreas într-un loc compatibil care conține numai caractere standard de tip ASCII și reinstalează Multi Theft Auto: San Andreas."
 
 #: Client/loader/MainFunctions.cpp:1215
 msgid "The path to your installation of 'MTA:SA' or 'GTA: San Andreas'\n"
 "contains a ';' (semicolon).\n\n"
 "If you experience problems when running MTA:SA,\n"
 "move your installation(s) to a path that does not contain a semicolon."
-msgstr "Calea cДѓtre instalarea 'MTA:SA' sau 'GTA: San Andreas'\n"
-"conИ›ine un simbol ';' (punct И™i virgulДѓ).\n\n"
-"DacДѓ Г®ntГўmpini probleme Г®n timp ce foloseИ™ti MTA:SA,\n"
-"mutДѓ instalarea cДѓtre o cale care nu conИ›ine acest simbol."
+msgstr "Calea către instalarea 'MTA:SA' sau 'GTA: San Andreas'\n"
+"conține un simbol ';' (punct și virgulă).\n\n"
+"Dacă întâmpini probleme în timp ce folosești MTA:SA,\n"
+"mută instalarea către o cale care nu conține acest simbol."
 
 #: Client/loader/MainFunctions.cpp:1398
 msgid "Invalid installation paths detected."
-msgstr "A fost detectatДѓ o adresДѓ de instalare nevalidДѓ."
+msgstr "A fost detectată o adresă de instalare nevalidă."
 
 #: Client/loader/MainFunctions.cpp:1529
 msgid "Load failed. Please ensure that the latest data files have been installed correctly."
-msgstr "ГЋncДѓrcarea a eИ™uat. Te rugДѓm asigurДѓ-te cДѓ ultimele fiИ™iere cu date au fost instalate corect."
+msgstr "Încărcarea a eșuat. Te rugăm asigură-te că ultimele fișiere cu date au fost instalate corect."
 
 #: Client/loader/MainFunctions.cpp:1538
 #, c-format
 msgid "Load failed. Please ensure that %s is installed correctly."
-msgstr "ГЋncДѓrcarea a eИ™uat. Te rugДѓm asigurДѓ-te cДѓ %s este instalat corect."
+msgstr "Încărcarea a eșuat. Te rugăm asigură-te că %s este instalat corect."
 
 #: Client/loader/MainFunctions.cpp:1547
 #, c-format
 msgid "Load failed. Could not find gta_sa.exe in %s."
-msgstr "ГЋncДѓrcarea a eИ™uat. Nu s-a putut gДѓsi 'gta_sa.exe' Г®n %s."
+msgstr "Încărcarea a eșuat. Nu s-a putut găsi 'gta_sa.exe' în %s."
 
 #: Client/loader/MainFunctions.cpp:1561
 #, c-format
 msgid "Load failed. %s exists in the GTA directory. Please delete before continuing."
-msgstr "ГЋncДѓrcarea a eИ™uat. %s se aflДѓ Г®n directorul GTA. Te rugДѓm И™terge-l Г®nainte de a continua."
+msgstr "Încărcarea a eșuat. %s se află în directorul GTA. Te rugăm șterge-l înainte de a continua."
 
 #: Client/loader/MainFunctions.cpp:1571
 #, c-format
 msgid "Main file has an incorrect name (%s)"
-msgstr "FiИ™ierul principal are un nume incorect (%s)"
+msgstr "Fișierul principal are un nume incorect (%s)"
 
 #: Client/loader/MainFunctions.cpp:1618
 #, c-format
 msgid "Data file %s is missing. Possible virus activity."
-msgstr "FiИ™ierul de date %s lipseИ™te. PosibilДѓ activitate virus."
+msgstr "Fișierul de date %s lipsește. Posibilă activitate virus."
 
 #: Client/loader/MainFunctions.cpp:1626
 #, c-format
 msgid "Data file %s is modified. Possible virus activity."
-msgstr "FiИ™ierul de date %s este modificat. PosibilДѓ activitate virus."
+msgstr "Fișierul de date %s este modificat. Posibilă activitate virus."
 
 #: Client/loader/MainFunctions.cpp:1650
 msgid ".asi files are in the installation directory.\n\n"
 "Remove these .asi files if you experience problems."
-msgstr "FiИ™iere .asi prezente Г®n dosarul de instalare.\n\n"
-"Иterge aceste fiИ™iere .asi dacДѓ Г®ntГўmpini probleme."
+msgstr "Fișiere .asi prezente în dosarul de instalare.\n\n"
+"Șterge aceste fișiere .asi dacă întâmpini probleme."
 
 #: Client/loader/MainFunctions.cpp:1819
 msgid "Invalid game paths detected."
@@ -340,11 +340,11 @@ msgstr "Au fost detectate adrese ale jocului nevalide."
 
 #: Client/loader/MainFunctions.cpp:1827
 msgid "Fix configuration issue"
-msgstr "ReparДѓ problema de configurare"
+msgstr "Repară problema de configurare"
 
 #: Client/loader/MainFunctions.cpp:1969
 msgid "GTA: San Andreas may not have launched correctly. Terminate it?"
-msgstr "Este posibil ca GTA: San Andreas sДѓ nu fi pornit corect. DoreИ™ti sДѓ Г®nchizi?"
+msgstr "Este posibil ca GTA: San Andreas să nu fi pornit corect. Dorești să închizi?"
 
 #: Client/loader/Install.cpp:265
 msgid "Unknown"
@@ -355,8 +355,8 @@ msgstr "Necunoscut"
 msgid "The file '%s' is currently locked by %zu processes.\n\n"
 "Do you want to terminate the following processes and continue updating?\n\n"
 "%s"
-msgstr "FiИ™ierul '%s' este blocat de procesul %zu.\n\n"
-"DoreИ™ti sДѓ termini acest proces И™i sДѓ continui cu actualizarea?\n\n"
+msgstr "Fișierul '%s' este blocat de procesul %zu.\n\n"
+"Dorești să termini acest proces și să continui cu actualizarea?\n\n"
 "%s"
 
 #: Client/loader/Install.cpp:479
@@ -365,124 +365,124 @@ msgid "Your installation may be corrupt now.\n\n"
 "%zu out of %zu files could not be restored from the backup.\n\n"
 "You should reinstall Multi Theft Auto from www.multitheftauto.com\n"
 "or try running the update with administrator rights."
-msgstr "DescДѓrcarea ta s-ar putea sДѓ fie coruptДѓ.\n\n"
-"%zu din %zu fiИ™iere nu au putut fi restaurate din backup.\n\n"
-"Ar trebui sДѓ reinstalezi Multi Theft Auto de pe www.multitheftauto.com\n"
-"sau sДѓ Г®ncerci sДѓ actualizezi jocul folosind permisiunile de administrator."
+msgstr "Descărcarea ta s-ar putea să fie coruptă.\n\n"
+"%zu din %zu fișiere nu au putut fi restaurate din backup.\n\n"
+"Ar trebui să reinstalezi Multi Theft Auto de pe www.multitheftauto.com\n"
+"sau să încerci să actualizezi jocul folosind permisiunile de administrator."
 
 #: Client/loader/Install.cpp:852 Client/loader/Dialogs.cpp:1035
 msgid "Installing update..."
-msgstr "Se instaleazДѓ actualizarea..."
+msgstr "Se instalează actualizarea..."
 
 #: Client/loader/Install.cpp:934 Client/loader/Dialogs.cpp:1043
 msgid "Extracting files..."
-msgstr "Se extrag fiИ™ierele..."
+msgstr "Se extrag fișierele..."
 
 #: Client/loader/CInstallManager.cpp:391
 #, c-format
 msgid "MTA:SA could not complete the following task:\n\n"
 "  '%s'\n"
-msgstr "MTA nu a reuИ™it sДѓ termine urmДѓtoarea sarcinДѓ:\n\n"
+msgstr "MTA nu a reușit să termine următoarea sarcină:\n\n"
 "'%s'\n"
 
 #: Client/loader/CInstallManager.cpp:460
 msgid "** The crash was caused by a graphics driver error **\n\n"
 "** Please update your graphics drivers **"
 msgstr "** Crashul a fost provocat de o eroare a driverului grafic **\n\n"
-"** Te rugДѓm actualizeazДѓ-И›i driverele grafice **"
+"** Te rugăm actualizează-ți driverele grafice **"
 
 #: Client/loader/CInstallManager.cpp:470
 msgid "** Out of memory - this crash was caused by insufficient free or fragmented memory. **"
-msgstr "** Out of memory - acest crash a fost cauzat de memorie insuficientДѓ sau fragmentatДѓ. **"
+msgstr "** Out of memory - acest crash a fost cauzat de memorie insuficientă sau fragmentată. **"
 
 #: Client/loader/CInstallManager.cpp:476
 msgid "** Enhanced crash capture will be attempted on next launch. **"
-msgstr "** CapturДѓ sporitДѓ crash va fi Г®ncercatДѓ la urmДѓtoarea pornire. **"
+msgstr "** Captură sporită crash va fi încercată la următoarea pornire. **"
 
 #: Client/loader/CInstallManager.cpp:1059
 msgid "Install updated MTA:SA files"
-msgstr "InstaleazДѓ fiИ™ierele MTA:SA actualizate"
+msgstr "Instalează fișierele MTA:SA actualizate"
 
 #: Client/loader/CInstallManager.cpp:1079
 msgid "Could not update due to file conflicts. Please close other applications and retry"
-msgstr "Nu s-a putut actualiza datoritДѓ conflictelor fiИ™ierelor. Te rugДѓm Г®nchide celelalte aplicaИ›ii И™i reГ®ncearcДѓ"
+msgstr "Nu s-a putut actualiza datorită conflictelor fișierelor. Te rugăm închide celelalte aplicații și reîncearcă"
 
 #: Client/loader/CInstallManager.cpp:1088
 #, c-format
 msgid "Multi Theft Auto has not been installed properly, please reinstall. %s"
-msgstr "Multi Theft Auto nu a fost instalat corespunzДѓtor, te rugДѓm reinstaleazДѓ-l. %s"
+msgstr "Multi Theft Auto nu a fost instalat corespunzător, te rugăm reinstalează-l. %s"
 
 #: Client/loader/CInstallManager.cpp:1140
 msgid "Create GTA:SA junctions"
-msgstr "CreeazДѓ intersecИ›iile GTA:SA"
+msgstr "Creează intersecțiile GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1184
 msgid "MTA:SA cannot launch because copying a file failed:"
-msgstr "MTA:SA nu poate fi lansat deoarece copierea unui fiИ™ier a eИ™uat:"
+msgstr "MTA:SA nu poate fi lansat deoarece copierea unui fișier a eșuat:"
 
 #: Client/loader/CInstallManager.cpp:1190
 #: Client/loader/CInstallManager.cpp:1230
 msgid "MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"
-msgstr "MTA:SA nu poate fi lansat deoarece un fiИ™ier MTA:SA este incorect sau lipseИ™te:"
+msgstr "MTA:SA nu poate fi lansat deoarece un fișier MTA:SA este incorect sau lipsește:"
 
 #: Client/loader/CInstallManager.cpp:1199
 msgid "Copy MTA:SA files"
-msgstr "CopiazДѓ fiИ™ierele MTA:SA"
+msgstr "Copiază fișierele MTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1222
 #: Client/loader/CInstallManager.cpp:1300
 msgid "MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"
-msgstr "MTA:SA nu poate fi lansat deoarece un fiИ™ier GTA:SA este incorect sau lipseИ™te:"
+msgstr "MTA:SA nu poate fi lansat deoarece un fișier GTA:SA este incorect sau lipsește:"
 
 #: Client/loader/CInstallManager.cpp:1307
 msgid "Patch GTA:SA dependency"
-msgstr "ActualizeazДѓ dependinИ›Дѓ GTA:SA"
+msgstr "Actualizează dependință GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1355
 msgid "MTA:SA cannot launch because the GTA:SA executable is incorrect or missing:"
-msgstr "MTA:SA nu poate fi lansat deoarece executabilul GTA:SA este incorect sau lipseИ™te:"
+msgstr "MTA:SA nu poate fi lansat deoarece executabilul GTA:SA este incorect sau lipsește:"
 
 #: Client/loader/CInstallManager.cpp:1359
 msgid "Please check your anti-virus for a false-positive detection, try to add an exception for the GTA:SA executable and restart MTA:SA."
-msgstr "VДѓ rugДѓm verificaИ›i antivirusul pentru o detectare fals-pozitivДѓ, Г®ncercaИ›i sДѓ adДѓugaИ›i o excepИ›ie pentru executabilul GTA:SA И™i apoi reporniИ›i MTA:SA."
+msgstr "Vă rugăm verificați antivirusul pentru o detectare fals-pozitivă, încercați să adăugați o excepție pentru executabilul GTA:SA și apoi reporniți MTA:SA."
 
 #: Client/loader/CInstallManager.cpp:1365
 msgid "Generate GTA:SA"
-msgstr "GenereazДѓ GTA:SA"
+msgstr "Generează GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1380
 msgid "MTA:SA cannot launch because the GTA:SA executable is not loadable:"
-msgstr "MTA:SA nu poate fi lansat deoarece executabilul GTA:SA nu poate fi Г®ncДѓrcat:"
+msgstr "MTA:SA nu poate fi lansat deoarece executabilul GTA:SA nu poate fi încărcat:"
 
 #: Client/loader/CInstallManager.cpp:1387
 #: Client/loader/CInstallManager.cpp:1410
 msgid "Patch GTA:SA"
-msgstr "ActualizeazДѓ GTA:SA"
+msgstr "Actualizează GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1403
 msgid "MTA:SA cannot launch because patching GTA:SA has failed:"
-msgstr "MTA:SA nu poate fi lansat deoarece actualizarea GTA:SA a eИ™uat:"
+msgstr "MTA:SA nu poate fi lansat deoarece actualizarea GTA:SA a eșuat:"
 
 #: Client/loader/CInstallManager.cpp:1584 Client/core/CCore.cpp:846
 #, c-format
 msgid "MTA:SA cannot continue because drive %s does not have enough space."
-msgstr "MTA:SA nu poate continua deoarece partiЕЈia %s nu are destul spaЕЈiu."
+msgstr "MTA:SA nu poate continua deoarece partiţia %s nu are destul spaţiu."
 
 #: Client/loader/CInstallManager.cpp:1640
 msgid "Missing file:"
-msgstr "FiИ™ier lipsДѓ:"
+msgstr "Fișier lipsă:"
 
 #: Client/loader/CInstallManager.cpp:1644
 msgid "If MTA fails to load, please re-install GTA:SA"
-msgstr "DacДѓ MTA nu reuИ™eИ™te sДѓ se Г®ncarce, te rugДѓm reinstaleazДѓ GTA:SA"
+msgstr "Dacă MTA nu reușește să se încarce, te rugăm reinstalează GTA:SA"
 
 #: Client/loader/CInstallManager.cpp:1679
 msgid "Update install settings"
-msgstr "ActualizeazДѓ setДѓrile de instalare"
+msgstr "Actualizează setările de instalare"
 
 #: Client/loader/CInstallManager.cpp:1832
 msgid "Update compatibility settings"
-msgstr "ActualizeazДѓ setДѓrile de compatibilitate"
+msgstr "Actualizează setările de compatibilitate"
 
 #. /////////////////////////////////////////////////////////////////////////
 #.
@@ -528,7 +528,7 @@ msgstr "OK"
 
 #: Client/loader/Dialogs.cpp:66
 msgid "Quit"
-msgstr "IeИ™ire"
+msgstr "Ieșire"
 
 #: Client/loader/Dialogs.cpp:67
 #: Client/core/ServerBrowser/CServerBrowser.cpp:717
@@ -542,27 +542,27 @@ msgstr "Ajutor"
 #: Client/gui/CGUIMessageBox_Impl.cpp:68
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:123
 msgid "Cancel"
-msgstr "AnuleazДѓ"
+msgstr "Anulează"
 
 #: Client/loader/Dialogs.cpp:83
 msgid "MTA: San Andreas has encountered a problem"
-msgstr "MTA: San Andreas a Г®ntГўmpinat o problemДѓ"
+msgstr "MTA: San Andreas a întâmpinat o problemă"
 
 #: Client/loader/Dialogs.cpp:84
 msgid "Crash information"
-msgstr "InformaИ›ii crash"
+msgstr "Informații crash"
 
 #: Client/loader/Dialogs.cpp:85
 msgid "Tick the check box to send this crash info to MTA devs using the 'internet'"
-msgstr "BifeazДѓ aceastДѓ casetДѓ pentru a trimite aceste informaИ›ii legate de crash cДѓtre dezvoltatorii MTA folosind 'internetul'"
+msgstr "Bifează această casetă pentru a trimite aceste informații legate de crash către dezvoltatorii MTA folosind 'internetul'"
 
 #: Client/loader/Dialogs.cpp:86
 msgid "Doing so will increase the chance of this crash being fixed."
-msgstr "Acest lucru va spori И™ansele ca acest crash sДѓ fie reparat."
+msgstr "Acest lucru va spori șansele ca acest crash să fie reparat."
 
 #: Client/loader/Dialogs.cpp:87
 msgid "Do you want to restart MTA: San Andreas ?"
-msgstr "EИ™ti sigur cДѓ vrei sДѓ reporneИ™ti MTA: San Andreas?"
+msgstr "Ești sigur că vrei să repornești MTA: San Andreas?"
 
 #: Client/loader/Dialogs.cpp:94
 msgid "MTA: San Andreas - Warning"
@@ -570,37 +570,37 @@ msgstr "MTA: San Andreas - Avertisment"
 
 #: Client/loader/Dialogs.cpp:95
 msgid "Your Grand Theft Auto: San Andreas install directory contains these files:"
-msgstr "Directorul tДѓu Grand Theft Auto: San Andreas conИ›ine aceste fiИ™iere:"
+msgstr "Directorul tău Grand Theft Auto: San Andreas conține aceste fișiere:"
 
 #: Client/loader/Dialogs.cpp:97
 msgid "These files are not required and may interfere with the graphical features in this version of MTA:SA.\n\n"
 "It is recommended that you remove or rename these files."
-msgstr "Aceste fiИ™iere nu sunt necesare И™i pot interfera cu caracteristicile grafice ale MTA:SA.\n\n"
-"Este recomandat sДѓ И™tergi sau sДѓ redenumeИ™ti aceste fiИ™iere."
+msgstr "Aceste fișiere nu sunt necesare și pot interfera cu caracteristicile grafice ale MTA:SA.\n\n"
+"Este recomandat să ștergi sau să redenumești aceste fișiere."
 
 #: Client/loader/Dialogs.cpp:99
 msgid "Keep these files, but also show this warning on next start"
-msgstr "PДѓstreazДѓ aceste fiИ™iere, dar aratДѓ acest avertisment И™i la urmДѓtoarea pornire"
+msgstr "Păstrează aceste fișiere, dar arată acest avertisment și la următoarea pornire"
 
 #: Client/loader/Dialogs.cpp:100
 msgid "Do not remind me about these files again"
-msgstr "Nu Г®mi reaminti despre aceste fiИ™iere"
+msgstr "Nu îmi reaminti despre aceste fișiere"
 
 #: Client/loader/Dialogs.cpp:101
 msgid "Rename these files from *.dll to *.dll.bak"
-msgstr "RedenumeИ™te aceste fiИ™iere din *.dll Г®n *.dll.bak"
+msgstr "Redenumește aceste fișiere din *.dll în *.dll.bak"
 
 #: Client/loader/Dialogs.cpp:102
 msgid "Show me these files"
-msgstr "AratДѓ-mi fiИ™ierele"
+msgstr "Arată-mi fișierele"
 
 #: Client/loader/Dialogs.cpp:103
 msgid "Play MTA:SA"
-msgstr "LanseazДѓ MTA:SA"
+msgstr "Lansează MTA:SA"
 
 #: Client/loader/Dialogs.cpp:109
 msgid "MTA: San Andreas - Confusing options"
-msgstr "MTA: San Andreas - OpИ›iuni derutante"
+msgstr "MTA: San Andreas - Opțiuni derutante"
 
 #: Client/loader/Dialogs.cpp:110
 msgid "NVidia Optimus detected!"
@@ -608,7 +608,7 @@ msgstr "nVidia Optimus detectat!"
 
 #: Client/loader/Dialogs.cpp:111
 msgid "Try each option and see what works:"
-msgstr "ГЋncearcДѓ fiecare opИ›inue И™i vezi care funcИ›ioneazДѓ:"
+msgstr "Încearcă fiecare opținue și vezi care funcționează:"
 
 #: Client/loader/Dialogs.cpp:112
 msgid "A - Standard NVidia"
@@ -628,19 +628,19 @@ msgstr "D - Intel Alternativ"
 
 #: Client/loader/Dialogs.cpp:116
 msgid "If you get desperate, this might help:"
-msgstr "DacДѓ devi disperat, asta te-ar putea ajuta:"
+msgstr "Dacă devi disperat, asta te-ar putea ajuta:"
 
 #: Client/loader/Dialogs.cpp:117
 msgid "If you have already selected an option that works, this might help:"
-msgstr "DacДѓ aЕЈi selectat deja o opЕЈiune care funcЕЈioneazДѓ, acest lucru ar putea ajuta:"
+msgstr "Dacă aţi selectat deja o opţiune care funcţionează, acest lucru ar putea ajuta:"
 
 #: Client/loader/Dialogs.cpp:118
 msgid "Force windowed mode"
-msgstr "ForИ›eazДѓ modul fereastrДѓ"
+msgstr "Forțează modul fereastră"
 
 #: Client/loader/Dialogs.cpp:119
 msgid "Don't show again"
-msgstr "Nu arДѓta din nou"
+msgstr "Nu arăta din nou"
 
 #: Client/loader/Dialogs.cpp:126 Client/game_sa/CSettingsSA.cpp:910
 msgid "MTA: San Andreas"
@@ -654,9 +654,9 @@ msgstr "Avertisment: Nu a putut fi detectat niciun produs anti-virus"
 msgid "MTA could not detect an anti-virus on your PC.\n\n"
 "Viruses interfere with MTA and degrade your gameplay experience.\n\n"
 "Press 'Help' for more information."
-msgstr "MTA nu a putut detecta niciun anti-virus pe calculatorul dumneavoastrДѓ.\n\n"
-"ViruИ™ii interfereazДѓ cu MTA И™i Г®И›i degradeazДѓ experienИ›a de joc.\n\n"
-"ApasДѓ pe 'Ajutor' pentru mai multe informaИ›ii."
+msgstr "MTA nu a putut detecta niciun anti-virus pe calculatorul dumneavoastră.\n\n"
+"Virușii interferează cu MTA și îți degradează experiența de joc.\n\n"
+"Apasă pe 'Ajutor' pentru mai multe informații."
 
 #: Client/loader/Dialogs.cpp:132
 msgid "I have already installed an anti-virus"
@@ -671,40 +671,40 @@ msgstr "Nu voi instala un anti-virus."
 msgid "The crash you experienced is due to memory abuse by servers.\n\n"
 "Even with plenty of RAM, this is a x86 game with address space limits up to 3.6GB and some highly unoptimized servers with a lot of mods (or just a few poorly written scripts) can make this happen, as well as lag your game.\n\n"
 "Contact the server owner or MTA support in the MTA official discord (https://discord.gg/mtasa) for more information."
-msgstr "Crash-ul Г®ntГўmpinat se datoreazДѓ abuzului de memorie de cДѓtre servere.\n\n"
-"Chiar И™i cu multДѓ memorie RAM, acesta este un joc x86 cu limite de spaИ›iu pentru adrese de pГўnДѓ la 3.6 GB, iar unele servere extrem de neoptimizate, cu multe modificДѓri (sau doar cГўteva scripturi prost scrise), pot provoca acest lucru, precum И™i lag.\n\n"
-"ContacteazДѓ proprietarul serverului sau asistenИ›a MTA pe Discord-ul oficial MTA (https://discord.gg/mtasa) pentru mai multe informaИ›ii."
+msgstr "Crash-ul întâmpinat se datorează abuzului de memorie de către servere.\n\n"
+"Chiar și cu multă memorie RAM, acesta este un joc x86 cu limite de spațiu pentru adrese de până la 3.6 GB, iar unele servere extrem de neoptimizate, cu multe modificări (sau doar câteva scripturi prost scrise), pot provoca acest lucru, precum și lag.\n\n"
+"Contactează proprietarul serverului sau asistența MTA pe Discord-ul oficial MTA (https://discord.gg/mtasa) pentru mai multe informații."
 
 #: Client/loader/Dialogs.cpp:673
 msgid "MTA: San Andreas - Out of Memory Information"
-msgstr "MTA: San Andreas - InformaИ›ie Memorie InsuficientДѓ"
+msgstr "MTA: San Andreas - Informație Memorie Insuficientă"
 
 #: Client/loader/Dialogs.cpp:1024
 msgid "Searching for Grand Theft Auto San Andreas"
-msgstr "Se cautДѓ Grand Theft Auto: San Andreas"
+msgstr "Se caută Grand Theft Auto: San Andreas"
 
 #: Client/loader/Dialogs.cpp:1027
 msgid "Please start Grand Theft Auto San Andreas"
-msgstr "Te rugДѓm lanseazДѓ Grand Theft Auto: San Andreas"
+msgstr "Te rugăm lansează Grand Theft Auto: San Andreas"
 
 #: Client/core/CConnectManager.cpp:85
 msgid "Connecting failed. Invalid nick provided!"
-msgstr "Conectarea a eИ™uat. Numele de utilizator specificat este invalid!"
+msgstr "Conectarea a eșuat. Numele de utilizator specificat este invalid!"
 
 #: Client/core/CConnectManager.cpp:116
 msgid "Connecting failed. Invalid host provided!"
-msgstr "Conectarea a eИ™uat. Hostul specificat este invalid!"
+msgstr "Conectarea a eșuat. Hostul specificat este invalid!"
 
 #: Client/core/CConnectManager.cpp:132
 #, c-format
 msgid "Connecting to %s at port %u failed!"
-msgstr "Conectarea la %s cu portul %u a eИ™uat!"
+msgstr "Conectarea la %s cu portul %u a eșuat!"
 
 #. Display the status box
 #: Client/core/CConnectManager.cpp:153
 #, c-format
 msgid "Connecting to %s:%u ..."
-msgstr "Se conecteazДѓ la %s:%u ..."
+msgstr "Se conectează la %s:%u ..."
 
 #: Client/core/CConnectManager.cpp:155
 #, c-format
@@ -715,7 +715,7 @@ msgstr "Reconectare la %s:%u ..."
 #: Client/core/CConnectManager.cpp:156
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
 msgid "CONNECTING"
-msgstr "SE CONECTEAZД‚"
+msgstr "SE CONECTEAZĂ"
 
 #: Client/core/CConnectManager.cpp:271
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1358
@@ -725,7 +725,7 @@ msgstr "Conexiunea a expirat"
 #: Client/core/CConnectManager.cpp:285 Client/core/CConnectManager.cpp:289
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1406
 msgid "Disconnected: unknown protocol error"
-msgstr "Deconectat: eroare de protocol necunoscutДѓ"
+msgstr "Deconectat: eroare de protocol necunoscută"
 
 #: Client/core/CConnectManager.cpp:293
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1410
@@ -735,12 +735,12 @@ msgstr "Deconectat: deconectat automat"
 #: Client/core/CConnectManager.cpp:297
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1414
 msgid "Disconnected: connection lost remotely"
-msgstr "Deconectat: conexiune pierdutДѓ"
+msgstr "Deconectat: conexiune pierdută"
 
 #: Client/core/CConnectManager.cpp:301
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1418
 msgid "Disconnected: you are banned from this server"
-msgstr "Deconectat: ai interdicИ›ie pe acest server"
+msgstr "Deconectat: ai interdicție pe acest server"
 
 #: Client/core/CConnectManager.cpp:308
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1426
@@ -750,31 +750,31 @@ msgstr "Deconectat: deconectat de la server"
 #: Client/core/CConnectManager.cpp:312
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1430
 msgid "Disconnected: connection to the server was lost"
-msgstr "Deconectat: conexiunea la server a fost pierdutДѓ"
+msgstr "Deconectat: conexiunea la server a fost pierdută"
 
 #: Client/core/CConnectManager.cpp:319
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1438
 msgid "Disconnected: connection was refused"
-msgstr "Deconectat: conectarea a fost refuzatДѓ"
+msgstr "Deconectat: conectarea a fost refuzată"
 
 #. Failed loading the mod
 #: Client/core/CConnectManager.cpp:414
 #, c-format
 msgid "No such mod installed (%s)"
-msgstr "Nu existДѓ asemena mod instalat (%s)"
+msgstr "Nu există asemena mod instalat (%s)"
 
 #: Client/core/CConnectManager.cpp:422
 msgid "Bad server response (2)"
-msgstr "RДѓspuns invalid de la server (2)"
+msgstr "Răspuns invalid de la server (2)"
 
 #: Client/core/CConnectManager.cpp:432
 msgid "Bad server response (1)"
-msgstr "RДѓspuns invalid de la server (1)"
+msgstr "Răspuns invalid de la server (1)"
 
 #. TRANSLATORS: Replace with your language native name
 #: Client/core/CLocalization.cpp:16
 msgid "English"
-msgstr "RomГўnДѓ"
+msgstr "Română"
 
 #: Client/core/CVersionUpdater.cpp:627
 msgid "Busy"
@@ -782,7 +782,7 @@ msgstr "Ocupat"
 
 #: Client/core/CVersionUpdater.cpp:627
 msgid "Can't check for updates right now"
-msgstr "Nu se poate verifica pentru actualizДѓri acum"
+msgstr "Nu se poate verifica pentru actualizări acum"
 
 #: Client/core/CVersionUpdater.cpp:1630 Client/core/CVersionUpdater.cpp:1650
 #: Client/core/CVersionUpdater.cpp:1668
@@ -794,31 +794,31 @@ msgstr "MTA:SA %s necesar"
 #, c-format
 msgid "An updated version of MTA:SA %s is required to join the selected server.\n\n"
 "Do you want to download and install MTA:SA %s ?"
-msgstr "O versiune mai actualДѓ de MTA:SA %s este necesarДѓ pentru a juca pe serverul selectat.\n\n"
-"EИ™ti sigur cДѓ vrei sДѓ descarci И™i sДѓ instalezi MTA:SA %s?"
+msgstr "O versiune mai actuală de MTA:SA %s este necesară pentru a juca pe serverul selectat.\n\n"
+"Ești sigur că vrei să descarci și să instalezi MTA:SA %s?"
 
 #: Client/core/CVersionUpdater.cpp:1651
 #, c-format
 msgid "Do you want to launch MTA:SA %s and connect to this server ?"
-msgstr "Vrei sДѓ porneИ™ti MTA:SA %s И™i sДѓ te conectezi la acest server?"
+msgstr "Vrei să pornești MTA:SA %s și să te conectezi la acest server?"
 
 #: Client/core/CVersionUpdater.cpp:1669
 msgid "It is not possible to connect at this time.\n\n"
 "Please try later."
-msgstr "Nu este posibil sДѓ te conectezi Г®n acest moment.\n\n"
-"ГЋncearcДѓ mai tГўrziu."
+msgstr "Nu este posibil să te conectezi în acest moment.\n\n"
+"Încearcă mai târziu."
 
 #: Client/core/CVersionUpdater.cpp:1851
 msgid "Connecting"
-msgstr "Se conecteazДѓ"
+msgstr "Se conectează"
 
 #: Client/core/CVersionUpdater.cpp:1852 Client/core/CVersionUpdater.cpp:1868
 msgid "Please wait..."
-msgstr "AИ™teaptДѓ..."
+msgstr "Așteaptă..."
 
 #: Client/core/CVersionUpdater.cpp:1867
 msgid "CHECKING"
-msgstr "SE VERIFICД‚"
+msgstr "SE VERIFICĂ"
 
 #: Client/core/CVersionUpdater.cpp:1884 Client/core/CVersionUpdater.cpp:1977
 msgid "UPDATE CHECK"
@@ -826,15 +826,15 @@ msgstr "VERIFICARE ACTUALIZARE"
 
 #: Client/core/CVersionUpdater.cpp:1885
 msgid "No update needed"
-msgstr "Nicio actualizare nu este necesarДѓ"
+msgstr "Nicio actualizare nu este necesară"
 
 #: Client/core/CVersionUpdater.cpp:1902
 msgid "DOWNLOADING"
-msgstr "SE DESCARCД‚"
+msgstr "SE DESCARCĂ"
 
 #: Client/core/CVersionUpdater.cpp:1903
 msgid "waiting..."
-msgstr "se aИ™teaptДѓ..."
+msgstr "se așteaptă..."
 
 #: Client/core/CVersionUpdater.cpp:1919
 msgid "MANDATORY UPDATE"
@@ -843,24 +843,24 @@ msgstr "ACTUALIZARE OBLIGATORIE"
 #: Client/core/CVersionUpdater.cpp:1920
 msgid "To join this server, you must update MTA.\n\n"
 " Do you want to update now ?"
-msgstr "Pentru a juca pe acest server trebuie sДѓ actualizezi MTA.\n\n"
-"DoreИ™ti sДѓ actualizezi acum?"
+msgstr "Pentru a juca pe acest server trebuie să actualizezi MTA.\n\n"
+"Dorești să actualizezi acum?"
 
 #: Client/core/CVersionUpdater.cpp:1938
 msgid "OPTIONAL UPDATE"
-msgstr "ACTUALIZARE OPИљIONALД‚"
+msgstr "ACTUALIZARE OPȚIONALĂ"
 
 #: Client/core/CVersionUpdater.cpp:1939
 msgid "Server says an update is recommended, but not essential.\n\n"
 " Do you want to update now ?"
-msgstr "Serverul spune cДѓ o actualizare este recomandatДѓ, dar nu necesarДѓ.\n\n"
-"DoreИ™ti sДѓ actualizezi acum?"
+msgstr "Serverul spune că o actualizare este recomandată, dar nu necesară.\n\n"
+"Dorești să actualizezi acum?"
 
 #: Client/core/CVersionUpdater.cpp:1978
 msgid "An update is currently not available.\n\n"
 "Please check www.multitheftauto.com"
-msgstr "Actualizarea nu este disponibilДѓ momentan.\n\n"
-"Te rugДѓm verificДѓ www.multitheftauto.com"
+msgstr "Actualizarea nu este disponibilă momentan.\n\n"
+"Te rugăm verifică www.multitheftauto.com"
 
 #: Client/core/CVersionUpdater.cpp:1999 Client/core/CVersionUpdater.cpp:2181
 msgid "ERROR SAVING"
@@ -868,16 +868,16 @@ msgstr "EROARE SALVARE"
 
 #: Client/core/CVersionUpdater.cpp:2000 Client/core/CVersionUpdater.cpp:2182
 msgid "Unable to create the file."
-msgstr "Nu s-a putut crea fiИ™ierul."
+msgstr "Nu s-a putut crea fișierul."
 
 #: Client/core/CVersionUpdater.cpp:2008 Client/core/CVersionUpdater.cpp:2017
 #: Client/core/CVersionUpdater.cpp:2190 Client/core/CVersionUpdater.cpp:2199
 msgid "ERROR DOWNLOADING"
-msgstr "EROARE DESCД‚RCARE"
+msgstr "EROARE DESCĂRCARE"
 
 #: Client/core/CVersionUpdater.cpp:2009 Client/core/CVersionUpdater.cpp:2191
 msgid "The downloaded file appears to be incorrect."
-msgstr "FiИ™ierul descДѓrcat pare sДѓ fie incorect."
+msgstr "Fișierul descărcat pare să fie incorect."
 
 #: Client/core/CVersionUpdater.cpp:2018 Client/core/CVersionUpdater.cpp:2200
 msgid "For some reason."
@@ -885,15 +885,15 @@ msgstr "Dintr-un anumit motiv."
 
 #: Client/core/CVersionUpdater.cpp:2029 Client/core/CVersionUpdater.cpp:2213
 msgid "DOWNLOAD COMPLETE"
-msgstr "DESCД‚RCARE COMPLETД‚"
+msgstr "DESCĂRCARE COMPLETĂ"
 
 #: Client/core/CVersionUpdater.cpp:2053
 msgid " - Unknown problem in _DialogUpdateResult"
-msgstr " - ProblemДѓ necunoscutДѓ Г®n _DialogUpdateResult"
+msgstr " - Problemă necunoscută în _DialogUpdateResult"
 
 #: Client/core/CVersionUpdater.cpp:2144 Client/core/CSettings.cpp:5731
 msgid "CUSTOMIZED GTA:SA FILES"
-msgstr "FIИIERE GTA:SA MODIFICATE"
+msgstr "FIȘIERE GTA:SA MODIFICATE"
 
 #: Client/core/CVersionUpdater.cpp:2151 Client/core/CVersionUpdater.cpp:2161
 msgid "Ok"
@@ -906,8 +906,8 @@ msgstr "EROARE"
 #: Client/core/CVersionUpdater.cpp:2160
 msgid "Some MTA:SA data files are missing.\n\n\n"
 "Please reinstall MTA:SA"
-msgstr "Unele fiИ™iere MTA:SA lipsesc.\n\n\n"
-"Te rugДѓm sДѓ reinstalezi MTA:SA"
+msgstr "Unele fișiere MTA:SA lipsesc.\n\n\n"
+"Te rugăm să reinstalezi MTA:SA"
 
 #: Client/core/CVersionUpdater.cpp:2837
 #, c-format
@@ -919,7 +919,7 @@ msgstr "%3d%% complet"
 msgid "\n\n"
 "Waiting for response  -  %-3d"
 msgstr "\n\n"
-"Se aИ™teaptДѓ un rДѓspuns - %-3d"
+"Se așteaptă un răspuns - %-3d"
 
 #: Client/core/CCommandFuncs.cpp:24
 msgid "***[ COMMAND HELP ]***\n"
@@ -932,20 +932,20 @@ msgstr "* Timpul este %d:%02d:%02d"
 
 #: Client/core/CCommandFuncs.cpp:191
 msgid "connect: Network is not ready, please wait a moment"
-msgstr "conectare: ReИ›eaua nu este gata, te rugДѓm aИ™teaptДѓ un moment"
+msgstr "conectare: Rețeaua nu este gata, te rugăm așteaptă un moment"
 
 #: Client/core/CCommandFuncs.cpp:225
 msgid "connect: Syntax is 'connect <host> [<port> <nick> <pass>]'"
-msgstr "connect: Sintaxa este 'connect <host> [<port> <nume> <parolДѓ>]'"
+msgstr "connect: Sintaxa este 'connect <host> [<port> <nume> <parolă>]'"
 
 #: Client/core/CCommandFuncs.cpp:233
 msgid "connect: Bad port number"
-msgstr "connect: NumДѓrul portului este incorect"
+msgstr "connect: Numărul portului este incorect"
 
 #: Client/core/CCommandFuncs.cpp:255
 #, c-format
 msgid "connect: Connecting to %s:%u..."
-msgstr "connect: Se conecteazДѓ la %s:%u..."
+msgstr "connect: Se conectează la %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:259
 #, c-format
@@ -954,20 +954,20 @@ msgstr "connect: nu s-a putut realiza conexiunea la %s:%u!"
 
 #: Client/core/CCommandFuncs.cpp:264
 msgid "connect: Failed to unload current mod"
-msgstr "connect: Dezactivarea modificДѓrii curente a eИ™uat"
+msgstr "connect: Dezactivarea modificării curente a eșuat"
 
 #: Client/core/CCommandFuncs.cpp:284
 msgid "reconnect: Network is not ready, please wait a moment"
-msgstr "reconectare: ReИ›eaua nu este gata, te rugДѓm aИ™teaptДѓ un moment"
+msgstr "reconectare: Rețeaua nu este gata, te rugăm așteaptă un moment"
 
 #: Client/core/CCommandFuncs.cpp:306
 msgid "reconnect: Bad port number"
-msgstr "reconectare: NumДѓr port incorect"
+msgstr "reconectare: Număr port incorect"
 
 #: Client/core/CCommandFuncs.cpp:325
 #, c-format
 msgid "reconnect: Reconnecting to %s:%u..."
-msgstr "reconectare: Se reconecteazДѓ la %s:%u..."
+msgstr "reconectare: Se reconectează la %s:%u..."
 
 #: Client/core/CCommandFuncs.cpp:329
 #, c-format
@@ -976,22 +976,22 @@ msgstr "reconectare: nu s-a putut conecta la %s:%u!"
 
 #: Client/core/CCommandFuncs.cpp:363
 msgid "Bound all controls from GTA"
-msgstr "FoloseИ™te controalele din GTA"
+msgstr "Folosește controalele din GTA"
 
 #: Client/core/CCommandFuncs.cpp:377
 msgid "Saved configuration file"
-msgstr "FiЕџierul cu configuraЕЈia a fost salvat"
+msgstr "Fişierul cu configuraţia a fost salvat"
 
 #. Print it
 #: Client/core/CCommandFuncs.cpp:456
 #, c-format
 msgid "* Your serial is: %s"
-msgstr "* Serialul tДѓu este: %s"
+msgstr "* Serialul tău este: %s"
 
 #. Create window (with frame) if it will fit inside the screen resolution
 #: Client/core/CSettings.cpp:503
 msgid "SETTINGS"
-msgstr "SETД‚RI"
+msgstr "SETĂRI"
 
 #: Client/core/CSettings.cpp:549
 msgid "Multiplayer"
@@ -1019,7 +1019,7 @@ msgstr "Controale"
 
 #: Client/core/CSettings.cpp:555
 msgid "Interface"
-msgstr "InterfaЕЈДѓ"
+msgstr "Interfaţă"
 
 #: Client/core/CSettings.cpp:556
 msgid "Web Browser"
@@ -1032,7 +1032,7 @@ msgstr "Avansat"
 #: Client/core/CSettings.cpp:582 Client/core/CSettings.cpp:790
 #: Client/core/CSettings.cpp:1119 Client/core/CSettings.cpp:1415
 msgid "Load defaults"
-msgstr "ГЋncarcДѓ setДѓrile implicite"
+msgstr "Încarcă setările implicite"
 
 #. *
 #. *  Controls tab
@@ -1044,37 +1044,37 @@ msgstr "Sensibilitate mouse:"
 #. VerticalAimSensitivity
 #: Client/core/CSettings.cpp:599 Client/core/CSettings.cpp:644
 msgid "Vertical aim sensitivity:"
-msgstr "Sensibilitate И›intДѓ verticalДѓ:"
+msgstr "Sensibilitate țintă verticală:"
 
 #. Mouse Options
 #: Client/core/CSettings.cpp:602
 msgid "Mouse options"
-msgstr "OpИ›iuni mouse"
+msgstr "Opțiuni mouse"
 
 #: Client/core/CSettings.cpp:609
 msgid "Invert mouse vertically"
-msgstr "InverseazДѓ mouseul vertical"
+msgstr "Inversează mouseul vertical"
 
 #: Client/core/CSettings.cpp:613
 msgid "Steer with mouse"
-msgstr "DirijeazДѓ cu mouseul"
+msgstr "Dirijează cu mouseul"
 
 #: Client/core/CSettings.cpp:617
 msgid "Fly with mouse"
-msgstr "PiloteazДѓ cu mouseul"
+msgstr "Pilotează cu mouseul"
 
 #: Client/core/CSettings.cpp:663
 msgid "Use mouse sensitivity for aiming"
-msgstr "FoloseИ™te sensibilitatea mouse-ului pentru И›intire"
+msgstr "Folosește sensibilitatea mouse-ului pentru țintire"
 
 #. Joypad options
 #: Client/core/CSettings.cpp:669
 msgid "Joypad options"
-msgstr "OpИ›iuni joypad"
+msgstr "Opțiuni joypad"
 
 #: Client/core/CSettings.cpp:682
 msgid "Standard controls (Mouse + Keyboard)"
-msgstr "Controale standard (Mouse + TastaturДѓ)"
+msgstr "Controale standard (Mouse + Tastatură)"
 
 #: Client/core/CSettings.cpp:689
 msgid "Classic controls (Joypad)"
@@ -1082,19 +1082,19 @@ msgstr "Controale clasice (Joypad)"
 
 #: Client/core/CSettings.cpp:726
 msgid "Dead Zone"
-msgstr "ZonДѓ moartДѓ"
+msgstr "Zonă moartă"
 
 #: Client/core/CSettings.cpp:731
 msgid "Saturation"
-msgstr "SaturaИ›ie"
+msgstr "Saturație"
 
 #: Client/core/CSettings.cpp:737
 msgid "Use the 'Binds' tab for joypad buttons."
-msgstr "FoloseИ™te tabul 'Taste' pentru butoanele joypadului."
+msgstr "Folosește tabul 'Taste' pentru butoanele joypadului."
 
 #: Client/core/CSettings.cpp:776
 msgid "Left Stick"
-msgstr "Stickul stГўng"
+msgstr "Stickul stâng"
 
 #: Client/core/CSettings.cpp:782
 msgid "Right Stick"
@@ -1106,11 +1106,11 @@ msgstr "DESCRIERE"
 
 #: Client/core/CSettings.cpp:798
 msgid "KEY"
-msgstr "TASTД‚"
+msgstr "TASTĂ"
 
 #: Client/core/CSettings.cpp:800
 msgid "ALT. KEY"
-msgstr "TASTД‚ ALTERNATIVД‚"
+msgstr "TASTĂ ALTERNATIVĂ"
 
 #. *
 #. *    Multiplayer tab
@@ -1121,10 +1121,11 @@ msgstr "Nume:"
 
 #: Client/core/CSettings.cpp:830
 msgid "Save server passwords"
-msgstr "SalveazДѓ parolele severelor"
+msgstr "Salvează parolele severelor"
 
 #: Client/core/CSettings.cpp:835
 msgid "Auto-refresh server browser"
+msgstr "Reîmprospătează automat lista cu servere"
 
 #: Client/core/CSettings.cpp:900
 msgid "History"
@@ -1163,7 +1164,7 @@ msgid "DELETE NICKNAME"
 msgstr ""
 
 #: Client/core/CSettings.cpp:4153
-msgid "Delete nickname "%s" from history?"
+msgid "Delete nickname \"%s\" from history?"
 msgstr ""
 
 #: Client/core/CSettings.cpp:4168
@@ -1174,19 +1175,17 @@ msgstr ""
 msgid "Delete all nicknames from history?"
 msgstr ""
 
-msgstr "ReГ®mprospДѓteazДѓ automat lista cu servere"
-
 #: Client/core/CSettings.cpp:840
 msgid "Allow screen upload"
-msgstr "Permite trimiterea capturilor de ecran cДѓtre servere"
+msgstr "Permite trimiterea capturilor de ecran către servere"
 
 #: Client/core/CSettings.cpp:845
 msgid "Allow external sounds"
-msgstr "PermiteЕЈi sunete externe"
+msgstr "Permiteţi sunete externe"
 
 #: Client/core/CSettings.cpp:850
 msgid "Always show download window"
-msgstr "AratДѓ Г®ntotdeauna fereastra de descДѓrcare"
+msgstr "Arată întotdeauna fereastra de descărcare"
 
 #: Client/core/CSettings.cpp:855
 msgid "Allow connecting with Discord Rich Presence"
@@ -1199,19 +1198,19 @@ msgstr "Permite statusul ingame a GTA:SA pe Steam"
 #. Enable camera photos getting saved to documents folder
 #: Client/core/CSettings.cpp:866
 msgid "Save photos taken by camera weapon to GTA San Andreas User Files folder"
-msgstr "SalveazДѓ pozele fДѓcute cu camera Г®n dosarul GTA San Andreas User Files"
+msgstr "Salvează pozele făcute cu camera în dosarul GTA San Andreas User Files"
 
 #: Client/core/CSettings.cpp:871
 msgid "Ask before disconnecting from server using main menu"
-msgstr "ГЋntreabДѓ Г®nainte sДѓ te deconectezi de pe server folosind meniul principal"
+msgstr "Întreabă înainte să te deconectezi de pe server folosind meniul principal"
 
 #: Client/core/CSettings.cpp:876
 msgid "Use customized GTA:SA files"
-msgstr "FoloseЕџte fiЕџiere GTA:SA modificate"
+msgstr "Foloseşte fişiere GTA:SA modificate"
 
 #: Client/core/CSettings.cpp:881
 msgid "Map rendering options"
-msgstr "OpИ›iuni de redare a hДѓrИ›ii"
+msgstr "Opțiuni de redare a hărții"
 
 #: Client/core/CSettings.cpp:889
 msgid "Opacity:"
@@ -1219,7 +1218,7 @@ msgstr "Opacitate:"
 
 #: Client/core/CSettings.cpp:912
 msgid "Image resolution:"
-msgstr "RezoluИ›ie imagine:"
+msgstr "Rezoluție imagine:"
 
 #: Client/core/CSettings.cpp:919
 msgid "1024 x 1024 (Default)"
@@ -1265,7 +1264,7 @@ msgstr "General"
 
 #: Client/core/CSettings.cpp:1045
 msgid "Radio options"
-msgstr "OpЕЈiuni radio"
+msgstr "Opţiuni radio"
 
 #: Client/core/CSettings.cpp:1051
 msgid "Radio Equalizer"
@@ -1277,7 +1276,7 @@ msgstr "Auto-reglare radio"
 
 #: Client/core/CSettings.cpp:1061
 msgid "Usertrack options"
-msgstr "OpИ›iuni usertrack"
+msgstr "Opțiuni usertrack"
 
 #: Client/core/CSettings.cpp:1075 Client/core/CSettings.cpp:4001
 msgid "Radio"
@@ -1289,50 +1288,50 @@ msgstr "Aleator"
 
 #: Client/core/CSettings.cpp:1077 Client/core/CSettings.cpp:4005
 msgid "Sequential"
-msgstr "SecvenИ›ial"
+msgstr "Secvențial"
 
 #: Client/core/CSettings.cpp:1080
 msgid "Automatic Media Scan"
-msgstr "Scanare media automatДѓ"
+msgstr "Scanare media automată"
 
 #: Client/core/CSettings.cpp:1087
 msgid "Mute options"
-msgstr "OpИ›iuni dezactivare sunet"
+msgstr "Opțiuni dezactivare sunet"
 
 #: Client/core/CSettings.cpp:1093
 msgid "Mute All sounds when minimized"
-msgstr "DezactiveazДѓ toate sunetele la minimizare"
+msgstr "Dezactivează toate sunetele la minimizare"
 
 #: Client/core/CSettings.cpp:1098
 msgid "Mute Radio sounds when minimized"
-msgstr "OpreИ™te sunetele radio la minimizare"
+msgstr "Oprește sunetele radio la minimizare"
 
 #: Client/core/CSettings.cpp:1103
 msgid "Mute SFX sounds when minimized"
-msgstr "OpreИ™te sunetele SFX la minimizare"
+msgstr "Oprește sunetele SFX la minimizare"
 
 #: Client/core/CSettings.cpp:1108
 msgid "Mute MTA sounds when minimized"
-msgstr "OpreИ™te sunetele MTA la minimizare"
+msgstr "Oprește sunetele MTA la minimizare"
 
 #: Client/core/CSettings.cpp:1113
 msgid "Mute Voice sounds when minimized"
-msgstr "OpreИ™te sunetele voce la minimizare"
+msgstr "Oprește sunetele voce la minimizare"
 
 #. *
 #. *  Video tab
 #. *
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1135
 msgid "Resolution:"
-msgstr "RezoluИ›ie:"
+msgstr "Rezoluție:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1190
 msgid "FOV:"
-msgstr "CГўmp vizual:"
+msgstr "Câmp vizual:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1209
 msgid "Draw Distance:"
-msgstr "DistanИ›Дѓ de redare:"
+msgstr "Distanță de redare:"
 
 #: Client/core/CSettings.cpp:1129 Client/core/CSettings.cpp:1230
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1461
@@ -1357,7 +1356,7 @@ msgstr "Raport de aspect:"
 
 #: Client/core/CSettings.cpp:1147
 msgid "Windowed"
-msgstr "ГЋn fereastrДѓ"
+msgstr "În fereastră"
 
 #: Client/core/CSettings.cpp:1153
 msgid "DPI aware"
@@ -1369,7 +1368,7 @@ msgstr "Standard"
 
 #: Client/core/CSettings.cpp:1172 Client/core/CSettings.cpp:2339
 msgid "Borderless keep res"
-msgstr "FДѓrДѓ margini pДѓstreazДѓ rezoluИ›ia"
+msgstr "Fără margini păstrează rezoluția"
 
 #: Client/core/CSettings.cpp:1175
 msgid "Mip Mapping"
@@ -1381,7 +1380,7 @@ msgstr "V-Sync"
 
 #: Client/core/CSettings.cpp:1259 Client/core/CSettings.cpp:2239
 msgid "Low"
-msgstr "ScДѓzutДѓ"
+msgstr "Scăzută"
 
 #: Client/core/CSettings.cpp:1260 Client/core/CSettings.cpp:2241
 msgid "Medium"
@@ -1390,11 +1389,11 @@ msgstr "Medie"
 #: Client/core/CSettings.cpp:1261 Client/core/CSettings.cpp:1755
 #: Client/core/CSettings.cpp:2243 Client/core/CSettings.cpp:4059
 msgid "High"
-msgstr "RidicatДѓ"
+msgstr "Ridicată"
 
 #: Client/core/CSettings.cpp:1262 Client/core/CSettings.cpp:2245
 msgid "Very high"
-msgstr "Foarte ridicatДѓ"
+msgstr "Foarte ridicată"
 
 #: Client/core/CSettings.cpp:1279 Client/core/CSettings.cpp:1282
 #: Client/core/CSettings.cpp:1310 Client/core/CSettings.cpp:1686
@@ -1436,7 +1435,7 @@ msgstr "16:9"
 
 #: Client/core/CSettings.cpp:1332
 msgid "HUD Match Aspect Ratio"
-msgstr "PotriveИ™te HUD-ul cu raportul de aspect"
+msgstr "Potrivește HUD-ul cu raportul de aspect"
 
 #: Client/core/CSettings.cpp:1338
 msgid "Volumetric Shadows"
@@ -1444,15 +1443,15 @@ msgstr "Umbre volumetrice"
 
 #: Client/core/CSettings.cpp:1342
 msgid "Grass effect"
-msgstr "Efect iarbДѓ"
+msgstr "Efect iarbă"
 
 #: Client/core/CSettings.cpp:1346
 msgid "Heat haze"
-msgstr "Efect cДѓldurДѓ"
+msgstr "Efect căldură"
 
 #: Client/core/CSettings.cpp:1350
 msgid "Tyre Smoke etc"
-msgstr "Fum roИ›i"
+msgstr "Fum roți"
 
 #: Client/core/CSettings.cpp:1354
 msgid "Dynamic ped shadows"
@@ -1460,31 +1459,31 @@ msgstr "Umbre dinamice pentru personaje"
 
 #: Client/core/CSettings.cpp:1358
 msgid "Motion blur"
-msgstr "Estompare Г®n miИ™care"
+msgstr "Estompare în mișcare"
 
 #: Client/core/CSettings.cpp:1362
 msgid "Corona rain reflections"
-msgstr "ReflecИ›ii ploaie de tip corona"
+msgstr "Reflecții ploaie de tip corona"
 
 #: Client/core/CSettings.cpp:1367
 msgid "Full Screen Minimize"
-msgstr "Minimizare ecran Г®ntreg"
+msgstr "Minimizare ecran întreg"
 
 #: Client/core/CSettings.cpp:1379
 msgid "Enable Device Selection Dialog"
-msgstr "ActiveazДѓ dialogul de selectare a dispozitivelor"
+msgstr "Activează dialogul de selectare a dispozitivelor"
 
 #: Client/core/CSettings.cpp:1391
 msgid "Show unsafe resolutions"
-msgstr "AfiЕџeazДѓ rezoluЕЈii nesigure"
+msgstr "Afişează rezoluţii nesigure"
 
 #: Client/core/CSettings.cpp:1403
 msgid "Render vehicles always in high detail"
-msgstr "AfiИ™eazДѓ Г®ntotdeauna vehiculele cu detalii ridicate"
+msgstr "Afișează întotdeauna vehiculele cu detalii ridicate"
 
 #: Client/core/CSettings.cpp:1407
 msgid "Render peds always in high detail"
-msgstr "AfiИ™eazДѓ Г®ntotdeauna personajele cu detalii ridicate"
+msgstr "Afișează întotdeauna personajele cu detalii ridicate"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1441
 msgid "Gamma:"
@@ -1496,15 +1495,15 @@ msgstr "Contrast:"
 
 #: Client/core/CSettings.cpp:1431 Client/core/CSettings.cpp:1501
 msgid "Saturation:"
-msgstr "SaturaИ›ie:"
+msgstr "Saturație:"
 
 #: Client/core/CSettings.cpp:1517
 msgid "Apply adjustments in windowed mode"
-msgstr "AplicДѓ ajustДѓrile Г®n modul windowed"
+msgstr "Aplică ajustările în modul windowed"
 
 #: Client/core/CSettings.cpp:1523
 msgid "Apply adjustments in fullscreen mode"
-msgstr "AplicДѓ ajustДѓrile Г®n modul fullscreen"
+msgstr "Aplică ajustările în modul fullscreen"
 
 #: Client/core/CSettings.cpp:1554
 msgid "Enable remote websites"
@@ -1516,11 +1515,11 @@ msgstr "Permite Javascript pe website-uri"
 
 #: Client/core/CSettings.cpp:1564
 msgid "Enable GPU rendering"
-msgstr "ActiveazДѓ randarea GPU"
+msgstr "Activează randarea GPU"
 
 #: Client/core/CSettings.cpp:1568
 msgid "Custom blacklist"
-msgstr "ListДѓ interdicЕЈie personalizatДѓ"
+msgstr "Listă interdicţie personalizată"
 
 #: Client/core/CSettings.cpp:1579 Client/core/CSettings.cpp:1625
 msgid "Enter a domain e.g. google.com"
@@ -1528,7 +1527,7 @@ msgstr "Introdu un domeniu (de ex. google.com)"
 
 #: Client/core/CSettings.cpp:1587
 msgid "Block"
-msgstr "BlocheazДѓ"
+msgstr "Blochează"
 
 #: Client/core/CSettings.cpp:1602 Client/core/CSettings.cpp:1646
 msgid "Domain"
@@ -1536,16 +1535,16 @@ msgstr "Domeniu"
 
 #: Client/core/CSettings.cpp:1604 Client/core/CSettings.cpp:1648
 msgid "Remove domain"
-msgstr "Иterge domeniul"
+msgstr "Șterge domeniul"
 
 #: Client/core/CSettings.cpp:1608 Client/core/CSettings.cpp:1652
 msgid "Remove all"
-msgstr "Иterge tot"
+msgstr "Șterge tot"
 
 #. Reset vecTemp
 #: Client/core/CSettings.cpp:1614
 msgid "Custom whitelist"
-msgstr "ListДѓ acces personalizatДѓ"
+msgstr "Listă acces personalizată"
 
 #: Client/core/CSettings.cpp:1633 Client/cefweb/CWebsiteRequests.cpp:51
 msgid "Allow"
@@ -1560,19 +1559,19 @@ msgstr "Diverse"
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1679
 #: Client/core/CSettings.cpp:6021
 msgid "Fast CJ clothes loading:"
-msgstr "ГЋncДѓrcare rapidДѓ haine CJ:"
+msgstr "Încărcare rapidă haine CJ:"
 
 #. Browser scan speed
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1693
 #: Client/core/CSettings.cpp:6023
 msgid "Browser speed:"
-msgstr "VitezДѓ navigator:"
+msgstr "Viteză navigator:"
 
 #. Single download
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1707
 #: Client/core/CSettings.cpp:6025
 msgid "Single connection:"
-msgstr "Conexiune solitarДѓ:"
+msgstr "Conexiune solitară:"
 
 #. Packet tag
 #: Client/core/CSettings.cpp:1671 Client/core/CSettings.cpp:1720
@@ -1584,7 +1583,7 @@ msgstr "Tag pachete:"
 #: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1733
 #: Client/core/CSettings.cpp:6029
 msgid "Progress animation:"
-msgstr "Progres animaИ›ie:"
+msgstr "Progres animație:"
 
 #. Process priority
 #: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1746
@@ -1596,7 +1595,7 @@ msgstr "Prioritate proces:"
 #: Client/core/CSettings.cpp:1672 Client/core/CSettings.cpp:1760
 #: Client/core/CSettings.cpp:6031
 msgid "Debug setting:"
-msgstr "SetДѓri depanare:"
+msgstr "Setări depanare:"
 
 #. Streaming memory
 #: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1783
@@ -1607,12 +1606,12 @@ msgstr "Memorie streaming:"
 #. Update build type
 #: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1903
 msgid "Update build type:"
-msgstr "Tip de actualizare aplicaИ›ie:"
+msgstr "Tip de actualizare aplicație:"
 
 #. UpdateAutoInstall
 #: Client/core/CSettings.cpp:1673 Client/core/CSettings.cpp:1882
 msgid "Install important updates:"
-msgstr "InstaleazДѓ actualizДѓrile importante:"
+msgstr "Instalează actualizările importante:"
 
 #: Client/core/CSettings.cpp:1687 Client/core/CSettings.cpp:1715
 #: Client/core/CSettings.cpp:1728 Client/core/CSettings.cpp:4070
@@ -1622,7 +1621,7 @@ msgstr "Activat"
 
 #: Client/core/CSettings.cpp:1700 Client/core/CSettings.cpp:4075
 msgid "Very slow"
-msgstr "Foarte Г®nceatДѓ"
+msgstr "Foarte înceată"
 
 #: Client/core/CSettings.cpp:1701 Client/core/CSettings.cpp:1714
 #: Client/core/CSettings.cpp:1727 Client/core/CSettings.cpp:1741
@@ -1636,7 +1635,7 @@ msgstr "Implicit"
 
 #: Client/core/CSettings.cpp:1702 Client/core/CSettings.cpp:4079
 msgid "Fast"
-msgstr "RapidДѓ"
+msgstr "Rapidă"
 
 #: Client/core/CSettings.cpp:1753 Client/core/CSettings.cpp:4055
 msgid "Normal"
@@ -1648,11 +1647,11 @@ msgstr "Peste normal"
 
 #: Client/core/CSettings.cpp:1790
 msgid "Min"
-msgstr "MinimДѓ"
+msgstr "Minimă"
 
 #: Client/core/CSettings.cpp:1815
 msgid "Max"
-msgstr "MaximДѓ"
+msgstr "Maximă"
 
 #. Windows 8 compatibility
 #: Client/core/CSettings.cpp:1823
@@ -1661,7 +1660,7 @@ msgstr "Compatibilitate Windows 8:"
 
 #: Client/core/CSettings.cpp:1827
 msgid "16-bit color"
-msgstr "culoare pe 16 biЕЈi"
+msgstr "culoare pe 16 biţi"
 
 #: Client/core/CSettings.cpp:1832
 msgid "Mouse fix"
@@ -1670,16 +1669,16 @@ msgstr "Fixare mouse"
 #. Cache path info
 #: Client/core/CSettings.cpp:1850
 msgid "Client resource files:"
-msgstr "FiИ™iere resursДѓ client:"
+msgstr "Fișiere resursă client:"
 
 #: Client/core/CSettings.cpp:1854
 msgid "Show in Explorer"
-msgstr "Deschide Г®n Explorer"
+msgstr "Deschide în Explorer"
 
 #. Process affinity
 #: Client/core/CSettings.cpp:1869
 msgid "Set CPU 0 affinity to improve game performance"
-msgstr "SeteazДѓ afinitate CPU 0 pentru Г®mbunДѓtДѓИ›irea performanИ›ei jocului"
+msgstr "Setează afinitate CPU 0 pentru îmbunătățirea performanței jocului"
 
 #. Auto updater section label
 #: Client/core/CSettings.cpp:1875 Client/core/CSettings.cpp:1878
@@ -1689,60 +1688,60 @@ msgstr "Actualizator automat"
 #. Check for updates
 #: Client/core/CSettings.cpp:1916
 msgid "Check for update now"
-msgstr "VerificДѓ pentru actualizДѓri acum"
+msgstr "Verifică pentru actualizări acum"
 
 #: Client/core/CSettings.cpp:2102
 msgid "Some settings will be changed when you next start MTA"
-msgstr "Unele setДѓri vor fi schimbate cГўnd porneЕџti MTA data viitoare"
+msgstr "Unele setări vor fi schimbate când porneşti MTA data viitoare"
 
 #: Client/core/CSettings.cpp:2103
 msgid "\n\n"
 "Do you want to restart now?"
 msgstr "\n\n"
-"Vrei sДѓ reporneИ™ti acum?"
+"Vrei să repornești acum?"
 
 #: Client/core/CSettings.cpp:2106
 msgid "RESTART REQUIRED"
-msgstr "REPORNIRE NECESARД‚"
+msgstr "REPORNIRE NECESARĂ"
 
 #: Client/core/CSettings.cpp:2126
 msgid "Some settings will be changed when you disconnect the current server"
-msgstr "Unele setДѓri vor fi modificate doar atunci cГўnd deconectaИ›i serverul curent"
+msgstr "Unele setări vor fi modificate doar atunci când deconectați serverul curent"
 
 #: Client/core/CSettings.cpp:2127
 msgid "\n\n"
 "Do you want to disconnect now?"
 msgstr "\n\n"
-"DoriИ›i sДѓ vДѓ deconectaИ›i acum?"
+"Doriți să vă deconectați acum?"
 
 #: Client/core/CSettings.cpp:2130
 msgid "DISCONNECT REQUIRED"
-msgstr "DECONECTARE NECESARД‚"
+msgstr "DECONECTARE NECESARĂ"
 
 #. Update the joystick name
 #: Client/core/CSettings.cpp:2572
 msgid "Joypad not detected  -  Check connections and restart game"
-msgstr "Joypad nedetectat - VerificДѓ conexiunile И™i reporneИ™te jocul"
+msgstr "Joypad nedetectat - Verifică conexiunile și repornește jocul"
 
 #: Client/core/CSettings.cpp:2828
 msgid "Binding axis"
-msgstr "Axe de legДѓturДѓ"
+msgstr "Axe de legătură"
 
 #: Client/core/CSettings.cpp:2828
 msgid "Move an axis to bind, or escape to clear"
-msgstr "MiИ™cДѓ o axДѓ pentru a ataИ™a sau apasДѓ Esc pentru a anula"
+msgstr "Mișcă o axă pentru a atașa sau apasă Esc pentru a anula"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Language:"
-msgstr "LimbДѓ:"
+msgstr "Limbă:"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Skin:"
-msgstr "TemДѓ:"
+msgstr "Temă:"
 
 #: Client/core/CSettings.cpp:2907
 msgid "Presets:"
-msgstr "PreconfigurДѓri:"
+msgstr "Preconfigurări:"
 
 #: Client/core/CSettings.cpp:2956
 msgid "Chat"
@@ -1750,7 +1749,7 @@ msgstr "Chat"
 
 #: Client/core/CSettings.cpp:2973
 msgid "Load"
-msgstr "ГЋncДѓrcare"
+msgstr "Încărcare"
 
 #: Client/core/CSettings.cpp:2985
 msgid "Colors"
@@ -1762,7 +1761,7 @@ msgstr "Aspect"
 
 #: Client/core/CSettings.cpp:2987 Client/core/CSettings.cpp:3233
 msgid "Options"
-msgstr "OpИ›iuni"
+msgstr "Opțiuni"
 
 #: Client/core/CSettings.cpp:2993
 msgid "Chat Background"
@@ -1786,11 +1785,11 @@ msgstr "Linii:"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Scale:"
-msgstr "ScalДѓ:"
+msgstr "Scală:"
 
 #: Client/core/CSettings.cpp:3016
 msgid "Width:"
-msgstr "LДѓИ›ime:"
+msgstr "Lățime:"
 
 #: Client/core/CSettings.cpp:3019
 msgid "Size"
@@ -1798,7 +1797,7 @@ msgstr "Dimensiune"
 
 #: Client/core/CSettings.cpp:3068
 msgid "after"
-msgstr "dupДѓ"
+msgstr "după"
 
 #: Client/core/CSettings.cpp:3068
 msgid "for"
@@ -1810,11 +1809,11 @@ msgstr "secunde"
 
 #: Client/core/CSettings.cpp:3071
 msgid "Fading"
-msgstr "Decolorare gradualДѓ"
+msgstr "Decolorare graduală"
 
 #: Client/core/CSettings.cpp:3077
 msgid "Fade out old lines"
-msgstr "EstompeazДѓ liniile vechi"
+msgstr "Estompează liniile vechi"
 
 #: Client/core/CSettings.cpp:3117
 msgid "Horizontal:"
@@ -1838,12 +1837,12 @@ msgstr "Offset Y:"
 
 #: Client/core/CSettings.cpp:3124
 msgid "Position"
-msgstr "PoziЕЈie"
+msgstr "Poziţie"
 
 #: Client/core/CSettings.cpp:3138 Client/core/CSettings.cpp:3166
 #: Client/core/CKeyBinds.cpp:191
 msgid "Left"
-msgstr "StГўnga"
+msgstr "Stânga"
 
 #: Client/core/CSettings.cpp:3139 Client/core/CSettings.cpp:3153
 msgid "Center"
@@ -1868,7 +1867,7 @@ msgstr "Font"
 
 #: Client/core/CSettings.cpp:3239
 msgid "Hide background when not typing"
-msgstr "Ascunde fundalul cГўnd nu tastezi"
+msgstr "Ascunde fundalul când nu tastezi"
 
 #: Client/core/CSettings.cpp:3244
 msgid "Nickname completion using the \"Tab\" key"
@@ -1876,11 +1875,11 @@ msgstr "Completare nickname cu tasta \"Tab\""
 
 #: Client/core/CSettings.cpp:3249
 msgid "Allow server to flash the window"
-msgstr "Permite serverului sДѓ evidenИ›ieze fereastra"
+msgstr "Permite serverului să evidențieze fereastra"
 
 #: Client/core/CSettings.cpp:3254
 msgid "Allow tray balloon notifications"
-msgstr "Permite notificДѓri"
+msgstr "Permite notificări"
 
 #: Client/core/CSettings.cpp:3259
 msgid "Chat text black/white outline"
@@ -1892,15 +1891,15 @@ msgstr "Contur text negru/alb"
 #. sSString strText = SString::Printf ( "Press a key to bind to '%s'", pItemBind->GetText ().c_str () );
 #: Client/core/CSettings.cpp:3508 Client/core/CSettings.cpp:3515
 msgid "Press a key to bind, or escape to clear"
-msgstr "ApasДѓ o tastДѓ pentru a ataИ™a sau apasДѓ Esc pentru a anula"
+msgstr "Apasă o tastă pentru a atașa sau apasă Esc pentru a anula"
 
 #: Client/core/CSettings.cpp:3509
 msgid "Binding a primary key"
-msgstr "ATAИARE TASTД‚ PRIMARД‚"
+msgstr "ATAȘARE TASTĂ PRIMARĂ"
 
 #: Client/core/CSettings.cpp:3516
 msgid "Binding a secondary key"
-msgstr "ATAИARE TASTД‚ SECUNDARД‚"
+msgstr "ATAȘARE TASTĂ SECUNDARĂ"
 
 #: Client/core/CSettings.cpp:3592
 msgid "GTA GAME CONTROLS"
@@ -1912,7 +1911,7 @@ msgstr "CONTROALE MULTIPLAYER"
 
 #: Client/core/CSettings.cpp:3839 Client/core/CSettings.cpp:5982
 msgid "Your nickname contains invalid characters!"
-msgstr "Numele tДѓu conИ›ine caractere invalide!"
+msgstr "Numele tău conține caractere invalide!"
 
 #: Client/core/CSettings.cpp:4441 Client/core/CCore.cpp:709
 #: Client/core/CMainMenu.cpp:303
@@ -1924,11 +1923,11 @@ msgstr "Meniu principal"
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1115
 #: Client/mods/deathmatch/logic/CResource.cpp:384
 msgid "In-game"
-msgstr "ГЋn-joc"
+msgstr "În-joc"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Red:"
-msgstr "RoИ™u:"
+msgstr "Roșu:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Green:"
@@ -1940,7 +1939,7 @@ msgstr "Albastru:"
 
 #: Client/core/CSettings.cpp:4798
 msgid "Transparency:"
-msgstr "TransparenИ›Дѓ:"
+msgstr "Transparență:"
 
 #: Client/core/CSettings.cpp:4801
 msgid "Color"
@@ -1952,38 +1951,38 @@ msgstr "Previzualizare"
 
 #: Client/core/CSettings.cpp:5215
 msgid "Please disconnect before changing language"
-msgstr "VДѓ rugДѓm sДѓ vДѓ deconectaИ›i Г®nainte de schimbarea limbii"
+msgstr "Vă rugăm să vă deconectați înainte de schimbarea limbii"
 
 #: Client/core/CSettings.cpp:5243
 msgid "Please disconnect before changing skin"
-msgstr "Te rugДѓm sДѓ te deconectezi Г®nainte de a schimba tema"
+msgstr "Te rugăm să te deconectezi înainte de a schimba tema"
 
 #: Client/core/CSettings.cpp:5623
 msgid "Volmetric shadows can cause some systems to slow down.\n\n"
 "Are you sure you want to enable them?"
 msgstr "Umbrele volumetrice pot cauza probleme pe unele calculatoare.\n\n"
-"EИ™ti sigur cДѓ vrei sДѓ le activezi?"
+"Ești sigur că vrei să le activezi?"
 
 #: Client/core/CSettings.cpp:5627
 msgid "PERFORMANCE WARNING"
-msgstr "AVERTISMENT DE PERFORMANИљД‚"
+msgstr "AVERTISMENT DE PERFORMANȚĂ"
 
 #: Client/core/CSettings.cpp:5647
 msgid "Screen upload is required by some servers for anti-cheat purposes.\n\n"
 "(The chat box and GUI is excluded from the upload)\n"
-msgstr "Trimiterea capturilor de ecran este necesarДѓ pentru anumite servere din motive anti-cheat.\n\n"
-"(Fereastra de chat И™i GUI-ul sunt excluse din capturДѓ)\n"
+msgstr "Trimiterea capturilor de ecran este necesară pentru anumite servere din motive anti-cheat.\n\n"
+"(Fereastra de chat și GUI-ul sunt excluse din captură)\n"
 
 #: Client/core/CSettings.cpp:5649
 msgid "SCREEN UPLOAD INFORMATION"
-msgstr "INFORMAЕўII CAPTURД‚ DE ECRAN"
+msgstr "INFORMAŢII CAPTURĂ DE ECRAN"
 
 #: Client/core/CSettings.cpp:5664
 msgid "Some scripts may play sounds, such as radio, from the internet.\n\n"
 "Disabling this setting may decrease network\n"
 "bandwidth consumption.\n"
 msgstr "Unele scripturi pot reda sunete, cum ar fi radio, de pe internet.\n\n"
-"Dezactivarea acestei setДѓri poate reduce traficul de date.\n"
+"Dezactivarea acestei setări poate reduce traficul de date.\n"
 
 #: Client/core/CSettings.cpp:5667
 msgid "EXTERNAL SOUNDS"
@@ -1994,80 +1993,80 @@ msgid "Rich Presence is currently enabled.\n"
 "Do you want to allow data sharing with servers you connect to?\n\n"
 "This includes your Discord client ID, and game state info."
 msgstr "Rich Presence este moment activat.\n"
-"DoreИ™ti sДѓ permiИ›i partajarea datelor cu serverele la care te conectezi?\n\n"
-"Acestea includ client ID-ul tДѓu Discord, И™i informaИ›ii despre starea jocului."
+"Dorești să permiți partajarea datelor cu serverele la care te conectezi?\n\n"
+"Acestea includ client ID-ul tău Discord, și informații despre starea jocului."
 
 #: Client/core/CSettings.cpp:5701
 msgid "CONSENT TO ALLOW DATA SHARING"
-msgstr "CONSIMИљД‚MГ‚NT PRIVIND PARTAJAREA DATELOR"
+msgstr "CONSIMȚĂMÂNT PRIVIND PARTAJAREA DATELOR"
 
 #: Client/core/CSettings.cpp:5725
 msgid "Some files in your GTA:SA data directory are customized.\n"
 "MTA will only use these modified files if this check box is ticked.\n\n"
 "However, CUSTOMIZED GTA:SA FILES ARE BLOCKED BY MANY SERVERS\n\n"
 "Are you sure you want to use them?"
-msgstr "Unele fiИ™iere din directorul tДѓu de date GTA:SA sunt modificate.\n"
-"MTA va folosi fiИ™ierele modificate dacДѓ aceastДѓ casetДѓ este selectatДѓ.\n\n"
-"TotuИ™i, FIИIERELE GTA:SA MODIFICATE SUNT BLOCATE DE MULTE SERVERE\n\n"
-"EИ™ti sigur cДѓ vrei sДѓ le foloseИ™ti?"
+msgstr "Unele fișiere din directorul tău de date GTA:SA sunt modificate.\n"
+"MTA va folosi fișierele modificate dacă această casetă este selectată.\n\n"
+"Totuși, FIȘIERELE GTA:SA MODIFICATE SUNT BLOCATE DE MULTE SERVERE\n\n"
+"Ești sigur că vrei să le folosești?"
 
 #: Client/core/CSettings.cpp:5774
 msgid "Enabling DPI awareness is an experimental feature and\n"
 "we only recommend it when you play MTA:SA on a scaled monitor.\n"
 "You may experience graphical issues if you enable this option.\n\n"
 "Are you sure you want to enable this option?"
-msgstr "\"DPI aware\" este o caracteristicДѓ experimentalДѓ Еџi\n"
-"recomandДѓm folosirea ei doar cГўnd jucaИ›i MTA:SA pe un monitor scalat.\n"
-"PuteИ›i Г®ntГўmpina probleme grafice dacДѓ activaИ›i aceastДѓ opИ›iune.\n\n"
-"Sigur doriИ›i sДѓ activaИ›i aceastДѓ opИ›iune?"
+msgstr "\"DPI aware\" este o caracteristică experimentală şi\n"
+"recomandăm folosirea ei doar când jucați MTA:SA pe un monitor scalat.\n"
+"Puteți întâmpina probleme grafice dacă activați această opțiune.\n\n"
+"Sigur doriți să activați această opțiune?"
 
 #: Client/core/CSettings.cpp:5780 Client/core/CSettings.cpp:5835
 msgid "EXPERIMENTAL FEATURE"
-msgstr "FUNCИљIE EXPERIMENTALД‚"
+msgstr "FUNCȚIE EXPERIMENTALĂ"
 
 #: Client/core/CSettings.cpp:5837
 msgid "Disabling this option is not recommended unless you are experiencing performance issues.\n\n"
 "Are you sure you want to disable it?"
-msgstr "Dezactivarea acestei opИ›iuni este recomandatДѓ numai dacДѓ Г®ntГўmpini probleme de performanИ›Дѓ.\n\n"
-"EИ™ti sigur cДѓ doreИ™ti sДѓ o dezactivezi?"
+msgstr "Dezactivarea acestei opțiuni este recomandată numai dacă întâmpini probleme de performanță.\n\n"
+"Ești sigur că dorești să o dezactivezi?"
 
 #: Client/core/CSettings.cpp:6000
 msgid "Please enter a nickname"
-msgstr "VДѓ rugДѓm introduceИ›i un nume"
+msgstr "Vă rugăm introduceți un nume"
 
 #: Client/core/CSettings.cpp:6001
 msgid "Please enter a nickname to be used ingame.  \n"
 "This will be your name when you connect to and play in a server"
-msgstr "Introdu un nume care va fi folosit Г®n joc.\n"
-"Acesta va fi numele tДѓu Г®n momentul Г®n care te conectezi la И™i te joci pe un server."
+msgstr "Introdu un nume care va fi folosit în joc.\n"
+"Acesta va fi numele tău în momentul în care te conectezi la și te joci pe un server."
 
 #: Client/core/CSettings.cpp:6019
 msgid "Very experimental feature."
-msgstr "FuncИ›ionalitate foarte experimentalДѓ."
+msgstr "Funcționalitate foarte experimentală."
 
 #: Client/core/CSettings.cpp:6021
 msgid "Stops stalls with CJ variations (Uses 65MB more RAM)"
-msgstr "OpreИ™te blocДѓrile Г®ncДѓrcДѓrilor variaИ›iilor de CJ (FoloseИ™te 65 MB de memorie RAM Г®n plus)"
+msgstr "Oprește blocările încărcărilor variațiilor de CJ (Folosește 65 MB de memorie RAM în plus)"
 
 #: Client/core/CSettings.cpp:6023
 msgid "Older routers may require a slower scan speed."
-msgstr "Routerele mai vechi pot necesita o vitezДѓ mai Г®nceatДѓ de scanare."
+msgstr "Routerele mai vechi pot necesita o viteză mai înceată de scanare."
 
 #: Client/core/CSettings.cpp:6025
 msgid "Switch on to use only one connection when downloading."
-msgstr "ActiveazДѓ pentru a folosi o singurДѓ conexiune atunci cГўnd descarci."
+msgstr "Activează pentru a folosi o singură conexiune atunci când descarci."
 
 #: Client/core/CSettings.cpp:6027
 msgid "Tag network packets to help ISPs identify MTA traffic."
-msgstr "EtichetaИ›i pachetele de reИ›ea pentru a ajuta furnizorii de internet sДѓ identifice traficul MTA."
+msgstr "Etichetați pachetele de rețea pentru a ajuta furnizorii de internet să identifice traficul MTA."
 
 #: Client/core/CSettings.cpp:6029
 msgid "Spinning circle animation at the bottom of the screen"
-msgstr "Indicator de progres animat Г®n partea de jos a ecranului"
+msgstr "Indicator de progres animat în partea de jos a ecranului"
 
 #: Client/core/CSettings.cpp:6031
 msgid "Select default always. (This setting is not saved)"
-msgstr "Alege 'Implicit' mereu. (AceastДѓ setare nu este salvatДѓ)"
+msgstr "Alege 'Implicit' mereu. (Această setare nu este salvată)"
 
 #: Client/core/CSettings.cpp:6033
 msgid "Maximum is usually best"
@@ -2079,19 +2078,19 @@ msgstr "Actualizator automat:"
 
 #: Client/core/CSettings.cpp:6035
 msgid "Select default unless you like filling out bug reports."
-msgstr "SelecteazДѓ 'Implicit' dacДѓ nu doreИ™ti sДѓ completezi rapoarte de erori."
+msgstr "Selectează 'Implicit' dacă nu dorești să completezi rapoarte de erori."
 
 #: Client/core/CSettings.cpp:6037
 msgid "Select default to automatically install important updates."
-msgstr "SelectaИ›i \"implicit\" pentru a instala automat actualizДѓrile importante."
+msgstr "Selectați \"implicit\" pentru a instala automat actualizările importante."
 
 #: Client/core/CSettings.cpp:6039
 msgid "16-bit color:"
-msgstr "culoare pe 16 biЕЈi:"
+msgstr "culoare pe 16 biţi:"
 
 #: Client/core/CSettings.cpp:6039
 msgid "Enable 16 bit color modes - Requires MTA restart"
-msgstr "ActiveazДѓ modurile de culori pe 16 biЕЈi - NecesitДѓ repornirea MTA"
+msgstr "Activează modurile de culori pe 16 biţi - Necesită repornirea MTA"
 
 #: Client/core/CSettings.cpp:6041
 msgid "Mouse fix:"
@@ -2099,7 +2098,7 @@ msgstr "Fixare mouse:"
 
 #: Client/core/CSettings.cpp:6041
 msgid "Mouse movement fix - May need PC restart"
-msgstr "FixeazДѓ miЕџcarea mouseului - Poate necesita restartarea calculatorului"
+msgstr "Fixează mişcarea mouseului - Poate necesita restartarea calculatorului"
 
 #: Client/core/CSettings.cpp:6043
 msgid "CPU affinity:"
@@ -2107,15 +2106,15 @@ msgstr "Afinitate CPU:"
 
 #: Client/core/CSettings.cpp:6043
 msgid "Only change if you're having stability issues."
-msgstr "ModificДѓ doar dacДѓ ai probleme de stabilitate."
+msgstr "Modifică doar dacă ai probleme de stabilitate."
 
 #: Client/core/CCore.cpp:848 Shared/mods/deathmatch/logic/Utils.cpp:129
 msgid "Fatal error"
-msgstr "Eroare fatalДѓ"
+msgstr "Eroare fatală"
 
 #: Client/core/CCore.cpp:969
 msgid "TO FIX, REMOVE THIS FILE:"
-msgstr "PENTRU A REMEDIA, ИTERGE ACEST FIИIER:"
+msgstr "PENTRU A REMEDIA, ȘTERGE ACEST FIȘIER:"
 
 #: Client/core/CCore.cpp:1001
 #, c-format
@@ -2134,103 +2133,103 @@ msgstr "acest ecran de ajutor"
 
 #: Client/core/CCore.cpp:1471 Client/core/CCore.cpp:1472
 msgid "exits the application"
-msgstr "iese din aplicaИ›ie"
+msgstr "iese din aplicație"
 
 #: Client/core/CCore.cpp:1473
 msgid "shows the version"
-msgstr "aratДѓ versiunea"
+msgstr "arată versiunea"
 
 #: Client/core/CCore.cpp:1474
 msgid "shows the time"
-msgstr "aratДѓ timpul"
+msgstr "arată timpul"
 
 #: Client/core/CCore.cpp:1475
 msgid "shows the hud"
-msgstr "aratДѓ HUD-ul"
+msgstr "arată HUD-ul"
 
 #: Client/core/CCore.cpp:1476
 msgid "shows all the binds"
-msgstr "aratДѓ toate legДѓturile"
+msgstr "arată toate legăturile"
 
 #: Client/core/CCore.cpp:1477
 msgid "shows your serial"
-msgstr "aratДѓ serialul tДѓu"
+msgstr "arată serialul tău"
 
 #: Client/core/CCore.cpp:1486
 msgid "connects to a server (host port nick pass)"
-msgstr "te conecteazДѓ la un server (host, port, nume, parolДѓ)"
+msgstr "te conectează la un server (host, port, nume, parolă)"
 
 #: Client/core/CCore.cpp:1487
 msgid "connects to a previous server"
-msgstr "te conecteazДѓ la un server precedent"
+msgstr "te conectează la un server precedent"
 
 #: Client/core/CCore.cpp:1488
 msgid "binds a key (key control)"
-msgstr "ataИ™eazДѓ o tastДѓ (control de tastДѓ)"
+msgstr "atașează o tastă (control de tastă)"
 
 #: Client/core/CCore.cpp:1489
 msgid "unbinds a key (key)"
-msgstr "elibereazДѓ o tastДѓ (tastДѓ)"
+msgstr "eliberează o tastă (tastă)"
 
 #: Client/core/CCore.cpp:1490
 msgid "copies the default gta controls"
-msgstr "ataИ™eazДѓ controalele implicite din GTA"
+msgstr "atașează controalele implicite din GTA"
 
 #: Client/core/CCore.cpp:1491
 msgid "outputs a screenshot"
-msgstr "creeazДѓ o capturДѓ de ecran"
+msgstr "creează o captură de ecran"
 
 #: Client/core/CCore.cpp:1492
 msgid "immediately saves the config"
-msgstr "salveazДѓ configuraИ›ia imediat"
+msgstr "salvează configurația imediat"
 
 #: Client/core/CCore.cpp:1494
 msgid "clears the debug view"
-msgstr "curДѓИ›Дѓ ecranul de depanare"
+msgstr "curăță ecranul de depanare"
 
 #: Client/core/CCore.cpp:1495
 msgid "scrolls the chatbox upwards"
-msgstr "deruleazДѓ fereastra de chat Г®n sus"
+msgstr "derulează fereastra de chat în sus"
 
 #: Client/core/CCore.cpp:1496
 msgid "scrolls the chatbox downwards"
-msgstr "deruleazДѓ fereastra de chat Г®n jos"
+msgstr "derulează fereastra de chat în jos"
 
 #: Client/core/CCore.cpp:1497
 msgid "scrolls the debug view upwards"
-msgstr "deruleazДѓ ecranul de depanare Г®n sus"
+msgstr "derulează ecranul de depanare în sus"
 
 #: Client/core/CCore.cpp:1498
 msgid "scrolls the debug view downwards"
-msgstr "deruleazДѓ ecranul de depanare Г®n jos"
+msgstr "derulează ecranul de depanare în jos"
 
 #: Client/core/CCore.cpp:1501
 msgid "shows the memory statistics"
-msgstr "aratДѓ statisticile despre memorie"
+msgstr "arată statisticile despre memorie"
 
 #: Client/core/CCore.cpp:1502
 msgid "shows the frame timing graph"
-msgstr "aratДѓ graficul cu timpii cadrului"
+msgstr "arată graficul cu timpii cadrului"
 
 #: Client/core/CCore.cpp:1506
 msgid "for developers: reload news"
-msgstr "pentru dezvoltatori: reГ®ncДѓrcaИ›i noutДѓИ›ile"
+msgstr "pentru dezvoltatori: reîncărcați noutățile"
 
 #: Client/core/CMainMenu.cpp:332
 msgid "You are using a feature-branch build! This is a test build only which cannot be used to connect to public servers!"
-msgstr "FoloseИ™ti un build de pe o ramurДѓ feature! Acesta este exclusiv un build de test И™i nu poate fi folosit pentru conectarea la servere publice!"
+msgstr "Folosești un build de pe o ramură feature! Acesta este exclusiv un build de test și nu poate fi folosit pentru conectarea la servere publice!"
 
 #: Client/core/CMainMenu.cpp:351
 msgid "MTA will not receive updates on XP/Vista after July 2019.\n\n"
 "Upgrade Windows to play on the latest servers."
-msgstr "MTA nu va primi actualizДѓri pe XP/Vista dupДѓ luna Iulie 2019.\n\n"
-"ActualizaИ›i-vДѓ versiunea de Windows pentru a juca pe cele mai recente servere."
+msgstr "MTA nu va primi actualizări pe XP/Vista după luna Iulie 2019.\n\n"
+"Actualizați-vă versiunea de Windows pentru a juca pe cele mai recente servere."
 
 #: Client/core/CMainMenu.cpp:1231
 msgid "This will disconnect you from the current server.\n\n"
 "Are you sure you want to disconnect?"
 msgstr "Acest lucru te va deconecta de la server.\n\n"
-"EИ™ti sigur cДѓ vrei sДѓ te deconectezi?"
+"Ești sigur că vrei să te deconectezi?"
 
 #: Client/core/CMainMenu.cpp:1235
 msgid "DISCONNECT WARNING"
@@ -2238,77 +2237,77 @@ msgstr "AVERTISMENT DECONECTARE"
 
 #: Client/core/CMainMenu.cpp:1256
 msgid "INFORMATION"
-msgstr "INFORMAИљIE"
+msgstr "INFORMAȚIE"
 
 #. Create the window
 #: Client/core/CNewsBrowser.cpp:154
 msgid "NEWS"
-msgstr "NOUTД‚ИљI"
+msgstr "NOUTĂȚI"
 
 #. News link
 #: Client/core/CNewsBrowser.cpp:172 Client/core/CNewsBrowser.cpp:173
 msgid "Visit latest news article"
-msgstr "VizitaИ›i cel mai recent articol"
+msgstr "Vizitați cel mai recent articol"
 
 #: Client/core/CScreenShot.cpp:200
 #, c-format
 msgid "Screenshot got %d bytes, but expected %d"
-msgstr "Captura de ecran a Г®nregistrat %d baiИ›i, dar erau de aИ™teptat %d"
+msgstr "Captura de ecran a înregistrat %d baiți, dar erau de așteptat %d"
 
 #: Client/core/CScreenShot.cpp:206
 msgid "Screenshot failed"
-msgstr "Capturarea ecranului a eИ™uat"
+msgstr "Capturarea ecranului a eșuat"
 
 #: Client/core/CScreenShot.cpp:256
 #, c-format
 msgid "Screenshot taken: '%s'"
-msgstr "CapturДѓ de ecran efectuatДѓ: '%s'"
+msgstr "Captură de ecran efectuată: '%s'"
 
 #. Unknown command
 #: Client/core/CCommands.cpp:233
 msgid "Unknown command or cvar: "
-msgstr "ComandДѓ necunoscutДѓ sau cvar necunoscut: "
+msgstr "Comandă necunoscută sau cvar necunoscut: "
 
 #: Client/core/CKeyBinds.cpp:186
 msgid "Fire"
-msgstr "TrДѓgaci"
+msgstr "Trăgaci"
 
 #: Client/core/CKeyBinds.cpp:187
 msgid "Next weapon"
-msgstr "Arma urmДѓtoare"
+msgstr "Arma următoare"
 
 #: Client/core/CKeyBinds.cpp:188
 msgid "Previous weapon"
-msgstr "Arma precedentДѓ"
+msgstr "Arma precedentă"
 
 #: Client/core/CKeyBinds.cpp:189
 msgid "Forwards"
-msgstr "ГЋnainte"
+msgstr "Înainte"
 
 #: Client/core/CKeyBinds.cpp:190
 msgid "Backwards"
-msgstr "ГЋnapoi"
+msgstr "Înapoi"
 
 #: Client/core/CKeyBinds.cpp:193
 msgid "Zoom in"
-msgstr "MДѓreИ™te"
+msgstr "Mărește"
 
 #: Client/core/CKeyBinds.cpp:194
 msgid "Zoom out"
-msgstr "MicИ™oreazДѓ"
+msgstr "Micșorează"
 
 #: Client/core/CKeyBinds.cpp:195
 msgid "Enter/Exit"
-msgstr "Intrare/IeЕџire"
+msgstr "Intrare/Ieşire"
 
 #: Client/core/CKeyBinds.cpp:196
 msgid "Change camera"
-msgstr "SchimbДѓ camera"
+msgstr "Schimbă camera"
 
 #. 10
 #: Client/core/CKeyBinds.cpp:197
 msgid "Jump"
-msgstr "SДѓriturДѓ"
+msgstr "Săritură"
 
 #: Client/core/CKeyBinds.cpp:198
 msgid "Sprint"
@@ -2316,7 +2315,7 @@ msgstr "Alergare"
 
 #: Client/core/CKeyBinds.cpp:199
 msgid "Look behind"
-msgstr "Privire in urmДѓ"
+msgstr "Privire in urmă"
 
 #: Client/core/CKeyBinds.cpp:200
 msgid "Crouch"
@@ -2324,7 +2323,7 @@ msgstr "Ghemuire"
 
 #: Client/core/CKeyBinds.cpp:201
 msgid "Action"
-msgstr "AcЕЈiune"
+msgstr "Acţiune"
 
 #: Client/core/CKeyBinds.cpp:202
 msgid "Walk"
@@ -2332,15 +2331,15 @@ msgstr "Mers"
 
 #: Client/core/CKeyBinds.cpp:203
 msgid "Vehicle fire"
-msgstr "TrДѓgaci vehicul"
+msgstr "Trăgaci vehicul"
 
 #: Client/core/CKeyBinds.cpp:204
 msgid "Vehicle secondary fire"
-msgstr "TrДѓgaci secundar vehicul"
+msgstr "Trăgaci secundar vehicul"
 
 #: Client/core/CKeyBinds.cpp:205
 msgid "Vehicle left"
-msgstr "Vehicul stГўnga"
+msgstr "Vehicul stânga"
 
 #: Client/core/CKeyBinds.cpp:206
 msgid "Vehicle right"
@@ -2349,11 +2348,11 @@ msgstr "Vehicul dreapta"
 #. 20
 #: Client/core/CKeyBinds.cpp:207
 msgid "Steer forwards/down"
-msgstr "Dirijare Г®nainte/jos"
+msgstr "Dirijare înainte/jos"
 
 #: Client/core/CKeyBinds.cpp:208
 msgid "Steer backwards/up"
-msgstr "Dirijare Г®napoi/sus"
+msgstr "Dirijare înapoi/sus"
 
 #: Client/core/CKeyBinds.cpp:209
 msgid "Accelerate"
@@ -2361,19 +2360,19 @@ msgstr "Accelerare"
 
 #: Client/core/CKeyBinds.cpp:210
 msgid "Brake/Reverse"
-msgstr "FrГўnДѓ/MarЕџarier"
+msgstr "Frână/Marşarier"
 
 #: Client/core/CKeyBinds.cpp:211
 msgid "Radio next"
-msgstr "StaИ›ia radio urmДѓtoare"
+msgstr "Stația radio următoare"
 
 #: Client/core/CKeyBinds.cpp:212
 msgid "Radio previous"
-msgstr "StaИ›ia radio anterioarДѓ"
+msgstr "Stația radio anterioară"
 
 #: Client/core/CKeyBinds.cpp:213
 msgid "Radio user track skip"
-msgstr "Salt staИ›ie radio personalizatДѓ "
+msgstr "Salt stație radio personalizată "
 
 #: Client/core/CKeyBinds.cpp:214
 msgid "Horn"
@@ -2385,12 +2384,12 @@ msgstr "Sub-misiune"
 
 #: Client/core/CKeyBinds.cpp:216
 msgid "Handbrake"
-msgstr "FrГўnДѓ de mГўnДѓ"
+msgstr "Frână de mână"
 
 #. 30
 #: Client/core/CKeyBinds.cpp:217
 msgid "Vehicle look left"
-msgstr "Vehicul privire stГўnga"
+msgstr "Vehicul privire stânga"
 
 #: Client/core/CKeyBinds.cpp:218
 msgid "Vehicle look right"
@@ -2398,7 +2397,7 @@ msgstr "Vehicul privire dreapta"
 
 #: Client/core/CKeyBinds.cpp:219
 msgid "Vehicle look behind"
-msgstr "Vehicul privire Г®napoi"
+msgstr "Vehicul privire înapoi"
 
 #: Client/core/CKeyBinds.cpp:220
 msgid "Vehicle mouse look"
@@ -2406,7 +2405,7 @@ msgstr "Vehicul privire mouse"
 
 #: Client/core/CKeyBinds.cpp:221
 msgid "Special control left"
-msgstr "Control special stГўnga"
+msgstr "Control special stânga"
 
 #: Client/core/CKeyBinds.cpp:222
 msgid "Special control right"
@@ -2422,38 +2421,38 @@ msgstr "Control special sus"
 
 #: Client/core/CKeyBinds.cpp:225
 msgid "Aim weapon"
-msgstr "ЕўintДѓ armДѓ"
+msgstr "Ţintă armă"
 
 #: Client/core/CKeyBinds.cpp:226
 msgid "Conversation yes"
-msgstr "ConversaЕЈie afirmativДѓ"
+msgstr "Conversaţie afirmativă"
 
 #. 40
 #: Client/core/CKeyBinds.cpp:227
 msgid "Conversation no"
-msgstr "ConversaЕЈie negativДѓ"
+msgstr "Conversaţie negativă"
 
 #: Client/core/CKeyBinds.cpp:228
 msgid "Group control forwards"
-msgstr "Control de grup Г®nainte"
+msgstr "Control de grup înainte"
 
 #: Client/core/CKeyBinds.cpp:229
 msgid "Group control backwards"
-msgstr "Control de grup Г®napoi"
+msgstr "Control de grup înapoi"
 
 #. Even the default skin doesn't work, so give up
 #: Client/core/CGUI.cpp:93
 msgid "The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."
-msgstr "Tema selectatДѓ de tine nu a putut fi Г®ncДѓrcatДѓ, iar tema implicitДѓ nu a putut fi nici ea Г®ncДѓrcatДѓ, te rugДѓm reinstaleazДѓ MTA."
+msgstr "Tema selectată de tine nu a putut fi încărcată, iar tema implicită nu a putut fi nici ea încărcată, te rugăm reinstalează MTA."
 
 #: Client/core/CQuestionBox.cpp:192 Shared/sdk/SharedUtil.Misc.hpp:1462
 msgid "Do you want to see some on-line help about this problem ?"
-msgstr "DoriИ›i ajutor online pentru aceastДѓ problemДѓ ?"
+msgstr "Doriți ajutor online pentru această problemă ?"
 
 #. Create window
 #: Client/core/CConsole.cpp:417
 msgid "CONSOLE"
-msgstr "CONSOLД‚"
+msgstr "CONSOLĂ"
 
 #: Client/core/CCredits.cpp:34
 msgid "Programming"
@@ -2469,7 +2468,7 @@ msgstr "Design de joc / Scripting"
 
 #: Client/core/CCredits.cpp:105
 msgid "Language Localization"
-msgstr "Localizare limbДѓ"
+msgstr "Localizare limbă"
 
 #: Client/core/CCredits.cpp:111
 msgid "Patch contributors"
@@ -2477,11 +2476,11 @@ msgstr "Contribuitori cu patchuri"
 
 #: Client/core/CCredits.cpp:234
 msgid "Special Thanks"
-msgstr "MulИ›umiri speciale"
+msgstr "Mulțumiri speciale"
 
 #: Client/core/CCredits.cpp:265
 msgid "This software and project makes use of the following libraries and software:"
-msgstr "Acest program И™i proiect utilizeazДѓ urmДѓtoarele librДѓrii И™i programe:"
+msgstr "Acest program și proiect utilizează următoarele librării și programe:"
 
 #: Client/core/CJoystickManager.cpp:1578
 msgid "Accelerate Axis"
@@ -2489,14 +2488,14 @@ msgstr "Axa de accelerare"
 
 #: Client/core/CJoystickManager.cpp:1580
 msgid "Brake Axis"
-msgstr "Axa de frГўnare"
+msgstr "Axa de frânare"
 
 #: Client/core/DXHook/CDirect3DHook9.cpp:125
 msgid "Could not initialize Direct3D9.\n\n"
 "Please ensure the DirectX End-User Runtime and\n"
 "latest Windows Service Packs are installed correctly."
-msgstr "Nu s-a putut iniИ›ializa Direct3D9.\n\n"
-"VerificaИ›i dacДѓ DirectX End-User Runtime И™i\n"
+msgstr "Nu s-a putut inițializa Direct3D9.\n\n"
+"Verificați dacă DirectX End-User Runtime și\n"
 "ultimele pachete de servicii ale Windows sunt instalate corect."
 
 #: Client/core/ServerBrowser/CServerList.cpp:25
@@ -2508,9 +2507,9 @@ msgstr "Inactiv"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:3158
 msgid "player"
 msgid_plural "players"
-msgstr[0] "jucДѓtor"
-msgstr[1] "jucДѓtori"
-msgstr[2] "jucДѓtoare"
+msgstr[0] "jucător"
+msgstr[1] "jucători"
+msgstr[2] "jucătoare"
 
 #: Client/core/ServerBrowser/CServerList.cpp:169
 msgid "on"
@@ -2528,21 +2527,21 @@ msgstr[2] "de servere"
 #: Client/core/ServerBrowser/CServerList.cpp:306
 #, c-format
 msgid "Requesting master server list (%lu ms elapsed)"
-msgstr "Se Г®ncarcДѓ lista cu servere (au trecut %lu ms)"
+msgstr "Se încarcă lista cu servere (au trecut %lu ms)"
 
 #. Abort
 #: Client/core/ServerBrowser/CServerList.cpp:324
 msgid "Master server list could not be parsed."
-msgstr "Lista cu servere nu a putut fi analizatДѓ."
+msgstr "Lista cu servere nu a putut fi analizată."
 
 #. Abort
 #: Client/core/ServerBrowser/CServerList.cpp:334
 msgid "Master server list could not be retrieved."
-msgstr "Lista cu servere nu a putut fi gДѓsitДѓ."
+msgstr "Lista cu servere nu a putut fi găsită."
 
 #: Client/core/ServerBrowser/CServerList.cpp:349
 msgid "(Backup server list)"
-msgstr "(RezervДѓ a listei de servere)"
+msgstr "(Rezervă a listei de servere)"
 
 #: Client/core/ServerBrowser/CServerList.cpp:419
 msgid "Cannot create LAN-broadcast socket"
@@ -2550,11 +2549,11 @@ msgstr "Nu se poate crea socket-ul LAN-broadcast"
 
 #: Client/core/ServerBrowser/CServerList.cpp:429
 msgid "Cannot bind LAN-broadcast socket"
-msgstr "Nu se poate ataИ™a socketul LAN-broadcast"
+msgstr "Nu se poate atașa socketul LAN-broadcast"
 
 #: Client/core/ServerBrowser/CServerList.cpp:472
 msgid "Attempting to discover LAN servers"
-msgstr "Se Г®ncearcДѓ descoperirea serverelor LAN"
+msgstr "Se încearcă descoperirea serverelor LAN"
 
 #. Create queue window
 #: Client/core/ServerBrowser/CServerInfo.cpp:32
@@ -2574,7 +2573,7 @@ msgstr "Nume:"
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:64
 msgid "Server Address:"
-msgstr "AdresДѓ server:"
+msgstr "Adresă server:"
 
 #. Gamemode
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
@@ -2586,13 +2585,13 @@ msgstr "Mod de joc:"
 #: Client/core/ServerBrowser/CServerInfo.cpp:44
 #: Client/core/ServerBrowser/CServerInfo.cpp:86
 msgid "Map:"
-msgstr "HartДѓ:"
+msgstr "Hartă:"
 
 #. Players
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:97
 msgid "Players:"
-msgstr "JucДѓtori:"
+msgstr "Jucători:"
 
 #. Passworded
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
@@ -2604,33 +2603,33 @@ msgstr "Parolat:"
 #: Client/core/ServerBrowser/CServerInfo.cpp:45
 #: Client/core/ServerBrowser/CServerInfo.cpp:119
 msgid "Latency:"
-msgstr "LatenИ›Дѓ:"
+msgstr "Latență:"
 
 #. Column for player names
 #. Player List Columns
 #: Client/core/ServerBrowser/CServerInfo.cpp:138
 #: Client/core/ServerBrowser/CServerBrowser.cpp:635
 msgid "Player list"
-msgstr "ListДѓ cu jucДѓtori"
+msgstr "Listă cu jucători"
 
 #. Close button
 #: Client/core/ServerBrowser/CServerInfo.cpp:144
 msgid "Close"
-msgstr "ГЋnchide"
+msgstr "Închide"
 
 #. Join Game button
 #: Client/core/ServerBrowser/CServerInfo.cpp:152
 msgid "Join Game"
-msgstr "IntrДѓ Г®n joc"
+msgstr "Intră în joc"
 
 #. Please enter password label
 #: Client/core/ServerBrowser/CServerInfo.cpp:166
 msgid "Please enter the password to the server:"
-msgstr "Te rugДѓm introdu parola serverului:"
+msgstr "Te rugăm introdu parola serverului:"
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:177
 msgid "Join the server as soon as a player slot is available."
-msgstr "IntrДѓ Г®n joc imediat ce un slot este disponibil."
+msgstr "Intră în joc imediat ce un slot este disponibil."
 
 #: Client/core/ServerBrowser/CServerInfo.cpp:310
 msgid "PLEASE ENTER SERVER PASSWORD"
@@ -2643,12 +2642,12 @@ msgstr "Sesiunea a expirat"
 #. Set every GUI elements text to blank
 #: Client/core/ServerBrowser/CServerInfo.cpp:515
 msgid "Querying..."
-msgstr "Se proceseazДѓ..."
+msgstr "Se procesează..."
 
 #. Create the window
 #: Client/core/ServerBrowser/CServerBrowser.cpp:189
 msgid "SERVER BROWSER"
-msgstr "CД‚UTARE SERVERE"
+msgstr "CĂUTARE SERVERE"
 
 #. Create the tabs
 #: Client/core/ServerBrowser/CServerBrowser.cpp:237
@@ -2672,9 +2671,9 @@ msgstr "Recente"
 msgid "FOR QUICK CONNECT:\n\n"
 "Type the address and port into the address bar.\n"
 "Or select a server from the history list and press 'Connect'"
-msgstr "PENTRU CONECTARE RAPIDД‚:\n\n"
-"TasteazДѓ adresa И™i portul Г®n bara de adrese.\n"
-"Sau selecteazДѓ un server din istoric И™i apasДѓ 'Conectare'"
+msgstr "PENTRU CONECTARE RAPIDĂ:\n\n"
+"Tastează adresa și portul în bara de adrese.\n"
+"Sau selectează un server din istoric și apasă 'Conectare'"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:321
 msgid "HELP"
@@ -2683,12 +2682,12 @@ msgstr "AJUTOR"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:371
 msgid "Refresh"
-msgstr "ReГ®mprospДѓteazДѓ"
+msgstr "Reîmprospătează"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:372
 msgid "Add Favorite"
-msgstr "AdaugДѓ la favorite"
+msgstr "Adaugă la favorite"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:373
@@ -2700,37 +2699,37 @@ msgstr "Conectare"
 #: Client/core/ServerBrowser/CServerBrowser.cpp:330
 #: Client/core/ServerBrowser/CServerBrowser.cpp:374
 msgid "Server information"
-msgstr "InformaИ›ii despre server"
+msgstr "Informații despre server"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:375
 msgid "Search servers"
-msgstr "CautДѓ servere"
+msgstr "Caută servere"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:376
 msgid "Search players"
-msgstr "CautДѓ jucДѓtori"
+msgstr "Caută jucători"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:377
 msgid "Start search"
-msgstr "PorneЕџte cДѓutarea"
+msgstr "Porneşte căutarea"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:331
 #: Client/core/ServerBrowser/CServerBrowser.cpp:378
 msgid "Delete from recent"
-msgstr "Иterge din recente"
+msgstr "Șterge din recente"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:455
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2086
 msgid "Search players..."
-msgstr "CautДѓ jucДѓtori..."
+msgstr "Caută jucători..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:578
 #: Client/core/ServerBrowser/CServerBrowser.cpp:2084
 msgid "Search servers..."
-msgstr "CautДѓ servere..."
+msgstr "Caută servere..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:610
 msgid "Name"
@@ -2738,7 +2737,7 @@ msgstr "Nume"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:611
 msgid "Players"
-msgstr "JucДѓtori"
+msgstr "Jucători"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:612
 msgid "Ping"
@@ -2775,23 +2774,23 @@ msgstr "Alte versiuni"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:711
 msgid "Back"
-msgstr "ГЋnapoi"
+msgstr "Înapoi"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1012
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1026
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1718
 msgid "Loading..."
-msgstr "Se Г®ncarcДѓ..."
+msgstr "Se încarcă..."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1563
 #: Client/core/ServerBrowser/CServerBrowser.cpp:3039
 msgid "  ..loading.."
-msgstr "..se Г®ncarcДѓ.."
+msgstr "..se încarcă.."
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1601
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1758
 msgid "No address specified!"
-msgstr "Nicio adresДѓ specificatДѓ!"
+msgstr "Nicio adresă specificată!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1614
 msgid "Unknown protocol"
@@ -2799,179 +2798,179 @@ msgstr "Protocol necunoscut!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1614
 msgid "Please use the mtasa:// protocol!"
-msgstr "Te rugДѓm sДѓ foloseИ™ti protocolul mtasa://"
+msgstr "Te rugăm să folosești protocolul mtasa://"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1623
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1682
 #: Client/mods/deathmatch/logic/CClientGame.cpp:673
 #: Client/mods/deathmatch/logic/CClientGame.cpp:765
 msgid "Invalid nickname! Please go to Settings and set a new one!"
-msgstr "Numele ales este invaild! Te rugДѓm mergi la SetДѓri И™i seteazДѓ unul nou!"
+msgstr "Numele ales este invaild! Te rugăm mergi la Setări și setează unul nou!"
 
 #: Client/core/ServerBrowser/CServerBrowser.cpp:1708
 msgid "You have to select a server to connect to."
-msgstr "Trebuie sДѓ selectezi un server la care sДѓ te conectezi."
+msgstr "Trebuie să selectezi un server la care să te conectezi."
 
 #. Couldn't create render target for CPostEffects
 #: Client/multiplayer_sa/CMultiplayerSA_CrashFixHacks.cpp:2225
 msgid "Problem with graphics driver"
-msgstr "ProblemДѓ cu placa graficДѓ"
+msgstr "Problemă cu placa grafică"
 
 #: Client/game_sa/CSettingsSA.cpp:832
 msgid "Can't find valid screen resolution."
-msgstr "Nu se poate gДѓsi o rezoluЕЈie validДѓ a ecranului."
+msgstr "Nu se poate găsi o rezoluţie validă a ecranului."
 
 #. Confirm that res should be used
 #: Client/game_sa/CSettingsSA.cpp:908
 msgid "Are you sure you want to use this screen resolution?"
-msgstr "EЕџti sigur cДѓ vrei sДѓ foloseЕџti aceastДѓ rezoluЕЈie?"
+msgstr "Eşti sigur că vrei să foloseşti această rezoluţie?"
 
 #: Client/game_sa/CGameSA.cpp:257 Client/game_sa/CGameSA.cpp:268
 msgid "Failed initialization game_sa"
-msgstr "IniИ›ializare game_sa eИ™uatДѓ"
+msgstr "Inițializare game_sa eșuată"
 
 #: Client/game_sa/CGameSA.cpp:259
 msgid "Memory allocations failed"
-msgstr "Alocare memorie eИ™uatДѓ"
+msgstr "Alocare memorie eșuată"
 
 #: Client/cefweb/CWebsiteRequests.cpp:19
 msgid "Website requests"
-msgstr "SolicitДѓri website"
+msgstr "Solicitări website"
 
 #: Client/cefweb/CWebsiteRequests.cpp:27
 msgid "The server requests the following websites in order to load them (later):"
-msgstr "Serverul solicitДѓ urmДѓtoarele site-uri web pentru a le Г®ncДѓrca (mai tГўrziu):"
+msgstr "Serverul solicită următoarele site-uri web pentru a le încărca (mai târziu):"
 
 #: Client/cefweb/CWebsiteRequests.cpp:33
 msgid "NEVER ENTER SENSITIVE DATA TO PROTECT THEM FROM BEING STOLEN"
-msgstr "NU INTRODUCEИљI NICIODATД‚ DATE PERSONALE, PENTRU A EVITA SД‚ FIE FURATE"
+msgstr "NU INTRODUCEȚI NICIODATĂ DATE PERSONALE, PENTRU A EVITA SĂ FIE FURATE"
 
 #: Client/cefweb/CWebsiteRequests.cpp:46
 msgid "Remember decision"
-msgstr "MemoreazДѓ decizia"
+msgstr "Memorează decizia"
 
 #: Client/cefweb/CWebsiteRequests.cpp:57
 msgid "Deny"
-msgstr "RefuzДѓ"
+msgstr "Refuză"
 
 #: Client/mods/deathmatch/CClient.cpp:38
 msgid "This version has expired."
-msgstr "AceastДѓ versiune a expirat."
+msgstr "Această versiune a expirat."
 
 #: Client/mods/deathmatch/CClient.cpp:58
 msgid "disconnect from the game"
-msgstr "deconecteazДѓ-te de la joc"
+msgstr "deconectează-te de la joc"
 
 #: Client/mods/deathmatch/CClient.cpp:59
 msgid "shows the nametags"
-msgstr "afiЕџeazДѓ numele"
+msgstr "afişează numele"
 
 #: Client/mods/deathmatch/CClient.cpp:60
 msgid "shows the chatbox"
-msgstr "afiИ™eazДѓ fereastra de chat"
+msgstr "afișează fereastra de chat"
 
 #: Client/mods/deathmatch/CClient.cpp:61
 msgid "shows the network statistics"
-msgstr "afiИ™eazДѓ statisticile conexiunii"
+msgstr "afișează statisticile conexiunii"
 
 #. Key commands (registered as 'mod commands', can be disabled)
 #: Client/mods/deathmatch/CClient.cpp:64
 msgid "open the chat input"
-msgstr "activeazДѓ intrarea ferestrei de chat"
+msgstr "activează intrarea ferestrei de chat"
 
 #: Client/mods/deathmatch/CClient.cpp:65
 msgid "transmits voice to other players"
-msgstr "transmite vocea cДѓtre ceilalИ›i jucДѓtori"
+msgstr "transmite vocea către ceilalți jucători"
 
 #: Client/mods/deathmatch/CClient.cpp:66
 msgid "enters a car as passenger"
-msgstr "intrДѓ Г®n maЕџinДѓ ca pasager"
+msgstr "intră în maşină ca pasager"
 
 #: Client/mods/deathmatch/CClient.cpp:67
 msgid "next radio channel"
-msgstr "staИ›ia radio urmДѓtoare"
+msgstr "stația radio următoare"
 
 #: Client/mods/deathmatch/CClient.cpp:68
 msgid "previous radio channel"
-msgstr "staИ›ia radio precedentДѓ"
+msgstr "stația radio precedentă"
 
 #: Client/mods/deathmatch/CClient.cpp:69
 msgid "enables the player-map view"
-msgstr "activeazДѓ harta jucДѓtorului"
+msgstr "activează harta jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:70
 msgid "zooms the player-map in"
-msgstr "mДѓreИ™te harta jucДѓtorului"
+msgstr "mărește harta jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:71
 msgid "zooms the player-map out"
-msgstr "micИ™oreazДѓ harta jucДѓtorului"
+msgstr "micșorează harta jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:72
 msgid "moves the player-map north"
-msgstr "mutДѓ harta jucДѓtorului la nord"
+msgstr "mută harta jucătorului la nord"
 
 #: Client/mods/deathmatch/CClient.cpp:73
 msgid "moves the player-map south"
-msgstr "mutДѓ harta jucДѓtorului la sud"
+msgstr "mută harta jucătorului la sud"
 
 #: Client/mods/deathmatch/CClient.cpp:74
 msgid "moves the player-map east"
-msgstr "mutДѓ harta jucДѓtorului la est"
+msgstr "mută harta jucătorului la est"
 
 #: Client/mods/deathmatch/CClient.cpp:75
 msgid "moves the player-map west"
-msgstr "mutДѓ hartДѓ jucДѓtorului la vest"
+msgstr "mută hartă jucătorului la vest"
 
 #: Client/mods/deathmatch/CClient.cpp:76
 msgid "attaches the player-map"
-msgstr "ataИ™eazДѓ harta jucДѓtorului"
+msgstr "atașează harta jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:77
 msgid "reduces player-map opacity"
-msgstr "reduce opacitatea hДѓrИ›ii jucДѓtorului"
+msgstr "reduce opacitatea hărții jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:78
 msgid "increases player-map opacity"
-msgstr "mДѓreИ™te opacitatea hДѓrИ›ii jucДѓtorului"
+msgstr "mărește opacitatea hărții jucătorului"
 
 #: Client/mods/deathmatch/CClient.cpp:79
 msgid "toggles player-map help text"
-msgstr "comutДѓ text ajutor hartДѓ jucДѓtor"
+msgstr "comută text ajutor hartă jucător"
 
 #: Client/mods/deathmatch/CClient.cpp:80
 msgid "sends a message to the targetted player"
-msgstr "trimite un mesaj jucДѓtorului specificat"
+msgstr "trimite un mesaj jucătorului specificat"
 
 #: Client/mods/deathmatch/CClient.cpp:81
 msgid "changes to the next weapon whilst in a vehicle"
-msgstr "schimbДѓ la arma urmДѓtoare Г®n timp ce eИ™ti Г®ntr-un vehicul"
+msgstr "schimbă la arma următoare în timp ce ești într-un vehicul"
 
 #: Client/mods/deathmatch/CClient.cpp:82
 msgid "changes to the previous weapon whilst in a vehicle"
-msgstr "schimbДѓ la arma precedentДѓ Г®n timp ce eИ™ti Г®ntr-un vehicul"
+msgstr "schimbă la arma precedentă în timp ce ești într-un vehicul"
 
 #: Client/mods/deathmatch/CClient.cpp:83
 msgid "outputs info about the current server"
-msgstr "afiИ™eazДѓ informaИ›ii despre serverul curent"
+msgstr "afișează informații despre serverul curent"
 
 #. ACHTUNG" Should this be handled by the atomic cvar setter?
 #: Client/mods/deathmatch/CClient.cpp:86
 msgid "defines the scale multiplier of all text-displays"
-msgstr "defineИ™te multiplicatorul de scarДѓ al tuturor afiИ™ajelor de text"
+msgstr "definește multiplicatorul de scară al tuturor afișajelor de text"
 
 #. Development mode
 #: Client/mods/deathmatch/CClient.cpp:93
 msgid "(Development mode) shows the colshapes"
-msgstr "(Mod de dezvoltare) afiИ™eazДѓ toate poliedrele de coliziune"
+msgstr "(Mod de dezvoltare) afișează toate poliedrele de coliziune"
 
 #: Client/mods/deathmatch/CClient.cpp:94
 msgid "(Development mode) prints world sound ids into the debug window"
-msgstr "(Mod de dezvoltare) afiИ™eazДѓ numДѓrul de identificare al sunetelor Г®n fereastra de depanare"
+msgstr "(Mod de dezvoltare) afișează numărul de identificare al sunetelor în fereastra de depanare"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:37
 msgid "HOST GAME"
-msgstr "GД‚ZDUIRE JOC"
+msgstr "GĂZDUIRE JOC"
 
 #. m_pTabs->CreateTab ( "Gamemode" );
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:53
@@ -2986,12 +2985,12 @@ msgstr "Nume server:"
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:64
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:66
 msgid "Password:"
-msgstr "ParolДѓ:"
+msgstr "Parolă:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:73
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:75
 msgid "Max players:"
-msgstr "NumДѓr sloturi:"
+msgstr "Număr sloturi:"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:82
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:84
@@ -3012,38 +3011,38 @@ msgstr "Toate"
 
 #: Client/mods/deathmatch/logic/CLocalServer.cpp:118
 msgid "Start"
-msgstr "LanseazДѓ"
+msgstr "Lansează"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:78
 #, c-format
 msgid "Change mode: %s"
-msgstr "SchimbДѓ mod: %s"
+msgstr "Schimbă mod: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:80
 #, c-format
 msgid "Zoom: %s/%s     Movement: %s, %s, %s, %s     Opacity: %s/%s"
-msgstr "MДѓreИ™te: %s/%s MiИ™care: %s, %s, %s, %s Opacitate: %s/%s"
+msgstr "Mărește: %s/%s Mișcare: %s, %s, %s, %s Opacitate: %s/%s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:84
 #, c-format
 msgid "Toggle map: %s     Toggle help text: %s"
-msgstr "Comutare hartДѓ: %s Comutare text ajutor: %s"
+msgstr "Comutare hartă: %s Comutare text ajutor: %s"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:714
 msgid "Following Player"
-msgstr "UrmДѓrire jucДѓtor"
+msgstr "Urmărire jucător"
 
 #: Client/mods/deathmatch/logic/CPlayerMap.cpp:716
 msgid "Free Movement"
-msgstr "MiИ™care liberДѓ"
+msgstr "Mișcare liberă"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:25
 msgid "Map download progress:"
-msgstr "Progresul descДѓrcДѓrii hДѓrИ›ii:"
+msgstr "Progresul descărcării hărții:"
 
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:28
 msgid "Download Progress:"
-msgstr "Progresul descДѓrcДѓrii:"
+msgstr "Progresul descărcării:"
 
 #. Find our largest piece of text, so we can size accordingly
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:42
@@ -3055,7 +3054,7 @@ msgstr "%s din %s"
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:44
 #: Client/mods/deathmatch/logic/CTransferBox.cpp:65
 msgid "Disconnect to cancel download"
-msgstr "DeconecteazДѓ-te pentru a anula descДѓrcarea"
+msgstr "Deconectează-te pentru a anula descărcarea"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:503
 msgid "Disconnected: Invalid nickname"
@@ -3063,20 +3062,20 @@ msgstr "Deconectat: Nume invalid"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:507
 msgid "Disconnect from server"
-msgstr "DeconecteazДѓ-te de la server"
+msgstr "Deconectează-te de la server"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:511
 #, c-format
 msgid "Disconnected: Serial is banned.\n"
 "Reason: %s"
-msgstr "Deconectat: Serialul tДѓu are interdicИ›ie.\n"
+msgstr "Deconectat: Serialul tău are interdicție.\n"
 "Motiv: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:517
 #, c-format
 msgid "Disconnected: You are banned.\n"
 "Reason: %s"
-msgstr "Deconectat: Ai interdicИ›ie.\n"
+msgstr "Deconectat: Ai interdicție.\n"
 "Motiv: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:523
@@ -3092,39 +3091,39 @@ msgstr "Deconectat: Nepotrivire de versiune"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:532
 msgid "Disconnected: Join flood. Please wait a minute, then reconnect."
-msgstr "Deconectat: Server supraГ®ncДѓrcat. Te rugДѓm aИ™teaptДѓ un minut, apoi reconecteazДѓ-te."
+msgstr "Deconectat: Server supraîncărcat. Te rugăm așteaptă un minut, apoi reconectează-te."
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:536
 #, c-format
 msgid "Disconnected: Server from different branch.\n"
 "Information: %s"
-msgstr "Deconectat: Serverul este dintr-o branИ™Дѓ diferitДѓ.\n"
-"InformaИ›ii: %s"
+msgstr "Deconectat: Serverul este dintr-o branșă diferită.\n"
+"Informații: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:541
 #, c-format
 msgid "Disconnected: Bad version.\n"
 "Information: %s"
-msgstr "Deconectat: Versiune incorectДѓ.\n"
-"InformaИ›ii: %s"
+msgstr "Deconectat: Versiune incorectă.\n"
+"Informații: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:546
 #, c-format
 msgid "Disconnected: Server is running a newer build.\n"
 "Information: %s"
-msgstr "Deconectat: Serverul ruleazДѓ o versiune mai nouДѓ.\n"
-"InformaИ›ii: %s"
+msgstr "Deconectat: Serverul rulează o versiune mai nouă.\n"
+"Informații: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:551
 #, c-format
 msgid "Disconnected: Server is running an older build.\n"
 "Information: %s"
-msgstr "Deconectat: Serverul ruleazДѓ o versiune mai veche.\n"
-"InformaИ›ii: %s"
+msgstr "Deconectat: Serverul rulează o versiune mai veche.\n"
+"Informații: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:556
 msgid "Disconnected: Nick already in use"
-msgstr "Deconectat: Numele tДѓu este deja folosit"
+msgstr "Deconectat: Numele tău este deja folosit"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:560
 msgid "Disconnected: Player element could not be created."
@@ -3137,11 +3136,11 @@ msgstr "Deconectat: Serverul a refuzat conexiunea: %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:569
 msgid "Disconnected: Serial verification failed"
-msgstr "Deconectat: Verificarea serialului a eИ™uat"
+msgstr "Deconectat: Verificarea serialului a eșuat"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:573
 msgid "Disconnected: Serial already in use"
-msgstr "Deconectat: Serial deja Г®n folosinИ›Дѓ"
+msgstr "Deconectat: Serial deja în folosință"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:577
 #, c-format
@@ -3151,66 +3150,66 @@ msgstr "Deconectat: Desincronizare de conexiune %s"
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:586
 #, c-format
 msgid "Disconnected: You were kicked by %s"
-msgstr "Deconectat: Ai fost dat afarДѓ de cДѓtre %s"
+msgstr "Deconectat: Ai fost dat afară de către %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:591
 #, c-format
 msgid "Disconnected: You were banned by %s"
-msgstr "Deconectat: Ai primit interdicИ›ie de la %s"
+msgstr "Deconectat: Ai primit interdicție de la %s"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:602
 msgid "Disconnected: Server shutdown or restarting"
-msgstr "Deconectat: Serverul a fost Г®nchis sau repornit"
+msgstr "Deconectat: Serverul a fost închis sau repornit"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:622
 msgid "You were kicked from the game"
-msgstr "Ai fost dat afarДѓ din joc"
+msgstr "Ai fost dat afară din joc"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:623
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:634
 msgid "This server requires a non-modifed gta_sa.exe"
-msgstr "Acest server nu permite modificДѓri ale fiИ™ierului gta_sa.exe"
+msgstr "Acest server nu permite modificări ale fișierului gta_sa.exe"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:624
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:635
 msgid "Please replace gta_sa.exe"
-msgstr "Te rugДѓm sДѓ Г®nlocuieИ™ti gta_sa.exe"
+msgstr "Te rugăm să înlocuiești gta_sa.exe"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:625
 msgid "This server does not allow custom D3D9.DLLs"
-msgstr "Acest server nu permite modificarea fiИ™ierului D3D9.DLL"
+msgstr "Acest server nu permite modificarea fișierului D3D9.DLL"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:626
 msgid "Remove D3D9.DLL from your GTA install directory and restart MTA"
-msgstr "EliminaИ›i D3D9.DLL din directorul de instalare GTA И™i reporniИ›i MTA"
+msgstr "Eliminați D3D9.DLL din directorul de instalare GTA și reporniți MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:627
 msgid "This server does not allow virtual machines"
-msgstr "Acest server nu permite maИ™ini virtuale"
+msgstr "Acest server nu permite mașini virtuale"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:628
 msgid "This server requires driver signing to be enabled"
-msgstr "Acest server necesitДѓ activarea driverelor semnate"
+msgstr "Acest server necesită activarea driverelor semnate"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:629
 msgid "Please restart your PC"
-msgstr "Te rugДѓm sДѓ reporneИ™ti computerul"
+msgstr "Te rugăm să repornești computerul"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:630
 msgid "This server has detected missing anti-cheat components"
-msgstr "Acest server a detectat componente anti-cheat lipsДѓ"
+msgstr "Acest server a detectat componente anti-cheat lipsă"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:631
 msgid "Try restarting MTA"
-msgstr "ГЋncercaИ›i sДѓ reporniИ›i MTA"
+msgstr "Încercați să reporniți MTA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:632
 msgid "This server requires a non-modifed gta3.img and gta_int.img"
-msgstr "Acest server nu permite conectarea cu fiИ™iere gta3.img sau gta_int.img modificate"
+msgstr "Acest server nu permite conectarea cu fișiere gta3.img sau gta_int.img modificate"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:633
 msgid "Please replace gta3.img or gta_int.img"
-msgstr "VДѓ rugДѓm sДѓ Г®nlocuiЕЈi gta3.img sau gta_int.img"
+msgstr "Vă rugăm să înlocuiţi gta3.img sau gta_int.img"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:636
 msgid "This server does not allow Wine"
@@ -3218,11 +3217,11 @@ msgstr "Acest server nu permite utilizarea Wine"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:637
 msgid "Ensure no other program is modifying MTA:SA"
-msgstr "AsiguraИ›i-vДѓ cДѓ niciun alt program nu modificДѓ MTA:SA"
+msgstr "Asigurați-vă că niciun alt program nu modifică MTA:SA"
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:651
 msgid "Time Remaining: "
-msgstr "Timp rДѓmas: "
+msgstr "Timp rămas: "
 
 #: Client/mods/deathmatch/logic/CPacketHandler.cpp:661
 #, c-format
@@ -3236,7 +3235,7 @@ msgstr[2] "%d de zile"
 #, c-format
 msgid "%d hour"
 msgid_plural "%d hours"
-msgstr[0] "%d orДѓ"
+msgstr[0] "%d oră"
 msgstr[1] "%d ore"
 msgstr[2] "%d de ore"
 
@@ -3252,7 +3251,7 @@ msgstr[2] "%d de minute"
 #, c-format
 msgid "%d second"
 msgid_plural "%d seconds"
-msgstr[0] "%d secundДѓ"
+msgstr[0] "%d secundă"
 msgstr[1] "%d secunde"
 msgstr[2] "%d de secunde"
 
@@ -3263,27 +3262,27 @@ msgstr "Deconectat"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Flying a UFO around"
-msgstr "PiloteazДѓ un UFO prin"
+msgstr "Pilotează un UFO prin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Cruising around"
-msgstr "ГЋn plimbare prin"
+msgstr "În plimbare prin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Riding the waves of"
-msgstr "NavigГўnd pe valurile"
+msgstr "Navigând pe valurile"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:388
 msgid "Riding the train in"
-msgstr "CДѓlДѓtorind cu trenul Г®n"
+msgstr "Călătorind cu trenul în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Flying around"
-msgstr "ZboarДѓ prin"
+msgstr "Zboară prin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Riding around"
-msgstr "CДѓlДѓtorind prin"
+msgstr "Călătorind prin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:389
 msgid "Monster truckin' around"
@@ -3303,12 +3302,12 @@ msgstr "Face lucruri ciudate prin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:395
 msgid "Climbing around in"
-msgstr "Se caИ›ДѓrДѓ Г®n jurul"
+msgstr "Se cațără în jurul"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:396
 #: Client/mods/deathmatch/logic/CClientGame.cpp:397
 msgid "Doing a drive-by in"
-msgstr "FДѓcГўnd un drive-by Г®n"
+msgstr "Făcând un drive-by în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:398
 msgid "Blub blub..."
@@ -3316,27 +3315,27 @@ msgstr "Blub blub..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:399
 msgid "Breathing water"
-msgstr "RespirДѓ apДѓ"
+msgstr "Respiră apă"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:400
 msgid "Drowning in"
-msgstr "Se Г®neacДѓ Г®n"
+msgstr "Se îneacă în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:401
 msgid "Ducking for cover in"
-msgstr "Ghemuit Г®n cover Г®n"
+msgstr "Ghemuit în cover în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:402
 msgid "Fighting in"
-msgstr "Se luptДѓ Г®n"
+msgstr "Se luptă în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:403
 msgid "Throwing fists in"
-msgstr "AruncГўnd pumni Г®n"
+msgstr "Aruncând pumni în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:404
 msgid "Blastin' fools in"
-msgstr "ГЋmpuИ™cГўnd fraieri Г®n"
+msgstr "Împușcând fraieri în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:405
 msgid "Shooting up"
@@ -3344,39 +3343,39 @@ msgstr "Trage cu arma"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:406
 msgid "Jetpacking in"
-msgstr "Cu jetpack-ul Г®n"
+msgstr "Cu jetpack-ul în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:407
 msgid "Literally on fire in"
-msgstr "Literalmente arde Г®n"
+msgstr "Literalmente arde în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:408
 msgid "Burning up in"
-msgstr "Arde Г®n"
+msgstr "Arde în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:409
 msgid "Swimming in"
-msgstr "ГЋnoatДѓ Г®n"
+msgstr "Înoată în"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:410
 msgid "Floating around in"
-msgstr "GraviteazДѓ prin jurul"
+msgstr "Gravitează prin jurul"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:411
 msgid "Being chased by a shark"
-msgstr "UrmДѓrit de un rechin"
+msgstr "Urmărit de un rechin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:412
 msgid "Choking to death in"
-msgstr "Se Г®neacДѓ pГўnДѓ la moarte"
+msgstr "Se îneacă până la moarte"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:689
 msgid "Entering the game ..."
-msgstr "Se intrДѓ Г®n joc ..."
+msgstr "Se intră în joc ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:741
 msgid "Not connected; please use Quick Connect or the 'connect' command to connect to a server."
-msgstr "Neconectat; te rugДѓm foloseИ™te conectarea rapidДѓ sau comanda 'connect' pentru a te conecta la un server."
+msgstr "Neconectat; te rugăm folosește conectarea rapidă sau comanda 'connect' pentru a te conecta la un server."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:787
 msgid "Could not start the local server. See console for details."
@@ -3389,7 +3388,7 @@ msgstr "Server local"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:797
 msgid "Starting local server ..."
-msgstr "Se porneИ™te serverul local ..."
+msgstr "Se pornește serverul local ..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1045
 msgid "Area 51"
@@ -3397,16 +3396,16 @@ msgstr "Zona 51"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1054
 msgid "Walking around "
-msgstr "PlimbГўndu-se prin "
+msgstr "Plimbându-se prin "
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1199
 #, c-format
 msgid "You were kicked from the game ( %s )"
-msgstr "Ai fost dat afarДѓ din joc (%s)"
+msgstr "Ai fost dat afară din joc (%s)"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1268
 msgid "Connecting to local server..."
-msgstr "Se conecteazДѓ la serverul local..."
+msgstr "Se conectează la serverul local..."
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1279
 msgid "Error connecting to server."
@@ -3426,27 +3425,27 @@ msgstr "Deconectat: serverul este momentan plin"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1434
 msgid "Disconnected: invalid password specified"
-msgstr "Deconectat: parola specificatДѓ este invalidДѓ"
+msgstr "Deconectat: parola specificată este invalidă"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:1456
 msgid "MTA Client verification failed!"
-msgstr "Verificarea clientului MTA a eИ™uat!"
+msgstr "Verificarea clientului MTA a eșuat!"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "In a ditch"
-msgstr "ГЋntr-un impas"
+msgstr "Într-un impas"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "En-route to hospital"
-msgstr "ГЋn drum spre spital"
+msgstr "În drum spre spital"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "Meeting their maker"
-msgstr "ГЋntГўlnindu-И™i creatorul"
+msgstr "Întâlnindu-și creatorul"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "Regretting their decisions"
-msgstr "RegretГўndu-И™i deciziile"
+msgstr "Regretându-și deciziile"
 
 #: Client/mods/deathmatch/logic/CClientGame.cpp:5691
 msgid "Wasted"
@@ -3456,13 +3455,13 @@ msgstr "Wasted"
 #: Client/mods/deathmatch/logic/CResourceFileDownloadManager.cpp:141
 #, c-format
 msgid "Download error: %s"
-msgstr "Eroare de descДѓrcare: %s"
+msgstr "Eroare de descărcare: %s"
 
 #. Populate the message and show the box
 #: Shared/mods/deathmatch/logic/Utils.cpp:127
 #, c-format
 msgid "Fatal error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr "Eroare fatalДѓ (%u). DacДѓ aceastДѓ problemДѓ persistДѓ, te rugДѓm verificДѓ multitheftauto.com pentru ajutor."
+msgstr "Eroare fatală (%u). Dacă această problemă persistă, te rugăm verifică multitheftauto.com pentru ajutor."
 
 #. #ifdef MTA_DEBUG
 #. assert ( 0 );
@@ -3471,7 +3470,7 @@ msgstr "Eroare fatalДѓ (%u). DacДѓ aceastДѓ problemДѓ persistДѓ, te ru
 #: Shared/mods/deathmatch/logic/Utils.cpp:143
 #, c-format
 msgid "Protocol error (%u). If this problem persists, please check out multitheftauto.com for support."
-msgstr "Eroare de protocol (%u). DacДѓ aceastДѓ problemДѓ persistДѓ, te rugДѓm verificДѓ multitheftauto.com pentru ajutor."
+msgstr "Eroare de protocol (%u). Dacă această problemă persistă, te rugăm verifică multitheftauto.com pentru ajutor."
 
 #: Shared/mods/deathmatch/logic/Utils.cpp:145
 msgid "Connection error"
@@ -3479,11 +3478,11 @@ msgstr "Eroare de conexiune"
 
 #: Shared/sdk/SharedUtil.Misc.hpp:381
 msgid "Multi Theft Auto has not been installed properly, please reinstall."
-msgstr "Multi Theft Auto nu a fost instalat corect, te rugДѓm reinstaleazДѓ-l."
+msgstr "Multi Theft Auto nu a fost instalat corect, te rugăm reinstalează-l."
 
 #: Shared/sdk/SharedUtil.Misc.hpp:1476
 msgid "Your browser will now display a web page with some help infomation.\n\n"
 "(If the page fails to load, paste (CTRL-V) the URL into your web browser)"
-msgstr "Navigatorul tДѓu va afiИ™a acum o paginДѓ web cu informaИ›ii ajutДѓtoare.\n\n"
-"(DacДѓ pagina eИ™ueazДѓ sДѓ se Г®ncarce, lipeИ™te (CTRL+V) URL-ul Г®n navigatorul tДѓu)"
+msgstr "Navigatorul tău va afișa acum o pagină web cu informații ajutătoare.\n\n"
+"(Dacă pagina eșuează să se încarce, lipește (CTRL+V) URL-ul în navigatorul tău)"
 
