@@ -2322,11 +2322,12 @@ int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
 
 float CLuaPedDefs::GetPedAnimationProgress(CClientPed* ped)
 {
-    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
-    std::int32_t type = currentTask->GetTaskType();
+    CTaskManager* taskManager = ped->GetTaskManager();
+    if (!taskManager)
+        return -1.0f;
 
-    // check if animation (task type is 401)
-    if (type != 401)
+    CTask* currentTask = taskManager->GetActiveTask();
+    if (!currentTask || currentTask->GetTaskType() != TASK_SIMPLE_NAMED_ANIM)
         return -1.0f;
 
     auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
@@ -2342,11 +2343,12 @@ float CLuaPedDefs::GetPedAnimationProgress(CClientPed* ped)
 
 float CLuaPedDefs::GetPedAnimationSpeed(CClientPed* ped)
 {
-    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
-    std::int32_t type = currentTask->GetTaskType();
+    CTaskManager* taskManager = ped->GetTaskManager();
+    if (!taskManager)
+        return -1.0f;
 
-    // check if animation (task type is 401)
-    if (type != 401)
+    CTask* currentTask = taskManager->GetActiveTask();
+    if (!currentTask || currentTask->GetTaskType() != TASK_SIMPLE_NAMED_ANIM)
         return -1.0f;
 
     auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
@@ -2362,11 +2364,12 @@ float CLuaPedDefs::GetPedAnimationSpeed(CClientPed* ped)
 
 float CLuaPedDefs::GetPedAnimationLength(CClientPed* ped)
 {
-    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
-    std::int32_t type = currentTask->GetTaskType();
+    CTaskManager* taskManager = ped->GetTaskManager();
+    if (!taskManager)
+        return -1.0f;
 
-    // check if animation (task type is 401)
-    if (type != 401)
+    CTask* currentTask = taskManager->GetActiveTask();
+    if (!currentTask || currentTask->GetTaskType() != TASK_SIMPLE_NAMED_ANIM)
         return -1.0f;
 
     auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
