@@ -104,6 +104,13 @@ namespace
         return width;
     }
 
+    int QuantizeVolumePercent(float& value)
+    {
+        const int iPercent = std::clamp(static_cast<int>(value * 100.0f + 0.5f), 0, 100);
+        value = iPercent / 100.0f;
+        return iPercent;
+    }
+
     void FinalizeSliderRow(float tabWidth, CGUIScrollBar* slider, CGUILabel* valueLabel, float preferredWidth, float labelSpacing = kSliderLabelSpacing,
                            CGUILabel* textLabel = nullptr)
     {
@@ -289,9 +296,6 @@ void CSettings::ResetGuiPointers()
     m_pProgressAnimationCombo = NULL;
     m_pDebugSettingLabel = NULL;
     m_pDebugSettingCombo = NULL;
-    m_pWin8Label = NULL;
-    m_pWin8ColorCheckBox = NULL;
-    m_pWin8MouseCheckBox = NULL;
     m_pPhotoSavingCheckbox = NULL;
     m_pCheckBoxAskBeforeDisconnect = NULL;
     m_pProcessAffinityCheckbox = NULL;
@@ -423,15 +427,55 @@ void CSettings::ResetGuiPointers()
     m_pGridBrowserWhitelist = NULL;
     m_pButtonBrowserWhitelistRemove = NULL;
     m_pCheckBoxBrowserGPUEnabled = NULL;
+    m_pCheckBoxBrowserVideoAccelEnabled = NULL;
 }
 
 CSettings::CSettings()
 {
     ResetGuiPointers();
 
-    CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
-    m_fRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
-    m_fSFXVolume = (float)gameSettings->GetSFXVolume() / 64.0f;
+    CClientVariables& clientVars = CClientVariables::GetSingleton();
+    CGameSettings*    gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
+
+    float fRadioVolume = 0.0f;
+    float fSFXVolume = 0.0f;
+
+    // Keep exact slider values in CVARs. Fall back to reconstructed values for
+    // one-time migration when those keys do not exist yet.
+    if (clientVars.Exists("radiovolume") && clientVars.Exists("sfxvolume"))
+    {
+        CVARS_GET("radiovolume", fRadioVolume);
+        CVARS_GET("sfxvolume", fSFXVolume);
+    }
+    else
+    {
+        // GTA stores radio/SFX as values already multiplied by master volume.
+        // The UI sliders represent the unscaled channel volumes, so recover them
+        // by dividing by the persisted master value during startup.
+        const float fMasterVolume = std::max(0.0f, std::min(CVARS_GET_VALUE<float>("mastervolume"), 1.0f));
+        const float fStoredRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
+        const float fStoredSFXVolume = (float)gameSettings->GetSFXVolume() / 64.0f;
+
+        if (fMasterVolume > 0.0001f)
+        {
+            fRadioVolume = fStoredRadioVolume / fMasterVolume;
+            fSFXVolume = fStoredSFXVolume / fMasterVolume;
+        }
+        else
+        {
+            // If master was zero we cannot recover hidden channel values.
+            fRadioVolume = fStoredRadioVolume;
+            fSFXVolume = fStoredSFXVolume;
+        }
+
+        CVARS_SET("radiovolume", fRadioVolume);
+        CVARS_SET("sfxvolume", fSFXVolume);
+    }
+
+    m_fRadioVolume = std::max(0.0f, std::min(fRadioVolume, 1.0f));
+    m_fSFXVolume = std::max(0.0f, std::min(fSFXVolume, 1.0f));
+    QuantizeVolumePercent(m_fRadioVolume);
+    QuantizeVolumePercent(m_fSFXVolume);
 
     m_iMaxAnisotropic = g_pDeviceState->AdapterState.MaxAnisotropicSetting;
     m_bBrowserListsChanged = false;
@@ -1555,6 +1599,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxBrowserGPUEnabled->SetPosition(CVector2D(browserRightColumnX, vecTemp.fY - 25.0f));
     m_pCheckBoxBrowserGPUEnabled->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxBrowserVideoAccelEnabled = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(m_pTabBrowser, _("Enable video acceleration"), true));
+    m_pCheckBoxBrowserVideoAccelEnabled->SetPosition(CVector2D(browserRightColumnX, vecTemp.fY));
+    m_pCheckBoxBrowserVideoAccelEnabled->AutoSize(NULL, 20.0f);
+
     m_pLabelBrowserCustomBlacklist = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pTabBrowser, _("Custom blacklist")));
     m_pLabelBrowserCustomBlacklist->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
     m_pLabelBrowserCustomBlacklist->GetPosition(vecTemp);
@@ -1813,33 +1861,6 @@ void CSettings::CreateGUI()
     vecTemp.fX = 22.f;
     vecTemp.fY += fLineHeight;
 
-    // Windows 8 compatibility
-    m_pWin8Label = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Windows 8 compatibility:")));
-    m_pWin8Label->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
-    m_pWin8Label->AutoSize();
-
-    m_pWin8ColorCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("16-bit color")));
-    m_pWin8ColorCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
-    m_pWin8ColorCheckBox->AutoSize(NULL, 20.0f);
-    vecTemp.fX += 140;
-
-    m_pWin8MouseCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Mouse fix")));
-    m_pWin8MouseCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
-    m_pWin8MouseCheckBox->AutoSize(NULL, 20.0f);
-    vecTemp.fY += fLineHeight;
-    vecTemp.fX -= 140;
-
-    // Hide if not Win8
-    if (atoi(GetApplicationSetting("real-os-version")) != 8)
-    {
-#ifndef MTA_DEBUG  // Don't hide when debugging
-        m_pWin8Label->SetVisible(false);
-        m_pWin8ColorCheckBox->SetVisible(false);
-        m_pWin8MouseCheckBox->SetVisible(false);
-        vecTemp.fY -= fLineHeight;
-#endif
-    }
-
     // Cache path info
     m_pCachePathLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Client resource files:")));
     m_pCachePathLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
@@ -2035,12 +2056,6 @@ void CSettings::CreateGUI()
 
     m_pUpdateBuildTypeCombo->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pUpdateBuildTypeCombo->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
-
-    m_pWin8ColorCheckBox->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
-    m_pWin8ColorCheckBox->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
-
-    m_pWin8MouseCheckBox->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
-    m_pWin8MouseCheckBox->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
 
     m_pUpdateAutoInstallLabel->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pUpdateAutoInstallLabel->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
@@ -4093,14 +4108,6 @@ void CSettings::LoadData()
     else if (iVar == 1)
         m_pProgressAnimationCombo->SetText(_("Default"));
 
-    // Windows 8 16-bit color
-    iVar = GetApplicationSettingInt("Win8Color16");
-    m_pWin8ColorCheckBox->SetSelected(iVar != 0);
-
-    // Windows 8 mouse fix
-    iVar = GetApplicationSettingInt("Win8MouseFix");
-    m_pWin8MouseCheckBox->SetSelected(iVar != 0);
-
     // Save camera photos inside user documents folder
     CVARS_GET("photosaving", bVar);
     m_pPhotoSavingCheckbox->SetSelected(bVar);
@@ -4218,6 +4225,8 @@ void CSettings::LoadData()
     m_pCheckBoxRemoteJavascript->SetSelected(bVar);
     CVARS_GET("browser_enable_gpu", bVar);
     m_pCheckBoxBrowserGPUEnabled->SetSelected(bVar);
+    CVARS_GET("browser_enable_video_acceleration", bVar);
+    m_pCheckBoxBrowserVideoAccelEnabled->SetSelected(bVar);
 
     ReloadBrowserLists();
 }
@@ -4541,12 +4550,6 @@ void CSettings::SaveData()
         CVARS_SET("progress_animation", iSelected);
     }
 
-    // Windows 8 16-bit color
-    SetApplicationSettingInt("Win8Color16", m_pWin8ColorCheckBox->GetSelected());
-
-    // Windows 8 mouse fix
-    SetApplicationSettingInt("Win8MouseFix", m_pWin8MouseCheckBox->GetSelected());
-
     // Save photos in documents folder
     bool photoSaving = m_pPhotoSavingCheckbox->GetSelected();
     CVARS_SET("photosaving", photoSaving);
@@ -4723,6 +4726,13 @@ void CSettings::SaveData()
     bool bBrowserGPUSettingChanged = (bBrowserGPUSetting != bBrowserGPUEnabled);
     CVARS_SET("browser_enable_gpu", bBrowserGPUSetting);
 
+    bool bBrowserVideoAccelEnabled = false;
+    CVARS_GET("browser_enable_video_acceleration", bBrowserVideoAccelEnabled);
+
+    bool bBrowserVideoAccelSetting = m_pCheckBoxBrowserVideoAccelEnabled->GetSelected();
+    bool bBrowserVideoAccelSettingChanged = (bBrowserVideoAccelSetting != bBrowserVideoAccelEnabled);
+    CVARS_SET("browser_enable_video_acceleration", bBrowserVideoAccelSetting);
+
     // Ensure CVARS ranges ok
     CClientVariables::GetSingleton().ValidateValues();
 
@@ -4732,7 +4742,8 @@ void CSettings::SaveData()
     gameSettings->Save();
 
     // Ask to restart?
-    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged || bBrowserGPUSettingChanged)
+    if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged || bBrowserGPUSettingChanged ||
+        bBrowserVideoAccelSettingChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();
@@ -5431,20 +5442,30 @@ bool CSettings::OnMasterVolumeChanged(CGUIElement* pElement)
 
 bool CSettings::OnRadioVolumeChanged(CGUIElement* pElement)
 {
-    int iVolume = m_pAudioRadioVolume->GetScrollPosition() * 100.0f;
+    float fVolume = m_pAudioRadioVolume->GetScrollPosition();
+    int   iVolume = QuantizeVolumePercent(fVolume);
     m_pLabelRadioVolumeValue->SetText(SString("%i%%", iVolume).c_str());
 
-    SetRadioVolume(m_pAudioRadioVolume->GetScrollPosition());
+    if (std::abs(m_pAudioRadioVolume->GetScrollPosition() - fVolume) > 0.0001f)
+        m_pAudioRadioVolume->SetScrollPosition(fVolume);
+
+    CVARS_SET("radiovolume", fVolume);
+    SetRadioVolume(fVolume);
 
     return true;
 }
 
 bool CSettings::OnSFXVolumeChanged(CGUIElement* pElement)
 {
-    int iVolume = m_pAudioSFXVolume->GetScrollPosition() * 100.0f;
+    float fVolume = m_pAudioSFXVolume->GetScrollPosition();
+    int   iVolume = QuantizeVolumePercent(fVolume);
     m_pLabelSFXVolumeValue->SetText(SString("%i%%", iVolume).c_str());
 
-    SetSFXVolume(m_pAudioSFXVolume->GetScrollPosition());
+    if (std::abs(m_pAudioSFXVolume->GetScrollPosition() - fVolume) > 0.0001f)
+        m_pAudioSFXVolume->SetScrollPosition(fVolume);
+
+    CVARS_SET("sfxvolume", fVolume);
+    SetSFXVolume(fVolume);
 
     return true;
 }
@@ -6048,10 +6069,6 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
         strText = std::string(_("Auto updater:")) + " " + std::string(_("Select default unless you like filling out bug reports."));
     else if (pLabel && pLabel == m_pUpdateAutoInstallLabel || pComboBox && pComboBox == m_pUpdateAutoInstallCombo)
         strText = std::string(_("Auto updater:")) + " " + std::string(_("Select default to automatically install important updates."));
-    else if (pCheckBox && pCheckBox == m_pWin8ColorCheckBox)
-        strText = std::string(_("16-bit color:")) + " " + std::string(_("Enable 16 bit color modes - Requires MTA restart"));
-    else if (pCheckBox && pCheckBox == m_pWin8MouseCheckBox)
-        strText = std::string(_("Mouse fix:")) + " " + std::string(_("Mouse movement fix - May need PC restart"));
     else if (pCheckBox && pCheckBox == m_pProcessAffinityCheckbox)
         strText = std::string(_("CPU affinity:")) + " " + std::string(_("Only change if you're having stability issues."));
 

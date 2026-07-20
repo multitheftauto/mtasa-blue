@@ -219,7 +219,8 @@ void CResourceHTMLItem::SetResponseCookie(const char* szCookieName, const char* 
     CookieParameters params;
     Datum            data;
     data = szCookieValue;
-    params[szCookieName] = data;
+    params["name"] = szCookieName;
+    params["value"] = data;
     m_currentResponse->SetCookie(params);
 }
 

@@ -136,7 +136,7 @@ protected:
 //
 // CLatentReceiver
 //
-// Keeps track of the current SReceiveItem being transfered from a remote connection
+// Keeps track of the current SReceiveItem being transferred from a remote connection
 //
 ///////////////////////////////////////////////////////////////
 class CLatentReceiver

@@ -147,6 +147,9 @@ namespace SharedUtil
     //
     void SetMTASABaseDirOverride(const SString& strPath);
 
+    bool IsUsableMtasaInstallRoot(const SString& strPath);
+    bool IsTemporaryUpdateLaunchPath(const SString& strLaunchPath);
+
     //
     // Get startup directory as saved in the registry by the launcher
     // Used in the Win32 Client only
@@ -410,12 +413,8 @@ namespace SharedUtil
     void    SetClipboardText(const SString& strText);
     SString GetClipboardText();
 
-    // Version checks
-    bool IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor);
-    bool IsWindowsXPSP3OrGreater();
-    bool IsWindowsVistaOrGreater();
-    bool IsWindows7OrGreater();
-    bool IsWindows8OrGreater();
+    // Version check
+    bool IsWindows10OrGreater();
 
     bool QueryThreadEntryPointAddress(void* thread, DWORD* entryPointAddress);
 

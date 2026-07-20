@@ -16,7 +16,7 @@
 class CCVarsInterface
 {
 public:
-    // Existance check
+    // Existence check
     virtual bool Exists(const std::string& strVariable) = 0;
 
     // Get queries

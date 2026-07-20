@@ -291,7 +291,7 @@ void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& lua
 }
 
 //
-// Get best debug info we possibly can from the relevent lua state
+// Get best debug info we possibly can from the relevant lua state
 //
 const SLuaDebugInfo& CScriptDebugging::GetLuaDebugInfo(lua_State* luaVM)
 {

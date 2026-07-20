@@ -164,4 +164,5 @@ public:
         assert(0);
         return false;
     }
+    virtual void SetMinClientRequirement(const char* szVersion) = 0;
 };

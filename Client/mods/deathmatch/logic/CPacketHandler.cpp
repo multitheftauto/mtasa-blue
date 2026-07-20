@@ -30,7 +30,7 @@ class CCore;
 std::wstring utf8_mbstowcs(const std::string& str);
 std::string  utf8_wcstombs(const std::wstring& wstr);
 
-// TODO: Make this independant of g_pClientGame. Just moved it here to get it out of the
+// TODO: Make this independent of g_pClientGame. Just moved it here to get it out of the
 //       horribly big CClientGame file.
 bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream)
 {
@@ -1659,7 +1659,11 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
         CDeathmatchVehicle* pVehicle = static_cast<CDeathmatchVehicle*>(g_pClientGame->m_pVehicleManager->Get(ID));
         if (pVehicle)
         {
-            bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
+            // Do not spawn flying components for already-blown vehicles.
+            // Physics collisions and burn explosions can trigger repeated
+            // damage syncs which would each spawn flying components on an
+            // already-destroyed vehicle.
+            bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS) && !pVehicle->IsBlown();
 
             for (unsigned char i = 0; i < MAX_DOORS; ++i)
             {
@@ -3221,16 +3225,16 @@ retry:
                         {
                             case CClientPickup::ARMOR:
                             {
-                                SPlayerHealthSync health;
-                                if (bitStream.Read(&health))
-                                    pPickup->m_fAmount = health.data.fValue;
+                                SPlayerArmorSync armor;
+                                if (bitStream.Read(&armor))
+                                    pPickup->m_fAmount = armor.data.fValue;
                                 break;
                             }
                             case CClientPickup::HEALTH:
                             {
-                                SPlayerArmorSync armor;
-                                if (bitStream.Read(&armor))
-                                    pPickup->m_fAmount = armor.data.fValue;
+                                SPlayerHealthSync health;
+                                if (bitStream.Read(&health))
+                                    pPickup->m_fAmount = health.data.fValue;
                                 break;
                             }
                             case CClientPickup::WEAPON:
@@ -3368,7 +3372,9 @@ retry:
                     pVehicle->SetPaintjob(paintjob.data.ucPaintjob);
                     pVehicle->SetColor(vehColor);
 
-                    bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
+                    // Do not spawn flying components for already-blown vehicles
+                    // when applying damage states.
+                    bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS) && !pVehicle->IsBlown();
                     // Setup our damage model
                     for (unsigned char i = 0; i < MAX_DOORS; i++)
                         pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], flyingComponents);
@@ -3974,7 +3980,7 @@ retry:
                         int         time, blendTime;
                         bool        looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
                         float       speed;
-                        double      startTime;
+                        float       elapsedTime;
 
                         // Read data
                         bitStream.ReadString(blockName);
@@ -3986,13 +3992,17 @@ retry:
                         bitStream.ReadBit(freezeLastFrame);
                         bitStream.Read(blendTime);
                         bitStream.ReadBit(taskRestore);
-                        bitStream.Read(startTime);
+                        bitStream.Read(elapsedTime);
                         bitStream.Read(speed);
+
+                        // Server sends elapsed time rather than start time due to bitstream limitations regarding 64 bit integers.
+                        const uint64_t nowTick = GetTickCount64_();
+                        const int64_t  startTime = nowTick - elapsedTime;
 
                         // Run anim
                         CStaticFunctionDefinitions::SetPedAnimation(*pPed, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable,
                                                                     freezeLastFrame);
-                        pPed->m_AnimationCache.startTime = static_cast<std::int64_t>(startTime);
+                        pPed->m_AnimationCache.startTime = startTime;
                         pPed->m_AnimationCache.speed = speed;
                         pPed->m_AnimationCache.progress = 0.0f;
 

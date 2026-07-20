@@ -184,6 +184,8 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_bSunbathing = false;
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
+    m_bProcessingWeaponFireEvent = false;
+    m_bDeferredGangDrivebyAbort = false;
 
     m_pAnimationBlock = NULL;
     m_bRequestedAnimation = false;
@@ -2494,7 +2496,7 @@ eMovementState CClientPed::GetMovementState()
         }
         else
         {
-            // Is he moving the contoller at all?
+            // Is he moving the controller at all?
             if (cs.LeftStickX == 0 && cs.LeftStickY == 0)
                 return MOVEMENTSTATE_CROUCH;
             else
@@ -2778,6 +2780,15 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 
         if (m_bPendingRebuildPlayer)
             ProcessRebuildPlayer(true);
+
+        // Run any gang driveby abort deferred by SetDoingGangDriveby(false).
+        if (m_bDeferredGangDrivebyAbort)
+        {
+            m_bDeferredGangDrivebyAbort = false;
+            CTask* primaryTask = m_pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
+            if (primaryTask && primaryTask->GetTaskType() == TASK_SIMPLE_GANG_DRIVEBY)
+                primaryTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
+        }
 
         CControllerState Current;
         GetControllerState(Current);
@@ -3646,7 +3657,20 @@ void CClientPed::_CreateModel()
     // Replace the loaded model info with the model we're going to load and
     // add a reference to it.
     m_pLoadedModelInfo = m_pModelInfo;
+    if (!m_pLoadedModelInfo)
+    {
+        NotifyUnableToCreate();
+        return;
+    }
+
     m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_CreateModel");
+    if (!m_pLoadedModelInfo->GetRwObject())
+    {
+        m_pLoadedModelInfo->RemoveRef();
+        m_pLoadedModelInfo = nullptr;
+        NotifyUnableToCreate();
+        return;
+    }
 
     // Create the new ped
     m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(this, m_ulModel));
@@ -3782,7 +3806,20 @@ void CClientPed::_CreateLocalModel()
 
         // Add a reference to the model we're using
         m_pLoadedModelInfo = m_pModelInfo;
+        if (!m_pLoadedModelInfo)
+        {
+            NotifyUnableToCreate();
+            return;
+        }
+
         m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_CreateLocalModel");
+        if (!m_pLoadedModelInfo->GetRwObject())
+        {
+            m_pLoadedModelInfo->RemoveRef();
+            m_pLoadedModelInfo = nullptr;
+            NotifyUnableToCreate();
+            return;
+        }
 
         // Make sure we are CJ
         if (m_pPlayerPed->GetModelIndex() != m_ulModel)
@@ -3916,12 +3953,20 @@ void CClientPed::_DestroyLocalModel()
     // Make sure we are CJ again
     if (m_pPlayerPed->GetModelIndex() != 0)
     {
-        m_pPlayerPed->SetModelIndex(0);
+        auto* pDefaultModelInfo = g_pGame->GetModelInfo(0);
+        if (pDefaultModelInfo && pDefaultModelInfo->GetRwObject())
+            m_pPlayerPed->SetModelIndex(0);
     }
 
-    // Remove reference to our previous model
-    m_pLoadedModelInfo->RemoveRef();
-    m_pLoadedModelInfo = NULL;
+    // Remove reference to our previous model.
+    // Always release regardless of whether the default model was restored;
+    // the ped is being abandoned by MTA here, and GTA's native ped ref still protects
+    // the model from streaming eviction if SetModelIndex(0) was not possible.
+    if (m_pLoadedModelInfo)
+    {
+        m_pLoadedModelInfo->RemoveRef();
+        m_pLoadedModelInfo = nullptr;
+    }
 
     // NULL our pointers, we don't destroy the local player
     m_pPlayerPed = NULL;
@@ -3933,6 +3978,32 @@ void CClientPed::_ChangeModel()
     // Different model than before?
     if (m_pPlayerPed->GetModelIndex() != m_ulModel)
     {
+        CModelInfo* pLoadedModel = nullptr;
+        if (m_bIsLocalPlayer)
+        {
+            // Remember the model we had loaded and store the new model we're going to load
+            pLoadedModel = m_pLoadedModelInfo;
+            m_pLoadedModelInfo = m_pModelInfo;
+            if (!m_pLoadedModelInfo)
+            {
+                m_pLoadedModelInfo = pLoadedModel;
+                if (m_clientModel && m_clientModel->GetModelID() != m_ulModel)
+                    m_clientModel = nullptr;
+                return;
+            }
+
+            // Add reference to the model
+            m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_ChangeModel");
+            if (!m_pLoadedModelInfo->GetRwObject())
+            {
+                m_pLoadedModelInfo->RemoveRef();
+                m_pLoadedModelInfo = pLoadedModel;
+                if (m_clientModel && m_clientModel->GetModelID() != m_ulModel)
+                    m_clientModel = nullptr;
+                return;
+            }
+        }
+
         g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter(false);
 
         // We need to reset visual stats when changing from CJ model
@@ -3980,13 +4051,6 @@ void CClientPed::_ChangeModel()
             // Takes care of clothes/task issues
             Respawn(NULL, true, false);
 
-            // Remember the model we had loaded and store the new model we're going to load
-            CModelInfo* pLoadedModel = m_pLoadedModelInfo;
-            m_pLoadedModelInfo = m_pModelInfo;
-
-            // Add reference to the model
-            m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_ChangeModel");
-
             // Set the new player model and restore the interior
             m_pPlayerPed->SetModelIndex(m_ulModel);
 
@@ -4000,7 +4064,8 @@ void CClientPed::_ChangeModel()
             }
 
             // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
-            pLoadedModel->RemoveRef(true);
+            if (pLoadedModel)
+                pLoadedModel->RemoveRef(true);
             pLoadedModel = NULL;
 
             // Warp into it again
@@ -4123,7 +4188,7 @@ void CClientPed::RebuildModel(bool bDelayChange)
         // We are CJ?
         if (m_ulModel == 0)
         {
-            // Adds only the neccesary textures
+            // Adds only the necessary textures
             m_pClothes->RefreshClothes();
             m_pClothes->AddAllToModel();
 
@@ -5363,7 +5428,7 @@ void CClientPed::Say(const ePedSpeechContext& speechId, float probability)
 
 const char* CClientPed::GetBodyPartName(unsigned char ucID)
 {
-    if (ucID <= 10)
+    if (ucID < 10)
     {
         return BodyPartNames[ucID].szName;
     }
@@ -5720,7 +5785,15 @@ void CClientPed::SetDoingGangDriveby(bool bDriveby)
     {
         if (!bDriveby)
         {
-            primaryTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
+            if (m_bProcessingWeaponFireEvent)
+            {
+                // Aborting now would re-enter the task's own native ProcessPed() and crash.
+                m_bDeferredGangDrivebyAbort = true;
+            }
+            else
+            {
+                primaryTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
+            }
         }
     }
     else if (bDriveby)
@@ -5809,7 +5882,7 @@ bool CClientPed::IsAnimationInProgress()
 }
 
 void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
-                                   bool bInterruptable, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
+                                   bool bInterruptible, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -5851,8 +5924,8 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
                 flags |= 0x80;
             }
 
-            // Kill any higher priority tasks if we dont want this anim interuptable
-            if (!bInterruptable)
+            // Kill any higher priority tasks if we dont want this anim interruptible
+            if (!bInterruptible)
             {
                 KillTask(TASK_PRIORITY_PHYSICAL_RESPONSE);
                 KillTask(TASK_PRIORITY_EVENT_RESPONSE_TEMP);
@@ -5862,7 +5935,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
             if (!bFreezeLastFrame)
                 flags |= 0x08;  // flag determines whether to freeze player when anim ends. Really annoying (Maccer)
             float  fBlendDelta = 1 / std::max((float)iBlend, 1.0f) * 1000;
-            CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleRunNamedAnim(szAnimName, pBlock->GetName(), flags, fBlendDelta, iTime, !bInterruptable,
+            CTask* pTask = g_pGame->GetTasks()->CreateTaskSimpleRunNamedAnim(szAnimName, pBlock->GetName(), flags, fBlendDelta, iTime, !bInterruptible,
                                                                              bRunInSequence, bOffsetPed, bHoldLastFrame);
             if (pTask)
             {
@@ -5891,7 +5964,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     m_AnimationCache.iBlend = iBlend;
     m_AnimationCache.bLoop = bLoop;
     m_AnimationCache.bUpdatePosition = bUpdatePosition;
-    m_AnimationCache.bInterruptable = bInterruptable;
+    m_AnimationCache.bInterruptible = bInterruptible;
     m_AnimationCache.bFreezeLastFrame = bFreezeLastFrame;
 }
 
@@ -5936,7 +6009,7 @@ void CClientPed::RunAnimationFromCache()
 
     // Run our animation
     RunNamedAnimation(m_pAnimationBlock, animName.c_str(), m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
-                      m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptable, m_AnimationCache.bFreezeLastFrame);
+                      m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptible, m_AnimationCache.bFreezeLastFrame);
 
     // Set anim progress & speed
     m_AnimationCache.progressWaitForStreamIn = true;
@@ -6351,7 +6424,7 @@ void CClientPed::RestoreAllAnimations()
                 auto pAnimStaticAssociation = pAnimationManager->GetAnimStaticAssociation(iGroupID, iAnimID);
                 if (pAnimStaticAssociation && pAnimHierarchy->IsCustom())
                 {
-                    auto pAnimHierarchyInterface = pAnimStaticAssociation->GetAnimHierachyInterface();
+                    auto pAnimHierarchyInterface = pAnimStaticAssociation->GetAnimHierarchyInterface();
                     CIFPEngine::EngineApplyAnimation(*this, pAnimHierarchyInterface, pAnimHierarchyInterface);
                 }
             }

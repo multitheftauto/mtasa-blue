@@ -42,15 +42,10 @@ public:
 
     bool HasReplaced(unsigned short usModel);
 
-    bool RestoreModel(unsigned short usModel);
+    void RestoreModel(unsigned short usModel);
     void RestoreModels();
 
     static bool IsDFFData(const SString& strData);
-
-    // After DoDeleteAll, unload models that had custom DFF replaced via ClearCustomModel.
-    // ClearCustomModel only nulls the clump pointer - the custom geometry stays loaded in
-    // GTA's streaming cache. This forces a re-stream from disk with original model data.
-    static void FlushDeferredModelRestores();
 
     // Sorta a hack that these are required by CClientEntity...
     void Unlink() {};
@@ -63,8 +58,7 @@ private:
 
     bool DoReplaceModel(unsigned short usModel, bool bAlphaTransparency);
     void UnloadDFF();
-
-    bool InternalRestoreModel(unsigned short usModel);
+    void InternalRestoreModel(unsigned short usModel);
 
     bool ReplaceClothes(ushort usModel);
     bool ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);
@@ -82,7 +76,4 @@ private:
     std::map<ushort, SLoadedClumpInfo> m_LoadedClumpInfoMap;
 
     std::list<unsigned short> m_Replaced;
-
-    static std::vector<unsigned short> ms_DeferredModelRestores;
-    static std::vector<RpClump*>       ms_DeferredClumpDestroys;
 };

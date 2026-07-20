@@ -4,7 +4,7 @@
  *
  *   TrueType bytecode interpreter (body).
  *
- * Copyright (C) 1996-2025 by
+ * Copyright (C) 1996-2026 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -272,7 +272,7 @@
    *
    *   Note that not all members of `TT_ExecContext` get initialized.
    */
-  FT_LOCAL_DEF( FT_Error )
+  FT_LOCAL_DEF( void )
   TT_Load_Context( TT_ExecContext  exec,
                    TT_Face         face,
                    TT_Size         size )
@@ -284,7 +284,7 @@
     exec->size = size;
 
     /* CVT and storage are not persistent in FreeType */
-    /* reset them after they might have been modifief */
+    /* reset them after they might have been modified */
     exec->storage = exec->stack   + exec->stackSize;
     exec->cvt     = exec->storage + exec->storeSize;
 
@@ -297,8 +297,6 @@
     exec->metrics    = *size->metrics;
 
     exec->twilight   = size->twilight;
-
-    return FT_Err_Ok;
   }
 
 
@@ -1106,7 +1104,7 @@
   /* documentation is in freetype.h */
 
   static __inline FT_Int32
-  TT_MulFixi14_i386( FT_Int32  a,
+  TT_MulFix14_i386( FT_Int32  a,
                      FT_Int32  b )
   {
     FT_Int32  result;
@@ -2843,7 +2841,13 @@
         ARRAY_BOUND_ERROR;
     }
     else
+    {
+      Modify_CVT_Check( exc );
+      if ( exc->error )
+        return;
+
       exc->cvt[I] = FT_MulFix( args[1], exc->tt_metrics.scale );
+    }
   }
 
 
@@ -4925,37 +4929,38 @@
   Compute_Point_Displacement( TT_ExecContext  exc,
                               FT_F26Dot6*     x,
                               FT_F26Dot6*     y,
-                              TT_GlyphZone    zone,
-                              FT_UShort*      refp )
+                              FT_Vector*      cur,
+                              FT_UInt*        refp )
   {
-    TT_GlyphZoneRec  zp;
-    FT_UShort        p;
-    FT_F26Dot6       d;
+    TT_GlyphZone  zp;
+    FT_UShort     p;
+    FT_F26Dot6    d;
 
 
     if ( exc->opcode & 1 )
     {
-      zp = exc->zp0;
+      zp = &exc->zp0;
       p  = exc->GS.rp1;
     }
     else
     {
-      zp = exc->zp1;
+      zp = &exc->zp1;
       p  = exc->GS.rp2;
     }
 
-    if ( BOUNDS( p, zp.n_points ) )
+    if ( BOUNDS( p, zp->n_points ) )
     {
       if ( exc->pedantic_hinting )
         exc->error = FT_THROW( Invalid_Reference );
-      *refp = 0;
       return FAILURE;
     }
 
-    *zone = zp;
-    *refp = p;
+    /* return reference if zones match */
+    if ( refp )
+      *refp = cur == zp->cur ? p
+                             : ~0U;  /* nan */
 
-    d = PROJECT( zp.cur + p, zp.org + p );
+    d = PROJECT( zp->cur + p, zp->org + p );
 
     *x = FT_MulFix( d, exc->moveVector.x );
     *y = FT_MulFix( d, exc->moveVector.y );
@@ -4967,10 +4972,9 @@
   /* See `ttinterp.h' for details on backward compatibility mode. */
   static void
   Move_Zp2_Point( TT_ExecContext  exc,
-                  FT_UShort       point,
+                  FT_UInt         point,
                   FT_F26Dot6      dx,
-                  FT_F26Dot6      dy,
-                  FT_Bool         touch )
+                  FT_F26Dot6      dy )
   {
     if ( exc->GS.freeVector.x != 0 )
     {
@@ -4980,8 +4984,7 @@
 #endif
         exc->zp2.cur[point].x = ADD_LONG( exc->zp2.cur[point].x, dx );
 
-      if ( touch )
-        exc->zp2.tags[point] |= FT_CURVE_TAG_TOUCH_X;
+      exc->zp2.tags[point] |= FT_CURVE_TAG_TOUCH_X;
     }
 
     if ( exc->GS.freeVector.y != 0 )
@@ -4992,8 +4995,7 @@
 #endif
         exc->zp2.cur[point].y = ADD_LONG( exc->zp2.cur[point].y, dy );
 
-      if ( touch )
-        exc->zp2.tags[point] |= FT_CURVE_TAG_TOUCH_Y;
+      exc->zp2.tags[point] |= FT_CURVE_TAG_TOUCH_Y;
     }
   }
 
@@ -5009,11 +5011,9 @@
            FT_Long*        args )
   {
     FT_Long          loop = exc->GS.loop;
-    TT_GlyphZoneRec  zp;
-    FT_UShort        refp;
 
     FT_F26Dot6       dx, dy;
-    FT_UShort        point;
+    FT_UInt          point;
 
 
     if ( exc->new_top < loop )
@@ -5025,12 +5025,12 @@
 
     exc->new_top -= loop;
 
-    if ( Compute_Point_Displacement( exc, &dx, &dy, &zp, &refp ) )
+    if ( Compute_Point_Displacement( exc, &dx, &dy, NULL, NULL ) )
       return;
 
     while ( loop-- )
     {
-      point = (FT_UShort)*(--args);
+      point = (FT_UInt)*(--args);
 
       if ( BOUNDS( point, exc->zp2.n_points ) )
       {
@@ -5041,7 +5041,7 @@
         }
       }
       else
-        Move_Zp2_Point( exc, point, dx, dy, TRUE );
+        Move_Zp2_Point( exc, point, dx, dy );
     }
 
   Fail:
@@ -5063,12 +5063,10 @@
   Ins_SHC( TT_ExecContext  exc,
            FT_Long*        args )
   {
-    TT_GlyphZoneRec  zp;
-    FT_UShort        refp;
+    FT_UInt          refp, start, limit, i;
     FT_F26Dot6       dx, dy;
 
     FT_UShort        contour, bounds;
-    FT_UShort        start, limit, i;
 
 
     contour = (FT_UShort)args[0];
@@ -5081,7 +5079,7 @@
       return;
     }
 
-    if ( Compute_Point_Displacement( exc, &dx, &dy, &zp, &refp ) )
+    if ( Compute_Point_Displacement( exc, &dx, &dy, exc->zp2.cur, &refp ) )
       return;
 
     if ( contour == 0 )
@@ -5097,8 +5095,8 @@
 
     for ( i = start; i < limit; i++ )
     {
-      if ( zp.cur != exc->zp2.cur || refp != i )
-        Move_Zp2_Point( exc, i, dx, dy, TRUE );
+      if ( refp != i )
+        Move_Zp2_Point( exc, i, dx, dy );
     }
   }
 
@@ -5113,40 +5111,59 @@
   Ins_SHZ( TT_ExecContext  exc,
            FT_Long*        args )
   {
-    TT_GlyphZoneRec  zp;
-    FT_UShort        refp;
-    FT_F26Dot6       dx,
-                     dy;
-
-    FT_UShort        limit, i;
+    FT_Vector*       cur;
+    FT_UInt          refp, i, limit;
+    FT_F26Dot6       dx, dy;
 
 
-    if ( BOUNDS( args[0], 2 ) )
+    /* XXX: UNDOCUMENTED! SHZ doesn't move the phantom points, */
+    /*      which must be subtracted.                          */
+    switch ( (FT_Int)args[0] )
     {
+    case 0:
+      cur   = exc->twilight.cur;
+      limit = exc->twilight.n_points;
+      break;
+
+    case 1:
+      cur   = exc->pts.cur;
+      limit = exc->pts.n_points > 4U ? exc->pts.n_points - 4U : 0;
+      break;
+
+    default:
       if ( exc->pedantic_hinting )
         exc->error = FT_THROW( Invalid_Reference );
       return;
     }
 
-    if ( Compute_Point_Displacement( exc, &dx, &dy, &zp, &refp ) )
+    if ( Compute_Point_Displacement( exc, &dx, &dy, cur, &refp ) )
       return;
 
-    /* XXX: UNDOCUMENTED! SHZ doesn't move the phantom points.     */
-    /*      Twilight zone has no real contours, so use `n_points'. */
-    /*      Normal zone's `n_points' includes phantoms, so must    */
-    /*      use end of last contour.                               */
-    if ( exc->GS.gep2 == 0 )
-      limit = exc->zp2.n_points;
-    else if ( exc->GS.gep2 == 1 && exc->zp2.n_contours > 0 )
-      limit = exc->zp2.contours[exc->zp2.n_contours - 1] + 1;
-    else
-      limit = 0;
-
-    /* XXX: UNDOCUMENTED! SHZ doesn't touch the points */
-    for ( i = 0; i < limit; i++ )
+    /* XXX: UNDOCUMENTED! SHZ doesn't touch the points. */
+    if ( dx )
     {
-      if ( zp.cur != exc->zp2.cur || refp != i )
-        Move_Zp2_Point( exc, i, dx, dy, FALSE );
+#ifdef TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL
+      /* See `ttinterp.h' for details on backward compatibility mode. */
+      if ( !exc->backward_compatibility )
+#endif
+        for ( i = 0; i < limit; i++ )
+        {
+          if ( refp != i )
+            cur[i].x = ADD_LONG( cur[i].x, dx );
+        }
+    }
+
+    if ( dy )
+    {
+#ifdef TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL
+      /* See `ttinterp.h' for details on backward compatibility mode. */
+      if ( exc->backward_compatibility != 0x7 )
+#endif
+        for ( i = 0; i < limit; i++ )
+        {
+          if ( refp != i )
+            cur[i].y = ADD_LONG( cur[i].y, dy );
+        }
     }
   }
 
@@ -5163,7 +5180,7 @@
   {
     FT_Long     loop = exc->GS.loop;
     FT_F26Dot6  dx, dy;
-    FT_UShort   point;
+    FT_UInt     point;
 #ifdef TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL
     FT_Bool     in_twilight = FT_BOOL( exc->GS.gep0 == 0 ||
                                        exc->GS.gep1 == 0 ||
@@ -5185,7 +5202,7 @@
 
     while ( loop-- )
     {
-      point = (FT_UShort)*(--args);
+      point = (FT_UInt)*(--args);
 
       if ( BOUNDS( point, exc->zp2.n_points ) )
       {
@@ -5208,11 +5225,11 @@
              ( exc->backward_compatibility != 0x7                     &&
                ( ( exc->is_composite && exc->GS.freeVector.y != 0 ) ||
                  ( exc->zp2.tags[point] & FT_CURVE_TAG_TOUCH_Y )    ) ) )
-          Move_Zp2_Point( exc, point, 0, dy, TRUE );
+          Move_Zp2_Point( exc, point, 0, dy );
       }
       else
 #endif
-        Move_Zp2_Point( exc, point, dx, dy, TRUE );
+        Move_Zp2_Point( exc, point, dx, dy );
     }
 
   Fail:
@@ -5457,11 +5474,11 @@
     /* single width cut-in test */
 
     /* |org_dist - single_width_value| < single_width_cutin */
-    if ( exc->GS.single_width_cutin > 0          &&
-         org_dist < exc->GS.single_width_value +
-                      exc->GS.single_width_cutin &&
-         org_dist > exc->GS.single_width_value -
-                      exc->GS.single_width_cutin )
+    if ( exc->GS.single_width_cutin > 0                    &&
+         org_dist < ADD_LONG( exc->GS.single_width_value,
+                              exc->GS.single_width_cutin ) &&
+         org_dist > SUB_LONG( exc->GS.single_width_value,
+                              exc->GS.single_width_cutin ) )
     {
       if ( org_dist >= 0 )
         org_dist = exc->GS.single_width_value;
@@ -6193,14 +6210,14 @@
     IUP_WorkerRec  V;
     FT_Byte        mask;
 
-    FT_UInt   first_point;   /* first point of contour        */
-    FT_UInt   end_point;     /* end point (last+1) of contour */
+    FT_UInt  first_point;   /* first point of contour        */
+    FT_UInt  end_point;     /* end point (last+1) of contour */
 
-    FT_UInt   first_touched; /* first touched point in contour   */
-    FT_UInt   cur_touched;   /* current touched point in contour */
+    FT_UInt  first_touched; /* first touched point in contour   */
+    FT_UInt  cur_touched;   /* current touched point in contour */
 
-    FT_UInt   point;         /* current point   */
-    FT_Short  contour;       /* current contour */
+    FT_UInt  point;         /* current point   */
+    FT_UInt  contour;       /* current contour */
 
 
 #ifdef TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL
@@ -7341,56 +7358,11 @@
       }
 
       if ( exc->error )
-      {
-        switch ( exc->error )
-        {
-        case FT_ERR( Invalid_Opcode ):
-          {
-            TT_DefRecord*  def   = exc->IDefs;
-            TT_DefRecord*  limit = FT_OFFSET( def, exc->numIDefs );
-
-
-            /* looking for redefined instructions */
-            for ( ; def < limit; def++ )
-            {
-              if ( def->active && exc->opcode == (FT_Byte)def->opc )
-              {
-                TT_CallRec*  callrec;
-
-
-                if ( exc->callTop >= exc->callSize )
-                {
-                  exc->error = FT_THROW( Invalid_Reference );
-                  goto LErrorLabel_;
-                }
-
-                callrec = &exc->callStack[exc->callTop];
-
-                callrec->Caller_Range = exc->curRange;
-                callrec->Caller_IP    = exc->IP + 1;
-                callrec->Cur_Count    = 1;
-                callrec->Def          = def;
-
-                if ( Ins_Goto_CodeRange( exc,
-                                         def->range,
-                                         def->start ) == FAILURE )
-                  goto LErrorLabel_;
-
-                goto LSuiteLabel_;
-              }
-            }
-          }
-          FALL_THROUGH;
-
-        default:
-          goto LErrorLabel_;
-        }
-      }
+        goto LErrorLabel_;
 
       exc->top = exc->new_top;
       exc->IP += exc->length;
 
-    LSuiteLabel_:
       if ( exc->IP >= exc->codeSize )
       {
         if ( exc->callTop > 0 )

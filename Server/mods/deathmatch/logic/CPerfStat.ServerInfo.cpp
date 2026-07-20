@@ -17,6 +17,7 @@
 #include "CBandwidthSettings.h"
 #include "ASE.h"
 #include "CGame.h"
+#include "CHTTPD.h"
 #include "net/SimHeaders.h"
 
 #ifdef WIN32
@@ -391,7 +392,7 @@ void CPerfStatServerInfoImpl::GetStats(CPerfStatResult* pResult, const std::map<
     }
 
     SAllocationStats httpAllocationStats;
-    EHS::StaticGetAllocationStats(httpAllocationStats);
+    g_pGame->GetHTTPD()->GetAllocationStats(httpAllocationStats);
     m_InfoList.push_back(StringPair("HTTP allocated active", SString("%d KB", httpAllocationStats.uiActiveKBAllocated)));
 
     if (bIncludeDebugInfo)

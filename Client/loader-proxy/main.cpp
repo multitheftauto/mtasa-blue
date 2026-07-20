@@ -535,7 +535,7 @@ BOOL WINAPI MyGetVersionExA(LPOSVERSIONINFOA versionInfo)
     // Execute the original function with the given parameter.
     BOOL result = Win32GetVersionExA(versionInfo);
 
-    // Restore the function pointer we've overriden to get here.
+    // Restore the function pointer we've overridden to get here.
     SetImportProcAddress("kernel32.dll", "GetVersionExA", FunctionPtrToFarProc(Win32GetVersionExA));
 
     // Run our startup code.

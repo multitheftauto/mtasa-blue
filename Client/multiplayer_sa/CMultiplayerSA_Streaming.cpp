@@ -12,15 +12,8 @@
 
 void OnModelLoaded(uint32_t uiModelID)
 {
-    const int32_t baseTxdId = pGameInterface->GetBaseIDforTXD();
-    if (baseTxdId <= 0)
-        return;
-
-    if (uiModelID < static_cast<unsigned int>(baseTxdId))
-    {
-        if (auto* pModelInfo = pGameInterface->GetModelInfo(uiModelID))
-            pModelInfo->MakeCustomModel();
-    }
+    if (uiModelID < pGameInterface->GetBaseIDforTXD())
+        pGameInterface->GetModelInfo(uiModelID)->MakeCustomModel();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -76,21 +69,11 @@ static DWORD RETURN_CStreaming__RetryLoadFileTimeout_LoopBack = 0x4076F4;  // Lo
 
 static DWORD s_retryLoopStartTick = 0;
 static DWORD s_retryLoopLastCallTick = 0;
-static DWORD s_retryTimeoutCount = 0;
-static DWORD s_lastTimeoutTick = 0;
 
 static bool ShouldTimeoutRetryLoop()
 {
-    constexpr DWORD FIRST_TIMEOUT_MS = 5000;
-    constexpr DWORD COOLDOWN_MS = 30000;
+    constexpr DWORD timeoutMs = 5000;
     DWORD           now = SharedUtil::GetTickCount32();
-
-    // After a quiet period with no timeouts, treat the next error as fresh
-    if (s_lastTimeoutTick != 0 && (now - s_lastTimeoutTick) > COOLDOWN_MS)
-    {
-        s_retryTimeoutCount = 0;
-        s_lastTimeoutTick = 0;
-    }
 
     // Detect new invocation: within the spin loop, consecutive calls are
     // microseconds apart. A gap over 100ms means this is a fresh RetryLoadFile
@@ -101,20 +84,12 @@ static bool ShouldTimeoutRetryLoop()
 
     s_retryLoopLastCallTick = now;
 
-    // After the first timeout, outer callers (LoadAllRequestedModels and
-    // CModelInfoSA::Request) can re-enter RetryLoadFile on the same
-    // persistent I/O error. Exit immediately on re-entry to avoid
-    // accumulating multi-minute freezes across nested retry loops.
-    DWORD timeoutMs = (s_retryTimeoutCount > 0) ? 0 : FIRST_TIMEOUT_MS;
-
     DWORD elapsed = now - s_retryLoopStartTick;
-    if (elapsed >= timeoutMs)
+    if (elapsed > timeoutMs)
     {
         s_retryLoopStartTick = 0;
-        s_retryTimeoutCount++;
-        s_lastTimeoutTick = now;
         *(int*)0x8E4B90 = -1;  // CStreaming::ms_channelError = -1 (force clear)
-        AddReportLog(8650, SString("RetryLoadFile spin loop timed out after %ums (count: %u)", elapsed, s_retryTimeoutCount));
+        AddReportLog(8650, SString("RetryLoadFile spin loop timed out after %ums", elapsed));
         return true;
     }
 

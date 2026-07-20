@@ -717,6 +717,13 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice, IDirect3DDevice9* pS
     if (bSet_##reg) \
     pStateDevice->SetRenderState(D3DRS_##reg, dwSaved_##reg)
 
+// Dual-pass alpha z-write threshold. Pixels with alpha >= this value write to the
+// z-buffer; pixels below do not. This emulates the PS2's per-pixel z-write control
+// which the PC's fixed-function pipeline cannot do natively. Without this, transparent
+// pixels (e.g. holes in a chain-link fence) write to the z-buffer and incorrectly
+// block objects behind them. Value of 128 matches SkyGFX's default.
+static constexpr DWORD DUALPASS_ALPHA_THRESHOLD = 128;
+
 /////////////////////////////////////////////////////////////
 //
 // CDirect3DEvents9::OnDrawPrimitive
@@ -744,7 +751,43 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive(IDirect3DDevice9* pDevice, IDirect3DDe
 
     if (!pLayers)
     {
-        // No shaders for this texture
+        // No shaders for this texture.
+        // Dual-pass alpha z-write emulation for blended 3D geometry (not pre-transformed 2D).
+        // Pass 1 z-writes pixels >= threshold, pass 2 blends the rest without z-write, so fence
+        // holes don't occlude what's behind them. only runs when the game has no meaningful alpha
+        // test of its own (ref at the DefinedState baseline of 2 or below): an active test at ref
+        // 100/140 already clips transparent pixels before z-write like vanilla, and forcing the
+        // dual pass over it draws the sub-ref gradient in pass 2, which is what kept the LV neon
+        // lines smeared no matter what the game side ALPHAREF was set to.
+        const bool bGameAlphaTestActive = g_pDeviceState->RenderState.ALPHATESTENABLE && g_pDeviceState->RenderState.ALPHAREF > 2;
+        if (!bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
+            !g_pDeviceState->VertexDeclState.PositionT)
+        {
+            // Save current alpha test state
+            const DWORD dwOrigAlphaTestEnable = g_pDeviceState->RenderState.ALPHATESTENABLE;
+            const DWORD dwOrigAlphaFunc = g_pDeviceState->RenderState.ALPHAFUNC;
+            const DWORD dwOrigAlphaRef = g_pDeviceState->RenderState.ALPHAREF;
+
+            // Pass 1: Draw opaque-enough pixels (alpha >= threshold) with z-write ON
+            pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+            pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+            pDevice->SetRenderState(D3DRS_ALPHAREF, DUALPASS_ALPHA_THRESHOLD);
+            DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
+
+            // Pass 2: Draw transparent pixels (alpha < threshold) WITHOUT z-write
+            pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_LESS);
+            pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+            DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
+
+            // Restore all modified states so the proxy cache stays consistent
+            pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, dwOrigAlphaTestEnable);
+            pDevice->SetRenderState(D3DRS_ALPHAFUNC, dwOrigAlphaFunc);
+            pDevice->SetRenderState(D3DRS_ALPHAREF, dwOrigAlphaRef);
+            pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+
+            return D3D_OK;
+        }
+
         return DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
     }
     else
@@ -964,6 +1007,39 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, IDir
 
     if (!pLayers)
     {
+        // No shaders for this texture.
+        // Dual-pass alpha z-write emulation, same rules as OnDrawPrimitive: skip when the game
+        // is already running a meaningful alpha test, it clips transparent pixels before z-write
+        // on its own and the dual pass would draw the sub-ref gradient in pass 2.
+        const bool bGameAlphaTestActive = g_pDeviceState->RenderState.ALPHATESTENABLE && g_pDeviceState->RenderState.ALPHAREF > 2;
+        if (!bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
+            !g_pDeviceState->VertexDeclState.PositionT)
+        {
+            // Save current alpha test state
+            const DWORD dwOrigAlphaTestEnable = g_pDeviceState->RenderState.ALPHATESTENABLE;
+            const DWORD dwOrigAlphaFunc = g_pDeviceState->RenderState.ALPHAFUNC;
+            const DWORD dwOrigAlphaRef = g_pDeviceState->RenderState.ALPHAREF;
+
+            // Pass 1: Draw opaque-enough pixels (alpha >= threshold) with z-write ON
+            pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+            pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+            pDevice->SetRenderState(D3DRS_ALPHAREF, DUALPASS_ALPHA_THRESHOLD);
+            DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
+
+            // Pass 2: Draw transparent pixels (alpha < threshold) WITHOUT z-write
+            pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_LESS);
+            pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+            DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
+
+            // Restore all modified states so the proxy cache stays consistent
+            pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, dwOrigAlphaTestEnable);
+            pDevice->SetRenderState(D3DRS_ALPHAFUNC, dwOrigAlphaFunc);
+            pDevice->SetRenderState(D3DRS_ALPHAREF, dwOrigAlphaRef);
+            pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+
+            return D3D_OK;
+        }
+
         // No shaders for this texture
         return DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
     }

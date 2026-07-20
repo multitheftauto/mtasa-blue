@@ -275,25 +275,21 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 }
             }
 
-            // Update Damage info
-            if (BitStream.Version() >= 0x047)
+            if (BitStream.ReadBit())
             {
-                if (BitStream.ReadBit() == true)
-                {
-                    ElementID DamagerID;
-                    if (!BitStream.Read(DamagerID))
-                        return false;
+                ElementID DamagerID;
+                if (!BitStream.Read(DamagerID))
+                    return false;
 
-                    SWeaponTypeSync weaponType;
-                    if (!BitStream.Read(&weaponType))
-                        return false;
+                SWeaponTypeSync weaponType;
+                if (!BitStream.Read(&weaponType))
+                    return false;
 
-                    SBodypartSync bodyPart;
-                    if (!BitStream.Read(&bodyPart))
-                        return false;
+                SBodypartSync bodyPart;
+                if (!BitStream.Read(&bodyPart))
+                    return false;
 
-                    pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, static_cast<unsigned char>(bodyPart.data.uiBodypart));
-                }
+                pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, static_cast<unsigned char>(bodyPart.data.uiBodypart));
             }
 
             // Player health
