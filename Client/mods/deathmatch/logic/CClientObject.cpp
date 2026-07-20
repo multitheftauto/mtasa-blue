@@ -139,8 +139,22 @@ void CClientObject::GetRotationRadians(CVector& vecRotation) const
     if (m_pObject)
     {
         CMatrix matTemp;
-        m_pObject->GetMatrix(&matTemp);
-        vecRotation = matTemp.GetRotation();
+        if (m_pObject->GetMatrix(&matTemp))
+        {
+            // Must use ZXY decomposition to match GTA's SetOrientation (0x439A80).
+            // CMatrix::GetRotation() uses a different convention, so the round-trip
+            // through StreamedInPulse would corrupt m_vecRotation on each frame.
+            CVector vecScale = matTemp.GetScale();
+            CVector vRight = matTemp.vRight / vecScale.fX;
+            CVector vFront = matTemp.vFront / vecScale.fY;
+            CVector vUp = matTemp.vUp / vecScale.fZ;
+
+            vecRotation.fX = asin(std::clamp(vFront.fZ, -1.0f, 1.0f));
+            vecRotation.fY = atan2(-vRight.fZ, vUp.fZ);
+            vecRotation.fZ = atan2(-vFront.fX, vFront.fY);
+        }
+        else
+            vecRotation = m_vecRotation;
     }
     else
     {

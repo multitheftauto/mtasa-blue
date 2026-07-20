@@ -56,6 +56,8 @@ public:
     void SetIgnoreAlphaLimits(bool ignore) noexcept { m_ignoreAlphaLimits = ignore; };
     bool AreAlphaLimitsIgnored() const noexcept override { return m_ignoreAlphaLimits; };
 
+    class RpAtomic* GetAtomic() const override;
+
 protected:
     void StreamIn();
     void StreamOut();

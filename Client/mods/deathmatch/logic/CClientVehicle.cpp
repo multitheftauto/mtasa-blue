@@ -31,6 +31,27 @@ std::set<const CClientEntity*> ms_AttachedVehiclesToIgnore;
 
 namespace
 {
+    constexpr char RADIO_TYPE_RANDOM = 2;
+    constexpr char RADIO_NUM_RANDOM = 13;
+
+    tVehicleAudioSettings GetNormalizedAudioSettings(const CVehicleAudioSettingsEntry& settings)
+    {
+        auto normalizedSettings = static_cast<const CVehicleAudioSettingsEntrySA&>(settings).GetInterface();
+        if (normalizedSettings.m_nRadioType == RADIO_TYPE_RANDOM)
+            normalizedSettings.m_nRadioID = RADIO_NUM_RANDOM;
+
+        return normalizedSettings;
+    }
+
+    tVehicleAudioSettings GetNormalizedAudioSettings(const CAEVehicleAudioEntitySAInterface& audioInterface)
+    {
+        auto normalizedSettings = audioInterface.m_nSettings;
+        if (normalizedSettings.m_nRadioType == RADIO_TYPE_RANDOM)
+            normalizedSettings.m_nRadioID = RADIO_NUM_RANDOM;
+
+        return normalizedSettings;
+    }
+
     bool HasPendingAudioSettingsChange(CVehicle* pVehicle, const CVehicleAudioSettingsEntry& settings)
     {
         auto* pVehicleSA = dynamic_cast<CVehicleSA*>(pVehicle);
@@ -42,8 +63,9 @@ namespace
         if (!pAudioInterface)
             return true;
 
-        const auto& desiredSettings = static_cast<const CVehicleAudioSettingsEntrySA&>(settings).GetInterface();
-        return std::memcmp(&pAudioInterface->m_nSettings, &desiredSettings, sizeof(desiredSettings)) != 0;
+        const auto currentSettings = GetNormalizedAudioSettings(*pAudioInterface);
+        const auto desiredSettings = GetNormalizedAudioSettings(settings);
+        return std::memcmp(&currentSettings, &desiredSettings, sizeof(desiredSettings)) != 0;
     }
 }
 
@@ -2673,6 +2695,10 @@ void CClientVehicle::Create()
             m_pVehicle->SetHeliRotorSpeed(m_fHeliRotorSpeed);
             m_pVehicle->SetHeliSearchLightVisible(m_bHeliSearchLightVisible);
         }
+        else if (m_eVehicleType == CLIENTVEHICLE_PLANE)
+        {
+            m_pVehicle->SetPlaneRotorSpeed(m_fPlaneRotorSpeed);
+        }
 
         m_pVehicle->SetUnderwater(IsBelowWater());
 
@@ -2995,6 +3021,7 @@ void CClientVehicle::Destroy()
         m_bEngineOn = m_pVehicle->IsEngineOn();
         m_bIsOnGround = IsOnGround();
         m_fHeliRotorSpeed = GetHeliRotorSpeed();
+        m_fPlaneRotorSpeed = GetPlaneRotorSpeed();
         m_bHeliSearchLightVisible = IsHeliSearchLightVisible();
         m_HandlingEntry->Assign(m_pVehicle->GetHandlingData());
         m_FlyingHandlingEntry->Assign(m_pVehicle->GetFlyingHandlingData());
@@ -5049,13 +5076,21 @@ CVehicleAudioSettingsEntry& CClientVehicle::GetOrCreateAudioSettings()
 
 bool CClientVehicle::GetDummyPosition(VehicleDummies dummy, CVector& position) const
 {
-    if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
+    if (dummy < VehicleDummies::LIGHT_FRONT_MAIN || dummy >= VehicleDummies::VEHICLE_DUMMY_COUNT)
+        return false;
+
+    position = m_dummyPositions[(std::size_t)dummy];
+
+    // Most models have no second exhaust dummy, in which case the game mirrors the primary
+    // exhaust on the X axis (see ApplyExhaustParticlesPosition). Reflect that here, so the
+    // reported position matches where the effects actually appear
+    if (dummy == VehicleDummies::EXHAUST_SECONDARY && position == CVector())
     {
-        position = m_dummyPositions[(std::size_t)dummy];
-        return true;
+        position = m_dummyPositions[(std::size_t)VehicleDummies::EXHAUST];
+        position.fX = -position.fX;
     }
 
-    return false;
+    return true;
 }
 
 bool CClientVehicle::SetDummyPosition(VehicleDummies dummy, const CVector& position)

@@ -360,7 +360,7 @@ void CheckLibVersions()
                                 "MTA\\game_sa.dll",
                                 "MTA\\" LOADER_PROXY_DLL_NAME,
                                 "mods\\deathmatch\\client.dll",
-                                "mods\\deathmatch\\pcre3.dll"};
+                                "mods\\deathmatch\\pcre2.dll"};
 
     SString strReqFileVersion;
     for (uint i = 0; i < NUMELMS(moduleList); i++)
@@ -464,9 +464,17 @@ void InitLocalization(bool bShowErrors)
         return;
 
     const SString strLaunchPath = GetLaunchPath();
+    const SString strMTASAPath = GetMTASAPath();
 
-    // Check for core.dll
-    const SString strCoreDLL = PathJoin(strLaunchPath, "mta", MTA_DLL_NAME);
+    // Probe the install root first and only fall back to the launch path. In the auto-update flow,
+    // Process C runs from a temp directory under \upcache\_*_tmp_*\ which does not contain mta\core.dll;
+    // the real install root is carried into g_strMTASAPath via the install manager's SetMTASABaseDirOverride
+    // path, so GetMTASAPath returns it even though GetLaunchPath still points at the temp tree. On a normal
+    // non-temp launch the two paths are equal and the first probe succeeds.
+    SString strCoreDLL = PathJoin(strMTASAPath, "mta", MTA_DLL_NAME);
+    if (!FileExists(strCoreDLL))
+        strCoreDLL = PathJoin(strLaunchPath, "mta", MTA_DLL_NAME);
+
     if (!FileExists(strCoreDLL))
     {
         if (!bShowErrors)
@@ -477,7 +485,6 @@ void InitLocalization(bool bShowErrors)
     }
 
     // Setup DLL search paths
-    const SString strMTASAPath = GetMTASAPath();
     SetDllDirectory(PathJoin(strMTASAPath, "mta"));
 
     // See if xinput is loadable (XInput9_1_0.dll or xinput1_3.dll)
@@ -820,7 +827,9 @@ void ConfigureWerDumpPath()
 {
     using WerRegisterAppLocalDumpFn = HRESULT(WINAPI*)(PCWSTR);
 
-    const SString strInstallPath = GetInstallPathForLauncher();
+    SString strInstallPath = GetInstallPathForLauncher();
+    if (strInstallPath.empty())
+        strInstallPath = GetMTASAPath();
     if (strInstallPath.empty())
         return;
 
@@ -898,7 +907,7 @@ void ConfigureWerDumpPath()
 // Commands are often stored in the registry by the installer and client.
 //
 // "L0" is opened before the launch sequence and is closed if MTA shutsdown with no error
-// "L1" is opened before the launch sequence and is closed if GTA is succesfully started
+// "L1" is opened before the launch sequence and is closed if GTA is successfully started
 // "CR1" is a counter which is incremented if GTA was not started and MTA shutsdown with an error
 //
 // "L2" is opened before the launch sequence and is closed if the GTA loading screen is shown
@@ -1858,11 +1867,13 @@ int LaunchGame(SString strCmdLine)
 
     SetDllDirectory(PathJoin(strMTASAPath, "mta"));
 
+#if MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
     if (!CheckService(CHECK_SERVICE_PRE_CREATE) && !IsUserAdmin())
     {
         RelaunchAsAdmin(strCmdLine, _("Fix configuration issue"));
         ExitProcess(EXIT_OK);
     }
+#endif
 
     // Do some D3D things
     BeginD3DStuff();
@@ -1992,6 +2003,15 @@ int LaunchGame(SString strCmdLine)
                     --i;  // Don't count this iteration
                     Sleep(100);
                 }
+            }
+
+            // Diagnostic: detect rapid process exit before loading screen appeared
+            if (status != WAIT_TIMEOUT && WatchDogIsSectionOpen("L3"))
+            {
+                DWORD dwEarlyExitCode = 0;
+                GetExitCodeProcess(piLoadee.hProcess, &dwEarlyExitCode);
+                WriteDebugEvent(SString("Loader - Process exited (code %lu) before loading screen appeared", dwEarlyExitCode));
+                AddReportLog(7103, SString("Loader - Premature exit (code %lu) - possible missing runtime dependencies or injection failure", dwEarlyExitCode));
             }
 
             HideSplash();

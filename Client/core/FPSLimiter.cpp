@@ -164,21 +164,21 @@ namespace FPSLimiter
             QueryPerformanceCounter(&m_lastFrameTime);
             m_appliedThisFrame = false;
             OnFPSLimitChange();
-        }
 
-        std::stringstream ss;
-        ss << "FPSLimiter: FPS limit changed to " << (m_fpsTarget == 0 ? "unlimited" : std::to_string(m_fpsTarget));
-        ss << " (Enforced by: " << EnumToString(GetEnforcer()) << ")";
+            std::stringstream ss;
+            ss << "FPSLimiter: FPS limit changed to " << (m_fpsTarget == 0 ? "unlimited" : std::to_string(m_fpsTarget));
+            ss << " (Enforced by: " << EnumToString(GetEnforcer()) << ")";
 #ifdef MTA_DEBUG
-        ss << " [Server: " << (m_serverEnforcedFps == 0 ? "unlimited" : std::to_string(m_serverEnforcedFps));
-        ss << ", Client: " << (m_clientEnforcedFps == 0 ? "unlimited" : std::to_string(m_clientEnforcedFps));
-        ss << ", User: " << (m_userDefinedFps == 0 ? "unlimited" : std::to_string(m_userDefinedFps));
-        ss << ", VSync: " << (m_displayRefreshRate == 0 ? "unlimited" : std::to_string(m_displayRefreshRate)) << "]";
+            ss << " [Server: " << (m_serverEnforcedFps == 0 ? "unlimited" : std::to_string(m_serverEnforcedFps));
+            ss << ", Client: " << (m_clientEnforcedFps == 0 ? "unlimited" : std::to_string(m_clientEnforcedFps));
+            ss << ", User: " << (m_userDefinedFps == 0 ? "unlimited" : std::to_string(m_userDefinedFps));
+            ss << ", VSync: " << (m_displayRefreshRate == 0 ? "unlimited" : std::to_string(m_displayRefreshRate)) << "]";
 #endif
-        auto* pConsole = CCore::GetSingleton().GetConsole();
-        if (pConsole)
-            CCore::GetSingleton().GetConsole()->Print(ss.str().c_str());
-        OutputDebugLine(ss.str().c_str());
+            auto* pConsole = CCore::GetSingleton().GetConsole();
+            if (pConsole)
+                CCore::GetSingleton().GetConsole()->Print(ss.str().c_str());
+            OutputDebugLine(ss.str().c_str());
+        }
     }
 
     void FPSLimiter::SetFrameRateThrottle()

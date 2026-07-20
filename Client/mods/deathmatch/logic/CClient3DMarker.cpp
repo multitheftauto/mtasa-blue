@@ -69,6 +69,11 @@ bool CClient3DMarker::IsHit(const CVector& vecPosition) const
     return IsPointNearPoint3D(m_Matrix.vPos, vecPosition, m_fSize + 4);
 }
 
+RpAtomic* CClient3DMarker::GetAtomic() const
+{
+    return m_pMarker ? reinterpret_cast<RpAtomic*>(m_pMarker->GetRwObject()) : nullptr;
+}
+
 void CClient3DMarker::StreamIn()
 {
     // We're now streamed in

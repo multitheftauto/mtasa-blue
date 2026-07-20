@@ -345,7 +345,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
                                 }
                             }
                             pVehicle->SetHealth(vehicle.data.fHealth);
-                            // Stops sync + fixVehicle/setElementHealth conflicts triggering onVehicleDamage by having a seperate stored float keeping track of
+                            // Stops sync + fixVehicle/setElementHealth conflicts triggering onVehicleDamage by having a separate stored float keeping track of
                             // ONLY what comes in via sync
                             // - Caz
                             pVehicle->SetLastSyncedHealth(vehicle.data.fHealth);
@@ -485,9 +485,13 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync(CUnoccupiedVehicle
         {
             // Convert to a CVehicle
             CVehicle* pVehicle = static_cast<CVehicle*>(pVehicleElement);
-            // Is the player syncing this vehicle and there is no driver? Also only process
-            // this packet if the time context matches.
-            if (pVehicle->GetSyncer() != pPlayer && pVehicle->GetTimeSinceLastPush() >= MIN_PUSH_ANTISPAM_RATE &&
+
+            CPlayer*   pSyncer = pVehicle->GetSyncer();
+            const bool bCanClaimSync = !pSyncer || (!IsSyncerPersistent() && pPlayer->GetContactElement() == pVehicle);
+
+            // Push sync is collision-driven, but the packet only carries a vehicle ID.
+            // Require server-accepted contact before replacing an existing syncer.
+            if (pVehicle->IsUnoccupiedSyncable() && pSyncer != pPlayer && bCanClaimSync && pVehicle->GetTimeSinceLastPush() >= MIN_PUSH_ANTISPAM_RATE &&
                 IsPointNearPoint3D(pVehicle->GetPosition(), pPlayer->GetPosition(), static_cast<float>(g_TickRateSettings.iVehicleContactSyncRadius)) &&
                 pVehicle->GetDimension() == pPlayer->GetDimension())
             {
@@ -495,11 +499,8 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync(CUnoccupiedVehicle
                 CPed* pOccupant = pVehicle->GetOccupant(0);
                 if (!pOccupant || !IS_PLAYER(pOccupant))
                 {
-                    // Change our syncer
-                    if (!pVehicle->GetSyncer() || !IsSyncerPersistent())
-                    {
-                        OverrideSyncer(pVehicle, pPlayer);
-                    }
+                    // Assign the pusher as syncer.
+                    OverrideSyncer(pVehicle, pPlayer);
 
                     // Reset our push time
                     pVehicle->ResetLastPushTime();

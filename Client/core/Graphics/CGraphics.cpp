@@ -27,6 +27,40 @@ extern std::atomic<bool> g_bInMTAScene;
 
 using namespace std;
 
+namespace
+{
+    // Convert a straight-alpha ARGB tint into its premultiplied form:
+    //
+    //     (R, G, B, A)  ->  (R*A/255, G*A/255, B*A/255, A)
+    //
+    // Needed when routing a translucent draw onto the (ONE, INVSRCALPHA)
+    // pipeline. That pipeline computes
+    //
+    //     out.rgb = src.rgb + dst.rgb * (1 - src.a)
+    //
+    // with src.rgb = tex.rgb * diff.rgb and src.a = tex.a * diff.a, so
+    // diff.a never enters the source rgb term. For a PM texel tex.rgb =
+    // R*A_tex, that leaves
+    //
+    //     out.rgb = R * A_tex * diff.rgb + dst.rgb * (1 - A_tex * diff.a)
+    //
+    // which is brighter than the correct PM composite by a factor of
+    // 1/diff.a during a fade. Premultiplying the diffuse here
+    // (diff.rgb *= diff.a) restores the missing factor and the equation
+    // reduces exactly to the PM "over" operator.
+    inline SColor PremultiplyAlpha(SColor c) noexcept
+    {
+        if (c.A == 0xFF)
+            return c;
+
+        const uint a = c.A;
+        c.R = static_cast<unsigned char>((c.R * a + 127) / 255);
+        c.G = static_cast<unsigned char>((c.G * a + 127) / 255);
+        c.B = static_cast<unsigned char>((c.B * a + 127) / 255);
+        return c;
+    }
+}  // namespace
+
 template <>
 CGraphics* CSingleton<CGraphics>::m_pSingleton = NULL;
 
@@ -1080,6 +1114,15 @@ void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice
     sDrawQueueItem Item;
     Item.eType = QUEUE_PRIMITIVEMATERIAL;
     Item.blendMode = m_ActiveBlendMode;
+    // Same PM auto-route as DrawTextureQueued, so dxDrawMaterialPrimitive
+    // composites SVG (premultiplied) textures correctly under default blend.
+    if (Item.blendMode == EBlendMode::BLEND && pMaterial && pMaterial->m_bPremultipliedAlpha)
+    {
+        Item.blendMode = EBlendMode::ADD;
+        // See PremultiplyAlpha for the diffuse premultiply rationale (#3828).
+        for (auto& vert : *pVecVertices)
+            vert.Color = PremultiplyAlpha(vert.Color);
+    }
     Item.PrimitiveMaterial.eType = eType;
     Item.PrimitiveMaterial.pMaterial = pMaterial;
     Item.PrimitiveMaterial.pVecVertices = pVecVertices;
@@ -1134,6 +1177,16 @@ void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeigh
     // Set up a queue item
     sDrawQueueItem Item;
     Item.blendMode = m_ActiveBlendMode;
+    // Premultiplied-alpha textures (SVG) need the (ONE, INVSRCALPHA) pipeline,
+    // not the straight-alpha BLEND mode. Route the default blend to ADD when
+    // the script hasn't asked for a specific mode (issue #4891), and convert
+    // the diffuse tint to PM so a translucent dxDrawImage call still fades
+    // correctly through that pipeline (issue #3828).
+    if (Item.blendMode == EBlendMode::BLEND && pMaterial && pMaterial->m_bPremultipliedAlpha)
+    {
+        Item.blendMode = EBlendMode::ADD;
+        ulColor = PremultiplyAlpha(ulColor);
+    }
     Item.Texture.fX = fX;
     Item.Texture.fY = fY;
     Item.Texture.fWidth = fWidth;

@@ -573,7 +573,7 @@ void CClientStreamer::Restream(bool bMovedFar)
             if (iMaxIn <= 0 || iMaxOut <= 0)
                 break;
 
-            // Check indicies are valid
+            // Check indices are valid
             if (iFurthestStreamedInIndex < 0)
                 break;
             if (uiClosestStreamedOutIndex >= ClosestStreamedOutList.size())

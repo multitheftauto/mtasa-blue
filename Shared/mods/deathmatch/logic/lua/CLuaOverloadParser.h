@@ -54,7 +54,7 @@ private:
         }
     }
 
-    // Chose an overload that the Nth paramter matches
+    // Choose an overload that the Nth parameter matches
     template <std::size_t N, typename... T>
     static ChosenFunction MakeChoice(std::variant<T...> var)
     {
