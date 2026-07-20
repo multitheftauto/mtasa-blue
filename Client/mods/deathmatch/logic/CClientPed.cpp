@@ -5413,7 +5413,7 @@ void CClientPed::Say(const ePedSpeechContext& speechId, float probability)
 
 const char* CClientPed::GetBodyPartName(unsigned char ucID)
 {
-    if (ucID <= 10)
+    if (ucID < 10)
     {
         return BodyPartNames[ucID].szName;
     }
