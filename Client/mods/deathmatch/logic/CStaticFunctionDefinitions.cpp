@@ -2649,7 +2649,7 @@ bool CStaticFunctionDefinitions::SetPedOxygenLevel(CClientEntity& Entity, float 
 
 bool CStaticFunctionDefinitions::GetBodyPartName(unsigned char ucID, SString& strOutName)
 {
-    if (ucID <= 10)
+    if (ucID < 10)
     {
         // Grab the name and check it's length
         strOutName = CClientPed::GetBodyPartName(ucID);
