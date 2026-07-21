@@ -10,6 +10,7 @@
 #include "StdInc.h"
 #include "SimHeaders.h"
 #include "Utils.h"
+#include "SyncBulletsyncValidation.h"
 #include "CWeaponNames.h"
 
 CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket(ElementID PlayerID, ushort PlayerLatency, uchar PlayerSyncTimeContext, uchar PlayerGotWeaponType,
@@ -157,6 +158,10 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 // Read the aim data only if he's shooting or aiming
                 if (sync.isFull())
                 {
+                    if (!SyncBulletsyncValidation::IsSyncedWeaponAimAcceptable(m_Cache.Position, sync.data.vecOrigin, sync.data.vecTarget, m_WeaponRange,
+                                                                               false))
+                        return false;
+
                     m_Cache.vecSniperSource = sync.data.vecOrigin;
                     m_Cache.vecTargetting = sync.data.vecTarget;
                     m_Cache.bIsAimFull = true;

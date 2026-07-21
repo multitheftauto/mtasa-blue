@@ -8,6 +8,7 @@
 #include "StdInc.h"
 #include "SimHeaders.h"
 #include "Utils.h"
+#include "SyncBulletsyncValidation.h"
 #include "CVehicleManager.h"
 #include "CWeaponNames.h"
 
@@ -216,6 +217,11 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 SWeaponAimSync aim(m_fPlayerGotWeaponRange, true);
                 if (!BitStream.Read(&aim))
                     return false;
+
+                if (!SyncBulletsyncValidation::IsSyncedWeaponAimAcceptable(m_Cache.PlrPosition, aim.data.vecOrigin, aim.data.vecTarget, m_fPlayerGotWeaponRange,
+                                                                           true))
+                    return false;
+
                 m_Cache.fAimDirection = aim.data.fArm;
                 m_Cache.vecSniperSource = aim.data.vecOrigin;
                 m_Cache.vecTargetting = aim.data.vecTarget;

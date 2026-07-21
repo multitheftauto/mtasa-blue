@@ -12,6 +12,7 @@
 #include "net/SyncStructures.h"
 #include "CPlayer.h"
 #include "lua/CLuaFunctionParseHelpers.h"
+#include "SyncBulletsyncValidation.h"
 
 CCustomWeaponBulletSyncPacket::CCustomWeaponBulletSyncPacket(CPlayer* player)
 {
@@ -32,7 +33,7 @@ bool CCustomWeaponBulletSyncPacket::Read(NetBitStreamInterface& stream)
     if (!stream.Read(reinterpret_cast<char*>(&m_start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&m_end), sizeof(CVector)))
         return false;
 
-    if (!m_start.IsValid() || !m_end.IsValid())
+    if (!SyncBulletsyncValidation::IsSyncedBulletSegmentNonDegenerate(m_start, m_end))
         return false;
 
     if (!stream.Read(m_order))

@@ -16,6 +16,7 @@
 #include "CVehicleManager.h"
 #include "net/SyncStructures.h"
 #include "Utils.h"
+#include "SyncBulletsyncValidation.h"
 
 CKeysyncPacket::CKeysyncPacket(CPlayer* pPlayer)
 {
@@ -106,6 +107,12 @@ bool CKeysyncPacket::Read(NetBitStreamInterface& BitStream)
                     SWeaponAimSync aim(fWeaponRange);
                     if (!BitStream.Read(&aim))
                         return false;
+
+                    if (bWeaponCorrect &&
+                        !SyncBulletsyncValidation::IsSyncedWeaponAimAcceptable(pSourcePlayer->GetPosition(), aim.data.vecOrigin, aim.data.vecTarget,
+                                                                               fWeaponRange, pSourcePlayer->GetOccupiedVehicle() != nullptr))
+                        return false;
+
                     pSourcePlayer->SetSniperSourceVector(aim.data.vecOrigin);
                     pSourcePlayer->SetTargettingVector(aim.data.vecTarget);
 

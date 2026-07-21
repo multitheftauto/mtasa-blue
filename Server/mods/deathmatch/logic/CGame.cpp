@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CGame.h"
+#include "SyncBulletsyncValidation.h"
 
 #ifdef WIN32
     #include <ws2tcpip.h>
@@ -2571,19 +2572,13 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     if (player->GetWeaponTotalAmmo(slot) <= 0)
         return;
 
-    // Note: Don't check ammo in clip here - it can be out of sync due to network timing
-    // The total ammo check above is sufficient
+    const auto  stat = CWeaponStatManager::GetSkillStatIndex(packet.m_weapon);
+    const auto  level = player->GetPlayerStat(stat);
+    auto*       stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
+    const float fWeaponRange = stats->GetWeaponRange();
 
-    const auto stat = CWeaponStatManager::GetSkillStatIndex(packet.m_weapon);
-    const auto level = player->GetPlayerStat(stat);
-    auto*      stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
-
-    const float distanceSq = (packet.m_start - packet.m_end).LengthSquared();
-    const float range = stats->GetWeaponRange();
-    const float rangeSq = range * range;
-
-    const float maxRangeSq = rangeSq * 1.1f;  // 10% tolerance for floating point
-    if (distanceSq > maxRangeSq)
+    if (!SyncBulletsyncValidation::IsSyncedBulletsyncPacketAcceptable(player->GetPosition(), player->GetOccupiedVehicle() != nullptr, packet.m_start,
+                                                                      packet.m_end, packet.m_damage, packet.m_zone, packet.m_damaged, fWeaponRange))
         return;
 
     CLuaArguments args;
@@ -2622,6 +2617,12 @@ void CGame::Packet_WeaponBulletsync(CCustomWeaponBulletSyncPacket& packet)
         return;
 
     if (weapon->GetClipAmmo() <= 0)
+        return;
+
+    CWeaponStat* pWeaponStat = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(weapon->GetWeaponType());
+    const float  fWeaponRange = pWeaponStat ? pWeaponStat->GetWeaponRange() : 0.0f;
+    if (!SyncBulletsyncValidation::IsSyncedBulletsyncGeometryAcceptable(player->GetPosition(), player->GetOccupiedVehicle() != nullptr, packet.m_start,
+                                                                        packet.m_end, fWeaponRange))
         return;
 
     CLuaArguments args;

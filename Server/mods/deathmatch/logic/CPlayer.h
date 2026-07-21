@@ -263,6 +263,9 @@ public:
     bool GetTeleported() const noexcept { return m_teleported; }
     void SetTeleported(bool state) noexcept { m_teleported = state; }
 
+    // Anti-cheat: cap forged bullet-sync floods (e.g. cheat loops SendBulletSync many times per shot).
+    bool TryAcceptBulletsync() noexcept;
+
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
 
@@ -463,4 +466,7 @@ private:
     SString m_strQuitReasonForLog;
 
     bool m_teleported = false;
+
+    unsigned long long m_ullBulletsyncWindowStartMs = 0;
+    unsigned int       m_uiBulletsyncCountInWindow = 0;
 };

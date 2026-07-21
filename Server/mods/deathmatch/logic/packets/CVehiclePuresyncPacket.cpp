@@ -16,6 +16,7 @@
 #include "CTrainTrackManager.h"
 #include "CWeaponNames.h"
 #include "Utils.h"
+#include "SyncBulletsyncValidation.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "net/SyncStructures.h"
 
@@ -378,6 +379,11 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     SWeaponAimSync aim(fWeaponRange, true);
                     if (!BitStream.Read(&aim))
                         return false;
+
+                    if (!SyncBulletsyncValidation::IsSyncedWeaponAimAcceptable(pSourcePlayer->GetPosition(), aim.data.vecOrigin, aim.data.vecTarget,
+                                                                               fWeaponRange, true))
+                        return false;
+
                     pSourcePlayer->SetAimDirection(aim.data.fArm);
                     pSourcePlayer->SetSniperSourceVector(aim.data.vecOrigin);
                     pSourcePlayer->SetTargettingVector(aim.data.vecTarget);

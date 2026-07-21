@@ -16,6 +16,7 @@
 #include "CElementIDs.h"
 #include "CElement.h"
 #include "CWeaponNames.h"
+#include "SyncBulletsyncValidation.h"
 
 CBulletsyncPacket::CBulletsyncPacket(CPlayer* player)
     : m_weapon(WEAPONTYPE_UNARMED), m_start(), m_end(), m_order(0), m_damage(0.0f), m_zone(0), m_damaged(INVALID_ELEMENT_ID)
@@ -25,19 +26,7 @@ CBulletsyncPacket::CBulletsyncPacket(CPlayer* player)
 
 bool CBulletsyncPacket::IsValidVector(const CVector& vec) noexcept
 {
-    if (!vec.IsValid())
-        return false;
-
-    if (IsNaN(vec.fX))
-        return false;
-
-    if (IsNaN(vec.fY))
-        return false;
-
-    if (IsNaN(vec.fZ))
-        return false;
-
-    return true;
+    return SyncBulletsyncValidation::IsSyncedBulletVectorAcceptable(vec);
 }
 
 bool CBulletsyncPacket::IsValidWeaponId(unsigned char weaponId) noexcept
@@ -47,22 +36,7 @@ bool CBulletsyncPacket::IsValidWeaponId(unsigned char weaponId) noexcept
 
 bool CBulletsyncPacket::ValidateTrajectory() const noexcept
 {
-    const float dx = m_end.fX - m_start.fX;
-    const float dy = m_end.fY - m_start.fY;
-    const float dz = m_end.fZ - m_start.fZ;
-
-    const float movementSq = (dx * dx) + (dy * dy) + (dz * dz);
-
-    if (IsNaN(movementSq))
-        return false;
-
-    if (movementSq < MIN_DISTANCE_SQ)
-        return false;
-
-    if (movementSq > MAX_DISTANCE_SQ)
-        return false;
-
-    return true;
+    return SyncBulletsyncValidation::IsSyncedBulletSegmentNonDegenerate(m_start, m_end);
 }
 
 void CBulletsyncPacket::ResetDamageData() noexcept
@@ -113,32 +87,12 @@ bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
     stream.Read(m_zone);
     stream.Read(m_damaged);
 
-    if (IsNaN(m_damage))
+    if (!SyncBulletsyncValidation::IsSyncedBulletDamageAcceptable(m_damage, m_zone, m_damaged))
     {
         ResetDamageData();
         return false;
     }
 
-    if (m_damage < 0.0f || m_damage > MAX_DAMAGE)
-    {
-        ResetDamageData();
-        return false;
-    }
-
-    if (m_zone > MAX_BODY_ZONE)
-    {
-        ResetDamageData();
-        return false;
-    }
-
-    if (m_damaged == 0)
-    {
-        ResetDamageData();
-        return false;
-    }
-
-    // Check that target element exists (if specified)
-    // Note: m_damaged can be INVALID_ELEMENT_ID when shooting at ground/world
     if (m_damaged != INVALID_ELEMENT_ID)
     {
         CElement* pElement = CElementIDs::GetElement(m_damaged);
@@ -147,7 +101,6 @@ bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
             ResetDamageData();
             return false;
         }
-        // Element exists
     }
 
     return true;
@@ -161,43 +114,26 @@ bool CBulletsyncPacket::Read(NetBitStreamInterface& stream)
     CPlayer* pPlayer = static_cast<CPlayer*>(m_pSourceElement);
     if (pPlayer)
     {
-        // Check if player is spawned and alive
         if (!pPlayer->IsSpawned() || pPlayer->IsDead())
             return false;
-
-        // Check player position is reasonable relative to bullet start
-        const CVector& playerPos = pPlayer->GetPosition();
-        const float    maxShootDistance = 50.0f;  // Max distance from player to bullet start
-
-        // This check will be done after we read positions
     }
 
     if (!ReadWeaponAndPositions(stream))
         return false;
 
-    // Now validate player position relative to shot origin
     if (pPlayer)
     {
-        const CVector& playerPos = pPlayer->GetPosition();
-        float          dx = m_start.fX - playerPos.fX;
-        float          dy = m_start.fY - playerPos.fY;
-        float          dz = m_start.fZ - playerPos.fZ;
-        float          distSq = dx * dx + dy * dy + dz * dz;
-
-        // Allow larger distance if player is in vehicle (vehicle guns like Hunter have offsets of ~5m,
-        // plus vehicle size, plus network lag compensation)
-        const float maxShootDistanceSq = pPlayer->GetOccupiedVehicle() ? (100.0f * 100.0f) : (50.0f * 50.0f);
-        if (distSq > maxShootDistanceSq)
-            return false;
-
-        // Check if player has this weapon
-        if (!pPlayer->HasWeaponType(static_cast<std::uint8_t>(m_weapon)))
-            return false;
-
-        // Check if weapon has ammo
         const auto type = static_cast<std::uint8_t>(m_weapon);
         const auto slot = CWeaponNames::GetSlotFromWeapon(type);
+
+        if (!pPlayer->HasWeaponType(type))
+            return false;
+
         if (pPlayer->GetWeaponTotalAmmo(slot) <= 0)
+            return false;
+
+        if (!SyncBulletsyncValidation::IsSyncedBulletsyncGeometryAcceptable(pPlayer->GetPosition(), pPlayer->GetOccupiedVehicle() != nullptr, m_start, m_end,
+                                                                            pPlayer->GetWeaponRangeFromSlot(slot)))
             return false;
     }
 
