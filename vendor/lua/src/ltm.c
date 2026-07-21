@@ -20,9 +20,10 @@
 
 
 
-const char *const luaT_typenames[] = {
+const char* const luaT_typenames[] = {
   "nil", "boolean", "userdata", "number",
   "string", "table", "function", "userdata", "thread",
+  "vec", /* LUA-VEC */
   "proto", "upval"
 };
 
