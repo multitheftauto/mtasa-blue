@@ -1064,7 +1064,6 @@ std::variant<bool, CMatrix, std::array<std::array<float, 4>, 4>> CLuaPedDefs::Ge
 
     g_pGame->GetRenderWare()->RwMatrixToCMatrix(*rwmatrix, matrix);
 
-
     CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
     if (pLuaMain && pLuaMain->IsOOPEnabled())
         return matrix;
