@@ -223,7 +223,6 @@ void CLuaGUIDefs::AddClass(lua_State* luaVM)
     AddGuiTabClass(luaVM);
 }
 
-// TODO: vector class
 void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
 {
     lua_newclass(luaVM);
@@ -253,8 +252,8 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getEnabled", "guiGetEnabled");
     lua_classfunction(luaVM, "getVisible", "guiGetVisible");
     lua_classfunction(luaVM, "getText", "guiGetText");
-    lua_classfunction(luaVM, "getPosition", "guiGetPosition");
-    lua_classfunction(luaVM, "getSize", "guiGetSize");
+    lua_classfunction(luaVM, "getPosition", OOP_GUIGetPosition);
+    lua_classfunction(luaVM, "getSize", OOP_GUIGetSize);
     lua_classfunction(luaVM, "getProperty", "guiGetProperty");
 
     lua_classfunction(luaVM, "setInputEnabled", "guiSetInputEnabled");
@@ -284,8 +283,8 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classvariable(luaVM, "alpha", "guiSetAlpha", "guiGetAlpha");
     lua_classvariable(luaVM, "enabled", "guiSetEnabled", "guiGetEnabled");
     lua_classvariable(luaVM, "text", "guiSetText", "guiGetText");
-    lua_classvariable(luaVM, "size", "guiSetSize", "guiGetSize");
-    lua_classvariable(luaVM, "position", "guiSetPosition", "guiGetPosition");
+    lua_classvariable(luaVM, "size", OOP_GUISetSize, OOP_GUIGetSize);
+    lua_classvariable(luaVM, "position", OOP_GUISetPosition, OOP_GUIGetPosition);
     lua_classvariable(luaVM, "chatboxCharacterLimit", "setChatboxCharacterLimit", "getChatboxCharacterLimit");
 
     lua_registerclass(luaVM, "GuiElement", "Element");
@@ -386,9 +385,10 @@ void CLuaGUIDefs::AddGuiImageClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "guiCreateStaticImage");
     lua_classfunction(luaVM, "loadImage", "guiStaticImageLoadImage");
-    lua_classfunction(luaVM, "getNativeSize", "guiStaticImageGetNativeSize");
+    lua_classfunction(luaVM, "getNativeSize", OOP_GUIStaticImageGetNativeSize);
 
     lua_classvariable(luaVM, "image", "guiStaticImageLoadImage", NULL);
+    lua_classvariable(luaVM, "nativeSize", nullptr, OOP_GUIStaticImageGetNativeSize);
 
     lua_registerclass(luaVM, "GuiStaticImage", "GuiElement");
 }
@@ -1228,6 +1228,30 @@ int CLuaGUIDefs::GUIStaticImageGetNativeSize(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::OOP_GUIStaticImageGetNativeSize(lua_State* luaVM)
+{
+    //  vector2 guiStaticImageGetNativeSize ( element theElement )
+    CClientGUIElement* theElement;
+    CVector2D          vecSize;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(theElement);
+
+    if (!argStream.HasErrors())
+        if (CStaticFunctionDefinitions::GUIStaticImageGetNativeSize(*theElement, vecSize))
+        {
+            lua_pushvector(luaVM, vecSize);
+            return 1;
+        }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaGUIDefs::GUICreateTab(lua_State* luaVM)
 {
     //  element guiCreateTab ( string text, element parent )
@@ -1782,6 +1806,32 @@ int CLuaGUIDefs::GUIGetSize(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::OOP_GUIGetSize(lua_State* luaVM)
+{
+    //  vector2 guiGetSize ( element theElement [, bool relative = false ] )
+    CClientGUIElement* theElement;
+    bool               relative;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(theElement);
+    argStream.ReadBool(relative, false);
+
+    if (!argStream.HasErrors())
+    {
+        CVector2D Size;
+        theElement->GetCGUIElement()->GetSize(Size, relative);
+
+        lua_pushvector(luaVM, Size);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaGUIDefs::GUIGetScreenSize(lua_State* luaVM)
 {
     const CVector2D Size = CStaticFunctionDefinitions::GUIGetScreenSize();
@@ -1809,6 +1859,32 @@ int CLuaGUIDefs::GUIGetPosition(lua_State* luaVM)
         lua_pushnumber(luaVM, Pos.fX);
         lua_pushnumber(luaVM, Pos.fY);
         return 2;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::OOP_GUIGetPosition(lua_State* luaVM)
+{
+    //  vector2 guiGetPosition ( element guiElement [, bool relative = false ] )
+    CClientGUIElement* guiElement;
+    bool               relative;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+    argStream.ReadBool(relative, false);
+
+    if (!argStream.HasErrors())
+    {
+        CVector2D Pos;
+        guiElement->GetCGUIElement()->GetPosition(Pos, relative);
+
+        lua_pushvector(luaVM, Pos);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -2105,6 +2181,31 @@ int CLuaGUIDefs::GUISetSize(lua_State* luaVM)
     return 1;
 }
 
+int CLuaGUIDefs::OOP_GUISetSize(lua_State* luaVM)
+{
+    //  bool guiSetSize ( element guiElement, vector2 size [, bool relative = false ] )
+    CClientGUIElement* guiElement;
+    CVector2D          vecSize;
+    bool               relative;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+    argStream.ReadVector2D(vecSize);
+    argStream.ReadBool(relative, false);
+
+    if (!argStream.HasErrors())
+    {
+        CStaticFunctionDefinitions::GUISetSize(*guiElement, vecSize, relative);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
 int CLuaGUIDefs::GUISetPosition(lua_State* luaVM)
 {
     //  bool guiSetPosition ( element guiElement, float x, float y, bool relative )
@@ -2129,6 +2230,31 @@ int CLuaGUIDefs::GUISetPosition(lua_State* luaVM)
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     // error: bad arguments
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaGUIDefs::OOP_GUISetPosition(lua_State* luaVM)
+{
+    //  bool guiSetPosition ( element guiElement, vector2 position [, bool relative = false ] )
+    CClientGUIElement* guiElement;
+    CVector2D          vecPosition;
+    bool               relative;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+    argStream.ReadVector2D(vecPosition);
+    argStream.ReadBool(relative, false);
+
+    if (!argStream.HasErrors())
+    {
+        CStaticFunctionDefinitions::GUISetPosition(*guiElement, vecPosition, relative);
+        lua_pushboolean(luaVM, true);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
     lua_pushboolean(luaVM, false);
     return 1;
 }

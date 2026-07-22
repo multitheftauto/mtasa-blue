@@ -22,7 +22,7 @@ public:
     LUA_DECLARE(GetLightType);
     LUA_DECLARE(GetLightRadius);
     LUA_DECLARE(GetLightColor);
-    LUA_DECLARE(GetLightDirection);
+    LUA_DECLARE_OOP(GetLightDirection);
     LUA_DECLARE(SetLightRadius);
     LUA_DECLARE(SetLightColor);
     LUA_DECLARE(SetLightDirection);

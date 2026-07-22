@@ -34,7 +34,7 @@ public:
     LUA_DECLARE(GetPedWeapon);
     LUA_DECLARE(GetPedAmmoInClip);
     LUA_DECLARE(GetPedTotalAmmo);
-    LUA_DECLARE(GetPedWeaponMuzzlePosition);
+    LUA_DECLARE_OOP(GetPedWeaponMuzzlePosition);
     LUA_DECLARE(GetPedStat);
     LUA_DECLARE(GetPedOccupiedVehicle);
     LUA_DECLARE(GetPedOccupiedVehicleSeat);

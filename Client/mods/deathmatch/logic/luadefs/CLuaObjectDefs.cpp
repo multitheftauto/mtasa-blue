@@ -56,7 +56,7 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "respawn", "respawnObject");
     lua_classfunction(luaVM, "toggleRespawn", "toggleObjectRespawn");
 
-    lua_classfunction(luaVM, "getScale", "getObjectScale");
+    lua_classfunction(luaVM, "getScale", OOP_GetObjectScale);
     lua_classfunction(luaVM, "isBreakable", "isObjectBreakable");
     lua_classfunction(luaVM, "getMass", "getObjectMass");
     lua_classfunction(luaVM, "getProperties", GetObjectProperties);
@@ -70,7 +70,7 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setProperty", "setObjectProperty");
 
     lua_classvariable(luaVM, "moving", nullptr, "isObjectMoving");
-    lua_classvariable(luaVM, "scale", "setObjectScale", "getObjectScale");
+    lua_classvariable(luaVM, "scale", SetObjectScale, OOP_GetObjectScale);
     lua_classvariable(luaVM, "breakable", "setObjectBreakable", "isObjectBreakable");
     lua_classvariable(luaVM, "mass", "setObjectMass", "getObjectMass");
     lua_classvariable(luaVM, "properties", nullptr, GetObjectProperties);
@@ -171,6 +171,30 @@ int CLuaObjectDefs::GetObjectScale(lua_State* luaVM)
             lua_pushnumber(luaVM, vecScale.fY);
             lua_pushnumber(luaVM, vecScale.fZ);
             return 3;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaObjectDefs::OOP_GetObjectScale(lua_State* luaVM)
+{
+    //  vector getObjectScale ( object theObject )
+    CClientObject* pObject;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pObject);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecScale;
+        if (CStaticFunctionDefinitions::GetObjectScale(*pObject, vecScale))
+        {
+            lua_pushvector(luaVM, vecScale);
+            return 1;
         }
     }
     else

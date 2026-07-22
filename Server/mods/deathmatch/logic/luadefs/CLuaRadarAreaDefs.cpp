@@ -45,7 +45,7 @@ void CLuaRadarAreaDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isInside", "isInsideRadarArea");
 
     lua_classfunction(luaVM, "isFlashing", "isRadarAreaFlashing");
-    lua_classfunction(luaVM, "getSize", "getRadarAreaSize");
+    lua_classfunction(luaVM, "getSize", "getRadarAreaSize", OOP_GetRadarAreaSize);
     lua_classfunction(luaVM, "getColor", "getRadarAreaColor");
 
     lua_classfunction(luaVM, "setSize", "setRadarAreaSize");

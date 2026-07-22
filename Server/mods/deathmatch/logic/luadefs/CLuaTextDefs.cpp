@@ -71,7 +71,7 @@ void CLuaTextDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "destroy", "textDestroyTextItem");
 
     lua_classfunction(luaVM, "getColor", "textItemGetColor");
-    lua_classfunction(luaVM, "getPosition", "textItemGetPosition");
+    lua_classfunction(luaVM, "getPosition", "textItemGetPosition", OOP_textItemGetPosition);
     lua_classfunction(luaVM, "getPriority", "textItemGetPriority");
     lua_classfunction(luaVM, "getScale", "textItemGetScale");
     lua_classfunction(luaVM, "getText", "textItemGetText");
@@ -85,7 +85,7 @@ void CLuaTextDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "priority", "textItemSetPriority", "textItemGetPriority");
     lua_classvariable(luaVM, "scale", "textItemSetScale", "textItemGetScale");
     lua_classvariable(luaVM, "text", "textItemSetText", "textItemGetText");
-    lua_classvariable(luaVM, "position", "textItemSetPosition", "textItemGetPosition");
+    lua_classvariable(luaVM, "position", "textItemSetPosition", "textItemGetPosition", textItemSetPosition, OOP_textItemGetPosition);
 
     lua_registerclass(luaVM, "TextItem");
 }
@@ -444,13 +444,13 @@ int CLuaTextDefs::textItemGetScale(lua_State* luaVM)
 
 int CLuaTextDefs::textItemSetPosition(lua_State* luaVM)
 {
+    // Accept Vector2 as well so textItem.position = Vector2(...) works via the OOP property
     CTextItem* pTextItem;
     CVector2D  vecPosition;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pTextItem);
-    argStream.ReadNumber(vecPosition.fX);
-    argStream.ReadNumber(vecPosition.fY);
+    argStream.ReadVector2D(vecPosition);
 
     if (!argStream.HasErrors())
     {
@@ -479,6 +479,26 @@ int CLuaTextDefs::textItemGetPosition(lua_State* luaVM)
         lua_pushnumber(luaVM, vecPosition.fX);
         lua_pushnumber(luaVM, vecPosition.fY);
         return 2;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaTextDefs::OOP_textItemGetPosition(lua_State* luaVM)
+{
+    CTextItem* pTextItem;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pTextItem);
+
+    if (!argStream.HasErrors())
+    {
+        CVector2D vecPosition = pTextItem->GetPosition();
+        lua_pushvector(luaVM, vecPosition);
+        return 1;
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());

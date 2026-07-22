@@ -37,7 +37,7 @@ public:
     LUA_DECLARE(GetVehicleSirensOn);
     LUA_DECLARE(GetVehicleTurnVelocity);
     LUA_DECLARE(OOP_GetVehicleTurnVelocity);
-    LUA_DECLARE(GetVehicleTurretPosition);
+    LUA_DECLARE_OOP(GetVehicleTurretPosition);
     LUA_DECLARE(IsVehicleLocked);
     LUA_DECLARE(GetVehiclesOfType);
     LUA_DECLARE(GetVehicleUpgradeOnSlot);

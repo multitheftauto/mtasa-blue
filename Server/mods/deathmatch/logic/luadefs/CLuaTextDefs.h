@@ -35,7 +35,7 @@ public:
     LUA_DECLARE(textItemSetScale);
     LUA_DECLARE(textItemGetScale);
     LUA_DECLARE(textItemSetPosition);
-    LUA_DECLARE(textItemGetPosition);
+    LUA_DECLARE_OOP(textItemGetPosition);
     LUA_DECLARE(textItemSetColor);
     LUA_DECLARE(textItemGetColor);
     LUA_DECLARE(textItemSetPriority);

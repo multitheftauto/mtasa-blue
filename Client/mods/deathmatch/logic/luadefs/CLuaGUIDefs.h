@@ -47,7 +47,7 @@ public:
     LUA_DECLARE(GUICreateStaticImage);
     LUA_DECLARE(GUICreateFont);
     LUA_DECLARE(GUIStaticImageLoadImage);
-    LUA_DECLARE(GUIStaticImageGetNativeSize);
+    LUA_DECLARE_OOP(GUIStaticImageGetNativeSize);
     LUA_DECLARE(GUIGetSelectedTab);
     LUA_DECLARE(GUISetSelectedTab);
     LUA_DECLARE(GUIDeleteTab);
@@ -94,8 +94,8 @@ public:
     LUA_DECLARE(GUISetEnabled);
     LUA_DECLARE(GUISetText);
     LUA_DECLARE(GUISetFont);
-    LUA_DECLARE(GUISetSize);
-    LUA_DECLARE(GUISetPosition);
+    LUA_DECLARE_OOP(GUISetSize);
+    LUA_DECLARE_OOP(GUISetPosition);
     LUA_DECLARE(GUISetVisible);
     LUA_DECLARE(GUISetAlpha);
     LUA_DECLARE(GUISetProperty);
@@ -108,8 +108,8 @@ public:
     LUA_DECLARE(GUIGetEnabled);
     LUA_DECLARE(GUIGetText);
     LUA_DECLARE(GUIGetFont);
-    LUA_DECLARE(GUIGetSize);
-    LUA_DECLARE(GUIGetPosition);
+    LUA_DECLARE_OOP(GUIGetSize);
+    LUA_DECLARE_OOP(GUIGetPosition);
     LUA_DECLARE(GUIGetVisible);
     LUA_DECLARE(GUIGetAlpha);
     LUA_DECLARE(GUIGetProperty);

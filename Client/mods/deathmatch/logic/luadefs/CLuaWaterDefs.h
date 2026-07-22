@@ -31,5 +31,5 @@ public:
     LUA_DECLARE(GetWaterColor);
     LUA_DECLARE(GetWaterLevel);
     LUA_DECLARE(IsWaterDrawnLast);
-    LUA_DECLARE(GetWaterVertexPosition);
+    LUA_DECLARE_OOP(GetWaterVertexPosition);
 };
