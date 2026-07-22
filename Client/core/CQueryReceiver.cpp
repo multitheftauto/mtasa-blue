@@ -34,6 +34,7 @@ void CQueryReceiver::RequestQuery(in_addr address, ushort port)
     addr.sin_family = AF_INET;
     addr.sin_addr = address;
     addr.sin_port = htons(port);
+    m_QueryAddress = addr;
 
     // Trailing data to work around 1 byte UDP packet filtering
     int iSendByte = g_pCore->GetNetwork()->SendTo(m_Socket, "r mtasa", 1, 0, (sockaddr*)&addr, sizeof(addr));
@@ -99,6 +100,12 @@ SQueryInfo CQueryReceiver::GetServerResponse()
 
     if (len >= 0)
     {
+        if (clntAddr.sin_family != m_QueryAddress.sin_family || clntAddr.sin_addr.S_un.S_addr != m_QueryAddress.sin_addr.S_un.S_addr ||
+            clntAddr.sin_port != m_QueryAddress.sin_port)
+        {
+            return info;
+        }
+
         // Parse data
 
         // Check length
