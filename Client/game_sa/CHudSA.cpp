@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <cstring>
 #include "CHudSA.h"
 #include "CGameSA.h"
 #include "CCameraSA.h"
@@ -106,31 +107,24 @@ void CHudSA::Disable(bool bDisabled)
     ApplyVisibilityState();
 }
 
-bool CHudSA::IsDisabled()
+bool CHudSA::IsDisabled() const noexcept
 {
-    return !m_isEnabled || m_suppressionReasons.any();
+    return !m_isEnabled || m_isSuppressed;
 }
 
-void CHudSA::SetSuppressed(eHudSuppressionReason reason, bool bSuppressed)
+void CHudSA::SetSuppressed(bool bSuppressed)
 {
-    const std::size_t index = static_cast<std::size_t>(reason);
-    if (index >= m_suppressionReasons.size() || m_suppressionReasons[index] == bSuppressed)
+    if (m_isSuppressed == bSuppressed)
         return;
 
-    m_suppressionReasons.set(index, bSuppressed);
+    m_isSuppressed = bSuppressed;
     ApplyVisibilityState();
-}
-
-bool CHudSA::IsSuppressed(eHudSuppressionReason reason) const noexcept
-{
-    const std::size_t index = static_cast<std::size_t>(reason);
-    return index < m_suppressionReasons.size() && m_suppressionReasons[index];
 }
 
 void CHudSA::ResetVisibilityState()
 {
     m_isEnabled = true;
-    m_suppressionReasons.reset();
+    m_isSuppressed = false;
     ApplyVisibilityState();
 }
 
@@ -222,7 +216,7 @@ void CHudSA::SetComponentVisible(eHudComponent component, bool bVisible)
         uchar* pDest = (uchar*)(pComponent->uiDataAddr);
 
         // Avoid unnecessary unprotect/write cycles when the component is already in the requested state
-        if (memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
+        if (std::memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
             return;
 
         for (uint i = 0; i < pComponent->uiDataSize; i++)
@@ -249,7 +243,7 @@ bool CHudSA::IsComponentVisible(eHudComponent component)
         // Determine if invisible by matching data with disabled values
         uchar* pSrc = (uchar*)(&pComponent->disabledData);
         uchar* pDest = (uchar*)(pComponent->uiDataAddr);
-        if (memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
+        if (std::memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
             return false;  // Matches disabled bytes
         return true;
     }
@@ -275,7 +269,7 @@ bool CHudSA::IsComponentEffectivelyVisible(eHudComponent component)
     {
         const uchar* pSrc = (const uchar*)(&pComponent->disabledData);
         const uchar* pDest = (const uchar*)(pComponent->uiDataAddr);
-        if (memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
+        if (std::memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
             return false;  // Matches disabled bytes
 
         if (pComponent->parent == HUD_ALL)

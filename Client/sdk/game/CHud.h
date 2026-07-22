@@ -72,20 +72,11 @@ enum class eFontAlignment : std::uint8_t
     ALIGN_RIGHT,
 };
 
-// Temporary owners that hide the whole HUD without changing the persistent state requested
-// through the showhud command. Each owner releases only its own suppression.
-enum class eHudSuppressionReason : std::uint8_t
-{
-    PLAYER_MAP,
-
-    COUNT,
-};
-
 class CHud
 {
 public:
     virtual void Disable(bool bDisabled) = 0;
-    virtual bool IsDisabled() = 0;
+    virtual bool IsDisabled() const noexcept = 0;
     virtual void SetComponentVisible(eHudComponent component, bool bVisible) = 0;
     virtual bool IsComponentVisible(eHudComponent component) = 0;
     virtual void AdjustComponents(float fAspectRatio) = 0;
@@ -143,10 +134,8 @@ public:
 
     virtual CVector2D GetComponentTextSize(const eHudComponent& component) const = 0;
 
-    // Keep new methods at the end so existing CHud virtual method positions remain stable across client modules
     virtual bool IsEnabled() const noexcept = 0;
-    virtual void SetSuppressed(eHudSuppressionReason reason, bool bSuppressed) = 0;
-    virtual bool IsSuppressed(eHudSuppressionReason reason) const noexcept = 0;
+    virtual void SetSuppressed(bool bSuppressed) = 0;
     virtual void ResetVisibilityState() = 0;
     virtual bool IsComponentEffectivelyVisible(eHudComponent component) = 0;
 };

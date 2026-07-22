@@ -506,14 +506,14 @@ void CPlayerMap::InternalSetPlayerMapEnabled(bool enable)
         m_bDebugVisible = g_pCore->IsDebugVisible();
 
         // The map temporarily suppresses the HUD without replacing the state requested through showhud
-        g_pGame->GetHud()->SetSuppressed(eHudSuppressionReason::PLAYER_MAP, true);
+        g_pGame->GetHud()->SetSuppressed(true);
         g_pMultiplayer->HideRadar(true);
         g_pCore->SetChatVisible(false);
         g_pCore->SetDebugVisible(false);
     }
     else
     {
-        g_pGame->GetHud()->SetSuppressed(eHudSuppressionReason::PLAYER_MAP, false);
+        g_pGame->GetHud()->SetSuppressed(false);
         g_pMultiplayer->HideRadar(false);
         g_pCore->SetChatVisible(m_bChatVisible, m_bChatInputBlocked);
         g_pCore->SetDebugVisible(m_bDebugVisible);

@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <bitset>
 #include <game/CHud.h>
 #include <CVector.h>
 #include <game/RenderWare.h>
@@ -70,7 +69,7 @@ struct SHudComponent
     DWORD         origData;
     DWORD         disabledData;
     // Components rendered inside another HUD component cannot draw while their parent is hidden
-    eHudComponent parent = HUD_ALL;
+    eHudComponent parent{HUD_ALL};
 };
 
 enum class eHudColour
@@ -180,7 +179,7 @@ class CHudSA : public CHud
 public:
     CHudSA();
     void Disable(bool bDisabled) override;
-    bool IsDisabled() override;
+    bool IsDisabled() const noexcept override;
     void SetComponentVisible(eHudComponent component, bool bVisible) override;
     bool IsComponentVisible(eHudComponent component) override;
     void AdjustComponents(float fAspectRatio) override;
@@ -188,8 +187,7 @@ public:
     bool IsCrosshairVisible() override;
 
     bool IsEnabled() const noexcept override { return m_isEnabled; }
-    void SetSuppressed(eHudSuppressionReason reason, bool bSuppressed) override;
-    bool IsSuppressed(eHudSuppressionReason reason) const noexcept override;
+    void SetSuppressed(bool bSuppressed) override;
     void ResetVisibilityState() override;
     bool IsComponentEffectivelyVisible(eHudComponent component) override;
 
@@ -311,11 +309,11 @@ private:
     std::map<eHudComponent, SHudComponent> m_HudComponentMap;
 
     // Persistent visibility requested through the showhud command
-    bool m_isEnabled = true;
+    bool m_isEnabled{true};
     // Last state actually written into GTA code, used to avoid redundant memory patching
-    bool m_isAppliedDisabled = false;
-    // Temporary suppression owners (e.g. the fullscreen player map); each owner releases only its own bit
-    std::bitset<static_cast<std::size_t>(eHudSuppressionReason::COUNT)> m_suppressionReasons;
+    bool m_isAppliedDisabled{false};
+    // Temporary suppression (e.g. the fullscreen player map) without changing showhud preference
+    bool m_isSuppressed{false};
 
     float* m_pfAspectRatioMultiplicator;
     float* m_pfCameraCrosshairScale;
