@@ -8289,8 +8289,17 @@ bool CStaticFunctionDefinitions::GetSoundProperties(CClientSound& Sound, float& 
     return true;
 }
 
+static bool IsValidFFTBandCount(int iLength, int iBands)
+{
+    // BASS provides iLength / 2 spectrum values, so additional bands cannot be populated without reading beyond the FFT data.
+    return iBands >= 0 && iBands <= iLength / 2;
+}
+
 float* CStaticFunctionDefinitions::GetSoundFFTData(CClientSound& Sound, int iLength, int iBands)
 {
+    if (!IsValidFFTBandCount(iLength, iBands))
+        return nullptr;
+
     // Get our FFT Data
     float* fData = Sound.GetFFTData(iLength);
     if (iBands != 0 && fData != NULL)
@@ -8346,6 +8355,9 @@ float* CStaticFunctionDefinitions::GetSoundFFTData(CClientSound& Sound, int iLen
 
 float* CStaticFunctionDefinitions::GetSoundFFTData(CClientPlayer& Player, int iLength, int iBands)
 {
+    if (!IsValidFFTBandCount(iLength, iBands))
+        return nullptr;
+
     CClientPlayerVoice* pVoice = Player.GetVoice();
     if (pVoice != NULL && Player.GetVoice()->IsActive())
     {
