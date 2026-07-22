@@ -98,6 +98,7 @@ typedef int(__cdecl* rwD3D9NativeTextureRead_t)(RwStream* stream, RwTexture** te
 typedef RwRaster*(__cdecl* RwRasterUnlock_t)(RwRaster* raster);
 typedef RwRaster*(__cdecl* RwRasterLock_t)(RwRaster* raster, unsigned char level, int lockmode);
 typedef RwRaster*(__cdecl* RwRasterCreate_t)(int width, int height, int depth, int flags);
+typedef RwRaster*(__cdecl* RwRasterDestroy_t)(RwRaster* raster);
 typedef RwTexture*(__cdecl* RwTextureCreate_t)(RwRaster* raster);
 typedef RpMaterial*(__cdecl* RpMaterialSetTexture_t)(RpMaterial* mat, RwTexture* tex);
 typedef RpHAnimHierarchy*(__cdecl* GetAnimHierarchyFromClump_t)(RpClump*);
@@ -188,6 +189,7 @@ RWFUNC(RwTextureDestroy_t RwTextureDestroy, (RwTextureDestroy_t)0xDEAD)
 RWFUNC(RwRasterUnlock_t RwRasterUnlock, (RwRasterUnlock_t)0xDEAD)
 RWFUNC(RwRasterLock_t RwRasterLock, (RwRasterLock_t)0xDEAD)
 RWFUNC(RwRasterCreate_t RwRasterCreate, (RwRasterCreate_t)0xDEAD)
+RWFUNC(RwRasterDestroy_t RwRasterDestroy, (RwRasterDestroy_t)0xDEAD)
 RWFUNC(RwTextureCreate_t RwTextureCreate, (RwTextureCreate_t)0xDEAD)
 RWFUNC(RpMaterialSetTexture_t RpMaterialSetTexture, (RpMaterialSetTexture_t)0xDEAD)
 RWFUNC(GetAnimHierarchyFromClump_t GetAnimHierarchyFromClump, (GetAnimHierarchyFromClump_t)0xDEAD)
