@@ -343,7 +343,7 @@ public:
     void SetVehicleEngineAutoStartEnabled(bool enabled) override;
 
     bool IsPs2ScorchedVehiclesEnabled() const noexcept override;
-    void SetPs2ScorchedVehiclesEnabled(bool enabled) override;
+    void SetPs2ScorchedVehiclesEnabled(bool enabled) noexcept override;
 
     bool IsRapidVehicleStopFixEnabled() const noexcept override { return m_isRapidVehicleStopFixEnabled; };
     void SetRapidVehicleStopFixEnabled(bool enabled) override;

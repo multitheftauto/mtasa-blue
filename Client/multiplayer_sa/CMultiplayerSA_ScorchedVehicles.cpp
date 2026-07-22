@@ -23,6 +23,7 @@ namespace
         if (ms_bPs2ScorchedVehiclesEnabled)
             lighting = SCORCHED_VEHICLE_LIGHTING_PS2;
 
+        // Call WorldReplaceNormalLightsWithScorched
         reinterpret_cast<WorldReplaceNormalLightsWithScorched_t>(0x7357E0)(world, lighting);
     }
 }  // namespace
@@ -32,13 +33,13 @@ bool CMultiplayerSA::IsPs2ScorchedVehiclesEnabled() const noexcept
     return ms_bPs2ScorchedVehiclesEnabled;
 }
 
-void CMultiplayerSA::SetPs2ScorchedVehiclesEnabled(bool enabled)
+void CMultiplayerSA::SetPs2ScorchedVehiclesEnabled(bool enabled) noexcept
 {
     ms_bPs2ScorchedVehiclesEnabled = enabled;
 }
 
 void CMultiplayerSA::InitHooks_ScorchedVehicles()
 {
-    HookInstallCall(0x553E6A, reinterpret_cast<DWORD>(WorldReplaceNormalLightsWithScorched_MTA));  // SetupLightingForEntity
-    HookInstallCall(0x554FC2, reinterpret_cast<DWORD>(WorldReplaceNormalLightsWithScorched_MTA));  // CObject::SetupLighting
+    HookInstallCall(0x553E6A, reinterpret_cast<DWORD>(WorldReplaceNormalLightsWithScorched_MTA));  // CRenderer::SetupLightingForEntity
+    HookInstallCall(0x554FB7, reinterpret_cast<DWORD>(WorldReplaceNormalLightsWithScorched_MTA));  // CObject::SetupLighting
 }

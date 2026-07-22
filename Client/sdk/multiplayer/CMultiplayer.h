@@ -450,7 +450,7 @@ public:
     virtual void SetVehicleEngineAutoStartEnabled(bool enabled) = 0;
 
     virtual bool IsPs2ScorchedVehiclesEnabled() const noexcept = 0;
-    virtual void SetPs2ScorchedVehiclesEnabled(bool enabled) = 0;
+    virtual void SetPs2ScorchedVehiclesEnabled(bool enabled) noexcept = 0;
 
     virtual bool IsRapidVehicleStopFixEnabled() const noexcept = 0;
     virtual void SetRapidVehicleStopFixEnabled(bool enabled) = 0;
