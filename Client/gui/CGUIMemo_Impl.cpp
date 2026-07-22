@@ -138,6 +138,25 @@ float CGUIMemo_Impl::GetScrollbarPageSize()
     return 1.0f;
 }
 
+unsigned int CGUIMemo_Impl::GetUTF8CharacterCount(const char* szText)
+{
+    return static_cast<unsigned int>(CGUI_Impl::GetUTFString(szText).length());
+}
+
+float CGUIMemo_Impl::GetVerticalOffsetForCharacterIndex(unsigned int uiIndex)
+{
+    CEGUI::MultiLineEditbox* pMemo = reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow);
+    const CEGUI::Font*       pFont = pMemo->getFont();
+    if (!pFont)
+        return 0.0f;
+
+    // An index at or beyond the end represents all rendered lines, not the start of the final line.
+    if (uiIndex >= pMemo->getText().length())
+        return GetScrollbarDocumentSize();
+
+    return pMemo->getLineNumberFromIndex(uiIndex) * pFont->getLineSpacing();
+}
+
 void CGUIMemo_Impl::SetSelection(unsigned int uiStart, unsigned int uiEnd)
 {
     reinterpret_cast<CEGUI::MultiLineEditbox*>(m_pWindow)->setSelection(uiStart, uiEnd);
