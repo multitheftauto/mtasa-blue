@@ -21,6 +21,7 @@ using namespace std;
 extern CClientGame* g_pClientGame;
 
 int CResource::m_iShowingCursor = 0;
+int CResource::m_iToggleControls = 0;
 
 CResource::CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
                      const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
@@ -31,6 +32,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     m_bStarting = true;
     m_bStopping = false;
     m_bShowingCursor = false;
+    m_bToggleControls = false;
     m_usRemainingNoClientCacheScripts = 0;
     m_bLoadAfterReceivingNoClientCacheScripts = false;
     m_strMinServerReq = strMinServerReq;
@@ -486,8 +488,19 @@ void CResource::ShowCursor(bool bShow, bool bToggleControls)
         m_bShowingCursor = bShow;
     }
 
+    bool bWantsToggle = m_bShowingCursor && bToggleControls;
+    if (bWantsToggle != m_bToggleControls)
+    {
+        if (bWantsToggle)
+            m_iToggleControls += 1;
+        else
+            m_iToggleControls -= 1;
+
+        m_bToggleControls = bWantsToggle;
+    }
+
     // Always update cursor and controls state regardless of cursor visibility change
-    g_pCore->ForceCursorVisible(m_iShowingCursor > 0, bToggleControls);
+    g_pCore->ForceCursorVisible(m_iShowingCursor > 0, m_iToggleControls > 0);
     g_pClientGame->SetCursorEventsEnabled(m_iShowingCursor > 0);
 }
 

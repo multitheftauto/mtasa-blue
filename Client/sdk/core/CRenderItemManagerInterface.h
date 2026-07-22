@@ -351,12 +351,17 @@ class CEffectWrap : public CRenderItem
 class CMaterialItem : public CRenderItem
 {
     DECLARE_CLASS(CMaterialItem, CRenderItem)
-    CMaterialItem() : ClassInit(this), m_TextureAddress(TADDRESS_WRAP), m_uiBorderColor(0) {}
+    CMaterialItem() : ClassInit(this), m_TextureAddress(TADDRESS_WRAP), m_uiBorderColor(0), m_bPremultipliedAlpha(false) {}
 
     uint            m_uiSizeX;
     uint            m_uiSizeY;
     ETextureAddress m_TextureAddress;
     uint            m_uiBorderColor;
+    // True if the texture pixels are stored with premultiplied alpha. When set,
+    // the default dxDrawImage blend ("blend") is internally routed through the
+    // (ONE, INVSRCALPHA) pipeline so compositing is mathematically correct
+    // without losing precision to a per-pixel integer unpremultiply.
+    bool m_bPremultipliedAlpha;
 };
 
 ////////////////////////////////////////////////////////////////

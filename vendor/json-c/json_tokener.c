@@ -46,7 +46,7 @@
 
 #define jt_hexdigit(x) (((x) <= '9') ? (x) - '0' : ((x)&7) + 9)
 
-#if !HAVE_STRNCASECMP && defined(_MSC_VER)
+#if !HAVE_STRNCASECMP && defined(_WIN32)
 /* MSC has the version as _strnicmp */
 #define strncasecmp _strnicmp
 #elif !HAVE_STRNCASECMP
@@ -145,8 +145,8 @@ enum json_tokener_error json_tokener_get_error(struct json_tokener *tok)
 }
 
 /* Stuff for decoding unicode sequences */
-#define IS_HIGH_SURROGATE(uc) (((uc)&0xFC00) == 0xD800)
-#define IS_LOW_SURROGATE(uc) (((uc)&0xFC00) == 0xDC00)
+#define IS_HIGH_SURROGATE(uc) (((uc)&0xFFFFFC00) == 0xD800)
+#define IS_LOW_SURROGATE(uc) (((uc)&0xFFFFFC00) == 0xDC00)
 #define DECODE_SURROGATE_PAIR(hi, lo) ((((hi)&0x3FF) << 10) + ((lo)&0x3FF) + 0x10000)
 static unsigned char utf8_replacement_char[3] = {0xEF, 0xBF, 0xBD};
 
@@ -1249,6 +1249,12 @@ struct json_object *json_tokener_parse_ex(struct json_tokener *tok, const char *
 					saved_state = json_tokener_state_object_field;
 					state = json_tokener_state_string_escape;
 					break;
+				}
+				else if ((tok->flags & JSON_TOKENER_STRICT) && (unsigned char)c <= 0x1f)
+				{
+					// Disallow control characters in strict mode
+					tok->err = json_tokener_error_parse_string;
+					goto out;
 				}
 				if (!ADVANCE_CHAR(str, tok) || !PEEK_CHAR(c, tok))
 				{

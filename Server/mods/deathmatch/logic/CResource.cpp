@@ -122,9 +122,8 @@ bool CResource::Load()
     time(&m_timeLoaded);
     m_timeStarted = 0;
 
-    // Register us in the EHS stuff
-    g_pGame->GetHTTPD()->RegisterEHS(this, m_strResourceName.c_str());
-    this->m_oEHSServerParameters["norouterequest"] = true;
+    // Register us in the HTTP server
+    g_pGame->GetHTTPD()->RegisterResource(this, m_strResourceName.c_str());
 
     // Store the actual directory and zip paths for fast access
     m_strResourceDirectoryPath = PathJoin(m_strAbsPath, m_strResourceName, "/");
@@ -136,7 +135,7 @@ bool CResource::Load()
         if (!UnzipResource())
         {
             // Unregister EHS stuff
-            g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+            g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
 
             return false;
         }
@@ -147,7 +146,7 @@ bool CResource::Load()
     if (!GetFilePath("meta.xml", strMeta))
     {
         // Unregister the EHS stuff
-        g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+        g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
 
         // Show error
         m_strFailureReason = SString("Couldn't find meta.xml file for resource '%s'\n", m_strResourceName.c_str());
@@ -274,7 +273,7 @@ bool CResource::Load()
                 !ReadIncludedHTML(pRoot) || !ReadIncludedExports(pRoot) || !ReadIncludedConfigs(pRoot))
             {
                 delete pMetaFile;
-                g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+                g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
                 return false;
             }
         }
@@ -298,7 +297,7 @@ bool CResource::Load()
         if (pMetaFile)
             delete pMetaFile;
 
-        g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+        g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
         return false;
     }
 
@@ -425,7 +424,7 @@ void CResource::TidyUp()
     for (CResource* pDependent : m_Dependents)
         pDependent->InvalidateIncludedResourceReference(this);
 
-    g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+    g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
 }
 
 bool CResource::GetInfoValue(const char* szKey, std::string& strValue) const
@@ -1068,6 +1067,13 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CResourceStartPacket(m_strResourceName, this, m_startCounter));
     SendNoClientCacheScripts();
     m_bClientSync = true;
+
+    // Run anything that got held back during onResourceStart because it depended on clients already knowing
+    // about elements we've just finished broadcasting above (see RunOrDeferUntilClientSynced)
+    std::vector<std::function<void()>> pendingCallbacks = std::move(m_PendingClientSyncCallbacks);
+    m_PendingClientSyncCallbacks.clear();
+    for (const auto& callback : pendingCallbacks)
+        callback();
 
     // Add us to the running resources list
     m_StartedResources.push_back(this);

@@ -1805,10 +1805,13 @@ int CLuaPedDefs::IsPedDead(lua_State* luaVM)
         // Grab his dead state and return it
         bool bDead = pPed->IsDead() || pPed->IsDying();
 
-        // Check player is already dead on network (#4147)
+        // Cover the window between network death and GTA processing it (#4147).
+        // Don't apply if GTA has already processed a revival (health > 0 and not
+        // in a death task) - IsDeadOnNetwork would be a stale server-side artifact.
         if (auto pPlayer = dynamic_cast<CClientPlayer*>(pPed))
         {
-            bDead = bDead || pPlayer->IsDeadOnNetwork();
+            if (pPlayer->IsDeadOnNetwork() && (pPed->GetHealth() <= 0.0f || bDead))
+                bDead = true;
         }
 
         lua_pushboolean(luaVM, bDead);
@@ -2319,11 +2322,12 @@ int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
 
 float CLuaPedDefs::GetPedAnimationProgress(CClientPed* ped)
 {
-    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
-    std::int32_t type = currentTask->GetTaskType();
+    CTaskManager* taskManager = ped->GetTaskManager();
+    if (!taskManager)
+        return -1.0f;
 
-    // check if animation (task type is 401)
-    if (type != 401)
+    CTask* currentTask = taskManager->GetActiveTask();
+    if (!currentTask || currentTask->GetTaskType() != TASK_SIMPLE_NAMED_ANIM)
         return -1.0f;
 
     auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
@@ -2339,11 +2343,12 @@ float CLuaPedDefs::GetPedAnimationProgress(CClientPed* ped)
 
 float CLuaPedDefs::GetPedAnimationSpeed(CClientPed* ped)
 {
-    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
-    std::int32_t type = currentTask->GetTaskType();
+    CTaskManager* taskManager = ped->GetTaskManager();
+    if (!taskManager)
+        return -1.0f;
 
-    // check if animation (task type is 401)
-    if (type != 401)
+    CTask* currentTask = taskManager->GetActiveTask();
+    if (!currentTask || currentTask->GetTaskType() != TASK_SIMPLE_NAMED_ANIM)
         return -1.0f;
 
     auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
@@ -2359,11 +2364,12 @@ float CLuaPedDefs::GetPedAnimationSpeed(CClientPed* ped)
 
 float CLuaPedDefs::GetPedAnimationLength(CClientPed* ped)
 {
-    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
-    std::int32_t type = currentTask->GetTaskType();
+    CTaskManager* taskManager = ped->GetTaskManager();
+    if (!taskManager)
+        return -1.0f;
 
-    // check if animation (task type is 401)
-    if (type != 401)
+    CTask* currentTask = taskManager->GetActiveTask();
+    if (!currentTask || currentTask->GetTaskType() != TASK_SIMPLE_NAMED_ANIM)
         return -1.0f;
 
     auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
