@@ -180,6 +180,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getCameraMatrix", "getCameraMatrix");
     lua_classfunction(luaVM, "getCameraTarget", "getCameraTarget");
     lua_classfunction(luaVM, "getScriptDebugLevel", "getPlayerScriptDebugLevel");
+    lua_classfunction(luaVM, "getElementsSyncedBy", "getElementsSyncedByPlayer");
 
     lua_classvariable(luaVM, "account", NULL, "getPlayerAccount");
     lua_classvariable(luaVM, "cameraInterior", "setCameraInterior", "getCameraInterior");
