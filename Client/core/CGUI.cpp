@@ -45,6 +45,7 @@ CLocalGUI::CLocalGUI()
     m_LastSettingsRevision = -1;
     m_LocaleChangeCounter = 0;
     m_bHasQueuedLocaleChange = false;
+    m_bPendingRestartPrompt = false;
 }
 
 CLocalGUI::~CLocalGUI()
@@ -104,6 +105,8 @@ void CLocalGUI::SetSkin(const char* szName)
         CreateWindows(guiWasLoaded);
         m_pConsole->SetPosition(consolePos);
         m_pConsole->SetSize(consoleSize);
+        // QuestionBox was destroyed with MainMenu; re-show if settings still need a restart
+        TryShowRestartPrompt();
     }
 
     if (CCore::GetSingleton().GetConsole() && !error.empty())
@@ -143,6 +146,8 @@ void CLocalGUI::ChangeLocale(const char* szName)
         CreateWindows(guiWasLoaded);
         m_pConsole->SetPosition(consolePos);
         m_pConsole->SetSize(consoleSize);
+        // QuestionBox was destroyed with MainMenu; re-show if settings still need a restart
+        TryShowRestartPrompt();
     }
 }
 
@@ -247,6 +252,59 @@ void CLocalGUI::RequestLocaleChange(const SString& strLocale)
         CVARS_SET("locale", m_LastLocaleName);
 }
 
+void CLocalGUI::RequestRestartPrompt()
+{
+    m_bPendingRestartPrompt = true;
+    TryShowRestartPrompt();
+}
+
+void CLocalGUI::TryShowRestartPrompt()
+{
+    if (!m_bPendingRestartPrompt || !m_pMainMenu)
+        return;
+
+    // Wait until locale/skin rebuilds finish so the prompt is not destroyed with MainMenu
+    if (m_bHasQueuedLocaleChange)
+        return;
+
+    SString strCurrentSkinName;
+    CVARS_GET("current_skin", strCurrentSkinName);
+    if (!strCurrentSkinName.empty() && strCurrentSkinName != m_LastSkinName)
+        return;
+
+    CQuestionBox* pQuestionBox = m_pMainMenu->GetQuestionWindow();
+    if (pQuestionBox->IsVisible())
+        return;
+
+    SString strMessage = _("Some settings will be changed when you next start MTA");
+    strMessage += _("\n\nDo you want to restart now?");
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(_("RESTART REQUIRED"));
+    pQuestionBox->SetMessage(strMessage);
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(RestartPromptCallBack);
+    pQuestionBox->Show();
+}
+
+void CLocalGUI::RestartPromptCallBack(void* pData, unsigned int uiButton)
+{
+    CLocalGUI* pLocalGUI = CLocalGUI::GetSingletonPtr();
+    if (!pLocalGUI)
+        return;
+
+    if (CMainMenu* pMainMenu = pLocalGUI->GetMainMenu())
+        pMainMenu->GetQuestionWindow()->Reset();
+
+    pLocalGUI->ClearRestartPrompt();
+
+    if (uiButton == 1)
+    {
+        SetOnQuitCommand("restart");
+        CCore::GetSingleton().Quit();
+    }
+}
+
 void CLocalGUI::ApplyQueuedLocale()
 {
     if (!m_bHasQueuedLocaleChange)
@@ -347,6 +405,9 @@ void CLocalGUI::DoPulse()
         if (m_LocaleChangeCounter >= 5)
             ApplyQueuedLocale();
     }
+
+    // Show after any deferred locale/skin work so a prior prompt is not lost
+    TryShowRestartPrompt();
 }
 
 void CLocalGUI::Draw()

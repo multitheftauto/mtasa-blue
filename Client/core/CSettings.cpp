@@ -2096,29 +2096,10 @@ void CSettings::DestroyGUI()
     ResetGuiPointers();
 }
 
-void RestartCallBack(void* ptr, unsigned int uiButton)
-{
-    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
-
-    if (uiButton == 1)
-    {
-        SetOnQuitCommand("restart");
-        CCore::GetSingleton().Quit();
-    }
-}
-
 void CSettings::ShowRestartQuestion()
 {
-    SString strMessage = _("Some settings will be changed when you next start MTA");
-    strMessage += _("\n\nDo you want to restart now?");
-    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
-    pQuestionBox->Reset();
-    pQuestionBox->SetTitle(_("RESTART REQUIRED"));
-    pQuestionBox->SetMessage(strMessage);
-    pQuestionBox->SetButton(0, _("No"));
-    pQuestionBox->SetButton(1, _("Yes"));
-    pQuestionBox->SetCallback(RestartCallBack);
-    pQuestionBox->Show();
+    // Persist across Interface locale/skin rebuilds (they destroy MainMenu's QuestionBox)
+    CLocalGUI::GetSingleton().RequestRestartPrompt();
 }
 
 void DisconnectCallback(void* ptr, unsigned int uiButton)
