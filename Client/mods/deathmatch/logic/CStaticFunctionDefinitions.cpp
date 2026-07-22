@@ -2064,9 +2064,11 @@ bool CStaticFunctionDefinitions::ShowPlayerHudComponent(eHudComponent component,
     return true;
 }
 
-bool CStaticFunctionDefinitions::IsPlayerHudComponentVisible(eHudComponent component, bool& bOutIsVisible)
+bool CStaticFunctionDefinitions::IsPlayerHudComponentVisible(eHudComponent component, bool& bOutIsVisible, bool bCheckEnabled)
 {
-    bOutIsVisible = g_pGame->GetHud()->IsComponentVisible(component);
+    CHud* hud = g_pGame->GetHud();
+    // Keep the one-argument behaviour compatible with SetComponentVisible. Passing false asks what can actually draw right now.
+    bOutIsVisible = bCheckEnabled ? hud->IsComponentVisible(component) : hud->IsComponentEffectivelyVisible(component);
     return true;
 }
 

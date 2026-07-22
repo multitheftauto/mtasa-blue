@@ -11,7 +11,6 @@
 
 #pragma once
 
-#include <bitset>
 #include <game/CHud.h>
 #include <CVector.h>
 #include <game/RenderWare.h>
@@ -69,8 +68,8 @@ struct SHudComponent
     DWORD         uiDataSize;
     DWORD         origData;
     DWORD         disabledData;
-    // Components rendered inside another HUD component inherit their parent's visibility.
-    eHudComponent parent = HUD_ALL;
+    // A child keeps its own visibility setting, but it still depends on its parent.
+    eHudComponent parent{HUD_ALL};
 };
 
 enum class eHudColour
@@ -180,16 +179,16 @@ class CHudSA : public CHud
 public:
     CHudSA();
     void Disable(bool disabled) override;
-    bool IsDisabled() override;
+    bool IsDisabled() const noexcept override;
     void SetComponentVisible(eHudComponent component, bool bVisible) override;
     bool IsComponentVisible(eHudComponent component) override;
     void AdjustComponents(float fAspectRatio);
     void ResetComponentAdjustment();
     bool IsCrosshairVisible();
 
-    bool IsEnabled() const noexcept override { return m_isEnabled; }
-    void SetSuppressed(eHudSuppressionReason reason, bool suppressed) override;
-    void ResetVisibilityState() override;
+    bool IsRequestedEnabled() const noexcept override { return m_isRequestedEnabled; }
+    void SetSuppressed(bool suppressed) override;
+    bool IsComponentEffectivelyVisible(eHudComponent component) const noexcept override;
 
     bool IsComponentBar(const eHudComponent& component) const noexcept override;
     bool IsComponentText(const eHudComponent& component) const noexcept override;
@@ -308,10 +307,10 @@ private:
 private:
     std::map<eHudComponent, SHudComponent> m_HudComponentMap;
 
-    bool m_isEnabled = true;
-    bool m_isAppliedDisabled = false;
-    // Each temporary owner releases only its own suppression, preserving the state requested through showhud.
-    std::bitset<static_cast<std::size_t>(eHudSuppressionReason::COUNT)> m_suppressionReasons;
+    bool m_isRequestedEnabled{true};
+    bool m_isAppliedDisabled{false};
+    // The player map hides the HUD temporarily, so keep this separate from the showhud preference.
+    bool m_isSuppressed{false};
 
     float* m_pfAspectRatioMultiplicator;
     float* m_pfCameraCrosshairScale;

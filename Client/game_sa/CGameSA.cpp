@@ -453,8 +453,9 @@ void CGameSA::Reset()
 
         Pause(false);  // We don't have to pause as the fadeout will stop the sound. Pausing it will make the fadein next start ugly
 
-        // Restore the HUD
-        m_pHud->ResetVisibilityState();
+        // Reset the showhud preference and clear any temporary suppression left by the player map.
+        m_pHud->Disable(false);
+        m_pHud->SetSuppressed(false);
         m_pHud->SetComponentVisible(HUD_ALL, true);
 
         // Restore model dummies' positions

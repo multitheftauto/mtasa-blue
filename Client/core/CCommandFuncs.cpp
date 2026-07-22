@@ -368,7 +368,7 @@ void CCommandFuncs::HUD(const char* szParameters)
 {
     const int  command = (szParameters && szParameters[0]) ? atoi(szParameters) : -1;
     auto*      hud = g_pCore->GetGame()->GetHud();
-    const bool show = (command == 1) ? true : (command == 0) ? false : !hud->IsEnabled();
+    const bool show = (command == 1) ? true : (command == 0) ? false : !hud->IsRequestedEnabled();
     hud->Disable(!show);
 }
 

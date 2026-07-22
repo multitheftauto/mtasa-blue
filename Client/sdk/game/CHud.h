@@ -57,13 +57,6 @@ enum class eHudComponentProperty
     ALL_PROPERTIES,
 };
 
-enum class eHudSuppressionReason : std::uint8_t
-{
-    PLAYER_MAP,
-
-    COUNT,
-};
-
 enum class eFontStyle : std::uint8_t
 {
     FONT_GOTHIC,
@@ -83,7 +76,7 @@ class CHud
 {
 public:
     virtual void Disable(bool bDisabled) = 0;
-    virtual bool IsDisabled() = 0;
+    virtual bool IsDisabled() const noexcept = 0;
     virtual void SetComponentVisible(eHudComponent component, bool bVisible) = 0;
     virtual bool IsComponentVisible(eHudComponent component) = 0;
     virtual void AdjustComponents(float fAspectRatio) = 0;
@@ -141,8 +134,9 @@ public:
 
     virtual CVector2D GetComponentTextSize(const eHudComponent& component) const = 0;
 
-    // Keep new methods at the end so existing CHud virtual method positions remain stable across client modules.
-    virtual bool IsEnabled() const noexcept = 0;
-    virtual void SetSuppressed(eHudSuppressionReason reason, bool suppressed) = 0;
-    virtual void ResetVisibilityState() = 0;
+    // CHud is used across client modules, so new virtuals stay at the end to avoid moving existing vtable slots.
+    virtual bool IsRequestedEnabled() const noexcept = 0;
+    // The map only hides the HUD temporarily; it should not overwrite the state requested through Disable.
+    virtual void SetSuppressed(bool suppressed) = 0;
+    virtual bool IsComponentEffectivelyVisible(eHudComponent component) const noexcept = 0;
 };

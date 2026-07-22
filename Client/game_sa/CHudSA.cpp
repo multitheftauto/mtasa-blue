@@ -17,6 +17,8 @@
 #include "TaskAttackSA.h"
 #include "CAERadioTrackManagerSA.h"
 
+#include <cstring>
+
 extern CGameSA* pGame;
 
 char szVehicleName[50] = {'\0'};
@@ -98,40 +100,32 @@ CHudSA::CHudSA()
 
 void CHudSA::Disable(bool disabled)
 {
-    const bool enabled = !disabled;
-    if (m_isEnabled == enabled)
+    const bool requestedEnabled = !disabled;
+    if (m_isRequestedEnabled == requestedEnabled)
         return;
 
-    m_isEnabled = enabled;
+    m_isRequestedEnabled = requestedEnabled;
     ApplyVisibilityState();
 }
 
-bool CHudSA::IsDisabled()
+bool CHudSA::IsDisabled() const noexcept
 {
-    return !m_isEnabled || m_suppressionReasons.any();
+    return !m_isRequestedEnabled || m_isSuppressed;
 }
 
-void CHudSA::SetSuppressed(eHudSuppressionReason reason, bool suppressed)
+void CHudSA::SetSuppressed(bool suppressed)
 {
-    const std::size_t index = static_cast<std::size_t>(reason);
-    if (index >= m_suppressionReasons.size() || m_suppressionReasons[index] == suppressed)
+    if (m_isSuppressed == suppressed)
         return;
 
-    m_suppressionReasons.set(index, suppressed);
-    ApplyVisibilityState();
-}
-
-void CHudSA::ResetVisibilityState()
-{
-    m_isEnabled = true;
-    m_suppressionReasons.reset();
+    m_isSuppressed = suppressed;
     ApplyVisibilityState();
 }
 
 void CHudSA::ApplyVisibilityState()
 {
     const bool disabled = IsDisabled();
-    // Avoid rewriting GTA code when overlapping owners do not change the effective HUD state.
+    // Only patch GTA's draw functions when the effective HUD state changes.
     if (m_isAppliedDisabled == disabled)
         return;
 
@@ -140,7 +134,7 @@ void CHudSA::ApplyVisibilityState()
     else
         MemPut<BYTE>(FUNC_Draw, 0x80);
 
-    // The regular HUD draw patch does not cover the fallback radar path used before the local player spawns.
+    // The fallback radar path can still draw before the local player has spawned.
     if (disabled)
         MemPut<BYTE>(FUNC_DrawRadarPlanB, 0xC3);
     else
@@ -228,16 +222,32 @@ void CHudSA::SetComponentVisible(eHudComponent component, bool bVisible)
 //
 bool CHudSA::IsComponentVisible(eHudComponent component)
 {
+    // Keep the old behaviour here: this only reports the value set through SetComponentVisible.
+    // Global HUD state and parent components are handled by IsComponentEffectivelyVisible instead.
+    const auto* hudComponent = MapFind(m_HudComponentMap, component);
+    if (!hudComponent)
+        return false;
+
+    const auto* disabledData = reinterpret_cast<const uchar*>(&hudComponent->disabledData);
+    const auto* currentData = reinterpret_cast<const uchar*>(hudComponent->uiDataAddr);
+    return std::memcmp(currentData, disabledData, hudComponent->uiDataSize) != 0;
+}
+
+//
+// CHudSA::IsComponentEffectivelyVisible
+//
+bool CHudSA::IsComponentEffectivelyVisible(eHudComponent component) const noexcept
+{
     if (IsDisabled())
         return false;
 
-    // A child component cannot render when any containing component in its draw path is disabled.
+    // A child keeps its own setting, but it still cannot draw while one of its parents is hidden.
     auto* currentComponent = MapFind(m_HudComponentMap, component);
     for (std::size_t depth = 0; currentComponent && depth < m_HudComponentMap.size(); ++depth)
     {
         const auto* disabledData = reinterpret_cast<const uchar*>(&currentComponent->disabledData);
         const auto* currentData = reinterpret_cast<const uchar*>(currentComponent->uiDataAddr);
-        if (memcmp(currentData, disabledData, currentComponent->uiDataSize) == 0)
+        if (std::memcmp(currentData, disabledData, currentComponent->uiDataSize) == 0)
             return false;
 
         if (currentComponent->parent == HUD_ALL)
@@ -246,7 +256,7 @@ bool CHudSA::IsComponentVisible(eHudComponent component)
         currentComponent = MapFind(m_HudComponentMap, currentComponent->parent);
     }
 
-    // Bound parent traversal so malformed component metadata cannot make a visibility query loop forever.
+    // Stop after one pass through the component map in case bad parent data ever creates a loop.
     return false;
 }
 
