@@ -3642,7 +3642,20 @@ void CClientPed::_CreateModel()
     // Replace the loaded model info with the model we're going to load and
     // add a reference to it.
     m_pLoadedModelInfo = m_pModelInfo;
+    if (!m_pLoadedModelInfo)
+    {
+        NotifyUnableToCreate();
+        return;
+    }
+
     m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_CreateModel");
+    if (!m_pLoadedModelInfo->GetRwObject())
+    {
+        m_pLoadedModelInfo->RemoveRef();
+        m_pLoadedModelInfo = nullptr;
+        NotifyUnableToCreate();
+        return;
+    }
 
     // Create the new ped
     m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(this, m_ulModel));
@@ -3778,7 +3791,20 @@ void CClientPed::_CreateLocalModel()
 
         // Add a reference to the model we're using
         m_pLoadedModelInfo = m_pModelInfo;
+        if (!m_pLoadedModelInfo)
+        {
+            NotifyUnableToCreate();
+            return;
+        }
+
         m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_CreateLocalModel");
+        if (!m_pLoadedModelInfo->GetRwObject())
+        {
+            m_pLoadedModelInfo->RemoveRef();
+            m_pLoadedModelInfo = nullptr;
+            NotifyUnableToCreate();
+            return;
+        }
 
         // Make sure we are CJ
         if (m_pPlayerPed->GetModelIndex() != m_ulModel)
@@ -3912,12 +3938,20 @@ void CClientPed::_DestroyLocalModel()
     // Make sure we are CJ again
     if (m_pPlayerPed->GetModelIndex() != 0)
     {
-        m_pPlayerPed->SetModelIndex(0);
+        auto* pDefaultModelInfo = g_pGame->GetModelInfo(0);
+        if (pDefaultModelInfo && pDefaultModelInfo->GetRwObject())
+            m_pPlayerPed->SetModelIndex(0);
     }
 
-    // Remove reference to our previous model
-    m_pLoadedModelInfo->RemoveRef();
-    m_pLoadedModelInfo = NULL;
+    // Remove reference to our previous model.
+    // Always release regardless of whether the default model was restored;
+    // the ped is being abandoned by MTA here, and GTA's native ped ref still protects
+    // the model from streaming eviction if SetModelIndex(0) was not possible.
+    if (m_pLoadedModelInfo)
+    {
+        m_pLoadedModelInfo->RemoveRef();
+        m_pLoadedModelInfo = nullptr;
+    }
 
     // NULL our pointers, we don't destroy the local player
     m_pPlayerPed = NULL;
@@ -3929,6 +3963,32 @@ void CClientPed::_ChangeModel()
     // Different model than before?
     if (m_pPlayerPed->GetModelIndex() != m_ulModel)
     {
+        CModelInfo* pLoadedModel = nullptr;
+        if (m_bIsLocalPlayer)
+        {
+            // Remember the model we had loaded and store the new model we're going to load
+            pLoadedModel = m_pLoadedModelInfo;
+            m_pLoadedModelInfo = m_pModelInfo;
+            if (!m_pLoadedModelInfo)
+            {
+                m_pLoadedModelInfo = pLoadedModel;
+                if (m_clientModel && m_clientModel->GetModelID() != m_ulModel)
+                    m_clientModel = nullptr;
+                return;
+            }
+
+            // Add reference to the model
+            m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_ChangeModel");
+            if (!m_pLoadedModelInfo->GetRwObject())
+            {
+                m_pLoadedModelInfo->RemoveRef();
+                m_pLoadedModelInfo = pLoadedModel;
+                if (m_clientModel && m_clientModel->GetModelID() != m_ulModel)
+                    m_clientModel = nullptr;
+                return;
+            }
+        }
+
         g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter(false);
 
         // We need to reset visual stats when changing from CJ model
@@ -3976,13 +4036,6 @@ void CClientPed::_ChangeModel()
             // Takes care of clothes/task issues
             Respawn(NULL, true, false);
 
-            // Remember the model we had loaded and store the new model we're going to load
-            CModelInfo* pLoadedModel = m_pLoadedModelInfo;
-            m_pLoadedModelInfo = m_pModelInfo;
-
-            // Add reference to the model
-            m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_ChangeModel");
-
             // Set the new player model and restore the interior
             m_pPlayerPed->SetModelIndex(m_ulModel);
 
@@ -3996,7 +4049,8 @@ void CClientPed::_ChangeModel()
             }
 
             // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
-            pLoadedModel->RemoveRef(true);
+            if (pLoadedModel)
+                pLoadedModel->RemoveRef(true);
             pLoadedModel = NULL;
 
             // Warp into it again
@@ -5359,7 +5413,7 @@ void CClientPed::Say(const ePedSpeechContext& speechId, float probability)
 
 const char* CClientPed::GetBodyPartName(unsigned char ucID)
 {
-    if (ucID <= 10)
+    if (ucID < 10)
     {
         return BodyPartNames[ucID].szName;
     }

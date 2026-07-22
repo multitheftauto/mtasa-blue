@@ -14,19 +14,19 @@
 #include "CPacket.h"
 #include <vector>
 
+constexpr unsigned short MAX_VOICE_BUFFER_SIZE = 2048;
+constexpr long long      VOICE_PACKET_INTERVAL_MS = 100;
+constexpr unsigned char  MAX_VOICE_PACKETS_PER_INTERVAL = 5;
+
 class CVoiceDataPacket final : public CPacket
 {
 public:
-    CVoiceDataPacket();
-
     ePacketID               GetPacketID() const { return PACKET_ID_VOICE_DATA; }
     unsigned long           GetFlags() const { return PACKET_LOW_PRIORITY | PACKET_SEQUENCED; };
     virtual ePacketOrdering GetPacketOrdering() const { return PACKET_ORDERING_VOICE; }
 
     bool Read(NetBitStreamInterface& BitStream);
     bool Write(NetBitStreamInterface& BitStream) const;
-
-    void SetVoiceData(const unsigned char* voiceBuffer, unsigned short voiceBufferLength);
 
     bool IsEmpty() const noexcept { return m_voiceBuffer.empty(); }
 

@@ -4053,6 +4053,9 @@ void CGame::Packet_Voice_End(CVoiceEndPacket& Packet)
 
         if (pPlayer)
         {
+            if (pPlayer->GetVoiceState() == VOICESTATE_IDLE)
+                return;
+
             CLuaArguments Arguments;
             pPlayer->CallEvent("onPlayerVoiceStop", Arguments, pPlayer);
 
