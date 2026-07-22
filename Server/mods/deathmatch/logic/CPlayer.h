@@ -261,7 +261,18 @@ public:
     bool IsRedirecting() const noexcept { return m_bIsRedirecting; }
 
     bool GetTeleported() const noexcept { return m_teleported; }
-    void SetTeleported(bool state) noexcept { m_teleported = state; }
+    void SetTeleported(bool state) noexcept;
+
+    CVehicle* SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat) override;
+
+    // Anti-cheat: last accepted on-foot puresync position used to reject forged position-only sync.
+    bool               HasLastAcceptedPuresyncPosition() const noexcept { return m_bHasLastAcceptedPuresyncPosition; }
+    const CVector&     GetLastAcceptedPuresyncPosition() const noexcept { return m_vecLastAcceptedPuresyncPosition; }
+    unsigned long long GetLastAcceptedPuresyncTick() const noexcept { return m_ullLastAcceptedPuresyncTick; }
+    ElementID          GetLastAcceptedPuresyncContactElementID() const noexcept { return m_LastAcceptedPuresyncContactElementID; }
+    const CVector&     GetLastAcceptedPuresyncContactRelative() const noexcept { return m_vecLastAcceptedPuresyncContactRelative; }
+    void               NoteAcceptedPuresyncPosition(const CVector& vecAbsolutePosition, CElement* pContactElement, const CVector& vecRelativePosition);
+    void               ResetPuresyncMovementGuard() noexcept;
 
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
@@ -463,4 +474,10 @@ private:
     SString m_strQuitReasonForLog;
 
     bool m_teleported = false;
+
+    bool               m_bHasLastAcceptedPuresyncPosition = false;
+    CVector            m_vecLastAcceptedPuresyncPosition;
+    unsigned long long m_ullLastAcceptedPuresyncTick = 0;
+    ElementID          m_LastAcceptedPuresyncContactElementID = INVALID_ELEMENT_ID;
+    CVector            m_vecLastAcceptedPuresyncContactRelative;
 };

@@ -65,6 +65,14 @@ public:
     // Flag
     bool m_bDoneFirstUpdate;
 
+    // Anti-cheat: mirror CPlayer puresync movement guard for sim-thread relay validation
+    bool               m_bHasLastAcceptedPuresyncPosition = false;
+    CVector            m_vecLastAcceptedPuresyncPosition;
+    unsigned long long m_ullLastAcceptedPuresyncTick = 0;
+    ElementID          m_LastAcceptedPuresyncContactElementID = INVALID_ELEMENT_ID;
+    CVector            m_vecLastAcceptedPuresyncContactRelative;
+    bool               m_bTeleported = false;
+
     // Interlink to CPlayer object
     CPlayer* m_pRealPlayer;
 };

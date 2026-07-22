@@ -61,6 +61,11 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
         SPositionSync position(false);
         if (!BitStream.Read(&position))
             return false;
+
+        // Reject NaN/Inf coordinates before relaying them to nearby players (SPositionSync only range-checks).
+        if (!position.data.vecPosition.IsValid())
+            return false;
+
         m_Cache.PlrPosition = position.data.vecPosition;
 
         if (CVehicleManager::GetVehicleType(static_cast<unsigned short>(m_Cache.iModelID)) == VEHICLE_TRAIN)

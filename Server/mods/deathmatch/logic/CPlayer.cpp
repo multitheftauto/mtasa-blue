@@ -1112,6 +1112,49 @@ void CPlayer::SetPosition(const CVector& vecPosition)
     CElement::SetPosition(vecPosition);
 }
 
+void CPlayer::SetTeleported(bool state) noexcept
+{
+    m_teleported = state;
+    // Authorized warps must not inherit a stale on-foot baseline from before the teleport.
+    if (state)
+        ResetPuresyncMovementGuard();
+}
+
+CVehicle* CPlayer::SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat)
+{
+    CVehicle* pResult = CPed::SetOccupiedVehicle(pVehicle, uiSeat);
+    // Vehicle puresync replaces on-foot puresync; drop the baseline so exiting the vehicle
+    // does not compare against a position from before the ride.
+    if (pVehicle)
+        ResetPuresyncMovementGuard();
+    return pResult;
+}
+
+void CPlayer::NoteAcceptedPuresyncPosition(const CVector& vecAbsolutePosition, CElement* pContactElement, const CVector& vecRelativePosition)
+{
+    m_vecLastAcceptedPuresyncPosition = vecAbsolutePosition;
+    m_ullLastAcceptedPuresyncTick = GetTickCount64_();
+    m_bHasLastAcceptedPuresyncPosition = true;
+    m_teleported = false;
+
+    if (pContactElement && pContactElement->GetType() == CElement::VEHICLE)
+    {
+        m_LastAcceptedPuresyncContactElementID = pContactElement->GetID();
+        m_vecLastAcceptedPuresyncContactRelative = vecRelativePosition;
+    }
+    else
+    {
+        m_LastAcceptedPuresyncContactElementID = INVALID_ELEMENT_ID;
+    }
+}
+
+void CPlayer::ResetPuresyncMovementGuard() noexcept
+{
+    m_bHasLastAcceptedPuresyncPosition = false;
+    m_ullLastAcceptedPuresyncTick = 0;
+    m_LastAcceptedPuresyncContactElementID = INVALID_ELEMENT_ID;
+}
+
 void CPlayer::SetPlayerStat(unsigned short usStat, float fValue)
 {
     m_pPlayerStatsPacket->Add(usStat, fValue);
