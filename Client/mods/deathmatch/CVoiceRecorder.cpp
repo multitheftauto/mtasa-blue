@@ -247,13 +247,13 @@ void CVoiceRecorder::DoPulse()
 {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    unsigned char* pInputBuffer;
-    unsigned char  audioBuffer[2048]{};
-    unsigned int   uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
-
     // Only send every 100 ms
     if (CClientTime::GetTime() - m_ulTimeOfLastSend > 100 && m_VoiceState != VOICESTATE_AWAITING_INPUT)
     {
+        unsigned char* pInputBuffer;
+        unsigned char  audioBuffer[2048]{};
+        unsigned int   uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
+
         m_bIsSendingVoiceData = false;
         unsigned int uiBytesAvailable = 0;
 
