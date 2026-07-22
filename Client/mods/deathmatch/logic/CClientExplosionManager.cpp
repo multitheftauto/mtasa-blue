@@ -23,6 +23,7 @@ CClientExplosionManager::CClientExplosionManager(CClientManager* pManager)
     m_pManager = pManager;
     m_LastWeaponType = WEAPONTYPE_UNARMED;
     m_pLastCreator = NULL;
+    m_vecLastPosition = CVector();
 }
 
 CClientExplosionManager::~CClientExplosionManager()
@@ -80,6 +81,9 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
             return false;
 
         eWeaponType explosionWeaponType = GetWeaponTypeFromExplosionType(explosionType);
+        m_LastWeaponType = explosionWeaponType;
+        m_vecLastPosition = vecPosition;
+        m_pLastCreator = localPlayer;
 
         CLuaArguments arguments;
         arguments.PushNumber(vecPosition.fX);
@@ -142,6 +146,13 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
             vehicle->SetBlowState(VehicleBlowState::BLOWN);
         }
 
+        if (allowExplosion)
+        {
+            m_LastWeaponType = explosionWeaponType;
+            m_vecLastPosition = vecPosition;
+            m_pLastCreator = pResponsible;
+        }
+
         return allowExplosion;
     }
 
@@ -196,8 +207,8 @@ CExplosion* CClientExplosionManager::Create(eExplosionType explosionType, CVecto
     if (pCreator)
         pGameCreator = pCreator->GetGameEntity();
 
-    // Update our records first?
     m_pLastCreator = pCreator;
+    m_vecLastPosition = vecPosition;
     if (responsibleWeapon != WEAPONTYPE_UNARMED)
         m_LastWeaponType = responsibleWeapon;
     else

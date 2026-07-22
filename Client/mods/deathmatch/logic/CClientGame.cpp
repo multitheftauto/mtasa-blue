@@ -4833,6 +4833,22 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         }
 
         CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
+        CVector        vecEventDamagePos = vecDamagePos;
+
+        // SA reports weapon 51 / pos (0,0,0) for all explosion damage
+        if (weaponType == WEAPONTYPE_EXPLOSION)
+        {
+            CClientExplosionManager* pExplosionManager = m_pManager->GetExplosionManager();
+            CClientEntity*           pLastExplosionCreator = pExplosionManager->m_pLastCreator;
+
+            if (!pClientAttacker && pLastExplosionCreator)
+                pClientAttacker = pLastExplosionCreator;
+
+            weaponType = pExplosionManager->m_LastWeaponType;
+
+            if (vecEventDamagePos.fX == 0.0f && vecEventDamagePos.fY == 0.0f && vecEventDamagePos.fZ == 0.0f)
+                vecEventDamagePos = pExplosionManager->m_vecLastPosition;
+        }
 
         // Compose arguments
         // attacker, weapon, loss, damagepos, tyreIdx
@@ -4846,9 +4862,9 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         else
             Arguments.PushNil();
         Arguments.PushNumber(fLoss);
-        Arguments.PushNumber(vecDamagePos.fX);
-        Arguments.PushNumber(vecDamagePos.fY);
-        Arguments.PushNumber(vecDamagePos.fZ);
+        Arguments.PushNumber(vecEventDamagePos.fX);
+        Arguments.PushNumber(vecEventDamagePos.fY);
+        Arguments.PushNumber(vecEventDamagePos.fZ);
         if (ucTyre != UCHAR_INVALID_INDEX)
             Arguments.PushNumber(ucTyre);
         else
