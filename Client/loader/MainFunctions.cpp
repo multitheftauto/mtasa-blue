@@ -1636,44 +1636,51 @@ void CheckDataFiles()
     }
 
     // Check for possible virus activity (simple file hash check)
-    struct IntegrityCheck
+    if (!Wine::IsRunningOnWine())
     {
-        const char* hash;
-        const char* fileName;
-    };
+        struct IntegrityCheck
+        {
+            const char* hash;
+            const char* fileName;
+        };
 
-    static const IntegrityCheck integrityCheckList[] = {
-        {"DE5C08577EAA65309974F9860E303F53", "bass.dll"},           {"1D5A1AEF041255DEA49CD4780CAE4CCC", "bass_aac.dll"},
-        {"8A1AC2AAD7F1691943635CA42F7F2940", "bass_ac3.dll"},       {"61C38C1FD091375F2A30EC631DF337E6", "bass_fx.dll"},
-        {"F47DCE69DAFAA06A55A4BC1F07F80C8A", "bassflac.dll"},       {"49A603ED114982787FC0A301C0E93FDB", "bassmidi.dll"},
-        {"064398B1A74B4EF35902F0C218142133", "bassmix.dll"},        {"9CFA31A873FF89C2CC491B9974FC5C65", "bassopus.dll"},
-        {"B35714019BBFF0D0CEE0AFA2637A77A7", "basswebm.dll"},       {"1507C60C02E159B5FB247FEC6B209B09", "basswma.dll"},
-        {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
-        {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"4B3932359373F11CBC542CC96D9A9285", "tags.dll"},
-        {"0B3DD892007FB366D1F52F2247C046F5", "d3dcompiler_43.dll"}, {"D5D8C8561C6DDA7EF0D7D6ABB0D772F4", "xinput1_3_mta.dll"},
+        static const IntegrityCheck integrityCheckList[] = {
+            {"DE5C08577EAA65309974F9860E303F53", "bass.dll"},           {"1D5A1AEF041255DEA49CD4780CAE4CCC", "bass_aac.dll"},
+            {"8A1AC2AAD7F1691943635CA42F7F2940", "bass_ac3.dll"},       {"61C38C1FD091375F2A30EC631DF337E6", "bass_fx.dll"},
+            {"F47DCE69DAFAA06A55A4BC1F07F80C8A", "bassflac.dll"},       {"49A603ED114982787FC0A301C0E93FDB", "bassmidi.dll"},
+            {"064398B1A74B4EF35902F0C218142133", "bassmix.dll"},        {"9CFA31A873FF89C2CC491B9974FC5C65", "bassopus.dll"},
+            {"B35714019BBFF0D0CEE0AFA2637A77A7", "basswebm.dll"},       {"1507C60C02E159B5FB247FEC6B209B09", "basswma.dll"},
+            {"C6A44FC3CF2F5801561804272217B14D", "D3DX9_42.dll"},       {"D439E8EDD8C93D7ADE9C04BCFE9197C6", "sa.dat"},
+            {"B33B21DB610116262D906305CE65C354", "D3DCompiler_42.dll"}, {"4B3932359373F11CBC542CC96D9A9285", "tags.dll"},
+            {"0B3DD892007FB366D1F52F2247C046F5", "d3dcompiler_43.dll"}, {"D5D8C8561C6DDA7EF0D7D6ABB0D772F4", "xinput1_3_mta.dll"},
 #ifdef MTA_MAETRO
-        {"E1677EC0E21E27405E65E31419980348", "d3dcompiler_47.dll"},
+            {"E1677EC0E21E27405E65E31419980348", "d3dcompiler_47.dll"},
 #else
-        {"2C0C596EE071B93CE15130BD5EE9CD31", "d3dcompiler_47.dll"},
+            {"2C0C596EE071B93CE15130BD5EE9CD31", "d3dcompiler_47.dll"},
 #endif
-        {"F1CA5A1E77965777AC26A81EAF345A7A", "XInput9_1_0_mta.dll"}};
+            {"F1CA5A1E77965777AC26A81EAF345A7A", "XInput9_1_0_mta.dll"}};
 
-    for (uint i = 0; i < NUMELMS(integrityCheckList); ++i)
+        for (uint i = 0; i < NUMELMS(integrityCheckList); ++i)
+        {
+            const IntegrityCheck& check = integrityCheckList[i];
+            const SString         filePath = PathJoin(strMTASAPath, "mta", check.fileName);
+            if (!ValidatePath(filePath) || !FileExists(filePath))
+            {
+                DisplayErrorMessageBox(SString(_("Data file %s is missing. Possible virus activity."), check.fileName), _E("CL30"), "maybe-virus2");
+                break;
+            }
+
+            const SString computed = CMD5Hasher::CalculateHexString(filePath);
+            if (!computed.CompareI(check.hash))
+            {
+                DisplayErrorMessageBox(SString(_("Data file %s is modified. Possible virus activity."), check.fileName), _E("CL30"), "maybe-virus2");
+                break;
+            }
+        }
+    }
+    else
     {
-        const IntegrityCheck& check = integrityCheckList[i];
-        const SString         filePath = PathJoin(strMTASAPath, "mta", check.fileName);
-        if (!ValidatePath(filePath) || !FileExists(filePath))
-        {
-            DisplayErrorMessageBox(SString(_("Data file %s is missing. Possible virus activity."), check.fileName), _E("CL30"), "maybe-virus2");
-            break;
-        }
-
-        const SString computed = CMD5Hasher::CalculateHexString(filePath);
-        if (!computed.CompareI(check.hash))
-        {
-            DisplayErrorMessageBox(SString(_("Data file %s is modified. Possible virus activity."), check.fileName), _E("CL30"), "maybe-virus2");
-            break;
-        }
+        WriteDebugEvent("Skipping file hash integrity check under Wine");
     }
 
     // Check for ASI files
@@ -1866,6 +1873,9 @@ int LaunchGame(SString strCmdLine)
     }
 
     SetDllDirectory(PathJoin(strMTASAPath, "mta"));
+
+    if (Wine::IsRunningOnWine())
+        SetEnvironmentVariableA("MTA_UNDER_WINE", "1");
 
 #if MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
     if (!CheckService(CHECK_SERVICE_PRE_CREATE) && !IsUserAdmin())
