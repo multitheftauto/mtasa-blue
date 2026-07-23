@@ -112,6 +112,10 @@ void CChat::OnModLoad()
 {
     // Set handlers
     m_pManager->SetCharacterKeyHandler(INPUT_MOD, GUI_CALLBACK_KEY(&CChat::CharacterKeyHandler, this));
+    m_pManager->SetKeyDownHandler(INPUT_MOD, GUI_CALLBACK_KEY(&CChat::SpecialKeyHandler, this));
+    m_pManager->SetMouseButtonDownHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CChat::OnInputMouseDown, this));
+    m_pManager->SetMouseMoveHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CChat::OnInputMouseMove, this));
+    m_pManager->SetMouseButtonUpHandler(INPUT_MOD, GUI_CALLBACK_MOUSE(&CChat::OnInputMouseUp, this));
 }
 
 void CChat::LoadCVars()
@@ -387,6 +391,8 @@ void CChat::DrawInputLine(bool bUsingOutline)
         bool      bInputShadow = (m_InputColor.A * m_fInputBackgroundAlpha == 0.f) && !bUsingOutline;
         CVector2D vecPosition(m_vecInputPosition.fX + (5.0f * m_vecScale.fX), m_vecInputPosition.fY + (fLineDifference * 0.125f));
         m_InputLine.Draw(vecPosition, 255, bInputShadow, bUsingOutline);
+
+        DrawInputCaretAndSelection();
     }
 }
 
@@ -520,6 +526,8 @@ void CChat::ClearInput()
 {
     m_strInputText.clear();
     m_InputLine.Clear();
+    m_iCaretIndex = m_iSelectionAnchor = 0;
+    m_bMouseSelecting = false;
     m_vecInputSize = CalcInputSize();
 
     if (m_pInput)
@@ -593,6 +601,9 @@ void CChat::SelectInputHistoryEntry(int iEntry)
         if (!strSelectedInputHistoryEntry.empty())
             SetInputText(strSelectedInputHistoryEntry.c_str());
     }
+
+    // Place the caret at the end of the loaded text
+    m_iCaretIndex = m_iSelectionAnchor = static_cast<int>(MbUTF8ToUTF16(m_strInputText).size());
 }
 
 bool CChat::SetNextHistoryText()
@@ -632,13 +643,10 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
     {
         case VK_BACK:
         {
-            if (m_strInputText.size() > 0)
-            {
-                // Convert our string to UTF8 before resizing, then back to ANSI.
-                std::wstring strText = MbUTF8ToUTF16(m_strInputText);
-                strText.resize(strText.size() - 1);
-                SetInputText(UTF16ToMbUTF8(strText).c_str());
-            }
+            if (HasSelection())
+                DeleteSelection();
+            else
+                DeleteCharBeforeCaret();
             break;
         }
 
@@ -744,6 +752,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                                 m_strLastPlayerNamePart = strPlayerNamePart;
                                 m_strLastPlayerName = strPlayerName;
                                 SetInputText(strOutput);
+                                m_iCaretIndex = m_iSelectionAnchor = static_cast<int>(MbUTF8ToUTF16(m_strInputText).size());
                             }
 
                             break;
@@ -770,68 +779,385 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
 
             if (KeyboardArgs.codepoint == 127)  // "delete" char, used to remove the previous word from input
             {
-                if (m_strInputText.size() > 0)
-                {
-                    // Convert our string to UTF8 before resizing, then back to ANSI.
-                    std::wstring      wstrText = MbUTF8ToUTF16(m_strInputText);
-                    std::wstring_view wstrTextView = wstrText;
-
-                    if (wstrTextView.back() == L' ' || wstrTextView.back() == L'-')
-                    {
-                        size_t lastPos = wstrTextView.find_last_not_of(wstrTextView.back());
-                        if (lastPos != std::string::npos)
-                            wstrTextView.remove_suffix(wstrTextView.size() - lastPos);
-                        else
-                            wstrText.clear();
-                    }
-
-                    size_t lastSpacePos = wstrTextView.find_last_of(L' ');
-                    size_t lastDashPos = wstrTextView.find_last_of(L'-');
-                    size_t lastPos = lastSpacePos;
-
-                    if ((lastSpacePos == std::string::npos || lastDashPos > lastSpacePos) && lastDashPos != std::string::npos)
-                        lastPos = lastDashPos;
-
-                    if (lastPos != std::string::npos)
-                        wstrText.resize(lastPos + 1);
-                    else
-                        wstrText.clear();
-
-                    SetInputText(UTF16ToMbUTF8(wstrText).c_str());
-                }
+                if (HasSelection())
+                    DeleteSelection();
+                else
+                    DeleteWordBeforeCaret();
                 break;
             }
 
-            // If we haven't exceeded the maximum number of characters per chat message, append the char to the message and update the input control
-            if (MbUTF8ToUTF16(m_strInputText).size() < static_cast<std::size_t>(m_iCharacterLimit))
+            // If we haven't exceeded the maximum number of characters per chat message, insert the char at the caret
+            if (KeyboardArgs.codepoint >= 32 && MbUTF8ToUTF16(m_strInputText).size() < static_cast<std::size_t>(m_iCharacterLimit))
             {
-                if (KeyboardArgs.codepoint >= 32)
-                {
-                    unsigned int uiCharacter = KeyboardArgs.codepoint;
-                    if (uiCharacter < 127)  // we have any char from ASCII
-                    {
-                        // injecting as is
-                        m_strInputText += static_cast<char>(KeyboardArgs.codepoint);
-                        SetInputText(m_strInputText.c_str());
-                    }
-                    else  // we have any char from Extended ASCII, any ANSI code page or UNICODE range
-                    {
-                        // Generate a null-terminating string for our character
-                        wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiCharacter), '\0'};
-
-                        // Convert our UTF character into an ANSI string
-                        std::string strANSI = UTF16ToMbUTF8(wUNICODE);
-
-                        // Append the ANSI string, and update
-                        m_strInputText.append(strANSI);
-                        SetInputText(m_strInputText.c_str());
-                    }
-                }
+                wchar_t wch = static_cast<wchar_t>(KeyboardArgs.codepoint);
+                InsertTextAtCaret(std::wstring(1, wch));
             }
             break;
         }
     }
     return true;
+}
+
+void CChat::GetSelectionRange(int& iStart, int& iEnd) const
+{
+    iStart = std::min(m_iCaretIndex, m_iSelectionAnchor);
+    iEnd = std::max(m_iCaretIndex, m_iSelectionAnchor);
+}
+
+int CChat::ClampCaretIndex(int iIndex) const
+{
+    int iLength = static_cast<int>(MbUTF8ToUTF16(m_strInputText).size());
+    return Clamp(0, iIndex, iLength);
+}
+
+void CChat::SetCaretPosition(int iNewCaret, bool bExtendSelection)
+{
+    m_iCaretIndex = ClampCaretIndex(iNewCaret);
+    if (!bExtendSelection)
+        m_iSelectionAnchor = m_iCaretIndex;
+    m_fCaretBlinkTimer = GetSecondCount();  // Reset blink phase so the caret is solid right after moving
+}
+
+// Finds the index you land on when skipping one word, starting from iFromIndex, in the given direction.
+// Mirrors the heuristic already used by the existing Ctrl+Backspace word-delete (space/dash boundaries).
+int CChat::FindWordBoundary(const std::wstring& wstrText, int iFromIndex, bool bForward) const
+{
+    int iLength = static_cast<int>(wstrText.size());
+    int i = Clamp(0, iFromIndex, iLength);
+
+    auto IsBoundaryChar = [](wchar_t wch) { return wch == L' ' || wch == L'-'; };
+
+    if (bForward)
+    {
+        while (i < iLength && IsBoundaryChar(wstrText[i]))
+            i++;
+        while (i < iLength && !IsBoundaryChar(wstrText[i]))
+            i++;
+    }
+    else
+    {
+        while (i > 0 && IsBoundaryChar(wstrText[i - 1]))
+            i--;
+        while (i > 0 && !IsBoundaryChar(wstrText[i - 1]))
+            i--;
+    }
+    return i;
+}
+
+void CChat::DeleteSelection()
+{
+    int iStart, iEnd;
+    GetSelectionRange(iStart, iEnd);
+    if (iStart == iEnd)
+        return;
+
+    std::wstring wstrText = MbUTF8ToUTF16(m_strInputText);
+    wstrText.erase(iStart, iEnd - iStart);
+    SetInputText(UTF16ToMbUTF8(wstrText).c_str());
+    SetCaretPosition(iStart, false);
+}
+
+void CChat::DeleteCharBeforeCaret()
+{
+    if (m_iCaretIndex <= 0)
+        return;
+
+    std::wstring wstrText = MbUTF8ToUTF16(m_strInputText);
+    wstrText.erase(m_iCaretIndex - 1, 1);
+    SetInputText(UTF16ToMbUTF8(wstrText).c_str());
+    SetCaretPosition(m_iCaretIndex - 1, false);
+}
+
+void CChat::DeleteCharAfterCaret()
+{
+    std::wstring wstrText = MbUTF8ToUTF16(m_strInputText);
+    if (m_iCaretIndex >= static_cast<int>(wstrText.size()))
+        return;
+
+    wstrText.erase(m_iCaretIndex, 1);
+    SetInputText(UTF16ToMbUTF8(wstrText).c_str());
+    SetCaretPosition(m_iCaretIndex, false);
+}
+
+void CChat::DeleteWordBeforeCaret()
+{
+    if (m_iCaretIndex <= 0)
+        return;
+
+    std::wstring wstrText = MbUTF8ToUTF16(m_strInputText);
+    int          iWordStart = FindWordBoundary(wstrText, m_iCaretIndex, false);
+    wstrText.erase(iWordStart, m_iCaretIndex - iWordStart);
+    SetInputText(UTF16ToMbUTF8(wstrText).c_str());
+    SetCaretPosition(iWordStart, false);
+}
+
+void CChat::InsertTextAtCaret(const std::wstring& wstrInsertText)
+{
+    if (wstrInsertText.empty())
+        return;
+
+    if (HasSelection())
+        DeleteSelection();
+
+    std::wstring wstrText = MbUTF8ToUTF16(m_strInputText);
+    int          iLength = static_cast<int>(wstrText.size());
+    int          iCaret = Clamp(0, m_iCaretIndex, iLength);
+
+    // Respect the character limit: only insert as much as fits
+    int iAvailable = static_cast<int>(m_iCharacterLimit) - iLength;
+    if (iAvailable <= 0)
+        return;
+
+    std::wstring wstrClipped = wstrInsertText.substr(0, std::min<size_t>(wstrInsertText.size(), static_cast<size_t>(iAvailable)));
+    wstrText.insert(iCaret, wstrClipped);
+    SetInputText(UTF16ToMbUTF8(wstrText).c_str());
+    SetCaretPosition(iCaret + static_cast<int>(wstrClipped.size()), false);
+}
+
+bool CChat::SpecialKeyHandler(CGUIKeyEventArgs KeyboardArgs)
+{
+    if (!CanTakeInput())
+        return false;
+
+    bool bShift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
+    bool bCtrl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+
+    std::wstring wstrText = MbUTF8ToUTF16(m_strInputText);
+
+    switch (KeyboardArgs.scancode)
+    {
+        case CGUIKeys::ArrowLeft:
+        {
+            int iNewCaret = bCtrl ? FindWordBoundary(wstrText, m_iCaretIndex, false) : m_iCaretIndex - 1;
+            SetCaretPosition(iNewCaret, bShift);
+            return true;
+        }
+        case CGUIKeys::ArrowRight:
+        {
+            int iNewCaret = bCtrl ? FindWordBoundary(wstrText, m_iCaretIndex, true) : m_iCaretIndex + 1;
+            SetCaretPosition(iNewCaret, bShift);
+            return true;
+        }
+        case CGUIKeys::Home:
+            SetCaretPosition(0, bShift);
+            return true;
+        case CGUIKeys::End:
+            SetCaretPosition(static_cast<int>(wstrText.size()), bShift);
+            return true;
+        case CGUIKeys::Delete:
+            if (HasSelection())
+                DeleteSelection();
+            else
+                DeleteCharAfterCaret();
+            return true;
+        case CGUIKeys::A:
+            if (bCtrl)
+            {
+                m_iSelectionAnchor = 0;
+                m_iCaretIndex = static_cast<int>(wstrText.size());
+                return true;
+            }
+            break;
+        case CGUIKeys::C:
+        case CGUIKeys::X:
+            if (bCtrl && HasSelection())
+            {
+                int iStart, iEnd;
+                GetSelectionRange(iStart, iEnd);
+                SString strSelected = UTF16ToMbUTF8(wstrText.substr(iStart, iEnd - iStart));
+                if (!strSelected.empty())
+                    SharedUtil::SetClipboardText(strSelected);
+
+                if (KeyboardArgs.scancode == CGUIKeys::X)
+                    DeleteSelection();
+                return true;
+            }
+            break;
+        case CGUIKeys::V:
+            if (bCtrl)
+            {
+                SString strClipboard = SharedUtil::GetClipboardText();
+                strClipboard = strClipboard.Replace("\r\n", " ").Replace("\n", " ").Replace("\r", " ");
+                if (!strClipboard.empty())
+                    InsertTextAtCaret(MbUTF8ToUTF16(strClipboard));
+                return true;
+            }
+            break;
+        default:
+            break;
+    }
+    return false;
+}
+
+// Returns the wrapped visual lines of the current input text (m_Sections[0] followed by each extra line),
+// matching the wrap already computed by SetInputText/CChatLine::Format. Known limitation: a space character
+// consumed at a wrap point isn't preserved, so for very long (wrapped) messages the mapping can drift by up
+// to one character per wrapped line.
+void CChat::GetWrappedLineTexts(std::vector<std::wstring>& outLines) const
+{
+    outLines.clear();
+    if (!m_InputLine.GetSections().empty())
+        outLines.push_back(MbUTF8ToUTF16(m_InputLine.GetSections()[0].GetText()));
+    else
+        outLines.push_back(std::wstring());
+
+    for (const auto& line : m_InputLine.m_ExtraLines)
+    {
+        if (!line.GetSections().empty())
+            outLines.push_back(MbUTF8ToUTF16(line.GetSections()[0].GetText()));
+        else
+            outLines.push_back(std::wstring());
+    }
+}
+
+void CChat::MapCaretIndexToLineAndX(int iCaretIndex, int& outLineIndex, float& outX) const
+{
+    std::vector<std::wstring> lines;
+    GetWrappedLineTexts(lines);
+
+    int iRemaining = iCaretIndex;
+    for (size_t i = 0; i < lines.size(); i++)
+    {
+        int iLineLength = static_cast<int>(lines[i].size());
+        if (iRemaining <= iLineLength || i == lines.size() - 1)
+        {
+            outLineIndex = static_cast<int>(i);
+            int iLocalIndex = Clamp(0, iRemaining, iLineLength);
+            outX = GetTextExtent(UTF16ToMbUTF8(lines[i].substr(0, iLocalIndex)).c_str(), m_vecScale.fX);
+            return;
+        }
+        iRemaining -= iLineLength;
+    }
+
+    outLineIndex = 0;
+    outX = 0.0f;
+}
+
+int CChat::MapScreenPosToCaretIndex(const CVector2D& vecScreenPos) const
+{
+    std::vector<std::wstring> lines;
+    GetWrappedLineTexts(lines);
+
+    float fLineDifference = CChat::GetFontHeight(m_vecScale.fY);
+    int   iLineIndex = static_cast<int>((vecScreenPos.fY - m_vecInputPosition.fY) / std::max(fLineDifference, 1.0f));
+    iLineIndex = Clamp(0, iLineIndex, static_cast<int>(lines.size()) - 1);
+
+    // Line 0 starts after the "Say:"/"Teamsay:" prefix, wrapped extra lines don't have one
+    float fLineBaseX = m_vecInputPosition.fX + (5.0f * m_vecScale.fX) + (iLineIndex == 0 ? m_InputLine.m_Prefix.GetWidth() : 0.0f);
+    float fLocalX = vecScreenPos.fX - fLineBaseX;
+
+    const std::wstring& wstrLine = lines[iLineIndex];
+    int                 iBestIndex = static_cast<int>(wstrLine.size());
+    float               fBestX = GetTextExtent(UTF16ToMbUTF8(wstrLine).c_str(), m_vecScale.fX);
+
+    for (int i = 0; i <= static_cast<int>(wstrLine.size()); i++)
+    {
+        float fX = GetTextExtent(UTF16ToMbUTF8(wstrLine.substr(0, i)).c_str(), m_vecScale.fX);
+        if (fabsf(fX - fLocalX) < fabsf(fBestX - fLocalX))
+        {
+            fBestX = fX;
+            iBestIndex = i;
+        }
+    }
+
+    // Add up the lengths of the wrapped lines before this one to get a global index
+    int iGlobalIndex = iBestIndex;
+    for (int i = 0; i < iLineIndex; i++)
+        iGlobalIndex += static_cast<int>(lines[i].size());
+
+    return iGlobalIndex;
+}
+
+bool CChat::OnInputMouseDown(CGUIMouseEventArgs MouseArgs)
+{
+    if (!CanTakeInput() || MouseArgs.button != CGUIMouse::LeftButton)
+        return false;
+
+    CVector2D vecTopLeft = m_vecInputPosition;
+    CVector2D vecBottomRight = m_vecInputPosition + m_vecInputSize;
+    if (MouseArgs.position.fX < vecTopLeft.fX || MouseArgs.position.fX > vecBottomRight.fX || MouseArgs.position.fY < vecTopLeft.fY ||
+        MouseArgs.position.fY > vecBottomRight.fY)
+        return false;
+
+    int iNewCaret = MapScreenPosToCaretIndex(MouseArgs.position);
+    SetCaretPosition(iNewCaret, false);
+    m_bMouseSelecting = true;
+    return true;
+}
+
+bool CChat::OnInputMouseMove(CGUIMouseEventArgs MouseArgs)
+{
+    if (!m_bMouseSelecting || !CanTakeInput())
+        return false;
+
+    int iNewCaret = MapScreenPosToCaretIndex(MouseArgs.position);
+    SetCaretPosition(iNewCaret, true);
+    return true;
+}
+
+bool CChat::OnInputMouseUp(CGUIMouseEventArgs MouseArgs)
+{
+    if (!m_bMouseSelecting)
+        return false;
+
+    m_bMouseSelecting = false;
+    return true;
+}
+
+void CChat::DrawInputCaretAndSelection()
+{
+    if (!m_bInputVisible || g_pChat->m_InputTextColor.A == 0)
+        return;
+
+    const unsigned long ulSelectionHighlightColor = COLOR_ARGB(110, 51, 153, 255);  // Translucent selection blue
+    constexpr float     fCaretWidth = 1.0f;                                         // In unscaled (800x600) pixels
+
+    float fLineDifference = CChat::GetFontHeight(m_vecScale.fY);
+    float fBaseX = m_vecInputPosition.fX + (5.0f * m_vecScale.fX) + m_InputLine.m_Prefix.GetWidth();
+    float fBaseY = m_vecInputPosition.fY + (fLineDifference * 0.125f);
+
+    // Selection highlight (drawn first, so the text renders on top of it)
+    if (HasSelection())
+    {
+        int iStart, iEnd;
+        GetSelectionRange(iStart, iEnd);
+
+        int   iStartLine, iEndLine;
+        float fStartX, fEndX;
+        MapCaretIndexToLineAndX(iStart, iStartLine, fStartX);
+        MapCaretIndexToLineAndX(iEnd, iEndLine, fEndX);
+
+        std::vector<std::wstring> lines;
+        GetWrappedLineTexts(lines);
+
+        for (int iLine = iStartLine; iLine <= iEndLine; iLine++)
+        {
+            float fX1 = (iLine == iStartLine) ? fStartX : 0.0f;
+            float fX2 = (iLine == iEndLine) ? fEndX : GetTextExtent(UTF16ToMbUTF8(lines[iLine]).c_str(), m_vecScale.fX);
+            float fY = fBaseY + (iLine * fLineDifference);
+            float fLineBaseX = (iLine == 0) ? fBaseX : (m_vecInputPosition.fX + (5.0f * m_vecScale.fX));
+
+            if (fX2 > fX1)
+                g_pCore->GetGraphics()->DrawRectQueued(fLineBaseX + fX1, fY, fX2 - fX1, fLineDifference, ulSelectionHighlightColor, true);
+        }
+    }
+
+    // Caret (blinks at a constant rate regardless of framerate; phase resets whenever the caret moves)
+    constexpr float fCaretBlinkPeriod = 1.0f;
+    float           fBlinkPhase = std::fmod(GetSecondCount() - m_fCaretBlinkTimer, fCaretBlinkPeriod);
+    if (fBlinkPhase < fCaretBlinkPeriod * 0.5f)
+    {
+        int   iCaretLine;
+        float fCaretX;
+        MapCaretIndexToLineAndX(m_iCaretIndex, iCaretLine, fCaretX);
+
+        float fLineBaseX = (iCaretLine == 0) ? fBaseX : (m_vecInputPosition.fX + (5.0f * m_vecScale.fX));
+        float fY = fBaseY + (iCaretLine * fLineDifference);
+
+        unsigned long ulCaretColor =
+            COLOR_ARGB(g_pChat->m_InputTextColor.A, g_pChat->m_InputTextColor.R, g_pChat->m_InputTextColor.G, g_pChat->m_InputTextColor.B);
+        g_pCore->GetGraphics()->DrawRectQueued(fLineBaseX + fCaretX, fY, fCaretWidth * m_vecScale.fX, fLineDifference, ulCaretColor, true);
+    }
 }
 
 void CChat::SetVisible(bool bVisible, bool bInputBlocked)
