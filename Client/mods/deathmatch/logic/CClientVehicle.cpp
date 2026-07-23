@@ -21,8 +21,16 @@
 #include <game/CStreaming.h>
 #include <game/CVehicleAudioSettingsManager.h>
 #include <enums/VehicleType.h>
+#include <game_sa/CAutomobileSA.h>
+#include <game_sa/CColModelSA.h>
+#include <game_sa/CModelInfoSA.h>
 #include <game_sa/CVehicleSA.h>
 #include <game_sa/CVehicleAudioSettingsEntrySA.h>
+#include <enums/SurfaceType.h>
+
+#include <cmath>
+#include <optional>
+#include <unordered_map>
 
 using std::list;
 
@@ -33,6 +41,362 @@ namespace
 {
     constexpr char RADIO_TYPE_RANDOM = 2;
     constexpr char RADIO_NUM_RANDOM = 13;
+
+    struct SCustomPackerRampAudioState
+    {
+        unsigned short lastAngle{};
+        float          smoothedSpeed{};
+        bool           initialized{};
+    };
+
+    std::unordered_map<CClientVehicle*, SCustomPackerRampAudioState> g_customPackerRampAudioStates;
+    std::unordered_map<WORD, std::optional<WORD>>                   g_modelSpecialAbilityOverrides;
+
+    CVector DecompressCollisionVector(const CCompressedVectorSA& vector)
+    {
+        return CVector(static_cast<float>(vector.x) / 128.0f, static_cast<float>(vector.y) / 128.0f, static_cast<float>(vector.z) / 128.0f);
+    }
+
+    CCompressedVectorSA CompressCollisionVector(const CVector& vector)
+    {
+        return CCompressedVectorSA{static_cast<short>(Clamp<float>(-32768.0f, vector.fX * 128.0f, 32767.0f)),
+                                   static_cast<short>(Clamp<float>(-32768.0f, vector.fY * 128.0f, 32767.0f)),
+                                   static_cast<short>(Clamp<float>(-32768.0f, vector.fZ * 128.0f, 32767.0f))};
+    }
+
+    void SetCollisionTrianglePlane(CColTrianglePlaneSA& plane, CCompressedVectorSA* vertices, const CColTriangleSA& triangle)
+    {
+        ((void(__thiscall*)(CColTrianglePlaneSA*, CCompressedVectorSA*, const CColTriangleSA&))0x411660)(&plane, vertices, triangle);
+    }
+
+    bool EnsureSpecialCollisionModel(CVehicleSAInterface* vehicleInterface)
+    {
+        return ((bool(__thiscall*)(CVehicleSAInterface*))0x6DF3D0)(vehicleInterface);
+    }
+
+    void UpdateModelSpecialAbilityRegistration(CVehicle* vehicle, const std::optional<WORD>& model)
+    {
+        if (!vehicle)
+            return;
+
+        vehicle->SetModelSpecialAbilityModel(model.value_or(0), model.has_value());
+    }
+
+    bool ResolveModelSpecialAbility(const SString& ability, std::optional<WORD>& model)
+    {
+        const SString normalizedAbility = ability.ToLower();
+        if (normalizedAbility.empty() || normalizedAbility == "none")
+        {
+            model = std::nullopt;
+            return true;
+        }
+
+        if (normalizedAbility == "towtruck")
+            model = static_cast<WORD>(VehicleType::VT_TOWTRUCK);
+        else if (normalizedAbility == "packer")
+            model = static_cast<WORD>(VehicleType::VT_PACKER);
+        else if (normalizedAbility == "firetruckwater")
+            model = static_cast<WORD>(VehicleType::VT_FIRETRUK);
+        else if (normalizedAbility == "firetruckladder")
+            model = static_cast<WORD>(VehicleType::VT_FIRELA);
+        else
+            return false;
+
+        return true;
+    }
+
+    const char* GetModelSpecialAbilityName(WORD model)
+    {
+        switch (static_cast<VehicleType>(model))
+        {
+            case VehicleType::VT_TOWTRUCK:
+                return "towtruck";
+            case VehicleType::VT_PACKER:
+                return "packer";
+            case VehicleType::VT_FIRETRUK:
+                return "fireTruckWater";
+            case VehicleType::VT_FIRELA:
+                return "fireTruckLadder";
+            default:
+                return "none";
+        }
+    }
+
+    std::optional<WORD> GetNativeModelSpecialAbility(WORD model)
+    {
+        switch (static_cast<VehicleType>(model))
+        {
+            case VehicleType::VT_TOWTRUCK:
+            case VehicleType::VT_PACKER:
+            case VehicleType::VT_FIRETRUK:
+            case VehicleType::VT_FIRELA:
+                return model;
+            default:
+                return std::nullopt;
+        }
+    }
+
+    std::optional<WORD> GetModelSpecialAbilityOverride(WORD model)
+    {
+        const auto iter = g_modelSpecialAbilityOverrides.find(model);
+        if (iter != g_modelSpecialAbilityOverrides.end())
+            return iter->second;
+
+        return GetNativeModelSpecialAbility(model);
+    }
+
+    void StopCustomPackerRampSound(CClientVehicle* clientVehicle, CVehicle* vehicle)
+    {
+        if (auto* const vehicleSA = dynamic_cast<CVehicleSA*>(vehicle))
+        {
+            if (auto* const audioEntity = vehicleSA->GetVehicleAudioEntity())
+                audioEntity->GetInterface()->StopGenericEngineSound(11 /* AE_SOUND_MOVING_PARTS */);
+        }
+
+        g_customPackerRampAudioStates.erase(clientVehicle);
+    }
+
+    void UpdateCustomPackerRampSound(CClientVehicle* clientVehicle, CVehicle* vehicle, unsigned short angle)
+    {
+        auto* const vehicleSA = dynamic_cast<CVehicleSA*>(vehicle);
+        auto* const audioEntity = vehicleSA ? vehicleSA->GetVehicleAudioEntity() : nullptr;
+        auto* const audioInterface = audioEntity ? audioEntity->GetInterface() : nullptr;
+        if (!audioInterface)
+            return;
+
+        auto& state = g_customPackerRampAudioStates[clientVehicle];
+        if (!state.initialized)
+        {
+            state.lastAngle = angle;
+            state.initialized = true;
+            return;
+        }
+
+        const float delta = (static_cast<float>(angle) - static_cast<float>(state.lastAngle)) / 30.0f;
+        state.lastAngle = angle;
+
+        const float targetSpeed = Clamp<float>(0.0f, std::fabs(delta), 1.0f);
+        if (targetSpeed > state.smoothedSpeed)
+            state.smoothedSpeed = Min(targetSpeed, state.smoothedSpeed + 0.2f);
+        else
+            state.smoothedSpeed = Max(targetSpeed, state.smoothedSpeed - 0.2f);
+
+        if (state.smoothedSpeed <= 0.0f)
+        {
+            audioInterface->StopGenericEngineSound(11 /* AE_SOUND_MOVING_PARTS */);
+            return;
+        }
+
+        // Native ProcessMovingParts is model-gated and also updates moving collision for packers.
+        // Recreate only the packer ramp sound parameters so custom packers keep the original audio
+        // feedback without re-entering the collision path that can push the camera away.
+        const float speed = delta <= 0.0f ? 0.8f : 1.0f;
+        const float baseVolume = delta <= 0.0f ? 3.0f : 9.0f;
+        const float volume = baseVolume + std::log10(state.smoothedSpeed) * 20.0f;
+        if (volume <= -100.0f)
+            audioInterface->StopGenericEngineSound(11 /* AE_SOUND_MOVING_PARTS */);
+        else
+            audioInterface->UpdateGenericVehicleSound(11 /* AE_SOUND_MOVING_PARTS */, 19 /* SND_BANK_SLOT_VEHICLE_GEN */,
+                                                      138 /* SND_BANK_GENRL_VEHICLE_GEN */, 15, speed, volume, 1.5f);
+    }
+
+    void UpdateCustomPackerMovingCollision(CVehicle* vehicle, CAutomobileSAInterface* automobileInterface, unsigned short angle)
+    {
+        auto* const vehicleSA = dynamic_cast<CVehicleSA*>(vehicle);
+        if (!vehicleSA || !automobileInterface || !automobileInterface->m_aCarNodes[static_cast<std::size_t>(eCarNodes::MISC_A)])
+            return;
+
+        auto* const vehicleInterface = vehicleSA->GetVehicleInterface();
+        if (!EnsureSpecialCollisionModel(vehicleInterface))
+            return;
+
+        auto* const modelInfo = g_pGame->GetModelInfo(vehicleSA->GetModelIndex());
+        auto* const baseModelInfo = modelInfo ? modelInfo->GetInterface() : nullptr;
+        auto* const colModel = baseModelInfo ? baseModelInfo->pColModel : nullptr;
+        auto* const colData = colModel ? colModel->m_data : nullptr;
+        if (!colModel || !colData)
+            return;
+
+        if (vehicleInterface->m_nSpecialColModel == 0xFF)
+            return;
+
+        auto* const specialColModels = reinterpret_cast<CColModelSAInterface*>(VAR_CVehicle_SpecialColModels);
+        auto&       specialColModel = specialColModels[vehicleInterface->m_nSpecialColModel];
+        auto* const specialColData = specialColModel.m_data;
+        if (!colData->m_vertices || !colData->m_triangles || !specialColData || !specialColData->m_vertices || !specialColData->m_triangles)
+            return;
+
+        const RwMatrix* miscMatrix = RwFrameGetMatrix(automobileInterface->m_aCarNodes[static_cast<std::size_t>(eCarNodes::MISC_A)]);
+        if (!miscMatrix)
+            return;
+
+        const CVector componentPos(miscMatrix->pos.x, miscMatrix->pos.y, miscMatrix->pos.z);
+        const float   angleRadians = static_cast<float>(angle) * -0.0001f;
+        const float   sinAngle = std::sin(angleRadians);
+        const float   cosAngle = std::cos(angleRadians);
+
+        auto transformPoint = [&](const CVector& point) {
+            const CVector distance = point - componentPos;
+            return CVector(distance.fX, distance.fY * cosAngle - distance.fZ * sinAngle, distance.fY * sinAngle + distance.fZ * cosAngle) + componentPos;
+        };
+
+        float minZ = 1000.0f;
+        float maxZ = -1000.0f;
+        const auto updateBounds = [&](float z) {
+            minZ = Min(minZ, z);
+            maxZ = Max(maxZ, z);
+        };
+
+        const std::uint16_t numTriangles = Min(colData->m_numTriangles, specialColData->m_numTriangles);
+        for (std::uint16_t triangleIndex = 0; triangleIndex < numTriangles; ++triangleIndex)
+        {
+            const CColTriangleSA& sourceTriangle = colData->m_triangles[triangleIndex];
+            CColTriangleSA&       specialTriangle = specialColData->m_triangles[triangleIndex];
+            if (specialTriangle.m_material != SurfaceTypes::SURFACE_CAR_MOVINGCOMPONENT)
+                continue;
+
+            for (int vertexIndex = 0; vertexIndex < 3; ++vertexIndex)
+            {
+                const CVector transformed = transformPoint(DecompressCollisionVector(colData->m_vertices[sourceTriangle.m_indices[vertexIndex]]));
+                specialColData->m_vertices[specialTriangle.m_indices[vertexIndex]] = CompressCollisionVector(transformed);
+                updateBounds(transformed.fZ);
+            }
+        }
+
+        if (specialColData->m_trianglePlanes)
+        {
+            for (std::uint16_t triangleIndex = 0; triangleIndex < specialColData->m_numTriangles; ++triangleIndex)
+                SetCollisionTrianglePlane(specialColData->m_trianglePlanes[triangleIndex], specialColData->m_vertices, specialColData->m_triangles[triangleIndex]);
+        }
+
+        const std::uint16_t numSpheres = Min(colData->m_numSpheres, specialColData->m_numSpheres);
+        for (std::uint16_t sphereIndex = 0; colData->m_spheres && specialColData->m_spheres && sphereIndex < numSpheres; ++sphereIndex)
+        {
+            const CColSphereSA& sourceSphere = colData->m_spheres[sphereIndex];
+            CColSphereSA&       specialSphere = specialColData->m_spheres[sphereIndex];
+            if (specialSphere.m_material != SurfaceTypes::SURFACE_CAR_MOVINGCOMPONENT)
+                continue;
+
+            specialSphere.m_center = transformPoint(sourceSphere.m_center);
+            updateBounds(specialSphere.m_center.fZ - specialSphere.m_radius);
+            updateBounds(specialSphere.m_center.fZ + specialSphere.m_radius);
+        }
+
+        if (maxZ > minZ)
+        {
+            if (colModel->m_bounds.m_vecMax.fZ < maxZ)
+                specialColModel.m_bounds.m_vecMax.fZ = maxZ;
+            if (colModel->m_bounds.m_vecMin.fZ > minZ)
+                specialColModel.m_bounds.m_vecMin.fZ = minZ;
+        }
+    }
+
+    void DrawModelSpecialAbilityDebug(CClientVehicle* clientVehicle, CVehicle* vehicle, const std::optional<WORD>& abilityModel)
+    {
+        if (!abilityModel || !vehicle)
+            return;
+
+        auto* const vehicleSA = dynamic_cast<CVehicleSA*>(vehicle);
+        if (!vehicleSA)
+            return;
+
+        auto* const graphics = g_pCore->GetGraphics();
+        if (!graphics)
+            return;
+
+        CVector screenPosition;
+        CVector worldPosition = *vehicle->GetPosition() + CVector(0.0f, 0.0f, 1.8f);
+        graphics->CalcScreenCoors(&worldPosition, &screenPosition);
+        if (screenPosition.fZ <= 0.0f)
+            return;
+
+        const WORD currentModel = vehicleSA->GetVehicleInterface()->m_nModelIndex;
+        const WORD resolvedModel = vehicleSA->GetModelSpecialAbilityModel(currentModel);
+        const SString text(
+            "specialAbility=%u real=%u iface=%u resolved=%u enabled=%u\n"
+            "process: %u -> %u (%u)\n"
+            "preRender: %u -> %u (%u)",
+            static_cast<unsigned int>(*abilityModel), static_cast<unsigned int>(clientVehicle->GetModel()), static_cast<unsigned int>(currentModel),
+            static_cast<unsigned int>(resolvedModel), vehicleSA->IsModelSpecialAbilityEnabled() ? 1u : 0u,
+            static_cast<unsigned int>(vehicleSA->GetLastProcessSpecialAbilityCurrentModel()),
+            static_cast<unsigned int>(vehicleSA->GetLastProcessSpecialAbilityResolvedModel()), vehicleSA->GetProcessSpecialAbilityResolveCount(),
+            static_cast<unsigned int>(vehicleSA->GetLastPreRenderSpecialAbilityCurrentModel()),
+            static_cast<unsigned int>(vehicleSA->GetLastPreRenderSpecialAbilityResolvedModel()), vehicleSA->GetPreRenderSpecialAbilityResolveCount());
+
+        const int x = static_cast<int>(screenPosition.fX);
+        const int y = static_cast<int>(screenPosition.fY);
+        graphics->DrawString(x + 1, y + 1, x + 1, y + 1, 0xCC000000, text, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER);
+        graphics->DrawString(x, y, x, y, 0xFFFFFF00, text, 1.0f, 1.0f, DT_NOCLIP | DT_CENTER);
+    }
+
+    void UpdateCustomPackerRampAngle(CClientVehicle* clientVehicle, CVehicle* vehicle, const std::optional<WORD>& abilityModel)
+    {
+        if (!abilityModel || *abilityModel != static_cast<WORD>(VehicleType::VT_PACKER) || !vehicle)
+            return;
+
+        if (!clientVehicle->GetOccupant(0) || !clientVehicle->GetOccupant(0)->IsLocalPlayer())
+        {
+            StopCustomPackerRampSound(clientVehicle, vehicle);
+            return;
+        }
+
+        auto* const automobile = dynamic_cast<CAutomobileSA*>(vehicle);
+        auto* const automobileInterface = automobile ? automobile->GetAutomobileInterface() : nullptr;
+        if (!automobileInterface)
+            return;
+
+        CControllerState controllerState;
+        g_pGame->GetPad()->GetCurrentControllerState(&controllerState);
+
+        const float input = static_cast<float>(controllerState.RightStickY) / 128.0f;
+        if (std::fabs(input) > 0.08f)
+        {
+            // Custom packers use the original PreRender branch for misc_a rotation, but not GTA's
+            // moving-collision ramp because it can push the follow camera far above custom meshes.
+            const float nextAngle =
+                static_cast<float>(automobileInterface->m_wMiscComponentAngle) + input * 10.0f * g_pGame->GetTimeStep();
+            automobileInterface->m_wMiscComponentAngle = static_cast<unsigned short>(Clamp<float>(0.0f, nextAngle, 2500.0f));
+        }
+
+        UpdateCustomPackerMovingCollision(vehicle, automobileInterface, automobileInterface->m_wMiscComponentAngle);
+        UpdateCustomPackerRampSound(clientVehicle, vehicle, automobileInterface->m_wMiscComponentAngle);
+    }
+
+    void UpdateCustomFireTruckWaterCannon(CVehicle* vehicle, const std::optional<WORD>& abilityModel)
+    {
+        if (!abilityModel || *abilityModel != static_cast<WORD>(VehicleType::VT_FIRETRUK) || !vehicle)
+            return;
+
+        auto* const automobile = dynamic_cast<CAutomobileSA*>(vehicle);
+        auto* const automobileInterface = automobile ? automobile->GetAutomobileInterface() : nullptr;
+        if (!automobileInterface)
+            return;
+
+        // FireTruckControl owns the original water cannon aiming, water effects, hit events and
+        // audio. The game normally reaches it through a hard-coded firetruck/SWAT model check, so
+        // call that native routine directly for resource-defined water-cannon vehicles.
+        ((void(__thiscall*)(CAutomobileSAInterface*, void*))0x729B60)(automobileInterface, nullptr);
+    }
+
+    void UpdateCustomFireTruckLadder(CVehicle* vehicle, const std::optional<WORD>& abilityModel)
+    {
+        if (!abilityModel || *abilityModel != static_cast<WORD>(VehicleType::VT_FIRELA) || !vehicle)
+            return;
+
+        auto* const vehicleSA = dynamic_cast<CVehicleSA*>(vehicle);
+        if (!vehicleSA || vehicleSA->GetModelIndex() == static_cast<WORD>(VehicleType::VT_FIRELA))
+            return;
+
+        auto* const vehicleInterface = vehicleSA->GetVehicleInterface();
+        const WORD  originalModel = vehicleInterface->m_nModelIndex;
+
+        // Firetruck ladder movement lives inside CAutomobile::UpdateMovingCollision, guarded by a
+        // hard-coded MODEL_FIRELA check. Temporarily expose that model only for this native call so
+        // custom ladder vehicles use GTA's original input/angle path without permanently changing ID.
+        vehicleInterface->m_nModelIndex = static_cast<WORD>(VehicleType::VT_FIRELA);
+        vehicleSA->UpdateMovingCollision(-1.0f);
+        vehicleInterface->m_nModelIndex = originalModel;
+    }
 
     tVehicleAudioSettings GetNormalizedAudioSettings(const CVehicleAudioSettingsEntry& settings)
     {
@@ -211,6 +575,8 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_ucVariation = ucVariation;
     m_ucVariation2 = ucVariation2;
     m_bEnableHeliBladeCollisions = true;
+    m_modelSpecialAbilityModel = std::nullopt;
+    m_hasModelSpecialAbilityOverride = false;
     m_fNitroLevel = 1.0f;
     m_cNitroCount = 0;
     m_fWheelScale = 1.0f;
@@ -1041,6 +1407,11 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
     // Different vehicle ID than we have now?
     if (m_usModel != usModel)
     {
+        // A model special ability is tied to the DFF/COL layout that was active when the resource
+        // set it. Clear explicit overrides before changing model IDs so the new model falls back
+        // to its own default behavior instead of inheriting towtruck/packer state.
+        ResetModelSpecialAbility();
+
         // Destroy the old vehicle if we have one
         if (m_pVehicle)
             Destroy();
@@ -1396,8 +1767,14 @@ void CClientVehicle::_SetAdjustablePropertyValue(unsigned short usValue)
             // Update our collision for this adjustable?
             if (HasMovingCollision())
             {
-                float fAngle = (float)usValue / 2499.0f;
-                m_pVehicle->UpdateMovingCollision(fAngle);
+                // Resource-defined model abilities enter GTA's native moving-collision path through
+                // the ProcessControl hook. Calling UpdateMovingCollision here during stream-in can
+                // run before the custom model has all native state ready.
+                if (!GetEffectiveModelSpecialAbilityModel())
+                {
+                    float fAngle = (float)usValue / 2499.0f;
+                    m_pVehicle->UpdateMovingCollision(fAngle);
+                }
             }
         }
     }
@@ -2412,6 +2789,11 @@ void CClientVehicle::StreamedInPulse()
 
         Interpolate();
         ProcessDoorInterpolation();
+        const auto effectiveModelSpecialAbility = GetEffectiveModelSpecialAbilityModel();
+        UpdateCustomPackerRampAngle(this, m_pVehicle, effectiveModelSpecialAbility);
+        UpdateCustomFireTruckWaterCannon(m_pVehicle, effectiveModelSpecialAbility);
+        UpdateCustomFireTruckLadder(m_pVehicle, effectiveModelSpecialAbility);
+        DrawModelSpecialAbilityDebug(this, m_pVehicle, effectiveModelSpecialAbility);
 
         // Grab our current position
         CVector vecPosition = *m_pVehicle->GetPosition();
@@ -2568,6 +2950,8 @@ void CClientVehicle::Create()
         {
             m_pVehicle = g_pGame->GetPools()->AddVehicle(this, m_usModel, m_ucVariation, m_ucVariation2);
         }
+
+        UpdateModelSpecialAbilityRegistration(m_pVehicle, GetEffectiveModelSpecialAbilityModel());
 
         // Failed. Remove our reference to the vehicle model and return
         if (!m_pVehicle)
@@ -3006,6 +3390,8 @@ void CClientVehicle::Destroy()
 #ifdef MTA_DEBUG
         g_pCore->GetConsole()->Printf("CClientVehicle::Destroy %d", GetModel());
 #endif
+        StopCustomPackerRampSound(this, m_pVehicle);
+        UpdateModelSpecialAbilityRegistration(m_pVehicle, std::nullopt);
 
         // Invalidate
         m_pManager->InvalidateEntity(this);
@@ -4639,6 +5025,122 @@ void CClientVehicle::RemoveVehicleSirens()
     }
 
     m_tSirenBeaconInfo.m_ucSirenCount = 0;
+}
+
+bool CClientVehicle::SetModelSpecialAbility(const SString& ability)
+{
+    std::optional<WORD> specialAbilityModel;
+    if (!ResolveModelSpecialAbility(ability, specialAbilityModel))
+        return false;
+
+    if (!specialAbilityModel)
+    {
+        StopCustomPackerRampSound(this, m_pVehicle);
+        m_hasModelSpecialAbilityOverride = true;
+        m_modelSpecialAbilityModel = std::nullopt;
+        m_bHasAdjustableProperty = CClientVehicleManager::HasAdjustableProperty(m_usModel);
+        UpdateModelSpecialAbilityRegistration(m_pVehicle, std::nullopt);
+
+        if (m_pVehicle)
+        {
+            if (auto* vehicleSA = dynamic_cast<CVehicleSA*>(m_pVehicle))
+                vehicleSA->GetVehicleInterface()->m_nModelIndex = m_usModel;
+        }
+        return true;
+    }
+
+    // GTA gates these special component behaviors behind hard-coded model checks. Store the
+    // original model that should drive those native paths, while keeping this vehicle's real
+    // model ID intact for rendering and streaming.
+    // Do not mark custom packers as MTA adjustable-property vehicles here. Their misc angle is
+    // updated locally for the native PreRender rotation path, without GTA's moving collision
+    // ramp that can push the follow camera far above custom meshes.
+    m_hasModelSpecialAbilityOverride = true;
+    m_modelSpecialAbilityModel = specialAbilityModel;
+    UpdateModelSpecialAbilityRegistration(m_pVehicle, GetEffectiveModelSpecialAbilityModel());
+    return true;
+}
+
+void CClientVehicle::ResetModelSpecialAbility()
+{
+    StopCustomPackerRampSound(this, m_pVehicle);
+    m_hasModelSpecialAbilityOverride = false;
+    m_modelSpecialAbilityModel = std::nullopt;
+    m_bHasAdjustableProperty = CClientVehicleManager::HasAdjustableProperty(m_usModel);
+    UpdateModelSpecialAbilityRegistration(m_pVehicle, GetEffectiveModelSpecialAbilityModel());
+
+    if (m_pVehicle)
+    {
+        if (auto* vehicleSA = dynamic_cast<CVehicleSA*>(m_pVehicle))
+            vehicleSA->GetVehicleInterface()->m_nModelIndex = m_usModel;
+    }
+}
+
+SString CClientVehicle::GetModelSpecialAbility() const
+{
+    // If a resource did not explicitly override the ability, report the GTA default for the
+    // current model so original towtrucks, packers, firetrucks and ladder trucks keep their
+    // native special-vehicle identity.
+    if (m_hasModelSpecialAbilityOverride && !m_modelSpecialAbilityModel)
+        return "none";
+
+    const auto model = GetEffectiveModelSpecialAbilityModel();
+    return model ? GetModelSpecialAbilityName(*model) : "none";
+}
+
+std::optional<WORD> CClientVehicle::GetEffectiveModelSpecialAbilityModel() const
+{
+    if (m_hasModelSpecialAbilityOverride)
+        return m_modelSpecialAbilityModel;
+
+    return GetModelSpecialAbilityOverride(m_usModel);
+}
+
+bool CClientVehicle::SetModelSpecialAbilityDefault(WORD model, const SString& ability)
+{
+    std::optional<WORD> specialAbilityModel;
+    if (!ResolveModelSpecialAbility(ability, specialAbilityModel))
+        return false;
+
+    // Model-level abilities work like model handling: they are the default for vehicles with
+    // this model ID. Per-vehicle overrides stay authoritative for vehicles that already opted
+    // into a different behavior explicitly.
+    g_modelSpecialAbilityOverrides[model] = specialAbilityModel;
+
+    CClientVehicleManager* vehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
+    for (auto iter = vehicleManager->IterBegin(); iter != vehicleManager->IterEnd(); ++iter)
+    {
+        CClientVehicle* vehicle = *iter;
+        if (vehicle && vehicle->GetModel() == model && !vehicle->m_hasModelSpecialAbilityOverride)
+        {
+            StopCustomPackerRampSound(vehicle, vehicle->m_pVehicle);
+            UpdateModelSpecialAbilityRegistration(vehicle->m_pVehicle, vehicle->GetEffectiveModelSpecialAbilityModel());
+        }
+    }
+
+    return true;
+}
+
+void CClientVehicle::ResetModelSpecialAbilityDefault(WORD model)
+{
+    g_modelSpecialAbilityOverrides.erase(model);
+
+    CClientVehicleManager* vehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
+    for (auto iter = vehicleManager->IterBegin(); iter != vehicleManager->IterEnd(); ++iter)
+    {
+        CClientVehicle* vehicle = *iter;
+        if (vehicle && vehicle->GetModel() == model && !vehicle->m_hasModelSpecialAbilityOverride)
+        {
+            StopCustomPackerRampSound(vehicle, vehicle->m_pVehicle);
+            UpdateModelSpecialAbilityRegistration(vehicle->m_pVehicle, vehicle->GetEffectiveModelSpecialAbilityModel());
+        }
+    }
+}
+
+SString CClientVehicle::GetModelSpecialAbilityDefault(WORD model)
+{
+    const auto specialAbilityModel = GetModelSpecialAbilityOverride(model);
+    return specialAbilityModel ? GetModelSpecialAbilityName(*specialAbilityModel) : "none";
 }
 
 bool CClientVehicle::SetComponentPosition(const SString& vehicleComponent, CVector vecPosition, EComponentBaseType inputBase)

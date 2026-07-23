@@ -440,6 +440,14 @@ private:
     unsigned char                    m_ucVariantCount{0};
     bool                             m_doorsUndamageable{false};
     bool                             m_rotorState{true};
+    bool                             m_modelSpecialAbilityEnabled{false};
+    WORD                             m_modelSpecialAbilityModel{0};
+    WORD                             m_modelSpecialAbilityLastProcessCurrentModel{0};
+    WORD                             m_modelSpecialAbilityLastProcessResolvedModel{0};
+    WORD                             m_modelSpecialAbilityLastPreRenderCurrentModel{0};
+    WORD                             m_modelSpecialAbilityLastPreRenderResolvedModel{0};
+    unsigned int                     m_modelSpecialAbilityProcessResolveCount{0};
+    unsigned int                     m_modelSpecialAbilityPreRenderResolveCount{0};
 
     std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)> m_dummyPositions;
 
@@ -646,6 +654,17 @@ public:
 
     CColModel* GetSpecialColModel();
     bool       UpdateMovingCollision(float fAngle);
+    void       SetModelSpecialAbilityModel(unsigned short model, bool enabled) override;
+    WORD       GetModelSpecialAbilityModel(WORD currentModel) const override;
+    void       NoteModelSpecialAbilityHookResolve(WORD currentModel, WORD resolvedModel, bool preRenderHook);
+    bool       IsModelSpecialAbilityEnabled() const { return m_modelSpecialAbilityEnabled; }
+    WORD       GetConfiguredModelSpecialAbilityModel() const { return m_modelSpecialAbilityModel; }
+    WORD       GetLastProcessSpecialAbilityCurrentModel() const { return m_modelSpecialAbilityLastProcessCurrentModel; }
+    WORD       GetLastProcessSpecialAbilityResolvedModel() const { return m_modelSpecialAbilityLastProcessResolvedModel; }
+    WORD       GetLastPreRenderSpecialAbilityCurrentModel() const { return m_modelSpecialAbilityLastPreRenderCurrentModel; }
+    WORD       GetLastPreRenderSpecialAbilityResolvedModel() const { return m_modelSpecialAbilityLastPreRenderResolvedModel; }
+    unsigned int GetProcessSpecialAbilityResolveCount() const { return m_modelSpecialAbilityProcessResolveCount; }
+    unsigned int GetPreRenderSpecialAbilityResolveCount() const { return m_modelSpecialAbilityPreRenderResolveCount; }
 
     void RecalculateHandling();
 

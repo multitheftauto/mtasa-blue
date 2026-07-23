@@ -133,6 +133,10 @@ void CLuaVehicleDefs::LoadFunctions()
         {"setHelicopterRotorSpeed", SetHelicopterRotorSpeed},
         {"setVehicleRotorSpeed", ArgumentParser<SetVehicleRotorSpeed>},
         {"setVehicleWheelsRotation", ArgumentParser<SetVehicleWheelsRotation>},
+        {"setVehicleSpecialAbility", ArgumentParser<SetVehicleSpecialAbility>},
+        {"setVehicleModelSpecialAbility", ArgumentParser<SetVehicleModelSpecialAbility>},
+        {"getVehicleSpecialAbility", ArgumentParser<GetVehicleSpecialAbility>},
+        {"getVehicleModelSpecialAbility", ArgumentParser<GetVehicleModelSpecialAbility>},
         {"setTrainDerailed", SetTrainDerailed},
         {"setTrainDerailable", SetTrainDerailable},
         {"setTrainDirection", SetTrainDirection},
@@ -321,6 +325,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setModelWheelSize", "setVehicleModelWheelSize");
     lua_classfunction(luaVM, "setSmokeTrailEnabled", "setVehicleSmokeTrailEnabled");
     lua_classfunction(luaVM, "setRotorState", "setVehicleRotorState");
+    lua_classfunction(luaVM, "setSpecialAbility", "setVehicleSpecialAbility");
+    lua_classfunction(luaVM, "getSpecialAbility", "getVehicleSpecialAbility");
     lua_classfunction(luaVM, "resetAudioSettings", "resetVehicleAudioSettings");
     lua_classfunction(luaVM, "setAudioSetting", "setVehicleAudioSetting");
 
@@ -2268,6 +2274,26 @@ bool CLuaVehicleDefs::SetVehicleRotorSpeed(CClientVehicle* pVehicle, float fSpee
 bool CLuaVehicleDefs::SetVehicleWheelsRotation(CClientVehicle* pVehicle, float fRotation) noexcept
 {
     return pVehicle->SetWheelsRotation(fRotation, fRotation, fRotation, fRotation);
+}
+
+bool CLuaVehicleDefs::SetVehicleSpecialAbility(CClientVehicle* pVehicle, std::string ability)
+{
+    return pVehicle->SetModelSpecialAbility(SString(ability));
+}
+
+bool CLuaVehicleDefs::SetVehicleModelSpecialAbility(unsigned short model, std::string ability)
+{
+    return CClientVehicle::SetModelSpecialAbilityDefault(model, SString(ability));
+}
+
+std::string CLuaVehicleDefs::GetVehicleSpecialAbility(CClientVehicle* pVehicle)
+{
+    return pVehicle->GetModelSpecialAbility().c_str();
+}
+
+std::string CLuaVehicleDefs::GetVehicleModelSpecialAbility(unsigned short model)
+{
+    return CClientVehicle::GetModelSpecialAbilityDefault(model).c_str();
 }
 
 int CLuaVehicleDefs::SetTrainDerailed(lua_State* luaVM)
