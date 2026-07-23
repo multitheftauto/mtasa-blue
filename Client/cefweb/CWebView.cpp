@@ -353,6 +353,20 @@ void CWebView::ClearTexture()
     }
 }
 
+void CWebView::RestoreTexture()
+{
+    {
+        const std::scoped_lock lock(m_RenderData.dataMutex);
+        if (!m_RenderData.buffer || m_RenderData.bufferSize == 0)
+            return;
+
+        // Reuse the retained CEF frame so screenshot filtering is not visible while an asynchronous repaint is pending.
+        m_RenderData.changed = true;
+    }
+
+    UpdateTexture();
+}
+
 void CWebView::UpdateTexture()
 {
     const std::scoped_lock lock(m_RenderData.dataMutex);
