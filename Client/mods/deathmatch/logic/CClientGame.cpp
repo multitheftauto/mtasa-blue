@@ -672,6 +672,7 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
 
     // Store our nickname
     m_strLocalNick.AssignLeft(szNick, MAX_PLAYER_NICK_LENGTH);
+    m_uiNextClientLuaEventSequence = 1;
 
     // Are we connected?
     if (g_pNet->IsConnected() || m_bIsPlayingBack)

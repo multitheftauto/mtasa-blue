@@ -263,6 +263,9 @@ public:
     bool GetTeleported() const noexcept { return m_teleported; }
     void SetTeleported(bool state) noexcept { m_teleported = state; }
 
+    bool TryAcceptClientLuaEvent(bool bHasSequence, uint32_t uiSequence) noexcept;
+    void ResetClientLuaEventSequence() noexcept;
+
     long long     GetLastVoiceDataTime() const noexcept { return m_lastVoiceDataTime; }
     void          SetLastVoiceDataTime(long long time) noexcept { m_lastVoiceDataTime = time; }
     unsigned char GetVoiceDataPacketsInInterval() const noexcept { return m_voiceDataPacketsInInterval; }
@@ -471,4 +474,6 @@ private:
     bool          m_teleported = false;
     long long     m_lastVoiceDataTime = 0;
     unsigned char m_voiceDataPacketsInInterval = 0;
+
+    uint32_t m_uiNextExpectedClientLuaEventSequence = 1;
 };
