@@ -45,8 +45,8 @@ namespace
     constexpr float kBorderlessSaturationMax = 2.0f;
     constexpr float kBorderlessSaturationDefault = 1.0f;
 
-    constexpr float kSettingsContentWidth = 680.0f;
-    constexpr float kSettingsBaseContentHeight = 480.0f;
+    constexpr float kSettingsContentWidth = 760.0f;
+    constexpr float kSettingsBaseContentHeight = 560.0f;
     constexpr float kSettingsWindowFrameHorizontal = 18.0f;  // 9px left + 9px right
     constexpr float kSettingsWindowFrameVertical = 22.0f;    // 20px top + 2px bottom
     constexpr float kSettingsBottomButtonAreaHeight = 38.0f;
@@ -200,6 +200,18 @@ void CSettings::ResetGuiPointers()
     m_pLabelNick = NULL;
     m_pButtonGenerateNick = NULL;
     m_pButtonGenerateNickIcon = NULL;
+    m_pButtonNickHistory = NULL;
+    m_pNickHistoryWindow = NULL;
+    m_pNickHistoryGrid = NULL;
+    m_pNickHistoryClose = NULL;
+    m_pNickHistoryCopy = NULL;
+    m_pNickHistoryPaste = NULL;
+    m_pNickHistoryDelete = NULL;
+    m_pNickHistoryDeleteAll = NULL;
+    m_pNickHistorySearch = NULL;
+    m_hNickHistoryColNick = 0;
+    m_hNickHistoryColDate = 0;
+    m_NickHistoryCache.clear();
     m_pEditNick = NULL;
     m_pSavePasswords = NULL;
     m_pAutoRefreshBrowser = NULL;
@@ -487,6 +499,22 @@ CSettings::CSettings()
     {
         SetApplicationSettingInt(GENERAL_PROGRESS_ANIMATION_DISABLE, 0);
         CVARS_SET("progress_animation", 0);
+    }
+
+    // Cache nicknames path and ensure file exists
+    m_strNicknamesFilePath = CalcMTASAPath("mta\\logs\\nicknames.xml");
+    MakeSureDirExists(m_strNicknamesFilePath);
+    {
+        CXMLFile* pFile = CCore::GetSingleton().GetXML()->CreateXML(m_strNicknamesFilePath);
+        if (pFile)
+        {
+            if (!pFile->Parse() || !pFile->GetRootNode())
+            {
+                pFile->CreateRootNode("nicknames");
+                pFile->Write();
+            }
+            CCore::GetSingleton().GetXML()->DeleteXML(pFile);
+        }
     }
 }
 
@@ -867,6 +895,72 @@ void CSettings::CreateGUI()
     m_pButtonGenerateNickIcon->LoadFromFile("cgui\\images\\serverbrowser\\refresh.png");
     m_pButtonGenerateNickIcon->SetProperty("MousePassThroughEnabled", "True");
     m_pButtonGenerateNickIcon->SetProperty("DistributeCapturedInputs", "True");
+
+    // Nick history button
+    m_pButtonNickHistory = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabMultiplayer, _("History")));
+    m_pButtonNickHistory->SetPosition(CVector2D(vecSize.fX + vecTemp.fX + 50.0f + 178.0f + 5.0f + 26.0f + 5.0f, vecTemp.fY - 1.0f));
+    m_pButtonNickHistory->SetSize(CVector2D(60.0f, 26.0f));
+    m_pButtonNickHistory->SetClickHandler(GUI_CALLBACK(&CSettings::OnNickHistoryButtonClick, this));
+    m_pButtonNickHistory->SetZOrderingEnabled(false);
+
+    // Nick history popup (hidden initially)
+    {
+        const CVector2D histWinSize(600.0f, 460.0f);
+        const CVector2D histWinPos = (resolution - histWinSize) / 2;
+        m_pNickHistoryWindow = reinterpret_cast<CGUIWindow*>(pManager->CreateWnd(NULL, _("Nickname history")));
+        m_pNickHistoryWindow->SetSize(histWinSize);
+        m_pNickHistoryWindow->SetPosition(histWinPos);
+        m_pNickHistoryWindow->SetSizingEnabled(false);
+        m_pNickHistoryWindow->SetAlwaysOnTop(true);
+        m_pNickHistoryWindow->SetVisible(false);
+
+        // Search field
+        m_pNickHistorySearch = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(m_pNickHistoryWindow));
+        m_pNickHistorySearch->SetPosition(CVector2D(10.0f, 30.0f));
+        m_pNickHistorySearch->SetSize(CVector2D(histWinSize.fX - 20.0f, 24.0f));
+        m_pNickHistorySearch->SetTextChangedHandler(GUI_CALLBACK(&CSettings::OnNickHistorySearchChanged, this));
+
+        // Grid
+        m_pNickHistoryGrid = reinterpret_cast<CGUIGridList*>(pManager->CreateGridList(m_pNickHistoryWindow));
+        m_pNickHistoryGrid->SetPosition(CVector2D(10.0f, 60.0f));
+        m_pNickHistoryGrid->SetSize(CVector2D(histWinSize.fX - 20.0f, histWinSize.fY - 150.0f));
+        m_hNickHistoryColNick = m_pNickHistoryGrid->AddColumn(_("Nickname"), 0.65f);
+        m_hNickHistoryColDate = m_pNickHistoryGrid->AddColumn(_("Date"), 0.35f);
+        m_pNickHistoryGrid->SetSortingEnabled(false);
+        m_pNickHistoryGrid->SetSelectionMode(SelectionModes::RowSingle);
+
+        // Buttons at the bottom
+        const float btnY = histWinSize.fY - 55.0f;
+        m_pNickHistoryPaste = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pNickHistoryWindow, _("Paste to nick")));
+        m_pNickHistoryPaste->SetPosition(CVector2D(10.0f, btnY));
+        m_pNickHistoryPaste->SetSize(CVector2D(95.0f, 26.0f));
+        m_pNickHistoryPaste->SetClickHandler(GUI_CALLBACK(&CSettings::OnNickHistoryPasteClick, this));
+        m_pNickHistoryPaste->SetVisible(true);
+
+        m_pNickHistoryCopy = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pNickHistoryWindow, _("Copy")));
+        m_pNickHistoryCopy->SetPosition(CVector2D(115.0f, btnY));
+        m_pNickHistoryCopy->SetSize(CVector2D(80.0f, 26.0f));
+        m_pNickHistoryCopy->SetClickHandler(GUI_CALLBACK(&CSettings::OnNickHistoryCopyClick, this));
+        m_pNickHistoryCopy->SetVisible(true);
+
+        m_pNickHistoryDelete = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pNickHistoryWindow, _("Delete")));
+        m_pNickHistoryDelete->SetPosition(CVector2D(205.0f, btnY));
+        m_pNickHistoryDelete->SetSize(CVector2D(80.0f, 26.0f));
+        m_pNickHistoryDelete->SetClickHandler(GUI_CALLBACK(&CSettings::OnNickHistoryDeleteClick, this));
+        m_pNickHistoryDelete->SetVisible(true);
+
+        m_pNickHistoryDeleteAll = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pNickHistoryWindow, _("Delete All")));
+        m_pNickHistoryDeleteAll->SetPosition(CVector2D(295.0f, btnY));
+        m_pNickHistoryDeleteAll->SetSize(CVector2D(95.0f, 26.0f));
+        m_pNickHistoryDeleteAll->SetClickHandler(GUI_CALLBACK(&CSettings::OnNickHistoryDeleteAllClick, this));
+        m_pNickHistoryDeleteAll->SetVisible(true);
+
+        m_pNickHistoryClose = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pNickHistoryWindow, _("Close")));
+        m_pNickHistoryClose->SetPosition(CVector2D(histWinSize.fX - 90.0f, btnY));
+        m_pNickHistoryClose->SetSize(CVector2D(80.0f, 26.0f));
+        m_pNickHistoryClose->SetClickHandler(GUI_CALLBACK(&CSettings::OnNickHistoryCloseClick, this));
+        m_pNickHistoryClose->SetVisible(true);
+    }
 
     m_pSavePasswords = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Save server passwords"), true));
     m_pSavePasswords->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 35.0f));
@@ -1699,7 +1793,7 @@ void CSettings::CreateGUI()
      *  Advanced tab
      **/
     vecTemp = CVector2D(12.f, 12.f);
-    float fComboWidth = 170.f;
+    float fComboWidth;
     float fHeaderHeight = 20;
     float fLineHeight = 27;
 
@@ -1716,6 +1810,7 @@ void CSettings::CreateGUI()
                5.0f;
 
     vecTemp.fX += 10.0f;
+    fComboWidth = std::clamp(tabPanelSize.fX - vecTemp.fX - fIndentX - 15.0f, 100.0f, 400.0f);
 
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Fast CJ clothes loading:")));
@@ -1920,29 +2015,41 @@ void CSettings::CreateGUI()
     m_pUpdateBuildTypeLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pUpdateBuildTypeLabel->AutoSize();
 
-    m_pUpdateBuildTypeCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
-    m_pUpdateBuildTypeCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
-    m_pUpdateBuildTypeCombo->SetSize(CVector2D(fComboWidth, 95.0f));
-    m_pUpdateBuildTypeCombo->AddItem(_("Default"))->SetData((void*)0);
-    m_pUpdateBuildTypeCombo->AddItem("Nightly")->SetData((void*)2);
-    m_pUpdateBuildTypeCombo->SetReadOnly(true);
-    vecTemp.fX += fComboWidth + 15;
+    {
+        // Reserve space for "Check for update now" button on the same line
+        const float fButtonTextWidth = pManager->GetTextExtent(_("Check for update now"));
+        const float fUpdateButtonReserve = fButtonTextWidth + 35.0f;
+        const float fUpdateComboWidth = std::clamp(tabPanelSize.fX - (vecTemp.fX + fIndentX) - fUpdateButtonReserve, 100.0f, fComboWidth);
+        m_pUpdateBuildTypeCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
+        m_pUpdateBuildTypeCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
+        m_pUpdateBuildTypeCombo->SetSize(CVector2D(fUpdateComboWidth, 95.0f));
+        m_pUpdateBuildTypeCombo->AddItem(_("Default"))->SetData((void*)0);
+        m_pUpdateBuildTypeCombo->AddItem("Nightly")->SetData((void*)2);
+        m_pUpdateBuildTypeCombo->SetReadOnly(true);
 
-    // Check for updates
-    m_pButtonUpdate = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabAdvanced, _("Check for update now")));
-    m_pButtonUpdate->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
-    m_pButtonUpdate->AutoSize(NULL, 20.0f, 8.0f);
-    m_pButtonUpdate->SetClickHandler(GUI_CALLBACK(&CSettings::OnUpdateButtonClick, this));
-    m_pButtonUpdate->SetZOrderingEnabled(false);
+        // Check for updates (place to right of combo, clamped to tab boundary)
+        m_pButtonUpdate = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabAdvanced, _("Check for update now")));
+        m_pButtonUpdate->SetPosition(CVector2D(vecTemp.fX + fIndentX + fUpdateComboWidth + 15.0f, vecTemp.fY));
+        m_pButtonUpdate->AutoSize(NULL, 20.0f, 8.0f);
+        {
+            // Ensure button doesn't extend beyond tab
+            CVector2D btnSize;
+            m_pButtonUpdate->GetSize(btnSize);
+            const float maxBtnX = tabPanelSize.fX - btnSize.fX - 4.0f;
+            if (vecTemp.fX + fIndentX + fUpdateComboWidth + 15.0f > maxBtnX)
+                m_pButtonUpdate->SetPosition(CVector2D(maxBtnX, vecTemp.fY));
+        }
+        m_pButtonUpdate->SetClickHandler(GUI_CALLBACK(&CSettings::OnUpdateButtonClick, this));
+        m_pButtonUpdate->SetZOrderingEnabled(false);
+    }
     vecTemp.fY += fLineHeight;
-    vecTemp.fX -= fComboWidth + 15;
 
     // Description label
     vecTemp.fY += 15.0f;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, ""));
     m_pAdvancedSettingDescriptionLabel->SetPosition(CVector2D(vecTemp.fX + 10.f, vecTemp.fY));
     m_pAdvancedSettingDescriptionLabel->SetFont("default-bold-small");
-    m_pAdvancedSettingDescriptionLabel->SetSize(CVector2D(500.0f, 95.0f));
+    m_pAdvancedSettingDescriptionLabel->SetSize(CVector2D(tabPanelSize.fX - 40.0f, 95.0f));
     m_pAdvancedSettingDescriptionLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP);
 
     // Set up the events
@@ -2087,6 +2194,12 @@ void CSettings::DestroyGUI()
 
     g_pCore->GetGUI()->DestroyElementRecursive(m_pWindow);
     m_pWindow = nullptr;
+
+    if (m_pNickHistoryWindow)
+    {
+        g_pCore->GetGUI()->DestroyElementRecursive(m_pNickHistoryWindow);
+        m_pNickHistoryWindow = nullptr;
+    }
 
     RemoveAllKeyBindSections();
     m_bBrowserListsChanged = false;
@@ -3865,6 +3978,268 @@ bool CSettings::OnNickButtonClick(CGUIElement* pElement)
     return true;
 }
 
+bool CSettings::OnNickHistoryButtonClick(CGUIElement* pElement)
+{
+    if (!m_pNickHistoryWindow || !m_pNickHistoryGrid)
+        return true;
+
+    if (m_pNickHistoryWindow->IsVisible())
+    {
+        m_pNickHistoryWindow->SetVisible(false);
+        return true;
+    }
+
+    // Load history from file into cache and populate grid
+    m_NickHistoryCache.clear();
+    m_pNickHistoryGrid->Clear();
+    m_pNickHistoryGrid->SetSortingEnabled(false);
+
+    if (m_pNickHistorySearch)
+        m_pNickHistorySearch->SetText("");
+
+    CXMLFile* pFile = CCore::GetSingleton().GetXML()->CreateXML(m_strNicknamesFilePath);
+    if (pFile)
+    {
+        if (pFile->Parse())
+        {
+            CXMLNode* pRoot = pFile->GetRootNode();
+            if (pRoot)
+            {
+            for (uint i = 0; i < pRoot->GetSubNodeCount(); i++)
+            {
+                CXMLNode* pNode = pRoot->GetSubNode(i);
+                if (pNode && pNode->GetTagName() == "nick")
+                {
+                    SString strName = pNode->GetAttributeValue("name");
+                    SString strDate = pNode->GetAttributeValue("date");
+                    if (!strName.empty() && !strDate.empty())
+                    {
+                        m_NickHistoryCache.push_back(std::make_pair(static_cast<std::string>(strName), static_cast<std::string>(strDate)));
+                        int row = m_pNickHistoryGrid->AddRow();
+                        m_pNickHistoryGrid->SetItemText(row, m_hNickHistoryColNick, strName, false, false, true);
+                        m_pNickHistoryGrid->SetItemText(row, m_hNickHistoryColDate, strDate, false, false, true);
+                    }
+                }
+            }
+            }
+        }
+        CCore::GetSingleton().GetXML()->DeleteXML(pFile);
+    }
+
+    m_pNickHistoryWindow->SetVisible(true);
+    m_pNickHistoryWindow->BringToFront();
+    return true;
+}
+
+bool CSettings::OnNickHistorySearchChanged(CGUIElement* pElement)
+{
+    if (!m_pNickHistoryGrid || !m_pNickHistorySearch)
+        return true;
+
+    SString strFilter = m_pNickHistorySearch->GetText();
+    strFilter = strFilter.ToUpper();
+
+    m_pNickHistoryGrid->Clear();
+    for (const auto& entry : m_NickHistoryCache)
+    {
+        SString strName(entry.first);
+        SString strDate(entry.second);
+        if (strFilter.empty() ||
+            strName.ToUpper().Contains(strFilter) ||
+            strDate.ToUpper().Contains(strFilter))
+        {
+            int row = m_pNickHistoryGrid->AddRow();
+            m_pNickHistoryGrid->SetItemText(row, m_hNickHistoryColNick, *strName, false, false, true);
+            m_pNickHistoryGrid->SetItemText(row, m_hNickHistoryColDate, *strDate, false, false, true);
+        }
+    }
+    return true;
+}
+
+bool CSettings::OnNickHistoryCloseClick(CGUIElement* pElement)
+{
+    if (m_pNickHistoryWindow)
+        m_pNickHistoryWindow->SetVisible(false);
+    return true;
+}
+
+bool CSettings::OnNickHistoryCopyClick(CGUIElement* pElement)
+{
+    if (m_pNickHistoryGrid)
+    {
+        int row = m_pNickHistoryGrid->GetSelectedItemRow();
+        if (row >= 0)
+        {
+            SString strNick = m_pNickHistoryGrid->GetItemText(row, m_hNickHistoryColNick);
+            if (!strNick.empty())
+                SharedUtil::SetClipboardText(strNick);
+        }
+    }
+    return true;
+}
+
+bool CSettings::OnNickHistoryPasteClick(CGUIElement* pElement)
+{
+    if (m_pNickHistoryGrid && m_pEditNick)
+    {
+        int row = m_pNickHistoryGrid->GetSelectedItemRow();
+        if (row >= 0)
+        {
+            SString strNewNick = m_pNickHistoryGrid->GetItemText(row, m_hNickHistoryColNick);
+            if (!strNewNick.empty())
+            {
+                m_pEditNick->SetText(strNewNick);
+            }
+        }
+    }
+    return true;
+}
+
+void NickHistoryDeleteCallback(void* ptr, unsigned int uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+    if (uiButton == 1 && ptr)
+    {
+        CSettings* pSettings = static_cast<CSettings*>(ptr);
+        int row = pSettings->m_pNickHistoryGrid->GetSelectedItemRow();
+        if (row >= 0 && (uint)row < pSettings->m_NickHistoryCache.size())
+        {
+            pSettings->m_NickHistoryCache.erase(pSettings->m_NickHistoryCache.begin() + row);
+            pSettings->RewriteNickHistoryFileFromCache();
+            // Refresh display
+            SString strFilter = pSettings->m_pNickHistorySearch->GetText();
+            pSettings->m_pNickHistoryGrid->Clear();
+            for (const auto& entry : pSettings->m_NickHistoryCache)
+            {
+                SString strName(entry.first);
+                SString strDate(entry.second);
+                SString strFilterUpper = strFilter.ToUpper();
+                if (strFilter.empty() || strName.ToUpper().Contains(strFilterUpper) || strDate.ToUpper().Contains(strFilterUpper))
+                {
+                    int newRow = pSettings->m_pNickHistoryGrid->AddRow();
+                    pSettings->m_pNickHistoryGrid->SetItemText(newRow, pSettings->m_hNickHistoryColNick, *strName, false, false, true);
+                    pSettings->m_pNickHistoryGrid->SetItemText(newRow, pSettings->m_hNickHistoryColDate, *strDate, false, false, true);
+                }
+            }
+        }
+    }
+}
+
+void NickHistoryDeleteAllCallback(void* ptr, unsigned int uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+    if (uiButton == 1 && ptr)
+    {
+        CSettings* pSettings = static_cast<CSettings*>(ptr);
+        pSettings->m_NickHistoryCache.clear();
+        pSettings->RewriteNickHistoryFileFromCache();
+        pSettings->m_pNickHistoryGrid->Clear();
+    }
+}
+
+bool CSettings::OnNickHistoryDeleteClick(CGUIElement* pElement)
+{
+    if (!m_pNickHistoryGrid)
+        return true;
+
+    int row = m_pNickHistoryGrid->GetSelectedItemRow();
+    if (row < 0)
+        return true;
+
+    SString strNick = m_pNickHistoryGrid->GetItemText(row, m_hNickHistoryColNick);
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(_("DELETE NICKNAME"));
+    pQuestionBox->SetMessage(SString(_("Delete nickname \"%s\" from history?"), *strNick));
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(NickHistoryDeleteCallback, this);
+    pQuestionBox->Show();
+    return true;
+}
+
+bool CSettings::OnNickHistoryDeleteAllClick(CGUIElement* pElement)
+{
+    if (m_NickHistoryCache.empty())
+        return true;
+
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(_("DELETE ALL"));
+    pQuestionBox->SetMessage(_("Delete all nicknames from history?"));
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(NickHistoryDeleteAllCallback, this);
+    pQuestionBox->Show();
+    return true;
+}
+
+void CSettings::SaveNicknameToFile(const SString& strNick)
+{
+    // Build timestamp
+    time_t rawtime;
+    time(&rawtime);
+    struct tm* timeinfo = localtime(&rawtime);
+    char buffer[80];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", timeinfo);
+    SString strDate{std::string(buffer)};
+
+    // Build new cache from existing file (so old entries are preserved)
+    m_NickHistoryCache.clear();
+    CXMLFile* pFile = CCore::GetSingleton().GetXML()->CreateXML(m_strNicknamesFilePath);
+    if (pFile)
+    {
+        if (pFile->Parse())
+        {
+            CXMLNode* pRoot = pFile->GetRootNode();
+            if (pRoot)
+            {
+                for (uint i = 0; i < pRoot->GetSubNodeCount(); i++)
+                {
+                    CXMLNode* pNode = pRoot->GetSubNode(i);
+                    if (pNode && pNode->GetTagName() == "nick")
+                    {
+                        SString strName = pNode->GetAttributeValue("name");
+                        SString strDateExisting = pNode->GetAttributeValue("date");
+                        if (!strName.empty())
+                            m_NickHistoryCache.push_back(std::make_pair(static_cast<std::string>(strName), static_cast<std::string>(strDateExisting)));
+                    }
+                }
+            }
+        }
+        CCore::GetSingleton().GetXML()->DeleteXML(pFile);
+    }
+
+    m_NickHistoryCache.push_back(std::make_pair(static_cast<std::string>(strNick), static_cast<std::string>(strDate)));
+
+    // Rewrite the entire file from cache
+    RewriteNickHistoryFileFromCache();
+}
+
+void CSettings::RewriteNickHistoryFileFromCache()
+{
+    MakeSureDirExists(m_strNicknamesFilePath);
+    CXMLFile* pFile = CCore::GetSingleton().GetXML()->CreateXML(m_strNicknamesFilePath);
+    if (pFile)
+    {
+        CXMLNode* pRoot = pFile->CreateRootNode("nicknames");
+        if (pRoot)
+        {
+            for (const auto& entry : m_NickHistoryCache)
+            {
+                CXMLNode* pNickNode = pRoot->CreateSubNode("nick");
+                if (pNickNode)
+                {
+                    pNickNode->GetAttributes().Create("name")->SetValue(entry.first.c_str());
+                    pNickNode->GetAttributes().Create("date")->SetValue(entry.second.c_str());
+                }
+            }
+            pFile->Write();
+        }
+        CCore::GetSingleton().GetXML()->DeleteXML(pFile);
+    }
+}
+
 bool CSettings::OnCancelButtonClick(CGUIElement* pElement)
 {
     CMainMenu* pMainMenu = CLocalGUI::GetSingleton().GetMainMenu();
@@ -4271,15 +4646,23 @@ void CSettings::SaveData()
     CGameSettings* gameSettings = CCore::GetSingleton().GetGame()->GetSettings();
 
     // Set and save our settings
-    if (CModManager::GetSingleton().IsLoaded())
     {
-        CVARS_GET("nick", strVar);
-        if (m_pEditNick->GetText().compare(strVar) != 0)
-            CCore::GetSingleton().GetCommands()->Execute("nick", m_pEditNick->GetText().c_str());
-    }
-    else
-    {
-        CVARS_SET("nick", m_pEditNick->GetText());
+        SString strOldNick;
+        CVARS_GET("nick", strOldNick);
+
+        if (CModManager::GetSingleton().IsLoaded())
+        {
+            if (m_pEditNick->GetText().compare(strOldNick) != 0)
+                CCore::GetSingleton().GetCommands()->Execute("nick", m_pEditNick->GetText().c_str());
+        }
+        else
+        {
+            CVARS_SET("nick", m_pEditNick->GetText());
+        }
+
+        // Save old nickname to history if it changed and is not empty
+        if (!strOldNick.empty() && m_pEditNick->GetText().compare(strOldNick) != 0)
+            SaveNicknameToFile(strOldNick);
     }
 
     // Server pass saving

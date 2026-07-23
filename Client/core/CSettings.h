@@ -76,6 +76,8 @@ enum
 class CSettings
 {
     friend class CCore;
+    friend void NickHistoryDeleteCallback(void* ptr, unsigned int uiButton);
+    friend void NickHistoryDeleteAllCallback(void* ptr, unsigned int uiButton);
 
 public:
     CSettings();
@@ -143,6 +145,19 @@ protected:
     CGUIButton*      m_pButtonGenerateNick;
     CGUIStaticImage* m_pButtonGenerateNickIcon;
     CGUIEdit*        m_pEditNick;
+    CGUIButton*      m_pButtonNickHistory;
+    CGUIWindow*      m_pNickHistoryWindow;
+    CGUIGridList*    m_pNickHistoryGrid;
+    CGUIButton*      m_pNickHistoryClose;
+    CGUIButton*      m_pNickHistoryCopy;
+    CGUIButton*      m_pNickHistoryPaste;
+    CGUIButton*      m_pNickHistoryDelete;
+    CGUIButton*      m_pNickHistoryDeleteAll;
+    CGUIEdit*        m_pNickHistorySearch;
+    unsigned int     m_hNickHistoryColNick;
+    unsigned int     m_hNickHistoryColDate;
+    SString                                               m_strNicknamesFilePath;
+    std::vector<std::pair<std::string, std::string>>      m_NickHistoryCache;
     CGUICheckBox*    m_pSavePasswords;
     CGUICheckBox*    m_pAutoRefreshBrowser;
 
@@ -382,6 +397,13 @@ protected:
     bool OnBindsListClick(CGUIElement* pElement);
     bool OnOKButtonClick(CGUIElement* pElement);
     bool OnNickButtonClick(CGUIElement* pElement);
+    bool OnNickHistoryButtonClick(CGUIElement* pElement);
+    bool OnNickHistoryCloseClick(CGUIElement* pElement);
+    bool OnNickHistoryCopyClick(CGUIElement* pElement);
+    bool OnNickHistoryPasteClick(CGUIElement* pElement);
+    bool OnNickHistoryDeleteClick(CGUIElement* pElement);
+    bool OnNickHistoryDeleteAllClick(CGUIElement* pElement);
+    bool OnNickHistorySearchChanged(CGUIElement* pElement);
     bool OnCancelButtonClick(CGUIElement* pElement);
     bool OnFieldOfViewChanged(CGUIElement* pElement);
     bool OnDrawDistanceChanged(CGUIElement* pElement);
@@ -479,6 +501,8 @@ private:
     void RefreshBorderlessDisplayCalibration();
     void UpdateBorderlessAdjustmentControls();
     void ResetGuiPointers();
+    void SaveNicknameToFile(const SString& strNick);
+    void RewriteNickHistoryFileFromCache();
 
     unsigned int m_uiCaptureKey;
     bool         m_bCaptureKey;
