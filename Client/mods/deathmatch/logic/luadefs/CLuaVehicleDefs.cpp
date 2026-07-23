@@ -2366,7 +2366,7 @@ int CLuaVehicleDefs::SetTrainSpeed(lua_State* luaVM)
 bool CLuaVehicleDefs::SetTrainTrack(CClientVehicle* pVehicle, uchar ucTrack)
 {
     if (ucTrack > 3)
-        throw new std::invalid_argument("Invalid track number range (0-3)");
+        throw std::invalid_argument("Invalid track number range (0-3)");
 
     if (pVehicle->GetVehicleType() != CLIENTVEHICLE_TRAIN)
         return false;
