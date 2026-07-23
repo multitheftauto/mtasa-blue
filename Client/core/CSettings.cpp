@@ -4178,9 +4178,10 @@ void CSettings::LoadData()
     {
         CVARS_GET("chat_scale", strVar);
         stringstream ss(strVar);
-        m_pChatScaleX->SetText(SString("%1.1f", atof(strVar.c_str())));
         ss >> strVar;
-        m_pChatScaleY->SetText(SString("%1.1f", atof(strVar.c_str())));
+        m_pChatScaleX->SetText(strVar.c_str());
+        ss >> strVar;
+        m_pChatScaleY->SetText(strVar.c_str());
     }
     catch (...)
     {
@@ -5039,22 +5040,22 @@ void CSettings::LoadSkins()
 
 void CSettings::LoadChatColorFromString(eChatColorType eType, const string& strColor)
 {
-    CColor       pColor;
     stringstream ss(strColor);
-    int          iR, iG, iB, iA;
 
-    try
-    {
-        ss >> iR >> iG >> iB >> iA;
-        pColor.R = static_cast<unsigned char>(iR);
-        pColor.G = static_cast<unsigned char>(iG);
-        pColor.B = static_cast<unsigned char>(iB);
-        pColor.A = static_cast<unsigned char>(iA);
-        SetChatColorValues(eType, pColor);
-    }
-    catch (...)
-    {
-    }
+    int iR, iG, iB;
+    if (!(ss >> iR >> iG >> iB))
+        return;
+
+    int iA;
+    if (!(ss >> iA))
+        iA = 255;
+
+    CColor pColor;
+    pColor.R = static_cast<unsigned char>(iR);
+    pColor.G = static_cast<unsigned char>(iG);
+    pColor.B = static_cast<unsigned char>(iB);
+    pColor.A = static_cast<unsigned char>(iA);
+    SetChatColorValues(eType, pColor);
 }
 
 int CSettings::GetMilliseconds(CGUIEdit* pEdit)
