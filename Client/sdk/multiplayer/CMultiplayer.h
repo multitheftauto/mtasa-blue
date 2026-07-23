@@ -463,6 +463,11 @@ public:
     virtual void SetBoatWaterSplashEnabled(bool bEnabled) = 0;
     virtual void SetTyreSmokeEnabled(bool bEnabled) = 0;
 
+    // When enabled, matches canonical vehicle component names to the typo'd hierarchy nodes in stock GTA SA models
+    // (SilentPatch-style fix). Off by default so behaviour stays vanilla unless a script opts in.
+    virtual void SetVehicleHierarchyTypoFixesEnabled(bool bEnabled) = 0;
+    virtual bool GetVehicleHierarchyTypoFixesEnabled() const = 0;
+
     virtual eAnimGroup GetLastStaticAnimationGroupID() = 0;
     virtual eAnimID    GetLastStaticAnimationID() = 0;
     virtual DWORD      GetLastAnimArrayAddress() = 0;
