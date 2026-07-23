@@ -45,8 +45,8 @@ namespace
     constexpr float kBorderlessSaturationMax = 2.0f;
     constexpr float kBorderlessSaturationDefault = 1.0f;
 
-    constexpr float kSettingsContentWidth = 680.0f;
-    constexpr float kSettingsBaseContentHeight = 480.0f;
+    constexpr float kSettingsContentWidth = 760.0f;
+    constexpr float kSettingsBaseContentHeight = 560.0f;
     constexpr float kSettingsWindowFrameHorizontal = 18.0f;  // 9px left + 9px right
     constexpr float kSettingsWindowFrameVertical = 22.0f;    // 20px top + 2px bottom
     constexpr float kSettingsBottomButtonAreaHeight = 38.0f;
@@ -1699,7 +1699,7 @@ void CSettings::CreateGUI()
      *  Advanced tab
      **/
     vecTemp = CVector2D(12.f, 12.f);
-    float fComboWidth = 170.f;
+    float fComboWidth;
     float fHeaderHeight = 20;
     float fLineHeight = 27;
 
@@ -1716,6 +1716,7 @@ void CSettings::CreateGUI()
                5.0f;
 
     vecTemp.fX += 10.0f;
+    fComboWidth = std::clamp(tabPanelSize.fX - vecTemp.fX - fIndentX - 15.0f, 100.0f, 400.0f);
 
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Fast CJ clothes loading:")));
@@ -1920,29 +1921,41 @@ void CSettings::CreateGUI()
     m_pUpdateBuildTypeLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pUpdateBuildTypeLabel->AutoSize();
 
-    m_pUpdateBuildTypeCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
-    m_pUpdateBuildTypeCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
-    m_pUpdateBuildTypeCombo->SetSize(CVector2D(fComboWidth, 95.0f));
-    m_pUpdateBuildTypeCombo->AddItem(_("Default"))->SetData((void*)0);
-    m_pUpdateBuildTypeCombo->AddItem("Nightly")->SetData((void*)2);
-    m_pUpdateBuildTypeCombo->SetReadOnly(true);
-    vecTemp.fX += fComboWidth + 15;
+    {
+        // Reserve space for "Check for update now" button on the same line
+        const float fButtonTextWidth = pManager->GetTextExtent(_("Check for update now"));
+        const float fUpdateButtonReserve = fButtonTextWidth + 35.0f;
+        const float fUpdateComboWidth = std::clamp(tabPanelSize.fX - (vecTemp.fX + fIndentX) - fUpdateButtonReserve, 100.0f, fComboWidth);
+        m_pUpdateBuildTypeCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAdvanced, ""));
+        m_pUpdateBuildTypeCombo->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY - 1.0f));
+        m_pUpdateBuildTypeCombo->SetSize(CVector2D(fUpdateComboWidth, 95.0f));
+        m_pUpdateBuildTypeCombo->AddItem(_("Default"))->SetData((void*)0);
+        m_pUpdateBuildTypeCombo->AddItem("Nightly")->SetData((void*)2);
+        m_pUpdateBuildTypeCombo->SetReadOnly(true);
 
-    // Check for updates
-    m_pButtonUpdate = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabAdvanced, _("Check for update now")));
-    m_pButtonUpdate->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
-    m_pButtonUpdate->AutoSize(NULL, 20.0f, 8.0f);
-    m_pButtonUpdate->SetClickHandler(GUI_CALLBACK(&CSettings::OnUpdateButtonClick, this));
-    m_pButtonUpdate->SetZOrderingEnabled(false);
+        // Check for updates (place to right of combo, clamped to tab boundary)
+        m_pButtonUpdate = reinterpret_cast<CGUIButton*>(pManager->CreateButton(pTabAdvanced, _("Check for update now")));
+        m_pButtonUpdate->SetPosition(CVector2D(vecTemp.fX + fIndentX + fUpdateComboWidth + 15.0f, vecTemp.fY));
+        m_pButtonUpdate->AutoSize(NULL, 20.0f, 8.0f);
+        {
+            // Ensure button doesn't extend beyond tab
+            CVector2D btnSize;
+            m_pButtonUpdate->GetSize(btnSize);
+            const float maxBtnX = tabPanelSize.fX - btnSize.fX - 4.0f;
+            if (vecTemp.fX + fIndentX + fUpdateComboWidth + 15.0f > maxBtnX)
+                m_pButtonUpdate->SetPosition(CVector2D(maxBtnX, vecTemp.fY));
+        }
+        m_pButtonUpdate->SetClickHandler(GUI_CALLBACK(&CSettings::OnUpdateButtonClick, this));
+        m_pButtonUpdate->SetZOrderingEnabled(false);
+    }
     vecTemp.fY += fLineHeight;
-    vecTemp.fX -= fComboWidth + 15;
 
     // Description label
     vecTemp.fY += 15.0f;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, ""));
     m_pAdvancedSettingDescriptionLabel->SetPosition(CVector2D(vecTemp.fX + 10.f, vecTemp.fY));
     m_pAdvancedSettingDescriptionLabel->SetFont("default-bold-small");
-    m_pAdvancedSettingDescriptionLabel->SetSize(CVector2D(500.0f, 95.0f));
+    m_pAdvancedSettingDescriptionLabel->SetSize(CVector2D(tabPanelSize.fX - 40.0f, 95.0f));
     m_pAdvancedSettingDescriptionLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP);
 
     // Set up the events
