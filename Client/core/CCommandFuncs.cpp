@@ -366,9 +366,12 @@ void CCommandFuncs::CopyGTAControls(const char* szParameters)
 
 void CCommandFuncs::HUD(const char* szParameters)
 {
-    int  iCmd = (szParameters && szParameters[0]) ? atoi(szParameters) : -1;
-    bool bShow = (iCmd == 1) ? true : (iCmd == 0) ? false : g_pCore->GetGame()->GetHud()->IsDisabled();
-    g_pCore->GetGame()->GetHud()->Disable(!bShow);
+    // Toggle based on the user's own showhud preference only, so temporary suppression
+    // (e.g. the F11 player map) does not flip the toggle in an unexpected direction
+    CHud*      pHud = g_pCore->GetGame()->GetHud();
+    const int  iCmd = (szParameters && szParameters[0]) ? std::atoi(szParameters) : -1;
+    const bool bShow = (iCmd == 1) ? true : (iCmd == 0) ? false : !pHud->IsEnabled();
+    pHud->Disable(!bShow);
 }
 
 void CCommandFuncs::SaveConfig(const char* szParameters)
