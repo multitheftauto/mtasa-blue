@@ -2423,6 +2423,47 @@ static void _declspec(naked) HOOK_CrashFix_DynVBCreateNull()
 }
 
 ////////////////////////////////////////////////////////////////////////
+// CPlane::PreRender
+//
+// A malformed custom plane can leave an active bouncing panel pointing at
+// a missing model node. CBouncingPanel::ProcessPanel passes that null frame
+// to CMatrix::Attach, which crashes while reading address 0x10.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_CPlane_PreRenderMissingBouncingPanel   0x6CA693
+#define HOOKSIZE_CrashFix_CPlane_PreRenderMissingBouncingPanel  7
+#define HOOKCHECK_CrashFix_CPlane_PreRenderMissingBouncingPanel 0x8B
+DWORD RETURN_CrashFix_CPlane_PreRenderMissingBouncingPanel = 0x6CA69A;
+DWORD RETURN_CrashFix_CPlane_PreRenderMissingBouncingPanel_Skip = 0x6CA6A3;
+
+static void __declspec(naked) HOOK_CrashFix_CPlane_PreRenderMissingBouncingPanel()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // Replicate the overwritten model-node lookup. EAX is the active panel's frame id,
+        // ESI is the CPlane, and EDI is the current CBouncingPanel.
+        mov     ecx, [esi+eax*4+648h]
+        test    ecx, ecx
+        jnz     valid_frame
+
+        // Disable this panel so the invalid lookup is not repeated every render frame.
+        mov     word ptr [edi], 0FFFFh
+        // CPlane::PreRender has already prepared 0x28 bytes of arguments for
+        // CBouncingPanel::ProcessPanel. The skipped callee would normally pop them.
+        add     esp, 28h
+        push    54
+        call    CrashAverted
+        jmp     RETURN_CrashFix_CPlane_PreRenderMissingBouncingPanel_Skip
+
+    valid_frame:
+        jmp     RETURN_CrashFix_CPlane_PreRenderMissingBouncingPanel
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
 // CClumpModelInfo::GetFrameFromId
 //
 // Invalid frame
@@ -4145,6 +4186,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CrashFix_VBInstV3dMorphNull);
     EZHookInstallChecked(CrashFix_VBInstWeightsNull);
     EZHookInstallChecked(CrashFix_DynVBCreateNull);
+    EZHookInstallChecked(CrashFix_CPlane_PreRenderMissingBouncingPanel);
     EZHookInstall(CrashFix_Misc39);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
