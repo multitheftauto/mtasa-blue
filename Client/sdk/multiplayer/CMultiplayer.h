@@ -136,6 +136,7 @@ typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
 typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
 typedef void(AudioZoneRadioSwitchHandler)(DWORD dwStationID);
+typedef void(VehicleAutomobilePostPreRenderHandler)(CEntitySAInterface* pVehicle);
 
 using VehicleWeaponHitHandler = void(SVehicleWeaponHitEvent& event);
 
@@ -432,6 +433,8 @@ public:
     virtual CLimits* GetLimits() = 0;
 
     virtual void UpdateVehicleSuspension() const noexcept = 0;
+    virtual void RestoreVehicleSuspensionAfterAutomobilePreRender(CEntitySAInterface* pVehicleIntf) = 0;
+    virtual void SetVehicleAutomobilePostPreRenderHandler(VehicleAutomobilePostPreRenderHandler* pHandler) = 0;
 
     virtual void FlushClothesCache() = 0;
     virtual void SetFastClothesLoading(EFastClothesLoading fastClothesLoading) = 0;

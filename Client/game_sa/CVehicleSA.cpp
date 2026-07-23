@@ -57,6 +57,12 @@ static void __fastcall RehideRhinoMiddleWheels(CAutomobileSAInterface* vehicle)
     }
 }
 
+static void __cdecl OnAutomobilePostPreRender(CAutomobileSAInterface* vehicleInterface)
+{
+    if (g_pCore && g_pCore->GetMultiplayer())
+        g_pCore->GetMultiplayer()->RestoreVehicleSuspensionAfterAutomobilePreRender(reinterpret_cast<CEntitySAInterface*>(vehicleInterface));
+}
+
 static void __declspec(naked) HOOK_Vehicle_PreRender(void)
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -77,6 +83,9 @@ static void __declspec(naked) HOOK_Vehicle_PreRender(void)
         pushad
         mov     ecx, esi
         call    RehideRhinoMiddleWheels
+        push    esi
+        call    OnAutomobilePostPreRender
+        add     esp, 4
         popad
 
         mov     [esp+0D4h], edi
