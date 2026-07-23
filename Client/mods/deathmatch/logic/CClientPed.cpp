@@ -5897,8 +5897,6 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     m_AnimationCache.bUpdatePosition = bUpdatePosition;
     m_AnimationCache.bInterruptible = bInterruptible;
     m_AnimationCache.bFreezeLastFrame = bFreezeLastFrame;
-    // Local setPedAnimation did not set this (RPCs did); needed for IsAnimationInProgress.
-    m_AnimationCache.startTime = GetTimestamp();
 }
 
 void CClientPed::KillAnimation()
