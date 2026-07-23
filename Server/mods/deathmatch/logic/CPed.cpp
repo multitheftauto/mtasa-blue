@@ -384,7 +384,7 @@ float CPed::GetMaxHealth()
 
 const char* CPed::GetBodyPartName(unsigned char ucID)
 {
-    if (ucID <= NUMELMS(BodyPartNames))
+    if (ucID < NUMELMS(BodyPartNames))
     {
         return BodyPartNames[ucID].szName;
     }
