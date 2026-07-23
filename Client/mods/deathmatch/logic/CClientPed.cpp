@@ -738,6 +738,27 @@ void CClientPed::SetCurrentRotationNew(float fRotation)
     SetRotationRadiansNew(CVector(0, 0, fRotation));
 }
 
+void CClientPed::SetScriptRotationOverride(const CVector& vecRotationRadians, bool bNewWay)
+{
+    m_bHasScriptRotationOverride = true;
+    m_bScriptRotationNewWay = bNewWay;
+    m_vecScriptRotation = vecRotationRadians;
+}
+
+void CClientPed::ReapplyScriptRotationIfNeeded()
+{
+    if (!m_bHasScriptRotationOverride || !m_pPlayerPed)
+        return;
+
+    if (GetRealOccupiedVehicle())
+        return;
+
+    if (m_bScriptRotationNewWay)
+        SetRotationRadiansNew(m_vecScriptRotation);
+    else
+        SetRotationRadians(m_vecScriptRotation);
+}
+
 void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior)
 {
     // Remove us from our car
@@ -779,6 +800,7 @@ void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned sho
 
     // Set some states
     SetFrozen(false);
+    ClearScriptRotationOverride();
     Teleport(vecPosition);
     SetCurrentRotationNew(fRotation);
     SetHealth(GetMaxHealth());

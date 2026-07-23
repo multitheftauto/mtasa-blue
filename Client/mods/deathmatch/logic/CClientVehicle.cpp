@@ -4187,6 +4187,7 @@ void CClientVehicle::SetPedOccupiedVehicle(CClientPed* pClientPed, CClientVehicl
     // Ped vars
     pClientPed->m_pOccupiedVehicle = pVehicle;
     pClientPed->m_uiOccupiedVehicleSeat = uiSeat;
+    pClientPed->ClearScriptRotationOverride();
 
     if (ucDoor != 0xFF)
         pVehicle->AllowDoorRatioSetting(ucDoor, true);
