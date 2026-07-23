@@ -5784,15 +5784,18 @@ bool CClientPed::GetRunningAnimationName(SString& strBlockName, SString& strAnim
 
 bool CClientPed::IsRunningAnimation()
 {
+    // Prefer the live named-anim primary task when present.
     if (m_pPlayerPed)
     {
         CTask* pTask = m_pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
         if (pTask && pTask->GetTaskType() == TASK_SIMPLE_NAMED_ANIM)
-        {
             return true;
-        }
-        return false;
     }
+
+    // Why: partial anims with a short time (e.g. time=1 on crry_prtial) finish the
+    // TASK_SIMPLE_NAMED_ANIM almost immediately while loop/freezeLastFrame keeps the
+    // pose. getPedAnimation must still report the cached block/anim in that case —
+    // same rule already used for streamed-out peds.
     return (m_AnimationCache.bLoop || m_AnimationCache.bFreezeLastFrame) && m_pAnimationBlock;
 }
 
@@ -5897,6 +5900,9 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     m_AnimationCache.bUpdatePosition = bUpdatePosition;
     m_AnimationCache.bInterruptible = bInterruptible;
     m_AnimationCache.bFreezeLastFrame = bFreezeLastFrame;
+    // Local setPedAnimation previously left startTime unset (only RPCs set it), which
+    // broke time-based IsAnimationInProgress checks for client-applied anims.
+    m_AnimationCache.startTime = GetTimestamp();
 }
 
 void CClientPed::KillAnimation()
