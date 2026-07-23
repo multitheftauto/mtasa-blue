@@ -180,7 +180,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTargetStart", OOP_GetPedTargetStart);
     lua_classfunction(luaVM, "getWeaponMuzzlePosition", "getPedWeaponMuzzlePosition");
     lua_classfunction(luaVM, "getBonePosition", OOP_GetPedBonePosition);
-    lua_classfunction(luaVM, "getBoneMatrix", ArgumentParserWarn<false, GetElementBoneMatrix>);
+    lua_classfunction(luaVM, "getBoneMatrix", ArgumentParserWarn<false, OOP_GetElementBoneMatrix>);
     lua_classfunction(luaVM, "getCameraRotation", "getPedCameraRotation");
     lua_classfunction(luaVM, "getWeaponSlot", "getPedWeaponSlot");
     lua_classfunction(luaVM, "getWalkingStyle", "getPedWalkingStyle");
@@ -1045,7 +1045,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float, float>> CLuaPedDefs::Get
     return CLuaMultiReturn<float, float, float, float>(x, y, z, w);
 }
 
-std::variant<bool, CMatrix, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(lua_State* luaVM, CClientPed* ped, const std::uint16_t bone)
+std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone)
 {
     if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
         throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
@@ -1064,11 +1064,29 @@ std::variant<bool, CMatrix, std::array<std::array<float, 4>, 4>> CLuaPedDefs::Ge
 
     g_pGame->GetRenderWare()->RwMatrixToCMatrix(*rwmatrix, matrix);
 
-    CLuaMain* pLuaMain = g_pClientGame->GetLuaManager()->GetVirtualMachine(luaVM);
-    if (pLuaMain && pLuaMain->IsOOPEnabled())
-        return matrix;
-
     return matrix.To4x4Array();
+}
+
+std::variant<bool, CMatrix> CLuaPedDefs::OOP_GetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone)
+{
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
+
+    CEntity* entity = ped->GetGameEntity();
+
+    if (!entity)
+        return false;
+
+    RwMatrix* rwmatrix = entity->GetBoneRwMatrix(static_cast<eBone>(bone));
+
+    if (!rwmatrix)
+        return false;
+
+    CMatrix matrix;
+
+    g_pGame->GetRenderWare()->RwMatrixToCMatrix(*rwmatrix, matrix);
+
+    return matrix;
 }
 
 bool CLuaPedDefs::SetElementBonePosition(CClientPed* ped, const std::uint16_t bone, const CVector position)
