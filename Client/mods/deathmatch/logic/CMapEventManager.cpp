@@ -196,6 +196,9 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     if (!g_pClientGame->GetDebugHookManager()->OnPreEventFunction(szName, Arguments, pSource, nullptr, pMapEvent))
                         continue;
 
+                    // Own cancelEvent for the remote-pulse guard. Restore the previous owner so a
+                    // nested CallEvent inside this handler does not wipe the outer VM's ownership.
+                    CLuaMain* const pPreviousActiveHandler = g_pClientGame->GetEvents()->GetActiveEventHandlerLuaMain();
                     g_pClientGame->GetEvents()->SetActiveEventHandlerLuaMain(luaMain);
 
                     // Store the current values of the globals
@@ -252,7 +255,7 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     pMapEvent->Call(Arguments);
                     bCalled = true;
 
-                    g_pClientGame->GetEvents()->SetActiveEventHandlerLuaMain(nullptr);
+                    g_pClientGame->GetEvents()->SetActiveEventHandlerLuaMain(pPreviousActiveHandler);
 
                     g_pClientGame->GetDebugHookManager()->OnPostEventFunction(szName, Arguments, pSource, nullptr, pMapEvent);
 
