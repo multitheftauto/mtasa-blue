@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaWaterDefs::LoadFunctions()
 {
@@ -48,7 +49,7 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
     // lua_classvariable ( luaVM, "drawnLast", "setWaterDrawnLast", "isWaterDrawnLast" );
 
     lua_classfunction(luaVM, "getLevel", "getWaterLevel");
-    lua_classfunction(luaVM, "getVertexPosition", "getWaterVertexPosition");
+    lua_classfunction(luaVM, "getVertexPosition", ArgumentParserWarn<false, OOP_GetWaterVertexPosition>);
     lua_classfunction(luaVM, "getWaveHeight", "getWaveHeight");
     lua_classfunction(luaVM, "getColor", "getWaterColor");
 
@@ -427,4 +428,13 @@ int CLuaWaterDefs::GetWaterVertexPosition(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<bool, CVector> CLuaWaterDefs::OOP_GetWaterVertexPosition(CClientWater* pWater, int iVertexIndex)
+{
+    CVector vecPosition;
+    if (!CStaticFunctionDefinitions::GetWaterVertexPosition(pWater, iVertexIndex, vecPosition))
+        return false;
+
+    return vecPosition;
 }

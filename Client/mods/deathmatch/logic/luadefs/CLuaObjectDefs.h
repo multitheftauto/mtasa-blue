@@ -25,6 +25,7 @@ public:
     LUA_DECLARE(IsObjectStatic);
     static bool IsObjectMoving(CClientEntity* pEntity);
     LUA_DECLARE(GetObjectScale);
+    static std::variant<bool, CVector> OOP_GetObjectScale(CClientObject* pObject);
     LUA_DECLARE(IsObjectBreakable);
     LUA_DECLARE(GetObjectMass);
     LUA_DECLARE(GetObjectProperty);

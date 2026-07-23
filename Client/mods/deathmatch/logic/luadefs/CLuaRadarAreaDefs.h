@@ -19,7 +19,8 @@ public:
 
     LUA_DECLARE(CreateRadarArea);
     LUA_DECLARE(GetRadarAreaColor);
-    LUA_DECLARE_OOP(GetRadarAreaSize);
+    LUA_DECLARE(GetRadarAreaSize);
+    static std::variant<bool, CVector2D> OOP_GetRadarAreaSize(CClientRadarArea* pRadarArea);
     LUA_DECLARE(IsRadarAreaFlashing);
     LUA_DECLARE(SetRadarAreaColor);
     LUA_DECLARE(SetRadarAreaFlashing);

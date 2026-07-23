@@ -229,7 +229,8 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getHelicopterRotorSpeed", "getHelicopterRotorSpeed");
     lua_classfunction(luaVM, "areHeliBladeCollisionsEnabled", "getHeliBladeCollisionsEnabled");
     lua_classfunction(luaVM, "getPaintjob", "getVehiclePaintjob");
-    lua_classfunction(luaVM, "getTurretPosition", "getVehicleTurretPosition");
+    // OOP should return a vector2 (procedural getVehicleTurretPosition returns two floats)
+    lua_classfunction(luaVM, "getTurretPosition", ArgumentParserWarn<false, OOP_GetVehicleTurretPosition>);
     lua_classfunction(luaVM, "getWheelStates", "getVehicleWheelStates");
     lua_classfunction(luaVM, "isWheelOnGround", "isVehicleWheelOnGround");
     lua_classfunction(luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio");
@@ -381,6 +382,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "nitroRecharging", NULL, "isVehicleNitroRecharging");
     lua_classvariable(luaVM, "gravity", SetVehicleGravity, OOP_GetVehicleGravity);
     lua_classvariable(luaVM, "turnVelocity", SetVehicleTurnVelocity, OOP_GetVehicleTurnVelocity);
+    lua_classvariable(luaVM, "turretPosition", nullptr, ArgumentParserWarn<false, OOP_GetVehicleTurretPosition>);
     lua_classvariable(luaVM, "wheelScale", "setVehicleWheelScale", "getVehicleWheelScale");
     lua_classvariable(luaVM, "rotorState", "setVehicleRotorState", "getVehicleRotorState");
     lua_classvariable(luaVM, "audioSettings", nullptr, "getVehicleAudioSettings");
@@ -795,6 +797,13 @@ int CLuaVehicleDefs::GetVehicleTurretPosition(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+CVector2D CLuaVehicleDefs::OOP_GetVehicleTurretPosition(CClientVehicle* pVehicle)
+{
+    CVector2D vecPosition;
+    pVehicle->GetTurretRotation(vecPosition.fX, vecPosition.fY);
+    return vecPosition;
 }
 
 int CLuaVehicleDefs::IsVehicleLocked(lua_State* luaVM)

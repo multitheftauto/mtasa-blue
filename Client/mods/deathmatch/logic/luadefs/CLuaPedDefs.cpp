@@ -178,7 +178,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setFootBloodEnabled", "setPedFootBloodEnabled");
     lua_classfunction(luaVM, "getTargetEnd", OOP_GetPedTargetEnd);
     lua_classfunction(luaVM, "getTargetStart", OOP_GetPedTargetStart);
-    lua_classfunction(luaVM, "getWeaponMuzzlePosition", "getPedWeaponMuzzlePosition");
+    lua_classfunction(luaVM, "getWeaponMuzzlePosition", ArgumentParserWarn<false, OOP_GetPedWeaponMuzzlePosition>);
     lua_classfunction(luaVM, "getBonePosition", OOP_GetPedBonePosition);
     lua_classfunction(luaVM, "getBoneMatrix", ArgumentParserWarn<false, OOP_GetElementBoneMatrix>);
     lua_classfunction(luaVM, "getCameraRotation", "getPedCameraRotation");
@@ -242,7 +242,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "targetCollision", nullptr, OOP_GetPedTargetCollision);
     lua_classvariable(luaVM, "targetEnd", nullptr, OOP_GetPedTargetEnd);
     lua_classvariable(luaVM, "targetStart", nullptr, OOP_GetPedTargetStart);
-    // lua_classvariable ( luaVM, "muzzlePosition", NULL, "getPedWeaponMuzzlePosition" ); // TODO: needs to return a vector3 for oop
+    lua_classvariable(luaVM, "muzzlePosition", nullptr, ArgumentParserWarn<false, OOP_GetPedWeaponMuzzlePosition>);
     lua_classvariable(luaVM, "weaponSlot", "setPedWeaponSlot", "getPedWeaponSlot");
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
     lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
@@ -481,6 +481,15 @@ int CLuaPedDefs::GetPedWeaponMuzzlePosition(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<bool, CVector> CLuaPedDefs::OOP_GetPedWeaponMuzzlePosition(CClientPed* pPed)
+{
+    CVector vecMuzzlePos;
+    if (!CStaticFunctionDefinitions::GetPedWeaponMuzzlePosition(*pPed, vecMuzzlePos))
+        return false;
+
+    return vecMuzzlePos;
 }
 
 int CLuaPedDefs::GetPedOccupiedVehicle(lua_State* luaVM)

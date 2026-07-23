@@ -37,6 +37,7 @@ public:
     LUA_DECLARE(GetVehicleSirensOn);
     LUA_DECLARE_OOP(GetVehicleTurnVelocity);
     LUA_DECLARE(GetVehicleTurretPosition);
+    static CVector2D OOP_GetVehicleTurretPosition(CClientVehicle* pVehicle);
     LUA_DECLARE(IsVehicleLocked);
     LUA_DECLARE(GetVehicleUpgradeOnSlot);
     LUA_DECLARE(GetVehicleUpgrades);

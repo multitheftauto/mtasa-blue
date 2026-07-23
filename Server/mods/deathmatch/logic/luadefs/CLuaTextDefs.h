@@ -36,6 +36,7 @@ public:
     LUA_DECLARE(textItemGetScale);
     LUA_DECLARE(textItemSetPosition);
     LUA_DECLARE(textItemGetPosition);
+    static CVector2D OOP_textItemGetPosition(CTextItem* pTextItem);
     LUA_DECLARE(textItemSetColor);
     LUA_DECLARE(textItemGetColor);
     LUA_DECLARE(textItemSetPriority);
