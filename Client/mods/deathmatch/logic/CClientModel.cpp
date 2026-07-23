@@ -198,16 +198,22 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
 
             // Restore pickups with custom model
             CClientPickupManager* pPickupManager = g_pClientGame->GetManager()->GetPickupManager();
-
-            unloadModelsAndCallEvents(pPickupManager->IterBegin(), pPickupManager->IterEnd(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
+            if (pPickupManager)
+                unloadModelsAndCallEvents(pPickupManager->IterBegin(), pPickupManager->IterEnd(), usParentID,
+                                          [=](auto& element) { element.SetModel(usParentID); });
 
             // Restore buildings
             CClientBuildingManager* pBuildingsManager = g_pClientGame->GetManager()->GetBuildingManager();
-            auto&                   buildingsList = pBuildingsManager->GetBuildings();
-            unloadModelsAndCallEventsNonStreamed(buildingsList.begin(), buildingsList.end(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
+            if (pBuildingsManager)
+            {
+                auto& buildingsList = pBuildingsManager->GetBuildings();
+                unloadModelsAndCallEventsNonStreamed(buildingsList.begin(), buildingsList.end(), usParentID,
+                                                     [=](auto& element) { element.SetModel(usParentID); });
+            }
 
             // Restore COL
-            g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(static_cast<unsigned short>(m_iModelID));
+            if (CClientColModelManager* pColModelManager = g_pClientGame->GetManager()->GetColModelManager())
+                pColModelManager->RestoreModel(static_cast<unsigned short>(m_iModelID));
             break;
         }
         case eClientModelType::VEHICLE:
@@ -215,14 +221,16 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             CClientVehicleManager* pVehicleManager = g_pClientGame->GetManager()->GetVehicleManager();
             const auto             usParentID = static_cast<unsigned short>(g_pGame->GetModelInfo(m_iModelID)->GetParentID());
 
-            unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID,
-                                      [=](auto& element) { element.SetModelBlocking(usParentID, 255, 255); });
+            if (pVehicleManager)
+                unloadModelsAndCallEvents(pVehicleManager->IterBegin(), pVehicleManager->IterEnd(), usParentID,
+                                          [=](auto& element) { element.SetModelBlocking(usParentID, 255, 255); });
             break;
         }
     }
 
     // Restore DFF/TXD
-    g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(static_cast<unsigned short>(m_iModelID));
+    if (CClientDFFManager* pDFFManager = g_pClientGame->GetManager()->GetDFFManager())
+        pDFFManager->RestoreModel(static_cast<unsigned short>(m_iModelID));
 }
 
 bool CClientModel::AllocateTXD(std::string& strTxdName)

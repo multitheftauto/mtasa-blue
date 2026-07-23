@@ -4175,14 +4175,14 @@ bool CStaticFunctionDefinitions::StopObject(CClientEntity& Entity)
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetObjectScale(CClientEntity& Entity, const CVector& vecScale)
+bool CStaticFunctionDefinitions::SetObjectScale(CClientEntity& Entity, const CVector& vecScale, std::optional<bool> scaleCollision)
 {
-    RUN_CHILDREN(SetObjectScale(**iter, vecScale))
+    RUN_CHILDREN(SetObjectScale(**iter, vecScale, scaleCollision))
 
     if (IS_OBJECT(&Entity))
     {
         CDeathmatchObject& Object = static_cast<CDeathmatchObject&>(Entity);
-        Object.SetScale(vecScale);
+        Object.SetScale(vecScale, scaleCollision);
         return true;
     }
 

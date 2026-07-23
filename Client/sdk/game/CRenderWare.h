@@ -20,6 +20,8 @@ class CPixels;
 class CShaderItem;
 class SString;
 class CColModel;
+class CVector;
+struct CColModelSAInterface;
 struct RpAtomicContainer;
 struct RwFrame;
 struct RwMatrix;
@@ -85,6 +87,7 @@ public:
     virtual RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer) = 0;
     virtual RpClump*         ReadDFF(const SString& strFilename, const SString& buffer, unsigned short usModelID, bool bLoadEmbeddedCollisions) = 0;
     virtual CColModel*       ReadCOL(const SString& buffer) = 0;
+    virtual CColModel*       CreateScaledColModel(CColModelSAInterface* pOriginalInterface, const CVector& vecScale) = 0;
     virtual void             DestroyDFF(RpClump* pClump) = 0;
     virtual void             DestroyTXD(RwTexDictionary* pTXD) = 0;
     virtual void             DestroyTexture(RwTexture* pTex) = 0;

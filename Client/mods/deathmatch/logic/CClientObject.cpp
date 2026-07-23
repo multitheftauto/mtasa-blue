@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <cmath>
+#include <optional>
 
 #define MTA_BUILDINGS
 #define CCLIENTOBJECT_MAX 250
@@ -64,8 +66,17 @@ CClientObject::~CClientObject()
     // Detach us from anything
     AttachTo(NULL);
 
-    // Destroy the object
+    // Destroy the object (this releases our reference to whatever model we're currently using,
+    // clone or not - must happen before we release the clone below, otherwise the clone's model
+    // info could be freed while m_pObject is still referencing it)
     Destroy();
+
+    // Release any scaled-collision model clone we were using
+    if (m_iScaleCollisionModelID != -1)
+    {
+        g_pClientGame->GetManager()->GetModelManager()->ReleaseScaledCollisionModel(m_iScaleCollisionModelID);
+        m_iScaleCollisionModelID = -1;
+    }
 
     // Remove us from the list
     Unlink();
@@ -407,13 +418,78 @@ void CClientObject::GetScale(CVector& vecScale) const
     }
 }
 
-void CClientObject::SetScale(const CVector& vecScale)
+void CClientObject::SetScale(const CVector& vecScale, std::optional<bool> scaleCollision)
 {
+    constexpr float kUnitScaleEpsilon = 0.0001f;
+    const bool      bIsUnitScale = std::fabs(vecScale.fX - 1.0f) < kUnitScaleEpsilon && std::fabs(vecScale.fY - 1.0f) < kUnitScaleEpsilon &&
+                              std::fabs(vecScale.fZ - 1.0f) < kUnitScaleEpsilon;
+    // If the caller didn't specify, keep whatever collision-scaling state this object already has,
+    // instead of silently turning it off whenever someone just wants to nudge the visual scale.
+    const bool bScaleCollision = scaleCollision.value_or(m_iScaleCollisionModelID != -1);
+    // Scaling collision to (1,1,1) would just be a wasteful clone of the original - skip it
+    const bool bWantScaledCollision = bScaleCollision && !bIsUnitScale;
+
+    // Set this before any SetModel() call below, since that can synchronously (or, once the model
+    // streams in, asynchronously) re-run Create(), which applies m_vecScale to the new object before
+    // registering it for collision/visibility. If m_vecScale were updated only at the end of this
+    // function, Create() would still see the old scale and register the object at the wrong size.
+    m_vecScale = vecScale;
+
+    CClientModelManager* pModelManager = g_pClientGame->GetManager()->GetModelManager();
+
+    if (bWantScaledCollision)
+    {
+        // Capture the true base model the first time collision scaling is enabled, so
+        // re-scaling (or later disabling it) can always find its way back to it.
+        const unsigned short usBaseModel = (m_iScaleCollisionModelID != -1) ? m_usScaleCollisionBaseModel : m_usModel;
+
+        const int iNewCloneID = pModelManager->AcquireScaledCollisionModel(usBaseModel, vecScale);
+        if (iNewCloneID != -1)
+        {
+            const int iOldCloneID = m_iScaleCollisionModelID;
+
+            m_usScaleCollisionBaseModel = usBaseModel;
+            m_iScaleCollisionModelID = iNewCloneID;
+
+            // The clone is a freshly minted model slot, so CClientModelRequestManager::Request()
+            // (called inside SetModel() below) would normally see it as "not loaded" and only
+            // queue an async callback to Create() once it streams in. That callback never actually
+            // fires for these clones (they don't reference new disk data, just the parent's already-
+            // loaded geometry, so nothing ever marks them "loaded"), leaving the object stuck with
+            // its old, unscaled collision until something else happens to retry. Force a blocking
+            // load first so Request() sees it as already loaded and Create() runs synchronously.
+            if (CModelInfo* pCloneModelInfo = g_pGame->GetModelInfo(iNewCloneID, true))
+            {
+                pCloneModelInfo->ModelAddRef(BLOCKING, "CClientObject::SetScale");
+                pCloneModelInfo->RemoveRef();
+            }
+
+            SetModel(static_cast<unsigned short>(iNewCloneID));
+
+            if (iOldCloneID != -1 && iOldCloneID != iNewCloneID)
+                pModelManager->ReleaseScaledCollisionModel(iOldCloneID);
+        }
+        // Else: couldn't get scaled collision (no free model slot, or unsupported geometry
+        // for this scale - e.g. non-uniform scale on a model with collision spheres). Leave
+        // whatever collision state we already had and just fall through to the visual scale.
+    }
+    else if (m_iScaleCollisionModelID != -1)
+    {
+        // Turning collision scaling back off - restore the real model and release our clone
+        const int            iOldCloneID = m_iScaleCollisionModelID;
+        const unsigned short usBaseModel = m_usScaleCollisionBaseModel;
+
+        m_iScaleCollisionModelID = -1;
+        m_usScaleCollisionBaseModel = 0;
+        SetModel(usBaseModel);
+
+        pModelManager->ReleaseScaledCollisionModel(iOldCloneID);
+    }
+
     if (m_pObject)
     {
         m_pObject->SetScale(vecScale.fX, vecScale.fY, vecScale.fZ);
     }
-    m_vecScale = vecScale;
 }
 
 void CClientObject::SetCollisionEnabled(bool bCollisionEnabled)
@@ -535,6 +611,20 @@ void CClientObject::Create()
                 // Put our pointer in its stored pointer
                 m_pObject->SetStoredPointer(this);
 
+                // Apply the visual scale directly on the freshly created game object, instead of going
+                // through CClientObject::SetScale(). That method can acquire or release a scaled
+                // collision clone and call SetModel(), which destroys and recursively re-creates this
+                // very object, so if the resulting model needs to stream in asynchronously, m_pObject
+                // ends up null here and everything below crashes on a null pointer. The collision
+                // clone bookkeeping is already settled by the time Create() runs, since it's what got
+                // us streaming m_usModel in the first place, so only the visual scale is needed here.
+                // This must happen before ProcessCollision()/UpdateVisibility() below, since those use
+                // the object's current size to register it for collision and visibility - scaling
+                // afterwards leaves it registered at its old (usually default 1,1,1) size, which can
+                // make it flicker in and out of view at some camera angles.
+                if (m_vecScale.fX != 1.0f || m_vecScale.fY != 1.0f || m_vecScale.fZ != 1.0f)
+                    m_pObject->SetScale(m_vecScale.fX, m_vecScale.fY, m_vecScale.fZ);
+
                 // Apply our data to the object
                 m_pObject->Teleport(m_vecPosition.fX, m_vecPosition.fY, m_vecPosition.fZ);
                 m_pObject->SetOrientation(m_vecRotation.fX, m_vecRotation.fY, m_vecRotation.fZ);
@@ -547,8 +637,6 @@ void CClientObject::Create()
                 UpdateVisibility();
                 if (!m_bUsesCollision)
                     SetCollisionEnabled(false);
-                if (m_vecScale.fX != 1.0f || m_vecScale.fY != 1.0f || m_vecScale.fZ != 1.0f)
-                    SetScale(m_vecScale);
                 m_pObject->SetAreaCode(m_ucInterior);
                 SetAlpha(m_ucAlpha);
                 m_pObject->SetHealth(m_fHealth);
