@@ -15,10 +15,12 @@
 // Limits for MTA
 #define MAX_VEHICLES_MTA             64     // Real limit is 110
 #define MAX_PEDS_MTA                 110    // Real limit is 140
-#define MAX_OBJECTS_MTA              1000   // Real limit is 1200
-#define MAX_ENTRY_INFO_NODES_MTA     72000  // Real limit is 72600  ( MAX_OBJECTS_MTA * 72 ) [Large col models are the cause of high usage]
-#define MAX_POINTER_SINGLE_LINKS_MTA 85000  // Real limit is 90000 [Large col models are the cause of high usage]
-#define MAX_POINTER_DOUBLE_LINKS_MTA 74000  // Real limit is 74800  ( MAX_OBJECTS_MTA * 72 + 2000 )
+// Object pool ceiling. Default streaming stays at stock (500/500, see CClientObjectManager);
+// this only sets how high engineSetObjectStreamingLimits may go. Node pools scale with it.
+#define MAX_OBJECTS_MTA              4000   // object pool ceiling for opt-in higher streaming limits
+#define MAX_ENTRY_INFO_NODES_MTA     (MAX_OBJECTS_MTA * 72)          // scales with objects (large col models drive usage)
+#define MAX_POINTER_SINGLE_LINKS_MTA (MAX_OBJECTS_MTA * 85)          // scales with objects
+#define MAX_POINTER_DOUBLE_LINKS_MTA (MAX_OBJECTS_MTA * 72 + 2000)   // scales with objects
 
 // Real limits for GTA
 #define MAX_VEHICLES             (MAX_VEHICLES_MTA + 46)  // 110
