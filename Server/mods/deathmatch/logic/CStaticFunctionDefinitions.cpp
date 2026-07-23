@@ -10406,7 +10406,7 @@ bool CStaticFunctionDefinitions::SetWeaponOwner(CCustomWeapon* pWeapon, CPlayer*
 
 bool CStaticFunctionDefinitions::GetBodyPartName(unsigned char ucID, char* szName)
 {
-    if (ucID <= 59)
+    if (ucID < 10)
     {
         // Grab the name and check it's length
         const char* szNamePointer = CPlayer::GetBodyPartName(ucID);
