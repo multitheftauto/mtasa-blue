@@ -4830,9 +4830,11 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
     CClientEntity* pCreator = NULL;
     if (CreatorID != INVALID_ELEMENT_ID)
         pCreator = CElementIDs::GetElement(CreatorID);
+
+    CClientEntity* pOriginSource = NULL;
     if (OriginID != INVALID_ELEMENT_ID)
     {
-        CClientEntity* pOriginSource = CElementIDs::GetElement(OriginID);
+        pOriginSource = CElementIDs::GetElement(OriginID);
         if (pOriginSource)
         {
             CVector vecTemp;
@@ -4850,12 +4852,29 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
     CClientEntity*       pTargetEntity = NULL;
     SVelocitySync        velocity;
     SRotationRadiansSync rotation(true);
+    bool                 bHasAttachOffset = false;
+    CVector              vecAttachOffsetPosition, vecAttachOffsetRotation;
 
     switch (weaponType)
     {
         case WEAPONTYPE_GRENADE:
         case WEAPONTYPE_TEARGAS:
         case WEAPONTYPE_MOLOTOV:
+        {
+            // Read the force
+            SFloatSync<7, 17> projectileForce;
+            if (!bitStream.Read(&projectileForce))
+                return;
+            fForce = projectileForce.data.fValue;
+
+            // Read the velocity
+            if (!bitStream.Read(&velocity))
+                return;
+            bCreateProjectile = true;
+
+            break;
+        }
+
         case WEAPONTYPE_REMOTE_SATCHEL_CHARGE:
         {
             // Read the force
@@ -4867,6 +4886,21 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
             // Read the velocity
             if (!bitStream.Read(&velocity))
                 return;
+
+            // Only ever set on a resync (CGame::Packet_ProjectileRestPosition) - where on the entity it was stuck,
+            // in GTA's own native attach offset terms (e.g. the hood, not the entity's centre)
+            if (!bitStream.ReadBit(bHasAttachOffset))
+                return;
+
+            if (bHasAttachOffset)
+            {
+                if (!bitStream.Read(vecAttachOffsetPosition.fX) || !bitStream.Read(vecAttachOffsetPosition.fY) || !bitStream.Read(vecAttachOffsetPosition.fZ))
+                    return;
+
+                if (!bitStream.Read(vecAttachOffsetRotation.fX) || !bitStream.Read(vecAttachOffsetRotation.fY) || !bitStream.Read(vecAttachOffsetRotation.fZ))
+                    return;
+            }
+
             bCreateProjectile = true;
 
             break;
@@ -4914,6 +4948,7 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
 
     if (bCreateProjectile)
     {
+        bool bCreated = false;
         if (pCreator)
         {
             if (pCreator->GetType() == CCLIENTPED || pCreator->GetType() == CCLIENTPLAYER)
@@ -4928,7 +4963,21 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
             if (pProjectile)
             {
                 pProjectile->Initiate(origin.data.vecPosition, rotation.data.vecRotation, velocity.data.vecVelocity, usModel);
+                g_pClientGame->m_pManager->GetProjectileManager()->SettleResyncedSatchel(pProjectile, weaponType, fForce, velocity.data.vecVelocity,
+                                                                                         pOriginSource, vecAttachOffsetPosition, vecAttachOffsetRotation);
+                bCreated = true;
             }
+        }
+
+        // The creator's in-game ped/vehicle might not have streamed in yet (e.g. they just connected, or we only
+        // just came into sync range of a projectile they planted earlier while we were out of view - see
+        // CGame::ProcessProjectileStreamIn on the server). Keep retrying instead of silently dropping it.
+        if (!bCreated && CreatorID != INVALID_ELEMENT_ID)
+        {
+            ElementID TargetID = pTargetEntity ? pTargetEntity->GetID() : INVALID_ELEMENT_ID;
+            g_pClientGame->m_pManager->GetProjectileManager()->QueuePendingCreation(CreatorID, weaponType, origin.data.vecPosition, fForce, TargetID, OriginID,
+                                                                                    rotation.data.vecRotation, velocity.data.vecVelocity, usModel,
+                                                                                    bHasAttachOffset, vecAttachOffsetPosition, vecAttachOffsetRotation);
         }
     }
 }

@@ -17,6 +17,7 @@
 CProjectileSyncPacket::CProjectileSyncPacket()
 {
     m_usModel = 0;
+    m_bHasAttachOffset = false;
 }
 
 bool CProjectileSyncPacket::Read(NetBitStreamInterface& BitStream)
@@ -47,6 +48,19 @@ bool CProjectileSyncPacket::Read(NetBitStreamInterface& BitStream)
         case 16:  // WEAPONTYPE_GRENADE
         case 17:  // WEAPONTYPE_TEARGAS
         case 18:  // WEAPONTYPE_MOLOTOV
+        {
+            SFloatSync<7, 17> projectileForce;
+            if (!BitStream.Read(&projectileForce))
+                return false;
+            m_fForce = projectileForce.data.fValue;
+
+            SVelocitySync velocity;
+            if (!BitStream.Read(&velocity))
+                return false;
+            m_vecMoveSpeed = velocity.data.vecVelocity;
+
+            break;
+        }
         case 39:  // WEAPONTYPE_REMOTE_SATCHEL_CHARGE
         {
             SFloatSync<7, 17> projectileForce;
@@ -58,6 +72,20 @@ bool CProjectileSyncPacket::Read(NetBitStreamInterface& BitStream)
             if (!BitStream.Read(&velocity))
                 return false;
             m_vecMoveSpeed = velocity.data.vecVelocity;
+
+            if (!BitStream.ReadBit(m_bHasAttachOffset))
+                return false;
+
+            if (m_bHasAttachOffset)
+            {
+                if (!BitStream.Read(m_vecAttachOffsetPosition.fX) || !BitStream.Read(m_vecAttachOffsetPosition.fY) ||
+                    !BitStream.Read(m_vecAttachOffsetPosition.fZ))
+                    return false;
+
+                if (!BitStream.Read(m_vecAttachOffsetRotation.fX) || !BitStream.Read(m_vecAttachOffsetRotation.fY) ||
+                    !BitStream.Read(m_vecAttachOffsetRotation.fZ))
+                    return false;
+            }
 
             break;
         }
@@ -131,6 +159,17 @@ bool CProjectileSyncPacket::Write(NetBitStreamInterface& BitStream) const
         case 16:  // WEAPONTYPE_GRENADE
         case 17:  // WEAPONTYPE_TEARGAS
         case 18:  // WEAPONTYPE_MOLOTOV
+        {
+            SFloatSync<7, 17> projectileForce;
+            projectileForce.data.fValue = m_fForce;
+            BitStream.Write(&projectileForce);
+
+            SVelocitySync velocity;
+            velocity.data.vecVelocity = m_vecMoveSpeed;
+            BitStream.Write(&velocity);
+
+            break;
+        }
         case 39:  // WEAPONTYPE_REMOTE_SATCHEL_CHARGE
         {
             SFloatSync<7, 17> projectileForce;
@@ -140,6 +179,21 @@ bool CProjectileSyncPacket::Write(NetBitStreamInterface& BitStream) const
             SVelocitySync velocity;
             velocity.data.vecVelocity = m_vecMoveSpeed;
             BitStream.Write(&velocity);
+
+            if (m_bHasAttachOffset)
+            {
+                BitStream.WriteBit(true);
+
+                BitStream.Write(m_vecAttachOffsetPosition.fX);
+                BitStream.Write(m_vecAttachOffsetPosition.fY);
+                BitStream.Write(m_vecAttachOffsetPosition.fZ);
+
+                BitStream.Write(m_vecAttachOffsetRotation.fX);
+                BitStream.Write(m_vecAttachOffsetRotation.fY);
+                BitStream.Write(m_vecAttachOffsetRotation.fZ);
+            }
+            else
+                BitStream.WriteBit(false);
 
             break;
         }

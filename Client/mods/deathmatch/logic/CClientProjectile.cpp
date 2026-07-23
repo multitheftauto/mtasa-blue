@@ -154,6 +154,29 @@ void CClientProjectile::DoPulse()
     if (m_bCorrected == false && m_pProjectile != NULL && GetWeaponType() == eWeaponType::WEAPONTYPE_REMOTE_SATCHEL_CHARGE)
     {
         m_bCorrected = m_pProjectile->CorrectPhysics();
+
+        // Tell the server where we actually settled, once, so a player who streams in later gets placed here
+        // directly instead of having the whole throw replayed at them (https://github.com/multitheftauto/mtasa-blue/issues/369, #368)
+        if (m_bCorrected && IsLocal() && GetCreator() == g_pClientGame->GetLocalPlayer())
+        {
+            CVector vecRestPosition;
+            GetPosition(vecRestPosition);
+
+            // Did it stick to a vehicle/ped? Report that too, along with exactly where on it (GTA's own attach
+            // offset, e.g. the hood instead of the vehicle's centre), so the resync keeps it glued to the same
+            // spot instead of leaving it behind - or snapping it to the vehicle's origin - the moment it moves.
+            CClientEntity* pAttachedTo = GetSatchelAttachedTo();
+            ElementID      attachedToID = INVALID_ELEMENT_ID;
+            CVector        vecAttachOffsetPosition, vecAttachOffsetRotation;
+            if (pAttachedTo)
+            {
+                attachedToID = pAttachedTo->GetID();
+                GetSatchelAttachOffsets(vecAttachOffsetPosition, vecAttachOffsetRotation);
+            }
+
+            g_pClientGame->SendProjectileRestPosition(GetWeaponType(), *GetOrigin(), vecRestPosition, attachedToID, vecAttachOffsetPosition,
+                                                      vecAttachOffsetRotation);
+        }
     }
 }
 
@@ -330,4 +353,29 @@ CClientEntity* CClientProjectile::GetSatchelAttachedTo()
 
     CPools* pPools = g_pGame->GetPools();
     return pPools->GetClientEntity((DWORD*)pAttachedToSA->GetInterface());
+}
+
+void CClientProjectile::GetSatchelAttachOffsets(CVector& vecOffsetPosition, CVector& vecOffsetRotation)
+{
+    if (m_pProjectile)
+        m_pProjectile->GetAttachedOffsets(vecOffsetPosition, vecOffsetRotation);
+}
+
+void CClientProjectile::AttachSatchelToEntity(CClientEntity* pEntity, const CVector& vecOffsetPosition, const CVector& vecOffsetRotation)
+{
+    if (!m_pProjectile || !pEntity)
+        return;
+
+    CPhysical* pGamePhysical = dynamic_cast<CPhysical*>(pEntity->GetGameEntity());
+    if (pGamePhysical)
+        m_pProjectile->AttachEntityToEntity(*pGamePhysical, vecOffsetPosition, vecOffsetRotation);
+}
+
+void CClientProjectile::SetStaticUntilCollisionLoaded()
+{
+    // Used when this satchel was just placed by a resync (CGame::Packet_ProjectileRestPosition) rather than thrown
+    // locally - the area's collision might not be streamed in yet, so without this it falls through the world
+    // until something already-loaded catches it (https://github.com/multitheftauto/mtasa-blue/issues/369, #368)
+    if (m_pProjectile)
+        m_pProjectile->SetStaticWaitingForCollision(true);
 }
