@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaWaterDefs::LoadFunctions()
 {
@@ -48,7 +49,7 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
     // lua_classvariable ( luaVM, "drawnLast", "setWaterDrawnLast", "isWaterDrawnLast" );
 
     lua_classfunction(luaVM, "getLevel", "getWaterLevel");
-    lua_classfunction(luaVM, "getVertexPosition", OOP_GetWaterVertexPosition);
+    lua_classfunction(luaVM, "getVertexPosition", ArgumentParserWarn<false, OOP_GetWaterVertexPosition>);
     lua_classfunction(luaVM, "getWaveHeight", "getWaveHeight");
     lua_classfunction(luaVM, "getColor", "getWaterColor");
 
@@ -429,28 +430,11 @@ int CLuaWaterDefs::GetWaterVertexPosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWaterDefs::OOP_GetWaterVertexPosition(lua_State* luaVM)
+std::variant<bool, CVector> CLuaWaterDefs::OOP_GetWaterVertexPosition(CClientWater* pWater, int iVertexIndex)
 {
-    //  vector getWaterVertexPosition ( water theWater, int vertexIndex )
-    CClientWater* pWater;
-    int           iVertexIndex;
+    CVector vecPosition;
+    if (!CStaticFunctionDefinitions::GetWaterVertexPosition(pWater, iVertexIndex, vecPosition))
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pWater);
-    argStream.ReadNumber(iVertexIndex);
-
-    if (!argStream.HasErrors())
-    {
-        CVector vecPosition;
-        if (CStaticFunctionDefinitions::GetWaterVertexPosition(pWater, iVertexIndex, vecPosition))
-        {
-            lua_pushvector(luaVM, vecPosition);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return vecPosition;
 }

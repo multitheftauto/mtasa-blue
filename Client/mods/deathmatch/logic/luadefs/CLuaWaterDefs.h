@@ -31,5 +31,5 @@ public:
     LUA_DECLARE(GetWaterColor);
     LUA_DECLARE(GetWaterLevel);
     LUA_DECLARE(IsWaterDrawnLast);
-    LUA_DECLARE_OOP(GetWaterVertexPosition);
+    static std::variant<bool, CVector> OOP_GetWaterVertexPosition(CClientWater* pWater, int iVertexIndex);
 };

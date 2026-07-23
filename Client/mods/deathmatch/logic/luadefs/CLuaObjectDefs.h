@@ -23,8 +23,8 @@ public:
 
     // Object get funcs
     LUA_DECLARE(IsObjectStatic);
-    static bool IsObjectMoving(CClientEntity* pEntity);
-    LUA_DECLARE_OOP(GetObjectScale);
+    static bool                        IsObjectMoving(CClientEntity* pEntity);
+    static std::variant<bool, CVector> OOP_GetObjectScale(CClientObject* pObject);
     LUA_DECLARE(IsObjectBreakable);
     LUA_DECLARE(GetObjectMass);
     LUA_DECLARE(GetObjectProperty);

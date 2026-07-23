@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CLuaTextDefs.h"
 #include "CScriptArgReader.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaTextDefs::LoadFunctions()
 {
@@ -71,7 +72,7 @@ void CLuaTextDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "destroy", "textDestroyTextItem");
 
     lua_classfunction(luaVM, "getColor", "textItemGetColor");
-    lua_classfunction(luaVM, "getPosition", "textItemGetPosition", OOP_textItemGetPosition);
+    lua_classfunction(luaVM, "getPosition", "textItemGetPosition", ArgumentParserWarn<false, OOP_textItemGetPosition>);
     lua_classfunction(luaVM, "getPriority", "textItemGetPriority");
     lua_classfunction(luaVM, "getScale", "textItemGetScale");
     lua_classfunction(luaVM, "getText", "textItemGetText");
@@ -85,7 +86,7 @@ void CLuaTextDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "priority", "textItemSetPriority", "textItemGetPriority");
     lua_classvariable(luaVM, "scale", "textItemSetScale", "textItemGetScale");
     lua_classvariable(luaVM, "text", "textItemSetText", "textItemGetText");
-    lua_classvariable(luaVM, "position", "textItemSetPosition", "textItemGetPosition", textItemSetPosition, OOP_textItemGetPosition);
+    lua_classvariable(luaVM, "position", "textItemSetPosition", "textItemGetPosition", textItemSetPosition, ArgumentParserWarn<false, OOP_textItemGetPosition>);
 
     lua_registerclass(luaVM, "TextItem");
 }
@@ -487,24 +488,9 @@ int CLuaTextDefs::textItemGetPosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaTextDefs::OOP_textItemGetPosition(lua_State* luaVM)
+CVector2D CLuaTextDefs::OOP_textItemGetPosition(CTextItem* pTextItem)
 {
-    CTextItem* pTextItem;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pTextItem);
-
-    if (!argStream.HasErrors())
-    {
-        CVector2D vecPosition = pTextItem->GetPosition();
-        lua_pushvector(luaVM, vecPosition);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return pTextItem->GetPosition();
 }
 
 int CLuaTextDefs::textItemSetColor(lua_State* luaVM)

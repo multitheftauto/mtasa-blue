@@ -21,7 +21,7 @@ public:
     LUA_DECLARE(CreateWater);
     LUA_DECLARE(SetWaterLevel);
     LUA_DECLARE(ResetWaterLevel);
-    LUA_DECLARE_OOP(GetWaterVertexPosition);
+    static std::variant<bool, CVector> OOP_GetWaterVertexPosition(CWater* pWater, int iVertexIndex);
     LUA_DECLARE(SetWaterVertexPosition);
     LUA_DECLARE(GetWaterColor);
     LUA_DECLARE(SetWaterColor);

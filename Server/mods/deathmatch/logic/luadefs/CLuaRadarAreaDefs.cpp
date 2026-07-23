@@ -13,6 +13,7 @@
 #include "CLuaRadarAreaDefs.h"
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaRadarAreaDefs::LoadFunctions()
 {
@@ -45,7 +46,7 @@ void CLuaRadarAreaDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "isInside", "isInsideRadarArea");
 
     lua_classfunction(luaVM, "isFlashing", "isRadarAreaFlashing");
-    lua_classfunction(luaVM, "getSize", "getRadarAreaSize", OOP_GetRadarAreaSize);
+    lua_classfunction(luaVM, "getSize", "getRadarAreaSize", ArgumentParserWarn<false, OOP_GetRadarAreaSize>);
     lua_classfunction(luaVM, "getColor", "getRadarAreaColor");
 
     lua_classfunction(luaVM, "setSize", "setRadarAreaSize");
@@ -53,7 +54,7 @@ void CLuaRadarAreaDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setColor", "setRadarAreaColor");
 
     lua_classvariable(luaVM, "flashing", "setRadarAreaFlashing", "isRadarAreaFlashing");
-    lua_classvariable(luaVM, "size", "setRadarAreaSize", "getRadarAreaSize", SetRadarAreaSize, OOP_GetRadarAreaSize);
+    lua_classvariable(luaVM, "size", "setRadarAreaSize", "getRadarAreaSize", SetRadarAreaSize, ArgumentParserWarn<false, OOP_GetRadarAreaSize>);
 
     lua_registerclass(luaVM, "RadarArea", "Element");
 }
@@ -133,28 +134,13 @@ int CLuaRadarAreaDefs::GetRadarAreaSize(lua_State* luaVM)
     return 1;
 }
 
-int CLuaRadarAreaDefs::OOP_GetRadarAreaSize(lua_State* luaVM)
+std::variant<bool, CVector2D> CLuaRadarAreaDefs::OOP_GetRadarAreaSize(CRadarArea* pRadarArea)
 {
-    //  vector2 getRadarAreaSize ( radararea theRadararea )
-    CRadarArea* pRadarArea;
+    CVector2D vecSize;
+    if (!CStaticFunctionDefinitions::GetRadarAreaSize(pRadarArea, vecSize))
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pRadarArea);
-
-    if (!argStream.HasErrors())
-    {
-        CVector2D vecSize;
-        if (CStaticFunctionDefinitions::GetRadarAreaSize(pRadarArea, vecSize))
-        {
-            lua_pushvector(luaVM, vecSize);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return vecSize;
 }
 
 int CLuaRadarAreaDefs::GetRadarAreaColor(lua_State* luaVM)
