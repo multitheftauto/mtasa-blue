@@ -34,6 +34,7 @@ public:
     LUA_DECLARE(GetPedWeapon);
     LUA_DECLARE(GetPedAmmoInClip);
     LUA_DECLARE(GetPedTotalAmmo);
+    LUA_DECLARE(GetPedWeaponMuzzlePosition);
     static std::variant<bool, CVector> OOP_GetPedWeaponMuzzlePosition(CClientPed* pPed);
     LUA_DECLARE(GetPedStat);
     LUA_DECLARE(GetPedOccupiedVehicle);

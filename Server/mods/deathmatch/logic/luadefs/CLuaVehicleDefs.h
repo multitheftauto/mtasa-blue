@@ -37,6 +37,7 @@ public:
     LUA_DECLARE(GetVehicleSirensOn);
     LUA_DECLARE(GetVehicleTurnVelocity);
     LUA_DECLARE(OOP_GetVehicleTurnVelocity);
+    LUA_DECLARE(GetVehicleTurretPosition);
     static std::variant<bool, CVector2D> OOP_GetVehicleTurretPosition(CVehicle* pVehicle);
     LUA_DECLARE(IsVehicleLocked);
     LUA_DECLARE(GetVehiclesOfType);
@@ -90,7 +91,9 @@ public:
     LUA_DECLARE(SetVehicleRespawnDelay);
     LUA_DECLARE(SetVehicleRespawnPosition);
     LUA_DECLARE(SetVehicleRespawnRotation);
+    LUA_DECLARE(GetVehicleRespawnPosition);
     static std::variant<bool, CVector> OOP_GetVehicleRespawnPosition(CElement* pElement);
+    LUA_DECLARE(GetVehicleRespawnRotation);
     static std::variant<bool, CVector> OOP_GetVehicleRespawnRotation(CElement* pElement);
     static bool                        IsVehicleRespawnable(CVehicle* vehicle) noexcept;
     static uint32_t                    GetVehicleRespawnDelay(CVehicle* vehicle) noexcept;

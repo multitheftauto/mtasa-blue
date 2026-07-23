@@ -22,6 +22,7 @@ public:
     LUA_DECLARE(GetLightType);
     LUA_DECLARE(GetLightRadius);
     LUA_DECLARE(GetLightColor);
+    LUA_DECLARE(GetLightDirection);
     static std::variant<bool, CVector> OOP_GetLightDirection(CClientPointLights* pLight);
     LUA_DECLARE(SetLightRadius);
     LUA_DECLARE(SetLightColor);

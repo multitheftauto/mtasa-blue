@@ -47,6 +47,7 @@ public:
     LUA_DECLARE(GUICreateStaticImage);
     LUA_DECLARE(GUICreateFont);
     LUA_DECLARE(GUIStaticImageLoadImage);
+    LUA_DECLARE(GUIStaticImageGetNativeSize);
     static std::variant<bool, CVector2D> OOP_GUIStaticImageGetNativeSize(CClientGUIElement* theElement);
     LUA_DECLARE(GUIGetSelectedTab);
     LUA_DECLARE(GUISetSelectedTab);
@@ -94,7 +95,9 @@ public:
     LUA_DECLARE(GUISetEnabled);
     LUA_DECLARE(GUISetText);
     LUA_DECLARE(GUISetFont);
+    LUA_DECLARE(GUISetSize);
     static bool OOP_GUISetSize(CClientGUIElement* guiElement, CVector2D vecSize, std::optional<bool> relative);
+    LUA_DECLARE(GUISetPosition);
     static bool OOP_GUISetPosition(CClientGUIElement* guiElement, CVector2D vecPosition, std::optional<bool> relative);
     LUA_DECLARE(GUISetVisible);
     LUA_DECLARE(GUISetAlpha);
@@ -108,7 +111,9 @@ public:
     LUA_DECLARE(GUIGetEnabled);
     LUA_DECLARE(GUIGetText);
     LUA_DECLARE(GUIGetFont);
+    LUA_DECLARE(GUIGetSize);
     static CVector2D OOP_GUIGetSize(CClientGUIElement* theElement, std::optional<bool> relative);
+    LUA_DECLARE(GUIGetPosition);
     static CVector2D OOP_GUIGetPosition(CClientGUIElement* guiElement, std::optional<bool> relative);
     LUA_DECLARE(GUIGetVisible);
     LUA_DECLARE(GUIGetAlpha);
