@@ -105,6 +105,9 @@ public:
 
     virtual void ForceRedraw() = 0;
 
+    virtual void SetColorCodesEnabled(bool bEnabled) = 0;
+    virtual bool GetColorCodesEnabled() = 0;
+
     virtual CRect2D   AbsoluteToRelative(const CRect2D& Rect) = 0;
     virtual CVector2D AbsoluteToRelative(const CVector2D& Vector) = 0;
 
