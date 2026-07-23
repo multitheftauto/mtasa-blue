@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <cstring>
 #include "CHudSA.h"
 #include "CGameSA.h"
 #include "CCameraSA.h"
