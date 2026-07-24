@@ -153,3 +153,16 @@ public:
 
     static CClientPerfStatPacketUsage* GetSingleton();
 };
+//
+// CClientPerfStatTiming
+//
+class CClientPerfStatTiming : public CClientPerfStatModule
+{
+public:
+    // CClientPerfStatModule
+    virtual const SString& GetCategoryName() = 0;
+    virtual void           DoPulse() = 0;
+    virtual void           GetStats(CClientPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
+
+    static CClientPerfStatTiming* GetSingleton();
+};
