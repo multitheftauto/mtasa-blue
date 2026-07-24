@@ -510,7 +510,7 @@ private:
     void Packet_Vehicle_InOut(class CVehicleInOutPacket& Packet);
     void Packet_VehicleTrailer(class CVehicleTrailerPacket& Packet);
     void Packet_LuaEvent(class CLuaEventPacket& Packet);
-    void Packet_CustomData(class CCustomDataPacket& Packet);
+    void Packet_CustomData(class CCustomDataPacket& packet);
     void Packet_Voice_Data(class CVoiceDataPacket& Packet);
     void Packet_Voice_End(class CVoiceEndPacket& Packet);
     void Packet_CameraSync(class CCameraSyncPacket& Packet);

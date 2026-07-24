@@ -2743,85 +2743,134 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
     }
 }
 
-void CGame::Packet_CustomData(CCustomDataPacket& Packet)
+void CGame::Packet_CustomData(CCustomDataPacket& packet)
 {
     // Got a valid source?
-    CPlayer* pSourcePlayer = Packet.GetSourcePlayer();
-    if (pSourcePlayer)
+    auto* sourcePlayer = packet.GetSourcePlayer();
+    if (sourcePlayer)
     {
         // Grab the element
-        ElementID ID = Packet.GetElementID();
-        CElement* pElement = CElementIDs::GetElement(ID);
-        if (pElement)
+        ElementID elementId = packet.GetElementID();
+        auto*     element = CElementIDs::GetElement(elementId);
+        if (element)
         {
             // Change the data
-            const char*   szName = Packet.GetName();
-            CLuaArgument& Value = Packet.GetValue();
+            const char*   name = packet.GetName();
+            CLuaArgument& value = packet.GetValue();
+            const bool    isDelete = packet.IsDelete();
 
             // Ignore if the wrong length
-            if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
+            if (strlen(name) > MAX_CUSTOMDATA_NAME_LENGTH)
             {
-                CLogger::ErrorPrintf("Received oversized custom data name from %s (%s)\n", Packet.GetSourcePlayer()->GetNick(),
-                                     *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
+                CLogger::ErrorPrintf("Received oversized custom data name from %s (%s)\n", sourcePlayer->GetNick(),
+                                     *SStringX(name).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
                 return;
             }
 
             ESyncType              lastSyncType = ESyncType::BROADCAST;
             eCustomDataClientTrust clientChangesMode{};
 
-            pElement->GetCustomData(szName, false, &lastSyncType, &clientChangesMode);
+            element->GetCustomData(name, false, &lastSyncType, &clientChangesMode);
 
             const bool changesAllowed = clientChangesMode == eCustomDataClientTrust::UNSET ? !m_pMainConfig->IsElementDataWhitelisted()
                                                                                            : clientChangesMode == eCustomDataClientTrust::ALLOW;
             if (!changesAllowed)
             {
-                CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)\n", Packet.GetSourcePlayer()->GetNick(), szName);
+                CLogger::ErrorPrintf("Client trying to change protected element data %s (%s)\n", sourcePlayer->GetNick(), name);
 
                 CLuaArguments arguments;
-                arguments.PushElement(pElement);
-                arguments.PushString(szName);
-                arguments.PushArgument(Value);
-                pSourcePlayer->CallEvent("onPlayerChangesProtectedData", arguments);
+                arguments.PushElement(element);
+                arguments.PushString(name);
+                arguments.PushArgument(value);
+                sourcePlayer->CallEvent("onPlayerChangesProtectedData", arguments);
                 return;
             }
 
-            if (pElement->SetCustomData(szName, Value, lastSyncType, pSourcePlayer))
+            if (isDelete)
             {
-                if (lastSyncType != ESyncType::LOCAL)
+                if (element->DeleteCustomData(name, sourcePlayer))
                 {
-                    // Tell our clients to update their data. Send to everyone but the one we got this packet from.
-                    unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
-                    CBitStream     BitStream;
-                    BitStream.pBitStream->WriteCompressed(usNameLength);
-                    BitStream.pBitStream->Write(szName, usNameLength);
-                    Value.WriteToBitStream(*BitStream.pBitStream);
-                    if (lastSyncType == ESyncType::BROADCAST)
-                        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pSourcePlayer);
-                    else
-                        m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream), pElement, szName,
-                                                                  pSourcePlayer);
+                    if (lastSyncType != ESyncType::LOCAL)
+                    {
+                        // Tell our clients to remove their data. Send to everyone but the one we got this packet from.
+                        std::uint16_t nameLength = static_cast<std::uint16_t>(strlen(name));
+                        CBitStream    bitStream;
+                        bitStream.pBitStream->WriteCompressed(nameLength);
+                        bitStream.pBitStream->Write(name, nameLength);
+                        bitStream.pBitStream->WriteBit(false);  // Unused (was recursive flag)
+                        if (lastSyncType == ESyncType::BROADCAST)
+                            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *bitStream.pBitStream), sourcePlayer);
+                        else
+                            m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *bitStream.pBitStream), element, name,
+                                                                      sourcePlayer);
 
-                    CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(szName, m_pPlayerManager->Count(),
-                                                                                             BitStream.pBitStream->GetNumberOfBytesUsed());
+                        CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(name, m_pPlayerManager->Count(),
+                                                                                                 bitStream.pBitStream->GetNumberOfBytesUsed());
+                    }
+
+                    if (lastSyncType == ESyncType::SUBSCRIBE)
+                        m_pPlayerManager->ClearElementData(element, name);
+                }
+                else
+                {
+                    // Restore the element data on the client, because the server cancelled the change in onElementDataChange.
+                    std::uint16_t nameLength = static_cast<std::uint16_t>(strlen(name));
+                    CBitStream    bitStream;
+                    bitStream.pBitStream->WriteCompressed(nameLength);
+                    bitStream.pBitStream->Write(name, nameLength);
+
+                    if (auto* serverValue = element->GetCustomData(name, false))
+                    {
+                        serverValue->WriteToBitStream(*bitStream.pBitStream);
+                        sourcePlayer->Send(CElementRPCPacket(element, SET_ELEMENT_DATA, *bitStream.pBitStream));
+                    }
+                    else
+                    {
+                        bitStream.pBitStream->WriteBit(false);
+                        sourcePlayer->Send(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *bitStream.pBitStream));
+                    }
                 }
             }
             else
             {
-                // Event was cancelled; sync the authoritative value back to the source player
-                unsigned short usNameLength = static_cast<unsigned short>(strlen(szName));
-                CBitStream     BitStream;
-                BitStream.pBitStream->WriteCompressed(usNameLength);
-                BitStream.pBitStream->Write(szName, usNameLength);
-
-                if (CLuaArgument* pServerValue = pElement->GetCustomData(szName, false))
+                if (element->SetCustomData(name, value, lastSyncType, sourcePlayer))
                 {
-                    pServerValue->WriteToBitStream(*BitStream.pBitStream);
-                    pSourcePlayer->Send(CElementRPCPacket(pElement, SET_ELEMENT_DATA, *BitStream.pBitStream));
+                    if (lastSyncType != ESyncType::LOCAL)
+                    {
+                        // Tell our clients to update their data. Send to everyone but the one we got this packet from.
+                        std::uint16_t nameLength = static_cast<std::uint16_t>(strlen(name));
+                        CBitStream    bitStream;
+                        bitStream.pBitStream->WriteCompressed(nameLength);
+                        bitStream.pBitStream->Write(name, nameLength);
+                        value.WriteToBitStream(*bitStream.pBitStream);
+                        if (lastSyncType == ESyncType::BROADCAST)
+                            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, SET_ELEMENT_DATA, *bitStream.pBitStream), sourcePlayer);
+                        else
+                            m_pPlayerManager->BroadcastOnlySubscribed(CElementRPCPacket(element, SET_ELEMENT_DATA, *bitStream.pBitStream), element, name,
+                                                                      sourcePlayer);
+
+                        CPerfStatEventPacketUsage::GetSingleton()->UpdateElementDataUsageRelayed(name, m_pPlayerManager->Count(),
+                                                                                                 bitStream.pBitStream->GetNumberOfBytesUsed());
+                    }
                 }
                 else
                 {
-                    BitStream.pBitStream->WriteBit(false);
-                    pSourcePlayer->Send(CElementRPCPacket(pElement, REMOVE_ELEMENT_DATA, *BitStream.pBitStream));
+                    // Restore the element data on the client, because the server cancelled the change in onElementDataChange.
+                    std::uint16_t nameLength = static_cast<std::uint16_t>(strlen(name));
+                    CBitStream    bitStream;
+                    bitStream.pBitStream->WriteCompressed(nameLength);
+                    bitStream.pBitStream->Write(name, nameLength);
+
+                    if (auto* serverValue = element->GetCustomData(name, false))
+                    {
+                        serverValue->WriteToBitStream(*bitStream.pBitStream);
+                        sourcePlayer->Send(CElementRPCPacket(element, SET_ELEMENT_DATA, *bitStream.pBitStream));
+                    }
+                    else
+                    {
+                        bitStream.pBitStream->WriteBit(false);
+                        sourcePlayer->Send(CElementRPCPacket(element, REMOVE_ELEMENT_DATA, *bitStream.pBitStream));
+                    }
                 }
             }
         }
