@@ -20,6 +20,7 @@
 #include "CColManager.h"
 #include "CSpatialDatabase.h"
 #include "CPlayerCamera.h"
+#include <CAnimationsData.h>
 
 CPedSync::CPedSync(CPlayerManager* pPlayerManager, CPedManager* pPedManager)
 {
@@ -82,7 +83,7 @@ void CPedSync::OverrideSyncer(CPed* pPed, CPlayer* pPlayer, bool bPersist)
 
 void CPedSync::UpdateAllSyncer()
 {
-    auto currentTimestamp = GetTimestamp();
+    auto currentLocalTick = GetLocalTick();
 
     // Update all the ped's sync states
     for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); iter++)
@@ -91,9 +92,10 @@ void CPedSync::UpdateAllSyncer()
         const SPlayerAnimData& animData = (*iter)->GetAnimationData();
         if (animData.IsAnimating())
         {
-            const std::int64_t elapsedMs = currentTimestamp >= animData.startTime ? (currentTimestamp - animData.startTime) : 0;
-            const float        deltaTime = static_cast<float>(elapsedMs);
-            if (!animData.freezeLastFrame && animData.time > 0 && deltaTime >= animData.time)
+            // 1. time < 0, loop = true, anim never ends
+            // 2. time >= 0, loop = true, anim run for time
+            std::int64_t elapsedTime = currentLocalTick - animData.startTime;
+            if (!animData.freezeLastFrame && animData.time >= 0 && elapsedTime >= animData.time)
                 (*iter)->SetAnimationData({});
         }
 

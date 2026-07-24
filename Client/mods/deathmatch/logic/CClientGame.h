@@ -272,6 +272,9 @@ public:
     void EnablePacketRecorder(const char* szFilename);
     void InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
 
+    void         SetTimeOffsetFromServer(std::int64_t offset) noexcept { m_serverTimeOffset = offset; }
+    std::int64_t GetSyncedTime() const noexcept { return GetLocalTick() + m_serverTimeOffset; }
+
     bool IsWindowFocused() const { return m_bFocused; }
 
     // Accessors
@@ -930,6 +933,8 @@ private:
     MultiCommandHandlerPolicy m_allowMultiCommandHandlers;
 
     long long m_timeLastDiscordStateUpdate;
+
+    std::int64_t m_serverTimeOffset;
 };
 
 extern CClientGame* g_pClientGame;

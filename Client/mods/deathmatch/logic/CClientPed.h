@@ -137,17 +137,17 @@ struct SReplacedAnimation
 
 struct SAnimationCache
 {
-    std::string  strName;
+    std::string  strName{};
     int          iTime{-1};
     bool         bLoop{false};
     bool         bUpdatePosition{false};
     bool         bInterruptible{false};
     bool         bFreezeLastFrame{true};
     int          iBlend{250};
-    float        progress{0.0f};
+    float        progress{std::numeric_limits<float>::quiet_NaN()};
     float        speed{1.0f};
-    bool         progressWaitForStreamIn{false};
     std::int64_t startTime{0};
+    bool         updateInNextFrame{false};
 };
 
 class CClientObject;
@@ -729,7 +729,7 @@ public:
     bool                                     m_bDeferredGangDrivebyAbort;
     std::unique_ptr<CAnimBlock>              m_pAnimationBlock;
     bool                                     m_bRequestedAnimation;
-    SAnimationCache                          m_AnimationCache;
+    SAnimationCache                          m_AnimationCache{};
     bool                                     m_bHeadless;
     bool                                     m_bFrozen;
     bool                                     m_bFrozenWaitingForGroundToLoad;
