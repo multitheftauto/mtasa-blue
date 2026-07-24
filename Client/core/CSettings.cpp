@@ -233,7 +233,7 @@ void CSettings::ResetGuiPointers()
     m_pCheckBoxHighDetailPeds = NULL;
     m_pCheckBoxBlur = NULL;
     m_pCheckBoxCoronaReflections = NULL;
-    m_pCheckBoxPs2ScorchedVehicles = NULL;
+    m_pCheckBoxPs2ScorchedVehicles = nullptr;
     m_pCheckBoxDynamicPedShadows = NULL;
     m_pFieldOfViewLabel = NULL;
     m_pFieldOfView = NULL;
