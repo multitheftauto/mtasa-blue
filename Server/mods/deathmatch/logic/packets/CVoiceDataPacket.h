@@ -15,8 +15,6 @@
 #include <vector>
 
 constexpr unsigned short MAX_VOICE_BUFFER_SIZE = 2048;
-constexpr long long      VOICE_PACKET_INTERVAL_MS = 100;
-constexpr unsigned char  MAX_VOICE_PACKETS_PER_INTERVAL = 32;
 
 class CVoiceDataPacket final : public CPacket
 {
