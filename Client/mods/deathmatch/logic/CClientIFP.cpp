@@ -151,7 +151,7 @@ WORD CClientIFP::ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& 
     MoveSequencesWithDummies(pAnimationHierarchy, MapOfSequences);
     WORD cSequences = m_kcIFPSequences + wUnknownSequences;
 
-    // As we need support for all 32 bones, we must change the total sequences count
+    // As we need support for all 64 bones (32 ped + 32 cutscene ped), we must change the total sequences count
     pAnimationHierarchy->SetNumSequences(cSequences);
     return cSequences;
 }
@@ -243,7 +243,7 @@ std::int32_t CClientIFP::ReadSequenceVersion1(SAnim& Anim)
     RoundSize(Anim.Base.Size);
     ReadBytes(&Anim.Name, Anim.Base.Size);
 
-    SString      strBoneName = ConvertStringToKey(Anim.Name);
+    SString      strBoneName = ConvertStringToKey(Anim.Name, true);
     std::int32_t iBoneID = GetBoneIDFromName(strBoneName);
 
     SString strCorrectBoneName = GetCorrectBoneNameFromName(strBoneName);
@@ -590,6 +590,25 @@ void CClientIFP::InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence
 
 void CClientIFP::CopyDummyKeyFrameByBoneID(BYTE* pKeyFrames, DWORD dwBoneID)
 {
+    /* FrameData structure:
+    * 
+    struct KeyFrame
+    {
+        short quaternionX;
+        short quaternionY;
+        short quaternionZ;
+        short quaternionW;
+        short time;
+    };
+
+    struct KeyFrameCompressed : KeyFrame
+    {
+        short translationX;
+        short translationY;
+        short translationZ;
+    };
+    */
+
     switch (dwBoneID)
     {
         case eBoneType::NORMAL:  // Normal or Root, both are same
@@ -791,10 +810,21 @@ void CClientIFP::CopyDummyKeyFrameByBoneID(BYTE* pKeyFrames, DWORD dwBoneID)
     }
 }
 
-SString CClientIFP::ConvertStringToKey(const SString& strBoneName)
+SString CClientIFP::ConvertStringToKey(const SString& strBoneName, bool isANPK)
 {
-    SString ConvertedString = strBoneName.ToLower();
-    // Remove white spaces
+    SString ConvertedString = strBoneName;
+
+    // Fix for some cutscene bones (like cssuitcase:Pelvis etc.)
+    if (isANPK)
+    {
+        std::size_t pos = ConvertedString.find(":");
+        if (pos != std::string::npos)
+            ConvertedString = ConvertedString.substr(pos + 1);
+    }
+
+    ConvertedString = ConvertedString.ToLower();
+
+    // Remove whitespaces
     ConvertedString.erase(std::remove(ConvertedString.begin(), ConvertedString.end(), ' '), ConvertedString.end());
     return ConvertedString;
 }
@@ -900,6 +930,72 @@ std::int32_t CClientIFP::GetBoneIDFromName(const SString& strBoneName)
         return eBoneType::R_FOOT;
     if (strBoneName == "rtoe0")
         return eBoneType::R_TOE_0;
+
+    // Cutscene bones
+    if (strBoneName == "rthumb1")
+        return eBoneType::R_Thumb1;
+    if (strBoneName == "rthumb2")
+        return eBoneType::R_Thumb2;
+    if (strBoneName == "lthumb1")
+        return eBoneType::L_Thumb1;
+    if (strBoneName == "lthumb2")
+        return eBoneType::L_Thumb2;
+    if (strBoneName == "llip11")
+        return eBoneType::LLIP11;
+    if (strBoneName == "jaw22")
+        return eBoneType::JAW22;
+    if (strBoneName == "headnub")
+        return eBoneType::HEADNUB;
+    if (strBoneName == "lfinger0nub")
+        return eBoneType::L_Finger0Nub;
+    if (strBoneName == "rfinger0nub")
+        return eBoneType::R_Finger0Nub;
+    if (strBoneName == "ltoe0nub")
+        return eBoneType::L_Toe0Nub;
+    if (strBoneName == "rtoe0nub")
+        return eBoneType::R_Toe0Nub;
+    if (strBoneName == "rbrow1")
+        return eBoneType::R_BROW1;
+    if (strBoneName == "rbrow2")
+        return eBoneType::R_BROW2;
+    if (strBoneName == "lbrow1")
+        return eBoneType::L_BROW1;
+    if (strBoneName == "lbrow2")
+        return eBoneType::L_BROW2;
+    if (strBoneName == "rlid")
+        return eBoneType::R_LID;
+    if (strBoneName == "llid")
+        return eBoneType::L_LID;
+    if (strBoneName == "rtlip3")
+        return eBoneType::R_TLIP3;
+    if (strBoneName == "ltlip3")
+        return eBoneType::L_TLIP3;
+    if (strBoneName == "rtlip1")
+        return eBoneType::R_TLIP1;
+    if (strBoneName == "rtlip2")
+        return eBoneType::R_TLIP2;
+    if (strBoneName == "ltlip1")
+        return eBoneType::L_TLIP1;
+    if (strBoneName == "ltlip2")
+        return eBoneType::L_TLIP2;
+    if (strBoneName == "rcorner")
+        return eBoneType::R_CORNER;
+    if (strBoneName == "lcorner")
+        return eBoneType::L_CORNER;
+    if (strBoneName == "jaw1")
+        return eBoneType::JAW1;
+    if (strBoneName == "jaw2")
+        return eBoneType::JAW2;
+    if (strBoneName == "llip1")
+        return eBoneType::LLIP1;
+    if (strBoneName == "reye")
+        return eBoneType::R_EYE;
+    if (strBoneName == "leye")
+        return eBoneType::L_EYE;
+    if (strBoneName == "rcheek")
+        return eBoneType::R_CHEEK;
+    if (strBoneName == "lcheek")
+        return eBoneType::L_CHEEK;
 
     // for GTA 3
     if (strBoneName == "player")
@@ -1017,6 +1113,72 @@ SString CClientIFP::GetCorrectBoneNameFromID(const std::int32_t& iBoneID)
     if (iBoneID == eBoneType::R_TOE_0)
         return "R Toe0";
 
+    // Cutscene bones
+    if (iBoneID == eBoneType::R_Thumb1)
+        return "RThumb1";
+    if (iBoneID == eBoneType::R_Thumb2)
+        return "RThumb2";
+    if (iBoneID == eBoneType::LLIP11)
+        return "llip11";
+    if (iBoneID == eBoneType::L_Thumb1)
+        return "LThumb1";
+    if (iBoneID == eBoneType::L_Thumb2)
+        return "LThumb2";
+    if (iBoneID == eBoneType::JAW22)
+        return "jaw22";
+    if (iBoneID == eBoneType::HEADNUB)
+        return "HeadNub";
+    if (iBoneID == eBoneType::L_Finger0Nub)
+        return "L Finger0Nub";
+    if (iBoneID == eBoneType::R_Finger0Nub)
+        return "R Finger0Nub";
+    if (iBoneID == eBoneType::L_Toe0Nub)
+        return "L Toe0Nub";
+    if (iBoneID == eBoneType::R_Toe0Nub)
+        return "R Toe0Nub";
+    if (iBoneID == eBoneType::R_BROW1)
+        return "rbrow1";
+    if (iBoneID == eBoneType::R_BROW2)
+        return "rbrow2";
+    if (iBoneID == eBoneType::L_BROW2)
+        return "lbrow2";
+    if (iBoneID == eBoneType::L_BROW1)
+        return "lbrow1";
+    if (iBoneID == eBoneType::R_LID)
+        return "rlid";
+    if (iBoneID == eBoneType::L_LID)
+        return "llid";
+    if (iBoneID == eBoneType::R_TLIP3)
+        return "rtlip3";
+    if (iBoneID == eBoneType::L_TLIP3)
+        return "ltlip3";
+    if (iBoneID == eBoneType::R_TLIP1)
+        return "rtlip1";
+    if (iBoneID == eBoneType::R_TLIP2)
+        return "rtlip2";
+    if (iBoneID == eBoneType::L_TLIP1)
+        return "ltlip1";
+    if (iBoneID == eBoneType::L_TLIP2)
+        return "ltlip2";
+    if (iBoneID == eBoneType::R_CORNER)
+        return "rcorner";
+    if (iBoneID == eBoneType::L_CORNER)
+        return "lcorner";
+    if (iBoneID == eBoneType::JAW1)
+        return "jaw1";
+    if (iBoneID == eBoneType::JAW2)
+        return "jaw2";
+    if (iBoneID == eBoneType::LLIP1)
+        return "llip1";
+    if (iBoneID == eBoneType::R_EYE)
+        return "reye";
+    if (iBoneID == eBoneType::L_EYE)
+        return "leye";
+    if (iBoneID == eBoneType::R_CHEEK)
+        return "rcheek";
+    if (iBoneID == eBoneType::L_CHEEK)
+        return "lcheek";
+
     return "";
 }
 
@@ -1097,6 +1259,72 @@ SString CClientIFP::GetCorrectBoneNameFromName(const SString& strBoneName)
         return "R Foot";
     if (strBoneName == "rtoe0")
         return "R Toe0";
+
+    // Cutscene bones
+    if (strBoneName == "rthumb1")
+        return "RThumb1";
+    if (strBoneName == "rthumb2")
+        return "RThumb2";
+    if (strBoneName == "llip11")
+        return "llip11";
+    if (strBoneName == "lthumb1")
+        return "LThumb1";
+    if (strBoneName == "lthumb2")
+        return "LThumb2";
+    if (strBoneName == "jaw22")
+        return "jaw22";
+    if (strBoneName == "headnub")
+        return "HeadNub";
+    if (strBoneName == "lfinger0nub")
+        return "L Finger0Nub";
+    if (strBoneName == "rfinger0nub")
+        return "R Finger0Nub";
+    if (strBoneName == "ltoe0nub")
+        return "L Toe0Nub";
+    if (strBoneName == "rtoe0nub")
+        return "R Toe0Nub";
+    if (strBoneName == "rbrow1")
+        return "rbrow1";
+    if (strBoneName == "rbrow2")
+        return "rbrow2";
+    if (strBoneName == "lbrow1")
+        return "lbrow1";
+    if (strBoneName == "lbrow2")
+        return "lbrow2";
+    if (strBoneName == "rlid")
+        return "rlid";
+    if (strBoneName == "llid")
+        return "llid";
+    if (strBoneName == "rtlip3")
+        return "rtlip3";
+    if (strBoneName == "ltlip3")
+        return "ltlip3";
+    if (strBoneName == "rtlip1")
+        return "rtlip1";
+    if (strBoneName == "rtlip2")
+        return "rtlip2";
+    if (strBoneName == "ltlip1")
+        return "ltlip1";
+    if (strBoneName == "ltlip2")
+        return "ltlip2";
+    if (strBoneName == "rcorner")
+        return "rcorner";
+    if (strBoneName == "lcorner")
+        return "lcorner";
+    if (strBoneName == "jaw1")
+        return "jaw1";
+    if (strBoneName == "jaw2")
+        return "jaw2";
+    if (strBoneName == "llip1")
+        return "llip1";
+    if (strBoneName == "reye")
+        return "reye";
+    if (strBoneName == "leye")
+        return "leye";
+    if (strBoneName == "rcheek")
+        return "rcheek";
+    if (strBoneName == "lcheek")
+        return "lcheek";
 
     // For GTA 3
     if (strBoneName == "player")
