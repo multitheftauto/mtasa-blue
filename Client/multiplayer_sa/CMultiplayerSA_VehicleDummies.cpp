@@ -1091,7 +1091,6 @@ static void __declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
 
         popad
         movsx   ecx, dx
-        mov     eax, CModelInfo__ms_modelInfoPtrs
         mov     eax, vehicleDummiesPositionArray
         jmp     CONTINUE_CVehicle_GetPlaneGunsPosition
 
@@ -1099,6 +1098,7 @@ static void __declspec(naked) HOOK_CVehicle_GetPlaneGunsPosition()
         popad
         movsx   ecx, dx
         mov     eax, CModelInfo__ms_modelInfoPtrs
+        mov     eax, [eax+ecx*4]
         mov     eax, [eax+5Ch]
         jmp     CONTINUE_CVehicle_GetPlaneGunsPosition
     }

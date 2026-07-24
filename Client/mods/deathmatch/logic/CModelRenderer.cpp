@@ -43,6 +43,8 @@ void CModelRenderer::Update()
             pVisibilityPlugins->InsertEntityIntoEntityList(&modelDesc, fDistance, RenderEntity);
         }
     }
+
+    m_bAlphaRefsActive = true;
 }
 
 void CModelRenderer::Render()
@@ -50,18 +52,33 @@ void CModelRenderer::Render()
     CRenderer* pRenderer = g_pGame->GetRenderer();
     assert(pRenderer);
 
-    // Draw opaque entities
+    // Render all queued models (enqueued during previous frame's onClientRender)
     for (auto& modelDesc : m_Queue)
     {
-        if (modelDesc.pModelInfo->IsLoaded() && !modelDesc.pModelInfo->GetIdeFlag(eModelIdeFlag::DRAW_LAST))
+        if (modelDesc.pModelInfo->IsLoaded())
             pRenderer->RenderModel(modelDesc.pModelInfo, modelDesc.matrix, modelDesc.lighting);
     }
+}
 
+void CModelRenderer::NotifyFrameEnd()
+{
     m_Queue.clear();
+    m_bAlphaRefsActive = false;
 }
 
 void CModelRenderer::RenderEntity(SModelToRender* modelDesc, float distance)
 {
+    // GTA's alpha entity list stores raw pointers from InsertEntityIntoEntityList.
+    // Verify modelDesc actually points into our queue before dereferencing it,
+    // in case heap corruption overwrote the entity field in a list node.
+    CModelRenderer* pModelRenderer = g_pClientGame->GetModelRenderer();
+    if (!pModelRenderer || pModelRenderer->m_Queue.empty())
+        return;
+
+    const SModelToRender* pQueueData = pModelRenderer->m_Queue.data();
+    if (modelDesc < pQueueData || modelDesc >= pQueueData + pModelRenderer->m_Queue.size())
+        return;
+
     if (!modelDesc->pModelInfo->IsLoaded())
         return;
 

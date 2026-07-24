@@ -304,17 +304,40 @@ void CInstallManager::InitSequencer()
 //////////////////////////////////////////////////////////
 void CInstallManager::SetMTASAPathSource(const SString& strCommandLineIn)
 {
-    // Update some settings which are used by ReportLog
-    UpdateSettingsForReportLog();
-
     InitSequencer();
     RestoreSequencerFromSnapshot(strCommandLineIn);
 
     // If command line says we're not running from the launch directory, get the launch directory location from the registry
     if (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far")
+    {
+        // Process B carried the real install root through the sequencer state. Honor it here so this
+        // temp launcher process can resolve its base dir without depending only on the registry.
+        // The override must be installed before UpdateSettingsForReportLog runs, because that helper
+        // reaches GetInstallPathForLauncher / GetMTASAPath through UpdateMTAVersionApplicationSetting.
+        const SString strRealInstallRoot = m_pSequencer->GetVariable(INSTALL_ROOT);
+        if (strRealInstallRoot.empty())
+        {
+            AddReportLog(1063, "CInstallManager::SetMTASAPathSource: no sequencer install root, falling back to registry");
+        }
+        else if (SharedUtil::IsUsableMtasaInstallRoot(strRealInstallRoot) && !SharedUtil::IsTemporaryUpdateLaunchPath(strRealInstallRoot))
+        {
+            AddReportLog(1063, SString("CInstallManager::SetMTASAPathSource: honoring sequencer install root '%s'", strRealInstallRoot.c_str()));
+            SharedUtil::SetMTASABaseDirOverride(strRealInstallRoot);
+        }
+        else
+        {
+            AddReportLog(1063, SString("CInstallManager::SetMTASAPathSource: rejecting unusable sequencer install root '%s', falling back to registry",
+                                       strRealInstallRoot.c_str()));
+        }
+
         ::SetMTASAPathSource(true);
+    }
     else
         ::SetMTASAPathSource(false);
+
+    // Update some settings which are used by ReportLog. Must run after the path source is resolved
+    // so that report-log helpers see the real install root rather than a temp extraction directory.
+    UpdateSettingsForReportLog();
 }
 
 //////////////////////////////////////////////////////////
@@ -328,7 +351,7 @@ SString CInstallManager::Continue()
 {
     // Initial report line
     DWORD   dwProcessId = GetCurrentProcessId();
-    SString GotPathFrom = (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far") ? "registry" : "module location";
+    SString GotPathFrom = (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far") ? "far-update resolver" : "module location";
     AddReportLog(1041, SString("* Launch * pid:%d '%s' MTASAPath set from %s '%s'", dwProcessId, GetLaunchPathFilename().c_str(), GotPathFrom.c_str(),
                                GetMTASAPath().c_str()));
 
@@ -627,6 +650,15 @@ SString CInstallManager::_CheckForWerCrash()
         {
             const auto  regs = WerCrash::ExtractRegistersFromMinidump(fullPath);
             const DWORD exceptionCode = regs.valid ? regs.exceptionCode : EXCEPTION_STACK_BUFFER_OVERRUN;
+
+            // Skip non-fail-fast dumps (e.g. 0xE06D7363 C++ exceptions) -
+            // those are handled by the normal crash handler, not the WER path.
+            if (regs.valid && exceptionCode != EXCEPTION_STACK_BUFFER_OVERRUN && exceptionCode != EXCEPTION_HEAP_CORRUPTION)
+            {
+                OutputDebugStringA(SString("_CheckForWerCrash: Skipping dump %s with non-fail-fast exception code 0x%08X\n", dumpFile.c_str(), exceptionCode));
+                continue;
+            }
+
             const char* exceptionName = (exceptionCode == EXCEPTION_STACK_BUFFER_OVERRUN) ? "Stack Buffer Overrun"
                                         : (exceptionCode == EXCEPTION_HEAP_CORRUPTION)    ? "Heap Corruption"
                                                                                           : "Security Exception";
@@ -773,6 +805,16 @@ SString CInstallManager::_CheckForWerCrash()
 
                 const auto  regs = WerCrash::ExtractRegistersFromMinidump(fullPath);
                 const DWORD exceptionCode = regs.valid ? regs.exceptionCode : EXCEPTION_STACK_BUFFER_OVERRUN;
+
+                // Skip non-fail-fast dumps (e.g. 0xE06D7363 C++ exceptions) -
+                // those are handled by the normal crash handler, not the WER path.
+                if (regs.valid && exceptionCode != EXCEPTION_STACK_BUFFER_OVERRUN && exceptionCode != EXCEPTION_HEAP_CORRUPTION)
+                {
+                    OutputDebugStringA(
+                        SString("_CheckForWerCrash: Skipping WER dump %s with non-fail-fast exception code 0x%08X\n", dumpFile.c_str(), exceptionCode));
+                    continue;
+                }
+
                 const char* exceptionName = (exceptionCode == EXCEPTION_STACK_BUFFER_OVERRUN) ? "Stack Buffer Overrun"
                                             : (exceptionCode == EXCEPTION_HEAP_CORRUPTION)    ? "Heap Corruption"
                                                                                               : "Security Exception";
@@ -1042,6 +1084,11 @@ SString CInstallManager::_MaybeSwitchToTempExe()
     // If a new "Multi Theft Auto.exe" exists, let that complete the install
     if (m_pSequencer->GetVariable(INSTALL_LOCATION) == "far")
     {
+        // Carry the current real install root forward to the temp launcher so it can set a base-dir
+        // override before reading the registry. Without this, the temp launcher has only Last Run
+        // Location to fall back on, which can be missing, stale, or denied by HKLM write failures.
+        m_pSequencer->SetVariable(INSTALL_ROOT, GetMTASAPath());
+
         ReleaseSingleInstanceMutex();
         if (ShellExecuteNonBlocking("open", GetLauncherPathFilename(), GetSequencerSnapshot()))
             ExitProcess(0);  // All done here
@@ -1065,10 +1112,27 @@ SString CInstallManager::_SwitchBackFromTempExe()
     {
         m_pSequencer->SetVariable(INSTALL_LOCATION, "near");
 
+        // GetInstallPathForLauncher returns empty when running from a temp update directory and no
+        // usable non-temp install root could be resolved. PathJoin would then produce a root-relative
+        // probe like "\Multi Theft Auto.exe", which could match an unrelated file on the current drive
+        // and cause us to launch the wrong executable. Skip straight to the GetMTASAPath() fallback.
+        const SString strRealInstallRoot = GetInstallPathForLauncher();
+        SString       strLauncherPathFilename = strRealInstallRoot.empty() ? SString() : PathJoin(strRealInstallRoot, MTA_EXE_NAME);
+        if (strLauncherPathFilename.empty() || !FileExists(strLauncherPathFilename))
+        {
+            strLauncherPathFilename = PathJoin(GetMTASAPath(), MTA_EXE_NAME);
+            if (!FileExists(strLauncherPathFilename))
+            {
+                AddReportLog(5055, SString("_SwitchBackFromTempExe: target launcher missing '%s'", strLauncherPathFilename.c_str()));
+                return "fail";
+            }
+        }
+
         ReleaseSingleInstanceMutex();
-        if (ShellExecuteNonBlocking("open", GetLauncherPathFilename(), GetSequencerSnapshot()))
+        if (ShellExecuteNonBlocking("open", strLauncherPathFilename, GetSequencerSnapshot()))
             ExitProcess(0);  // All done here
         CreateSingleInstanceMutex();
+        AddReportLog(5055, SString("_SwitchBackFromTempExe: failed to launch '%s'", strLauncherPathFilename.c_str()));
         return "fail";
     }
     return "ok";
@@ -1098,6 +1162,7 @@ SString CInstallManager::_InstallFiles()
     }
     else
     {
+        SetOnRestartCommand("");
         UpdateMTAVersionApplicationSetting();
         AddReportLog(2050, SString("_InstallFiles: ok %s", ""));
         return "ok";
@@ -1155,31 +1220,6 @@ SString CInstallManager::_PrepareLaunchLocation()
     const fs::path mtaDir = GetMTARootDirectory() / "MTA";
     const fs::path launchDir = GetGameLaunchDirectory();
 
-#if 0
-    // NOTE(botder): We are not using this solution because creating directory junctions requires administrator privileges.
-    // Create GTA subdirectory junctions to our launch directory.
-    for (const char* directoryName : {"anim", "audio", "data", "models", "text"})
-    {
-        // Delete shortcuts that may be confusing to the eye.
-        const fs::path shortcutPath = (launchDir / directoryName).replace_extension(".lnk");
-
-        if (std::error_code ec; fs::exists(shortcutPath, ec))
-        {
-            if (!fs::remove(shortcutPath, ec))
-            {
-                OutputDebugLine(*SString("Failed to remove shortcut for %s (%d, %s)", directoryName, ec.value(), ec.message().c_str()));
-            }
-        }
-
-        if (std::error_code ec; !SetDirectoryJunction(gtaDir / directoryName, launchDir / directoryName, ec))
-        {
-            OutputDebugLine(*SString("Failed to create junction for %s (%d, %s)", directoryName, ec.value(), ec.message().c_str()));
-            m_strAdminReason = _("Create GTA:SA junctions");
-            return "fail";
-        }
-    }
-#endif
-
     // Copy GTA dependencies to our launch directory.
     for (const char* fileName : {"eax.dll", "ogg.dll", "vorbis.dll", "vorbisFile.dll"})
     {
@@ -1199,7 +1239,11 @@ SString CInstallManager::_PrepareLaunchLocation()
     }
 
     // Copy MTA dependencies to our launch directory.
+#ifdef MTA_MAETRO
+    for (const char* fileName : {LOADER_PROXY_DLL_NAME, MAETRO32_DLL_NAME})
+#else
     for (const char* fileName : {LOADER_PROXY_DLL_NAME})
+#endif
     {
         const fs::path sourcePath = mtaDir / fileName;
         const fs::path targetPath = launchDir / fileName;
@@ -1256,6 +1300,7 @@ SString CInstallManager::_ProcessGtaPatchCheck()
 
     if (!FileGenerator::IsPatchBase(patchBasePath))
     {
+        AddReportLog(5053, SString("_ProcessGtaPatchCheck: patch base invalid '%ls'", patchBasePath.wstring().c_str()));
         SString strMessage(_("MTA:SA cannot launch because a GTA:SA file is incorrect or missing:"));
         strMessage += "\n\n" + UTF8FilePath(patchBasePath);
         BrowseToSolution("gengta_pakfiles", ASK_GO_ONLINE, strMessage);
@@ -1264,6 +1309,7 @@ SString CInstallManager::_ProcessGtaPatchCheck()
 
     if (!FileGenerator::IsPatchDiff(patchDiffPath))
     {
+        AddReportLog(5053, SString("_ProcessGtaPatchCheck: patch diff invalid '%ls'", patchDiffPath.wstring().c_str()));
         SString strMessage(_("MTA:SA cannot launch because an MTA:SA file is incorrect or missing:"));
         strMessage += "\n\n" + UTF8FilePath(patchDiffPath);
         BrowseToSolution("mta-datafiles-missing", ASK_GO_ONLINE, strMessage);
@@ -1709,6 +1755,7 @@ SString CInstallManager::_ProcessLangFileChecks()
 //////////////////////////////////////////////////////////
 SString CInstallManager::_ProcessServiceChecks()
 {
+#if MTASA_VERSION_TYPE != VERSION_TYPE_CUSTOM
     if (!CheckService(CHECK_SERVICE_PRE_GAME))
     {
         if (!IsNativeArm64Host() && !IsUserAdmin())
@@ -1717,6 +1764,7 @@ SString CInstallManager::_ProcessServiceChecks()
             return "fail";
         }
     }
+#endif
     return "ok";
 }
 
@@ -1733,7 +1781,10 @@ SString CInstallManager::_ProcessAppCompatChecks()
     IsWow64Process(GetCurrentProcess(), &bIsWOW64);
     uint    uiHKLMFlags = bIsWOW64 ? KEY_WOW64_64KEY : 0;
     WString strGTAExePathFilename = GetGameExecutablePath().wstring();
-    WString strMTAExePathFilename = FromUTF8(GetLaunchPathFilename());
+    SString strMTAInstallPath = GetInstallPathForLauncher();
+    if (strMTAInstallPath.empty())
+        strMTAInstallPath = GetMTASAPath();
+    WString strMTAExePathFilename = FromUTF8(PathJoin(strMTAInstallPath, MTA_EXE_NAME));
     WString strCompatModeRegKey = L"SOFTWARE\\Microsoft\\Windows NT\\CurrentVersion\\AppCompatFlags\\Layers";
     int     bWin816BitColorOption = GetApplicationSettingInt("Win8Color16");
     int     bWin8MouseOption = GetApplicationSettingInt("Win8MouseFix");

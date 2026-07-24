@@ -4,10 +4,10 @@
 if ($PSVersionTable.PSVersion.Major -lt 7) {
     $currentVersion = $PSVersionTable.PSVersion
     Write-Error @"
-This script requires PowerShell 7 or later. 
+This script requires PowerShell 7 or later.
 Current version: $currentVersion
 
-Install PowerShell 7+: 
+Install PowerShell 7+:
   - Or run: winget install Microsoft.PowerShell (Windows)
   - Windows/macOS/Linux: https://github.com/PowerShell/PowerShell#get-powershell
 "@
@@ -93,6 +93,11 @@ function Invoke-ClangFormat {
     [CmdletBinding()]
     param()
 
+    $arguments = @('-i')
+    if ($VerbosePreference -eq 'Continue') {
+        $arguments += '--verbose'
+    }
+
     $repoRoot = Split-Path -Parent $PSScriptRoot
     Push-Location $repoRoot
     Write-Verbose "Changed directory to repository root: $repoRoot"
@@ -102,14 +107,14 @@ function Invoke-ClangFormat {
         # $clangTidyPath = Get-ClangTool -RepoRoot $repoRoot -ToolName "clang-tidy"
 
         Write-Verbose "Searching for source files to format..."
-        $searchFolders = "Client", "Server", "Shared"
-        $files = Get-ChildItem -Path $searchFolders -Include *.c, *.cc, *.cpp, *.h, *.hh, *.hpp -Recurse -ErrorAction SilentlyContinue | Select-Object -ExpandProperty FullName
+        $searchFolders = "Client", "Server", "Shared", "Tests"
+        $files = Get-ChildItem -Path $searchFolders -Include *.c, *.cc, *.cpp, *.h, *.hh, *.hpp -Recurse -ErrorAction SilentlyContinue
 
         $tmp = [System.IO.Path]::GetTempFileName()
-        $files | Out-File $tmp -Encoding utf8
+        $files.FullName | ForEach-Object { '"{0}"' -f $_ } | Set-Content $tmp -Encoding utf8
         Write-Verbose "List of files to format written to temporary file: $tmp"
 
-        & "$clangFormatPath" -i --files=$tmp
+        & "$clangFormatPath" @arguments "@$tmp"
 
         Remove-Item $tmp
         Write-Verbose "Successfully formatted $($files.Count) files."

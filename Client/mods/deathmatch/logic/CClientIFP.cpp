@@ -275,15 +275,25 @@ void CClientIFP::ReadSequenceVersion2(SSequenceHeaderV2& ObjectNode)
 
 bool CClientIFP::ReadSequenceKeyFrames(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, eFrameType iFrameType, const std::int32_t& cFrames)
 {
+    if (cFrames <= 0)
+        return false;
+
     size_t iCompressedFrameSize = GetSizeOfCompressedFrame(iFrameType);
-    if (iCompressedFrameSize)
+    size_t iSourceFrameSize = GetSourceFrameDataSize(iFrameType);
+    if (iCompressedFrameSize == 0 || iSourceFrameSize == 0)
+        return false;
+
+    BYTE* pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory(iCompressedFrameSize * cFrames);
+    if (!pKeyFrames)
     {
-        BYTE* pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory(iCompressedFrameSize * cFrames);
-        pAnimationSequence->SetKeyFrames(cFrames, IsKeyFramesTypeRoot(iFrameType), m_kbAllKeyFramesCompressed, pKeyFrames);
-        ReadKeyFramesAsCompressed(pAnimationSequence, iFrameType, cFrames);
-        return true;
+        // Advance stream past frame data to keep subsequent reads aligned
+        SkipBytes(static_cast<std::uint32_t>(iSourceFrameSize * cFrames));
+        return false;
     }
-    return false;
+
+    pAnimationSequence->SetKeyFrames(cFrames, IsKeyFramesTypeRoot(iFrameType), m_kbAllKeyFramesCompressed, pKeyFrames);
+    ReadKeyFramesAsCompressed(pAnimationSequence, iFrameType, cFrames);
+    return true;
 }
 
 void CClientIFP::ReadHeaderVersion1(SInfo& Info)
@@ -448,6 +458,34 @@ size_t CClientIFP::GetSizeOfCompressedFrame(eFrameType iFrameType)
     return 0;
 }
 
+size_t CClientIFP::GetSourceFrameDataSize(eFrameType iFrameType)
+{
+    switch (iFrameType)
+    {
+        case eFrameType::KRTS:
+        {
+            return sizeof(SKrts);
+        }
+        case eFrameType::KRT0:
+        {
+            return sizeof(SKrt0);
+        }
+        case eFrameType::KR00:
+        {
+            return sizeof(SKr00);
+        }
+        case eFrameType::KR00_COMPRESSED:
+        {
+            return sizeof(SCompressed_KR00);
+        }
+        case eFrameType::KRT0_COMPRESSED:
+        {
+            return sizeof(SCompressed_KRT0);
+        }
+    }
+    return 0;
+}
+
 void CClientIFP::InitializeAnimationHierarchy(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, const SString& strAnimationName,
                                               const std::int32_t& iSequences)
 {
@@ -543,6 +581,9 @@ void CClientIFP::InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence
 
     const size_t FramesDataSizeInBytes = FrameSize * cKeyFrames;
     BYTE*        pKeyFrames = m_pAnimManager->AllocateKeyFramesMemory(FramesDataSizeInBytes);
+    if (!pKeyFrames)
+        return;
+
     pAnimationSequence->SetKeyFrames(cKeyFrames, bHasTranslationValues, m_kbAllKeyFramesCompressed, pKeyFrames);
     CopyDummyKeyFrameByBoneID(pKeyFrames, dwBoneID);
 }

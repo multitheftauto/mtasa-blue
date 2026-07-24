@@ -26,6 +26,38 @@ private:
     unsigned char nValue;
 };
 
+// GTA SA pool slot stride for each interface type.
+// Most pools use sizeof(T), but vehicle, ped, and object pools allocate
+// slots larger than the base interface to accommodate derived types
+// (e.g. CAutomobileSAInterface inside the vehicle pool).
+template <typename T>
+struct PoolAllocStride
+{
+    static constexpr std::uint32_t value = sizeof(T);
+};
+
+class CVehicleSAInterface;
+class CPedSAInterface;
+class CObjectSAInterface;
+
+template <>
+struct PoolAllocStride<CVehicleSAInterface>
+{
+    static constexpr std::uint32_t value = 2584;
+};
+
+template <>
+struct PoolAllocStride<CPedSAInterface>
+{
+    static constexpr std::uint32_t value = 1988;
+};
+
+template <>
+struct PoolAllocStride<CObjectSAInterface>
+{
+    static constexpr std::uint32_t value = 412;
+};
+
 template <class A, class B = A>
 class CPoolSAInterface
 {
@@ -105,18 +137,19 @@ public:
             m_nFirstFree = slot;
             e->bEmpty = false;
             e->nId++;
-            return &m_pObjects[slot];
+            return reinterpret_cast<B*>(reinterpret_cast<std::uint8_t*>(m_pObjects) + slot * PoolAllocStride<B>::value);
         }
         return nullptr;
     }
 
     B* AllocateAt(uint uiSlot)
     {
-        m_pObjects[uiSlot] = B();
+        B* pSlot = reinterpret_cast<B*>(reinterpret_cast<std::uint8_t*>(m_pObjects) + uiSlot * PoolAllocStride<B>::value);
+        *pSlot = B();
         m_byteMap[uiSlot].bEmpty = false;
         m_byteMap[uiSlot].nId ^= uiSlot ^ (uiSlot + 1);
 
-        return &m_pObjects[uiSlot];
+        return pSlot;
     }
 
     B* AllocateAtNoInit(std::uint32_t uiSlot)
@@ -124,7 +157,7 @@ public:
         m_byteMap[uiSlot].bEmpty = false;
         m_byteMap[uiSlot].nId ^= uiSlot ^ (uiSlot + 1);
 
-        return &m_pObjects[uiSlot];
+        return reinterpret_cast<B*>(reinterpret_cast<std::uint8_t*>(m_pObjects) + uiSlot * PoolAllocStride<B>::value);
     }
 
     void Release(uint index)
@@ -149,17 +182,23 @@ public:
         return !IsEmpty(index);
     }
 
-    B* GetObject(std::int32_t objectIndex) { return &m_pObjects[objectIndex]; }
+    B* GetObject(std::int32_t objectIndex)
+    {
+        return reinterpret_cast<B*>(reinterpret_cast<std::uint8_t*>(m_pObjects) + objectIndex * PoolAllocStride<B>::value);
+    }
 
-    std::int32_t GetObjectIndex(B* pObject) { return ((DWORD)pObject - (DWORD)m_pObjects) / sizeof(B); }
+    uint GetObjectIndex(B* pObject)
+    {
+        return static_cast<uint>((reinterpret_cast<std::uint8_t*>(pObject) - reinterpret_cast<std::uint8_t*>(m_pObjects)) / PoolAllocStride<B>::value);
+    }
 
     std::int32_t GetObjectIndexSafe(B* pObject)
     {
         uint32_t index = GetObjectIndex(pObject);
         if (m_nSize <= 0)
-            return UINT_MAX;
+            return -1;
 
-        return index >= static_cast<uint32_t>(m_nSize) ? UINT_MAX : index;
+        return index >= static_cast<uint32_t>(m_nSize) ? -1 : static_cast<std::int32_t>(index);
     }
 };
 

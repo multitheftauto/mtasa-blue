@@ -11,6 +11,7 @@
 #pragma once
 
 #include <list>
+#include <unordered_set>
 #include "CClientCommon.h"
 
 class CClientStreamer;
@@ -38,8 +39,8 @@ public:
     std::list<CClientStreamElement*>::iterator Begin() { return m_Elements.begin(); }
     std::list<CClientStreamElement*>::iterator End() { return m_Elements.end(); }
 
-    void         AddElements(std::list<CClientStreamElement*>* pList);
-    void         RemoveElements(std::list<CClientStreamElement*>* pList);
+    void         AddElements(std::list<CClientStreamElement*>* pList, std::unordered_set<CClientStreamElement*>* pSet = nullptr);
+    void         RemoveElements(std::list<CClientStreamElement*>* pList, std::unordered_set<CClientStreamElement*>* pSet = nullptr);
     unsigned int CountElements() { return m_Elements.size(); }
 
     CClientStreamSectorRow* GetRow() { return m_pRow; }

@@ -5,11 +5,70 @@ on: [push, pull_request, workflow_dispatch]
 jobs:
   clang-format:
     runs-on: ubuntu-24.04
+    permissions:
+      contents: write
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Run clang-format
+        id: clang_format
+        continue-on-error: true
         shell: pwsh
         run: ./utils/clang-format.ps1 -Verbose
+
+      - name: Generate GitHub App token
+        id: app-token
+        if: |
+          steps.clang_format.outcome == 'failure' &&
+          github.ref == 'refs/heads/master' &&
+          github.event_name == 'push' &&
+          !github.event.repository.fork
+        uses: actions/create-github-app-token@v3
+        with:
+          client-id: ${{ secrets.GH_APP_MTA_CLIENT_ID }}
+          private-key: ${{ secrets.GH_APP_MTA_PEM }}
+          owner: ${{ github.repository_owner }}
+          repositories: ${{ github.event.repository.name }}
+          permission-contents: write
+
+      - name: Auto-fix formatting issues
+        if: |
+          steps.clang_format.outcome == 'failure' &&
+          github.ref == 'refs/heads/master' &&
+          github.event_name == 'push' &&
+          !github.event.repository.fork
+        shell: bash
+        run: |
+          # Stage the formatted files (clang-format.ps1 already ran in-place)
+          git add -u
+
+          # Verify idempotency: run clang-format again on the staged files
+          # and check that no further changes are produced
+          ./Build/tmp/clang-format -i $(git diff --name-only --cached)
+
+          if ! git diff --quiet; then
+            echo "::error::clang-format is not idempotent - cannot auto-fix"
+            exit 1
+          fi
+
+          # Allow commit to work
+          git config user.name "multitheftauto[bot]"
+          git config user.email "274826127+multitheftauto[bot]@users.noreply.github.com"
+
+          # Append a commit with a fix applied
+          git commit -m "Fix formatting issues introduced by ${GITHUB_SHA}
+
+          cc @${GITHUB_ACTOR} please make sure to run clang-format locally before pushing changes to avoid this in the future."
+
+          # Authenticate with the GitHub App token and push
+          git remote set-url origin https://x-access-token:${{ steps.app-token.outputs.token }}@github.com/${{ github.repository }}
+          git push
+
+      - name: Report formatting issues
+        if: |
+          steps.clang_format.outcome == 'failure' &&
+          !(github.ref == 'refs/heads/master' && github.event_name == 'push')
+        shell: bash
+        run: exit 1

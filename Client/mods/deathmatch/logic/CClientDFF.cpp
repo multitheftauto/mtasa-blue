@@ -27,31 +27,6 @@ CClientDFF::~CClientDFF()
     // Remove us from DFF manager list
     m_pDFFManager->RemoveFromList(this);
 
-    bool bInDeleteAll = g_pClientGame && g_pClientGame->GetElementDeleter()->IsBeingDeleted(this);
-
-    // During DoDeleteAll (arbitrary element destruction order), clear custom model
-    // pointers to prevent stale clump references. Skip restreaming and UnloadDFF
-    // which would corrupt RW data or double-free textures. Normal resource cleanup
-    // (engineRestoreModel, resource stop) uses the full restoration path below.
-    if (bInDeleteAll)
-    {
-        for (auto usModel : m_Replaced)
-        {
-            CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
-            if (pModelInfo)
-            {
-                pModelInfo->ClearCustomModel();
-            }
-        }
-        m_Replaced.clear();
-
-        // Remove clothes buffer references so OnCStreaming_RequestModel_Mid
-        // won't serve up our soon-to-be-freed m_RawDataBuffer pointer
-        g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_RawDataBuffer.data());
-        g_pGame->GetRenderWare()->ClothesRemoveFile(m_RawDataBuffer.data());
-        return;
-    }
-
     // Restore all our models
     RestoreModels();
 
@@ -72,8 +47,7 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
         info.bTriedLoad = true;
 
         // Make sure previous model+collision is loaded
-        if (!m_pManager->GetModelRequestManager()->RequestBlocking(usModelId, "CClientDFF::LoadDFF"))
-            AddReportLog(8631, SString("GetLoadedClump: RequestBlocking failed for model %d", usModelId));
+        m_pManager->GetModelRequestManager()->RequestBlocking(usModelId, "CClientDFF::LoadDFF");
 
         // Attempt loading it
         if (!m_bIsRawData)  // We have file
@@ -119,9 +93,7 @@ void CClientDFF::UnloadDFF()
     {
         SLoadedClumpInfo& info = iter->second;
         if (info.pClump)
-        {
             g_pGame->GetRenderWare()->DestroyDFF(info.pClump);
-        }
     }
 
     m_LoadedClumpInfoMap.clear();
@@ -240,11 +212,6 @@ bool CClientDFF::DoReplaceModel(unsigned short usModel, bool bAlphaTransparency)
     }
 
     // No supported type or no loaded clump
-    if (!pClump)
-        AddReportLog(8632, SString("DoReplaceModel: GetLoadedClump returned null for model %d", usModel));
-    else
-        AddReportLog(8633, SString("DoReplaceModel: No type match for model %d (loaded clump exists)", usModel));
-
     return false;
 }
 
@@ -265,12 +232,11 @@ bool CClientDFF::HasReplaced(unsigned short usModel)
     return false;
 }
 
-bool CClientDFF::RestoreModel(unsigned short usModel)
+void CClientDFF::RestoreModel(unsigned short usModel)
 {
     // Restore the model and remove it from the list
-    bool bRestored = InternalRestoreModel(usModel);
+    InternalRestoreModel(usModel);
     m_Replaced.remove(usModel);
-    return bRestored;
 }
 
 void CClientDFF::RestoreModels()
@@ -279,7 +245,7 @@ void CClientDFF::RestoreModels()
     std::list<unsigned short>::iterator iter = m_Replaced.begin();
     for (; iter != m_Replaced.end(); iter++)
     {
-        // Restore this model (ignore return - bulk cleanup)
+        // Restore this model
         InternalRestoreModel(*iter);
     }
 
@@ -290,7 +256,7 @@ void CClientDFF::RestoreModels()
     m_Replaced.clear();
 }
 
-bool CClientDFF::InternalRestoreModel(unsigned short usModel)
+void CClientDFF::InternalRestoreModel(unsigned short usModel)
 {
     // Is this a vehicle ID?
     if (CClientVehicleManager::IsValidModel(usModel))
@@ -300,7 +266,7 @@ bool CClientDFF::InternalRestoreModel(unsigned short usModel)
         // eventually stream them back in with async loading.
         m_pManager->GetVehicleManager()->RestreamVehicles(usModel);
     }
-    // Is this a ped ID?
+    // Is this an ped ID?
     else if (CClientPlayerManager::IsValidModel(usModel))
     {
         // Stream the ped of that model out so we have no
@@ -329,36 +295,17 @@ bool CClientDFF::InternalRestoreModel(unsigned short usModel)
     else if (CClientPlayerClothes::IsValidModel(usModel))
     {
         g_pGame->GetRenderWare()->ClothesRemoveReplacement(m_RawDataBuffer.data());
-        return true;
+        return;
     }
     else
-    {
-        AddReportLog(9403, SString("InternalRestoreModel: Model %u not recognized as vehicle/ped/object/clothes", usModel), 10);
-        return false;
-    }
+        return;
 
-    // Restore model first - this releases texture replacement tracking refs
+    // Restore all the models we replaced.
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
-    if (!pModelInfo)
-    {
-        AddReportLog(9405, SString("InternalRestoreModel: GetModelInfo returned null for model %u", usModel), 10);
-        return false;
-    }
     pModelInfo->ResetVehicleDummies(true);
     pModelInfo->ResetVehicleWheelSizes();
     pModelInfo->RestoreOriginalModel();
     pModelInfo->ResetAlphaTransparency();
-
-    // Check if model was actually unloaded (immediate restore)
-    bool bModelUnloaded = !pModelInfo->IsLoaded();
-
-    // Only clean up isolated TXD if model has no refs (no entities using it)
-    // If refs remain, TXD cleanup is deferred to CClientModel::Deallocate
-    if (CRenderWare* pRenderWare = g_pGame->GetRenderWare())
-    {
-        if (bModelUnloaded)
-            pRenderWare->CleanupIsolatedTxdForModel(usModel);
-    }
 
     // 'Restream' upgrades after model replacement to propagate visual changes with immediate effect
     if (CClientObjectManager::IsValidModel(usModel) && CVehicleUpgrades::IsUpgrade(usModel))
@@ -376,9 +323,6 @@ bool CClientDFF::InternalRestoreModel(unsigned short usModel)
             g_pGame->GetRenderWare()->DestroyDFF(pInfo->pClump);
         MapRemove(m_LoadedClumpInfoMap, usModel);
     }
-
-    // Return true only if model was immediately restored (not deferred due to entities using it)
-    return bModelUnloaded;
 }
 
 bool CClientDFF::ReplaceClothes(ushort usModel)
@@ -409,11 +353,7 @@ bool CClientDFF::ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlpha
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(usModel);
 
     if (!pModelInfo->SetCustomModel(pClump))
-    {
-        AddReportLog(8635, SString("ReplaceObjectModel: SetCustomModel failed for model %d (loaded=%d, type=%d)", usModel, pModelInfo->IsLoaded() ? 1 : 0,
-                                   static_cast<int>(pModelInfo->GetModelType())));
         return false;
-    }
 
     pModelInfo->SetAlphaTransparencyEnabled(bAlphaTransparency);
 

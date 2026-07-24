@@ -50,11 +50,13 @@ bool CIFPEngine::EngineReplaceAnimation(CClientEntity* pEntity, const SString& s
         std::shared_ptr<CClientIFP> pCustomIFP = g_pClientGame->GetIFPPointerFromMap(u32BlockNameHash);
         if (pInternalBlock && pCustomIFP)
         {
-            // Block must be loaded - Request(BLOCKING) to "try to load block" as fallback, can lead to freeze during resource cleanup
-            // when file I/O is delayed. Standard blocks are loaded during gameplay.
             if (!pInternalBlock->IsLoaded())
             {
-                g_pClientGame->GetScriptDebugging()->LogWarning(nullptr, "engineReplaceAnimation: Animation block '%s' not loaded", *strInternalBlockName);
+                // Request non-blocking load to avoid freezes from synchronous I/O (e.g. during resource cleanup).
+                // Only request if no existing refs, to avoid inflating ref count on repeated calls.
+                if (pInternalBlock->GetRefs() == 0)
+                    pInternalBlock->Request(NON_BLOCKING);
+
                 return false;
             }
 
@@ -118,8 +120,8 @@ bool CIFPEngine::EngineApplyAnimation(CClientPed& Ped, CAnimBlendHierarchySAInte
         if (pCurrentAnimAssociation)
         {
             auto pCurrentAnimHierarchy = pCurrentAnimAssociation->GetAnimHierarchy();
-            auto pAssocHierachyInterface = pCurrentAnimHierarchy->GetInterface();
-            if (pAssocHierachyInterface == pAnimHierarchyInterface)
+            auto pAssocHierarchyInterface = pCurrentAnimHierarchy->GetInterface();
+            if (pAssocHierarchyInterface == pAnimHierarchyInterface)
             {
                 return true;
             }

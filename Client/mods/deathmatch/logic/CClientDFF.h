@@ -42,7 +42,7 @@ public:
 
     bool HasReplaced(unsigned short usModel);
 
-    bool RestoreModel(unsigned short usModel);
+    void RestoreModel(unsigned short usModel);
     void RestoreModels();
 
     static bool IsDFFData(const SString& strData);
@@ -58,8 +58,7 @@ private:
 
     bool DoReplaceModel(unsigned short usModel, bool bAlphaTransparency);
     void UnloadDFF();
-
-    bool InternalRestoreModel(unsigned short usModel);
+    void InternalRestoreModel(unsigned short usModel);
 
     bool ReplaceClothes(ushort usModel);
     bool ReplaceObjectModel(RpClump* pClump, ushort usModel, bool bAlphaTransparency);

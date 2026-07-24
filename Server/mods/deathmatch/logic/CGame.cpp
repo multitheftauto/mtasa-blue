@@ -276,6 +276,7 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)  // Max of 4 connections per 30
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
     m_JetpackWeapons[WEAPONTYPE_PISTOL] = true;
+    m_JetpackWeapons[WEAPONTYPE_SAWNOFF_SHOTGUN] = true;
     // Glitch names (for Lua interface)
     m_GlitchNames["quickreload"] = GLITCH_QUICKRELOAD;
     m_GlitchNames["fastfire"] = GLITCH_FASTFIRE;
@@ -572,6 +573,11 @@ void CGame::DoPulse()
     if (m_pHqComms)
         m_pHqComms->Pulse();
 
+    // Periodic maintenance for the built-in HTTP server (login session and
+    // connection cache upkeep).
+    if (m_pHTTPD)
+        m_pHTTPD->HttpPulse();
+
     CLOCK_CALL1(m_pFunctionUseLogger->Pulse(););
     CLOCK_CALL1(m_lightsyncManager.DoPulse(););
 
@@ -657,14 +663,20 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         return false;
     }
 
-    // Check pcre has been built correctly
-    int iPcreConfigUtf8 = 0;
-    pcre_config(PCRE_CONFIG_UTF8, &iPcreConfigUtf8);
-    if (iPcreConfigUtf8 == 0)
+    // Check pcre2 has been built correctly with Unicode/UTF support
+    uint32_t uiPcre2Unicode = 0;
+    pcre2_config(PCRE2_CONFIG_UNICODE, &uiPcre2Unicode);
+    if (uiPcre2Unicode == 0)
     {
-        CLogger::ErrorPrintf("PCRE built without UTF8 support\n");
+        CLogger::ErrorPrintf("PCRE2 built without Unicode support\n");
         return false;
     }
+
+    // Set json-c double serialization to 16 significant digits instead of the
+    // default %.17g. At 17 digits, IEEE 754 rounding artifacts from the least
+    // significant bit become visible (e.g. 5.1 becomes "5.1000000000000001").
+    // This API survives json-c upgrades so the source files don't need patching.
+    json_c_set_serialization_double_format("%.16g", JSON_C_OPTION_GLOBAL);
 
     // Check json has precision mod - #8853 (toJSON passes wrong floats)
     json_object* pJsonObject = json_object_new_double(5.12345678901234);
@@ -2083,6 +2095,13 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
     CPed* pPed = GetElementFromId<CPed>(Packet.m_PedID);
     if (pPed && !pPed->IsDead())
     {
+        CVehicle* pVehicle = pPed->GetOccupiedVehicle();
+
+        // Non syncable peds should be fully ignored unless in vehicle (Fix for 3598)
+        // We allow it only if the ped should die from their occupied vehicle exploding or drowning
+        if (!pPed->IsSyncable() && (!pVehicle || (Packet.m_ucKillerWeapon != 51 && Packet.m_ucKillerWeapon != 53)))
+            return;
+
         pPed->SetIsDead(true);
         pPed->SetHealth(0.0f);
         pPed->SetArmor(0.0f);
@@ -2095,7 +2114,6 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
             pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
         // Remove him from any occupied vehicle
-        CVehicle* pVehicle = pPed->GetOccupiedVehicle();
         if (pVehicle)
         {
             pVehicle->SetOccupant(NULL, pPed->GetOccupiedVehicleSeat());
@@ -2382,7 +2400,14 @@ void CGame::Packet_PlayerPuresync(CPlayerPuresyncPacket& Packet)
         {
             // Allow it if he's exiting
             if (pPlayer->GetVehicleAction() != CPed::VEHICLEACTION_EXITING)
+            {
+                // Still acknowledge so the client's network-trouble watchdog doesn't trip while it catches up
+                // to the new vehicle-occupied state (e.g. just after warpPedIntoVehicle, before it starts
+                // sending vehicle puresync packets instead of these on-foot ones)
+                if ((pPlayer->GetPuresyncCount() % 4) == 0)
+                    pPlayer->Send(CReturnSyncPacket(pPlayer));
                 return;
+            }
         }
 
         // Send a returnsync packet to the player that sent it
@@ -2428,6 +2453,13 @@ void CGame::Packet_VehicleDamageSync(CVehicleDamageSyncPacket& Packet)
             // Is this guy the driver or syncer?
             if (pVehicle->GetSyncer() == pPlayer || pVehicle->GetOccupant(0) == pPlayer)
             {
+                // Ignore damage syncs for already-blown vehicles. Once a vehicle
+                // is destroyed, further damage changes (from physics collisions or
+                // burn explosions) only cause repeated flying component spawns and
+                // excess explosions on clients.
+                if (pVehicle->IsBlown())
+                    return;
+
                 // Set the new damage model
                 for (unsigned int i = 0; i < MAX_DOORS; ++i)
                 {
@@ -2570,6 +2602,10 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     args.PushNumber(packet.m_start.fZ);
 
     player->CallEvent("onPlayerWeaponFire", args);
+
+    // Sim sync only relays bullet packets to zone-0 viewers. Relay to the rest of the
+    // near list here so zone-1/2 observers still receive long-range bullet sync.
+    RelayNearbyPacket(packet);
 }
 
 void CGame::Packet_WeaponBulletsync(CCustomWeaponBulletSyncPacket& packet)
@@ -4005,6 +4041,9 @@ void CGame::Packet_Voice_End(CVoiceEndPacket& Packet)
 
         if (pPlayer)
         {
+            if (pPlayer->GetVoiceState() == VOICESTATE_IDLE)
+                return;
+
             CLuaArguments Arguments;
             pPlayer->CallEvent("onPlayerVoiceStop", Arguments, pPlayer);
 
@@ -4373,7 +4412,10 @@ void CGame::PlayerCompleteConnect(CPlayer* pPlayer)
     {
         // event cancelled, disconnect the player
         CLogger::LogPrintf("CONNECT: %s failed to connect. (onPlayerConnect event cancelled) (%s)\n", pPlayer->GetNick(), strIPAndSerial.c_str());
-        const char* szError = g_pGame->GetEvents()->GetLastError();
+        // Use WasLastError() rather than GetLastError(): CallEvent() above already restored
+        // m_strLastError to the outer (pre-call) value once it returned, so the reason set via
+        // cancelEvent() inside the onPlayerConnect handler is only available through this getter.
+        const char* szError = g_pGame->GetEvents()->WasLastError();
         if (szError && szError[0])
         {
             DisconnectPlayer(g_pGame, *pPlayer, szError);

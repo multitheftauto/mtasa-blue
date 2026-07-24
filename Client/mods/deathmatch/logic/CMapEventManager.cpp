@@ -120,7 +120,8 @@ void CMapEventManager::DeleteAll()
     m_bHasEvents = !m_EventsMap.empty();
 }
 
-bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, class CClientEntity* pSource, class CClientEntity* pThis)
+bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, class CClientEntity* pSource, class CClientEntity* pThis,
+                            const char* minClientVersion)
 {
     // Check if no events
     if (!m_bHasEvents)
@@ -162,7 +163,14 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                 if (pSource == pThis || pMapEvent->IsPropagated())
                 {
                     // Grab the current VM
-                    lua_State* pState = pMapEvent->GetVM()->GetVM();
+                    CLuaMain*  luaMain = pMapEvent->GetVM();
+                    lua_State* pState = luaMain->GetVM();
+
+                    if (minClientVersion != nullptr)
+                    {
+                        if (luaMain->GetResource()->GetMinClientReq() < minClientVersion)
+                            continue;
+                    }
 
                     LUA_CHECKSTACK(pState, 1);  // Ensure some room
 
@@ -183,7 +191,7 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     // Record event for the crash dump writer
                     static bool bEnabled = (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::LUA_TRACE_0000);
                     if (bEnabled)
-                        g_pCore->LogEvent(0, "Lua Event", pMapEvent->GetVM()->GetScriptName(), szName);
+                        g_pCore->LogEvent(0, "Lua Event", luaMain->GetScriptName(), szName);
 
                     if (!g_pClientGame->GetDebugHookManager()->OnPreEventFunction(szName, Arguments, pSource, nullptr, pMapEvent))
                         continue;
@@ -275,9 +283,9 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
 
                     if (deltaTimeUs > 3000)
                         if (IS_TIMING_CHECKPOINTS())
-                            strStatus += SString(" (%s %d ms)", pMapEvent->GetVM()->GetScriptName(), deltaTimeUs / 1000);
+                            strStatus += SString(" (%s %d ms)", luaMain->GetScriptName(), deltaTimeUs / 1000);
 
-                    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pMapEvent->GetVM(), szName, deltaTimeUs);
+                    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(luaMain, szName, deltaTimeUs);
                 }
             }
         }

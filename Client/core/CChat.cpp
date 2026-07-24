@@ -645,7 +645,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
         case VK_RETURN:
         {
             // Empty the chat and hide the input stuff
-            // If theres a command to call, call it
+            // If there's a command to call, call it
             if (!m_strCommand.empty() && !m_strInputText.empty())
                 CCommands::GetSingleton().Execute(m_strCommand.c_str(), m_strInputText.c_str());
 

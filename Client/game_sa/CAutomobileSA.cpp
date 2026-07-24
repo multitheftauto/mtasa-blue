@@ -1,6 +1,6 @@
 /*****************************************************************************
  *
- *  PROJECT:     Multi Theft Auto v1.0
+ *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        game_sa/CAutomobileSA.cpp
  *  PURPOSE:     Automobile vehicle entity
@@ -19,6 +19,17 @@ CAutomobileSA::CAutomobileSA(CAutomobileSAInterface* pInterface)
 {
     SetInterface(pInterface);
     Init();
+}
+
+// Returns true when any wheel is partially compressed (not fully relaxed)
+bool CAutomobileSA::IsAnyWheelTouchingGround() const
+{
+    CAutomobileSAInterface* autoInterface = GetAutomobileInterface();
+    if (!autoInterface)
+        return false;
+
+    return autoInterface->m_wheelRatios[0] < 1.0f || autoInterface->m_wheelRatios[1] < 1.0f || autoInterface->m_wheelRatios[2] < 1.0f ||
+           autoInterface->m_wheelRatios[3] < 1.0f;
 }
 
 void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlass, bool spawnFlyingComponent)

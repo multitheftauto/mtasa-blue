@@ -141,7 +141,7 @@ struct SAnimationCache
     int          iTime{-1};
     bool         bLoop{false};
     bool         bUpdatePosition{false};
-    bool         bInterruptable{false};
+    bool         bInterruptible{false};
     bool         bFreezeLastFrame{true};
     int          iBlend{250};
     float        progress{0.0f};
@@ -462,6 +462,9 @@ public:
     bool IsDoingGangDriveby();
     void SetDoingGangDriveby(bool bDriveby);
 
+    // Set while onClientPlayerWeaponFire/onClientPedWeaponFire is dispatched.
+    void SetProcessingWeaponFireEvent(bool bProcessing) noexcept { m_bProcessingWeaponFireEvent = bProcessing; }
+
     bool GetRunningAnimationName(SString& strBlockName, SString& strAnimName);
     bool IsRunningAnimation();
 
@@ -469,7 +472,7 @@ public:
     bool IsAnimationInProgress();
 
     void RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true,
-                           bool bUpdatePosition = true, bool bInterruptable = false, bool bFreezeLastFrame = true, bool bRunInSequence = false,
+                           bool bUpdatePosition = true, bool bInterruptible = false, bool bFreezeLastFrame = true, bool bRunInSequence = false,
                            bool bOffsetPed = false, bool bHoldLastFrame = false);
     void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
@@ -722,6 +725,8 @@ public:
     CClientPad                               m_Pad;
     bool                                     m_bDestroyingSatchels;
     bool                                     m_bDoingGangDriveby;
+    bool                                     m_bProcessingWeaponFireEvent;
+    bool                                     m_bDeferredGangDrivebyAbort;
     std::unique_ptr<CAnimBlock>              m_pAnimationBlock;
     bool                                     m_bRequestedAnimation;
     SAnimationCache                          m_AnimationCache;

@@ -22,8 +22,8 @@ class CStatsSA : public CStats
 {
 public:
     float GetStatValue(unsigned short usIndex);
-    void  ModifyStat(unsigned short usIndex, float fAmmount);
-    void  SetStatValue(unsigned short usIndex, float fAmmount);
+    void  ModifyStat(unsigned short usIndex, float fAmount);
+    void  SetStatValue(unsigned short usIndex, float fAmount);
 
     unsigned short GetSkillStatIndex(eWeaponType type);
 };

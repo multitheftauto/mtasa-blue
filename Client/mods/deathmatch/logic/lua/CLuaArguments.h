@@ -32,6 +32,8 @@ class CLuaArguments;
 class CLuaArguments
 {
 public:
+    static constexpr unsigned int MaxBitStreamTableReadDepth = 64;
+
     CLuaArguments() {}
     CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
     CLuaArguments(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
@@ -67,7 +69,7 @@ public:
     void DeleteArguments();
     void Pop();
 
-    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
     void         ValidateTableKeys();
     bool         ReadFromJSONString(const char* szJSON);

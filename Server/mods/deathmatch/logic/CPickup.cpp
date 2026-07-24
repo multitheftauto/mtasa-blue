@@ -434,7 +434,7 @@ void CPickup::Use(CPlayer& Player)
             // Tell him to play the sound and hide/show it
             Player.Send(CPickupHitConfirmPacket(this, true));
 
-            // Tell everyone else to hide/show it as neccessary
+            // Tell everyone else to hide/show it as necessary
             g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CPickupHitConfirmPacket(this, false), &Player);
 
             // Handle it depending on the type

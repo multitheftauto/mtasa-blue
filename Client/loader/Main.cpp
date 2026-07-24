@@ -42,8 +42,12 @@ namespace
         ERROR_INSTALL_CONTINUE = -4
     };
 
-    // Command line constants
-    constexpr size_t MAX_CMD_LINE_LENGTH = 4096;
+    // Command line constants. Sized to hold the Windows command-line maximum (CreateProcess limit
+    // is 32767 wchar_t, see CreateProcessW docs). The auto-update flow serializes the sequencer
+    // snapshot through this buffer (CInstallManager::_MaybeSwitchToTempExe -> ShellExecuteNonBlocking
+    // -> Process C lpCmdLine), so a smaller cap silently truncates restored state and breaks the
+    // INSTALL_ROOT carry that prevents U01 in temp-launched processes.
+    constexpr size_t MAX_CMD_LINE_LENGTH = 32768;
 
     // Report log IDs
     constexpr int LOG_ID_END = 1044;
@@ -144,8 +148,10 @@ namespace
         // Start logging.....now
         BeginEventLog();
 
-        // Start localization if possible
-        InitLocalization(false);
+        // A temp updater shouldnt load the install root's core.dll before RunInstall;
+        // the localization module stays loaded and would block replacement.
+        if (!SharedUtil::IsTemporaryUpdateLaunchPath(GetLaunchPath()))
+            InitLocalization(false);
 
         // Handle commands from the installer
         HandleSpecialLaunchOptions();

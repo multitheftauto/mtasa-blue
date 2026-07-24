@@ -191,23 +191,15 @@ void CRenderWareSA::PulseWorldTextureWatch()
 
             // Get list of texture names and data to add
 
+            // Note: If txd has been unloaded since, textureList will be empty
             std::vector<RwTexture*> textureList;
             GetTxdTextures(textureList, action.usTxdId);
 
             for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
             {
-                RwTexture* texture = *iter;
-
-                // Validate texture pointer (TXD could unload mid-iteration)
-                if (!texture || !SharedUtil::IsReadablePointer(texture, sizeof(RwTexture)))
-                    continue;
-
+                RwTexture*  texture = *iter;
                 const char* szTextureName = texture->name;
-
-                // Check raster pointer
-                CD3DDUMMY* pD3DData =
-                    (texture->raster && SharedUtil::IsReadablePointer(texture->raster, sizeof(RwRaster))) ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
-
+                CD3DDUMMY*  pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
                 if (!MapContains(m_SpecialTextures, texture))
                     StreamingAddedTexture(action.usTxdId, szTextureName, pD3DData);
             }
@@ -223,8 +215,6 @@ void CRenderWareSA::PulseWorldTextureWatch()
     }
 
     ms_txdStreamEventList.clear();
-
-    ProcessPendingIsolatedModels();
     TIMING_CHECKPOINT("-TextureWatch");
 }
 
@@ -233,18 +223,11 @@ void CRenderWareSA::PulseWorldTextureWatch()
 // CRenderWareSA::StreamingAddedTexture
 //
 // Called when a TXD is loaded.
-// Create a texinfo for the texture.
-// Note: We register textures with their actual GTA internal name (e.g., "#emap").
-// The pattern matching in AppendAdditiveMatch/AppendSubtractiveMatch handles
-// mapping external names in scripts (e.g. "remap*") to internal names.
+// Create a texinfo for the texture
 //
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::StreamingAddedTexture(ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData)
 {
-    // Skip textures without valid D3D data or name - shader matching requires both
-    if (!pD3DData || strTextureName.empty())
-        return;
-
     STexInfo* pTexInfo = CreateTexInfo(usTxdId, strTextureName, pD3DData);
     OnTextureStreamIn(pTexInfo);
 }
@@ -266,7 +249,7 @@ void CRenderWareSA::StreamingRemovedTxd(ushort usTxdId)
     for (ConstIterType iter = range.first; iter != range.second;)
     {
         STexInfo* pTexInfo = iter->second;
-        if (pTexInfo && pTexInfo->texTag == usTxdId)
+        if (pTexInfo->texTag == usTxdId)
         {
             OnTextureStreamOut(pTexInfo);
             DestroyTexInfo(pTexInfo);
@@ -281,50 +264,6 @@ void CRenderWareSA::StreamingRemovedTxd(ushort usTxdId)
 
 ////////////////////////////////////////////////////////////////
 //
-// CRenderWareSA::RemoveStreamingTexture
-//
-// Remove a single texture that was added via StreamingAddedTexture.
-// Finds the texture by matching TXD ID and D3D data pointer.
-//
-////////////////////////////////////////////////////////////////
-void CRenderWareSA::RemoveStreamingTexture(unsigned short usTxdId, CD3DDUMMY* pD3DData)
-{
-    if (!pD3DData)
-        return;
-
-    typedef std::multimap<ushort, STexInfo*>::iterator IterType;
-    std::pair<IterType, IterType>                      range = m_TexInfoMap.equal_range(usTxdId);
-    for (IterType iter = range.first; iter != range.second;)
-    {
-        STexInfo* pTexInfo = iter->second;
-        if (pTexInfo && pTexInfo->pD3DData == pD3DData)
-        {
-            OnTextureStreamOut(pTexInfo);
-            DestroyTexInfo(pTexInfo);
-            m_TexInfoMap.erase(iter++);
-            return;  // Only one entry per D3D data
-        }
-        else
-            ++iter;
-    }
-}
-
-////////////////////////////////////////////////////////////////
-//
-// CRenderWareSA::IsTexInfoRegistered
-//
-// Check if a D3D data pointer is already registered in the shader system.
-//
-////////////////////////////////////////////////////////////////
-bool CRenderWareSA::IsTexInfoRegistered(CD3DDUMMY* pD3DData) const
-{
-    if (!pD3DData)
-        return false;
-    return MapContains(m_D3DDataTexInfoMap, pD3DData);
-}
-
-////////////////////////////////////////////////////////////////
-//
 // CRenderWareSA::ScriptAddedTxd
 //
 // Called when a TXD is loaded outside of streaming
@@ -334,28 +273,13 @@ bool CRenderWareSA::IsTexInfoRegistered(CD3DDUMMY* pD3DData) const
 void CRenderWareSA::ScriptAddedTxd(RwTexDictionary* pTxd)
 {
     TIMING_CHECKPOINT("+ScriptAddedTxd");
-
-    // Validate TXD pointer before iterating
-    if (!pTxd || !SharedUtil::IsReadablePointer(pTxd, sizeof(RwTexDictionary)))
-    {
-        TIMING_CHECKPOINT("-ScriptAddedTxd");
-        return;
-    }
-
     std::vector<RwTexture*> textureList;
     GetTxdTextures(textureList, pTxd);
     for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
     {
-        RwTexture* texture = *iter;
-        if (!texture || !SharedUtil::IsReadablePointer(texture, sizeof(RwTexture)))
-            continue;
-
+        RwTexture*  texture = *iter;
         const char* szTextureName = texture->name;
-        CD3DDUMMY*  pD3DData =
-            (texture->raster && SharedUtil::IsReadablePointer(texture->raster, sizeof(RwRaster))) ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
-
-        if (!pD3DData || !szTextureName[0])
-            continue;
+        CD3DDUMMY*  pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
 
         // Added texture
         STexInfo* pTexInfo = CreateTexInfo(texture, szTextureName, pD3DData);
@@ -379,7 +303,7 @@ void CRenderWareSA::ScriptRemovedTexture(RwTexture* pTex)
     for (std::multimap<ushort, STexInfo*>::iterator iter = m_TexInfoMap.begin(); iter != m_TexInfoMap.end();)
     {
         STexInfo* pTexInfo = iter->second;
-        if (pTexInfo && pTexInfo->texTag == pTex)
+        if (pTexInfo->texTag == pTex)
         {
             OnTextureStreamOut(pTexInfo);
             DestroyTexInfo(pTexInfo);
@@ -400,21 +324,12 @@ void CRenderWareSA::ScriptRemovedTexture(RwTexture* pTex)
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::SpecialAddedTexture(RwTexture* texture, const char* szTextureName)
 {
-    if (!texture || !SharedUtil::IsReadablePointer(texture, sizeof(RwTexture)))
-        return;
-
     if (!szTextureName)
         szTextureName = texture->name;
-    if (!szTextureName || !szTextureName[0])
-        return;
-
-    CD3DDUMMY* pD3DData =
-        (texture->raster && SharedUtil::IsReadablePointer(texture->raster, sizeof(RwRaster))) ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
-
-    if (!pD3DData)
-        return;
 
     OutputDebug(SString("Adding special texture %s", szTextureName));
+
+    CD3DDUMMY* pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
 
     // Added texture
     STexInfo* pTexInfo = CreateTexInfo(texture, szTextureName, pD3DData);
@@ -443,7 +358,7 @@ void CRenderWareSA::SpecialRemovedTexture(RwTexture* pTex)
     for (std::multimap<ushort, STexInfo*>::iterator iter = m_TexInfoMap.begin(); iter != m_TexInfoMap.end();)
     {
         STexInfo* pTexInfo = iter->second;
-        if (pTexInfo && pTexInfo->texTag == pTex)
+        if (pTexInfo->texTag == pTex)
         {
             OutputDebug(SString("     %s", *pTexInfo->strTextureName));
             OnTextureStreamOut(pTexInfo);
@@ -492,15 +407,9 @@ STexInfo* CRenderWareSA::CreateTexInfo(const STexTag& texTag, const SString& str
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::DestroyTexInfo(STexInfo* pTexInfo)
 {
-    if (!pTexInfo)
-        return;
-
-    // Only remove if this specific STexInfo is the registered one
-    STexInfo* pCurrentEntry = MapFindRef(m_D3DDataTexInfoMap, pTexInfo->pD3DData);
-    if (pCurrentEntry == pTexInfo)
-    {
+    // Remove from D3DData lookup map
+    if (MapFindRef(m_D3DDataTexInfoMap, pTexInfo->pD3DData) == pTexInfo)
         MapRemove(m_D3DDataTexInfoMap, pTexInfo->pD3DData);
-    }
 
     delete pTexInfo;
 }
@@ -565,10 +474,6 @@ SShaderItemLayers* CRenderWareSA::GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData
 void CRenderWareSA::AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* szTextureNameMatch, float fShaderPriority,
                                         bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers)
 {
-    // NULL or empty pattern would cause issues
-    if (!szTextureNameMatch || !szTextureNameMatch[0])
-        return;
-
     TIMING_CHECKPOINT("+AppendAddMatch");
 
     // Make previous versions usage of "CJ" work with new way
@@ -576,52 +481,8 @@ void CRenderWareSA::AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntity
     if (strTextureNameMatch.CompareI("cj"))
         strTextureNameMatch = "cj_ped_*";
 
-    // Register the pattern as provided by script
     m_pMatchChannelManager->AppendAdditiveMatch(pShaderData, pClientEntity, strTextureNameMatch, fShaderPriority, bShaderLayered, iTypeMask, uiShaderCreateTime,
                                                 bShaderUsesVertexShader, bAppendLayers);
-
-    // Also register with internal texture name variant if pattern contains a known external name.
-    // This handles the case where script uses external names (e.g. "remap") but GTA internally
-    // renames textures (e.g., "#emap"). We register both patterns so the shader matches either.
-    // Handles: "remap", "remap*", "*remap*", "vehicleremap", etc.
-    SString strLower = strTextureNameMatch.ToLower();
-    bool    bHasRemap = strLower.Contains("remap");
-    bool    bHasWhite = strLower.Contains("white");
-
-    // Check for "remap" anywhere in the pattern (case-insensitive)
-    if (bHasRemap)
-    {
-        SString strInternalPattern = strTextureNameMatch.ReplaceI("remap", "#emap");
-        // Only register if actually different (avoid duplicates)
-        if (strInternalPattern != strTextureNameMatch)
-        {
-            m_pMatchChannelManager->AppendAdditiveMatch(pShaderData, pClientEntity, strInternalPattern, fShaderPriority, bShaderLayered, iTypeMask,
-                                                        uiShaderCreateTime, bShaderUsesVertexShader, bAppendLayers);
-
-            // If pattern also contains "white", register the doubly-transformed variant
-            // e.g., "white_remap*" -> "@hite_#emap*"
-            if (bHasWhite)
-            {
-                SString strBothInternal = strInternalPattern.ReplaceI("white", "@hite");
-                if (strBothInternal != strInternalPattern)
-                {
-                    m_pMatchChannelManager->AppendAdditiveMatch(pShaderData, pClientEntity, strBothInternal, fShaderPriority, bShaderLayered, iTypeMask,
-                                                                uiShaderCreateTime, bShaderUsesVertexShader, bAppendLayers);
-                }
-            }
-        }
-    }
-    // Check for "white" anywhere in the pattern (case-insensitive)
-    if (bHasWhite)
-    {
-        SString strInternalPattern = strTextureNameMatch.ReplaceI("white", "@hite");
-        if (strInternalPattern != strTextureNameMatch)
-        {
-            m_pMatchChannelManager->AppendAdditiveMatch(pShaderData, pClientEntity, strInternalPattern, fShaderPriority, bShaderLayered, iTypeMask,
-                                                        uiShaderCreateTime, bShaderUsesVertexShader, bAppendLayers);
-        }
-    }
-
     TIMING_CHECKPOINT("-AppendAddMatch");
 }
 
@@ -634,10 +495,6 @@ void CRenderWareSA::AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntity
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* szTextureNameMatch)
 {
-    // NULL or empty pattern would cause problems
-    if (!szTextureNameMatch || !szTextureNameMatch[0])
-        return;
-
     TIMING_CHECKPOINT("+AppendSubMatch");
 
     // Make previous versions usage of "CJ" work with new way
@@ -645,41 +502,7 @@ void CRenderWareSA::AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEnt
     if (strTextureNameMatch.CompareI("cj"))
         strTextureNameMatch = "cj_ped_*";
 
-    // Register the pattern as provided by script
     m_pMatchChannelManager->AppendSubtractiveMatch(pShaderData, pClientEntity, strTextureNameMatch);
-
-    // Also register with internal texture name variant (same logic as AppendAdditiveMatch)
-    SString strLower = strTextureNameMatch.ToLower();
-    bool    bHasRemap = strLower.Contains("remap");
-    bool    bHasWhite = strLower.Contains("white");
-
-    if (bHasRemap)
-    {
-        SString strInternalPattern = strTextureNameMatch.ReplaceI("remap", "#emap");
-        if (strInternalPattern != strTextureNameMatch)
-        {
-            m_pMatchChannelManager->AppendSubtractiveMatch(pShaderData, pClientEntity, strInternalPattern);
-
-            // If pattern also contains "white", register the doubly-transformed variant
-            if (bHasWhite)
-            {
-                SString strBothInternal = strInternalPattern.ReplaceI("white", "@hite");
-                if (strBothInternal != strInternalPattern)
-                {
-                    m_pMatchChannelManager->AppendSubtractiveMatch(pShaderData, pClientEntity, strBothInternal);
-                }
-            }
-        }
-    }
-    if (bHasWhite)
-    {
-        SString strInternalPattern = strTextureNameMatch.ReplaceI("white", "@hite");
-        if (strInternalPattern != strTextureNameMatch)
-        {
-            m_pMatchChannelManager->AppendSubtractiveMatch(pShaderData, pClientEntity, strInternalPattern);
-        }
-    }
-
     TIMING_CHECKPOINT("-AppendSubMatch");
 }
 
@@ -692,9 +515,6 @@ void CRenderWareSA::AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEnt
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::OnTextureStreamIn(STexInfo* pTexInfo)
 {
-    if (!pTexInfo)
-        return;
-
     // Insert into all channels that match the name
     m_pMatchChannelManager->InsertTexture(pTexInfo);
 }
@@ -708,9 +528,6 @@ void CRenderWareSA::OnTextureStreamIn(STexInfo* pTexInfo)
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::OnTextureStreamOut(STexInfo* pTexInfo)
 {
-    if (!pTexInfo)
-        return;
-
     m_pMatchChannelManager->RemoveTexture(pTexInfo);
 }
 

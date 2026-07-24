@@ -143,6 +143,14 @@ namespace SharedUtil
     SString GetParentProcessPathFilename(int pid);
 
     //
+    // Set the MTASA base dir manually
+    //
+    void SetMTASABaseDirOverride(const SString& strPath);
+
+    bool IsUsableMtasaInstallRoot(const SString& strPath);
+    bool IsTemporaryUpdateLaunchPath(const SString& strLaunchPath);
+
+    //
     // Get startup directory as saved in the registry by the launcher
     // Used in the Win32 Client only
     //
@@ -405,12 +413,8 @@ namespace SharedUtil
     void    SetClipboardText(const SString& strText);
     SString GetClipboardText();
 
-    // Version checks
-    bool IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor);
-    bool IsWindowsXPSP3OrGreater();
-    bool IsWindowsVistaOrGreater();
-    bool IsWindows7OrGreater();
-    bool IsWindows8OrGreater();
+    // Version check
+    bool IsWindows10OrGreater();
 
     bool QueryThreadEntryPointAddress(void* thread, DWORD* entryPointAddress);
 
@@ -655,6 +659,24 @@ namespace SharedUtil
                 it = itemList.erase(it);
             else
                 ++it;
+        }
+    }
+
+    // Remove all occurrences of item from unordered itemList (swap-and-pop)
+    // Only use when element order within the vector does not matter.
+    template <class T>
+    void ListRemoveUnordered(std::vector<T>& itemList, const T& item)
+    {
+        for (std::size_t i = 0; i < itemList.size();)
+        {
+            if (item == itemList[i])
+            {
+                if (i != itemList.size() - 1)
+                    itemList[i] = std::move(itemList.back());
+                itemList.pop_back();
+            }
+            else
+                ++i;
         }
     }
 

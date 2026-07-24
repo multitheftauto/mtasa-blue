@@ -679,7 +679,12 @@ bool CClientSound::SetFxEffect(uint uiFxEffect, bool bEnable)
     m_EnabledEffects[uiFxEffect] = bEnable;
 
     if (m_pAudio)
+    {
         m_pAudio->SetFxEffects(&m_EnabledEffects[0], NUMELMS(m_EnabledEffects));
+        // Report the BASS-effective outcome: an effect the OS doesn't provide
+        // (e.g. I3DL2REVERB on Windows 11 24H2, #4259) won't actually engage.
+        return m_pAudio->IsFxEffectEnabled(uiFxEffect) == bEnable;
+    }
 
     return true;
 }
@@ -688,6 +693,8 @@ bool CClientSound::IsFxEffectEnabled(uint uiFxEffect)
 {
     if (uiFxEffect >= NUMELMS(m_EnabledEffects))
         return false;
+    if (m_pAudio)
+        return m_pAudio->IsFxEffectEnabled(uiFxEffect);
     return m_EnabledEffects[uiFxEffect] ? true : false;
 }
 

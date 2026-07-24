@@ -13,16 +13,16 @@
 
 namespace MemSA
 {
-    inline size_t msize(const void* p)
+    size_t msize(const void* p)
     {
-        using gta_msize = size_t (*)(const void*);
-        return reinterpret_cast<gta_msize>(0x828C4A)(p);
+        using gta_msize = size_t(__cdecl*)(const void*);
+        return ((gta_msize)0x828C4A)(p);
     };
 
-    inline void* malloc(size_t count)
+    void* malloc(size_t count)
     {
-        using gta_malloc = void* (*)(size_t);
-        return reinterpret_cast<gta_malloc>(0x824257)(count);
+        using gta_malloc = void*(__cdecl*)(size_t a1);
+        return ((gta_malloc)0x824257)(count);
     };
 
     template <typename T>
@@ -31,9 +31,9 @@ namespace MemSA
         return static_cast<T*>(MemSA::malloc(sizeof(T) * count));
     }
 
-    inline void free(void* p)
+    void free(void* p)
     {
-        using gta_free = void (*)(void*);
-        return reinterpret_cast<gta_free>(0x82413F)(p);
+        using gta_free = void(__cdecl*)(void* p);
+        return ((gta_free)0x82413F)(p);
     };
 }

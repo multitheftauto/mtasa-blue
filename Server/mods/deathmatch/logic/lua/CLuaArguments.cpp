@@ -528,8 +528,11 @@ void CLuaArguments::ValidateTableKeys()
     }
 }
 
-bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables, unsigned int uiDepth)
 {
+    if (uiDepth > MaxBitStreamTableReadDepth)
+        return false;
+
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
@@ -540,6 +543,15 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
     unsigned int uiNumArgs;
     if (bitStream.ReadCompressed(uiNumArgs))
     {
+        // Each argument needs at least 4 bits (SLuaTypeSync), reject obviously corrupt counts
+        int unreadBits = bitStream.GetNumberOfUnreadBits();
+        if (unreadBits < 0 || uiNumArgs > static_cast<unsigned int>(unreadBits) / 4)
+        {
+            if (bKnownTablesCreated)
+                delete pKnownTables;
+            return false;
+        }
+
         pKnownTables->push_back(this);
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
         {

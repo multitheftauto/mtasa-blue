@@ -163,6 +163,21 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             }
         }
 
+        if (BitStream.ReadBit())
+        {
+            ElementID DamagerID;
+            if (!BitStream.Read(DamagerID))
+                return false;
+
+            SWeaponTypeSync weaponType;
+            if (!BitStream.Read(&weaponType))
+                return false;
+
+            SBodypartSync bodyPart;
+            if (!BitStream.Read(&bodyPart))
+                return false;
+        }
+
         // Player health
         SPlayerHealthSync health;
         if (!BitStream.Read(&health))
