@@ -682,6 +682,26 @@ void CMultiplayerSA::InitHooks()
 
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29);
     HookInstall(HOOKPOS_VehCol, (DWORD)HOOK_VehCol, 9);
+
+    // CVehicleModelInfo::SetEditableMaterialsCB (0x4C8220) uses "movzx esi, ms_currentCol[n]" before
+    // applying a matched paint slot. MTA's HOOK_VehColCB (0x4C838D, installed above) treats esi as a
+    // vehColors slot index (0-3), not a GTA palette index (0-255). HOOK_VehCol (CVehicle::SetupRender)
+    // already forces ms_currentCol to {0,1,2,3}, so on that path esi is already correct and this patch
+    // is a no-op. SetEditableMaterialsCB can still run on paths that bypass SetupRender, leaving
+    // ms_currentCol holding palette indices; esi then indexes vehColors out of bounds or reads the wrong
+    // slot (notably tertiary/quaternary on default 2-color vehicles where ms_currentCol[3] is often 0).
+    // Replace each movzx with "mov esi, <slot>; nop" (7 bytes, verified on gta_sa.exe 1.0 US) so esi is
+    // always the intended color slot regardless of which path invoked the callback.
+    static const std::uint8_t aSetVehicleColorSlot[] = {
+        0xC7, 0xC6, 0x00, 0x00, 0x00, 0x00, 0x90,  // mov esi, 0; nop  (primary)
+        0xC7, 0xC6, 0x01, 0x00, 0x00, 0x00, 0x90,  // mov esi, 1; nop  (secondary)
+        0xC7, 0xC6, 0x02, 0x00, 0x00, 0x00, 0x90,  // mov esi, 2; nop  (tertiary)
+        0xC7, 0xC6, 0x03, 0x00, 0x00, 0x00, 0x90,  // mov esi, 3; nop  (quaternary)
+    };
+    MemCpy((void*)0x4C833F, aSetVehicleColorSlot + 0, 7);
+    MemCpy((void*)0x4C8350, aSetVehicleColorSlot + 7, 7);
+    MemCpy((void*)0x4C8361, aSetVehicleColorSlot + 14, 7);
+    MemCpy((void*)0x4C8372, aSetVehicleColorSlot + 21, 7);
     HookInstall(HOOKPOS_PreFxRender, (DWORD)HOOK_PreFxRender, 5);
     HookInstall(HOOKPOS_PostColorFilterRender, (DWORD)HOOK_PostColorFilterRender, 5);
     HookInstall(HOOKPOS_PreHUDRender, (DWORD)HOOK_PreHUDRender, 5);
@@ -6510,6 +6530,15 @@ void _cdecl SaveVehColors(DWORD dwThis)
     if (pVehicle)
     {
         pVehicle->GetColor(&vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], true);
+    }
+    else
+    {
+        // vehColors is shared between all vehicles; do not reuse the previous vehicle's colors when
+        // SetupRender runs for a non-MTA vehicle.
+        vehColors[0] = 0;
+        vehColors[1] = 0;
+        vehColors[2] = 0;
+        vehColors[3] = 0;
     }
 }
 
