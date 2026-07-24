@@ -301,6 +301,13 @@ void CBuildingsPoolSA::PurgeStaleSectorEntries(void* oldPool, int poolSize)
 
 bool CBuildingsPoolSA::Resize(int size)
 {
+    // Reject sizes that would wrap either GTA allocation before changing the active pool.
+    if (size <= 0 || static_cast<size_t>(size) > std::numeric_limits<size_t>::max() / sizeof(CBuildingSAInterface) ||
+        static_cast<size_t>(size) > std::numeric_limits<size_t>::max() / sizeof(tPoolObjectFlags))
+    {
+        return false;
+    }
+
     auto*     pool = (*m_ppBuildingPoolInterface);
     const int currentSize = pool->m_nSize;
 
@@ -310,7 +317,37 @@ bool CBuildingsPoolSA::Resize(int size)
     const bool skipLinkSweeps = m_bLinkSweepsDone;
     m_bLinkSweepsDone = false;
 
-    m_buildingPool.entities.resize(size);
+    try
+    {
+        m_buildingPool.entities.resize(size);
+    }
+    catch (const std::bad_alloc&)
+    {
+        return false;
+    }
+    catch (const std::length_error&)
+    {
+        return false;
+    }
+
+    // Allocate every replacement block first so a failure leaves the old pool and its world pointers intact.
+    CBuildingSAInterface* newObjects = MemSA::malloc_struct<CBuildingSAInterface>(size);
+    if (newObjects == nullptr)
+    {
+        m_buildingPool.entities.resize(currentSize);
+        return false;
+    }
+
+    tPoolObjectFlags* newBytemap = MemSA::malloc_struct<tPoolObjectFlags>(size);
+    if (newBytemap == nullptr)
+    {
+        MemSA::free(newObjects);
+        m_buildingPool.entities.resize(currentSize);
+        return false;
+    }
+
+    for (auto i = 0; i < size; i++)
+        newBytemap[i].bEmpty = true;
 
     void* oldPool = pool->m_pObjects;
 
@@ -333,30 +370,10 @@ bool CBuildingsPoolSA::Resize(int size)
         pool->m_byteMap = nullptr;
     }
 
-    CBuildingSAInterface* newObjects = MemSA::malloc_struct<CBuildingSAInterface>(size);
-    if (newObjects == nullptr)
-    {
-        Resize(currentSize);
-        return false;
-    }
-
-    tPoolObjectFlags* newBytemap = MemSA::malloc_struct<tPoolObjectFlags>(size);
-    if (newBytemap == nullptr)
-    {
-        MemSA::free(newObjects);
-        Resize(currentSize);
-        return false;
-    }
-
     pool->m_pObjects = newObjects;
     pool->m_byteMap = newBytemap;
     pool->m_nSize = size;
     pool->m_nFirstFree = 0;
-
-    for (auto i = 0; i < size; i++)
-    {
-        newBytemap[i].bEmpty = true;
-    }
 
     const std::uint32_t offset = (std::uint32_t)newObjects - (std::uint32_t)oldPool;
     if (oldPool != nullptr)
