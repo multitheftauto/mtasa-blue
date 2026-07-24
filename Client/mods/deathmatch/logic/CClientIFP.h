@@ -220,8 +220,9 @@ public:
 
 private:
     bool ReadIFPByVersion();
+    bool ValidateIFPVersion2(bool bAnp3) const;
     void ReadIFPVersion1();
-    void ReadIFPVersion2(bool bAnp3);
+    bool ReadIFPVersion2(bool bAnp3);
 
     WORD         ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
     WORD         ReadSequences(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
@@ -272,7 +273,7 @@ private:
 
     eFrameType   GetFrameTypeFromFourCC(const char* szFourCC);
     size_t       GetSizeOfCompressedFrame(eFrameType FrameType);
-    size_t       GetSourceFrameDataSize(eFrameType iFrameType);
+    size_t       GetSourceFrameDataSize(eFrameType iFrameType) const;
     std::int32_t GetBoneIDFromName(const SString& strBoneName);
     SString      GetCorrectBoneNameFromName(const SString& strBoneName);
     SString      GetCorrectBoneNameFromID(const std::int32_t& iBoneID);
