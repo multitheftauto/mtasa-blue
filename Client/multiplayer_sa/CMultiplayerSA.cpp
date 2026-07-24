@@ -1597,6 +1597,7 @@ void CMultiplayerSA::InitHooks()
     InitHooks_Postprocess();
     InitHooks_Explosions();
     InitHooks_Tasks();
+    InitHooks_ScorchedVehicles();
 }
 
 // Used to store copied pointers for explosions in the FxSystem
@@ -6510,6 +6511,18 @@ void _cdecl SaveVehColors(DWORD dwThis)
     if (pVehicle)
     {
         pVehicle->GetColor(&vehColors[0], &vehColors[1], &vehColors[2], &vehColors[3], true);
+
+        // Darken blown vehicle colours
+        if (pMultiplayer->IsPs2ScorchedVehiclesEnabled() && pVehicle->GetHealth() <= 0.0f)
+        {
+            constexpr float darkFactor = 0.08f;
+            for (auto& color : vehColors)
+            {
+                color.R = static_cast<unsigned char>(color.R * darkFactor);
+                color.G = static_cast<unsigned char>(color.G * darkFactor);
+                color.B = static_cast<unsigned char>(color.B * darkFactor);
+            }
+        }
     }
 }
 
