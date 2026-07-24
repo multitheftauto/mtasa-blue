@@ -957,8 +957,10 @@ public:
     //
     void ReadLuaArguments(CLuaArguments& outValue)
     {
-        outValue.ReadArguments(m_luaVM, m_iIndex);
-        m_iIndex += outValue.Count();
+        const int iArgumentCount = lua_gettop(m_luaVM) - m_iIndex + 1;
+        if (!outValue.ReadArguments(m_luaVM, m_iIndex))
+            SetCustomError("Lua table nesting depth exceeds the supported limit");
+        m_iIndex += iArgumentCount;
     }
 
     //
@@ -969,7 +971,8 @@ public:
         int iArgument = lua_type(m_luaVM, m_iIndex);
         if (iArgument != LUA_TNONE)
         {
-            outValue.Read(m_luaVM, m_iIndex++);
+            if (!outValue.Read(m_luaVM, m_iIndex++))
+                SetCustomError("Lua table nesting depth exceeds the supported limit");
             return;
         }
 
@@ -1019,9 +1022,17 @@ public:
         int iArgument = lua_type(m_luaVM, m_iIndex);
         if (iArgument == LUA_TTABLE)
         {
+            const int iStackTop = lua_gettop(m_luaVM);
             for (lua_pushnil(m_luaVM); lua_next(m_luaVM, m_iIndex) != 0; lua_pop(m_luaVM, 1))
             {
-                outLuaArguments.ReadArgument(m_luaVM, -1);
+                if (!outLuaArguments.ReadArgument(m_luaVM, -1))
+                {
+                    lua_settop(m_luaVM, iStackTop);
+                    outLuaArguments.DeleteArguments();
+                    SetCustomError("Lua table nesting depth exceeds the supported limit");
+                    m_iIndex++;
+                    return;
+                }
             }
             m_iIndex++;
             return;
