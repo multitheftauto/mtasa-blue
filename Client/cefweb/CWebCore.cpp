@@ -776,21 +776,6 @@ bool CWebCore::GetRemoteJavascriptEnabled()
     return bIsRemoteJavascriptEnabled;
 }
 
-void CWebCore::OnPreScreenshot()
-{
-    // Clear all textures
-    ClearTextures();
-}
-
-void CWebCore::OnPostScreenshot()
-{
-    // Re-draw textures
-    for (auto& pWebView : m_WebViews)
-    {
-        pWebView->GetCefBrowser()->GetHost()->Invalidate(CefBrowserHost::PaintElementType::PET_VIEW);
-    }
-}
-
 void CWebCore::OnFPSLimitChange(std::uint16_t fps)
 {
     dassert(g_pCore->GetNetwork() != nullptr);  // Ensure network module is loaded
@@ -833,14 +818,6 @@ void CWebCore::ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
 
     m_pFocusedWebView->InjectKeyboardEvent(keyEvent);
-}
-
-void CWebCore::ClearTextures()
-{
-    for (auto& pWebBrowser : m_WebViews)
-    {
-        pWebBrowser->ClearTexture();
-    }
 }
 
 bool CWebCore::SetGlobalAudioVolume(float fVolume)
