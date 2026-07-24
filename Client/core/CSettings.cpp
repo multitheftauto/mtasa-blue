@@ -233,6 +233,7 @@ void CSettings::ResetGuiPointers()
     m_pCheckBoxHighDetailPeds = NULL;
     m_pCheckBoxBlur = NULL;
     m_pCheckBoxCoronaReflections = NULL;
+    m_pCheckBoxPs2ScorchedVehicles = NULL;
     m_pCheckBoxDynamicPedShadows = NULL;
     m_pFieldOfViewLabel = NULL;
     m_pFieldOfView = NULL;
@@ -1407,6 +1408,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxCoronaReflections->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 150.0f));
     m_pCheckBoxCoronaReflections->AutoSize(nullptr, 20.0f);
 
+    m_pCheckBoxPs2ScorchedVehicles = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("PS2 scorched vehicles"), true));
+    m_pCheckBoxPs2ScorchedVehicles->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 170.0f));
+    m_pCheckBoxPs2ScorchedVehicles->AutoSize(nullptr, 20.0f);
+
     float fPosY = vecTemp.fY;
     m_pCheckBoxMinimize = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Full Screen Minimize"), true));
     m_pCheckBoxMinimize->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 30.0f));
@@ -2330,6 +2335,11 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("corona_reflections", bCoronaReflections);
     m_pCheckBoxCoronaReflections->SetSelected(bCoronaReflections);
 
+    // PS2 scorched vehicles
+    bool bPs2ScorchedVehicles;
+    CVARS_GET("ps2_scorched_vehicles", bPs2ScorchedVehicles);
+    m_pCheckBoxPs2ScorchedVehicles->SetSelected(bPs2ScorchedVehicles);
+
     // Dynamic ped shadows
     bool bDynamicPedShadows;
     CVARS_GET("dynamic_ped_shadows", bDynamicPedShadows);
@@ -2679,6 +2689,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("high_detail_peds", false);
     CVARS_SET("blur", true);
     CVARS_SET("corona_reflections", false);
+    CVARS_SET("ps2_scorched_vehicles", false);
     CVARS_SET("dynamic_ped_shadows", false);
     CVARS_SET("borderless_gamma_power", kBorderlessGammaDefault);
     CVARS_SET("borderless_brightness_scale", kBorderlessBrightnessDefault);
@@ -4498,6 +4509,11 @@ void CSettings::SaveData()
     bool bCoronaReflections = m_pCheckBoxCoronaReflections->GetSelected();
     CVARS_SET("corona_reflections", bCoronaReflections);
     gameSettings->ResetCoronaReflectionsEnabled();
+
+    // PS2 scorched vehicles (client graphics preference)
+    bool bPs2ScorchedVehicles = m_pCheckBoxPs2ScorchedVehicles->GetSelected();
+    CVARS_SET("ps2_scorched_vehicles", bPs2ScorchedVehicles);
+    g_pCore->GetMultiplayer()->SetPs2ScorchedVehiclesEnabled(bPs2ScorchedVehicles);
 
     // Dynamic ped shadows
     bool bDynamicPedShadows = m_pCheckBoxDynamicPedShadows->GetSelected();

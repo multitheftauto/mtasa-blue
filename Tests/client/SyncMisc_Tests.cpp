@@ -87,7 +87,7 @@ TEST(SFunBugsStateSync, RoundTrip)
 // World special properties
 // ============================================================================
 
-// 21 boolean flags controlling world behaviour (hovercars, foliage, etc.).
+// 20 boolean flags controlling world behaviour (hovercars, foliage, etc.).
 // The constructor sets default values, so we flip a few and verify both
 // changed and unchanged flags.
 TEST(SWorldSpecialPropertiesStateSync, RoundTrip)
@@ -98,7 +98,7 @@ TEST(SWorldSpecialPropertiesStateSync, RoundTrip)
     sync.data.randomfoliage = false;
     sync.data.vehicleEngineAutoStart = false;
     sync.Write(bs);
-    EXPECT_EQ(21, bs.GetNumberOfBitsUsed());
+    EXPECT_EQ(20, bs.GetNumberOfBitsUsed());
     bs.ResetReadPointer();
     SWorldSpecialPropertiesStateSync out;
     EXPECT_TRUE(out.Read(bs));

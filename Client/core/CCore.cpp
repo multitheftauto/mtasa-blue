@@ -684,6 +684,8 @@ void CCore::ApplyGameSettings()
     pGameSettings->SetGrassEnabled(bVal);
     CVARS_GET("heat_haze", bVal);
     m_pMultiplayer->SetHeatHazeEnabled(bVal);
+    CVARS_GET("ps2_scorched_vehicles", bVal);
+    m_pMultiplayer->SetPs2ScorchedVehiclesEnabled(bVal);
     CVARS_GET("fast_clothes_loading", iVal);
     m_pMultiplayer->SetFastClothesLoading((CMultiplayer::EFastClothesLoading)iVal);
     CVARS_GET("tyre_smoke_enabled", bVal);

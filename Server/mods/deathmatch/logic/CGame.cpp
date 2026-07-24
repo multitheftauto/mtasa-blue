@@ -272,7 +272,6 @@ CGame::CGame() : m_FloodProtect(4, 30000, 30000)  // Max of 4 connections per 30
     m_WorldSpecialProps[WorldSpecialProperty::FLYINGCOMPONENTS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::VEHICLEBURNEXPLOSIONS] = true;
     m_WorldSpecialProps[WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART] = true;
-    m_WorldSpecialProps[WorldSpecialProperty::PS2SCORCHEDVEHICLES] = false;
 
     m_JetpackWeapons[WEAPONTYPE_MICRO_UZI] = true;
     m_JetpackWeapons[WEAPONTYPE_TEC9] = true;
@@ -4515,7 +4514,6 @@ void CGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo)
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::FLYINGCOMPONENTS, true);
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS, true);
         g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART, true);
-        g_pGame->SetWorldSpecialPropertyEnabled(WorldSpecialProperty::PS2SCORCHEDVEHICLES, false);
     }
 
     // Reset all weather stuff like heat haze, wind velocity etc
