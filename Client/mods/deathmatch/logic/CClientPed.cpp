@@ -3376,6 +3376,13 @@ void CClientPed::SetCurrentRotation(float fRotation, bool bIncludeTarget)
     CVector vecRotation = m_Matrix.GetRotation();
     vecRotation.fZ = fRotation;
     m_Matrix.SetRotation(vecRotation);
+
+    if (IsFrozen() && !GetRealOccupiedVehicle())
+    {
+        CVector vecFrozenRot = m_matFrozen.GetRotation();
+        vecFrozenRot.fZ = fRotation;
+        m_matFrozen.SetRotation(vecFrozenRot);
+    }
 }
 
 void CClientPed::SetTargetRotation(float fRotation)
