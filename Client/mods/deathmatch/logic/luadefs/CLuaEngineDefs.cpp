@@ -14,9 +14,11 @@
 #include <game/CObjectGroupPhysicalProperties.h>
 #include <game/CStreaming.h>
 #include <game/CPtrNodeSingleLinkPool.h>
+#include <game/CVisibilityPlugins.h>
 #include <lua/CLuaFunctionParser.h>
 #include "CLuaEngineDefs.h"
 #include <enums/VehicleType.h>
+#include <enums/RenderingEntityListType.h>
 
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
@@ -163,6 +165,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
         {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
         {"engineRestream", ArgumentParser<EngineRestream>},
+        {"engineSetRenderingListSize", ArgumentParser<EngineSetRenderingListSize>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -2655,4 +2658,14 @@ bool CLuaEngineDefs::EngineRestreamModel(std::uint16_t modelId)
 void CLuaEngineDefs::EngineRestream(std::optional<RestreamOption> option)
 {
     g_pClientGame->Restream(option);
+}
+
+void CLuaEngineDefs::EngineSetRenderingListSize(RenderingEntityListType listType, std::size_t elementsCount)
+{
+    if (listType == RenderingEntityListType::ENTITY_LIST_TYPE_ALPHA && elementsCount < DEFAULT_MAX_ALPHA_ENTITIES)
+        throw std::invalid_argument("Alpha entities list size cannot be less than 200");
+    else if (listType == RenderingEntityListType::ENTITY_LIST_TYPE_UNDERWATER && elementsCount < DEFAULT_MAX_UNDERWATER_ENTITIES)
+        throw std::invalid_argument("Underwater entities list size cannot be less than 100");
+
+    g_pGame->GetVisibilityPlugins()->SetRenderingListSize(listType, elementsCount);
 }

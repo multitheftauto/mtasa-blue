@@ -10,9 +10,13 @@
  *****************************************************************************/
 
 #pragma once
+#include "enums/RenderingEntityListType.h"
 
 #define ATOMIC_ID_FLAG_TWO_VERSIONS_UNDAMAGED 1
 #define ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED   2
+
+#define DEFAULT_MAX_ALPHA_ENTITIES      200
+#define DEFAULT_MAX_UNDERWATER_ENTITIES 100
 
 struct RpClump;
 struct RpAtomic;
@@ -24,7 +28,8 @@ public:
     virtual void SetClumpAlpha(RpClump* pClump, int iAlpha) = 0;
     virtual int  GetAtomicId(RwObject* pAtomic) = 0;
 
-    virtual bool InsertEntityIntoEntityList(void* entity, float distance, void* callback) = 0;
-
     virtual bool IsAtomicVisible(RpAtomic* atomic) const = 0;
+
+    virtual bool InsertEntityIntoEntityList(void* entity, float distance, void* callback) = 0;
+    virtual void SetRenderingListSize(RenderingEntityListType listType, std::size_t elementsCount) = 0;
 };

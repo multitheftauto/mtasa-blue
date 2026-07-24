@@ -251,6 +251,7 @@ CGameSA::CGameSA()
         CPtrNodeSingleLinkPoolSA::StaticSetHooks();
         CVehicleAudioSettingsManagerSA::StaticSetHooks();
         CPointLightsSA::StaticSetHooks();
+        CVisibilityPluginsSA::StaticSetHooks();
     }
     catch (const std::bad_alloc& e)
     {
@@ -469,6 +470,9 @@ void CGameSA::Reset()
 
         // Restore changed TXD IDs
         CModelInfoSA::StaticResetTextureDictionaries();
+
+        // Restore visibility plugin lists
+        CVisibilityPluginsSA::ResetRenderingEntityLists();
 
         // Restore default world state
         RestoreGameWorld();
