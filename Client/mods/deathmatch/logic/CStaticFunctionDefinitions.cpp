@@ -2264,6 +2264,9 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                 Ped.SetCurrentAnimationCustom(false);
                 Ped.SetNextAnimationNormal();
                 Ped.RunNamedAnimation(pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame);
+                Ped.m_AnimationCache.startTime = GetTimestamp();
+                Ped.m_AnimationCache.speed = 1.0f;
+                Ped.m_AnimationCache.progress = 0.0f;
                 return true;
             }
             else
@@ -2283,12 +2286,13 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
 
                         const char* szGateWayAnimationName = g_pGame->GetAnimManager()->GetGateWayAnimationName();
                         Ped.RunNamedAnimation(pBlock, szGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame);
+                        Ped.m_AnimationCache.startTime = GetTimestamp();
+                        Ped.m_AnimationCache.speed = 1.0f;
+                        Ped.m_AnimationCache.progress = 0.0f;
                         return true;
                     }
                 }
             }
-
-            Ped.m_AnimationCache.startTime = GetTimestamp();
         }
         else
         {
