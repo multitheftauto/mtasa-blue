@@ -1539,6 +1539,8 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
          &CMainConfig::OnPlayerTriggeredEventIntervalChange},
         {true, true, 0, 1, 1, "resource_client_file_checks", &m_checkResourceClientFiles, nullptr},
         {true, true, 0, 1, 2, "allow_multi_command_handlers", &m_allowMultiCommandHandlers, &CMainConfig::OnAllowMultiCommandHandlersChange},
+        {true, true, 50, 100, 1000, "voice_packets_interval", &m_voicePacketsInterval, nullptr},
+        {true, true, 1, 32, 200, "max_voice_packets_per_interval", &m_maxVoicePacketsPerInterval, nullptr},
     };
 
     static std::vector<SIntSetting> settingsList;

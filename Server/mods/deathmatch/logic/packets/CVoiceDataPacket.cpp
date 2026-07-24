@@ -12,6 +12,8 @@
 #include "StdInc.h"
 #include "CVoiceDataPacket.h"
 #include "CPlayer.h"
+#include "CGame.h"
+#include "CMainConfig.h"
 
 bool CVoiceDataPacket::Read(NetBitStreamInterface& BitStream)
 {
@@ -23,11 +25,12 @@ bool CVoiceDataPacket::Read(NetBitStreamInterface& BitStream)
     if (!BitStream.Read(voiceBufferLength) || voiceBufferLength == 0 || voiceBufferLength > MAX_VOICE_BUFFER_SIZE)
         return false;
 
+    const auto*         mainConfig = g_pGame->GetConfig();
     const long long     now = GetTickCount64_();
-    const bool          newInterval = pPlayer->GetLastVoiceDataTime() == 0 || now - pPlayer->GetLastVoiceDataTime() >= VOICE_PACKET_INTERVAL_MS;
+    const bool          newInterval = pPlayer->GetLastVoiceDataTime() == 0 || now - pPlayer->GetLastVoiceDataTime() >= mainConfig->GetVoicePacketsInterval();
     const unsigned char packetsInInterval = newInterval ? 0 : pPlayer->GetVoiceDataPacketsInInterval();
 
-    if (packetsInInterval >= MAX_VOICE_PACKETS_PER_INTERVAL)
+    if (packetsInInterval >= mainConfig->GetMaxVoicePacketsPerInterval())
         return false;
 
     std::vector<unsigned char> voiceBuffer(voiceBufferLength);
