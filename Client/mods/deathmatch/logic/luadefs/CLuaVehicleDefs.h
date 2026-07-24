@@ -73,6 +73,7 @@ public:
     LUA_DECLARE_OOP(GetVehicleGravity);
     static bool IsVehicleBlown(CClientVehicle* vehicle);
     LUA_DECLARE(GetVehicleHeadLightColor);
+    static std::variant<bool, CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>> GetVehicleNitroColor(CClientVehicle* vehicle);
     LUA_DECLARE(GetVehicleCurrentGear);
     LUA_DECLARE(GetVehicleHandling);
     LUA_DECLARE(GetOriginalHandling);
@@ -130,6 +131,8 @@ public:
     LUA_DECLARE(SetTrainPosition);
     LUA_DECLARE(SetVehicleGravity);
     LUA_DECLARE(SetVehicleHeadLightColor);
+    static bool SetVehicleNitroColor(CClientEntity* entity, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::optional<std::uint8_t> a);
+    static bool ResetVehicleNitroColor(CClientEntity* entity);
     LUA_DECLARE(SetVehicleTurretPosition);
     LUA_DECLARE(SetVehicleDoorOpenRatio);
     LUA_DECLARE(SetVehicleHandling);

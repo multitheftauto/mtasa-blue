@@ -71,6 +71,8 @@ void CFxManagerSA::OnFxSystemSAInterfaceDestroyed(CFxSystemSAInterface* pFxSyste
     CFxSystemSA* pFxSystemSA = GetFxSystem(pFxSystemSAInterface);
     if (pFxSystemSA)
         delete pFxSystemSA;
+
+    MapRemove(m_NitroSystemMap, pFxSystemSAInterface);
 }
 
 CFxSystemBPSAInterface* CFxManagerSA::GetFxSystemBlueprintByName(SString sName)
@@ -104,4 +106,20 @@ void CFxManagerSA::RemoveFromList(CFxSystemSA* pFxSystemSA)
 CFxSystemSA* CFxManagerSA::GetFxSystem(CFxSystemSAInterface* pFxSystemSAInterface)
 {
     return MapFindRef(m_FxInterfaceMap, pFxSystemSAInterface);
+}
+
+void CFxManagerSA::RegisterNitroSystem(CFxSystemSAInterface* pFxSystemSAInterface, CVehicle* pVehicle)
+{
+    if (pFxSystemSAInterface)
+        MapSet(m_NitroSystemMap, pFxSystemSAInterface, pVehicle);
+}
+
+CVehicle* CFxManagerSA::GetVehicleFromNitroSystem(CFxSystemSAInterface* pFxSystemSAInterface)
+{
+    return MapFindRef(m_NitroSystemMap, pFxSystemSAInterface);
+}
+
+void CFxManagerSA::UnregisterVehicleNitroSystems(CVehicle* pVehicle)
+{
+    MapRemoveByValue(m_NitroSystemMap, pVehicle);
 }

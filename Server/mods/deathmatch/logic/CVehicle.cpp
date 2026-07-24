@@ -195,6 +195,7 @@ CElement* CVehicle::Clone(bool* bAddEntity, CResource* pResource)
         pTemp->SetBlowState(m_blowState);
         pTemp->SetHealth(GetHealth());
         pTemp->SetColor(GetColor());
+        pTemp->SetNitroColor(GetNitroColor());
         pTemp->SetUpgrades(GetUpgrades());
         pTemp->m_ucDoorStates = m_ucDoorStates;
         pTemp->m_ucWheelStates = m_ucWheelStates;

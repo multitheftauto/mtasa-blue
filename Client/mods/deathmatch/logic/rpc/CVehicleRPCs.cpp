@@ -45,6 +45,7 @@ void CVehicleRPCs::LoadFunctions()
     AddHandler(SET_TRAIN_POSITION, SetTrainPosition, "SetTrainPosition");
     AddHandler(SET_TAXI_LIGHT_ON, SetVehicleTaxiLightOn, "SetVehicleTaxiLightOn");
     AddHandler(SET_VEHICLE_HEADLIGHT_COLOR, SetVehicleHeadLightColor, "SetVehicleHeadLightColor");
+    AddHandler(SET_VEHICLE_NITRO_COLOR, SetVehicleNitroColor, "SetVehicleNitroColor");
     AddHandler(SET_VEHICLE_TURRET_POSITION, SetVehicleTurretPosition, "SetVehicleTurretPosition");
     AddHandler(SET_VEHICLE_DOOR_OPEN_RATIO, SetVehicleDoorOpenRatio, "SetVehicleDoorOpenRatio");
     AddHandler(SET_VEHICLE_VARIANT, SetVehicleVariant, "SetVehicleVariant");
@@ -557,6 +558,29 @@ void CVehicleRPCs::SetVehicleHeadLightColor(CClientEntity* pSource, NetBitStream
         if (pVehicle)
         {
             pVehicle->SetHeadLightColor(color);
+        }
+    }
+}
+
+void CVehicleRPCs::SetVehicleNitroColor(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    bool bHasColor;
+    if (bitStream.ReadBit(bHasColor))
+    {
+        std::optional<SColor> color;
+        if (bHasColor)
+        {
+            SColorRGBA rgba(255, 255, 255, 255);
+            if (!bitStream.Read(rgba.R) || !bitStream.Read(rgba.G) || !bitStream.Read(rgba.B) || !bitStream.Read(rgba.A))
+                return;
+
+            color = rgba;
+        }
+
+        CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
+        if (pVehicle)
+        {
+            pVehicle->SetNitroColor(color);
         }
     }
 }
