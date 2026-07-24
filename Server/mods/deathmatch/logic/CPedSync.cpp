@@ -13,6 +13,7 @@
 #include "CPedSync.h"
 #include "Utils.h"
 #include "CElementIDs.h"
+#include "CStaticFunctionDefinitions.h"
 #include "CTickRateSettings.h"
 #include "packets/CPedStartSyncPacket.h"
 #include "packets/CPedStopSyncPacket.h"
@@ -256,14 +257,15 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
 
         if (Data.ucFlags & 0x08)
         {
-            // Less health than last time?
-            float fPreviousHealth = pPed->GetHealth();
-            pPed->SetHealth(Data.fHealth);
+            const float fIncomingHealth = Data.fHealth;
+            const float fPreviousHealth = pPed->GetHealth();
+            const float fHealth = pPed->ValidateIncomingSyncHealth(fIncomingHealth);
+            pPed->SetHealth(fHealth);
 
-            if (Data.fHealth < fPreviousHealth)
+            if (fHealth < fPreviousHealth)
             {
                 // Grab the delta health
-                float fDeltaHealth = fPreviousHealth - Data.fHealth;
+                float fDeltaHealth = fPreviousHealth - fHealth;
 
                 if (fDeltaHealth > 0.0f)
                 {
@@ -273,10 +275,20 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
                     pPed->CallEvent("onPedDamage", Arguments);
                 }
             }
+
+            if (fHealth != fIncomingHealth)
+                CStaticFunctionDefinitions::SendHealthCorrectionToPlayer(pPed, pPlayer, fHealth);
         }
 
         if (Data.ucFlags & 0x10)
-            pPed->SetArmor(Data.fArmor);
+        {
+            const float fIncomingArmor = Data.fArmor;
+            const float fArmor = pPed->ValidateIncomingSyncArmor(fIncomingArmor);
+            pPed->SetArmor(fArmor);
+
+            if (fArmor != fIncomingArmor)
+                CStaticFunctionDefinitions::SendArmorCorrectionToPlayer(pPed, pPlayer, fArmor);
+        }
 
         if (Data.flags2 & 0x01)
             pPed->SetCameraRotation(Data.cameraRotation);

@@ -180,14 +180,14 @@ struct SFloatAsBitsSync : public SFloatAsBitsSyncBase
 // Declare specific health and armor sync structures
 struct SPlayerHealthSync : public SFloatAsBitsSync<8>
 {
-    // 0 - 200 step 1                                 255 = ( 2^8 - 1 ) * 1
-    SPlayerHealthSync() : SFloatAsBitsSync<8>(0.f, 255.0f, true, false) {}
+    // 0 - 200 step ~0.78                             200 = ( 2^8 - 1 ) * (200/255)
+    SPlayerHealthSync() : SFloatAsBitsSync<8>(0.f, 200.0f, true, false) {}
 };
 
 struct SPlayerArmorSync : public SFloatAsBitsSync<8>
 {
-    // 0 - 100 step 0.5                              127.5 = ( 2^8 - 1 ) * 0.5
-    SPlayerArmorSync() : SFloatAsBitsSync<8>(0.f, 127.5f, true, false) {}
+    // 0 - 100 step ~0.39                             100 = ( 2^8 - 1 ) * (100/255)
+    SPlayerArmorSync() : SFloatAsBitsSync<8>(0.f, 100.0f, true, false) {}
 };
 
 struct SVehicleHealthSync : public SFloatAsBitsSync<12>

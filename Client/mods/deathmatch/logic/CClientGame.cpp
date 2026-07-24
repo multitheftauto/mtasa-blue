@@ -347,7 +347,9 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Disable the enter/exit vehicle key button (we want to handle this button ourselves)
     g_pMultiplayer->DisableEnterExitVehicleKey(true);
 
-    // Disable GTA's pickup processing as we want to confirm the hits with the server
+    // Disable GTA's pickup processing as we want to confirm the hits with the server.
+    // This also blocks native map armor/health pickups from applying client-only values
+    // that would bypass server-side health/armor authorization (#3791).
     m_pPickupManager->SetPickupProcessingDisabled(true);
 
     // Key-bind for fire-key (for handling satchels and stealth-kills)
