@@ -130,10 +130,12 @@ void CUnoccupiedVehicleSync::UpdateVehicle(CVehicle* pVehicle)
         // This vehicle got a syncer?
         if (pSyncer)
         {
-            // He isn't close enough to the vehicle and in the right dimension?
+            // He isn't close enough to the vehicle, or isn't in the right dimension?
+            // A persistent syncer keeps syncing wherever the vehicle ends up, so both tests belong
+            // inside the IsSyncerPersistent() guard.
             if (!IsSyncerPersistent() &&
-                    (!IsPointNearPoint3D(pSyncer->GetPosition(), pVehicle->GetPosition(), (float)g_TickRateSettings.iUnoccupiedVehicleSyncerDistance)) ||
-                (pVehicle->GetDimension() != pSyncer->GetDimension()))
+                (!IsPointNearPoint3D(pSyncer->GetPosition(), pVehicle->GetPosition(), (float)g_TickRateSettings.iUnoccupiedVehicleSyncerDistance) ||
+                 pVehicle->GetDimension() != pSyncer->GetDimension()))
             {
                 // Stop him from syncing it
                 StopSync(pVehicle);
