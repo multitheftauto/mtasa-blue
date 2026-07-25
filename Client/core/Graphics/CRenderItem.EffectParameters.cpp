@@ -579,13 +579,17 @@ bool CEffectParameters::ApplyCommonHandles()
         D3DXCOLOR   strongestDiffuse(0, 0, 0, 0);
         D3DXCOLOR   strongestSpecular(0, 0, 0, 0);
         D3DXVECTOR3 strongestDirection(0, 0, -1);
-        for (uint i = 0; i < 4; i++)
+        // The vehicle pipeline reserves slot 7 for its specular directional
+        // light. Include it without broadening the existing selection of GTA's
+        // temporary world lights in slots 0 through 3.
+        constexpr DWORD COMMON_EFFECT_LIGHT_SLOTS[] = {0, 1, 2, 3, 7};
+        for (const DWORD lightSlot : COMMON_EFFECT_LIGHT_SLOTS)
         {
             BOOL bEnabled;
-            if (SUCCEEDED(pDevice->GetLightEnable(i, &bEnabled)) && bEnabled)
+            if (SUCCEEDED(pDevice->GetLightEnable(lightSlot, &bEnabled)) && bEnabled)
             {
                 D3DLIGHT9 D3DLight;
-                pDevice->GetLight(i, &D3DLight);
+                pDevice->GetLight(lightSlot, &D3DLight);
                 if (D3DLight.Type == D3DLIGHT_DIRECTIONAL)
                 {
                     totalAmbient += D3DLight.Ambient;

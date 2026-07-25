@@ -180,6 +180,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTargetStart", OOP_GetPedTargetStart);
     lua_classfunction(luaVM, "getWeaponMuzzlePosition", "getPedWeaponMuzzlePosition");
     lua_classfunction(luaVM, "getBonePosition", OOP_GetPedBonePosition);
+    lua_classfunction(luaVM, "getBoneMatrix", ArgumentParserWarn<false, OOP_GetElementBoneMatrix>);
     lua_classfunction(luaVM, "getCameraRotation", "getPedCameraRotation");
     lua_classfunction(luaVM, "getWeaponSlot", "getPedWeaponSlot");
     lua_classfunction(luaVM, "getWalkingStyle", "getPedWalkingStyle");
@@ -1064,6 +1065,28 @@ std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementB
     g_pGame->GetRenderWare()->RwMatrixToCMatrix(*rwmatrix, matrix);
 
     return matrix.To4x4Array();
+}
+
+std::variant<bool, CMatrix> CLuaPedDefs::OOP_GetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone)
+{
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
+
+    CEntity* entity = ped->GetGameEntity();
+
+    if (!entity)
+        return false;
+
+    RwMatrix* rwmatrix = entity->GetBoneRwMatrix(static_cast<eBone>(bone));
+
+    if (!rwmatrix)
+        return false;
+
+    CMatrix matrix;
+
+    g_pGame->GetRenderWare()->RwMatrixToCMatrix(*rwmatrix, matrix);
+
+    return matrix;
 }
 
 bool CLuaPedDefs::SetElementBonePosition(CClientPed* ped, const std::uint16_t bone, const CVector position)
