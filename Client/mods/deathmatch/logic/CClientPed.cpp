@@ -1970,6 +1970,10 @@ void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bSt
     if (IsWearingGoggles())
         SetWearingGoggles(false, false);
 
+    // Clear the targeting marker so it doesn't stay on screen after death
+    if (m_pPlayerPed)
+        m_pPlayerPed->SetTargetedEntity(nullptr);
+
     m_bDead = true;
 }
 
