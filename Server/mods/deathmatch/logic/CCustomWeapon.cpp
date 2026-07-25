@@ -11,12 +11,16 @@
 #include "StdInc.h"
 #include "CCustomWeapon.h"
 #include "CObjectManager.h"
+#include "CElementRefManager.h"
 #include "CVehicle.h"
 #include "CPed.h"
 
 CCustomWeapon::CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType)
     : CObject(pParent, pObjectManager, false)
 {
+    // Ensure m_pTarget and m_pOwner get nulled when the elements they point at are destroyed
+    CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CCustomWeapon"), &m_pTarget, &m_pOwner, NULL);
+
     // Init
     m_iType = CElement::WEAPON;
     SetTypeName("weapon");
@@ -57,6 +61,8 @@ CCustomWeapon::CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, 
 
 CCustomWeapon::~CCustomWeapon()
 {
+    CElementRefManager::RemoveElementRefs(ELEMENT_REF_DEBUG(this, "CCustomWeapon"), &m_pTarget, &m_pOwner, NULL);
+
     m_pWeaponManager->RemoveFromList(this);
 }
 
