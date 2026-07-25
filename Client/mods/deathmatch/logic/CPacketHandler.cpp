@@ -3575,11 +3575,20 @@ retry:
                         bitStream.Read(ucSirenCount);
                         bitStream.Read(ucSirenType);
 
-                        pVehicle->GiveVehicleSirens(ucSirenType, ucSirenCount);
+                        // The count comes straight off the wire and is used to index a fixed size array.
+                        // Keep reading the entries the packet claims to hold so the stream stays aligned,
+                        // but only store the ones that fit.
+                        unsigned char ucStoredSirenCount = std::min<unsigned char>(ucSirenCount, SIREN_COUNT_MAX);
+
+                        pVehicle->GiveVehicleSirens(ucSirenType, ucStoredSirenCount);
                         for (unsigned char i = 0; i < ucSirenCount; i++)
                         {
                             SVehicleSirenSync sirenData;
                             bitStream.Read(&sirenData);
+
+                            if (i >= ucStoredSirenCount)
+                                continue;
+
                             pVehicle->SetVehicleSirenPosition(i, sirenData.data.m_vecSirenPositions);
                             pVehicle->SetVehicleSirenColour(i, sirenData.data.m_colSirenColour);
                             pVehicle->SetVehicleSirenMinimumAlpha(i, sirenData.data.m_dwSirenMinAlpha);
