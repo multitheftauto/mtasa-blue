@@ -33,7 +33,7 @@ void CLuaPointLightDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getType", "getLightType");
     lua_classfunction(luaVM, "getRadius", "getLightRadius");
     lua_classfunction(luaVM, "getColor", "getLightColor");
-    lua_classfunction(luaVM, "getDirection", ArgumentParserWarn<false, OOP_GetLightDirection>);
+    lua_classfunction(luaVM, "getDirection", OOP_GetLightDirection);
 
     lua_classfunction(luaVM, "setRadius", "setLightRadius");
     lua_classfunction(luaVM, "setColor", "setLightColor");
@@ -41,7 +41,7 @@ void CLuaPointLightDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "type", nullptr, "getLightType");
     lua_classvariable(luaVM, "radius", "setLightRadius", "getLightRadius");
-    lua_classvariable(luaVM, "direction", SetLightDirection, ArgumentParserWarn<false, OOP_GetLightDirection>);
+    lua_classvariable(luaVM, "direction", SetLightDirection, OOP_GetLightDirection);
 
     lua_registerclass(luaVM, "Light", "Element");
 }
@@ -194,13 +194,37 @@ int CLuaPointLightDefs::GetLightDirection(lua_State* luaVM)
     return 1;
 }
 
-std::variant<bool, CVector> CLuaPointLightDefs::OOP_GetLightDirection(CClientPointLights* pLight)
+int CLuaPointLightDefs::OOP_GetLightDirection(lua_State* luaVM)
 {
-    CVector vecDirection;
-    if (!CStaticFunctionDefinitions::GetLightDirection(pLight, vecDirection))
-        return false;
+    // vector3 getLightDirection ( light theLight ) — or 3 floats if the caller expects them
+    CClientPointLights* pLight;
 
-    return vecDirection;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pLight);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecDirection;
+        if (CStaticFunctionDefinitions::GetLightDirection(pLight, vecDirection))
+        {
+            int iExpected = lua_ncallresult(luaVM);
+            if (iExpected == 3)
+            {
+                lua_pushnumber(luaVM, static_cast<lua_Number>(vecDirection.fX));
+                lua_pushnumber(luaVM, static_cast<lua_Number>(vecDirection.fY));
+                lua_pushnumber(luaVM, static_cast<lua_Number>(vecDirection.fZ));
+                return 3;
+            }
+
+            lua_pushvector(luaVM, vecDirection);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, SString("Bad argument @ '%s' [%s]", lua_tostring(luaVM, lua_upvalueindex(1)), *argStream.GetErrorMessage()));
+
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
 
 int CLuaPointLightDefs::SetLightRadius(lua_State* luaVM)

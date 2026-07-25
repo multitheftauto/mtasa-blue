@@ -252,8 +252,8 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getEnabled", "guiGetEnabled");
     lua_classfunction(luaVM, "getVisible", "guiGetVisible");
     lua_classfunction(luaVM, "getText", "guiGetText");
-    lua_classfunction(luaVM, "getPosition", ArgumentParserWarn<false, OOP_GUIGetPosition>);
-    lua_classfunction(luaVM, "getSize", ArgumentParserWarn<false, OOP_GUIGetSize>);
+    lua_classfunction(luaVM, "getPosition", OOP_GUIGetPosition);
+    lua_classfunction(luaVM, "getSize", OOP_GUIGetSize);
     lua_classfunction(luaVM, "getProperty", "guiGetProperty");
 
     lua_classfunction(luaVM, "setInputEnabled", "guiSetInputEnabled");
@@ -283,8 +283,8 @@ void CLuaGUIDefs::AddGuiElementClass(lua_State* luaVM)
     lua_classvariable(luaVM, "alpha", "guiSetAlpha", "guiGetAlpha");
     lua_classvariable(luaVM, "enabled", "guiSetEnabled", "guiGetEnabled");
     lua_classvariable(luaVM, "text", "guiSetText", "guiGetText");
-    lua_classvariable(luaVM, "size", ArgumentParserWarn<false, OOP_GUISetSize>, ArgumentParserWarn<false, OOP_GUIGetSize>);
-    lua_classvariable(luaVM, "position", ArgumentParserWarn<false, OOP_GUISetPosition>, ArgumentParserWarn<false, OOP_GUIGetPosition>);
+    lua_classvariable(luaVM, "size", ArgumentParserWarn<false, OOP_GUISetSize>, OOP_GUIGetSize);
+    lua_classvariable(luaVM, "position", ArgumentParserWarn<false, OOP_GUISetPosition>, OOP_GUIGetPosition);
     lua_classvariable(luaVM, "chatboxCharacterLimit", "setChatboxCharacterLimit", "getChatboxCharacterLimit");
 
     lua_registerclass(luaVM, "GuiElement", "Element");
@@ -385,10 +385,10 @@ void CLuaGUIDefs::AddGuiImageClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "guiCreateStaticImage");
     lua_classfunction(luaVM, "loadImage", "guiStaticImageLoadImage");
-    lua_classfunction(luaVM, "getNativeSize", ArgumentParserWarn<false, OOP_GUIStaticImageGetNativeSize>);
+    lua_classfunction(luaVM, "getNativeSize", OOP_GUIStaticImageGetNativeSize);
 
     lua_classvariable(luaVM, "image", "guiStaticImageLoadImage", NULL);
-    lua_classvariable(luaVM, "nativeSize", nullptr, ArgumentParserWarn<false, OOP_GUIStaticImageGetNativeSize>);
+    lua_classvariable(luaVM, "nativeSize", nullptr, OOP_GUIStaticImageGetNativeSize);
 
     lua_registerclass(luaVM, "GuiStaticImage", "GuiElement");
 }
@@ -1228,13 +1228,36 @@ int CLuaGUIDefs::GUIStaticImageGetNativeSize(lua_State* luaVM)
     return 1;
 }
 
-std::variant<bool, CVector2D> CLuaGUIDefs::OOP_GUIStaticImageGetNativeSize(CClientGUIElement* theElement)
+int CLuaGUIDefs::OOP_GUIStaticImageGetNativeSize(lua_State* luaVM)
 {
-    CVector2D vecSize;
-    if (!CStaticFunctionDefinitions::GUIStaticImageGetNativeSize(*theElement, vecSize))
-        return false;
+    // vector2 guiStaticImageGetNativeSize ( element theElement ) — or 2 floats if the caller expects them
+    CClientGUIElement* theElement;
+    CVector2D          vecSize;
 
-    return vecSize;
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(theElement);
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::GUIStaticImageGetNativeSize(*theElement, vecSize))
+        {
+            int iExpected = lua_ncallresult(luaVM);
+            if (iExpected == 2)
+            {
+                lua_pushnumber(luaVM, vecSize.fX);
+                lua_pushnumber(luaVM, vecSize.fY);
+                return 2;
+            }
+
+            lua_pushvector(luaVM, vecSize);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
 
 int CLuaGUIDefs::GUICreateTab(lua_State* luaVM)
@@ -1791,11 +1814,37 @@ int CLuaGUIDefs::GUIGetSize(lua_State* luaVM)
     return 1;
 }
 
-CVector2D CLuaGUIDefs::OOP_GUIGetSize(CClientGUIElement* theElement, std::optional<bool> relative)
+int CLuaGUIDefs::OOP_GUIGetSize(lua_State* luaVM)
 {
-    CVector2D size;
-    theElement->GetCGUIElement()->GetSize(size, relative.value_or(false));
-    return size;
+    // vector2 guiGetSize ( element theElement [, bool relative = false ] ) — or 2 floats if the caller expects them
+    CClientGUIElement* theElement;
+    bool               relative;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(theElement);
+    argStream.ReadBool(relative, false);
+
+    if (!argStream.HasErrors())
+    {
+        CVector2D Size;
+        theElement->GetCGUIElement()->GetSize(Size, relative);
+
+        int iExpected = lua_ncallresult(luaVM);
+        if (iExpected == 2)
+        {
+            lua_pushnumber(luaVM, Size.fX);
+            lua_pushnumber(luaVM, Size.fY);
+            return 2;
+        }
+
+        lua_pushvector(luaVM, Size);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
 
 int CLuaGUIDefs::GUIGetScreenSize(lua_State* luaVM)
@@ -1834,11 +1883,37 @@ int CLuaGUIDefs::GUIGetPosition(lua_State* luaVM)
     return 1;
 }
 
-CVector2D CLuaGUIDefs::OOP_GUIGetPosition(CClientGUIElement* guiElement, std::optional<bool> relative)
+int CLuaGUIDefs::OOP_GUIGetPosition(lua_State* luaVM)
 {
-    CVector2D pos;
-    guiElement->GetCGUIElement()->GetPosition(pos, relative.value_or(false));
-    return pos;
+    // vector2 guiGetPosition ( element guiElement [, bool relative = false ] ) — or 2 floats if the caller expects them
+    CClientGUIElement* guiElement;
+    bool               relative;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(guiElement);
+    argStream.ReadBool(relative, false);
+
+    if (!argStream.HasErrors())
+    {
+        CVector2D Pos;
+        guiElement->GetCGUIElement()->GetPosition(Pos, relative);
+
+        int iExpected = lua_ncallresult(luaVM);
+        if (iExpected == 2)
+        {
+            lua_pushnumber(luaVM, Pos.fX);
+            lua_pushnumber(luaVM, Pos.fY);
+            return 2;
+        }
+
+        lua_pushvector(luaVM, Pos);
+        return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
 }
 
 int CLuaGUIDefs::GUISetAlpha(lua_State* luaVM)
