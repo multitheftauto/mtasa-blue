@@ -14,8 +14,6 @@
 #include "CPacket.h"
 #include <vector>
 
-constexpr unsigned short MAX_VOICE_BUFFER_SIZE = 2048;
-
 class CVoiceDataPacket final : public CPacket
 {
 public:

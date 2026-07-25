@@ -22,10 +22,10 @@ bool CVoiceDataPacket::Read(NetBitStreamInterface& BitStream)
         return false;
 
     unsigned short voiceBufferLength{};
-    if (!BitStream.Read(voiceBufferLength) || voiceBufferLength == 0 || voiceBufferLength > MAX_VOICE_BUFFER_SIZE)
+    const auto*    mainConfig = g_pGame->GetConfig();
+    if (!BitStream.Read(voiceBufferLength) || voiceBufferLength == 0 || voiceBufferLength > mainConfig->GetMaxVoiceBufferSize())
         return false;
 
-    const auto*         mainConfig = g_pGame->GetConfig();
     const long long     now = GetTickCount64_();
     const bool          newInterval = pPlayer->GetLastVoiceDataTime() == 0 || now - pPlayer->GetLastVoiceDataTime() >= mainConfig->GetVoicePacketsInterval();
     const unsigned char packetsInInterval = newInterval ? 0 : pPlayer->GetVoiceDataPacketsInInterval();
