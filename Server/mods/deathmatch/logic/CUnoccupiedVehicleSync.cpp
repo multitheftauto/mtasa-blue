@@ -63,11 +63,8 @@ void CUnoccupiedVehicleSync::OverrideSyncer(CVehicle* pVehicle, CPlayer* pPlayer
     {
         if (pSyncer == pPlayer)
         {
-            if (!bPersist)
-            {
-                SetSyncerAsPersistent(false);
-            }
-
+            // Already syncing it, so the persistence setting is the only thing left to apply.
+            pVehicle->SetSyncerPersistent(bPersist);
             return;
         }
 
@@ -76,7 +73,7 @@ void CUnoccupiedVehicleSync::OverrideSyncer(CVehicle* pVehicle, CPlayer* pPlayer
 
     if (pPlayer && !pVehicle->IsBeingDeleted())
     {
-        SetSyncerAsPersistent(bPersist);
+        pVehicle->SetSyncerPersistent(bPersist);
         StartSync(pPlayer, pVehicle);
     }
 }
@@ -112,7 +109,7 @@ void CUnoccupiedVehicleSync::UpdateVehicle(CVehicle* pVehicle)
     }
 
     // If someones driving it, or its being towed by someone driving (and not just entering/exiting)
-    if (!IsSyncerPersistent() && pController && IS_PLAYER(pController) && pController->GetVehicleAction() == CPlayer::VEHICLEACTION_NONE)
+    if (!pVehicle->IsSyncerPersistent() && pController && IS_PLAYER(pController) && pController->GetVehicleAction() == CPlayer::VEHICLEACTION_NONE)
     {
         // if we need to change syncer to the controller
         if (pSyncer != pController)
@@ -133,7 +130,7 @@ void CUnoccupiedVehicleSync::UpdateVehicle(CVehicle* pVehicle)
             // He isn't close enough to the vehicle, or isn't in the right dimension?
             // A persistent syncer keeps syncing wherever the vehicle ends up, so both tests belong
             // inside the IsSyncerPersistent() guard.
-            if (!IsSyncerPersistent() &&
+            if (!pVehicle->IsSyncerPersistent() &&
                 (!IsPointNearPoint3D(pSyncer->GetPosition(), pVehicle->GetPosition(), (float)g_TickRateSettings.iUnoccupiedVehicleSyncerDistance) ||
                  pVehicle->GetDimension() != pSyncer->GetDimension()))
             {
@@ -216,10 +213,8 @@ void CUnoccupiedVehicleSync::StopSync(CVehicle* pVehicle)
     CPlayer* pSyncer = pVehicle->GetSyncer();
     pSyncer->Send(CUnoccupiedVehicleStopSyncPacket(pVehicle->GetID()));
 
-    // Unmark him as the syncing player
+    // Unmark him as the syncing player. This also drops any persistence the syncer was given.
     pVehicle->SetSyncer(NULL);
-
-    SetSyncerAsPersistent(false);
 
     // Call the onElementStopSync event
     CLuaArguments Arguments;
@@ -243,7 +238,7 @@ CPlayer* CUnoccupiedVehicleSync::FindPlayerCloseToVehicle(CVehicle* pVehicle, fl
         if (pPlayer->IsJoined() && !pPlayer->IsBeingDeleted())
         {
             // He's near enough?
-            if (!IsSyncerPersistent() && IsPointNearPoint3D(vecVehiclePosition, pPlayer->GetPosition(), fMaxDistance))
+            if (IsPointNearPoint3D(vecVehiclePosition, pPlayer->GetPosition(), fMaxDistance))
             {
                 // Same dimension?
                 if (pPlayer->GetDimension() == pVehicle->GetDimension())
@@ -489,7 +484,7 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehiclePushSync(CUnoccupiedVehicle
             CVehicle* pVehicle = static_cast<CVehicle*>(pVehicleElement);
 
             CPlayer*   pSyncer = pVehicle->GetSyncer();
-            const bool bCanClaimSync = !pSyncer || (!IsSyncerPersistent() && pPlayer->GetContactElement() == pVehicle);
+            const bool bCanClaimSync = !pSyncer || (!pVehicle->IsSyncerPersistent() && pPlayer->GetContactElement() == pVehicle);
 
             // Push sync is collision-driven, but the packet only carries a vehicle ID.
             // Require server-accepted contact before replacing an existing syncer.

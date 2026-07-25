@@ -3195,7 +3195,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                                         // HACK?: check the ped's vehicle-action is still the same (not warped in?)
                                                         if (pPed->GetVehicleAction() == CPed::VEHICLEACTION_ENTERING)
                                                         {
-                                                            if (!m_pUnoccupiedVehicleSync->IsSyncerPersistent())
+                                                            if (!pVehicle->IsSyncerPersistent())
                                                             {
                                                                 // Force the player (or ped syncer) as the syncer of the vehicle to which they are entering
                                                                 m_pUnoccupiedVehicleSync->OverrideSyncer(pVehicle, pPlayer);
@@ -3558,7 +3558,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                     pPed->SetOccupiedVehicle(NULL, 0);
                                     pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
-                                    if (!m_pUnoccupiedVehicleSync->IsSyncerPersistent())
+                                    if (!pVehicle->IsSyncerPersistent())
                                     {
                                         // Force the player (or ped syncer) that just left the vehicle as the syncer
                                         m_pUnoccupiedVehicleSync->OverrideSyncer(pVehicle, pPlayer);
@@ -3624,7 +3624,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                 pPed->SetOccupiedVehicle(NULL, 0);
                                 pVehicle->SetOccupant(NULL, occupiedSeat);
 
-                                if (!m_pUnoccupiedVehicleSync->IsSyncerPersistent())
+                                if (!pVehicle->IsSyncerPersistent())
                                 {
                                     // Force the player (or ped syncer) that just left the vehicle as the syncer
                                     m_pUnoccupiedVehicleSync->OverrideSyncer(pVehicle, pPlayer);
@@ -3904,10 +3904,12 @@ void CGame::Packet_VehicleTrailer(CVehicleTrailerPacket& Packet)
                         pVehicle->SetTowedVehicle(pTrailer);
                         pTrailer->SetTowedByVehicle(pVehicle);
 
-                        if (m_pUnoccupiedVehicleSync->IsSyncerPersistent())
+                        if (pVehicle->IsSyncerPersistent())
                         {
-                            // Make sure the un-occupied syncer of the trailer is this driver
-                            m_pUnoccupiedVehicleSync->OverrideSyncer(pTrailer, pPlayer);
+                            // Make sure the un-occupied syncer of the trailer is this driver. The trailer
+                            // inherits the persistence too, otherwise the towing vehicle keeps its chosen
+                            // syncer while the trailer is handed to somebody else on the next update.
+                            m_pUnoccupiedVehicleSync->OverrideSyncer(pTrailer, pPlayer, true);
                         }
 
                         // Broadcast this packet to everyone else
