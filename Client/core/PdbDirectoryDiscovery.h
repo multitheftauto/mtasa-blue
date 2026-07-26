@@ -53,9 +53,12 @@ namespace CrashHandler::Details
     {
         std::vector<std::filesystem::path> pdbDirectories;
 
-        // Client PDBs are emitted beside the launcher or the MTA binaries. Limiting discovery to those locations prevents large resource trees from
-        // delaying startup while retaining local-symbol support for development builds.
-        const std::array candidateDirectories{processDirectory, processDirectory / L"MTA"};
+        if (processDirectory.empty()) [[unlikely]]
+            return pdbDirectories;
+
+        // Main client process PDBs are emitted beside the launcher, the MTA binaries, or the Deathmatch module. Checking only those locations prevents
+        // large resource trees from delaying startup while retaining local-symbol support for development builds.
+        const std::array candidateDirectories{processDirectory, processDirectory / L"MTA", processDirectory / L"mods" / L"deathmatch"};
 
         for (const auto& directory : candidateDirectories)
         {

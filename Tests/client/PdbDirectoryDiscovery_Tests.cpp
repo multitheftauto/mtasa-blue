@@ -50,26 +50,72 @@ namespace
 
         std::filesystem::path m_root;
     };
+
+    class CurrentPathRestorer
+    {
+    public:
+        CurrentPathRestorer() : m_originalPath(std::filesystem::current_path()) {}
+
+        ~CurrentPathRestorer()
+        {
+            std::error_code ec;
+            std::filesystem::current_path(m_originalPath, ec);
+        }
+
+    private:
+        std::filesystem::path m_originalPath;
+    };
 }
 
-TEST_F(PdbDirectoryDiscoveryTest, FindsPdbsOnlyBesideClientBinaries)
+TEST_F(PdbDirectoryDiscoveryTest, FindsPdbsInMainClientBinaryDirectories)
 {
     CreateFile(m_root / L"launcher.pdb");
     CreateFile(m_root / L"MTA" / L"core.PDB");
+    CreateFile(m_root / L"mods" / L"deathmatch" / L"client.PdB");
     CreateFile(m_root / L"MTA" / L"nested" / L"ignored.pdb");
     CreateFile(m_root / L"mods" / L"deathmatch" / L"resources" / L"ignored.pdb");
 
     const auto directories = CrashHandler::Details::FindPdbDirectories(m_root);
 
-    ASSERT_EQ(directories.size(), 2u);
+    ASSERT_EQ(directories.size(), 3u);
     EXPECT_EQ(directories[0], m_root);
     EXPECT_EQ(directories[1], m_root / L"MTA");
+    EXPECT_EQ(directories[2], m_root / L"mods" / L"deathmatch");
+}
+
+TEST_F(PdbDirectoryDiscoveryTest, FindsDeathmatchPdbWhenOtherCandidateDirectoriesHaveNone)
+{
+    CreateFile(m_root / L"mods" / L"deathmatch" / L"client.pdb");
+
+    const auto directories = CrashHandler::Details::FindPdbDirectories(m_root);
+
+    ASSERT_EQ(directories.size(), 1u);
+    EXPECT_EQ(directories[0], m_root / L"mods" / L"deathmatch");
 }
 
 TEST_F(PdbDirectoryDiscoveryTest, IgnoresPdbsOutsideClientBinaryDirectories)
 {
     CreateFile(m_root / L"MTA" / L"nested" / L"ignored.pdb");
+    CreateFile(m_root / L"MTA" / L"cef" / L"ignored.pdb");
     CreateFile(m_root / L"mods" / L"deathmatch" / L"resources" / L"ignored.pdb");
+    CreateFile(m_root / L"lib" / L"ignored.pdb");
+    CreateFile(m_root / L"server" / L"ignored.pdb");
+    CreateFile(m_root / L"tests" / L"ignored.pdb");
 
     EXPECT_TRUE(CrashHandler::Details::FindPdbDirectories(m_root).empty());
+}
+
+TEST_F(PdbDirectoryDiscoveryTest, ReturnsEmptyForMissingProcessDirectory)
+{
+    EXPECT_TRUE(CrashHandler::Details::FindPdbDirectories(m_root / L"missing").empty());
+}
+
+TEST_F(PdbDirectoryDiscoveryTest, ReturnsEmptyForEmptyProcessDirectory)
+{
+    CreateFile(m_root / L"unrelated.pdb");
+
+    CurrentPathRestorer restoreCurrentPath;
+    std::filesystem::current_path(m_root);
+
+    EXPECT_TRUE(CrashHandler::Details::FindPdbDirectories({}).empty());
 }

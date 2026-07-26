@@ -1512,7 +1512,7 @@ namespace CrashHandler
     SafeDebugOutput("========================================\n");
 
     // Warm up PDB detection early to avoid filesystem scan during crash handling
-    // This performs the recursive directory search now rather than during exception processing
+    // This checks the bounded client binary directories now rather than during exception processing
     const bool hasSymbols = CrashHandler::ProcessHasLocalDebugSymbols();
 
     SafeDebugOutput("========================================\n");
