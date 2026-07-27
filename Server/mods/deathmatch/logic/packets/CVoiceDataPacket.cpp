@@ -43,7 +43,16 @@ bool CVoiceDataPacket::Read(NetBitStreamInterface& BitStream)
         BitStream.Read(m_usActualDataLength);
         if (m_usActualDataLength)
         {
-            BitStream.Read(reinterpret_cast<char*>(m_pBuffer), m_usActualDataLength <= m_usDataBufferSize ? m_usActualDataLength : m_usDataBufferSize);
+            // Reject oversized payloads. The declared length must fit the buffer,
+            // otherwise the relayed packet would contain data beyond what the
+            // client actually sent (read from adjacent heap memory).
+            if (m_usActualDataLength > m_usDataBufferSize)
+                return false;
+
+            // Reject truncated payloads, otherwise the uninitialized remainder
+            // of the buffer would be relayed to other players.
+            if (!BitStream.Read(reinterpret_cast<char*>(m_pBuffer), m_usActualDataLength))
+                return false;
         }
         return true;
     }
