@@ -64,5 +64,10 @@ bool CClientTrainTrack::SetNodePosition(std::size_t nodeIndex, const CVector& po
         return false;
 
     m_NodePositions[nodeIndex] = position;
+
+    // Keep the data the movement hook actually reads in sync too
+    if (m_pGameTrainTrack)
+        m_pGameTrainTrack->SetNodePosition(static_cast<std::uint32_t>(nodeIndex), position);
+
     return true;
 }

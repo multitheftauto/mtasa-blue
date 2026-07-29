@@ -26,6 +26,7 @@
 #include "CPlayerRPCs.h"
 #include "CRadarRPCs.h"
 #include "CTeamRPCs.h"
+#include "CTrainTrackRPCs.h"
 #include "CVehicleRPCs.h"
 #include "CWeaponRPCs.h"
 #include "CWaterRPCs.h"
@@ -48,6 +49,7 @@ CClientPedManager*         CRPCFunctions::m_pPedManager;
 CBlendedWeather*           CRPCFunctions::m_pBlendedWeather;
 CClientGame*               CRPCFunctions::m_pClientGame;
 CClientWaterManager*       CRPCFunctions::m_pWaterManager;
+CClientTrainTrackManager*  CRPCFunctions::m_pTrainTrackManager;
 
 SFixedArray<CRPCFunctions::SRPCHandler, CRPCFunctions::NUM_RPC_FUNCS>        CRPCFunctions::m_RPCHandlers;
 SFixedArray<CRPCFunctions::SElementRPCHandler, CRPCFunctions::NUM_RPC_FUNCS> CRPCFunctions::m_ElementRPCHandlers;
@@ -70,6 +72,7 @@ CRPCFunctions::CRPCFunctions(CClientGame* pClientGame)
     m_pPedManager = m_pManager->GetPedManager();
     m_pBlendedWeather = pClientGame->GetBlendedWeather();
     m_pWaterManager = m_pManager->GetWaterManager();
+    m_pTrainTrackManager = m_pManager->GetTrainTrackManager();
     m_pClientGame = pClientGame;
 
     AddHandlers();
@@ -95,6 +98,7 @@ void CRPCFunctions::AddHandlers()
     CPlayerRPCs::LoadFunctions();
     CRadarRPCs::LoadFunctions();
     CTeamRPCs::LoadFunctions();
+    CTrainTrackRPCs::LoadFunctions();
     CVehicleRPCs::LoadFunctions();
     CWeaponRPCs::LoadFunctions();
     CWaterRPCs::LoadFunctions();

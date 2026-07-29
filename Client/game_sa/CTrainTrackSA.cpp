@@ -25,17 +25,34 @@ CTrainTrackSA::CTrainTrackSA(std::uint8_t trackID, const std::vector<CVector>& n
     : m_TrackID(trackID), m_fTotalLength(0.0f), m_bLinkLastNodes(bLinkLastNodes)
 {
     m_Nodes.reserve(nodePositions.size());
+    for (const auto& position : nodePositions)
+        m_Nodes.push_back({position, 0.0f});
 
+    RecomputeDistances();
+}
+
+bool CTrainTrackSA::SetNodePosition(std::uint32_t nodeIndex, const CVector& position) noexcept
+{
+    if (nodeIndex >= m_Nodes.size())
+        return false;
+
+    m_Nodes[nodeIndex].position = position;
+    RecomputeDistances();
+    return true;
+}
+
+void CTrainTrackSA::RecomputeDistances() noexcept
+{
     float fDistance = 0.0f;
-    for (std::size_t i = 0; i < nodePositions.size(); i++)
+    for (std::size_t i = 0; i < m_Nodes.size(); i++)
     {
         if (i > 0)
-            fDistance += Distance2D(nodePositions[i], nodePositions[i - 1]);
+            fDistance += Distance2D(m_Nodes[i].position, m_Nodes[i - 1].position);
 
-        m_Nodes.push_back({nodePositions[i], fDistance});
+        m_Nodes[i].distanceFromStart = fDistance;
     }
 
     m_fTotalLength = fDistance;
-    if (bLinkLastNodes && nodePositions.size() > 1)
-        m_fTotalLength += Distance2D(nodePositions.back(), nodePositions.front());
+    if (m_bLinkLastNodes && m_Nodes.size() > 1)
+        m_fTotalLength += Distance2D(m_Nodes.back().position, m_Nodes.front().position);
 }

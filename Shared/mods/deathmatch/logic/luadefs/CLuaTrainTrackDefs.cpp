@@ -15,6 +15,8 @@
     #include "CTrainTrackManager.h"
     #include "CGame.h"
     #include "CDummy.h"
+    #include "common/CBitStream.h"
+    #include "packets/CElementRPCPacket.h"
 #endif
 
 void CLuaTrainTrackDefs::LoadFunctions()
@@ -92,6 +94,18 @@ std::variant<CVector, bool> CLuaTrainTrackDefs::GetTrainTrackNodePosition(CTrain
 
 bool CLuaTrainTrackDefs::SetTrainTrackNodePosition(CTrainTrack* pTrainTrack, uint nodeIndex, CVector position)
 {
-    return pTrainTrack->SetTrackNodePosition(nodeIndex, position);
+    if (!pTrainTrack->SetTrackNodePosition(nodeIndex, position))
+        return false;
+
+    // Tell clients that already have this track so they don't drift out of sync with it
+    CBitStream BitStream;
+    BitStream.pBitStream->Write(nodeIndex);
+    BitStream.pBitStream->Write(position.fX);
+    BitStream.pBitStream->Write(position.fY);
+    BitStream.pBitStream->Write(position.fZ);
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pTrainTrack, SET_TRAIN_TRACK_NODE_POSITION, *BitStream.pBitStream));
+
+    return true;
 }
 #endif

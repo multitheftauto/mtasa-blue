@@ -20,8 +20,11 @@ public:
     const std::vector<STrainTrackNodeSA>& GetNodes() const noexcept override { return m_Nodes; }
     float                                 GetTotalLength() const noexcept override { return m_fTotalLength; }
     bool                                  GetLastNodesLinked() const noexcept override { return m_bLinkLastNodes; }
+    bool                                  SetNodePosition(std::uint32_t nodeIndex, const CVector& position) noexcept override;
 
 private:
+    void RecomputeDistances() noexcept;
+
     std::uint8_t                   m_TrackID;
     std::vector<STrainTrackNodeSA> m_Nodes;
     float                          m_fTotalLength;
