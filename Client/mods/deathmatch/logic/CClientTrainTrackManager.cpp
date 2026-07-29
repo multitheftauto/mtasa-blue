@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 #include "CClientTrainTrack.h"
+#include <game/CTrainTrackManager.h>
 
 CClientTrainTrackManager::CClientTrainTrackManager(CClientManager* pManager)
 {
@@ -26,6 +27,20 @@ CClientTrainTrack* CClientTrainTrackManager::Get(ElementID ID)
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
     if (pEntity && pEntity->GetType() == CCLIENTTRAINTRACK)
         return static_cast<CClientTrainTrack*>(pEntity);
+
+    return nullptr;
+}
+
+CClientTrainTrack* CClientTrainTrackManager::GetByGameTrackID(std::uint8_t gameTrackID) const noexcept
+{
+    if (gameTrackID < CTrainTrackManager::FIRST_CUSTOM_TRACK_ID)
+        return nullptr;
+
+    for (CClientTrainTrack* pTrainTrack : m_TrainTracks)
+    {
+        if (pTrainTrack->GetGameTrackID() == gameTrackID)
+            return pTrainTrack;
+    }
 
     return nullptr;
 }

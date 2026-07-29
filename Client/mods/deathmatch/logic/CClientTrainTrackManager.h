@@ -22,7 +22,12 @@ class CClientTrainTrackManager
 public:
     unsigned int              Count() const noexcept { return static_cast<unsigned int>(m_TrainTracks.size()); }
     static CClientTrainTrack* Get(ElementID ID);
-    void                      DeleteAll();
+
+    // Game track IDs are handed out per client, so this is the only way back to the element the
+    // server knows about when all we have is what the game itself stores on a train
+    CClientTrainTrack* GetByGameTrackID(std::uint8_t gameTrackID) const noexcept;
+
+    void DeleteAll();
 
 private:
     CClientTrainTrackManager(class CClientManager* pManager);

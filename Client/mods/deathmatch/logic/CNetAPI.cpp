@@ -15,6 +15,7 @@
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
 #include <game/CTaskManager.h>
+#include <game/CTrainTrackManager.h>
 #include <game/Task.h>
 #include <enums/VehicleType.h>
 
@@ -1661,10 +1662,25 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         BitStream.WriteBit(bDirection);
         BitStream.Write(fSpeed);
 
-        // The client only knows about the 4 default tracks so far, so it always reports one of those
-        BitStream.WriteBit(true);
-        BitStream.WriteBit(true);
-        BitStream.Write(ucTrack);
+        // The game only stores a track ID on the train, so a custom track has to be reported back as
+        // the element the server knows it by, not as that ID
+        if (CClientTrainTrack* pCustomTrack = g_pClientGame->GetManager()->GetTrainTrackManager()->GetByGameTrackID(ucTrack))
+        {
+            BitStream.WriteBit(true);
+            BitStream.WriteBit(false);
+            BitStream.Write(pCustomTrack->GetID());
+        }
+        else if (ucTrack < CTrainTrackManager::FIRST_CUSTOM_TRACK_ID)
+        {
+            BitStream.WriteBit(true);
+            BitStream.WriteBit(true);
+            BitStream.Write(ucTrack);
+        }
+        else
+        {
+            // On no track we can name: either derailed, or on a custom track that's already gone
+            BitStream.WriteBit(false);
+        }
     }
 
     // Write the camera orientation

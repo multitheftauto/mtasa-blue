@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <game/CAnimManager.h>
+#include <game/CTrainTrackManager.h>
 #include "../game_sa/CTrainSA.h"
 #include "../game_sa/CAnimBlendSequenceSA.h"
 #include "../game_sa/CAnimBlendHierarchySA.h"
@@ -3224,23 +3225,14 @@ static void __declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
 #define HOOKSIZE_CTrain__ProcessControl 6
 static DWORD CONTINUE_CTrain__ProcessControl = 0x6F8FE5;
 
-// 0xC37FEC; float RailTrackLength[NUM_TRACKS]
-static float* RailTrackLength = reinterpret_cast<float*>(0xC37FEC);
-
 static void _cdecl WrapTrainRailDistance(CTrainSAInterface* train)
 {
-    // Custom tracks (see CMultiplayerSA_TrainTracks.cpp) never reach this point; that hook sits
-    // at the top of the same function and returns before getting anywhere near here, so a
-    // trackID >= 4 here always means "not on a rail" rather than "on a custom track"
-    if (train->m_ucRailTrackID >= 4)
-    {
-        train->m_fTrainRailDistance = 0.0f;
-        return;
-    }
+    // Track lengths come from the manager rather than the game's own array, because that array is
+    // relocated to make room for custom track IDs (see CTrainTrackManagerSA). A track ID that isn't
+    // in use, 0xFF included, reports a length of 0 and so falls into the check below.
+    const float railTrackLength = pGameInterface->GetTrainTrackManager()->GetTrackLength(train->m_ucRailTrackID);
 
     // Check if the current rail track has a valid length (>= 1.0f)
-    const float railTrackLength = RailTrackLength[train->m_ucRailTrackID];
-
     if (railTrackLength < 1.0f)
     {
         train->m_fTrainRailDistance = 0.0f;

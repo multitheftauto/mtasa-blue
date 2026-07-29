@@ -17,6 +17,7 @@
     #include "CDummy.h"
     #include "common/CBitStream.h"
     #include "packets/CElementRPCPacket.h"
+    #include "packets/CEntityAddPacket.h"
 #endif
 
 void CLuaTrainTrackDefs::LoadFunctions()
@@ -74,6 +75,15 @@ CLuaTrainTrackDefs::TrainTrack CLuaTrainTrackDefs::CreateTrainTrack(lua_State* l
 
     if (CElementGroup* elementGroup = resource.GetElementGroup())
         elementGroup->Add(pTrainTrack);
+
+    // Clients need the node data before any train can be put on this track: setTrainTrack refers to
+    // the track by element, so a client that never received it just leaves the train where it was
+    if (resource.IsClientSynced())
+    {
+        CEntityAddPacket packet;
+        packet.Add(pTrainTrack);
+        m_pPlayerManager->BroadcastOnlyJoined(packet);
+    }
 
     return pTrainTrack;
 }

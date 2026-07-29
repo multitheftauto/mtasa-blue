@@ -23,4 +23,8 @@ public:
     virtual CTrainTrack* CreateTrainTrack(const std::vector<CVector>& nodePositions, bool bLinkLastNodes) = 0;
     virtual void         DestroyTrainTrack(std::uint8_t trackID) = 0;
     virtual CTrainTrack* GetTrainTrack(std::uint8_t trackID) = 0;
+
+    // Length of any track, built-in or custom, read from the arrays the game's train code uses.
+    // Returns 0 for a track ID that isn't in use, including the 0xFF "no track" value.
+    virtual float GetTrackLength(std::uint8_t trackID) const noexcept = 0;
 };
