@@ -24,9 +24,9 @@ CClientTrainTrack::CClientTrainTrack(CClientManager* pManager, ElementID ID, con
     m_bLinkLastNodes = bLinkLastNodes;
     m_vecPosition = nodePositions.empty() ? CVector() : nodePositions.front();
 
-    // This is what the game's native train code actually drives on; if we run out of track ID
-    // slots it comes back nullptr and the track just won't move any train placed on it
-    m_pGameTrainTrack = g_pGame->GetTrainTrackManager()->CreateTrainTrack(nodePositions, bLinkLastNodes);
+    // The track the game's own train code drives on. It comes back nullptr when there are no track
+    // ID slots left, in which case no train can be placed on this element.
+    m_pGameTrainTrack = g_pGame->GetTrainTrackManager()->CreateTrainTrack(nodePositions);
 
     m_pTrainTrackManager->AddToList(this);
 }

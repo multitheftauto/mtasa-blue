@@ -40,8 +40,7 @@ namespace
     }
 }  // namespace
 
-CTrainTrackSA::CTrainTrackSA(std::uint8_t trackID, const std::vector<CVector>& nodePositions, bool bLinkLastNodes)
-    : m_TrackID(trackID), m_fTotalLength(0.0f), m_bLinkLastNodes(bLinkLastNodes)
+CTrainTrackSA::CTrainTrackSA(std::uint8_t trackID, const std::vector<CVector>& nodePositions) : m_TrackID(trackID), m_fTotalLength(0.0f)
 {
     m_Nodes.reserve(nodePositions.size());
     for (const auto& position : nodePositions)
@@ -81,18 +80,17 @@ void CTrainTrackSA::RecomputeDistances() noexcept
         m_Nodes[i].distanceFromStart = fDistance;
     }
 
-    m_fTotalLength = fDistance;
-
-    // The train code always wraps at the total length, so the run from the last node back to the
-    // first is part of the track whether or not the script asked for the ends to be linked
+    // The train code wraps at the total length, so every track is a loop: the run from the last node
+    // back to the first counts towards the length
     if (m_Nodes.size() > 1)
-        m_fTotalLength += Distance2D(m_Nodes.back().position, m_Nodes.front().position);
+        fDistance += Distance2D(m_Nodes.back().position, m_Nodes.front().position);
+
+    m_fTotalLength = fDistance;
 }
 
 void CTrainTrackSA::PublishToGame() noexcept
 {
-    m_GameNodes.resize(m_Nodes.size());
-
+    // Both vectors are sized once in the constructor and the node count never changes after that
     for (std::size_t i = 0; i < m_Nodes.size(); i++)
     {
         SRailNodeSA& gameNode = m_GameNodes[i];

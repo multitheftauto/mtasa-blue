@@ -19,8 +19,9 @@ public:
 
     virtual ~CTrainTrackManager() = default;
 
-    // Returns nullptr if there are no free track ID slots left
-    virtual CTrainTrack* CreateTrainTrack(const std::vector<CVector>& nodePositions, bool bLinkLastNodes) = 0;
+    // Returns nullptr if there are no free track ID slots left. Every track is a loop, because the
+    // train code wraps a train's rail distance at the track length rather than stopping it.
+    virtual CTrainTrack* CreateTrainTrack(const std::vector<CVector>& nodePositions) = 0;
     virtual void         DestroyTrainTrack(std::uint8_t trackID) = 0;
     virtual CTrainTrack* GetTrainTrack(std::uint8_t trackID) = 0;
 

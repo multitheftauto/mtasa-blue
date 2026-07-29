@@ -23,15 +23,15 @@ public:
 
     CTrainTrackManagerSA();
 
-    CTrainTrack* CreateTrainTrack(const std::vector<CVector>& nodePositions, bool bLinkLastNodes) override;
+    CTrainTrack* CreateTrainTrack(const std::vector<CVector>& nodePositions) override;
     void         DestroyTrainTrack(std::uint8_t trackID) override;
     CTrainTrack* GetTrainTrack(std::uint8_t trackID) override;
-    float        GetTrackLength(std::uint8_t trackID) const noexcept override;
+    float        GetTrackLength(std::uint8_t trackID) const noexcept override { return trackID < MAX_TRACKS ? ms_TotalTrackLength[trackID] : 0.0f; }
 
-    // Anything that used to read the game's own track globals has to come through here instead,
-    // since after the relocation the originals are never populated
-    static SRailNodeSA* GetTrackNodes(std::uint8_t trackID) noexcept;
-    static std::int32_t GetTrackNodeCount(std::uint8_t trackID) noexcept;
+    // The relocated arrays hold the node data for every track, built-in ones included. Read it from
+    // here: the game's own globals stay empty and are never updated.
+    static SRailNodeSA* GetTrackNodes(std::uint8_t trackID) noexcept { return trackID < MAX_TRACKS ? ms_pTrackNodes[trackID] : nullptr; }
+    static std::int32_t GetTrackNodeCount(std::uint8_t trackID) noexcept { return trackID < MAX_TRACKS ? ms_NumTrackNodes[trackID] : 0; }
 
     // The game's three per-track globals, relocated so a track ID past its built-in 4 stays in bounds.
     // CTrainTrackSA writes its own entry here; nothing else should touch them.

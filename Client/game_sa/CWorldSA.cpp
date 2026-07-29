@@ -782,7 +782,7 @@ int CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutT
     // on it instead of being dragged off to the nearest default track
     for (uchar ucTrackId = 0; ucTrackId < CTrainTrackManagerSA::MAX_TRACKS; ++ucTrackId)
     {
-        // Node data lives in the relocated arrays now, not the game's own (see CTrainTrackManagerSA)
+        // Node data lives in the relocated arrays, not the game's own (see CTrainTrackManagerSA)
         const std::int32_t iNumTrackNodes = CTrainTrackManagerSA::GetTrackNodeCount(ucTrackId);
         const SRailNodeSA* pTrackNodes = CTrainTrackManagerSA::GetTrackNodes(ucTrackId);
 

@@ -24,10 +24,7 @@ class CTrainTrack
 public:
     virtual ~CTrainTrack() = default;
 
-    virtual std::uint8_t                          GetTrackID() const noexcept = 0;
-    virtual const std::vector<STrainTrackNodeSA>& GetNodes() const noexcept = 0;
-    virtual float                                 GetTotalLength() const noexcept = 0;
-    virtual bool                                  GetLastNodesLinked() const noexcept = 0;
+    virtual std::uint8_t GetTrackID() const noexcept = 0;
 
     // Moves a node and recomputes the distances every node past it depends on
     virtual bool SetNodePosition(std::uint32_t nodeIndex, const CVector& position) noexcept = 0;

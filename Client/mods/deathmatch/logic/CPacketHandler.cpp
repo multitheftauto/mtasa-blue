@@ -3741,8 +3741,6 @@ retry:
                         nodePositions.push_back(position.data.vecPosition);
                     }
 
-                    // Trains don't actually drive on these yet; the element exists so scripts can
-                    // read the node data and so the entity stream stays lined up with the server
                     pEntity = new CClientTrainTrack(g_pClientGame->m_pManager, EntityID, nodePositions, bLinkLastNodes);
 
                     break;

@@ -77,7 +77,7 @@ CLuaTrainTrackDefs::TrainTrack CLuaTrainTrackDefs::CreateTrainTrack(lua_State* l
         elementGroup->Add(pTrainTrack);
 
     // Clients need the node data before any train can be put on this track: setTrainTrack refers to
-    // the track by element, so a client that never received it just leaves the train where it was
+    // the track by element, and a client without that element cannot move a train onto it
     if (resource.IsClientSynced())
     {
         CEntityAddPacket packet;
