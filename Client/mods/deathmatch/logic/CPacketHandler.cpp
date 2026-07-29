@@ -3727,16 +3727,23 @@ retry:
 
                 case CClientGame::TRAIN_TRACK:
                 {
-                    // Custom tracks aren't rendered client-side yet (that lands with the client
-                    // train-track element), so just consume the bytes to keep the stream aligned
                     bool bLinkLastNodes;
                     bitStream.ReadBit(bLinkLastNodes);
 
                     unsigned int uiNodeCount = 0;
                     bitStream.ReadCompressed(uiNodeCount);
 
+                    std::vector<CVector> nodePositions;
+                    nodePositions.reserve(uiNodeCount);
                     for (unsigned int i = 0; i < uiNodeCount; i++)
+                    {
                         bitStream.Read(&position);
+                        nodePositions.push_back(position.data.vecPosition);
+                    }
+
+                    // Trains don't actually drive on these yet; the element exists so scripts can
+                    // read the node data and so the entity stream stays lined up with the server
+                    pEntity = new CClientTrainTrack(g_pClientGame->m_pManager, EntityID, nodePositions, bLinkLastNodes);
 
                     break;
                 }
