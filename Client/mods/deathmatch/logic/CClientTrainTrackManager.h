@@ -20,7 +20,7 @@ class CClientTrainTrackManager
     friend class CClientTrainTrack;
 
 public:
-    unsigned int Count() const noexcept { return static_cast<unsigned int>(m_TrainTracks.size()); }
+    unsigned int              Count() const noexcept { return static_cast<unsigned int>(m_TrainTracks.size()); }
     static CClientTrainTrack* Get(ElementID ID);
     void                      DeleteAll();
 
@@ -31,6 +31,6 @@ private:
     void AddToList(CClientTrainTrack* pTrainTrack) { m_TrainTracks.push_back(pTrainTrack); }
     void RemoveFromList(CClientTrainTrack* pTrainTrack) { m_TrainTracks.remove(pTrainTrack); }
 
-    class CClientManager*          m_pManager;
+    class CClientManager*         m_pManager;
     std::list<CClientTrainTrack*> m_TrainTracks;
 };

@@ -774,7 +774,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                     BitStream.WriteBit(pTrainTrack->GetLastNodesLinked());
 
-                    const auto&  nodes = pTrainTrack->GetNodes();
+                    const auto& nodes = pTrainTrack->GetNodes();
                     BitStream.WriteCompressed(static_cast<unsigned int>(nodes.size()));
 
                     for (const auto& node : nodes)

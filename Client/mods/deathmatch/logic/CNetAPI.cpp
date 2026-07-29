@@ -1358,8 +1358,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
             BitStream.ReadBit(bDirection);
             BitStream.Read(fSpeed);
 
-            // A train can be on no track (nil), one of the 4 default tracks, or a custom track
-            // element; only the default case can be applied to the client's native train code so far
+            // A train can be on no track (nil), one of the 4 default tracks, or a custom track element
             uchar ucTrack = 0;
             bool  bTrackIsUsable = false;
 
@@ -1378,6 +1377,13 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
                 {
                     ElementID trackElementID;
                     BitStream.Read(trackElementID);
+
+                    CClientTrainTrack* pTrainTrack = g_pClientGame->GetManager()->GetTrainTrackManager()->Get(trackElementID);
+                    if (pTrainTrack && pTrainTrack->GetGameTrackID() != 0xFF)
+                    {
+                        ucTrack = pTrainTrack->GetGameTrackID();
+                        bTrackIsUsable = true;
+                    }
                 }
             }
 

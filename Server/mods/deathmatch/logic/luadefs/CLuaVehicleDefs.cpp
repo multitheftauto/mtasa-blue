@@ -2827,15 +2827,20 @@ bool CLuaVehicleDefs::SetTrainTrack(CVehicle* pVehicle, CTrainTrack* pTrainTrack
 
     pVehicle->SetTrainTrack(pTrainTrack);
 
-    // Clients only understand the 4 default tracks so far; custom tracks are modelled server-side
-    // and synced through puresync, but the client's native train code can't render them yet
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit(true);
     if (pTrainTrack->IsDefault())
     {
-        CBitStream BitStream;
+        BitStream.pBitStream->WriteBit(true);
         BitStream.pBitStream->Write(pTrainTrack->GetDefaultTrackId());
-
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_TRAIN_TRACK, *BitStream.pBitStream));
     }
+    else
+    {
+        BitStream.pBitStream->WriteBit(false);
+        BitStream.pBitStream->Write(pTrainTrack->GetID());
+    }
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_TRAIN_TRACK, *BitStream.pBitStream));
 
     return true;
 }

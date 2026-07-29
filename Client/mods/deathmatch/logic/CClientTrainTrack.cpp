@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CTrainTrackManager.h>
+#include <game/CTrainTrack.h>
 
 CClientTrainTrack::CClientTrainTrack(CClientManager* pManager, ElementID ID, const std::vector<CVector>& nodePositions, bool bLinkLastNodes)
     : ClassInit(this), CClientEntity(ID)
@@ -22,12 +24,24 @@ CClientTrainTrack::CClientTrainTrack(CClientManager* pManager, ElementID ID, con
     m_bLinkLastNodes = bLinkLastNodes;
     m_vecPosition = nodePositions.empty() ? CVector() : nodePositions.front();
 
+    // This is what the game's native train code actually drives on; if we run out of track ID
+    // slots it comes back nullptr and the track just won't move any train placed on it
+    m_pGameTrainTrack = g_pGame->GetTrainTrackManager()->CreateTrainTrack(nodePositions, bLinkLastNodes);
+
     m_pTrainTrackManager->AddToList(this);
 }
 
 CClientTrainTrack::~CClientTrainTrack()
 {
+    if (m_pGameTrainTrack)
+        g_pGame->GetTrainTrackManager()->DestroyTrainTrack(m_pGameTrainTrack->GetTrackID());
+
     Unlink();
+}
+
+std::uint8_t CClientTrainTrack::GetGameTrackID() const noexcept
+{
+    return m_pGameTrainTrack ? m_pGameTrainTrack->GetTrackID() : 0xFF;
 }
 
 void CClientTrainTrack::Unlink()

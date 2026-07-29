@@ -3229,7 +3229,9 @@ static float* RailTrackLength = reinterpret_cast<float*>(0xC37FEC);
 
 static void _cdecl WrapTrainRailDistance(CTrainSAInterface* train)
 {
-    // Check if the train is driving on a valid rail track (id < NUM_TRACKS)
+    // Custom tracks (see CMultiplayerSA_TrainTracks.cpp) never reach this point; that hook sits
+    // at the top of the same function and returns before getting anywhere near here, so a
+    // trackID >= 4 here always means "not on a rail" rather than "on a custom track"
     if (train->m_ucRailTrackID >= 4)
     {
         train->m_fTrainRailDistance = 0.0f;
