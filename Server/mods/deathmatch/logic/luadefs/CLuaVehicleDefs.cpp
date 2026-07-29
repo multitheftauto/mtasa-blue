@@ -2825,16 +2825,17 @@ bool CLuaVehicleDefs::SetTrainTrack(CVehicle* pVehicle, CTrainTrack* pTrainTrack
     else if (pVehicle->IsDerailed())
         return false;
 
-    // TODO(qaisjp, feature/custom-train-tracks): this needs to support non-default train tracks
-    if (!pTrainTrack->IsDefault())
-        throw std::invalid_argument("setTrainTrack only supports default train tracks");
-
     pVehicle->SetTrainTrack(pTrainTrack);
 
-    CBitStream BitStream;
-    BitStream.pBitStream->Write(pTrainTrack->GetDefaultTrackId());
+    // Clients only understand the 4 default tracks so far; custom tracks are modelled server-side
+    // and synced through puresync, but the client's native train code can't render them yet
+    if (pTrainTrack->IsDefault())
+    {
+        CBitStream BitStream;
+        BitStream.pBitStream->Write(pTrainTrack->GetDefaultTrackId());
 
-    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_TRAIN_TRACK, *BitStream.pBitStream));
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_TRAIN_TRACK, *BitStream.pBitStream));
+    }
 
     return true;
 }

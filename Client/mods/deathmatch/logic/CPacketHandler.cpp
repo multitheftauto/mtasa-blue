@@ -2804,6 +2804,11 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
     // unsigned char        (1)     - size
     // unsigned long        (4)     - color
 
+    // Train tracks:
+    // bool                         - last nodes linked?
+    // unsigned int         (?)     - node count
+    // CVector              (12)    - node position, repeated per node
+
     // Radar areas:
     // CVector2D            (8)     - position
     // CVector2D            (8)     - size
@@ -3716,6 +3721,22 @@ retry:
 
                     pBlip->SetScale(size);
                     pBlip->SetColor(color);
+
+                    break;
+                }
+
+                case CClientGame::TRAIN_TRACK:
+                {
+                    // Custom tracks aren't rendered client-side yet (that lands with the client
+                    // train-track element), so just consume the bytes to keep the stream aligned
+                    bool bLinkLastNodes;
+                    bitStream.ReadBit(bLinkLastNodes);
+
+                    unsigned int uiNodeCount = 0;
+                    bitStream.ReadCompressed(uiNodeCount);
+
+                    for (unsigned int i = 0; i < uiNodeCount; i++)
+                        bitStream.Read(&position);
 
                     break;
                 }

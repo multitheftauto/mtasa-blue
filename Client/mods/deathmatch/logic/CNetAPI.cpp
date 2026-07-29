@@ -1352,20 +1352,42 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
         {
             // Train specific data
             float fPosition = 0.0f;
-            uchar ucTrack = 0;
             bool  bDirection = false;
             float fSpeed = 0.0f;
             BitStream.Read(fPosition);
             BitStream.ReadBit(bDirection);
             BitStream.Read(fSpeed);
-            BitStream.Read(ucTrack);
+
+            // A train can be on no track (nil), one of the 4 default tracks, or a custom track
+            // element; only the default case can be applied to the client's native train code so far
+            uchar ucTrack = 0;
+            bool  bTrackIsUsable = false;
+
+            bool bHasTrack;
+            BitStream.ReadBit(bHasTrack);
+            if (bHasTrack)
+            {
+                bool bIsDefaultTrack;
+                BitStream.ReadBit(bIsDefaultTrack);
+                if (bIsDefaultTrack)
+                {
+                    BitStream.Read(ucTrack);
+                    bTrackIsUsable = true;
+                }
+                else
+                {
+                    ElementID trackElementID;
+                    BitStream.Read(trackElementID);
+                }
+            }
 
             if (vehicleType == CLIENTVEHICLE_TRAIN)
             {
                 if (!pVehicle->IsStreamedIn())
                     pVehicle->SetPosition(position.data.vecPosition, true);
 
-                pVehicle->SetTrainTrack(ucTrack);
+                if (bTrackIsUsable)
+                    pVehicle->SetTrainTrack(ucTrack);
                 pVehicle->SetTrainPosition(fPosition, false);
                 pVehicle->SetTrainDirection(bDirection);
                 pVehicle->SetTrainSpeed(fSpeed);
@@ -1632,6 +1654,10 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         BitStream.Write(fPosition);
         BitStream.WriteBit(bDirection);
         BitStream.Write(fSpeed);
+
+        // The client only knows about the 4 default tracks so far, so it always reports one of those
+        BitStream.WriteBit(true);
+        BitStream.WriteBit(true);
         BitStream.Write(ucTrack);
     }
 

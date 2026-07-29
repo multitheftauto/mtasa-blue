@@ -22,6 +22,7 @@
 #include "CPickup.h"
 #include "CMarker.h"
 #include "CBlip.h"
+#include "CTrainTrack.h"
 #include "CRadarArea.h"
 #include "CWater.h"
 #include "CVehicleManager.h"
@@ -761,6 +762,26 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     SColorSync color;
                     color = pBlip->GetColor();
                     BitStream.Write(&color);
+
+                    break;
+                }
+
+                case CElement::TRAIN_TRACK:
+                {
+                    // Only custom tracks (created with a parent) reach this packet; the 4 default
+                    // tracks are already known to the client through the game's own train code
+                    CTrainTrack* pTrainTrack = static_cast<CTrainTrack*>(pElement);
+
+                    BitStream.WriteBit(pTrainTrack->GetLastNodesLinked());
+
+                    const auto&  nodes = pTrainTrack->GetNodes();
+                    BitStream.WriteCompressed(static_cast<unsigned int>(nodes.size()));
+
+                    for (const auto& node : nodes)
+                    {
+                        position.data.vecPosition = node.position;
+                        BitStream.Write(&position);
+                    }
 
                     break;
                 }

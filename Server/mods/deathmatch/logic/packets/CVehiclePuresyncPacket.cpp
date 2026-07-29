@@ -13,6 +13,7 @@
 #include "CVehiclePuresyncPacket.h"
 #include "CVehicleManager.h"
 #include "CGame.h"
+#include "CElementIDs.h"
 #include "CTrainTrackManager.h"
 #include "CWeaponNames.h"
 #include "Utils.h"
@@ -75,18 +76,36 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             {
                 float        fPosition;
                 bool         bDirection;
-                CTrainTrack* pTrainTrack;
+                CTrainTrack* pTrainTrack = nullptr;
                 float        fSpeed;
 
                 BitStream.Read(fPosition);
                 BitStream.ReadBit(bDirection);
                 BitStream.Read(fSpeed);
 
-                // TODO(qaisjp, feature/custom-train-tracks): this needs to be changed to an ElementID when the time is right (in a backwards compatible manner)
-                // Note: here we use a uchar, in the CTT branch this is a uint. Just don't forget that, it might be important
-                uchar trackIndex;
-                BitStream.Read(trackIndex);
-                pTrainTrack = g_pGame->GetTrainTrackManager()->GetDefaultTrackByIndex(trackIndex);
+                // A train can be on no track (nil), one of the 4 default tracks, or a custom track element
+                bool bHasTrack;
+                BitStream.ReadBit(bHasTrack);
+                if (bHasTrack)
+                {
+                    bool bIsDefaultTrack;
+                    BitStream.ReadBit(bIsDefaultTrack);
+                    if (bIsDefaultTrack)
+                    {
+                        uchar ucDefaultTrackId;
+                        BitStream.Read(ucDefaultTrackId);
+                        pTrainTrack = g_pGame->GetTrainTrackManager()->GetDefaultTrackByIndex(ucDefaultTrackId);
+                    }
+                    else
+                    {
+                        ElementID trackElementID;
+                        BitStream.Read(trackElementID);
+
+                        CElement* pTrackElement = CElementIDs::GetElement(trackElementID);
+                        if (pTrackElement && pTrackElement->GetType() == CElement::TRAIN_TRACK)
+                            pTrainTrack = static_cast<CTrainTrack*>(pTrackElement);
+                    }
+                }
 
                 // But we should only actually apply that train-specific data if that vehicle is train on our side
                 if (vehicleType == VEHICLE_TRAIN)
@@ -482,24 +501,27 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.WriteBit(bDirection);
                     BitStream.Write(fSpeed);
 
-                    // Push the train track information
+                    // Push the train track information; a train can be on no track (nil), one of the 4
+                    // default tracks, or a custom track element, so the reader needs to know which case this is
                     const auto trainTrack = pVehicle->GetTrainTrack();
                     if (!trainTrack || pVehicle->IsDerailed())
                     {
                         // NOTE(qaisjp, feature/custom-train-tracks): when can a train both be on a track AND derailed?
                         // I suppose it's possible for some weirdness here. We should make sure that whenever we set the train track,
                         // we set that the train is NOT derailed; and that whenever we derail the track, we set the train track to nil.
-                        // Note: here we use a uchar, in the CTT branch this is a uint. Just don't forget that, it might be important
-                        BitStream.Write((uchar)0);
+                        BitStream.WriteBit(false);
                     }
-                    else if (trainTrack && trainTrack->IsDefault())
+                    else if (trainTrack->IsDefault())
                     {
+                        BitStream.WriteBit(true);
+                        BitStream.WriteBit(true);
                         BitStream.Write(trainTrack->GetDefaultTrackId());
                     }
                     else
                     {
-                        // TODO(qaisjp, feature/custom-train-tracks): implement behaviour for non-default tracks
-                        assert(0 && "It is impossible for custom train tracks to exist right now, so this should never be reached.");
+                        BitStream.WriteBit(true);
+                        BitStream.WriteBit(false);
+                        BitStream.Write(trainTrack->GetID());
                     }
                 }
 
