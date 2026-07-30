@@ -123,6 +123,18 @@ void CClientPlayerVoice::DecodeAndBuffer(const unsigned char* voiceBuffer, unsig
     if (!voiceBuffer || !voiceBufferLength || voiceBufferLength > 2048)
         return;
 
+    char      pTempBuffer[2048];
+    SpeexBits speexBits;
+    speex_bits_init(&speexBits);
+
+    speex_bits_read_from(&speexBits, reinterpret_cast<const char*>(voiceBuffer), voiceBufferLength);
+    const int decodeResult = speex_decode_int(m_pSpeexDecoderState, &speexBits, (spx_int16_t*)pTempBuffer);
+
+    speex_bits_destroy(&speexBits);
+
+    if (decodeResult < 0)
+        return;
+
     m_Mutex.lock();
 
     if (!m_bVoiceActive)
@@ -141,15 +153,6 @@ void CClientPlayerVoice::DecodeAndBuffer(const unsigned char* voiceBuffer, unsig
     {
         m_Mutex.unlock();
     }
-
-    char      pTempBuffer[2048];
-    SpeexBits speexBits;
-    speex_bits_init(&speexBits);
-
-    speex_bits_read_from(&speexBits, reinterpret_cast<const char*>(voiceBuffer), voiceBufferLength);
-    speex_decode_int(m_pSpeexDecoderState, &speexBits, (spx_int16_t*)pTempBuffer);
-
-    speex_bits_destroy(&speexBits);
 
     unsigned int uiSpeexBlockSize = m_iSpeexIncomingFrameSampleCount * VOICE_SAMPLE_SIZE;
 
@@ -361,7 +364,12 @@ bool CClientPlayerVoice::SetFxEffect(uint uiFxEffect, bool bEnable)
 
     // Apply if active
     if (m_pBassPlaybackStream)
+    {
         ApplyFxEffects();
+        // ApplyFxEffects clears m_EnabledEffects[i] when BASS rejects the effect
+        // (e.g. I3DL2REVERB on Windows 11 24H2, #4259), so report the truth.
+        return (m_EnabledEffects[uiFxEffect] != 0) == bEnable;
+    }
 
     return true;
 }
@@ -378,7 +386,12 @@ void CClientPlayerVoice::ApplyFxEffects()
             // Switch on
             m_FxEffects[i] = BASS_ChannelSetFX(m_pBassPlaybackStream, i, 0);
             if (!m_FxEffects[i])
+            {
+                // Effect could not be wired up by BASS (e.g. Windows 11 24H2
+                // removed BASS_FX_DX8_I3DL2REVERB at the OS level, #4259).
+                g_pCore->GetConsole()->Printf("BASS ERROR %d in BASS_ChannelSetFX (effect %u)", BASS_ErrorGetCode(), i);
                 m_FxEffects[i] = INVALID_FX_HANDLE;
+            }
         }
         else
         {
@@ -390,6 +403,11 @@ void CClientPlayerVoice::ApplyFxEffects()
                 m_FxEffects[i] = 0;
             }
         }
+
+        // Mirror failure into m_EnabledEffects so IsFxEffectEnabled() reports
+        // the truth and re-enable requests don't silently leave a dangling handle.
+        if (m_FxEffects[i] == INVALID_FX_HANDLE)
+            m_EnabledEffects[i] = 0;
     }
 }
 

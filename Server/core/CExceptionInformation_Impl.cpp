@@ -128,8 +128,8 @@ void CExceptionInformation_Impl::Set(unsigned int iCode, _EXCEPTION_POINTERS* pE
 }
 
 /**
- * Returns the name of the module in which the exception occured, or
- * an emtpy string if the module could not be found.
+ * Returns the name of the module in which the exception occurred, or
+ * an empty string if the module could not be found.
  *
  * @return <code>true</code> if successful, <code>false</code> otherwise.
  */

@@ -1,0 +1,41 @@
+name: "Tests"
+
+on:
+  push:
+    branches: ["master", "tests"]
+  pull_request:
+    branches: ["master"]
+  workflow_dispatch:
+
+jobs:
+  client-tests:
+    name: Client Tests (x86 Debug)
+    runs-on: windows-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Generate project files
+        shell: cmd
+        run: |
+          utils\premake5.exe install_cef
+          utils\premake5.exe install_unifont
+          utils\premake5.exe install_discord
+          utils\premake5.exe vs2026
+
+      - name: Build Tests_Client
+        shell: cmd
+        run: msbuild Build\Tests_Client.vcxproj /p:Configuration=Debug /p:Platform=Win32 /p:PlatformToolset=v143 /nologo /v:minimal
+
+      - name: Run tests
+        run: Bin\tests\Tests_Client_d.exe --gtest_output=xml:Bin\tests\test_results.xml
+
+      - name: Upload test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: Bin/tests/test_results.xml

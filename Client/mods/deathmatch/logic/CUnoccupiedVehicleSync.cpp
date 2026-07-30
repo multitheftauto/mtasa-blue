@@ -220,7 +220,7 @@ void CUnoccupiedVehicleSync::UpdateDamageModels()
         list<CDeathmatchVehicle*>::const_iterator iter = m_List.begin();
         for (; iter != m_List.end(); iter++)
         {
-            // Sync its damage model changes if neccessary
+            // Sync its damage model changes if necessary
             (*iter)->SyncDamageModel();
         }
     }
@@ -235,7 +235,8 @@ void CUnoccupiedVehicleSync::UpdateStates()
         !pPlayer->GetRealOccupiedVehicle())
     {
         // Make sure it's valid and add it to our list temporarily
-        if (auto* pVehicle = dynamic_cast<CDeathmatchVehicle*>(pPlayer->GetOccupiedVehicle()))
+        pVehicle = dynamic_cast<CDeathmatchVehicle*>(pPlayer->GetOccupiedVehicle());
+        if (pVehicle)
             m_List.push_front(pVehicle);
     }
 

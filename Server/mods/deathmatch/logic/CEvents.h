@@ -14,7 +14,6 @@
 #include <string>
 #include <list>
 #include <vector>
-#include "CEventContext.h"
 
 struct SEvent
 {
@@ -41,23 +40,32 @@ public:
     CFastHashMap<SString, SEvent*>::const_iterator IterBegin() { return m_EventHashMap.begin(); };
     CFastHashMap<SString, SEvent*>::const_iterator IterEnd() { return m_EventHashMap.end(); };
 
-    void PreEventPulse(CEventContext* pContext);
-    void PostEventPulse(CEventContext* pContext);
+    void PreEventPulse();
+    void PostEventPulse();
 
     void        CancelEvent(bool bCancelled = true);
     void        CancelEvent(bool bCancelled, const char* szReason);
     bool        WasEventCancelled();
     const char* GetLastError();
+    const char* WasLastError();
 
 private:
     void RemoveAllEvents();
 
     CFastHashMap<SString, SEvent*> m_EventHashMap;
 
-    std::vector<int> m_CancelledList;
-    bool             m_bEventCancelled;
-    bool             m_bWasEventCancelled;
-    SString          m_strLastError;
+    std::vector<int>     m_CancelledList;
+    std::vector<SString> m_LastErrorList;  // Stacked alongside m_CancelledList so a nested
+                                           // event's cancel reason cannot overwrite an outer
+                                           // event's reason (see issue #4529 / PR fix for #4873).
+    bool m_bEventCancelled;
+    bool m_bWasEventCancelled;
 
-    std::vector<CEventContext*> m_ContextStack;
+    SString m_strLastError;
+    SString m_strWasLastError;  // Mirrors m_bWasEventCancelled: captures the reason set via
+                                // cancelEvent() during the call, since m_strLastError itself
+                                // is restored to the outer event's reason once the call returns
+                                // (see issue #4963 - callers reading the reason after CallEvent()
+                                // returns, e.g. onPlayerConnect, must use this instead of
+                                // GetLastError()).
 };

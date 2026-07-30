@@ -263,6 +263,12 @@ public:
     bool GetTeleported() const noexcept { return m_teleported; }
     void SetTeleported(bool state) noexcept { m_teleported = state; }
 
+    long long     GetLastVoiceDataTime() const noexcept { return m_lastVoiceDataTime; }
+    void          SetLastVoiceDataTime(long long time) noexcept { m_lastVoiceDataTime = time; }
+    unsigned char GetVoiceDataPacketsInInterval() const noexcept { return m_voiceDataPacketsInInterval; }
+    void          SetVoiceDataPacketsInInterval(unsigned char count) noexcept { m_voiceDataPacketsInInterval = count; }
+    void          IncrementVoiceDataPacketsInInterval() noexcept { ++m_voiceDataPacketsInInterval; }
+
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
 
@@ -462,5 +468,7 @@ private:
     ushort  m_usPrevDimension;
     SString m_strQuitReasonForLog;
 
-    bool m_teleported = false;
+    bool          m_teleported = false;
+    long long     m_lastVoiceDataTime = 0;
+    unsigned char m_voiceDataPacketsInInterval = 0;
 };

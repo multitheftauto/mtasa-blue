@@ -71,7 +71,6 @@ public:
     static bool           GetElementDistanceFromCentreOfMassToBaseOfModel(CClientEntity& Entity, float& fDistance);
     static bool           GetElementAttachedOffsets(CClientEntity& Entity, CVector& vecPosition, CVector& vecRotation);
     static bool           GetElementAlpha(CClientEntity& Entity, unsigned char& ucAlpha);
-    static bool           IsElementOnScreen(CClientEntity& Entity, bool& bOnScreen);
     static bool           GetElementHealth(CClientEntity& Entity, float& fHealth);
     static bool           GetElementModel(CClientEntity& Entity, unsigned short& usModel);
     static bool           IsElementInWater(CClientEntity& Entity, bool& bInWater);
@@ -172,7 +171,7 @@ public:
     static bool SetPedRotation(CClientEntity& Entity, float fRotation, bool bNewWay);
     static bool SetPedCanBeKnockedOffBike(CClientEntity& Entity, bool bCanBeKnockedOffBike);
     static bool SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
-                                bool bUpdatePosition, bool bInterruptable, bool bFreezeLastFrame);
+                                bool bUpdatePosition, bool bInterruptible, bool bFreezeLastFrame);
 
     static bool SetPedAnimationProgress(CClientEntity& Entity, const SString& strAnimName, float fProgress);
     static bool SetPedAnimationSpeed(CClientEntity& Entity, const SString& strAnimName, float fSpeed);

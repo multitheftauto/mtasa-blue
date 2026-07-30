@@ -173,7 +173,7 @@ HRESULT CProxyDirect3DEffect::CloneEffect(LPDIRECT3DDEVICE9 pDevice, LPD3DXEFFEC
 //
 // MyD3DXCreateEffectFromFile
 //
-// Wrap result of orignal function
+// Wrap result of original function
 //
 /////////////////////////////////////////////////////////////
 HRESULT WINAPI MyD3DXCreateEffectFromFile(LPDIRECT3DDEVICE9 pDevice, LPCSTR pSrcFile, CONST D3DXMACRO* pDefines, LPD3DXINCLUDE pInclude, DWORD Flags,
@@ -192,7 +192,7 @@ HRESULT WINAPI MyD3DXCreateEffectFromFile(LPDIRECT3DDEVICE9 pDevice, LPCSTR pSrc
 //
 // D3DXCreateEffect
 //
-// Wrap result of orignal function
+// Wrap result of original function
 //
 /////////////////////////////////////////////////////////////
 HRESULT WINAPI MyD3DXCreateEffect(LPDIRECT3DDEVICE9 pDevice, LPCVOID pSrcData, UINT SrcDataLen, CONST D3DXMACRO* pDefines, LPD3DXINCLUDE pInclude, DWORD Flags,

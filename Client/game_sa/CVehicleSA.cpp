@@ -17,7 +17,6 @@
 #include "CBikeSA.h"
 #include "CCameraSA.h"
 #include "CColModelSA.h"
-#include "CColModelGuard.h"
 #include "CFxManagerSA.h"
 #include "CFxSystemSA.h"
 #include "CGameSA.h"
@@ -31,12 +30,32 @@
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
 #include "CFireManagerSA.h"
-#include "enums/VehicleType.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
 static BOOL m_bVehicleSunGlare = false;
+
+// PreRender re-asserts rpATOMICRENDER on all wheel atomics every frame, which re-shows
+// the Rhino's middle wheels that SetupModelNodes hides at init. Re-clear the flag here so
+// it stays the last write of the frame and the wheels remain invisible like in vanilla.
+static RwObject* __cdecl ClearAtomicRenderFlagCB(RwObject* object, void* /*data*/)
+{
+    object->flags &= ~0x04;  // rpATOMICRENDER
+    return object;
+}
+
+static void __fastcall RehideRhinoMiddleWheels(CAutomobileSAInterface* vehicle)
+{
+    if (!vehicle || vehicle->m_nModelIndex != 432 /* Rhino */)
+        return;
+
+    for (auto comp : {eCarNodes::WHEEL_LM, eCarNodes::WHEEL_RM})
+    {
+        if (RwFrame* frame = vehicle->m_aCarNodes[static_cast<std::size_t>(comp)])
+            RwFrameForAllObjects(frame, (void*)ClearAtomicRenderFlagCB, nullptr);
+    }
+}
 
 static void __declspec(naked) HOOK_Vehicle_PreRender(void)
 {
@@ -53,6 +72,13 @@ static void __declspec(naked) HOOK_Vehicle_PreRender(void)
         call    eax
 
         noglare:
+        // Re-hide Rhino middle wheels after PreRender's generic-car block re-shows them.
+        // esi still points to the CAutomobileSAInterface at this hook site.
+        pushad
+        mov     ecx, esi
+        call    RehideRhinoMiddleWheels
+        popad
+
         mov     [esp+0D4h], edi
         push    6ABD04h
         retn
@@ -69,6 +95,13 @@ static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleI
 
     if (vehicle->pEntity->GetVehicleRotorState())
     {
+        // Blown aircraft must not re-enter the custom rotor processing path. With
+        // vehicle_engine_autostart disabled this path moves unattended aircraft to
+        // STATUS_PHYSICS, which lets wreck contacts repeatedly create GTA flying
+        // components/explosions after the vehicle has already blown up.
+        if (vehicle->pEntity->GetHealth() <= 0.0f)
+            return false;
+
         if (g_pCore->GetMultiplayer()->IsVehicleEngineAutoStartEnabled())  // keep default behavior
             return true;
 
@@ -205,7 +238,7 @@ namespace
                 RwFrameDump(ret, pVehicleSA);
             }
             // don't re-add, check ret for validity, if it has an empty string at this point it isn't a variant or it's already added
-            if (pVehicleSA->IsComponentPresent(ret->szName) == false && ret->szName[0] != '\0')
+            if (pVehicleSA->IsComponentPresent(ret->szName) == false && ret->szName != "")
             {
                 pVehicleSA->AddComponent(ret, true);
             }
@@ -1883,14 +1916,15 @@ bool CVehicleSA::UpdateMovingCollision(float fAngle)
 
 void* CVehicleSA::GetPrivateSuspensionLines()
 {
-    if (m_pSuspensionLines == nullptr)
+    if (m_pSuspensionLines == NULL)
     {
         CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-        if (!pModelInfo)
-            return nullptr;
-
-        CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-        CColDataSA*                pColData = (pInterface && pInterface->pColModel) ? pInterface->pColModel->m_data : nullptr;
+        // Validate the model/collision chain before deref. During streaming
+        // GC races any of these pointers can be transiently null while a
+        // CAutomobile still runs a tick on the entity.
+        CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+        CColModelSAInterface*      pColModel = pInterface ? pInterface->pColModel : nullptr;
+        CColDataSA*                pColData = pColModel ? pColModel->m_data : nullptr;
         if (pModelInfo->IsMonsterTruck())
         {
             // Monster truck suspension data is 0x90 BYTES rather than 0x80 (some extra stuff I guess)
@@ -1903,9 +1937,11 @@ void* CVehicleSA::GetPrivateSuspensionLines()
         }
         else
         {
-            // CAutomobile allocates wheels * 32 (0x20)
-            const std::size_t numLines = pColData ? std::min<std::size_t>(pColData->m_numSuspensionLines, MAX_SUSPENSION_LINES) : MAX_SUSPENSION_LINES;
-            m_pSuspensionLines = new BYTE[numLines * SUSPENSION_SIZE_STANDARD];
+            // CAutomobile allocates wheels * 32 (0x20). Fall back to a safe
+            // default count when col data is unavailable so we never allocate
+            // from a garbage size and never deref a null pColData.
+            const std::size_t numLines = pColData ? pColData->m_numSuspensionLines : 4;
+            m_pSuspensionLines = new BYTE[numLines * 0x20];
         }
     }
 
@@ -1915,82 +1951,51 @@ void* CVehicleSA::GetPrivateSuspensionLines()
 void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-    if (!pModelInfo)
-        return;
-
-    // Protect collision model from streaming GC
-    CColModelGuard guard(static_cast<CModelInfoSA*>(pModelInfo));
-    if (!guard.IsValid())
-        return;
-
-    CColDataSA* pColData = guard.GetColData();
+    // Same guard as GetPrivateSuspensionLines: the streaming GC can yank
+    // collision data out from under us, leaving dangling pointers here.
+    CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+    CColModelSAInterface*      pColModel = pInterface ? pInterface->pColModel : nullptr;
+    CColDataSA*                pColData = pColModel ? pColModel->m_data : nullptr;
     if (!pColData || !pColData->m_suspensionLines)
         return;
 
-    void* pPrivateLines = GetPrivateSuspensionLines();
-    if (!pPrivateLines)
-        return;
-
-    // Determine copy size based on vehicle type
-    std::size_t copySize = 0;
     if (pModelInfo->IsMonsterTruck())
     {
-        // Monster trucks: 0x90 bytes
-        copySize = SUSPENSION_SIZE_MONSTER_TRUCK;
+        // Monster trucks are 0x90 bytes not 0x80
+        memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, 0x90);
     }
     else if (pModelInfo->IsBike())
     {
-        // Bikes: 0x80 bytes (2 wheels with extra data)
-        copySize = SUSPENSION_SIZE_BIKE;
+        // Bikes are 0x80 bytes not 0x40
+        memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, 0x80);
     }
     else
     {
-        // CAutomobile: wheels * 0x20 bytes
-        const std::size_t numLines = std::min<std::size_t>(pColData->m_numSuspensionLines, MAX_SUSPENSION_LINES);
-        copySize = numLines * SUSPENSION_SIZE_STANDARD;
-    }
-
-    if (copySize > 0 && copySize <= MAX_SUSPENSION_LINES * SUSPENSION_SIZE_STANDARD)
-    {
-        memcpy(pPrivateLines, pColData->m_suspensionLines, copySize);
+        // CAutomobile allocates wheels * 32 (0x20)
+        memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, pColData->m_numSuspensionLines * 0x20);
     }
 }
 
 void CVehicleSA::RecalculateSuspensionLines()
 {
     CHandlingEntry* pHandlingEntry = GetHandlingData();
-    if (!pHandlingEntry)
-        return;
 
-    const std::uint32_t dwModel = GetModelIndex();
-
+    DWORD       dwModel = GetModelIndex();
     CModelInfo* pModelInfo = pGame->GetModelInfo(dwModel);
-    if (!pModelInfo || !pModelInfo->GetInterface())
+    if (!pModelInfo)
         return;
 
-    // Only for vehicles with suspension lines
-    if (!(pModelInfo->IsMonsterTruck() || pModelInfo->IsCar()))
-        return;
+    // Only cars and monster trucks use this suspension setup path.
+    if ((pModelInfo->IsMonsterTruck() || pModelInfo->IsCar()))
+    {
+        // Trains (Their trailers do as well!)
+        if (pModelInfo->IsTrain() || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590)
+            return;
 
-    // Skip trains and their trailers (no suspension lines)
-    if (pModelInfo->IsTrain() || dwModel == static_cast<std::uint32_t>(VehicleType::VT_FREIFLAT) ||
-        dwModel == static_cast<std::uint32_t>(VehicleType::VT_STREAKC) || dwModel == static_cast<std::uint32_t>(VehicleType::VT_FREIBOX))
-        return;
+        GetVehicleInterface()->SetupSuspensionLines();
 
-    // Protect collision model before accessing suspension data
-    CColModelGuard guard(static_cast<CModelInfoSA*>(pModelInfo));
-    if (!guard.IsValid())
-        return;
-
-    CVehicleSAInterface* pVehicleInterface = GetVehicleInterface();
-    if (!pVehicleInterface)
-        return;
-
-    // Safe to call now - collision is protected by guard
-    pVehicleInterface->SetupSuspensionLines();
-
-    // Copy to private storage while still protected
-    CopyGlobalSuspensionLinesToPrivate();
+        CopyGlobalSuspensionLinesToPrivate();
+    }
 }
 
 void CVehicleSA::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount)
@@ -2263,7 +2268,7 @@ void CVehicleSA::AddComponent(RwFrame* pFrame, bool bReadOnly)
         return;
 
     // if the frame already exists ignore it
-    if (IsComponentPresent(pFrame->szName) || pFrame->szName[0] == '\0')
+    if (IsComponentPresent(pFrame->szName) || pFrame->szName == "")
         return;
 
     SString strName = pFrame->szName;
@@ -2379,8 +2384,20 @@ bool CVehicleSA::SetComponentVisible(const SString& vehicleComponent, bool bRequ
                 RwObject* pAtomic = atomicList[i];
                 int       AtomicId = pGame->GetVisibilityPlugins()->GetAtomicId(pAtomic);
 
-                if ((isComponentDamaged && (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED)) ||
-                    (!isComponentDamaged && (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_UNDAMAGED)))
+                const bool bHasDamagedVersion = (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED) != 0;
+                const bool bHasUndamagedVersion = (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_UNDAMAGED) != 0;
+
+                // If this atomic has no two-version flags, it is a single-version component and
+                // should always be shown when visibility is requested.
+                bool bShouldShow = (!bHasDamagedVersion && !bHasUndamagedVersion);
+
+                // For two-version components, show the matching damage state.
+                if (isComponentDamaged)
+                    bShouldShow = bShouldShow || bHasDamagedVersion;
+                else
+                    bShouldShow = bShouldShow || bHasUndamagedVersion;
+
+                if (bShouldShow)
                     pAtomic->flags |= 0x04;
             }
         }
@@ -2557,15 +2574,7 @@ bool CVehicleSA::SetPlateText(const SString& strText)
     CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
     if (!pModelInfo)
         return false;
-
-    auto* pVehicleModelInfo = static_cast<CVehicleModelInfoSAInterface*>(pModelInfo->GetInterface());
-    if (!pVehicleModelInfo)
-    {
-        pModelInfo->Request(BLOCKING, "SetPlateText");
-        pVehicleModelInfo = static_cast<CVehicleModelInfoSAInterface*>(pModelInfo->GetInterface());
-        if (!pVehicleModelInfo)
-            return false;
-    }
+    CVehicleModelInfoSAInterface* pVehicleModelInfo = (CVehicleModelInfoSAInterface*)pModelInfo->GetInterface();
 
     // Copy text
     strncpy(pVehicleModelInfo->plateText, *strText, 8);
@@ -2633,17 +2642,17 @@ void CVehicleSA::ReinitAudio()
     if (!m_pVehicleAudioEntity)
         return;
 
-    auto* pAudioInterface = m_pVehicleAudioEntity->GetInterface();
-    if (!pAudioInterface)
+    auto* audioInterface = m_pVehicleAudioEntity->GetInterface();
+    if (!audioInterface)
         return;
 
-    CancelVehicleAudioSlots(pAudioInterface);
+    CancelVehicleAudioSlots(audioInterface);
 
-    pAudioInterface->TerminateAudio();
-    pAudioInterface->InitAudio(GetVehicleInterface());
+    audioInterface->TerminateAudio();
+    audioInterface->InitAudio(GetVehicleInterface());
 
     CPed* pLocalPlayer = pGame->GetPedContext();
 
     if (IsPassenger(pLocalPlayer) || GetDriver() == pLocalPlayer)
-        pAudioInterface->SoundJoin();
+        audioInterface->SoundJoin();
 }

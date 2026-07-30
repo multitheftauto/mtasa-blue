@@ -2366,7 +2366,7 @@ int CLuaVehicleDefs::SetTrainSpeed(lua_State* luaVM)
 bool CLuaVehicleDefs::SetTrainTrack(CClientVehicle* pVehicle, uchar ucTrack)
 {
     if (ucTrack > 3)
-        throw new std::invalid_argument("Invalid track number range (0-3)");
+        throw std::invalid_argument("Invalid track number range (0-3)");
 
     if (pVehicle->GetVehicleType() != CLIENTVEHICLE_TRAIN)
         return false;
@@ -3202,7 +3202,7 @@ int CLuaVehicleDefs::SetVehicleSirens(lua_State* luaVM)
     {
         if (ucSirenID > 0 && ucSirenID < 9)
         {
-            // Array indicies start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
+            // Array indices start at 0 so compensate here. This way all code works properly and we get nice 1-8 numbers for API
             ucSirenID--;
             argStream.ReadVector3D(tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions);
             argStream.ReadNumber(tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour.R);
@@ -4417,7 +4417,7 @@ bool CLuaVehicleDefs::SetSmokeTrailEnabled(CClientVehicle* vehicle, bool state)
 {
     std::uint16_t model = vehicle->GetModel();
     if (model != 512 && model != 513)
-        throw LuaFunctionError("Invaild model ID");
+        throw LuaFunctionError("Invalid model ID");
 
     vehicle->SetSmokeTrailEnabled(state);
     return true;

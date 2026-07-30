@@ -24,6 +24,9 @@ void CVectorGraphicItem::PostConstruct(CRenderItemManager* pManager, uint width,
     m_uiSizeY = height;
     m_uiSurfaceSizeX = width;
     m_uiSurfaceSizeY = height;
+    // lunasvg writes premultiplied ARGB into the surface; let the draw
+    // path use a PM-aware blend instead of unpremultiplying per pixel.
+    m_bPremultipliedAlpha = true;
 
     CreateUnderlyingData();
 }

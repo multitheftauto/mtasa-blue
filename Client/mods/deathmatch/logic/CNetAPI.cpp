@@ -14,6 +14,8 @@
 #include <game/CWeapon.h>
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
+#include <game/CTaskManager.h>
+#include <game/Task.h>
 #include <enums/VehicleType.h>
 
 extern CClientGame* g_pClientGame;
@@ -30,6 +32,8 @@ CNetAPI::CNetAPI(CClientManager* pManager)
     m_ulLastSyncReturnTime = 0;
     m_bStoredReturnSync = false;
     m_bIncreaseTimeoutTime = false;
+    m_ulDeadSyncGraceEndTime = 0;
+    m_bWasDeadOnNetwork = false;
 }
 
 bool CNetAPI::ProcessPacket(unsigned char bytePacketID, NetBitStreamInterface& BitStream)
@@ -297,7 +301,20 @@ void CNetAPI::DoPulse()
         CClientPlayer* pPlayer = m_pPlayerManager->GetLocalPlayer();
         if (pPlayer)
         {
-            unsigned long ulCurrentTime = CClientTime::GetTime();
+            unsigned long           ulCurrentTime = CClientTime::GetTime();
+            constexpr unsigned long DEAD_SYNC_GRACE_MS = 1000;
+
+            const bool bIsDeadOnNetwork = pPlayer->IsDeadOnNetwork();
+            if (bIsDeadOnNetwork && !m_bWasDeadOnNetwork)
+                m_ulDeadSyncGraceEndTime = ulCurrentTime + DEAD_SYNC_GRACE_MS;
+            m_bWasDeadOnNetwork = bIsDeadOnNetwork;
+
+            const auto inOutState = pPlayer->GetVehicleInOutState();
+            const bool bIsTransitioningVehicle =
+                inOutState == VEHICLE_INOUT_GETTING_IN || inOutState == VEHICLE_INOUT_GETTING_OUT || inOutState == VEHICLE_INOUT_JACKING;
+            // Keep dead-player sync for a short period after death and during vehicle transitions.
+            // This preserves corpse/fall settle updates without keeping full puresync active indefinitely.
+            const bool bAllowDeadStateSync = !bIsDeadOnNetwork || ulCurrentTime <= m_ulDeadSyncGraceEndTime || bIsTransitioningVehicle;
 
             // Grab the player vehicle
             CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
@@ -306,7 +323,7 @@ void CNetAPI::DoPulse()
             m_pManager->GetPacketRecorder()->RecordLocalData(pPlayer);
 
             // We should do a puresync?
-            if (IsPureSyncNeeded() && !g_pClientGame->IsDownloadingBigPacket())
+            if (bAllowDeadStateSync && IsPureSyncNeeded() && !g_pClientGame->IsDownloadingBigPacket())
             {
                 // Are in a vehicle?
                 if (pVehicle)
@@ -364,7 +381,7 @@ void CNetAPI::DoPulse()
             else
             {
                 // We should do a keysync?
-                if (IsSmallKeySyncNeeded(pPlayer) && !g_pClientGame->IsDownloadingBigPacket())
+                if (bAllowDeadStateSync && IsSmallKeySyncNeeded(pPlayer) && !g_pClientGame->IsDownloadingBigPacket())
                 {
                     // Send a keysync packet
                     NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
@@ -381,9 +398,12 @@ void CNetAPI::DoPulse()
             }
 
             // Time to freeze because of lack of return sync?
+            // Only treat missing return-sync as network trouble while the local player is alive.
+            // During expected dead/spectate periods (e.g. race map voting), return-sync can pause
+            // by design and would otherwise show a misleading "NETWORK TROUBLE" warning.
             if (!g_pClientGame->IsDownloadingBigPacket() && (m_bStoredReturnSync) && (m_ulLastPuresyncTime != 0) && (m_ulLastSyncReturnTime != 0) &&
-                (ulCurrentTime <= m_ulLastPuresyncTime + 5000) && (ulCurrentTime >= m_ulLastSyncReturnTime + 10000) &&
-                (!g_pClientGame->GetLocalPlayer()->m_bIsGettingIntoVehicle) && (!m_bIncreaseTimeoutTime))
+                (ulCurrentTime <= m_ulLastPuresyncTime + 5000) && (ulCurrentTime >= m_ulLastSyncReturnTime + 10000) && !pPlayer->IsDead() &&
+                !pPlayer->IsDying() && (!g_pClientGame->GetLocalPlayer()->m_bIsGettingIntoVehicle) && (!m_bIncreaseTimeoutTime))
             {
                 // No vehicle or vehicle in seat 0?
                 if (!pVehicle || pPlayer->GetOccupiedVehicleSeat() == 0)
@@ -1094,6 +1114,20 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     // Write the full player keys
     CControllerState ControllerState;
     pPlayerModel->GetControllerState(ControllerState);
+
+    // The aim/fire buttons may still be held from before we received our current weapon.
+    // GTA:SA only starts TASK_SIMPLE_USE_GUN on a fresh button press, so clear stale bits
+    // here to keep the aim sync below consistent with our own pose.
+    if (ControllerState.RightShoulder1 || ControllerState.ButtonCircle)
+    {
+        CTask* pAttackTask = pPlayerModel->GetTaskManager()->GetTaskSecondary(TASK_SECONDARY_ATTACK);
+        if (!pAttackTask || pAttackTask->GetTaskType() != TASK_SIMPLE_USE_GUN)
+        {
+            ControllerState.RightShoulder1 = 0;
+            ControllerState.ButtonCircle = 0;
+        }
+    }
+
     WriteFullKeysync(ControllerState, BitStream);
 
     // Get the contact entity
@@ -1669,6 +1703,34 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
         BitStream.WriteBit(false);
     }
 
+    if (!g_pClientGame->GetDamageSent())
+    {
+        g_pClientGame->SetDamageSent(true);
+
+        ElementID DamagerID = g_pClientGame->GetDamagerID();
+        if (DamagerID != RESERVED_ELEMENT_ID)
+        {
+            BitStream.WriteBit(true);
+            BitStream.Write(DamagerID);
+
+            SWeaponTypeSync weaponType;
+            weaponType.data.ucWeaponType = g_pClientGame->GetDamageWeapon();
+            BitStream.Write(&weaponType);
+
+            SBodypartSync bodypart;
+            bodypart.data.uiBodypart = g_pClientGame->GetDamageBodyPiece();
+            BitStream.Write(&bodypart);
+        }
+        else
+        {
+            BitStream.WriteBit(false);
+        }
+    }
+    else
+    {
+        BitStream.WriteBit(false);
+    }
+
     // Player health sync (scaled from 0.0f-200.0f to 0-255 to save three bytes).
     // Scale goes up to 200.0f because having max stats gives you the double of health.
     SPlayerHealthSync health;
@@ -2209,7 +2271,12 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
 {
     SVehicleDamageSyncMethodeB damage;
     BitStream.Read(&damage);
-    bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
+
+    // Do not spawn flying components when applying damage to already-blown
+    // vehicles. Physics collisions and burn explosions can trigger repeated
+    // damage syncs on destroyed vehicles, each of which would spawn new
+    // flying components even though the vehicle is already wrecked.
+    bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled() && !pVehicle->IsBlown();
 
     if (damage.data.bSyncDoors)
         for (unsigned char i = 0; i < MAX_DOORS; ++i)

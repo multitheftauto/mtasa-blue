@@ -258,6 +258,8 @@ void CClientVariables::ValidateValues()
     ClampValue("chat_text_alignment", Chat::Text::Align::LEFT, Chat::Text::Align::RIGHT);
     ClampValue("text_scale", 0.8f, 3.0f);
     ClampValue("mastervolume", 0.0f, 1.0f);
+    ClampValue("radiovolume", 0.0f, 1.0f);
+    ClampValue("sfxvolume", 0.0f, 1.0f);
     ClampValue("mtavolume", 0.0f, 1.0f);
     ClampValue("voicevolume", 0.0f, 1.0f);
     ClampValue("mapalpha", 0, 255);
@@ -326,6 +328,8 @@ void CClientVariables::LoadDefaults()
     DEFAULT("steer_with_mouse", false);                                     // steering with mouse controls
     DEFAULT("classic_controls", false);                                     // classic/standard controls
     DEFAULT("mastervolume", 1.0f);                                          // master volume
+    DEFAULT("radiovolume", 1.0f);                                           // radio volume (unscaled)
+    DEFAULT("sfxvolume", 1.0f);                                             // sfx volume (unscaled)
     DEFAULT("mtavolume", 1.0f);                                             // custom sound's volume
     DEFAULT("voicevolume", 1.0f);                                           // voice chat output volume
     DEFAULT("mapalpha", 155);                                               // player map alpha
@@ -392,6 +396,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("discord_rpc_share_data", false);            // Consistent Rich Presence data sharing
     DEFAULT("discord_rpc_share_data_firsttime", false);  // Display the user data sharing consent dialog box - for the first time
     DEFAULT("browser_enable_gpu", true);                 // Enable GPU in CEF? (allows stuff like WebGL to function)
+    DEFAULT("browser_enable_video_acceleration", true);  // Enable hardware video decoding in CEF?
     DEFAULT("process_cpu_affinity", true);               // Set CPU 0 affinity to improve game performance and fix the known issue in single-threaded games
     DEFAULT("ask_before_disconnect", true);              // Ask before disconnecting from a server
     DEFAULT("allow_steam_client", false);                // Allow connecting with the local Steam client (to set GTA:SA ingame status)

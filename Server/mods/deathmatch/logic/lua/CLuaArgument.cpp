@@ -59,7 +59,7 @@ void CLuaArgument::CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLua
     // Clear the string
     m_strString = "";
 
-    // Destroy our old tabledata if neccessary
+    // Destroy our old tabledata if necessary
     DeleteTableData();
 
 #ifdef MTA_DEBUG
@@ -435,7 +435,7 @@ bool CLuaArgument::GetAsString(SString& strBuffer)
 }
 
 // Can't use bitStream.Version() here as it is sometimes not set
-bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables, unsigned int uiDepth)
 {
     DeleteTableData();
     m_iType = LUA_TNIL;
@@ -494,7 +494,7 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             case LUA_TTABLE:
             {
                 m_pTableData = new CLuaArguments();
-                if (!m_pTableData->ReadFromBitStream(bitStream, pKnownTables))
+                if (!m_pTableData->ReadFromBitStream(bitStream, pKnownTables, uiDepth + 1))
                 {
                     DeleteTableData();
                     return false;
@@ -730,7 +730,7 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
             }
             else
             {
-                // Jax: this just spams the script debugger, it's not really neccesary
+                // Jax: this just spams the script debugger, it's not really necessary
                 // LogUnableToPacketize ( "Couldn't packetize argument list, invalid element specified." );
 
                 // Write a nil though so other side won't get out of sync

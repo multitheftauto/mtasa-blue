@@ -47,7 +47,7 @@ public:
 
 private:
     void RestoreDFF(CModelInfo* pModelInfo);
-    void RestoreTXD();
+    void RestoreTXD(CModelInfo* pModelInfo);
 
 protected:
     CClientManager* m_pManager;
