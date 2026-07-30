@@ -18,12 +18,14 @@ struct STrackNode
     CVector position;
     float   railDistance;
 
+    // Builds a node from the game's own on-disk track format, which stores coordinates in eighths of
+    // a unit and rail distances in thirds
     STrackNode(std::int16_t x, std::int16_t y, std::int16_t z, std::uint16_t distance)
     {
-        position.fX = 8.0f * x;
-        position.fY = 8.0f * y;
-        position.fZ = 8.0f * z;
-        railDistance = 3.0f * distance;  // TODO(Jusonex, feature/custom-train-tracks/9063a3dc080): Remove distance
+        position.fX = x / 8.0f;
+        position.fY = y / 8.0f;
+        position.fZ = z / 8.0f;
+        railDistance = distance / 3.0f;
     }
 
     STrackNode(const CVector& pos) : position(pos) {}
