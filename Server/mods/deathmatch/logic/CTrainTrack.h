@@ -36,7 +36,6 @@ class CTrainTrack final : public CElement
 {
 public:
     CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId = 0xFF);
-    // TODO: Add move constructor
     virtual ~CTrainTrack();
 
     bool SetTrackNodePosition(uint nodeIndex, const CVector& position);
@@ -45,8 +44,7 @@ public:
     const std::vector<STrackNode>& GetNodes() const { return m_Nodes; }
     std::size_t                    GetNumberOfNodes() const { return m_Nodes.size(); }
 
-    void SetLastNodesLinked(bool link) { m_LinkLastNodes = link; }
-    bool GetLastNodesLinked() { return m_LinkLastNodes; }
+    bool GetLastNodesLinked() const { return m_LinkLastNodes; }
 
     bool  IsDefault() { return m_DefaultTrackId != 0xFF; }
     uchar GetDefaultTrackId() { return m_DefaultTrackId; }

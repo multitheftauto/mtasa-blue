@@ -49,15 +49,6 @@ void CClientTrainTrack::Unlink()
     m_pTrainTrackManager->RemoveFromList(this);
 }
 
-bool CClientTrainTrack::GetNodePosition(std::size_t nodeIndex, CVector& position) const
-{
-    if (nodeIndex >= m_NodePositions.size())
-        return false;
-
-    position = m_NodePositions[nodeIndex];
-    return true;
-}
-
 bool CClientTrainTrack::SetNodePosition(std::size_t nodeIndex, const CVector& position)
 {
     if (nodeIndex >= m_NodePositions.size())
@@ -65,7 +56,7 @@ bool CClientTrainTrack::SetNodePosition(std::size_t nodeIndex, const CVector& po
 
     m_NodePositions[nodeIndex] = position;
 
-    // Keep the data the movement hook actually reads in sync too
+    // Keep the data the game's train code reads in sync too
     if (m_pGameTrainTrack)
         m_pGameTrainTrack->SetNodePosition(static_cast<std::uint32_t>(nodeIndex), position);
 

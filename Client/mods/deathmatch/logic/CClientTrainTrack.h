@@ -32,11 +32,7 @@ public:
     void GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; }
     void SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; }
 
-    std::size_t GetNodeCount() const noexcept { return m_NodePositions.size(); }
-    bool        GetNodePosition(std::size_t nodeIndex, CVector& position) const;
-    bool        SetNodePosition(std::size_t nodeIndex, const CVector& position);
-
-    bool GetLastNodesLinked() const noexcept { return m_bLinkLastNodes; }
+    bool SetNodePosition(std::size_t nodeIndex, const CVector& position);
 
     // The byte-sized track ID the game's native train code understands; 0xFF if we ran out of slots
     std::uint8_t GetGameTrackID() const noexcept;
