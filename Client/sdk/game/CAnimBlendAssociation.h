@@ -39,7 +39,7 @@ public:
 
     virtual float GetBlendAmount() = 0;
     virtual void  SetBlendAmount(float fAmount) = 0;
-    virtual bool  IsPartial() const noexcept = 0;
+    virtual bool  IsPartial() const = 0;
     // Drops any blend node for a bone the original animation doesn't animate, so a custom replacement
     // for a partial anim can't drive the bones (root, pelvis, legs) the original left to the movement anim.
     virtual void  RestrictToBonesOf(const CAnimBlendStaticAssociationSAInterface* pOriginalAssoc) = 0;
