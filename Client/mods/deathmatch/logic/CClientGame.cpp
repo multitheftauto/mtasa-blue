@@ -3922,6 +3922,17 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWeatherUpdateHandler()
 {
+    // CGame::Process does not reach GTA's later CCullZones::Update call on the
+    // multiplayer path. Refresh both attribute masks before weather consumes them.
+    if (m_pManager->IsGameLoaded() && m_pLocalPlayer && m_pCamera)
+    {
+        CVector playerPosition;
+        CVector cameraPosition;
+        m_pLocalPlayer->GetPosition(playerPosition);
+        m_pCamera->GetPosition(cameraPosition);
+        g_pGame->GetWorld()->UpdateCullZoneFlags(playerPosition, cameraPosition);
+    }
+
     // Fix #4803: Set MTA's weather types and zero InterpolationValue BEFORE
     // CWeather::Update runs. Zeroing InterpolationValue prevents the wrap branch
     // from ever firing (engine_interp >= 0 is always true), so the engine computes

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CCullZonesSA.h"
 #include <numbers>
 #include <multiplayer/CMultiplayer.h>
 #include <core/CCoreInterface.h>
@@ -30,11 +31,61 @@ namespace
     extern const unsigned char aOriginalSurfaceInfo[2292];
 }
 
-CWorldSA::CWorldSA()
+CWorldSA::CWorldSA() : m_pSurfaceInfo(reinterpret_cast<CSurfaceType*>(ARRAY_SurfaceInfos)), m_cullZones(std::make_unique<CCullZonesSA>())
 {
-    m_pSurfaceInfo = reinterpret_cast<CSurfaceType*>(ARRAY_SurfaceInfos);
-
     InstallHooks();
+}
+
+CWorldSA::~CWorldSA() = default;
+
+std::size_t CWorldSA::GetCullZoneCount()
+{
+    return m_cullZones->GetCount();
+}
+
+bool CWorldSA::GetCullZoneByIndex(std::size_t index, SCullZoneInfo& outInfo)
+{
+    return m_cullZones->GetByIndex(index, outInfo);
+}
+
+std::uint32_t CWorldSA::CreateCullZone(const SCullZoneDefinition& definition, const void* owner)
+{
+    return m_cullZones->Create(definition, owner);
+}
+
+bool CWorldSA::SetCullZone(std::uint32_t id, const SCullZoneDefinition& definition, const void* owner)
+{
+    return m_cullZones->Set(id, definition, owner);
+}
+
+bool CWorldSA::SetCullZoneEnabled(std::uint32_t id, bool enabled, const void* owner)
+{
+    return m_cullZones->SetEnabled(id, enabled, owner);
+}
+
+bool CWorldSA::RemoveCullZone(std::uint32_t id, const void* owner)
+{
+    return m_cullZones->Remove(id, owner);
+}
+
+bool CWorldSA::RestoreCullZone(std::uint32_t id, const void* owner)
+{
+    return m_cullZones->Restore(id, owner);
+}
+
+void CWorldSA::RemoveCullZoneChangesByOwner(const void* owner)
+{
+    m_cullZones->RemoveChangesByOwner(owner);
+}
+
+void CWorldSA::SetCullMirrorZonesEnabled(bool enabled)
+{
+    m_cullZones->SetMirrorsEnabled(enabled);
+}
+
+void CWorldSA::UpdateCullZoneFlags(const CVector& playerPosition, const CVector& cameraPosition)
+{
+    m_cullZones->UpdateCurrentFlags(playerPosition, cameraPosition);
 }
 
 CSurfaceType* CWorldSA::GetSurfaceInfo()
