@@ -173,8 +173,8 @@ namespace
         return ToInt16(input.centerX - vector1X - vector2X, output.cornerX) && ToInt16(input.centerY - vector1Y - vector2Y, output.cornerY) &&
                ToInt16(vector1X * 2.0f, output.vector1X) && ToInt16(vector1Y * 2.0f, output.vector1Y) && ToInt16(vector2X * 2.0f, output.vector2X) &&
                ToInt16(vector2Y * 2.0f, output.vector2Y) && ToInt16(input.centerZ - input.height * 0.5f, output.minZ) &&
-               ToInt16(input.centerZ + input.height * 0.5f, output.maxZ) && output.minZ < output.maxZ &&
-               (output.vector1X != 0 || output.vector1Y != 0) && (output.vector2X != 0 || output.vector2Y != 0);
+               ToInt16(input.centerZ + input.height * 0.5f, output.maxZ) && output.minZ < output.maxZ && (output.vector1X != 0 || output.vector1Y != 0) &&
+               (output.vector2X != 0 || output.vector2Y != 0);
     }
 
     bool BuildNativeMirrorZone(const SCullZoneDefinition& input, SNativeMirrorZone& output)
