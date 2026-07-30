@@ -14,6 +14,7 @@
 #include <game/CRenderWare.h>
 #include <game/CHud.h>
 #include <game/CStreaming.h>
+#include <game/CWorld.h>
 #include <type_traits>
 
 #include "enums/VehicleComponent.h"
@@ -97,6 +98,7 @@ DECLARE_ENUM_CLASS(eRenderStage);
 DECLARE_ENUM_CLASS(FxParticleSystems);
 DECLARE_ENUM(ePools);
 DECLARE_ENUM_CLASS(WorldProperty);
+DECLARE_ENUM_CLASS(ECullZoneType);
 DECLARE_ENUM_CLASS(eModelLoadState);
 DECLARE_ENUM_CLASS(PreloadAreaOption);
 DECLARE_ENUM_CLASS(RestreamOption);

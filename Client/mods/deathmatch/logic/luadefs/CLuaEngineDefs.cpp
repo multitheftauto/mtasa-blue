@@ -17,6 +17,126 @@
 #include <lua/CLuaFunctionParser.h>
 #include "CLuaEngineDefs.h"
 #include <enums/VehicleType.h>
+#include <cmath>
+#include <cstdint>
+#include <limits>
+#include <optional>
+#include <stdexcept>
+#include <string>
+#include <unordered_map>
+#include <variant>
+#include <vector>
+
+namespace
+{
+    using CullZoneValue = std::variant<std::uint32_t, float, bool, ECullZoneType>;
+    using CullZoneTable = std::unordered_map<std::string, CullZoneValue>;
+
+    std::uint16_t GetCullZoneFlags(ECullZoneType type, double flags)
+    {
+        const double maximumFlags = type == ECullZoneType::MIRROR ? std::numeric_limits<std::uint8_t>::max() : std::numeric_limits<std::uint16_t>::max();
+        if (flags < 0.0 || flags > maximumFlags || std::trunc(flags) != flags)
+            throw std::invalid_argument{"Flags must be a whole number in range for the selected CULL zone type"};
+
+        return static_cast<std::uint16_t>(flags);
+    }
+
+    std::uint32_t GetCullZoneId(double id)
+    {
+        if (id < 1.0 || id > std::numeric_limits<std::uint32_t>::max() || std::trunc(id) != id)
+            throw std::invalid_argument{"CULL zone ID must be a positive whole number"};
+
+        return static_cast<std::uint32_t>(id);
+    }
+
+    SCullZoneDefinition MakeCullZoneDefinition(ECullZoneType type, float centerX, float centerY, float centerZ, float width, float depth, float height,
+                                               double flags, std::optional<float> rotationDegrees, std::optional<float> mirrorV,
+                                               std::optional<float> mirrorNormalX, std::optional<float> mirrorNormalY, std::optional<float> mirrorNormalZ)
+    {
+        SCullZoneDefinition definition;
+        definition.type = type;
+        definition.centerX = centerX;
+        definition.centerY = centerY;
+        definition.centerZ = centerZ;
+        definition.width = width;
+        definition.depth = depth;
+        definition.height = height;
+        definition.flags = GetCullZoneFlags(type, flags);
+        definition.rotationDegrees = rotationDegrees.value_or(0.0f);
+        definition.mirrorV = mirrorV.value_or(0.0f);
+        definition.mirrorNormalX = mirrorNormalX.value_or(0.0f);
+        definition.mirrorNormalY = mirrorNormalY.value_or(0.0f);
+        definition.mirrorNormalZ = mirrorNormalZ.value_or(1.0f);
+        return definition;
+    }
+
+    std::vector<CullZoneTable> EngineGetCullZones(std::optional<ECullZoneType> type)
+    {
+        CWorld*                    world = g_pGame->GetWorld();
+        std::vector<CullZoneTable> result;
+        result.reserve(world->GetCullZoneCount());
+
+        for (std::size_t i = 0; i < world->GetCullZoneCount(); ++i)
+        {
+            SCullZoneInfo info;
+            if (!world->GetCullZoneByIndex(i, info) || (type && info.type != *type))
+                continue;
+
+            result.emplace_back(CullZoneTable{{"id", info.id},
+                                              {"type", info.type},
+                                              {"x", info.centerX},
+                                              {"y", info.centerY},
+                                              {"z", info.centerZ},
+                                              {"width", info.width},
+                                              {"depth", info.depth},
+                                              {"height", info.height},
+                                              {"rotation", info.rotationDegrees},
+                                              {"flags", static_cast<std::uint32_t>(info.flags)},
+                                              {"mirrorV", info.mirrorV},
+                                              {"normalX", info.mirrorNormalX},
+                                              {"normalY", info.mirrorNormalY},
+                                              {"normalZ", info.mirrorNormalZ},
+                                              {"enabled", info.enabled},
+                                              {"original", info.original}});
+        }
+        return result;
+    }
+
+    std::variant<bool, std::uint32_t> EngineCreateCullZone(lua_State* luaVM, ECullZoneType type, float centerX, float centerY, float centerZ, float width,
+                                                           float depth, float height, double flags, std::optional<float> rotationDegrees,
+                                                           std::optional<float> mirrorV, std::optional<float> mirrorNormalX, std::optional<float> mirrorNormalY,
+                                                           std::optional<float> mirrorNormalZ)
+    {
+        const SCullZoneDefinition definition = MakeCullZoneDefinition(type, centerX, centerY, centerZ, width, depth, height, flags, rotationDegrees, mirrorV,
+                                                                      mirrorNormalX, mirrorNormalY, mirrorNormalZ);
+        const std::uint32_t       id = g_pGame->GetWorld()->CreateCullZone(definition, &lua_getownerresource(luaVM));
+        return id ? std::variant<bool, std::uint32_t>{id} : std::variant<bool, std::uint32_t>{false};
+    }
+
+    bool EngineSetCullZone(lua_State* luaVM, double id, ECullZoneType type, float centerX, float centerY, float centerZ, float width, float depth, float height,
+                           double flags, std::optional<float> rotationDegrees, std::optional<float> mirrorV, std::optional<float> mirrorNormalX,
+                           std::optional<float> mirrorNormalY, std::optional<float> mirrorNormalZ)
+    {
+        const SCullZoneDefinition definition = MakeCullZoneDefinition(type, centerX, centerY, centerZ, width, depth, height, flags, rotationDegrees, mirrorV,
+                                                                      mirrorNormalX, mirrorNormalY, mirrorNormalZ);
+        return g_pGame->GetWorld()->SetCullZone(GetCullZoneId(id), definition, &lua_getownerresource(luaVM));
+    }
+
+    bool EngineSetCullZoneEnabled(lua_State* luaVM, double id, bool enabled)
+    {
+        return g_pGame->GetWorld()->SetCullZoneEnabled(GetCullZoneId(id), enabled, &lua_getownerresource(luaVM));
+    }
+
+    bool EngineRemoveCullZone(lua_State* luaVM, double id)
+    {
+        return g_pGame->GetWorld()->RemoveCullZone(GetCullZoneId(id), &lua_getownerresource(luaVM));
+    }
+
+    bool EngineRestoreCullZone(lua_State* luaVM, double id)
+    {
+        return g_pGame->GetWorld()->RestoreCullZone(GetCullZoneId(id), &lua_getownerresource(luaVM));
+    }
+}  // namespace
 
 //! Set the CModelCacheManager limits
 //! By passing `nil`/no value the original values are restored
@@ -104,6 +224,12 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineGetModelLODDistance", EngineGetModelLODDistance},
         {"engineSetModelLODDistance", EngineSetModelLODDistance},
         {"engineResetModelLODDistance", EngineResetModelLODDistance},
+        {"engineGetCullZones", ArgumentParser<EngineGetCullZones>},
+        {"engineCreateCullZone", ArgumentParser<EngineCreateCullZone>},
+        {"engineSetCullZone", ArgumentParser<EngineSetCullZone>},
+        {"engineSetCullZoneEnabled", ArgumentParser<EngineSetCullZoneEnabled>},
+        {"engineRemoveCullZone", ArgumentParser<EngineRemoveCullZone>},
+        {"engineRestoreCullZone", ArgumentParser<EngineRestoreCullZone>},
         {"engineSetAsynchronousLoading", EngineSetAsynchronousLoading},
         {"engineApplyShaderToWorldTexture", EngineApplyShaderToWorldTexture},
         {"engineRemoveShaderFromWorldTexture", EngineRemoveShaderFromWorldTexture},
