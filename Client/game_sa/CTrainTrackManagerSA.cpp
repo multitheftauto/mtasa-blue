@@ -9,7 +9,10 @@
 
 #include "StdInc.h"
 #include "CTrainTrackManagerSA.h"
+#include "CGameSA.h"
 #include <cstring>
+
+extern CGameSA* pGame;
 
 namespace
 {
@@ -64,6 +67,38 @@ namespace
         }
 
         return false;
+    }
+
+    ////////////////////////////////////////////////////////////////////////
+    // CTrain::ProcessControl indexes the track arrays every frame and only skips them for a derailed
+    // train, so a train still pointing at a track whose node data just got freed reads a null pointer
+    // on its very next tick. The server derails its own trains when a track goes away, but that only
+    // reaches this client over the network, long after the next frame has run.
+    //
+    // Derailing them here, in the same breath as freeing the data, is what actually keeps the train
+    // code away from the empty slot. Carriages have to be covered too: only the front one is a
+    // scriptable element, the rest are native-only pool entries carrying their own track ID.
+    ////////////////////////////////////////////////////////////////////////
+    void UnlinkTrainsFromTrack(std::uint8_t trackID) noexcept
+    {
+        CPools* pPools = pGame->GetPools();
+
+        // The pool is a sparse array: ulCount is how many slots are occupied, not the highest one in
+        // use, so every slot has to be visited and the empty ones skipped
+        for (std::size_t i = 0; i < MAX_VEHICLES; i++)
+        {
+            SClientEntity<CVehicleSA>* pEntry = pPools->GetVehicle(i);
+            if (!pEntry || !pEntry->pEntity)
+                continue;
+
+            CVehicleSA*          pVehicle = pEntry->pEntity;
+            CVehicleSAInterface* pInterface = pVehicle->GetVehicleInterface();
+            if (!pInterface || pInterface->m_vehicleClass != VehicleClass::TRAIN)
+                continue;
+
+            if (pVehicle->GetRailTrack() == trackID)
+                pVehicle->SetDerailed(true);
+        }
     }
 }  // namespace
 
@@ -149,8 +184,11 @@ void CTrainTrackManagerSA::DestroyTrainTrack(std::uint8_t trackID)
         return;
 
     std::size_t index = static_cast<std::size_t>(trackID) - FIRST_CUSTOM_TRACK_ID;
-    if (index < m_Tracks.size())
-        m_Tracks[index].reset();
+    if (index >= m_Tracks.size())
+        return;
+
+    UnlinkTrainsFromTrack(trackID);
+    m_Tracks[index].reset();
 }
 
 CTrainTrack* CTrainTrackManagerSA::GetTrainTrack(std::uint8_t trackID)
