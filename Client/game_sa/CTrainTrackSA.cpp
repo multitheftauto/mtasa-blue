@@ -58,17 +58,6 @@ CTrainTrackSA::~CTrainTrackSA()
     CTrainTrackManagerSA::SetTrackData(m_TrackID, nullptr, 0, 0.0f);
 }
 
-bool CTrainTrackSA::SetNodePosition(std::uint32_t nodeIndex, const CVector& position) noexcept
-{
-    if (nodeIndex >= m_Nodes.size())
-        return false;
-
-    m_Nodes[nodeIndex].position = position;
-    RecomputeDistances();
-    PublishToGame();
-    return true;
-}
-
 void CTrainTrackSA::RecomputeDistances() noexcept
 {
     float fDistance = 0.0f;

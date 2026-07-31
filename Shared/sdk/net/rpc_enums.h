@@ -293,7 +293,5 @@ enum eElementRPCFunctions
 
     SET_ELEMENT_ON_FIRE,
 
-    SET_TRAIN_TRACK_NODE_POSITION,
-
     NUM_RPC_FUNCS  // Add above this line
 };

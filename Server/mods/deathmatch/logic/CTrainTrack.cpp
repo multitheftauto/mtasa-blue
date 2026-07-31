@@ -40,23 +40,3 @@ CTrainTrack::~CTrainTrack()
     // Unreference train track
     m_pManager->DestroyTrainTrack(this);
 }
-
-bool CTrainTrack::SetTrackNodePosition(uint nodeIndex, const CVector& position)
-{
-    if (nodeIndex >= m_Nodes.size())
-        return false;
-
-    auto& node = m_Nodes[nodeIndex];
-    node.position = position;
-    return true;
-}
-
-bool CTrainTrack::GetTrackNodePosition(uint nodeIndex, CVector& position)
-{
-    if (nodeIndex >= m_Nodes.size())
-        return false;
-
-    auto& node = m_Nodes[nodeIndex];
-    position = node.position;
-    return true;
-}

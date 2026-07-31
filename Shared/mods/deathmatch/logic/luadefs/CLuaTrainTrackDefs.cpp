@@ -15,8 +15,6 @@
     #include "CTrainTrackManager.h"
     #include "CGame.h"
     #include "CDummy.h"
-    #include "common/CBitStream.h"
-    #include "packets/CElementRPCPacket.h"
     #include "packets/CEntityAddPacket.h"
 #endif
 
@@ -26,9 +24,6 @@ void CLuaTrainTrackDefs::LoadFunctions()
 
 #ifndef MTA_CLIENT
     CLuaCFunctions::AddFunction("createTrainTrack", ArgumentParser<CreateTrainTrack>);
-    CLuaCFunctions::AddFunction("getTrainTrackNodeCount", ArgumentParser<GetTrainTrackNodeCount>);
-    CLuaCFunctions::AddFunction("getTrainTrackNodePosition", ArgumentParser<GetTrainTrackNodePosition>);
-    CLuaCFunctions::AddFunction("setTrainTrackNodePosition", ArgumentParser<SetTrainTrackNodePosition>);
 #endif
 }
 
@@ -40,9 +35,6 @@ void CLuaTrainTrackDefs::AddClass(lua_State* luaVM)
 
 #ifndef MTA_CLIENT
     lua_classfunction(luaVM, "create", "createTrainTrack");
-    lua_classfunction(luaVM, "getNodeCount", "getTrainTrackNodeCount");
-    lua_classfunction(luaVM, "getNodePosition", "getTrainTrackNodePosition");
-    lua_classfunction(luaVM, "setNodePosition", "setTrainTrackNodePosition");
 #endif
 
     lua_registerclass(luaVM, "TrainTrack", "Element");
@@ -86,36 +78,5 @@ CLuaTrainTrackDefs::TrainTrack CLuaTrainTrackDefs::CreateTrainTrack(lua_State* l
     }
 
     return pTrainTrack;
-}
-
-uint CLuaTrainTrackDefs::GetTrainTrackNodeCount(CTrainTrack* pTrainTrack)
-{
-    return static_cast<uint>(pTrainTrack->GetNumberOfNodes());
-}
-
-std::variant<CVector, bool> CLuaTrainTrackDefs::GetTrainTrackNodePosition(CTrainTrack* pTrainTrack, uint nodeIndex)
-{
-    CVector position;
-    if (!pTrainTrack->GetTrackNodePosition(nodeIndex, position))
-        return false;
-
-    return position;
-}
-
-bool CLuaTrainTrackDefs::SetTrainTrackNodePosition(CTrainTrack* pTrainTrack, uint nodeIndex, CVector position)
-{
-    if (!pTrainTrack->SetTrackNodePosition(nodeIndex, position))
-        return false;
-
-    // Tell clients that already have this track so they don't drift out of sync with it
-    CBitStream BitStream;
-    BitStream.pBitStream->Write(nodeIndex);
-    BitStream.pBitStream->Write(position.fX);
-    BitStream.pBitStream->Write(position.fY);
-    BitStream.pBitStream->Write(position.fZ);
-
-    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pTrainTrack, SET_TRAIN_TRACK_NODE_POSITION, *BitStream.pBitStream));
-
-    return true;
 }
 #endif

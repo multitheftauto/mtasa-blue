@@ -38,11 +38,7 @@ public:
     CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId = 0xFF);
     virtual ~CTrainTrack();
 
-    bool SetTrackNodePosition(uint nodeIndex, const CVector& position);
-    bool GetTrackNodePosition(uint nodeIndex, CVector& position);
-
     const std::vector<STrackNode>& GetNodes() const { return m_Nodes; }
-    std::size_t                    GetNumberOfNodes() const { return m_Nodes.size(); }
 
     bool GetLastNodesLinked() const { return m_LinkLastNodes; }
 

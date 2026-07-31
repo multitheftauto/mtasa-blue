@@ -19,7 +19,6 @@ public:
     ~CTrainTrackSA();
 
     std::uint8_t GetTrackID() const noexcept override { return m_TrackID; }
-    bool         SetNodePosition(std::uint32_t nodeIndex, const CVector& position) noexcept override;
 
 private:
     void RecomputeDistances() noexcept;

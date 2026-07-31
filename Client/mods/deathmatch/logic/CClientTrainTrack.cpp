@@ -48,17 +48,3 @@ void CClientTrainTrack::Unlink()
 {
     m_pTrainTrackManager->RemoveFromList(this);
 }
-
-bool CClientTrainTrack::SetNodePosition(std::size_t nodeIndex, const CVector& position)
-{
-    if (nodeIndex >= m_NodePositions.size())
-        return false;
-
-    m_NodePositions[nodeIndex] = position;
-
-    // Keep the data the game's train code reads in sync too
-    if (m_pGameTrainTrack)
-        m_pGameTrainTrack->SetNodePosition(static_cast<std::uint32_t>(nodeIndex), position);
-
-    return true;
-}

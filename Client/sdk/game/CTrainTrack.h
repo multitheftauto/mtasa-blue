@@ -25,7 +25,4 @@ public:
     virtual ~CTrainTrack() = default;
 
     virtual std::uint8_t GetTrackID() const noexcept = 0;
-
-    // Moves a node and recomputes the distances every node past it depends on
-    virtual bool SetNodePosition(std::uint32_t nodeIndex, const CVector& position) noexcept = 0;
 };

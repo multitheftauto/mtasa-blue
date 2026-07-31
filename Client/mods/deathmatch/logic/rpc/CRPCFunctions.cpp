@@ -26,7 +26,6 @@
 #include "CPlayerRPCs.h"
 #include "CRadarRPCs.h"
 #include "CTeamRPCs.h"
-#include "CTrainTrackRPCs.h"
 #include "CVehicleRPCs.h"
 #include "CWeaponRPCs.h"
 #include "CWaterRPCs.h"
@@ -98,7 +97,6 @@ void CRPCFunctions::AddHandlers()
     CPlayerRPCs::LoadFunctions();
     CRadarRPCs::LoadFunctions();
     CTeamRPCs::LoadFunctions();
-    CTrainTrackRPCs::LoadFunctions();
     CVehicleRPCs::LoadFunctions();
     CWeaponRPCs::LoadFunctions();
     CWaterRPCs::LoadFunctions();
