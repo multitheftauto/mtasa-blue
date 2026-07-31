@@ -347,6 +347,15 @@ public:
     SString                m_strD3d9Md5;
     SString                m_strD3d9Sha256;
 
+    // Per-player token bucket throttling for onPlayerResourceStart acks. Genuine duplicates
+    // consume a token; race-condition acks (resource stopped/restarted before the ack arrived)
+    // do not. A sustained flood that exhausts the bucket is counted in m_ResourceStartDrops
+    // and the player is disconnected once the drop count crosses the threshold in CGame.
+    CElapsedTime       m_ResourceStartPacketTimer;
+    unsigned int       m_ResourceStartTokens{50};
+    unsigned long long m_ResourceStartRefillRemainderMs{};
+    unsigned int       m_ResourceStartDrops{};
+
 private:
     SLightweightSyncData m_lightweightSyncData;
 
