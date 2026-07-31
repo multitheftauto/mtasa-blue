@@ -4306,11 +4306,15 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
                 // Check if new start
                 if (Packet.m_usPartNumber == 0)
                 {
+                    if (!info.bRequested)
+                        return;
+
                     info.bInProgress = true;
                     info.usNextPartNumber = 0;
                     info.usScreenShotId = Packet.m_usScreenShotId;
 
                     info.llTimeStamp = Packet.m_llServerGrabTime;
+                    info.llStartTime = GetTickCount64_();
                     info.uiTotalBytes = Packet.m_uiTotalBytes;
                     info.usTotalParts = Packet.m_usTotalParts;
                     info.usResourceNetId = Packet.m_pResource ? Packet.m_pResource->GetNetID() : INVALID_RESOURCE_NET_ID;
@@ -4321,6 +4325,25 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
             // Add data if valid
             if (info.bInProgress)
             {
+                // Reject if accumulated data exceeds 50MB
+                constexpr uint MAX_SCREENSHOT_SIZE = 50 * 1024 * 1024;
+                if (info.buffer.GetSize() + Packet.m_buffer.GetSize() > MAX_SCREENSHOT_SIZE)
+                {
+                    info.bInProgress = false;
+                    info.bRequested = false;
+                    info.buffer.Clear();
+                    return;
+                }
+
+                // Timeout stale transfers after 30 seconds
+                if (GetTickCount64_() - info.llStartTime > 30000)
+                {
+                    info.bInProgress = false;
+                    info.bRequested = false;
+                    info.buffer.Clear();
+                    return;
+                }
+
                 info.buffer += Packet.m_buffer;
                 info.usNextPartNumber++;
 
@@ -4340,6 +4363,7 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
                     }
 
                     info.bInProgress = false;
+                    info.bRequested = false;
                     info.buffer.Clear();
                 }
             }

@@ -56,9 +56,11 @@ typedef CFastHashMap<CPlayer*, SViewerInfo> SViewerMapType;
 struct SScreenShotInfo
 {
     bool      bInProgress;
+    bool      bRequested;
     ushort    usNextPartNumber;
     ushort    usScreenShotId;
     long long llTimeStamp;
+    long long llStartTime;
     uint      uiTotalBytes;
     ushort    usTotalParts;
     ushort    usResourceNetId;
