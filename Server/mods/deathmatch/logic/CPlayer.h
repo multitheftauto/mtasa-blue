@@ -24,6 +24,7 @@ class CPlayer;
 #include "packets/CPacket.h"
 #include "packets/CPlayerStatsPacket.h"
 #include "CStringName.h"
+#include "CTokenBucket.h"
 class CKeyBinds;
 class CPlayerCamera;
 enum class eVehicleAimDirection : unsigned char;
@@ -360,6 +361,20 @@ public:
     unsigned int       m_uiActiveSatchelCount{};
     CElapsedTime       m_DetonateSatchelTimer;
     CElapsedTime       m_DestroySatchelTimer;
+
+    // Per-player throttling for bullet sync. Shot multiplication cheats resend one shot many
+    // times, so the last accepted trajectory is kept to recognise the copies, and the token
+    // bucket bounds the packet rate for anything that varies the trajectory instead. The
+    // ceiling sits well above the fastest weapon, so ordinary bursts are never affected.
+    static constexpr unsigned int BULLETSYNC_RATE_LIMIT = 30;
+    static constexpr unsigned int BULLETSYNC_RATE_PERIOD_MS = 1000;
+
+    CElapsedTime m_BulletSyncPacketTimer;
+    CTokenBucket m_BulletSyncBucket{BULLETSYNC_RATE_LIMIT, BULLETSYNC_RATE_PERIOD_MS / BULLETSYNC_RATE_LIMIT};
+    CElapsedTime m_LastBulletSyncTimer;
+    CVector      m_vecLastBulletSyncStart;
+    CVector      m_vecLastBulletSyncEnd;
+    bool         m_bHasLastBulletSync{};
 
 private:
     SLightweightSyncData m_lightweightSyncData;

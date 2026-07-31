@@ -2573,6 +2573,35 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     // Weapon ownership, ammo, trajectory and damage payload are validated in
     // CBulletsyncPacket::Read, which runs before the packet ever gets here.
 
+    // Shot multiplication resends one shot several times so it counts several times. Every
+    // copy carries the trajectory of the original, which a player firing normally cannot
+    // reproduce: the game applies weapon spread and the muzzle moves between shots. The
+    // slowest bullet sync weapon still fires far apart enough for this window to be safe.
+    constexpr unsigned long long BULLETSYNC_REPEAT_WINDOW_MS = 100;
+
+    if (player->m_bHasLastBulletSync && player->m_LastBulletSyncTimer.Get() < BULLETSYNC_REPEAT_WINDOW_MS &&
+        player->m_vecLastBulletSyncStart == packet.m_start && player->m_vecLastBulletSyncEnd == packet.m_end)
+        return;
+
+    // Bounds anything that varies the trajectory instead of repeating it.
+    constexpr unsigned int BULLETSYNC_DROPS_BEFORE_KICK = 20;
+
+    const unsigned long long elapsed = player->m_BulletSyncPacketTimer.Get();
+    player->m_BulletSyncPacketTimer.Reset();
+
+    if (!player->m_BulletSyncBucket.Consume(elapsed))
+    {
+        if (player->m_BulletSyncBucket.GetDrops() >= BULLETSYNC_DROPS_BEFORE_KICK)
+            DisconnectPlayer(this, *player, "Bullet Sync Flooding");
+
+        return;
+    }
+
+    player->m_vecLastBulletSyncStart = packet.m_start;
+    player->m_vecLastBulletSyncEnd = packet.m_end;
+    player->m_bHasLastBulletSync = true;
+    player->m_LastBulletSyncTimer.Reset();
+
     CLuaArguments args;
     args.PushNumber(packet.m_weapon);
     args.PushNumber(packet.m_end.fX);
