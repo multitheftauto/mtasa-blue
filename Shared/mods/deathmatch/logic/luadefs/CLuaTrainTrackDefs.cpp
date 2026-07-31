@@ -53,7 +53,7 @@ CLuaTrainTrackDefs::TrainTrack CLuaTrainTrackDefs::GetDefaultTrack(uchar trackID
 }
 
 #ifndef MTA_CLIENT
-CLuaTrainTrackDefs::TrainTrack CLuaTrainTrackDefs::CreateTrainTrack(lua_State* luaVM, std::vector<CVector> nodePositions, std::optional<bool> linkLastNodes)
+CLuaTrainTrackDefs::TrainTrack CLuaTrainTrackDefs::CreateTrainTrack(lua_State* luaVM, std::vector<CVector> nodePositions)
 {
     if (nodePositions.empty())
         throw std::invalid_argument("createTrainTrack needs at least one node");
@@ -61,7 +61,7 @@ CLuaTrainTrackDefs::TrainTrack CLuaTrainTrackDefs::CreateTrainTrack(lua_State* l
     std::vector<STrackNode> nodes(nodePositions.begin(), nodePositions.end());
 
     CResource&   resource = lua_getownerresource(luaVM);
-    CTrainTrack* pTrainTrack = g_pGame->GetTrainTrackManager()->CreateTrainTrack(nodes, linkLastNodes.value_or(false), resource.GetDynamicElementRoot());
+    CTrainTrack* pTrainTrack = g_pGame->GetTrainTrackManager()->CreateTrainTrack(nodes, resource.GetDynamicElementRoot());
     if (!pTrainTrack)
         return nullptr;
 

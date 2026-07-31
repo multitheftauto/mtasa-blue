@@ -20,7 +20,7 @@ class CClientTrainTrack final : public CClientEntity
     friend class CClientTrainTrackManager;
 
 public:
-    CClientTrainTrack(class CClientManager* pManager, ElementID ID, const std::vector<CVector>& nodePositions, bool bLinkLastNodes);
+    CClientTrainTrack(class CClientManager* pManager, ElementID ID, const std::vector<CVector>& nodePositions);
     ~CClientTrainTrack();
 
     void Unlink();
@@ -38,7 +38,6 @@ private:
     CClientTrainTrackManager* m_pTrainTrackManager;
 
     std::vector<CVector> m_NodePositions;
-    bool                 m_bLinkLastNodes;
     CVector              m_vecPosition;
     class CTrainTrack*   m_pGameTrainTrack;
 };

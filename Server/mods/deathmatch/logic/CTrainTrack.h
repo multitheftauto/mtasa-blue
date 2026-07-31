@@ -35,12 +35,10 @@ struct STrackNode
 class CTrainTrack final : public CElement
 {
 public:
-    CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId = 0xFF);
+    CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, CElement* pParent, uchar defaultTrackId = 0xFF);
     virtual ~CTrainTrack();
 
     const std::vector<STrackNode>& GetNodes() const { return m_Nodes; }
-
-    bool GetLastNodesLinked() const { return m_LinkLastNodes; }
 
     bool  IsDefault() { return m_DefaultTrackId != 0xFF; }
     uchar GetDefaultTrackId() { return m_DefaultTrackId; }
@@ -52,6 +50,5 @@ private:
     CTrainTrackManager* m_pManager;
 
     std::vector<STrackNode> m_Nodes;
-    bool                    m_LinkLastNodes;
     uchar                   m_DefaultTrackId;
 };

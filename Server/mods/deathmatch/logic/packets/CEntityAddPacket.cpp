@@ -772,8 +772,6 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // tracks are already known to the client through the game's own train code
                     CTrainTrack* pTrainTrack = static_cast<CTrainTrack*>(pElement);
 
-                    BitStream.WriteBit(pTrainTrack->GetLastNodesLinked());
-
                     const auto& nodes = pTrainTrack->GetNodes();
                     BitStream.WriteCompressed(static_cast<unsigned int>(nodes.size()));
 

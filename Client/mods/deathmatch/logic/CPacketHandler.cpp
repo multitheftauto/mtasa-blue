@@ -3727,9 +3727,6 @@ retry:
 
                 case CClientGame::TRAIN_TRACK:
                 {
-                    bool bLinkLastNodes;
-                    bitStream.ReadBit(bLinkLastNodes);
-
                     unsigned int uiNodeCount = 0;
                     bitStream.ReadCompressed(uiNodeCount);
 
@@ -3741,7 +3738,7 @@ retry:
                         nodePositions.push_back(position.data.vecPosition);
                     }
 
-                    pEntity = new CClientTrainTrack(g_pClientGame->m_pManager, EntityID, nodePositions, bLinkLastNodes);
+                    pEntity = new CClientTrainTrack(g_pClientGame->m_pManager, EntityID, nodePositions);
 
                     break;
                 }

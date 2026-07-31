@@ -12,8 +12,7 @@
 #include <game/CTrainTrackManager.h>
 #include <game/CTrainTrack.h>
 
-CClientTrainTrack::CClientTrainTrack(CClientManager* pManager, ElementID ID, const std::vector<CVector>& nodePositions, bool bLinkLastNodes)
-    : ClassInit(this), CClientEntity(ID)
+CClientTrainTrack::CClientTrainTrack(CClientManager* pManager, ElementID ID, const std::vector<CVector>& nodePositions) : ClassInit(this), CClientEntity(ID)
 {
     m_pManager = pManager;
     m_pTrainTrackManager = pManager->GetTrainTrackManager();
@@ -21,7 +20,6 @@ CClientTrainTrack::CClientTrainTrack(CClientManager* pManager, ElementID ID, con
     SetTypeName("train-track");
 
     m_NodePositions = nodePositions;
-    m_bLinkLastNodes = bLinkLastNodes;
     m_vecPosition = nodePositions.empty() ? CVector() : nodePositions.front();
 
     // The track the game's own train code drives on. It comes back nullptr when there are no track

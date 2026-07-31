@@ -26,6 +26,6 @@ public:
     static TrainTrack GetDefaultTrack(uchar trackID);
 
 #ifndef MTA_CLIENT
-    static TrainTrack CreateTrainTrack(lua_State* luaVM, std::vector<CVector> nodePositions, std::optional<bool> linkLastNodes);
+    static TrainTrack CreateTrainTrack(lua_State* luaVM, std::vector<CVector> nodePositions);
 #endif
 };

@@ -13,14 +13,13 @@
 #include "CVehicleManager.h"
 #include "CGame.h"
 
-CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId)
+CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, CElement* pParent, uchar defaultTrackId)
     : CElement(pParent), m_pManager(pManager)
 {
     m_iType = CElement::TRAIN_TRACK;
     SetTypeName("train-track");
 
     m_Nodes = nodes;
-    m_LinkLastNodes = linkLastNodes;
     m_DefaultTrackId = defaultTrackId;
 }
 
