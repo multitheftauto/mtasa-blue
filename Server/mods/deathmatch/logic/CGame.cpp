@@ -989,6 +989,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     // Register our packethandler
     g_pNetServer->RegisterPacketHandler(CGame::StaticProcessPacket);
 
+    CalculateMinClientRequirement();
+
     // Try to start the network
     if (!g_pNetServer->StartNetwork(strServerIPList, usServerPort, uiMaxPlayers, m_pMainConfig->GetServerName().c_str()))
     {
@@ -1943,9 +1945,10 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 // Tell the console
                                 CLogger::LogPrintf("CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick, strIPAndSerial.c_str());
 
-                                // Tell the player
-                                pPlayer->Send(CUpdateInfoPacket("Mandatory", CalculateMinClientRequirement()));
-                                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::NO_REASON);
+                                // Tell the player and let them know which exact version is required
+                                const CMtaVersion strRequiredVersion = CalculateMinClientRequirement();
+                                pPlayer->Send(CUpdateInfoPacket("Mandatory", strRequiredVersion));
+                                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::BAD_VERSION, strRequiredVersion.c_str());
                                 return;
                             }
 
@@ -1957,9 +1960,10 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 CLogger::LogPrintf("CONNECT: %s advised to update (Client version is below recommended) (%s)\n", szNick,
                                                    strIPAndSerial.c_str());
 
-                                // Tell the player
-                                pPlayer->Send(CUpdateInfoPacket("Optional", GetConfig()->GetRecommendedClientVersion()));
-                                DisconnectPlayer(this, *pPlayer, "");
+                                // Tell the player and let them know which exact version is recommended
+                                const CMtaVersion strRecommendedVersion = GetConfig()->GetRecommendedClientVersion();
+                                pPlayer->Send(CUpdateInfoPacket("Optional", strRecommendedVersion));
+                                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::BAD_VERSION, strRecommendedVersion.c_str());
                                 return;
                             }
 
@@ -5109,6 +5113,9 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     if (strNewMin < RELEASE_MIN_CLIENT_VERSION)
         strNewMin = RELEASE_MIN_CLIENT_VERSION;
 #endif
+
+    if (g_pNetServer)
+        g_pNetServer->SetMinClientRequirement(*strNewMin);
 
     return strNewMin;
 }
