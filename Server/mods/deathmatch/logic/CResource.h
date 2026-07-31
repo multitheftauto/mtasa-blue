@@ -137,9 +137,9 @@ enum class EResourceState : unsigned char
 // ack so the caller can rate-limit only the latter.
 enum class EPlayerResourceStartAck : unsigned char
 {
-    Accepted,    // ack matches the current start cycle, fire onPlayerResourceStart
-    RaceMiss,    // resource not running for this start cycle, normal during start/stop races
-    Duplicate,   // ack already accepted for this start cycle, charge rate-limit token
+    Accepted,   // ack matches the current start cycle, fire onPlayerResourceStart
+    RaceMiss,   // resource not running for this start cycle, normal during start/stop races
+    Duplicate,  // ack already accepted for this start cycle, charge rate-limit token
 };
 
 // A resource is either a directory with files or a ZIP file which contains the content of such directory.

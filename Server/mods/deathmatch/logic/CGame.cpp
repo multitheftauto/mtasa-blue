@@ -4236,7 +4236,7 @@ namespace
 
     SString SanitizePlayerDiagnosticMessage(const SString& strMessage)
     {
-        SString strResult;
+        SString      strResult;
         const size_t uiCopyLength = Min<size_t>(strMessage.length(), MAX_PLAYER_DIAGNOSTIC_LOG_LENGTH);
 
         for (size_t i = 0; i < uiCopyLength; i++)
