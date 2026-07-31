@@ -4139,28 +4139,107 @@ void CGame::Packet_PlayerTransgression(CPlayerTransgressionPacket& Packet)
     }
 }
 
+namespace
+{
+    constexpr size_t MAX_PLAYER_DIAGNOSTIC_LOG_LENGTH = 512;
+
+    bool IsKnownPlayerDiagnosticLevel(uint uiLevel)
+    {
+        switch (uiLevel)
+        {
+            case 1000:
+            case 1002:
+            case 1003:
+            case 1004:
+            case 1005:
+            case 1007:
+            case 1008:
+            case 1009:
+            case 1010:
+            case 1011:
+            case 1012:
+            case 1013:
+                return true;
+        }
+
+        return false;
+    }
+
+    bool IsHexDigest(const SString& strValue, size_t uiExpectedLength)
+    {
+        if (strValue.length() != uiExpectedLength)
+            return false;
+
+        for (size_t i = 0; i < strValue.length(); i++)
+        {
+            if (!isxdigit(static_cast<uchar>(strValue[i])))
+                return false;
+        }
+
+        return true;
+    }
+
+    bool HasUsableD3d9Info(const SString& strD3d9Md5, const SString& strD3d9Sha256, uint uiD3d9Size)
+    {
+        if (strD3d9Md5.empty() && strD3d9Sha256.empty())
+            return uiD3d9Size == 0;
+
+        return IsHexDigest(strD3d9Md5, 32) && IsHexDigest(strD3d9Sha256, 64);
+    }
+
+    bool BuildDetectedAcList(const std::vector<uchar>& idList, SString& strDetectedAC)
+    {
+        strDetectedAC.clear();
+        bool bSeenIds[64] = {};
+
+        for (size_t i = 0; i < idList.size(); i++)
+        {
+            const uchar ucId = idList[i];
+            if (ucId > 63 || bSeenIds[ucId])
+                return false;
+
+            bSeenIds[ucId] = true;
+            if (!strDetectedAC.empty())
+                strDetectedAC += ",";
+            strDetectedAC += SString("%u", static_cast<uint>(ucId));
+        }
+
+        return true;
+    }
+
+    SString SanitizePlayerDiagnosticMessage(const SString& strMessage)
+    {
+        SString strResult;
+        const size_t uiCopyLength = Min<size_t>(strMessage.length(), MAX_PLAYER_DIAGNOSTIC_LOG_LENGTH);
+
+        for (size_t i = 0; i < uiCopyLength; i++)
+        {
+            const uchar ucChar = static_cast<uchar>(strMessage[i]);
+            if (ucChar == '\r' || ucChar == '\n' || ucChar == '\t')
+                strResult += ' ';
+            else if (ucChar < 0x20 || ucChar == 0x7F)
+                strResult += '?';
+            else
+                strResult += strMessage[i];
+        }
+
+        if (strMessage.length() > MAX_PLAYER_DIAGNOSTIC_LOG_LENGTH)
+            strResult += "...";
+
+        return strResult;
+    }
+}
+
 void CGame::Packet_PlayerDiagnostic(CPlayerDiagnosticPacket& Packet)
 {
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
-        if (Packet.m_uiLevel == 236)
+        if (Packet.m_uiLevel != 236 &&
+            (IsKnownPlayerDiagnosticLevel(Packet.m_uiLevel) || g_pGame->GetConfig()->IsEnableDiagnostic(SString("%d", Packet.m_uiLevel))))
         {
-            // Handle special info
-            std::vector<SString> parts;
-            Packet.m_strMessage.Split(",", parts);
-            if (parts.size() > 3)
-            {
-                pPlayer->m_strDetectedAC = parts[0].Replace("|", ",");
-                pPlayer->m_uiD3d9Size = atoi(parts[1]);
-                pPlayer->m_strD3d9Md5 = parts[2];
-                pPlayer->m_strD3d9Sha256 = parts[3];
-            }
-        }
-        else if (Packet.m_uiLevel >= 1000 || g_pGame->GetConfig()->IsEnableDiagnostic(SString("%d", Packet.m_uiLevel)))
-        {
-            // If diagnosticis enabled on this server, log it
-            SString strMessageCombo("DIAGNOSTIC: %s #%d %s\n", pPlayer->GetNick(), Packet.m_uiLevel, Packet.m_strMessage.c_str());
+            const SString strSanitizedMessage = SanitizePlayerDiagnosticMessage(Packet.m_strMessage);
+            const SString strMessageCombo("DIAGNOSTIC: %s #%d %s\n", pPlayer->GetNick(), Packet.m_uiLevel, *strSanitizedMessage);
             CLogger::LogPrint(strMessageCombo);
         }
     }
@@ -4442,6 +4521,28 @@ void CGame::Packet_PlayerACInfo(CPlayerACInfoPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer)
     {
+        SString strDetectedAC;
+        uint    uiD3d9Size = 0;
+        SString strD3d9Md5;
+        SString strD3d9Sha256;
+
+        // Build the comma-separated detected AC list and update the cached d3d9 fields when the
+        // hashes are usable. The event is fired unconditionally so scripts always see the report.
+        if (BuildDetectedAcList(Packet.m_IdList, strDetectedAC))
+        {
+            pPlayer->m_strDetectedAC = strDetectedAC;
+
+            if (HasUsableD3d9Info(Packet.m_strD3d9MD5, Packet.m_strD3d9SHA256, Packet.m_uiD3d9Size))
+            {
+                uiD3d9Size = Packet.m_uiD3d9Size;
+                strD3d9Md5 = Packet.m_strD3d9MD5;
+                strD3d9Sha256 = Packet.m_strD3d9SHA256;
+                pPlayer->m_uiD3d9Size = uiD3d9Size;
+                pPlayer->m_strD3d9Md5 = strD3d9Md5;
+                pPlayer->m_strD3d9Sha256 = strD3d9Sha256;
+            }
+        }
+
         CLuaArguments acList;
         for (uint i = 0; i < Packet.m_IdList.size(); i++)
         {
@@ -4451,9 +4552,9 @@ void CGame::Packet_PlayerACInfo(CPlayerACInfoPacket& Packet)
 
         CLuaArguments Arguments;
         Arguments.PushTable(&acList);
-        Arguments.PushNumber(Packet.m_uiD3d9Size);
-        Arguments.PushString(Packet.m_strD3d9MD5);
-        Arguments.PushString(Packet.m_strD3d9SHA256);
+        Arguments.PushNumber(uiD3d9Size);
+        Arguments.PushString(strD3d9Md5);
+        Arguments.PushString(strD3d9Sha256);
         pPlayer->CallEvent("onPlayerACInfo", Arguments);
     }
 }
