@@ -38,7 +38,10 @@ void CSimControl::Startup()
     dassert(CPlayerPuresyncPacket().HasSimHandler());
     dassert(CVehiclePuresyncPacket().HasSimHandler());
     dassert(CKeysyncPacket().HasSimHandler());
-    dassert(CBulletsyncPacket().HasSimHandler());
+
+    // Bullet sync is deliberately excluded: it must reach the main thread so onPlayerWeaponFire
+    // runs before the shot is relayed. See CBulletsyncPacket::HasSimHandler.
+    dassert(!CBulletsyncPacket().HasSimHandler());
 }
 
 ///////////////////////////////////////////////////////////////

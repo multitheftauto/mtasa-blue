@@ -17,6 +17,7 @@
 #include <game/CTaskManager.h>
 #include <game/Task.h>
 #include <enums/VehicleType.h>
+#include <CBulletSyncValidation.h>
 
 extern CClientGame* g_pClientGame;
 CTickRateSettings   g_TickRateSettings;
@@ -2307,8 +2308,12 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
 
     CVector start;
     CVector end;
-    if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)) || !start.IsValid() ||
-        !end.IsValid())
+    if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)))
+        return;
+
+    // The server is authoritative here, this only keeps out of bounds coordinates away from
+    // the game's line of sight processing if anything upstream lets them through.
+    if (BulletSync::ValidateTrajectory(start, end, 0.0f) != BulletSync::EResult::Valid)
         return;
 
     std::uint8_t order = 0;
@@ -2323,6 +2328,9 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
     {
         ElementID id = INVALID_ELEMENT_ID;
         if (!stream.Read(damage) || !stream.Read(zone) || !stream.Read(id))
+            return;
+
+        if (BulletSync::ValidateDamagePayload(damage, zone) != BulletSync::EResult::Valid)
             return;
 
         damaged = DynamicCast<CClientPlayer>(CElementIDs::GetElement(id));
@@ -2359,8 +2367,10 @@ void CNetAPI::ReadWeaponBulletsync(CClientPlayer* player, NetBitStreamInterface&
 
     CVector start;
     CVector end;
-    if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)) || !start.IsValid() ||
-        !end.IsValid())
+    if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)))
+        return;
+
+    if (BulletSync::ValidateTrajectory(start, end, 0.0f) != BulletSync::EResult::Valid)
         return;
 
     uint8_t order = 0;

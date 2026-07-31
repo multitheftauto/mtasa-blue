@@ -335,39 +335,6 @@ bool CSimPlayerManager::HandleKeySync(const NetServerPlayerID& Socket, NetBitStr
     return true;
 }
 
-bool CSimPlayerManager::HandleBulletSync(const NetServerPlayerID& socket, NetBitStreamInterface* stream)
-{
-    if (!CNetBufferWatchDog::CanSendPacket(PACKET_ID_PLAYER_BULLETSYNC))
-        return true;
-
-    LockSimSystem();
-
-    auto* player = Get(socket);
-    if (!player || !player->IsJoined())
-    {
-        UnlockSimSystem();
-        return true;
-    }
-
-    auto packet = std::make_unique<CSimBulletsyncPacket>(player->m_PlayerID);
-    if (!packet->Read(*stream))
-    {
-        UnlockSimSystem();
-        return true;
-    }
-
-    if (!player->m_pRealPlayer->HasWeaponType(packet->m_cache.weapon))
-    {
-        UnlockSimSystem();
-        return true;
-    }
-
-    Broadcast(*packet, player->GetPuresyncSendList());
-
-    UnlockSimSystem();
-    return true;
-}
-
 ///////////////////////////////////////////////////////////////
 //
 // CSimPlayerManager::HandlePedTaskPacket
