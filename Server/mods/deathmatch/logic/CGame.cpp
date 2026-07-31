@@ -2215,6 +2215,10 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
             pPlayer->SetWeaponAmmoInClip(0, slot);
             pPlayer->SetWeaponTotalAmmo(0, slot);
         }
+
+        // Active satchels are wiped client-side when the player dies. Reset our count
+        // so the next life isn't blocked by the per-life cap from the old life's throws.
+        pPlayer->m_uiActiveSatchelCount = 0;
     }
 }
 
@@ -2834,11 +2838,17 @@ void CGame::Packet_DetonateSatchels(CDetonateSatchelsPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
+        constexpr unsigned long long DETONATE_SATCHEL_COOLDOWN_MS = 1000;
+        if (pPlayer->m_DetonateSatchelTimer.Get() < DETONATE_SATCHEL_COOLDOWN_MS)
+            return;
+        pPlayer->m_DetonateSatchelTimer.Reset();
+
         // Trigger Lua event and see if we are allowed to continue
         CLuaArguments arguments;
         if (!pPlayer->CallEvent("onPlayerDetonateSatchels", arguments))
             return;
 
+        pPlayer->m_uiActiveSatchelCount = 0;
         // Tell everyone to blow up this guy's satchels
         m_pPlayerManager->BroadcastOnlyJoined(Packet);
         // Take away their detonator
@@ -2852,6 +2862,11 @@ void CGame::Packet_DestroySatchels(CDestroySatchelsPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
+        constexpr unsigned long long DESTROY_SATCHEL_COOLDOWN_MS = 1000;
+        if (pPlayer->m_DestroySatchelTimer.Get() < DESTROY_SATCHEL_COOLDOWN_MS)
+            return;
+        pPlayer->m_DestroySatchelTimer.Reset();
+        pPlayer->m_uiActiveSatchelCount = 0;
         // Tell everyone to destroy up this player's satchels
         m_pPlayerManager->BroadcastOnlyJoined(Packet);
         // Take away their detonator
@@ -2987,6 +3002,14 @@ void CGame::Packet_ProjectileSync(CProjectileSyncPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
+        if (Packet.m_ucWeaponType == 39)
+        {
+            constexpr unsigned int MAX_PLAYER_SATCHELS = 128;
+            if (pPlayer->m_uiActiveSatchelCount >= MAX_PLAYER_SATCHELS)
+                return;
+            pPlayer->m_uiActiveSatchelCount++;
+        }
+
         CVector vecPosition = Packet.m_vecOrigin;
         if (Packet.m_OriginID != INVALID_ELEMENT_ID)
         {

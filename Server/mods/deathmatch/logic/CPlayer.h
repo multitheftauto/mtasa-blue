@@ -355,6 +355,9 @@ public:
     unsigned int       m_ResourceStartTokens{50};
     unsigned long long m_ResourceStartRefillRemainderMs{};
     unsigned int       m_ResourceStartDrops{};
+    unsigned int m_uiActiveSatchelCount{};
+    CElapsedTime m_DetonateSatchelTimer;
+    CElapsedTime m_DestroySatchelTimer;
 
 private:
     SLightweightSyncData m_lightweightSyncData;
