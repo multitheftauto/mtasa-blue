@@ -79,7 +79,7 @@ namespace
     // code away from the empty slot. Carriages have to be covered too: only the front one is a
     // scriptable element, the rest are native-only pool entries carrying their own track ID.
     ////////////////////////////////////////////////////////////////////////
-    void UnlinkTrainsFromTrack(std::uint8_t trackID) noexcept
+    void UnlinkTrainsFromTrack(std::uint8_t trackID)
     {
         CPools* pPools = pGame->GetPools();
 
@@ -112,7 +112,7 @@ CTrainTrackManagerSA::CTrainTrackManagerSA()
     RelocateTrackArrays();
 }
 
-bool CTrainTrackManagerSA::RelocateTrackArrays() noexcept
+bool CTrainTrackManagerSA::RelocateTrackArrays()
 {
     if (ms_bArraysRelocated)
         return true;
@@ -189,16 +189,4 @@ void CTrainTrackManagerSA::DestroyTrainTrack(std::uint8_t trackID)
 
     UnlinkTrainsFromTrack(trackID);
     m_Tracks[index].reset();
-}
-
-CTrainTrack* CTrainTrackManagerSA::GetTrainTrack(std::uint8_t trackID)
-{
-    if (trackID < FIRST_CUSTOM_TRACK_ID)
-        return nullptr;
-
-    std::size_t index = static_cast<std::size_t>(trackID) - FIRST_CUSTOM_TRACK_ID;
-    if (index >= m_Tracks.size())
-        return nullptr;
-
-    return m_Tracks[index].get();
 }

@@ -506,9 +506,6 @@ bool CVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
                     const auto trainTrack = pVehicle->GetTrainTrack();
                     if (!trainTrack || pVehicle->IsDerailed())
                     {
-                        // NOTE(qaisjp, feature/custom-train-tracks): when can a train both be on a track AND derailed?
-                        // I suppose it's possible for some weirdness here. We should make sure that whenever we set the train track,
-                        // we set that the train is NOT derailed; and that whenever we derail the track, we set the train track to nil.
                         BitStream.WriteBit(false);
                     }
                     else if (trainTrack->IsDefault())

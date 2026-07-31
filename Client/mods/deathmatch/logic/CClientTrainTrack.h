@@ -8,8 +8,6 @@
  *
  *****************************************************************************/
 
-class CClientTrainTrack;
-
 #pragma once
 
 #include "CClientEntity.h"

@@ -25,7 +25,6 @@ public:
 
     CTrainTrack* CreateTrainTrack(const std::vector<CVector>& nodePositions) override;
     void         DestroyTrainTrack(std::uint8_t trackID) override;
-    CTrainTrack* GetTrainTrack(std::uint8_t trackID) override;
     float        GetTrackLength(std::uint8_t trackID) const noexcept override { return trackID < MAX_TRACKS ? ms_TotalTrackLength[trackID] : 0.0f; }
 
     // The relocated arrays hold the node data for every track, built-in ones included. Read it from
@@ -39,7 +38,7 @@ public:
 
 private:
     // Repoints every instruction that indexes the built-in track arrays at the ones above
-    static bool RelocateTrackArrays() noexcept;
+    static bool RelocateTrackArrays();
 
     static SRailNodeSA* ms_pTrackNodes[MAX_TRACKS];
     static std::int32_t ms_NumTrackNodes[MAX_TRACKS];
