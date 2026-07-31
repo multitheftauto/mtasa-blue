@@ -7,10 +7,12 @@
  *
  *****************************************************************************/
 
+#pragma once
+
 #include <CMatrix_Pad.h>
 #include <CVector.h>
 
-class CSimpleTransformSAInterface            // 16 bytes
+class CSimpleTransformSAInterface  // 16 bytes
 {
 public:
     CVector m_translate;
@@ -27,12 +29,13 @@ public:
     bool  IsPlaceableVTBL() const { return GetVTBL() == (void*)0x863C40; }
 
     bool HasMatrix() const noexcept { return matrix != nullptr; }
+    void AllocateMatrix() { ((void(__thiscall*)(void*))0x54F560)(this); }
     void RemoveMatrix() { ((void(__thiscall*)(void*))0x54F3B0)(this); }
 
     void SetOrientation(float x, float y, float z) { ((void(__thiscall*)(CPlaceableSAInterface * pEntity, float, float, float))0x439A80)(this, x, y, z); }
 
 public:
     CSimpleTransformSAInterface m_transform;
-    CMatrix_Padded*             matrix;            // This is actually XYZ*, change later
+    CMatrix_Padded*             matrix;  // This is actually XYZ*, change later
 };
 static_assert(sizeof(CPlaceableSAInterface) == 0x18, "Invalid size for CPlaceableSAInterface");

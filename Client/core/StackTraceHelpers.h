@@ -76,7 +76,7 @@ namespace StackTraceHelpers
             return 0;
 
         MEMORY_BASIC_INFORMATION mbi{};
-        const auto addr32 = static_cast<std::uint32_t>(address);
+        const auto               addr32 = static_cast<std::uint32_t>(address);
         if (VirtualQuery(reinterpret_cast<LPCVOID>(static_cast<std::uintptr_t>(addr32)), &mbi, sizeof(mbi)) == 0) [[unlikely]]
             return 0;
 
@@ -90,18 +90,10 @@ namespace StackTraceHelpers
     {
         if (useDbgHelp)
         {
-            return StackWalkRoutines{
-                .readMemory          = &LocalReadProcessMemory,
-                .functionTableAccess = SymFunctionTableAccess64,
-                .moduleBase          = SymGetModuleBase64
-            };
+            return StackWalkRoutines{.readMemory = &LocalReadProcessMemory, .functionTableAccess = SymFunctionTableAccess64, .moduleBase = SymGetModuleBase64};
         }
 
-        return StackWalkRoutines{
-            .readMemory          = &LocalReadProcessMemory,
-            .functionTableAccess = nullptr,
-            .moduleBase          = &LocalGetModuleBase
-        };
+        return StackWalkRoutines{.readMemory = &LocalReadProcessMemory, .functionTableAccess = nullptr, .moduleBase = &LocalGetModuleBase};
     }
 
     struct ModuleAddressInfo
@@ -142,15 +134,10 @@ namespace StackTraceHelpers
         }
 
         const std::string_view modulePathView{modulePath.data(), pathLen};
-        const auto lastSlash = modulePathView.find_last_of("\\/");
-        const std::string_view moduleName = (lastSlash != std::string_view::npos) 
-            ? modulePathView.substr(lastSlash + 1) 
-            : modulePathView;
+        const auto             lastSlash = modulePathView.find_last_of("\\/");
+        const std::string_view moduleName = (lastSlash != std::string_view::npos) ? modulePathView.substr(lastSlash + 1) : modulePathView;
 
-        ModuleAddressInfo info{
-            .name = std::string{moduleName},
-            .base = static_cast<DWORD64>(reinterpret_cast<std::uintptr_t>(mbi.AllocationBase))
-        };
+        ModuleAddressInfo info{.name = std::string{moduleName}, .base = static_cast<DWORD64>(reinterpret_cast<std::uintptr_t>(mbi.AllocationBase))};
         return info;
     }
 
@@ -188,4 +175,4 @@ namespace StackTraceHelpers
             return "<format_error>";
         }
     }
-} // namespace StackTraceHelpers
+}  // namespace StackTraceHelpers

@@ -41,7 +41,7 @@ namespace
     public:
         CLuaMainMemoryMap LuaMainMemoryMap;
     };
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //

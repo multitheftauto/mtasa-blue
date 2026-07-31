@@ -42,6 +42,13 @@ void CDeathmatchVehicle::SetIsSyncing(bool bIsSyncing)
 
 bool CDeathmatchVehicle::SyncDamageModel()
 {
+    // Do not sync damage for blown vehicles. Once destroyed, further
+    // damage state changes (e.g. from physics collision or burn explosions)
+    // would only re-spawn flying components and excess explosions on all
+    // clients without meaningful effect.
+    if (IsBlown())
+        return false;
+
     SVehicleDamageSync damage(true, true, true, true, true);
     bool               bChanges = false;
 

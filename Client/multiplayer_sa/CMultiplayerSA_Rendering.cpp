@@ -9,14 +9,15 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-extern CCoreInterface*   g_pCore;
-GameEntityRenderHandler* pGameEntityRenderHandler = nullptr;
-PreRenderSkyHandler*     pPreRenderSkyHandlerHandler = nullptr;
-RenderHeliLightHandler*  pRenderHeliLightHandler = nullptr;
-RenderEverythingBarRoadsHandler*  pRenderEverythingBarRoadsHandler = nullptr;
+#include <game/RenderWare.h>
+extern CCoreInterface*           g_pCore;
+GameEntityRenderHandler*         pGameEntityRenderHandler = nullptr;
+PreRenderSkyHandler*             pPreRenderSkyHandlerHandler = nullptr;
+RenderHeliLightHandler*          pRenderHeliLightHandler = nullptr;
+RenderEverythingBarRoadsHandler* pRenderEverythingBarRoadsHandler = nullptr;
 
-#define VAR_CCullZones_NumMirrorAttributeZones  0x0C87AC4   // int
-#define VAR_CMirrors_d3dRestored                0x0C7C729   // uchar
+#define VAR_CCullZones_NumMirrorAttributeZones 0x0C87AC4  // int
+#define VAR_CMirrors_d3dRestored               0x0C7C729  // uchar
 
 namespace
 {
@@ -24,7 +25,7 @@ namespace
     CEntitySAInterface* ms_RenderingOneNonRoad = NULL;
     bool                ms_bIsMinimizedAndNotConnected = false;
     int                 ms_iSavedNumMirrorZones = 0;
-}            // namespace
+}  // namespace
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -44,10 +45,10 @@ void OnMY_CallIdle_Post(RwGeometry* pGeometry, DWORD calledFrom)
 }
 
 // Hook info
-#define HOOKPOS_CallIdle                         0x53ECBD
-#define HOOKSIZE_CallIdle                        5
-DWORD RETURN_CallIdle = 0x53ECC2;
-DWORD DO_CallIdle = 0x53E920;
+#define HOOKPOS_CallIdle  0x53ECBD
+#define HOOKSIZE_CallIdle 5
+DWORD                         RETURN_CallIdle = 0x53ECC2;
+DWORD                         DO_CallIdle = 0x53E920;
 static void __declspec(naked) HOOK_CallIdle()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -110,14 +111,14 @@ void OnMY_CEntity_Render_Post()
     if (ms_Rendering)
     {
         ms_Rendering = NULL;
-        CallGameEntityRenderHandler(ms_RenderingOneNonRoad);            // restore value set in RenderOneNonRoad
+        CallGameEntityRenderHandler(ms_RenderingOneNonRoad);  // restore value set in RenderOneNonRoad
     }
 }
 
 // Hook info
-#define HOOKPOS_CEntity_Render                         0x534310
-#define HOOKSIZE_CEntity_Render                        6
-DWORD RETURN_CEntity_Render = 0x534317;
+#define HOOKPOS_CEntity_Render  0x534310
+#define HOOKSIZE_CEntity_Render 6
+DWORD                         RETURN_CEntity_Render = 0x534317;
 static void __declspec(naked) HOOK_CEntity_Render()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -155,15 +156,77 @@ inner:
 // Detect entity rendering
 //
 //////////////////////////////////////////////////////////////////////////////////////////
+
+// #425: the game sets ALPHAREF before the entity render call (140 in
+// RenderEverythingBarRoads, 100 in CVisibilityPlugins::RenderEntity), alpha func is
+// GREATER. MTA applies setElementAlpha by scaling material alpha during the render,
+// so at element alpha A every pixel lands at (texel * A / 255) and the object drops
+// below the ref once A <= 140 or A <= 100 depending on path. lowering the refs
+// globally is what smeared the LV neon textures (#4996), so scale the ref for this
+// entity only: ref' = ref * A / 255. both sides of the compare scale equally, cutouts
+// keep their shape and ref' < A so the object never fully vanishes. restored in the
+// Post handler. player peds, cars and bikes set ref 1 and restore it inside their
+// own Render fns. boats and trains never did, so vehicles get the same scaling,
+// for cars and bikes it's a no-op since their own ref write lands after ours.
+static bool  ms_bAlphaTestRefOverridden = false;
+static DWORD ms_dwSavedAlphaTestRef = 0;
+
+static void OverrideAlphaTestRefForElementAlpha(CEntitySAInterface* pEntity)
+{
+    unsigned char ucAlpha = 255;
+
+    if (pEntity->nType == ENTITY_TYPE_OBJECT)
+    {
+        SClientEntity<CObjectSA>* pObjectClientEntity = pGameInterface->GetPools()->GetObject((DWORD*)pEntity);
+        if (pObjectClientEntity && pObjectClientEntity->pEntity)
+            ucAlpha = pObjectClientEntity->pEntity->GetAlpha();
+    }
+    else if (pEntity->nType == ENTITY_TYPE_VEHICLE)
+    {
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pEntity);
+        if (pVehicleClientEntity && pVehicleClientEntity->pEntity)
+            ucAlpha = pVehicleClientEntity->pEntity->GetAlpha();
+    }
+
+    if (ucAlpha == 255)
+        return;
+
+    // RwEngineInstance->dOpenDevice.fpRenderStateGet/fpRenderStateSet
+    DWORD engine = *(DWORD*)0xC97B24;
+    auto  fpGet = reinterpret_cast<BOOL(__cdecl*)(DWORD, void*)>(*(DWORD*)(engine + 0x24));
+    auto  fpSet = reinterpret_cast<BOOL(__cdecl*)(DWORD, void*)>(*(DWORD*)(engine + 0x20));
+
+    fpGet(0x1e /*rwRENDERSTATEALPHATESTFUNCTIONREF*/, &ms_dwSavedAlphaTestRef);
+    fpSet(0x1e /*rwRENDERSTATEALPHATESTFUNCTIONREF*/, reinterpret_cast<void*>(ms_dwSavedAlphaTestRef * ucAlpha / 255));
+    ms_bAlphaTestRefOverridden = true;
+}
+
+static void RestoreAlphaTestRef()
+{
+    if (!ms_bAlphaTestRefOverridden)
+        return;
+
+    ms_bAlphaTestRefOverridden = false;
+
+    DWORD engine = *(DWORD*)0xC97B24;
+    auto  fpSet = reinterpret_cast<BOOL(__cdecl*)(DWORD, void*)>(*(DWORD*)(engine + 0x20));
+    fpSet(0x1e /*rwRENDERSTATEALPHATESTFUNCTIONREF*/, reinterpret_cast<void*>(ms_dwSavedAlphaTestRef));
+}
+
 bool OnMY_CEntity_RenderOneNonRoad_Pre(CEntitySAInterface* pEntity)
 {
     ms_RenderingOneNonRoad = pEntity;
     CallGameEntityRenderHandler(ms_RenderingOneNonRoad);
+
+    OverrideAlphaTestRefForElementAlpha(pEntity);
+
     return IsEntityRenderable(pEntity);
 }
 
 void OnMY_CEntity_RenderOneNonRoad_Post(CEntitySAInterface* pEntity)
 {
+    RestoreAlphaTestRef();
+
     if (ms_RenderingOneNonRoad)
     {
         ms_RenderingOneNonRoad = NULL;
@@ -172,9 +235,9 @@ void OnMY_CEntity_RenderOneNonRoad_Post(CEntitySAInterface* pEntity)
 }
 
 // Hook info
-#define HOOKPOS_CEntity_RenderOneNonRoad                         0x553260
-#define HOOKSIZE_CEntity_RenderOneNonRoad                        5
-DWORD RETURN_CEntity_RenderOneNonRoad = 0x553265;
+#define HOOKPOS_CEntity_RenderOneNonRoad  0x553260
+#define HOOKSIZE_CEntity_RenderOneNonRoad 5
+DWORD                         RETURN_CEntity_RenderOneNonRoad = 0x553265;
 static void __declspec(naked) HOOK_CEntity_RenderOneNonRoad()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -223,9 +286,9 @@ void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_Mid(CPedSAInterface* pEntity)
 }
 
 // Hook info
-#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_Mid                0x733080
-#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_Mid               6
-DWORD RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid = 0x733086;
+#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_Mid  0x733080
+#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_Mid 6
+DWORD                         RETURN_CVisibilityPlugins_RenderWeaponPedsForPC_Mid = 0x733086;
 static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_Mid()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -259,8 +322,8 @@ void OnMY_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 }
 
 // Hook info
-#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_End                0x73314D
-#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_End               5
+#define HOOKPOS_CVisibilityPlugins_RenderWeaponPedsForPC_End  0x73314D
+#define HOOKSIZE_CVisibilityPlugins_RenderWeaponPedsForPC_End 5
 static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -288,9 +351,9 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End(
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_Check_NoOfVisibleLods                         0x5534F9
-#define HOOKSIZE_Check_NoOfVisibleLods                        6
-DWORD RETURN_Check_NoOfVisibleLods = 0x5534FF;
+#define HOOKPOS_Check_NoOfVisibleLods  0x5534F9
+#define HOOKSIZE_Check_NoOfVisibleLods 6
+DWORD                         RETURN_Check_NoOfVisibleLods = 0x5534FF;
 static void __declspec(naked) HOOK_Check_NoOfVisibleLods()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -316,9 +379,9 @@ limit:
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_Check_NoOfVisibleEntities                         0x55352D
-#define HOOKSIZE_Check_NoOfVisibleEntities                        6
-DWORD RETURN_Check_NoOfVisibleEntities = 0x553533;
+#define HOOKPOS_Check_NoOfVisibleEntities  0x55352D
+#define HOOKSIZE_Check_NoOfVisibleEntities 6
+DWORD                         RETURN_Check_NoOfVisibleEntities = 0x553533;
 static void __declspec(naked) HOOK_Check_NoOfVisibleEntities()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -348,9 +411,9 @@ void OnMY_WinLoop()
 }
 
 // Hook info
-#define HOOKPOS_WinLoop                            0x748A93
-#define HOOKSIZE_WinLoop                           5
-DWORD RETURN_WinLoop = 0x748A98;
+#define HOOKPOS_WinLoop  0x748A93
+#define HOOKSIZE_WinLoop 5
+DWORD                         RETURN_WinLoop = 0x748A98;
 static void __declspec(naked) HOOK_WinLoop()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -375,9 +438,9 @@ static void __declspec(naked) HOOK_WinLoop()
 // Just before GTA calculates frame time deltas
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CTimer_Update               0x561B10
-#define HOOKSIZE_CTimer_Update              6
-static const DWORD CONTINUE_CTimer_Update = 0x561B16;
+#define HOOKPOS_CTimer_Update  0x561B10
+#define HOOKSIZE_CTimer_Update 6
+static const DWORD            CONTINUE_CTimer_Update = 0x561B16;
 static void __declspec(naked) HOOK_CTimer_Update()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -410,21 +473,22 @@ static void __declspec(naked) HOOK_CTimer_Update()
 // Prevent crashes if _timerFunction is NULL during init
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CTimer_Suspend              0x5619E9
-#define HOOKSIZE_CTimer_Suspend             6
-static const DWORD CONTINUE_CTimer_Suspend = 0x5619EF;
+#define HOOKPOS_CTimer_Suspend  0x5619E9
+#define HOOKSIZE_CTimer_Suspend 6
+static const DWORD           CONTINUE_CTimer_Suspend = 0x5619EF;
 static void _declspec(naked) HOOK_CTimer_Suspend()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     _asm
     {
         // Check if _timerFunction is NULL
         mov     eax, dword ptr ds:[0B7CB28h]
         test    eax, eax
         jz      skip_suspend
-        
-        // Original code: call [_timerFunction]
+
+             // Original code: call [_timerFunction]
         call    eax
         jmp     CONTINUE_CTimer_Suspend
         
@@ -434,23 +498,25 @@ static void _declspec(naked) HOOK_CTimer_Suspend()
         xor     edx, edx
         jmp     CONTINUE_CTimer_Suspend
     }
+    // clang-format on
 }
 
-#define HOOKPOS_CTimer_Resume               0x561A11
-#define HOOKSIZE_CTimer_Resume              6
-static const DWORD CONTINUE_CTimer_Resume = 0x561A17;
+#define HOOKPOS_CTimer_Resume  0x561A11
+#define HOOKSIZE_CTimer_Resume 6
+static const DWORD           CONTINUE_CTimer_Resume = 0x561A17;
 static void _declspec(naked) HOOK_CTimer_Resume()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     _asm
     {
         // Check if _timerFunction is NULL
         mov     eax, dword ptr ds:[0B7CB28h]
         test    eax, eax
         jz      skip_resume
-        
-        // Original code: call [_timerFunction]
+
+             // Original code: call [_timerFunction]
         call    eax
         jmp     CONTINUE_CTimer_Resume
         
@@ -460,6 +526,7 @@ static void _declspec(naked) HOOK_CTimer_Resume()
         xor     edx, edx
         jmp     CONTINUE_CTimer_Resume
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -496,10 +563,10 @@ bool OnMY_psGrabScreen_ShouldUseRect()
 }
 
 // Hook info
-#define HOOKPOS_psGrabScreen                        0x7452FC
-#define HOOKSIZE_psGrabScreen                       5
-DWORD RETURN_psGrabScreen_YesChange = 0x745311;
-DWORD RETURN_psGrabScreen_NoChange = 0x745336;
+#define HOOKPOS_psGrabScreen  0x7452FC
+#define HOOKSIZE_psGrabScreen 5
+DWORD                         RETURN_psGrabScreen_YesChange = 0x745311;
+DWORD                         RETURN_psGrabScreen_NoChange = 0x745336;
 static void __declspec(naked) HOOK_psGrabScreen()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -544,10 +611,10 @@ void OnMY_CClouds_RenderSkyPolys()
 }
 
 // Hook info
-#define HOOKCHECK_CClouds_RenderSkyPolys            0xA1
-#define HOOKPOS_CClouds_RenderSkyPolys              0x714650
-#define HOOKSIZE_CClouds_RenderSkyPolys             5
-DWORD RETURN_CClouds_RenderSkyPolys = 0x714655;
+#define HOOKCHECK_CClouds_RenderSkyPolys 0xA1
+#define HOOKPOS_CClouds_RenderSkyPolys   0x714650
+#define HOOKSIZE_CClouds_RenderSkyPolys  5
+DWORD                         RETURN_CClouds_RenderSkyPolys = 0x714655;
 static void __declspec(naked) HOOK_CClouds_RenderSkyPolys()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -603,10 +670,10 @@ float OnMY_RwCameraSetNearClipPlane(DWORD dwCalledFrom, void* pUnknown, float fD
 }
 
 // Hook info
-#define HOOKCHECK_RwCameraSetNearClipPlane          0xD9
-#define HOOKPOS_RwCameraSetNearClipPlane            0x7EE1D0
-#define HOOKSIZE_RwCameraSetNearClipPlane           5
-DWORD RETURN_RwCameraSetNearClipPlane = 0x7EE1D5;
+#define HOOKCHECK_RwCameraSetNearClipPlane 0xD9
+#define HOOKPOS_RwCameraSetNearClipPlane   0x7EE1D0
+#define HOOKSIZE_RwCameraSetNearClipPlane  5
+DWORD                         RETURN_RwCameraSetNearClipPlane = 0x7EE1D5;
 static void __declspec(naked) HOOK_RwCameraSetNearClipPlane()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -639,9 +706,9 @@ static void __declspec(naked) HOOK_RwCameraSetNearClipPlane()
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 // Hook info
-#define HOOKPOS_RenderEffects_HeliLight                           0x53E1B9
-#define HOOKSIZE_RenderEffects_HeliLight                          5
-DWORD RETURN_RenderEffects_HeliLight = 0x53E1BE;
+#define HOOKPOS_RenderEffects_HeliLight  0x53E1B9
+#define HOOKSIZE_RenderEffects_HeliLight 5
+DWORD                         RETURN_RenderEffects_HeliLight = 0x53E1BE;
 static void __declspec(naked) HOOK_RenderEffects_HeliLight()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -767,34 +834,29 @@ bool IsMatrixValid(RwMatrix* pMatrix)
     constexpr float maxValue = 100000.0;
     constexpr float minValue = -100000.0;
 
-    return
-        pMatrix->at.x >= minValue && pMatrix->at.x <= maxValue
-        && pMatrix->at.y >= minValue && pMatrix->at.y <= maxValue
-        && pMatrix->at.z >= minValue && pMatrix->at.y <= maxValue
+    return pMatrix->at.x >= minValue && pMatrix->at.x <= maxValue && pMatrix->at.y >= minValue && pMatrix->at.y <= maxValue && pMatrix->at.z >= minValue &&
+           pMatrix->at.y <= maxValue
 
-        && pMatrix->right.x >= minValue && pMatrix->right.x <= maxValue
-        && pMatrix->right.y >= minValue && pMatrix->right.y <= maxValue
-        && pMatrix->right.z >= minValue && pMatrix->right.y <= maxValue
+           && pMatrix->right.x >= minValue && pMatrix->right.x <= maxValue && pMatrix->right.y >= minValue && pMatrix->right.y <= maxValue &&
+           pMatrix->right.z >= minValue && pMatrix->right.y <= maxValue
 
-        && pMatrix->up.x >= minValue && pMatrix->up.x <= maxValue
-        && pMatrix->up.y >= minValue && pMatrix->up.y <= maxValue
-        && pMatrix->up.z >= minValue && pMatrix->up.y <= maxValue
+           && pMatrix->up.x >= minValue && pMatrix->up.x <= maxValue && pMatrix->up.y >= minValue && pMatrix->up.y <= maxValue && pMatrix->up.z >= minValue &&
+           pMatrix->up.y <= maxValue
 
-        && pMatrix->pos.x >= minValue && pMatrix->pos.x <= maxValue
-        && pMatrix->pos.y >= minValue && pMatrix->pos.y <= maxValue
-        && pMatrix->pos.z >= minValue && pMatrix->pos.y <= maxValue;
+           && pMatrix->pos.x >= minValue && pMatrix->pos.x <= maxValue && pMatrix->pos.y >= minValue && pMatrix->pos.y <= maxValue &&
+           pMatrix->pos.z >= minValue && pMatrix->pos.y <= maxValue;
 }
 
 bool AreMatricesOfRpAtomicValid(RpAtomic* pAtomic)
 {
-    uint32 atomicSkinOffset = *(uint32*)0xC978A4;
+    uint32            atomicSkinOffset = *(uint32*)0xC978A4;
     RpHAnimHierarchy* pSkinPluginData = *(RpHAnimHierarchy**)((char*)pAtomic + atomicSkinOffset);
 
     if (!pSkinPluginData)
         return true;
 
     unsigned __int32 count = pSkinPluginData->numNodes;
-    RwMatrix* pMatrixArray = pSkinPluginData->pMatrixArray;
+    RwMatrix*        pMatrixArray = pSkinPluginData->pMatrixArray;
 
     for (unsigned int i = 0; i < count; i++)
     {
@@ -805,8 +867,8 @@ bool AreMatricesOfRpAtomicValid(RpAtomic* pAtomic)
     return true;
 }
 
-#define HOOKPOS_CVisibilityPlugins_RenderPedCB                        0x7335B0
-#define HOOKSIZE_CVisibilityPlugins_RenderPedCB                       5
+#define HOOKPOS_CVisibilityPlugins_RenderPedCB  0x7335B0
+#define HOOKSIZE_CVisibilityPlugins_RenderPedCB 5
 static void __declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -837,10 +899,10 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderPedCB()
 }
 
 // Hook info
-#define HOOKPOS_CRenderer_EverythingBarRoads                         0x553C78
-#define HOOKSIZE_CRenderer_EverythingBarRoads                        5
-DWORD RETURN_CRenderer_EverythingBarRoads = 0x553C7D;
-DWORD DO_CRenderer_EverythingBarRoads = 0x7EE180;
+#define HOOKPOS_CRenderer_EverythingBarRoads  0x553C78
+#define HOOKSIZE_CRenderer_EverythingBarRoads 5
+DWORD                         RETURN_CRenderer_EverythingBarRoads = 0x553C7D;
+DWORD                         DO_CRenderer_EverythingBarRoads = 0x7EE180;
 static void __declspec(naked) HOOK_CRenderer_EverythingBarRoads()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -852,8 +914,7 @@ static void __declspec(naked) HOOK_CRenderer_EverythingBarRoads()
     }
     // clang-format on
 
-    if (pRenderEverythingBarRoadsHandler)
-        pRenderEverythingBarRoadsHandler();
+    if (pRenderEverythingBarRoadsHandler) pRenderEverythingBarRoadsHandler();
 
     // clang-format off
     __asm
@@ -875,6 +936,15 @@ static void __declspec(naked) HOOK_CRenderer_EverythingBarRoads()
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_Rendering()
 {
+    // GTA assigns main-world temporary directional lights to slots 1 through 6,
+    // but the vehicle env-map pipeline overwrites slot 1 with its specular light.
+    // Reserve slot 7 for the specular light so headlights can illuminate vehicle
+    // materials without being discarded immediately before the draw.
+    constexpr BYTE VEHICLE_SPECULAR_LIGHT_SLOT = 7;
+    MemPut<BYTE>(0x5D9A88, VEHICLE_SPECULAR_LIGHT_SLOT);  // RwD3D9SetLight
+    MemPut<BYTE>(0x5D9A91, VEHICLE_SPECULAR_LIGHT_SLOT);  // RwD3D9EnableLight(TRUE)
+    MemPut<BYTE>(0x5D9F1F, VEHICLE_SPECULAR_LIGHT_SLOT);  // RwD3D9EnableLight(FALSE)
+
     EZHookInstall(CallIdle);
     EZHookInstall(CEntity_Render);
     EZHookInstall(CEntity_RenderOneNonRoad);

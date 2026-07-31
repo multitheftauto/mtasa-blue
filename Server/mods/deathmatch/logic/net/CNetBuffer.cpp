@@ -11,9 +11,48 @@
 #include "SimHeaders.h"
 #include "CGame.h"
 #include "packets/CPlayerDisconnectedPacket.h"
+#ifndef WIN32
+    #include <dlfcn.h>
+#endif
 
 SThreadCPUTimesStore g_SyncThreadCPUTimes;
 uint                 g_uiNetSentByteCounter = 0;
+
+namespace
+{
+    using PFN_NotifyHqReachable = void (*)(int);
+    PFN_NotifyHqReachable ms_pfnNotifyHqReachable = nullptr;
+
+    void ResolveNotifyHqReachable()
+    {
+        if (ms_pfnNotifyHqReachable)
+            return;
+#ifdef WIN32
+        HMODULE hNetMod = GetModuleHandleA("net.dll");
+        if (!hNetMod)
+            hNetMod = GetModuleHandleA("net_d.dll");
+        if (hNetMod)
+            ms_pfnNotifyHqReachable = reinterpret_cast<PFN_NotifyHqReachable>(GetProcAddress(hNetMod, "NetServer_NotifyHqReachable"));
+#else
+        // Core loads net.so without RTLD_GLOBAL, so RTLD_DEFAULT cannot see its symbols.
+        // RTLD_NOLOAD returns a handle to the already-loaded module without reloading it.
+        void* hNetMod = dlopen("net.so", RTLD_NOW | RTLD_NOLOAD);
+        if (!hNetMod)
+            hNetMod = dlopen("net_d.so", RTLD_NOW | RTLD_NOLOAD);
+        if (hNetMod)
+        {
+            ms_pfnNotifyHqReachable = reinterpret_cast<PFN_NotifyHqReachable>(dlsym(hNetMod, "NetServer_NotifyHqReachable"));
+            dlclose(hNetMod);
+        }
+#endif
+    }
+}
+
+void NetServer_NotifyHqReachable(bool bReachable)
+{
+    if (ms_pfnNotifyHqReachable)
+        ms_pfnNotifyHqReachable(bReachable ? 1 : 0);
+}
 
 namespace
 {
@@ -102,7 +141,7 @@ namespace
         ms_StatsSendCmdsTotal += ms_StatsSendNumCommands;
         ms_StatsSendCmdsMax = std::max(ms_StatsSendCmdsMax, ms_StatsSendNumCommands);
     }
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////////////////
 //
@@ -116,6 +155,8 @@ CNetServerBuffer::CNetServerBuffer(CSimPlayerManager* pSimPlayerManager)
     m_pSimPlayerManager = pSimPlayerManager;
     ms_pNetServerBuffer = this;
     m_pRealNetServer = g_pRealNetServer;
+
+    ResolveNotifyHqReachable();
 
     // Begin the watchdog
     shared.m_pWatchDog = new CNetBufferWatchDog(this, false);
@@ -237,7 +278,7 @@ void CNetServerBuffer::DoPulse()
         shared.m_Mutex.Lock();
         fSyncFPS = static_cast<float>(shared.m_iThreadFrameCount);
         shared.m_iThreadFrameCount = 0;
-        shared.m_iuGamePlayerCount = g_pGame->GetPlayerManager()->Count();            // Also update player count here (for scaling buffer size checks)
+        shared.m_iuGamePlayerCount = g_pGame->GetPlayerManager()->Count();  // Also update player count here (for scaling buffer size checks)
         shared.m_Mutex.Unlock();
 
         // Compress high counts
@@ -740,6 +781,18 @@ void CNetServerBuffer::SetNetOptions(const SNetOptions& options)
 
 ///////////////////////////////////////////////////////////////////////////
 //
+// CNetServerBuffer::SetMinClientRequirement
+//
+// Thread safe
+//
+///////////////////////////////////////////////////////////////////////////
+void CNetServerBuffer::SetMinClientRequirement(const char* szVersion)
+{
+    m_pRealNetServer->SetMinClientRequirement(szVersion);
+}
+
+///////////////////////////////////////////////////////////////////////////
+//
 // CNetServerBuffer::GenerateRandomData
 //
 // Thread safe
@@ -1089,29 +1142,54 @@ void CNetServerBuffer::ProcessCommand(CNetJobData* pJobData)
 #define CALLPRE0(func) \
     case TYPE_##func: \
     {
-
 #define CALLPRE(func) \
     case TYPE_##func: \
     { \
         S##func##Args& a = *(S##func##Args*)pJobData->pArgs;
 
-#define CALLREALNET0(func)                                                CALLPRE0(func) m_pRealNetServer->func (); CALLPOST
-#define CALLREALNET1(func,t1,n1)                                          CALLPRE(func) m_pRealNetServer->func ( a.n1 ); CALLPOST
-#define CALLREALNET2(func,t1,n1,t2,n2)                                    CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2 ); CALLPOST
-#define CALLREALNET3(func,t1,n1,t2,n2,t3,n3)                              CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2, a.n3 ); CALLPOST
-#define CALLREALNET4(func,t1,n1,t2,n2,t3,n3,t4,n4)                        CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2, a.n3, a.n4 ); CALLPOST
-#define CALLREALNET5(func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5)                  CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2, a.n3, a.n4, a.n5 ); CALLPOST
-#define CALLREALNET6(func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5,t6,n6)            CALLPRE(func) m_pRealNetServer->func ( a.n1, a.n2, a.n3, a.n4, a.n5, a.n6 ); CALLPOST
+#define CALLREALNET0(func) \
+    CALLPRE0(func) m_pRealNetServer->func(); \
+    CALLPOST
+#define CALLREALNET1(func, t1, n1) \
+    CALLPRE(func) m_pRealNetServer->func(a.n1); \
+    CALLPOST
+#define CALLREALNET2(func, t1, n1, t2, n2) \
+    CALLPRE(func) m_pRealNetServer->func(a.n1, a.n2); \
+    CALLPOST
+#define CALLREALNET3(func, t1, n1, t2, n2, t3, n3) \
+    CALLPRE(func) m_pRealNetServer->func(a.n1, a.n2, a.n3); \
+    CALLPOST
+#define CALLREALNET4(func, t1, n1, t2, n2, t3, n3, t4, n4) \
+    CALLPRE(func) m_pRealNetServer->func(a.n1, a.n2, a.n3, a.n4); \
+    CALLPOST
+#define CALLREALNET5(func, t1, n1, t2, n2, t3, n3, t4, n4, t5, n5) \
+    CALLPRE(func) m_pRealNetServer->func(a.n1, a.n2, a.n3, a.n4, a.n5); \
+    CALLPOST
+#define CALLREALNET6(func, t1, n1, t2, n2, t3, n3, t4, n4, t5, n5, t6, n6) \
+    CALLPRE(func) m_pRealNetServer->func(a.n1, a.n2, a.n3, a.n4, a.n5, a.n6); \
+    CALLPOST
 
-#define CALLREALNET0R(ret,func)                                           CALLPRE(func) a.result = m_pRealNetServer->func (); CALLPOST
-#define CALLREALNET1R(ret,func,t1,n1)                                     CALLPRE(func) a.result = m_pRealNetServer->func ( a.n1 ); CALLPOST
-#define CALLREALNET2R(ret,func,t1,n1,t2,n2)                               CALLPRE(func) a.result = m_pRealNetServer->func ( a.n1, a.n2 ); CALLPOST
-#define CALLREALNET3R(ret,func,t1,n1,t2,n2,t3,n3)                         CALLPRE(func) a.result = m_pRealNetServer->func ( a.n1, a.n2, a.n3 ); CALLPOST
-#define CALLREALNET4R(ret,func,t1,n1,t2,n2,t3,n3,t4,n4)                   CALLPRE(func) a.result = m_pRealNetServer->func ( a.n1, a.n2, a.n3, a.n4 ); CALLPOST
-#define CALLREALNET7R(ret,func,t1,n1,t2,n2,t3,n3,t4,n4,t5,n5,t6,n6,t7,n7) CALLPRE(func) a.result = m_pRealNetServer->func ( a.n1, a.n2, a.n3, a.n4, a.n5, a.n6, a.n7 ); CALLPOST
+#define CALLREALNET0R(ret, func) \
+    CALLPRE(func) a.result = m_pRealNetServer->func(); \
+    CALLPOST
+#define CALLREALNET1R(ret, func, t1, n1) \
+    CALLPRE(func) a.result = m_pRealNetServer->func(a.n1); \
+    CALLPOST
+#define CALLREALNET2R(ret, func, t1, n1, t2, n2) \
+    CALLPRE(func) a.result = m_pRealNetServer->func(a.n1, a.n2); \
+    CALLPOST
+#define CALLREALNET3R(ret, func, t1, n1, t2, n2, t3, n3) \
+    CALLPRE(func) a.result = m_pRealNetServer->func(a.n1, a.n2, a.n3); \
+    CALLPOST
+#define CALLREALNET4R(ret, func, t1, n1, t2, n2, t3, n3, t4, n4) \
+    CALLPRE(func) a.result = m_pRealNetServer->func(a.n1, a.n2, a.n3, a.n4); \
+    CALLPOST
+#define CALLREALNET7R(ret, func, t1, n1, t2, n2, t3, n3, t4, n4, t5, n5, t6, n6, t7, n7) \
+    CALLPRE(func) a.result = m_pRealNetServer->func(a.n1, a.n2, a.n3, a.n4, a.n5, a.n6, a.n7); \
+    CALLPOST
 
 #define CALLPOST \
-        break; \
+    break; \
     }
 
     switch (pJobData->pArgs->type)
@@ -1288,10 +1366,10 @@ void CNetServerBuffer::GetQueueSizes(uint& uiFinishedList, uint& uiOutCommandQue
 bool CNetJobData::SetCallback(PFN_NETRESULT pfnNetResult, void* pContext)
 {
     if (callback.bSet)
-        return false;            // One has already been set
+        return false;  // One has already been set
 
     if (this->stage > EJobStage::RESULT)
-        return false;            // Too late to set a callback now
+        return false;  // Too late to set a callback now
 
     // Set new
     callback.pfnNetResult = pfnNetResult;

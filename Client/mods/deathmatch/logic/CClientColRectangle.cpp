@@ -67,7 +67,7 @@ void CClientColRectangle::DebugRender(const CVector& vecPosition, float fDrawRad
         static const CVector cornerPoints[] = {CVector(0, 0, 1), CVector(1, 0, 1), CVector(1, 1, 1), CVector(0, 1, 1)};
 
         CVector vecMult = vecSize;
-        CVector vecAdd = vecBase + CVector(0, 0, 4);            // Extra bit so a slice is on the same Z coord as the camera
+        CVector vecAdd = vecBase + CVector(0, 0, 4);  // Extra bit so a slice is on the same Z coord as the camera
 
         for (uint s = iSkipEndSlicesZ; s < uiNumSlicesZ - iSkipEndSlicesZ; s++)
         {
@@ -94,7 +94,7 @@ void CClientColRectangle::DebugRender(const CVector& vecPosition, float fDrawRad
             for (uint i = 0; i < NUMELMS(cornerPoints); i++)
             {
                 if (!(i & 1))
-                    continue;            // No end cap
+                    continue;  // No end cap
                 const CVector& vecBegin = cornerPoints[i] * vecMult + vecAdd;
                 const CVector& vecEnd = cornerPoints[(i + 1) % 4] * vecMult + vecAdd;
                 pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);
@@ -115,7 +115,7 @@ void CClientColRectangle::DebugRender(const CVector& vecPosition, float fDrawRad
             for (uint i = 0; i < NUMELMS(cornerPoints); i++)
             {
                 if (!(i & 1))
-                    continue;            // No end cap
+                    continue;  // No end cap
                 const CVector& vecBegin = cornerPoints[i] * vecMult + vecAdd;
                 const CVector& vecEnd = cornerPoints[(i + 1) % 4] * vecMult + vecAdd;
                 pGraphics->DrawLine3DQueued(vecBegin, vecEnd, fLineWidth, color, eRenderStage::POST_FX);

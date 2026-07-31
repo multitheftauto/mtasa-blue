@@ -43,9 +43,9 @@ void CServer::ServerInitialize(CServerInterface* pServerInterface)
     g_pServerInterface = pServerInterface;
     g_pNetServer = pServerInterface->GetNetwork();
     g_pRealNetServer = g_pNetServer;
-    #if defined(MTA_DEBUG)
+#if defined(MTA_DEBUG)
     SharedUtil_Tests();
-    #endif
+#endif
 }
 
 bool CServer::ServerStartup(int iArgumentCount, char* szArguments[])

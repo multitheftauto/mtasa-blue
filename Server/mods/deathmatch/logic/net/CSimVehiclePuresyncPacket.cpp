@@ -63,7 +63,6 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             return false;
         m_Cache.PlrPosition = position.data.vecPosition;
 
-        // TODO: GetVehicleType does not support the range of 'int'.
         if (CVehicleManager::GetVehicleType(static_cast<unsigned short>(m_Cache.iModelID)) == VEHICLE_TRAIN)
         {
             // Train specific data
@@ -162,6 +161,21 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 if (BitStream.ReadBit(bHasTrailer) == false)
                     return false;
             }
+        }
+
+        if (BitStream.ReadBit())
+        {
+            ElementID DamagerID;
+            if (!BitStream.Read(DamagerID))
+                return false;
+
+            SWeaponTypeSync weaponType;
+            if (!BitStream.Read(&weaponType))
+                return false;
+
+            SBodypartSync bodyPart;
+            if (!BitStream.Read(&bodyPart))
+                return false;
         }
 
         // Player health
@@ -426,7 +440,6 @@ void CSimVehiclePuresyncPacket::ReadVehicleSpecific(NetBitStreamInterface& BitSt
     }
 
     // Door angles.
-    // TODO: HasDoors does not support the range of 'int'.
     if (CVehicleManager::HasDoors(static_cast<unsigned short>(m_Cache.iModelID)))
     {
         SDoorOpenRatioSync door;
@@ -458,7 +471,6 @@ void CSimVehiclePuresyncPacket::WriteVehicleSpecific(NetBitStreamInterface& BitS
     }
 
     // Door angles.
-    // TODO: HasDoors does not support the range of 'int'.
     if (CVehicleManager::HasDoors(static_cast<unsigned short>(m_Cache.iModelID)))
     {
         SDoorOpenRatioSync door;

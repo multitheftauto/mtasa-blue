@@ -173,6 +173,11 @@ public:
         return CVector(vec.fX * vRight.fX + vec.fY * vFront.fX + vec.fZ * vUp.fX + vPos.fX, vec.fX * vRight.fY + vec.fY * vFront.fY + vec.fZ * vUp.fY + vPos.fY,
                        vec.fX * vRight.fZ + vec.fY * vFront.fZ + vec.fZ * vUp.fZ + vPos.fZ);
     }
+    CVector TransformVectorByRotation(const CVector& vec) const
+    {
+        return CVector(vec.fX * vRight.fX + vec.fY * vFront.fX + vec.fZ * vUp.fX, vec.fX * vRight.fY + vec.fY * vFront.fY + vec.fZ * vUp.fY,
+                       vec.fX * vRight.fZ + vec.fY * vFront.fZ + vec.fZ * vUp.fZ);
+    }
 
     //
     // Ensure matrix component axes are normalized and orthogonal to each other.

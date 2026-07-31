@@ -86,7 +86,8 @@ bool CConsoleCommands::StartResource(CConsole* pConsole, const char* szArguments
 
         if (!resource->IsLoaded())
         {
-            pEchoClient->SendConsole(SString("start: Resource '%s' is loaded, but has errors (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
+            pEchoClient->SendConsole(
+                SString("start: Resource '%s' is loaded, but has errors (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
             continue;
         }
 
@@ -135,7 +136,8 @@ bool CConsoleCommands::RestartResource(CConsole* pConsole, const char* szArgumen
 
         if (!resource->IsLoaded())
         {
-            pEchoClient->SendConsole(SString("restart: Resource '%s' is loaded, but has errors (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
+            pEchoClient->SendConsole(
+                SString("restart: Resource '%s' is loaded, but has errors (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
             continue;
         }
 
@@ -384,7 +386,7 @@ bool CConsoleCommands::Say(CConsole* pConsole, const char* szInArguments, CClien
                             // Send the chat message and player pointer to the script
                             CLuaArguments Arguments;
                             Arguments.PushString(szArguments);
-                            Arguments.PushNumber(MESSAGE_TYPE_PLAYER);            // Normal chat
+                            Arguments.PushNumber(MESSAGE_TYPE_PLAYER);  // Normal chat
                             bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent("onPlayerChat", Arguments);
                             if (bContinue)
                             {
@@ -519,7 +521,7 @@ bool CConsoleCommands::TeamSay(CConsole* pConsole, const char* szInArguments, CC
                             // Send the chat message and player pointer to the script
                             CLuaArguments Arguments;
                             Arguments.PushString(szArguments);
-                            Arguments.PushNumber(MESSAGE_TYPE_TEAM);            // Team chat
+                            Arguments.PushNumber(MESSAGE_TYPE_TEAM);  // Team chat
                             bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent("onPlayerChat", Arguments);
                             if (bContinue)
                             {
@@ -626,9 +628,9 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
 
                                         // Send the message and player pointer to the script
                                         CLuaArguments Arguments;
-                                        Arguments.PushString(szArguments); // We don't want to remove this for backwards compatibility reasons
+                                        Arguments.PushString(szArguments);  // We don't want to remove this for backwards compatibility reasons
                                         Arguments.PushElement(pPlayer);
-                                        Arguments.PushString(szMessage); // Fix #2135
+                                        Arguments.PushString(szMessage);  // Fix #2135
 
                                         bool bContinue = pSender->CallEvent("onPlayerPrivateMessage", Arguments);
                                         if (bContinue)
@@ -636,7 +638,7 @@ bool CConsoleCommands::Msg(CConsole* pConsole, const char* szInArguments, CClien
                                             // Send it to the player
                                             pPlayer->Send(CChatEchoPacket(strMessage, CHATCOLOR_INFO, false, MESSAGE_TYPE_PRIVATE));
 
-                                            // Send a reponse to the player who sent it
+                                            // Send a response to the player who sent it
                                             pEchoClient->SendEcho(SString("-> %s: %s", pPlayer->GetNick(), szMessage));
                                         }
                                         break;
@@ -726,8 +728,8 @@ bool CConsoleCommands::Me(CConsole* pConsole, const char* szArguments, CClient* 
                     if (pClient->GetClientType() == CClient::CLIENT_PLAYER)
                     {
                         CLuaArguments Arguments;
-                        Arguments.PushString(szArguments);                    // text
-                        Arguments.PushNumber(MESSAGE_TYPE_ACTION);            // Me chat
+                        Arguments.PushString(szArguments);          // text
+                        Arguments.PushNumber(MESSAGE_TYPE_ACTION);  // Me chat
                         bool bContinue = static_cast<CPlayer*>(pClient)->CallEvent("onPlayerChat", Arguments);
                         if (bContinue)
                         {
@@ -786,7 +788,7 @@ bool CConsoleCommands::Nick(CConsole* pConsole, const char* szArguments, CClient
                         const char* szNick = pClient->GetNick();
                         if (!szNick || strcmp(szNewNick, szNick) != 0)
                         {
-                            // Check that it doesn't already exist, or if it matches our current nick case-independantly (means we changed to the same nick but
+                            // Check that it doesn't already exist, or if it matches our current nick case-independently (means we changed to the same nick but
                             // in a different case)
                             if ((szNick && stricmp(szNick, szNewNick) == 0) || !pConsole->GetPlayerManager()->Get(szNewNick))
                             {
@@ -796,7 +798,7 @@ bool CConsoleCommands::Nick(CConsole* pConsole, const char* szArguments, CClient
                                 CLuaArguments Arguments;
                                 Arguments.PushString(pClient->GetNick());
                                 Arguments.PushString(szNewNick);
-                                Arguments.PushBoolean(true);            // manually changed
+                                Arguments.PushBoolean(true);  // manually changed
                                 if (pPlayer->CallEvent("onPlayerChangeNick", Arguments))
                                 {
                                     // Tell the console
@@ -1295,8 +1297,8 @@ bool CConsoleCommands::DebugScript(CConsole* console, const char* arguments, CCl
     }
 
     CPlayer* player = static_cast<CPlayer*>(client);
-    int debugLevel = arguments[0] - '0'; // Convert the character to an integer (e.g., '2' -> 2)
-    int debugLevelCurrent = player->GetScriptDebugLevel();
+    int      debugLevel = arguments[0] - '0';  // Convert the character to an integer (e.g., '2' -> 2)
+    int      debugLevelCurrent = player->GetScriptDebugLevel();
 
     // Check if the level is the same
     if (debugLevel == debugLevelCurrent)

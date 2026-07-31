@@ -12,8 +12,8 @@
 #include "StdInc.h"
 #include "TaskJumpFallSA.h"
 
-CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, eClimbHeights nHeight,
-                                       const bool bForceClimb)
+CTaskSimpleClimbSA::CTaskSimpleClimbSA(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType,
+                                       eClimbHeights nHeight, const bool bForceClimb)
 {
     CreateTaskInterface(sizeof(CTaskSimpleClimbSAInterface));
     if (!IsValid())

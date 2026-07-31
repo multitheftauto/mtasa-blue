@@ -137,7 +137,7 @@ void CRemoteMasterServer::Refresh()
     if (pHTTP->QueueFile(m_strURL, NULL, this, &CRemoteMasterServer::StaticDownloadFinished, options))
     {
         m_bPendingDownload = true;
-        AddRef();            // Keep alive
+        AddRef();  // Keep alive
     }
     else
     {
@@ -184,7 +184,7 @@ void CRemoteMasterServer::StaticDownloadFinished(const SHttpDownloadResult& resu
 {
     CRemoteMasterServer* pRemoteMasterServer = (CRemoteMasterServer*)result.pObj;
     pRemoteMasterServer->DownloadFinished(result);
-    pRemoteMasterServer->Release();            // Unkeep alive
+    pRemoteMasterServer->Release();  // Unkeep alive
 }
 
 ///////////////////////////////////////////////////////////////
@@ -349,10 +349,12 @@ bool CRemoteMasterServer::ParseListVer0(CServerListItemList& itemList)
     uint uiNumServersBefore = itemList.size();
 #endif
 
+    uint uiTieBreakCounter = 0;
+
     while (!stream.AtEnd(6) && usCount--)
     {
-        in_addr        Address;                // IP-address
-        unsigned short usQueryPort;            // Query port
+        in_addr        Address;      // IP-address
+        unsigned short usQueryPort;  // Query port
 
         stream.Read(Address.S_un.S_un_b.s_b1);
         stream.Read(Address.S_un.S_un_b.s_b2);
@@ -362,6 +364,14 @@ bool CRemoteMasterServer::ParseListVer0(CServerListItemList& itemList)
 
         // Add or find item to update
         CServerListItem* pItem = GetServerListItem(itemList, Address, usQueryPort - SERVER_LIST_QUERY_PORT_OFFSET);
+
+        if (pItem->uiTieBreakPosition != uiTieBreakCounter)
+        {
+            pItem->uiTieBreakPosition = uiTieBreakCounter;
+            pItem->strTieBreakSortKey = SString("%04d", pItem->uiTieBreakPosition);
+            pItem->uiRevision++;
+        }
+        uiTieBreakCounter++;
 
         if (pItem->ShouldAllowDataQuality(SERVER_INFO_ASE_0))
         {
@@ -445,21 +455,31 @@ bool CRemoteMasterServer::ParseListVer2(CServerListItemList& itemList)
     uint uiNumServersBefore = itemList.size();
 #endif
 
+    uint uiTieBreakCounter = 0;
+
     // Add all servers until we hit the count or run out of data
     while (!stream.AtEnd(6) && uiCount--)
     {
-        ushort usLength = 0;            // Length of data for this server
+        ushort usLength = 0;  // Length of data for this server
         stream.Read(usLength);
         uint uiSkipPos = stream.Tell() + usLength - 2;
 
-        in_addr        Address;               // IP-address
-        unsigned short usGamePort;            // Game port
+        in_addr        Address;     // IP-address
+        unsigned short usGamePort;  // Game port
 
         stream.Read(Address.S_un.S_addr);
         stream.Read(usGamePort);
 
         // Add or find item to update
         CServerListItem* pItem = GetServerListItem(itemList, Address, usGamePort);
+
+        if (pItem->uiTieBreakPosition != uiTieBreakCounter)
+        {
+            pItem->uiTieBreakPosition = uiTieBreakCounter;
+            pItem->strTieBreakSortKey = SString("%04d", pItem->uiTieBreakPosition);
+            pItem->uiRevision++;
+        }
+        uiTieBreakCounter++;
 
         if (pItem->ShouldAllowDataQuality(uiDataQuality))
         {

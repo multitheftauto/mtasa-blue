@@ -4,7 +4,7 @@
  *
  *   SFNT object management (base).
  *
- * Copyright (C) 1996-2025 by
+ * Copyright (C) 1996-2026 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -723,6 +723,7 @@
       /* note that `glyf' or `CFF2' have precedence */
       if ( face->goto_table( face, TTAG_glyf, stream, 0 ) &&
            face->goto_table( face, TTAG_CFF2, stream, 0 ) &&
+           face->goto_table( face, TTAG_hvgl, stream, 0 ) &&
            !face->goto_table( face, TTAG_CFF, stream, 0 ) )
         num_instances = 0;
 

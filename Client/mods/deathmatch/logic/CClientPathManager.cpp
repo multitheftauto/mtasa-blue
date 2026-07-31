@@ -88,7 +88,7 @@ void CClientPathManager::ReverseNodes(CClientPathNode* pPathNode)
         pPathNode = pPathNode->GetPreviousNode();
     } while (pPathNode && pPathNode != pTempNode);
 
-    // Go through the chain untill we've reached an end or looped, and reverse
+    // Go through the chain until we've reached an end or looped, and reverse
     pTempNode = pFirstNode;
     do
     {

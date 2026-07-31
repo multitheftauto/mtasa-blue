@@ -2,6 +2,7 @@ project "Client SDK"
 	language "C++"
 	kind "StaticLib"
 	targetname "sdk"
+	clangtidy "On"
 
 	vpaths {
 		["Headers/*"] = { "**.h", "**.hpp" },

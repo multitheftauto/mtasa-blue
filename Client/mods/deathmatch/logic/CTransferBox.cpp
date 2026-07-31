@@ -56,7 +56,7 @@ void CTransferBox::CreateTransferWindow()
     m_window->SetCloseButtonEnabled(false);
     m_window->SetSizingEnabled(false);
     m_window->SetPosition(CVector2D(screenSize.fX * 0.5f - fTransferBoxWidth * 0.5f, screenSize.fY * 0.85f - TRANSFERBOX_HEIGHT * 0.5f));
-    m_window->SetSize(CVector2D(fTransferBoxWidth, TRANSFERBOX_HEIGHT));            // relative 0.35, 0.225
+    m_window->SetSize(CVector2D(fTransferBoxWidth, TRANSFERBOX_HEIGHT));  // relative 0.35, 0.225
 
     m_progressBar.reset(m_GUI->CreateProgressBar(m_window.get()));
     m_progressBar->SetPosition(CVector2D(0, TRANSFERBOX_YSTART));

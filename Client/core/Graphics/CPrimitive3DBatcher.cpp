@@ -11,6 +11,7 @@
  *****************************************************************************/
 #include <StdInc.h>
 #include "CPrimitive3DBatcher.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 ////////////////////////////////////////////////////////////////
 //
 // CPrimitive3DBatcher::CPrimitive3DBatcher

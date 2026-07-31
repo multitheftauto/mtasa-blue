@@ -18,7 +18,7 @@
 class CGUIMessageBox
 {
 public:
-    virtual ~CGUIMessageBox(){};
+    virtual ~CGUIMessageBox() {};
 
     virtual void SetAutoDestroy(bool bAutoDestroy) = 0;
     virtual bool GetAutoDestroy() = 0;

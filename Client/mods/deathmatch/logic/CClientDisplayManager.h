@@ -31,7 +31,7 @@ public:
 
     void DoPulse();
 
-    unsigned int    Count() { return static_cast<unsigned int>(m_List.size()); };
+    unsigned int                    Count() { return static_cast<unsigned int>(m_List.size()); };
     std::shared_ptr<CClientDisplay> Get(unsigned long ulID);
 
     void DrawText2D(const char* szCaption, const CVector& vecPosition, float fScale = 1.0f, RGBA rgbaColor = 0xFFFFFFFF);
@@ -43,4 +43,3 @@ public:
 
     std::list<std::weak_ptr<CClientDisplay>> m_List;
 };
-

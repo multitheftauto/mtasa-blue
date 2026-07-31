@@ -16,5 +16,5 @@
 class CBmx : public virtual CBike
 {
 public:
-    virtual ~CBmx(){};
+    virtual ~CBmx() {};
 };

@@ -15,8 +15,8 @@
 
 extern CMultiplayerSA* pMultiplayer;
 
-DWORD dwCurrentPlayerPed = 0;            // stores the player ped temporarily during hooks
-DWORD dwCurrentVehicle = 0;              // stores the current vehicle during the hooks
+DWORD dwCurrentPlayerPed = 0;  // stores the player ped temporarily during hooks
+DWORD dwCurrentVehicle = 0;    // stores the current vehicle during the hooks
 
 DWORD dwParameter = 0;
 
@@ -36,6 +36,42 @@ extern float      fLocalPlayerGravity;
 
 extern PreContextSwitchHandler*  m_pPreContextSwitchHandler;
 extern PostContextSwitchHandler* m_pPostContextSwitchHandler;
+
+#define NUM_FirstStreamEngineSlot     7
+#define NUM_LastStreamEngineSlot      16
+#define NUM_LocalVehicleAudioContext  0x0
+#define NUM_RemoteVehicleAudioContext 0x1
+#define VAR_VehicleAudioContext       0x50230C
+
+namespace
+{
+    bool HasValidVehicleAudioContext(const CAEVehicleAudioEntitySAInterface* pAudioInterface) noexcept
+    {
+        if (!pAudioInterface)
+            return false;
+
+        if (pAudioInterface->m_wEngineBankSlotId >= NUM_FirstStreamEngineSlot && pAudioInterface->m_wEngineBankSlotId <= NUM_LastStreamEngineSlot)
+            return true;
+
+        return pAudioInterface->m_wEngineAccelerateSoundBankId >= 0 || pAudioInterface->m_wEngineDecelerateSoundBankId >= 0;
+    }
+
+    void SetVehicleAudioContext(CVehicleSA* pVehicleSA, BYTE ucContext)
+    {
+        if (ucContext == NUM_LocalVehicleAudioContext && pVehicleSA)
+        {
+            auto* pVehicleAudioEntity = pVehicleSA->GetVehicleAudioEntity();
+            auto* pAudioInterface = pVehicleAudioEntity ? pVehicleAudioEntity->GetInterface() : nullptr;
+            if (!HasValidVehicleAudioContext(pAudioInterface))
+                return;
+        }
+
+        if (*reinterpret_cast<BYTE*>(VAR_VehicleAudioContext) == ucContext)
+            return;
+
+        MemPutFast<BYTE>(VAR_VehicleAudioContext, ucContext);
+    }
+}
 
 VOID InitKeysyncHooks()
 {
@@ -148,7 +184,7 @@ void         PostContextSwitch()
 
         // Prevent the game making remote players vehicle's audio behave like locals (and deleting
         // radio etc when they are removed) - issue #95
-        MemPutFast<BYTE>(0x50230C, 0x1);
+        SetVehicleAudioContext(nullptr, NUM_RemoteVehicleAudioContext);
 
         bRadioHackInstalled = FALSE;
     }
@@ -201,7 +237,7 @@ VOID ReturnContextToLocalPlayer()
 
         bNotInLocalContext = false;
 
-        CPed*   pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
+        CPed*   pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);  // the player
         CPedSA* pLocalPlayerPedSA = dynamic_cast<CPedSA*>(pLocalPlayerPed);
         if (pLocalPlayerPedSA)
         {
@@ -222,7 +258,7 @@ VOID ReturnContextToLocalPlayer()
         // Store any changes to the local-players stats?
         if (!bLocalStatsStatic)
         {
-            assert(0);            // bLocalStatsStatic is always true
+            assert(0);  // bLocalStatsStatic is always true
             MemCpyFast(&localStatsData.StatTypesFloat, (void*)0xb79380, sizeof(float) * MAX_FLOAT_STATS);
             MemCpyFast(&localStatsData.StatTypesInt, (void*)0xb79000, sizeof(int) * MAX_INT_STATS);
             MemCpyFast(&localStatsData.StatReactionValue, (void*)0xb78f10, sizeof(float) * MAX_REACTION_STATS);
@@ -245,7 +281,7 @@ void SwitchContext(CPed* thePed)
     if (thePed && !bNotInLocalContext)
     {
         // Grab the local ped and the local pad
-        CPed*            pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);            // the player
+        CPed*            pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);  // the player
         CPad*            pLocalPad = pGameInterface->GetPad();
         CPadSAInterface* pLocalPadInterface = ((CPadSA*)pLocalPad)->GetInterface();
 
@@ -253,7 +289,7 @@ void SwitchContext(CPed* thePed)
         if (thePed != pLocalPlayerPed)
         {
             // Store the local pad
-            pLocalPad->Store();            // store a copy of the local pad internally
+            pLocalPad->Store();  // store a copy of the local pad internally
 
             // Grab the remote data storage for the player we're context switching to
             CPlayerPed* thePlayerPed = dynamic_cast<CPlayerPed*>(thePed);
@@ -314,7 +350,8 @@ void SwitchContext(CPed* thePed)
 
                     // Disable mouse look if they're not in a fight task and not aiming (strafing)
                     // Fix GitHub Issue #395
-                    if (thePed->GetCurrentWeaponSlot() == eWeaponSlot::WEAPONSLOT_TYPE_UNARMED && data->m_pad.NewState.RightShoulder1 != 0 && thePed->GetPedIntelligence()->GetFightTask())
+                    if (thePed->GetCurrentWeaponSlot() == eWeaponSlot::WEAPONSLOT_TYPE_UNARMED && data->m_pad.NewState.RightShoulder1 != 0 &&
+                        thePed->GetPedIntelligence()->GetFightTask())
                         bDisableMouseLook = false;
 
                     // Disable mouse look if they're not underwater (Ped vertical rotation when diving)
@@ -450,7 +487,7 @@ void SwitchContext(CVehicle* pVehicle)
         {
             // Prevent the game making remote players vehicle's audio behave like locals (and deleting
             // radio etc when they are removed) - issue #95
-            MemPutFast<BYTE>(0x50230C, 0x0);
+            SetVehicleAudioContext(pVehicleSA, NUM_LocalVehicleAudioContext);
 
             // For tanks, to prevent our mouse movement affecting remote tanks
             // 006AEA25   0F85 60010000    JNZ gta_sa.006AEB8B

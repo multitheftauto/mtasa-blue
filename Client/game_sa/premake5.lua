@@ -3,6 +3,7 @@ project "Game SA"
 	kind "SharedLib"
 	targetname "game_sa"
 	targetdir(buildpath("mta"))
+	clangtidy "On"
 
 	-- DO NOT REMOVE OR TURN THIS OPTION ON
 	-- By turning this feature off, our code will be compiled with '/Zi' instead of '/ZI'.

@@ -34,7 +34,7 @@ class CPlayerModInfoPacket final : public CPacket
 {
 public:
     ePacketID     GetPacketID() const { return PACKET_ID_PLAYER_MODINFO; };
-    unsigned long GetFlags() const { return 0; };            // Not used
+    unsigned long GetFlags() const { return 0; };  // Not used
 
     bool Read(NetBitStreamInterface& BitStream);
 

@@ -14,6 +14,8 @@
 #include "Dialogs.h"
 #include <array>
 #include <random>
+#include <cstring>
+#include <winternl.h>
 #include <cryptopp/crc.h>
 #include <cryptopp/files.h>
 #include <tchar.h>
@@ -23,7 +25,7 @@
 #include <wintrust.h>
 #include <version.h>
 #include <windows.h>
-#pragma comment (lib, "wintrust")
+#pragma comment(lib, "wintrust")
 
 namespace fs = std::filesystem;
 
@@ -86,7 +88,7 @@ WString devicePathToWin32Path(const WString& strDevicePath)
             while (*p++)
                 ;
 
-        } while (!bFound && *p);            // end of string
+        } while (!bFound && *p);  // end of string
     }
     return pszFilename;
 }
@@ -457,6 +459,207 @@ auto GetGameExecutablePath() -> std::filesystem::path
     return executable;
 }
 
+namespace
+{
+    SString MakeCurrentVersionRegistryPath(const SString& strPath)
+    {
+        return PathJoin(GetProductRegistryPath(), GetMajorVersionString(), strPath).TrimEnd("\\");
+    }
+
+    bool HasDistinct64BitRegistryView()
+    {
+#if defined(_WIN64)
+        return false;
+#elif defined(KEY_WOW64_64KEY)
+        using IsWow64ProcessFn = BOOL(WINAPI*)(HANDLE, PBOOL);
+
+        static IsWow64ProcessFn fnIsWow64Process = nullptr;
+        static bool             bResolved = false;
+
+        if (!bResolved)
+        {
+            bResolved = true;
+
+            if (HMODULE hKernel32 = GetModuleHandleW(L"kernel32.dll"); hKernel32)
+            {
+                FARPROC procAddr = GetProcAddress(hKernel32, "IsWow64Process");
+                if (procAddr)
+                {
+                    static_assert(sizeof(fnIsWow64Process) == sizeof(procAddr), "Unexpected function pointer size");
+                    std::memcpy(&fnIsWow64Process, &procAddr, sizeof(fnIsWow64Process));
+                }
+            }
+        }
+
+        if (!fnIsWow64Process)
+            return false;
+
+        BOOL bIsWow64 = FALSE;
+        return fnIsWow64Process(GetCurrentProcess(), &bIsWow64) && bIsWow64;
+#else
+        return false;
+#endif
+    }
+
+    SString GetRegistryValue64(const SString& strPath, const SString& strName)
+    {
+        if (!HasDistinct64BitRegistryView())
+            return GetRegistryValue(strPath, strName);
+
+        const WString wstrSubKey = FromUTF8(MakeCurrentVersionRegistryPath(strPath));
+        const WString wstrValueName = FromUTF8(strName);
+
+        HKEY hKey = nullptr;
+        if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, wstrSubKey.c_str(), 0, KEY_READ | KEY_WOW64_64KEY, &hKey) != ERROR_SUCCESS || !hKey)
+            return "";
+
+        DWORD valueType = REG_SZ;
+        DWORD valueSize = 0;
+        LONG  result = RegQueryValueExW(hKey, wstrValueName.c_str(), nullptr, &valueType, nullptr, &valueSize);
+        if (result != ERROR_SUCCESS || (valueType != REG_SZ && valueType != REG_EXPAND_SZ) || valueSize == 0)
+        {
+            RegCloseKey(hKey);
+            return "";
+        }
+
+        std::vector<wchar_t> buffer((valueSize / sizeof(wchar_t)) + 1, L'\0');
+        result = RegQueryValueExW(hKey, wstrValueName.c_str(), nullptr, &valueType, reinterpret_cast<LPBYTE>(buffer.data()), &valueSize);
+        RegCloseKey(hKey);
+
+        if (result != ERROR_SUCCESS || (valueType != REG_SZ && valueType != REG_EXPAND_SZ))
+            return "";
+
+        if (valueSize >= sizeof(wchar_t))
+            buffer[(valueSize / sizeof(wchar_t)) - 1] = L'\0';
+        else
+            buffer[0] = L'\0';
+
+        return ToUTF8(buffer.data());
+    }
+
+    void SetRegistryValue64(const SString& strPath, const SString& strName, const SString& strValue)
+    {
+        if (!HasDistinct64BitRegistryView())
+        {
+            SetRegistryValue(strPath, strName, strValue);
+            return;
+        }
+
+        const WString wstrSubKey = FromUTF8(MakeCurrentVersionRegistryPath(strPath));
+        const WString wstrValueName = FromUTF8(strName);
+        const WString wstrValue = FromUTF8(strValue);
+
+        HKEY hKey = nullptr;
+        if (RegCreateKeyExW(HKEY_LOCAL_MACHINE, wstrSubKey.c_str(), 0, nullptr, REG_OPTION_NON_VOLATILE, KEY_ALL_ACCESS | KEY_WOW64_64KEY, nullptr, &hKey,
+                            nullptr) != ERROR_SUCCESS ||
+            !hKey)
+            return;
+
+        RegSetValueExW(hKey, wstrValueName.c_str(), 0, REG_SZ, reinterpret_cast<const BYTE*>(wstrValue.c_str()),
+                       static_cast<DWORD>((wstrValue.length() + 1) * sizeof(wchar_t)));
+        RegCloseKey(hKey);
+    }
+
+    // Read Last Run Location from a specific registry view. viewFlag should be one of
+    // KEY_WOW64_64KEY, KEY_WOW64_32KEY, or 0 (no view override). Returns empty string on any failure.
+    // Oversized values are rejected without allocation so a malformed registry entry on the U01
+    // recovery path cannot turn into a large allocation; the same 1 MB cap is used by the generic
+    // ReadRegistryStringValue helper in SharedUtil.Misc.hpp.
+    SString ReadInstallRootRegistryView(REGSAM viewFlag)
+    {
+        constexpr DWORD kMaxRegistryValueBytes = 1024u * 1024u;
+
+        const WString wstrSubKey = FromUTF8(MakeCurrentVersionRegistryPath(""));
+        const WString wstrValueName = FromUTF8("Last Run Location");
+
+        HKEY hKey = nullptr;
+        if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, wstrSubKey.c_str(), 0, KEY_READ | viewFlag, &hKey) != ERROR_SUCCESS || !hKey)
+            return "";
+
+        DWORD valueType = REG_SZ;
+        DWORD valueSize = 0;
+        LONG  result = RegQueryValueExW(hKey, wstrValueName.c_str(), nullptr, &valueType, nullptr, &valueSize);
+        if (result != ERROR_SUCCESS || (valueType != REG_SZ && valueType != REG_EXPAND_SZ) || valueSize == 0 || valueSize > kMaxRegistryValueBytes ||
+            (valueSize % sizeof(wchar_t)) != 0)
+        {
+            RegCloseKey(hKey);
+            return "";
+        }
+
+        std::vector<wchar_t> buffer((valueSize / sizeof(wchar_t)) + 1u, L'\0');
+        result = RegQueryValueExW(hKey, wstrValueName.c_str(), nullptr, &valueType, reinterpret_cast<LPBYTE>(buffer.data()), &valueSize);
+        RegCloseKey(hKey);
+
+        if (result != ERROR_SUCCESS || (valueType != REG_SZ && valueType != REG_EXPAND_SZ) || valueSize > kMaxRegistryValueBytes ||
+            (valueSize % sizeof(wchar_t)) != 0)
+            return "";
+
+        buffer[valueSize / sizeof(wchar_t)] = L'\0';
+
+        // Expand environment variable references for REG_EXPAND_SZ values so callers see a real
+        // filesystem path. Without this, a value like "%ProgramFiles%\..." would fail validation.
+        // The expansion is bounded by the same 1 MB cap so a value containing a self-referential or
+        // explosive expansion cannot trigger a large allocation here.
+        if (valueType == REG_EXPAND_SZ)
+        {
+            constexpr DWORD kMaxExpandChars = kMaxRegistryValueBytes / sizeof(wchar_t);
+            const DWORD     expandedChars = ExpandEnvironmentStringsW(buffer.data(), nullptr, 0);
+            if (expandedChars > 0 && expandedChars <= kMaxExpandChars)
+            {
+                std::vector<wchar_t> expanded(expandedChars, L'\0');
+                if (ExpandEnvironmentStringsW(buffer.data(), expanded.data(), expandedChars))
+                    return ToUTF8(expanded.data());
+            }
+        }
+
+        return ToUTF8(buffer.data());
+    }
+}
+
+SString GetInstallPathForLauncher()
+{
+    const SString strLaunchPath = GetLaunchPath();
+    if (!SharedUtil::IsTemporaryUpdateLaunchPath(strLaunchPath))
+        return strLaunchPath;
+
+    // Prefer the resolved base dir over the registry when one was already established. In the
+    // far-update Process C, CInstallManager applies SetMTASABaseDirOverride from the sequencer
+    // carried INSTALL_ROOT and runs ::SetMTASAPathSource(true) before any consumer reaches here,
+    // so g_strMTASAPath holds the validated real install root that Process B was updating. A stale
+    // or differently-installed registry "Last Run Location" must not win over that carried root and
+    // aim consumers at a different MTA install. Read g_strMTASAPath directly rather than calling
+    // GetMTASAPath(), because GetMTASAPath() lazy-inits via SetMTASAPathSource(false), which calls
+    // back into GetInstallPathForLauncher() and would recurse for any temp launcher whose g_strMTASAPath
+    // has not yet been populated by the far-update sequencer path. Empty string falls through to the
+    // per-view registry loop below, preserving the temp-launcher-without-far-update fallback.
+    if (!g_strMTASAPath.empty() && SharedUtil::IsUsableMtasaInstallRoot(g_strMTASAPath) && !SharedUtil::IsTemporaryUpdateLaunchPath(g_strMTASAPath) &&
+        !g_strMTASAPath.CompareI(strLaunchPath))
+        return g_strMTASAPath;
+
+    // Read each registry view independently so a stale value in one view cannot shadow a usable value in another.
+    REGSAM viewFlags[3] = {0, 0, 0};
+    int    viewCount = 0;
+#if defined(KEY_WOW64_64KEY)
+    viewFlags[viewCount++] = KEY_WOW64_64KEY;
+#endif
+#if defined(KEY_WOW64_32KEY)
+    viewFlags[viewCount++] = KEY_WOW64_32KEY;
+#endif
+    viewFlags[viewCount++] = 0;
+
+    for (int i = 0; i < viewCount; ++i)
+    {
+        const SString strSavedInstallPath = ReadInstallRootRegistryView(viewFlags[i]);
+        if (SharedUtil::IsUsableMtasaInstallRoot(strSavedInstallPath) && !SharedUtil::IsTemporaryUpdateLaunchPath(strSavedInstallPath))
+            return strSavedInstallPath;
+    }
+
+    // No usable non-temp install root resolved. Returning empty forces callers to use their own fallbacks
+    // (such as a base-dir override carried forward from the parent launcher) instead of treating a temp
+    // update directory as the real install location.
+    return SString();
+}
+
 void SetMTASAPathSource(bool bReadFromRegistry)
 {
     if (bReadFromRegistry)
@@ -467,6 +670,35 @@ void SetMTASAPathSource(bool bReadFromRegistry)
     {
         // Get current module full path
         SString strLaunchPathFilename = GetLaunchPathFilename();
+        SString strLaunchPath = GetLaunchPath();
+        SString strInstallPath = GetInstallPathForLauncher();
+
+        // GetInstallPathForLauncher returns empty when running from a temp update directory and no
+        // usable non-temp install root could be resolved. In that case the safest local fallback is
+        // the launch path itself, which preserves the prior behavior for non-update launches without
+        // contaminating the registry from the auto-update flow (Process C now goes through the far
+        // branch with a base-dir override carried forward by CInstallManager).
+        if (strInstallPath.empty())
+            strInstallPath = strLaunchPath;
+
+        if (!strInstallPath.CompareI(strLaunchPath))
+        {
+            AddReportLog(1063, SString("SetMTASAPathSource: preserving install path '%s' for temp launcher '%s'", strInstallPath.c_str(),
+                                       strLaunchPathFilename.c_str()));
+            g_strMTASAPath = strInstallPath;
+            return;
+        }
+
+        // Refuse to write a temp update extraction directory into the install-location registry
+        // values. A temp launcher started without the far-update sequencer state would otherwise
+        // contaminate Last Run Location with an upcache\_*_tmp_* path that gets deleted later by
+        // CleanDownloadCache, leaving a stale registry pointer that produces U01 on the next launch.
+        if (SharedUtil::IsTemporaryUpdateLaunchPath(strLaunchPath))
+        {
+            AddReportLog(1063, SString("SetMTASAPathSource: refusing to record temp launch path '%s' in registry", strLaunchPath.c_str()));
+            g_strMTASAPath = strLaunchPath;
+            return;
+        }
 
         SString strHash = "-";
         {
@@ -481,14 +713,16 @@ void SetMTASAPathSource(bool bReadFromRegistry)
         }
 
         SetRegistryValue("", "Last Run Path", strLaunchPathFilename);
+        SetRegistryValue64("", "Last Run Path", strLaunchPathFilename);
         SetRegistryValue("", "Last Run Path Hash", strHash);
+        SetRegistryValue64("", "Last Run Path Hash", strHash);
         SetRegistryValue("", "Last Run Path Version", MTA_DM_ASE_VERSION);
+        SetRegistryValue64("", "Last Run Path Version", MTA_DM_ASE_VERSION);
 
         // Strip the module name out of the path.
-        SString strLaunchPath = GetLaunchPath();
-
         // Save to a temp registry key
         SetRegistryValue("", "Last Run Location", strLaunchPath);
+        SetRegistryValue64("", "Last Run Location", strLaunchPath);
         g_strMTASAPath = strLaunchPath;
     }
 }
@@ -532,7 +766,8 @@ static const SString DoUserAssistedSearch() noexcept
 {
     SString result;
 
-    MessageBox(nullptr, _("Start Grand Theft Auto: San Andreas.\nEnsure the game is placed in the 'Program Files (x86)' folder."), _("Searching for GTA: San Andreas"), MB_OK | MB_ICONINFORMATION);
+    MessageBox(nullptr, _("Start Grand Theft Auto: San Andreas.\nEnsure the game is placed in the 'Program Files (x86)' folder."),
+               _("Searching for GTA: San Andreas"), MB_OK | MB_ICONINFORMATION);
 
     while (true)
     {
@@ -545,7 +780,10 @@ static const SString DoUserAssistedSearch() noexcept
             return result;
         }
 
-        if (MessageBox(nullptr, _("Sorry, game not found.\nStart Grand Theft Auto: San Andreas and click retry.\nEnsure the game is placed in the 'Program Files (x86)' folder."), _("Searching for GTA: San Andreas"), MB_RETRYCANCEL | MB_ICONWARNING) == IDCANCEL)
+        if (MessageBox(nullptr,
+                       _("Sorry, game not found.\nStart Grand Theft Auto: San Andreas and click retry.\nEnsure the game is placed in the 'Program Files (x86)' "
+                         "folder."),
+                       _("Searching for GTA: San Andreas"), MB_RETRYCANCEL | MB_ICONWARNING) == IDCANCEL)
             return result;
     }
 }
@@ -564,7 +802,7 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
 
     // Try HKLM "SOFTWARE\\Multi Theft Auto: San Andreas All\\Common\\"
     pathList.push_back(GetCommonRegistryValue("", "GTA:SA Path"));
-    
+
     WriteDebugEvent(SString("GetGamePath: Registry returned '%s'", pathList[0].c_str()));
 
     // Unicode character check on first one
@@ -581,11 +819,13 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
         if (pathList[i].empty())
         {
             WriteDebugEvent(SString("GetGamePath: pathList[%d] is empty", i));
+            AddReportLog(3201, SString("GetGamePath: Registry GTA:SA Path is empty (index %d)", i));
             continue;
         }
 
         WriteDebugEvent(SString("GetGamePath: Checking '%s' for '%s'", pathList[i].c_str(), MTA_GTA_KNOWN_FILE_NAME));
-        if (FileExists(PathJoin(pathList[i], MTA_GTA_KNOWN_FILE_NAME)))
+        SString strCheckPath = PathJoin(pathList[i], MTA_GTA_KNOWN_FILE_NAME);
+        if (FileExists(strCheckPath))
         {
             strOutResult = pathList[i];
             // Update registry.
@@ -593,15 +833,23 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
             WriteDebugEvent(SString("GetGamePath: Found GTA at '%s'", strOutResult.c_str()));
             return GAME_PATH_OK;
         }
+        else
+        {
+            AddReportLog(3202, SString("GetGamePath: File check failed - '%s' not found", strCheckPath.c_str()));
+        }
     }
 
     WriteDebugEvent("GetGamePath: No valid GTA path found in registry");
 
     // Try to find?
     if (!bFindIfMissing)
+    {
+        AddReportLog(3203, "GetGamePath: No valid GTA path and bFindIfMissing=false");
         return GAME_PATH_MISSING;
+    }
 
     // Ask user to browse for GTA
+    AddReportLog(3204, "GetGamePath: Prompting user to browse for GTA folder");
     BROWSEINFOW bi = {0};
     WString     strMessage(_("Select your Grand Theft Auto: San Andreas Installation Directory"));
     bi.lpszTitle = strMessage;
@@ -614,6 +862,7 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
         if (SHGetPathFromIDListW(pidl, szBuffer))
         {
             strOutResult = ToUTF8(szBuffer);
+            AddReportLog(3205, SString("GetGamePath: User browsed to '%s'", strOutResult.c_str()));
         }
 
         // free memory used
@@ -624,21 +873,31 @@ ePathResult GetGamePath(SString& strOutResult, bool bFindIfMissing)
             imalloc->Release();
         }
     }
+    else
+    {
+        AddReportLog(3206, "GetGamePath: User cancelled browse dialog");
+    }
 
     // Check browse result
-    if (!FileExists(PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME)))
+    SString strBrowseCheckPath = PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME);
+    if (!FileExists(strBrowseCheckPath))
     {
+        AddReportLog(3207, SString("GetGamePath: Browse result invalid - '%s' not found, trying DoUserAssistedSearch", strBrowseCheckPath.c_str()));
         // If browse didn't help, try another method
         strOutResult = DoUserAssistedSearch();
 
-        if (!FileExists(PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME)))
+        SString strSearchCheckPath = PathJoin(strOutResult, MTA_GTA_KNOWN_FILE_NAME);
+        if (!FileExists(strSearchCheckPath))
         {
+            AddReportLog(3208, SString("GetGamePath: DoUserAssistedSearch failed - '%s' not found, giving up", strSearchCheckPath.c_str()));
             // If still not found, give up
             return GAME_PATH_MISSING;
         }
+        AddReportLog(3209, SString("GetGamePath: DoUserAssistedSearch succeeded - found '%s'", strOutResult.c_str()));
     }
 
     // File found. Update registry.
+    AddReportLog(3210, SString("GetGamePath: Success - GTA found at '%s'", strOutResult.c_str()));
     SetCommonRegistryValue("", "GTA:SA Path", strOutResult);
     return GAME_PATH_OK;
 }
@@ -854,16 +1113,40 @@ void MakeRandomIndexList(int Size, std::vector<int>& outList)
 //
 // GetOSVersion
 //
-// Affected by compatibility mode
+// Returns OS version info
 //
 ///////////////////////////////////////////////////////////////
+static bool QueryRtlGetVersion(SOSVersionInfo& versionInfo)
+{
+    HMODULE hNtdll = GetModuleHandleW(L"ntdll.dll");
+    if (!hNtdll)
+        return false;
+
+    FARPROC pProc = GetProcAddress(hNtdll, "RtlGetVersion");
+    if (!pProc)
+        return false;
+
+    using RtlGetVersionFn = LONG(WINAPI*)(PRTL_OSVERSIONINFOW);
+    RtlGetVersionFn pRtlGetVersion = nullptr;
+    static_assert(sizeof(pRtlGetVersion) == sizeof(pProc), "Unexpected function pointer size");
+    std::memcpy(&pRtlGetVersion, &pProc, sizeof(pRtlGetVersion));
+
+    RTL_OSVERSIONINFOW osvi = {};
+    osvi.dwOSVersionInfoSize = sizeof(osvi);
+    if (pRtlGetVersion(&osvi) != 0)
+        return false;
+
+    versionInfo.dwMajor = osvi.dwMajorVersion;
+    versionInfo.dwMinor = osvi.dwMinorVersion;
+    versionInfo.dwBuild = osvi.dwBuildNumber;
+    return true;
+}
+
 SOSVersionInfo GetOSVersion()
 {
-    OSVERSIONINFO versionInfo;
-    memset(&versionInfo, 0, sizeof(versionInfo));
-    versionInfo.dwOSVersionInfoSize = sizeof(versionInfo);
-    GetVersionEx(&versionInfo);
-    return {versionInfo.dwMajorVersion, versionInfo.dwMinorVersion, versionInfo.dwBuildNumber};
+    SOSVersionInfo versionInfo = {0};
+    QueryRtlGetVersion(versionInfo);
+    return versionInfo;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -1053,8 +1336,62 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
         usNetRel = static_cast<unsigned short>(atoi(parts[5]));
     }
 
+    const auto LoadVersionModule = [&](const SString& strRootPath, DWORD& dwOutLastError) -> HMODULE
+    {
+        if (strRootPath.empty())
+            return NULL;
+
+        const SString strLibPath = PathJoin(strRootPath, "mta");
+        const SString strLibPathFilename = PathJoin(strLibPath, strFilename);
+        if (!FileExists(strLibPathFilename))
+        {
+            dwOutLastError = ERROR_FILE_NOT_FOUND;
+            return NULL;
+        }
+
+        const SString strPrevCurDir = GetSystemCurrentDirectory();
+        SetCurrentDirectory(strLibPath);
+        SetDllDirectory(strLibPath);
+
+        HMODULE hLoadedModule = LoadLibrary(strLibPathFilename);
+        dwOutLastError = GetLastError();
+
+        SetCurrentDirectory(strPrevCurDir);
+        SetDllDirectory(strPrevCurDir);
+        return hLoadedModule;
+    };
+
     DWORD   dwLastError = 0;
-    HMODULE hModule = GetLibraryHandle(strFilename, &dwLastError);
+    HMODULE hModule = NULL;
+    bool    bFreeModule = false;
+
+    const SString strInstallPath = GetInstallPathForLauncher();
+    if (SharedUtil::IsUsableMtasaInstallRoot(strInstallPath))
+    {
+        hModule = LoadVersionModule(strInstallPath, dwLastError);
+        bFreeModule = hModule != NULL;
+    }
+
+    // GetInstallPathForLauncher returns empty when running from a temp update directory and no
+    // usable non-temp install root could be resolved. GetMTASAPath consults SetMTASABaseDirOverride
+    // (which the install manager populates from the sequencer-carried INSTALL_ROOT in the far branch),
+    // so this attempt covers the recovered far-update case before falling back to the launch dir.
+    if (!hModule)
+    {
+        const SString strBaseDirPath = GetMTASAPath();
+        if (SharedUtil::IsUsableMtasaInstallRoot(strBaseDirPath) && !strBaseDirPath.CompareI(strInstallPath))
+        {
+            hModule = LoadVersionModule(strBaseDirPath, dwLastError);
+            bFreeModule = hModule != NULL;
+        }
+    }
+
+    if (!hModule)
+    {
+        hModule = LoadVersionModule(GetLaunchPath(), dwLastError);
+        bFreeModule = hModule != NULL;
+    }
+
     if (hModule)
     {
         typedef void (*PFNINITNETREV)(const char*, const char*, const char*);
@@ -1075,6 +1412,9 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
         SString strMessage(_("Error loading %s module! (%s)"), *strFilename.ToLower(), *strError);
         DisplayErrorMessageBox(strMessage, _E("CL38"), "module-not-loadable&name=" + ExtractBeforeExtension(strFilename));
     }
+
+    if (bFreeModule)
+        FreeLibrary(hModule);
 
     if (!bQuiet)
         SetApplicationSetting("mta-version-ext", SString("%d.%d.%d-%d.%05d.%c.%03d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE,
@@ -1145,13 +1485,13 @@ bool Is32bitProcess(DWORD processID)
             if (bOk)
             {
                 if (bIsWow64 == FALSE)
-                    return false;            // 64 bit O/S and process not running under WOW64, so it must be a 64 bit process
+                    return false;  // 64 bit O/S and process not running under WOW64, so it must be a 64 bit process
                 return true;
             }
         }
     }
 
-    return false;            // Can't determine. Guess it's 64 bit
+    return false;  // Can't determine. Guess it's 64 bit
 }
 
 ///////////////////////////////////////////////////////////////////////////
@@ -1311,10 +1651,13 @@ int GetFileAge(const SString& strPathFilename)
 ///////////////////////////////////////////////////////////////////////////
 void CleanDownloadCache()
 {
-    const uint uiMaxCleanTime = 5;                           // Limit clean time (seconds)
-    const uint uiCleanFileAge = 60 * 60 * 24 * 7;            // Delete files older than this
+    const uint uiMaxCleanTime = 5;                 // Limit clean time (seconds)
+    const uint uiCleanFileAge = 60 * 60 * 24 * 7;  // Delete files older than this
+    const uint uiTmpDirCleanAge = 60 * 60 * 24;    // Delete stale extracted temp dirs older than this
 
-    const time_t tMaxEndTime = time(NULL) + uiMaxCleanTime;
+    const time_t  tMaxEndTime = time(NULL) + uiMaxCleanTime;
+    const SString strLaunchPath = GetLaunchPath();
+    const SString strCurrentDir = GetSystemCurrentDirectory();
 
     // Search possible cache locations
     std::list<SString> cacheLocationList;
@@ -1331,8 +1674,18 @@ void CleanDownloadCache()
         for (uint i = 0; i < fileList.size(); i++)
         {
             const SString strPathFilename = PathJoin(strCacheLocation, fileList[i]);
+            const bool    bIsExtractedTempDir = DirectoryExists(strPathFilename) && ExtractFilename(strPathFilename).ContainsI("_tmp_");
+            const uint    uiRequiredAge = bIsExtractedTempDir ? uiTmpDirCleanAge : uiCleanFileAge;
+
+            if (bIsExtractedTempDir)
+            {
+                if (strLaunchPath.CompareI(strPathFilename) || strCurrentDir.CompareI(strPathFilename) || strLaunchPath.BeginsWithI(strPathFilename + "\\") ||
+                    strCurrentDir.BeginsWithI(strPathFilename + "\\"))
+                    continue;
+            }
+
             // Check if over 7 days old
-            if (GetFileAge(strPathFilename) > uiCleanFileAge)
+            if (GetFileAge(strPathFilename) > uiRequiredAge)
             {
                 // Delete as directory or file
                 if (DirectoryExists(strPathFilename))
@@ -1394,7 +1747,7 @@ void DirectoryCopy(SString strSrcBase, SString strDestBase, bool bShowProgressDi
     bool      bCheckFreeSpace = false;
     long long llFreeBytesAvailable = GetDiskFreeSpace(strDestBase);
     if (llFreeBytesAvailable != 0)
-        bCheckFreeSpace = (llFreeBytesAvailable < (iMinFreeSpaceMB + 10000) * 0x100000LL);            // Only check if initial freespace is less than 10GB
+        bCheckFreeSpace = (llFreeBytesAvailable < (iMinFreeSpaceMB + 10000) * 0x100000LL);  // Only check if initial freespace is less than 10GB
 
     if (bShowProgressDialog)
         ShowProgressDialog(g_hInstance, _("Copying files..."), true);
@@ -1501,7 +1854,7 @@ void MaybeShowCopySettingsDialog()
     if (!FileExists(strPreviousConfig))
         return;
 
-    HideSplash();            // Hide standard MTA splash
+    HideSplash();  // Hide standard MTA splash
 
     // Show dialog
     SString strMessage;
@@ -2164,7 +2517,7 @@ bool IsNativeArm64Host()
         if (kernel32)
         {
             BOOL(WINAPI * IsWow64Process2_)(HANDLE, USHORT*, USHORT*) = nullptr;
-            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(static_cast<void*>(GetProcAddress(kernel32, "IsWow64Process2")));
+            IsWow64Process2_ = reinterpret_cast<decltype(IsWow64Process2_)>(reinterpret_cast<void*>(GetProcAddress(kernel32, "IsWow64Process2")));
 
             if (IsWow64Process2_)
             {
@@ -2261,8 +2614,8 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 //////////////////////////////////////////////////////////
 WerCrashInfo QueryWerCrashInfo(DWORD targetExceptionCode)
 {
-    constexpr DWORD EXCEPTION_STACK_BUFFER_OVERRUN = 0xC0000409;
-    constexpr DWORD EXCEPTION_HEAP_CORRUPTION = 0xC0000374;
+    constexpr DWORD     EXCEPTION_STACK_BUFFER_OVERRUN = 0xC0000409;
+    constexpr DWORD     EXCEPTION_HEAP_CORRUPTION = 0xC0000374;
     constexpr ULONGLONG FILETIME_UNITS_PER_SECOND = 10000000ULL;
     constexpr ULONGLONG MAX_CRASH_AGE_MINUTES = 15;
 
@@ -2286,7 +2639,7 @@ WerCrashInfo QueryWerCrashInfo(DWORD targetExceptionCode)
     for (const SString& werArchivePath : werArchivePaths)
     {
         SString searchPattern = PathJoin(werArchivePath, "AppCrash_gta_sa.exe_*");
-        auto reportDirs = FindFiles(searchPattern, false, true, true);
+        auto    reportDirs = FindFiles(searchPattern, false, true, true);
         for (const SString& dir : reportDirs)
         {
             allReportDirs.push_back({werArchivePath, dir});
@@ -2306,10 +2659,9 @@ WerCrashInfo QueryWerCrashInfo(DWORD targetExceptionCode)
     {
         const SString& werArchivePath = it->first;
         const SString& reportDir = it->second;
-        SString reportPath = PathJoin(werArchivePath, reportDir, "Report.wer");
+        SString        reportPath = PathJoin(werArchivePath, reportDir, "Report.wer");
 
-        HANDLE hFile = CreateFileA(reportPath, GENERIC_READ, FILE_SHARE_READ, nullptr,
-                                   OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+        HANDLE hFile = CreateFileA(reportPath, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
         if (hFile == INVALID_HANDLE_VALUE)
             continue;
 
@@ -2332,17 +2684,15 @@ WerCrashInfo QueryWerCrashInfo(DWORD targetExceptionCode)
         }
 
         wchar_t wbuffer[8192]{};
-        DWORD bytesRead = 0;
+        DWORD   bytesRead = 0;
         SetFilePointer(hFile, 0, nullptr, FILE_BEGIN);
         ReadFile(hFile, wbuffer, sizeof(wbuffer) - sizeof(wchar_t), &bytesRead, nullptr);
         CloseHandle(hFile);
 
         std::wstring content(wbuffer, bytesRead / sizeof(wchar_t));
 
-        bool hasStackOverrun = content.find(L"c0000409") != std::wstring::npos ||
-                               content.find(L"C0000409") != std::wstring::npos;
-        bool hasHeapCorruption = content.find(L"c0000374") != std::wstring::npos ||
-                                 content.find(L"C0000374") != std::wstring::npos;
+        bool hasStackOverrun = content.find(L"c0000409") != std::wstring::npos || content.find(L"C0000409") != std::wstring::npos;
+        bool hasHeapCorruption = content.find(L"c0000374") != std::wstring::npos || content.find(L"C0000374") != std::wstring::npos;
 
         if (!hasStackOverrun && !hasHeapCorruption)
             continue;
@@ -2352,9 +2702,10 @@ WerCrashInfo QueryWerCrashInfo(DWORD targetExceptionCode)
         if (targetExceptionCode != 0 && foundCode != targetExceptionCode)
             continue;
 
-        auto parseField = [&content](const wchar_t* fieldName) -> SString {
+        auto parseField = [&content](const wchar_t* fieldName) -> SString
+        {
             std::wstring searchKey = std::wstring(fieldName) + L".Value=";
-            size_t pos = content.find(searchKey);
+            size_t       pos = content.find(searchKey);
             if (pos == std::wstring::npos)
                 return "";
             pos += searchKey.length();
@@ -2370,14 +2721,14 @@ WerCrashInfo QueryWerCrashInfo(DWORD targetExceptionCode)
         SString werOffset = parseField(L"Sig[6]");
 
         SString evtModule, evtOffset;
-        HANDLE hEventLog = OpenEventLogW(nullptr, L"Application");
+        HANDLE  hEventLog = OpenEventLogW(nullptr, L"Application");
         if (hEventLog)
         {
             std::vector<BYTE> buffer(65536);
-            DWORD evtBytesRead = 0, minBytes = 0;
+            DWORD             evtBytesRead = 0, minBytes = 0;
 
-            if (ReadEventLogW(hEventLog, EVENTLOG_BACKWARDS_READ | EVENTLOG_SEQUENTIAL_READ,
-                             0, buffer.data(), static_cast<DWORD>(buffer.size()), &evtBytesRead, &minBytes))
+            if (ReadEventLogW(hEventLog, EVENTLOG_BACKWARDS_READ | EVENTLOG_SEQUENTIAL_READ, 0, buffer.data(), static_cast<DWORD>(buffer.size()), &evtBytesRead,
+                              &minBytes))
             {
                 auto* record = reinterpret_cast<EVENTLOGRECORD*>(buffer.data());
                 DWORD totalRead = 0;
@@ -2386,28 +2737,27 @@ WerCrashInfo QueryWerCrashInfo(DWORD targetExceptionCode)
                 {
                     if (record->EventID == 1000)
                     {
-                        auto* source = reinterpret_cast<const wchar_t*>(
-                            reinterpret_cast<const BYTE*>(record) + sizeof(EVENTLOGRECORD));
+                        auto* source = reinterpret_cast<const wchar_t*>(reinterpret_cast<const BYTE*>(record) + sizeof(EVENTLOGRECORD));
 
                         if (wcscmp(source, L"Application Error") == 0)
                         {
                             constexpr LONGLONG UNIX_EPOCH_DIFF = 11644473600LL;
-                            ULARGE_INTEGER eventTime;
+                            ULARGE_INTEGER     eventTime;
                             eventTime.QuadPart = (static_cast<LONGLONG>(record->TimeGenerated) + UNIX_EPOCH_DIFF) * FILETIME_UNITS_PER_SECOND;
 
-                            ULONGLONG timeDiff = (uliWrite.QuadPart > eventTime.QuadPart) ?
-                                (uliWrite.QuadPart - eventTime.QuadPart) : (eventTime.QuadPart - uliWrite.QuadPart);
+                            ULONGLONG timeDiff =
+                                (uliWrite.QuadPart > eventTime.QuadPart) ? (uliWrite.QuadPart - eventTime.QuadPart) : (eventTime.QuadPart - uliWrite.QuadPart);
 
                             if (timeDiff < 2ULL * 60 * FILETIME_UNITS_PER_SECOND)
                             {
-                                auto* strPtr = reinterpret_cast<const wchar_t*>(
-                                    reinterpret_cast<const BYTE*>(record) + record->StringOffset);
+                                auto* strPtr = reinterpret_cast<const wchar_t*>(reinterpret_cast<const BYTE*>(record) + record->StringOffset);
 
                                 std::vector<SString> eventStrings;
                                 for (WORD s = 0; s < record->NumStrings && s < 10; ++s)
                                 {
                                     eventStrings.emplace_back(SString("%ls", strPtr));
-                                    while (*strPtr) ++strPtr;
+                                    while (*strPtr)
+                                        ++strPtr;
                                     ++strPtr;
                                 }
 
@@ -2493,7 +2843,7 @@ ModuleCrashInfo ResolveModuleCrashAddress(DWORD crashAddress)
     };
 
     std::vector<ModuleEntry> modules;
-    std::vector<SString> entries;
+    std::vector<SString>     entries;
     strModuleBases.Split(";", entries, true);
 
     for (const SString& entry : entries)
@@ -2555,7 +2905,7 @@ ModuleCrashInfo ResolveModuleCrashAddress(DWORD crashAddress)
             result.rva = crashAddress - mod.base;
 
             // IDA default base varies: DLLs at 0x10000000, EXEs at 0x00400000
-            const bool isExe = result.moduleName.EndsWithI(".exe");
+            const bool  isExe = result.moduleName.EndsWithI(".exe");
             const DWORD idaBase = isExe ? 0x00400000 : 0x10000000;
             result.idaAddress = idaBase + result.rva;
             result.resolved = true;
@@ -2587,7 +2937,7 @@ ModuleCrashInfo ResolveModuleCrashAddress(DWORD crashAddress, HANDLE hProcess)
         return result;
 
     HMODULE hMods[512];
-    DWORD cbNeeded = 0;
+    DWORD   cbNeeded = 0;
 
     if (!EnumProcessModules(hProcess, hMods, sizeof(hMods), &cbNeeded))
         return result;
@@ -2631,7 +2981,7 @@ ModuleCrashInfo ResolveModuleCrashAddress(DWORD crashAddress, HANDLE hProcess)
             result.moduleBase = modBase;
             result.rva = crashAddress - modBase;
 
-            const bool isExe = result.moduleName.EndsWithI(".exe");
+            const bool  isExe = result.moduleName.EndsWithI(".exe");
             const DWORD idaBase = isExe ? 0x00400000 : 0x10000000;
             result.idaAddress = idaBase + result.rva;
             result.resolved = true;

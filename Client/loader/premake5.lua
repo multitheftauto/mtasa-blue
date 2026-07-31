@@ -6,6 +6,7 @@ project "Loader"
 	disablewarnings {
 		"4996", -- use of symbol with __declspec(deprecated)
 	}
+	clangtidy "On"
 
 	includedirs {
 		"../../Shared/sdk",

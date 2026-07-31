@@ -97,6 +97,7 @@ typedef void(Render3DStuffHandler)();
 typedef void(PreRenderSkyHandler)();
 typedef void(RenderHeliLightHandler)();
 typedef bool(ChokingHandler)(unsigned char ucWeaponType);
+typedef void(PreWeatherUpdateHandler)();
 typedef void(PreWorldProcessHandler)();
 typedef void(PostWorldProcessHandler)();
 typedef void(PostWorldProcessPedsAfterPreRenderHandler)();
@@ -105,8 +106,8 @@ typedef void(PreFxRenderHandler)();
 typedef void(PostColorFilterRenderHandler)();
 typedef void(PreHudRenderHandler)();
 typedef void(RenderEverythingBarRoadsHandler)();
-typedef CAnimBlendAssociationSAInterface*(AddAnimationHandler)(RpClump* pClump, AssocGroupId animGroup, AnimationId animID);
-typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump* pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
+typedef CAnimBlendAssociationSAInterface*(AddAnimationHandler)(RpClump * pClump, AssocGroupId animGroup, AnimationId animID);
+typedef CAnimBlendAssociationSAInterface*(AddAnimationAndSyncHandler)(RpClump * pClump, CAnimBlendAssociationSAInterface* pAnimAssocToSyncWith,
                                                                       AssocGroupId animGroup, AnimationId animID);
 typedef void(CAnimBlendAssocDestructorHandler)(CAnimBlendAssociationSAInterface* pThis);
 typedef bool(AssocGroupCopyAnimationHandler)(CAnimBlendAssociationSAInterface* pAnimAssoc, RpClump* pClump, CAnimBlendAssocGroupSAInterface* pAnimAssocGroup,
@@ -228,6 +229,7 @@ public:
     virtual void  SetChokingHandler(ChokingHandler* pChokingHandler) = 0;
     virtual void  SetProjectileHandler(ProjectileHandler* pProjectileHandler) = 0;
     virtual void  SetProjectileStopHandler(ProjectileStopHandler* pProjectileHandler) = 0;
+    virtual void  SetPreWeatherUpdateHandler(PreWeatherUpdateHandler* pHandler) = 0;
     virtual void  SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler) = 0;
     virtual void  SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler) = 0;
     virtual void  SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler) = 0;
@@ -311,17 +313,17 @@ public:
     virtual int   GetMoonSize() = 0;
     virtual void  ResetMoonSize() = 0;
 
-    virtual void  GetAmbientColor(float& red, float& green, float& blue) const = 0;
-    virtual bool  SetAmbientColor(float red, float green, float blue) = 0;
-    virtual bool  ResetAmbientColor() = 0;
+    virtual void GetAmbientColor(float& red, float& green, float& blue) const = 0;
+    virtual bool SetAmbientColor(float red, float green, float blue) = 0;
+    virtual bool ResetAmbientColor() = 0;
 
-    virtual void  GetAmbientObjectColor(float& red, float& green, float& blue) const = 0;
-    virtual bool  SetAmbientObjectColor(float red, float green, float blue) = 0;
-    virtual bool  ResetAmbientObjectColor() = 0;
+    virtual void GetAmbientObjectColor(float& red, float& green, float& blue) const = 0;
+    virtual bool SetAmbientObjectColor(float red, float green, float blue) = 0;
+    virtual bool ResetAmbientObjectColor() = 0;
 
-    virtual void  GetDirectionalColor(float& red, float& green, float& blue) const = 0;
-    virtual bool  SetDirectionalColor(float red, float green, float blue) = 0;
-    virtual bool  ResetDirectionalColor() = 0;
+    virtual void GetDirectionalColor(float& red, float& green, float& blue) const = 0;
+    virtual bool SetDirectionalColor(float red, float green, float blue) = 0;
+    virtual bool ResetDirectionalColor() = 0;
 
     virtual float GetSpriteSize() const = 0;
     virtual bool  SetSpriteSize(float size) = 0;
@@ -347,13 +349,13 @@ public:
     virtual bool  SetLightsOnGroundBrightness(float brightness) = 0;
     virtual bool  ResetLightsOnGroundBrightness() = 0;
 
-    virtual void  GetLowCloudsColor(int16& red, int16& green, int16& blue) const = 0;
-    virtual bool  SetLowCloudsColor(int16 red, int16 green, int16 blue) = 0;
-    virtual bool  ResetLowCloudsColor() = 0;
+    virtual void GetLowCloudsColor(int16& red, int16& green, int16& blue) const = 0;
+    virtual bool SetLowCloudsColor(int16 red, int16 green, int16 blue) = 0;
+    virtual bool ResetLowCloudsColor() = 0;
 
-    virtual void  GetBottomCloudsColor(int16& red, int16& green, int16& blue) const = 0;
-    virtual bool  SetBottomCloudsColor(int16 red, int16 green, int16 blue) = 0;
-    virtual bool  ResetBottomCloudsColor() = 0;
+    virtual void GetBottomCloudsColor(int16& red, int16& green, int16& blue) const = 0;
+    virtual bool SetBottomCloudsColor(int16 red, int16 green, int16 blue) = 0;
+    virtual bool ResetBottomCloudsColor() = 0;
 
     virtual float GetCloudsAlpha1() const = 0;
     virtual bool  SetCloudsAlpha1(float alpha) = 0;

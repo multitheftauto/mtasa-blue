@@ -63,6 +63,8 @@ bool CScreenSourceItem::IsValid()
 void CScreenSourceItem::OnLostDevice()
 {
     ReleaseUnderlyingData();
+    m_uiLastEnsureAttempt = 0;
+    m_uiEnsureDelayMs = 0;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -75,6 +77,48 @@ void CScreenSourceItem::OnLostDevice()
 void CScreenSourceItem::OnResetDevice()
 {
     CreateUnderlyingData();
+    m_uiLastEnsureAttempt = 0;
+    m_uiEnsureDelayMs = 0;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CScreenSourceItem::TryEnsureValid
+//
+// Attempt to (re)create device resources if missing
+//
+////////////////////////////////////////////////////////////////
+bool CScreenSourceItem::TryEnsureValid()
+{
+    if (IsValid())
+        return true;
+
+    if (!m_pManager || m_pManager->GetDeviceCooperativeLevel("ScreenSourceTryEnsureValid", false) != D3D_OK)
+        return false;
+
+    const uint kRetryIntervalMinMs = 250;
+    const uint kRetryIntervalMaxMs = 2000;
+    const uint uiNow = GetTickCount32();
+    if (m_uiEnsureDelayMs == 0)
+        m_uiEnsureDelayMs = kRetryIntervalMinMs;
+
+    if (uiNow - m_uiLastEnsureAttempt < m_uiEnsureDelayMs)
+        return false;
+
+    m_uiLastEnsureAttempt = uiNow;
+
+    if (m_pD3DRenderTargetSurface || m_pD3DTexture)
+        ReleaseUnderlyingData();
+
+    CreateUnderlyingData();
+    if (IsValid())
+    {
+        m_uiEnsureDelayMs = kRetryIntervalMinMs;
+        return true;
+    }
+
+    m_uiEnsureDelayMs = std::min(m_uiEnsureDelayMs * 2, kRetryIntervalMaxMs);
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////

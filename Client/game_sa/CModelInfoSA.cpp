@@ -10,7 +10,6 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <chrono>
 #include <core/CCoreInterface.h>
 #include "CColModelSA.h"
 #include "CColStoreSA.h"
@@ -18,6 +17,7 @@
 #include "CModelInfoSA.h"
 #include "CPedModelInfoSA.h"
 #include "CPedSA.h"
+#include "CPoolsSA.h"
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
 
@@ -27,15 +27,15 @@ extern CGameSA*        pGame;
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
-std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::map<DWORD, unsigned short>                                       CModelInfoSA::ms_ModelDefaultFlagsMap;
-std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::map<unsigned short, int>                                        CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<DWORD, float>                                               CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::map<DWORD, unsigned short>                                      CModelInfoSA::ms_ModelDefaultFlagsMap;
+std::map<DWORD, BYTE>                                                CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<std::uint32_t, std::map<VehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
-std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfoSA::ms_ModelDefaultModelTimeInfo;
-std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
-std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
-std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
+std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>               CModelInfoSA::ms_ModelDefaultModelTimeInfo;
+std::unordered_map<DWORD, unsigned short>                            CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, std::pair<float, float>>                   CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
+std::map<unsigned short, int>                                        CModelInfoSA::ms_DefaultTxdIDMap;
 
 union tIdeFlags
 {
@@ -94,7 +94,6 @@ CModelInfoSA::CModelInfoSA()
 {
     m_pInterface = NULL;
     m_dwModelID = 0xFFFFFFFF;
-    m_dwParentID = 0;
     m_dwReferences = 0;
     m_dwPendingInterfaceRef = 0;
     m_pOriginalColModelInterface = NULL;
@@ -326,8 +325,7 @@ bool CModelInfoSA::IsVehicleModel(std::uint32_t model) noexcept
 
 bool CModelInfoSA::IsPlayerModel()
 {
-    CBaseModelInfoSAInterface* pInterface = GetInterface();
-    return pInterface && pInterface->pColModel && pInterface->pColModel == (CColModelSAInterface*)VAR_CTempColModels_ModelPed1;
+    return (GetInterface() && GetInterface()->pColModel && GetInterface()->pColModel == (CColModelSAInterface*)VAR_CTempColModels_ModelPed1);
 }
 
 bool CModelInfoSA::IsUpgrade()
@@ -342,7 +340,7 @@ char* CModelInfoSA::GetNameIfVehicle()
     DWORD ModelID = m_dwModelID;
     DWORD dwReturn = 0;
 
-        // clang-format off
+    // clang-format off
         __asm
         {
             push    eax
@@ -365,15 +363,12 @@ char* CModelInfoSA::GetNameIfVehicle()
             pop     ebx
             pop     eax
         }
-        // clang-format on
+    // clang-format on
     return (char*)dwReturn;
 }
 
 uint CModelInfoSA::GetAnimFileIndex()
 {
-    if (!m_pInterface || !m_pInterface->VFTBL)
-        return 0xFFFFFFFF;
-
     DWORD dwFunc = m_pInterface->VFTBL->GetAnimFileIndex;
     DWORD dwThis = (DWORD)m_pInterface;
     uint  uiReturn = 0;
@@ -395,10 +390,6 @@ void CModelInfoSA::Request(EModelRequestType requestType, const char* szTag)
 {
     // don't bother loading it if it already is
     if (IsLoaded())
-        return;
-
-    // Don't request deallocated models (ppModelInfo[id] is NULL)
-    if (!IsValid())
         return;
 
     // Bikes can sometimes get stuck when loading unless the anim file is handled like what is does here
@@ -466,8 +457,6 @@ void CModelInfoSA::Remove()
     // Or we'll screw up SA's map for example.
 
     m_pInterface = ppModelInfo[m_dwModelID];
-    if (!m_pInterface)
-        return;
 
     // Remove our reference
     if (m_pInterface->usNumberOfRefs > 0)
@@ -483,10 +472,6 @@ void CModelInfoSA::Remove()
 
 bool CModelInfoSA::UnloadUnused()
 {
-    m_pInterface = ppModelInfo[m_dwModelID];
-    if (!m_pInterface)
-        return false;
-
     if (m_pInterface->usNumberOfRefs == 0 && !m_pCustomClump && !m_pCustomColModel)
     {
         pGame->GetStreaming()->RemoveModel(m_dwModelID);
@@ -503,8 +488,7 @@ bool CModelInfoSA::IsLoaded()
         {
             assert(m_dwReferences > 0);
             m_pInterface = ppModelInfo[m_dwModelID];
-            if (m_pInterface)
-                m_pInterface->usNumberOfRefs++;
+            m_pInterface->usNumberOfRefs++;
             m_dwPendingInterfaceRef = 0;
         }
         return true;
@@ -533,10 +517,7 @@ bool CModelInfoSA::DoIsLoaded()
 
 unsigned short CModelInfoSA::GetFlags()
 {
-    CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
-    if (!pInterface)
-        return 0;
-    return pInterface->usFlags;
+    return ppModelInfo[m_dwModelID]->usFlags;
 }
 
 unsigned short CModelInfoSA::GetOriginalFlags()
@@ -544,10 +525,7 @@ unsigned short CModelInfoSA::GetOriginalFlags()
     if (MapContains(ms_ModelDefaultFlagsMap, m_dwModelID))
         return MapGet(ms_ModelDefaultFlagsMap, m_dwModelID);
 
-    CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
-    if (!pInterface)
-        return 0;
-    return pInterface->usFlags;
+    return ppModelInfo[m_dwModelID]->usFlags;
 }
 
 void CModelInfoSA::SetFlags(unsigned short usFlags)
@@ -561,8 +539,8 @@ void CModelInfoSA::SetFlags(unsigned short usFlags)
         MapSet(ms_ModelDefaultFlagsMap, m_dwModelID, m_pInterface->usFlags);
 
     // Don't change bIsColLoaded flag
-    usFlags &= 0xFF7F;                                  // Disable flag in input
-    usFlags |= m_pInterface->usFlags & 0x80;            // Apply current bIsColLoaded flag
+    usFlags &= 0xFF7F;                        // Disable flag in input
+    usFlags |= m_pInterface->usFlags & 0x80;  // Apply current bIsColLoaded flag
 
     m_pInterface->usFlags = usFlags;
 }
@@ -582,7 +560,7 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
 
     // Default value is 0xC0 (bIsColLoaded + bIsBackfaceCulled)
     // But bIsColLoaded should not be changed
-    m_pInterface->usFlags &= 0x80;            // Reset all flags except bIsColLoaded
+    m_pInterface->usFlags &= 0x80;  // Reset all flags except bIsColLoaded
     m_pInterface->bIsBackfaceCulled = true;
 
     // setBaseModelInfoFlags
@@ -794,35 +772,6 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
     return dwReturn;
 }
 
-bool CModelInfoSA::IsCollisionLoaded() const noexcept
-{
-    if (m_dwModelID >= MODELINFO_DFF_MAX)
-        return false;
-
-    const CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
-    return pInterface && pInterface->pColModel != nullptr;
-}
-
-bool CModelInfoSA::IsRwObjectLoaded() const noexcept
-{
-    if (m_dwModelID >= MODELINFO_DFF_MAX)
-        return false;
-
-    const CBaseModelInfoSAInterface* pInterface = ppModelInfo[m_dwModelID];
-    return pInterface && pInterface->pRwObject != nullptr;
-}
-
-void CModelInfoSA::WaitForModelFullyLoaded(std::chrono::milliseconds timeout)
-{
-    // Don't request deallocated models
-    if (!IsValid())
-        return;
-
-    // Implementation placeholder - would need streaming system integration
-    // For now, just ensure the model is requested
-    pGame->GetStreaming()->RequestModel(m_dwModelID, BLOCKING);
-}
-
 bool CModelInfoSA::IsValid()
 {
     if (m_dwModelID >= MODELINFO_DFF_MAX && m_dwModelID < MODELINFO_TXD_MAX)
@@ -830,9 +779,6 @@ bool CModelInfoSA::IsValid()
 
     if (m_dwModelID >= pGame->GetBaseIDforTXD() && m_dwModelID < pGame->GetCountOfAllFileIDs())
         return true;
-
-    if (m_dwModelID >= MODELINFO_DFF_MAX)
-        return false;
 
     if (!ppModelInfo[m_dwModelID])
         return false;
@@ -842,8 +788,7 @@ bool CModelInfoSA::IsValid()
 
 bool CModelInfoSA::IsAllocatedInArchive() const noexcept
 {
-    CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-    return pStreamingInfo && pStreamingInfo->sizeInBlocks > 0;
+    return pGame->GetStreaming()->GetStreamingInfo(m_dwModelID)->sizeInBlocks > 0;
 }
 
 float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
@@ -851,6 +796,7 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
     float fReturn = 0;
+    // clang-format off
     __asm {
         mov     eax, ModelID
 
@@ -867,6 +813,7 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
         fstp    fReturn
 skip:
     }
+    // clang-format on
     return fReturn;
 }
 
@@ -912,11 +859,12 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
 void CModelInfoSA::ResetTextureDictionaryID()
 {
     const auto it = ms_DefaultTxdIDMap.find(static_cast<unsigned short>(m_dwModelID));
-    if (it == ms_DefaultTxdIDMap.end()) {
+    if (it == ms_DefaultTxdIDMap.end())
+    {
         return;
     }
     SetTextureDictionaryID(static_cast<unsigned short>(it->second));
-    ms_DefaultTxdIDMap.erase(it); // Only erase after calling the function above [otherwise gets reinserted]
+    ms_DefaultTxdIDMap.erase(it);  // Only erase after calling the function above [otherwise gets reinserted]
 }
 
 void CModelInfoSA::StaticResetTextureDictionaries()
@@ -1061,236 +1009,95 @@ void CModelInfoSA::RestreamIPL()
 {
     // IPLs should not contain peds, weapons, vehicles and vehicle upgrades
     if (m_dwModelID > 611 && (m_dwModelID < 1000 || m_dwModelID > 1193))
-    {
-        constexpr std::size_t kMaxPendingTxdIDs = 1000;
-        if (ms_RestreamTxdIDMap.size() >= kMaxPendingTxdIDs)
-            return;
-
-        auto txdId = GetTextureDictionaryID();
-        if (txdId == 0)
-            return;
-
-        MapSet(ms_RestreamTxdIDMap, txdId, 0);
-    }
-}
-
-// Helper to call entity's DeleteRwObject virtual method
-static void DeleteEntityRwObject(CEntitySAInterface* pEntity)
-{
-    _asm
-    {
-        mov ecx, pEntity
-        mov eax, [ecx]
-        call dword ptr [eax+20h]
-    }
+        MapSet(ms_RestreamTxdIDMap, GetTextureDictionaryID(), 0);
 }
 
 void CModelInfoSA::StaticFlushPendingRestreamIPL()
 {
     if (ms_RestreamTxdIDMap.empty())
         return;
-
     // This function restreams all instances of the model *that are from the default SA world (ipl)*.
     // In other words, it does not affect elements created by MTA.
     // It's mostly a reimplementation of SA's DeleteAllRwObjects, except that it filters by model ID.
 
-    reinterpret_cast<void(*)()>(FUNC_FlushRequestList)();
+    ((void (*)())FUNC_FlushRequestList)();
 
-    std::unordered_set<unsigned short> processedTxdIDs;
-    std::unordered_set<unsigned short> pendingTxdIDs;
+    std::set<unsigned short> removedModels;
 
-    // Models to unload - includes processed entities, timed-out, and unprocessed TXD models
-    std::unordered_set<unsigned short> modelsToUnload;
-
-    // Sector array constants
-    constexpr int kStreamSectorCount = 2 * NUM_StreamSectorRows * NUM_StreamSectorCols;
-    constexpr int kRepeatSectorCount = NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols;
-    constexpr int kRepeatSectorStride = 3;  // StreamRepeatSectors uses stride of 3, we access element [2]
-
-    // Helper to validate entity vtable - checks if DeleteRwObject points to expected address
-    auto isValidEntity = [](CEntitySAInterface* pEntity) -> bool {
-        constexpr std::size_t kDeleteRwObjectVtblOffset = 8;
-        constexpr std::size_t kExpectedDeleteRwObject = 0x00534030;
-        auto* vtbl = static_cast<std::size_t*>(pEntity->GetVTBL());
-        return vtbl[kDeleteRwObjectVtblOffset] == kExpectedDeleteRwObject;
-    };
-
-    // Process entities from a sector list
-    // Note: validateVtable should be true for StreamSectors but false for StreamRepeatSectors
-    auto processSectorList = [&](DWORD* pSectorEntry, bool validateVtable, int sectorIndex) {
+    for (int i = 0; i < 2 * NUM_StreamSectorRows * NUM_StreamSectorCols; i++)
+    {
+        DWORD* pSectorEntry = ((DWORD**)ARRAY_StreamSectors)[i];
         while (pSectorEntry)
         {
-            auto* pEntity = reinterpret_cast<CEntitySAInterface*>(pSectorEntry[0]);
-            if (!pEntity)
+            CEntitySAInterface* pEntity = (CEntitySAInterface*)pSectorEntry[0];
+
+            // Possible bug - pEntity seems to be invalid here occasionally
+            constexpr auto CEntity_DeleteRwObject_VTBL_OFFSET = 8;
+            if (static_cast<std::size_t*>(pEntity->GetVTBL())[CEntity_DeleteRwObject_VTBL_OFFSET] != 0x00534030)
             {
-                pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
+                // Log info
+                OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex,
+                                          i / 2 % NUM_StreamSectorRows, i / 2 / NUM_StreamSectorCols));
+// Assert in debug
+#if MTA_DEBUG
+                assert(static_cast<std::size_t*>(pEntity->GetVTBL())[CEntity_DeleteRwObject_VTBL_OFFSET] != 0x00534030);
+#endif
+                pSectorEntry = (DWORD*)pSectorEntry[1];
                 continue;
             }
 
-            // Vtable validation for StreamSectors
-            if (validateVtable && !isValidEntity(pEntity))
-            {
-                OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", 
-                    pEntity, pEntity->m_nModelIndex,
-                    sectorIndex / 2 % NUM_StreamSectorRows, sectorIndex / 2 / NUM_StreamSectorCols));
-                    pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
-                continue;
-            }
-
-            auto* pModelInfo = pGame->GetModelInfo(pEntity->m_nModelIndex);
-            if (!pModelInfo)
-            {
-                pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
-                continue;
-            }
-
-            auto txdID = pModelInfo->GetTextureDictionaryID();
-            if (MapContains(ms_RestreamTxdIDMap, txdID))
+            if (MapContains(ms_RestreamTxdIDMap, pGame->GetModelInfo(pEntity->m_nModelIndex)->GetTextureDictionaryID()))
             {
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
-                    DeleteEntityRwObject(pEntity);
-                    processedTxdIDs.insert(txdID);
-                    modelsToUnload.insert(pEntity->m_nModelIndex);
-                }
-                else
-                {
-                    pendingTxdIDs.insert(txdID);
+                    // clang-format off
+                    __asm
+                    {
+                        mov ecx, pEntity
+                        mov eax, [ecx]
+                        call dword ptr [eax+20h]
+                    }
+                    // clang-format on
+                    removedModels.insert(pEntity->m_nModelIndex);
                 }
             }
 
-            pSectorEntry = reinterpret_cast<DWORD*>(pSectorEntry[1]);
+            pSectorEntry = (DWORD*)pSectorEntry[1];
         }
-    };
-
-    // Process StreamSectors (skip null entries for efficiency)
-    for (int i = 0; i < kStreamSectorCount; i++)
-    {
-        auto* pSectorEntry = reinterpret_cast<DWORD*>(reinterpret_cast<DWORD**>(ARRAY_StreamSectors)[i]);
-        if (pSectorEntry)
-            processSectorList(pSectorEntry, true, i);
     }
 
-    // Process StreamRepeatSectors (skip null entries for efficiency)
-    for (int i = 0; i < kRepeatSectorCount; i++)
+    for (int i = 0; i < NUM_StreamRepeatSectorRows * NUM_StreamRepeatSectorCols; i++)
     {
-        auto* pSectorEntry = reinterpret_cast<DWORD*>(reinterpret_cast<DWORD**>(ARRAY_StreamRepeatSectors)[kRepeatSectorStride * i + 2]);
-        if (pSectorEntry)
-            processSectorList(pSectorEntry, false, i);
-    }
-
-    // Determine which TXD IDs had no entities found at all (buildings not yet streamed in)
-    std::unordered_set<unsigned short> unprocessedTxdIDs;
-    for (const auto& entry : ms_RestreamTxdIDMap)
-    {
-        if (!processedTxdIDs.count(entry.first) && !pendingTxdIDs.count(entry.first))
-            unprocessedTxdIDs.insert(entry.first);
-    }
-
-    // Only remove fully processed TXD IDs from the map
-    // Keep: pendingTxdIDs (entities being rendered) + unprocessedTxdIDs (no entities found yet)
-    for (auto txdID : processedTxdIDs)
-    {
-        if (!pendingTxdIDs.count(txdID))
-            ms_RestreamTxdIDMap.erase(txdID);
-    }
-
-    // Increment retry counter ONLY for pending TXD IDs (entities being rendered)
-    // Don't increment for: unprocessed (will be erased below)
-    // Note: processedTxdIDs that are also in pendingTxdIDs stay in map and need counter incremented
-    constexpr int kMaxRetryFrames = 300;  // ~5 seconds at 60fps
-    std::unordered_set<unsigned short> timedOutTxdIDs;
-    for (auto it = ms_RestreamTxdIDMap.begin(); it != ms_RestreamTxdIDMap.end(); )
-    {
-        // Skip if unprocessed - those will be erased below after model unload attempt
-        if (unprocessedTxdIDs.count(it->first))
+        DWORD* pSectorEntry = ((DWORD**)ARRAY_StreamRepeatSectors)[3 * i + 2];
+        while (pSectorEntry)
         {
-            ++it;
-            continue;
-        }
-        
-        it->second++;  // Increment retry counter for pending TXD IDs
-        if (it->second > kMaxRetryFrames)
-        {
-            // Timed out - entity was always being rendered. Force unload the models.
-            timedOutTxdIDs.insert(it->first);
-            it = ms_RestreamTxdIDMap.erase(it);
-        }
-        else
-            ++it;
-    }
-
-    // Force unload models for timed-out TXD IDs (entities that were always being rendered)
-    // This is needed because we can't delete RwObject while entity is being rendered,
-    // but we still need to refresh the textures eventually.
-    if (!timedOutTxdIDs.empty())
-    {
-        const auto maxModelId = static_cast<DWORD>(pGame->GetBaseIDforTXD());
-
-        for (DWORD modelId = 612; modelId < 1000; modelId++)
-        {
-            auto* pModelInfo = pGame->GetModelInfo(modelId);
-            if (!pModelInfo)
-                continue;
-            auto txdId = pModelInfo->GetTextureDictionaryID();
-            if (txdId != 0 && timedOutTxdIDs.count(txdId))
-                modelsToUnload.insert(static_cast<unsigned short>(modelId));
-        }
-
-        for (DWORD modelId = 1194; modelId < maxModelId; modelId++)
-        {
-            auto* pModelInfo = pGame->GetModelInfo(modelId);
-            if (!pModelInfo)
-                continue;
-            auto txdId = pModelInfo->GetTextureDictionaryID();
-            if (txdId != 0 && timedOutTxdIDs.count(txdId))
-                modelsToUnload.insert(static_cast<unsigned short>(modelId));
+            CEntitySAInterface* pEntity = (CEntitySAInterface*)pSectorEntry[0];
+            if (MapContains(ms_RestreamTxdIDMap, pGame->GetModelInfo(pEntity->m_nModelIndex)->GetTextureDictionaryID()))
+            {
+                if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
+                {
+                    // clang-format off
+                    __asm
+                    {
+                        mov ecx, pEntity
+                        mov eax, [ecx]
+                        call dword ptr [eax+20h]
+                    }
+                    // clang-format on
+                    removedModels.insert(pEntity->m_nModelIndex);
+                }
+            }
+            pSectorEntry = (DWORD*)pSectorEntry[1];
         }
     }
 
-    // For unprocessed TXD IDs (no entities visible), try to unload the actual models
-    // This handles the cases where models are loaded with old textures but not yet streamed as entities
-    if (!unprocessedTxdIDs.empty())
+    ms_RestreamTxdIDMap.clear();
+
+    std::set<unsigned short>::iterator it;
+    for (it = removedModels.begin(); it != removedModels.end(); it++)
     {
-        const auto maxModelId = static_cast<DWORD>(pGame->GetBaseIDforTXD());
-
-        auto tryQueueModelUnload = [&](DWORD modelId) {
-            auto* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(modelId);
-            if (!pStreamingInfo || pStreamingInfo->loadState == eModelLoadState::LOADSTATE_NOT_LOADED)
-                return;
-
-            auto* pModelInfo = pGame->GetModelInfo(modelId);
-            if (!pModelInfo)
-                return;
-
-            auto modelTxdId = pModelInfo->GetTextureDictionaryID();
-            if (modelTxdId == 0 || !unprocessedTxdIDs.count(modelTxdId))
-                return;
-
-            auto* pInterface = pModelInfo->GetInterface();
-            if (pInterface && pInterface->usNumberOfRefs == 0)
-                modelsToUnload.insert(static_cast<unsigned short>(modelId));
-        };
-
-        // Building model ranges matching RestreamIPL filter: > 611 && (< 1000 || > 1193)
-        for (DWORD modelId = 612; modelId < 1000; modelId++)
-            tryQueueModelUnload(modelId);
-
-        for (DWORD modelId = 1194; modelId < maxModelId; modelId++)
-            tryQueueModelUnload(modelId);
-
-        // Clear unprocessed TXD IDs - we've done what we can
-        for (auto txdID : unprocessedTxdIDs)
-            ms_RestreamTxdIDMap.erase(txdID);
-    }
-
-    // Unload models to force texture re-binding on reload
-    for (auto modelId : modelsToUnload)
-    {
-        pGame->GetStreaming()->RemoveModel(modelId);
-        CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(modelId);
-        if (pStreamingInfo)
-            pStreamingInfo->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
+        pGame->GetStreaming()->RemoveModel(*it);
+        pGame->GetStreaming()->GetStreamingInfo(*it)->loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
     }
 }
 
@@ -1343,7 +1150,7 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
     if (bRemoveExtraGTARef)
     {
         // Remove ref added by GTA.
-        if (m_pInterface && m_pInterface->usNumberOfRefs > 1)
+        if (m_pInterface->usNumberOfRefs > 1)
         {
             DWORD                      dwFunction = FUNC_RemoveRef;
             CBaseModelInfoSAInterface* pInterface = m_pInterface;
@@ -1491,10 +1298,8 @@ void CModelInfoSA::SetCustomCarPlateText(const char* szText)
     }
     // clang-format on
 
-    if (szText)
-        strncpy(szStoredText, szText, 8);
-    else
-        szStoredText[0] = '\0';
+    if (szText) strncpy(szStoredText, szText, 8);
+    else szStoredText[0] = 0;
 }
 
 unsigned int CModelInfoSA::GetNumRemaps()
@@ -1627,7 +1432,7 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
 
     auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
-        return;            // Early out in case the model doesn't have any dummies modified
+        return;  // Early out in case the model doesn't have any dummies modified
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
     for (const auto& dummy : ms_ModelDefaultDummiesPosition[m_dwModelID])
@@ -1761,7 +1566,6 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
             success = pGame->GetRenderWare()->ReplaceWeaponModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         case eModelInfoType::VEHICLE:
-            // ReplaceVehicleModele handles collision preservation internally
             success = pGame->GetRenderWare()->ReplaceVehicleModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         case eModelInfoType::ATOMIC:
@@ -1773,42 +1577,7 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
             break;
     }
 
-    if (success)
-    {
-        m_pCustomClump = pClump;
-
-        // Rebind texture pointers in the GAME's clump to current TXD textures.
-        // ReplaceModel clones the input clump, so we must rebind the ACTUAL clump the game is using.
-        // This is needed because the TXD may contain replacement textures (via engineImportTXD),
-        // but the DFF's materials still point to old/original textures from when it was loaded.
-        // Without this fix, shader texture replacement fails on custom DFF models.
-        eModelInfoType modelType = GetModelType();
-        switch (modelType)
-        {
-            case eModelInfoType::PED:
-            case eModelInfoType::WEAPON:
-            case eModelInfoType::VEHICLE:
-            case eModelInfoType::CLUMP:
-            case eModelInfoType::UNKNOWN:
-            {
-                RpClump* pGameClump = reinterpret_cast<RpClump*>(GetRwObject());
-                if (pGameClump && pGame)
-                {
-                    CRenderWare* pRenderWare = pGame->GetRenderWare();
-                    if (pRenderWare)
-                        pRenderWare->RebindClumpTexturesToTxd(pGameClump, GetTextureDictionaryID());
-                }
-                break;
-            }
-            default:
-                break;
-        }
-    }
-    else
-    {
-        m_pCustomClump = nullptr;
-    }
-
+    m_pCustomClump = success ? pClump : nullptr;
     return success;
 }
 
@@ -1819,14 +1588,20 @@ void CModelInfoSA::RestoreOriginalModel()
     {
         pGame->GetStreaming()->RemoveModel(m_dwModelID);
     }
+
     // Reset the stored custom vehicle clump
-    m_pCustomClump = nullptr;
+    m_pCustomClump = NULL;
 }
 
 void CModelInfoSA::SetColModel(CColModel* pColModel)
 {
+    if (!pColModel)
+        return;
+
     // Grab the interfaces
     CColModelSAInterface* pColModelInterface = pColModel->GetInterface();
+    if (!pColModelInterface)
+        return;
 
     // Skip setting if already done
     if (m_pCustomColModel == pColModel)
@@ -1850,7 +1625,7 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         // Apply some low-level hacks
         pColModelInterface->m_sphere.m_collisionSlot = 0xA9;
 
-        CBaseModelInfo_SetColModel(m_pInterface, pColModelInterface, true);
+        CBaseModelInfo_SetColModel(m_pInterface, pColModelInterface, false);
         CColAccel_addCacheCol(m_dwModelID, pColModelInterface);
 
         // SetColModel sets bDoWeOwnTheColModel if the last parameter is truthy
@@ -1876,6 +1651,37 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
                 }
             }
         }
+
+        // Handle paired time models explicitly so MTA tracking stays in sync.
+        if (GetModelType() == eModelInfoType::TIME)
+        {
+            const short pairedModelId = static_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo.m_wOtherTimeModel;
+            CModelInfo* pairedModel = pairedModelId >= 0 ? pGame->GetModelInfo(pairedModelId) : nullptr;
+            auto*       pairedModelSA = static_cast<CModelInfoSA*>(pairedModel);
+
+            if (pairedModelSA && pairedModelSA != this)
+            {
+                CBaseModelInfoSAInterface* pairedInterface = pairedModelSA->GetInterface();
+
+                if (pairedInterface)
+                {
+                    if (!pairedModelSA->m_pOriginalColModelInterface)
+                    {
+                        pairedModelSA->m_pOriginalColModelInterface = pairedInterface->pColModel;
+                        pairedModelSA->m_originalFlags = pairedModelSA->GetOriginalFlags();
+                    }
+
+                    pairedModelSA->m_pCustomColModel = pColModel;
+                    CBaseModelInfo_SetColModel(pairedInterface, pColModelInterface, false);
+                    CColAccel_addCacheCol(pairedModelId, pColModelInterface);
+                    pairedInterface->bDoWeOwnTheColModel = false;
+                    pairedInterface->bIsColLoaded = false;
+
+                    // Fix random foliage on custom collisions for the paired model
+                    (reinterpret_cast<void(__cdecl*)(CBaseModelInfoSAInterface*)>(0x5DB650))(pairedInterface);
+                }
+            }
+        }
     }
 }
 
@@ -1886,16 +1692,49 @@ void CModelInfoSA::RestoreColModel()
     // Restore original collision model and flags
     if (m_pInterface && m_pOriginalColModelInterface && m_pCustomColModel)
     {
-        CBaseModelInfo_SetColModel(m_pInterface, m_pOriginalColModelInterface, true);
+        CBaseModelInfo_SetColModel(m_pInterface, m_pOriginalColModelInterface, false);
         CColAccel_addCacheCol(m_dwModelID, m_pInterface->pColModel);
 
         m_pInterface->usFlags = m_originalFlags;
 
         // Force the game to load the original collision model data, if we applied a custom collision model before
         // there was any object/building, which would've provoked CColStore to request it.
-        if (!m_pInterface->pColModel->m_data && m_dwReferences > 1)
+        if (m_pInterface->pColModel && !m_pInterface->pColModel->m_data && m_dwReferences > 1)
         {
             pGame->GetStreaming()->RemoveModel(RESOURCE_ID_COL + m_pInterface->pColModel->m_sphere.m_collisionSlot);
+        }
+
+        // Handle paired time models explicitly so MTA tracking stays in sync.
+        if (GetModelType() == eModelInfoType::TIME)
+        {
+            const short pairedModelId = static_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo.m_wOtherTimeModel;
+            CModelInfo* pairedModel = pairedModelId >= 0 ? pGame->GetModelInfo(pairedModelId) : nullptr;
+            auto*       pairedModelSA = static_cast<CModelInfoSA*>(pairedModel);
+
+            if (pairedModelSA && pairedModelSA != this)
+            {
+                bool                       pairedRestored = false;
+                CBaseModelInfoSAInterface* pairedInterface = pairedModelSA->GetInterface();
+                if (pairedInterface && pairedModelSA->m_pOriginalColModelInterface && pairedModelSA->m_pCustomColModel)
+                {
+                    CBaseModelInfo_SetColModel(pairedInterface, pairedModelSA->m_pOriginalColModelInterface, false);
+                    CColAccel_addCacheCol(pairedModelId, pairedInterface->pColModel);
+                    pairedInterface->usFlags = pairedModelSA->m_originalFlags;
+                    pairedRestored = true;
+
+                    if (pairedInterface->pColModel && !pairedInterface->pColModel->m_data && pairedModelSA->m_dwReferences > 1)
+                    {
+                        pGame->GetStreaming()->RemoveModel(RESOURCE_ID_COL + pairedInterface->pColModel->m_sphere.m_collisionSlot);
+                    }
+                }
+
+                if (pairedRestored)
+                {
+                    pairedModelSA->m_pCustomColModel = nullptr;
+                    pairedModelSA->m_pOriginalColModelInterface = nullptr;
+                    pairedModelSA->m_originalFlags = 0;
+                }
+            }
         }
     }
 
@@ -1910,23 +1749,7 @@ void CModelInfoSA::MakeCustomModel()
     // We have a custom model?
     if (m_pCustomClump)
     {
-        // Store and clear m_pCustomClump BEFORE calling SetCustomModel to prevent recursive calls.
-        // SetCustomModel may trigger LoadAllRequestedModels which can recursively call MakeCustomModel
-        // on the same model (via the streaming hook) if the custom DFF lacks embedded collision.
-        RpClump* pClumpToSet = m_pCustomClump;
-        m_pCustomClump = nullptr;
-        
-        if (!SetCustomModel(pClumpToSet))
-        {
-            // SetCustomModel failed, restore the custom clump for retry on next stream-in
-            m_pCustomClump = pClumpToSet;
-        }
-        else
-        {
-            // Preserve the custom clump pointer for restream/retry paths
-            m_pCustomClump = pClumpToSet;
-            // Note: SetCustomModel now handles RebindClumpTexturesToTxd internally after successful replacement
-        }
+        SetCustomModel(m_pCustomClump);
     }
 
     // Custom collision model is not NULL and it's different from the original?
@@ -2020,9 +1843,6 @@ void CModelInfoSA::CopyStreamingInfoFromModel(ushort usBaseModelID)
     CStreamingInfo* pBaseModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(usBaseModelID);
     CStreamingInfo* pTargetModelStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
 
-    if (!pBaseModelStreamingInfo || !pTargetModelStreamingInfo)
-        return;
-
     *pTargetModelStreamingInfo = CStreamingInfo{};
     pTargetModelStreamingInfo->archiveId = pBaseModelStreamingInfo->archiveId;
     pTargetModelStreamingInfo->offsetInBlocks = pBaseModelStreamingInfo->offsetInBlocks;
@@ -2040,14 +1860,19 @@ void CModelInfoSA::MakePedModel(const char* szTexture)
 
 void CModelInfoSA::MakeObjectModel(ushort usBaseID)
 {
-    CBaseModelInfoSAInterface* m_pInterface = new CBaseModelInfoSAInterface();
+    // Allocate at least a CClumpModelInfoSAInterface: the base model's vtable (copied below) may be a
+    // CClumpModelInfo-derived one (e.g. weapons), whose GetAnimFileIndex() reads m_nAnimFileIndex at
+    // offset sizeof(CBaseModelInfoSAInterface). Allocating only the base size would make that an
+    // out-of-bounds read/write.
+    CClumpModelInfoSAInterface* m_pInterface = new CClumpModelInfoSAInterface();
 
     CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];
-    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
+    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
     m_pInterface->usUnknown = 65535;
     m_pInterface->usDynamicIndex = 65535;
+    m_pInterface->m_nAnimFileIndex = 0xFFFFFFFF;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
 
@@ -2083,7 +1908,7 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
     m_pInterface->pRwObject = nullptr;
     m_pInterface->usUnknown = 65535;
     m_pInterface->usDynamicIndex = 65535;
-    m_pInterface->timeInfo.m_wOtherTimeModel = 0;
+    m_pInterface->timeInfo.m_wOtherTimeModel = -1;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
 
@@ -2094,7 +1919,7 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
 void CModelInfoSA::MakeClumpModel(ushort usBaseID)
 {
     CClumpModelInfoSAInterface* pNewInterface = new CClumpModelInfoSAInterface();
-    CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];
+    CBaseModelInfoSAInterface*  pBaseObjectInfo = ppModelInfo[usBaseID];
     MemCpyFast(pNewInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
     pNewInterface->usNumberOfRefs = 0;
     pNewInterface->pRwObject = nullptr;
@@ -2127,17 +1952,25 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 
 void CModelInfoSA::DeallocateModel(void)
 {
-    // Model IDs can be reused (engineRequestModel); do not let a previous model's stored default TXD
-    // mapping leak into a later model that reuses the same ID.
-    ms_DefaultTxdIDMap.erase(static_cast<unsigned short>(m_dwModelID));
+    Remove();
 
-    // Force streaming system to unload regardless of reference count,
-    // since we're about to delete the model info memory
-    pGame->GetStreaming()->RemoveModel(m_dwModelID);
+    // Clean up stored defaults so stale entries don't leak to a model that reuses this ID.
+    // Without this, a freed model ID could retain alpha transparency / flag overrides
+    // that get incorrectly restored later, causing wrong draw-order or z-buffer behavior.
+    ms_DefaultTxdIDMap.erase(static_cast<unsigned short>(m_dwModelID));
+    ms_ModelDefaultFlagsMap.erase(m_dwModelID);
+    ms_ModelDefaultLodDistanceMap.erase(m_dwModelID);
+    ms_ModelDefaultAlphaTransparencyMap.erase(m_dwModelID);
+    ms_OriginalObjectPropertiesGroups.erase(m_dwModelID);
+    ms_ModelDefaultDummiesPosition.erase(m_dwModelID);
+    ms_VehicleModelDefaultWheelSizes.erase(m_dwModelID);
 
     switch (GetModelType())
     {
         case eModelInfoType::VEHICLE:
+            // Stop detached car parts referencing this model (they keep their source vehicle's
+            // model index for repainting, and would dereference the freed model info)
+            static_cast<CPoolsSA*>(pGame->GetPools())->ResetDetachedCarPartsRefModel(static_cast<std::uint16_t>(m_dwModelID));
             delete reinterpret_cast<CVehicleModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         case eModelInfoType::PED:
@@ -2164,10 +1997,7 @@ void CModelInfoSA::DeallocateModel(void)
     }
 
     ppModelInfo[m_dwModelID] = nullptr;
-
-    CStreamingInfo* pStreamingInfo = pGame->GetStreaming()->GetStreamingInfo(m_dwModelID);
-    if (pStreamingInfo)
-        *pStreamingInfo = CStreamingInfo{};
+    *pGame->GetStreaming()->GetStreamingInfo(m_dwModelID) = CStreamingInfo{};
 }
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -2193,9 +2023,9 @@ __declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest,
 }
 
 // Hook info
-#define HOOKPOS_NodeNameStreamRead                         0x072FA68
-#define HOOKSIZE_NodeNameStreamRead                        15
-DWORD RETURN_NodeNameStreamRead = 0x072FA77;
+#define HOOKPOS_NodeNameStreamRead  0x072FA68
+#define HOOKSIZE_NodeNameStreamRead 15
+DWORD                         RETURN_NodeNameStreamRead = 0x072FA77;
 static void __declspec(naked) HOOK_NodeNameStreamRead()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -2378,7 +2208,7 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 eModelInfoType CModelInfoSA::GetModelType()
 {
     if (auto pInterface = GetInterface())
-        return ((eModelInfoType(*)())pInterface->VFTBL->GetModelType)();
+        return ((eModelInfoType (*)())pInterface->VFTBL->GetModelType)();
 
     return eModelInfoType::UNKNOWN;
 }

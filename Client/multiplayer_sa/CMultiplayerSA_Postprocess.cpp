@@ -20,55 +20,56 @@ namespace GrainEffect
     static BYTE  ucGrainEnabled = FALSE;
     static DWORD dwGrainStrength = 1;
 
+    static BYTE ScaleLevel(BYTE ucLevel, float fMultiplier)
+    {
+        const float scaled = static_cast<float>(ucLevel) * fMultiplier;
+        if (scaled <= 0.0f)
+            return 0;
+        if (scaled >= 255.0f)
+            return 255;
+        return static_cast<BYTE>(scaled);
+    }
+
+    static int ApplyGrainEffect(BYTE ucLevel, BYTE ucUpdate)
+    {
+        using GrainApplyEffectFn = int(__cdecl*)(BYTE, BYTE);
+        const auto pfnApplyEffect = reinterpret_cast<GrainApplyEffectFn>(0x7037C0);
+        return pfnApplyEffect(ucLevel, ucUpdate);
+    }
+
     struct MasterModifier
     {
         static float fMultiplier;
 
-        static void ApplyEffect(float grainStrength, bool updateGrainRaster)
-        {
-            void(__cdecl * CPostEffects__Grain)(int, bool) = reinterpret_cast<decltype(CPostEffects__Grain)>(0x7037C0);
-            CPostEffects__Grain(static_cast<int>(grainStrength * fMultiplier), updateGrainRaster);
-        }
+        static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate) { return ApplyGrainEffect(ScaleLevel(ucLevel, fMultiplier), ucUpdate); }
     };
 
     struct InfraredModifier
     {
         static float fMultiplier;
 
-        static void ApplyEffect(int grainStrength, bool updateGrainRaster)
-        {
-            MasterModifier::ApplyEffect(grainStrength * fMultiplier, updateGrainRaster);
-        }
+        static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate) { return MasterModifier::ApplyEffect(ScaleLevel(ucLevel, fMultiplier), ucUpdate); }
     };
 
     struct NightModifier
     {
         static float fMultiplier;
 
-        static void ApplyEffect(int grainStrength, bool updateGrainRaster)
-        {
-            MasterModifier::ApplyEffect(grainStrength * fMultiplier, updateGrainRaster);
-        }
+        static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate) { return MasterModifier::ApplyEffect(ScaleLevel(ucLevel, fMultiplier), ucUpdate); }
     };
 
     struct RainModifier
     {
         static float fMultiplier;
 
-        static void ApplyEffect(int grainStrength, bool updateGrainRaster)
-        {
-            MasterModifier::ApplyEffect(grainStrength * fMultiplier, updateGrainRaster);
-        }
+        static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate) { return MasterModifier::ApplyEffect(ScaleLevel(ucLevel, fMultiplier), ucUpdate); }
     };
 
     struct OverlayModifier
     {
         static float fMultiplier;
 
-        static void ApplyEffect(int grainStrength, bool updateGrainRaster)
-        {
-            MasterModifier::ApplyEffect(grainStrength * fMultiplier, updateGrainRaster);
-        }
+        static int ApplyEffect(BYTE ucLevel, BYTE ucUpdate) { return MasterModifier::ApplyEffect(ScaleLevel(ucLevel, fMultiplier), ucUpdate); }
     };
 
     float MasterModifier::fMultiplier = 1.0f;
@@ -76,7 +77,7 @@ namespace GrainEffect
     float NightModifier::fMultiplier = 1.0f;
     float RainModifier::fMultiplier = 1.0f;
     float OverlayModifier::fMultiplier = 1.0f;
-}            // namespace GrainEffect
+}  // namespace GrainEffect
 
 void CMultiplayerSA::SetGrainMultiplier(eGrainMultiplierType type, float fMultiplier)
 {
@@ -136,7 +137,7 @@ void CMultiplayerSA::SetGrainLevel(BYTE ucLevel)
 
 void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 {
-    MemPutFast<BYTE>(0xC402B8, bEnabled ? 1 : 0);            // bool CPostEffects::m_bNightVision
+    MemPutFast<BYTE>(0xC402B8, bEnabled ? 1 : 0);  // bool CPostEffects::m_bNightVision
 
     if (bNoiseEnabled)
     {
@@ -150,7 +151,7 @@ void CMultiplayerSA::SetNightVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 
 void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 {
-    MemPutFast<BYTE>(0xC402B9, bEnabled ? 1 : 0);            // bool CPostEffects::m_bInfraredVision
+    MemPutFast<BYTE>(0xC402B9, bEnabled ? 1 : 0);  // bool CPostEffects::m_bInfraredVision
 
     if (bNoiseEnabled)
     {
@@ -164,12 +165,12 @@ void CMultiplayerSA::SetThermalVisionEnabled(bool bEnabled, bool bNoiseEnabled)
 
 bool CMultiplayerSA::IsNightVisionEnabled()
 {
-    return (*(BYTE*)0xC402B8 == 1);            // bool CPostEffects::m_bNightVision
+    return (*(BYTE*)0xC402B8 == 1);  // bool CPostEffects::m_bNightVision
 }
 
 bool CMultiplayerSA::IsThermalVisionEnabled()
 {
-    return (*(BYTE*)0xC402B9 == 1);            // bool CPostEffects::m_bInfraredVision
+    return (*(BYTE*)0xC402B9 == 1);  // bool CPostEffects::m_bInfraredVision
 }
 
 void CMultiplayerSA::InitHooks_Postprocess()

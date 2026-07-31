@@ -54,13 +54,13 @@ void CLuaMarkerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getIcon", "getMarkerIcon");
     lua_classfunction(luaVM, "getSize", "getMarkerSize");
     lua_classfunction(luaVM, "getTarget", "getMarkerTarget", OOP_GetMarkerTarget);
-    lua_classfunction(luaVM, "getColor", "getMarkerColor");            // color
+    lua_classfunction(luaVM, "getColor", "getMarkerColor");  // color
 
     lua_classfunction(luaVM, "setType", "setMarkerType");
     lua_classfunction(luaVM, "setIcon", "setMarkerIcon");
     lua_classfunction(luaVM, "setSize", "setMarkerSize");
     lua_classfunction(luaVM, "setTarget", "setMarkerTarget");
-    lua_classfunction(luaVM, "setColor", "setMarkerColor");            // color
+    lua_classfunction(luaVM, "setColor", "setMarkerColor");  // color
 
     lua_classvariable(luaVM, "markerType", "setMarkerType", "getMarkerType");
     lua_classvariable(luaVM, "icon", "setMarkerIcon", "getMarkerIcon");
@@ -206,7 +206,7 @@ int CLuaMarkerDefs::GetMarkerColor(lua_State* luaVM)
             lua_pushnumber(luaVM, static_cast<lua_Number>(color.B));
 
             if (!pMarker->AreAlphaLimitsIgnored() && (pMarker->GetMarkerType() == CMarker::TYPE_CHECKPOINT || pMarker->GetMarkerType() == CMarker::TYPE_ARROW))
-                lua_pushnumber(luaVM, 255); // fake alpha
+                lua_pushnumber(luaVM, 255);  // fake alpha
             else
                 lua_pushnumber(luaVM, static_cast<lua_Number>(color.A));
 
@@ -423,7 +423,8 @@ int CLuaMarkerDefs::SetMarkerIcon(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaMarkerDefs::SetMarkerTargetArrowProperties(CMarker* marker, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g, std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<float> size)
+bool CLuaMarkerDefs::SetMarkerTargetArrowProperties(CMarker* marker, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g,
+                                                    std::optional<std::uint8_t> b, std::optional<std::uint8_t> a, std::optional<float> size)
 {
     SColor color;
     color.R = r.value_or(255);
@@ -434,7 +435,8 @@ bool CLuaMarkerDefs::SetMarkerTargetArrowProperties(CMarker* marker, std::option
     return CStaticFunctionDefinitions::SetMarkerTargetArrowProperties(marker, color, size.value_or(marker->GetSize() * 0.625f));
 }
 
-std::variant<CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>, bool> CLuaMarkerDefs::GetMarkerTargetArrowProperties(CMarker* marker) noexcept
+std::variant<CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t, float>, bool> CLuaMarkerDefs::GetMarkerTargetArrowProperties(
+    CMarker* marker) noexcept
 {
     if (!marker->HasTarget() || marker->GetMarkerType() != CMarker::TYPE_CHECKPOINT)
         return false;

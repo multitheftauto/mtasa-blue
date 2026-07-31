@@ -32,11 +32,11 @@ public:
 
     // Functions required for linking
     void GetPosition(CVector& vecPosition) const {};
-    void SetPosition(const CVector& vecPosition){};
+    void SetPosition(const CVector& vecPosition) {};
 
     // Functions required by CClientEntity
     eClientEntityType GetType() const { return SCRIPTFILE; };
-    void              Unlink(){};
+    void              Unlink() {};
 
     // Load and unload routines
     bool           Load(CResource* pResourceForFilePath, eMode Mode);
@@ -53,7 +53,7 @@ public:
     /**
      * @brief Returns a pointer to CResourceFile if the script file points to one.
      * @return A pointer to CResourceFile on success, null otherwise
-    */
+     */
     CResourceFile* GetResourceFile() const;
 
     // Only call functions below this if you're sure that the file is loaded.
@@ -79,8 +79,8 @@ private:
     void DoResourceFileCheck();
 
     CBinaryFileInterface* m_pFile;
-    SString               m_strFilename;            // Resource relative
-    SString               m_strAbsPath;             // Absolute
+    SString               m_strFilename;  // Resource relative
+    SString               m_strAbsPath;   // Absolute
     unsigned long         m_ulMaxSize;
     bool                  m_bDoneResourceFileCheck;
     unsigned int          m_uiScriptId;

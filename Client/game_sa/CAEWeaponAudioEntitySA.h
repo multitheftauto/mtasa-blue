@@ -40,12 +40,12 @@ public:
     eMiniGunState  m_miniGunState;
     eChainsawState m_chainsawState;
 
-    std::uint32_t  m_lastFlamethrowerFireTimeInMS;
-    std::uint32_t  m_lastSpraycanFireTimeInMS;
-    std::uint32_t  m_lastFireExtinguisherFireTimeInMS;
-    std::uint32_t  m_lastMinigunFireTimeInMS;
-    std::uint32_t  m_lastChainsawFireTimeInMS;
-    std::uint32_t  m_lastGunFireTimeInMS;
+    std::uint32_t m_lastFlamethrowerFireTimeInMS;
+    std::uint32_t m_lastSpraycanFireTimeInMS;
+    std::uint32_t m_lastFireExtinguisherFireTimeInMS;
+    std::uint32_t m_lastMinigunFireTimeInMS;
+    std::uint32_t m_lastChainsawFireTimeInMS;
+    std::uint32_t m_lastGunFireTimeInMS;
 
     CAESound* m_flameThrowerIdleGasLoopSound{};
 };

@@ -74,10 +74,11 @@ std::vector<DWORD> GetGTAProcessList();
 bool CommandLineContains(const SString& strText);
 void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "");
 
-auto GetMTARootDirectory() -> std::filesystem::path;
-auto GetGameBaseDirectory() -> std::filesystem::path;
-auto GetGameLaunchDirectory() -> std::filesystem::path;
-auto GetGameExecutablePath() -> std::filesystem::path;
+auto    GetMTARootDirectory() -> std::filesystem::path;
+auto    GetGameBaseDirectory() -> std::filesystem::path;
+auto    GetGameLaunchDirectory() -> std::filesystem::path;
+auto    GetGameExecutablePath() -> std::filesystem::path;
+SString GetInstallPathForLauncher();
 
 void            SetMTASAPathSource(bool bReadFromRegistry);
 SString         GetMTASAPath();
@@ -172,8 +173,8 @@ struct ModuleCrashInfo
     SString moduleName;
     DWORD   moduleBase = 0;
     DWORD   crashAddress = 0;
-    DWORD   rva = 0;              // Relative Virtual Address (crash - base)
-    DWORD   idaAddress = 0;       // IDA-friendly address (0x10000000 + rva for DLLs)
+    DWORD   rva = 0;         // Relative Virtual Address (crash - base)
+    DWORD   idaAddress = 0;  // IDA-friendly address (0x10000000 + rva for DLLs)
     bool    resolved = false;
 };
 
@@ -262,7 +263,7 @@ public:
 };
 
 // For NtQuerySystemInformation
-#define STATUS_INFO_LENGTH_MISMATCH    ((NTSTATUS)0xC0000004L)
+#define STATUS_INFO_LENGTH_MISMATCH       ((NTSTATUS)0xC0000004L)
 #define SystemProcessImageNameInformation ((SYSTEM_INFORMATION_CLASS)88)
 typedef struct _SYSTEM_PROCESS_IMAGE_NAME_INFORMATION
 {

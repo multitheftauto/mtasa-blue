@@ -20,11 +20,11 @@
 class CAnimBlendAssociation;
 typedef DWORD CTaskUtilityLineUpPedWithCar;
 
-#define FUNC_CTaskSimpleCarSetPedInAsDriver__Constructor            0x6470E0
-#define FUNC_CTaskSimpleCarSetPedInAsPassenger__Constructor         0x646FE0
-#define FUNC_CTaskSimpleCarSetPedOut__Constructor                   0x6478B0
+#define FUNC_CTaskSimpleCarSetPedInAsDriver__Constructor    0x6470E0
+#define FUNC_CTaskSimpleCarSetPedInAsPassenger__Constructor 0x646FE0
+#define FUNC_CTaskSimpleCarSetPedOut__Constructor           0x6478B0
 
-#define FUNC_CTaskSimpleCarSetPedOut__PositionPedOutOfCollision     0x6479B0
+#define FUNC_CTaskSimpleCarSetPedOut__PositionPedOutOfCollision 0x6479B0
 
 // ##############################################################################
 // ## Name:    CTaskSimpleCarSetPedInAsDriver
@@ -47,7 +47,7 @@ public:
 class CTaskSimpleCarSetPedInAsDriverSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleCarSetPedInAsDriver
 {
 public:
-    CTaskSimpleCarSetPedInAsDriverSA(){};
+    CTaskSimpleCarSetPedInAsDriverSA() {};
     CTaskSimpleCarSetPedInAsDriverSA(CVehicle* pTargetVehicle, CTaskUtilityLineUpPedWithCar* pUtility);
 
     void SetIsWarpingPedIntoCar();
@@ -76,7 +76,7 @@ public:
 class CTaskSimpleCarSetPedInAsPassengerSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleCarSetPedInAsPassenger
 {
 public:
-    CTaskSimpleCarSetPedInAsPassengerSA(){};
+    CTaskSimpleCarSetPedInAsPassengerSA() {};
     CTaskSimpleCarSetPedInAsPassengerSA(CVehicle* pTargetVehicle, int iTargetDoor, CTaskUtilityLineUpPedWithCar* pUtility);
 
     void SetIsWarpingPedIntoCar();
@@ -92,11 +92,11 @@ public:
 class CTaskSimpleCarSetPedOutSAInterface : public CTaskSimpleSAInterface
 {
 public:
-    CVehicleSAInterface* m_pTargetVehicle;              // 8
-    int                  m_iTargetDoor;                 // 12
-    bool                 m_bSwitchOffEngine;            // 16
+    CVehicleSAInterface* m_pTargetVehicle;    // 8
+    int                  m_iTargetDoor;       // 12
+    bool                 m_bSwitchOffEngine;  // 16
     bool                 m_bWarpingOutOfCar;
-    bool                 m_bFallingOutOfCar;            // jumping or falling off car or bike
+    bool                 m_bFallingOutOfCar;  // jumping or falling off car or bike
     bool                 m_bKnockedOffBike;
     unsigned char        m_nDoorFlagsToClear;
     unsigned char        m_nNumGettingInToClear;
@@ -105,7 +105,7 @@ public:
 class CTaskSimpleCarSetPedOutSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleCarSetPedOut
 {
 public:
-    CTaskSimpleCarSetPedOutSA(){};
+    CTaskSimpleCarSetPedOutSA() {};
     CTaskSimpleCarSetPedOutSA(CVehicle* pTargetVehicle, int iTargetDoor, bool bSwitchOffEngine = false);
 
     void SetIsWarpingPedOutOfCar();

@@ -15,24 +15,22 @@
 
 void CLuaTeamDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
-        // Team create/destroy functions
-        {"createTeam", ArgumentParserWarn<false, CreateTeam>},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{// Team create/destroy functions
+                                                                             {"createTeam", ArgumentParserWarn<false, CreateTeam>},
 
-        // Team get funcs
-        {"getTeamName", ArgumentParserWarn<false, GetTeamName>},
-        {"getTeamFromName", ArgumentParserWarn<false, GetTeamFromName>},
-        {"getTeamColor", ArgumentParserWarn<false, GetTeamColor>},
-        {"getTeamFriendlyFire", ArgumentParserWarn<false, GetTeamFriendlyFire>},
-        {"getPlayersInTeam", ArgumentParserWarn<false, GetPlayersInTeam>},
-        {"countPlayersInTeam", ArgumentParserWarn<false, CountPlayersInTeam>},
+                                                                             // Team get funcs
+                                                                             {"getTeamName", ArgumentParserWarn<false, GetTeamName>},
+                                                                             {"getTeamFromName", ArgumentParserWarn<false, GetTeamFromName>},
+                                                                             {"getTeamColor", ArgumentParserWarn<false, GetTeamColor>},
+                                                                             {"getTeamFriendlyFire", ArgumentParserWarn<false, GetTeamFriendlyFire>},
+                                                                             {"getPlayersInTeam", ArgumentParserWarn<false, GetPlayersInTeam>},
+                                                                             {"countPlayersInTeam", ArgumentParserWarn<false, CountPlayersInTeam>},
 
-        // Team set funcs
-        {"setPlayerTeam", ArgumentParserWarn<false, SetPlayerTeam>},
-        {"setTeamName", ArgumentParserWarn<false, SetTeamName>},
-        {"setTeamColor", ArgumentParserWarn<false, SetTeamColor>},
-        {"setTeamFriendlyFire", ArgumentParserWarn<false, SetTeamFriendlyFire>}
-    };
+                                                                             // Team set funcs
+                                                                             {"setPlayerTeam", ArgumentParserWarn<false, SetPlayerTeam>},
+                                                                             {"setTeamName", ArgumentParserWarn<false, SetTeamName>},
+                                                                             {"setTeamColor", ArgumentParserWarn<false, SetTeamColor>},
+                                                                             {"setTeamFriendlyFire", ArgumentParserWarn<false, SetTeamFriendlyFire>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -48,7 +46,7 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "countPlayers", "countPlayersInTeam");
     lua_classfunction(luaVM, "getPlayers", "getPlayersInTeam");
     lua_classfunction(luaVM, "outputChat", "outputChatBox", ArgumentParserWarn<false, CLuaGenericDefs::OOP_OutputChatBox>);
-     
+
     lua_classfunction(luaVM, "getFriendlyFire", "getTeamFriendlyFire");
     lua_classfunction(luaVM, "getName", "getTeamName");
     lua_classfunction(luaVM, "getColor", "getTeamColor");
@@ -65,9 +63,10 @@ void CLuaTeamDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Team", "Element");
 }
 
-std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, const std::string name, const std::optional<std::uint8_t> red, const std::optional<std::uint8_t> green, const std::optional<std::uint8_t> blue)
+std::variant<CTeam*, bool> CLuaTeamDefs::CreateTeam(lua_State* lua, const std::string name, const std::optional<std::uint8_t> red,
+                                                    const std::optional<std::uint8_t> green, const std::optional<std::uint8_t> blue)
 {
-    CLuaMain& vm = lua_getownercluamain(lua);
+    CLuaMain&  vm = lua_getownercluamain(lua);
     CResource* resource = vm.GetResource();
 
     if (!resource)

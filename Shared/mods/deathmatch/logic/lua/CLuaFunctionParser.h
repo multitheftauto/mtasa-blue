@@ -26,8 +26,7 @@ protected:
     bool        m_bWarning;
 
 public:
-    constexpr LuaFunctionError(const char* what, bool throwWarning = true) noexcept
-        : m_message(what), m_bWarning(throwWarning) {}
+    constexpr LuaFunctionError(const char* what, bool throwWarning = true) noexcept : m_message(what), m_bWarning(throwWarning) {}
 
     constexpr const char* what() const noexcept { return m_message; }
     constexpr bool        IsWarning() const noexcept { return m_bWarning; }
@@ -95,7 +94,7 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_same_v<T, SColor>)
             return "colour";
         else if constexpr (std::is_same_v<T, lua_State*>)
-            return "";            // not reachable
+            return "";  // not reachable
         else if constexpr (is_variant<T>::value)
         {
             SString strTypes;
@@ -325,10 +324,9 @@ struct CLuaFunctionParserBase
                 return false;
 
             using class_t = std::remove_pointer_t<T>;
-            int tempIndex{index};
-            void* pValue = lua::PopPrimitive<void*>(L, tempIndex);                
-            auto result = iArgument == LUA_TLIGHTUSERDATA ? UserDataCast((class_t*)pValue, L) :
-                UserDataCast(*reinterpret_cast<class_t**>(pValue), L);
+            int   tempIndex{index};
+            void* pValue = lua::PopPrimitive<void*>(L, tempIndex);
+            auto  result = iArgument == LUA_TLIGHTUSERDATA ? UserDataCast((class_t*)pValue, L) : UserDataCast(*reinterpret_cast<class_t**>(pValue), L);
             return result != nullptr;
         }
 
@@ -410,7 +408,7 @@ struct CLuaFunctionParserBase
             return lua::PopPrimitive<T>(L, index);
         else if constexpr (std::is_same_v<T, bool>)
             return lua::PopPrimitive<T>(L, index);
-        else if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>)            // bool is an integral type, so must pop it before ^^
+        else if constexpr (std::is_integral_v<T> || std::is_floating_point_v<T>)  // bool is an integral type, so must pop it before ^^
         {
             const auto number = lua::PopPrimitive<lua_Number>(L, index);
 
@@ -481,7 +479,7 @@ struct CLuaFunctionParserBase
             return std::nullopt;
         }
 
-        else if constexpr (is_2specialization<T, std::vector>::value)            // 2 specialization due to allocator
+        else if constexpr (is_2specialization<T, std::vector>::value)  // 2 specialization due to allocator
         {
             using param = typename is_2specialization<T, std::vector>::param1_t;
             T vecData;
@@ -497,7 +495,7 @@ struct CLuaFunctionParserBase
 
                 int i = -1;
                 vecData.emplace_back(PopUnsafe<param>(L, i));
-                lua_pop(L, 1);            // drop value, keep key for lua_next
+                lua_pop(L, 1);  // drop value, keep key for lua_next
             }
             ++index;
             return vecData;
@@ -527,7 +525,7 @@ struct CLuaFunctionParserBase
                 auto v = PopUnsafe<value_t>(L, i);
                 auto k = PopUnsafe<key_t>(L, i);
                 map.emplace(std::move(k), std::move(v));
-                lua_pop(L, 2);            // drop values(key copy and value), keep original key for lua_next
+                lua_pop(L, 2);  // drop values(key copy and value), keep original key for lua_next
             }
             ++index;
             return map;
@@ -579,9 +577,10 @@ struct CLuaFunctionParserBase
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
             void* pValue = lua::PopPrimitive<void*>(L, index);
-            auto  cast = [isLightUserData, pValue, L](auto null) {
+            auto  cast = [isLightUserData, pValue, L](auto null)
+            {
                 return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                        : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                                       : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
             };
             // A vector2 may also be filled from a vector3/vector4
             if (CLuaVector2D* pVec2D = cast((CLuaVector2D*)0); pVec2D != nullptr)
@@ -609,9 +608,10 @@ struct CLuaFunctionParserBase
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
             void* pValue = lua::PopPrimitive<void*>(L, index);
-            auto  cast = [isLightUserData, pValue, L](auto null) {
+            auto  cast = [isLightUserData, pValue, L](auto null)
+            {
                 return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                        : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                                       : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
             };
             // A vector3 may also be filled from a vector4
             if (CLuaVector3D* pVec3D = cast((CLuaVector3D*)0); pVec3D != nullptr)
@@ -638,9 +638,10 @@ struct CLuaFunctionParserBase
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
             void* pValue = lua::PopPrimitive<void*>(L, index);
-            auto  cast = [isLightUserData, pValue, L](auto null) {
+            auto  cast = [isLightUserData, pValue, L](auto null)
+            {
                 return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                        : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                                       : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
             };
             // A vector3 may also be filled from a vector4
             if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
@@ -689,9 +690,10 @@ struct CLuaFunctionParserBase
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
             void* pValue = lua::PopPrimitive<void*>(L, index);
-            auto  cast = [isLightUserData, pValue, L](auto null) {
+            auto  cast = [isLightUserData, pValue, L](auto null)
+            {
                 return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                        : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                                       : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
             };
             // A vector4 may also be filled from a CLuaMatrix
             if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
@@ -832,7 +834,7 @@ struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, Func> : CLuaFunctionP
 // Case where F is a class method pointer
 // Note: If you see weird compiler errors like: Undefined type, overload resolution failed, etc..
 // Ask on Dev Discord(#new-argument-parser), because rn this implementation is pretty beta. - 03/2021
-template <bool ErrorOnFailure, auto ReturnOnFailure, typename T, typename R, typename... Args, R(T::*F)(Args...)>
+template <bool ErrorOnFailure, auto ReturnOnFailure, typename T, typename R, typename... Args, R (T::*F)(Args...)>
 struct CLuaFunctionParser<ErrorOnFailure, ReturnOnFailure, F>
 {
     // Remove constness here, because we must be able to std::move
