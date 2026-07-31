@@ -4271,16 +4271,77 @@ void CGame::Packet_PlayerNetworkStatus(CPlayerNetworkStatusPacket& Packet)
 
 void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
 {
-    CPlayer*     sourcePlayer = Packet.GetSourcePlayer();
-    CResource*   resource = Packet.GetResource();
-    unsigned int playerStartCounter = Packet.GetStartCounter();
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if (pPlayer && pPlayer->IsJoined() && !pPlayer->IsLeavingServer())
+    {
+        CResource* pResource = Packet.GetResource();
 
-    if (!sourcePlayer || !resource || !resource->CanPlayerTriggerResourceStart(sourcePlayer, playerStartCounter))
-        return;
+        // Packets with no valid resource (stale ID, race with resource stop) are
+        // harmless and should not consume or count toward disconnect.
+        if (!pResource)
+            return;
 
-    CLuaArguments Arguments;
-    Arguments.PushResource(resource);
-    sourcePlayer->CallEvent("onPlayerResourceStart", Arguments, nullptr);
+        // Distinguish a benign join/restart race (no token charge) from a genuine duplicate
+        // ack (rate-limited) using the start counter the client echoed back.
+        const EPlayerResourceStartAck ackResult = pResource->CanPlayerTriggerResourceStart(pPlayer, Packet.GetStartCounter());
+
+        if (ackResult == EPlayerResourceStartAck::Accepted)
+        {
+            CLuaArguments Arguments;
+            Arguments.PushResource(pResource);
+            pPlayer->CallEvent("onPlayerResourceStart", Arguments, NULL);
+            return;
+        }
+
+        // Race condition acks (resource stopped before ack arrived, stale generation)
+        // are normal during join and shouldn't cost the player tokens.
+        if (ackResult == EPlayerResourceStartAck::RaceMiss)
+            return;
+
+        // Only genuine duplicate acks reach here. Apply the rate limit.
+        constexpr unsigned int RESOURCE_START_RATE_LIMIT = 50;
+        constexpr unsigned int RESOURCE_START_RATE_PERIOD_MS = 2000;
+        constexpr unsigned int RESOURCE_START_TOKEN_INTERVAL_MS = RESOURCE_START_RATE_PERIOD_MS / RESOURCE_START_RATE_LIMIT;
+
+        // Preserve sub-token time so normal packet jitter doesn't reduce the effective refill rate.
+        unsigned long long elapsed = pPlayer->m_ResourceStartPacketTimer.Get();
+        pPlayer->m_ResourceStartPacketTimer.Reset();
+
+        if (pPlayer->m_ResourceStartTokens < RESOURCE_START_RATE_LIMIT)
+        {
+            pPlayer->m_ResourceStartRefillRemainderMs += elapsed;
+            unsigned int refill = static_cast<unsigned int>(pPlayer->m_ResourceStartRefillRemainderMs / RESOURCE_START_TOKEN_INTERVAL_MS);
+
+            if (refill)
+            {
+                unsigned int tokens = pPlayer->m_ResourceStartTokens + refill;
+                pPlayer->m_ResourceStartTokens = (tokens > RESOURCE_START_RATE_LIMIT) ? RESOURCE_START_RATE_LIMIT : tokens;
+                pPlayer->m_ResourceStartRefillRemainderMs %= RESOURCE_START_TOKEN_INTERVAL_MS;
+
+                // Only reset the drop counter when the bucket is fully restored. Resetting on
+                // any partial refill lets a sender pace at ~40ms and never accumulate drops.
+                if (pPlayer->m_ResourceStartTokens == RESOURCE_START_RATE_LIMIT)
+                {
+                    pPlayer->m_ResourceStartDrops = 0;
+                    pPlayer->m_ResourceStartRefillRemainderMs = 0;
+                }
+            }
+        }
+        else
+        {
+            // A stalled sender shouldn't hold extra burst capacity beyond the bucket cap.
+            pPlayer->m_ResourceStartRefillRemainderMs = 0;
+        }
+
+        if (pPlayer->m_ResourceStartTokens == 0)
+        {
+            if (++pPlayer->m_ResourceStartDrops >= 10)
+                DisconnectPlayer(this, *pPlayer, "Trigger Flooding");
+            return;
+        }
+
+        --pPlayer->m_ResourceStartTokens;
+    }
 }
 
 void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket& packet) noexcept

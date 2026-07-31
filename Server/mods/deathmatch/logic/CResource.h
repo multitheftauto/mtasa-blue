@@ -132,6 +132,16 @@ enum class EResourceState : unsigned char
     Stopping,  // the resource is stopping
 };
 
+// Result of CanPlayerTriggerResourceStart. Distinguishes a benign race (resource
+// stopped or restarted between server send and client ack) from a real duplicate
+// ack so the caller can rate-limit only the latter.
+enum class EPlayerResourceStartAck : unsigned char
+{
+    Accepted,    // ack matches the current start cycle, fire onPlayerResourceStart
+    RaceMiss,    // resource not running for this start cycle, normal during start/stop races
+    Duplicate,   // ack already accepted for this start cycle, charge rate-limit token
+};
+
 // A resource is either a directory with files or a ZIP file which contains the content of such directory.
 // The directory or ZIP file must contain a meta.xml file, which describes the required content by the resource.
 // It's a process-like environment for scripts, maps, images and other files.
@@ -155,7 +165,7 @@ public:
 
     void Reload();
 
-    bool CanPlayerTriggerResourceStart(CPlayer* player, unsigned int playerStartCounter);
+    EPlayerResourceStartAck CanPlayerTriggerResourceStart(CPlayer* player, unsigned int playerStartCounter);
 
     // Get a resource default setting
     bool GetDefaultSetting(const char* szName, char* szValue, size_t sizeBuffer);
