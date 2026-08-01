@@ -2012,6 +2012,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bool flyingcomponents : 1;
         bool vehicleburnexplosions : 1;
         bool vehicleEngineAutoStart : 1;
+        bool vehicleexplosions : 1;
     } data;
 
     // Add new ones in separate structs
@@ -2039,6 +2040,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data.flyingcomponents = true;
         data.vehicleburnexplosions = true;
         data.vehicleEngineAutoStart = true;
+        data.vehicleexplosions = true;
     }
 };
 
