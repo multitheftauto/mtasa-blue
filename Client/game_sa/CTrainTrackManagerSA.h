@@ -2,6 +2,8 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        game_sa/CTrainTrackManagerSA.h
+ *  PURPOSE:     Custom train track manager header
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *

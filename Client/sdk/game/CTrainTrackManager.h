@@ -2,6 +2,8 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/CTrainTrackManager.h
+ *  PURPOSE:     Train track manager interface
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *

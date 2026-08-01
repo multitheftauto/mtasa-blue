@@ -722,11 +722,14 @@ struct SDrivebyDirectionSync : public ISyncStructure
 //////////////////////////////////////////
 struct SUnoccupiedVehicleSync : public ISyncStructure
 {
-    SUnoccupiedVehicleSync() { *((char*)&data) = 0; }
+    // The flags are read and written as a raw run of bits off the front of this struct, so they
+    // have to start out cleared; there are more than 8 of them now, which puts some in the second
+    // byte where zeroing a single char doesn't reach
+    SUnoccupiedVehicleSync() { memset(&data, 0, sizeof(data)); }
 
     bool Read(NetBitStreamInterface& bitStream)
     {
-        if (bitStream.Read(data.vehicleID) && bitStream.Read(data.ucTimeContext) && bitStream.ReadBits((char*)&data, 9))
+        if (bitStream.Read(data.vehicleID) && bitStream.Read(data.ucTimeContext) && bitStream.ReadBits((char*)&data, 10))
         {
             if (data.bSyncPosition)
             {
@@ -768,6 +771,25 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
                 bitStream.Read(data.trailer);
             }
 
+            if (data.bSyncTrain)
+            {
+                bitStream.Read(data.fTrainPosition);
+                bitStream.ReadBit(data.bTrainDirection);
+                bitStream.Read(data.fTrainSpeed);
+
+                // A train can be on no track (nil), one of the 4 default tracks, or a custom track
+                // element; same encoding the occupied vehicle puresync uses
+                bitStream.ReadBit(data.bTrainHasTrack);
+                if (data.bTrainHasTrack)
+                {
+                    bitStream.ReadBit(data.bTrainTrackIsDefault);
+                    if (data.bTrainTrackIsDefault)
+                        bitStream.Read(data.ucTrainDefaultTrackId);
+                    else
+                        bitStream.Read(data.TrainTrackElementID);
+                }
+            }
+
             return true;
         }
         return false;
@@ -777,7 +799,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
     {
         bitStream.Write(data.vehicleID);
         bitStream.Write(data.ucTimeContext);
-        bitStream.WriteBits((const char*)&data, 9);
+        bitStream.WriteBits((const char*)&data, 10);
 
         if (data.bSyncPosition)
         {
@@ -818,10 +840,28 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
         {
             bitStream.Write(data.trailer);
         }
+
+        if (data.bSyncTrain)
+        {
+            bitStream.Write(data.fTrainPosition);
+            bitStream.WriteBit(data.bTrainDirection);
+            bitStream.Write(data.fTrainSpeed);
+
+            bitStream.WriteBit(data.bTrainHasTrack);
+            if (data.bTrainHasTrack)
+            {
+                bitStream.WriteBit(data.bTrainTrackIsDefault);
+                if (data.bTrainTrackIsDefault)
+                    bitStream.Write(data.ucTrainDefaultTrackId);
+                else
+                    bitStream.Write(data.TrainTrackElementID);
+            }
+        }
     }
     bool HasChanged()
     {
-        return (data.bSyncPosition || data.bSyncRotation || data.bSyncVelocity || data.bSyncTurnVelocity || data.bSyncHealth || data.bSyncTrailer);
+        return (data.bSyncPosition || data.bSyncRotation || data.bSyncVelocity || data.bSyncTurnVelocity || data.bSyncHealth || data.bSyncTrailer ||
+                data.bSyncTrain);
     }
     struct
     {
@@ -833,6 +873,7 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
         bool      bSyncTurnVelocity : 1;
         bool      bSyncHealth : 1;
         bool      bSyncTrailer : 1;
+        bool      bSyncTrain : 1;
         bool      bEngineOn : 1;
         bool      bDerailed : 1;
         bool      bIsInWater : 1;
@@ -842,6 +883,17 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
         CVector   vecTurnVelocity;
         float     fHealth;
         ElementID trailer;
+
+        // Train state, on the wire only while bSyncTrain is set. An unoccupied train has no driver
+        // to carry these in the regular vehicle puresync packet, which otherwise leaves
+        // vehicle.trainPosition and the rest stuck where the last occupant left them (#396)
+        float         fTrainPosition;
+        bool          bTrainDirection;
+        float         fTrainSpeed;
+        bool          bTrainHasTrack;
+        bool          bTrainTrackIsDefault;
+        unsigned char ucTrainDefaultTrackId;
+        ElementID     TrainTrackElementID;
 
         ElementID     vehicleID;
         unsigned char ucTimeContext;

@@ -1326,6 +1326,15 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
     SRotationDegreesSync rotation;
     SVelocitySync        velocity;
 
+    // Train data is only kept here for now; the derailed flag it depends on comes later in the
+    // stream, and a rail distance applied before we know the track it belongs to puts the train
+    // in the wrong place
+    float fRailPosition = 0.0f;
+    bool  bRailDirection = false;
+    float fRailSpeed = 0.0f;
+    uchar ucRailTrack = 0;
+    bool  bRailTrackIsUsable = false;
+
     // Read the remote model to prevent desyncs when the remote model
     // differs from the local one (#8800)
     int iModelID = pVehicle->GetModel();
@@ -1352,17 +1361,11 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
         if (remoteVehicleType == CLIENTVEHICLE_TRAIN)
         {
             // Train specific data
-            float fPosition = 0.0f;
-            bool  bDirection = false;
-            float fSpeed = 0.0f;
-            BitStream.Read(fPosition);
-            BitStream.ReadBit(bDirection);
-            BitStream.Read(fSpeed);
+            BitStream.Read(fRailPosition);
+            BitStream.ReadBit(bRailDirection);
+            BitStream.Read(fRailSpeed);
 
             // A train can be on no track (nil), one of the 4 default tracks, or a custom track element
-            uchar ucTrack = 0;
-            bool  bTrackIsUsable = false;
-
             bool bHasTrack;
             BitStream.ReadBit(bHasTrack);
             if (bHasTrack)
@@ -1371,8 +1374,8 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
                 BitStream.ReadBit(bIsDefaultTrack);
                 if (bIsDefaultTrack)
                 {
-                    BitStream.Read(ucTrack);
-                    bTrackIsUsable = true;
+                    BitStream.Read(ucRailTrack);
+                    bRailTrackIsUsable = true;
                 }
                 else
                 {
@@ -1380,25 +1383,19 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
                     BitStream.Read(trackElementID);
 
                     CClientTrainTrack* pTrainTrack = g_pClientGame->GetManager()->GetTrainTrackManager()->Get(trackElementID);
+
+                    // Left false the train stays on whatever it is running on now; better than
+                    // moving it along a track we can't resolve
                     if (pTrainTrack && pTrainTrack->GetGameTrackID() != 0xFF)
                     {
-                        ucTrack = pTrainTrack->GetGameTrackID();
-                        bTrackIsUsable = true;
+                        ucRailTrack = pTrainTrack->GetGameTrackID();
+                        bRailTrackIsUsable = true;
                     }
                 }
             }
 
-            if (vehicleType == CLIENTVEHICLE_TRAIN)
-            {
-                if (!pVehicle->IsStreamedIn())
-                    pVehicle->SetPosition(position.data.vecPosition, true);
-
-                if (bTrackIsUsable)
-                    pVehicle->SetTrainTrack(ucTrack);
-                pVehicle->SetTrainPosition(fPosition, false);
-                pVehicle->SetTrainDirection(bDirection);
-                pVehicle->SetTrainSpeed(fSpeed);
-            }
+            if (vehicleType == CLIENTVEHICLE_TRAIN && !pVehicle->IsStreamedIn())
+                pVehicle->SetPosition(position.data.vecPosition, true);
         }
 
         BitStream.Read(&rotation);
@@ -1512,6 +1509,20 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
             {
                 pVehicle->SetTargetPosition(position.data.vecPosition, TICK_RATE, true, velocity.data.vecVelocity.fZ);
                 pVehicle->SetTargetRotation(rotation.data.vecRotation, TICK_RATE);
+            }
+            else if (remoteVehicleType == CLIENTVEHICLE_TRAIN)
+            {
+                // The rail distance only means something now that the track is known; measured
+                // against the one it was on before, it made the train look derailed to everyone
+                if (bRailTrackIsUsable)
+                {
+                    // Track first; switching it recalculates the rail distance from the train's
+                    // current coordinates, so the synced one goes in after
+                    pVehicle->SetTrainTrack(ucRailTrack);
+                    pVehicle->SetTrainPosition(fRailPosition, false);
+                    pVehicle->SetTrainDirection(bRailDirection);
+                    pVehicle->SetTrainSpeed(fRailSpeed);
+                }
             }
         }
 

@@ -2805,7 +2805,6 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
     // unsigned long        (4)     - color
 
     // Train tracks:
-    // bool                         - last nodes linked?
     // unsigned int         (?)     - node count
     // CVector              (12)    - node position, repeated per node
 
