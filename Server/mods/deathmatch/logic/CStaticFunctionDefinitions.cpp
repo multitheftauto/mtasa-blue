@@ -3348,6 +3348,8 @@ bool CStaticFunctionDefinitions::TakePlayerScreenShot(CElement* pElement, uint u
         BitStream.pBitStream->Write(GetTickCount32());
         pPlayer->Send(CLuaPacket(TAKE_PLAYER_SCREEN_SHOT, *BitStream.pBitStream));
 
+        pPlayer->GetScreenShotInfo().bRequested = true;
+
         return true;
     }
 
@@ -10406,7 +10408,7 @@ bool CStaticFunctionDefinitions::SetWeaponOwner(CCustomWeapon* pWeapon, CPlayer*
 
 bool CStaticFunctionDefinitions::GetBodyPartName(unsigned char ucID, char* szName)
 {
-    if (ucID <= 59)
+    if (ucID < 10)
     {
         // Grab the name and check it's length
         const char* szNamePointer = CPlayer::GetBodyPartName(ucID);
