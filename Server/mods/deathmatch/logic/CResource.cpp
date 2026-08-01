@@ -361,16 +361,32 @@ void CResource::Reload()
     Load();
 }
 
-bool CResource::CanPlayerTriggerResourceStart(CPlayer* player, unsigned int playerStartCounter)
+EPlayerResourceStartAck CResource::CanPlayerTriggerResourceStart(CPlayer* player, unsigned int playerStartCounter)
 {
-    if (playerStartCounter != m_startCounter || m_eState != EResourceState::Running)
-        return false;
+    // A player who is mid-quit or not yet fully joined cannot legitimately ack a resource
+    // start. Treat it as a race so the caller doesn't charge a token.
+    if (!player || !player->IsJoined() || player->IsLeavingServer())
+        return EPlayerResourceStartAck::RaceMiss;
 
-    if (m_isRunningForPlayer.contains(player))
-        return false;
+    // If the resource was never started (counter still zero) or is no longer running, the ack
+    // can't possibly be valid. This is a normal race during start/stop churn.
+    if (!m_startCounter || m_eState != EResourceState::Running)
+        return EPlayerResourceStartAck::RaceMiss;
 
-    m_isRunningForPlayer.insert(player);
-    return true;
+    // First valid ack from this player for the current resource incarnation always wins.
+    // A generation mismatch here means the player's ack was in flight when a server-side
+    // restart bumped the counter; rejecting it leaves the join loading gate closed until
+    // the second cycle's ack arrives seconds later.
+    auto [it, inserted] = m_isRunningForPlayer.insert(player);
+    if (inserted)
+        return EPlayerResourceStartAck::Accepted;
+
+    // Player already had their ack accepted for this start cycle. Distinguish a stale-
+    // generation ack (race) from a true duplicate so the caller only rate-limits the latter.
+    if (playerStartCounter != m_startCounter)
+        return EPlayerResourceStartAck::RaceMiss;
+
+    return EPlayerResourceStartAck::Duplicate;
 }
 
 void CResource::OnPlayerQuit(CPlayer& Player)
@@ -1039,6 +1055,11 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
 
     m_eState = EResourceState::Running;
 
+    // Bump the generation counter before any handler can observe the resource as running.
+    // The CResourceStartPacket broadcast below carries this value, and onResourceStart
+    // handlers must see the same value clients will be told to ack against.
+    m_startCounter = std::max<unsigned int>(m_startCounter + 1, 1);  // We consider zero to be an invalid start counter.
+
     // Call the onResourceStart event. If it returns false, cancel this script again
     CLuaArguments Arguments;
     Arguments.PushResource(this);
@@ -1052,7 +1073,6 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
         return false;
     }
 
-    m_startCounter = std::max<unsigned int>(m_startCounter + 1, 1);  // We consider zero to be an invalid start counter.
     m_bStartedManually = bManualStart;
 
     // Remember the client files state
@@ -1144,6 +1164,7 @@ bool CResource::Stop(bool bManualStop)
     // Tell all the players that have joined that this resource is stopped
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CResourceStopPacket(m_usNetID));
     m_bClientSync = false;
+    m_isRunningForPlayer.clear();
 
     // Call the onResourceStop event on this resource element
     CLuaArguments Arguments;
