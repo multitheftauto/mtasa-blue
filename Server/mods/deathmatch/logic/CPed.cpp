@@ -470,6 +470,12 @@ void CPed::SetSyncer(CPlayer* pPlayer)
         // Set it
         m_pSyncer = pPlayer;
 
+        // Persistence was granted for one specific syncer, so it dies with the assignment. Clearing
+        // it here covers every route that drops a syncer, including CPlayer's destructor, which
+        // reaches SetSyncer directly without going through CPedSync::StopSync.
+        if (!pPlayer)
+            m_bSyncerPersistent = false;
+
         // Check if we are in an enter/exit action
         // We need to complete the process by warping the ped in or out, because the syncer changed
         unsigned int uiAction = GetVehicleAction();
