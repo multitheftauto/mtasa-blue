@@ -496,6 +496,9 @@ public:
     bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != MODEL_PROPERTIES_GROUP_STATIC : false; };
     bool IsDamageableAtomic() override;
 
+    void* GetDamagedAtomicPointer() override;
+    void  SetDamagedAtomicPointer(void* pDamagedAtomic) override;
+
     static bool IsVehicleModel(std::uint32_t model) noexcept;
 
 private:

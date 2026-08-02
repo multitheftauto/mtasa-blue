@@ -285,6 +285,40 @@ void CClientObject::UpdateVisibility()
 
 void CClientObject::SetModel(unsigned short usModel)
 {
+    if (m_iScaleCollisionModelID == -1)
+    {
+        SetModelInternal(usModel);
+        return;
+    }
+
+    // Scaling is active and this is a real model, not our own clone (those only flow through
+    // SetScale). The base model is changing, so move the clone over instead of leaving the old
+    // one attached, which would show the new model with stale, mismatched collision.
+    CClientModelManager* pModelManager = g_pClientGame->GetManager()->GetModelManager();
+    const int            iOldCloneID = m_iScaleCollisionModelID;
+    const int            iNewCloneID = pModelManager->AcquireScaledCollisionModel(usModel, m_vecScale);
+
+    if (iNewCloneID != -1)
+    {
+        m_usScaleCollisionBaseModel = usModel;
+        m_iScaleCollisionModelID = iNewCloneID;
+        SetModelInternal(static_cast<unsigned short>(iNewCloneID));
+    }
+    else
+    {
+        // Can't scale collision for the new model (no free slot, unsupported geometry); fall
+        // back to the plain model, same as SetScale does.
+        m_iScaleCollisionModelID = -1;
+        m_usScaleCollisionBaseModel = 0;
+        SetModelInternal(usModel);
+    }
+
+    if (iOldCloneID != iNewCloneID)
+        pModelManager->ReleaseScaledCollisionModel(iOldCloneID);
+}
+
+void CClientObject::SetModelInternal(unsigned short usModel)
+{
     // Valid model ID?
     if (CClientObjectManager::IsValidModel(usModel))
     {
@@ -429,10 +463,8 @@ void CClientObject::SetScale(const CVector& vecScale, std::optional<bool> scaleC
     // Scaling collision to (1,1,1) would just be a wasteful clone of the original - skip it
     const bool bWantScaledCollision = bScaleCollision && !bIsUnitScale;
 
-    // Set this before any SetModel() call below, since that can synchronously (or, once the model
-    // streams in, asynchronously) re-run Create(), which applies m_vecScale to the new object before
-    // registering it for collision/visibility. If m_vecScale were updated only at the end of this
-    // function, Create() would still see the old scale and register the object at the wrong size.
+    // Must be set before SetModelInternal() below; it can re-run Create() synchronously (or later,
+    // once the model streams in), which applies m_vecScale before registering collision/visibility.
     m_vecScale = vecScale;
 
     CClientModelManager* pModelManager = g_pClientGame->GetManager()->GetModelManager();
@@ -452,7 +484,7 @@ void CClientObject::SetScale(const CVector& vecScale, std::optional<bool> scaleC
             m_iScaleCollisionModelID = iNewCloneID;
 
             // The clone is a freshly minted model slot, so CClientModelRequestManager::Request()
-            // (called inside SetModel() below) would normally see it as "not loaded" and only
+            // (called inside SetModelInternal() below) would normally see it as "not loaded" and only
             // queue an async callback to Create() once it streams in. That callback never actually
             // fires for these clones (they don't reference new disk data, just the parent's already-
             // loaded geometry, so nothing ever marks them "loaded"), leaving the object stuck with
@@ -464,7 +496,7 @@ void CClientObject::SetScale(const CVector& vecScale, std::optional<bool> scaleC
                 pCloneModelInfo->RemoveRef();
             }
 
-            SetModel(static_cast<unsigned short>(iNewCloneID));
+            SetModelInternal(static_cast<unsigned short>(iNewCloneID));
 
             if (iOldCloneID != -1 && iOldCloneID != iNewCloneID)
                 pModelManager->ReleaseScaledCollisionModel(iOldCloneID);
@@ -481,7 +513,7 @@ void CClientObject::SetScale(const CVector& vecScale, std::optional<bool> scaleC
 
         m_iScaleCollisionModelID = -1;
         m_usScaleCollisionBaseModel = 0;
-        SetModel(usBaseModel);
+        SetModelInternal(usBaseModel);
 
         pModelManager->ReleaseScaledCollisionModel(iOldCloneID);
     }
@@ -598,7 +630,7 @@ void CClientObject::Create()
             m_pModelInfo->ModelAddRef(BLOCKING, "CClientObject::Create");
 
             // If the new object is not breakable, allow it into the vertical line test
-            g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest(!CClientObjectManager::IsBreakableModel(m_usModel));
+            g_pMultiplayer->AllowCreatedObjectsInVerticalLineTest(!CClientObjectManager::IsBreakableModel(GetBreakableCheckModel()));
 
             // Create the object
             m_pObject = g_pGame->GetPools()->AddObject(this, m_usModel, m_bIsLowLod, m_bBreakingDisabled);
@@ -613,7 +645,7 @@ void CClientObject::Create()
 
                 // Apply the visual scale directly on the freshly created game object, instead of going
                 // through CClientObject::SetScale(). That method can acquire or release a scaled
-                // collision clone and call SetModel(), which destroys and recursively re-creates this
+                // collision clone and call SetModelInternal(), which destroys and recursively re-creates this
                 // very object, so if the resulting model needs to stream in asynchronously, m_pObject
                 // ends up null here and everything below crashes on a null pointer. The collision
                 // clone bookkeeping is already settled by the time Create() runs, since it's what got
@@ -835,14 +867,14 @@ bool CClientObject::IsBreakable(bool bCheckModelList)
     if (!bCheckModelList)
         return !m_bBreakingDisabled;
 
-    return (CClientObjectManager::IsBreakableModel(m_usModel) && !m_bBreakingDisabled);
+    return (CClientObjectManager::IsBreakableModel(GetBreakableCheckModel()) && !m_bBreakingDisabled);
 }
 
 bool CClientObject::SetBreakable(bool bBreakable)
 {
     bool bDisableBreaking = !bBreakable;
     // Are we breakable and have we changed
-    if (CClientObjectManager::IsBreakableModel(m_usModel) && m_bBreakingDisabled != bDisableBreaking)
+    if (CClientObjectManager::IsBreakableModel(GetBreakableCheckModel()) && m_bBreakingDisabled != bDisableBreaking)
     {
         m_bBreakingDisabled = bDisableBreaking;
         // We can't use ReCreate directly (otherwise the game will crash)
@@ -855,7 +887,7 @@ bool CClientObject::SetBreakable(bool bBreakable)
 bool CClientObject::Break()
 {
     // Are we breakable?
-    if (m_pObject && CClientObjectManager::IsBreakableModel(m_usModel) && !m_bBreakingDisabled)
+    if (m_pObject && CClientObjectManager::IsBreakableModel(GetBreakableCheckModel()) && !m_bBreakingDisabled)
     {
         m_pObject->Break();
         return true;

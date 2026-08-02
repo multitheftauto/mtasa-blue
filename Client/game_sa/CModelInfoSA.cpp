@@ -2261,6 +2261,20 @@ bool CModelInfoSA::IsDamageableAtomic()
     return asDamagable != nullptr;
 }
 
+void* CModelInfoSA::GetDamagedAtomicPointer()
+{
+    if (!IsDamageableAtomic())
+        return nullptr;
+    return static_cast<CDamageableModelInfoSAInterface*>(ppModelInfo[m_dwModelID])->m_damagedAtomic;
+}
+
+void CModelInfoSA::SetDamagedAtomicPointer(void* pDamagedAtomic)
+{
+    if (!IsDamageableAtomic())
+        return;
+    static_cast<CDamageableModelInfoSAInterface*>(ppModelInfo[m_dwModelID])->m_damagedAtomic = pDamagedAtomic;
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CModelInfoSA::ForceUnload

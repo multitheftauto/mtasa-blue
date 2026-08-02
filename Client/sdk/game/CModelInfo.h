@@ -260,4 +260,9 @@ public:
     virtual unsigned int GetParentID() = 0;
     virtual bool         IsDynamic() = 0;
     virtual bool         IsDamageableAtomic() = 0;
+
+    // The broken/shattered RenderWare atomic a damageable model switches to once broken. Only
+    // meaningful when IsDamageableAtomic() is true; nullptr otherwise (or if not yet loaded).
+    virtual void* GetDamagedAtomicPointer() = 0;
+    virtual void  SetDamagedAtomicPointer(void* pDamagedAtomic) = 0;
 };

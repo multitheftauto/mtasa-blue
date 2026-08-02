@@ -160,6 +160,18 @@ namespace
     {
         return static_cast<int>(std::lround(fValue * 1000.0f));
     }
+
+    // Match the base model's kind, or the clone loses its behaviour: timed objects stop switching
+    // day/night, breakables stop breaking. CClientModel::Allocate() picks its MakeXModel() call
+    // from eClientModelType, so it has to reflect what the base model actually is.
+    eClientModelType DetermineCloneModelType(CModelInfo* pBaseModelInfo)
+    {
+        if (pBaseModelInfo->GetModelType() == eModelInfoType::TIME)
+            return eClientModelType::TIMED_OBJECT;
+        if (pBaseModelInfo->IsDamageableAtomic())
+            return eClientModelType::OBJECT_DAMAGEABLE;
+        return eClientModelType::OBJECT;
+    }
 }  // namespace
 
 int CClientModelManager::AcquireScaledCollisionModel(unsigned short usBaseModelID, const CVector& vecScale)
@@ -184,6 +196,8 @@ int CClientModelManager::AcquireScaledCollisionModel(unsigned short usBaseModelI
     // our temporary reference - whatever already (or will) reference this model keeps it loaded.
     pBaseModelInfo->ModelAddRef(BLOCKING, "AcquireScaledCollisionModel");
     CColModelSAInterface* pOriginalColModelInterface = pBaseModelInfo->GetColModelInterface();
+    void*                 pOriginalDamagedAtomic = pBaseModelInfo->GetDamagedAtomicPointer();
+    const unsigned short  usOriginalPropertiesGroup = pBaseModelInfo->GetObjectPropertiesGroup();
     pBaseModelInfo->RemoveRef();
     if (!pOriginalColModelInterface)
         return -1;
@@ -199,7 +213,7 @@ int CClientModelManager::AcquireScaledCollisionModel(unsigned short usBaseModelI
         return -1;
     }
 
-    auto pClonedModel = std::make_shared<CClientModel>(g_pClientGame->GetManager(), iCloneID, eClientModelType::OBJECT);
+    auto pClonedModel = std::make_shared<CClientModel>(g_pClientGame->GetManager(), iCloneID, DetermineCloneModelType(pBaseModelInfo));
     if (!pClonedModel->Allocate(static_cast<ushort>(usBaseModelID)))
     {
         pScaledColModel->Destroy();
@@ -210,6 +224,20 @@ int CClientModelManager::AcquireScaledCollisionModel(unsigned short usBaseModelI
 
     CModelInfo* pCloneModelInfo = g_pGame->GetModelInfo(iCloneID, true);
     pCloneModelInfo->SetColModel(pScaledColModel);
+
+    // Allocate() clears this since it assumes a fresh custom model won't share the base's damaged
+    // geometry. Here it does; the clone reuses the exact same clump, only collision changes, so the
+    // base's damaged atomic is still correct. Without this, breaking a scaled object never errors,
+    // it just never shows the broken visual.
+    if (pOriginalDamagedAtomic)
+        pCloneModelInfo->SetDamagedAtomicPointer(pOriginalDamagedAtomic);
+
+    // Allocate() also resets the object.dat properties group to MODEL_PROPERTIES_GROUP_STATIC. That
+    // value tells CObjectData::SetObjectData there's no object.dat entry for this model, so it skips
+    // assigning m_nColDamageEffect (breakable, explodes, etc) and forces 99999 mass with no gravity.
+    // MTA's own physics sync reads the same group. Copy it from the base so the clone behaves like
+    // the object it was scaled from instead of a generic static prop.
+    pCloneModelInfo->SetObjectPropertiesGroup(usOriginalPropertiesGroup);
 
     SScaledColModelEntry entry;
     entry.pClonedModel = pClonedModel;

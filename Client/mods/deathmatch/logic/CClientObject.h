@@ -89,6 +89,11 @@ public:
     void SetScale(const CVector& vecScale, std::optional<bool> scaleCollision = std::nullopt);
     bool IsCollisionScaled() const { return m_iScaleCollisionModelID != -1; }
 
+    // IsBreakableModel() looks up by exact model ID against a fixed list, so a scaled-collision
+    // clone (its own, arbitrary slot ID) would never match even though its base model would. Use
+    // this instead of m_usModel wherever that lookup happens.
+    unsigned short GetBreakableCheckModel() const { return m_iScaleCollisionModelID != -1 ? m_usScaleCollisionBaseModel : m_usModel; }
+
     bool IsCollisionEnabled() { return m_bUsesCollision; };
     void SetCollisionEnabled(bool bCollisionEnabled);
 
@@ -127,6 +132,10 @@ public:
     bool SetOnFire(bool onFire) override { return m_pObject ? m_pObject->SetOnFire(onFire) : false; };
 
 protected:
+    // Raw model swap, no clone handling. SetModel() calls this after resolving any scaled-collision
+    // clone; SetScale() calls it directly since it already owns that bookkeeping.
+    void SetModelInternal(unsigned short usModel);
+
     void StreamIn(bool bInstantly);
     void StreamOut();
 
