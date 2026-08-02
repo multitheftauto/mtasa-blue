@@ -1370,6 +1370,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
         case CCLIENTWORLDMESH:
         case CCLIENTSOUND:
         case CCLIENTWATER:
+        case CCLIENTBUILDING:
         {
             Entity.SetDimension(usDimension);
             return true;

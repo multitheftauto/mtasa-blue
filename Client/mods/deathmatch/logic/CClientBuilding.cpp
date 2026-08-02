@@ -27,7 +27,7 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
     m_pModelInfo = g_pGame->GetModelInfo(usModelId);
     SetTypeName("building");
     m_pBuildingManager->AddToList(this);
-    Create();
+    RelateDimension(m_pBuildingManager->GetDimension());
     UpdateSpatialData();
 }
 
@@ -95,6 +95,20 @@ void CClientBuilding::SetInterior(uint8_t ucInterior)
         return;
     m_interior = ucInterior;
     Recreate();
+}
+
+void CClientBuilding::SetDimension(unsigned short usDimension)
+{
+    CClientEntity::SetDimension(usDimension);
+    RelateDimension(m_pBuildingManager->GetDimension());
+}
+
+void CClientBuilding::RelateDimension(unsigned short usDimension)
+{
+    if (usDimension == GetDimension())
+        Create();
+    else
+        Destroy();
 }
 
 void CClientBuilding::SetModel(uint16_t model)
