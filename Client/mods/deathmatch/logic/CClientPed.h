@@ -479,6 +479,7 @@ public:
     const SAnimationCache&      GetAnimationCache() const noexcept { return m_AnimationCache; }
     void                        RunAnimationFromCache();
     void                        UpdateAnimationProgressAndSpeed();
+    void                        UpdateCustomPartialAnimationBones();
 
     bool IsUsingGun();
 
