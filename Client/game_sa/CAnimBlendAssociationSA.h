@@ -166,6 +166,7 @@ public:
     void  SetBlendAmount(float fAmount) { m_pInterface->fBlendAmount = fAmount; }
     bool  IsPartial() const override { return m_pInterface->m_bPartial; }
     void  RestrictToBonesOf(const CAnimBlendStaticAssociationSAInterface* pOriginalAssoc) override;
+    void  RestrictToBones(std::bitset<32> animatedBonesMask) override;
     void  SetCurrentProgress(float fProgress);
     float GetCurrentProgress() const noexcept { return m_pInterface->fCurrentTime; }
     float GetCurrentSpeed() const noexcept { return m_pInterface->fSpeed; }
