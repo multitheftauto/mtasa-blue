@@ -4865,6 +4865,16 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         {
             bAllowDamage = false;
         }
+
+        if (bAllowDamage && fLoss > 0.0f && !g_pGame->IsVehicleExplosionsEnabled())
+        {
+            CVehicle* pGameVehicle = pClientVehicle->GetGameVehicle();
+            if (pGameVehicle && pGameVehicle->GetHealth() - fLoss < VEHICLE_BURNING_HEALTH)
+            {
+                pGameVehicle->SetHealth(VEHICLE_BURNING_HEALTH);
+                bAllowDamage = false;
+            }
+        }
     }
 
     return bAllowDamage;

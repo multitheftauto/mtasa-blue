@@ -941,18 +941,6 @@ void CGameSA::SetVehicleBurnExplosionsEnabled(bool isEnabled)
 
 void CGameSA::SetVehicleExplosionsEnabled(bool isEnabled)
 {
-    if (isEnabled == m_isVehicleExplosionsEnabled)
-        return;
-
-    if (isEnabled)
-    {
-        MemCpy((void*)0x6B8F80, "\x56\x8B\xF1", 3);  // CVehicle::BlowUpCar
-    }
-    else
-    {
-        MemCpy((void*)0x6B8F80, "\xC2\x08\x00", 3);  // CVehicle::BlowUpCar
-    }
-
     m_isVehicleExplosionsEnabled = isEnabled;
 }
 

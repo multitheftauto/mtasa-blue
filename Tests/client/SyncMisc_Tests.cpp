@@ -87,7 +87,8 @@ TEST(SFunBugsStateSync, RoundTrip)
 // World special properties
 // ============================================================================
 
-// 20 boolean flags controlling world behaviour (hovercars, foliage, etc.).
+// 20 boolean flags controlling world behaviour (hovercars, foliage, etc.), followed by a second
+// block of flags added later and guarded by its own bitstream version.
 // The constructor sets default values, so we flip a few and verify both
 // changed and unchanged flags.
 TEST(SWorldSpecialPropertiesStateSync, RoundTrip)
@@ -97,16 +98,35 @@ TEST(SWorldSpecialPropertiesStateSync, RoundTrip)
     sync.data.hovercars = true;
     sync.data.randomfoliage = false;
     sync.data.vehicleEngineAutoStart = false;
+    sync.data2.vehicleexplosions = false;
     sync.Write(bs);
-    EXPECT_EQ(20, bs.GetNumberOfBitsUsed());
+    EXPECT_EQ(21, bs.GetNumberOfBitsUsed());
     bs.ResetReadPointer();
     SWorldSpecialPropertiesStateSync out;
     EXPECT_TRUE(out.Read(bs));
     EXPECT_TRUE(out.data.hovercars);
     EXPECT_FALSE(out.data.randomfoliage);
     EXPECT_FALSE(out.data.vehicleEngineAutoStart);
+    EXPECT_FALSE(out.data2.vehicleexplosions);
     // Verify a default-true flag that wasn't changed
     EXPECT_TRUE(out.data.underworldwarp);
+}
+
+// A peer older than WorldSpecialProperty_VehicleExplosions neither writes nor reads the second
+// block, so the stream stays 20 bits wide and the property falls back to its default.
+TEST(SWorldSpecialPropertiesStateSync, LegacyPeerOmitsSecondBlock)
+{
+    MockBitStream                    bs(static_cast<unsigned short>(eBitStreamVersion::WorldSpecialProperty_VehicleExplosions) - 1);
+    SWorldSpecialPropertiesStateSync sync;
+    sync.data.hovercars = true;
+    sync.data2.vehicleexplosions = false;
+    sync.Write(bs);
+    EXPECT_EQ(20, bs.GetNumberOfBitsUsed());
+    bs.ResetReadPointer();
+    SWorldSpecialPropertiesStateSync out;
+    EXPECT_TRUE(out.Read(bs));
+    EXPECT_TRUE(out.data.hovercars);
+    EXPECT_TRUE(out.data2.vehicleexplosions);
 }
 
 // ============================================================================

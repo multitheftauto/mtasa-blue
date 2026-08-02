@@ -32,6 +32,18 @@ bool CAutomobileSA::IsAnyWheelTouchingGround() const
            autoInterface->m_wheelRatios[3] < 1.0f;
 }
 
+void CAutomobileSA::SetHealth(float fHealth)
+{
+    CVehicleSA::SetHealth(fHealth);
+
+    if (fHealth < VEHICLE_BURNING_HEALTH)
+        return;
+
+    CAutomobileSAInterface* autoInterface = GetAutomobileInterface();
+    if (autoInterface)
+        autoInterface->m_fBurningTime = 0.0f;
+}
+
 void CAutomobileSAInterface::SetPanelDamage(std::uint8_t panelId, bool breakGlass, bool spawnFlyingComponent)
 {
     int nodeId = CDamageManagerSA::GetCarNodeIndexFromPanel(panelId);

@@ -1968,9 +1968,19 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         BITCOUNT = 20
     };
 
+    enum
+    {
+        BITCOUNT2 = 1
+    };
+
     bool Read(NetBitStreamInterface& bitStream)
     {
         bool isOK = bitStream.ReadBits(reinterpret_cast<char*>(&data), BITCOUNT);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_VehicleExplosions))
+            isOK &= bitStream.ReadBits(reinterpret_cast<char*>(&data2), BITCOUNT2);
+        else
+            data2.vehicleexplosions = true;
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -1984,6 +1994,9 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
     void Write(NetBitStreamInterface& bitStream) const
     {
         bitStream.WriteBits(reinterpret_cast<const char*>(&data), BITCOUNT);
+
+        if (bitStream.Can(eBitStreamVersion::WorldSpecialProperty_VehicleExplosions))
+            bitStream.WriteBits(reinterpret_cast<const char*>(&data2), BITCOUNT2);
 
         //// Example for adding item:
         // if (bitStream.Can(eBitStreamVersion::YourProperty))
@@ -2012,10 +2025,13 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         bool flyingcomponents : 1;
         bool vehicleburnexplosions : 1;
         bool vehicleEngineAutoStart : 1;
-        bool vehicleexplosions : 1;
     } data;
 
     // Add new ones in separate structs
+    struct
+    {
+        bool vehicleexplosions : 1;
+    } data2;
 
     SWorldSpecialPropertiesStateSync()
     {
@@ -2040,7 +2056,7 @@ struct SWorldSpecialPropertiesStateSync : public ISyncStructure
         data.flyingcomponents = true;
         data.vehicleburnexplosions = true;
         data.vehicleEngineAutoStart = true;
-        data.vehicleexplosions = true;
+        data2.vehicleexplosions = true;
     }
 };
 

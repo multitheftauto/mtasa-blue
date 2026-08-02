@@ -192,7 +192,7 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     wsProps.data.flyingcomponents = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::FLYINGCOMPONENTS);
     wsProps.data.vehicleburnexplosions = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS);
     wsProps.data.vehicleEngineAutoStart = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART);
-    wsProps.data.vehicleexplosions = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEEXPLOSIONS);
+    wsProps.data2.vehicleexplosions = g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLEEXPLOSIONS);
     BitStream.Write(&wsProps);
 
     BitStream.Write(m_fJetpackMaxHeight);
