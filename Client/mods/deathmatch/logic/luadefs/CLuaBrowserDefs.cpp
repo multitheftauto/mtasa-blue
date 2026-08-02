@@ -192,6 +192,10 @@ int CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        // Remove whitespaces
+        for (auto& url : pages)
+            url.erase(std::remove_if(url.begin(), url.end(), [](unsigned char c) { return std::isspace(c); }), url.end());
+
         // Remove empty and invalid URLs
         std::regex invalidSynmbolsRegex("[^A-Za-z0-9._~!#$&'()*+,;=:@/?%-]");
 

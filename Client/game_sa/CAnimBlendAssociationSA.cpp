@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CAnimBlendAssociationSA.h"
 #include "CAnimBlendHierarchySA.h"
+#include "CAnimBlendStaticAssociationSA.h"
 #include "CAnimManagerSA.h"
 #include "CGameSA.h"
 
@@ -126,6 +127,26 @@ std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy()
 const std::unique_ptr<CAnimBlendHierarchy> CAnimBlendAssociationSA::GetAnimHierarchy() const noexcept
 {
     return pGame->GetAnimManager()->GetAnimBlendHierarchy(m_pInterface->pAnimHierarchy);
+}
+
+void CAnimBlendAssociationSA::RestrictToBonesOf(const CAnimBlendStaticAssociationSAInterface* pOriginalAssoc)
+{
+    if (!pOriginalAssoc || !pOriginalAssoc->pAnimBlendNodesSequenceArray)
+        return;
+
+    // Custom animations are padded out to the full 32 bone skeleton when their IFP is loaded, with a
+    // fixed pose standing in for every bone the animation doesn't define. That padding is what a full
+    // body animation needs, but for a partial one it would drive the root, pelvis and legs the original
+    // never touched, leaving the ped rigid. Keep only the bones the original animation itself animates.
+    void* const*         ppOriginalSequences = reinterpret_cast<void* const*>(pOriginalAssoc->pAnimBlendNodesSequenceArray);
+    const unsigned short numOriginalNodes = pOriginalAssoc->nNumBlendNodes;
+
+    for (unsigned short i = 0; i < m_pInterface->cNumBlendNodes; i++)
+    {
+        const bool isAnimatedByOriginal = i < numOriginalNodes && ppOriginalSequences[i] != nullptr;
+        if (!isAnimatedByOriginal)
+            m_pInterface->pAnimBlendNodeArray[i].pAnimSequence = nullptr;
+    }
 }
 
 void CAnimBlendAssociationSA::SetCurrentProgress(float fProgress)

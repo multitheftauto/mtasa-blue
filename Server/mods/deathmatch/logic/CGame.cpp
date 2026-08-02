@@ -989,6 +989,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     // Register our packethandler
     g_pNetServer->RegisterPacketHandler(CGame::StaticProcessPacket);
 
+    CalculateMinClientRequirement();
+
     // Try to start the network
     if (!g_pNetServer->StartNetwork(strServerIPList, usServerPort, uiMaxPlayers, m_pMainConfig->GetServerName().c_str()))
     {
@@ -1943,9 +1945,10 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 // Tell the console
                                 CLogger::LogPrintf("CONNECT: %s failed to connect (Client version is below minimum) (%s)\n", szNick, strIPAndSerial.c_str());
 
-                                // Tell the player
-                                pPlayer->Send(CUpdateInfoPacket("Mandatory", CalculateMinClientRequirement()));
-                                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::NO_REASON);
+                                // Tell the player and let them know which exact version is required
+                                const CMtaVersion strRequiredVersion = CalculateMinClientRequirement();
+                                pPlayer->Send(CUpdateInfoPacket("Mandatory", strRequiredVersion));
+                                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::BAD_VERSION, strRequiredVersion.c_str());
                                 return;
                             }
 
@@ -1957,9 +1960,10 @@ void CGame::Packet_PlayerJoinData(CPlayerJoinDataPacket& Packet)
                                 CLogger::LogPrintf("CONNECT: %s advised to update (Client version is below recommended) (%s)\n", szNick,
                                                    strIPAndSerial.c_str());
 
-                                // Tell the player
-                                pPlayer->Send(CUpdateInfoPacket("Optional", GetConfig()->GetRecommendedClientVersion()));
-                                DisconnectPlayer(this, *pPlayer, "");
+                                // Tell the player and let them know which exact version is recommended
+                                const CMtaVersion strRecommendedVersion = GetConfig()->GetRecommendedClientVersion();
+                                pPlayer->Send(CUpdateInfoPacket("Optional", strRecommendedVersion));
+                                DisconnectPlayer(this, *pPlayer, CPlayerDisconnectedPacket::BAD_VERSION, strRecommendedVersion.c_str());
                                 return;
                             }
 
@@ -2215,6 +2219,10 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
             pPlayer->SetWeaponAmmoInClip(0, slot);
             pPlayer->SetWeaponTotalAmmo(0, slot);
         }
+
+        // Active satchels are wiped client-side when the player dies. Reset our count
+        // so the next life isn't blocked by the per-life cap from the old life's throws.
+        pPlayer->m_uiActiveSatchelCount = 0;
     }
 }
 
@@ -2834,11 +2842,17 @@ void CGame::Packet_DetonateSatchels(CDetonateSatchelsPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
+        constexpr unsigned long long DETONATE_SATCHEL_COOLDOWN_MS = 1000;
+        if (pPlayer->m_DetonateSatchelTimer.Get() < DETONATE_SATCHEL_COOLDOWN_MS)
+            return;
+        pPlayer->m_DetonateSatchelTimer.Reset();
+
         // Trigger Lua event and see if we are allowed to continue
         CLuaArguments arguments;
         if (!pPlayer->CallEvent("onPlayerDetonateSatchels", arguments))
             return;
 
+        pPlayer->m_uiActiveSatchelCount = 0;
         // Tell everyone to blow up this guy's satchels
         m_pPlayerManager->BroadcastOnlyJoined(Packet);
         // Take away their detonator
@@ -2852,6 +2866,11 @@ void CGame::Packet_DestroySatchels(CDestroySatchelsPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
+        constexpr unsigned long long DESTROY_SATCHEL_COOLDOWN_MS = 1000;
+        if (pPlayer->m_DestroySatchelTimer.Get() < DESTROY_SATCHEL_COOLDOWN_MS)
+            return;
+        pPlayer->m_DestroySatchelTimer.Reset();
+        pPlayer->m_uiActiveSatchelCount = 0;
         // Tell everyone to destroy up this player's satchels
         m_pPlayerManager->BroadcastOnlyJoined(Packet);
         // Take away their detonator
@@ -2987,6 +3006,14 @@ void CGame::Packet_ProjectileSync(CProjectileSyncPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
+        if (Packet.m_ucWeaponType == 39)
+        {
+            constexpr unsigned int MAX_PLAYER_SATCHELS = 128;
+            if (pPlayer->m_uiActiveSatchelCount >= MAX_PLAYER_SATCHELS)
+                return;
+            pPlayer->m_uiActiveSatchelCount++;
+        }
+
         CVector vecPosition = Packet.m_vecOrigin;
         if (Packet.m_OriginID != INVALID_ELEMENT_ID)
         {
@@ -4141,28 +4168,107 @@ void CGame::Packet_PlayerTransgression(CPlayerTransgressionPacket& Packet)
     }
 }
 
+namespace
+{
+    constexpr size_t MAX_PLAYER_DIAGNOSTIC_LOG_LENGTH = 512;
+
+    bool IsKnownPlayerDiagnosticLevel(uint uiLevel)
+    {
+        switch (uiLevel)
+        {
+            case 1000:
+            case 1002:
+            case 1003:
+            case 1004:
+            case 1005:
+            case 1007:
+            case 1008:
+            case 1009:
+            case 1010:
+            case 1011:
+            case 1012:
+            case 1013:
+                return true;
+        }
+
+        return false;
+    }
+
+    bool IsHexDigest(const SString& strValue, size_t uiExpectedLength)
+    {
+        if (strValue.length() != uiExpectedLength)
+            return false;
+
+        for (size_t i = 0; i < strValue.length(); i++)
+        {
+            if (!isxdigit(static_cast<uchar>(strValue[i])))
+                return false;
+        }
+
+        return true;
+    }
+
+    bool HasUsableD3d9Info(const SString& strD3d9Md5, const SString& strD3d9Sha256, uint uiD3d9Size)
+    {
+        if (strD3d9Md5.empty() && strD3d9Sha256.empty())
+            return uiD3d9Size == 0;
+
+        return IsHexDigest(strD3d9Md5, 32) && IsHexDigest(strD3d9Sha256, 64);
+    }
+
+    bool BuildDetectedAcList(const std::vector<uchar>& idList, SString& strDetectedAC)
+    {
+        strDetectedAC.clear();
+        bool bSeenIds[64] = {};
+
+        for (size_t i = 0; i < idList.size(); i++)
+        {
+            const uchar ucId = idList[i];
+            if (ucId > 63 || bSeenIds[ucId])
+                return false;
+
+            bSeenIds[ucId] = true;
+            if (!strDetectedAC.empty())
+                strDetectedAC += ",";
+            strDetectedAC += SString("%u", static_cast<uint>(ucId));
+        }
+
+        return true;
+    }
+
+    SString SanitizePlayerDiagnosticMessage(const SString& strMessage)
+    {
+        SString      strResult;
+        const size_t uiCopyLength = Min<size_t>(strMessage.length(), MAX_PLAYER_DIAGNOSTIC_LOG_LENGTH);
+
+        for (size_t i = 0; i < uiCopyLength; i++)
+        {
+            const uchar ucChar = static_cast<uchar>(strMessage[i]);
+            if (ucChar == '\r' || ucChar == '\n' || ucChar == '\t')
+                strResult += ' ';
+            else if (ucChar < 0x20 || ucChar == 0x7F)
+                strResult += '?';
+            else
+                strResult += strMessage[i];
+        }
+
+        if (strMessage.length() > MAX_PLAYER_DIAGNOSTIC_LOG_LENGTH)
+            strResult += "...";
+
+        return strResult;
+    }
+}
+
 void CGame::Packet_PlayerDiagnostic(CPlayerDiagnosticPacket& Packet)
 {
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer && pPlayer->IsJoined())
     {
-        if (Packet.m_uiLevel == 236)
+        if (Packet.m_uiLevel != 236 &&
+            (IsKnownPlayerDiagnosticLevel(Packet.m_uiLevel) || g_pGame->GetConfig()->IsEnableDiagnostic(SString("%d", Packet.m_uiLevel))))
         {
-            // Handle special info
-            std::vector<SString> parts;
-            Packet.m_strMessage.Split(",", parts);
-            if (parts.size() > 3)
-            {
-                pPlayer->m_strDetectedAC = parts[0].Replace("|", ",");
-                pPlayer->m_uiD3d9Size = atoi(parts[1]);
-                pPlayer->m_strD3d9Md5 = parts[2];
-                pPlayer->m_strD3d9Sha256 = parts[3];
-            }
-        }
-        else if (Packet.m_uiLevel >= 1000 || g_pGame->GetConfig()->IsEnableDiagnostic(SString("%d", Packet.m_uiLevel)))
-        {
-            // If diagnosticis enabled on this server, log it
-            SString strMessageCombo("DIAGNOSTIC: %s #%d %s\n", pPlayer->GetNick(), Packet.m_uiLevel, Packet.m_strMessage.c_str());
+            const SString strSanitizedMessage = SanitizePlayerDiagnosticMessage(Packet.m_strMessage);
+            const SString strMessageCombo("DIAGNOSTIC: %s #%d %s\n", pPlayer->GetNick(), Packet.m_uiLevel, *strSanitizedMessage);
             CLogger::LogPrint(strMessageCombo);
         }
     }
@@ -4202,11 +4308,15 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
                 // Check if new start
                 if (Packet.m_usPartNumber == 0)
                 {
+                    if (!info.bRequested)
+                        return;
+
                     info.bInProgress = true;
                     info.usNextPartNumber = 0;
                     info.usScreenShotId = Packet.m_usScreenShotId;
 
                     info.llTimeStamp = Packet.m_llServerGrabTime;
+                    info.llStartTime = GetTickCount64_();
                     info.uiTotalBytes = Packet.m_uiTotalBytes;
                     info.usTotalParts = Packet.m_usTotalParts;
                     info.usResourceNetId = Packet.m_pResource ? Packet.m_pResource->GetNetID() : INVALID_RESOURCE_NET_ID;
@@ -4217,6 +4327,25 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
             // Add data if valid
             if (info.bInProgress)
             {
+                // Reject if accumulated data exceeds 50MB
+                constexpr uint MAX_SCREENSHOT_SIZE = 50 * 1024 * 1024;
+                if (info.buffer.GetSize() + Packet.m_buffer.GetSize() > MAX_SCREENSHOT_SIZE)
+                {
+                    info.bInProgress = false;
+                    info.bRequested = false;
+                    info.buffer.Clear();
+                    return;
+                }
+
+                // Timeout stale transfers after 30 seconds
+                if (GetTickCount64_() - info.llStartTime > 30000)
+                {
+                    info.bInProgress = false;
+                    info.bRequested = false;
+                    info.buffer.Clear();
+                    return;
+                }
+
                 info.buffer += Packet.m_buffer;
                 info.usNextPartNumber++;
 
@@ -4236,6 +4365,7 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
                     }
 
                     info.bInProgress = false;
+                    info.bRequested = false;
                     info.buffer.Clear();
                 }
             }
@@ -4273,16 +4403,77 @@ void CGame::Packet_PlayerNetworkStatus(CPlayerNetworkStatusPacket& Packet)
 
 void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
 {
-    CPlayer*     sourcePlayer = Packet.GetSourcePlayer();
-    CResource*   resource = Packet.GetResource();
-    unsigned int playerStartCounter = Packet.GetStartCounter();
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if (pPlayer && pPlayer->IsJoined() && !pPlayer->IsLeavingServer())
+    {
+        CResource* pResource = Packet.GetResource();
 
-    if (!sourcePlayer || !resource || !resource->CanPlayerTriggerResourceStart(sourcePlayer, playerStartCounter))
-        return;
+        // Packets with no valid resource (stale ID, race with resource stop) are
+        // harmless and should not consume or count toward disconnect.
+        if (!pResource)
+            return;
 
-    CLuaArguments Arguments;
-    Arguments.PushResource(resource);
-    sourcePlayer->CallEvent("onPlayerResourceStart", Arguments, nullptr);
+        // Distinguish a benign join/restart race (no token charge) from a genuine duplicate
+        // ack (rate-limited) using the start counter the client echoed back.
+        const EPlayerResourceStartAck ackResult = pResource->CanPlayerTriggerResourceStart(pPlayer, Packet.GetStartCounter());
+
+        if (ackResult == EPlayerResourceStartAck::Accepted)
+        {
+            CLuaArguments Arguments;
+            Arguments.PushResource(pResource);
+            pPlayer->CallEvent("onPlayerResourceStart", Arguments, NULL);
+            return;
+        }
+
+        // Race condition acks (resource stopped before ack arrived, stale generation)
+        // are normal during join and shouldn't cost the player tokens.
+        if (ackResult == EPlayerResourceStartAck::RaceMiss)
+            return;
+
+        // Only genuine duplicate acks reach here. Apply the rate limit.
+        constexpr unsigned int RESOURCE_START_RATE_LIMIT = 50;
+        constexpr unsigned int RESOURCE_START_RATE_PERIOD_MS = 2000;
+        constexpr unsigned int RESOURCE_START_TOKEN_INTERVAL_MS = RESOURCE_START_RATE_PERIOD_MS / RESOURCE_START_RATE_LIMIT;
+
+        // Preserve sub-token time so normal packet jitter doesn't reduce the effective refill rate.
+        unsigned long long elapsed = pPlayer->m_ResourceStartPacketTimer.Get();
+        pPlayer->m_ResourceStartPacketTimer.Reset();
+
+        if (pPlayer->m_ResourceStartTokens < RESOURCE_START_RATE_LIMIT)
+        {
+            pPlayer->m_ResourceStartRefillRemainderMs += elapsed;
+            unsigned int refill = static_cast<unsigned int>(pPlayer->m_ResourceStartRefillRemainderMs / RESOURCE_START_TOKEN_INTERVAL_MS);
+
+            if (refill)
+            {
+                unsigned int tokens = pPlayer->m_ResourceStartTokens + refill;
+                pPlayer->m_ResourceStartTokens = (tokens > RESOURCE_START_RATE_LIMIT) ? RESOURCE_START_RATE_LIMIT : tokens;
+                pPlayer->m_ResourceStartRefillRemainderMs %= RESOURCE_START_TOKEN_INTERVAL_MS;
+
+                // Only reset the drop counter when the bucket is fully restored. Resetting on
+                // any partial refill lets a sender pace at ~40ms and never accumulate drops.
+                if (pPlayer->m_ResourceStartTokens == RESOURCE_START_RATE_LIMIT)
+                {
+                    pPlayer->m_ResourceStartDrops = 0;
+                    pPlayer->m_ResourceStartRefillRemainderMs = 0;
+                }
+            }
+        }
+        else
+        {
+            // A stalled sender shouldn't hold extra burst capacity beyond the bucket cap.
+            pPlayer->m_ResourceStartRefillRemainderMs = 0;
+        }
+
+        if (pPlayer->m_ResourceStartTokens == 0)
+        {
+            if (++pPlayer->m_ResourceStartDrops >= 10)
+                DisconnectPlayer(this, *pPlayer, "Trigger Flooding");
+            return;
+        }
+
+        --pPlayer->m_ResourceStartTokens;
+    }
 }
 
 void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket& packet) noexcept
@@ -4383,6 +4574,28 @@ void CGame::Packet_PlayerACInfo(CPlayerACInfoPacket& Packet)
     CPlayer* pPlayer = Packet.GetSourcePlayer();
     if (pPlayer)
     {
+        SString strDetectedAC;
+        uint    uiD3d9Size = 0;
+        SString strD3d9Md5;
+        SString strD3d9Sha256;
+
+        // Build the comma-separated detected AC list and update the cached d3d9 fields when the
+        // hashes are usable. The event is fired unconditionally so scripts always see the report.
+        if (BuildDetectedAcList(Packet.m_IdList, strDetectedAC))
+        {
+            pPlayer->m_strDetectedAC = strDetectedAC;
+
+            if (HasUsableD3d9Info(Packet.m_strD3d9MD5, Packet.m_strD3d9SHA256, Packet.m_uiD3d9Size))
+            {
+                uiD3d9Size = Packet.m_uiD3d9Size;
+                strD3d9Md5 = Packet.m_strD3d9MD5;
+                strD3d9Sha256 = Packet.m_strD3d9SHA256;
+                pPlayer->m_uiD3d9Size = uiD3d9Size;
+                pPlayer->m_strD3d9Md5 = strD3d9Md5;
+                pPlayer->m_strD3d9Sha256 = strD3d9Sha256;
+            }
+        }
+
         CLuaArguments acList;
         for (uint i = 0; i < Packet.m_IdList.size(); i++)
         {
@@ -4392,9 +4605,9 @@ void CGame::Packet_PlayerACInfo(CPlayerACInfoPacket& Packet)
 
         CLuaArguments Arguments;
         Arguments.PushTable(&acList);
-        Arguments.PushNumber(Packet.m_uiD3d9Size);
-        Arguments.PushString(Packet.m_strD3d9MD5);
-        Arguments.PushString(Packet.m_strD3d9SHA256);
+        Arguments.PushNumber(uiD3d9Size);
+        Arguments.PushString(strD3d9Md5);
+        Arguments.PushString(strD3d9Sha256);
         pPlayer->CallEvent("onPlayerACInfo", Arguments);
     }
 }
@@ -4926,6 +5139,9 @@ CMtaVersion CGame::CalculateMinClientRequirement()
     if (strNewMin < RELEASE_MIN_CLIENT_VERSION)
         strNewMin = RELEASE_MIN_CLIENT_VERSION;
 #endif
+
+    if (g_pNetServer)
+        g_pNetServer->SetMinClientRequirement(*strNewMin);
 
     return strNewMin;
 }
