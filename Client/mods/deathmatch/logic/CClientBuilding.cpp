@@ -139,6 +139,8 @@ void CClientBuilding::Create()
     if (!m_pBuilding)
         return;
 
+    m_pBuilding->SetStoredPointer(this);
+
     if (m_bDoubleSidedInit)
         m_pBuilding->SetBackfaceCulled(!m_bDoubleSided);
 
