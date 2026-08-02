@@ -6436,7 +6436,6 @@ static void __declspec(naked) HOOK_CTaskSimpleClimb_ScanToGrabSectorList()
         mov     word ptr [esi+2Ch], cx
         setne   al
         mov     bClimbScanTargetUsesCollision, al
-        pushad
     }
     // clang-format on
 
@@ -6445,7 +6444,6 @@ static void __declspec(naked) HOOK_CTaskSimpleClimb_ScanToGrabSectorList()
         // clang-format off
         __asm
         {
-            popad
             jmp     SKIP_CTaskSimpleClimb_ScanToGrabSectorList
         }
         // clang-format on
@@ -6455,7 +6453,6 @@ static void __declspec(naked) HOOK_CTaskSimpleClimb_ScanToGrabSectorList()
         // clang-format off
         __asm
         {
-            popad
             jmp     RETURN_CTaskSimpleClimb_ScanToGrabSectorList
         }
         // clang-format on
