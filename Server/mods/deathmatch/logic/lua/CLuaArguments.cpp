@@ -520,8 +520,12 @@ void CLuaArguments::ValidateTableKeys()
     }
 }
 
-bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables, unsigned int uiDepth)
 {
+    // Cap table nesting at 64 levels to prevent stack overflow
+    if (uiDepth > 64)
+        return false;
+
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
@@ -545,7 +549,7 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
         {
             CLuaArgument* pArgument = new CLuaArgument();
-            if (!pArgument->ReadFromBitStream(bitStream, pKnownTables))
+            if (!pArgument->ReadFromBitStream(bitStream, pKnownTables, uiDepth))
             {
                 delete pArgument;
                 if (bKnownTablesCreated)

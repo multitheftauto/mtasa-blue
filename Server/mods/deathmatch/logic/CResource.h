@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <unordered_set>
 #include "packets/CResourceStartPacket.h"
 #include "packets/CResourceStopPacket.h"
 #include "packets/CEntityRemovePacket.h"
@@ -131,6 +132,15 @@ enum class EResourceState : unsigned char
     Stopping,  // the resource is stopping
 };
 
+// Return value for AddPlayerResourceStart. Used to distinguish normal race conditions
+// (resource stopped before ack arrived) from actually duplicate acks.
+enum class EPlayerResourceStartAck : unsigned char
+{
+    Accepted,    // ack is valid for the current start, event should fire
+    RaceMiss,    // resource not running or stale generation - normal race, no token charge
+    Duplicate,   // player already had their ack accepted for this start - genuine duplicate
+};
+
 // A resource is either a directory with files or a ZIP file which contains the content of such directory.
 // The directory or ZIP file must contain a meta.xml file, which describes the required content by the resource.
 // It's a process-like environment for scripts, maps, images and other files.
@@ -152,6 +162,8 @@ public:
     bool Unload();
 
     void Reload();
+
+    EPlayerResourceStartAck AddPlayerResourceStart(CPlayer* player, unsigned int uiStartGeneration, bool bHasStartGeneration);
 
     // Get a resource default setting
     bool GetDefaultSetting(const char* szName, char* szValue, size_t sizeBuffer);
@@ -265,9 +277,12 @@ public:
     void           SetNetID(unsigned short usNetID) { m_usNetID = usNetID; }
     unsigned short GetNetID() const noexcept { return m_usNetID; }
 
+    unsigned int GetStartCounter() const noexcept { return m_startCounter; }
+
     uint GetScriptID() const noexcept { return m_uiScriptID; }
 
     void OnPlayerJoin(CPlayer& Player);
+    void OnPlayerQuit(CPlayer& Player);
     void SendNoClientCacheScripts(CPlayer* pPlayer = nullptr);
 
     void OnResourceStateChange(const char* state) noexcept;
@@ -394,6 +409,9 @@ private:
     CDummy*        m_pResourceDynamicElementRoot = nullptr;
     CElementGroup* m_pDefaultElementGroup = nullptr;  // stores elements created by scripts in this resource
     CLuaMain*      m_pVM = nullptr;
+
+    unsigned int                      m_startCounter{};
+    std::unordered_set<CPlayer*>      m_playersStarted;
 
     KeyValueMap                    m_Info;
     std::list<CIncludedResources*> m_IncludedResources;  // we store them here temporarily, then read them once all the resources are loaded

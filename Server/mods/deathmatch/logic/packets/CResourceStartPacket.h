@@ -17,7 +17,7 @@
 class CResourceStartPacket final : public CPacket
 {
 public:
-    CResourceStartPacket(const char* szResourceName, class CResource* pResource);
+    CResourceStartPacket(const char* szResourceName, class CResource* pResource, unsigned int uiStartCounter);
 
     ePacketID     GetPacketID() const { return PACKET_ID_RESOURCE_START; };
     unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -25,6 +25,7 @@ public:
     bool Write(NetBitStreamInterface& BitStream) const;
 
 private:
-    std::string m_strResourceName;
-    CResource*  m_pResource;
+    std::string  m_strResourceName;
+    CResource*   m_pResource{};
+    unsigned int m_uiStartCounter{};
 };

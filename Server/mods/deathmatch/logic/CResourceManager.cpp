@@ -543,6 +543,14 @@ void CResourceManager::OnPlayerJoin(CPlayer& Player)
     }
 }
 
+void CResourceManager::OnPlayerQuit(CPlayer& Player)
+{
+    for (auto iter = IterBegin(); iter != IterEnd(); ++iter)
+    {
+        (*iter)->OnPlayerQuit(Player);
+    }
+}
+
 //
 // Add resource <-> luaVM lookup mapping
 //

@@ -452,8 +452,11 @@ void CLuaArguments::ValidateTableKeys()
     }
 }
 
-bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables, unsigned int uiDepth)
 {
+    if (uiDepth > MaxBitStreamTableReadDepth)
+        return false;
+
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {

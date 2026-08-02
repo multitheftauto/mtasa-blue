@@ -16,7 +16,22 @@
 bool CPlayerResourceStartPacket::Read(NetBitStreamInterface& BitStream)
 {
     ushort usResourceNetId;
-    BitStream.Read(usResourceNetId);
+    if (!BitStream.Read(usResourceNetId))
+        return false;
+
+    if (BitStream.Can(eBitStreamVersion::OnPlayerResourceStartGeneration))
+    {
+        if (!BitStream.Read(m_uiStartGeneration))
+            return false;
+
+        m_bHasStartGeneration = true;
+    }
+    else
+    {
+        m_uiStartGeneration = 0;
+        m_bHasStartGeneration = false;
+    }
+
     m_pResource = g_pGame->GetResourceManager()->GetResourceFromNetID(usResourceNetId);
     return true;
 }
