@@ -21,7 +21,7 @@ public:
     virtual void                            SetName(const char* szName) = 0;
     virtual void                            SetSequences(CAnimBlendSequenceSAInterface* pSequences) = 0;
     virtual void                            SetNumSequences(unsigned short uNumSequences) = 0;
-    virtual void                            SetRunningCompressed(bool bCompressed) = 0;
+    virtual void                            SetRunningCompressed(bool bCompressed, bool isANPK) = 0;
     virtual void                            SetAnimationBlockID(int iBlockID) = 0;
     virtual void                            RemoveAnimSequences() = 0;
     virtual void                            RemoveFromUncompressedCache() = 0;

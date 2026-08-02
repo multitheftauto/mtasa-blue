@@ -25,7 +25,7 @@ void CAnimBlendHierarchySA::Initialize()
     m_pInterface->pSequences = 0;
     m_pInterface->usNumSequences = 0;
     m_pInterface->bRunningCompressed = 0;
-    m_pInterface->pad = 0;
+    m_pInterface->keepCompressed = 0;
     m_pInterface->iAnimBlockID = -1;
     m_pInterface->fTotalTime = 0;
     m_pInterface->pLinkPtr = 0;
