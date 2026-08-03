@@ -703,7 +703,6 @@ public:
     float                                    m_fHealth;
     float                                    m_armor;
     bool                                     m_bDead;
-    // Animation this ped died with; restores its final pose when the streamer recreates it.
     AssocGroupId                             m_deathAnimGroup;
     AnimationId                              m_deathAnimID;
     bool                                     m_bWorldIgnored;
