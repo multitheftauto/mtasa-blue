@@ -158,7 +158,7 @@ CommandExecutionResult CRegisteredCommands::ProcessCommand(const char* szKey, co
     CommandExecutionResult result;
 
     // Call the handler for every virtual machine that matches the given key
-    int  iCompareResult;
+    int iCompareResult;
     m_bIteratingList = true;
     list<SCommand*>::const_iterator iter = m_Commands.begin();
     for (; iter != m_Commands.end(); iter++)

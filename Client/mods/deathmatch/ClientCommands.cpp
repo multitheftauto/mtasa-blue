@@ -59,41 +59,32 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
         strClumpedCommand = UTF16ToMbUTF8(strClumpedCommandUTF);
 
         CClientPlayer* localPlayer = g_pClientGame->GetLocalPlayer();
-        
-        // First try to process with registered Lua commands
+
+        // Trigger onClientCommand event first to allow cancellation of any client command
+        if (localPlayer != nullptr)
+        {
+            CLuaArguments arguments;
+            arguments.PushString(szCommandBufferPointer);
+            arguments.PushBoolean(false);  // executedByFunction
+            arguments.PushString(szArguments ? szArguments : "");
+
+            localPlayer->CallEvent("onClientCommand", arguments, false);
+
+            // If command was intercepted and cancelled by event, don't execute or send to server
+            if (g_pClientGame->GetEvents()->WasEventCancelled())
+            {
+                return true;
+            }
+        }
+
+        // Try to process with registered Lua commands
         CommandExecutionResult commandResult = g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommandBufferPointer, szArguments, false);
-        
+
         // If command was handled by Lua, don't send to server
         if (commandResult.wasExecuted)
         {
-            return true; // Command was handled locally, don't send to server
+            return true;
         }
-        
-        // If no Lua handler was found, trigger onClientCommand event to allow interception
-        CLuaArguments arguments;
-        arguments.PushString(szCommandBufferPointer);
-        arguments.PushBoolean(false); // executedByFunction
-        
-        if (szArguments && *szArguments)
-        {
-            std::istringstream stream{szArguments};
-            for (std::string arg; stream >> arg;)
-            {
-                arguments.PushString(arg.c_str());
-            }
-        }
-        
-        if (localPlayer)
-        {
-            localPlayer->CallEvent("onClientCommand", arguments, false);
-            
-            // If command was handled by onClientCommand event, don't send to server
-            if (g_pClientGame->GetEvents()->WasEventCancelled())
-            {
-                return true; // Command was intercepted and handled
-            }
-        }
-       
 
         if (localPlayer != nullptr)
         {
@@ -143,7 +134,7 @@ bool COMMAND_Executed(const char* szCommand, const char* szArguments, bool bHand
         if (bAllowScriptedBind)
         {
             CommandExecutionResult coreCommandResult = g_pClientGame->GetRegisteredCommands()->ProcessCommand(szCommand, szArguments, false);
-            
+
             // If core command failed, don't show unknown message (these are usually keybinds)
             if (!coreCommandResult.wasExecuted)
             {

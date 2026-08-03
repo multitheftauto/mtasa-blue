@@ -84,16 +84,13 @@ bool CConsole::HandleInput(const char* szCommand, CClient* pClient, CClient* pEc
         }
 
         // Let the script handle it
-        int iClientType = pClient->GetClientType();
-        bool wasHandled = false;
-
         switch (iClientType)
         {
             case CClient::CLIENT_PLAYER:
             {
                 // See if any registered command can process it
                 CPlayer* pPlayer = static_cast<CPlayer*>(pClient);
-                wasHandled = m_pRegisteredCommands->ProcessCommand(szKey, szArguments, pClient);
+                m_pRegisteredCommands->ProcessCommand(szKey, szArguments, pClient);
 
                 // HACK: if the client gets destroyed before here, dont continue
                 if (m_pPlayerManager->Exists(pPlayer))
@@ -103,39 +100,25 @@ bool CConsole::HandleInput(const char* szCommand, CClient* pClient, CClient* pEc
                     Arguments.PushString(szCommand);
                     pPlayer->CallEvent("onConsole", Arguments);
                 }
-                
-                // If command wasn't handled, send "unknown command" message to client
-                if (!wasHandled && m_pPlayerManager->Exists(pPlayer))
-                {
-                    SString strError("Unknown command or cvar: %s", szKey);
-                    pPlayer->SendEcho(strError);
-                    return false;
-                }
                 break;
             }
             case CClient::CLIENT_CONSOLE:
             {
                 // See if any registered command can process it
                 CConsoleClient* pConsole = static_cast<CConsoleClient*>(pClient);
-                wasHandled = m_pRegisteredCommands->ProcessCommand(szKey, szArguments, pClient);
+                m_pRegisteredCommands->ProcessCommand(szKey, szArguments, pClient);
 
                 // Call the console event
                 CLuaArguments Arguments;
                 Arguments.PushString(szCommand);
                 pConsole->CallEvent("onConsole", Arguments);
-                
-                // If command wasn't handled, it's unknown
-                if (!wasHandled)
-                {
-                    return false;
-                }
                 break;
             }
             default:
                 break;
         }
-        
-        return wasHandled;
+
+        return true;
     }
 
     // Doesn't exist
