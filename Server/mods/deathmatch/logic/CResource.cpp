@@ -362,6 +362,37 @@ void CResource::Reload()
     Load();
 }
 
+EPlayerResourceStartAck CResource::AddPlayerResourceStart(CPlayer* player, unsigned int uiStartGeneration, bool bHasStartGeneration)
+{
+    if (!player || !player->IsJoined() || player->IsLeavingServer())
+        return EPlayerResourceStartAck::RaceMiss;
+
+    // Resource must have been started at least once and still be running.
+    if (!m_startCounter || m_eState != EResourceState::Running)
+        return EPlayerResourceStartAck::RaceMiss;
+
+    // First valid ack from this player for the current resource incarnation always wins.
+    // A generation mismatch here means the player's ack was in flight when a server-side
+    // restart bumped the counter; rejecting it left the join loading gate closed until the
+    // second cycle's ack arrived seconds later.
+    auto [it, inserted] = m_playersStarted.insert(player);
+    if (inserted)
+        return EPlayerResourceStartAck::Accepted;
+
+    // Player is already acked. Distinguish a stale-generation ack (race) from a true duplicate.
+    // Old clients don't send a generation, so they fall through as the current counter.
+    unsigned int uiExpectedGeneration = bHasStartGeneration ? uiStartGeneration : m_startCounter;
+    if (uiExpectedGeneration != m_startCounter)
+        return EPlayerResourceStartAck::RaceMiss;
+
+    return EPlayerResourceStartAck::Duplicate;
+}
+
+void CResource::OnPlayerQuit(CPlayer& Player)
+{
+    m_playersStarted.erase(&Player);
+}
+
 CResource::~CResource()
 {
     CIdArray::PushUniqueId(this, EIdClass::RESOURCE, m_uiScriptID);
@@ -1023,6 +1054,12 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
 
     m_eState = EResourceState::Running;
 
+    // Bump the generation counter before any handler can observe the resource as running.
+    // The CResourceStartPacket broadcast below carries this value, and onResourceStart
+    // handlers must see the same value clients will be told to ack against. Clamped past
+    // zero so a UINT_MAX wrap never reuses the "never started" value.
+    m_startCounter = std::max<unsigned int>(m_startCounter + 1, 1);
+
     // Call the onResourceStart event. If it returns false, cancel this script again
     CLuaArguments Arguments;
     Arguments.PushResource(this);
@@ -1047,7 +1084,7 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
 
     // Broadcast new resourceelement that is loaded and tell the players that a new resource was started
     g_pGame->GetMapManager()->BroadcastResourceElements(m_pResourceElement, m_pDefaultElementGroup);
-    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CResourceStartPacket(m_strResourceName.c_str(), this));
+    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CResourceStartPacket(m_strResourceName.c_str(), this, m_startCounter));
     SendNoClientCacheScripts();
     m_bClientSync = true;
 
@@ -1123,6 +1160,7 @@ bool CResource::Stop(bool bManualStop)
     // Tell all the players that have joined that this resource is stopped
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CResourceStopPacket(m_usNetID));
     m_bClientSync = false;
+    m_playersStarted.clear();
 
     // Call the onResourceStop event on this resource element
     CLuaArguments Arguments;
@@ -3334,7 +3372,7 @@ bool CResource::CheckState()
 void CResource::OnPlayerJoin(CPlayer& Player)
 {
     // do the player join crap
-    Player.Send(CResourceStartPacket(m_strResourceName.c_str(), this));
+    Player.Send(CResourceStartPacket(m_strResourceName.c_str(), this, m_startCounter));
     SendNoClientCacheScripts(&Player);
 }
 

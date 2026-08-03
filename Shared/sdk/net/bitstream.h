@@ -628,6 +628,10 @@ enum class eBitStreamVersion : unsigned short
     // 2025-06-05
     Glitch_VehicleRapidStop,
 
+    // Add resource start generation to onPlayerResourceStart ack
+    // 2026-04-06
+    OnPlayerResourceStartGeneration,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

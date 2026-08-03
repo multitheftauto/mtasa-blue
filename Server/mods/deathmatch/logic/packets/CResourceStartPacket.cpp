@@ -18,10 +18,11 @@
 #include "CResource.h"
 #include "CDummy.h"
 
-CResourceStartPacket::CResourceStartPacket(const char* szResourceName, CResource* pResource)
+CResourceStartPacket::CResourceStartPacket(const char* szResourceName, CResource* pResource, unsigned int uiStartCounter)
 {
     m_strResourceName = szResourceName;
     m_pResource = pResource;
+    m_uiStartCounter = uiStartCounter;
 }
 
 bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
@@ -75,6 +76,11 @@ bool CResourceStartPacket::Write(NetBitStreamInterface& BitStream) const
         if (BitStream.Version() >= 0x62)
         {
             BitStream.Write(m_pResource->GetDownloadPriorityGroup());
+        }
+
+        if (BitStream.Can(eBitStreamVersion::OnPlayerResourceStartGeneration))
+        {
+            BitStream.Write(m_uiStartCounter);
         }
 
         // Send the resource files info

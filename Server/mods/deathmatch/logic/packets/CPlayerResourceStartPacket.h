@@ -26,7 +26,11 @@ public:
     bool Read(NetBitStreamInterface& BitStream);
 
     CResource* GetResource() const { return m_pResource; }
+    unsigned int GetStartGeneration() const { return m_uiStartGeneration; }
+    bool HasStartGeneration() const { return m_bHasStartGeneration; }
 
 private:
-    CResource* m_pResource;
+    CResource*   m_pResource{};
+    unsigned int m_uiStartGeneration{};
+    bool         m_bHasStartGeneration{};
 };
