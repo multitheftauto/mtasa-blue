@@ -84,7 +84,7 @@ bool CConsole::HandleInput(const char* szCommand, CClient* pClient, CClient* pEc
         }
 
         // Let the script handle it
-        switch (iClientType)
+        switch (pClient->GetClientType())
         {
             case CClient::CLIENT_PLAYER:
             {
