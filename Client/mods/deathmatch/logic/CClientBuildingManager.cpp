@@ -138,7 +138,8 @@ bool CClientBuildingManager::SetPoolCapacity(size_t newCapacity)
 {
     const int currentUsed = g_pGame->GetPools()->GetNumberOfUsedSpaces(ePools::BUILDING_POOL);
 
-    if (newCapacity - currentUsed < PRESERVED_POOL_SIZE)
+    // Reject invalid capacities before temporarily destroying resource-created buildings.
+    if (newCapacity > static_cast<size_t>(std::numeric_limits<int>::max()) || newCapacity < static_cast<size_t>(currentUsed) + PRESERVED_POOL_SIZE)
         return false;
 
     return DoPoolResize(newCapacity);
