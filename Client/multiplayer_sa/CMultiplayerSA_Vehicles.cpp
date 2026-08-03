@@ -10,6 +10,22 @@
 
 #include "StdInc.h"
 
+#define CALL_CClumpModelInfo_FindFrameFromName_Stricmp 0x4C5311
+
+static int __cdecl CompareVehicleComponentName(const char* expectedName, const char* frameName)
+{
+    const int result = _stricmp(expectedName, frameName);
+    if (result == 0)
+        return 0;
+
+    // The stock DFT-30 model names its left middle wheel "wheel_lm", while
+    // the vehicle hierarchy expects "wheel_lm_dummy".
+    if (_stricmp(expectedName, "wheel_lm_dummy") == 0 && _stricmp(frameName, "wheel_lm") == 0)
+        return 0;
+
+    return result;
+}
+
 static bool __fastcall AreVehicleDoorsUndamageable(CVehicleSAInterface* vehicle)
 {
     SClientEntity<CVehicleSA>* pair = pGameInterface->GetPools()->GetVehicle((DWORD*)vehicle);
@@ -72,4 +88,5 @@ static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 void CMultiplayerSA::InitHooks_Vehicles()
 {
     EZHookInstall(CDamageManager__ProgressDoorDamage);
+    HookInstallCall(CALL_CClumpModelInfo_FindFrameFromName_Stricmp, (DWORD)CompareVehicleComponentName);
 }
