@@ -293,6 +293,8 @@ public:
     void SetIsDead(bool bDead) noexcept { m_bDead = bDead; };
     void Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bStealth = false, bool bSetDirectlyDead = false, AssocGroupId animGroup = 0,
               AnimationId animID = 15);
+    // Holds the death animation on its last frame so a recreated ped is posed at once.
+    void FreezeDeathAnimationOnLastFrame();
     void StealthKill(CClientPed* pPed);
     void BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
 
@@ -701,6 +703,9 @@ public:
     float                                    m_fHealth;
     float                                    m_armor;
     bool                                     m_bDead;
+    // Animation this ped died with; restores its final pose when the streamer recreates it.
+    AssocGroupId                             m_deathAnimGroup;
+    AnimationId                              m_deathAnimID;
     bool                                     m_bWorldIgnored;
     float                                    m_fCurrentRotation;
     float                                    m_fMoveSpeed;
