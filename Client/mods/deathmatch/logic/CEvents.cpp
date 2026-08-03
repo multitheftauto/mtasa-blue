@@ -149,10 +149,29 @@ void CEvents::PostEventPulse()
 
 void CEvents::CancelEvent(bool bCancelled)
 {
+    // During server->client remote events, only the handler's own VM may cancel the pulse.
+    if (m_iRemoteServerEventPulseDepth > 0 && m_pActiveEventHandlerLuaMain)
+    {
+        CLuaMain* pCaller = g_pClientGame->GetScriptDebugging()->GetTopLuaMain();
+        if (pCaller != m_pActiveEventHandlerLuaMain)
+            return;
+    }
+
     m_bEventCancelled = bCancelled;
 }
 
 bool CEvents::WasEventCancelled()
 {
     return m_bWasEventCancelled;
+}
+
+void CEvents::PushRemoteServerEventPulse()
+{
+    ++m_iRemoteServerEventPulseDepth;
+}
+
+void CEvents::PopRemoteServerEventPulse()
+{
+    if (m_iRemoteServerEventPulseDepth > 0)
+        --m_iRemoteServerEventPulseDepth;
 }

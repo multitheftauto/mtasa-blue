@@ -5047,7 +5047,9 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
                         CClientEntity* pEntity = CElementIDs::GetElement(EntityID);
                         if (pEntity)
                         {
+                            g_pClientGame->GetEvents()->PushRemoteServerEventPulse();
                             pEntity->CallEvent(szName, Arguments, true);
+                            g_pClientGame->GetEvents()->PopRemoteServerEventPulse();
                         }
                     }
                     else
