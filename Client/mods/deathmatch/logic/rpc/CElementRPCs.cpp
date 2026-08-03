@@ -269,6 +269,35 @@ void CElementRPCs::SetElementInterior(CClientEntity* pSource, NetBitStreamInterf
                 pSource->SetPosition(vecPosition);
             }
         }
+
+        CClientColManager* pColManager = m_pClientGame->GetManager()->GetColManager();
+        switch (pSource->GetType())
+        {
+            case CCLIENTPLAYER:
+            case CCLIENTPED:
+            case CCLIENTVEHICLE:
+            {
+                CVector vecEntityPosition;
+                pSource->GetPosition(vecEntityPosition);
+                pColManager->DoHitDetection(vecEntityPosition, 0.0f, pSource);
+                break;
+            }
+            case CCLIENTMARKER:
+            case CCLIENTPICKUP:
+            {
+                CClientColShape* pColShape = NULL;
+                if (pSource->GetType() == CCLIENTMARKER)
+                    pColShape = static_cast<CClientMarker*>(pSource)->GetColShape();
+                else
+                    pColShape = static_cast<CClientPickup*>(pSource)->GetColShape();
+
+                if (pColShape)
+                    CStaticFunctionDefinitions::RefreshColShapeColliders(pColShape);
+                break;
+            }
+            default:
+                break;
+        }
     }
 }
 

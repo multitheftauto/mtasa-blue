@@ -1970,6 +1970,10 @@ void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bSt
     if (IsWearingGoggles())
         SetWearingGoggles(false, false);
 
+    // Clear the targeting marker so it doesn't stay on screen after death
+    if (m_pPlayerPed)
+        m_pPlayerPed->SetTargetedEntity(nullptr);
+
     m_bDead = true;
 }
 
@@ -2931,6 +2935,13 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         // We need to do it here because the anim starts on the next frame after calling RunNamedAnimation
         if (m_pAnimationBlock && m_AnimationCache.progressWaitForStreamIn && IsAnimationInProgress())
             UpdateAnimationProgressAndSpeed();
+
+        // Same "next frame" issue as above: the gateway swap to our custom hierarchy (see
+        // CClientGame::BlendAnimationHierarchyHandler) only takes effect in the game's animation blend
+        // a frame after RunNamedAnimation was called, so we can only trim a partial anim's padding once
+        // it's actually playing. Runs every frame while a custom animation is active; cheap and idempotent.
+        if (m_pAnimationBlock && m_bisCurrentAnimationCustom)
+            UpdateCustomPartialAnimationBones();
 
         // Update our alpha
         unsigned char ucAlpha = m_ucAlpha;
@@ -6029,6 +6040,31 @@ void CClientPed::UpdateAnimationProgressAndSpeed()
     animAssoc->SetCurrentSpeed(m_AnimationCache.speed);
 
     m_AnimationCache.progressWaitForStreamIn = false;
+}
+
+void CClientPed::UpdateCustomPartialAnimationBones()
+{
+    std::shared_ptr<CClientIFP> pIFP = GetCustomAnimationIFP();
+    if (!pIFP)
+        return;
+
+    // This is the same name handed to SetNextAnimationCustom for the swap that's now live
+    // (m_bisCurrentAnimationCustom); it isn't cleared once consumed.
+    const SString& strCustomAnimName = GetNextAnimationCustomName();
+
+    auto* pCustomHierarchyInterface = pIFP->GetAnimationHierarchy(strCustomAnimName);
+    if (!pCustomHierarchyInterface)
+        return;
+
+    // Bones the source IFP animation doesn't define are padded out to a fixed pose (see CClientIFP),
+    // so a full mask means there's nothing to restrict and we can skip finding the association at all.
+    std::bitset<32> animatedBonesMask = pIFP->GetAnimatedBonesMask(strCustomAnimName);
+    if (animatedBonesMask.all())
+        return;
+
+    auto pCustomAnimAssociation = GetAnimAssociation(pCustomHierarchyInterface);
+    if (pCustomAnimAssociation)
+        pCustomAnimAssociation->RestrictToBones(animatedBonesMask);
 }
 
 void CClientPed::PostWeaponFire()

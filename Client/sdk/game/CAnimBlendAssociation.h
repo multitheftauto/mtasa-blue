@@ -11,6 +11,7 @@
 
 #pragma once
 
+#include <bitset>
 #include <memory>
 
 typedef unsigned long AssocGroupId;
@@ -42,7 +43,11 @@ public:
     virtual bool  IsPartial() const = 0;
     // Drops any blend node for a bone the original animation doesn't animate, so a custom replacement
     // for a partial anim can't drive the bones (root, pelvis, legs) the original left to the movement anim.
-    virtual void  RestrictToBonesOf(const CAnimBlendStaticAssociationSAInterface* pOriginalAssoc) = 0;
+    virtual void RestrictToBonesOf(const CAnimBlendStaticAssociationSAInterface* pOriginalAssoc) = 0;
+    // Same idea as RestrictToBonesOf, but driven directly by a bone mask (bit i set means bone i is
+    // animated) instead of comparing against another association. Used for custom animations played
+    // from a custom IFP bank, which have no built-in association to compare against.
+    virtual void  RestrictToBones(std::bitset<32> animatedBonesMask) = 0;
     virtual void  SetCurrentProgress(float fProgress) = 0;
     virtual float GetCurrentProgress() const noexcept = 0;
     virtual void  SetCurrentSpeed(float fSpeed) = 0;

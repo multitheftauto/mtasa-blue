@@ -149,6 +149,19 @@ void CAnimBlendAssociationSA::RestrictToBonesOf(const CAnimBlendStaticAssociatio
     }
 }
 
+void CAnimBlendAssociationSA::RestrictToBones(std::bitset<32> animatedBonesMask)
+{
+    // Same padding problem as RestrictToBonesOf, but for animations played directly from a custom IFP
+    // bank rather than replacing a built-in one. There's no built-in association to compare against, so
+    // the caller passes the set of bones the source IFP animation itself defines (see CClientIFP).
+    for (unsigned short i = 0; i < m_pInterface->cNumBlendNodes; i++)
+    {
+        const bool isAnimated = i < animatedBonesMask.size() && animatedBonesMask.test(i);
+        if (!isAnimated)
+            m_pInterface->pAnimBlendNodeArray[i].pAnimSequence = nullptr;
+    }
+}
+
 void CAnimBlendAssociationSA::SetCurrentProgress(float fProgress)
 {
     float fTime = m_pInterface->pAnimHierarchy->fTotalTime * fProgress;
