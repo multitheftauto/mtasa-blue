@@ -1643,6 +1643,24 @@ float CWeaponStatManager::GetWeaponRangeFromSkillLevel(eWeaponType eWeapon, floa
     return fWeaponRange;
 }
 
+// The shooter's skill stat is not a reliable predictor of the range the firing client used:
+// the server starts every stat at zero while the client sizes its shot with hitman data, so a
+// pistol reported at its 35m range would be measured against the 30m poor entry. Bullet sync
+// only needs an upper bound, so take the widest tier the weapon has.
+float CWeaponStatManager::GetMaxWeaponRange(eWeaponType eWeapon)
+{
+    float fWeaponRange = 0.0f;
+
+    for (eWeaponSkill skill : {WEAPONSKILL_POOR, WEAPONSKILL_STD, WEAPONSKILL_PRO})
+    {
+        CWeaponStat* pWeaponStat = GetWeaponStats(eWeapon, skill);
+        if (pWeaponStat)
+            fWeaponRange = std::max(fWeaponRange, pWeaponStat->GetWeaponRange());
+    }
+
+    return fWeaponRange;
+}
+
 bool CWeaponStatManager::HasWeaponBulletSync(uint32_t weaponID) noexcept
 {
     return weaponID >= 22 && weaponID <= 34;

@@ -28,6 +28,14 @@ namespace
 
     // Typical sniper rifle range
     constexpr float kWeaponRange = 100.0f;
+
+    // Colt 45 / Silenced / Deagle at poor skill - the shortest range in the bullet sync set
+    constexpr float kHandgunRange = 30.0f;
+
+    constexpr float ExpectedLimit(float range)
+    {
+        return range * BulletSync::RANGE_TOLERANCE + BulletSync::RANGE_SLACK;
+    }
 }  // namespace
 
 ///////////////////////////////////////////////////////////////
@@ -87,15 +95,51 @@ TEST(BulletSyncValidation, TrajectoryRejectsZeroLength)
 TEST(BulletSyncValidation, TrajectoryRejectsShotBeyondWeaponRange)
 {
     const CVector start(100.0f, 100.0f, 10.0f);
-    const CVector end(100.0f + kWeaponRange * BulletSync::RANGE_TOLERANCE + 1.0f, 100.0f, 10.0f);
+    const CVector end(100.0f + ExpectedLimit(kWeaponRange) + 1.0f, 100.0f, 10.0f);
     EXPECT_EQ(BulletSync::EResult::TrajectoryTooLong, BulletSync::ValidateTrajectory(start, end, kWeaponRange));
 }
 
 TEST(BulletSyncValidation, TrajectoryAllowsRangeTolerance)
 {
     const CVector start(100.0f, 100.0f, 10.0f);
-    const CVector end(100.0f + kWeaponRange * BulletSync::RANGE_TOLERANCE - 0.5f, 100.0f, 10.0f);
+    const CVector end(100.0f + ExpectedLimit(kWeaponRange) - 0.5f, 100.0f, 10.0f);
     EXPECT_EQ(BulletSync::EResult::Valid, BulletSync::ValidateTrajectory(start, end, kWeaponRange));
+}
+
+// Regression for #5122. The packet reports the gun muzzle as the start while the game traced the
+// shot from the camera, so a handgun fired at its nominal range measures noticeably longer than
+// that range. Scaling the tolerance alone leaves 3m of headroom on a 30m weapon, which dropped
+// ordinary handgun shots and took onPlayerWeaponFire down with them.
+TEST(BulletSyncValidation, TrajectoryAcceptsShortRangeWeaponWithCameraOffset)
+{
+    const CVector start(100.0f, 100.0f, 10.0f);
+
+    for (const float length : {30.0f, 35.0f, 40.0f})
+    {
+        const CVector end(100.0f + length, 100.0f, 10.0f);
+        EXPECT_EQ(BulletSync::EResult::Valid, BulletSync::ValidateTrajectory(start, end, kHandgunRange)) << "handgun shot of " << length << "m";
+    }
+}
+
+// The slack is a fixed allowance, not an open door for short range weapons
+TEST(BulletSyncValidation, TrajectoryStillRejectsShortRangeWeaponAtRifleDistance)
+{
+    const CVector start(100.0f, 100.0f, 10.0f);
+    const CVector end(170.0f, 100.0f, 10.0f);
+    EXPECT_EQ(BulletSync::EResult::TrajectoryTooLong, BulletSync::ValidateTrajectory(start, end, kHandgunRange));
+}
+
+// Long range weapons gain the same absolute slack, not a proportional one
+TEST(BulletSyncValidation, TrajectorySlackDoesNotScaleWithRange)
+{
+    constexpr float sniperRange = 300.0f;
+    const CVector   start(100.0f, 100.0f, 10.0f);
+
+    const CVector withinLimit(100.0f + ExpectedLimit(sniperRange) - 1.0f, 100.0f, 10.0f);
+    EXPECT_EQ(BulletSync::EResult::Valid, BulletSync::ValidateTrajectory(start, withinLimit, sniperRange));
+
+    const CVector beyondLimit(100.0f + ExpectedLimit(sniperRange) + 1.0f, 100.0f, 10.0f);
+    EXPECT_EQ(BulletSync::EResult::TrajectoryTooLong, BulletSync::ValidateTrajectory(start, beyondLimit, sniperRange));
 }
 
 // A high bullet: end far above the muzzle must fail on length, not slip through on height

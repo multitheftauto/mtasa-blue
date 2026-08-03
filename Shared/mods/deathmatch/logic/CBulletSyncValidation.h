@@ -33,6 +33,12 @@ namespace BulletSync
     // Skill stats and network timing make the reported length drift from the nominal range.
     inline constexpr float RANGE_TOLERANCE = 1.1f;
 
+    // The reported start is the gun muzzle, but the game traces the shot from the camera, so the
+    // measured length picks up the third person camera offset. That offset does not shrink with
+    // the weapon range: a proportional tolerance alone leaves a 30m pistol just 3m of headroom
+    // and drops ordinary shots, while a rifle never notices. Slack has to be absolute.
+    inline constexpr float RANGE_SLACK = 15.0f;
+
     // Distance between the shooter and the muzzle position they report. Vehicle weapons
     // have large offsets (Hunter ~5m) on top of vehicle size and lag compensation.
     inline constexpr float MAX_MUZZLE_OFFSET_ON_FOOT = 50.0f;
@@ -86,7 +92,7 @@ namespace BulletSync
 
         float limit = MAX_TRAJECTORY_LENGTH;
         if (maxRange > 0.0f)
-            limit = std::min(maxRange * RANGE_TOLERANCE, MAX_TRAJECTORY_LENGTH);
+            limit = std::min(maxRange * RANGE_TOLERANCE + RANGE_SLACK, MAX_TRAJECTORY_LENGTH);
 
         if (lengthSq > limit * limit)
             return EResult::TrajectoryTooLong;

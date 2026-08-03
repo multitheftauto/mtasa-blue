@@ -76,8 +76,7 @@ bool CBulletsyncPacket::ValidateAgainstShooter(CPlayer* player)
     if (BulletSync::ValidateMuzzleOrigin(player->GetPosition(), m_start, player->GetOccupiedVehicle() != nullptr) != BulletSync::EResult::Valid)
         return false;
 
-    const float skillLevel = player->GetPlayerStat(CWeaponStatManager::GetSkillStatIndex(m_weapon));
-    const float range = g_pGame->GetWeaponStatManager()->GetWeaponRangeFromSkillLevel(m_weapon, skillLevel);
+    const float range = g_pGame->GetWeaponStatManager()->GetMaxWeaponRange(m_weapon);
 
     return BulletSync::ValidateTrajectory(m_start, m_end, range) == BulletSync::EResult::Valid;
 }
