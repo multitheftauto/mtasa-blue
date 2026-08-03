@@ -293,5 +293,7 @@ enum eElementRPCFunctions
 
     SET_ELEMENT_ON_FIRE,
 
+    SET_VEHICLE_NITRO_COLOR,
+
     NUM_RPC_FUNCS  // Add above this line
 };

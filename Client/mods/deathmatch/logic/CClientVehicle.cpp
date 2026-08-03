@@ -2682,6 +2682,7 @@ void CClientVehicle::Create()
         m_pVehicle->SetSmokeTrailEnabled(m_bSmokeTrail);
         m_pVehicle->SetGravity(&m_vecGravity);
         m_pVehicle->SetHeadLightColor(m_HeadLightColor);
+        m_pVehicle->SetNitroColor(m_NitroColor);
         m_pVehicle->SetRadioStatus(0);
 
         if (IsNitroInstalled())
@@ -4109,6 +4110,22 @@ void CClientVehicle::SetHeadLightColor(const SColor color)
         m_pVehicle->SetHeadLightColor(color);
 
     m_HeadLightColor = color;
+}
+
+std::optional<SColor> CClientVehicle::GetNitroColor()
+{
+    if (m_pVehicle)
+        return m_pVehicle->GetNitroColor();
+
+    return m_NitroColor;
+}
+
+void CClientVehicle::SetNitroColor(const std::optional<SColor> color)
+{
+    if (m_pVehicle)
+        m_pVehicle->SetNitroColor(color);
+
+    m_NitroColor = color;
 }
 
 //

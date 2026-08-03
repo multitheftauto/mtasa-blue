@@ -33,7 +33,35 @@ public:
 };
 static_assert(sizeof(CAEFireAudioEntitySAInterface) == 0x88, "Invalid size for CAEFireAudioEntitySAInterface");
 
-class FxInfoSAInterface;
+// Internal SA Name: FxInfo_c
+// nType is one of the eFxInfoType values (e.g. FX_INFO_COLOUR_DATA)
+class FxInfoSAInterface
+{
+public:
+    void*    vmt;    // 0x00
+    uint16_t nType;  // 0x04
+};
+
+constexpr uint16_t FX_INFO_COLOUR_DATA = 0x4001;
+constexpr uint16_t FX_INFO_COLOURBRIGHT_DATA = 0x4400;
+constexpr uint16_t FX_INFO_COLOURRANGE_DATA = 0x4100;
+
+// Internal SA Name: FxInfoColour_c (FxInfo_c + an embedded FxInterpInfoU255_c)
+// Holds ppChannelValues[channel][keyframe] for nNumChannels channels (4 = R, G, B, A) of
+// nNumKeyframes keyframes each. Values are fixed-point, scaled by 1/256.
+class FxInfoColorSAInterface : public FxInfoSAInterface
+{
+public:
+    void*      pInterpInfoVmt;   // 0x08
+    bool       bLooped;          // 0x0C
+    int8_t     nNumKeyframes;    // 0x0D
+    int8_t     nNumChannels;     // 0x0E
+    char       pad;              // 0x0F
+    uint16_t*  pTimes;           // 0x10
+    uint16_t** ppChannelValues;  // 0x14
+};
+static_assert(sizeof(FxInfoColorSAInterface) == 0x18, "Invalid size for FxInfoColorSAInterface");
+
 class CFxSystemBPSAInterface;
 
 class CFxSystemSAInterface  // Internal SA Name: FxSystem_c
@@ -103,10 +131,10 @@ protected:
 class FxInfoManagerSAInterface
 {
 public:
-    uint32_t           m_nNumInfos;           // 0x00
-    FxInfoSAInterface* m_pInfos;              // 0x04
-    uint8_t            m_nFirstMovementInfo;  // 0x08
-    uint8_t            m_nFirstRenderInfo;    // 0x09
+    uint32_t            m_nNumInfos;           // 0x00
+    FxInfoSAInterface** m_pInfos;              // 0x04
+    uint8_t             m_nFirstMovementInfo;  // 0x08
+    uint8_t             m_nFirstRenderInfo;    // 0x09
 };
 static_assert(sizeof(FxInfoManagerSAInterface) == 0xC, "Invalid size for FxInfoManagerSAInterface");
 
@@ -143,4 +171,13 @@ public:
     CFxEmitterBPSAInterface* pBlueprint;  // 0x04
     CFxSystemSAInterface*    pOwner;      // 0x08
     // TODO the rest
+};
+
+// Internal SA Name: FxParticle_c
+// A single particle instance, owned by an FxSystem_c and rendered via its FxEmitterBP_c.
+class CFxParticleSAInterface
+{
+public:
+    uint8_t               pad[0x28];  // 0x00
+    CFxSystemSAInterface* pSystem;    // 0x28
 };
