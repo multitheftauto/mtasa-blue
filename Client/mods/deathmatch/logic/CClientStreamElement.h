@@ -12,6 +12,7 @@
 
 #include "CClientEntity.h"
 #include <cstdint>
+#include <optional>
 class CClientStreamer;
 class CClientStreamSector;
 class CClientStreamSectorRow;
@@ -47,6 +48,24 @@ public:
     virtual CSphere         GetWorldBoundingSphere();
     float                   GetDistanceToBoundingBoxSquared(const CVector& vecPosition);
 
+    CClientStreamer* GetStreamer() const noexcept { return m_pStreamer; }
+
+    // Effective range, resolved as element > model > element type > streamer default.
+    // Derived forms are cached because Restream() reads them for every active element every frame.
+    float GetStreamDistance() const noexcept { return m_fStreamDistance; }
+    float GetStreamDistanceExp() const noexcept { return m_fStreamDistanceExp; }
+    float GetStreamThresholdExp() const noexcept { return m_fStreamThresholdExp; }
+    float GetInvStreamDistanceExp() const noexcept { return m_fInvStreamDistanceExp; }
+
+    // Camera distance as a fraction of this element's own range, so elements with different
+    // ranges can be prioritised against each other fairly.
+    float GetStreamPriority() const noexcept { return m_fStreamPriority; }
+
+    bool  HasCustomStreamDistance() const noexcept { return m_fCustomStreamDistance > 0.0f; }
+    float GetCustomStreamDistance() const noexcept { return m_fCustomStreamDistance; }
+    void  SetCustomStreamDistance(std::optional<float> distance);
+    void  RefreshStreamDistance();
+
     bool IsStreamingCompatibleClass() { return true; };
 
     virtual bool IsVisibleInAllDimensions() { return false; };
@@ -55,11 +74,20 @@ private:
     void SetStreamRow(CClientStreamSectorRow* pRow) { m_pStreamRow = pRow; }
     void SetStreamSector(CClientStreamSector* pSector) { m_pStreamSector = pSector; }
     void SetExpDistance(float fDistance) { m_fExpDistance = fDistance; }
+    void SetStreamPriority(float fPriority) { m_fStreamPriority = fPriority; }
+
+    void ApplyStreamDistance(float fDistance);
 
     CClientStreamSectorRow* m_pStreamRow;
     CClientStreamSector*    m_pStreamSector;
     CVector                 m_vecStreamPosition;
     float                   m_fExpDistance;
+    float                   m_fStreamPriority;
+    float                   m_fCustomStreamDistance;
+    float                   m_fStreamDistance;
+    float                   m_fStreamDistanceExp;
+    float                   m_fStreamThresholdExp;
+    float                   m_fInvStreamDistanceExp;
     unsigned short          m_usStreamReferences, m_usStreamReferencesScript;
 
 protected:

@@ -18,9 +18,14 @@ CClientStreamer::CClientStreamer(StreamerLimitReachedFunction* pLimitReachedFunc
     : m_fSectorSize(fSectorSize), m_fRowSize(fRowSize)
 {
     // Setup our distance variables
-    m_fMaxDistanceExp = fMaxDistance * fMaxDistance;
-    m_fMaxDistanceThreshold = (fMaxDistance + 50.0f) * (fMaxDistance + 50.0f);
+    m_fMaxDistance = fMaxDistance;
+    m_fLargestPinnedDistance = 0.0f;
     m_usDimension = 0;
+
+    // Restream() ranks elements by the fraction of their own range, so the swap hysteresis has to
+    // live in that space too. Deriving it from the default range keeps the original behaviour for
+    // elements without a custom stream distance.
+    m_fSwapHysteresisRatio = (10.0f * 10.0f) / (fMaxDistance * fMaxDistance);
 
     // We need the limit reached func
     assert(pLimitReachedFunc);
@@ -188,7 +193,7 @@ void                CClientStreamer::DoPulse(CVector& vecPosition)
 
     // Update distances every frame
     SetExpDistances(&m_ActiveElements);
-    m_ActiveElements.sort(CompareExpDistance);
+    m_ActiveElements.sort(CompareStreamPriority);
 
     Restream(bMovedFar);
 }
@@ -311,7 +316,7 @@ void CClientStreamer::OnUpdateStreamPosition(CClientStreamElement* pElement)
     else
     {
         // Make sure our distance is updated
-        pElement->SetExpDistance(pElement->GetDistanceToBoundingBoxSquared(m_vecPosition));
+        UpdateElementDistance(pElement);
     }
 }
 
@@ -332,6 +337,18 @@ void CClientStreamer::RemoveElement(CClientStreamElement* pElement)
     m_ActiveElements.remove(pElement);
     m_ActiveElementSet.erase(pElement);
     m_ToStreamOut.remove(pElement);
+
+    if (m_PinnedElements.erase(pElement) > 0)
+        RecalculateLargestPinnedDistance();
+}
+
+void CClientStreamer::UpdateElementDistance(CClientStreamElement* pElement)
+{
+    const float fDistance = pElement->GetDistanceToBoundingBoxSquared(m_vecPosition);
+
+    // m_fExpDistance stays in world units because other systems (nametags) read it directly
+    pElement->SetExpDistance(fDistance);
+    pElement->SetStreamPriority(fDistance * pElement->GetInvStreamDistanceExp());
 }
 
 void CClientStreamer::SetExpDistances(list<CClientStreamElement*>* pList)
@@ -343,15 +360,14 @@ void CClientStreamer::SetExpDistances(list<CClientStreamElement*>* pList)
     {
         pElement = *iter;
         // Set its distance ^ 2
-        pElement->SetExpDistance(pElement->GetDistanceToBoundingBoxSquared(m_vecPosition));
+        UpdateElementDistance(pElement);
     }
 }
 
 void CClientStreamer::AddToSortedList(list<CClientStreamElement*>* pList, CClientStreamElement* pElement)
 {
     // Make sure it's exp distance is updated
-    float fDistance = pElement->GetDistanceToBoundingBoxSquared(m_vecPosition);
-    pElement->SetExpDistance(fDistance);
+    UpdateElementDistance(pElement);
 
     // Don't add if already in the list (O(1) check)
     if (m_ActiveElementSet.count(pElement))
@@ -364,9 +380,54 @@ void CClientStreamer::AddToSortedList(list<CClientStreamElement*>* pList, CClien
     pList->push_back(pElement);
 }
 
-bool CClientStreamer::CompareExpDistance(CClientStreamElement* p1, CClientStreamElement* p2)
+bool CClientStreamer::CompareStreamPriority(CClientStreamElement* p1, CClientStreamElement* p2)
 {
-    return p1->GetExpDistance() < p2->GetExpDistance();
+    return p1->GetStreamPriority() < p2->GetStreamPriority();
+}
+
+void CClientStreamer::OnElementStreamDistanceChanged(CClientStreamElement* pElement)
+{
+    const bool bShouldPin = pElement->GetStreamDistance() > m_fMaxDistance;
+    const bool bIsPinned = IsPinnedElement(pElement);
+
+    if (bShouldPin)
+    {
+        m_PinnedElements.insert(pElement);
+
+        // A pinned element must be considered no matter which sectors are currently active
+        if (!m_ActiveElementSet.count(pElement))
+            AddToSortedList(&m_ActiveElements, pElement);
+    }
+    else if (bIsPinned)
+    {
+        m_PinnedElements.erase(pElement);
+
+        // Back to normal rules: only stay active while its sector is
+        CClientStreamSector* pSector = pElement->GetStreamSector();
+        if ((!pSector || !pSector->IsActivated()) && m_ActiveElementSet.erase(pElement) > 0)
+            m_ActiveElements.remove(pElement);
+    }
+
+    if (bShouldPin || bIsPinned)
+        RecalculateLargestPinnedDistance();
+
+    UpdateElementDistance(pElement);
+}
+
+void CClientStreamer::RestorePinnedElements()
+{
+    for (CClientStreamElement* pElement : m_PinnedElements)
+    {
+        if (!m_ActiveElementSet.count(pElement))
+            AddToSortedList(&m_ActiveElements, pElement);
+    }
+}
+
+void CClientStreamer::RecalculateLargestPinnedDistance()
+{
+    m_fLargestPinnedDistance = 0.0f;
+    for (CClientStreamElement* pElement : m_PinnedElements)
+        m_fLargestPinnedDistance = std::max(m_fLargestPinnedDistance, pElement->GetStreamDistance());
 }
 
 bool CClientStreamer::IsActiveElement(CClientStreamElement* pElement)
@@ -376,9 +437,6 @@ bool CClientStreamer::IsActiveElement(CClientStreamElement* pElement)
 
 void CClientStreamer::Restream(bool bMovedFar)
 {
-    // Avoid swap ping-pong when two candidates are almost the same distance.
-    // Distances are squared, so compare against squared hysteresis too.
-    constexpr float         swapHysteresisDistanceSq = 10.0f * 10.0f;
     constexpr std::uint32_t minStreamInDelayAfterOutMs = 100u;
     const std::uint32_t     currentTime = static_cast<std::uint32_t>(CClientTime::GetTime());
 
@@ -417,10 +475,15 @@ void CClientStreamer::Restream(bool bMovedFar)
     bool bReachedLimit = ReachedLimit();
     // Loop through our active elements list (they should be ordered closest to furthest)
     list<CClientStreamElement*>::iterator iter = m_ActiveElements.begin();
-    for (; iter != m_ActiveElements.end(); iter++)
+    while (iter != m_ActiveElements.end())
     {
         CClientStreamElement* pElement = *iter;
-        float                 fElementDistanceExp = pElement->GetExpDistance();
+
+        // Advance before streaming, because the stream in/out events let scripts remove this
+        // element from the active list (destroyElement, setElementModel, a stream distance change)
+        ++iter;
+
+        float fElementDistanceExp = pElement->GetExpDistance();
 
         // Is this element streamed in?
         if (pElement->IsStreamedIn())
@@ -458,7 +521,7 @@ void CClientStreamer::Restream(bool bMovedFar)
                 }
             }
             // Too far away? Use the threshold so we won't flicker load it if it's on the border moving.
-            if (fElementDistanceExp > m_fMaxDistanceThreshold)
+            if (fElementDistanceExp > pElement->GetStreamThresholdExp())
             {
                 // Unstream it now?
                 if (iMaxOut > 0)
@@ -489,7 +552,7 @@ void CClientStreamer::Restream(bool bMovedFar)
             if (pElement->GetDimension() == m_usDimension || pElement->IsVisibleInAllDimensions())
             {
                 // Too far away? Stop here.
-                if (fElementDistanceExp > m_fMaxDistanceExp)
+                if (fElementDistanceExp > pElement->GetStreamDistanceExp())
                     continue;
 
                 if (IS_VEHICLE(pElement))
@@ -582,7 +645,7 @@ void CClientStreamer::Restream(bool bMovedFar)
             // See if ClosestStreamedOut is nearer than FurthestStreamedIn
             CClientStreamElement* pFurthestStreamedIn = FurthestStreamedInList[iFurthestStreamedInIndex];
             CClientStreamElement* pClosestStreamedOut = ClosestStreamedOutList[uiClosestStreamedOutIndex];
-            if ((pClosestStreamedOut->GetExpDistance() + swapHysteresisDistanceSq) >= pFurthestStreamedIn->GetExpDistance())
+            if ((pClosestStreamedOut->GetStreamPriority() + m_fSwapHysteresisRatio) >= pFurthestStreamedIn->GetStreamPriority())
                 break;
 
             // Stream out FurthestStreamedIn candidate if possible
@@ -634,7 +697,7 @@ void CClientStreamer::OnEnterSector(CClientStreamSector* pSector)
                     for (; iter != pTempSector->End(); iter++)
                     {
                         pElement = *iter;
-                        if (pElement->IsStreamedIn())
+                        if (pElement->IsStreamedIn() && !IsPinnedElement(pElement))
                         {
                             // Add it to our streaming out list
                             m_ToStreamOut.push_back(pElement);
@@ -662,8 +725,9 @@ void CClientStreamer::OnEnterSector(CClientStreamSector* pSector)
         }
     }
     m_pSector = pSector;
+    RestorePinnedElements();
     SetExpDistances(&m_ActiveElements);
-    m_ActiveElements.sort(CompareExpDistance);
+    m_ActiveElements.sort(CompareStreamPriority);
 }
 
 void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClientStreamSector* pSector)
@@ -692,6 +756,12 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
                 // Add this element to our active-elements list
                 AddToSortedList(&m_ActiveElements, pElement);
             }
+        }
+        else if (IsPinnedElement(pElement))
+        {
+            // Pinned elements ignore the sector window entirely
+            if (!m_ActiveElementSet.count(pElement))
+                AddToSortedList(&m_ActiveElements, pElement);
         }
         else
         {

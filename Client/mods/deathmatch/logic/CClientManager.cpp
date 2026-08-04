@@ -302,3 +302,133 @@ void CClientManager::OnLowLODElementDestroyed()
     if (m_iNumLowLODElements == 0)
         g_pCore->GetMultiplayer()->SetLODSystemEnabled(false);
 }
+
+// Markers have no model, so they can only be targeted by an element type override
+static std::optional<std::uint16_t> GetStreamElementModel(CClientStreamElement* pElement)
+{
+    switch (pElement->GetType())
+    {
+        case CCLIENTOBJECT:
+            return static_cast<CClientObject*>(pElement)->GetModel();
+        case CCLIENTVEHICLE:
+            return static_cast<CClientVehicle*>(pElement)->GetModel();
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
+            return static_cast<std::uint16_t>(static_cast<CClientPed*>(pElement)->GetModel());
+        case CCLIENTPICKUP:
+            return static_cast<CClientPickup*>(pElement)->GetModel();
+        default:
+            return std::nullopt;
+    }
+}
+
+void CClientManager::ForEachStreamElement(const std::function<void(CClientStreamElement*)>& callback)
+{
+    for (CClientObject* pObject : m_pObjectManager->GetObjects())
+        callback(pObject);
+
+    for (auto iter = m_pVehicleManager->IterBegin(); iter != m_pVehicleManager->IterEnd(); ++iter)
+        callback(*iter);
+
+    // Players are CClientPed derived and live in the ped list as well
+    for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); ++iter)
+        callback(*iter);
+
+    for (auto iter = m_pPickupManager->IterBegin(); iter != m_pPickupManager->IterEnd(); ++iter)
+        callback(*iter);
+
+    for (CClientMarker* pMarker : m_pMarkerManager->m_Markers)
+        callback(pMarker);
+}
+
+CClientStreamer* CClientManager::GetStreamerForType(eClientEntityType type) const
+{
+    switch (type)
+    {
+        case CCLIENTOBJECT:
+            return m_pObjectStreamer;
+        case CCLIENTVEHICLE:
+            return m_pVehicleStreamer;
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
+            return m_pPlayerStreamer;
+        case CCLIENTPICKUP:
+            return m_pPickupStreamer;
+        case CCLIENTMARKER:
+            return m_pMarkerStreamer;
+        default:
+            return nullptr;
+    }
+}
+
+float CClientManager::ResolveStreamDistance(CClientStreamElement* pElement) const
+{
+    if (pElement->HasCustomStreamDistance())
+        return pElement->GetCustomStreamDistance();
+
+    if (!m_ModelStreamDistances.empty())
+    {
+        if (std::optional<std::uint16_t> model = GetStreamElementModel(pElement))
+        {
+            auto iter = m_ModelStreamDistances.find(model.value());
+            if (iter != m_ModelStreamDistances.end())
+                return iter->second;
+        }
+    }
+
+    auto iter = m_TypeStreamDistances.find(pElement->GetType());
+    if (iter != m_TypeStreamDistances.end())
+        return iter->second;
+
+    return pElement->GetStreamer()->GetDefaultStreamDistance();
+}
+
+bool CClientManager::SetTypeStreamDistance(eClientEntityType type, std::optional<float> distance)
+{
+    if (distance.has_value())
+        m_TypeStreamDistances[type] = distance.value();
+    else if (m_TypeStreamDistances.erase(type) == 0)
+        return false;
+
+    ForEachStreamElement(
+        [type](CClientStreamElement* pElement)
+        {
+            if (pElement->GetType() == type)
+                pElement->RefreshStreamDistance();
+        });
+
+    return true;
+}
+
+float CClientManager::GetTypeStreamDistance(eClientEntityType type) const
+{
+    auto iter = m_TypeStreamDistances.find(type);
+    if (iter != m_TypeStreamDistances.end())
+        return iter->second;
+
+    CClientStreamer* pStreamer = GetStreamerForType(type);
+    return pStreamer ? pStreamer->GetDefaultStreamDistance() : 0.0f;
+}
+
+bool CClientManager::SetModelStreamDistance(std::uint16_t usModel, std::optional<float> distance)
+{
+    if (distance.has_value())
+        m_ModelStreamDistances[usModel] = distance.value();
+    else if (m_ModelStreamDistances.erase(usModel) == 0)
+        return false;
+
+    ForEachStreamElement(
+        [usModel](CClientStreamElement* pElement)
+        {
+            if (GetStreamElementModel(pElement) == usModel)
+                pElement->RefreshStreamDistance();
+        });
+
+    return true;
+}
+
+float CClientManager::GetModelStreamDistance(std::uint16_t usModel) const
+{
+    auto iter = m_ModelStreamDistances.find(usModel);
+    return iter != m_ModelStreamDistances.end() ? iter->second : 0.0f;
+}

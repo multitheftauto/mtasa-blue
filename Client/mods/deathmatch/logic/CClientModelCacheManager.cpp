@@ -10,18 +10,20 @@
 #include "StdInc.h"
 #include "../../../core/CModelCacheManager.h"
 
-#define PED_STREAM_IN_DISTANCE             (250)
-#define VEHICLE_STREAM_IN_DISTANCE         (250)
-#define STREAMER_STREAM_OUT_EXTRA_DISTANCE (50)
-
-#define PED_MAX_STREAM_DISTANCE    (PED_STREAM_IN_DISTANCE + STREAMER_STREAM_OUT_EXTRA_DISTANCE)
-#define PED_MAX_STREAM_DISTANCE_SQ (PED_MAX_STREAM_DISTANCE * PED_MAX_STREAM_DISTANCE)
-
-#define VEHICLE_MAX_STREAM_DISTANCE    (VEHICLE_STREAM_IN_DISTANCE + STREAMER_STREAM_OUT_EXTRA_DISTANCE)
-#define VEHICLE_MAX_STREAM_DISTANCE_SQ (VEHICLE_MAX_STREAM_DISTANCE * VEHICLE_MAX_STREAM_DISTANCE)
-
 #define PED_MAX_VELOCITY     (10)
 #define VEHICLE_MAX_VELOCITY (10)
+
+// Caching has to happen before the streamer asks for a model, so follow the streamers' actual
+// ranges rather than their defaults - scripts can widen them with a custom stream distance
+static float GetPedStreamInDistance()
+{
+    return g_pClientGame->GetManager()->GetPlayerStreamer()->GetLargestStreamDistance() + CClientStreamer::STREAM_OUT_EXTRA_DISTANCE;
+}
+
+static float GetVehicleStreamInDistance()
+{
+    return g_pClientGame->GetManager()->GetVehicleStreamer()->GetLargestStreamDistance() + CClientStreamer::STREAM_OUT_EXTRA_DISTANCE;
+}
 
 ///////////////////////////////////////////////////////////////
 //
@@ -162,8 +164,10 @@ void CClientModelCacheManagerImpl::DoPulse()
 ///////////////////////////////////////////////////////////////
 void CClientModelCacheManagerImpl::DoPulsePedModels()
 {
+    const float fPedStreamInDistance = GetPedStreamInDistance();
+
     // Scale up query radius to compensate for the camera speed and possible ped speeds
-    float fPedQueryRadius = PED_STREAM_IN_DISTANCE + STREAMER_STREAM_OUT_EXTRA_DISTANCE + m_fSmoothCameraSpeed * 2 + PED_MAX_VELOCITY * 2;
+    float fPedQueryRadius = fPedStreamInDistance + m_fSmoothCameraSpeed * 2 + PED_MAX_VELOCITY * 2;
 
     // Get all entities within range
     CClientEntityResult result;
@@ -189,8 +193,8 @@ void CClientModelCacheManagerImpl::DoPulsePedModels()
 
     // Compile a list of ped models which should be cached
     std::map<ushort, float> newNeedCacheList;
-    ProcessPlayerList(newNeedCacheList, playerList, Square(PED_STREAM_IN_DISTANCE + STREAMER_STREAM_OUT_EXTRA_DISTANCE + m_fSmoothCameraSpeed * 2));
-    ProcessPedList(newNeedCacheList, pedList, Square(PED_STREAM_IN_DISTANCE + STREAMER_STREAM_OUT_EXTRA_DISTANCE + m_fSmoothCameraSpeed * 2));
+    ProcessPlayerList(newNeedCacheList, playerList, Square(fPedStreamInDistance + m_fSmoothCameraSpeed * 2));
+    ProcessPedList(newNeedCacheList, pedList, Square(fPedStreamInDistance + m_fSmoothCameraSpeed * 2));
 
     // Apply desired caching
     m_pCoreModelCacheManager->UpdatePedModelCaching(newNeedCacheList);
@@ -205,8 +209,10 @@ void CClientModelCacheManagerImpl::DoPulsePedModels()
 ///////////////////////////////////////////////////////////////
 void CClientModelCacheManagerImpl::DoPulseVehicleModels()
 {
+    const float fVehicleStreamInDistance = GetVehicleStreamInDistance();
+
     // Scale up query radius to compensate for the camera speed and possible vehicle speeds
-    float fVehicleQueryRadius = VEHICLE_STREAM_IN_DISTANCE + STREAMER_STREAM_OUT_EXTRA_DISTANCE + m_fSmoothCameraSpeed * 2 + VEHICLE_MAX_VELOCITY * 2;
+    float fVehicleQueryRadius = fVehicleStreamInDistance + m_fSmoothCameraSpeed * 2 + VEHICLE_MAX_VELOCITY * 2;
 
     // Get all entities within range
     CClientEntityResult result;
@@ -227,7 +233,7 @@ void CClientModelCacheManagerImpl::DoPulseVehicleModels()
 
     // Compile a list of vehicle models which should be cached
     std::map<ushort, float> newNeedCacheList;
-    ProcessVehicleList(newNeedCacheList, vehicleList, Square(VEHICLE_STREAM_IN_DISTANCE + STREAMER_STREAM_OUT_EXTRA_DISTANCE + m_fSmoothCameraSpeed * 2));
+    ProcessVehicleList(newNeedCacheList, vehicleList, Square(fVehicleStreamInDistance + m_fSmoothCameraSpeed * 2));
 
     // Apply desired caching
     m_pCoreModelCacheManager->UpdateVehicleModelCaching(newNeedCacheList);
