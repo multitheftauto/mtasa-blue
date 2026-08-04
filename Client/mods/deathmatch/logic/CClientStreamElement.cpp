@@ -55,8 +55,6 @@ void CClientStreamElement::ApplyStreamDistance(float fDistance)
 
 void CClientStreamElement::RefreshStreamDistance()
 {
-    // Derived constructors assign m_pManager before calling us, but keep the streamer default
-    // if that ever stops being true rather than dereferencing null
     if (!m_pManager)
         return;
 
@@ -65,9 +63,6 @@ void CClientStreamElement::RefreshStreamDistance()
         return;
 
     ApplyStreamDistance(fResolved);
-
-    // The streamer keeps elements reaching beyond its own radius permanently active,
-    // so it has to re-evaluate that classification
     m_pStreamer->OnElementStreamDistanceChanged(this);
 }
 

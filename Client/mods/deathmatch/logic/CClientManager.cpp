@@ -303,12 +303,13 @@ void CClientManager::OnLowLODElementDestroyed()
         g_pCore->GetMultiplayer()->SetLODSystemEnabled(false);
 }
 
-// Markers have no model, so they can only be targeted by an element type override
+// Markers and searchlights have no model, so they can only be targeted by an element type override
 static std::optional<std::uint16_t> GetStreamElementModel(CClientStreamElement* pElement)
 {
     switch (pElement->GetType())
     {
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
             return static_cast<CClientObject*>(pElement)->GetModel();
         case CCLIENTVEHICLE:
             return static_cast<CClientVehicle*>(pElement)->GetModel();
@@ -324,6 +325,7 @@ static std::optional<std::uint16_t> GetStreamElementModel(CClientStreamElement* 
 
 void CClientManager::ForEachStreamElement(const std::function<void(CClientStreamElement*)>& callback)
 {
+    // Weapons are CClientObject derived and live in the object list as well
     for (CClientObject* pObject : m_pObjectManager->GetObjects())
         callback(pObject);
 
@@ -339,13 +341,19 @@ void CClientManager::ForEachStreamElement(const std::function<void(CClientStream
 
     for (CClientMarker* pMarker : m_pMarkerManager->m_Markers)
         callback(pMarker);
+
+    for (CClientSearchLight* pSearchLight : m_pPointLightsManager->m_SearchLightList)
+        callback(pSearchLight);
 }
 
 CClientStreamer* CClientManager::GetStreamerForType(eClientEntityType type) const
 {
     switch (type)
     {
+        // Low LOD objects live on a separate streamer, but the regular object radius is the more
+        // useful answer for a script asking about "object"
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
             return m_pObjectStreamer;
         case CCLIENTVEHICLE:
             return m_pVehicleStreamer;
@@ -356,6 +364,8 @@ CClientStreamer* CClientManager::GetStreamerForType(eClientEntityType type) cons
             return m_pPickupStreamer;
         case CCLIENTMARKER:
             return m_pMarkerStreamer;
+        case CCLIENTSEARCHLIGHT:
+            return m_pLightStreamer;
         default:
             return nullptr;
     }

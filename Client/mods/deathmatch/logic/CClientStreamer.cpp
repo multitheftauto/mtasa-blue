@@ -22,9 +22,8 @@ CClientStreamer::CClientStreamer(StreamerLimitReachedFunction* pLimitReachedFunc
     m_fLargestPinnedDistance = 0.0f;
     m_usDimension = 0;
 
-    // Restream() ranks elements by the fraction of their own range, so the swap hysteresis has to
-    // live in that space too. Deriving it from the default range keeps the original behaviour for
-    // elements without a custom stream distance.
+    // Restream() ranks elements by the fraction of their own range, so the swap hysteresis lives in
+    // that space too. Deriving it from the default keeps the original behaviour for regular elements
     m_fSwapHysteresisRatio = (10.0f * 10.0f) / (fMaxDistance * fMaxDistance);
 
     // We need the limit reached func
@@ -394,7 +393,6 @@ void CClientStreamer::OnElementStreamDistanceChanged(CClientStreamElement* pElem
     {
         m_PinnedElements.insert(pElement);
 
-        // A pinned element must be considered no matter which sectors are currently active
         if (!m_ActiveElementSet.count(pElement))
             AddToSortedList(&m_ActiveElements, pElement);
     }
@@ -759,7 +757,6 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
         }
         else if (IsPinnedElement(pElement))
         {
-            // Pinned elements ignore the sector window entirely
             if (!m_ActiveElementSet.count(pElement))
                 AddToSortedList(&m_ActiveElements, pElement);
         }

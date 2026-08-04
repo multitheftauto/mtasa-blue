@@ -50,15 +50,14 @@ public:
 
     CClientStreamer* GetStreamer() const noexcept { return m_pStreamer; }
 
-    // Effective range, resolved as element > model > element type > streamer default.
-    // Derived forms are cached because Restream() reads them for every active element every frame.
+    // Derived forms are cached because Restream() reads them for every active element every frame
     float GetStreamDistance() const noexcept { return m_fStreamDistance; }
     float GetStreamDistanceExp() const noexcept { return m_fStreamDistanceExp; }
     float GetStreamThresholdExp() const noexcept { return m_fStreamThresholdExp; }
     float GetInvStreamDistanceExp() const noexcept { return m_fInvStreamDistanceExp; }
 
-    // Camera distance as a fraction of this element's own range, so elements with different
-    // ranges can be prioritised against each other fairly.
+    // Camera distance as a fraction of this element's own range, so elements with different ranges
+    // can be prioritised against each other fairly
     float GetStreamPriority() const noexcept { return m_fStreamPriority; }
 
     bool  HasCustomStreamDistance() const noexcept { return m_fCustomStreamDistance > 0.0f; }

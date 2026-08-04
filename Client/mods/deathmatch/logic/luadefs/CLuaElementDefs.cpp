@@ -2532,16 +2532,18 @@ bool CLuaElementDefs::SetElementOnFire(CClientEntity* entity, bool onFire) noexc
 
 namespace
 {
-    // The upper bound keeps a single script from pinning half the map into the streamer's
-    // permanently active list, which costs a distance update and a sort slot every frame
+    // The upper bound keeps a script from pinning half the map into the streamer's permanently
+    // active list, which costs a distance update and a sort slot every frame
     constexpr float MIN_STREAM_DISTANCE = 1.0f;
     constexpr float MAX_STREAM_DISTANCE = 3000.0f;
 
+    // Every element type that goes through CClientStreamer. Buildings, sounds, lights, effects and
+    // projectiles are absent because they are not streamed by the streamer at all
     eClientEntityType ReadStreamableType(const std::string& type)
     {
         static const std::unordered_map<std::string, eClientEntityType> streamableTypes{
-            {"object", CCLIENTOBJECT}, {"vehicle", CCLIENTVEHICLE}, {"ped", CCLIENTPED},
-            {"player", CCLIENTPLAYER}, {"pickup", CCLIENTPICKUP},   {"marker", CCLIENTMARKER},
+            {"object", CCLIENTOBJECT}, {"vehicle", CCLIENTVEHICLE}, {"ped", CCLIENTPED},       {"player", CCLIENTPLAYER},
+            {"pickup", CCLIENTPICKUP}, {"marker", CCLIENTMARKER},   {"weapon", CCLIENTWEAPON}, {"searchlight", CCLIENTSEARCHLIGHT},
         };
 
         auto iter = streamableTypes.find(type);
@@ -2578,39 +2580,33 @@ namespace
 
 bool CLuaElementDefs::SetElementStreamDistance(CClientEntity* entity, std::optional<float> distance)
 {
-    //  bool setElementStreamDistance ( element theElement [, float distance ] )
     ReadStreamElement(entity)->SetCustomStreamDistance(ReadStreamDistance(distance));
     return true;
 }
 
 float CLuaElementDefs::GetElementStreamDistance(CClientEntity* entity)
 {
-    //  float getElementStreamDistance ( element theElement )
     return ReadStreamElement(entity)->GetStreamDistance();
 }
 
 bool CLuaElementDefs::SetElementTypeStreamDistance(std::string type, std::optional<float> distance)
 {
-    //  bool setElementTypeStreamDistance ( string elementType [, float distance ] )
     return m_pManager->SetTypeStreamDistance(ReadStreamableType(type), ReadStreamDistance(distance));
 }
 
 float CLuaElementDefs::GetElementTypeStreamDistance(std::string type)
 {
-    //  float getElementTypeStreamDistance ( string elementType )
     return m_pManager->GetTypeStreamDistance(ReadStreamableType(type));
 }
 
 bool CLuaElementDefs::SetElementModelStreamDistance(std::uint32_t model, std::optional<float> distance)
 {
-    //  bool setElementModelStreamDistance ( int modelId [, float distance ] )
     return m_pManager->SetModelStreamDistance(ReadModelId(model), ReadStreamDistance(distance));
 }
 
-// There is no element type to fall back on for a bare model id, so report "not set" instead of a default
+// A bare model id has no element type to fall back on, so report "not set" instead of a default
 std::variant<bool, float> CLuaElementDefs::GetElementModelStreamDistance(std::uint32_t model)
 {
-    //  float getElementModelStreamDistance ( int modelId )
     const float fDistance = m_pManager->GetModelStreamDistance(ReadModelId(model));
     if (fDistance <= 0.0f)
         return false;

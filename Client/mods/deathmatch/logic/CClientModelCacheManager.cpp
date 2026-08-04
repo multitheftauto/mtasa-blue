@@ -13,8 +13,8 @@
 #define PED_MAX_VELOCITY     (10)
 #define VEHICLE_MAX_VELOCITY (10)
 
-// Caching has to happen before the streamer asks for a model, so follow the streamers' actual
-// ranges rather than their defaults - scripts can widen them with a custom stream distance
+// Follow the streamers' actual ranges rather than their defaults, otherwise a custom stream
+// distance would stream elements in before their model was ever cached
 static float GetPedStreamInDistance()
 {
     return g_pClientGame->GetManager()->GetPlayerStreamer()->GetLargestStreamDistance() + CClientStreamer::STREAM_OUT_EXTRA_DISTANCE;
