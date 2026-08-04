@@ -306,6 +306,7 @@ public:
 
     virtual CEntitySAInterface* GetTargetedObject() const = 0;
     virtual PedState            GetPedState() const = 0;
+    virtual void                SetPedState(PedState state) = 0;
 
     virtual void GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const = 0;
 
