@@ -14,7 +14,8 @@ class CClientColCuboid final : public CClientColShape
 {
     DECLARE_CLASS(CClientColCuboid, CClientColShape)
 public:
-    CClientColCuboid(CClientManager* pManager, ElementID ID, const CVector& vecPosition, const CVector& vecSize);
+    CClientColCuboid(CClientManager* pManager, ElementID ID, const CVector& vecPosition, const CVector& vecSize,
+                     const CVector& vecRotation = CVector());
 
     virtual CSphere GetWorldBoundingSphere();
     virtual void    DebugRender(const CVector& vecPosition, float fDrawRadius);
@@ -30,6 +31,14 @@ public:
         SizeChanged();
     }
 
+    void GetRotationRadians(CVector& vecRotation) const override { vecRotation = m_vecRotation; }
+    void SetRotationRadians(const CVector& vecRotation) override
+    {
+        m_vecRotation = vecRotation;
+        SizeChanged();
+    }
+
 protected:
     CVector m_vecSize;
+    CVector m_vecRotation;    // Radians, ZXY Euler order
 };
