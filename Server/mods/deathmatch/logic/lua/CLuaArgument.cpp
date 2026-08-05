@@ -136,7 +136,7 @@ bool CLuaArgument::operator!=(const CLuaArgument& Argument) const
     return !IsEqualTo(Argument, &knownTables);
 }
 
-void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables)
+bool CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables, unsigned int uiDepth)
 {
 #ifdef MTA_DEBUG
     // Store debug data for later retrieval
@@ -181,9 +181,20 @@ void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
                 }
                 else
                 {
+                    if (uiDepth >= CLuaArguments::MaxLuaTableReadDepth)
+                    {
+                        m_iType = LUA_TNIL;
+                        return false;
+                    }
+
                     m_pTableData = new CLuaArguments();
-                    m_pTableData->ReadTable(luaVM, iArgument, pKnownTables);
                     m_bWeakTableRef = false;
+                    if (!m_pTableData->ReadTable(luaVM, iArgument, pKnownTables, uiDepth))
+                    {
+                        DeleteTableData();
+                        m_iType = LUA_TNIL;
+                        return false;
+                    }
                 }
                 break;
             }
@@ -237,6 +248,8 @@ void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
             }
         }
     }
+
+    return true;
 }
 
 void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables) const

@@ -74,7 +74,7 @@ void CLuaArguments::CopyRecursive(const CLuaArguments& Arguments, CFastHashMap<C
         delete pKnownTables;
 }
 
-void CLuaArguments::ReadArguments(lua_State* luaVM, signed int uiIndexBegin)
+bool CLuaArguments::ReadArguments(lua_State* luaVM, signed int uiIndexBegin)
 {
     // Delete the previous arguments if any
     DeleteArguments();
@@ -85,15 +85,30 @@ void CLuaArguments::ReadArguments(lua_State* luaVM, signed int uiIndexBegin)
     while (lua_type(luaVM, uiIndexBegin) != LUA_TNONE)
     {
         // Create an argument, let it read out the argument and add it to our vector
-        CLuaArgument* pArgument = new CLuaArgument(luaVM, uiIndexBegin++, &knownTables);
+        CLuaArgument* pArgument = new CLuaArgument();
+        if (!pArgument->Read(luaVM, uiIndexBegin++, &knownTables))
+        {
+            delete pArgument;
+            DeleteArguments();
+            return false;
+        }
         m_Arguments.push_back(pArgument);
 
         knownTables.clear();
     }
+
+    return true;
 }
 
-void CLuaArguments::ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<const void*, CLuaArguments*>* pKnownTables)
+bool CLuaArguments::ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<const void*, CLuaArguments*>* pKnownTables, unsigned int uiDepth)
 {
+    const int iStackTop = lua_gettop(luaVM);
+    if (!LUA_CHECKSTACK(luaVM, 2))
+    {
+        DeleteArguments();
+        return false;
+    }
+
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
@@ -101,12 +116,12 @@ void CLuaArguments::ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<co
         bKnownTablesCreated = true;
     }
 
-    pKnownTables->insert(std::make_pair(lua_topointer(luaVM, iIndexBegin), this));
+    const void* pTablePointer = lua_topointer(luaVM, iIndexBegin);
+    pKnownTables->insert(std::make_pair(pTablePointer, this));
 
     // Delete the previous arguments if any
     DeleteArguments();
 
-    LUA_CHECKSTACK(luaVM, 2);
     lua_pushnil(luaVM); /* first key */
     if (iIndexBegin < 0)
         iIndexBegin--;
@@ -114,10 +129,30 @@ void CLuaArguments::ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<co
     while (lua_next(luaVM, iIndexBegin) != 0)
     {
         /* uses 'key' (at index -2) and 'value' (at index -1) */
-        CLuaArgument* pArgument = new CLuaArgument(luaVM, -2, pKnownTables);
+        CLuaArgument* pArgument = new CLuaArgument();
+        if (!pArgument->Read(luaVM, -2, pKnownTables, uiDepth + 1))
+        {
+            delete pArgument;
+            lua_settop(luaVM, iStackTop);
+            DeleteArguments();
+            pKnownTables->erase(pTablePointer);
+            if (bKnownTablesCreated)
+                delete pKnownTables;
+            return false;
+        }
         m_Arguments.push_back(pArgument);  // push the key first
 
-        pArgument = new CLuaArgument(luaVM, -1, pKnownTables);
+        pArgument = new CLuaArgument();
+        if (!pArgument->Read(luaVM, -1, pKnownTables, uiDepth + 1))
+        {
+            delete pArgument;
+            lua_settop(luaVM, iStackTop);
+            DeleteArguments();
+            pKnownTables->erase(pTablePointer);
+            if (bKnownTablesCreated)
+                delete pKnownTables;
+            return false;
+        }
         m_Arguments.push_back(pArgument);  // then the value
 
         /* removes 'value'; keeps 'key' for next iteration */
@@ -126,12 +161,20 @@ void CLuaArguments::ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<co
 
     if (bKnownTablesCreated)
         delete pKnownTables;
+
+    return true;
 }
 
-void CLuaArguments::ReadArgument(lua_State* luaVM, int iIndex)
+bool CLuaArguments::ReadArgument(lua_State* luaVM, int iIndex)
 {
-    CLuaArgument* pArgument = new CLuaArgument(luaVM, iIndex);
+    CLuaArgument* pArgument = new CLuaArgument();
+    if (!pArgument->Read(luaVM, iIndex))
+    {
+        delete pArgument;
+        return false;
+    }
     m_Arguments.push_back(pArgument);
+    return true;
 }
 
 void CLuaArguments::PushArguments(lua_State* luaVM) const
