@@ -4191,11 +4191,6 @@ retry:
                         pWater =
                             new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
                     }
-                    if (!pWater->Exists())
-                    {
-                        delete pWater;
-                        pWater = NULL;
-                    }
                     pEntity = pWater;
                     break;
                 }
