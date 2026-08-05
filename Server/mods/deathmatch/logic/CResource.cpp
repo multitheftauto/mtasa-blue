@@ -2245,9 +2245,6 @@ bool CResource::ReadIncludedMaps(CXMLNode* pRoot)
                         m_ResourceFiles.push_back(new CResourceMapItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes, iDimension));
                     }
                 }
-
-                if (glob::has_magic(strFilename))
-                    m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
             }
             else
             {
