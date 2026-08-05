@@ -2218,13 +2218,13 @@ bool CResource::ReadIncludedMaps(CXMLNode* pRoot)
 
                 std::vector<std::string> vecFiles = GetFilePaths(strFilename.c_str());
 
+                if (glob::has_magic(strFilename))
+                    m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
+
                 if (vecFiles.empty())
                 {
                     if (glob::has_magic(strFilename))
-                    {
-                        m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
                         continue;
-                    }
 
                     m_strFailureReason = SString("Couldn't find map %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
