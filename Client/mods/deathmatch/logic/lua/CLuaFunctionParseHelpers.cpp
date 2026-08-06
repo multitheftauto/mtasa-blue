@@ -26,6 +26,12 @@ ADD_ENUM(static_cast<eLuaType>(LUA_TUSERDATA), "userdata")
 ADD_ENUM(static_cast<eLuaType>(LUA_TTHREAD), "thread")
 IMPLEMENT_ENUM_END("lua-type")
 
+IMPLEMENT_ENUM_CLASS_BEGIN(ECullZoneType)
+ADD_ENUM(ECullZoneType::ATTRIBUTE, "attribute")
+ADD_ENUM(ECullZoneType::TUNNEL, "tunnel")
+ADD_ENUM(ECullZoneType::MIRROR, "mirror")
+IMPLEMENT_ENUM_CLASS_END("cull-zone-type")
+
 IMPLEMENT_ENUM_BEGIN(CGUIVerticalAlign)
 ADD_ENUM(CGUI_ALIGN_TOP, "top")
 ADD_ENUM(CGUI_ALIGN_BOTTOM, "bottom")
