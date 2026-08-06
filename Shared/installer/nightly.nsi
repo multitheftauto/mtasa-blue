@@ -96,7 +96,7 @@ Var UninstallExePath
 !define PRODUCT_NAME_NO_VER "MTA:SA"
 
 !define PRODUCT_PUBLISHER "Multi Theft Auto"
-!define PRODUCT_WEB_SITE "https://www.multitheftauto.com"
+!define PRODUCT_WEB_SITE "https://multitheftauto.com/"
 !define PRODUCT_DIR_REGKEY "Software\Microsoft\Windows\CurrentVersion\App Paths\Multi Theft Auto ${0.0}.exe"
 !define PRODUCT_UNINST_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${PRODUCT_NAME}"
 !define PRODUCT_UNINST_ROOT_KEY "HKLM"
@@ -203,37 +203,37 @@ VIAddVersionKey /LANG=${LANG_ENGLISH} "ProductVersion" "${VI_PRODUCT_VERSION}"
 
 ;@INSERT_TRANSLATIONS@
 
-LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "Multi Theft Auto does not support Windows XP or Vista.  Please upgrade your computer."
-LangString	GET_WIN81_PLEASE	${LANG_ENGLISH} "This version of MTA:SA requires Windows 10 or later. Please upgrade your computer."
-LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "The version of MTA:SA you've downloaded is designed for old versions of Windows.  Please download an alternative version from www.multitheftauto.com."
+LangString	GET_XPVISTA_PLEASE	${LANG_ENGLISH} "Multi Theft Auto requires Windows 10 or later. Please upgrade your operating system."
+LangString	GET_WIN81_PLEASE	${LANG_ENGLISH} "Multi Theft Auto requires Windows 10 or later. Please upgrade your operating system."
+LangString  GET_MASTER_PLEASE	${LANG_ENGLISH} "This version of Multi Theft Auto was designed for old versions of Windows and is no longer supported. Please download a more up-to-date version from multitheftauto.com."
 LangString  WELCOME_TEXT  ${LANG_ENGLISH}   "This wizard will guide you through the installation or update of $(^Name) ${REVISION_TAG}\n\n\
-It is recommended that you close all other applications before starting Setup.\n\n\
-[Admin access may be requested for Vista and up]\n\n\
+It is recommended that you close all other applications before starting the setup process.\n\n\
+[Administrator access may be requested during the installation.]\n\n\
 Click Next to continue."
 LangString  HEADER_Text         ${LANG_ENGLISH} "Grand Theft Auto: San Andreas location"
 LangString  DIRECTORY_Text_Dest ${LANG_ENGLISH} "Grand Theft Auto: San Andreas folder"
-LangString  DIRECTORY_Text_Top  ${LANG_ENGLISH} "Please select your Grand Theft Auto: San Andreas folder.$\n$\nYou MUST have Grand Theft Auto: San Andreas 1.0 installed to use MTA:SA, it does not support any other versions.$\n$\nClick Install to begin installing."
+LangString  DIRECTORY_Text_Top  ${LANG_ENGLISH} "Please select your Grand Theft Auto: San Andreas folder.$\n$\nTo play Multi Theft Auto, version 1.0 of the game is required.$\n$\nGTA:SA bought from Steam will be made compatible automatically.$\n$\nClick Install to start the setup process."
 
 ; Language files
-LangString  DESC_Section10          ${LANG_ENGLISH} "Create a Start Menu group for installed applications"
-LangString  DESC_Section11          ${LANG_ENGLISH} "Create a Desktop Shortcut for the MTA:SA Client."
-LangString  DESC_Section12          ${LANG_ENGLISH} "Register mtasa:// protocol for browser clickable-ness."
-LangString  DESC_Section13          ${LANG_ENGLISH} "Add to Windows Games Explorer (if present)."
-LangString  DESC_DirectX            ${LANG_ENGLISH} "Install or update DirectX (if required)."
-LangString  DESC_Section1           ${LANG_ENGLISH} "The core components required to run Multi Theft Auto."
-LangString  DESC_Section2           ${LANG_ENGLISH} "The MTA:SA modification, allowing you to play online."
-;LangString DESC_Section3           ${LANG_ENGLISH} "The Multi Theft Auto:Editor for MTA:SA, allowing you to create and edit maps."
-;LangString DESC_SectionGroupMods   ${LANG_ENGLISH} "Modifications for Multi Theft Auto. Without at least one of these, you cannot play Multi Theft Auto."
-LangString  DESC_SectionGroupServer  ${LANG_ENGLISH}    "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
-LangString  DESC_Section4           ${LANG_ENGLISH} "The Multi Theft Auto server. This is a required component."
-LangString  DESC_Section5           ${LANG_ENGLISH} "The MTA:SA modification for the server."
-LangString  DESC_Section6           ${LANG_ENGLISH} "This is a set of required resources for your server."
-LangString  DESC_Section7           ${LANG_ENGLISH} "This is an optional set of gamemodes and maps for your server."
-LangString  DESC_Section8           ${LANG_ENGLISH} "The MTA:SA 1.0 Map Editor.  This can be used to create your very own maps for use in gamemodes for MTA."
-LangString  DESC_Section9           ${LANG_ENGLISH} "This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
-;LangString DESC_Blank          ${LANG_ENGLISH} ""
-LangString  DESC_SectionGroupDev        ${LANG_ENGLISH} "Development code and tools that aid in the creation of mods for Multi Theft Auto"
-LangString  DESC_SectionGroupClient  ${LANG_ENGLISH}    "The client is the program you run to play on a Multi Theft Auto server"
+LangString  DESC_Section10              ${LANG_ENGLISH} "Create a Start Menu group for installed applications"
+LangString  DESC_Section11              ${LANG_ENGLISH} "Create a Desktop shortcut for Multi Theft Auto"
+LangString  DESC_Section12              ${LANG_ENGLISH} "Register \"mtasa://\" protocol for browser clickable-ness."
+LangString  DESC_Section13              ${LANG_ENGLISH} "Add to Windows Games Explorer (if present)."
+LangString  DESC_DirectX                ${LANG_ENGLISH} "Install or update DirectX (if required)."
+LangString  DESC_Section1               ${LANG_ENGLISH} "The core components required to run Multi Theft Auto."
+LangString  DESC_Section2               ${LANG_ENGLISH} "The MTA:SA modification, allowing you to play online."
+;LangString DESC_Section3               ${LANG_ENGLISH} "The Multi Theft Auto:Editor for MTA:SA, allowing you to create and edit maps."
+;LangString DESC_SectionGroupMods       ${LANG_ENGLISH} "Modifications for Multi Theft Auto. Without at least one of these, you cannot play Multi Theft Auto."
+LangString  DESC_SectionGroupServer     ${LANG_ENGLISH} "The Multi Theft Auto Server. This allows you to host games from your computer. This requires a fast internet connection."
+LangString  DESC_Section4               ${LANG_ENGLISH} "The Multi Theft Auto server. This is a required component."
+LangString  DESC_Section5               ${LANG_ENGLISH} "Server components for Multi Theft Auto."
+LangString  DESC_Section6               ${LANG_ENGLISH} "This is a set of required resources for your server."
+LangString  DESC_Section7               ${LANG_ENGLISH} "This is an optional set of gamemodes and maps for your server."
+LangString  DESC_Section8               ${LANG_ENGLISH} "The MTA:SA 1.0 Map Editor. This can be used to create your very own maps to be used in gamemodes in MTA."
+LangString  DESC_Section9               ${LANG_ENGLISH} "This is the SDK for creating binary modules for the MTA server. Only install if you have a good understanding of C++!"
+;LangString DESC_Blank                  ${LANG_ENGLISH} ""
+LangString  DESC_SectionGroupDev        ${LANG_ENGLISH} "Development code and tools that aid in the creation of mods for Multi Theft Auto."
+LangString  DESC_SectionGroupClient     ${LANG_ENGLISH} "The client is the program that allows you to play on a Multi Theft Auto server."
 
 
 Function LaunchLink
@@ -259,20 +259,20 @@ Function .onInit
     # MTA isn't supported on XP/Vista
     ${If} ${AtMostWinVista}
         MessageBox MB_OK "$(GET_XPVISTA_PLEASE)"
-        ExecShell "open" "https://multitheftauto.com"
+        ExecShell "open" "https://multitheftauto.com/"
         Quit
     ${EndIf}
 
     !ifdef MTA_MAETRO
         ${If} ${AtLeastWin10}
             MessageBox MB_OK "$(GET_MASTER_PLEASE)"
-            ExecShell "open" "https://multitheftauto.com"
+            ExecShell "open" "https://multitheftauto.com/"
             Quit
         ${EndIf}
     !else
         ${If} ${AtMostWin8.1}
             MessageBox MB_OK "$(GET_WIN81_PLEASE)"
-            ExecShell "open" "https://multitheftauto.com"
+            ExecShell "open" "https://multitheftauto.com/"
             Quit
         ${EndIf}
     !endif
@@ -476,7 +476,7 @@ Function .onInstSuccess
     ${LogText} "-Function end - .onInstSuccess"
 FunctionEnd
 
-LangString INST_CLIENTSERVER ${LANG_ENGLISH}    "Client and Server"
+LangString INST_CLIENTSERVER ${LANG_ENGLISH}    "Client and server"
 LangString INST_SERVER ${LANG_ENGLISH}  "Server only"
 
 
@@ -493,9 +493,9 @@ ShowUnInstDetails show
 
 LangString INST_STARTMENU_GROUP     ${LANG_ENGLISH} "Start menu group"
 LangString INST_DESKTOP_ICON        ${LANG_ENGLISH} "Desktop icon"
-LangString INST_PROTOCOL            ${LANG_ENGLISH} "Register mtasa:// protocol"
+LangString INST_PROTOCOL            ${LANG_ENGLISH} "Register \"mtasa://\" protocol"
 LangString INST_GAMES_EXPLORER      ${LANG_ENGLISH} "Add to Games Explorer"
-LangString INST_DIRECTX             ${LANG_ENGLISH} "Install DirectX"
+LangString INST_DIRECTX             ${LANG_ENGLISH} "Install/Update DirectX"
 
 Section "$(INST_STARTMENU_GROUP)" SEC10
     SectionIn 1 2
@@ -536,11 +536,11 @@ LangString INST_SEC_GAME            ${LANG_ENGLISH} "Game module"
 
 LangString INFO_INPLACE_UPGRADE ${LANG_ENGLISH} "Performing in-place upgrade..."
 LangString INFO_UPDATE_PERMISSIONS ${LANG_ENGLISH}  "Updating permissions. This could take a few minutes..."
-LangString MSGBOX_INVALID_GTASA ${LANG_ENGLISH} "A valid Windows version of Grand Theft Auto: San Andreas was not detected.\
-$\r$\nHowever installation will continue.\
+LangString MSGBOX_INVALID_GTASA ${LANG_ENGLISH} "A valid installation of Grand Theft Auto: San Andreas was not detected.\
+$\r$\nHowever, installation will continue normally.\
 $\r$\nPlease reinstall if there are problems later."
-LangString INST_SEC_CORE_RESOURCES ${LANG_ENGLISH}  "Core Resources"
-LangString INST_SEC_OPTIONAL_RESOURCES ${LANG_ENGLISH}  "Optional Resources"
+LangString INST_SEC_CORE_RESOURCES ${LANG_ENGLISH}  "Core resources"
+LangString INST_SEC_OPTIONAL_RESOURCES ${LANG_ENGLISH}  "Optional resources"
 LangString INST_SEC_EDITOR ${LANG_ENGLISH}  "Editor"
 
 SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
@@ -1098,8 +1098,8 @@ FunctionEnd
 
 
 LangString UNINST_REQUEST ${LANG_ENGLISH}   "Are you sure you want to completely remove $(^Name) and all of its components?"
-LangString UNINST_REQUEST_NOTE ${LANG_ENGLISH}  "Uninstalling before update?\
-$\r$\nIt is not necessary to uninstall before installing a new version of MTA:SA\
+LangString UNINST_REQUEST_NOTE ${LANG_ENGLISH}  "Uninstalling before updating?\
+$\r$\nIt is not necessary to uninstall before installing a new version of Multi Theft Auto.\
 $\r$\nRun the new installer to upgrade and preserve your settings."
 
 Function un.onInit
@@ -1111,7 +1111,7 @@ Function un.onInit
     !insertmacro MUI_UNGETLANGUAGE
 FunctionEnd
 
-LangString UNINST_DATA_REQUEST ${LANG_ENGLISH}  "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
+LangString UNINST_DATA_REQUEST ${LANG_ENGLISH}  "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click NO, any resources, configurations and screenshots you have created will be permanently deleted."
 Section Uninstall
     IfFileExists "$INSTDIR\server\mods\deathmatch\resources\*.*" ask 0 ;no maps folder, so delete everything
     IfFileExists "$INSTDIR\screenshots\*.*" ask 0 ;no maps folder, so delete everything
@@ -1260,10 +1260,10 @@ FunctionEnd
 ;====================================================================================
 ; UAC related functions
 ;====================================================================================
-LangString UAC_RIGHTS1 ${LANG_ENGLISH}  "This installer requires admin access, try again"
-LangString UAC_RIGHTS_UN ${LANG_ENGLISH}    "This uninstaller requires admin access, try again"
-LangString UAC_RIGHTS3 ${LANG_ENGLISH}  "Logon service not running, aborting!"
-LangString UAC_RIGHTS4 ${LANG_ENGLISH}  "Unable to elevate"
+LangString UAC_RIGHTS1 ${LANG_ENGLISH}  "This installer requires administrator access. Try again."
+LangString UAC_RIGHTS_UN ${LANG_ENGLISH}    "This uninstaller requires administrator access. Try again."
+LangString UAC_RIGHTS3 ${LANG_ENGLISH}  "Logon service not running. Aborting..."
+LangString UAC_RIGHTS4 ${LANG_ENGLISH}  "Unable to acquire administrator permissions."
 !macro RightsElevation AdminError
     uac_tryagain:
     !insertmacro UAC_RunElevated
@@ -1859,7 +1859,7 @@ Function GetVersionAtLocation
 FunctionEnd
 
 
-LangString INST_MTA_CONFLICT ${LANG_ENGLISH}    "A different major version of MTA ($1) already exists at that path.$\n$\n\
+LangString INST_MTA_CONFLICT ${LANG_ENGLISH}    "A different major version of Multi Theft Auto ($1) already exists at that path.$\n$\n\
             MTA is designed for major versions to be installed in different paths.$\n \
             Are you sure you want to overwrite MTA $1 at \
             $INSTDIR ?"
@@ -1867,9 +1867,9 @@ LangString INST_GTA_CONFLICT ${LANG_ENGLISH}    "MTA cannot be installed into th
             Do you want to use the default install directory$\n\
             $DEFAULT_INSTDIR ?"
 LangString INST_GTA_ERROR1 ${LANG_ENGLISH} "The selected directory does not exist.$\n$\n\
-            Please select the GTA:SA install directory"
-LangString INST_GTA_ERROR2 ${LANG_ENGLISH} "Could not find GTA:SA installed at $GTA_DIR $\n$\n\
-            Are you sure you want to continue ?"
+            Please select the GTA:SA install directory."
+LangString INST_GTA_ERROR2 ${LANG_ENGLISH} "Could not find a GTA:SA installation at $GTA_DIR $\n$\n\
+            Are you sure you want to continue?"
 
 Function "CustomDirectoryPageLeave"
     ${LogText} "+Function begin - CustomDirectoryPageLeave"
@@ -1986,8 +1986,8 @@ Var PosY
 !define MID_GREY2K "0x808080"
 !define LT_GREY2K "0xD1CEC9"
 
-LangString INST_CHOOSE_LOC_TOP ${LANG_ENGLISH}  "Choose Install Location"
-LangString INST_CHOOSE_LOC ${LANG_ENGLISH}  "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
+LangString INST_CHOOSE_LOC_TOP ${LANG_ENGLISH}  "Choose install location"
+LangString INST_CHOOSE_LOC ${LANG_ENGLISH}  "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}."
 LangString INST_CHOOSE_LOC2 ${LANG_ENGLISH} "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n\
 To install in a different folder, click Browse and select another folder.$\n$\n Click Next to continue."
 LangString INST_CHOOSE_LOC3 ${LANG_ENGLISH} "Destination Folder"
@@ -2190,8 +2190,8 @@ Function CustomDirectoryPageBrowseButtonClick
     ${EndIf}
 FunctionEnd
 
-LangString INST_LOC_OW ${LANG_ENGLISH}  "Warning: A different major version of MTA ($1) already exists at that path."
-LangString INST_LOC_UPGRADE ${LANG_ENGLISH} "Installation type:  Upgrade"
+LangString INST_LOC_OW ${LANG_ENGLISH}  "Warning: a different major version of Multi Theft Auto  ($1) already exists at that path."
+LangString INST_LOC_UPGRADE ${LANG_ENGLISH} "Installation type: Upgrade"
 Function CustomDirectoryPageSetUpgradeMessage
     Call CustomDirectoryPageUpdateINSTDIR
     Push $INSTDIR
@@ -2426,9 +2426,9 @@ Var NetOtherSuccessCount
 Var NetMirror
 !define NEXT_BUTTON_ID 1
 LangString NETTEST_TITLE1   ${LANG_ENGLISH} "Online update"
-LangString NETTEST_TITLE2   ${LANG_ENGLISH} "Checking for update information"
+LangString NETTEST_TITLE2   ${LANG_ENGLISH} "Checking for update information..."
 LangString NETTEST_STATUS1  ${LANG_ENGLISH} "Checking for installer update information..."
-LangString NETTEST_STATUS2  ${LANG_ENGLISH} "Please ensure your firewall is not blocking"
+LangString NETTEST_STATUS2  ${LANG_ENGLISH} "Ensure your firewall is not blocking MTA connections"
 
 Function CustomNetMessagePage
     ${LogText} "+Function begin - CustomNetMessagePage"
@@ -2665,7 +2665,7 @@ Function MTACreateShortсut
 		"" \
 		"Play Multi Theft Auto: San Andreas"
 	${If} ${Errors}
-		${LogText} "Error creating shortcut for EXE $2"
+		${LogText} "Error creating shortcut for executable \"$2\""
 	${EndIf}
 FunctionEnd
 
@@ -2680,10 +2680,10 @@ Function MTAUpdateShortсutTarget
 	${If} $2 == $1
 		Abort
 	${EndIf}
-	${LogText} "Changing shortcut target $0 to Exe $1"
+	${LogText} "Changing shortcut target \"$0\" to executable \"$1\""
 	ShellLink::SetShortCutTarget $0 $1
 	Pop $0
-	${LogText} "Changing shortcut target error: $0"
+	${LogText} "Error while changing shortcut target: $0"
 FunctionEnd
 
 Function MTAInitFileNamesAndPaths
