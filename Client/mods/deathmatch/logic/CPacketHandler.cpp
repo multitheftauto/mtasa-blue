@@ -2804,6 +2804,10 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
     // unsigned char        (1)     - size
     // unsigned long        (4)     - color
 
+    // Train tracks:
+    // unsigned int         (?)     - node count
+    // CVector              (12)    - node position, repeated per node
+
     // Radar areas:
     // CVector2D            (8)     - position
     // CVector2D            (8)     - size
@@ -3725,6 +3729,24 @@ retry:
 
                     pBlip->SetScale(size);
                     pBlip->SetColor(color);
+
+                    break;
+                }
+
+                case CClientGame::TRAIN_TRACK:
+                {
+                    unsigned int uiNodeCount = 0;
+                    bitStream.ReadCompressed(uiNodeCount);
+
+                    std::vector<CVector> nodePositions;
+                    nodePositions.reserve(uiNodeCount);
+                    for (unsigned int i = 0; i < uiNodeCount; i++)
+                    {
+                        bitStream.Read(&position);
+                        nodePositions.push_back(position.data.vecPosition);
+                    }
+
+                    pEntity = new CClientTrainTrack(g_pClientGame->m_pManager, EntityID, nodePositions);
 
                     break;
                 }

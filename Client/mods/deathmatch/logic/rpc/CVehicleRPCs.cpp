@@ -524,14 +524,37 @@ void CVehicleRPCs::SetTrainSpeed(CClientEntity* pSource, NetBitStreamInterface& 
 
 void CVehicleRPCs::SetTrainTrack(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
+    bool bHasTrack;
+    if (!bitStream.ReadBit(bHasTrack) || !bHasTrack)
+        return;
+
+    bool bIsDefaultTrack;
+    if (!bitStream.ReadBit(bIsDefaultTrack))
+        return;
+
     uchar ucTrack;
-    if (bitStream.Read(ucTrack))
+    if (bIsDefaultTrack)
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
-        if (pVehicle)
-        {
-            pVehicle->SetTrainTrack(ucTrack);
-        }
+        if (!bitStream.Read(ucTrack))
+            return;
+    }
+    else
+    {
+        ElementID trackElementID;
+        if (!bitStream.Read(trackElementID))
+            return;
+
+        CClientTrainTrack* pTrainTrack = g_pClientGame->GetManager()->GetTrainTrackManager()->Get(trackElementID);
+        if (!pTrainTrack || pTrainTrack->GetGameTrackID() == 0xFF)
+            return;
+
+        ucTrack = pTrainTrack->GetGameTrackID();
+    }
+
+    CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
+    if (pVehicle)
+    {
+        pVehicle->SetTrainTrack(ucTrack);
     }
 }
 

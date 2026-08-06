@@ -775,13 +775,23 @@ BYTE CVehicleSA::GetRailTrack()
 
 void CVehicleSA::SetRailTrack(BYTE ucTrackID)
 {
-    if (ucTrackID >= NUM_RAILTRACKS)
+    // 0xFF means "no track"; anything else (including custom track IDs >= NUM_RAILTRACKS) is valid
+    if (ucTrackID == 0xFF)
         return;
 
     auto pInterf = static_cast<CTrainSAInterface*>(GetVehicleInterface());
     if (pInterf->m_ucRailTrackID != ucTrackID)
     {
         pInterf->m_ucRailTrackID = ucTrackID;
+
+        // The node index counts into the node array of the track the train is leaving, and the call
+        // below only recomputes the rail distance, so it has to be put back in range by hand. A
+        // track with fewer nodes than the previous one would otherwise be indexed past its end on
+        // the very next frame; the train code walks the index back to the right node from here.
+        pInterf->m_ucTrackNodeID = 0;
+
+        // Safe for a custom track ID too: the rail node arrays this walks are relocated to ones big
+        // enough to hold them (see CTrainTrackManagerSA)
         if (!IsDerailed())
         {
             DWORD dwFunc = FUNC_CTrain_FindPositionOnTrackFromCoors;
