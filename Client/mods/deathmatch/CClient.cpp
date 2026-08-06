@@ -202,36 +202,52 @@ void CClient::ClientShutdown()
 
 void CClient::PreFrameExecutionHandler()
 {
+    CLOCK_SET_SECTION("CClient::PreFrameExecutionHandler");
+    CLOCK1("Total");
+
     // If the client modification is loaded, pulse it
     if (g_pClientGame)
     {
-        g_pClientGame->DoPulsePreFrame();
+        CLOCK_CALL1(g_pClientGame->DoPulsePreFrame(););
     }
+    UNCLOCK1("Total");
 }
 
 void CClient::PreHUDRenderExecutionHandler(bool bDidUnminimize, bool bDidRecreateRenderTargets)
 {
+    CLOCK_SET_SECTION("CClient::PreHUDRenderExecutionHandler");
+    CLOCK1("Total");
+
     if (g_pClientGame)
     {
-        g_pClientGame->DoPulsePreHUDRender(bDidUnminimize, bDidRecreateRenderTargets);
+        CLOCK_CALL1(g_pClientGame->DoPulsePreHUDRender(bDidUnminimize, bDidRecreateRenderTargets););
     }
+    UNCLOCK1("Total");
 }
 
 void CClient::PostFrameExecutionHandler()
 {
+    CLOCK_SET_SECTION("CClient::PostFrameExecutionHandler");
+    CLOCK1("Total");
+
     // If the client modification is loaded, pulse it
     if (g_pClientGame)
     {
-        g_pClientGame->DoPulsePostFrame();
+        CLOCK_CALL1(g_pClientGame->DoPulsePostFrame(););
     }
+    UNCLOCK1("Total");
 }
 
 void CClient::IdleHandler()
 {
+    CLOCK_SET_SECTION("CClient::IdleHandler");
+    CLOCK1("Total");
+
     if (g_pClientGame)
     {
-        g_pClientGame->IdleHandler();
+        CLOCK_CALL1(g_pClientGame->IdleHandler(););
     }
+    UNCLOCK1("Total");
 }
 
 bool CClient::WebsiteRequestResultHandler(const std::unordered_set<SString>& newPages)
