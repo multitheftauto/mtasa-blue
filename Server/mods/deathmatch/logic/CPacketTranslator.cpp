@@ -28,6 +28,7 @@
 #include "packets/CCommandPacket.h"
 #include "packets/CExplosionSyncPacket.h"
 #include "packets/CProjectileSyncPacket.h"
+#include "packets/CProjectileRestPositionPacket.h"
 #include "packets/CVehicleInOutPacket.h"
 #include "packets/CVehicleDamageSyncPacket.h"
 #include "packets/CVehicleTrailerPacket.h"
@@ -131,6 +132,10 @@ CPacket* CPacketTranslator::Translate(const NetServerPlayerID& Socket, ePacketID
 
         case PACKET_ID_PROJECTILE:
             pTemp = new CProjectileSyncPacket;
+            break;
+
+        case PACKET_ID_PROJECTILE_REST_POSITION:
+            pTemp = new CProjectileRestPositionPacket;
             break;
 
         case PACKET_ID_VEHICLE_INOUT:
