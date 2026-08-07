@@ -2571,26 +2571,39 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     if (!player || !player->IsJoined())
         return;
 
+    // Reject NaN/Inf coordinates before any math or relaying happens.
+    // This is the actual exploit: NaN in a floating point comparison
+    // (distanceSq > maxRangeSq below) always evaluates to false, so a
+    // packet with NaN start/end coordinates was silently passing the
+    // range check regardless of how "far" the shot claimed to be.
+    if (!std::isfinite(packet.m_start.fX) || !std::isfinite(packet.m_start.fY) || !std::isfinite(packet.m_start.fZ) ||
+        !std::isfinite(packet.m_end.fX) || !std::isfinite(packet.m_end.fY) || !std::isfinite(packet.m_end.fZ))
+        return;
+
     const auto type = static_cast<std::uint8_t>(packet.m_weapon);
     if (!player->HasWeaponType(type))
         return;
-
     const auto slot = CWeaponNames::GetSlotFromWeapon(type);
     if (player->GetWeaponTotalAmmo(slot) <= 0)
         return;
-
     // Note: Don't check ammo in clip here - it can be out of sync due to network timing
     // The total ammo check above is sufficient
 
     const auto stat = CWeaponStatManager::GetSkillStatIndex(packet.m_weapon);
     const auto level = player->GetPlayerStat(stat);
-    auto*      stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
+    auto* stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
+    if (!stats)
+        return; // defensive: a spoofed/invalid packet.m_weapon could yield a null stats pointer
 
     const float distanceSq = (packet.m_start - packet.m_end).LengthSquared();
     const float range = stats->GetWeaponRange();
     const float rangeSq = range * range;
-
     const float maxRangeSq = rangeSq * 1.1f;  // 10% tolerance for floating point
+
+    // distanceSq is now guaranteed to be a finite number (both inputs validated
+    // above), so this comparison can no longer be bypassed via NaN, and any
+    // absurdly large but finite value will still fail this check since no
+    // weapon has that kind of range.
     if (distanceSq > maxRangeSq)
         return;
 
@@ -2599,16 +2612,13 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     args.PushNumber(packet.m_end.fX);
     args.PushNumber(packet.m_end.fY);
     args.PushNumber(packet.m_end.fZ);
-
     if (packet.m_damaged == INVALID_ELEMENT_ID)
         args.PushNil();
     else
         args.PushElement(CElementIDs::GetElement(packet.m_damaged));
-
     args.PushNumber(packet.m_start.fX);
     args.PushNumber(packet.m_start.fY);
     args.PushNumber(packet.m_start.fZ);
-
     player->CallEvent("onPlayerWeaponFire", args);
 
     // Sim sync only relays bullet packets to zone-0 viewers. Relay to the rest of the
