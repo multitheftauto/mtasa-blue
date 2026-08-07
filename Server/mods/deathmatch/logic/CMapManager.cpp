@@ -606,6 +606,7 @@ void CMapManager::SpawnPlayer(CPlayer& Player, const CVector& vecPosition, float
     // Update the player data
     Player.SetSpawned(true);
     Player.SetTeleported(true);
+    Player.AuthorizeHealthChange(Player.GetMaxHealth());
     Player.SetHealth(Player.GetMaxHealth());
     Player.SetIsDead(false);
     Player.SetWearingGoggles(false);
