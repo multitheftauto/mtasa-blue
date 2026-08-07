@@ -95,6 +95,7 @@ public:
     static std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> OOP_GetVehicleRespawnPosition(lua_State* luaVM, CElement* element);
     LUA_DECLARE(GetVehicleRespawnRotation);
     static std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> OOP_GetVehicleRespawnRotation(lua_State* luaVM, CElement* element);
+
     static bool     IsVehicleRespawnable(CVehicle* vehicle) noexcept;
     static uint32_t GetVehicleRespawnDelay(CVehicle* vehicle) noexcept;
     static uint32_t GetVehicleIdleRespawnDelay(CVehicle* vehicle) noexcept;

@@ -86,8 +86,7 @@ void CLuaTextDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "priority", "textItemSetPriority", "textItemGetPriority");
     lua_classvariable(luaVM, "scale", "textItemSetScale", "textItemGetScale");
     lua_classvariable(luaVM, "text", "textItemSetText", "textItemGetText");
-    lua_classvariable(luaVM, "position", "textItemSetPosition", "textItemGetPosition", textItemSetPosition,
-                      ArgumentParserWarn<false, OOP_textItemGetPosition>);
+    lua_classvariable(luaVM, "position", "textItemSetPosition", "textItemGetPosition", textItemSetPosition, ArgumentParserWarn<false, OOP_textItemGetPosition>);
 
     lua_registerclass(luaVM, "TextItem");
 }
