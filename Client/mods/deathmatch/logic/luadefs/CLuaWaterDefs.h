@@ -12,6 +12,8 @@
 #pragma once
 #include "CLuaDefs.h"
 
+class CClientWater;
+
 class CLuaWaterDefs : public CLuaDefs
 {
 public:
@@ -31,5 +33,6 @@ public:
     LUA_DECLARE(GetWaterColor);
     LUA_DECLARE(GetWaterLevel);
     LUA_DECLARE(IsWaterDrawnLast);
-    LUA_DECLARE_OOP(GetWaterVertexPosition);
+    LUA_DECLARE(GetWaterVertexPosition);
+    static std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> OOP_GetWaterVertexPosition(lua_State* luaVM, CClientWater* water, int vertexIndex);
 };

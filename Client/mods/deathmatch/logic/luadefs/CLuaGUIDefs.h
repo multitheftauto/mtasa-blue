@@ -12,6 +12,8 @@
 #pragma once
 #include "CLuaDefs.h"
 
+class CClientGUIElement;
+
 #define MAX_CHATBOX_LAYOUT_CVARS 21
 
 class CLuaGUIDefs : public CLuaDefs
@@ -47,7 +49,8 @@ public:
     LUA_DECLARE(GUICreateStaticImage);
     LUA_DECLARE(GUICreateFont);
     LUA_DECLARE(GUIStaticImageLoadImage);
-    LUA_DECLARE_OOP(GUIStaticImageGetNativeSize);
+    LUA_DECLARE(GUIStaticImageGetNativeSize);
+    static std::variant<CLuaMultiReturn<float, float>, CVector2D, bool> OOP_GUIStaticImageGetNativeSize(lua_State* luaVM, CClientGUIElement* guiElement);
     LUA_DECLARE(GUIGetSelectedTab);
     LUA_DECLARE(GUISetSelectedTab);
     LUA_DECLARE(GUIDeleteTab);
@@ -110,8 +113,11 @@ public:
     LUA_DECLARE(GUIGetEnabled);
     LUA_DECLARE(GUIGetText);
     LUA_DECLARE(GUIGetFont);
-    LUA_DECLARE_OOP(GUIGetSize);
-    LUA_DECLARE_OOP(GUIGetPosition);
+    LUA_DECLARE(GUIGetSize);
+    static std::variant<CLuaMultiReturn<float, float>, CVector2D> OOP_GUIGetSize(lua_State* luaVM, CClientGUIElement* guiElement, std::optional<bool> relative);
+    LUA_DECLARE(GUIGetPosition);
+    static std::variant<CLuaMultiReturn<float, float>, CVector2D> OOP_GUIGetPosition(lua_State* luaVM, CClientGUIElement* guiElement,
+                                                                                     std::optional<bool> relative);
     LUA_DECLARE(GUIGetVisible);
     LUA_DECLARE(GUIGetAlpha);
     LUA_DECLARE(GUIGetProperty);

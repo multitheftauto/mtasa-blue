@@ -72,7 +72,7 @@ void CLuaTextDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "destroy", "textDestroyTextItem");
 
     lua_classfunction(luaVM, "getColor", "textItemGetColor");
-    lua_classfunction(luaVM, "getPosition", "textItemGetPosition", OOP_textItemGetPosition);
+    lua_classfunction(luaVM, "getPosition", "textItemGetPosition", ArgumentParserWarn<false, OOP_textItemGetPosition>);
     lua_classfunction(luaVM, "getPriority", "textItemGetPriority");
     lua_classfunction(luaVM, "getScale", "textItemGetScale");
     lua_classfunction(luaVM, "getText", "textItemGetText");
@@ -86,7 +86,8 @@ void CLuaTextDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "priority", "textItemSetPriority", "textItemGetPriority");
     lua_classvariable(luaVM, "scale", "textItemSetScale", "textItemGetScale");
     lua_classvariable(luaVM, "text", "textItemSetText", "textItemGetText");
-    lua_classvariable(luaVM, "position", "textItemSetPosition", "textItemGetPosition", textItemSetPosition, OOP_textItemGetPosition);
+    lua_classvariable(luaVM, "position", "textItemSetPosition", "textItemGetPosition", textItemSetPosition,
+                      ArgumentParserWarn<false, OOP_textItemGetPosition>);
 
     lua_registerclass(luaVM, "TextItem");
 }
@@ -488,34 +489,15 @@ int CLuaTextDefs::textItemGetPosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaTextDefs::OOP_textItemGetPosition(lua_State* luaVM)
+std::variant<CLuaMultiReturn<float, float>, CVector2D> CLuaTextDefs::OOP_textItemGetPosition(lua_State* luaVM, CTextItem* textItem)
 {
-    // vector2 textItemGetPosition ( textitem theTextItem ) — or 2 floats if the caller expects them
-    CTextItem* pTextItem;
+    const CVector2D& vecPosition = textItem->GetPosition();
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pTextItem);
+    // Keep returning two floats when the caller assigns two results
+    if (lua_ncallresult(luaVM) == 2)
+        return CLuaMultiReturn<float, float>(vecPosition.fX, vecPosition.fY);
 
-    if (!argStream.HasErrors())
-    {
-        CVector2D vecPosition = pTextItem->GetPosition();
-
-        int iExpected = lua_ncallresult(luaVM);
-        if (iExpected == 2)
-        {
-            lua_pushnumber(luaVM, vecPosition.fX);
-            lua_pushnumber(luaVM, vecPosition.fY);
-            return 2;
-        }
-
-        lua_pushvector(luaVM, vecPosition);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return vecPosition;
 }
 
 int CLuaTextDefs::textItemSetColor(lua_State* luaVM)

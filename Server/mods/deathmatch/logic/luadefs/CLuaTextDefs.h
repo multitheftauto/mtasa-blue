@@ -12,6 +12,8 @@
 #pragma once
 #include "CLuaDefs.h"
 
+class CTextItem;
+
 class CLuaTextDefs : public CLuaDefs
 {
 public:
@@ -36,7 +38,7 @@ public:
     LUA_DECLARE(textItemGetScale);
     LUA_DECLARE(textItemSetPosition);
     LUA_DECLARE(textItemGetPosition);
-    LUA_DECLARE(OOP_textItemGetPosition);
+    static std::variant<CLuaMultiReturn<float, float>, CVector2D> OOP_textItemGetPosition(lua_State* luaVM, CTextItem* textItem);
     LUA_DECLARE(textItemSetColor);
     LUA_DECLARE(textItemGetColor);
     LUA_DECLARE(textItemSetPriority);

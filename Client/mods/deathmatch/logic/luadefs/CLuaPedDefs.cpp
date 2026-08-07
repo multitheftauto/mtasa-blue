@@ -178,7 +178,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setFootBloodEnabled", "setPedFootBloodEnabled");
     lua_classfunction(luaVM, "getTargetEnd", OOP_GetPedTargetEnd);
     lua_classfunction(luaVM, "getTargetStart", OOP_GetPedTargetStart);
-    lua_classfunction(luaVM, "getWeaponMuzzlePosition", OOP_GetPedWeaponMuzzlePosition);
+    lua_classfunction(luaVM, "getWeaponMuzzlePosition", ArgumentParserWarn<false, OOP_GetPedWeaponMuzzlePosition>);
     lua_classfunction(luaVM, "getBonePosition", OOP_GetPedBonePosition);
     lua_classfunction(luaVM, "getCameraRotation", "getPedCameraRotation");
     lua_classfunction(luaVM, "getWeaponSlot", "getPedWeaponSlot");
@@ -241,7 +241,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "targetCollision", nullptr, OOP_GetPedTargetCollision);
     lua_classvariable(luaVM, "targetEnd", nullptr, OOP_GetPedTargetEnd);
     lua_classvariable(luaVM, "targetStart", nullptr, OOP_GetPedTargetStart);
-    lua_classvariable(luaVM, "muzzlePosition", nullptr, OOP_GetPedWeaponMuzzlePosition);
+    lua_classvariable(luaVM, "muzzlePosition", nullptr, ArgumentParserWarn<false, OOP_GetPedWeaponMuzzlePosition>);
     lua_classvariable(luaVM, "weaponSlot", "setPedWeaponSlot", "getPedWeaponSlot");
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
     lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
@@ -482,37 +482,17 @@ int CLuaPedDefs::GetPedWeaponMuzzlePosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPedDefs::OOP_GetPedWeaponMuzzlePosition(lua_State* luaVM)
+std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> CLuaPedDefs::OOP_GetPedWeaponMuzzlePosition(lua_State* luaVM, CClientPed* ped)
 {
-    // vector3 getPedWeaponMuzzlePosition ( ped thePed ) — or 3 floats if the caller expects them
-    CClientPed* pPed = NULL;
+    CVector vecMuzzlePosition;
+    if (!CStaticFunctionDefinitions::GetPedWeaponMuzzlePosition(*ped, vecMuzzlePosition))
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPed);
+    // Keep returning three floats when the caller assigns three results
+    if (lua_ncallresult(luaVM) == 3)
+        return CLuaMultiReturn<float, float, float>(vecMuzzlePosition.fX, vecMuzzlePosition.fY, vecMuzzlePosition.fZ);
 
-    if (!argStream.HasErrors())
-    {
-        CVector vecMuzzlePos;
-        if (CStaticFunctionDefinitions::GetPedWeaponMuzzlePosition(*pPed, vecMuzzlePos))
-        {
-            int iExpected = lua_ncallresult(luaVM);
-            if (iExpected == 3)
-            {
-                lua_pushnumber(luaVM, vecMuzzlePos.fX);
-                lua_pushnumber(luaVM, vecMuzzlePos.fY);
-                lua_pushnumber(luaVM, vecMuzzlePos.fZ);
-                return 3;
-            }
-
-            lua_pushvector(luaVM, vecMuzzlePos);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return vecMuzzlePosition;
 }
 
 int CLuaPedDefs::GetPedOccupiedVehicle(lua_State* luaVM)

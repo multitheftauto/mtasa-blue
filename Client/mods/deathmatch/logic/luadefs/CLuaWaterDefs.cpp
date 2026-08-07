@@ -49,7 +49,7 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
     // lua_classvariable ( luaVM, "drawnLast", "setWaterDrawnLast", "isWaterDrawnLast" );
 
     lua_classfunction(luaVM, "getLevel", "getWaterLevel");
-    lua_classfunction(luaVM, "getVertexPosition", OOP_GetWaterVertexPosition);
+    lua_classfunction(luaVM, "getVertexPosition", ArgumentParserWarn<false, OOP_GetWaterVertexPosition>);
     lua_classfunction(luaVM, "getWaveHeight", "getWaveHeight");
     lua_classfunction(luaVM, "getColor", "getWaterColor");
 
@@ -430,37 +430,16 @@ int CLuaWaterDefs::GetWaterVertexPosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWaterDefs::OOP_GetWaterVertexPosition(lua_State* luaVM)
+std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> CLuaWaterDefs::OOP_GetWaterVertexPosition(lua_State* luaVM, CClientWater* water,
+                                                                                                            int vertexIndex)
 {
-    // vector3 getWaterVertexPosition ( water theWater, int vertexIndex ) — or 3 floats if the caller expects them
-    CClientWater* pWater;
-    int           iVertexIndex;
+    CVector vecPosition;
+    if (!CStaticFunctionDefinitions::GetWaterVertexPosition(water, vertexIndex, vecPosition))
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pWater);
-    argStream.ReadNumber(iVertexIndex);
+    // Keep returning three floats when the caller assigns three results
+    if (lua_ncallresult(luaVM) == 3)
+        return CLuaMultiReturn<float, float, float>(vecPosition.fX, vecPosition.fY, vecPosition.fZ);
 
-    if (!argStream.HasErrors())
-    {
-        CVector vecPosition;
-        if (CStaticFunctionDefinitions::GetWaterVertexPosition(pWater, iVertexIndex, vecPosition))
-        {
-            int iExpected = lua_ncallresult(luaVM);
-            if (iExpected == 3)
-            {
-                lua_pushnumber(luaVM, vecPosition.fX);
-                lua_pushnumber(luaVM, vecPosition.fY);
-                lua_pushnumber(luaVM, vecPosition.fZ);
-                return 3;
-            }
-
-            lua_pushvector(luaVM, vecPosition);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return vecPosition;
 }

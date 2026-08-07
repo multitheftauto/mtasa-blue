@@ -36,7 +36,8 @@ public:
     LUA_DECLARE(GetVehicleRotation);
     LUA_DECLARE(GetVehicleSirensOn);
     LUA_DECLARE_OOP(GetVehicleTurnVelocity);
-    LUA_DECLARE_OOP(GetVehicleTurretPosition);
+    LUA_DECLARE(GetVehicleTurretPosition);
+    static std::variant<CLuaMultiReturn<float, float>, CVector2D> OOP_GetVehicleTurretPosition(lua_State* luaVM, CClientVehicle* vehicle);
     LUA_DECLARE(IsVehicleLocked);
     LUA_DECLARE(GetVehicleUpgradeOnSlot);
     LUA_DECLARE(GetVehicleUpgrades);
