@@ -70,6 +70,12 @@
 #define FUNC_RpAnimBlendClumpGetNumAssociations  0x4d6b60
 #define FUNC_RpAnimBlendClumpUpdateAnimations    0x4d34f0
 
+struct WalkingAnimFootStepData
+{
+    const char* animName;
+    float       stepInterval;
+};
+
 class CAnimManagerSA : public CAnimManager
 {
     typedef std::unique_ptr<CAnimBlendStaticAssociation> StaticAssocIntface_type;
@@ -165,4 +171,12 @@ public:
 
     bool IsValidGroup(std::uint32_t uiAnimGroup) const;
     bool IsValidAnim(std::uint32_t uiAnimGroup, std::uint32_t uiAnimID) const;
+
+public:
+    static constexpr const char* partialAnimsWithWalking[] = {"crry_prtial", "silence_reload"};
+
+    static constexpr const WalkingAnimFootStepData walkingAnims[] = {
+        {"cs_wuzi_pt1", 0.6f},
+        {"wuzi_walk", 0.5f},
+    };
 };
