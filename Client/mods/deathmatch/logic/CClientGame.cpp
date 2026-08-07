@@ -289,6 +289,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetPreWorldProcessHandler(CClientGame::StaticPreWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler);
+    g_pMultiplayer->SetVehicleAutomobilePostPreRenderHandler(CClientGame::StaticVehicleAutomobilePostPreRenderHandler);
     g_pMultiplayer->SetPreFxRenderHandler(CClientGame::StaticPreFxRenderHandler);
     g_pMultiplayer->SetPostColorFilterRenderHandler(CClientGame::StaticPostColorFilterRenderHandler);
     g_pMultiplayer->SetPreHudRenderHandler(CClientGame::StaticPreHudRenderHandler);
@@ -505,6 +506,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetPreWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessHandler(NULL);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(nullptr);
+    g_pMultiplayer->SetVehicleAutomobilePostPreRenderHandler(nullptr);
     g_pMultiplayer->SetPreFxRenderHandler(NULL);
     g_pMultiplayer->SetPostColorFilterRenderHandler(nullptr);
     g_pMultiplayer->SetPreHudRenderHandler(NULL);
@@ -3659,6 +3661,18 @@ void CClientGame::StaticPostWorldProcessHandler()
 void CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler()
 {
     g_pClientGame->PostWorldProcessPedsAfterPreRenderHandler();
+}
+
+void CClientGame::StaticVehicleAutomobilePostPreRenderHandler(CEntitySAInterface* pGameEntity)
+{
+    if (!pGameEntity || !g_pClientGame)
+        return;
+
+    CClientEntity* pClientEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)pGameEntity);
+    if (!pClientEntity || pClientEntity->GetType() != CCLIENTVEHICLE)
+        return;
+
+    static_cast<CClientVehicle*>(pClientEntity)->ApplyWheelComponentPositionsAfterPreRender();
 }
 
 void CClientGame::StaticPreFxRenderHandler()
