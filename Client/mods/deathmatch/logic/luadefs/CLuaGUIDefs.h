@@ -112,6 +112,8 @@ public:
     LUA_DECLARE(GUIGetPosition);
     LUA_DECLARE(GUIGetVisible);
     LUA_DECLARE(GUIGetAlpha);
+    LUA_DECLARE(GUISetColorCodesEnabled);
+    LUA_DECLARE(GUIGetColorCodesEnabled);
     LUA_DECLARE(GUIGetProperty);
     LUA_DECLARE(GUIGetProperties);
     LUA_DECLARE(GUICheckBoxGetSelected);
