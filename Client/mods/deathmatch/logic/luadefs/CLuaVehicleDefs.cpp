@@ -4393,7 +4393,7 @@ bool CLuaVehicleDefs::AddVehicleSirens(CClientVehicle* vehicle, std::uint8_t sir
 {
     eClientVehicleType vehicleType = vehicle->GetVehicleType();
 
-    if (vehicleType != CLIENTVEHICLE_CAR && vehicleType != CLIENTVEHICLE_MONSTERTRUCK && vehicleType != CLIENTVEHICLE_QUADBIKE)
+    if (vehicleType == CLIENTVEHICLE_NONE)
         return false;
 
     if (sirenType < 1 || sirenType > 6)
