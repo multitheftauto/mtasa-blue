@@ -4865,6 +4865,16 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         {
             bAllowDamage = false;
         }
+
+        if (bAllowDamage && fLoss > 0.0f && !g_pGame->IsVehicleExplosionsEnabled())
+        {
+            CVehicle* pGameVehicle = pClientVehicle->GetGameVehicle();
+            if (pGameVehicle && pGameVehicle->GetHealth() - fLoss < VEHICLE_BURNING_HEALTH)
+            {
+                pGameVehicle->SetHealth(VEHICLE_BURNING_HEALTH);
+                bAllowDamage = false;
+            }
+        }
     }
 
     return bAllowDamage;
@@ -6167,6 +6177,10 @@ bool CClientGame::SetWorldSpecialProperty(const WorldSpecialProperty property, c
         case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
             SetVehicleEngineAutoStartEnabled(enabled);
             break;
+        case WorldSpecialProperty::VEHICLEEXPLOSIONS:
+            // Toggles whether vehicle explosions occur in client game
+            g_pGame->SetVehicleExplosionsEnabled(enabled);
+            break;
         default:
             return false;
     }
@@ -6215,6 +6229,8 @@ bool CClientGame::IsWorldSpecialProperty(const WorldSpecialProperty property)
             return g_pGame->IsVehicleBurnExplosionsEnabled();
         case WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART:
             return IsVehicleEngineAutoStartEnabled();
+        case WorldSpecialProperty::VEHICLEEXPLOSIONS:
+            return g_pGame->IsVehicleExplosionsEnabled();
     }
 
     return false;
@@ -7020,6 +7036,7 @@ void CClientGame::ResetWorldProperties(const ResetWorldPropsInfo& resetPropsInfo
         m_pVehicleManager->SetSpawnFlyingComponentEnabled(true);
         g_pGame->SetVehicleBurnExplosionsEnabled(true);
         SetVehicleEngineAutoStartEnabled(true);
+        g_pGame->SetVehicleExplosionsEnabled(true);
     }
 
     // Reset all setWorldProperty to default

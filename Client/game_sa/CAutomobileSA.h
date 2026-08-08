@@ -146,4 +146,6 @@ public:
     CAutomobileSAInterface* GetAutomobileInterface() const { return reinterpret_cast<CAutomobileSAInterface*>(GetInterface()); }
 
     bool IsAnyWheelTouchingGround() const override;
+
+    void SetHealth(float fHealth) override;
 };

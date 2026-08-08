@@ -259,6 +259,9 @@ public:
     bool IsVehicleBurnExplosionsEnabled() const noexcept override { return m_isVehicleBurnExplosionsEnabled; }
     void SetVehicleBurnExplosionsEnabled(bool isEnabled) override;
 
+    bool IsVehicleExplosionsEnabled() const noexcept override { return m_isVehicleExplosionsEnabled; }
+    void SetVehicleExplosionsEnabled(bool isEnabled) override;
+
     unsigned long GetMinuteDuration();
     void          SetMinuteDuration(unsigned long ulTime);
 
@@ -391,6 +394,7 @@ private:
     bool         m_isExtendedWaterCannonsEnabled{false};
     bool         m_isIgnoreFireStateEnabled{false};
     bool         m_isVehicleBurnExplosionsEnabled{true};
+    bool         m_isVehicleExplosionsEnabled{true};
 
     static unsigned int& ClumpOffset;
 

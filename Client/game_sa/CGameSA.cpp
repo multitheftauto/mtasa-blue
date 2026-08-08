@@ -939,6 +939,11 @@ void CGameSA::SetVehicleBurnExplosionsEnabled(bool isEnabled)
     m_isVehicleBurnExplosionsEnabled = isEnabled;
 }
 
+void CGameSA::SetVehicleExplosionsEnabled(bool isEnabled)
+{
+    m_isVehicleExplosionsEnabled = isEnabled;
+}
+
 bool CGameSA::PerformChecks()
 {
     std::map<std::string, SCheatSA*>::iterator it;

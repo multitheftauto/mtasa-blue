@@ -34,6 +34,8 @@ class CPed;
 class SString;
 struct RwFrame;
 
+static constexpr float VEHICLE_BURNING_HEALTH = 250.0f;
+
 enum eWinchType
 {
     WINCH_NONE = 0,
