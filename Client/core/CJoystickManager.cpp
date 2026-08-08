@@ -29,6 +29,10 @@ extern IDirectInput8* g_pDirectInput8;
 
 #define VALID_INDEX_FOR(array, index) (index >= 0 && index < NUMELMS(array))
 
+// How long to wait before retrying a failed joystick detection, and how long a device can go without
+// responding before we consider it unplugged
+constexpr uint JOYSTICK_RETRY_DELAY_MS = 3000;
+
 SString GUIDToString(const GUID& g)
 {
     return SString("%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x", g.Data1, g.Data2, g.Data3, g.Data4[0], g.Data4[1], g.Data4[2], g.Data4[3], g.Data4[4],
@@ -138,6 +142,7 @@ public:
 
     // Status
     virtual bool IsJoypadConnected();
+    virtual void OnPossibleDeviceChange();
 
     // Settings
     virtual string GetControllerName();
@@ -182,6 +187,9 @@ private:
     bool             m_bXInputDeviceAttached;
     uint             m_uiXInputReattachDelay;
     CElapsedTime     m_XInputReattachTimer;
+    uint             m_uiDirectInputReattachDelay;
+    CElapsedTime     m_DirectInputReattachTimer;
+    CElapsedTime     m_PollFailTimer;
     bool             m_bAutoDeadZoneEnabled;
     int              m_iAutoDeadZoneCounter;
 
@@ -519,6 +527,11 @@ void CJoystickManager::InitDirectInput()
     {
         WriteDebugEvent("InitDirectInput - SetCooperativeLevel failed");
     }
+
+    // The device isn't Acquired yet, so its first Poll() is expected to fail. Start the fail timer
+    // from here, otherwise it would count the time since CJoystickManager was created and could
+    // drop the device as unresponsive before it was ever given a chance to be polled.
+    m_PollFailTimer.Reset();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -539,6 +552,19 @@ void CJoystickManager::DoPulse()
         // Init DInput if not done yet
         InitDirectInput();
         m_bDoneInit = true;
+    }
+    else if (!m_bUseXInput && !m_DevInfo.pDevice)
+    {
+        // Not using XInput yet and no DirectInput joystick either, so keep checking both in case
+        // an XInput pad (e.g. an Xbox controller) got connected after startup
+        if (IsXInputDeviceAttached())
+            m_bUseXInput = true;
+        else if (m_DirectInputReattachTimer.Get() >= m_uiDirectInputReattachDelay)
+        {
+            InitDirectInput();
+            m_DirectInputReattachTimer.Reset();
+            m_uiDirectInputReattachDelay = JOYSTICK_RETRY_DELAY_MS;
+        }
     }
 
     // Stop if no joystick
@@ -846,9 +872,20 @@ bool CJoystickManager::ReadInputSubsystem(DIJOYSTATE2& js)
         // Try to poll
         if (FAILED(m_DevInfo.pDevice->Poll()))
         {
-            m_DevInfo.pDevice->Acquire();
+            if (m_PollFailTimer.Get() > JOYSTICK_RETRY_DELAY_MS)
+            {
+                // Been failing to respond for a while, most likely unplugged, so forget it and look for a replacement
+                m_DevInfo.pDevice->Release();
+                m_DevInfo.pDevice = nullptr;
+                m_DevInfo.bDoneEnumAxes = false;
+                memset(m_DevInfo.axis, 0, sizeof(m_DevInfo.axis));
+                m_DevInfo.iAxisCount = 0;
+            }
+            else
+                m_DevInfo.pDevice->Acquire();
             return false;
         }
+        m_PollFailTimer.Reset();
 
         if (FAILED(m_DevInfo.pDevice->GetDeviceState(sizeof(DIJOYSTATE2), &js)))
             return false;
@@ -961,7 +998,7 @@ bool CJoystickManager::IsXInputDeviceAttached()
         if (m_XInputReattachTimer.Get() < m_uiXInputReattachDelay)
             return false;
         m_XInputReattachTimer.Reset();
-        m_uiXInputReattachDelay = 3000;
+        m_uiXInputReattachDelay = JOYSTICK_RETRY_DELAY_MS;
 
         XINPUT_CAPABILITIES Capabilities;
         DWORD               dwStatus = XInputGetCapabilities(0, XINPUT_FLAG_GAMEPAD, &Capabilities);
@@ -1174,6 +1211,20 @@ bool CJoystickManager::IsJoypadConnected()
     if (m_bUseXInput)
         return IsXInputDeviceAttached();
     return m_DevInfo.pDevice != NULL;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CJoystickManager::OnPossibleDeviceChange
+//
+// Called when Windows tells us a HID device was plugged in or removed, so we
+// don't have to wait for the next scheduled retry to notice.
+//
+///////////////////////////////////////////////////////////////
+void CJoystickManager::OnPossibleDeviceChange()
+{
+    m_uiDirectInputReattachDelay = 0;
+    m_uiXInputReattachDelay = 0;
 }
 
 ///////////////////////////////////////////////////////////////
