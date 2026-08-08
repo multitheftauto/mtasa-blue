@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CEntity.h"
+#include "CWeaponInfo.h"
 
 class CMatrix;
 class CCam;
@@ -157,4 +158,13 @@ public:
     virtual bool         GetTransitionMatrix(CMatrix& matrix) const = 0;
 
     virtual bool IsSphereVisible(CVector* center, float radius) const = 0;
+
+    // Per-weapon aiming camera. Offset is in camera space (x=right, y=up, z=forward).
+    virtual void  SetWeaponAimCameraOffset(eWeaponType weaponType, float fX, float fY, float fZ) = 0;
+    virtual void  GetWeaponAimCameraOffset(eWeaponType weaponType, float& fX, float& fY, float& fZ) = 0;
+    virtual void  ResetWeaponAimCameraOffset(eWeaponType weaponType) = 0;
+    virtual void  SetWeaponAimCameraZoom(eWeaponType weaponType, float fFOV) = 0;
+    virtual float GetWeaponAimCameraZoom(eWeaponType weaponType) = 0;
+    virtual void  ResetWeaponAimCameraZoom(eWeaponType weaponType) = 0;
+    virtual void  ResetAllWeaponAimCameraOverrides() = 0;
 };

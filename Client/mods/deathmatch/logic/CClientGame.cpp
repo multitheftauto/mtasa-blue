@@ -3498,6 +3498,7 @@ void CClientGame::Event_OnIngame()
     g_pGame->GetWaterManager()->Reset();  // Deletes all custom water elements, ResetMapInfo only reverts changes to water level
     g_pGame->GetWaterManager()->SetWaterDrawnLast(true);
     m_pCamera->ResetCameraClip();
+    g_pGame->GetCamera()->ResetAllWeaponAimCameraOverrides();
 
     // Deallocate all custom models
     m_pManager->GetModelManager()->RemoveAll();
