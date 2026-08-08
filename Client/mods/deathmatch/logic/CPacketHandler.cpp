@@ -5293,6 +5293,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
 
                                 // Delete the file that already exists
                                 FileDelete(strName);
+                                CChecksum::InvalidateChecksumCacheEntry(strName);
                                 if (FileExists(strName))
                                 {
                                     SString strMessage("Unable to delete old file %s", *ConformResourcePath(strName));
