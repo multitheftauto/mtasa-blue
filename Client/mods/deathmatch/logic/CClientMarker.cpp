@@ -38,6 +38,8 @@ CClientMarker::CClientMarker(CClientManager* pManager, ElementID ID, int iMarker
     // Add us to marker manager list
     m_pMarkerManager->AddToList(this);
     UpdateSpatialData();
+
+    RefreshStreamDistance();
 }
 
 CClientMarker::~CClientMarker()

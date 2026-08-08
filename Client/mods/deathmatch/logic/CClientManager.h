@@ -45,6 +45,10 @@ class CClientManager;
 #include "CClientIMGManager.h"
 #include "CClientBuildingManager.h"
 
+#include <functional>
+#include <optional>
+#include <unordered_map>
+
 class CClientProjectileManager;
 class CClientExplosionManager;
 
@@ -114,7 +118,18 @@ public:
     void OnLowLODElementCreated();
     void OnLowLODElementDestroyed();
 
+    // Stream distance overrides, resolved per element as element > model > element type > streamer default
+    float            ResolveStreamDistance(CClientStreamElement* pElement) const;
+    CClientStreamer* GetStreamerForType(eClientEntityType type) const;
+
+    bool  SetTypeStreamDistance(eClientEntityType type, std::optional<float> distance);
+    float GetTypeStreamDistance(eClientEntityType type) const;
+    bool  SetModelStreamDistance(std::uint16_t usModel, std::optional<float> distance);
+    float GetModelStreamDistance(std::uint16_t usModel) const;
+
 private:
+    void ForEachStreamElement(const std::function<void(CClientStreamElement*)>& callback);
+
     CAntiCheat                   m_AntiCheat;
     CClientCamera*               m_pCamera;
     CClientColModelManager*      m_pColModelManager;
@@ -157,4 +172,7 @@ private:
     bool                         m_bBeingDeleted;
     bool                         m_bGameUnloadedFlag;
     int                          m_iNumLowLODElements;
+
+    std::unordered_map<int, float>           m_TypeStreamDistances;
+    std::unordered_map<std::uint16_t, float> m_ModelStreamDistances;
 };

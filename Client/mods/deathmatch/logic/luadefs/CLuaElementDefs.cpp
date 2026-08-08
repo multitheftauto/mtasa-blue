@@ -71,6 +71,9 @@ void CLuaElementDefs::LoadFunctions()
         {"isElementCallPropagationEnabled", IsElementCallPropagationEnabled},
         {"isElementWaitingForGroundToLoad", IsElementWaitingForGroundToLoad},
         {"isElementOnFire", ArgumentParser<IsElementOnFire>},
+        {"getElementStreamDistance", ArgumentParser<GetElementStreamDistance>},
+        {"getElementTypeStreamDistance", ArgumentParser<GetElementTypeStreamDistance>},
+        {"getElementModelStreamDistance", ArgumentParser<GetElementModelStreamDistance>},
 
         // Element set funcs
         {"createElement", CreateElement},
@@ -101,6 +104,9 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementCallPropagationEnabled", SetElementCallPropagationEnabled},
         {"setElementLighting", ArgumentParser<SetElementLighting>},
         {"setElementOnFire", ArgumentParser<SetElementOnFire>},
+        {"setElementStreamDistance", ArgumentParser<SetElementStreamDistance>},
+        {"setElementTypeStreamDistance", ArgumentParser<SetElementTypeStreamDistance>},
+        {"setElementModelStreamDistance", ArgumentParser<SetElementModelStreamDistance>},
     };
 
     // Add functions
@@ -172,6 +178,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getData", "getElementData");
     lua_classfunction(luaVM, "getAllData", "getAllElementData");
     lua_classfunction(luaVM, "isOnFire", "isElementOnFire");
+    lua_classfunction(luaVM, "getStreamDistance", "getElementStreamDistance");
 
     lua_classfunction(luaVM, "setAttachedOffsets", "setElementAttachedOffsets");
     lua_classfunction(luaVM, "setData", "setElementData");
@@ -196,6 +203,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setStreamable", "setElementStreamable");
     lua_classfunction(luaVM, "setLighting", "setElementLighting");
     lua_classfunction(luaVM, "setOnFire", "setElementOnFire");
+    lua_classfunction(luaVM, "setStreamDistance", "setElementStreamDistance");
 
     lua_classvariable(luaVM, "callPropagationEnabled", "setElementCallPropagationEnabled", "isElementCallPropagationEnabled");
     lua_classvariable(luaVM, "waitingForGroundToLoad", NULL, "isElementWaitingForGroundToLoad");
@@ -232,6 +240,7 @@ void CLuaElementDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "isElement", NULL, "isElement");
     lua_classvariable(luaVM, "lighting", "setElementLighting", "getElementLighting");
     lua_classvariable(luaVM, "onFire", "setElementOnFire", "isElementOnFire");
+    lua_classvariable(luaVM, "streamDistance", "setElementStreamDistance", "getElementStreamDistance");
     // TODO: Support element data: player.data["age"] = 1337; <=> setElementData(player, "age", 1337)
 
     lua_registerclass(luaVM, "Element");
@@ -2519,6 +2528,90 @@ bool CLuaElementDefs::SetElementOnFire(CClientEntity* entity, bool onFire) noexc
         return false;
 
     return entity->SetOnFire(onFire);
+}
+
+namespace
+{
+    // The upper bound keeps a script from pinning half the map into the streamer's permanently
+    // active list, which costs a distance update and a sort slot every frame
+    constexpr float MIN_STREAM_DISTANCE = 1.0f;
+    constexpr float MAX_STREAM_DISTANCE = 3000.0f;
+
+    // Every element type that goes through CClientStreamer. Buildings, sounds, lights, effects and
+    // projectiles are absent because they are not streamed by the streamer at all
+    eClientEntityType ReadStreamableType(const std::string& type)
+    {
+        static const std::unordered_map<std::string, eClientEntityType> streamableTypes{
+            {"object", CCLIENTOBJECT}, {"vehicle", CCLIENTVEHICLE}, {"ped", CCLIENTPED},       {"player", CCLIENTPLAYER},
+            {"pickup", CCLIENTPICKUP}, {"marker", CCLIENTMARKER},   {"weapon", CCLIENTWEAPON}, {"searchlight", CCLIENTSEARCHLIGHT},
+        };
+
+        auto iter = streamableTypes.find(type);
+        if (iter == streamableTypes.end())
+            throw std::invalid_argument("Element type is not streamable");
+
+        return iter->second;
+    }
+
+    std::uint16_t ReadModelId(std::uint32_t model)
+    {
+        if (model > std::numeric_limits<std::uint16_t>::max())
+            throw std::invalid_argument("Invalid model id");
+
+        return static_cast<std::uint16_t>(model);
+    }
+
+    std::optional<float> ReadStreamDistance(std::optional<float> distance)
+    {
+        if (distance.has_value() && (distance.value() < MIN_STREAM_DISTANCE || distance.value() > MAX_STREAM_DISTANCE))
+            throw std::invalid_argument(SString("Stream distance must be between %g and %g", MIN_STREAM_DISTANCE, MAX_STREAM_DISTANCE));
+
+        return distance;
+    }
+
+    CClientStreamElement* ReadStreamElement(CClientEntity* entity)
+    {
+        if (!entity->IsStreamingCompatibleClass())
+            throw std::invalid_argument("Element is not streamable");
+
+        return static_cast<CClientStreamElement*>(entity);
+    }
+}  // namespace
+
+bool CLuaElementDefs::SetElementStreamDistance(CClientEntity* entity, std::optional<float> distance)
+{
+    ReadStreamElement(entity)->SetCustomStreamDistance(ReadStreamDistance(distance));
+    return true;
+}
+
+float CLuaElementDefs::GetElementStreamDistance(CClientEntity* entity)
+{
+    return ReadStreamElement(entity)->GetStreamDistance();
+}
+
+bool CLuaElementDefs::SetElementTypeStreamDistance(std::string type, std::optional<float> distance)
+{
+    return m_pManager->SetTypeStreamDistance(ReadStreamableType(type), ReadStreamDistance(distance));
+}
+
+float CLuaElementDefs::GetElementTypeStreamDistance(std::string type)
+{
+    return m_pManager->GetTypeStreamDistance(ReadStreamableType(type));
+}
+
+bool CLuaElementDefs::SetElementModelStreamDistance(std::uint32_t model, std::optional<float> distance)
+{
+    return m_pManager->SetModelStreamDistance(ReadModelId(model), ReadStreamDistance(distance));
+}
+
+// A bare model id has no element type to fall back on, so report "not set" instead of a default
+std::variant<bool, float> CLuaElementDefs::GetElementModelStreamDistance(std::uint32_t model)
+{
+    const float fDistance = m_pManager->GetModelStreamDistance(ReadModelId(model));
+    if (fDistance <= 0.0f)
+        return false;
+
+    return fDistance;
 }
 
 int CLuaElementDefs::IsElementLowLod(lua_State* luaVM)
