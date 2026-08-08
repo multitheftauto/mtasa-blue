@@ -13,7 +13,6 @@
 #include "packets/CPlayerPuresyncPacket.h"
 #include "packets/CVehiclePuresyncPacket.h"
 #include "packets/CKeysyncPacket.h"
-#include "packets/CBulletsyncPacket.h"
 
 namespace
 {
@@ -38,7 +37,6 @@ void CSimControl::Startup()
     dassert(CPlayerPuresyncPacket().HasSimHandler());
     dassert(CVehiclePuresyncPacket().HasSimHandler());
     dassert(CKeysyncPacket().HasSimHandler());
-    dassert(CBulletsyncPacket().HasSimHandler());
 }
 
 ///////////////////////////////////////////////////////////////

@@ -88,6 +88,7 @@ public:
     void         Init();
     bool         LoadDefault(CWeaponStat* pDest, eWeaponType weaponType, eWeaponSkill skill = WEAPONSKILL_STD);
     float        GetWeaponRangeFromSkillLevel(eWeaponType eWeapon, float fSkillLevel);
+    float        GetMaxWeaponRange(eWeaponType eWeapon);
 
     // Static Methods
     static eStats GetSkillStatIndex(eWeaponType weapon);
