@@ -9,6 +9,7 @@
 
 #include "StdInc.h"
 #include "CCustomWeaponBulletSyncPacket.h"
+#include "CBulletSyncValidation.h"
 #include "net/SyncStructures.h"
 #include "CPlayer.h"
 #include "lua/CLuaFunctionParseHelpers.h"
@@ -28,11 +29,15 @@ bool CCustomWeaponBulletSyncPacket::Read(NetBitStreamInterface& stream)
         return false;
 
     m_weapon = GetElementFromId<CCustomWeapon>(id);
+    if (!m_weapon)
+        return false;
 
     if (!stream.Read(reinterpret_cast<char*>(&m_start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&m_end), sizeof(CVector)))
         return false;
 
-    if (!m_start.IsValid() || !m_end.IsValid())
+    // Scripts can raise a custom weapon's range arbitrarily, so only the hard cap is applied
+    // here - enough to stop out of bounds coordinates from reaching other clients.
+    if (BulletSync::ValidateTrajectory(m_start, m_end, 0.0f) != BulletSync::EResult::Valid)
         return false;
 
     if (!stream.Read(m_order))
@@ -43,7 +48,10 @@ bool CCustomWeaponBulletSyncPacket::Read(NetBitStreamInterface& stream)
 
 bool CCustomWeaponBulletSyncPacket::Write(NetBitStreamInterface& stream) const
 {
-    if (!m_pSourceElement)
+    if (!m_pSourceElement || !m_weapon)
+        return false;
+
+    if (BulletSync::ValidateTrajectory(m_start, m_end, 0.0f) != BulletSync::EResult::Valid)
         return false;
 
     auto* player = static_cast<CPlayer*>(m_pSourceElement);

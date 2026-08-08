@@ -20,17 +20,16 @@
 class CBulletsyncPacket final : public CPacket
 {
 public:
-    static constexpr float         MIN_DISTANCE_SQ = 0.0001f;
-    static constexpr float         MAX_DISTANCE_SQ = 160000.0f;
-    static constexpr float         EPSILON = 0.0001f;
-    static constexpr float         EPSILON_SQ = EPSILON * EPSILON;
-    static constexpr unsigned char MAX_BODY_ZONE = 9;
-    static constexpr float         MAX_DAMAGE = 200.0f;
+    static constexpr float EPSILON = 0.0001f;
 
     CBulletsyncPacket() = default;
     explicit CBulletsyncPacket(class CPlayer* player);
 
-    bool          HasSimHandler() const noexcept override { return true; }
+    // Bullet sync must not be relayed from the sync thread. Relaying there would bypass
+    // CGame::Packet_Bulletsync, so onPlayerWeaponFire would never see the shot while other
+    // players already received it - which is exactly how crafted bullets stay invisible to
+    // the scripting layer. Everything goes through the main thread instead.
+    bool          HasSimHandler() const noexcept override { return false; }
     ePacketID     GetPacketID() const noexcept override { return PACKET_ID_PLAYER_BULLETSYNC; }
     unsigned long GetFlags() const noexcept override { return PACKET_MEDIUM_PRIORITY | PACKET_RELIABLE; }
 
@@ -40,12 +39,10 @@ public:
 private:
     bool ReadWeaponAndPositions(NetBitStreamInterface& stream);
     bool ReadOptionalDamage(NetBitStreamInterface& stream);
-    bool ValidateTrajectory() const noexcept;
+    bool ValidateAgainstShooter(class CPlayer* player);
     void ResetDamageData() noexcept;
 
-    static constexpr bool IsNaN(float value) noexcept { return value != value; }
-    static bool           IsValidVector(const CVector& vec) noexcept;
-    static bool           IsValidWeaponId(unsigned char weaponId) noexcept;
+    static bool IsValidWeaponId(unsigned char weaponId) noexcept;
 
 public:
     eWeaponType  m_weapon{};

@@ -51,7 +51,6 @@
 #include "CRegistryManager.h"
 #include "CLatentTransferManager.h"
 #include "CCommandFile.h"
-#include "CWeaponNames.h"
 #include "packets/CVoiceEndPacket.h"
 #include "packets/CEntityAddPacket.h"
 #include "packets/CUpdateInfoPacket.h"
@@ -2571,28 +2570,37 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     if (!player || !player->IsJoined())
         return;
 
-    const auto type = static_cast<std::uint8_t>(packet.m_weapon);
-    if (!player->HasWeaponType(type))
+    // Weapon ownership, ammo, trajectory and damage payload are validated in
+    // CBulletsyncPacket::Read, which runs before the packet ever gets here.
+
+    // Shot multiplication resends one shot several times so it counts several times. Every
+    // copy carries the trajectory of the original, which a player firing normally cannot
+    // reproduce: the game applies weapon spread and the muzzle moves between shots. The
+    // slowest bullet sync weapon still fires far apart enough for this window to be safe.
+    constexpr unsigned long long BULLETSYNC_REPEAT_WINDOW_MS = 100;
+
+    if (player->m_bHasLastBulletSync && player->m_LastBulletSyncTimer.Get() < BULLETSYNC_REPEAT_WINDOW_MS &&
+        player->m_vecLastBulletSyncStart == packet.m_start && player->m_vecLastBulletSyncEnd == packet.m_end)
         return;
 
-    const auto slot = CWeaponNames::GetSlotFromWeapon(type);
-    if (player->GetWeaponTotalAmmo(slot) <= 0)
+    // Bounds anything that varies the trajectory instead of repeating it.
+    constexpr unsigned int BULLETSYNC_DROPS_BEFORE_KICK = 20;
+
+    const unsigned long long elapsed = player->m_BulletSyncPacketTimer.Get();
+    player->m_BulletSyncPacketTimer.Reset();
+
+    if (!player->m_BulletSyncBucket.Consume(elapsed))
+    {
+        if (player->m_BulletSyncBucket.GetDrops() >= BULLETSYNC_DROPS_BEFORE_KICK)
+            DisconnectPlayer(this, *player, "Bullet Sync Flooding");
+
         return;
+    }
 
-    // Note: Don't check ammo in clip here - it can be out of sync due to network timing
-    // The total ammo check above is sufficient
-
-    const auto stat = CWeaponStatManager::GetSkillStatIndex(packet.m_weapon);
-    const auto level = player->GetPlayerStat(stat);
-    auto*      stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
-
-    const float distanceSq = (packet.m_start - packet.m_end).LengthSquared();
-    const float range = stats->GetWeaponRange();
-    const float rangeSq = range * range;
-
-    const float maxRangeSq = rangeSq * 1.1f;  // 10% tolerance for floating point
-    if (distanceSq > maxRangeSq)
-        return;
+    player->m_vecLastBulletSyncStart = packet.m_start;
+    player->m_vecLastBulletSyncEnd = packet.m_end;
+    player->m_bHasLastBulletSync = true;
+    player->m_LastBulletSyncTimer.Reset();
 
     CLuaArguments args;
     args.PushNumber(packet.m_weapon);
@@ -2611,8 +2619,6 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
 
     player->CallEvent("onPlayerWeaponFire", args);
 
-    // Sim sync only relays bullet packets to zone-0 viewers. Relay to the rest of the
-    // near list here so zone-1/2 observers still receive long-range bullet sync.
     RelayNearbyPacket(packet);
 }
 
