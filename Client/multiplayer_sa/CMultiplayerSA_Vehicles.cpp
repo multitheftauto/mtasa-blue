@@ -110,7 +110,7 @@ static constexpr bool HasTowBarDummy(VehicleType model)
 
 static std::uint32_t __fastcall GetTowBarModelId(CVehicleSAInterface* vehicle)
 {
-    const std::uint32_t modelId = vehicle->m_nModelIndex;
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
 
     CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
     if (!modelInfo)
