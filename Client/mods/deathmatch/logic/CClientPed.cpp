@@ -3234,7 +3234,8 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     {
         // Entering as driver or passenger?
         int iTaskType = pTask->GetTaskType();
-        if (iTaskType == TASK_COMPLEX_ENTER_CAR_AS_DRIVER || iTaskType == TASK_COMPLEX_ENTER_CAR_AS_PASSENGER || iTaskType == TASK_COMPLEX_ENTER_BOAT_AS_DRIVER)
+        if (iTaskType == TASK_COMPLEX_ENTER_CAR_AS_DRIVER || iTaskType == TASK_COMPLEX_ENTER_CAR_AS_PASSENGER ||
+            iTaskType == TASK_COMPLEX_ENTER_BOAT_AS_DRIVER || iTaskType == TASK_SIMPLE_NAMED_ANIM || iTaskType == TASK_SIMPLE_ANIM)
         {
             // Don't allow the aiming key (RightShoulder1)
             // This fixes bug allowing you to run around in aim mode while
@@ -5966,6 +5967,8 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
             if (pTask)
             {
                 pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+                KillTaskSecondary(TASK_SECONDARY_ATTACK);
+                KillTaskSecondary(TASK_SECONDARY_IK);
                 g_pClientGame->InsertRunNamedAnimTaskToMap(reinterpret_cast<CTaskSimpleRunNamedAnimSAInterface*>(pTask->GetInterface()), this);
             }
         }
