@@ -139,6 +139,7 @@ void CFileTextureItem::CreateUnderlyingData(const SString& strFilename, bool bMi
 
     // D3DX cannot decode every format we support, so we need to perform the following steps:
     // Load the file, ask CPixelsManager what it is, and if it's not something D3DX can handle, convert to PLAIN and upload manually
+    if (strFilename.EndsWithI(".webp"))
     {
         std::vector<char> fileBytes;
         if (FileLoad(strFilename, fileBytes) && !fileBytes.empty())
