@@ -242,6 +242,11 @@ namespace FPSLimiter
         // RDTSC spin wait - reusable for all spin scenarios
         auto rdtscSpinWait = [&](std::uint64_t targetTSC) -> std::uint64_t
         {
+            // Briefly raise our priority so the OS is less likely to preempt us mid-spin.
+            HANDLE    hCurrentThread = GetCurrentThread();
+            const int savedPriority = GetThreadPriority(hCurrentThread);
+            SetThreadPriority(hCurrentThread, THREAD_PRIORITY_TIME_CRITICAL);
+
             std::uint64_t lastMeasuredTSC = __rdtsc();
             std::uint64_t remaining = targetTSC - lastMeasuredTSC;
             if (remaining > 10000)  // > ~3us at 3GHz
@@ -265,6 +270,8 @@ namespace FPSLimiter
                     _mm_pause();
                 lastMeasuredTSC = __rdtsc();
             } while (lastMeasuredTSC < targetTSC);
+
+            SetThreadPriority(hCurrentThread, savedPriority);
 
             return lastMeasuredTSC;
         };
