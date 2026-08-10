@@ -105,11 +105,11 @@ static void __declspec(naked) HOOK_CAutomobile__PreRender_PopUpLights()
     // clang-format off
     __asm
     {
-        pushad
+        push    esi
         mov     ecx, esi
         call    HasPopUpHeadlights
-        test    al, al          // popad leaves the flags alone, so this survives it
-        popad
+        test    al, al
+        pop     esi
         jz      notPopUpLights
 
         jmp     CONTINUE_CAutomobile__PreRender_PopUpLights
@@ -138,11 +138,13 @@ static void __declspec(naked) HOOK_CVehicle__DoVehicleLights_PopUpLights()
     // clang-format off
     __asm
     {
-        pushad
+        push    esi
+        push    ecx
         mov     ecx, esi
         call    HasPopUpHeadlights
         test    al, al
-        popad
+        pop     ecx
+        pop     esi
         jz      notPopUpLights
 
         jmp     CONTINUE_CVehicle__DoVehicleLights_PopUpLights
