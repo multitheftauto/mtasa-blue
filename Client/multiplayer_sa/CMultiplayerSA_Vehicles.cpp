@@ -80,7 +80,7 @@ static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 //////////////////////////////////////////////////////////////////////////////////////////
 static bool __fastcall IsCementTruckOrClone(CVehicleSAInterface* vehicle)
 {
-    const std::uint32_t modelId = vehicle->m_nModelIndex;
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
     if (modelId == static_cast<std::uint32_t>(VehicleType::VT_CEMENT))
         return true;
 
@@ -106,11 +106,11 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_CementAngleReset(
     // clang-format off
     __asm
     {
-        pushad
+        push    ecx
         mov     ecx, edi
         call    IsCementTruckOrClone
         test    al, al
-        popad
+        pop     ecx
         jz      notCement
 
         jmp     CONTINUE_CAutomobile__ProcessControl_CementAngleReset
@@ -139,11 +139,11 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_CementMiscGate()
     // clang-format off
     __asm
     {
-        pushad
+        push    ecx
         mov     ecx, edi
         call    IsCementTruckOrClone
         test    al, al
-        popad
+        pop     ecx
         jz      notCement
 
         jmp     CONTINUE_CAutomobile__ProcessControl_CementMiscGate
@@ -172,11 +172,11 @@ static void __declspec(naked) HOOK_CAutomobile__MovingCollisionSpeed_Cement()
     // clang-format off
     __asm
     {
-        pushad
+        push    eax
         mov     ecx, edi
         call    IsCementTruckOrClone
         test    al, al
-        popad
+        pop     eax
         jz      notCement
 
         jmp     CONTINUE_CAutomobile__MovingCollisionSpeed_Cement
@@ -205,11 +205,11 @@ static void __declspec(naked) HOOK_CAutomobile__PreRender_CementTurn()
     // clang-format off
     __asm
     {
-        pushad
+        push    eax
         mov     ecx, esi
         call    IsCementTruckOrClone
         test    al, al
-        popad
+        pop     eax
         jz      notCement
 
         jmp     CONTINUE_CAutomobile__PreRender_CementTurn
@@ -238,11 +238,11 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_CementDispatch()
     // clang-format off
     __asm
     {
-        pushad
+        push    eax
         mov     ecx, esi
         call    IsCementTruckOrClone
         test    al, al
-        popad
+        pop     eax
         jz      notCement
 
         jmp     CONTINUE_CAutomobile__ProcessControl_CementDispatch
