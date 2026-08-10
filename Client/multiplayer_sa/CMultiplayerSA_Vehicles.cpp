@@ -507,7 +507,7 @@ static void __declspec(naked) HOOK_CAutomobile__GetTowBarPos()
 //////////////////////////////////////////////////////////////////////////////////////////
 static bool __fastcall IsDumperOrClone(CVehicleSAInterface* vehicle)
 {
-    const std::uint32_t modelId = vehicle->m_nModelIndex;
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
     if (modelId == static_cast<std::uint32_t>(VehicleType::VT_DUMPER))
         return true;
 
