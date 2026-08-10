@@ -617,6 +617,12 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
             if (ucSlot == 2)
             {
                 CModelInfo* pVehicleModelInfo = g_pGame->GetModelInfo(m_pVehicle->GetModel());
+                if (!pVehicleModelInfo)
+                    return;
+
+                if (pVehicleModelInfo->GetParentID() != 0)
+                    pVehicleModelInfo = g_pGame->GetModelInfo(static_cast<unsigned short>(pVehicleModelInfo->GetParentID()));
+
                 if (!pVehicleModelInfo || !pVehicleModelInfo->GetVehicleSupportedUpgrades().m_bSpoiler)
                 {
                     // Vehicle doesn't support this spoiler upgrade - skip it
