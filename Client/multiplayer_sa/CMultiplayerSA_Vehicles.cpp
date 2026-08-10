@@ -79,7 +79,7 @@ static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 //////////////////////////////////////////////////////////////////////////////////////////
 static bool __fastcall IsDozerOrClone(CVehicleSAInterface* vehicle)
 {
-    const std::uint32_t modelId = vehicle->m_nModelIndex;
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
     if (modelId == static_cast<std::uint32_t>(VehicleType::VT_DOZER))
         return true;
 
@@ -105,11 +105,11 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_DozerAngleReset()
     // clang-format off
     __asm
     {
-        pushad
+        push    ecx
         mov     ecx, edi
         call    IsDozerOrClone
         test    al, al
-        popad
+        pop     ecx
         jz      notDozer
 
         jmp     CONTINUE_CAutomobile__ProcessControl_DozerAngleReset
@@ -138,11 +138,11 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_DozerMiscGate()
     // clang-format off
     __asm
     {
-        pushad
+        push    ecx
         mov     ecx, edi
         call    IsDozerOrClone
         test    al, al
-        popad
+        pop     ecx
         jz      notDozer
 
         jmp     CONTINUE_CAutomobile__ProcessControl_DozerMiscGate
@@ -175,11 +175,11 @@ static void __declspec(naked) HOOK_CAutomobile__MovingCollisionSpeed_Dozer()
         // every model that reaches this point, not only a matched one, so it stays unconditional.
         mov     dword ptr [esp + 0xF8], ebx
 
-        pushad
+        push    eax
         mov     ecx, edi
         call    IsDozerOrClone
         test    al, al
-        popad
+        pop     eax
         jz      notDozer
 
         jmp     CONTINUE_CAutomobile__MovingCollisionSpeed_Dozer
@@ -208,11 +208,11 @@ static void __declspec(naked) HOOK_CAutomobile__MovingCollisionSpeed_DozerExtraA
     // clang-format off
     __asm
     {
-        pushad
+        push    ecx
         mov     ecx, esi
         call    IsDozerOrClone
         test    al, al
-        popad
+        pop     ecx
         jz      notDozer
 
         jmp     CONTINUE_CAutomobile__MovingCollisionSpeed_DozerExtraA
@@ -241,11 +241,12 @@ static void __declspec(naked) HOOK_CAutomobile__MovingCollisionSpeed_DozerExtraB
     // clang-format off
     __asm
     {
-        // ecx already holds the vehicle pointer here, nothing to move into it.
-        pushad
+        push    eax
+        push    ecx
         call    IsDozerOrClone
         test    al, al
-        popad
+        pop     ecx
+        pop     eax
         jz      notDozer
 
         jmp     CONTINUE_CAutomobile__MovingCollisionSpeed_DozerExtraB
@@ -274,11 +275,11 @@ static void __declspec(naked) HOOK_CAutomobile__PreRender_DozerSwing()
     // clang-format off
     __asm
     {
-        pushad
+        push    eax
         mov     ecx, esi
         call    IsDozerOrClone
         test    al, al
-        popad
+        pop     eax
         jz      notDozer
 
         jmp     CONTINUE_CAutomobile__PreRender_DozerSwing
@@ -307,11 +308,11 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_DozerDispatch()
     // clang-format off
     __asm
     {
-        pushad
+        push    eax
         mov     ecx, esi
         call    IsDozerOrClone
         test    al, al
-        popad
+        pop     eax
         jz      notDozer
 
         jmp     CONTINUE_CAutomobile__ProcessControl_DozerDispatch
