@@ -79,7 +79,7 @@ static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 //////////////////////////////////////////////////////////////////////////////////////////
 static bool __fastcall IsDozerOrClone(CVehicleSAInterface* vehicle)
 {
-    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
+    const std::uint32_t modelId = vehicle->m_nModelIndex;
     if (modelId == static_cast<std::uint32_t>(VehicleType::VT_DOZER))
         return true;
 
