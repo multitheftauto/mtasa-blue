@@ -24,10 +24,7 @@ protected:
     bool        m_bWarning;
 
 public:
-    LuaFunctionError(std::string strMessage, bool bThrowWarning = true) noexcept
-        : m_strMessage(std::move(strMessage)), m_bWarning(bThrowWarning)
-    {
-    }
+    LuaFunctionError(std::string strMessage, bool bThrowWarning = true) noexcept : m_strMessage(std::move(strMessage)), m_bWarning(bThrowWarning) {}
 
     const char* what() const noexcept { return m_strMessage.c_str(); }
     bool        IsWarning() const noexcept { return m_bWarning; }

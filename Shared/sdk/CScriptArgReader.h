@@ -1556,10 +1556,7 @@ public:
     //
     // Throw error via LuaFunctionError exception for safe stack unwinding
     //
-    [[noreturn]] int ThrowError()
-    {
-        throw LuaFunctionError(GetFullErrorMessage(), false);
-    }
+    [[noreturn]] int ThrowError() { throw LuaFunctionError(GetFullErrorMessage(), false); }
 
     //
     // Set custom warning message
