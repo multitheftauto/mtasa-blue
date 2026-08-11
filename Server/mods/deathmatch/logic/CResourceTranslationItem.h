@@ -1,11 +1,11 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*  LICENSE:     See LICENSE in the top level directory
-*
-*  Multi Theft Auto is available from https://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #pragma once
 
@@ -21,12 +21,12 @@ public:
     bool Stop() override;
 
     std::string GetLanguage() const noexcept { return m_language; }
-    bool IsPrimary() const noexcept { return m_isPrimary; }
+    bool        IsPrimary() const noexcept { return m_isPrimary; }
 
 private:
     std::string ExtractLanguageFromName() const;
 
 private:
     std::string m_language;
-    bool m_isPrimary;
+    bool        m_isPrimary;
 };

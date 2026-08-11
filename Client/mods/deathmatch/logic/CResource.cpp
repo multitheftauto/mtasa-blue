@@ -90,7 +90,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     // Move this after the CreateVirtualMachine line and heads will roll
     m_bOOPEnabled = bEnableOOP;
     m_iDownloadPriorityGroup = 0;
-    
+
     m_translationManager = std::make_unique<CResourceTranslationManager>(m_strResourceName.c_str());
 
     m_pLuaVM = m_pLuaManager->CreateVirtualMachine(this, bEnableOOP);
@@ -209,7 +209,7 @@ CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResour
     }
 
     CResourceFile* pResourceFile = nullptr;
-    
+
     if (resourceType == CDownloadableResource::RESOURCE_FILE_TYPE_TRANSLATION)
     {
         bool isPrimary = m_translationPrimaryFlags.find(szFileName) != m_translationPrimaryFlags.end();
@@ -223,7 +223,7 @@ CDownloadableResource* CResource::AddResourceFile(CDownloadableResource::eResour
     {
         pResourceFile = new CResourceFile(this, resourceType, szFileName, strBuffer, uiDownloadSize, serverChecksum, bAutoDownload);
     }
-    
+
     if (pResourceFile)
     {
         m_ResourceFiles.push_back(pResourceFile);
@@ -449,13 +449,13 @@ void CResource::Stop()
 {
     m_bStarting = false;
     m_bStopping = true;
-    
+
     // Unregister global translation provider if this resource was one
     if (m_translationManager && m_translationManager->IsGlobalProvider())
     {
         CGlobalTranslationManager::GetSingleton().UnregisterProvider(m_strResourceName.c_str());
     }
-    
+
     CLuaArguments Arguments;
     Arguments.PushResource(this);
     m_pResourceEntity->CallEvent("onClientResourceStop", Arguments, true);
@@ -660,7 +660,7 @@ bool CResource::LoadTranslations()
                 if (FileExists(fullPath.c_str()))
                 {
                     std::string language = translationItem->GetLanguage();
-                    bool isPrimary = m_translationPrimaryFlags.find(language) != m_translationPrimaryFlags.end();
+                    bool        isPrimary = m_translationPrimaryFlags.find(language) != m_translationPrimaryFlags.end();
                     m_translationManager->LoadTranslation(fullPath, isPrimary);
                 }
             }
@@ -675,12 +675,11 @@ bool CResource::LoadTranslations()
             else
             {
                 CScriptDebugging* scriptDebugging = g_pClientGame->GetScriptDebugging();
-                SLuaDebugInfo debugInfo;
+                SLuaDebugInfo     debugInfo;
                 debugInfo.infoType = DEBUG_INFO_NONE;
                 debugInfo.strShortSrc = SString("[Resource: %s]", m_strResourceName.c_str());
-                
-                scriptDebugging->LogError(debugInfo,
-                    "Failed to cast resource file to CGlobalTranslationItem");
+
+                scriptDebugging->LogError(debugInfo, "Failed to cast resource file to CGlobalTranslationItem");
             }
         }
     }

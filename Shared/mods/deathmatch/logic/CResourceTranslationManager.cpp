@@ -1,11 +1,11 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*  LICENSE:     See LICENSE in the top level directory
-*
-*  Multi Theft Auto is available from https://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "CResourceTranslationManager.h"
@@ -32,11 +32,10 @@
 #include <fstream>
 #include <set>
 
-static bool s_tinyGetTextLoggingInitialized = false;
+static bool       s_tinyGetTextLoggingInitialized = false;
 static std::mutex s_loggingMutex;
 
-CResourceTranslationManager::CResourceTranslationManager(const std::string& resourceName, const std::string& charset)
-    : m_resourceName(resourceName)
+CResourceTranslationManager::CResourceTranslationManager(const std::string& resourceName, const std::string& charset) : m_resourceName(resourceName)
 {
     std::lock_guard<std::mutex> lock(s_loggingMutex);
     if (!s_tinyGetTextLoggingInitialized)
@@ -56,25 +55,25 @@ bool CResourceTranslationManager::ValidatePoFile(const std::string& filePath)
     std::ifstream file(filePath, std::ios::binary | std::ios::ate);
     if (!file.is_open())
         return false;
-    
+
     std::streampos fileSize = file.tellg();
     if (fileSize == 0)
         return false;
-    
+
     file.seekg(-1, std::ios::end);
     char lastChar;
     file.read(&lastChar, 1);
-    
+
     if (lastChar != '\n')
         return false;
-    
+
     return true;
 }
 
 bool CResourceTranslationManager::LoadTranslation(const std::string& filePath, bool isPrimary)
 {
     m_lastError.clear();
-    
+
     std::string extractedLanguage = ExtractLanguageFromPath(filePath);
     if (extractedLanguage.empty())
     {
@@ -88,7 +87,7 @@ bool CResourceTranslationManager::LoadTranslation(const std::string& filePath, b
         m_lastError = "Invalid language code '" + extractedLanguage + "'";
         return false;
     }
-    
+
     std::string language = validatedLanguage;
 
     if (!std::filesystem::exists(filePath))
@@ -100,21 +99,22 @@ bool CResourceTranslationManager::LoadTranslation(const std::string& filePath, b
     if (!ValidatePoFile(filePath))
         return false;
 
-    try {
+    try
+    {
         auto dictionary = std::make_unique<tinygettext::Dictionary>();
-        
+
         std::ifstream file(filePath, std::ios::binary);
         if (!file.is_open())
         {
             m_lastError = "Could not open translation file: " + filePath;
             return false;
         }
-        
+
         tinygettext::POParser::parse(filePath, file, *dictionary);
-        
+
         m_translationFiles[language] = filePath;
         m_dictionaries[language] = dictionary.release();
-        
+
         if (isPrimary)
         {
             m_primaryLanguage = language;
@@ -143,7 +143,7 @@ std::string CResourceTranslationManager::GetTranslation(const std::string& msgid
 
     if (!m_globalProviders.empty())
         return GetTranslationWithGlobalFallback(msgid, language);
-    
+
     return GetLocalTranslation(msgid, language);
 }
 
@@ -153,14 +153,13 @@ std::string CResourceTranslationManager::GetLocalTranslation(const std::string& 
         return msgid;
 
     std::string targetLanguage = language.empty() ? m_primaryLanguage : language;
-    
+
     if (targetLanguage.empty())
         return msgid;
-    
+
     if (m_translationFiles.find(targetLanguage) == m_translationFiles.end())
     {
-        if (!m_primaryLanguage.empty() && targetLanguage != m_primaryLanguage && 
-            m_translationFiles.find(m_primaryLanguage) != m_translationFiles.end())
+        if (!m_primaryLanguage.empty() && targetLanguage != m_primaryLanguage && m_translationFiles.find(m_primaryLanguage) != m_translationFiles.end())
         {
             targetLanguage = m_primaryLanguage;
         }
@@ -173,7 +172,7 @@ std::string CResourceTranslationManager::GetLocalTranslation(const std::string& 
     auto dictIt = m_dictionaries.find(targetLanguage);
     if (dictIt == m_dictionaries.end() || !dictIt->second)
         return msgid;
-        
+
     std::string translation = dictIt->second->translate_silent(msgid);
     return translation.empty() ? msgid : translation;
 }
@@ -181,35 +180,35 @@ std::string CResourceTranslationManager::GetLocalTranslation(const std::string& 
 std::string CResourceTranslationManager::GetTranslationWithGlobalFallback(const std::string& msgid, const std::string& language) const
 {
     thread_local std::set<std::string> currentResourceStack;
-    
+
     if (currentResourceStack.find(m_resourceName) != currentResourceStack.end())
         return msgid;
-    
+
     currentResourceStack.insert(m_resourceName);
-    
-    struct StackGuard {
+
+    struct StackGuard
+    {
         std::set<std::string>& stack;
-        std::string resourceName;
+        std::string            resourceName;
         StackGuard(std::set<std::string>& s, const std::string& r) : stack(s), resourceName(r) {}
         ~StackGuard() { stack.erase(resourceName); }
     } guard(currentResourceStack, m_resourceName);
-    
+
     std::string localTranslation = GetLocalTranslation(msgid, language);
     if (!localTranslation.empty() && localTranslation != msgid)
         return localTranslation;
-    
-    std::string globalTranslation = CGlobalTranslationManager::GetSingleton()
-        .GetGlobalTranslation(m_globalProviders, msgid, language);
+
+    std::string globalTranslation = CGlobalTranslationManager::GetSingleton().GetGlobalTranslation(m_globalProviders, msgid, language);
     if (!globalTranslation.empty() && globalTranslation != msgid)
         return globalTranslation;
-    
+
     if (!language.empty() && language != m_primaryLanguage)
     {
         std::string primaryTranslation = GetLocalTranslation(msgid, m_primaryLanguage);
         if (!primaryTranslation.empty() && primaryTranslation != msgid)
             return primaryTranslation;
     }
-    
+
     return msgid;
 }
 
@@ -217,14 +216,14 @@ std::vector<std::string> CResourceTranslationManager::GetAvailableLanguages() co
 {
     std::vector<std::string> languages;
     languages.reserve(m_translationFiles.size());
-    
+
     for (const auto& pair : m_translationFiles)
     {
         languages.push_back(pair.first);
     }
-    
+
     std::sort(languages.begin(), languages.end());
-    
+
     return languages;
 }
 
@@ -244,9 +243,8 @@ void CResourceTranslationManager::SetPlayerLanguage(void* player, const std::str
         SLuaDebugInfo debugInfo;
         debugInfo.infoType = DEBUG_INFO_NONE;
         debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
-        
-        pScriptDebugging->LogError(debugInfo, "Invalid language '%s' - use standard locale format (e.g., en_US, es_ES)", 
-                                  language.c_str());
+
+        pScriptDebugging->LogError(debugInfo, "Invalid language '%s' - use standard locale format (e.g., en_US, es_ES)", language.c_str());
         return;
     }
 
@@ -264,9 +262,9 @@ void CResourceTranslationManager::SetPlayerLanguage(void* player, const std::str
         SLuaDebugInfo debugInfo;
         debugInfo.infoType = DEBUG_INFO_NONE;
         debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
-        
-        pScriptDebugging->LogWarning(debugInfo, "Language '%s' not available for player, using primary language '%s'", 
-                                    validatedLanguage.c_str(), m_primaryLanguage.c_str());
+
+        pScriptDebugging->LogWarning(debugInfo, "Language '%s' not available for player, using primary language '%s'", validatedLanguage.c_str(),
+                                     m_primaryLanguage.c_str());
         if (!m_primaryLanguage.empty())
             m_playerLanguages[player] = m_primaryLanguage;
     }
@@ -312,7 +310,7 @@ void CResourceTranslationManager::SetClientLanguage(const std::string& language)
         SLuaDebugInfo debugInfo;
         debugInfo.infoType = DEBUG_INFO_NONE;
         debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
-        
+
         pScriptDebugging->LogWarning(debugInfo, "setCurrentTranslationLanguage called with empty language code");
         return;
     }
@@ -328,9 +326,8 @@ void CResourceTranslationManager::SetClientLanguage(const std::string& language)
         SLuaDebugInfo debugInfo;
         debugInfo.infoType = DEBUG_INFO_NONE;
         debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
-        
-        pScriptDebugging->LogError(debugInfo, "Invalid language '%s' - use standard locale format (e.g., en_US, es_ES)", 
-                                  language.c_str());
+
+        pScriptDebugging->LogError(debugInfo, "Invalid language '%s' - use standard locale format (e.g., en_US, es_ES)", language.c_str());
         return;
     }
 
@@ -338,7 +335,7 @@ void CResourceTranslationManager::SetClientLanguage(const std::string& language)
     {
         m_clientLanguage = validatedLanguage;
     }
-    else 
+    else
     {
 #ifdef MTA_CLIENT
         CScriptDebugging* pScriptDebugging = g_pClientGame->GetScriptDebugging();
@@ -348,9 +345,9 @@ void CResourceTranslationManager::SetClientLanguage(const std::string& language)
         SLuaDebugInfo debugInfo;
         debugInfo.infoType = DEBUG_INFO_NONE;
         debugInfo.strShortSrc = SString("[Resource: %s]", m_resourceName.c_str());
-        
-        pScriptDebugging->LogWarning(debugInfo, "Language '%s' not available, falling back to primary language '%s'", 
-                                    validatedLanguage.c_str(), m_primaryLanguage.c_str());
+
+        pScriptDebugging->LogWarning(debugInfo, "Language '%s' not available, falling back to primary language '%s'", validatedLanguage.c_str(),
+                                     m_primaryLanguage.c_str());
         if (!m_primaryLanguage.empty())
         {
             m_clientLanguage = m_primaryLanguage;
@@ -362,28 +359,28 @@ std::string CResourceTranslationManager::GetClientLanguage() const
 {
     if (!m_clientLanguage.empty())
         return m_clientLanguage;
-    
+
     if (!m_primaryLanguage.empty())
         return m_primaryLanguage;
-    
+
     if (!m_translationFiles.empty())
         return m_translationFiles.begin()->first;
-    
+
     return "";
 }
 
 void CResourceTranslationManager::Clear()
 {
     m_translationFiles.clear();
-    
+
     for (auto& pair : m_dictionaries)
         delete pair.second;
-    
+
     m_dictionaries.clear();
     m_primaryLanguage.clear();
     m_clientLanguage.clear();
     m_playerLanguages.clear();
-    
+
     RemoveAllGlobalProviders();
 }
 
@@ -391,11 +388,11 @@ void CResourceTranslationManager::AddGlobalTranslationProvider(const std::string
 {
     if (providerResourceName.empty())
         return;
-    
+
     auto it = std::find(m_globalProviders.begin(), m_globalProviders.end(), providerResourceName);
     if (it != m_globalProviders.end())
         return;
-    
+
     m_globalProviders.push_back(providerResourceName);
 }
 
@@ -414,9 +411,9 @@ std::string CResourceTranslationManager::ValidateLanguageWithCore(const std::str
 {
     if (language.empty())
         return "";
-    
+
     std::string normalizedLanguage = language;
-    
+
     if (normalizedLanguage == "en")
         normalizedLanguage = "en_US";
     else if (normalizedLanguage == "fi")
@@ -425,7 +422,7 @@ std::string CResourceTranslationManager::ValidateLanguageWithCore(const std::str
         normalizedLanguage = "az_AZ";
     else if (normalizedLanguage == "ka")
         normalizedLanguage = "ka_GE";
-    
+
     tinygettext::Language lang = tinygettext::Language::from_name(normalizedLanguage);
     if (!lang)
     {
@@ -434,20 +431,19 @@ std::string CResourceTranslationManager::ValidateLanguageWithCore(const std::str
         {
             return "";
         }
-        
+
         return "";
     }
-    
+
     std::string result = lang.str();
-    
+
     return result;
 }
-
 
 std::string CResourceTranslationManager::ConformTranslationPath(const std::string& message)
 {
     std::string result = message;
-    
+
     size_t resourcesPos = result.find("/resources/");
     if (resourcesPos == std::string::npos)
     {
@@ -455,19 +451,19 @@ std::string CResourceTranslationManager::ConformTranslationPath(const std::strin
         if (resourcesPos == std::string::npos)
             return result;
     }
-    
+
     size_t startPos = resourcesPos + 11;
     if (startPos >= result.length())
         return result;
-    
+
     std::string resourceRelativePath = result.substr(startPos);
-    
+
     for (char& c : resourceRelativePath)
     {
         if (c == '\\')
             c = '/';
     }
-    
+
     return resourceRelativePath;
 }
 
@@ -478,17 +474,17 @@ void CResourceTranslationManager::TinyGetTextErrorCallback(const std::string& me
 #else
     CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
 #endif
-    
+
     SLuaDebugInfo debugInfo;
     debugInfo.infoType = DEBUG_INFO_NONE;
     debugInfo.strShortSrc = "[TinyGetText]";
-    
+
     std::string cleanMessage = message;
     if (!cleanMessage.empty() && cleanMessage.back() == '\n')
         cleanMessage.pop_back();
-    
+
     cleanMessage = ConformTranslationPath(cleanMessage);
-    
+
     pScriptDebugging->LogError(debugInfo, "%s", cleanMessage.c_str());
 }
 
@@ -499,17 +495,17 @@ void CResourceTranslationManager::TinyGetTextWarningCallback(const std::string& 
 #else
     CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
 #endif
-    
+
     SLuaDebugInfo debugInfo;
     debugInfo.infoType = DEBUG_INFO_NONE;
     debugInfo.strShortSrc = "[TinyGetText]";
-    
+
     std::string cleanMessage = message;
     if (!cleanMessage.empty() && cleanMessage.back() == '\n')
         cleanMessage.pop_back();
-    
+
     cleanMessage = ConformTranslationPath(cleanMessage);
-    
+
     pScriptDebugging->LogWarning(debugInfo, "%s", cleanMessage.c_str());
 }
 

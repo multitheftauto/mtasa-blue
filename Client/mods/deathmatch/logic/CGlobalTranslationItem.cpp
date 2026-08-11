@@ -1,11 +1,11 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*  LICENSE:     See LICENSE in the top level directory
-*
-*  Multi Theft Auto is available from https://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "CGlobalTranslationItem.h"
@@ -24,13 +24,13 @@ bool CGlobalTranslationItem::Start()
     if (m_providerResourceName.empty())
     {
         CScriptDebugging* scriptDebugging = g_pClientGame->GetScriptDebugging();
-        SLuaDebugInfo debugInfo;
+        SLuaDebugInfo     debugInfo;
         debugInfo.infoType = DEBUG_INFO_NONE;
         debugInfo.strShortSrc = SString("[Resource: %s]", m_pResource->GetName());
-        
-        scriptDebugging->LogError(debugInfo, 
-            "Global translation: Empty provider resource name in meta.xml. "
-            "Check your <global-translation src=\"...\"/> tag.");
+
+        scriptDebugging->LogError(debugInfo,
+                                  "Global translation: Empty provider resource name in meta.xml. "
+                                  "Check your <global-translation src=\"...\"/> tag.");
         return false;
     }
 
@@ -39,16 +39,16 @@ bool CGlobalTranslationItem::Start()
         m_pResource->GetTranslationManager()->AddGlobalTranslationProvider(m_providerResourceName);
         return true;
     }
-    
+
     CScriptDebugging* scriptDebugging = g_pClientGame->GetScriptDebugging();
-    SLuaDebugInfo debugInfo;
+    SLuaDebugInfo     debugInfo;
     debugInfo.infoType = DEBUG_INFO_NONE;
     debugInfo.strShortSrc = SString("[Resource: %s]", m_pResource->GetName());
-    
+
     scriptDebugging->LogError(debugInfo,
-        "Global translation: Translation manager not available when adding provider '%s'. "
-        "This is an internal error - please report this issue.",
-        m_providerResourceName.c_str());
+                              "Global translation: Translation manager not available when adding provider '%s'. "
+                              "This is an internal error - please report this issue.",
+                              m_providerResourceName.c_str());
     return false;
 }
 

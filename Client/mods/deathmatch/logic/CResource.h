@@ -100,10 +100,10 @@ public:
      * @return A pointer to CResourceFile on success, null otherwise
      */
     CResourceFile* GetResourceFile(const SString& relativePath) const;
-    
+
     CResourceTranslationManager* GetTranslationManager() const noexcept { return m_translationManager.get(); }
-    bool LoadTranslations();
-    void SetTranslationPrimary(const std::string& language) { m_translationPrimaryFlags[language] = true; }
+    bool                         LoadTranslations();
+    void                         SetTranslationPrimary(const std::string& language) { m_translationPrimaryFlags[language] = true; }
 
     void               SetRemainingNoClientCacheScripts(unsigned short usRemaining) { m_usRemainingNoClientCacheScripts = usRemaining; }
     void               LoadNoClientCacheScript(const char* chunk, unsigned int length, const SString& strFilename);
@@ -160,9 +160,9 @@ private:
     CElementGroup*                        m_pDefaultElementGroup;  // stores elements created by scripts in this resource
     std::list<SNoClientCacheScript>       m_NoClientCacheScriptList;
 
-    CResourceModelStreamer m_modelStreamer{};
+    CResourceModelStreamer                       m_modelStreamer{};
     std::unique_ptr<CResourceTranslationManager> m_translationManager;
-    std::map<std::string, bool> m_translationPrimaryFlags;
+    std::map<std::string, bool>                  m_translationPrimaryFlags;
 
     bool VerifyPendingClientChecksums();
 };

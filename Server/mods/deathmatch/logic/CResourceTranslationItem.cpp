@@ -1,11 +1,11 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*  LICENSE:     See LICENSE in the top level directory
-*
-*  Multi Theft Auto is available from https://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "CResourceTranslationItem.h"
@@ -19,7 +19,7 @@ CResourceTranslationItem::CResourceTranslationItem(CResource* resource, const ch
 {
     m_type = RESOURCE_FILE_TYPE_TRANSLATION;
     m_language = ExtractLanguageFromName();
-    
+
     if (xmlAttributes)
     {
         CXMLAttribute* primaryAttr = xmlAttributes->Find("primary");
@@ -35,8 +35,7 @@ bool CResourceTranslationItem::Start()
 {
     if (!std::filesystem::exists(m_strResourceFileName))
     {
-        CLogger::ErrorPrintf("Translation file '%s' not found for resource '%s'\n", 
-                            m_strShortName.c_str(), m_resource->GetName().c_str());
+        CLogger::ErrorPrintf("Translation file '%s' not found for resource '%s'\n", m_strShortName.c_str(), m_resource->GetName().c_str());
         return false;
     }
 

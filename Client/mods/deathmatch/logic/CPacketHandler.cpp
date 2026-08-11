@@ -5286,8 +5286,8 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                                 case CDownloadableResource::RESOURCE_FILE_TYPE_TRANSLATION:
                                 {
                                     bool isPrimary = bitStream.ReadBit();
-                                    pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_TRANSLATION,
-                                                                                       szParsedChunkData, uiDownloadSize, chunkChecksum, true);
+                                    pDownloadableResource = pResource->AddResourceFile(CDownloadableResource::RESOURCE_FILE_TYPE_TRANSLATION, szParsedChunkData,
+                                                                                       uiDownloadSize, chunkChecksum, true);
                                     if (pDownloadableResource && isPrimary)
                                     {
                                         CResourceTranslationItem* translationItem = dynamic_cast<CResourceTranslationItem*>(pDownloadableResource);

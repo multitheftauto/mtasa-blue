@@ -31,8 +31,6 @@ void CLuaTranslationDefs::LoadFunctions()
         CLuaCFunctions::AddFunction(name, func);
 }
 
-
-
 int CLuaTranslationDefs::GetTranslation(lua_State* luaVM)
 {
     SString msgid;
@@ -58,7 +56,8 @@ int CLuaTranslationDefs::GetTranslation(lua_State* luaVM)
                 }
                 else
                 {
-                    m_pScriptDebugging->LogWarning(luaVM, "Translation system not initialized for resource '%s' when requesting '%s'", resource->GetName().c_str(), msgid.c_str());
+                    m_pScriptDebugging->LogWarning(luaVM, "Translation system not initialized for resource '%s' when requesting '%s'",
+                                                   resource->GetName().c_str(), msgid.c_str());
                 }
             }
         }
@@ -84,13 +83,13 @@ int CLuaTranslationDefs::GetAvailableTranslations(lua_State* luaVM)
     {
         if (resource)
             m_pScriptDebugging->LogWarning(luaVM, "Translation system not initialized for resource '%s'", resource->GetName().c_str());
-        
+
         lua_newtable(luaVM);
         return 1;
     }
 
     const std::vector<std::string> languages = resource->GetTranslationManager()->GetAvailableLanguages();
-    
+
     lua_newtable(luaVM);
     for (size_t i = 0; i < languages.size(); ++i)
     {
@@ -104,7 +103,7 @@ int CLuaTranslationDefs::GetAvailableTranslations(lua_State* luaVM)
 int CLuaTranslationDefs::GetGlobalTranslationProviders(lua_State* luaVM)
 {
     const std::vector<std::string> providers = CGlobalTranslationManager::GetSingleton().GetAvailableProviders();
-    
+
     lua_newtable(luaVM);
     for (size_t i = 0; i < providers.size(); ++i)
     {
@@ -112,17 +111,17 @@ int CLuaTranslationDefs::GetGlobalTranslationProviders(lua_State* luaVM)
         lua_pushstring(luaVM, providers[i].c_str());
         lua_settable(luaVM, -3);
     }
-    
+
     return 1;
 }
 
 int CLuaTranslationDefs::IsResourceGlobalTranslationProvider(lua_State* luaVM)
 {
     CResource* resource;
-    
+
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(resource);
-    
+
     if (argStream.HasErrors())
     {
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -145,9 +144,9 @@ int CLuaTranslationDefs::IsResourceGlobalTranslationProvider(lua_State* luaVM)
 int CLuaTranslationDefs::GetResourceGlobalTranslationProviders(lua_State* luaVM)
 {
     CResource* resource = nullptr;
-    
+
     CScriptArgReader argStream(luaVM);
-    
+
     if (argStream.NextIsUserData())
     {
         argStream.ReadUserData(resource);
@@ -158,7 +157,7 @@ int CLuaTranslationDefs::GetResourceGlobalTranslationProviders(lua_State* luaVM)
         if (luaMain)
             resource = luaMain->GetResource();
     }
-    
+
     if (argStream.HasErrors())
     {
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -174,7 +173,7 @@ int CLuaTranslationDefs::GetResourceGlobalTranslationProviders(lua_State* luaVM)
     }
 
     const std::vector<std::string> providers = resource->GetTranslationManager()->GetGlobalProviders();
-    
+
     lua_newtable(luaVM);
     for (size_t i = 0; i < providers.size(); ++i)
     {
@@ -182,6 +181,6 @@ int CLuaTranslationDefs::GetResourceGlobalTranslationProviders(lua_State* luaVM)
         lua_pushstring(luaVM, providers[i].c_str());
         lua_settable(luaVM, -3);
     }
-    
+
     return 1;
 }

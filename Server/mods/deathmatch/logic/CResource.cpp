@@ -285,7 +285,7 @@ bool CResource::Load()
                 g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
                 return false;
             }
-            
+
             // Load translation files into the translation manager
             if (!LoadTranslations())
             {
@@ -3158,7 +3158,7 @@ static HttpStatusCode ParseLuaHttpRouterResponse(CLuaArguments& luaResponse, Htt
         }
         else if (key == "headers")
         {
-            if (CLuaArguments* headers; argValue->TryGetTable(headers))
+            if (CLuaArguments * headers; argValue->TryGetTable(headers))
             {
                 for (size_t j = 0; j < headers->Count(); j += 2)
                 {
@@ -3174,7 +3174,7 @@ static HttpStatusCode ParseLuaHttpRouterResponse(CLuaArguments& luaResponse, Htt
         }
         else if (key == "cookies")
         {
-            if (CLuaArguments* cookies; argValue->TryGetTable(cookies))
+            if (CLuaArguments * cookies; argValue->TryGetTable(cookies))
             {
                 for (size_t j = 0; j < cookies->Count(); j += 2)
                 {
@@ -3190,7 +3190,7 @@ static HttpStatusCode ParseLuaHttpRouterResponse(CLuaArguments& luaResponse, Htt
                         cookie["value"] = std::string{v};
                         httpResponse.SetCookie(cookie);
                     }
-                    else if (CLuaArguments* properties; argValue->TryGetTable(properties))
+                    else if (CLuaArguments * properties; argValue->TryGetTable(properties))
                     {
                         CookieParameters cookie;
 
@@ -3376,7 +3376,7 @@ HttpStatusCode CResource::HandleRequestRouter(HttpRequest* request, HttpResponse
             response->SetBody("", 0);
             responseCode = static_cast<HttpStatusCode>(statusCode);
         }
-        else if (CLuaArguments* luaResponse; results[0]->TryGetTable(luaResponse))
+        else if (CLuaArguments * luaResponse; results[0]->TryGetTable(luaResponse))
         {
             responseCode = ParseLuaHttpRouterResponse(*luaResponse, *response);
         }
@@ -3603,7 +3603,7 @@ bool CResource::ReadIncludedTranslations(CXMLNode* pRoot)
     for (CXMLNode* pTranslation = pRoot->FindSubNode("translation", i); pTranslation != nullptr; pTranslation = pRoot->FindSubNode("translation", ++i))
     {
         CXMLAttributes& Attributes = pTranslation->GetAttributes();
-        CXMLAttribute* pSrc = Attributes.Find("src");
+        CXMLAttribute*  pSrc = Attributes.Find("src");
 
         if (pSrc)
         {
@@ -3627,12 +3627,14 @@ bool CResource::ReadIncludedTranslations(CXMLNode* pRoot)
             }
             else
             {
-                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'translation' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'translation' node of 'meta.xml' for resource '%s', ignoring\n",
+                                   m_strResourceName.c_str());
             }
         }
         else
         {
-            CLogger::LogPrintf("WARNING: Missing 'src' attribute from 'translation' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
+            CLogger::LogPrintf("WARNING: Missing 'src' attribute from 'translation' node of 'meta.xml' for resource '%s', ignoring\n",
+                               m_strResourceName.c_str());
         }
     }
 
@@ -3653,11 +3655,11 @@ bool CResource::ReadIncludedGlobalTranslations(CXMLNode* pRoot)
     }
 
     // Loop through global-translation nodes (consumer tags)
-    for (CXMLNode* pGlobalTranslation = pRoot->FindSubNode("global-translation", i); pGlobalTranslation != nullptr; 
+    for (CXMLNode* pGlobalTranslation = pRoot->FindSubNode("global-translation", i); pGlobalTranslation != nullptr;
          pGlobalTranslation = pRoot->FindSubNode("global-translation", ++i))
     {
         CXMLAttributes& Attributes = pGlobalTranslation->GetAttributes();
-        CXMLAttribute* pSrc = Attributes.Find("src");
+        CXMLAttribute*  pSrc = Attributes.Find("src");
 
         if (pSrc)
         {
@@ -3669,12 +3671,14 @@ bool CResource::ReadIncludedGlobalTranslations(CXMLNode* pRoot)
             }
             else
             {
-                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'global-translation' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
+                CLogger::LogPrintf("WARNING: Empty 'src' attribute from 'global-translation' node of 'meta.xml' for resource '%s', ignoring\n",
+                                   m_strResourceName.c_str());
             }
         }
         else
         {
-            CLogger::LogPrintf("WARNING: Missing 'src' attribute from 'global-translation' node of 'meta.xml' for resource '%s', ignoring\n", m_strResourceName.c_str());
+            CLogger::LogPrintf("WARNING: Missing 'src' attribute from 'global-translation' node of 'meta.xml' for resource '%s', ignoring\n",
+                               m_strResourceName.c_str());
         }
     }
 
@@ -4228,20 +4232,20 @@ bool CResource::LoadTranslations()
         if (pTranslationItem)
         {
             std::string strFullPath = pTranslationItem->GetFullName();
-            bool isPrimary = pTranslationItem->IsPrimary();
+            bool        isPrimary = pTranslationItem->IsPrimary();
             if (!m_translationManager->LoadTranslation(strFullPath, isPrimary))
             {
                 // Use detailed error message from translation manager if available
                 std::string detailedError = m_translationManager->GetLastError();
                 if (!detailedError.empty())
                 {
-                    m_strFailureReason = SString("Failed to load translation file '%s' for resource '%s' (%s)", 
-                                                pTranslationItem->GetName(), m_strResourceName.c_str(), detailedError.c_str());
+                    m_strFailureReason = SString("Failed to load translation file '%s' for resource '%s' (%s)", pTranslationItem->GetName(),
+                                                 m_strResourceName.c_str(), detailedError.c_str());
                 }
                 else
                 {
-                    m_strFailureReason = SString("Failed to load translation file '%s' for resource '%s'", 
-                                                pTranslationItem->GetName(), m_strResourceName.c_str());
+                    m_strFailureReason =
+                        SString("Failed to load translation file '%s' for resource '%s'", pTranslationItem->GetName(), m_strResourceName.c_str());
                 }
                 return false;
             }

@@ -31,10 +31,10 @@ void CLuaTranslationDefsClient::LoadFunctions()
 int CLuaTranslationDefsClient::SetCurrentTranslationLanguage(lua_State* luaVM)
 {
     SString language;
-    
+
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(language);
-    
+
     if (!argStream.HasErrors())
     {
         CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -48,19 +48,19 @@ int CLuaTranslationDefsClient::SetCurrentTranslationLanguage(lua_State* luaVM)
                     std::string oldLanguage = resource->GetTranslationManager()->GetClientLanguage();
                     resource->GetTranslationManager()->SetClientLanguage(language);
                     std::string newLanguage = resource->GetTranslationManager()->GetClientLanguage();
-                    
+
                     if (oldLanguage != newLanguage)
                     {
                         CLuaArguments args;
                         args.PushString(oldLanguage);
                         args.PushString(newLanguage);
-                        
+
                         if (g_pClientGame->GetLocalPlayer())
                         {
                             g_pClientGame->GetLocalPlayer()->CallEvent("onClientTranslationLanguageChange", args, true);
                         }
                     }
-                    
+
                     lua_pushboolean(luaVM, true);
                     return 1;
                 }
@@ -73,7 +73,7 @@ int CLuaTranslationDefsClient::SetCurrentTranslationLanguage(lua_State* luaVM)
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    
+
     lua_pushboolean(luaVM, false);
     return 1;
 }
@@ -123,17 +123,17 @@ int CLuaTranslationDefsClient::GetTranslation(lua_State* luaVM)
                 if (resource->GetTranslationManager())
                 {
                     // If no language specified, use current client language
-                    std::string targetLanguage = language.empty() ? 
-                        resource->GetTranslationManager()->GetClientLanguage() : language;
-                    
+                    std::string targetLanguage = language.empty() ? resource->GetTranslationManager()->GetClientLanguage() : language;
+
                     std::string result = resource->GetTranslationManager()->GetTranslation(msgid, targetLanguage);
-                    
+
                     lua_pushstring(luaVM, result.c_str());
                     return 1;
                 }
                 else
                 {
-                    m_pScriptDebugging->LogWarning(luaVM, "Translation system not initialized for resource '%s' when requesting '%s'", resource->GetName(), msgid.c_str());
+                    m_pScriptDebugging->LogWarning(luaVM, "Translation system not initialized for resource '%s' when requesting '%s'", resource->GetName(),
+                                                   msgid.c_str());
                 }
             }
         }
@@ -159,13 +159,13 @@ int CLuaTranslationDefsClient::GetAvailableTranslations(lua_State* luaVM)
     {
         if (resource)
             m_pScriptDebugging->LogWarning(luaVM, "Translation system not initialized for resource '%s'", resource->GetName());
-        
+
         lua_newtable(luaVM);
         return 1;
     }
 
     const std::vector<std::string> languages = resource->GetTranslationManager()->GetAvailableLanguages();
-    
+
     lua_newtable(luaVM);
     for (size_t i = 0; i < languages.size(); ++i)
     {

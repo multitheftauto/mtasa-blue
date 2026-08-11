@@ -1,11 +1,11 @@
 /*****************************************************************************
-*
-*  PROJECT:     Multi Theft Auto
-*  LICENSE:     See LICENSE in the top level directory
-*
-*  Multi Theft Auto is available from https://www.multitheftauto.com/
-*
-*****************************************************************************/
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *
+ *****************************************************************************/
 
 #include "StdInc.h"
 #include "CGlobalTranslationManager.h"
@@ -33,13 +33,14 @@ bool CGlobalTranslationManager::RegisterProvider(const std::string& resourceName
         return false;
 
     std::lock_guard<std::mutex> lock(m_providerMutex);
-    
+
     if (m_providers.find(resourceName) != m_providers.end())
     {
-        LogWarning("Global translation provider '" + resourceName + "' is already registered, replacing with new instance. "
+        LogWarning("Global translation provider '" + resourceName +
+                   "' is already registered, replacing with new instance. "
                    "This might indicate a resource restart or duplicate provider registration.");
     }
-    
+
     m_providers[resourceName] = translationManager;
     return true;
 }
@@ -50,7 +51,7 @@ void CGlobalTranslationManager::UnregisterProvider(const std::string& resourceNa
         return;
 
     std::lock_guard<std::mutex> lock(m_providerMutex);
-    
+
     auto it = m_providers.find(resourceName);
     if (it != m_providers.end())
     {
@@ -58,53 +59,55 @@ void CGlobalTranslationManager::UnregisterProvider(const std::string& resourceNa
     }
 }
 
-std::string CGlobalTranslationManager::GetGlobalTranslation(const std::vector<std::string>& providers, const std::string& msgid, const std::string& language) const
+std::string CGlobalTranslationManager::GetGlobalTranslation(const std::vector<std::string>& providers, const std::string& msgid,
+                                                            const std::string& language) const
 {
     if (msgid.empty() || providers.empty())
         return msgid;
 
     thread_local std::set<std::string> visitedProviders;
-    
+
     std::lock_guard<std::mutex> lock(m_providerMutex);
-    
+
     for (const auto& providerName : providers)
     {
         if (visitedProviders.find(providerName) != visitedProviders.end())
             continue;
-            
+
         auto it = m_providers.find(providerName);
         if (it != m_providers.end() && it->second)
         {
             visitedProviders.insert(providerName);
-            
-            struct VisitGuard {
+
+            struct VisitGuard
+            {
                 std::set<std::string>& visited;
-                std::string providerName;
+                std::string            providerName;
                 VisitGuard(std::set<std::string>& v, const std::string& name) : visited(v), providerName(name) {}
                 ~VisitGuard() { visited.erase(providerName); }
             } guard(visitedProviders, providerName);
-            
+
             std::string translation = it->second->GetLocalTranslation(msgid, language);
             if (!translation.empty() && translation != msgid)
                 return translation;
         }
     }
-    
+
     return msgid;
 }
 
 std::vector<std::string> CGlobalTranslationManager::GetAvailableProviders() const
 {
     std::lock_guard<std::mutex> lock(m_providerMutex);
-    
+
     std::vector<std::string> providers;
     providers.reserve(m_providers.size());
-    
+
     for (const auto& pair : m_providers)
     {
         providers.push_back(pair.first);
     }
-    
+
     std::sort(providers.begin(), providers.end());
     return providers;
 }
@@ -131,10 +134,10 @@ void CGlobalTranslationManager::LogWarning(const std::string& message) const
 #else
     CScriptDebugging* pScriptDebugging = g_pGame->GetScriptDebugging();
 #endif
-    
+
     SLuaDebugInfo debugInfo;
     debugInfo.infoType = DEBUG_INFO_NONE;
     debugInfo.strShortSrc = "[GlobalTranslation]";
-    
+
     pScriptDebugging->LogWarning(debugInfo, "%s", message.c_str());
 }
