@@ -79,11 +79,11 @@ private:
     void*                 m_pSpeexEncoderState;
     SpeexPreprocessState* m_pSpeexPreprocState;
 
-    char*        m_pOutgoingBuffer;
-    int          m_iSpeexOutgoingFrameSampleCount;
-    unsigned int m_uiOutgoingReadIndex;
-    unsigned int m_uiOutgoingWriteIndex;
-    bool         m_bIsSendingVoiceData;
+    unsigned char* m_pOutgoingBuffer;
+    int            m_iSpeexOutgoingFrameSampleCount;
+    unsigned int   m_uiOutgoingReadIndex;
+    unsigned int   m_uiOutgoingWriteIndex;
+    bool           m_bIsSendingVoiceData;
 
     unsigned long m_ulTimeOfLastSend;
 
