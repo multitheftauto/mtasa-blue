@@ -18,6 +18,7 @@
 #include "CStringMap.h"
 #include "CScriptDebugging.h"
 #include "CStringName.h"
+#include "CLuaFunctionError.h"
 
 #ifndef MTA_CLIENT
     #include "CGame.h"
@@ -1551,6 +1552,14 @@ public:
     // Make full error message
     //
     SString GetFullErrorMessage() { return SString("%s @ '%s' [%s]", *m_strErrorCategory, lua_tostring(m_luaVM, lua_upvalueindex(1)), *GetErrorMessage()); }
+
+    //
+    // Throw error via LuaFunctionError exception for safe stack unwinding
+    //
+    [[noreturn]] int ThrowError()
+    {
+        throw LuaFunctionError(GetFullErrorMessage(), false);
+    }
 
     //
     // Set custom warning message
