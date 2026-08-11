@@ -621,7 +621,7 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
                     return;
 
                 if (pVehicleModelInfo->GetParentID() != 0)
-                    pVehicleModelInfo = g_pGame->GetModelInfo(static_cast<unsigned short>(pVehicleModelInfo->GetParentID()));
+                    pVehicleModelInfo = g_pGame->GetModelInfo(pVehicleModelInfo->GetParentID());
 
                 if (!pVehicleModelInfo || !pVehicleModelInfo->GetVehicleSupportedUpgrades().m_bSpoiler)
                 {
