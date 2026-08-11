@@ -298,8 +298,6 @@ void CVoiceRecorder::DoPulse()
 
                 unsigned int audioBufferLength = speex_bits_write(&speexBits, reinterpret_cast<char*>(audioBuffer), 2048);
 
-                g_pClientGame->GetLocalPlayer()->GetVoice()->DecodeAndBuffer(audioBuffer, audioBufferLength);
-
                 NetBitStreamInterface* pBitStream = g_pNet->AllocateNetBitStream();
                 if (pBitStream)
                 {

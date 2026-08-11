@@ -123,6 +123,18 @@ void CClientPlayerVoice::DecodeAndBuffer(const unsigned char* voiceBuffer, unsig
     if (!voiceBuffer || !voiceBufferLength || voiceBufferLength > 2048)
         return;
 
+    char      pTempBuffer[2048];
+    SpeexBits speexBits;
+    speex_bits_init(&speexBits);
+
+    speex_bits_read_from(&speexBits, reinterpret_cast<const char*>(voiceBuffer), voiceBufferLength);
+    const int decodeResult = speex_decode_int(m_pSpeexDecoderState, &speexBits, (spx_int16_t*)pTempBuffer);
+
+    speex_bits_destroy(&speexBits);
+
+    if (decodeResult < 0)
+        return;
+
     m_Mutex.lock();
 
     if (!m_bVoiceActive)
@@ -141,15 +153,6 @@ void CClientPlayerVoice::DecodeAndBuffer(const unsigned char* voiceBuffer, unsig
     {
         m_Mutex.unlock();
     }
-
-    char      pTempBuffer[2048];
-    SpeexBits speexBits;
-    speex_bits_init(&speexBits);
-
-    speex_bits_read_from(&speexBits, reinterpret_cast<const char*>(voiceBuffer), voiceBufferLength);
-    speex_decode_int(m_pSpeexDecoderState, &speexBits, (spx_int16_t*)pTempBuffer);
-
-    speex_bits_destroy(&speexBits);
 
     unsigned int uiSpeexBlockSize = m_iSpeexIncomingFrameSampleCount * VOICE_SAMPLE_SIZE;
 
