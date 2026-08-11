@@ -282,7 +282,7 @@ bool CResource::Load()
                 !ReadIncludedGlobalTranslations(pRoot))
             {
                 delete pMetaFile;
-                g_pGame->GetHTTPD()->UnregisterEHS(m_strResourceName.c_str());
+                g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
                 return false;
             }
             
