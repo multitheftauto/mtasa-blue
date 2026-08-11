@@ -65,6 +65,456 @@ static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// The Cement Truck's drum on custom vehicle models
+//
+// Same split again: ProcessControl decides whether to turn the drum and whether to reach the code
+// that works out the force it applies, and PreRender decides whether to draw it turned. A clone
+// carrying its own model ID matches none of the checks, so the drum just sits still.
+//
+// The force calculation site is shared with the fire truck's ladder, which keeps its own separate
+// comparison right after this one; only the Cement Truck's own comparison is touched here.
+//
+// Every hook below asks the same question, whether this vehicle should behave as a Cement Truck,
+// and lets the model it was cloned from count. Everything else keeps the model index it already had.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static bool __fastcall IsCementTruckOrClone(CVehicleSAInterface* vehicle)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
+    if (modelId == static_cast<std::uint32_t>(VehicleType::VT_CEMENT))
+        return true;
+
+    CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+    return modelInfo && modelInfo->GetParentID() == static_cast<unsigned int>(VehicleType::VT_CEMENT);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::ProcessControl, resetting the drum's previous angle for this tick
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A149F | 66 81 F9 0C 02 | cmp     cx, 0x20C
+// >>> 0x6A14A4 | 74 0E          | je      0x6A14B4
+//     0x6A14A6 | 66 81 F9 50 02 | cmp     cx, 0x250
+#define HOOKPOS_CAutomobile__ProcessControl_CementAngleReset  0x6A149F
+#define HOOKSIZE_CAutomobile__ProcessControl_CementAngleReset 7
+static const DWORD CONTINUE_CAutomobile__ProcessControl_CementAngleReset = 0x6A14B4;
+static const DWORD SKIP_CAutomobile__ProcessControl_CementAngleReset = 0x6A14A6;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_CementAngleReset()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    ecx
+        mov     ecx, edi
+        call    IsCementTruckOrClone
+        test    al, al
+        pop     ecx
+        jz      notCement
+
+        jmp     CONTINUE_CAutomobile__ProcessControl_CementAngleReset
+
+        notCement:
+        jmp     SKIP_CAutomobile__ProcessControl_CementAngleReset
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::ProcessControl, letting the drum into the block that turns it this tick
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A1502 | 66 81 F9 0C 02 | cmp     cx, 0x20C
+// >>> 0x6A1507 | 74 53          | je      0x6A155C
+//     0x6A1509 | 66 81 F9 50 02 | cmp     cx, 0x250
+#define HOOKPOS_CAutomobile__ProcessControl_CementMiscGate  0x6A1502
+#define HOOKSIZE_CAutomobile__ProcessControl_CementMiscGate 7
+static const DWORD CONTINUE_CAutomobile__ProcessControl_CementMiscGate = 0x6A155C;
+static const DWORD SKIP_CAutomobile__ProcessControl_CementMiscGate = 0x6A1509;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_CementMiscGate()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    ecx
+        mov     ecx, edi
+        call    IsCementTruckOrClone
+        test    al, al
+        pop     ecx
+        jz      notCement
+
+        jmp     CONTINUE_CAutomobile__ProcessControl_CementMiscGate
+
+        notCement:
+        jmp     SKIP_CAutomobile__ProcessControl_CementMiscGate
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The force the drum applies to whatever it pushes
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A1560 | 66 3D 0C 02       | cmp     ax, 0x20C
+// >>> 0x6A1564 | 0F 84 0B 08 00 00 | je      0x6A1D75
+//     0x6A156A | 66 3D 20 02       | cmp     ax, 0x220
+#define HOOKPOS_CAutomobile__MovingCollisionSpeed_Cement  0x6A1560
+#define HOOKSIZE_CAutomobile__MovingCollisionSpeed_Cement 10
+static const DWORD CONTINUE_CAutomobile__MovingCollisionSpeed_Cement = 0x6A1D75;
+static const DWORD SKIP_CAutomobile__MovingCollisionSpeed_Cement = 0x6A156A;
+
+static void __declspec(naked) HOOK_CAutomobile__MovingCollisionSpeed_Cement()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    eax
+        mov     ecx, edi
+        call    IsCementTruckOrClone
+        test    al, al
+        pop     eax
+        jz      notCement
+
+        jmp     CONTINUE_CAutomobile__MovingCollisionSpeed_Cement
+
+        notCement:
+        jmp     SKIP_CAutomobile__MovingCollisionSpeed_Cement
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::PreRender, turning the drum
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6AC43B | 66 3D 0C 02       | cmp     ax, 0x20C
+// >>> 0x6AC43F | 0F 85 94 00 00 00 | jne     0x6AC4D9
+//     0x6AC445 | 8A 56 36          | mov     dl, byte ptr [esi + 0x36]
+#define HOOKPOS_CAutomobile__PreRender_CementTurn  0x6AC43B
+#define HOOKSIZE_CAutomobile__PreRender_CementTurn 10
+static const DWORD CONTINUE_CAutomobile__PreRender_CementTurn = 0x6AC445;
+static const DWORD SKIP_CAutomobile__PreRender_CementTurn = 0x6AC4D9;
+
+static void __declspec(naked) HOOK_CAutomobile__PreRender_CementTurn()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    eax
+        mov     ecx, esi
+        call    IsCementTruckOrClone
+        test    al, al
+        pop     eax
+        jz      notCement
+
+        jmp     CONTINUE_CAutomobile__PreRender_CementTurn
+
+        notCement:
+        jmp     SKIP_CAutomobile__PreRender_CementTurn
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::ProcessControl, the model switch that reaches UpdateMovingCollision at all
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6B1FA1 | 66 3D 0C 02 | cmp     ax, 0x20C
+// >>> 0x6B1FA5 | 74 68       | je      0x6B200F
+//     0x6B1FA7 | 66 3D 50 02 | cmp     ax, 0x250
+#define HOOKPOS_CAutomobile__ProcessControl_CementDispatch  0x6B1FA1
+#define HOOKSIZE_CAutomobile__ProcessControl_CementDispatch 6
+static const DWORD CONTINUE_CAutomobile__ProcessControl_CementDispatch = 0x6B200F;
+static const DWORD SKIP_CAutomobile__ProcessControl_CementDispatch = 0x6B1FA7;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_CementDispatch()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    eax
+        mov     ecx, esi
+        call    IsCementTruckOrClone
+        test    al, al
+        pop     eax
+        jz      notCement
+
+        jmp     CONTINUE_CAutomobile__ProcessControl_CementDispatch
+
+        notCement:
+        jmp     SKIP_CAutomobile__ProcessControl_CementDispatch
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// The Dozer's blade on custom vehicle models
+//
+// CAutomobile::ProcessControl and CAutomobile::PreRender both decide whether to move the blade
+// (component misc_a) through their own separate model index checks, and the force the blade applies
+// to whatever it pushes is worked out the same way in a third place. A model created by
+// engineRequestModel carries an ID of its own, so a cloned Dozer matches none of them and the blade
+// just sits still.
+//
+// Every hook below asks the same question, whether this vehicle should behave as a Dozer, and lets
+// the model it was cloned from count. Everything else keeps the model index it already had.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static bool __fastcall IsDozerOrClone(CVehicleSAInterface* vehicle)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
+    if (modelId == static_cast<std::uint32_t>(VehicleType::VT_DOZER))
+        return true;
+
+    CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+    return modelInfo && modelInfo->GetParentID() == static_cast<unsigned int>(VehicleType::VT_DOZER);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::ProcessControl, resetting the blade's previous angle for this tick
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A1491 | 66 81 F9 E6 01 | cmp     cx, 0x1E6
+// >>> 0x6A1496 | 74 1C          | je      0x6A14B4
+//     0x6A1498 | 66 81 F9 96 01 | cmp     cx, 0x196
+#define HOOKPOS_CAutomobile__ProcessControl_DozerAngleReset  0x6A1491
+#define HOOKSIZE_CAutomobile__ProcessControl_DozerAngleReset 7
+static const DWORD CONTINUE_CAutomobile__ProcessControl_DozerAngleReset = 0x6A14B4;
+static const DWORD SKIP_CAutomobile__ProcessControl_DozerAngleReset = 0x6A1498;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_DozerAngleReset()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    ecx
+        mov     ecx, edi
+        call    IsDozerOrClone
+        test    al, al
+        pop     ecx
+        jz      notDozer
+
+        jmp     CONTINUE_CAutomobile__ProcessControl_DozerAngleReset
+
+        notDozer:
+        jmp     SKIP_CAutomobile__ProcessControl_DozerAngleReset
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::ProcessControl, letting the blade into the block that moves it this tick
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A14F4 | 66 81 F9 E6 01 | cmp     cx, 0x1E6
+// >>> 0x6A14F9 | 74 61          | je      0x6A155C
+//     0x6A14FB | 66 81 F9 96 01 | cmp     cx, 0x196
+#define HOOKPOS_CAutomobile__ProcessControl_DozerMiscGate  0x6A14F4
+#define HOOKSIZE_CAutomobile__ProcessControl_DozerMiscGate 7
+static const DWORD CONTINUE_CAutomobile__ProcessControl_DozerMiscGate = 0x6A155C;
+static const DWORD SKIP_CAutomobile__ProcessControl_DozerMiscGate = 0x6A14FB;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_DozerMiscGate()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    ecx
+        mov     ecx, edi
+        call    IsDozerOrClone
+        test    al, al
+        pop     ecx
+        jz      notDozer
+
+        jmp     CONTINUE_CAutomobile__ProcessControl_DozerMiscGate
+
+        notDozer:
+        jmp     SKIP_CAutomobile__ProcessControl_DozerMiscGate
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The force the blade applies to whatever it pushes, part one
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A173F | 66 3D E6 01          | cmp     ax, 0x1E6
+// >>> 0x6A1743 | 89 9C 24 F8 00 00 00 | mov     dword ptr [esp + 0xF8], ebx
+// >>> 0x6A174A | 75 50                | jne     0x6A179C
+#define HOOKPOS_CAutomobile__MovingCollisionSpeed_Dozer  0x6A173F
+#define HOOKSIZE_CAutomobile__MovingCollisionSpeed_Dozer 13
+static const DWORD CONTINUE_CAutomobile__MovingCollisionSpeed_Dozer = 0x6A174C;
+static const DWORD SKIP_CAutomobile__MovingCollisionSpeed_Dozer = 0x6A179C;
+
+static void __declspec(naked) HOOK_CAutomobile__MovingCollisionSpeed_Dozer()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // ebx is already zero here (xor ebx, ebx a few instructions up), and this reset happens for
+        // every model that reaches this point, not only a matched one, so it stays unconditional.
+        mov     dword ptr [esp + 0xF8], ebx
+
+        push    eax
+        mov     ecx, edi
+        call    IsDozerOrClone
+        test    al, al
+        pop     eax
+        jz      notDozer
+
+        jmp     CONTINUE_CAutomobile__MovingCollisionSpeed_Dozer
+
+        notDozer:
+        jmp     SKIP_CAutomobile__MovingCollisionSpeed_Dozer
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The force the blade applies to whatever it pushes, part two
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A1FB6 | 66 81 F9 E6 01 | cmp     cx, 0x1E6
+// >>> 0x6A1FBB | 75 14          | jne     0x6A1FD1
+//     0x6A1FBD | 8B 86 98 06 00 00 | mov  eax, [esi + 0x698]
+#define HOOKPOS_CAutomobile__MovingCollisionSpeed_DozerExtraA  0x6A1FB6
+#define HOOKSIZE_CAutomobile__MovingCollisionSpeed_DozerExtraA 7
+static const DWORD CONTINUE_CAutomobile__MovingCollisionSpeed_DozerExtraA = 0x6A1FBD;
+static const DWORD SKIP_CAutomobile__MovingCollisionSpeed_DozerExtraA = 0x6A1FD1;
+
+static void __declspec(naked) HOOK_CAutomobile__MovingCollisionSpeed_DozerExtraA()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    ecx
+        mov     ecx, esi
+        call    IsDozerOrClone
+        test    al, al
+        pop     ecx
+        jz      notDozer
+
+        jmp     CONTINUE_CAutomobile__MovingCollisionSpeed_DozerExtraA
+
+        notDozer:
+        jmp     SKIP_CAutomobile__MovingCollisionSpeed_DozerExtraA
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The force the blade applies to whatever it pushes, part three
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A21A4 | 66 3D E6 01 | cmp     ax, 0x1E6
+// >>> 0x6A21A8 | 75 1E       | jne     0x6A21C8
+//     0x6A21AA | 8B B1 98 06 00 00 | mov ptr esi, [ecx + 0x698]
+#define HOOKPOS_CAutomobile__MovingCollisionSpeed_DozerExtraB  0x6A21A4
+#define HOOKSIZE_CAutomobile__MovingCollisionSpeed_DozerExtraB 6
+static const DWORD CONTINUE_CAutomobile__MovingCollisionSpeed_DozerExtraB = 0x6A21AA;
+static const DWORD SKIP_CAutomobile__MovingCollisionSpeed_DozerExtraB = 0x6A21C8;
+
+static void __declspec(naked) HOOK_CAutomobile__MovingCollisionSpeed_DozerExtraB()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    eax
+        push    ecx
+        call    IsDozerOrClone
+        test    al, al
+        pop     ecx
+        pop     eax
+        jz      notDozer
+
+        jmp     CONTINUE_CAutomobile__MovingCollisionSpeed_DozerExtraB
+
+        notDozer:
+        jmp     SKIP_CAutomobile__MovingCollisionSpeed_DozerExtraB
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::PreRender, swinging the misc_a component out (Dozer blade)
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6AC40C | 66 3D E6 01 | cmp     ax, 0x1E6
+// >>> 0x6AC410 | 75 29       | jne     0x6AC43B
+//     0x6AC412 | 0F B7 86 6C 08 00 00 | movzx eax, word ptr [esi + 0x86C]
+#define HOOKPOS_CAutomobile__PreRender_DozerSwing  0x6AC40C
+#define HOOKSIZE_CAutomobile__PreRender_DozerSwing 6
+static const DWORD CONTINUE_CAutomobile__PreRender_DozerSwing = 0x6AC412;
+static const DWORD SKIP_CAutomobile__PreRender_DozerSwing = 0x6AC43B;
+
+static void __declspec(naked) HOOK_CAutomobile__PreRender_DozerSwing()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    eax
+        mov     ecx, esi
+        call    IsDozerOrClone
+        test    al, al
+        pop     eax
+        jz      notDozer
+
+        jmp     CONTINUE_CAutomobile__PreRender_DozerSwing
+
+        notDozer:
+        jmp     SKIP_CAutomobile__PreRender_DozerSwing
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::ProcessControl, the model switch that reaches UpdateMovingCollision at all
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6B1F95 | 66 3D E6 01 | cmp     ax, 0x1E6
+// >>> 0x6B1F99 | 74 74       | je      0x6B200F
+//     0x6B1F9B | 66 3D 96 01 | cmp     ax, 0x196
+#define HOOKPOS_CAutomobile__ProcessControl_DozerDispatch  0x6B1F95
+#define HOOKSIZE_CAutomobile__ProcessControl_DozerDispatch 6
+static const DWORD CONTINUE_CAutomobile__ProcessControl_DozerDispatch = 0x6B200F;
+static const DWORD SKIP_CAutomobile__ProcessControl_DozerDispatch = 0x6B1F9B;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_DozerDispatch()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    eax
+        mov     ecx, esi
+        call    IsDozerOrClone
+        test    al, al
+        pop     eax
+        jz      notDozer
+
+        jmp     CONTINUE_CAutomobile__ProcessControl_DozerDispatch
+
+        notDozer:
+        jmp     SKIP_CAutomobile__ProcessControl_DozerDispatch
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Pop up headlights on custom vehicle models
 //
 // The ZR-350 is the one car whose headlights swing out before they light up, and the game drives it
@@ -88,7 +538,7 @@ static bool __fastcall HasPopUpHeadlights(CVehicleSAInterface* vehicle)
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// CAutomobile::PreRender, swinging the misc_a component out
+// CAutomobile::PreRender, swinging the misc_a component out (ZR-350 headlights)
 //////////////////////////////////////////////////////////////////////////////////////////
 // >>> 0x6ACA8D | 66 3D DD 01       | cmp     ax, 0x1DD
 // >>> 0x6ACA91 | 0F 85 30 01 00 00 | jne     0x6ACBC7
@@ -236,6 +686,232 @@ static void __declspec(naked) HOOK_CAutomobile__GetTowBarPos()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// The Dumper's tipping ramp on custom vehicle models
+//
+// Built on CMonsterTruck, not plain CAutomobile: ProcessControl decides whether the ramp moves,
+// UpdateMovingCollision moves it and picks the rotation formula, GetMovingCollisionOffset answers
+// how far it's tipped, and CMonsterTruck::PreRender does the actual swing. All gate on model index
+// alone, so a clone matches none of them. IsSubMonsterTruck() (a runtime flag, not model index)
+// already recognises a clone and is left untouched.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static bool __fastcall IsDumperOrClone(CVehicleSAInterface* vehicle)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
+    if (modelId == static_cast<std::uint32_t>(VehicleType::VT_DUMPER))
+        return true;
+
+    CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+    return modelInfo && modelInfo->GetParentID() == static_cast<unsigned int>(VehicleType::VT_DUMPER);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::ProcessControl, the switch that reaches UpdateMovingCollision at all
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6B1F9B | 66 3D 96 01 | cmp     ax, 0x196
+// >>> 0x6B1F9F | 74 6E       | je      0x6B200F
+//     0x6B1FA1 | 66 3D 0C 02 | cmp     ax, 0x20C
+#define HOOKPOS_CAutomobile__ProcessControl_DumperDispatch  0x6B1F9B
+#define HOOKSIZE_CAutomobile__ProcessControl_DumperDispatch 6
+static const DWORD CONTINUE_CAutomobile__ProcessControl_DumperDispatch = 0x6B200F;
+static const DWORD SKIP_CAutomobile__ProcessControl_DumperDispatch = 0x6B1FA1;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_DumperDispatch()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // ax (model id) is read again on skip
+        push    eax
+        mov     ecx, esi
+        call    IsDumperOrClone
+        test    al, al
+        pop     eax
+        jz      notDumper
+
+        jmp     CONTINUE_CAutomobile__ProcessControl_DumperDispatch
+
+        notDumper:
+        jmp     SKIP_CAutomobile__ProcessControl_DumperDispatch
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::UpdateMovingCollision, resetting the ramp's previous angle for this tick
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A1498 | 66 81 F9 96 01 | cmp     cx, 0x196
+// >>> 0x6A149D | 74 15          | je      0x6A14B4
+//     0x6A149F | 66 81 F9 0C 02 | cmp     cx, 0x20C
+#define HOOKPOS_CAutomobile__UpdateMovingCollision_DumperAngleReset  0x6A1498
+#define HOOKSIZE_CAutomobile__UpdateMovingCollision_DumperAngleReset 7
+static const DWORD CONTINUE_CAutomobile__UpdateMovingCollision_DumperAngleReset = 0x6A14B4;
+static const DWORD SKIP_CAutomobile__UpdateMovingCollision_DumperAngleReset = 0x6A149F;
+
+static void __declspec(naked) HOOK_CAutomobile__UpdateMovingCollision_DumperAngleReset()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // cx (model id) is read again on skip
+        push    ecx
+        mov     ecx, edi
+        call    IsDumperOrClone
+        test    al, al
+        pop     ecx
+        jz      notDumper
+
+        jmp     CONTINUE_CAutomobile__UpdateMovingCollision_DumperAngleReset
+
+        notDumper:
+        jmp     SKIP_CAutomobile__UpdateMovingCollision_DumperAngleReset
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::UpdateMovingCollision, letting the ramp into the block that moves it this tick
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A14FB | 66 81 F9 96 01 | cmp     cx, 0x196
+// >>> 0x6A1500 | 74 5A          | je      0x6A155C
+//     0x6A1502 | 66 81 F9 0C 02 | cmp     cx, 0x20C
+#define HOOKPOS_CAutomobile__UpdateMovingCollision_DumperMiscGate  0x6A14FB
+#define HOOKSIZE_CAutomobile__UpdateMovingCollision_DumperMiscGate 7
+static const DWORD CONTINUE_CAutomobile__UpdateMovingCollision_DumperMiscGate = 0x6A155C;
+static const DWORD SKIP_CAutomobile__UpdateMovingCollision_DumperMiscGate = 0x6A1502;
+
+static void __declspec(naked) HOOK_CAutomobile__UpdateMovingCollision_DumperMiscGate()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // cx (model id) is read again on skip
+        push    ecx
+        mov     ecx, edi
+        call    IsDumperOrClone
+        test    al, al
+        pop     ecx
+        jz      notDumper
+
+        jmp     CONTINUE_CAutomobile__UpdateMovingCollision_DumperMiscGate
+
+        notDumper:
+        jmp     SKIP_CAutomobile__UpdateMovingCollision_DumperMiscGate
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::UpdateMovingCollision, picking the ramp's own rotation formula
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A179C | 66 3D 96 01 | cmp     ax, 0x196
+// >>> 0x6A17A0 | 75 4D       | jne     0x6A17EF
+//     0x6A17A2 | 83 BF 94 05 00 00 01 | cmp dword ptr [edi + 0x594], 1
+#define HOOKPOS_CAutomobile__UpdateMovingCollision_DumperRotation  0x6A179C
+#define HOOKSIZE_CAutomobile__UpdateMovingCollision_DumperRotation 6
+static const DWORD CONTINUE_CAutomobile__UpdateMovingCollision_DumperRotation = 0x6A17A2;
+static const DWORD SKIP_CAutomobile__UpdateMovingCollision_DumperRotation = 0x6A17EF;
+
+static void __declspec(naked) HOOK_CAutomobile__UpdateMovingCollision_DumperRotation()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // ax (model id) is read again on skip
+        push    eax
+        mov     ecx, edi
+        call    IsDumperOrClone
+        test    al, al
+        pop     eax
+        jz      notDumper
+
+        jmp     CONTINUE_CAutomobile__UpdateMovingCollision_DumperRotation
+
+        notDumper:
+        jmp     SKIP_CAutomobile__UpdateMovingCollision_DumperRotation
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::GetMovingCollisionOffset, the ramp's case in the model switch
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A2166 | 66 3D 96 01 | cmp     ax, 0x196
+// >>> 0x6A216A | 75 1E       | jne     0x6A218A
+//     0x6A216C | 8B B1 A0 06 00 00 | mov esi, [ecx + 0x6A0]
+#define HOOKPOS_CAutomobile__GetMovingCollisionOffset_Dumper  0x6A2166
+#define HOOKSIZE_CAutomobile__GetMovingCollisionOffset_Dumper 6
+static const DWORD CONTINUE_CAutomobile__GetMovingCollisionOffset_Dumper = 0x6A216C;
+static const DWORD SKIP_CAutomobile__GetMovingCollisionOffset_Dumper = 0x6A218A;
+
+static void __declspec(naked) HOOK_CAutomobile__GetMovingCollisionOffset_Dumper()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // ecx is the vehicle (already the call arg); ax and dx are both read again past here
+        push    eax
+        push    ecx
+        push    edx
+        call    IsDumperOrClone
+        test    al, al
+        pop     edx
+        pop     ecx
+        pop     eax
+        jz      notDumper
+
+        jmp     CONTINUE_CAutomobile__GetMovingCollisionOffset_Dumper
+
+        notDumper:
+        jmp     SKIP_CAutomobile__GetMovingCollisionOffset_Dumper
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CMonsterTruck::PreRender, swinging the misc_c component out
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6C7F30 | 66 81 7E 22 96 01 | cmp     word ptr [esi + 0x22], 0x196
+// >>> 0x6C7F36 | 75 2F             | jne     0x6C7F67
+//     0x6C7F38 | 8B 86 A0 06 00 00 | mov     eax, [esi + 0x6A0]
+#define HOOKPOS_CMonsterTruck__PreRender_DumperSwing  0x6C7F30
+#define HOOKSIZE_CMonsterTruck__PreRender_DumperSwing 8
+static const DWORD CONTINUE_CMonsterTruck__PreRender_DumperSwing = 0x6C7F38;
+static const DWORD SKIP_CMonsterTruck__PreRender_DumperSwing = 0x6C7F67;
+
+static void __declspec(naked) HOOK_CMonsterTruck__PreRender_DumperSwing()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // esi is callee-saved; nothing past here reads eax/ecx/edx from before the call
+        mov     ecx, esi
+        call    IsDumperOrClone
+        test    al, al
+        jz      notDumper
+
+        jmp     CONTINUE_CMonsterTruck__PreRender_DumperSwing
+
+        notDumper:
+        jmp     SKIP_CMonsterTruck__PreRender_DumperSwing
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::InitHooks_Vehicles
 //
 // Setup hooks
@@ -244,7 +920,25 @@ static void __declspec(naked) HOOK_CAutomobile__GetTowBarPos()
 void CMultiplayerSA::InitHooks_Vehicles()
 {
     EZHookInstall(CDamageManager__ProgressDoorDamage);
+    EZHookInstall(CAutomobile__ProcessControl_CementAngleReset);
+    EZHookInstall(CAutomobile__ProcessControl_CementMiscGate);
+    EZHookInstall(CAutomobile__MovingCollisionSpeed_Cement);
+    EZHookInstall(CAutomobile__PreRender_CementTurn);
+    EZHookInstall(CAutomobile__ProcessControl_CementDispatch);
+    EZHookInstall(CAutomobile__ProcessControl_DozerAngleReset);
+    EZHookInstall(CAutomobile__ProcessControl_DozerMiscGate);
+    EZHookInstall(CAutomobile__MovingCollisionSpeed_Dozer);
+    EZHookInstall(CAutomobile__MovingCollisionSpeed_DozerExtraA);
+    EZHookInstall(CAutomobile__MovingCollisionSpeed_DozerExtraB);
+    EZHookInstall(CAutomobile__PreRender_DozerSwing);
+    EZHookInstall(CAutomobile__ProcessControl_DozerDispatch);
     EZHookInstall(CAutomobile__PreRender_PopUpLights);
     EZHookInstall(CVehicle__DoVehicleLights_PopUpLights);
     EZHookInstall(CAutomobile__GetTowBarPos);
+    EZHookInstall(CAutomobile__ProcessControl_DumperDispatch);
+    EZHookInstall(CAutomobile__UpdateMovingCollision_DumperAngleReset);
+    EZHookInstall(CAutomobile__UpdateMovingCollision_DumperMiscGate);
+    EZHookInstall(CAutomobile__UpdateMovingCollision_DumperRotation);
+    EZHookInstall(CAutomobile__GetMovingCollisionOffset_Dumper);
+    EZHookInstall(CMonsterTruck__PreRender_DumperSwing);
 }
