@@ -43,7 +43,6 @@ project "Deathmatch"
 	links {
 		"Lua_Server", "sqlite", "cryptopp", "pme", "pcre2", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt", "tinygettext",
 	}
-	}
 
 	vpaths {
 		["Headers/*"] = {"**.h", "../../../Shared/mods/deathmatch/**.h", "../../**.h"},
