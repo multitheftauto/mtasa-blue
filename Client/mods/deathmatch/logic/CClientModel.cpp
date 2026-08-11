@@ -136,14 +136,16 @@ void CClientModel::RestoreEntitiesUsingThisModel()
 
 void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
 {
-    auto callElementChangeEvent = [](auto &element, unsigned short usParentID, auto modelId) {
+    auto callElementChangeEvent = [](auto& element, unsigned short usParentID, auto modelId)
+    {
         CLuaArguments Arguments;
         Arguments.PushNumber(modelId);
         Arguments.PushNumber(usParentID);
         element.CallEvent("onClientElementModelChange", Arguments, true);
     };
 
-    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda) {
+    auto unloadModelsAndCallEvents = [&](auto iterBegin, auto iterEnd, unsigned short usParentID, auto setElementModelLambda)
+    {
         for (auto iter = iterBegin; iter != iterEnd; iter++)
         {
             auto& element = **iter;
@@ -202,8 +204,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             // Restore buildings
             CClientBuildingManager* pBuildingsManager = g_pClientGame->GetManager()->GetBuildingManager();
             auto&                   buildingsList = pBuildingsManager->GetBuildings();
-            unloadModelsAndCallEventsNonStreamed(buildingsList.begin(), buildingsList.end(), usParentID,
-                                      [=](auto& element) { element.SetModel(usParentID); });
+            unloadModelsAndCallEventsNonStreamed(buildingsList.begin(), buildingsList.end(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
 
             // Restore COL
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(static_cast<unsigned short>(m_iModelID));
@@ -224,7 +225,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
     g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(static_cast<unsigned short>(m_iModelID));
 }
 
-bool CClientModel::AllocateTXD(std::string &strTxdName)
+bool CClientModel::AllocateTXD(std::string& strTxdName)
 {
     std::uint32_t uiSlotID = g_pGame->GetPools()->GetTxdPool().AllocateTextureDictonarySlot(m_iModelID - MAX_MODEL_DFF_ID, strTxdName);
     if (uiSlotID != -1)

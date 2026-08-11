@@ -25,7 +25,10 @@ CBikeHandlingEntrySA::CBikeHandlingEntrySA(tBikeHandlingDataSA* pOriginal)
 
 void CBikeHandlingEntrySA::Assign(const CBikeHandlingEntry* pData)
 {
-    const CBikeHandlingEntrySA* pEntrySA = static_cast<const CBikeHandlingEntrySA*>(pData);
+    if (!pData)
+        return;
+
+    const auto* pEntrySA = static_cast<const CBikeHandlingEntrySA*>(pData);
     m_BikeHandling = pEntrySA->m_BikeHandling;
 }
 

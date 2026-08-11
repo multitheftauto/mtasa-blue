@@ -25,6 +25,7 @@ CDiscordRichPresence::CDiscordRichPresence() : m_uiDiscordAppStart(0), m_uiDisco
 
     m_strDiscordAppState.clear();
     m_strDiscordCustomResourceName.clear();
+    m_bDiscordRPCEnabled = false;
     m_bConnected = false;
 }
 
@@ -37,7 +38,7 @@ CDiscordRichPresence::~CDiscordRichPresence()
 void CDiscordRichPresence::InitializeDiscord()
 {
     std::lock_guard<std::mutex> lock(m_threadSafetyMutex);
-    DiscordEventHandlers handlers;
+    DiscordEventHandlers        handlers;
     memset(&handlers, 0, sizeof(handlers));
 
     handlers.ready = HandleDiscordReady;
@@ -107,7 +108,7 @@ void CDiscordRichPresence::UpdatePresence()
         return;
 
     std::lock_guard<std::mutex> lock(m_threadSafetyMutex);
-    DiscordRichPresence discordPresence;
+    DiscordRichPresence         discordPresence;
     memset(&discordPresence, 0, sizeof(discordPresence));
 
     discordPresence.largeImageKey = m_strDiscordAppAsset.c_str();
@@ -115,7 +116,8 @@ void CDiscordRichPresence::UpdatePresence()
     discordPresence.smallImageKey = m_strDiscordAppAssetSmall.c_str();
     discordPresence.smallImageText = m_strDiscordAppAssetSmallText.c_str();
 
-    discordPresence.state = (!m_strDiscordAppCustomState.empty() || !m_bDisallowCustomDetails) ? m_strDiscordAppCustomState.c_str() : m_strDiscordAppState.c_str();
+    discordPresence.state =
+        (!m_strDiscordAppCustomState.empty() || !m_bDisallowCustomDetails) ? m_strDiscordAppCustomState.c_str() : m_strDiscordAppState.c_str();
 
     discordPresence.details =
         (!m_strDiscordAppCustomDetails.empty() || !m_bDisallowCustomDetails) ? m_strDiscordAppCustomDetails.c_str() : m_strDiscordAppDetails.c_str();

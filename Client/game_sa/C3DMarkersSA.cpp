@@ -41,8 +41,13 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, T3DMarkerType dwType, CV
     dwType = (T3DMarkerType)wType;
     bool bZCheck = true;
 
+    // Pass a copy of the position to PlaceMarker, not the original pointer.
+    CVector  vecPositionCopy = *vecPosition;
+    CVector* pVecPosCopy = &vecPositionCopy;
+
     DWORD dwFunc = FUNC_PlaceMarker;
     DWORD dwReturn = 0;
+    // clang-format off
     __asm
     {
         push    bZCheck     // zCheck  ##SA##
@@ -57,13 +62,14 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, T3DMarkerType dwType, CV
         push    g           // green
         push    r           // red
         push    fSize       // size
-        push    vecPosition // position
+        push    pVecPosCopy // position (copy to prevent PlaceMarker from corrupting the caller's vector)
         push    dwType      // type
         push    Identifier  // identifier
         call    dwFunc
         mov     dwReturn, eax
         add     esp, 0x3C
     }
+    // clang-format on
 
     if (dwReturn)
     {
@@ -102,7 +108,7 @@ C3DMarker* C3DMarkersSA::FindMarker(DWORD Identifier)
 
 void C3DMarkersSA::ReinitMarkers()
 {
-    using Function_ShutdownMarkers = void(__cdecl *)();
+    using Function_ShutdownMarkers = void(__cdecl*)();
     auto shutdownMarkers = reinterpret_cast<Function_ShutdownMarkers>(0x722710);
 
     using Function_InitMarkers = void(__cdecl*)();

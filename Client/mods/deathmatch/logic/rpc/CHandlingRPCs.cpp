@@ -364,10 +364,12 @@ void CHandlingRPCs::RestoreVehicleHandlingProperty(CClientEntity* pSource, NetBi
             CClientVehicle&       Vehicle = static_cast<CClientVehicle&>(*pSource);
             CHandlingEntry*       pHandlingEntry = Vehicle.GetHandlingData();
             const CHandlingEntry* pOriginalEntry = Vehicle.GetOriginalHandlingData();
+            CModelInfo*           pModelInfo = Vehicle.GetModelInfo();
             HandlingProperty      property = static_cast<HandlingProperty>(ucProperty);
+            const bool            bSupportsSuspension = pModelInfo && (pModelInfo->IsCar() || pModelInfo->IsMonsterTruck());
 
             if (property >= HandlingProperty::HANDLING_SUSPENSION_FORCELEVEL && property <= HandlingProperty::HANDLING_SUSPENSION_ANTIDIVEMULTIPLIER &&
-                (Vehicle.GetModelInfo()->IsCar() || Vehicle.GetModelInfo()->IsMonsterTruck()))
+                !bSupportsSuspension)
             {
                 return;
             }

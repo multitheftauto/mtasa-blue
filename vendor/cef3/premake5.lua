@@ -3,6 +3,7 @@ project "CEF"
 	language "C++"
 	kind "StaticLib"
 	targetdir(buildpath("lib"))
+	warnings "Off"
 
 	includedirs { "cef" }
 	-- Check this: https://bitbucket.org/chromiumembedded/cef/src/48908c919591afadac3383effbc5f21a2d40f637/cmake/cef_variables.cmake.in?at=master&fileviewer=file-view-default
@@ -27,6 +28,6 @@ project "CEF"
 
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
-	
+
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" }

@@ -6,6 +6,7 @@ project "Loader"
 	disablewarnings {
 		"4996", -- use of symbol with __declspec(deprecated)
 	}
+	clangtidy "On"
 
 	includedirs {
 		"../../Shared/sdk",
@@ -17,6 +18,7 @@ project "Loader"
 	links {
 		"unrar", "d3d9",
 		"detours", "Imagehlp",
+		"DbgHelp", "Psapi",
 		"../../vendor/nvapi/x86/nvapi.lib",
 		"cryptopp",
 	}
@@ -35,7 +37,9 @@ project "Loader"
 	files {
 		"premake5.lua",
 		"*.h",
-		"*.cpp"
+		"*.cpp",
+		"../core/FastFailCrashHandler/WerCrashHandler.h",
+		"../core/FastFailCrashHandler/WerCrashHandler.cpp"
 	}
 
 	filter "system:windows"

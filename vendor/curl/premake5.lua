@@ -3,6 +3,7 @@ project "curl"
 	language "C"
 	kind "StaticLib"
 	targetname "curl"
+	warnings "Off"
 
 	includedirs { "include", "lib", "../mbedtls/include", "../zlib" }
 	defines { "BUILDING_LIBCURL", "CURL_STATICLIB", "HTTP_ONLY", "USE_ZLIB", "HAVE_LIBZ", "HAVE_ZLIB_H", "HAVE_CONFIG_H", "CURL_DISABLE_LIBCURL_OPTION" }

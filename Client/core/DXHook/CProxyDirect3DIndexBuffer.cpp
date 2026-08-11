@@ -21,7 +21,7 @@
 /////////////////////////////////////////////////////////////
 CProxyDirect3DIndexBuffer::CProxyDirect3DIndexBuffer(IDirect3DDevice9* InD3DDevice9, IDirect3DIndexBuffer9* pOriginal, UINT Length, DWORD Usage,
                                                      D3DFORMAT Format, D3DPOOL Pool)
-    : m_stats(Usage & D3DUSAGE_DYNAMIC ? g_pDeviceState->MemoryState.DynamicIndexBuffer : g_pDeviceState->MemoryState.StaticIndexBuffer)
+    : m_pStats(Usage & D3DUSAGE_DYNAMIC ? &g_StaticMemoryState.DynamicIndexBuffer : &g_StaticMemoryState.StaticIndexBuffer)
 {
     m_pOriginal = pOriginal;
     m_iMemUsed = Length;
@@ -29,10 +29,10 @@ CProxyDirect3DIndexBuffer::CProxyDirect3DIndexBuffer(IDirect3DDevice9* InD3DDevi
     m_format = Format;
     m_pool = Pool;
 
-    m_stats.iCurrentCount++;
-    m_stats.iCurrentBytes += m_iMemUsed;
-    m_stats.iCreatedCount++;
-    m_stats.iCreatedBytes += m_iMemUsed;
+    m_pStats->iCurrentCount++;
+    m_pStats->iCurrentBytes += m_iMemUsed;
+    m_pStats->iCreatedCount++;
+    m_pStats->iCreatedBytes += m_iMemUsed;
 }
 
 /////////////////////////////////////////////////////////////
@@ -44,10 +44,13 @@ CProxyDirect3DIndexBuffer::CProxyDirect3DIndexBuffer(IDirect3DDevice9* InD3DDevi
 /////////////////////////////////////////////////////////////
 CProxyDirect3DIndexBuffer::~CProxyDirect3DIndexBuffer()
 {
-    m_stats.iCurrentCount--;
-    m_stats.iCurrentBytes -= m_iMemUsed;
-    m_stats.iDestroyedCount++;
-    m_stats.iDestroyedBytes += m_iMemUsed;
+    if (m_pStats)
+    {
+        m_pStats->iCurrentCount--;
+        m_pStats->iCurrentBytes -= m_iMemUsed;
+        m_pStats->iDestroyedCount++;
+        m_pStats->iDestroyedBytes += m_iMemUsed;
+    }
 }
 
 /////////////////////////////////////////////////////////////
@@ -87,7 +90,7 @@ ULONG CProxyDirect3DIndexBuffer::Release()
     if (count == 0)
     {
         // now, the Original Object has deleted itself, so do we here
-        delete this;            // destructor will be called automatically
+        delete this;  // destructor will be called automatically
     }
 
     return count;
@@ -102,7 +105,8 @@ ULONG CProxyDirect3DIndexBuffer::Release()
 /////////////////////////////////////////////////////////////
 HRESULT CProxyDirect3DIndexBuffer::Lock(UINT OffsetToLock, UINT SizeToLock, void** ppbData, DWORD Flags)
 {
-    m_stats.iLockedCount++;
+    if (m_pStats)
+        m_pStats->iLockedCount++;
 
     *ppbData = NULL;
     HRESULT hr = m_pOriginal->Lock(OffsetToLock, SizeToLock, ppbData, Flags);

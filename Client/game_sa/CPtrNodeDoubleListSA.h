@@ -10,11 +10,11 @@
 
 #pragma once
 
-template<class T>
+template <class T>
 class CPtrNodeDoubleLink
 {
 public:
-    T* pItem;
+    T*                     pItem;
     CPtrNodeDoubleLink<T>* pNext;
     CPtrNodeDoubleLink<T>* pPrev;
 };

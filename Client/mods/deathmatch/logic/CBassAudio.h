@@ -7,7 +7,7 @@
  *
  *****************************************************************************/
 
-#define CUT_OFF 5.0f            // Cut off point at which volume is regarded as 0 in the function e^-x
+#define CUT_OFF 5.0f  // Cut off point at which volume is regarded as 0 in the function e^-x
 
 enum eSoundEventType
 {
@@ -77,6 +77,7 @@ public:
     void    SetFxEffects(int* pEnabledEffects, uint iNumElements);
     BOOL    SetFxParameters(uint iFxEffect, void* params);
     BOOL    GetFxParameters(uint iFxEffect, void* params);
+    bool    IsFxEffectEnabled(uint iFxEffect) const { return iFxEffect < NUMELMS(m_EnabledEffects) && m_EnabledEffects[iFxEffect] != 0; }
     SString GetMetaTags(const SString& strFormat);
     uint    GetReachedEndCount();
     bool    IsFreed();
@@ -159,3 +160,9 @@ private:
     HSYNC m_hSyncFree;
     HSYNC m_hSyncMeta;
 };
+
+// Signal streaming threads that shutdown is in progress - they should exit ASAP
+void SignalStreamingThreadsToStop();
+
+// Wait for streaming threads to complete. Call after BASS_Free() which aborts pending operations.
+void WaitForAllStreamingThreads(unsigned int uiTimeoutMs = 3000);

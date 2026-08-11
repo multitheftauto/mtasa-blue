@@ -121,7 +121,7 @@ public:
     virtual const SString& GetCategoryName() = 0;
     virtual void           DoPulse() = 0;
     virtual void           GetStats(CPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) = 0;
-    virtual void           Stop(){};
+    virtual void           Stop() {};
 };
 
 //

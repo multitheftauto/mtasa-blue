@@ -11,12 +11,12 @@
 
 #ifdef MTA_CLIENT
 
-#define _WIN32_DCOM
-#include <comdef.h>
-#include <Wbemidl.h>
+    #define _WIN32_DCOM
+    #include <comdef.h>
+    #include <Wbemidl.h>
 
-# pragma comment(lib, "wbemuuid.lib")
-#pragma comment(lib, "Version.lib")
+    #pragma comment(lib, "wbemuuid.lib")
+    #pragma comment(lib, "Version.lib")
 
 namespace
 {
@@ -45,7 +45,7 @@ namespace
                      /* [in] */ long                                                                                lTimeout,
                      /* [in] */ ULONG                                                                               uCount,
                      /* [length_is][size_is][out] */ __RPC__out_ecount_part(uCount, *puReturned) IWbemClassObject** apObjects,
-                     /* [out] */ __RPC__out ULONG* puReturned)
+                     /* [out] */ __RPC__out ULONG*                                                                  puReturned)
     {
         __try
         {
@@ -57,7 +57,7 @@ namespace
             return STATUS_ACCESS_VIOLATION;
         }
     }
-}            // namespace
+}  // namespace
 
 /////////////////////////////////////////////////////////////////////
 //
@@ -92,14 +92,14 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
     // parameter of CoInitializeSecurity ------------------------
 
     hres = CoInitializeSecurity(NULL,
-                                -1,                                     // COM authentication
-                                NULL,                                   // Authentication services
-                                NULL,                                   // Reserved
-                                RPC_C_AUTHN_LEVEL_DEFAULT,              // Default authentication
-                                RPC_C_IMP_LEVEL_IMPERSONATE,            // Default Impersonation
-                                NULL,                                   // Authentication info
-                                EOAC_NONE,                              // Additional capabilities
-                                NULL                                    // Reserved
+                                -1,                           // COM authentication
+                                NULL,                         // Authentication services
+                                NULL,                         // Reserved
+                                RPC_C_AUTHN_LEVEL_DEFAULT,    // Default authentication
+                                RPC_C_IMP_LEVEL_IMPERSONATE,  // Default Impersonation
+                                NULL,                         // Authentication info
+                                EOAC_NONE,                    // Additional capabilities
+                                NULL                          // Reserved
     );
 
     // Error here can be non fatal
@@ -131,14 +131,14 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
     // the current user and obtain pointer pSvc
     // to make IWbemServices calls.
     hres = CallConnectServer(pLoc,
-                             _bstr_t(SStringX("ROOT\\") + strNamespace),            // Object path of WMI namespace
-                             NULL,                                                  // User name. NULL = current user
-                             NULL,                                                  // User password. NULL = current
-                             0,                                                     // Locale. NULL indicates current
-                             NULL,                                                  // Security flags.
-                             0,                                                     // Authority (e.g. Kerberos)
-                             0,                                                     // Context object
-                             &pSvc                                                  // pointer to IWbemServices proxy
+                             _bstr_t(SStringX("ROOT\\") + strNamespace),  // Object path of WMI namespace
+                             NULL,                                        // User name. NULL = current user
+                             NULL,                                        // User password. NULL = current
+                             0,                                           // Locale. NULL indicates current
+                             NULL,                                        // Security flags.
+                             0,                                           // Authority (e.g. Kerberos)
+                             0,                                           // Context object
+                             &pSvc                                        // pointer to IWbemServices proxy
     );
 
     if (FAILED(hres))
@@ -151,14 +151,14 @@ bool SharedUtil::QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, c
     // Step 5: --------------------------------------------------
     // Set security levels on the proxy -------------------------
 
-    hres = CoSetProxyBlanket(pSvc,                                   // Indicates the proxy to set
-                             RPC_C_AUTHN_WINNT,                      // RPC_C_AUTHN_xxx
-                             RPC_C_AUTHZ_NONE,                       // RPC_C_AUTHZ_xxx
-                             NULL,                                   // Server principal name
-                             RPC_C_AUTHN_LEVEL_CALL,                 // RPC_C_AUTHN_LEVEL_xxx
-                             RPC_C_IMP_LEVEL_IMPERSONATE,            // RPC_C_IMP_LEVEL_xxx
-                             NULL,                                   // client identity
-                             EOAC_NONE                               // proxy capabilities
+    hres = CoSetProxyBlanket(pSvc,                         // Indicates the proxy to set
+                             RPC_C_AUTHN_WINNT,            // RPC_C_AUTHN_xxx
+                             RPC_C_AUTHZ_NONE,             // RPC_C_AUTHZ_xxx
+                             NULL,                         // Server principal name
+                             RPC_C_AUTHN_LEVEL_CALL,       // RPC_C_AUTHN_LEVEL_xxx
+                             RPC_C_IMP_LEVEL_IMPERSONATE,  // RPC_C_IMP_LEVEL_xxx
+                             NULL,                         // client identity
+                             EOAC_NONE                     // proxy capabilities
     );
 
     if (FAILED(hres))
@@ -314,7 +314,7 @@ long long SharedUtil::GetWMITotalPhysicalMemory()
 
     if (llResult == 0)
     {
-        llResult = 2LL * 1024 * 1024 * 1024;            // 2GB
+        llResult = 2LL * 1024 * 1024 * 1024;  // 2GB
     }
     return llResult;
 }
@@ -350,7 +350,7 @@ unsigned int SharedUtil::GetWMIVideoAdapterMemorySize(const unsigned long ulVen,
         if ((iAvailability == 8 || iAvailability == 3) && PNPDeviceID.Contains(DevVen))
         {
             uiResult = uiAdapterRAM;
-            break;            // Found match
+            break;  // Found match
         }
     }
 

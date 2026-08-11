@@ -20,7 +20,7 @@
 extern CCoreInterface* g_pCore;
 
 // count: 26316 in unmodified game
-CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo(*)[26316])0x8E4CC0;
+CStreamingInfo (&CStreamingSA::ms_aInfoForModel)[26316] = *(CStreamingInfo (*)[26316])0x8E4CC0;
 HANDLE* phStreamingThread = (HANDLE*)0x8E4008;
 uint32(&CStreamingSA::ms_streamingHalfOfBufferSizeBlocks) = *(uint32*)0x8E4CA8;
 void* (&CStreamingSA::ms_pStreamingBuffer)[2] = *(void* (*)[2])0x8E4CAC;
@@ -39,10 +39,10 @@ namespace
 
         void Record()
         {
-            #define VAR_CStreaming_bLoadingBigModel         0x08E4A58
-            #define VAR_CStreaming_numPriorityRequests      0x08E4BA0
-            #define VAR_CStreaming_numModelsRequested       0x08E4CB8
-            #define VAR_CStreaming_memoryUsed               0x08E4CB4
+#define VAR_CStreaming_bLoadingBigModel    0x08E4A58
+#define VAR_CStreaming_numPriorityRequests 0x08E4BA0
+#define VAR_CStreaming_numModelsRequested  0x08E4CB8
+#define VAR_CStreaming_memoryUsed          0x08E4CB4
 
             bLoadingBigModel = *(BYTE*)VAR_CStreaming_bLoadingBigModel != 0;
             numPriorityRequests = *(DWORD*)VAR_CStreaming_numPriorityRequests;
@@ -51,11 +51,11 @@ namespace
         }
     };
 
-    constexpr size_t RESERVED_STREAMS_NUM = 10; // GTA3 + 9 SFX archives(FEET, GENRL, PAIN_A, SCRIPT, SPC_EA, SPC_FA, SPC_GA, SPC_NA, SPC_PA)
+    constexpr size_t RESERVED_STREAMS_NUM = 10;  // GTA3 + 9 SFX archives(FEET, GENRL, PAIN_A, SCRIPT, SPC_EA, SPC_FA, SPC_GA, SPC_NA, SPC_PA)
     constexpr size_t MAX_STREAMS_NUM = 255;
     constexpr size_t MAX_IMAGES_NUM = MAX_STREAMS_NUM - RESERVED_STREAMS_NUM;
-    constexpr size_t MIN_IMAGES_NUM = 6; // GTA3(yes, it is presented twice), GTA_INT, CARREC, SCRIPT, CUTSCENE, PLAYER
-} // namespace
+    constexpr size_t MIN_IMAGES_NUM = 6;  // GTA3(yes, it is presented twice), GTA_INT, CARREC, SCRIPT, CUTSCENE, PLAYER
+}  // namespace
 
 bool IsUpgradeModelId(DWORD dwModelID)
 {
@@ -68,16 +68,13 @@ CStreamingSA::CStreamingSA()
     SetArchivesNum(VAR_DefaultMaxArchives);
 
     // Copy the default data
-    HANDLE (&defaultStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010;
-    SStreamName (&defaultStreamingNames)[32] = *(SStreamName(*)[32])0x8E4098;
-    CArchiveInfo (&defaultAchiveInfo)[8] = *(CArchiveInfo(*)[8])0x8E48D8;
+    HANDLE(&defaultStreamingHandlers)[32] = *(HANDLE(*)[32])0x8E4010;
+    SStreamName(&defaultStreamingNames)[32] = *(SStreamName(*)[32])0x8E4098;
+    CArchiveInfo(&defaultAchiveInfo)[8] = *(CArchiveInfo(*)[8])0x8E48D8;
 
-    std::memcpy(m_StreamHandles.data(), defaultStreamingHandlers,
-        sizeof(HANDLE) * std::min(m_StreamHandles.size(), (size_t)VAR_DefaultStreamHandlersMaxCount));
-    std::memcpy(m_StreamNames.data(), defaultStreamingNames,
-        sizeof(SStreamName) *  std::min(m_StreamNames.size(), (size_t)VAR_DefaultStreamHandlersMaxCount));
-    std::memcpy(m_Imgs.data(), defaultAchiveInfo,
-        sizeof(CArchiveInfo) * std::min(m_Imgs.size(), (size_t)VAR_DefaultMaxArchives));
+    std::memcpy(m_StreamHandles.data(), defaultStreamingHandlers, sizeof(HANDLE) * std::min(m_StreamHandles.size(), (size_t)VAR_DefaultStreamHandlersMaxCount));
+    std::memcpy(m_StreamNames.data(), defaultStreamingNames, sizeof(SStreamName) * std::min(m_StreamNames.size(), (size_t)VAR_DefaultStreamHandlersMaxCount));
+    std::memcpy(m_Imgs.data(), defaultAchiveInfo, sizeof(CArchiveInfo) * std::min(m_Imgs.size(), (size_t)VAR_DefaultMaxArchives));
 }
 
 void CStreamingSA::SetArchivesNum(size_t imagesNum)
@@ -99,7 +96,7 @@ void CStreamingSA::SetArchivesNum(size_t imagesNum)
             return;
         }
 
-        const auto pImgs = m_Imgs.data();
+        const auto   pImgs = m_Imgs.data();
         const size_t uiImgsSize = sizeof(CArchiveInfo) * m_Imgs.size();
 
         // CStreaming::AddImageToList
@@ -185,24 +182,24 @@ void CStreamingSA::SetArchivesNum(size_t imagesNum)
         // _openStream
         DWORD dwExeCodePtr = (DWORD)0x01564A94;
 
-        MemPutFast<WORD>((void*)(dwExeCodePtr), (WORD)0x048B); // mov     eax, _streamHandles[esi*4]
+        MemPutFast<WORD>((void*)(dwExeCodePtr), (WORD)0x048B);  // mov     eax, _streamHandles[esi*4]
         MemPutFast<BYTE>((void*)(dwExeCodePtr + 2), (BYTE)0xB5);
         MemPutFast<DWORD>((void*)(dwExeCodePtr + 3), (DWORD)pStreamHandles);
 
         MemPutFast<WORD>((void*)(dwExeCodePtr + 7), (WORD)0xC085);
 
         MemPutFast<WORD>((void*)(dwExeCodePtr + 9), (WORD)0x840F);
-        MemPutFast<DWORD>((void*)(dwExeCodePtr + 11), (DWORD)(0x01564B31 - (dwExeCodePtr+15)));
+        MemPutFast<DWORD>((void*)(dwExeCodePtr + 11), (DWORD)(0x01564B31 - (dwExeCodePtr + 15)));
 
         MemPutFast<BYTE>((void*)(dwExeCodePtr + 15), (BYTE)0x46);
         MemPutFast<WORD>((void*)(dwExeCodePtr + 16), (WORD)0xFE81);
-        MemPutFast<DWORD>((void*)(dwExeCodePtr + 18), (DWORD)(handlesNum - 1)); // MAX_NUMBER_OF_STREAM_HANDLES
+        MemPutFast<DWORD>((void*)(dwExeCodePtr + 18), (DWORD)(handlesNum - 1));  // MAX_NUMBER_OF_STREAM_HANDLES
 
         MemPutFast<BYTE>((void*)(dwExeCodePtr + 22), (BYTE)0x7C);
-        MemPutFast<BYTE>((void*)(dwExeCodePtr + 23), (BYTE)(dwExeCodePtr - (dwExeCodePtr+24)));
+        MemPutFast<BYTE>((void*)(dwExeCodePtr + 23), (BYTE)(dwExeCodePtr - (dwExeCodePtr + 24)));
 
         MemPutFast<BYTE>((void*)(dwExeCodePtr + 24), (BYTE)0xE9);
-        MemPutFast<DWORD>((void*)(dwExeCodePtr + 25), (DWORD)(0x01564B31 - (dwExeCodePtr+29)));
+        MemPutFast<DWORD>((void*)(dwExeCodePtr + 25), (DWORD)(0x01564B31 - (dwExeCodePtr + 29)));
         // end of loop creation
 
         MemPutFast<DWORD>((void*)0x1564B74, (DWORD)pStreamHandles);
@@ -229,6 +226,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
     if (IsUpgradeModelId(dwModelID))
     {
         DWORD dwFunc = FUNC_RequestVehicleUpgrade;
+        // clang-format off
         __asm
         {
             push    dwFlags
@@ -236,10 +234,12 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
             call    dwFunc
             add     esp, 8
         }
+        // clang-format on
     }
     else
     {
         DWORD dwFunction = FUNC_CStreaming__RequestModel;
+        // clang-format off
         __asm
         {
             push    dwFlags
@@ -247,6 +247,7 @@ void CStreamingSA::RequestModel(DWORD dwModelID, DWORD dwFlags)
             call    dwFunction
             add     esp, 8
         }
+        // clang-format on
     }
 }
 
@@ -263,12 +264,14 @@ void CStreamingSA::LoadAllRequestedModels(bool bOnlyPriorityModels, const char* 
 
     DWORD dwFunction = FUNC_LoadAllRequestedModels;
     DWORD dwOnlyPriorityModels = bOnlyPriorityModels;
+    // clang-format off
     __asm
     {
         push    dwOnlyPriorityModels
         call    dwFunction
         add     esp, 4
     }
+    // clang-format on
 
     if (IS_TIMING_CHECKPOINTS())
     {
@@ -284,6 +287,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
     {
         bool  bReturn;
         DWORD dwFunc = FUNC_CStreaming__HasVehicleUpgradeLoaded;
+        // clang-format off
         __asm
         {
             push    dwModelID
@@ -291,12 +295,14 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
             add     esp, 0x4
             mov     bReturn, al
         }
+        // clang-format on
         return bReturn;
     }
     else
     {
         DWORD dwFunc = FUNC_CStreaming__HasModelLoaded;
         bool  bReturn = 0;
+        // clang-format off
         __asm
         {
             push    dwModelID
@@ -304,6 +310,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
             mov     bReturn, al
             pop     eax
         }
+        // clang-format on
 
         return bReturn;
     }
@@ -312,6 +319,7 @@ bool CStreamingSA::HasModelLoaded(DWORD dwModelID)
 void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD channel)
 {
     DWORD dwFunc = FUNC_CStreaming_RequestSpecialModel;
+    // clang-format off
     __asm
     {
         push    channel
@@ -320,6 +328,7 @@ void CStreamingSA::RequestSpecialModel(DWORD model, const char* szTexture, DWORD
         call    dwFunc
         add     esp, 0xC
     }
+    // clang-format on
 }
 
 void CStreamingSA::ReinitStreaming()
@@ -340,15 +349,12 @@ void CStreamingSA::SetStreamingInfo(uint modelid, unsigned char usStreamID, uint
     // In this case, we must force-remove the RwObject from memory, because it is no longer used,
     // and due to the archive change the streamer no longer detects it and therefore won't delete it.
     // As a result, a memory leak occurs after every call to engineImageLinkDFF.
-    const auto baseTxdId = g_pCore->GetGame()->GetBaseIDforTXD();
-    if (modelid < static_cast<uint>(baseTxdId))
+    // Only DFF models (< MODELINFO_DFF_MAX) have a valid CBaseModelInfoSAInterface with an RwObject.
+    // TXD and other higher model IDs don't — their CModelInfoSA::m_pInterface is uninitialized.
+    if (modelid < MODELINFO_DFF_MAX)
     {
-        if (CModelInfo* modelInfo = g_pCore->GetGame()->GetModelInfo(modelid, true))
-        {
-            // Only DFF models got RwObjects, TXDs don't, so we only flush those here (or crash)
-            if (modelInfo->GetRwObject())
-                RemoveModel(modelid);
-        }
+        if (CModelInfo* modelInfo = g_pCore->GetGame()->GetModelInfo(modelid); modelInfo && modelInfo->GetRwObject())
+            RemoveModel(modelid);
     }
 
     // Change nextInImg field for prev model
@@ -420,7 +426,7 @@ unsigned char CStreamingSA::AddArchive(const wchar_t* szFilePath)
     // Create new stream handler
     const auto streamCreateFlags = *(DWORD*)0x8E3FE0;
     HANDLE     hFile = CreateFileW(szFilePath, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING,
-                               streamCreateFlags | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS, NULL);
+                                   streamCreateFlags | FILE_ATTRIBUTE_READONLY | FILE_FLAG_RANDOM_ACCESS, NULL);
 
     if (hFile == INVALID_HANDLE_VALUE)
         return INVALID_ARCHIVE_ID;
@@ -448,8 +454,8 @@ void CStreamingSA::RemoveArchive(unsigned char ucArchiveID)
 
 bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
 {
-    numBlocks += numBlocks % 2; // Make sure number is even by "rounding" it upwards. [Otherwise it can't be split in half properly]
-    
+    numBlocks += numBlocks % 2;  // Make sure number is even by "rounding" it upwards. [Otherwise it can't be split in half properly]
+
     // Check if the size is the same already
     if (numBlocks == ms_streamingHalfOfBufferSizeBlocks * 2)
         return true;
@@ -461,14 +467,15 @@ bool CStreamingSA::SetStreamingBufferSize(uint32 numBlocks)
     // NOTE: Due to a bug in the `MallocAlign` code the function will just *crash* instead of returning nullptr on alloc. failure :D
     typedef void*(__cdecl * Function_CMemoryMgr_MallocAlign)(uint32 uiCount, uint32 uiAlign);
     void* pNewBuffer = ((Function_CMemoryMgr_MallocAlign)(0x72F4C0))(numBlocks * 2048, 2048);
-    if (!pNewBuffer) // ...so this code is useless for now
+    if (!pNewBuffer)  // ...so this code is useless for now
         return false;
 
     int pointer = *(int*)0x8E3FFC;
     SGtaStream(&streaming)[5] = *(SGtaStream(*)[5])(pointer);
 
     // Wait while streaming thread ends tasks
-    while (streaming[0].bInUse || streaming[1].bInUse);
+    while (streaming[0].bInUse || streaming[1].bInUse)
+        ;
 
     // Suspend streaming thread [otherwise data might become corrupted]
     SuspendThread(*phStreamingThread);

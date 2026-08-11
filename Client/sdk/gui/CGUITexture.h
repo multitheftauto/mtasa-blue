@@ -18,7 +18,7 @@ struct IDirect3DTexture9;
 class CGUITexture
 {
 public:
-    virtual ~CGUITexture(){};
+    virtual ~CGUITexture() {};
 
     virtual bool LoadFromFile(const char* szFilename) = 0;
     virtual void LoadFromMemory(const void* pBuffer, unsigned int uiWidth, unsigned int uiHeight) = 0;

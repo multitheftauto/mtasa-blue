@@ -17,6 +17,8 @@
 #include "../game_sa/TaskBasicSA.h"
 #include "../game_sa/CFxSystemBPSA.h"
 #include "../game_sa/CFxSystemSA.h"
+#include "../game_sa/CColModelSA.h"
+#include "../game_sa/CTxdPoolSA.h"
 
 extern CCoreInterface* g_pCore;
 
@@ -26,12 +28,15 @@ extern CCoreInterface* g_pCore;
 void OnCrashAverted(uint uiId);
 void OnEnterCrashZone(uint uiId);
 
+void OnRequestDeferredStreamingMemoryRelief();
+
 static void __declspec(naked) CrashAverted()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
-    {
+        {
         pushfd
         pushad
         push    [esp+4+32+4*1]
@@ -40,21 +45,168 @@ static void __declspec(naked) CrashAverted()
         popad
         popfd
         retn    4
+        }
+    // clang-format on
+}
+
+static bool HasReadAccess(DWORD dwProtect) noexcept
+{
+    if (dwProtect & PAGE_GUARD)
+        return false;
+
+    dwProtect &= 0xFF;
+
+    if (dwProtect == PAGE_NOACCESS)
+        return false;
+
+    return dwProtect == PAGE_READONLY || dwProtect == PAGE_READWRITE || dwProtect == PAGE_WRITECOPY || dwProtect == PAGE_EXECUTE ||
+           dwProtect == PAGE_EXECUTE_READ || dwProtect == PAGE_EXECUTE_READWRITE || dwProtect == PAGE_EXECUTE_WRITECOPY;
+}
+
+static bool HasWriteAccess(DWORD dwProtect) noexcept
+{
+    if (dwProtect & PAGE_GUARD)
+        return false;
+
+    dwProtect &= 0xFF;
+
+    return dwProtect == PAGE_READWRITE || dwProtect == PAGE_WRITECOPY || dwProtect == PAGE_EXECUTE_READWRITE || dwProtect == PAGE_EXECUTE_WRITECOPY;
+}
+
+static constexpr std::size_t    REGION_CACHE_SIZE = 8;
+static constexpr std::uintptr_t NUM_LOWMEM_THRESHOLD = 0x10000;
+
+#define NUM_LOWMEM_THRESHOLD_ASM 0x10000
+
+struct CachedRegion
+{
+    std::uintptr_t start{};
+    std::uintptr_t end{};
+    DWORD          state{};
+    DWORD          protect{};
+};
+
+static bool QueryRegionCached(std::uintptr_t address, DWORD& outState, DWORD& outProtect, std::uintptr_t& outEnd) noexcept
+{
+    static thread_local CachedRegion s_cache[REGION_CACHE_SIZE]{};
+    static thread_local std::size_t  s_nextSlot{};
+
+    for (const auto& entry : s_cache)
+    {
+        if (entry.start != 0 && address >= entry.start && address <= entry.end)
+        {
+            outState = entry.state;
+            outProtect = entry.protect;
+            outEnd = entry.end;
+            return true;
+        }
+    }
+
+    MEMORY_BASIC_INFORMATION mbi{};
+    if (VirtualQuery(reinterpret_cast<LPCVOID>(address), &mbi, sizeof(mbi)) != sizeof(mbi))
+        return false;
+
+    const auto regionSize = static_cast<std::uintptr_t>(mbi.RegionSize);
+    if (regionSize == 0)
+        return false;
+
+    auto& slot = s_cache[s_nextSlot];
+    s_nextSlot = (s_nextSlot + 1) % REGION_CACHE_SIZE;
+
+    slot.start = reinterpret_cast<std::uintptr_t>(mbi.BaseAddress);
+    slot.state = mbi.State;
+    slot.protect = mbi.Protect;
+
+    const auto endPlusOne = slot.start + regionSize;
+    slot.end = (endPlusOne <= slot.start) ? static_cast<std::uintptr_t>(-1) : (endPlusOne - 1);
+
+    outState = slot.state;
+    outProtect = slot.protect;
+    outEnd = slot.end;
+    return true;
+}
+
+static bool IsReadablePtr(const void* ptr, std::size_t size) noexcept
+{
+    if (ptr == nullptr || size == 0)
+        return false;
+
+    const auto start = reinterpret_cast<std::uintptr_t>(ptr);
+    if (start < NUM_LOWMEM_THRESHOLD)
+        return false;
+
+    const auto end = start + size - 1;
+    if (end < start)
+        return false;
+
+    auto cur = start;
+    for (;;)
+    {
+        DWORD          state{}, protect{};
+        std::uintptr_t regionEnd{};
+        if (!QueryRegionCached(cur, state, protect, regionEnd))
+            return false;
+
+        if (state != MEM_COMMIT || !HasReadAccess(protect))
+            return false;
+
+        if (regionEnd >= end)
+            return true;
+
+        if (regionEnd < cur || regionEnd == static_cast<std::uintptr_t>(-1))
+            return false;
+
+        cur = regionEnd + 1;
+    }
+}
+
+static bool IsWritablePtr(void* ptr, std::size_t size) noexcept
+{
+    if (ptr == nullptr || size == 0)
+        return false;
+
+    const auto start = reinterpret_cast<std::uintptr_t>(ptr);
+    if (start < NUM_LOWMEM_THRESHOLD)
+        return false;
+
+    const auto end = start + size - 1;
+    if (end < start)
+        return false;
+
+    auto cur = start;
+    for (;;)
+    {
+        DWORD          state{}, protect{};
+        std::uintptr_t regionEnd{};
+        if (!QueryRegionCached(cur, state, protect, regionEnd))
+            return false;
+
+        if (state != MEM_COMMIT || !HasWriteAccess(protect))
+            return false;
+
+        if (regionEnd >= end)
+            return true;
+
+        if (regionEnd < cur || regionEnd == static_cast<std::uintptr_t>(-1))
+            return false;
+
+        cur = regionEnd + 1;
     }
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CCustomCarEnvMapPipeline::CustomPipeRenderCB
-// 
+//
 // Null mesh material pointer
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc1                              0x5D9A6E
-#define HOOKSIZE_CrashFix_Misc1                             6
-DWORD RETURN_CrashFix_Misc1 = 0x5D9A74;
+#define HOOKPOS_CrashFix_Misc1  0x5D9A6E
+#define HOOKSIZE_CrashFix_Misc1 6
+DWORD                         RETURN_CrashFix_Misc1 = 0x5D9A74;
 static void __declspec(naked) HOOK_CrashFix_Misc1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     eax,dword ptr [esp+18h]
@@ -62,7 +214,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc1()
         je      cont
 
         mov     eax,dword ptr ds:[008D12CCh]
-        mov     ecx,dword ptr [eax+esi]     // If [eax+esi] (mesh->material) is 0, it causes a crash
+        mov     ecx,dword ptr [eax+esi]            // If [eax+esi] (mesh->material) is 0, it causes a crash
         test    ecx,ecx
         jne     cont
         push    1
@@ -71,35 +223,37 @@ static void __declspec(naked) HOOK_CrashFix_Misc1()
     cont:
         jmp     RETURN_CrashFix_Misc1
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CAutomobile::ProcessControl
-// 
+//
 // Null CColModel pointer or corrupted m_pColData
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc2                              0x6B18B0
-#define HOOKSIZE_CrashFix_Misc2                             9
-DWORD RETURN_CrashFix_Misc2 = 0x6B18B9;
-DWORD RETURN_CrashFix_Misc2B = 0x6B3775;
+#define HOOKPOS_CrashFix_Misc2  0x6B18B0
+#define HOOKSIZE_CrashFix_Misc2 9
+DWORD                         RETURN_CrashFix_Misc2 = 0x6B18B9;
+DWORD                         RETURN_CrashFix_Misc2B = 0x6B3775;
 static void __declspec(naked) HOOK_CrashFix_Misc2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    eax,eax
-        je      cont        // Skip much code if eax is zero (vehicle has no colmodel)
+        je      cont            // Skip much code if eax is zero (vehicle has no colmodel)
 
         mov     eax,dword ptr [eax+2Ch]
 
         test    eax,eax
-        je      cont        // Skip much code if eax is zero (colmodel has no coldata)
+        je      cont            // Skip much code if eax is zero (colmodel has no coldata)
 
         mov     ebx,dword ptr [eax+10h]
 
         test    ebx,ebx
-        je      cont        // Skip much code if ebx is zero (coldata has no suspension lines)
+        je      cont            // Skip much code if ebx is zero (coldata has no suspension lines)
 
         mov     cl,byte ptr [esi+429h]
         jmp     RETURN_CrashFix_Misc2
@@ -108,25 +262,27 @@ static void __declspec(naked) HOOK_CrashFix_Misc2()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc2B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CAESoundManager::Service
-// 
+//
 // Division by 0
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc4                              0x4F02D2
-#define HOOKSIZE_CrashFix_Misc4                             5
-DWORD RETURN_CrashFix_Misc4 = 0x4F02D7;
-DWORD RETURN_CrashFix_Misc4B = 0x4F0B07;
+#define HOOKPOS_CrashFix_Misc4  0x4F02D2
+#define HOOKSIZE_CrashFix_Misc4 5
+DWORD                         RETURN_CrashFix_Misc4 = 0x4F02D7;
+DWORD                         RETURN_CrashFix_Misc4B = 0x4F0B07;
 static void __declspec(naked) HOOK_CrashFix_Misc4()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    ecx,ecx
-        je      cont        // Skip much code if ecx is zero (avoid divide by zero in soundmanager::service)
+        je      cont            // Skip much code if ecx is zero (avoid divide by zero in soundmanager::service)
 
         cdq
         idiv    ecx
@@ -137,17 +293,18 @@ static void __declspec(naked) HOOK_CrashFix_Misc4()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc4B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CPed::SetPedPositionInCar
-// 
+//
 // Null pointer m_pVehicleStruct in the CVehicleModelInfo structure
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc5                              0x5DF949
-#define HOOKSIZE_CrashFix_Misc5                             7
-DWORD RETURN_CrashFix_Misc5 = 0x5DF950;
-DWORD RETURN_CrashFix_Misc5B = 0x5DFCC4;
+#define HOOKPOS_CrashFix_Misc5  0x5DF949
+#define HOOKSIZE_CrashFix_Misc5 7
+DWORD                         RETURN_CrashFix_Misc5 = 0x5DF950;
+DWORD                         RETURN_CrashFix_Misc5B = 0x5DFCC4;
 static void __declspec(naked) HOOK_CrashFix_Misc5()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -157,7 +314,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc5()
         mov     edi, dword ptr [ecx*4+edi]
         mov     edi, dword ptr [edi+5Ch]
         test    edi, edi
-        je      cont            // Skip much code if edi is zero
+        je      cont  // Skip much code if edi is zero
 
         mov edi, dword ptr[ARRAY_ModelInfo]
         mov     edi, dword ptr [ecx*4+edi]
@@ -177,18 +334,19 @@ static void __declspec(naked) HOOK_CrashFix_Misc5()
 //
 // Null pointer to object in the BlendNodeArrays array of the AnimBlendUpdateData structure
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc6                              0x4D1750
-#define HOOKSIZE_CrashFix_Misc6                             5
-DWORD RETURN_CrashFix_Misc6 = 0x4D1755;
-DWORD RETURN_CrashFix_Misc6B = 0x4D1A44;
+#define HOOKPOS_CrashFix_Misc6  0x4D1750
+#define HOOKSIZE_CrashFix_Misc6 5
+DWORD                         RETURN_CrashFix_Misc6 = 0x4D1755;
+DWORD                         RETURN_CrashFix_Misc6B = 0x4D1A44;
 static void __declspec(naked) HOOK_CrashFix_Misc6()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    ecx, ecx
-        je      cont        // Skip much code if ecx is zero (ped has no anim something)
+        je      cont            // Skip much code if ecx is zero (ped has no anim something)
 
         mov     eax, dword ptr [ecx+10h]
         test    eax, eax
@@ -198,6 +356,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc6()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc6B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -207,18 +366,19 @@ static void __declspec(naked) HOOK_CrashFix_Misc6()
 //
 // Null colModel pointer
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc7                              0x417BF8
-#define HOOKSIZE_CrashFix_Misc7                             5
-DWORD RETURN_CrashFix_Misc7 = 0x417BFD;
-DWORD RETURN_CrashFix_Misc7B = 0x417BFF;
+#define HOOKPOS_CrashFix_Misc7  0x417BF8
+#define HOOKSIZE_CrashFix_Misc7 5
+DWORD                         RETURN_CrashFix_Misc7 = 0x417BFD;
+DWORD                         RETURN_CrashFix_Misc7B = 0x417BFF;
 static void __declspec(naked) HOOK_CrashFix_Misc7()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    ecx, ecx
-        je      cont        // Skip much code if ecx is zero (no colmodel)
+        je      cont            // Skip much code if ecx is zero (no colmodel)
 
         mov     esi, dword ptr [ecx+2Ch]
         test    esi, esi
@@ -228,6 +388,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc7()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc7B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -237,18 +398,19 @@ static void __declspec(naked) HOOK_CrashFix_Misc7()
 //
 // Null pointer atomic->geometry in the RpAtomic
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc8                              0x73485D
-#define HOOKSIZE_CrashFix_Misc8                             5
-DWORD RETURN_CrashFix_Misc8 = 0x734862;
-DWORD RETURN_CrashFix_Misc8B = 0x734871;
+#define HOOKPOS_CrashFix_Misc8  0x73485D
+#define HOOKSIZE_CrashFix_Misc8 5
+DWORD                         RETURN_CrashFix_Misc8 = 0x734862;
+DWORD                         RETURN_CrashFix_Misc8B = 0x734871;
 static void __declspec(naked) HOOK_CrashFix_Misc8()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    ecx, ecx
-        je      cont        // Skip much code if ecx is zero (no 2d effect plugin)
+        je      cont            // Skip much code if ecx is zero (no 2d effect plugin)
 
         mov     ecx, dword ptr [edx+ecx]
         test    ecx, ecx
@@ -258,6 +420,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc8()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc8B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -267,18 +430,19 @@ static void __declspec(naked) HOOK_CrashFix_Misc8()
 //
 // Null pointer projectile of type CObject* in the array CProjectileInfo::ms_apProjectile
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc9                              0x738B64
-#define HOOKSIZE_CrashFix_Misc9                             6
-DWORD RETURN_CrashFix_Misc9 = 0x738B6A;
-DWORD RETURN_CrashFix_Misc9B = 0x73983A;
+#define HOOKPOS_CrashFix_Misc9  0x738B64
+#define HOOKSIZE_CrashFix_Misc9 6
+DWORD                         RETURN_CrashFix_Misc9 = 0x738B6A;
+DWORD                         RETURN_CrashFix_Misc9B = 0x73983A;
 static void __declspec(naked) HOOK_CrashFix_Misc9()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    esi, esi
-        je      cont        // Skip much code if esi is zero (invalid projectile)
+        je      cont            // Skip much code if esi is zero (invalid projectile)
 
         mov     eax, dword ptr [esi+40h]
         test    ah, 1
@@ -288,6 +452,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc9()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc9B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -297,18 +462,19 @@ static void __declspec(naked) HOOK_CrashFix_Misc9()
 //
 // Invalid pointer to a vector
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc10                             0x5334FE
-#define HOOKSIZE_CrashFix_Misc10                            6
-DWORD RETURN_CrashFix_Misc10 = 0x533504;
-DWORD RETURN_CrashFix_Misc10B = 0x533539;
+#define HOOKPOS_CrashFix_Misc10  0x5334FE
+#define HOOKSIZE_CrashFix_Misc10 6
+DWORD                         RETURN_CrashFix_Misc10 = 0x533504;
+DWORD                         RETURN_CrashFix_Misc10B = 0x533539;
 static void __declspec(naked) HOOK_CrashFix_Misc10()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     ecx, 0x80
-        jb      cont  // Skip much code if ecx is small (invalid vector pointer)
+        jb      cont            // Skip much code if ecx is small (invalid vector pointer)
 
         mov     edx, dword ptr [ecx]
         mov     dword ptr [esp], edx
@@ -322,6 +488,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc10()
         mov     dword ptr [ecx+8],0
         jmp     RETURN_CrashFix_Misc10B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -331,18 +498,19 @@ static void __declspec(naked) HOOK_CrashFix_Misc10()
 //
 // The crash likely occurs due to invalid data passed as the second argument
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc11                             0x4D2C62
-#define HOOKSIZE_CrashFix_Misc11                            5
-DWORD RETURN_CrashFix_Misc11 = 0x4D2C67;
-DWORD RETURN_CrashFix_Misc11B = 0x4D2E03;
+#define HOOKPOS_CrashFix_Misc11  0x4D2C62
+#define HOOKSIZE_CrashFix_Misc11 5
+DWORD                         RETURN_CrashFix_Misc11 = 0x4D2C67;
+DWORD                         RETURN_CrashFix_Misc11B = 0x4D2E03;
 static void __declspec(naked) HOOK_CrashFix_Misc11()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    ecx, ecx
-        je      cont  // Skip much code if ecx is zero (invalid anim somthing)
+        je      cont            // Skip much code if ecx is zero (invalid anim somthing)
 
         mov     eax, dword ptr [ecx+10h]
         test    eax, eax
@@ -352,6 +520,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc11()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc11B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -361,18 +530,19 @@ static void __declspec(naked) HOOK_CrashFix_Misc11()
 //
 // Null pointer of type CAnimBlendHierarchy passed to the function
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc12                             0x4D41C5
-#define HOOKSIZE_CrashFix_Misc12                            5
-DWORD RETURN_CrashFix_Misc12 = 0x4D41CA;
-DWORD RETURN_CrashFix_Misc12B = 0x4D4222;
+#define HOOKPOS_CrashFix_Misc12  0x4D41C5
+#define HOOKSIZE_CrashFix_Misc12 5
+DWORD                         RETURN_CrashFix_Misc12 = 0x4D41CA;
+DWORD                         RETURN_CrashFix_Misc12B = 0x4D4222;
 static void __declspec(naked) HOOK_CrashFix_Misc12()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    edi, edi
-        je      cont  // Skip much code if edi is zero (invalid anim somthing)
+        je      cont            // Skip much code if edi is zero (invalid anim somthing)
 
         mov     al, byte ptr [edi+0Bh]
         test    al, al
@@ -382,6 +552,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc12()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc12B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -389,18 +560,19 @@ static void __declspec(naked) HOOK_CrashFix_Misc12()
 //
 // Invalid animation (Null pointer returned by CAnimBlendAssocGroup::GetAnimation)
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc13                             0x4D464E
-#define HOOKSIZE_CrashFix_Misc13                            6
-DWORD RETURN_CrashFix_Misc13 = 0x4D4654;
-DWORD RETURN_CrashFix_Misc13B = 0x4D4764;
+#define HOOKPOS_CrashFix_Misc13  0x4D464E
+#define HOOKSIZE_CrashFix_Misc13 6
+DWORD                         RETURN_CrashFix_Misc13 = 0x4D4654;
+DWORD                         RETURN_CrashFix_Misc13B = 0x4D4764;
 static void __declspec(naked) HOOK_CrashFix_Misc13()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     eax, 0x2480
-        jb      cont  // Skip much code if eax is less than 0x480 (invalid anim)
+        jb      cont            // Skip much code if eax is less than 0x480 (invalid anim)
 
         mov     al, byte ptr [eax+0Ah]
         shr     al, 5
@@ -410,25 +582,27 @@ static void __declspec(naked) HOOK_CrashFix_Misc13()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc13B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CAEFrontendAudioEntity::AddAudioEvent
-// 
+//
 // Invalid pointer to the array CAEAudioEntity::m_pAudioEventVolumes
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc14                             0x4DD4B5
-#define HOOKSIZE_CrashFix_Misc14                            6
-DWORD RETURN_CrashFix_Misc14 = 0x4DD4BB;
+#define HOOKPOS_CrashFix_Misc14  0x4DD4B5
+#define HOOKSIZE_CrashFix_Misc14 6
+DWORD                         RETURN_CrashFix_Misc14 = 0x4DD4BB;
 static void __declspec(naked) HOOK_CrashFix_Misc14()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
-    {
+        {
         mov     eax, dword ptr ds:[0BD00F8h]
         cmp     eax, 0
-        je      cont  // Skip much code if eax is zero ( Audio event volumes table not initialized )
+        je      cont            // Skip much code if eax is zero ( Audio event volumes table not initialized )
 
         sub     esp, 0D4h
         jmp     RETURN_CrashFix_Misc14
@@ -437,17 +611,34 @@ static void __declspec(naked) HOOK_CrashFix_Misc14()
         call    CrashAverted
         add     esp, 12
         retn    12
-    }
+        }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 void _cdecl DoWait(HANDLE hHandle)
 {
-    DWORD dwWait = 4000;
+    static DWORD s_consecutiveTimeouts = 0;
+    static DWORD s_lastCallTick = 0;
+
+    DWORD now = SharedUtil::GetTickCount32();
+
+    // Reset counter after a quiet period - a 10+ second gap means
+    // we moved on to a different streaming operation
+    if (s_lastCallTick != 0 && (now - s_lastCallTick) > 10000)
+        s_consecutiveTimeouts = 0;
+    s_lastCallTick = now;
+
+    // After a consecutive timeout, use a short wait so
+    // LoadAllRequestedModels doesn't accumulate multi-second freezes
+    // when the same I/O issue keeps recurring
+    DWORD dwWait = (s_consecutiveTimeouts >= 1) ? 100 : 4000;
+
     DWORD dwResult = WaitForSingleObject(hHandle, dwWait);
     if (dwResult == WAIT_TIMEOUT)
     {
-        AddReportLog(6211, SString("WaitForSingleObject timed out with %08x and %dms", hHandle, dwWait));
+        s_consecutiveTimeouts++;
+        AddReportLog(6211, SString("WaitForSingleObject timed out with %08x and %dms (consecutive: %u)", hHandle, dwWait, s_consecutiveTimeouts));
         // This thread lock bug in GTA will have to be fixed one day.
         // Until then, a 5 second freeze should be long enough for the loading thread to have finished it's job.
 #if 0
@@ -459,18 +650,28 @@ void _cdecl DoWait(HANDLE hHandle)
             ")
          , _CRT_WIDE(__FILE__), __LINE__);
 #endif
-        dwResult = WaitForSingleObject(hHandle, 1000);
+        if (dwWait >= 4000)
+        {
+            dwResult = WaitForSingleObject(hHandle, 1000);
+            if (dwResult != WAIT_TIMEOUT)
+                s_consecutiveTimeouts = 0;  // Completed during retry, not persistent
+        }
+    }
+    else
+    {
+        s_consecutiveTimeouts = 0;
     }
 }
 
 // hook info
-#define HOOKPOS_FreezeFix_Misc15                        	0x156CDAE
-#define HOOKSIZE_FreezeFix_Misc15                        	6
-DWORD RETURN_FreezeFix_Misc15 = 0x156CDB4;
+#define HOOKPOS_FreezeFix_Misc15  0x156CDAE
+#define HOOKSIZE_FreezeFix_Misc15 6
+DWORD                         RETURN_FreezeFix_Misc15 = 0x156CDB4;
 static void __declspec(naked) HOOK_FreezeFix_Misc15()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pop eax
@@ -484,6 +685,7 @@ static void __declspec(naked) HOOK_FreezeFix_Misc15()
         popad
         jmp     RETURN_FreezeFix_Misc15
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -491,19 +693,20 @@ static void __declspec(naked) HOOK_FreezeFix_Misc15()
 //
 // RpAnimBlendClumpGetFirstAssociation returns null pointer
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc16                             0x5E5815
-#define HOOKSIZE_CrashFix_Misc16                            6
-DWORD RETURN_CrashFix_Misc16 = 0x5E581B;
+#define HOOKPOS_CrashFix_Misc16  0x5E5815
+#define HOOKSIZE_CrashFix_Misc16 6
+DWORD                         RETURN_CrashFix_Misc16 = 0x5E581B;
 static void __declspec(naked) HOOK_CrashFix_Misc16()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     eax, 0
-        je      cont  // Skip much code if eax is zero ( RpAnimBlendClumpGetFirstAssociation returns NULL )
+        je      cont            // Skip much code if eax is zero ( RpAnimBlendClumpGetFirstAssociation returns NULL )
 
-        // continue standard path
+         // continue standard path
         movsx   ecx, word ptr [eax+2Ch]
         xor     edi, edi
         jmp     RETURN_CrashFix_Misc16
@@ -514,6 +717,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc16()
         add     esp, 96
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -521,20 +725,21 @@ static void __declspec(naked) HOOK_CrashFix_Misc16()
 //
 // Null pointer for the objectList (0x90) field of the RwFrame structure
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc17                             0x7F120E
-#define HOOKSIZE_CrashFix_Misc17                            6
-DWORD RETURN_CrashFix_Misc17 = 0x7F1214;
-DWORD RETURN_CrashFix_Misc17B = 0x7F1236;
+#define HOOKPOS_CrashFix_Misc17  0x7F120E
+#define HOOKSIZE_CrashFix_Misc17 6
+DWORD                         RETURN_CrashFix_Misc17 = 0x7F1214;
+DWORD                         RETURN_CrashFix_Misc17B = 0x7F1236;
 static void __declspec(naked) HOOK_CrashFix_Misc17()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     eax, 0
-        je      cont  // Skip much code if eax is zero
+        je      cont            // Skip much code if eax is zero
 
-        // continue standard path
+         // continue standard path
         mov     eax, [eax+90h]
         jmp     RETURN_CrashFix_Misc17
 
@@ -543,6 +748,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc17()
         call    CrashAverted
         jmp     RETURN_CrashFix_Misc17B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -550,19 +756,20 @@ static void __declspec(naked) HOOK_CrashFix_Misc17()
 //
 // Null pointer frame returned by CClumpModelInfo::GetFrameFromId
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc18                             0x4C7DAD
-#define HOOKSIZE_CrashFix_Misc18                            7
-DWORD RETURN_CrashFix_Misc18 = 0x4C7DB4;
+#define HOOKPOS_CrashFix_Misc18  0x4C7DAD
+#define HOOKSIZE_CrashFix_Misc18 7
+DWORD                         RETURN_CrashFix_Misc18 = 0x4C7DB4;
 static void __declspec(naked) HOOK_CrashFix_Misc18()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
-    {
+        {
         cmp     ebp, 0
-        je      cont  // Skip much code if ebp is zero
+        je      cont            // Skip much code if ebp is zero
 
-        // continue standard path
+             // continue standard path
         mov         edx,dword ptr [ebp+40h]
         mov         eax,dword ptr [esp+10h]
         jmp     RETURN_CrashFix_Misc18
@@ -578,7 +785,8 @@ static void __declspec(naked) HOOK_CrashFix_Misc18()
         mov         dword ptr [eax+8],edx
         pop         ebp
         ret         0Ch
-    }
+        }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -586,20 +794,21 @@ static void __declspec(naked) HOOK_CrashFix_Misc18()
 //
 // The pointer passed as the first argument of type RwFrame to the function is null
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc19                             0x7F0BF7
-#define HOOKSIZE_CrashFix_Misc19                            6
-DWORD RETURN_CrashFix_Misc19 = 0x7F0BFD;
-DWORD RETURN_CrashFix_Misc19B = 0x7F0C20;
+#define HOOKPOS_CrashFix_Misc19  0x7F0BF7
+#define HOOKSIZE_CrashFix_Misc19 6
+DWORD                         RETURN_CrashFix_Misc19 = 0x7F0BFD;
+DWORD                         RETURN_CrashFix_Misc19B = 0x7F0C20;
 static void __declspec(naked) HOOK_CrashFix_Misc19()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     esi, 0
-        je      cont  // Skip much code if esi is zero
+        je      cont            // Skip much code if esi is zero
 
-        // continue standard path
+         // continue standard path
         mov     eax, [esi+98h]
         jmp     RETURN_CrashFix_Misc19
 
@@ -610,26 +819,28 @@ static void __declspec(naked) HOOK_CrashFix_Misc19()
         test    edx,edx
         jmp     RETURN_CrashFix_Misc19B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CPlaceable::RemoveMatrix
-// 
+//
 // "this" is invalid
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc20                             0x54F3B0
-#define HOOKSIZE_CrashFix_Misc20                            6
-DWORD RETURN_CrashFix_Misc20 = 0x54F3B6;
+#define HOOKPOS_CrashFix_Misc20  0x54F3B0
+#define HOOKSIZE_CrashFix_Misc20 6
+DWORD                         RETURN_CrashFix_Misc20 = 0x54F3B6;
 static void __declspec(naked) HOOK_CrashFix_Misc20()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     ecx, 0
-        je      cont        // Skip much code if ecx is zero
+        je      cont            // Skip much code if ecx is zero
 
-        // continue standard path
+         // continue standard path
         sub     esp, 10h
         mov     eax, [ecx+14h]
         jmp     RETURN_CrashFix_Misc20
@@ -639,11 +850,12 @@ static void __declspec(naked) HOOK_CrashFix_Misc20()
         call    CrashAverted
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CTaskSimpleCarFallOut::FinishAnimFallOutCB
-// 
+//
 // Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
 ////////////////////////////////////////////////////////////////////////
 bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAssociation, CTaskSimpleCarFallOutSAInterface* pTask)
@@ -670,13 +882,14 @@ bool IsTaskSimpleCarFallOutValid(CAnimBlendAssociationSAInterface* pAnimBlendAss
     return true;
 }
 
-#define HOOKPOS_CrashFix_Misc21                             0x648EE0
-#define HOOKSIZE_CrashFix_Misc21                            7
-DWORD RETURN_CrashFix_Misc21 = 0x648EE7;
+#define HOOKPOS_CrashFix_Misc21  0x648EE0
+#define HOOKSIZE_CrashFix_Misc21 7
+DWORD                         RETURN_CrashFix_Misc21 = 0x648EE7;
 static void __declspec(naked) HOOK_CrashFix_Misc21()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -686,9 +899,9 @@ static void __declspec(naked) HOOK_CrashFix_Misc21()
         add     esp, 4*2
         cmp     al,0
         popad
-        je      cont  // Skip much code if CTaskSimpleCarFallOut is not valid
+        je      cont            // Skip much code if CTaskSimpleCarFallOut is not valid
 
-        // continue standard path
+         // continue standard path
         mov     eax, [esp+8]
         mov     ecx, [eax+10h]
         jmp     RETURN_CrashFix_Misc21
@@ -698,6 +911,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc21()
         call    CrashAverted
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -705,21 +919,22 @@ static void __declspec(naked) HOOK_CrashFix_Misc21()
 //
 // this->m_clumpAssoc.m_pNodeArray[v5] is invalid
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc22                             0x4CEF08
-#define HOOKSIZE_CrashFix_Misc22                            6
-DWORD RETURN_CrashFix_Misc22 = 0x4CEF25;
+#define HOOKPOS_CrashFix_Misc22  0x4CEF08
+#define HOOKSIZE_CrashFix_Misc22 6
+DWORD                         RETURN_CrashFix_Misc22 = 0x4CEF25;
 static void __declspec(naked) HOOK_CrashFix_Misc22()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov         edx,dword ptr [edi+0Ch]
 
         cmp     edx, 0x480
-        jb      altcode  // Fill output with zeros if edx is low
+        jb      altcode            // Fill output with zeros if edx is low
 
-        // do standard code
+         // do standard code
     lp1:
         mov         edx,dword ptr [edi+0Ch]
         mov         edx,dword ptr [edx+eax*4]
@@ -734,7 +949,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc22()
         jl          lp1
         jmp     RETURN_CrashFix_Misc22
 
-        // do alternate code
+          // do alternate code
     altcode:
         push    22
         call    CrashAverted
@@ -749,6 +964,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc22()
         jl          altcode
         jmp     RETURN_CrashFix_Misc22
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -756,13 +972,14 @@ static void __declspec(naked) HOOK_CrashFix_Misc22()
 //
 // Door index is out of range
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc23                             0x6E3D10
-#define HOOKSIZE_CrashFix_Misc23                            7
-DWORD RETURN_CrashFix_Misc23 = 0x6E3D17;
+#define HOOKPOS_CrashFix_Misc23  0x6E3D10
+#define HOOKSIZE_CrashFix_Misc23 7
+DWORD                         RETURN_CrashFix_Misc23 = 0x6E3D17;
 static void __declspec(naked) HOOK_CrashFix_Misc23()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Ensure door index is reasonable
@@ -770,7 +987,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc23()
         cmp     edx,16
         jb      ok
 
-        // zero if out of range
+            // zero if out of range
         mov     edx,0
         mov     [esp+8], edx
         push    23
@@ -782,26 +999,28 @@ static void __declspec(naked) HOOK_CrashFix_Misc23()
         lea     eax, [edx+edx*2]
         jmp     RETURN_CrashFix_Misc23
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // RwFrameForAllChildren
-// 
+//
 // The first argument of type RwFrame received is invalid
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc24                             0x7F0DC8
-#define HOOKSIZE_CrashFix_Misc24                            6
-DWORD RETURN_CrashFix_Misc24 = 0x7F0DCE;
+#define HOOKPOS_CrashFix_Misc24  0x7F0DC8
+#define HOOKSIZE_CrashFix_Misc24 6
+DWORD                         RETURN_CrashFix_Misc24 = 0x7F0DCE;
 static void __declspec(naked) HOOK_CrashFix_Misc24()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         cmp     ebp, 0x480
-        jb      cont  // Skip code if ebp is low
+        jb      cont            // Skip code if ebp is low
 
-        // continue standard path
+         // continue standard path
         mov     eax, [ebp+98h]
         jmp     RETURN_CrashFix_Misc24
 
@@ -812,6 +1031,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc24()
         mov     eax, 0
         jmp     RETURN_CrashFix_Misc24
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -819,13 +1039,14 @@ static void __declspec(naked) HOOK_CrashFix_Misc24()
 //
 // Null vehicle pointer
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc25                             0x646026
-#define HOOKSIZE_CrashFix_Misc25                            5
-DWORD RETURN_CrashFix_Misc25 = 0x64602B;
+#define HOOKPOS_CrashFix_Misc25  0x646026
+#define HOOKSIZE_CrashFix_Misc25 5
+DWORD                         RETURN_CrashFix_Misc25 = 0x64602B;
 static void __declspec(naked) HOOK_CrashFix_Misc25()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Check for zero pointer to vehicle
@@ -833,7 +1054,7 @@ static void __declspec(naked) HOOK_CrashFix_Misc25()
         cmp     eax, 0
         jz      fix
 
-        // Continue standard path
+            // Continue standard path
         lea     eax,[esp+10h]
         push    eax
         jmp     RETURN_CrashFix_Misc25
@@ -841,32 +1062,34 @@ static void __declspec(naked) HOOK_CrashFix_Misc25()
     fix:
         push    25
         call    CrashAverted
-        // Do special thing
+            // Do special thing
         pop     esi
         pop     ecx
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CShotInfo::Update
-// 
+//
 // _creator->m_pIntelligence is invalid
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc26                             0x739FA0
-#define HOOKSIZE_CrashFix_Misc26                            6
-DWORD RETURN_CrashFix_Misc26 = 0x739FA6;
+#define HOOKPOS_CrashFix_Misc26  0x739FA0
+#define HOOKSIZE_CrashFix_Misc26 6
+DWORD                         RETURN_CrashFix_Misc26 = 0x739FA6;
 static void __declspec(naked) HOOK_CrashFix_Misc26()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Check for incorrect pointer
         cmp     ebx, 130h
         jz      fix
 
-        // Continue standard path
+            // Continue standard path
         mov     edi,dword ptr [ebx+ebp*4]
         dec     ebp
         test    edi,edi
@@ -875,33 +1098,35 @@ static void __declspec(naked) HOOK_CrashFix_Misc26()
     fix:
         push    26
         call    CrashAverted
-        // Do special thing
+             // Do special thing
         mov     edi, 0
         dec     ebp
         test    edi,edi
         jmp     RETURN_CrashFix_Misc26
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CTaskComplexDieInCar::ControlSubTask
-// 
+//
 // ped or ped->m_pVehicle is null pointer
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc27                             0x6377FB
-#define HOOKSIZE_CrashFix_Misc27                            7
-DWORD RETURN_CrashFix_Misc27 = 0x637802;
+#define HOOKPOS_CrashFix_Misc27  0x6377FB
+#define HOOKSIZE_CrashFix_Misc27 7
+DWORD                         RETURN_CrashFix_Misc27 = 0x637802;
 static void __declspec(naked) HOOK_CrashFix_Misc27()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Execute replaced code
         cmp     byte ptr [edi+484h], 2
         je      cont
 
-        // Check if veh pointer is zero
+            // Check if veh pointer is zero
         mov     ecx, [edi+58Ch]
         test    ecx, ecx
         jne     cont
@@ -912,6 +1137,7 @@ cont:
         // Continue standard path
         jmp     RETURN_CrashFix_Misc27
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -919,14 +1145,15 @@ cont:
 //
 // Null this->m_pDummyObject pointer
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc28                             0x44A4FD
-#define HOOKSIZE_CrashFix_Misc28                            6
-DWORD RETURN_CrashFix_Misc28 = 0x44A503;
-DWORD RETURN_CrashFix_Misc28B = 0x44A650;
+#define HOOKPOS_CrashFix_Misc28  0x44A4FD
+#define HOOKSIZE_CrashFix_Misc28 6
+DWORD                         RETURN_CrashFix_Misc28 = 0x44A503;
+DWORD                         RETURN_CrashFix_Misc28B = 0x44A650;
 static void __declspec(naked) HOOK_CrashFix_Misc28()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Execute replaced code
@@ -938,13 +1165,14 @@ static void __declspec(naked) HOOK_CrashFix_Misc28()
 
         push    28
         call    CrashAverted
-        // Skip much code
+                // Skip much code
         jmp     RETURN_CrashFix_Misc28B
 
 cont:
         // Continue standard path
         jmp     RETURN_CrashFix_Misc28
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -952,55 +1180,352 @@ cont:
 //
 // The value of the argument BankSlotId is invalid
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc29                             0x4E022C
-#define HOOKSIZE_CrashFix_Misc29                            5
-DWORD RETURN_CrashFix_Misc29 = 0x4E0231;
-DWORD RETURN_CrashFix_Misc29B = 0x4E0227;
+#define HOOKPOS_CrashFix_Misc29  0x4E022C
+#define HOOKSIZE_CrashFix_Misc29 5
+DWORD                         RETURN_CrashFix_Misc29 = 0x4E0231;
+DWORD                         RETURN_CrashFix_Misc29B = 0x4E0227;
 static void __declspec(naked) HOOK_CrashFix_Misc29()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Execute replaced code
         movsx   eax,word ptr [esp+8]
 
-        // Check word being -1
-        cmp     al, 0xffff
-        jz      cont
+        // Check for out-of-range BankSlotId
+        test    eax, eax
+        js      cont
+        cmp     ax, word ptr [ecx+0Ch]
+        jae     cont
 
-        // Continue standard path
+            // Continue standard path
         jmp     RETURN_CrashFix_Misc29
 
 cont:
         push    29
         call    CrashAverted
-        // Skip much code
+            // Skip much code
         jmp     RETURN_CrashFix_Misc29B
     }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::GetSoundBuffer
+//
+// The value of the argument bankSlotInfoId is out of range
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc43  0x4E028C
+#define HOOKSIZE_CrashFix_Misc43 5
+DWORD                 RETURN_CrashFix_Misc43 = 0x4E0291;
+void _declspec(naked) HOOK_CrashFix_Misc43()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Validate bankSlotInfoId range
+        movsx   eax, word ptr [esp+8]
+
+        test    eax, eax
+        js      bail
+        cmp     ax, word ptr [ecx+0Ch]
+        jae     bail
+
+        // Execute replaced code
+        push    ebx
+        mov     ebx, [ecx]
+        push    ebp
+        push    esi
+        // Continue standard path
+        jmp     RETURN_CrashFix_Misc43
+
+bail:
+        push    43
+        call    CrashAverted
+        // Return null buffer
+        xor     eax, eax
+        retn    10h
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::GetSoundBuffer
+//
+// Reject impossible sound-count, sound-id, or bank-id metadata
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc45  0x4E02E8
+#define HOOKSIZE_CrashFix_Misc45 5
+DWORD                 RETURN_CrashFix_Misc45 = 0x4E02ED;
+DWORD                 RETURN_CrashFix_Misc45B = 0x4E036C;
+void _declspec(naked) HOOK_CrashFix_Misc45()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Reject impossible sound-count metadata
+        cmp     dx, 0FFFFh
+        je      check_bank
+        test    dx, dx
+        jle     bail45
+        cmp     dx, 190h
+        jg      bail45
+
+check_bank:
+        // Reject values that would later index outside the 400-entry sound header table
+        cmp     di, 190h
+        jae     bail45
+
+        // Reject slot metadata whose bank id points outside the lookup table
+        mov     ax, [ebx+esi+10h]
+        cmp     ax, word ptr [ecx+0Eh]
+        jae     bail45
+
+        // Execute replaced code
+        cmp     di, 190h
+        jmp     RETURN_CrashFix_Misc45
+
+bail45:
+        push    45
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc45B
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::GetSoundBuffer
+//
+// Computed sound size or offset exceeds the slot buffer capacity,
+// caused by stale or inconsistent slot metadata after a slot reload
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc44  0x4E0347
+#define HOOKSIZE_CrashFix_Misc44 7
+DWORD                 RETURN_CrashFix_Misc44 = 0x4E034E;
+void _declspec(naked) HOOK_CrashFix_Misc44()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // At this point size was written to *a4.
+        // ecx = this, ebx = m_pBankSlotsInfos, esi = bankSlotInfoId * 4820,
+        // edi = bankSlotInfoId * 4820 + 12 * soundId
+
+        // Read the computed size
+        mov     edx, [esp+1Ch]
+        mov     eax, [edx]
+
+        // Verify sound_offset + size fits within the slot buffer
+        add     eax, [edi+ebx+14h]
+        jc      bail44
+        cmp     eax, [ebx+esi+4]
+        ja      bail44
+
+        // Execute replaced code
+        mov     edx, [ecx]
+        mov     ax, [edi+edx+1Ch]
+        jmp     RETURN_CrashFix_Misc44
+
+bail44:
+        push    44
+        call    CrashAverted
+        pop     edi
+        pop     esi
+        pop     ebp
+        xor     eax, eax
+        pop     ebx
+        retn    10h
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::Service (PENDING_LOAD_ONE_SOUND)
+//
+// BankNumBytes from the stream header may exceed the buffer limit for
+// the rep movsd at 0x4DFE92. Clamp it so the copy stays within bounds.
+// Only bail when OffsetBytes is at or past the buffer end.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc47  0x4DFE7D
+#define HOOKSIZE_CrashFix_Misc47 5
+DWORD                 RETURN_CrashFix_Misc47 = 0x4DFE82;
+DWORD                 RETURN_CrashFix_Misc47B = 0x4DFFED;
+void _declspec(naked) HOOK_CrashFix_Misc47()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Execute replaced code
+        mov     edx, [ebx-1Ah]          // edx = req.SlotInfo
+        mov     edi, [edx]              // edi = SlotInfo->OffsetBytes
+
+        // Safe limit = m_BufferSize - OffsetBytes; bail if no room at all
+        mov     eax, [ebp+18h]          // eax = m_BufferSize
+        sub     eax, edi                // eax = space left in m_Buffer
+        jbe     bail47                  // OffsetBytes >= m_BufferSize
+
+        // Reduce safe limit to SlotInfo->NumBytes if that is smaller
+        mov     ecx, [edx+4]            // ecx = SlotInfo->NumBytes
+        cmp     eax, ecx
+        jb      skip47                  // space_left is the tighter bound
+        mov     eax, ecx                // NumBytes is the tighter bound
+skip47:
+
+        // Clamp BankNumBytes to the safe limit if needed
+        mov     ecx, [ebx-12h]          // ecx = req.BankNumBytes
+        cmp     ecx, eax
+        jbe     ok47                    // already within range
+
+        mov     [ebx-12h], eax          // req.BankNumBytes = safe limit
+        push    47
+        call    CrashAverted
+
+ok47:
+        jmp     RETURN_CrashFix_Misc47
+
+bail47:
+        push    47
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc47B
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::Service (PENDING_READ, whole-bank path)
+//
+// Same buffer overflow risk as Misc47, but on the whole-bank memcpy
+// at 0x4DFF90. Clamp BankNumBytes so the copy stays within bounds.
+// Only bail when OffsetBytes is at or past the buffer end.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc48  0x4DFF78
+#define HOOKSIZE_CrashFix_Misc48 5
+DWORD                 RETURN_CrashFix_Misc48 = 0x4DFF7D;
+DWORD                 RETURN_CrashFix_Misc48B = 0x4DFFED;
+void _declspec(naked) HOOK_CrashFix_Misc48()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Execute replaced code
+        mov     edx, [ebx-1Ah]          // edx = req.SlotInfo
+        mov     edi, [edx]              // edi = SlotInfo->OffsetBytes
+
+        // Safe limit = m_BufferSize - OffsetBytes; bail if no room at all
+        mov     eax, [ebp+18h]          // eax = m_BufferSize
+        sub     eax, edi                // eax = space left in m_Buffer
+        jbe     bail48                  // OffsetBytes >= m_BufferSize
+
+        // Reduce safe limit to SlotInfo->NumBytes if that is smaller
+        mov     ecx, [edx+4]            // ecx = SlotInfo->NumBytes
+        cmp     eax, ecx
+        jb      skip48                  // space_left is the tighter bound
+        mov     eax, ecx                // NumBytes is the tighter bound
+skip48:
+
+        // Clamp BankNumBytes to the safe limit if needed
+        mov     ecx, [ebx-12h]          // ecx = req.BankNumBytes
+        cmp     ecx, eax
+        jbe     ok48                    // already within range
+
+        mov     [ebx-12h], eax          // req.BankNumBytes = safe limit
+        push    48
+        call    CrashAverted
+
+ok48:
+        jmp     RETURN_CrashFix_Misc48
+
+bail48:
+        push    48
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc48B
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CAEMP3BankLoader::Service (PENDING_READ, single-sound path)
+//
+// BankNumBytes from the stream header can be negative or larger than
+// the slot holds. Clamp to SlotInfo->NumBytes so the second read still
+// runs and the bank slot gets populated. Bail only when the bank index
+// is out of range, which would write past the end of the slot array
+// when the second read completes.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc49  0x4E0094
+#define HOOKSIZE_CrashFix_Misc49 5
+DWORD                 RETURN_CrashFix_Misc49 = 0x4E0099;
+DWORD                 RETURN_CrashFix_Misc49B = 0x4DFFED;
+void _declspec(naked) HOOK_CrashFix_Misc49()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Execute replaced subtraction; EAX must be unchanged for the return site at 0x4E0099
+        sub     ecx, [eax]              // ecx = nextOrEnd - Sounds[SoundID].BankOffsetBytes
+
+        // Bail on out-of-range Bank: it is used as an array index for slot writes
+        movsx   edx, word ptr [ebx-2]   // edx = req.Bank
+        test    edx, edx
+        js      bail49
+        cmp     dx, [ebp+0Eh]           // Bank >= m_BankLkupCnt?
+        jae     bail49
+
+        // Clamp BankNumBytes to SlotInfo->NumBytes
+        mov     edx, [ebx-1Ah]          // edx = req.SlotInfo
+        mov     edi, [edx+4]            // edi = SlotInfo->NumBytes
+        test    ecx, ecx                // negative result (underflow)?
+        js      clamp49
+        cmp     ecx, edi                // BankNumBytes > NumBytes?
+        jbe     ok49
+
+clamp49:
+        mov     ecx, edi
+        push    49
+        call    CrashAverted
+
+ok49:
+        mov     [ebx-12h], ecx          // req.BankNumBytes = ecx
+        jmp     RETURN_CrashFix_Misc49
+
+bail49:
+        push    49
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc49B
+    }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CAnimBlendAssociation::SetFinishCallback
-// 
+//
 // "this" is invalid
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc30                             0x4CEBE8
-#define HOOKSIZE_CrashFix_Misc30                            7
-#define HOOKCHECK_CrashFix_Misc30                           0xC7
-DWORD RETURN_CrashFix_Misc30 = 0x4CEBEF;
-DWORD RETURN_CrashFix_Misc30B = 0x4CEBF5;
+#define HOOKPOS_CrashFix_Misc30   0x4CEBE8
+#define HOOKSIZE_CrashFix_Misc30  7
+#define HOOKCHECK_CrashFix_Misc30 0xC7
+DWORD                         RETURN_CrashFix_Misc30 = 0x4CEBEF;
+DWORD                         RETURN_CrashFix_Misc30B = 0x4CEBF5;
 static void __declspec(naked) HOOK_CrashFix_Misc30()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Check for incorrect pointer
         cmp     ecx, 0
         jz      cont
 
-        // Execute replaced code
+            // Execute replaced code
         mov     dword ptr [ecx+30h], 1
         // Continue standard path
         jmp     RETURN_CrashFix_Misc30
@@ -1008,35 +1533,37 @@ static void __declspec(naked) HOOK_CrashFix_Misc30()
 cont:
         push    30
         call    CrashAverted
-        // Skip much code
+            // Skip much code
         jmp     RETURN_CrashFix_Misc30B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CAnimBlendAssociation::SetCurrentTime
-// 
+//
 // "this" is invalid
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc32                             0x4CEA80
-#define HOOKSIZE_CrashFix_Misc32                            8
+#define HOOKPOS_CrashFix_Misc32  0x4CEA80
+#define HOOKSIZE_CrashFix_Misc32 8
 DWORD RETURN_CrashFix_Misc32 = 0x4CEA88;
 
 static void __declspec(naked) HOOK_CrashFix_Misc32()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
     __asm
-    {
+        {
         test    ecx, ecx
         jz      cont
 
-        // Check hierarchy pointer (offset 0x14)
-        // We can use eax as scratch because it gets overwritten by the first replaced instruction anyway
+             // Check hierarchy pointer (offset 0x14)
+             // We can use eax as scratch because it gets overwritten by the first replaced instruction anyway
         mov     eax, [ecx+14h]
         test    eax, eax
         jz      cont
 
-        // Execute replaced code
+             // Execute replaced code
         mov     eax, [esp+4]
         fld     dword ptr [esp+4]
         jmp     RETURN_CrashFix_Misc32
@@ -1045,35 +1572,260 @@ static void __declspec(naked) HOOK_CrashFix_Misc32()
         push    32
         call    CrashAverted
         retn    4
-    }
+        }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
-// RwTexDictionaryFindNamedTexture
-// 
-// "dict" is invalid
+// CVehicleModelInfo::FindTextureCB (0x4C7510)
+// SA's inlined strcpy to 32-byte buffer overruns if name >= 31 chars > 0xC0000409
+// Reimplement it using safe string handling
+//
+// Hook interaction: This calls RwTexDictionaryFindNamedTexture (0x7F39F0) which has
+// Misc33 hook. Direct calls causes re-entry and stack corruption.
+// Solution: CallOriginalRwTexDictionaryFindNamedTexture replicates Misc33's overwritten
+// bytes (mov eax,[esp+4]; push ebx) and jumps to 0x7F39F5 to work around the hook.
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CrashFix_Misc33                             0x7F39F0
-#define HOOKSIZE_CrashFix_Misc33                            5
-DWORD RETURN_CrashFix_Misc33 = 0x7F39F5;
+typedef RwTexture*(__cdecl* RwTexDictionaryFindNamedTexture_t)(RwTexDictionary* dict, const char* name);
+typedef RwTexDictionary*(__cdecl* RwTexDictionaryGetCurrent_t)();
 
-typedef RwTexDictionary* (__cdecl *PFN_RwTexDictionaryGetCurrent)();
-PFN_RwTexDictionaryGetCurrent pfnRwTexDictionaryGetCurrent = (PFN_RwTexDictionaryGetCurrent)0x7F3A90;
+static RwTexDictionaryGetCurrent_t pfnRwTexDictionaryGetCurrentForMisc39 = (RwTexDictionaryGetCurrent_t)0x7F3A90;
 
-static void __declspec(naked) CallOriginalFindNamedTexture()
+// Trampoline to call the ORIGINAL RwTexDictionaryFindNamedTexture at 0x7F39F0,
+// thereby working around HOOK_CrashFix_Misc33.
+// Replicates the 5 overwritten bytes (mov eax,[esp+4]; push ebx) then jumps to 0x7F39F5.
+static constexpr DWORD       AddrFindNamedTexture_Continue = 0x7F39F5;
+static void _declspec(naked) TrampolineRwTexDictionaryFindNamedTexture()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
     __asm
     {
         mov     eax, [esp+4]
         push    ebx
-        jmp     RETURN_CrashFix_Misc33
+        jmp     AddrFindNamedTexture_Continue
     }
+    // clang-format on
+}
+
+static constexpr std::size_t TextureNameSize = 32;
+static constexpr char        RemapPrefix[] = "remap";
+
+typedef RwTexDictionary*(__cdecl* CTxdStore_GetTxd_t)(unsigned int id);
+typedef int(__cdecl* CTxdStore_GetParentTxdSlot_t)(int index);
+
+// Cached dict-to-slot mapping to avoid repeated pool scans
+static RwTexDictionary* s_cachedTxdPtr = nullptr;
+static int              s_cachedSlotIndex = -1;
+
+// Reads the runtime TXD pool size from SA's pool struct at 0xC8800C.
+// Returns 0 if the pool hasn't been created yet.
+static int GetRuntimeTxdPoolSize() noexcept
+{
+    auto* pPool = *reinterpret_cast<CPoolSAInterface<CTextureDictonarySAInterface>**>(0xC8800C);
+    if (!pPool)
+        return 0;
+    return pPool->m_nSize;
+}
+
+// Finds the pool slot index for a given RwTexDictionary pointer by scanning
+// non-empty slots within the pool bounds. Uses a one-entry cache to skip
+// the scan when the same dictionary is looked up again.
+static int FindTxdSlotForDict(RwTexDictionary* pDict) noexcept
+{
+    if (!pDict)
+        return -1;
+
+    // Check cached result first
+    if (s_cachedTxdPtr == pDict && s_cachedSlotIndex >= 0)
+    {
+        // Check the slot still holds this dictionary
+        auto* pPool = *reinterpret_cast<CPoolSAInterface<CTextureDictonarySAInterface>**>(0xC8800C);
+        if (pPool && pPool->m_byteMap && pPool->m_pObjects && s_cachedSlotIndex < pPool->m_nSize && !pPool->m_byteMap[s_cachedSlotIndex].bEmpty &&
+            pPool->m_pObjects[s_cachedSlotIndex].rwTexDictonary == pDict)
+        {
+            return s_cachedSlotIndex;
+        }
+        s_cachedTxdPtr = nullptr;
+        s_cachedSlotIndex = -1;
+    }
+
+    auto* pPool = *reinterpret_cast<CPoolSAInterface<CTextureDictonarySAInterface>**>(0xC8800C);
+    if (!pPool || pPool->m_nSize <= 0 || !pPool->m_byteMap || !pPool->m_pObjects)
+        return -1;
+
+    const int scanLimit = (pPool->m_nSize < 32768) ? pPool->m_nSize : 32768;
+    for (int i = 0; i < scanLimit; ++i)
+    {
+        if (pPool->m_byteMap[i].bEmpty)
+            continue;
+        if (pPool->m_pObjects[i].rwTexDictonary == pDict)
+        {
+            s_cachedTxdPtr = pDict;
+            s_cachedSlotIndex = i;
+            return i;
+        }
+    }
+    return -1;
+}
+
+static RwTexture* __cdecl OnMY_FindTextureCB(const char* name)
+{
+    if (name == nullptr)
+        return nullptr;
+
+    const auto RwTexDictionaryFindNamedTexture =
+        reinterpret_cast<RwTexDictionaryFindNamedTexture_t>(reinterpret_cast<void*>(TrampolineRwTexDictionaryFindNamedTexture));
+    const auto RwTexDictionaryGetCurrent = pfnRwTexDictionaryGetCurrentForMisc39;
+    const auto CTxdStore_GetTxd = reinterpret_cast<CTxdStore_GetTxd_t>(0x00408340);
+    const auto CTxdStore_GetParentTxdSlot = reinterpret_cast<CTxdStore_GetParentTxdSlot_t>(0x00408370);
+
+    RwTexDictionary* vehicleTxd = *reinterpret_cast<RwTexDictionary**>(0x00B4E688);
+    if (vehicleTxd != nullptr)
+    {
+        RwTexture* tex = RwTexDictionaryFindNamedTexture(vehicleTxd, name);
+        if (tex != nullptr)
+        {
+            return tex;
+        }
+    }
+
+    RwTexDictionary* currentTxd = RwTexDictionaryGetCurrent();
+    if (currentTxd == nullptr)
+        return nullptr;
+
+    RwTexture* tex = nullptr;
+    const bool bIsRemap = (std::strncmp(name, RemapPrefix, sizeof(RemapPrefix) - 1) == 0);
+
+    constexpr int kMaxDepth = 32;
+    int           depth = 0;
+    int           slotIndex = -1;
+    bool          slotLookedUp = false;
+
+    char remapName[TextureNameSize];
+    if (bIsRemap)
+    {
+        const std::size_t nameLen = strnlen(name, TextureNameSize);
+        if (nameLen >= TextureNameSize)
+        {
+            OnCrashAverted(39);
+            return nullptr;
+        }
+        std::memcpy(remapName, name, nameLen + 1);
+        remapName[0] = '#';
+    }
+
+    RwTexDictionary* txd = currentTxd;
+    while (txd != nullptr && depth < kMaxDepth)
+    {
+        tex = RwTexDictionaryFindNamedTexture(txd, name);
+        if (tex != nullptr)
+            break;
+
+        if (bIsRemap)
+        {
+            tex = RwTexDictionaryFindNamedTexture(txd, remapName);
+            if (tex != nullptr)
+                break;
+        }
+
+        if (!slotLookedUp)
+        {
+            slotLookedUp = true;
+            slotIndex = FindTxdSlotForDict(currentTxd);
+        }
+
+        if (slotIndex < 0)
+            break;
+
+        int parentSlot = CTxdStore_GetParentTxdSlot(slotIndex);
+        if (parentSlot < 0 || parentSlot == slotIndex)
+            break;
+
+        // Check parentSlot is within pool bounds
+        const int poolSize = GetRuntimeTxdPoolSize();
+        if (parentSlot >= poolSize)
+            break;
+
+        slotIndex = parentSlot;
+        txd = CTxdStore_GetTxd(static_cast<unsigned int>(parentSlot));
+        ++depth;
+    }
+
+    if (depth >= kMaxDepth)
+        AddReportLog(8540, SString("FindTextureCB: parent chain depth cap reached for '%s'", name));
+
+    if (tex != nullptr && bIsRemap)
+    {
+        if (IsWritablePtr(tex, sizeof(RwTexture)))
+        {
+            tex->name[0] = '#';
+        }
+    }
+
+    return tex;
+}
+
+#define HOOKPOS_CrashFix_Misc39  0x4C7510
+#define HOOKSIZE_CrashFix_Misc39 5
+static void __declspec(naked) HOOK_CrashFix_Misc39()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        push    [esp+4]
+        call    OnMY_FindTextureCB
+        add     esp, 4
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryFindNamedTexture (0x7F39F0)
+//
+// Crash occur when dict pointer is NULL or invalid (not a valid RwTexDictionary).
+// This can happen with corrupted texture dictionary chains or during streaming issues.
+//
+// Validates the dict pointer before calling the SA function
+//
+// Overwrites the first 5 bytes at 0x7F39F0:
+//   Original: 8B 44 24 04 53  (mov eax,[esp+4]; push ebx)
+//   Replaced: E9 xx xx xx xx  (jmp HOOK_CrashFix_Misc33)
+//
+// HOOK_CrashFix_Misc39 (FindTextureCB replacement) needs to call this function
+// but has to dodge this hook (risk of re-entry and stack corruption)
+// See CallOriginalRwTexDictionaryFindNamedTexture in the Misc39 code for the
+// trampoline that replicates the overwritten bytes and jumps to 0x7F39F5.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc33  0x7F39F0
+#define HOOKSIZE_CrashFix_Misc33 5
+DWORD RETURN_CrashFix_Misc33 = 0x7F39F5;
+
+typedef RwTexDictionary*(__cdecl* PFN_RwTexDictionaryGetCurrent)();
+PFN_RwTexDictionaryGetCurrent pfnRwTexDictionaryGetCurrent = (PFN_RwTexDictionaryGetCurrent)0x7F3A90;
+
+// Helper to execute the original func's overwritten prologue and continue.
+// Used by HOOK_CrashFix_Misc33 when validation passes.
+static void __declspec(naked) CallOriginalFindNamedTexture()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Replicate overwritten bytes at 0x7F39F0
+        mov     eax, [esp+4]        // Original: mov eax, [esp+dict]
+        push    ebx                  // Original: push ebx
+        jmp     RETURN_CrashFix_Misc33  // Continue at 0x7F39F5: add eax, 8
+    }
+    // clang-format on
 }
 
 static void __declspec(naked) HOOK_CrashFix_Misc33()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
     __asm
     {
         // Get first argument (dict)
@@ -1086,48 +1838,588 @@ static void __declspec(naked) HOOK_CrashFix_Misc33()
         test    edx, edx
         jz      invalid_texture
 
-        // Check for NULL dict
+            // Check for NULL dict
         test    ecx, ecx
         jz      invalid_texture
 
-        // Check for valid pointer
+            // Check for valid pointer
         cmp     ecx, 0x10000
         jb      invalid_texture
 
-        // Check if it's a dictionary (type 6)
+        // Check if it's a dictionary (RwObject type 6 at offset 0)
         cmp     byte ptr [ecx], 6
         jne     use_current_dict
 
-        // Validate dict->texturesInDict.next (offset 8)
+            // Validate dict->texturesInDict.next (offset 8)
         mov     eax, [ecx+8]
         test    eax, eax
         jz      invalid_texture
 
-        // Execute replaced code
+        // All validation passed - execute original function
         jmp     CallOriginalFindNamedTexture
 
     use_current_dict:
-        // Attempt to recover by using the current dictionary
-        push    edx             // Save name before the call
+        // Dict exists but is not type 6, try to recover using current dictionary
+        // Save name in edx across the call
+        push    edx
         call    pfnRwTexDictionaryGetCurrent
-        pop     edx             // Restore name
+        pop     edx
         test    eax, eax
         jz      invalid_texture
 
-        // Call original function with (dict, name)
-        push    edx             // name
-        push    eax             // dict
-        call    CallOriginalFindNamedTexture
-        add     esp, 8
-        
-        retn                    // Return to caller
+        // Replace the invalid dict argument on stack with current one
+        mov     [esp+4], eax
+        // Continue with corrected dict
+        jmp     CallOriginalFindNamedTexture
 
     invalid_texture:
         push    33
         call    CrashAverted
-        xor     eax, eax        // Return NULL
-        retn                    // cdecl
+        xor     eax, eax            // Return null (texture not found)
+        retn                        // cdecl
     }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CCustomCarEnvMapPipeline::CustomPipeRenderCB - EnvWave path
+//
+// NULL env map plugin data pointer (EBP) causes crash in CalculateEnvMap
+// Crash when rendering a car environment map (Accessing [esi+2])
+// This occurs when a material has MF_HAS_SHINE_WAVE flag set
+// but the env map plugin data slot is NULL.
+//
+// Hook at 0x5D9CB2 replaces: jz loc_5D9E0D (original flag check)
+//
+// Original code flow at loc_5D9CAC:
+//  0x5D9CAC: mov al, [esp+4Ch+var_39]  ; load EnvWave flag
+//  0x5D9CB0: test al, al
+//  0x5D9CB2: jz loc_5D9E0D             ; skip if flag not set <-- HOOKED
+//  0x5D9CB8: mov eax, ds:_RwEngineInstance (EnvWave processing begins)
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc34  0x5D9CB2
+#define HOOKSIZE_CrashFix_Misc34 6
+DWORD                         RETURN_CrashFix_Misc34 = 0x5D9CB8;
+DWORD                         RETURN_CrashFix_Misc34_Skip = 0x5D9E0D;  // Skip to end of EnvWave block
+static void __declspec(naked) HOOK_CrashFix_Misc34()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        // Replicate original flag check: ZF was set by previous "test al, al"
+        // If ZF is set (al == 0, flag not set), skip EnvWave (original behavior)
+        // Note: JMP does not modify flags, so ZF from "test al, al" is preserved
+        jz      skip_envwave_normal
+
+            // Flag is set - check if EBP (env map plugin data) is valid
+            // EBP was loaded at loc_5D9A00: mov ebp, [ecx+esi] (material plugin slot)
+            // Check if EBP points to a valid address (catches NULL and low invalid addresses)
+        cmp     ebp, 0x10000
+        jb      skip_envwave_crash
+
+            // EBP is valid, continue with EnvWave processing
+            // Return to 0x5D9CB8: mov eax, ds:_RwEngineInstance
+        jmp     RETURN_CrashFix_Misc34
+
+    skip_envwave_normal:
+        // Normal skip - flag was not set (original behavior)
+        jmp     RETURN_CrashFix_Misc34_Skip
+
+    skip_envwave_crash:
+        // Crash averted - flag was set but EBP was NULL or invalid
+        push    34
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc34_Skip
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryForAllTextures
+//
+// Invalid list entry pointer (crash at 0x7F374A: mov esi, [eax])
+// (https://pastebin.com/hFduf1JB)
+// WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc35   0x7F374A
+#define HOOKSIZE_CrashFix_Misc35  5
+#define HOOKCHECK_CrashFix_Misc35 0x8B
+DWORD RETURN_CrashFix_Misc35 = 0x7F374F;
+DWORD RETURN_CrashFix_Misc35_Abort = 0x7F3760;
+
+static void __declspec(naked) HOOK_CrashFix_Misc35()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        cmp     eax, NUM_LOWMEM_THRESHOLD_ASM
+        jb      abort_35
+
+        push    eax
+        push    ecx
+        push    edx
+        push    4
+        push    eax
+        call    IsReadablePtr
+        add     esp, 8
+        test    al, al
+        pop     edx
+        pop     ecx
+        pop     eax
+        jz      abort_35
+
+        mov     esi, [eax]
+        add     eax, 0FFFFFFF8h
+        jmp     RETURN_CrashFix_Misc35
+
+    abort_35:
+        push    35
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc35_Abort
+    }
+    // clang-format on
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryFindNamedTexture - Invalid/corrupted texture name pointer
+// Crash: 0x7F3A17 (mov cl,[esi]), see https://pastebin.com/buBbyWRx and https://pastebin.com/1wTeTwu2
+// Flow: validate ebx > compute ecx=ebx+8 > range-check > IsReadablePtr(ecx)
+// Bad ptrs: 0xFF1B1B1B (high), 0x4E505444 (unmapped ASCII)
+// WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
+//          Use push eax/ecx/edx + pushfd instead (16 bytes vs 32)
+///////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc36   0x7F3A09
+#define HOOKSIZE_CrashFix_Misc36  6
+#define HOOKCHECK_CrashFix_Misc36 0x8D
+DWORD RETURN_CrashFix_Misc36 = 0x7F3A0F;
+DWORD RETURN_CrashFix_Misc36_Abort = 0x7F3A5C;
+
+static void __declspec(naked) HOOK_CrashFix_Misc36()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        cmp     ebx, NUM_LOWMEM_THRESHOLD_ASM
+        jb      abort_36
+
+        // Replicate original code
+        lea     eax, [ebx-8]
+        lea     ecx, [eax+10h]
+
+        cmp     ecx, NUM_LOWMEM_THRESHOLD_ASM
+        jb      abort_36
+
+        push    eax
+        push    ecx
+        push    edx
+        push    1
+        push    ecx
+        call    IsReadablePtr
+        add     esp, 8
+        test    al, al
+        pop     edx
+        pop     ecx
+        pop     eax
+        jz      abort_36
+
+        // Continue to original code at test ecx, ecx
+        jmp     RETURN_CrashFix_Misc36
+
+    abort_36:
+        push    36
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc36_Abort
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// RwTexDictionaryAddTexture
+//
+// Invalid list head pointer (crash at 0x7F39B3: mov [esi+4], edx)
+// (https://pastebin.com/pkWwsSih)
+// WARNING: No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc37   0x7F39B3
+#define HOOKSIZE_CrashFix_Misc37  5
+#define HOOKCHECK_CrashFix_Misc37 0x89
+DWORD RETURN_CrashFix_Misc37 = 0x7F39B8;
+
+static void __declspec(naked) HOOK_CrashFix_Misc37()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        cmp     esi, NUM_LOWMEM_THRESHOLD_ASM
+        jb      bad
+
+        push    eax
+        push    ecx
+        push    edx
+        push    8
+        push    esi
+        call    IsWritablePtr
+        add     esp, 8
+        test    al, al
+        pop     edx
+        pop     ecx
+        pop     eax
+        jz      bad
+
+        cmp     esi, ecx
+        jz      ok
+
+        cmp     dword ptr [esi+4], ecx
+        jz      ok
+
+    bad:
+        push    37
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc37
+
+    ok:
+        mov     [edx], esi
+        mov     [esi+4], edx
+        mov     [ecx], edx
+        jmp     RETURN_CrashFix_Misc37
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// __rpD3D9SkinGeometryReinstance
+//
+// NULL pointer (out of video mem crash at 0x003C91CC: mov ebx, [esi])
+// Hook at loc_7C91C0 validates [eax]
+// On NULL, skip to loc_7C91DA (after the call block) to continue the loop.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc38   0x7C91C0
+#define HOOKSIZE_CrashFix_Misc38  6
+#define HOOKCHECK_CrashFix_Misc38 0x8B
+DWORD RETURN_CrashFix_Misc38 = 0x7C91C6;
+DWORD RETURN_CrashFix_Misc38_Skip = 0x7C91DA;  // loc_7C91DA: after call block, safe loop continuation
+
+constexpr std::uint32_t NUM_VRAM_RELIEF_THROTTLE_MS = 500;
+
+static void OnVideoMemoryExhausted()
+{
+    static DWORD s_dwLastReliefTick = 0;
+    const DWORD  dwNow = GetTickCount32();
+
+    if (dwNow - s_dwLastReliefTick < NUM_VRAM_RELIEF_THROTTLE_MS)
+        return;
+
+    s_dwLastReliefTick = dwNow;
+    OnRequestDeferredStreamingMemoryRelief();
+}
+
+// No pushad/popad with C++ calls (corrupts /GS cookie > 0xC0000409)
+static void __declspec(naked) HOOK_CrashFix_Misc38()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     esi, [eax]
+        test    esi, esi
+        jnz     ok
+
+        // Save only volatile registers before call
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    38
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc38_Skip
+
+    ok:
+        lea     ecx, [esp+ecx*4+18h]
+        jmp     RETURN_CrashFix_Misc38
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// __rpD3D9VertexDeclarationInstV3d
+//
+// Same class of issue as CrashFix_Misc38 (skin geometry path), usually due to out of video mem.
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+// NULL locked vertex buffer crash (VB Lock failure unchecked by RW).
+// RW's D3D9AtomicDefaultInstanceCallback passes a NULL lockedVertexBuffer
+// to this function when IDirect3DVertexBuffer9::Lock() fails and the
+// HRESULT is discarded. The function writes vertex data to the NULL
+// pointer, causing an crash at 0x00352BA7 (0x752BA7) (case 2, first store).
+//
+// __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src, [esp+10]=numVerts, [esp+14]=stride
+// Returns D3D9VertexTypeSize[type] in EAX on all paths.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_VBInstV3dNull   0x752AD0
+#define HOOKSIZE_CrashFix_VBInstV3dNull  7
+#define HOOKCHECK_CrashFix_VBInstV3dNull 0x51
+DWORD RETURN_CrashFix_VBInstV3dNull = 0x752AD7;
+DWORD ARRAY_D3D9VertexTypeSize = 0x874EF8;
+
+static void _declspec(naked) HOOK_CrashFix_VBInstV3dNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+8]                         // eax = mem (locked VB pointer)
+        test    eax, eax
+        jz      bail_out
+
+        // Replicate overwritten prologue (7 bytes: push ecx; push ebx; push ebp; mov ebp,[esp+0Ch])
+        push    ecx
+        push    ebx
+        push    ebp
+        mov     ebp, [esp+10h]                       // type (was [esp+0C] before 3 pushes, +4 each = +0Ch+4 = 10h)
+        jmp     RETURN_CrashFix_VBInstV3dNull
+
+    bail_out:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    40
+        call    CrashAverted
+
+        // Return D3D9VertexTypeSize[type] to satisfy caller's contract
+        mov     ecx, [esp+4]                         // ecx = type
+        mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
+        mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// __rpD3D9VertexDeclarationInstV3dMorph
+//
+// Same NULL locked VB crash as above __rpD3D9VertexDeclarationInstV3d, but in the morph interpolation path.
+// Called from D3D9AtomicDefaultInstanceCallback when geometry has morph
+// targets. mem (2nd arg) receives lockedVertexBuffer[] which can be NULL.
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+//
+// __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src1, [esp+10]=src2,
+//          [esp+14]=scale(float), [esp+18]=numVerts, [esp+1C]=stride
+// Returns D3D9VertexTypeSize[type] in EAX.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_VBInstV3dMorphNull   0x753B60
+#define HOOKSIZE_CrashFix_VBInstV3dMorphNull  5
+#define HOOKCHECK_CrashFix_VBInstV3dMorphNull 0x51
+DWORD RETURN_CrashFix_VBInstV3dMorphNull = 0x753B65;
+
+static void _declspec(naked) HOOK_CrashFix_VBInstV3dMorphNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+8]                         // eax = mem (locked VB pointer)
+        test    eax, eax
+        jz      bail_out_morph
+
+        // Replicate overwritten prologue (5 bytes: push ecx; mov eax,[esp+4+arg_0])
+        push    ecx
+        mov     eax, [esp+8]                         // type (was [esp+4+4] = [esp+8] after push ecx)
+        jmp     RETURN_CrashFix_VBInstV3dMorphNull
+
+    bail_out_morph:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    41
+        call    CrashAverted
+
+        // Return D3D9VertexTypeSize[type]
+        mov     ecx, [esp+4]                         // ecx = type
+        mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
+        mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// __rpD3D9VertexDeclarationInstWeights
+//
+// Same NULL locked VB crash as InstV3d/InstV3dMorph, but in the skin
+// weights instancing path. Called only from __rpD3D9SkinGeometryReinstance
+// when rendering skinned meshes (peds, deformable vehicles).
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+// The caller adds a vertex byte offset to the locked pointer, so mem
+// is typically a small non-zero value (e.g 0x20) rather than exact NULL.
+// Any address below 0x10000 (Windows null guard page) is invalid.
+//
+// __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src, [esp+10]=numVerts, [esp+14]=stride
+// Returns D3D9VertexTypeSize[type] in EAX.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_VBInstWeightsNull   0x752320
+#define HOOKSIZE_CrashFix_VBInstWeightsNull  7
+#define HOOKCHECK_CrashFix_VBInstWeightsNull 0x8B
+DWORD RETURN_CrashFix_VBInstWeightsNull = 0x752327;
+
+static void _declspec(naked) HOOK_CrashFix_VBInstWeightsNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        cmp     dword ptr [esp+8], 10000h            // mem below 64KB null guard page?
+        jb      bail_out_weights
+
+        // Replicate overwritten prologue (7 bytes: mov eax,[esp+4]; sub esp,10h)
+        mov     eax, [esp+4]                         // type
+        sub     esp, 10h
+        jmp     RETURN_CrashFix_VBInstWeightsNull
+
+    bail_out_weights:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    42
+        call    CrashAverted
+
+        // Return D3D9VertexTypeSize[type]
+        mov     ecx, [esp+4]                         // ecx = type
+        mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
+        mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// __rpD3D9VertexDeclarationInstIndicesRemap
+//
+// Same NULL locked VB crash as InstV3d/InstV3dMorph and InstWeights,
+// but in the bone index remap path. Called only from __rpD3D9SkinGeometryReinstance
+// when rendering skinned meshes (peds, deformable vehicles).
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+// The caller adds a vertex element byte offset to the locked pointer, so mem
+// is typically a small non-zero value (e.g 0x28) rather than exact NULL.
+// Any address below 0x10000 (Windows null guard page) is invalid.
+//
+// __cdecl: [esp+4]=type, [esp+8]=mem, [esp+C]=src, [esp+10]=remap, [esp+14]=numVerts, [esp+18]=stride
+// Returns D3D9VertexTypeSize[type] in EAX.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_VBInstIndicesRemapNull   0x754C80
+#define HOOKSIZE_CrashFix_VBInstIndicesRemapNull  8
+#define HOOKCHECK_CrashFix_VBInstIndicesRemapNull 0x8B
+DWORD RETURN_CrashFix_VBInstIndicesRemapNull = 0x754C88;
+
+static void _declspec(naked) HOOK_CrashFix_VBInstIndicesRemapNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        cmp     dword ptr [esp+8], 10000h            // mem below 64KB null guard page?
+        jb      bail_out_remap
+
+        // Replicate overwritten prologue (8 bytes: mov edx,[esp+4]; mov eax,[esp+0Ch])
+        mov     edx, [esp+4]                         // type
+        mov     eax, [esp+0Ch]                       // src
+        jmp     RETURN_CrashFix_VBInstIndicesRemapNull
+
+    bail_out_remap:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    53
+        call    CrashAverted
+
+        // Return D3D9VertexTypeSize[type]
+        mov     ecx, [esp+4]                         // ecx = type
+        mov     eax, ARRAY_D3D9VertexTypeSize        // eax = array base address
+        mov     eax, [eax + ecx*4]                   // eax = D3D9VertexTypeSize[type]
+        ret
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// _RwD3D9DynamicVertexBufferCreate
+//
+// NULL VB pointer crash when reusing a DynamicVertexBuffer list entry
+// whose prior CreateVertexBuffer call failed (out of video mem).
+// The entry has in_use=0, pVB=NULL, size=old_size. When the function
+// finds this entry with a non-matching size, it tries to Release() the
+// old VB through a NULL pointer (crash at 0x003F5A3A / 0x7F5A3A: mov ecx,[eax]).
+// This condition indicates out of video mem, but we'll alleviate it by calling OnVideoMemoryExhausted following the avert.
+//
+// Hook at 0x7F5A36 replaces: mov eax,[esi+8]; push eax; mov ecx,[eax]
+// On NULL, skip the Release() block and continue to VB reallocation.
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_DynVBCreateNull   0x7F5A36
+#define HOOKSIZE_CrashFix_DynVBCreateNull  6
+#define HOOKCHECK_CrashFix_DynVBCreateNull 0x8B
+DWORD RETURN_CrashFix_DynVBCreateNull = 0x7F5A3C;
+DWORD RETURN_CrashFix_DynVBCreateNull_Skip = 0x7F5A8F;
+
+static void _declspec(naked) HOOK_CrashFix_DynVBCreateNull()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esi+8]                         // load VB pointer from list entry
+        test    eax, eax
+        jz      bail_out_dynvb
+
+        // Replicate overwritten bytes (push eax; mov ecx,[eax])
+        push    eax
+        mov     ecx, [eax]
+        jmp     RETURN_CrashFix_DynVBCreateNull
+
+    bail_out_dynvb:
+        push    eax
+        push    ecx
+        push    edx
+        call    OnVideoMemoryExhausted
+        pop     edx
+        pop     ecx
+        pop     eax
+
+        push    46
+        call    CrashAverted
+        jmp     RETURN_CrashFix_DynVBCreateNull_Skip
+    }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1141,10 +2433,10 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
         return pFrameResult;
 
     // Don't check frame if call can legitimately return NULL
-    if (calledFrom == 0x6D308F                // CVehicle::SetWindowOpenFlag
-        || calledFrom == 0x6D30BF             // CVehicle::ClearWindowOpenFlag
-        || calledFrom == 0x4C7DDE             // CVehicleModelInfo::GetOriginalCompPosition
-        || calledFrom == 0x4C96BD)            // CVehicleModelInfo::CreateInstance
+    if (calledFrom == 0x6D308F      // CVehicle::SetWindowOpenFlag
+        || calledFrom == 0x6D30BF   // CVehicle::ClearWindowOpenFlag
+        || calledFrom == 0x4C7DDE   // CVehicleModelInfo::GetOriginalCompPosition
+        || calledFrom == 0x4C96BD)  // CVehicleModelInfo::CreateInstance
         return NULL;
 
     // Ignore external calls
@@ -1158,14 +2450,14 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
     int   iModelId = 0;
     DWORD pVehicle = NULL;
 
-    if (calledFrom == 0x6D3847)            // CVehicle::AddReplacementUpgrade
+    if (calledFrom == 0x6D3847)  // CVehicle::AddReplacementUpgrade
         pVehicle = _ebx;
-    else if (calledFrom == 0x6DFA61                // CVehicle::AddUpgrade
-             || calledFrom == 0x6D3A62)            // CVehicle::GetReplacementUpgrade
+    else if (calledFrom == 0x6DFA61      // CVehicle::AddUpgrade
+             || calledFrom == 0x6D3A62)  // CVehicle::GetReplacementUpgrade
         pVehicle = _edi;
-    else if (calledFrom == 0x06AC740               // CAutomobile::PreRender (Forklift)
-             || calledFrom == 0x6D39F3             // CVehicle::RemoveReplacementUpgrade
-             || calledFrom == 0x6D3A32)            // CVehicle::RemoveReplacementUpgrade2
+    else if (calledFrom == 0x06AC740     // CAutomobile::PreRender (Forklift)
+             || calledFrom == 0x6D39F3   // CVehicle::RemoveReplacementUpgrade
+             || calledFrom == 0x6D3A32)  // CVehicle::RemoveReplacementUpgrade2
         pVehicle = _esi;
 
     if (pVehicle > 0x1000)
@@ -1176,7 +2468,8 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
     {
         RwFrame* pNewFrameResult = NULL;
         uint     uiNewId = id + (i / 2) * ((i & 1) ? -1 : 1);
-        DWORD    dwFunc = 0x4C53C0;            // CClumpModelInfo::GetFrameFromId
+        DWORD    dwFunc = 0x4C53C0;  // CClumpModelInfo::GetFrameFromId
+        // clang-format off
         __asm
         {
             push    uiNewId
@@ -1185,6 +2478,7 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
             add     esp, 8
             mov     pNewFrameResult,eax
         }
+        // clang-format on
 
         if (pNewFrameResult)
         {
@@ -1204,13 +2498,14 @@ RwFrame* OnMY_CClumpModelInfo_GetFrameFromId_Post(RwFrame* pFrameResult, DWORD _
 }
 
 // Hook info
-#define HOOKPOS_CClumpModelInfo_GetFrameFromId                      0x4C53C0
-#define HOOKSIZE_CClumpModelInfo_GetFrameFromId                     7
-DWORD RETURN_CClumpModelInfo_GetFrameFromId = 0x4C53C7;
+#define HOOKPOS_CClumpModelInfo_GetFrameFromId  0x4C53C0
+#define HOOKSIZE_CClumpModelInfo_GetFrameFromId 7
+DWORD                         RETURN_CClumpModelInfo_GetFrameFromId = 0x4C53C7;
 static void __declspec(naked) HOOK_CClumpModelInfo_GetFrameFromId()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         push    [esp+4*2]
@@ -1238,6 +2533,7 @@ inner:
         mov     eax,dword ptr [esp+10h]
         jmp     RETURN_CClumpModelInfo_GetFrameFromId
     }
+    // clang-format on
 }
 
 CStreamingInfo* GetStreamingInfo(uint id)
@@ -1271,10 +2567,18 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
         {
             // Crash will occur at offset 00134134
             CStreamingInfo* pStreamingInfo = pGameInterface->GetStreaming()->GetStreamingInfo(usModelId);
-            SString         strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d flg:%d off:%d size:%d loadState:%d", pModelInfo->usNumberOfRefs,
-                               pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel, pStreamingInfo->flg,
-                               pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks, pStreamingInfo->loadState);
-            LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d %s", usModelId, *strDetails), 5415);
+            if (pStreamingInfo)
+            {
+                SString strDetails("refs:%d txd:%d RwObj:%08x bOwn:%d flg:%d off:%d size:%d loadState:%d", pModelInfo->usNumberOfRefs,
+                                   pModelInfo->usTextureDictionary, pModelInfo->pRwObject, pModelInfo->bDoWeOwnTheColModel, pStreamingInfo->flg,
+                                   pStreamingInfo->offsetInBlocks, pStreamingInfo->sizeInBlocks, pStreamingInfo->loadState);
+                LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d %s", usModelId, *strDetails), 5415);
+            }
+            else
+            {
+                LogEvent(815, "Model collision missing", "CEntity_GetBoundRect", SString("No collision for model:%d (invalid streaming info)", usModelId),
+                         5415);
+            }
             CArgMap argMap;
             argMap.Set("id", usModelId);
             argMap.Set("reason", "collision");
@@ -1284,14 +2588,15 @@ void OnMY_CEntity_GetBoundRect(CEntitySAInterface* pEntity)
 }
 
 // Hook info
-#define HOOKPOS_CEntity_GetBoundRect                      0x534131
-#define HOOKSIZE_CEntity_GetBoundRect                     5
-#define HOOKCHECK_CEntity_GetBoundRect                    0x8B
-DWORD RETURN_CEntity_GetBoundRect = 0x534136;
+#define HOOKPOS_CEntity_GetBoundRect   0x534131
+#define HOOKSIZE_CEntity_GetBoundRect  5
+#define HOOKCHECK_CEntity_GetBoundRect 0x8B
+DWORD                         RETURN_CEntity_GetBoundRect = 0x534136;
 static void __declspec(naked) HOOK_CEntity_GetBoundRect()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1300,11 +2605,12 @@ static void __declspec(naked) HOOK_CEntity_GetBoundRect()
         add     esp, 4*1
         popad
 
-        // Continue replaced code
+             // Continue replaced code
         mov     eax, [ecx+14h]
         mov     edx, [eax]
         jmp     RETURN_CEntity_GetBoundRect
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1327,14 +2633,15 @@ void OnMY_CVehicle_AddUpgrade_Post()
 }
 
 // Hook info
-#define HOOKPOS_CVehicle_AddUpgrade                      0x6DFA20
-#define HOOKSIZE_CVehicle_AddUpgrade                     6
-#define HOOKCHECK_CVehicle_AddUpgrade                    0x51
-DWORD RETURN_CVehicle_AddUpgrade = 0x6DFA26;
+#define HOOKPOS_CVehicle_AddUpgrade   0x6DFA20
+#define HOOKSIZE_CVehicle_AddUpgrade  6
+#define HOOKCHECK_CVehicle_AddUpgrade 0x51
+DWORD                         RETURN_CVehicle_AddUpgrade = 0x6DFA26;
 static void __declspec(naked) HOOK_CVehicle_AddUpgrade()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1359,20 +2666,21 @@ inner:
         mov     ebx, [esp+16]
         jmp     RETURN_CVehicle_AddUpgrade
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CObject::~CObject, CObject::ProcessTrainCrossingBehavior
-// 
+//
 // Train crossings: Detach barrier from post (to be able to create objects 1373 and 1374 separately)
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CObject_Destructor_TrainCrossing_Check 0x59F7A8
-#define HOOKPOS_CObject_ProcessTrainCrossingBehavior1 0x5A0C34
-#define HOOKPOS_CObject_ProcessTrainCrossingBehavior2 0x5A0C54
-#define RETURN_CObject_Destructor_TrainCrossing_Check 0x59F7AD
-#define RETURN_CObject_Destructor_TrainCrossing_Invalid 0x59F811
-#define RETURN_CObject_ProcessTrainCrossingBehavior1_Check 0x5A0C39
-#define RETURN_CObject_ProcessTrainCrossingBehavior2_Check 0x5A0C59
+#define HOOKPOS_CObject_Destructor_TrainCrossing_Check      0x59F7A8
+#define HOOKPOS_CObject_ProcessTrainCrossingBehavior1       0x5A0C34
+#define HOOKPOS_CObject_ProcessTrainCrossingBehavior2       0x5A0C54
+#define RETURN_CObject_Destructor_TrainCrossing_Check       0x59F7AD
+#define RETURN_CObject_Destructor_TrainCrossing_Invalid     0x59F811
+#define RETURN_CObject_ProcessTrainCrossingBehavior1_Check  0x5A0C39
+#define RETURN_CObject_ProcessTrainCrossingBehavior2_Check  0x5A0C59
 #define RETURN_CObject_ProcessTrainCrossingBehavior_Invalid 0x5A0CBD
 
 DWORD TrainCrossingFix_ReturnAddress, TrainCrossingFix_InvalidReturnAddress;
@@ -1385,44 +2693,48 @@ static void __declspec(naked) HOOK_TrainCrossingBarrierCrashFix()
     TrainCrossingFix_ReturnAddress = ReturnAddress;
     TrainCrossingFix_InvalidReturnAddress = InvalidReturnAddress;
 
+    // clang-format off
     __asm
     {
-        test eax, eax // Check if pLinkedBarrierPost exists
-        jz jmp_invalid // Skip the barrier stuff
-        mov ecx, [eax+14h] // Execute replaced code
+        test eax, eax            // Check if pLinkedBarrierPost exists
+        jz jmp_invalid            // Skip the barrier stuff
+        mov ecx, [eax+14h]            // Execute replaced code
         test ecx, ecx
         jmp TrainCrossingFix_ReturnAddress
 
 jmp_invalid:
         jmp TrainCrossingFix_InvalidReturnAddress
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // Interior_c::Init
-// 
+//
 // GTA doesn't reset the furniture object counter, so do it manually everytime before GTA furnishes an interior (Interior_c::Init)
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_ResetFurnitureObjectCounter 0x593BF0
+#define HOOKPOS_ResetFurnitureObjectCounter  0x593BF0
 #define HOOKSIZE_ResetFurnitureObjectCounter 6
-DWORD RETURN_ResetFurnitureObjectCounter = 0x593BF6;
+DWORD                         RETURN_ResetFurnitureObjectCounter = 0x593BF6;
 static void __declspec(naked) HOOK_ResetFurnitureObjectCounter()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
-    *(int*)0xBB3A18 = 0;            // InteriorManager_c::ms_objectCounter
+    *(int*)0xBB3A18 = 0;  // InteriorManager_c::ms_objectCounter
 
+    // clang-format off
     __asm
     {
         // original instruction
         mov eax, fs:[0]
         jmp RETURN_ResetFurnitureObjectCounter
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CVolumetricShadowMgr_Render
-// 
+//
 // Custom models can cause problems for volumetric shadows.
 // Record when volumetric shadows are being rendered so we can disable them if a crash occurs.
 ////////////////////////////////////////////////////////////////////////
@@ -1437,14 +2749,15 @@ void OnMY_CVolumetricShadowMgr_Render_Post()
 }
 
 // Hook info
-#define HOOKPOS_CVolumetricShadowMgr_Render                 0x7113B0
-#define HOOKSIZE_CVolumetricShadowMgr_Render                8
-#define HOOKCHECK_CVolumetricShadowMgr_Render               0x83
-DWORD RETURN_CVolumetricShadowMgr_Render = 0x7113B8;
+#define HOOKPOS_CVolumetricShadowMgr_Render   0x7113B0
+#define HOOKSIZE_CVolumetricShadowMgr_Render  8
+#define HOOKCHECK_CVolumetricShadowMgr_Render 0x83
+DWORD                         RETURN_CVolumetricShadowMgr_Render = 0x7113B8;
 static void __declspec(naked) HOOK_CVolumetricShadowMgr_Render()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1459,16 +2772,17 @@ static void __declspec(naked) HOOK_CVolumetricShadowMgr_Render()
         retn
 
 inner:
-        // Replaced code
+     // Replaced code
         sub     esp, 18h
         mov     ecx, 0A9AE00h
         jmp     RETURN_CVolumetricShadowMgr_Render
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CVolumetricShadowMgr_Update
-// 
+//
 // Custom models can cause problems for volumetric shadows.
 // Record when volumetric shadows are being updated so we can disable them if a crash occurs.
 ////////////////////////////////////////////////////////////////////////
@@ -1483,14 +2797,15 @@ void OnMY_CVolumetricShadowMgr_Update_Post()
 }
 
 // Hook info
-#define HOOKPOS_CVolumetricShadowMgr_Update                 0x711D90
-#define HOOKSIZE_CVolumetricShadowMgr_Update                5
-#define HOOKCHECK_CVolumetricShadowMgr_Update               0xB9
-DWORD RETURN_CVolumetricShadowMgr_Update = 0x711D95;
+#define HOOKPOS_CVolumetricShadowMgr_Update   0x711D90
+#define HOOKSIZE_CVolumetricShadowMgr_Update  5
+#define HOOKCHECK_CVolumetricShadowMgr_Update 0xB9
+DWORD                         RETURN_CVolumetricShadowMgr_Update = 0x711D95;
 static void __declspec(naked) HOOK_CVolumetricShadowMgr_Update()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1507,47 +2822,55 @@ static void __declspec(naked) HOOK_CVolumetricShadowMgr_Update()
         retn
 
 inner:
-        // Replaced code
+     // Replaced code
         mov     ecx, 0A9AE00h
         jmp     RETURN_CVolumetricShadowMgr_Update
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CAnimManager::CreateAnimAssocGroups
-// 
-// CModelInfo::ms_modelInfoPtrs at the given index is a null pointer
+//
+// Missing model info or RwObject before the clump is used for associations
 ////////////////////////////////////////////////////////////////////////
-void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
+bool OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 {
-    CModelInfo* pModelInfo = pGameInterface->GetModelInfo(uiModelId);
-    if (pModelInfo->GetInterface()->pRwObject == NULL)
+    CModelInfo*                pModelInfo = pGameInterface->GetModelInfo(uiModelId);
+    CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+    if (!pInterface || !pInterface->pRwObject)
     {
-        // Crash will occur at offset 00349b7b
+        OnCrashAverted(816);
         LogEvent(816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString("No RwObject for model:%d", uiModelId), 5416);
         CArgMap argMap;
         argMap.Set("id", uiModelId);
         argMap.Set("reason", "createanim");
         SetApplicationSetting("diagnostics", "gta-model-fail", argMap.ToString());
+        return false;
     }
+    return true;
 }
 
 // Hook info
-#define HOOKPOS_CAnimManager_CreateAnimAssocGroups                 0x4D3D52
-#define HOOKSIZE_CAnimManager_CreateAnimAssocGroups                5
-#define HOOKCHECK_CAnimManager_CreateAnimAssocGroups               0x8B
-DWORD RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
-static void __declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
+#define HOOKPOS_CAnimManager_CreateAnimAssocGroups   0x4D3D52
+#define HOOKSIZE_CAnimManager_CreateAnimAssocGroups  5
+#define HOOKCHECK_CAnimManager_CreateAnimAssocGroups 0x8B
+DWORD                 RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
+DWORD                 RETURN_CAnimManager_CreateAnimAssocGroups_Skip = 0x4D3D71;
+void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
         push    eax
         call    OnMY_CAnimManager_CreateAnimAssocGroups
         add     esp, 4*1
+        test    al, al
         popad
+        jz      skipCreateInstance
 
         // Replaced code
         push    ecx
@@ -1556,7 +2879,82 @@ static void __declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
         pop     ecx
 
         jmp     RETURN_CAnimManager_CreateAnimAssocGroups
+
+    skipCreateInstance:
+        xor     ebx, ebx
+        jmp     RETURN_CAnimManager_CreateAnimAssocGroups_Skip
     }
+    // clang-format on
+}
+
+void OnMY_CAnimBlendAssocGroup_CreateAssociations(CBaseModelInfoSAInterface* pModelInfo)
+{
+    OnCrashAverted(816);
+
+    int                         iModelId = -1;
+    CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
+    const int                   maximumModelId = pGameInterface->GetBaseIDforTXD();
+    for (int i = 0; i < maximumModelId; i++)
+    {
+        if (ppModelInfo[i] == pModelInfo)
+        {
+            iModelId = i;
+            break;
+        }
+    }
+
+    LogEvent(816, "Model not loaded", "CAnimBlendAssocGroup_CreateAssociations", SString("No RwObject for model:%d", iModelId), 5416);
+    CArgMap argMap;
+    argMap.Set("id", iModelId);
+    argMap.Set("reason", "createassoc");
+    SetApplicationSetting("diagnostics", "gta-model-fail", argMap.ToString());
+}
+
+#define HOOKPOS_CAnimBlendAssocGroup_CreateAssociations   0x4CE2F7
+#define HOOKSIZE_CAnimBlendAssocGroup_CreateAssociations  7
+#define HOOKCHECK_CAnimBlendAssocGroup_CreateAssociations 0x8B
+DWORD                 RETURN_CAnimBlendAssocGroup_CreateAssociations = 0x4CE2FE;
+DWORD                 RETURN_CAnimBlendAssocGroup_CreateAssociations_Skip = 0x4CE36F;
+void _declspec(naked) HOOK_CAnimBlendAssocGroup_CreateAssociations()
+{
+    // clang-format off
+
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    __asm
+    {
+        // CModelInfo::GetModelInfoFromHashKey returned the model info for
+        // this animation. SA already skips the entry when it returns null.
+        test    eax, eax
+        jz      skipCreateAssociation
+
+        // CBaseModelInfo::pRwObject is at +0x1C. The original instructions
+        // immediately call CBaseModelInfo::CreateInstance at vtable+0x2C.
+        cmp     dword ptr[eax+1Ch], 0
+        jnz     continueCreateAssociation
+
+        // CreateInstance requires the RenderWare object. Record its absence
+        // and follow SA's existing per-animation skip path.
+        pushad
+        push    eax
+        call    OnMY_CAnimBlendAssocGroup_CreateAssociations
+        add     esp, 4*1
+        popad
+        jmp     skipCreateAssociation
+
+    continueCreateAssociation:
+        // Restore the seven overwritten bytes: load the vtable, pass the
+        // model info as this, then call CreateInstance.
+        mov     edx, [eax]
+        mov     ecx, eax
+        call    dword ptr[edx+2Ch]
+        jmp     RETURN_CAnimBlendAssocGroup_CreateAssociations
+
+    skipCreateAssociation:
+        // 0x4CE36F increments the created-association count and advances
+        // the animation and static-association indices for the next entry.
+        jmp     RETURN_CAnimBlendAssocGroup_CreateAssociations_Skip
+    }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -1565,8 +2963,8 @@ static void __declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 // Accessing a temporally not existing vehicle
 // (seems to happen when the driver is slower being thrown out than the jacker enters the vehicle)
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask   0x6485AC
-#define HOOKSIZE_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask  6
+#define HOOKPOS_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask  0x6485AC
+#define HOOKSIZE_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask 6
 DWORD RETURN_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask = 0x6485B2;
 DWORD RETURN_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask_Invalid = 0x6485E1;
 void  OnMY_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask()
@@ -1578,6 +2976,7 @@ static void __declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSu
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test eax, eax
@@ -1592,11 +2991,12 @@ static void __declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOut_CreateFirstSu
         popad
         jmp RETURN_CTaskComplexCarSlowBeDraggedOut_CreateFirstSubTask_Invalid
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // OnMY_printf
-// 
+//
 // GTA outputs stuff via printf which we can use to help diagnose problems
 ////////////////////////////////////////////////////////////////////////
 void _cdecl OnMY_printf(DWORD dwCalledFrom, const char* szMessage)
@@ -1629,14 +3029,15 @@ void _cdecl OnMY_printf(DWORD dwCalledFrom, const char* szMessage)
 }
 
 // hook info
-#define HOOKPOS_printf                            0x821982
-#define HOOKSIZE_printf                           7
-#define HOOKCHECK_printf                          0x6A
-DWORD RETURN_printf = 0x821989;
+#define HOOKPOS_printf   0x821982
+#define HOOKSIZE_printf  7
+#define HOOKCHECK_printf 0x6A
+DWORD                         RETURN_printf = 0x821989;
 static void __declspec(naked) HOOK_printf()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1646,31 +3047,33 @@ static void __declspec(naked) HOOK_printf()
         add     esp, 4*2
         popad
 
-        // Replaced code
+             // Replaced code
         push    10h
         push    887DC0h
         jmp     RETURN_printf
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // RwMatrixMultiply
-// 
+//
 // The third received argument of type RwMatrixTag* is a null pointer
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_RwMatrixMultiply                0x7F18B0
-#define HOOKSIZE_RwMatrixMultiply               6
-#define HOOKCHECK_RwMatrixMultiply              0x8B
-DWORD RETURN_RwMatrixMultiply = 0x7F18B6;
+#define HOOKPOS_RwMatrixMultiply   0x7F18B0
+#define HOOKSIZE_RwMatrixMultiply  6
+#define HOOKCHECK_RwMatrixMultiply 0x8B
+DWORD                         RETURN_RwMatrixMultiply = 0x7F18B6;
 static void __declspec(naked) HOOK_RwMatrixMultiply()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     eax, [esp+0Ch]
         cmp     eax, 0x480
-        jb      cont  // Skip code if eax is low
+        jb      cont            // Skip code if eax is low
 
         mov     ecx, dword ptr ds:[0C979BCh]
         jmp     RETURN_RwMatrixMultiply
@@ -1680,11 +3083,12 @@ cont:
         call    CrashAverted
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CAnimBlendNode::GetCurrentTranslation
-// 
+//
 // Invalid endKeyFrameIndex
 ////////////////////////////////////////////////////////////////////////
 void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInterface)
@@ -1692,7 +3096,7 @@ void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInter
     if (!pInterface)
         return;
 
-	// Crash will occur at offset 0x000CFCD6
+    // Crash will occur at offset 0x000CFCD6
     OnCrashAverted(32);
     CAnimBlendAssociationSAInterface* pAnimAssoc = pInterface->pAnimBlendAssociation;
     if (!pAnimAssoc)
@@ -1732,16 +3136,15 @@ void OnMY_CAnimBlendNode_GetCurrentTranslation(CAnimBlendNodeSAInterface* pInter
 }
 
 // Hook info
-#define HOOKPOS_CAnimBlendNode_GetCurrentTranslation                 0x4CFCB5
-#define HOOKSIZE_CAnimBlendNode_GetCurrentTranslation                6
-DWORD RETURN_CAnimBlendNode_GetCurrentTranslation = 0x4CFCBB;
+#define HOOKPOS_CAnimBlendNode_GetCurrentTranslation  0x4CFCB5
+#define HOOKSIZE_CAnimBlendNode_GetCurrentTranslation 6
+DWORD                         RETURN_CAnimBlendNode_GetCurrentTranslation = 0x4CFCBB;
 static void __declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
     __asm
-        {
-            // if end key frame index is greater than 10,000 then return
+        {// if end key frame index is greater than 10,000 then return
         cmp     eax, 0x2710
         jg      altcode
 
@@ -1755,7 +3158,7 @@ static void __declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
         altcode:
          // Save registers before logging
         pushad
-        push    ebp            // Pass 'this' pointer
+        push    ebp  // Pass 'this' pointer
         call    OnMY_CAnimBlendNode_GetCurrentTranslation
         add     esp, 4
         popad
@@ -1768,7 +3171,7 @@ static void __declspec(naked) HOOK_CAnimBlendNode_GetCurrentTranslation()
 
 ////////////////////////////////////////////////////////////////////////
 // CStreaming::AreAnimsUsedByRequestedModels
-// 
+//
 // GTA streamer will use this function to decide if IFP blocks should be unloaded or not.
 // We will return true to disable unloading.
 ////////////////////////////////////////////////////////////////////////
@@ -1790,12 +3193,13 @@ bool __cdecl OnMY_CStreaming_AreAnimsUsedByRequestedModels(int modelID)
 }
 
 // Hook info
-#define HOOKPOS_CStreaming_AreAnimsUsedByRequestedModels                0x407AD5
-#define HOOKSIZE_CStreaming_AreAnimsUsedByRequestedModels               7
+#define HOOKPOS_CStreaming_AreAnimsUsedByRequestedModels  0x407AD5
+#define HOOKSIZE_CStreaming_AreAnimsUsedByRequestedModels 7
 static void __declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         push    [esp + 4]
@@ -1803,11 +3207,12 @@ static void __declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
         add     esp, 0x4
         retn
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CTrain::ProcessControl
-// 
+//
 // This hook overwrites the logic to wrap the train's rail distance, because in the
 // original game code this could cause an infinite loop
 //
@@ -1815,8 +3220,8 @@ static void __declspec(naked) HOOK_CStreaming_AreAnimsUsedByRequestedModels()
 // >>> 0x6F8F89 | D9 86 A8 05 00 00 | fld     dword ptr [esi + 5A8h]
 //     0x6F8F8F | D8 1D 50 8B 85 00 | fcomp   ds: __real @00000000
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CTrain__ProcessControl         0x6F8F89
-#define HOOKSIZE_CTrain__ProcessControl        6
+#define HOOKPOS_CTrain__ProcessControl  0x6F8F89
+#define HOOKSIZE_CTrain__ProcessControl 6
 static DWORD CONTINUE_CTrain__ProcessControl = 0x6F8FE5;
 
 // 0xC37FEC; float RailTrackLength[NUM_TRACKS]
@@ -1863,6 +3268,7 @@ static void __declspec(naked) HOOK_CTrain__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -1872,11 +3278,12 @@ static void __declspec(naked) HOOK_CTrain__ProcessControl()
         popad
         jmp     CONTINUE_CTrain__ProcessControl
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CTaskComplexCarSlowBeDraggedOutAndStandUp::CreateFirstSubTask
-// 
+//
 // This hook adds a null-pointer check for eax, which stores the ped's current vehicle.
 // Returning a null-pointer from this function will prevent the animation from being played.
 //
@@ -1884,8 +3291,8 @@ static void __declspec(naked) HOOK_CTrain__ProcessControl()
 // >>> 0x648AAF | 8B 80 84 03 00 00    | mov    eax, [eax + 384h]
 //     0x648AB5 | 0F B6 80 DE 00 00 00 | movzx  eax, byte ptr [eax + 0DEh]
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask         0x648AAF
-#define HOOKSIZE_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask        6
+#define HOOKPOS_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask  0x648AAF
+#define HOOKSIZE_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask 6
 static DWORD CONTINUE_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask = 0x648AB5;
 
 static void _cdecl LOG_CTaskComplexCarSlowBeDraggedOutAndStandUp__CreateFirstSubTask()
@@ -1897,8 +3304,9 @@ static void __declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOutAndStandUp__Cr
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
-    {
+        {
         test    eax, eax
         jz      returnZeroTaskLocation
         mov     eax, [eax + 384h]
@@ -1911,12 +3319,13 @@ static void __declspec(naked) HOOK_CTaskComplexCarSlowBeDraggedOutAndStandUp__Cr
         pop     edi
         pop     esi
         retn    4
-    }
+        }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CVehicleModelInfo::LoadVehicleColours
-// 
+//
 // A modified data/carcols.dat can have entries with invalid model names and these cause
 // CModelInfo::GetModelInfo to return a null pointer, but the original code doesn't verify
 // the return value and tries to use the null pointer. This hook adds a null pointer check
@@ -1931,8 +3340,8 @@ static void _cdecl LOG_CVehicleModelInfo__LoadVehicleColours(int location, const
 // >>> 0x5B6B20 | 8B F0          | mov   esi, eax
 //     0x5B6B22 | 8D 47 FF       | lea   eax, [edi - 1]
 //     0x5B6B25 | 99             | cdq
-#define HOOKPOS_CVehicleModelInfo__LoadVehicleColours_1         0x5B6B20
-#define HOOKSIZE_CVehicleModelInfo__LoadVehicleColours_1        5
+#define HOOKPOS_CVehicleModelInfo__LoadVehicleColours_1  0x5B6B20
+#define HOOKSIZE_CVehicleModelInfo__LoadVehicleColours_1 5
 static DWORD CONTINUE_CVehicleModelInfo__LoadVehicleColours_1 = 0x5B6B25;
 static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_1 = 0x5B6D04;
 
@@ -1940,6 +3349,7 @@ static void __declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    eax, eax
@@ -1961,14 +3371,15 @@ static void __declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_1()
         lea     eax, [edi - 1]
         jmp     CONTINUE_CVehicleModelInfo__LoadVehicleColours_1
     }
+    // clang-format on
 }
 
 //     0x5B6CA5 | E8 96 EC F0 FF | call  CModelInfo::GetModelInfo
 // >>> 0x5B6CAA | 8B F0          | mov   esi, eax
 //     0x5B6CAC | 8D 47 FF       | lea   eax, [edi - 1]
 //     0x5B6CAF | 99             | cdq
-#define HOOKPOS_CVehicleModelInfo__LoadVehicleColours_2         0x5B6CAA
-#define HOOKSIZE_CVehicleModelInfo__LoadVehicleColours_2        5
+#define HOOKPOS_CVehicleModelInfo__LoadVehicleColours_2  0x5B6CAA
+#define HOOKSIZE_CVehicleModelInfo__LoadVehicleColours_2 5
 static DWORD CONTINUE_CVehicleModelInfo__LoadVehicleColours_2 = 0x5B6CAF;
 static DWORD SKIP_CVehicleModelInfo__LoadVehicleColours_2 = 0x5B6D04;
 
@@ -1976,6 +3387,7 @@ static void __declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         test    eax, eax
@@ -1997,11 +3409,12 @@ static void __declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
         lea     eax, [edi - 1]
         jmp     CONTINUE_CVehicleModelInfo__LoadVehicleColours_2
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CPlaceName::Process
-// 
+//
 // Prevent the original game code from accessing the ped's vehicle, when it's a null pointer
 // and the ped flag bInVehicle is set by setting the ped flag to zero.
 //
@@ -2009,31 +3422,33 @@ static void __declspec(naked) HOOK_CVehicleModelInfo__LoadVehicleColours_2()
 // >>> 0x571F39 | 8B 88 6C 04 00 00 | mov   ecx, [eax + 46Ch]
 //     0x571F3F | F6 C5 01          | test  ch, 1
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CPlaceName__Process         0x571F39
-#define HOOKSIZE_CPlaceName__Process        6
+#define HOOKPOS_CPlaceName__Process  0x571F39
+#define HOOKSIZE_CPlaceName__Process 6
 static DWORD CONTINUE_CPlaceName__Process = 0x571F3F;
 
 static void __declspec(naked) HOOK_CPlaceName__Process()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
         mov     ecx, [eax + 46Ch]
-        test    ch, 1                       // if (ped->pedFlags.bInVehicle
+        test    ch, 1            // if (ped->pedFlags.bInVehicle
         jz      continueAfterFixLocation
-        mov     ebx, [eax + 58Ch]           //     && !ped->m_pVehicle)
+        mov     ebx, [eax + 58Ch]            //     && !ped->m_pVehicle)
         test    ebx, ebx
         jnz     continueAfterFixLocation
         and     ch, 0FEh
-        mov     dword ptr [eax + 46Ch], ecx // ped->pedFlags.bInVehicle = 0
+        mov     dword ptr [eax + 46Ch], ecx            // ped->pedFlags.bInVehicle = 0
 
         continueAfterFixLocation:
         popad
         mov     ecx, [eax + 46Ch]
         jmp     CONTINUE_CPlaceName__Process
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2056,21 +3471,22 @@ static void LOG_CWorld__FindObjectsKindaCollidingSectorList(unsigned int modelId
     }
 }
 
-#define HOOKPOS_CWorld__FindObjectsKindaCollidingSectorList 0x56508C
+#define HOOKPOS_CWorld__FindObjectsKindaCollidingSectorList  0x56508C
 #define HOOKSIZE_CWorld__FindObjectsKindaCollidingSectorList 0xA
-static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList = 0x565096;
-static const unsigned int RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP = 0x5650C3;
+static const unsigned int     RETURN_CWorld__FindObjectsKindaCollidingSectorList = 0x565096;
+static const unsigned int     RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP = 0x5650C3;
 static void __declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
-        mov eax, [edx*4+0xA9B0C8]   // CModelInfo::ms_modelInfoPtrs
+        mov eax, [edx*4+0xA9B0C8]            // CModelInfo::ms_modelInfoPtrs
         test eax, eax
         jz skip
 
-        mov ecx, [eax+0x14]         // m_pColModel
+        mov ecx, [eax+0x14]            // m_pColModel
         test ecx, ecx
         jz skip
 
@@ -2085,11 +3501,12 @@ static void __declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 
         jmp RETURN_CWorld__FindObjectsKindaCollidingSectorList_SKIP
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // RpClumpForAllAtomics
-// 
+//
 // Adds a nullptr check for the clump object pointer.
 //
 // >>> 0x749B70 | 8B 44 24 04 | mov  eax, [esp+arg_0]
@@ -2097,17 +3514,18 @@ static void __declspec(naked) HOOK_CWorld__FindObjectsKindaCollidingSectorList()
 // >>> 0x749B75 | 55          | push ebp
 //     0x749B76 | 56          | push esi
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_RpClumpForAllAtomics         0x749B70
-#define HOOKSIZE_RpClumpForAllAtomics        6
+#define HOOKPOS_RpClumpForAllAtomics  0x749B70
+#define HOOKSIZE_RpClumpForAllAtomics 6
 static DWORD CONTINUE_RpClumpForAllAtomics = 0x749B76;
 
 static void __declspec(naked) HOOK_RpClumpForAllAtomics()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
-        mov     eax, [esp+4]    // RpClump* clump
+        mov     eax, [esp+4]            // RpClump* clump
         test    eax, eax
         jnz     continueAfterFixLocation
         retn
@@ -2117,24 +3535,26 @@ static void __declspec(naked) HOOK_RpClumpForAllAtomics()
         push    ebp
         jmp     CONTINUE_RpClumpForAllAtomics
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // RpAnimBlendClumpGetFirstAssociation
-// 
+//
 // Adds a nullptr check for the clump object pointer.
 //
 // >>> 0x4D6A70 | 8B 0D 78 F8 B5 00 | mov ecx, ds:_ClumpOffset
 //     0x4D6A76 | 8B 44 24 04       | mov eax, [esp+4]
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_RpAnimBlendClumpGetFirstAssociation         0x4D6A70
-#define HOOKSIZE_RpAnimBlendClumpGetFirstAssociation        6
+#define HOOKPOS_RpAnimBlendClumpGetFirstAssociation  0x4D6A70
+#define HOOKSIZE_RpAnimBlendClumpGetFirstAssociation 6
 static DWORD CONTINUE_RpAnimBlendClumpGetFirstAssociation = 0x4D6A76;
 
 static void __declspec(naked) HOOK_RpAnimBlendClumpGetFirstAssociation()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     eax, [esp+4]            // RpClump* clump
@@ -2146,25 +3566,27 @@ static void __declspec(naked) HOOK_RpAnimBlendClumpGetFirstAssociation()
         mov     ecx, ds:[0xB5F878]
         jmp     CONTINUE_RpAnimBlendClumpGetFirstAssociation
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CAnimManager::BlendAnimation
-// 
+//
 // Adds a nullptr check for the clump object pointer.
 //
 // >>> 0x4D4610 | 83 EC 14          | sub esp, 14h
 // >>> 0x4D4613 | 8B 4C 24 18       | mov ecx, [esp+18h]
 //     0x4D4617 | 8B 15 34 EA B4 00 | mov edx, CAnimManager::ms_aAnimAssocGroups
 ////////////////////////////////////////////////////////////////////////
-#define HOOKPOS_CAnimManager__BlendAnimation         0x4D4610
-#define HOOKSIZE_CAnimManager__BlendAnimation        7
+#define HOOKPOS_CAnimManager__BlendAnimation  0x4D4610
+#define HOOKSIZE_CAnimManager__BlendAnimation 7
 static DWORD CONTINUE_CAnimManager__BlendAnimation = 0x4D4617;
 
 static void __declspec(naked) HOOK_CAnimManager__BlendAnimation()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov     eax, [esp+4]            // RpClump* clump
@@ -2177,6 +3599,7 @@ static void __declspec(naked) HOOK_CAnimManager__BlendAnimation()
         mov     ecx, [esp+18h]
         jmp     CONTINUE_CAnimManager__BlendAnimation
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2230,8 +3653,9 @@ static void __declspec(naked) HOOK_FxSystemBP_c__Load()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
-    {
+        {
         pushad
         push    ebp
         call    POST_PROCESS_FxSystemBP_c__Load
@@ -2241,10 +3665,11 @@ static void __declspec(naked) HOOK_FxSystemBP_c__Load()
         pop     ebp
         xor     al, al
         pop     ebx
-    //  mov     large fs:0, ecx
+             //  mov     large fs:0, ecx
         add     esp, 5E8h
         retn    0Ch
-    }
+        }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
@@ -2264,8 +3689,9 @@ static void __declspec(naked) HOOK_FxPrim_c__Enable()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
-    {
+        {
         test    ecx, ecx
         jz      returnFromFunction
         mov     al, [esp+4]
@@ -2273,27 +3699,29 @@ static void __declspec(naked) HOOK_FxPrim_c__Enable()
 
         returnFromFunction:
         retn    4
-    }
+        }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////////////
 // CFire::ProcessFire
-// 
+//
 // GitHub #1757 (https://github.com/multitheftauto/mtasa-blue/issues/1757)
-// 
+//
 // Null pointer to the attachedTo field in the CFire structure
 ////////////////////////////////////////////////////////////////////////
 #define HOOKPOS_CFire_ProcessFire  0x53A6FC
 #define HOOKSIZE_CFire_ProcessFire 9
-static constexpr DWORD CONTINUE_CFire_ProcessFire = 0x53A705;
-static constexpr DWORD SKIP_CFire_ProcessFire = 0x53A69C;
+static constexpr DWORD        CONTINUE_CFire_ProcessFire = 0x53A705;
+static constexpr DWORD        SKIP_CFire_ProcessFire = 0x53A69C;
 static void __declspec(naked) HOOK_CFire_ProcessFire()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
-        test byte ptr [esi], 1 // If the "active" flag has been set to 0, we skip processing attached entities
+        test byte ptr [esi], 1            // If the "active" flag has been set to 0, we skip processing attached entities
         jz skip
 
         mov ecx, [esi+10h]
@@ -2304,6 +3732,364 @@ static void __declspec(naked) HOOK_CFire_ProcessFire()
         mov ecx, esi
         jmp SKIP_CFire_ProcessFire
     }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CColModel::MakeMultipleAlloc - Validate collision data before converting
+// single-allocation to multi-allocation format via CCollisionData::Copy.
+//
+// Corrupt collision data (e.g. from PC_Scratch buffer overflow) can produce
+// bogus shadow vertex/triangle counts, causing Copy to read past allocations.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CColModel_MakeMultipleAlloc  0x40F740
+#define HOOKSIZE_CColModel_MakeMultipleAlloc 5
+static void __fastcall HOOK_CColModel_MakeMultipleAlloc(CColModelSAInterface* pColModel, void*)
+{
+    if (CColDataSA* pData = pColModel->m_data)
+    {
+        constexpr std::uint32_t MAX_SHADOW_TRIANGLES = 5000;
+        constexpr std::uint32_t MAX_SHADOW_VERTICES = 10000;
+
+        const bool shadowCorrupt = pData->m_numShadowTriangles > MAX_SHADOW_TRIANGLES || pData->m_numShadowVertices > MAX_SHADOW_VERTICES ||
+                                   (pData->m_numShadowVertices > 0 && !pData->m_shadowVertices) ||
+                                   (pData->m_numShadowTriangles > 0 && !pData->m_shadowTriangles);
+
+        if (shadowCorrupt)
+        {
+            pData->m_numShadowTriangles = 0;
+            pData->m_numShadowVertices = 0;
+            pData->m_shadowVertices = nullptr;
+            pData->m_shadowTriangles = nullptr;
+            pData->m_hasShadowInfo = 0;
+            pData->m_hasShadow = 0;
+
+            OnCrashAverted(9801);
+        }
+    }
+
+    // Call the original MakeMultipleAlloc
+    using MakeMultipleAlloc_t = void(__thiscall*)(CColModelSAInterface*);
+    reinterpret_cast<MakeMultipleAlloc_t>(0x1564A10)(pColModel);
+}
+
+////////////////////////////////////////////////////////////////////////
+// AreTexturesUsedByRequestedModels
+//
+// Null ms_modelInfoPtrs[modelId] during requested-list and channel iteration
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_Misc50  0x156650D
+#define HOOKSIZE_CrashFix_Misc50 7
+DWORD                 RETURN_CrashFix_Misc50 = 0x1566514;
+DWORD                 RETURN_CrashFix_Misc50B = 0x1566552;
+void _declspec(naked) HOOK_CrashFix_Misc50()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        test    edx, edx
+        js      skip
+        mov     ecx, dword ptr [edx*4 + 0A9B0C8h]
+        test    ecx, ecx
+        jnz     cont
+    skip:
+        push    50
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc50B
+    cont:
+        jmp     RETURN_CrashFix_Misc50
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_CrashFix_Misc51  0x156658A
+#define HOOKSIZE_CrashFix_Misc51 7
+DWORD                 RETURN_CrashFix_Misc51 = 0x1566591;
+DWORD                 RETURN_CrashFix_Misc51B = 0x15665BB;
+void _declspec(naked) HOOK_CrashFix_Misc51()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        test    eax, eax
+        js      skip
+        mov     edx, dword ptr [eax*4 + 0A9B0C8h]
+        test    edx, edx
+        jnz     cont
+    skip:
+        push    51
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc51B
+    cont:
+        jmp     RETURN_CrashFix_Misc51
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_CrashFix_Misc52  0x15665C9
+#define HOOKSIZE_CrashFix_Misc52 7
+DWORD                 RETURN_CrashFix_Misc52 = 0x15665D0;
+DWORD                 RETURN_CrashFix_Misc52B = 0x1566600;
+void _declspec(naked) HOOK_CrashFix_Misc52()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    // clang-format off
+    __asm
+    {
+        test    eax, eax
+        js      skip
+        mov     ecx, dword ptr [eax*4 + 0A9B0C8h]
+        test    ecx, ecx
+        jnz     cont
+    skip:
+        push    52
+        call    CrashAverted
+        jmp     RETURN_CrashFix_Misc52B
+    cont:
+        jmp     RETURN_CrashFix_Misc52
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CEventScanner::ScanForEvents (escalator contact entity check)
+//
+// Inside CEventScanner::ScanForEvents, the code reads ped.m_pContactEntity
+// (offset 0x584 from CPed) and then dereferences it to read m_nModelIndex
+// to check if the ped is on an escalator step. When MTA destroys an entity
+// (e.g. via element destruction) while a ped still has a stale reference
+// in m_pContactEntity, the pointer becomes dangling and dereferencing it
+// causes an access violation.
+//
+// This hook replaces the original null-only check with a C function that
+// validates the entity pointer by reading m_nModelIndex inside __try/__except,
+// catching any access violation from a dangling pointer.
+//
+// >>> 0x6080B2 | 8B 86 84 05 00 00 | mov   eax, [esi+584h]     ; eax = ped.m_pContactEntity
+// >>> 0x6080B8 | 85 C0             | test  eax, eax
+// >>> 0x6080BA | 74 58             | je    0x608114             ; skip if null
+//     0x6080BC | 0F BF 40 22       | movsx eax, word ptr [eax+22h] ; read m_nModelIndex
+////////////////////////////////////////////////////////////////////////
+static bool __cdecl IsContactEntityModelIndexReadable(CEntitySAInterface* pEntity)
+{
+    if (!pEntity)
+        return false;
+
+    // Use SEH to safely attempt to read m_nModelIndex from the entity.
+    // A dangling pointer will trigger an access violation which we catch here.
+    __try
+    {
+        volatile auto modelIdx = pEntity->m_nModelIndex;
+        (void)modelIdx;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
+#define HOOKPOS_CEventScanner__ScanForEvents_ContactEntity   0x6080B2
+#define HOOKSIZE_CEventScanner__ScanForEvents_ContactEntity  0xA
+#define HOOKCHECK_CEventScanner__ScanForEvents_ContactEntity 0x8B
+static constexpr DWORD RETURN_CEventScanner__ScanForEvents_ContactEntity = 0x6080BC;
+static constexpr DWORD SKIP_CEventScanner__ScanForEvents_ContactEntity = 0x608114;
+
+static void __declspec(naked) HOOK_CEventScanner__ScanForEvents_ContactEntity()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // Original: mov eax, [esi+584h]
+        mov     eax, [esi+584h]
+
+        // Validate the entity pointer via C helper (handles both null and dangling)
+        push    eax
+        call    IsContactEntityModelIndexReadable
+        add     esp, 4
+        test    al, al
+        jz      skip
+
+        // Pointer is valid - let the original code read m_nModelIndex
+        mov     eax, [esi+584h]
+        jmp     RETURN_CEventScanner__ScanForEvents_ContactEntity
+
+    skip:
+        jmp     SKIP_CEventScanner__ScanForEvents_ContactEntity
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CStreaming::GetNextFileOnCd (TXD path)
+//
+// In the TXD case of GetNextFileOnCd, the code calls CTxdStore::ms_pTxdPool->GetAt(slot)
+// to look up the TxdDef entry. When MTA's custom model system frees a TXD (e.g.
+// engineFreeModel) while its streaming request is still queued, GetAt returns null.
+// The original code then dereferences the null pointer to read m_wParentIndex at
+// offset +0x06, causing an access violation.
+//
+// This hook adds a null check for the TxdDef pointer. When null, we skip to the
+// next entry in the streaming request list instead of crashing.
+//
+//     0x408F6B | 8D 04 8A       | lea   eax, [edx+ecx*4]  ; eax = TxdDef* (or null via xor eax,eax path)
+// >>> 0x408F6E | 0F BF 40 06    | movsx eax, word ptr [eax+6]  ; eax = txdDef->m_wParentIndex
+// >>> 0x408F72 | 83 F8 FF       | cmp   eax, -1
+//     0x408F75 | 74 4B          | je    0x408FC2
+////////////////////////////////////////////////////////////////////////
+static void LOG_CStreaming__GetNextFileOnCd_NullTxdDef(unsigned int modelId)
+{
+    LogEvent(850, "TxdDef pool entry is null", "CStreaming::GetNextFileOnCd",
+             SString("Null TxdDef for streaming model: %u (TXD slot: %u)", modelId, modelId - 20000), 5701);
+}
+
+#define HOOKPOS_CStreaming__GetNextFileOnCd_NullTxdDef   0x408F6E
+#define HOOKSIZE_CStreaming__GetNextFileOnCd_NullTxdDef  7
+#define HOOKCHECK_CStreaming__GetNextFileOnCd_NullTxdDef 0x0F
+static constexpr DWORD RETURN_CStreaming__GetNextFileOnCd_NullTxdDef = 0x408F75;
+static constexpr DWORD LOOP_CONTINUE_CStreaming__GetNextFileOnCd_NullTxdDef = 0x409003;
+
+static void __declspec(naked) HOOK_CStreaming__GetNextFileOnCd_NullTxdDef()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        test    eax, eax
+        jz      skip
+
+        // Original instructions: read m_wParentIndex and compare with -1
+        movsx   eax, word ptr [eax+6]
+        cmp     eax, -1
+        jmp     RETURN_CStreaming__GetNextFileOnCd_NullTxdDef
+
+    skip:
+        pushad
+        push    edi                   // edi = modelId
+        call    LOG_CStreaming__GetNextFileOnCd_NullTxdDef
+        add     esp, 4
+        popad
+
+        mov     esi, ebp              // Advance to next node (same as all other continue paths)
+        jmp     LOOP_CONTINUE_CStreaming__GetNextFileOnCd_NullTxdDef
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CStreaming::ConvertBufferToObject (TXD parent check)
+//
+// Same root cause as the GetNextFileOnCd TxdDef null crash, but in a different
+// code path. In ConvertBufferToObject's TXD case, the code calls
+// CTxdStore::ms_pTxdPool->GetAt(txdSlot) to look up the TxdDef. When the pool
+// slot is freed (byte map sign bit clear), the inlined GetAt returns null. The
+// compiled code then jumps directly to the m_wParentIndex read at [eax+6] with
+// no null guard, crashing with EAX=0.
+//
+// This hook adds the missing null check. When the TxdDef pointer is null, we
+// jump to the "textures not needed" cleanup path (0x40C8FA) which calls
+// RemoveModel + RwStreamClose and returns false, WITHOUT calling RequestModel.
+// We cannot skip to the RemoveModel + RequestModel path (0x40C948) because
+// RequestModel calls CTxdStore::GetParentTxdSlot on the freed TXD slot, which
+// crashes inside a hooked trampoline. We also cannot skip to just the parent
+// check (0x40C8E4) because the code after it calls AreTexturesUsedByRequestedModels,
+// which dereferences CModelInfo pointers that may also be null for freed custom models.
+//
+//     0x40C8CB | 8D 04 90       | lea   eax, [eax+edx*4]   ; eax = TxdDef* (or null via xor path)
+// >>> 0x40C8CE | 0F BF 40 06    | movsx eax, word ptr [eax+6]  ; eax = txdDef->m_wParentIndex
+// >>> 0x40C8D2 | 83 F8 FF       | cmp   eax, -1
+//     0x40C8D5 | 74 0D          | je    0x40C8E4
+////////////////////////////////////////////////////////////////////////
+static void LOG_CStreaming__ConvertBufferToObject_NullTxdDef(unsigned int modelId)
+{
+    LogEvent(851, "TxdDef pool entry is null", "CStreaming::ConvertBufferToObject",
+             SString("Null TxdDef for streaming model: %u (TXD slot: %u)", modelId, modelId - 20000), 5702);
+}
+
+#define HOOKPOS_CStreaming__ConvertBufferToObject_NullTxdDef   0x40C8CE
+#define HOOKSIZE_CStreaming__ConvertBufferToObject_NullTxdDef  7
+#define HOOKCHECK_CStreaming__ConvertBufferToObject_NullTxdDef 0x0F
+static constexpr DWORD RETURN_CStreaming__ConvertBufferToObject_NullTxdDef = 0x40C8D5;
+static constexpr DWORD SKIP_CStreaming__ConvertBufferToObject_NullTxdDef = 0x40C8FA;
+
+static void __declspec(naked) HOOK_CStreaming__ConvertBufferToObject_NullTxdDef()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        test    eax, eax
+        jz      skip
+
+        // Original instructions: read m_wParentIndex and compare with -1
+        movsx   eax, word ptr [eax+6]
+        cmp     eax, -1
+        jmp     RETURN_CStreaming__ConvertBufferToObject_NullTxdDef
+
+    skip:
+        pushad
+        push    esi                   // esi = modelId in ConvertBufferToObject
+        call    LOG_CStreaming__ConvertBufferToObject_NullTxdDef
+        add     esp, 4
+        popad
+
+        jmp     SKIP_CStreaming__ConvertBufferToObject_NullTxdDef
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Fix vehicles spawning with corrupt wheel scale / bounding box on Windows 11 24H2.
+//
+// Root cause: CFileLoader::LoadVehicleObject (0x5B6F30) has local variables for
+// wheelModelID, frontWheelSize, rearWheelSize, and wheelUpgradeClass that are only
+// written by sscanf when the vehicles.ide line has enough fields (e.g. cars have 14-15
+// fields, but boats/Skimmer only have 12). In original GTA SA, these locals survived
+// as stale stack residue from the previous vehicle's parse. On Win11 24H2,
+// LeaveCriticalSection (called inside fgets between consecutive LoadVehicleObject calls)
+// uses more stack space and clobbers these uninitialized locals with garbage.
+// Corrupt wheelScale propagates into bounding box calculations and SetupSuspensionLines,
+// causing vehicles to fall through collision, camera to flash, and burnt colors.
+//
+// Fix: Intercept the sscanf call inside LoadVehicleObject and pre-initialize the four
+// optional output variables to safe defaults before sscanf runs.
+//
+// Reference: https://cookieplmonster.github.io/2025/04/23/gta-san-andreas-win11-24h2-bug/
+//            https://github.com/CookiePLMonster/SilentPatch/commit/881aded
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+
+// Address of the "call sscanf" instruction inside CFileLoader::LoadVehicleObject
+#define CALL_CFileLoader_LoadVehicleObject_sscanf 0x5B6FC7
+
+// The sscanf call in LoadVehicleObject has this exact signature at the call site:
+//   sscanf(line, "%d %s %s %s %s %s %s %s %d %d %x %d %f %f %d",
+//          &modelId, modelName, texName, type, handlingName, gameName, anims, vehClass,
+//          &frq, &flags, &comprules, &wheelModelID, &frontWheelSize, &rearWheelSize, &wheelUpgradeClass)
+//
+// Parameters 12-15 (&wheelModelID through &wheelUpgradeClass) are optional — sscanf only
+// writes them if the input line has enough fields. We set safe defaults before sscanf runs.
+static int _cdecl CFileLoader_LoadVehicleObject_sscanf(const char* s, const char* format, int* modelId, char* modelName, char* texName, char* type,
+                                                       char* handlingName, char* gameName, char* anims, char* vehClass, int* frq, int* flags, int* comprules,
+                                                       int* wheelModelID, float* frontWheelSize, float* rearWheelSize, int* wheelUpgradeClass)
+{
+    // Pre-initialize the optional fields that sscanf may not write
+    *wheelModelID = -1;
+    *frontWheelSize = 0.7f;
+    *rearWheelSize = 0.7f;
+    *wheelUpgradeClass = -1;
+
+    return sscanf(s, format, modelId, modelName, texName, type, handlingName, gameName, anims, vehClass, frq, flags, comprules, wheelModelID, frontWheelSize,
+                  rearWheelSize, wheelUpgradeClass);
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -2341,9 +4127,25 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc27);
     EZHookInstall(CrashFix_Misc28);
     EZHookInstall(CrashFix_Misc29);
+    EZHookInstall(CrashFix_Misc43);
+    EZHookInstall(CrashFix_Misc45);
+    EZHookInstall(CrashFix_Misc44);
+    EZHookInstall(CrashFix_Misc47);
+    EZHookInstall(CrashFix_Misc48);
+    EZHookInstall(CrashFix_Misc49);
     EZHookInstallChecked(CrashFix_Misc30);
     EZHookInstall(CrashFix_Misc32);
     EZHookInstall(CrashFix_Misc33);
+    EZHookInstall(CrashFix_Misc34);
+    EZHookInstallChecked(CrashFix_Misc35);
+    EZHookInstallChecked(CrashFix_Misc36);
+    EZHookInstallChecked(CrashFix_Misc37);
+    EZHookInstallChecked(CrashFix_Misc38);
+    EZHookInstallChecked(CrashFix_VBInstV3dNull);
+    EZHookInstallChecked(CrashFix_VBInstV3dMorphNull);
+    EZHookInstallChecked(CrashFix_VBInstWeightsNull);
+    EZHookInstallChecked(CrashFix_DynVBCreateNull);
+    EZHookInstall(CrashFix_Misc39);
     EZHookInstall(CClumpModelInfo_GetFrameFromId);
     EZHookInstallChecked(CEntity_GetBoundRect);
     EZHookInstallChecked(CVehicle_AddUpgrade);
@@ -2369,6 +4171,16 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(FxPrim_c__Enable);
     EZHookInstall(CFire_ProcessFire);
 
+    EZHookInstall(CColModel_MakeMultipleAlloc);
+
+    EZHookInstall(CrashFix_Misc50);
+    EZHookInstall(CrashFix_Misc51);
+    EZHookInstall(CrashFix_Misc52);
+
+    EZHookInstallChecked(CStreaming__GetNextFileOnCd_NullTxdDef);
+    EZHookInstallChecked(CStreaming__ConvertBufferToObject_NullTxdDef);
+    EZHookInstallChecked(CEventScanner__ScanForEvents_ContactEntity);
+
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
     HookInstall(HOOKPOS_CObject_Destructor_TrainCrossing_Check, (DWORD)temp, 5);
@@ -2376,4 +4188,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     HookInstall(HOOKPOS_CObject_ProcessTrainCrossingBehavior1, (DWORD)temp, 5);
     temp = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_ProcessTrainCrossingBehavior2_Check, RETURN_CObject_ProcessTrainCrossingBehavior_Invalid>;
     HookInstall(HOOKPOS_CObject_ProcessTrainCrossingBehavior2, (DWORD)temp, 5);
+
+    // Fix uninitialized wheel scale in CFileLoader::LoadVehicleObject on Win11 24H2
+    HookInstallCall(CALL_CFileLoader_LoadVehicleObject_sscanf, (DWORD)CFileLoader_LoadVehicleObject_sscanf);
 }

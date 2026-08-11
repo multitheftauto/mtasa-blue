@@ -17,7 +17,7 @@ namespace CCreditsGUI
 {
     float fWindowX = 560.0f;
     float fWindowY = 300.0f;
-}            // namespace CCreditsGUI
+}  // namespace CCreditsGUI
 using namespace CCreditsGUI;
 
 CCredits::CCredits()
@@ -42,7 +42,9 @@ CCredits::CCredits()
         "Dan \"Talidan\" Chowdhury\n"
         "Chris \"ccw\" Cockwanger\n"
         "Adge \"Jax\" Cutler\n"
+        "Leonard \"lopsi\" Drumsticks\n"
         "Cecill \"ijs\" Etheredge\n"
+        "Patrik Juvonen\n"
         "Danish \"Saml1er\" Khan\n"
         "Marek \"botder\" Kulik\n"
         "Sebas \"x86\" Lamers\n"
@@ -51,10 +53,12 @@ CCredits::CCredits()
         "Christian \"ChrML\" Myhre Lundheim\n"
         "Qais \"qaisjp\" Patankar\n"
         "Arushan \"aru\" Raj\n"
+        "Jordy \"Megadreams\" Sleeubus\n"
         "Frank \"Aim\" Spijkerman\n"
         "Pascal \"sbx320\" Stücker\n"
         "Kevin \"Kevuwk\" Whiteside\n"
         "Richard \"Cazomino05\" Whitlock\n"
+        "Dutchman101\n"
         "Gamesnert\n"
         "Jusonex\n"
         "\n"
@@ -65,7 +69,6 @@ CCredits::CCredits()
         "\n\n"
 
         "Patrik \"Pirulax\" Jankovics-Szmolenicki\n"
-        "Patrik \"myonlake\" Juvonen\n"
         "Uladzislau \"TheNormalnij\" Nikalayevich\n"
         "Nikita \"StrixG\" Obrecht\n"
         "Arran\n"
@@ -74,7 +77,6 @@ CCredits::CCredits()
         "Iztas\n"
         "JoeBullet\n"
         "lopezloo\n"
-        "Lpsd\n"
         "MX_Master\n"
         "Remp\n"
         "SugarD-x\n"
@@ -93,7 +95,6 @@ CCredits::CCredits()
         "Norbert \"norby89\" Juhos\n"
         "Kris \"KWKSND\" Kulchisky\n"
         "Dustin \"Ransom\" Morren\n"
-        "Dutchman101\n"
         "erorr404\n"
         "Synecy\n"
         "\n"
@@ -141,7 +142,6 @@ CCredits::CCredits()
         "Sam \"samr46\" R.\n"
         "Fernando Rocha\n"
         "Fedor \"Ted\" Sinev\n"
-        "Jordy \"MegadreamsBE\" Sleeubus\n"
         "Simon \"Simi23\" Tamás\n"
         "Adam \"50p\" Telega\n"
         "Ilya \"Kenix\" Volkov\n"
@@ -314,7 +314,6 @@ CCredits::CCredits()
         "tinyxml (https://sourceforge.net/projects/tinyxml/)\n"
         "UnRAR (https://www.rarlab.com/)\n"
         "zlib (https://zlib.net/)\n";
-
 
     // SA credits
     m_strCredits += "\n\n\n== Grand Theft Auto: San Andreas (TM) (c) 2005 Rockstar Games, Inc. ==\n\n\n";
@@ -1092,8 +1091,7 @@ CCredits::CCredits()
         "Sarah Oram\n"
         "Smoke Stack\n"
         "Trattoria Siciliana\n"
-        "Black Bull\n"
-    ;
+        "Black Bull\n";
 
     // Create our window
     CVector2D RelativeWindow = CVector2D(fWindowX / pManager->GetResolution().fX, fWindowY / pManager->GetResolution().fY);
@@ -1101,7 +1099,7 @@ CCredits::CCredits()
     m_pWindow->SetCloseButtonEnabled(false);
     m_pWindow->SetMovable(false);
     m_pWindow->SetPosition(CVector2D(0.5f - RelativeWindow.fX * 0.5f, 0.5f - RelativeWindow.fY * 0.5f), true);
-    m_pWindow->SetSize(CVector2D(fWindowX, fWindowY));            // relative 0.70, 0.50
+    m_pWindow->SetSize(CVector2D(fWindowX, fWindowY));  // relative 0.70, 0.50
     m_pWindow->SetSizingEnabled(false);
     m_pWindow->SetVisible(false);
     m_pWindow->SetAlwaysOnTop(true);
@@ -1134,7 +1132,7 @@ CCredits::CCredits()
             // Create the label
             m_pLabels[uiLabelIndex] = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, strBuffer.c_str()));
             m_pLabels[uiLabelIndex]->SetPosition(CVector2D(0.022f, fStartPosition), true);
-            m_pLabels[uiLabelIndex]->SetSize(CVector2D(532.0f, 1500.0f));            // relative 0.95, 6.0
+            m_pLabels[uiLabelIndex]->SetSize(CVector2D(532.0f, 1500.0f));  // relative 0.95, 6.0
             m_pLabels[uiLabelIndex]->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
             ++uiLabelIndex;
 
@@ -1153,7 +1151,7 @@ CCredits::CCredits()
     // Create the OK button
     m_pButtonOK = reinterpret_cast<CGUIButton*>(pManager->CreateButton(m_pWindow, "OK"));
     m_pButtonOK->SetPosition(CVector2D(0.77f, 0.90f), true);
-    m_pButtonOK->SetSize(CVector2D(112.0f, 21.0f));            // relative 0.20, 0.07
+    m_pButtonOK->SetSize(CVector2D(112.0f, 21.0f));  // relative 0.20, 0.07
     m_pButtonOK->SetVisible(true);
     m_pButtonOK->SetAlwaysOnTop(true);
 

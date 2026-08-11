@@ -21,16 +21,16 @@
 /////////////////////////////////////////////////////////////
 CProxyDirect3DTexture::CProxyDirect3DTexture(IDirect3DDevice9* InD3DDevice9, IDirect3DTexture9* pOriginal, UINT Width, UINT Height, UINT Levels, DWORD Usage,
                                              D3DFORMAT Format, D3DPOOL Pool)
-    : m_stats(Usage & D3DUSAGE_DYNAMIC ? g_pDeviceState->MemoryState.DynamicTexture : g_pDeviceState->MemoryState.StaticTexture)
+    : m_pStats(Usage & D3DUSAGE_DYNAMIC ? &g_StaticMemoryState.DynamicTexture : &g_StaticMemoryState.StaticTexture)
 {
     m_pOriginal = pOriginal;
     m_iMemUsed = CRenderItemManager::CalcD3DTextureMemoryKBUsage(pOriginal) * 1024;
     m_dwUsage = Usage;
 
-    m_stats.iCurrentCount++;
-    m_stats.iCurrentBytes += m_iMemUsed;
-    m_stats.iCreatedCount++;
-    m_stats.iCreatedBytes += m_iMemUsed;
+    m_pStats->iCurrentCount++;
+    m_pStats->iCurrentBytes += m_iMemUsed;
+    m_pStats->iCreatedCount++;
+    m_pStats->iCreatedBytes += m_iMemUsed;
 }
 
 /////////////////////////////////////////////////////////////
@@ -42,10 +42,13 @@ CProxyDirect3DTexture::CProxyDirect3DTexture(IDirect3DDevice9* InD3DDevice9, IDi
 /////////////////////////////////////////////////////////////
 CProxyDirect3DTexture::~CProxyDirect3DTexture()
 {
-    m_stats.iCurrentCount--;
-    m_stats.iCurrentBytes -= m_iMemUsed;
-    m_stats.iDestroyedCount++;
-    m_stats.iDestroyedBytes += m_iMemUsed;
+    if (m_pStats)
+    {
+        m_pStats->iCurrentCount--;
+        m_pStats->iCurrentBytes -= m_iMemUsed;
+        m_pStats->iDestroyedCount++;
+        m_pStats->iDestroyedBytes += m_iMemUsed;
+    }
 }
 
 /////////////////////////////////////////////////////////////
@@ -85,7 +88,7 @@ ULONG CProxyDirect3DTexture::Release()
     if (count == 0)
     {
         // now, the Original Object has deleted itself, so do we here
-        delete this;            // destructor will be called automatically
+        delete this;  // destructor will be called automatically
     }
 
     return count;
@@ -100,6 +103,7 @@ ULONG CProxyDirect3DTexture::Release()
 /////////////////////////////////////////////////////////////
 HRESULT CProxyDirect3DTexture::LockRect(UINT Level, D3DLOCKED_RECT* pLockedRect, CONST RECT* pRect, DWORD Flags)
 {
-    m_stats.iLockedCount++;
+    if (m_pStats)
+        m_pStats->iLockedCount++;
     return m_pOriginal->LockRect(Level, pLockedRect, pRect, Flags);
 }

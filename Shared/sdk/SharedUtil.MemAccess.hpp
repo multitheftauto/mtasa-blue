@@ -8,7 +8,7 @@
  *
  *****************************************************************************/
 
-#pragma once		
+#pragma once
 #include <windows.h>
 #include <cassert>
 #include "SharedUtil.MemAccess.h"
@@ -21,9 +21,9 @@ namespace SharedUtil
     bool ismemset(const void* pInAddr, int cValue, uint uiAmount)
     {
         const uchar* pAddr = (const uchar*)pInAddr;
-        auto         ucValue = (uchar)cValue;
+        const int    iValue = (cValue & 0xFF);
         for (uint i = 0; i < uiAmount; i++)
-            if (pAddr[i] != ucValue)
+            if (pAddr[i] != iValue)
                 return false;
         return true;
     }
@@ -111,8 +111,8 @@ namespace SharedUtil
         OutputDebugLine(SString("[MemAccess] OpenMemWrite at %08x for %d bytes  (oldProt:%04x)", pAddr, uiAmount, hMem.oldProt));
 
 #ifdef MTA_DEBUG
-#if 0   // Annoying
-        // Checks
+    #if 0  // Annoying
+           // Checks
         if ( IsProtectedSlowMem( (const void*)hMem.dwFirstPage ) )
             assert( hMem.oldProt == PAGE_EXECUTE_READ || hMem.oldProt == PAGE_READONLY );
         else
@@ -162,7 +162,7 @@ namespace SharedUtil
             dassert(oldProt == PAGE_EXECUTE_READWRITE);
         }
 
-        hMem.dwFirstPage = 0;            // Invalidate handle
+        hMem.dwFirstPage = 0;  // Invalidate handle
     }
 
-}            // namespace SharedUtil
+}  // namespace SharedUtil

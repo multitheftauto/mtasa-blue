@@ -15,6 +15,7 @@
 #include "../luadefs/CLuaTranslationDefsClient.h"
 #include "../luadefs/CLuaVectorGraphicDefs.h"
 #include "../luadefs/CLuaClientDefs.h"
+#include "../luadefs/CLuaPostfxDefs.h"
 
 using std::list;
 
@@ -30,10 +31,10 @@ CLuaManager::CLuaManager(CClientGame* pClientGame)
     m_pGUIManager = pClientGame->GetGUIManager();
     m_pRegisteredCommands = pClientGame->GetRegisteredCommands();
 
-    // Ensure lua was compiled with apichecks
-    #ifdef NDEBUG
-        #error "NDEBUG should not be defined"
-    #endif
+// Ensure lua was compiled with apichecks
+#ifdef NDEBUG
+    #error "NDEBUG should not be defined"
+#endif
     assert(luaX_is_apicheck_enabled());
 
     // Load the C functions
@@ -144,7 +145,7 @@ CLuaMain* CLuaManager::GetVirtualMachine(lua_State* luaVM)
     {
         if (luaVM == (*iter)->GetVirtualMachine())
         {
-            dassert(0);            // Why not in map?
+            dassert(0);  // Why not in map?
             return *iter;
         }
     }
@@ -286,4 +287,5 @@ void CLuaManager::LoadCFunctions()
     CLuaDiscordDefs::LoadFunctions();
     CLuaBuildingDefs::LoadFunctions();
     CLuaTranslationDefsClient::LoadFunctions();
+    CLuaPostfxDefs::LoadFunctions();
 }

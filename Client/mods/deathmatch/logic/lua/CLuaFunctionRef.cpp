@@ -10,7 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#pragma warning( disable : 4355 )   // warning C4355: 'this' : used in base member initializer list
+#pragma warning(disable : 4355)  // warning C4355: 'this' : used in base member initializer list
 
 CIntrusiveList<CLuaFunctionRef> CLuaFunctionRef::ms_AllRefList(&CLuaFunctionRef::m_ListNode);
 

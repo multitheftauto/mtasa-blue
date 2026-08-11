@@ -44,10 +44,8 @@ void CLuaPathDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "path");
 }
 
-std::optional<std::vector<std::string>> CLuaPathDefs::pathListDir(
-    lua_State* luaVM,
-    std::string path
-) {
+std::optional<std::vector<std::string>> CLuaPathDefs::pathListDir(lua_State* luaVM, std::string path)
+{
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!pLuaMain)
         return std::nullopt;
@@ -57,15 +55,13 @@ std::optional<std::vector<std::string>> CLuaPathDefs::pathListDir(
     CResource* pResource = pLuaMain->GetResource();
     if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath))
     {
-        m_pScriptDebugging->LogWarning(luaVM, "Cannot parse provided path: \"%s\"",
-            path.c_str());
+        m_pScriptDebugging->LogWarning(luaVM, "Cannot parse provided path: \"%s\"", path.c_str());
         return std::nullopt;
     }
 
     if (!DirectoryExists(strAbsPath))
     {
-        m_pScriptDebugging->LogWarning(luaVM, "Directory \"%s\" doesn't exist!",
-            path.c_str());
+        m_pScriptDebugging->LogWarning(luaVM, "Directory \"%s\" doesn't exist!", path.c_str());
         return std::nullopt;
     }
 
@@ -83,8 +79,7 @@ bool CLuaPathDefs::pathIsFile(lua_State* luaVM, std::string path)
     CResource* pResource = pLuaMain->GetResource();
     if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath))
     {
-        m_pScriptDebugging->LogWarning(luaVM, "Cannot parse provided path: \"%s\"",
-            path.c_str());
+        m_pScriptDebugging->LogWarning(luaVM, "Cannot parse provided path: \"%s\"", path.c_str());
         return false;
     }
 
@@ -102,8 +97,7 @@ bool CLuaPathDefs::pathIsDirectory(lua_State* luaVM, std::string path)
     CResource* pResource = pLuaMain->GetResource();
     if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath))
     {
-        m_pScriptDebugging->LogWarning(luaVM, "Cannot parse provided path: \"%s\"",
-            path.c_str());
+        m_pScriptDebugging->LogWarning(luaVM, "Cannot parse provided path: \"%s\"", path.c_str());
         return false;
     }
 

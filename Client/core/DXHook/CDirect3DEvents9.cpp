@@ -24,133 +24,140 @@
 #include "Graphics/CVideoModeManager.h"
 #include "Graphics/CRenderItem.EffectTemplate.h"
 
-
-std::atomic<bool>   g_bInMTAScene{false};
-extern std::atomic<bool> g_bInGTAScene;
-void ResetGTASceneState();
+std::atomic<bool>             g_bInMTAScene{false};
+extern std::atomic<bool>      g_bInGTAScene;
+extern CProxyDirect3DDevice9* g_pProxyDevice;
+void                          ResetGTASceneState();
 
 // Other variables
 static uint                 ms_RequiredAnisotropicLevel = 1;
 static EDiagnosticDebugType ms_DiagnosticDebug = EDiagnosticDebug::NONE;
+
+// Tracks frames since the last hardware fault caught by FilterException.
+// Draw calls are skipped for a short cooldown to avoid repeated exceptions,
+// then re-enabled as PresentGuarded increments this counter each frame.
+//   UINT_MAX  = normal (no active fault)
+//   0..N      = frames elapsed since fault
+static uint ms_uiFramesSinceDeviceFault = UINT_MAX;
 
 // To reuse shader setups between calls to DrawIndexedPrimitive
 CShaderItem* g_pActiveShader = NULL;
 
 namespace
 {
-struct SResolvedShaderState
-{
-    CShaderInstance* pInstance = nullptr;
-    CEffectWrap*     pEffectWrap = nullptr;
-    ID3DXEffect*     pEffect = nullptr;
-};
+    struct SResolvedShaderState
+    {
+        CShaderInstance* pInstance = nullptr;
+        CEffectWrap*     pEffectWrap = nullptr;
+        ID3DXEffect*     pEffect = nullptr;
+    };
 
-bool TryResolveShaderState(CShaderItem* pShaderItem, SResolvedShaderState& outState)
-{
-    if (!pShaderItem)
-        return false;
+    bool TryResolveShaderState(CShaderItem* pShaderItem, SResolvedShaderState& outState)
+    {
+        if (!pShaderItem)
+            return false;
 
-    CShaderInstance* pInstance = pShaderItem->m_pShaderInstance;
-    if (!pInstance)
-        return false;
+        CShaderInstance* pInstance = pShaderItem->m_pShaderInstance;
+        if (!pInstance)
+            return false;
 
-    CEffectWrap* pEffectWrap = pInstance->m_pEffectWrap;
-    if (!pEffectWrap)
-        return false;
+        CEffectWrap* pEffectWrap = pInstance->m_pEffectWrap;
+        if (!pEffectWrap)
+            return false;
 
-    outState.pInstance = pInstance;
-    outState.pEffectWrap = pEffectWrap;
-    outState.pEffect = pEffectWrap->m_pD3DEffect;
-    return true;
-}
+        outState.pInstance = pInstance;
+        outState.pEffectWrap = pEffectWrap;
+        outState.pEffect = pEffectWrap->m_pD3DEffect;
+        return true;
+    }
 }
 
 namespace
 {
-struct SToneMapVertex
-{
-    static const DWORD FVF = D3DFVF_XYZRHW | D3DFVF_TEX1;
-    float             x, y, z, w;
-    float             u, v;
-};
-
-class BorderlessToneMapPass
-{
-public:
-    bool Apply(IDirect3DDevice9* device, float gammaPower, float brightnessScale, float contrastScale, float saturationScale);
-    void Release();
-
-private:
-    bool EnsureResources(IDirect3DDevice9* device, UINT width, UINT height, D3DFORMAT format);
-    bool EnsureShader(IDirect3DDevice9* device);
-    bool EnsureStateBlock(IDirect3DDevice9* device);
-    void ReleaseTexture();
-    void ReleaseShader();
-    void ReleaseStateBlock();
-
-    IDirect3DTexture9* m_sourceTexture = nullptr;
-    IDirect3DSurface9* m_sourceSurface = nullptr;
-    IDirect3DPixelShader9* m_pixelShader = nullptr;
-    LPD3DXCONSTANTTABLE m_constantTable = nullptr;
-    D3DXHANDLE          m_toneParamsHandle = nullptr;
-    IDirect3DStateBlock9* m_restoreStateBlock = nullptr;
-    IDirect3DStateBlock9* m_applyStateBlock = nullptr;
-    UINT                m_width = 0;
-    UINT                m_height = 0;
-    D3DFORMAT           m_format = D3DFMT_UNKNOWN;
-    bool                m_shaderFailed = false;
-};
-
-static BorderlessToneMapPass g_BorderlessToneMapPass;
-
-static void RunBorderlessToneMap(IDirect3DDevice9* device)
-{
-    if (!device)
-        return;
-
-    bool isWindowed = false;
-    bool havePresentationState = false;
-    if (CVideoModeManagerInterface* videoModeManager = GetVideoModeManager())
+    struct SToneMapVertex
     {
-        isWindowed = videoModeManager->IsDisplayModeWindowed() || videoModeManager->IsDisplayModeFullScreenWindow();
-        havePresentationState = true;
-    }
+        static const DWORD FVF = D3DFVF_XYZRHW | D3DFVF_TEX1;
+        float              x, y, z, w;
+        float              u, v;
+    };
 
-    if (!havePresentationState && g_pDeviceState)
+    class BorderlessToneMapPass
     {
-        const auto& params = g_pDeviceState->CreationState.PresentationParameters;
-        isWindowed = params.Windowed != 0;
-        havePresentationState = true;
-    }
+    public:
+        bool Apply(IDirect3DDevice9* device, float gammaPower, float brightnessScale, float contrastScale, float saturationScale);
+        void Release();
 
-    if (!havePresentationState)
-        return;
+    private:
+        bool EnsureResources(IDirect3DDevice9* device, UINT width, UINT height, D3DFORMAT format);
+        bool EnsureShader(IDirect3DDevice9* device);
+        bool EnsureStateBlock(IDirect3DDevice9* device);
+        void ReleaseTexture();
+        void ReleaseShader();
+        void ReleaseStateBlock();
 
-    float gammaPower = 1.0f;
-    float brightnessScale = 1.0f;
-    float contrastScale = 1.0f;
-    float saturationScale = 1.0f;
-    bool  applyWindowed = true;
-    bool  applyFullscreen = false;
-    BorderlessGamma::FetchSettings(gammaPower, brightnessScale, contrastScale, saturationScale, applyWindowed, applyFullscreen);
+        IDirect3DTexture9*     m_sourceTexture = nullptr;
+        IDirect3DSurface9*     m_sourceSurface = nullptr;
+        IDirect3DPixelShader9* m_pixelShader = nullptr;
+        LPD3DXCONSTANTTABLE    m_constantTable = nullptr;
+        D3DXHANDLE             m_toneParamsHandle = nullptr;
+        IDirect3DStateBlock9*  m_restoreStateBlock = nullptr;
+        IDirect3DStateBlock9*  m_applyStateBlock = nullptr;
+        UINT                   m_width = 0;
+        UINT                   m_height = 0;
+        D3DFORMAT              m_format = D3DFMT_UNKNOWN;
+        bool                   m_shaderFailed = false;
+    };
 
-    const bool adjustmentsEnabled = isWindowed ? applyWindowed : applyFullscreen;
-    if (!adjustmentsEnabled)
+    static BorderlessToneMapPass g_BorderlessToneMapPass;
+
+    static void RunBorderlessToneMap(IDirect3DDevice9* device)
     {
-        g_BorderlessToneMapPass.Release();
-        return;
-    }
+        if (!device)
+            return;
 
-    if (!BorderlessGamma::ShouldApplyAdjustments(gammaPower, brightnessScale, contrastScale, saturationScale))
-        return;
+        bool isWindowed = false;
+        bool havePresentationState = false;
+        if (CVideoModeManagerInterface* videoModeManager = GetVideoModeManager())
+        {
+            isWindowed = videoModeManager->IsDisplayModeWindowed() || videoModeManager->IsDisplayModeFullScreenWindow();
+            havePresentationState = true;
+        }
 
-    if (!g_BorderlessToneMapPass.Apply(device, gammaPower, brightnessScale, contrastScale, saturationScale))
-    {
-        // Fallback: release resources to allow retry on future frames.
-        g_BorderlessToneMapPass.Release();
+        if (!havePresentationState && g_pDeviceState)
+        {
+            const auto& params = g_pDeviceState->CreationState.PresentationParameters;
+            isWindowed = params.Windowed != 0;
+            havePresentationState = true;
+        }
+
+        if (!havePresentationState)
+            return;
+
+        float gammaPower = 1.0f;
+        float brightnessScale = 1.0f;
+        float contrastScale = 1.0f;
+        float saturationScale = 1.0f;
+        bool  applyWindowed = true;
+        bool  applyFullscreen = false;
+        BorderlessGamma::FetchSettings(gammaPower, brightnessScale, contrastScale, saturationScale, applyWindowed, applyFullscreen);
+
+        const bool adjustmentsEnabled = isWindowed ? applyWindowed : applyFullscreen;
+        if (!adjustmentsEnabled)
+        {
+            g_BorderlessToneMapPass.Release();
+            return;
+        }
+
+        if (!BorderlessGamma::ShouldApplyAdjustments(gammaPower, brightnessScale, contrastScale, saturationScale))
+            return;
+
+        if (!g_BorderlessToneMapPass.Apply(device, gammaPower, brightnessScale, contrastScale, saturationScale))
+        {
+            // Fallback: release resources to allow retry on future frames.
+            g_BorderlessToneMapPass.Release();
+        }
     }
-}
-} // namespace
+}  // namespace
 
 bool BorderlessToneMapPass::EnsureShader(IDirect3DDevice9* device)
 {
@@ -177,11 +184,12 @@ bool BorderlessToneMapPass::EnsureShader(IDirect3DDevice9* device)
         "    return color;\n"
         "}\n";
 
-    LPD3DXBUFFER       shaderBuffer = nullptr;
-    LPD3DXBUFFER       errorBuffer = nullptr;
+    LPD3DXBUFFER        shaderBuffer = nullptr;
+    LPD3DXBUFFER        errorBuffer = nullptr;
     LPD3DXCONSTANTTABLE constantTable = nullptr;
 
-    HRESULT hr = D3DXCompileShader(kShaderSource, sizeof(kShaderSource) - 1, nullptr, nullptr, "main", "ps_2_0", 0, &shaderBuffer, &errorBuffer, &constantTable);
+    HRESULT hr =
+        D3DXCompileShader(kShaderSource, sizeof(kShaderSource) - 1, nullptr, nullptr, "main", "ps_2_0", 0, &shaderBuffer, &errorBuffer, &constantTable);
     if (FAILED(hr))
     {
         SString message("BorderlessToneMap: pixel shader compile failed (%08x)", hr);
@@ -239,7 +247,7 @@ bool BorderlessToneMapPass::EnsureStateBlock(IDirect3DDevice9* device)
     if (!m_applyStateBlock)
     {
         device->BeginStateBlock();
-        
+
         // Configure all render states for tone mapping pass
         device->SetRenderState(D3DRS_ZENABLE, FALSE);
         device->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
@@ -249,11 +257,11 @@ bool BorderlessToneMapPass::EnsureStateBlock(IDirect3DDevice9* device)
         device->SetRenderState(D3DRS_FOGENABLE, FALSE);
         device->SetRenderState(D3DRS_STENCILENABLE, FALSE);
         device->SetRenderState(D3DRS_SRGBWRITEENABLE, FALSE);
-        
+
         device->SetPixelShader(m_pixelShader);
         device->SetVertexShader(nullptr);
         device->SetFVF(SToneMapVertex::FVF);
-        
+
         device->SetTexture(0, m_sourceTexture);
         device->SetSamplerState(0, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
         device->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
@@ -261,7 +269,7 @@ bool BorderlessToneMapPass::EnsureStateBlock(IDirect3DDevice9* device)
         device->SetSamplerState(0, D3DSAMP_ADDRESSU, D3DTADDRESS_CLAMP);
         device->SetSamplerState(0, D3DSAMP_ADDRESSV, D3DTADDRESS_CLAMP);
         device->SetSamplerState(0, D3DSAMP_SRGBTEXTURE, FALSE);
-        
+
         IDirect3DStateBlock9* applyBlock = nullptr;
         if (FAILED(device->EndStateBlock(&applyBlock)) || !applyBlock)
         {
@@ -315,7 +323,7 @@ bool BorderlessToneMapPass::Apply(IDirect3DDevice9* device, float gammaPower, fl
         return false;
 
     IDirect3DSurface9* backBuffer = nullptr;
-    HRESULT             hr = device->GetRenderTarget(0, &backBuffer);
+    HRESULT            hr = device->GetRenderTarget(0, &backBuffer);
     if (FAILED(hr) || !backBuffer)
         return false;
 
@@ -342,6 +350,8 @@ bool BorderlessToneMapPass::Apply(IDirect3DDevice9* device, float gammaPower, fl
         return false;
     }
 
+    m_restoreStateBlock->Capture();
+
     // Apply all rendering state in one call using cached state block
     m_applyStateBlock->Apply();
 
@@ -358,12 +368,8 @@ bool BorderlessToneMapPass::Apply(IDirect3DDevice9* device, float gammaPower, fl
     const float bottom = static_cast<float>(m_height) - 0.5f;
 
     const SToneMapVertex vertices[6] = {
-        {left, top, 0.0f, 1.0f, 0.0f, 0.0f},
-        {right, top, 0.0f, 1.0f, 1.0f, 0.0f},
-        {left, bottom, 0.0f, 1.0f, 0.0f, 1.0f},
-        {right, top, 0.0f, 1.0f, 1.0f, 0.0f},
-        {right, bottom, 0.0f, 1.0f, 1.0f, 1.0f},
-        {left, bottom, 0.0f, 1.0f, 0.0f, 1.0f},
+        {left, top, 0.0f, 1.0f, 0.0f, 0.0f},  {right, top, 0.0f, 1.0f, 1.0f, 0.0f},    {left, bottom, 0.0f, 1.0f, 0.0f, 1.0f},
+        {right, top, 0.0f, 1.0f, 1.0f, 0.0f}, {right, bottom, 0.0f, 1.0f, 1.0f, 1.0f}, {left, bottom, 0.0f, 1.0f, 0.0f, 1.0f},
     };
 
     device->DrawPrimitiveUP(D3DPT_TRIANGLELIST, 2, vertices, sizeof(SToneMapVertex));
@@ -384,7 +390,7 @@ void BorderlessToneMapPass::ReleaseTexture()
     m_width = 0;
     m_height = 0;
     m_format = D3DFMT_UNKNOWN;
-    
+
     // Invalidate apply state block since it captured the old texture pointer
     SAFE_RELEASE(m_applyStateBlock);
 }
@@ -395,7 +401,7 @@ void BorderlessToneMapPass::ReleaseShader()
     SAFE_RELEASE(m_constantTable);
     m_toneParamsHandle = nullptr;
     m_shaderFailed = false;
-    
+
     // Invalidate apply state block since it captured the shader pointer
     SAFE_RELEASE(m_applyStateBlock);
 }
@@ -455,6 +461,9 @@ void CDirect3DEvents9::OnDirect3DDeviceCreate(IDirect3DDevice9* pDevice)
 {
     WriteDebugEvent("CDirect3DEvents9::OnDirect3DDeviceCreate");
 
+    // Reset fault cooldown for the new device.
+    ms_uiFramesSinceDeviceFault = UINT_MAX;
+
     // Create the GUI manager
     CCore::GetSingleton().InitGUI(pDevice);
 
@@ -494,7 +503,6 @@ void CDirect3DEvents9::OnBeginScene(IDirect3DDevice9* pDevice)
 
 bool CDirect3DEvents9::OnEndScene(IDirect3DDevice9* pDevice)
 {
-    CloseActiveShader();
     return true;
 }
 
@@ -504,8 +512,7 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
 
     const HRESULT hrCooperativeLevel = pDevice->TestCooperativeLevel();
     const bool    bDeviceOperational = (hrCooperativeLevel == D3D_OK);
-    const bool    bDeviceTemporarilyLost =
-        (hrCooperativeLevel == D3DERR_DEVICELOST || hrCooperativeLevel == D3DERR_DEVICENOTRESET);
+    const bool    bDeviceTemporarilyLost = (hrCooperativeLevel == D3DERR_DEVICELOST || hrCooperativeLevel == D3DERR_DEVICENOTRESET);
 
     if (!bDeviceOperational && !bDeviceTemporarilyLost)
         WriteDebugEvent(SString("OnInvalidate: unexpected cooperative level %08x", hrCooperativeLevel));
@@ -514,14 +521,15 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
     const bool bInGTAScene = g_bInGTAScene.load(std::memory_order_acquire);
     const bool bInAnyScene = bInMTAScene || bInGTAScene;
 
+    IDirect3DDevice9* pStateDevice = g_pProxyDevice ? static_cast<IDirect3DDevice9*>(g_pProxyDevice) : pDevice;
+
     if (bDeviceOperational)
     {
         // Flush any pending operations before invalidation while the device still accepts work
         g_pCore->GetGraphics()->GetRenderItemManager()->SaveReadableDepthBuffer();
         g_pCore->GetGraphics()->GetRenderItemManager()->FlushNonAARenderTarget();
 
-        // Ensure any in-progress effect passes are wrapped up before ending the scene
-        CloseActiveShader();
+        CloseActiveShader(true, pStateDevice);
 
         if (bInAnyScene)
         {
@@ -532,7 +540,7 @@ void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
     }
     else
     {
-        CloseActiveShader(false);
+        CloseActiveShader(false, pStateDevice);
 
         if (bInAnyScene)
         {
@@ -569,9 +577,10 @@ void CDirect3DEvents9::OnRestore(IDirect3DDevice9* pDevice)
     CCore::GetSingleton().OnDeviceRestore();
 }
 
-void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
+void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice)
 {
     TIMING_CHECKPOINT("+OnPresent1");
+    CGraphics::GetSingleton().SetSkipMTARenderThisFrame(false);
     // Start a new scene. This isn't ideal and is not really recommended by MSDN.
     // I tried disabling EndScene from GTA and just end it after this code ourselves
     // before present, but that caused graphical issues randomly with the sky.
@@ -581,23 +590,49 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
         return;
     }
 
+    if (!pStateDevice)
+        pStateDevice = pDevice;
+
     // Reset samplers on first call
     static bool bDoneReset = false;
     if (!bDoneReset)
     {
         bDoneReset = true;
-        for (uint i = 0; i < 16; i++)
+        if (pStateDevice)
         {
-            pDevice->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-            pDevice->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-            pDevice->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+            for (uint i = 0; i < 16; i++)
+            {
+                pStateDevice->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+                pStateDevice->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+                pStateDevice->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+            }
         }
     }
 
+    CGraphics::GetSingleton().RefreshViewportIfNeeded();
+
     CGraphics::GetSingleton().EnteringMTARenderZone();
+    CGraphics::GetSingleton().ApplyMTARenderViewportIfNeeded();
 
     // Tell everyone that the zbuffer will need clearing before use
     CGraphics::GetSingleton().OnZBufferModified();
+
+    if (CGraphics::GetSingleton().ShouldSkipMTARenderThisFrame())
+    {
+        CCore::GetSingleton().DoPostFramePulse();
+
+        CGraphics::GetSingleton().LeavingMTARenderZone();
+
+        // Finalize any lingering shader passes (same as normal path)
+        CloseActiveShader();
+
+        if (g_bInMTAScene.load(std::memory_order_acquire))
+        {
+            if (!EndSceneWithoutProxy(pDevice, ESceneOwner::MTA))
+                WriteDebugEvent("OnPresent: EndSceneWithoutProxy failed (skip)");
+        }
+        return;
+    }
 
     TIMING_CHECKPOINT("-OnPresent1");
     // Make a screenshot if needed (before GUI)
@@ -640,13 +675,14 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
     // Redraw the mouse cursor so it will always be over other elements
     CLocalGUI::GetSingleton().DrawMouseCursor();
 
-    RunBorderlessToneMap(pDevice);
+    RunBorderlessToneMap(pStateDevice);
 
     CGraphics::GetSingleton().DidRenderScene();
 
     CGraphics::GetSingleton().LeavingMTARenderZone();
 
     // Finalize any lingering shader passes before wrapping the scene
+    // (Added for alt-tab freeze fix - commit 3390d22/e556d42)
     CloseActiveShader();
 
     // End the scene that we started.
@@ -668,18 +704,25 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
 
     TIMING_CHECKPOINT("-OnPresent2");
 
-    TIMING_CHECKPOINT("");            // End of frame for profiler
+    TIMING_CHECKPOINT("");  // End of frame for profiler
 }
 
-#define SAVE_RENDERSTATE_AND_SET( reg, value ) \
+#define SAVE_RENDERSTATE_AND_SET(reg, value) \
     const DWORD dwSaved_##reg = g_pDeviceState->RenderState.reg; \
-    const bool bSet_##reg = ( dwSaved_##reg != value ); \
-    if ( bSet_##reg ) \
-        pDevice->SetRenderState ( D3DRS_##reg, value )
+    const bool  bSet_##reg = (dwSaved_##reg != value); \
+    if (bSet_##reg) \
+    pStateDevice->SetRenderState(D3DRS_##reg, value)
 
-#define RESTORE_RENDERSTATE( reg ) \
-    if ( bSet_##reg ) \
-        pDevice->SetRenderState ( D3DRS_##reg, dwSaved_##reg )
+#define RESTORE_RENDERSTATE(reg) \
+    if (bSet_##reg) \
+    pStateDevice->SetRenderState(D3DRS_##reg, dwSaved_##reg)
+
+// Dual-pass alpha z-write threshold. Pixels with alpha >= this value write to the
+// z-buffer; pixels below do not. This emulates the PS2's per-pixel z-write control
+// which the PC's fixed-function pipeline cannot do natively. Without this, transparent
+// pixels (e.g. holes in a chain-link fence) write to the z-buffer and incorrectly
+// block objects behind them. Value of 128 matches SkyGFX's default.
+static constexpr DWORD DUALPASS_ALPHA_THRESHOLD = 128;
 
 /////////////////////////////////////////////////////////////
 //
@@ -688,12 +731,15 @@ void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice)
 // May change render states for custom renderings
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::OnDrawPrimitive(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex, UINT PrimitiveCount)
+HRESULT CDirect3DEvents9::OnDrawPrimitive(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex,
+                                          UINT PrimitiveCount)
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::GRAPHICS_6734)
         return pDevice->DrawPrimitive(PrimitiveType, StartVertex, PrimitiveCount);
 
-    CloseActiveShader();
+    if (!pStateDevice)
+        pStateDevice = pDevice;
+    CloseActiveShader(true, pStateDevice);
 
     // Any shader for this texture ?
     SShaderItemLayers* pLayers =
@@ -705,13 +751,49 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive(IDirect3DDevice9* pDevice, D3DPRIMITIV
 
     if (!pLayers)
     {
-        // No shaders for this texture
+        // No shaders for this texture.
+        // Dual-pass alpha z-write emulation for blended 3D geometry (not pre-transformed 2D).
+        // Pass 1 z-writes pixels >= threshold, pass 2 blends the rest without z-write, so fence
+        // holes don't occlude what's behind them. only runs when the game has no meaningful alpha
+        // test of its own (ref at the DefinedState baseline of 2 or below): an active test at ref
+        // 100/140 already clips transparent pixels before z-write like vanilla, and forcing the
+        // dual pass over it draws the sub-ref gradient in pass 2, which is what kept the LV neon
+        // lines smeared no matter what the game side ALPHAREF was set to.
+        const bool bGameAlphaTestActive = g_pDeviceState->RenderState.ALPHATESTENABLE && g_pDeviceState->RenderState.ALPHAREF > 2;
+        if (!bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
+            !g_pDeviceState->VertexDeclState.PositionT)
+        {
+            // Save current alpha test state
+            const DWORD dwOrigAlphaTestEnable = g_pDeviceState->RenderState.ALPHATESTENABLE;
+            const DWORD dwOrigAlphaFunc = g_pDeviceState->RenderState.ALPHAFUNC;
+            const DWORD dwOrigAlphaRef = g_pDeviceState->RenderState.ALPHAREF;
+
+            // Pass 1: Draw opaque-enough pixels (alpha >= threshold) with z-write ON
+            pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+            pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+            pDevice->SetRenderState(D3DRS_ALPHAREF, DUALPASS_ALPHA_THRESHOLD);
+            DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
+
+            // Pass 2: Draw transparent pixels (alpha < threshold) WITHOUT z-write
+            pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_LESS);
+            pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+            DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
+
+            // Restore all modified states so the proxy cache stays consistent
+            pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, dwOrigAlphaTestEnable);
+            pDevice->SetRenderState(D3DRS_ALPHAFUNC, dwOrigAlphaFunc);
+            pDevice->SetRenderState(D3DRS_ALPHAREF, dwOrigAlphaRef);
+            pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+
+            return D3D_OK;
+        }
+
         return DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
     }
     else
     {
         // Yes base shader
-        DrawPrimitiveShader(pDevice, PrimitiveType, StartVertex, PrimitiveCount, pLayers->pBase, false);
+        DrawPrimitiveShader(pDevice, pStateDevice, PrimitiveType, StartVertex, PrimitiveCount, pLayers->pBase, false);
 
         // Draw each layer
         if (!pLayers->layerList.empty())
@@ -731,7 +813,7 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive(IDirect3DDevice9* pDevice, D3DPRIMITIV
 
             for (uint i = 0; i < pLayers->layerList.size(); i++)
             {
-                DrawPrimitiveShader(pDevice, PrimitiveType, StartVertex, PrimitiveCount, pLayers->layerList[i], true);
+                DrawPrimitiveShader(pDevice, pStateDevice, PrimitiveType, StartVertex, PrimitiveCount, pLayers->layerList[i], true);
             }
 
             RESTORE_RENDERSTATE(SLOPESCALEDEPTHBIAS);
@@ -757,8 +839,8 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive(IDirect3DDevice9* pDevice, D3DPRIMITIV
 //
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex, UINT PrimitiveCount,
-                                              CShaderItem* pShaderItem, bool bIsLayer)
+HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex,
+                                              UINT PrimitiveCount, CShaderItem* pShaderItem, bool bIsLayer)
 {
     if (!pShaderItem)
     {
@@ -793,8 +875,8 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
         pDevice->GetVertexShader(&pOriginalVertexShader);
 
         // Do shader passes
-        bool bEffectDeviceTemporarilyLost = false;
-        bool bEffectDeviceOperational = true;
+        bool              bEffectDeviceTemporarilyLost = false;
+        bool              bEffectDeviceOperational = true;
         IDirect3DDevice9* pEffectDevice = nullptr;
         if (SUCCEEDED(pD3DEffect->GetDevice(&pEffectDevice)) && pEffectDevice)
         {
@@ -810,9 +892,9 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
             return D3D_OK;
         }
 
-        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
-        uint  uiNumPasses = 0;
-    HRESULT hrBegin = pEffectWrap->Begin(&uiNumPasses, dwFlags);
+        DWORD   dwFlags = D3DXFX_DONOTSAVESHADERSTATE;  // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
+        uint    uiNumPasses = 0;
+        HRESULT hrBegin = pEffectWrap->Begin(&uiNumPasses, dwFlags);
         if (FAILED(hrBegin) || uiNumPasses == 0)
         {
             if (FAILED(hrBegin) && hrBegin != D3DERR_DEVICELOST && hrBegin != D3DERR_DEVICENOTRESET)
@@ -839,8 +921,8 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
             }
 
             // Apply original vertex shader if original draw was using it (i.e. for ped animation)
-            if (pOriginalVertexShader)
-                pDevice->SetVertexShader(pOriginalVertexShader);
+            if (pOriginalVertexShader && pStateDevice)
+                pStateDevice->SetVertexShader(pOriginalVertexShader);
 
             HRESULT hrDraw = DrawPrimitiveGuarded(pDevice, PrimitiveType, StartVertex, PrimitiveCount);
             if (hrDraw == D3DERR_DEVICELOST || hrDraw == D3DERR_DEVICENOTRESET)
@@ -860,15 +942,18 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
                 bCompletedAnyPass = true;
         }
 
-    HRESULT hrEnd = pEffectWrap->End(bEffectDeviceOperational && !bEncounteredDeviceLoss);
+        HRESULT hrEnd = pEffectWrap->End(bEffectDeviceOperational && !bEncounteredDeviceLoss);
         if (FAILED(hrEnd) && hrEnd != D3DERR_DEVICELOST && hrEnd != D3DERR_DEVICENOTRESET)
             WriteDebugEvent(SString("DrawPrimitiveShader: End failed %08x", hrEnd));
 
         // If we didn't get the effect to save the shader state, clear some things here
         if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
         {
-            pDevice->SetVertexShader(pOriginalVertexShader);
-            pDevice->SetPixelShader(NULL);
+            if (pStateDevice)
+            {
+                pStateDevice->SetVertexShader(pOriginalVertexShader);
+                pStateDevice->SetPixelShader(nullptr);
+            }
         }
 
         SAFE_RELEASE(pOriginalVertexShader);
@@ -887,26 +972,29 @@ HRESULT CDirect3DEvents9::DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIM
 // May change render states for custom renderings
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex,
-                                                 UINT NumVertices, UINT startIndex, UINT primCount)
+HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex,
+                                                 UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount)
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::GRAPHICS_6734)
         return pDevice->DrawIndexedPrimitive(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
 
+    if (!pStateDevice)
+        pStateDevice = pDevice;
+
     // Apply anisotropic filtering if required
     if (ms_RequiredAnisotropicLevel > 1)
     {
-        pDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
-        pDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+        pStateDevice->SetSamplerState(0, D3DSAMP_MINFILTER, D3DTEXF_ANISOTROPIC);
+        pStateDevice->SetSamplerState(0, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
         if (ms_RequiredAnisotropicLevel > g_pDeviceState->SamplerState[0].MAXANISOTROPY)
-            pDevice->SetSamplerState(0, D3DSAMP_MAXANISOTROPY, ms_RequiredAnisotropicLevel);
+            pStateDevice->SetSamplerState(0, D3DSAMP_MAXANISOTROPY, ms_RequiredAnisotropicLevel);
     }
 
     // See if we can continue using the active shader
     if (g_pActiveShader)
     {
-        return DrawIndexedPrimitiveShader(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, g_pActiveShader, false,
-                                          false);
+        return DrawIndexedPrimitiveShader(pDevice, pStateDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount,
+                                          g_pActiveShader, false, false);
     }
 
     // Any shader for this texture ?
@@ -919,14 +1007,47 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, D3DP
 
     if (!pLayers)
     {
+        // No shaders for this texture.
+        // Dual-pass alpha z-write emulation, same rules as OnDrawPrimitive: skip when the game
+        // is already running a meaningful alpha test, it clips transparent pixels before z-write
+        // on its own and the dual pass would draw the sub-ref gradient in pass 2.
+        const bool bGameAlphaTestActive = g_pDeviceState->RenderState.ALPHATESTENABLE && g_pDeviceState->RenderState.ALPHAREF > 2;
+        if (!bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
+            !g_pDeviceState->VertexDeclState.PositionT)
+        {
+            // Save current alpha test state
+            const DWORD dwOrigAlphaTestEnable = g_pDeviceState->RenderState.ALPHATESTENABLE;
+            const DWORD dwOrigAlphaFunc = g_pDeviceState->RenderState.ALPHAFUNC;
+            const DWORD dwOrigAlphaRef = g_pDeviceState->RenderState.ALPHAREF;
+
+            // Pass 1: Draw opaque-enough pixels (alpha >= threshold) with z-write ON
+            pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+            pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
+            pDevice->SetRenderState(D3DRS_ALPHAREF, DUALPASS_ALPHA_THRESHOLD);
+            DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
+
+            // Pass 2: Draw transparent pixels (alpha < threshold) WITHOUT z-write
+            pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_LESS);
+            pDevice->SetRenderState(D3DRS_ZWRITEENABLE, FALSE);
+            DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
+
+            // Restore all modified states so the proxy cache stays consistent
+            pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, dwOrigAlphaTestEnable);
+            pDevice->SetRenderState(D3DRS_ALPHAFUNC, dwOrigAlphaFunc);
+            pDevice->SetRenderState(D3DRS_ALPHAREF, dwOrigAlphaRef);
+            pDevice->SetRenderState(D3DRS_ZWRITEENABLE, TRUE);
+
+            return D3D_OK;
+        }
+
         // No shaders for this texture
         return DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
     }
     else
     {
         // Draw base shader
-        DrawIndexedPrimitiveShader(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->pBase, false,
-                                   pLayers->layerList.empty());
+        DrawIndexedPrimitiveShader(pDevice, pStateDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->pBase,
+                                   false, pLayers->layerList.empty());
 
         // Draw each layer
         if (!pLayers->layerList.empty())
@@ -946,8 +1067,8 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, D3DP
 
             for (uint i = 0; i < pLayers->layerList.size(); i++)
             {
-                DrawIndexedPrimitiveShader(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount, pLayers->layerList[i],
-                                           true, false);
+                DrawIndexedPrimitiveShader(pDevice, pStateDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount,
+                                           pLayers->layerList[i], true, false);
             }
 
             RESTORE_RENDERSTATE(SLOPESCALEDEPTHBIAS);
@@ -973,9 +1094,9 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, D3DP
 //
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex,
-                                                     UINT NumVertices, UINT startIndex, UINT primCount, CShaderItem* pShaderItem, bool bIsLayer,
-                                                     bool bCanBecomeActiveShader)
+HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType,
+                                                     INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount,
+                                                     CShaderItem* pShaderItem, bool bIsLayer, bool bCanBecomeActiveShader)
 {
     if (pShaderItem && pShaderItem->m_fMaxDistanceSq > 0)
     {
@@ -990,7 +1111,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
 
     if (!pShaderItem)
     {
-        CloseActiveShader();
+        CloseActiveShader(true, pStateDevice);
 
         // No shader for this texture
         if (!bIsLayer)
@@ -1004,7 +1125,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
             SResolvedShaderState activeState;
             if (!TryResolveShaderState(g_pActiveShader, activeState) || !activeState.pEffect)
             {
-                CloseActiveShader(false);
+                CloseActiveShader(false, pStateDevice);
                 if (!bIsLayer)
                     return DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
                 return D3D_OK;
@@ -1018,8 +1139,8 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
             CEffectWrap*     pActiveEffectWrap = activeState.pEffectWrap;
             ID3DXEffect*     pActiveEffect = activeState.pEffect;
 
-            bool bDeviceTemporarilyLost = false;
-            bool bDeviceOperational = true;
+            bool              bDeviceTemporarilyLost = false;
+            bool              bDeviceOperational = true;
             IDirect3DDevice9* pEffectDevice = nullptr;
             if (SUCCEEDED(pActiveEffect->GetDevice(&pEffectDevice)) && pEffectDevice)
             {
@@ -1029,7 +1150,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
 
             if (!bDeviceOperational)
             {
-                CloseActiveShader(false);
+                CloseActiveShader(false, pStateDevice);
                 return D3D_OK;
             }
 
@@ -1042,7 +1163,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
                 {
                     if (hrCommit != D3DERR_DEVICELOST && hrCommit != D3DERR_DEVICENOTRESET)
                         WriteDebugEvent(SString("DrawIndexedPrimitiveShader: CommitChanges failed %08x", hrCommit));
-                    CloseActiveShader(false);
+                    CloseActiveShader(false, pStateDevice);
                     return D3D_OK;
                 }
             }
@@ -1084,8 +1205,8 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
         pDevice->GetVertexShader(&pOriginalVertexShader);
 
         // Do shader passes
-        bool bEffectDeviceTemporarilyLost = false;
-        bool bEffectDeviceOperational = true;
+        bool              bEffectDeviceTemporarilyLost = false;
+        bool              bEffectDeviceOperational = true;
         IDirect3DDevice9* pEffectDevice = nullptr;
         if (SUCCEEDED(pD3DEffect->GetDevice(&pEffectDevice)) && pEffectDevice)
         {
@@ -1103,9 +1224,9 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
             return D3D_OK;
         }
 
-        DWORD dwFlags = D3DXFX_DONOTSAVESHADERSTATE;            // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
-        uint  uiNumPasses = 0;
-    HRESULT hrBegin = pEffectWrap->Begin(&uiNumPasses, dwFlags);
+        DWORD   dwFlags = D3DXFX_DONOTSAVESHADERSTATE;  // D3DXFX_DONOTSAVE(SHADER|SAMPLER)STATE
+        uint    uiNumPasses = 0;
+        HRESULT hrBegin = pEffectWrap->Begin(&uiNumPasses, dwFlags);
         if (FAILED(hrBegin) || uiNumPasses == 0)
         {
             if (FAILED(hrBegin) && hrBegin != D3DERR_DEVICELOST && hrBegin != D3DERR_DEVICENOTRESET)
@@ -1135,8 +1256,8 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
             }
 
             // Apply original vertex shader if original draw was using it (i.e. for ped animation)
-            if (pOriginalVertexShader)
-                pDevice->SetVertexShader(pOriginalVertexShader);
+            if (pOriginalVertexShader && pStateDevice)
+                pStateDevice->SetVertexShader(pOriginalVertexShader);
 
             HRESULT hrDraw = DrawIndexedPrimitiveGuarded(pDevice, PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
             if (hrDraw == D3DERR_DEVICELOST || hrDraw == D3DERR_DEVICENOTRESET)
@@ -1166,15 +1287,18 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
                 bCompletedAnyPass = true;
         }
 
-    HRESULT hrEnd = pEffectWrap->End(bEffectDeviceOperational && !bEncounteredDeviceLoss);
+        HRESULT hrEnd = pEffectWrap->End(bEffectDeviceOperational && !bEncounteredDeviceLoss);
         if (FAILED(hrEnd) && hrEnd != D3DERR_DEVICELOST && hrEnd != D3DERR_DEVICENOTRESET)
             WriteDebugEvent(SString("DrawIndexedPrimitiveShader: End failed %08x", hrEnd));
 
         // If we didn't get the effect to save the shader state, clear some things here
         if (dwFlags & D3DXFX_DONOTSAVESHADERSTATE)
         {
-            pDevice->SetVertexShader(pOriginalVertexShader);
-            pDevice->SetPixelShader(NULL);
+            if (pStateDevice)
+            {
+                pStateDevice->SetVertexShader(pOriginalVertexShader);
+                pStateDevice->SetPixelShader(nullptr);
+            }
         }
 
         // Unset additional vertex stream
@@ -1197,7 +1321,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, 
 // Finish the active shader if there is one
 //
 /////////////////////////////////////////////////////////////
-void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
+void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational, IDirect3DDevice9* pStateDevice)
 {
     CShaderItem* pShaderItem = g_pActiveShader;
     g_pActiveShader = nullptr;
@@ -1209,7 +1333,7 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
 
     SResolvedShaderState shaderState;
     bool                 bHasShaderState = TryResolveShaderState(pShaderItem, shaderState);
-    
+
     if (bHasShaderState)
     {
         if (shaderState.pInstance && !SharedUtil::IsReadablePointer(shaderState.pInstance, sizeof(void*)))
@@ -1218,8 +1342,10 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
             bHasShaderState = false;
     }
 
-    ID3DXEffect* pD3DEffect = bHasShaderState ? shaderState.pEffect : nullptr;
+    ID3DXEffect*      pD3DEffect = bHasShaderState ? shaderState.pEffect : nullptr;
     IDirect3DDevice9* pDevice = g_pGraphics ? g_pGraphics->GetDevice() : nullptr;
+    if (!pStateDevice)
+        pStateDevice = pDevice;
 
     bool bAllowDeviceWork = bDeviceOperational;
     if (pDevice)
@@ -1246,6 +1372,7 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational)
     if (bAllowDeviceWork && pDevice)
     {
         // We didn't get the effect to save the shader state, clear some things here
+        // Use raw device (not proxy) to avoid cache updates - matches upstream behavior
         pDevice->SetVertexShader(nullptr);
         pDevice->SetPixelShader(nullptr);
     }
@@ -1303,11 +1430,28 @@ bool AreVertexStreamsBigEnough(IDirect3DDevice9* pDevice, uint viMinBased, uint 
 //
 /////////////////////////////////////////////////////////////
 thread_local uint uiLastExceptionCode = 0;
-int             FilterException(uint exceptionCode)
+int               FilterException(uint exceptionCode)
 {
     uiLastExceptionCode = exceptionCode;
     if (exceptionCode == EXCEPTION_ACCESS_VIOLATION)
         return EXCEPTION_EXECUTE_HANDLER;
+    if (exceptionCode == EXCEPTION_ILLEGAL_INSTRUCTION || exceptionCode == EXCEPTION_PRIV_INSTRUCTION)
+    {
+        // Corrupted vtable, overlay hooks, or driver code-page corruption can
+        // produce these inside D3D9 calls. Handle like access violations.
+        ms_uiFramesSinceDeviceFault = 0;
+        char buf[80];
+        _snprintf_s(buf, _countof(buf), _TRUNCATE, "FilterException: caught instruction fault %08x", exceptionCode);
+        WriteDebugEvent(buf);
+        return EXCEPTION_EXECUTE_HANDLER;
+    }
+    if (exceptionCode == EXCEPTION_IN_PAGE_ERROR)
+    {
+        // Paging failure reading d3d9.dll from disk.
+        ms_uiFramesSinceDeviceFault = 0;
+        WriteDebugEvent("FilterException: caught in-page error");
+        return EXCEPTION_EXECUTE_HANDLER;
+    }
     if (exceptionCode == 0xE06D7363)
     {
         WriteDebugEvent("FilterException: caught Microsoft C++ exception");
@@ -1318,54 +1462,57 @@ int             FilterException(uint exceptionCode)
 
 namespace
 {
-void WriteDebugEventFormatted(const char* format, HRESULT value)
-{
-    char buffer[160];
-    _snprintf_s(buffer, _countof(buffer), _TRUNCATE, format, value);
-    WriteDebugEvent(buffer);
-}
+    void WriteDebugEventFormatted(const char* format, HRESULT value)
+    {
+        char buffer[160];
+        _snprintf_s(buffer, _countof(buffer), _TRUNCATE, format, value);
+        WriteDebugEvent(buffer);
+    }
 
-HRESULT CallSetRenderTargetWithGuard(IDirect3DDevice9* pDevice, DWORD renderTargetIndex, IDirect3DSurface9* pRenderTarget)
-{
-    HRESULT hr = D3D_OK;
-    __try
+    HRESULT CallSetRenderTargetWithGuard(IDirect3DDevice9* pDevice, DWORD renderTargetIndex, IDirect3DSurface9* pRenderTarget)
     {
-        hr = pDevice->SetRenderTarget(renderTargetIndex, pRenderTarget);
+        HRESULT hr = D3D_OK;
+        __try
+        {
+            hr = pDevice->SetRenderTarget(renderTargetIndex, pRenderTarget);
+        }
+        __except (FilterException(GetExceptionCode()))
+        {
+            CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 15 * 1000000);
+            hr = D3DERR_INVALIDCALL;
+        }
+        return hr;
     }
-    __except (FilterException(GetExceptionCode()))
-    {
-        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 15 * 1000000);
-    }
-    return hr;
-}
 
-HRESULT CallSetDepthStencilSurfaceWithGuard(IDirect3DDevice9* pDevice, IDirect3DSurface9* pNewZStencil)
-{
-    HRESULT hr = D3D_OK;
-    __try
+    HRESULT CallSetDepthStencilSurfaceWithGuard(IDirect3DDevice9* pDevice, IDirect3DSurface9* pNewZStencil)
     {
-        hr = pDevice->SetDepthStencilSurface(pNewZStencil);
+        HRESULT hr = D3D_OK;
+        __try
+        {
+            hr = pDevice->SetDepthStencilSurface(pNewZStencil);
+        }
+        __except (FilterException(GetExceptionCode()))
+        {
+            CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 16 * 1000000);
+            hr = D3DERR_INVALIDCALL;
+        }
+        return hr;
     }
-    __except (FilterException(GetExceptionCode()))
-    {
-        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 16 * 1000000);
-    }
-    return hr;
-}
 
-HRESULT CallCreateAdditionalSwapChainWithGuard(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DSwapChain9** pSwapChain)
-{
-    HRESULT hr = D3D_OK;
-    __try
+    HRESULT CallCreateAdditionalSwapChainWithGuard(IDirect3DDevice9* pDevice, D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DSwapChain9** pSwapChain)
     {
-        hr = pDevice->CreateAdditionalSwapChain(pPresentationParameters, pSwapChain);
+        HRESULT hr = D3D_OK;
+        __try
+        {
+            hr = pDevice->CreateAdditionalSwapChain(pPresentationParameters, pSwapChain);
+        }
+        __except (FilterException(GetExceptionCode()))
+        {
+            CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 17 * 1000000);
+            hr = D3DERR_INVALIDCALL;
+        }
+        return hr;
     }
-    __except (FilterException(GetExceptionCode()))
-    {
-        CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 17 * 1000000);
-    }
-    return hr;
-}
 }
 
 /////////////////////////////////////////////////////////////
@@ -1379,8 +1526,12 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRI
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawPrimitive(PrimitiveType, StartVertex, PrimitiveCount);
 
-    bool     bDeviceTemporarilyLost = false;
-    HRESULT  hrCooperativeLevel = D3DERR_INVALIDCALL;
+    // Skip draws briefly after a hardware fault; PresentGuarded ticks the counter.
+    if (ms_uiFramesSinceDeviceFault < 2)
+        return D3D_OK;
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
     if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
     {
         if (bDeviceTemporarilyLost)
@@ -1404,7 +1555,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRI
         uint viMinBased = StartVertex;
         uint viMaxBased = NumVertices + StartVertex;
 
-    if (!AreVertexStreamsBigEnough(pDevice, viMinBased, viMaxBased))
+        if (!AreVertexStreamsBigEnough(pDevice, viMinBased, viMaxBased))
             return hr;
     }
 
@@ -1415,6 +1566,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRI
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 1 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
     return hr;
 }
@@ -1432,8 +1584,11 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded(IDirect3DDevice9* pDevice,
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawIndexedPrimitive(PrimitiveType, BaseVertexIndex, MinVertexIndex, NumVertices, startIndex, primCount);
 
-    bool     bDeviceTemporarilyLost = false;
-    HRESULT  hrCooperativeLevel = D3DERR_INVALIDCALL;
+    if (ms_uiFramesSinceDeviceFault < 2)
+        return D3D_OK;
+
+    bool    bDeviceTemporarilyLost = false;
+    HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
     if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
     {
         if (bDeviceTemporarilyLost)
@@ -1441,7 +1596,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded(IDirect3DDevice9* pDevice,
 
         if (hrCooperativeLevel != D3D_OK)
             return hrCooperativeLevel;
-    RunBorderlessToneMap(pDevice);
+        RunBorderlessToneMap(pDevice);
         return D3DERR_INVALIDCALL;
     }
 
@@ -1461,6 +1616,7 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveGuarded(IDirect3DDevice9* pDevice,
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 2 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
     return hr;
 }
@@ -1477,6 +1633,9 @@ HRESULT CDirect3DEvents9::DrawPrimitiveUPGuarded(IDirect3DDevice9* pDevice, D3DP
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawPrimitiveUP(PrimitiveType, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
+
+    if (ms_uiFramesSinceDeviceFault < 2)
+        return D3D_OK;
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
@@ -1500,6 +1659,7 @@ HRESULT CDirect3DEvents9::DrawPrimitiveUPGuarded(IDirect3DDevice9* pDevice, D3DP
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 3 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1517,8 +1677,11 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveUPGuarded(IDirect3DDevice9* pDevic
                                                         CONST void* pVertexStreamZeroData, UINT VertexStreamZeroStride)
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
-        return pDevice->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat,
-                                               pVertexStreamZeroData, VertexStreamZeroStride);
+        return pDevice->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat, pVertexStreamZeroData,
+                                               VertexStreamZeroStride);
+
+    if (ms_uiFramesSinceDeviceFault < 2)
+        return D3D_OK;
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
@@ -1537,12 +1700,13 @@ HRESULT CDirect3DEvents9::DrawIndexedPrimitiveUPGuarded(IDirect3DDevice9* pDevic
 
     __try
     {
-        hr = pDevice->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat,
-                                             pVertexStreamZeroData, VertexStreamZeroStride);
+        hr = pDevice->DrawIndexedPrimitiveUP(PrimitiveType, MinVertexIndex, NumVertices, PrimitiveCount, pIndexData, IndexDataFormat, pVertexStreamZeroData,
+                                             VertexStreamZeroStride);
     }
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 4 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1559,6 +1723,9 @@ HRESULT CDirect3DEvents9::DrawRectPatchGuarded(IDirect3DDevice9* pDevice, UINT H
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawRectPatch(Handle, pNumSegs, pRectPatchInfo);
+
+    if (ms_uiFramesSinceDeviceFault < 2)
+        return D3D_OK;
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
@@ -1582,6 +1749,7 @@ HRESULT CDirect3DEvents9::DrawRectPatchGuarded(IDirect3DDevice9* pDevice, UINT H
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 6 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1598,6 +1766,9 @@ HRESULT CDirect3DEvents9::DrawTriPatchGuarded(IDirect3DDevice9* pDevice, UINT Ha
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->DrawTriPatch(Handle, pNumSegs, pTriPatchInfo);
+
+    if (ms_uiFramesSinceDeviceFault < 2)
+        return D3D_OK;
 
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
@@ -1621,6 +1792,7 @@ HRESULT CDirect3DEvents9::DrawTriPatchGuarded(IDirect3DDevice9* pDevice, UINT Ha
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 7 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1661,6 +1833,7 @@ HRESULT CDirect3DEvents9::ProcessVerticesGuarded(IDirect3DDevice9* pDevice, UINT
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 8 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1700,6 +1873,7 @@ HRESULT CDirect3DEvents9::ClearGuarded(IDirect3DDevice9* pDevice, DWORD Count, C
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 9 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1739,6 +1913,7 @@ HRESULT CDirect3DEvents9::ColorFillGuarded(IDirect3DDevice9* pDevice, IDirect3DS
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 10 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1779,6 +1954,7 @@ HRESULT CDirect3DEvents9::UpdateSurfaceGuarded(IDirect3DDevice9* pDevice, IDirec
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 11 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1791,8 +1967,7 @@ HRESULT CDirect3DEvents9::UpdateSurfaceGuarded(IDirect3DDevice9* pDevice, IDirec
 // Catch access violations and device-loss states
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::UpdateTextureGuarded(IDirect3DDevice9* pDevice, IDirect3DBaseTexture9* pSourceTexture,
-                                               IDirect3DBaseTexture9* pDestinationTexture)
+HRESULT CDirect3DEvents9::UpdateTextureGuarded(IDirect3DDevice9* pDevice, IDirect3DBaseTexture9* pSourceTexture, IDirect3DBaseTexture9* pDestinationTexture)
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->UpdateTexture(pSourceTexture, pDestinationTexture);
@@ -1819,6 +1994,7 @@ HRESULT CDirect3DEvents9::UpdateTextureGuarded(IDirect3DDevice9* pDevice, IDirec
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 12 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1831,8 +2007,7 @@ HRESULT CDirect3DEvents9::UpdateTextureGuarded(IDirect3DDevice9* pDevice, IDirec
 // Catch access violations and device-loss states
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::GetRenderTargetDataGuarded(IDirect3DDevice9* pDevice, IDirect3DSurface9* pRenderTarget,
-                                                     IDirect3DSurface9* pDestSurface)
+HRESULT CDirect3DEvents9::GetRenderTargetDataGuarded(IDirect3DDevice9* pDevice, IDirect3DSurface9* pRenderTarget, IDirect3DSurface9* pDestSurface)
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->GetRenderTargetData(pRenderTarget, pDestSurface);
@@ -1859,6 +2034,7 @@ HRESULT CDirect3DEvents9::GetRenderTargetDataGuarded(IDirect3DDevice9* pDevice, 
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 13 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1898,6 +2074,7 @@ HRESULT CDirect3DEvents9::GetFrontBufferDataGuarded(IDirect3DDevice9* pDevice, U
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 14 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -1998,9 +2175,8 @@ HRESULT CDirect3DEvents9::CreateAdditionalSwapChainGuarded(IDirect3DDevice9* pDe
 // Catch access violations and device-loss states
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::CreateVolumeTextureGuarded(IDirect3DDevice9* pDevice, UINT Width, UINT Height, UINT Depth, UINT Levels, DWORD Usage,
-                                                     D3DFORMAT Format, D3DPOOL Pool, IDirect3DVolumeTexture9** ppVolumeTexture,
-                                                     HANDLE* pSharedHandle)
+HRESULT CDirect3DEvents9::CreateVolumeTextureGuarded(IDirect3DDevice9* pDevice, UINT Width, UINT Height, UINT Depth, UINT Levels, DWORD Usage, D3DFORMAT Format,
+                                                     D3DPOOL Pool, IDirect3DVolumeTexture9** ppVolumeTexture, HANDLE* pSharedHandle)
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->CreateVolumeTexture(Width, Height, Depth, Levels, Usage, Format, Pool, ppVolumeTexture, pSharedHandle);
@@ -2027,6 +2203,7 @@ HRESULT CDirect3DEvents9::CreateVolumeTextureGuarded(IDirect3DDevice9* pDevice, 
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 18 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -2039,8 +2216,8 @@ HRESULT CDirect3DEvents9::CreateVolumeTextureGuarded(IDirect3DDevice9* pDevice, 
 // Catch access violations and device-loss states
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::CreateCubeTextureGuarded(IDirect3DDevice9* pDevice, UINT EdgeLength, UINT Levels, DWORD Usage, D3DFORMAT Format,
-                                                   D3DPOOL Pool, IDirect3DCubeTexture9** ppCubeTexture, HANDLE* pSharedHandle)
+HRESULT CDirect3DEvents9::CreateCubeTextureGuarded(IDirect3DDevice9* pDevice, UINT EdgeLength, UINT Levels, DWORD Usage, D3DFORMAT Format, D3DPOOL Pool,
+                                                   IDirect3DCubeTexture9** ppCubeTexture, HANDLE* pSharedHandle)
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->CreateCubeTexture(EdgeLength, Levels, Usage, Format, Pool, ppCubeTexture, pSharedHandle);
@@ -2067,6 +2244,7 @@ HRESULT CDirect3DEvents9::CreateCubeTextureGuarded(IDirect3DDevice9* pDevice, UI
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 19 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -2079,9 +2257,8 @@ HRESULT CDirect3DEvents9::CreateCubeTextureGuarded(IDirect3DDevice9* pDevice, UI
 // Catch access violations and device-loss states
 //
 /////////////////////////////////////////////////////////////
-HRESULT CDirect3DEvents9::CreateRenderTargetGuarded(IDirect3DDevice9* pDevice, UINT Width, UINT Height, D3DFORMAT Format,
-                                                    D3DMULTISAMPLE_TYPE MultiSample, DWORD MultisampleQuality, BOOL Lockable,
-                                                    IDirect3DSurface9** ppSurface, HANDLE* pSharedHandle)
+HRESULT CDirect3DEvents9::CreateRenderTargetGuarded(IDirect3DDevice9* pDevice, UINT Width, UINT Height, D3DFORMAT Format, D3DMULTISAMPLE_TYPE MultiSample,
+                                                    DWORD MultisampleQuality, BOOL Lockable, IDirect3DSurface9** ppSurface, HANDLE* pSharedHandle)
 {
     if (ms_DiagnosticDebug == EDiagnosticDebug::D3D_6732)
         return pDevice->CreateRenderTarget(Width, Height, Format, MultiSample, MultisampleQuality, Lockable, ppSurface, pSharedHandle);
@@ -2108,6 +2285,7 @@ HRESULT CDirect3DEvents9::CreateRenderTargetGuarded(IDirect3DDevice9* pDevice, U
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 20 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -2149,6 +2327,7 @@ HRESULT CDirect3DEvents9::CreateDepthStencilSurfaceGuarded(IDirect3DDevice9* pDe
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 21 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -2189,6 +2368,7 @@ HRESULT CDirect3DEvents9::CreateOffscreenPlainSurfaceGuarded(IDirect3DDevice9* p
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 22 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -2204,6 +2384,10 @@ HRESULT CDirect3DEvents9::CreateOffscreenPlainSurfaceGuarded(IDirect3DDevice9* p
 HRESULT CDirect3DEvents9::PresentGuarded(IDirect3DDevice9* pDevice, CONST RECT* pSourceRect, CONST RECT* pDestRect, HWND hDestWindowOverride,
                                          CONST RGNDATA* pDirtyRegion)
 {
+    // Tick the fault cooldown so draw calls resume after a short skip.
+    if (ms_uiFramesSinceDeviceFault < UINT_MAX)
+        ++ms_uiFramesSinceDeviceFault;
+
     bool    bDeviceTemporarilyLost = false;
     HRESULT hrCooperativeLevel = D3DERR_INVALIDCALL;
     if (!IsDeviceOperational(pDevice, &bDeviceTemporarilyLost, &hrCooperativeLevel))
@@ -2226,6 +2410,7 @@ HRESULT CDirect3DEvents9::PresentGuarded(IDirect3DDevice9* pDevice, CONST RECT* 
     __except (FilterException(GetExceptionCode()))
     {
         CCore::GetSingleton().OnCrashAverted((uiLastExceptionCode & 0xFFFF) + 5 * 1000000);
+        hr = D3DERR_INVALIDCALL;
     }
 
     return hr;
@@ -2327,7 +2512,6 @@ HRESULT CDirect3DEvents9::CreateTexture(IDirect3DDevice9* pDevice, UINT Width, U
         {
             SString strMessage("CreateTexture fail: hr:%x W:%x H:%x L:%x Usage:%x Format:%x Pool:%x", hr, Width, Height, Levels, Usage, Format, Pool);
             WriteDebugEvent(strMessage);
-            AddReportLog(8612, strMessage);
             CCore::GetSingleton().LogEvent(612, "CreateTexture", "", strMessage);
             return hr;
         }
@@ -2445,8 +2629,8 @@ HRESULT CDirect3DEvents9::CreateVertexDeclaration(IDirect3DDevice9* pDevice, CON
 
     *ppDecl = nullptr;
 
-    HRESULT                          hr = D3D_OK;
-    IDirect3DVertexDeclaration9*     pOriginalDecl = nullptr;
+    HRESULT                      hr = D3D_OK;
+    IDirect3DVertexDeclaration9* pOriginalDecl = nullptr;
 
     hr = pDevice->CreateVertexDeclaration(pVertexElements, ppDecl);
     if (FAILED(hr))
@@ -2544,7 +2728,8 @@ ERenderFormat CDirect3DEvents9::DiscoverReadableDepthFormat(IDirect3DDevice9* pD
                 D3DFORMAT DepthFormat = (D3DFORMAT)checkList[i];
 
                 // Can use this format?
-                if (D3D_OK != pD3D->CheckDeviceFormat(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, displayMode.Format, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, DepthFormat))
+                if (D3D_OK !=
+                    pD3D->CheckDeviceFormat(D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL, displayMode.Format, D3DUSAGE_DEPTHSTENCIL, D3DRTYPE_SURFACE, DepthFormat))
                     continue;
 
                 // Don't check for compatibility with multisampling, as we turn AA off when using readable depth buffer

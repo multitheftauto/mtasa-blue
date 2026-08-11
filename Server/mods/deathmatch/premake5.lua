@@ -3,39 +3,46 @@ project "Deathmatch"
 	kind "SharedLib"
 	targetname "deathmatch"
 	targetdir(buildpath("server/mods/deathmatch"))
+	clangtidy "On"
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
 	filter "system:windows"
 		includedirs { "../../../vendor/sparsehash/src/windows" }
+		-- cpp-httplib (included via CHTTPD.cpp) requires Windows 10+ APIs and enforces _WIN32_WINNT >= 0x0A00
+		removedefines { "_WIN32_WINNT=0x601" }
+		defines { "_WIN32_WINNT=0x0A00" }
 
 	filter {}
-	includedirs {
-		"../../../Shared/sdk",
-		"../../sdk",
-		"../../../vendor/bochs",
-		"../../../vendor/pme",
-		"../../../vendor/zip",
-		"../../../vendor/glob/include",
-		"../../../vendor/zlib",
-		"../../../vendor/pcre",
-		"../../../vendor/json-c",
-		"../../../vendor/lua/src",
-		"../../../vendor/tinygettext",
-		"../../../Shared/gta",
-		"../../../Shared/mods/deathmatch/logic",
-		"../../../Shared/animation",
-		"../../../Shared/publicsdk/include",
-		"../../../vendor/sparsehash/src/",
-		"logic",
-		"utils",
-		"."
-	}
+		includedirs {
+			"../../../Shared/sdk",
+			"../../sdk",
+			"../../../vendor/bochs",
+			"../../../vendor/pme",
+			"../../../vendor/cpp-httplib",
+			"../../../vendor/zip",
+			"../../../vendor/glob/include",
+			"../../../vendor/zlib",
+			"../../../vendor/pcre2",
+			"../../../vendor/json-c",
+			"../../../vendor/lua/src",
+			"../../../vendor/tinygettext",
+			"../../../Shared/gta",
+			"../../../Shared/mods/deathmatch/logic",
+			"../../../Shared/animation",
+			"../../../Shared",
+			"../../../Shared/publicsdk/include",
+			"../../../vendor/sparsehash/src/",
+			"logic",
+			"utils",
+			"."
+		}
 
 	defines { "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Server", "sqlite", "ehs", "cryptopp", "pme", "pcre", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt", "tinygettext",
+		"Lua_Server", "sqlite", "cryptopp", "pme", "pcre2", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt", "tinygettext",
+	}
 	}
 
 	vpaths {
@@ -77,3 +84,7 @@ project "Deathmatch"
 
 	filter "platforms:arm64"
 		targetdir(buildpath("server/arm64"))
+
+	-- 32-bit Windows server is no longer supported
+	filter { "system:windows", "platforms:x86" }
+		flags { "ExcludeFromBuild" }

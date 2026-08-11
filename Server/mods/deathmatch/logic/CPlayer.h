@@ -35,7 +35,7 @@ enum eVoiceState
     VOICESTATE_TRANSMITTING_IGNORED,
 };
 
-#define MOVEMENT_UPDATE_THRESH (5)
+#define MOVEMENT_UPDATE_THRESH   (5)
 #define DISTANCE_FOR_NEAR_VIEWER (310)
 
 struct SViewerInfo
@@ -56,9 +56,11 @@ typedef CFastHashMap<CPlayer*, SViewerInfo> SViewerMapType;
 struct SScreenShotInfo
 {
     bool      bInProgress;
+    bool      bRequested;
     ushort    usNextPartNumber;
     ushort    usScreenShotId;
     long long llTimeStamp;
+    long long llStartTime;
     uint      uiTotalBytes;
     ushort    usTotalParts;
     ushort    usResourceNetId;
@@ -263,6 +265,18 @@ public:
     bool GetTeleported() const noexcept { return m_teleported; }
     void SetTeleported(bool state) noexcept { m_teleported = state; }
 
+    long long     GetLastVoiceDataTime() const noexcept { return m_lastVoiceDataTime; }
+    void          SetLastVoiceDataTime(long long time) noexcept { m_lastVoiceDataTime = time; }
+    unsigned char GetVoiceDataPacketsInInterval() const noexcept { return m_voiceDataPacketsInInterval; }
+    void          SetVoiceDataPacketsInInterval(unsigned char count) noexcept { m_voiceDataPacketsInInterval = count; }
+    void          IncrementVoiceDataPacketsInInterval() noexcept { ++m_voiceDataPacketsInInterval; }
+
+    long long     GetLastVoiceEndTime() const noexcept { return m_lastVoiceEndTime; }
+    void          SetLastVoiceEndTime(long long time) noexcept { m_lastVoiceEndTime = time; }
+    unsigned char GetVoiceEndPacketsInInterval() const noexcept { return m_voiceEndPacketsInInterval; }
+    void          SetVoiceEndPacketsInInterval(unsigned char count) noexcept { m_voiceEndPacketsInInterval = count; }
+    void          IncrementVoiceEndPacketsInInterval() noexcept { ++m_voiceEndPacketsInInterval; }
+
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
 
@@ -340,6 +354,18 @@ public:
     uint                   m_uiD3d9Size;
     SString                m_strD3d9Md5;
     SString                m_strD3d9Sha256;
+
+    // Per-player token bucket throttling for onPlayerResourceStart acks. Genuine duplicates
+    // consume a token; race-condition acks (resource stopped/restarted before the ack arrived)
+    // do not. A sustained flood that exhausts the bucket is counted in m_ResourceStartDrops
+    // and the player is disconnected once the drop count crosses the threshold in CGame.
+    CElapsedTime       m_ResourceStartPacketTimer;
+    unsigned int       m_ResourceStartTokens{50};
+    unsigned long long m_ResourceStartRefillRemainderMs{};
+    unsigned int       m_ResourceStartDrops{};
+    unsigned int       m_uiActiveSatchelCount{};
+    CElapsedTime       m_DetonateSatchelTimer;
+    CElapsedTime       m_DestroySatchelTimer;
 
 private:
     SLightweightSyncData m_lightweightSyncData;
@@ -462,5 +488,9 @@ private:
     ushort  m_usPrevDimension;
     SString m_strQuitReasonForLog;
 
-    bool m_teleported = false;
+    bool          m_teleported = false;
+    long long     m_lastVoiceDataTime = 0;
+    unsigned char m_voiceDataPacketsInInterval = 0;
+    long long     m_lastVoiceEndTime = 0;
+    unsigned char m_voiceEndPacketsInInterval = 0;
 };

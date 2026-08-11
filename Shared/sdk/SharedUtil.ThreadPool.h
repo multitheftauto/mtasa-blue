@@ -28,63 +28,69 @@ namespace SharedUtil
             m_vecThreads.reserve(threads);
             for (std::size_t i = 0; i < threads; ++i)
             {
-                m_vecThreads.emplace_back([this] {
-                    while (true)
+                m_vecThreads.emplace_back(
+                    [this]
                     {
-                        std::packaged_task<void(bool)> task;
+                        while (true)
                         {
-                            // Wait until either exit is signalled or a new task arrives
-                            std::unique_lock<std::mutex> lock(m_mutex);
-                            m_cv.wait(lock, [this] { return m_exit || !m_tasks.empty(); });
-                            if (m_exit && m_tasks.empty())
-                                return;
-                            task = std::move(m_tasks.front());
-                            m_tasks.pop();
+                            std::packaged_task<void(bool)> task;
+                            {
+                                // Wait until either exit is signalled or a new task arrives
+                                std::unique_lock<std::mutex> lock(m_mutex);
+                                m_cv.wait(lock, [this] { return m_exit || !m_tasks.empty(); });
+                                if (m_exit && m_tasks.empty())
+                                    return;
+                                task = std::move(m_tasks.front());
+                                m_tasks.pop();
+                            }
+                            // Run the task (catch exceptions to prevent thread death)
+                            try
+                            {
+                                task(false);
+                            }
+                            catch (...)
+                            {
+                                // Exception is automatically captured by std::packaged_task
+                                // and will be re-thrown when future.get() is called.
+                                // We must catch here to prevent the worker thread from terminating.
+                            }
                         }
-                        // Run the task (catch exceptions to prevent thread death)
-                        try
-                        {
-                            task(false);
-                        }
-                        catch (...)
-                        {
-                            // Exception is automatically captured by std::packaged_task
-                            // and will be re-thrown when future.get() is called.
-                            // We must catch here to prevent the worker thread from terminating.
-                        }
-                    }
-                });
+                    });
             }
         };
 
         template <typename Func, typename... Args>
         auto enqueue(Func&& f, Args&&... args)
         {
-#if __cplusplus < 201703L // C++17
+#if __cplusplus < 201703L  // C++17
             using ReturnT = typename std::result_of<Func(Args...)>::type;
 #else
             using ReturnT = std::invoke_result_t<Func, Args...>;
 #endif
-            auto  ff = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
-            auto task = std::make_shared<std::packaged_task<ReturnT()>>(ff);
 
-            // Package the task in a wrapper with a common void result
-            // plus a skip flag for destruction without running the task
-            std::packaged_task<void(bool)> resultTask([task](bool skip) {
-                if (!skip)
-                    (*task)();
-                // task automatically deleted when shared_ptr goes out of scope
-            });
-
-            // Add task to queue and return future
+            auto                 ff = std::bind(std::forward<Func>(f), std::forward<Args>(args)...);
+            auto                 task = std::make_shared<std::packaged_task<ReturnT()>>(ff);
             std::future<ReturnT> res = task->get_future();
+
             {
                 std::unique_lock<std::mutex> lock(m_mutex);
                 if (m_exit)
                 {
-                    // Pool is shutting down - reject new tasks
-                    throw std::runtime_error("Cannot enqueue task: thread pool is shutting down");
+                    // Return failed future instead of throwing (avoids crash if caller ignores result)
+                    lock.unlock();
+                    std::promise<ReturnT> failedPromise;
+                    failedPromise.set_exception(std::make_exception_ptr(std::runtime_error("Cannot enqueue task: thread pool is shutting down")));
+                    return failedPromise.get_future();
                 }
+
+                // Wrap task with skip flag for shutdown cleanup
+                std::packaged_task<void(bool)> resultTask(
+                    [task](bool skip)
+                    {
+                        if (!skip)
+                            (*task)();
+                    });
+
                 m_tasks.emplace(std::move(resultTask));
             }
             m_cv.notify_one();
@@ -95,11 +101,11 @@ namespace SharedUtil
         {
             {
                 std::unique_lock<std::mutex> lock(m_mutex);
-                
+
                 // Already shutting down or shut down
                 if (m_exit)
                     return;
-                
+
                 m_exit = true;
 
                 // Clear all remaining tasks (they will be destroyed automatically)
@@ -120,6 +126,13 @@ namespace SharedUtil
             }
         }
 
+        // This destructor is never called during normal operation because
+        // getDefaultThreadPool() uses a heap-allocated pool that is never
+        // deleted (see getDefaultThreadPool() for rationale). During normal
+        // server shutdown, ~CGame() calls shutdown() explicitly. If this
+        // destructor is ever reached (abnormal shutdown where ~CGame() is
+        // skipped during atexit), it joins all worker threads as a last
+        // resort to prevent crashes during DLL unload.
         ~CThreadPool() noexcept
         {
             try
@@ -136,8 +149,16 @@ namespace SharedUtil
 
         static CThreadPool& getDefaultThreadPool()
         {
-            static CThreadPool DefaultThreadPool(Clamp<int>(2, std::thread::hardware_concurrency(), 16));
-            return DefaultThreadPool;
+            // Heap-allocated to prevent the static-destruction-order hazard:
+            // function-local static objects are destroyed during atexit, and
+            // any code path that reaches SharedUtil::async() after that point
+            // would access a destroyed mutex (undefined behavior). By never
+            // destroying the pool, getDefaultThreadPool() always returns a
+            // valid reference. The enqueue() m_exit guard handles post-shutdown
+            // calls safely. The explicit shutdown() in ~CGame() joins all
+            // threads during normal server shutdown.
+            static CThreadPool* pDefaultThreadPool = new CThreadPool(Clamp<int>(2, std::thread::hardware_concurrency(), 16));
+            return *pDefaultThreadPool;
         }
 
     private:
@@ -153,4 +174,4 @@ namespace SharedUtil
     {
         return CThreadPool::getDefaultThreadPool().enqueue(std::forward<Args>(args)...);
     }
-}            // namespace SharedUtil
+}  // namespace SharedUtil

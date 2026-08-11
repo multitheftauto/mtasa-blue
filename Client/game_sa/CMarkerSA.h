@@ -23,7 +23,7 @@ public:
     // The following parameter is used when Blip Type is CAR, CHAR or OBJECT
     long PoolIndex;
     // The following parameter is used when Blip Type is COORDS
-    CVector position;            // vec2DBlip;
+    CVector position;  // vec2DBlip;
 
     WORD ReferenceIndex;
 

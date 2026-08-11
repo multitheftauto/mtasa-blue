@@ -14,7 +14,7 @@
 
 DWORD dwDurationAddress = 0x558D1El;
 
-CRopesSAInterface (&CRopesSA::ms_aRopes)[8] = *(CRopesSAInterface(*)[8])0xB768B8;
+CRopesSAInterface (&CRopesSA::ms_aRopes)[8] = *(CRopesSAInterface (*)[8])0xB768B8;
 
 int CRopesSA::CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration)
 {
@@ -23,6 +23,7 @@ int CRopesSA::CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration)
     CVector* pvecPosition = const_cast<CVector*>(&vecPosition);
     // First Push @ 0x558D1D is the duration.
     MemPut((void*)(dwDurationAddress), dwDuration);
+    // clang-format off
     __asm
     {
         push    pvecPosition
@@ -30,6 +31,7 @@ int CRopesSA::CreateRopeForSwatPed(const CVector& vecPosition, DWORD dwDuration)
         add     esp, 0x4
         mov     iReturn, eax
     }
+    // clang-format on
     //   Set it back for SA in case we ever do some other implementation.
     MemPut((DWORD*)(dwDurationAddress), 4000);
     return iReturn;

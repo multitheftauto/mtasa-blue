@@ -41,7 +41,7 @@ public:
     float               m_randomMoveBlendRatio;
     float               m_swimStopTime;
     std::uint32_t       m_timeStep;
-    void*               m_fxSystem;            // FxSystem_cSAInterface*
+    void*               m_fxSystem;  // FxSystem_cSAInterface*
     bool                m_triggerWaterSplash;
     std::uint8_t        m_field61[3];
 };
@@ -53,7 +53,7 @@ public:
     CTaskSimpleSwimSA(CPed* ped, CVector* pos);
 
     const CTaskSimpleSwimSAInterface* GetTaskInterface() const { return static_cast<const CTaskSimpleSwimSAInterface*>(GetInterface()); }
-    CTaskSimpleSwimSAInterface* GetTaskInterface() { return static_cast<CTaskSimpleSwimSAInterface*>(GetInterface()); }
+    CTaskSimpleSwimSAInterface*       GetTaskInterface() { return static_cast<CTaskSimpleSwimSAInterface*>(GetInterface()); }
 
     swimState GetSwimState() const override { return GetTaskInterface()->m_swimState; }
 };

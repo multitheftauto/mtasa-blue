@@ -14,12 +14,29 @@
 #include "lua/CLuaMain.h"
 #include "CGame.h"
 #include "Utils.h"
+#include <array>
+#include <cstdint>
+#include <numeric>
 
 extern CNetServer* g_pRealNetServer;
 
 namespace
 {
-    #define TOP_COUNT (3)
+#define TOP_COUNT (3)
+
+    const auto& GetAllPacketIds()
+    {
+        // Cache the full packet id range once so packet usage stats track the
+        // shared enum automatically whenever new packet types are added.
+        static const auto packetIds = []
+        {
+            std::array<std::uint8_t, NUM_PACKETS> packetIds{};
+            std::iota(packetIds.begin(), packetIds.end(), std::uint8_t{0});
+            return packetIds;
+        }();
+
+        return packetIds;
+    }
 
     struct CTopValue
     {
@@ -47,8 +64,8 @@ namespace
 
     struct CTimeSpan
     {
-        CTopSet acc;             // Accumulator for current period
-        CTopSet prev;            // Result for previous period
+        CTopSet acc;   // Accumulator for current period
+        CTopSet prev;  // Result for previous period
 
         void Pulse(CTimeSpan* above)
         {
@@ -62,10 +79,10 @@ namespace
     class CTimeSpanBlock
     {
     public:
-        CTimeSpan s5;             // 5 second period
-        CTimeSpan s60;            // 60
-        CTimeSpan m5;             // 300
-        CTimeSpan m60;            // 3600
+        CTimeSpan s5;   // 5 second period
+        CTimeSpan s60;  // 60
+        CTimeSpan m5;   // 300
+        CTimeSpan m60;  // 3600
 
         void Pulse1s(int flags)
         {
@@ -95,7 +112,7 @@ namespace
             }
         }
     };
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -200,13 +217,13 @@ void CPerfStatPlayerPacketUsageImpl::DoPulse()
         int flags = 0;
         m_SecondCounter++;
 
-        if (m_SecondCounter % 5 == 0)            // 5 second
+        if (m_SecondCounter % 5 == 0)  // 5 second
             flags |= 1;
-        if (m_SecondCounter % 60 == 0)            // 60 seconds
+        if (m_SecondCounter % 60 == 0)  // 60 seconds
             flags |= 2;
-        if (m_SecondCounter % (5 * 60) == 0)            // 5 mins
+        if (m_SecondCounter % (5 * 60) == 0)  // 5 mins
             flags |= 4;
-        if (m_SecondCounter % (60 * 60) == 0)            // 60 mins
+        if (m_SecondCounter % (60 * 60) == 0)  // 60 mins
             flags |= 8;
 
         m_AllPlayerPacketUsage.Pulse1s(flags);
@@ -223,12 +240,14 @@ void CPerfStatPlayerPacketUsageImpl::DoPulse()
 void CPerfStatPlayerPacketUsageImpl::UpdatePlayerPacketUsage()
 {
     // Get stats from net module
-    uchar      packetIdList[] = {PACKET_ID_COMMAND, PACKET_ID_LUA_EVENT, PACKET_ID_CUSTOM_DATA};
-    const uint uiNumPacketIds = NUMELMS(packetIdList);
-    const uint uiTopCount = TOP_COUNT;
+    const auto& packetIdList = GetAllPacketIds();
+    const uint  uiNumPacketIds = static_cast<uint>(packetIdList.size());
+    const uint  uiTopCount = TOP_COUNT;
 
-    SPlayerPacketUsage stats[uiNumPacketIds * uiTopCount];
-    if (!g_pRealNetServer->GetPlayerPacketUsageStats(packetIdList, uiNumPacketIds, stats, uiTopCount))
+    std::vector<SPlayerPacketUsage> stats(uiNumPacketIds * uiTopCount);
+    // The net server API still takes a mutable pointer even though the packet id
+    // list is read-only, so keep the cast contained at this legacy boundary.
+    if (!g_pRealNetServer->GetPlayerPacketUsageStats(const_cast<std::uint8_t*>(packetIdList.data()), uiNumPacketIds, stats.data(), uiTopCount))
         return;
 
     uint uiPlayerCount = g_pGame->GetPlayerManager()->Count();

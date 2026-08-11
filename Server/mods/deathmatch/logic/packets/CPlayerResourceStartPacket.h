@@ -25,7 +25,7 @@ public:
 
     bool Read(NetBitStreamInterface& BitStream);
 
-    CResource* GetResource() const noexcept { return m_pResource; }
+    CResource*   GetResource() const noexcept { return m_pResource; }
     unsigned int GetStartCounter() const noexcept { return m_startCounter; }
 
 private:

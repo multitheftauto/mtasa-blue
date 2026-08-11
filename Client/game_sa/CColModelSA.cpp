@@ -17,60 +17,35 @@ CColModelSA::CColModelSA()
     m_pInterface = new CColModelSAInterface;
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CColModel_Constructor;
-    
-    try
+    // clang-format off
+    __asm
     {
-        __asm
-        {
-            mov     ecx, dwThis
-            call    dwFunc
-        }
+        mov     ecx, dwThis
+        call    dwFunc
     }
-        catch (...)
-        {
-            // Clean up on constructor failure
-            delete m_pInterface;
-            m_pInterface = nullptr;
-            throw;
-        }    m_bDestroyInterface = true;
-    m_bValid = true;
+    // clang-format on
+    m_bDestroyInterface = true;
 }
 
 CColModelSA::CColModelSA(CColModelSAInterface* pInterface)
 {
     m_pInterface = pInterface;
     m_bDestroyInterface = false;
-    m_bValid = true;
 }
 
 CColModelSA::~CColModelSA()
 {
-    m_bValid = false;
-    
-    if (m_bDestroyInterface && m_pInterface)
+    if (m_bDestroyInterface)
     {
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CColModel_Destructor;
-        
-        try
+        // clang-format off
+        __asm
         {
-            __asm
-            {
-                mov     ecx, dwThis
-                call    dwFunc
-            }
+            mov     ecx, dwThis
+            call    dwFunc
         }
-        catch (...)
-        {
-            // Ensure cleanup completes on exception
-        }
-        
+        // clang-format on
         delete m_pInterface;
-        m_pInterface = nullptr;
     }
-}
-
-void CColModelSA::Destroy()
-{
-    delete this;
 }

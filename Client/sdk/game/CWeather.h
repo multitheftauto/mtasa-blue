@@ -18,7 +18,9 @@ class CWeather
 public:
     virtual unsigned char Get() = 0;
     virtual void          Set(unsigned char primary, unsigned char secondary) = 0;
-    virtual void          Release() = 0;
+    // Zero InterpolationValue so CWeather::Update's wrap branch cannot fire (#4803).
+    virtual void ResyncInterpolationWithGameClock(unsigned char primary, unsigned char secondary) = 0;
+    virtual void Release() = 0;
 
     virtual float GetAmountOfRain() = 0;
     virtual void  SetAmountOfRain(float fAmount) = 0;

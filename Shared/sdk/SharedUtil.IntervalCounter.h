@@ -51,4 +51,4 @@ namespace SharedUtil
         } shared;
     };
 
-}            // namespace SharedUtil
+}  // namespace SharedUtil

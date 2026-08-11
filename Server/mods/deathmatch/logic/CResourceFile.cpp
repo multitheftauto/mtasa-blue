@@ -74,17 +74,37 @@ HttpStatusCode CResourceFile::Request(HttpRequest* ipoHttpRequest, HttpResponse*
         long lBufferLength = ftell(file);
         rewind(file);
 
+        if (lBufferLength < 0)
+        {
+            fclose(file);
+            ipoHttpResponse->SetBody("Failed to determine file size", strlen("Failed to determine file size"));
+            return HTTP_STATUS_CODE_500_INTERNAL_SERVER_ERROR;
+        }
+
         // Allocate and read the entire file
         // TODO: This is inefficient.
-        char* szBuffer = new char[lBufferLength + 1];
-        fread(szBuffer, 1, lBufferLength, file);
-        fclose(file);
+        char* szBuffer = nullptr;
+        try
+        {
+            szBuffer = new char[lBufferLength + 1];
+            size_t bytesRead = fread(szBuffer, 1, lBufferLength, file);
+            fclose(file);
+            file = nullptr;
 
-        //
-        ipoHttpResponse->oResponseHeaders["content-type"] = "application/octet-stream";            // not really the right mime-type
-        ipoHttpResponse->SetBody(szBuffer, lBufferLength);
-        delete[] szBuffer;
-        return HTTP_STATUS_CODE_200_OK;
+            ipoHttpResponse->oResponseHeaders["content-type"] = "application/octet-stream";
+            ipoHttpResponse->SetBody(szBuffer, static_cast<int>(bytesRead));
+            delete[] szBuffer;
+            return HTTP_STATUS_CODE_200_OK;
+        }
+        catch (const std::bad_alloc&)
+        {
+            delete[] szBuffer;
+            if (file)
+                fclose(file);
+
+            ipoHttpResponse->SetBody("Server out of memory", strlen("Server out of memory"));
+            return HTTP_STATUS_CODE_500_INTERNAL_SERVER_ERROR;
+        }
     }
     else
     {

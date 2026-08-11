@@ -15,18 +15,18 @@
 #include "CPedSA.h"
 #include "CWantedSA.h"
 
-#define FUNC_SetInitialState            0x60CD20
-#define FUNC_ClearWeaponTarget          0x533B30
+#define FUNC_SetInitialState   0x60CD20
+#define FUNC_ClearWeaponTarget 0x533B30
 
-#define FUNC_CPedOperatorNew            0x5E4720 // ##SA##
-#define FUNC_CPlayerPedConstructor      0x60D5B0 // ##SA##
+#define FUNC_CPedOperatorNew       0x5E4720  // ##SA##
+#define FUNC_CPlayerPedConstructor 0x60D5B0  // ##SA##
 
-#define FUNC_CPlayerPedDestructor       0x6093B0 // ##SA##
-#define FUNC_CPlayerPedOperatorDelete   0x5E4760 // ##SA##
+#define FUNC_CPlayerPedDestructor     0x6093B0  // ##SA##
+#define FUNC_CPlayerPedOperatorDelete 0x5E4760  // ##SA##
 
-#define FUNC_CPlayerPed_ReApplyMoveAnims    0x609650
+#define FUNC_CPlayerPed_ReApplyMoveAnims 0x609650
 
-#define SIZEOF_CPLAYERPED               1956
+#define SIZEOF_CPLAYERPED 1956
 
 class CPlayerPedSAInterface : public CPedSAInterface
 {
@@ -56,7 +56,7 @@ public:
     void      SetMoveAnim(eMoveAnim iAnimGroup);
 
     CEntity* GetTargetedEntity() const override;
-    void SetTargetedEntity(CEntity* targetEntity) override;
+    void     SetTargetedEntity(CEntity* targetEntity) override;
 
     CPlayerPedSAInterface* GetPlayerPedInterface() const noexcept { return static_cast<CPlayerPedSAInterface*>(m_pInterface); };
 

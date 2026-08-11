@@ -20,7 +20,7 @@ class CConsoleClient final : public CElement, public CClient
 {
 public:
     CConsoleClient(CConsole* pConsole);
-    virtual ~CConsoleClient(){};
+    virtual ~CConsoleClient() {};
 
     int         GetClientType() { return CClient::CLIENT_CONSOLE; };
     const char* GetNick() { return m_strNick; };
@@ -28,7 +28,7 @@ public:
     void SendEcho(const char* szEcho) { CLogger::LogPrintf("%s\n", szEcho); };
     void SendConsole(const char* szEcho) { CLogger::LogPrintf("%s\n", szEcho); };
 
-    void Unlink(){};
+    void Unlink() {};
 
 protected:
     bool ReadSpecialData(const int iLine) override { return false; }

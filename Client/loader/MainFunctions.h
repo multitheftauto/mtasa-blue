@@ -18,6 +18,7 @@ void HandleOnQuitCommand();
 void HandleTrouble();
 void HandleResetSettings();
 void HandleNotUsedMainMenu();
+void ConfigureWerDumpPath();
 void PreLaunchWatchDogs();
 void PostRunWatchDogs(int iReturnCode);
 void HandleIfGTAIsAlreadyRunning();
@@ -27,5 +28,5 @@ void CheckDataFiles();
 void CheckLibVersions();
 int  LaunchGame(SString strCmdLine);
 
-#define EXIT_OK     (0)
-#define EXIT_ERROR  (1)
+#define EXIT_OK    (0)
+#define EXIT_ERROR (1)

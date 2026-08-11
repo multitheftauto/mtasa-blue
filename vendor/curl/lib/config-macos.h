@@ -59,7 +59,7 @@
 /* #undef CURL_DISABLE_IMAP */
 
 /* to disable LDAP */
-#define CURL_DISABLE_LDAP 1
+#define CURL_DISABLE_LDAP
 
 /* to disable LDAPS */
 #define CURL_DISABLE_LDAPS 1
@@ -232,9 +232,6 @@
 
 /* fsetxattr() takes 6 args */
 #define HAVE_FSETXATTR_6 1
-
-/* Define to 1 if you have the ftruncate function. */
-#define HAVE_FTRUNCATE 1
 
 /* Define to 1 if you have a working getaddrinfo function. */
 #define HAVE_GETADDRINFO 1
@@ -410,9 +407,6 @@
 
 /* Define to 1 if you have the <locale.h> header file. */
 #define HAVE_LOCALE_H 1
-
-/* Define to 1 if the compiler supports the 'long long' data type. */
-#define HAVE_LONGLONG 1
 
 /* Define to 1 if you have the `mach_absolute_time' function. */
 #define HAVE_MACH_ABSOLUTE_TIME 1
@@ -659,17 +653,8 @@
 /* Define to 1 if you have the <sys/select.h> header file. */
 #define HAVE_SYS_SELECT_H 1
 
-/* Define to 1 if you have the <sys/socket.h> header file. */
-#define HAVE_SYS_SOCKET_H 1
-
 /* Define to 1 if you have the <sys/sockio.h> header file. */
 #define HAVE_SYS_SOCKIO_H 1
-
-/* Define to 1 if you have the <sys/stat.h> header file. */
-#define HAVE_SYS_STAT_H 1
-
-/* Define to 1 if you have the <sys/time.h> header file. */
-#define HAVE_SYS_TIME_H 1
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1

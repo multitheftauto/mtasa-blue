@@ -18,7 +18,7 @@ class CVehicleManager;
 #include <list>
 
 // Undefined number of passengers (to disable custom passenger seats overriding in CVehicle)
-#define VEHICLE_PASSENGERS_UNDEFINED    255
+#define VEHICLE_PASSENGERS_UNDEFINED 255
 
 class CVehicleManager
 {

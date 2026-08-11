@@ -3,13 +3,14 @@ project "Client Deathmatch"
 	kind "SharedLib"
 	targetname "client"
 	targetdir(buildpath("mods/deathmatch"))
+	clangtidy "On"
 
 	pchheader "StdInc.h"
 	pchsource "StdInc.cpp"
 
 	defines { "LUNASVG_BUILD", "LUA_USE_APICHECK", "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Client", "pcre", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt", "lunasvg", "tinygettext",
+		"Lua_Client", "pcre2", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt", "lunasvg", "tinygettext",
 		"../../../vendor/bass/lib/bass",
 		"../../../vendor/bass/lib/bass_fx",
 		"../../../vendor/bass/lib/bassmix",
@@ -32,17 +33,19 @@ project "Client Deathmatch"
 			".",
 			"./logic",
 			"../../sdk/",
+			"../../",
 			"../../../vendor/pthreads/include",
 			"../../../vendor/bochs",
 			"../../../vendor/bass",
 			"../../../vendor/libspeex",
 			"../../../vendor/zlib",
-		"../../../vendor/pcre",
-		"../../../vendor/json-c",
-		"../../../vendor/lua/src",
-		"../../../vendor/tinygettext",
-		"../../../Shared/mods/deathmatch/logic",
+			"../../../vendor/pcre2",
+			"../../../vendor/json-c",
+			"../../../vendor/lua/src",
+			"../../../vendor/tinygettext",
+			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",
+			"../../../Shared",
 			"../../../vendor/sparsehash/src/",
 			"../../../vendor/lunasvg/include"
 	}

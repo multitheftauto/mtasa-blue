@@ -26,7 +26,7 @@ public:
     float        m_fAccelerationBreakStatusPrev;
     float        m_fSteeringFactor;
     float        field_9A0;
-    float        m_planeCreationHeading;            // The heading when plane is created or placed on road properly
+    float        m_planeCreationHeading;  // The heading when plane is created or placed on road properly
     float        m_maxAltitude;
     float        m_altitude;
     float        m_minAltitude;
@@ -34,7 +34,7 @@ public:
     float        m_planeHeadingPrev;
     float        m_forwardZ;
     uint32_t     m_nStartedFlyingTime;
-    float        m_fPropSpeed;            // Rotor speed 0x09C4
+    float        m_fPropSpeed;  // Rotor speed 0x09C4
     float        field_9C8;
     float        m_fLandingGearStatus;
     int32_t      m_planeDamageWave;

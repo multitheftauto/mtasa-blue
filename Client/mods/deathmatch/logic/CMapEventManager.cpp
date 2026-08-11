@@ -120,7 +120,8 @@ void CMapEventManager::DeleteAll()
     m_bHasEvents = !m_EventsMap.empty();
 }
 
-bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, class CClientEntity* pSource, class CClientEntity* pThis)
+bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, class CClientEntity* pSource, class CClientEntity* pThis,
+                            const char* minClientVersion)
 {
     // Check if no events
     if (!m_bHasEvents)
@@ -144,6 +145,7 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
 
     // Copy the results into a array in case m_EventsMap is modified during the call
     std::vector<CMapEvent*> matchingEvents;
+    matchingEvents.reserve(8);
     for (EventsIter iter = itPair.first; iter != itPair.second; ++iter)
         matchingEvents.push_back(iter->second);
 
@@ -161,13 +163,20 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                 if (pSource == pThis || pMapEvent->IsPropagated())
                 {
                     // Grab the current VM
-                    lua_State* pState = pMapEvent->GetVM()->GetVM();
+                    CLuaMain*  luaMain = pMapEvent->GetVM();
+                    lua_State* pState = luaMain->GetVM();
 
-                    LUA_CHECKSTACK(pState, 1);            // Ensure some room
+                    if (minClientVersion != nullptr)
+                    {
+                        if (luaMain->GetResource()->GetMinClientReq() < minClientVersion)
+                            continue;
+                    }
 
-                    #if MTA_DEBUG
+                    LUA_CHECKSTACK(pState, 1);  // Ensure some room
+
+#if MTA_DEBUG
                     int luaStackPointer = lua_gettop(pState);
-                    #endif
+#endif
 
                     TIMEUS startTime = GetTimeUs();
 
@@ -182,7 +191,7 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     // Record event for the crash dump writer
                     static bool bEnabled = (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::LUA_TRACE_0000);
                     if (bEnabled)
-                        g_pCore->LogEvent(0, "Lua Event", pMapEvent->GetVM()->GetScriptName(), szName);
+                        g_pCore->LogEvent(0, "Lua Event", luaMain->GetScriptName(), szName);
 
                     if (!g_pClientGame->GetDebugHookManager()->OnPreEventFunction(szName, Arguments, pSource, nullptr, pMapEvent))
                         continue;
@@ -259,9 +268,9 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     OldEventName.Push(pState);
                     lua_setglobal(pState, "eventName");
 
-                    #if MTA_DEBUG
+#if MTA_DEBUG
                     assert(lua_gettop(pState) == luaStackPointer);
-                    #endif
+#endif
 
                     // Aspect ratio adjustment bodges
                     if (pMapEvent->ShouldAllowAspectRatioAdjustment())
@@ -274,9 +283,9 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
 
                     if (deltaTimeUs > 3000)
                         if (IS_TIMING_CHECKPOINTS())
-                            strStatus += SString(" (%s %d ms)", pMapEvent->GetVM()->GetScriptName(), deltaTimeUs / 1000);
+                            strStatus += SString(" (%s %d ms)", luaMain->GetScriptName(), deltaTimeUs / 1000);
 
-                    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pMapEvent->GetVM(), szName, deltaTimeUs);
+                    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(luaMain, szName, deltaTimeUs);
                 }
             }
         }

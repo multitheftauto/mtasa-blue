@@ -17,7 +17,7 @@
 class CXMLAttribute : public CXMLCommon
 {
 public:
-    virtual ~CXMLAttribute(){};
+    virtual ~CXMLAttribute() {};
 
     virtual const std::string  GetName() const = 0;
     virtual const std::string& GetValue() const = 0;

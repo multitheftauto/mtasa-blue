@@ -55,7 +55,7 @@ void CLuaXMLDefs::AddClass(lua_State* luaVM)
 #ifndef MTA_CLIENT
     lua_classfunction(luaVM, "loadMapData", "loadMapData");
     lua_classfunction(luaVM, "saveMapData", "saveMapData");
-#endif // !MTA_CLIENT
+#endif  // !MTA_CLIENT
 
     lua_classfunction(luaVM, "getValue", "xmlNodeGetValue");
     lua_classfunction(luaVM, "setAttribute", "xmlNodeSetAttribute");
@@ -85,7 +85,7 @@ int CLuaXMLDefs::xmlCreateFile(lua_State* luaVM)
 #ifndef MTA_CLIENT
     if (lua_type(luaVM, 3) == LUA_TLIGHTUSERDATA)
         m_pScriptDebugging->LogCustom(luaVM, "xmlCreateFile may be using an outdated syntax. Please check and update.");
-#endif // !MTA_CLIENT
+#endif  // !MTA_CLIENT
 
     // Grab our resource
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -101,7 +101,7 @@ int CLuaXMLDefs::xmlCreateFile(lua_State* luaVM)
         {
             SString    strPath;
             CResource* pThisResource = pLuaMain->GetResource();
-            CResource* pOtherResource = pThisResource;            // clientside, this variable will always be pThisResource
+            CResource* pOtherResource = pThisResource;  // clientside, this variable will always be pThisResource
 
             // Resolve other resource from name
             if (CResourceManager::ParseResourcePathInput(strInputPath, pOtherResource, &strPath, nullptr))
@@ -144,7 +144,7 @@ int CLuaXMLDefs::xmlLoadFile(lua_State* luaVM)
 #ifndef MTA_CLIENT
     if (lua_type(luaVM, 2) == LUA_TLIGHTUSERDATA)
         m_pScriptDebugging->LogCustom(luaVM, "xmlLoadFile may be using an outdated syntax. Please check and update.");
-#endif // !MTA_CLIENT
+#endif  // !MTA_CLIENT
 
     // Grab our resource
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -250,7 +250,7 @@ int CLuaXMLDefs::xmlCopyFile(lua_State* luaVM)
 #ifndef MTA_CLIENT
     if (lua_type(luaVM, 3) == LUA_TLIGHTUSERDATA)
         m_pScriptDebugging->LogCustom(luaVM, "xmlCopyFile may be using an outdated syntax. Please check and update.");
-#endif // !MTA_CLIENT
+#endif  // !MTA_CLIENT
 
     // Grab our resource
     CLuaMain* pLUA = m_pLuaManager->GetVirtualMachine(luaVM);

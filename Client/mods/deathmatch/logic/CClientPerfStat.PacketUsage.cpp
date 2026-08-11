@@ -247,7 +247,7 @@ void CClientPerfStatPacketUsageImpl::GetStats(CClientPerfStatResult* pResult, co
             row[c++] = SString("%d", (statInDelta.iCount + 4) / 5);
             row[c++] = SString("%d", (statInDelta.iTotalBytes + 4) / 5);
             row[c++] = SString("%2.2f%%",
-                               statInDelta.totalTime / 50000.f);            // Number of microseconds in sample period ( 5sec * 1000000 ) into percent ( * 100 )
+                               statInDelta.totalTime / 50000.f);  // Number of microseconds in sample period ( 5sec * 1000000 ) into percent ( * 100 )
         }
         else
         {

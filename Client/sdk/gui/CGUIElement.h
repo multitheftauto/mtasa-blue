@@ -47,7 +47,7 @@ enum eCGUIType
 class CGUIElement
 {
 public:
-    virtual ~CGUIElement(){};
+    virtual ~CGUIElement() {};
 
     virtual void SetVisible(bool bVisible) = 0;
     virtual bool IsVisible() = 0;

@@ -17,8 +17,8 @@
 class CEntitySAInterface;
 class FxSystem_c;
 
-#define FUNC_Extinguish                 0x5393F0
-#define FUNC_CreateFxSysForStrength     0x539360
+#define FUNC_Extinguish             0x5393F0
+#define FUNC_CreateFxSysForStrength 0x539360
 
 class CFireSAInterface
 {
