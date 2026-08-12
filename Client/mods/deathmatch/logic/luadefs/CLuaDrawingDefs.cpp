@@ -630,7 +630,7 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
     }
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
@@ -688,7 +688,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
     }
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
@@ -737,7 +737,7 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
     }
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
@@ -791,7 +791,7 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
     }
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {

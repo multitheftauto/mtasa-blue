@@ -1587,7 +1587,7 @@ int CLuaElementDefs::setElementData(lua_State* luaVM)
         }
     }
     else
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1622,7 +1622,7 @@ int CLuaElementDefs::removeElementData(lua_State* luaVM)
         }
     }
     else
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1651,7 +1651,7 @@ int CLuaElementDefs::addElementDataSubscriber(lua_State* luaVM)
         }
     }
     else
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1680,7 +1680,7 @@ int CLuaElementDefs::removeElementDataSubscriber(lua_State* luaVM)
         }
     }
     else
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -1707,7 +1707,7 @@ int CLuaElementDefs::hasElementDataSubscriber(lua_State* luaVM)
         return 1;
     }
 
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaElementDefs::setElementMatrix(lua_State* luaVM)

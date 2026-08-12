@@ -680,7 +680,7 @@ int CLuaPedDefs::OOP_GetPedTargetStart(lua_State* luaVM)
     argStream.ReadUserData(pPed);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     CVector vecStart;
 
@@ -727,7 +727,7 @@ int CLuaPedDefs::OOP_GetPedTargetEnd(lua_State* luaVM)
     argStream.ReadUserData(pPed);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     CVector vecEnd;
 
@@ -775,7 +775,7 @@ int CLuaPedDefs::OOP_GetPedTargetCollision(lua_State* luaVM)
     argStream.ReadUserData(pPed);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     CVector vecCollision;
     if (CStaticFunctionDefinitions::GetPedTargetCollision(*pPed, vecCollision))
