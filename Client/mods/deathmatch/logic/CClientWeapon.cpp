@@ -254,13 +254,12 @@ void CClientWeapon::Fire(bool bServerFire)
                     {
                         if (m_pTarget->GetType() == CCLIENTVEHICLE)
                         {
-                            if (m_itargetWheel <= MAX_WHEELS)
-                            {
-                                CClientVehicle* pTarget = (CClientVehicle*)(CClientEntity*)m_pTarget;
-                                vecTarget = pTarget->GetGameVehicle()->GetWheelPosition((eWheelPosition)m_itargetWheel);
-                            }
+                            CClientVehicle* pTarget = (CClientVehicle*)(CClientEntity*)m_pTarget;
+                            CVehicle*       pGameVehicle = pTarget->GetGameVehicle();
+                            if (m_itargetWheel >= 0 && m_itargetWheel < MAX_WHEELS && pGameVehicle)
+                                vecTarget = pGameVehicle->GetWheelPosition((eWheelPosition)m_itargetWheel);
                             else
-                                m_pTarget->GetPosition(vecTarget);
+                                pTarget->GetPosition(vecTarget);
                         }
                         else
                             m_pTarget->GetPosition(vecTarget);

@@ -78,6 +78,9 @@ public:
 
     void ShowNetworkNotReadyWindow();
 
+    // Returns false and shows a dialog if the local server cannot run on this OS (e.g. 32-bit).
+    bool WarnIfLocalServerUnsupported();
+
 private:
     sMenuItem* CreateItem(unsigned char menuType, const char* szFilename, CVector2D vecRelPosition);
     bool       SetItemHoverProgress(sMenuItem* pItem, float fProgress, bool bHovering);
@@ -170,12 +173,6 @@ private:
     std::unique_ptr<CGUITexture>     m_pFeatureBranchAlertTexture;
     std::unique_ptr<CGUIStaticImage> m_pFeatureBranchAlertImage;
     std::unique_ptr<CGUILabel>       m_pFeatureBranchAlertLabel;
-#endif
-
-#if _WIN32_WINNT <= _WIN32_WINNT_WINXP
-    std::unique_ptr<CGUITexture>     m_pAlertTexture;
-    std::unique_ptr<CGUIStaticImage> m_pAlertImage;
-    std::unique_ptr<CGUILabel>       m_pAlertLabel;
 #endif
 
     // Fade states

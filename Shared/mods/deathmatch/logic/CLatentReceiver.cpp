@@ -128,6 +128,15 @@ void CLatentReceiver::OnReceive(NetBitStreamInterface* pBitStream)
         if (uiFinalSize > 100 * 1024 * 1024)
             return OnReceiveError("uiFinalSize too large");
 
+        // CATEGORY_PACKET reassembles raw packet data and feeds it into
+        // the main packet dispatch (CGame::StaticProcessPacket). Without
+        // a tighter cap, an attacker can craft a 100MB payload targeting
+        // packet handlers that scale poorly with input size (e.g.
+        // CPlayerModInfoPacket). 10MB is well above any legitimate use.
+        constexpr uint LATENT_PACKET_MAX_SIZE = 10 * 1024 * 1024;
+        if (usCategory == CATEGORY_PACKET && uiFinalSize > LATENT_PACKET_MAX_SIZE)
+            return OnReceiveError("CATEGORY_PACKET payload too large");
+
         activeRx.usId = usId;
         activeRx.bReceiveStarted = true;
         activeRx.usCategory = usCategory;

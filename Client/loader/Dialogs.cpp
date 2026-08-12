@@ -181,6 +181,143 @@ void InitDialogStrings(HWND hwndDialog, const SDialogItemInfo* dialogItems)
 
 ///////////////////////////////////////////////////////////////////////////
 //
+// Dialog control anchoring
+//
+//
+///////////////////////////////////////////////////////////////////////////
+
+enum AnchorFlags
+{
+    ANCHOR_LEFT = 1 << 0,      // Left edge is fixed
+    ANCHOR_TOP = 1 << 1,       // Top edge is fixed
+    ANCHOR_RIGHT = 1 << 2,     // Right edge moves with dialog right
+    ANCHOR_BOTTOM = 1 << 3,    // Bottom edge moves with dialog bottom
+    ANCHOR_CENTER_H = 1 << 4,  // Maintain horizontal center offset from dialog center
+    ANCHOR_CENTER_V = 1 << 5,  // Maintain vertical center offset from dialog center
+
+    // Convenience combos
+    ANCHOR_STACK = ANCHOR_LEFT | ANCHOR_RIGHT | ANCHOR_BOTTOM,
+    ANCHOR_FILL = ANCHOR_LEFT | ANCHOR_RIGHT | ANCHOR_TOP | ANCHOR_BOTTOM,
+};
+
+struct ControlAnchor
+{
+    HWND control;
+    UINT flags;
+    RECT initialRect;
+};
+
+struct DialogAnchors
+{
+    SIZE                       initialSize;
+    std::vector<ControlAnchor> anchors;
+};
+
+static DialogAnchors g_CrashedDialogAnchors{};
+
+static void InitDialogAnchors(HWND dialog, DialogAnchors& d, std::initializer_list<std::pair<int, UINT>> definitions)
+{
+    RECT rect{};
+
+    if (!GetClientRect(dialog, &rect))
+        return;
+
+    d.initialSize = {rect.right, rect.bottom};
+    d.anchors.reserve(definitions.size());
+    d.anchors.clear();
+
+    for (auto& [id, flags] : definitions)
+    {
+        HWND control = GetDlgItem(dialog, id);
+
+        if (!control)
+            continue;
+
+        GetWindowRect(control, &rect);
+        MapWindowPoints(HWND_DESKTOP, dialog, reinterpret_cast<LPPOINT>(&rect), 2);
+
+        d.anchors.emplace_back(ControlAnchor{control, flags, rect});
+    }
+}
+
+static void HandleDialogResize(HWND dialog, DialogAnchors& d, int newWidth, int newHeight)
+{
+    int deltaW = newWidth - d.initialSize.cx;
+    int deltaH = newHeight - d.initialSize.cy;
+
+    HDWP hdwp = BeginDeferWindowPos(static_cast<int>(d.anchors.size()));
+
+    for (const auto& anchor : d.anchors)
+    {
+        RECT r = anchor.initialRect;
+
+        // Adjust left/right edges
+        if (!(anchor.flags & ANCHOR_LEFT))
+            r.left += deltaW;
+        if (anchor.flags & ANCHOR_RIGHT)
+            r.right += deltaW;
+
+        // Adjust top/bottom edges
+        if (!(anchor.flags & ANCHOR_TOP))
+            r.top += deltaH;
+        if (anchor.flags & ANCHOR_BOTTOM)
+            r.bottom += deltaH;
+
+        if (anchor.flags & ANCHOR_CENTER_H)
+        {
+            int ctrlW = anchor.initialRect.right - anchor.initialRect.left;
+            int ctrlCenterX = (anchor.initialRect.left + anchor.initialRect.right) / 2;
+            int offsetFromCenter = ctrlCenterX - (d.initialSize.cx / 2);
+
+            r.left = (newWidth / 2) + offsetFromCenter - ctrlW / 2;
+            r.right = r.left + ctrlW;
+        }
+
+        if (anchor.flags & ANCHOR_CENTER_V)
+        {
+            int ctrlH = anchor.initialRect.bottom - anchor.initialRect.top;
+            int ctrlCenterY = (anchor.initialRect.top + anchor.initialRect.bottom) / 2;
+            int offsetFromCenter = ctrlCenterY - (d.initialSize.cy / 2);
+
+            r.top = (newHeight / 2) + offsetFromCenter - ctrlH / 2;
+            r.bottom = r.top + ctrlH;
+        }
+
+        hdwp = DeferWindowPos(hdwp, anchor.control, nullptr, r.left, r.top, r.right - r.left, r.bottom - r.top, SWP_NOZORDER | SWP_NOACTIVATE);
+    }
+
+    EndDeferWindowPos(hdwp);
+    RedrawWindow(dialog, nullptr, nullptr, RDW_INVALIDATE | RDW_ALLCHILDREN | RDW_ERASE);
+}
+
+static void ClampWindowToMonitor(HWND window, LONG desktopPadding = 10)
+{
+    RECT windowRect;
+    GetWindowRect(window, &windowRect);
+
+    HMONITOR    monitor = MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST);
+    MONITORINFO mi = {sizeof(mi)};
+    GetMonitorInfoW(monitor, &mi);
+
+    RECT desktop = mi.rcWork;
+    desktop.left += desktopPadding;
+    desktop.top += desktopPadding;
+    desktop.right -= desktopPadding;
+    desktop.bottom -= desktopPadding;
+
+    const LONG desktopWidth = desktop.right - desktop.left;
+    const LONG desktopHeight = desktop.bottom - desktop.top;
+
+    const LONG w = std::min(windowRect.right - windowRect.left, desktopWidth);
+    const LONG h = std::min(windowRect.bottom - windowRect.top, desktopHeight);
+    const LONG x = desktop.left + (desktopWidth - w) / 2;
+    const LONG y = desktop.top + (desktopHeight - h) / 2;
+
+    SetWindowPos(window, nullptr, x, y, w, h, SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
+///////////////////////////////////////////////////////////////////////////
+//
 // DialogProc
 //
 // Generic callback for all our dialogs
@@ -207,6 +344,14 @@ int CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             {
                 if (wParam == SC_CLOSE || wParam == SC_MINIMIZE || wParam == SC_MAXIMIZE)
                     return TRUE;
+            }
+            break;
+
+        case WM_SIZE:
+            if (hwnd == hwndCrashedDialog)
+            {
+                HandleDialogResize(hwnd, g_CrashedDialogAnchors, LOWORD(lParam), HIWORD(lParam));
+                return TRUE;
             }
             break;
 
@@ -567,6 +712,26 @@ void StopPseudoProgress()
                 {
                 }
             }
+
+            // clang-format off
+            InitDialogAnchors(hwndCrashedDialog, g_CrashedDialogAnchors,
+            {
+                // Crash information
+                {IDC_CRASH_HEAD,      ANCHOR_FILL},  // Groupbox
+                {IDC_CRASH_INFO_EDIT, ANCHOR_FILL},  // Multi-line edit
+                // Upload user consent
+                {IDC_CHECKBOX_GROUP,   ANCHOR_STACK},  // Groupbox around consent checkbox
+                {IDC_SEND_DUMP_CHECK,  ANCHOR_STACK},  // Consent checkbox
+                {IDC_SEND_DESC_STATIC, ANCHOR_STACK},  // Consent info text
+                // Buttons
+                {IDC_RESTART_QUESTION_STATIC, ANCHOR_STACK},                     // Restart question at the bottom
+                {IDOK,                        ANCHOR_CENTER_H | ANCHOR_BOTTOM},  // Button "Yes"
+                {IDCANCEL,                    ANCHOR_CENTER_H | ANCHOR_BOTTOM},  // Button "No"
+            });
+            // clang-format on
+
+            // Clamp window size after computing initial anchor data.
+            ClampWindowToMonitor(hwndCrashedDialog);
         }
         if (!hwndCrashedDialog) [[unlikely]]
         {

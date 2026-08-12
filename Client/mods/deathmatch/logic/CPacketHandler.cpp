@@ -1659,7 +1659,11 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
         CDeathmatchVehicle* pVehicle = static_cast<CDeathmatchVehicle*>(g_pClientGame->m_pVehicleManager->Get(ID));
         if (pVehicle)
         {
-            bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
+            // Do not spawn flying components for already-blown vehicles.
+            // Physics collisions and burn explosions can trigger repeated
+            // damage syncs which would each spawn flying components on an
+            // already-destroyed vehicle.
+            bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS) && !pVehicle->IsBlown();
 
             for (unsigned char i = 0; i < MAX_DOORS; ++i)
             {
@@ -3368,7 +3372,9 @@ retry:
                     pVehicle->SetPaintjob(paintjob.data.ucPaintjob);
                     pVehicle->SetColor(vehColor);
 
-                    bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
+                    // Do not spawn flying components for already-blown vehicles
+                    // when applying damage states.
+                    bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS) && !pVehicle->IsBlown();
                     // Setup our damage model
                     for (unsigned char i = 0; i < MAX_DOORS; i++)
                         pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], flyingComponents);
@@ -3569,11 +3575,20 @@ retry:
                         bitStream.Read(ucSirenCount);
                         bitStream.Read(ucSirenType);
 
-                        pVehicle->GiveVehicleSirens(ucSirenType, ucSirenCount);
+                        // The count comes straight off the wire and is used to index a fixed size array.
+                        // Keep reading the entries the packet claims to hold so the stream stays aligned,
+                        // but only store the ones that fit.
+                        unsigned char ucStoredSirenCount = std::min<unsigned char>(ucSirenCount, SIREN_COUNT_MAX);
+
+                        pVehicle->GiveVehicleSirens(ucSirenType, ucStoredSirenCount);
                         for (unsigned char i = 0; i < ucSirenCount; i++)
                         {
                             SVehicleSirenSync sirenData;
                             bitStream.Read(&sirenData);
+
+                            if (i >= ucStoredSirenCount)
+                                continue;
+
                             pVehicle->SetVehicleSirenPosition(i, sirenData.data.m_vecSirenPositions);
                             pVehicle->SetVehicleSirenColour(i, sirenData.data.m_colSirenColour);
                             pVehicle->SetVehicleSirenMinimumAlpha(i, sirenData.data.m_dwSirenMinAlpha);
@@ -4175,11 +4190,6 @@ retry:
                     {
                         pWater =
                             new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
-                    }
-                    if (!pWater->Exists())
-                    {
-                        delete pWater;
-                        pWater = NULL;
                     }
                     pEntity = pWater;
                     break;
@@ -5458,7 +5468,7 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
 
         if (pPlayer && bitStream.Read(voiceBufferLength) && voiceBufferLength <= 2048)
         {
-            const auto voiceBuffer = new unsigned char[voiceBufferLength];
+            unsigned char voiceBuffer[2048];
 
             if (bitStream.Read(reinterpret_cast<char*>(voiceBuffer), voiceBufferLength))
             {
@@ -5467,8 +5477,6 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
                     pPlayer->GetVoice()->DecodeAndBuffer(voiceBuffer, voiceBufferLength);
                 }
             }
-
-            delete[] voiceBuffer;
         }
     }
 }

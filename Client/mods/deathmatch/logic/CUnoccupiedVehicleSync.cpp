@@ -235,7 +235,8 @@ void CUnoccupiedVehicleSync::UpdateStates()
         !pPlayer->GetRealOccupiedVehicle())
     {
         // Make sure it's valid and add it to our list temporarily
-        if (auto* pVehicle = dynamic_cast<CDeathmatchVehicle*>(pPlayer->GetOccupiedVehicle()))
+        pVehicle = dynamic_cast<CDeathmatchVehicle*>(pPlayer->GetOccupiedVehicle());
+        if (pVehicle)
             m_List.push_front(pVehicle);
     }
 

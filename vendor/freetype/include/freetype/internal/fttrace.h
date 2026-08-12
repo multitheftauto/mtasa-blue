@@ -4,7 +4,7 @@
  *
  *   Tracing handling (specification only).
  *
- * Copyright (C) 2002-2025 by
+ * Copyright (C) 2002-2026 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -119,6 +119,11 @@ FT_TRACE_DEF( cidgload )
 FT_TRACE_DEF( cidload )
 FT_TRACE_DEF( cidobjs )
 FT_TRACE_DEF( cidparse )
+
+  /* HVF driver component */
+FT_TRACE_DEF( hvfdrv )
+FT_TRACE_DEF( hvfobjs )
+FT_TRACE_DEF( hvfload )
 
   /* Windows font component */
 FT_TRACE_DEF( winfnt )
