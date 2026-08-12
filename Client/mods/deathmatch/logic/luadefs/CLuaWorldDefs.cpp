@@ -140,6 +140,28 @@ void CLuaWorldDefs::LoadFunctions()
         {"resetWorldProperties", ArgumentParser<ResetWorldProperties>},
         {"resetDynamicPedShadows", ArgumentParser<ResetDynamicPedShadows>},
 
+        // World reset funcs
+        {"resetColorFilter", ArgumentParser<ResetColorFilter>},
+        {"resetCoronaReflectionsEnabled", ArgumentParser<ResetCoronaReflectionsEnabled>},
+        {"resetSkyGradient", ResetSkyGradient},
+        {"resetHeatHaze", ResetHeatHaze},
+        {"resetWindVelocity", ResetWindVelocity},
+        {"resetRainLevel", ResetRainLevel},
+        {"resetFarClipDistance", ResetFarClipDistance},
+        {"resetNearClipDistance", ResetNearClipDistance},
+        {"resetVehiclesLODDistance", ResetVehiclesLODDistance},
+        {"resetPedsLODDistance", ResetPedsLODDistance},
+        {"resetFogDistance", ResetFogDistance},
+        {"resetSunColor", ResetSunColor},
+        {"resetSunSize", ResetSunSize},
+        {"resetMoonSize", ResetMoonSize},
+        {"resetBlurLevel", ResetBlurLevel},
+        {"resetWorldProperty", ArgumentParserWarn<false, ResetWorldProperty>},
+        {"resetTimeFrozen", ArgumentParser<ResetTimeFrozen>},
+        {"resetVolumetricShadows", ArgumentParser<ResetVolumetricShadows>},
+        {"resetWorldProperties", ArgumentParser<ResetWorldProperties>},
+        {"resetDynamicPedShadows", ArgumentParser<ResetDynamicPedShadows>},
+
         // World check funcs
         {"areTrafficLightsLocked", AreTrafficLightsLocked},
         {"isPedTargetingMarkerEnabled", IsPedTargetingMarkerEnabled},
@@ -149,7 +171,12 @@ void CLuaWorldDefs::LoadFunctions()
         {"isTimeFrozen", ArgumentParser<IsTimeFrozen>},
         {"isVolumetricShadowsEnabled", ArgumentParser<IsVolumetricShadowsEnabled>},
         {"isDynamicPedShadowsEnabled", ArgumentParser<IsDynamicPedShadowsEnabled>},
-        {"testSphereAgainstWorld", ArgumentParser<TestSphereAgainstWorld>}};
+        {"testSphereAgainstWorld", ArgumentParser<TestSphereAgainstWorld>},
+
+        // Grass draw distance functions
+        {"getGrassDrawDistance", ArgumentParser<GetGrassDrawDistance>},
+        {"setGrassDrawDistance", ArgumentParser<SetGrassDrawDistance>},
+        {"resetGrassDrawDistance", ArgumentParser<ResetGrassDrawDistance>}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -1828,6 +1855,23 @@ int CLuaWorldDefs::ResetFogDistance(lua_State* luaVM)
 
     lua_pushboolean(luaVM, true);
     return 1;
+}
+
+CLuaMultiReturn<float, float> CLuaWorldDefs::GetGrassDrawDistance()
+{
+    float closeDistance, farDistance;
+    g_pMultiplayer->GetGrassDrawDistance(closeDistance, farDistance);
+    return {closeDistance, farDistance};
+}
+
+void CLuaWorldDefs::SetGrassDrawDistance(float closeDistance, float farDistance)
+{
+    g_pMultiplayer->SetGrassDrawDistance(closeDistance, farDistance);
+}
+
+void CLuaWorldDefs::ResetGrassDrawDistance()
+{
+    g_pMultiplayer->ResetGrassDrawDistance();
 }
 
 int CLuaWorldDefs::GetSunColor(lua_State* luaVM)
