@@ -20,6 +20,7 @@ class CFxSystemBPSAInterface;
 class CFxSystemSAInterface;
 class CFxEmitterSAInterface;
 class CFxSystemSA;
+class CVehicle;
 
 class CFxMemoryPoolSAInterface
 {
@@ -74,7 +75,12 @@ public:
     void         AddToList(CFxSystemSAInterface* pFxSystemSAInterface, CFxSystemSA* pFxSystemSA);
     void         RemoveFromList(CFxSystemSA* pFxSystemSA);
 
+    void      RegisterNitroSystem(CFxSystemSAInterface* pFxSystemSAInterface, CVehicle* pVehicle);
+    CVehicle* GetVehicleFromNitroSystem(CFxSystemSAInterface* pFxSystemSAInterface);
+    void      UnregisterVehicleNitroSystems(CVehicle* pVehicle);
+
 private:
     CFxManagerSAInterface*                            m_pInterface;
     CFastHashMap<CFxSystemSAInterface*, CFxSystemSA*> m_FxInterfaceMap;
+    CFastHashMap<CFxSystemSAInterface*, CVehicle*>    m_NitroSystemMap;
 };

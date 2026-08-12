@@ -21,7 +21,8 @@ public:
     CFxSystemBPSAInterface* pNext;      // 0x04
 
     // Actual members
-    char*                     szNameHash;            // 0x08
+    // CRC-32 (no final XOR) of the lowercased blueprint name, e.g. "nitro" - NOT a string pointer
+    uint32_t                  uiNameHash;            // 0x08
     float                     fLength;               // 0x0C
     float                     fLoopIntervalMinimum;  // 0x10
     float                     fLoopIntervalLength;   // 0x14

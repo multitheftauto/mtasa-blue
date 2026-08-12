@@ -456,6 +456,9 @@ public:
     SColor GetHeadLightColor();
     void   SetHeadLightColor(const SColor color);
 
+    std::optional<SColor> GetNitroColor();
+    void                  SetNitroColor(const std::optional<SColor> color);
+
     int GetCurrentGear();
 
     bool IsEnterable(bool localEntity = false);
@@ -727,8 +730,9 @@ protected:
 
     bool m_bNitroActivated;
 
-    CVector m_vecGravity;
-    SColor  m_HeadLightColor;
+    CVector               m_vecGravity;
+    SColor                m_HeadLightColor;
+    std::optional<SColor> m_NitroColor;
 
     bool m_bHasCustomHandling;
 
