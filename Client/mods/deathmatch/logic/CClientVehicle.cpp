@@ -2700,6 +2700,9 @@ void CClientVehicle::Create()
             m_pVehicle->SetPlaneRotorSpeed(m_fPlaneRotorSpeed);
         }
 
+        if (m_eVehicleType == CLIENTVEHICLE_HELI || m_eVehicleType == CLIENTVEHICLE_PLANE)
+            m_pVehicle->SetVehicleRotorState(m_rotorState, true, m_eVehicleType == CLIENTVEHICLE_HELI);
+
         m_pVehicle->SetUnderwater(IsBelowWater());
 
         // HACK: temp fix until windows are fixed using setAlpha
