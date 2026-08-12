@@ -120,8 +120,8 @@ bool CIFPEngine::EngineApplyAnimation(CClientPed& Ped, CAnimBlendHierarchySAInte
         if (pCurrentAnimAssociation)
         {
             auto pCurrentAnimHierarchy = pCurrentAnimAssociation->GetAnimHierarchy();
-            auto pAssocHierachyInterface = pCurrentAnimHierarchy->GetInterface();
-            if (pAssocHierachyInterface == pAnimHierarchyInterface)
+            auto pAssocHierarchyInterface = pCurrentAnimHierarchy->GetInterface();
+            if (pAssocHierarchyInterface == pAnimHierarchyInterface)
             {
                 return true;
             }
@@ -132,10 +132,22 @@ bool CIFPEngine::EngineApplyAnimation(CClientPed& Ped, CAnimBlendHierarchySAInte
             {
                 return true;
             }
+            // Remember if this was a partial anim before swapping its hierarchy, so the replacement can be
+            // trimmed back to the bones the original animated instead of the full skeleton the IFP padded it to.
+            const bool wasPartial = pCurrentAnimAssociation->IsPartial();
+
             auto pAnimHierarchy = pAnimationManager->GetAnimBlendHierarchy(pAnimHierarchyInterface);
             pAnimationManager->UncompressAnimation(pAnimHierarchy.get());
             pCurrentAnimAssociation->FreeAnimBlendNodeArray();
             pCurrentAnimAssociation->Init(pClump, pAnimHierarchyInterface);
+
+            if (wasPartial)
+            {
+                auto pOriginalStaticAssoc = pAnimationManager->GetAnimStaticAssociation(iGroupID, iAnimID);
+                if (pOriginalStaticAssoc)
+                    pCurrentAnimAssociation->RestrictToBonesOf(pOriginalStaticAssoc->GetInterface());
+            }
+
             pCurrentAnimAssociation->SetCurrentProgress(0.0);
             return true;
         }

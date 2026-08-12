@@ -300,7 +300,13 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     if (ucEntityTypeID == CElement::WEAPON)
                     {
                         CCustomWeapon* pWeapon = static_cast<CCustomWeapon*>(pElement);
+                        CElement*      pTarget = pWeapon->GetElementTarget();
                         unsigned char  targetType = pWeapon->GetTargetType();
+
+                        // The targeted element may have been destroyed since it was set
+                        if (targetType == TARGET_TYPE_ENTITY && !pTarget)
+                            targetType = TARGET_TYPE_FIXED;
+
                         BitStream.WriteBits(&targetType, 3);  // 3 bits = 4 possible values.
 
                         switch (targetType)
@@ -311,7 +317,6 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                             }
                             case TARGET_TYPE_ENTITY:
                             {
-                                CElement* pTarget = pWeapon->GetElementTarget();
                                 ElementID targetID = pTarget->GetID();
 
                                 BitStream.Write(targetID);
@@ -1128,9 +1133,6 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                     // Model id
                     BitStream.WriteCompressed(pBuilding->GetModel());
-
-                    // Interior
-                    BitStream.WriteCompressed(pBuilding->GetInterior());
 
                     CBuilding* pLowLodBuilding = pBuilding->GetLowLodElement();
                     ElementID  lowLodBuildingID = pLowLodBuilding ? pLowLodBuilding->GetID() : INVALID_ELEMENT_ID;

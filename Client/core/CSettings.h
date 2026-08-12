@@ -237,9 +237,6 @@ protected:
     CGUIComboBox*  m_pProgressAnimationCombo;
     CGUILabel*     m_pDebugSettingLabel;
     CGUIComboBox*  m_pDebugSettingCombo;
-    CGUILabel*     m_pWin8Label;
-    CGUICheckBox*  m_pWin8ColorCheckBox;
-    CGUICheckBox*  m_pWin8MouseCheckBox;
     CGUICheckBox*  m_pPhotoSavingCheckbox;
     CGUICheckBox*  m_pCheckBoxAskBeforeDisconnect;
     CGUICheckBox*  m_pProcessAffinityCheckbox;
@@ -372,6 +369,7 @@ protected:
     CGUIButton*   m_pButtonBrowserWhitelistRemove;
     CGUIButton*   m_pButtonBrowserWhitelistRemoveAll;
     CGUICheckBox* m_pCheckBoxBrowserGPUEnabled;
+    CGUICheckBox* m_pCheckBoxBrowserVideoAccelEnabled;
     bool          m_bBrowserListsChanged;
     bool          m_bBrowserListsLoadEnabled;
 

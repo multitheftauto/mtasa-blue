@@ -122,4 +122,6 @@ private:
     CControllerState m_LastSentControllerState;
     float            m_fLastSentCameraRotation;
     float            m_fLastSentAimY;
+    unsigned long    m_ulDeadSyncGraceEndTime;
+    bool             m_bWasDeadOnNetwork;
 };

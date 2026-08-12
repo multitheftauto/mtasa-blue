@@ -213,8 +213,8 @@ void CPedSA::ClearWeapons()
 
 void CPedSA::RemoveWeaponModel(std::uint32_t model)
 {
-    // void __thiscall CPed::RemoveWeaponModel(CPed *this, int modelID)
-    ((void(__thiscall*)(CEntitySAInterface*, std::uint32_t))FUNC_RemoveWeaponModel)(m_pInterface, model);
+    if (auto* pedInterface = GetPedInterface())
+        pedInterface->RemoveWeaponModel(model);
 }
 
 void CPedSA::ClearWeapon(eWeaponType weaponType)
@@ -598,6 +598,73 @@ void CPedSA::SetInWaterFlags(bool inWater)
     physicalInterface->bSubmergedInWater = inWater;
 }
 
+void __fastcall CPedSA::RemoveWeaponWhenEnteringVehicle(CPedSAInterface* pedInterface, void*, int jetpack)
+{
+    if (!pedInterface)
+        return;
+
+    pedInterface->RemoveWeaponWhenEnteringVehicle(jetpack == 1);
+}
+
+void CPedSAInterface::RemoveWeaponWhenEnteringVehicle(bool jetpack)
+{
+    // Bugfix #3659 (allow switch weapons while using jetpack - see PR #3573)
+    if (!jetpack)
+    {
+        if (auto* playerData = pPlayerData)
+            playerData->m_bInVehicleDontAllowWeaponChange = true;
+    }
+
+    if (savedWeapon != eWeaponType::WEAPONTYPE_UNIDENTIFIED)
+        return;
+
+    eWeaponSlot newSlot = WEAPONSLOT_MAX;
+
+    if (IsPlayer())
+    {
+        auto* playerInfo = pGame->GetPlayerInfo();
+        if (playerInfo && playerInfo->CanDoDriveBy())
+        {
+            const auto& smg = Weapons[WEAPONSLOT_TYPE_SMG];
+            const auto& shotgun = Weapons[WEAPONSLOT_TYPE_SHOTGUN];
+            const auto& pistol = Weapons[WEAPONSLOT_TYPE_HANDGUN];
+
+            const bool hasSMG = (smg.m_eWeaponType == eWeaponType::WEAPONTYPE_MICRO_UZI || smg.m_eWeaponType == eWeaponType::WEAPONTYPE_TEC9 ||
+                                 (jetpack && smg.m_eWeaponType == eWeaponType::WEAPONTYPE_MP5)) &&
+                                smg.m_ammoTotal > 0;
+
+            const bool hasSawnoff = jetpack && shotgun.m_eWeaponType == eWeaponType::WEAPONTYPE_SAWNOFF_SHOTGUN && shotgun.m_ammoTotal > 0;
+
+            const bool hasPistol = jetpack && pistol.m_eWeaponType == eWeaponType::WEAPONTYPE_PISTOL && pistol.m_ammoTotal > 0;
+
+            if (hasSMG)
+            {
+                newSlot = WEAPONSLOT_TYPE_SMG;
+            }
+            else if (hasSawnoff)  // Bugfix - the default here was WEAPONSLOT_TYPE_HANDGUN
+            {
+                newSlot = WEAPONSLOT_TYPE_SHOTGUN;
+            }
+            else if (hasPistol)
+            {
+                newSlot = WEAPONSLOT_TYPE_HANDGUN;
+            }
+        }
+    }
+
+    if (newSlot != WEAPONSLOT_MAX)
+    {
+        savedWeapon = Weapons[bCurrentWeaponSlot].m_eWeaponType;
+        SetCurrentWeapon(newSlot);
+    }
+    else if (!jetpack)  // Bugfix #508 (weapons are invisible when wearing jetpack - see PR #3559)
+    {
+        auto weaponType = Weapons[bCurrentWeaponSlot].m_eWeaponType;
+        auto model = pGame->GetWeaponInfo(weaponType, eWeaponSkill::WEAPONSKILL_STD)->GetModel();
+        RemoveWeaponModel(model);
+    }
+}
+
 ////////////////////////////////////////////////////////////////
 //
 // CPed_PreRenderAfterTest
@@ -686,4 +753,9 @@ void CPedSA::StaticSetHooks()
 {
     EZHookInstall(CPed_PreRenderAfterTest);
     EZHookInstall(CPed_PreRenderAfterTest_Mid);
+
+    HookInstallCall(0x68025A, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleJetPack::ProcessPed
+    HookInstallCall(0x64DB4D, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleCarGetIn::ProcessPed
+    HookInstallCall(0x64BCA3, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleCarSetPedInAsDriver::ProcessPed
+    HookInstallCall(0x64B876, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleCarSetPedInAsPassenger::ProcessPed
 }

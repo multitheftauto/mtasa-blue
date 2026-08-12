@@ -931,6 +931,10 @@ bool IsNickValid(const char* szNick)
         {
             return false;
         }
+        if (ucTemp == '`')  // Backtick is rejected to match CheckNickProvided
+        {
+            return false;
+        }
     }
 
     // Nickname is valid, return true

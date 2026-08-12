@@ -438,11 +438,10 @@ bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPl
     if (!g_pGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, pCaller))
         return false;
 
-    CEvents*      pEvents = g_pGame->GetEvents();
-    CEventContext eventContext;
+    CEvents* pEvents = g_pGame->GetEvents();
 
     // Make sure our event-manager knows we're about to call an event
-    pEvents->PreEventPulse(&eventContext);
+    pEvents->PreEventPulse();
 
     // Call the event on our parents/us first
     CallParentEvent(szName, Arguments, this, pCaller);
@@ -451,12 +450,12 @@ bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPl
     CallEventNoParent(szName, Arguments, this, pCaller);
 
     // Tell the event manager that we're done calling the event
-    pEvents->PostEventPulse(&eventContext);
+    pEvents->PostEventPulse();
 
     g_pGame->GetDebugHookManager()->OnPostEvent(szName, Arguments, this, pCaller);
 
     // Return whether our event was cancelled or not
-    return !eventContext.IsCancelled();
+    return (!pEvents->WasEventCancelled());
 }
 
 bool CElement::DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction)

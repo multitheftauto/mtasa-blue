@@ -398,6 +398,12 @@ void CGUIElement_Impl::CorrectEdges()
 
 bool CGUIElement_Impl::SetFont(const char* szFontName)
 {
+    if (szFontName != nullptr && *szFontName != '\0')
+    {
+        if (!CEGUI::FontManager::getSingleton().isFontPresent(CEGUI::String(szFontName)))
+            return false;
+    }
+
     try
     {
         m_pWindow->setFont(CEGUI::String(szFontName));

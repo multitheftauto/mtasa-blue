@@ -69,7 +69,7 @@ bool CTrayIcon::CreateTrayIcon()
         return false;
     }
 
-    // The handle to the core.dll is neccessary here,
+    // The handle to the core.dll is necessary here,
     // because Windows will search for the ICON in the executable and not in the DLL
     // Note: Changing the size will not show a higher quality icon in the balloon
     auto hIcon = LoadImage(g_hModule, MAKEINTRESOURCE(IDI_ICON1), IMAGE_ICON, LR_DEFAULTSIZE, LR_DEFAULTSIZE, LR_SHARED | LR_LOADTRANSPARENT);

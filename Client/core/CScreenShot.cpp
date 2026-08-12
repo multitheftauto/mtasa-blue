@@ -26,7 +26,7 @@ static bool ms_bBeforeGUI = false;
 
 static SString ms_strScreenDirectoryPath;
 
-// Last save time, seperated per given type
+// Last save time, separated per given type
 // (normal screenshot or camera weapon initiated)
 static long long ms_lLastSaveTime[2] = {0, 0};
 

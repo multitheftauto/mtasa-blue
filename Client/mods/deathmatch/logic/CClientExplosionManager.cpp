@@ -211,11 +211,20 @@ CExplosion* CClientExplosionManager::Create(eExplosionType explosionType, CVecto
     }
     else if (!pCreator)
     {
+        // Fire onClientExplosion for script-driven createExplosion() calls without a
+        // creator. We can't reuse Hook_ExplosionCreation here: when it sees the local
+        // player as responsible it routes the explosion through SendExplosionSync and
+        // the server-replayed copy uses default makeSound/camShake, ignoring the
+        // script's arguments (regression from PR #4341).
         CClientPlayer* localPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
         if (localPlayer)
         {
-            bool allowExplosion = Hook_ExplosionCreation(nullptr, localPlayer->GetGameEntity(), vecPosition, explosionType);
-            if (!allowExplosion)
+            CLuaArguments arguments;
+            arguments.PushNumber(vecPosition.fX);
+            arguments.PushNumber(vecPosition.fY);
+            arguments.PushNumber(vecPosition.fZ);
+            arguments.PushNumber(m_LastWeaponType);
+            if (!localPlayer->CallEvent("onClientExplosion", arguments, true))
                 return nullptr;
         }
     }

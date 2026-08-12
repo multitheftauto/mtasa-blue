@@ -23,4 +23,6 @@ public:
     int  GetAtomicId(RwObject* pAtomic);
 
     bool InsertEntityIntoEntityList(void* entity, float distance, void* callback);
+
+    bool IsAtomicVisible(RpAtomic* atomic) const override;
 };

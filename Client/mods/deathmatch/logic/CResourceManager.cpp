@@ -110,9 +110,18 @@ void CResourceManager::OnDownloadGroupFinished()
         CResource* pResource = *iter;
         if (!pResource->IsActive())
         {
-            // Stop as soon as we hit a resource which hasn't downloaded yet (as per previous behaviour)
+            if (!pResource->CanBeLoaded())
+            {
+                // Stop as soon as we hit a resource which hasn't downloaded yet (as per previous behaviour)
+                if (pResource->IsWaitingForInitialDownloads())
+                    break;
+
+                continue;
+            }
+
             if (pResource->IsWaitingForInitialDownloads())
                 break;
+
             pResource->Load();
         }
     }
@@ -275,8 +284,9 @@ void CResourceManager::ValidateResourceFile(const SString& strInFilename, const 
                 CMD5Hasher::ConvertToHex(checksum.md5, szMd5);
                 char szMd5Wanted[33];
                 CMD5Hasher::ConvertToHex(pResourceFile->GetServerChecksum().md5, szMd5Wanted);
-                SString strMessage("%s [Expected Size:%d MD5:%s][Got Size:%d MD5:%s] ", *ConformResourcePath(strInFilename), pResourceFile->GetDownloadSize(),
-                                   szMd5Wanted, (int)FileSize(strInFilename), szMd5);
+                const int iGotSize = buffer ? static_cast<int>(bufferSize) : static_cast<int>(FileSize(strInFilename));
+                SString   strMessage("%s [Expected Size:%d CRC:%08lX MD5:%s][Got Size:%d CRC:%08lX MD5:%s] ", *ConformResourcePath(strInFilename),
+                                     pResourceFile->GetDownloadSize(), pResourceFile->GetServerChecksum().ulCRC, szMd5Wanted, iGotSize, checksum.ulCRC, szMd5);
                 if (pResourceFile->IsDownloaded())
                 {
                     strMessage = "Resource file unexpected change: " + strMessage;

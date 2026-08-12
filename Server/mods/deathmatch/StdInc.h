@@ -34,6 +34,16 @@
     #include <winsock2.h>
     #include <windows.h>
     #include <mmsystem.h>
+#else
+//
+// Non-Windows: provide the Windows Sleep() spelling used throughout this
+// module. This used to be supplied transitively by the EHS vendor headers
+// (vendor/ehs/socket.h); now that EHS is gone we define it ourselves, matching
+// the equivalent shim in Server/core/StdInc.h.
+    #include <unistd.h>
+    #ifndef Sleep
+        #define Sleep(duration) usleep((duration) * 1000)
+    #endif
 #endif
 
 #include <net/CSimControl.h>
@@ -49,7 +59,7 @@
 #include <CMatrix.h>
 #include "CStringName.h"
 #include <bochs_internal/bochs_crc32.h>
-#include <pcrecpp.h>
+#include <pcrecpp_compat.h>
 #include <pthread.h>
 #include "version.h"
 

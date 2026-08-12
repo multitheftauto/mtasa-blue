@@ -162,6 +162,9 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                         CLuaArguments Arguments;
                         Arguments.PushNumber(fDeltaHealth);
                         pVehicle->CallEvent("onVehicleDamage", Arguments);
+                        // Skip health write if the event destroyed this vehicle.
+                        if (pVehicle->IsBeingDeleted())
+                            return false;
                     }
                 }
                 pVehicle->SetHealth(fHealth);
@@ -216,6 +219,8 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                                 CLuaArguments Arguments;
                                 Arguments.PushElement(pTowedByVehicle);
                                 pCurrentTrailer->CallEvent("onTrailerDetach", Arguments);
+                                if (pTowedByVehicle->IsBeingDeleted() || pTrailer->IsBeingDeleted())
+                                    return false;
                             }
 
                             // If something else is towing this trailer
@@ -233,6 +238,8 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                                 CLuaArguments Arguments;
                                 Arguments.PushElement(pCurrentVehicle);
                                 pTrailer->CallEvent("onTrailerDetach", Arguments);
+                                if (pTowedByVehicle->IsBeingDeleted() || pTrailer->IsBeingDeleted())
+                                    return false;
                             }
 
                             pTowedByVehicle->SetTowedVehicle(pTrailer);
@@ -242,6 +249,8 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                             CLuaArguments Arguments;
                             Arguments.PushElement(pTowedByVehicle);
                             bool bContinue = pTrailer->CallEvent("onTrailerAttach", Arguments);
+                            if (pTowedByVehicle->IsBeingDeleted() || pTrailer->IsBeingDeleted())
+                                return false;
 
                             // Attach or detach trailers depending on the event outcome
                             CVehicleTrailerPacket TrailerPacket(pTowedByVehicle, pTrailer, bContinue);
@@ -272,28 +281,27 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     CLuaArguments Arguments;
                     Arguments.PushElement(pTowedByVehicle);
                     pCurrentTrailer->CallEvent("onTrailerDetach", Arguments);
+                    // Skip later vehicle writes if the event destroyed the vehicle.
+                    if (pVehicle->IsBeingDeleted())
+                        return false;
                 }
             }
 
-            // Update Damage info
-            if (BitStream.Version() >= 0x047)
+            if (BitStream.ReadBit())
             {
-                if (BitStream.ReadBit() == true)
-                {
-                    ElementID DamagerID;
-                    if (!BitStream.Read(DamagerID))
-                        return false;
+                ElementID DamagerID;
+                if (!BitStream.Read(DamagerID))
+                    return false;
 
-                    SWeaponTypeSync weaponType;
-                    if (!BitStream.Read(&weaponType))
-                        return false;
+                SWeaponTypeSync weaponType;
+                if (!BitStream.Read(&weaponType))
+                    return false;
 
-                    SBodypartSync bodyPart;
-                    if (!BitStream.Read(&bodyPart))
-                        return false;
+                SBodypartSync bodyPart;
+                if (!BitStream.Read(&bodyPart))
+                    return false;
 
-                    pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, static_cast<unsigned char>(bodyPart.data.uiBodypart));
-                }
+                pSourcePlayer->SetDamageInfo(DamagerID, weaponType.data.ucWeaponType, static_cast<unsigned char>(bodyPart.data.uiBodypart));
             }
 
             // Player health

@@ -21,6 +21,7 @@ using namespace std;
 extern CClientGame* g_pClientGame;
 
 int CResource::m_iShowingCursor = 0;
+int CResource::m_iToggleControls = 0;
 
 CResource::CResource(unsigned short usNetID, const char* szResourceName, CClientEntity* pResourceEntity, CClientEntity* pResourceDynamicEntity,
                      const CMtaVersion& strMinServerReq, const CMtaVersion& strMinClientReq, bool bEnableOOP)
@@ -31,6 +32,7 @@ CResource::CResource(unsigned short usNetID, const char* szResourceName, CClient
     m_bStarting = true;
     m_bStopping = false;
     m_bShowingCursor = false;
+    m_bToggleControls = false;
     m_usRemainingNoClientCacheScripts = 0;
     m_bLoadAfterReceivingNoClientCacheScripts = false;
     m_strMinServerReq = strMinServerReq;
@@ -238,9 +240,50 @@ bool CResource::CallExportedFunction(const SString& name, CLuaArguments& args, C
     return false;
 }
 
+bool CResource::VerifyPendingClientChecksums()
+{
+    bool bQueuedDownload = false;
+
+    const auto queueDownloadForMismatch = [&bQueuedDownload](CDownloadableResource* pDownloadableResource)
+    {
+        if (!pDownloadableResource->IsAutoDownload() || pDownloadableResource->IsWaitingForDownload() || pDownloadableResource->HasVerifiedClientChecksum())
+            return;
+
+        const CChecksum clientChecksum = pDownloadableResource->GenerateClientChecksum();
+        if (clientChecksum == pDownloadableResource->GetServerChecksum())
+            return;
+
+        const SString strName = pDownloadableResource->GetName();
+        FileDelete(strName);
+        if (FileExists(strName))
+        {
+            SString strMessage("Unable to delete old file %s", *ConformResourcePath(strName));
+            g_pClientGame->TellServerSomethingImportant(1009, strMessage);
+        }
+
+        MakeSureDirExists(strName);
+        g_pClientGame->GetResourceFileDownloadManager()->AddPendingFileDownload(pDownloadableResource);
+        bQueuedDownload = true;
+    };
+
+    for (CResourceConfigItem* pConfigFile : m_ConfigFiles)
+        queueDownloadForMismatch(pConfigFile);
+
+    for (CResourceFile* pResourceFile : m_ResourceFiles)
+        queueDownloadForMismatch(pResourceFile);
+
+    return bQueuedDownload;
+}
+
 bool CResource::CanBeLoaded()
 {
-    return !IsActive() && !IsWaitingForInitialDownloads();
+    if (IsActive() || IsWaitingForInitialDownloads())
+        return false;
+
+    if (VerifyPendingClientChecksums())
+        return false;
+
+    return !IsWaitingForInitialDownloads();
 }
 
 bool CResource::IsWaitingForInitialDownloads()
@@ -317,17 +360,24 @@ void CResource::Load()
         {
             // Load the file
             std::vector<char> buffer;
-            FileLoad(pResourceFile->GetName(), buffer);
-            const char* pBufferData = buffer.empty() ? nullptr : &buffer.at(0);
+            const bool        bLoaded = FileLoad(pResourceFile->GetName(), buffer);
+            const char*       pBufferData = buffer.empty() ? nullptr : &buffer.at(0);
 
             DECLARE_PROFILER_SECTION(OnPreLoadScript)
             // Check the contents
-            if (CChecksum::GenerateChecksumFromBuffer(pBufferData, buffer.size()) == pResourceFile->GetServerChecksum())
+            if (bLoaded)
             {
-                m_pLuaVM->LoadScriptFromBuffer(pBufferData, buffer.size(), pResourceFile->GetName());
+                const CChecksum checksum = CChecksum::GenerateChecksumFromBuffer(pBufferData, buffer.size());
+                pResourceFile->SetLastClientChecksum(checksum);
+
+                if (checksum == pResourceFile->GetServerChecksum())
+                    m_pLuaVM->LoadScriptFromBuffer(pBufferData, buffer.size(), pResourceFile->GetName());
+                else
+                    HandleDownloadedFileTrouble(pResourceFile, true);
             }
             else
             {
+                pResourceFile->SetLastClientChecksum(CChecksum());
                 HandleDownloadedFileTrouble(pResourceFile, true);
             }
             DECLARE_PROFILER_SECTION(OnPostLoadScript)
@@ -438,8 +488,19 @@ void CResource::ShowCursor(bool bShow, bool bToggleControls)
         m_bShowingCursor = bShow;
     }
 
+    bool bWantsToggle = m_bShowingCursor && bToggleControls;
+    if (bWantsToggle != m_bToggleControls)
+    {
+        if (bWantsToggle)
+            m_iToggleControls += 1;
+        else
+            m_iToggleControls -= 1;
+
+        m_bToggleControls = bWantsToggle;
+    }
+
     // Always update cursor and controls state regardless of cursor visibility change
-    g_pCore->ForceCursorVisible(m_iShowingCursor > 0, bToggleControls);
+    g_pCore->ForceCursorVisible(m_iShowingCursor > 0, m_iToggleControls > 0);
     g_pClientGame->SetCursorEventsEnabled(m_iShowingCursor > 0);
 }
 
@@ -527,7 +588,11 @@ void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool b
     SString errorMessage;
 
     CChecksum clientChecksum = pResourceFile->GetLastClientChecksum();
-    if (clientChecksum == CChecksum())
+    if (!pResourceFile->HasVerifiedClientChecksum())
+    {
+        errorMessage = "Client checksum was not verified before load";
+    }
+    else if (clientChecksum == CChecksum())
     {
         errorMessage = SString("File not readable: %s", pResourceFile->GetName());
     }
@@ -535,7 +600,8 @@ void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool b
     {
         SString strGotMd5 = ConvertDataToHexString(clientChecksum.md5.data, sizeof(MD5));
         SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
-        errorMessage = SString("Got MD5:%s, wanted MD5:%s", *strGotMd5, *strWantedMd5);
+        errorMessage =
+            SString("Got CRC:%08lX MD5:%s, wanted CRC:%08lX MD5:%s", clientChecksum.ulCRC, *strGotMd5, pResourceFile->GetServerChecksum().ulCRC, *strWantedMd5);
     }
 
     SString strFilename = ExtractFilename(PathConform(pResourceFile->GetShortName()));

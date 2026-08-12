@@ -631,7 +631,7 @@ void _cdecl DoWait(HANDLE hHandle)
 
     // After a consecutive timeout, use a short wait so
     // LoadAllRequestedModels doesn't accumulate multi-second freezes
-    // when the same I/O issue keeps re-ocurring
+    // when the same I/O issue keeps recurring
     DWORD dwWait = (s_consecutiveTimeouts >= 1) ? 100 : 4000;
 
     DWORD dwResult = WaitForSingleObject(hHandle, dwWait);
@@ -1654,7 +1654,7 @@ static int FindTxdSlotForDict(RwTexDictionary* pDict) noexcept
     if (!pPool || pPool->m_nSize <= 0 || !pPool->m_byteMap || !pPool->m_pObjects)
         return -1;
 
-    const int scanLimit = (pPool->m_nSize < CTxdPoolSA::TXD_POOL_MAX_CAPACITY) ? pPool->m_nSize : CTxdPoolSA::TXD_POOL_MAX_CAPACITY;
+    const int scanLimit = (pPool->m_nSize < 32768) ? pPool->m_nSize : 32768;
     for (int i = 0; i < scanLimit; ++i)
     {
         if (pPool->m_byteMap[i].bEmpty)
@@ -2832,29 +2832,32 @@ inner:
 ////////////////////////////////////////////////////////////////////////
 // CAnimManager::CreateAnimAssocGroups
 //
-// CModelInfo::ms_modelInfoPtrs at the given index is a null pointer
+// Missing model info or RwObject before the clump is used for associations
 ////////////////////////////////////////////////////////////////////////
-void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
+bool OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 {
     CModelInfo*                pModelInfo = pGameInterface->GetModelInfo(uiModelId);
     CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
-    if (!pInterface || pInterface->pRwObject == nullptr)
+    if (!pInterface || !pInterface->pRwObject)
     {
-        // Crash will occur at offset 00349b7b
+        OnCrashAverted(816);
         LogEvent(816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString("No RwObject for model:%d", uiModelId), 5416);
         CArgMap argMap;
         argMap.Set("id", uiModelId);
         argMap.Set("reason", "createanim");
         SetApplicationSetting("diagnostics", "gta-model-fail", argMap.ToString());
+        return false;
     }
+    return true;
 }
 
 // Hook info
 #define HOOKPOS_CAnimManager_CreateAnimAssocGroups   0x4D3D52
 #define HOOKSIZE_CAnimManager_CreateAnimAssocGroups  5
 #define HOOKCHECK_CAnimManager_CreateAnimAssocGroups 0x8B
-DWORD                         RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
-static void __declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
+DWORD                 RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
+DWORD                 RETURN_CAnimManager_CreateAnimAssocGroups_Skip = 0x4D3D71;
+void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
@@ -2865,15 +2868,91 @@ static void __declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
         push    eax
         call    OnMY_CAnimManager_CreateAnimAssocGroups
         add     esp, 4*1
+        test    al, al
         popad
+        jz      skipCreateInstance
 
-             // Replaced code
+        // Replaced code
         push    ecx
         mov     ecx, dword ptr[ARRAY_ModelInfo]
         mov     eax, dword ptr[ecx + eax*4]
         pop     ecx
 
         jmp     RETURN_CAnimManager_CreateAnimAssocGroups
+
+    skipCreateInstance:
+        xor     ebx, ebx
+        jmp     RETURN_CAnimManager_CreateAnimAssocGroups_Skip
+    }
+    // clang-format on
+}
+
+void OnMY_CAnimBlendAssocGroup_CreateAssociations(CBaseModelInfoSAInterface* pModelInfo)
+{
+    OnCrashAverted(816);
+
+    int                         iModelId = -1;
+    CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
+    const int                   maximumModelId = pGameInterface->GetBaseIDforTXD();
+    for (int i = 0; i < maximumModelId; i++)
+    {
+        if (ppModelInfo[i] == pModelInfo)
+        {
+            iModelId = i;
+            break;
+        }
+    }
+
+    LogEvent(816, "Model not loaded", "CAnimBlendAssocGroup_CreateAssociations", SString("No RwObject for model:%d", iModelId), 5416);
+    CArgMap argMap;
+    argMap.Set("id", iModelId);
+    argMap.Set("reason", "createassoc");
+    SetApplicationSetting("diagnostics", "gta-model-fail", argMap.ToString());
+}
+
+#define HOOKPOS_CAnimBlendAssocGroup_CreateAssociations   0x4CE2F7
+#define HOOKSIZE_CAnimBlendAssocGroup_CreateAssociations  7
+#define HOOKCHECK_CAnimBlendAssocGroup_CreateAssociations 0x8B
+DWORD                 RETURN_CAnimBlendAssocGroup_CreateAssociations = 0x4CE2FE;
+DWORD                 RETURN_CAnimBlendAssocGroup_CreateAssociations_Skip = 0x4CE36F;
+void _declspec(naked) HOOK_CAnimBlendAssocGroup_CreateAssociations()
+{
+    // clang-format off
+
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    __asm
+    {
+        // CModelInfo::GetModelInfoFromHashKey returned the model info for
+        // this animation. SA already skips the entry when it returns null.
+        test    eax, eax
+        jz      skipCreateAssociation
+
+        // CBaseModelInfo::pRwObject is at +0x1C. The original instructions
+        // immediately call CBaseModelInfo::CreateInstance at vtable+0x2C.
+        cmp     dword ptr[eax+1Ch], 0
+        jnz     continueCreateAssociation
+
+        // CreateInstance requires the RenderWare object. Record its absence
+        // and follow SA's existing per-animation skip path.
+        pushad
+        push    eax
+        call    OnMY_CAnimBlendAssocGroup_CreateAssociations
+        add     esp, 4*1
+        popad
+        jmp     skipCreateAssociation
+
+    continueCreateAssociation:
+        // Restore the seven overwritten bytes: load the vtable, pass the
+        // model info as this, then call CreateInstance.
+        mov     edx, [eax]
+        mov     ecx, eax
+        call    dword ptr[edx+2Ch]
+        jmp     RETURN_CAnimBlendAssocGroup_CreateAssociations
+
+    skipCreateAssociation:
+        // 0x4CE36F increments the created-association count and advances
+        // the animation and static-association indices for the next entry.
+        jmp     RETURN_CAnimBlendAssocGroup_CreateAssociations_Skip
     }
     // clang-format on
 }
@@ -3776,6 +3855,243 @@ void _declspec(naked) HOOK_CrashFix_Misc52()
     // clang-format on
 }
 
+////////////////////////////////////////////////////////////////////////
+// CEventScanner::ScanForEvents (escalator contact entity check)
+//
+// Inside CEventScanner::ScanForEvents, the code reads ped.m_pContactEntity
+// (offset 0x584 from CPed) and then dereferences it to read m_nModelIndex
+// to check if the ped is on an escalator step. When MTA destroys an entity
+// (e.g. via element destruction) while a ped still has a stale reference
+// in m_pContactEntity, the pointer becomes dangling and dereferencing it
+// causes an access violation.
+//
+// This hook replaces the original null-only check with a C function that
+// validates the entity pointer by reading m_nModelIndex inside __try/__except,
+// catching any access violation from a dangling pointer.
+//
+// >>> 0x6080B2 | 8B 86 84 05 00 00 | mov   eax, [esi+584h]     ; eax = ped.m_pContactEntity
+// >>> 0x6080B8 | 85 C0             | test  eax, eax
+// >>> 0x6080BA | 74 58             | je    0x608114             ; skip if null
+//     0x6080BC | 0F BF 40 22       | movsx eax, word ptr [eax+22h] ; read m_nModelIndex
+////////////////////////////////////////////////////////////////////////
+static bool __cdecl IsContactEntityModelIndexReadable(CEntitySAInterface* pEntity)
+{
+    if (!pEntity)
+        return false;
+
+    // Use SEH to safely attempt to read m_nModelIndex from the entity.
+    // A dangling pointer will trigger an access violation which we catch here.
+    __try
+    {
+        volatile auto modelIdx = pEntity->m_nModelIndex;
+        (void)modelIdx;
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
+#define HOOKPOS_CEventScanner__ScanForEvents_ContactEntity   0x6080B2
+#define HOOKSIZE_CEventScanner__ScanForEvents_ContactEntity  0xA
+#define HOOKCHECK_CEventScanner__ScanForEvents_ContactEntity 0x8B
+static constexpr DWORD RETURN_CEventScanner__ScanForEvents_ContactEntity = 0x6080BC;
+static constexpr DWORD SKIP_CEventScanner__ScanForEvents_ContactEntity = 0x608114;
+
+static void __declspec(naked) HOOK_CEventScanner__ScanForEvents_ContactEntity()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // Original: mov eax, [esi+584h]
+        mov     eax, [esi+584h]
+
+        // Validate the entity pointer via C helper (handles both null and dangling)
+        push    eax
+        call    IsContactEntityModelIndexReadable
+        add     esp, 4
+        test    al, al
+        jz      skip
+
+        // Pointer is valid - let the original code read m_nModelIndex
+        mov     eax, [esi+584h]
+        jmp     RETURN_CEventScanner__ScanForEvents_ContactEntity
+
+    skip:
+        jmp     SKIP_CEventScanner__ScanForEvents_ContactEntity
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CStreaming::GetNextFileOnCd (TXD path)
+//
+// In the TXD case of GetNextFileOnCd, the code calls CTxdStore::ms_pTxdPool->GetAt(slot)
+// to look up the TxdDef entry. When MTA's custom model system frees a TXD (e.g.
+// engineFreeModel) while its streaming request is still queued, GetAt returns null.
+// The original code then dereferences the null pointer to read m_wParentIndex at
+// offset +0x06, causing an access violation.
+//
+// This hook adds a null check for the TxdDef pointer. When null, we skip to the
+// next entry in the streaming request list instead of crashing.
+//
+//     0x408F6B | 8D 04 8A       | lea   eax, [edx+ecx*4]  ; eax = TxdDef* (or null via xor eax,eax path)
+// >>> 0x408F6E | 0F BF 40 06    | movsx eax, word ptr [eax+6]  ; eax = txdDef->m_wParentIndex
+// >>> 0x408F72 | 83 F8 FF       | cmp   eax, -1
+//     0x408F75 | 74 4B          | je    0x408FC2
+////////////////////////////////////////////////////////////////////////
+static void LOG_CStreaming__GetNextFileOnCd_NullTxdDef(unsigned int modelId)
+{
+    LogEvent(850, "TxdDef pool entry is null", "CStreaming::GetNextFileOnCd",
+             SString("Null TxdDef for streaming model: %u (TXD slot: %u)", modelId, modelId - 20000), 5701);
+}
+
+#define HOOKPOS_CStreaming__GetNextFileOnCd_NullTxdDef   0x408F6E
+#define HOOKSIZE_CStreaming__GetNextFileOnCd_NullTxdDef  7
+#define HOOKCHECK_CStreaming__GetNextFileOnCd_NullTxdDef 0x0F
+static constexpr DWORD RETURN_CStreaming__GetNextFileOnCd_NullTxdDef = 0x408F75;
+static constexpr DWORD LOOP_CONTINUE_CStreaming__GetNextFileOnCd_NullTxdDef = 0x409003;
+
+static void __declspec(naked) HOOK_CStreaming__GetNextFileOnCd_NullTxdDef()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        test    eax, eax
+        jz      skip
+
+        // Original instructions: read m_wParentIndex and compare with -1
+        movsx   eax, word ptr [eax+6]
+        cmp     eax, -1
+        jmp     RETURN_CStreaming__GetNextFileOnCd_NullTxdDef
+
+    skip:
+        pushad
+        push    edi                   // edi = modelId
+        call    LOG_CStreaming__GetNextFileOnCd_NullTxdDef
+        add     esp, 4
+        popad
+
+        mov     esi, ebp              // Advance to next node (same as all other continue paths)
+        jmp     LOOP_CONTINUE_CStreaming__GetNextFileOnCd_NullTxdDef
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CStreaming::ConvertBufferToObject (TXD parent check)
+//
+// Same root cause as the GetNextFileOnCd TxdDef null crash, but in a different
+// code path. In ConvertBufferToObject's TXD case, the code calls
+// CTxdStore::ms_pTxdPool->GetAt(txdSlot) to look up the TxdDef. When the pool
+// slot is freed (byte map sign bit clear), the inlined GetAt returns null. The
+// compiled code then jumps directly to the m_wParentIndex read at [eax+6] with
+// no null guard, crashing with EAX=0.
+//
+// This hook adds the missing null check. When the TxdDef pointer is null, we
+// jump to the "textures not needed" cleanup path (0x40C8FA) which calls
+// RemoveModel + RwStreamClose and returns false, WITHOUT calling RequestModel.
+// We cannot skip to the RemoveModel + RequestModel path (0x40C948) because
+// RequestModel calls CTxdStore::GetParentTxdSlot on the freed TXD slot, which
+// crashes inside a hooked trampoline. We also cannot skip to just the parent
+// check (0x40C8E4) because the code after it calls AreTexturesUsedByRequestedModels,
+// which dereferences CModelInfo pointers that may also be null for freed custom models.
+//
+//     0x40C8CB | 8D 04 90       | lea   eax, [eax+edx*4]   ; eax = TxdDef* (or null via xor path)
+// >>> 0x40C8CE | 0F BF 40 06    | movsx eax, word ptr [eax+6]  ; eax = txdDef->m_wParentIndex
+// >>> 0x40C8D2 | 83 F8 FF       | cmp   eax, -1
+//     0x40C8D5 | 74 0D          | je    0x40C8E4
+////////////////////////////////////////////////////////////////////////
+static void LOG_CStreaming__ConvertBufferToObject_NullTxdDef(unsigned int modelId)
+{
+    LogEvent(851, "TxdDef pool entry is null", "CStreaming::ConvertBufferToObject",
+             SString("Null TxdDef for streaming model: %u (TXD slot: %u)", modelId, modelId - 20000), 5702);
+}
+
+#define HOOKPOS_CStreaming__ConvertBufferToObject_NullTxdDef   0x40C8CE
+#define HOOKSIZE_CStreaming__ConvertBufferToObject_NullTxdDef  7
+#define HOOKCHECK_CStreaming__ConvertBufferToObject_NullTxdDef 0x0F
+static constexpr DWORD RETURN_CStreaming__ConvertBufferToObject_NullTxdDef = 0x40C8D5;
+static constexpr DWORD SKIP_CStreaming__ConvertBufferToObject_NullTxdDef = 0x40C8FA;
+
+static void __declspec(naked) HOOK_CStreaming__ConvertBufferToObject_NullTxdDef()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        test    eax, eax
+        jz      skip
+
+        // Original instructions: read m_wParentIndex and compare with -1
+        movsx   eax, word ptr [eax+6]
+        cmp     eax, -1
+        jmp     RETURN_CStreaming__ConvertBufferToObject_NullTxdDef
+
+    skip:
+        pushad
+        push    esi                   // esi = modelId in ConvertBufferToObject
+        call    LOG_CStreaming__ConvertBufferToObject_NullTxdDef
+        add     esp, 4
+        popad
+
+        jmp     SKIP_CStreaming__ConvertBufferToObject_NullTxdDef
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Fix vehicles spawning with corrupt wheel scale / bounding box on Windows 11 24H2.
+//
+// Root cause: CFileLoader::LoadVehicleObject (0x5B6F30) has local variables for
+// wheelModelID, frontWheelSize, rearWheelSize, and wheelUpgradeClass that are only
+// written by sscanf when the vehicles.ide line has enough fields (e.g. cars have 14-15
+// fields, but boats/Skimmer only have 12). In original GTA SA, these locals survived
+// as stale stack residue from the previous vehicle's parse. On Win11 24H2,
+// LeaveCriticalSection (called inside fgets between consecutive LoadVehicleObject calls)
+// uses more stack space and clobbers these uninitialized locals with garbage.
+// Corrupt wheelScale propagates into bounding box calculations and SetupSuspensionLines,
+// causing vehicles to fall through collision, camera to flash, and burnt colors.
+//
+// Fix: Intercept the sscanf call inside LoadVehicleObject and pre-initialize the four
+// optional output variables to safe defaults before sscanf runs.
+//
+// Reference: https://cookieplmonster.github.io/2025/04/23/gta-san-andreas-win11-24h2-bug/
+//            https://github.com/CookiePLMonster/SilentPatch/commit/881aded
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+
+// Address of the "call sscanf" instruction inside CFileLoader::LoadVehicleObject
+#define CALL_CFileLoader_LoadVehicleObject_sscanf 0x5B6FC7
+
+// The sscanf call in LoadVehicleObject has this exact signature at the call site:
+//   sscanf(line, "%d %s %s %s %s %s %s %s %d %d %x %d %f %f %d",
+//          &modelId, modelName, texName, type, handlingName, gameName, anims, vehClass,
+//          &frq, &flags, &comprules, &wheelModelID, &frontWheelSize, &rearWheelSize, &wheelUpgradeClass)
+//
+// Parameters 12-15 (&wheelModelID through &wheelUpgradeClass) are optional — sscanf only
+// writes them if the input line has enough fields. We set safe defaults before sscanf runs.
+static int _cdecl CFileLoader_LoadVehicleObject_sscanf(const char* s, const char* format, int* modelId, char* modelName, char* texName, char* type,
+                                                       char* handlingName, char* gameName, char* anims, char* vehClass, int* frq, int* flags, int* comprules,
+                                                       int* wheelModelID, float* frontWheelSize, float* rearWheelSize, int* wheelUpgradeClass)
+{
+    // Pre-initialize the optional fields that sscanf may not write
+    *wheelModelID = -1;
+    *frontWheelSize = 0.7f;
+    *rearWheelSize = 0.7f;
+    *wheelUpgradeClass = -1;
+
+    return sscanf(s, format, modelId, modelName, texName, type, handlingName, gameName, anims, vehClass, frq, flags, comprules, wheelModelID, frontWheelSize,
+                  rearWheelSize, wheelUpgradeClass);
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for CrashFixHacks
@@ -3861,6 +4177,10 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc51);
     EZHookInstall(CrashFix_Misc52);
 
+    EZHookInstallChecked(CStreaming__GetNextFileOnCd_NullTxdDef);
+    EZHookInstallChecked(CStreaming__ConvertBufferToObject_NullTxdDef);
+    EZHookInstallChecked(CEventScanner__ScanForEvents_ContactEntity);
+
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
     HookInstall(HOOKPOS_CObject_Destructor_TrainCrossing_Check, (DWORD)temp, 5);
@@ -3868,4 +4188,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     HookInstall(HOOKPOS_CObject_ProcessTrainCrossingBehavior1, (DWORD)temp, 5);
     temp = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_ProcessTrainCrossingBehavior2_Check, RETURN_CObject_ProcessTrainCrossingBehavior_Invalid>;
     HookInstall(HOOKPOS_CObject_ProcessTrainCrossingBehavior2, (DWORD)temp, 5);
+
+    // Fix uninitialized wheel scale in CFileLoader::LoadVehicleObject on Win11 24H2
+    HookInstallCall(CALL_CFileLoader_LoadVehicleObject_sscanf, (DWORD)CFileLoader_LoadVehicleObject_sscanf);
 }
