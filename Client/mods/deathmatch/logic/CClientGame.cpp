@@ -4612,6 +4612,54 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
             if (pDamagedPed->IsLocalPlayer() && bIsBeingShotWhilstAiming)
                 return false;
 
+        // Send the server information that a ped/player has been hit by a melee attack, a weapon, or a vehicle
+        if (pInflictingEntity && pDamagedPed)
+        {
+            bool isMeleeWeapon = weaponUsed >= eWeaponType::WEAPONTYPE_UNARMED && weaponUsed <= eWeaponType::WEAPONTYPE_CANE;
+            bool cuttingWithChainsaw = false;
+            bool hitByWeapon = false;
+
+            if (IS_PED(pInflictingEntity))
+            {
+                // Using a chainsaw (with RMB held down) would cause packet spam, around 6–7 packets, so we'll avoid that
+                // Only a single packet will be sent when the chainsaw attack starts.
+                CClientPed* ped = static_cast<CClientPed*>(pInflictingEntity);
+                if (ped->m_pPlayerPed)
+                    cuttingWithChainsaw = weaponUsed == eWeaponType::WEAPONTYPE_CHAINSAW && ped->m_pPlayerPed->IsPedCuttingWithChainsaw();
+
+                // When attacking (hit) with a weapon such as an M4, the ped has the SIMPLE_USE_GUN task and a specific animation
+                if (ped->GetUseGunTask())
+                    hitByWeapon =
+                        (g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pInflictingEntity->GetGameEntity()->GetRpClump(), "gun_butt") ||
+                         g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pInflictingEntity->GetGameEntity()->GetRpClump(), "gun_butt_crouch"));
+            }
+
+            // If the attacker is a player, the attacker sends the packet to the server
+            // If the attacker is an NPC ped, its syncer sends the packet to the server
+            // If the attacker is a vehicle, its syncer sends the packet to the server
+            if (((isMeleeWeapon && !cuttingWithChainsaw) || weaponUsed == eWeaponType::WEAPONTYPE_RAMMEDBYCAR || hitByWeapon) &&
+                !pDamagedPed->IsLocalPlayer() && !pDamagedPed->IsLocalEntity() && !pInflictingEntity->IsLocalEntity() && damagerID != INVALID_ELEMENT_ID &&
+                ((IS_PLAYER(pInflictingEntity) && static_cast<CClientPlayer*>(pInflictingEntity)->IsLocalPlayer()) ||
+                 (IS_PED(pInflictingEntity) && static_cast<CClientPed*>(pInflictingEntity)->IsSyncing()) ||
+                 (IS_VEHICLE(pInflictingEntity) && static_cast<CDeathmatchVehicle*>(pInflictingEntity)->IsSyncing())))
+            {
+                NetBitStreamInterface* bitStream = g_pNet->AllocateNetBitStream();
+
+                bitStream->Write(pDamagedPed->GetID());
+                bitStream->Write(damagerID);
+                bitStream->Write(static_cast<std::uint8_t>(weaponUsed));
+                bitStream->Write(hitZone);
+
+                SFloatAsBitsSync<15> damage = SFloatAsBitsSync<15>(0.f, 176.0f, true, false);
+                damage.data.fValue = fDamage;
+                bitStream->Write(&damage);
+
+                g_pNet->SendPacket(PACKET_ID_PED_HIT, bitStream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE_SEQUENCED);
+
+                g_pNet->DeallocateNetBitStream(bitStream);
+            }
+        }
+
         ///////////////////////////////////////////////////////////////////////////
         // Pass 2 end
         ///////////////////////////////////////////////////////////////////////////
