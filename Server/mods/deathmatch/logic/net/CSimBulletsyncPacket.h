@@ -27,11 +27,11 @@ public:
 
     struct
     {
-        eWeaponType          weapon = eWeaponType::WEAPONTYPE_UNARMED;
+        eWeaponType          weapon{eWeaponType::WEAPONTYPE_UNARMED};
         SPositionSync        start{};
         SPositionSync        end{};
         SFloatAsBitsSync<16> damage{0.0f, CBulletsyncPacket::MAX_DAMAGE, true, false};
         std::uint8_t         zone{};
-        ElementID            damaged = INVALID_ELEMENT_ID;
+        ElementID            damaged{INVALID_ELEMENT_ID};
     } m_cache;
 };
