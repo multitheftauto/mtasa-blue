@@ -25,6 +25,12 @@ bool CCustomWeaponBulletSyncPacket::Read(NetBitStreamInterface& stream)
     if (!m_pSourceElement)
         return false;
 
+    CPlayer* pPlayer = static_cast<CPlayer*>(m_pSourceElement);
+
+    // Mirror the player path: a dead or not-yet-spawned player cannot fire
+    if (!pPlayer || !pPlayer->IsSpawned() || pPlayer->IsDead())
+        return false;
+
     ElementID id = INVALID_ELEMENT_ID;
     if (!stream.Read(id))
         return false;
@@ -43,6 +49,20 @@ bool CCustomWeaponBulletSyncPacket::Read(NetBitStreamInterface& stream)
 
     // Huge coordinates could crash other players
     if (!m_start.data.vecPosition.IsInWorldBounds(true) || !m_end.data.vecPosition.IsInWorldBounds(true))
+        return false;
+
+    // Mirror the player path proximity check so a hacked client cannot
+    // report shots from anywhere on the map
+    const CVector& playerPos = pPlayer->GetPosition();
+    float          dx = m_start.data.vecPosition.fX - playerPos.fX;
+    float          dy = m_start.data.vecPosition.fY - playerPos.fY;
+    float          dz = m_start.data.vecPosition.fZ - playerPos.fZ;
+    float          distSq = dx * dx + dy * dy + dz * dz;
+
+    // Allow larger distance if player is in vehicle (vehicle guns have offsets,
+    // plus vehicle size, plus network lag compensation)
+    const float maxShootDistanceSq = pPlayer->GetOccupiedVehicle() ? (100.0f * 100.0f) : (50.0f * 50.0f);
+    if (distSq > maxShootDistanceSq)
         return false;
 
     // Scripted custom weapons can outrange the stock bullet sync set, so the

@@ -1513,6 +1513,27 @@ void CGame::InitialDataStream(CPlayer& Player)
 
     marker.Set("onPlayerJoin");
 
+    // Custom weapon stat properties are sent to clients only when a script
+    // sets them, so a player who joins later would keep the default values.
+    // Re-send the weapon range used by the client-side shot cap so a viewer
+    // joining late measures shots the same way the server does.
+    CCustomWeaponManager* pWeaponManager = GetCustomWeaponManager();
+    if (pWeaponManager)
+    {
+        for (CCustomWeaponListType::const_iterator iter = pWeaponManager->IterBegin(); iter != pWeaponManager->IterEnd(); ++iter)
+        {
+            CCustomWeapon* pWeapon = *iter;
+            if (pWeapon->IsBeingDeleted())
+                continue;
+
+            CBitStream bitStream;
+            bitStream.pBitStream->Write(pWeapon->GetWeaponStat()->GetWeaponRange());
+            Player.Send(CElementRPCPacket(pWeapon, SET_CUSTOM_WEAPON_WEAPON_RANGE, *bitStream.pBitStream));
+        }
+    }
+
+    marker.Set("CustomWeaponSync");
+
     // Register them on the lightweight sync manager.
     m_lightsyncManager.RegisterPlayer(&Player);
 
@@ -2643,11 +2664,18 @@ void CGame::Packet_WeaponBulletsync(CCustomWeaponBulletSyncPacket& packet)
     if (weapon->GetAmmo() <= 0)
         return;
 
+    // The server-side clip is the scripted authority for custom weapons, so
+    // shots are dropped while the clip is empty. Scripts that empty the
+    // clip with setWeaponClipAmmo rely on this to suppress the weapon.
+    if (weapon->GetClipAmmo() <= 0)
+        return;
+
     // Bound custom weapon fire like the other bullet sync paths. Use the
-    // weapon's configured fire time so scripted rates are respected, with a
-    // 40 ms floor that caps how fast a hacked client can push shots through
-    // to the full-join broadcast below.
-    const int fireRateGate = std::max(40, weapon->GetWeaponFireTime());
+    // weapon's configured fire time so scripted rates are respected. The
+    // floor only stops a hacked client pushing shots at line rate, so it
+    // must stay below the fastest fire loop (the minigun at 14 ms)
+    // or legitimate shots of that weapon would be dropped.
+    const int fireRateGate = std::max(10, weapon->GetWeaponFireTime());
     if (player->m_WeaponBulletSyncRateTimer.Get() < fireRateGate)
         return;
     player->m_WeaponBulletSyncRateTimer.Reset();

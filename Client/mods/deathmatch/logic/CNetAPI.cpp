@@ -2356,9 +2356,11 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
 
         damaged = DynamicCast<CClientPlayer>(CElementIDs::GetElement(id));
 
-        // Body zones are 0-9. The server validates this, but the client
-        // should not feed an out-of-range value to the game either.
-        if (zone > 9)
+        // The server validates the zone and that a damaged target exists and
+        // is a player, but the sim relay can carry a shot the main path
+        // rejects. Drop any shot whose target id does not resolve to a player
+        // so the local game never runs the bullet trace for a bogus target.
+        if (zone > 9 || !damaged)
             return;
     }
 
@@ -2378,7 +2380,9 @@ void CNetAPI::ReadWeaponBulletsync(CClientPlayer* player, NetBitStreamInterface&
         return;
 
     auto* weapon = DynamicCast<CClientWeapon>(CElementIDs::GetElement(id));
-    if (!weapon || !CClientWeaponManager::HasWeaponBulletSync(weapon->GetWeaponType()))
+    // The custom path is type-agnostic on the send and server sides, so no
+    // weapon type filter applies here; the element check is the only gate.
+    if (!weapon)
         return;
 
     SPositionSync startPosition;

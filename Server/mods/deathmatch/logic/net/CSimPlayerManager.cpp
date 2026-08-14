@@ -9,7 +9,9 @@
 
 #include "StdInc.h"
 #include "SimHeaders.h"
+#include "CGame.h"
 #include "CWeaponNames.h"
+#include "CWeaponStatManager.h"
 
 //
 // CSimPlayer object is created on CPlayer construction
@@ -149,6 +151,12 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
     {
         pSim->m_WeaponTypes[slot] = pPlayer->GetWeaponType(slot);
         pSim->m_WeaponTotalAmmo[slot] = pPlayer->GetWeaponTotalAmmo(slot);
+        // Only weapons in the bullet sync set can reach the sim range gate,
+        // so only those slots need a snapshot. The widest tier matches the
+        // main path's gate source.
+        if (CWeaponStatManager::HasWeaponBulletSync(pSim->m_WeaponTypes[slot]))
+            pSim->m_fBulletSyncRangeHighest[slot] =
+                g_pGame->GetWeaponStatManager()->GetWeaponRangeFromSkillLevel(static_cast<eWeaponType>(pSim->m_WeaponTypes[slot]), 1000.0f);
     }
     pSim->m_bVehicleHasHydraulics = pVehicle ? pVehicle->GetUpgrades()->HasUpgrade(1087) : false;
     pSim->m_bVehicleIsPlaneOrHeli = pVehicle ? pVehicle->GetVehicleType() == VEHICLE_PLANE || pVehicle->GetVehicleType() == VEHICLE_HELI : false;
@@ -408,13 +416,11 @@ bool CSimPlayerManager::HandleBulletSync(const NetServerPlayerID& socket, NetBit
         return true;
     }
 
-    // m_fWeaponRange comes from the shooter's skill tier, so allow the same
-    // proportional tolerance as the main path plus an absolute slack for the
-    // camera-to-muzzle offset. Short range weapons are measured against the
-    // poor tier, so the slack keeps legitimate pistol shots accepted. A zero
-    // or negative range leaves only the slack envelope, and a non-finite one
-    // skips the gate, leaving the 400 m trajectory cap from the packet read.
-    const float range = player->m_fWeaponRange;
+    // The snapshot holds the packet's weapon slot widest-tier range,
+    // matching the main path's gate source, so zone-0 viewers accept the
+    // same shots zone-1/2 viewers get. The tolerance and slack mirror the
+    // main path.
+    const float range = player->m_fBulletSyncRangeHighest[slot];
     if (std::isfinite(range))
     {
         const float maxDistance = std::max(0.0f, range) * 1.1f + 15.0f;
