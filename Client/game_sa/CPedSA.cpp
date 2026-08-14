@@ -610,13 +610,8 @@ bool CPedSA::IsPedCuttingWithChainsaw() const
         assert(gamePed);
 
         if (gamePed->m_pRwObject && gamePed->weaponAudioEntity.m_chainsawState == eChainsawState::CUTTING)
-        {
-            auto cuttingAnim = pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(gamePed->m_pRwObject, "csaw_g");
-            if (!cuttingAnim)
-                cuttingAnim = pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(gamePed->m_pRwObject, "csaw_part");
-
-            return cuttingAnim != nullptr;
-        }
+            return pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(gamePed->m_pRwObject, "csaw_g") ||
+                   pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(gamePed->m_pRwObject, "csaw_part");
     }
 
     return false;

@@ -4629,9 +4629,15 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
 
                 // When attacking (hit) with a weapon such as an M4, the ped has the SIMPLE_USE_GUN task and a specific animation
                 if (ped->GetUseGunTask())
-                    hitByWeapon =
-                        (g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pInflictingEntity->GetGameEntity()->GetRpClump(), "gun_butt") ||
-                         g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pInflictingEntity->GetGameEntity()->GetRpClump(), "gun_butt_crouch"));
+                {
+                    CEntity* gameEntity = pInflictingEntity->GetGameEntity();
+                    if (gameEntity && gameEntity->GetRpClump())
+                    {
+                        hitByWeapon =
+                            g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pInflictingEntity->GetGameEntity()->GetRpClump(), "gun_butt") ||
+                            g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pInflictingEntity->GetGameEntity()->GetRpClump(), "gun_butt_crouch");
+                    }
+                }
             }
 
             // If the attacker is a player, the attacker sends the packet to the server
