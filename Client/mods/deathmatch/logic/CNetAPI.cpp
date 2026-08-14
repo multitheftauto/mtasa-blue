@@ -2297,6 +2297,18 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
     static_cast<CDeathmatchVehicle*>(pVehicle)->ResetDamageModelSync();
 }
 
+namespace
+{
+    // Mirrors CBulletsyncPacket::ValidateTrajectory bounds so a compromised or
+    // buggy server cant push extreme shots to this client. The server side
+    // checks remain the authority.
+    bool IsBulletSyncTrajectoryValid(const CVector& start, const CVector& end)
+    {
+        const float movementSq = (end - start).LengthSquared();
+        return std::isfinite(movementSq) && movementSq >= 0.0001f && movementSq <= 160000.0f;
+    }
+}  // namespace
+
 void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& stream)
 {
     std::uint8_t weapon = 0;
@@ -2317,6 +2329,18 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
     if (!startPosition.data.vecPosition.IsInWorldBounds(true) || !endPosition.data.vecPosition.IsInWorldBounds(true))
         return;
 
+    if (!IsBulletSyncTrajectoryValid(startPosition.data.vecPosition, endPosition.data.vecPosition))
+        return;
+
+    // Skip re-delivered copies of the same shot within a short window. The
+    // window must stay below the fastest legitimate fire interval (MP5 at
+    // 94 ms) so repeated shots from a player standing still are not eaten,
+    // while the two relay copies arrive within the same server frame.
+    const CTickCount tickCountNow = CTickCount::Now();
+    if (startPosition.data.vecPosition == player->m_vecPrevBulletSyncStart && endPosition.data.vecPosition == player->m_vecPrevBulletSyncEnd &&
+        (tickCountNow - player->m_BulletSyncDedupTime) < CTickCount(50LL))
+        return;
+
     // 200 is MAX weapon damage
     SFloatAsBitsSync<8> damage(0, 200.0f, true, false);
     damage.data.fValue = 0.0f;
@@ -2331,7 +2355,18 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
             return;
 
         damaged = DynamicCast<CClientPlayer>(CElementIDs::GetElement(id));
+
+        // Body zones are 0-9. The server validates this, but the client
+        // should not feed an out-of-range value to the game either.
+        if (zone > 9)
+            return;
     }
+
+    // Remember the shot only once every field has parsed, so a malformed
+    // packet cannot eat the slot from the next legitimate identical shot.
+    player->m_vecPrevBulletSyncStart = startPosition.data.vecPosition;
+    player->m_vecPrevBulletSyncEnd = endPosition.data.vecPosition;
+    player->m_BulletSyncDedupTime = tickCountNow;
 
     player->DischargeWeapon(type, startPosition.data.vecPosition, endPosition.data.vecPosition, damage.data.fValue, zone, damaged);
 }
@@ -2358,6 +2393,20 @@ void CNetAPI::ReadWeaponBulletsync(CClientPlayer* player, NetBitStreamInterface&
     if (!startPosition.data.vecPosition.IsInWorldBounds(true) || !endPosition.data.vecPosition.IsInWorldBounds(true))
         return;
 
+    // Scripted custom weapons can outrange the stock bullet sync set, so the
+    // shot length cap follows the weapon's own stat instead of the fixed
+    // 400 m cap. A zero, negative or non-finite scripted range falls back to
+    // the fixed cap.
+    CWeaponStat* pWeaponStat = weapon->GetWeaponStat();
+    float        range = pWeaponStat ? pWeaponStat->GetWeaponRange() : 0.0f;
+    if (!std::isfinite(range))
+        range = 0.0f;
+
+    const float maxDistance = std::max(400.0f, std::max(0.0f, range) * 1.1f + 15.0f);
+    const float movementSq = (endPosition.data.vecPosition - startPosition.data.vecPosition).LengthSquared();
+    if (!std::isfinite(movementSq) || movementSq < 0.0001f || movementSq > maxDistance * maxDistance)
+        return;
+
     weapon->FireInstantHit(startPosition.data.vecPosition, endPosition.data.vecPosition, false, true);
 }
 
@@ -2380,7 +2429,7 @@ void CNetAPI::SendBulletSyncFire(eWeaponType weapon, const CVector& start, const
 
     if (hasDamaged)
     {
-        SFloatAsBitsSync<8> damageF(0, 200.0f, false);
+        SFloatAsBitsSync<8> damageF(0, 200.0f, true);
         damageF.data.fValue = damage;
 
         stream->Write(&damageF);

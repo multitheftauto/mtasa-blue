@@ -23,8 +23,6 @@ class CBulletsyncPacket final : public CPacket
 public:
     static constexpr float         MIN_DISTANCE_SQ = 0.0001f;
     static constexpr float         MAX_DISTANCE_SQ = 160000.0f;
-    static constexpr float         EPSILON = 0.0001f;
-    static constexpr float         EPSILON_SQ = EPSILON * EPSILON;
     static constexpr unsigned char MAX_BODY_ZONE = 9;
     static constexpr float         MAX_DAMAGE = 200.0f;
 

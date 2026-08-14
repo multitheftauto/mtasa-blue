@@ -20,6 +20,7 @@
 CBulletsyncPacket::CBulletsyncPacket(CPlayer* player) : m_weapon(WEAPONTYPE_UNARMED), m_start(), m_end(), m_zone(0), m_damaged(INVALID_ELEMENT_ID)
 {
     m_pSourceElement = player;
+    m_damage.data.fValue = 0.0f;
 }
 
 bool CBulletsyncPacket::ValidateTrajectory(const CVector& start, const CVector& end) noexcept
@@ -81,9 +82,11 @@ bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
         return true;
     }
 
-    stream.Read(&m_damage);
-    stream.Read(m_zone);
-    stream.Read(m_damaged);
+    if (!stream.Read(&m_damage) || !stream.Read(m_zone) || !stream.Read(m_damaged))
+    {
+        ResetDamageData();
+        return false;
+    }
 
     if (!std::isfinite(m_damage.data.fValue))
     {
@@ -103,17 +106,18 @@ bool CBulletsyncPacket::ReadOptionalDamage(NetBitStreamInterface& stream)
         return false;
     }
 
-    // Check that target element exists (if specified)
-    // Note: m_damaged can be INVALID_ELEMENT_ID when shooting at ground/world
+    // Check that target element exists and is a player, since the client only
+    // reports player hits. Note: m_damaged can be INVALID_ELEMENT_ID when
+    // shooting at ground/world
     if (m_damaged != INVALID_ELEMENT_ID)
     {
         CElement* pElement = CElementIDs::GetElement(m_damaged);
-        if (!pElement)
+        if (!pElement || !IS_PLAYER(pElement))
         {
             ResetDamageData();
             return false;
         }
-        // Element exists
+        // Element exists and is a player
     }
 
     return true;

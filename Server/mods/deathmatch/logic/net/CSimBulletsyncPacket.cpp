@@ -10,7 +10,7 @@
 #include "StdInc.h"
 #include "SimHeaders.h"
 #include "CWeaponStatManager.h"
-#include <packets/CBulletsyncPacket.h>
+#include "packets/CBulletsyncPacket.h"
 
 CSimBulletsyncPacket::CSimBulletsyncPacket(ElementID id) : m_id(id)
 {
@@ -40,7 +40,8 @@ bool CSimBulletsyncPacket::Read(NetBitStreamInterface& stream)
 
     if (stream.ReadBit())
     {
-        stream.Read(&m_cache.damage);
+        if (!stream.Read(&m_cache.damage))
+            return false;
 
         if (!std::isfinite(m_cache.damage.data.fValue))
             return false;
@@ -48,11 +49,19 @@ bool CSimBulletsyncPacket::Read(NetBitStreamInterface& stream)
         if (m_cache.damage.data.fValue < 0.0f || m_cache.damage.data.fValue > CBulletsyncPacket::MAX_DAMAGE)
             return false;
 
-        stream.Read(m_cache.zone);
+        if (!stream.Read(m_cache.zone))
+            return false;
+
         if (m_cache.zone > CBulletsyncPacket::MAX_BODY_ZONE)
             return false;
 
-        stream.Read(m_cache.damaged);
+        if (!stream.Read(m_cache.damaged))
+            return false;
+
+        // The main path checks that a damaged target still exists. Doing that
+        // here would dereference the element table from the sim thread while
+        // the main thread can free entries, so the relay relies on the main
+        // path check and on the receiving client ignoring unknown targets.
     }
 
     return true;

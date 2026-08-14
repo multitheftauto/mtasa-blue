@@ -58,6 +58,19 @@ public:
     uint                  m_uiVehicleDamageInfoSendPhase;
     SSimVehicleDamageInfo m_VehicleDamageInfo;
 
+    // Used in bullet sync validation (HandleBulletSync)
+    CVector      m_vecPosition;
+    CElapsedTime m_BulletSyncRateTimer;
+
+    // Bullet sync validation snapshot, refreshed by UpdateSimPlayer on the
+    // main thread. The sim thread must not read live player state, so the
+    // sim path's possession and ammo checks run against these copies.
+    static constexpr unsigned char WEAPON_SLOT_COUNT = 13;  // Matches WEAPON_SLOTS in CPed.h
+    bool                           m_bIsSpawned;
+    bool                           m_bIsDead;
+    unsigned char                  m_WeaponTypes[WEAPON_SLOT_COUNT];
+    unsigned short                 m_WeaponTotalAmmo[WEAPON_SLOT_COUNT];
+
     // Used in CSimKeysyncPacket
     bool m_bVehicleHasHydraulics;
     bool m_bVehicleIsPlaneOrHeli;

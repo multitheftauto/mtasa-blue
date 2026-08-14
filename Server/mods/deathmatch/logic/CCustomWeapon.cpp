@@ -44,6 +44,10 @@ CCustomWeapon::CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, 
 
     m_pWeaponStat = new CWeaponStat(m_Type, WEAPONSKILL_STD);
 
+    // Seed the fire time from the weapon stat like the client ctor does, so
+    // reading it before a script ever sets or resets it returns a sane value.
+    ResetWeaponFireTime();
+
     m_itargetWheel = MAX_WHEELS + 1;
     m_nAmmoInClip = m_pWeaponStat->GetMaximumClipAmmo();
     m_ucCounter = 0;

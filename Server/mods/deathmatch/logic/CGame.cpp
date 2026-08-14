@@ -2583,19 +2583,30 @@ void CGame::Packet_Bulletsync(CBulletsyncPacket& packet)
     // Note: Don't check ammo in clip here - it can be out of sync due to network timing
     // The total ammo check above is sufficient
 
-    const auto stat = CWeaponStatManager::GetSkillStatIndex(packet.m_weapon);
-    const auto level = player->GetPlayerStat(stat);
-    auto*      stats = g_pGame->GetWeaponStatManager()->GetWeaponStatsFromSkillLevel(packet.m_weapon, level);
-
     const float distanceSq = (packet.m_start.data.vecPosition - packet.m_end.data.vecPosition).LengthSquared();
-    const float range = stats->GetWeaponRange();
-    const float rangeSq = range * range;
 
-    const float maxRangeSq = rangeSq * 1.1f;  // 10% tolerance for floating point
-    if (distanceSq > maxRangeSq)
+    // Measure the shot against the weapon's widest skill tier, because a player
+    // whose stat has never been raised would otherwise be measured against the
+    // poor tier. Keep the 10% tolerance for floating point and add an absolute
+    // slack for the third-person camera-to-muzzle offset, which does not shrink
+    // with the weapon range. A zero or negative script-set range leaves only
+    // the slack envelope, and a non-finite one skips the gate, leaving the
+    // 400 m trajectory cap applied during packet read.
+    const float range = g_pGame->GetWeaponStatManager()->GetWeaponRangeFromSkillLevel(packet.m_weapon, 1000.0f);
+    if (std::isfinite(range))
+    {
+        const float maxDistance = std::max(0.0f, range) * 1.1f + 15.0f;
+        if (distanceSq > maxDistance * maxDistance)
+            return;
+    }
+
+    // Per-player fire rate gate so a shooter cannot relay bullets at line rate.
+    // No weapon in the bullet sync set (22-34) fires faster than about 16 rounds
+    // per second, so a 40 ms minimum leaves room for legitimate play while
+    // bounding the relayed traffic a cheater can push through per-shot checks.
+    if (player->m_BulletSyncRateTimer.Get() < 40)
         return;
-
-    RelayNearbyPacket(packet);
+    player->m_BulletSyncRateTimer.Reset();
 
     CLuaArguments args;
     args.PushNumber(packet.m_weapon);
@@ -2631,6 +2642,15 @@ void CGame::Packet_WeaponBulletsync(CCustomWeaponBulletSyncPacket& packet)
     CCustomWeapon* weapon = packet.GetWeapon();
     if (weapon->GetAmmo() <= 0)
         return;
+
+    // Bound custom weapon fire like the other bullet sync paths. Use the
+    // weapon's configured fire time so scripted rates are respected, with a
+    // 40 ms floor that caps how fast a hacked client can push shots through
+    // to the full-join broadcast below.
+    const int fireRateGate = std::max(40, weapon->GetWeaponFireTime());
+    if (player->m_WeaponBulletSyncRateTimer.Get() < fireRateGate)
+        return;
+    player->m_WeaponBulletSyncRateTimer.Reset();
 
     CLuaArguments args;
     args.PushElement(player);
