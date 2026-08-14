@@ -2342,7 +2342,7 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
         return;
 
     // 200 is MAX weapon damage
-    SFloatAsBitsSync<8> damage(0, 200.0f, true, false);
+    SFloatAsBitsSync<16> damage(0, 200.0f, true, false);
     damage.data.fValue = 0.0f;
 
     std::uint8_t   zone = 0;
@@ -2433,7 +2433,7 @@ void CNetAPI::SendBulletSyncFire(eWeaponType weapon, const CVector& start, const
 
     if (hasDamaged)
     {
-        SFloatAsBitsSync<8> damageF(0, 200.0f, true);
+        SFloatAsBitsSync<16> damageF(0, 200.0f, true);
         damageF.data.fValue = damage;
 
         stream->Write(&damageF);

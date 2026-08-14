@@ -44,12 +44,12 @@ private:
     void ResetDamageData() noexcept;
 
 public:
-    eWeaponType         m_weapon{};
-    SPositionSync       m_start{};
-    SPositionSync       m_end{};
-    SFloatAsBitsSync<8> m_damage{0.0f, 200.0f, true, false};
-    std::uint8_t        m_zone{};
-    ElementID           m_damaged{INVALID_ELEMENT_ID};
+    eWeaponType          m_weapon{};
+    SPositionSync        m_start{};
+    SPositionSync        m_end{};
+    SFloatAsBitsSync<16> m_damage{0.0f, MAX_DAMAGE, true, false};
+    std::uint8_t         m_zone{};
+    ElementID            m_damaged{INVALID_ELEMENT_ID};
 };
 
 #endif  // __CBULLETSYNCPACKET_H
