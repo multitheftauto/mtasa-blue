@@ -4630,12 +4630,16 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
                 // When attacking (hit) with a weapon such as an M4, the ped has the SIMPLE_USE_GUN task and a specific animation
                 if (ped->GetUseGunTask())
                 {
-                    CEntity* gameEntity = pInflictingEntity->GetGameEntity();
-                    if (gameEntity && gameEntity->GetRpClump())
+                    if (CEntity* gameEntity = pInflictingEntity->GetGameEntity())
                     {
-                        hitByWeapon =
-                            g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pInflictingEntity->GetGameEntity()->GetRpClump(), "gun_butt") ||
-                            g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pInflictingEntity->GetGameEntity()->GetRpClump(), "gun_butt_crouch");
+                        if (RpClump* clump = gameEntity->GetRpClump())
+                        {
+                            auto animManager = g_pGame->GetAnimManager();
+                            assert(animManager);
+
+                            hitByWeapon = animManager->RpAnimBlendClumpGetAssociation(clump, "gun_butt") ||
+                                          animManager->RpAnimBlendClumpGetAssociation(clump, "gun_butt_crouch");
+                        }
                     }
                 }
             }
