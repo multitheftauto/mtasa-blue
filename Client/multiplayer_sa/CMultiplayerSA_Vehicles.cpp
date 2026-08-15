@@ -1014,7 +1014,7 @@ static void __declspec(naked) HOOK_CVehicle__GetPlaneNumGuns_ModelId()
     {
         push    ecx
         push    edx
-        movsx   ecx, word ptr [ecx + 0x22]
+        movzx   ecx, word ptr [ecx + 0x22]
         call    ResolveAircraftWeaponModelId
         pop     edx
         pop     ecx
@@ -1039,7 +1039,7 @@ static void __declspec(naked) HOOK_CVehicle__GetPlaneGunsAutoAimAngle_ModelId()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [ecx + 0x22]
+        movzx   ecx, word ptr [ecx + 0x22]
         call    ResolveAircraftWeaponModelId
         add     eax, 0xFFFFFE57
         jmp     CONTINUE_CVehicle__GetPlaneGunsAutoAimAngle_ModelId
@@ -1062,7 +1062,7 @@ static void __declspec(naked) HOOK_CVehicle__GetPlaneGunsRateOfFire_ModelId()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [ecx + 0x22]
+        movzx   ecx, word ptr [ecx + 0x22]
         call    ResolveAircraftWeaponModelId
         add     eax, 0xFFFFFE57
         jmp     CONTINUE_CVehicle__GetPlaneGunsRateOfFire_ModelId
@@ -1085,7 +1085,7 @@ static void __declspec(naked) HOOK_CVehicle__GetPlaneOrdnanceRateOfFire_ModelId(
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [ecx + 0x22]
+        movzx   ecx, word ptr [ecx + 0x22]
         call    ResolveAircraftWeaponModelId
         add     eax, 0xFFFFFE57
         jmp     CONTINUE_CVehicle__GetPlaneOrdnanceRateOfFire_ModelId
@@ -1159,7 +1159,7 @@ static void __declspec(naked) HOOK_CVehicle__SelectPlaneWeapon_ModelId()
     {
         push    ecx
         push    edx
-        movsx   ecx, word ptr [ecx + 0x22]
+        movzx   ecx, word ptr [ecx + 0x22]
         call    ResolveAircraftWeaponModelId
         pop     edx
         pop     ecx
@@ -1184,7 +1184,7 @@ static void __declspec(naked) HOOK_CVehicle__FirePlaneGuns_ModelId()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveAircraftWeaponModelId
         add     eax, 0xFFFFFE57
         jmp     CONTINUE_CVehicle__FirePlaneGuns_ModelId
@@ -1207,7 +1207,7 @@ static void __declspec(naked) HOOK_CVehicle__FireUnguidedMissile_ModelId()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveAircraftWeaponModelId
         sub     eax, 0x1A9
         jmp     CONTINUE_CVehicle__FireUnguidedMissile_ModelId
@@ -1230,7 +1230,7 @@ static void __declspec(naked) HOOK_CVehicle__GetPlaneWeaponFiringStatus_ModelId(
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveAircraftWeaponModelId
         add     eax, 0xFFFFFE57
         jmp     CONTINUE_CVehicle__GetPlaneWeaponFiringStatus_ModelId
@@ -1252,7 +1252,7 @@ static void __declspec(naked) HOOK_CVehicle__ProcessWeapons_HydraCheck()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveAircraftWeaponModelId
         cmp     eax, 0x208
         jmp     CONTINUE_CVehicle__ProcessWeapons_HydraCheck
@@ -1283,7 +1283,7 @@ static void __declspec(naked) HOOK_CHud__DrawCrossHairs_ModelCheck()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [eax + 0x22]
+        movzx   ecx, word ptr [eax + 0x22]
         call    ResolveAircraftWeaponModelId
         cmp     eax, 0x208
         je      matched
@@ -1309,7 +1309,7 @@ static void __declspec(naked) HOOK_CCam__Process_HydraLockOnCheck()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [eax + 0x22]
+        movzx   ecx, word ptr [eax + 0x22]
         call    ResolveAircraftWeaponModelId
         cmp     eax, 0x208
         jmp     CONTINUE_CCam__Process_HydraLockOnCheck
@@ -1412,7 +1412,7 @@ static void __declspec(naked) HOOK_CPlane__ProcessControlInputs_HydraNozzleTurn(
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveAircraftWeaponModelId
         cmp     eax, 0x208
         jmp     CONTINUE_CPlane__ProcessControlInputs_HydraNozzleTurn
@@ -1437,7 +1437,7 @@ static void __declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessAircraft_JetCla
     {
         push    ecx
         push    edx
-        movsx   ecx, word ptr [edx + 0x22]
+        movzx   ecx, word ptr [edx + 0x22]
         call    ResolveJetAudioModelId
         pop     edx
         pop     ecx
@@ -1462,7 +1462,7 @@ static void __declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessGenericJet_Mode
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [eax + 0x22]
+        movzx   ecx, word ptr [eax + 0x22]
         call    ResolveJetAudioModelId
         add     eax, 0xFFFFFDF9
         jmp     CONTINUE_CAEVehicleAudioEntity__ProcessGenericJet_ModelSelect
@@ -1486,7 +1486,7 @@ static void __declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessSpecialVehicle_
     __asm
     {
         push    ecx
-        movsx   ecx, word ptr [eax + 0x22]
+        movzx   ecx, word ptr [eax + 0x22]
         call    ResolveVehicleParentModelId
         pop     ecx
         add     eax, 0xFFFFFE4D
@@ -1511,7 +1511,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessBuoyancy_AmphibiousRotorE
     __asm
     {
         // ax is left holding the resolved id for the untouched Leviathan compare at 0x6A8DF0.
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x1BF
         jmp     CONTINUE_CAutomobile__ProcessBuoyancy_AmphibiousRotorExempt
@@ -1535,7 +1535,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessBuoyancy_AmphibiousSafeFl
     __asm
     {
         // cx is left holding the resolved id for the Leviathan and Vortex compares below.
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         mov     ecx, eax
         cmp     cx, 0x1BF
@@ -1559,7 +1559,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessBuoyancy_VortexSpeedDampi
     __asm
     {
         // Don't touch the x87 stack; st(0) feeds the fstp at CONTINUE.
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x21B
         jmp     CONTINUE_CAutomobile__ProcessBuoyancy_VortexSpeedDampingExempt
@@ -1582,7 +1582,7 @@ static void __declspec(naked) HOOK_CPlane__ProcessControlInputs_VortexSteerAxis(
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x21B
         push    edi
@@ -1606,7 +1606,7 @@ static void __declspec(naked) HOOK_CPlane__ProcessControlInputs_VortexSteerAngle
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x21B
         mov     edx, dword ptr [esi + 0x384]
@@ -1630,7 +1630,7 @@ static void __declspec(naked) HOOK_CCam__ProcessFollowCarSA_DistanceCategoryMode
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [edi + 0x22]
+        movzx   ecx, word ptr [edi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x1B9
         jmp     CONTINUE_CCam__ProcessFollowCarSA_DistanceCategoryModel
@@ -1652,7 +1652,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_SkimmerBoatContro
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CAutomobile__ProcessControl_SkimmerBoatControl
@@ -1674,7 +1674,7 @@ static void __declspec(naked) HOOK_CHeli__ProcessControl_SearchLightModel()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1F1
         jmp     CONTINUE_CHeli__ProcessControl_SearchLightModel
@@ -1696,7 +1696,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_RCBaronFakePhysic
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1D0
         jmp     CONTINUE_CAutomobile__ProcessControl_RCBaronFakePhysicsGate
@@ -1718,7 +1718,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_RCBaronNormalGate
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1D0
         jmp     CONTINUE_CAutomobile__ProcessControl_RCBaronNormalGate
@@ -1740,7 +1740,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessFlyingCarStuff_RCBaronFas
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x1D0
         jmp     CONTINUE_CAutomobile__ProcessFlyingCarStuff_RCBaronFastPathGate
@@ -1763,7 +1763,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessFlyingCarStuff_RCBaronCon
     __asm
     {
         push    eax
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x1D0
         pop     eax
@@ -1787,7 +1787,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessFlyingCarStuff_RCBaronBeh
     __asm
     {
         push    eax
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         mov     cx, ax
         cmp     cx, 0x1D0
@@ -1798,7 +1798,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessFlyingCarStuff_RCBaronBeh
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
-// >>> 0x6D6A7B | 0F BF 4E 22          | movsx   ecx, word ptr [esi + 0x22]
+// >>> 0x6D6A7B | 0F BF 4E 22          | movzx   ecx, word ptr [esi + 0x22]
 // >>> 0x6D6A7F | 88 86 88 04 00 00    | mov     byte ptr [esi + 0x488], al
 //     0x6D6A85 | 8D 81 47 FE FF FF    | lea     eax, [ecx - 0x1B9]
 #define HOOKPOS_CVehicle__SetModelIndex_RCVehicleFlag  0x6D6A7B
@@ -1813,7 +1813,7 @@ static void __declspec(naked) HOOK_CVehicle__SetModelIndex_RCVehicleFlag()
     __asm
     {
         mov     byte ptr [esi + 0x488], al
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         mov     ecx, eax
         jmp     CONTINUE_CVehicle__SetModelIndex_RCVehicleFlag
@@ -1836,7 +1836,7 @@ static void __declspec(naked) HOOK_CPlane__ProcessControl_SmokeEjectorModel()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x200
         jmp     CONTINUE_CPlane__ProcessControl_SmokeEjectorModel
@@ -1859,7 +1859,7 @@ static void __declspec(naked) HOOK_CPlane__ProcessControl_SmokeParticleModel()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x200
         jmp     CONTINUE_CPlane__ProcessControl_SmokeParticleModel
@@ -1881,7 +1881,7 @@ static void __declspec(naked) HOOK_CPlane__ProcessControl_VortexTrailModel()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x21B
         jmp     CONTINUE_CPlane__ProcessControl_VortexTrailModel
@@ -1904,7 +1904,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_AmphibiousPhysics
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         mov     ecx, eax
         cmp     cx, 0x1BF
@@ -1927,7 +1927,7 @@ static void __declspec(naked) HOOK_CPlane__Constructor_HydraNozzlePrime()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x208
         jmp     CONTINUE_CPlane__Constructor_HydraNozzlePrime
@@ -1949,7 +1949,7 @@ static void __declspec(naked) HOOK_CVehicle__FlyingControl_HydraPlaneThrust()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x208
         jmp     CONTINUE_CVehicle__FlyingControl_HydraPlaneThrust
@@ -1971,7 +1971,7 @@ static void __declspec(naked) HOOK_CVehicle__FlyingControl_HydraHoverThrust()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x208
         jmp     CONTINUE_CVehicle__FlyingControl_HydraHoverThrust
@@ -1994,7 +1994,7 @@ static void __declspec(naked) HOOK_CPlane__PreRender_ComponentSwitch()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         add     eax, 0xFFFFFE24
         jmp     CONTINUE_CPlane__PreRender_ComponentSwitch
@@ -2016,7 +2016,7 @@ static void __declspec(naked) HOOK_CPlane__PreRender_HydraRotationMode()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x208
         jmp     CONTINUE_CPlane__PreRender_HydraRotationMode
@@ -2039,7 +2039,7 @@ static void __declspec(naked) HOOK_CPlane__PreRender_RampAndNozzleModel()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x250
         jmp     CONTINUE_CPlane__PreRender_RampAndNozzleModel
@@ -2260,7 +2260,7 @@ static void __declspec(naked) HOOK_CVehicle__ProcessBoatControl_SkimmerCapsizedB
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CVehicle__ProcessBoatControl_SkimmerCapsizedBuoyancy
@@ -2284,7 +2284,7 @@ static void __declspec(naked) HOOK_CVehicle__ProcessBoatControl_SkimmerWaterLand
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CVehicle__ProcessBoatControl_SkimmerWaterLandingDamping
@@ -2310,7 +2310,7 @@ static void __declspec(naked) HOOK_CVehicle__ProcessBoatControl_SkimmerAquaplane
     {
         // ecx (a physics-matrix pointer) is reused past CONTINUE at 0x6DC2B1/BE/C9.
         push    ecx
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         pop     ecx
         cmp     eax, 0x1CC
@@ -2335,7 +2335,7 @@ static void __declspec(naked) HOOK_CVehicle__ProcessBoatControl_SkimmerSlowingDo
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CVehicle__ProcessBoatControl_SkimmerSlowingDownGate
@@ -2359,7 +2359,7 @@ static void __declspec(naked) HOOK_CVehicle__ProcessBoatControl_SkimmerTurnResis
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CVehicle__ProcessBoatControl_SkimmerTurnResistanceSkip
@@ -2383,7 +2383,7 @@ static void __declspec(naked) HOOK_CVehicle__ApplyBoatWaterResistance_SkimmerHul
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CVehicle__ApplyBoatWaterResistance_SkimmerHullDrag
@@ -2411,7 +2411,7 @@ static void __declspec(naked) HOOK_CBuoyancy__PreCalcSetup_LeviathanSkimmerModel
     {
         push    ecx
         push    edx
-        movsx   ecx, word ptr [edi + 0x22]
+        movzx   ecx, word ptr [edi + 0x22]
         call    ResolveVehicleParentModelId
         pop     edx
         pop     ecx
@@ -2437,7 +2437,7 @@ static void __declspec(naked) HOOK_CPlane__ProcessControl_SkimmerWheelStatus()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CPlane__ProcessControl_SkimmerWheelStatus
@@ -2461,7 +2461,7 @@ static void __declspec(naked) HOOK_CPlane__PreRender_SkimmerBoatSplashesCall()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CPlane__PreRender_SkimmerBoatSplashesCall
@@ -2488,7 +2488,7 @@ static void __declspec(naked) HOOK_CVehicle__DoBoatSplashes_SkimmerIntensityMode
     {
         // edi keeps the literal target; only the vehicle's model is resolved
         mov     edi, 0x1CC
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, di
         jmp     CONTINUE_CVehicle__DoBoatSplashes_SkimmerIntensityModel
@@ -2513,7 +2513,7 @@ static void __declspec(naked) HOOK_CWaterLevel__RenderBoatWakes_SkimmerModel()
     __asm
     {
         push    eax
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         pop     eax
@@ -2538,7 +2538,7 @@ static void __declspec(naked) HOOK_CBoat__Render_SkimmerPropellerSpin()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CBoat__Render_SkimmerPropellerSpin
@@ -2562,7 +2562,7 @@ static void __declspec(naked) HOOK_CCamera__CamControl_SkimmerCameraMode()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [ecx + 0x22]
+        movzx   ecx, word ptr [ecx + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CCamera__CamControl_SkimmerCameraMode
@@ -2586,7 +2586,7 @@ static void __declspec(naked) HOOK_CCam__TryToStartNewCamMode_SkimmerCheckA()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [eax + 0x22]
+        movzx   ecx, word ptr [eax + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CCam__TryToStartNewCamMode_SkimmerCheckA
@@ -2611,7 +2611,7 @@ static void __declspec(naked) HOOK_CCam__TryToStartNewCamMode_SkimmerCheckB()
     __asm
     {
         push    ecx
-        movsx   ecx, word ptr [ecx + 0x22]
+        movzx   ecx, word ptr [ecx + 0x22]
         call    ResolveVehicleParentModelId
         pop     ecx
         cmp     eax, 0x1CC
@@ -2636,7 +2636,7 @@ static void __declspec(naked) HOOK_CCam__TryToStartNewCamMode_SkimmerCheckC()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [eax + 0x22]
+        movzx   ecx, word ptr [eax + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CCam__TryToStartNewCamMode_SkimmerCheckC
@@ -2660,7 +2660,7 @@ static void __declspec(naked) HOOK_CCam__TryToStartNewCamMode_SkimmerCheckD()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [edx + 0x22]
+        movzx   ecx, word ptr [edx + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CCam__TryToStartNewCamMode_SkimmerCheckD
@@ -2684,7 +2684,7 @@ static void __declspec(naked) HOOK_CCam__TryToStartNewCamMode_SkimmerCheckE()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [ecx + 0x22]
+        movzx   ecx, word ptr [ecx + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CCam__TryToStartNewCamMode_SkimmerCheckE
@@ -2708,7 +2708,7 @@ static void __declspec(naked) HOOK_CCam__Process_SkimmerFramingA()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [edx + 0x22]
+        movzx   ecx, word ptr [edx + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CCam__Process_SkimmerFramingA
@@ -2732,7 +2732,7 @@ static void __declspec(naked) HOOK_CCam__Process_SkimmerFramingB()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [edx + 0x22]
+        movzx   ecx, word ptr [edx + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CCam__Process_SkimmerFramingB
@@ -2756,7 +2756,7 @@ static void __declspec(naked) HOOK_CCam__Process_SkimmerFramingC()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [ecx + 0x22]
+        movzx   ecx, word ptr [ecx + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CCam__Process_SkimmerFramingC
@@ -2780,7 +2780,7 @@ static void __declspec(naked) HOOK_CCam__Process_SkimmerFramingD()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [eax + 0x22]
+        movzx   ecx, word ptr [eax + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CCam__Process_SkimmerFramingD
@@ -2804,7 +2804,7 @@ static void __declspec(naked) HOOK_CCam__Process_SkimmerFramingE()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [eax + 0x22]
+        movzx   ecx, word ptr [eax + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x1CC
         jmp     CONTINUE_CCam__Process_SkimmerFramingE
@@ -2830,7 +2830,7 @@ static void __declspec(naked) HOOK_CRenderer__SetupEntityVisibility_SkimmerCulli
     // clang-format off
     __asm
     {
-        movsx   ecx, ax
+        movzx   ecx, ax
         call    ResolveVehicleParentModelId
         cmp     ax, 0x1CC
         jne     notSkimmer
@@ -2857,7 +2857,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_VortexTractionBoo
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x21B
         jmp     CONTINUE_CAutomobile__ProcessControl_VortexTractionBoost
@@ -2879,7 +2879,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_VortexWheelSettle
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x21B
         jmp     CONTINUE_CAutomobile__ProcessControl_VortexWheelSettleExempt
@@ -2901,7 +2901,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessSuspension_VortexSpringFo
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x21B
         jmp     CONTINUE_CAutomobile__ProcessSuspension_VortexSpringForceScale
@@ -2923,7 +2923,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessSuspension_VortexGroundSp
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x21B
         jmp     CONTINUE_CAutomobile__ProcessSuspension_VortexGroundSpringExempt
@@ -2951,7 +2951,7 @@ static void __declspec(naked) HOOK_CVehicle__FlyingControl_VortexSkimmerGroundRe
     {
         // eax holds 1.0f, consumed by four untouched dword compares at 0x6D8E23/2B/33/3B.
         push    eax
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         mov     bx, ax
         pop     eax
@@ -2978,7 +2978,7 @@ static void __declspec(naked) HOOK_CVehicle__FlyingControl_VortexThrustFormula()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x21B
         jmp     CONTINUE_CVehicle__FlyingControl_VortexThrustFormula
@@ -3004,7 +3004,7 @@ static void __declspec(naked) HOOK_CVehicle__FlyingControl_VortexTurnDampingClam
     {
         // eax holds a pointer from call 0x542ce0, read again past CONTINUE via fld [eax]/[eax+4].
         push    eax
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         mov     edx, eax
         pop     eax
@@ -3031,7 +3031,7 @@ static void __declspec(naked) HOOK_CPlane__Constructor_VortexFlyerCollisionExemp
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x21B
         jmp     CONTINUE_CPlane__Constructor_VortexFlyerCollisionExempt
@@ -3058,7 +3058,7 @@ static void __declspec(naked) HOOK_CPlane__VehicleDamage_VortexCarStyleDamage()
         // eax/ecx hold globals stored to [esp+0xC]/[esp+8] right after CONTINUE.
         push    eax
         push    ecx
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         mov     edx, eax
         pop     ecx
@@ -3083,7 +3083,7 @@ static void __declspec(naked) HOOK_CPlane__PreRender_VortexFanFXMatrix()
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     eax, 0x21B
         jmp     CONTINUE_CPlane__PreRender_VortexFanFXMatrix
@@ -3109,7 +3109,7 @@ static void __declspec(naked) HOOK_CAEVehicleAudioEntity__Initialise_SpecialVehi
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [edx + 0x22]
+        movzx   ecx, word ptr [edx + 0x22]
         call    ResolveVehicleParentModelId
         add     eax, 0xFFFFFE40
         jmp     CONTINUE_CAEVehicleAudioEntity__Initialise_SpecialVehicleModelSwitch
@@ -3137,7 +3137,7 @@ static void __declspec(naked) HOOK_CPlane__PreRender_ShadowTypeModel()
     {
         push    ecx
         fstp    dword ptr [esp + 0x38]
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         pop     ecx
         // CONTINUE re-does the compare on ax, so none is needed here
@@ -3165,7 +3165,7 @@ static void __declspec(naked) HOOK_CCarEnterExit__IsRoomForPedToLeaveCar_AT400Do
     {
         // eax is read again on the not-taken path at 0x650878 (cmp eax, [esi + 0xFC]).
         push    eax
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x241
         pop     eax
@@ -3192,7 +3192,7 @@ static void __declspec(naked) HOOK_CCarEnterExit__IsRoomForPedToLeaveCar_Amphibi
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         // si is left holding the resolved id for the compares that follow
         mov     si, ax
@@ -3219,7 +3219,7 @@ static void __declspec(naked) HOOK_CCarEnterExit__IsPathToDoorBlockedByVehicleCo
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [edi + 0x22]
+        movzx   ecx, word ptr [edi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x241
         jmp     CONTINUE_CCarEnterExit__IsPathToDoorBlockedByVehicleCollisionModel_AT400DoorException
@@ -3244,7 +3244,7 @@ static void __declspec(naked) HOOK_CTaskUtilityLineUpPedWithCar__ProcessPed_AT40
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x241
         jmp     CONTINUE_CTaskUtilityLineUpPedWithCar__ProcessPed_AT400StairOffsetA
@@ -3268,7 +3268,7 @@ static void __declspec(naked) HOOK_CTaskUtilityLineUpPedWithCar__ProcessPed_AT40
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x241
         jmp     CONTINUE_CTaskUtilityLineUpPedWithCar__ProcessPed_AT400StairOffsetB
@@ -3292,7 +3292,7 @@ static void __declspec(naked) HOOK_CTaskUtilityLineUpPedWithCar__ProcessPed_AT40
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x241
         jmp     CONTINUE_CTaskUtilityLineUpPedWithCar__ProcessPed_AT400StairOffsetC
@@ -3319,7 +3319,7 @@ static void __declspec(naked) HOOK_CTaskComplexEnterCar__CreateFirstSubTask_Amph
     __asm
     {
         push    eax
-        movsx   ecx, word ptr [eax + 0x22]
+        movzx   ecx, word ptr [eax + 0x22]
         call    ResolveVehicleParentModelId
         // cx is left holding the resolved id for the compares further down
         mov     cx, ax
@@ -3347,7 +3347,7 @@ static void __declspec(naked) HOOK_CPlayerInfo__FindClosestCarSectorList_AT400Di
     __asm
     {
         push    eax
-        movsx   ecx, word ptr [esi + 0x22]
+        movzx   ecx, word ptr [esi + 0x22]
         call    ResolveVehicleParentModelId
         cmp     ax, 0x241
         pop     eax
@@ -3374,7 +3374,7 @@ static void __declspec(naked) HOOK_CPlayerInfo__Process_AmphibiousWaterExitChain
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [ebx + 0x22]
+        movzx   ecx, word ptr [ebx + 0x22]
         call    ResolveVehicleParentModelId
         // ax is left holding the resolved id for the compares that follow
         cmp     ax, 0x1CC
@@ -3401,7 +3401,7 @@ static void __declspec(naked) HOOK_CWeapon__FireInstantHit_MountedGunSpreadChain
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [edi + 0x22]
+        movzx   ecx, word ptr [edi + 0x22]
         call    ResolveAircraftWeaponModelId
         // ax is left holding the resolved id for the compares that follow
         cmp     ax, 0x1BF
@@ -3428,7 +3428,7 @@ static void __declspec(naked) HOOK_CShadows__StoreShadowForVehicle_ModelDispatch
     // clang-format off
     __asm
     {
-        movsx   ecx, word ptr [edi + 0x22]
+        movzx   ecx, word ptr [edi + 0x22]
         call    ResolveVehicleParentModelId
         mov     ebx, eax
         // call must not touch the x87 stack; this fstp is the only allowed pop

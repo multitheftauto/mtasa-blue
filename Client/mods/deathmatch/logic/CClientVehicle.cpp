@@ -1362,7 +1362,7 @@ void CClientVehicle::SetLandingGearDown(bool bLandingGearDown)
 // since SetModelBlocking calls in here before that pointer has been updated.
 static VehicleType GetVehicleTypeForModel(unsigned short usModel)
 {
-    std::uint32_t ulModel = usModel;
+    std::uint16_t ulModel = usModel;
     if (ulModel < 400 || ulModel > 611)
     {
         if (CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel))
