@@ -14,6 +14,8 @@
 #include "CElementRefManager.h"
 #include "CVehicle.h"
 #include "CPed.h"
+#include "CWeaponStatManager.h"
+#include "CGame.h"
 
 CCustomWeapon::CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType)
     : CObject(pParent, pObjectManager, false)
@@ -43,6 +45,17 @@ CCustomWeapon::CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, 
     m_weaponConfig.flags.bCheckCarTires = true;
 
     m_pWeaponStat = new CWeaponStat(m_Type, WEAPONSKILL_STD);
+
+    // The new stat starts blank, so load the pristine weapon data the same
+    // way the weapon stat manager loads its own copies. The client creates
+    // its stat from the game's weapon data, and without this load every
+    // property read before a script sets it would return uninitialized
+    // memory on the server.
+    g_pGame->GetWeaponStatManager()->LoadDefault(m_pWeaponStat, m_Type, WEAPONSKILL_STD);
+
+    // Seed the fire time from the weapon stat like the client ctor does, so
+    // reading it before a script ever sets or resets it returns a sane value.
+    ResetWeaponFireTime();
 
     m_itargetWheel = MAX_WHEELS + 1;
     m_nAmmoInClip = m_pWeaponStat->GetMaximumClipAmmo();
