@@ -13,6 +13,8 @@
 #include <game/CPad.h>
 #include "XInput.h"
 #include <dinputd.h>
+#include <atomic>
+#include <thread>
 
 using std::string;
 
@@ -32,6 +34,11 @@ extern IDirectInput8* g_pDirectInput8;
 // How long to wait before retrying a failed joystick detection, and how long a device can go without
 // responding before we consider it unplugged
 constexpr uint JOYSTICK_RETRY_DELAY_MS = 3000;
+
+// How long to wait for a burst of Windows device-change notifications to go quiet before actually
+// re-scanning; a single physical plug/unplug can fire several of these in a row, one per device
+// interface
+constexpr uint JOYSTICK_DEVICE_CHANGE_SETTLE_MS = 300;
 
 SString GUIDToString(const GUID& g)
 {
@@ -111,6 +118,28 @@ struct SInputDeviceInfo
     } axis[7];
 };
 
+//////////////////////////////////////////////////////////
+//
+// Result of a background DirectInput device scan (discovery + axis enumeration). Built up
+// entirely on the scan thread from a freshly created device no one else can see yet, then handed
+// over as a finished value so the main thread only ever has to copy it into place.
+//
+struct SJoystickScanResult
+{
+    IDirectInputDevice8A* pDevice = nullptr;
+    int                   iAxisCount = 0;
+    GUID                  guidProduct{};
+    string                strProductName;
+
+    struct
+    {
+        bool  bEnabled = false;
+        long  lMax = 0;
+        long  lMin = 0;
+        DWORD dwType = 0;
+    } axis[7];
+};
+
 // Internal state
 struct SJoystickState
 {
@@ -163,17 +192,13 @@ public:
     virtual bool   IsCapturingAxis();
     virtual void   CancelCaptureAxis(bool bClearBinding);
 
-    // CJoystickManager methods
-    BOOL DoEnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance);
-    BOOL DoEnumObjectsCallback(const DIDEVICEOBJECTINSTANCE* pdidoi);
-
 private:
     bool      ReadInputSubsystem(DIJOYSTATE2& js);
     bool      HandleXInputGetState(XINPUT_STATE& XInputState);
     bool      IsXInputDeviceAttached();
     bool      IsJoypadValid();
-    void      EnumAxes();
-    void      InitDirectInput();
+    void      StartDirectInputScan();
+    void      CollectDirectInputScanResult();
     void      ReadCurrentState();
     CXMLNode* GetConfigNode(bool bCreateIfRequired);
     bool      LoadFromXML();
@@ -198,8 +223,13 @@ private:
     int            m_iCaptureOutputIndex;
     SJoystickState m_PreBindJoystickState;
 
-    DIJOYCONFIG* m_pPreferredJoyCfg;
-    bool         m_bPreferredJoyCfgValid;
+    // DirectInput device discovery (including axis enumeration, which used to run on the main
+    // thread the moment the device was first polled) runs on a background thread so none of it
+    // ever costs a frame; DoPulse only ever picks up a finished scan, it never blocks on one.
+    std::thread         m_ScanThread;
+    std::atomic<bool>   m_bScanRunning{false};
+    std::atomic<bool>   m_bScanReady{false};
+    SJoystickScanResult m_ScanResult;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -252,44 +282,170 @@ CJoystickManager::CJoystickManager()
 
 CJoystickManager::~CJoystickManager()
 {
+    // Let a scan still in flight finish before the members it writes into go away
+    if (m_ScanThread.joinable())
+        m_ScanThread.join();
 }
 
 ///////////////////////////////////////////////////////////////
 //
-// CJoystickManager EnumJoysticksCallback
+// Background joystick discovery
 //
-// Called once for each enumerated Joystick. If we find one, create a
-//       device interface on it so we can play with it.
+// Runs entirely off the CJoystickManager instance: g_pDirectInput8 is otherwise only ever
+// touched from the main thread, and CJoystickManager guarantees at most one scan is in flight
+// at a time (see m_bScanRunning), so this never races another EnumDevices/CreateDevice call.
+// The device it creates is brand new and not visible to anything else until the main thread
+// adopts it in CollectDirectInputScanResult(), so there's nothing here for the main thread to
+// race with either.
 //
 ///////////////////////////////////////////////////////////////
-BOOL CALLBACK EnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance, VOID* pContext)
+namespace
 {
-    // Redir to instance
-    return ((CJoystickManager*)pContext)->DoEnumJoysticksCallback(pdidInstance);
-}
+    struct SJoystickEnumContext
+    {
+        bool                  bPreferredValid = false;
+        GUID                  preferredGuidInstance{};
+        IDirectInputDevice8A* pDevice = nullptr;
+    };
 
-BOOL CJoystickManager::DoEnumJoysticksCallback(const DIDEVICEINSTANCE* pdidInstance)
-{
-    WriteDebugEvent(
-        SString("DInput EnumJoysticksCallback - guidProduct:%s  ProductName:%s", *GUIDToString(pdidInstance->guidProduct), pdidInstance->tszProductName));
+    BOOL CALLBACK EnumJoysticksCallbackAsync(const DIDEVICEINSTANCE* pdidInstance, VOID* pContext)
+    {
+        auto* pCtx = static_cast<SJoystickEnumContext*>(pContext);
 
-    // Skip anything other than the perferred Joystick device as defined by the control panel.
-    // Instead you could store all the enumerated Joysticks and let the user pick.
-    if (m_bPreferredJoyCfgValid && !IsEqualGUID(pdidInstance->guidInstance, m_pPreferredJoyCfg->guidInstance))
+        // Skip anything other than the perferred Joystick device as defined by the control panel.
+        // Instead you could store all the enumerated Joysticks and let the user pick.
+        if (pCtx->bPreferredValid && !IsEqualGUID(pdidInstance->guidInstance, pCtx->preferredGuidInstance))
+            return DIENUM_CONTINUE;
+
+        // Obtain an interface to the enumerated Joystick. (Maybe the user unplugged it while we
+        // were in the middle of enumerating it, in which case this just fails and we move on.)
+        if (FAILED(g_pDirectInput8->CreateDevice(pdidInstance->guidInstance, &pCtx->pDevice, NULL)))
+            return DIENUM_CONTINUE;
+
+        // Stop enumeration. Note: we're just taking the first Joystick we get. You
+        // could store all the enumerated Joysticks and let the user pick.
+        return DIENUM_STOP;
+    }
+
+    // Same axis setup CJoystickManager used to do synchronously the moment a device's first Poll()
+    // succeeded (range/deadzone/saturation properties, axis index mapping); moved here so it runs
+    // before the device is ever handed to the main thread instead of costing it a frame later.
+    BOOL CALLBACK EnumAxesCallbackAsync(const DIDEVICEOBJECTINSTANCE* pdidoi, VOID* pContext)
+    {
+        auto* pResult = static_cast<SJoystickScanResult*>(pContext);
+
+        if (!(pdidoi->dwType & DIDFT_AXIS))
+            return DIENUM_CONTINUE;
+
+        DIPROPRANGE range;
+        range.diph.dwSize = sizeof(DIPROPRANGE);
+        range.diph.dwHeaderSize = sizeof(DIPROPHEADER);
+        range.diph.dwHow = DIPH_BYID;
+        range.diph.dwObj = pdidoi->dwType;
+        range.lMin = -1000;
+        range.lMax = +1000;
+
+        if (FAILED(pResult->pDevice->SetProperty(DIPROP_RANGE, &range.diph)))
+            return DIENUM_CONTINUE;
+        if (FAILED(pResult->pDevice->GetProperty(DIPROP_RANGE, &range.diph)))
+            return DIENUM_CONTINUE;
+
+        // Remove Deadzone and Saturation
+        DIPROPDWORD dead, sat;
+        dead.diph.dwSize = sizeof dead;
+        dead.diph.dwHeaderSize = sizeof dead.diph;
+        dead.diph.dwHow = DIPH_BYID;
+        dead.diph.dwObj = pdidoi->dwType;
+        dead.dwData = 0;  // No Deadzone
+
+        sat = dead;
+        sat.dwData = 10000;  // No Saturation
+
+        pResult->pDevice->SetProperty(DIPROP_DEADZONE, &dead.diph);
+        pResult->pDevice->SetProperty(DIPROP_SATURATION, &sat.diph);
+
+        // Figure out the axis index
+        int axisIndex = -1;
+        if (pdidoi->guidType == GUID_XAxis)
+            axisIndex = eJoyX;
+        else if (pdidoi->guidType == GUID_YAxis)
+            axisIndex = eJoyY;
+        else if (pdidoi->guidType == GUID_ZAxis)
+            axisIndex = eJoyZ;
+        else if (pdidoi->guidType == GUID_RxAxis)
+            axisIndex = eJoyRx;
+        else if (pdidoi->guidType == GUID_RyAxis)
+            axisIndex = eJoyRy;
+        else if (pdidoi->guidType == GUID_RzAxis)
+            axisIndex = eJoyRz;
+        else if (pdidoi->guidType == GUID_Slider)
+            axisIndex = eJoyS1;
+
+        if (axisIndex >= 0 && axisIndex < NUMELMS(pResult->axis) && range.lMin < range.lMax && !pResult->axis[axisIndex].bEnabled)
+        {
+            pResult->axis[axisIndex].lMin = range.lMin;
+            pResult->axis[axisIndex].lMax = range.lMax;
+            pResult->axis[axisIndex].bEnabled = true;
+            pResult->axis[axisIndex].dwType = pdidoi->dwType;
+            pResult->iAxisCount++;
+        }
+
         return DIENUM_CONTINUE;
+    }
 
-    // Obtain an interface to the enumerated Joystick.
-    HRESULT hr = g_pDirectInput8->CreateDevice(pdidInstance->guidInstance, &m_DevInfo.pDevice, NULL);
+    SJoystickScanResult ScanForDirectInputDevice(HWND hWindow)
+    {
+        SJoystickScanResult  result;
+        SJoystickEnumContext ctx;
 
-    // If it failed, then we can't use this Joystick. (Maybe the user unplugged
-    // it while we were in the middle of enumerating it.)
-    if (FAILED(hr))
-        return DIENUM_CONTINUE;
+        IDirectInputJoyConfig8* pJoyConfig = NULL;
+        if (SUCCEEDED(g_pDirectInput8->QueryInterface(IID_IDirectInputJoyConfig8, (void**)&pJoyConfig)))
+        {
+            DIJOYCONFIG PreferredJoyCfg = {0};
+            PreferredJoyCfg.dwSize = sizeof(PreferredJoyCfg);
+            if (SUCCEEDED(pJoyConfig->GetConfig(0, &PreferredJoyCfg, DIJC_GUIDINSTANCE)))  // Expected to fail if no Joystick is attached
+            {
+                ctx.bPreferredValid = true;
+                ctx.preferredGuidInstance = PreferredJoyCfg.guidInstance;
+            }
+            SAFE_RELEASE(pJoyConfig);
+        }
 
-    // Stop enumeration. Note: we're just taking the first Joystick we get. You
-    // could store all the enumerated Joysticks and let the user pick.
-    return DIENUM_STOP;
-}
+        g_pDirectInput8->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksCallbackAsync, &ctx, DIEDFL_ATTACHEDONLY);
+
+        if (!ctx.pDevice)
+            return result;
+
+        // In case device did not identify itself as a joysitck during creation,
+        // set flag again to ensure input data will not be dropped when the mouse cursor is showing.
+        CProxyDirectInputDevice8* pProxyInputDevice = dynamic_cast<CProxyDirectInputDevice8*>(ctx.pDevice);
+        if (pProxyInputDevice)
+            pProxyInputDevice->m_bDropDataIfInputGoesToGUI = false;
+
+        // Set the data format to "simple Joystick" - a predefined data format telling DInput we'll
+        // be passing a DIJOYSTATE2 structure to IDirectInputDevice::GetDeviceState().
+        ctx.pDevice->SetDataFormat(&c_dfDIJoystick2);
+
+        // Set the cooperative level to let DInput know how this device should
+        // interact with the system and with other DInput applications.
+        ctx.pDevice->SetCooperativeLevel(hWindow, DISCL_NONEXCLUSIVE | DISCL_FOREGROUND);
+
+        result.pDevice = ctx.pDevice;
+
+        // Enumerate the joystick's axes and set their range/deadzone/saturation properties
+        ctx.pDevice->EnumObjects(EnumAxesCallbackAsync, &result, DIDFT_ALL);
+
+        DIDEVICEINSTANCE didi;
+        didi.dwSize = sizeof didi;
+        if (SUCCEEDED(ctx.pDevice->GetDeviceInfo(&didi)))
+        {
+            result.guidProduct = didi.guidProduct;
+            result.strProductName = didi.tszProductName;
+        }
+
+        return result;
+    }
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -306,231 +462,83 @@ void CJoystickManager::RemoveDevice(IDirectInputDevice8A* pDevice)
 
 ///////////////////////////////////////////////////////////////
 //
-// CJoystickManager EnumObjectsCallback
+// CJoystickManager::StartDirectInputScan
 //
-// Enumeration callback used by CJoystickManager::EnumAxes.
+// Kicks off a background scan for a joystick device, if one isn't running already
 //
 ///////////////////////////////////////////////////////////////
-BOOL CALLBACK EnumObjectsCallback(const DIDEVICEOBJECTINSTANCE* pdidoi, VOID* pContext)
+void CJoystickManager::StartDirectInputScan()
 {
-    // Redir to instance
-    return ((CJoystickManager*)pContext)->DoEnumObjectsCallback(pdidoi);
-}
+    if (m_bUseXInput || m_bScanRunning)
+        return;
 
-BOOL CJoystickManager::DoEnumObjectsCallback(const DIDEVICEOBJECTINSTANCE* pdidoi)
-{
-    SString strGuid = GUIDToString(pdidoi->guidType);
-    SString strName = pdidoi->tszName;
-    WriteDebugEvent(SString("DInput - EnumObjectsCallback. dwSize:%d  strGuid:%s  dwOfs:%d  dwType:0x%08x  dwFlags:0x%08x strName:%s", pdidoi->dwSize, *strGuid,
-                            pdidoi->dwOfs, pdidoi->dwType, pdidoi->dwFlags, *strName));
+    m_bScanRunning = true;
+    m_bScanReady = false;
 
-    // For axes that are found, do things
-    if (pdidoi->dwType & DIDFT_AXIS)
-    {
-        // Set the range for the axis
-        DIPROPRANGE range;
-        range.diph.dwSize = sizeof(DIPROPRANGE);
-        range.diph.dwHeaderSize = sizeof(DIPROPHEADER);
-        range.diph.dwHow = DIPH_BYID;
-        range.diph.dwObj = pdidoi->dwType;  // Specify the enumerated axis
-        range.lMin = -1000;
-        range.lMax = +1000;
-
-        if (FAILED(m_DevInfo.pDevice->SetProperty(DIPROP_RANGE, &range.diph)))
+    HWND hWindow = g_pCore->GetHookedWindow();
+    m_ScanThread = std::thread(
+        [this, hWindow]()
         {
-            WriteDebugEvent(SStringX("                    Failed to set DIPROP_RANGE"));
-            return DIENUM_CONTINUE;
-        }
-
-        if (FAILED(m_DevInfo.pDevice->GetProperty(DIPROP_RANGE, &range.diph)))
-        {
-            WriteDebugEvent(SStringX("                    Failed to get DIPROP_RANGE"));
-            return DIENUM_CONTINUE;
-        }
-
-        // Remove Deadzone and Saturation
-        DIPROPDWORD dead, sat;
-
-        dead.diph.dwSize = sizeof dead;
-        dead.diph.dwHeaderSize = sizeof dead.diph;
-        dead.diph.dwHow = DIPH_BYID;
-        dead.diph.dwObj = pdidoi->dwType;
-        dead.dwData = 0;  // No Deadzone
-
-        sat = dead;
-        sat.dwData = 10000;  // No Saturation
-
-        m_DevInfo.pDevice->SetProperty(DIPROP_DEADZONE, &dead.diph);
-        m_DevInfo.pDevice->SetProperty(DIPROP_SATURATION, &sat.diph);
-
-        // Figure out the axis index
-        int axisIndex = -1;
-
-        if (pdidoi->guidType == GUID_XAxis)
-            axisIndex = eJoyX;
-        if (pdidoi->guidType == GUID_YAxis)
-            axisIndex = eJoyY;
-        if (pdidoi->guidType == GUID_ZAxis)
-            axisIndex = eJoyZ;
-        if (pdidoi->guidType == GUID_RxAxis)
-            axisIndex = eJoyRx;
-        if (pdidoi->guidType == GUID_RyAxis)
-            axisIndex = eJoyRy;
-        if (pdidoi->guidType == GUID_RzAxis)
-            axisIndex = eJoyRz;
-        if (pdidoi->guidType == GUID_Slider)
-            axisIndex = eJoyS1;
-
-        SString strStatus;
-        // Save the range and the axis index
-        if (axisIndex >= 0 && axisIndex < NUMELMS(m_DevInfo.axis) && range.lMin < range.lMax)
-        {
-            if (!m_DevInfo.axis[axisIndex].bEnabled)
-            {
-                m_DevInfo.axis[axisIndex].lMin = range.lMin;
-                m_DevInfo.axis[axisIndex].lMax = range.lMax;
-                m_DevInfo.axis[axisIndex].bEnabled = true;
-                m_DevInfo.axis[axisIndex].dwType = pdidoi->dwType;
-
-                m_DevInfo.iAxisCount++;
-                strStatus = SString("Added axis index %d. lMin:%d lMax:%d (iAxisCount:%d)", axisIndex, range.lMin, range.lMax, m_DevInfo.iAxisCount);
-            }
-            else
-            {
-                strStatus = SString("Ignoring duplicate axis index %d", axisIndex);
-            }
-        }
-        else
-        {
-            strStatus = "Failed to recognise axis";
-        }
-        WriteDebugEvent("                    " + strStatus);
-
-#ifdef MTA_DEBUG
-    #if 0
-        if ( CCore::GetSingleton ().GetConsole () )
-            CCore::GetSingleton ().GetConsole ()->Printf(
-                            "%p  dwHow:%d  dwObj:%d  guid:%x  index:%d  lMin:%d  lMax:%d"
-                            ,m_DevInfo.pDevice
-                            ,range.diph.dwHow
-                            ,range.diph.dwObj
-                            ,pdidoi->guidType.Data1
-                            ,axisIndex
-                            ,range.lMin
-                            ,range.lMax
-                            );
-
-    #endif
-#endif
-    }
-
-    return DIENUM_CONTINUE;
+            m_ScanResult = ScanForDirectInputDevice(hWindow);
+            m_bScanReady.store(true, std::memory_order_release);
+        });
 }
 
 ///////////////////////////////////////////////////////////////
 //
-// CJoystickManager::EnumAxes
+// CJoystickManager::CollectDirectInputScanResult
 //
-// Starts the enumeration of the joystick axes.
+// Picks up the result of a background scan once it has finished. Called every DoPulse, so it
+// never blocks - if the scan isn't ready yet, this just returns and tries again next tick.
 //
 ///////////////////////////////////////////////////////////////
-void CJoystickManager::EnumAxes()
+void CJoystickManager::CollectDirectInputScanResult()
 {
-    if (!m_DevInfo.pDevice)
+    if (!m_bScanReady.load(std::memory_order_acquire))
         return;
 
-    // Enumerate the joystick objects. The callback function ..blah..blah..
-    // values property ..blah..blah.. discovered axes ..blah..blah..
-    if (FAILED(m_DevInfo.pDevice->EnumObjects(EnumObjectsCallback, (VOID*)this, DIDFT_ALL)))
-    {
-        WriteDebugEvent("CJoystickManager EnumObjects failed");
-    }
+    m_ScanThread.join();
+    SJoystickScanResult result = std::move(m_ScanResult);
+    m_ScanResult = SJoystickScanResult();
+    m_bScanReady = false;
+    m_bScanRunning = false;
 
-    // Get device id and load config for it
-    DIDEVICEINSTANCE didi;
-    didi.dwSize = sizeof didi;
-
-    if (SUCCEEDED(m_DevInfo.pDevice->GetDeviceInfo(&didi)))
-    {
-        m_DevInfo.guidProduct = didi.guidProduct;
-        m_DevInfo.strProductName = didi.tszProductName;
-        m_DevInfo.strGuid = GUIDToString(m_DevInfo.guidProduct);
-        if (!LoadFromXML())
-        {
-            SetDefaults();
-        }
-    }
-
-    m_DevInfo.bDoneEnumAxes = true;
-}
-
-///////////////////////////////////////////////////////////////
-//
-// CJoystickManager::InitDirectInput
-//
-// Create a joystick device if possible
-//
-///////////////////////////////////////////////////////////////
-void CJoystickManager::InitDirectInput()
-{
-    if (m_bUseXInput)
-        return;
-
-    DIJOYCONFIG PreferredJoyCfg = {0};
-    m_pPreferredJoyCfg = &PreferredJoyCfg;
-    m_bPreferredJoyCfgValid = false;
-
-    IDirectInputJoyConfig8* pJoyConfig = NULL;
-    if (FAILED(g_pDirectInput8->QueryInterface(IID_IDirectInputJoyConfig8, (void**)&pJoyConfig)))
-    {
-        WriteDebugEvent("InitDirectInput - QueryInterface IDirectInputJoyConfig8 failed");
-        return;
-    }
-
-    PreferredJoyCfg.dwSize = sizeof(PreferredJoyCfg);
-    if (SUCCEEDED(pJoyConfig->GetConfig(0, &PreferredJoyCfg, DIJC_GUIDINSTANCE)))  // This function is expected to fail if no Joystick is attached
-        m_bPreferredJoyCfgValid = true;
-    SAFE_RELEASE(pJoyConfig);
-
-    // Look for a simple Joystick we can use for this sample program.
-    if (FAILED(g_pDirectInput8->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksCallback, this, DIEDFL_ATTACHEDONLY)))
-    {
-        WriteDebugEvent("InitDirectInput - EnumDevices failed");
-    }
-
-    // Make sure we got a Joystick
-    if (NULL == m_DevInfo.pDevice)
+    if (!result.pDevice)
     {
         WriteDebugEvent("InitDirectInput - No Joystick found");
         return;
     }
 
-    // In case device did not identify itself as a joysitck during creation,
-    // set flag again to ensure input data will not be dropped when the mouse cursor is showing.
-    CProxyDirectInputDevice8* pProxyInputDevice = dynamic_cast<CProxyDirectInputDevice8*>(m_DevInfo.pDevice);
-    if (pProxyInputDevice)
-        pProxyInputDevice->m_bDropDataIfInputGoesToGUI = false;
-
-    // Set the data format to "simple Joystick" - a predefined data format
-    //
-    // A data format specifies which controls on a device we are interested in,
-    // and how they should be reported. This tells DInput that we will be
-    // passing a DIJOYSTATE2 structure to IDirectInputDevice::GetDeviceState().
-    if (FAILED(m_DevInfo.pDevice->SetDataFormat(&c_dfDIJoystick2)))
+    if (m_bUseXInput)
     {
-        WriteDebugEvent("InitDirectInput - SetDataFormat failed");
+        // An XInput pad showed up while this scan was in flight, so it's not needed anymore
+        result.pDevice->Release();
+        return;
     }
 
-    // Set the cooperative level to let DInput know how this device should
-    // interact with the system and with other DInput applications.
-    if (FAILED(m_DevInfo.pDevice->SetCooperativeLevel(g_pCore->GetHookedWindow(), DISCL_NONEXCLUSIVE | DISCL_FOREGROUND)))
+    m_DevInfo.pDevice = result.pDevice;
+    m_DevInfo.iAxisCount = result.iAxisCount;
+    m_DevInfo.guidProduct = result.guidProduct;
+    m_DevInfo.strProductName = result.strProductName;
+    m_DevInfo.strGuid = GUIDToString(m_DevInfo.guidProduct);
+
+    for (int i = 0; i < NUMELMS(m_DevInfo.axis) && i < NUMELMS(result.axis); i++)
     {
-        WriteDebugEvent("InitDirectInput - SetCooperativeLevel failed");
+        m_DevInfo.axis[i].bEnabled = result.axis[i].bEnabled;
+        m_DevInfo.axis[i].lMin = result.axis[i].lMin;
+        m_DevInfo.axis[i].lMax = result.axis[i].lMax;
+        m_DevInfo.axis[i].dwType = result.axis[i].dwType;
+        m_DevInfo.axis[i].fAutoDeadZoneSample = 0.f;
     }
+
+    if (!LoadFromXML())
+        SetDefaults();
+
+    m_DevInfo.bDoneEnumAxes = true;
 
     // The device isn't Acquired yet, so its first Poll() is expected to fail. Start the fail timer
-    // from here, otherwise it would count the time since CJoystickManager was created and could
-    // drop the device as unresponsive before it was ever given a chance to be polled.
+    // from here, otherwise it would count the time since the scan started and could drop the
+    // device as unresponsive before it was ever given a chance to be polled.
     m_PollFailTimer.Reset();
 }
 
@@ -549,21 +557,26 @@ void CJoystickManager::DoPulse()
         if (!g_pDirectInput8)
             return;
 
-        // Init DInput if not done yet
-        InitDirectInput();
+        // Kick off the first scan in the background; DoPulse picks up the result once it's ready
         m_bDoneInit = true;
+        StartDirectInputScan();
     }
     else if (!m_bUseXInput && !m_DevInfo.pDevice)
     {
+        CollectDirectInputScanResult();
+
         // Not using XInput yet and no DirectInput joystick either, so keep checking both in case
         // an XInput pad (e.g. an Xbox controller) got connected after startup
-        if (IsXInputDeviceAttached())
-            m_bUseXInput = true;
-        else if (m_DirectInputReattachTimer.Get() >= m_uiDirectInputReattachDelay)
+        if (!m_DevInfo.pDevice)
         {
-            InitDirectInput();
-            m_DirectInputReattachTimer.Reset();
-            m_uiDirectInputReattachDelay = JOYSTICK_RETRY_DELAY_MS;
+            if (IsXInputDeviceAttached())
+                m_bUseXInput = true;
+            else if (!m_bScanRunning && m_DirectInputReattachTimer.Get() >= m_uiDirectInputReattachDelay)
+            {
+                StartDirectInputScan();
+                m_DirectInputReattachTimer.Reset();
+                m_uiDirectInputReattachDelay = JOYSTICK_RETRY_DELAY_MS;
+            }
         }
     }
 
@@ -862,12 +875,6 @@ bool CJoystickManager::ReadInputSubsystem(DIJOYSTATE2& js)
 
         if (!m_DevInfo.pDevice)
             return false;
-
-        // Enumerate axes if not done yet
-        if (!m_DevInfo.bDoneEnumAxes)
-        {
-            EnumAxes();
-        }
 
         // Try to poll
         if (FAILED(m_DevInfo.pDevice->Poll()))
@@ -1217,14 +1224,22 @@ bool CJoystickManager::IsJoypadConnected()
 //
 // CJoystickManager::OnPossibleDeviceChange
 //
-// Called when Windows tells us a HID device was plugged in or removed, so we
-// don't have to wait for the next scheduled retry to notice.
+// Called when Windows tells us a HID device was plugged in or removed, so we don't have to wait
+// for the next scheduled retry to notice.
+//
+// A single physical connect or disconnect can fire several of these in a row, one per device
+// interface, so this pushes the check back a bit instead of running it right away. Each extra
+// notification in the same burst just pushes it back again, and it only actually runs once
+// things go quiet, by which point Windows is done updating the device list.
 //
 ///////////////////////////////////////////////////////////////
 void CJoystickManager::OnPossibleDeviceChange()
 {
-    m_uiDirectInputReattachDelay = 0;
-    m_uiXInputReattachDelay = 0;
+    m_uiDirectInputReattachDelay = JOYSTICK_DEVICE_CHANGE_SETTLE_MS;
+    m_DirectInputReattachTimer.Reset();
+
+    m_uiXInputReattachDelay = JOYSTICK_DEVICE_CHANGE_SETTLE_MS;
+    m_XInputReattachTimer.Reset();
 }
 
 ///////////////////////////////////////////////////////////////
