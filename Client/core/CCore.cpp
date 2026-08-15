@@ -698,8 +698,8 @@ void CCore::ApplyGameSettings()
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     pController->SetVerticalAimSensitivitySameAsHorizontal(CVARS_GET_VALUE<bool>("use_mouse_sensitivity_for_aiming"));
     CVARS_GET("mastervolume", fVal);
-    pGameSettings->SetRadioVolume(CVARS_GET_VALUE<float>("radiovolume") * fVal * 64.0f);
-    pGameSettings->SetSFXVolume(CVARS_GET_VALUE<float>("sfxvolume") * fVal * 64.0f);
+    pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
+    pGameSettings->SetSFXVolume(pGameSettings->GetSFXVolume() * fVal);
 }
 
 void CCore::SetConnected(bool bConnected)
