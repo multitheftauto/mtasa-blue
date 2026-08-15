@@ -23,7 +23,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "../curl_setup.h"
+#include "curl_setup.h"
 
 struct connectdata;
 struct ssl_config_data;
@@ -32,24 +32,32 @@ struct Curl_cfilter;
 struct Curl_easy;
 struct dynbuf;
 
-#define SSLSUPP_CA_PATH      (1<<0) /* supports CAPATH */
-#define SSLSUPP_CERTINFO     (1<<1) /* supports CURLOPT_CERTINFO */
-#define SSLSUPP_PINNEDPUBKEY (1<<2) /* supports CURLOPT_PINNEDPUBLICKEY */
-#define SSLSUPP_SSL_CTX      (1<<3) /* supports CURLOPT_SSL_CTX */
-#define SSLSUPP_HTTPS_PROXY  (1<<4) /* supports access via HTTPS proxies */
-#define SSLSUPP_TLS13_CIPHERSUITES (1<<5) /* supports TLS 1.3 ciphersuites */
-#define SSLSUPP_CAINFO_BLOB  (1<<6)
-#define SSLSUPP_ECH          (1<<7)
-#define SSLSUPP_CA_CACHE     (1<<8)
-#define SSLSUPP_CIPHER_LIST  (1<<9) /* supports TLS 1.0-1.2 ciphersuites */
-#define SSLSUPP_SIGNATURE_ALGORITHMS (1<<10) /* supports TLS sigalgs */
+#define SSLSUPP_CA_PATH      (1 << 0) /* supports CAPATH */
+#define SSLSUPP_CERTINFO     (1 << 1) /* supports CURLOPT_CERTINFO */
+#define SSLSUPP_PINNEDPUBKEY (1 << 2) /* supports CURLOPT_PINNEDPUBLICKEY */
+#define SSLSUPP_SSL_CTX      (1 << 3) /* supports CURLOPT_SSL_CTX */
+#define SSLSUPP_HTTPS_PROXY  (1 << 4) /* supports access via HTTPS proxies */
+#define SSLSUPP_TLS13_CIPHERSUITES (1 << 5) /* supports TLS 1.3 ciphersuites */
+#define SSLSUPP_CAINFO_BLOB  (1 << 6)
+#define SSLSUPP_ECH          (1 << 7)
+#define SSLSUPP_CA_CACHE     (1 << 8)
+#define SSLSUPP_CIPHER_LIST  (1 << 9) /* supports TLS 1.0-1.2 ciphersuites */
+#define SSLSUPP_SIGNATURE_ALGORITHMS (1 << 10) /* supports TLS sigalgs */
+#define SSLSUPP_ISSUERCERT   (1 << 11) /* supports CURLOPT_ISSUERCERT */
+#define SSLSUPP_SSL_EC_CURVES (1 << 12) /* supports CURLOPT_SSL_EC_CURVES */
+#define SSLSUPP_CRLFILE      (1 << 13) /* supports CURLOPT_CRLFILE */
+#define SSLSUPP_ISSUERCERT_BLOB (1 << 14) /* CURLOPT_ISSUERCERT_BLOB */
 
 #ifdef USE_ECH
-# include "../curlx/base64.h"
-# define ECH_ENABLED(__data__) \
-    (__data__->set.tls_ech && \
-     !(__data__->set.tls_ech & CURLECH_DISABLE)\
-    )
+/* CURLECH_ bits for the tls_ech option */
+#define CURLECH_DISABLE    (1 << 0)
+#define CURLECH_GREASE     (1 << 1)
+#define CURLECH_ENABLE     (1 << 2)
+#define CURLECH_HARD       (1 << 3)
+#define CURLECH_CLA_CFG    (1 << 4)
+
+#define CURLECH_ENABLED(data) \
+  ((data)->set.tls_ech && !((data)->set.tls_ech & CURLECH_DISABLE))
 #endif /* USE_ECH */
 
 #define ALPN_ACCEPTED "ALPN: server accepted "
@@ -88,20 +96,14 @@ struct ssl_peer {
   char *sni;             /* SNI version of hostname or NULL if not usable */
   char *scache_key;      /* for lookups in session cache */
   ssl_peer_type type;    /* type of the peer information */
-  int port;              /* port we are talking to */
-  int transport;         /* one of TRNSPRT_* defines */
+  uint16_t port;         /* port we are talking to */
+  uint8_t transport;     /* one of TRNSPRT_* defines */
 };
 
 CURLsslset Curl_init_sslset_nolock(curl_sslbackend id, const char *name,
                                    const curl_ssl_backend ***avail);
 
-#ifndef MAX_PINNED_PUBKEY_SIZE
-#define MAX_PINNED_PUBKEY_SIZE 1048576 /* 1MB */
-#endif
-
-#ifndef CURL_SHA256_DIGEST_LENGTH
-#define CURL_SHA256_DIGEST_LENGTH 32 /* fixed size */
-#endif
+#define MAX_PINNED_PUBKEY_SIZE (1024 * 1024) /* 1 MiB */
 
 curl_sslbackend Curl_ssl_backend(void);
 
@@ -138,7 +140,7 @@ bool Curl_ssl_conn_config_match(struct Curl_easy *data,
                                 bool proxy);
 
 /* Update certain connection SSL config flags after they have
- * been changed on the easy handle. Will work for `verifypeer`,
+ * been changed on the easy handle. Works for `verifypeer`,
  * `verifyhost` and `verifystatus`. */
 void Curl_ssl_conn_config_update(struct Curl_easy *data, bool for_proxy);
 
@@ -148,7 +150,7 @@ void Curl_ssl_conn_config_update(struct Curl_easy *data, bool for_proxy);
 CURLcode Curl_ssl_peer_init(struct ssl_peer *peer,
                             struct Curl_cfilter *cf,
                             const char *tls_id,
-                            int transport);
+                            uint8_t transport);
 /**
  * Free all allocated data and reset peer information.
  */
@@ -169,6 +171,7 @@ void Curl_ssl_version(char *buffer, size_t size);
 
 /* Certificate information list handling. */
 #define CURL_X509_STR_MAX  100000
+#define MAX_ALLOWED_CERT_AMOUNT 100
 
 void Curl_ssl_free_certinfo(struct Curl_easy *data);
 CURLcode Curl_ssl_init_certinfo(struct Curl_easy *data, int num);
@@ -181,16 +184,14 @@ CURLcode Curl_ssl_push_certinfo(struct Curl_easy *data, int certnum,
 /* Functions to be used by SSL library adaptation functions */
 
 /* get N random bytes into the buffer */
-CURLcode Curl_ssl_random(struct Curl_easy *data, unsigned char *buffer,
-                         size_t length);
+CURLcode Curl_ssl_random(struct Curl_easy *data,
+                         unsigned char *buffer, size_t length);
 /* Check pinned public key. */
 CURLcode Curl_pin_peer_pubkey(struct Curl_easy *data,
                               const char *pinnedpubkey,
                               const unsigned char *pubkey, size_t pubkeylen);
 
 bool Curl_ssl_cert_status_request(void);
-
-bool Curl_ssl_false_start(void);
 
 /* The maximum size of the SSL channel binding is 85 bytes, as defined in
  * RFC 5929, Section 4.1. The 'tls-server-end-point:' prefix is 21 bytes long,
@@ -209,7 +210,7 @@ bool Curl_ssl_false_start(void);
  * returned.
  */
 CURLcode Curl_ssl_get_channel_binding(struct Curl_easy *data, int sockindex,
-                                       struct dynbuf *binding);
+                                      struct dynbuf *binding);
 
 #define SSL_SHUTDOWN_TIMEOUT 10000 /* ms */
 
@@ -236,16 +237,6 @@ CURLcode Curl_cf_ssl_proxy_insert_after(struct Curl_cfilter *cf_at,
 bool Curl_ssl_supports(struct Curl_easy *data, unsigned int ssl_option);
 
 /**
- * Get the internal ssl instance (like OpenSSL's SSL*) from the filter
- * chain at `sockindex` of type specified by `info`.
- * For `n` == 0, the first active (top down) instance is returned.
- * 1 gives the second active, etc.
- * NULL is returned when no active SSL filter is present.
- */
-void *Curl_ssl_get_internals(struct Curl_easy *data, int sockindex,
-                             CURLINFO info, int n);
-
-/**
  * Get the ssl_config_data in `data` that is relevant for cfilter `cf`.
  */
 struct ssl_config_data *Curl_ssl_cf_get_config(struct Curl_cfilter *cf,
@@ -264,22 +255,20 @@ extern struct Curl_cftype Curl_cft_ssl_proxy;
 
 #else /* if not USE_SSL */
 
-/* When SSL support is not present, just define away these function calls */
+/* When SSL support is not present, define away these function calls */
 #define Curl_ssl_init() 1
 #define Curl_ssl_cleanup() Curl_nop_stmt
 #define Curl_ssl_close_all(x) Curl_nop_stmt
-#define Curl_ssl_set_engine(x,y) CURLE_NOT_BUILT_IN
+#define Curl_ssl_set_engine(x, y) CURLE_NOT_BUILT_IN
 #define Curl_ssl_set_engine_default(x) CURLE_NOT_BUILT_IN
 #define Curl_ssl_engines_list(x) NULL
 #define Curl_ssl_free_certinfo(x) Curl_nop_stmt
-#define Curl_ssl_random(x,y,z) ((void)x, CURLE_NOT_BUILT_IN)
+#define Curl_ssl_random(x, y, z) ((void)(x), CURLE_NOT_BUILT_IN)
 #define Curl_ssl_cert_status_request() FALSE
-#define Curl_ssl_false_start() FALSE
-#define Curl_ssl_get_internals(a,b,c,d) NULL
-#define Curl_ssl_supports(a,b) FALSE
-#define Curl_ssl_cfilter_add(a,b,c) CURLE_NOT_BUILT_IN
-#define Curl_ssl_cfilter_remove(a,b,c) CURLE_OK
-#define Curl_ssl_cf_get_config(a,b) NULL
+#define Curl_ssl_supports(a, b) FALSE
+#define Curl_ssl_cfilter_add(a, b, c) CURLE_NOT_BUILT_IN
+#define Curl_ssl_cfilter_remove(a, b, c) CURLE_OK
+#define Curl_ssl_cf_get_config(a, b) NULL
 #define Curl_ssl_cf_get_primary_config(a) NULL
 #endif
 

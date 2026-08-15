@@ -12,7 +12,7 @@
 #pragma once
 
 #include "CXMLAttributesImpl.h"
-#include <tinyxml.h>
+#include <tinyxml2.h>
 #include <xml/CXMLNode.h>
 
 #include <list>
@@ -20,11 +20,13 @@
 
 class CXMLNodeImpl : public CXMLNode
 {
+    friend class CXMLImpl;
+
 public:
-    CXMLNodeImpl(class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node);
+    CXMLNodeImpl(class CXMLFileImpl* pFile, CXMLNodeImpl* pParent, tinyxml2::XMLElement& Node);
     ~CXMLNodeImpl();
 
-    // BuildFromDocument recursively builds child CXMLNodeImpl from the underlying TiXmlElement.
+    // BuildFromDocument recursively builds child CXMLNodeImpl from the underlying XMLElement.
     //
     // This is **only** used for xmlLoadString right now.
     // Look elsewhere if you're thinking about XML files. It does things a different way.
@@ -73,8 +75,8 @@ public:
     CXMLNode* CopyNode(CXMLNode* pParent = NULL);
     bool      CopyChildrenInto(CXMLNode* pDestination, bool bRecursive);
 
-    TiXmlElement* GetNode();
-    void          DeleteWrapper();
+    tinyxml2::XMLElement* GetNode();
+    void                  DeleteWrapper();
 
     void AddToList(CXMLNode* pNode);
     void RemoveFromList(CXMLNode* pNode);
@@ -94,13 +96,16 @@ private:
     unsigned long m_ulID;
     const bool    m_bUsingIDs;
 
-    class CXMLFileImpl* m_pFile;
-    CXMLNodeImpl*       m_pParent;
-    TiXmlElement*       m_pNode;
-    TiXmlDocument*      m_pDocument;
-
-    std::list<CXMLNode*> m_Children;
-    bool                 m_bCanRemoveFromList;
+    class CXMLFileImpl*    m_pFile;
+    CXMLNodeImpl*          m_pParent;
+    tinyxml2::XMLElement*  m_pNode;
+    tinyxml2::XMLDocument* m_pDocument;
+    mutable std::string    m_strTagNameCache;
+    // When there is no owning CXMLFileImpl (dummy nodes), the standalone
+    // document owns the element. Set by CXMLImpl::CreateDummyNode.
+    std::unique_ptr<tinyxml2::XMLDocument> m_standaloneDocument;
+    std::list<CXMLNode*>                   m_Children;
+    bool                                   m_bCanRemoveFromList;
 
     CXMLAttributesImpl m_Attributes;
 };

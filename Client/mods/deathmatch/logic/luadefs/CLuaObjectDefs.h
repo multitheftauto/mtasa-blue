@@ -12,6 +12,8 @@
 #pragma once
 #include "CLuaDefs.h"
 
+class CClientObject;
+
 class CLuaObjectDefs : public CLuaDefs
 {
 public:
@@ -25,6 +27,7 @@ public:
     LUA_DECLARE(IsObjectStatic);
     static bool IsObjectMoving(CClientEntity* pEntity);
     LUA_DECLARE(GetObjectScale);
+    static std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> OOP_GetObjectScale(lua_State* luaVM, CClientObject* object);
     LUA_DECLARE(IsObjectBreakable);
     LUA_DECLARE(GetObjectMass);
     LUA_DECLARE(GetObjectProperty);

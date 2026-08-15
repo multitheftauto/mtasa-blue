@@ -293,6 +293,8 @@ public:
     void SetIsDead(bool bDead) noexcept { m_bDead = bDead; };
     void Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bStealth = false, bool bSetDirectlyDead = false, AssocGroupId animGroup = 0,
               AnimationId animID = 15);
+    // Holds the death animation on its last frame so a recreated ped is posed at once.
+    void FreezeDeathAnimationOnLastFrame();
     void StealthKill(CClientPed* pPed);
     void BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
 
@@ -462,6 +464,9 @@ public:
     bool IsDoingGangDriveby();
     void SetDoingGangDriveby(bool bDriveby);
 
+    // Set while onClientPlayerWeaponFire/onClientPedWeaponFire is dispatched.
+    void SetProcessingWeaponFireEvent(bool bProcessing) noexcept { m_bProcessingWeaponFireEvent = bProcessing; }
+
     bool GetRunningAnimationName(SString& strBlockName, SString& strAnimName);
     bool IsRunningAnimation();
 
@@ -476,6 +481,7 @@ public:
     const SAnimationCache&      GetAnimationCache() const noexcept { return m_AnimationCache; }
     void                        RunAnimationFromCache();
     void                        UpdateAnimationProgressAndSpeed();
+    void                        UpdateCustomPartialAnimationBones();
 
     bool IsUsingGun();
 
@@ -697,6 +703,8 @@ public:
     float                                    m_fHealth;
     float                                    m_armor;
     bool                                     m_bDead;
+    AssocGroupId                             m_deathAnimGroup;
+    AnimationId                              m_deathAnimID;
     bool                                     m_bWorldIgnored;
     float                                    m_fCurrentRotation;
     float                                    m_fMoveSpeed;
@@ -722,6 +730,8 @@ public:
     CClientPad                               m_Pad;
     bool                                     m_bDestroyingSatchels;
     bool                                     m_bDoingGangDriveby;
+    bool                                     m_bProcessingWeaponFireEvent;
+    bool                                     m_bDeferredGangDrivebyAbort;
     std::unique_ptr<CAnimBlock>              m_pAnimationBlock;
     bool                                     m_bRequestedAnimation;
     SAnimationCache                          m_AnimationCache;

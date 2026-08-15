@@ -63,6 +63,16 @@ CClientEntity* CBuildingsPoolSA::GetClientBuilding(CBuildingSAInterface* pGameIn
     return m_buildingPool.entities[static_cast<size_t>(poolIndex)].pClientEntity;
 }
 
+CEntity* CBuildingsPoolSA::GetBuilding(CBuildingSAInterface* pGameInterface) const noexcept
+{
+    std::int32_t poolIndex = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pGameInterface);
+
+    if (poolIndex == -1)
+        return nullptr;
+
+    return m_buildingPool.entities[static_cast<size_t>(poolIndex)].pEntity;
+}
+
 CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector* vRot, uint8_t interior)
 {
     if (!HasFreeBuildingSlot())
@@ -199,7 +209,12 @@ void CBuildingsPoolSA::RemoveAllWithBackup()
             RemoveBuildingFromWorld(building);
 
             if (building->HasMatrix())
+            {
+                // Keep original matrix
+                m_buildingMatrix[building] = *building->matrix;
+
                 building->RemoveMatrix();
+            }
 
             pBuildsingsPool->Release(i);
 
@@ -230,6 +245,17 @@ void CBuildingsPoolSA::RestoreBackup()
         {
             auto* pBuilding = pBuildsingsPool->AllocateAtNoInit(i);
             std::memcpy(pBuilding, &originalData[i].second, sizeof(CBuildingSAInterface));
+
+            // Restore matrix if it was removed
+            auto it = m_buildingMatrix.find(pBuilding);
+            if (it != m_buildingMatrix.end())
+            {
+                if (!pBuilding->HasMatrix())
+                    pBuilding->AllocateMatrix();
+
+                *pBuilding->matrix = it->second;
+                m_buildingMatrix.erase(it);
+            }
 
             worldSA->Add(pBuilding, CBuildingPool_Constructor);
             buildingRemovealSA->AddDataBuilding(pBuilding);

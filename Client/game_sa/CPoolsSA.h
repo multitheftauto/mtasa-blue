@@ -86,6 +86,8 @@ public:
     DWORD GetVehiclePoolIndex(std::uint8_t* pInterfacee);
     DWORD GetObjectPoolIndex(std::uint8_t* pInterface);
 
+    void ResetDetachedCarPartsRefModel(std::uint16_t usModelID) noexcept;
+
     int  GetNumberOfUsedSpaces(ePools pools);
     int  GetPoolDefaultCapacity(ePools pool);
     int  GetPoolDefaultModdedCapacity(ePools pool);

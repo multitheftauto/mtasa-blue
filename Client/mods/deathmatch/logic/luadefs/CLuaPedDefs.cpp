@@ -178,8 +178,9 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setFootBloodEnabled", "setPedFootBloodEnabled");
     lua_classfunction(luaVM, "getTargetEnd", OOP_GetPedTargetEnd);
     lua_classfunction(luaVM, "getTargetStart", OOP_GetPedTargetStart);
-    lua_classfunction(luaVM, "getWeaponMuzzlePosition", "getPedWeaponMuzzlePosition");
+    lua_classfunction(luaVM, "getWeaponMuzzlePosition", ArgumentParserWarn<false, OOP_GetPedWeaponMuzzlePosition>);
     lua_classfunction(luaVM, "getBonePosition", OOP_GetPedBonePosition);
+    lua_classfunction(luaVM, "getBoneMatrix", ArgumentParserWarn<false, OOP_GetElementBoneMatrix>);
     lua_classfunction(luaVM, "getCameraRotation", "getPedCameraRotation");
     lua_classfunction(luaVM, "getWeaponSlot", "getPedWeaponSlot");
     lua_classfunction(luaVM, "getWalkingStyle", "getPedWalkingStyle");
@@ -241,7 +242,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "targetCollision", nullptr, OOP_GetPedTargetCollision);
     lua_classvariable(luaVM, "targetEnd", nullptr, OOP_GetPedTargetEnd);
     lua_classvariable(luaVM, "targetStart", nullptr, OOP_GetPedTargetStart);
-    // lua_classvariable ( luaVM, "muzzlePosition", NULL, "getPedWeaponMuzzlePosition" ); // TODO: needs to return a vector3 for oop
+    lua_classvariable(luaVM, "muzzlePosition", nullptr, ArgumentParserWarn<false, OOP_GetPedWeaponMuzzlePosition>);
     lua_classvariable(luaVM, "weaponSlot", "setPedWeaponSlot", "getPedWeaponSlot");
     lua_classvariable(luaVM, "walkingStyle", "setPedWalkingStyle", "getPedWalkingStyle");
     lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
@@ -480,6 +481,19 @@ int CLuaPedDefs::GetPedWeaponMuzzlePosition(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> CLuaPedDefs::OOP_GetPedWeaponMuzzlePosition(lua_State* luaVM, CClientPed* ped)
+{
+    CVector vecMuzzlePosition;
+    if (!CStaticFunctionDefinitions::GetPedWeaponMuzzlePosition(*ped, vecMuzzlePosition))
+        return false;
+
+    // Keep returning three floats when the caller assigns three results
+    if (lua_ncallresult(luaVM) == 3)
+        return CLuaMultiReturn<float, float, float>(vecMuzzlePosition.fX, vecMuzzlePosition.fY, vecMuzzlePosition.fZ);
+
+    return vecMuzzlePosition;
 }
 
 int CLuaPedDefs::GetPedOccupiedVehicle(lua_State* luaVM)
@@ -1064,6 +1078,28 @@ std::variant<bool, std::array<std::array<float, 4>, 4>> CLuaPedDefs::GetElementB
     g_pGame->GetRenderWare()->RwMatrixToCMatrix(*rwmatrix, matrix);
 
     return matrix.To4x4Array();
+}
+
+std::variant<bool, CMatrix> CLuaPedDefs::OOP_GetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone)
+{
+    if (bone < BONE_ROOT || bone > BONE_LEFTBREAST)
+        throw std::invalid_argument("Invalid bone: " + std::to_string(bone));
+
+    CEntity* entity = ped->GetGameEntity();
+
+    if (!entity)
+        return false;
+
+    RwMatrix* rwmatrix = entity->GetBoneRwMatrix(static_cast<eBone>(bone));
+
+    if (!rwmatrix)
+        return false;
+
+    CMatrix matrix;
+
+    g_pGame->GetRenderWare()->RwMatrixToCMatrix(*rwmatrix, matrix);
+
+    return matrix;
 }
 
 bool CLuaPedDefs::SetElementBonePosition(CClientPed* ped, const std::uint16_t bone, const CVector position)
@@ -1805,10 +1841,13 @@ int CLuaPedDefs::IsPedDead(lua_State* luaVM)
         // Grab his dead state and return it
         bool bDead = pPed->IsDead() || pPed->IsDying();
 
-        // Check player is already dead on network (#4147)
+        // Cover the window between network death and GTA processing it (#4147).
+        // Don't apply if GTA has already processed a revival (health > 0 and not
+        // in a death task) - IsDeadOnNetwork would be a stale server-side artifact.
         if (auto pPlayer = dynamic_cast<CClientPlayer*>(pPed))
         {
-            bDead = bDead || pPlayer->IsDeadOnNetwork();
+            if (pPlayer->IsDeadOnNetwork() && (pPed->GetHealth() <= 0.0f || bDead))
+                bDead = true;
         }
 
         lua_pushboolean(luaVM, bDead);
@@ -2319,11 +2358,12 @@ int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
 
 float CLuaPedDefs::GetPedAnimationProgress(CClientPed* ped)
 {
-    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
-    std::int32_t type = currentTask->GetTaskType();
+    CTaskManager* taskManager = ped->GetTaskManager();
+    if (!taskManager)
+        return -1.0f;
 
-    // check if animation (task type is 401)
-    if (type != 401)
+    CTask* currentTask = taskManager->GetActiveTask();
+    if (!currentTask || currentTask->GetTaskType() != TASK_SIMPLE_NAMED_ANIM)
         return -1.0f;
 
     auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
@@ -2339,11 +2379,12 @@ float CLuaPedDefs::GetPedAnimationProgress(CClientPed* ped)
 
 float CLuaPedDefs::GetPedAnimationSpeed(CClientPed* ped)
 {
-    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
-    std::int32_t type = currentTask->GetTaskType();
+    CTaskManager* taskManager = ped->GetTaskManager();
+    if (!taskManager)
+        return -1.0f;
 
-    // check if animation (task type is 401)
-    if (type != 401)
+    CTask* currentTask = taskManager->GetActiveTask();
+    if (!currentTask || currentTask->GetTaskType() != TASK_SIMPLE_NAMED_ANIM)
         return -1.0f;
 
     auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);
@@ -2359,11 +2400,12 @@ float CLuaPedDefs::GetPedAnimationSpeed(CClientPed* ped)
 
 float CLuaPedDefs::GetPedAnimationLength(CClientPed* ped)
 {
-    CTask*       currentTask = ped->GetTaskManager()->GetActiveTask();
-    std::int32_t type = currentTask->GetTaskType();
+    CTaskManager* taskManager = ped->GetTaskManager();
+    if (!taskManager)
+        return -1.0f;
 
-    // check if animation (task type is 401)
-    if (type != 401)
+    CTask* currentTask = taskManager->GetActiveTask();
+    if (!currentTask || currentTask->GetTaskType() != TASK_SIMPLE_NAMED_ANIM)
         return -1.0f;
 
     auto* animation = dynamic_cast<CTaskSimpleRunNamedAnim*>(currentTask);

@@ -360,7 +360,7 @@ void CheckLibVersions()
                                 "MTA\\game_sa.dll",
                                 "MTA\\" LOADER_PROXY_DLL_NAME,
                                 "mods\\deathmatch\\client.dll",
-                                "mods\\deathmatch\\pcre3.dll"};
+                                "mods\\deathmatch\\pcre2.dll"};
 
     SString strReqFileVersion;
     for (uint i = 0; i < NUMELMS(moduleList); i++)
@@ -2003,6 +2003,15 @@ int LaunchGame(SString strCmdLine)
                     --i;  // Don't count this iteration
                     Sleep(100);
                 }
+            }
+
+            // Diagnostic: detect rapid process exit before loading screen appeared
+            if (status != WAIT_TIMEOUT && WatchDogIsSectionOpen("L3"))
+            {
+                DWORD dwEarlyExitCode = 0;
+                GetExitCodeProcess(piLoadee.hProcess, &dwEarlyExitCode);
+                WriteDebugEvent(SString("Loader - Process exited (code %lu) before loading screen appeared", dwEarlyExitCode));
+                AddReportLog(7103, SString("Loader - Premature exit (code %lu) - possible missing runtime dependencies or injection failure", dwEarlyExitCode));
             }
 
             HideSplash();

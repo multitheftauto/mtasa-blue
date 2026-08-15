@@ -1914,7 +1914,6 @@ void CCore::OnPostColorFilterRender()
 
 void CCore::ApplyCoreInitSettings()
 {
-#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN)
     bool aware = CVARS_GET_VALUE<bool>("process_dpi_aware");
 
     // The minimum supported client for the function below is Windows Vista (Longhorn).
@@ -1922,7 +1921,6 @@ void CCore::ApplyCoreInitSettings()
     // https://learn.microsoft.com/en-us/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows
     if (aware)
         SetProcessDPIAware();
-#endif
 
     int revision = GetApplicationSettingInt("reset-settings-revision");
 
