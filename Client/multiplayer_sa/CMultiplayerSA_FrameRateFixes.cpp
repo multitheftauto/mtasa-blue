@@ -291,9 +291,7 @@ static void __declspec(naked) HOOK_CTimer__Update()
     {
         // Keep the private timestep current while disabled so enabling the
         // glitch does not begin with a stale sample.
-        pushad
         call UpdateFastWeaponStrafeTimeStep
-        popad
 
         add esp, 0x4
 
