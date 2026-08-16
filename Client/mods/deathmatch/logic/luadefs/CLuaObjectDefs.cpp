@@ -56,7 +56,7 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "respawn", "respawnObject");
     lua_classfunction(luaVM, "toggleRespawn", "toggleObjectRespawn");
 
-    lua_classfunction(luaVM, "getScale", "getObjectScale");
+    lua_classfunction(luaVM, "getScale", ArgumentParserWarn<false, OOP_GetObjectScale>);
     lua_classfunction(luaVM, "isBreakable", "isObjectBreakable");
     lua_classfunction(luaVM, "getMass", "getObjectMass");
     lua_classfunction(luaVM, "getProperties", GetObjectProperties);
@@ -70,7 +70,7 @@ void CLuaObjectDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setProperty", "setObjectProperty");
 
     lua_classvariable(luaVM, "moving", nullptr, "isObjectMoving");
-    lua_classvariable(luaVM, "scale", "setObjectScale", "getObjectScale");
+    lua_classvariable(luaVM, "scale", SetObjectScale, ArgumentParserWarn<false, OOP_GetObjectScale>);
     lua_classvariable(luaVM, "breakable", "setObjectBreakable", "isObjectBreakable");
     lua_classvariable(luaVM, "mass", "setObjectMass", "getObjectMass");
     lua_classvariable(luaVM, "properties", nullptr, GetObjectProperties);
@@ -178,6 +178,19 @@ int CLuaObjectDefs::GetObjectScale(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> CLuaObjectDefs::OOP_GetObjectScale(lua_State* luaVM, CClientObject* object)
+{
+    CVector vecScale;
+    if (!CStaticFunctionDefinitions::GetObjectScale(*object, vecScale))
+        return false;
+
+    // Keep returning three floats when the caller assigns three results
+    if (lua_ncallresult(luaVM) == 3)
+        return CLuaMultiReturn<float, float, float>(vecScale.fX, vecScale.fY, vecScale.fZ);
+
+    return vecScale;
 }
 
 int CLuaObjectDefs::IsObjectBreakable(lua_State* luaVM)

@@ -57,6 +57,7 @@ namespace FPSLimiter
         LARGE_INTEGER m_lastFrameTime;
         std::uint64_t m_lastFrameTSC;
         HANDLE        m_hTimer;
+        double        m_timerJitterPeakMs;   // Decaying peak of measured timer wake-up overshoot, used to size the busy-wait margin
         std::uint16_t m_serverEnforcedFps;   // Maximum FPS enforced by the server
         std::uint16_t m_clientEnforcedFps;   // Maximum FPS enforced by the client
         std::uint16_t m_userDefinedFps;      // Maximum FPS defined by the user (see `fps_limit` cvar)
