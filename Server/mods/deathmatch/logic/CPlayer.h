@@ -366,6 +366,9 @@ public:
     unsigned int       m_uiActiveSatchelCount{};
     CElapsedTime       m_DetonateSatchelTimer;
     CElapsedTime       m_DestroySatchelTimer;
+    CElapsedTime       m_BulletSyncRateTimer;
+    // Rate gate for custom weapon fire (PACKET_ID_WEAPON_BULLETSYNC)
+    CElapsedTime m_WeaponBulletSyncRateTimer;
 
 private:
     SLightweightSyncData m_lightweightSyncData;
