@@ -18,6 +18,12 @@
 #define FRAME_OUTGOING_BUFFER_COUNT 100
 #define FRAME_INCOMING_BUFFER_COUNT 100
 
+// Speex produces one 20 ms frame per packet regardless of sample rate
+#define VOICE_FRAME_DURATION_MS 20
+// Max decoded frames a single remote speaker may have queued at once (500 ms of audio).
+// Legit speech never exceeds real-time, so only bursts and floods reach this ceiling.
+#define VOICE_DECODE_BURST_DEFAULT 25
+
 #include <mutex>
 #include <speex/speex.h>
 #include <speex/speex_preprocess.h>
@@ -50,7 +56,7 @@ public:
     CVoiceRecorder();
     ~CVoiceRecorder();
 
-    void Init(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
+    void Init(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate, unsigned char ucDecodeBurst);
 
     bool IsEnabled() { return m_bEnabled; }
 
@@ -61,6 +67,7 @@ public:
 
     unsigned int  GetSampleRate() { return m_SampleRate; }
     unsigned char GetSampleQuality() { return m_ucQuality; }
+    unsigned char GetDecodeBurst() { return m_ucDecodeBurst; }
 
     const SpeexMode* getSpeexModeFromSampleRate();
 
@@ -92,6 +99,7 @@ private:
 
     eSampleRate   m_SampleRate;
     unsigned char m_ucQuality;
+    unsigned char m_ucDecodeBurst;
 
     std::list<SString> m_EventQueue;
     std::mutex         m_Mutex;

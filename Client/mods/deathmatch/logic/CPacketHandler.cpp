@@ -401,7 +401,12 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     unsigned int iBitrate;
     bitStream.ReadCompressed(iBitrate);
 
-    g_pClientGame->InitVoice(bVoiceEnabled, (unsigned int)sampleRate, quality, iBitrate);
+    // Per-speaker decode burst limit; older servers do not send it
+    unsigned char ucVoiceDecodeBurst = VOICE_DECODE_BURST_DEFAULT;
+    if (bitStream.Can(eBitStreamVersion::VoiceDecodeBurstLimit))
+        bitStream.Read(ucVoiceDecodeBurst);
+
+    g_pClientGame->InitVoice(bVoiceEnabled, (unsigned int)sampleRate, quality, iBitrate, ucVoiceDecodeBurst);
 
     // Get fakelag command enabled
     if (bitStream.ReadBit())

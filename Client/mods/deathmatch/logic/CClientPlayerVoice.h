@@ -81,6 +81,7 @@ public:
 private:
     void Init();
     void DeInit();
+    bool TakeDecodeCredit();
     void ServiceEventQueue();
     void ApplyFxEffects();
 
@@ -108,5 +109,10 @@ private:
     SFixedArray<int, 9> m_EnabledEffects;
     SFixedArray<HFX, 9> m_FxEffects;
 
-    unsigned char m_voiceFramesThisPulse;  // Decodes per frame limit
+    // Decode throttle. Credit accrues at the real-time frame rate (one frame per
+    // VOICE_FRAME_DURATION_MS) up to the server-configured burst ceiling, so a
+    // speaker who is merely ahead of a slow client frame is never dropped, while a
+    // flood is capped at the ceiling and then held to real-time.
+    float         m_fDecodeCredit;
+    unsigned long m_ulDecodeCreditTime;
 };

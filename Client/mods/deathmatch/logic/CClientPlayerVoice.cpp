@@ -31,6 +31,8 @@ CClientPlayerVoice::CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* p
     m_SampleRate = SAMPLERATE_WIDEBAND;
     m_pSpeexDecoderState = NULL;
     m_iSpeexIncomingFrameSampleCount = 0;
+    m_fDecodeCredit = 0.0f;
+    m_ulDecodeCreditTime = 0;
 
     // Get initial voice volume
     m_fVolume = 1.0f;
@@ -103,8 +105,6 @@ void CClientPlayerVoice::DeInit()
 
 void CClientPlayerVoice::DoPulse()
 {
-    m_voiceFramesThisPulse = 0;
-
     // Dispatch queued events
     ServiceEventQueue();
 
@@ -133,10 +133,8 @@ void CClientPlayerVoice::DecodeAndBuffer(const unsigned char* voiceBuffer, unsig
     if (!m_pSpeexDecoderState)
         return;
 
-    // Limit decodes per frame to bound CPU from relay floods
-    if (m_voiceFramesThisPulse >= 6)
+    if (!TakeDecodeCredit())
         return;
-    ++m_voiceFramesThisPulse;
 
     char      pTempBuffer[2048];
     SpeexBits speexBits;
@@ -175,6 +173,39 @@ void CClientPlayerVoice::DecodeAndBuffer(const unsigned char* voiceBuffer, unsig
 
     if (m_pBassPlaybackStream)
         BASS_StreamPutData(m_pBassPlaybackStream, (void*)pTempBuffer, uiSpeexBlockSize);
+}
+
+// Bounds decode CPU against relay floods without starving legitimate speech.
+//
+// The previous fixed cap of N decodes per game frame dropped real packets whenever
+// the client rendered slower than the 50 Hz voice frame rate, or whenever the
+// network delivered a burst, and every dropped packet stalled the BASS stream and
+// fired onClientPlayerVoiceStop mid-sentence. Credit is now earned in real time and
+// only the burst ceiling is capped, so steady speech is never throttled.
+bool CClientPlayerVoice::TakeDecodeCredit()
+{
+    const unsigned long ulNow = CClientTime::GetTime();
+    const float         fBurst = static_cast<float>(m_pVoiceRecorder->GetDecodeBurst());
+
+    if (m_ulDecodeCreditTime == 0)
+    {
+        m_ulDecodeCreditTime = ulNow;
+        m_fDecodeCredit = fBurst;
+    }
+    else if (ulNow > m_ulDecodeCreditTime)
+    {
+        m_fDecodeCredit += static_cast<float>(ulNow - m_ulDecodeCreditTime) / VOICE_FRAME_DURATION_MS;
+        m_ulDecodeCreditTime = ulNow;
+
+        if (m_fDecodeCredit > fBurst)
+            m_fDecodeCredit = fBurst;
+    }
+
+    if (m_fDecodeCredit < 1.0f)
+        return false;
+
+    m_fDecodeCredit -= 1.0f;
+    return true;
 }
 
 void CClientPlayerVoice::ServiceEventQueue()
