@@ -39,4 +39,8 @@ public:
     virtual void EnsureCaratIsVisible() = 0;
 
     virtual void SetTextChangedHandler(const GUI_CALLBACK& Callback) = 0;
+
+    // Keep new virtual methods at the end so existing slots remain stable for modules built against older interfaces.
+    virtual unsigned int GetUTF8CharacterCount(const char* szText) = 0;
+    virtual float        GetVerticalOffsetForCharacterIndex(unsigned int uiIndex) = 0;
 };
