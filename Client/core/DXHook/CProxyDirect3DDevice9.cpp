@@ -1073,6 +1073,12 @@ HRESULT CProxyDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDes
     TIMING_GRAPH("Present");
     HRESULT hr = CDirect3DEvents9::PresentGuarded(m_pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
     TIMING_GRAPH("PostPresent");
+
+    // Apply FPS limiting here, as the last thing before the frame ends, so pacing accounts
+    // for the full frame (GUI draw and the real Present/vsync) instead of just the portion
+    // of the frame that happens before GUI draw.
+    CCore::GetSingleton().GetFPSLimiter()->OnFrameEnd();
+
     return hr;
 }
 

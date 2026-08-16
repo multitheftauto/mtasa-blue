@@ -1812,7 +1812,10 @@ struct SVehicleSirenSync : public ISyncStructure
                 bitStream.ReadBit(data.m_bDoLOSCheck);
                 bitStream.ReadBit(data.m_bUseRandomiser);
                 bitStream.ReadBit(data.m_bEnableSilent);
-                return true;
+
+                // The id indexes a fixed size array, so reject it here rather than at the point of use.
+                // Everything is read first so the rest of the stream stays aligned.
+                return data.m_ucSirenID <= SIREN_ID_MAX;
             }
         }
 
