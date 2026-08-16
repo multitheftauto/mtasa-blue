@@ -153,6 +153,7 @@ public:
     int GetVoicePacketsInterval() const noexcept { return m_voicePacketsInterval; }
     int GetMaxVoicePacketsPerInterval() const noexcept { return m_maxVoicePacketsPerInterval; }
     int GetMaxVoiceBufferSize() const noexcept { return m_maxVoiceBufferSize; }
+    int GetMaxVoiceDecodeBurst() const noexcept { return m_maxVoiceDecodeBurst; }
 
 private:
     void RegisterCommand(const char* szName, FCommandHandler* pFunction, bool bRestricted, const char* szConsoleHelpText);
@@ -241,4 +242,5 @@ private:
     int                        m_voicePacketsInterval{};
     int                        m_maxVoicePacketsPerInterval{};
     int                        m_maxVoiceBufferSize{};
+    int                        m_maxVoiceDecodeBurst{};
 };

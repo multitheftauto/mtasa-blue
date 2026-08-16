@@ -27,13 +27,14 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket()
     m_ucSampleRate = 1;
     m_ucQuality = 4;
     m_uiBitrate = 0;
+    m_ucVoiceDecodeBurst = 25;
     m_szServerName = "";
 }
 
 CPlayerJoinCompletePacket::CPlayerJoinCompletePacket(ElementID PlayerID, ElementID RootElementID, eHTTPDownloadType ucHTTPDownloadType,
                                                      unsigned short usHTTPDownloadPort, const char* szHTTPDownloadURL, int iHTTPMaxConnectionsPerClient,
                                                      int iEnableClientChecks, bool bVoiceEnabled, unsigned char ucSampleRate, unsigned char ucVoiceQuality,
-                                                     unsigned int uiBitrate, const char* szServerName)
+                                                     unsigned int uiBitrate, unsigned char ucVoiceDecodeBurst, const char* szServerName)
 {
     m_PlayerID = PlayerID;
     m_RootElementID = RootElementID;
@@ -44,6 +45,7 @@ CPlayerJoinCompletePacket::CPlayerJoinCompletePacket(ElementID PlayerID, Element
     m_ucSampleRate = ucSampleRate;
     m_ucQuality = ucVoiceQuality;
     m_uiBitrate = uiBitrate;
+    m_ucVoiceDecodeBurst = ucVoiceDecodeBurst;
     m_szServerName = szServerName;
 
     switch (m_ucHTTPDownloadType)
@@ -88,6 +90,10 @@ bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
 
     // Transmit the max bitrate for voice
     BitStream.WriteCompressed(m_uiBitrate);
+
+    // Transmit the per-speaker decode burst limit for voice
+    if (BitStream.Can(eBitStreamVersion::VoiceDecodeBurstLimit))
+        BitStream.Write(m_ucVoiceDecodeBurst);
 
     // fakelag command enabled
     if (BitStream.Can(eBitStreamVersion::FakeLagCommand))
