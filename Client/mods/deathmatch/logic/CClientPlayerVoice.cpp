@@ -103,6 +103,8 @@ void CClientPlayerVoice::DeInit()
 
 void CClientPlayerVoice::DoPulse()
 {
+    m_voiceFramesThisPulse = 0;
+
     // Dispatch queued events
     ServiceEventQueue();
 
@@ -114,13 +116,38 @@ void CClientPlayerVoice::DoPulse()
     {
         m_fVolumeScale = fPreviousVolume;
         float fScaledVolume = m_fVolume * m_fVolumeScale;
-        BASS_ChannelSetAttribute(m_pBassPlaybackStream, BASS_ATTRIB_VOL, fScaledVolume);
+        if (m_pBassPlaybackStream)
+            BASS_ChannelSetAttribute(m_pBassPlaybackStream, BASS_ATTRIB_VOL, fScaledVolume);
     }
 }
 
 void CClientPlayerVoice::DecodeAndBuffer(const unsigned char* voiceBuffer, unsigned int voiceBufferLength)
 {
     if (!voiceBuffer || !voiceBufferLength || voiceBufferLength > 2048)
+        return;
+
+    // Skip uniform-byte noise before costly Speex decode
+    if (voiceBufferLength >= 4 && voiceBuffer[0] == voiceBuffer[1] && voiceBuffer[0] == voiceBuffer[2] && voiceBuffer[0] == voiceBuffer[3])
+        return;
+
+    if (!m_pSpeexDecoderState)
+        return;
+
+    // Limit decodes per frame to bound CPU from relay floods
+    if (m_voiceFramesThisPulse >= 6)
+        return;
+    ++m_voiceFramesThisPulse;
+
+    char      pTempBuffer[2048];
+    SpeexBits speexBits;
+    speex_bits_init(&speexBits);
+
+    speex_bits_read_from(&speexBits, reinterpret_cast<const char*>(voiceBuffer), voiceBufferLength);
+    const int decodeResult = speex_decode_int(m_pSpeexDecoderState, &speexBits, (spx_int16_t*)pTempBuffer);
+
+    speex_bits_destroy(&speexBits);
+
+    if (decodeResult < 0)
         return;
 
     m_Mutex.lock();
@@ -135,25 +162,19 @@ void CClientPlayerVoice::DecodeAndBuffer(const unsigned char* voiceBuffer, unsig
         if (!m_pPlayer->CallEvent("onClientPlayerVoiceStart", Arguments, true))
             return;
 
+        m_Mutex.lock();
         m_bVoiceActive = true;
+        m_Mutex.unlock();
     }
     else
     {
         m_Mutex.unlock();
     }
 
-    char      pTempBuffer[2048];
-    SpeexBits speexBits;
-    speex_bits_init(&speexBits);
-
-    speex_bits_read_from(&speexBits, reinterpret_cast<const char*>(voiceBuffer), voiceBufferLength);
-    speex_decode_int(m_pSpeexDecoderState, &speexBits, (spx_int16_t*)pTempBuffer);
-
-    speex_bits_destroy(&speexBits);
-
     unsigned int uiSpeexBlockSize = m_iSpeexIncomingFrameSampleCount * VOICE_SAMPLE_SIZE;
 
-    BASS_StreamPutData(m_pBassPlaybackStream, (void*)pTempBuffer, uiSpeexBlockSize);
+    if (m_pBassPlaybackStream)
+        BASS_StreamPutData(m_pBassPlaybackStream, (void*)pTempBuffer, uiSpeexBlockSize);
 }
 
 void CClientPlayerVoice::ServiceEventQueue()
