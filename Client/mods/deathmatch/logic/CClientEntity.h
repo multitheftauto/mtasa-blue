@@ -20,7 +20,6 @@ class CClientEntity;
 #include "enums/ElementType.h"
 #include "enums/3DMarkerType.h"
 #include <CVector.h>
-#include <optional>
 class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType

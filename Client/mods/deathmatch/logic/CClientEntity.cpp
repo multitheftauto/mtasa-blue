@@ -2019,11 +2019,8 @@ void CClientEntity::GetFilteredChildrenByType(const std::string_view& type, cons
         {
             for (CClientEntity* entity : find->second)
             {
-                if (entity && !entity->IsBeingDeleted())
-                {
-                    if (entity->EvaluateEntityFilters(filterOptions))
-                        outList.push_back(entity);
-                }
+                if (entity && !entity->IsBeingDeleted() && entity->EvaluateEntityFilters(filterOptions))
+                    outList.push_back(entity);
             }
         }
     }
