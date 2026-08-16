@@ -40,11 +40,11 @@ DWORD RETN_CAutomobile_PreRender_SirenSkip = 0x6ABC71;    // original "no siren"
 // Bikes, BMX, boats, planes and helis don't draw scripted sirens natively. Each of these PreRender
 // methods starts with the same 13-byte SEH prologue (push -1; push <handler>; mov eax, fs:[0]); we
 // hook the entry, draw our sirens, then replay it and continue at entry+0xD so the body is untouched.
-#define HOOKPOS_CBike_PreRender_Siren 0x6BD090
-#define HOOKPOS_CBmx_PreRender_Siren 0x6C0810
-#define HOOKPOS_CBoat_PreRender_Siren 0x6F1180
+#define HOOKPOS_CBike_PreRender_Siren  0x6BD090
+#define HOOKPOS_CBmx_PreRender_Siren   0x6C0810
+#define HOOKPOS_CBoat_PreRender_Siren  0x6F1180
 #define HOOKPOS_CPlane_PreRender_Siren 0x6C94A0
-#define HOOKPOS_CHeli_PreRender_Siren 0x6C5420
+#define HOOKPOS_CHeli_PreRender_Siren  0x6C5420
 DWORD RETN_CBike_PreRender_Siren = 0x6BD09D;
 DWORD RETN_CBmx_PreRender_Siren = 0x6C081D;
 DWORD RETN_CBoat_PreRender_Siren = 0x6F118D;
@@ -378,39 +378,42 @@ void GetVehicleSirenType()
     }
 }
 
+// Resolves a native vehicle interface to its CVehicle wrapper, but only when that wrapper actually
+// carries scripted sirens. Shared by the model gate, the custom render and the custom sound below,
+// which otherwise each repeated the same pool lookup and null/sirens check on their own.
+CVehicle* GetSirenVehicle(CVehicleSAInterface* vehicleInterface)
+{
+    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)vehicleInterface);
+    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
+    return (pVehicle && pVehicle->DoesVehicleHaveSirens()) ? pVehicle : nullptr;
+}
+
 // Index used for the native siren-type table reads when a vehicle is outside the stock
-// 407-599 range. 596 (police) - 407; its value is discarded by the TestSirenType* override
-// hooks, so any in-range index works - it only keeps the table reads in bounds.
+// 407-599 range. 596 (police) minus 407; its value is discarded by the TestSirenType* override
+// hooks, so any in-range index works, it only keeps the table reads in bounds.
 #define SIREN_SAFE_MODEL_INDEX_ADJ 189
 
+// modelIndex - 407, so it goes negative for the stock 400-406 range; that is why this stays a
+// signed int rather than unsigned. The unsigned cast below is only a wraparound trick that turns
+// the two-sided range check into a single comparison.
 int g_iSirenModelIndexAdj = 0;
-int g_iRenderCustomSiren = 0;
 
 // Decide whether the siren block in CAutomobile::PreRender should run for this
 // vehicle. Stock models 407-599 keep the original behaviour; anything else (custom
 // engineRequestModel ids, stock 400-406 / 600-611) renders only when it has scripted sirens.
-void ProcessCustomSirenModelGate()
+bool ProcessCustomSirenModelGate()
 {
     // Native siren range: behave exactly like the original code (keep edi = modelIndex - 407).
     if (static_cast<unsigned int>(g_iSirenModelIndexAdj) <= 0xC0)
-    {
-        g_iRenderCustomSiren = 1;
-        return;
-    }
+        return true;
 
     // Out of native range: only render when the vehicle has scripted sirens, and clamp the
     // index so the native siren-type table reads stay in bounds.
-    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
-    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
-    if (pVehicle && pVehicle->DoesVehicleHaveSirens())
-    {
-        g_iSirenModelIndexAdj = SIREN_SAFE_MODEL_INDEX_ADJ;
-        g_iRenderCustomSiren = 1;
-    }
-    else
-    {
-        g_iRenderCustomSiren = 0;
-    }
+    if (!GetSirenVehicle(pVehicleWithTheSiren))
+        return false;
+
+    g_iSirenModelIndexAdj = SIREN_SAFE_MODEL_INDEX_ADJ;
+    return true;
 }
 
 static void __declspec(naked) HOOK_CAutomobile_PreRender_SirenModelGate()
@@ -425,15 +428,16 @@ static void __declspec(naked) HOOK_CAutomobile_PreRender_SirenModelGate()
         sub   eax, 0x197
         mov   g_iSirenModelIndexAdj, eax
         mov   pVehicleWithTheSiren, esi
-        pushad
     }
     // clang-format on
+    // The bool comes back in al, and nothing between the call and the test below touches eax.
+    // esi/ebx/edi/ebp are untouched by any ordinary call under our calling convention, so there is
+    // nothing left here that a pushad would still need to protect.
     ProcessCustomSirenModelGate();
     // clang-format off
     __asm
     {
-        popad
-        cmp   g_iRenderCustomSiren, 0
+        test  al, al
         je    skip_sirens
         // edi = (possibly clamped) modelIndex - 407, consumed by the native siren-type table reads
         mov   edi, g_iSirenModelIndexAdj
@@ -693,18 +697,23 @@ using RegisterCorona_t = void(__cdecl*)(unsigned int id, void* attachTo, unsigne
 // render sirens natively. Called from the PreRender entry hooks of CBike/CBmx/CBoat/CPlane/CHeli.
 // Reuses ProcessVehicleSirenPosition() for the per-frame slot pick / randomiser / LOS / colour,
 // then registers one corona attached to the vehicle (so the relative position is transformed for us).
-void RenderCustomVehicleSirens()
+//
+// Takes the vehicle interface directly so its callers can call straight through with the this
+// pointer already sitting in ecx. ProcessVehicleSirenPosition() and DoesVehicleHaveSiren() below
+// still read it back through the shared pVehicleWithTheSiren global, so that still gets set here
+// rather than separately at each call site.
+void __fastcall RenderCustomVehicleSirens(CVehicleSAInterface* vehicleInterface)
 {
-    if (!pVehicleWithTheSiren)
+    if (!vehicleInterface)
         return;
+    pVehicleWithTheSiren = vehicleInterface;
 
     // The HPV1000 (523) draws its siren through the native bike code; don't double up.
     if (DoesVehicleHaveSiren())
         return;
 
-    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
-    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
-    if (!pVehicle || !pVehicle->DoesVehicleHaveSirens() || pVehicle->GetVehicleSirenCount() == 0)
+    CVehicle* pVehicle = GetSirenVehicle(vehicleInterface);
+    if (!pVehicle || pVehicle->GetVehicleSirenCount() == 0)
         return;
 
     // Pick the siren slot for this frame and fill in dwRed/dwGreen/dwBlue + the relative position.
@@ -721,15 +730,17 @@ void RenderCustomVehicleSirens()
 
     // Match the native vehicle-siren corona look (size 0.4, far clip = corona brightness * 150).
     float fRange = *reinterpret_cast<float*>(0xB6F118) * 150.0f;
-    reinterpret_cast<RegisterCorona_t>(FUNC_CCoronas_RegisterCorona)(reinterpret_cast<unsigned int>(pVehicleWithTheSiren) + 0x15, pVehicleWithTheSiren,
-                                                                     static_cast<unsigned char>(dwRed), static_cast<unsigned char>(dwGreen),
-                                                                     static_cast<unsigned char>(dwBlue), 0xFF, vecRelative, 0.4f, fRange, nullptr, 0, 0, 0,
-                                                                     0, 0.0f, false, 1.5f, false, 15.0f, false, true);
+    reinterpret_cast<RegisterCorona_t>(FUNC_CCoronas_RegisterCorona)(
+        reinterpret_cast<unsigned int>(vehicleInterface) + 0x15, vehicleInterface, static_cast<unsigned char>(dwRed), static_cast<unsigned char>(dwGreen),
+        static_cast<unsigned char>(dwBlue), 0xFF, vecRelative, 0.4f, fRange, nullptr, 0, 0, 0, 0, 0.0f, false, 1.5f, false, 15.0f, false, true);
 }
 
-// Each of these five hooks stashes 'this' (ecx), draws the custom sirens, then replays the original
-// SEH prologue (push -1; push <handler>; mov eax, fs:[0]) and continues at PreRender+0xD. They only
-// differ in the per-function SEH handler address and the return address.
+// Each of these five hooks saves every register, calls straight through with the vehicle interface
+// (the this pointer) already sitting in ecx, restores everything, then replays the original SEH
+// prologue (push -1; push <handler>; mov eax, fs:[0]) and continues at PreRender+0xD. ecx has to
+// survive the call intact since the replayed prologue and the native PreRender body after it both
+// still need it, which is why pushad/popad stay here even though the call itself needs no setup.
+// The hooks only differ in the per-function SEH handler address and the return address.
 static void __declspec(naked) HOOK_CBike_PreRender_Siren()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -737,14 +748,8 @@ static void __declspec(naked) HOOK_CBike_PreRender_Siren()
     // clang-format off
     __asm
     {
-        mov pVehicleWithTheSiren, ecx
         pushad
-    }
-    // clang-format on
-    RenderCustomVehicleSirens();
-    // clang-format off
-    __asm
-    {
+        call RenderCustomVehicleSirens
         popad
         push 0FFFFFFFFh
         push 848321h
@@ -761,14 +766,8 @@ static void __declspec(naked) HOOK_CBmx_PreRender_Siren()
     // clang-format off
     __asm
     {
-        mov pVehicleWithTheSiren, ecx
         pushad
-    }
-    // clang-format on
-    RenderCustomVehicleSirens();
-    // clang-format off
-    __asm
-    {
+        call RenderCustomVehicleSirens
         popad
         push 0FFFFFFFFh
         push 848401h
@@ -785,14 +784,8 @@ static void __declspec(naked) HOOK_CBoat_PreRender_Siren()
     // clang-format off
     __asm
     {
-        mov pVehicleWithTheSiren, ecx
         pushad
-    }
-    // clang-format on
-    RenderCustomVehicleSirens();
-    // clang-format off
-    __asm
-    {
+        call RenderCustomVehicleSirens
         popad
         push 0FFFFFFFFh
         push 848918h
@@ -809,14 +802,8 @@ static void __declspec(naked) HOOK_CPlane_PreRender_Siren()
     // clang-format off
     __asm
     {
-        mov pVehicleWithTheSiren, ecx
         pushad
-    }
-    // clang-format on
-    RenderCustomVehicleSirens();
-    // clang-format off
-    __asm
-    {
+        call RenderCustomVehicleSirens
         popad
         push 0FFFFFFFFh
         push 8485ABh
@@ -833,14 +820,8 @@ static void __declspec(naked) HOOK_CHeli_PreRender_Siren()
     // clang-format off
     __asm
     {
-        mov pVehicleWithTheSiren, ecx
         pushad
-    }
-    // clang-format on
-    RenderCustomVehicleSirens();
-    // clang-format off
-    __asm
-    {
+        call RenderCustomVehicleSirens
         popad
         push 0FFFFFFFFh
         push 848488h
@@ -851,7 +832,8 @@ static void __declspec(naked) HOOK_CHeli_PreRender_Siren()
 }
 
 // CTrain::PreRender has a plain (non-SEH) prologue, so it gets its own hook that replays
-// push esi; mov esi, ecx; call CVehicle::PreRender before continuing at PreRender+8.
+// push esi; mov esi, ecx; call CVehicle::PreRender before continuing at PreRender+8. ecx (the
+// vehicle interface) has to survive the call for that replay, same reasoning as the five hooks above.
 static void __declspec(naked) HOOK_CTrain_PreRender_Siren()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -859,14 +841,8 @@ static void __declspec(naked) HOOK_CTrain_PreRender_Siren()
     // clang-format off
     __asm
     {
-        mov pVehicleWithTheSiren, ecx
         pushad
-    }
-    // clang-format on
-    RenderCustomVehicleSirens();
-    // clang-format off
-    __asm
-    {
+        call RenderCustomVehicleSirens
         popad
         push esi
         mov esi, ecx
@@ -1283,30 +1259,28 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound()
         // clang-format on
     }
 }
-DWORD                         CALL_CVehicleAudio_ProcessCarHorn = 0x5002C0;
+DWORD CALL_CVehicleAudio_ProcessCarHorn = 0x5002C0;
 
 // CAEVehicleAudioEntity::ProcessVehicle only calls ProcessVehicleSirenAlarmHorn for the car/bike/bmx
 // audio types, so boats/aircraft/trains never play the siren wail. Run it ourselves (once, before the
 // type switch) for those audio types when the vehicle carries scripted sirens.
-void* g_pSirenAudioEntity = nullptr;   // CAEVehicleAudioEntity* (this)
-void* g_pSirenAudioVehicle = nullptr;  // vehicle interface being processed
-void* g_pSirenAudioParams = nullptr;   // &tVehicleParams (built on ProcessVehicle's stack)
-
-void ProcessCustomSirenSound()
+//
+// Takes its three arguments straight from the registers/stack the hook below already has them in,
+// rather than stashing each one into its own global first.
+void __fastcall ProcessCustomSirenSound(CAEVehicleAudioEntitySAInterface* audioEntity, CVehicleSAInterface* vehicleInterface, void* vehicleParams)
 {
-    // m_AuSettings.VehicleAudioType @ +0x80: 0 car / 1 bike / 2 bmx already handle the siren;
-    // 3 boat, 4 heli, 5 plane, 6 seaplane, 7 one-gear, 8 train, 9 special; 10 none has no case.
-    signed char audioType = *(reinterpret_cast<signed char*>(g_pSirenAudioEntity) + 0x80);
-    if (audioType < 3 || audioType > 9)
+    // m_nSettings.m_eVehicleSoundType: CAR/BIKE/BMX already handle the siren in the native switch.
+    // BOAT through this enum's last entry, TRAILLER, get the extra processing here; TRAILLER is this
+    // enum's name for what the native code and CAEVehicleAudioEntity.h's own eVehicleAudioType both
+    // call SPECIAL. Native's out of range NO_VEHICLE, past this enum entirely, has no case either way.
+    const VehicleSoundType audioType = audioEntity->m_nSettings.m_eVehicleSoundType;
+    if (audioType < VehicleSoundType::BOAT || audioType > VehicleSoundType::TRAILLER)
         return;
 
-    SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)g_pSirenAudioVehicle);
-    CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
-    if (!pVehicle || !pVehicle->DoesVehicleHaveSirens())
+    if (!GetSirenVehicle(vehicleInterface))
         return;
 
-    // CAEVehicleAudioEntity::ProcessVehicleSirenAlarmHorn(tVehicleParams&) - thiscall
-    reinterpret_cast<void(__thiscall*)(void*, void*)>(CALL_CVehicleAudio_ProcessCarHorn)(g_pSirenAudioEntity, g_pSirenAudioParams);
+    audioEntity->ProcessVehicleSirenAlarmHorn(vehicleParams);
 }
 
 static void __declspec(naked) HOOK_CAEVehicleAudioEntity_ProcessVehicle_SirenSound()
@@ -1316,17 +1290,14 @@ static void __declspec(naked) HOOK_CAEVehicleAudioEntity_ProcessVehicle_SirenSou
     // clang-format off
     __asm
     {
-        lea eax, [esp+0Ch]              // &vp
-        mov g_pSirenAudioParams, eax
-        mov g_pSirenAudioEntity, esi    // this (CAEVehicleAudioEntity)
-        mov g_pSirenAudioVehicle, edi   // vehicle interface
+        // ecx (VehicleAudioType, read by the jmp table below) has to survive the call intact, so
+        // this saves every register first rather than push/popping just the three arguments.
         pushad
-    }
-    // clang-format on
-    ProcessCustomSirenSound();
-    // clang-format off
-    __asm
-    {
+        mov  edx, edi          // 2nd arg: vehicle interface
+        mov  ecx, esi          // 1st arg: this (CAEVehicleAudioEntity)
+        lea  eax, [esp+2Ch]    // 3rd arg: &vp, esp+0Ch before pushad's own 0x20 bytes
+        push eax
+        call ProcessCustomSirenSound
         popad
         // original switch dispatch on ecx = VehicleAudioType
         jmp dword ptr [ecx*4 + 50224Ch]

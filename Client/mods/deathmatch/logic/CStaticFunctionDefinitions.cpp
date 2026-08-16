@@ -3592,18 +3592,13 @@ bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio(CClientEntity& Entity, 
 
 bool CStaticFunctionDefinitions::SetVehicleSirens(CClientVehicle& Vehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo)
 {
-    eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(Vehicle.GetModel());
-    if (vehicleType != CLIENTVEHICLE_NONE)
-    {
-        if (ucSirenID <= 7)
-        {
-            Vehicle.SetVehicleSirenPosition(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions);
-            Vehicle.SetVehicleSirenColour(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour);
-            Vehicle.SetVehicleSirenMinimumAlpha(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha);
-            return true;
-        }
-    }
-    return false;
+    if (ucSirenID > 7)
+        return false;
+
+    Vehicle.SetVehicleSirenPosition(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions);
+    Vehicle.SetVehicleSirenColour(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour);
+    Vehicle.SetVehicleSirenMinimumAlpha(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha);
+    return true;
 }
 
 bool CStaticFunctionDefinitions::IsVehicleNitroRecharging(CClientVehicle& Vehicle, bool& bRecharging)
