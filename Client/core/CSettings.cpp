@@ -2222,6 +2222,11 @@ void CSettings::UpdateVideoTab()
     GetVideoModeManager()->GetNextVideoMode(iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle);
 
     m_pCheckBoxMipMapping->SetSelected(gameSettings->IsMipMappingEnabled());
+
+    bool bVSync = true;
+    CVARS_GET("vsync", bVSync);
+    m_pCheckBoxVSync->SetSelected(bVSync);
+
     m_pCheckBoxWindowed->SetSelected(bNextWindowed);
     m_pCheckBoxMinimize->SetSelected(bNextFSMinimize);
     m_pDrawDistance->SetScrollPosition((gameSettings->GetDrawDistance() - 0.925f) / 0.8749f);

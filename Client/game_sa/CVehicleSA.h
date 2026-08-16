@@ -86,8 +86,9 @@ struct RwTexture;
 #define FUNC_CAutomobile__GetDoorAngleOpenRatio 0x6A2270
 #define FUNC_CTrain__GetDoorAngleOpenRatio      0x6F59C0
 
-#define HANDLING_NOS_Flag        0x00080000
-#define HANDLING_Hydraulics_Flag 0x00020000
+#define HANDLING_NOS_Flag             0x00080000
+#define HANDLING_Hydraulics_Flag      0x00020000
+#define HANDLING_SwingingChassis_Flag 0x10000000
 
 #define VAR_CVehicle_Variation1 0x8A6458
 #define VAR_CVehicle_Variation2 0x8A6459
@@ -721,6 +722,7 @@ private:
     static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies dummy, const CVector& position);
 
     void           RecalculateSuspensionLines();
+    void           RecalculateSwingingChassis();
     void           CopyGlobalSuspensionLinesToPrivate();
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);
     void           FinalizeFramesList();
