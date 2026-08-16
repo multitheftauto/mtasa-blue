@@ -229,7 +229,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getHelicopterRotorSpeed", "getHelicopterRotorSpeed");
     lua_classfunction(luaVM, "areHeliBladeCollisionsEnabled", "getHeliBladeCollisionsEnabled");
     lua_classfunction(luaVM, "getPaintjob", "getVehiclePaintjob");
-    lua_classfunction(luaVM, "getTurretPosition", "getVehicleTurretPosition");
+    lua_classfunction(luaVM, "getTurretPosition", ArgumentParserWarn<false, OOP_GetVehicleTurretPosition>);
     lua_classfunction(luaVM, "getWheelStates", "getVehicleWheelStates");
     lua_classfunction(luaVM, "isWheelOnGround", "isVehicleWheelOnGround");
     lua_classfunction(luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio");
@@ -381,6 +381,7 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "nitroRecharging", NULL, "isVehicleNitroRecharging");
     lua_classvariable(luaVM, "gravity", SetVehicleGravity, OOP_GetVehicleGravity);
     lua_classvariable(luaVM, "turnVelocity", SetVehicleTurnVelocity, OOP_GetVehicleTurnVelocity);
+    lua_classvariable(luaVM, "turretPosition", SetVehicleTurretPosition, ArgumentParserWarn<false, OOP_GetVehicleTurretPosition>);
     lua_classvariable(luaVM, "wheelScale", "setVehicleWheelScale", "getVehicleWheelScale");
     lua_classvariable(luaVM, "rotorState", "setVehicleRotorState", "getVehicleRotorState");
     lua_classvariable(luaVM, "audioSettings", nullptr, "getVehicleAudioSettings");
@@ -795,6 +796,18 @@ int CLuaVehicleDefs::GetVehicleTurretPosition(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<CLuaMultiReturn<float, float>, CVector2D> CLuaVehicleDefs::OOP_GetVehicleTurretPosition(lua_State* luaVM, CClientVehicle* vehicle)
+{
+    CVector2D vecPosition;
+    vehicle->GetTurretRotation(vecPosition.fX, vecPosition.fY);
+
+    // Keep returning two floats when the caller assigns two results
+    if (lua_ncallresult(luaVM) == 2)
+        return CLuaMultiReturn<float, float>(vecPosition.fX, vecPosition.fY);
+
+    return vecPosition;
 }
 
 int CLuaVehicleDefs::IsVehicleLocked(lua_State* luaVM)
@@ -2366,7 +2379,7 @@ int CLuaVehicleDefs::SetTrainSpeed(lua_State* luaVM)
 bool CLuaVehicleDefs::SetTrainTrack(CClientVehicle* pVehicle, uchar ucTrack)
 {
     if (ucTrack > 3)
-        throw new std::invalid_argument("Invalid track number range (0-3)");
+        throw std::invalid_argument("Invalid track number range (0-3)");
 
     if (pVehicle->GetVehicleType() != CLIENTVEHICLE_TRAIN)
         return false;
@@ -2498,16 +2511,16 @@ int CLuaVehicleDefs::SetVehicleHeadLightColor(lua_State* luaVM)
 
 int CLuaVehicleDefs::SetVehicleTurretPosition(lua_State* luaVM)
 {
+    // Accept Vector2 as well so vehicle.turretPosition = Vector2(...) works via the OOP property
     CClientVehicle*  pVehicle = NULL;
-    float            fHorizontal = 0.0f, fVertical = 0.0f;
+    CVector2D        vecPosition;
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVehicle);
-    argStream.ReadNumber(fHorizontal);
-    argStream.ReadNumber(fVertical);
+    argStream.ReadVector2D(vecPosition);
 
     if (!argStream.HasErrors())
     {
-        pVehicle->SetTurretRotation(fHorizontal, fVertical);
+        pVehicle->SetTurretRotation(vecPosition.fX, vecPosition.fY);
         lua_pushboolean(luaVM, true);
         return 1;
     }

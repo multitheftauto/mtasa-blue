@@ -11,12 +11,18 @@
 #include "StdInc.h"
 #include "CCustomWeapon.h"
 #include "CObjectManager.h"
+#include "CElementRefManager.h"
 #include "CVehicle.h"
 #include "CPed.h"
+#include "CWeaponStatManager.h"
+#include "CGame.h"
 
 CCustomWeapon::CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, CCustomWeaponManager* pWeaponManager, eWeaponType weaponType)
     : CObject(pParent, pObjectManager, false)
 {
+    // Ensure m_pTarget and m_pOwner get nulled when the elements they point at are destroyed
+    CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CCustomWeapon"), &m_pTarget, &m_pOwner, NULL);
+
     // Init
     m_iType = CElement::WEAPON;
     SetTypeName("weapon");
@@ -40,6 +46,17 @@ CCustomWeapon::CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, 
 
     m_pWeaponStat = new CWeaponStat(m_Type, WEAPONSKILL_STD);
 
+    // The new stat starts blank, so load the pristine weapon data the same
+    // way the weapon stat manager loads its own copies. The client creates
+    // its stat from the game's weapon data, and without this load every
+    // property read before a script sets it would return uninitialized
+    // memory on the server.
+    g_pGame->GetWeaponStatManager()->LoadDefault(m_pWeaponStat, m_Type, WEAPONSKILL_STD);
+
+    // Seed the fire time from the weapon stat like the client ctor does, so
+    // reading it before a script ever sets or resets it returns a sane value.
+    ResetWeaponFireTime();
+
     m_itargetWheel = MAX_WHEELS + 1;
     m_nAmmoInClip = m_pWeaponStat->GetMaximumClipAmmo();
     m_ucCounter = 0;
@@ -57,6 +74,8 @@ CCustomWeapon::CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, 
 
 CCustomWeapon::~CCustomWeapon()
 {
+    CElementRefManager::RemoveElementRefs(ELEMENT_REF_DEBUG(this, "CCustomWeapon"), &m_pTarget, &m_pOwner, NULL);
+
     m_pWeaponManager->RemoveFromList(this);
 }
 

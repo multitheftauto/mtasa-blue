@@ -169,7 +169,7 @@ void CClientIFP::ReadIFPVersion1()
         Animation.pSequencesMemory = AllocateSequencesMemory(Animation.pHierarchy);
         Animation.pHierarchy->SetSequences(reinterpret_cast<CAnimBlendSequenceSAInterface*>(Animation.pSequencesMemory + 4));
 
-        *(DWORD*)Animation.pSequencesMemory = ReadSequencesWithDummies(Animation.pHierarchy);
+        *(DWORD*)Animation.pSequencesMemory = ReadSequencesWithDummies(Animation.pHierarchy, Animation.AnimatedBonesMask);
         PreProcessAnimationHierarchy(Animation.pHierarchy);
     }
 }
@@ -202,19 +202,19 @@ bool CClientIFP::ReadIFPVersion2(bool bAnp3)
         Animation.pSequencesMemory = AllocateSequencesMemory(Animation.pHierarchy);
         Animation.pHierarchy->SetSequences(reinterpret_cast<CAnimBlendSequenceSAInterface*>(Animation.pSequencesMemory + 4));
 
-        *(DWORD*)Animation.pSequencesMemory = ReadSequencesWithDummies(Animation.pHierarchy);
+        *(DWORD*)Animation.pSequencesMemory = ReadSequencesWithDummies(Animation.pHierarchy, Animation.AnimatedBonesMask);
         PreProcessAnimationHierarchy(Animation.pHierarchy);
     }
 
     return true;
 }
 
-WORD CClientIFP::ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy)
+WORD CClientIFP::ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, std::bitset<32>& outAnimatedBonesMask)
 {
     SequenceMapType MapOfSequences;
     WORD            wUnknownSequences = ReadSequences(pAnimationHierarchy, MapOfSequences);
 
-    MoveSequencesWithDummies(pAnimationHierarchy, MapOfSequences);
+    MoveSequencesWithDummies(pAnimationHierarchy, MapOfSequences, outAnimatedBonesMask);
     WORD cSequences = m_kcIFPSequences + wUnknownSequences;
 
     // As we need support for all 32 bones, we must change the total sequences count
@@ -578,7 +578,8 @@ void CClientIFP::PreProcessAnimationHierarchy(std::unique_ptr<CAnimBlendHierarch
     }
 }
 
-void CClientIFP::MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& mapOfSequences)
+void CClientIFP::MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& mapOfSequences,
+                                          std::bitset<32>& outAnimatedBonesMask)
 {
     for (size_t SequenceIndex = 0; SequenceIndex < m_kcIFPSequences; SequenceIndex++)
     {
@@ -594,6 +595,7 @@ void CClientIFP::MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& 
             pAnimationSequence->CopySequenceProperties(pMapAnimSequenceInterface);
             // Delete the interface because we are moving, not copying
             m_pAnimManager->DeleteCustomAnimSequenceInterface(pMapAnimSequenceInterface);
+            outAnimatedBonesMask.set(SequenceIndex);
         }
         else
         {
@@ -1215,4 +1217,16 @@ CAnimBlendHierarchySAInterface* CClientIFP::GetAnimationHierarchy(const SString&
         return it->pHierarchy->GetInterface();
     }
     return nullptr;
+}
+
+std::bitset<32> CClientIFP::GetAnimatedBonesMask(const SString& strAnimationName)
+{
+    const unsigned int uiAnimationNameHash = HashString(strAnimationName.ToLower());
+    auto               it = std::find_if(m_pVecAnimations->begin(), m_pVecAnimations->end(),
+                                         [&uiAnimationNameHash](SAnimation const& Animation) { return Animation.uiNameHash == uiAnimationNameHash; });
+    if (it != m_pVecAnimations->end())
+    {
+        return it->AnimatedBonesMask;
+    }
+    return {};
 }

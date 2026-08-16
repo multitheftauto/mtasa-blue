@@ -483,6 +483,7 @@ public:
 
     CEntitySAInterface* GetTargetedObject() const override { return GetPedInterface()->pTargetedObject; }
     PedState            GetPedState() const override { return static_cast<PedState>(GetPedInterface()->pedState); }
+    void                SetPedState(PedState state) override { GetPedInterface()->pedState = static_cast<int>(state); }
 
     void GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const override;
 
