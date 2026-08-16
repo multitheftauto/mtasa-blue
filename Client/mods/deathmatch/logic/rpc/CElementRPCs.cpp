@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CElementRPCs.h"
 #include "net/SyncStructures.h"
+#include "game/CWeaponStat.h"
 
 using std::list;
 
@@ -45,6 +46,7 @@ void CElementRPCs::LoadFunctions()
     AddHandler(SET_CUSTOM_WEAPON_FLAGS, SetCustomWeaponFlags, "setWeaponFlags");
     AddHandler(SET_CUSTOM_WEAPON_FIRING_RATE, SetCustomWeaponFiringRate, "setWeaponFiringRate");
     AddHandler(RESET_CUSTOM_WEAPON_FIRING_RATE, ResetCustomWeaponFiringRate, "resetWeaponFiringRate");
+    AddHandler(SET_CUSTOM_WEAPON_WEAPON_RANGE, SetCustomWeaponWeaponRange, "setWeaponWeaponRange");
     AddHandler(SET_WEAPON_OWNER, SetWeaponOwner, "setWeaponOwner");
     AddHandler(SET_CUSTOM_WEAPON_FLAGS, SetWeaponConfig, "setWeaponFlags");
     AddHandler(SET_PROPAGATE_CALLS_ENABLED, SetCallPropagationEnabled, "setCallPropagationEnabled");
@@ -268,6 +270,35 @@ void CElementRPCs::SetElementInterior(CClientEntity* pSource, NetBitStreamInterf
             {
                 pSource->SetPosition(vecPosition);
             }
+        }
+
+        CClientColManager* pColManager = m_pClientGame->GetManager()->GetColManager();
+        switch (pSource->GetType())
+        {
+            case CCLIENTPLAYER:
+            case CCLIENTPED:
+            case CCLIENTVEHICLE:
+            {
+                CVector vecEntityPosition;
+                pSource->GetPosition(vecEntityPosition);
+                pColManager->DoHitDetection(vecEntityPosition, 0.0f, pSource);
+                break;
+            }
+            case CCLIENTMARKER:
+            case CCLIENTPICKUP:
+            {
+                CClientColShape* pColShape = NULL;
+                if (pSource->GetType() == CCLIENTMARKER)
+                    pColShape = static_cast<CClientMarker*>(pSource)->GetColShape();
+                else
+                    pColShape = static_cast<CClientPickup*>(pSource)->GetColShape();
+
+                if (pColShape)
+                    CStaticFunctionDefinitions::RefreshColShapeColliders(pColShape);
+                break;
+            }
+            default:
+                break;
         }
     }
 }
@@ -811,6 +842,16 @@ void CElementRPCs::ResetCustomWeaponFiringRate(CClientEntity* pSource, NetBitStr
     {
         CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
         pWeapon->ResetWeaponFireTime();
+    }
+}
+
+void CElementRPCs::SetCustomWeaponWeaponRange(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    float fRange = 0.0f;
+    if (bitStream.Read(fRange) && pSource->GetType() == CCLIENTWEAPON)
+    {
+        CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
+        pWeapon->GetWeaponStat()->SetWeaponRange(fRange);
     }
 }
 

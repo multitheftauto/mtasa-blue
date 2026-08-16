@@ -271,6 +271,12 @@ public:
     void          SetVoiceDataPacketsInInterval(unsigned char count) noexcept { m_voiceDataPacketsInInterval = count; }
     void          IncrementVoiceDataPacketsInInterval() noexcept { ++m_voiceDataPacketsInInterval; }
 
+    long long     GetLastVoiceEndTime() const noexcept { return m_lastVoiceEndTime; }
+    void          SetLastVoiceEndTime(long long time) noexcept { m_lastVoiceEndTime = time; }
+    unsigned char GetVoiceEndPacketsInInterval() const noexcept { return m_voiceEndPacketsInInterval; }
+    void          SetVoiceEndPacketsInInterval(unsigned char count) noexcept { m_voiceEndPacketsInInterval = count; }
+    void          IncrementVoiceEndPacketsInInterval() noexcept { ++m_voiceEndPacketsInInterval; }
+
 protected:
     bool ReadSpecialData(const int iLine) override { return true; }
 
@@ -360,6 +366,9 @@ public:
     unsigned int       m_uiActiveSatchelCount{};
     CElapsedTime       m_DetonateSatchelTimer;
     CElapsedTime       m_DestroySatchelTimer;
+    CElapsedTime       m_BulletSyncRateTimer;
+    // Rate gate for custom weapon fire (PACKET_ID_WEAPON_BULLETSYNC)
+    CElapsedTime m_WeaponBulletSyncRateTimer;
 
 private:
     SLightweightSyncData m_lightweightSyncData;
@@ -485,4 +494,6 @@ private:
     bool          m_teleported = false;
     long long     m_lastVoiceDataTime = 0;
     unsigned char m_voiceDataPacketsInInterval = 0;
+    long long     m_lastVoiceEndTime = 0;
+    unsigned char m_voiceEndPacketsInInterval = 0;
 };
