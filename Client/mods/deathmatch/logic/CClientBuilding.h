@@ -37,6 +37,13 @@ public:
     bool SetMatrix(const CMatrix& matrix) override;
 
     void SetInterior(uint8_t ucInterior) override;
+    void SetDimension(unsigned short usDimension) override;
+
+    // Buildings aren't a CClientStreamElement, so unlike objects/peds/vehicles they get no
+    // automatic dimension-based streaming; this is what the manager calls on every building
+    // whenever the local player's dimension changes, and what our own SetDimension calls to
+    // re-evaluate this one building right after its own dimension changes.
+    void RelateDimension(unsigned short usDimension);
 
     uint16_t GetModel() const noexcept { return m_usModelId; };
     void     SetModel(uint16_t ulModel);

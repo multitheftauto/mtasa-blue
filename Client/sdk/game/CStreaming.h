@@ -16,7 +16,7 @@
 #define INVALID_ARCHIVE_ID 0xFF
 #define INVALID_STREAM_ID  0xFF
 
-enum class eModelLoadState : std::uint32_t
+enum class eModelLoadState : std::uint8_t
 {
     // Model isn't loaded
     LOADSTATE_NOT_LOADED = 0,
@@ -62,6 +62,7 @@ struct CStreamingInfo
     uint32_t        offsetInBlocks = 0u;
     uint32_t        sizeInBlocks = 0u;
     eModelLoadState loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
+    uint8_t         padding[3]{};
 };
 static_assert(sizeof(CStreamingInfo) == 0x14, "Invalid size for CStreamingInfo");
 
