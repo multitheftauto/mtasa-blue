@@ -43,6 +43,14 @@ void CClientBuildingManager::RemoveAll()
     m_bRemoveFromList = true;
 }
 
+void CClientBuildingManager::SetDimension(unsigned short usDimension)
+{
+    for (CClientBuilding* building : m_List)
+        building->RelateDimension(usDimension);
+
+    m_usDimension = usDimension;
+}
+
 bool CClientBuildingManager::Exists(CClientBuilding* pBuilding)
 {
     return std::find(m_List.begin(), m_List.end(), pBuilding) != m_List.end();
@@ -103,7 +111,7 @@ void CClientBuildingManager::RestoreDestroyed()
             if (highLodBuilding && !highLodBuilding->IsValid())
                 hasInvalidLods = true;
             else
-                building->Create();
+                building->RelateDimension(m_usDimension);
         }
     }
 }
