@@ -536,11 +536,23 @@ bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHash
 
 bool CLuaArguments::WriteToJSONString(std::string& strJSON, bool bSerialize, int flags)
 {
-    json_object* my_array = WriteToJSONArray(bSerialize);
-    if (my_array)
+    json_object* my_object = nullptr;
+
+    // If there is exactly one argument and it is a table, serialize it directly as a JSON object
+    // This fixes toJSON({ key = value }) returning "[{...}]" instead of "{...}"
+    if (m_Arguments.size() == 1 && m_Arguments[0]->GetType() == LUA_TTABLE)
     {
-        strJSON = json_object_to_json_string_ext(my_array, flags);
-        json_object_put(my_array);  // dereference - causes a crash, is actually commented out in the example too
+        my_object = m_Arguments[0]->WriteToJSONObject(bSerialize);
+    }
+    else
+    {
+        my_object = WriteToJSONArray(bSerialize);
+    }
+
+    if (my_object)
+    {
+        strJSON = json_object_to_json_string_ext(my_object, flags);
+        json_object_put(my_object);
         return true;
     }
     return false;
