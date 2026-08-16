@@ -617,6 +617,12 @@ CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)
         {
             return pThePedEntity->pEntity;
         }
+
+        auto pTheBuildingEntity = m_BuildingsPool.GetBuilding(reinterpret_cast<CBuildingSAInterface*>(pGameInterface));
+        if (pTheBuildingEntity)
+        {
+            return pTheBuildingEntity;
+        }
     }
     return NULL;
 }
