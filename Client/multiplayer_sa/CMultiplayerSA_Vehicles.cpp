@@ -92,11 +92,9 @@ static void __declspec(naked) HOOK_CBike__ProcessControl_SteerRatio()
     // clang-format off
     __asm
     {
-        push    eax
         mov     eax, [edi + 0A0h]
         test    eax, 7FFFFFFFh              // zero, ignoring the sign bit
         jz      noSteeringLock
-        pop     eax
 
         fld     dword ptr [edi + 0A0h]
         fmul    dword ptr ds:[08595ECh]
@@ -104,7 +102,6 @@ static void __declspec(naked) HOOK_CBike__ProcessControl_SteerRatio()
         jmp     CONTINUE_CBike__ProcessControl_SteerRatio
 
         noSteeringLock:
-        pop     eax
         fstp    st(0)
         fldz
         jmp     CONTINUE_CBike__ProcessControl_SteerRatio
@@ -128,11 +125,9 @@ static void __declspec(naked) HOOK_CBike__ProcessControl_LeanRatio()
     // clang-format off
     __asm
     {
-        push    eax
         mov     eax, [ecx + 0A0h]
         test    eax, 7FFFFFFFh
         jz      noSteeringLock
-        pop     eax
 
         fld     dword ptr [ecx + 0A0h]
         fmul    dword ptr ds:[08595ECh]
@@ -140,7 +135,6 @@ static void __declspec(naked) HOOK_CBike__ProcessControl_LeanRatio()
         jmp     CONTINUE_CBike__ProcessControl_LeanRatio
 
         noSteeringLock:
-        pop     eax
         fldz
         jmp     CONTINUE_CBike__ProcessControl_LeanRatio
     }
