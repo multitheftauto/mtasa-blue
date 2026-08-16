@@ -58,7 +58,8 @@ std::unordered_map<eHudComponent, SHudComponentData> defaultComponentProperties 
     {HUD_WEAPON, {RwColor{255, 255, 255, 255}, RwColor{255, 255, 255, 255}}},
     {HUD_WANTED,
      {CHudSA::GetHUDColour(eHudColour::GOLD), RwColor{0, 0, 0, 170}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_RIGHT, eFontStyle::FONT_GOTHIC, 1, 0,
-      true}}};
+      true}},
+    {HUD_CROSSHAIR, RwColor{255, 255, 255, 255}}};
 
 CHudSA::CHudSA()
 {
@@ -94,6 +95,7 @@ CHudSA::CHudSA()
     componentProperties.radioName = MapGet(defaultComponentProperties, HUD_RADIO);
     componentProperties.weaponIcon = MapGet(defaultComponentProperties, HUD_WEAPON);
     componentProperties.wanted = MapGet(defaultComponentProperties, HUD_WANTED);
+    componentProperties.crosshair = MapGet(defaultComponentProperties, HUD_CROSSHAIR);
 }
 
 void CHudSA::Disable(bool bDisabled)
@@ -266,6 +268,11 @@ void CHudSA::UpdateStreetchCalculations()
     wantedPlacement.height = calcStreetchY * 1.21f;
     wantedPlacement.width = calcStreetchX * 0.6f;
     wantedPlacement.setDefaultXY = false;
+
+    SComponentPlacement& crosshairPlacement = componentProperties.crosshair.placement;
+    crosshairPlacement.height = 0;
+    crosshairPlacement.width = 0;
+    crosshairPlacement.setDefaultXY = false;
 }
 
 //
@@ -351,9 +358,7 @@ bool CHudSA::IsCrosshairVisible()
         }
     }
 
-    // Check CTheScripts::bDrawCrossHair
-    std::uint8_t crossHairType = *reinterpret_cast<std::uint8_t*>(VAR_CTheScripts_bDrawCrossHair);
-    return specialAiming || simpleAiming || crossHairType > 0;
+    return specialAiming || simpleAiming;
 }
 
 bool CHudSA::IsComponentBar(const eHudComponent& component) const noexcept
@@ -531,6 +536,8 @@ SHudComponentData& CHudSA::GetHudComponentRef(const eHudComponent& component) co
             return componentProperties.weaponIcon;
         case HUD_WANTED:
             return componentProperties.wanted;
+        case HUD_CROSSHAIR:
+            return componentProperties.crosshair;
         default:
             break;
     }
@@ -594,6 +601,12 @@ CVector2D CHudSA::GetComponentPosition(const eHudComponent& component) const noe
     float x = ref.placement.useCustomPosition ? ref.placement.customX : ref.placement.x;
     float y = ref.placement.useCustomPosition ? ref.placement.customY : ref.placement.y;
 
+    if (component == eHudComponent::HUD_CROSSHAIR && ref.placement.useCustomPosition)
+    {
+        x -= ref.placement.width;
+        y -= ref.placement.height;
+    }
+
     return CVector2D(x, y);
 }
 
@@ -603,6 +616,18 @@ CVector2D CHudSA::GetComponentSize(const eHudComponent& component) const noexcep
 
     float w = ref.placement.useCustomSize ? ref.placement.customWidth : ref.placement.width;
     float h = ref.placement.useCustomSize ? ref.placement.customHeight : ref.placement.height;
+
+    if (component == eHudComponent::HUD_CROSSHAIR)
+    {
+        float offsetW = ref.placement.width - w;
+        float offsetH = ref.placement.height - h;
+
+        w += offsetW;
+        h += offsetH;
+
+        w *= 2.0f;
+        h *= 2.0f;
+    }
 
     return CVector2D(w, h);
 }
@@ -655,14 +680,14 @@ void CHudSA::RenderHealthBar(int x, int y)
     float barWidth = useCustomSize ? componentProperties.hpBar.placement.customWidth : componentProperties.hpBar.placement.width;
 
     // Calc bar width depending on MAX_HEALTH stat
-    const double statModifier = ((double(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(10);
+    double statModifier = ((double(__cdecl*)(int))FUNC_CStats_GetFatAndMuscleModifier)(10);
     if (statModifier <= 0.0)
         return;
 
-    const float totalWidth = static_cast<float>((static_cast<double>(barWidth) * maxHealth) / statModifier);
+    float totalWidth = static_cast<float>((static_cast<double>(barWidth) * maxHealth) / statModifier);
 
-    const float   posX = useCustomPosition ? componentProperties.hpBar.placement.customX : (barWidth - totalWidth + static_cast<float>(x));
-    const float   posY = useCustomPosition ? componentProperties.hpBar.placement.customY : static_cast<float>(y);
+    float         posX = useCustomPosition ? componentProperties.hpBar.placement.customX : (barWidth - totalWidth + static_cast<float>(x));
+    float         posY = useCustomPosition ? componentProperties.hpBar.placement.customY : static_cast<float>(y);
     std::uint32_t barHeight =
         static_cast<std::uint32_t>(useCustomSize ? componentProperties.hpBar.placement.customHeight : componentProperties.hpBar.placement.height);
 
@@ -698,15 +723,15 @@ void CHudSA::RenderBreathBar(int x, int y)
     bool useCustomPosition = componentProperties.breathBar.placement.useCustomPosition;
     bool useCustomSize = componentProperties.breathBar.placement.useCustomSize;
 
-    const float   posX = useCustomPosition ? componentProperties.breathBar.placement.customX : static_cast<float>(x);
-    const float   posY = useCustomPosition ? componentProperties.breathBar.placement.customY : static_cast<float>(y);
+    float         posX = useCustomPosition ? componentProperties.breathBar.placement.customX : static_cast<float>(x);
+    float         posY = useCustomPosition ? componentProperties.breathBar.placement.customY : static_cast<float>(y);
     std::uint16_t barWidth =
         static_cast<std::uint16_t>(useCustomSize ? componentProperties.breathBar.placement.customWidth : componentProperties.breathBar.placement.width);
     std::uint32_t barHeight =
         static_cast<std::uint32_t>(useCustomSize ? componentProperties.breathBar.placement.customHeight : componentProperties.breathBar.placement.height);
 
     // call CSprite2d::DrawBarChart
-    const float breathPercent = static_cast<float>((static_cast<double>(playerPed->GetOxygenLevel()) / statModifier) * 100.0);
+    float breathPercent = static_cast<float>((static_cast<double>(playerPed->GetOxygenLevel()) / statModifier) * 100.0);
     DrawBarChart(posX, posY, barWidth, barHeight, breathPercent, false, componentProperties.breathBar.drawPercentage,
                  componentProperties.breathBar.drawBlackBorder, componentProperties.breathBar.fillColor, COLOR_BLACK);
 }
@@ -733,8 +758,8 @@ void CHudSA::RenderArmorBar(int x, int y)
     bool useCustomPosition = componentProperties.hpBar.placement.useCustomPosition;
     bool useCustomSize = componentProperties.hpBar.placement.useCustomSize;
 
-    const float   posX = useCustomPosition ? componentProperties.armorBar.placement.customX : static_cast<float>(x);
-    const float   posY = useCustomPosition ? componentProperties.armorBar.placement.customY : static_cast<float>(y);
+    float         posX = useCustomPosition ? componentProperties.armorBar.placement.customX : static_cast<float>(x);
+    float         posY = useCustomPosition ? componentProperties.armorBar.placement.customY : static_cast<float>(y);
     std::uint16_t barWidth =
         static_cast<std::uint16_t>(useCustomSize ? componentProperties.armorBar.placement.customWidth : componentProperties.armorBar.placement.width);
     std::uint32_t barHeight =
@@ -928,6 +953,150 @@ void CHudSA::RenderWanted(bool empty, float x, float y, const char* strLevel)
     RenderText(x, y, strLevel, componentProperties.wanted, empty);
 }
 
+void __fastcall CHudSA::RenderCircleCrosshair(void* sprite, void*, CRect* rect, RwColor* color)
+{
+    float screenChairX = rsGlobal->maximumWidth * *reinterpret_cast<float*>(VAR_ChairMultX);
+    float screenChairY = rsGlobal->maximumHeight * *reinterpret_cast<float*>(VAR_ChairMultY);
+
+    CPed* playerPed = pGame->GetPedContext();
+    if (!playerPed)
+        return;
+
+    // Call CPlayerPed::GetWeaponRadiusOnScreen
+    double gunRadius = ((double(__thiscall*)(CPedSAInterface*))0x609CD0)(playerPed->GetPedInterface());
+
+    SHudComponentData& properties = componentProperties.crosshair;
+
+    auto DrawSprite = [&properties](void* sprite, CRect* rect) -> void
+    {
+        // Call CSprite2d::Draw
+        ((void(__thiscall*)(void*, CRect*, RwColor*))FUNC_CSprite2d_Draw)(sprite, rect, &properties.fillColor);
+    };
+
+    bool useCustomPosition = properties.placement.useCustomPosition;
+    bool useCustomSize = properties.placement.useCustomSize;
+
+    float width = calcStreetchX * VAR_CrosshairTexSize * gunRadius * 0.5f;   // width of one sprite
+    float height = calcStreetchY * VAR_CrosshairTexSize * gunRadius * 0.5f;  // height of one sprite
+
+    float x = useCustomPosition ? properties.placement.customX : screenChairX;
+    float y = useCustomPosition ? properties.placement.customY : screenChairY;
+    float w = useCustomSize ? properties.placement.customWidth : width;
+    float h = useCustomSize ? properties.placement.customHeight : height;
+    properties.placement.width = w;
+    properties.placement.height = h;
+
+    if (gunRadius == 0.2)
+    {
+        CRect dotRect{};
+
+        dotRect.left = (useCustomPosition ? x : screenChairX) - 1.0f;
+        dotRect.top = (useCustomPosition ? y : screenChairY) - 1.0f;
+        dotRect.right = (useCustomPosition ? x : screenChairX) + 1.0f;
+        dotRect.bottom = (useCustomPosition ? y : screenChairY) + 1.0f;
+
+        // Call CSprite2d::DrawRect
+        ((void(__cdecl*)(CRect*, RwColor*))0x727B60)(&dotRect, color);
+    }
+
+    rect->left = x - w;
+    properties.placement.x = rect->left;
+
+    rect->right = x;
+    rect->bottom = y;
+    rect->top = y - h;
+    properties.placement.y = rect->top;
+
+    // left top
+    DrawSprite(sprite, rect);
+
+    // right top
+    rect->left = x + w;
+    DrawSprite(sprite, rect);
+
+    // left bottom
+    rect->left = x - w;
+    rect->bottom = y;
+    rect->top = y + h;
+    DrawSprite(sprite, rect);
+
+    // right bottom
+    rect->left = x + w;
+    DrawSprite(sprite, rect);
+}
+
+void CHudSA::RenderRocketCrosshair(CVector _pos, CVector2D _halfSize, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint16_t intensity, float rhw,
+                                   std::uint8_t a, std::uint8_t uDir, std::uint8_t vDir)
+{
+    CPed* playerPed = pGame->GetPedContext();
+    if (!playerPed)
+        return;
+
+    SHudComponentData& properties = componentProperties.crosshair;
+
+    auto DrawXLUSprite = [&properties](CVector& pos, CVector2D& halfSize, std::uint8_t uDir, std::uint8_t vDir) -> void
+    {
+        // Call CSprite::RenderOneXLUSprite
+        ((void(__cdecl*)(CVector, CVector2D, std::uint8_t, std::uint8_t, std::uint8_t, std::uint16_t, float, std::uint8_t, std::uint8_t,
+                         std::uint8_t))FUNC_CSprite_RenderOneXLUSprite)(pos, halfSize, properties.fillColor.r, properties.fillColor.g, properties.fillColor.b,
+                                                                        static_cast<std::uint16_t>(properties.fillColor.a), 0.01f, properties.fillColor.a, uDir,
+                                                                        vDir);
+    };
+
+    CVector2D screenCrossHair{};
+    CVector2D screenOffsetCenter{0.0f, 0.0f};
+
+    bool useCustomPosition = properties.placement.useCustomPosition;
+    bool useCustomSize = properties.placement.useCustomSize;
+
+    eWeaponType weaponType = playerPed->GetWeapon(playerPed->GetCurrentWeaponSlot())->GetType();
+    if (weaponType == eWeaponType::WEAPONTYPE_CAMERA || weaponType == eWeaponType::WEAPONTYPE_SNIPERRIFLE)
+    {
+        if (weaponType == eWeaponType::WEAPONTYPE_CAMERA)
+        {
+            screenCrossHair.fX = useCustomSize ? properties.placement.customWidth : calcStreetchX * 256.0f;
+            screenCrossHair.fY = useCustomSize ? properties.placement.customHeight
+                                               : calcStreetchY * *reinterpret_cast<float*>(VAR_CameraCrosshairScale);  // m_pfCameraCrosshairScale
+        }
+        else
+        {
+            float sniperCrosshairScale = **reinterpret_cast<float**>(0x58E7D6);  // m_fSniperCrosshairScale
+            screenCrossHair.fX = useCustomSize ? properties.placement.customWidth : calcStreetchX * sniperCrosshairScale;
+            screenCrossHair.fY = useCustomSize ? properties.placement.customHeight : calcStreetchY * sniperCrosshairScale;
+        }
+    }
+    else
+    {
+        screenCrossHair.fX = useCustomSize ? properties.placement.customWidth : calcStreetchX * 24.0f;
+        screenCrossHair.fY = useCustomSize ? properties.placement.customHeight : calcStreetchY * 24.0f;
+        screenOffsetCenter.fX = calcStreetchX * 20.0f;
+        screenOffsetCenter.fY = calcStreetchY * 20.0f;
+    }
+
+    CVector2D screenCenter = {rsGlobal->maximumWidth * 0.5f, rsGlobal->maximumHeight * 0.5f};
+    CVector2D halfSize = {screenCrossHair.fX * 0.5f, screenCrossHair.fY * 0.5f};
+    properties.placement.width = screenCrossHair.fX + screenOffsetCenter.fX;
+    properties.placement.height = screenCrossHair.fY + screenOffsetCenter.fY;
+
+    float x = useCustomPosition ? properties.placement.customX : screenCenter.fX;
+    float y = useCustomPosition ? properties.placement.customY : screenCenter.fY;
+
+    CVector leftTop = CVector(x - halfSize.fX - screenOffsetCenter.fX, y - halfSize.fY - screenOffsetCenter.fY, 1.0f);
+    properties.placement.x = leftTop.fX - halfSize.fX;
+    properties.placement.y = leftTop.fY - halfSize.fY;
+
+    DrawXLUSprite(leftTop, halfSize, 0, 0);
+
+    CVector rightTop = CVector(x + halfSize.fX + screenOffsetCenter.fX, y - halfSize.fY - screenOffsetCenter.fY, 1.0f);
+    DrawXLUSprite(rightTop, halfSize, 1, 0);
+
+    CVector leftBottom = CVector(x - halfSize.fX - screenOffsetCenter.fX, y + halfSize.fY + screenOffsetCenter.fY, 1.0f);
+    DrawXLUSprite(leftBottom, halfSize, 0, 1);
+
+    CVector rightBottom = CVector(x + halfSize.fX + screenOffsetCenter.fX, y + halfSize.fY + screenOffsetCenter.fY, 1.0f);
+    DrawXLUSprite(rightBottom, halfSize, 1, 1);
+}
+
 static constexpr std::uintptr_t CONTINUE_RenderWanted = 0x58DFD8;
 static void __declspec(naked)   HOOK_RenderWanted()
 {
@@ -971,16 +1140,32 @@ void CHudSA::StaticSetHooks()
     HookInstall(FUNC_RenderBreathBar, &HOOK_RenderHudBar, 11);
     HookInstall(FUNC_RenderArmorBar, &HOOK_RenderHudBar, 11);
 
-    HookInstallCall(0x58EC21, (DWORD)&RenderClock);
-    HookInstallCall(0x58F607, (DWORD)&RenderMoney);
-    HookInstallCall(0x58962A, (DWORD)&RenderAmmo);
+    HookInstallCall(0x58EC21, (DWORD)RenderClock);
+    HookInstallCall(0x58F607, (DWORD)RenderMoney);
+    HookInstallCall(0x58962A, (DWORD)RenderAmmo);
 
-    HookInstallCall(0x58B156, (DWORD)&RenderVehicleName);
-    HookInstallCall(0x58AE5D, (DWORD)&RenderZoneName);
-    HookInstallCall(0x4E9FF1, (DWORD)&RenderRadioName);
+    HookInstallCall(0x58B156, (DWORD)RenderVehicleName);
+    HookInstallCall(0x58AE5D, (DWORD)RenderZoneName);
+    HookInstallCall(0x4E9FF1, (DWORD)RenderRadioName);
 
-    HookInstallCall(0x58D988, (DWORD)&RenderWeaponIcon_Sprite);
-    HookInstallCall(0x58D8FD, (DWORD)&RenderWeaponIcon_XLU);
+    HookInstallCall(0x58D988, (DWORD)RenderWeaponIcon_Sprite);
+    HookInstallCall(0x58D8FD, (DWORD)RenderWeaponIcon_XLU);
 
-    HookInstall(0x58DFD3, &HOOK_RenderWanted);
+    HookInstall(0x58DFD3, HOOK_RenderWanted);
+
+    HookInstallCall(0x58E3A5, (DWORD)RenderCircleCrosshair);
+    HookInstallCall(0x58E95B, (DWORD)RenderRocketCrosshair);
+
+    // Disable circle crosshair rendering by GTA
+    MemCpy((void*)0x58E3FA, "\x83\xC4\x08\x90\x90", 5);
+    MemCpy((void*)0x58E44F, "\x83\xC4\x08\x90\x90", 5);
+    MemCpy((void*)0x58E49C, "\x83\xC4\x08\x90\x90", 5);
+
+    // Disable rendering white square in the center of the crosshair
+    MemSet((void*)0x58E2DD, 0x90, 5);
+
+    // Disable rocket/sniper/camera crosshair rendering by GTA
+    MemSet((void*)0x58E9CA, 0x90, 5);
+    MemSet((void*)0x58EA39, 0x90, 5);
+    MemSet((void*)0x58EAA8, 0x90, 5);
 }
