@@ -737,6 +737,7 @@ void CNetAPI::WriteKeysync(CClientPed* pPlayerModel, NetBitStreamInterface& BitS
     WriteSmallKeysync(ControllerState, BitStream);
 
     // Write the rotations
+    pPlayerModel->ReapplyScriptRotationIfNeeded();
     SKeysyncRotation rotation;
     rotation.data.fPlayerRotation = pPlayerModel->GetCurrentRotation();
     rotation.data.fCameraRotation = pPlayerModel->GetCameraRotation();
@@ -1187,6 +1188,7 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     BitStream.Write(&position);
 
     // Player rotation
+    pPlayerModel->ReapplyScriptRotationIfNeeded();
     SPedRotationSync rotation;
     rotation.data.fRotation = pPlayerModel->GetCurrentRotation();
     BitStream.Write(&rotation);
