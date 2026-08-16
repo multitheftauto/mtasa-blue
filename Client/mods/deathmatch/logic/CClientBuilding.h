@@ -50,6 +50,7 @@ public:
 
     eClientEntityType GetType() const { return CCLIENTBUILDING; }
 
+    bool GetUsesCollision() const noexcept { return m_usesCollision; }
     void SetUsesCollision(bool state);
 
     void Create();

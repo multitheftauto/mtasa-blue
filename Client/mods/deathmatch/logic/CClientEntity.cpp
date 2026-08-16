@@ -1577,6 +1577,462 @@ void CClientEntity::_GetEntitiesFromRoot(unsigned int uiTypeHash, std::map<CClie
 
 #endif
 
+bool CClientEntity::EvaluateEntityFilters(const ChildrenFiltersOption& filter)
+{
+    auto CompareValues = [](auto valueA, auto valueB, CompareMethod method) -> bool
+    {
+        switch (method)
+        {
+            case CompareMethod::EQUAL:
+                return valueA == valueB;
+            case CompareMethod::NOT_EQUAL:
+                return valueA != valueB;
+            case CompareMethod::EQUAL_OR_HIGHER:
+                return valueA >= valueB;
+            case CompareMethod::EQUAL_OR_LOWER:
+                return valueA <= valueB;
+            case CompareMethod::HIGHER:
+                return valueA > valueB;
+            case CompareMethod::LOWER:
+                return valueA < valueB;
+            default:
+                break;
+        }
+
+        return false;
+    };
+
+    if (filter.checkStreamIn.check)
+    {
+        bool isStreamedIn = IsStreamingCompatibleClass() && reinterpret_cast<CClientStreamElement*>(this)->IsStreamedIn();
+        if (isStreamedIn != filter.checkStreamIn.value)
+            return false;
+    }
+
+    if (filter.checkOnScreen.check)
+    {
+        if (IsOnScreen() != filter.checkOnScreen.value)
+            return false;
+    }
+
+    if (filter.checkInterior.check)
+    {
+        if (GetInterior() != filter.checkInterior.value)
+            return false;
+    }
+
+    if (filter.checkDimension.check)
+    {
+        if (GetDimension() != filter.checkDimension.value)
+            return false;
+    }
+
+    if (filter.checkModel.check)
+    {
+        if (!filter.checkVehicleType.check)  // Ignore the model check when vehicleType is specified
+        {
+            auto model = static_cast<std::uint16_t>(GetModelInfo()->GetModel());
+            bool modelMatches = false;
+
+            if (std::holds_alternative<std::uint16_t>(filter.checkModel.value))
+            {
+                modelMatches = model == std::get<std::uint16_t>(filter.checkModel.value);
+            }
+            else if (std::holds_alternative<std::vector<std::uint16_t>>(filter.checkModel.value))
+            {
+                const auto& allowedModels = std::get<std::vector<std::uint16_t>>(filter.checkModel.value);
+                modelMatches = std::ranges::contains(allowedModels, model);
+            }
+
+            if (!modelMatches)
+                return false;
+        }
+    }
+
+    if (filter.checkRange.check)
+    {
+        const auto& rangeData = filter.checkRange.value;
+
+        CVector entityPosition;
+        GetPosition(entityPosition);
+
+        float distanceSq = (entityPosition - rangeData.position).LengthSquared();
+        if (distanceSq > (rangeData.range * rangeData.range))
+            return false;
+    }
+
+    // Player filters
+    if (IS_PLAYER(this))
+    {
+        CClientPlayer* player = static_cast<CClientPlayer*>(this);
+
+        if (filter.checkPlayerTeam.check)
+        {
+            if ((player->GetTeam() != nullptr) != filter.checkPlayerTeam.value)
+                return false;
+        }
+    }
+
+    // Ped filters
+    if (IS_PED(this))
+    {
+        CClientPed* ped = static_cast<CClientPed*>(this);
+
+        if (filter.checkOnGround.check)
+        {
+            if (ped->IsOnGround() != filter.checkOnGround.value)
+                return false;
+        }
+
+        if (filter.checkInWater.check)
+        {
+            if (ped->IsInWater() != filter.checkInWater.value)
+                return false;
+        }
+
+        if (filter.checkAlpha.check)
+        {
+            if (!CompareValues(ped->GetAlpha(), filter.checkAlpha.value, filter.checkAlpha.compareMethod))
+                return false;
+        }
+
+        if (filter.checkIsFrozen.check)
+        {
+            if (ped->IsFrozen() != filter.checkIsFrozen.value)
+                return false;
+        }
+
+        if (filter.checkPedVehicle.check)
+        {
+            if (ped->IsInVehicle() != filter.checkPedVehicle.value)
+                return false;
+        }
+
+        if (filter.checkOnFire.check)
+        {
+            if (ped->IsOnFire() != filter.checkOnFire.value)
+                return false;
+        }
+
+        if (filter.checkIsCollidable.check)
+        {
+            if (ped->GetUsesCollision() != filter.checkIsCollidable.value)
+                return false;
+        }
+
+        if (filter.checkJetpack.check)
+        {
+            if (ped->HasJetPack() != filter.checkJetpack.value)
+                return false;
+        }
+
+        if (filter.checkHealth.check)
+        {
+            if (!CompareValues(ped->GetHealth(), filter.checkHealth.value, filter.checkHealth.compareMethod))
+                return false;
+        }
+    }
+
+    // Vehicle filters
+    if (IS_VEHICLE(this))
+    {
+        CClientVehicle* vehicle = static_cast<CClientVehicle*>(this);
+
+        if (filter.checkVehicleDamageProof.check)
+        {
+            if ((!vehicle->GetScriptCanBeDamaged() != filter.checkVehicleDamageProof.value))
+                return false;
+        }
+
+        if (filter.checkVehicleType.check)
+        {
+            if (vehicle->GetVehicleType() != filter.checkVehicleType.value)
+                return false;
+        }
+
+        if (filter.checkOnGround.check)
+        {
+            if (vehicle->IsOnGround() != filter.checkOnGround.value)
+                return false;
+        }
+
+        if (filter.checkInWater.check)
+        {
+            if (vehicle->IsInWater() != filter.checkInWater.value)
+                return false;
+        }
+
+        if (filter.checkAlpha.check)
+        {
+            if (!CompareValues(vehicle->GetAlpha(), filter.checkAlpha.value, filter.checkAlpha.compareMethod))
+                return false;
+        }
+
+        if (filter.checkIsFrozen.check)
+        {
+            if (vehicle->IsFrozen() != filter.checkIsFrozen.value)
+                return false;
+        }
+
+        if (filter.checkOnFire.check)
+        {
+            if (vehicle->IsOnFire() != filter.checkOnFire.value)
+                return false;
+        }
+
+        if (filter.checkIsCollidable.check)
+        {
+            if (vehicle->IsCollisionEnabled() != filter.checkIsCollidable.value)
+                return false;
+        }
+
+        if (filter.checkHealth.check)
+        {
+            if (!CompareValues(vehicle->GetHealth(), filter.checkHealth.value, filter.checkHealth.compareMethod))
+                return false;
+        }
+
+        if (filter.checkVehicleOccupants.check)
+        {
+            const auto maxPassengers = CClientVehicleManager::GetMaxPassengerCount(vehicle->GetModel());
+            bool       isUnoccupied = true;
+
+            if (maxPassengers != 255)
+            {
+                for (std::uint8_t i = 0; i < maxPassengers; ++i)
+                {
+                    if (vehicle->GetOccupant(i) != nullptr)
+                    {
+                        isUnoccupied = false;
+                        break;
+                    }
+                }
+            }
+
+            if (isUnoccupied != filter.checkVehicleOccupants.value)
+                return false;
+        }
+    }
+
+    // Object filters
+    if (IS_OBJECT(this))
+    {
+        CClientObject* object = static_cast<CClientObject*>(this);
+
+        if (filter.checkAlpha.check)
+        {
+            if (!CompareValues(object->GetAlpha(), filter.checkAlpha.value, filter.checkAlpha.compareMethod))
+                return false;
+        }
+
+        if (filter.checkIsFrozen.check)
+        {
+            if (object->IsFrozen() != filter.checkIsFrozen.value)
+                return false;
+        }
+
+        if (filter.checkOnFire.check)
+        {
+            if (object->IsOnFire() != filter.checkOnFire.value)
+                return false;
+        }
+
+        if (filter.checkIsCollidable.check)
+        {
+            if (object->IsCollisionEnabled() != filter.checkIsCollidable.value)
+                return false;
+        }
+
+        if (filter.checkObjectBreakable.check)
+        {
+            if (object->IsBreakable() != filter.checkObjectBreakable.value)
+                return false;
+        }
+
+        if (filter.checkObjectRespawnable.check)
+        {
+            if (object->IsRespawnEnabled() != filter.checkObjectRespawnable.value)
+                return false;
+        }
+
+        if (filter.checkObjectMoving.check)
+        {
+            if (static_cast<CDeathmatchObject*>(object)->IsMoving() != filter.checkObjectMoving.value)
+                return false;
+        }
+
+        if (filter.checkObjectPhysics.check)
+        {
+            std::uint16_t group = GetModelInfo()->GetObjectPropertiesGroup();
+            if ((group != 0xFFFF) != filter.checkObjectPhysics.value)
+                return false;
+        }
+
+        if (filter.checkHealth.check)
+        {
+            if (!CompareValues(object->GetHealth(), filter.checkHealth.value, filter.checkHealth.compareMethod))
+                return false;
+        }
+
+        if (filter.checkLowLOD.check)
+        {
+            if (object->IsLowLod() != filter.checkLowLOD.value)
+                return false;
+        }
+    }
+
+    // Building filters
+    if (IS_BUILDING(this))
+    {
+        CClientBuilding* building = static_cast<CClientBuilding*>(this);
+
+        if (filter.checkIsCollidable.check)
+        {
+            if (building->GetUsesCollision() != filter.checkIsCollidable.value)
+                return false;
+        }
+
+        if (filter.checkLowLOD.check)
+        {
+            if (building->IsLod() != filter.checkLowLOD.value)
+                return false;
+        }
+    }
+
+    // Marker filters
+    if (IS_MARKER(this))
+    {
+        CClientMarker* marker = static_cast<CClientMarker*>(this);
+
+        if (filter.checkMarkerType.check)
+        {
+            if (static_cast<MarkerType3D::Enum>(marker->GetMarkerType()) != filter.checkMarkerType.value)
+                return false;
+        }
+    }
+
+    // Pickup filters
+    if (IS_PICKUP(this))
+    {
+        CClientPickup* pickup = static_cast<CClientPickup*>(this);
+
+        if (filter.checkPickupType.check)
+        {
+            if (pickup->m_ucType != filter.checkPickupType.value)
+                return false;
+        }
+    }
+
+    // Colshape filters
+    if (IS_COLSHAPE(this))
+    {
+        CClientColShape* colShape = static_cast<CClientColShape*>(this);
+
+        if (filter.checkColShapeType.check)
+        {
+            if (static_cast<std::uint8_t>(colShape->GetShapeType()) != filter.checkColShapeType.value)
+                return false;
+        }
+    }
+
+    // Blip filters
+    if (IS_RADARMARKER(this))
+    {
+        CClientRadarMarker* blip = static_cast<CClientRadarMarker*>(this);
+
+        if (filter.checkBlipIcon.check)
+        {
+            if (static_cast<std::uint8_t>(blip->GetSprite()) != filter.checkBlipIcon.value)
+                return false;
+        }
+    }
+
+    // Team filters
+    if (IS_TEAM(this))
+    {
+        CClientTeam* team = static_cast<CClientTeam*>(this);
+
+        if (filter.checkEmptyTeam.check)
+        {
+            if ((team->CountPlayers() == 0) != filter.checkEmptyTeam.value)
+                return false;
+        }
+    }
+
+    // Weapon filters
+    if (IS_WEAPON(this))
+    {
+        CClientWeapon* weapon = static_cast<CClientWeapon*>(this);
+
+        if (filter.checkWeaponType.check)
+        {
+            if (weapon->GetWeaponType() != filter.checkWeaponType.value)
+                return false;
+        }
+    }
+
+    // Projectile filters
+    if (IS_PROJECTILE(this))
+    {
+        CClientProjectile* projectile = static_cast<CClientProjectile*>(this);
+
+        if (filter.checkWeaponType.check)
+        {
+            if (projectile->GetWeaponType() != filter.checkWeaponType.value)
+                return false;
+        }
+    }
+
+    return true;
+}
+
+void CClientEntity::RecursiveCollectAndFilter(std::uint32_t typeHash, const ChildrenFiltersOption& filterOptions, CElementListSnapshot& outList)
+{
+    if (IsBeingDeleted())
+        return;
+
+    auto hash = GetTypeHash();
+    if (hash == typeHash)
+    {
+        if (EvaluateEntityFilters(filterOptions))
+            outList.push_back(this);
+    }
+
+    for (CClientEntity* child : m_Children)
+    {
+        if (child)
+            child->RecursiveCollectAndFilter(typeHash, filterOptions, outList);
+    }
+}
+
+void CClientEntity::GetFilteredChildrenByType(const std::string_view& type, const ChildrenFiltersOption& filterOptions, CElementListSnapshot& outList)
+{
+    if (IsBeingDeleted())
+        return;
+
+    std::uint32_t typeHash = GetTypeHashFromString(type);
+
+    if (this == g_pClientGame->GetRootEntity())
+    {
+        auto find = ms_mapEntitiesFromRoot.find(typeHash);
+        if (find != ms_mapEntitiesFromRoot.end())
+        {
+            for (CClientEntity* entity : find->second)
+            {
+                if (entity && !entity->IsBeingDeleted())
+                {
+                    if (entity->EvaluateEntityFilters(filterOptions))
+                        outList.push_back(entity);
+                }
+            }
+        }
+    }
+    else
+    {
+        RecursiveCollectAndFilter(typeHash, filterOptions, outList);
+    }
+}
+
 bool CClientEntity::IsCollidableWith(CClientEntity* pEntity)
 {
     return !MapContains(m_DisabledCollisions, pEntity);

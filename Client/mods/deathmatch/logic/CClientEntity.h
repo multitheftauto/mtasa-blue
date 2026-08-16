@@ -17,6 +17,10 @@ class CClientEntity;
 #include <core/CClientEntityBase.h>
 #include "logic/CClientEntityRefManager.h"
 #include "CStringName.h"
+#include "enums/ElementType.h"
+#include "enums/3DMarkerType.h"
+#include <CVector.h>
+#include <optional>
 class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType
@@ -37,6 +41,9 @@ class CClientManager;
 #define IS_PROJECTILE(entity)    ((entity)->GetType() == CCLIENTPROJECTILE)
 #define IS_GUI(entity)           ((entity)->GetType() == CCLIENTGUI)
 #define IS_IFP(entity)           ((entity)->GetType() == CCLIENTIFP)
+#define IS_TEAM(entity)          ((entity)->GetType() == CCLIENTTEAM)
+#define IS_WEAPON(entity)        ((entity)->GetType() == CCLIENTWEAPON)
+#define IS_BUILDING(entity)      ((entity)->GetType() == CCLIENTBUILDING)
 #define CHECK_CGUI(entity, type) (((CClientGUIElement*)entity)->GetCGUIElement()->GetType() == (type))
 
 enum eClientEntityType
@@ -92,6 +99,8 @@ class CLuaArgument;
 class CLuaArguments;
 class CLuaMain;
 class CMapEventManager;
+enum eClientVehicleType;
+enum eWeaponType;
 typedef CFastList<CClientEntity*> CChildListType;
 
 typedef std::vector<CClientEntity*>           CElementListSnapshot;
@@ -146,6 +155,64 @@ enum eCClientEntityClassTypes
     CLASS_CClientSearchLight,
     CLASS_CClientIMG,
     CLASS_CClientBuilding,
+};
+
+enum class CompareMethod
+{
+    EQUAL,            // ==
+    NOT_EQUAL,        // !=
+    EQUAL_OR_LOWER,   // <=
+    EQUAL_OR_HIGHER,  // >=
+    LOWER,            // <
+    HIGHER,           // >
+};
+
+struct EntityInRangeFilterData
+{
+    CVector position{};
+    float   range{0.0f};
+};
+
+template <typename T>
+struct CheckValue
+{
+    bool          check{false};
+    T             value{};
+    CompareMethod compareMethod{CompareMethod::EQUAL};
+};
+
+struct ChildrenFiltersOption
+{
+    CheckValue<bool>                                                    checkStreamIn{};
+    CheckValue<bool>                                                    checkOnScreen{};
+    CheckValue<EntityInRangeFilterData>                                 checkRange{};
+    CheckValue<std::uint8_t>                                            checkInterior{};
+    CheckValue<std::int16_t>                                            checkDimension{};
+    CheckValue<std::variant<std::uint16_t, std::vector<std::uint16_t>>> checkModel{};
+    CheckValue<bool>                                                    checkOnGround{};
+    CheckValue<bool>                                                    checkInWater{};
+    CheckValue<bool>                                                    checkPlayerTeam{};
+    CheckValue<bool>                                                    checkPedVehicle{};
+    CheckValue<std::uint8_t>                                            checkAlpha{};
+    CheckValue<bool>                                                    checkIsFrozen{};
+    CheckValue<bool>                                                    checkOnFire{};
+    CheckValue<bool>                                                    checkIsCollidable{};
+    CheckValue<bool>                                                    checkJetpack{};
+    CheckValue<float>                                                   checkHealth{};
+    CheckValue<bool>                                                    checkVehicleOccupants{};
+    CheckValue<bool>                                                    checkVehicleDamageProof{};
+    CheckValue<eClientVehicleType>                                      checkVehicleType{};
+    CheckValue<bool>                                                    checkObjectBreakable{};
+    CheckValue<bool>                                                    checkObjectRespawnable{};
+    CheckValue<bool>                                                    checkObjectMoving{};
+    CheckValue<bool>                                                    checkObjectPhysics{};
+    CheckValue<bool>                                                    checkLowLOD{};
+    CheckValue<MarkerType3D::Enum>                                      checkMarkerType{};
+    CheckValue<std::uint16_t>                                           checkPickupType{};
+    CheckValue<std::uint8_t>                                            checkColShapeType{};
+    CheckValue<std::uint8_t>                                            checkBlipIcon{};
+    CheckValue<bool>                                                    checkEmptyTeam{};
+    CheckValue<eWeaponType>                                             checkWeaponType{};
 };
 
 class CClientEntity : public CClientEntityBase
@@ -270,6 +337,8 @@ public:
     void GetChildren(lua_State* luaVM);
     void GetChildrenByType(const char* szType, lua_State* luaVM);
 
+    void GetFilteredChildrenByType(const std::string_view& type, const ChildrenFiltersOption& filterOptions, CElementListSnapshot& outList);
+
     void AddCollision(CClientColShape* pShape) { m_Collisions.push_back(pShape); }
     void RemoveCollision(CClientColShape* pShape)
     {
@@ -389,6 +458,9 @@ private:
     static void AddEntityFromRoot(unsigned int uiTypeHash, CClientEntity* pEntity, bool bDebugCheck = true);
     static void RemoveEntityFromRoot(unsigned int uiTypeHash, CClientEntity* pEntity);
     static void GetEntitiesFromRoot(unsigned int uiTypeHash, lua_State* luaVM, bool bStreamedIn);
+
+    bool EvaluateEntityFilters(const ChildrenFiltersOption& filter);
+    void RecursiveCollectAndFilter(std::uint32_t typeHash, const ChildrenFiltersOption& filterOptions, CElementListSnapshot& outList);
 
 #if CHECK_ENTITIES_FROM_ROOT
     static void _CheckEntitiesFromRoot(unsigned int uiTypeHash);
