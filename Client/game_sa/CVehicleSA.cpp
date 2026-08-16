@@ -30,6 +30,7 @@
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
 #include "CFireManagerSA.h"
+#include "enums/VehicleType.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -1570,6 +1571,55 @@ void CVehicleSA::RecalculateHandling()
         GetVehicleInterface ()->fDragCoeff = pGame->GetHandlingManager()->GetBasicDragCoeff();
     else*/
     // pInt->fDragCoeff = m_pHandlingData->GetInterface()->fDragCoeff / 1000 * pGame->GetHandlingManager()->GetDragMultiplier();
+
+    // The swinging chassis flag is only applied once, inside the game's vehicle constructor.
+    // Redo that setup here so a live handling change actually takes effect.
+    RecalculateSwingingChassis();
+}
+
+void CVehicleSA::RecalculateSwingingChassis()
+{
+    if (GetVehicleInterface()->m_vehicleClass != VehicleClass::AUTOMOBILE)
+        return;
+
+    constexpr std::uint16_t axisZ = 2;
+    constexpr std::uint16_t axisNegY = 4;
+    constexpr std::uint16_t extraChassis = 0x40;
+    constexpr std::uint16_t extraFixedState = 0x80;
+    constexpr std::uint16_t extraFiretruck = 0x100;
+
+    auto&               chassis = static_cast<CAutomobileSAInterface*>(GetVehicleInterface())->m_swingingChassis;
+    const std::uint16_t modelID = GetModelIndex();
+
+    // The Firela's ladder reuses this same slot for its own animation, so it must never be overridden by the swinging chassis flag.
+    if (modelID == static_cast<std::uint16_t>(VehicleType::VT_FIRELA))
+    {
+        chassis.m_fOpenAngle = 0.1f * PI;
+        chassis.m_fClosedAngle = -0.1f * PI;
+        chassis.m_nAxis = axisZ;
+        chassis.m_nDirn = axisNegY | extraFixedState | extraFiretruck;
+        chassis.m_nDoorState = static_cast<std::uint8_t>(DoorState::DOOR_HIT_MAX_END);
+        return;
+    }
+
+    if (!(GetVehicleInterface()->dwHandlingFlags & HANDLING_SwingingChassis_Flag))
+    {
+        chassis = {};  // Flag off: reset so the chassis can't swing anymore
+        return;
+    }
+
+    // Same per-model angle multiplier the game's vehicle constructor uses
+    float angleMultiplier = 0.02f;
+    if (modelID == static_cast<std::uint16_t>(VehicleType::VT_COPCARVG) || modelID == static_cast<std::uint16_t>(VehicleType::VT_ESPERANT))
+        angleMultiplier = 0.03f;
+    else if (modelID == static_cast<std::uint16_t>(VehicleType::VT_STRETCH))
+        angleMultiplier = 0.01f;
+
+    chassis.m_fOpenAngle = angleMultiplier * PI;
+    chassis.m_fClosedAngle = -angleMultiplier * PI;
+    chassis.m_nAxis = axisZ;
+    chassis.m_nDirn = axisNegY | extraChassis | extraFixedState;
+    chassis.m_nDoorState = static_cast<std::uint8_t>(DoorState::DOOR_HIT_MAX_END);
 }
 
 void CVehicleSA::BurstTyre(BYTE bTyre)
