@@ -205,15 +205,15 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTowedByVehicle", "getVehicleTowedByVehicle");
     lua_classfunction(luaVM, "getTowingVehicle", "getVehicleTowingVehicle");
     lua_classfunction(luaVM, "getTurnVelocity", "getVehicleTurnVelocity", CLuaVehicleDefs::OOP_GetVehicleTurnVelocity);
-    lua_classfunction(luaVM, "getTurretPosition", "getVehicleTurretPosition");
+    lua_classfunction(luaVM, "getTurretPosition", "getVehicleTurretPosition", ArgumentParserWarn<false, OOP_GetVehicleTurretPosition>);
     lua_classfunction(luaVM, "getVehicleType", "getVehicleType");  // This isn't "getType" because it would overwrite Element.getType
     lua_classfunction(luaVM, "getUpgradeOnSlot", "getVehicleUpgradeOnSlot");
     lua_classfunction(luaVM, "getUpgrades", "getVehicleUpgrades");
     lua_classfunction(luaVM, "getWheelStates", "getVehicleWheelStates");
     lua_classfunction(luaVM, "getDoorOpenRatio", "getVehicleDoorOpenRatio");
     lua_classfunction(luaVM, "getHandling", "getVehicleHandling");
-    lua_classfunction(luaVM, "getRespawnPosition", "getVehicleRespawnPosition");
-    lua_classfunction(luaVM, "getRespawnRotation", "getVehicleRespawnRotation");
+    lua_classfunction(luaVM, "getRespawnPosition", "getVehicleRespawnPosition", ArgumentParserWarn<false, OOP_GetVehicleRespawnPosition>);
+    lua_classfunction(luaVM, "getRespawnRotation", "getVehicleRespawnRotation", ArgumentParserWarn<false, OOP_GetVehicleRespawnRotation>);
     lua_classfunction(luaVM, "isRespawnable", "isVehicleRespawnable");
     lua_classfunction(luaVM, "getRespawnDelay", "getVehicleRespawnDelay");
     lua_classfunction(luaVM, "getIdleRespawnDelay", "getVehicleIdleRespawnDelay");
@@ -280,16 +280,17 @@ void CLuaVehicleDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "landingGearDown", "setVehicleLandingGearDown", "getVehicleLandingGearDown");
     lua_classvariable(luaVM, "maxPassengers", NULL, "getVehicleMaxPassengers");
     lua_classvariable(luaVM, "upgrades", NULL, "getVehicleUpgrades");
-    lua_classvariable(luaVM, "turretPosition", "setVehicleTurretPosition", "getVehicleTurretPosition");
+    lua_classvariable(luaVM, "turretPosition", "setVehicleTurretPosition", "getVehicleTurretPosition", SetVehicleTurretPosition,
+                      ArgumentParserWarn<false, OOP_GetVehicleTurretPosition>);
     lua_classvariable(luaVM, "turnVelocity", "setVehicleTurnVelocity", "getVehicleTurnVelocity", SetVehicleTurnVelocity, OOP_GetVehicleTurnVelocity);
     lua_classvariable(luaVM, "overrideLights", "setVehicleOverrideLights", "getVehicleOverrideLights");
     lua_classvariable(luaVM, "idleRespawnDelay", "setVehicleIdleRespawnDelay", "getVehicleIdleRespawnDelay");
     lua_classvariable(luaVM, "respawnable", "toggleVehicleRespawn", "isVehicleRespawnable");
     lua_classvariable(luaVM, "respawnDelay", "setVehicleRespawnDelay", "getVehicleRespawnDelay");
     lua_classvariable(luaVM, "respawnPosition", "setVehicleRespawnPosition", "getVehicleRespawnPosition", SetVehicleRespawnPosition,
-                      OOP_GetVehicleRespawnPosition);
+                      ArgumentParserWarn<false, OOP_GetVehicleRespawnPosition>);
     lua_classvariable(luaVM, "respawnRotation", "setVehicleRespawnRotation", "getVehicleRespawnRotation", SetVehicleRespawnRotation,
-                      OOP_GetVehicleRespawnRotation);
+                      ArgumentParserWarn<false, OOP_GetVehicleRespawnRotation>);
     lua_classvariable(luaVM, "onGround", NULL, "isVehicleOnGround");
     lua_classvariable(luaVM, "name", NULL, "getVehicleName");
     lua_classvariable(luaVM, "vehicleType", NULL, "getVehicleType");
@@ -1083,6 +1084,19 @@ int CLuaVehicleDefs::GetVehicleTurretPosition(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<CLuaMultiReturn<float, float>, CVector2D, bool> CLuaVehicleDefs::OOP_GetVehicleTurretPosition(lua_State* luaVM, CVehicle* vehicle)
+{
+    CVector2D vecPosition;
+    if (!CStaticFunctionDefinitions::GetVehicleTurretPosition(vehicle, vecPosition))
+        return false;
+
+    // Keep returning two floats when the caller assigns two results
+    if (lua_ncallresult(luaVM) == 2)
+        return CLuaMultiReturn<float, float>(vecPosition.fX, vecPosition.fY);
+
+    return vecPosition;
 }
 
 int CLuaVehicleDefs::IsVehicleLocked(lua_State* luaVM)
@@ -2208,52 +2222,30 @@ int CLuaVehicleDefs::SetVehicleRespawnDelay(lua_State* luaVM)
     return 1;
 }
 
-int CLuaVehicleDefs::OOP_GetVehicleRespawnRotation(lua_State* luaVM)
+std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> CLuaVehicleDefs::OOP_GetVehicleRespawnRotation(lua_State* luaVM, CElement* element)
 {
-    CElement* pElement = NULL;
+    CVector vecRotationDegrees;
+    if (!CStaticFunctionDefinitions::GetVehicleRespawnRotation(element, vecRotationDegrees))
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
+    // Keep returning three floats when the caller assigns three results
+    if (lua_ncallresult(luaVM) == 3)
+        return CLuaMultiReturn<float, float, float>(vecRotationDegrees.fX, vecRotationDegrees.fY, vecRotationDegrees.fZ);
 
-    if (!argStream.HasErrors())
-    {
-        CVector vecRotationDegress;
-        if (CStaticFunctionDefinitions::GetVehicleRespawnRotation(pElement, vecRotationDegress))
-        {
-            lua_pushvector(luaVM, vecRotationDegress);
-
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return vecRotationDegrees;
 }
 
-int CLuaVehicleDefs::OOP_GetVehicleRespawnPosition(lua_State* luaVM)
+std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> CLuaVehicleDefs::OOP_GetVehicleRespawnPosition(lua_State* luaVM, CElement* element)
 {
-    CElement* pElement = NULL;
+    CVector vecPosition;
+    if (!CStaticFunctionDefinitions::GetVehicleRespawnPosition(element, vecPosition))
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
+    // Keep returning three floats when the caller assigns three results
+    if (lua_ncallresult(luaVM) == 3)
+        return CLuaMultiReturn<float, float, float>(vecPosition.fX, vecPosition.fY, vecPosition.fZ);
 
-    if (!argStream.HasErrors())
-    {
-        CVector vecPosition;
-        if (CStaticFunctionDefinitions::GetVehicleRespawnPosition(pElement, vecPosition))
-        {
-            lua_pushvector(luaVM, vecPosition);
-
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return vecPosition;
 }
 
 int CLuaVehicleDefs::GetVehicleRespawnRotation(lua_State* luaVM)
@@ -2895,18 +2887,17 @@ int CLuaVehicleDefs::SetVehicleHeadLightColor(lua_State* luaVM)
 
 int CLuaVehicleDefs::SetVehicleTurretPosition(lua_State* luaVM)
 {
+    // Accept Vector2 as well so vehicle.turretPosition = Vector2(...) works via the OOP property
     CVehicle* pVehicle;
-    float     fHorizontal;
-    float     fVertical;
+    CVector2D vecPosition;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVehicle);
-    argStream.ReadNumber(fHorizontal);
-    argStream.ReadNumber(fVertical);
+    argStream.ReadVector2D(vecPosition);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehicleTurretPosition(pVehicle, fHorizontal, fVertical))
+        if (CStaticFunctionDefinitions::SetVehicleTurretPosition(pVehicle, vecPosition.fX, vecPosition.fY))
         {
             lua_pushboolean(luaVM, true);
             return 1;

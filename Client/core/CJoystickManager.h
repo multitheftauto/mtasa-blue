@@ -23,6 +23,7 @@ public:
 
     // Status
     virtual bool IsJoypadConnected() = 0;
+    virtual void OnPossibleDeviceChange() = 0;
 
     // Settings
     virtual std::string GetControllerName() = 0;

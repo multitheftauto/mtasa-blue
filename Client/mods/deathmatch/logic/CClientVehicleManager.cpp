@@ -664,24 +664,35 @@ bool CClientVehicleManager::HasTaxiLight(unsigned long ulModel)
     return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_TAXI_LIGHTS));
 }
 
+// The attribute table only covers the standard models, so a custom model has to be looked up
+// under the model it was cloned from.
+static bool HasVehicleAttribute(unsigned long ulModel, unsigned long ulAttribute)
+{
+    // Use parent model ID for non-standard vehicle model IDs.
+    if ((ulModel < 400 || ulModel > 611) && CClientVehicleManager::IsValidModel(ulModel))
+        ulModel = g_pGame->GetModelInfo(ulModel)->GetParentID();
+
+    return (CClientVehicleManager::IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & ulAttribute));
+}
+
 bool CClientVehicleManager::HasSearchLight(unsigned long ulModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SEARCH_LIGHT));
+    return HasVehicleAttribute(ulModel, VEHICLE_HAS_SEARCH_LIGHT);
 }
 
 bool CClientVehicleManager::HasLandingGears(unsigned long ulModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_LANDING_GEARS));
+    return HasVehicleAttribute(ulModel, VEHICLE_HAS_LANDING_GEARS);
 }
 
 bool CClientVehicleManager::HasAdjustableProperty(unsigned long ulModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_ADJUSTABLE_PROPERTY));
+    return HasVehicleAttribute(ulModel, VEHICLE_HAS_ADJUSTABLE_PROPERTY);
 }
 
 bool CClientVehicleManager::HasSmokeTrail(unsigned long ulModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SMOKE_TRAIL));
+    return HasVehicleAttribute(ulModel, VEHICLE_HAS_SMOKE_TRAIL);
 }
 
 bool CClientVehicleManager::HasDamageModel(unsigned long ulModel)
