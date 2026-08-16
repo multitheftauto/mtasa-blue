@@ -4213,6 +4213,7 @@ retry:
                                                                      rotationRadians.data.vecRotation, ucInterior);
 
                     pBuilding->SetUsesCollision(bCollisonsEnabled);
+                    pEntity = pBuilding;
                     break;
                 }
 
@@ -5468,7 +5469,7 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
 
         if (pPlayer && bitStream.Read(voiceBufferLength) && voiceBufferLength <= 2048)
         {
-            const auto voiceBuffer = new unsigned char[voiceBufferLength];
+            unsigned char voiceBuffer[2048];
 
             if (bitStream.Read(reinterpret_cast<char*>(voiceBuffer), voiceBufferLength))
             {
@@ -5477,8 +5478,6 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
                     pPlayer->GetVoice()->DecodeAndBuffer(voiceBuffer, voiceBufferLength);
                 }
             }
-
-            delete[] voiceBuffer;
         }
     }
 }
