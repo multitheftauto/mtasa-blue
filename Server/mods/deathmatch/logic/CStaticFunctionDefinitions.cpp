@@ -10183,6 +10183,13 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(CCustomWeapon* pWeapon, eWeap
         if (eProperty == WEAPON_WEAPON_RANGE)
         {
             pWeapon->GetWeaponStat()->SetWeaponRange(fData);
+
+            // Sync the range to the clients so their per-shot acceptance cap
+            // stays in line with the server's. Both ends reject shots beyond
+            // this range, so they must use the same value.
+            CBitStream BitStream;
+            BitStream.pBitStream->Write(fData);
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pWeapon, SET_CUSTOM_WEAPON_WEAPON_RANGE, *BitStream.pBitStream));
             return true;
         }
     }
