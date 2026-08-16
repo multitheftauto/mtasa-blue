@@ -1193,6 +1193,11 @@ void CClientEntity::DoAttaching()
         if (!SetMatrix(returnMatrix))
             SetPosition(returnMatrix.vPos);
 
+        // Moving us can run script events (a colshape firing hit/leave events here), and a
+        // handler may have detached us, so make sure we are still attached before going on
+        if (!m_pAttachedToEntity)
+            return;
+
         // The game only recalculates an entity's surface brightness from its surroundings
         // while it's not attached to anything (see CObject::PreRender), so an attached
         // entity would otherwise stay stuck at its default (too bright) value forever.
