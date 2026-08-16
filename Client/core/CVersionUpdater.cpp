@@ -1914,10 +1914,12 @@ void CVersionUpdater::_DialogDownloading()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_DialogServerSaysUpdateQuestion()
 {
-    // Display message
+    // Include both versions so players can update manually if the auto-updater fails
+    // (e.g. blocked mirrors).
     GetQuestionBox().Reset();
     GetQuestionBox().SetTitle(_("MANDATORY UPDATE"));
-    GetQuestionBox().SetMessage(_("To join this server, you must update MTA.\n\n Do you want to update now ?"));
+    GetQuestionBox().SetMessage(SString(_("This server requires version %s.\nYou are currently running version %s.\n\nDo you want to update now?"),
+                                        *m_strServerSaysData, *GetProductVersion()));
     GetQuestionBox().SetButton(0, _("No"));
     GetQuestionBox().SetButton(1, _("Yes"));
     GetQuestionBox().Show();
@@ -1933,10 +1935,13 @@ void CVersionUpdater::_DialogServerSaysUpdateQuestion()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::_DialogServerSaysRecommendQuestion()
 {
-    // Display message
+    // Include both versions so players can update manually if the auto-updater fails
+    // (e.g. blocked mirrors).
     GetQuestionBox().Reset();
     GetQuestionBox().SetTitle(_("OPTIONAL UPDATE"));
-    GetQuestionBox().SetMessage(_("Server says an update is recommended, but not essential.\n\n Do you want to update now ?"));
+    GetQuestionBox().SetMessage(
+        SString(_("This server recommends version %s, but it is not essential.\nYou are currently running version %s.\n\nDo you want to update now?"),
+                *m_strServerSaysData, *GetProductVersion()));
     GetQuestionBox().SetButton(0, _("No"));
     GetQuestionBox().SetButton(1, _("Yes"));
     GetQuestionBox().Show();

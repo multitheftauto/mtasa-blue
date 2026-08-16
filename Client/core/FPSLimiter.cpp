@@ -13,10 +13,24 @@
 #include "FPSLimiter.h"
 #include "CGraphStats.h"
 #include <SharedUtil.Misc.h>
+#include <algorithm>
 
 namespace FPSLimiter
 {
     constexpr std::uint16_t DEFAULT_FPS_VSYNC = 60;  // Default user-defined FPS limit
+
+    // Tuning for the adaptive busy-wait margin used by SetFrameRateThrottle.
+    // Rather than always reserving a fixed amount of time for the final precision spin,
+    // we measure how much the waitable timer actually overshoots on this machine and
+    // size the margin to match. This keeps precision the same while avoiding wasted
+    // spinning on systems where the timer already wakes up on time.
+    constexpr double INITIAL_TIMER_JITTER_MS = 1.0;        // Starting margin, matches the previous fixed-margin behaviour
+    constexpr double MIN_SPIN_MARGIN_MS = 0.05;            // Never spin less than this, in case of a very lucky measurement
+    constexpr double MAX_SPIN_MARGIN_MS = 1.0;             // Never spin more than the old fixed margin
+    constexpr double SPIN_MARGIN_SAFETY_BUFFER_MS = 0.05;  // Extra headroom on top of the measured peak jitter
+    constexpr double TIMER_JITTER_DECAY = 0.98;            // Per-frame decay applied when the timer wakes up on time
+    constexpr int    FINAL_SPIN_BATCH_SIZE = 16;           // PAUSE instructions issued between two TSC reads in the final spin
+    static_assert(MIN_SPIN_MARGIN_MS <= MAX_SPIN_MARGIN_MS);
 
     FPSLimiter::FPSLimiter()
 
@@ -24,6 +38,7 @@ namespace FPSLimiter
           m_lastFrameTime{0},
           m_lastFrameTSC{__rdtsc()},
           m_hTimer(nullptr),
+          m_timerJitterPeakMs{INITIAL_TIMER_JITTER_MS},
           m_serverEnforcedFps{0},
           m_clientEnforcedFps{0},
           m_userDefinedFps{0},
@@ -227,6 +242,11 @@ namespace FPSLimiter
         // RDTSC spin wait - reusable for all spin scenarios
         auto rdtscSpinWait = [&](std::uint64_t targetTSC) -> std::uint64_t
         {
+            // Briefly raise our priority so the OS is less likely to preempt us mid-spin.
+            HANDLE    hCurrentThread = GetCurrentThread();
+            const int savedPriority = GetThreadPriority(hCurrentThread);
+            SetThreadPriority(hCurrentThread, THREAD_PRIORITY_TIME_CRITICAL);
+
             std::uint64_t lastMeasuredTSC = __rdtsc();
             std::uint64_t remaining = targetTSC - lastMeasuredTSC;
             if (remaining > 10000)  // > ~3us at 3GHz
@@ -240,12 +260,18 @@ namespace FPSLimiter
                 } while (lastMeasuredTSC + 5000 < targetTSC);  // Stop 5000 cycles early
             }
 
-            // Final precision loop
+            // Final precision loop. PAUSE calls are batched between TSC reads because
+            // __rdtsc() is a serializing instruction; checking it less often lowers the
+            // per-frame instruction overhead while bounding the worst-case overshoot to
+            // a handful of PAUSE instructions (well under a microsecond).
             do
             {
-                _mm_pause();
+                for (int i = 0; i < FINAL_SPIN_BATCH_SIZE; ++i)
+                    _mm_pause();
                 lastMeasuredTSC = __rdtsc();
             } while (lastMeasuredTSC < targetTSC);
+
+            SetThreadPriority(hCurrentThread, savedPriority);
 
             return lastMeasuredTSC;
         };
@@ -294,7 +320,10 @@ namespace FPSLimiter
 
                 if (m_hTimer)
                 {
-                    double timerWaitMs = waitTimeMs - 1.0;  // Leave margin for spin
+                    // Size the spin margin to what this machine's timer actually needs,
+                    // instead of always reserving the worst-case 1ms for it.
+                    const double spinMarginMs = std::clamp(m_timerJitterPeakMs + SPIN_MARGIN_SAFETY_BUFFER_MS, MIN_SPIN_MARGIN_MS, MAX_SPIN_MARGIN_MS);
+                    double       timerWaitMs = waitTimeMs - spinMarginMs;
                     if (timerWaitMs > 0.5)
                     {
                         LARGE_INTEGER dueTime;
@@ -303,6 +332,23 @@ namespace FPSLimiter
                         if (SetWaitableTimer(m_hTimer, &dueTime, 0, nullptr, nullptr, FALSE))
                         {
                             WaitForSingleObject(m_hTimer, INFINITE);
+
+                            // Measure how far the timer overshot its requested wait, and
+                            // remember the peak so future frames reserve enough margin to
+                            // still land the spin loop before targetTSC. The peak decays
+                            // slowly when the timer wakes up on time, so the margin shrinks
+                            // back down once the system proves it can be more precise.
+                            const std::uint64_t wakeTSC = __rdtsc();
+                            const double        expectedWaitTicks = (timerWaitMs / 1000.0) * tscFrequency;
+                            const double        actualWaitTicks = static_cast<double>(wakeTSC - currentTSC);
+                            const double        overshootMs = ((actualWaitTicks - expectedWaitTicks) * 1000.0) / tscFrequency;
+
+                            if (overshootMs > m_timerJitterPeakMs)
+                                m_timerJitterPeakMs = overshootMs;
+                            else
+                                m_timerJitterPeakMs *= TIMER_JITTER_DECAY;
+                            m_timerJitterPeakMs = std::clamp(m_timerJitterPeakMs, 0.0, MAX_SPIN_MARGIN_MS);
+
                             frameEndTSC = rdtscSpinWait(targetTSC);
                         }
                         else

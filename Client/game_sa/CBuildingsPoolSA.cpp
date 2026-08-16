@@ -63,6 +63,16 @@ CClientEntity* CBuildingsPoolSA::GetClientBuilding(CBuildingSAInterface* pGameIn
     return m_buildingPool.entities[static_cast<size_t>(poolIndex)].pClientEntity;
 }
 
+CEntity* CBuildingsPoolSA::GetBuilding(CBuildingSAInterface* pGameInterface) const noexcept
+{
+    std::int32_t poolIndex = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pGameInterface);
+
+    if (poolIndex == -1)
+        return nullptr;
+
+    return m_buildingPool.entities[static_cast<size_t>(poolIndex)].pEntity;
+}
+
 CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint16_t modelId, CVector* vPos, CVector* vRot, uint8_t interior)
 {
     if (!HasFreeBuildingSlot())

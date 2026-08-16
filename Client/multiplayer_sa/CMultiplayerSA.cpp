@@ -168,6 +168,12 @@ DWORD**       VAR_TagInfoArray = (DWORD**)0xA9A8C0;
 #define HOOKPOS_CPhysical_ProcessCollisionSectorList 0x54BB93
 DWORD RETURN_CPhysical_ProcessCollisionSectorList = 0x54BB9A;
 
+// CTaskSimpleClimb::ScanToGrabSectorList. Hooked right after its own collision check, so climb
+// and vault scans also skip entities excluded via setElementCollidableWith.
+#define HOOKPOS_CTaskSimpleClimb_ScanToGrabSectorList 0x67DF28
+DWORD RETURN_CTaskSimpleClimb_ScanToGrabSectorList = 0x67DF36;
+DWORD SKIP_CTaskSimpleClimb_ScanToGrabSectorList = 0x67E580;
+
 #define HOOKPOS_CheckAnimMatrix 0x7C5A5C
 DWORD RETURN_CheckAnimMatrix = 0x7C5A61;
 
@@ -476,6 +482,7 @@ void HOOK_CEventHandler_ComputeKnockOffBikeResponse();
 void HOOK_CPed_GetWeaponSkill();
 void HOOK_CPed_AddGogglesModel();
 void HOOK_CPhysical_ProcessCollisionSectorList();
+void HOOK_CTaskSimpleClimb_ScanToGrabSectorList();
 void HOOK_CrashFix_Misc1();
 void HOOK_CrashFix_Misc2();
 void HOOK_CrashFix_Misc4();
@@ -678,6 +685,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7);
+    HookInstall(HOOKPOS_CTaskSimpleClimb_ScanToGrabSectorList, (DWORD)HOOK_CTaskSimpleClimb_ScanToGrabSectorList, 8);
     HookInstall(HOOKPOS_CheckAnimMatrix, (DWORD)HOOK_CheckAnimMatrix, 5);
 
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29);
@@ -6393,6 +6401,59 @@ static void __declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList()
             test    edi, 1
             mov     edi, pCollisionPhysical
             jmp     RETURN_CPhysical_ProcessCollisionSectorList
+        }
+        // clang-format on
+    }
+}
+
+CEntitySAInterface* pClimbScanPedInterface;
+CEntitySAInterface* pClimbScanTargetInterface;
+BYTE                bClimbScanTargetUsesCollision;
+
+bool CTaskSimpleClimb_ShouldSkipEntity()
+{
+    // Same as the game's own check this replaces: no collision on the entity at all
+    if (!bClimbScanTargetUsesCollision)
+        return true;
+
+    // Also skip entities the ped was explicitly made non-collidable with (setElementCollidableWith)
+    if (pClimbScanPedInterface && pClimbScanTargetInterface && m_pProcessCollisionHandler)
+        return !m_pProcessCollisionHandler(pClimbScanPedInterface, pClimbScanTargetInterface);
+
+    return false;
+}
+
+static void __declspec(naked) HOOK_CTaskSimpleClimb_ScanToGrabSectorList()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     pClimbScanPedInterface, ebx
+        mov     pClimbScanTargetInterface, esi
+        test    byte ptr [esi+1Ch], 1
+        mov     word ptr [esi+2Ch], cx
+        setne   al
+        mov     bClimbScanTargetUsesCollision, al
+    }
+    // clang-format on
+
+    if (CTaskSimpleClimb_ShouldSkipEntity())
+    {
+        // clang-format off
+        __asm
+        {
+            jmp     SKIP_CTaskSimpleClimb_ScanToGrabSectorList
+        }
+        // clang-format on
+    }
+    else
+    {
+        // clang-format off
+        __asm
+        {
+            jmp     RETURN_CTaskSimpleClimb_ScanToGrabSectorList
         }
         // clang-format on
     }

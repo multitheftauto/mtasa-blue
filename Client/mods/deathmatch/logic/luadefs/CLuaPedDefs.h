@@ -35,6 +35,7 @@ public:
     LUA_DECLARE(GetPedAmmoInClip);
     LUA_DECLARE(GetPedTotalAmmo);
     LUA_DECLARE(GetPedWeaponMuzzlePosition);
+    static std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> OOP_GetPedWeaponMuzzlePosition(lua_State* luaVM, CClientPed* ped);
     LUA_DECLARE(GetPedStat);
     LUA_DECLARE(GetPedOccupiedVehicle);
     LUA_DECLARE(GetPedOccupiedVehicleSeat);
@@ -55,6 +56,7 @@ public:
     static std::variant<bool, CLuaMultiReturn<float, float, float>>        GetElementBoneRotation(CClientPed* ped, const std::uint16_t bone);
     static std::variant<bool, CLuaMultiReturn<float, float, float, float>> GetElementBoneQuaternion(CClientPed* ped, const std::uint16_t bone);
     static std::variant<bool, std::array<std::array<float, 4>, 4>>         GetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone);
+    static std::variant<bool, CMatrix>                                     OOP_GetElementBoneMatrix(CClientPed* ped, const std::uint16_t bone);
 
     static bool SetElementBonePosition(CClientPed* ped, const std::uint16_t bone, const CVector position);
     static bool SetElementBoneRotation(CClientPed* ped, const std::uint16_t bone, const float yaw, const float pitch, const float roll);
