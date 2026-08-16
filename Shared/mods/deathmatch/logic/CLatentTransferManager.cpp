@@ -407,13 +407,21 @@ bool DoSendPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamIn
 
 bool DoStaticProcessPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId)
 {
-    // Check if latent packet should be ignored
-    if (usResourceNetId != 0xFFFF)
-    {
-        CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromNetID(usResourceNetId);
-        if (!pResource)
-            return true;
-    }
+    // triggerLatentServerEvent is the only legitimate client-to-server latent
+    // path. It always sends PACKET_ID_LUA_EVENT with a valid resource net ID.
+    // Reject any other packet ID to prevent arbitrary packet handler dispatch
+    // via the latent transfer channel (e.g. routing PACKET_ID_PLAYER_MODINFO
+    // through a 100MB reassembled buffer to cause an unbounded heap storm).
+    if (ucPacketID != PACKET_ID_LUA_EVENT)
+        return false;
+
+    if (usResourceNetId == 0xFFFF)
+        return false;
+
+    CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromNetID(usResourceNetId);
+    if (!pResource)
+        return true;
+
     return CGame::StaticProcessPacket(ucPacketID, remoteId, pBitStream, NULL);
 }
 

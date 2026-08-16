@@ -252,6 +252,15 @@ bool CResourceManager::Refresh(bool bRefreshAll, const SString strJustThisResour
     {
         CResource* pResource = m_resourcesToStartAfterRefresh.front();
         m_resourcesToStartAfterRefresh.pop_front();
+        if (pResource->HasResourceChanged())
+        {
+            // Files changed since Load(); reload to refresh checksums
+            if (!Reload(pResource))
+            {
+                CLogger::LogPrintf("Resource '%s' has changed but reload failed; skipping start\n", pResource->GetName().c_str());
+                continue;
+            }
+        }
         pResource->Start();
     }
 
@@ -427,7 +436,7 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
     CResource* pResource = GetResource(szResourceName);
     if (pResource)
     {
-        if (!pResource->HasResourceChanged())
+        if (pResource->IsLoaded() && !pResource->HasResourceChanged())
         {
             // Already loaded and no reload required
             return pResource;
