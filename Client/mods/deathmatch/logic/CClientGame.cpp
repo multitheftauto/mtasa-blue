@@ -6205,11 +6205,11 @@ bool CClientGame::VerifySADataFiles(int iEnableClientChecks)
     return true;
 }
 
-void CClientGame::InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate)
+void CClientGame::InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate, unsigned char ucDecodeBurst)
 {
     if (m_pVoiceRecorder)
     {
-        m_pVoiceRecorder->Init(bEnabled, uiServerSampleRate, ucQuality, uiBitrate);
+        m_pVoiceRecorder->Init(bEnabled, uiServerSampleRate, ucQuality, uiBitrate, ucDecodeBurst);
     }
 }
 
