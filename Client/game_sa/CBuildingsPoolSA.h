@@ -31,6 +31,7 @@ public:
     bool           Resize(int size) override;
     int            GetSize() const override { return (m_ppBuildingPoolInterface && *m_ppBuildingPoolInterface) ? (*m_ppBuildingPoolInterface)->m_nSize : 0; };
     CClientEntity* GetClientBuilding(CBuildingSAInterface* pGameInterface) const noexcept;
+    CEntity*       GetBuilding(CBuildingSAInterface* pGameInterface) const noexcept;
 
 private:
     void RemoveBuildingFromWorld(CBuildingSAInterface* pBuilding);

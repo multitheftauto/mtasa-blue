@@ -107,4 +107,6 @@ private:
 
     SFixedArray<int, 9> m_EnabledEffects;
     SFixedArray<HFX, 9> m_FxEffects;
+
+    unsigned char m_voiceFramesThisPulse;  // Decodes per frame limit
 };

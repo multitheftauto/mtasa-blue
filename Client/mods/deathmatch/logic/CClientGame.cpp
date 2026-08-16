@@ -2196,6 +2196,7 @@ void CClientGame::SetAllDimensions(unsigned short usDimension)
     m_pManager->GetSoundManager()->SetDimension(usDimension);
     m_pManager->GetPointLightsManager()->SetDimension(usDimension);
     m_pManager->GetWaterManager()->SetDimension(usDimension);
+    m_pManager->GetBuildingManager()->SetDimension(usDimension);
     m_pNametags->SetDimension(usDimension);
     m_pCamera->SetDimension(usDimension);
 }
@@ -4097,6 +4098,13 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
             pAnimAssociation->SetFlags(pOriginalAnimStaticAssoc->GetFlags());
             pAnimAssociation->SetAnimID(pOriginalAnimStaticAssoc->GetAnimID());
             pAnimAssociation->SetAnimGroup(pOriginalAnimStaticAssoc->GetAnimGroup());
+
+            // A partial anim (e.g. weapon fire) only animates part of the skeleton and leaves the rest to
+            // whatever movement anim is playing. Loading an IFP pads its animations out to all 32 bones,
+            // so without this the replacement would also drive the root, pelvis and legs with a fixed pose
+            // and the ped would go rigid.
+            if (pAnimAssociation->IsPartial())
+                pAnimAssociation->RestrictToBonesOf(pOriginalAnimStaticAssoc->GetInterface());
         }
     }
 

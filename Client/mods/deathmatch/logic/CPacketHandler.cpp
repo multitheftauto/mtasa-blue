@@ -3575,11 +3575,20 @@ retry:
                         bitStream.Read(ucSirenCount);
                         bitStream.Read(ucSirenType);
 
-                        pVehicle->GiveVehicleSirens(ucSirenType, ucSirenCount);
+                        // The count comes straight off the wire and is used to index a fixed size array.
+                        // Keep reading the entries the packet claims to hold so the stream stays aligned,
+                        // but only store the ones that fit.
+                        unsigned char ucStoredSirenCount = std::min<unsigned char>(ucSirenCount, SIREN_COUNT_MAX);
+
+                        pVehicle->GiveVehicleSirens(ucSirenType, ucStoredSirenCount);
                         for (unsigned char i = 0; i < ucSirenCount; i++)
                         {
                             SVehicleSirenSync sirenData;
                             bitStream.Read(&sirenData);
+
+                            if (i >= ucStoredSirenCount)
+                                continue;
+
                             pVehicle->SetVehicleSirenPosition(i, sirenData.data.m_vecSirenPositions);
                             pVehicle->SetVehicleSirenColour(i, sirenData.data.m_colSirenColour);
                             pVehicle->SetVehicleSirenMinimumAlpha(i, sirenData.data.m_dwSirenMinAlpha);
@@ -4182,11 +4191,6 @@ retry:
                         pWater =
                             new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
                     }
-                    if (!pWater->Exists())
-                    {
-                        delete pWater;
-                        pWater = NULL;
-                    }
                     pEntity = pWater;
                     break;
                 }
@@ -4209,6 +4213,7 @@ retry:
                                                                      rotationRadians.data.vecRotation, ucInterior);
 
                     pBuilding->SetUsesCollision(bCollisonsEnabled);
+                    pEntity = pBuilding;
                     break;
                 }
 
@@ -5464,7 +5469,7 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
 
         if (pPlayer && bitStream.Read(voiceBufferLength) && voiceBufferLength <= 2048)
         {
-            const auto voiceBuffer = new unsigned char[voiceBufferLength];
+            unsigned char voiceBuffer[2048];
 
             if (bitStream.Read(reinterpret_cast<char*>(voiceBuffer), voiceBufferLength))
             {
@@ -5473,8 +5478,6 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
                     pPlayer->GetVoice()->DecodeAndBuffer(voiceBuffer, voiceBufferLength);
                 }
             }
-
-            delete[] voiceBuffer;
         }
     }
 }

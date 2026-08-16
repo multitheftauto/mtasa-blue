@@ -1357,6 +1357,21 @@ void CClientVehicle::SetLandingGearDown(bool bLandingGearDown)
     }
 }
 
+// The checks below compare against standard model IDs, so a custom model has to be read as the
+// model it was cloned from. The model info is looked up fresh rather than through m_pModelInfo,
+// since SetModelBlocking calls in here before that pointer has been updated.
+static VehicleType GetVehicleTypeForModel(unsigned short usModel)
+{
+    std::uint16_t ulModel = usModel;
+    if (ulModel < 400 || ulModel > 611)
+    {
+        if (CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel))
+            ulModel = pModelInfo->GetParentID();
+    }
+
+    return static_cast<VehicleType>(ulModel);
+}
+
 unsigned short CClientVehicle::GetAdjustablePropertyValue()
 {
     unsigned short usPropertyValue;
@@ -1364,7 +1379,7 @@ unsigned short CClientVehicle::GetAdjustablePropertyValue()
     {
         usPropertyValue = m_pVehicle->GetAdjustablePropertyValue();
         // If it's a Hydra invert it with 5000 (as 0 is "forward"), so we can maintain a standard of 0 being "normal"
-        if (static_cast<VehicleType>(m_usModel) == VehicleType::VT_HYDRA)
+        if (GetVehicleTypeForModel(m_usModel) == VehicleType::VT_HYDRA)
             usPropertyValue = 5000 - usPropertyValue;
     }
     else
@@ -1378,7 +1393,7 @@ unsigned short CClientVehicle::GetAdjustablePropertyValue()
 
 void CClientVehicle::SetAdjustablePropertyValue(unsigned short usValue)
 {
-    if (static_cast<VehicleType>(m_usModel) == VehicleType::VT_HYDRA)
+    if (GetVehicleTypeForModel(m_usModel) == VehicleType::VT_HYDRA)
         usValue = 5000 - usValue;
 
     _SetAdjustablePropertyValue(usValue);
@@ -1406,7 +1421,7 @@ void CClientVehicle::_SetAdjustablePropertyValue(unsigned short usValue)
 
 bool CClientVehicle::HasMovingCollision()
 {
-    auto model = static_cast<VehicleType>(m_usModel);
+    auto model = GetVehicleTypeForModel(m_usModel);
 
     return (model == VehicleType::VT_FORKLIFT || model == VehicleType::VT_FIRELA || model == VehicleType::VT_ANDROM || model == VehicleType::VT_DUMPER ||
             model == VehicleType::VT_DOZER || model == VehicleType::VT_PACKER);
@@ -2513,7 +2528,7 @@ void CClientVehicle::StreamOut()
 
 bool CClientVehicle::DoCheckHasLandingGear()
 {
-    auto model = static_cast<VehicleType>(m_usModel);
+    auto model = GetVehicleTypeForModel(m_usModel);
 
     return (model == VehicleType::VT_ANDROM || model == VehicleType::VT_AT400 || model == VehicleType::VT_NEVADA || model == VehicleType::VT_RUSTLER ||
             model == VehicleType::VT_SHAMAL || model == VehicleType::VT_HYDRA || model == VehicleType::VT_STUNT);
@@ -4631,7 +4646,7 @@ void CClientVehicle::RemoveVehicleSirens()
     m_tSirenBeaconInfo.m_bOverrideSirens = false;
     SetSirenOrAlarmActive(false);
 
-    for (unsigned char i = 0; i < 7; i++)
+    for (unsigned char i = 0; i < SIREN_COUNT_MAX; i++)
     {
         SetVehicleSirenPosition(i, CVector(0, 0, 0));
         SetVehicleSirenMinimumAlpha(i, 0);

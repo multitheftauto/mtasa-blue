@@ -625,6 +625,12 @@ bool CStaticFunctionDefinitions::GetElementRadius(CClientEntity& Entity, float& 
             pModelInfo = g_pGame->GetModelInfo(Object.GetModel());
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
+            pModelInfo = g_pGame->GetModelInfo(Building.GetModel());
+            break;
+        }
     }
     if (pModelInfo)
     {
@@ -1313,6 +1319,29 @@ bool CStaticFunctionDefinitions::SetElementInterior(CClientEntity& Entity, unsig
         }
     }
 
+    switch (Entity.GetType())
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+        case CCLIENTVEHICLE:
+        {
+            CVector vecEntityPosition;
+            Entity.GetPosition(vecEntityPosition);
+            m_pColManager->DoHitDetection(vecEntityPosition, 0.0f, &Entity);
+            break;
+        }
+        case CCLIENTMARKER:
+        case CCLIENTPICKUP:
+        {
+            CClientColShape* pColShape = GetElementColShape(&Entity);
+            if (pColShape)
+                RefreshColShapeColliders(pColShape);
+            break;
+        }
+        default:
+            break;
+    }
+
     return true;
 }
 
@@ -1347,6 +1376,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
         case CCLIENTWORLDMESH:
         case CCLIENTSOUND:
         case CCLIENTWATER:
+        case CCLIENTBUILDING:
         {
             Entity.SetDimension(usDimension);
             return true;
