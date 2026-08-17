@@ -946,6 +946,7 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     MemPut(0x6D4063, &kOriginalTimeStep);
     MemPut(0x6D4096, &kOriginalTimeStep);
 
+    // Fixes slow boat movement on high FPS.
     // CVehicle::ProcessBoatControl
     MemPut(0x6DC23F, &kOriginalTimeStep);
 
