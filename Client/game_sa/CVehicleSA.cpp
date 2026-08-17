@@ -694,6 +694,11 @@ float CVehicleSA::GetHeliRotorSpeed() const
     return static_cast<CHeliSAInterface*>(m_pInterface)->m_wheelSpeed[1];
 }
 
+bool CVehicleSA::CanPedStepOutCar(bool bIgnoreSpeedUpright)
+{
+    return ((bool(__thiscall*)(CVehicleSAInterface*, bool))FUNC_CVehicle_CanPedStepOutCar)(GetVehicleInterface(), bIgnoreSpeedUpright);
+}
+
 void CVehicleSA::SetHeliRotorSpeed(float speed)
 {
     static_cast<CHeliSAInterface*>(GetInterface())->m_wheelSpeed[1] = speed;

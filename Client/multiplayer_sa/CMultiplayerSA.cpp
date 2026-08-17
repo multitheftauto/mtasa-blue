@@ -4258,12 +4258,10 @@ void CMultiplayerSA::DisableEnterExitVehicleKey(bool bDisabled)
         MemPut<BYTE>(0x6AD75D, 0x90);
         MemPut<BYTE>(0x6AD75E, 0x90);
 
-        // CBike__ProcessControlInputs
-        MemPut<BYTE>(0x6BE34B, 0x32);
-        MemPut<BYTE>(0x6BE34C, 0xC0);
-        MemPut<BYTE>(0x6BE34D, 0x90);
-        MemPut<BYTE>(0x6BE34E, 0x90);
-        MemPut<BYTE>(0x6BE34F, 0x90);
+        // Leave CBike::ProcessControlInputs (0x6BE34B CALL CPad::GetExitVehicle) alone.
+        // Patching it to XOR AL,AL removed the single-player F-brake on bikes/BMX.
+        // GetExitVehicle is held-state, not JustDown; it only feeds the brake. The
+        // actual native leave is CPad::ExitVehicleJustDown / CPlayerInfo::Process.
 
         // CTaskSimpleJetPack__ProcessControlInput
         MemPut<BYTE>(0x67E834, 0x32);
