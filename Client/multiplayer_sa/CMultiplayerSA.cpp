@@ -580,7 +580,7 @@ CMultiplayerSA::CMultiplayerSA()
     SetInitialVirtualProtect();
 
     CRemoteDataSA::Init();
-    m_bEnabledLODSystem = true;
+    m_bEnabledLODSystem = false;
     m_bEnabledAltWaterOrder = false;
     m_pBreakTowLinkHandler = NULL;
     m_pDrawRadarAreasHandler = NULL;

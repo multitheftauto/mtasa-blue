@@ -73,25 +73,28 @@ static void __declspec(naked) HOOK_CExplosion_AddExplosion()
         cmp     CMultiplayerSA::m_pExplosionHandler, 0
         jz      proceed_with_explosion
 
+        // Preserve registers before calling C++ handler
+        pushad
+
         // Pass arguments directly from stack to CallExplosionHandler:
-        // [esp+4] = explodingEntity (CEntitySAInterface*)
-        // [esp+8] = explosionCreator (CEntitySAInterface*)
-        // [esp+12] = explosionType (eExplosionType)
-        // [esp+16..24] = location (float x, y, z)
-        push    dword ptr [esp + 12]        // explosionType
-        lea     eax, [esp + 16 + 4]          // &location
+        // [esp + 32] is return address
+        // [esp + 32 + 4] = explodingEntity (CEntitySAInterface*)
+        // [esp + 32 + 8] = explosionCreator (CEntitySAInterface*)
+        // [esp + 32 + 12] = explosionType (eExplosionType)
+        // [esp + 32 + 16..24] = location (float x, y, z)
+        push    dword ptr [esp + 32 + 12]       // explosionType
+        lea     eax, [esp + 32 + 16 + 4]        // &location
         push    eax
-        push    dword ptr [esp + 8 + 8]      // explosionCreator
-        push    dword ptr [esp + 4 + 12]     // explodingEntity
+        push    dword ptr [esp + 32 + 8 + 8]    // explosionCreator
+        push    dword ptr [esp + 32 + 4 + 12]   // explodingEntity
         call    CallExplosionHandler
         add     esp, 16
 
         test    al, al
-        jnz     proceed_with_explosion
+        jz      cancel_explosion
 
-        // Cancelled by explosion handler
-        xor     al, al
-        retn
+        // Explosion allowed by handler -> restore registers and proceed
+        popad
 
     proceed_with_explosion:
         // Replaced GTA:SA instructions (6 bytes)
@@ -100,6 +103,11 @@ static void __declspec(naked) HOOK_CExplosion_AddExplosion()
         push    ebp
         push    esi
         jmp     RETURN_CExplosion_AddExplosion
+
+    cancel_explosion:
+        popad
+        xor     al, al
+        retn
     }
     // clang-format on
 }
