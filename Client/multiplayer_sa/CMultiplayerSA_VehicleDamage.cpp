@@ -23,10 +23,6 @@ namespace
     CEntitySAInterface* ms_SavedAttacker;
     CVector             ms_SavedDamagedPos;
 
-    // Track InflictDamage so we can skip the duplicate VehicleDamage event
-    bool                 ms_bInflictDamageAllowed = true;
-    CVehicleSAInterface* ms_pInflictDamageVehicle = nullptr;
-
     VehicleDamageHandler* m_pVehicleDamageHandler = NULL;
 }  // namespace
 
@@ -147,13 +143,9 @@ cont:
 //////////////////////////////////////////////////////////////////////////////////////////
 bool OnMY_CVehicle_InflictDamage(CVehicleSAInterface* pVehicle, CEntitySAInterface* pAttacker, eWeaponType weaponType, float fDamage, CVector vecDamagePos)
 {
-    ms_pInflictDamageVehicle = pVehicle;
-    ms_bInflictDamageAllowed = true;
-
     if (m_pVehicleDamageHandler)
     {
-        ms_bInflictDamageAllowed = m_pVehicleDamageHandler(pVehicle, fDamage, pAttacker, weaponType, vecDamagePos, UCHAR_INVALID_INDEX);
-        if (!ms_bInflictDamageAllowed)
+        if (!m_pVehicleDamageHandler(pVehicle, fDamage, pAttacker, weaponType, vecDamagePos, UCHAR_INVALID_INDEX))
             return false;
     }
 
@@ -262,31 +254,20 @@ float OnMY_CVehicle_VehicleDamage2(CVehicleSAInterface* pVehicle, float fDamage)
 {
     if (m_pVehicleDamageHandler)
     {
-        // InflictDamage already fired the event; honour cancelEvent on follow-up calls
-        const bool bDuplicateOfInflictDamage = ms_HasSavedData && pVehicle == ms_pInflictDamageVehicle && ms_SavedWeaponType != WEAPONTYPE_INVALID;
+        eWeaponType         weaponType = WEAPONTYPE_INVALID;
+        CEntitySAInterface* pAttacker = pVehicle->m_pCollidedEntity;
+        CVector             vecDamagePos = pVehicle->m_vecCollisionPosition;
 
-        if (bDuplicateOfInflictDamage)
+        if (ms_HasSavedData)
         {
-            if (!ms_bInflictDamageAllowed)
-                fDamage = 0;
+            if (ms_SavedAttacker)
+                pAttacker = ms_SavedAttacker;
+            weaponType = ms_SavedWeaponType;
+            vecDamagePos = ms_SavedDamagedPos;
         }
-        else
-        {
-            eWeaponType         weaponType = WEAPONTYPE_INVALID;
-            CEntitySAInterface* pAttacker = pVehicle->m_pCollidedEntity;
-            CVector             vecDamagePos = pVehicle->m_vecCollisionPosition;
 
-            if (ms_HasSavedData)
-            {
-                if (ms_SavedAttacker)
-                    pAttacker = ms_SavedAttacker;
-                weaponType = ms_SavedWeaponType;
-                vecDamagePos = ms_SavedDamagedPos;
-            }
-
-            if (!m_pVehicleDamageHandler(pVehicle, fDamage, pAttacker, weaponType, vecDamagePos, UCHAR_INVALID_INDEX))
-                fDamage = 0;
-        }
+        if (!m_pVehicleDamageHandler(pVehicle, fDamage, pAttacker, weaponType, vecDamagePos, UCHAR_INVALID_INDEX))
+            fDamage = 0;
     }
     ms_HasSavedData = false;
     return fDamage;

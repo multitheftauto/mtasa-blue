@@ -32,7 +32,6 @@ public:
 
     eWeaponType      m_LastWeaponType;
     CClientEntityPtr m_pLastCreator;
-    CVector          m_vecLastPosition;  // SA passes (0,0,0) into InflictDamage for explosions
 
 private:
     CClientManager* m_pManager;
