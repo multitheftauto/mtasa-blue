@@ -78,13 +78,9 @@ public:
     virtual CWebViewInterface* GetFocusedWebView() = 0;
     virtual void               SetFocusedWebView(CWebView* pWebView) = 0;
     virtual void               ProcessInputMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
-    virtual void               ClearTextures() = 0;
 
     virtual bool GetRemotePagesEnabled() = 0;
     virtual bool GetRemoteJavascriptEnabled() = 0;
-
-    virtual void OnPreScreenshot() = 0;
-    virtual void OnPostScreenshot() = 0;
 
     virtual void OnFPSLimitChange(std::uint16_t fps) = 0;
 
