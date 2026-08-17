@@ -94,9 +94,17 @@ public:
 
     void RequestLocaleChange(const SString& strLocale);
 
+    // Locale/skin changes destroy MainMenu (and its QuestionBox). Keep the restart
+    // requirement across that rebuild so resolution/etc. prompts are not lost.
+    void RequestRestartPrompt();
+
 private:
     void UpdateCursor();
     void ApplyQueuedLocale();
+    void TryShowRestartPrompt();
+    void ClearRestartPrompt() { m_bPendingRestartPrompt = false; }
+
+    static void RestartPromptCallBack(void* pData, unsigned int uiButton);
 
     DWORD TranslateScanCodeToGUIKey(DWORD dwCharacter);
 
@@ -123,4 +131,5 @@ private:
     uint    m_LocaleChangeCounter;
     SString m_QueuedLocaleChange;
     bool    m_bHasQueuedLocaleChange;
+    bool    m_bPendingRestartPrompt;
 };

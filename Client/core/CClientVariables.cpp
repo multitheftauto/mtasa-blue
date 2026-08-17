@@ -328,8 +328,6 @@ void CClientVariables::LoadDefaults()
     DEFAULT("steer_with_mouse", false);                                     // steering with mouse controls
     DEFAULT("classic_controls", false);                                     // classic/standard controls
     DEFAULT("mastervolume", 1.0f);                                          // master volume
-    DEFAULT("radiovolume", 1.0f);                                           // radio volume (unscaled)
-    DEFAULT("sfxvolume", 1.0f);                                             // sfx volume (unscaled)
     DEFAULT("mtavolume", 1.0f);                                             // custom sound's volume
     DEFAULT("voicevolume", 1.0f);                                           // voice chat output volume
     DEFAULT("mapalpha", 155);                                               // player map alpha

@@ -442,33 +442,23 @@ CSettings::CSettings()
 
     // Keep exact slider values in CVARs. Fall back to reconstructed values for
     // one-time migration when those keys do not exist yet.
-    if (clientVars.Exists("radiovolume") && clientVars.Exists("sfxvolume"))
+    if (clientVars.Exists("radiovolume"))
     {
         CVARS_GET("radiovolume", fRadioVolume);
+    }
+    else
+    {
+        fRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
+        CVARS_SET("radiovolume", fRadioVolume);
+    }
+
+    if (clientVars.Exists("sfxvolume"))
+    {
         CVARS_GET("sfxvolume", fSFXVolume);
     }
     else
     {
-        // GTA stores radio/SFX as values already multiplied by master volume.
-        // The UI sliders represent the unscaled channel volumes, so recover them
-        // by dividing by the persisted master value during startup.
-        const float fMasterVolume = std::max(0.0f, std::min(CVARS_GET_VALUE<float>("mastervolume"), 1.0f));
-        const float fStoredRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
-        const float fStoredSFXVolume = (float)gameSettings->GetSFXVolume() / 64.0f;
-
-        if (fMasterVolume > 0.0001f)
-        {
-            fRadioVolume = fStoredRadioVolume / fMasterVolume;
-            fSFXVolume = fStoredSFXVolume / fMasterVolume;
-        }
-        else
-        {
-            // If master was zero we cannot recover hidden channel values.
-            fRadioVolume = fStoredRadioVolume;
-            fSFXVolume = fStoredSFXVolume;
-        }
-
-        CVARS_SET("radiovolume", fRadioVolume);
+        fSFXVolume = (float)gameSettings->GetSFXVolume() / 64.0f;
         CVARS_SET("sfxvolume", fSFXVolume);
     }
 
@@ -2096,29 +2086,10 @@ void CSettings::DestroyGUI()
     ResetGuiPointers();
 }
 
-void RestartCallBack(void* ptr, unsigned int uiButton)
-{
-    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
-
-    if (uiButton == 1)
-    {
-        SetOnQuitCommand("restart");
-        CCore::GetSingleton().Quit();
-    }
-}
-
 void CSettings::ShowRestartQuestion()
 {
-    SString strMessage = _("Some settings will be changed when you next start MTA");
-    strMessage += _("\n\nDo you want to restart now?");
-    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
-    pQuestionBox->Reset();
-    pQuestionBox->SetTitle(_("RESTART REQUIRED"));
-    pQuestionBox->SetMessage(strMessage);
-    pQuestionBox->SetButton(0, _("No"));
-    pQuestionBox->SetButton(1, _("Yes"));
-    pQuestionBox->SetCallback(RestartCallBack);
-    pQuestionBox->Show();
+    // Persist across Interface locale/skin rebuilds (they destroy MainMenu's QuestionBox)
+    CLocalGUI::GetSingleton().RequestRestartPrompt();
 }
 
 void DisconnectCallback(void* ptr, unsigned int uiButton)
@@ -2785,6 +2756,7 @@ void CSettings::SetRadioVolume(float fVolume)
     fVolume = std::max(0.0f, std::min(fVolume, 1.0f));
 
     m_fRadioVolume = fVolume;
+    CVARS_SET("radiovolume", fVolume);
 
     CCore::GetSingleton().GetGame()->GetSettings()->SetRadioVolume(m_fRadioVolume * CVARS_GET_VALUE<float>("mastervolume") * 64.0f);
 }
@@ -2794,6 +2766,7 @@ void CSettings::SetSFXVolume(float fVolume)
     fVolume = std::max(0.0f, std::min(fVolume, 1.0f));
 
     m_fSFXVolume = fVolume;
+    CVARS_SET("sfxvolume", fVolume);
 
     CCore::GetSingleton().GetGame()->GetSettings()->SetSFXVolume(m_fSFXVolume * CVARS_GET_VALUE<float>("mastervolume") * 64.0f);
 }
