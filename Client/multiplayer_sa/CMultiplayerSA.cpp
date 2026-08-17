@@ -64,11 +64,9 @@ DWORD RETURN_FxManager_DestroyFxSystem = 0x4A9817;
 
 #define HOOKPOS_CCam_ProcessFixed                           0x51D470
 #define HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon 0x6859a0
-#define HOOKPOS_CPed_IsPlayer                               0x5DF8F0
 
 DWORD RETURN_CCam_ProcessFixed = 0x51D475;
 DWORD RETURN_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon = 0x6859A7;
-DWORD RETURN_CPed_IsPlayer = 0x5DF8F6;
 
 #define VAR_CollisionStreamRead_ModelInfo 0x9689E0
 #define HOOKPOS_CollisionStreamRead       0x41B1D0
@@ -153,12 +151,6 @@ DWORD RETURN_CPlantMgr_Render_success = 0x5DBC52;
 DWORD RETURN_CEventHandler_ComputeKnockOffBikeResponse = 0x4BA076;
 
 #define HOOKPOS_CAnimBlendAssocGroupCopyAnimation 0x4CE130
-
-#define HOOKPOS_CPed_GetWeaponSkill 0x5e3b60
-DWORD RETURN_CPed_GetWeaponSkill = 0x5E3B68;
-
-#define HOOKPOS_CPed_AddGogglesModel 0x5E3ACB
-DWORD RETURN_CPed_AddGogglesModel = 0x5E3AD4;
 
 #define FUNC_CWorld_Remove                  0x563280
 #define FUNC_CTagManager_ShutdownForRestart 0x49CC60
@@ -444,7 +436,6 @@ void HOOK_FxManager_DestroyFxSystem();
 void HOOK_CCam_ProcessFixed();
 void HOOK_Render3DStuff();
 void HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon();
-void HOOK_CPed_IsPlayer();
 void HOOK_CTrain_ProcessControl_Derail();
 void HOOK_CVehicle_SetupRender();
 void HOOK_CVehicle_ResetAfterRender();
@@ -479,8 +470,6 @@ void HOOK_RenderScene_Plants();
 void HOOK_RenderScene_end();
 void HOOK_CPlantMgr_Render();
 void HOOK_CEventHandler_ComputeKnockOffBikeResponse();
-void HOOK_CPed_GetWeaponSkill();
-void HOOK_CPed_AddGogglesModel();
 void HOOK_CPhysical_ProcessCollisionSectorList();
 void HOOK_CTaskSimpleClimb_ScanToGrabSectorList();
 void HOOK_CrashFix_Misc1();
@@ -651,7 +640,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_FxManager_DestroyFxSystem, (DWORD)HOOK_FxManager_DestroyFxSystem, 7);
     HookInstall(HOOKPOS_CCam_ProcessFixed, (DWORD)HOOK_CCam_ProcessFixed, 5);
     HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, 7);
-    HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
     HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
     HookInstall(HOOKPOS_CVehicle_SetupRender, (DWORD)HOOK_CVehicle_SetupRender, 5);
     HookInstall(HOOKPOS_CVehicle_ResetAfterRender, (DWORD)HOOK_CVehicle_ResetAfterRender, 5);
@@ -682,8 +670,6 @@ void CMultiplayerSA::InitHooks()
     HookInstallCall(CALL_CWeather_Update_FromCGameProcess, (DWORD)HOOK_CWeather_Update);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
     HookInstall(HOOKPOS_CEventHandler_ComputeKnockOffBikeResponse, (DWORD)HOOK_CEventHandler_ComputeKnockOffBikeResponse, 7);
-    HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
-    HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7);
     HookInstall(HOOKPOS_CTaskSimpleClimb_ScanToGrabSectorList, (DWORD)HOOK_CTaskSimpleClimb_ScanToGrabSectorList, 8);
     HookInstall(HOOKPOS_CheckAnimMatrix, (DWORD)HOOK_CheckAnimMatrix, 5);
@@ -3613,51 +3599,6 @@ static void __declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon()
     }
 }
 
-CPedSAInterface* pIsPlayerPed = NULL;
-bool             IsPlayer()
-{
-    return true;
-}
-
-static void __declspec(naked) HOOK_CPed_IsPlayer()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    /*
-    005DF8F0  mov         eax,dword ptr [ecx+598h]      <hook>
-    005DF8F6  test        eax,eax                       <return>
-    */
-    // clang-format off
-    __asm
-    {
-        mov    pIsPlayerPed, ecx
-        pushad
-    }
-    // clang-format on
-    if (IsPlayer())
-    {
-        // clang-format off
-        __asm
-        {
-            popad
-            mov         eax,dword ptr [ecx+598h]
-            jmp         RETURN_CPed_IsPlayer
-        }
-        // clang-format on
-    }
-    else
-    {
-        // clang-format off
-        __asm
-        {
-            popad
-            xor         al, al
-            ret
-        }
-        // clang-format on
-    }
-}
-
 void CRunningScript_Process()
 {
     if (!bHasProcessedScript)
@@ -6166,119 +6107,6 @@ static void __declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse()
         popad
         call    dw_CEventDamage_AffectsPed
         jmp     RETURN_CEventHandler_ComputeKnockOffBikeResponse
-    }
-    // clang-format on
-}
-
-CPedSAInterface* weaponSkillPed;
-eWeaponType      weaponSkillWeapon;
-BYTE             weaponSkill;
-bool             CPed_GetWeaponSkill()
-{
-    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)weaponSkillPed);
-    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
-    if (pPed)
-    {
-        CPed* pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef((DWORD)1);
-        if (pPed != pLocalPlayerPed)
-        {
-            if (weaponSkillWeapon >= WEAPONTYPE_PISTOL && weaponSkillWeapon <= WEAPONTYPE_TEC9)
-            {
-                CPlayerPed* playerPed = dynamic_cast<CPlayerPed*>(pPed);
-                if (playerPed)
-                {
-                    CRemoteDataStorageSA* data = CRemoteDataSA::GetRemoteDataStorage(playerPed);
-                    if (data)
-                    {
-                        float stat = data->m_stats.StatTypesFloat[pGameInterface->GetStats()->GetSkillStatIndex(weaponSkillWeapon)];
-
-                        CWeaponInfo* pPoor = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_POOR);
-                        CWeaponInfo* pStd = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_STD);
-                        CWeaponInfo* pPro = pGameInterface->GetWeaponInfo(weaponSkillWeapon, WEAPONSKILL_PRO);
-
-                        if (stat >= pPro->GetRequiredStatLevel())
-                            weaponSkill = WEAPONSKILL_PRO;
-                        else if (stat >= pStd->GetRequiredStatLevel())
-                            weaponSkill = WEAPONSKILL_STD;
-                        else
-                            weaponSkill = WEAPONSKILL_POOR;
-                        return true;
-                    }
-                }
-            }
-        }
-    }
-    return false;
-}
-
-static void __declspec(naked) HOOK_CPed_GetWeaponSkill()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        mov     weaponSkillPed, ecx
-        mov     eax, [esp+4]
-        mov     weaponSkillWeapon, eax
-        pushad
-    }
-    // clang-format on
-
-    if (CPed_GetWeaponSkill())
-    {
-        // clang-format off
-        __asm
-        {
-            popad
-            mov     al, weaponSkill
-            retn    4
-        }
-        // clang-format on
-    }
-    else
-    {
-        // clang-format off
-        __asm
-        {
-            popad
-            push    esi
-            mov     esi, [esp+8]
-            cmp     esi, 16h
-            jmp     RETURN_CPed_GetWeaponSkill
-        }
-        // clang-format on
-    }
-}
-
-// Actually check if the ped putting on goggles is the local player before
-// applying the visual effect
-bool _cdecl CPed_AddGogglesModelCheck(void* pPedInterface)
-{
-    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pPedInterface);
-    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
-    return pPed == pGameInterface->GetPools()->GetPedFromRef(1);
-}
-
-static void __declspec(naked) HOOK_CPed_AddGogglesModel()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        push esi
-        call CPed_AddGogglesModelCheck
-        add esp, 4
-
-        test al, al
-        jz skip
-        mov eax, [esp+0x10]
-        mov [esi+0x500], eax
-        mov byte ptr [eax], 1
-
-    skip:
-        jmp RETURN_CPed_AddGogglesModel
     }
     // clang-format on
 }
