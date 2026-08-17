@@ -758,6 +758,94 @@ static void __declspec(naked)   HOOK_CWeapon_Update()
     // clang-format on
 }
 
+/// Scales the collision impulse applied to vehicles when pushed by peds to make the displacement frame-rate independent.
+#define CALL_CPhysical__ApplyCollision_1    0x54BDB2
+#define CALL_CPhysical__ApplyCollision_2    0x54BF78
+#define CALL_CPhysical__ApplyCollision_3    0x54C23A
+#define CALL_CPhysical__ApplyCollision_4    0x54C435
+#define CALL_CPhysical__ApplyCollision_5    0x54D17E
+#define CALL_CPhysical__ApplyCollision_6    0x54D27E
+#define CALL_CPhysical__ApplyCollision_7    0x54D3FE
+#define CALL_CPhysical__ApplyCollision_8    0x54D4D2
+#define CALL_CPhysical__ApplyCollisionAlt_1 0x54C9FA
+#define CALL_CPhysical__ApplyCollisionAlt_2 0x54CAC2
+
+static bool __fastcall HOOK_CPhysical__ApplyCollision(CPhysicalSAInterface* pThis, void* /*edx*/, CEntitySAInterface* theEntity,
+                                                      CColPointSAInterface* pColPoint, float* pThisDamageIntensity, float* pEntityDamageIntensity)
+{
+    const CVector vecMoveThisBefore = pThis ? pThis->m_vecLinearVelocity : CVector{};
+    const CVector vecTurnThisBefore = pThis ? pThis->m_vecAngularVelocity : CVector{};
+
+    auto*   pPhysicalEntity = reinterpret_cast<CPhysicalSAInterface*>(theEntity);
+    CVector vecMoveEntityBefore{};
+    CVector vecTurnEntityBefore{};
+    if (pPhysicalEntity)
+    {
+        vecMoveEntityBefore = pPhysicalEntity->m_vecLinearVelocity;
+        vecTurnEntityBefore = pPhysicalEntity->m_vecAngularVelocity;
+    }
+
+    using ApplyCollisionFn = bool(__thiscall*)(CPhysicalSAInterface*, CEntitySAInterface*, CColPointSAInterface*, float*, float*);
+    const auto pfnApplyCollision = reinterpret_cast<ApplyCollisionFn>(0x548680);
+
+    const bool bResult = pfnApplyCollision(pThis, theEntity, pColPoint, pThisDamageIntensity, pEntityDamageIntensity);
+
+    if (bResult && theEntity && pThis)
+    {
+        // 2 = Vehicle, 3 = Ped (from CEntitySAInterface::nType bitfield)
+        const uint8 typeA = pThis->nType;
+        const uint8 typeB = theEntity->nType;
+
+        const float timeStepRatio = *(float*)0xB7CB5C / kOriginalTimeStep;
+
+        if (typeA == 2 && typeB == 3)
+        {
+            // pThis is the Vehicle: scale only vehicle velocities
+            pThis->m_vecLinearVelocity = vecMoveThisBefore + (pThis->m_vecLinearVelocity - vecMoveThisBefore) * timeStepRatio;
+            pThis->m_vecAngularVelocity = vecTurnThisBefore + (pThis->m_vecAngularVelocity - vecTurnThisBefore) * timeStepRatio;
+        }
+        else if (typeA == 3 && typeB == 2)
+        {
+            // theEntity is the Vehicle: scale only vehicle velocities
+            if (pPhysicalEntity)
+            {
+                pPhysicalEntity->m_vecLinearVelocity = vecMoveEntityBefore + (pPhysicalEntity->m_vecLinearVelocity - vecMoveEntityBefore) * timeStepRatio;
+                pPhysicalEntity->m_vecAngularVelocity = vecTurnEntityBefore + (pPhysicalEntity->m_vecAngularVelocity - vecTurnEntityBefore) * timeStepRatio;
+            }
+        }
+    }
+
+    return bResult;
+}
+
+static bool __fastcall HOOK_CPhysical__ApplyCollisionAlt(CPhysicalSAInterface* pThis, void* /*edx*/, CPhysicalSAInterface* pEntity,
+                                                         CColPointSAInterface* pColPoint, float* pDamageIntensity, CVector* pOutVecMoveSpeed,
+                                                         CVector* pOutVecTurnSpeed)
+{
+    const CVector vecMoveBefore = *pOutVecMoveSpeed;
+    const CVector vecTurnBefore = *pOutVecTurnSpeed;
+
+    using ApplyCollisionAltFn = bool(__thiscall*)(CPhysicalSAInterface*, CPhysicalSAInterface*, CColPointSAInterface*, float*, CVector*, CVector*);
+    const auto pfnApplyCollisionAlt = reinterpret_cast<ApplyCollisionAltFn>(0x544D50);
+
+    const bool bResult = pfnApplyCollisionAlt(pThis, pEntity, pColPoint, pDamageIntensity, pOutVecMoveSpeed, pOutVecTurnSpeed);
+
+    if (bResult && pEntity && pThis)
+    {
+        const uint8 entityType = pEntity->nType;
+        const uint8 thisType = pThis->nType;
+
+        if (thisType == 2 && entityType == 3)
+        {
+            const float timeStepRatio = *(float*)0xB7CB5C / kOriginalTimeStep;
+            *pOutVecMoveSpeed = vecMoveBefore + (*pOutVecMoveSpeed - vecMoveBefore) * timeStepRatio;
+            *pOutVecTurnSpeed = vecTurnBefore + (*pOutVecTurnSpeed - vecTurnBefore) * timeStepRatio;
+        }
+    }
+
+    return bResult;
+}
+
 #define HOOKPOS_CPhysical__ApplyAirResistance  0x544D29
 #define HOOKSIZE_CPhysical__ApplyAirResistance 5
 static const unsigned int     RETURN_CPhysical__ApplyAirResistance = 0x544D4D;
@@ -853,7 +941,11 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     // CCam::Process_FollowCar_SA
     MemSet((void*)0x524FD7, 0x90, 0x1B);
 
-    // Fixes slow boat movement on high FPS.
+    // Fixes fast vehicle steering on high FPS.
+    // GitHub Issue #2779
+    MemPut(0x6D4063, &kOriginalTimeStep);
+    MemPut(0x6D4096, &kOriginalTimeStep);
+
     // CVehicle::ProcessBoatControl
     MemPut(0x6DC23F, &kOriginalTimeStep);
 
@@ -888,4 +980,14 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CTaskSimpleSwim__ProcessEffectsBubbleFix);
 
     EZHookInstall(CWeapon_Update);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_1, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_2, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_3, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_4, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_5, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_6, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_7, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_8, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollisionAlt_1, (DWORD)HOOK_CPhysical__ApplyCollisionAlt);
+    HookInstallCall(CALL_CPhysical__ApplyCollisionAlt_2, (DWORD)HOOK_CPhysical__ApplyCollisionAlt);
 }
