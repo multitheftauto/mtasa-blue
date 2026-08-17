@@ -73,18 +73,18 @@ static void __declspec(naked)   HOOK_CTaskSimplePlayerOnFoot__MakeAbortable()
 // the object's Z translation matrix. This hook adds object matrix position to the edge height.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-static bool ProcessGrab(CEntitySAInterface* pEntity, float fEntityEdgeHeight, const CVector* pPedPosition)
+static bool ProcessGrab(CEntitySAInterface* entity, float entityEdgeHeight, const CVector* pedPosition)
 {
-    float edgeHeight = fEntityEdgeHeight;
-    if (pEntity && pEntity->nType == ENTITY_TYPE_OBJECT)
+    float edgeHeight = entityEdgeHeight;
+    if (entity && entity->nType == ENTITY_TYPE_OBJECT)
     {
-        if (pEntity->matrix)
-            edgeHeight = fEntityEdgeHeight + pEntity->matrix->vPos.fZ;
+        if (entity->matrix)
+            edgeHeight = entityEdgeHeight + entity->matrix->vPos.fZ;
         else
-            edgeHeight = fEntityEdgeHeight + pEntity->m_transform.m_translate.fZ;
+            edgeHeight = entityEdgeHeight + entity->m_transform.m_translate.fZ;
     }
 
-    return (pPedPosition && (edgeHeight - pPedPosition->fZ >= 1.4f));
+    return (pedPosition && (edgeHeight - pedPosition->fZ >= 1.4f));
 }
 
 #define HOOKPOS_CTaskComplexJump__CreateSubTask  0x67DABE
@@ -102,9 +102,9 @@ static void __declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
         // eax = pedPosition, esi = jumpTask (this->m_pSubTask)
         // [esi + 28] = entity, [esi + 16] = edgeHeight
         pushad
-        push    eax                     // pPedPosition
-        push    dword ptr [esi + 16]    // fEntityEdgeHeight
-        push    dword ptr [esi + 28]    // pEntity
+        push    eax                     // pedPosition
+        push    dword ptr [esi + 16]    // entityEdgeHeight
+        push    dword ptr [esi + 28]    // entity
         call    ProcessGrab
         add     esp, 12
         test    al, al
@@ -127,17 +127,17 @@ static void __declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
 // Handles player weapon state processing and synchronizing remote player firing/aiming tasks.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-static bool ProcessPlayerWeapon(CPedSAInterface* pPedInterface)
+static bool ProcessPlayerWeapon(CPedSAInterface* pedInterface)
 {
-    if (IsLocalPlayer(pPedInterface))
+    if (IsLocalPlayer(pedInterface))
         return true;
 
-    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pPedInterface);
-    CPlayerPed*            pPed = pPedClientEntity ? dynamic_cast<CPlayerPed*>(pPedClientEntity->pEntity) : nullptr;
-    if (pPed)
+    SClientEntity<CPedSA>* pedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pedInterface);
+    CPlayerPed*            ped = pedClientEntity ? dynamic_cast<CPlayerPed*>(pedClientEntity->pEntity) : nullptr;
+    if (ped)
     {
-        CRemoteDataStorageSA* pData = CRemoteDataSA::GetRemoteDataStorage(pPed);
-        if (pData && pData->ProcessPlayerWeapon())
+        CRemoteDataStorageSA* remoteData = CRemoteDataSA::GetRemoteDataStorage(ped);
+        if (remoteData && remoteData->ProcessPlayerWeapon())
         {
             return true;
         }
@@ -157,7 +157,7 @@ static void __declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon()
     __asm
     {
         pushad
-        push    dword ptr [esp + 32 + 4]    // playa (arg1)
+        push    dword ptr [esp + 32 + 4]    // pedInterface (arg1)
         call    ProcessPlayerWeapon
         add     esp, 4
         test    al, al
@@ -179,7 +179,7 @@ static void __declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon()
 //
 // CTaskSimplePlayerOnFire::ProcessPed
 //
-// Passes the fire's creator entity (pPed->pFire->pCreator) to the damage event instead of NULL,
+// Passes the fire's creator entity (ped->pFire->pCreator) to the damage event instead of NULL,
 // allowing kill/damage attribution to function properly when players catch fire.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -197,7 +197,7 @@ static void __declspec(naked) HOOK_CTaskSimplePlayerOnFire_ProcessPed()
         push    3
         push    0x25
         push    edx
-        mov     eax, [edi + 0x730]      // eax = pPed->pFire
+        mov     eax, [edi + 0x730]      // eax = ped->pFire
         mov     eax, [eax + 0x14]       // eax = pFire->pCreator
         push    eax
         jmp     RETURN_CTaskSimplePlayerOnFire_ProcessPed
@@ -213,13 +213,13 @@ static void __declspec(naked) HOOK_CTaskSimplePlayerOnFire_ProcessPed()
 // with the climbing ped via setElementCollidableWith.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-static bool CTaskSimpleClimb_ShouldSkipEntity(CPedSAInterface* pPed, CEntitySAInterface* pTarget, bool bTargetUsesCollision)
+static bool CTaskSimpleClimb_ShouldSkipEntity(CPedSAInterface* ped, CEntitySAInterface* target, bool targetUsesCollision)
 {
-    if (!bTargetUsesCollision)
+    if (!targetUsesCollision)
         return true;
 
-    if (pPed && pTarget && CMultiplayerSA::m_pProcessCollisionHandler)
-        return !CMultiplayerSA::m_pProcessCollisionHandler(pPed, pTarget);
+    if (ped && target && CMultiplayerSA::m_pProcessCollisionHandler)
+        return !CMultiplayerSA::m_pProcessCollisionHandler(ped, target);
 
     return false;
 }
@@ -243,9 +243,9 @@ static void __declspec(naked) HOOK_CTaskSimpleClimb_ScanToGrabSectorList()
 
         pushad
         movzx   eax, al
-        push    eax                     // bTargetUsesCollision
-        push    esi                     // pTarget
-        push    ebx                     // pPed
+        push    eax                     // targetUsesCollision
+        push    esi                     // target
+        push    ebx                     // ped
         call    CTaskSimpleClimb_ShouldSkipEntity
         add     esp, 12
         test    al, al
@@ -268,16 +268,16 @@ static void __declspec(naked) HOOK_CTaskSimpleClimb_ScanToGrabSectorList()
 // Dispatches to custom drive-by animation handler to allow override/custom animations.
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-static void CTaskSimpleGangDriveBy_ProcessPed(DWORD pProcessedGangDriveBySimpleTask)
+static void CTaskSimpleGangDriveBy_ProcessPed(DWORD gangDriveByTask)
 {
-    if (!pProcessedGangDriveBySimpleTask)
+    if (!gangDriveByTask)
         return;
 
-    auto*        pRequiredAnim = reinterpret_cast<AnimationId*>(pProcessedGangDriveBySimpleTask + 0x24);
-    AssocGroupId requiredAnimGroup = *reinterpret_cast<AssocGroupId*>(pProcessedGangDriveBySimpleTask + 0x28);
+    auto*        requiredAnim = reinterpret_cast<AnimationId*>(gangDriveByTask + 0x24);
+    AssocGroupId requiredAnimGroup = *reinterpret_cast<AssocGroupId*>(gangDriveByTask + 0x28);
 
     if (CMultiplayerSA::m_pDrivebyAnimationHandler != nullptr)
-        *pRequiredAnim = CMultiplayerSA::m_pDrivebyAnimationHandler(*pRequiredAnim, requiredAnimGroup);
+        *requiredAnim = CMultiplayerSA::m_pDrivebyAnimationHandler(*requiredAnim, requiredAnimGroup);
 }
 
 #define HOOKPOS_CTaskSimpleGangDriveBy__ProcessPed  0x62D5A7
