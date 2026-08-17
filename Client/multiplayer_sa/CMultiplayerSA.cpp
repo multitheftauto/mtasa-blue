@@ -34,7 +34,6 @@ extern CGame* pGameInterface;
 #define HOOKPOS_CStreaming_Update_Caller                 0x53BF09
 #define HOOKPOS_CHud_Draw_Caller                         0x53E4FA
 #define HOOKPOS_CRunningScript_Process                   0x469F00
-#define HOOKPOS_CExplosion_AddExplosion                  0x736A50
 #define HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic 0x6FF35B
 #define HOOKPOS_Trailer_BreakTowLink                     0x6E0027
 #define HOOKPOS_CRadar__DrawRadarGangOverlay             0x586650
@@ -139,8 +138,6 @@ DWORD RETURN_CWorld_SetWorldOnFire = 0x56B989;
 DWORD RETURN_CTaskSimplePlayerOnFire_ProcessPed = 0x6336E0;
 #define HOOKPOS_CFire_ProcessFire 0x53AC1A
 DWORD RETURN_CFire_ProcessFire = 0x53AC1F;
-#define HOOKPOS_CExplosion_Update 0x7377D3
-DWORD RETURN_CExplosion_Update = 0x7377D8;
 #define HOOKPOS_CWeapon_FireAreaEffect 0x73EBFE
 DWORD RETURN_CWeapon_FireAreaEffect = 0x73EC03;
 
@@ -319,7 +316,6 @@ bool          bHideRadar;
 bool          bHasProcessedScript;
 float         fX, fY, fZ;
 DWORD         RoadSignFixTemp;
-bool          m_bExplosionsDisabled;
 float         fGlobalGravity = 0.008f;
 float         fLocalPlayerGravity = 0.008f;
 float         fLocalPlayerCameraRotation = 0.0f;
@@ -405,7 +401,6 @@ ProjectileHandler*                         m_pProjectileHandler = NULL;
 ProjectileStopHandler*                     m_pProjectileStopHandler = NULL;
 ProcessCamHandler*                         m_pProcessCamHandler = NULL;
 ChokingHandler*                            m_pChokingHandler = NULL;
-ExplosionHandler*                          m_pExplosionHandler = NULL;
 BreakTowLinkHandler*                       m_pBreakTowLinkHandler = NULL;
 DrawRadarAreasHandler*                     m_pDrawRadarAreasHandler = NULL;
 Render3DStuffHandler*                      m_pRender3DStuffHandler = NULL;
@@ -434,7 +429,6 @@ void HOOK_FindPlayerHeading();
 void HOOK_CStreaming_Update_Caller();
 void HOOK_CHud_Draw_Caller();
 void HOOK_CRunningScript_Process();
-void HOOK_CExplosion_AddExplosion();
 void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
 void HOOK_Trailer_BreakTowLink();
 void HOOK_CRadar__DrawRadarGangOverlay();
@@ -470,7 +464,6 @@ void HOOK_ApplyCarBlowHop();
 void HOOK_CWorld_SetWorldOnFire();
 void HOOK_CTaskSimplePlayerOnFire_ProcessPed();
 void HOOK_CFire_ProcessFire();
-void HOOK_CExplosion_Update();
 void HOOK_CWeapon_FireAreaEffect();
 void HOOK_CGame_Process();
 void HOOK_CWeather_Update();
@@ -587,9 +580,8 @@ CMultiplayerSA::CMultiplayerSA()
     SetInitialVirtualProtect();
 
     CRemoteDataSA::Init();
-
-    m_bExplosionsDisabled = false;
-    m_pExplosionHandler = NULL;
+    m_bEnabledLODSystem = true;
+    m_bEnabledAltWaterOrder = false;
     m_pBreakTowLinkHandler = NULL;
     m_pDrawRadarAreasHandler = NULL;
     m_pDamageHandler = NULL;
@@ -642,7 +634,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CStreaming_Update_Caller, (DWORD)HOOK_CStreaming_Update_Caller, 7);
     HookInstall(HOOKPOS_CHud_Draw_Caller, (DWORD)HOOK_CHud_Draw_Caller, 10);
     HookInstall(HOOKPOS_CRunningScript_Process, (DWORD)HOOK_CRunningScript_Process, 6);
-    HookInstall(HOOKPOS_CExplosion_AddExplosion, (DWORD)HOOK_CExplosion_AddExplosion, 6);
     HookInstall(HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic, (DWORD)HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic, 6);
     HookInstall(HOOKPOS_Trailer_BreakTowLink, (DWORD)HOOK_Trailer_BreakTowLink, 6);
     HookInstall(HOOKPOS_CRadar__DrawRadarGangOverlay, (DWORD)HOOK_CRadar__DrawRadarGangOverlay, 6);
@@ -676,7 +667,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWorld_SetWorldOnFire, (DWORD)HOOK_CWorld_SetWorldOnFire, 5);
     HookInstall(HOOKPOS_CTaskSimplePlayerOnFire_ProcessPed, (DWORD)HOOK_CTaskSimplePlayerOnFire_ProcessPed, 5);
     HookInstall(HOOKPOS_CFire_ProcessFire, (DWORD)HOOK_CFire_ProcessFire, 5);
-    HookInstall(HOOKPOS_CExplosion_Update, (DWORD)HOOK_CExplosion_Update, 5);
     HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
     HookInstallCall(CALL_CWeather_Update_FromCGameProcess, (DWORD)HOOK_CWeather_Update);
@@ -2597,21 +2587,6 @@ bool CMultiplayerSA::ResetIllumination()
     return true;
 }
 
-bool CMultiplayerSA::GetExplosionsDisabled()
-{
-    return m_bExplosionsDisabled;
-}
-
-void CMultiplayerSA::DisableExplosions(bool bDisabled)
-{
-    m_bExplosionsDisabled = bDisabled;
-}
-
-void CMultiplayerSA::SetExplosionHandler(ExplosionHandler* pExplosionHandler)
-{
-    m_pExplosionHandler = pExplosionHandler;
-}
-
 void CMultiplayerSA::SetProjectileHandler(ProjectileHandler* pProjectileHandler)
 {
     m_pProjectileHandler = pProjectileHandler;
@@ -3181,126 +3156,6 @@ static void __declspec(naked) HOOK_Trailer_BreakTowLink()
         mov     ecx, HOOKPOS_Trailer_BreakTowLink
         add     ecx, 6
         jmp     ecx
-    }
-    // clang-format on
-}
-
-eExplosionType explosionType;
-CVector        vecExplosionLocation;
-DWORD          explosionCreator = 0;
-DWORD          explosionEntity = 0;
-
-bool CallExplosionHandler()
-{
-    // Find out who the creator is
-    CEntity*            pExplosionCreator = NULL;
-    CEntity*            pExplodingEntity = NULL;
-    CEntitySAInterface* pInterface = (CEntitySAInterface*)explosionCreator;
-    CEntitySAInterface* pExplodingEntityInterface = (CEntitySAInterface*)explosionEntity;
-
-    if (pInterface)
-    {
-        pExplosionCreator = pGameInterface->GetPools()->GetEntity((DWORD*)pInterface);
-    }
-
-    if (pExplodingEntityInterface)
-    {
-        pExplodingEntity = pGameInterface->GetPools()->GetEntity((DWORD*)pExplodingEntityInterface);
-    }
-
-    return m_pExplosionHandler(pExplodingEntity, pExplosionCreator, vecExplosionLocation, explosionType);
-}
-
-static void __declspec(naked) HOOK_CExplosion_AddExplosion()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        // Check if explosions are disabled.
-        push        eax
-        mov         al, m_bExplosionsDisabled
-        test        al, al
-        pop         eax
-        jz          checkexplosionhandler
-
-        // If they are, just return now
-        retn
-
-        // Check the explosion handler. So we can call it if it exists. Jump over the explosion
-        // handler part if we have none
-        checkexplosionhandler:
-        push        eax
-        mov         eax, m_pExplosionHandler
-        test        eax, eax
-        pop         eax
-        jz          noexplosionhandler
-
-        // Extract arguments....
-        push    esi
-        push    edi
-
-        mov     esi, [esp+12]
-        mov     explosionEntity, esi
-
-        mov     esi, [esp+16]
-        mov     explosionCreator, esi
-
-        mov     esi, [esp+20]
-        mov     explosionType, esi
-
-        lea     edi, vecExplosionLocation
-        mov     esi, esp
-        add     esi, 24 // 3 DWORDS and RETURN address and 2 STORED REGISTERS
-        movsd
-        movsd
-        movsd
-
-        pop     edi
-        pop     esi
-
-        // Store registers for calling this handler
-        pushad
-    }
-    // clang-format on
-
-    // Call the explosion handler
-    if (!CallExplosionHandler())
-    {
-        // clang-format off
-        __asm
-        {
-            popad
-            retn // if they return false from the handler, they don't want the explosion to show
-        }
-        // clang-format on
-    }
-    else
-    {
-        // clang-format off
-        __asm
-        {
-            popad
-        }
-        // clang-format on
-    }
-
-    // clang-format off
-    __asm
-    {
-        noexplosionhandler:
-
-        // Replaced code
-        sub     esp, 0x1C
-        push    ebx
-        push    ebp
-        push    esi
-
-        // Return to the calling function and resume (do the explosion)
-        mov     edx, HOOKPOS_CExplosion_AddExplosion
-        add     edx, 6
-        jmp     edx
     }
     // clang-format on
 }
@@ -5882,26 +5737,6 @@ static void __declspec(naked) HOOK_CFire_ProcessFire()
         mov [eax+0x14], ecx
 fail:
         jmp RETURN_CFire_ProcessFire
-    }
-    // clang-format on
-}
-
-static void __declspec(naked) HOOK_CExplosion_Update()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // Set the new fire's creator to the explosion's creator
-    // clang-format off
-    __asm
-    {
-        mov eax, 0x53A450       // CCreepingFire::TryToStartFireAtCoors
-        call eax
-        test eax, eax
-        jz fail
-        mov ecx, [esi-0x18]
-        mov [eax+0x14], ecx
-fail:
-        jmp RETURN_CExplosion_Update
     }
     // clang-format on
 }

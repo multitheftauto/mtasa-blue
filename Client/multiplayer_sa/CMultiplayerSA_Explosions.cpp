@@ -9,6 +9,133 @@
  *****************************************************************************/
 #include "StdInc.h"
 
+bool              CMultiplayerSA::m_bExplosionsDisabled = false;
+ExplosionHandler* CMultiplayerSA::m_pExplosionHandler = nullptr;
+
+bool CMultiplayerSA::GetExplosionsDisabled()
+{
+    return m_bExplosionsDisabled;
+}
+
+void CMultiplayerSA::DisableExplosions(bool bDisabled)
+{
+    m_bExplosionsDisabled = bDisabled;
+}
+
+void CMultiplayerSA::SetExplosionHandler(ExplosionHandler* pExplosionHandler)
+{
+    m_pExplosionHandler = pExplosionHandler;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CExplosion::AddExplosion
+//
+// Intercept explosions to trigger MTA events and allow custom explosion handling
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static bool CallExplosionHandler(CEntitySAInterface* explodingEntityInterface, CEntitySAInterface* explosionCreatorInterface, const CVector& location,
+                                 eExplosionType explosionType)
+{
+    if (!CMultiplayerSA::m_pExplosionHandler)
+        return true;
+
+    CEntity* explosionCreator = nullptr;
+    CEntity* explodingEntity = nullptr;
+
+    if (explosionCreatorInterface)
+        explosionCreator = pGameInterface->GetPools()->GetEntity((DWORD*)explosionCreatorInterface);
+
+    if (explodingEntityInterface)
+        explodingEntity = pGameInterface->GetPools()->GetEntity((DWORD*)explodingEntityInterface);
+
+    return CMultiplayerSA::m_pExplosionHandler(explodingEntity, explosionCreator, location, explosionType);
+}
+
+#define HOOKPOS_CExplosion_AddExplosion  0x736A50
+#define HOOKSIZE_CExplosion_AddExplosion 6
+static constexpr std::uintptr_t RETURN_CExplosion_AddExplosion = 0x736A56;
+
+static void __declspec(naked) HOOK_CExplosion_AddExplosion()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // Check if explosions are globally disabled
+        cmp     CMultiplayerSA::m_bExplosionsDisabled, 0
+        jz      check_handler
+        xor     al, al
+        retn
+
+    check_handler:
+        cmp     CMultiplayerSA::m_pExplosionHandler, 0
+        jz      proceed_with_explosion
+
+        // Pass arguments directly from stack to CallExplosionHandler:
+        // [esp+4] = explodingEntity (CEntitySAInterface*)
+        // [esp+8] = explosionCreator (CEntitySAInterface*)
+        // [esp+12] = explosionType (eExplosionType)
+        // [esp+16..24] = location (float x, y, z)
+        push    dword ptr [esp + 12]        // explosionType
+        lea     eax, [esp + 16 + 4]          // &location
+        push    eax
+        push    dword ptr [esp + 8 + 8]      // explosionCreator
+        push    dword ptr [esp + 4 + 12]     // explodingEntity
+        call    CallExplosionHandler
+        add     esp, 16
+
+        test    al, al
+        jnz     proceed_with_explosion
+
+        // Cancelled by explosion handler
+        xor     al, al
+        retn
+
+    proceed_with_explosion:
+        // Replaced GTA:SA instructions (6 bytes)
+        sub     esp, 1Ch
+        push    ebx
+        push    ebp
+        push    esi
+        jmp     RETURN_CExplosion_AddExplosion
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CExplosion::Update
+//
+// Set the creeping fire's creator to the explosion creator
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CExplosion_Update  0x7377D3
+#define HOOKSIZE_CExplosion_Update 5
+static constexpr std::uintptr_t RETURN_CExplosion_Update = 0x7377D8;
+
+static void __declspec(naked) HOOK_CExplosion_Update()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // Set the new creeping fire's creator to the explosion's creator
+    // clang-format off
+    __asm
+    {
+        mov     eax, 0x53A450       // CCreepingFire::TryToStartFireAtCoors
+        call    eax
+        test    eax, eax
+        jz      fail
+        mov     ecx, [esi - 18h]
+        mov     [eax + 14h], ecx
+
+    fail:
+        jmp     RETURN_CExplosion_Update
+    }
+    // clang-format on
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CWorld::TriggerExplosion
@@ -83,4 +210,6 @@ void CMultiplayerSA::InitHooks_Explosions()
 {
     EZHookInstall(CWorld_TriggerExplosion);
     EZHookInstall(CWorld_TriggerExplosionSectorList);
+    EZHookInstall(CExplosion_AddExplosion);
+    EZHookInstall(CExplosion_Update);
 }
