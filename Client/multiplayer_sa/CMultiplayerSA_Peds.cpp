@@ -90,36 +90,36 @@ static void __declspec(naked) HOOK_CPed_IsPlayer()
 // Synchronize and return the weapon skill stat (Poor, Standard, Pro) for remote players
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-static bool GetRemotePedWeaponSkill(CPedSAInterface* pPedInterface, eWeaponType weaponType, eWeaponSkill& outSkill)
+static bool GetRemotePedWeaponSkill(CPedSAInterface* pedInterface, eWeaponType weaponType, eWeaponSkill& outSkill)
 {
-    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pPedInterface);
-    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
-    if (!pPed)
+    SClientEntity<CPedSA>* pedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pedInterface);
+    CPed*                  ped = pedClientEntity ? pedClientEntity->pEntity : nullptr;
+    if (!ped)
         return false;
 
-    CPed* pLocalPlayerPed = pGameInterface->GetPools()->GetPedFromRef(1);
-    if (pPed == pLocalPlayerPed)
+    CPed* localPlayerPed = pGameInterface->GetPools()->GetPedFromRef(1);
+    if (ped == localPlayerPed)
         return false;
 
     if (weaponType < WEAPONTYPE_PISTOL || weaponType > WEAPONTYPE_TEC9)
         return false;
 
-    auto* pPlayerPed = dynamic_cast<CPlayerPed*>(pPed);
-    if (!pPlayerPed)
+    auto* playerPed = dynamic_cast<CPlayerPed*>(ped);
+    if (!playerPed)
         return false;
 
-    CRemoteDataStorageSA* pData = CRemoteDataSA::GetRemoteDataStorage(pPlayerPed);
-    if (!pData)
+    CRemoteDataStorageSA* remoteData = CRemoteDataSA::GetRemoteDataStorage(playerPed);
+    if (!remoteData)
         return false;
 
-    float        fStat = pData->m_stats.StatTypesFloat[pGameInterface->GetStats()->GetSkillStatIndex(weaponType)];
-    CWeaponInfo* pPoor = pGameInterface->GetWeaponInfo(weaponType, WEAPONSKILL_POOR);
-    CWeaponInfo* pStd = pGameInterface->GetWeaponInfo(weaponType, WEAPONSKILL_STD);
-    CWeaponInfo* pPro = pGameInterface->GetWeaponInfo(weaponType, WEAPONSKILL_PRO);
+    float        stat = remoteData->m_stats.StatTypesFloat[pGameInterface->GetStats()->GetSkillStatIndex(weaponType)];
+    CWeaponInfo* poor = pGameInterface->GetWeaponInfo(weaponType, WEAPONSKILL_POOR);
+    CWeaponInfo* std = pGameInterface->GetWeaponInfo(weaponType, WEAPONSKILL_STD);
+    CWeaponInfo* pro = pGameInterface->GetWeaponInfo(weaponType, WEAPONSKILL_PRO);
 
-    if (fStat >= pPro->GetRequiredStatLevel())
+    if (stat >= pro->GetRequiredStatLevel())
         outSkill = WEAPONSKILL_PRO;
-    else if (fStat >= pStd->GetRequiredStatLevel())
+    else if (stat >= std->GetRequiredStatLevel())
         outSkill = WEAPONSKILL_STD;
     else
         outSkill = WEAPONSKILL_POOR;
@@ -143,7 +143,7 @@ static void __declspec(naked) HOOK_CPed_GetWeaponSkill()
         lea     eax, [esp]              // &outSkill
         push    eax
         push    dword ptr [esp + 8 + 4] // weaponType (arg1)
-        push    ecx                     // pPedInterface (this)
+        push    ecx                     // pedInterface (this)
         call    GetRemotePedWeaponSkill
         add     esp, 12
         test    al, al
@@ -171,11 +171,11 @@ static void __declspec(naked) HOOK_CPed_GetWeaponSkill()
 // Only apply the full-screen goggles visual effect if the ped putting them on is the local player
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-static bool CPed_AddGogglesModelCheck(void* pPedInterface)
+static bool CPed_AddGogglesModelCheck(void* pedInterface)
 {
-    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pPedInterface);
-    CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
-    return pPed == pGameInterface->GetPools()->GetPedFromRef(1);
+    SClientEntity<CPedSA>* pedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pedInterface);
+    CPed*                  ped = pedClientEntity ? pedClientEntity->pEntity : nullptr;
+    return ped == pGameInterface->GetPools()->GetPedFromRef(1);
 }
 
 #define HOOKPOS_CPed_AddGogglesModel  0x5E3ACB
