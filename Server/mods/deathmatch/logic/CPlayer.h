@@ -354,6 +354,15 @@ public:
     uint                   m_uiD3d9Size;
     SString                m_strD3d9Md5;
     SString                m_strD3d9Sha256;
+    bool                   m_bCPUInfoReceived = false;
+    bool                   m_bAllowCPUInfo = false;
+    SString                m_strCPUName;
+    unsigned int           m_uiCPUMaxClockSpeedMHz = 0;
+    unsigned int           m_uiCPUCores = 0;
+    unsigned int           m_uiCPUThreads = 0;
+    unsigned int           m_uiCPUL1CacheKB = 0;
+    unsigned int           m_uiCPUL2CacheKB = 0;
+    unsigned int           m_uiCPUL3CacheKB = 0;
 
     // Per-player token bucket throttling for onPlayerResourceStart acks. Genuine duplicates
     // consume a token; race-condition acks (resource stopped/restarted before the ack arrived)

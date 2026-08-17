@@ -221,6 +221,7 @@ void CSettings::ResetGuiPointers()
     m_pCheckBoxDeviceSelectionDialog = NULL;
     m_pCheckBoxShowUnsafeResolutions = NULL;
     m_pCheckBoxAllowScreenUpload = NULL;
+    m_pCheckBoxAllowCPUInfo = NULL;
     m_pCheckBoxAllowExternalSounds = NULL;
     m_pCheckBoxCustomizedSAFiles = NULL;
     m_pCheckBoxAllowDiscordRPC = NULL;
@@ -499,6 +500,7 @@ void CSettings::CreateGUI()
     m_dwFrameCount = 0;
     m_bShownVolumetricShadowsWarning = false;
     m_bShownAllowScreenUploadMessage = false;
+    m_bShownAllowCPUInfoMessage = false;
     CVector2D vecTemp;
     CVector2D vecSize;
 
@@ -872,6 +874,11 @@ void CSettings::CreateGUI()
     m_pCheckBoxAllowScreenUpload->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
     m_pCheckBoxAllowScreenUpload->GetPosition(vecTemp, false);
     m_pCheckBoxAllowScreenUpload->AutoSize(NULL, 20.0f);
+
+    m_pCheckBoxAllowCPUInfo = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow CPU info"), true));
+    m_pCheckBoxAllowCPUInfo->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
+    m_pCheckBoxAllowCPUInfo->GetPosition(vecTemp, false);
+    m_pCheckBoxAllowCPUInfo->AutoSize(NULL, 20.0f);
 
     m_pCheckBoxAllowExternalSounds = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabMultiplayer, _("Allow external sounds"), true));
     m_pCheckBoxAllowExternalSounds->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 20.0f));
@@ -1972,6 +1979,7 @@ void CSettings::CreateGUI()
     m_pComboFxQuality->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnFxQualityChanged, this));
     m_pCheckBoxVolumetricShadows->SetClickHandler(GUI_CALLBACK(&CSettings::OnVolumetricShadowsClick, this));
     m_pCheckBoxAllowScreenUpload->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowScreenUploadClick, this));
+    m_pCheckBoxAllowCPUInfo->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowCPUInfoClick, this));
     m_pCheckBoxAllowExternalSounds->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowExternalSoundsClick, this));
     m_pCheckBoxAllowDiscordRPC->SetClickHandler(GUI_CALLBACK(&CSettings::OnAllowDiscordRPC, this));
     m_pCheckBoxCustomizedSAFiles->SetClickHandler(GUI_CALLBACK(&CSettings::OnCustomizedSAFilesClick, this));
@@ -3909,6 +3917,10 @@ void CSettings::LoadData()
     CVARS_GET("allow_screen_upload", bAllowScreenUploadEnabled);
     m_pCheckBoxAllowScreenUpload->SetSelected(bAllowScreenUploadEnabled);
 
+    bool bAllowCPUInfoEnabled;
+    CVARS_GET("allow_cpu_info", bAllowCPUInfoEnabled);
+    m_pCheckBoxAllowCPUInfo->SetSelected(bAllowCPUInfoEnabled);
+
     // Allow external sounds
     bool bAllowExternalSoundsEnabled;
     CVARS_GET("allow_external_sounds", bAllowExternalSoundsEnabled);
@@ -4399,6 +4411,9 @@ void CSettings::SaveData()
     // Allow screen upload
     bool bAllowScreenUploadEnabled = m_pCheckBoxAllowScreenUpload->GetSelected();
     CVARS_SET("allow_screen_upload", bAllowScreenUploadEnabled);
+
+    bool bAllowCPUInfoEnabled = m_pCheckBoxAllowCPUInfo->GetSelected();
+    CVARS_SET("allow_cpu_info", bAllowCPUInfoEnabled);
 
     // Allow external sounds
     bool bAllowExternalSoundsEnabled = m_pCheckBoxAllowExternalSounds->GetSelected();
@@ -5660,6 +5675,23 @@ bool CSettings::OnAllowScreenUploadClick(CGUIElement* pElement)
             _("Screen upload is required by some servers for anti-cheat purposes."
               "\n\n(The chat box and GUI is excluded from the upload)\n");
         CCore::GetSingleton().ShowMessageBox(_("SCREEN UPLOAD INFORMATION"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
+    }
+    return true;
+}
+
+//
+// AllowCPUInfo
+//
+bool CSettings::OnAllowCPUInfoClick(CGUIElement* pElement)
+{
+    if (!m_pCheckBoxAllowCPUInfo->GetSelected() && !m_bShownAllowCPUInfoMessage)
+    {
+        m_bShownAllowCPUInfoMessage = true;
+        SString strMessage;
+        strMessage +=
+            _("Some servers use CPU information to adjust quality or identify clients."
+              "\n\nDisabling this setting may prevent you from joining those servers.\n");
+        CCore::GetSingleton().ShowMessageBox(_("CPU INFO"), strMessage, MB_BUTTON_OK | MB_ICON_INFO);
     }
     return true;
 }

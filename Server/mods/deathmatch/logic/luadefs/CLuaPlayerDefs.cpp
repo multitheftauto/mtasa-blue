@@ -15,6 +15,7 @@
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
 #include "CKeyBinds.h"
+#include "lua/CLuaFunctionParser.h"
 
 void CLuaPlayerDefs::LoadFunctions()
 {
@@ -46,6 +47,7 @@ void CLuaPlayerDefs::LoadFunctions()
         {"getPlayerAccount", GetPlayerAccount},
         {"getPlayerVersion", GetPlayerVersion},
         {"getPlayerACInfo", GetPlayerACInfo},
+        {"getPlayerCPUInfo", ArgumentParser<GetPlayerCPUInfo>},
         {"resendPlayerModInfo", ResendPlayerModInfo},
         {"resendPlayerACInfo", ResendPlayerACInfo},
         {"getPlayerScriptDebugLevel", ArgumentParser<GetPlayerScriptDebugLevel>},
@@ -176,6 +178,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getMoney", "getPlayerMoney");
     lua_classfunction(luaVM, "getAnnounceValue", "getPlayerAnnounceValue");
     lua_classfunction(luaVM, "getACInfo", "getPlayerACInfo");
+    lua_classfunction(luaVM, "getCPUInfo", "getPlayerCPUInfo");
     lua_classfunction(luaVM, "getCameraInterior", "getCameraInterior");
     lua_classfunction(luaVM, "getCameraMatrix", "getCameraMatrix");
     lua_classfunction(luaVM, "getCameraTarget", "getCameraTarget");
@@ -186,6 +189,7 @@ void CLuaPlayerDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "cameraMatrix", "setCameraMatrix", "getCameraMatrix");
     lua_classvariable(luaVM, "cameraTarget", "setCameraTarget", "getCameraTarget");
     lua_classvariable(luaVM, "ACInfo", NULL, "getPlayerACInfo");
+    lua_classvariable(luaVM, "CPUInfo", NULL, "getPlayerCPUInfo");
     lua_classvariable(luaVM, "voiceBroadcastTo", "setPlayerVoiceBroadcastTo", NULL);
     lua_classvariable(luaVM, "voiceIgnoreFrom", "setPlayerVoiceIgnoreFrom", NULL);
     lua_classvariable(luaVM, "money", "setPlayerMoney", "getPlayerMoney");
@@ -495,6 +499,36 @@ int CLuaPlayerDefs::GetPlayerACInfo(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<CLuaArguments, bool> CLuaPlayerDefs::GetPlayerCPUInfo(CPlayer* const player)
+{
+    if (!player->m_bCPUInfoReceived)
+        return false;
+
+    CLuaArguments table;
+    table.PushString("AllowCPUInfo");
+    table.PushBoolean(player->m_bAllowCPUInfo);
+
+    if (player->m_bAllowCPUInfo)
+    {
+        table.PushString("Name");
+        table.PushString(player->m_strCPUName);
+        table.PushString("MaxClockSpeedMHz");
+        table.PushNumber(player->m_uiCPUMaxClockSpeedMHz);
+        table.PushString("Cores");
+        table.PushNumber(player->m_uiCPUCores);
+        table.PushString("Threads");
+        table.PushNumber(player->m_uiCPUThreads);
+        table.PushString("L1CacheKB");
+        table.PushNumber(player->m_uiCPUL1CacheKB);
+        table.PushString("L2CacheKB");
+        table.PushNumber(player->m_uiCPUL2CacheKB);
+        table.PushString("L3CacheKB");
+        table.PushNumber(player->m_uiCPUL3CacheKB);
+    }
+
+    return table;
 }
 
 int CLuaPlayerDefs::GetPlayerWantedLevel(lua_State* luaVM)
