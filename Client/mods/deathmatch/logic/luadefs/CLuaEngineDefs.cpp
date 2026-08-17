@@ -2014,9 +2014,9 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (modelId >= g_pGame->GetBaseIDforTXD())
+        if (modelId >= g_pGame->GetBaseIDforCOL())
         {
-            argStream.SetCustomError(SString("Expected model ID in range [0-%u] at argument 1", g_pGame->GetBaseIDforTXD() - 1));
+            argStream.SetCustomError(SString("Expected model ID in range [0-%u] at argument 1", g_pGame->GetBaseIDforCOL() - 1));
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
@@ -2045,9 +2045,9 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (modelId > g_pGame->GetBaseIDforTXD() - 1)
+        if (modelId > g_pGame->GetBaseIDforCOL() - 1)
         {
-            argStream.SetCustomError(SString("Expected model ID in range [0-%u] at argument 1", g_pGame->GetBaseIDforTXD() - 1));
+            argStream.SetCustomError(SString("Expected model ID in range [0-%u] at argument 1", g_pGame->GetBaseIDforCOL() - 1));
             return luaL_error(luaVM, argStream.GetFullErrorMessage());
         }
 
