@@ -216,6 +216,17 @@ void CGUI_Impl::SetBidiEnabled(bool bEnabled)
     m_pSystem->SetBidiEnabled(bEnabled);
 }
 
+SString CGUI_Impl::BidifyText(const char* szText)
+{
+    if (!szText || szText[0] == '\0')
+        return SString();
+
+    // Reuse CEGUI minibidi (UAX #9 + Arabic/Persian shaping) so DX chat
+    // matches GUI editboxes for mixed RTL/LTR strings.
+    const CEGUI::String bidified = GetUTFString(szText).bidify();
+    return SString(bidified.c_str());
+}
+
 void CGUI_Impl::SubscribeToMouseEvents()
 {
     // Mouse events
