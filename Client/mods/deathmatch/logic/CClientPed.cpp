@@ -3418,6 +3418,13 @@ void CClientPed::SetCurrentRotation(float fRotation, bool bIncludeTarget)
     CVector vecRotation = m_Matrix.GetRotation();
     vecRotation.fZ = fRotation;
     m_Matrix.SetRotation(vecRotation);
+
+    if (IsFrozen())
+    {
+        m_matFrozen.SetRotation(vecRotation);
+        if (m_pPlayerPed)
+            m_pPlayerPed->SetMatrix(&m_matFrozen);
+    }
 }
 
 void CClientPed::SetTargetRotation(float fRotation)
