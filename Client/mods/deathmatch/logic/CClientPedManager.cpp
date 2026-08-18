@@ -106,8 +106,8 @@ void CClientPedManager::RestreamPeds(unsigned short usModel)
     {
         pPed = *iter;
 
-        // Streamed in and same vehicle ID?
-        if (pPed->IsStreamedIn() && pPed->GetModel() == usModel)
+        // Streamed in (or the local player, whose m_bStreamedIn never gets set, see CLuaElementDefs::IsElementStreamedIn) and same model ID?
+        if ((pPed->IsStreamedIn() || pPed->IsLocalPlayer()) && pPed->GetModel() == usModel)
         {
             // Stream it out for a while until streamed decides to stream it
             // back in eventually
@@ -128,8 +128,8 @@ void CClientPedManager::RestreamAllPeds()
 {
     for (auto& pPed : m_List)
     {
-        // Streamed in and same vehicle ID?
-        if (pPed->IsStreamedIn())
+        // Streamed in (or the local player - see RestreamPeds above)?
+        if (pPed->IsStreamedIn() || pPed->IsLocalPlayer())
         {
             // Stream it out for a while until streamed decides to stream it
             // back in eventually
