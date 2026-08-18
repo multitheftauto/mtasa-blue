@@ -719,6 +719,16 @@ bool CStaticFunctionDefinitions::GetElementAlpha(CClientEntity& Entity, unsigned
             ucAlpha = Object.GetAlpha();
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            ucAlpha = static_cast<CClientBuilding&>(Entity).GetAlpha();
+            break;
+        }
+        case CCLIENTPROJECTILE:
+        {
+            ucAlpha = static_cast<CClientProjectile&>(Entity).GetAlpha();
+            break;
+        }
         case CCLIENTMARKER:
         {
             CClientMarker& Marker = static_cast<CClientMarker&>(Entity);
@@ -914,15 +924,19 @@ bool CStaticFunctionDefinitions::GetElementCollisionsEnabled(CClientEntity& Enti
             return Vehicle.IsCollisionEnabled();
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
-            CClientObject& Object = static_cast<CClientObject&>(Entity);
-            return Object.IsCollisionEnabled();
+            return static_cast<CClientObject&>(Entity).IsCollisionEnabled();
         }
         case CCLIENTPED:
         case CCLIENTPLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             return Ped.GetUsesCollision();
+        }
+        case CCLIENTBUILDING:
+        {
+            return static_cast<CClientBuilding&>(Entity).GetUsesCollision();
         }
         default:
             return false;
@@ -949,9 +963,15 @@ bool CStaticFunctionDefinitions::IsElementFrozen(CClientEntity& Entity, bool& bF
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             bFrozen = Object.IsFrozen();
+            break;
+        }
+        case CCLIENTPROJECTILE:
+        {
+            bFrozen = static_cast<CClientProjectile&>(Entity).IsFrozen();
             break;
         }
         default:
@@ -1497,6 +1517,16 @@ bool CStaticFunctionDefinitions::SetElementAlpha(CClientEntity& Entity, unsigned
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.SetAlpha(ucAlpha);
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            static_cast<CClientBuilding&>(Entity).SetAlpha(ucAlpha);
+            break;
+        }
+        case CCLIENTPROJECTILE:
+        {
+            static_cast<CClientProjectile&>(Entity).SetAlpha(ucAlpha);
             break;
         }
         case CCLIENTMARKER:
@@ -3921,9 +3951,15 @@ bool CStaticFunctionDefinitions::SetElementFrozen(CClientEntity& Entity, bool bF
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.SetFrozen(bFrozen);
+            break;
+        }
+        case CCLIENTPROJECTILE:
+        {
+            static_cast<CClientProjectile&>(Entity).SetFrozen(bFrozen);
             break;
         }
         default:
