@@ -3495,14 +3495,24 @@ retry:
                     pVehicle->SetAlpha(alpha.data.ucAlpha);
 
                     // Read our headlight color
-                    SColorRGBA color(255, 255, 255, 255);
+                    SColorRGBA colorLeft(255, 255, 255, 255);
+                    SColorRGBA colorRight(255, 255, 255, 255);
                     if (bitStream.ReadBit() == true)
                     {
-                        bitStream.Read(color.R);
-                        bitStream.Read(color.G);
-                        bitStream.Read(color.B);
+                        bitStream.Read(colorLeft.R);
+                        bitStream.Read(colorLeft.G);
+                        bitStream.Read(colorLeft.B);
+                        colorRight = colorLeft;
+
+                        if (bitStream.ReadBit() == true)
+                        {
+                            bitStream.Read(colorRight.R);
+                            bitStream.Read(colorRight.G);
+                            bitStream.Read(colorRight.B);
+                        }
                     }
-                    pVehicle->SetHeadLightColor(color);
+                    pVehicle->SetHeadLightColor(colorLeft, HeadlightSide::Left);
+                    pVehicle->SetHeadLightColor(colorRight, HeadlightSide::Right);
 
                     // Read out and set handling
                     if (bitStream.ReadBit() == true)
