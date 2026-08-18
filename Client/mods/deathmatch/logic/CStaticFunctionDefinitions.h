@@ -96,9 +96,15 @@ public:
     static bool          SetElementParent(CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain);
     static bool          SetElementInterior(CClientEntity& Entity, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition);
     static bool          SetElementDimension(CClientEntity& Entity, unsigned short usDimension);
-    static bool          AttachElements(CClientEntity& Entity, CClientEntity& AttachedToEntity, CVector& vecPosition, CVector& vecRotation);
+    static bool          AttachElements(CClientEntity& Entity, CClientEntity& attachedToEntity, CVector& position, CVector& rotation, eBone bone = BONE_ROOT,
+                                        bool enableCollisions = false);
     static bool          DetachElements(CClientEntity& Entity, CClientEntity* pAttachedToEntity = NULL);
     static bool          SetElementAttachedOffsets(CClientEntity& Entity, CVector& vecPosition, CVector& vecRotation);
+    static bool          AttachElementToBone(CClientEntity& Entity, CClientEntity& attachedToEntity, eBone bone, CVector& position, CVector& rotation,
+                                             bool enableCollisions = false);
+    static bool          DetachElementFromBone(CClientEntity& Entity);
+    static bool          IsElementAttachedToBone(CClientEntity& Entity, bool& isAttached);
+    static bool          GetElementAttachedBone(CClientEntity& Entity, eBone& bone);
     static bool          SetElementAlpha(CClientEntity& Entity, unsigned char ucAlpha);
     static bool          SetElementHealth(CClientEntity& Entity, float fHealth);
     static bool          SetElementModel(CClientEntity& Entity, unsigned short usModel);

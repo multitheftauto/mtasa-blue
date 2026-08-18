@@ -48,6 +48,8 @@ public:
     LUA_DECLARE_OOP(GetElementBoundingBox);
     LUA_DECLARE(GetElementRadius);
     LUA_DECLARE(IsElementAttached);
+    LUA_DECLARE(IsElementAttachedToBone);
+    LUA_DECLARE(GetElementAttachedBone);
     LUA_DECLARE(GetElementAttachedTo);
     LUA_DECLARE(GetAttachedElements);
     LUA_DECLARE(GetElementDistanceFromCentreOfMassToBaseOfModel);
@@ -89,6 +91,8 @@ public:
     LUA_DECLARE(SetElementDimension);
     LUA_DECLARE(AttachElements);
     LUA_DECLARE(DetachElements);
+    LUA_DECLARE(AttachElementToBone);
+    LUA_DECLARE(DetachElementFromBone);
     LUA_DECLARE(SetElementAttachedOffsets);
     LUA_DECLARE(SetElementCollisionsEnabled);
     LUA_DECLARE(SetElementAlpha);

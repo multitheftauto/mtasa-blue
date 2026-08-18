@@ -132,6 +132,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                 pElement->GetAttachedOffsets(attachedPosition.data.vecPosition, attachedRotation.data.vecRotation);
                 BitStream.Write(&attachedPosition);
                 BitStream.Write(&attachedRotation);
+                BitStream.Write(static_cast<unsigned char>(pElement->GetAttachedBone()));
             }
             else
                 BitStream.WriteBit(false);

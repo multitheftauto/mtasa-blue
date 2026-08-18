@@ -82,7 +82,11 @@ public:
     // Attachement
     LUA_DECLARE(attachElements);
     LUA_DECLARE(detachElements);
+    LUA_DECLARE(attachElementToBone);
+    LUA_DECLARE(detachElementFromBone);
     LUA_DECLARE(isElementAttached);
+    LUA_DECLARE(isElementAttachedToBone);
+    LUA_DECLARE(getElementAttachedBone);
     LUA_DECLARE(getAttachedElements);
     LUA_DECLARE(getElementAttachedTo);
     LUA_DECLARE(setElementAttachedOffsets);

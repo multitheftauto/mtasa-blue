@@ -7423,3 +7423,31 @@ void CClientPed::RunSwimTask() const
 
     inWaterTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_EVENT_RESPONSE_NONTEMP, true);
 }
+
+bool CClientPed::GetBoneMatrix(eBone bone, CMatrix& outMatrix)
+{
+    CEntity* entity = GetGameEntity();
+    if (!entity)
+        return false;
+
+    RwMatrix* boneRwMatrix = entity->GetBoneRwMatrix(bone);
+    if (!boneRwMatrix)
+        return false;
+
+    g_pGame->GetRenderWare()->RwMatrixToCMatrix(*boneRwMatrix, outMatrix);
+    return true;
+}
+
+void CClientPed::UpdateBoneAttachments()
+{
+    if (m_AttachedEntities.empty())
+        return;
+
+    for (CClientEntity* attachedEntity : m_AttachedEntities)
+    {
+        if (attachedEntity && attachedEntity->IsAttachedToBone())
+        {
+            attachedEntity->DoAttaching();
+        }
+    }
+}
