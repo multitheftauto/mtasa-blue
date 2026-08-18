@@ -82,11 +82,12 @@ public:
     // Attachement
     LUA_DECLARE(attachElements);
     LUA_DECLARE(detachElements);
-    LUA_DECLARE(attachElementToBone);
-    LUA_DECLARE(detachElementFromBone);
+    static bool attachElementToBone(CElement* element, CElement* pedElement, std::uint32_t bone, std::optional<CVector> pos, std::optional<CVector> rot,
+                                    std::optional<bool> enableCollisions);
+    static bool detachElementFromBone(CElement* element);
     LUA_DECLARE(isElementAttached);
-    LUA_DECLARE(isElementAttachedToBone);
-    LUA_DECLARE(getElementAttachedBone);
+    static bool                         isElementAttachedToBone(CElement* element);
+    static std::optional<std::uint32_t> getElementAttachedBone(CElement* element);
     LUA_DECLARE(getAttachedElements);
     LUA_DECLARE(getElementAttachedTo);
     LUA_DECLARE(setElementAttachedOffsets);

@@ -48,8 +48,8 @@ public:
     LUA_DECLARE_OOP(GetElementBoundingBox);
     LUA_DECLARE(GetElementRadius);
     LUA_DECLARE(IsElementAttached);
-    LUA_DECLARE(IsElementAttachedToBone);
-    LUA_DECLARE(GetElementAttachedBone);
+    static bool                         IsElementAttachedToBone(CClientEntity* entity);
+    static std::optional<std::uint32_t> GetElementAttachedBone(CClientEntity* entity);
     LUA_DECLARE(GetElementAttachedTo);
     LUA_DECLARE(GetAttachedElements);
     LUA_DECLARE(GetElementDistanceFromCentreOfMassToBaseOfModel);
@@ -91,8 +91,9 @@ public:
     LUA_DECLARE(SetElementDimension);
     LUA_DECLARE(AttachElements);
     LUA_DECLARE(DetachElements);
-    LUA_DECLARE(AttachElementToBone);
-    LUA_DECLARE(DetachElementFromBone);
+    static bool AttachElementToBone(CClientEntity* entity, CClientEntity* pedEntity, std::uint32_t bone, std::optional<CVector> pos, std::optional<CVector> rot,
+                                    std::optional<bool> enableCollisions);
+    static bool DetachElementFromBone(CClientEntity* entity);
     LUA_DECLARE(SetElementAttachedOffsets);
     LUA_DECLARE(SetElementCollisionsEnabled);
     LUA_DECLARE(SetElementAlpha);

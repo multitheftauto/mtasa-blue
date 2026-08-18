@@ -88,10 +88,10 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementDimension", SetElementDimension},
         {"attachElements", AttachElements},
         {"detachElements", DetachElements},
-        {"attachElementToBone", AttachElementToBone},
-        {"detachElementFromBone", DetachElementFromBone},
-        {"isElementAttachedToBone", IsElementAttachedToBone},
-        {"getElementAttachedBone", GetElementAttachedBone},
+        {"attachElementToBone", ArgumentParser<AttachElementToBone>},
+        {"detachElementFromBone", ArgumentParser<DetachElementFromBone>},
+        {"isElementAttachedToBone", ArgumentParser<IsElementAttachedToBone>},
+        {"getElementAttachedBone", ArgumentParser<GetElementAttachedBone>},
         {"setElementAttachedOffsets", SetElementAttachedOffsets},
         {"setElementAlpha", SetElementAlpha},
         {"setElementHealth", SetElementHealth},
@@ -2221,100 +2221,49 @@ int CLuaElementDefs::AttachElements(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::AttachElementToBone(lua_State* luaVM)
+bool CLuaElementDefs::AttachElementToBone(CClientEntity* entity, CClientEntity* pedEntity, std::uint32_t bone, std::optional<CVector> pos,
+                                          std::optional<CVector> rot, std::optional<bool> enableCollisions)
 {
-    CClientEntity* entity = nullptr;
-    CClientEntity* pedEntity = nullptr;
-    uint32         bone = BONE_ROOT;
-    CVector        position, rotation;
-    bool           enableCollisions = false;
+    if (!entity || !pedEntity)
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(entity);
-    argStream.ReadUserData(pedEntity);
-    argStream.ReadNumber(bone);
-    argStream.ReadVector3D(position, position);
-    argStream.ReadVector3D(rotation, rotation);
-    argStream.ReadBool(enableCollisions, false);
+    CVector position = pos.value_or(CVector{});
+    CVector rotation = rot.value_or(CVector{});
+    bool    collisions = enableCollisions.value_or(false);
 
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::AttachElementToBone(*entity, *pedEntity, static_cast<eBone>(bone), position, rotation, enableCollisions))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::AttachElementToBone(*entity, *pedEntity, static_cast<eBone>(bone), position, rotation, collisions);
 }
 
-int CLuaElementDefs::DetachElementFromBone(lua_State* luaVM)
+bool CLuaElementDefs::DetachElementFromBone(CClientEntity* entity)
 {
-    CClientEntity*   entity = nullptr;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(entity);
+    if (!entity)
+        return false;
 
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::DetachElementFromBone(*entity))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::DetachElementFromBone(*entity);
 }
 
-int CLuaElementDefs::IsElementAttachedToBone(lua_State* luaVM)
+bool CLuaElementDefs::IsElementAttachedToBone(CClientEntity* entity)
 {
-    CClientEntity*   entity = nullptr;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(entity);
+    if (!entity)
+        return false;
 
-    if (!argStream.HasErrors())
-    {
-        bool isAttached = false;
-        if (CStaticFunctionDefinitions::IsElementAttachedToBone(*entity, isAttached))
-        {
-            lua_pushboolean(luaVM, isAttached);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    bool isAttached = false;
+    if (CStaticFunctionDefinitions::IsElementAttachedToBone(*entity, isAttached))
+        return isAttached;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
-int CLuaElementDefs::GetElementAttachedBone(lua_State* luaVM)
+std::optional<std::uint32_t> CLuaElementDefs::GetElementAttachedBone(CClientEntity* entity)
 {
-    CClientEntity*   entity = nullptr;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(entity);
+    if (!entity)
+        return std::nullopt;
 
-    if (!argStream.HasErrors())
-    {
-        eBone bone = BONE_ROOT;
-        if (CStaticFunctionDefinitions::GetElementAttachedBone(*entity, bone))
-        {
-            lua_pushnumber(luaVM, static_cast<lua_Number>(bone));
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    eBone bone = BONE_ROOT;
+    if (CStaticFunctionDefinitions::GetElementAttachedBone(*entity, bone))
+        return static_cast<std::uint32_t>(bone);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return std::nullopt;
 }
 
 int CLuaElementDefs::DetachElements(lua_State* luaVM)
