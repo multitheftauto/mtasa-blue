@@ -8,6 +8,7 @@
  *
  *****************************************************************************/
 #include "StdInc.h"
+#include <game/RenderWare.h>
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
@@ -61,17 +62,23 @@ static void __declspec(naked) HOOK_CPed_DoFootLanded()
 //
 // CTaskSimpleJetPack::RenderJetPack / CAEPedAudioEntity::UpdateJetPack
 //
-// Hide and mute a ped's jetpack whenever the ped itself is hidden due to being in a different
-// interior
+// Hide and mute a ped's jetpack whenever the ped itself is hidden (other interior or alpha 0).
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 
 // CTaskSimpleJetPack::RenderJetPack draws the jetpack from its own clump, separate from the ped's;
-// interior-based alpha hiding never reaches it. This hook skips the render and its thruster FX
-// whenever the ped itself is hidden.
+// interior hiding and setPedAlpha never reach it. Skip the render (and thruster FX) when the ped
+// is hidden, and copy the ped clump alpha onto the jetpack so me.alpha = 0 does not leave a
+// floating pack (#5225).
 #define HOOKPOS_CTaskSimpleJetPack_RenderJetPack 0x67F6A0
 DWORD RETURN_CTaskSimpleJetPack_RenderJetPack = 0x67F6AC;
 DWORD SKIP_CTaskSimpleJetPack_RenderJetPack = 0x67FA11;
+
+static constexpr DWORD FUNC_CVisibilityPlugins_SetClumpAlpha = 0x732B00;
+static constexpr DWORD FUNC_CVisibilityPlugins_GetClumpAlpha = 0x732B20;
+static constexpr DWORD FUNC_RpClumpForAllAtomics = 0x749B70;
+// rpGEOMETRYMODULATEMATERIALCOLOR — material colour (including alpha) is otherwise ignored.
+static constexpr unsigned int RpGeometryModulateMaterialColor = 0x00000040;
 
 // CAEPedAudioEntity::UpdateJetPack recomputes the engine sound's volume from its own ramp state
 // every tick; this hook releases the sound channels while the ped is hidden and recreates them
@@ -85,10 +92,62 @@ DWORD SKIP_CAEPedAudioEntity_UpdateJetPack = 0x4E1112;
 static constexpr std::uintptr_t CWorld_CurrentArea = 0xB72914;
 
 CPedSAInterface* pJetpackHookPedInterface;
+RpClump*         pJetPackClumpForAlpha;
+
+static int GetPedClumpAlpha(CPedSAInterface* pPed)
+{
+    if (!pPed || !pPed->m_pRwObject)
+        return 255;
+
+    return ((int(__cdecl*)(RpClump*))FUNC_CVisibilityPlugins_GetClumpAlpha)(pPed->m_pRwObject);
+}
+
+static bool IsPedJetpackHidden(CPedSAInterface* pPed)
+{
+    if (!pPed)
+        return false;
+
+    if (pPed->m_areaCode != *reinterpret_cast<std::uint8_t*>(CWorld_CurrentArea))
+        return true;
+
+    // StreamedInPulse writes ped alpha onto the ped clump. Alpha 0 should hide the jetpack
+    // the same way a different interior does, including thruster FX.
+    return GetPedClumpAlpha(pPed) == 0;
+}
 
 bool CTaskSimpleJetPack_ShouldHide()
 {
-    return pJetpackHookPedInterface && pJetpackHookPedInterface->m_areaCode != *reinterpret_cast<std::uint8_t*>(CWorld_CurrentArea);
+    return IsPedJetpackHidden(pJetpackHookPedInterface);
+}
+
+static RpAtomic* SetJetpackAtomicAlpha(RpAtomic* pAtomic, void* pData)
+{
+    RpGeometry* pGeometry = pAtomic->geometry;
+    if (!pGeometry)
+        return pAtomic;
+
+    const auto ucAlpha = static_cast<unsigned char>(reinterpret_cast<std::uintptr_t>(pData));
+    pGeometry->flags |= RpGeometryModulateMaterialColor;
+
+    for (int i = 0; i < pGeometry->materials.entries; ++i)
+    {
+        if (RpMaterial* pMaterial = pGeometry->materials.materials[i])
+            pMaterial->color.a = ucAlpha;
+    }
+
+    return pAtomic;
+}
+
+static void CTaskSimpleJetPack_ApplyPedAlpha()
+{
+    if (!pJetPackClumpForAlpha || !pJetpackHookPedInterface)
+        return;
+
+    const int iAlpha = GetPedClumpAlpha(pJetpackHookPedInterface);
+    ((void(__cdecl*)(RpClump*, int))FUNC_CVisibilityPlugins_SetClumpAlpha)(pJetPackClumpForAlpha, iAlpha);
+    // RpClumpRender uses material alpha, not CVisibilityPlugins clump alpha, for this object clump.
+    ((RpClump * (__cdecl*)(RpClump*, RpAtomic * (__cdecl*)(RpAtomic*, void*), void*)) FUNC_RpClumpForAllAtomics)(
+        pJetPackClumpForAlpha, SetJetpackAtomicAlpha, reinterpret_cast<void*>(static_cast<std::uintptr_t>(iAlpha)));
 }
 
 static void __declspec(naked) HOOK_CTaskSimpleJetPack_RenderJetPack()
@@ -128,7 +187,17 @@ static void __declspec(naked) HOOK_CTaskSimpleJetPack_RenderJetPack()
         // clang-format off
         __asm
         {
-            // EAX isn't preserved across the call above, so reload the clump pointer it held
+            mov     eax, [ebp+40h]
+            mov     pJetPackClumpForAlpha, eax
+        }
+        // clang-format on
+
+        CTaskSimpleJetPack_ApplyPedAlpha();
+
+        // clang-format off
+        __asm
+        {
+            // EAX isn't preserved across the calls above, so reload the clump pointer it held
             mov     eax, [ebp+40h]
             jmp     RETURN_CTaskSimpleJetPack_RenderJetPack
         }
@@ -143,8 +212,7 @@ CPedSoundEntitySAInterface* pJetpackAudioHookInterface;
 
 bool CAEPedAudioEntity_IsJetpackHidden()
 {
-    return pJetpackAudioHookInterface && pJetpackAudioHookInterface->ped &&
-           pJetpackAudioHookInterface->ped->m_areaCode != *reinterpret_cast<std::uint8_t*>(CWorld_CurrentArea);
+    return IsPedJetpackHidden(pJetpackAudioHookInterface ? pJetpackAudioHookInterface->ped : nullptr);
 }
 
 static void __declspec(naked) HOOK_CAEPedAudioEntity_UpdateJetPack()
