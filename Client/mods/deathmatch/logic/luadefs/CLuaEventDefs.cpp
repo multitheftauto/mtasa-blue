@@ -37,17 +37,19 @@ std::optional<bool> CLuaEventDefs::TriggerEvent(lua_State* luaVM, std::string na
 
     std::uint32_t hash = HashString(name.c_str(), name.length());
 
+    // Don't trigger the event if it hasn't been registered
     CEventsManager* eventManager = m_pClientGame->GetEventsManager();
     if (!eventManager->EventExists(hash))
         return false;
 
-    return eventManager->TriggerEvent(hash, baseElement, args.value_or(CLuaArguments()), true);
+    return eventManager->TriggerCustomEvent(hash, baseElement, args.value_or(CLuaArguments()), true);
 }
 
 bool CLuaEventDefs::AddEvent(lua_State* luaVM, std::string name, std::optional<bool> allowRemoteTrigger)
 {
     // Check if this is built-in event
-    if (auto it = eventNameToId.find(name); it != eventNameToId.end())
+    BuiltInEvent::Enum builtInEvent;
+    if (StringToEnum(name, builtInEvent))
         return false;
 
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -84,9 +86,9 @@ bool CLuaEventDefs::AddEventHandler(lua_State* luaVM, std::string name, CClientE
 
     // Check if this is built-in event
     std::variant<std::uint32_t, BuiltInEvent::Enum> event;
-
-    if (auto it = CEventsManager::getBuiltInEvent(name); it != CEventsManager::GetIterEnd())
-        event = it->second;
+    BuiltInEvent::Enum                              eventId = CEventsManager::getBuiltInEventIDFromName(name);
+    if (eventId != BuiltInEvent::MAX_EVENTS)
+        event = eventId;
     else
         event = HashString(name.c_str(), name.length());
 
@@ -95,7 +97,7 @@ bool CLuaEventDefs::AddEventHandler(lua_State* luaVM, std::string name, CClientE
         throw std::logic_error(name + " with this function is already handled");
 
     m_pClientGame->GetEventsManager()->AddHandler(event, attachedTo, luaMain, func, propagated.value_or(true), priorityType, priorityMod,
-                                                        entityType.value_or(eClientEntityType::CCLIENTUNKNOWN));
+                                                  entityType.value_or(eClientEntityType::CCLIENTUNKNOWN));
     return true;
 }
 
@@ -105,14 +107,15 @@ bool CLuaEventDefs::RemoveEventHandler(lua_State* luaVM, std::string name, CClie
     if (!luaMain)
         return false;
 
-    std::variant<std::uint32_t, BuiltInEvent::Enum> event;
-
     // Check if this is built-in event
-    if (auto it = CEventsManager::getBuiltInEvent(name); it != CEventsManager::GetIterEnd())
-        event = it->second;
+    std::variant<std::uint32_t, BuiltInEvent::Enum> event;
+    BuiltInEvent::Enum                              eventId = CEventsManager::getBuiltInEventIDFromName(name);
+    if (eventId != BuiltInEvent::MAX_EVENTS)
+        event = eventId;
     else
         event = HashString(name.c_str(), name.length());
 
+    // If the handler isn't attached to this function...
     CEventsManager* eventManager = m_pClientGame->GetEventsManager();
     if (!eventManager->IsEventHandlerAttached(event, attachedTo, luaMain, func))
         return false;
@@ -127,11 +130,11 @@ std::variant<bool, std::vector<CLuaFunctionRef>> CLuaEventDefs::GetEventHandlers
     if (!luaMain)
         return false;
 
-    std::variant<std::uint32_t, BuiltInEvent::Enum> event;
-
     // Check if this is built-in event
-    if (auto it = CEventsManager::getBuiltInEvent(name); it != CEventsManager::GetIterEnd())
-        event = it->second;
+    std::variant<std::uint32_t, BuiltInEvent::Enum> event;
+    BuiltInEvent::Enum                              eventId = CEventsManager::getBuiltInEventIDFromName(name);
+    if (eventId != BuiltInEvent::MAX_EVENTS)
+        event = eventId;
     else
         event = HashString(name.c_str(), name.length());
 

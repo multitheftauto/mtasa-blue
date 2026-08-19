@@ -23,7 +23,7 @@ struct SEventHandler
     bool                               propagate{true};
     EEventPriority::EEventPriorityType priority{EEventPriority::NORMAL};
     float                              priorityMod{0.0f};
-    bool                               isCurrentlyUsed{false};
+    bool                               isInUse{false};
     eClientEntityType                  entityType{eClientEntityType::CCLIENTUNKNOWN};
     bool                               isRenderingEvent{false};
     bool                               forceAspectRatioAdjustment{false};
@@ -37,7 +37,8 @@ struct SEventHandler
     }
 };
 
-using EventHandlersTable = CFastHashMap<CClientEntity*, std::vector<SEventHandler>>;
+using EventHandlersList = std::vector<SEventHandler>;
+using EventHandlersTable = CFastHashMap<CClientEntity*, EventHandlersList>;
 
 struct SCustomEvent
 {
@@ -62,9 +63,12 @@ public:
     bool RemoveHandler(const std::variant<std::uint32_t, BuiltInEvent::Enum>& event, CClientEntity* sourceEntity, CLuaMain* luaMain,
                        const CLuaFunctionRef& luaFunctionRef);
     void RemoveAllHandlers(CLuaMain* luaMain);
+    void RemoveHandlersForEntity(CClientEntity* entity);
 
-    bool TriggerEvent(const std::variant<std::uint32_t, BuiltInEvent::Enum>& event, CClientEntity* sourceEntity, const CLuaArguments& args,
-                      bool callOnChildren = true);
+    // Use for built-in events
+    bool TriggerEvent(BuiltInEvent::Enum event, CClientEntity* sourceEntity, const CLuaArguments& args, bool callOnChildren = true);
+
+    bool TriggerCustomEvent(std::uint32_t hash, CClientEntity* sourceEntity, const CLuaArguments& args, bool callOnChildren = true);
 
     void CancelEvent() noexcept { m_eventCancelled = true; }
 
@@ -81,16 +85,19 @@ public:
 
     static inline bool IsEventActive(BuiltInEvent::Enum event) { return m_eventActive[static_cast<std::size_t>(event)]; }
 
-    static auto getBuiltInEvent(const std::string_view& name) { return m_eventNameToId.find(name.data()); }
-    static auto GetIterEnd() { return m_eventNameToId.end(); }
+    static BuiltInEvent::Enum getBuiltInEventIDFromName(const std::string_view& name);
 
 private:
     static void SetEventActive(BuiltInEvent::Enum event, bool active) { m_eventActive[static_cast<std::size_t>(event)] = active; }
 
-    void ExecuteHandlersForEntity(EventHandlersTable& handlersTable, CClientEntity* sourceEntity, CClientEntity* entity, const CLuaArguments& args,
+    void ExecuteHandlersForEntity(EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt, CClientEntity* sourceEntity,
+                                  CClientEntity* entity,
+                                  const CLuaArguments& args,
                                   const std::string_view& eventName);
     void TriggerEventOnChildren(EventHandlersTable& handlersTable, CClientEntity* sourceEntity, CClientEntity* entity, const CLuaArguments& args,
                                 const std::string_view& eventName);
+
+    void TryRemoveHandler(EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt);
 
     std::string_view GetEventName(BuiltInEvent::Enum event) const { return m_eventNames[static_cast<std::size_t>(event)]; }
     std::string_view GetEventName(std::uint32_t hash) const;

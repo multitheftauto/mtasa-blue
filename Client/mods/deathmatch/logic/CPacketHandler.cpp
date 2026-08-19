@@ -5036,19 +5036,20 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
                 /** ======= FUTURE CODE ============
                 CEventsManager*  eventsManager = g_pClientGame->GetEventsManager();
                 std::uint32_t         hash = HashString(szName);
-                const SCustomEvent&   event = eventsManager->GetCustomEvent(hash);
-                if (event.eventNameHash > 0)
+                const SCustomEvent*   event = eventsManager->GetCustomEvent(hash);
+                if (event->eventNameHash > 0)
                 {
-                    if (event.allowRemoteTrigger)
+                    if (event->allowRemoteTrigger)
                     {
                         CClientEntity* entity = CElementIDs::GetElement(EntityID);
                         if (entity)
-                            eventsManager->TriggerEvent(hash, entity, Arguments, true);
+                            eventsManager->TriggerCustomEvent(hash, entity, Arguments, true);
                     }
                     else
                         g_pClientGame->m_pScriptDebugging->LogError(
                             nullptr, "Server triggered clientside event %s, but event is not marked as remotely triggerable", szName);
-                }*/
+                }
+                */
 
                 // Grab the event. Does it exist and is it remotely triggerable?
                 SEvent* pEvent = g_pClientGame->m_Events.Get(szName);
