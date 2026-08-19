@@ -18,7 +18,7 @@
 #define FUNC_rwDeviceSystemRequest     0x7F2AB0
 #define FUNC_DialogFunc                0x745E50
 #define FUNC_RwEngineGetSubSystemInfo  0x7F2C30
-#define FUNC_RwEngineGetNumVideoModes  0x7F2C80
+#define FUNC_RwEngineGetNumVideoModes  0x7F2CC0
 #define FUNC_RwEngineGetVideoModeInfo  0x7F2CF0
 #define CLASS_RwGlobals                0xC97B24
 #define CLASS_IDirect3D9               0xC97C20
