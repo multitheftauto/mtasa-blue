@@ -99,17 +99,40 @@ public:
             }
         }
 
-        SString buf;
-        if (!SharedUtil::FileLoadWithTimeout(strFilename, buf, 2000))
+        if (wide.empty())
         {
             if (!hasMeta)
                 return SString("File not found or inaccessible: %s", strFilename.c_str());
             return SString("Could not read: %s", strFilename.c_str());
         }
 
+        FILE* pFile = _wfopen(wide.c_str(), L"rb");
+        if (!pFile)
+        {
+            if (!hasMeta)
+                return SString("File not found or inaccessible: %s", strFilename.c_str());
+            return SString("Could not read: %s", strFilename.c_str());
+        }
+
+        CMD5Hasher md5Hasher;
+        md5Hasher.Init();
+        unsigned long           currentCRC = 0;
+        constexpr size_t        bufferSize = 1024 * 1024;
+        std::unique_ptr<char[]> buffer = std::make_unique<char[]>(bufferSize);
+
+        size_t bytesRead = 0;
+        while ((bytesRead = fread(buffer.get(), 1, bufferSize, pFile)) > 0)
+        {
+            currentCRC = CRCGenerator::GetCRCFromBuffer(buffer.get(), bytesRead, currentCRC);
+            md5Hasher.Update(reinterpret_cast<unsigned char*>(buffer.get()), static_cast<unsigned int>(bytesRead));
+        }
+
+        fclose(pFile);
+
+        md5Hasher.Finalize();
         CChecksum r;
-        r.ulCRC = CRCGenerator::GetCRCFromBuffer(buf.data(), buf.size());
-        CMD5Hasher().Calculate(buf.data(), buf.size(), r.md5);
+        r.ulCRC = currentCRC;
+        memcpy(r.md5.data, md5Hasher.GetResult(), sizeof(r.md5.data));
 
         if (hasMeta && SharedUtil::GetFileAttributesExWithTimeout(wide.c_str(), attr, 500) &&
             sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&

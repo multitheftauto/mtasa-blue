@@ -19,6 +19,8 @@
 #include "CScriptFile.h"
 #include "CScriptArgReader.h"
 #include <lua/CLuaFunctionParser.h>
+#include <lua/CLuaArguments.h>
+#include <lua/CLuaShared.h>
 
 #define DEFAULT_MAX_FILESIZE 52428800
 
@@ -47,6 +49,7 @@ void CLuaFileDefs::LoadFunctions()
         {"fileClose", fileClose},
         {"fileFlush", fileFlush},
         {"fileRead", fileRead},
+        {"fileReadAsync", ArgumentParser<fileReadAsync>},
         {"fileWrite", fileWrite},
         {"fileGetPos", fileGetPos},
         {"fileGetSize", fileGetSize},
@@ -54,6 +57,7 @@ void CLuaFileDefs::LoadFunctions()
         {"fileIsEOF", fileIsEOF},
         {"fileSetPos", fileSetPos},
         {"fileGetContents", ArgumentParser<fileGetContents>},
+        {"fileGetContentsAsync", ArgumentParser<fileGetContentsAsync>},
         {"fileGetHash", ArgumentParser<fileGetHash>},
     };
 
@@ -84,12 +88,14 @@ void CLuaFileDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "close", "fileClose");
     lua_classfunction(luaVM, "flush", "fileFlush");
     lua_classfunction(luaVM, "read", "fileRead");
+    lua_classfunction(luaVM, "readAsync", "fileReadAsync");
     lua_classfunction(luaVM, "write", "fileWrite");
 
     lua_classfunction(luaVM, "getPos", "fileGetPos");
     lua_classfunction(luaVM, "getSize", "fileGetSize");
     lua_classfunction(luaVM, "getPath", "fileGetPath");
     lua_classfunction(luaVM, "getContents", "fileGetContents");
+    lua_classfunction(luaVM, "getContentsAsync", "fileGetContentsAsync");
     lua_classfunction(luaVM, "getHash", "fileGetHash");
     lua_classfunction(luaVM, "isEOF", "fileIsEOF");
 
@@ -858,6 +864,260 @@ std::optional<std::string> CLuaFileDefs::fileGetContents(lua_State* L, CScriptFi
     }
 
     return {};
+}
+
+bool CLuaFileDefs::fileGetContentsAsync(lua_State* luaVM, CScriptFile* scriptFile, CLuaFunctionRef callback, std::optional<bool> maybeVerifyContents)
+{
+    // bool fileGetContentsAsync ( file target, function callback [, bool verifyContents = true ] )
+    if (!scriptFile || !scriptFile->IsLoaded())
+    {
+        m_pScriptDebugging->LogBadPointer(luaVM, "file", 1);
+        return false;
+    }
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    const SString strAbsPath = scriptFile->GetAbsPath();
+    if (strAbsPath.empty())
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "fileGetContentsAsync: failed to resolve file path for async read");
+        return false;
+    }
+
+    const bool bVerify = maybeVerifyContents.value_or(true);
+    bool       bHasExpectedChecksum = false;
+    CChecksum  expectedChecksum;
+    SString    warningFilePath;
+
+    if (bVerify)
+    {
+        CResource& thisResource = lua_getownerresource(luaVM);
+        if (CResourceFile* resourceFile = scriptFile->GetResourceFile(); resourceFile != nullptr)
+        {
+            bHasExpectedChecksum = true;
+#ifdef MTA_CLIENT
+            expectedChecksum = resourceFile->GetServerChecksum();
+#else
+            expectedChecksum = resourceFile->GetLastChecksum();
+#endif
+            warningFilePath = getResourceFilePath(&thisResource, scriptFile->GetResource(), scriptFile->GetFilePath());
+        }
+        else
+        {
+            warningFilePath = getResourceFilePath(&thisResource, scriptFile->GetResource(), scriptFile->GetFilePath());
+        }
+    }
+
+    struct SFileAsyncResult
+    {
+        enum class EStatus
+        {
+            SUCCESS,
+            OUT_OF_MEMORY,
+            READ_ERROR,
+            CHECKSUM_MISMATCH,
+            RESOURCE_FILE_NOT_FOUND
+        } status{EStatus::SUCCESS};
+        std::string buffer;
+        CChecksum   currentChecksum;
+        CChecksum   expectedChecksum;
+        SString     warningFilePath;
+    };
+
+    CLuaShared::GetAsyncTaskScheduler()->PushTask(
+        [strAbsPath, bVerify, bHasExpectedChecksum, expectedChecksum, warningFilePath]() -> SFileAsyncResult
+        {
+            SFileAsyncResult result;
+            result.expectedChecksum = expectedChecksum;
+            result.warningFilePath = warningFilePath;
+
+            FILE* pFile = File::Fopen(strAbsPath.c_str(), "rb");
+            if (!pFile)
+            {
+                result.status = SFileAsyncResult::EStatus::READ_ERROR;
+                return result;
+            }
+
+            fseek(pFile, 0, SEEK_END);
+            long fileSize = ftell(pFile);
+            fseek(pFile, 0, SEEK_SET);
+
+            if (fileSize < 0)
+            {
+                fclose(pFile);
+                result.status = SFileAsyncResult::EStatus::READ_ERROR;
+                return result;
+            }
+
+            if (fileSize > 0)
+            {
+                try
+                {
+                    result.buffer.resize(fileSize);
+                    size_t bytesRead = fread(result.buffer.data(), 1, fileSize, pFile);
+                    result.buffer.resize(bytesRead);
+                }
+                catch (const std::bad_alloc&)
+                {
+                    fclose(pFile);
+                    result.buffer.clear();
+                    result.status = SFileAsyncResult::EStatus::OUT_OF_MEMORY;
+                    return result;
+                }
+            }
+            fclose(pFile);
+
+            if (bVerify)
+            {
+                if (!bHasExpectedChecksum)
+                {
+                    result.status = SFileAsyncResult::EStatus::RESOURCE_FILE_NOT_FOUND;
+                    return result;
+                }
+
+                result.currentChecksum = CChecksum::GenerateChecksumFromBuffer(result.buffer.data(), static_cast<unsigned long>(result.buffer.size()));
+                if (result.currentChecksum != result.expectedChecksum)
+                {
+                    result.status = SFileAsyncResult::EStatus::CHECKSUM_MISMATCH;
+                    return result;
+                }
+            }
+
+            return result;
+        },
+        [luaFunctionRef = callback](SFileAsyncResult result)
+        {
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+            if (!pLuaMain)
+                return;
+
+            CLuaArguments arguments;
+
+            switch (result.status)
+            {
+                case SFileAsyncResult::EStatus::SUCCESS:
+                    arguments.PushString(std::move(result.buffer));
+                    break;
+                case SFileAsyncResult::EStatus::OUT_OF_MEMORY:
+                    m_pScriptDebugging->LogWarning(pLuaMain->GetVM(), "fileGetContentsAsync: out of memory");
+                    arguments.PushBoolean(false);
+                    break;
+                case SFileAsyncResult::EStatus::READ_ERROR:
+                    m_pScriptDebugging->LogWarning(pLuaMain->GetVM(), "fileGetContentsAsync: failed to read file");
+                    arguments.PushBoolean(false);
+                    break;
+                case SFileAsyncResult::EStatus::CHECKSUM_MISMATCH:
+                    m_pScriptDebugging->LogWarning(pLuaMain->GetVM(), "verification failed: checksum mismatch for resource file '%s' (expected %08X, got %08X)",
+                                                   result.warningFilePath.c_str(), result.expectedChecksum.ulCRC, result.currentChecksum.ulCRC);
+                    arguments.PushBoolean(false);
+                    break;
+                case SFileAsyncResult::EStatus::RESOURCE_FILE_NOT_FOUND:
+                    m_pScriptDebugging->LogWarning(pLuaMain->GetVM(), "verification failed: resource file not found '%s'", result.warningFilePath.c_str());
+                    arguments.PushBoolean(false);
+                    break;
+            }
+
+            arguments.Call(pLuaMain, luaFunctionRef);
+        });
+
+    return true;
+}
+
+bool CLuaFileDefs::fileReadAsync(lua_State* luaVM, CScriptFile* scriptFile, unsigned long count, CLuaFunctionRef callback)
+{
+    // bool fileReadAsync ( file target, int count, function callback )
+    if (!scriptFile || !scriptFile->IsLoaded())
+    {
+        m_pScriptDebugging->LogBadPointer(luaVM, "file", 1);
+        return false;
+    }
+
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    if (count == 0)
+    {
+        CLuaArguments arguments;
+        arguments.PushString("");
+        arguments.Call(pLuaMain, callback);
+        return true;
+    }
+
+    const SString strAbsPath = scriptFile->GetAbsPath();
+    if (strAbsPath.empty())
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "fileReadAsync: failed to resolve file path for async read");
+        return false;
+    }
+
+    const unsigned long ulCurrentPos = static_cast<unsigned long>(scriptFile->GetPointer());
+
+    struct SFileReadAsyncResult
+    {
+        bool          success{false};
+        std::string   buffer;
+        unsigned long bytesRead{0};
+    };
+
+    CLuaShared::GetAsyncTaskScheduler()->PushTask(
+        [strAbsPath, ulCurrentPos, count]() -> SFileReadAsyncResult
+        {
+            SFileReadAsyncResult result;
+            FILE*                pFile = File::Fopen(strAbsPath.c_str(), "rb");
+            if (!pFile)
+                return result;
+
+            if (fseek(pFile, ulCurrentPos, SEEK_SET) != 0)
+            {
+                fclose(pFile);
+                return result;
+            }
+
+            try
+            {
+                result.buffer.resize(count);
+                size_t actualRead = fread(result.buffer.data(), 1, count, pFile);
+                result.buffer.resize(actualRead);
+                result.bytesRead = static_cast<unsigned long>(actualRead);
+                result.success = true;
+            }
+            catch (const std::bad_alloc&)
+            {
+                result.buffer.clear();
+                result.success = false;
+            }
+
+            fclose(pFile);
+            return result;
+        },
+        [luaFunctionRef = callback, scriptFile, ulCurrentPos](SFileReadAsyncResult result)
+        {
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+            if (!pLuaMain)
+                return;
+
+            if (scriptFile && scriptFile->IsLoaded())
+            {
+                scriptFile->SetPointer(ulCurrentPos + result.bytesRead);
+            }
+
+            CLuaArguments arguments;
+            if (result.success)
+            {
+                arguments.PushString(std::move(result.buffer));
+            }
+            else
+            {
+                arguments.PushBoolean(false);
+            }
+
+            arguments.Call(pLuaMain, luaFunctionRef);
+        });
+
+    return true;
 }
 
 template <typename, typename = std::void_t<>>

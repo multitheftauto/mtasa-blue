@@ -34,12 +34,13 @@ project "Deathmatch"
 			"../../../Shared/publicsdk/include",
 			"../../../Shared",
 			"../../../vendor/sparsehash/src/",
+			"../../../vendor/discord-rpc/discord/thirdparty/rapidjson/include",
 			"logic",
 			"utils",
 			"."
 		}
 
-	defines { "SDK_WITH_BCRYPT" }
+	defines { "SDK_WITH_BCRYPT", "RAPIDJSON_HAS_STDSTRING=1", "RAPIDJSON_SSE2=1" }
 	links {
 		"Lua_Server", "sqlite", "cryptopp", "pme", "pcre2", "json-c", "zip", "glob", "zlib", "blowfish_bcrypt",
 	}
