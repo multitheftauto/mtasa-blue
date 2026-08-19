@@ -44,6 +44,7 @@
 #include "CMapManager.h"
 #include "CMarkerManager.h"
 #include "CHandlingManager.h"
+#include "models/CModelManager.h"
 #include "CScriptDebugging.h"
 #include "CBandwidthSettings.h"
 #include "CMainConfig.h"
@@ -618,6 +619,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         m_pRadarAreaManager = new CRadarAreaManager;
         m_pMarkerManager = new CMarkerManager(m_pColManager);
         m_HandlingManager = std::make_unique<CHandlingManager>();
+        m_modelManager = std::make_unique<CModelManager>();
+        m_modelManager->Initialize();
         m_pVehicleManager = new CVehicleManager;
         m_pPacketTranslator = new CPacketTranslator(m_pPlayerManager);
         m_pBanManager = new CBanManager;

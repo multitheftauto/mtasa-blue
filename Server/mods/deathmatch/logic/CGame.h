@@ -107,6 +107,7 @@ class CTrainTrackManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
 class CVehicleSoundSettingsManager;
+class CModelManager;
 
 class CCustomWeaponManager;
 class COpenPortsTester;
@@ -220,6 +221,7 @@ public:
 
     CMainConfig*            GetConfig() { return m_pMainConfig; }
     CHandlingManager*       GetHandlingManager() const noexcept { return m_HandlingManager.get(); }
+    CModelManager*          GetModelManager() const noexcept { return m_modelManager.get(); }
     CMapManager*            GetMapManager() { return m_pMapManager; }
     CPlayerManager*         GetPlayerManager() { return m_pPlayerManager; }
     CObjectManager*         GetObjectManager() { return m_pObjectManager; }
@@ -577,6 +579,7 @@ private:
     CZoneNames*                       m_pZoneNames;
     ASE*                              m_pASE;
     std::unique_ptr<CHandlingManager> m_HandlingManager;
+    std::unique_ptr<CModelManager>    m_modelManager;
     CRPCFunctions*                    m_pRPCFunctions;
     CLanBroadcast*                    m_pLanBroadcast;
     CWaterManager*                    m_pWaterManager;
