@@ -656,18 +656,32 @@ public:
 
     void GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount);
     void RemoveVehicleSirens() { m_tSirenInfo.m_bOverrideSirens = false; }
-    void SetVehicleSirenMinimumAlpha(unsigned char ucSirenCount, DWORD dwPercentage)
+    void SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD dwPercentage)
     {
-        m_tSirenInfo.m_tSirenInfo[ucSirenCount].m_dwMinSirenAlpha = dwPercentage;
+        if (ucSirenID >= SIREN_COUNT_MAX)
+            return;
+        m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
     }
-    void               SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos);
-    void               GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos);
-    unsigned char      GetVehicleSirenCount() { return m_tSirenInfo.m_ucSirenCount; }
-    unsigned char      GetVehicleSirenType() { return m_tSirenInfo.m_ucSirenType; }
-    DWORD              GetVehicleSirenMinimumAlpha(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha; }
-    SharedUtil::SColor GetVehicleSirenColour(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour; }
-    void               SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour)
+    void          SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos);
+    void          GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos);
+    unsigned char GetVehicleSirenCount() { return m_tSirenInfo.m_ucSirenCount; }
+    unsigned char GetVehicleSirenType() { return m_tSirenInfo.m_ucSirenType; }
+    DWORD         GetVehicleSirenMinimumAlpha(unsigned char ucSirenID)
     {
+        if (ucSirenID >= SIREN_COUNT_MAX)
+            return 0;
+        return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha;
+    }
+    SharedUtil::SColor GetVehicleSirenColour(unsigned char ucSirenID)
+    {
+        if (ucSirenID >= SIREN_COUNT_MAX)
+            return SharedUtil::SColor();
+        return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour;
+    }
+    void SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour)
+    {
+        if (ucSirenID >= SIREN_COUNT_MAX)
+            return;
         m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
     }
     void                              SetVehicleCurrentSirenID(unsigned char ucCurrentSirenID) { m_tSirenInfo.m_ucCurrentSirenID = ucCurrentSirenID; }
