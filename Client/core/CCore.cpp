@@ -1889,7 +1889,9 @@ void CCore::UpdateRecentlyPlayed()
         CServerBrowser* pServerBrowser = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser();
         CServerList*    pRecentList = pServerBrowser->GetRecentList();
         pRecentList->Remove(Address, usPort);
-        pRecentList->AddUnique(Address, usPort, true);
+        CServerListItem* pItem = pRecentList->AddUnique(Address, usPort, true);
+        if (pItem && CServerListItem::IsHostName(strHost.c_str()))
+            pItem->strHostName = strHost;
 
         pServerBrowser->SaveRecentlyPlayedList();
         if (!m_pConnectManager->m_strLastPassword.empty())
