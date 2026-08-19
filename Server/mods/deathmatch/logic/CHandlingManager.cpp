@@ -14,6 +14,8 @@
 #include "CHandlingConfig.h"
 #include "CCommon.h"
 #include "CVehicleManager.h"
+#include "CGame.h"
+#include "models/CModelManager.h"
 
 // Original handling data
 static tHandlingData                   m_OriginalHandlingData[HT_MAX];
@@ -159,6 +161,13 @@ void CHandlingManager::SetModelHandlingHasChanged(std::uint32_t model, bool bCha
 // Return the handling manager id
 eHandlingTypes CHandlingManager::GetHandlingID(std::uint32_t model) const noexcept
 {
+    if (model > 611 && g_pGame && g_pGame->GetModelManager())
+    {
+        std::uint32_t baseModel = g_pGame->GetModelManager()->GetBaseModelId(model);
+        if (baseModel != model)
+            return GetHandlingID(baseModel);
+    }
+
     switch (model)
     {
         case VT_LANDSTAL:

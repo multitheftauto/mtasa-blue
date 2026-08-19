@@ -13,6 +13,7 @@
 #include "CPlayerManager.h"
 #include "packets/CPlayerDisconnectedPacket.h"
 #include "CGame.h"
+#include "models/CModelManager.h"
 #include "net/SimHeaders.h"
 
 CPlayerManager::CPlayerManager()
@@ -337,8 +338,11 @@ void CPlayerManager::Broadcast(const CPacket& Packet, const std::multimap<ushort
 
 bool CPlayerManager::IsValidPlayerModel(unsigned short model)
 {
+    if (g_pGame && g_pGame->GetModelManager())
+        return g_pGame->GetModelManager()->IsValidModel(model, eModelType::PED);
+
     if (model > 312)
-        return false;  // TODO: On client side maybe check if a model was allocated with engineRequestModel and it is a ped
+        return false;
 
     switch (model)
     {
