@@ -299,8 +299,8 @@ public:
     CSingularFileDownloadManager* GetSingularFileDownloadManager() { return m_pSingularFileDownloadManager; };
     CServerInfo*                  GetServerInfo() { return m_ServerInfo.get(); }
 
-    CClientEntity* GetRootEntity() { return m_pRootEntity; }
-    CEvents*       GetEvents() { return &m_Events; }
+    CClientEntity*  GetRootEntity() { return m_pRootEntity; }
+    CEvents*        GetEvents() { return &m_Events; }
     CEventsManager* GetEventsManager() noexcept { return &m_eventsManager; }
 
     CBlendedWeather*       GetBlendedWeather() { return m_pBlendedWeather; };

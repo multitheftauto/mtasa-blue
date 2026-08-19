@@ -267,9 +267,9 @@ public:
 
     unsigned int CountChildren() { return static_cast<unsigned int>(m_Children.size()); };
 
-    void GetChildren(lua_State* luaVM);
+    void           GetChildren(lua_State* luaVM);
     CChildListType GetChildren() const noexcept { return m_Children; }
-    void GetChildrenByType(const char* szType, lua_State* luaVM);
+    void           GetChildrenByType(const char* szType, lua_State* luaVM);
 
     void AddCollision(CClientColShape* pShape) { m_Collisions.push_back(pShape); }
     void RemoveCollision(CClientColShape* pShape)

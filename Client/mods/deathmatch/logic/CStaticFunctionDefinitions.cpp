@@ -73,8 +73,7 @@ static CClientSoundManager*      m_pSoundManager;
                 func; \
     }
 CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager, CEvents* pEvents, CEventsManager* eventsManager, CCoreInterface* pCore,
-                                                       CGame* pGame,
-                                                       CClientGame* pClientGame, CClientManager* pManager)
+                                                       CGame* pGame, CClientGame* pClientGame, CClientManager* pManager)
 {
     m_pLuaManager = pLuaManager;
     m_pEvents = pEvents;
@@ -107,8 +106,7 @@ CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 {
 }
 
-void CStaticFunctionDefinitions::PreInitialize(CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame, CEvents* pEvents,
-                                               CEventsManager* eventsManager)
+void CStaticFunctionDefinitions::PreInitialize(CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame, CEvents* pEvents, CEventsManager* eventsManager)
 {
     m_pCore = pCore;
     m_pGame = pGame;

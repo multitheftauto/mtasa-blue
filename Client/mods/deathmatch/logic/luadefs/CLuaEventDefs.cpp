@@ -14,15 +14,15 @@
 
 void CLuaEventDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{{"addEvent", ArgumentParserWarn<false, AddEvent>},
-                                                                             {"addEventHandler", ArgumentParserWarn<false, AddEventHandler>},
-                                                                             {"removeEventHandler", ArgumentParserWarn<false, RemoveEventHandler>},
-                                                                             {"cancelEvent", ArgumentParserWarn<false, CancelEvent>},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{{"addEvent2", ArgumentParserWarn<false, AddEvent>},
+                                                                             {"addEventHandler2", ArgumentParserWarn<false, AddEventHandler>},
+                                                                             {"removeEventHandler2", ArgumentParserWarn<false, RemoveEventHandler>},
+                                                                             {"cancelEvent2", ArgumentParserWarn<false, CancelEvent>},
 
-                                                                             {"triggerEvent", ArgumentParserWarn<nullptr, TriggerEvent>},
+                                                                             {"triggerEvent2", ArgumentParserWarn<nullptr, TriggerEvent>},
 
-                                                                             {"getEventHandlers", ArgumentParserWarn<false, GetEventHandlers>},
-                                                                             {"wasEventCancelled", ArgumentParserWarn<false, WasEventCancelled>}};
+                                                                             {"getEventHandlers2", ArgumentParserWarn<false, GetEventHandlers>},
+                                                                             {"wasEventCancelled2", ArgumentParserWarn<false, WasEventCancelled>}};
 
     // Add functions
     for (const auto& [name, func] : functions)

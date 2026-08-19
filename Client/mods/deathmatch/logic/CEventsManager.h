@@ -83,17 +83,11 @@ public:
 
     bool CallingRenderEvent() const noexcept { return m_callingRenderEvent; }
 
-    static inline bool IsEventActive(BuiltInEvent::Enum event) { return m_eventActive[static_cast<std::size_t>(event)]; }
-
     static BuiltInEvent::Enum getBuiltInEventIDFromName(const std::string_view& name);
 
 private:
-    static void SetEventActive(BuiltInEvent::Enum event, bool active) { m_eventActive[static_cast<std::size_t>(event)] = active; }
-
-    void ExecuteHandlersForEntity(EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt, CClientEntity* sourceEntity,
-                                  CClientEntity* entity,
-                                  const CLuaArguments& args,
-                                  const std::string_view& eventName);
+    void ExecuteHandlersForEntity(EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt,
+                                  CClientEntity* sourceEntity, CClientEntity* entity, const CLuaArguments& args, const std::string_view& eventName);
     void TriggerEventOnChildren(EventHandlersTable& handlersTable, CClientEntity* sourceEntity, CClientEntity* entity, const CLuaArguments& args,
                                 const std::string_view& eventName);
 
@@ -106,7 +100,6 @@ private:
     std::unordered_map<std::uint32_t, SCustomEvent> m_customEvents{};
 
     EventHandlersTable m_eventsTable[static_cast<std::size_t>(BuiltInEvent::MAX_EVENTS)]{};
-    inline static bool m_eventActive[static_cast<std::size_t>(BuiltInEvent::MAX_EVENTS)]{false};
     bool               m_eventCancelled{false};
 
     inline static std::array<std::string_view, static_cast<std::size_t>(BuiltInEvent::MAX_EVENTS)> m_eventNames{};

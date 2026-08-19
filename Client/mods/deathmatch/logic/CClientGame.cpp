@@ -1323,7 +1323,7 @@ void CClientGame::DoPulses()
 
         // Call onClientRender LUA event
         CLuaArguments Arguments;
-        //m_pRootEntity->CallEvent("onClientRender", Arguments, false);
+        // m_pRootEntity->CallEvent("onClientRender", Arguments, false);
         m_eventsManager.TriggerEvent(BuiltInEvent::ON_CLIENT_RENDER, m_pRootEntity, Arguments, false);
 
         // Disallow scripted dxSetRenderTarget for old scripts

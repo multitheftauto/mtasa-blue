@@ -93,12 +93,12 @@ namespace lua
         args.PushAsTable(L);
     }
 
-   inline void Push(lua_State* L, const CLuaFunctionRef& value)
+    inline void Push(lua_State* L, const CLuaFunctionRef& value)
     {
-       if (value.ToInt() != LUA_NOREF && value.ToInt() != LUA_REFNIL)
-           lua_getref(L, value.ToInt());
-       else
-           lua_pushnil(L);
+        if (value.ToInt() != LUA_NOREF && value.ToInt() != LUA_REFNIL)
+            lua_getref(L, value.ToInt());
+        else
+            lua_pushnil(L);
     }
 
     inline void Push(lua_State* L, const CVector2D& value)
@@ -309,6 +309,5 @@ namespace lua
             },
             tuple);
     }
-
 
 }  // namespace lua

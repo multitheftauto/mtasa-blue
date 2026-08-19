@@ -58,7 +58,6 @@ void CEventsManager::AddHandler(const std::variant<std::uint32_t, BuiltInEvent::
     {
         auto builtInEnum = std::get<BuiltInEvent::Enum>(event);
         handlersListPtr = &m_eventsTable[static_cast<std::size_t>(builtInEnum)][sourceEntity];
-        SetEventActive(builtInEnum, true);
 
         isRenderingEvent = builtInEnum == BuiltInEvent::ON_CLIENT_RENDER || builtInEnum == BuiltInEvent::ON_CLIENT_PRE_RENDER ||
                            builtInEnum == BuiltInEvent::ON_CLIENT_HUD_RENDER;
@@ -146,7 +145,7 @@ void CEventsManager::RemoveAllHandlers(CLuaMain* luaMain)
             auto& handlersList = it->second;
 
             handlersList.erase(std::remove_if(handlersList.begin(), handlersList.end(),
-                                              [luaMain](SEventHandler& h) 
+                                              [luaMain](SEventHandler& h)
                                               {
                                                   if (h.luaMain == luaMain)
                                                   {
@@ -258,6 +257,8 @@ bool CEventsManager::TriggerEvent(BuiltInEvent::Enum event, CClientEntity* sourc
     if (eventId >= m_eventsTable->size() || m_eventsTable[eventId].empty())
         return true;
 
+    auto start = std::chrono::high_resolution_clock::now();
+
     EventHandlersTable& handlersTable = m_eventsTable[eventId];
     std::string_view    eventName = GetEventName(eventId);
 
@@ -283,6 +284,16 @@ bool CEventsManager::TriggerEvent(BuiltInEvent::Enum event, CClientEntity* sourc
     // Call the event on the children (down the tree)
     if (callOnChildren && sourceEntity)
         TriggerEventOnChildren(handlersTable, sourceEntity, sourceEntity, args, eventName);
+
+    auto   end = std::chrono::high_resolution_clock::now();
+    double durationMs = std::chrono::duration<double, std::milli>(end - start).count();
+
+    static bool checked = false;
+    if (!checked)
+    {
+        AddReportLog(479878, SString("5k [%s] handlers took: %.3f ms\n", eventName.data(), durationMs).c_str());
+        checked = true;
+    }
 
     // g_pClientGame->GetDebugHookManager()->OnPostEvent(eventName.data(), args, sourceEntity, nullptr);
     return !m_eventCancelled;
@@ -430,10 +441,10 @@ void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, Event
         if (result > 1 && result != LUA_ERRSYNTAX)
             g_pClientGame->GetScriptDebugging()->LogPCallError(luaVM, ConformResourcePath(lua_tostring(luaVM, -1)));
         else
-            CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(luaMain, luaMain->GetFunctionTag(handler.luaFunctionRef.ToInt()),
-                                                                      GetTimeUs() - startTime);
+            // CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(luaMain, luaMain->GetFunctionTag(handler.luaFunctionRef.ToInt()),
+            //                                                           GetTimeUs() - startTime);
 
-        lua_settop(luaVM, preCallTop);
+            lua_settop(luaVM, preCallTop);
 
         // TODO g_pClientGame->GetDebugHookManager()->OnPostEventFunction
 

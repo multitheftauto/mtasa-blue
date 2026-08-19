@@ -23,8 +23,8 @@ class CStaticFunctionDefinitions;
 class CStaticFunctionDefinitions
 {
 public:
-    CStaticFunctionDefinitions(class CLuaManager* pLuaManager, CEvents* pEvents, CEventsManager* eventsManager, CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame,
-                               CClientManager* pManager);
+    CStaticFunctionDefinitions(class CLuaManager* pLuaManager, CEvents* pEvents, CEventsManager* eventsManager, CCoreInterface* pCore, CGame* pGame,
+                               CClientGame* pClientGame, CClientManager* pManager);
     ~CStaticFunctionDefinitions();
 
     static void PreInitialize(CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame, CEvents* pEvents, CEventsManager* eventsManager);
