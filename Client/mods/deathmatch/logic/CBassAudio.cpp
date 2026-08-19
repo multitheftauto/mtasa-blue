@@ -511,10 +511,10 @@ HSTREAM CBassAudio::ConvertFileToMono(const SString& strPath)
     DWORD decodedLength = BASS_ChannelGetData(decoder, data, length);  // decode data
     BASS_StreamFree(decoder);                                          // free the decoder/mixer
 
-    if (decodedLength == static_cast<DWORD>(-1))
+    if (decodedLength == 0 || decodedLength == static_cast<DWORD>(-1))
     {
         free(data);
-        return 0;  // decode failed
+        return 0;  // no decoded data
     }
 
     HSTREAM stream = BASS_StreamCreate(ci.freq, 1, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL);  // create stream
@@ -524,7 +524,7 @@ HSTREAM CBassAudio::ConvertFileToMono(const SString& strPath)
         return 0;  // stream creation failed
     }
 
-    if (!BASS_StreamPutData(stream, data, decodedLength))  // set the stream data
+    if (BASS_StreamPutData(stream, data, decodedLength) == static_cast<DWORD>(-1))  // set the stream data
     {
         free(data);
         BASS_StreamFree(stream);
