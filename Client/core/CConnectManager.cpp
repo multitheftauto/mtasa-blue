@@ -463,7 +463,7 @@ void CConnectManager::OnServerExists()
     if (m_bNotifyServerBrowser)
     {
         m_bNotifyServerBrowser = false;
-        CServerBrowser::GetSingletonPtr()->NotifyServerExists(m_Address, m_usPort);
+        CServerBrowser::GetSingletonPtr()->NotifyServerExists(m_Address, m_usPort, m_strHost);
     }
 }
 

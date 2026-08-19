@@ -130,6 +130,9 @@ public:
         return true;
     }
 
+    // Anything that is not a numeric IPv4 address is treated as a hostname
+    static bool IsHostName(const char* szAddress) { return szAddress[0] != '\0' && inet_addr(szAddress) == INADDR_NONE; }
+
     bool operator==(const CServerListItem& other) const { return (Address.S_un.S_addr == other.Address.S_un.S_addr && usGamePort == other.usGamePort); }
 
     void Init()
@@ -375,9 +378,9 @@ public:
     CServerListReverseIterator ReverseIteratorEnd() { return m_Servers.rend(); };
     unsigned int               GetServerCount() { return m_Servers.size(); };
 
-    bool AddUnique(in_addr Address, ushort usGamePort, bool addAtFront = false);
-    void Clear();
-    bool Remove(in_addr Address, ushort usGamePort);
+    CServerListItem* AddUnique(in_addr Address, ushort usGamePort, bool addAtFront = false);
+    void             Clear();
+    bool             Remove(in_addr Address, ushort usGamePort);
 
     std::string& GetStatus() { return m_strStatus; };
     bool         IsUpdated() { return m_bUpdated; };
