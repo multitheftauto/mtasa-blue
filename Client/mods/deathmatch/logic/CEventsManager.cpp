@@ -73,6 +73,8 @@ void CEventsManager::AddHandler(const std::variant<std::uint32_t, BuiltInEvent::
     if (!handlersListPtr)
         return;
 
+    sourceEntity->IncrementEventHandlersCount();
+
     handlersListPtr->push_back(SEventHandler{.luaMain = luaMain,
                                              .luaFunctionRef = luaFunctionRef,
                                              .isValid = true,
@@ -131,7 +133,7 @@ bool CEventsManager::RemoveHandler(const std::variant<std::uint32_t, BuiltInEven
 
     // If the event is currently being executed, it will be removed by the executing loop (ExecuteHandlersForEntity)
     if (!isInUse)
-        TryRemoveHandler(handlersList, *entityMapPtr, it);
+        TryRemoveHandler(sourceEntity, handlersList, *entityMapPtr, it);
 
     return removed;
 }
@@ -178,7 +180,7 @@ void CEventsManager::RemoveAllHandlers(CLuaMain* luaMain)
 
 void CEventsManager::RemoveHandlersForEntity(CClientEntity* entity)
 {
-    if (!entity)
+    if (!entity || entity->GetEventHandlersCount() == 0)
         return;
 
     auto cleanEventTable = [entity](auto& eventMap)
@@ -269,7 +271,7 @@ bool CEventsManager::TriggerEvent(BuiltInEvent::Enum event, CClientEntity* sourc
     CClientEntity* currentEntity = sourceEntity;
     while (currentEntity)
     {
-        if (!currentEntity->IsBeingDeleted())
+        if (!currentEntity->IsBeingDeleted() && currentEntity->GetEventHandlersCount() > 0)
         {
             auto it = handlersTable.find(currentEntity);
             if (it != handlersTable.end())
@@ -307,7 +309,7 @@ bool CEventsManager::TriggerCustomEvent(std::uint32_t hash, CClientEntity* sourc
     CClientEntity* currentEntity = sourceEntity;
     while (currentEntity)
     {
-        if (!currentEntity->IsBeingDeleted())
+        if (!currentEntity->IsBeingDeleted() && currentEntity->GetEventHandlersCount() > 0)
         {
             auto it = handlersTable.find(currentEntity);
             if (it != handlersTable.end())
@@ -331,7 +333,7 @@ void CEventsManager::TriggerEventOnChildren(EventHandlersTable& handlersTable, C
     const auto& children = entity->GetChildren();
     for (CClientEntity* child : children)
     {
-        if (!child || child->IsBeingDeleted())
+        if (!child || child->IsBeingDeleted() || child->GetEventHandlersCount() == 0)
             continue;
 
         auto it = handlersTable.find(child);
@@ -342,9 +344,14 @@ void CEventsManager::TriggerEventOnChildren(EventHandlersTable& handlersTable, C
     }
 }
 
-void CEventsManager::TryRemoveHandler(EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt)
+void CEventsManager::TryRemoveHandler(CClientEntity* entity, EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt)
 {
+    std::size_t oldSize = handlers.size();
     handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [](const SEventHandler& h) { return !h.isValid && !h.isInUse; }), handlers.end());
+    std::size_t removedCount = oldSize - handlers.size();
+
+    for (std::size_t i = 0; i < removedCount; ++i)
+        entity->DecrementEventHandlersCount();
 
     if (handlers.empty())
         handlersTable.erase(mapIt);
@@ -458,7 +465,7 @@ void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, Event
 
     // To avoid searching through the entire list with erase, we first check whether there is anything to remove
     if (removedDuringCallback)
-        TryRemoveHandler(handlers, handlersTable, mapIt);
+        TryRemoveHandler(entity, handlers, handlersTable, mapIt);
 }
 
 const SCustomEvent* CEventsManager::GetCustomEvent(std::uint32_t hash) const

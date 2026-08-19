@@ -91,7 +91,7 @@ private:
     void TriggerEventOnChildren(EventHandlersTable& handlersTable, CClientEntity* sourceEntity, CClientEntity* entity, const CLuaArguments& args,
                                 const std::string_view& eventName);
 
-    void TryRemoveHandler(EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt);
+    void TryRemoveHandler(CClientEntity* entity, EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt);
 
     std::string_view GetEventName(BuiltInEvent::Enum event) const { return m_eventNames[static_cast<std::size_t>(event)]; }
     std::string_view GetEventName(std::uint32_t hash) const;
