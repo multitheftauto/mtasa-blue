@@ -191,7 +191,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
             }
         }
 
-        // When updating m_bFocused in CClientGame from CPacketHandler (to fix another bug ù see the note there),
+        // When updating m_bFocused in CClientGame from CPacketHandler (to fix another bug - see the note there),
         // the window might not actually have focus at that moment (even though Windows reports it as focused).
         // In this case, isMTAWindowFocused returns false even though the window has focus.
         // Therefore, we need to intercept the window return operation and manually set the focus in CClientGame.
