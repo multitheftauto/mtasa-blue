@@ -37,6 +37,7 @@
 
 using std::list;
 
+static CEventsManager*           m_eventsManager;
 static CLuaManager*              m_pLuaManager;
 static CEvents*                  m_pEvents;
 static CCoreInterface*           m_pCore;
@@ -71,11 +72,13 @@ static CClientSoundManager*      m_pSoundManager;
             if (!(*iter)->IsBeingDeleted()) \
                 func; \
     }
-CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager, CEvents* pEvents, CCoreInterface* pCore, CGame* pGame,
+CStaticFunctionDefinitions::CStaticFunctionDefinitions(CLuaManager* pLuaManager, CEvents* pEvents, CEventsManager* eventsManager, CCoreInterface* pCore,
+                                                       CGame* pGame,
                                                        CClientGame* pClientGame, CClientManager* pManager)
 {
     m_pLuaManager = pLuaManager;
     m_pEvents = pEvents;
+    m_eventsManager = eventsManager;
     m_pCore = pCore;
     m_pGame = pGame;
     m_pClientGame = pClientGame;
@@ -104,12 +107,14 @@ CStaticFunctionDefinitions::~CStaticFunctionDefinitions()
 {
 }
 
-void CStaticFunctionDefinitions::PreInitialize(CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame, CEvents* pEvents)
+void CStaticFunctionDefinitions::PreInitialize(CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame, CEvents* pEvents,
+                                               CEventsManager* eventsManager)
 {
     m_pCore = pCore;
     m_pGame = pGame;
     m_pClientGame = pClientGame;
     m_pEvents = pEvents;
+    m_eventsManager = eventsManager;
 }
 
 bool CStaticFunctionDefinitions::AddEvent(CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger)

@@ -26,6 +26,7 @@ SString             CLuaMain::ms_strExpectedUndumpHash;
 #include "luascripts/coroutine_debug.lua.h"
 #include "luascripts/exports.lua.h"
 #include "luascripts/inspect.lua.h"
+#include <luascripts/eventhandler_globals.lua.h>
 
 CLuaMain::CLuaMain(CLuaManager* pLuaManager, CResource* pResourceOwner, bool bEnableOOP)
 {
@@ -187,6 +188,15 @@ void CLuaMain::LoadEmbeddedScripts()
     LoadScript(EmbeddedLuaCode::exports);
     LoadScript(EmbeddedLuaCode::coroutine_debug);
     LoadScript(EmbeddedLuaCode::inspect);
+
+    LoadScript(EmbeddedLuaCode::SetEventHandlerGlobals);
+    lua_getglobal(m_luaVM, "SetEventHandlerGlobals");
+
+    m_eventHandlerGlobalsFuncRef = lua_ref(m_luaVM, true);
+
+    lua_pushnil(m_luaVM);
+    lua_setglobal(m_luaVM, "SetEventHandlerGlobals");
+
     DECLARE_PROFILER_SECTION(OnPostLoadScript)
 }
 

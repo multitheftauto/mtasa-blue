@@ -112,6 +112,8 @@ CResource::~CResource()
     ShowCursor(false);
 
     // Do this before we delete our elements.
+    g_pClientGame->GetEventsManager()->RemoveAllHandlers(m_pLuaVM);
+
     m_pRootEntity->CleanUpForVM(m_pLuaVM, true);
     g_pClientGame->GetElementDeleter()->CleanUpForVM(m_pLuaVM);
     m_pLuaManager->RemoveVirtualMachine(m_pLuaVM);

@@ -23,11 +23,11 @@ class CStaticFunctionDefinitions;
 class CStaticFunctionDefinitions
 {
 public:
-    CStaticFunctionDefinitions(class CLuaManager* pLuaManager, CEvents* pEvents, CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame,
+    CStaticFunctionDefinitions(class CLuaManager* pLuaManager, CEvents* pEvents, CEventsManager* eventsManager, CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame,
                                CClientManager* pManager);
     ~CStaticFunctionDefinitions();
 
-    static void PreInitialize(CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame, CEvents* pEvents);
+    static void PreInitialize(CCoreInterface* pCore, CGame* pGame, CClientGame* pClientGame, CEvents* pEvents, CEventsManager* eventsManager);
 
     static bool AddEvent(CLuaMain& LuaMain, const char* szName, bool bAllowRemoteTrigger);
     static bool AddEventHandler(CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction, bool bPropagated,

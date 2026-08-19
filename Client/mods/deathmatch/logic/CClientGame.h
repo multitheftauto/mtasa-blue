@@ -44,6 +44,7 @@
 #include "CVoiceRecorder.h"
 #include "CSingularFileDownloadManager.h"
 #include "CObjectRespawner.h"
+#include "CEventsManager.h"
 
 #define HeliKill_List_Clear_Rate        500
 #define MIN_PUSH_ANTISPAM_RATE          1500
@@ -300,6 +301,7 @@ public:
 
     CClientEntity* GetRootEntity() { return m_pRootEntity; }
     CEvents*       GetEvents() { return &m_Events; }
+    CEventsManager* GetEventsManager() noexcept { return &m_eventsManager; }
 
     CBlendedWeather*       GetBlendedWeather() { return m_pBlendedWeather; };
     CNetAPI*               GetNetAPI() { return m_pNetAPI; };
@@ -895,6 +897,7 @@ private:
     bool m_bShowSound;
 
 private:
+    CEventsManager                              m_eventsManager;
     CEvents                                     m_Events;
     std::list<SScreenShotArgs>                  m_ScreenShotArgList;
     ushort                                      m_usNextScreenShotId;

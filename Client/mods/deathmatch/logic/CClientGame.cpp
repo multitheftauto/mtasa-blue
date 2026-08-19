@@ -84,7 +84,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Init the global var with ourself
     g_pClientGame = this;
 
-    CStaticFunctionDefinitions::PreInitialize(g_pCore, g_pGame, this, &m_Events);
+    CStaticFunctionDefinitions::PreInitialize(g_pCore, g_pGame, this, &m_Events, &m_eventsManager);
 
     // Packet handler
     m_pPacketHandler = new CPacketHandler();
@@ -337,7 +337,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_pScriptDebugging = new CScriptDebugging(m_pLuaManager);
     m_pScriptDebugging->SetLogfile(CalcMTASAPath("mta\\logs\\clientscript.log"), 3);
 
-    CStaticFunctionDefinitions(m_pLuaManager, &m_Events, g_pCore, g_pGame, this, m_pManager);
+    CStaticFunctionDefinitions(m_pLuaManager, &m_Events, &m_eventsManager, g_pCore, g_pGame, this, m_pManager);
     CLuaFunctionDefs::Initialize(m_pLuaManager, m_pScriptDebugging, this);
     CLuaDefs::Initialize(this, m_pLuaManager, m_pScriptDebugging);
 
@@ -1323,7 +1323,8 @@ void CClientGame::DoPulses()
 
         // Call onClientRender LUA event
         CLuaArguments Arguments;
-        m_pRootEntity->CallEvent("onClientRender", Arguments, false);
+        //m_pRootEntity->CallEvent("onClientRender", Arguments, false);
+        m_eventsManager.TriggerEvent(BuiltInEvent::ON_CLIENT_RENDER, m_pRootEntity, Arguments, false);
 
         // Disallow scripted dxSetRenderTarget for old scripts
         g_pCore->GetGraphics()->GetRenderItemManager()->EnableSetRenderTargetOldVer(false);
