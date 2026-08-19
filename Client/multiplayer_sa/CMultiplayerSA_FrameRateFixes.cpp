@@ -796,7 +796,8 @@ static bool __fastcall HOOK_CPhysical__ApplyCollision(CPhysicalSAInterface* pThi
         const uint8 typeA = pThis->nType;
         const uint8 typeB = theEntity->nType;
 
-        const float timeStepRatio = *(float*)0xB7CB5C / kOriginalTimeStep;
+        // Sqrt scaling compensates for per-frame tire friction damping at high FPS.
+        const float timeStepRatio = std::sqrt(*(float*)0xB7CB5C / kOriginalTimeStep);
 
         if (typeA == 2 && typeB == 3)
         {
@@ -837,7 +838,8 @@ static bool __fastcall HOOK_CPhysical__ApplyCollisionAlt(CPhysicalSAInterface* p
 
         if (thisType == 2 && entityType == 3)
         {
-            const float timeStepRatio = *(float*)0xB7CB5C / kOriginalTimeStep;
+            // Sqrt scaling compensates for per-frame tire friction damping at high FPS.
+            const float timeStepRatio = std::sqrt(*(float*)0xB7CB5C / kOriginalTimeStep);
             *pOutVecMoveSpeed = vecMoveBefore + (*pOutVecMoveSpeed - vecMoveBefore) * timeStepRatio;
             *pOutVecTurnSpeed = vecTurnBefore + (*pOutVecTurnSpeed - vecTurnBefore) * timeStepRatio;
         }
