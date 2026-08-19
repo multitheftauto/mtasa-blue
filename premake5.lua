@@ -225,6 +225,7 @@ workspace "MTASA"
 		include "vendor/pcre2"
 		include "vendor/pme"
 		include "vendor/sqlite"
+		include "vendor/tinygettext" -- Required by the localization system on all platforms (Server + Linux/macOS CI)
 		include "vendor/tinyxml2"
 		include "vendor/unrar"
 		include "vendor/zip"

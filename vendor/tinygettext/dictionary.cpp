@@ -77,7 +77,19 @@ Dictionary::translate_plural(const std::string& msgid, const std::string& msgid_
 }
 
 std::string
+Dictionary::translate_plural_silent(const std::string& msgid, const std::string& msgid_plural, int num)
+{
+  return translate_plural_impl(entries, msgid, msgid_plural, num, true);
+}
+
+std::string
 Dictionary::translate_plural(const Entries& dict, const std::string& msgid, const std::string& msgid_plural, int count)
+{
+  return translate_plural_impl(dict, msgid, msgid_plural, count, false);
+}
+
+std::string
+Dictionary::translate_plural_impl(const Entries& dict, const std::string& msgid, const std::string& msgid_plural, int count, bool silent)
 {
   Entries::const_iterator i = dict.find(msgid);
 
@@ -94,10 +106,13 @@ Dictionary::translate_plural(const Entries& dict, const std::string& msgid, cons
   }
   else
   {
-    log_info << "Couldn't translate: " << msgid << std::endl;
-    log_info << "Candidates: " << std::endl;
-    for (i = dict.begin(); i != dict.end(); ++i)
-      log_info << "'" << i->first << "'" << std::endl;
+    if (!silent)
+    {
+      log_info << "Couldn't translate: " << msgid << std::endl;
+      log_info << "Candidates: " << std::endl;
+      for (i = dict.begin(); i != dict.end(); ++i)
+        log_info << "'" << i->first << "'" << std::endl;
+    }
   }
 
   if (count == 1) // default to english rules
@@ -113,7 +128,19 @@ Dictionary::translate(const std::string& msgid)
 }
 
 std::string
+Dictionary::translate_silent(const std::string& msgid)
+{
+  return translate_impl(entries, msgid, true);
+}
+
+std::string
 Dictionary::translate(const Entries& dict, const std::string& msgid)
+{
+  return translate_impl(dict, msgid, false);
+}
+
+std::string
+Dictionary::translate_impl(const Entries& dict, const std::string& msgid, bool silent)
 {
   Entries::const_iterator i = dict.find(msgid);
   if (i != dict.end() && !i->second.empty())
@@ -122,7 +149,10 @@ Dictionary::translate(const Entries& dict, const std::string& msgid)
   }
   else
   {
-    log_info << "Couldn't translate: " << msgid << std::endl;
+    if (!silent)
+    {
+      log_info << "Couldn't translate: " << msgid << std::endl;
+    }
     return msgid;
   } 
 }

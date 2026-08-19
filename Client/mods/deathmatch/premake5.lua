@@ -10,7 +10,7 @@ project "Client Deathmatch"
 
 	defines { "LUNASVG_BUILD", "LUA_USE_APICHECK", "SDK_WITH_BCRYPT" }
 	links {
-		"Lua_Client", "pcre2", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt", "lunasvg",
+		"Lua_Client", "pcre2", "json-c", "ws2_32", "portaudio", "zlib", "cryptopp", "libspeex", "blowfish_bcrypt", "lunasvg", "tinygettext",
 		"../../../vendor/bass/lib/bass",
 		"../../../vendor/bass/lib/bass_fx",
 		"../../../vendor/bass/lib/bassmix",
@@ -42,6 +42,7 @@ project "Client Deathmatch"
 			"../../../vendor/pcre2",
 			"../../../vendor/json-c",
 			"../../../vendor/lua/src",
+			"../../../vendor/tinygettext",
 			"../../../Shared/mods/deathmatch/logic",
 			"../../../Shared/animation",
 			"../../../Shared",
