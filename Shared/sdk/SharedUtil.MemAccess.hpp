@@ -49,6 +49,9 @@ namespace SharedUtil
         VirtualProtect((LPVOID)0x6AE000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
         VirtualProtect((LPVOID)0x729000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
         VirtualProtect((LPVOID)0x742000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
+
+        // Used by CPathFind's hooks in game_sa/CPathFindSA.cpp, installed via the Fast path.
+        VirtualProtect((LPVOID)0x156F000, 0x1000, PAGE_EXECUTE_READWRITE, &oldProt);
     }
 
     // Returns true if pAddr is in slow mem area
