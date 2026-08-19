@@ -12,10 +12,6 @@
 #include "StdInc.h"
 #include "CLuaEventDefs.h"
 
-extern std::array<SString, static_cast<std::size_t>(BuiltInEvent::MAX_EVENTS)> eventNames{};
-extern std::unordered_map<SString, BuiltInEvent::Enum>                         eventNameToId{};
-
-
 void CLuaEventDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{{"addEvent", ArgumentParserWarn<false, AddEvent>},
