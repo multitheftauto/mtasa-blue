@@ -4594,6 +4594,9 @@ void CClientVehicle::HandleWaitingForGroundToLoad()
 
 bool CClientVehicle::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount)
 {
+    if (ucSirenCount > SIREN_COUNT_MAX)
+        ucSirenCount = SIREN_COUNT_MAX;
+
     m_tSirenBeaconInfo.m_bOverrideSirens = true;
     m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
     m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
@@ -4605,6 +4608,9 @@ bool CClientVehicle::GiveVehicleSirens(unsigned char ucSirenType, unsigned char 
 }
 void CClientVehicle::SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
+
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
 
     if (m_pVehicle)
@@ -4613,6 +4619,9 @@ void CClientVehicle::SetVehicleSirenPosition(unsigned char ucSirenID, CVector ve
 
 void CClientVehicle::SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD dwPercentage)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
+
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
 
     if (m_pVehicle)
@@ -4621,6 +4630,9 @@ void CClientVehicle::SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD 
 
 void CClientVehicle::SetVehicleSirenColour(unsigned char ucSirenID, SColor tVehicleSirenColour)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
+
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
 
     if (m_pVehicle)

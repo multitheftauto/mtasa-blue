@@ -869,16 +869,22 @@ void CVehicle::GenerateHandlingData() noexcept
 
 void CVehicle::SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
 }
 
 void CVehicle::SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD dwPercentage)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
 }
 
 void CVehicle::SetVehicleSirenColour(unsigned char ucSirenID, SColor tVehicleSirenColour)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
 }
 
@@ -891,7 +897,7 @@ void CVehicle::SetVehicleFlags(bool bEnable360, bool bEnableRandomiser, bool bEn
 }
 void CVehicle::RemoveVehicleSirens()
 {
-    for (unsigned char i = 0; i <= 7; i++)
+    for (int i = 0; i < SIREN_COUNT_MAX; i++)
     {
         m_tSirenBeaconInfo.m_tSirenInfo[i] = SSirenBeaconInfo();
         SetVehicleSirenPosition(i, CVector(0, 0, 0));
