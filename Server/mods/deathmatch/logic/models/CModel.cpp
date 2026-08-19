@@ -13,6 +13,6 @@
 #include "CModel.h"
 
 CModel::CModel(std::uint32_t modelId, eModelType modelType, std::uint32_t parentModelId, CResource* resource, bool isCustom)
-    : m_modelId(modelId), m_parentModelId(parentModelId == 0 ? modelId : parentModelId), m_modelType(modelType), m_isCustom(isCustom), m_resource(resource)
+    : m_modelId(modelId), m_parentModelId(parentModelId), m_modelType(modelType), m_isCustom(isCustom), m_resource(resource)
 {
 }

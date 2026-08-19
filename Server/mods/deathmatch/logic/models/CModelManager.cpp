@@ -12,6 +12,8 @@
 #include "StdInc.h"
 #include "CModelManager.h"
 #include "CLogger.h"
+#include "CResource.h"
+#include <algorithm>
 
 CModelManager::CModelManager()
     : m_vehiclesConfig("mods/deathmatch/vehicles.conf"), m_pedConfig("mods/deathmatch/peds.conf"), m_objectConfig("mods/deathmatch/objects.conf")
@@ -151,10 +153,13 @@ std::shared_ptr<CModel> CModelManager::RequestModel(CResource* resource, eModelT
     return customModel;
 }
 
-bool CModelManager::FreeModel(std::uint32_t modelId)
+bool CModelManager::FreeModel(std::uint32_t modelId, CResource* resource)
 {
     auto it = m_models.find(modelId);
     if (it == m_models.end() || !it->second->IsCustom())
+        return false;
+
+    if (resource && it->second->GetResource() != resource)
         return false;
 
     m_models.erase(it);
@@ -198,6 +203,20 @@ bool CModelManager::IsValidModel(std::uint32_t modelId, eModelType modelType) co
 {
     auto it = m_models.find(modelId);
     return (it != m_models.end() && it->second->GetModelType() == modelType);
+}
+
+std::vector<std::uint32_t> CModelManager::GetModelsByType(eModelType modelType, std::uint32_t minModelId) const
+{
+    std::vector<std::uint32_t> result;
+    for (const auto& pair : m_models)
+    {
+        if (pair.first >= minModelId && pair.second && pair.second->GetModelType() == modelType)
+        {
+            result.push_back(pair.first);
+        }
+    }
+    std::sort(result.begin(), result.end());
+    return result;
 }
 
 std::uint32_t CModelManager::GetFirstFreeModelId(eModelType modelType) const
