@@ -334,8 +334,12 @@ public:
     void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
     std::uint32_t GetEventHandlersCount() const noexcept { return m_eventHandlersCounter; }
-    void IncrementEventHandlersCount() noexcept { m_eventHandlersCounter++; }
-    void DecrementEventHandlersCount() noexcept { if (m_eventHandlersCounter > 0) m_eventHandlersCounter--; }
+    void          IncrementEventHandlersCount() noexcept { m_eventHandlersCounter++; }
+    void          DecrementEventHandlersCount() noexcept
+    {
+        if (m_eventHandlersCounter > 0)
+            m_eventHandlersCounter--;
+    }
 
     virtual bool IsOnFire() { return false; }
     virtual bool SetOnFire(bool onFire) { return false; }
