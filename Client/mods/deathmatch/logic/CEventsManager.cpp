@@ -257,8 +257,6 @@ bool CEventsManager::TriggerEvent(BuiltInEvent::Enum event, CClientEntity* sourc
     if (eventId >= m_eventsTable->size() || m_eventsTable[eventId].empty())
         return true;
 
-    auto start = std::chrono::high_resolution_clock::now();
-
     EventHandlersTable& handlersTable = m_eventsTable[eventId];
     std::string_view    eventName = GetEventName(event);
 
@@ -284,16 +282,6 @@ bool CEventsManager::TriggerEvent(BuiltInEvent::Enum event, CClientEntity* sourc
     // Call the event on the children (down the tree)
     if (callOnChildren && sourceEntity)
         TriggerEventOnChildren(handlersTable, sourceEntity, sourceEntity, args, eventName);
-
-    auto   end = std::chrono::high_resolution_clock::now();
-    double durationMs = std::chrono::duration<double, std::milli>(end - start).count();
-
-    static bool checked = false;
-    if (!checked)
-    {
-        AddReportLog(479878, SString("5k [%s] handlers took: %.3f ms\n", eventName.data(), durationMs).c_str());
-        checked = true;
-    }
 
     // g_pClientGame->GetDebugHookManager()->OnPostEvent(eventName.data(), args, sourceEntity, nullptr);
     return !m_eventCancelled;
