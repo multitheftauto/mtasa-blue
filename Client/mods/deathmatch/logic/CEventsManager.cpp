@@ -260,7 +260,7 @@ bool CEventsManager::TriggerEvent(BuiltInEvent::Enum event, CClientEntity* sourc
     auto start = std::chrono::high_resolution_clock::now();
 
     EventHandlersTable& handlersTable = m_eventsTable[eventId];
-    std::string_view    eventName = GetEventName(eventId);
+    std::string_view    eventName = GetEventName(event);
 
     // if (!g_pClientGame->GetDebugHookManager()->OnPreEvent(eventName.data(), args, sourceEntity, nullptr))
     //    return false;
