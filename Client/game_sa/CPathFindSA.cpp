@@ -42,48 +42,13 @@ static void __declspec(naked) HOOK_CPathFind_LoadPathNodeCount_Mid()
     // clang-format on
 }
 
-// Test-only: deliberately reproduces the crash above by forcing every m_pPathNodes[area]
-// allocation to look like it failed, the moment after it's stored. Off unless explicitly
-// compiled in, so it can never affect a normal build. Used to confirm the crash happens without
-// the fix above (undo HOOK_CPathFind_LoadPathNodeCount_Mid's install to test that) and is gone
-// with it.
-// #define MTA_DEBUG_REPRO_PATHFIND_NULL_CRASH
-
-#ifdef MTA_DEBUG_REPRO_PATHFIND_NULL_CRASH
-    #define HOOKPOS_CPathFind_ReproForceNull_Mid  0x0156F7F6
-    #define HOOKSIZE_CPathFind_ReproForceNull_Mid 7
-DWORD                         RETURN_CPathFind_ReproForceNull_Mid = 0x0156F7FD;
-static void __declspec(naked) HOOK_CPathFind_ReproForceNull_Mid()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        // Replicate the overwritten instruction (unrelated field, must still run)
-        mov     eax, dword ptr [esi + edi*4 + 0x1304]
-
-        // Force the just-stored m_pPathNodes[area] to null, as if malloc() had failed
-        mov     dword ptr [esi + edi*4 + 0x804], 0
-
-        jmp     RETURN_CPathFind_ReproForceNull_Mid
-    }
-    // clang-format on
-}
-#endif
-
-// Both hooks above live past 0x8A4000, past the range IsSlowMem normally covers, so they
-// install through the Fast path instead of EZHookInstall (see SetInitialVirtualProtect).
+// This address is further into the executable than IsSlowMem recognizes, so the normal
+// EZHookInstall path would assert in Debug builds. Unprotected up front in
+// SetInitialVirtualProtect and installed via the Fast path instead, like the other hot addresses.
 void CPathFindSA::StaticSetHooks()
 {
     BYTE jumpBytes[MAX_JUMPCODE_SIZE];
     MemSetFast(jumpBytes, 0x90, MAX_JUMPCODE_SIZE);
     CreateJump(HOOKPOS_CPathFind_LoadPathNodeCount_Mid, (DWORD)HOOK_CPathFind_LoadPathNodeCount_Mid, jumpBytes);
     MemCpyFast((PVOID)HOOKPOS_CPathFind_LoadPathNodeCount_Mid, jumpBytes, HOOKSIZE_CPathFind_LoadPathNodeCount_Mid);
-
-#ifdef MTA_DEBUG_REPRO_PATHFIND_NULL_CRASH
-    MemSetFast(jumpBytes, 0x90, MAX_JUMPCODE_SIZE);
-    CreateJump(HOOKPOS_CPathFind_ReproForceNull_Mid, (DWORD)HOOK_CPathFind_ReproForceNull_Mid, jumpBytes);
-    MemCpyFast((PVOID)HOOKPOS_CPathFind_ReproForceNull_Mid, jumpBytes, HOOKSIZE_CPathFind_ReproForceNull_Mid);
-#endif
 }
