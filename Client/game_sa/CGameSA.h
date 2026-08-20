@@ -140,6 +140,7 @@ public:
     CHud*                     GetHud() { return m_pHud; }
     CWeather*                 GetWeather() { return m_pWeather; }
     CWorld*                   GetWorld() { return m_pWorld; }
+    CTrainTrackManager*       GetTrainTrackManager() const noexcept { return m_pTrainTrackManager.get(); }
     CCamera*                  GetCamera() { return m_pCamera; }
     CPickups*                 GetPickups() { return m_pPickups; }
     C3DMarkers*               Get3DMarkers() { return m_p3DMarkers; }
@@ -320,42 +321,43 @@ public:
     bool SetBuildingPoolSize(size_t size);
 
 private:
-    std::unique_ptr<CPools>           m_Pools;
-    CPlayerInfo*                      m_pPlayerInfo;
-    CProjectileInfo*                  m_pProjectileInfo;
-    CRadar*                           m_pRadar;
-    CClock*                           m_pClock;
-    CCoronas*                         m_pCoronas;
-    CCheckpoints*                     m_pCheckpoints;
-    CEventList*                       m_pEventList;
-    CFireManager*                     m_pFireManager;
-    CGarages*                         m_pGarages;
-    CHud*                             m_pHud;
-    CWeather*                         m_pWeather;
-    CWorld*                           m_pWorld;
-    CCamera*                          m_pCamera;
-    CModelInfo*                       m_pModelInfo;
-    CPickups*                         m_pPickups;
-    CWeaponInfo*                      m_pWeaponInfo;
-    CExplosionManager*                m_pExplosionManager;
-    C3DMarkers*                       m_p3DMarkers;
-    CRenderWareSA*                    m_pRenderWare;
-    std::unique_ptr<CHandlingManager> m_HandlingManager;
-    CAnimManager*                     m_pAnimManager;
-    CStreaming*                       m_pStreaming;
-    CVisibilityPlugins*               m_pVisibilityPlugins;
-    CKeyGen*                          m_pKeyGen;
-    CRopes*                           m_pRopes;
-    CFx*                              m_pFx;
-    CFxManagerSA*                     m_pFxManager;
-    CWaterManager*                    m_pWaterManager;
-    CWeaponStatManager*               m_pWeaponStatsManager;
-    CPointLights*                     m_pPointLights;
-    CColStore*                        m_collisionStore;
-    CObjectGroupPhysicalProperties*   m_pObjectGroupPhysicalProperties;
-    CCoverManagerSA*                  m_pCoverManager;
-    CPlantManagerSA*                  m_pPlantManager;
-    CBuildingRemoval*                 m_pBuildingRemoval;
+    std::unique_ptr<CPools>             m_Pools;
+    std::unique_ptr<CTrainTrackManager> m_pTrainTrackManager;
+    CPlayerInfo*                        m_pPlayerInfo;
+    CProjectileInfo*                    m_pProjectileInfo;
+    CRadar*                             m_pRadar;
+    CClock*                             m_pClock;
+    CCoronas*                           m_pCoronas;
+    CCheckpoints*                       m_pCheckpoints;
+    CEventList*                         m_pEventList;
+    CFireManager*                       m_pFireManager;
+    CGarages*                           m_pGarages;
+    CHud*                               m_pHud;
+    CWeather*                           m_pWeather;
+    CWorld*                             m_pWorld;
+    CCamera*                            m_pCamera;
+    CModelInfo*                         m_pModelInfo;
+    CPickups*                           m_pPickups;
+    CWeaponInfo*                        m_pWeaponInfo;
+    CExplosionManager*                  m_pExplosionManager;
+    C3DMarkers*                         m_p3DMarkers;
+    CRenderWareSA*                      m_pRenderWare;
+    std::unique_ptr<CHandlingManager>   m_HandlingManager;
+    CAnimManager*                       m_pAnimManager;
+    CStreaming*                         m_pStreaming;
+    CVisibilityPlugins*                 m_pVisibilityPlugins;
+    CKeyGen*                            m_pKeyGen;
+    CRopes*                             m_pRopes;
+    CFx*                                m_pFx;
+    CFxManagerSA*                       m_pFxManager;
+    CWaterManager*                      m_pWaterManager;
+    CWeaponStatManager*                 m_pWeaponStatsManager;
+    CPointLights*                       m_pPointLights;
+    CColStore*                          m_collisionStore;
+    CObjectGroupPhysicalProperties*     m_pObjectGroupPhysicalProperties;
+    CCoverManagerSA*                    m_pCoverManager;
+    CPlantManagerSA*                    m_pPlantManager;
+    CBuildingRemoval*                   m_pBuildingRemoval;
 
     std::unique_ptr<CVehicleAudioSettingsManagerSA> m_pVehicleAudioSettingsManager;
 

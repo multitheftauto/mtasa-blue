@@ -36,6 +36,7 @@ CClientManager::CClientManager()
     m_pSoundManager = new CClientSoundManager(this);
     m_pRenderElementManager = new CClientRenderElementManager(this);
     m_pTeamManager = new CClientTeamManager;
+    m_pTrainTrackManager = new CClientTrainTrackManager(this);
     m_pDisplayManager = new CClientDisplayManager;
     m_pVehicleManager = new CClientVehicleManager(this);
     m_pCamera = new CClientCamera(this);
@@ -112,6 +113,9 @@ CClientManager::~CClientManager()
 
     delete m_pTeamManager;
     m_pTeamManager = NULL;
+
+    delete m_pTrainTrackManager;
+    m_pTrainTrackManager = NULL;
 
     delete m_pSoundManager;
     m_pSoundManager = NULL;
