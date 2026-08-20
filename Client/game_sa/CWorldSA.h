@@ -12,6 +12,9 @@
 #pragma once
 
 #include <game/CWorld.h>
+#include <memory>
+
+class CCullZonesSA;
 
 #define FUNC_Add                                     0x563220
 #define FUNC_Remove                                  0x563280
@@ -43,6 +46,7 @@ class CWorldSA : public CWorld
 {
 public:
     CWorldSA();
+    ~CWorldSA();
     void  InstallHooks();
     void  Add(CEntity* entity, eDebugCaller CallerId);
     void  Add(CEntitySAInterface* entityInterface, eDebugCaller CallerId);
@@ -78,7 +82,19 @@ public:
     CEntity* TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles, bool checkPeds,
                                     bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result) override;
 
+    std::size_t   GetCullZoneCount() override;
+    bool          GetCullZoneByIndex(std::size_t index, SCullZoneInfo& outInfo) override;
+    std::uint32_t CreateCullZone(const SCullZoneDefinition& definition, const void* owner) override;
+    bool          SetCullZone(std::uint32_t id, const SCullZoneDefinition& definition, const void* owner) override;
+    bool          SetCullZoneEnabled(std::uint32_t id, bool enabled, const void* owner) override;
+    bool          RemoveCullZone(std::uint32_t id, const void* owner) override;
+    bool          RestoreCullZone(std::uint32_t id, const void* owner) override;
+    void          RemoveCullZoneChangesByOwner(const void* owner) override;
+    void          SetCullMirrorZonesEnabled(bool enabled) override;
+    void          UpdateCullZoneFlags(const CVector& playerPosition, const CVector& cameraPosition) override;
+
 private:
-    float         m_fAircraftMaxHeight;
-    CSurfaceType* m_pSurfaceInfo;
+    float                         m_fAircraftMaxHeight;
+    CSurfaceType*                 m_pSurfaceInfo;
+    std::unique_ptr<CCullZonesSA> m_cullZones;
 };
