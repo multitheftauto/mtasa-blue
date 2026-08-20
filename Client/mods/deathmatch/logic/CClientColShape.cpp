@@ -70,15 +70,8 @@ bool CClientColShape::IsAttachable()
 //
 SColor CClientColShape::GetDebugColor(const SColor& baseColor)
 {
-    // Colshapes owned by a marker or pickup belong to whatever side created that element
-    CClientEntity* pEntity = this;
-    if (m_pOwningMarker)
-        pEntity = m_pOwningMarker;
-    else if (m_pOwningPickup)
-        pEntity = m_pOwningPickup;
-
     // Serverside shapes use the plain color of their shape type
-    if (!pEntity->IsLocalEntity())
+    if (!IsLocalEntity())
         return baseColor;
 
     // Clientside shapes use a lighter shade of it, so both kinds can be told apart at a glance
