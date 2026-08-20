@@ -293,6 +293,7 @@ protected:
     std::vector<CGUILabel*>  m_pJoypadLabels;
     std::vector<CGUIButton*> m_pJoypadButtons;
     int                      m_JoypadSettingsRevision;
+    int                      m_JoypadDeviceListRevision;
     bool                     m_bUpdatingJoypadCombo;
 
     CGUILabel*     m_pControlsMouseLabel;

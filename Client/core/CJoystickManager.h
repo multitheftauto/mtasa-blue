@@ -50,6 +50,7 @@ public:
     virtual void                               SetSelectedControllerId(const std::string& strId) = 0;
     virtual std::vector<SJoystickDeviceChoice> GetAvailableControllers() = 0;
     virtual int                                GetSettingsRevision() = 0;
+    virtual int                                GetDeviceListRevision() = 0;
     virtual void                               SetDefaults() = 0;
     virtual bool                               SaveToXML() = 0;
 

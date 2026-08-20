@@ -41,6 +41,9 @@ constexpr uint JOYSTICK_RETRY_DELAY_MS = 3000;
 // interface
 constexpr uint JOYSTICK_DEVICE_CHANGE_SETTLE_MS = 300;
 
+// DirectInput Acquire() can block while Windows is still enumerating USB devices; don't hammer it every frame.
+constexpr uint JOYSTICK_ACQUIRE_RETRY_MS = 500;
+
 // Stick/trigger deadzone is a percentage of throw. Saturation 0-100 keeps the old mapping
 // (100 = linear, lower = reaches max sooner). Values 101-200 multiply beyond linear so a
 // worn stick that never hits the physical extreme can still produce a full GTA axis.
@@ -264,6 +267,7 @@ public:
     virtual void                               SetSelectedControllerId(const string& strId);
     virtual std::vector<SJoystickDeviceChoice> GetAvailableControllers();
     virtual int                                GetSettingsRevision();
+    virtual int                                GetDeviceListRevision();
     virtual void                               SetDefaults();
     virtual bool                               SaveToXML();
 
@@ -283,6 +287,9 @@ private:
     bool      IsJoypadValid();
     void      StartDirectInputScan();
     void      CollectDirectInputScanResult();
+    void      StartDirectInputListRefresh();
+    void      CollectDirectInputListRefresh();
+    void      BumpDeviceListRevision();
     void      ReadCurrentState();
     CXMLNode* GetConfigNode(bool bCreateIfRequired);
     bool      LoadFromXML();
@@ -298,6 +305,8 @@ private:
 
     bool                                 m_bDoneInit;
     int                                  m_SettingsRevision;
+    int                                  m_iDeviceListRevision;
+    bool                                 m_bPendingDeviceListRefresh;
     SInputDeviceInfo                     m_DevInfo;
     SJoystickState                       m_JoystickState;
     SMappingLine                         m_currentMapping[10];
@@ -309,6 +318,8 @@ private:
     uint                                 m_uiDirectInputReattachDelay;
     CElapsedTime                         m_DirectInputReattachTimer;
     CElapsedTime                         m_PollFailTimer;
+    CElapsedTime                         m_AcquireRetryTimer;
+    uint                                 m_uiAcquireRetryDelay;
     bool                                 m_bAutoDeadZoneEnabled;
     int                                  m_iAutoDeadZoneCounter;
     string                               m_strSelectedControllerId;
@@ -331,6 +342,12 @@ private:
     std::atomic<bool>   m_bScanRunning{false};
     std::atomic<bool>   m_bScanReady{false};
     SJoystickScanResult m_ScanResult;
+
+    // Lightweight background refresh of the DirectInput device list for the settings combo.
+    std::thread       m_ListRefreshThread;
+    std::atomic<bool> m_bListRefreshRunning{false};
+    std::atomic<bool> m_bListRefreshReady{false};
+    std::vector<std::pair<GUID, string>> m_ListRefreshResult;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -365,6 +382,7 @@ CJoystickManager::CJoystickManager()
     m_strSelectedControllerId = "auto";
     m_bVibrationEnabled = true;
     m_iXInputUserIndex = 0;
+    m_uiAcquireRetryDelay = JOYSTICK_ACQUIRE_RETRY_MS;
 
     // CVars may not be loaded yet if this is constructed very early; ApplyControllerSelection
     // then just auto-picks the first XInput slot like we used to.
@@ -387,6 +405,8 @@ CJoystickManager::~CJoystickManager()
     // Let a scan still in flight finish before the members it writes into go away
     if (m_ScanThread.joinable())
         m_ScanThread.join();
+    if (m_ListRefreshThread.joinable())
+        m_ListRefreshThread.join();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -565,6 +585,14 @@ namespace
 
         return result;
     }
+
+    std::vector<std::pair<GUID, string>> EnumerateDirectInputDeviceList()
+    {
+        std::vector<std::pair<GUID, string>> list;
+        if (g_pDirectInput8)
+            g_pDirectInput8->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksListCallback, &list, DIEDFL_ATTACHEDONLY);
+        return list;
+    }
 }  // namespace
 
 ///////////////////////////////////////////////////////////////
@@ -626,6 +654,7 @@ void CJoystickManager::CollectDirectInputScanResult()
     m_bScanRunning = false;
 
     m_ListedDInputDevices = std::move(result.listedDevices);
+    BumpDeviceListRevision();
 
     if (!result.pDevice)
     {
@@ -674,6 +703,41 @@ void CJoystickManager::CollectDirectInputScanResult()
     m_PollFailTimer.Reset();
 }
 
+void CJoystickManager::BumpDeviceListRevision()
+{
+    m_iDeviceListRevision++;
+}
+
+void CJoystickManager::StartDirectInputListRefresh()
+{
+    if (m_bListRefreshRunning || m_bScanRunning || !g_pDirectInput8)
+        return;
+
+    m_bListRefreshRunning = true;
+    m_bListRefreshReady = false;
+
+    m_ListRefreshThread = std::thread([this]()
+                                      {
+                                          m_ListRefreshResult = EnumerateDirectInputDeviceList();
+                                          m_bListRefreshReady.store(true, std::memory_order_release);
+                                      });
+}
+
+void CJoystickManager::CollectDirectInputListRefresh()
+{
+    if (!m_bListRefreshReady.load(std::memory_order_acquire))
+        return;
+
+    if (m_ListRefreshThread.joinable())
+        m_ListRefreshThread.join();
+
+    m_ListedDInputDevices = std::move(m_ListRefreshResult);
+    m_ListRefreshResult.clear();
+    m_bListRefreshReady = false;
+    m_bListRefreshRunning = false;
+    BumpDeviceListRevision();
+}
+
 ///////////////////////////////////////////////////////////////
 //
 // CJoystickManager::DoPulse
@@ -696,6 +760,15 @@ void CJoystickManager::DoPulse()
     else
     {
         CollectDirectInputScanResult();
+        CollectDirectInputListRefresh();
+
+        // After a USB plug/unplug burst settles, refresh the device list off-thread so the
+        // settings combo can update without blocking gameplay on DirectInput enumeration.
+        if (m_bPendingDeviceListRefresh && m_DirectInputReattachTimer.Get() >= m_uiDirectInputReattachDelay)
+        {
+            m_bPendingDeviceListRefresh = false;
+            StartDirectInputListRefresh();
+        }
 
         if (!m_bUseXInput && !m_DevInfo.pDevice)
         {
@@ -1041,11 +1114,17 @@ bool CJoystickManager::ReadInputSubsystem(DIJOYSTATE2& js)
                 memset(m_DevInfo.axis, 0, sizeof(m_DevInfo.axis));
                 m_DevInfo.iAxisCount = 0;
             }
-            else
+            else if (m_AcquireRetryTimer.Get() >= m_uiAcquireRetryDelay)
+            {
+                // Acquire() can block while Windows is still enumerating unrelated USB devices,
+                // so retry occasionally instead of hammering it every frame.
                 m_DevInfo.pDevice->Acquire();
+                m_AcquireRetryTimer.Reset();
+            }
             return false;
         }
         m_PollFailTimer.Reset();
+        m_AcquireRetryTimer.Reset();
 
         if (FAILED(m_DevInfo.pDevice->GetDeviceState(sizeof(DIJOYSTATE2), &js)))
             return false;
@@ -1202,12 +1281,14 @@ bool CJoystickManager::IsXInputDeviceAttached()
         // Compose a product name
         m_DevInfo.strProductName = GetXInputDisplayName(m_iXInputUserIndex, Capabilities);
 
-        m_DevInfo.strGuid = GUIDToString(m_DevInfo.guidProduct);
-
-        // Load config for this guid, or set defaults
-        if (!LoadFromXML())
+        // Config is keyed by product GUID, so a brief disconnect/reconnect doesn't need a reload.
+        const string strNewGuid = GUIDToString(m_DevInfo.guidProduct);
+        const bool   bHadConfig = (strNewGuid == m_DevInfo.strGuid);
+        m_DevInfo.strGuid = strNewGuid;
+        if (!bHadConfig)
         {
-            SetDefaults();
+            if (!LoadFromXML())
+                SetDefaults();
         }
     }
 
@@ -1384,7 +1465,7 @@ bool CJoystickManager::IsJoypadConnected()
 ///////////////////////////////////////////////////////////////
 void CJoystickManager::OnPossibleDeviceChange()
 {
-    m_SettingsRevision++;
+    m_bPendingDeviceListRefresh = true;
     m_uiDirectInputReattachDelay = JOYSTICK_DEVICE_CHANGE_SETTLE_MS;
     m_DirectInputReattachTimer.Reset();
 
@@ -1497,7 +1578,6 @@ std::vector<SJoystickDeviceChoice> CJoystickManager::GetAvailableControllers()
             list.push_back({SString("xinput:%d", i), GetXInputDisplayName(i, Capabilities)});
     }
 
-    RefreshDirectInputDeviceList();
     for (const auto& device : m_ListedDInputDevices)
         list.push_back({SString("dinput:%s", GUIDToString(device.first).c_str()), device.second});
 
@@ -1507,6 +1587,11 @@ std::vector<SJoystickDeviceChoice> CJoystickManager::GetAvailableControllers()
 int CJoystickManager::GetSettingsRevision()
 {
     return m_SettingsRevision;
+}
+
+int CJoystickManager::GetDeviceListRevision()
+{
+    return m_iDeviceListRevision;
 }
 
 bool CJoystickManager::IsJoypadValid()

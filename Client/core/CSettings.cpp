@@ -730,6 +730,7 @@ void CSettings::CreateGUI()
     // Advanced Joypad settings
     {
         m_JoypadSettingsRevision = -1;
+        m_JoypadDeviceListRevision = -1;
 
         CJoystickManagerInterface* JoyMan = GetJoystickManager();
 
@@ -2583,11 +2584,13 @@ void CSettings::UpdateJoypadTab()
 {
     CJoystickManagerInterface* JoyMan = GetJoystickManager();
 
-    // Has anything changed?
-    if (m_JoypadSettingsRevision == JoyMan->GetSettingsRevision())
+    const bool bSettingsChanged = m_JoypadSettingsRevision != JoyMan->GetSettingsRevision();
+    const bool bDeviceListChanged = m_JoypadDeviceListRevision != JoyMan->GetDeviceListRevision();
+
+    if (!bSettingsChanged && !bDeviceListChanged)
         return;
 
-    if (m_pJoypadDeviceCombo && !m_pJoypadDeviceCombo->IsOpen())
+    if (bDeviceListChanged && m_pWindow->IsVisible() && m_pJoypadDeviceCombo && !m_pJoypadDeviceCombo->IsOpen())
     {
         m_bUpdatingJoypadCombo = true;
         std::vector<SJoystickDeviceChoice> devices = JoyMan->GetAvailableControllers();
@@ -2605,7 +2608,11 @@ void CSettings::UpdateJoypadTab()
         if (!devices.empty())
             m_pJoypadDeviceCombo->SetSelectedItemByIndex(iSelect);
         m_bUpdatingJoypadCombo = false;
+        m_JoypadDeviceListRevision = JoyMan->GetDeviceListRevision();
     }
+
+    if (!bSettingsChanged)
+        return;
 
     if (m_pCheckBoxJoypadVibration)
         m_pCheckBoxJoypadVibration->SetSelected(JoyMan->GetVibrationEnabled());
@@ -2669,6 +2676,7 @@ bool CSettings::OnJoypadDeviceChanged(CGUIElement* pElement)
 
     GetJoystickManager()->SetSelectedControllerId(static_cast<const char*>(pItem->GetData()));
     m_JoypadSettingsRevision = -1;
+    m_JoypadDeviceListRevision = -1;
     UpdateJoypadTab();
     return true;
 }
