@@ -258,7 +258,7 @@ void CBuildingsPoolSA::RestoreBackup()
             }
 
             worldSA->Add(pBuilding, CBuildingPool_Constructor);
-            buildingRemovealSA->AddDataBuilding(pBuilding);
+            buildingRemovealSA->AddDataBuildingAndReapplyRemoval(pBuilding);
         }
     }
 

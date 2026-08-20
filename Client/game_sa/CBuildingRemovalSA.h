@@ -35,8 +35,11 @@ public:
     bool IsDataModelRemoved(uint16_t usModelID) override;
     bool IsEntityRemoved(CEntitySAInterface* pInterface) override;
     void DropCaches();
+    void AddDataBuildingAndReapplyRemoval(CEntitySAInterface* pInterface);
 
 private:
+    sDataBuildingRemovalItem* RegisterDataBuilding(CEntitySAInterface* pInterface);
+
     std::multimap<uint16_t, SBuildingRemoval*>*         m_pBuildingRemovals;
     std::multimap<uint16_t, sDataBuildingRemovalItem*>* m_pDataBuildings;
     std::multimap<uint16_t, sBuildingRemovalItem*>*     m_pBinaryBuildings;
