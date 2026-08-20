@@ -652,7 +652,7 @@ bool CCore::IsCursorForcedVisible()
 void CCore::ApplyConsoleSettings()
 {
     CConsole* pConsole = m_pLocalGUI->GetConsole();
-    if (!pConsole)
+    if (!pConsole) [[unlikely]]
         return;
 
     CVector2D vec;

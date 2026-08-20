@@ -141,7 +141,7 @@ void CLocalGUI::ChangeLocale(const char* szName)
 {
     // Guard against re-entrant calls while the windows are half-destroyed during
     // a skin change (the fatal skin dialog pumps the message loop).
-    if (!m_pConsole)
+    if (!m_pConsole) [[unlikely]]
         return;
 
     // A fatal fault dialog may be pumping the message loop; do not rebuild the
@@ -448,11 +448,11 @@ void CLocalGUI::DoPulse()
 // Set while a fatal GUI fault dialog is open, so a nested fault during the
 // dialog's message-loop pump terminates without stacking more dialogs.
 static bool s_bFaultDialogOpen = false;
-bool        CLocalGUI::IsFaultDialogOpen()
+bool        CLocalGUI::IsFaultDialogOpen() noexcept
 {
     return s_bFaultDialogOpen;
 }
-void CLocalGUI::SetFaultDialogOpen(bool bOpen)
+void CLocalGUI::SetFaultDialogOpen(bool bOpen) noexcept
 {
     s_bFaultDialogOpen = bOpen;
 }
@@ -484,7 +484,7 @@ static void ReportGUISEHFault(DWORD dwExceptionCode, const char* szContext)
 // other faults are left for the wider OnPresent guard.
 static int FilterGUISehFault(unsigned int uiExceptionCode)
 {
-    if (uiExceptionCode == EXCEPTION_ACCESS_VIOLATION || uiExceptionCode == 0xE06D7363)
+    if (uiExceptionCode == EXCEPTION_ACCESS_VIOLATION || uiExceptionCode == CPP_EXCEPTION_CODE)
         return EXCEPTION_EXECUTE_HANDLER;
     return EXCEPTION_CONTINUE_SEARCH;
 }
@@ -516,7 +516,7 @@ void CLocalGUI::DrawInternal()
 
     // The windows may be half-destroyed while a fatal dialog pumps the message
     // loop during a skin or locale change, so skip drawing until they are back.
-    if (!m_pMainMenu)
+    if (!m_pMainMenu) [[unlikely]]
         return;
 
     // Update mainmenu stuff

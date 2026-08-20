@@ -1487,7 +1487,7 @@ int               FilterException(uint exceptionCode)
         WriteDebugEvent("FilterException: caught in-page error");
         return EXCEPTION_EXECUTE_HANDLER;
     }
-    if (exceptionCode == 0xE06D7363)
+    if (exceptionCode == CPP_EXCEPTION_CODE)
     {
         WriteDebugEvent("FilterException: caught Microsoft C++ exception");
         return EXCEPTION_EXECUTE_HANDLER;
