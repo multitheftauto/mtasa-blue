@@ -1387,11 +1387,12 @@ void CGame::JoinPlayer(CPlayer& Player)
     marker.Set("Start");
 
     // Let him join
-    Player.Send(CPlayerJoinCompletePacket(
-        Player.GetID(), m_pMapManager->GetRootElement()->GetID(), m_pMainConfig->GetHTTPDownloadType(), m_pMainConfig->GetHTTPPort(),
-        m_pMainConfig->GetHTTPDownloadURL().c_str(), m_pMainConfig->GetHTTPMaxConnectionsPerClient(), m_pMainConfig->GetEnableClientChecks(),
-        m_pMainConfig->IsVoiceEnabled(), static_cast<unsigned char>(m_pMainConfig->GetVoiceSampleRate()),
-        static_cast<unsigned char>(m_pMainConfig->GetVoiceQuality()), m_pMainConfig->GetVoiceBitrate(), m_pMainConfig->GetServerName().c_str()));
+    Player.Send(CPlayerJoinCompletePacket(Player.GetID(), m_pMapManager->GetRootElement()->GetID(), m_pMainConfig->GetHTTPDownloadType(),
+                                          m_pMainConfig->GetHTTPPort(), m_pMainConfig->GetHTTPDownloadURL().c_str(),
+                                          m_pMainConfig->GetHTTPMaxConnectionsPerClient(), m_pMainConfig->GetEnableClientChecks(),
+                                          m_pMainConfig->IsVoiceEnabled(), static_cast<unsigned char>(m_pMainConfig->GetVoiceSampleRate()),
+                                          static_cast<unsigned char>(m_pMainConfig->GetVoiceQuality()), m_pMainConfig->GetVoiceBitrate(),
+                                          static_cast<unsigned char>(m_pMainConfig->GetMaxVoiceDecodeBurst()), m_pMainConfig->GetServerName().c_str()));
 
     marker.Set("CPlayerJoinCompletePacket");
 

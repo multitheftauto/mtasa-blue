@@ -18,6 +18,8 @@ CVoiceRecorder::CVoiceRecorder()
 
     m_VoiceState = VOICESTATE_AWAITING_INPUT;
     m_SampleRate = SAMPLERATE_WIDEBAND;
+    m_ucQuality = 4;
+    m_ucDecodeBurst = VOICE_DECODE_BURST_DEFAULT;
 
     m_pAudioStream = NULL;
 
@@ -52,9 +54,10 @@ int CVoiceRecorder::PACallback(const void* inputBuffer, void* outputBuffer, unsi
     return 0;
 }
 
-void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate)
+void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate, unsigned char ucDecodeBurst)
 {
     m_bEnabled = bEnabled;
+    m_ucDecodeBurst = ucDecodeBurst > 0 ? ucDecodeBurst : VOICE_DECODE_BURST_DEFAULT;
 
     if (!bEnabled)  // If we aren't enabled, don't bother continuing
         return;

@@ -40,6 +40,10 @@ enum class eBitStreamVersion : unsigned short
     // YYYY-MM-DD
     // Name,
 
+    // Server-configurable voice decode burst limit sent in the join packet
+    // 2026-08-16
+    VoiceDecodeBurstLimit,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

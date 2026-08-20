@@ -270,7 +270,7 @@ public:
 
     void StartPlayback();
     void EnablePacketRecorder(const char* szFilename);
-    void InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate);
+    void InitVoice(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate, unsigned char ucDecodeBurst);
 
     bool IsWindowFocused() const { return m_bFocused; }
 
