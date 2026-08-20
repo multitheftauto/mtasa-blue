@@ -84,6 +84,7 @@ private:
     unsigned int   m_uiOutgoingReadIndex;
     unsigned int   m_uiOutgoingWriteIndex;
     bool           m_bIsSendingVoiceData;
+    bool           m_bOutgoingBufferFull;
 
     unsigned long m_ulTimeOfLastSend;
 
