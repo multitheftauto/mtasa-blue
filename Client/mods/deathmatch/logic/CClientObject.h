@@ -12,6 +12,7 @@ class CClientObject;
 
 #pragma once
 
+#include <optional>
 #include <game/CObject.h>
 #include "CClientStreamElement.h"
 #include "CClientModel.h"
@@ -83,7 +84,15 @@ public:
     unsigned char GetAlpha() { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha);
     void          GetScale(CVector& vecScale) const;
-    void          SetScale(const CVector& vecScale);
+    // scaleCollision left unspecified (nullopt) preserves whatever collision-scaling state this
+    // object already has, instead of silently turning it off.
+    void SetScale(const CVector& vecScale, std::optional<bool> scaleCollision = std::nullopt);
+    bool IsCollisionScaled() const { return m_iScaleCollisionModelID != -1; }
+
+    // IsBreakableModel() looks up by exact model ID against a fixed list, so a scaled-collision
+    // clone (its own, arbitrary slot ID) would never match even though its base model would. Use
+    // this instead of m_usModel wherever that lookup happens.
+    unsigned short GetBreakableCheckModel() const { return m_iScaleCollisionModelID != -1 ? m_usScaleCollisionBaseModel : m_usModel; }
 
     bool IsCollisionEnabled() { return m_bUsesCollision; };
     void SetCollisionEnabled(bool bCollisionEnabled);
@@ -123,6 +132,10 @@ public:
     bool SetOnFire(bool onFire) override { return m_pObject ? m_pObject->SetOnFire(onFire) : false; };
 
 protected:
+    // Raw model swap, no clone handling. SetModel() calls this after resolving any scaled-collision
+    // clone; SetScale() calls it directly since it already owns that bookkeeping.
+    void SetModelInternal(unsigned short usModel);
+
     void StreamIn(bool bInstantly);
     void StreamOut();
 
@@ -157,6 +170,12 @@ protected:
     float         m_fBuoyancyConstant;
     CVector       m_vecCenterOfMass;
     bool          m_bVisibleInAllDimensions = false;
+
+    // Tracks the per-scale collision clone acquired from CClientModelManager when SetScale is
+    // called with bScaleCollision=true. -1 means no clone is currently in use (normal shared
+    // collision). m_usScaleCollisionBaseModel remembers the real model so it can be restored.
+    int            m_iScaleCollisionModelID = -1;
+    unsigned short m_usScaleCollisionBaseModel = 0;
 
     CVector m_vecMoveSpeed;
     CVector m_vecTurnSpeed;
