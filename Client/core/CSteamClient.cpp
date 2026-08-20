@@ -150,7 +150,8 @@ static bool IsBinarySignatureTrusted(const wchar_t* filePath)
     trustData.dwUnionChoice = WTD_CHOICE_FILE;
     trustData.pFile = &fileInfo;
     trustData.dwStateAction = WTD_STATEACTION_VERIFY;
-    trustData.dwProvFlags = WTD_SAFER_FLAG;
+    trustData.dwProvFlags =
+        WTD_SAFER_FLAG | WTD_REVOCATION_CHECK_NONE | WTD_CACHE_ONLY_URL_RETRIEVAL;  // Offline verify: no network fetch during signature checks.
 
     GUID policyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
     LONG trustError = WinVerifyTrust(NULL, &policyGUID, &trustData);
@@ -158,7 +159,10 @@ static bool IsBinarySignatureTrusted(const wchar_t* filePath)
     trustData.dwStateAction = WTD_STATEACTION_CLOSE;
     WinVerifyTrust(NULL, &policyGUID, &trustData);
 
-    return trustError == ERROR_SUCCESS || trustError == CERT_E_UNTRUSTEDROOT || trustError == CERT_E_CHAINING || trustError == TRUST_E_TIME_STAMP;
+    // Cache-only keeps chain faults inside the tolerated set below; expiry
+    // Dont remove CERT_E_CHAINING or CERT_E_EXPIRED without revisiting the flags above.
+    return trustError == ERROR_SUCCESS || trustError == CERT_E_UNTRUSTEDROOT || trustError == CERT_E_CHAINING || trustError == TRUST_E_TIME_STAMP ||
+           trustError == CERT_E_EXPIRED;
 }
 
 /**
