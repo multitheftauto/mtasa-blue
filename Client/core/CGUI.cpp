@@ -58,6 +58,26 @@ CLocalGUI::~CLocalGUI()
 
 void CLocalGUI::SetSkin(const char* szName)
 {
+    // Guard against re-entrant calls. MessageBoxW pumps the message loop, so the
+    // fatal CC51 dialog below would otherwise trigger pulse calls that touch
+    // m_pConsole while windows are half-destroyed (DestroyWindows called but
+    // CreateWindows not yet reached). The guard also clears the flag if a
+    // window rebuild throws, so a failed skin change cannot disable later ones.
+    static bool s_bInSetSkin = false;
+    if (s_bInSetSkin)
+        return;
+    struct SetSkinGuard
+    {
+        bool& flag;
+        explicit SetSkinGuard(bool& inFlag) : flag(inFlag) { flag = true; }
+        ~SetSkinGuard() { flag = false; }
+    } guard(s_bInSetSkin);
+
+    // A fatal fault dialog may be pumping the message loop; do not rebuild the
+    // windows inside that pump.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return;
+
     CVector2D consolePos, consoleSize;
 
     bool guiWasLoaded = m_pMainMenu != NULL;
@@ -90,7 +110,11 @@ void CLocalGUI::SetSkin(const char* szName)
         }
         catch (...)
         {
-            // Even the default skin doesn't work, so give up
+            // Both the selected and the default skin failed. MessageBoxW pumps the
+            // message loop (re-entrant), but the guard above prevents further damage
+            // before TerminateProcess takes effect. Mark the dialog as open so a
+            // nested fault during the pump terminates instead of stacking another.
+            CLocalGUI::SetFaultDialogOpen(true);
             MessageBoxUTF8(0, _("The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."),
                            _("Error") + _E("CC51"), MB_OK | MB_ICONERROR | MB_TOPMOST);
             TerminateProcess(GetCurrentProcess(), 9);
@@ -115,6 +139,16 @@ void CLocalGUI::SetSkin(const char* szName)
 
 void CLocalGUI::ChangeLocale(const char* szName)
 {
+    // Guard against re-entrant calls while the windows are half-destroyed during
+    // a skin change (the fatal skin dialog pumps the message loop).
+    if (!m_pConsole) [[unlikely]]
+        return;
+
+    // A fatal fault dialog may be pumping the message loop; do not rebuild the
+    // windows inside that pump.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return;
+
     bool guiWasLoaded = m_pMainMenu != NULL;
     assert(guiWasLoaded);
 
@@ -322,7 +356,8 @@ void CLocalGUI::ApplyQueuedLocale()
 
     if (CCore::GetSingleton().GetModManager()->IsLoaded())
     {
-        CCore::GetSingleton().GetConsole()->Printf("Please disconnect before changing language");
+        if (CConsoleInterface* pConsole = CCore::GetSingleton().GetConsole())
+            pConsole->Printf("Please disconnect before changing language");
         if (cvars)
             cvars->Set("locale", m_LastLocaleName);
 
@@ -374,7 +409,8 @@ void CLocalGUI::DoPulse()
                 SetSkin(currentSkinName);
             else
             {
-                CCore::GetSingleton().GetConsole()->Printf("Please disconnect before changing skin");
+                if (CConsoleInterface* pConsole = CCore::GetSingleton().GetConsole())
+                    pConsole->Printf("Please disconnect before changing skin");
                 cvars->Set("current_skin", m_LastSkinName);
             }
         }
@@ -409,13 +445,79 @@ void CLocalGUI::DoPulse()
     // Show after any deferred locale/skin work so a prior prompt is not lost
     TryShowRestartPrompt();
 }
+// Set while a fatal GUI fault dialog is open, so a nested fault during the
+// dialog's message-loop pump terminates without stacking more dialogs.
+static bool s_bFaultDialogOpen = false;
+bool        CLocalGUI::IsFaultDialogOpen() noexcept
+{
+    return s_bFaultDialogOpen;
+}
+void CLocalGUI::SetFaultDialogOpen(bool bOpen) noexcept
+{
+    s_bFaultDialogOpen = bOpen;
+}
+
+// Error reporting for SEH faults in GUI rendering
+static void ReportGUISEHFault(DWORD dwExceptionCode, const char* szContext)
+{
+    // A nested fault can fire while this dialog pumps the message loop (the
+    // game frame keeps running). Show one dialog, then terminate immediately.
+    if (CLocalGUI::IsFaultDialogOpen())
+    {
+        TerminateProcess(GetCurrentProcess(), 9);
+        return;
+    }
+    CLocalGUI::SetFaultDialogOpen(true);
+
+    SString strMsg(
+        "Rendering fault in %s (code 0x%08X).\n\n"
+        "Usually caused by missing GUI/loading-screen assets.\n\n"
+        "Please verify game files or reinstall.",
+        szContext, dwExceptionCode);
+    WriteDebugEvent(SString("CLocalGUI::Draw SEH fault in %s code=0x%08X", szContext, dwExceptionCode));
+    MessageBoxUTF8(0, strMsg, _("Error") + _E("CC54"), MB_OK | MB_ICONERROR | MB_TOPMOST);
+    TerminateProcess(GetCurrentProcess(), 9);
+}
+
+// SEH filter for GUI rendering faults. Access violations and C++ exceptions
+// (CEGUI errors) are the common failures with missing or corrupt GUI assets;
+// other faults are left for the wider OnPresent guard.
+static int FilterGUISehFault(unsigned int uiExceptionCode)
+{
+    if (uiExceptionCode == EXCEPTION_ACCESS_VIOLATION || uiExceptionCode == CPP_EXCEPTION_CODE)
+        return EXCEPTION_EXECUTE_HANDLER;
+    return EXCEPTION_CONTINUE_SEARCH;
+}
+
+// SEH wrapper for the entire Draw body.
+static void DrawSEHGuard(CLocalGUI* pLocalGUI)
+{
+    __try
+    {
+        pLocalGUI->DrawInternal();
+    }
+    __except (FilterGUISehFault(GetExceptionCode()))
+    {
+        ReportGUISEHFault(GetExceptionCode(), "CLocalGUI::Draw");
+    }
+}
 
 void CLocalGUI::Draw()
+{
+    DrawSEHGuard(this);
+}
+
+void CLocalGUI::DrawInternal()
 {
     // Get the game interface
     CGame*      pGame = CCore::GetSingleton().GetGame();
     SystemState systemState = pGame->GetSystemState();
     CGUI*       pGUI = CCore::GetSingleton().GetGUI();
+
+    // The windows may be half-destroyed while a fatal dialog pumps the message
+    // loop during a skin or locale change, so skip drawing until they are back.
+    if (!m_pMainMenu) [[unlikely]]
+        return;
 
     // Update mainmenu stuff
     m_pMainMenu->Update();
