@@ -309,5 +309,4 @@ namespace lua
             },
             tuple);
     }
-
 }  // namespace lua
