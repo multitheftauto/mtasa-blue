@@ -344,9 +344,9 @@ private:
     SJoystickScanResult m_ScanResult;
 
     // Lightweight background refresh of the DirectInput device list for the settings combo.
-    std::thread       m_ListRefreshThread;
-    std::atomic<bool> m_bListRefreshRunning{false};
-    std::atomic<bool> m_bListRefreshReady{false};
+    std::thread                          m_ListRefreshThread;
+    std::atomic<bool>                    m_bListRefreshRunning{false};
+    std::atomic<bool>                    m_bListRefreshReady{false};
     std::vector<std::pair<GUID, string>> m_ListRefreshResult;
 };
 
@@ -716,11 +716,12 @@ void CJoystickManager::StartDirectInputListRefresh()
     m_bListRefreshRunning = true;
     m_bListRefreshReady = false;
 
-    m_ListRefreshThread = std::thread([this]()
-                                      {
-                                          m_ListRefreshResult = EnumerateDirectInputDeviceList();
-                                          m_bListRefreshReady.store(true, std::memory_order_release);
-                                      });
+    m_ListRefreshThread = std::thread(
+        [this]()
+        {
+            m_ListRefreshResult = EnumerateDirectInputDeviceList();
+            m_bListRefreshReady.store(true, std::memory_order_release);
+        });
 }
 
 void CJoystickManager::CollectDirectInputListRefresh()
