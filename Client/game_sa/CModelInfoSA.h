@@ -342,6 +342,7 @@ protected:
     DWORD                                                                       m_dwReferences;
     DWORD                                                                       m_dwPendingInterfaceRef;
     CColModel*                                                                  m_pCustomColModel;
+    CColModelSAInterface*                                                       m_pOwnedColModel;
     CColModelSAInterface*                                                       m_pOriginalColModelInterface;
     std::uint16_t                                                               m_originalFlags = 0;
     RpClump*                                                                    m_pCustomClump;
@@ -499,6 +500,9 @@ public:
 
 private:
     void CopyStreamingInfoFromModel(ushort usCopyFromModelID);
+    void CloneParentColModel(CBaseModelInfoSAInterface* pInterface);
+    void DestroyOwnedColModel();
+    void UpdateBoundsFromRwObject();
     void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
     void SetModelSpecialType(eModelSpecialType eType, bool bState);
 };
