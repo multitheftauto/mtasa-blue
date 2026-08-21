@@ -331,8 +331,20 @@ HRESULT CProxyDirect3D9::CreateDevice(UINT Adapter, D3DDEVTYPE DeviceType, HWND 
 #endif
 
     // Set dark titlebar if needed
-    BOOL darkTitleBar =
-        GetSystemRegistryValue((uint)HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme") == "\x0";
+    int           themeStatus = 0;
+    const SString appsUseLightTheme =
+        GetSystemRegistryValue((uint)HKEY_CURRENT_USER, "Software\\Microsoft\\Windows\\CurrentVersion\\Themes\\Personalize", "AppsUseLightTheme", &themeStatus);
+    BOOL darkTitleBar = FALSE;
+    if (themeStatus > 0)
+    {
+        // Parse the registry value into a numeric flag
+        char*      themeEnd = nullptr;
+        const long themeNumeric = strtol(appsUseLightTheme.c_str(), &themeEnd, 10);
+        if (themeEnd != appsUseLightTheme.c_str() && *themeEnd == '\0')
+        {
+            darkTitleBar = (themeNumeric == 0);
+        }
+    }
     DwmSetWindowAttribute(hFocusWindow, DWMWA_USE_IMMERSIVE_DARK_MODE, &darkTitleBar, sizeof(darkTitleBar));
 
     // Update icon
@@ -1182,7 +1194,7 @@ namespace
 //
 // Hook CCore::OnPreCreateDevice
 //
-// Modify paramters
+// Modify parameters
 //
 ////////////////////////////////////////////////
 void CCore::OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE DeviceType, HWND hFocusWindow, DWORD& BehaviorFlags,
@@ -1212,7 +1224,7 @@ void CCore::OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
     BehaviorFlagsOrig = BehaviorFlags;
     presentationParametersOrig = *pPresentationParameters;
 
-    WriteDebugEvent("  Original paramters:");
+    WriteDebugEvent("  Original parameters:");
     WriteDebugEvent(ToString(Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters));
 
     // Make sure DirectX Get...() calls will work
@@ -1223,7 +1235,7 @@ void CCore::OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
 
     GetVideoModeManager()->PreCreateDevice(pPresentationParameters);
 
-    WriteDebugEvent("  Modified paramters:");
+    WriteDebugEvent("  Modified parameters:");
     WriteDebugEvent(ToString(Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters));
 }
 
@@ -1297,7 +1309,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
     BehaviorFlagsOrig = BehaviorFlags;
     presentationParametersOrig = *pPresentationParameters;
 
-    WriteDebugEvent("  Original paramters:");
+    WriteDebugEvent("  Original parameters:");
     WriteDebugEvent(ToString(Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters));
 
     // Make sure DirectX Get...() calls will work
@@ -1308,7 +1320,7 @@ HRESULT CCore::OnPostCreateDevice(HRESULT hResult, IDirect3D9* pDirect3D, UINT A
 
     GetVideoModeManager()->PreCreateDevice(pPresentationParameters);
 
-    WriteDebugEvent("  Modified paramters:");
+    WriteDebugEvent("  Modified parameters:");
     WriteDebugEvent(ToString(Adapter, DeviceType, hFocusWindow, BehaviorFlags, *pPresentationParameters));
 
     hResult = CreateDeviceInsist(2, 1000, pDirect3D, Adapter, DeviceType, hFocusWindow, BehaviorFlags, pPresentationParameters, ppReturnedDeviceInterface);
