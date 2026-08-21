@@ -21,6 +21,7 @@
 #include "Enums.h"
 #include "CElementGroup.h"
 #include "CStringName.h"
+#include "enums/ElementType.h"
 
 // Used to check fast version of getElementsByType
 // #define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG

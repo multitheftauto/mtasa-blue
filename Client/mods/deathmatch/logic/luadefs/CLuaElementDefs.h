@@ -11,6 +11,35 @@
 #pragma once
 #include "CLuaDefs.h"
 
+/*
+    inRange = {position = {0, 0, 0}, range = 3.5},
+    health = {value = 100, compareMethod = "<"},
+*/
+
+using ElementTypeFilterValueData = std::unordered_map<std::string, std::variant<bool, lua_Number, std::vector<float>, std::string>>;
+
+/*
+    player = {
+        model = 5,
+        model = {0, 7, 12},
+        onScreen = true,
+        alpha = {value = 200, compareMethod = "=="},
+    },
+
+    vehicle = {
+        vehicleType = "bike",
+    },
+*/
+using ElementTypeFilterData =
+    std::unordered_map<std::string, std::variant<bool, lua_Number, std::string, ElementTypeFilterValueData, std::vector<std::uint16_t>>>;
+
+/* {
+    player = {
+
+    }
+}*/
+using ElementsFilterData = std::unordered_map<std::string, ElementTypeFilterData>;
+
 class CLuaElementDefs : public CLuaDefs
 {
 public:
@@ -102,4 +131,7 @@ public:
     LUA_DECLARE(SetElementCallPropagationEnabled);
     static bool SetElementLighting(CClientEntity* entity, float lighting);
     static bool SetElementOnFire(CClientEntity* entity, bool onFire) noexcept;
+
+    static std::optional<std::unordered_map<std::string, CElementListSnapshot>> GetElements(ElementsFilterData            filterData,
+                                                                                            std::optional<CClientEntity*> startAt);
 };

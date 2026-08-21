@@ -26,6 +26,7 @@
 #include "enums/SoundEffectType.h"
 #include "enums/ObjectGroupPhysicalProperties.h"
 #include "enums/PostFXType.h"
+#include "enums/3DMarkerType.h"
 
 enum eLuaType
 {
@@ -102,8 +103,12 @@ DECLARE_ENUM_CLASS(PreloadAreaOption);
 DECLARE_ENUM_CLASS(RestreamOption);
 DECLARE_ENUM_CLASS(taskType);
 DECLARE_ENUM(eEntityType);
+DECLARE_ENUM(ElementType::Enum);
 DECLARE_ENUM_CLASS(VehicleAudioSettingProperty);
 DECLARE_ENUM_CLASS(PostFXType);
+DECLARE_ENUM_CLASS(CompareMethod);
+DECLARE_ENUM(eClientVehicleType);
+DECLARE_ENUM(MarkerType3D::Enum);
 
 class CRemoteCall;
 
