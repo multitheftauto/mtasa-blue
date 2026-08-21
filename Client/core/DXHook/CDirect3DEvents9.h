@@ -19,6 +19,7 @@ public:
     static void    OnDirect3DDeviceCreate(IDirect3DDevice9* pDevice);
     static void    OnDirect3DDeviceDestroy(IDirect3DDevice9* pDevice);
     static void    OnPresent(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice);
+    static void    OnPresentInternal(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice);
     static void    OnBeginScene(IDirect3DDevice9* pDevice);
     static bool    OnEndScene(IDirect3DDevice9* pDevice);
     static void    OnInvalidate(IDirect3DDevice9* pDevice);
