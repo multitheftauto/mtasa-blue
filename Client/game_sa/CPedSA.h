@@ -488,6 +488,7 @@ public:
     void GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const override;
 
     void SetInWaterFlags(bool inWater) override;
+    bool IsPedCuttingWithChainsaw() const override;
 
     static void __fastcall RemoveWeaponWhenEnteringVehicle(CPedSAInterface* pedInterface, void*, int jetpack);
     static void            StaticSetHooks();
