@@ -920,7 +920,7 @@ bool CChat::SpecialKeyHandler(CGUIKeyEventArgs KeyboardArgs)
         return false;
 
     bool bShift = (GetAsyncKeyState(VK_SHIFT) & 0x8000) != 0;
-    bool bCtrl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0;
+    bool bCtrl = (GetAsyncKeyState(VK_CONTROL) & 0x8000) != 0 && (GetAsyncKeyState(VK_MENU) & 0x8000) == 0;
 
     std::wstring wstrText = MbUTF8ToUTF16(m_strInputText);
 
