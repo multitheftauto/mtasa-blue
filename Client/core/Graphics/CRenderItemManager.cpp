@@ -201,6 +201,35 @@ CTextureItem* CRenderItemManager::CreateTexture(const SString& strFullFilePath, 
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderItemManager::ReplaceFileTextureFromMemory
+//
+// Replace the D3D resource of an existing file texture without changing the Lua element.
+// Used by async dxCreateTexture so a 1x1 placeholder can become the real image on the main thread.
+//
+////////////////////////////////////////////////////////////////
+bool CRenderItemManager::ReplaceFileTextureFromMemory(CTextureItem* pTextureItem, const void* pData, uint uiSize, bool bMipMaps, ERenderFormat format,
+                                                      bool bTreatAsPixels)
+{
+    if (!pTextureItem || !pData || uiSize == 0)
+        return false;
+
+    if (!pTextureItem->IsA(CFileTextureItem::GetClassId()))
+        return false;
+
+    CFileTextureItem* pFileItem = static_cast<CFileTextureItem*>(pTextureItem);
+    if (bTreatAsPixels)
+    {
+        CPixels pixels;
+        pixels.externalData.pData = const_cast<char*>(static_cast<const char*>(pData));
+        pixels.externalData.uiSize = uiSize;
+        return pFileItem->ReplaceFromPixels(&pixels, bMipMaps, format);
+    }
+
+    return pFileItem->ReplaceFromFileMemory(pData, uiSize, bMipMaps, format);
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderItemManager::CreateVectorGraphic
 //
 //
