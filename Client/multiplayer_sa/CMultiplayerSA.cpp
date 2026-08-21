@@ -127,9 +127,6 @@ DWORD RETURN_UnoccupiedVehicleBurnCheck = 0x6A76E4;
 #define HOOKPOS_ApplyCarBlowHop 0x6B3816
 DWORD RETURN_ApplyCarBlowHop = 0x6B3831;
 
-#define HOOKPOS_CVehicle_ApplyBoatWaterResistance 0x6D2771
-DWORD RETURN_CVehicle_ApplyBoatWaterResistance = 0x6D2777;
-
 #define HOOKPOS_CPhysical_ApplyGravity 0x543081
 DWORD RETURN_CPhysical_ApplyGravity = 0x543093;
 
@@ -293,8 +290,6 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli = FUNC_CAEVehicleAudioEntity__
 DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyProp = 0x4FDFAB;
 DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__ProcessAIProp;
 
-#define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance 0x68A4EF
-DWORD       RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
 const DWORD HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA03;
 const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
@@ -453,7 +448,6 @@ void HOOK_EndWorldColors();
 void HOOK_CWorld_ProcessVerticalLineSectorList();
 void HOOK_ComputeDamageResponse_StartChoking();
 void HOOK_CollisionStreamRead();
-void HOOK_CVehicle_ApplyBoatWaterResistance();
 void HOOK_CPhysical_ApplyGravity();
 void HOOK_VehicleCamStart();
 void HOOK_VehicleCamTargetZTweak();
@@ -567,7 +561,6 @@ void HOOK_CAERadioTrackManager__ChooseMusicTrackIndex();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 
-void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
 void HOOK_Idle_CWorld_ProcessPedsAfterPreRender();
 
 void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio();
@@ -668,7 +661,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehicleCamEnd, (DWORD)HOOK_VehicleCamEnd, 6);
     HookInstall(HOOKPOS_VehicleLookBehind, (DWORD)HOOK_VehicleLookBehind, 6);
     HookInstall(HOOKPOS_VehicleLookAside, (DWORD)HOOK_VehicleLookAside, 6);
-    HookInstall(HOOKPOS_CVehicle_ApplyBoatWaterResistance, (DWORD)HOOK_CVehicle_ApplyBoatWaterResistance, 6);
     HookInstall(HOOKPOS_CPhysical_ApplyGravity, (DWORD)HOOK_CPhysical_ApplyGravity, 6);
     HookInstall(HOOKPOS_OccupiedVehicleBurnCheck, (DWORD)HOOK_OccupiedVehicleBurnCheck, 6);
     HookInstall(HOOKPOS_UnoccupiedVehicleBurnCheck, (DWORD)HOOK_UnoccupiedVehicleBurnCheck, 5);
@@ -767,8 +759,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyHeli, 5);
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyProp, 5);
 
-    // Fix GTA:SA swimming speed problem on higher fps
-    HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
     HookInstall(HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender, (DWORD)HOOK_Idle_CWorld_ProcessPedsAfterPreRender, 5);
 
     HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio,
@@ -4835,22 +4825,6 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
     }
 }
 
-const float                   kfTimeStepOrg = 5.0f / 3.0f;
-static void __declspec(naked) HOOK_CVehicle_ApplyBoatWaterResistance()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        fmul    ds : 0x871DDC   // Original constant used in code
-        fmul    ds : 0xB7CB5C   // Multiply by current timestep
-        fdiv    kfTimeStepOrg   // Divide by desired timestep, used at 30fps
-        jmp     RETURN_CVehicle_ApplyBoatWaterResistance
-    }
-    // clang-format on
-}
-
 static void __declspec(naked) HOOK_CPhysical_ApplyGravity()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -7996,43 +7970,6 @@ static void __declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp()
         call    dwFUNC_CAEVehicleAudioEntity__ProcessAIProp
         // go back
         jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyProp
-    }
-    // clang-format on
-}
-
-const float                   kfTimeStepOriginal = 1.66f;
-static void __declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        fsub    st, st(1)
-
-        fld     dword ptr[esp + 16]
-        lea     eax, [esi + 44h]
-        mov     ecx, eax
-        fmul    st, st(1)
-
-        fdiv    ds : 0xB7CB5C
-        fmul    kfTimeStepOriginal
-
-        fstp    dword ptr[esp + 28]
-
-        fld     dword ptr[esp + 20]
-        fmul    st, st(1)
-
-        fdiv    ds : 0xB7CB5C
-        fmul    kfTimeStepOriginal
-
-        fstp    dword ptr[esp + 32]
-        fmul    dword ptr[esp + 24]
-
-        fdiv    ds : 0xB7CB5C
-        fmul    kfTimeStepOriginal
-
-        jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
     }
     // clang-format on
 }
