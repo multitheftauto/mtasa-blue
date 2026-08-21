@@ -501,8 +501,7 @@ void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, Event
         if (result > 1 && result != LUA_ERRSYNTAX)
             g_pClientGame->GetScriptDebugging()->LogPCallError(luaVM, ConformResourcePath(lua_tostring(luaVM, -1)));
         else
-            // CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(luaMain, luaMain->GetFunctionTag(handler.luaFunctionRef.ToInt()),
-            //                                                           GetTimeUs() - startTime);
+            // CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(luaMain, eventName.data(), GetTimeUs() - startTime);
 
             lua_settop(luaVM, preCallTop);
 
