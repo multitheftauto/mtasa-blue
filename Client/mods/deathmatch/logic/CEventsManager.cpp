@@ -89,8 +89,7 @@ void CEventsManager::AddHandler(const std::variant<std::uint32_t, BuiltInEvent::
                                              .priority = priority,
                                              .priorityMod = priorityMod,
                                              .entityType = entityType,
-                                             .isRenderingEvent = isRenderingEvent,
-                                             .forceAspectRatioAdjustment = std::string(luaMain->GetScriptName()) == "customblips"});
+                                             .isRenderingEvent = isRenderingEvent});
 
     if (auto resource = luaMain->GetResource())
         resource->InsertEventHandlerIntoList(sourceEntity, {isCustomEvent, eventIdOrHash, luaFunctionRef});
@@ -444,10 +443,10 @@ void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, Event
 
     for (auto& handler : handlers)
     {
-        if (!handler.isValid) [[unlikely]]
+        if (!handler.isValid)
             continue;
 
-        if (!isDirectSource && !handler.propagate) [[unlikely]]
+        if (!isDirectSource && !handler.propagate)
             continue;
 
         if (handler.entityType != eClientEntityType::CCLIENTUNKNOWN && entityType != handler.entityType)
@@ -460,7 +459,9 @@ void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, Event
 
         LUA_CHECKSTACK(luaVM, 1);
 
-        TIMEUS startTime = GetTimeUs();
+        TIMEUS startTime = 0;
+        if (IS_TIMING_CHECKPOINTS())
+            startTime = GetTimeUs();
 
         // Record event for the crash dump writer
         if (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::LUA_TRACE_0000)
@@ -468,11 +469,7 @@ void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, Event
 
         // Aspect ratio adjustment bodges
         if (handler.isRenderingEvent)
-        {
             m_callingRenderEvent = true;
-            if (handler.forceAspectRatioAdjustment)
-                g_pCore->GetGraphics()->SetAspectRatioAdjustmentEnabled(true);
-        }
 
         // TODO g_pClientGame->GetDebugHookManager()->OnPreEventFunction
 

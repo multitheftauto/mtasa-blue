@@ -26,7 +26,6 @@ struct SEventHandler
     bool                               isInUse{false};
     eClientEntityType                  entityType{eClientEntityType::CCLIENTUNKNOWN};
     bool                               isRenderingEvent{false};
-    bool                               forceAspectRatioAdjustment{false};
 
     bool operator<(const SEventHandler& other) const
     {
