@@ -35,6 +35,13 @@ struct SPendingFileDownload
     double  dDownloadSize;
 };
 
+struct SResourceHandlerRef
+{
+    bool            isCustomEvent{false};
+    std::uint32_t   eventIdOrHash{};
+    CLuaFunctionRef luaFunctionRef{};
+};
+
 class CResource
 {
 public:
@@ -113,6 +120,12 @@ public:
     void         SetStartCounter(unsigned int startCounter) { m_startCounter = startCounter; }
     unsigned int GetStartCounter() const noexcept { return m_startCounter; }
 
+    void InsertEventHandlerIntoList(CClientEntity* entity, SResourceHandlerRef handlerRef) { m_eventHandlers[entity].push_back(std::move(handlerRef)); }
+    void RemoveEventHandlerFromList(CClientEntity* entity, std::uint32_t eventIdOrHash);
+    void ClearEventHandlersListForEntity(CClientEntity* entity);
+
+    const std::unordered_map<CClientEntity*, std::vector<SResourceHandlerRef>>& GetEventHandlersList() const noexcept { return m_eventHandlers; }
+
 private:
     unsigned short       m_usNetID;
     uint                 m_uiScriptID;
@@ -156,6 +169,8 @@ private:
     std::list<SNoClientCacheScript>       m_NoClientCacheScriptList;
 
     CResourceModelStreamer m_modelStreamer{};
+
+    std::unordered_map<CClientEntity*, std::vector<SResourceHandlerRef>> m_eventHandlers{};  // store event handlers created added in this resource
 
     bool VerifyPendingClientChecksums();
 };

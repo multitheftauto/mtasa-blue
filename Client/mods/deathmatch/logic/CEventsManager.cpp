@@ -53,11 +53,15 @@ void CEventsManager::AddHandler(const std::variant<std::uint32_t, BuiltInEvent::
 {
     std::vector<SEventHandler>* handlersListPtr = nullptr;
     bool                        isRenderingEvent = false;
+    bool                        isCustomEvent = false;
+    std::uint32_t               eventIdOrHash = 0;
 
     if (std::holds_alternative<BuiltInEvent::Enum>(event))
     {
         auto builtInEnum = std::get<BuiltInEvent::Enum>(event);
         handlersListPtr = &m_eventsTable[static_cast<std::size_t>(builtInEnum)][sourceEntity];
+
+        eventIdOrHash = static_cast<std::uint32_t>(builtInEnum);
 
         isRenderingEvent = builtInEnum == BuiltInEvent::ON_CLIENT_RENDER || builtInEnum == BuiltInEvent::ON_CLIENT_PRE_RENDER ||
                            builtInEnum == BuiltInEvent::ON_CLIENT_HUD_RENDER;
@@ -68,6 +72,9 @@ void CEventsManager::AddHandler(const std::variant<std::uint32_t, BuiltInEvent::
         auto it = m_customEvents.find(hash);
         if (it != m_customEvents.end())
             handlersListPtr = &it->second.handlersTable[sourceEntity];
+
+        eventIdOrHash = hash;
+        isCustomEvent = true;
     }
 
     if (!handlersListPtr)
@@ -85,6 +92,9 @@ void CEventsManager::AddHandler(const std::variant<std::uint32_t, BuiltInEvent::
                                              .isRenderingEvent = isRenderingEvent,
                                              .forceAspectRatioAdjustment = std::string(luaMain->GetScriptName()) == "customblips"});
 
+    if (auto resource = luaMain->GetResource())
+        resource->InsertEventHandlerIntoList(sourceEntity, {isCustomEvent, eventIdOrHash});
+
     std::sort(handlersListPtr->begin(), handlersListPtr->end());
 }
 
@@ -92,11 +102,14 @@ bool CEventsManager::RemoveHandler(const std::variant<std::uint32_t, BuiltInEven
                                    const CLuaFunctionRef& luaFunctionRef)
 {
     CFastHashMap<CClientEntity*, std::vector<SEventHandler>>* entityMapPtr = nullptr;
+    std::uint32_t                                             eventIdOrHash = 0;
 
     if (std::holds_alternative<BuiltInEvent::Enum>(event))
     {
         auto builtInEnum = std::get<BuiltInEvent::Enum>(event);
         entityMapPtr = &m_eventsTable[static_cast<std::size_t>(builtInEnum)];
+
+        eventIdOrHash = static_cast<std::uint32_t>(builtInEnum);
     }
     else
     {
@@ -104,6 +117,8 @@ bool CEventsManager::RemoveHandler(const std::variant<std::uint32_t, BuiltInEven
         auto it = m_customEvents.find(hash);
         if (it != m_customEvents.end())
             entityMapPtr = &it->second.handlersTable;
+
+        eventIdOrHash = hash;
     }
 
     if (!entityMapPtr)
@@ -132,50 +147,73 @@ bool CEventsManager::RemoveHandler(const std::variant<std::uint32_t, BuiltInEven
     }
 
     // If the event is currently being executed, it will be removed by the executing loop (ExecuteHandlersForEntity)
-    if (!isInUse)
-        TryRemoveHandler(sourceEntity, handlersList, *entityMapPtr, it);
+    if (!isInUse && removed)
+        TryRemoveHandler(sourceEntity, handlersList, *entityMapPtr, it, eventIdOrHash);
 
     return removed;
 }
 
 void CEventsManager::RemoveAllHandlers(CLuaMain* luaMain)
 {
-    auto removeHandlersLambda = [luaMain](auto& eventMap)
+    if (auto resource = luaMain->GetResource())
     {
-        for (auto it = eventMap.begin(); it != eventMap.end();)
+        const auto& handlersMap = resource->GetEventHandlersList();
+
+        for (const auto& [entity, refs] : handlersMap)
         {
-            auto& handlersList = it->second;
+            for (const auto& ref : refs)
+            {
+                if (!ref.isCustomEvent)
+                {
+                    auto& handlersList = m_eventsTable[static_cast<std::size_t>(ref.eventIdOrHash)][entity];
 
-            handlersList.erase(std::remove_if(handlersList.begin(), handlersList.end(),
-                                              [luaMain](SEventHandler& h)
-                                              {
-                                                  if (h.luaMain == luaMain)
-                                                  {
-                                                      if (h.isInUse)
+                    handlersList.erase(std::remove_if(handlersList.begin(), handlersList.end(),
+                                                      [luaMain, entity](SEventHandler& h)
                                                       {
-                                                          h.isValid = false;
+                                                          if (h.luaMain == luaMain)
+                                                          {
+                                                              if (h.isInUse)
+                                                              {
+                                                                  h.isValid = false;
+                                                                  return false;
+                                                              }
+
+                                                              entity->DecrementEventHandlersCount();
+                                                              return true;
+                                                          }
                                                           return false;
-                                                      }
-                                                      return true;
-                                                  }
-                                                  return false;
-                                              }),
-                               handlersList.end());
+                                                      }),
+                                       handlersList.end());
+                }
+                else
+                {
+                    auto itCustom = m_customEvents.find(ref.eventIdOrHash);
+                    if (itCustom != m_customEvents.end())
+                    {
+                        auto& handlersList = itCustom->second.handlersTable[entity];
 
-            if (handlersList.empty())
-                eventMap.erase(it++);
-            else
-                ++it;
+                        handlersList.erase(std::remove_if(handlersList.begin(), handlersList.end(),
+                                                          [luaMain, entity](SEventHandler& h)
+                                                          {
+                                                              if (h.luaMain == luaMain)
+                                                              {
+                                                                  if (h.isInUse)
+                                                                  {
+                                                                      h.isValid = false;
+                                                                      return false;
+                                                                  }
+
+                                                                  entity->DecrementEventHandlersCount();
+                                                                  return true;
+                                                              }
+                                                              return false;
+                                                          }),
+                                           handlersList.end());
+                    }
+                }
+            }
         }
-    };
-
-    // Built-in events
-    for (std::size_t eventIndex = 0; eventIndex < static_cast<std::size_t>(BuiltInEvent::MAX_EVENTS); ++eventIndex)
-        removeHandlersLambda(m_eventsTable[eventIndex]);
-
-    // Custom events
-    for (auto& [hash, customEvent] : m_customEvents)
-        removeHandlersLambda(customEvent.handlersTable);
+    }
 }
 
 void CEventsManager::RemoveHandlersForEntity(CClientEntity* entity)
@@ -188,21 +226,31 @@ void CEventsManager::RemoveHandlersForEntity(CClientEntity* entity)
         auto it = eventMap.find(entity);
         if (it != eventMap.end())
         {
-            bool inUse = false;
+            bool                           inUse = false;
+            std::unordered_set<CResource*> affectedResources;
+
             for (auto& h : it->second)
             {
+                h.isValid = false;
+
                 if (h.isInUse)
-                {
-                    h.isValid = false;
                     inUse = true;
+                else
+                {
+                    if (auto resource = h.luaMain->GetResource())
+                        affectedResources.insert(resource);
                 }
             }
 
             // If none are in use, remove the entry from the map entirely
             if (!inUse)
+            {
+                for (auto* resource : affectedResources)
+                    resource->ClearEventHandlersListForEntity(entity);
+
                 eventMap.erase(it);
-            else
-                // Otherwise, clear the vector contents to prevent keeping stale data
+            }
+            else  // Otherwise, clear the vector contents to prevent keeping stale data
                 it->second.clear();
         }
     };
@@ -261,6 +309,7 @@ bool CEventsManager::TriggerEvent(BuiltInEvent::Enum event, CClientEntity* sourc
 
     EventHandlersTable& handlersTable = m_eventsTable[eventId];
     std::string_view    eventName = GetEventName(event);
+    std::uint32_t       eventIdOrHash = static_cast<std::uint32_t>(eventId);
 
     // if (!g_pClientGame->GetDebugHookManager()->OnPreEvent(eventName.data(), args, sourceEntity, nullptr))
     //    return false;
@@ -275,7 +324,7 @@ bool CEventsManager::TriggerEvent(BuiltInEvent::Enum event, CClientEntity* sourc
         {
             auto it = handlersTable.find(currentEntity);
             if (it != handlersTable.end())
-                ExecuteHandlersForEntity(it->second, handlersTable, it, sourceEntity, currentEntity, args, eventName);
+                ExecuteHandlersForEntity(it->second, handlersTable, it, sourceEntity, currentEntity, args, eventName, eventIdOrHash);
         }
 
         currentEntity = currentEntity->GetParent();
@@ -283,7 +332,7 @@ bool CEventsManager::TriggerEvent(BuiltInEvent::Enum event, CClientEntity* sourc
 
     // Call the event on the children (down the tree)
     if (callOnChildren && sourceEntity)
-        TriggerEventOnChildren(handlersTable, sourceEntity, sourceEntity, args, eventName);
+        TriggerEventOnChildren(handlersTable, sourceEntity, sourceEntity, args, eventName, eventIdOrHash);
 
     // g_pClientGame->GetDebugHookManager()->OnPostEvent(eventName.data(), args, sourceEntity, nullptr);
     return !m_eventCancelled;
@@ -299,6 +348,7 @@ bool CEventsManager::TriggerCustomEvent(std::uint32_t hash, CClientEntity* sourc
 
     EventHandlersTable& handlersTable = it->second.handlersTable;
     std::string_view    eventName = it->second.eventName;
+    std::uint32_t       eventIdOrHash = it->second.eventNameHash;
 
     // if (!g_pClientGame->GetDebugHookManager()->OnPreEvent(eventName.data(), args, sourceEntity, nullptr))
     //    return false;
@@ -313,7 +363,7 @@ bool CEventsManager::TriggerCustomEvent(std::uint32_t hash, CClientEntity* sourc
         {
             auto it = handlersTable.find(currentEntity);
             if (it != handlersTable.end())
-                ExecuteHandlersForEntity(it->second, handlersTable, it, sourceEntity, currentEntity, args, eventName);
+                ExecuteHandlersForEntity(it->second, handlersTable, it, sourceEntity, currentEntity, args, eventName, eventIdOrHash);
         }
 
         currentEntity = currentEntity->GetParent();
@@ -321,14 +371,14 @@ bool CEventsManager::TriggerCustomEvent(std::uint32_t hash, CClientEntity* sourc
 
     // Call the event on the children (down the tree)
     if (callOnChildren && sourceEntity)
-        TriggerEventOnChildren(handlersTable, sourceEntity, sourceEntity, args, eventName);
+        TriggerEventOnChildren(handlersTable, sourceEntity, sourceEntity, args, eventName, eventIdOrHash);
 
     // g_pClientGame->GetDebugHookManager()->OnPostEvent(eventName.data(), args, sourceEntity, nullptr);
     return !m_eventCancelled;
 }
 
 void CEventsManager::TriggerEventOnChildren(EventHandlersTable& handlersTable, CClientEntity* sourceEntity, CClientEntity* entity, const CLuaArguments& args,
-                                            const std::string_view& eventName)
+                                            const std::string_view& eventName, std::uint32_t eventIdOrHash)
 {
     const auto& children = entity->GetChildren();
     for (CClientEntity* child : children)
@@ -338,16 +388,33 @@ void CEventsManager::TriggerEventOnChildren(EventHandlersTable& handlersTable, C
 
         auto it = handlersTable.find(child);
         if (it != handlersTable.end())
-            ExecuteHandlersForEntity(it->second, handlersTable, it, sourceEntity, child, args, eventName);
+            ExecuteHandlersForEntity(it->second, handlersTable, it, sourceEntity, child, args, eventName, eventIdOrHash);
 
-        TriggerEventOnChildren(handlersTable, sourceEntity, child, args, eventName);
+        TriggerEventOnChildren(handlersTable, sourceEntity, child, args, eventName, eventIdOrHash);
     }
 }
 
-void CEventsManager::TryRemoveHandler(CClientEntity* entity, EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt)
+void CEventsManager::TryRemoveHandler(CClientEntity* entity, EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt,
+                                      std::uint32_t eventIdOrHash)
 {
     std::size_t oldSize = handlers.size();
-    handlers.erase(std::remove_if(handlers.begin(), handlers.end(), [](const SEventHandler& h) { return !h.isValid && !h.isInUse; }), handlers.end());
+    handlers.erase(std::remove_if(handlers.begin(), handlers.end(),
+                                  [entity, eventIdOrHash](const SEventHandler& h)
+                                  {
+                                      if (!h.isValid && !h.isInUse)
+                                      {
+                                          if (h.luaMain)
+                                          {
+                                              if (auto resource = h.luaMain->GetResource())
+                                                  resource->RemoveEventHandlerFromList(entity, eventIdOrHash);
+                                          }
+
+                                          return true;
+                                      }
+                                      return false;
+                                  }),
+                   handlers.end());
+
     std::size_t removedCount = oldSize - handlers.size();
 
     for (std::size_t i = 0; i < removedCount; ++i)
@@ -358,7 +425,8 @@ void CEventsManager::TryRemoveHandler(CClientEntity* entity, EventHandlersList& 
 }
 
 void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt,
-                                              CClientEntity* sourceEntity, CClientEntity* entity, const CLuaArguments& args, const std::string_view& eventName)
+                                              CClientEntity* sourceEntity, CClientEntity* entity, const CLuaArguments& args, const std::string_view& eventName,
+                                              std::uint32_t eventIdOrHash)
 {
     if (handlers.empty())
         return;
@@ -465,7 +533,7 @@ void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, Event
 
     // To avoid searching through the entire list with erase, we first check whether there is anything to remove
     if (removedDuringCallback)
-        TryRemoveHandler(entity, handlers, handlersTable, mapIt);
+        TryRemoveHandler(entity, handlers, handlersTable, mapIt, eventIdOrHash);
 }
 
 const SCustomEvent* CEventsManager::GetCustomEvent(std::uint32_t hash) const

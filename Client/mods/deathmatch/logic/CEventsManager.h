@@ -71,15 +71,15 @@ public:
     bool TriggerCustomEvent(std::uint32_t hash, CClientEntity* sourceEntity, const CLuaArguments& args, bool callOnChildren = true);
 
     void CancelEvent() noexcept { m_eventCancelled = true; }
+    bool WasEventCancelled() const noexcept { return m_eventCancelled; }
 
-    const SCustomEvent* GetCustomEvent(std::uint32_t hash) const;
-
+    const SCustomEvent*          GetCustomEvent(std::uint32_t hash) const;
     std::vector<CLuaFunctionRef> GetEventHandlers(const std::variant<std::uint32_t, BuiltInEvent::Enum>& event, CClientEntity* sourceEntity, CLuaMain* luaMain,
                                                   std::optional<eClientEntityType> elementType);
+
     bool IsEventHandlerAttached(const std::variant<std::uint32_t, BuiltInEvent::Enum>& event, CClientEntity* sourceEntity, CLuaMain* luaMain,
                                 const CLuaFunctionRef& luaFunctionRef);
     bool EventExists(std::uint32_t hash) const noexcept { return m_customEvents.find(hash) != m_customEvents.end(); }
-    bool WasEventCancelled() const noexcept { return m_eventCancelled; }
 
     bool CallingRenderEvent() const noexcept { return m_callingRenderEvent; }
 
@@ -87,11 +87,13 @@ public:
 
 private:
     void ExecuteHandlersForEntity(EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt,
-                                  CClientEntity* sourceEntity, CClientEntity* entity, const CLuaArguments& args, const std::string_view& eventName);
+                                  CClientEntity* sourceEntity, CClientEntity* entity, const CLuaArguments& args, const std::string_view& eventName,
+                                  std::uint32_t eventIdOrHash);
     void TriggerEventOnChildren(EventHandlersTable& handlersTable, CClientEntity* sourceEntity, CClientEntity* entity, const CLuaArguments& args,
-                                const std::string_view& eventName);
+                                const std::string_view& eventName, std::uint32_t eventIdOrHash);
 
-    void TryRemoveHandler(CClientEntity* entity, EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt);
+    void TryRemoveHandler(CClientEntity* entity, EventHandlersList& handlers, EventHandlersTable& handlersTable, EventHandlersTable::iterator mapIt,
+                          std::uint32_t eventIdOrHash);
 
     std::string_view GetEventName(BuiltInEvent::Enum event) const { return m_eventNames[static_cast<std::size_t>(event)]; }
     std::string_view GetEventName(std::uint32_t hash) const;
