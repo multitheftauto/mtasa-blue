@@ -29,7 +29,6 @@ CVoiceRecorder::CVoiceRecorder()
     m_iSpeexOutgoingFrameSampleCount = 0;
     m_uiOutgoingReadIndex = 0;
     m_uiOutgoingWriteIndex = 0;
-    m_bIsSendingVoiceData = false;
     m_bOutgoingBufferFull = false;
 
     m_ulTimeOfLastSend = 0;
@@ -67,7 +66,7 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
     if (!bEnabled)  // If we aren't enabled, don't bother continuing
         return;
 
-    std::lock_guard<std::mutex> lock(m_Mutex);
+    std::unique_lock<std::mutex> lock(m_Mutex);
 
     // Convert the sample rate we received from the server (0-2) into an actual sample rate
     m_SampleRate = convertServerSampleRate(uiServerSampleRate);
@@ -87,9 +86,7 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
     const SpeexMode* speexMode = getSpeexModeFromSampleRate();
     m_pSpeexEncoderState = speex_encoder_init(speexMode);
 
-    Pa_Initialize();
-
-    int count = Pa_GetHostApiCount();
+    PaError error = Pa_Initialize();
 
     PaStreamParameters inputDevice;
     inputDevice.channelCount = 1;
@@ -98,10 +95,34 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
     inputDevice.hostApiSpecificStreamInfo = nullptr;
     inputDevice.suggestedLatency = 0;
 
-    Pa_OpenStream(&m_pAudioStream, &inputDevice, NULL, m_SampleRate, iFramesPerBuffer, paNoFlag, PACallback, this);
+    if (error == paNoError)
+        error = Pa_OpenStream(&m_pAudioStream, &inputDevice, NULL, m_SampleRate, iFramesPerBuffer, paNoFlag, PACallback, this);
+    if (error == paNoError && m_pAudioStream)
+        error = Pa_StartStream(m_pAudioStream);
 
-    if (m_pAudioStream)
-        Pa_StartStream(m_pAudioStream);
+    // A recorder that looks enabled but never captures is worse than one that
+    // reports the failure, so shut down cleanly when the mic stream cannot be
+    // opened or started. The stream close must run outside the mutex, same as
+    // DeInit, in case a host API leaves the callback running after a failed start
+    if (error != paNoError)
+    {
+        m_bEnabled = false;
+        lock.unlock();
+        if (m_pAudioStream)
+        {
+            Pa_CloseStream(m_pAudioStream);
+            m_pAudioStream = nullptr;
+        }
+        Pa_Terminate();
+        lock.lock();
+        if (m_pSpeexEncoderState)
+        {
+            speex_encoder_destroy(m_pSpeexEncoderState);
+            m_pSpeexEncoderState = nullptr;
+        }
+        g_pCore->GetConsole()->Printf("Voice: cannot open microphone stream (%s)", Pa_GetErrorText(error));
+        return;
+    }
 
     // Initialize our outgoing buffer. A failed encoder creation would leave these
     // calls on a null handle, so the whole config chain is skipped when the
@@ -110,13 +131,37 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
     if (m_pSpeexEncoderState)
     {
         speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexOutgoingFrameSampleCount);
-        speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_QUALITY, &m_ucQuality);
+        int iQuality = m_ucQuality;
+        speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_QUALITY, &iQuality);
         iBitRate = (int)uiBitrate;
         if (iBitRate)
             speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_BITRATE, &iBitRate);
     }
 
     m_pOutgoingBuffer = (unsigned char*)malloc(m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT);
+    if (!m_pOutgoingBuffer)
+    {
+        // Without the ring the recorder would look enabled but never send,
+        // so shut down cleanly instead. The stream close must run outside the
+        // mutex: the callback can be waiting on it, and Pa_CloseStream waits
+        // for the callback to return
+        m_bEnabled = false;
+        lock.unlock();
+        if (m_pAudioStream)
+        {
+            Pa_CloseStream(m_pAudioStream);
+            m_pAudioStream = nullptr;
+        }
+        Pa_Terminate();
+        lock.lock();
+        if (m_pSpeexEncoderState)
+        {
+            speex_encoder_destroy(m_pSpeexEncoderState);
+            m_pSpeexEncoderState = nullptr;
+        }
+        g_pCore->GetConsole()->Printf("Voice: could not allocate the voice buffer");
+        return;
+    }
     m_uiOutgoingReadIndex = 0;
     m_uiOutgoingWriteIndex = 0;
     m_bOutgoingBufferFull = false;
@@ -186,7 +231,6 @@ void CVoiceRecorder::DeInit()
     m_iSpeexOutgoingFrameSampleCount = 0;
     m_uiOutgoingReadIndex = 0;
     m_uiOutgoingWriteIndex = 0;
-    m_bIsSendingVoiceData = false;
     m_bOutgoingBufferFull = false;
     m_ulTimeOfLastSend = 0;
     m_uiBufferSizeBytes = 0;
@@ -295,7 +339,6 @@ void CVoiceRecorder::DoPulse()
         static_assert(640 * sizeof(short) <= sizeof(audioBuffer), "Voice frame exceeds the local audio buffer");
         unsigned int uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
 
-        m_bIsSendingVoiceData = false;
         unsigned int uiBytesAvailable = 0;
 
         if (m_bOutgoingBufferFull)
@@ -344,11 +387,13 @@ void CVoiceRecorder::DoPulse()
                 }
 
                 // Encode our audio stream with speex
-                speex_encode_int(m_pSpeexEncoderState, (spx_int16_t*)pInputBuffer, &speexBits);
+                const int encodeResult = speex_encode_int(m_pSpeexEncoderState, (spx_int16_t*)pInputBuffer, &speexBits);
 
                 m_uiOutgoingReadIndex = (m_uiOutgoingReadIndex + uiSpeexBlockSize) % uiTotalBufferSize;
 
-                m_bIsSendingVoiceData = true;
+                // A failed encode produces no usable bits, so drop the frame
+                if (encodeResult < 0)
+                    continue;
 
                 unsigned int audioBufferLength = speex_bits_write(&speexBits, reinterpret_cast<char*>(audioBuffer), 2048);
 
