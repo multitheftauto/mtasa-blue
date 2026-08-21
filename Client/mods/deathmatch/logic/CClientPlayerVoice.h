@@ -107,6 +107,7 @@ private:
     CVoiceRecorder* m_pVoiceRecorder;
     unsigned int    m_SampleRate;
     HSTREAM         m_pBassPlaybackStream;
+    HSYNC           m_hStallSync;
     void*           m_pSpeexDecoderState;
     int             m_iSpeexIncomingFrameSampleCount;
     float           m_fVolume;
