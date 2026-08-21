@@ -713,6 +713,65 @@ static void __declspec(naked) HOOK_CTaskSimpleSwim__ProcessEffectsBubbleFix()
     // clang-format on
 }
 
+// Fixes boat water resistance and deceleration scaling on high FPS.
+#define HOOKPOS_CVehicle__ApplyBoatWaterResistance  0x6D2771
+#define HOOKSIZE_CVehicle__ApplyBoatWaterResistance 6
+static const unsigned int     RETURN_CVehicle__ApplyBoatWaterResistance = 0x6D2777;
+static void __declspec(naked) HOOK_CVehicle__ApplyBoatWaterResistance()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fmul    ds:[0x871DDC]           // Original constant used in code
+        fmul    ds:[0xB7CB5C]           // Multiply by current timestep
+        fdiv    kOriginalTimeStep       // Divide by desired 30 FPS timestep
+        jmp     RETURN_CVehicle__ApplyBoatWaterResistance
+    }
+    // clang-format on
+}
+
+// Fixes ped swimming resistance and speed on high FPS.
+#define HOOKPOS_CTaskSimpleSwim__ProcessSwimmingResistance  0x68A4EF
+#define HOOKSIZE_CTaskSimpleSwim__ProcessSwimmingResistance 6
+static const unsigned int     RETURN_CTaskSimpleSwim__ProcessSwimmingResistance = 0x68A50E;
+static void __declspec(naked) HOOK_CTaskSimpleSwim__ProcessSwimmingResistance()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fsub    st, st(1)
+
+        fld     dword ptr [esp + 16]
+        lea     eax, [esi + 44h]
+        mov     ecx, eax
+        fmul    st, st(1)
+
+        fdiv    ds:[0xB7CB5C]
+        fmul    kOriginalTimeStep
+
+        fstp    dword ptr [esp + 28]
+
+        fld     dword ptr [esp + 20]
+        fmul    st, st(1)
+
+        fdiv    ds:[0xB7CB5C]
+        fmul    kOriginalTimeStep
+
+        fstp    dword ptr [esp + 32]
+        fmul    dword ptr [esp + 24]
+
+        fdiv    ds:[0xB7CB5C]
+        fmul    kOriginalTimeStep
+
+        jmp     RETURN_CTaskSimpleSwim__ProcessSwimmingResistance
+    }
+    // clang-format on
+}
+
 // Fixes invisible weapon particles (extinguisher, spraycan, flamethrower) at high FPS
 #define HOOKPOS_CWeapon_Update  0x73DC3D
 #define HOOKSIZE_CWeapon_Update 5
@@ -882,10 +941,12 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CAutomobile__UpdateWheelMatrix);
     EZHookInstall(CVehicle__DoBoatSplashes);
     EZHookInstall(CVehicle__AddWaterSplashParticles);
+    EZHookInstall(CVehicle__ApplyBoatWaterResistance);
     EZHookInstall(CPlane__ProcessControl);
     EZHookInstall(CVehicle__AddExhaustParticles);
     EZHookInstall(CTaskSimpleSwim__ProcessEffects);
     EZHookInstall(CTaskSimpleSwim__ProcessEffectsBubbleFix);
+    EZHookInstall(CTaskSimpleSwim__ProcessSwimmingResistance);
 
     EZHookInstall(CWeapon_Update);
 }

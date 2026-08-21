@@ -120,7 +120,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
         m_pUniFont = (CGUIFont_Impl*)CreateFnt("unifont", CGUI_MTA_SUBSTITUTE_FONT, 9, 0, false);
         m_pFontManager->setSubstituteFont(m_pUniFont->GetFont());
     }
-    catch (CEGUI::InvalidRequestException e)
+    catch (const CEGUI::Exception& e)
     {
         SString strMessage = e.getMessage().c_str();
         BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading fonts!\n\n%s", *strMessage));
@@ -138,7 +138,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
         m_pSAGothicFont = (CGUIFont_Impl*)CreateFnt("sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, true);
         m_pSansFont = (CGUIFont_Impl*)CreateFnt("sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, false);
     }
-    catch (CEGUI::InvalidRequestException e)
+    catch (const CEGUI::Exception& e)
     {
         SString strMessage = e.getMessage().c_str();
         BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading fonts!\n\n%s", *strMessage));
@@ -277,7 +277,15 @@ void CGUI_Impl::Draw()
 
 void CGUI_Impl::Invalidate()
 {
-    reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->preD3DReset();
+    try
+    {
+        reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->preD3DReset();
+    }
+    catch (const CEGUI::Exception& exception)
+    {
+        MessageBox(0, exception.getMessage().c_str(), "CEGUI Exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
+        TerminateProcess(GetCurrentProcess(), 1);
+    }
 }
 
 void CGUI_Impl::Restore()
@@ -286,7 +294,7 @@ void CGUI_Impl::Restore()
     {
         reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->postD3DReset();
     }
-    catch (CEGUI::RendererException& exception)
+    catch (const CEGUI::Exception& exception)
     {
         MessageBox(0, exception.getMessage().c_str(), "CEGUI Exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
         TerminateProcess(GetCurrentProcess(), 1);
