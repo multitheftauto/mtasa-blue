@@ -293,7 +293,7 @@ void CVoiceRecorder::DoPulse()
         // One frame at the highest Speex rate (32 kHz ultra-wideband) is 1280 bytes;
         // the check keeps the local buffer in step with the largest Speex frame
         static_assert(640 * sizeof(short) <= sizeof(audioBuffer), "Voice frame exceeds the local audio buffer");
-        unsigned int   uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
+        unsigned int uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
 
         m_bIsSendingVoiceData = false;
         unsigned int uiBytesAvailable = 0;

@@ -73,7 +73,7 @@ private:
                           PaStreamCallbackFlags statusFlags, void* userData);
 
     std::atomic<bool> m_bEnabled;
-    eVoiceState      m_VoiceState;
+    eVoiceState       m_VoiceState;
 
     PaStream* m_pAudioStream;
 
