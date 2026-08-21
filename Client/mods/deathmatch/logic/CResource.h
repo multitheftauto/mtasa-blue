@@ -121,7 +121,7 @@ public:
     unsigned int GetStartCounter() const noexcept { return m_startCounter; }
 
     void InsertEventHandlerIntoList(CClientEntity* entity, SResourceHandlerRef handlerRef) { m_eventHandlers[entity].push_back(std::move(handlerRef)); }
-    void RemoveEventHandlerFromList(CClientEntity* entity, std::uint32_t eventIdOrHash);
+    void RemoveEventHandlerFromList(CClientEntity* entity, std::uint32_t eventIdOrHash, const CLuaFunctionRef& luaFunctionRef);
     void ClearEventHandlersListForEntity(CClientEntity* entity);
 
     const std::unordered_map<CClientEntity*, std::vector<SResourceHandlerRef>>& GetEventHandlersList() const noexcept { return m_eventHandlers; }

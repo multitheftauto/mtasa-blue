@@ -93,7 +93,7 @@ void CEventsManager::AddHandler(const std::variant<std::uint32_t, BuiltInEvent::
                                              .forceAspectRatioAdjustment = std::string(luaMain->GetScriptName()) == "customblips"});
 
     if (auto resource = luaMain->GetResource())
-        resource->InsertEventHandlerIntoList(sourceEntity, {isCustomEvent, eventIdOrHash});
+        resource->InsertEventHandlerIntoList(sourceEntity, {isCustomEvent, eventIdOrHash, luaFunctionRef});
 
     std::sort(handlersListPtr->begin(), handlersListPtr->end());
 }
@@ -406,7 +406,7 @@ void CEventsManager::TryRemoveHandler(CClientEntity* entity, EventHandlersList& 
                                           if (h.luaMain)
                                           {
                                               if (auto resource = h.luaMain->GetResource())
-                                                  resource->RemoveEventHandlerFromList(entity, eventIdOrHash);
+                                                  resource->RemoveEventHandlerFromList(entity, eventIdOrHash, h.luaFunctionRef);
                                           }
 
                                           return true;

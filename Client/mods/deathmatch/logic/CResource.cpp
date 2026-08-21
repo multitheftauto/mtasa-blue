@@ -614,7 +614,7 @@ void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool b
     g_pCore->GetConsole()->Printf("Download error: %s", *strMessage);
 }
 
-void CResource::RemoveEventHandlerFromList(CClientEntity* entity, std::uint32_t eventIdOrHash)
+void CResource::RemoveEventHandlerFromList(CClientEntity* entity, std::uint32_t eventIdOrHash, const CLuaFunctionRef& luaFunctionRef)
 {
     if (m_eventHandlers.empty())
         return;
@@ -624,7 +624,7 @@ void CResource::RemoveEventHandlerFromList(CClientEntity* entity, std::uint32_t 
         return;
 
     auto& vector = it->second;
-    std::erase_if(vector, [&](const SResourceHandlerRef& ref) { return ref.eventIdOrHash == eventIdOrHash; });
+    std::erase_if(vector, [&](const SResourceHandlerRef& ref) { return ref.eventIdOrHash == eventIdOrHash && ref.luaFunctionRef == luaFunctionRef; });
 
     if (vector.empty())
         m_eventHandlers.erase(it);
