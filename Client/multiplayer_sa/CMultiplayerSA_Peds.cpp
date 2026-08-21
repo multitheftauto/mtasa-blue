@@ -205,6 +205,23 @@ static void __declspec(naked) HOOK_CAEPedAudioEntity_UpdateJetPack()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// RenderEffects
+//
+// GitHub Issue #5255
+// Prevents the ped targeting marker from being rendered when they are in different interiors
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static void __fastcall CanRenderPedTargetingMarker(CPlayerPedSAInterface* playerPed)
+{
+    if (!playerPed || !playerPed->mouseTargetEntity)
+        return;
+
+    if (playerPed->m_areaCode == playerPed->mouseTargetEntity->m_areaCode)
+        ((void(__thiscall*)(CPlayerPedSAInterface*))0x60BA80)(playerPed);  // Call CPlayerPed::DrawTriangleForMouseRecruitPed
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::InitHooks_Peds
 //
 // Setup hooks
@@ -216,4 +233,6 @@ void CMultiplayerSA::InitHooks_Peds()
 
     HookInstall(HOOKPOS_CTaskSimpleJetPack_RenderJetPack, (DWORD)HOOK_CTaskSimpleJetPack_RenderJetPack, 12);
     HookInstall(HOOKPOS_CAEPedAudioEntity_UpdateJetPack, (DWORD)HOOK_CAEPedAudioEntity_UpdateJetPack, 6);
+
+    HookInstallCall(0x53E20E, reinterpret_cast<DWORD>(CanRenderPedTargetingMarker));
 }
