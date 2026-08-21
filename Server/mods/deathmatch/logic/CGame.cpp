@@ -1341,6 +1341,12 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
+        case PACKET_ID_PLAYER_CPUINFO:
+        {
+            Packet_PlayerCPUInfo(static_cast<CPlayerCPUInfoPacket&>(Packet));
+            return true;
+        }
+
         case PACKET_ID_PLAYER_SCREENSHOT:
         {
             Packet_PlayerScreenShot(static_cast<CPlayerScreenShotPacket&>(Packet));
@@ -1704,6 +1710,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPlayerCommand", "command", NULL, false);
     m_Events.AddEvent("onPlayerModInfo", "filename, itemlist", NULL, false);
     m_Events.AddEvent("onPlayerACInfo", "aclist, size, md5, sha256", NULL, false);
+    m_Events.AddEvent("onPlayerCPUInfo", "allowed, name, maxClockSpeedMHz, cores, threads, l1CacheKB, l2CacheKB, l3CacheKB", NULL, false);
     m_Events.AddEvent("onPlayerNetworkStatus", "type, ticks", NULL, false);
     m_Events.AddEvent("onPlayerScreenShot", "resource, status, file_data, timestamp, tag", NULL, false);
     m_Events.AddEvent("onPlayerResourceStart", "resource", NULL, false);
@@ -4668,6 +4675,34 @@ void CGame::Packet_PlayerACInfo(CPlayerACInfoPacket& Packet)
         Arguments.PushString(strD3d9Sha256);
         pPlayer->CallEvent("onPlayerACInfo", Arguments);
     }
+}
+
+void CGame::Packet_PlayerCPUInfo(CPlayerCPUInfoPacket& Packet)
+{
+    CPlayer* pPlayer = Packet.GetSourcePlayer();
+    if (!pPlayer)
+        return;
+
+    pPlayer->m_bCPUInfoReceived = true;
+    pPlayer->m_bAllowCPUInfo = Packet.m_bAllowCPUInfo;
+    pPlayer->m_strCPUName = Packet.m_strName;
+    pPlayer->m_uiCPUMaxClockSpeedMHz = Packet.m_uiMaxClockSpeedMHz;
+    pPlayer->m_uiCPUCores = Packet.m_uiCores;
+    pPlayer->m_uiCPUThreads = Packet.m_uiThreads;
+    pPlayer->m_uiCPUL1CacheKB = Packet.m_uiL1CacheKB;
+    pPlayer->m_uiCPUL2CacheKB = Packet.m_uiL2CacheKB;
+    pPlayer->m_uiCPUL3CacheKB = Packet.m_uiL3CacheKB;
+
+    CLuaArguments Arguments;
+    Arguments.PushBoolean(Packet.m_bAllowCPUInfo);
+    Arguments.PushString(Packet.m_strName);
+    Arguments.PushNumber(Packet.m_uiMaxClockSpeedMHz);
+    Arguments.PushNumber(Packet.m_uiCores);
+    Arguments.PushNumber(Packet.m_uiThreads);
+    Arguments.PushNumber(Packet.m_uiL1CacheKB);
+    Arguments.PushNumber(Packet.m_uiL2CacheKB);
+    Arguments.PushNumber(Packet.m_uiL3CacheKB);
+    pPlayer->CallEvent("onPlayerCPUInfo", Arguments);
 }
 
 void CGame::PlayerCompleteConnect(CPlayer* pPlayer)

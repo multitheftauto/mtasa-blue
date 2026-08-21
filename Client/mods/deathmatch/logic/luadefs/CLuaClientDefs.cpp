@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CLuaClientDefs.h"
 #include "lua/CLuaFunctionParser.h"
+#include <SharedUtil.SysInfo.h>
 
 void CLuaClientDefs::LoadFunctions()
 {
@@ -23,7 +24,8 @@ void CLuaClientDefs::LoadFunctions()
                                                                              {"isChatInputBlocked", ArgumentParser<IsChatInputBlocked>},
                                                                              {"clearDebugBox", ArgumentParser<ClearDebug>},
                                                                              {"isMTAWindowFocused", ArgumentParser<IsMTAWindowFocused>},
-                                                                             {"isCapsLockEnabled", ArgumentParser<IsCapsLockEnabled>}};
+                                                                             {"isCapsLockEnabled", ArgumentParser<IsCapsLockEnabled>},
+                                                                             {"getCPUInfo", ArgumentParser<GetCPUInfo>}};
 
     for (const auto& [name, func] : functions)
         CLuaCFunctions::AddFunction(name, func);
@@ -79,4 +81,37 @@ bool CLuaClientDefs::IsMTAWindowFocused()
 bool CLuaClientDefs::IsCapsLockEnabled()
 {
     return ((::GetKeyState(VK_CAPITAL) & 0x0001) != 0);
+}
+
+CLuaArguments CLuaClientDefs::GetCPUInfo()
+{
+    CLuaArguments table;
+    bool          bAllowCPUInfo = true;
+    g_pCore->GetCVars()->Get("allow_cpu_info", bAllowCPUInfo);
+
+    table.PushString("AllowCPUInfo");
+    table.PushBoolean(bAllowCPUInfo);
+
+    // Opt-out must omit hardware fields so server scripts cannot recover them from a client event.
+    if (!bAllowCPUInfo)
+        return table;
+
+    SharedUtil::SCPUInfo info;
+    SharedUtil::GetCPUInfo(info);
+
+    table.PushString("Name");
+    table.PushString(info.strName);
+    table.PushString("MaxClockSpeedMHz");
+    table.PushNumber(info.uiMaxClockSpeedMHz);
+    table.PushString("Cores");
+    table.PushNumber(info.uiCores);
+    table.PushString("Threads");
+    table.PushNumber(info.uiThreads);
+    table.PushString("L1CacheKB");
+    table.PushNumber(info.uiL1CacheKB);
+    table.PushString("L2CacheKB");
+    table.PushNumber(info.uiL2CacheKB);
+    table.PushString("L3CacheKB");
+    table.PushNumber(info.uiL3CacheKB);
+    return table;
 }

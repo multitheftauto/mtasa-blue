@@ -163,6 +163,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxDeviceSelectionDialog;
     CGUICheckBox*  m_pCheckBoxShowUnsafeResolutions;
     CGUICheckBox*  m_pCheckBoxAllowScreenUpload;
+    CGUICheckBox*  m_pCheckBoxAllowCPUInfo;
     CGUICheckBox*  m_pCheckBoxAllowExternalSounds;
     CGUICheckBox*  m_pCheckBoxCustomizedSAFiles;
     CGUICheckBox*  m_pCheckBoxAllowDiscordRPC;
@@ -438,6 +439,7 @@ protected:
     bool OnFxQualityChanged(CGUIElement* pElement);
     bool OnVolumetricShadowsClick(CGUIElement* pElement);
     bool OnAllowScreenUploadClick(CGUIElement* pElement);
+    bool OnAllowCPUInfoClick(CGUIElement* pElement);
     bool OnAllowExternalSoundsClick(CGUIElement* pElement);
     bool OnAllowDiscordRPC(CGUIElement* pElement);
     bool OnCustomizedSAFilesClick(CGUIElement* pElement);
@@ -512,6 +514,7 @@ private:
     DWORD m_dwFrameCount;
     bool  m_bShownVolumetricShadowsWarning;
     bool  m_bShownAllowScreenUploadMessage;
+    bool  m_bShownAllowCPUInfoMessage;
     bool  m_bShownAllowExternalSoundsMessage;
     int   m_iMaxAnisotropic;
 

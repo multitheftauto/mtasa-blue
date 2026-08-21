@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <net/SyncStructures.h>
+#include <SharedUtil.SysInfo.h>
 #include <game/C3DMarkers.h>
 #include <game/CAnimBlendAssocGroup.h>
 #include <game/CAnimBlendAssociation.h>
@@ -727,6 +728,35 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             // Send the packet as joindata
             g_pNet->SendPacket(PACKET_ID_PLAYER_JOINDATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
             g_pNet->DeallocateNetBitStream(pBitStream);
+
+            // CPU info is a separate packet so old servers can ignore the unknown id.
+            // AllowCPUInfo=false is still sent so the server can tell opt-out from "no packet".
+            {
+                bool bAllowCPUInfo = true;
+                g_pCore->GetCVars()->Get("allow_cpu_info", bAllowCPUInfo);
+
+                NetBitStreamInterface* pCPUBitStream = g_pNet->AllocateNetBitStream();
+                if (pCPUBitStream)
+                {
+                    pCPUBitStream->WriteBit(bAllowCPUInfo);
+                    if (bAllowCPUInfo)
+                    {
+                        SharedUtil::SCPUInfo cpuInfo;
+                        SharedUtil::GetCPUInfo(cpuInfo);
+                        if (cpuInfo.strName.length() > 128)
+                            cpuInfo.strName = cpuInfo.strName.Left(128);
+                        pCPUBitStream->WriteString(cpuInfo.strName);
+                        pCPUBitStream->Write(cpuInfo.uiMaxClockSpeedMHz);
+                        pCPUBitStream->Write(cpuInfo.uiCores);
+                        pCPUBitStream->Write(cpuInfo.uiThreads);
+                        pCPUBitStream->Write(cpuInfo.uiL1CacheKB);
+                        pCPUBitStream->Write(cpuInfo.uiL2CacheKB);
+                        pCPUBitStream->Write(cpuInfo.uiL3CacheKB);
+                    }
+                    g_pNet->SendPacket(PACKET_ID_PLAYER_CPUINFO, pCPUBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
+                    g_pNet->DeallocateNetBitStream(pCPUBitStream);
+                }
+            }
 
             return true;
         }
