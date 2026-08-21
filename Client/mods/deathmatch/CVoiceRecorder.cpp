@@ -20,11 +20,12 @@ CVoiceRecorder::CVoiceRecorder()
     m_SampleRate = SAMPLERATE_WIDEBAND;
     m_ucQuality = 0;
 
-    m_pAudioStream = NULL;
+    m_pAudioStream = nullptr;
 
-    m_pSpeexEncoderState = NULL;
+    m_pSpeexEncoderState = nullptr;
+    m_pSpeexPreprocState = nullptr;
 
-    m_pOutgoingBuffer = NULL;
+    m_pOutgoingBuffer = nullptr;
     m_iSpeexOutgoingFrameSampleCount = 0;
     m_uiOutgoingReadIndex = 0;
     m_uiOutgoingWriteIndex = 0;
@@ -56,6 +57,11 @@ int CVoiceRecorder::PACallback(const void* inputBuffer, void* outputBuffer, unsi
 
 void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsigned char ucQuality, unsigned int uiBitrate)
 {
+    // A re-init shouldnt leak the previous session's stream, encoder, preprocessor
+    // and buffer, and disabling must still clean up the old stream
+    if (m_bEnabled)
+        DeInit();
+
     m_bEnabled = bEnabled;
 
     if (!bEnabled)  // If we aren't enabled, don't bother continuing
@@ -89,19 +95,26 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
     inputDevice.channelCount = 1;
     inputDevice.device = Pa_GetDefaultInputDevice();
     inputDevice.sampleFormat = paInt16;
-    inputDevice.hostApiSpecificStreamInfo = NULL;
+    inputDevice.hostApiSpecificStreamInfo = nullptr;
     inputDevice.suggestedLatency = 0;
 
     Pa_OpenStream(&m_pAudioStream, &inputDevice, NULL, m_SampleRate, iFramesPerBuffer, paNoFlag, PACallback, this);
 
-    Pa_StartStream(m_pAudioStream);
+    if (m_pAudioStream)
+        Pa_StartStream(m_pAudioStream);
 
-    // Initialize our outgoing buffer
-    speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexOutgoingFrameSampleCount);
-    speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_QUALITY, &m_ucQuality);
-    int iBitRate = (int)uiBitrate;
-    if (iBitRate)
-        speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_BITRATE, &iBitRate);
+    // Initialize our outgoing buffer. A failed encoder creation would leave these
+    // calls on a null handle, so the whole config chain is skipped when the
+    // encoder is missing; DoPulse drops frames the same way
+    int iBitRate = 0;
+    if (m_pSpeexEncoderState)
+    {
+        speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexOutgoingFrameSampleCount);
+        speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_QUALITY, &m_ucQuality);
+        iBitRate = (int)uiBitrate;
+        if (iBitRate)
+            speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_BITRATE, &iBitRate);
+    }
 
     m_pOutgoingBuffer = (unsigned char*)malloc(m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT);
     m_uiOutgoingReadIndex = 0;
@@ -109,20 +122,28 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
     m_bOutgoingBufferFull = false;
 
     // Initialise the speex preprocessor
-    int iSamplingRate;
-    speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_SAMPLING_RATE, &iSamplingRate);
-    m_pSpeexPreprocState = speex_preprocess_state_init(m_iSpeexOutgoingFrameSampleCount, iSamplingRate);
+    int iSamplingRate = 0;
+    if (m_pSpeexEncoderState)
+    {
+        speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_SAMPLING_RATE, &iSamplingRate);
+        m_pSpeexPreprocState = speex_preprocess_state_init(m_iSpeexOutgoingFrameSampleCount, iSamplingRate);
+    }
 
-    // Set our preprocessor parameters
+    // Set our preprocessor parameters, but only when the preprocessor exists
     int iEnable = 1;
     int iDisable = 0;
-    speex_preprocess_ctl(m_pSpeexPreprocState, SPEEX_PREPROCESS_SET_AGC, &iEnable);
-    speex_preprocess_ctl(m_pSpeexPreprocState, SPEEX_PREPROCESS_SET_DENOISE, &iEnable);
-    speex_preprocess_ctl(m_pSpeexPreprocState, SPEEX_PREPROCESS_SET_DEREVERB, &iEnable);
-    speex_preprocess_ctl(m_pSpeexPreprocState, SPEEX_PREPROCESS_SET_VAD, &iDisable);
-    speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_DTX, &iEnable);
-
-    speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_BITRATE, &iBitRate);
+    if (m_pSpeexPreprocState)
+    {
+        speex_preprocess_ctl(m_pSpeexPreprocState, SPEEX_PREPROCESS_SET_AGC, &iEnable);
+        speex_preprocess_ctl(m_pSpeexPreprocState, SPEEX_PREPROCESS_SET_DENOISE, &iEnable);
+        speex_preprocess_ctl(m_pSpeexPreprocState, SPEEX_PREPROCESS_SET_DEREVERB, &iEnable);
+        speex_preprocess_ctl(m_pSpeexPreprocState, SPEEX_PREPROCESS_SET_VAD, &iDisable);
+    }
+    if (m_pSpeexEncoderState)
+    {
+        speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_DTX, &iEnable);
+        speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_BITRATE, &iBitRate);
+    }
 
     g_pCore->GetConsole()->Printf("Server Voice Chat Quality [%i];  Sample Rate: [%iHz]; Bitrate [%ibps]", m_ucQuality, iSamplingRate, iBitRate);
 }
@@ -132,30 +153,35 @@ void CVoiceRecorder::DeInit()
     if (!m_bEnabled)
         return;
 
-    std::lock_guard<std::mutex> lock(m_Mutex);
-
+    // The audio callback can be mid-frame here; it must be able to finish
+    // before the stream closes, so take the mutex only after the stream teardown
     m_bEnabled = false;
 
-    Pa_CloseStream(m_pAudioStream);
+    if (m_pAudioStream)
+        Pa_CloseStream(m_pAudioStream);
     Pa_Terminate();
 
-    m_pAudioStream = NULL;
+    m_pAudioStream = nullptr;
+
+    std::lock_guard<std::mutex> lock(m_Mutex);
 
     m_iSpeexOutgoingFrameSampleCount = 0;
 
-    speex_encoder_destroy(m_pSpeexEncoderState);
-    m_pSpeexEncoderState = NULL;
+    if (m_pSpeexEncoderState)
+        speex_encoder_destroy(m_pSpeexEncoderState);
+    m_pSpeexEncoderState = nullptr;
 
-    speex_preprocess_state_destroy(m_pSpeexPreprocState);
-    m_pSpeexPreprocState = NULL;
+    if (m_pSpeexPreprocState)
+        speex_preprocess_state_destroy(m_pSpeexPreprocState);
+    m_pSpeexPreprocState = nullptr;
 
     free(m_pOutgoingBuffer);
-    m_pOutgoingBuffer = NULL;
+    m_pOutgoingBuffer = nullptr;
 
     m_VoiceState = VOICESTATE_AWAITING_INPUT;
     m_SampleRate = SAMPLERATE_WIDEBAND;
 
-    m_pAudioStream = NULL;
+    m_pAudioStream = nullptr;
 
     m_iSpeexOutgoingFrameSampleCount = 0;
     m_uiOutgoingReadIndex = 0;
@@ -254,8 +280,16 @@ void CVoiceRecorder::DoPulse()
 {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
+    // A missing buffer still needs the flush below to run, so it can reset the
+    // last-packet state and send the voice end packet
+    if (!m_pOutgoingBuffer && m_VoiceState != VOICESTATE_RECORDING_LAST_PACKET)
+        return;
+
     unsigned char* pInputBuffer;
     unsigned char  audioBuffer[2048]{};
+    // One frame at the highest Speex rate (32 kHz ultra-wideband) is 1280 bytes;
+    // the check keeps the local buffer in step with the largest Speex frame
+    static_assert(640 * sizeof(short) <= sizeof(audioBuffer), "Voice frame exceeds the local audio buffer");
     unsigned int   uiTotalBufferSize = m_uiBufferSizeBytes * FRAME_OUTGOING_BUFFER_COUNT;
 
     // Only send every 100 ms, or flush the last packet right away on release
@@ -273,7 +307,9 @@ void CVoiceRecorder::DoPulse()
 
         unsigned int uiSpeexBlockSize = m_iSpeexOutgoingFrameSampleCount * VOICE_SAMPLE_SIZE;
 
-        unsigned int uiSpeexFramesAvailable = uiBytesAvailable / uiSpeexBlockSize;
+        // A missing encoder leaves the frame size at zero; skip the division so
+        // the pulse degrades instead of dividing by zero
+        unsigned int uiSpeexFramesAvailable = uiSpeexBlockSize ? uiBytesAvailable / uiSpeexBlockSize : 0;
 
         if (uiSpeexFramesAvailable > 0)
         {
@@ -296,7 +332,16 @@ void CVoiceRecorder::DoPulse()
                     pInputBuffer = m_pOutgoingBuffer + m_uiOutgoingReadIndex;
 
                 // Run through our preprocessor (noise/echo cancelation)
-                speex_preprocess_run(m_pSpeexPreprocState, (spx_int16_t*)pInputBuffer);
+                if (m_pSpeexPreprocState)
+                    speex_preprocess_run(m_pSpeexPreprocState, (spx_int16_t*)pInputBuffer);
+
+                // A missing encoder leaves voice without a codec; drop the frame
+                // the same way an encode error is handled
+                if (!m_pSpeexEncoderState)
+                {
+                    m_uiOutgoingReadIndex = (m_uiOutgoingReadIndex + uiSpeexBlockSize) % uiTotalBufferSize;
+                    continue;
+                }
 
                 // Encode our audio stream with speex
                 speex_encode_int(m_pSpeexEncoderState, (spx_int16_t*)pInputBuffer, &speexBits);
@@ -319,8 +364,8 @@ void CVoiceRecorder::DoPulse()
 
                         g_pNet->SendPacket(PACKET_ID_VOICE_DATA, pBitStream, PACKET_PRIORITY_LOW, PACKET_RELIABILITY_UNRELIABLE_SEQUENCED,
                                            PACKET_ORDERING_VOICE);
-                        g_pNet->DeallocateNetBitStream(pBitStream);
                     }
+                    g_pNet->DeallocateNetBitStream(pBitStream);
                 }
             }
             speex_bits_destroy(&speexBits);
@@ -356,7 +401,7 @@ void CVoiceRecorder::SendFrame(const void* inputBuffer)
 {
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    if (m_VoiceState == VOICESTATE_AWAITING_INPUT || !m_bEnabled || !inputBuffer)
+    if (m_VoiceState == VOICESTATE_AWAITING_INPUT || !m_bEnabled || !inputBuffer || !m_pOutgoingBuffer)
         return;
 
     unsigned int remainingBufferSize = 0;
