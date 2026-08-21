@@ -628,6 +628,10 @@ void CClientCamera::SetFocusToLocalPlayerImpl()
     m_pCamera->RestoreWithJumpCut();
     SetCenterOfWorldCached(NULL, 0.0f);
     InvalidateCachedTransforms();
+
+    CClientPlayer* pLocalPlayer = m_pPlayerManager ? m_pPlayerManager->GetLocalPlayer() : nullptr;
+    if (pLocalPlayer && !pLocalPlayer->GetOccupiedVehicle())
+        pLocalPlayer->SetCameraRotation(pLocalPlayer->GetCurrentRotation());
 }
 
 void CClientCamera::UnreferenceEntity(CClientEntity* pEntity)
