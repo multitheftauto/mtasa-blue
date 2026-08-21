@@ -3705,6 +3705,547 @@ static void __declspec(naked) HOOK_CPlane__PreRender_AndromRampBlock()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CVehicle::ProcessControl (Occupied Vehicle Inversion Check)
+//
+// Replaces GTA's default Z up-vector check with custom gravity-aware dot product to detect
+// if an occupied vehicle is lying upside down on its roof.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x570C84 | 50             | push    eax
+//     0x570C85 | E8 D6 0C F7 FF | call    CVehicle::GetMatrix
+//     0x570C8A | D9 44 24 14    | fld     dword ptr [esp + 14h]
+#define HOOKPOS_CVehicle__ProcessControl_OccupiedBurnCheck  0x570C84
+#define HOOKSIZE_CVehicle__ProcessControl_OccupiedBurnCheck 6
+static constexpr std::uintptr_t CONTINUE_CVehicle__ProcessControl_OccupiedBurnCheck = 0x570C8A;
+
+static float VehicleBurnCheck(CVehicleSAInterface* vehicleInterface)
+{
+    SClientEntity<CVehicleSA>* vehicleClientEntity = pGameInterface->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicleInterface));
+    CVehicle*                  vehicle = vehicleClientEntity ? vehicleClientEntity->pEntity : nullptr;
+    if (!vehicle)
+        return 1.0f;
+
+    CVector gravity;
+    CMatrix vehicleMatrix;
+    vehicle->GetGravity(&gravity);
+    vehicle->GetMatrix(&vehicleMatrix);
+    gravity = -gravity;
+    return vehicleMatrix.vUp.DotProduct(&gravity);
+}
+
+static void __declspec(naked) HOOK_CVehicle__ProcessControl_OccupiedBurnCheck()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    eax
+        call    VehicleBurnCheck
+        add     esp, 4
+        jmp     CONTINUE_CVehicle__ProcessControl_OccupiedBurnCheck
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CAutomobile::ProcessControl (Unoccupied Vehicle Inversion Check)
+//
+// Replaces GTA's default Z up-vector check with custom gravity-aware check to detect if an
+// unoccupied vehicle is lying upside down on its roof.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A76DC | 66 89 4C 24 78 | mov     word ptr [esp + 78h], cx
+//     0x6A76E1 | E8 3A 00 00 00 | call    ...
+//     0x6A76E6 | D9 44 24 78    | fld     ...
+#define HOOKPOS_CAutomobile__ProcessControl_UnoccupiedBurnCheck  0x6A76DC
+#define HOOKSIZE_CAutomobile__ProcessControl_UnoccupiedBurnCheck 5
+static constexpr std::uintptr_t CONTINUE_CAutomobile__ProcessControl_UnoccupiedBurnCheck = 0x6A76E4;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_UnoccupiedBurnCheck()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     word ptr [esp + 78h], cx
+
+        push    esi
+        call    VehicleBurnCheck
+        add     esp, 4
+        jmp     CONTINUE_CAutomobile__ProcessControl_UnoccupiedBurnCheck
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CAutomobile::BlowUpCar (Blow-up Jump Velocity)
+//
+// Applies upward hop velocity when a vehicle explodes taking custom gravity into account.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6B3816 | D9 46 4C       | fld     dword ptr [esi + 4Ch]
+//     0x6B3819 | D8 05 90 28 87 | fadd    ds:dbl_872890
+//     0x6B381F | D9 5E 4C       | fstp    dword ptr [esi + 4Ch]
+#define HOOKPOS_CAutomobile__BlowUpCarsInPath_ApplyCarBlowHop  0x6B3816
+#define HOOKSIZE_CAutomobile__BlowUpCarsInPath_ApplyCarBlowHop 6
+static constexpr std::uintptr_t CONTINUE_CAutomobile__BlowUpCarsInPath_ApplyCarBlowHop = 0x6B3831;
+
+static void ApplyVehicleBlowHop(CVehicleSAInterface* vehicleInterface)
+{
+    SClientEntity<CVehicleSA>* vehicleClientEntity = pGameInterface->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicleInterface));
+    CVehicle*                  vehicle = vehicleClientEntity ? vehicleClientEntity->pEntity : nullptr;
+    if (!vehicle)
+        return;
+
+    CVector gravity, velocity;
+    vehicle->GetGravity(&gravity);
+    vehicle->GetMoveSpeed(&velocity);
+    velocity -= gravity * 0.13f;
+    vehicle->SetMoveSpeed(velocity);
+}
+
+static void __declspec(naked) HOOK_CAutomobile__BlowUpCarsInPath_ApplyCarBlowHop()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    esi
+        call    ApplyVehicleBlowHop
+        add     esp, 4
+
+        mov     dl, [esi + 36h]
+        mov     ecx, [esi + 18h]
+        and     dl, 7
+        or      dl, 28h
+        mov     [esi + 36h], dl
+        jmp     CONTINUE_CAutomobile__BlowUpCarsInPath_ApplyCarBlowHop
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CTrailer::BreakTowLink
+//
+// Intercepts trailer detachment to invoke MTA's BreakTowLinkHandler.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6E0027 | 8B 02          | mov     eax, [edx]
+//     0x6E0029 | FF 90 F8 00 00 | call    dword ptr [eax + 0F8h]
+#define HOOKPOS_CTrailer__BreakTowLink  0x6E0027
+#define HOOKSIZE_CTrailer__BreakTowLink 6
+static constexpr std::uintptr_t CONTINUE_CTrailer__BreakTowLink = 0x6E002D;
+
+extern BreakTowLinkHandler* m_pBreakTowLinkHandler;
+
+static bool CallBreakTowLinkHandler(CVehicleSAInterface* vehicleInterface)
+{
+    SClientEntity<CVehicleSA>* vehicleClientEntity = pGameInterface->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicleInterface));
+    CVehicle*                  vehicle = vehicleClientEntity ? vehicleClientEntity->pEntity : nullptr;
+    if (vehicle && m_pBreakTowLinkHandler)
+    {
+        return m_pBreakTowLinkHandler(vehicle);
+    }
+    return true;
+}
+
+static void __declspec(naked) HOOK_CTrailer__BreakTowLink()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    ecx                     // vehicle interface
+        call    CallBreakTowLinkHandler
+        add     esp, 4
+        test    al, al
+        jz      skipBreakTowLinkCall
+
+        popad
+        call    dword ptr [edx + 0F8h]
+        jmp     CONTINUE_CTrailer__BreakTowLink
+
+    skipBreakTowLinkCall:
+        popad
+        jmp     CONTINUE_CTrailer__BreakTowLink
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CTrain::ProcessControl (Train Derailment Check)
+//
+// Ensures trains only derail if CVehicle::IsDerailable() returns true.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6F8DBA | 0F 8B C9 01 00 00 | jnp     loc_6F8F89
+#define HOOKPOS_CTrain__ProcessControl_Derail  0x6F8DBA
+#define HOOKSIZE_CTrain__ProcessControl_Derail 6
+static constexpr std::uintptr_t CONTINUE_CTrain__ProcessControl_Derail_Allow = 0x6F8DC0;
+static constexpr std::uintptr_t CONTINUE_CTrain__ProcessControl_Derail_Deny = 0x6F8F89;
+
+static bool IsTrainDerailable(CVehicleSAInterface* trainInterface)
+{
+    if (!trainInterface || !trainInterface->m_pVehicle)
+        return true;
+    return trainInterface->m_pVehicle->IsDerailable();
+}
+
+static void __declspec(naked) HOOK_CTrain__ProcessControl_Derail()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        jnp     trainWouldDerail
+        jmp     CONTINUE_CTrain__ProcessControl_Derail_Deny
+
+    trainWouldDerail:
+        pushad
+        push    esi                     // CTrainSAInterface*
+        call    IsTrainDerailable
+        add     esp, 4
+        test    al, al
+        jz      preventDerail
+
+        popad
+        jmp     CONTINUE_CTrain__ProcessControl_Derail_Allow
+
+    preventDerail:
+        popad
+        jmp     CONTINUE_CTrain__ProcessControl_Derail_Deny
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CAutomobile::ProcessSwingingDoor
+//
+// Checks if the vehicle allows swinging doors before processing door physics on impacts.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A9DAF | 8B 8C 86 48 06 00 00 | mov     ecx, [esi + eax*4 + 648h]
+#define HOOKPOS_CAutomobile__ProcessSwingingDoor  0x6A9DAF
+#define HOOKSIZE_CAutomobile__ProcessSwingingDoor 7
+static constexpr std::uintptr_t CONTINUE_CAutomobile__ProcessSwingingDoor_Allow = 0x6A9DB6;
+static constexpr std::uintptr_t CONTINUE_CAutomobile__ProcessSwingingDoor_Deny = 0x6AA1DA;
+
+static bool AllowSwingingDoors(CVehicleSAInterface* vehicleInterface)
+{
+    SClientEntity<CVehicleSA>* vehicleClientEntity = pGameInterface->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicleInterface));
+    CVehicle*                  vehicle = vehicleClientEntity ? vehicleClientEntity->pEntity : nullptr;
+    return !vehicle || vehicle->AreSwingingDoorsAllowed();
+}
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     ecx, [esi + eax*4 + 648h]
+        pushad
+        push    esi                     // CAutomobileSAInterface*
+        call    AllowSwingingDoors
+        add     esp, 4
+        test    al, al
+        jz      denySwinging
+
+        popad
+        jmp     CONTINUE_CAutomobile__ProcessSwingingDoor_Allow
+
+    denySwinging:
+        popad
+        jmp     CONTINUE_CAutomobile__ProcessSwingingDoor_Deny
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// cTransmission::CalculateDriveAcceleration & Vehicle Drive Type
+//
+// Clamps vehicle gear index and reads custom per-vehicle drive type (RWD/FWD/AWD).
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6D05E0 | 8B 44 24 10 | mov     eax, [esp + 10h]
+//     0x6D05E4 | 8B 10       | mov     edx, [eax]
+#define HOOKPOS_CTransmission__CalculateDriveAcceleration  0x6D05E0
+#define HOOKSIZE_CTransmission__CalculateDriveAcceleration 5
+static constexpr std::uintptr_t CONTINUE_CTransmission__CalculateDriveAcceleration = 0x6D05E6;
+
+#define HOOKPOS_CHandlingData__isNotRWD  0x6A048C
+#define HOOKSIZE_CHandlingData__isNotRWD 7
+static constexpr std::uintptr_t CONTINUE_CHandlingData__isNotRWD = 0x6A0493;
+
+#define HOOKPOS_CHandlingData__isNotFWD  0x6A04BC
+#define HOOKSIZE_CHandlingData__isNotFWD 7
+static constexpr std::uintptr_t CONTINUE_CHandlingData__isNotFWD = 0x6A04C3;
+
+static void CheckVehicleMaxGear(CTransmission* transmission, std::uint8_t* currentGear)
+{
+    if (transmission && currentGear && *currentGear > transmission->numOfGears)
+    {
+        *currentGear = transmission->numOfGears;
+    }
+}
+
+static void __declspec(naked) HOOK_CTransmission__CalculateDriveAcceleration()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        mov     eax, [esp + 20h + 0Ch]   // current gear pointer (after pushad 0x20 offset)
+        push    eax
+        push    ecx                     // CTransmission*
+        call    CheckVehicleMaxGear
+        add     esp, 8
+        popad
+
+        mov     eax, [esp + 10h]
+        mov     edx, [eax]
+        jmp     CONTINUE_CTransmission__CalculateDriveAcceleration
+    }
+    // clang-format on
+}
+
+static unsigned char GetVehicleDriveType(CVehicleSAInterface* vehicleInterface)
+{
+    if (vehicleInterface && vehicleInterface->m_pVehicle && vehicleInterface->m_pVehicle->GetHandlingData())
+    {
+        return static_cast<unsigned char>(vehicleInterface->m_pVehicle->GetHandlingData()->GetCarDriveType());
+    }
+    return '4';
+}
+
+static void __declspec(naked) HOOK_CHandlingData__isNotRWD()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    esi                     // CVehicleSAInterface*
+        call    GetVehicleDriveType
+        add     esp, 4
+        mov     bl, al
+        jmp     CONTINUE_CHandlingData__isNotRWD
+    }
+    // clang-format on
+}
+
+static void __declspec(naked) HOOK_CHandlingData__isNotFWD()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    esi                     // CVehicleSAInterface*
+        call    GetVehicleDriveType
+        add     esp, 4
+        mov     bl, al
+        jmp     CONTINUE_CHandlingData__isNotFWD
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CAutomobile::dmgDrawCarCollidingParticles
+//
+// Spawns vehicle collision paint debris particles matching MTA's custom vehicle color.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CAutomobile__dmgDrawCarCollidingParticles  0x6A6FF0
+#define HOOKSIZE_CAutomobile__dmgDrawCarCollidingParticles 0x91
+static constexpr std::uintptr_t CONTINUE_CAutomobile__dmgDrawCarCollidingParticles = 0x6A7081;
+
+static void AddVehicleColoredDebris(CAutomobileSAInterface* vehicleInterface, CVector& position, int count)
+{
+    SClientEntity<CVehicleSA>* vehicleClientEntity = pGameInterface->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicleInterface));
+    CVehicle*                  vehicle = vehicleClientEntity ? vehicleClientEntity->pEntity : nullptr;
+    if (vehicle)
+    {
+        SColor colors[4];
+        vehicle->GetColor(&colors[0], &colors[1], &colors[2], &colors[3], false);
+
+        RwColor color = {static_cast<unsigned char>(colors[0].R * vehicleInterface->m_fLighting),
+                         static_cast<unsigned char>(colors[0].G * vehicleInterface->m_fLighting),
+                         static_cast<unsigned char>(colors[0].B * vehicleInterface->m_fLighting), 0xFF};
+
+        // Fx_c::AddDebris
+        reinterpret_cast<void(__thiscall*)(int, CVector&, RwColor&, float, int)>(0x49F750)(CLASS_CFx, position, color, 0.06f, count / 100 + 1);
+    }
+}
+
+static void __declspec(naked) HOOK_CAutomobile__dmgDrawCarCollidingParticles()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        lea     eax, [esp + 1Ch]
+        push    ebp                     // count
+        push    eax                     // position
+        push    edi                     // vehicleInterface
+        call    AddVehicleColoredDebris
+        add     esp, 12
+
+        jmp     CONTINUE_CAutomobile__dmgDrawCarCollidingParticles
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CHeli::ProcessControl (Heli Blade Kill Event)
+//
+// Notifies MTA when a helicopter's blades strike an entity.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6DB201 | 0F 85 30 02 00 00 | jnz     loc_6DB437
+#define HOOKPOS_CHeli__ProcessHeliKill  0x6DB201
+#define HOOKSIZE_CHeli__ProcessHeliKill 6
+static constexpr std::uintptr_t CONTINUE_CHeli__ProcessHeliKill_Cont = 0x6DB207;
+static constexpr std::uintptr_t CONTINUE_CHeli__ProcessHeliKill_Branch = 0x6DB437;
+static constexpr std::uintptr_t CANCEL_CHeli__ProcessHeliKill = 0x6DB9E0;
+
+extern HeliKillHandler* m_pHeliKillHandler;
+
+static bool CallHeliKillEvent(CVehicleSAInterface* heliInterface, CEntitySAInterface* hitEntityInterface)
+{
+    if (m_pHeliKillHandler)
+    {
+        return m_pHeliKillHandler(heliInterface, hitEntityInterface);
+    }
+    return true;
+}
+
+static void __declspec(naked) HOOK_CHeli__ProcessHeliKill()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushfd
+        pushad
+        push    edi                     // hit entity
+        push    esi                     // heli
+        call    CallHeliKillEvent
+        add     esp, 8
+        test    al, al
+        jz      cancelHeliKill
+
+        popad
+        popfd
+        jnz     branchTarget
+        jmp     CONTINUE_CHeli__ProcessHeliKill_Cont
+
+    branchTarget:
+        jmp     CONTINUE_CHeli__ProcessHeliKill_Branch
+
+    cancelHeliKill:
+        popad
+        popfd
+        jmp     CANCEL_CHeli__ProcessHeliKill
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CVehicle::VehicleColor & Callback
+//
+// Applies custom vehicle colors during vehicle rendering.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6D6603 | ...
+#define HOOKPOS_CVehicle__VehicleColor  0x6D6603
+#define HOOKSIZE_CVehicle__VehicleColor 9
+static constexpr std::uintptr_t CONTINUE_CVehicle__VehicleColor = 0x6D660C;
+
+#define HOOKPOS_CVehicle__VehicleColorCallback  0x4C838D
+#define HOOKSIZE_CVehicle__VehicleColorCallback 29
+static constexpr std::uintptr_t CONTINUE_CVehicle__VehicleColorCallback = 0x4C83AA;
+
+static SColor s_vehicleColors[4];
+
+static void SaveVehColors(CVehicleSAInterface* vehicleInterface)
+{
+    SClientEntity<CVehicleSA>* vehicleClientEntity = pGameInterface->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicleInterface));
+    CVehicle*                  vehicle = vehicleClientEntity ? vehicleClientEntity->pEntity : nullptr;
+    if (vehicle)
+    {
+        vehicle->GetColor(&s_vehicleColors[0], &s_vehicleColors[1], &s_vehicleColors[2], &s_vehicleColors[3], true);
+    }
+}
+
+static void __declspec(naked) HOOK_CVehicle__VehicleColor()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    esi                     // CVehicleSAInterface*
+        call    SaveVehColors
+        add     esp, 4
+        popad
+
+        mov     dl, 3
+        mov     al, 2
+        mov     cl, 1
+        push    edx
+        xor     edx, edx
+        mov     dl, byte ptr [esi + 434h]
+        mov     dl, 0
+        jmp     CONTINUE_CVehicle__VehicleColor
+    }
+    // clang-format on
+}
+
+static void __declspec(naked) HOOK_CVehicle__VehicleColorCallback()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     cl, byte ptr [esi * 4 + s_vehicleColors.R]
+        mov     byte ptr [eax + 4], cl
+
+        mov     cl, byte ptr [esi * 4 + s_vehicleColors.G]
+        mov     byte ptr [eax + 5], cl
+
+        mov     cl, byte ptr [esi * 4 + s_vehicleColors.B]
+        mov     byte ptr [eax + 6], cl
+
+        jmp     CONTINUE_CVehicle__VehicleColorCallback
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::InitHooks_Vehicles
 //
 // Setup hooks
@@ -3835,4 +4376,18 @@ void CMultiplayerSA::InitHooks_Vehicles()
     EZHookInstall(CAEVehicleAudioEntity__ProcessMovingParts_AndromGate);
     EZHookInstall(CAEVehicleAudioEntity__ProcessMovingParts_AndromCreakCase);
     EZHookInstall(CPlane__PreRender_AndromRampBlock);
+
+    EZHookInstall(CVehicle__ProcessControl_OccupiedBurnCheck);
+    EZHookInstall(CAutomobile__ProcessControl_UnoccupiedBurnCheck);
+    EZHookInstall(CAutomobile__BlowUpCarsInPath_ApplyCarBlowHop);
+    EZHookInstall(CTrailer__BreakTowLink);
+    EZHookInstall(CTrain__ProcessControl_Derail);
+    EZHookInstall(CAutomobile__ProcessSwingingDoor);
+    EZHookInstall(CTransmission__CalculateDriveAcceleration);
+    EZHookInstall(CHandlingData__isNotRWD);
+    EZHookInstall(CHandlingData__isNotFWD);
+    EZHookInstall(CAutomobile__dmgDrawCarCollidingParticles);
+    EZHookInstall(CHeli__ProcessHeliKill);
+    EZHookInstall(CVehicle__VehicleColor);
+    EZHookInstall(CVehicle__VehicleColorCallback);
 }
