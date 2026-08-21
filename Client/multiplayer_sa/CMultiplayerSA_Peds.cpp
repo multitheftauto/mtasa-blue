@@ -69,7 +69,8 @@ static void __declspec(naked) HOOK_CPed_DoFootLanded()
 // CTaskSimpleJetPack::RenderJetPack draws the jetpack from its own clump, separate from the ped's;
 // interior hiding and setPedAlpha never reach it. Skip the render (and thruster FX) when the ped
 // is hidden, and copy the ped clump alpha onto the jetpack so me.alpha = 0 does not leave a
-// floating pack (#5225).
+// floating pack (#5225). Thruster FxSystem has no colour alpha, so scale spawn rate by ped alpha
+// instead — otherwise translucent peds still show full-bright thruster flames.
 #define HOOKPOS_CTaskSimpleJetPack_RenderJetPack 0x67F6A0
 DWORD RETURN_CTaskSimpleJetPack_RenderJetPack = 0x67F6AC;
 DWORD SKIP_CTaskSimpleJetPack_RenderJetPack = 0x67FA11;
@@ -79,6 +80,11 @@ static constexpr DWORD FUNC_CVisibilityPlugins_GetClumpAlpha = 0x732B20;
 static constexpr DWORD FUNC_RpClumpForAllAtomics = 0x749B70;
 // rpGEOMETRYMODULATEMATERIALCOLOR — material colour (including alpha) is otherwise ignored.
 static constexpr unsigned int RpGeometryModulateMaterialColor = 0x00000040;
+// CTaskSimpleJetPack::m_ThrusterFX[2] (left/right), see gta-reversed TaskSimpleJetPack.h
+static constexpr unsigned int OFFSET_Task_ThrusterFX = 0x64;
+// FxSystem_c::m_nRateMult — 1000 == density 1.0 (matches CFxSystemSA::SetEffectDensity)
+static constexpr unsigned int OFFSET_FxSystem_RateMult = 0x5E;
+static constexpr short        FX_RATE_MULT_FULL = 1000;
 
 // CAEPedAudioEntity::UpdateJetPack recomputes the engine sound's volume from its own ramp state
 // every tick; this hook releases the sound channels while the ped is hidden and recreates them
@@ -93,6 +99,7 @@ static constexpr std::uintptr_t CWorld_CurrentArea = 0xB72914;
 
 CPedSAInterface* pJetpackHookPedInterface;
 RpClump*         pJetPackClumpForAlpha;
+void*            pJetPackTaskForAlpha;
 
 static int GetPedClumpAlpha(CPedSAInterface* pPed)
 {
@@ -138,6 +145,35 @@ static RpAtomic* SetJetpackAtomicAlpha(RpAtomic* pAtomic, void* pData)
     return pAtomic;
 }
 
+// FxSystem_c has no per-system colour alpha; rate mult is the only knob that fades thrusters with the ped.
+static void ApplyThrusterFxAlpha(void* pTask, int iAlpha)
+{
+    if (!pTask)
+        return;
+
+    auto**      ppThrusterFX = reinterpret_cast<void**>(static_cast<char*>(pTask) + OFFSET_Task_ThrusterFX);
+    const short sRateMult = static_cast<short>((Clamp(0, iAlpha, 255) / 255.0f) * FX_RATE_MULT_FULL);
+
+    for (int i = 0; i < 2; ++i)
+    {
+        if (void* pFx = ppThrusterFX[i])
+            *reinterpret_cast<short*>(static_cast<char*>(pFx) + OFFSET_FxSystem_RateMult) = sRateMult;
+    }
+}
+
+// Kill both thruster systems (CTaskSimpleJetPack::StopJetPackEffect).
+static constexpr DWORD FUNC_CTaskSimpleJetPack_StopJetPackEffect = 0x67BA10;
+
+static void KillThrusterFx(void* pTask)
+{
+    if (!pTask)
+        return;
+
+    ((void(__thiscall*)(void*))FUNC_CTaskSimpleJetPack_StopJetPackEffect)(pTask);
+}
+
+static int s_iLastThrusterAlpha = 255;
+
 static void CTaskSimpleJetPack_ApplyPedAlpha()
 {
     if (!pJetPackClumpForAlpha || !pJetpackHookPedInterface)
@@ -148,6 +184,16 @@ static void CTaskSimpleJetPack_ApplyPedAlpha()
     // RpClumpRender uses material alpha, not CVisibilityPlugins clump alpha, for this object clump.
     ((RpClump * (__cdecl*)(RpClump*, RpAtomic * (__cdecl*)(RpAtomic*, void*), void*)) FUNC_RpClumpForAllAtomics)(
         pJetPackClumpForAlpha, SetJetpackAtomicAlpha, reinterpret_cast<void*>(static_cast<std::uintptr_t>(iAlpha)));
+
+    // Already-spawned thruster particles keep their old brightness when alpha drops, so kill them
+    // on change. DoJetPackEffect recreates the systems later this frame; next RenderJetPack scales
+    // their spawn rate. Continuous frames only touch rate mult.
+    if (iAlpha != s_iLastThrusterAlpha)
+    {
+        KillThrusterFx(pJetPackTaskForAlpha);
+        s_iLastThrusterAlpha = iAlpha;
+    }
+    ApplyThrusterFxAlpha(pJetPackTaskForAlpha, iAlpha);
 }
 
 static void __declspec(naked) HOOK_CTaskSimpleJetPack_RenderJetPack()
@@ -189,6 +235,7 @@ static void __declspec(naked) HOOK_CTaskSimpleJetPack_RenderJetPack()
         {
             mov     eax, [ebp+40h]
             mov     pJetPackClumpForAlpha, eax
+            mov     pJetPackTaskForAlpha, ebp
         }
         // clang-format on
 
