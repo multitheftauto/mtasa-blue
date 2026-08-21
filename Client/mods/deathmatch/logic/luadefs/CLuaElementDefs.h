@@ -71,7 +71,10 @@ public:
     LUA_DECLARE(IsElementLowLod);
     LUA_DECLARE(IsElementCallPropagationEnabled);
     LUA_DECLARE(IsElementWaitingForGroundToLoad);
-    static bool IsElementOnFire(CClientEntity* entity) noexcept;
+    static bool                      IsElementOnFire(CClientEntity* entity) noexcept;
+    static float                     GetElementStreamDistance(CClientEntity* entity);
+    static float                     GetElementTypeStreamDistance(std::string type);
+    static std::variant<bool, float> GetElementModelStreamDistance(std::uint32_t model);
 
     // Element set funcs
     LUA_DECLARE(CreateElement);
@@ -102,4 +105,7 @@ public:
     LUA_DECLARE(SetElementCallPropagationEnabled);
     static bool SetElementLighting(CClientEntity* entity, float lighting);
     static bool SetElementOnFire(CClientEntity* entity, bool onFire) noexcept;
+    static bool SetElementStreamDistance(CClientEntity* entity, std::optional<float> distance);
+    static bool SetElementTypeStreamDistance(std::string type, std::optional<float> distance);
+    static bool SetElementModelStreamDistance(std::uint32_t model, std::optional<float> distance);
 };
