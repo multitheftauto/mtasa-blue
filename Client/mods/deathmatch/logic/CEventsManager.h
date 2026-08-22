@@ -14,6 +14,7 @@
 
 class CClientEntity;
 class CLuaMain;
+class CTimingBlock;
 
 struct SEventHandler
 {
@@ -26,6 +27,8 @@ struct SEventHandler
     bool                               isInUse{false};
     eClientEntityType                  entityType{eClientEntityType::CCLIENTUNKNOWN};
     bool                               isRenderingEvent{false};
+    CTimingBlock*                      eventTiming{nullptr};
+    CTimingBlock*                      resourceTiming{nullptr};
 
     bool operator<(const SEventHandler& other) const
     {

@@ -55,6 +55,7 @@ void CEventsManager::AddHandler(const std::variant<std::uint32_t, BuiltInEvent::
     bool                        isRenderingEvent = false;
     bool                        isCustomEvent = false;
     std::uint32_t               eventIdOrHash = 0;
+    std::string_view            eventName{};
 
     if (std::holds_alternative<BuiltInEvent::Enum>(event))
     {
@@ -62,6 +63,7 @@ void CEventsManager::AddHandler(const std::variant<std::uint32_t, BuiltInEvent::
         handlersListPtr = &m_eventsTable[static_cast<std::size_t>(builtInEnum)][sourceEntity];
 
         eventIdOrHash = static_cast<std::uint32_t>(builtInEnum);
+        eventName = GetEventName(builtInEnum);
 
         isRenderingEvent = builtInEnum == BuiltInEvent::ON_CLIENT_RENDER || builtInEnum == BuiltInEvent::ON_CLIENT_PRE_RENDER ||
                            builtInEnum == BuiltInEvent::ON_CLIENT_HUD_RENDER;
@@ -71,7 +73,10 @@ void CEventsManager::AddHandler(const std::variant<std::uint32_t, BuiltInEvent::
         auto hash = std::get<std::uint32_t>(event);
         auto it = m_customEvents.find(hash);
         if (it != m_customEvents.end())
+        {
             handlersListPtr = &it->second.handlersTable[sourceEntity];
+            eventName = it->second.eventName;
+        }
 
         eventIdOrHash = hash;
         isCustomEvent = true;
@@ -82,19 +87,25 @@ void CEventsManager::AddHandler(const std::variant<std::uint32_t, BuiltInEvent::
 
     sourceEntity->IncrementEventHandlersCount();
 
-    handlersListPtr->push_back(SEventHandler{.luaMain = luaMain,
-                                             .luaFunctionRef = luaFunctionRef,
-                                             .isValid = true,
-                                             .propagate = propagated,
-                                             .priority = priority,
-                                             .priorityMod = priorityMod,
-                                             .entityType = entityType,
-                                             .isRenderingEvent = isRenderingEvent});
+    CTimingBlock* eventTiming = CClientPerfStatLuaTiming::GetSingleton()->GetTimingBlock(luaMain, eventName.data());
+    CTimingBlock* resourceTiming = CClientPerfStatLuaTiming::GetSingleton()->GetResourceTimingBlock(luaMain);
+
+    SEventHandler newHandler{.luaMain = luaMain,
+                             .luaFunctionRef = luaFunctionRef,
+                             .isValid = true,
+                             .propagate = propagated,
+                             .priority = priority,
+                             .priorityMod = priorityMod,
+                             .entityType = entityType,
+                             .isRenderingEvent = isRenderingEvent,
+                             .eventTiming = eventTiming,
+                             .resourceTiming = resourceTiming};
 
     if (auto resource = luaMain->GetResource())
         resource->InsertEventHandlerIntoList(sourceEntity, {isCustomEvent, eventIdOrHash, luaFunctionRef});
 
-    std::sort(handlersListPtr->begin(), handlersListPtr->end());
+    auto insertPos = std::upper_bound(handlersListPtr->begin(), handlersListPtr->end(), newHandler);
+    handlersListPtr->insert(insertPos, std::move(newHandler));
 }
 
 bool CEventsManager::RemoveHandler(const std::variant<std::uint32_t, BuiltInEvent::Enum>& event, CClientEntity* sourceEntity, CLuaMain* luaMain,
@@ -129,27 +140,31 @@ bool CEventsManager::RemoveHandler(const std::variant<std::uint32_t, BuiltInEven
 
     auto& handlersList = it->second;
     bool  removed = false;
-    bool  isInUse = false;
-
     for (auto handlerIt = handlersList.begin(); handlerIt != handlersList.end(); ++handlerIt)
     {
         if (handlerIt->luaMain == luaMain && handlerIt->luaFunctionRef == luaFunctionRef && handlerIt->isValid)
         {
-            handlerIt->isValid = false;
-            removed = true;
-
             if (handlerIt->isInUse)
-                isInUse = true;
+            {
+                handlerIt->isValid = false;
+            }
+            else
+            {
+                if (auto resource = luaMain->GetResource())
+                    resource->RemoveEventHandlerFromList(sourceEntity, eventIdOrHash, luaFunctionRef);
 
-            break;
+                handlersList.erase(handlerIt);
+                sourceEntity->DecrementEventHandlersCount();
+
+                if (handlersList.empty())
+                    entityMapPtr->erase(it);
+            }
+
+            return true;
         }
     }
 
-    // If the event is currently being executed, it will be removed by the executing loop (ExecuteHandlersForEntity)
-    if (!isInUse && removed)
-        TryRemoveHandler(sourceEntity, handlersList, *entityMapPtr, it, eventIdOrHash);
-
-    return removed;
+    return false;
 }
 
 void CEventsManager::RemoveAllHandlers(CLuaMain* luaMain)
@@ -160,36 +175,17 @@ void CEventsManager::RemoveAllHandlers(CLuaMain* luaMain)
 
         for (const auto& [entity, refs] : handlersMap)
         {
+            // Deduplicate event IDs to avoid doing O(N^2) remove_if passes on the same list
+            std::unordered_set<std::uint32_t> customEventsProcessed;
+            std::unordered_set<std::uint32_t> builtInEventsProcessed;
+
             for (const auto& ref : refs)
             {
                 if (!ref.isCustomEvent)
                 {
-                    auto& handlersList = m_eventsTable[static_cast<std::size_t>(ref.eventIdOrHash)][entity];
-
-                    handlersList.erase(std::remove_if(handlersList.begin(), handlersList.end(),
-                                                      [luaMain, entity](SEventHandler& h)
-                                                      {
-                                                          if (h.luaMain == luaMain)
-                                                          {
-                                                              if (h.isInUse)
-                                                              {
-                                                                  h.isValid = false;
-                                                                  return false;
-                                                              }
-
-                                                              entity->DecrementEventHandlersCount();
-                                                              return true;
-                                                          }
-                                                          return false;
-                                                      }),
-                                       handlersList.end());
-                }
-                else
-                {
-                    auto itCustom = m_customEvents.find(ref.eventIdOrHash);
-                    if (itCustom != m_customEvents.end())
+                    if (builtInEventsProcessed.insert(ref.eventIdOrHash).second)
                     {
-                        auto& handlersList = itCustom->second.handlersTable[entity];
+                        auto& handlersList = m_eventsTable[static_cast<std::size_t>(ref.eventIdOrHash)][entity];
 
                         handlersList.erase(std::remove_if(handlersList.begin(), handlersList.end(),
                                                           [luaMain, entity](SEventHandler& h)
@@ -208,6 +204,35 @@ void CEventsManager::RemoveAllHandlers(CLuaMain* luaMain)
                                                               return false;
                                                           }),
                                            handlersList.end());
+                    }
+                }
+                else
+                {
+                    if (customEventsProcessed.insert(ref.eventIdOrHash).second)
+                    {
+                        auto itCustom = m_customEvents.find(ref.eventIdOrHash);
+                        if (itCustom != m_customEvents.end())
+                        {
+                            auto& handlersList = itCustom->second.handlersTable[entity];
+
+                            handlersList.erase(std::remove_if(handlersList.begin(), handlersList.end(),
+                                                              [luaMain, entity](SEventHandler& h)
+                                                              {
+                                                                  if (h.luaMain == luaMain)
+                                                                  {
+                                                                      if (h.isInUse)
+                                                                      {
+                                                                          h.isValid = false;
+                                                                          return false;
+                                                                      }
+
+                                                                      entity->DecrementEventHandlersCount();
+                                                                      return true;
+                                                                  }
+                                                                  return false;
+                                                              }),
+                                               handlersList.end());
+                        }
                     }
                 }
             }
@@ -459,9 +484,8 @@ void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, Event
 
         LUA_CHECKSTACK(luaVM, 1);
 
-        TIMEUS startTime = 0;
-        if (IS_TIMING_CHECKPOINTS())
-            startTime = GetTimeUs();
+        const bool   timingActive = CClientPerfStatLuaTiming::GetSingleton()->IsActive();
+        const TIMEUS startTime = (timingActive || IS_TIMING_CHECKPOINTS()) ? GetTimeUs() : 0;
 
         // Record event for the crash dump writer
         if (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::LUA_TRACE_0000)
@@ -499,11 +523,16 @@ void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, Event
 
         int result = luaMain->PCall(luaVM, 6 + args.Count(), 0, 0);
         if (result > 1 && result != LUA_ERRSYNTAX)
+        {
             g_pClientGame->GetScriptDebugging()->LogPCallError(luaVM, ConformResourcePath(lua_tostring(luaVM, -1)));
-        else
-            // CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(luaMain, eventName.data(), GetTimeUs() - startTime);
+        }
+        else if (timingActive)
+        {
+            const TIMEUS deltaTime = GetTimeUs() - startTime;
+            CClientPerfStatLuaTiming::GetSingleton()->UpdateTimingFast(handler.eventTiming, handler.resourceTiming, deltaTime);
+        }
 
-            lua_settop(luaVM, preCallTop);
+        lua_settop(luaVM, preCallTop);
 
         // TODO g_pClientGame->GetDebugHookManager()->OnPostEventFunction
 
