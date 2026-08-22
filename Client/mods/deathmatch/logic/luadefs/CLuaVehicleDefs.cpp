@@ -4404,15 +4404,10 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
 bool CLuaVehicleDefs::AddVehicleSirens(CClientVehicle* vehicle, std::uint8_t sirenType, std::uint8_t sirenCount, std::optional<bool> enable360,
                                        std::optional<bool> enableLOSCheck, std::optional<bool> enableRandomiser, std::optional<bool> enableSilent) noexcept
 {
-    eClientVehicleType vehicleType = vehicle->GetVehicleType();
-
-    if (vehicleType != CLIENTVEHICLE_CAR && vehicleType != CLIENTVEHICLE_MONSTERTRUCK && vehicleType != CLIENTVEHICLE_QUADBIKE)
-        return false;
-
     if (sirenType < 1 || sirenType > 6)
         return false;
 
-    if (sirenCount < 0 || sirenCount > SIREN_COUNT_MAX)
+    if (sirenCount > SIREN_COUNT_MAX)
         return false;
 
     vehicle->GiveVehicleSirens(sirenType, sirenCount);
