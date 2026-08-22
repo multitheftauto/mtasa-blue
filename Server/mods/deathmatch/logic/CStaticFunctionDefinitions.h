@@ -98,8 +98,14 @@ public:
     static bool SetElementVisibleTo(CElement* pElement, CElement* pReference, bool bVisible);
     static bool SetElementInterior(CElement* pElement, unsigned char ucInterior, bool bSetPosition, CVector& vecPosition);
     static bool SetElementDimension(CElement* pElement, unsigned short usDimension);
-    static bool AttachElements(CElement* pElement, CElement* pAttachedToElement, CVector& vecPosition, CVector& vecRotation);
+    static bool AttachElements(CElement* element, CElement* attachedToElement, CVector& position, CVector& rotation, eBone bone = BONE_ROOT,
+                               bool enableCollisions = false);
     static bool DetachElements(CElement* pElement, CElement* pAttachedToElement = NULL);
+    static bool AttachElementToBone(CElement* element, CElement* attachedToElement, eBone bone, CVector& position, CVector& rotation,
+                                    bool enableCollisions = false);
+    static bool DetachElementFromBone(CElement* element);
+    static bool IsElementAttachedToBone(CElement* element, bool& isAttached);
+    static bool GetElementAttachedBone(CElement* element, eBone& bone);
     static bool SetElementAlpha(CElement* pElement, unsigned char ucAlpha);
     static bool SetElementDoubleSided(CElement* pElement, bool bDoubleSided);
     static bool SetElementHealth(CElement* pElement, float fHealth);

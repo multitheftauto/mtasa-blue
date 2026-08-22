@@ -53,6 +53,7 @@ class CPacketHandler
         ElementID      Parent;
         ElementID      AttachedToID;
         ElementID      LowLodObjectID;
+        unsigned char  ucAttachedBone;
     };
 
 public:

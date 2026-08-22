@@ -1399,34 +1399,77 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
     return false;
 }
 
-bool CStaticFunctionDefinitions::AttachElements(CClientEntity& Entity, CClientEntity& AttachedToEntity, CVector& vecPosition, CVector& vecRotation)
+bool CStaticFunctionDefinitions::AttachElements(CClientEntity& Entity, CClientEntity& attachedToEntity, CVector& position, CVector& rotation, eBone bone,
+                                                bool enableCollisions)
 {
-    RUN_CHILDREN(AttachElements(**iter, AttachedToEntity, vecPosition, vecRotation))
+    RUN_CHILDREN(AttachElements(**iter, attachedToEntity, position, rotation, bone, enableCollisions))
 
     // Can these elements be attached?
-    if (!Entity.IsAttachToable() || !AttachedToEntity.IsAttachable() || AttachedToEntity.IsAttachedToElement(&Entity) ||
-        Entity.GetDimension() != AttachedToEntity.GetDimension())
+    if (!Entity.IsAttachToable() || !attachedToEntity.IsAttachable() || attachedToEntity.IsAttachedToElement(&Entity) ||
+        Entity.GetDimension() != attachedToEntity.GetDimension())
     {
         return false;
     }
 
-    CLuaArguments Arguments;
-    Arguments.PushElement(&AttachedToEntity);
-    Arguments.PushNumber(vecPosition.fX);
-    Arguments.PushNumber(vecPosition.fY);
-    Arguments.PushNumber(vecPosition.fZ);
-    Arguments.PushNumber(vecRotation.fX);
-    Arguments.PushNumber(vecRotation.fY);
-    Arguments.PushNumber(vecRotation.fZ);
+    CLuaArguments arguments;
+    arguments.PushElement(&attachedToEntity);
+    arguments.PushNumber(position.fX);
+    arguments.PushNumber(position.fY);
+    arguments.PushNumber(position.fZ);
+    arguments.PushNumber(rotation.fX);
+    arguments.PushNumber(rotation.fY);
+    arguments.PushNumber(rotation.fZ);
+    if (bone != BONE_ROOT)
+        arguments.PushNumber(static_cast<double>(bone));
 
-    if (!Entity.CallEvent("onClientElementAttach", Arguments, true))
+    if (!Entity.CallEvent("onClientElementAttach", arguments, true))
         return false;
 
-    ConvertDegreesToRadians(vecRotation);
+    ConvertDegreesToRadians(rotation);
 
-    Entity.SetAttachedOffsets(vecPosition, vecRotation);
-    Entity.AttachTo(&AttachedToEntity);
+    Entity.SetAttachedOffsets(position, rotation);
+    Entity.AttachTo(&attachedToEntity, bone);
 
+    if (bone != BONE_ROOT && !enableCollisions)
+    {
+        SetElementCollisionsEnabled(Entity, false);
+    }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::AttachElementToBone(CClientEntity& Entity, CClientEntity& attachedToEntity, eBone bone, CVector& position, CVector& rotation,
+                                                     bool enableCollisions)
+{
+    if (bone < BONE_ROOT || bone > BONE_RIGHTFOOT)
+        return false;
+
+    if (!IS_PED(&attachedToEntity))
+        return false;
+
+    return AttachElements(Entity, attachedToEntity, position, rotation, bone, enableCollisions);
+}
+
+bool CStaticFunctionDefinitions::DetachElementFromBone(CClientEntity& Entity)
+{
+    if (!Entity.IsAttachedToBone())
+        return false;
+
+    return DetachElements(Entity);
+}
+
+bool CStaticFunctionDefinitions::IsElementAttachedToBone(CClientEntity& Entity, bool& isAttached)
+{
+    isAttached = Entity.IsAttachedToBone();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetElementAttachedBone(CClientEntity& Entity, eBone& bone)
+{
+    if (!Entity.IsAttachedToBone())
+        return false;
+
+    bone = Entity.GetAttachedBone();
     return true;
 }
 
