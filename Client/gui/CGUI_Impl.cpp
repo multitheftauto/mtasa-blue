@@ -62,6 +62,8 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
       m_pSchemeManager(nullptr),
       m_pWindowManager(nullptr),
       m_pTop(nullptr),
+      m_ScriptTop(nullptr),
+      m_ScriptRoot(nullptr),
       m_pCursor(nullptr),
       m_pDefaultFont(nullptr),
       m_pSmallFont(nullptr),
@@ -147,6 +149,12 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
 
 CGUI_Impl::~CGUI_Impl()
 {
+    if (m_ScriptRoot)
+    {
+        delete m_ScriptRoot;
+        m_ScriptRoot = nullptr;
+    }
+
     // Clean up font objects to prevent memory leaks
     delete m_pUniFont;
     delete m_pDefaultFont;
@@ -170,6 +178,16 @@ void CGUI_Impl::CreateRootWindow()
     // Create dummy GUI root
     m_pTop = reinterpret_cast<CEGUI::DefaultWindow*>(m_pWindowManager->createWindow("DefaultWindow", "guiroot"));
     m_pSystem->setGUISheet(m_pTop);
+
+    // Create a dedicated script GUI root container to isolate script elements from MTA Core UI (Main Menu & Console).
+    // This ensures script AlwaysOnTop elements can never render above system UI while preserving AlwaysOnTop among script elements.
+    m_ScriptTop = reinterpret_cast<CEGUI::DefaultWindow*>(m_pWindowManager->createWindow("DefaultWindow", "guiroot_script"));
+    m_ScriptTop->setRect(CEGUI::Relative, CEGUI::Rect(0.0f, 0.0f, 1.0f, 1.0f));
+    m_ScriptTop->setMousePassThroughEnabled(true);
+    m_ScriptTop->setDestroyedByParent(false);
+    m_pTop->addChildWindow(m_ScriptTop);
+
+    m_ScriptRoot = new CGUIDefaultWindow_Impl(this, m_ScriptTop);
 }
 
 void CGUI_Impl::SetSkin(const char* szName)
@@ -361,24 +379,24 @@ bool CGUI_Impl::GetGUIInputEnabled()
         {
             if (m_pTop)
             {
-                CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
-                if (!pActiveWindow || pActiveWindow == m_pTop || !pActiveWindow->isVisible())
+                CEGUI::Window* activeWindow = m_pTop->getActiveChild();
+                if (!activeWindow || activeWindow == m_pTop || activeWindow == m_ScriptTop || !activeWindow->isVisible())
                 {
                     return false;
                 }
-                if (pActiveWindow->getType() == "CGUI/Editbox")
+                if (activeWindow->getType() == "CGUI/Editbox")
                 {
-                    CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(pActiveWindow);
+                    CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(activeWindow);
                     return (!pEditBox->isReadOnly() && pEditBox->hasInputFocus());
                 }
-                else if (pActiveWindow->getType() == "CGUI/MultiLineEditbox")
+                else if (activeWindow->getType() == "CGUI/MultiLineEditbox")
                 {
-                    CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(pActiveWindow);
+                    CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(activeWindow);
                     return (!pMultiLineEditBox->isReadOnly() && pMultiLineEditBox->hasInputFocus());
                 }
-                else if (pActiveWindow->getType() == CGUIWEBBROWSER_NAME)
+                else if (activeWindow->getType() == CGUIWEBBROWSER_NAME)
                 {
-                    auto pElement = reinterpret_cast<CGUIElement_Impl*>(pActiveWindow->getUserData());
+                    auto pElement = reinterpret_cast<CGUIElement_Impl*>(activeWindow->getUserData());
                     if (pElement->GetType() == CGUI_WEBBROWSER)
                     {
                         auto pWebBrowser = reinterpret_cast<CGUIWebBrowser_Impl*>(pElement);
@@ -1187,18 +1205,18 @@ bool CGUI_Impl::Event_MouseButtonDown(const CEGUI::EventArgs& Args)
     CGUIElement* pElement = reinterpret_cast<CGUIElement*>(wnd->getUserData());
 
     // Call global and object handlers
-    if (pElement)
+    if (pElement && pElement != m_ScriptRoot)
         pElement->Event_OnMouseButtonDown();
     else
     {
         if (m_pTop)
         {
-            // If there's no element, we're probably dealing with the root element
-            CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
-            if (m_pTop == wnd && pActiveWindow)
+            // If there's no element (or root element), we're probably dealing with the root background
+            CEGUI::Window* activeWindow = m_pTop->getActiveChild();
+            if ((m_pTop == wnd || m_ScriptTop == wnd) && activeWindow)
             {
                 // Deactivate active window to trigger onClientGUIBlur
-                pActiveWindow->deactivate();
+                activeWindow->deactivate();
             }
         }
     }
@@ -1839,6 +1857,13 @@ void CGUI_Impl::Cleanup()
     {
         CleanDeadPool();
 
+        if (m_ScriptRoot)
+        {
+            delete m_ScriptRoot;
+            m_ScriptRoot = nullptr;
+        }
+
+        m_ScriptTop = nullptr;
         m_pTop = nullptr;
 
         if (m_pWindowManager)
@@ -1854,11 +1879,13 @@ void CGUI_Impl::Cleanup()
     catch (const std::exception& e)
     {
         WriteDebugEvent(SString("CGUI_Impl::Cleanup - Exception: %s", e.what()));
+        m_ScriptTop = nullptr;
         m_pTop = nullptr;
     }
     catch (...)
     {
         WriteDebugEvent("CGUI_Impl::Cleanup() failed with unknown exception");
+        m_ScriptTop = nullptr;
         m_pTop = nullptr;
     }
 }
