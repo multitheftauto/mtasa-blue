@@ -130,16 +130,8 @@ DWORD RETURN_ApplyCarBlowHop = 0x6B3831;
 #define HOOKPOS_CPhysical_ApplyGravity 0x543081
 DWORD RETURN_CPhysical_ApplyGravity = 0x543093;
 
-#define HOOKPOS_CWorld_SetWorldOnFire 0x56B983
-DWORD RETURN_CWorld_SetWorldOnFire = 0x56B989;
-#define HOOKPOS_CTaskSimplePlayerOnFire_ProcessPed 0x6336DA
-DWORD RETURN_CTaskSimplePlayerOnFire_ProcessPed = 0x6336E0;
-#define HOOKPOS_CFire_ProcessFire 0x53AC1A
-DWORD RETURN_CFire_ProcessFire = 0x53AC1F;
 #define HOOKPOS_CExplosion_Update 0x7377D3
 DWORD RETURN_CExplosion_Update = 0x7377D8;
-#define HOOKPOS_CWeapon_FireAreaEffect 0x73EBFE
-DWORD RETURN_CWeapon_FireAreaEffect = 0x73EC03;
 
 #define CALL_RenderScene_Plants  0x53E103
 #define HOOKPOS_RenderScene_end  0x53E159
@@ -461,11 +453,7 @@ void HOOK_VehicleLookAside();
 void HOOK_OccupiedVehicleBurnCheck();
 void HOOK_UnoccupiedVehicleBurnCheck();
 void HOOK_ApplyCarBlowHop();
-void HOOK_CWorld_SetWorldOnFire();
-void HOOK_CTaskSimplePlayerOnFire_ProcessPed();
-void HOOK_CFire_ProcessFire();
 void HOOK_CExplosion_Update();
-void HOOK_CWeapon_FireAreaEffect();
 void HOOK_CGame_Process();
 void HOOK_CWeather_Update();
 void HOOK_Idle();
@@ -665,11 +653,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_OccupiedVehicleBurnCheck, (DWORD)HOOK_OccupiedVehicleBurnCheck, 6);
     HookInstall(HOOKPOS_UnoccupiedVehicleBurnCheck, (DWORD)HOOK_UnoccupiedVehicleBurnCheck, 5);
     HookInstall(HOOKPOS_ApplyCarBlowHop, (DWORD)HOOK_ApplyCarBlowHop, 6);
-    HookInstall(HOOKPOS_CWorld_SetWorldOnFire, (DWORD)HOOK_CWorld_SetWorldOnFire, 5);
-    HookInstall(HOOKPOS_CTaskSimplePlayerOnFire_ProcessPed, (DWORD)HOOK_CTaskSimplePlayerOnFire_ProcessPed, 5);
-    HookInstall(HOOKPOS_CFire_ProcessFire, (DWORD)HOOK_CFire_ProcessFire, 5);
     HookInstall(HOOKPOS_CExplosion_Update, (DWORD)HOOK_CExplosion_Update, 5);
-    HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
     HookInstall(HOOKPOS_CGame_Process, (DWORD)HOOK_CGame_Process, 10);
     HookInstallCall(CALL_CWeather_Update_FromCGameProcess, (DWORD)HOOK_CWeather_Update);
     HookInstall(HOOKPOS_Idle, (DWORD)HOOK_Idle, 10);
@@ -5803,63 +5787,6 @@ static void __declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
 
 // ---------------------------------------------------
 
-// Report fire damage, with correct inflictor entity
-
-static void __declspec(naked) HOOK_CWorld_SetWorldOnFire()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // Actually pass the pCreatorEntity parameter that this function receives to CFireManager::StartFire
-    // (instead of a null pointer)
-    // clang-format off
-    __asm
-    {
-        push 7000
-        push [esp+0x18+0x14]
-        jmp RETURN_CWorld_SetWorldOnFire
-    }
-    // clang-format on
-}
-
-static void __declspec(naked) HOOK_CTaskSimplePlayerOnFire_ProcessPed()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // Actually pass the fire's pCreatorEntity to the damage event (instead of a null pointer)
-    // clang-format off
-    __asm
-    {
-        push 3
-        push 0x25
-        push edx
-        mov eax, [edi+0x730]    // eax = pPed->pFire
-        mov eax, [eax+0x14]     // eax = pFire->pCreator
-        push eax
-        jmp RETURN_CTaskSimplePlayerOnFire_ProcessPed
-    }
-    // clang-format on
-}
-
-static void __declspec(naked) HOOK_CFire_ProcessFire()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // Set the new fire's creator to the original fire's creator
-    // clang-format off
-    __asm
-    {
-        mov eax, 0x53A450       // CCreepingFire::TryToStartFireAtCoors
-        call eax
-        test eax, eax
-        jz fail
-        mov ecx, [esi+0x14]
-        mov [eax+0x14], ecx
-fail:
-        jmp RETURN_CFire_ProcessFire
-    }
-    // clang-format on
-}
-
 static void __declspec(naked) HOOK_CExplosion_Update()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -5876,26 +5803,6 @@ static void __declspec(naked) HOOK_CExplosion_Update()
         mov [eax+0x14], ecx
 fail:
         jmp RETURN_CExplosion_Update
-    }
-    // clang-format on
-}
-
-static void __declspec(naked) HOOK_CWeapon_FireAreaEffect()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // Set the new fire's creator to the weapon's owner
-    // clang-format off
-    __asm
-    {
-        mov eax, 0x53A450       // CCreepingFire::TryToStartFireAtCoors
-        call eax
-        test eax, eax
-        jz fail
-        mov ecx, [esp+0x6C+4]
-        mov [eax+0x14], ecx
-fail:
-        jmp RETURN_CWeapon_FireAreaEffect
     }
     // clang-format on
 }
