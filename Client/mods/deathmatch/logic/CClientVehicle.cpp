@@ -1052,6 +1052,17 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         // Are we swapping from a vehicle without doors?
         bool bResetWheelAndDoorStates = (!CClientVehicleManager::HasDoors(m_usModel) || m_eVehicleType != CClientVehicleManager::GetVehicleType(usModel));
 
+        // For non-local (server-synchronized) vehicles transitioning to/from custom models,
+        // preserve the damage states if both models support doors and damage models.
+        if (!IsLocalEntity() && (!CClientVehicleManager::IsStandardModel(usModel) || !CClientVehicleManager::IsStandardModel(m_usModel)))
+        {
+            if (CClientVehicleManager::HasDoors(m_usModel) && CClientVehicleManager::HasDoors(usModel) &&
+                m_eVehicleType == CClientVehicleManager::GetVehicleType(usModel))
+            {
+                bResetWheelAndDoorStates = false;
+            }
+        }
+
         // Apply variant requirements
         if (ucVariant == 255 && ucVariant2 == 255)
             CClientVehicleManager::GetRandomVariation(usModel, ucVariant, ucVariant2);
@@ -1431,7 +1442,7 @@ unsigned char CClientVehicle::GetDoorStatus(unsigned char ucDoor)
 {
     if (ucDoor < MAX_DOORS)
     {
-        if (m_pVehicle && HasDamageModel())
+        if (m_pVehicle && HasDamageModel() && !m_bJustStreamedIn)
         {
             return m_pVehicle->GetDamageManager()->GetDoorStatus(static_cast<eDoors>(ucDoor));
         }
@@ -1478,7 +1489,7 @@ unsigned char CClientVehicle::GetPanelStatus(unsigned char ucPanel)
 {
     if (ucPanel < MAX_PANELS)
     {
-        if (m_pVehicle && HasDamageModel())
+        if (m_pVehicle && HasDamageModel() && !m_bJustStreamedIn)
             return m_pVehicle->GetDamageManager()->GetPanelStatus(ucPanel);
 
         return m_ucPanelStates[ucPanel];
@@ -1491,7 +1502,7 @@ unsigned char CClientVehicle::GetLightStatus(unsigned char ucLight)
 {
     if (ucLight < MAX_LIGHTS)
     {
-        if (m_pVehicle && HasDamageModel())
+        if (m_pVehicle && HasDamageModel() && !m_bJustStreamedIn)
             return m_pVehicle->GetDamageManager()->GetLightStatus(ucLight);
 
         return m_ucLightStates[ucLight];
@@ -4594,6 +4605,9 @@ void CClientVehicle::HandleWaitingForGroundToLoad()
 
 bool CClientVehicle::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount)
 {
+    if (ucSirenCount > SIREN_COUNT_MAX)
+        ucSirenCount = SIREN_COUNT_MAX;
+
     m_tSirenBeaconInfo.m_bOverrideSirens = true;
     m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
     m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
@@ -4605,6 +4619,9 @@ bool CClientVehicle::GiveVehicleSirens(unsigned char ucSirenType, unsigned char 
 }
 void CClientVehicle::SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
+
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
 
     if (m_pVehicle)
@@ -4613,6 +4630,9 @@ void CClientVehicle::SetVehicleSirenPosition(unsigned char ucSirenID, CVector ve
 
 void CClientVehicle::SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD dwPercentage)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
+
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
 
     if (m_pVehicle)
@@ -4621,6 +4641,9 @@ void CClientVehicle::SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD 
 
 void CClientVehicle::SetVehicleSirenColour(unsigned char ucSirenID, SColor tVehicleSirenColour)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
+
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
 
     if (m_pVehicle)

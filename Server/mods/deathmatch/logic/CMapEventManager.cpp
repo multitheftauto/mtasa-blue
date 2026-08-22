@@ -172,7 +172,8 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     int luaStackPointer = lua_gettop(pState);
 #endif
 
-                    TIMEUS startTime = GetTimeUs();
+                    const bool   timingActive = CPerfStatLuaTiming::GetSingleton()->IsActive();
+                    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
                     if (!g_pGame->GetDebugHookManager()->OnPreEventFunction(szName, Arguments, pSource, pCaller, pMapEvent))
                         continue;
@@ -271,7 +272,10 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     assert(lua_gettop(pState) == luaStackPointer);
 #endif
 
-                    CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pMapEvent->GetVM(), szName, GetTimeUs() - startTime);
+                    if (timingActive)
+                    {
+                        CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pMapEvent->GetVM(), szName, GetTimeUs() - startTime);
+                    }
                 }
             }
         }
