@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CLuaHookGuard.h"
 #define DECLARE_PROFILER_SECTION_CLuaMain
 #include "profiler/SharedUtil.Profiler.h"
 
@@ -213,6 +214,10 @@ void CLuaMain::InstructionCountHook(lua_State* luaVM, lua_Debug* pDebug)
 
 bool CLuaMain::LoadScriptFromBuffer(const char* cpInBuffer, unsigned int uiInSize, const char* szFileName)
 {
+    // Refuse to hand any script data to a potentially hooked Lua loader
+    if (!CLuaHookGuard::VerifyAndReport(1006, ConformResourcePath(szFileName)))
+        return false;
+
     SString strNiceFilename = ConformResourcePath(szFileName);
 
     // Deobfuscate if required

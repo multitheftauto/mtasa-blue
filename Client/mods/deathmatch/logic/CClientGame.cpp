@@ -40,6 +40,7 @@
 #include <windowsx.h>
 #include "CServerInfo.h"
 #include "CClientPed.h"
+#include "lua/CLuaHookGuard.h"
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -83,6 +84,10 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 {
     // Init the global var with ourself
     g_pClientGame = this;
+
+    // Snapshot the Lua loader code so inline hooks can be detected before
+    // any script data reaches the loader
+    CLuaHookGuard::Initialize();
 
     CStaticFunctionDefinitions::PreInitialize(g_pCore, g_pGame, this, &m_Events);
 

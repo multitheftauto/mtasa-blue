@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
+#include "lua/CLuaHookGuard.h"
 
 using std::list;
 
@@ -429,6 +430,13 @@ int CLuaResourceDefs::LoadString(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        // Refuse to hand script data to a potentially hooked loader
+        if (!CLuaHookGuard::VerifyAndReport(1006, m_pResourceManager->GetResourceName(luaVM) + "/loadstring"))
+            argStream.SetCustomError("loader integrity check failed");
+    }
+
+    if (!argStream.HasErrors())
+    {
         const char* szChunkname = strName.empty() ? *strInput : *strName;
         const char* cpInBuffer = strInput;
         uint        uiInSize = strInput.length();
@@ -477,6 +485,13 @@ int CLuaResourceDefs::Load(lua_State* luaVM)
     argStream.ReadFunction(iLuaFunction);
     argStream.ReadString(strName, "=(load)");
     argStream.ReadFunctionComplete();
+
+    if (!argStream.HasErrors())
+    {
+        // Refuse to hand script data to a potentially hooked loader
+        if (!CLuaHookGuard::VerifyAndReport(1006, m_pResourceManager->GetResourceName(luaVM) + "/load"))
+            argStream.SetCustomError("loader integrity check failed");
+    }
 
     if (!argStream.HasErrors())
     {
