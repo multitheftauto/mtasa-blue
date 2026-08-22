@@ -146,6 +146,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_Glitches[GLITCH_QUICKSTAND] = false;
     m_Glitches[GLITCH_KICKOUTOFVEHICLE_ONMODELREPLACE] = false;
     m_Glitches[GLITCH_VEHICLE_RAPID_STOP] = false;
+    m_Glitches[GLITCH_FASTWEAPONSTRAFE] = false;
+    g_pMultiplayer->SetFastWeaponStrafeEnabled(false);
     g_pMultiplayer->SetRapidVehicleStopFixEnabled(true);
 
     g_pMultiplayer->DisableBadDrivebyHitboxes(true);
@@ -6105,6 +6107,8 @@ bool CClientGame::SetGlitchEnabled(unsigned char ucGlitch, bool bEnabled)
             g_pMultiplayer->DisableCloseRangeDamage(!bEnabled);
         if (ucGlitch == GLITCH_VEHICLE_RAPID_STOP)
             g_pMultiplayer->SetRapidVehicleStopFixEnabled(!bEnabled);
+        if (ucGlitch == GLITCH_FASTWEAPONSTRAFE)
+            g_pMultiplayer->SetFastWeaponStrafeEnabled(bEnabled);
         return true;
     }
     return false;
@@ -6665,7 +6669,9 @@ void CClientGame::OutputServerInfo()
             "Fast sprint",
             "Bad driveby hitboxes",
             "Quick stand",
-            "Kickout of vehicle on model replace"
+            "Kickout of vehicle on model replace",
+            "Vehicle rapid stop",
+            "Fast weapon strafe"
 
         };
 
