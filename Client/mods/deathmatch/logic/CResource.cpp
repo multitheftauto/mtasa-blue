@@ -112,6 +112,8 @@ CResource::~CResource()
     ShowCursor(false);
 
     // Do this before we delete our elements.
+    g_pClientGame->GetEventsManager()->RemoveAllHandlers(m_pLuaVM);
+    m_eventHandlers.clear();
     m_pRootEntity->CleanUpForVM(m_pLuaVM, true);
     g_pClientGame->GetElementDeleter()->CleanUpForVM(m_pLuaVM);
     m_pLuaManager->RemoveVirtualMachine(m_pLuaVM);
@@ -610,4 +612,32 @@ void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool b
     // Log to the server & client console
     g_pClientGame->TellServerSomethingImportant(bScript ? 1002 : 1013, strMessage, 4);
     g_pCore->GetConsole()->Printf("Download error: %s", *strMessage);
+}
+
+void CResource::RemoveEventHandlerFromList(CClientEntity* entity, std::uint32_t eventIdOrHash, const CLuaFunctionRef& luaFunctionRef)
+{
+    if (m_eventHandlers.empty())
+        return;
+
+    auto it = m_eventHandlers.find(entity);
+    if (it == m_eventHandlers.end())
+        return;
+
+    auto& vector = it->second;
+    std::erase_if(vector, [&](const SResourceHandlerRef& ref) { return ref.eventIdOrHash == eventIdOrHash && ref.luaFunctionRef == luaFunctionRef; });
+
+    if (vector.empty())
+        m_eventHandlers.erase(it);
+}
+
+void CResource::ClearEventHandlersListForEntity(CClientEntity* entity)
+{
+    if (m_eventHandlers.empty())
+        return;
+
+    auto it = m_eventHandlers.find(entity);
+    if (it == m_eventHandlers.end())
+        return;
+
+    m_eventHandlers.erase(it);
 }

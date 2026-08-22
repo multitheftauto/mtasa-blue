@@ -17,7 +17,7 @@
 #include <SharedUtil.SysInfo.hpp>
 
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS "1.3.0-9.04431"
-extern bool g_bAllowAspectRatioAdjustment;
+extern bool g_bAllowAspectRatioAdjustment;  // TODO goodbye
 
 void CLuaDrawingDefs::LoadFunctions()
 {
@@ -2081,6 +2081,7 @@ int CLuaDrawingDefs::DxSetAspectRatioAdjustmentEnabled(lua_State* luaVM)
     argStream.ReadBool(bEnabled);
     argStream.ReadNumber(fSourceRatio, 4 / 3.f);
 
+    // if (!g_pClientGame->GetEventsManager()->CallingRenderEvent())
     if (!g_bAllowAspectRatioAdjustment)
         argStream.SetCustomError("Function can only be used inside certain events");
 
