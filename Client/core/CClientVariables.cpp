@@ -327,6 +327,8 @@ void CClientVariables::LoadDefaults()
     DEFAULT("fly_with_mouse", false);                                       // flying with mouse controls
     DEFAULT("steer_with_mouse", false);                                     // steering with mouse controls
     DEFAULT("classic_controls", false);                                     // classic/standard controls
+    DEFAULT("controller_device", _S("auto"));                               // auto / xinput:N / dinput:guid
+    DEFAULT("controller_vibration", true);                                  // XInput rumble from GTA pad shake
     DEFAULT("mastervolume", 1.0f);                                          // master volume
     DEFAULT("mtavolume", 1.0f);                                             // custom sound's volume
     DEFAULT("voicevolume", 1.0f);                                           // voice chat output volume

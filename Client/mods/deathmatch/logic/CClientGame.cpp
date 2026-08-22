@@ -4843,6 +4843,11 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
 
         CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
 
+        // GTA passes a zeroed position for explosion and fire damage, so report the vehicle position instead
+        CVector vecEventDamagePos = vecDamagePos;
+        if (vecEventDamagePos == CVector())
+            pClientVehicle->GetPosition(vecEventDamagePos);
+
         // Compose arguments
         // attacker, weapon, loss, damagepos, tyreIdx
         CLuaArguments Arguments;
@@ -4855,9 +4860,9 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         else
             Arguments.PushNil();
         Arguments.PushNumber(fLoss);
-        Arguments.PushNumber(vecDamagePos.fX);
-        Arguments.PushNumber(vecDamagePos.fY);
-        Arguments.PushNumber(vecDamagePos.fZ);
+        Arguments.PushNumber(vecEventDamagePos.fX);
+        Arguments.PushNumber(vecEventDamagePos.fY);
+        Arguments.PushNumber(vecEventDamagePos.fZ);
         if (ucTyre != UCHAR_INVALID_INDEX)
             Arguments.PushNumber(ucTyre);
         else
