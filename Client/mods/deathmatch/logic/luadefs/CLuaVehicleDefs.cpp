@@ -1290,7 +1290,13 @@ int CLuaVehicleDefs::GetVehicleName(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        const char* szVehicleName = CVehicleNames::GetVehicleName(pVehicle->GetModel());
+        unsigned short model = pVehicle->GetModel();
+        CModelInfo*    modelInfo = g_pGame->GetModelInfo(model);
+
+        if (modelInfo && modelInfo->GetParentID() != 0)
+            model = modelInfo->GetParentID();
+
+        const char* szVehicleName = CVehicleNames::GetVehicleName(model);
         if (szVehicleName)
         {
             lua_pushstring(luaVM, szVehicleName);
