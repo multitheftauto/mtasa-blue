@@ -55,14 +55,7 @@ private:
         return m;
     }
 
-public:
-    static void ClearChecksumCache()
-    {
-        std::lock_guard<std::mutex> l(CacheMtx());
-        Cache().clear();
-    }
-
-    static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
+    static std::string MakeCacheKey(const SString& strFilename)
     {
         std::string key = strFilename;
         for (char& c : key)
@@ -72,25 +65,37 @@ public:
             if (c == '\\')
                 c = '/';
         }
+        return key;
+    }
 
-        WIN32_FILE_ATTRIBUTE_DATA attr;
-        WString                   wide;
-        try
+public:
+    static void ClearChecksumCache()
+    {
+        std::lock_guard<std::mutex> l(CacheMtx());
+        Cache().clear();
+    }
+
+    // Call after deleting or replacing a file, so a later checksum cannot be answered from the entry
+    // that describes its previous contents
+    static void InvalidateChecksumCacheEntry(const SString& strFilename)
+    {
+        std::lock_guard<std::mutex> l(CacheMtx());
+        Cache().erase(MakeCacheKey(strFilename));
+    }
+
+    static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
+    {
+        const std::string key = MakeCacheKey(strFilename);
+
+        // Size and write time come from an open handle so the cache is validated against the same
+        // view of the file that the read below would see
+        SharedUtil::SFileReadInfo info;
+        const bool                hasInfo = SharedUtil::GetFileInfoWithTimeout(strFilename, info, 500);
+        if (hasInfo)
         {
-            wide = SharedUtil::FromUTF8(strFilename);
-        }
-        catch (...)
-        {
-        }
-        bool          hasMeta = !wide.empty() && SharedUtil::GetFileAttributesExWithTimeout(wide.c_str(), attr, 500);
-        std::uint64_t sz = 0, mt = 0;
-        if (hasMeta)
-        {
-            sz = (std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow;
-            mt = (std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime;
             std::lock_guard<std::mutex> l(CacheMtx());
             auto                        it = Cache().find(key);
-            if (it != Cache().end() && it->second.size == sz && it->second.mtime == mt)
+            if (it != Cache().end() && it->second.size == info.size && it->second.mtime == info.mtime)
             {
                 CChecksum cached;
                 cached.ulCRC = it->second.crc;
@@ -99,10 +104,11 @@ public:
             }
         }
 
-        SString buf;
-        if (!SharedUtil::FileLoadWithTimeout(strFilename, buf, 2000))
+        SString                   buf;
+        SharedUtil::SFileReadInfo readInfo;
+        if (!SharedUtil::FileLoadWithTimeout(strFilename, buf, 2000, &readInfo))
         {
-            if (!hasMeta)
+            if (!hasInfo)
                 return SString("File not found or inaccessible: %s", strFilename.c_str());
             return SString("Could not read: %s", strFilename.c_str());
         }
@@ -111,17 +117,18 @@ public:
         r.ulCRC = CRCGenerator::GetCRCFromBuffer(buf.data(), buf.size());
         CMD5Hasher().Calculate(buf.data(), buf.size(), r.md5);
 
-        if (hasMeta && SharedUtil::GetFileAttributesExWithTimeout(wide.c_str(), attr, 500) &&
-            sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
-            mt == ((std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime))
+        // Never cache an empty file: it is the shape a read caught mid-write takes, and re-hashing nothing is free
+        if (readInfo.size > 0)
         {
             std::lock_guard<std::mutex> l(CacheMtx());
-            Cache()[key] = {sz, mt, r.ulCRC, r.md5};
+            Cache()[key] = {readInfo.size, readInfo.mtime, r.ulCRC, r.md5};
         }
         return r;
     }
 #else
     static void ClearChecksumCache() {}
+
+    static void InvalidateChecksumCacheEntry(const SString&) {}
 
     // Server and non-Windows builds use the original implementation
     static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
