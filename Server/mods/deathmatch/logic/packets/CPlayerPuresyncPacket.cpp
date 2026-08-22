@@ -54,7 +54,6 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
         pSourcePlayer->SetInWater(flags.data.bIsInWater);
         pSourcePlayer->SetOnGround(flags.data.bIsOnGround);
-        pSourcePlayer->SetHasJetPack(flags.data.bHasJetPack);
         pSourcePlayer->SetDucked(flags.data.bIsDucked);
         pSourcePlayer->SetWearingGoggles(flags.data.bWearsGoogles);
         pSourcePlayer->SetChoking(flags.data.bIsChoking);
