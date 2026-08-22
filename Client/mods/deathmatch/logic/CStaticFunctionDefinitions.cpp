@@ -3592,7 +3592,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio(CClientEntity& Entity, 
 
 bool CStaticFunctionDefinitions::SetVehicleSirens(CClientVehicle& Vehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo)
 {
-    if (ucSirenID > 7)
+    if (ucSirenID >= SIREN_COUNT_MAX)
         return false;
 
     Vehicle.SetVehicleSirenPosition(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions);
