@@ -120,6 +120,8 @@ public:
 
     // CRenderWareSA methods
     RwTexture*          RightSizeTexture(RwTexture* pTexture, uint uiSizeLimit, SString& strError);
+    RwTexture*          CreateResizedTexture(RwTexture* pTexture, uint uiNewWidth, uint uiNewHeight, SString& strError,
+                                             std::optional<uint> uiTargetD3DFormat = std::nullopt, std::optional<bool> bTargetAlpha = std::nullopt);
     void                ResetStats();
     void                GetShaderReplacementStats(SShaderReplacementStats& outStats);
     CModelTexturesInfo* GetModelTexturesInfo(ushort usModelId);
@@ -128,6 +130,7 @@ public:
 
     static void  StaticSetHooks();
     static void  StaticSetClothesReplacingHooks();
+    static void  StaticSetClothesTexturesHooks();
     static void  RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static bool  RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static short CTxdStore_GetTxdRefcount(unsigned short usTxdID);
