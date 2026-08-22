@@ -13,6 +13,8 @@
 #include "CScriptArgReader.h"
 #include "Utils.h"
 #include <lua/CLuaFunctionParser.h>
+#include <lua/CLuaArguments.h>
+#include <lua/CLuaShared.h>
 #include <SharedUtil.Memory.h>
 
 #ifndef MTA_CLIENT
@@ -60,6 +62,7 @@ void CLuaUtilDefs::LoadFunctions()
         // JSON funcs
         {"toJSON", toJSON},
         {"fromJSON", fromJSON},
+        {"fromJSONAsync", ArgumentParser<fromJSONAsync>},
 
         // PCRE functions
         {"pregFind", PregFind},
@@ -493,13 +496,12 @@ int CLuaUtilDefs::fromJSON(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        // Read it into lua arguments
-        CLuaArguments Converted;
-        if (Converted.ReadFromJSONString(strJson))
+        rapidjson::Document document;
+        document.Parse(strJson.c_str());
+        if (!document.HasParseError())
         {
-            // Return it as data
-            Converted.PushArguments(luaVM);
-            return static_cast<int>(Converted.Count());
+            CLuaArguments::PushRapidValue(luaVM, document);
+            return 1;
         }
     }
     else
@@ -508,6 +510,74 @@ int CLuaUtilDefs::fromJSON(lua_State* luaVM)
     // Failed
     lua_pushnil(luaVM);
     return 1;
+}
+
+bool CLuaUtilDefs::fromJSONAsync(lua_State* luaVM, std::string jsonString, CLuaFunctionRef callback)
+{
+    // bool fromJSONAsync ( string jsonString, function callback )
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    CLuaShared::GetAsyncTaskScheduler()->PushTask(
+        [jsonString = std::move(jsonString)]() -> std::shared_ptr<rapidjson::Document>
+        {
+            try
+            {
+                auto pDoc = std::make_shared<rapidjson::Document>();
+                pDoc->Parse(jsonString.c_str());
+                if (pDoc->HasParseError())
+                {
+                    return nullptr;
+                }
+                return pDoc;
+            }
+            catch (const std::bad_alloc&)
+            {
+                return nullptr;
+            }
+        },
+        [luaFunctionRef = callback](std::shared_ptr<rapidjson::Document> pDoc)
+        {
+            CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaFunctionRef.GetLuaVM());
+            if (!pLuaMain)
+                return;
+
+            lua_State* luaVM = pLuaMain->GetVirtualMachine();
+            if (!luaVM)
+                return;
+
+            int luaStackPointer = lua_gettop(luaVM);
+            lua_getref(luaVM, luaFunctionRef.ToInt());
+
+            if (pDoc)
+            {
+                CLuaArguments::PushRapidValue(luaVM, *pDoc);
+                pDoc.reset();
+            }
+            else
+            {
+                lua_pushnil(luaVM);
+            }
+
+            pLuaMain->ResetInstructionCount();
+            int iret = pLuaMain->PCall(luaVM, 1, LUA_MULTRET, 0);
+            if (iret == LUA_ERRRUN || iret == LUA_ERRMEM)
+            {
+                std::string strRes = ConformResourcePath(lua_tostring(luaVM, -1));
+                m_pScriptDebugging->LogPCallError(luaVM, strRes);
+
+                while (lua_gettop(luaVM) - luaStackPointer > 0)
+                    lua_pop(luaVM, 1);
+            }
+            else
+            {
+                while (lua_gettop(luaVM) - luaStackPointer > 0)
+                    lua_pop(luaVM, 1);
+            }
+        });
+
+    return true;
 }
 
 int CLuaUtilDefs::PregFind(lua_State* luaVM)

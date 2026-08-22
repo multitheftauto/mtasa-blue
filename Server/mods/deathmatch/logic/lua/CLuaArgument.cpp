@@ -284,8 +284,7 @@ void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKn
             if (pKnownTables && (pTableId = MapFind(*pKnownTables, m_pTableData)))
             {
                 lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
-                lua_pushnumber(luaVM, *pTableId);
-                lua_gettable(luaVM, -2);
+                lua_rawgeti(luaVM, -1, *pTableId);
                 lua_remove(luaVM, -2);
             }
             else
@@ -1110,5 +1109,115 @@ bool CLuaArgument::ReadFromJSONObject(json_object* object, std::vector<CLuaArgum
                 return false;
         }
     }
+    return true;
+}
+
+bool CLuaArgument::ReadFromRapidValue(const rapidjson::Value& value, std::vector<CLuaArguments*>* pKnownTables)
+{
+    DeleteTableData();
+
+    if (value.IsNull())
+    {
+        m_iType = LUA_TNIL;
+    }
+    else if (value.IsBool())
+    {
+        ReadBool(value.GetBool());
+    }
+    else if (value.IsNumber())
+    {
+        ReadNumber(value.GetDouble());
+    }
+    else if (value.IsObject())
+    {
+        m_pTableData = new CLuaArguments();
+        m_pTableData->ReadFromRapidObject(value, pKnownTables);
+        m_bWeakTableRef = false;
+        m_iType = LUA_TTABLE;
+    }
+    else if (value.IsArray())
+    {
+        m_pTableData = new CLuaArguments();
+        m_pTableData->ReadFromRapidArray(value, pKnownTables);
+        m_bWeakTableRef = false;
+        m_iType = LUA_TTABLE;
+    }
+    else if (value.IsString())
+    {
+        const char* szString = value.GetString();
+        size_t      iLength = value.GetStringLength();
+
+        if (iLength > 3 && szString[0] == '^' && szString[2] == '^' && szString[1] != '^')
+        {
+            switch (szString[1])
+            {
+                case 'E':  // element
+                {
+                    int       id = atoi(szString + 3);
+                    CElement* element = NULL;
+                    if (id != INT_MAX && id != INT_MIN && id != 0)
+                        element = CElementIDs::GetElement(id);
+                    if (element)
+                    {
+                        ReadElement(element);
+                    }
+                    else
+                    {
+                        m_iType = LUA_TNIL;
+                    }
+                    break;
+                }
+                case 'R':  // resource
+                {
+                    CResource* resource = g_pGame->GetResourceManager()->GetResource(szString + 3);
+                    if (resource)
+                    {
+                        ReadScriptID(resource->GetScriptID());
+                    }
+                    else
+                    {
+                        g_pGame->GetScriptDebugging()->LogError(NULL, "Invalid resource specified in JSON string '%s'.", szString);
+                        m_iType = LUA_TNIL;
+                    }
+                    break;
+                }
+                case 'T':  // Table reference
+                {
+                    unsigned long ulTableID = static_cast<unsigned long>(atol(szString + 3));
+                    if (pKnownTables && ulTableID < pKnownTables->size())
+                    {
+                        m_pTableData = pKnownTables->at(ulTableID);
+                        m_bWeakTableRef = true;
+                        m_iType = LUA_TTABLE;
+                    }
+                    else
+                    {
+                        g_pGame->GetScriptDebugging()->LogError(NULL, "Invalid table reference specified in JSON string '%s'.", szString);
+                        m_iType = LUA_TNIL;
+                    }
+                    break;
+                }
+                default:
+                {
+                    ReadString(std::string_view(szString, iLength));
+                    break;
+                }
+            }
+        }
+        else if (iLength >= 2 && szString[0] == '^' && szString[1] == '^')
+        {
+            // Escaped caret
+            ReadString(std::string_view(szString + 1, iLength - 1));
+        }
+        else
+        {
+            ReadString(std::string_view(szString, iLength));
+        }
+    }
+    else
+    {
+        m_iType = LUA_TNIL;
+    }
+
     return true;
 }

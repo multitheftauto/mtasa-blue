@@ -46,7 +46,13 @@ project "Client Deathmatch"
 			"../../../Shared/animation",
 			"../../../Shared",
 			"../../../vendor/sparsehash/src/",
-			"../../../vendor/lunasvg/include"
+			"../../../vendor/lunasvg/include",
+			"../../../vendor/discord-rpc/discord/thirdparty/rapidjson/include"
+	}
+
+	defines {
+		"RAPIDJSON_HAS_STDSTRING=1",
+		"RAPIDJSON_SSE2=1",
 	}
 
 	files {

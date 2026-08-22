@@ -166,14 +166,14 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
         lua_setfield(luaVM, LUA_REGISTRYINDEX, "cache");
     }
 
-    lua_newtable(luaVM);
+    // Pre-allocate the exact table capacity to eliminate re-hashing
+    lua_createtable(luaVM, 0, static_cast<int>(m_Arguments.size() / 2));
 
     // push it onto the known tables
     int size = pKnownTables->size();
     lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
-    lua_pushnumber(luaVM, ++size);
-    lua_pushvalue(luaVM, -3);
-    lua_settable(luaVM, -3);
+    lua_pushvalue(luaVM, -2);
+    lua_rawseti(luaVM, -2, ++size);
     lua_pop(luaVM, 1);
     pKnownTables->insert(std::make_pair((CLuaArguments*)this, size));
 
@@ -183,7 +183,7 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
         (*iter)->Push(luaVM, pKnownTables);  // index
         ++iter;
         (*iter)->Push(luaVM, pKnownTables);  // value
-        lua_settable(luaVM, -3);
+        lua_rawset(luaVM, -3);
     }
 
     if (bKnownTablesCreated)
@@ -743,6 +743,9 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
 
 bool CLuaArguments::ReadFromJSONString(const char* szJSON)
 {
+    if (!szJSON)
+        return false;
+
     // Fast isJSON check: Check first non-white space character is '[' or '{'
     for (const char* ptr = szJSON; true;)
     {
@@ -754,44 +757,111 @@ bool CLuaArguments::ReadFromJSONString(const char* szJSON)
         return false;
     }
 
-    json_object* object = json_tokener_parse(szJSON);
-    if (object)
+    rapidjson::Document doc;
+    doc.Parse<rapidjson::kParseStopWhenDoneFlag>(szJSON);
+    if (doc.HasParseError())
+        return false;
+
+    std::vector<CLuaArguments*> knownTables;
+
+    if (doc.IsArray())
     {
-        if (json_object_get_type(object) == json_type_array)
+        for (rapidjson::SizeType i = 0; i < doc.Size(); ++i)
         {
-            bool bSuccess = true;
-
-            std::vector<CLuaArguments*> knownTables;
-
-            for (uint i = 0; i < json_object_array_length(object); i++)
+            auto pArgument = new CLuaArgument();
+            if (!pArgument->ReadFromRapidValue(doc[i], &knownTables))
             {
-                json_object*  arrayObject = json_object_array_get_idx(object, i);
-                CLuaArgument* pArgument = new CLuaArgument();
-                bSuccess = pArgument->ReadFromJSONObject(arrayObject, &knownTables);
-                m_Arguments.push_back(pArgument);  // then the value
-                if (!bSuccess)
-                    break;
+                delete pArgument;
+                return false;
             }
-            json_object_put(object);  // dereference
-            return bSuccess;
+            m_Arguments.push_back(pArgument);
         }
-        else if (json_object_get_type(object) == json_type_object)
-        {
-            std::vector<CLuaArguments*> knownTables;
-            CLuaArgument*               pArgument = new CLuaArgument();
-            bool                        bSuccess = pArgument->ReadFromJSONObject(object, &knownTables);
-            m_Arguments.push_back(pArgument);  // value
-            json_object_put(object);
-
-            return bSuccess;
-        }
-        json_object_put(object);  // dereference
+        return true;
     }
-    //    else
-    //        g_pGame->GetScriptDebugging()->LogError ( "Could not parse invalid JSON object.");
-    //   else
-    //        g_pGame->GetScriptDebugging()->LogError ( "Could not parse HTTP POST request, ensure data uses JSON.");
+    else if (doc.IsObject())
+    {
+        auto pArgument = new CLuaArgument();
+        if (!pArgument->ReadFromRapidValue(doc, &knownTables))
+        {
+            delete pArgument;
+            return false;
+        }
+        m_Arguments.push_back(pArgument);
+        return true;
+    }
+
     return false;
+}
+
+bool CLuaArguments::ReadFromRapidObject(const rapidjson::Value& object, std::vector<CLuaArguments*>* pKnownTables)
+{
+    if (!object.IsObject())
+        return false;
+
+    bool bKnownTablesCreated = false;
+    if (!pKnownTables)
+    {
+        pKnownTables = new std::vector<CLuaArguments*>();
+        bKnownTablesCreated = true;
+    }
+
+    pKnownTables->push_back(this);
+
+    bool bSuccess = true;
+    for (auto iter = object.MemberBegin(); iter != object.MemberEnd(); ++iter)
+    {
+        auto pKeyArgument = new CLuaArgument();
+        pKeyArgument->ReadString(std::string_view(iter->name.GetString(), iter->name.GetStringLength()));
+        m_Arguments.push_back(pKeyArgument);
+
+        auto pValArgument = new CLuaArgument();
+        bSuccess = pValArgument->ReadFromRapidValue(iter->value, pKnownTables);
+        m_Arguments.push_back(pValArgument);
+
+        if (!bSuccess)
+            break;
+    }
+
+    if (bKnownTablesCreated)
+        delete pKnownTables;
+
+    return bSuccess;
+}
+
+bool CLuaArguments::ReadFromRapidArray(const rapidjson::Value& array, std::vector<CLuaArguments*>* pKnownTables)
+{
+    if (!array.IsArray())
+        return false;
+
+    bool bKnownTablesCreated = false;
+    if (!pKnownTables)
+    {
+        pKnownTables = new std::vector<CLuaArguments*>();
+        bKnownTablesCreated = true;
+    }
+
+    pKnownTables->push_back(this);
+
+    bool         bSuccess = true;
+    unsigned int index = 1;
+    for (auto iter = array.Begin(); iter != array.End(); ++iter, ++index)
+    {
+        auto pKeyArgument = new CLuaArgument();
+        pKeyArgument->ReadNumber(index);
+        m_Arguments.push_back(pKeyArgument);
+
+        auto pValArgument = new CLuaArgument();
+        bSuccess = pValArgument->ReadFromRapidValue(*iter, pKnownTables);
+        m_Arguments.push_back(pValArgument);
+
+        if (!bSuccess)
+            break;
+    }
+
+    if (bKnownTablesCreated)
+        delete pKnownTables;
+
+    return bSuccess;
 }
 
 bool CLuaArguments::ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables)
@@ -887,4 +957,106 @@ bool CLuaArguments::IsEqualTo(const CLuaArguments& compareTo, std::set<const CLu
 
     return std::equal(std::begin(m_Arguments), std::end(m_Arguments), std::begin(compareTo.m_Arguments),
                       [knownTables](const CLuaArgument* lhs, const CLuaArgument* rhs) { return lhs->IsEqualTo(*rhs, knownTables); });
+}
+
+extern CGame* g_pGame;
+
+void CLuaArguments::PushRapidValue(lua_State* luaVM, const rapidjson::Value& value)
+{
+    if (value.IsNull())
+    {
+        lua_pushnil(luaVM);
+    }
+    else if (value.IsBool())
+    {
+        lua_pushboolean(luaVM, value.GetBool());
+    }
+    else if (value.IsInt())
+    {
+        lua_pushnumber(luaVM, value.GetInt());
+    }
+    else if (value.IsUint())
+    {
+        lua_pushnumber(luaVM, value.GetUint());
+    }
+    else if (value.IsInt64())
+    {
+        lua_pushnumber(luaVM, static_cast<lua_Number>(value.GetInt64()));
+    }
+    else if (value.IsUint64())
+    {
+        lua_pushnumber(luaVM, static_cast<lua_Number>(value.GetUint64()));
+    }
+    else if (value.IsDouble())
+    {
+        lua_pushnumber(luaVM, value.GetDouble());
+    }
+    else if (value.IsString())
+    {
+        const char*         szString = value.GetString();
+        rapidjson::SizeType iLength = value.GetStringLength();
+
+        if (iLength >= 3 && szString[0] == '^' && szString[2] == '^')
+        {
+            switch (szString[1])
+            {
+                case 'E':  // Element
+                {
+                    unsigned int uiElementID = static_cast<unsigned int>(atol(szString + 3));
+                    lua_pushuserdata(luaVM, (void*)reinterpret_cast<unsigned int*>(uiElementID));
+                    break;
+                }
+                case 'R':  // Resource
+                {
+                    CResource* resource = g_pGame->GetResourceManager()->GetResource(szString + 3);
+                    if (resource)
+                    {
+                        lua_pushuserdata(luaVM, reinterpret_cast<void*>(resource->GetScriptID()));
+                    }
+                    else
+                    {
+                        lua_pushnil(luaVM);
+                    }
+                    break;
+                }
+                default:
+                {
+                    lua_pushlstring(luaVM, szString, iLength);
+                    break;
+                }
+            }
+        }
+        else if (iLength >= 2 && szString[0] == '^' && szString[1] == '^')
+        {
+            lua_pushlstring(luaVM, szString + 1, iLength - 1);
+        }
+        else
+        {
+            lua_pushlstring(luaVM, szString, iLength);
+        }
+    }
+    else if (value.IsArray())
+    {
+        lua_createtable(luaVM, value.Size(), 0);
+        rapidjson::SizeType idx = 1;
+        for (auto iter = value.Begin(); iter != value.End(); ++iter, ++idx)
+        {
+            PushRapidValue(luaVM, *iter);
+            lua_rawseti(luaVM, -2, idx);
+        }
+    }
+    else if (value.IsObject())
+    {
+        lua_createtable(luaVM, 0, value.MemberCount());
+        for (auto iter = value.MemberBegin(); iter != value.MemberEnd(); ++iter)
+        {
+            lua_pushlstring(luaVM, iter->name.GetString(), iter->name.GetStringLength());
+            PushRapidValue(luaVM, iter->value);
+            lua_rawset(luaVM, -3);
+        }
+    }
+    else
+    {
+        lua_pushnil(luaVM);
+    }
 }

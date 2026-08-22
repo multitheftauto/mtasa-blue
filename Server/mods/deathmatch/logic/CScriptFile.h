@@ -39,6 +39,7 @@ public:
     void           Unload();
     bool           IsLoaded() { return m_pFile != NULL; };
     const SString& GetFilePath() { return m_strFilename; };
+    const SString& GetAbsPath() const { return m_strAbsPath; };
 
     // Get the owning resource
     CResource* GetResource();
@@ -77,6 +78,7 @@ private:
     FILE*         m_pFile;
     uint          m_uiScriptId;
     SString       m_strFilename;
+    SString       m_strAbsPath;
     unsigned long m_ulMaxSize;
     SLuaDebugInfo m_LuaDebugInfo;
 };

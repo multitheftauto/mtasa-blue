@@ -29,8 +29,10 @@ private:
     LUA_DECLARE(fileClose);
     LUA_DECLARE(fileFlush);
     LUA_DECLARE(fileRead);
+    static bool fileReadAsync(lua_State* luaVM, CScriptFile* scriptFile, unsigned long count, CLuaFunctionRef callback);
     LUA_DECLARE(fileWrite);
     static std::optional<std::string> fileGetContents(lua_State* L, CScriptFile* scriptFile, std::optional<bool> maybeVerifyContents);
+    static bool fileGetContentsAsync(lua_State* luaVM, CScriptFile* scriptFile, CLuaFunctionRef callback, std::optional<bool> maybeVerifyContents);
     static std::optional<std::string> fileGetHash(lua_State* const luaVM, CScriptFile* scriptFile, HashFunctionType hashFunction,
                                                   std::optional<std::unordered_map<std::string, std::string>> options);
 

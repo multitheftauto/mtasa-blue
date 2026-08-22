@@ -21,6 +21,7 @@ extern "C"
 #include "../common/CBitStream.h"
 #include "json.h"
 #include "CLuaFunctionRef.h"
+#include <rapidjson/document.h>
 
 inline void LUA_CHECKSTACK(lua_State* L, int size)
 {
@@ -93,8 +94,11 @@ public:
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
     bool         ReadFromJSONString(const char* szJSON);
+    bool         ReadFromRapidObject(const rapidjson::Value& object, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    bool         ReadFromRapidArray(const rapidjson::Value& array, std::vector<CLuaArguments*>* pKnownTables = NULL);
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
     bool         WriteToJSONString(std::string& strJSON, bool bSerialize = false, int flags = JSON_C_TO_STRING_PLAIN);
+    static void  PushRapidValue(lua_State* luaVM, const rapidjson::Value& value);
     json_object* WriteTableToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
     json_object* WriteToJSONArray(bool bSerialize);
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
