@@ -41,4 +41,5 @@ private:
     unsigned char     m_ucQuality;
     unsigned int      m_uiBitrate;
     const char*       m_szServerName;
+    std::int64_t      m_serverTime;
 };
