@@ -9,6 +9,9 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <algorithm>
+#include <cmath>
+#include <numbers>
 #include <enums/VehicleType.h>
 
 static bool __fastcall AreVehicleDoorsUndamageable(CVehicleSAInterface* vehicle)
@@ -137,6 +140,158 @@ static void __declspec(naked) HOOK_CBike__ProcessControl_LeanRatio()
         noSteeringLock:
         fldz
         jmp     CONTINUE_CBike__ProcessControl_LeanRatio
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::HydraulicControl
+//
+// This hook gives monster trucks working hydraulics instead of letting the native control wreck
+// their suspension.
+//
+// HydraulicControl runs every tick for any vehicle carrying the hydraulics upgrade, monster trucks
+// included, and it knows nothing about them. It rewrites the suspension spring and line lengths for
+// an ordinary car's suspension range, derived from the wheel radius and the handling limits, while
+// CMonsterTruck keeps a suspension model entirely of its own. CMonsterTruck::PreRender then clamps
+// its wheel position against the very spring length field the native control just overwrote, so the
+// two fight over it every frame and the wheels settle wherever that unrelated math left them.
+//
+// Monster trucks are told apart by their vtable pointer rather than a handling bitfield, since MTA
+// maps none of CMonsterTruck's own suspension fields to read one from.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A07A0 | 83 EC 60             | sub     esp, 0x60
+//     0x6A07A3 | 55                   | push    ebp
+//     0x6A07A4 | 8B E9                | mov     ebp, ecx
+//     0x6A07A6 | 0F BF 45 22          | movsx   eax, word ptr [ebp + 0x22]
+#define HOOKPOS_CAutomobile__HydraulicControl  0x6A07A0
+#define HOOKSIZE_CAutomobile__HydraulicControl 6
+static DWORD CONTINUE_CAutomobile__HydraulicControl = 0x6A07A6;
+
+#define MONSTERTRUCK_VTABLE 0x8717D8
+
+// CAutomobile's m_aSuspensionSpringLength and m_aSuspensionLineLength, four floats each.
+// CMonsterTruck repurposes them as the travel limits of m_wheelPosition: SetupSuspensionLines fills
+// them with the wheel's Z plus the handling suspension upper and lower limit respectively, and
+// ExtendSuspension clamps m_wheelPosition into the range they describe.
+
+// Value m_wMiscComponentAngle carries while the hydraulics are raised, matching what the native
+// control parks there for the same purpose. The only monster truck that puts the field to another
+// use is the dumper, and CAutomobile::ProcessControl sends that one to UpdateMovingCollision instead
+// of ever reaching hydraulics.
+static constexpr std::uint16_t MONSTERTRUCK_HYDRAULICS_RAISED = 500;
+
+// Fraction of the truck's own suspension travel a fully raised wheel gives up. The native control
+// shifts a car by a flat 0.2, roughly half the travel of a stock car; taking a proportion instead
+// keeps the lift in scale with a monster truck's far longer suspension.
+static constexpr float MONSTERTRUCK_HYDRAULICS_RAISE_RATIO = 0.5f;
+
+static const std::uint32_t CModelInfo__ms_modelInfoPtrs = 0xA9B0C8;
+static const std::uint32_t FUNC_CVehicleModelInfo__GetWheelPosn = 0x4C7D20;
+
+// Recreates the native control scheme against CMonsterTruck's own suspension, so the horn raises and
+// lowers the truck, the hydraulic jump button hops every wheel at once and the right stick tilts it.
+// Only ever reached for the vehicle the local player is driving, matching the STATUS_PLAYER gate the
+// native control applies before it reads any pad input.
+static void __fastcall MonsterTruckHydraulicControl(CAutomobileSAInterface* vehicle)
+{
+    if (!vehicle || vehicle->nStatus != STATUS_PLAYER)
+        return;
+
+    const auto* handling = vehicle->pHandlingData;
+    if (!handling)
+        return;
+
+    auto* modelInfo = reinterpret_cast<void**>(CModelInfo__ms_modelInfoPtrs)[vehicle->m_nModelIndex];
+    if (!modelInfo)
+        return;
+
+    auto*            pad = pGameInterface->GetPad();
+    CControllerState state, lastState;
+    pad->GetCurrentControllerState(&state);
+    pad->GetLastControllerState(&lastState);
+
+    // The horn is the raise and lower toggle, which is what the native control reads through
+    // CPad::HornJustDown; in the default control mode that button is ShockButtonL, the one MTA maps
+    // its horn control to. The game already silences the horn itself on any vehicle carrying the
+    // upgrade, so without this the key would do nothing at all.
+    if (state.ShockButtonL && !lastState.ShockButtonL)
+        vehicle->m_wMiscComponentAngle = vehicle->m_wMiscComponentAngle < MONSTERTRUCK_HYDRAULICS_RAISED ? MONSTERTRUCK_HYDRAULICS_RAISED : 0;
+
+    const bool raised = vehicle->m_wMiscComponentAngle >= MONSTERTRUCK_HYDRAULICS_RAISED;
+
+    float suspensionChange[MAX_WHEELS] = {};
+
+    if (state.ShockButtonR)
+    {
+        std::ranges::fill(suspensionChange, 1.0f);
+    }
+    else if (state.RightStickX != 0 || state.RightStickY != 0)
+    {
+        // The diagonal tilt the native control derives from this same stick, read straight from
+        // CControllerState rather than through CPad::GetCarGunLeftRight and GetCarGunUpDown, which
+        // return these two fields anyway in every common control mode.
+        const float leftRight = static_cast<float>(state.RightStickX);
+        const float upDown = static_cast<float>(state.RightStickY);
+        const float factor = std::sqrt(upDown * upDown + leftRight * leftRight) * 1.5f / 128.0f;
+        const float angle = std::atan2(leftRight, upDown) - std::numbers::pi_v<float> / 4.0f;
+        const float rearRight = std::cos(angle) * factor;
+        const float frontRight = std::sin(angle) * factor;
+
+        suspensionChange[FRONT_LEFT_WHEEL] = std::max(0.0f, -rearRight);
+        suspensionChange[REAR_LEFT_WHEEL] = std::max(0.0f, -frontRight);
+        suspensionChange[FRONT_RIGHT_WHEEL] = std::max(0.0f, frontRight);
+        suspensionChange[REAR_RIGHT_WHEEL] = std::max(0.0f, rearRight);
+    }
+
+    // Raising slides the whole travel window down relative to the chassis, the same move the native
+    // control makes when it drops both of its limits by an equal amount. The spring keeps its length
+    // and only the window it works in relocates, so the wheel settles that much further from the
+    // chassis and the body rides that much higher. ExtendSuspension clamps m_wheelPosition into the
+    // new window before the compression is recomputed from it, and PreRender clamps it once more for
+    // rendering, so the physics and the visible wheel both follow the window down.
+    const auto  GetWheelPosn = reinterpret_cast<void(__thiscall*)(void*, int, CVector*, bool)>(FUNC_CVehicleModelInfo__GetWheelPosn);
+    const float travel = handling->fSuspensionUpperLimit - handling->fSuspensionLowerLimit;
+
+    for (int i = 0; i < MAX_WHEELS; i++)
+    {
+        // Being raised inverts what an input asks for, exactly as it does natively. Lowered, a wheel
+        // rests on its own suspension until an input lifts it; raised, every wheel is held up until
+        // an input releases one, which is what lets the stick tilt the truck from a raised stance.
+        const float change = std::min(suspensionChange[i], 1.0f);
+        const float drop = travel * MONSTERTRUCK_HYDRAULICS_RAISE_RATIO * (raised ? 1.0f - change : change);
+
+        // Rebuilding both limits the way SetupSuspensionLines first derived them, from the wheel's Z
+        // plus the matching handling limit, keeps this idempotent: a wheel with nothing asked of it
+        // is handed back exactly what the game set up, so nothing needs restoring when the player
+        // leaves the truck or it gets destroyed.
+        CVector wheelPosition;
+        GetWheelPosn(modelInfo, i, &wheelPosition, false);
+
+        vehicle->m_aSuspensionSpringLength[i] = wheelPosition.fZ + handling->fSuspensionUpperLimit - drop;
+        vehicle->m_aSuspensionLineLength[i] = wheelPosition.fZ + handling->fSuspensionLowerLimit - drop;
+    }
+}
+
+static void __declspec(naked) HOOK_CAutomobile__HydraulicControl()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        cmp     dword ptr [ecx], MONSTERTRUCK_VTABLE
+        jne     continueGameCodeLocation
+
+        call    MonsterTruckHydraulicControl
+        retn
+
+        continueGameCodeLocation:
+        sub     esp, 0x60
+        push    ebp
+        mov     ebp, ecx
+        jmp     CONTINUE_CAutomobile__HydraulicControl
     }
     // clang-format on
 }
@@ -706,12 +861,9 @@ static void __declspec(naked) HOOK_CVehicle__DoVehicleLights_PopUpLights()
 #define HOOKSIZE_CAutomobile__GetTowBarPos 7
 static const DWORD CONTINUE_CAutomobile__GetTowBarPos = 0x6AF257;
 
-// Models that answer with their misc_a dummy, so a clone of one still tows.
-//
-// The tow truck and the tractor are left out; they derive the bar from their hoist angle, and the
-// rest of their behaviour stays gated on the stock model index, so a clone would only half work.
-// The trailers in that same switch, artict3 and the two baggage boxes, are vehicles.ide type
-// trailer and so become CTrailer, which overrides this function and never reaches it.
+// Models that answer with their misc_a dummy, so a clone of one still tows. Tow truck and tractor
+// share a different branch below, handled by GetTowBarModelId; artict3 and the baggage boxes are
+// CTrailer, which overrides this function entirely.
 static constexpr bool HasTowBarDummy(VehicleType model)
 {
     switch (model)
@@ -739,7 +891,12 @@ static std::uint32_t __fastcall GetTowBarModelId(CVehicleSAInterface* vehicle)
     // Only engineRequestModel models carry a parent, so stock vehicles keep their index and take
     // the branch they always did.
     const std::uint32_t parentId = modelInfo->GetParentID();
-    if (parentId == 0 || !HasTowBarDummy(static_cast<VehicleType>(parentId)))
+    if (parentId == 0)
+        return modelId;
+
+    // Tow truck and tractor share a further branch below; let a clone's parent take it too.
+    const auto parentType = static_cast<VehicleType>(parentId);
+    if (!HasTowBarDummy(parentType) && parentType != VehicleType::VT_TOWTRUCK && parentType != VehicleType::VT_TRACTOR)
         return modelId;
 
     return parentId;
@@ -758,6 +915,421 @@ static void __declspec(naked) HOOK_CAutomobile__GetTowBarPos()
 
         sub     esp, 0x0C
         jmp     CONTINUE_CAutomobile__GetTowBarPos
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The tug (and baggage/bagboxa/bagboxb, which share this same branch) only reaches the dummy read
+// below if what it's hooking onto is a bagboxa, bagboxb or tugstair by raw id, so a clone of one of
+// those, or the utility trailer entirely, never gets recognised. Resolve clones the usual way and
+// also accept the utility trailer, letting the tug (and its trailermates) tow it too.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6AF2B6 | 66 8B 42 22 | mov     ax, word ptr [edx + 0x22]
+// >>> 0x6AF2BA | 66 3D 5E 02 | cmp     ax, 0x25E
+// >>> 0x6AF2BE | 74 0C       | je      0x6AF2CC
+// >>> 0x6AF2C0 | 66 3D 5F 02 | cmp     ax, 0x25F
+// >>> 0x6AF2C4 | 74 06       | je      0x6AF2CC
+// >>> 0x6AF2C6 | 66 3D 60 02 | cmp     ax, 0x260
+// >>> 0x6AF2CA | 75 34       | jne     0x6AF300
+#define HOOKPOS_CAutomobile__GetTowBarPos_TugAttachWhitelist  0x6AF2B6
+#define HOOKSIZE_CAutomobile__GetTowBarPos_TugAttachWhitelist 22
+static const DWORD CONTINUE_CAutomobile__GetTowBarPos_TugAttachWhitelist = 0x6AF2CC;
+static const DWORD SKIP_CAutomobile__GetTowBarPos_TugAttachWhitelist = 0x6AF300;
+
+static constexpr bool IsTugAttachable(VehicleType model)
+{
+    switch (model)
+    {
+        case VehicleType::VT_BAGBOXA:
+        case VehicleType::VT_BAGBOXB:
+        case VehicleType::VT_TUGSTAIR:
+        case VehicleType::VT_UTILTR1:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool __fastcall IsTugAttachableOrClone(CVehicleSAInterface* attachTo)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(attachTo->m_nModelIndex);
+    if (IsTugAttachable(static_cast<VehicleType>(modelId)))
+        return true;
+
+    CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+    return modelInfo && IsTugAttachable(static_cast<VehicleType>(modelInfo->GetParentID()));
+}
+
+static void __declspec(naked) HOOK_CAutomobile__GetTowBarPos_TugAttachWhitelist()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    ecx                          // this (the tug), needed by both targets below
+        mov     ecx, edx
+        call    IsTugAttachableOrClone
+        pop     ecx
+        test    al, al
+        jz      notAttachable
+
+        jmp     CONTINUE_CAutomobile__GetTowBarPos_TugAttachWhitelist
+
+        notAttachable:
+        jmp     SKIP_CAutomobile__GetTowBarPos_TugAttachWhitelist
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The tug's dummy is exported as misc_b, not misc_a like every other model on this branch, so the
+// unconditional misc_a read above finds nothing; fall back to misc_b only when misc_a is absent.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6AF2CC | 8B 81 98 06 00 00 | mov     eax, dword ptr [ecx + 0x698]
+//     0x6AF2D2 | 85 C0             | test    eax, eax
+#define HOOKPOS_CAutomobile__GetTowBarPos_TugDummy  0x6AF2CC
+#define HOOKSIZE_CAutomobile__GetTowBarPos_TugDummy 6
+static const DWORD CONTINUE_CAutomobile__GetTowBarPos_TugDummy = 0x6AF2D2;
+
+static RwFrame* __fastcall GetAutomobileTowBarFrame(CAutomobileSAInterface* vehicle)
+{
+    RwFrame* misc_a = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::MISC_A)];
+    return misc_a ? misc_a : vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::MISC_B)];
+}
+
+static void __declspec(naked) HOOK_CAutomobile__GetTowBarPos_TugDummy()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        call    GetAutomobileTowBarFrame    // ecx=vehicle, returns frame in eax
+        jmp     CONTINUE_CAutomobile__GetTowBarPos_TugDummy
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CTrailer::GetTowBarPos only answers with a bounding box guess unless the model is a baggage box,
+// so the artict3's own misc_b dummy at its tail never gets read and a second trailer can't attach.
+// Read that dummy's position directly and answer true for the artict3 and its clones.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6CFD60 | 8A 44 24 08 | mov     al, byte ptr [esp + 8]
+// >>> 0x6CFD64 | 83 EC 0C    | sub     esp, 0xC
+//     0x6CFD67 | 84 C0       | test    al, al
+#define HOOKPOS_CTrailer__GetTowBarPos  0x6CFD60
+#define HOOKSIZE_CTrailer__GetTowBarPos 7
+static const DWORD CONTINUE_CTrailer__GetTowBarPos = 0x6CFD67;
+
+static bool __fastcall TryGetArtict3FifthWheelPos(CVehicleSAInterface* trailer, CVector* outPos)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(trailer->m_nModelIndex);
+    bool                isArtict3 = modelId == static_cast<std::uint32_t>(VehicleType::VT_ARTICT3);
+    if (!isArtict3)
+    {
+        CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+        isArtict3 = modelInfo && modelInfo->GetParentID() == static_cast<unsigned int>(VehicleType::VT_ARTICT3);
+    }
+    if (!isArtict3)
+        return false;
+
+    RwFrame* fifthWheel = reinterpret_cast<CAutomobileSAInterface*>(trailer)->m_aCarNodes[static_cast<std::size_t>(eCarNodes::MISC_B)];
+    if (!fifthWheel)
+        return false;
+
+    const RwMatrix* worldTransform = ((RwMatrix * (__cdecl*)(RwFrame*))0x7F0990)(fifthWheel);  // RwFrameGetLTM
+    outPos->fX = worldTransform->pos.x;
+    outPos->fY = worldTransform->pos.y;
+    outPos->fZ = worldTransform->pos.z;
+    return true;
+}
+
+static void __declspec(naked) HOOK_CTrailer__GetTowBarPos()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    ecx                          // trailer (this)
+        mov     edx, [esp + 8]                // &posnOut
+        call    TryGetArtict3FifthWheelPos    // al = result
+        pop     ecx
+        test    al, al
+        jz      notArtict3
+
+        retn    0x0C
+
+        notArtict3:
+        mov     al, byte ptr [esp + 8]
+        sub     esp, 0x0C
+        jmp     CONTINUE_CTrailer__GetTowBarPos
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// PreRender, ProcessControl, UpdateTrailerLink and UpdateTractorLink each gate the tow truck's hook
+// and tow line on model index, so a clone matches none of them. The tractor reaches the exact same
+// TowTruckControl and tow line checks, so ProcessControl and UpdateTrailerLink test both in one
+// patched span; PreRender's swing and UpdateTractorLink's offset calc diverge and get their own.
+//////////////////////////////////////////////////////////////////////////////////////////
+static bool __fastcall IsTowTruckOrClone(CVehicleSAInterface* vehicle)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
+    if (modelId == static_cast<std::uint32_t>(VehicleType::VT_TOWTRUCK))
+        return true;
+
+    CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+    return modelInfo && modelInfo->GetParentID() == static_cast<unsigned int>(VehicleType::VT_TOWTRUCK);
+}
+
+static bool __fastcall IsTractorOrClone(CVehicleSAInterface* vehicle)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
+    if (modelId == static_cast<std::uint32_t>(VehicleType::VT_TRACTOR))
+        return true;
+
+    CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+    return modelInfo && modelInfo->GetParentID() == static_cast<unsigned int>(VehicleType::VT_TRACTOR);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::PreRender, swinging the misc_a component out
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6AC507 | 66 3D 0D 02          | cmp     ax, 0x20D
+// >>> 0x6AC50B | 0F 85 C8 01 00 00    | jne     0x6AC6D9
+//     0x6AC511 | 0F B7 8E 6C 08 00 00 | movzx   ecx, word ptr [esi + 0x86C]
+#define HOOKPOS_CAutomobile__PreRender_TowTruckHook  0x6AC507
+#define HOOKSIZE_CAutomobile__PreRender_TowTruckHook 10
+static const DWORD CONTINUE_CAutomobile__PreRender_TowTruckHook = 0x6AC511;
+static const DWORD SKIP_CAutomobile__PreRender_TowTruckHook = 0x6AC6D9;
+
+static void __declspec(naked) HOOK_CAutomobile__PreRender_TowTruckHook()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    eax
+        mov     ecx, esi
+        call    IsTowTruckOrClone
+        test    al, al
+        pop     eax
+        jz      notTowTruck
+
+        jmp     CONTINUE_CAutomobile__PreRender_TowTruckHook
+
+        notTowTruck:
+        jmp     SKIP_CAutomobile__PreRender_TowTruckHook
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::PreRender again, the tractor's swing; it lands on a different, shorter
+// continuation than the tow truck's, so it needs a branch of its own instead of sharing one.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6AC6D9 | 66 3D 13 02 | cmp     ax, 0x213
+// >>> 0x6AC6DD | 75 3D       | jne     0x6AC71C
+//     0x6AC6DF | 0F B7 8E 6C 08 00 00 | movzx   ecx, word ptr [esi + 0x86C]
+#define HOOKPOS_CAutomobile__PreRender_TractorHook  0x6AC6D9
+#define HOOKSIZE_CAutomobile__PreRender_TractorHook 6
+static const DWORD CONTINUE_CAutomobile__PreRender_TractorHook = 0x6AC6DF;
+static const DWORD SKIP_CAutomobile__PreRender_TractorHook = 0x6AC71C;
+
+static void __declspec(naked) HOOK_CAutomobile__PreRender_TractorHook()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    eax
+        mov     ecx, esi
+        call    IsTractorOrClone
+        test    al, al
+        pop     eax
+        jz      notTractor
+
+        jmp     CONTINUE_CAutomobile__PreRender_TractorHook
+
+        notTractor:
+        jmp     SKIP_CAutomobile__PreRender_TractorHook
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::ProcessControl, the switch that reaches TowTruckControl; the tow truck's and
+// tractor's compares sit back to back and reach the same call, so one span covers both.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6B1FB3 | 66 3D 0D 02 | cmp     ax, 0x20D
+// >>> 0x6B1FB7 | 74 4D       | je      0x6B2006
+// >>> 0x6B1FB9 | 66 3D 13 02 | cmp     ax, 0x213
+// >>> 0x6B1FBD | 74 47       | je      0x6B2006
+//     0x6B1FBF | F7 86 8C 03 00 00 00 00 02 00 | test    dword ptr [esi + 0x38C], 0x20000
+#define HOOKPOS_CAutomobile__ProcessControl_TowTruckDispatch  0x6B1FB3
+#define HOOKSIZE_CAutomobile__ProcessControl_TowTruckDispatch 12
+static const DWORD CONTINUE_CAutomobile__ProcessControl_TowTruckDispatch = 0x6B2006;
+static const DWORD SKIP_CAutomobile__ProcessControl_TowTruckDispatch = 0x6B1FBF;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_TowTruckDispatch()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     ecx, esi
+        call    IsTowTruckOrClone
+        test    al, al
+        jnz     isMatch
+
+        mov     ecx, esi
+        call    IsTractorOrClone
+        test    al, al
+        jz      notMatch
+
+        isMatch:
+        jmp     CONTINUE_CAutomobile__ProcessControl_TowTruckDispatch
+
+        notMatch:
+        jmp     SKIP_CAutomobile__ProcessControl_TowTruckDispatch
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CVehicle::UpdateTrailerLink; same back to back compares as ProcessControl above.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6DFDB6 | 66 3D 0D 02 | cmp     ax, 0x20D
+// >>> 0x6DFDBA | 74 06       | je      0x6DFDC2
+// >>> 0x6DFDBC | 66 3D 13 02 | cmp     ax, 0x213
+// >>> 0x6DFDC0 | 75 19       | jne     0x6DFDDB
+//     0x6DFDC2 | 0F B7 0D 3C 31 8D 00 | movzx   ecx, word ptr [0x8D313C]
+#define HOOKPOS_CVehicle__UpdateTrailerLink_TowTruck  0x6DFDB6
+#define HOOKSIZE_CVehicle__UpdateTrailerLink_TowTruck 12
+static const DWORD CONTINUE_CVehicle__UpdateTrailerLink_TowTruck = 0x6DFDC2;
+static const DWORD SKIP_CVehicle__UpdateTrailerLink_TowTruck = 0x6DFDDB;
+
+static void __declspec(naked) HOOK_CVehicle__UpdateTrailerLink_TowTruck()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     ecx, ebx
+        call    IsTowTruckOrClone
+        test    al, al
+        jnz     isMatch
+
+        mov     ecx, ebx
+        call    IsTractorOrClone
+        test    al, al
+        jz      notMatch
+
+        isMatch:
+        jmp     CONTINUE_CVehicle__UpdateTrailerLink_TowTruck
+
+        notMatch:
+        jmp     SKIP_CVehicle__UpdateTrailerLink_TowTruck
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CVehicle::UpdateTractorLink; the compare feeds a jz several FPU instructions later, so this
+// restores ax to the real stock id instead of redirecting, the original compares take it from there.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6E00D0 | 66 8B 46 22 | mov     ax, word ptr [esi + 0x22]
+// >>> 0x6E00D4 | 66 3D 0D 02 | cmp     ax, 0x20D
+//     0x6E00D8 | D8 64 24 10 | fsub    dword ptr [esp + 0x10]
+#define HOOKPOS_CVehicle__UpdateTractorLink_TowTruck  0x6E00D0
+#define HOOKSIZE_CVehicle__UpdateTractorLink_TowTruck 8
+static const DWORD CONTINUE_CVehicle__UpdateTractorLink_TowTruck = 0x6E00D8;
+
+static void __declspec(naked) HOOK_CVehicle__UpdateTractorLink_TowTruck()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     ecx, esi
+        call    IsTowTruckOrClone
+        test    al, al
+        jnz     isTowTruck
+
+        mov     ecx, esi
+        call    IsTractorOrClone
+        test    al, al
+        jnz     isTractor
+
+        mov     ax, word ptr [esi + 0x22]
+        jmp     doCompare
+
+        isTowTruck:
+        mov     ax, 0x20D
+        jmp     doCompare
+
+        isTractor:
+        mov     ax, 0x213
+
+        doCompare:
+        cmp     ax, 0x20D
+        jmp     CONTINUE_CVehicle__UpdateTractorLink_TowTruck
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::CAutomobile, registering the hook's misc_b (tow truck) or CAR_BOOT (tractor) as a
+// bouncing panel; that's what gives it physics driven sway instead of sitting rigid, and it only
+// ever runs once, at construction, gated the same raw way.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6B0EE2 | 66 8B 46 22 | mov     ax, word ptr [esi + 0x22]
+// >>> 0x6B0EE6 | 66 3D 0D 02 | cmp     ax, 0x20D
+//     0x6B0EEA | 75 23       | jne     0x6B0F0F
+#define HOOKPOS_CAutomobile__Constructor_TowTruckBouncingPanel  0x6B0EE2
+#define HOOKSIZE_CAutomobile__Constructor_TowTruckBouncingPanel 8
+static const DWORD CONTINUE_CAutomobile__Constructor_TowTruckBouncingPanel = 0x6B0EEA;
+
+static void __declspec(naked) HOOK_CAutomobile__Constructor_TowTruckBouncingPanel()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     ecx, esi
+        call    IsTowTruckOrClone
+        test    al, al
+        jnz     isTowTruck
+
+        mov     ecx, esi
+        call    IsTractorOrClone
+        test    al, al
+        jnz     isTractor
+
+        mov     ax, word ptr [esi + 0x22]
+        jmp     doCompare
+
+        isTowTruck:
+        mov     ax, 0x20D
+        jmp     doCompare
+
+        isTractor:
+        mov     ax, 0x213
+
+        doCompare:
+        cmp     ax, 0x20D
+        jmp     CONTINUE_CAutomobile__Constructor_TowTruckBouncingPanel
     }
     // clang-format on
 }
@@ -3637,6 +4209,7 @@ void CMultiplayerSA::InitHooks_Vehicles()
     EZHookInstall(CDamageManager__ProgressDoorDamage);
     EZHookInstall(CBike__ProcessControl_SteerRatio);
     EZHookInstall(CBike__ProcessControl_LeanRatio);
+    EZHookInstall(CAutomobile__HydraulicControl);
     EZHookInstall(CAutomobile__ProcessControl_CementAngleReset);
     EZHookInstall(CAutomobile__ProcessControl_CementMiscGate);
     EZHookInstall(CAutomobile__MovingCollisionSpeed_Cement);
@@ -3652,6 +4225,9 @@ void CMultiplayerSA::InitHooks_Vehicles()
     EZHookInstall(CAutomobile__PreRender_PopUpLights);
     EZHookInstall(CVehicle__DoVehicleLights_PopUpLights);
     EZHookInstall(CAutomobile__GetTowBarPos);
+    EZHookInstall(CAutomobile__GetTowBarPos_TugAttachWhitelist);
+    EZHookInstall(CAutomobile__GetTowBarPos_TugDummy);
+    EZHookInstall(CTrailer__GetTowBarPos);
     EZHookInstall(CAutomobile__ProcessControl_DumperDispatch);
     EZHookInstall(CAutomobile__UpdateMovingCollision_DumperAngleReset);
     EZHookInstall(CAutomobile__UpdateMovingCollision_DumperMiscGate);
@@ -3758,4 +4334,10 @@ void CMultiplayerSA::InitHooks_Vehicles()
     EZHookInstall(CAEVehicleAudioEntity__ProcessMovingParts_AndromGate);
     EZHookInstall(CAEVehicleAudioEntity__ProcessMovingParts_AndromCreakCase);
     EZHookInstall(CPlane__PreRender_AndromRampBlock);
+    EZHookInstall(CAutomobile__PreRender_TowTruckHook);
+    EZHookInstall(CAutomobile__PreRender_TractorHook);
+    EZHookInstall(CAutomobile__ProcessControl_TowTruckDispatch);
+    EZHookInstall(CVehicle__UpdateTrailerLink_TowTruck);
+    EZHookInstall(CVehicle__UpdateTractorLink_TowTruck);
+    EZHookInstall(CAutomobile__Constructor_TowTruckBouncingPanel);
 }
