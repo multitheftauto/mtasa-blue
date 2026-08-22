@@ -203,7 +203,8 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_bChainEngine = false;
     m_bTaxiLightOn = false;
     m_vecGravity = CVector(0.0f, 0.0f, -1.0f);
-    m_HeadLightColor = SColorRGBA(255, 255, 255, 255);
+    m_headlightColors[0] = SColorRGBA(255, 255, 255, 255);
+    m_headlightColors[1] = SColorRGBA(255, 255, 255, 255);
     m_bHeliSearchLightVisible = false;
     m_fHeliRotorSpeed = 0.0f;
     m_fPlaneRotorSpeed = 0.0f;
@@ -2707,7 +2708,8 @@ void CClientVehicle::Create()
         m_pVehicle->SetAreaCode(m_ucInterior);
         m_pVehicle->SetSmokeTrailEnabled(m_bSmokeTrail);
         m_pVehicle->SetGravity(&m_vecGravity);
-        m_pVehicle->SetHeadLightColor(m_HeadLightColor);
+        m_pVehicle->SetHeadLightColor(m_headlightColors[0], HeadlightSide::Left);
+        m_pVehicle->SetHeadLightColor(m_headlightColors[1], HeadlightSide::Right);
         m_pVehicle->SetRadioStatus(0);
 
         if (IsNitroInstalled())
@@ -4116,12 +4118,14 @@ void CClientVehicle::SetGravity(const CVector& vecGravity)
     m_vecGravity = vecGravity;
 }
 
-SColor CClientVehicle::GetHeadLightColor()
+SColor CClientVehicle::GetHeadLightColor(HeadlightSide side)
 {
     if (m_pVehicle)
-        return m_pVehicle->GetHeadLightColor();
+        return m_pVehicle->GetHeadLightColor(side);
 
-    return m_HeadLightColor;
+    if (side == HeadlightSide::Right)
+        return m_headlightColors[1];
+    return m_headlightColors[0];
 }
 
 int CClientVehicle::GetCurrentGear()
@@ -4129,12 +4133,15 @@ int CClientVehicle::GetCurrentGear()
     return m_pVehicle ? m_pVehicle->GetCurrentGear() : 0;
 }
 
-void CClientVehicle::SetHeadLightColor(const SColor color)
+void CClientVehicle::SetHeadLightColor(const SColor color, HeadlightSide side)
 {
     if (m_pVehicle)
-        m_pVehicle->SetHeadLightColor(color);
+        m_pVehicle->SetHeadLightColor(color, side);
 
-    m_HeadLightColor = color;
+    if (side == HeadlightSide::Left || side == HeadlightSide::Both)
+        m_headlightColors[0] = color;
+    if (side == HeadlightSide::Right || side == HeadlightSide::Both)
+        m_headlightColors[1] = color;
 }
 
 //

@@ -1623,19 +1623,43 @@ bool CLuaVehicleDefs::IsVehicleBlown(CClientVehicle* vehicle)
 
 int CLuaVehicleDefs::GetVehicleHeadLightColor(lua_State* luaVM)
 {
-    CClientVehicle*  pVehicle = NULL;
+    CClientVehicle*  vehicle = nullptr;
+    SString          sideName;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pVehicle);
+    argStream.ReadUserData(vehicle);
+    argStream.ReadString(sideName, "");
 
     if (!argStream.HasErrors())
     {
-        SColor color;
-        if (CStaticFunctionDefinitions::GetVehicleHeadLightColor(*pVehicle, color))
+        if (sideName.CompareI("both"))
         {
-            lua_pushnumber(luaVM, color.R);
-            lua_pushnumber(luaVM, color.G);
-            lua_pushnumber(luaVM, color.B);
-            return 3;
+            SColor leftColor, rightColor;
+            if (CStaticFunctionDefinitions::GetVehicleHeadLightColor(*vehicle, leftColor, HeadlightSide::Left) &&
+                CStaticFunctionDefinitions::GetVehicleHeadLightColor(*vehicle, rightColor, HeadlightSide::Right))
+            {
+                lua_pushnumber(luaVM, leftColor.R);
+                lua_pushnumber(luaVM, leftColor.G);
+                lua_pushnumber(luaVM, leftColor.B);
+                lua_pushnumber(luaVM, rightColor.R);
+                lua_pushnumber(luaVM, rightColor.G);
+                lua_pushnumber(luaVM, rightColor.B);
+                return 6;
+            }
+        }
+        else
+        {
+            HeadlightSide side = HeadlightSide::Left;
+            if (sideName.CompareI("right") || sideName == "1")
+                side = HeadlightSide::Right;
+
+            SColor color;
+            if (CStaticFunctionDefinitions::GetVehicleHeadLightColor(*vehicle, color, side))
+            {
+                lua_pushnumber(luaVM, color.R);
+                lua_pushnumber(luaVM, color.G);
+                lua_pushnumber(luaVM, color.B);
+                return 3;
+            }
         }
     }
     else
@@ -2485,18 +2509,26 @@ int CLuaVehicleDefs::SetVehicleGravity(lua_State* luaVM)
 
 int CLuaVehicleDefs::SetVehicleHeadLightColor(lua_State* luaVM)
 {
-    CClientEntity*   pEntity = NULL;
+    CClientEntity*   entity = nullptr;
     SColor           color;
+    SString          sideName;
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
+    argStream.ReadUserData(entity);
     argStream.ReadNumber(color.R);
     argStream.ReadNumber(color.G);
     argStream.ReadNumber(color.B);
+    argStream.ReadString(sideName, "both");
     color.A = 255;
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetVehicleHeadLightColor(*pEntity, color))
+        HeadlightSide side = HeadlightSide::Both;
+        if (sideName.CompareI("left") || sideName == "0")
+            side = HeadlightSide::Left;
+        else if (sideName.CompareI("right") || sideName == "1")
+            side = HeadlightSide::Right;
+
+        if (CStaticFunctionDefinitions::SetVehicleHeadLightColor(*entity, color, side))
         {
             lua_pushboolean(luaVM, true);
             return 1;
