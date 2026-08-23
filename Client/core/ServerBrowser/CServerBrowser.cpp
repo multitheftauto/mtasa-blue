@@ -2146,8 +2146,10 @@ bool CServerBrowser::LoadServerList(CXMLNode* pNode, const std::string& strTagNa
                     if (!CServerListItem::IsHostName(strHost.c_str()))
                         continue;
 
-                    // Hostname failed to resolve, keep the entry anyway so it isn't dropped from the config on the next save
-                    Address.S_un.S_addr = 0;
+                    // Hostname failed to resolve, fall back to the last known address so the entry isn't dropped from the config
+                    CXMLAttribute* pIpAttribute = pSubNode->GetAttributes().Find("ip");
+                    if (!pIpAttribute || !CServerListItem::Parse(pIpAttribute->GetValue().c_str(), Address))
+                        Address.S_un.S_addr = 0;
                 }
 
                 CServerListItem* pItem = pList->AddUnique(Address, static_cast<ushort>(iPort));
@@ -2236,6 +2238,12 @@ bool CServerBrowser::SaveServerList(CXMLNode* pNode, const std::string& strTagNa
 
             CXMLAttribute* pPortAttribute = pSubNode->GetAttributes().Create("port");
             pPortAttribute->SetValue(pServer->usGamePort);
+
+            if (!pServer->strHostName.empty() && pServer->Address.S_un.S_addr != 0)
+            {
+                CXMLAttribute* pIpAttribute = pSubNode->GetAttributes().Create("ip");
+                pIpAttribute->SetValue(pServer->strHost.c_str());
+            }
         }
         ++iProcessed;
     }
