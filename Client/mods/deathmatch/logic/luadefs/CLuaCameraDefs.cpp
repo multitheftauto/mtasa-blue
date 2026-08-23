@@ -436,7 +436,7 @@ bool CLuaCameraDefs::SetCameraViewMode(std::optional<unsigned char> ucVehicleVie
 
 // Offsets for the vehicle follow camera, see CMultiplayer::SetVehicleCameraViewOffset
 static constexpr unsigned char VEHICLE_VIEW_MODE_COUNT = 6;  // see eVehicleCamMode
-static constexpr float MAX_VEHICLE_VIEW_OFFSET = 20.0f;
+static constexpr float         MAX_VEHICLE_VIEW_OFFSET = 20.0f;
 
 bool CLuaCameraDefs::SetCameraVehicleViewOffset(unsigned char ucViewMode, std::optional<float> fOffsetX, std::optional<float> fOffsetY,
                                                 std::optional<float> fOffsetZ)
