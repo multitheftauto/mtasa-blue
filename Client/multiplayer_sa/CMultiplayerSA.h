@@ -306,6 +306,10 @@ public:
     bool IsCustomCameraRotationEnabled();
     void SetCustomCameraRotationEnabled(bool bEnabled);
 
+    bool SetVehicleCameraViewOffset(unsigned char ucViewMode, const CVector& vecOffset) override;
+    bool GetVehicleCameraViewOffset(unsigned char ucViewMode, CVector& vecOffset) override;
+    void ResetVehicleCameraViewOffsets() override;
+
     void SetDebugVars(float f1, float f2, float f3);
 
     CVector& GetAkimboTarget() { return m_vecAkimboTarget; };
