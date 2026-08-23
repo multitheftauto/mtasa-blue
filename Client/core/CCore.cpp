@@ -2007,6 +2007,19 @@ void CCore::OnDeviceRestore()
     m_uiNextRenderTargetRetryTime = 0;
 }
 
+void CCore::OnPreWaterRender()
+{
+    if (!CGraphics::GetSingleton().HasLine3DPreWaterQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPreWaterQueueItems())
+        return;
+
+    CGraphics::GetSingleton().EnteringMTARenderZone();
+
+    CGraphics::GetSingleton().DrawLine3DPreWaterQueue();
+    CGraphics::GetSingleton().DrawPrimitive3DPreWaterQueue();
+
+    CGraphics::GetSingleton().LeavingMTARenderZone();
+}
+
 //
 // OnPreFxRender
 //

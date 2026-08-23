@@ -93,15 +93,19 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     auto line3DPreGUI = std::make_unique<CLine3DBatcher>(true);
     auto line3DPostFX = std::make_unique<CLine3DBatcher>(true);
     auto line3DPostGUI = std::make_unique<CLine3DBatcher>(false);
+    auto line3DPreWater = std::make_unique<CLine3DBatcher>(true);
     auto materialLinePreGUI = std::make_unique<CMaterialLine3DBatcher>(true);
     auto materialLinePostFX = std::make_unique<CMaterialLine3DBatcher>(true);
     auto materialLinePostGUI = std::make_unique<CMaterialLine3DBatcher>(false);
+    auto materialLinePreWater = std::make_unique<CMaterialLine3DBatcher>(true);
     auto primitive3DPreGUI = std::make_unique<CPrimitive3DBatcher>(true);
     auto primitive3DPostFX = std::make_unique<CPrimitive3DBatcher>(true);
     auto primitive3DPostGUI = std::make_unique<CPrimitive3DBatcher>(false);
+    auto primitive3DPreWater = std::make_unique<CPrimitive3DBatcher>(true);
     auto materialPrimitivePreGUI = std::make_unique<CMaterialPrimitive3DBatcher>(true, this);
     auto materialPrimitivePostFX = std::make_unique<CMaterialPrimitive3DBatcher>(true, this);
     auto materialPrimitivePostGUI = std::make_unique<CMaterialPrimitive3DBatcher>(false, this);
+    auto materialPrimitivePreWater = std::make_unique<CMaterialPrimitive3DBatcher>(true, this);
     auto primitiveBatcher = std::make_unique<CPrimitiveBatcher>();
     auto primitiveMaterialBatcher = std::make_unique<CPrimitiveMaterialBatcher>(this);
     auto screenGrabber = std::unique_ptr<CScreenGrabberInterface>(NewScreenGrabber());
@@ -113,15 +117,19 @@ CGraphics::CGraphics(CLocalGUI* pGUI)
     m_pLine3DBatcherPreGUI = line3DPreGUI.release();
     m_pLine3DBatcherPostFX = line3DPostFX.release();
     m_pLine3DBatcherPostGUI = line3DPostGUI.release();
+    m_pLine3DBatcherPreWater = line3DPreWater.release();
     m_pMaterialLine3DBatcherPreGUI = materialLinePreGUI.release();
     m_pMaterialLine3DBatcherPostFX = materialLinePostFX.release();
     m_pMaterialLine3DBatcherPostGUI = materialLinePostGUI.release();
+    m_pMaterialLine3DBatcherPreWater = materialLinePreWater.release();
     m_pPrimitive3DBatcherPreGUI = primitive3DPreGUI.release();
     m_pPrimitive3DBatcherPostFX = primitive3DPostFX.release();
     m_pPrimitive3DBatcherPostGUI = primitive3DPostGUI.release();
+    m_pPrimitive3DBatcherPreWater = primitive3DPreWater.release();
     m_pMaterialPrimitive3DBatcherPreGUI = materialPrimitivePreGUI.release();
     m_pMaterialPrimitive3DBatcherPostFX = materialPrimitivePostFX.release();
     m_pMaterialPrimitive3DBatcherPostGUI = materialPrimitivePostGUI.release();
+    m_pMaterialPrimitive3DBatcherPreWater = materialPrimitivePreWater.release();
     m_pPrimitiveBatcher = primitiveBatcher.release();
     m_pPrimitiveMaterialBatcher = primitiveMaterialBatcher.release();
     m_pScreenGrabber = screenGrabber.release();
@@ -172,17 +180,21 @@ CGraphics::~CGraphics()
     SAFE_DELETE(m_pLine3DBatcherPreGUI);
     SAFE_DELETE(m_pLine3DBatcherPostFX);
     SAFE_DELETE(m_pLine3DBatcherPostGUI);
+    SAFE_DELETE(m_pLine3DBatcherPreWater);
     SAFE_DELETE(m_pMaterialLine3DBatcherPreGUI);
     SAFE_DELETE(m_pMaterialLine3DBatcherPostFX);
     SAFE_DELETE(m_pMaterialLine3DBatcherPostGUI);
+    SAFE_DELETE(m_pMaterialLine3DBatcherPreWater);
     SAFE_DELETE(m_pPrimitiveBatcher);
     SAFE_DELETE(m_pPrimitiveMaterialBatcher);
     SAFE_DELETE(m_pPrimitive3DBatcherPreGUI);
     SAFE_DELETE(m_pPrimitive3DBatcherPostFX);
     SAFE_DELETE(m_pPrimitive3DBatcherPostGUI);
+    SAFE_DELETE(m_pPrimitive3DBatcherPreWater);
     SAFE_DELETE(m_pMaterialPrimitive3DBatcherPreGUI);
     SAFE_DELETE(m_pMaterialPrimitive3DBatcherPostFX);
     SAFE_DELETE(m_pMaterialPrimitive3DBatcherPostGUI);
+    SAFE_DELETE(m_pMaterialPrimitive3DBatcherPreWater);
     SAFE_DELETE(m_pScreenGrabber);
     SAFE_DELETE(m_pPixelsManager);
     SAFE_DELETE(m_pAspectRatioConverter);
@@ -942,6 +954,8 @@ void CGraphics::DrawLine3DQueued(const CVector& vecBegin, const CVector& vecEnd,
         m_pLine3DBatcherPostGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor);
     else if (stage == eRenderStage::PRE_FX)
         m_pLine3DBatcherPreGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor);
+    else if (stage == eRenderStage::PRE_WATER)
+        m_pLine3DBatcherPreWater->AddLine3D(vecBegin, vecEnd, fWidth, ulColor);
     else
         m_pLine3DBatcherPostFX->AddLine3D(vecBegin, vecEnd, fWidth, ulColor);
 }
@@ -966,6 +980,9 @@ void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector&
     else if (stage == eRenderStage::PRE_FX)
         m_pMaterialLine3DBatcherPreGUI->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
                                                   vecFaceToward);
+    else if (stage == eRenderStage::PRE_WATER)
+        m_pMaterialLine3DBatcherPreWater->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
+                                                    vecFaceToward);
     else
         m_pMaterialLine3DBatcherPostFX->AddLine3D(vecBegin, vecEnd, fWidth, ulColor, pMaterial, fU, fV, fSizeU, fSizeV, bRelativeUV, bFlipUV, bUseFaceToward,
                                                   vecFaceToward);
@@ -1059,6 +1076,8 @@ void CGraphics::DrawPrimitive3DQueued(std::vector<PrimitiveVertice>* pVecVertice
         m_pPrimitive3DBatcherPostGUI->AddPrimitive(eType, pVecVertices);
     else if (stage == eRenderStage::PRE_FX)
         m_pPrimitive3DBatcherPreGUI->AddPrimitive(eType, pVecVertices);
+    else if (stage == eRenderStage::PRE_WATER)
+        m_pPrimitive3DBatcherPreWater->AddPrimitive(eType, pVecVertices);
     else
         m_pPrimitive3DBatcherPostFX->AddPrimitive(eType, pVecVertices);
 }
@@ -1084,6 +1103,8 @@ void CGraphics::DrawMaterialPrimitive3DQueued(std::vector<PrimitiveMaterialVerti
         m_pMaterialPrimitive3DBatcherPostGUI->AddPrimitive(eType, pMaterial, pVecVertices);
     else if (stage == eRenderStage::PRE_FX)
         m_pMaterialPrimitive3DBatcherPreGUI->AddPrimitive(eType, pMaterial, pVecVertices);
+    else if (stage == eRenderStage::PRE_WATER)
+        m_pMaterialPrimitive3DBatcherPreWater->AddPrimitive(eType, pMaterial, pVecVertices);
     else
         m_pMaterialPrimitive3DBatcherPostFX->AddPrimitive(eType, pMaterial, pVecVertices);
 }
@@ -1680,17 +1701,21 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
     m_pLine3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pLine3DBatcherPostFX->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pLine3DBatcherPreWater->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPostFX->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialLine3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pMaterialLine3DBatcherPreWater->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitiveBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitiveMaterialBatcher->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitive3DBatcherPostFX->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pPrimitive3DBatcherPreWater->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialPrimitive3DBatcherPreGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialPrimitive3DBatcherPostFX->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pMaterialPrimitive3DBatcherPostGUI->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
+    m_pMaterialPrimitive3DBatcherPreWater->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pRenderItemManager->OnDeviceCreate(pDevice, GetViewportWidth(), GetViewportHeight());
     m_pScreenGrabber->OnDeviceCreate(pDevice);
     m_pPixelsManager->OnDeviceCreate(pDevice);
@@ -1805,10 +1830,22 @@ void CGraphics::DrawLine3DPostFXQueue(void)
     m_pMaterialLine3DBatcherPostFX->Flush();
 }
 
+void CGraphics::DrawLine3DPreWaterQueue()
+{
+    m_pLine3DBatcherPreWater->Flush();
+    m_pMaterialLine3DBatcherPreWater->Flush();
+}
+
 void CGraphics::DrawPrimitive3DPreGUIQueue(void)
 {
     m_pPrimitive3DBatcherPreGUI->Flush();
     m_pMaterialPrimitive3DBatcherPreGUI->Flush();
+}
+
+void CGraphics::DrawPrimitive3DPreWaterQueue()
+{
+    m_pPrimitive3DBatcherPreWater->Flush();
+    m_pMaterialPrimitive3DBatcherPreWater->Flush();
 }
 
 bool CGraphics::HasLine3DPreGUIQueueItems(void)
@@ -1819,6 +1856,11 @@ bool CGraphics::HasLine3DPreGUIQueueItems(void)
 bool CGraphics::HasLine3DPostFXQueueItems()
 {
     return m_pLine3DBatcherPostFX->HasItems() || m_pMaterialLine3DBatcherPostFX->HasItems();
+}
+
+bool CGraphics::HasLine3DPreWaterQueueItems()
+{
+    return m_pLine3DBatcherPreWater->HasItems() || m_pMaterialLine3DBatcherPreWater->HasItems();
 }
 
 void CGraphics::DrawPrimitive3DPostFXQueue(void)
@@ -1835,6 +1877,11 @@ bool CGraphics::HasPrimitive3DPreGUIQueueItems(void)
 bool CGraphics::HasPrimitive3DPostFXQueueItems()
 {
     return m_pMaterialPrimitive3DBatcherPostFX->HasItems() || m_pPrimitive3DBatcherPostFX->HasItems();
+}
+
+bool CGraphics::HasPrimitive3DPreWaterQueueItems()
+{
+    return m_pMaterialPrimitive3DBatcherPreWater->HasItems() || m_pPrimitive3DBatcherPreWater->HasItems();
 }
 
 void CGraphics::DrawQueue(std::vector<sDrawQueueItem>& Queue)

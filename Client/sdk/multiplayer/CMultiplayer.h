@@ -102,6 +102,7 @@ typedef void(PreWorldProcessHandler)();
 typedef void(PostWorldProcessHandler)();
 typedef void(PostWorldProcessPedsAfterPreRenderHandler)();
 typedef void(IdleHandler)();
+typedef void(PreWaterRenderHandler)();
 typedef void(PreFxRenderHandler)();
 typedef void(PostColorFilterRenderHandler)();
 typedef void(PreHudRenderHandler)();
@@ -233,6 +234,7 @@ public:
     virtual void  SetPreWorldProcessHandler(PreWorldProcessHandler* pHandler) = 0;
     virtual void  SetPostWorldProcessHandler(PostWorldProcessHandler* pHandler) = 0;
     virtual void  SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler) = 0;
+    virtual void  SetPreWaterRenderHandler(PreWaterRenderHandler* pHandler) = 0;
     virtual void  SetIdleHandler(IdleHandler* pHandler) = 0;
     virtual void  SetPreFxRenderHandler(PreFxRenderHandler* pHandler) = 0;
     virtual void  SetPostColorFilterRenderHandler(PostColorFilterRenderHandler* pHandler) = 0;

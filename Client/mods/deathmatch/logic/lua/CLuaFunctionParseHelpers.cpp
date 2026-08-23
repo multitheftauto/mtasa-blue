@@ -860,6 +860,7 @@ IMPLEMENT_ENUM_CLASS_BEGIN(eRenderStage)
 ADD_ENUM(eRenderStage::PRE_FX, "prefx")
 ADD_ENUM(eRenderStage::POST_FX, "postfx")
 ADD_ENUM(eRenderStage::POST_GUI, "postgui")
+ADD_ENUM(eRenderStage::PRE_WATER, "prewater")
 IMPLEMENT_ENUM_CLASS_END("render-stage")
 
 IMPLEMENT_ENUM_BEGIN(ePools)

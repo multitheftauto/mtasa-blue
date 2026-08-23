@@ -94,7 +94,8 @@ enum class eRenderStage
 {
     PRE_FX,
     POST_FX,
-    POST_GUI
+    POST_GUI,
+    PRE_WATER,
 };
 
 class CGraphicsInterface
