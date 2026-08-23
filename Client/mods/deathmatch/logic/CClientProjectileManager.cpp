@@ -55,6 +55,95 @@ void CClientProjectileManager::DoPulse()
             pProjectile->DoPulse();
         }
     }
+
+    ProcessPendingCreations();
+}
+
+void CClientProjectileManager::QueuePendingCreation(ElementID creatorID, eWeaponType eWeapon, const CVector& vecOrigin, float fForce, ElementID targetID,
+                                                    ElementID originSourceID, const CVector& vecRotation, const CVector& vecVelocity, unsigned short usModel,
+                                                    bool bHasAttachOffset, const CVector& vecAttachOffsetPosition, const CVector& vecAttachOffsetRotation)
+{
+    SPendingProjectileCreation pending;
+    pending.creatorID = creatorID;
+    pending.weaponType = eWeapon;
+    pending.vecOrigin = vecOrigin;
+    pending.fForce = fForce;
+    pending.targetID = targetID;
+    pending.originSourceID = originSourceID;
+    pending.vecRotation = vecRotation;
+    pending.vecVelocity = vecVelocity;
+    pending.usModel = usModel;
+    pending.bHasAttachOffset = bHasAttachOffset;
+    pending.vecAttachOffsetPosition = vecAttachOffsetPosition;
+    pending.vecAttachOffsetRotation = vecAttachOffsetRotation;
+    pending.llCreationTime = GetTickCount64_();
+    m_PendingCreations.push_back(pending);
+}
+
+void CClientProjectileManager::SettleResyncedSatchel(CClientProjectile* pProjectile, eWeaponType weaponType, float fForce, const CVector& vecVelocity,
+                                                     CClientEntity* pOriginSource, const CVector& vecAttachOffsetPosition,
+                                                     const CVector& vecAttachOffsetRotation)
+{
+    // A live throw always has some non-zero force/velocity - zero on both is only ever seen on a satchel resync
+    // packet (CGame::Packet_ProjectileRestPosition), which deliberately zeroes them once the satchel has settled.
+    if (weaponType != WEAPONTYPE_REMOTE_SATCHEL_CHARGE || fForce != 0.0f || vecVelocity != CVector())
+        return;
+
+    pProjectile->SetStaticUntilCollisionLoaded();
+
+    if (pOriginSource)
+        pProjectile->AttachSatchelToEntity(pOriginSource, vecAttachOffsetPosition, vecAttachOffsetRotation);
+}
+
+void CClientProjectileManager::ProcessPendingCreations()
+{
+    if (m_PendingCreations.empty())
+        return;
+
+    // Generous timeout: the creator's ped/vehicle just needs to come within the game's own streaming distance,
+    // which can take a while if whoever it belongs to is approaching on foot from the edge of sync range.
+    constexpr long long PENDING_CREATION_TIMEOUT = 60000;
+    const long long     llNow = GetTickCount64_();
+
+    for (auto iter = m_PendingCreations.begin(); iter != m_PendingCreations.end();)
+    {
+        SPendingProjectileCreation& pending = *iter;
+
+        bool           bResolved = false;
+        CClientEntity* pCreator = CElementIDs::GetElement(pending.creatorID);
+        if (pCreator)
+        {
+            if (pCreator->GetType() == CCLIENTPED || pCreator->GetType() == CCLIENTPLAYER)
+            {
+                CClientVehicle* pVehicle = static_cast<CClientPed*>(pCreator)->GetOccupiedVehicle();
+                if (pVehicle)
+                    pCreator = pVehicle;
+            }
+
+            CClientEntity* pTargetEntity = NULL;
+            if (pending.targetID != INVALID_ELEMENT_ID)
+                pTargetEntity = CElementIDs::GetElement(pending.targetID);
+
+            CClientProjectile* pProjectile = Create(pCreator, pending.weaponType, pending.vecOrigin, pending.fForce, NULL, pTargetEntity);
+            if (pProjectile)
+            {
+                pProjectile->Initiate(pending.vecOrigin, pending.vecRotation, pending.vecVelocity, pending.usModel);
+
+                CClientEntity* pOriginSource = NULL;
+                if (pending.originSourceID != INVALID_ELEMENT_ID)
+                    pOriginSource = CElementIDs::GetElement(pending.originSourceID);
+                SettleResyncedSatchel(pProjectile, pending.weaponType, pending.fForce, pending.vecVelocity, pOriginSource, pending.vecAttachOffsetPosition,
+                                      pending.vecAttachOffsetRotation);
+
+                bResolved = true;
+            }
+        }
+
+        if (bResolved || (llNow - pending.llCreationTime) > PENDING_CREATION_TIMEOUT)
+            iter = m_PendingCreations.erase(iter);
+        else
+            ++iter;
+    }
 }
 
 void CClientProjectileManager::RemoveAll()
