@@ -178,7 +178,8 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     int luaStackPointer = lua_gettop(pState);
 #endif
 
-                    TIMEUS startTime = GetTimeUs();
+                    const bool   timingActive = CClientPerfStatLuaTiming::GetSingleton()->IsActive();
+                    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
                     // Aspect ratio adjustment bodges
                     if (pMapEvent->ShouldAllowAspectRatioAdjustment())
@@ -279,13 +280,16 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                         g_bAllowAspectRatioAdjustment = false;
                     }
 
-                    TIMEUS deltaTimeUs = GetTimeUs() - startTime;
+                    if (timingActive)
+                    {
+                        TIMEUS deltaTimeUs = GetTimeUs() - startTime;
 
-                    if (deltaTimeUs > 3000)
-                        if (IS_TIMING_CHECKPOINTS())
-                            strStatus += SString(" (%s %d ms)", luaMain->GetScriptName(), deltaTimeUs / 1000);
+                        if (deltaTimeUs > 3000)
+                            if (IS_TIMING_CHECKPOINTS())
+                                strStatus += SString(" (%s %d ms)", luaMain->GetScriptName(), deltaTimeUs / 1000);
 
-                    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(luaMain, szName, deltaTimeUs);
+                        CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(luaMain, szName, deltaTimeUs);
+                    }
                 }
             }
         }
