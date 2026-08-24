@@ -817,11 +817,11 @@ void CPlayerMap::InternalSetPlayerMapEnabled(bool enable)
 
         // Keep mouse cursor hidden by default (toggleable via Mouse 3)
         g_pCore->ForceCursorVisible(false, false);
-        cursorEnabled = false;
-        isDragging = false;
+        m_cursorEnabled = false;
+        m_isDragging = false;
 
         // Restore player's persistent zoom level
-        m_fZoom = savedZoomLevel;
+        m_fZoom = m_savedZoomLevel;
         m_bIsAttachedToLocal = true;
         SetupMapVariables();
     }
@@ -836,8 +836,8 @@ void CPlayerMap::InternalSetPlayerMapEnabled(bool enable)
         g_pGame->GetPad()->Disable(false);
 
         g_pCore->ForceCursorVisible(false, false);
-        isDragging = false;
-        cursorEnabled = false;
+        m_isDragging = false;
+        m_cursorEnabled = false;
     }
 }
 
@@ -1195,7 +1195,7 @@ void CPlayerMap::ToggleWaypoint(float worldX, float worldY)
 
     if (!m_waypointMarker)
     {
-        m_waypointMarker = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, 0, 99999);
+        m_waypointMarker = new CClientRadarMarker(m_pManager, INVALID_ELEMENT_ID, 0, 0);
         m_waypointMarker->SetSprite(41);
         m_waypointMarker->SetScale(2);
         m_waypointMarker->SetColor(SColorRGBA(235, 45, 45, 230));
