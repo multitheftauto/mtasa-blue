@@ -30,6 +30,7 @@
 #include "CExplosionManagerSA.h"
 #include "CFileLoaderSA.h"
 #include "CFireManagerSA.h"
+#include "CFontSA.h"
 #include "CFxSA.h"
 #include "CFxSystemSA.h"
 #include "CGameSA.h"
@@ -248,6 +249,8 @@ CGameSA::CGameSA()
         CCheckpointSA::StaticSetHooks();
         CHudSA::StaticSetHooks();
         CFireSA::StaticSetHooks();
+        CFontSA::StaticSetHooks();
+        CRadarSA::StaticSetHooks();
         CPtrNodeSingleLinkPoolSA::StaticSetHooks();
         CVehicleAudioSettingsManagerSA::StaticSetHooks();
         CPointLightsSA::StaticSetHooks();

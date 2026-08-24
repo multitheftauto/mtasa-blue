@@ -37,6 +37,7 @@
 #include "game/CClock.h"
 #include <game/CProjectileInfo.h>
 #include <game/CVehicleAudioSettingsManager.h>
+#include <game/CRadar.h>
 #include <windowsx.h>
 #include "CServerInfo.h"
 #include "CClientPed.h"
@@ -277,6 +278,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetDrawRadarAreasHandler(CClientGame::StaticDrawRadarAreasHandler);
     g_pMultiplayer->SetDamageHandler(CClientGame::StaticDamageHandler);
     g_pMultiplayer->SetDeathHandler(CClientGame::StaticDeathHandler);
+
     g_pMultiplayer->SetFireHandler(CClientGame::StaticFireHandler);
     g_pMultiplayer->SetProjectileStopHandler(CClientProjectileManager::Hook_StaticProjectileAllow);
     g_pMultiplayer->SetProjectileHandler(CClientProjectileManager::Hook_StaticProjectileCreation);
@@ -1572,6 +1574,9 @@ void CClientGame::HandleRadioNext(CControlFunctionBind*)
 {
     if (g_pClientGame)
     {
+        if (g_pClientGame->m_pPlayerMap && g_pClientGame->m_pPlayerMap->IsPlayerMapShowing())
+            return;
+
         CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer();
         if (pPlayer)
         {
@@ -1584,6 +1589,9 @@ void CClientGame::HandleRadioPrevious(CControlFunctionBind*)
 {
     if (g_pClientGame)
     {
+        if (g_pClientGame->m_pPlayerMap && g_pClientGame->m_pPlayerMap->IsPlayerMapShowing())
+            return;
+
         CClientPlayer* pPlayer = g_pClientGame->m_pPlayerManager->GetLocalPlayer();
         if (pPlayer)
         {
@@ -1591,6 +1599,7 @@ void CClientGame::HandleRadioPrevious(CControlFunctionBind*)
         }
     }
 }
+
 bool CClientGame::IsNametagValid(const char* szNick)
 {
     // Grab the size of the nametag. Check that it's not to long or short
@@ -5101,6 +5110,11 @@ bool CClientGame::StaticProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPAR
 
 bool CClientGame::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    if (m_pPlayerMap && m_pPlayerMap->ProcessMessage(hwnd, uMsg, wParam, lParam))
+    {
+        return true;
+    }
+
     if (ProcessMessageForCursorEvents(hwnd, uMsg, wParam, lParam))
     {
         return true;
