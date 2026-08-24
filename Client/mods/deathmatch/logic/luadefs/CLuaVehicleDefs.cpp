@@ -1290,7 +1290,13 @@ int CLuaVehicleDefs::GetVehicleName(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        const char* szVehicleName = CVehicleNames::GetVehicleName(pVehicle->GetModel());
+        unsigned short model = pVehicle->GetModel();
+        CModelInfo*    modelInfo = g_pGame->GetModelInfo(model);
+
+        if (modelInfo && modelInfo->GetParentID() != 0)
+            model = modelInfo->GetParentID();
+
+        const char* szVehicleName = CVehicleNames::GetVehicleName(model);
         if (szVehicleName)
         {
             lua_pushstring(luaVM, szVehicleName);
@@ -4404,15 +4410,10 @@ bool CLuaVehicleDefs::SpawnVehicleFlyingComponent(CClientVehicle* const vehicle,
 bool CLuaVehicleDefs::AddVehicleSirens(CClientVehicle* vehicle, std::uint8_t sirenType, std::uint8_t sirenCount, std::optional<bool> enable360,
                                        std::optional<bool> enableLOSCheck, std::optional<bool> enableRandomiser, std::optional<bool> enableSilent) noexcept
 {
-    eClientVehicleType vehicleType = vehicle->GetVehicleType();
-
-    if (vehicleType != CLIENTVEHICLE_CAR && vehicleType != CLIENTVEHICLE_MONSTERTRUCK && vehicleType != CLIENTVEHICLE_QUADBIKE)
-        return false;
-
     if (sirenType < 1 || sirenType > 6)
         return false;
 
-    if (sirenCount < 0 || sirenCount > SIREN_COUNT_MAX)
+    if (sirenCount > SIREN_COUNT_MAX)
         return false;
 
     vehicle->GiveVehicleSirens(sirenType, sirenCount);
