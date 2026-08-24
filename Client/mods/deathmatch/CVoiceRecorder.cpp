@@ -131,7 +131,7 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
     if (m_pSpeexEncoderState)
     {
         speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexOutgoingFrameSampleCount);
-        int iQuality = m_ucQuality;
+        int iQuality = static_cast<int>(m_ucQuality);
         speex_encoder_ctl(m_pSpeexEncoderState, SPEEX_SET_QUALITY, &iQuality);
         iBitRate = (int)uiBitrate;
         if (iBitRate)

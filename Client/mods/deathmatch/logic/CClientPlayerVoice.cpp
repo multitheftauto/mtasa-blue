@@ -73,9 +73,8 @@ void CALLBACK BASS_VoiceStateChange(HSYNC handle, DWORD channel, DWORD data, voi
 
 void CClientPlayerVoice::Init()
 {
-    // Grab our sample rate and quality
+    // Grab our sample rate
     m_SampleRate = m_pVoiceRecorder->GetSampleRate();
-    unsigned char ucQuality = m_pVoiceRecorder->GetSampleQuality();
 
     // Setup our BASS playback device
     m_pBassPlaybackStream = BASS_StreamCreate(m_SampleRate / VOICE_SAMPLE_SIZE, 2, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL);
@@ -103,7 +102,7 @@ void CClientPlayerVoice::Init()
     {
         // Initialize our speex decoder
         speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexIncomingFrameSampleCount);
-        int iQuality = ucQuality;
+        int iQuality = static_cast<int>(m_pVoiceRecorder->GetSampleQuality());
         speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_SET_QUALITY, &iQuality);
     }
 }
