@@ -171,5 +171,6 @@ public:
     virtual CGUIWindow* LoadLayout(CGUIElement* pParent, const SString& strFilename) = 0;
     virtual bool        LoadImageset(const SString& strFilename) = 0;
 
-    virtual void Cleanup() = 0;
+    virtual void         Cleanup() = 0;
+    virtual CGUIElement* GetScriptRoot() = 0;
 };
