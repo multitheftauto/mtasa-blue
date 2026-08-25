@@ -1595,8 +1595,7 @@ CGUIElement* CGUI_Impl::ResolveRedrawHandle(std::uint32_t handle) const
 
 CGUIButton* CGUI_Impl::CreateButton(CGUIElement* pParent, const char* szCaption)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateButton(wnd, szCaption);
+    return _CreateButton(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption);
 }
 
 CGUIButton* CGUI_Impl::CreateButton(CGUITab* pParent, const char* szCaption)
@@ -1607,8 +1606,7 @@ CGUIButton* CGUI_Impl::CreateButton(CGUITab* pParent, const char* szCaption)
 
 CGUICheckBox* CGUI_Impl::CreateCheckBox(CGUIElement* pParent, const char* szCaption, bool bChecked)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateCheckBox(wnd, szCaption, bChecked);
+    return _CreateCheckBox(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption, bChecked);
 }
 
 CGUICheckBox* CGUI_Impl::CreateCheckBox(CGUITab* pParent, const char* szCaption, bool bChecked)
@@ -1619,8 +1617,7 @@ CGUICheckBox* CGUI_Impl::CreateCheckBox(CGUITab* pParent, const char* szCaption,
 
 CGUIRadioButton* CGUI_Impl::CreateRadioButton(CGUIElement* pParent, const char* szCaption)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateRadioButton(wnd, szCaption);
+    return _CreateRadioButton(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption);
 }
 
 CGUIRadioButton* CGUI_Impl::CreateRadioButton(CGUITab* pParent, const char* szCaption)
@@ -1631,8 +1628,7 @@ CGUIRadioButton* CGUI_Impl::CreateRadioButton(CGUITab* pParent, const char* szCa
 
 CGUIEdit* CGUI_Impl::CreateEdit(CGUIElement* pParent, const char* szText)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateEdit(wnd, szText);
+    return _CreateEdit(dynamic_cast<CGUIElement_Impl*>(pParent), szText);
 }
 
 CGUIEdit* CGUI_Impl::CreateEdit(CGUITab* pParent, const char* szText)
@@ -1643,8 +1639,7 @@ CGUIEdit* CGUI_Impl::CreateEdit(CGUITab* pParent, const char* szText)
 
 CGUIGridList* CGUI_Impl::CreateGridList(CGUIElement* pParent, bool bFrame)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateGridList(wnd, bFrame);
+    return _CreateGridList(dynamic_cast<CGUIElement_Impl*>(pParent), bFrame);
 }
 
 CGUIGridList* CGUI_Impl::CreateGridList(CGUITab* pParent, bool bFrame)
@@ -1655,8 +1650,7 @@ CGUIGridList* CGUI_Impl::CreateGridList(CGUITab* pParent, bool bFrame)
 
 CGUILabel* CGUI_Impl::CreateLabel(CGUIElement* pParent, const char* szCaption)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateLabel(wnd, szCaption);
+    return _CreateLabel(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption);
 }
 
 CGUILabel* CGUI_Impl::CreateLabel(CGUITab* pParent, const char* szCaption)
@@ -1672,8 +1666,7 @@ CGUILabel* CGUI_Impl::CreateLabel(const char* szCaption)
 
 CGUIProgressBar* CGUI_Impl::CreateProgressBar(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateProgressBar(wnd);
+    return _CreateProgressBar(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIProgressBar* CGUI_Impl::CreateProgressBar(CGUITab* pParent)
@@ -1684,8 +1677,7 @@ CGUIProgressBar* CGUI_Impl::CreateProgressBar(CGUITab* pParent)
 
 CGUIMemo* CGUI_Impl::CreateMemo(CGUIElement* pParent, const char* szText)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateMemo(wnd, szText);
+    return _CreateMemo(dynamic_cast<CGUIElement_Impl*>(pParent), szText);
 }
 
 CGUIMemo* CGUI_Impl::CreateMemo(CGUITab* pParent, const char* szText)
@@ -1696,8 +1688,7 @@ CGUIMemo* CGUI_Impl::CreateMemo(CGUITab* pParent, const char* szText)
 
 CGUIStaticImage* CGUI_Impl::CreateStaticImage(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateStaticImage(wnd);
+    return _CreateStaticImage(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIStaticImage* CGUI_Impl::CreateStaticImage(CGUITab* pParent)
@@ -1719,8 +1710,7 @@ CGUIStaticImage* CGUI_Impl::CreateStaticImage()
 
 CGUITabPanel* CGUI_Impl::CreateTabPanel(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateTabPanel(wnd);
+    return _CreateTabPanel(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUITabPanel* CGUI_Impl::CreateTabPanel(CGUITab* pParent)
@@ -1741,8 +1731,7 @@ CGUIScrollPane* CGUI_Impl::CreateScrollPane()
 
 CGUIScrollPane* CGUI_Impl::CreateScrollPane(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateScrollPane(wnd);
+    return _CreateScrollPane(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIScrollPane* CGUI_Impl::CreateScrollPane(CGUITab* pParent)
@@ -1753,8 +1742,7 @@ CGUIScrollPane* CGUI_Impl::CreateScrollPane(CGUITab* pParent)
 
 CGUIScrollBar* CGUI_Impl::CreateScrollBar(bool bHorizontal, CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateScrollBar(bHorizontal, wnd);
+    return _CreateScrollBar(bHorizontal, dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIScrollBar* CGUI_Impl::CreateScrollBar(bool bHorizontal, CGUITab* pParent)
@@ -1765,8 +1753,7 @@ CGUIScrollBar* CGUI_Impl::CreateScrollBar(bool bHorizontal, CGUITab* pParent)
 
 CGUIComboBox* CGUI_Impl::CreateComboBox(CGUIElement* pParent, const char* szCaption)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateComboBox(wnd, szCaption);
+    return _CreateComboBox(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption);
 }
 
 CGUIComboBox* CGUI_Impl::CreateComboBox(CGUIComboBox* pParent, const char* szCaption)
@@ -1777,8 +1764,7 @@ CGUIComboBox* CGUI_Impl::CreateComboBox(CGUIComboBox* pParent, const char* szCap
 
 CGUIWebBrowser* CGUI_Impl::CreateWebBrowser(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateWebBrowser(wnd);
+    return _CreateWebBrowser(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIWebBrowser* CGUI_Impl::CreateWebBrowser(CGUITab* pParent)
