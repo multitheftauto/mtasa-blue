@@ -18,12 +18,6 @@ class CGUIElement;
 #include <string>
 #include "CGUITypes.h"
 
-// Forward declaration
-namespace CEGUI
-{
-    class EventArgs;
-}
-
 enum eCGUIType
 {
     CGUI_BUTTON,
@@ -136,7 +130,7 @@ public:
     virtual void SetKeyDownHandler(const GUI_CALLBACK_KEY& Callback) = 0;
     virtual void SetEnterKeyHandler(GUI_CALLBACK Callback) = 0;
 
-    virtual bool Event_OnClick(const CEGUI::EventArgs& e) = 0;
+    virtual bool Event_OnClick(const CGUIMouseEventArgs& args) = 0;
     virtual bool Event_OnDoubleClick() = 0;
     virtual bool Event_OnMouseEnter() = 0;
     virtual bool Event_OnMouseLeave() = 0;

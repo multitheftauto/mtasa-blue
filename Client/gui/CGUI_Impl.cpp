@@ -1136,23 +1136,23 @@ bool CGUI_Impl::Event_MouseClick(const CEGUI::EventArgs& Args)
     // get the CGUIElement
     CGUIElement* pElement = reinterpret_cast<CGUIElement*>(wnd->getUserData());
 
+    CGUIMouseEventArgs mouseArgs;
+
+    // copy the variables
+    mouseArgs.button = static_cast<CGUIMouse::MouseButton>(e.button);
+    mouseArgs.moveDelta = CVector2D(e.moveDelta.d_x, e.moveDelta.d_y);
+    mouseArgs.position = CGUIPosition(e.position.d_x, e.position.d_y);
+    mouseArgs.sysKeys = e.sysKeys;
+    mouseArgs.wheelChange = e.wheelChange;
+    mouseArgs.pWindow = pElement;
+
     // Call global and object handlers
     if (pElement)
-        pElement->Event_OnClick(Args);
+        pElement->Event_OnClick(mouseArgs);
 
     if (m_MouseClickHandlers[m_Channel])
     {
-        CGUIMouseEventArgs NewArgs;
-
-        // copy the variables
-        NewArgs.button = static_cast<CGUIMouse::MouseButton>(e.button);
-        NewArgs.moveDelta = CVector2D(e.moveDelta.d_x, e.moveDelta.d_y);
-        NewArgs.position = CGUIPosition(e.position.d_x, e.position.d_y);
-        NewArgs.sysKeys = e.sysKeys;
-        NewArgs.wheelChange = e.wheelChange;
-        NewArgs.pWindow = pElement;
-
-        m_MouseClickHandlers[m_Channel](NewArgs);
+        m_MouseClickHandlers[m_Channel](mouseArgs);
     }
     return true;
 }
