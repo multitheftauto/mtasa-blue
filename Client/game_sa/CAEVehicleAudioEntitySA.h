@@ -62,6 +62,10 @@ public:
         return ((int16_t(__thiscall*)(CAEVehicleAudioEntitySAInterface*, CVehicleSAInterface*))0x4F7670)(this, vehicle);
     }
 
+    // vehicleParams is tVehicleParams&, a struct built on CAEVehicleAudioEntity::ProcessVehicle's own
+    // stack that MTA has no layout for; it is only ever forwarded here from that same stack frame.
+    void ProcessVehicleSirenAlarmHorn(void* vehicleParams) { ((void(__thiscall*)(CAEVehicleAudioEntitySAInterface*, void*))0x5002C0)(this, vehicleParams); }
+
     short                  unk1;                            // +124
     char                   unk2[2];                         // +126
     tVehicleAudioSettings  m_nSettings;                     // +128
