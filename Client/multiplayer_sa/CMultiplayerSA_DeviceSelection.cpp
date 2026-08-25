@@ -40,6 +40,8 @@ INT_PTR CALLBACK CustomDlgProc(HWND window, UINT msg, WPARAM wParam, LPARAM lPar
 //
 // Query friendly monitor display names from active display paths via Windows CCD APIs.
 // Dynamically imported to ensure backwards compatibility across all Windows versions.
+// Inspired by / based on SilentPatch:
+// https://github.com/CookiePLMonster/SilentPatch/blob/dev/SilentPatch/FriendlyMonitorNames.cpp
 //
 std::unordered_map<std::string, std::string> GetFriendlyMonitorNamesForDevicePaths()
 {
@@ -316,8 +318,12 @@ static INT_PTR WINAPI DialogBoxParamA_New(HINSTANCE instanceHandle, LPCSTR templ
         setThreadDpiAwarenessContext = reinterpret_cast<SetThreadDpiAwarenessContextFn>(GetProcAddress(user32Module, "SetThreadDpiAwarenessContext"));
         if (setThreadDpiAwarenessContext)
         {
-            // DPI_AWARENESS_CONTEXT_UNAWARE (-1) allows DWM to scale dialog bitmap proportions cleanly on High-DPI screens
-            previousDpiContext = setThreadDpiAwarenessContext(-1);
+            // DPI_AWARENESS_CONTEXT_PER_MONITOR_AWARE_V2 (-4) renders controls and fonts natively at exact monitor DPI without DWM bitmap blur
+            previousDpiContext = setThreadDpiAwarenessContext(-4);
+            if (!previousDpiContext)
+            {
+                previousDpiContext = setThreadDpiAwarenessContext(-2);
+            }
         }
     }
 
