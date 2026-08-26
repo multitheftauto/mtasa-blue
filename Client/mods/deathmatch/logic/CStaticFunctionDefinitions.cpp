@@ -165,8 +165,8 @@ bool CStaticFunctionDefinitions::TriggerEvent(const char* szName, CClientEntity&
     if (m_pEvents->Exists(szName))
     {
         // Call the event
-        Entity.CallEvent(szName, Arguments, true);
-        bWasCancelled = m_pEvents->WasEventCancelled();
+        bool bSuccess = Entity.CallEvent(szName, Arguments, true);
+        bWasCancelled = m_pEvents->WasEventCancelled() || !bSuccess;
         return true;
     }
 
