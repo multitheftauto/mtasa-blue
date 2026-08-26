@@ -746,7 +746,7 @@ bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments
     CDebugHookManager* debugHookManager = g_pClientGame->GetDebugHookManager();
     if (debugHookManager->HasPreEventHooks())
     {
-        if (!debugHookManager->OnPreEvent(szName, Arguments, this, NULL))
+        if (!debugHookManager->OnPreEvent(szName, Arguments, this, nullptr))
             return false;
     }
 
@@ -777,7 +777,7 @@ bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments
     }
 
     if (debugHookManager->HasPostEventHooks())
-        debugHookManager->OnPostEvent(szName, Arguments, this, NULL);
+        debugHookManager->OnPostEvent(szName, Arguments, this, nullptr);
 
     // Return whether it got cancelled or not
     return (!pEvents->WasEventCancelled());
