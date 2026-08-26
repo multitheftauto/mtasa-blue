@@ -86,8 +86,9 @@ struct RwTexture;
 #define FUNC_CAutomobile__GetDoorAngleOpenRatio 0x6A2270
 #define FUNC_CTrain__GetDoorAngleOpenRatio      0x6F59C0
 
-#define HANDLING_NOS_Flag        0x00080000
-#define HANDLING_Hydraulics_Flag 0x00020000
+#define HANDLING_NOS_Flag             0x00080000
+#define HANDLING_Hydraulics_Flag      0x00020000
+#define HANDLING_SwingingChassis_Flag 0x10000000
 
 #define VAR_CVehicle_Variation1 0x8A6458
 #define VAR_CVehicle_Variation2 0x8A6459
@@ -655,18 +656,32 @@ public:
 
     void GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount);
     void RemoveVehicleSirens() { m_tSirenInfo.m_bOverrideSirens = false; }
-    void SetVehicleSirenMinimumAlpha(unsigned char ucSirenCount, DWORD dwPercentage)
+    void SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD dwPercentage)
     {
-        m_tSirenInfo.m_tSirenInfo[ucSirenCount].m_dwMinSirenAlpha = dwPercentage;
+        if (ucSirenID >= SIREN_COUNT_MAX)
+            return;
+        m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
     }
-    void               SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos);
-    void               GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos);
-    unsigned char      GetVehicleSirenCount() { return m_tSirenInfo.m_ucSirenCount; }
-    unsigned char      GetVehicleSirenType() { return m_tSirenInfo.m_ucSirenType; }
-    DWORD              GetVehicleSirenMinimumAlpha(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha; }
-    SharedUtil::SColor GetVehicleSirenColour(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour; }
-    void               SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour)
+    void          SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos);
+    void          GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos);
+    unsigned char GetVehicleSirenCount() { return m_tSirenInfo.m_ucSirenCount; }
+    unsigned char GetVehicleSirenType() { return m_tSirenInfo.m_ucSirenType; }
+    DWORD         GetVehicleSirenMinimumAlpha(unsigned char ucSirenID)
     {
+        if (ucSirenID >= SIREN_COUNT_MAX)
+            return 0;
+        return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha;
+    }
+    SharedUtil::SColor GetVehicleSirenColour(unsigned char ucSirenID)
+    {
+        if (ucSirenID >= SIREN_COUNT_MAX)
+            return SharedUtil::SColor();
+        return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour;
+    }
+    void SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour)
+    {
+        if (ucSirenID >= SIREN_COUNT_MAX)
+            return;
         m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
     }
     void                              SetVehicleCurrentSirenID(unsigned char ucCurrentSirenID) { m_tSirenInfo.m_ucCurrentSirenID = ucCurrentSirenID; }
@@ -721,6 +736,7 @@ private:
     static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies dummy, const CVector& position);
 
     void           RecalculateSuspensionLines();
+    void           RecalculateSwingingChassis();
     void           CopyGlobalSuspensionLinesToPrivate();
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);
     void           FinalizeFramesList();

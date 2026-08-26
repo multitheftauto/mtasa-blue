@@ -651,9 +651,11 @@ bool CCore::IsCursorForcedVisible()
 
 void CCore::ApplyConsoleSettings()
 {
-    CVector2D vec;
     CConsole* pConsole = m_pLocalGUI->GetConsole();
+    if (!pConsole) [[unlikely]]
+        return;
 
+    CVector2D vec;
     CVARS_GET("console_pos", vec);
     pConsole->SetPosition(vec);
     CVARS_GET("console_size", vec);
@@ -698,8 +700,8 @@ void CCore::ApplyGameSettings()
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     pController->SetVerticalAimSensitivitySameAsHorizontal(CVARS_GET_VALUE<bool>("use_mouse_sensitivity_for_aiming"));
     CVARS_GET("mastervolume", fVal);
-    pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
-    pGameSettings->SetSFXVolume(pGameSettings->GetSFXVolume() * fVal);
+    pGameSettings->SetRadioVolume(CVARS_GET_VALUE<float>("radiovolume") * fVal * 64.0f);
+    pGameSettings->SetSFXVolume(CVARS_GET_VALUE<float>("sfxvolume") * fVal * 64.0f);
 }
 
 void CCore::SetConnected(bool bConnected)
@@ -1914,7 +1916,6 @@ void CCore::OnPostColorFilterRender()
 
 void CCore::ApplyCoreInitSettings()
 {
-#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN)
     bool aware = CVARS_GET_VALUE<bool>("process_dpi_aware");
 
     // The minimum supported client for the function below is Windows Vista (Longhorn).
@@ -1922,7 +1923,6 @@ void CCore::ApplyCoreInitSettings()
     // https://learn.microsoft.com/en-us/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows
     if (aware)
         SetProcessDPIAware();
-#endif
 
     int revision = GetApplicationSettingInt("reset-settings-revision");
 

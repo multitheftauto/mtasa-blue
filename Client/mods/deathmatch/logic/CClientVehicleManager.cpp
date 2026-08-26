@@ -664,24 +664,35 @@ bool CClientVehicleManager::HasTaxiLight(unsigned long ulModel)
     return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_TAXI_LIGHTS));
 }
 
+// The attribute table only covers the standard models, so a custom model has to be looked up
+// under the model it was cloned from.
+static bool HasVehicleAttribute(unsigned long ulModel, unsigned long ulAttribute)
+{
+    // Use parent model ID for non-standard vehicle model IDs.
+    if ((ulModel < 400 || ulModel > 611) && CClientVehicleManager::IsValidModel(ulModel))
+        ulModel = g_pGame->GetModelInfo(ulModel)->GetParentID();
+
+    return (CClientVehicleManager::IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & ulAttribute));
+}
+
 bool CClientVehicleManager::HasSearchLight(unsigned long ulModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SEARCH_LIGHT));
+    return HasVehicleAttribute(ulModel, VEHICLE_HAS_SEARCH_LIGHT);
 }
 
 bool CClientVehicleManager::HasLandingGears(unsigned long ulModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_LANDING_GEARS));
+    return HasVehicleAttribute(ulModel, VEHICLE_HAS_LANDING_GEARS);
 }
 
 bool CClientVehicleManager::HasAdjustableProperty(unsigned long ulModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_ADJUSTABLE_PROPERTY));
+    return HasVehicleAttribute(ulModel, VEHICLE_HAS_ADJUSTABLE_PROPERTY);
 }
 
 bool CClientVehicleManager::HasSmokeTrail(unsigned long ulModel)
 {
-    return (IsStandardModel(ulModel) && (g_ulVehicleAttributes[ulModel - 400] & VEHICLE_HAS_SMOKE_TRAIL));
+    return HasVehicleAttribute(ulModel, VEHICLE_HAS_SMOKE_TRAIL);
 }
 
 bool CClientVehicleManager::HasDamageModel(unsigned long ulModel)
@@ -711,6 +722,14 @@ bool CClientVehicleManager::HasDoors(unsigned long ulModel)
 
     if (HasDamageModel(ulModel) == true)
     {
+        // Custom models allocated via engineRequestModel inherit properties from their parent model.
+        if (!IsStandardModel(ulModel) && IsValidModel(ulModel))
+        {
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel);
+            if (pModelInfo && pModelInfo->GetParentID() != 0)
+                ulModel = pModelInfo->GetParentID();
+        }
+
         switch (static_cast<VehicleType>(ulModel))
         {
             case VehicleType::VT_BFINJECT:
@@ -824,7 +843,10 @@ void CClientVehicleManager::ResetNotControlledRotors(bool engineAutoStart)
     eEntityStatus status = engineAutoStart ? eEntityStatus::STATUS_ABANDONED : eEntityStatus::STATUS_PHYSICS;
     for (auto& pVehicle : m_List)
     {
-        if (pVehicle->GetGameEntity() && pVehicle->GetVehicleRotorState() && !pVehicle->IsDriven())
+        // Blown aircraft should stay out of the unattended rotor workaround. For
+        // engine autostart off, putting wrecks into STATUS_PHYSICS lets later
+        // contacts keep producing detached components and explosion effects.
+        if (pVehicle->GetGameEntity() && pVehicle->GetVehicleRotorState() && !pVehicle->IsDriven() && !pVehicle->IsBlown())
         {
             float speed = (!engineAutoStart && pVehicle->IsEngineOn()) ? 0.001f : 0.0f;
             pVehicle->GetGameEntity()->SetEntityStatus(status);

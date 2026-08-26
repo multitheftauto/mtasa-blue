@@ -17,6 +17,7 @@
 #include "CModelInfoSA.h"
 #include "CPedModelInfoSA.h"
 #include "CPedSA.h"
+#include "CPoolsSA.h"
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
 
@@ -1859,14 +1860,18 @@ void CModelInfoSA::MakePedModel(const char* szTexture)
 
 void CModelInfoSA::MakeObjectModel(ushort usBaseID)
 {
-    CBaseModelInfoSAInterface* m_pInterface = new CBaseModelInfoSAInterface();
+    // Allocate at least a CClumpModelInfoSAInterface: the base model's vtable (copied below) may be a
+    // CClumpModelInfo-derived one (e.g. weapons), whose GetAnimFileIndex() reads m_nAnimFileIndex at
+    // offset sizeof(CBaseModelInfoSAInterface). Allocating only the base size would make that an
+    // out-of-bounds read/write.
+    CClumpModelInfoSAInterface* m_pInterface = new CClumpModelInfoSAInterface();
 
     CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];
-    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CBaseModelInfoSAInterface));
+    MemCpyFast(m_pInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
     m_pInterface->usUnknown = 65535;
-    m_pInterface->usDynamicIndex = 65535;
+    m_pInterface->m_nAnimFileIndex = 0xFFFFFFFF;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
 
@@ -1883,7 +1888,6 @@ void CModelInfoSA::MakeObjectDamageableModel(std::uint16_t baseModel)
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
     m_pInterface->usUnknown = 65535;
-    m_pInterface->usDynamicIndex = 65535;
     m_pInterface->m_damagedAtomic = nullptr;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
@@ -1901,7 +1905,6 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
     m_pInterface->usUnknown = 65535;
-    m_pInterface->usDynamicIndex = 65535;
     m_pInterface->timeInfo.m_wOtherTimeModel = -1;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
@@ -1918,7 +1921,6 @@ void CModelInfoSA::MakeClumpModel(ushort usBaseID)
     pNewInterface->usNumberOfRefs = 0;
     pNewInterface->pRwObject = nullptr;
     pNewInterface->usUnknown = 65535;
-    pNewInterface->usDynamicIndex = 65535;
 
     ppModelInfo[m_dwModelID] = pNewInterface;
 
@@ -1962,6 +1964,9 @@ void CModelInfoSA::DeallocateModel(void)
     switch (GetModelType())
     {
         case eModelInfoType::VEHICLE:
+            // Stop detached car parts referencing this model (they keep their source vehicle's
+            // model index for repainting, and would dereference the freed model info)
+            static_cast<CPoolsSA*>(pGame->GetPools())->ResetDetachedCarPartsRefModel(static_cast<std::uint16_t>(m_dwModelID));
             delete reinterpret_cast<CVehicleModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         case eModelInfoType::PED:

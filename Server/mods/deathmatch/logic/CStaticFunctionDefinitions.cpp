@@ -625,9 +625,15 @@ bool CStaticFunctionDefinitions::GetElementAlpha(CElement* pElement, unsigned ch
             break;
         }
         case CElement::OBJECT:
+        case CElement::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             ucAlpha = pObject->GetAlpha();
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            ucAlpha = static_cast<CBuilding*>(pElement)->GetAlpha();
             break;
         }
         case CElement::MARKER:
@@ -770,6 +776,7 @@ bool CStaticFunctionDefinitions::GetElementCollisionsEnabled(CElement* pElement)
             return pVehicle->GetCollisionEnabled();
         }
         case CElement::OBJECT:
+        case CElement::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             return pObject->GetCollisionEnabled();
@@ -811,6 +818,7 @@ bool CStaticFunctionDefinitions::IsElementFrozen(CElement* pElement, bool& bFroz
             break;
         }
         case CElement::OBJECT:
+        case CElement::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             bFrozen = pObject->IsFrozen();
@@ -1507,6 +1515,34 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
     {
         pElement->SetInterior(ucInterior);
 
+        // Re-evaluate marker/pickup collisions after interior changes
+        switch (pElement->GetType())
+        {
+            case CElement::PLAYER:
+            case CElement::PED:
+            case CElement::VEHICLE:
+                m_pColManager->DoHitDetection(pElement->GetPosition(), pElement);
+                break;
+            case CElement::MARKER:
+            {
+                CMarker*   pMarker = static_cast<CMarker*>(pElement);
+                CColShape* pColShape = pMarker->GetColShape();
+                if (pColShape)
+                    RefreshColShapeColliders(pColShape);
+                break;
+            }
+            case CElement::PICKUP:
+            {
+                CPickup*   pPickup = static_cast<CPickup*>(pElement);
+                CColShape* pColShape = pPickup->GetColShape();
+                if (pColShape)
+                    RefreshColShapeColliders(pColShape);
+                break;
+            }
+            default:
+                break;
+        }
+
         // Tell everyone
         CBitStream BitStream;
         BitStream.pBitStream->Write(ucInterior);
@@ -1730,9 +1766,15 @@ bool CStaticFunctionDefinitions::SetElementAlpha(CElement* pElement, unsigned ch
             break;
         }
         case CElement::OBJECT:
+        case CElement::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->SetAlpha(ucAlpha);
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            static_cast<CBuilding*>(pElement)->SetAlpha(ucAlpha);
             break;
         }
         case CElement::MARKER:
@@ -2042,6 +2084,7 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CElement* pElement,
             break;
         }
         case CElement::OBJECT:
+        case CElement::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->SetCollisionEnabled(bEnable);
@@ -2091,6 +2134,7 @@ bool CStaticFunctionDefinitions::SetElementFrozen(CElement* pElement, bool bFroz
             break;
         }
         case CElement::OBJECT:
+        case CElement::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->SetFrozen(bFrozen);
@@ -3353,6 +3397,8 @@ bool CStaticFunctionDefinitions::TakePlayerScreenShot(CElement* pElement, uint u
         BitStream.pBitStream->Write(GetTickCount32());
         pPlayer->Send(CLuaPacket(TAKE_PLAYER_SCREEN_SHOT, *BitStream.pBitStream));
 
+        pPlayer->GetScreenShotInfo().bRequested = true;
+
         return true;
     }
 
@@ -4312,7 +4358,7 @@ bool CStaticFunctionDefinitions::SetPedWeaponSlot(CElement* pElement, unsigned c
     return false;
 }
 
-bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat)
+bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat, CResource* pCallingResource)
 {
     assert(pPed);
     assert(pVehicle);
@@ -4366,12 +4412,24 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
                     if (uiSeat == 0 && g_pGame->IsWorldSpecialPropertyEnabled(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART))
                         pVehicle->SetEngineOn(true);
 
-                    // Tell all the players
-                    CBitStream BitStream;
-                    BitStream.pBitStream->Write(pVehicle->GetID());
-                    BitStream.pBitStream->Write(static_cast<unsigned char>(uiSeat));
-                    BitStream.pBitStream->Write(pPed->GenerateSyncTimeContext());
-                    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream));
+                    // Tell all the players. If the calling resource's elements haven't reached the clients yet
+                    // (e.g. called from onResourceStart on a vehicle created in the same event), hold off until
+                    // they have instead of just dropping it - the vehicle itself isn't synced to clients yet
+                    // either, and an RPC referencing an unknown element there would leave the server and clients
+                    // permanently disagreeing about whether this ped is in a vehicle.
+                    auto sendWarpRpc = [pPed, pVehicle, uiSeat]()
+                    {
+                        CBitStream BitStream;
+                        BitStream.pBitStream->Write(pVehicle->GetID());
+                        BitStream.pBitStream->Write(static_cast<unsigned char>(uiSeat));
+                        BitStream.pBitStream->Write(pPed->GenerateSyncTimeContext());
+                        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream));
+                    };
+
+                    if (pCallingResource)
+                        pCallingResource->RunOrDeferUntilClientSynced(sendWarpRpc);
+                    else
+                        sendWarpRpc();
 
                     // Call the player->vehicle event
                     CLuaArguments PlayerVehicleArguments;
@@ -5181,8 +5239,7 @@ bool CStaticFunctionDefinitions::GiveVehicleSirens(CVehicle* pVehicle, unsigned 
 {
     assert(pVehicle);
     eVehicleType vehicleType = CVehicleManager::GetVehicleType(pVehicle->GetModel());
-    // Won't work with below.
-    if (vehicleType != VEHICLE_CAR && vehicleType != VEHICLE_MONSTERTRUCK && vehicleType != VEHICLE_QUADBIKE)
+    if (vehicleType == VEHICLE_NONE)
         return false;
 
     if (ucSirenType < 1 || ucSirenType > 6)
@@ -5220,9 +5277,7 @@ bool CStaticFunctionDefinitions::SetVehicleSirens(CVehicle* pVehicle, unsigned c
 {
     assert(pVehicle);
     eVehicleType vehicleType = CVehicleManager::GetVehicleType(pVehicle->GetModel());
-    // Won't work with below.
-    if (vehicleType != VEHICLE_PLANE && vehicleType != VEHICLE_BOAT && vehicleType != VEHICLE_TRAILER && vehicleType != VEHICLE_HELI &&
-        vehicleType != VEHICLE_BIKE && vehicleType != VEHICLE_BMX)
+    if (vehicleType != VEHICLE_NONE)
     {
         if (ucSirenID <= SIREN_ID_MAX)
         {
@@ -7918,6 +7973,10 @@ CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CV
                 pMarker->AddVisibleToReference(pVisibleTo);
             }
 
+            CColShape* pColShape = pMarker->GetColShape();
+            if (pColShape)
+                RefreshColShapeColliders(pColShape);
+
             // Tell everyone about it
             if (pResource->IsClientSynced())
                 pMarker->Sync(true);
@@ -10156,6 +10215,13 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(CCustomWeapon* pWeapon, eWeap
         if (eProperty == WEAPON_WEAPON_RANGE)
         {
             pWeapon->GetWeaponStat()->SetWeaponRange(fData);
+
+            // Sync the range to the clients so their per-shot acceptance cap
+            // stays in line with the server's. Both ends reject shots beyond
+            // this range, so they must use the same value.
+            CBitStream BitStream;
+            BitStream.pBitStream->Write(fData);
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pWeapon, SET_CUSTOM_WEAPON_WEAPON_RANGE, *BitStream.pBitStream));
             return true;
         }
     }
@@ -10413,7 +10479,7 @@ bool CStaticFunctionDefinitions::SetWeaponOwner(CCustomWeapon* pWeapon, CPlayer*
 
 bool CStaticFunctionDefinitions::GetBodyPartName(unsigned char ucID, char* szName)
 {
-    if (ucID <= 59)
+    if (ucID < 10)
     {
         // Grab the name and check it's length
         const char* szNamePointer = CPlayer::GetBodyPartName(ucID);

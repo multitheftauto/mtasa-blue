@@ -62,6 +62,8 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
       m_pSchemeManager(nullptr),
       m_pWindowManager(nullptr),
       m_pTop(nullptr),
+      m_ScriptTop(nullptr),
+      m_ScriptRoot(nullptr),
       m_pCursor(nullptr),
       m_pDefaultFont(nullptr),
       m_pSmallFont(nullptr),
@@ -120,7 +122,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
         m_pUniFont = (CGUIFont_Impl*)CreateFnt("unifont", CGUI_MTA_SUBSTITUTE_FONT, 9, 0, false);
         m_pFontManager->setSubstituteFont(m_pUniFont->GetFont());
     }
-    catch (CEGUI::InvalidRequestException e)
+    catch (const CEGUI::Exception& e)
     {
         SString strMessage = e.getMessage().c_str();
         BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading fonts!\n\n%s", *strMessage));
@@ -138,7 +140,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
         m_pSAGothicFont = (CGUIFont_Impl*)CreateFnt("sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, true);
         m_pSansFont = (CGUIFont_Impl*)CreateFnt("sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, false);
     }
-    catch (CEGUI::InvalidRequestException e)
+    catch (const CEGUI::Exception& e)
     {
         SString strMessage = e.getMessage().c_str();
         BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading fonts!\n\n%s", *strMessage));
@@ -147,6 +149,12 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
 
 CGUI_Impl::~CGUI_Impl()
 {
+    if (m_ScriptRoot)
+    {
+        delete m_ScriptRoot;
+        m_ScriptRoot = nullptr;
+    }
+
     // Clean up font objects to prevent memory leaks
     delete m_pUniFont;
     delete m_pDefaultFont;
@@ -170,6 +178,16 @@ void CGUI_Impl::CreateRootWindow()
     // Create dummy GUI root
     m_pTop = reinterpret_cast<CEGUI::DefaultWindow*>(m_pWindowManager->createWindow("DefaultWindow", "guiroot"));
     m_pSystem->setGUISheet(m_pTop);
+
+    // Create a dedicated script GUI root container to isolate script elements from MTA Core UI (Main Menu & Console).
+    // This ensures script AlwaysOnTop elements can never render above system UI while preserving AlwaysOnTop among script elements.
+    m_ScriptTop = reinterpret_cast<CEGUI::DefaultWindow*>(m_pWindowManager->createWindow("DefaultWindow", "guiroot_script"));
+    m_ScriptTop->setRect(CEGUI::Relative, CEGUI::Rect(0.0f, 0.0f, 1.0f, 1.0f));
+    m_ScriptTop->setMousePassThroughEnabled(true);
+    m_ScriptTop->setDestroyedByParent(false);
+    m_pTop->addChildWindow(m_ScriptTop);
+
+    m_ScriptRoot = new CGUIDefaultWindow_Impl(this, m_ScriptTop);
 }
 
 void CGUI_Impl::SetSkin(const char* szName)
@@ -277,7 +295,15 @@ void CGUI_Impl::Draw()
 
 void CGUI_Impl::Invalidate()
 {
-    reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->preD3DReset();
+    try
+    {
+        reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->preD3DReset();
+    }
+    catch (const CEGUI::Exception& exception)
+    {
+        MessageBox(0, exception.getMessage().c_str(), "CEGUI Exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
+        TerminateProcess(GetCurrentProcess(), 1);
+    }
 }
 
 void CGUI_Impl::Restore()
@@ -286,7 +312,7 @@ void CGUI_Impl::Restore()
     {
         reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->postD3DReset();
     }
-    catch (CEGUI::RendererException& exception)
+    catch (const CEGUI::Exception& exception)
     {
         MessageBox(0, exception.getMessage().c_str(), "CEGUI Exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
         TerminateProcess(GetCurrentProcess(), 1);
@@ -353,24 +379,24 @@ bool CGUI_Impl::GetGUIInputEnabled()
         {
             if (m_pTop)
             {
-                CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
-                if (!pActiveWindow || pActiveWindow == m_pTop || !pActiveWindow->isVisible())
+                CEGUI::Window* activeWindow = m_pTop->getActiveChild();
+                if (!activeWindow || activeWindow == m_pTop || activeWindow == m_ScriptTop || !activeWindow->isVisible())
                 {
                     return false;
                 }
-                if (pActiveWindow->getType() == "CGUI/Editbox")
+                if (activeWindow->getType() == "CGUI/Editbox")
                 {
-                    CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(pActiveWindow);
+                    CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(activeWindow);
                     return (!pEditBox->isReadOnly() && pEditBox->hasInputFocus());
                 }
-                else if (pActiveWindow->getType() == "CGUI/MultiLineEditbox")
+                else if (activeWindow->getType() == "CGUI/MultiLineEditbox")
                 {
-                    CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(pActiveWindow);
+                    CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(activeWindow);
                     return (!pMultiLineEditBox->isReadOnly() && pMultiLineEditBox->hasInputFocus());
                 }
-                else if (pActiveWindow->getType() == CGUIWEBBROWSER_NAME)
+                else if (activeWindow->getType() == CGUIWEBBROWSER_NAME)
                 {
-                    auto pElement = reinterpret_cast<CGUIElement_Impl*>(pActiveWindow->getUserData());
+                    auto pElement = reinterpret_cast<CGUIElement_Impl*>(activeWindow->getUserData());
                     if (pElement->GetType() == CGUI_WEBBROWSER)
                     {
                         auto pWebBrowser = reinterpret_cast<CGUIWebBrowser_Impl*>(pElement);
@@ -1179,18 +1205,18 @@ bool CGUI_Impl::Event_MouseButtonDown(const CEGUI::EventArgs& Args)
     CGUIElement* pElement = reinterpret_cast<CGUIElement*>(wnd->getUserData());
 
     // Call global and object handlers
-    if (pElement)
+    if (pElement && pElement != m_ScriptRoot)
         pElement->Event_OnMouseButtonDown();
     else
     {
         if (m_pTop)
         {
-            // If there's no element, we're probably dealing with the root element
-            CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
-            if (m_pTop == wnd && pActiveWindow)
+            // If there's no element (or root element), we're probably dealing with the root background
+            CEGUI::Window* activeWindow = m_pTop->getActiveChild();
+            if ((m_pTop == wnd || m_ScriptTop == wnd) && activeWindow)
             {
                 // Deactivate active window to trigger onClientGUIBlur
-                pActiveWindow->deactivate();
+                activeWindow->deactivate();
             }
         }
     }
@@ -1569,8 +1595,7 @@ CGUIElement* CGUI_Impl::ResolveRedrawHandle(std::uint32_t handle) const
 
 CGUIButton* CGUI_Impl::CreateButton(CGUIElement* pParent, const char* szCaption)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateButton(wnd, szCaption);
+    return _CreateButton(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption);
 }
 
 CGUIButton* CGUI_Impl::CreateButton(CGUITab* pParent, const char* szCaption)
@@ -1581,8 +1606,7 @@ CGUIButton* CGUI_Impl::CreateButton(CGUITab* pParent, const char* szCaption)
 
 CGUICheckBox* CGUI_Impl::CreateCheckBox(CGUIElement* pParent, const char* szCaption, bool bChecked)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateCheckBox(wnd, szCaption, bChecked);
+    return _CreateCheckBox(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption, bChecked);
 }
 
 CGUICheckBox* CGUI_Impl::CreateCheckBox(CGUITab* pParent, const char* szCaption, bool bChecked)
@@ -1593,8 +1617,7 @@ CGUICheckBox* CGUI_Impl::CreateCheckBox(CGUITab* pParent, const char* szCaption,
 
 CGUIRadioButton* CGUI_Impl::CreateRadioButton(CGUIElement* pParent, const char* szCaption)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateRadioButton(wnd, szCaption);
+    return _CreateRadioButton(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption);
 }
 
 CGUIRadioButton* CGUI_Impl::CreateRadioButton(CGUITab* pParent, const char* szCaption)
@@ -1605,8 +1628,7 @@ CGUIRadioButton* CGUI_Impl::CreateRadioButton(CGUITab* pParent, const char* szCa
 
 CGUIEdit* CGUI_Impl::CreateEdit(CGUIElement* pParent, const char* szText)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateEdit(wnd, szText);
+    return _CreateEdit(dynamic_cast<CGUIElement_Impl*>(pParent), szText);
 }
 
 CGUIEdit* CGUI_Impl::CreateEdit(CGUITab* pParent, const char* szText)
@@ -1617,8 +1639,7 @@ CGUIEdit* CGUI_Impl::CreateEdit(CGUITab* pParent, const char* szText)
 
 CGUIGridList* CGUI_Impl::CreateGridList(CGUIElement* pParent, bool bFrame)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateGridList(wnd, bFrame);
+    return _CreateGridList(dynamic_cast<CGUIElement_Impl*>(pParent), bFrame);
 }
 
 CGUIGridList* CGUI_Impl::CreateGridList(CGUITab* pParent, bool bFrame)
@@ -1629,8 +1650,7 @@ CGUIGridList* CGUI_Impl::CreateGridList(CGUITab* pParent, bool bFrame)
 
 CGUILabel* CGUI_Impl::CreateLabel(CGUIElement* pParent, const char* szCaption)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateLabel(wnd, szCaption);
+    return _CreateLabel(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption);
 }
 
 CGUILabel* CGUI_Impl::CreateLabel(CGUITab* pParent, const char* szCaption)
@@ -1646,8 +1666,7 @@ CGUILabel* CGUI_Impl::CreateLabel(const char* szCaption)
 
 CGUIProgressBar* CGUI_Impl::CreateProgressBar(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateProgressBar(wnd);
+    return _CreateProgressBar(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIProgressBar* CGUI_Impl::CreateProgressBar(CGUITab* pParent)
@@ -1658,8 +1677,7 @@ CGUIProgressBar* CGUI_Impl::CreateProgressBar(CGUITab* pParent)
 
 CGUIMemo* CGUI_Impl::CreateMemo(CGUIElement* pParent, const char* szText)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateMemo(wnd, szText);
+    return _CreateMemo(dynamic_cast<CGUIElement_Impl*>(pParent), szText);
 }
 
 CGUIMemo* CGUI_Impl::CreateMemo(CGUITab* pParent, const char* szText)
@@ -1670,8 +1688,7 @@ CGUIMemo* CGUI_Impl::CreateMemo(CGUITab* pParent, const char* szText)
 
 CGUIStaticImage* CGUI_Impl::CreateStaticImage(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateStaticImage(wnd);
+    return _CreateStaticImage(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIStaticImage* CGUI_Impl::CreateStaticImage(CGUITab* pParent)
@@ -1693,8 +1710,7 @@ CGUIStaticImage* CGUI_Impl::CreateStaticImage()
 
 CGUITabPanel* CGUI_Impl::CreateTabPanel(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateTabPanel(wnd);
+    return _CreateTabPanel(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUITabPanel* CGUI_Impl::CreateTabPanel(CGUITab* pParent)
@@ -1715,8 +1731,7 @@ CGUIScrollPane* CGUI_Impl::CreateScrollPane()
 
 CGUIScrollPane* CGUI_Impl::CreateScrollPane(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateScrollPane(wnd);
+    return _CreateScrollPane(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIScrollPane* CGUI_Impl::CreateScrollPane(CGUITab* pParent)
@@ -1727,8 +1742,7 @@ CGUIScrollPane* CGUI_Impl::CreateScrollPane(CGUITab* pParent)
 
 CGUIScrollBar* CGUI_Impl::CreateScrollBar(bool bHorizontal, CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateScrollBar(bHorizontal, wnd);
+    return _CreateScrollBar(bHorizontal, dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIScrollBar* CGUI_Impl::CreateScrollBar(bool bHorizontal, CGUITab* pParent)
@@ -1739,8 +1753,7 @@ CGUIScrollBar* CGUI_Impl::CreateScrollBar(bool bHorizontal, CGUITab* pParent)
 
 CGUIComboBox* CGUI_Impl::CreateComboBox(CGUIElement* pParent, const char* szCaption)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateComboBox(wnd, szCaption);
+    return _CreateComboBox(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption);
 }
 
 CGUIComboBox* CGUI_Impl::CreateComboBox(CGUIComboBox* pParent, const char* szCaption)
@@ -1751,8 +1764,7 @@ CGUIComboBox* CGUI_Impl::CreateComboBox(CGUIComboBox* pParent, const char* szCap
 
 CGUIWebBrowser* CGUI_Impl::CreateWebBrowser(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateWebBrowser(wnd);
+    return _CreateWebBrowser(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIWebBrowser* CGUI_Impl::CreateWebBrowser(CGUITab* pParent)
@@ -1831,6 +1843,13 @@ void CGUI_Impl::Cleanup()
     {
         CleanDeadPool();
 
+        if (m_ScriptRoot)
+        {
+            delete m_ScriptRoot;
+            m_ScriptRoot = nullptr;
+        }
+
+        m_ScriptTop = nullptr;
         m_pTop = nullptr;
 
         if (m_pWindowManager)
@@ -1846,11 +1865,13 @@ void CGUI_Impl::Cleanup()
     catch (const std::exception& e)
     {
         WriteDebugEvent(SString("CGUI_Impl::Cleanup - Exception: %s", e.what()));
+        m_ScriptTop = nullptr;
         m_pTop = nullptr;
     }
     catch (...)
     {
         WriteDebugEvent("CGUI_Impl::Cleanup() failed with unknown exception");
+        m_ScriptTop = nullptr;
         m_pTop = nullptr;
     }
 }

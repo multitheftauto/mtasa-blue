@@ -127,9 +127,6 @@ DWORD RETURN_UnoccupiedVehicleBurnCheck = 0x6A76E4;
 #define HOOKPOS_ApplyCarBlowHop 0x6B3816
 DWORD RETURN_ApplyCarBlowHop = 0x6B3831;
 
-#define HOOKPOS_CVehicle_ApplyBoatWaterResistance 0x6D2771
-DWORD RETURN_CVehicle_ApplyBoatWaterResistance = 0x6D2777;
-
 #define HOOKPOS_CPhysical_ApplyGravity 0x543081
 DWORD RETURN_CPhysical_ApplyGravity = 0x543093;
 
@@ -167,6 +164,12 @@ DWORD**       VAR_TagInfoArray = (DWORD**)0xA9A8C0;
 
 #define HOOKPOS_CPhysical_ProcessCollisionSectorList 0x54BB93
 DWORD RETURN_CPhysical_ProcessCollisionSectorList = 0x54BB9A;
+
+// CTaskSimpleClimb::ScanToGrabSectorList. Hooked right after its own collision check, so climb
+// and vault scans also skip entities excluded via setElementCollidableWith.
+#define HOOKPOS_CTaskSimpleClimb_ScanToGrabSectorList 0x67DF28
+DWORD RETURN_CTaskSimpleClimb_ScanToGrabSectorList = 0x67DF36;
+DWORD SKIP_CTaskSimpleClimb_ScanToGrabSectorList = 0x67E580;
 
 #define HOOKPOS_CheckAnimMatrix 0x7C5A5C
 DWORD RETURN_CheckAnimMatrix = 0x7C5A61;
@@ -287,8 +290,6 @@ DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli = FUNC_CAEVehicleAudioEntity__
 DWORD RETURN_CAEVEhicleAudioEntity__ProcessDummyProp = 0x4FDFAB;
 DWORD dwFUNC_CAEVehicleAudioEntity__ProcessAIProp = FUNC_CAEVehicleAudioEntity__ProcessAIProp;
 
-#define HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance 0x68A4EF
-DWORD       RETURN_CTaskSimpleSwim_ProcessSwimmingResistance = 0x68A50E;
 const DWORD HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA03;
 const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 
@@ -300,6 +301,8 @@ const DWORD RETURN_Idle_CWorld_ProcessPedsAfterPreRender = 0x53EA08;
 #define HOOKPOS_CWeapon__TakePhotograph 0x73C26E
 
 #define HOOKPOS_CCollision__CheckCameraCollisionObjects 0x41AB8E
+
+#define HOOKPOS_CMirrors__CreateBuffer 0x72701D
 
 CPed*         pContextSwitchedPed = 0;
 CVector       vecCenterOfWorld;
@@ -445,7 +448,6 @@ void HOOK_EndWorldColors();
 void HOOK_CWorld_ProcessVerticalLineSectorList();
 void HOOK_ComputeDamageResponse_StartChoking();
 void HOOK_CollisionStreamRead();
-void HOOK_CVehicle_ApplyBoatWaterResistance();
 void HOOK_CPhysical_ApplyGravity();
 void HOOK_VehicleCamStart();
 void HOOK_VehicleCamTargetZTweak();
@@ -474,6 +476,7 @@ void HOOK_CEventHandler_ComputeKnockOffBikeResponse();
 void HOOK_CPed_GetWeaponSkill();
 void HOOK_CPed_AddGogglesModel();
 void HOOK_CPhysical_ProcessCollisionSectorList();
+void HOOK_CTaskSimpleClimb_ScanToGrabSectorList();
 void HOOK_CrashFix_Misc1();
 void HOOK_CrashFix_Misc2();
 void HOOK_CrashFix_Misc4();
@@ -558,7 +561,6 @@ void HOOK_CAERadioTrackManager__ChooseMusicTrackIndex();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 
-void HOOK_CTaskSimpleSwim_ProcessSwimmingResistance();
 void HOOK_Idle_CWorld_ProcessPedsAfterPreRender();
 
 void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio();
@@ -569,6 +571,8 @@ void HOOK_CAutomobile__dmgDrawCarCollidingParticles();
 void HOOK_CWeapon__TakePhotograph();
 
 void HOOK_CCollision__CheckCameraCollisionObjects();
+
+void HOOK_CMirrors__CreateBuffer();
 
 CMultiplayerSA::CMultiplayerSA()
 {
@@ -657,7 +661,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_VehicleCamEnd, (DWORD)HOOK_VehicleCamEnd, 6);
     HookInstall(HOOKPOS_VehicleLookBehind, (DWORD)HOOK_VehicleLookBehind, 6);
     HookInstall(HOOKPOS_VehicleLookAside, (DWORD)HOOK_VehicleLookAside, 6);
-    HookInstall(HOOKPOS_CVehicle_ApplyBoatWaterResistance, (DWORD)HOOK_CVehicle_ApplyBoatWaterResistance, 6);
     HookInstall(HOOKPOS_CPhysical_ApplyGravity, (DWORD)HOOK_CPhysical_ApplyGravity, 6);
     HookInstall(HOOKPOS_OccupiedVehicleBurnCheck, (DWORD)HOOK_OccupiedVehicleBurnCheck, 6);
     HookInstall(HOOKPOS_UnoccupiedVehicleBurnCheck, (DWORD)HOOK_UnoccupiedVehicleBurnCheck, 5);
@@ -674,6 +677,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7);
+    HookInstall(HOOKPOS_CTaskSimpleClimb_ScanToGrabSectorList, (DWORD)HOOK_CTaskSimpleClimb_ScanToGrabSectorList, 8);
     HookInstall(HOOKPOS_CheckAnimMatrix, (DWORD)HOOK_CheckAnimMatrix, 5);
 
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29);
@@ -755,8 +759,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyHeli, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyHeli, 5);
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyProp, 5);
 
-    // Fix GTA:SA swimming speed problem on higher fps
-    HookInstall(HOOKPOS_CTaskSimpleSwim_ProcessSwimmingResistance, (DWORD)HOOK_CTaskSimpleSwim_ProcessSwimmingResistance, 6);
     HookInstall(HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender, (DWORD)HOOK_Idle_CWorld_ProcessPedsAfterPreRender, 5);
 
     HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio,
@@ -769,6 +771,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CWeapon__TakePhotograph, (DWORD)HOOK_CWeapon__TakePhotograph, 3 + 2);
 
     HookInstall(HOOKPOS_CCollision__CheckCameraCollisionObjects, (DWORD)HOOK_CCollision__CheckCameraCollisionObjects, 6 + 4);
+
+    // Fix mirror rendering when anti-aliasing is enabled
+    HookInstall(HOOKPOS_CMirrors__CreateBuffer, (DWORD)HOOK_CMirrors__CreateBuffer, 5);
 
     // Disable GTA setting g_bGotFocus to false when we minimize
     MemSet((void*)ADDR_GotFocus, 0x90, 10);
@@ -1568,17 +1573,6 @@ void CMultiplayerSA::InitHooks()
     // Disable spreading fires (Moved from multiplayer_shotsync)
     MemCpy((void*)0x53A23F, "\x33\xC0\x90\x90\x90", 5);
     MemCpy((void*)0x53A00A, "\x33\xC0\x90\x90\x90", 5);
-
-    // Fix objects with alpha below 141 are invisible (#425)
-    // Original values: 0x553AD9=140, 0x732C2F=100. These are passed to
-    // RwRenderStateSet(rwRENDERSTATEALPHATESTFUNCTIONREF, value).
-    // When value=0, RenderWare DISABLES alpha testing entirely, causing
-    // fully transparent pixels to write to the z-buffer and block objects
-    // behind transparent surfaces (fences, vegetation, etc).
-    // Using value=1 keeps alpha testing enabled (rejecting only alpha=0
-    // pixels) while preserving the fix for low-alpha entity visibility.
-    MemPut<BYTE>(0x553AD9, 1);
-    MemPut<BYTE>(0x732C2F, 1);
 
     InitHooks_CrashFixHacks();
     InitHooks_DeviceSelection();
@@ -4831,22 +4825,6 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
     }
 }
 
-const float                   kfTimeStepOrg = 5.0f / 3.0f;
-static void __declspec(naked) HOOK_CVehicle_ApplyBoatWaterResistance()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        fmul    ds : 0x871DDC   // Original constant used in code
-        fmul    ds : 0xB7CB5C   // Multiply by current timestep
-        fdiv    kfTimeStepOrg   // Divide by desired timestep, used at 30fps
-        jmp     RETURN_CVehicle_ApplyBoatWaterResistance
-    }
-    // clang-format on
-}
-
 static void __declspec(naked) HOOK_CPhysical_ApplyGravity()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -6416,6 +6394,59 @@ static void __declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList()
     }
 }
 
+CEntitySAInterface* pClimbScanPedInterface;
+CEntitySAInterface* pClimbScanTargetInterface;
+BYTE                bClimbScanTargetUsesCollision;
+
+bool CTaskSimpleClimb_ShouldSkipEntity()
+{
+    // Same as the game's own check this replaces: no collision on the entity at all
+    if (!bClimbScanTargetUsesCollision)
+        return true;
+
+    // Also skip entities the ped was explicitly made non-collidable with (setElementCollidableWith)
+    if (pClimbScanPedInterface && pClimbScanTargetInterface && m_pProcessCollisionHandler)
+        return !m_pProcessCollisionHandler(pClimbScanPedInterface, pClimbScanTargetInterface);
+
+    return false;
+}
+
+static void __declspec(naked) HOOK_CTaskSimpleClimb_ScanToGrabSectorList()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     pClimbScanPedInterface, ebx
+        mov     pClimbScanTargetInterface, esi
+        test    byte ptr [esi+1Ch], 1
+        mov     word ptr [esi+2Ch], cx
+        setne   al
+        mov     bClimbScanTargetUsesCollision, al
+    }
+    // clang-format on
+
+    if (CTaskSimpleClimb_ShouldSkipEntity())
+    {
+        // clang-format off
+        __asm
+        {
+            jmp     SKIP_CTaskSimpleClimb_ScanToGrabSectorList
+        }
+        // clang-format on
+    }
+    else
+    {
+        // clang-format off
+        __asm
+        {
+            jmp     RETURN_CTaskSimpleClimb_ScanToGrabSectorList
+        }
+        // clang-format on
+    }
+}
+
 // Ped animation matrix array gets corrupted sometimes by unknown thing
 // Hack fix for now is to validate each matrix before it is used
 void _cdecl CheckMatrix(float* pMatrix)
@@ -7957,43 +7988,6 @@ static void __declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp()
     // clang-format on
 }
 
-const float                   kfTimeStepOriginal = 1.66f;
-static void __declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        fsub    st, st(1)
-
-        fld     dword ptr[esp + 16]
-        lea     eax, [esi + 44h]
-        mov     ecx, eax
-        fmul    st, st(1)
-
-        fdiv    ds : 0xB7CB5C
-        fmul    kfTimeStepOriginal
-
-        fstp    dword ptr[esp + 28]
-
-        fld     dword ptr[esp + 20]
-        fmul    st, st(1)
-
-        fdiv    ds : 0xB7CB5C
-        fmul    kfTimeStepOriginal
-
-        fstp    dword ptr[esp + 32]
-        fmul    dword ptr[esp + 24]
-
-        fdiv    ds : 0xB7CB5C
-        fmul    kfTimeStepOriginal
-
-        jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
-    }
-    // clang-format on
-}
-
 void PostCWorld_ProcessPedsAfterPreRender()
 {
     if (m_postWorldProcessPedsAfterPreRenderHandler)
@@ -8212,6 +8206,41 @@ static void __declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
 
     out1: jmp   RETURN_CCollision__CheckCameraCollisionObjects
     out2: jmp   RETURN_CCollision__CheckCameraCollisionObjects_2
+    }
+    // clang-format on
+}
+
+const DWORD RETURN_CMirrors__CreateBuffer = 0x727022;
+
+void CreateMirrorBuffer()
+{
+    // preserve the MSAA values
+    DWORD oldMSAAValues[2] = {*reinterpret_cast<DWORD*>(0xC9C050), *reinterpret_cast<DWORD*>(0xC9C054)};
+
+    // set them to 0 so that the Rw raster textures create correctly
+    MemPutFast<DWORD>(0xC9C050, 0);
+    MemPutFast<DWORD>(0xC9C054, 0);
+
+    // CMirrors::CreateBuffer
+    reinterpret_cast<void(__cdecl*)()>(0x7230A0)();
+
+    // restore the MSAA values
+    MemPutFast<DWORD>(0xC9C050, oldMSAAValues[0]);
+    MemPutFast<DWORD>(0xC9C054, oldMSAAValues[1]);
+}
+
+static void __declspec(naked) HOOK_CMirrors__CreateBuffer()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad;
+        call CreateMirrorBuffer;
+        popad;
+
+        jmp RETURN_CMirrors__CreateBuffer;
     }
     // clang-format on
 }

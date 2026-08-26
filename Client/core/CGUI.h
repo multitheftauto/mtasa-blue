@@ -52,8 +52,15 @@ public:
     void DoPulse();
 
     void Draw();
+    void DrawInternal();
     void Invalidate();
     void Restore();
+
+    // True while a fatal GUI fault dialog is open, so a nested fault during the
+    // dialog's message-loop pump terminates without stacking more dialogs, and
+    // window-rebuild paths (skin and locale changes) do not run inside the pump.
+    static bool IsFaultDialogOpen() noexcept;
+    static void SetFaultDialogOpen(bool bOpen) noexcept;
 
     void DrawMouseCursor();
     void SetCursorPos(int iX, int iY, bool bForce = false, bool overrideStored = true);
@@ -94,9 +101,17 @@ public:
 
     void RequestLocaleChange(const SString& strLocale);
 
+    // Locale/skin changes destroy MainMenu (and its QuestionBox). Keep the restart
+    // requirement across that rebuild so resolution/etc. prompts are not lost.
+    void RequestRestartPrompt();
+
 private:
     void UpdateCursor();
     void ApplyQueuedLocale();
+    void TryShowRestartPrompt();
+    void ClearRestartPrompt() { m_bPendingRestartPrompt = false; }
+
+    static void RestartPromptCallBack(void* pData, unsigned int uiButton);
 
     DWORD TranslateScanCodeToGUIKey(DWORD dwCharacter);
 
@@ -123,4 +138,5 @@ private:
     uint    m_LocaleChangeCounter;
     SString m_QueuedLocaleChange;
     bool    m_bHasQueuedLocaleChange;
+    bool    m_bPendingRestartPrompt;
 };

@@ -1052,6 +1052,17 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         // Are we swapping from a vehicle without doors?
         bool bResetWheelAndDoorStates = (!CClientVehicleManager::HasDoors(m_usModel) || m_eVehicleType != CClientVehicleManager::GetVehicleType(usModel));
 
+        // For non-local (server-synchronized) vehicles transitioning to/from custom models,
+        // preserve the damage states if both models support doors and damage models.
+        if (!IsLocalEntity() && (!CClientVehicleManager::IsStandardModel(usModel) || !CClientVehicleManager::IsStandardModel(m_usModel)))
+        {
+            if (CClientVehicleManager::HasDoors(m_usModel) && CClientVehicleManager::HasDoors(usModel) &&
+                m_eVehicleType == CClientVehicleManager::GetVehicleType(usModel))
+            {
+                bResetWheelAndDoorStates = false;
+            }
+        }
+
         // Apply variant requirements
         if (ucVariant == 255 && ucVariant2 == 255)
             CClientVehicleManager::GetRandomVariation(usModel, ucVariant, ucVariant2);
@@ -1357,6 +1368,21 @@ void CClientVehicle::SetLandingGearDown(bool bLandingGearDown)
     }
 }
 
+// The checks below compare against standard model IDs, so a custom model has to be read as the
+// model it was cloned from. The model info is looked up fresh rather than through m_pModelInfo,
+// since SetModelBlocking calls in here before that pointer has been updated.
+static VehicleType GetVehicleTypeForModel(unsigned short usModel)
+{
+    std::uint16_t ulModel = usModel;
+    if (ulModel < 400 || ulModel > 611)
+    {
+        if (CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel))
+            ulModel = pModelInfo->GetParentID();
+    }
+
+    return static_cast<VehicleType>(ulModel);
+}
+
 unsigned short CClientVehicle::GetAdjustablePropertyValue()
 {
     unsigned short usPropertyValue;
@@ -1364,7 +1390,7 @@ unsigned short CClientVehicle::GetAdjustablePropertyValue()
     {
         usPropertyValue = m_pVehicle->GetAdjustablePropertyValue();
         // If it's a Hydra invert it with 5000 (as 0 is "forward"), so we can maintain a standard of 0 being "normal"
-        if (static_cast<VehicleType>(m_usModel) == VehicleType::VT_HYDRA)
+        if (GetVehicleTypeForModel(m_usModel) == VehicleType::VT_HYDRA)
             usPropertyValue = 5000 - usPropertyValue;
     }
     else
@@ -1378,7 +1404,7 @@ unsigned short CClientVehicle::GetAdjustablePropertyValue()
 
 void CClientVehicle::SetAdjustablePropertyValue(unsigned short usValue)
 {
-    if (static_cast<VehicleType>(m_usModel) == VehicleType::VT_HYDRA)
+    if (GetVehicleTypeForModel(m_usModel) == VehicleType::VT_HYDRA)
         usValue = 5000 - usValue;
 
     _SetAdjustablePropertyValue(usValue);
@@ -1406,7 +1432,7 @@ void CClientVehicle::_SetAdjustablePropertyValue(unsigned short usValue)
 
 bool CClientVehicle::HasMovingCollision()
 {
-    auto model = static_cast<VehicleType>(m_usModel);
+    auto model = GetVehicleTypeForModel(m_usModel);
 
     return (model == VehicleType::VT_FORKLIFT || model == VehicleType::VT_FIRELA || model == VehicleType::VT_ANDROM || model == VehicleType::VT_DUMPER ||
             model == VehicleType::VT_DOZER || model == VehicleType::VT_PACKER);
@@ -1416,7 +1442,7 @@ unsigned char CClientVehicle::GetDoorStatus(unsigned char ucDoor)
 {
     if (ucDoor < MAX_DOORS)
     {
-        if (m_pVehicle && HasDamageModel())
+        if (m_pVehicle && HasDamageModel() && !m_bJustStreamedIn)
         {
             return m_pVehicle->GetDamageManager()->GetDoorStatus(static_cast<eDoors>(ucDoor));
         }
@@ -1463,7 +1489,7 @@ unsigned char CClientVehicle::GetPanelStatus(unsigned char ucPanel)
 {
     if (ucPanel < MAX_PANELS)
     {
-        if (m_pVehicle && HasDamageModel())
+        if (m_pVehicle && HasDamageModel() && !m_bJustStreamedIn)
             return m_pVehicle->GetDamageManager()->GetPanelStatus(ucPanel);
 
         return m_ucPanelStates[ucPanel];
@@ -1476,7 +1502,7 @@ unsigned char CClientVehicle::GetLightStatus(unsigned char ucLight)
 {
     if (ucLight < MAX_LIGHTS)
     {
-        if (m_pVehicle && HasDamageModel())
+        if (m_pVehicle && HasDamageModel() && !m_bJustStreamedIn)
             return m_pVehicle->GetDamageManager()->GetLightStatus(ucLight);
 
         return m_ucLightStates[ucLight];
@@ -2513,7 +2539,7 @@ void CClientVehicle::StreamOut()
 
 bool CClientVehicle::DoCheckHasLandingGear()
 {
-    auto model = static_cast<VehicleType>(m_usModel);
+    auto model = GetVehicleTypeForModel(m_usModel);
 
     return (model == VehicleType::VT_ANDROM || model == VehicleType::VT_AT400 || model == VehicleType::VT_NEVADA || model == VehicleType::VT_RUSTLER ||
             model == VehicleType::VT_SHAMAL || model == VehicleType::VT_HYDRA || model == VehicleType::VT_STUNT);
@@ -4579,6 +4605,9 @@ void CClientVehicle::HandleWaitingForGroundToLoad()
 
 bool CClientVehicle::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount)
 {
+    if (ucSirenCount > SIREN_COUNT_MAX)
+        ucSirenCount = SIREN_COUNT_MAX;
+
     m_tSirenBeaconInfo.m_bOverrideSirens = true;
     m_tSirenBeaconInfo.m_ucSirenType = ucSirenType;
     m_tSirenBeaconInfo.m_ucSirenCount = ucSirenCount;
@@ -4590,6 +4619,9 @@ bool CClientVehicle::GiveVehicleSirens(unsigned char ucSirenType, unsigned char 
 }
 void CClientVehicle::SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
+
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
 
     if (m_pVehicle)
@@ -4598,6 +4630,9 @@ void CClientVehicle::SetVehicleSirenPosition(unsigned char ucSirenID, CVector ve
 
 void CClientVehicle::SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD dwPercentage)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
+
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
 
     if (m_pVehicle)
@@ -4606,6 +4641,9 @@ void CClientVehicle::SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD 
 
 void CClientVehicle::SetVehicleSirenColour(unsigned char ucSirenID, SColor tVehicleSirenColour)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
+
     m_tSirenBeaconInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
 
     if (m_pVehicle)
@@ -4631,7 +4669,7 @@ void CClientVehicle::RemoveVehicleSirens()
     m_tSirenBeaconInfo.m_bOverrideSirens = false;
     SetSirenOrAlarmActive(false);
 
-    for (unsigned char i = 0; i < 7; i++)
+    for (unsigned char i = 0; i < SIREN_COUNT_MAX; i++)
     {
         SetVehicleSirenPosition(i, CVector(0, 0, 0));
         SetVehicleSirenMinimumAlpha(i, 0);
@@ -5076,13 +5114,21 @@ CVehicleAudioSettingsEntry& CClientVehicle::GetOrCreateAudioSettings()
 
 bool CClientVehicle::GetDummyPosition(VehicleDummies dummy, CVector& position) const
 {
-    if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
+    if (dummy < VehicleDummies::LIGHT_FRONT_MAIN || dummy >= VehicleDummies::VEHICLE_DUMMY_COUNT)
+        return false;
+
+    position = m_dummyPositions[(std::size_t)dummy];
+
+    // Most models have no second exhaust dummy, in which case the game mirrors the primary
+    // exhaust on the X axis (see ApplyExhaustParticlesPosition). Reflect that here, so the
+    // reported position matches where the effects actually appear
+    if (dummy == VehicleDummies::EXHAUST_SECONDARY && position == CVector())
     {
-        position = m_dummyPositions[(std::size_t)dummy];
-        return true;
+        position = m_dummyPositions[(std::size_t)VehicleDummies::EXHAUST];
+        position.fX = -position.fX;
     }
 
-    return false;
+    return true;
 }
 
 bool CClientVehicle::SetDummyPosition(VehicleDummies dummy, const CVector& position)

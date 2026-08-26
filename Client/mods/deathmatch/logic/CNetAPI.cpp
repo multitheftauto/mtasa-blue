@@ -14,6 +14,8 @@
 #include <game/CWeapon.h>
 #include <game/CWeaponStat.h>
 #include <game/CWeaponStatManager.h>
+#include <game/CTaskManager.h>
+#include <game/Task.h>
 #include <enums/VehicleType.h>
 
 extern CClientGame* g_pClientGame;
@@ -134,7 +136,7 @@ bool CNetAPI::ProcessPacket(unsigned char bytePacketID, NetBitStreamInterface& B
             if (!BitStream.Read(id))
                 return true;
 
-            auto* player = m_pPlayerManager->Get(id);
+            CClientPlayer* player = m_pPlayerManager->Get(id);
             if (!player)
                 return true;
 
@@ -1112,6 +1114,20 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     // Write the full player keys
     CControllerState ControllerState;
     pPlayerModel->GetControllerState(ControllerState);
+
+    // The aim/fire buttons may still be held from before we received our current weapon.
+    // GTA:SA only starts TASK_SIMPLE_USE_GUN on a fresh button press, so clear stale bits
+    // here to keep the aim sync below consistent with our own pose.
+    if (ControllerState.RightShoulder1 || ControllerState.ButtonCircle)
+    {
+        CTask* pAttackTask = pPlayerModel->GetTaskManager()->GetTaskSecondary(TASK_SECONDARY_ATTACK);
+        if (!pAttackTask || pAttackTask->GetTaskType() != TASK_SIMPLE_USE_GUN)
+        {
+            ControllerState.RightShoulder1 = 0;
+            ControllerState.ButtonCircle = 0;
+        }
+    }
+
     WriteFullKeysync(ControllerState, BitStream);
 
     // Get the contact entity
@@ -2255,7 +2271,12 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
 {
     SVehicleDamageSyncMethodeB damage;
     BitStream.Read(&damage);
-    bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled();
+
+    // Do not spawn flying components when applying damage to already-blown
+    // vehicles. Physics collisions and burn explosions can trigger repeated
+    // damage syncs on destroyed vehicles, each of which would spawn new
+    // flying components even though the vehicle is already wrecked.
+    bool flyingComponents = m_pVehicleManager->IsSpawnFlyingComponentEnabled() && !pVehicle->IsBlown();
 
     if (damage.data.bSyncDoors)
         for (unsigned char i = 0; i < MAX_DOORS; ++i)
@@ -2276,54 +2297,80 @@ void CNetAPI::ReadVehiclePartsState(CClientVehicle* pVehicle, NetBitStreamInterf
     static_cast<CDeathmatchVehicle*>(pVehicle)->ResetDamageModelSync();
 }
 
+namespace
+{
+    // Mirrors CBulletsyncPacket::ValidateTrajectory bounds so a compromised or
+    // buggy server cant push extreme shots to this client. The server side
+    // checks remain the authority.
+    bool IsBulletSyncTrajectoryValid(const CVector& start, const CVector& end)
+    {
+        const float movementSq = (end - start).LengthSquared();
+        return std::isfinite(movementSq) && movementSq >= 0.0001f && movementSq <= 160000.0f;
+    }
+}  // namespace
+
 void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& stream)
 {
     std::uint8_t weapon = 0;
     if (!stream.Read(weapon) || !CClientWeaponManager::HasWeaponBulletSync(weapon))
         return;
 
-    const auto type = static_cast<eWeaponType>(weapon);
+    auto type = static_cast<eWeaponType>(weapon);
 
-    CVector start;
-    CVector end;
-    if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)) || !start.IsValid() ||
-        !end.IsValid())
+    SPositionSync startPosition;
+    SPositionSync endPosition;
+    if (!stream.Read(&startPosition) || !stream.Read(&endPosition))
         return;
 
-    std::uint8_t order = 0;
-    if (!stream.Read(order))
+    if (!startPosition.data.vecPosition.IsValid() || !endPosition.data.vecPosition.IsValid())
         return;
 
-    float          damage = 0.0f;
+    // Huge coordinates can crash other players
+    if (!startPosition.data.vecPosition.IsInWorldBounds(true) || !endPosition.data.vecPosition.IsInWorldBounds(true))
+        return;
+
+    if (!IsBulletSyncTrajectoryValid(startPosition.data.vecPosition, endPosition.data.vecPosition))
+        return;
+
+    // Skip re-delivered copies of the same shot within a short window. The
+    // window must stay below the fastest legitimate fire interval (MP5 at
+    // 94 ms) so repeated shots from a player standing still are not eaten,
+    // while the two relay copies arrive within the same server frame.
+    const CTickCount tickCountNow = CTickCount::Now();
+    if (startPosition.data.vecPosition == player->m_vecPrevBulletSyncStart && endPosition.data.vecPosition == player->m_vecPrevBulletSyncEnd &&
+        (tickCountNow - player->m_BulletSyncDedupTime) < CTickCount(50LL))
+        return;
+
+    // 200 is MAX weapon damage
+    SFloatAsBitsSync<16> damage(0, 200.0f, true, false);
+    damage.data.fValue = 0.0f;
+
     std::uint8_t   zone = 0;
     CClientPlayer* damaged = nullptr;
 
     if (stream.ReadBit())
     {
         ElementID id = INVALID_ELEMENT_ID;
-        if (!stream.Read(damage) || !stream.Read(zone) || !stream.Read(id))
+        if (!stream.Read(&damage) || !stream.Read(zone) || !stream.Read(id))
             return;
 
         damaged = DynamicCast<CClientPlayer>(CElementIDs::GetElement(id));
+
+        // The server validates the zone and that a damaged target exists and
+        // is a player, but the sim relay can carry a shot the main path
+        // rejects. Drop any shot whose target id does not resolve to a player
+        // so the local game never runs the bullet trace for a bogus target.
+        if (zone > 9 || !damaged)
+            return;
     }
 
-    bool duplicate = false;
+    // Remember the shot only once every field has parsed, so a malformed
+    // packet cannot eat the slot from the next legitimate identical shot.
+    player->m_vecPrevBulletSyncStart = startPosition.data.vecPosition;
+    player->m_vecPrevBulletSyncEnd = endPosition.data.vecPosition;
+    player->m_BulletSyncDedupTime = tickCountNow;
 
-    if (start == player->m_vecPrevBulletSyncStart && end == player->m_vecPrevBulletSyncEnd)
-        duplicate = true;
-
-    player->m_vecPrevBulletSyncStart = start;
-    player->m_vecPrevBulletSyncEnd = end;
-
-    if (static_cast<char>(order - player->m_ucPrevBulletSyncOrderCounter) > 0)
-        duplicate = false;
-
-    player->m_ucPrevBulletSyncOrderCounter = order;
-
-    if (duplicate)
-        return;
-
-    player->DischargeWeapon(type, start, end, damage, zone, damaged);
+    player->DischargeWeapon(type, startPosition.data.vecPosition, endPosition.data.vecPosition, damage.data.fValue, zone, damaged);
 }
 
 void CNetAPI::ReadWeaponBulletsync(CClientPlayer* player, NetBitStreamInterface& stream)
@@ -2333,41 +2380,65 @@ void CNetAPI::ReadWeaponBulletsync(CClientPlayer* player, NetBitStreamInterface&
         return;
 
     auto* weapon = DynamicCast<CClientWeapon>(CElementIDs::GetElement(id));
-    if (!weapon || !CClientWeaponManager::HasWeaponBulletSync(weapon->GetWeaponType()))
+    // The custom path is type-agnostic on the send and server sides, so no
+    // weapon type filter applies here; the element check is the only gate.
+    if (!weapon)
         return;
 
-    CVector start;
-    CVector end;
-    if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)) || !start.IsValid() ||
-        !end.IsValid())
+    SPositionSync startPosition;
+    SPositionSync endPosition;
+    if (!stream.Read(&startPosition) || !stream.Read(&endPosition))
         return;
 
-    uint8_t order = 0;
-    if (!stream.Read(order))
+    if (!startPosition.data.vecPosition.IsValid() || !endPosition.data.vecPosition.IsValid())
         return;
 
-    weapon->FireInstantHit(start, end, false, true);
+    // Huge coordinates can crash other players
+    if (!startPosition.data.vecPosition.IsInWorldBounds(true) || !endPosition.data.vecPosition.IsInWorldBounds(true))
+        return;
+
+    // Scripted custom weapons can outrange the stock bullet sync set, so the
+    // shot length cap follows the weapon's own stat instead of the fixed
+    // 400 m cap. A zero, negative or non-finite scripted range falls back to
+    // the fixed cap.
+    CWeaponStat* pWeaponStat = weapon->GetWeaponStat();
+    float        range = pWeaponStat ? pWeaponStat->GetWeaponRange() : 0.0f;
+    if (!std::isfinite(range))
+        range = 0.0f;
+
+    const float maxDistance = std::max(400.0f, std::max(0.0f, range) * 1.1f + 15.0f);
+    const float movementSq = (endPosition.data.vecPosition - startPosition.data.vecPosition).LengthSquared();
+    if (!std::isfinite(movementSq) || movementSq < 0.0001f || movementSq > maxDistance * maxDistance)
+        return;
+
+    weapon->FireInstantHit(startPosition.data.vecPosition, endPosition.data.vecPosition, false, true);
 }
 
 void CNetAPI::SendBulletSyncFire(eWeaponType weapon, const CVector& start, const CVector& end, float damage, std::uint8_t zone, CClientPlayer* damaged)
 {
-    auto* stream = g_pNet->AllocateNetBitStream();
+    NetBitStreamInterface* stream = g_pNet->AllocateNetBitStream();
+    SPositionSync          startPosition;
+    startPosition.data.vecPosition = start;
 
-    stream->Write(static_cast<char>(weapon));
-    stream->Write(reinterpret_cast<const char*>(&start), sizeof(CVector));
-    stream->Write(reinterpret_cast<const char*>(&end), sizeof(CVector));
-    stream->Write(m_ucBulletSyncOrderCounter++);
+    SPositionSync endPosition;
+    endPosition.data.vecPosition = end;
 
-    if (damage > 0.0f && damaged)
+    stream->Write(static_cast<std::uint8_t>(weapon));
+
+    stream->Write(&startPosition);
+    stream->Write(&endPosition);
+
+    bool hasDamaged = damaged && damage > 0.0f;
+    stream->WriteBit(hasDamaged);
+
+    if (hasDamaged)
     {
-        stream->WriteBit(true);
-        stream->Write(damage);
+        SFloatAsBitsSync<16> damageF(0, 200.0f, true);
+        damageF.data.fValue = damage;
+
+        stream->Write(&damageF);
         stream->Write(zone);
         stream->Write(damaged->GetID());
-    }
-    else
-    {
-        stream->WriteBit(false);
     }
 
     g_pNet->SendPacket(PACKET_ID_PLAYER_BULLETSYNC, stream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE);
@@ -2379,12 +2450,17 @@ void CNetAPI::SendBulletSyncCustomWeaponFire(CClientWeapon* weapon, const CVecto
     if (weapon->IsLocalEntity())
         return;
 
-    auto* stream = g_pNet->AllocateNetBitStream();
+    NetBitStreamInterface* stream = g_pNet->AllocateNetBitStream();
+
+    SPositionSync startPosition;
+    startPosition.data.vecPosition = start;
+
+    SPositionSync endPosition;
+    endPosition.data.vecPosition = end;
 
     stream->Write(weapon->GetID());
-    stream->Write(reinterpret_cast<const char*>(&start), sizeof(CVector));
-    stream->Write(reinterpret_cast<const char*>(&end), sizeof(CVector));
-    stream->Write(m_ucCustomWeaponBulletSyncOrderCounter++);
+    stream->Write(&startPosition);
+    stream->Write(&endPosition);
 
     g_pNet->SendPacket(PACKET_ID_WEAPON_BULLETSYNC, stream, PACKET_PRIORITY_MEDIUM, PACKET_RELIABILITY_RELIABLE);
     g_pNet->DeallocateNetBitStream(stream);

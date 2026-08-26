@@ -201,14 +201,26 @@ void CLuaArguments::PushArguments(const CLuaArguments& Arguments)
 bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments* returnValues) const
 {
     assert(pLuaMain);
-    TIMEUS startTime = GetTimeUs();
+    const bool   timingActive = CClientPerfStatLuaTiming::GetSingleton()->IsActive();
+    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
-    // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine();
     assert(luaVM);
-    LUA_CHECKSTACK(luaVM, 2);
+    LUA_CHECKSTACK(luaVM, 1);
     int luaStackPointer = lua_gettop(luaVM);
+
+    // Get the function from the registry
     lua_getref(luaVM, iLuaFunction.ToInt());
+
+    // If that function doesn't exist, return false
+    if (lua_isnil(luaVM, -1))
+    {
+        // cleanup the stack
+        while (lua_gettop(luaVM) - luaStackPointer > 0)
+            lua_pop(luaVM, 1);
+
+        return false;
+    }
 
     // Push our arguments onto the stack
     PushArguments(luaVM);
@@ -245,7 +257,10 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
             lua_pop(luaVM, 1);
     }
 
-    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, pLuaMain->GetFunctionTag(iLuaFunction.ToInt()), GetTimeUs() - startTime);
+    if (timingActive)
+    {
+        CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, pLuaMain->GetFunctionTag(iLuaFunction.ToInt()), GetTimeUs() - startTime);
+    }
     return true;
 }
 
@@ -253,7 +268,8 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
 {
     assert(pLuaMain);
     assert(szFunction);
-    TIMEUS startTime = GetTimeUs();
+    const bool   timingActive = CClientPerfStatLuaTiming::GetSingleton()->IsActive();
+    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine();
@@ -309,7 +325,10 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
             lua_pop(luaVM, 1);
     }
 
-    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, szFunction, GetTimeUs() - startTime);
+    if (timingActive)
+    {
+        CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, szFunction, GetTimeUs() - startTime);
+    }
     return true;
 }
 
@@ -488,7 +507,7 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
         {
             CLuaArgument* pArgument = new CLuaArgument();
-            if (!pArgument->ReadFromBitStream(bitStream, pKnownTables))
+            if (!pArgument->ReadFromBitStream(bitStream, pKnownTables, uiDepth + 1))
             {
                 delete pArgument;
                 if (bKnownTablesCreated)

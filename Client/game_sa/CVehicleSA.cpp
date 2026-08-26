@@ -30,11 +30,33 @@
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
 #include "CFireManagerSA.h"
+#include "enums/VehicleType.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
 static BOOL m_bVehicleSunGlare = false;
+
+// PreRender re-asserts rpATOMICRENDER on all wheel atomics every frame, which re-shows
+// the Rhino's middle wheels that SetupModelNodes hides at init. Re-clear the flag here so
+// it stays the last write of the frame and the wheels remain invisible like in vanilla.
+static RwObject* __cdecl ClearAtomicRenderFlagCB(RwObject* object, void* /*data*/)
+{
+    object->flags &= ~0x04;  // rpATOMICRENDER
+    return object;
+}
+
+static void __fastcall RehideRhinoMiddleWheels(CAutomobileSAInterface* vehicle)
+{
+    if (!vehicle || vehicle->m_nModelIndex != 432 /* Rhino */)
+        return;
+
+    for (auto comp : {eCarNodes::WHEEL_LM, eCarNodes::WHEEL_RM})
+    {
+        if (RwFrame* frame = vehicle->m_aCarNodes[static_cast<std::size_t>(comp)])
+            RwFrameForAllObjects(frame, (void*)ClearAtomicRenderFlagCB, nullptr);
+    }
+}
 
 static void __declspec(naked) HOOK_Vehicle_PreRender(void)
 {
@@ -51,6 +73,13 @@ static void __declspec(naked) HOOK_Vehicle_PreRender(void)
         call    eax
 
         noglare:
+        // Re-hide Rhino middle wheels after PreRender's generic-car block re-shows them.
+        // esi still points to the CAutomobileSAInterface at this hook site.
+        pushad
+        mov     ecx, esi
+        call    RehideRhinoMiddleWheels
+        popad
+
         mov     [esp+0D4h], edi
         push    6ABD04h
         retn
@@ -67,6 +96,13 @@ static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleI
 
     if (vehicle->pEntity->GetVehicleRotorState())
     {
+        // Blown aircraft must not re-enter the custom rotor processing path. With
+        // vehicle_engine_autostart disabled this path moves unattended aircraft to
+        // STATUS_PHYSICS, which lets wreck contacts repeatedly create GTA flying
+        // components/explosions after the vehicle has already blown up.
+        if (vehicle->pEntity->GetHealth() <= 0.0f)
+            return false;
+
         if (g_pCore->GetMultiplayer()->IsVehicleEngineAutoStartEnabled())  // keep default behavior
             return true;
 
@@ -1535,6 +1571,55 @@ void CVehicleSA::RecalculateHandling()
         GetVehicleInterface ()->fDragCoeff = pGame->GetHandlingManager()->GetBasicDragCoeff();
     else*/
     // pInt->fDragCoeff = m_pHandlingData->GetInterface()->fDragCoeff / 1000 * pGame->GetHandlingManager()->GetDragMultiplier();
+
+    // The swinging chassis flag is only applied once, inside the game's vehicle constructor.
+    // Redo that setup here so a live handling change actually takes effect.
+    RecalculateSwingingChassis();
+}
+
+void CVehicleSA::RecalculateSwingingChassis()
+{
+    if (GetVehicleInterface()->m_vehicleClass != VehicleClass::AUTOMOBILE)
+        return;
+
+    constexpr std::uint16_t axisZ = 2;
+    constexpr std::uint16_t axisNegY = 4;
+    constexpr std::uint16_t extraChassis = 0x40;
+    constexpr std::uint16_t extraFixedState = 0x80;
+    constexpr std::uint16_t extraFiretruck = 0x100;
+
+    auto&               chassis = static_cast<CAutomobileSAInterface*>(GetVehicleInterface())->m_swingingChassis;
+    const std::uint16_t modelID = GetModelIndex();
+
+    // The Firela's ladder reuses this same slot for its own animation, so it must never be overridden by the swinging chassis flag.
+    if (modelID == static_cast<std::uint16_t>(VehicleType::VT_FIRELA))
+    {
+        chassis.m_fOpenAngle = 0.1f * PI;
+        chassis.m_fClosedAngle = -0.1f * PI;
+        chassis.m_nAxis = axisZ;
+        chassis.m_nDirn = axisNegY | extraFixedState | extraFiretruck;
+        chassis.m_nDoorState = static_cast<std::uint8_t>(DoorState::DOOR_HIT_MAX_END);
+        return;
+    }
+
+    if (!(GetVehicleInterface()->dwHandlingFlags & HANDLING_SwingingChassis_Flag))
+    {
+        chassis = {};  // Flag off: reset so the chassis can't swing anymore
+        return;
+    }
+
+    // Same per-model angle multiplier the game's vehicle constructor uses
+    float angleMultiplier = 0.02f;
+    if (modelID == static_cast<std::uint16_t>(VehicleType::VT_COPCARVG) || modelID == static_cast<std::uint16_t>(VehicleType::VT_ESPERANT))
+        angleMultiplier = 0.03f;
+    else if (modelID == static_cast<std::uint16_t>(VehicleType::VT_STRETCH))
+        angleMultiplier = 0.01f;
+
+    chassis.m_fOpenAngle = angleMultiplier * PI;
+    chassis.m_fClosedAngle = -angleMultiplier * PI;
+    chassis.m_nAxis = axisZ;
+    chassis.m_nDirn = axisNegY | extraChassis | extraFixedState;
+    chassis.m_nDoorState = static_cast<std::uint8_t>(DoorState::DOOR_HIT_MAX_END);
 }
 
 void CVehicleSA::BurstTyre(BYTE bTyre)
@@ -1965,6 +2050,9 @@ void CVehicleSA::RecalculateSuspensionLines()
 
 void CVehicleSA::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount)
 {
+    if (ucSirenCount > SIREN_COUNT_MAX)
+        ucSirenCount = SIREN_COUNT_MAX;
+
     m_tSirenInfo.m_bOverrideSirens = true;
     m_tSirenInfo.m_ucSirenType = ucSirenType;
     m_tSirenInfo.m_ucSirenCount = ucSirenCount;
@@ -1972,11 +2060,18 @@ void CVehicleSA::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSi
 
 void CVehicleSA::SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
     m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
 }
 
 void CVehicleSA::GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+    {
+        vecPos = CVector();
+        return;
+    }
     vecPos = m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions;
 }
 

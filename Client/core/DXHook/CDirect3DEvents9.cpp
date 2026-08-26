@@ -577,7 +577,42 @@ void CDirect3DEvents9::OnRestore(IDirect3DDevice9* pDevice)
     CCore::GetSingleton().OnDeviceRestore();
 }
 
+int FilterException(uint exceptionCode);
+
+static void ReportOnPresentSEHFault(DWORD dwExceptionCode)
+{
+    // A nested fault can fire while this dialog pumps the message loop (the
+    // game frame keeps running). Show one dialog, then terminate immediately.
+    if (CLocalGUI::IsFaultDialogOpen())
+    {
+        TerminateProcess(GetCurrentProcess(), 9);
+        return;
+    }
+    CLocalGUI::SetFaultDialogOpen(true);
+
+    SString strMsg(
+        "Rendering fault during frame rendering (code 0x%08X).\n\n"
+        "Usually caused by missing GUI/loading-screen assets.\n\n"
+        "Please verify game files or reinstall.",
+        dwExceptionCode);
+    WriteDebugEvent(SString("OnPresent SEH fault code=0x%08X", dwExceptionCode));
+    MessageBoxUTF8(0, strMsg, _("Error") + _E("CC54"), MB_OK | MB_ICONERROR | MB_TOPMOST);
+    TerminateProcess(GetCurrentProcess(), 9);
+}
+
 void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice)
+{
+    __try
+    {
+        OnPresentInternal(pDevice, pStateDevice);
+    }
+    __except (FilterException(GetExceptionCode()))
+    {
+        ReportOnPresentSEHFault(GetExceptionCode());
+    }
+}
+
+void CDirect3DEvents9::OnPresentInternal(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice)
 {
     TIMING_CHECKPOINT("+OnPresent1");
     CGraphics::GetSingleton().SetSkipMTARenderThisFrame(false);
@@ -752,11 +787,16 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive(IDirect3DDevice9* pDevice, IDirect3DDe
     if (!pLayers)
     {
         // No shaders for this texture.
-        // Apply dual-pass alpha rendering when the mesh has alpha blending with z-write enabled,
-        // but only for 3D world geometry (not pre-transformed 2D elements like the radar/HUD).
-        // This prevents transparent pixels (e.g. fence holes, vegetation cutouts) from writing to
-        // the z-buffer and blocking objects behind them — emulating PS2 per-pixel z-write behavior.
-        if (g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE && !g_pDeviceState->VertexDeclState.PositionT)
+        // Dual-pass alpha z-write emulation for blended 3D geometry (not pre-transformed 2D).
+        // Pass 1 z-writes pixels >= threshold, pass 2 blends the rest without z-write, so fence
+        // holes don't occlude what's behind them. only runs when the game has no meaningful alpha
+        // test of its own (ref at the DefinedState baseline of 2 or below): an active test at ref
+        // 100/140 already clips transparent pixels before z-write like vanilla, and forcing the
+        // dual pass over it draws the sub-ref gradient in pass 2, which is what kept the LV neon
+        // lines smeared no matter what the game side ALPHAREF was set to.
+        const bool bGameAlphaTestActive = g_pDeviceState->RenderState.ALPHATESTENABLE && g_pDeviceState->RenderState.ALPHAREF > 2;
+        if (!bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
+            !g_pDeviceState->VertexDeclState.PositionT)
         {
             // Save current alpha test state
             const DWORD dwOrigAlphaTestEnable = g_pDeviceState->RenderState.ALPHATESTENABLE;
@@ -1003,11 +1043,12 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, IDir
     if (!pLayers)
     {
         // No shaders for this texture.
-        // Apply dual-pass alpha rendering when the mesh has alpha blending with z-write enabled,
-        // but only for 3D world geometry (not pre-transformed 2D elements like the radar/HUD).
-        // This prevents transparent pixels (e.g. fence holes, vegetation cutouts) from writing to
-        // the z-buffer and blocking objects behind them — emulating PS2 per-pixel z-write behavior.
-        if (g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE && !g_pDeviceState->VertexDeclState.PositionT)
+        // Dual-pass alpha z-write emulation, same rules as OnDrawPrimitive: skip when the game
+        // is already running a meaningful alpha test, it clips transparent pixels before z-write
+        // on its own and the dual pass would draw the sub-ref gradient in pass 2.
+        const bool bGameAlphaTestActive = g_pDeviceState->RenderState.ALPHATESTENABLE && g_pDeviceState->RenderState.ALPHAREF > 2;
+        if (!bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
+            !g_pDeviceState->VertexDeclState.PositionT)
         {
             // Save current alpha test state
             const DWORD dwOrigAlphaTestEnable = g_pDeviceState->RenderState.ALPHATESTENABLE;
@@ -1446,7 +1487,7 @@ int               FilterException(uint exceptionCode)
         WriteDebugEvent("FilterException: caught in-page error");
         return EXCEPTION_EXECUTE_HANDLER;
     }
-    if (exceptionCode == 0xE06D7363)
+    if (exceptionCode == CPP_EXCEPTION_CODE)
     {
         WriteDebugEvent("FilterException: caught Microsoft C++ exception");
         return EXCEPTION_EXECUTE_HANDLER;

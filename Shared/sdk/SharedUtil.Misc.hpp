@@ -29,7 +29,7 @@
     #define SHAREDUTIL_PLATFORM_WINDOWS 1
 #endif
 
-#if defined(__linux__) || defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+#if defined(__linux__) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
     #include <fstream>
     #include <string>
     #include <sstream>
@@ -636,7 +636,7 @@ bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
     }
 
     return true;
-    #elif defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+    #elif defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
     static_assert(sizeof(uintptr_t) <= sizeof(unsigned long long), "Unexpected uintptr_t size");
 
     std::ifstream maps("/proc/self/maps");
@@ -2021,47 +2021,25 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 #endif  // MTA_CLIENT
 
 #ifdef SHAREDUTIL_PLATFORM_WINDOWS
-    #define _WIN32_WINNT_WIN8 0x0602
-///////////////////////////////////////////////////////////////////////////
-//
-// SharedUtil::IsWindowsVersionOrGreater
-//
-// From Windows Kits\8.1 VersionHelpers.h
-// (Ignores compatibility mode)
-//
-///////////////////////////////////////////////////////////////////////////
-bool SharedUtil::IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor)
+    #define _WIN32_WINNT_WIN8  0x0602
+    #define _WIN32_WINNT_WIN10 0x0A00
+
+bool SharedUtil::IsWindows10OrGreater()
 {
-    OSVERSIONINFOEXW osvi = {sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0};
-    DWORDLONG const  dwlConditionMask =
-        VerSetConditionMask(VerSetConditionMask(VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL), VER_MINORVERSION, VER_GREATER_EQUAL),
-                            VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
+    using RtlGetVersionFn = LONG(WINAPI*)(OSVERSIONINFOEXW*);
+    if (HMODULE ntdll = GetModuleHandleW(L"ntdll.dll"))
+    {
+        RtlGetVersionFn pfnRtlGetVersion = reinterpret_cast<RtlGetVersionFn>(GetProcAddress(ntdll, "RtlGetVersion"));
+        if (pfnRtlGetVersion)
+        {
+            OSVERSIONINFOEXW info{};
+            info.dwOSVersionInfoSize = sizeof(info);
+            if (pfnRtlGetVersion(&info) == 0 /* STATUS_SUCCESS */)
+                return info.dwMajorVersion >= 10;
+        }
+    }
 
-    osvi.dwMajorVersion = wMajorVersion;
-    osvi.dwMinorVersion = wMinorVersion;
-    osvi.wServicePackMajor = wServicePackMajor;
-
-    return VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR, dwlConditionMask) != FALSE;
-}
-
-bool SharedUtil::IsWindowsXPSP3OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP), LOBYTE(_WIN32_WINNT_WINXP), 3);
-}
-
-bool SharedUtil::IsWindowsVistaOrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA), LOBYTE(_WIN32_WINNT_VISTA), 0);
-}
-
-bool SharedUtil::IsWindows7OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN7), LOBYTE(_WIN32_WINNT_WIN7), 0);
-}
-
-bool SharedUtil::IsWindows8OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN8), LOBYTE(_WIN32_WINNT_WIN8), 0);
+    return false;
 }
 #endif  // SHAREDUTIL_PLATFORM_WINDOWS
 

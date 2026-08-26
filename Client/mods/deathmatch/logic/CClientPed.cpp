@@ -161,6 +161,9 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_fHealth = 100.0f;
     m_armor = 0.0f;
     m_bDead = false;
+    // Kill() defaults; poses a ped that was already dead before we ever saw it alive.
+    m_deathAnimGroup = 0;
+    m_deathAnimID = 15;
     m_bWorldIgnored = false;
     m_fCurrentRotation = 0.0f;
     m_fMoveSpeed = 0.0f;
@@ -184,6 +187,8 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_bSunbathing = false;
     m_bDestroyingSatchels = false;
     m_bDoingGangDriveby = false;
+    m_bProcessingWeaponFireEvent = false;
+    m_bDeferredGangDrivebyAbort = false;
 
     m_pAnimationBlock = NULL;
     m_bRequestedAnimation = false;
@@ -1887,6 +1892,20 @@ bool CClientPed::IsDead()
     return m_bDead;
 }
 
+void CClientPed::FreezeDeathAnimationOnLastFrame()
+{
+    std::unique_ptr<CAnimBlendAssociation> pAnimAssoc = BlendAnimation(m_deathAnimGroup, m_deathAnimID, 1000.0f);
+    if (!pAnimAssoc)
+        return;
+
+    // Full blend amount applies the pose on this frame instead of easing in from the idle the recreated
+    // ped starts on. Death animations don't loop, so full progress clamps to the last frame and a zero
+    // speed holds it there.
+    pAnimAssoc->SetBlendAmount(1.0f);
+    pAnimAssoc->SetCurrentProgress(1.0f);
+    pAnimAssoc->SetCurrentSpeed(0.0f);
+}
+
 void CClientPed::BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
 {
     CPlayerPed* pPedAttacker = pClientPedAttacker->GetGamePlayer();
@@ -1902,8 +1921,10 @@ void CClientPed::BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPar
 
 void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bStealth, bool bSetDirectlyDead, AssocGroupId animGroup, AnimationId animID)
 {
-    // Don't change task if already dead or dying
-    if (m_pPlayerPed && !IsDead() && !IsDying())
+    // Don't change task if already dead or dying. bSetDirectlyDead restores the dead state onto a ped
+    // the streamer just recreated; that ped holds no tasks yet, while IsDead() still reports the cached
+    // m_bDead left over from the original death and would veto giving it the dead task.
+    if (m_pPlayerPed && !IsDying() && (bSetDirectlyDead || !IsDead()))
     {
         // Do we have the in_water task?
         CTask* pTask = m_pTaskManager->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
@@ -1923,12 +1944,16 @@ void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bSt
 
         if (bSetDirectlyDead)
         {
-            // TODO: Avoid the animation, try to make it go directly to the last animation frame.
             pTask = g_pGame->GetTasks()->CreateTaskSimpleDead(GetTickCount32(), true);
             if (pTask)
             {
                 pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_DEFAULT);
             }
+
+            // The task only marks the ped dead on its next update and never poses one killed on foot,
+            // leaving the game free to run a death sequence of its own first.
+            m_pPlayerPed->SetPedState(PedState::PED_DEAD);
+            FreezeDeathAnimationOnLastFrame();
         }
         else if (bStealth)
         {
@@ -1967,6 +1992,17 @@ void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bSt
     // Remove goggles #9477
     if (IsWearingGoggles())
         SetWearingGoggles(false, false);
+
+    // Clear the targeting marker so it doesn't stay on screen after death
+    if (m_pPlayerPed)
+        m_pPlayerPed->SetTargetedEntity(nullptr);
+
+    // Kept here rather than read back off the ped, which may be streamed out when the pose is restored.
+    if (!bSetDirectlyDead)
+    {
+        m_deathAnimGroup = animGroup;
+        m_deathAnimID = animID;
+    }
 
     m_bDead = true;
 }
@@ -2764,6 +2800,15 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         if (m_bPendingRebuildPlayer)
             ProcessRebuildPlayer(true);
 
+        // Run any gang driveby abort deferred by SetDoingGangDriveby(false).
+        if (m_bDeferredGangDrivebyAbort)
+        {
+            m_bDeferredGangDrivebyAbort = false;
+            CTask* primaryTask = m_pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
+            if (primaryTask && primaryTask->GetTaskType() == TASK_SIMPLE_GANG_DRIVEBY)
+                primaryTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
+        }
+
         CControllerState Current;
         GetControllerState(Current);
         m_rawControllerState = Current;
@@ -2920,6 +2965,13 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         // We need to do it here because the anim starts on the next frame after calling RunNamedAnimation
         if (m_pAnimationBlock && m_AnimationCache.progressWaitForStreamIn && IsAnimationInProgress())
             UpdateAnimationProgressAndSpeed();
+
+        // Same "next frame" issue as above: the gateway swap to our custom hierarchy (see
+        // CClientGame::BlendAnimationHierarchyHandler) only takes effect in the game's animation blend
+        // a frame after RunNamedAnimation was called, so we can only trim a partial anim's padding once
+        // it's actually playing. Runs every frame while a custom animation is active; cheap and idempotent.
+        if (m_pAnimationBlock && m_bisCurrentAnimationCustom)
+            UpdateCustomPartialAnimationBones();
 
         // Update our alpha
         unsigned char ucAlpha = m_ucAlpha;
@@ -3126,23 +3178,29 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
                 Current.ButtonSquare = 0;
                 Current.ButtonCross = 0;
             }
-            // Disable the fire keys whilst crouching as well
-            Current.ButtonCircle = 0;
-            Current.LeftShoulder1 = 0;
+            // Disable the fire keys whilst crouching as well unless crouchbug or fastfire glitch is enabled
+            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_CROUCHBUG) && !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
+            {
+                Current.ButtonCircle = 0;
+                Current.LeftShoulder1 = 0;
+            }
             if (m_ulLastTimeBeganCrouch >= ulNow - 400.0f * fSpeedRatio)
             {
-                // Disable double crouching (another anim cut)
-                if (g_pClientGame->IsUsingAlternatePulseOrder())
-                    Current.ShockButtonL = 255;  // Do this differently if we have changed the pulse order
-                else
-                    Current.ShockButtonL = 0;
+                // Disable double crouching (another anim cut) unless glitch is enabled
+                if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_CROUCHBUG) && !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
+                {
+                    if (g_pClientGame->IsUsingAlternatePulseOrder())
+                        Current.ShockButtonL = 255;  // Do this differently if we have changed the pulse order
+                    else
+                        Current.ShockButtonL = 0;
+                }
             }
         }
     }
-    // If we just started aiming, make sure they dont try and crouch
+    // If we just started aiming, make sure they dont try and crouch unless crouchbug or fastfire is enabled
     else if ((m_ulLastTimeBeganAiming != 0 && m_ulLastTimeBeganAiming >= ulNow - 300.0f * fSpeedRatio) || (ulNow - m_ulLastTimeFired) <= 300.0f * fSpeedRatio)
     {
-        if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
+        if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_CROUCHBUG) && !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
         {
             Current.ShockButtonL = 0;
         }
@@ -3182,7 +3240,8 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     {
         // Entering as driver or passenger?
         int iTaskType = pTask->GetTaskType();
-        if (iTaskType == TASK_COMPLEX_ENTER_CAR_AS_DRIVER || iTaskType == TASK_COMPLEX_ENTER_CAR_AS_PASSENGER || iTaskType == TASK_COMPLEX_ENTER_BOAT_AS_DRIVER)
+        if (iTaskType == TASK_COMPLEX_ENTER_CAR_AS_DRIVER || iTaskType == TASK_COMPLEX_ENTER_CAR_AS_PASSENGER ||
+            iTaskType == TASK_COMPLEX_ENTER_BOAT_AS_DRIVER || iTaskType == TASK_SIMPLE_NAMED_ANIM || iTaskType == TASK_SIMPLE_ANIM)
         {
             // Don't allow the aiming key (RightShoulder1)
             // This fixes bug allowing you to run around in aim mode while
@@ -3631,7 +3690,20 @@ void CClientPed::_CreateModel()
     // Replace the loaded model info with the model we're going to load and
     // add a reference to it.
     m_pLoadedModelInfo = m_pModelInfo;
+    if (!m_pLoadedModelInfo)
+    {
+        NotifyUnableToCreate();
+        return;
+    }
+
     m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_CreateModel");
+    if (!m_pLoadedModelInfo->GetRwObject())
+    {
+        m_pLoadedModelInfo->RemoveRef();
+        m_pLoadedModelInfo = nullptr;
+        NotifyUnableToCreate();
+        return;
+    }
 
     // Create the new ped
     m_pPlayerPed = dynamic_cast<CPlayerPed*>(g_pGame->GetPools()->AddPed(this, m_ulModel));
@@ -3767,7 +3839,20 @@ void CClientPed::_CreateLocalModel()
 
         // Add a reference to the model we're using
         m_pLoadedModelInfo = m_pModelInfo;
+        if (!m_pLoadedModelInfo)
+        {
+            NotifyUnableToCreate();
+            return;
+        }
+
         m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_CreateLocalModel");
+        if (!m_pLoadedModelInfo->GetRwObject())
+        {
+            m_pLoadedModelInfo->RemoveRef();
+            m_pLoadedModelInfo = nullptr;
+            NotifyUnableToCreate();
+            return;
+        }
 
         // Make sure we are CJ
         if (m_pPlayerPed->GetModelIndex() != m_ulModel)
@@ -3901,12 +3986,20 @@ void CClientPed::_DestroyLocalModel()
     // Make sure we are CJ again
     if (m_pPlayerPed->GetModelIndex() != 0)
     {
-        m_pPlayerPed->SetModelIndex(0);
+        auto* pDefaultModelInfo = g_pGame->GetModelInfo(0);
+        if (pDefaultModelInfo && pDefaultModelInfo->GetRwObject())
+            m_pPlayerPed->SetModelIndex(0);
     }
 
-    // Remove reference to our previous model
-    m_pLoadedModelInfo->RemoveRef();
-    m_pLoadedModelInfo = NULL;
+    // Remove reference to our previous model.
+    // Always release regardless of whether the default model was restored;
+    // the ped is being abandoned by MTA here, and GTA's native ped ref still protects
+    // the model from streaming eviction if SetModelIndex(0) was not possible.
+    if (m_pLoadedModelInfo)
+    {
+        m_pLoadedModelInfo->RemoveRef();
+        m_pLoadedModelInfo = nullptr;
+    }
 
     // NULL our pointers, we don't destroy the local player
     m_pPlayerPed = NULL;
@@ -3918,6 +4011,32 @@ void CClientPed::_ChangeModel()
     // Different model than before?
     if (m_pPlayerPed->GetModelIndex() != m_ulModel)
     {
+        CModelInfo* pLoadedModel = nullptr;
+        if (m_bIsLocalPlayer)
+        {
+            // Remember the model we had loaded and store the new model we're going to load
+            pLoadedModel = m_pLoadedModelInfo;
+            m_pLoadedModelInfo = m_pModelInfo;
+            if (!m_pLoadedModelInfo)
+            {
+                m_pLoadedModelInfo = pLoadedModel;
+                if (m_clientModel && m_clientModel->GetModelID() != m_ulModel)
+                    m_clientModel = nullptr;
+                return;
+            }
+
+            // Add reference to the model
+            m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_ChangeModel");
+            if (!m_pLoadedModelInfo->GetRwObject())
+            {
+                m_pLoadedModelInfo->RemoveRef();
+                m_pLoadedModelInfo = pLoadedModel;
+                if (m_clientModel && m_clientModel->GetModelID() != m_ulModel)
+                    m_clientModel = nullptr;
+                return;
+            }
+        }
+
         g_pMultiplayer->SetAutomaticVehicleStartupOnPedEnter(false);
 
         // We need to reset visual stats when changing from CJ model
@@ -3965,13 +4084,6 @@ void CClientPed::_ChangeModel()
             // Takes care of clothes/task issues
             Respawn(NULL, true, false);
 
-            // Remember the model we had loaded and store the new model we're going to load
-            CModelInfo* pLoadedModel = m_pLoadedModelInfo;
-            m_pLoadedModelInfo = m_pModelInfo;
-
-            // Add reference to the model
-            m_pLoadedModelInfo->ModelAddRef(BLOCKING, "CClientPed::_ChangeModel");
-
             // Set the new player model and restore the interior
             m_pPlayerPed->SetModelIndex(m_ulModel);
 
@@ -3985,7 +4097,8 @@ void CClientPed::_ChangeModel()
             }
 
             // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
-            pLoadedModel->RemoveRef(true);
+            if (pLoadedModel)
+                pLoadedModel->RemoveRef(true);
             pLoadedModel = NULL;
 
             // Warp into it again
@@ -5348,7 +5461,7 @@ void CClientPed::Say(const ePedSpeechContext& speechId, float probability)
 
 const char* CClientPed::GetBodyPartName(unsigned char ucID)
 {
-    if (ucID <= 10)
+    if (ucID < 10)
     {
         return BodyPartNames[ucID].szName;
     }
@@ -5705,7 +5818,15 @@ void CClientPed::SetDoingGangDriveby(bool bDriveby)
     {
         if (!bDriveby)
         {
-            primaryTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
+            if (m_bProcessingWeaponFireEvent)
+            {
+                // Aborting now would re-enter the task's own native ProcessPed() and crash.
+                m_bDeferredGangDrivebyAbort = true;
+            }
+            else
+            {
+                primaryTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_URGENT, NULL);
+            }
         }
     }
     else if (bDriveby)
@@ -5769,11 +5890,11 @@ bool CClientPed::IsRunningAnimation()
     {
         CTask* pTask = m_pTaskManager->GetTask(TASK_PRIORITY_PRIMARY);
         if (pTask && pTask->GetTaskType() == TASK_SIMPLE_NAMED_ANIM)
-        {
             return true;
-        }
-        return false;
     }
+
+    // Short-lived partial anims end TASK_SIMPLE_NAMED_ANIM while loop/freezeLastFrame
+    // keeps the pose; fall back to cache (same as streamed-out peds).
     return (m_AnimationCache.bLoop || m_AnimationCache.bFreezeLastFrame) && m_pAnimationBlock;
 }
 
@@ -5852,6 +5973,8 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
             if (pTask)
             {
                 pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+                KillTaskSecondary(TASK_SECONDARY_ATTACK);
+                KillTaskSecondary(TASK_SECONDARY_IK);
                 g_pClientGame->InsertRunNamedAnimTaskToMap(reinterpret_cast<CTaskSimpleRunNamedAnimSAInterface*>(pTask->GetInterface()), this);
             }
         }
@@ -5956,6 +6079,31 @@ void CClientPed::UpdateAnimationProgressAndSpeed()
     animAssoc->SetCurrentSpeed(m_AnimationCache.speed);
 
     m_AnimationCache.progressWaitForStreamIn = false;
+}
+
+void CClientPed::UpdateCustomPartialAnimationBones()
+{
+    std::shared_ptr<CClientIFP> pIFP = GetCustomAnimationIFP();
+    if (!pIFP)
+        return;
+
+    // This is the same name handed to SetNextAnimationCustom for the swap that's now live
+    // (m_bisCurrentAnimationCustom); it isn't cleared once consumed.
+    const SString& strCustomAnimName = GetNextAnimationCustomName();
+
+    auto* pCustomHierarchyInterface = pIFP->GetAnimationHierarchy(strCustomAnimName);
+    if (!pCustomHierarchyInterface)
+        return;
+
+    // Bones the source IFP animation doesn't define are padded out to a fixed pose (see CClientIFP),
+    // so a full mask means there's nothing to restrict and we can skip finding the association at all.
+    std::bitset<32> animatedBonesMask = pIFP->GetAnimatedBonesMask(strCustomAnimName);
+    if (animatedBonesMask.all())
+        return;
+
+    auto pCustomAnimAssociation = GetAnimAssociation(pCustomHierarchyInterface);
+    if (pCustomAnimAssociation)
+        pCustomAnimAssociation->RestrictToBones(animatedBonesMask);
 }
 
 void CClientPed::PostWeaponFire()
