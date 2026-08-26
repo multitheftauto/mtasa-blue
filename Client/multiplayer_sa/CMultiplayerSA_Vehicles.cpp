@@ -68,6 +68,83 @@ static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CBike::ProcessControl
+//
+// Both divide the steer angle by the steering lock in radians to get a steer ratio. The steer
+// angle is itself the steering lock times the input, so a lock of zero makes this 0 / 0, a NaN
+// rather than an infinity. Cars survive the same division because an infinity trips their
+// "greater than 1" clamp, while a NaN compares false against every clamp. It reaches the rider
+// lean angle, and CBike::CalculateLeanMatrix builds the bike and rider matrices from it, which
+// is what stretches the ped until respawn.
+//
+// A lock of zero means the bike cannot steer, so the ratio is zero. These produce it directly.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6BAB93 | D9 87 A0 00 00 00 | fld     dword ptr [edi + 0A0h]  ; m_fSteeringLock
+//     0x6BAB99 | D8 0D EC 95 85 00 | fmul    dword ptr ds:[08595ECh] ; degrees to radians
+//     0x6BAB9F | DE F9             | fdivp   st(1), st(0)
+#define HOOKPOS_CBike__ProcessControl_SteerRatio  0x6BAB93
+#define HOOKSIZE_CBike__ProcessControl_SteerRatio 14
+static DWORD CONTINUE_CBike__ProcessControl_SteerRatio = 0x6BABA1;
+
+// This one divides a value already on the FPU stack, so zero has to replace it.
+static void __declspec(naked) HOOK_CBike__ProcessControl_SteerRatio()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [edi + 0A0h]
+        test    eax, 7FFFFFFFh              // zero, ignoring the sign bit
+        jz      noSteeringLock
+
+        fld     dword ptr [edi + 0A0h]
+        fmul    dword ptr ds:[08595ECh]
+        fdivp   st(1), st(0)
+        jmp     CONTINUE_CBike__ProcessControl_SteerRatio
+
+        noSteeringLock:
+        fstp    st(0)
+        fldz
+        jmp     CONTINUE_CBike__ProcessControl_SteerRatio
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6BBA49 | D9 81 A0 00 00 00 | fld     dword ptr [ecx + 0A0h]  ; m_fSteeringLock
+//     0x6BBA4F | D8 0D EC 95 85 00 | fmul    dword ptr ds:[08595ECh] ; degrees to radians
+//     0x6BBA55 | D8 BE 94 04 00 00 | fdivr   dword ptr [esi + 494h]  ; m_fSteerAngle
+#define HOOKPOS_CBike__ProcessControl_LeanRatio  0x6BBA49
+#define HOOKSIZE_CBike__ProcessControl_LeanRatio 18
+static DWORD CONTINUE_CBike__ProcessControl_LeanRatio = 0x6BBA5B;
+
+// This one pushes a new value onto the FPU stack, so zero is simply pushed instead.
+static void __declspec(naked) HOOK_CBike__ProcessControl_LeanRatio()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [ecx + 0A0h]
+        test    eax, 7FFFFFFFh
+        jz      noSteeringLock
+
+        fld     dword ptr [ecx + 0A0h]
+        fmul    dword ptr ds:[08595ECh]
+        fdivr   dword ptr [esi + 494h]
+        jmp     CONTINUE_CBike__ProcessControl_LeanRatio
+
+        noSteeringLock:
+        fldz
+        jmp     CONTINUE_CBike__ProcessControl_LeanRatio
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 // CAutomobile::HydraulicControl
 //
 // This hook gives monster trucks working hydraulics instead of letting the native control wreck
@@ -4694,6 +4771,8 @@ void CMultiplayerSA::InitHooks_Vehicles()
     EZHookInstall(CObject__ProcessControl_ForkliftCanCarry);
     EZHookInstall(CObject__ObjectDamage_ForkliftImmune);
     EZHookInstall(CAutomobile__ProcessEntityCollision_ForkliftColPointDrop);
+    EZHookInstall(CBike__ProcessControl_SteerRatio);
+    EZHookInstall(CBike__ProcessControl_LeanRatio);
     EZHookInstall(CAutomobile__HydraulicControl);
     EZHookInstall(CAutomobile__ProcessControl_CementAngleReset);
     EZHookInstall(CAutomobile__ProcessControl_CementMiscGate);

@@ -287,6 +287,8 @@ public:
     // Cleanup CEGUI active resources (dead pool)
     void Cleanup();
 
+    CGUIElement* GetScriptRoot() override { return m_ScriptRoot; }
+
 private:
     friend class CGUIElement_Impl;
     CGUIButton*      _CreateButton(CGUIElement_Impl* pParent = NULL, const char* szCaption = "");
@@ -319,6 +321,8 @@ private:
     CEGUI::WindowManager*   m_pWindowManager;
 
     CEGUI::DefaultWindow* m_pTop;
+    CEGUI::DefaultWindow* m_ScriptTop;
+    CGUIElement*          m_ScriptRoot;
     const CEGUI::Image*   m_pCursor;
     float                 m_fCurrentServerCursorAlpha;
 
