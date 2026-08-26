@@ -627,8 +627,14 @@ static UINT GetWindowDpi(HWND window)
     using GetDpiForWindow_t = UINT(WINAPI*)(HWND);
 
     static GetDpiForWindow_t Win32GetDpiForWindow = ([] {
-        HMODULE user32 = LoadLibrary("user32");
-        return user32 ? reinterpret_cast<GetDpiForWindow_t>(static_cast<void*>(GetProcAddress(user32, "GetDpiForWindow"))) : nullptr;
+        HMODULE hUser32 = GetModuleHandleA("user32.dll");
+        if (hUser32)
+        {
+            return reinterpret_cast<GetDpiForWindow_t>(
+                GetProcAddress(hUser32, "GetDpiForWindow")
+            );
+        }
+        return static_cast<GetDpiForWindow_t>(nullptr);
     })();
 
     if (Win32GetDpiForWindow)
