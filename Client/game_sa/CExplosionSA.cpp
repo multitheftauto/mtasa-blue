@@ -37,12 +37,12 @@ void CExplosionSA::SetExplosionPosition(const CVector* vecPosition)
  */
 CEntity* CExplosionSA::GetExplosionCreator()
 {
-    eEntityType entityType = (eEntityType)GetInterface()->m_pEntExplosionOwner->nType;
+    auto entityType = (EntityType::Enum)GetInterface()->m_pEntExplosionOwner->nType;
 
     CPools* pools = pGame->GetPools();
     switch (entityType)
     {
-        case ENTITY_TYPE_PED:
+        case EntityType::PED:
         {
             SClientEntity<CPedSA>* pPedClientEntity = pools->GetPed((DWORD*)GetInterface()->m_pEntExplosionOwner);
             if (pPedClientEntity)
@@ -51,7 +51,7 @@ CEntity* CExplosionSA::GetExplosionCreator()
             }
             break;
         }
-        case ENTITY_TYPE_VEHICLE:
+        case EntityType::VEHICLE:
         {
             SClientEntity<CVehicleSA>* pVehicleClientEntity = pools->GetVehicle((DWORD*)GetInterface()->m_pEntExplosionOwner);
             if (pVehicleClientEntity)
@@ -60,7 +60,7 @@ CEntity* CExplosionSA::GetExplosionCreator()
             }
             break;
         }
-        case ENTITY_TYPE_OBJECT:
+        case EntityType::OBJECT:
         {
             break;
         }

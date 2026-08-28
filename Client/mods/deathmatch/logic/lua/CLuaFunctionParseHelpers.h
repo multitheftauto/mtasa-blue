@@ -101,7 +101,7 @@ DECLARE_ENUM_CLASS(eModelLoadState);
 DECLARE_ENUM_CLASS(PreloadAreaOption);
 DECLARE_ENUM_CLASS(RestreamOption);
 DECLARE_ENUM_CLASS(taskType);
-DECLARE_ENUM(eEntityType);
+DECLARE_ENUM(ElementType::Enum);
 DECLARE_ENUM_CLASS(VehicleAudioSettingProperty);
 DECLARE_ENUM_CLASS(PostFXType);
 

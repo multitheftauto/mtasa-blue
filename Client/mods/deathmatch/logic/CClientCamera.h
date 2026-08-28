@@ -41,7 +41,7 @@ public:
     void Unlink() {};
     void DoPulse();
 
-    eClientEntityType GetType() const { return CCLIENTCAMERA; };
+    ElementType::Enum GetType() const { return ElementType::CAMERA; };
 
     bool  SetMatrix(const CMatrix& Matrix);
     bool  GetMatrix(CMatrix& Matrix) const;

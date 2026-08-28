@@ -17,7 +17,7 @@
 CScriptFile::CScriptFile(uint uiScriptId, const char* szFilename, unsigned long ulMaxSize) : CElement(NULL)
 {
     // Init
-    m_iType = CElement::SCRIPTFILE;
+    m_iType = ElementType::SCRIPTFILE;
     SetTypeName("file");
     m_uiScriptId = uiScriptId;
     m_pFile = NULL;

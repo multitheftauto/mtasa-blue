@@ -111,7 +111,7 @@ int CLuaFunctionDefs::ExecuteCommandHandler(lua_State* luaVM)
         if (pLuaMain)
         {
             CClient* pClient = NULL;
-            if (pElement->GetType() == CElement::PLAYER)
+            if (pElement->GetType() == ElementType::PLAYER)
                 pClient = static_cast<CClient*>(static_cast<CPlayer*>(pElement));
 
             if (pClient)

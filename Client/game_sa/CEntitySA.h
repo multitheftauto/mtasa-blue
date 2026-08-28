@@ -240,7 +240,7 @@ public:
     CEntitySAInterface* GetInterface() const { return m_pInterface; };
     void                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
 
-    bool IsPed() { return GetEntityType() == ENTITY_TYPE_PED; }
+    bool IsPed() { return GetEntityType() == EntityType::PED; }
     void UpdateRpHAnim();
     bool SetScaleInternal(const CVector& scale);
     void SetPosition(float fX, float fY, float fZ);
@@ -262,7 +262,7 @@ public:
     CMatrix*     GetMatrixInternal(CMatrix* matrix);
     void         SetMatrix(CMatrix* matrix);
     WORD         GetModelIndex();
-    eEntityType  GetEntityType();
+    EntityType::Enum  GetEntityType();
     bool         IsOnScreen();
     bool         IsFullyVisible();
 

@@ -132,7 +132,7 @@ void CElementRPCs::SetElementPosition(CClientEntity* pSource, NetBitStreamInterf
         pSource->SetSyncTimeContext(ucTimeContext);
 
         // If it's a player, use Teleport
-        if (pSource->GetType() == CCLIENTPLAYER)
+        if (pSource->GetType() == ElementType::PLAYER)
         {
             unsigned char ucWarp = 1;
             bitStream.Read(ucWarp);
@@ -155,7 +155,7 @@ void CElementRPCs::SetElementPosition(CClientEntity* pSource, NetBitStreamInterf
                 m_pClientGame->GetNetAPI()->ResetReturnPosition();
             }
         }
-        else if (pSource->GetType() == CCLIENTVEHICLE)
+        else if (pSource->GetType() == ElementType::VEHICLE)
         {
             CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
             pVehicle->RemoveTargetPosition();
@@ -177,8 +177,8 @@ void CElementRPCs::SetElementVelocity(CClientEntity* pSource, NetBitStreamInterf
     {
         switch (pSource->GetType())
         {
-            case CCLIENTPED:
-            case CCLIENTPLAYER:
+            case ElementType::PED:
+            case ElementType::PLAYER:
             {
                 CClientPed* pPed = static_cast<CClientPed*>(pSource);
 
@@ -192,15 +192,15 @@ void CElementRPCs::SetElementVelocity(CClientEntity* pSource, NetBitStreamInterf
                 }
                 break;
             }
-            case CCLIENTVEHICLE:
+            case ElementType::VEHICLE:
             {
                 CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
                 pVehicle->SetMoveSpeed(vecVelocity);
 
                 break;
             }
-            case CCLIENTOBJECT:
-            case CCLIENTWEAPON:
+            case ElementType::OBJECT:
+            case ElementType::WEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetMoveSpeed(vecVelocity);
@@ -219,8 +219,8 @@ void CElementRPCs::SetElementAngularVelocity(CClientEntity* pSource, NetBitStrea
     {
         switch (pSource->GetType())
         {
-            case CCLIENTPED:
-            case CCLIENTPLAYER:
+            case ElementType::PED:
+            case ElementType::PLAYER:
             {
                 CClientPed* pPed = static_cast<CClientPed*>(pSource);
 
@@ -228,15 +228,15 @@ void CElementRPCs::SetElementAngularVelocity(CClientEntity* pSource, NetBitStrea
 
                 break;
             }
-            case CCLIENTVEHICLE:
+            case ElementType::VEHICLE:
             {
                 CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
                 pVehicle->SetTurnSpeed(vecTurnVelocity);
 
                 break;
             }
-            case CCLIENTOBJECT:
-            case CCLIENTWEAPON:
+            case ElementType::OBJECT:
+            case ElementType::WEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetTurnSpeed(vecTurnVelocity);
@@ -253,7 +253,7 @@ void CElementRPCs::SetElementInterior(CClientEntity* pSource, NetBitStreamInterf
     if (bitStream.Read(ucInterior) && bitStream.Read(ucSetPosition))
     {
         pSource->SetInterior(ucInterior);
-        if (pSource->GetType() == CCLIENTPLAYER)
+        if (pSource->GetType() == ElementType::PLAYER)
         {
             CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pSource);
             if (pPlayer->IsLocalPlayer())
@@ -275,20 +275,20 @@ void CElementRPCs::SetElementInterior(CClientEntity* pSource, NetBitStreamInterf
         CClientColManager* pColManager = m_pClientGame->GetManager()->GetColManager();
         switch (pSource->GetType())
         {
-            case CCLIENTPLAYER:
-            case CCLIENTPED:
-            case CCLIENTVEHICLE:
+            case ElementType::PLAYER:
+            case ElementType::PED:
+            case ElementType::VEHICLE:
             {
                 CVector vecEntityPosition;
                 pSource->GetPosition(vecEntityPosition);
                 pColManager->DoHitDetection(vecEntityPosition, 0.0f, pSource);
                 break;
             }
-            case CCLIENTMARKER:
-            case CCLIENTPICKUP:
+            case ElementType::MARKER:
+            case ElementType::PICKUP:
             {
                 CClientColShape* pColShape = NULL;
-                if (pSource->GetType() == CCLIENTMARKER)
+                if (pSource->GetType() == ElementType::MARKER)
                     pColShape = static_cast<CClientMarker*>(pSource)->GetColShape();
                 else
                     pColShape = static_cast<CClientPickup*>(pSource)->GetColShape();
@@ -308,7 +308,7 @@ void CElementRPCs::SetElementDimension(CClientEntity* pSource, NetBitStreamInter
     unsigned short usDimension;
     if (bitStream.Read(usDimension))
     {
-        if (pSource->GetType() == CCLIENTTEAM)
+        if (pSource->GetType() == ElementType::TEAM)
         {
             CClientTeam*                         pTeam = static_cast<CClientTeam*>(pSource);
             list<CClientPlayer*>::const_iterator iter = pTeam->IterBegin();
@@ -326,7 +326,7 @@ void CElementRPCs::SetElementDimension(CClientEntity* pSource, NetBitStreamInter
         }
         else
         {
-            if (pSource->GetType() == CCLIENTPLAYER)
+            if (pSource->GetType() == ElementType::PLAYER)
             {
                 CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pSource);
                 if (pPlayer->IsLocalPlayer())
@@ -438,32 +438,32 @@ void CElementRPCs::SetElementAlpha(CClientEntity* pSource, NetBitStreamInterface
     {
         switch (pSource->GetType())
         {
-            case CCLIENTPED:
-            case CCLIENTPLAYER:
+            case ElementType::PED:
+            case ElementType::PLAYER:
             {
                 CClientPed* pPed = static_cast<CClientPed*>(pSource);
                 pPed->SetAlpha(ucAlpha);
                 break;
             }
-            case CCLIENTVEHICLE:
+            case ElementType::VEHICLE:
             {
                 CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
                 pVehicle->SetAlpha(ucAlpha);
                 break;
             }
-            case CCLIENTOBJECT:
-            case CCLIENTWEAPON:
+            case ElementType::OBJECT:
+            case ElementType::WEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetAlpha(ucAlpha);
                 break;
             }
-            case CCLIENTBUILDING:
+            case ElementType::BUILDING:
             {
                 static_cast<CClientBuilding*>(pSource)->SetAlpha(ucAlpha);
                 break;
             }
-            case CCLIENTPROJECTILE:
+            case ElementType::PROJECTILE:
             {
                 static_cast<CClientProjectile*>(pSource)->SetAlpha(ucAlpha);
                 break;
@@ -500,8 +500,8 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
 
         switch (pSource->GetType())
         {
-            case CCLIENTPED:
-            case CCLIENTPLAYER:
+            case ElementType::PED:
+            case ElementType::PLAYER:
             {
                 CClientPed* pPed = static_cast<CClientPed*>(pSource);
                 if (pPed->IsHealthLocked())
@@ -537,15 +537,15 @@ void CElementRPCs::SetElementHealth(CClientEntity* pSource, NetBitStreamInterfac
                 break;
             }
 
-            case CCLIENTVEHICLE:
+            case ElementType::VEHICLE:
             {
                 CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
                 pVehicle->SetHealth(fHealth);
                 break;
             }
 
-            case CCLIENTOBJECT:
-            case CCLIENTWEAPON:
+            case ElementType::OBJECT:
+            case ElementType::WEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetHealth(fHealth);
@@ -564,8 +564,8 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
 
     switch (pSource->GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed*          pPed = static_cast<CClientPed*>(pSource);
             const unsigned short usCurrentModel = static_cast<ushort>(pPed->GetModel());
@@ -584,7 +584,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
             break;
         }
 
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             uchar ucVariant = 255, ucVariant2 = 255;
             if (bitStream.GetNumberOfUnreadBits() >= sizeof(ucVariant) + sizeof(ucVariant2))
@@ -609,8 +609,8 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
             break;
         }
 
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject*       pObject = static_cast<CClientObject*>(pSource);
             const unsigned short usCurrentModel = pObject->GetModel();
@@ -626,7 +626,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
 
             break;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             CClientBuilding* building = static_cast<CClientBuilding*>(pSource);
             const auto       currentModel = building->GetModel();
@@ -663,30 +663,30 @@ void CElementRPCs::SetElementCollisionsEnabled(CClientEntity* pSource, NetBitStr
     {
         switch (pSource->GetType())
         {
-            case CCLIENTPED:
-            case CCLIENTPLAYER:
+            case ElementType::PED:
+            case ElementType::PLAYER:
             {
                 CClientPed* pPed = static_cast<CClientPed*>(pSource);
                 pPed->SetUsesCollision(bEnable);
                 break;
             }
 
-            case CCLIENTVEHICLE:
+            case ElementType::VEHICLE:
             {
                 CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
                 pVehicle->SetCollisionEnabled(bEnable);
                 break;
             }
 
-            case CCLIENTOBJECT:
-            case CCLIENTWEAPON:
+            case ElementType::OBJECT:
+            case ElementType::WEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetCollisionEnabled(bEnable);
                 break;
             }
 
-            case CCLIENTBUILDING:
+            case ElementType::BUILDING:
             {
                 static_cast<CClientBuilding*>(pSource)->SetUsesCollision(bEnable);
                 break;
@@ -703,29 +703,29 @@ void CElementRPCs::SetElementFrozen(CClientEntity* pSource, NetBitStreamInterfac
     {
         switch (pSource->GetType())
         {
-            case CCLIENTPED:
-            case CCLIENTPLAYER:
+            case ElementType::PED:
+            case ElementType::PLAYER:
             {
                 CClientPed* pPed = static_cast<CClientPed*>(pSource);
                 pPed->SetFrozen(bFrozen);
                 break;
             }
 
-            case CCLIENTVEHICLE:
+            case ElementType::VEHICLE:
             {
                 CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pSource);
                 pVehicle->SetFrozen(bFrozen);
                 break;
             }
 
-            case CCLIENTOBJECT:
-            case CCLIENTWEAPON:
+            case ElementType::OBJECT:
+            case ElementType::WEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetFrozen(bFrozen);
                 break;
             }
-            case CCLIENTPROJECTILE:
+            case ElementType::PROJECTILE:
             {
                 static_cast<CClientProjectile*>(pSource)->SetFrozen(bFrozen);
                 break;
@@ -741,14 +741,14 @@ void CElementRPCs::SetLowLodElement(CClientEntity* pSource, NetBitStreamInterfac
     {
         switch (pSource->GetType())
         {
-            case CCLIENTOBJECT:
+            case ElementType::OBJECT:
             {
                 CClientObject* pLowLodObject = DynamicCast<CClientObject>(CElementIDs::GetElement(LowLodObjectID));
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetLowLodObject(pLowLodObject);
                 break;
             }
-            case CCLIENTBUILDING:
+            case ElementType::BUILDING:
             {
                 CClientBuilding* pLowLodBuilding = DynamicCast<CClientBuilding>(CElementIDs::GetElement(LowLodObjectID));
                 CClientBuilding* pBuilding = static_cast<CClientBuilding*>(pSource);
@@ -761,7 +761,7 @@ void CElementRPCs::SetLowLodElement(CClientEntity* pSource, NetBitStreamInterfac
 
 void CElementRPCs::FireCustomWeapon(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    if (pSource->GetType() == CCLIENTWEAPON)
+    if (pSource->GetType() == ElementType::WEAPON)
     {
         CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
         pWeapon->Fire(true);
@@ -771,7 +771,7 @@ void CElementRPCs::FireCustomWeapon(CClientEntity* pSource, NetBitStreamInterfac
 void CElementRPCs::SetCustomWeaponState(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     char cWeaponState = 0;
-    if (bitStream.Read(cWeaponState) && pSource->GetType() == CCLIENTWEAPON)
+    if (bitStream.Read(cWeaponState) && pSource->GetType() == ElementType::WEAPON)
     {
         CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
         pWeapon->SetWeaponState((eWeaponState)cWeaponState);
@@ -781,7 +781,7 @@ void CElementRPCs::SetCustomWeaponState(CClientEntity* pSource, NetBitStreamInte
 void CElementRPCs::SetCustomWeaponClipAmmo(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     int iAmmo = 0;
-    if (bitStream.Read(iAmmo) && pSource->GetType() == CCLIENTWEAPON)
+    if (bitStream.Read(iAmmo) && pSource->GetType() == ElementType::WEAPON)
     {
         CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
         pWeapon->SetClipAmmo(iAmmo);
@@ -791,7 +791,7 @@ void CElementRPCs::SetCustomWeaponClipAmmo(CClientEntity* pSource, NetBitStreamI
 void CElementRPCs::SetCustomWeaponAmmo(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     int iAmmo = 0;
-    if (bitStream.Read(iAmmo) && pSource->GetType() == CCLIENTWEAPON)
+    if (bitStream.Read(iAmmo) && pSource->GetType() == ElementType::WEAPON)
     {
         CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
         pWeapon->SetAmmo(iAmmo);
@@ -805,7 +805,7 @@ void CElementRPCs::SetCustomWeaponTarget(CClientEntity* pSource, NetBitStreamInt
     bool      bVector = false;
     CVector   vecTarget;
 
-    if (bitStream.ReadBit(bVector) && pSource->GetType() == CCLIENTWEAPON)
+    if (bitStream.ReadBit(bVector) && pSource->GetType() == ElementType::WEAPON)
     {
         CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
         if (bVector)
@@ -827,7 +827,7 @@ void CElementRPCs::SetCustomWeaponTarget(CClientEntity* pSource, NetBitStreamInt
 
 void CElementRPCs::ResetCustomWeaponTarget(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    if (pSource->GetType() == CCLIENTWEAPON)
+    if (pSource->GetType() == ElementType::WEAPON)
     {
         CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
         pWeapon->ResetWeaponTarget();
@@ -836,7 +836,7 @@ void CElementRPCs::ResetCustomWeaponTarget(CClientEntity* pSource, NetBitStreamI
 
 void CElementRPCs::SetCustomWeaponFlags(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    if (pSource->GetType() == CCLIENTWEAPON)
+    if (pSource->GetType() == ElementType::WEAPON)
     {
         CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
         pWeapon->Fire();
@@ -846,7 +846,7 @@ void CElementRPCs::SetCustomWeaponFlags(CClientEntity* pSource, NetBitStreamInte
 void CElementRPCs::SetCustomWeaponFiringRate(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     int iFiringRate = 0;
-    if (bitStream.Read(iFiringRate) && pSource->GetType() == CCLIENTWEAPON)
+    if (bitStream.Read(iFiringRate) && pSource->GetType() == ElementType::WEAPON)
     {
         CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
         pWeapon->SetWeaponFireTime(iFiringRate);
@@ -855,7 +855,7 @@ void CElementRPCs::SetCustomWeaponFiringRate(CClientEntity* pSource, NetBitStrea
 
 void CElementRPCs::ResetCustomWeaponFiringRate(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    if (pSource->GetType() == CCLIENTWEAPON)
+    if (pSource->GetType() == ElementType::WEAPON)
     {
         CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
         pWeapon->ResetWeaponFireTime();
@@ -865,7 +865,7 @@ void CElementRPCs::ResetCustomWeaponFiringRate(CClientEntity* pSource, NetBitStr
 void CElementRPCs::SetCustomWeaponWeaponRange(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     float fRange = 0.0f;
-    if (bitStream.Read(fRange) && pSource->GetType() == CCLIENTWEAPON)
+    if (bitStream.Read(fRange) && pSource->GetType() == ElementType::WEAPON)
     {
         CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
         pWeapon->GetWeaponStat()->SetWeaponRange(fRange);
@@ -874,7 +874,7 @@ void CElementRPCs::SetCustomWeaponWeaponRange(CClientEntity* pSource, NetBitStre
 
 void CElementRPCs::SetWeaponOwner(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    if (pSource->GetType() == CCLIENTWEAPON)
+    if (pSource->GetType() == ElementType::WEAPON)
     {
         ElementID PlayerID;
         if (bitStream.Read(PlayerID))
@@ -895,7 +895,7 @@ void CElementRPCs::SetWeaponOwner(CClientEntity* pSource, NetBitStreamInterface&
 
 void CElementRPCs::SetWeaponConfig(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    if (pSource->GetType() == CCLIENTWEAPON)
+    if (pSource->GetType() == ElementType::WEAPON)
     {
         CClientWeapon*       pWeapon = static_cast<CClientWeapon*>(pSource);
         SWeaponConfiguration weaponConfig;

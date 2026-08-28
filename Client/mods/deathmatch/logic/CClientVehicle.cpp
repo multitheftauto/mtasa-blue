@@ -2367,7 +2367,7 @@ void CClientVehicle::StreamedInPulse()
         }
 
         CClientPed* pControllingPed = GetControllingPlayer();
-        if (GetVehicleType() == CLIENTVEHICLE_TRAIN && (!pControllingPed || pControllingPed->GetType() != CCLIENTPLAYER))
+        if (GetVehicleType() == CLIENTVEHICLE_TRAIN && (!pControllingPed || pControllingPed->GetType() != ElementType::PLAYER))
         {
             // Apply chain engine's speed on its carriages (if chain engine isn't streamed in)
             CClientVehicle* pChainEngine = GetChainEngine();
@@ -3459,23 +3459,23 @@ bool CClientVehicle::PickupEntityWithWinch(CClientEntity* pEntity)
         if (m_eWinchType != WINCH_NONE)
         {
             CEntity*          pGameEntity = NULL;
-            eClientEntityType entityType = pEntity->GetType();
+            ElementType::Enum entityType = pEntity->GetType();
             switch (entityType)
             {
-                case CCLIENTOBJECT:
+                case ElementType::OBJECT:
                 {
                     CClientObject* pObject = static_cast<CClientObject*>(pEntity);
                     pGameEntity = pObject->GetGameObject();
                     break;
                 }
-                case CCLIENTPED:
-                case CCLIENTPLAYER:
+                case ElementType::PLAYER:
+                case ElementType::PED:
                 {
                     CClientPed* pModel = static_cast<CClientPed*>(pEntity);
                     pGameEntity = pModel->GetGameEntity();
                     break;
                 }
-                case CCLIENTVEHICLE:
+                case ElementType::VEHICLE:
                 {
                     CClientVehicle* pVehicle = static_cast<CClientVehicle*>(pEntity);
                     pGameEntity = pVehicle->GetGameVehicle();
@@ -4511,7 +4511,7 @@ void CClientVehicle::HandleWaitingForGroundToLoad()
     GetClientSpatialDatabase()->SphereQuery(result, CSphere(vecPosition + CVector(0, 0, -3), 5));
     for (CClientEntityResult::const_iterator it = result.begin(); it != result.end(); ++it)
     {
-        if ((*it)->GetType() == CCLIENTOBJECT)
+        if ((*it)->GetType() == ElementType::OBJECT)
         {
             bNearObject = true;
             break;

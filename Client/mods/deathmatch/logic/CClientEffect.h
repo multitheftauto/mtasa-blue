@@ -37,7 +37,7 @@ public:
     void  SetDrawDistance(float fDrawDistance);
     float GetDrawDistance() const;
 
-    eClientEntityType GetType() const { return CCLIENTEFFECT; };
+    ElementType::Enum GetType() const { return ElementType::EFFECT; };
 
 protected:
     friend class CClientEffectManager;

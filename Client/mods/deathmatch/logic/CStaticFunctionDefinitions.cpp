@@ -392,8 +392,8 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
     int iType = Entity.GetType();
     switch (iType)
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             Ped.GetRotationDegrees(vecRotation);
@@ -413,7 +413,7 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
 
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             Vehicle.GetRotationDegrees(vecRotation);
@@ -423,8 +423,8 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
             }
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.GetRotationDegrees(vecRotation);
@@ -434,7 +434,7 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
             }
             break;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
             pBuilding.GetRotationDegrees(vecRotation);
@@ -444,14 +444,14 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
             }
             break;
         }
-        case CCLIENTPROJECTILE:
+        case ElementType::PROJECTILE:
         {
             CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
             Projectile.GetRotationDegrees(vecRotation);
             break;
         }
-        case CCLIENTCAMERA:
-        case CCLIENTEFFECT:
+        case ElementType::CAMERA:
+        case ElementType::EFFECT:
         {
             Entity.GetRotationDegrees(vecRotation);
             break;
@@ -468,33 +468,33 @@ bool CStaticFunctionDefinitions::GetElementVelocity(CClientEntity& Entity, CVect
     int iType = Entity.GetType();
     switch (iType)
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             Ped.GetMoveSpeed(vecVelocity);
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             Vehicle.GetMoveSpeed(vecVelocity);
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.GetMoveSpeed(vecVelocity);
             break;
         }
-        case CCLIENTPROJECTILE:
+        case ElementType::PROJECTILE:
         {
             CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
             Projectile.GetVelocity(vecVelocity);
             break;
         }
-        case CCLIENTSOUND:
+        case ElementType::SOUND:
         {
             CClientSound& Sound = static_cast<CClientSound&>(Entity);
             Sound.GetVelocity(vecVelocity);
@@ -512,21 +512,21 @@ bool CStaticFunctionDefinitions::GetElementTurnVelocity(CClientEntity& Entity, C
     int iType = Entity.GetType();
     switch (iType)
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             Ped.GetTurnSpeed(vecTurnVelocity);
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             Vehicle.GetTurnSpeed(vecTurnVelocity);
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.GetTurnSpeed(vecTurnVelocity);
@@ -550,27 +550,27 @@ bool CStaticFunctionDefinitions::GetElementBoundingBox(CClientEntity& Entity, CV
     CModelInfo* pModelInfo = NULL;
     switch (Entity.GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             pModelInfo = g_pGame->GetModelInfo(Ped.GetModel());
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             pModelInfo = g_pGame->GetModelInfo(Vehicle.GetModel());
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             pModelInfo = g_pGame->GetModelInfo(Object.GetModel());
             break;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             CClientBuilding& building = static_cast<CClientBuilding&>(Entity);
             pModelInfo = g_pGame->GetModelInfo(building.GetModel());
@@ -605,27 +605,27 @@ bool CStaticFunctionDefinitions::GetElementRadius(CClientEntity& Entity, float& 
     CModelInfo* pModelInfo = NULL;
     switch (Entity.GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             pModelInfo = g_pGame->GetModelInfo(Ped.GetModel());
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             pModelInfo = g_pGame->GetModelInfo(Vehicle.GetModel());
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             pModelInfo = g_pGame->GetModelInfo(Object.GetModel());
             break;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
             pModelInfo = g_pGame->GetModelInfo(Building.GetModel());
@@ -661,24 +661,24 @@ bool CStaticFunctionDefinitions::GetElementDistanceFromCentreOfMassToBaseOfModel
 {
     switch (Entity.GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             fDistance = static_cast<CClientPed&>(Entity).GetDistanceFromCentreOfMassToBaseOfModel();
             return true;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             fDistance = static_cast<CClientVehicle&>(Entity).GetDistanceFromCentreOfMassToBaseOfModel();
             return true;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             fDistance = static_cast<CClientObject&>(Entity).GetDistanceFromCentreOfMassToBaseOfModel();
             return true;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             fDistance = static_cast<CClientBuilding&>(Entity).GetDistanceFromCentreOfMassToBaseOfModel();
             return true;
@@ -699,37 +699,37 @@ bool CStaticFunctionDefinitions::GetElementAlpha(CClientEntity& Entity, unsigned
 {
     switch (Entity.GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             ucAlpha = Ped.GetAlpha();
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             ucAlpha = Vehicle.GetAlpha();
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             ucAlpha = Object.GetAlpha();
             break;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             ucAlpha = static_cast<CClientBuilding&>(Entity).GetAlpha();
             break;
         }
-        case CCLIENTPROJECTILE:
+        case ElementType::PROJECTILE:
         {
             ucAlpha = static_cast<CClientProjectile&>(Entity).GetAlpha();
             break;
         }
-        case CCLIENTMARKER:
+        case ElementType::MARKER:
         {
             CClientMarker& Marker = static_cast<CClientMarker&>(Entity);
             ucAlpha = Marker.GetColor().A;
@@ -745,21 +745,21 @@ bool CStaticFunctionDefinitions::GetElementHealth(CClientEntity& Entity, float& 
 {
     switch (Entity.GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             fHealth = Ped.GetHealth();
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             fHealth = Vehicle.GetHealth();
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             fHealth = Object.GetHealth();
@@ -775,39 +775,39 @@ bool CStaticFunctionDefinitions::GetElementModel(CClientEntity& Entity, unsigned
 {
     switch (Entity.GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             usModel = static_cast<unsigned short>(Ped.GetModel());
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             usModel = Vehicle.GetModel();
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             usModel = Object.GetModel();
             break;
         }
-        case CCLIENTPICKUP:
+        case ElementType::PICKUP:
         {
             CClientPickup& pPickup = static_cast<CClientPickup&>(Entity);
             usModel = pPickup.GetModel();
             break;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
             usModel = pBuilding.GetModel();
             break;
         }
-        case CCLIENTPROJECTILE:
+        case ElementType::PROJECTILE:
         {
             CClientProjectile& pProjectile = static_cast<CClientProjectile&>(Entity);
             usModel = pProjectile.GetModel();
@@ -823,8 +823,8 @@ bool CStaticFunctionDefinitions::IsElementInWater(CClientEntity& Entity, bool& b
 {
     switch (Entity.GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             if (Ped.GetOccupiedVehicle())
@@ -838,7 +838,7 @@ bool CStaticFunctionDefinitions::IsElementInWater(CClientEntity& Entity, bool& b
                 break;
             }
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             bInWater = Vehicle.IsInWater();
@@ -854,14 +854,14 @@ bool CStaticFunctionDefinitions::IsElementSyncer(CClientEntity& Entity, bool& bI
 {
     switch (Entity.GetType())
     {
-        case CCLIENTPED:
+        case ElementType::PED:
         {
             CClientPed* Ped = static_cast<CClientPed*>(&Entity);
             if (Ped)
                 bIsSyncer = m_pClientGame->GetPedSync()->Exists(Ped);
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CDeathmatchVehicle* Vehicle = static_cast<CDeathmatchVehicle*>(&Entity);
             if (Vehicle)
@@ -869,7 +869,7 @@ bool CStaticFunctionDefinitions::IsElementSyncer(CClientEntity& Entity, bool& bI
             break;
         }
 #ifdef WITH_OBJECT_SYNC
-        case CCLIENTOBJECT:
+        case ElementType::OBJECT:
         {
             CDeathmatchObject* pObject = static_cast<CDeathmatchObject*>(&Entity);
             if (pObject)
@@ -887,17 +887,17 @@ bool CStaticFunctionDefinitions::IsElementCollidableWith(CClientEntity& Entity, 
 {
     switch (Entity.GetType())
     {
-        case CCLIENTPLAYER:
-        case CCLIENTPED:
-        case CCLIENTOBJECT:
-        case CCLIENTVEHICLE:
+        case ElementType::PLAYER:
+        case ElementType::PED:
+        case ElementType::OBJECT:
+        case ElementType::VEHICLE:
         {
             switch (ThisEntity.GetType())
             {
-                case CCLIENTPLAYER:
-                case CCLIENTPED:
-                case CCLIENTOBJECT:
-                case CCLIENTVEHICLE:
+                case ElementType::PLAYER:
+                case ElementType::PED:
+                case ElementType::OBJECT:
+                case ElementType::VEHICLE:
                 {
                     bCanCollide = Entity.IsCollidableWith(&ThisEntity);
                     return true;
@@ -918,23 +918,23 @@ bool CStaticFunctionDefinitions::GetElementCollisionsEnabled(CClientEntity& Enti
 {
     switch (Entity.GetType())
     {
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             return Vehicle.IsCollisionEnabled();
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             return static_cast<CClientObject&>(Entity).IsCollisionEnabled();
         }
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             return Ped.GetUsesCollision();
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             return static_cast<CClientBuilding&>(Entity).GetUsesCollision();
         }
@@ -949,27 +949,27 @@ bool CStaticFunctionDefinitions::IsElementFrozen(CClientEntity& Entity, bool& bF
 {
     switch (Entity.GetType())
     {
-        case CCLIENTPLAYER:
-        case CCLIENTPED:
+        case ElementType::PLAYER:
+        case ElementType::PED:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             bFrozen = Ped.IsFrozen();
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             bFrozen = Vehicle.IsFrozen();
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             bFrozen = Object.IsFrozen();
             break;
         }
-        case CCLIENTPROJECTILE:
+        case ElementType::PROJECTILE:
         {
             bFrozen = static_cast<CClientProjectile&>(Entity).IsFrozen();
             break;
@@ -987,7 +987,7 @@ CClientDummy* CStaticFunctionDefinitions::CreateElement(CResource& Resource, con
     assert(szID);
 
     // Long enough typename and not an internal one?
-    if (szTypeName[0] != '\0' && CClientEntity::GetTypeID(szTypeName) == CCLIENTUNKNOWN)
+    if (szTypeName[0] != '\0' && CClientEntity::GetTypeID(szTypeName) == ElementType::UNKNOWN)
     {
         CClientDummy* pDummy = new CClientDummy(m_pManager, INVALID_ELEMENT_ID, szTypeName);
         pDummy->SetName(szID);
@@ -1114,8 +1114,8 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
     int iType = Entity.GetType();
     switch (iType)
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_MINUS_ZYX)
@@ -1134,7 +1134,7 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
             }
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZYX)
@@ -1147,8 +1147,8 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
             }
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
@@ -1162,7 +1162,7 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
 
             break;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
             if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
@@ -1175,15 +1175,15 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
             }
             break;
         }
-        case CCLIENTPROJECTILE:
+        case ElementType::PROJECTILE:
         {
             // Didn't implement anything for projectiles since I couldn't really test (only non crashing element was satchel and its rotation is ugly)
             CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
             Projectile.SetRotationDegrees(const_cast<CVector&>(vecRotation));
             break;
         }
-        case CCLIENTCAMERA:
-        case CCLIENTEFFECT:
+        case ElementType::CAMERA:
+        case ElementType::EFFECT:
         {
             Entity.SetRotationDegrees(vecRotation);
             break;
@@ -1202,33 +1202,33 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CClientEntity& Entity, const
     int iType = Entity.GetType();
     switch (iType)
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             Ped.SetMoveSpeed(vecVelocity);
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             Vehicle.SetMoveSpeed(vecVelocity);
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.SetMoveSpeed(vecVelocity);
             break;
         }
-        case CCLIENTPROJECTILE:
+        case ElementType::PROJECTILE:
         {
             CClientProjectile& Projectile = static_cast<CClientProjectile&>(Entity);
             Projectile.SetVelocity(const_cast<CVector&>(vecVelocity));
             break;
         }
-        case CCLIENTSOUND:
+        case ElementType::SOUND:
         {
             CClientSound& Sound = static_cast<CClientSound&>(Entity);
             Sound.SetVelocity(const_cast<CVector&>(vecVelocity));
@@ -1249,21 +1249,21 @@ bool CStaticFunctionDefinitions::SetElementAngularVelocity(CClientEntity& Entity
     int iType = Entity.GetType();
     switch (iType)
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             Ped.SetTurnSpeed(vecTurnVelocity);
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             Vehicle.SetTurnSpeed(vecTurnVelocity);
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.SetTurnSpeed(vecTurnVelocity);
@@ -1281,17 +1281,17 @@ bool CStaticFunctionDefinitions::SetElementParent(CClientEntity& Entity, CClient
     if (&Entity == &Parent || Entity.IsMyChild(&Parent, true))
         return false;
 
-    if (Entity.GetType() == CCLIENTCAMERA || Parent.GetType() == CCLIENTCAMERA)
+    if (Entity.GetType() == ElementType::CAMERA || Parent.GetType() == ElementType::CAMERA)
         return false;
 
-    if (Entity.GetType() == CCLIENTGUI)
+    if (Entity.GetType() == ElementType::GUI)
     {
-        if (Parent.GetType() != CCLIENTGUI && &Parent != pLuaMain->GetResource()->GetResourceGUIEntity())
+        if (Parent.GetType() != ElementType::GUI && &Parent != pLuaMain->GetResource()->GetResourceGUIEntity())
             return false;
 
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
 
-        if (Parent.GetType() == CCLIENTGUI)
+        if (Parent.GetType() == ElementType::GUI)
             GUIElement.GetCGUIElement()->SetParent(static_cast<CClientGUIElement&>(Parent).GetCGUIElement());
         else
             GUIElement.GetCGUIElement()->SetParent(m_pGUI->GetScriptRoot());
@@ -1334,7 +1334,7 @@ bool CStaticFunctionDefinitions::SetElementInterior(CClientEntity& Entity, unsig
     if (bSetPosition)
         Entity.SetPosition(vecPosition);
 
-    if (Entity.GetType() == CCLIENTPLAYER)
+    if (Entity.GetType() == ElementType::PLAYER)
     {
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         if (Ped.IsLocalPlayer())
@@ -1346,17 +1346,17 @@ bool CStaticFunctionDefinitions::SetElementInterior(CClientEntity& Entity, unsig
 
     switch (Entity.GetType())
     {
-        case CCLIENTPLAYER:
-        case CCLIENTPED:
-        case CCLIENTVEHICLE:
+        case ElementType::PLAYER:
+        case ElementType::PED:
+        case ElementType::VEHICLE:
         {
             CVector vecEntityPosition;
             Entity.GetPosition(vecEntityPosition);
             m_pColManager->DoHitDetection(vecEntityPosition, 0.0f, &Entity);
             break;
         }
-        case CCLIENTMARKER:
-        case CCLIENTPICKUP:
+        case ElementType::MARKER:
+        case ElementType::PICKUP:
         {
             CClientColShape* pColShape = GetElementColShape(&Entity);
             if (pColShape)
@@ -1377,7 +1377,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
     switch (Entity.GetType())
     {
         // Client side elements
-        case CCLIENTTEAM:
+        case ElementType::TEAM:
         {
             CClientTeam&                         Team = static_cast<CClientTeam&>(Entity);
             list<CClientPlayer*>::const_iterator iter = Team.IterBegin();
@@ -1387,27 +1387,26 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
             }
         }
 
-        case CCLIENTCOLSHAPE:
-        case CCLIENTDUMMY:
-        case CCLIENTVEHICLE:
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
-        case CCLIENTMARKER:
-        case CCLIENTRADARMARKER:
-        case CCLIENTPED:
-        case CCLIENTPICKUP:
-        case CCLIENTPOINTLIGHTS:
-        case CCLIENTRADARAREA:
-        case CCLIENTWORLDMESH:
-        case CCLIENTSOUND:
-        case CCLIENTWATER:
-        case CCLIENTBUILDING:
+        case ElementType::COLSHAPE:
+        case ElementType::DUMMY:
+        case ElementType::VEHICLE:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
+        case ElementType::MARKER:
+        case ElementType::BLIP:
+        case ElementType::PED:
+        case ElementType::PICKUP:
+        case ElementType::POINTLIGHTS:
+        case ElementType::RADAR_AREA:
+        case ElementType::SOUND:
+        case ElementType::WATER:
+        case ElementType::BUILDING:
         {
             Entity.SetDimension(usDimension);
             return true;
         }
 
-        case CCLIENTPLAYER:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             if (Ped.IsLocalPlayer())
@@ -1504,37 +1503,37 @@ bool CStaticFunctionDefinitions::SetElementAlpha(CClientEntity& Entity, unsigned
 
     switch (Entity.GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             Ped.SetAlpha(ucAlpha);
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             Vehicle.SetAlpha(ucAlpha);
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.SetAlpha(ucAlpha);
             break;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             static_cast<CClientBuilding&>(Entity).SetAlpha(ucAlpha);
             break;
         }
-        case CCLIENTPROJECTILE:
+        case ElementType::PROJECTILE:
         {
             static_cast<CClientProjectile&>(Entity).SetAlpha(ucAlpha);
             break;
         }
-        case CCLIENTMARKER:
+        case ElementType::MARKER:
         {
             CClientMarker& Marker = static_cast<CClientMarker&>(Entity);
             SColor         color = Marker.GetColor();
@@ -1555,8 +1554,8 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
 
     switch (Entity.GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             // Grab the model
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
@@ -1573,14 +1572,14 @@ bool CStaticFunctionDefinitions::SetElementHealth(CClientEntity& Entity, float f
             return true;
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             Vehicle.SetHealth(fHealth);
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.SetHealth(fHealth);
@@ -1619,8 +1618,8 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
 
     switch (Entity.GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             // Grab the model
             CClientPed&          Ped = static_cast<CClientPed&>(Entity);
@@ -1634,7 +1633,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
 
             return callOnChangeEvent(Ped, usCurrentModel, usModel);
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle&      Vehicle = static_cast<CClientVehicle&>(Entity);
             const unsigned short usCurrentModel = Vehicle.GetModel();
@@ -1665,8 +1664,8 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
 
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject&       Object = static_cast<CClientObject&>(Entity);
             const unsigned short usCurrentModel = Object.GetModel();
@@ -1681,7 +1680,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
 
             return callOnChangeEvent(Object, usCurrentModel, usModel);
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             CClientBuilding&     Object = static_cast<CClientBuilding&>(Entity);
             const unsigned short usCurrentModel = Object.GetModel();
@@ -1696,7 +1695,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
 
             return callOnChangeEvent(Object, usCurrentModel, usModel);
         }
-        case CCLIENTPROJECTILE:
+        case ElementType::PROJECTILE:
         {
             CClientProjectile&   Projectile = static_cast<CClientProjectile&>(Entity);
             const unsigned short usCurrentModel = Projectile.GetModel();
@@ -1822,7 +1821,7 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& ped, const std::
     if (&ped == GetLocalPlayer())
         return GetControlState(control.c_str(), state);
 
-    if (ped.GetType() == CCLIENTPLAYER)
+    if (ped.GetType() == ElementType::PLAYER)
     {
         CControllerState controller;
         ped.GetControllerState(controller);
@@ -1856,7 +1855,7 @@ bool CStaticFunctionDefinitions::GetPedControlState(CClientPed& ped, const std::
 
 bool CStaticFunctionDefinitions::GetPedAnalogControlState(CClientPed& Ped, const char* szControl, float& fState, bool bRawInput)
 {
-    if (Ped.GetType() == CCLIENTPLAYER)
+    if (Ped.GetType() == ElementType::PLAYER)
     {
         CControllerState cs;
         bool             bOnFoot = (!Ped.GetRealOccupiedVehicle());
@@ -2106,7 +2105,7 @@ bool CStaticFunctionDefinitions::GivePedWeapon(CClientEntity& Entity, uchar ucWe
     {
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         // Make sure it's a ped and not a player
-        if (Ped.GetType() == CCLIENTPED)
+        if (Ped.GetType() == ElementType::PED)
         {
             Ped.GiveWeapon(static_cast<eWeaponType>(ucWeaponID), usWeaponAmmo, bSetAsCurrent);
 
@@ -3866,27 +3865,27 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CClientEntity& Enti
 {
     switch (Entity.GetType())
     {
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             Vehicle.SetCollisionEnabled(bEnabled);
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.SetCollisionEnabled(bEnabled);
             break;
         }
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             Ped.SetUsesCollision(bEnabled);
             break;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             static_cast<CClientBuilding&>(Entity).SetUsesCollision(bEnabled);
             break;
@@ -3902,19 +3901,19 @@ bool CStaticFunctionDefinitions::SetElementCollidableWith(CClientEntity& Entity,
 {
     switch (Entity.GetType())
     {
-        case CCLIENTPLAYER:
-        case CCLIENTPED:
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
-        case CCLIENTVEHICLE:
+        case ElementType::PLAYER:
+        case ElementType::PED:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
+        case ElementType::VEHICLE:
         {
             switch (ThisEntity.GetType())
             {
-                case CCLIENTPLAYER:
-                case CCLIENTPED:
-                case CCLIENTOBJECT:
-                case CCLIENTWEAPON:
-                case CCLIENTVEHICLE:
+                case ElementType::PLAYER:
+                case ElementType::PED:
+                case ElementType::OBJECT:
+                case ElementType::WEAPON:
+                case ElementType::VEHICLE:
                 {
                     Entity.SetCollidableWith(&ThisEntity, bCanCollide);
                     return true;
@@ -3935,27 +3934,27 @@ bool CStaticFunctionDefinitions::SetElementFrozen(CClientEntity& Entity, bool bF
 {
     switch (Entity.GetType())
     {
-        case CCLIENTPLAYER:
-        case CCLIENTPED:
+        case ElementType::PLAYER:
+        case ElementType::PED:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             Ped.SetFrozen(bFrozen);
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             Vehicle.SetFrozen(bFrozen);
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.SetFrozen(bFrozen);
             break;
         }
-        case CCLIENTPROJECTILE:
+        case ElementType::PROJECTILE:
         {
             static_cast<CClientProjectile&>(Entity).SetFrozen(bFrozen);
             break;
@@ -3971,14 +3970,14 @@ bool CStaticFunctionDefinitions::SetLowLodElement(CClientEntity& Entity, CClient
 {
     RUN_CHILDREN(SetLowLodElement(**iter, pLowLodEntity))
 
-    eClientEntityType entityType = Entity.GetType();
+    ElementType::Enum entityType = Entity.GetType();
 
     if (pLowLodEntity != nullptr && entityType != pLowLodEntity->GetType())
         return false;
 
     switch (entityType)
     {
-        case CCLIENTOBJECT:
+        case ElementType::OBJECT:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             CClientObject* pLowLodObject = static_cast<CClientObject*>(pLowLodEntity);
@@ -3986,7 +3985,7 @@ bool CStaticFunctionDefinitions::SetLowLodElement(CClientEntity& Entity, CClient
                 return false;
             break;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
             CClientBuilding* pLowLodBuilding = static_cast<CClientBuilding*>(pLowLodEntity);
@@ -4007,13 +4006,13 @@ bool CStaticFunctionDefinitions::GetLowLodElement(CClientEntity& Entity, CClient
 
     switch (Entity.GetType())
     {
-        case CCLIENTOBJECT:
+        case ElementType::OBJECT:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             pOutLowLodEntity = Object.GetLowLodObject();
             break;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
             pOutLowLodEntity = Building.GetLowLodBuilding();
@@ -4032,13 +4031,13 @@ bool CStaticFunctionDefinitions::IsElementLowLod(CClientEntity& Entity, bool& bO
 
     switch (Entity.GetType())
     {
-        case CCLIENTOBJECT:
+        case ElementType::OBJECT:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             bOutIsLowLod = Object.IsLowLod();
             break;
         }
-        case CCLIENTBUILDING:
+        case ElementType::BUILDING:
         {
             CClientBuilding& Building = static_cast<CClientBuilding&>(Entity);
             bOutIsLowLod = Building.IsLod();
@@ -4075,14 +4074,14 @@ bool CStaticFunctionDefinitions::IsElementFrozenWaitingForGroundToLoad(CClientEn
 {
     switch (Entity.GetType())
     {
-        case CCLIENTPLAYER:
-        case CCLIENTPED:
+        case ElementType::PLAYER:
+        case ElementType::PED:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             bWaitingForGroundToLoad = Ped.IsFrozenWaitingForGroundToLoad();
             return true;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
             bWaitingForGroundToLoad = Vehicle.IsFrozenWaitingForGroundToLoad();
@@ -5174,7 +5173,7 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity)
 
     switch (pEntity->GetType())
     {
-        case CCLIENTPLAYER:
+        case ElementType::PLAYER:
         {
             CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pEntity);
             if (pPlayer->IsLocalPlayer())
@@ -5191,8 +5190,8 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity)
             }
             break;
         }
-        case CCLIENTPED:
-        case CCLIENTVEHICLE:
+        case ElementType::PED:
+        case ElementType::VEHICLE:
         {
             // Reset camera focus and remove all references
             m_pCamera->Reset();
@@ -7468,9 +7467,9 @@ CClientProjectile* CStaticFunctionDefinitions::CreateProjectile(CResource& Resou
     // Valid creator type?
     switch (Creator.GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
-        case CCLIENTVEHICLE:
+        case ElementType::PED:
+        case ElementType::PLAYER:
+        case ElementType::VEHICLE:
         {
             eWeaponType weaponType = (eWeaponType)ucWeaponType;
 
@@ -7711,10 +7710,10 @@ CClientColShape* CStaticFunctionDefinitions::GetElementColShape(CClientEntity* p
     CClientColShape* pColShape = NULL;
     switch (pEntity->GetType())
     {
-        case CCLIENTMARKER:
+        case ElementType::MARKER:
             pColShape = static_cast<CClientMarker*>(pEntity)->GetColShape();
             break;
-        case CCLIENTPICKUP:
+        case ElementType::PICKUP:
             pColShape = static_cast<CClientPickup*>(pEntity)->GetColShape();
             break;
     }

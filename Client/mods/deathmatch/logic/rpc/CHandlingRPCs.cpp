@@ -25,7 +25,7 @@ void CHandlingRPCs::LoadFunctions()
 void CHandlingRPCs::SetVehicleHandling(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Check it's type
-    if (pSource && pSource->GetType() == CCLIENTVEHICLE)
+    if (pSource && pSource->GetType() == ElementType::VEHICLE)
     {
         // Grab the vehicle handling entry
         CClientVehicle& Vehicle = static_cast<CClientVehicle&>(*pSource);
@@ -86,7 +86,7 @@ void CHandlingRPCs::SetVehicleHandlingProperty(CClientEntity* pSource, NetBitStr
     if (bitStream.Read(ucProperty))
     {
         // Check its type
-        if (pSource && pSource->GetType() == CCLIENTVEHICLE)
+        if (pSource && pSource->GetType() == ElementType::VEHICLE)
         {
             // Grab the vehicle handling entry
             CClientVehicle& vehicle = static_cast<CClientVehicle&>(*pSource);
@@ -358,7 +358,7 @@ void CHandlingRPCs::RestoreVehicleHandlingProperty(CClientEntity* pSource, NetBi
     if (bitStream.Read(ucProperty))
     {
         // Check its type
-        if (pSource && pSource->GetType() == CCLIENTVEHICLE)
+        if (pSource && pSource->GetType() == ElementType::VEHICLE)
         {
             // Grab the vehicle handling entry and the original handling
             CClientVehicle&       Vehicle = static_cast<CClientVehicle&>(*pSource);
@@ -516,7 +516,7 @@ void CHandlingRPCs::RestoreVehicleHandlingProperty(CClientEntity* pSource, NetBi
 void CHandlingRPCs::RestoreVehicleHandling(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
     // Check its type
-    if (pSource && pSource->GetType() == CCLIENTVEHICLE)
+    if (pSource && pSource->GetType() == ElementType::VEHICLE)
     {
         // Grab the vehicle handling entry and restore all data
         CClientVehicle&       Vehicle = static_cast<CClientVehicle&>(*pSource);

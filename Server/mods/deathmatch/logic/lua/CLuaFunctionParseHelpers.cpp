@@ -252,30 +252,28 @@ ADD_ENUM(CAccessControlListRight::RIGHT_TYPE_RESOURCE, "resource")
 ADD_ENUM(CAccessControlListRight::RIGHT_TYPE_GENERAL, "general")
 IMPLEMENT_ENUM_END("right-type")
 
-IMPLEMENT_ENUM_BEGIN(CElement::EElementType)
-ADD_ENUM(CElement::DUMMY, "dummy")
-ADD_ENUM(CElement::PLAYER, "player")
-ADD_ENUM(CElement::VEHICLE, "vehicle")
-ADD_ENUM(CElement::OBJECT, "object")
-ADD_ENUM(CElement::MARKER, "marker")
-ADD_ENUM(CElement::BLIP, "blip")
-ADD_ENUM(CElement::PICKUP, "pickup")
-ADD_ENUM(CElement::RADAR_AREA, "radararea")
-ADD_ENUM(CElement::SPAWNPOINT_DEPRECATED, "spawnpoint_deprecated")
-ADD_ENUM(CElement::REMOTECLIENT_DEPRECATED, "remoteclient_deprecated")
-ADD_ENUM(CElement::CONSOLE, "console")
-ADD_ENUM(CElement::PATH_NODE_UNUSED, "pathnode_unused")
-ADD_ENUM(CElement::WORLD_MESH_UNUSED, "worldmesh_unused")
-ADD_ENUM(CElement::TEAM, "team")
-ADD_ENUM(CElement::PED, "ped")
-ADD_ENUM(CElement::COLSHAPE, "colshape")
-ADD_ENUM(CElement::SCRIPTFILE, "scriptfile")
-ADD_ENUM(CElement::WATER, "water")
-ADD_ENUM(CElement::DATABASE_CONNECTION, "db-connection")
-ADD_ENUM(CElement::ROOT, "root")
-ADD_ENUM(CElement::UNKNOWN, "unknown")
-ADD_ENUM(CElement::BUILDING, "building")
-IMPLEMENT_ENUM_END_DEFAULTS("element-type", CElement::UNKNOWN, "unknown")
+IMPLEMENT_ENUM_BEGIN(ElementType::Enum)
+ADD_ENUM(ElementType::Enum::DUMMY, "dummy")
+ADD_ENUM(ElementType::Enum::PLAYER, "player")
+ADD_ENUM(ElementType::Enum::VEHICLE, "vehicle")
+ADD_ENUM(ElementType::Enum::OBJECT, "object")
+ADD_ENUM(ElementType::Enum::MARKER, "marker")
+ADD_ENUM(ElementType::Enum::BLIP, "blip")
+ADD_ENUM(ElementType::Enum::PICKUP, "pickup")
+ADD_ENUM(ElementType::Enum::RADAR_AREA, "radararea")
+ADD_ENUM(ElementType::Enum::TEAM, "team")
+ADD_ENUM(ElementType::Enum::PED, "ped")
+ADD_ENUM(ElementType::Enum::COLSHAPE, "colshape")
+ADD_ENUM(ElementType::Enum::SCRIPTFILE, "scriptfile")
+ADD_ENUM(ElementType::Enum::WATER, "water")
+ADD_ENUM(ElementType::Enum::WEAPON, "weapon")
+ADD_ENUM(ElementType::Enum::UNKNOWN, "unknown")
+ADD_ENUM(ElementType::Enum::BUILDING, "building")
+ADD_ENUM(ElementType::Enum::CONSOLE, "console")
+ADD_ENUM(ElementType::Enum::DATABASE_CONNECTION, "db-connection")
+ADD_ENUM(ElementType::Enum::TRAIN_TRACK, "traintrack")
+ADD_ENUM(ElementType::Enum::ROOT, "root")
+IMPLEMENT_ENUM_END("element-type")
 
 IMPLEMENT_ENUM_BEGIN(CAccountPassword::EAccountPasswordType)
 ADD_ENUM(CAccountPassword::PLAINTEXT, "plaintext")
@@ -441,7 +439,7 @@ CPed* UserDataCast(CPed* ptr, lua_State* luaState)
 {
     ElementID ID = TO_ELEMENTID(ptr);
     CElement* pElement = CElementIDs::GetElement(ID);
-    if (!pElement || pElement->IsBeingDeleted() || (pElement->GetType() != CElement::PED && pElement->GetType() != CElement::PLAYER))
+    if (!pElement || pElement->IsBeingDeleted() || (pElement->GetType() != ElementType::PED && pElement->GetType() != ElementType::PLAYER))
         return nullptr;
     return (CPed*)pElement;
 }
@@ -467,7 +465,7 @@ CPlayer* UserDataCast(CPlayer* ptr, lua_State* luaState)
 {
     ElementID ID = TO_ELEMENTID(ptr);
     CElement* pElement = CElementIDs::GetElement(ID);
-    if (!pElement || pElement->IsBeingDeleted() || (pElement->GetType() != CElement::PLAYER))
+    if (!pElement || pElement->IsBeingDeleted() || (pElement->GetType() != ElementType::PLAYER))
         return nullptr;
     return (CPlayer*)pElement;
 }
@@ -483,9 +481,9 @@ CClient* UserDataCast(CClient* ptr, lua_State* luaState)
         return nullptr;
 
     CClient* pClient = nullptr;
-    if (pElement->GetType() == CElement::PLAYER)
+    if (pElement->GetType() == ElementType::PLAYER)
         pClient = reinterpret_cast<CPlayer*>(pElement);
-    else if (pElement->GetType() == CElement::CONSOLE)
+    else if (pElement->GetType() == ElementType::CONSOLE)
         pClient = reinterpret_cast<CConsoleClient*>(pElement);
 
     return pClient;

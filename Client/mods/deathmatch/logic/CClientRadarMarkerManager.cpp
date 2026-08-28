@@ -61,7 +61,7 @@ CClientRadarMarker* CClientRadarMarkerManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (pEntity && pEntity->GetType() == CCLIENTRADARMARKER)
+    if (pEntity && pEntity->GetType() == ElementType::BLIP)
     {
         return static_cast<CClientRadarMarker*>(pEntity);
     }

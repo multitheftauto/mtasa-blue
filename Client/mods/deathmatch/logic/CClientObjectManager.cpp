@@ -81,7 +81,7 @@ CClientObject* CClientObjectManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (pEntity && pEntity->GetType() == CCLIENTOBJECT)
+    if (pEntity && pEntity->GetType() == ElementType::OBJECT)
     {
         return static_cast<CClientObject*>(pEntity);
     }
@@ -183,7 +183,7 @@ bool CClientObjectManager::ObjectsAroundPointLoaded(const CVector& vecPosition, 
     for (CClientEntityResult::const_iterator it = result.begin(); it != result.end(); ++it)
     {
         CClientEntity* pEntity = *it;
-        if (pEntity->GetType() == CCLIENTOBJECT)
+        if (pEntity->GetType() == ElementType::OBJECT)
         {
             CClientObject* pObject = static_cast<CClientObject*>(pEntity);
             if (!pObject->GetGameObject() || !pObject->GetModelInfo()->IsLoaded() || !pObject->IsStreamedIn())

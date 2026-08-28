@@ -21,7 +21,7 @@ public:
 
     void Unlink();
 
-    eClientEntityType GetType() const { return CCLIENTDUMMY; }
+    ElementType::Enum  GetType() const { return ElementType::DUMMY; }
     const CVector&    GetPosition() { return m_vecPosition; };
     void              GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; };
     void              SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; };

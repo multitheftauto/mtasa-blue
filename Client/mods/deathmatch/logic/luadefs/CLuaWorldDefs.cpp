@@ -2363,7 +2363,7 @@ bool CLuaWorldDefs::ResetDynamicPedShadows() noexcept
     return g_pGame->GetSettings()->ResetDynamicPedShadows();
 }
 
-CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, float, int, eEntityType> CLuaWorldDefs::TestSphereAgainstWorld(
+CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, float, int, ElementType::Enum> CLuaWorldDefs::TestSphereAgainstWorld(
     CVector sphereCenter, float radius, std::optional<CClientEntity*> ignoredEntity, std::optional<bool> checkBuildings, std::optional<bool> checkVehicles,
     std::optional<bool> checkPeds, std::optional<bool> checkObjects, std::optional<bool> checkDummies, std::optional<bool> cameraIgnore)
 {

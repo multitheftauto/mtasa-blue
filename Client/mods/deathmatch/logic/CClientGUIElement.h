@@ -54,7 +54,7 @@ public:
 
     void Unlink();
 
-    eClientEntityType GetType() const { return CCLIENTGUI; };
+    ElementType::Enum GetType() const { return ElementType::GUI; };
     eCGUIType         GetCGUIType() const { return m_pCGUIElement->GetType(); };
     const char*       GetCGUITypeName() const { return m_strCGUITypeName; };
 

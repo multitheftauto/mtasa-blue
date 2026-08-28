@@ -111,35 +111,6 @@ public:
 
     enum
     {
-        DUMMY,
-        PLAYER,
-        VEHICLE,
-        OBJECT,
-        MARKER,
-        BLIP,
-        PICKUP,
-        RADAR_AREA,
-        SPAWNPOINT_DEPRECATED,
-        REMOTECLIENT,
-        CONSOLE,
-        PATH_NODE,
-        WORLD_MESH,
-        TEAM,
-        PED,
-        COLSHAPE,
-        SCRIPTFILE,
-        WATER,
-        WEAPON,
-        _DATABASE_CONNECTION,  // server only
-        TRAIN_TRACK,
-        ROOT,
-        UNKNOWN,
-        BUILDING,
-        POINTLIGHTS,
-    };
-
-    enum
-    {
         MARKER_CHECKPOINT,
         MARKER_RING,
         MARKER_CYLINDER,

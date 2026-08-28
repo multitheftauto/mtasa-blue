@@ -2409,7 +2409,7 @@ bool CClientPed::HasWeapon(eWeaponType weaponType)
 void CClientPed::ValidateRemoteWeapons()
 {
     // Must be streamed in remote player
-    if (!m_pPlayerPed || IsLocalPlayer() || GetType() != CCLIENTPLAYER)
+    if (!m_pPlayerPed || IsLocalPlayer() || GetType() != ElementType::PLAYER)
         return;
 
     // Check everything matches
@@ -2498,7 +2498,7 @@ eMovementState CClientPed::GetMovementState()
         if (!IsDucked())
         {
             bool walking = false;
-            if (GetType() == CCLIENTPLAYER)
+            if (GetType() == ElementType::PLAYER)
                 walking = CClientPad::GetControlState("walk", cs, true);
             else
                 m_Pad.GetControlState("walk", walking);
@@ -2938,7 +2938,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         }
 
         // Are we a CClientPed and not a CClientPlayer
-        if (GetType() == CCLIENTPED)
+        if (GetType() == ElementType::PED)
         {
             // Update our controller state to match our scripted pad
             m_Pad.DoPulse(this);
@@ -3356,7 +3356,7 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     else
     {
         // If we are a normal ped
-        if (GetType() == eClientEntityType::CCLIENTPED)
+        if (GetType() == ElementType::PED)
         {
             // Do we have a weapon?
             CWeapon* pWeapon = GetWeapon();
@@ -3881,7 +3881,7 @@ void CClientPed::_CreateLocalModel()
 void CClientPed::_DestroyModel()
 {
     // Store ped ammo
-    if (GetType() == CCLIENTPED)
+    if (GetType() == ElementType::PED)
     {
         for (uchar i = 0; i < (uchar)WEAPONSLOT_MAX; i++)
         {
@@ -5302,8 +5302,8 @@ CClientEntity* CClientPed::GetContactEntity()
         if (pEntity)
         {
             CEntitySAInterface* pInterface = pEntity->GetInterface();
-            eEntityType         entityType = pInterface ? pEntity->GetEntityType() : ENTITY_TYPE_NOTHING;
-            if (entityType == ENTITY_TYPE_VEHICLE || entityType == ENTITY_TYPE_OBJECT)
+            EntityType::Enum    entityType = pInterface ? pEntity->GetEntityType() : EntityType::NOTHING;
+            if (entityType == EntityType::VEHICLE || entityType == EntityType::OBJECT)
             {
                 return pPools->GetClientEntity((DWORD*)pInterface);
             }
@@ -6571,7 +6571,7 @@ void CClientPed::HandleWaitingForGroundToLoad()
     GetClientSpatialDatabase()->SphereQuery(result, CSphere(vecPosition + CVector(0, 0, -3), 5));
     for (CClientEntityResult::const_iterator it = result.begin(); it != result.end(); ++it)
     {
-        if ((*it)->GetType() == CCLIENTOBJECT)
+        if ((*it)->GetType() == ElementType::OBJECT)
         {
             bNearObject = true;
             break;
