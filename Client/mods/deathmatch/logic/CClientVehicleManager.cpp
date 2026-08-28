@@ -769,6 +769,14 @@ bool CClientVehicleManager::HasDoors(unsigned long ulModel)
 
     if (HasDamageModel(ulModel) == true)
     {
+        // Custom models allocated via engineRequestModel inherit properties from their parent model.
+        if (!IsStandardModel(ulModel) && IsValidModel(ulModel))
+        {
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel);
+            if (pModelInfo && pModelInfo->GetParentID() != 0)
+                ulModel = pModelInfo->GetParentID();
+        }
+
         switch (static_cast<VehicleType>(ulModel))
         {
             case VehicleType::VT_BFINJECT:

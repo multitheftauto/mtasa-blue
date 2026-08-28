@@ -11,6 +11,15 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
+struct SJoystickDeviceChoice
+{
+    std::string strId;
+    std::string strName;
+};
+
 class CJoystickManagerInterface
 {
 public:
@@ -26,14 +35,24 @@ public:
     virtual void OnPossibleDeviceChange() = 0;
 
     // Settings
-    virtual std::string GetControllerName() = 0;
-    virtual int         GetDeadZone() = 0;
-    virtual int         GetSaturation() = 0;
-    virtual void        SetDeadZone(int iDeadZone) = 0;
-    virtual void        SetSaturation(int iSaturation) = 0;
-    virtual int         GetSettingsRevision() = 0;
-    virtual void        SetDefaults() = 0;
-    virtual bool        SaveToXML() = 0;
+    virtual std::string                        GetControllerName() = 0;
+    virtual int                                GetDeadZone() = 0;
+    virtual int                                GetSaturation() = 0;
+    virtual int                                GetTriggerDeadZone() = 0;
+    virtual int                                GetTriggerSaturation() = 0;
+    virtual void                               SetDeadZone(int iDeadZone) = 0;
+    virtual void                               SetSaturation(int iSaturation) = 0;
+    virtual void                               SetTriggerDeadZone(int iDeadZone) = 0;
+    virtual void                               SetTriggerSaturation(int iSaturation) = 0;
+    virtual bool                               GetVibrationEnabled() = 0;
+    virtual void                               SetVibrationEnabled(bool bEnabled) = 0;
+    virtual std::string                        GetSelectedControllerId() = 0;
+    virtual void                               SetSelectedControllerId(const std::string& strId) = 0;
+    virtual std::vector<SJoystickDeviceChoice> GetAvailableControllers() = 0;
+    virtual int                                GetSettingsRevision() = 0;
+    virtual int                                GetDeviceListRevision() = 0;
+    virtual void                               SetDefaults() = 0;
+    virtual bool                               SaveToXML() = 0;
 
     // Binding
     virtual int         GetOutputCount() = 0;

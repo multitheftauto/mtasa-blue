@@ -53,7 +53,11 @@ public:
 
     eClientEntityType GetType() const { return CCLIENTBUILDING; }
 
+    bool GetUsesCollision() const noexcept { return m_usesCollision; }
     void SetUsesCollision(bool state);
+
+    unsigned char GetAlpha() const noexcept { return m_ucAlpha; }
+    void          SetAlpha(unsigned char ucAlpha);
 
     void Create();
     void Destroy();
@@ -79,13 +83,14 @@ private:
 private:
     CClientBuildingManager* m_pBuildingManager;
 
-    CBuilding* m_pBuilding;
-    uint16_t   m_usModelId;
-    uint16_t   m_logicalModel = 0xFFFF;
-    CVector    m_vPos;
-    CVector    m_vRot;
-    uint8_t    m_interior;
-    bool       m_usesCollision;
+    CBuilding*    m_pBuilding;
+    uint16_t      m_usModelId;
+    uint16_t      m_logicalModel = 0xFFFF;
+    CVector       m_vPos;
+    CVector       m_vRot;
+    uint8_t       m_interior;
+    bool          m_usesCollision;
+    unsigned char m_ucAlpha;
 
     CClientBuilding* m_pHighBuilding;
     CClientBuilding* m_pLowBuilding;

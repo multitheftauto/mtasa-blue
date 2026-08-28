@@ -215,6 +215,8 @@ public:
     void Stop();
 
     static bool StaticProcessPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream, SNetExtraInfo* pNetExtraInfo);
+    static bool StaticProcessNetworkPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* BitStream,
+                                           SNetExtraInfo* pNetExtraInfo);
     bool        ProcessPacket(CPacket& Packet);
 
     void SetIsFinished(bool bFinished) { m_bIsFinished = bFinished; };

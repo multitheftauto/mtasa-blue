@@ -458,6 +458,16 @@ void CElementRPCs::SetElementAlpha(CClientEntity* pSource, NetBitStreamInterface
                 pObject->SetAlpha(ucAlpha);
                 break;
             }
+            case CCLIENTBUILDING:
+            {
+                static_cast<CClientBuilding*>(pSource)->SetAlpha(ucAlpha);
+                break;
+            }
+            case CCLIENTPROJECTILE:
+            {
+                static_cast<CClientProjectile*>(pSource)->SetAlpha(ucAlpha);
+                break;
+            }
             default:
                 break;
         }
@@ -693,6 +703,7 @@ void CElementRPCs::SetElementCollisionsEnabled(CClientEntity* pSource, NetBitStr
             }
 
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetCollisionEnabled(bEnable);
@@ -732,9 +743,15 @@ void CElementRPCs::SetElementFrozen(CClientEntity* pSource, NetBitStreamInterfac
             }
 
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetFrozen(bFrozen);
+                break;
+            }
+            case CCLIENTPROJECTILE:
+            {
+                static_cast<CClientProjectile*>(pSource)->SetFrozen(bFrozen);
                 break;
             }
         }

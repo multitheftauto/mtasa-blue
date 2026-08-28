@@ -22,6 +22,7 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
       m_interior(interior),
       m_pBuilding(nullptr),
       m_usesCollision(true),
+      m_ucAlpha(255),
       m_pHighBuilding(nullptr),
       m_pLowBuilding(nullptr)
 {
@@ -146,6 +147,15 @@ void CClientBuilding::SetUsesCollision(bool state)
     m_usesCollision = state;
 }
 
+void CClientBuilding::SetAlpha(unsigned char ucAlpha)
+{
+    m_ucAlpha = ucAlpha;
+    // Buildings are not CObject, so they never hit the per-entity object alpha hook. Apply
+    // SetRwObjectAlpha on the game entity (and again in Create after Recreate).
+    if (m_pBuilding)
+        m_pBuilding->SetAlpha(ucAlpha);
+}
+
 void CClientBuilding::Create()
 {
     if (m_pBuilding)
@@ -168,6 +178,8 @@ void CClientBuilding::Create()
     {
         m_pBuilding->SetUsesCollision(m_usesCollision);
     }
+    if (m_ucAlpha != 255)
+        m_pBuilding->SetAlpha(m_ucAlpha);
     if (m_pHighBuilding)
     {
         m_pHighBuilding->GetBuildingEntity()->SetLod(m_pBuilding);

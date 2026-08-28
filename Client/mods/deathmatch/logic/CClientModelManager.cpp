@@ -84,9 +84,7 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
 
 int CClientModelManager::GetFirstFreeModelID(void)
 {
-    // Dynamic DFF models must stay below the TXD file-ID range. Allocating an
-    // object in a TXD/COL slot corrupts the corresponding streaming entry.
-    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforTXD();
+    const unsigned int uiMaxModelID = MAX_MODEL_DFF_ID;
     for (unsigned int i = 0; i < uiMaxModelID; i++)
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(i, true);
