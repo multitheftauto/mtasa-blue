@@ -275,10 +275,18 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
     if (streamModel == NULL)
         return NULL;
 
+    // engineLoadDFF loads through here rather than CFileLoader_LoadAtomicFile, so it needs the
+    // same leading UV anim dictionary read.
+    RwChunkHeaderInfo leadingChunk;
+    RtDict*           pUVAnimDict = CFileLoader_ReadLeadingUVAnimDict(streamModel, leadingChunk);
+
     // DFF header id: 0x10
     // find our dff chunk
-    if (RwStreamFindChunk(streamModel, 0x10, NULL, NULL) == false)
+    if (leadingChunk.type != 0x10 && RwStreamFindChunk(streamModel, 0x10, NULL, NULL) == false)
     {
+        if (pUVAnimDict)
+            RtDictDestroy(pUVAnimDict);
+
         RwStreamClose(streamModel, NULL);
         return NULL;
     }
@@ -317,6 +325,9 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
 
     // close the stream
     RwStreamClose(streamModel, NULL);
+
+    if (pUVAnimDict)
+        RtDictDestroy(pUVAnimDict);
 
     return pClump;
 }

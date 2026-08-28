@@ -8,6 +8,8 @@ class CEntitySAInterface;
 struct RpAtomic;
 struct RpClump;
 struct RwStream;
+struct RwChunkHeaderInfo;
+struct RtDict;
 
 struct SRelatedModelInfo
 {
@@ -41,3 +43,7 @@ public:
 bool                CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId);
 RpAtomic*           CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo* pRelatedModelInfo);
 CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine);
+
+// Reads the UV anim dictionary preceding a clump, if present, and sets it current for
+// RpClumpStreamRead. outLeadingChunk receives the peeked header either way.
+RtDict* CFileLoader_ReadLeadingUVAnimDict(RwStream* stream, RwChunkHeaderInfo& outLeadingChunk);

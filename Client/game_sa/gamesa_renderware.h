@@ -64,6 +64,14 @@ typedef RwMatrix*(__cdecl* RwMatrixTranslate_t)(RwMatrix* matrix, const RwV3d* t
 typedef RwMatrix*(__cdecl* RwMatrixScale_t)(RwMatrix* matrix, const RwV3d* translation, RwTransformOrder order);
 typedef RpMaterial*(__cdecl* RpMaterialCreate_t)();
 typedef int(__cdecl* RpMaterialDestroy_t)(RpMaterial* mat);
+typedef int(__cdecl* RpMaterialUVAnimExists_t)(const RpMaterial* mat);
+typedef void*(__cdecl* RpMaterialUVAnimGetInterpolator_t)(RpMaterial* mat, unsigned int slot);
+typedef RpAtomic*(__cdecl* RpMatFXAtomicEnableEffects_t)(RpAtomic* atomic);
+typedef RpMaterial*(__cdecl* RpMatFXMaterialSetEffects_t)(RpMaterial* mat, RpMatFXMaterialFlags flags);
+typedef RwStream*(__cdecl* RwStreamReadChunkHeaderInfo_t)(RwStream* stream, RwChunkHeaderInfo* header);
+typedef RtDict*(__cdecl* RtDictSchemaStreamReadDict_t)(RtDictSchema* schema, RwStream* stream);
+typedef RtDictSchema*(__cdecl* RtDictSchemaSetCurrentDict_t)(RtDictSchema* schema, RtDict* dict);
+typedef int(__cdecl* RtDictDestroy_t)(RtDict* dict);
 typedef RwTexDictionary*(__cdecl* RwTexDictionarySetCurrent_t)(RwTexDictionary* dict);
 typedef const RwTexDictionary*(__cdecl* RwTexDictionaryForAllTextures_t)(const RwTexDictionary* dict, void* callback, void* data);
 typedef RwTexture*(__cdecl* RwTexDictionaryAddTexture_t)(RwTexDictionary* dict, RwTexture* texture);
@@ -166,6 +174,14 @@ RWFUNC(RpGeometryTriangleSetMaterial_t RpGeometryTriangleSetMaterial, (RpGeometr
 RWFUNC(RpMaterialCreate_t RpMaterialCreate, (RpMaterialCreate_t)0xDEAD)
 RWFUNC(RpGeometryDestroy_t RpGeometryDestroy, (RpGeometryDestroy_t)0xDEAD)
 RWFUNC(RpMaterialDestroy_t RpMaterialDestroy, (RpMaterialDestroy_t)0xDEAD)
+RWFUNC(RpMaterialUVAnimExists_t RpMaterialUVAnimExists, (RpMaterialUVAnimExists_t)0xDEAD)
+RWFUNC(RpMaterialUVAnimGetInterpolator_t RpMaterialUVAnimGetInterpolator, (RpMaterialUVAnimGetInterpolator_t)0xDEAD)
+RWFUNC(RpMatFXAtomicEnableEffects_t RpMatFXAtomicEnableEffects, (RpMatFXAtomicEnableEffects_t)0xDEAD)
+RWFUNC(RpMatFXMaterialSetEffects_t RpMatFXMaterialSetEffects, (RpMatFXMaterialSetEffects_t)0xDEAD)
+RWFUNC(RwStreamReadChunkHeaderInfo_t RwStreamReadChunkHeaderInfo, (RwStreamReadChunkHeaderInfo_t)0xDEAD)
+RWFUNC(RtDictSchemaStreamReadDict_t RtDictSchemaStreamReadDict, (RtDictSchemaStreamReadDict_t)0xDEAD)
+RWFUNC(RtDictSchemaSetCurrentDict_t RtDictSchemaSetCurrentDict, (RtDictSchemaSetCurrentDict_t)0xDEAD)
+RWFUNC(RtDictDestroy_t RtDictDestroy, (RtDictDestroy_t)0xDEAD)
 RWFUNC(RwV3dNormalize_t RwV3dNormalize, (RwV3dNormalize_t)0xDEAD)
 RWFUNC(RwIm3DTransform_t RwIm3DTransform, (RwIm3DTransform_t)0xDEAD)
 RWFUNC(RwIm3DRenderIndexedPrimitive_t RwIm3DRenderIndexedPrimitive, (RwIm3DRenderIndexedPrimitive_t)0xDEAD)

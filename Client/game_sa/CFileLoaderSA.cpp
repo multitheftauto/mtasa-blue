@@ -143,6 +143,23 @@ static void CVehicleModelInfo_StopUsingCommonVehicleTexDicationary()
 static auto          CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 static unsigned int& gAtomicModelId = *reinterpret_cast<unsigned int*>(DWORD_AtomicsReplacerModelID);
 
+// UV anim keyframes live in a dictionary chunk preceding the clump; peek the header instead of
+// RwStreamFindChunk, which would skip the whole chunk by its declared length.
+static constexpr std::uint32_t RW_CHUNK_UVANIMDICT = 0x2B;
+static const std::uintptr_t    ARRAY_RpUVAnimDictSchema = 0x8DED50;
+
+RtDict* CFileLoader_ReadLeadingUVAnimDict(RwStream* stream, RwChunkHeaderInfo& outLeadingChunk)
+{
+    RwStreamReadChunkHeaderInfo(stream, &outLeadingChunk);
+    if (outLeadingChunk.type != RW_CHUNK_UVANIMDICT)
+        return nullptr;
+
+    auto*   schema = reinterpret_cast<RtDictSchema*>(ARRAY_RpUVAnimDictSchema);
+    RtDict* dict = RtDictSchemaStreamReadDict(schema, stream);
+    RtDictSchemaSetCurrentDict(schema, dict);
+    return dict;
+}
+
 bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
 {
     CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[modelId];
@@ -156,11 +173,18 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
     }
 
     const unsigned int rwID_CLUMP = 16;
-    if (RwStreamFindChunk(stream, rwID_CLUMP, nullptr, nullptr))
+
+    RwChunkHeaderInfo leadingChunk;
+    RtDict*           pUVAnimDict = CFileLoader_ReadLeadingUVAnimDict(stream, leadingChunk);
+
+    if (leadingChunk.type == rwID_CLUMP || RwStreamFindChunk(stream, rwID_CLUMP, nullptr, nullptr))
     {
         RpClump* pReadClump = RpClumpStreamRead(stream);
         if (!pReadClump)
         {
+            if (pUVAnimDict)
+                RtDictDestroy(pUVAnimDict);
+
             if (bUseCommonVehicleTexDictionary)
             {
                 CVehicleModelInfo_StopUsingCommonVehicleTexDicationary();
@@ -177,6 +201,9 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
         RpClumpDestroy(pReadClump);
     }
 
+    if (pUVAnimDict)
+        RtDictDestroy(pUVAnimDict);
+
     if (!pBaseModelInfo->pRwObject)
     {
         return false;
@@ -187,6 +214,29 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
         CVehicleModelInfo_StopUsingCommonVehicleTexDicationary();
     }
     return true;
+}
+
+// The atomic level MatFX flag alone does not animate UV coordinates; each material also needs
+// its own effect type set, or the render pipeline keeps sampling static UVs.
+static constexpr std::uint32_t RP_UVANIM_DUAL_PASS_CHANNEL = 1;
+
+static void EnableUVAnimIfPresent(RpAtomic* atomic)
+{
+    RpGeometry* geometry = atomic->geometry;
+    if (!geometry)
+        return;
+
+    for (std::int32_t i = 0; i < geometry->materials.entries; i++)
+    {
+        RpMaterial* material = geometry->materials.materials[i];
+        if (!material || !RpMaterialUVAnimExists(material))
+            continue;
+
+        RpMatFXAtomicEnableEffects(atomic);
+
+        const bool bDual = RpMaterialUVAnimGetInterpolator(material, RP_UVANIM_DUAL_PASS_CHANNEL) != nullptr;
+        RpMatFXMaterialSetEffects(material, bDual ? rpMATFXEFFECTDUALUVTRANSFORM : rpMATFXEFFECTUVTRANSFORM);
+    }
 }
 
 RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo* pRelatedModelInfo)
@@ -227,6 +277,7 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     RwFrame* newFrame = RwFrameCreate();
     RpAtomicSetFrame(atomic, newFrame);
     CVisibilityPlugins_SetAtomicId(atomic, gAtomicModelId);
+    EnableUVAnimIfPresent(atomic);
 
     // Fix #359: engineReplaceModel memory leak
     if (!bDamage && pRelatedModelInfo->bDeleteOldRwObject)

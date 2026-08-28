@@ -60,6 +60,14 @@ void InitRwFunctions()
     RpMaterialCreate = (RpMaterialCreate_t)0x0074D990;
     RpGeometryDestroy = (RpGeometryDestroy_t)0x0074CCC0;
     RpMaterialDestroy = (RpMaterialDestroy_t)0x0074DA20;
+    RpMaterialUVAnimExists = (RpMaterialUVAnimExists_t)0x007CC530;
+    RpMaterialUVAnimGetInterpolator = (RpMaterialUVAnimGetInterpolator_t)0x007CC430;
+    RpMatFXAtomicEnableEffects = (RpMatFXAtomicEnableEffects_t)0x00811C00;
+    RpMatFXMaterialSetEffects = (RpMatFXMaterialSetEffects_t)0x00811C80;
+    RwStreamReadChunkHeaderInfo = (RwStreamReadChunkHeaderInfo_t)0x007ED590;
+    RtDictSchemaStreamReadDict = (RtDictSchemaStreamReadDict_t)0x007CF240;
+    RtDictSchemaSetCurrentDict = (RtDictSchemaSetCurrentDict_t)0x007CEEF0;
+    RtDictDestroy = (RtDictDestroy_t)0x007CF130;
     RwV3dNormalize = (RwV3dNormalize_t)0x007ED9B0;
     RwIm3DTransform = (RwIm3DTransform_t)0x007EF450;
     RwIm3DRenderIndexedPrimitive = (RwIm3DRenderIndexedPrimitive_t)0x007EF550;
