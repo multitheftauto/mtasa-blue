@@ -257,8 +257,31 @@ bool CVehicleNames::IsModelTrailer(unsigned long ulModel)
 
 const char* CVehicleNames::GetVehicleName(unsigned long ulModel)
 {
+    if (ulModel < 400 || ulModel > 611)
+    {
+        if (g_pClientGame && g_pClientGame->GetManager() && g_pClientGame->GetManager()->GetModelManager())
+        {
+            if (const auto def = g_pClientGame->GetManager()->GetModelManager()->FindServerModelDefinition(static_cast<std::uint16_t>(ulModel)))
+            {
+                if (!def->name.empty())
+                    return def->name.c_str();
+
+                ulModel = def->parentModelId;
+            }
+        }
+
+        if (ulModel < static_cast<unsigned long>(g_pGame->GetBaseIDforTXD()))
+        {
+            CModelInfo* modelInfo = g_pGame->GetModelInfo(ulModel);
+            if (modelInfo && modelInfo->IsValid() && modelInfo->GetModelType() == eModelInfoType::VEHICLE)
+            {
+                ulModel = modelInfo->GetParentID();
+            }
+        }
+    }
+
     // Valid?
-    if (IsValidModel(ulModel))
+    if (IsValidModel(ulModel) || IsModelTrailer(ulModel))
     {
         // Look it up in the table
         return VehicleNames[ulModel - 400].szName;
@@ -272,6 +295,16 @@ unsigned int CVehicleNames::GetVehicleModel(const char* szName)
     // If the specified string was empty, return 0
     if (szName[0] == 0)
         return 0;
+
+    // Look for server-allocated named models first
+    if (g_pClientGame && g_pClientGame->GetManager() && g_pClientGame->GetManager()->GetModelManager())
+    {
+        if (const auto def = g_pClientGame->GetManager()->GetModelManager()->FindServerModelDefinition(szName))
+        {
+            if (def->type == eServerModelType::VEHICLE)
+                return def->logicalModelId;
+        }
+    }
 
     // Look for it in our table
     for (unsigned int i = 0; i < NUMELMS(VehicleNames); i++)
@@ -287,9 +320,25 @@ unsigned int CVehicleNames::GetVehicleModel(const char* szName)
 
 const char* CVehicleNames::GetVehicleTypeName(unsigned long ulModel)
 {
-    // Use parent model ID for non-standard vehicle model IDs.
-    if ((ulModel < 400 || ulModel > 611) && CClientVehicleManager::IsValidModel(ulModel))
-        ulModel = g_pGame->GetModelInfo(ulModel)->GetParentID();
+    if (ulModel < 400 || ulModel > 611)
+    {
+        if (g_pClientGame && g_pClientGame->GetManager() && g_pClientGame->GetManager()->GetModelManager())
+        {
+            if (const auto def = g_pClientGame->GetManager()->GetModelManager()->FindServerModelDefinition(static_cast<std::uint16_t>(ulModel)))
+            {
+                ulModel = def->parentModelId;
+            }
+        }
+
+        if (ulModel < static_cast<unsigned long>(g_pGame->GetBaseIDforTXD()))
+        {
+            CModelInfo* modelInfo = g_pGame->GetModelInfo(ulModel);
+            if (modelInfo && modelInfo->IsValid() && modelInfo->GetModelType() == eModelInfoType::VEHICLE)
+            {
+                ulModel = modelInfo->GetParentID();
+            }
+        }
+    }
 
     // Check whether the model is valid
     if ((IsValidModel(ulModel) || IsModelTrailer(ulModel)) && ((ulModel - 400) < NUMELMS(ucVehicleTypes)))

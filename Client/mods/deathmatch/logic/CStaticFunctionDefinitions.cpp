@@ -769,32 +769,32 @@ bool CStaticFunctionDefinitions::GetElementModel(CClientEntity& Entity, unsigned
         case CCLIENTPLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            usModel = static_cast<unsigned short>(Ped.GetModel());
+            usModel = static_cast<unsigned short>(Ped.GetLogicalModel());
             break;
         }
         case CCLIENTVEHICLE:
         {
             CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
-            usModel = Vehicle.GetModel();
+            usModel = Vehicle.GetLogicalModel();
             break;
         }
         case CCLIENTOBJECT:
         case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
-            usModel = Object.GetModel();
+            usModel = Object.GetLogicalModel();
             break;
         }
         case CCLIENTPICKUP:
         {
             CClientPickup& pPickup = static_cast<CClientPickup&>(Entity);
-            usModel = pPickup.GetModel();
+            usModel = pPickup.GetLogicalModel();
             break;
         }
         case CCLIENTBUILDING:
         {
             CClientBuilding& pBuilding = static_cast<CClientBuilding&>(Entity);
-            usModel = pBuilding.GetModel();
+            usModel = pBuilding.GetLogicalModel();
             break;
         }
         case CCLIENTPROJECTILE:
@@ -1561,21 +1561,34 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
 {
     RUN_CHILDREN(SetElementModel(**iter, usModel))
 
-    auto callOnChangeEvent = [](auto& element, uint16_t usCurrentModel, uint16_t usModel)
+    unsigned short runtimeModel = usModel;
+    unsigned short logicalModel = 0xFFFF;
+    if (m_pClientGame && m_pClientGame->GetManager() && m_pClientGame->GetManager()->GetModelManager())
+    {
+        m_pClientGame->GetManager()->GetModelManager()->ResolveModelID(usModel, runtimeModel, &logicalModel);
+    }
+
+    auto callOnChangeEvent = [](auto& element, uint16_t usCurrentModel, uint16_t usTargetModel)
     {
         CLuaArguments Arguments;
         Arguments.PushNumber(usCurrentModel);
-        Arguments.PushNumber(usModel);
+        Arguments.PushNumber(usTargetModel);
         bool bContinue = element.CallEvent("onClientElementModelChange", Arguments, true);
 
         // Check for another call to setElementModel
-        if (usModel != element.GetModel())
+        if (usTargetModel != element.GetLogicalModel())
             return false;
 
         if (!bContinue)
         {
             // Change canceled
-            element.SetModel(usCurrentModel);
+            unsigned short oldRuntime = usCurrentModel;
+            unsigned short oldLogical = 0xFFFF;
+            if (m_pClientGame && m_pClientGame->GetManager() && m_pClientGame->GetManager()->GetModelManager())
+            {
+                m_pClientGame->GetManager()->GetModelManager()->ResolveModelID(usCurrentModel, oldRuntime, &oldLogical);
+            }
+            element.SetModel(oldRuntime, oldLogical);
             return false;
         }
 
@@ -1589,12 +1602,12 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         {
             // Grab the model
             CClientPed&          Ped = static_cast<CClientPed&>(Entity);
-            const unsigned short usCurrentModel = static_cast<ushort>(Ped.GetModel());
+            const unsigned short usCurrentModel = static_cast<ushort>(Ped.GetLogicalModel());
 
-            if (usCurrentModel == usModel)
+            if (usCurrentModel == usModel && Ped.GetModel() == runtimeModel)
                 return false;
 
-            if (!Ped.SetModel(usModel))
+            if (!Ped.SetModel(runtimeModel, false, logicalModel))
                 return false;
 
             return callOnChangeEvent(Ped, usCurrentModel, usModel);
@@ -1602,15 +1615,16 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         case CCLIENTVEHICLE:
         {
             CClientVehicle&      Vehicle = static_cast<CClientVehicle&>(Entity);
-            const unsigned short usCurrentModel = Vehicle.GetModel();
+            const unsigned short usCurrentModel = Vehicle.GetLogicalModel();
 
-            if (usCurrentModel == usModel)
+            if (usCurrentModel == usModel && Vehicle.GetModel() == runtimeModel)
                 return false;
 
-            if (!CClientVehicleManager::IsValidModel(usModel))
+            if (!CClientVehicleManager::IsValidModel(runtimeModel))
                 return false;
 
-            Vehicle.SetModelBlocking(usModel, 255, 255);
+            Vehicle.SetLogicalModel(logicalModel);
+            Vehicle.SetModelBlocking(runtimeModel, 255, 255);
 
             CLuaArguments Arguments;
             Arguments.PushNumber(usCurrentModel);
@@ -1618,13 +1632,20 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             bool bContinue = Vehicle.CallEvent("onClientElementModelChange", Arguments, true);
 
             // Check for another call to setElementModel
-            if (usModel != Vehicle.GetModel())
+            if (usModel != Vehicle.GetLogicalModel())
                 return false;
 
             if (!bContinue)
             {
                 // Change canceled
-                Vehicle.SetModelBlocking(usCurrentModel, 255, 255);
+                unsigned short oldRuntime = usCurrentModel;
+                unsigned short oldLogical = 0xFFFF;
+                if (m_pClientGame && m_pClientGame->GetManager() && m_pClientGame->GetManager()->GetModelManager())
+                {
+                    m_pClientGame->GetManager()->GetModelManager()->ResolveModelID(usCurrentModel, oldRuntime, &oldLogical);
+                }
+                Vehicle.SetLogicalModel(oldLogical);
+                Vehicle.SetModelBlocking(oldRuntime, 255, 255);
                 return false;
             }
 
@@ -1634,30 +1655,30 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
         case CCLIENTWEAPON:
         {
             CClientObject&       Object = static_cast<CClientObject&>(Entity);
-            const unsigned short usCurrentModel = Object.GetModel();
+            const unsigned short usCurrentModel = Object.GetLogicalModel();
 
-            if (usCurrentModel == usModel)
+            if (usCurrentModel == usModel && Object.GetModel() == runtimeModel)
                 return false;
 
-            if (!CClientObjectManager::IsValidModel(usModel))
+            if (!CClientObjectManager::IsValidModel(runtimeModel))
                 return false;
 
-            Object.SetModel(usModel);
+            Object.SetModel(runtimeModel, logicalModel);
 
             return callOnChangeEvent(Object, usCurrentModel, usModel);
         }
         case CCLIENTBUILDING:
         {
             CClientBuilding&     Object = static_cast<CClientBuilding&>(Entity);
-            const unsigned short usCurrentModel = Object.GetModel();
+            const unsigned short usCurrentModel = Object.GetLogicalModel();
 
             if (usCurrentModel == usModel)
                 return false;
 
-            if (!CClientObjectManager::IsValidModel(usModel))
+            if (!CClientBuildingManager::IsValidModel(runtimeModel))
                 return false;
 
-            Object.SetModel(usModel);
+            Object.SetModel(runtimeModel, logicalModel);
 
             return callOnChangeEvent(Object, usCurrentModel, usModel);
         }
@@ -1669,12 +1690,26 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             if (usCurrentModel == usModel)
                 return false;
 
-            if (!CClientObjectManager::IsValidModel(usModel))
+            if (!CClientObjectManager::IsValidModel(runtimeModel))
                 return false;
 
-            Projectile.SetModel(usModel);
+            Projectile.SetModel(runtimeModel);
 
-            return callOnChangeEvent(Projectile, usCurrentModel, usModel);
+            CLuaArguments Arguments;
+            Arguments.PushNumber(usCurrentModel);
+            Arguments.PushNumber(usModel);
+            bool bContinue = Projectile.CallEvent("onClientElementModelChange", Arguments, true);
+
+            if (usModel != Projectile.GetModel())
+                return false;
+
+            if (!bContinue)
+            {
+                Projectile.SetModel(usCurrentModel);
+                return false;
+            }
+
+            return true;
         }
         default:
             return false;

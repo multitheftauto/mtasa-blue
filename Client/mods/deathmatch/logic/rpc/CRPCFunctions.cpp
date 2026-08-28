@@ -31,6 +31,7 @@
 #include "CWaterRPCs.h"
 #include "CWorldRPCs.h"
 #include "CColShapeRPCs.h"
+#include "CModelRPCs.h"
 
 CClientManager*            CRPCFunctions::m_pManager;
 CClientCamera*             CRPCFunctions::m_pCamera;
@@ -100,6 +101,7 @@ void CRPCFunctions::AddHandlers()
     CWaterRPCs::LoadFunctions();
     CWorldRPCs::LoadFunctions();
     CColShapeRPCs::LoadFunctions();
+    CModelRPCs::LoadFunctions();
 }
 
 void CRPCFunctions::AddHandler(unsigned char ucID, pfnRPCHandler Callback, const char* szName)

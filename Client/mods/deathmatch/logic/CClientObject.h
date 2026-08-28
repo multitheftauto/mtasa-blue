@@ -69,7 +69,9 @@ public:
     void SetVisible(bool bVisible);
 
     unsigned short GetModel() const { return m_usModel; };
-    void           SetModel(unsigned short usModel);
+    std::uint16_t  GetLogicalModel() const { return m_logicalModel != 0xFFFF ? m_logicalModel : m_usModel; }
+    void           SetLogicalModel(std::uint16_t logicalModel) { m_logicalModel = logicalModel; }
+    void           SetModel(unsigned short model, std::uint16_t logicalModel = 0xFFFF);
 
     bool           IsLowLod();
     bool           SetLowLodObject(CClientObject* pLowLodObject);
@@ -138,6 +140,7 @@ protected:
     class CClientModelRequestManager* m_pModelRequester;
 
     unsigned short m_usModel;
+    std::uint16_t  m_logicalModel = 0xFFFF;
 
     CVector       m_vecPosition;
     CVector       m_vecRotation;

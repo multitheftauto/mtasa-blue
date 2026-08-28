@@ -295,5 +295,8 @@ enum eElementRPCFunctions
 
     SET_CUSTOM_WEAPON_WEAPON_RANGE,
 
+    ALLOCATE_SERVER_MODEL,
+    FREE_SERVER_MODEL,
+
     NUM_RPC_FUNCS  // Add above this line
 };

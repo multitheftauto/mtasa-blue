@@ -58,6 +58,7 @@ class CGame;
 
 #include "CLightsyncManager.h"
 #include "CBanManager.h"
+#include <CServerModelDefinition.h>
 
 // Forward declarations
 class ASE;
@@ -275,6 +276,10 @@ public:
     void InitialDataStream(CPlayer& Player);
     void QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason = CClient::QUIT_QUIT, bool bSayInConsole = true, const char* szKickReason = "None",
                     const char* szResponsiblePlayer = "None");
+
+    void BroadcastAllocateServerModel(const SServerModelDefinition& definition);
+    void BroadcastFreeServerModel(std::uint16_t logicalModelId);
+    void SendServerModels(CPlayer* player);
 
     class CLuaManager* GetLuaManager() { return m_pLuaManager; };
 

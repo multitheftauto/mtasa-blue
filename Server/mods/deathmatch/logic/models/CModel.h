@@ -35,9 +35,11 @@ public:
     bool          IsCustom() const noexcept { return m_isCustom; }
     CResource*    GetResource() const noexcept { return m_resource; }
 
-    void SetParentModelId(std::uint32_t parentModelId) noexcept { m_parentModelId = parentModelId; }
-    void SetResource(CResource* resource) noexcept { m_resource = resource; }
-    void SetCustom(bool isCustom) noexcept { m_isCustom = isCustom; }
+    void               SetParentModelId(std::uint32_t parentModelId) noexcept { m_parentModelId = parentModelId; }
+    void               SetResource(CResource* resource) noexcept { m_resource = resource; }
+    void               SetCustom(bool isCustom) noexcept { m_isCustom = isCustom; }
+    const std::string& GetName() const noexcept { return m_name; }
+    void               SetName(std::string name) { m_name = std::move(name); }
 
 protected:
     std::uint32_t m_modelId{0};
@@ -45,4 +47,5 @@ protected:
     eModelType    m_modelType{eModelType::UNKNOWN};
     bool          m_isCustom{false};
     CResource*    m_resource{nullptr};
+    std::string   m_name;
 };

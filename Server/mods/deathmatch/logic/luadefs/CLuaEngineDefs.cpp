@@ -25,6 +25,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineFreeModel", ArgumentParser<FreeModel>},
         {"engineGetModelParent", ArgumentParser<GetModelParent>},
         {"engineGetModelType", ArgumentParser<GetModelType>},
+        {"engineGetModelName", ArgumentParser<GetModelName>},
+        {"engineGetModelFromName", ArgumentParser<GetModelFromName>},
         {"engineGetModelAllocatingResource", ArgumentParser<GetModelAllocatingResource>},
         {"engineGetModelsByType", ArgumentParser<GetModelsByType>},
         {"engineIsModelCustom", ArgumentParser<IsModelCustom>},
@@ -37,7 +39,7 @@ void CLuaEngineDefs::LoadFunctions()
 }
 
 std::variant<std::uint32_t, bool> CLuaEngineDefs::RequestModel(lua_State* luaVM, std::string modelTypeStr, std::optional<std::uint32_t> parentModelIdOpt,
-                                                               std::optional<std::uint32_t> requestedIdOpt)
+                                                               std::optional<std::string> nameOpt, std::optional<std::uint32_t> requestedIdOpt)
 {
     eModelType    modelType = eModelType::UNKNOWN;
     std::uint32_t defaultParent = 0;
@@ -63,6 +65,7 @@ std::variant<std::uint32_t, bool> CLuaEngineDefs::RequestModel(lua_State* luaVM,
     }
 
     std::uint32_t parentModelId = parentModelIdOpt.value_or(defaultParent);
+    std::string   name = nameOpt.value_or("");
     std::uint32_t requestedId = requestedIdOpt.value_or(0);
 
     CLuaMain*  luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -70,7 +73,7 @@ std::variant<std::uint32_t, bool> CLuaEngineDefs::RequestModel(lua_State* luaVM,
 
     if (g_pGame && g_pGame->GetModelManager())
     {
-        auto customModel = g_pGame->GetModelManager()->RequestModel(resource, modelType, parentModelId, requestedId);
+        auto customModel = g_pGame->GetModelManager()->RequestModel(resource, modelType, parentModelId, name, requestedId);
         if (customModel)
             return customModel->GetModelId();
     }
@@ -122,6 +125,30 @@ std::variant<std::string, bool> CLuaEngineDefs::GetModelType(std::uint32_t model
                     break;
             }
         }
+    }
+
+    return false;
+}
+
+std::variant<std::string, bool> CLuaEngineDefs::GetModelName(std::uint32_t modelId)
+{
+    if (g_pGame && g_pGame->GetModelManager())
+    {
+        auto model = g_pGame->GetModelManager()->FindModel(modelId);
+        if (model && !model->GetName().empty())
+            return model->GetName();
+    }
+
+    return false;
+}
+
+std::variant<std::uint32_t, bool> CLuaEngineDefs::GetModelFromName(std::string name)
+{
+    if (g_pGame && g_pGame->GetModelManager())
+    {
+        auto model = g_pGame->GetModelManager()->FindModelByName(name);
+        if (model)
+            return model->GetModelId();
     }
 
     return false;

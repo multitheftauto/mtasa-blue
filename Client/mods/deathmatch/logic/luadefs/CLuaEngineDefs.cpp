@@ -163,6 +163,13 @@ void CLuaEngineDefs::LoadFunctions()
         {"enginePreloadWorldArea", ArgumentParser<EnginePreloadWorldArea>},
         {"engineRestreamModel", ArgumentParser<EngineRestreamModel>},
         {"engineRestream", ArgumentParser<EngineRestream>},
+        {"engineGetModelRuntimeID", ArgumentParser<EngineGetModelRuntimeID>},
+        {"engineGetModelLogicalID", ArgumentParser<EngineGetModelLogicalID>},
+        {"engineGetModelName", ArgumentParser<EngineGetModelName>},
+        {"engineGetModelFromName", ArgumentParser<EngineGetModelFromName>},
+        {"engineGetModelParent", ArgumentParser<EngineGetModelParent>},
+        {"engineGetModelType", ArgumentParser<EngineGetModelType>},
+        {"engineIsModelCustom", ArgumentParser<EngineIsModelCustom>},
 
         // CLuaCFunctions::AddFunction ( "engineReplaceMatchingAtomics", EngineReplaceMatchingAtomics );
         // CLuaCFunctions::AddFunction ( "engineReplaceWheelAtomics", EngineReplaceWheelAtomics );
@@ -211,6 +218,14 @@ void CLuaEngineDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getModelTXDID", "engineGetModelTXDID");
     lua_classfunction(luaVM, "setModelTXDID", "engineSetModelTXDID");
     lua_classfunction(luaVM, "resetModelTXDID", "engineResetModelTXDID");
+
+    lua_classfunction(luaVM, "getModelRuntimeID", "engineGetModelRuntimeID");
+    lua_classfunction(luaVM, "getModelLogicalID", "engineGetModelLogicalID");
+    lua_classfunction(luaVM, "getModelName", "engineGetModelName");
+    lua_classfunction(luaVM, "getModelFromName", "engineGetModelFromName");
+    lua_classfunction(luaVM, "getModelParent", "engineGetModelParent");
+    lua_classfunction(luaVM, "getModelType", "engineGetModelType");
+    lua_classfunction(luaVM, "isModelCustom", "engineIsModelCustom");
 
     lua_registerstaticclass(luaVM, "Engine");
 
@@ -646,6 +661,14 @@ int CLuaEngineDefs::EngineImportTXD(lua_State* luaVM)
         if (modelId == INVALID_MODEL_ID)
             modelId = CModelNames::ResolveClothesTexID(strModelName);
 
+        CClientModelManager* modelManager = g_pClientGame && g_pClientGame->GetManager() ? g_pClientGame->GetManager()->GetModelManager() : nullptr;
+        if (modelManager)
+        {
+            uint16_t runtimeModelId = static_cast<uint16_t>(modelId);
+            if (modelManager->ResolveModelID(modelId, runtimeModelId))
+                modelId = runtimeModelId;
+        }
+
         if (CClientTXD::IsImportableModel(static_cast<unsigned short>(modelId)))
         {
             // Try to import
@@ -833,7 +856,15 @@ int CLuaEngineDefs::EngineReplaceModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        const auto modelId = static_cast<unsigned short>(CModelNames::ResolveModelID(strModelName));
+        auto modelId = static_cast<unsigned short>(CModelNames::ResolveModelID(strModelName));
+
+        CClientModelManager* modelManager = g_pClientGame && g_pClientGame->GetManager() ? g_pClientGame->GetManager()->GetModelManager() : nullptr;
+        if (modelManager)
+        {
+            uint16_t runtimeModelId = modelId;
+            if (modelManager->ResolveModelID(modelId, runtimeModelId))
+                modelId = runtimeModelId;
+        }
 
         if (modelId != INVALID_MODEL_ID)
         {
@@ -877,7 +908,15 @@ bool CLuaEngineDefs::EngineAddClothingModel(CClientDFF* pDFF, std::string strMod
 int CLuaEngineDefs::EngineRestoreModel(lua_State* luaVM)
 {
     // Grab the model ID
-    const auto usModelID = static_cast<unsigned short>(CModelNames::ResolveModelID(lua_tostring(luaVM, 1)));
+    auto usModelID = static_cast<unsigned short>(CModelNames::ResolveModelID(lua_tostring(luaVM, 1)));
+
+    CClientModelManager* modelManager = g_pClientGame && g_pClientGame->GetManager() ? g_pClientGame->GetManager()->GetModelManager() : nullptr;
+    if (modelManager)
+    {
+        uint16_t runtimeModelId = usModelID;
+        if (modelManager->ResolveModelID(usModelID, runtimeModelId))
+            usModelID = runtimeModelId;
+    }
 
     // Valid client DFF and model?
     if (CClientDFFManager::IsReplacableModel(usModelID))
@@ -2655,4 +2694,118 @@ bool CLuaEngineDefs::EngineRestreamModel(std::uint16_t modelId)
 void CLuaEngineDefs::EngineRestream(std::optional<RestreamOption> option)
 {
     g_pClientGame->Restream(option);
+}
+
+std::variant<uint16_t, bool> CLuaEngineDefs::EngineGetModelRuntimeID(uint16_t logicalModelId)
+{
+    CClientModelManager* modelManager = g_pClientGame && g_pClientGame->GetManager() ? g_pClientGame->GetManager()->GetModelManager() : nullptr;
+    if (!modelManager)
+        return false;
+
+    int runtimeSlot = modelManager->GetServerModelRuntimeID(logicalModelId);
+    if (runtimeSlot == INVALID_MODEL_ID)
+        return false;
+
+    return static_cast<uint16_t>(runtimeSlot);
+}
+
+std::variant<uint16_t, bool> CLuaEngineDefs::EngineGetModelLogicalID(uint16_t runtimeModelId)
+{
+    CClientModelManager* modelManager = g_pClientGame && g_pClientGame->GetManager() ? g_pClientGame->GetManager()->GetModelManager() : nullptr;
+    if (!modelManager)
+        return false;
+
+    uint16_t logicalId = modelManager->GetServerModelID(runtimeModelId);
+    if (logicalId == 0xFFFF)
+        return false;
+
+    return logicalId;
+}
+
+std::variant<std::string, bool> CLuaEngineDefs::EngineGetModelName(uint32_t modelId)
+{
+    CClientModelManager* modelManager = g_pClientGame && g_pClientGame->GetManager() ? g_pClientGame->GetManager()->GetModelManager() : nullptr;
+    if (!modelManager)
+        return false;
+
+    const SServerModelDefinition* def = modelManager->FindServerModelDefinition(static_cast<uint16_t>(modelId));
+    if (def && !def->name.empty())
+        return def->name;
+
+    return false;
+}
+
+std::variant<uint16_t, bool> CLuaEngineDefs::EngineGetModelFromName(std::string modelName)
+{
+    CClientModelManager* modelManager = g_pClientGame && g_pClientGame->GetManager() ? g_pClientGame->GetManager()->GetModelManager() : nullptr;
+    if (!modelManager)
+        return false;
+
+    const SServerModelDefinition* def = modelManager->FindServerModelDefinition(modelName);
+    if (def)
+        return def->logicalModelId;
+
+    return false;
+}
+
+std::variant<uint16_t, bool> CLuaEngineDefs::EngineGetModelParent(uint32_t modelId)
+{
+    CClientModelManager* modelManager = g_pClientGame && g_pClientGame->GetManager() ? g_pClientGame->GetManager()->GetModelManager() : nullptr;
+    if (!modelManager)
+        return false;
+
+    const SServerModelDefinition* def = modelManager->FindServerModelDefinition(static_cast<uint16_t>(modelId));
+    if (def)
+        return def->parentModelId;
+
+    CModelInfo* modelInfo = g_pGame ? g_pGame->GetModelInfo(modelId, true) : nullptr;
+    if (modelInfo && modelInfo->IsValid() && modelInfo->GetParentID())
+        return static_cast<uint16_t>(modelInfo->GetParentID());
+
+    return false;
+}
+
+std::variant<std::string, bool> CLuaEngineDefs::EngineGetModelType(uint32_t modelId)
+{
+    CClientModelManager* modelManager = g_pClientGame && g_pClientGame->GetManager() ? g_pClientGame->GetManager()->GetModelManager() : nullptr;
+    if (!modelManager)
+        return false;
+
+    const SServerModelDefinition* def = modelManager->FindServerModelDefinition(static_cast<uint16_t>(modelId));
+    if (def)
+    {
+        switch (def->type)
+        {
+            case eServerModelType::VEHICLE:
+                return "vehicle";
+            case eServerModelType::PED:
+                return "ped";
+            case eServerModelType::OBJECT:
+                return "object";
+            default:
+                return false;
+        }
+    }
+
+    if (CClientVehicleManager::IsValidModel(modelId))
+        return "vehicle";
+    if (CClientPlayerManager::IsValidModel(modelId))
+        return "ped";
+    if (CClientObjectManager::IsValidModel(modelId))
+        return "object";
+
+    return false;
+}
+
+bool CLuaEngineDefs::EngineIsModelCustom(uint32_t modelId)
+{
+    CClientModelManager* modelManager = g_pClientGame && g_pClientGame->GetManager() ? g_pClientGame->GetManager()->GetModelManager() : nullptr;
+    if (!modelManager)
+        return false;
+
+    if (modelManager->FindServerModelDefinition(static_cast<uint16_t>(modelId)) != nullptr)
+        return true;
+
+    CModelInfo* modelInfo = g_pGame ? g_pGame->GetModelInfo(modelId, true) : nullptr;
+    return modelInfo && modelInfo->IsValid() && modelInfo->GetParentID() != 0;
 }

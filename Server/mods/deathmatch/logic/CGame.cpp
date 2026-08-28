@@ -1435,6 +1435,9 @@ void CGame::InitialDataStream(CPlayer& Player)
     // Tell him current bullet sync enabled weapons and vehicle extrapolation settings
     SendSyncSettings(&Player);
 
+    // Tell him all active custom server models before streaming entities
+    SendServerModels(&Player);
+
     // Tell the other players about him
     CPlayerListPacket PlayerNotice;
     PlayerNotice.AddPlayer(&Player);
@@ -5279,5 +5282,45 @@ void CGame::ProcessClientTriggeredEventSpam()
             it = m_mapClientTriggeredEvents.erase(it);
         else
             it++;
+    }
+}
+
+void CGame::BroadcastAllocateServerModel(const SServerModelDefinition& definition)
+{
+    if (!m_pPlayerManager)
+        return;
+
+    CBitStream bitStream;
+    bitStream.pBitStream->Write(definition.logicalModelId);
+    bitStream.pBitStream->Write(definition.parentModelId);
+    bitStream.pBitStream->Write(static_cast<std::uint8_t>(definition.type));
+    bitStream.pBitStream->WriteString(definition.name);
+    m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(ALLOCATE_SERVER_MODEL, *bitStream.pBitStream));
+}
+
+void CGame::BroadcastFreeServerModel(std::uint16_t logicalModelId)
+{
+    if (!m_pPlayerManager)
+        return;
+
+    CBitStream bitStream;
+    bitStream.pBitStream->Write(logicalModelId);
+    m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(FREE_SERVER_MODEL, *bitStream.pBitStream));
+}
+
+void CGame::SendServerModels(CPlayer* player)
+{
+    if (!player || !m_modelManager)
+        return;
+
+    const auto definitions = m_modelManager->GetAllocatedModelDefinitions();
+    for (const auto& definition : definitions)
+    {
+        CBitStream bitStream;
+        bitStream.pBitStream->Write(definition.logicalModelId);
+        bitStream.pBitStream->Write(definition.parentModelId);
+        bitStream.pBitStream->Write(static_cast<std::uint8_t>(definition.type));
+        bitStream.pBitStream->WriteString(definition.name);
+        player->Send(CLuaPacket(ALLOCATE_SERVER_MODEL, *bitStream.pBitStream));
     }
 }
