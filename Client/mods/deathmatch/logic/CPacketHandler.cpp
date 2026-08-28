@@ -3790,8 +3790,8 @@ retry:
                     break;
                 }
 
-                //case CClientGame::WORLD_MESH:
-                //    break;
+                    // case CClientGame::WORLD_MESH:
+                    //     break;
 
                 case ElementType::TEAM:
                 {

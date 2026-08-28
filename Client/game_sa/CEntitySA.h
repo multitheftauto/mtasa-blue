@@ -255,16 +255,16 @@ public:
     void SetUnderwater(bool bUnderwater);
     bool GetUnderwater();
 
-    virtual void RestoreLastGoodPhysicsState();
-    CVector*     GetPosition();
-    CVector*     GetPositionInternal();
-    CMatrix*     GetMatrix(CMatrix* matrix);
-    CMatrix*     GetMatrixInternal(CMatrix* matrix);
-    void         SetMatrix(CMatrix* matrix);
-    WORD         GetModelIndex();
-    EntityType::Enum  GetEntityType();
-    bool         IsOnScreen();
-    bool         IsFullyVisible();
+    virtual void     RestoreLastGoodPhysicsState();
+    CVector*         GetPosition();
+    CVector*         GetPositionInternal();
+    CMatrix*         GetMatrix(CMatrix* matrix);
+    CMatrix*         GetMatrixInternal(CMatrix* matrix);
+    void             SetMatrix(CMatrix* matrix);
+    WORD             GetModelIndex();
+    EntityType::Enum GetEntityType();
+    bool             IsOnScreen();
+    bool             IsFullyVisible();
 
     bool IsVisible();
     void SetVisible(bool bVisible);

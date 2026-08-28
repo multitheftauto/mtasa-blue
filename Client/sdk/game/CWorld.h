@@ -66,11 +66,11 @@ struct SProcessLineOfSightMaterialInfoResult
 
 struct STestSphereAgainstWorldResult
 {
-    bool          collisionDetected{false};
-    std::uint32_t modelID{0};
-    CVector       entityPosition{};
-    CVector       entityRotation{};
-    std::uint32_t lodID{0};
+    bool              collisionDetected{false};
+    std::uint32_t     modelID{0};
+    CVector           entityPosition{};
+    CVector           entityRotation{};
+    std::uint32_t     lodID{0};
     ElementType::Enum type{ElementType::UNKNOWN};
 };
 

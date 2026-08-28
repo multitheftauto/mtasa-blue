@@ -802,31 +802,31 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                //case ElementType::WORLD_MESH_UNUSED:
-                {
-                    /*
-                    CWorldMesh* pMesh = static_cast < CWorldMesh* > ( pElement );
+                    // case ElementType::WORLD_MESH_UNUSED:
+                    {
+                        /*
+                        CWorldMesh* pMesh = static_cast < CWorldMesh* > ( pElement );
 
-                    // Write the name
-                    char* szName = pMesh->GetName ();
-                    unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
-                    BitStream.Write ( usNameLength );
-                    BitStream.Write ( szName, static_cast < int > ( usNameLength ) );
+                        // Write the name
+                        char* szName = pMesh->GetName ();
+                        unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
+                        BitStream.Write ( usNameLength );
+                        BitStream.Write ( szName, static_cast < int > ( usNameLength ) );
 
-                    // Write the position and rotation
-                    CVector vecTemp = pMesh->GetPosition ();
-                    BitStream.Write ( vecTemp.fX );
-                    BitStream.Write ( vecTemp.fY );
-                    BitStream.Write ( vecTemp.fZ );
+                        // Write the position and rotation
+                        CVector vecTemp = pMesh->GetPosition ();
+                        BitStream.Write ( vecTemp.fX );
+                        BitStream.Write ( vecTemp.fY );
+                        BitStream.Write ( vecTemp.fZ );
 
-                    vecTemp = pMesh->GetRotation ();
-                    BitStream.Write ( vecTemp.fX );
-                    BitStream.Write ( vecTemp.fY );
-                    BitStream.Write ( vecTemp.fZ );
-                    */
+                        vecTemp = pMesh->GetRotation ();
+                        BitStream.Write ( vecTemp.fX );
+                        BitStream.Write ( vecTemp.fY );
+                        BitStream.Write ( vecTemp.fZ );
+                        */
 
-                    //break;
-                }
+                        // break;
+                    }
 
                 case ElementType::TEAM:
                 {

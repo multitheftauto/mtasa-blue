@@ -1619,7 +1619,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         case ElementType::BLIP:
         case ElementType::PICKUP:
         case ElementType::RADAR_AREA:
-        //case CElement::WORLD_MESH_UNUSED:
+        // case CElement::WORLD_MESH_UNUSED:
         case ElementType::WATER:
         {
             pElement->SetDimension(usDimension);
