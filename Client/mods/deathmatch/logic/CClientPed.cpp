@@ -3178,23 +3178,29 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
                 Current.ButtonSquare = 0;
                 Current.ButtonCross = 0;
             }
-            // Disable the fire keys whilst crouching as well
-            Current.ButtonCircle = 0;
-            Current.LeftShoulder1 = 0;
+            // Disable the fire keys whilst crouching as well unless crouchbug or fastfire glitch is enabled
+            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_CROUCHBUG) && !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
+            {
+                Current.ButtonCircle = 0;
+                Current.LeftShoulder1 = 0;
+            }
             if (m_ulLastTimeBeganCrouch >= ulNow - 400.0f * fSpeedRatio)
             {
-                // Disable double crouching (another anim cut)
-                if (g_pClientGame->IsUsingAlternatePulseOrder())
-                    Current.ShockButtonL = 255;  // Do this differently if we have changed the pulse order
-                else
-                    Current.ShockButtonL = 0;
+                // Disable double crouching (another anim cut) unless glitch is enabled
+                if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_CROUCHBUG) && !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
+                {
+                    if (g_pClientGame->IsUsingAlternatePulseOrder())
+                        Current.ShockButtonL = 255;  // Do this differently if we have changed the pulse order
+                    else
+                        Current.ShockButtonL = 0;
+                }
             }
         }
     }
-    // If we just started aiming, make sure they dont try and crouch
+    // If we just started aiming, make sure they dont try and crouch unless crouchbug or fastfire is enabled
     else if ((m_ulLastTimeBeganAiming != 0 && m_ulLastTimeBeganAiming >= ulNow - 300.0f * fSpeedRatio) || (ulNow - m_ulLastTimeFired) <= 300.0f * fSpeedRatio)
     {
-        if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
+        if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_CROUCHBUG) && !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
         {
             Current.ShockButtonL = 0;
         }

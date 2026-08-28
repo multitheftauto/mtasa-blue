@@ -165,8 +165,8 @@ bool CStaticFunctionDefinitions::TriggerEvent(const char* szName, CClientEntity&
     if (m_pEvents->Exists(szName))
     {
         // Call the event
-        Entity.CallEvent(szName, Arguments, true);
-        bWasCancelled = m_pEvents->WasEventCancelled();
+        bool bSuccess = Entity.CallEvent(szName, Arguments, true);
+        bWasCancelled = m_pEvents->WasEventCancelled() || !bSuccess;
         return true;
     }
 
@@ -719,6 +719,16 @@ bool CStaticFunctionDefinitions::GetElementAlpha(CClientEntity& Entity, unsigned
             ucAlpha = Object.GetAlpha();
             break;
         }
+        case CCLIENTBUILDING:
+        {
+            ucAlpha = static_cast<CClientBuilding&>(Entity).GetAlpha();
+            break;
+        }
+        case CCLIENTPROJECTILE:
+        {
+            ucAlpha = static_cast<CClientProjectile&>(Entity).GetAlpha();
+            break;
+        }
         case CCLIENTMARKER:
         {
             CClientMarker& Marker = static_cast<CClientMarker&>(Entity);
@@ -914,15 +924,19 @@ bool CStaticFunctionDefinitions::GetElementCollisionsEnabled(CClientEntity& Enti
             return Vehicle.IsCollisionEnabled();
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
-            CClientObject& Object = static_cast<CClientObject&>(Entity);
-            return Object.IsCollisionEnabled();
+            return static_cast<CClientObject&>(Entity).IsCollisionEnabled();
         }
         case CCLIENTPED:
         case CCLIENTPLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
             return Ped.GetUsesCollision();
+        }
+        case CCLIENTBUILDING:
+        {
+            return static_cast<CClientBuilding&>(Entity).GetUsesCollision();
         }
         default:
             return false;
@@ -949,9 +963,15 @@ bool CStaticFunctionDefinitions::IsElementFrozen(CClientEntity& Entity, bool& bF
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             bFrozen = Object.IsFrozen();
+            break;
+        }
+        case CCLIENTPROJECTILE:
+        {
+            bFrozen = static_cast<CClientProjectile&>(Entity).IsFrozen();
             break;
         }
         default:
@@ -1271,6 +1291,11 @@ bool CStaticFunctionDefinitions::SetElementParent(CClientEntity& Entity, CClient
 
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
 
+        if (Parent.GetType() == CCLIENTGUI)
+            GUIElement.GetCGUIElement()->SetParent(static_cast<CClientGUIElement&>(Parent).GetCGUIElement());
+        else
+            GUIElement.GetCGUIElement()->SetParent(m_pGUI->GetScriptRoot());
+
         GUIElement.SetParent(&Parent);
         return true;
     }
@@ -1497,6 +1522,16 @@ bool CStaticFunctionDefinitions::SetElementAlpha(CClientEntity& Entity, unsigned
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.SetAlpha(ucAlpha);
+            break;
+        }
+        case CCLIENTBUILDING:
+        {
+            static_cast<CClientBuilding&>(Entity).SetAlpha(ucAlpha);
+            break;
+        }
+        case CCLIENTPROJECTILE:
+        {
+            static_cast<CClientProjectile&>(Entity).SetAlpha(ucAlpha);
             break;
         }
         case CCLIENTMARKER:
@@ -3592,20 +3627,13 @@ bool CStaticFunctionDefinitions::SetVehicleDoorOpenRatio(CClientEntity& Entity, 
 
 bool CStaticFunctionDefinitions::SetVehicleSirens(CClientVehicle& Vehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo)
 {
-    eClientVehicleType vehicleType = CClientVehicleManager::GetVehicleType(Vehicle.GetModel());
-    // Won't work with below.
-    if (vehicleType != CLIENTVEHICLE_PLANE && vehicleType != CLIENTVEHICLE_BOAT && vehicleType != CLIENTVEHICLE_TRAILER && vehicleType != CLIENTVEHICLE_HELI &&
-        vehicleType != CLIENTVEHICLE_BIKE && vehicleType != CLIENTVEHICLE_BMX)
-    {
-        if (ucSirenID >= 0 && ucSirenID <= 7)
-        {
-            Vehicle.SetVehicleSirenPosition(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions);
-            Vehicle.SetVehicleSirenColour(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour);
-            Vehicle.SetVehicleSirenMinimumAlpha(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha);
-            return true;
-        }
-    }
-    return false;
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return false;
+
+    Vehicle.SetVehicleSirenPosition(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions);
+    Vehicle.SetVehicleSirenColour(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour);
+    Vehicle.SetVehicleSirenMinimumAlpha(ucSirenID, tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha);
+    return true;
 }
 
 bool CStaticFunctionDefinitions::IsVehicleNitroRecharging(CClientVehicle& Vehicle, bool& bRecharging)
@@ -3921,9 +3949,15 @@ bool CStaticFunctionDefinitions::SetElementFrozen(CClientEntity& Entity, bool bF
             break;
         }
         case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
         {
             CClientObject& Object = static_cast<CClientObject&>(Entity);
             Object.SetFrozen(bFrozen);
+            break;
+        }
+        case CCLIENTPROJECTILE:
+        {
+            static_cast<CClientProjectile&>(Entity).SetFrozen(bFrozen);
             break;
         }
         default:
@@ -5366,7 +5400,7 @@ eCursorType CStaticFunctionDefinitions::GUIGetCursorType()
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
                                                                bool bRelative)
 {
-    CGUIElement* pElement = m_pGUI->CreateWnd(NULL, szCaption);
+    CGUIElement* pElement = m_pGUI->CreateWnd(m_pGUI->GetScriptRoot(), szCaption);
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -5385,7 +5419,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateWindow(CLuaMain& LuaMain
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateStaticImage(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const SString& strPath,
                                                                     bool bRelative, CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateStaticImage(pParent ? pParent->GetCGUIElement() : NULL);
+    CGUIElement* pElement = m_pGUI->CreateStaticImage(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot());
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -5460,7 +5494,7 @@ bool CStaticFunctionDefinitions::GUIStaticImageGetNativeSize(CClientEntity& Enti
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
                                                               bool bRelative, CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateLabel(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
+    CGUIElement* pElement = m_pGUI->CreateLabel(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot(), szCaption);
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -5474,7 +5508,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateLabel(CLuaMain& LuaMain,
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateButton(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
                                                                bool bRelative, CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateButton(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
+    CGUIElement* pElement = m_pGUI->CreateButton(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot(), szCaption);
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -5492,7 +5526,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateButton(CLuaMain& LuaMain
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateProgressBar(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
                                                                     CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateProgressBar(pParent ? pParent->GetCGUIElement() : NULL);
+    CGUIElement* pElement = m_pGUI->CreateProgressBar(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot());
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -5506,7 +5540,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateProgressBar(CLuaMain& Lu
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollBar(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bHorizontal,
                                                                   bool bRelative, CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateScrollBar(bHorizontal, pParent ? pParent->GetCGUIElement() : NULL);
+    CGUIElement* pElement = m_pGUI->CreateScrollBar(bHorizontal, pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot());
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -5524,7 +5558,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollBar(CLuaMain& LuaM
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateCheckBox(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
                                                                  bool bChecked, bool bRelative, CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateCheckBox(pParent ? pParent->GetCGUIElement() : NULL, szCaption, bChecked);
+    CGUIElement* pElement = m_pGUI->CreateCheckBox(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot(), szCaption, bChecked);
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -5542,7 +5576,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateCheckBox(CLuaMain& LuaMa
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateRadioButton(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
                                                                     bool bRelative, CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateRadioButton(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
+    CGUIElement* pElement = m_pGUI->CreateRadioButton(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot(), szCaption);
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -5560,7 +5594,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateRadioButton(CLuaMain& Lu
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateEdit(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
                                                              bool bRelative, CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateEdit(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
+    CGUIElement* pElement = m_pGUI->CreateEdit(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot(), szCaption);
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
     pElement->SetText(szCaption);
@@ -5580,7 +5614,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateEdit(CLuaMain& LuaMain, 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateMemo(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
                                                              bool bRelative, CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateMemo(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
+    CGUIElement* pElement = m_pGUI->CreateMemo(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot(), szCaption);
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
     pElement->SetText(szCaption);
@@ -5599,7 +5633,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateMemo(CLuaMain& LuaMain, 
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateGridList(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
                                                                  CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateGridList(pParent ? pParent->GetCGUIElement() : NULL, true);
+    CGUIElement* pElement = m_pGUI->CreateGridList(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot(), true);
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -5613,7 +5647,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateGridList(CLuaMain& LuaMa
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateTabPanel(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
                                                                  CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateTabPanel(pParent ? pParent->GetCGUIElement() : NULL);
+    CGUIElement* pElement = m_pGUI->CreateTabPanel(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot());
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -5631,7 +5665,7 @@ CClientGUIElement* CStaticFunctionDefinitions::GUICreateTabPanel(CLuaMain& LuaMa
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateScrollPane(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bRelative,
                                                                    CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateScrollPane(pParent ? pParent->GetCGUIElement() : NULL);
+    CGUIElement* pElement = m_pGUI->CreateScrollPane(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot());
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -5709,7 +5743,7 @@ bool CStaticFunctionDefinitions::GUIDeleteTab(CLuaMain& LuaMain, CClientGUIEleme
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateComboBox(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, const char* szCaption,
                                                                  bool bRelative, CClientGUIElement* pParent)
 {
-    CGUIElement* pElement = m_pGUI->CreateComboBox(pParent ? pParent->GetCGUIElement() : NULL, szCaption);
+    CGUIElement* pElement = m_pGUI->CreateComboBox(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot(), szCaption);
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -5936,7 +5970,7 @@ bool CStaticFunctionDefinitions::GUIComboBoxIsOpen(CClientEntity& Entity)
 CClientGUIElement* CStaticFunctionDefinitions::GUICreateBrowser(CLuaMain& LuaMain, const CVector2D& position, const CVector2D& size, bool bIsLocal,
                                                                 bool bIsTransparent, bool bRelative, CClientGUIElement* pParent)
 {
-    CGUIWebBrowser* pElement = m_pGUI->CreateWebBrowser(pParent ? pParent->GetCGUIElement() : nullptr);
+    CGUIWebBrowser* pElement = m_pGUI->CreateWebBrowser(pParent ? pParent->GetCGUIElement() : m_pGUI->GetScriptRoot());
     pElement->SetPosition(position, bRelative);
     pElement->SetSize(size, bRelative);
 
@@ -6042,20 +6076,8 @@ void CStaticFunctionDefinitions::GUISetProperty(CClientEntity& Entity, const cha
     {
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
 
-        bool bConsoleHadInputFocus = g_pCore->GetConsole()->IsInputActive();
-
         // Set the property
         GUIElement.GetCGUIElement()->SetProperty(szProperty, szValue);
-
-        // HACK: If the property being set is AlwaysOnTop, move it to the back so it's not in front of the main menu
-        if ((stricmp(szProperty, "AlwaysOnTop") == 0) && (stricmp(szValue, "True") == 0))
-        {
-            GUIElement.GetCGUIElement()->MoveToBack();
-
-            // Restore input focus to the console if required
-            if (bConsoleHadInputFocus)
-                g_pCore->GetConsole()->ActivateInput();
-        }
     }
 }
 
@@ -6077,20 +6099,16 @@ bool CStaticFunctionDefinitions::GUIBringToFront(CClientEntity& Entity)
     if (IS_GUI(&Entity))
     {
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
-        // We don't allow AlwaysOnTop GUI to be brought to the front (so it doesn't appear on top of the main menu)
-        std::string strValue = GUIElement.GetCGUIElement()->GetProperty("AlwaysOnTop");
-        if (strValue.compare("True") != 0)
-        {
-            bool bConsoleHadInputFocus = g_pCore->GetConsole()->IsInputActive();
 
-            // Bring it to the front
-            GUIElement.GetCGUIElement()->BringToFront();
+        bool consoleHadInputFocus = g_pCore->GetConsole()->IsInputActive();
 
-            // Restore input focus to the console if required
-            if (bConsoleHadInputFocus)
-                g_pCore->GetConsole()->ActivateInput();
-            return true;
-        }
+        // Bring it to the front
+        GUIElement.GetCGUIElement()->BringToFront();
+
+        // Restore input focus to the console if required
+        if (consoleHadInputFocus)
+            g_pCore->GetConsole()->ActivateInput();
+        return true;
     }
     return false;
 }

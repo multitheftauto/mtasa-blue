@@ -16,7 +16,9 @@
 #define VOICE_SAMPLE_SIZE               2
 */
 
+#include <deque>
 #include <mutex>
+#include <vector>
 #include <speex/speex.h>
 #include <CClientPlayer.h>
 #include <../deathmatch/CVoiceRecorder.h>
@@ -33,8 +35,16 @@ public:
 
     bool m_bVoiceActive;
 
+    // Called by the BASS thread when playback underflows
+    void OnVoiceStall()
+    {
+        std::lock_guard<std::mutex> lock(m_Mutex);
+        m_bStallPending = true;
+    }
+
     std::list<SString> m_EventQueue;
-    std::mutex         m_Mutex;  // Only for m_EventQueue and m_bVoiceActive
+    std::mutex         m_Mutex;  // Only for m_EventQueue, m_bVoiceActive, m_bStallPending, m_bIgnoreStart, m_ulTimeOfLastFrame,
+                                 // m_ulTimeOfLastPacket, m_voiceFramesThisPulse and m_PendingVoiceFrames
 
     void GetTempoValues(float& fSampleRate, float& fTempo, float& fPitch, bool& bReverse)
     {
@@ -79,15 +89,25 @@ public:
     bool IsActive() { return m_bVoiceActive; }
 
 private:
-    void Init();
-    void DeInit();
-    void ServiceEventQueue();
-    void ApplyFxEffects();
+    enum class EVoiceFrameResult
+    {
+        Accepted,   // Frame was fed to BASS
+        Deferred,   // BASS refused the frame; retry on a later pulse
+        Suppressed  // Frame dropped on purpose; do not retry
+    };
+
+    void              Init();
+    void              DeInit();
+    void              ServiceEventQueue();
+    EVoiceFrameResult ProcessFrame(const unsigned char* voiceBuffer, unsigned int voiceBufferLength);
+    void              QueueVoiceFrame(const unsigned char* voiceBuffer, unsigned int voiceBufferLength);
+    void              ApplyFxEffects();
 
     CClientPlayer*  m_pPlayer;
     CVoiceRecorder* m_pVoiceRecorder;
     unsigned int    m_SampleRate;
     HSTREAM         m_pBassPlaybackStream;
+    HSYNC           m_hStallSync;
     void*           m_pSpeexDecoderState;
     int             m_iSpeexIncomingFrameSampleCount;
     float           m_fVolume;
@@ -108,5 +128,11 @@ private:
     SFixedArray<int, 9> m_EnabledEffects;
     SFixedArray<HFX, 9> m_FxEffects;
 
-    unsigned char m_voiceFramesThisPulse;  // Decodes per frame limit
+    unsigned char m_voiceFramesThisPulse;  // Decodes per frame limit (shared by the packet intake and the pulse drain)
+
+    bool                                   m_bStallPending;       // Set by the BASS thread when playback underflows
+    unsigned long                          m_ulTimeOfLastFrame;   // Time of the last frame accepted into the BASS stream
+    unsigned long                          m_ulTimeOfLastPacket;  // Time of the last packet received from the speaker
+    bool                                   m_bIgnoreStart;        // Start event canceled; suppress until the burst ends
+    std::deque<std::vector<unsigned char>> m_PendingVoiceFrames;  // Frames waiting for a decode slot
 };
