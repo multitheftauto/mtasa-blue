@@ -322,6 +322,7 @@ private:
     uint                                 m_uiAcquireRetryDelay;
     bool                                 m_bAutoDeadZoneEnabled;
     int                                  m_iAutoDeadZoneCounter;
+    bool                                 m_bLoggedNoJoystick;
     string                               m_strSelectedControllerId;
     bool                                 m_bVibrationEnabled;
     bool                                 m_bVibrationWasActive;
@@ -658,9 +659,16 @@ void CJoystickManager::CollectDirectInputScanResult()
 
     if (!result.pDevice)
     {
-        WriteDebugEvent("InitDirectInput - No Joystick found");
+        // Retries every few seconds for hotplug; only log the first miss (or after a device was lost)
+        if (!m_bLoggedNoJoystick)
+        {
+            WriteDebugEvent("InitDirectInput - No Joystick found");
+            m_bLoggedNoJoystick = true;
+        }
         return;
     }
+
+    m_bLoggedNoJoystick = false;
 
     if (m_bUseXInput)
     {
