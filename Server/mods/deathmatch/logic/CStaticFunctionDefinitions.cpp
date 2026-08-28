@@ -204,8 +204,8 @@ bool CStaticFunctionDefinitions::TriggerEvent(const char* szName, CElement* pEle
     if (m_pEvents->Exists(szName))
     {
         // Call the event
-        pElement->CallEvent(szName, Arguments);
-        bWasCanceled = m_pEvents->WasEventCancelled();
+        bool bSuccess = pElement->CallEvent(szName, Arguments);
+        bWasCanceled = m_pEvents->WasEventCancelled() || !bSuccess;
         return true;
     }
 
