@@ -335,8 +335,12 @@ bool CEventsManager::TriggerEvent(BuiltInEvent::Enum event, CClientEntity* sourc
     std::string_view    eventName = GetEventName(event);
     std::uint32_t       eventIdOrHash = static_cast<std::uint32_t>(eventId);
 
-    // if (!g_pClientGame->GetDebugHookManager()->OnPreEvent(eventName.data(), args, sourceEntity, nullptr))
-    //    return false;
+    CDebugHookManager* debugHookManager = g_pClientGame->GetDebugHookManager();
+    if (debugHookManager->HasPreEventHooks())
+    {
+        if (!debugHookManager->OnPreEvent(eventName.data(), args, sourceEntity, nullptr))
+            return false;
+    }
 
     m_eventCancelled = false;
 
@@ -358,7 +362,9 @@ bool CEventsManager::TriggerEvent(BuiltInEvent::Enum event, CClientEntity* sourc
     if (callOnChildren && sourceEntity)
         TriggerEventOnChildren(handlersTable, sourceEntity, sourceEntity, args, eventName, eventIdOrHash);
 
-    // g_pClientGame->GetDebugHookManager()->OnPostEvent(eventName.data(), args, sourceEntity, nullptr);
+    if (debugHookManager->HasPostEventHooks())
+        debugHookManager->OnPostEvent(eventName.data(), args, sourceEntity, nullptr);
+
     return !m_eventCancelled;
 }
 
@@ -374,8 +380,12 @@ bool CEventsManager::TriggerCustomEvent(std::uint32_t hash, CClientEntity* sourc
     std::string_view    eventName = it->second.eventName;
     std::uint32_t       eventIdOrHash = it->second.eventNameHash;
 
-    // if (!g_pClientGame->GetDebugHookManager()->OnPreEvent(eventName.data(), args, sourceEntity, nullptr))
-    //    return false;
+    CDebugHookManager* debugHookManager = g_pClientGame->GetDebugHookManager();
+    if (debugHookManager->HasPreEventHooks())
+    {
+        if (!debugHookManager->OnPreEvent(eventName.data(), args, sourceEntity, nullptr))
+            return false;
+    }
 
     m_eventCancelled = false;
 
@@ -397,7 +407,9 @@ bool CEventsManager::TriggerCustomEvent(std::uint32_t hash, CClientEntity* sourc
     if (callOnChildren && sourceEntity)
         TriggerEventOnChildren(handlersTable, sourceEntity, sourceEntity, args, eventName, eventIdOrHash);
 
-    // g_pClientGame->GetDebugHookManager()->OnPostEvent(eventName.data(), args, sourceEntity, nullptr);
+    if (debugHookManager->HasPostEventHooks())
+        debugHookManager->OnPostEvent(eventName.data(), args, sourceEntity, nullptr);
+
     return !m_eventCancelled;
 }
 
@@ -455,9 +467,6 @@ void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, Event
     if (handlers.empty())
         return;
 
-    // TIMEUS  startTimeCall = GetTimeUs();
-    // SString strStatus;
-
     const bool isDirectSource = sourceEntity == entity;
     const auto entityType = entity->GetType();
     bool       removedDuringCallback = false;
@@ -491,11 +500,16 @@ void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, Event
         if (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::LUA_TRACE_0000)
             g_pCore->LogEvent(0, "Lua Event", luaMain->GetScriptName(), eventName.data());
 
+        CDebugHookManager* debugHookManager = g_pClientGame->GetDebugHookManager();
+        if (debugHookManager->HasPreEventFunctionHooks())
+        {
+            if (!debugHookManager->OnPreEventFunction(eventName.data(), args, sourceEntity, nullptr, handler.luaMain, handler.luaFunctionRef))
+                continue;
+        }
+
         // Aspect ratio adjustment bodges
         if (handler.isRenderingEvent)
             m_callingRenderEvent = true;
-
-        // TODO g_pClientGame->GetDebugHookManager()->OnPreEventFunction
 
         int preCallTop = lua_gettop(luaVM);
 
@@ -534,7 +548,8 @@ void CEventsManager::ExecuteHandlersForEntity(EventHandlersList& handlers, Event
 
         lua_settop(luaVM, preCallTop);
 
-        // TODO g_pClientGame->GetDebugHookManager()->OnPostEventFunction
+         if (debugHookManager->HasPostEventFunctionHooks())
+            debugHookManager->OnPostEventFunction(eventName.data(), args, sourceEntity, nullptr, handler.luaMain, handler.luaFunctionRef);
 
         // Aspect ratio adjustment bodges
         if (handler.isRenderingEvent)
