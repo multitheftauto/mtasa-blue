@@ -244,6 +244,23 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
     return pTex;
 }
 
+// UV anim keyframes live in a dictionary chunk preceding the clump; peek the header instead of
+// RwStreamFindChunk, which would skip the whole chunk by its declared length.
+static constexpr std::uint32_t RW_CHUNK_UVANIMDICT = 0x2B;
+static const std::uintptr_t    ARRAY_RpUVAnimDictSchema = 0x8DED50;
+
+static RtDict* ReadLeadingUVAnimDict(RwStream* stream, RwChunkHeaderInfo& outLeadingChunk)
+{
+    RwStreamReadChunkHeaderInfo(stream, &outLeadingChunk);
+    if (outLeadingChunk.type != RW_CHUNK_UVANIMDICT)
+        return nullptr;
+
+    auto*   schema = reinterpret_cast<RtDictSchema*>(ARRAY_RpUVAnimDictSchema);
+    RtDict* dict = RtDictSchemaStreamReadDict(schema, stream);
+    RtDictSchemaSetCurrentDict(schema, dict);
+    return dict;
+}
+
 // Reads and parses a DFF file specified by a path (szDFF) into a CModelInfo identified by the object id (usModelID)
 // bLoadEmbeddedCollisions should be true for vehicles
 // Any custom TXD should be imported before this call
@@ -275,10 +292,8 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
     if (streamModel == NULL)
         return NULL;
 
-    // engineLoadDFF loads through here rather than CFileLoader_LoadAtomicFile, so it needs the
-    // same leading UV anim dictionary read.
     RwChunkHeaderInfo leadingChunk;
-    RtDict*           pUVAnimDict = CFileLoader_ReadLeadingUVAnimDict(streamModel, leadingChunk);
+    RtDict*           pUVAnimDict = ReadLeadingUVAnimDict(streamModel, leadingChunk);
 
     // DFF header id: 0x10
     // find our dff chunk

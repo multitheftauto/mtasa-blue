@@ -143,23 +143,6 @@ static void CVehicleModelInfo_StopUsingCommonVehicleTexDicationary()
 static auto          CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 static unsigned int& gAtomicModelId = *reinterpret_cast<unsigned int*>(DWORD_AtomicsReplacerModelID);
 
-// UV anim keyframes live in a dictionary chunk preceding the clump; peek the header instead of
-// RwStreamFindChunk, which would skip the whole chunk by its declared length.
-static constexpr std::uint32_t RW_CHUNK_UVANIMDICT = 0x2B;
-static const std::uintptr_t    ARRAY_RpUVAnimDictSchema = 0x8DED50;
-
-RtDict* CFileLoader_ReadLeadingUVAnimDict(RwStream* stream, RwChunkHeaderInfo& outLeadingChunk)
-{
-    RwStreamReadChunkHeaderInfo(stream, &outLeadingChunk);
-    if (outLeadingChunk.type != RW_CHUNK_UVANIMDICT)
-        return nullptr;
-
-    auto*   schema = reinterpret_cast<RtDictSchema*>(ARRAY_RpUVAnimDictSchema);
-    RtDict* dict = RtDictSchemaStreamReadDict(schema, stream);
-    RtDictSchemaSetCurrentDict(schema, dict);
-    return dict;
-}
-
 bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
 {
     CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[modelId];
@@ -172,19 +155,13 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
         CVehicleModelInfo_UseCommonVehicleTexDicationary();
     }
 
+    // CStreaming::ConvertBufferToObject, this function's only caller, already reads the leading UV anim dictionary chunk.
     const unsigned int rwID_CLUMP = 16;
-
-    RwChunkHeaderInfo leadingChunk;
-    RtDict*           pUVAnimDict = CFileLoader_ReadLeadingUVAnimDict(stream, leadingChunk);
-
-    if (leadingChunk.type == rwID_CLUMP || RwStreamFindChunk(stream, rwID_CLUMP, nullptr, nullptr))
+    if (RwStreamFindChunk(stream, rwID_CLUMP, nullptr, nullptr))
     {
         RpClump* pReadClump = RpClumpStreamRead(stream);
         if (!pReadClump)
         {
-            if (pUVAnimDict)
-                RtDictDestroy(pUVAnimDict);
-
             if (bUseCommonVehicleTexDictionary)
             {
                 CVehicleModelInfo_StopUsingCommonVehicleTexDicationary();
@@ -200,9 +177,6 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
         RpClumpForAllAtomics(pReadClump, reinterpret_cast<RpClumpForAllAtomicsCB_t>(CFileLoader_SetRelatedModelInfoCB), &relatedModelInfo);
         RpClumpDestroy(pReadClump);
     }
-
-    if (pUVAnimDict)
-        RtDictDestroy(pUVAnimDict);
 
     if (!pBaseModelInfo->pRwObject)
     {
