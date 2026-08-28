@@ -103,8 +103,10 @@ public:
     LUA_DECLARE(ToggleAllControls);
 
     // Command funcs
-    static bool AddCommandHandler(lua_State* luaVM, std::string commandName, CLuaFunctionRef handlerFunction, std::optional<bool> maybeCaseSensitive);
-    static bool RemoveCommandHandler(lua_State* luaVM, std::string commandName, std::optional<CLuaFunctionRef> maybeHandlerFunction);
+    static bool AddCommandHandler(lua_State* luaVM, std::variant<std::string, std::vector<std::string>> commandNames, CLuaFunctionRef handlerFunction,
+                                  std::optional<bool> maybeCaseSensitive);
+    static bool RemoveCommandHandler(lua_State* luaVM, std::variant<std::string, std::vector<std::string>> commandNames,
+                                     std::optional<CLuaFunctionRef> maybeHandlerFunction);
     static bool ExecuteCommandHandler(lua_State* luaVM, std::string commandName, std::optional<std::string> maybeArgs);
     LUA_DECLARE(GetCommandHandlers);
 

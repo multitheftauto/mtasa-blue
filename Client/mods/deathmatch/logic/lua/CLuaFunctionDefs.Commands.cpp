@@ -12,32 +12,82 @@
 
 #include "StdInc.h"
 
-bool CLuaFunctionDefs::AddCommandHandler(lua_State* luaVM, std::string commandName, CLuaFunctionRef handlerFunction, std::optional<bool> maybeCaseSensitive)
+bool CLuaFunctionDefs::AddCommandHandler(lua_State* luaVM, std::variant<std::string, std::vector<std::string>> commandNames, CLuaFunctionRef handlerFunction,
+                                         std::optional<bool> maybeCaseSensitive)
 {
-    // bool addCommandHandler ( string commandName, function handlerFunction, [bool caseSensitive = true] )
-    if (commandName.empty())
-        return false;
-
+    // bool addCommandHandler ( string / table commandNames, function handlerFunction, [bool caseSensitive = true] )
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!luaMain)
         return false;
 
     const bool caseSensitive = maybeCaseSensitive.value_or(true);
-    return m_pRegisteredCommands->AddCommand(luaMain, commandName.c_str(), handlerFunction, caseSensitive);
-}
 
-bool CLuaFunctionDefs::RemoveCommandHandler(lua_State* luaVM, std::string commandName, std::optional<CLuaFunctionRef> maybeHandlerFunction)
-{
-    // bool removeCommandHandler ( string commandName [, function handler] )
-    if (commandName.empty())
+    if (std::holds_alternative<std::string>(commandNames))
+    {
+        const std::string& commandName = std::get<std::string>(commandNames);
+        if (commandName.empty())
+            return false;
+
+        return m_pRegisteredCommands->AddCommand(luaMain, commandName.c_str(), handlerFunction, caseSensitive);
+    }
+
+    const auto& nameList = std::get<std::vector<std::string>>(commandNames);
+    if (nameList.empty())
         return false;
 
+    std::unordered_set<std::string> uniqueCommands;
+    bool                            success = false;
+
+    for (const std::string& commandName : nameList)
+    {
+        if (commandName.empty())
+            continue;
+
+        // Skip duplicates within the same array registration
+        if (!uniqueCommands.insert(commandName).second)
+            continue;
+
+        if (m_pRegisteredCommands->AddCommand(luaMain, commandName.c_str(), handlerFunction, caseSensitive))
+            success = true;
+    }
+
+    return success;
+}
+
+bool CLuaFunctionDefs::RemoveCommandHandler(lua_State* luaVM, std::variant<std::string, std::vector<std::string>> commandNames,
+                                            std::optional<CLuaFunctionRef> maybeHandlerFunction)
+{
+    // bool removeCommandHandler ( string / table commandNames [, function handler] )
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!luaMain)
         return false;
 
     const CLuaFunctionRef handlerFunction = maybeHandlerFunction.value_or(CLuaFunctionRef());
-    return m_pRegisteredCommands->RemoveCommand(luaMain, commandName.c_str(), handlerFunction);
+
+    if (std::holds_alternative<std::string>(commandNames))
+    {
+        const std::string& commandName = std::get<std::string>(commandNames);
+        if (commandName.empty())
+            return false;
+
+        return m_pRegisteredCommands->RemoveCommand(luaMain, commandName.c_str(), handlerFunction);
+    }
+
+    const auto& nameList = std::get<std::vector<std::string>>(commandNames);
+    if (nameList.empty())
+        return false;
+
+    bool success = false;
+    for (const std::string& commandName : nameList)
+    {
+        if (commandName.empty())
+            continue;
+
+        if (m_pRegisteredCommands->RemoveCommand(luaMain, commandName.c_str(), handlerFunction))
+            success = true;
+    }
+
+    return success;
 }
 
 bool CLuaFunctionDefs::ExecuteCommandHandler(lua_State* luaVM, std::string commandName, std::optional<std::string> maybeArgs)
