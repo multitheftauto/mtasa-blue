@@ -2266,6 +2266,11 @@ struct SOverrideLightsSync : public ISyncStructure
 //              Lua types               //
 //                                      //
 //////////////////////////////////////////
+#define LUA_TVECTOR2 11
+#define LUA_TVECTOR3 12
+#define LUA_TVECTOR4 13
+#define LUA_TMATRIX  14
+
 struct SLuaTypeSync : public ISyncStructure
 {
     enum

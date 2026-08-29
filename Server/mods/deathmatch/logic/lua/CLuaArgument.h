@@ -19,12 +19,20 @@ extern "C"
 }
 #include "../common/CBitStream.h"
 #include "json.h"
+#include <CVector.h>
+#include <CVector2D.h>
+#include <CVector4D.h>
+#include <CMatrix.h>
 
 class CElement;
 class CLuaArguments;
 
 #define LUA_TTABLEREF    9
 #define LUA_TSTRING_LONG 10
+#define LUA_TVECTOR2     11
+#define LUA_TVECTOR3     12
+#define LUA_TVECTOR4     13
+#define LUA_TMATRIX      14
 
 class CLuaArgument
 {
@@ -51,6 +59,10 @@ public:
     void ReadElementID(ElementID ID);
     void ReadScriptID(uint uiScriptID);
     void ReadTable(class CLuaArguments* table);
+    void ReadVector(const CVector2D& vector);
+    void ReadVector(const CVector& vector);
+    void ReadVector(const CVector4D& vector);
+    void ReadMatrix(const CMatrix& matrix);
 
     int GetType() const { return m_iType; };
 
@@ -61,6 +73,8 @@ public:
     CLuaArguments*     GetTable() const { return m_pTableData; }
     CElement*          GetElement() const;
     bool               GetAsString(SString& strBuffer);
+    const CVector4D&   GetVector() const noexcept { return m_vectorData; }
+    const CMatrix*     GetMatrix() const noexcept { return m_matrixData; }
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
@@ -112,6 +126,11 @@ public:
         return false;
     }
 
+    [[nodiscard]] bool IsVector2() const noexcept { return m_iType == LUA_TVECTOR2; }
+    [[nodiscard]] bool IsVector3() const noexcept { return m_iType == LUA_TVECTOR3; }
+    [[nodiscard]] bool IsVector4() const noexcept { return m_iType == LUA_TVECTOR4; }
+    [[nodiscard]] bool IsMatrix() const noexcept { return m_iType == LUA_TMATRIX && m_matrixData != nullptr; }
+
 private:
     void LogUnableToPacketize(const char* szMessage) const;
 
@@ -122,6 +141,8 @@ private:
     void*          m_pUserData;
     CLuaArguments* m_pTableData;
     bool           m_bWeakTableRef;
+    CVector4D      m_vectorData;
+    CMatrix*       m_matrixData;
 
 #ifdef MTA_DEBUG
     std::string m_strFilename;
