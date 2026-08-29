@@ -44,11 +44,8 @@ static void __declspec(naked) HOOK_CPathFind_LoadPathNodeCount_Mid()
 
 // This address is further into the executable than IsSlowMem recognizes, so the normal
 // EZHookInstall path would assert in Debug builds. Unprotected up front in
-// SetInitialVirtualProtect and installed via the Fast path instead, like the other hot addresses.
+// SetInitialVirtualProtect and installed with HookInstallFast
 void CPathFindSA::StaticSetHooks()
 {
-    BYTE jumpBytes[MAX_JUMPCODE_SIZE];
-    MemSetFast(jumpBytes, 0x90, MAX_JUMPCODE_SIZE);
-    CreateJump(HOOKPOS_CPathFind_LoadPathNodeCount_Mid, (DWORD)HOOK_CPathFind_LoadPathNodeCount_Mid, jumpBytes);
-    MemCpyFast((PVOID)HOOKPOS_CPathFind_LoadPathNodeCount_Mid, jumpBytes, HOOKSIZE_CPathFind_LoadPathNodeCount_Mid);
+    HookInstallFast(HOOKPOS_CPathFind_LoadPathNodeCount_Mid, (DWORD)HOOK_CPathFind_LoadPathNodeCount_Mid, HOOKSIZE_CPathFind_LoadPathNodeCount_Mid);
 }

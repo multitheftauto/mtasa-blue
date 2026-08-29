@@ -74,6 +74,24 @@ bool HookInstall(DWORD dwInstallAddress, T dwHookHandler, int iJmpCodeSize = 5)
     }
 }
 
+// For install addresses outside the ranges MemCpy knows how to unprotect; the page must have
+// been made writable beforehand (see SetInitialVirtualProtect)
+template <typename T>
+bool HookInstallFast(DWORD dwInstallAddress, T dwHookHandler, int iJmpCodeSize = 5)
+{
+    BYTE JumpBytes[MAX_JUMPCODE_SIZE];
+    MemSetFast(JumpBytes, 0x90, MAX_JUMPCODE_SIZE);
+    if (CreateJump(dwInstallAddress, (DWORD)FunctionPointerToVoidP(dwHookHandler), JumpBytes))
+    {
+        MemCpyFast((PVOID)dwInstallAddress, JumpBytes, iJmpCodeSize);
+        return true;
+    }
+    else
+    {
+        return false;
+    }
+}
+
 // Auto detect requirement of US/EU hook installation
 #define EZHookInstall(type) HookInstall(HOOKPOS_##type, (DWORD)HOOK_##type, HOOKSIZE_##type);
 
