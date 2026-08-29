@@ -16,16 +16,7 @@
 class CLuaVector2D : public CVector2D
 {
 public:
-    CLuaVector2D();
-    CLuaVector2D(const CVector2D& vector);
-    CLuaVector2D(float fX, float fY);
-
-    ~CLuaVector2D();
-
-    unsigned int GetScriptID() const { return m_uiScriptID; }
-
-    static CLuaVector2D* GetFromScriptID(unsigned int uiScriptID);
-
-private:
-    unsigned int m_uiScriptID;
+    CLuaVector2D() : CVector2D() {}
+    CLuaVector2D(const CVector2D& vector) : CVector2D(vector) {}
+    CLuaVector2D(float fX, float fY) : CVector2D(fX, fY) {}
 };

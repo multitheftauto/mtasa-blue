@@ -1022,7 +1022,7 @@ CLuaTimer* UserDataCast(CLuaTimer* ptr, lua_State* luaState)
 //
 CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState)
 {
-    return CLuaVector2D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+    return ptr;
 }
 
 //
@@ -1030,7 +1030,7 @@ CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState)
 //
 CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState)
 {
-    return CLuaVector3D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+    return ptr;
 }
 
 //
@@ -1038,7 +1038,7 @@ CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState)
 //
 CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState)
 {
-    return CLuaVector4D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+    return ptr;
 }
 
 //
@@ -1046,7 +1046,7 @@ CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState)
 //
 CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState)
 {
-    return CLuaMatrix::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
+    return ptr;
 }
 
 //
