@@ -64,6 +64,8 @@ typedef RwMatrix*(__cdecl* RwMatrixTranslate_t)(RwMatrix* matrix, const RwV3d* t
 typedef RwMatrix*(__cdecl* RwMatrixScale_t)(RwMatrix* matrix, const RwV3d* translation, RwTransformOrder order);
 typedef RpMaterial*(__cdecl* RpMaterialCreate_t)();
 typedef int(__cdecl* RpMaterialDestroy_t)(RpMaterial* mat);
+typedef RpMaterial*(__cdecl* RpMaterialCallBack_t)(RpMaterial* mat, void* data);
+typedef RpGeometry*(__cdecl* RpGeometryForAllMaterials_t)(RpGeometry* geometry, RpMaterialCallBack_t callback, void* data);
 typedef int(__cdecl* RpMaterialUVAnimExists_t)(const RpMaterial* mat);
 typedef void*(__cdecl* RpMaterialUVAnimGetInterpolator_t)(RpMaterial* mat, unsigned int slot);
 typedef RpAtomic*(__cdecl* RpMatFXAtomicEnableEffects_t)(RpAtomic* atomic);
@@ -174,6 +176,7 @@ RWFUNC(RpGeometryTriangleSetMaterial_t RpGeometryTriangleSetMaterial, (RpGeometr
 RWFUNC(RpMaterialCreate_t RpMaterialCreate, (RpMaterialCreate_t)0xDEAD)
 RWFUNC(RpGeometryDestroy_t RpGeometryDestroy, (RpGeometryDestroy_t)0xDEAD)
 RWFUNC(RpMaterialDestroy_t RpMaterialDestroy, (RpMaterialDestroy_t)0xDEAD)
+RWFUNC(RpGeometryForAllMaterials_t RpGeometryForAllMaterials, (RpGeometryForAllMaterials_t)0xDEAD)
 RWFUNC(RpMaterialUVAnimExists_t RpMaterialUVAnimExists, (RpMaterialUVAnimExists_t)0xDEAD)
 RWFUNC(RpMaterialUVAnimGetInterpolator_t RpMaterialUVAnimGetInterpolator, (RpMaterialUVAnimGetInterpolator_t)0xDEAD)
 RWFUNC(RpMatFXAtomicEnableEffects_t RpMatFXAtomicEnableEffects, (RpMatFXAtomicEnableEffects_t)0xDEAD)

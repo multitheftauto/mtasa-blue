@@ -246,8 +246,8 @@ RwTexDictionary* CRenderWareSA::ReadTXD(const SString& strFilename, const SStrin
 
 // UV anim keyframes live in a dictionary chunk preceding the clump; peek the header instead of
 // RwStreamFindChunk, which would skip the whole chunk by its declared length.
-static constexpr std::uint32_t RW_CHUNK_UVANIMDICT = 0x2B;
-static const std::uintptr_t    ARRAY_RpUVAnimDictSchema = 0x8DED50;
+static constexpr std::uint32_t  RW_CHUNK_UVANIMDICT = 0x2B;
+static constexpr std::uintptr_t ARRAY_RpUVAnimDictSchema = 0x8DED50;
 
 static RtDict* ReadLeadingUVAnimDict(RwStream* stream, RwChunkHeaderInfo& outLeadingChunk)
 {

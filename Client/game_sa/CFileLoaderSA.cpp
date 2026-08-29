@@ -194,23 +194,22 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
 // its own effect type set, or the render pipeline keeps sampling static UVs.
 static constexpr std::uint32_t RP_UVANIM_DUAL_PASS_CHANNEL = 1;
 
+static RpMaterial* EnableMaterialUVAnimCB(RpMaterial* material, void* data)
+{
+    if (!material || !RpMaterialUVAnimExists(material))
+        return material;
+
+    RpMatFXAtomicEnableEffects(static_cast<RpAtomic*>(data));
+
+    const bool bDual = RpMaterialUVAnimGetInterpolator(material, RP_UVANIM_DUAL_PASS_CHANNEL) != nullptr;
+    RpMatFXMaterialSetEffects(material, bDual ? rpMATFXEFFECTDUALUVTRANSFORM : rpMATFXEFFECTUVTRANSFORM);
+    return material;
+}
+
 static void EnableUVAnimIfPresent(RpAtomic* atomic)
 {
-    RpGeometry* geometry = atomic->geometry;
-    if (!geometry)
-        return;
-
-    for (std::int32_t i = 0; i < geometry->materials.entries; i++)
-    {
-        RpMaterial* material = geometry->materials.materials[i];
-        if (!material || !RpMaterialUVAnimExists(material))
-            continue;
-
-        RpMatFXAtomicEnableEffects(atomic);
-
-        const bool bDual = RpMaterialUVAnimGetInterpolator(material, RP_UVANIM_DUAL_PASS_CHANNEL) != nullptr;
-        RpMatFXMaterialSetEffects(material, bDual ? rpMATFXEFFECTDUALUVTRANSFORM : rpMATFXEFFECTUVTRANSFORM);
-    }
+    if (atomic->geometry)
+        RpGeometryForAllMaterials(atomic->geometry, EnableMaterialUVAnimCB, atomic);
 }
 
 RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo* pRelatedModelInfo)

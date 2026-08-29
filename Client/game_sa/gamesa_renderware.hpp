@@ -60,6 +60,7 @@ void InitRwFunctions()
     RpMaterialCreate = (RpMaterialCreate_t)0x0074D990;
     RpGeometryDestroy = (RpGeometryDestroy_t)0x0074CCC0;
     RpMaterialDestroy = (RpMaterialDestroy_t)0x0074DA20;
+    RpGeometryForAllMaterials = (RpGeometryForAllMaterials_t)0x0074C790;
     RpMaterialUVAnimExists = (RpMaterialUVAnimExists_t)0x007CC530;
     RpMaterialUVAnimGetInterpolator = (RpMaterialUVAnimGetInterpolator_t)0x007CC430;
     RpMatFXAtomicEnableEffects = (RpMatFXAtomicEnableEffects_t)0x00811C00;
