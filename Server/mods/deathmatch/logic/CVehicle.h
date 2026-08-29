@@ -275,6 +275,11 @@ public:
     class CPlayer* GetSyncer() { return m_pSyncer; };
     void           SetSyncer(class CPlayer* pPlayer);
 
+    // Set through setElementSyncer, and describes this vehicle's current syncer only. SetSyncer
+    // clears it, so it can never outlive the assignment it was granted for.
+    bool IsSyncerPersistent() const { return m_bSyncerPersistent; };
+    void SetSyncerPersistent(bool bPersistent) { m_bSyncerPersistent = bPersistent; };
+
     bool IsUnoccupiedSyncable() { return m_bUnoccupiedSyncable; };
     void SetUnoccupiedSyncable(bool bUnoccupiedSynced) { m_bUnoccupiedSyncable = bUnoccupiedSynced; };
 
@@ -415,6 +420,7 @@ private:
     class CVehicleManager* m_pVehicleManager;
 
     CPlayer*                              m_pSyncer;
+    bool                                  m_bSyncerPersistent = false;
     SFixedArray<CPed*, MAX_VEHICLE_SEATS> m_pOccupants;
 
     unsigned short m_usModel;
