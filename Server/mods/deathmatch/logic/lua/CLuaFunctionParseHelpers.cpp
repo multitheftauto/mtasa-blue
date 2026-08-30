@@ -394,7 +394,7 @@ CBan* UserDataCast(CBan* ptr, lua_State* luaState)
 //
 CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState)
 {
-    return ptr;
+    return nullptr;
 }
 
 //
@@ -402,7 +402,7 @@ CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState)
 //
 CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState)
 {
-    return ptr;
+    return nullptr;
 }
 
 //
@@ -410,7 +410,7 @@ CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState)
 //
 CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState)
 {
-    return ptr;
+    return nullptr;
 }
 
 //
@@ -418,7 +418,7 @@ CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState)
 //
 CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState)
 {
-    return ptr;
+    return nullptr;
 }
 
 //

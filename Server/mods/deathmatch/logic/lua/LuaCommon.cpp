@@ -181,14 +181,6 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushxmlnode(luaVM, pNode);
     else if (CLuaTimer* pTimer = UserDataCast((CLuaTimer*)pData, luaVM))
         return lua_pushtimer(luaVM, pTimer);
-    else if (CLuaVector2D* pVector = UserDataCast((CLuaVector2D*)pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
-    else if (CLuaVector3D* pVector = UserDataCast((CLuaVector3D*)pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
-    else if (CLuaVector4D* pVector = UserDataCast((CLuaVector4D*)pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
-    else if (CLuaMatrix* pMatrix = UserDataCast((CLuaMatrix*)pData, luaVM))
-        return lua_pushmatrix(luaVM, *pMatrix);
     else if (CAccount* pAccount = UserDataCast((CAccount*)pData, luaVM))
         return lua_pushaccount(luaVM, pAccount);
     else if (CAccessControlList* pACL = UserDataCast((CAccessControlList*)pData, luaVM))
