@@ -6,9 +6,15 @@ project "Core"
 	clangtidy "On"
 
 	filter "system:windows"
-		includedirs { "../../vendor/sparsehash/current/src/windows" }
+		includedirs {
+			"../../vendor/sparsehash/current/src/windows",
+			"../../vendor/detours/4.0.1/src",
+		}
+		links { "detours" }
 		-- Server requires Windows 10+ (cpp-httplib)
 		defines { "_WIN32_WINNT=0x0A00" }
+
+
 
 	filter {}
 		includedirs {
