@@ -11,6 +11,21 @@
 #include "StdInc.h"
 #include <libpng/png.h>
 
+namespace
+{
+    struct PngErrorException
+    {
+    };
+
+    // libpng is built without setjmp support, so its default fatal error path
+    // aborts the process. Throw a private exception to let malformed input fail
+    // at the PNG decoder boundary instead.
+    [[noreturn]] void PngErrorHandler(png_structp, png_const_charp)
+    {
+        throw PngErrorException{};
+    }
+}  // namespace
+
 ///////////////////////////////////////////////////////////////
 //
 // IsPng
@@ -136,7 +151,8 @@ void ReadDataFromInputStream(png_structp png_ptr, png_bytep outBytes, png_size_t
         return;
 
     CBufferReadStream& stream = *(CBufferReadStream*)ioPtr;
-    stream.ReadBytes((byte*)outBytes, (size_t)byteCountToRead);
+    if (byteCountToRead > INT_MAX || !stream.ReadBytes((byte*)outBytes, static_cast<int>(byteCountToRead)))
+        png_error(png_ptr, "Read beyond end of PNG data");
 }
 
 ///////////////////////////////////////////////////////////////
@@ -148,67 +164,69 @@ void ReadDataFromInputStream(png_structp png_ptr, png_bytep outBytes, png_size_t
 ///////////////////////////////////////////////////////////////
 bool PngDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& uiOutWidth, uint& uiOutHeight)
 {
-    CBuffer           inBuffer(pData, uiDataSize);
-    CBufferReadStream stream(inBuffer);
-
     enum
     {
         kPngSignatureLength = 8
     };
-    byte pngSignature[kPngSignatureLength];
 
-    stream.ReadBytes(pngSignature, kPngSignatureLength);
-
-    if (!png_check_sig(pngSignature, kPngSignatureLength))
+    if (!pData || uiDataSize < kPngSignatureLength)
         return false;
 
-    ///////////////////////////////////////////////////
-    // get PNG file info struct (memory is allocated by libpng)
+    CBuffer           inBuffer(pData, uiDataSize);
+    CBufferReadStream stream(inBuffer);
+    byte              pngSignature[kPngSignatureLength];
+
+    if (!stream.ReadBytes(pngSignature, kPngSignatureLength) || !png_check_sig(pngSignature, kPngSignatureLength))
+        return false;
+
     png_structp png_ptr = NULL;
-    png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, NULL, NULL);
+    png_infop   info_ptr = NULL;
 
-    if (png_ptr == NULL)
-        return false;
-
-    ///////////////////////////////////////////////////
-    // get PNG image data info struct (memory is allocated by libpng)
-    png_infop info_ptr = NULL;
-    info_ptr = png_create_info_struct(png_ptr);
-
-    if (info_ptr == NULL)
+    try
     {
-        // libpng must free file info struct memory before we bail
-        png_destroy_read_struct(&png_ptr, NULL, NULL);
-        return false;
-    }
+        ///////////////////////////////////////////////////
+        // get PNG file info struct (memory is allocated by libpng)
+        png_ptr = png_create_read_struct(PNG_LIBPNG_VER_STRING, NULL, PngErrorHandler, NULL);
 
-    png_set_read_fn(png_ptr, &stream, ReadDataFromInputStream);
+        if (png_ptr == NULL)
+            return false;
 
-    // tell libpng we already read the signature
-    png_set_sig_bytes(png_ptr, kPngSignatureLength);
+        ///////////////////////////////////////////////////
+        // get PNG image data info struct (memory is allocated by libpng)
+        info_ptr = png_create_info_struct(png_ptr);
 
-    ///////////////////////////////////////////////////
-    png_read_info(png_ptr, info_ptr);
+        if (info_ptr == NULL)
+        {
+            // libpng must free file info struct memory before we bail
+            png_destroy_read_struct(&png_ptr, NULL, NULL);
+            return false;
+        }
 
-    png_uint_32 width = 0;
-    png_uint_32 height = 0;
-    int         bitDepth = 0;
-    int         colorType = -1;
-    png_uint_32 retval = png_get_IHDR(png_ptr, info_ptr, &width, &height, &bitDepth, &colorType, NULL, NULL, NULL);
+        png_set_read_fn(png_ptr, &stream, ReadDataFromInputStream);
 
-    if (retval != 1)
-    {
-        png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-        return false;
-    }
+        // tell libpng we already read the signature
+        png_set_sig_bytes(png_ptr, kPngSignatureLength);
 
-    ///////////////////////////////////////////////////
-    uiOutWidth = width;
-    uiOutHeight = height;
+        ///////////////////////////////////////////////////
+        png_read_info(png_ptr, info_ptr);
 
-    if (pOutBuffer)
-    {
-        try
+        png_uint_32 width = 0;
+        png_uint_32 height = 0;
+        int         bitDepth = 0;
+        int         colorType = -1;
+        png_uint_32 retval = png_get_IHDR(png_ptr, info_ptr, &width, &height, &bitDepth, &colorType, NULL, NULL, NULL);
+
+        if (retval != 1)
+        {
+            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+            return false;
+        }
+
+        ///////////////////////////////////////////////////
+        uiOutWidth = width;
+        uiOutHeight = height;
+
+        if (pOutBuffer)
         {
             pOutBuffer->SetSize(width * height * 4);
 
@@ -227,11 +245,18 @@ bool PngDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& ui
                     return false;
             }
         }
-        catch (...)
-        {
-            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
-            throw;
-        }
+    }
+    catch (const PngErrorException&)
+    {
+        if (png_ptr)
+            png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : NULL, NULL);
+        return false;
+    }
+    catch (...)
+    {
+        if (png_ptr)
+            png_destroy_read_struct(&png_ptr, info_ptr ? &info_ptr : NULL, NULL);
+        throw;
     }
 
     png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
