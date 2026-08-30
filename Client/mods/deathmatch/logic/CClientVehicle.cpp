@@ -379,6 +379,14 @@ void CClientVehicle::GetPosition(CVector& vecPosition) const
     }
 }
 
+// A ped that is getting out or being dragged out and has physically left the car is owned by his
+// own exit animation; moving him with the vehicle would keep warping him back inside it.
+static bool CanMoveOccupantWithVehicle(CClientPed* pOccupant)
+{
+    const int iState = pOccupant->GetVehicleInOutState();
+    return (iState != VEHICLE_INOUT_GETTING_OUT && iState != VEHICLE_INOUT_GETTING_JACKED) || pOccupant->GetRealOccupiedVehicle();
+}
+
 void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpolation, bool bAllowGroundLoadFreeze)
 {
     // Is the local player in the vehicle
@@ -419,10 +427,9 @@ void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpol
     }
 
     // If we have any occupants, update their positions
-    // Make sure we dont update their position if they are getting out and have physically left the car
     for (int i = 0; i <= NUMELMS(m_pPassengers); i++)
         if (CClientPed* pOccupant = GetOccupant(i))
-            if (pOccupant->GetVehicleInOutState() != VEHICLE_INOUT_GETTING_OUT || pOccupant->GetRealOccupiedVehicle())
+            if (CanMoveOccupantWithVehicle(pOccupant))
                 pOccupant->SetPosition(vecPosition);
 
     // Reset interpolation
@@ -455,7 +462,8 @@ void CClientVehicle::UpdatePedPositions(const CVector& vecPosition)
     // If we have any occupants, update their positions
     for (int i = 0; i <= NUMELMS(m_pPassengers); i++)
         if (CClientPed* pOccupant = GetOccupant(i))
-            pOccupant->SetPosition(vecPosition);
+            if (CanMoveOccupantWithVehicle(pOccupant))
+                pOccupant->SetPosition(vecPosition);
 }
 
 void CClientVehicle::GetRotationDegrees(CVector& vecRotation) const
@@ -573,10 +581,9 @@ bool CClientVehicle::SetMatrix(const CMatrix& Matrix)
     m_matFrozen = Matrix;
 
     // If we have any occupants, update their positions
-    // Make sure we dont update their position if they are getting out and have physically left the car
     for (int i = 0; i <= NUMELMS(m_pPassengers); i++)
         if (CClientPed* pOccupant = GetOccupant(i))
-            if (pOccupant->GetVehicleInOutState() != VEHICLE_INOUT_GETTING_OUT || pOccupant->GetRealOccupiedVehicle())
+            if (CanMoveOccupantWithVehicle(pOccupant))
                 pOccupant->SetPosition(m_Matrix.vPos);
 
     return true;
