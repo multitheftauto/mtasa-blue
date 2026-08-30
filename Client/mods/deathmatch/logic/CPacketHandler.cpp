@@ -1849,7 +1849,9 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                                 {
                                     // Desynced? Outside but supposed to be in
                                     // For local player or synced peds this is taken care of in CClientPed::UpdateVehicleInOut()
-                                    if (pJacked->GetOccupiedVehicle() && !pJacked->GetRealOccupiedVehicle())
+                                    // Not while his drag animation still plays; an aborted jack ends with him out anyway,
+                                    // and his own client is about to notify that.
+                                    if (pJacked->GetOccupiedVehicle() && !pJacked->GetRealOccupiedVehicle() && !pJacked->IsGettingJacked())
                                     {
                                         // Warp him back in
                                         pJacked->WarpIntoVehicle(pJacked->GetOccupiedVehicle(), pJacked->GetOccupiedVehicleSeat());
@@ -1917,7 +1919,9 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                             pPed->ResetVehicleInOut();
 
                         // Make sure we're removed from the vehicle
-                        bool bDontWarpIfGettingDraggedOut = pPed->IsLocalPlayer() || pPed->IsSyncing();
+                        // A jack victim also leaves through here when the jacker aborts, and his drag
+                        // animation may still be playing on clients watching it; let it finish.
+                        bool bDontWarpIfGettingDraggedOut = pPed->IsLocalPlayer() || pPed->IsSyncing() || pPed->IsGettingJacked();
                         pPed->RemoveFromVehicle(bDontWarpIfGettingDraggedOut);
 
                         if (ucSeat == 0)
