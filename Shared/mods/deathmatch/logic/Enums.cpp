@@ -119,6 +119,7 @@ ADD_ENUM(WorldSpecialProperty::TUNNELWEATHERBLEND, "tunnelweatherblend")
 ADD_ENUM(WorldSpecialProperty::IGNOREFIRESTATE, "ignorefirestate")
 ADD_ENUM(WorldSpecialProperty::FLYINGCOMPONENTS, "flyingcomponents")
 ADD_ENUM(WorldSpecialProperty::VEHICLEBURNEXPLOSIONS, "vehicleburnexplosions")
+ADD_ENUM(WorldSpecialProperty::VEHICLEBURNBLOWUP, "vehicleburnblowup")
 ADD_ENUM(WorldSpecialProperty::VEHICLE_ENGINE_AUTOSTART, "vehicle_engine_autostart")
 IMPLEMENT_ENUM_CLASS_END("world-special-property")
 
