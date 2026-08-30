@@ -10,10 +10,78 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CStaticFunctionDefinitions.h"
+#include "CElementArray.h"
 
 // Don't whine bout my gotos, lua api is a bitch, i had to!
 int CLuaClassDefs::Index(lua_State* luaVM)
 {
+    // Fast-path: Directly resolve high-frequency element properties in C++ to achieve 1:1 speed with procedural calls
+    if (lua_type(luaVM, 2) == LUA_TSTRING && lua_isuserdata(luaVM, 1))
+    {
+        const char*    key = lua_tostring(luaVM, 2);
+        void*          object = *(void**)lua_touserdata(luaVM, 1);
+        CClientEntity* entity = CElementIDs::GetElement(TO_ELEMENTID(object));
+        if (entity)
+        {
+            if (strcmp(key, "health") == 0)
+            {
+                float health = 0.0f;
+                if (CStaticFunctionDefinitions::GetElementHealth(*entity, health))
+                {
+                    lua_pushnumber(luaVM, health);
+                    return 1;
+                }
+            }
+            else if (strcmp(key, "dimension") == 0)
+            {
+                lua_pushnumber(luaVM, entity->GetDimension());
+                return 1;
+            }
+            else if (strcmp(key, "interior") == 0)
+            {
+                unsigned char interior = 0;
+                if (CStaticFunctionDefinitions::GetElementInterior(*entity, interior))
+                {
+                    lua_pushnumber(luaVM, interior);
+                    return 1;
+                }
+            }
+            else if (strcmp(key, "alpha") == 0)
+            {
+                unsigned char alpha = 0;
+                if (CStaticFunctionDefinitions::GetElementAlpha(*entity, alpha))
+                {
+                    lua_pushnumber(luaVM, alpha);
+                    return 1;
+                }
+            }
+            else if (strcmp(key, "frozen") == 0)
+            {
+                bool frozen = false;
+                if (CStaticFunctionDefinitions::IsElementFrozen(*entity, frozen))
+                {
+                    lua_pushboolean(luaVM, frozen);
+                    return 1;
+                }
+            }
+            else if (strcmp(key, "doubleSided") == 0)
+            {
+                lua_pushboolean(luaVM, entity->IsDoubleSided());
+                return 1;
+            }
+            else if (strcmp(key, "model") == 0)
+            {
+                unsigned short model = 0;
+                if (CStaticFunctionDefinitions::GetElementModel(*entity, model))
+                {
+                    lua_pushnumber(luaVM, model);
+                    return 1;
+                }
+            }
+        }
+    }
+
     lua_pushvalue(luaVM, lua_upvalueindex(1));  // ud, k, mt
 
     // First we look for a function
@@ -90,6 +158,66 @@ searchparent:
 
 int CLuaClassDefs::NewIndex(lua_State* luaVM)
 {
+    // Fast-path: Directly apply high-frequency element property mutations in C++
+    if (lua_type(luaVM, 2) == LUA_TSTRING && lua_isuserdata(luaVM, 1))
+    {
+        const char*    key = lua_tostring(luaVM, 2);
+        void*          object = *(void**)lua_touserdata(luaVM, 1);
+        CClientEntity* entity = CElementIDs::GetElement(TO_ELEMENTID(object));
+        if (entity)
+        {
+            if (strcmp(key, "health") == 0)
+            {
+                if (lua_isnumber(luaVM, 3))
+                {
+                    CStaticFunctionDefinitions::SetElementHealth(*entity, static_cast<float>(lua_tonumber(luaVM, 3)));
+                    return 0;
+                }
+            }
+            else if (strcmp(key, "dimension") == 0)
+            {
+                if (lua_isnumber(luaVM, 3))
+                {
+                    CStaticFunctionDefinitions::SetElementDimension(*entity, static_cast<unsigned short>(lua_tonumber(luaVM, 3)));
+                    return 0;
+                }
+            }
+            else if (strcmp(key, "interior") == 0)
+            {
+                if (lua_isnumber(luaVM, 3))
+                {
+                    CVector dummyPos;
+                    CStaticFunctionDefinitions::SetElementInterior(*entity, static_cast<unsigned char>(lua_tonumber(luaVM, 3)), false, dummyPos);
+                    return 0;
+                }
+            }
+            else if (strcmp(key, "alpha") == 0)
+            {
+                if (lua_isnumber(luaVM, 3))
+                {
+                    CStaticFunctionDefinitions::SetElementAlpha(*entity, static_cast<unsigned char>(lua_tonumber(luaVM, 3)));
+                    return 0;
+                }
+            }
+            else if (strcmp(key, "frozen") == 0)
+            {
+                if (lua_isboolean(luaVM, 3))
+                {
+                    CStaticFunctionDefinitions::SetElementFrozen(*entity, lua_toboolean(luaVM, 3) != 0);
+                    return 0;
+                }
+            }
+            else if (strcmp(key, "model") == 0)
+            {
+                if (lua_isnumber(luaVM, 3))
+                {
+                    CStaticFunctionDefinitions::SetElementModel(*entity, static_cast<unsigned short>(lua_tonumber(luaVM, 3)));
+                    return 0;
+                }
+            }
+        }
+    }
+
     lua_pushvalue(luaVM, lua_upvalueindex(1));  // ud, k, v, mt
 
     lua_pushstring(luaVM, "__set");  // ud, k, v, mt, "__set"
