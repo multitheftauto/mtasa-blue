@@ -1578,13 +1578,13 @@ void CVehicleSA::RecalculateHandling()
     RecalculateSwingingChassis();
 
     // Same story as the chassis above: the door setup below is also only ever applied once, inside
-    // the game's vehicle constructor (0x6B0DBE / 0x6B0DF4 / 0x6B0E4B).
+    // the game's vehicle constructor.
     RecalculateDoorModelFlags();
 }
 
-// Mirrors the native vehicle constructor's bonnet, boot and NO_DOORS setup (0x6B0DBE / 0x6B0DF4 /
-// 0x6B0E4B) so a live REVERSE_BONNET/HANGING_BOOT/TAILGATE_BOOT/NO_DOORS change actually reaches an
-// already spawned vehicle instead of only ever taking effect for one created after the change.
+// Mirrors the native vehicle constructor's bonnet, boot and NO_DOORS setup, so a live
+// REVERSE_BONNET, HANGING_BOOT, TAILGATE_BOOT or NO_DOORS change reaches an already spawned
+// vehicle instead of only ever taking effect for one created after the change.
 void CVehicleSA::RecalculateDoorModelFlags()
 {
     if (GetVehicleInterface()->m_vehicleClass != VehicleClass::AUTOMOBILE)
@@ -1598,8 +1598,8 @@ void CVehicleSA::RecalculateDoorModelFlags()
     constexpr std::uint16_t extraBased = 0x10;
     constexpr std::uint16_t extraLowGravity = 0x20;
 
-    auto*              pInt = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
-    const unsigned int uiModelFlags = m_pHandlingData->GetInterface()->uiModelFlags;
+    auto*               pInt = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
+    const std::uint32_t uiModelFlags = m_pHandlingData->GetInterface()->uiModelFlags;
 
     CDoorSAInterface& bonnet = pInt->m_doors[eDoors::BONNET];
     if (uiModelFlags & MODELFLAGS_REVERSE_BONNET)
@@ -1638,28 +1638,32 @@ void CVehicleSA::RecalculateDoorModelFlags()
     boot.m_fClosedAngle = 0.0f;
 
     // Same constructor-only story again: NO_DOORS marks the four side doors missing once, at
-    // creation. Removing the flag doesn't restore them; the constructor never does that either, and
-    // this damage state is meant to keep holding once a real door actually blows off for the same
-    // reason. Going through CDamageManager::SetDoorStatus alone (the same call damage sync already
-    // uses) isn't enough on a live vehicle though: it runs into CAutomobile::SetDoorDamage's own
-    // lock check, which for a locked vehicle's front doors quietly turns the request into a plain
-    // dent and returns before ever hiding anything - a case the constructor itself never hits,
-    // since it runs before any lock state exists yet. Hiding the door mesh here directly, the same
-    // call that status route would otherwise make on its own, sidesteps that gate instead of
-    // fighting it.
+    // creation, and removing the flag doesn't restore them, since the constructor never does that
+    // either. The status alone isn't enough on a live vehicle, though; a locked vehicle's front
+    // doors quietly turn the request into a dent instead, so the door mesh is hidden directly here
+    // too.
     if (uiModelFlags & MODELFLAGS_NO_DOORS)
     {
-        static constexpr eCarNodes doorNodes[] = {eCarNodes::DOOR_LF, eCarNodes::DOOR_RF, eCarNodes::DOOR_LR, eCarNodes::DOOR_RR};
-        static constexpr eDoors    doorIds[] = {eDoors::FRONT_LEFT_DOOR, eDoors::FRONT_RIGHT_DOOR, eDoors::REAR_LEFT_DOOR, eDoors::REAR_RIGHT_DOOR};
+        struct SSideDoor
+        {
+            eDoors    id;
+            eCarNodes node;
+        };
+        static constexpr SSideDoor sideDoors[] = {
+            {eDoors::FRONT_LEFT_DOOR, eCarNodes::DOOR_LF},
+            {eDoors::FRONT_RIGHT_DOOR, eCarNodes::DOOR_RF},
+            {eDoors::REAR_LEFT_DOOR, eCarNodes::DOOR_LR},
+            {eDoors::REAR_RIGHT_DOOR, eCarNodes::DOOR_RR},
+        };
 
         if (CDamageManager* pDamageManager = GetDamageManager())
         {
-            for (std::size_t i = 0; i < std::size(doorIds); ++i)
+            for (const SSideDoor& sideDoor : sideDoors)
             {
-                pDamageManager->SetDoorStatus(doorIds[i], DT_DOOR_MISSING, false);
+                pDamageManager->SetDoorStatus(sideDoor.id, DT_DOOR_MISSING, false);
 
-                if (RwFrame* pFrame = pInt->m_aCarNodes[static_cast<std::size_t>(doorNodes[i])])
-                    pInt->SetComponentVisibility(pFrame, 0);            // ATOMIC_IS_NOT_PRESENT
+                if (RwFrame* pFrame = pInt->m_aCarNodes[static_cast<std::size_t>(sideDoor.node)])
+                    pInt->SetComponentVisibility(pFrame, 0);  // ATOMIC_IS_NOT_PRESENT
             }
         }
     }
