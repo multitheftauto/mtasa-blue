@@ -16,6 +16,7 @@
 #include <game/CPedDamageResponse.h>
 #include <game/CEventList.h>
 #include <game/CEventDamage.h>
+#include "../game_sa/TaskAttackSA.h"
 
 class CEventDamageSAInterface;
 
@@ -4205,26 +4206,11 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
 // attacker still runs a CTaskSimpleStealthKill, without checking who that task is for; a knife
 // kill keeps it active for the whole animation, so a tear gas tick or a stray bullet from the
 // same attacker makes a nearby ped play the stealth death too.
-class CTaskSimpleStealthKillSAInterface
-{
-public:
-    void*            pVTable;
-    void*            pParent;
-    bool             bKeepTargetAlive;
-    CPedSAInterface* pTarget;
-    int              animGroupId;
-    bool             bIsAborting;
-    bool             bIsFinished;
-    void*            pAnim;
-    unsigned int     uiSpentWaitingMs;
-};
-static_assert(sizeof(CTaskSimpleStealthKillSAInterface) == 0x20, "Invalid CTaskSimpleStealthKillSAInterface size");
-
 // The original code compares the task's type further down, but on any other task type this reads
 // a field that can't match the ped, so the outcome doesn't change
-bool _cdecl IsStealthKillTaskTarget(CTaskSimpleStealthKillSAInterface* pStealthKillTask, CPedSAInterface* pPed)
+bool _cdecl IsStealthKillTaskTarget(CTaskSimpleStealthKillSAInterface* pStealthKillTask, CPed* pPed)
 {
-    return pStealthKillTask && pStealthKillTask->pTarget == pPed;
+    return pStealthKillTask && pStealthKillTask->m_pTarget == pPed;
 }
 
 DWORD                         RETURN_ComputeDamageResponse_StealthKillTarget = 0x4C0365;
