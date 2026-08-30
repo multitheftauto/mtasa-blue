@@ -157,4 +157,7 @@ public:
     virtual bool         GetTransitionMatrix(CMatrix& matrix) const = 0;
 
     virtual bool IsSphereVisible(CVector* center, float radius) const = 0;
+
+    virtual void SetScriptViewModeCycling(bool bEnabled) = 0;
+    virtual void ApplyScriptCamSwitch() = 0;
 };

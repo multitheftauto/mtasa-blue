@@ -151,12 +151,33 @@ CClientCamera::~CClientCamera()
         // Restore the camera to the local player
         SetFocusToLocalPlayerImpl();
     }
+    // The gate patches live in game_sa and would outlive us
+    if (m_pCamera)
+        m_pCamera->SetScriptViewModeCycling(false);
+
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pFocusedPlayer, &m_pFocusedEntity, NULL);
 }
 
 void CClientCamera::DoPulse()
 {
     InvalidateCachedTransforms();
+
+    if (m_pCamera)
+    {
+        // GTA ignores the change camera key while a script owns the camera, which is how
+        // setCameraTarget holds it; open the native cycling while we follow an entity
+        const bool bFollowingEntity = !m_bFixed && !m_bInvalidated && m_pFocusedGameEntity != nullptr;
+        m_pCamera->SetScriptViewModeCycling(bFollowingEntity);
+
+        // The native mode switch stays off under script control, so a vehicle index outside the
+        // three zoom levels sinks the camera into the vehicle or leaves it stale
+        if (bFollowingEntity && m_pFocusedEntity && m_pFocusedEntity->GetType() == CCLIENTVEHICLE)
+        {
+            const eVehicleCamMode eViewMode = GetCameraVehicleViewMode();
+            if (eViewMode < eVehicleCamMode::CLOSE_EXTERNAL || eViewMode > eVehicleCamMode::FAR_EXTERNAL)
+                SetCameraVehicleViewMode(eVehicleCamMode::FAR_EXTERNAL);
+        }
+    }
 
     // If we're fixed, force the target vector
     if (m_bFixed)
@@ -507,6 +528,10 @@ void CClientCamera::SetFocus(CClientEntity* pEntity, eCamMode eMode, bool bSmoot
 
             // Do it
             m_pCamera->TakeControl(pGameEntity, eMode, iSwitchStyle);
+
+            // Commit the switch so refocusing between a ped and a vehicle engages the new mode
+            if (eMode == MODE_CAM_ON_A_STRING || eMode == MODE_FOLLOWPED)
+                m_pCamera->ApplyScriptCamSwitch();
 
             // Store
             m_pFocusedEntity = pEntity;
