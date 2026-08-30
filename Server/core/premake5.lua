@@ -8,11 +8,16 @@ project "Core"
 	filter "system:windows"
 		includedirs {
 			"../../vendor/sparsehash/current/src/windows",
+		}
+		-- Server requires Windows 10+ (cpp-httplib)
+		defines { "_WIN32_WINNT=0x0A00" }
+
+	filter { "system:windows", "platforms:x86" }
+		includedirs {
 			"../../vendor/detours/4.0.1/src",
 		}
 		links { "detours" }
-		-- Server requires Windows 10+ (cpp-httplib)
-		defines { "_WIN32_WINNT=0x0A00" }
+
 
 
 

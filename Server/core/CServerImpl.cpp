@@ -1150,19 +1150,32 @@ void CServerImpl::ExecuteCurrentCommand()
     const std::wstring fullCommand = m_inputBuffer;
     ClearInput();
 
+    const auto EqualsIgnoreCase = [](const std::wstring& str, const wchar_t* target)
+    {
+        size_t len = str.length();
+        size_t i = 0;
+        while (i < len && target[i] != L'\0')
+        {
+            if (towlower(str[i]) != towlower(target[i]))
+                return false;
+            i++;
+        }
+        return i == len && target[i] == L'\0';
+    };
+
     // Check for hardcoded core commands
-    if (!_wcsicmp(fullCommand.c_str(), L"quit") || !_wcsicmp(fullCommand.c_str(), L"exit"))
+    if (EqualsIgnoreCase(fullCommand, L"quit") || EqualsIgnoreCase(fullCommand, L"exit"))
     {
         m_bRequestedQuit = true;
         return;
     }
-    if (!_wcsicmp(fullCommand.c_str(), L"reset"))
+    if (EqualsIgnoreCase(fullCommand, L"reset"))
     {
         m_bRequestedReset = true;
         m_bRequestedQuit = true;
         return;
     }
-    if (!_wcsicmp(fullCommand.c_str(), L"cls") || !_wcsicmp(fullCommand.c_str(), L"clear"))
+    if (EqualsIgnoreCase(fullCommand, L"cls") || EqualsIgnoreCase(fullCommand, L"clear"))
     {
         ClearScreen();
         return;
@@ -1617,7 +1630,11 @@ void CServerImpl::LoadCommandHistory()
     std::ifstream inFile;
     for (const auto& path : candidatePaths)
     {
+#ifdef WIN32
         inFile.open(FromUTF8(path));
+#else
+        inFile.open(path);
+#endif
         if (inFile.is_open())
             break;
     }
@@ -1670,12 +1687,20 @@ void CServerImpl::SaveCommandHistory()
     std::string privDir = PathJoin(m_strServerModPath, "priv");
     MakeSureDirExists(privDir.c_str());
 
-    std::string   historyPath = PathJoin(privDir, "history.txt");
+    std::string historyPath = PathJoin(privDir, "history.txt");
+#ifdef WIN32
     std::ofstream outFile(FromUTF8(historyPath), std::ios::trunc);
+#else
+    std::ofstream outFile(historyPath, std::ios::trunc);
+#endif
     if (!outFile.is_open())
     {
         historyPath = PathJoin(m_strServerModPath, "history.txt");
+#ifdef WIN32
         outFile.open(FromUTF8(historyPath), std::ios::trunc);
+#else
+        outFile.open(historyPath, std::ios::trunc);
+#endif
     }
 
     if (!outFile.is_open())
