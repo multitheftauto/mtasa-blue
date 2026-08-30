@@ -2280,7 +2280,7 @@ SString PadLeft(const SString& strText, uint uiNumSpaces, char cCharacter)
 //////////////////////////////////////////////////////////
 BOOL CALLBACK MyEnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
-    WINDOWINFO windowInfo;
+    WINDOWINFO windowInfo{sizeof(WINDOWINFO)};
     if (GetWindowInfo(hwnd, &windowInfo))
     {
         if (windowInfo.atomWindowType == reinterpret_cast<uint>(WC_DIALOG))
@@ -2301,6 +2301,22 @@ BOOL CALLBACK MyEnumWindowsProc(HWND hwnd, LPARAM lParam)
 bool IsDeviceSelectionDialogOpen(DWORD processID)
 {
     return !EnumWindows(MyEnumWindowsProc, processID);
+}
+
+BOOL CALLBACK FindVisibleGameWindow(HWND hwnd, LPARAM lParam)
+{
+    DWORD windowProcessId = 0;
+    GetWindowThreadProcessId(hwnd, &windowProcessId);
+    if (windowProcessId != static_cast<DWORD>(lParam) || !IsWindowVisible(hwnd))
+        return true;
+
+    WINDOWINFO windowInfo{sizeof(WINDOWINFO)};
+    return !GetWindowInfo(hwnd, &windowInfo) || windowInfo.atomWindowType == reinterpret_cast<uint>(WC_DIALOG);
+}
+
+bool IsGameWindowOpen(DWORD processID)
+{
+    return !EnumWindows(FindVisibleGameWindow, processID);
 }
 
 //////////////////////////////////////////////////////////
