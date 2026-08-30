@@ -46,7 +46,8 @@ extern CGame* pGameInterface;
 #define HOOKPOS_EndWorldColors                           0x561795
 #define HOOKPOS_CWorld_ProcessVerticalLineSectorList     0x563357
 #define HOOKPOS_ComputeDamageResponse_StartChoking       0x4C05B9
-#define HOOKPOS_ComputeDamageResponse_StealthKillTarget  0x4C03AB
+#define HOOKPOS_ComputeDamageResponse_StealthKillTarget  0x4C035C
+#define FUNC_CTaskManager_GetActiveTask                  0x681720
 #define HOOKPOS_CAutomobile__ProcessSwingingDoor         0x6A9DAF
 
 #define FUNC_CStreaming_Update                     0x40E670
@@ -654,7 +655,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
     HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
     HookInstall(HOOKPOS_ComputeDamageResponse_StartChoking, (DWORD)HOOK_ComputeDamageResponse_StartChoking, 7);
-    HookInstall(HOOKPOS_ComputeDamageResponse_StealthKillTarget, (DWORD)HOOK_ComputeDamageResponse_StealthKillTarget, 5);
+    HookInstall(HOOKPOS_ComputeDamageResponse_StealthKillTarget, (DWORD)HOOK_ComputeDamageResponse_StealthKillTarget, 9);
     HookInstall(HOOKPOS_CollisionStreamRead, (DWORD)HOOK_CollisionStreamRead, 6);
     HookInstall(HOOKPOS_VehicleCamStart, (DWORD)HOOK_VehicleCamStart, 6);
     HookInstall(HOOKPOS_VehicleCamTargetZTweak, (DWORD)HOOK_VehicleCamTargetZTweak, 8);
@@ -4204,16 +4205,29 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
 // attacker still runs a CTaskSimpleStealthKill, without checking who that task is for; a knife
 // kill keeps it active for the whole animation, so a tear gas tick or a stray bullet from the
 // same attacker makes a nearby ped play the stealth death too.
-bool _cdecl IsStealthKillTaskTarget(DWORD dwStealthKillTask, DWORD dwPed)
+class CTaskSimpleStealthKillSAInterface
 {
-    if (!dwStealthKillTask)
-        return false;
+public:
+    void*            pVTable;
+    void*            pParent;
+    bool             bKeepTargetAlive;
+    CPedSAInterface* pTarget;
+    int              animGroupId;
+    bool             bIsAborting;
+    bool             bIsFinished;
+    void*            pAnim;
+    unsigned int     uiSpentWaitingMs;
+};
+static_assert(sizeof(CTaskSimpleStealthKillSAInterface) == 0x20, "Invalid CTaskSimpleStealthKillSAInterface size");
 
-    // CTaskSimpleStealthKill::m_target
-    return *reinterpret_cast<DWORD*>(dwStealthKillTask + 0xC) == dwPed;
+// The original code compares the task's type further down, but on any other task type this reads
+// a field that can't match the ped, so the outcome doesn't change
+bool _cdecl IsStealthKillTaskTarget(CTaskSimpleStealthKillSAInterface* pStealthKillTask, CPedSAInterface* pPed)
+{
+    return pStealthKillTask && pStealthKillTask->pTarget == pPed;
 }
 
-DWORD                         RETURN_ComputeDamageResponse_StealthKillTarget = 0x4C03B0;
+DWORD                         RETURN_ComputeDamageResponse_StealthKillTarget = 0x4C0365;
 DWORD                         RETURN_ComputeDamageResponse_StealthKillSkip = 0x4C03D6;
 static void __declspec(naked) HOOK_ComputeDamageResponse_StealthKillTarget()
 {
@@ -4222,8 +4236,11 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StealthKillTarget()
     // clang-format off
     __asm
     {
-        // eax = attacker's active CTaskSimpleStealthKill, ebx = attacker, [edi] = ped taking the damage
-        pushad
+        // Replaced code: ecx already points at the attacker's task manager and eax gets his active
+        // task. Past the hook nothing reads eax, ecx or edx before writing them, on either path.
+        mov     edx, FUNC_CTaskManager_GetActiveTask
+        call    edx
+
         mov     ecx, [edi]
         push    ecx
         push    eax
@@ -4232,15 +4249,9 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StealthKillTarget()
         test    al, al
         jz      notTheTarget
 
-        popad
-        // Replaced code
-        mov     eax, [eax+0x10]
-        push    eax
-        push    ebx
         jmp     RETURN_ComputeDamageResponse_StealthKillTarget
 
         notTheTarget:
-        popad
         jmp     RETURN_ComputeDamageResponse_StealthKillSkip
     }
     // clang-format on
