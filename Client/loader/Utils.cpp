@@ -2289,7 +2289,8 @@ BOOL CALLBACK MyEnumWindowsProc(HWND hwnd, LPARAM lParam)
             GetWindowThreadProcessId(hwnd, &dwWindowProcessId);
             if (lParam == dwWindowProcessId)
             {
-                SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+                // Match the topmost splash so GTA's device selection remains visible above it.
+                SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
                 return false;
             }
         }
