@@ -1921,6 +1921,14 @@ void CClientPed::BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPar
 
 void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bStealth, bool bSetDirectlyDead, AssocGroupId animGroup, AnimationId animID)
 {
+    // These come off the wire; the death task hands them to CAnimManager::BlendAnimation, which
+    // indexes the association groups array with no checks. Fall back to the DoWastedCheck defaults.
+    if (animGroup >= static_cast<AssocGroupId>(eAnimGroup::ANIM_TOTAL_GROUPS) || animID >= static_cast<AnimationId>(eAnimID::ANIM_ID_MAX))
+    {
+        animGroup = static_cast<AssocGroupId>(eAnimGroup::ANIM_GROUP_DEFAULT);
+        animID = static_cast<AnimationId>(eAnimID::ANIM_ID_KO_SHOT_FRONT_0);
+    }
+
     // Don't change task if already dead or dying. bSetDirectlyDead restores the dead state onto a ped
     // the streamer just recreated; that ped holds no tasks yet, while IsDead() still reports the cached
     // m_bDead left over from the original death and would veto giving it the dead task.
