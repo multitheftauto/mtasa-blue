@@ -1577,14 +1577,14 @@ void CVehicleSA::RecalculateHandling()
     // Redo that setup here so a live handling change actually takes effect.
     RecalculateSwingingChassis();
 
-    // Same story as the chassis above: the bonnet and boot hinge setup below is also only ever
-    // applied once, inside the game's vehicle constructor (0x6B0DBE / 0x6B0DF4).
+    // Same story as the chassis above: the door setup below is also only ever applied once, inside
+    // the game's vehicle constructor (0x6B0DBE / 0x6B0DF4 / 0x6B0E4B).
     RecalculateDoorModelFlags();
 }
 
-// Mirrors the native vehicle constructor's bonnet and boot door setup (0x6B0DBE / 0x6B0DF4) so a
-// live REVERSE_BONNET/HANGING_BOOT/TAILGATE_BOOT change actually reaches an already spawned
-// vehicle instead of only ever taking effect for one created after the change.
+// Mirrors the native vehicle constructor's bonnet, boot and NO_DOORS setup (0x6B0DBE / 0x6B0DF4 /
+// 0x6B0E4B) so a live REVERSE_BONNET/HANGING_BOOT/TAILGATE_BOOT/NO_DOORS change actually reaches an
+// already spawned vehicle instead of only ever taking effect for one created after the change.
 void CVehicleSA::RecalculateDoorModelFlags()
 {
     if (GetVehicleInterface()->m_vehicleClass != VehicleClass::AUTOMOBILE)
@@ -1636,6 +1636,33 @@ void CVehicleSA::RecalculateDoorModelFlags()
         boot.m_nDirn = axisNegY | extraBased;
     }
     boot.m_fClosedAngle = 0.0f;
+
+    // Same constructor-only story again: NO_DOORS marks the four side doors missing once, at
+    // creation. Removing the flag doesn't restore them; the constructor never does that either, and
+    // this damage state is meant to keep holding once a real door actually blows off for the same
+    // reason. Going through CDamageManager::SetDoorStatus alone (the same call damage sync already
+    // uses) isn't enough on a live vehicle though: it runs into CAutomobile::SetDoorDamage's own
+    // lock check, which for a locked vehicle's front doors quietly turns the request into a plain
+    // dent and returns before ever hiding anything - a case the constructor itself never hits,
+    // since it runs before any lock state exists yet. Hiding the door mesh here directly, the same
+    // call that status route would otherwise make on its own, sidesteps that gate instead of
+    // fighting it.
+    if (uiModelFlags & MODELFLAGS_NO_DOORS)
+    {
+        static constexpr eCarNodes doorNodes[] = {eCarNodes::DOOR_LF, eCarNodes::DOOR_RF, eCarNodes::DOOR_LR, eCarNodes::DOOR_RR};
+        static constexpr eDoors    doorIds[] = {eDoors::FRONT_LEFT_DOOR, eDoors::FRONT_RIGHT_DOOR, eDoors::REAR_LEFT_DOOR, eDoors::REAR_RIGHT_DOOR};
+
+        if (CDamageManager* pDamageManager = GetDamageManager())
+        {
+            for (std::size_t i = 0; i < std::size(doorIds); ++i)
+            {
+                pDamageManager->SetDoorStatus(doorIds[i], DT_DOOR_MISSING, false);
+
+                if (RwFrame* pFrame = pInt->m_aCarNodes[static_cast<std::size_t>(doorNodes[i])])
+                    pInt->SetComponentVisibility(pFrame, 0);            // ATOMIC_IS_NOT_PRESENT
+            }
+        }
+    }
 }
 
 void CVehicleSA::RecalculateSwingingChassis()
