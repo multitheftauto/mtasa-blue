@@ -60,6 +60,7 @@ void CLuaElementDefs::LoadFunctions()
         {"isElementStreamedIn", IsElementStreamedIn},
         {"isElementStreamable", IsElementStreamable},
         {"getElementColShape", GetElementColShape},
+        {"getElements", ArgumentParser<GetElements>},
         {"isElementInWater", IsElementInWater},
         {"isElementSyncer", IsElementSyncer},
         {"isElementCollidableWith", IsElementCollidableWith},
@@ -2519,6 +2520,301 @@ bool CLuaElementDefs::SetElementOnFire(CClientEntity* entity, bool onFire) noexc
         return false;
 
     return entity->SetOnFire(onFire);
+}
+
+std::optional<std::unordered_map<std::string, CElementListSnapshot>> CLuaElementDefs::GetElements(ElementsFilterData            filterData,
+                                                                                                  std::optional<CClientEntity*> startAt)
+{
+    if (filterData.empty())
+        return std::nullopt;
+
+    std::unordered_map<std::string, CElementListSnapshot> groupedElements{};
+    auto*                                                 parent = startAt.value_or(m_pRootEntity);
+
+    auto GetBool = [](const ElementTypeFilterData& options, std::string_view name) -> std::optional<bool>
+    {
+        if (auto it = options.find(name.data()); it != options.end())
+        {
+            if (const auto* value = std::get_if<bool>(&it->second))
+                return *value;
+        }
+
+        return std::nullopt;
+    };
+
+    auto GetNumber = [](const ElementTypeFilterData& options, std::string_view name) -> std::optional<lua_Number>
+    {
+        if (auto it = options.find(name.data()); it != options.end())
+        {
+            if (const auto* value = std::get_if<lua_Number>(&it->second))
+                return *value;
+        }
+
+        return std::nullopt;
+    };
+
+    auto ReadSharedOptions = [GetBool, GetNumber](const ElementTypeFilterData& options, ChildrenFiltersOption& filterOptions) -> void
+    {
+        if (auto value = GetBool(options, "streamedIn"))
+            filterOptions.checkStreamIn = {true, *value};
+
+        if (auto value = GetBool(options, "onScreen"))
+            filterOptions.checkOnScreen = {true, *value};
+
+        if (auto it = options.find("inRange"); it != options.end() && std::holds_alternative<ElementTypeFilterValueData>(it->second))
+        {
+            // inRange = {position = {0, 0, 0}, range = 3.5}
+            const auto& data = std::get<ElementTypeFilterValueData>(it->second);
+
+            if (auto posIt = data.find("position"); posIt != data.end() && std::holds_alternative<std::vector<float>>(posIt->second))
+            {
+                if (auto rangeIt = data.find("range"); rangeIt != data.end() && std::holds_alternative<lua_Number>(rangeIt->second))
+                {
+                    const auto& pos = std::get<std::vector<float>>(posIt->second);
+                    if (pos.size() >= 3)  // x, y, z
+                    {
+                        filterOptions.checkRange.check = true;
+                        filterOptions.checkRange.value = {CVector{pos[0], pos[1], pos[2]}, static_cast<float>(std::get<lua_Number>(rangeIt->second))};
+                    }
+                }
+            }
+        }
+
+        if (auto value = GetNumber(options, "interior"))
+            filterOptions.checkInterior = {true, static_cast<std::uint8_t>(*value)};
+
+        if (auto value = GetNumber(options, "dimension"))
+        {
+            auto dimension = static_cast<std::int16_t>(*value);
+            if (dimension >= -1)
+                filterOptions.checkDimension = {true, dimension};
+        }
+
+        if (auto it = options.find("model"); it != options.end())
+        {
+            // model = 400
+            if (std::holds_alternative<lua_Number>(it->second))
+            {
+                filterOptions.checkModel.check = true;
+                filterOptions.checkModel.value = static_cast<std::uint16_t>(std::get<lua_Number>(it->second));
+            }
+            else if (std::holds_alternative<std::vector<std::uint16_t>>(it->second))  // model = {0, 7, 12}
+            {
+                filterOptions.checkModel.check = true;
+                filterOptions.checkModel.value = std::get<std::vector<std::uint16_t>>(it->second);
+            }
+        }
+
+        if (auto value = GetBool(options, "onGround"))
+            filterOptions.checkOnGround = {true, *value};
+
+        if (auto value = GetBool(options, "inWater"))
+            filterOptions.checkInWater = {true, *value};
+
+        if (auto it = options.find("alpha"); it != options.end() && std::holds_alternative<ElementTypeFilterValueData>(it->second))
+        {
+            // alpha = {value = 200, compareMethod = "=="}
+            const auto& data = std::get<ElementTypeFilterValueData>(it->second);
+            if (auto valIt = data.find("value"); valIt != data.end() && std::holds_alternative<lua_Number>(valIt->second))
+            {
+                if (auto methodIt = data.find("compareMethod"); methodIt != data.end() && std::holds_alternative<std::string>(methodIt->second))
+                {
+                    filterOptions.checkAlpha.check = true;
+                    filterOptions.checkAlpha.value = static_cast<std::uint8_t>(std::get<lua_Number>(valIt->second));
+
+                    CompareMethod method;
+                    if (!StringToEnum(std::get<std::string>(methodIt->second), method))
+                        throw std::invalid_argument("Invalid compare method");
+
+                    filterOptions.checkAlpha.compareMethod = method;
+                }
+            }
+        }
+
+        if (auto value = GetBool(options, "isFrozen"))
+            filterOptions.checkIsFrozen = {true, *value};
+
+        if (auto value = GetBool(options, "isOnFire"))
+            filterOptions.checkOnFire = {true, *value};
+
+        if (auto value = GetBool(options, "isCollidable"))
+            filterOptions.checkIsCollidable = {true, *value};
+
+        if (auto it = options.find("health"); it != options.end() && std::holds_alternative<ElementTypeFilterValueData>(it->second))
+        {
+            const auto& data = std::get<ElementTypeFilterValueData>(it->second);
+            if (auto valIt = data.find("value"); valIt != data.end() && std::holds_alternative<lua_Number>(valIt->second))
+            {
+                if (auto methodIt = data.find("compareMethod"); methodIt != data.end() && std::holds_alternative<std::string>(methodIt->second))
+                {
+                    filterOptions.checkHealth.check = true;
+                    filterOptions.checkHealth.value = static_cast<float>(std::get<lua_Number>(valIt->second));
+
+                    CompareMethod method;
+                    if (!StringToEnum(std::get<std::string>(methodIt->second), method))
+                        throw std::invalid_argument("Invalid compare method");
+
+                    filterOptions.checkHealth.compareMethod = method;
+                }
+            }
+        }
+    };
+
+    for (const auto& [typeName, options] : filterData)
+    {
+        ChildrenFiltersOption filterOptionsData{};
+
+        // An empty options table returns all elements, just like getElementsByType
+        // {player = {}}
+        if (!options.empty())
+        {
+            ElementType::Enum elementType = ElementType::UNKNOWN;
+            StringToEnum(typeName, elementType);
+
+            ReadSharedOptions(options, filterOptionsData);
+
+            // Built-in type checks
+            if (elementType != ElementType::UNKNOWN)
+            {
+                switch (elementType)
+                {
+                    case ElementType::PLAYER:
+                    {
+                        if (auto value = GetBool(options, "isInTeam"))
+                            filterOptionsData.checkPlayerTeam = {true, *value};
+
+                        [[fallthrough]];
+                    }
+                    case ElementType::PED:
+                    {
+                        if (auto value = GetBool(options, "isInVehicle"))
+                            filterOptionsData.checkPedVehicle = {true, *value};
+
+                        if (auto value = GetBool(options, "hasJetpack"))
+                            filterOptionsData.checkJetpack = {true, *value};
+
+                        break;
+                    }
+                    case ElementType::VEHICLE:
+                    {
+                        if (auto value = GetBool(options, "isUnoccupied"))
+                            filterOptionsData.checkVehicleOccupants = {true, *value};
+
+                        if (auto value = GetBool(options, "isDamageProof"))
+                            filterOptionsData.checkVehicleDamageProof = {true, *value};
+
+                        if (auto it = options.find("vehicleType"); it != options.end() && std::holds_alternative<std::string>(it->second))
+                        {
+                            eClientVehicleType vehicleType;
+                            if (StringToEnum(std::get<std::string>(it->second), vehicleType))
+                            {
+                                filterOptionsData.checkVehicleType.check = true;
+                                filterOptionsData.checkVehicleType.value = vehicleType;
+                            }
+                        }
+
+                        break;
+                    }
+                    case ElementType::OBJECT:
+                    {
+                        if (auto value = GetBool(options, "isBreakable"))
+                            filterOptionsData.checkObjectBreakable = {true, *value};
+
+                        if (auto value = GetBool(options, "isRespawnable"))
+                            filterOptionsData.checkObjectRespawnable = {true, *value};
+
+                        if (auto value = GetBool(options, "isMoving"))
+                            filterOptionsData.checkObjectMoving = {true, *value};
+
+                        if (auto value = GetBool(options, "hasPhysics"))
+                            filterOptionsData.checkObjectPhysics = {true, *value};
+
+                        [[fallthrough]];
+                    }
+                    case ElementType::BUILDING:
+                    {
+                        if (auto value = GetBool(options, "isLowLOD"))
+                            filterOptionsData.checkLowLOD = {true, *value};
+
+                        break;
+                    }
+                    case ElementType::MARKER:
+                    {
+                        if (auto it = options.find("markerType"); it != options.end() && std::holds_alternative<std::string>(it->second))
+                        {
+                            MarkerType3D::Enum markerType;
+                            if (StringToEnum(std::get<std::string>(it->second), markerType))
+                            {
+                                filterOptionsData.checkMarkerType.check = true;
+                                filterOptionsData.checkMarkerType.value = markerType;
+                            }
+                        }
+
+                        break;
+                    }
+                    case ElementType::PICKUP:
+                    {
+                        if (auto value = GetNumber(options, "pickupType"))
+                        {
+                            auto pickupType = static_cast<std::uint16_t>(*value);
+                            if (CClientPickupManager::IsValidPickupID(pickupType))
+                                filterOptionsData.checkPickupType = {true, pickupType};
+                        }
+
+                        break;
+                    }
+                    case ElementType::COLSHAPE:
+                    {
+                        if (auto value = GetNumber(options, "colShapeType"))
+                        {
+                            auto colshapeType = static_cast<std::uint8_t>(*value);
+                            if (colshapeType <= 5)  // 0 - 5
+                                filterOptionsData.checkColShapeType = {true, colshapeType};
+                        }
+
+                        break;
+                    }
+                    case ElementType::BLIP:
+                    {
+                        if (auto value = GetNumber(options, "icon"))
+                        {
+                            auto icon = static_cast<std::uint8_t>(*value);
+                            if (CClientRadarMarkerManager::IsValidIcon(icon))
+                                filterOptionsData.checkBlipIcon = {true, icon};
+                        }
+
+                        break;
+                    }
+                    case ElementType::TEAM:
+                    {
+                        if (auto value = GetBool(options, "isEmpty"))
+                            filterOptionsData.checkEmptyTeam = {true, *value};
+
+                        break;
+                    }
+                    case ElementType::WEAPON:
+                    case ElementType::PROJECTILE:
+                    {
+                        if (auto value = GetNumber(options, "weaponType"))
+                        {
+                            auto weaponType = static_cast<eWeaponType>(*value);
+                            if (CClientPickupManager::IsValidWeaponID(static_cast<std::uint16_t>(*value)))
+                                filterOptionsData.checkWeaponType = {true, weaponType};
+                        }
+
+                        break;
+                    }
+                    default:
+                        break;
+                }
+            }
+        }
+
+        auto& elementsList = groupedElements[typeName];
+        parent->GetFilteredChildrenByType(typeName, filterOptionsData, elementsList);
+    }
+
+    return groupedElements;
 }
 
 int CLuaElementDefs::IsElementLowLod(lua_State* luaVM)
