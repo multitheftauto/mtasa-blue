@@ -476,6 +476,14 @@ CLuaArgument* CLuaArguments::PushDbQuery(CDbJobData* pJobData)
     return pArgument;
 }
 
+CLuaArgument* CLuaArguments::PushVector(float x, float y, float z, float w)
+{
+    CLuaArgument* pArgument = new CLuaArgument();
+    pArgument->ReadVector(x, y, z, w);
+    m_Arguments.push_back(pArgument);
+    return pArgument;
+}
+
 void CLuaArguments::DeleteArguments()
 {
     // Delete each item

@@ -7,10 +7,10 @@ liblua_la_SOURCES = \
 	lobject.c lopcodes.c lparser.c lstate.c lstring.c ltable.c ltm.c  \
 	lundump.c lvm.c lzio.c \
 	lauxlib.c lbaselib.c ldblib.c liolib.c lmathlib.c loslib.c ltablib.c \
-	lstrlib.c loadlib.c linit.c \
+	lstrlib.c loadlib.c linit.c lveclib.c lvector.c \
 	lapi.h ldebug.h lgc.h lmem.h lparser.h ltable.h lzio.h ldo.h llex.h \
 	lobject.h lstate.h ltm.h lundump.h lcode.h lfunc.h llimits.h lopcodes.h \
-	lstring.h lvm.h \
+	lstring.h lvm.h lvector.h \
 	unidata.h lutf8lib.c
 
 EXTRA_DIST = luaconf.h.template.in

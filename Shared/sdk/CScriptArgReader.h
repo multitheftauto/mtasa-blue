@@ -147,7 +147,16 @@ public:
     void ReadVector2D(CVector2D& outValue)
     {
         int iArgument = lua_type(m_luaVM, m_iIndex);
-        if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
+        if (iArgument == LUA_TVEC)
+        {
+            const float* v = lua_tovec(m_luaVM, m_iIndex++);
+            if (v)
+            {
+                outValue = CVector2D(v[0], v[1]);
+                return;
+            }
+        }
+        else if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
         {
             ReadNumber(outValue.fX);
             ReadNumber(outValue.fY);
@@ -208,7 +217,16 @@ public:
     {
         outValue = vecDefault;
         int iArgument = lua_type(m_luaVM, m_iIndex);
-        if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
+        if (iArgument == LUA_TVEC)
+        {
+            const float* v = lua_tovec(m_luaVM, m_iIndex++);
+            if (v)
+            {
+                outValue = CVector2D(v[0], v[1]);
+                return;
+            }
+        }
+        else if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
         {
             ReadNumber(outValue.fX, vecDefault.fX);
             ReadNumber(outValue.fY, vecDefault.fY);
@@ -272,7 +290,16 @@ public:
     void ReadVector3D(CVector& outValue)
     {
         int iArgument = lua_type(m_luaVM, m_iIndex);
-        if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
+        if (iArgument == LUA_TVEC)
+        {
+            const float* v = lua_tovec(m_luaVM, m_iIndex++);
+            if (v)
+            {
+                outValue = CVector(v[0], v[1], v[2]);
+                return;
+            }
+        }
+        else if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
         {
             ReadNumber(outValue.fX);
             ReadNumber(outValue.fY);
@@ -304,7 +331,7 @@ public:
                     outValue = *pVector;
                     return;
                 }
-                outValue = CVector4D();
+                outValue = CVector();
                 return;  // Error set in ReadUserData
             }
         }
@@ -321,7 +348,16 @@ public:
     {
         outValue = vecDefault;
         int iArgument = lua_type(m_luaVM, m_iIndex);
-        if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
+        if (iArgument == LUA_TVEC)
+        {
+            const float* v = lua_tovec(m_luaVM, m_iIndex++);
+            if (v)
+            {
+                outValue = CVector(v[0], v[1], v[2]);
+                return;
+            }
+        }
+        else if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
         {
             ReadNumber(outValue.fX, vecDefault.fX);
             ReadNumber(outValue.fY, vecDefault.fY);
@@ -353,7 +389,7 @@ public:
                     outValue = *pVector;
                     return;
                 }
-                outValue = CVector4D();
+                outValue = CVector();
                 return;  // Error set in ReadUserData
             }
         }
@@ -373,7 +409,16 @@ public:
     void ReadVector4D(CVector4D& outValue)
     {
         int iArgument = lua_type(m_luaVM, m_iIndex);
-        if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
+        if (iArgument == LUA_TVEC)
+        {
+            const float* v = lua_tovec(m_luaVM, m_iIndex++);
+            if (v)
+            {
+                outValue = CVector4D(v[0], v[1], v[2], v[3]);
+                return;
+            }
+        }
+        else if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
         {
             ReadNumber(outValue.fX);
             ReadNumber(outValue.fY);
@@ -410,7 +455,16 @@ public:
     {
         outValue = vecDefault;
         int iArgument = lua_type(m_luaVM, m_iIndex);
-        if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
+        if (iArgument == LUA_TVEC)
+        {
+            const float* v = lua_tovec(m_luaVM, m_iIndex++);
+            if (v)
+            {
+                outValue = CVector4D(v[0], v[1], v[2], v[3]);
+                return;
+            }
+        }
+        else if (iArgument == LUA_TSTRING || iArgument == LUA_TNUMBER)
         {
             ReadNumber(outValue.fX, vecDefault.fX);
             ReadNumber(outValue.fY, vecDefault.fY);
@@ -1313,6 +1367,7 @@ public:
     bool NextIsString(int iOffset = 0) const { return NextIs(LUA_TSTRING, iOffset); }
     bool NextIsTable(int iOffset = 0) const { return NextIs(LUA_TTABLE, iOffset); }
     bool NextIsFunction(int iOffset = 0) const { return NextIs(LUA_TFUNCTION, iOffset); }
+    bool NextIsVector(int iOffset = 0) const { return NextIs(LUA_TVEC, iOffset); }
     bool NextCouldBeNumber(int iOffset = 0) const { return NextIsNumber(iOffset) || NextIsString(iOffset); }
     bool NextCouldBeString(int iOffset = 0) const { return NextIsNumber(iOffset) || NextIsString(iOffset); }
 
@@ -1348,19 +1403,20 @@ public:
 
     bool NextIsVector4D() const
     {
-        return (NextCouldBeNumber() && NextCouldBeNumber(1) && NextCouldBeNumber(2) && NextCouldBeNumber(3)) || NextIsUserDataOfType<CLuaVector4D>();
+        return (NextCouldBeNumber() && NextCouldBeNumber(1) && NextCouldBeNumber(2) && NextCouldBeNumber(3)) || NextIsUserDataOfType<CLuaVector4D>() ||
+               NextIsVector();
     }
 
     bool NextIsVector3D() const
     {
         return (NextCouldBeNumber() && NextCouldBeNumber(1) && NextCouldBeNumber(2)) || NextIsUserDataOfType<CLuaVector3D>() ||
-               NextIsUserDataOfType<CLuaVector4D>();
+               NextIsUserDataOfType<CLuaVector4D>() || NextIsVector();
     }
 
     bool NextIsVector2D() const
     {
         return (NextCouldBeNumber() && NextCouldBeNumber(1)) || NextIsUserDataOfType<CLuaVector2D>() || NextIsUserDataOfType<CLuaVector3D>() ||
-               NextIsUserDataOfType<CLuaVector4D>();
+               NextIsUserDataOfType<CLuaVector4D>() || NextIsVector();
     }
 
     //
