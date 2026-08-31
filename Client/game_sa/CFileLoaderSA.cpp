@@ -213,6 +213,10 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     CVisibilityPlugins_SetAtomicRenderCallback(atomic, 0);
 
     RpAtomic* pOldAtomic = reinterpret_cast<RpAtomic*>(pBaseModelInfo->pRwObject);
+
+    // Not pOldFrame: that one belongs to the incoming clone, which the caller destroys.
+    RwFrame* pOldAtomicFrame = pOldAtomic ? reinterpret_cast<RwFrame*>(pOldAtomic->object.object.parent) : nullptr;
+
     if (bDamage)
     {
         auto pDamagableModelInfo = reinterpret_cast<CDamagableModelInfo*>(pAtomicModelInfo);
@@ -234,11 +238,10 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
         if (pOldAtomic)
         {
             RpAtomicDestroy(pOldAtomic);
-        }
-
-        if (pOldFrame)
-        {
-            RwFrameDestroy(pOldFrame);
+            if (pOldAtomicFrame && pOldAtomicFrame != pOldFrame)
+            {
+                RwFrameDestroy(pOldAtomicFrame);
+            }
         }
     }
     return atomic;
