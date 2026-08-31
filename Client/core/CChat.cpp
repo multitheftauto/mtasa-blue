@@ -771,10 +771,8 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                         std::string strClipboard = UTF16ToMbUTF8(pBuffer);
                         GlobalUnlock(hData);
 
-                        strClipboard.erase(std::remove(strClipboard.begin(), strClipboard.end(), '\r'),
-                                           strClipboard.end());
-                        strClipboard.erase(std::remove(strClipboard.begin(), strClipboard.end(), '\n'),
-                                           strClipboard.end());
+                        strClipboard.erase(std::remove(strClipboard.begin(), strClipboard.end(), '\r'), strClipboard.end());
+                        strClipboard.erase(std::remove(strClipboard.begin(), strClipboard.end(), '\n'), strClipboard.end());
 
                         std::wstring wCurrent = MbUTF8ToUTF16(m_strInputText);
                         std::wstring wClipboard = MbUTF8ToUTF16(strClipboard);
