@@ -771,8 +771,10 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                         std::string strClipboard = UTF16ToMbUTF8(pBuffer);
                         GlobalUnlock(hData);
 
-                        strClipboard.erase(std::remove(strClipboard.begin(), strClipboard.end(), '\r'), strClipboard.end());
-                        strClipboard.erase(std::remove(strClipboard.begin(), strClipboard.end(), '\n'), strClipboard.end());
+                        strClipboard.erase(std::remove(strClipboard.begin(), strClipboard.end(), '\r'),
+                                           strClipboard.end());
+                        strClipboard.erase(std::remove(strClipboard.begin(), strClipboard.end(), '\n'),
+                                           strClipboard.end());
 
                         std::wstring wCurrent = MbUTF8ToUTF16(m_strInputText);
                         std::wstring wClipboard = MbUTF8ToUTF16(strClipboard);
@@ -783,7 +785,8 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                         }
                         else
                         {
-                            size_t availableSpace = (m_iCharacterLimit > wCurrent.size()) ? (m_iCharacterLimit - wCurrent.size()) : 0;
+                            size_t availableSpace =
+                                (m_iCharacterLimit > wCurrent.size()) ? (m_iCharacterLimit - wCurrent.size()) : 0;
                             if (availableSpace > 0)
                             {
                                 wClipboard.resize(availableSpace);
