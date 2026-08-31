@@ -38,7 +38,7 @@ public:
     bool                operator==(const CLuaArgument& Argument);
     bool                operator!=(const CLuaArgument& Argument);
 
-    void Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
+    bool Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
     void ReadBool(bool bBool);
     void ReadNumber(double dNumber);
     void ReadString(const std::string& string);

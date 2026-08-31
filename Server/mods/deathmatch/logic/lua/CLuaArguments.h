@@ -22,10 +22,12 @@ extern "C"
 #include "json.h"
 #include "CLuaFunctionRef.h"
 
-inline void LUA_CHECKSTACK(lua_State* L, int size)
+inline bool LUA_CHECKSTACK(lua_State* L, int size)
 {
     if (lua_getstackgap(L) < size + 5)
-        lua_checkstack(L, (size + 2) * 3 + 4);
+        return lua_checkstack(L, (size + 2) * 3 + 4) != 0;
+
+    return true;
 }
 
 class CAccessControlList;
@@ -45,6 +47,8 @@ class CLuaArguments
 {
 public:
     static constexpr unsigned int MaxBitStreamTableReadDepth = 64;
+    // Bound recursive copies before they can exhaust the Lua or native stack.
+    static constexpr unsigned int MaxLuaTableReadDepth = 64;
 
     CLuaArguments() {}
     CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
@@ -56,14 +60,14 @@ public:
     const CLuaArguments& operator=(const CLuaArguments& Arguments);
     CLuaArgument*        operator[](const unsigned int uiPosition) const;
 
-    void ReadArgument(lua_State* luaVM, signed int uiIndex);
-    void ReadArguments(lua_State* luaVM, signed int uiIndexBegin = 1);
+    bool ReadArgument(lua_State* luaVM, signed int uiIndex);
+    bool ReadArguments(lua_State* luaVM, signed int uiIndexBegin = 1);
     void PushArguments(lua_State* luaVM) const;
     void PushArguments(const CLuaArguments& Arguments);
     bool Call(class CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments* returnValues = NULL) const;
     bool CallGlobal(class CLuaMain* pLuaMain, const char* szFunction, CLuaArguments* returnValues = NULL) const;
 
-    void ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
+    bool ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
     void PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = nullptr) const;
 
     CLuaArgument* PushNil();
