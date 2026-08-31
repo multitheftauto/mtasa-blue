@@ -758,6 +758,45 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
             break;
         }
 
+        case 22: // CTRL + V
+        {
+            if (OpenClipboard(NULL))
+            {
+                HANDLE hData = GetClipboardData(CF_UNICODETEXT);
+                if (hData)
+                {
+                    wchar_t* pBuffer = static_cast<wchar_t*>(GlobalLock(hData));
+                    if (pBuffer)
+                    {
+                        std::string strClipboard = UTF16ToMbUTF8(pBuffer);
+                        GlobalUnlock(hData);
+
+                        strClipboard.erase(std::remove(strClipboard.begin(), strClipboard.end(), '\r'), strClipboard.end());
+                        strClipboard.erase(std::remove(strClipboard.begin(), strClipboard.end(), '\n'), strClipboard.end());
+
+                        std::wstring wCurrent = MbUTF8ToUTF16(m_strInputText);
+                        std::wstring wClipboard = MbUTF8ToUTF16(strClipboard);
+
+                        if (wCurrent.size() + wClipboard.size() <= static_cast<size_t>(m_iCharacterLimit))
+                        {
+                            SetInputText((m_strInputText + strClipboard).c_str());
+                        }
+                        else
+                        {
+                            size_t availableSpace = (m_iCharacterLimit > wCurrent.size()) ? (m_iCharacterLimit - wCurrent.size()) : 0;
+                            if (availableSpace > 0)
+                            {
+                                wClipboard.resize(availableSpace);
+                                SetInputText((m_strInputText + UTF16ToMbUTF8(wClipboard)).c_str());
+                            }
+                        }
+                    }
+                }
+                CloseClipboard();
+            }
+            break;
+        }
+
         default:
         {
             // Clear last namepart when pressing letter
