@@ -47,6 +47,14 @@ public:
     static bool ShakeCamera(float radius, std::optional<float> x, std::optional<float> y, std::optional<float> z) noexcept;
     static bool ResetShakeCamera() noexcept;
 
+    // Weapon aim camera overrides
+    static bool                                 SetWeaponAimCameraOffset(int weaponType, float fX, float fY, float fZ);
+    static CLuaMultiReturn<float, float, float> GetWeaponAimCameraOffset(int weaponType);
+    static bool                                 ResetWeaponAimCameraOffset(int weaponType);
+    static bool                                 SetWeaponAimCameraZoom(int weaponType, float fFOV);
+    static float                                GetWeaponAimCameraZoom(int weaponType);
+    static bool                                 ResetWeaponAimCameraZoom(int weaponType);
+
     // For OOP only
     LUA_DECLARE(OOP_GetCameraPosition);
     LUA_DECLARE(OOP_SetCameraPosition);

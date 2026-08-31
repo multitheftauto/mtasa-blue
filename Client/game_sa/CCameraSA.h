@@ -425,4 +425,12 @@ public:
 
     // Additional methods
     void RestoreLastGoodState();
+
+    void  SetWeaponAimCameraOffset(eWeaponType weaponType, float fX, float fY, float fZ) override;
+    void  GetWeaponAimCameraOffset(eWeaponType weaponType, float& fX, float& fY, float& fZ) override;
+    void  ResetWeaponAimCameraOffset(eWeaponType weaponType) override;
+    void  SetWeaponAimCameraZoom(eWeaponType weaponType, float fFOV) override;
+    float GetWeaponAimCameraZoom(eWeaponType weaponType) override;
+    void  ResetWeaponAimCameraZoom(eWeaponType weaponType) override;
+    void  ResetAllWeaponAimCameraOverrides() override;
 };
