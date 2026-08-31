@@ -758,7 +758,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
             break;
         }
 
-        case 22: // CTRL + V
+        case 22:  // CTRL + V
         {
             if (OpenClipboard(NULL))
             {
@@ -783,8 +783,7 @@ bool CChat::CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs)
                         }
                         else
                         {
-                            size_t availableSpace =
-                                (m_iCharacterLimit > wCurrent.size()) ? (m_iCharacterLimit - wCurrent.size()) : 0;
+                            size_t availableSpace = (m_iCharacterLimit > wCurrent.size()) ? (m_iCharacterLimit - wCurrent.size()) : 0;
                             if (availableSpace > 0)
                             {
                                 wClipboard.resize(availableSpace);
