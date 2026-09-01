@@ -77,8 +77,7 @@ static CMappedArray<STxdStreamEvent> ms_txdStreamEventList;
 __declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
 {
     ushort usTxdId = (ushort)dwTxdId;
-    // Ensure there are no previous events for this txd
-    ms_txdStreamEventList.remove(STxdStreamEvent(false, usTxdId));
+    // Drop a duplicate 'added' only - a pending 'removed' still has to reach the watch
     ms_txdStreamEventList.remove(STxdStreamEvent(true, usTxdId));
     // Append 'added'
     ms_txdStreamEventList.push_back(STxdStreamEvent(true, usTxdId));
