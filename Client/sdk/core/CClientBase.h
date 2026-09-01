@@ -14,6 +14,13 @@
 #include "CCoreInterface.h"
 #include "CExceptionInformation.h"
 
+struct SSoundDeviceInfo
+{
+    std::string strName;
+    std::string strDriver;
+    bool        bIsDefault;
+};
+
 class CClientBase
 {
 public:
@@ -35,4 +42,9 @@ public:
 
     virtual void OnWindowFocusChange(bool state) = 0;
     virtual void OnPossibleAudioDeviceChange() = 0;
+
+    virtual unsigned int                  GetSoundOutputDeviceListRevision() = 0;
+    virtual std::vector<SSoundDeviceInfo> GetSoundOutputDevices() = 0;
+    virtual std::string                   GetSoundOutputDeviceDriver() = 0;
+    virtual bool                          SetSoundOutputDevice(const std::string& strDriver) = 0;
 };

@@ -514,6 +514,11 @@ public:
     void OnWindowFocusChange(bool state);
     void OnPossibleAudioDeviceChange();
 
+    unsigned int                  GetSoundOutputDeviceListRevision();
+    std::vector<SSoundDeviceInfo> GetSoundOutputDevices();
+    std::string                   GetSoundOutputDeviceDriver();
+    bool                          SetSoundOutputDevice(const std::string& strDriver);
+
     void                      SetAllowMultiCommandHandlers(MultiCommandHandlerPolicy policy) noexcept { m_allowMultiCommandHandlers = policy; }
     MultiCommandHandlerPolicy GetAllowMultiCommandHandlers() const noexcept { return m_allowMultiCommandHandlers; }
 

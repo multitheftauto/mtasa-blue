@@ -306,6 +306,26 @@ void CClient::OnPossibleAudioDeviceChange()
     g_pClientGame->OnPossibleAudioDeviceChange();
 }
 
+unsigned int CClient::GetSoundOutputDeviceListRevision()
+{
+    return g_pClientGame->GetSoundOutputDeviceListRevision();
+}
+
+std::vector<SSoundDeviceInfo> CClient::GetSoundOutputDevices()
+{
+    return g_pClientGame->GetSoundOutputDevices();
+}
+
+std::string CClient::GetSoundOutputDeviceDriver()
+{
+    return g_pClientGame->GetSoundOutputDeviceDriver();
+}
+
+bool CClient::SetSoundOutputDevice(const std::string& strDriver)
+{
+    return g_pClientGame->SetSoundOutputDevice(strDriver);
+}
+
 CClient::InitializeArguments CClient::ExtractInitializeArguments(const char* arguments)
 {
     // Format: "nickname [password]"

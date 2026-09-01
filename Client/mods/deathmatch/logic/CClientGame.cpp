@@ -7166,6 +7166,26 @@ void CClientGame::OnPossibleAudioDeviceChange()
     m_pManager->GetSoundManager()->OnPossibleDeviceChange();
 }
 
+unsigned int CClientGame::GetSoundOutputDeviceListRevision()
+{
+    return m_pManager->GetSoundManager()->GetOutputDeviceListRevision();
+}
+
+std::vector<SSoundDeviceInfo> CClientGame::GetSoundOutputDevices()
+{
+    return m_pManager->GetSoundManager()->GetOutputDevices();
+}
+
+std::string CClientGame::GetSoundOutputDeviceDriver()
+{
+    return m_pManager->GetSoundManager()->GetOutputDeviceDriver();
+}
+
+bool CClientGame::SetSoundOutputDevice(const std::string& strDriver)
+{
+    return m_pManager->GetSoundManager()->SetOutputDevice(strDriver);
+}
+
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
 {
     m_mapOfIfpPointers[u32BlockNameHash] = pIFP;

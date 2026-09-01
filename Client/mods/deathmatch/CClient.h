@@ -37,6 +37,11 @@ public:
     void OnWindowFocusChange(bool state) override;
     void OnPossibleAudioDeviceChange() override;
 
+    unsigned int                  GetSoundOutputDeviceListRevision() override;
+    std::vector<SSoundDeviceInfo> GetSoundOutputDevices() override;
+    std::string                   GetSoundOutputDeviceDriver() override;
+    bool                          SetSoundOutputDevice(const std::string& strDriver) override;
+
 private:
     struct InitializeArguments
     {

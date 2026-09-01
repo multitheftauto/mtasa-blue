@@ -340,6 +340,11 @@ void CSettings::ResetGuiPointers()
     m_pComboUsertrackMode = NULL;
     m_pAudioDefButton = NULL;
 
+    m_pAudioOutputDeviceLabel = NULL;
+    m_pSoundOutputDeviceCombo = NULL;
+    m_uiSoundOutputDeviceListRevision = 0;
+    m_bUpdatingSoundOutputDeviceCombo = false;
+
     m_pBindsList = NULL;
     m_pBindsDefButton = NULL;
 
@@ -1144,6 +1149,18 @@ void CSettings::CreateGUI()
     m_pCheckBoxUserAutoscan->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 52.0f));
     m_pCheckBoxUserAutoscan->AutoSize(NULL, 20.0f);
     m_pCheckBoxUserAutoscan->GetPosition(vecTemp, false);
+
+    m_pAudioOutputDeviceLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Output device")));
+    m_pAudioOutputDeviceLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f), false);
+    m_pAudioOutputDeviceLabel->GetPosition(vecTemp, false);
+    m_pAudioOutputDeviceLabel->AutoSize(NULL, 20.0f);
+    m_pAudioOutputDeviceLabel->SetFont("default-bold-small");
+
+    m_pSoundOutputDeviceCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAudio, ""));
+    m_pSoundOutputDeviceCombo->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
+    m_pSoundOutputDeviceCombo->SetSize(CVector2D(320.0f, 120.0f));
+    m_pSoundOutputDeviceCombo->SetReadOnly(true);
+    m_pSoundOutputDeviceCombo->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnSoundOutputDeviceChanged, this));
 
     m_pAudioRadioLabel->GetPosition(vecTemp, false);
     vecTemp.fX = fIndentX + 173;
@@ -2162,6 +2179,7 @@ void CSettings::Update()
     if (m_dwFrameCount >= CORE_SETTINGS_UPDATE_INTERVAL)
     {
         UpdateJoypadTab();
+        UpdateSoundOutputDeviceCombo();
 
         m_dwFrameCount = 0;
     }
@@ -2209,6 +2227,52 @@ void CSettings::UpdateAudioTab()
     m_pCheckBoxMuteVoice->SetEnabled(!m_bMuteMaster);
 
     m_pComboUsertrackMode->SetSelectedItemByIndex(gameSettings->GetUsertrackMode());
+}
+
+void CSettings::UpdateSoundOutputDeviceCombo()
+{
+    if (!CModManager::GetSingleton().IsLoaded() || !m_pWindow->IsVisible() || !m_pSoundOutputDeviceCombo || m_pSoundOutputDeviceCombo->IsOpen())
+        return;
+
+    CClientBase* pClient = CModManager::GetSingleton().GetClient();
+
+    unsigned int uiRevision = pClient->GetSoundOutputDeviceListRevision();
+    if (uiRevision == m_uiSoundOutputDeviceListRevision)
+        return;
+
+    m_bUpdatingSoundOutputDeviceCombo = true;
+
+    std::vector<SSoundDeviceInfo> devices = pClient->GetSoundOutputDevices();
+    std::string                   strSelected = pClient->GetSoundOutputDeviceDriver();
+
+    m_pSoundOutputDeviceCombo->Clear();
+    int iSelect = 0;
+    for (size_t i = 0; i < devices.size(); i++)
+    {
+        CGUIListItem* pItem = m_pSoundOutputDeviceCombo->AddItem(devices[i].strName.c_str());
+        if (pItem)
+            pItem->SetData(devices[i].strDriver.c_str());
+        if (devices[i].strDriver == strSelected)
+            iSelect = static_cast<int>(i);
+    }
+    if (!devices.empty())
+        m_pSoundOutputDeviceCombo->SetSelectedItemByIndex(iSelect);
+
+    m_bUpdatingSoundOutputDeviceCombo = false;
+    m_uiSoundOutputDeviceListRevision = uiRevision;
+}
+
+bool CSettings::OnSoundOutputDeviceChanged(CGUIElement* pElement)
+{
+    if (m_bUpdatingSoundOutputDeviceCombo || !m_pSoundOutputDeviceCombo)
+        return true;
+
+    CGUIListItem* pItem = m_pSoundOutputDeviceCombo->GetSelectedItem();
+    if (!pItem || !pItem->GetData())
+        return true;
+
+    CModManager::GetSingleton().GetClient()->SetSoundOutputDevice(static_cast<const char*>(pItem->GetData()));
+    return true;
 }
 
 void CSettings::UpdateVideoTab()

@@ -14,15 +14,9 @@
 #include <thread>
 #include <atomic>
 #include <bass.h>
+#include <core/CClientBase.h>
 #include <game/CAudioContainer.h>
 #include "CClientSound.h"
-
-struct SSoundDeviceInfo
-{
-    std::string strName;
-    std::string strDriver;
-    bool        bIsDefault;
-};
 
 class CClientSoundManager
 {
