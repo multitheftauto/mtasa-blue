@@ -51,6 +51,8 @@ typedef struct RwObjectFrame        RwObjectFrame;
 typedef struct RpAtomic             RpAtomic;
 typedef struct RwCamera             RwCamera;
 typedef struct RpLight              RpLight;
+typedef struct RtDict               RtDict;
+typedef struct RtDictSchema         RtDictSchema;
 
 typedef RwCamera* (*RwCameraPreCallback)(RwCamera* camera);
 typedef RwCamera* (*RwCameraPostCallback)(RwCamera* camera);
@@ -198,6 +200,11 @@ enum RpLightFlags
     LIGHT_ILLUMINATES_ATOMICS = 1,
     LIGHT_ILLUMINATES_GEOMETRY = 2,
     LIGHT_FLAGS_LAST = RW_STRUCT_ALIGN
+};
+enum RpMatFXMaterialFlags
+{
+    rpMATFXEFFECTUVTRANSFORM = 5,
+    rpMATFXEFFECTDUALUVTRANSFORM = 6
 };
 
 // RenderWare/plugin base types
@@ -528,6 +535,14 @@ struct RwStream
 struct RwError
 {
     int err1, err2;
+};
+struct RwChunkHeaderInfo
+{
+    unsigned int type;
+    unsigned int length;
+    unsigned int version;
+    unsigned int buildNum;
+    int          isComplex;
 };
 
 /*****************************************************************************/
