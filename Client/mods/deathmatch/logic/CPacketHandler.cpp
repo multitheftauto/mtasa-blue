@@ -22,6 +22,7 @@
 #include <game/CBuildingRemoval.h>
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
+#include "enums/HTTPDownloadType.h"
 
 using std::list;
 
@@ -419,7 +420,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     bitStream.Read(usHTTPDownloadPort);
 
     SString strExternalHTTPDownloadURL;
-    if (ucHTTPDownloadType == HTTP_DOWNLOAD_ENABLED_URL)
+    if (ucHTTPDownloadType == HTTPDownloadType::HTTP_DOWNLOAD_ENABLED_URL)
     {
         bitStream.ReadString(strExternalHTTPDownloadURL);
     }
