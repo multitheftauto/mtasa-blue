@@ -335,8 +335,8 @@ public:
     virtual void                              SetWheelScale(float fWheelScale) = 0;
     virtual CAEVehicleAudioEntity*            GetVehicleAudioEntity() = 0;
 
-    virtual bool GetDummyPosition(VehicleDummies dummy, CVector& position) const = 0;
-    virtual bool SetDummyPosition(VehicleDummies dummy, const CVector& position) = 0;
+    virtual bool GetDummyPosition(VehicleDummies::Enum dummy, CVector& position) const = 0;
+    virtual bool SetDummyPosition(VehicleDummies::Enum dummy, const CVector& position) = 0;
 
     virtual const CVector* GetDummyPositions() const = 0;
     virtual void           ReinitAudio() = 0;

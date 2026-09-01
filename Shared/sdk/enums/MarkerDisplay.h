@@ -12,10 +12,13 @@
 #pragma once
 #include <cstdint>
 
-enum class MarkerDisplay : std::uint8_t
+namespace MarkerDisplay
 {
-    MARKER_DISPLAY_NEITHER = 0,  //  BLIPDISPLAY_NEITHER
-    MARKER_DISPLAY_MARKERONLY,   //  BLIPDISPLAY_MARKERONLY
-    MARKER_DISPLAY_BLIPONLY,     //  MARKER_DISPLAY_BLIPONLY
-    MARKER_DISPLAY_BOTH          //  BLIPDISPLAY_BOTH
-};
+    enum Enum : std::uint8_t
+    {
+        MARKER_DISPLAY_NEITHER = 0,  //  BLIPDISPLAY_NEITHER
+        MARKER_DISPLAY_MARKERONLY,   //  BLIPDISPLAY_MARKERONLY
+        MARKER_DISPLAY_BLIPONLY,     //  MARKER_DISPLAY_BLIPONLY
+        MARKER_DISPLAY_BOTH          //  BLIPDISPLAY_BOTH
+    };
+}

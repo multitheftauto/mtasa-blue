@@ -482,8 +482,8 @@ public:
     std::unique_ptr<CPedIK> GetPedIK() override { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
 
     CEntitySAInterface* GetTargetedObject() const override { return GetPedInterface()->pTargetedObject; }
-    PedState            GetPedState() const override { return static_cast<PedState>(GetPedInterface()->pedState); }
-    void                SetPedState(PedState state) override { GetPedInterface()->pedState = static_cast<int>(state); }
+    PedState::Enum      GetPedState() const override { return static_cast<PedState::Enum>(GetPedInterface()->pedState); }
+    void                SetPedState(PedState::Enum state) override { GetPedInterface()->pedState = static_cast<int>(state); }
 
     void GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const override;
 

@@ -336,25 +336,25 @@ static_assert(sizeof(CVehicleModelInfoSAInterface) == 0x308, "Invalid size of CV
 class CModelInfoSA : public CModelInfo
 {
 protected:
-    CBaseModelInfoSAInterface*                                                  m_pInterface;
-    DWORD                                                                       m_dwModelID;
-    DWORD                                                                       m_dwParentID;
-    DWORD                                                                       m_dwReferences;
-    DWORD                                                                       m_dwPendingInterfaceRef;
-    CColModel*                                                                  m_pCustomColModel;
-    CColModelSAInterface*                                                       m_pOriginalColModelInterface;
-    std::uint16_t                                                               m_originalFlags = 0;
-    RpClump*                                                                    m_pCustomClump;
-    static std::map<unsigned short, int>                                        ms_RestreamTxdIDMap;
-    static std::map<DWORD, float>                                               ms_ModelDefaultLodDistanceMap;
-    static std::map<DWORD, unsigned short>                                      ms_ModelDefaultFlagsMap;
-    static std::map<DWORD, BYTE>                                                ms_ModelDefaultAlphaTransparencyMap;
-    static std::unordered_map<std::uint32_t, std::map<VehicleDummies, CVector>> ms_ModelDefaultDummiesPosition;
-    static std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>               ms_ModelDefaultModelTimeInfo;
-    static std::unordered_map<DWORD, unsigned short>                            ms_OriginalObjectPropertiesGroups;
-    static std::unordered_map<DWORD, std::pair<float, float>>                   ms_VehicleModelDefaultWheelSizes;
-    static std::map<unsigned short, int>                                        ms_DefaultTxdIDMap;
-    SVehicleSupportedUpgrades                                                   m_ModelSupportedUpgrades;
+    CBaseModelInfoSAInterface*                                                        m_pInterface;
+    DWORD                                                                             m_dwModelID;
+    DWORD                                                                             m_dwParentID;
+    DWORD                                                                             m_dwReferences;
+    DWORD                                                                             m_dwPendingInterfaceRef;
+    CColModel*                                                                        m_pCustomColModel;
+    CColModelSAInterface*                                                             m_pOriginalColModelInterface;
+    std::uint16_t                                                                     m_originalFlags = 0;
+    RpClump*                                                                          m_pCustomClump;
+    static std::map<unsigned short, int>                                              ms_RestreamTxdIDMap;
+    static std::map<DWORD, float>                                                     ms_ModelDefaultLodDistanceMap;
+    static std::map<DWORD, unsigned short>                                            ms_ModelDefaultFlagsMap;
+    static std::map<DWORD, BYTE>                                                      ms_ModelDefaultAlphaTransparencyMap;
+    static std::unordered_map<std::uint32_t, std::map<VehicleDummies::Enum, CVector>> ms_ModelDefaultDummiesPosition;
+    static std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                     ms_ModelDefaultModelTimeInfo;
+    static std::unordered_map<DWORD, unsigned short>                                  ms_OriginalObjectPropertiesGroups;
+    static std::unordered_map<DWORD, std::pair<float, float>>                         ms_VehicleModelDefaultWheelSizes;
+    static std::map<unsigned short, int>                                              ms_DefaultTxdIDMap;
+    SVehicleSupportedUpgrades                                                         m_ModelSupportedUpgrades;
 
 public:
     CModelInfoSA();
@@ -435,14 +435,14 @@ public:
     void*        SetVehicleSuspensionData(void* pSuspensionLines);
     CVector      GetVehicleExhaustFumesPosition() override;
     void         SetVehicleExhaustFumesPosition(const CVector& vecPosition) override;
-    CVector      GetVehicleDummyDefaultPosition(VehicleDummies eDummy) override;
-    CVector      GetVehicleDummyPosition(VehicleDummies eDummy) override;
+    CVector      GetVehicleDummyDefaultPosition(VehicleDummies::Enum eDummy) override;
+    CVector      GetVehicleDummyPosition(VehicleDummies::Enum eDummy) override;
     bool         GetVehicleDummyPositions(std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)>& positions) const override;
-    void         SetVehicleDummyPosition(VehicleDummies eDummy, const CVector& vecPosition) override;
+    void         SetVehicleDummyPosition(VehicleDummies::Enum eDummy, const CVector& vecPosition) override;
     void         ResetVehicleDummies(bool bRemoveFromDummiesMap);
     static void  ResetAllVehicleDummies();
-    float        GetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup) override;
-    void         SetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup, float fWheelSize) override;
+    float        GetVehicleWheelSize(ResizableVehicleWheelGroup::Enum eWheelGroup) override;
+    void         SetVehicleWheelSize(ResizableVehicleWheelGroup::Enum eWheelGroup, float fWheelSize) override;
     void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = nullptr) override;
     static void  ResetAllVehiclesWheelSizes();
 

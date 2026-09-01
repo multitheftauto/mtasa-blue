@@ -1371,7 +1371,7 @@ void CClientVehicle::SetLandingGearDown(bool bLandingGearDown)
 // The checks below compare against standard model IDs, so a custom model has to be read as the
 // model it was cloned from. The model info is looked up fresh rather than through m_pModelInfo,
 // since SetModelBlocking calls in here before that pointer has been updated.
-static VehicleType GetVehicleTypeForModel(unsigned short usModel)
+static VehicleType::Enum GetVehicleTypeForModel(unsigned short usModel)
 {
     std::uint16_t ulModel = usModel;
     if (ulModel < 400 || ulModel > 611)
@@ -1380,7 +1380,7 @@ static VehicleType GetVehicleTypeForModel(unsigned short usModel)
             ulModel = pModelInfo->GetParentID();
     }
 
-    return static_cast<VehicleType>(ulModel);
+    return static_cast<VehicleType::Enum>(ulModel);
 }
 
 unsigned short CClientVehicle::GetAdjustablePropertyValue()
@@ -3012,7 +3012,7 @@ void CClientVehicle::Create()
         {
             for (size_t i = 0; i < static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT); ++i)
             {
-                m_pVehicle->SetDummyPosition(static_cast<VehicleDummies>(i), m_dummyPositions[i]);
+                m_pVehicle->SetDummyPosition(static_cast<VehicleDummies::Enum>(i), m_dummyPositions[i]);
             }
         }
 
@@ -3431,7 +3431,7 @@ bool CClientVehicle::IsTowableBy(CClientVehicle* towingVehicle)
 
 bool CClientVehicle::SetWinchType(eWinchType winchType)
 {
-    if (static_cast<VehicleType>(GetModel()) == VehicleType::VT_LEVIATHN)  // Leviathan
+    if (static_cast<VehicleType::Enum>(GetModel()) == VehicleType::VT_LEVIATHN)  // Leviathan
     {
         if (m_pVehicle)
         {
@@ -3759,7 +3759,7 @@ void CClientVehicle::Interpolate()
 
 void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    switch (static_cast<VehicleType>(m_usModel))
+    switch (static_cast<VehicleType::Enum>(m_usModel))
     {
         case VehicleType::VT_BAGGAGE:
         case VehicleType::VT_BANDITO:
@@ -4078,7 +4078,7 @@ bool CClientVehicle::HasRadio()
 
 bool CClientVehicle::HasPoliceRadio()
 {
-    switch (static_cast<VehicleType>(m_usModel))
+    switch (static_cast<VehicleType::Enum>(m_usModel))
     {
         case VehicleType::VT_COPCARLA:
         case VehicleType::VT_COPCARSF:
@@ -5112,7 +5112,7 @@ CVehicleAudioSettingsEntry& CClientVehicle::GetOrCreateAudioSettings()
     return *m_pSoundSettingsEntry.get();
 }
 
-bool CClientVehicle::GetDummyPosition(VehicleDummies dummy, CVector& position) const
+bool CClientVehicle::GetDummyPosition(VehicleDummies::Enum dummy, CVector& position) const
 {
     if (dummy < VehicleDummies::LIGHT_FRONT_MAIN || dummy >= VehicleDummies::VEHICLE_DUMMY_COUNT)
         return false;
@@ -5131,7 +5131,7 @@ bool CClientVehicle::GetDummyPosition(VehicleDummies dummy, CVector& position) c
     return true;
 }
 
-bool CClientVehicle::SetDummyPosition(VehicleDummies dummy, const CVector& position)
+bool CClientVehicle::SetDummyPosition(VehicleDummies::Enum dummy, const CVector& position)
 {
     if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
     {
@@ -5155,7 +5155,7 @@ bool CClientVehicle::ResetDummyPositions()
 
         for (size_t i = 0; i < positions.size(); ++i)
         {
-            SetDummyPosition(static_cast<VehicleDummies>(i), positions[i]);
+            SetDummyPosition(static_cast<VehicleDummies::Enum>(i), positions[i]);
         }
 
         return true;

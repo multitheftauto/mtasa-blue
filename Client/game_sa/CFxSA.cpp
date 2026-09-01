@@ -268,7 +268,7 @@ void CFxSA::TriggerFootSplash(CVector& vecPosition)
     // clang-format on
 }
 
-void CFxSA::AddParticle(FxParticleSystems eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA,
+void CFxSA::AddParticle(FxParticleSystems::Enum eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB, float fA,
                         bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife)
 {
     // Init our own FxPrtMult struct

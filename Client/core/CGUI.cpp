@@ -510,9 +510,9 @@ void CLocalGUI::Draw()
 void CLocalGUI::DrawInternal()
 {
     // Get the game interface
-    CGame*      pGame = CCore::GetSingleton().GetGame();
-    SystemState systemState = pGame->GetSystemState();
-    CGUI*       pGUI = CCore::GetSingleton().GetGUI();
+    CGame*            pGame = CCore::GetSingleton().GetGame();
+    SystemState::Enum systemState = pGame->GetSystemState();
+    CGUI*             pGUI = CCore::GetSingleton().GetGUI();
 
     // The windows may be half-destroyed while a fatal dialog pumps the message
     // loop during a skin or locale change, so skip drawing until they are back.

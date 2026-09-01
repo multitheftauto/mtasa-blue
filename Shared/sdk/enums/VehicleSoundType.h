@@ -12,15 +12,18 @@
 #pragma once
 #include <cstdint>
 
-enum class VehicleSoundType : std::uint8_t
+namespace VehicleSoundType
 {
-    CAR = 0,
-    MOTORCYCLE,
-    BICYCLE,
-    BOAT,
-    HELI,
-    PLANE,
-    TRAIN = 8,
-    TRAILLER,
-    SPECIAL,
-};
+    enum Enum : std::uint8_t
+    {
+        CAR = 0,
+        MOTORCYCLE,
+        BICYCLE,
+        BOAT,
+        HELI,
+        PLANE,
+        TRAIN = 8,
+        TRAILLER,
+        SPECIAL,
+    };
+}

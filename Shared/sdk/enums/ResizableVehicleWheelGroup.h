@@ -11,9 +11,12 @@
 
 #pragma once
 
-enum class ResizableVehicleWheelGroup
+namespace ResizableVehicleWheelGroup
 {
-    FRONT_AXLE = 0,
-    REAR_AXLE,
-    ALL_WHEELS = 0xFF,
-};
+    enum Enum
+    {
+        FRONT_AXLE = 0,
+        REAR_AXLE,
+        ALL_WHEELS = 0xFF,
+    };
+}

@@ -11,20 +11,23 @@
 
 #pragma once
 
-enum class VehicleAudioSettingProperty
+namespace VehicleAudioSettingProperty
 {
-    SOUND_TYPE,
-    ENGINE_ON_SOUND_BANK_ID,
-    ENGINE_OFF_SOUND_BANK_ID,
-    BASS_SETTING,
-    BASS_EQ,
-    FIELD_C,
-    HORN_TON,
-    ENGINE_UPGRADE,
-    DOOR_SOUND,
-    RADIO_NUM,
-    RADIO_TYPE,
-    VEHICLE_TYPE_FOR_AUDIO,
-    HORN_VOLUME_DELTA,
-    HORN_HIGH,
+    enum Enum
+    {
+        SOUND_TYPE,
+        ENGINE_ON_SOUND_BANK_ID,
+        ENGINE_OFF_SOUND_BANK_ID,
+        BASS_SETTING,
+        BASS_EQ,
+        FIELD_C,
+        HORN_TON,
+        ENGINE_UPGRADE,
+        DOOR_SOUND,
+        RADIO_NUM,
+        RADIO_TYPE,
+        VEHICLE_TYPE_FOR_AUDIO,
+        HORN_VOLUME_DELTA,
+        HORN_HIGH,
+    };
 };

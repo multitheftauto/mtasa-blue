@@ -11,8 +11,11 @@
 
 #pragma once
 
-enum class PickupState
+namespace PickupState
 {
-    PUSTATE_ON,
-    PUSTATE_OFF
-};
+    enum Enum
+    {
+        PUSTATE_ON,
+        PUSTATE_OFF
+    };
+}

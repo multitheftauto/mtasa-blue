@@ -9,10 +9,13 @@
  *
  *****************************************************************************/
 
-enum class PostFXType
+namespace PostFXType
 {
-    GAMMA,
-    BRIGHTNESS,
-    CONTRAST,
-    SATURATION
+    enum Enum
+    {
+        GAMMA,
+        BRIGHTNESS,
+        CONTRAST,
+        SATURATION
+    };
 };

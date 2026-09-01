@@ -81,7 +81,7 @@ CRegisteredCorona* CCoronasSA::FindCorona(DWORD Identifier)
     return (CRegisteredCorona*)NULL;
 }
 
-RwTexture* CCoronasSA::GetTexture(CoronaType type)
+RwTexture* CCoronasSA::GetTexture(CoronaType::Enum type)
 {
     if ((DWORD)type < MAX_CORONA_TEXTURES)
         return (RwTexture*)(*(DWORD*)(ARRAY_CORONA_TEXTURES + static_cast<DWORD>(type) * sizeof(DWORD)));

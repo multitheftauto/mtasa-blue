@@ -696,7 +696,7 @@ void CNetAPI::ReadKeysync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStre
         }
 
         // Jax: temp fix for rhino firing, CPlayerInfo::m_LastTimeBigGunFired needs to be context-switched
-        if (static_cast<VehicleType>(pVehicle->GetModel()) == VehicleType::VT_RHINO)
+        if (static_cast<VehicleType::Enum>(pVehicle->GetModel()) == VehicleType::VT_RHINO)
         {
             ControllerState.ButtonCircle = 0;
         }
@@ -1311,7 +1311,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
     ReadFullKeysync(ControllerState, BitStream);
 
     // Jax: temp fix for rhino firing, CPlayerInfo::m_LastTimeBigGunFired needs to be context-switched
-    if (static_cast<VehicleType>(pVehicle->GetModel()) == VehicleType::VT_RHINO)
+    if (static_cast<VehicleType::Enum>(pVehicle->GetModel()) == VehicleType::VT_RHINO)
     {
         ControllerState.ButtonCircle = 0;
     }

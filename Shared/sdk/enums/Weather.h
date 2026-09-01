@@ -11,13 +11,16 @@
 
 #pragma once
 
-enum class Weather
+namespace Weather
 {
-    SUNNY = 0,
-    CLOUDY,
-    RAINY,
-    FOGGY,
-    VERY_SUNNY,
-    VERY_RAINY,
-    INSIDE
-};
+    enum Enum
+    {
+        SUNNY = 0,
+        CLOUDY,
+        RAINY,
+        FOGGY,
+        VERY_SUNNY,
+        VERY_RAINY,
+        INSIDE
+    };
+}
