@@ -102,6 +102,7 @@ public:
 
     void UpdateAudioTab();
     void UpdateSoundOutputDeviceCombo();
+    void UpdateSoundInputDeviceCombo();
 
     void UpdateVideoTab();
     void UpdatePostFxTab();
@@ -286,6 +287,11 @@ protected:
     unsigned int  m_uiSoundOutputDeviceListRevision;
     bool          m_bUpdatingSoundOutputDeviceCombo;
 
+    CGUILabel*    m_pAudioInputDeviceLabel;
+    CGUIComboBox* m_pSoundInputDeviceCombo;
+    unsigned int  m_uiSoundInputDeviceListRevision;
+    bool          m_bUpdatingSoundInputDeviceCombo;
+
     CGUIGridList* m_pBindsList;
     CGUIButton*   m_pBindsDefButton;
     CGUIHandle    m_hBind, m_hPriKey, m_hSecKeys[SecKeyNum];
@@ -386,6 +392,7 @@ protected:
     bool OnJoypadTextChanged(CGUIElement* pElement);
     bool OnJoypadDeviceChanged(CGUIElement* pElement);
     bool OnSoundOutputDeviceChanged(CGUIElement* pElement);
+    bool OnSoundInputDeviceChanged(CGUIElement* pElement);
     bool OnJoypadVibrationClick(CGUIElement* pElement);
     bool OnAxisSelectClick(CGUIElement* pElement);
     bool OnAudioDefaultClick(CGUIElement* pElement);

@@ -326,6 +326,26 @@ bool CClient::SetSoundOutputDevice(const std::string& strDriver)
     return g_pClientGame->SetSoundOutputDevice(strDriver);
 }
 
+unsigned int CClient::GetSoundInputDeviceListRevision()
+{
+    return g_pClientGame->GetSoundInputDeviceListRevision();
+}
+
+std::vector<SSoundDeviceInfo> CClient::GetSoundInputDevices()
+{
+    return g_pClientGame->GetSoundInputDevices();
+}
+
+std::string CClient::GetSoundInputDeviceName()
+{
+    return g_pClientGame->GetSoundInputDeviceName();
+}
+
+bool CClient::SetSoundInputDevice(const std::string& strName)
+{
+    return g_pClientGame->SetSoundInputDevice(strName);
+}
+
 CClient::InitializeArguments CClient::ExtractInitializeArguments(const char* arguments)
 {
     // Format: "nickname [password]"

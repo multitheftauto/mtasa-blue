@@ -345,6 +345,11 @@ void CSettings::ResetGuiPointers()
     m_uiSoundOutputDeviceListRevision = 0;
     m_bUpdatingSoundOutputDeviceCombo = false;
 
+    m_pAudioInputDeviceLabel = NULL;
+    m_pSoundInputDeviceCombo = NULL;
+    m_uiSoundInputDeviceListRevision = 0;
+    m_bUpdatingSoundInputDeviceCombo = false;
+
     m_pBindsList = NULL;
     m_pBindsDefButton = NULL;
 
@@ -1161,6 +1166,19 @@ void CSettings::CreateGUI()
     m_pSoundOutputDeviceCombo->SetSize(CVector2D(320.0f, 120.0f));
     m_pSoundOutputDeviceCombo->SetReadOnly(true);
     m_pSoundOutputDeviceCombo->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnSoundOutputDeviceChanged, this));
+    m_pSoundOutputDeviceCombo->GetPosition(vecTemp, false);
+
+    m_pAudioInputDeviceLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Microphone")));
+    m_pAudioInputDeviceLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f), false);
+    m_pAudioInputDeviceLabel->GetPosition(vecTemp, false);
+    m_pAudioInputDeviceLabel->AutoSize(NULL, 20.0f);
+    m_pAudioInputDeviceLabel->SetFont("default-bold-small");
+
+    m_pSoundInputDeviceCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAudio, ""));
+    m_pSoundInputDeviceCombo->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
+    m_pSoundInputDeviceCombo->SetSize(CVector2D(320.0f, 120.0f));
+    m_pSoundInputDeviceCombo->SetReadOnly(true);
+    m_pSoundInputDeviceCombo->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnSoundInputDeviceChanged, this));
 
     m_pAudioRadioLabel->GetPosition(vecTemp, false);
     vecTemp.fX = fIndentX + 173;
@@ -2180,6 +2198,7 @@ void CSettings::Update()
     {
         UpdateJoypadTab();
         UpdateSoundOutputDeviceCombo();
+        UpdateSoundInputDeviceCombo();
 
         m_dwFrameCount = 0;
     }
@@ -2272,6 +2291,58 @@ bool CSettings::OnSoundOutputDeviceChanged(CGUIElement* pElement)
         return true;
 
     CModManager::GetSingleton().GetClient()->SetSoundOutputDevice(static_cast<const char*>(pItem->GetData()));
+    return true;
+}
+
+void CSettings::UpdateSoundInputDeviceCombo()
+{
+    if (!CModManager::GetSingleton().IsLoaded() || !m_pWindow->IsVisible() || !m_pSoundInputDeviceCombo || m_pSoundInputDeviceCombo->IsOpen())
+        return;
+
+    CClientBase* pClient = CModManager::GetSingleton().GetClient();
+
+    unsigned int uiRevision = pClient->GetSoundInputDeviceListRevision();
+    if (uiRevision == m_uiSoundInputDeviceListRevision)
+        return;
+
+    m_bUpdatingSoundInputDeviceCombo = true;
+
+    std::vector<SSoundDeviceInfo> devices = pClient->GetSoundInputDevices();
+    std::string                   strSelected = pClient->GetSoundInputDeviceName();
+
+    m_pSoundInputDeviceCombo->Clear();
+    if (devices.empty())
+    {
+        m_pSoundInputDeviceCombo->AddItem(_("No microphone detected"));
+    }
+    else
+    {
+        int iSelect = 0;
+        for (size_t i = 0; i < devices.size(); i++)
+        {
+            CGUIListItem* pItem = m_pSoundInputDeviceCombo->AddItem(devices[i].strName.c_str());
+            if (pItem)
+                pItem->SetData(devices[i].strDriver.c_str());
+            if (devices[i].strDriver == strSelected)
+                iSelect = static_cast<int>(i);
+        }
+        m_pSoundInputDeviceCombo->SetSelectedItemByIndex(iSelect);
+    }
+
+    m_bUpdatingSoundInputDeviceCombo = false;
+    m_uiSoundInputDeviceListRevision = uiRevision;
+}
+
+bool CSettings::OnSoundInputDeviceChanged(CGUIElement* pElement)
+{
+    if (m_bUpdatingSoundInputDeviceCombo || !m_pSoundInputDeviceCombo)
+        return true;
+
+    CGUIListItem* pItem = m_pSoundInputDeviceCombo->GetSelectedItem();
+    if (!pItem || !pItem->GetData())
+        return true;
+
+    CModManager::GetSingleton().GetClient()->SetSoundInputDevice(static_cast<const char*>(pItem->GetData()));
     return true;
 }
 

@@ -7164,6 +7164,7 @@ void CClientGame::OnWindowFocusChange(bool state)
 void CClientGame::OnPossibleAudioDeviceChange()
 {
     m_pManager->GetSoundManager()->OnPossibleDeviceChange();
+    m_pVoiceRecorder->OnPossibleDeviceChange();
 }
 
 unsigned int CClientGame::GetSoundOutputDeviceListRevision()
@@ -7184,6 +7185,26 @@ std::string CClientGame::GetSoundOutputDeviceDriver()
 bool CClientGame::SetSoundOutputDevice(const std::string& strDriver)
 {
     return m_pManager->GetSoundManager()->SetOutputDevice(strDriver);
+}
+
+unsigned int CClientGame::GetSoundInputDeviceListRevision()
+{
+    return m_pVoiceRecorder->GetInputDeviceListRevision();
+}
+
+std::vector<SSoundDeviceInfo> CClientGame::GetSoundInputDevices()
+{
+    return m_pVoiceRecorder->GetInputDevices();
+}
+
+std::string CClientGame::GetSoundInputDeviceName()
+{
+    return m_pVoiceRecorder->GetInputDeviceName();
+}
+
+bool CClientGame::SetSoundInputDevice(const std::string& strName)
+{
+    return m_pVoiceRecorder->SetInputDevice(strName);
 }
 
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)

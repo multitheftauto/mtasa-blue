@@ -20,9 +20,11 @@
 
 #include <mutex>
 #include <atomic>
+#include <thread>
 #include <speex/speex.h>
 #include <speex/speex_preprocess.h>
 #include <portaudio/portaudio.h>
+#include <core/CClientBase.h>
 
 enum eVoiceState
 {
@@ -65,6 +67,14 @@ public:
 
     const SpeexMode* getSpeexModeFromSampleRate();
 
+    std::vector<SSoundDeviceInfo> GetAvailableInputDevices();
+    std::string                   GetInputDeviceName();
+    bool                          SetInputDevice(const std::string& strName);
+
+    void                                 OnPossibleDeviceChange();
+    const std::vector<SSoundDeviceInfo>& GetInputDevices() const { return m_InputDevices; }
+    unsigned int                         GetInputDeviceListRevision() const { return m_uiInputDeviceListRevision; }
+
 private:
     void DeInit();
     void SendFrame(const void* inputBuffer);
@@ -93,6 +103,20 @@ private:
 
     eSampleRate   m_SampleRate;
     unsigned char m_ucQuality;
+
+    // Cached so a device switch can re-run Init with the same session parameters
+    unsigned int m_uiLastServerSampleRate;
+    unsigned int m_uiLastBitrate;
+    std::string  m_strSelectedDeviceName;
+
+    void CollectInputDeviceScanResult();
+
+    std::thread                   m_InputDeviceScanThread;
+    std::atomic<bool>             m_bInputDeviceScanRunning{false};
+    std::atomic<bool>             m_bInputDeviceScanReady{false};
+    std::vector<SSoundDeviceInfo> m_InputDeviceScanResult;
+    std::vector<SSoundDeviceInfo> m_InputDevices;
+    unsigned int                  m_uiInputDeviceListRevision{0};
 
     std::list<SString> m_EventQueue;
     std::mutex         m_Mutex;

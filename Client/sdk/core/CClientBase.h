@@ -47,4 +47,9 @@ public:
     virtual std::vector<SSoundDeviceInfo> GetSoundOutputDevices() = 0;
     virtual std::string                   GetSoundOutputDeviceDriver() = 0;
     virtual bool                          SetSoundOutputDevice(const std::string& strDriver) = 0;
+
+    virtual unsigned int                  GetSoundInputDeviceListRevision() = 0;
+    virtual std::vector<SSoundDeviceInfo> GetSoundInputDevices() = 0;
+    virtual std::string                   GetSoundInputDeviceName() = 0;
+    virtual bool                          SetSoundInputDevice(const std::string& strName) = 0;
 };

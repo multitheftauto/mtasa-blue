@@ -519,6 +519,11 @@ public:
     std::string                   GetSoundOutputDeviceDriver();
     bool                          SetSoundOutputDevice(const std::string& strDriver);
 
+    unsigned int                  GetSoundInputDeviceListRevision();
+    std::vector<SSoundDeviceInfo> GetSoundInputDevices();
+    std::string                   GetSoundInputDeviceName();
+    bool                          SetSoundInputDevice(const std::string& strName);
+
     void                      SetAllowMultiCommandHandlers(MultiCommandHandlerPolicy policy) noexcept { m_allowMultiCommandHandlers = policy; }
     MultiCommandHandlerPolicy GetAllowMultiCommandHandlers() const noexcept { return m_allowMultiCommandHandlers; }
 
