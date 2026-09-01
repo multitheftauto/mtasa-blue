@@ -21,6 +21,10 @@ CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
 {
     m_pClientManager = pClientManager;
 
+    // Keep following the system default device across output changes, instead of getting stuck on
+    // whatever device was default at Init time
+    BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, TRUE);
+
     // Initialize BASS audio library
     if (!BASS_Init(-1, 44100, NULL, NULL, NULL))
         g_pCore->GetConsole()->Printf("BASS ERROR %d in Init", BASS_ErrorGetCode());
