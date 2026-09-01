@@ -493,6 +493,13 @@ int CLuaUtilDefs::fromJSON(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (strJson.length() > 512 * 1024)
+        {
+            m_pScriptDebugging->LogError(luaVM, "JSON string is too large and may cause server crash (>512KB).");
+            lua_pushnil(luaVM);
+            return 1;
+        }
+
         // Read it into lua arguments
         CLuaArguments Converted;
         if (Converted.ReadFromJSONString(strJson))
