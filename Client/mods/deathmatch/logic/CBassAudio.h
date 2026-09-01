@@ -84,6 +84,7 @@ public:
     float   GetPan();
     void    SetPan(float fPan);
     bool    SetLooped(bool bLoop);
+    DWORD   GetChannelHandle() const { return m_pSound; }
 
     void   DoPulse(const CVector& vecPlayerPosition, const CVector& vecCameraPosition, const CVector& vecLookAt);
     void   AddQueuedEvent(eSoundEventType type, const SString& strString, double dNumber = 0.0, bool bBool = false, const SString& strError = "");

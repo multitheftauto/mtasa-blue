@@ -11,6 +11,7 @@
 #include "StdInc.h"
 #include <game/CSettings.h>
 #include "CBassAudio.h"
+#include "CClientPlayerManager.h"
 
 using SharedUtil::CalcMTASAPath;
 using std::list;
@@ -321,6 +322,64 @@ void CClientSoundManager::UpdateVolume()
 
     BASS_SetConfig(BASS_CONFIG_GVOL_STREAM, static_cast<DWORD>(fValue * 10000));
     BASS_SetConfig(BASS_CONFIG_GVOL_MUSIC, static_cast<DWORD>(fValue * 10000));
+}
+
+std::vector<SSoundDeviceInfo> CClientSoundManager::GetAvailableOutputDevices()
+{
+    std::vector<SSoundDeviceInfo> devices;
+    BASS_DEVICEINFO               info;
+    for (DWORD i = 0; BASS_GetDeviceInfo(i, &info); i++)
+    {
+        if (!(info.flags & BASS_DEVICE_ENABLED) || !info.driver)
+            continue;
+
+        devices.push_back({info.name ? info.name : "", info.driver, (info.flags & BASS_DEVICE_DEFAULT) != 0});
+    }
+    return devices;
+}
+
+std::string CClientSoundManager::GetOutputDeviceDriver()
+{
+    BASS_DEVICEINFO info;
+    if (BASS_GetDeviceInfo(BASS_GetDevice(), &info) && info.driver)
+        return info.driver;
+    return "";
+}
+
+bool CClientSoundManager::SetOutputDevice(const std::string& strDriver)
+{
+    BASS_DEVICEINFO info;
+    for (DWORD i = 0; BASS_GetDeviceInfo(i, &info); i++)
+    {
+        if (!(info.flags & BASS_DEVICE_ENABLED) || !info.driver || strDriver != info.driver)
+            continue;
+
+        if (!(info.flags & BASS_DEVICE_INIT) && !BASS_Init(i, 44100, NULL, NULL, NULL))
+            return false;
+
+        BASS_SetDevice(i);
+
+        // Move already-playing sounds over immediately instead of waiting for them to restart
+        for (CClientSound* pSound : m_Sounds)
+        {
+            DWORD dwChannel = pSound->GetChannelHandle();
+            if (dwChannel)
+                BASS_ChannelSetDevice(dwChannel, i);
+        }
+
+        // Voice playback streams live for the whole connection rather than per transmission, so
+        // anyone already talking needs to be moved over the same way
+        CClientPlayerManager* pPlayerManager = m_pClientManager->GetPlayerManager();
+        for (auto iter = pPlayerManager->IterBegin(); iter != pPlayerManager->IterEnd(); ++iter)
+        {
+            CClientPlayerVoice* pVoice = (*iter)->GetVoice();
+            if (pVoice)
+                pVoice->MoveToDevice(i);
+        }
+
+        return true;
+    }
+    return false;
 }
 
 //

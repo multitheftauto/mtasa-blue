@@ -15,6 +15,13 @@
 #include <game/CAudioContainer.h>
 #include "CClientSound.h"
 
+struct SSoundDeviceInfo
+{
+    std::string strName;
+    std::string strDriver;
+    bool        bIsDefault;
+};
+
 class CClientSoundManager
 {
 public:
@@ -44,6 +51,10 @@ public:
     std::map<std::string, int> GetFxEffects() { return m_FxEffectNames; }
 
     void UpdateVolume();
+
+    std::vector<SSoundDeviceInfo> GetAvailableOutputDevices();
+    std::string                   GetOutputDeviceDriver();
+    bool                          SetOutputDevice(const std::string& strDriver);
 
     void UpdateDistanceStreaming(const CVector& vecListenerPosition);
 
