@@ -22,6 +22,15 @@ struct SShaderReplacementStats;
 struct STexInfo;
 struct STexTag;
 
+//
+// A texture a replaced model renders with, watched for as long as the model uses it
+//
+struct SDffTexInfo
+{
+    STexInfo* pTexInfo;
+    uint      uiUsageCount;
+};
+
 class CRenderWareSA : public CRenderWare
 {
 public:
@@ -137,13 +146,16 @@ public:
     void      StreamingAddedTexture(ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData);
     void      StreamingRemovedTxd(ushort usTxdId);
     void      ScriptAddedTxd(RwTexDictionary* pTxd);
+    void      ScriptAddedDff(RpClump* pClump);
     void      ScriptRemovedTexture(RwTexture* pTex);
+    void      ScriptRemovedDff(RpClump* pClump);
     void      SpecialAddedTexture(RwTexture* texture, const char* szTextureName = NULL);
     void      SpecialRemovedTexture(RwTexture* texture);
     STexInfo* CreateTexInfo(const STexTag& texTag, const SString& strTextureName, CD3DDUMMY* pD3DData);
     void      DestroyTexInfo(STexInfo* pTexInfo);
 
     static void GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& outAtomicList);
+    static void GetClumpTextures(std::vector<RwTexture*>& outTextureList, RpClump* pClump);
     static bool DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB);
 
     void OnTextureStreamIn(STexInfo* pTexInfo);
@@ -153,18 +165,20 @@ public:
     void SetGTAVertexShadersEnabled(bool bEnable);
 
     // Watched world textures
-    std::multimap<ushort, STexInfo*>    m_TexInfoMap;
-    CFastHashMap<CD3DDUMMY*, STexInfo*> m_D3DDataTexInfoMap;
-    CClientEntityBase*                  m_pRenderingClientEntity;
-    ushort                              m_usRenderingEntityModelId;
-    int                                 m_iRenderingEntityType;
-    CMatchChannelManager*               m_pMatchChannelManager;
-    int                                 m_uiReplacementRequestCounter;
-    int                                 m_uiReplacementMatchCounter;
-    int                                 m_uiNumReplacementRequests;
-    int                                 m_uiNumReplacementMatches;
-    CElapsedTime                        m_GTAVertexShadersDisabledTimer;
-    bool                                m_bGTAVertexShadersEnabled;
-    std::set<RwTexture*>                m_SpecialTextures;
-    static int                          ms_iRenderingType;
+    std::multimap<ushort, STexInfo*>                m_TexInfoMap;
+    CFastHashMap<CD3DDUMMY*, STexInfo*>             m_D3DDataTexInfoMap;
+    CFastHashMap<CD3DDUMMY*, SDffTexInfo>           m_DffTexInfoMap;
+    CFastHashMap<RpClump*, std::vector<CD3DDUMMY*>> m_DffClumpTextures;
+    CClientEntityBase*                              m_pRenderingClientEntity;
+    ushort                                          m_usRenderingEntityModelId;
+    int                                             m_iRenderingEntityType;
+    CMatchChannelManager*                           m_pMatchChannelManager;
+    int                                             m_uiReplacementRequestCounter;
+    int                                             m_uiReplacementMatchCounter;
+    int                                             m_uiNumReplacementRequests;
+    int                                             m_uiNumReplacementMatches;
+    CElapsedTime                                    m_GTAVertexShadersDisabledTimer;
+    bool                                            m_bGTAVertexShadersEnabled;
+    std::set<RwTexture*>                            m_SpecialTextures;
+    static int                                      ms_iRenderingType;
 };

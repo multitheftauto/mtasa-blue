@@ -290,6 +290,84 @@ void CRenderWareSA::ScriptAddedTxd(RwTexDictionary* pTxd)
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::ScriptAddedDff
+//
+// Called when a DFF is loaded outside of streaming
+// Watch the textures its materials were bound to, as those outlive their txd
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::ScriptAddedDff(RpClump* pClump)
+{
+    TIMING_CHECKPOINT("+ScriptAddedDff");
+    std::vector<RwTexture*> textureList;
+    GetClumpTextures(textureList, pClump);
+
+    std::vector<CD3DDUMMY*> watchedTextures;
+    for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
+    {
+        RwTexture* texture = *iter;
+        CD3DDUMMY* pD3DData = texture->raster ? (CD3DDUMMY*)texture->raster->renderResource : NULL;
+        if (!pD3DData)
+            continue;
+
+        SDffTexInfo* pDffTexInfo = MapFind(m_DffTexInfoMap, pD3DData);
+        if (pDffTexInfo)
+            pDffTexInfo->uiUsageCount++;
+        else
+        {
+            // Kept out of m_TexInfoMap and m_D3DDataTexInfoMap, so txd and script texture removal cannot delete it
+            STexInfo*   pTexInfo = new STexInfo(texture, texture->name, pD3DData);
+            SDffTexInfo dffTexInfo = {pTexInfo, 1};
+            MapSet(m_DffTexInfoMap, pD3DData, dffTexInfo);
+            OnTextureStreamIn(pTexInfo);
+        }
+
+        watchedTextures.push_back(pD3DData);
+    }
+
+    if (!watchedTextures.empty())
+    {
+        dassert(!MapContains(m_DffClumpTextures, pClump));
+        MapSet(m_DffClumpTextures, pClump, watchedTextures);
+    }
+    TIMING_CHECKPOINT("-ScriptAddedDff");
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::ScriptRemovedDff
+//
+// Called when a DFF is destroyed outside of streaming
+// Stop watching the textures it was bound to
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::ScriptRemovedDff(RpClump* pClump)
+{
+    TIMING_CHECKPOINT("+ScriptRemovedDff");
+    // Release what the clump registered, as a texture's raster can be gone by now
+    std::vector<CD3DDUMMY*>* pWatchedTextures = MapFind(m_DffClumpTextures, pClump);
+    if (pWatchedTextures)
+    {
+        std::vector<CD3DDUMMY*> watchedTextures = *pWatchedTextures;
+        MapRemove(m_DffClumpTextures, pClump);
+
+        for (std::vector<CD3DDUMMY*>::iterator iter = watchedTextures.begin(); iter != watchedTextures.end(); iter++)
+        {
+            SDffTexInfo* pDffTexInfo = MapFind(m_DffTexInfoMap, *iter);
+            if (!pDffTexInfo || --pDffTexInfo->uiUsageCount > 0)
+                continue;
+
+            STexInfo* pTexInfo = pDffTexInfo->pTexInfo;
+            MapRemove(m_DffTexInfoMap, *iter);
+            OnTextureStreamOut(pTexInfo);
+            delete pTexInfo;
+        }
+    }
+    TIMING_CHECKPOINT("-ScriptRemovedDff");
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::ScriptRemovedTexture
 //
 // Called when a texture is destroyed outside of streaming
@@ -446,7 +524,13 @@ SShaderItemLayers* CRenderWareSA::GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData
     STexInfo* pTexInfo = MapFindRef(m_D3DDataTexInfoMap, pD3DData);
 
     if (!pTexInfo)
-        return NULL;
+    {
+        // A replaced model can render with a texture its txd no longer holds
+        SDffTexInfo* pDffTexInfo = MapFind(m_DffTexInfoMap, pD3DData);
+        if (!pDffTexInfo)
+            return NULL;
+        pTexInfo = pDffTexInfo->pTexInfo;
+    }
 
     SShaderInfoLayers* pInfoLayers = m_pMatchChannelManager->GetShaderForTexAndEntity(pTexInfo, m_pRenderingClientEntity, m_iRenderingEntityType);
 
