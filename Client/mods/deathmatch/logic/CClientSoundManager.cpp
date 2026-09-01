@@ -374,6 +374,14 @@ void CClientSoundManager::OnPossibleDeviceChange()
 
 void CClientSoundManager::CollectOutputDeviceScanResult()
 {
+    if (m_bNativeAudioRestartPending.exchange(false) && g_pMultiplayer)
+    {
+        // Re-resolve the preferred device by name rather than just restarting outright: if that
+        // device is the one that just disappeared, this correctly falls back to the system
+        // default instead of retrying a dead GUID and failing to open at all
+        g_pMultiplayer->SetPreferredAudioDeviceName(m_strPreferredOutputDeviceName);
+    }
+
     if (!m_bOutputDeviceScanReady.load(std::memory_order_acquire))
         return;
 
@@ -416,9 +424,11 @@ bool CClientSoundManager::SetOutputDevice(const std::string& strDriver)
                 pVoice->MoveToDevice(i);
         }
 
-        // The native audio engine only picks this up on its own next (re)init, not immediately
+        // Restarts the native audio engine on this same device right away; also remembered so a
+        // hotplug event can re-resolve it later instead of blindly reusing a dead device's GUID
+        m_strPreferredOutputDeviceName = info.name ? info.name : "";
         if (g_pMultiplayer)
-            g_pMultiplayer->SetPreferredAudioDeviceName(info.name ? info.name : "");
+            g_pMultiplayer->SetPreferredAudioDeviceName(m_strPreferredOutputDeviceName);
 
         return true;
     }

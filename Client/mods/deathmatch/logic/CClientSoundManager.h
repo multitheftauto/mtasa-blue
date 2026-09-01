@@ -53,6 +53,7 @@ public:
     bool                          SetOutputDevice(const std::string& strDriver);
 
     void                                 OnPossibleDeviceChange();
+    void                                 RestartNativeAudioOnNextPulse() { m_bNativeAudioRestartPending = true; }
     const std::vector<SSoundDeviceInfo>& GetOutputDevices() const { return m_OutputDevices; }
     unsigned int                         GetOutputDeviceListRevision() const { return m_uiOutputDeviceListRevision; }
 
@@ -97,4 +98,6 @@ private:
     std::vector<SSoundDeviceInfo> m_OutputDeviceScanResult;
     std::vector<SSoundDeviceInfo> m_OutputDevices;
     unsigned int                  m_uiOutputDeviceListRevision{0};
+    std::atomic<bool>             m_bNativeAudioRestartPending{false};
+    std::string                   m_strPreferredOutputDeviceName;
 };

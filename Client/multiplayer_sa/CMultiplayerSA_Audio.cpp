@@ -9,6 +9,7 @@
  *****************************************************************************/
 #include "StdInc.h"
 #include <dsound.h>
+#include <game/CAEAudioHardware.h>
 
 #pragma comment(lib, "dsound.lib")
 
@@ -56,8 +57,8 @@ static void __declspec(naked)   HOOK_CAEAudioHardware_CreateDirectSound()
 //
 // CMultiplayerSA::SetPreferredAudioDeviceName
 //
-// Resolves the given device name to a DirectSound GUID, to be substituted next time
-// CAEAudioHardware::Initialise runs (game restart, not immediately - see the hook above)
+// Resolves the given device name to a DirectSound GUID, to be substituted by the hook above,
+// then restarts the audio hardware right away so it takes effect immediately
 //
 //////////////////////////////////////////////////////////////////////////////////////////
 namespace
@@ -82,20 +83,36 @@ namespace
     }
 }            // namespace
 
+extern CGame* pGameInterface;
+
+void CMultiplayerSA::RestartAudioHardware()
+{
+    // Same teardown/rebuild the game already does once at normal startup, just run again on
+    // demand; causes the same brief hitch, but never needs a full game restart to take effect
+    CAEAudioHardware* pAEAudioHardware = pGameInterface->GetAEAudioHardware();
+    if (!pAEAudioHardware)
+        return;
+
+    pAEAudioHardware->Terminate();
+    if (!pAEAudioHardware->Initialise())
+        OutputDebugLine("[Audio] Native audio hardware failed to (re)initialise; no SFX/radio/vehicle sounds until it recovers");
+}
+
 void CMultiplayerSA::SetPreferredAudioDeviceName(const std::string& strName)
 {
     if (strName.empty())
-    {
         g_bHasPreferredAudioDeviceGuid = false;
-        return;
+    else
+    {
+        SFindDeviceContext findContext{&strName, false, {}};
+        DirectSoundEnumerateA(FindDeviceByNameCallback, &findContext);
+
+        g_bHasPreferredAudioDeviceGuid = findContext.bFound;
+        if (findContext.bFound)
+            g_PreferredAudioDeviceGuid = findContext.guid;
     }
 
-    SFindDeviceContext findContext{&strName, false, {}};
-    DirectSoundEnumerateA(FindDeviceByNameCallback, &findContext);
-
-    g_bHasPreferredAudioDeviceGuid = findContext.bFound;
-    if (findContext.bFound)
-        g_PreferredAudioDeviceGuid = findContext.guid;
+    RestartAudioHardware();
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

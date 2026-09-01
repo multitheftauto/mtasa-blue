@@ -358,6 +358,7 @@ public:
     void SetBoatWaterSplashEnabled(bool bEnabled);
     void SetTyreSmokeEnabled(bool bEnabled);
 
+    void RestartAudioHardware() override;
     void SetPreferredAudioDeviceName(const std::string& strName) override;
 
     void SetLastStaticAnimationPlayed(eAnimGroup dwGroupID, eAnimID dwAnimID, DWORD dwAnimArrayAddress)

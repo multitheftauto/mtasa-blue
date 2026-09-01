@@ -7164,6 +7164,7 @@ void CClientGame::OnWindowFocusChange(bool state)
 void CClientGame::OnPossibleAudioDeviceChange()
 {
     m_pManager->GetSoundManager()->OnPossibleDeviceChange();
+    m_pManager->GetSoundManager()->RestartNativeAudioOnNextPulse();
     m_pVoiceRecorder->OnPossibleDeviceChange();
 }
 
