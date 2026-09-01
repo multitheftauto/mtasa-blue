@@ -39,7 +39,7 @@ CTransferBox::CTransferBox(TransferBoxType transferType) : m_GUI(g_pCore->GetGUI
 void CTransferBox::CreateTransferWindow()
 {
     // Find our largest piece of text, so we can size accordingly
-    std::string largeTextSample = m_titleProgressPrefix + " " + SString(_("%s of %s"), "999.99 kB", "999.99 kB");
+    std::string largeTextSample = m_titleProgressPrefix + " " + SString(_("%s of %s (Speed: %s)"), "999.99 kB", "999.99 kB", "999.99 kB");
     float       fTransferBoxWidth = m_GUI->GetTextExtent(largeTextSample.c_str(), "default-bold-small");
     fTransferBoxWidth = std::max<float>(fTransferBoxWidth, m_GUI->GetTextExtent(_("Disconnect to cancel download"), "default-normal"));
 
@@ -100,11 +100,54 @@ void CTransferBox::Hide()
 
 void CTransferBox::SetDownloadProgress(uint64_t downloadedSizeTotal)
 {
+    uint32_t currentTime = GetTickCount32();
+
+    if (m_lastTimeCheck == 0)
+    {
+        m_lastTimeCheck = currentTime;
+        m_lastDownloadedSize = downloadedSizeTotal;
+        m_smoothedSpeed = 0.0f;
+    }
+
+    uint32_t timeElapsed = currentTime - m_lastTimeCheck;
+
+    if (timeElapsed >= 250)
+    {
+        uint64_t bytesDelta = (downloadedSizeTotal > m_lastDownloadedSize) ? (downloadedSizeTotal - m_lastDownloadedSize) : 0;
+        float    instantaneousSpeed = (float)bytesDelta / (timeElapsed / 1000.0f);
+
+        if (m_smoothedSpeed == 0.0f)
+        {
+            m_smoothedSpeed = instantaneousSpeed;
+        }
+        else
+        {
+            float alpha = 0.2f;
+            m_smoothedSpeed = alpha * instantaneousSpeed + (1.0f - alpha) * m_smoothedSpeed;
+        }
+
+        m_lastDownloadedSize = downloadedSizeTotal;
+        m_lastTimeCheck = currentTime;
+    }
+
     SString current = GetDataUnit(downloadedSizeTotal);
     SString total = GetDataUnit(m_downloadTotalSize);
-    SString progress = m_titleProgressPrefix + " " + SString(_("%s of %s"), current.c_str(), total.c_str());
+
+    SString speedStr;
+    if (m_smoothedSpeed >= 1024.0f * 1024.0f)
+        speedStr = SString(_("%.2f MB/s"), m_smoothedSpeed / (1024.0f * 1024.0f));
+    else if (m_smoothedSpeed >= 1024.0f)
+        speedStr = SString(_("%.2f KB/s"), m_smoothedSpeed / 1024.0f);
+    else
+        speedStr = SString(_("%d B/s"), (int)m_smoothedSpeed);
+
+    SString progress = m_titleProgressPrefix + " " + SString(_("%s of %s (Speed: %s)"), current.c_str(), total.c_str(), speedStr.c_str());
     m_window->SetText(progress.c_str());
-    m_progressBar->SetProgress(static_cast<float>(static_cast<double>(downloadedSizeTotal) / m_downloadTotalSize));
+
+    if (m_downloadTotalSize > 0)
+    {
+        m_progressBar->SetProgress(static_cast<float>(static_cast<double>(downloadedSizeTotal) / m_downloadTotalSize));
+    }
 }
 
 void CTransferBox::DoPulse()
