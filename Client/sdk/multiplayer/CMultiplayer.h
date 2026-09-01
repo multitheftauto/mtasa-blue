@@ -469,4 +469,7 @@ public:
 
     virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;
     virtual unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept = 0;
+
+    // Takes effect the next time the game's own audio hardware (re)initialises, not immediately
+    virtual void SetPreferredAudioDeviceName(const std::string& strName) = 0;
 };

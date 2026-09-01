@@ -17,6 +17,7 @@ using SharedUtil::CalcMTASAPath;
 using std::list;
 
 extern CCoreInterface* g_pCore;
+extern CMultiplayer*   g_pMultiplayer;
 
 CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
 {
@@ -414,6 +415,10 @@ bool CClientSoundManager::SetOutputDevice(const std::string& strDriver)
             if (pVoice)
                 pVoice->MoveToDevice(i);
         }
+
+        // The native audio engine only picks this up on its own next (re)init, not immediately
+        if (g_pMultiplayer)
+            g_pMultiplayer->SetPreferredAudioDeviceName(info.name ? info.name : "");
 
         return true;
     }
