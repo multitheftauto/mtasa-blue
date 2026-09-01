@@ -1986,10 +1986,20 @@ int LaunchGame(SString strCmdLine)
         else
         {
             // Wait for game window
-            DWORD status = WAIT_TIMEOUT;
-            for (uint i = 0; i < 20 && status == WAIT_TIMEOUT; ++i)  // Max 20 iterations
+            constexpr DWORD startupTimeoutMs = 20000;
+            constexpr DWORD waitIntervalMs = 100;
+            constexpr uint  maxWaitCount = startupTimeoutMs / waitIntervalMs;
+            DWORD           status = WAIT_TIMEOUT;
+            bool            splashHidden = false;
+            for (uint i = 0; i < maxWaitCount && status == WAIT_TIMEOUT; ++i)
             {
-                status = WaitForSingleObject(piLoadee.hProcess, 1000);  // 1 second timeout
+                status = WaitForSingleObject(piLoadee.hProcess, waitIntervalMs);
+
+                if (!splashHidden && IsGameWindowOpen(piLoadee.dwProcessId))
+                {
+                    HideSplash();
+                    splashHidden = true;
+                }
 
                 if (!WatchDogIsSectionOpen("L3"))  // Gets closed when loading screen is shown
                 {
@@ -2001,7 +2011,6 @@ int LaunchGame(SString strCmdLine)
                 if (IsDeviceSelectionDialogOpen(piLoadee.dwProcessId) && i > 0)
                 {
                     --i;  // Don't count this iteration
-                    Sleep(100);
                 }
             }
 
@@ -2014,7 +2023,9 @@ int LaunchGame(SString strCmdLine)
                 AddReportLog(7103, SString("Loader - Premature exit (code %lu) - possible missing runtime dependencies or injection failure", dwEarlyExitCode));
             }
 
-            HideSplash();
+            // Ensure the splash is hidden if no game window was detected
+            if (!splashHidden)
+                HideSplash();
 
             // Handle process if stuck at startup
             if (status == WAIT_TIMEOUT)

@@ -68,6 +68,83 @@ static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CBike::ProcessControl
+//
+// Both divide the steer angle by the steering lock in radians to get a steer ratio. The steer
+// angle is itself the steering lock times the input, so a lock of zero makes this 0 / 0, a NaN
+// rather than an infinity. Cars survive the same division because an infinity trips their
+// "greater than 1" clamp, while a NaN compares false against every clamp. It reaches the rider
+// lean angle, and CBike::CalculateLeanMatrix builds the bike and rider matrices from it, which
+// is what stretches the ped until respawn.
+//
+// A lock of zero means the bike cannot steer, so the ratio is zero. These produce it directly.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6BAB93 | D9 87 A0 00 00 00 | fld     dword ptr [edi + 0A0h]  ; m_fSteeringLock
+//     0x6BAB99 | D8 0D EC 95 85 00 | fmul    dword ptr ds:[08595ECh] ; degrees to radians
+//     0x6BAB9F | DE F9             | fdivp   st(1), st(0)
+#define HOOKPOS_CBike__ProcessControl_SteerRatio  0x6BAB93
+#define HOOKSIZE_CBike__ProcessControl_SteerRatio 14
+static DWORD CONTINUE_CBike__ProcessControl_SteerRatio = 0x6BABA1;
+
+// This one divides a value already on the FPU stack, so zero has to replace it.
+static void __declspec(naked) HOOK_CBike__ProcessControl_SteerRatio()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [edi + 0A0h]
+        test    eax, 7FFFFFFFh              // zero, ignoring the sign bit
+        jz      noSteeringLock
+
+        fld     dword ptr [edi + 0A0h]
+        fmul    dword ptr ds:[08595ECh]
+        fdivp   st(1), st(0)
+        jmp     CONTINUE_CBike__ProcessControl_SteerRatio
+
+        noSteeringLock:
+        fstp    st(0)
+        fldz
+        jmp     CONTINUE_CBike__ProcessControl_SteerRatio
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6BBA49 | D9 81 A0 00 00 00 | fld     dword ptr [ecx + 0A0h]  ; m_fSteeringLock
+//     0x6BBA4F | D8 0D EC 95 85 00 | fmul    dword ptr ds:[08595ECh] ; degrees to radians
+//     0x6BBA55 | D8 BE 94 04 00 00 | fdivr   dword ptr [esi + 494h]  ; m_fSteerAngle
+#define HOOKPOS_CBike__ProcessControl_LeanRatio  0x6BBA49
+#define HOOKSIZE_CBike__ProcessControl_LeanRatio 18
+static DWORD CONTINUE_CBike__ProcessControl_LeanRatio = 0x6BBA5B;
+
+// This one pushes a new value onto the FPU stack, so zero is simply pushed instead.
+static void __declspec(naked) HOOK_CBike__ProcessControl_LeanRatio()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [ecx + 0A0h]
+        test    eax, 7FFFFFFFh
+        jz      noSteeringLock
+
+        fld     dword ptr [ecx + 0A0h]
+        fmul    dword ptr ds:[08595ECh]
+        fdivr   dword ptr [esi + 494h]
+        jmp     CONTINUE_CBike__ProcessControl_LeanRatio
+
+        noSteeringLock:
+        fldz
+        jmp     CONTINUE_CBike__ProcessControl_LeanRatio
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 // CAutomobile::HydraulicControl
 //
 // This hook gives monster trucks working hydraulics instead of letting the native control wreck
@@ -784,12 +861,9 @@ static void __declspec(naked) HOOK_CVehicle__DoVehicleLights_PopUpLights()
 #define HOOKSIZE_CAutomobile__GetTowBarPos 7
 static const DWORD CONTINUE_CAutomobile__GetTowBarPos = 0x6AF257;
 
-// Models that answer with their misc_a dummy, so a clone of one still tows.
-//
-// The tow truck and the tractor are left out; they derive the bar from their hoist angle, and the
-// rest of their behaviour stays gated on the stock model index, so a clone would only half work.
-// The trailers in that same switch, artict3 and the two baggage boxes, are vehicles.ide type
-// trailer and so become CTrailer, which overrides this function and never reaches it.
+// Models that answer with their misc_a dummy, so a clone of one still tows. Tow truck and tractor
+// share a different branch below, handled by GetTowBarModelId; artict3 and the baggage boxes are
+// CTrailer, which overrides this function entirely.
 static constexpr bool HasTowBarDummy(VehicleType model)
 {
     switch (model)
@@ -817,7 +891,12 @@ static std::uint32_t __fastcall GetTowBarModelId(CVehicleSAInterface* vehicle)
     // Only engineRequestModel models carry a parent, so stock vehicles keep their index and take
     // the branch they always did.
     const std::uint32_t parentId = modelInfo->GetParentID();
-    if (parentId == 0 || !HasTowBarDummy(static_cast<VehicleType>(parentId)))
+    if (parentId == 0)
+        return modelId;
+
+    // Tow truck and tractor share a further branch below; let a clone's parent take it too.
+    const auto parentType = static_cast<VehicleType>(parentId);
+    if (!HasTowBarDummy(parentType) && parentType != VehicleType::VT_TOWTRUCK && parentType != VehicleType::VT_TRACTOR)
         return modelId;
 
     return parentId;
@@ -836,6 +915,421 @@ static void __declspec(naked) HOOK_CAutomobile__GetTowBarPos()
 
         sub     esp, 0x0C
         jmp     CONTINUE_CAutomobile__GetTowBarPos
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The tug (and baggage/bagboxa/bagboxb, which share this same branch) only reaches the dummy read
+// below if what it's hooking onto is a bagboxa, bagboxb or tugstair by raw id, so a clone of one of
+// those, or the utility trailer entirely, never gets recognised. Resolve clones the usual way and
+// also accept the utility trailer, letting the tug (and its trailermates) tow it too.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6AF2B6 | 66 8B 42 22 | mov     ax, word ptr [edx + 0x22]
+// >>> 0x6AF2BA | 66 3D 5E 02 | cmp     ax, 0x25E
+// >>> 0x6AF2BE | 74 0C       | je      0x6AF2CC
+// >>> 0x6AF2C0 | 66 3D 5F 02 | cmp     ax, 0x25F
+// >>> 0x6AF2C4 | 74 06       | je      0x6AF2CC
+// >>> 0x6AF2C6 | 66 3D 60 02 | cmp     ax, 0x260
+// >>> 0x6AF2CA | 75 34       | jne     0x6AF300
+#define HOOKPOS_CAutomobile__GetTowBarPos_TugAttachWhitelist  0x6AF2B6
+#define HOOKSIZE_CAutomobile__GetTowBarPos_TugAttachWhitelist 22
+static const DWORD CONTINUE_CAutomobile__GetTowBarPos_TugAttachWhitelist = 0x6AF2CC;
+static const DWORD SKIP_CAutomobile__GetTowBarPos_TugAttachWhitelist = 0x6AF300;
+
+static constexpr bool IsTugAttachable(VehicleType model)
+{
+    switch (model)
+    {
+        case VehicleType::VT_BAGBOXA:
+        case VehicleType::VT_BAGBOXB:
+        case VehicleType::VT_TUGSTAIR:
+        case VehicleType::VT_UTILTR1:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static bool __fastcall IsTugAttachableOrClone(CVehicleSAInterface* attachTo)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(attachTo->m_nModelIndex);
+    if (IsTugAttachable(static_cast<VehicleType>(modelId)))
+        return true;
+
+    CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+    return modelInfo && IsTugAttachable(static_cast<VehicleType>(modelInfo->GetParentID()));
+}
+
+static void __declspec(naked) HOOK_CAutomobile__GetTowBarPos_TugAttachWhitelist()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    ecx                          // this (the tug), needed by both targets below
+        mov     ecx, edx
+        call    IsTugAttachableOrClone
+        pop     ecx
+        test    al, al
+        jz      notAttachable
+
+        jmp     CONTINUE_CAutomobile__GetTowBarPos_TugAttachWhitelist
+
+        notAttachable:
+        jmp     SKIP_CAutomobile__GetTowBarPos_TugAttachWhitelist
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The tug's dummy is exported as misc_b, not misc_a like every other model on this branch, so the
+// unconditional misc_a read above finds nothing; fall back to misc_b only when misc_a is absent.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6AF2CC | 8B 81 98 06 00 00 | mov     eax, dword ptr [ecx + 0x698]
+//     0x6AF2D2 | 85 C0             | test    eax, eax
+#define HOOKPOS_CAutomobile__GetTowBarPos_TugDummy  0x6AF2CC
+#define HOOKSIZE_CAutomobile__GetTowBarPos_TugDummy 6
+static const DWORD CONTINUE_CAutomobile__GetTowBarPos_TugDummy = 0x6AF2D2;
+
+static RwFrame* __fastcall GetAutomobileTowBarFrame(CAutomobileSAInterface* vehicle)
+{
+    RwFrame* misc_a = vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::MISC_A)];
+    return misc_a ? misc_a : vehicle->m_aCarNodes[static_cast<std::size_t>(eCarNodes::MISC_B)];
+}
+
+static void __declspec(naked) HOOK_CAutomobile__GetTowBarPos_TugDummy()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        call    GetAutomobileTowBarFrame    // ecx=vehicle, returns frame in eax
+        jmp     CONTINUE_CAutomobile__GetTowBarPos_TugDummy
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CTrailer::GetTowBarPos only answers with a bounding box guess unless the model is a baggage box,
+// so the artict3's own misc_b dummy at its tail never gets read and a second trailer can't attach.
+// Read that dummy's position directly and answer true for the artict3 and its clones.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6CFD60 | 8A 44 24 08 | mov     al, byte ptr [esp + 8]
+// >>> 0x6CFD64 | 83 EC 0C    | sub     esp, 0xC
+//     0x6CFD67 | 84 C0       | test    al, al
+#define HOOKPOS_CTrailer__GetTowBarPos  0x6CFD60
+#define HOOKSIZE_CTrailer__GetTowBarPos 7
+static const DWORD CONTINUE_CTrailer__GetTowBarPos = 0x6CFD67;
+
+static bool __fastcall TryGetArtict3FifthWheelPos(CVehicleSAInterface* trailer, CVector* outPos)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(trailer->m_nModelIndex);
+    bool                isArtict3 = modelId == static_cast<std::uint32_t>(VehicleType::VT_ARTICT3);
+    if (!isArtict3)
+    {
+        CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+        isArtict3 = modelInfo && modelInfo->GetParentID() == static_cast<unsigned int>(VehicleType::VT_ARTICT3);
+    }
+    if (!isArtict3)
+        return false;
+
+    RwFrame* fifthWheel = reinterpret_cast<CAutomobileSAInterface*>(trailer)->m_aCarNodes[static_cast<std::size_t>(eCarNodes::MISC_B)];
+    if (!fifthWheel)
+        return false;
+
+    const RwMatrix* worldTransform = ((RwMatrix * (__cdecl*)(RwFrame*))0x7F0990)(fifthWheel);  // RwFrameGetLTM
+    outPos->fX = worldTransform->pos.x;
+    outPos->fY = worldTransform->pos.y;
+    outPos->fZ = worldTransform->pos.z;
+    return true;
+}
+
+static void __declspec(naked) HOOK_CTrailer__GetTowBarPos()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    ecx                          // trailer (this)
+        mov     edx, [esp + 8]                // &posnOut
+        call    TryGetArtict3FifthWheelPos    // al = result
+        pop     ecx
+        test    al, al
+        jz      notArtict3
+
+        retn    0x0C
+
+        notArtict3:
+        mov     al, byte ptr [esp + 8]
+        sub     esp, 0x0C
+        jmp     CONTINUE_CTrailer__GetTowBarPos
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// PreRender, ProcessControl, UpdateTrailerLink and UpdateTractorLink each gate the tow truck's hook
+// and tow line on model index, so a clone matches none of them. The tractor reaches the exact same
+// TowTruckControl and tow line checks, so ProcessControl and UpdateTrailerLink test both in one
+// patched span; PreRender's swing and UpdateTractorLink's offset calc diverge and get their own.
+//////////////////////////////////////////////////////////////////////////////////////////
+static bool __fastcall IsTowTruckOrClone(CVehicleSAInterface* vehicle)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
+    if (modelId == static_cast<std::uint32_t>(VehicleType::VT_TOWTRUCK))
+        return true;
+
+    CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+    return modelInfo && modelInfo->GetParentID() == static_cast<unsigned int>(VehicleType::VT_TOWTRUCK);
+}
+
+static bool __fastcall IsTractorOrClone(CVehicleSAInterface* vehicle)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
+    if (modelId == static_cast<std::uint32_t>(VehicleType::VT_TRACTOR))
+        return true;
+
+    CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+    return modelInfo && modelInfo->GetParentID() == static_cast<unsigned int>(VehicleType::VT_TRACTOR);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::PreRender, swinging the misc_a component out
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6AC507 | 66 3D 0D 02          | cmp     ax, 0x20D
+// >>> 0x6AC50B | 0F 85 C8 01 00 00    | jne     0x6AC6D9
+//     0x6AC511 | 0F B7 8E 6C 08 00 00 | movzx   ecx, word ptr [esi + 0x86C]
+#define HOOKPOS_CAutomobile__PreRender_TowTruckHook  0x6AC507
+#define HOOKSIZE_CAutomobile__PreRender_TowTruckHook 10
+static const DWORD CONTINUE_CAutomobile__PreRender_TowTruckHook = 0x6AC511;
+static const DWORD SKIP_CAutomobile__PreRender_TowTruckHook = 0x6AC6D9;
+
+static void __declspec(naked) HOOK_CAutomobile__PreRender_TowTruckHook()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    eax
+        mov     ecx, esi
+        call    IsTowTruckOrClone
+        test    al, al
+        pop     eax
+        jz      notTowTruck
+
+        jmp     CONTINUE_CAutomobile__PreRender_TowTruckHook
+
+        notTowTruck:
+        jmp     SKIP_CAutomobile__PreRender_TowTruckHook
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::PreRender again, the tractor's swing; it lands on a different, shorter
+// continuation than the tow truck's, so it needs a branch of its own instead of sharing one.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6AC6D9 | 66 3D 13 02 | cmp     ax, 0x213
+// >>> 0x6AC6DD | 75 3D       | jne     0x6AC71C
+//     0x6AC6DF | 0F B7 8E 6C 08 00 00 | movzx   ecx, word ptr [esi + 0x86C]
+#define HOOKPOS_CAutomobile__PreRender_TractorHook  0x6AC6D9
+#define HOOKSIZE_CAutomobile__PreRender_TractorHook 6
+static const DWORD CONTINUE_CAutomobile__PreRender_TractorHook = 0x6AC6DF;
+static const DWORD SKIP_CAutomobile__PreRender_TractorHook = 0x6AC71C;
+
+static void __declspec(naked) HOOK_CAutomobile__PreRender_TractorHook()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    eax
+        mov     ecx, esi
+        call    IsTractorOrClone
+        test    al, al
+        pop     eax
+        jz      notTractor
+
+        jmp     CONTINUE_CAutomobile__PreRender_TractorHook
+
+        notTractor:
+        jmp     SKIP_CAutomobile__PreRender_TractorHook
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::ProcessControl, the switch that reaches TowTruckControl; the tow truck's and
+// tractor's compares sit back to back and reach the same call, so one span covers both.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6B1FB3 | 66 3D 0D 02 | cmp     ax, 0x20D
+// >>> 0x6B1FB7 | 74 4D       | je      0x6B2006
+// >>> 0x6B1FB9 | 66 3D 13 02 | cmp     ax, 0x213
+// >>> 0x6B1FBD | 74 47       | je      0x6B2006
+//     0x6B1FBF | F7 86 8C 03 00 00 00 00 02 00 | test    dword ptr [esi + 0x38C], 0x20000
+#define HOOKPOS_CAutomobile__ProcessControl_TowTruckDispatch  0x6B1FB3
+#define HOOKSIZE_CAutomobile__ProcessControl_TowTruckDispatch 12
+static const DWORD CONTINUE_CAutomobile__ProcessControl_TowTruckDispatch = 0x6B2006;
+static const DWORD SKIP_CAutomobile__ProcessControl_TowTruckDispatch = 0x6B1FBF;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_TowTruckDispatch()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     ecx, esi
+        call    IsTowTruckOrClone
+        test    al, al
+        jnz     isMatch
+
+        mov     ecx, esi
+        call    IsTractorOrClone
+        test    al, al
+        jz      notMatch
+
+        isMatch:
+        jmp     CONTINUE_CAutomobile__ProcessControl_TowTruckDispatch
+
+        notMatch:
+        jmp     SKIP_CAutomobile__ProcessControl_TowTruckDispatch
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CVehicle::UpdateTrailerLink; same back to back compares as ProcessControl above.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6DFDB6 | 66 3D 0D 02 | cmp     ax, 0x20D
+// >>> 0x6DFDBA | 74 06       | je      0x6DFDC2
+// >>> 0x6DFDBC | 66 3D 13 02 | cmp     ax, 0x213
+// >>> 0x6DFDC0 | 75 19       | jne     0x6DFDDB
+//     0x6DFDC2 | 0F B7 0D 3C 31 8D 00 | movzx   ecx, word ptr [0x8D313C]
+#define HOOKPOS_CVehicle__UpdateTrailerLink_TowTruck  0x6DFDB6
+#define HOOKSIZE_CVehicle__UpdateTrailerLink_TowTruck 12
+static const DWORD CONTINUE_CVehicle__UpdateTrailerLink_TowTruck = 0x6DFDC2;
+static const DWORD SKIP_CVehicle__UpdateTrailerLink_TowTruck = 0x6DFDDB;
+
+static void __declspec(naked) HOOK_CVehicle__UpdateTrailerLink_TowTruck()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     ecx, ebx
+        call    IsTowTruckOrClone
+        test    al, al
+        jnz     isMatch
+
+        mov     ecx, ebx
+        call    IsTractorOrClone
+        test    al, al
+        jz      notMatch
+
+        isMatch:
+        jmp     CONTINUE_CVehicle__UpdateTrailerLink_TowTruck
+
+        notMatch:
+        jmp     SKIP_CVehicle__UpdateTrailerLink_TowTruck
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CVehicle::UpdateTractorLink; the compare feeds a jz several FPU instructions later, so this
+// restores ax to the real stock id instead of redirecting, the original compares take it from there.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6E00D0 | 66 8B 46 22 | mov     ax, word ptr [esi + 0x22]
+// >>> 0x6E00D4 | 66 3D 0D 02 | cmp     ax, 0x20D
+//     0x6E00D8 | D8 64 24 10 | fsub    dword ptr [esp + 0x10]
+#define HOOKPOS_CVehicle__UpdateTractorLink_TowTruck  0x6E00D0
+#define HOOKSIZE_CVehicle__UpdateTractorLink_TowTruck 8
+static const DWORD CONTINUE_CVehicle__UpdateTractorLink_TowTruck = 0x6E00D8;
+
+static void __declspec(naked) HOOK_CVehicle__UpdateTractorLink_TowTruck()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     ecx, esi
+        call    IsTowTruckOrClone
+        test    al, al
+        jnz     isTowTruck
+
+        mov     ecx, esi
+        call    IsTractorOrClone
+        test    al, al
+        jnz     isTractor
+
+        mov     ax, word ptr [esi + 0x22]
+        jmp     doCompare
+
+        isTowTruck:
+        mov     ax, 0x20D
+        jmp     doCompare
+
+        isTractor:
+        mov     ax, 0x213
+
+        doCompare:
+        cmp     ax, 0x20D
+        jmp     CONTINUE_CVehicle__UpdateTractorLink_TowTruck
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::CAutomobile, registering the hook's misc_b (tow truck) or CAR_BOOT (tractor) as a
+// bouncing panel; that's what gives it physics driven sway instead of sitting rigid, and it only
+// ever runs once, at construction, gated the same raw way.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6B0EE2 | 66 8B 46 22 | mov     ax, word ptr [esi + 0x22]
+// >>> 0x6B0EE6 | 66 3D 0D 02 | cmp     ax, 0x20D
+//     0x6B0EEA | 75 23       | jne     0x6B0F0F
+#define HOOKPOS_CAutomobile__Constructor_TowTruckBouncingPanel  0x6B0EE2
+#define HOOKSIZE_CAutomobile__Constructor_TowTruckBouncingPanel 8
+static const DWORD CONTINUE_CAutomobile__Constructor_TowTruckBouncingPanel = 0x6B0EEA;
+
+static void __declspec(naked) HOOK_CAutomobile__Constructor_TowTruckBouncingPanel()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     ecx, esi
+        call    IsTowTruckOrClone
+        test    al, al
+        jnz     isTowTruck
+
+        mov     ecx, esi
+        call    IsTractorOrClone
+        test    al, al
+        jnz     isTractor
+
+        mov     ax, word ptr [esi + 0x22]
+        jmp     doCompare
+
+        isTowTruck:
+        mov     ax, 0x20D
+        jmp     doCompare
+
+        isTractor:
+        mov     ax, 0x213
+
+        doCompare:
+        cmp     ax, 0x20D
+        jmp     CONTINUE_CAutomobile__Constructor_TowTruckBouncingPanel
     }
     // clang-format on
 }
@@ -3704,6 +4198,555 @@ static void __declspec(naked) HOOK_CPlane__PreRender_AndromRampBlock()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// The Forklift's forks on custom vehicle models
+//
+// ProcessControl decides whether the forks move and whether the force calc reaches them,
+// UpdateMovingCollision picks their rotation formula, and PreRender does the swing; all four gate on
+// model index alone. Picking a ped or object up on the forks is a separate mechanic, not covered.
+//////////////////////////////////////////////////////////////////////////////////////////
+static bool __fastcall IsForkliftOrClone(CVehicleSAInterface* vehicle)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
+    if (modelId == static_cast<std::uint32_t>(VehicleType::VT_FORKLIFT))
+        return true;
+
+    CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+    return modelInfo && modelInfo->GetParentID() == static_cast<unsigned int>(VehicleType::VT_FORKLIFT);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::ProcessControl, resetting the forks' previous angle for this tick
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A14AD | 66 81 F9 12 02 | cmp     cx, 0x212
+// >>> 0x6A14B2 | 75 0E          | jne     0x6A14C2
+//     0x6A14B4 | 66 8B 87 6C 08 00 00 | mov ax, word ptr [edi + 0x86C]
+#define HOOKPOS_CAutomobile__ProcessControl_ForkliftAngleReset  0x6A14AD
+#define HOOKSIZE_CAutomobile__ProcessControl_ForkliftAngleReset 7
+static const DWORD CONTINUE_CAutomobile__ProcessControl_ForkliftAngleReset = 0x6A14B4;
+static const DWORD SKIP_CAutomobile__ProcessControl_ForkliftAngleReset = 0x6A14C2;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_ForkliftAngleReset()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    ecx
+        mov     ecx, edi
+        call    IsForkliftOrClone
+        test    al, al
+        pop     ecx
+        jz      notForklift
+
+        jmp     CONTINUE_CAutomobile__ProcessControl_ForkliftAngleReset
+
+        notForklift:
+        jmp     SKIP_CAutomobile__ProcessControl_ForkliftAngleReset
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::ProcessControl, letting the forks into the block that moves them this tick
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A1517 | 66 81 F9 12 02 | cmp     cx, 0x212
+// >>> 0x6A151C | 74 3E          | je      0x6A155C
+//     0x6A151E | E9 88 09 00 00 | jmp     0x6A1EAB
+#define HOOKPOS_CAutomobile__ProcessControl_ForkliftMiscGate  0x6A1517
+#define HOOKSIZE_CAutomobile__ProcessControl_ForkliftMiscGate 7
+static const DWORD CONTINUE_CAutomobile__ProcessControl_ForkliftMiscGate = 0x6A155C;
+static const DWORD SKIP_CAutomobile__ProcessControl_ForkliftMiscGate = 0x6A151E;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_ForkliftMiscGate()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // the skip target is a bare function epilogue, and the continue target reloads its own
+        // model id from edi fresh, so neither reads ecx from before the call
+        mov     ecx, edi
+        call    IsForkliftOrClone
+        test    al, al
+        jz      notForklift
+
+        jmp     CONTINUE_CAutomobile__ProcessControl_ForkliftMiscGate
+
+        notForklift:
+        jmp     SKIP_CAutomobile__ProcessControl_ForkliftMiscGate
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The force the forks apply to whatever they push, part one: picks the rotation matrix
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A1648 | 66 81 7F 22 12 02    | cmp     word ptr [edi + 0x22], 0x212
+// >>> 0x6A164E | A1 08 10 87 00       | mov     eax, dword ptr [0x871008]
+// >>> 0x6A1653 | 8B 5C 24 14          | mov     ebx, dword ptr [esp + 0x14]
+// >>> 0x6A1657 | 89 44 24 1C          | mov     dword ptr [esp + 0x1C], eax
+// >>> 0x6A165B | 75 34                | jne     0x6A1691
+#define HOOKPOS_CAutomobile__MovingCollisionSpeed_ForkliftA  0x6A1648
+#define HOOKSIZE_CAutomobile__MovingCollisionSpeed_ForkliftA 21
+static const DWORD CONTINUE_CAutomobile__MovingCollisionSpeed_ForkliftA = 0x6A165D;
+static const DWORD SKIP_CAutomobile__MovingCollisionSpeed_ForkliftA = 0x6A1691;
+
+static void __declspec(naked) HOOK_CAutomobile__MovingCollisionSpeed_ForkliftA()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // These three moves run for every model reaching this point, not only a matched one; eax's
+        // own value is already committed to memory by the time the call below could touch it.
+        mov     eax, dword ptr [0x871008]
+        mov     ebx, dword ptr [esp + 0x14]
+        mov     dword ptr [esp + 0x1C], eax
+
+        mov     ecx, edi
+        call    IsForkliftOrClone
+        test    al, al
+        jz      notForklift
+
+        jmp     CONTINUE_CAutomobile__MovingCollisionSpeed_ForkliftA
+
+        notForklift:
+        jmp     SKIP_CAutomobile__MovingCollisionSpeed_ForkliftA
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The force the forks apply to whatever they push, part two
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A186D | 66 3D 12 02 | cmp     ax, 0x212
+// >>> 0x6A1871 | 75 5F       | jne     0x6A18D2
+//     0x6A1873 | 39 9F 98 06 00 00 | cmp dword ptr [edi + 0x698], ebx
+#define HOOKPOS_CAutomobile__MovingCollisionSpeed_ForkliftB  0x6A186D
+#define HOOKSIZE_CAutomobile__MovingCollisionSpeed_ForkliftB 6
+static const DWORD CONTINUE_CAutomobile__MovingCollisionSpeed_ForkliftB = 0x6A1873;
+static const DWORD SKIP_CAutomobile__MovingCollisionSpeed_ForkliftB = 0x6A18D2;
+
+static void __declspec(naked) HOOK_CAutomobile__MovingCollisionSpeed_ForkliftB()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // ecx is read again as a call argument further down, past CONTINUE
+        push    ecx
+        mov     ecx, edi
+        call    IsForkliftOrClone
+        test    al, al
+        pop     ecx
+        jz      notForklift
+
+        jmp     CONTINUE_CAutomobile__MovingCollisionSpeed_ForkliftB
+
+        notForklift:
+        jmp     SKIP_CAutomobile__MovingCollisionSpeed_ForkliftB
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The force the forks apply to whatever they push, part three: the SetTranslate branch
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A2002 | 66 3D 12 02 | cmp     cx, 0x212
+// >>> 0x6A2007 | 75 4B       | jne     0x6A2054
+//     0x6A2009 | DD D8       | fstp    st(0)
+#define HOOKPOS_CAutomobile__MovingCollisionSpeed_ForkliftC  0x6A2002
+#define HOOKSIZE_CAutomobile__MovingCollisionSpeed_ForkliftC 7
+static const DWORD CONTINUE_CAutomobile__MovingCollisionSpeed_ForkliftC = 0x6A2009;
+static const DWORD SKIP_CAutomobile__MovingCollisionSpeed_ForkliftC = 0x6A2054;
+
+static void __declspec(naked) HOOK_CAutomobile__MovingCollisionSpeed_ForkliftC()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // esi is callee-saved; nothing past here reads eax/ecx/edx from before the call
+        mov     ecx, esi
+        call    IsForkliftOrClone
+        test    al, al
+        jz      notForklift
+
+        jmp     CONTINUE_CAutomobile__MovingCollisionSpeed_ForkliftC
+
+        notForklift:
+        jmp     SKIP_CAutomobile__MovingCollisionSpeed_ForkliftC
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::GetMovingCollisionOffset, the forks' case in the model switch; the last case in the
+// switch, so unlike its neighbours the fallthrough never re-checks ax against another model.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6A21EC | 66 3D 12 02 | cmp     ax, 0x212
+// >>> 0x6A21F0 | 75 14       | jne     0x6A2206
+//     0x6A21F2 | 0F B7 CA    | movzx   ecx, dx
+#define HOOKPOS_CAutomobile__GetMovingCollisionOffset_Forklift  0x6A21EC
+#define HOOKSIZE_CAutomobile__GetMovingCollisionOffset_Forklift 6
+static const DWORD CONTINUE_CAutomobile__GetMovingCollisionOffset_Forklift = 0x6A21F2;
+static const DWORD SKIP_CAutomobile__GetMovingCollisionOffset_Forklift = 0x6A2206;
+
+static void __declspec(naked) HOOK_CAutomobile__GetMovingCollisionOffset_Forklift()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // ecx is the vehicle (already the call arg) and gets overwritten either way past here; dx
+        // is read again on the matched path, so only that needs saving
+        push    edx
+        call    IsForkliftOrClone
+        test    al, al
+        pop     edx
+        jz      notForklift
+
+        jmp     CONTINUE_CAutomobile__GetMovingCollisionOffset_Forklift
+
+        notForklift:
+        jmp     SKIP_CAutomobile__GetMovingCollisionOffset_Forklift
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::PreRender, raising the forks
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6AC71C | 66 3D 12 02       | cmp     ax, 0x212
+// >>> 0x6AC720 | 0F 85 85 00 00 00 | jne     0x6AC7AB
+//     0x6AC726 | 8B 8E 98 06 00 00 | mov     ecx, dword ptr [esi + 0x698]
+#define HOOKPOS_CAutomobile__PreRender_ForkliftRaise  0x6AC71C
+#define HOOKSIZE_CAutomobile__PreRender_ForkliftRaise 10
+static const DWORD CONTINUE_CAutomobile__PreRender_ForkliftRaise = 0x6AC726;
+static const DWORD SKIP_CAutomobile__PreRender_ForkliftRaise = 0x6AC7AB;
+
+static void __declspec(naked) HOOK_CAutomobile__PreRender_ForkliftRaise()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push    eax
+        mov     ecx, esi
+        call    IsForkliftOrClone
+        test    al, al
+        pop     eax
+        jz      notForklift
+
+        jmp     CONTINUE_CAutomobile__PreRender_ForkliftRaise
+
+        notForklift:
+        jmp     SKIP_CAutomobile__PreRender_ForkliftRaise
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// CAutomobile::ProcessControl, the model switch that reaches UpdateMovingCollision at all
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6B1FAD | 66 3D 12 02 | cmp     ax, 0x212
+// >>> 0x6B1FB1 | 74 5C       | je      0x6B200F
+//     0x6B1FB3 | 66 3D 0D 02 | cmp     ax, 0x20D
+#define HOOKPOS_CAutomobile__ProcessControl_ForkliftDispatch  0x6B1FAD
+#define HOOKSIZE_CAutomobile__ProcessControl_ForkliftDispatch 6
+static const DWORD CONTINUE_CAutomobile__ProcessControl_ForkliftDispatch = 0x6B200F;
+static const DWORD SKIP_CAutomobile__ProcessControl_ForkliftDispatch = 0x6B1FB3;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_ForkliftDispatch()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // the continue target reloads ecx fresh, and the skip target lands right in the tow truck
+        // dispatch hook above, which reloads ecx fresh too and never reads ax; neither needs
+        // eax/ecx preserved across the call
+        mov     ecx, esi
+        call    IsForkliftOrClone
+        test    al, al
+        jz      notForklift
+
+        jmp     CONTINUE_CAutomobile__ProcessControl_ForkliftDispatch
+
+        notForklift:
+        jmp     SKIP_CAutomobile__ProcessControl_ForkliftDispatch
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// A picked up object tracking the forks, not just the Forklift's own body
+//
+// CPhysical::PositionAttachedEntity and CPhysical::AttachEntityToEntity both special case an
+// attached object's matrix through the misc_a dummy when the vehicle holding it is the Forklift, so
+// whatever it picked up rides the forks instead of hovering at a fixed spot on the chassis. Both
+// gate on the raw model index, so a clone matches neither and drops back to the generic behaviour.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x5470BF | 66 81 79 22 12 02 | cmp     word ptr [ecx + 0x22], 0x212
+// >>> 0x5470C5 | 75 20             | jne     0x5470E7
+//     0x5470C7 | 8B 89 98 06 00 00 | mov     ecx, dword ptr [ecx + 0x698]
+#define HOOKPOS_CPhysical__PositionAttachedEntity_ForkliftMatrix  0x5470BF
+#define HOOKSIZE_CPhysical__PositionAttachedEntity_ForkliftMatrix 8
+static const DWORD CONTINUE_CPhysical__PositionAttachedEntity_ForkliftMatrix = 0x5470C7;
+static const DWORD SKIP_CPhysical__PositionAttachedEntity_ForkliftMatrix = 0x5470E7;
+
+static void __declspec(naked) HOOK_CPhysical__PositionAttachedEntity_ForkliftMatrix()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // ecx is already the attached-to vehicle (the call arg) and is read again on the matched path
+        push    ecx
+        call    IsForkliftOrClone
+        test    al, al
+        pop     ecx
+        jz      notForklift
+
+        jmp     CONTINUE_CPhysical__PositionAttachedEntity_ForkliftMatrix
+
+        notForklift:
+        jmp     SKIP_CPhysical__PositionAttachedEntity_ForkliftMatrix
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Same special case, on the moment something first gets attached rather than every following frame
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x54D70D | 66 81 7F 22 12 02 | cmp     word ptr [edi + 0x22], 0x212
+// >>> 0x54D713 | 75 1D             | jne     0x54D732
+//     0x54D715 | 8B 87 98 06 00 00 | mov     eax, dword ptr [edi + 0x698]
+#define HOOKPOS_CPhysical__AttachEntityToEntity_ForkliftMatrix  0x54D70D
+#define HOOKSIZE_CPhysical__AttachEntityToEntity_ForkliftMatrix 8
+static const DWORD CONTINUE_CPhysical__AttachEntityToEntity_ForkliftMatrix = 0x54D715;
+static const DWORD SKIP_CPhysical__AttachEntityToEntity_ForkliftMatrix = 0x54D732;
+
+static void __declspec(naked) HOOK_CPhysical__AttachEntityToEntity_ForkliftMatrix()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // edi is callee-saved; nothing past here reads eax/ecx/edx from before the call
+        mov     ecx, edi
+        call    IsForkliftOrClone
+        test    al, al
+        jz      notForklift
+
+        jmp     CONTINUE_CPhysical__AttachEntityToEntity_ForkliftMatrix
+
+        notForklift:
+        jmp     SKIP_CPhysical__AttachEntityToEntity_ForkliftMatrix
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Exempting the Forklift from the steep angle auto detach every other vehicle gets
+//
+// PositionAttachedEntity drops an attached object the moment the vehicle carrying it tips past 45
+// degrees, so a trailer or object doesn't ride along a rollover. The Forklift is the one exception,
+// since tilting the forks themselves is normal, not a crash; a clone missed the exemption and an
+// object would fall off its forks on any real incline.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x54743A | 66 81 F9 12 02 | cmp     cx, 0x212
+// >>> 0x54743F | 74 56          | je      0x547497
+//     0x547441 | 3C 02          | cmp     al, 2
+#define HOOKPOS_CPhysical__PositionAttachedEntity_ForkliftAngleExempt  0x54743A
+#define HOOKSIZE_CPhysical__PositionAttachedEntity_ForkliftAngleExempt 7
+static const DWORD CONTINUE_CPhysical__PositionAttachedEntity_ForkliftAngleExempt = 0x547497;
+static const DWORD SKIP_CPhysical__PositionAttachedEntity_ForkliftAngleExempt = 0x547441;
+
+static void __declspec(naked) HOOK_CPhysical__PositionAttachedEntity_ForkliftAngleExempt()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // al carries the attached entity's own type past the skip target; ecx carries the
+        // attached-to model index into a further compare past the continue target
+        push    eax
+        push    ecx
+        mov     ecx, edi
+        call    IsForkliftOrClone
+        test    al, al
+        pop     ecx
+        pop     eax
+        jz      notForklift
+
+        jmp     CONTINUE_CPhysical__PositionAttachedEntity_ForkliftAngleExempt
+
+        notForklift:
+        jmp     SKIP_CPhysical__PositionAttachedEntity_ForkliftAngleExempt
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Letting go of whatever the Forklift is carrying once the forks come back down
+//
+// The Forklift drops an attached object when the forks return to level after being raised, or on
+// a hard enough hit against a building, the same way lowering the forks releases cargo. A clone
+// never took this branch, so nothing it picked up ever let go on its own.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x5474E4 | 66 81 F9 12 02 | cmp     cx, 0x212
+// >>> 0x5474E9 | 75 4C          | jne     0x547537
+//     0x5474EB | 66 39 AF 6C 08 00 00 | cmp word ptr [edi + 0x86C], bp
+#define HOOKPOS_CPhysical__PositionAttachedEntity_ForkliftRelease  0x5474E4
+#define HOOKSIZE_CPhysical__PositionAttachedEntity_ForkliftRelease 7
+static const DWORD CONTINUE_CPhysical__PositionAttachedEntity_ForkliftRelease = 0x5474EB;
+static const DWORD SKIP_CPhysical__PositionAttachedEntity_ForkliftRelease = 0x547537;
+
+static void __declspec(naked) HOOK_CPhysical__PositionAttachedEntity_ForkliftRelease()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // edi is callee-saved; neither target reads eax/ecx/edx from before the call
+        mov     ecx, edi
+        call    IsForkliftOrClone
+        test    al, al
+        jz      notForklift
+
+        jmp     CONTINUE_CPhysical__PositionAttachedEntity_ForkliftRelease
+
+        notForklift:
+        jmp     SKIP_CPhysical__PositionAttachedEntity_ForkliftRelease
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Letting the Forklift pick up a loose object instead of just running it over
+//
+// CObject::ProcessControl only offers the auto attach that turns a hard hit into a pickup when the
+// thing that hit it is the Dumper or the Forklift, so a clone just applies ordinary collision
+// damage and breaks whatever it pushes into instead of carrying it.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x5A21D4 | 66 81 F9 12 02       | cmp     cx, 0x212
+// >>> 0x5A21D9 | 0F 85 28 01 00 00    | jne     0x5A2307
+//     0x5A21DF | 66 83 B8 6C 08 00 00 00 | cmp  word ptr [eax + 0x86C], 0
+#define HOOKPOS_CObject__ProcessControl_ForkliftCanCarry  0x5A21D4
+#define HOOKSIZE_CObject__ProcessControl_ForkliftCanCarry 11
+static const DWORD CONTINUE_CObject__ProcessControl_ForkliftCanCarry = 0x5A21DF;
+static const DWORD SKIP_CObject__ProcessControl_ForkliftCanCarry = 0x5A2307;
+
+static void __declspec(naked) HOOK_CObject__ProcessControl_ForkliftCanCarry()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // eax is the damaging vehicle (already the call arg) and is read again past the continue
+        push    eax
+        mov     ecx, eax
+        call    IsForkliftOrClone
+        test    al, al
+        pop     eax
+        jz      notForklift
+
+        jmp     CONTINUE_CObject__ProcessControl_ForkliftCanCarry
+
+        notForklift:
+        jmp     SKIP_CObject__ProcessControl_ForkliftCanCarry
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// The Forklift doesn't damage what it's carrying, so it shouldn't damage what it's about to
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x5A0EBF | 66 81 7F 22 12 02 | cmp     word ptr [edi + 0x22], 0x212
+// >>> 0x5A0EC5 | 0F 84 76 03 00 00 | je      0x5A1241
+//     0x5A0ECB | 8B 8E 60 01 00 00 | mov     ecx, dword ptr [esi + 0x160]
+#define HOOKPOS_CObject__ObjectDamage_ForkliftImmune  0x5A0EBF
+#define HOOKSIZE_CObject__ObjectDamage_ForkliftImmune 12
+static const DWORD CONTINUE_CObject__ObjectDamage_ForkliftImmune = 0x5A1241;
+static const DWORD SKIP_CObject__ObjectDamage_ForkliftImmune = 0x5A0ECB;
+
+static void __declspec(naked) HOOK_CObject__ObjectDamage_ForkliftImmune()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // edi is callee-saved; the return target is a plain epilogue, and the fallthrough overwrites
+        // ecx fresh, so neither reads eax/ecx/edx from before the call
+        mov     ecx, edi
+        call    IsForkliftOrClone
+        test    al, al
+        jz      notForklift
+
+        jmp     CONTINUE_CObject__ObjectDamage_ForkliftImmune
+
+        notForklift:
+        jmp     SKIP_CObject__ObjectDamage_ForkliftImmune
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+// Letting the forks pass through a carried object instead of colliding with it
+//
+// With the forks level and nothing raised this or last tick, CAutomobile::ProcessEntityCollision
+// drops any collision point tagged as the moving component surface, so the forks that just set
+// something down don't immediately shove it. A clone never took this branch.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x6AD378 | 66 81 7E 22 12 02 | cmp     word ptr [esi + 0x22], 0x212
+// >>> 0x6AD37E | 8B 44 24 18       | mov     eax, dword ptr [esp + 0x18]
+// >>> 0x6AD382 | 0F 85 A7 00 00 00 | jne     0x6AD42F
+//     0x6AD388 | 85 C0             | test    eax, eax
+#define HOOKPOS_CAutomobile__ProcessEntityCollision_ForkliftColPointDrop  0x6AD378
+#define HOOKSIZE_CAutomobile__ProcessEntityCollision_ForkliftColPointDrop 16
+static const DWORD CONTINUE_CAutomobile__ProcessEntityCollision_ForkliftColPointDrop = 0x6AD388;
+static const DWORD SKIP_CAutomobile__ProcessEntityCollision_ForkliftColPointDrop = 0x6AD42F;
+
+static void __declspec(naked) HOOK_CAutomobile__ProcessEntityCollision_ForkliftColPointDrop()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // esi is callee-saved; the eax load is unconditional in the original code either way, so
+        // it's replayed after the call instead of needing to survive it
+        mov     ecx, esi
+        call    IsForkliftOrClone
+        test    al, al
+        jz      notForklift
+
+        mov     eax, dword ptr [esp + 0x18]
+        jmp     CONTINUE_CAutomobile__ProcessEntityCollision_ForkliftColPointDrop
+
+        notForklift:
+        mov     eax, dword ptr [esp + 0x18]
+        jmp     SKIP_CAutomobile__ProcessEntityCollision_ForkliftColPointDrop
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_Vehicles
 //
@@ -3713,6 +4756,23 @@ static void __declspec(naked) HOOK_CPlane__PreRender_AndromRampBlock()
 void CMultiplayerSA::InitHooks_Vehicles()
 {
     EZHookInstall(CDamageManager__ProgressDoorDamage);
+    EZHookInstall(CAutomobile__ProcessControl_ForkliftAngleReset);
+    EZHookInstall(CAutomobile__ProcessControl_ForkliftMiscGate);
+    EZHookInstall(CAutomobile__MovingCollisionSpeed_ForkliftA);
+    EZHookInstall(CAutomobile__MovingCollisionSpeed_ForkliftB);
+    EZHookInstall(CAutomobile__MovingCollisionSpeed_ForkliftC);
+    EZHookInstall(CAutomobile__GetMovingCollisionOffset_Forklift);
+    EZHookInstall(CAutomobile__PreRender_ForkliftRaise);
+    EZHookInstall(CAutomobile__ProcessControl_ForkliftDispatch);
+    EZHookInstall(CPhysical__PositionAttachedEntity_ForkliftMatrix);
+    EZHookInstall(CPhysical__AttachEntityToEntity_ForkliftMatrix);
+    EZHookInstall(CPhysical__PositionAttachedEntity_ForkliftAngleExempt);
+    EZHookInstall(CPhysical__PositionAttachedEntity_ForkliftRelease);
+    EZHookInstall(CObject__ProcessControl_ForkliftCanCarry);
+    EZHookInstall(CObject__ObjectDamage_ForkliftImmune);
+    EZHookInstall(CAutomobile__ProcessEntityCollision_ForkliftColPointDrop);
+    EZHookInstall(CBike__ProcessControl_SteerRatio);
+    EZHookInstall(CBike__ProcessControl_LeanRatio);
     EZHookInstall(CAutomobile__HydraulicControl);
     EZHookInstall(CAutomobile__ProcessControl_CementAngleReset);
     EZHookInstall(CAutomobile__ProcessControl_CementMiscGate);
@@ -3729,6 +4789,9 @@ void CMultiplayerSA::InitHooks_Vehicles()
     EZHookInstall(CAutomobile__PreRender_PopUpLights);
     EZHookInstall(CVehicle__DoVehicleLights_PopUpLights);
     EZHookInstall(CAutomobile__GetTowBarPos);
+    EZHookInstall(CAutomobile__GetTowBarPos_TugAttachWhitelist);
+    EZHookInstall(CAutomobile__GetTowBarPos_TugDummy);
+    EZHookInstall(CTrailer__GetTowBarPos);
     EZHookInstall(CAutomobile__ProcessControl_DumperDispatch);
     EZHookInstall(CAutomobile__UpdateMovingCollision_DumperAngleReset);
     EZHookInstall(CAutomobile__UpdateMovingCollision_DumperMiscGate);
@@ -3835,4 +4898,10 @@ void CMultiplayerSA::InitHooks_Vehicles()
     EZHookInstall(CAEVehicleAudioEntity__ProcessMovingParts_AndromGate);
     EZHookInstall(CAEVehicleAudioEntity__ProcessMovingParts_AndromCreakCase);
     EZHookInstall(CPlane__PreRender_AndromRampBlock);
+    EZHookInstall(CAutomobile__PreRender_TowTruckHook);
+    EZHookInstall(CAutomobile__PreRender_TractorHook);
+    EZHookInstall(CAutomobile__ProcessControl_TowTruckDispatch);
+    EZHookInstall(CVehicle__UpdateTrailerLink_TowTruck);
+    EZHookInstall(CVehicle__UpdateTractorLink_TowTruck);
+    EZHookInstall(CAutomobile__Constructor_TowTruckBouncingPanel);
 }

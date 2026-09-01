@@ -206,7 +206,8 @@ void CLuaArguments::PushArguments(const CLuaArguments& Arguments)
 bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments* returnValues) const
 {
     assert(pLuaMain);
-    TIMEUS startTime = GetTimeUs();
+    const bool   timingActive = CPerfStatLuaTiming::GetSingleton()->IsActive();
+    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine();
@@ -250,7 +251,10 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
             lua_pop(luaVM, 1);
     }
 
-    CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, pLuaMain->GetFunctionTag(iLuaFunction.ToInt()), GetTimeUs() - startTime);
+    if (timingActive)
+    {
+        CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, pLuaMain->GetFunctionTag(iLuaFunction.ToInt()), GetTimeUs() - startTime);
+    }
     return true;
 }
 
@@ -258,7 +262,8 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
 {
     assert(pLuaMain);
     assert(szFunction);
-    TIMEUS startTime = GetTimeUs();
+    const bool   timingActive = CPerfStatLuaTiming::GetSingleton()->IsActive();
+    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine();
@@ -314,7 +319,10 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
             lua_pop(luaVM, 1);
     }
 
-    CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, szFunction, GetTimeUs() - startTime);
+    if (timingActive)
+    {
+        CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, szFunction, GetTimeUs() - startTime);
+    }
     return true;
 }
 
