@@ -35,6 +35,7 @@ public:
     void GetPlayerNames(std::vector<SString>& vPlayerNames);
 
     void OnWindowFocusChange(bool state) override;
+    void OnPossibleAudioDeviceChange() override;
 
 private:
     struct InitializeArguments

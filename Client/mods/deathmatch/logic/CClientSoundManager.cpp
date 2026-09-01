@@ -70,10 +70,15 @@ CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
     {
         m_aValidatedSFX[i] = g_pGame->GetAudioContainer()->ValidateContainer(static_cast<eAudioLookupIndex>(i));
     }
+
+    OnPossibleDeviceChange();
 }
 
 CClientSoundManager::~CClientSoundManager()
 {
+    if (m_OutputDeviceScanThread.joinable())
+        m_OutputDeviceScanThread.join();
+
     ProcessStopQueues(true);
 
     // Signal stream threads to exit as soon as their blocking call returns
@@ -92,6 +97,7 @@ CClientSoundManager::~CClientSoundManager()
 void CClientSoundManager::DoPulse()
 {
     UpdateVolume();
+    CollectOutputDeviceScanResult();
 
     CClientCamera* pCamera = m_pClientManager->GetCamera();
 
@@ -344,6 +350,38 @@ std::string CClientSoundManager::GetOutputDeviceDriver()
     if (BASS_GetDeviceInfo(BASS_GetDevice(), &info) && info.driver)
         return info.driver;
     return "";
+}
+
+void CClientSoundManager::OnPossibleDeviceChange()
+{
+    if (m_bOutputDeviceScanRunning)
+        return;
+
+    if (m_OutputDeviceScanThread.joinable())
+        m_OutputDeviceScanThread.join();
+
+    m_bOutputDeviceScanRunning = true;
+    m_bOutputDeviceScanReady = false;
+
+    m_OutputDeviceScanThread = std::thread(
+        [this]()
+        {
+            m_OutputDeviceScanResult = GetAvailableOutputDevices();
+            m_bOutputDeviceScanReady.store(true, std::memory_order_release);
+        });
+}
+
+void CClientSoundManager::CollectOutputDeviceScanResult()
+{
+    if (!m_bOutputDeviceScanReady.load(std::memory_order_acquire))
+        return;
+
+    m_OutputDeviceScanThread.join();
+    m_OutputDevices = std::move(m_OutputDeviceScanResult);
+    m_OutputDeviceScanResult.clear();
+    m_bOutputDeviceScanReady = false;
+    m_bOutputDeviceScanRunning = false;
+    m_uiOutputDeviceListRevision++;
 }
 
 bool CClientSoundManager::SetOutputDevice(const std::string& strDriver)

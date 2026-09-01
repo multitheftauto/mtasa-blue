@@ -34,4 +34,5 @@ public:
     virtual void GetPlayerNames(std::vector<SString>& vPlayerNames) = 0;
 
     virtual void OnWindowFocusChange(bool state) = 0;
+    virtual void OnPossibleAudioDeviceChange() = 0;
 };

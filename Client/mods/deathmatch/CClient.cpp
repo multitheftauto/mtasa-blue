@@ -301,6 +301,11 @@ void CClient::OnWindowFocusChange(bool state)
     g_pClientGame->OnWindowFocusChange(state);
 }
 
+void CClient::OnPossibleAudioDeviceChange()
+{
+    g_pClientGame->OnPossibleAudioDeviceChange();
+}
+
 CClient::InitializeArguments CClient::ExtractInitializeArguments(const char* arguments)
 {
     // Format: "nickname [password]"

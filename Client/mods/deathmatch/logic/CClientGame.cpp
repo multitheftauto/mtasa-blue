@@ -7161,6 +7161,11 @@ void CClientGame::OnWindowFocusChange(bool state)
     m_pRootEntity->CallEvent("onClientMTAFocusChange", Arguments, false);
 }
 
+void CClientGame::OnPossibleAudioDeviceChange()
+{
+    m_pManager->GetSoundManager()->OnPossibleDeviceChange();
+}
+
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
 {
     m_mapOfIfpPointers[u32BlockNameHash] = pIFP;

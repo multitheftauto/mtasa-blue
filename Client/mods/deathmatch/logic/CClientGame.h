@@ -512,6 +512,7 @@ public:
     void ReinitMarkers();
 
     void OnWindowFocusChange(bool state);
+    void OnPossibleAudioDeviceChange();
 
     void                      SetAllowMultiCommandHandlers(MultiCommandHandlerPolicy policy) noexcept { m_allowMultiCommandHandlers = policy; }
     MultiCommandHandlerPolicy GetAllowMultiCommandHandlers() const noexcept { return m_allowMultiCommandHandlers; }

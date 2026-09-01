@@ -11,6 +11,8 @@
 #pragma once
 
 #include <list>
+#include <thread>
+#include <atomic>
 #include <bass.h>
 #include <game/CAudioContainer.h>
 #include "CClientSound.h"
@@ -56,6 +58,10 @@ public:
     std::string                   GetOutputDeviceDriver();
     bool                          SetOutputDevice(const std::string& strDriver);
 
+    void                                 OnPossibleDeviceChange();
+    const std::vector<SSoundDeviceInfo>& GetOutputDevices() const { return m_OutputDevices; }
+    unsigned int                         GetOutputDeviceListRevision() const { return m_uiOutputDeviceListRevision; }
+
     void UpdateDistanceStreaming(const CVector& vecListenerPosition);
 
     void OnDistanceStreamIn(CClientSound* pSound);
@@ -88,4 +94,13 @@ private:
     std::vector<DWORD>                  m_ChannelStopQueue;
     std::map<CBassAudio*, CElapsedTime> m_AudioStopQueue;
     CCriticalSection                    m_CS;
+
+    void CollectOutputDeviceScanResult();
+
+    std::thread                   m_OutputDeviceScanThread;
+    std::atomic<bool>             m_bOutputDeviceScanRunning{false};
+    std::atomic<bool>             m_bOutputDeviceScanReady{false};
+    std::vector<SSoundDeviceInfo> m_OutputDeviceScanResult;
+    std::vector<SSoundDeviceInfo> m_OutputDevices;
+    unsigned int                  m_uiOutputDeviceListRevision{0};
 };
