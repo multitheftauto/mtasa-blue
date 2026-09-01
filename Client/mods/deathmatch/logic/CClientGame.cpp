@@ -289,6 +289,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetPreWorldProcessHandler(CClientGame::StaticPreWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessHandler(CClientGame::StaticPostWorldProcessHandler);
     g_pMultiplayer->SetPostWorldProcessPedsAfterPreRenderHandler(CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler);
+    g_pMultiplayer->SetPreWaterRenderHandler(CClientGame::StaticPreWaterRenderHandler);
     g_pMultiplayer->SetPreFxRenderHandler(CClientGame::StaticPreFxRenderHandler);
     g_pMultiplayer->SetPostColorFilterRenderHandler(CClientGame::StaticPostColorFilterRenderHandler);
     g_pMultiplayer->SetPreHudRenderHandler(CClientGame::StaticPreHudRenderHandler);
@@ -3660,6 +3661,12 @@ void CClientGame::StaticPostWorldProcessHandler()
 void CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler()
 {
     g_pClientGame->PostWorldProcessPedsAfterPreRenderHandler();
+}
+
+void CClientGame::StaticPreWaterRenderHandler()
+{
+    // Draw underwater 3D lines and primitives before calling CWaterLevel::RenderWater
+    g_pCore->OnPreWaterRender();
 }
 
 void CClientGame::StaticPreFxRenderHandler()
