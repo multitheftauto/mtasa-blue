@@ -77,6 +77,7 @@ public:
     void                InitHooks_VehicleLights();
     void                InitHooks_VehicleDamage();
     void                InitHooks_VehicleWeapons();
+    void                InitHooks_WaterCannons();
     void                InitHooks_Direct3D();
     void                InitHooks_FixLineOfSightArgs();
     void                InitHooks_Streaming();
@@ -140,6 +141,9 @@ public:
     void SetObjectDamageHandler(ObjectDamageHandler* pHandler);
     void SetObjectBreakHandler(ObjectBreakHandler* pHandler);
     void SetWaterCannonHitHandler(WaterCannonHitHandler* pHandler);
+    void* CreateCustomWaterCannon();
+    void  DestroyCustomWaterCannon(void* pCannon);
+    void  UpdateCustomWaterCannon(void* pCannon, const CVector& vecStart, const CVector& vecVelocity);
     void SetVehicleFellThroughMapHandler(VehicleFellThroughMapHandler* pHandler);
     void SetGameObjectDestructHandler(GameObjectDestructHandler* pHandler);
     void SetGameVehicleDestructHandler(GameVehicleDestructHandler* pHandler);

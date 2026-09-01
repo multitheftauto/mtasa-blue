@@ -7758,6 +7758,17 @@ CClientWeapon* CStaticFunctionDefinitions::CreateWeapon(CResource& Resource, eWe
     return pWeapon;
 }
 
+CClientWaterCannon* CStaticFunctionDefinitions::CreateWaterCannon(CResource& Resource, const CVector& vecPosition)
+{
+    CClientWaterCannon* pCannon = m_pManager->GetWaterCannonManager()->Create(INVALID_ELEMENT_ID);
+    if (!pCannon)
+        return nullptr;
+
+    pCannon->SetPosition(vecPosition);
+    pCannon->SetParent(Resource.GetResourceDynamicEntity());
+    return pCannon;
+}
+
 bool CStaticFunctionDefinitions::FireWeapon(CClientWeapon* pWeapon)
 {
     if (pWeapon)

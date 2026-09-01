@@ -250,6 +250,13 @@ public:
     virtual void  SetObjectDamageHandler(ObjectDamageHandler* pHandler) = 0;
     virtual void  SetObjectBreakHandler(ObjectBreakHandler* pHandler) = 0;
     virtual void  SetWaterCannonHitHandler(WaterCannonHitHandler* pHandler) = 0;
+
+    // A script-owned water cannon, driven by its own list of native CWaterCannon instances kept
+    // entirely apart from the vehicle-owned ones (the Firetruck/SWAT tank's own aCannons array),
+    // so scripts spawning a lot of them can never starve a real vehicle's water cannon of a slot.
+    virtual void* CreateCustomWaterCannon() = 0;
+    virtual void  DestroyCustomWaterCannon(void* pCannon) = 0;
+    virtual void  UpdateCustomWaterCannon(void* pCannon, const CVector& vecStart, const CVector& vecVelocity) = 0;
     virtual void  SetVehicleFellThroughMapHandler(VehicleFellThroughMapHandler* pHandler) = 0;
     virtual void  SetGameObjectDestructHandler(GameObjectDestructHandler* pHandler) = 0;
     virtual void  SetGameVehicleDestructHandler(GameVehicleDestructHandler* pHandler) = 0;
