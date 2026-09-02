@@ -977,10 +977,69 @@ int CLuaDrawingDefs::OOP_DxGetFontHeight(lua_State* luaVM)
     return 1;
 }
 
+namespace
+{
+    void ReadDxCreateTextureAsyncArgs(CScriptArgReader& argStream, bool& bAsync, CLuaFunctionRef& callback, CLuaArguments& callbackArgs)
+    {
+        argStream.ReadBool(bAsync, false);
+        if (!bAsync)
+            return;
+
+        argStream.ReadFunction(callback, LUA_REFNIL);
+        if (argStream.NextIsTable())
+            argStream.ReadLuaArgumentsTable(callbackArgs);
+        argStream.ReadFunctionComplete();
+    }
+
+    CClientTexture* CreateDxTexturePlaceholder(CResource* pParentResource, ETextureAddress textureAddress)
+    {
+        // 1x1 so dxDrawImage on a not-yet-loaded texture cannot crash. Replaced in-place when the real image is ready.
+        CClientTexture* pTexture =
+            g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", nullptr, false, 1, 1, RFORMAT_ARGB, textureAddress);
+        if (pTexture)
+            pTexture->SetParent(pParentResource->GetResourceDynamicEntity());
+        return pTexture;
+    }
+
+    void CompleteAsyncDxTexture(ElementID textureId, const std::vector<char>& data, bool bMipMaps, ERenderFormat format, bool bTreatAsPixels,
+                                const CLuaFunctionRef& callback, const CLuaArguments& callbackArgs, const SString& strErrorContext)
+    {
+        CClientEntity* pEntity = CElementIDs::GetElement(textureId);
+        if (!pEntity || pEntity->GetType() != CCLIENTTEXTURE || pEntity->IsBeingDeleted())
+            return;
+
+        auto* pTexture = static_cast<CClientTexture*>(pEntity);
+        bool  bSuccess = false;
+        if (!data.empty())
+        {
+            bSuccess = g_pCore->GetGraphics()->GetRenderItemManager()->ReplaceFileTextureFromMemory(
+                pTexture->GetTextureItem(), data.data(), static_cast<uint>(data.size()), bMipMaps, format, bTreatAsPixels);
+        }
+
+        if (!bSuccess && callback.GetLuaVM())
+            CLuaDefs::m_pScriptDebugging->LogCustom(callback.GetLuaVM(), strErrorContext);
+
+        if (!VERIFY_FUNCTION(callback))
+            return;
+
+        CLuaMain* pLuaMain = CLuaDefs::m_pLuaManager->GetVirtualMachine(callback.GetLuaVM());
+        if (!pLuaMain)
+            return;
+
+        CLuaArguments arguments;
+        arguments.PushElement(pTexture);
+        arguments.PushBoolean(bSuccess);
+        arguments.PushArguments(callbackArgs);
+        arguments.Call(pLuaMain, callback);
+    }
+}  // namespace
+
 int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
 {
-    //  element dxCreateTexture( string filepath [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
-    //  element dxCreateTexture( string pixels [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
+    //  element dxCreateTexture( string filepath [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" [, bool async, function
+    //  callbackFunction, table callbackArguments ] ] )
+    //  element dxCreateTexture( string pixels [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" [, bool async, function
+    //  callbackFunction, table callbackArguments ] ] )
     //  element dxCreateTexture( int width, int height [, string textureFormat = "argb", string textureEdge = "wrap", string textureType = "2d", int depth ] )
     SString         strFilePath;
     CPixels         pixels;
@@ -991,6 +1050,9 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
     ETextureAddress textureAddress;
     ETextureType    textureType = TTYPE_TEXTURE;
     int             depth = 1;
+    bool            bAsync = false;
+    CLuaFunctionRef callback;
+    CLuaArguments   callbackArgs;
 
     CScriptArgReader argStream(luaVM);
     if (!argStream.NextIsNumber())
@@ -998,20 +1060,22 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
         argStream.ReadCharStringRef(pixels.externalData);
         if (!g_pCore->GetGraphics()->GetPixelsManager()->IsPixels(pixels))
         {
-            // element dxCreateTexture( string filepath [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
+            // element dxCreateTexture( string filepath [, ... [, bool async, function callbackFunction, table callbackArguments ] ] )
             pixels = CPixels();
             argStream = CScriptArgReader(luaVM);
             argStream.ReadString(strFilePath);
             argStream.ReadEnumString(renderFormat, RFORMAT_UNKNOWN);
             argStream.ReadBool(bMipMaps, true);
             argStream.ReadEnumString(textureAddress, TADDRESS_WRAP);
+            ReadDxCreateTextureAsyncArgs(argStream, bAsync, callback, callbackArgs);
         }
         else
         {
-            // element dxCreateTexture( string pixels [, string textureFormat = "argb", bool mipmaps = true, string textureEdge = "wrap" ] )
+            // element dxCreateTexture( string pixels [, ... [, bool async, function callbackFunction, table callbackArguments ] ] )
             argStream.ReadEnumString(renderFormat, RFORMAT_UNKNOWN);
             argStream.ReadBool(bMipMaps, true);
             argStream.ReadEnumString(textureAddress, TADDRESS_WRAP);
+            ReadDxCreateTextureAsyncArgs(argStream, bAsync, callback, callbackArgs);
         }
     }
     else
@@ -1043,6 +1107,41 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
                 {
                     if (FileExists(strPath))
                     {
+                        if (bAsync)
+                        {
+                            CClientTexture* pTexture = CreateDxTexturePlaceholder(pParentResource, textureAddress);
+                            if (!pTexture)
+                            {
+                                m_pScriptDebugging->LogCustom(
+                                    luaVM,
+                                    SString("[DxCreateTexture] Failed to create texture from file '%s' (may be corrupt, unsupported format, or out of memory)",
+                                            strFilePath.c_str()));
+                                lua_pushnil(luaVM);
+                                return 1;
+                            }
+
+                            // File IO on a worker: D3D9 is not thread-safe, so GPU upload happens later on the main thread.
+                            const ElementID textureId = pTexture->GetID();
+                            g_pClientGame->GetAsyncTaskScheduler()->PushTask(
+                                [strPath]
+                                {
+                                    std::vector<char> buffer;
+                                    if (!FileLoad(strPath, buffer) || buffer.empty())
+                                        return std::vector<char>{};
+                                    return buffer;
+                                },
+                                [textureId, bMipMaps, renderFormat, callback, callbackArgs, strFilePath](const std::vector<char>& data)
+                                {
+                                    CompleteAsyncDxTexture(textureId, data, bMipMaps, renderFormat, false, callback, callbackArgs,
+                                                           SString("[DxCreateTexture] Failed to create texture from file '%s' (may be corrupt, unsupported "
+                                                                   "format, or out of memory)",
+                                                                   strFilePath.c_str()));
+                                });
+
+                            lua_pushelement(luaVM, pTexture);
+                            return 1;
+                        }
+
                         CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture(
                             strPath, NULL, bMipMaps, RDEFAULT, RDEFAULT, renderFormat, textureAddress);
                         if (pTexture)
@@ -1072,6 +1171,32 @@ int CLuaDrawingDefs::DxCreateTexture(lua_State* luaVM)
             else if (pixels.GetSize())
             {
                 // From pixels
+                if (bAsync)
+                {
+                    CClientTexture* pTexture = CreateDxTexturePlaceholder(pParentResource, textureAddress);
+                    if (!pTexture)
+                    {
+                        m_pScriptDebugging->LogCustom(luaVM,
+                                                      "[DxCreateTexture:Pixels] Failed to create texture from pixel data (invalid format or out of memory)");
+                        lua_pushnil(luaVM);
+                        return 1;
+                    }
+
+                    // Copy now: the Lua string backing CPixels is not valid after this function returns.
+                    std::vector<char> pixelData(pixels.GetData(), pixels.GetData() + pixels.GetSize());
+                    const ElementID   textureId = pTexture->GetID();
+                    g_pClientGame->GetAsyncTaskScheduler()->PushTask(
+                        [pixelData = std::move(pixelData)]() mutable { return std::move(pixelData); },
+                        [textureId, bMipMaps, renderFormat, callback, callbackArgs](const std::vector<char>& data)
+                        {
+                            CompleteAsyncDxTexture(textureId, data, bMipMaps, renderFormat, true, callback, callbackArgs,
+                                                   "[DxCreateTexture:Pixels] Failed to create texture from pixel data (invalid format or out of memory)");
+                        });
+
+                    lua_pushelement(luaVM, pTexture);
+                    return 1;
+                }
+
                 CClientTexture* pTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateTexture("", &pixels, bMipMaps, RDEFAULT, RDEFAULT,
                                                                                                                  renderFormat, textureAddress);
                 if (pTexture)
