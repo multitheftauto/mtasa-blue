@@ -334,20 +334,12 @@ bool CClientWebBrowser::Events_OnResourcePathCheck(SString& strURL)
 
 bool CClientWebBrowser::Events_OnResourceFileCheck(const SString& strPath, CBuffer& outFileData)
 {
-    if (m_bBeingDestroyed)
+    if (m_bBeingDestroyed || !m_pResource)
         return false;
-
-    if (!m_pResource)
-    {
-        if (!FileExists(strPath))
-            return false;
-
-        return outFileData.LoadFromFile(strPath);
-    }
 
     auto pFile = g_pClientGame->GetResourceManager()->GetDownloadableResourceFile(strPath.ToLower());
 
-    // Script or user generated file not in meta.xml
+    // Allow unlisted or non-downloaded files if they belong to the owning resource
     if (pFile == nullptr)
     {
         SString localResourceDir = PathConform(m_pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, "")).Replace("\\", "/");
