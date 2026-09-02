@@ -39,7 +39,7 @@ CTransferBox::CTransferBox(TransferBoxType transferType) : m_GUI(g_pCore->GetGUI
 void CTransferBox::CreateTransferWindow()
 {
     // Find our largest piece of text, so we can size accordingly
-    std::string largeTextSample = m_titleProgressPrefix + " " + SString(_("%s of %s (Speed: %s)"), "999.99 kB", "999.99 kB", "999.99 kB");
+    std::string largeTextSample = m_titleProgressPrefix + " " + SString(_("%s of %s (%s)"), "999.99 kB", "999.99 kB", "999.99 kB");
     float       fTransferBoxWidth = m_GUI->GetTextExtent(largeTextSample.c_str(), "default-bold-small");
     fTransferBoxWidth = std::max<float>(fTransferBoxWidth, m_GUI->GetTextExtent(_("Disconnect to cancel download"), "default-normal"));
 
@@ -141,7 +141,7 @@ void CTransferBox::SetDownloadProgress(uint64_t downloadedSizeTotal)
     else
         speedStr = SString(_("%d B/s"), (int)m_smoothedSpeed);
 
-    SString progress = m_titleProgressPrefix + " " + SString(_("%s of %s (Speed: %s)"), current.c_str(), total.c_str(), speedStr.c_str());
+    SString progress = m_titleProgressPrefix + " " + SString(_("%s of %s (%s)"), current.c_str(), total.c_str(), speedStr.c_str());
     m_window->SetText(progress.c_str());
 
     if (m_downloadTotalSize > 0)
