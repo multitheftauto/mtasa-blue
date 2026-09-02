@@ -255,6 +255,8 @@ CClientVehicle::CClientVehicle(CClientManager* pManager, ElementID ID, unsigned 
     m_clientModel = pManager->GetModelManager()->FindModelByID(usModel);
 
     m_pSoundSettingsEntry = nullptr;
+
+    RefreshStreamDistance();
 }
 
 CClientVehicle::~CClientVehicle()
@@ -1152,6 +1154,8 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         // Reset stored dummy positions
         m_copyDummyPositions = true;
         m_dummyPositions = {};
+
+        RefreshStreamDistance();
 
         // Create the vehicle if we're streamed in
         if (IsStreamedIn())
