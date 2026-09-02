@@ -195,6 +195,40 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
     }
 }
 
+void CLuaArguments::PushArgumentsAsTable(lua_State* luaVM) const
+{
+    LUA_CHECKSTACK(luaVM, 4);
+
+    CFastHashMap<CLuaArguments*, int> knownTables;
+
+    lua_newtable(luaVM);
+    lua_setfield(luaVM, LUA_REGISTRYINDEX, "cache");
+
+    lua_newtable(luaVM);
+
+    const int tableId = static_cast<int>(knownTables.size()) + 1;
+
+    lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
+    lua_pushnumber(luaVM, tableId);
+    lua_pushvalue(luaVM, -3);
+    lua_settable(luaVM, -3);
+    lua_pop(luaVM, 1);
+
+    knownTables.insert(std::make_pair(const_cast<CLuaArguments*>(this), tableId));
+
+    int index = 1;
+
+    for (auto iter = m_Arguments.begin(); iter != m_Arguments.end(); ++iter)
+    {
+        (*iter)->Push(luaVM, &knownTables);
+        lua_rawseti(luaVM, -2, index++);
+    }
+
+    // Clear temporary registry cache
+    lua_pushnil(luaVM);
+    lua_setfield(luaVM, LUA_REGISTRYINDEX, "cache");
+}
+
 void CLuaArguments::PushArguments(const CLuaArguments& Arguments)
 {
     for (CLuaArgument* argument : Arguments)
