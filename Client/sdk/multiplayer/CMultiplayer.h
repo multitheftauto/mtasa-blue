@@ -123,7 +123,7 @@ typedef bool(VehicleDamageHandler)(CEntitySAInterface* pVehicle, float fLoss, CE
 typedef bool(HeliKillHandler)(class CVehicleSAInterface* pVehicle, class CEntitySAInterface* pHitInterface);
 typedef bool(ObjectDamageHandler)(class CObjectSAInterface* pObject, float fLoss, class CEntitySAInterface* pAttacker);
 typedef bool(ObjectBreakHandler)(class CObjectSAInterface* pObject, class CEntitySAInterface* pAttacker);
-typedef bool(WaterCannonHitHandler)(class CVehicleSAInterface* pCannonVehicle, class CPedSAInterface* pHitPed);
+typedef bool(WaterCannonHitHandler)(class CVehicleSAInterface* pCannonVehicle, class CPedSAInterface* pHitPed, void* pWaterCannonInterface);
 typedef bool(VehicleFellThroughMapHandler)(class CVehicleSAInterface* pVehicle);
 typedef void(GameObjectDestructHandler)(CEntitySAInterface* pObject);
 typedef void(GameVehicleDestructHandler)(CEntitySAInterface* pVehicle);

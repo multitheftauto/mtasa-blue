@@ -21,6 +21,8 @@ void CLuaWaterCannonDefs::LoadFunctions()
         {"getWaterCannonForce", ArgumentParser<GetWaterCannonForce>},
         {"setWaterCannonEnabled", ArgumentParser<SetWaterCannonEnabled>},
         {"isWaterCannonEnabled", ArgumentParser<IsWaterCannonEnabled>},
+        {"setWaterCannonKnockdownEnabled", ArgumentParser<SetWaterCannonKnockdownEnabled>},
+        {"isWaterCannonKnockdownEnabled", ArgumentParser<IsWaterCannonKnockdownEnabled>},
         {"setWaterCannonColor", ArgumentParser<SetWaterCannonColor>},
         {"getWaterCannonColor", ArgumentParser<GetWaterCannonColor>},
         {"resetWaterCannonColor", ArgumentParser<ResetWaterCannonColor>},
@@ -39,22 +41,26 @@ void CLuaWaterCannonDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setDirection", "setWaterCannonDirection");
     lua_classfunction(luaVM, "setForce", "setWaterCannonForce");
     lua_classfunction(luaVM, "setEnabled", "setWaterCannonEnabled");
+    lua_classfunction(luaVM, "setKnockdownEnabled", "setWaterCannonKnockdownEnabled");
     lua_classfunction(luaVM, "setColor", "setWaterCannonColor");
     lua_classfunction(luaVM, "resetColor", "resetWaterCannonColor");
 
     lua_classfunction(luaVM, "getDirection", "getWaterCannonDirection");
     lua_classfunction(luaVM, "getForce", "getWaterCannonForce");
     lua_classfunction(luaVM, "isEnabled", "isWaterCannonEnabled");
+    lua_classfunction(luaVM, "isKnockdownEnabled", "isWaterCannonKnockdownEnabled");
     lua_classfunction(luaVM, "getColor", "getWaterCannonColor");
 
     lua_classvariable(luaVM, "direction", "setWaterCannonDirection", "getWaterCannonDirection");
     lua_classvariable(luaVM, "force", "setWaterCannonForce", "getWaterCannonForce");
     lua_classvariable(luaVM, "enabled", "setWaterCannonEnabled", "isWaterCannonEnabled");
+    lua_classvariable(luaVM, "knockdownEnabled", "setWaterCannonKnockdownEnabled", "isWaterCannonKnockdownEnabled");
 
     lua_registerclass(luaVM, "WaterCannon", "Element");
 }
 
-std::variant<CClientWaterCannon*, bool> CLuaWaterCannonDefs::CreateWaterCannon(lua_State* luaVM, CVector vecPosition, std::optional<SColor> color)
+std::variant<CClientWaterCannon*, bool> CLuaWaterCannonDefs::CreateWaterCannon(lua_State* luaVM, CVector vecPosition, std::optional<SColor> color,
+                                                                               std::optional<bool> bKnockdownEnabled)
 {
     CResource&          resource = lua_getownerresource(luaVM);
     CClientWaterCannon* pCannon = CStaticFunctionDefinitions::CreateWaterCannon(resource, vecPosition);
@@ -63,6 +69,9 @@ std::variant<CClientWaterCannon*, bool> CLuaWaterCannonDefs::CreateWaterCannon(l
 
     if (color.has_value())
         pCannon->SetColor(color.value());
+
+    if (bKnockdownEnabled.has_value())
+        pCannon->SetKnockdownEnabled(bKnockdownEnabled.value());
 
     if (CElementGroup* elementGroup = resource.GetElementGroup())
         elementGroup->Add(pCannon);
@@ -101,6 +110,17 @@ bool CLuaWaterCannonDefs::SetWaterCannonEnabled(CClientWaterCannon* pCannon, boo
 bool CLuaWaterCannonDefs::IsWaterCannonEnabled(CClientWaterCannon* pCannon)
 {
     return pCannon->IsEnabled();
+}
+
+bool CLuaWaterCannonDefs::SetWaterCannonKnockdownEnabled(CClientWaterCannon* pCannon, bool bEnabled)
+{
+    pCannon->SetKnockdownEnabled(bEnabled);
+    return true;
+}
+
+bool CLuaWaterCannonDefs::IsWaterCannonKnockdownEnabled(CClientWaterCannon* pCannon)
+{
+    return pCannon->IsKnockdownEnabled();
 }
 
 bool CLuaWaterCannonDefs::SetWaterCannonColor(CClientWaterCannon* pCannon, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue,

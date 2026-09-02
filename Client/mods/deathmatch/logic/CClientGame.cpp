@@ -3714,9 +3714,9 @@ bool CClientGame::StaticObjectBreakHandler(CObjectSAInterface* pObjectInterface,
     return g_pClientGame->ObjectBreakHandler(pObjectInterface, pAttackerInterface);
 }
 
-bool CClientGame::StaticWaterCannonHandler(CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed)
+bool CClientGame::StaticWaterCannonHandler(CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed, void* pWaterCannonInterface)
 {
-    return g_pClientGame->WaterCannonHitHandler(pCannonVehicle, pHitPed);
+    return g_pClientGame->WaterCannonHitHandler(pCannonVehicle, pHitPed, pWaterCannonInterface);
 }
 
 bool CClientGame::StaticVehicleFellThroughMapHandler(CVehicleSAInterface* pVehicle)
@@ -4938,8 +4938,14 @@ bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEnti
     return true;
 }
 
-bool CClientGame::WaterCannonHitHandler(CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed)
+bool CClientGame::WaterCannonHitHandler(CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed, void* pWaterCannonInterface)
 {
+    // A script-owned standalone cannon (createWaterCannon) has no vehicle to fire
+    // onClientPedHitByWaterCannon/onClientPlayerHitByWaterCannon against; let the native push and
+    // knockdown through as normal unless the script disabled it for this particular cannon
+    if (!pCannonVehicle)
+        return m_pManager->GetWaterCannonManager()->IsKnockdownEnabled(pWaterCannonInterface);
+
     if (pCannonVehicle && pHitPed)
     {
         CPools*                    pPools = g_pGame->GetPools();

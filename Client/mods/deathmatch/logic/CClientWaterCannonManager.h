@@ -33,6 +33,11 @@ public:
 
     void DoPulse();
 
+    // pWaterCannonInterface is the raw native CWaterCannon this cannon wraps (CClientWaterCannon::
+    // GetNativeHandle); defaults to true for a handle this manager doesn't recognise, so a real
+    // vehicle-owned cannon's own knockdown is never accidentally blocked through this path
+    bool IsKnockdownEnabled(void* pWaterCannonInterface) const;
+
 private:
     void AddToList(CClientWaterCannon* pCannon) { m_List.push_back(pCannon); };
     void RemoveFromList(CClientWaterCannon* pCannon);

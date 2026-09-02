@@ -17,6 +17,7 @@ CClientWaterCannon::CClientWaterCannon(CClientManager* pManager, ElementID ID) :
     m_vecDirection = CVector(0.0f, 1.0f, 0.0f);
     m_fForce = 1.0f;
     m_bEnabled = true;
+    m_bKnockdownEnabled = true;
     m_bHasCustomColor = false;
     m_Color = SColor(0xFFC8C8FF);  // the native jet's light blue (R200 G200 B255), opaque
     m_pNativeCannon = g_pMultiplayer->CreateCustomWaterCannon();

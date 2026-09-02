@@ -54,6 +54,11 @@ public:
     bool IsEnabled() const { return m_bEnabled; };
     void SetEnabled(bool bEnabled) { m_bEnabled = bEnabled; };
 
+    // Whether getting sprayed by this cannon knocks a ped down, the same reaction a real vehicle-
+    // owned cannon gives; on by default to match that vanilla behaviour
+    bool IsKnockdownEnabled() const { return m_bKnockdownEnabled; };
+    void SetKnockdownEnabled(bool bEnabled) { m_bKnockdownEnabled = bEnabled; };
+
     // A custom jet colour; when unset the native fading light-blue is used
     bool          HasCustomColor() const { return m_bHasCustomColor; };
     const SColor& GetColor() const { return m_Color; };
@@ -62,7 +67,8 @@ public:
 
     // False if the shared custom-cannon pool (CMultiplayer::CreateCustomWaterCannon, capped
     // separately from the vehicle-owned one) was full at construction time.
-    bool HasNativeCannon() const { return m_pNativeCannon != nullptr; };
+    bool  HasNativeCannon() const { return m_pNativeCannon != nullptr; };
+    void* GetNativeHandle() const { return m_pNativeCannon; };
 
 protected:
     void DoPulse();
@@ -74,6 +80,7 @@ private:
     CVector m_vecDirection;
     float   m_fForce;
     bool    m_bEnabled;
+    bool    m_bKnockdownEnabled;
 
     bool   m_bHasCustomColor;
     SColor m_Color;
