@@ -733,3 +733,30 @@ inline void CGUIElement_Impl::ForceRedraw()
 {
     m_pWindow->forceRedraw();
 }
+
+namespace {
+    void RecursivelyForceRedrawAutoWindows(CEGUI::Window* pWindow)
+    {
+        for (uint i = 0; i < pWindow->getChildCount(); ++i)
+        {
+            CEGUI::Window* pChild = pWindow->getChildAtIdx(i);
+            if (pChild->getName().find("__auto_") != CEGUI::String::npos)
+            {
+                pChild->forceRedraw();
+                RecursivelyForceRedrawAutoWindows(pChild);
+            }
+        }
+    }
+}
+
+void CGUIElement_Impl::SetColorCodesEnabled(bool bEnabled)
+{
+    m_pWindow->setUserString("ColorCodesEnabled", bEnabled ? "True" : "False");
+    m_pWindow->forceRedraw();
+    RecursivelyForceRedrawAutoWindows(m_pWindow);
+}
+
+bool CGUIElement_Impl::GetColorCodesEnabled()
+{
+    return m_pWindow->isUserStringDefined("ColorCodesEnabled") && m_pWindow->getUserString("ColorCodesEnabled") == "True";
+}
