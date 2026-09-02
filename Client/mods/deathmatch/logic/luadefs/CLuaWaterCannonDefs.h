@@ -19,7 +19,7 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    static std::variant<CClientWaterCannon*, bool> CreateWaterCannon(lua_State* luaVM, CVector vecPosition);
+    static std::variant<CClientWaterCannon*, bool> CreateWaterCannon(lua_State* luaVM, CVector vecPosition, std::optional<SColor> color);
 
     static bool    SetWaterCannonDirection(CClientWaterCannon* pCannon, CVector vecDirection);
     static CVector GetWaterCannonDirection(CClientWaterCannon* pCannon);
@@ -29,4 +29,9 @@ public:
 
     static bool SetWaterCannonEnabled(CClientWaterCannon* pCannon, bool bEnabled);
     static bool IsWaterCannonEnabled(CClientWaterCannon* pCannon);
+
+    static bool SetWaterCannonColor(CClientWaterCannon* pCannon, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue,
+                                    std::optional<unsigned char> ucAlpha);
+    static CLuaMultiReturn<uchar, uchar, uchar, uchar> GetWaterCannonColor(CClientWaterCannon* pCannon);
+    static bool                                        ResetWaterCannonColor(CClientWaterCannon* pCannon);
 };

@@ -17,6 +17,8 @@ CClientWaterCannon::CClientWaterCannon(CClientManager* pManager, ElementID ID) :
     m_vecDirection = CVector(0.0f, 1.0f, 0.0f);
     m_fForce = 1.0f;
     m_bEnabled = true;
+    m_bHasCustomColor = false;
+    m_Color = SColor(0xFFC8C8FF);  // the native jet's light blue (R200 G200 B255), opaque
     m_pNativeCannon = g_pMultiplayer->CreateCustomWaterCannon();
 
     SetTypeName("water-cannon");
@@ -33,6 +35,22 @@ CClientWaterCannon::~CClientWaterCannon()
 void CClientWaterCannon::Unlink()
 {
     m_pWaterCannonManager->RemoveFromList(this);
+}
+
+void CClientWaterCannon::SetColor(const SColor& color)
+{
+    m_Color = color;
+    m_bHasCustomColor = true;
+    if (m_pNativeCannon)
+        g_pMultiplayer->SetCustomWaterCannonColor(m_pNativeCannon, color.R, color.G, color.B, color.A);
+}
+
+void CClientWaterCannon::ResetColor()
+{
+    m_bHasCustomColor = false;
+    m_Color = SColor(0xFFC8C8FF);
+    if (m_pNativeCannon)
+        g_pMultiplayer->ResetCustomWaterCannonColor(m_pNativeCannon);
 }
 
 void CClientWaterCannon::DoPulse()

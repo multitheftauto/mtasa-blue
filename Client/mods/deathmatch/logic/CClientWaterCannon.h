@@ -54,6 +54,12 @@ public:
     bool IsEnabled() const { return m_bEnabled; };
     void SetEnabled(bool bEnabled) { m_bEnabled = bEnabled; };
 
+    // A custom jet colour; when unset the native fading light-blue is used
+    bool          HasCustomColor() const { return m_bHasCustomColor; };
+    const SColor& GetColor() const { return m_Color; };
+    void          SetColor(const SColor& color);
+    void          ResetColor();
+
     // False if the shared custom-cannon pool (CMultiplayer::CreateCustomWaterCannon, capped
     // separately from the vehicle-owned one) was full at construction time.
     bool HasNativeCannon() const { return m_pNativeCannon != nullptr; };
@@ -68,6 +74,9 @@ private:
     CVector m_vecDirection;
     float   m_fForce;
     bool    m_bEnabled;
+
+    bool   m_bHasCustomColor;
+    SColor m_Color;
 
     // Opaque handle from CMultiplayer::CreateCustomWaterCannon; our own native CWaterCannon
     // instance, kept apart from the vehicle-owned ones (see CClientWaterCannon.cpp).

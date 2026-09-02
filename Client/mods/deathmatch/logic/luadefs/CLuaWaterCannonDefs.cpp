@@ -21,6 +21,9 @@ void CLuaWaterCannonDefs::LoadFunctions()
         {"getWaterCannonForce", ArgumentParser<GetWaterCannonForce>},
         {"setWaterCannonEnabled", ArgumentParser<SetWaterCannonEnabled>},
         {"isWaterCannonEnabled", ArgumentParser<IsWaterCannonEnabled>},
+        {"setWaterCannonColor", ArgumentParser<SetWaterCannonColor>},
+        {"getWaterCannonColor", ArgumentParser<GetWaterCannonColor>},
+        {"resetWaterCannonColor", ArgumentParser<ResetWaterCannonColor>},
     };
 
     for (const auto& [name, func] : functions)
@@ -36,10 +39,13 @@ void CLuaWaterCannonDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setDirection", "setWaterCannonDirection");
     lua_classfunction(luaVM, "setForce", "setWaterCannonForce");
     lua_classfunction(luaVM, "setEnabled", "setWaterCannonEnabled");
+    lua_classfunction(luaVM, "setColor", "setWaterCannonColor");
+    lua_classfunction(luaVM, "resetColor", "resetWaterCannonColor");
 
     lua_classfunction(luaVM, "getDirection", "getWaterCannonDirection");
     lua_classfunction(luaVM, "getForce", "getWaterCannonForce");
     lua_classfunction(luaVM, "isEnabled", "isWaterCannonEnabled");
+    lua_classfunction(luaVM, "getColor", "getWaterCannonColor");
 
     lua_classvariable(luaVM, "direction", "setWaterCannonDirection", "getWaterCannonDirection");
     lua_classvariable(luaVM, "force", "setWaterCannonForce", "getWaterCannonForce");
@@ -48,12 +54,15 @@ void CLuaWaterCannonDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "WaterCannon", "Element");
 }
 
-std::variant<CClientWaterCannon*, bool> CLuaWaterCannonDefs::CreateWaterCannon(lua_State* luaVM, CVector vecPosition)
+std::variant<CClientWaterCannon*, bool> CLuaWaterCannonDefs::CreateWaterCannon(lua_State* luaVM, CVector vecPosition, std::optional<SColor> color)
 {
-    CResource&           resource = lua_getownerresource(luaVM);
+    CResource&          resource = lua_getownerresource(luaVM);
     CClientWaterCannon* pCannon = CStaticFunctionDefinitions::CreateWaterCannon(resource, vecPosition);
     if (!pCannon)
         return false;
+
+    if (color.has_value())
+        pCannon->SetColor(color.value());
 
     if (CElementGroup* elementGroup = resource.GetElementGroup())
         elementGroup->Add(pCannon);
@@ -92,4 +101,23 @@ bool CLuaWaterCannonDefs::SetWaterCannonEnabled(CClientWaterCannon* pCannon, boo
 bool CLuaWaterCannonDefs::IsWaterCannonEnabled(CClientWaterCannon* pCannon)
 {
     return pCannon->IsEnabled();
+}
+
+bool CLuaWaterCannonDefs::SetWaterCannonColor(CClientWaterCannon* pCannon, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue,
+                                              std::optional<unsigned char> ucAlpha)
+{
+    pCannon->SetColor(SColorRGBA(ucRed, ucGreen, ucBlue, ucAlpha.value_or(255)));
+    return true;
+}
+
+CLuaMultiReturn<uchar, uchar, uchar, uchar> CLuaWaterCannonDefs::GetWaterCannonColor(CClientWaterCannon* pCannon)
+{
+    const SColor color = pCannon->GetColor();
+    return {color.R, color.G, color.B, color.A};
+}
+
+bool CLuaWaterCannonDefs::ResetWaterCannonColor(CClientWaterCannon* pCannon)
+{
+    pCannon->ResetColor();
+    return true;
 }
