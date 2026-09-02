@@ -57,6 +57,10 @@ public:
     // Reads and parses a COL3 file with an optional collision key name
     CColModel* ReadCOL(const SString& buffer);
 
+    // Builds a new CColModel with the same geometry as pOriginalInterface, scaled by vecScale.
+    // Returns nullptr if pOriginalInterface has collision spheres/disks/lines and vecScale is not uniform.
+    CColModel* CreateScaledColModel(CColModelSAInterface* pOriginalInterface, const CVector& vecScale);
+
     // Replaces a CColModel for a specific object identified by the object id (usModelID)
     void ReplaceCollisions(CColModel* pColModel, unsigned short usModelID);
 

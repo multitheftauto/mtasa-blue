@@ -3087,7 +3087,9 @@ retry:
                             bitStream.Read(vecScale.fY);
                             bitStream.Read(vecScale.fZ);
                         }
-                        pObject->SetScale(vecScale);
+                        bool bScaleCollision = false;
+                        bitStream.ReadBit(bScaleCollision);
+                        pObject->SetScale(vecScale, bScaleCollision);
 
                         bool bFrozen;
                         if (bitStream.ReadBit(bFrozen))
