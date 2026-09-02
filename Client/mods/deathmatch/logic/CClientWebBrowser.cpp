@@ -337,15 +337,32 @@ bool CClientWebBrowser::Events_OnResourceFileCheck(const SString& strPath, CBuff
     if (m_bBeingDestroyed)
         return false;
 
-    // If no resource is set, we do not require to verify the file
     if (!m_pResource)
-        return true;
+    {
+        if (!FileExists(strPath))
+            return false;
+
+        return outFileData.LoadFromFile(strPath);
+    }
 
     auto pFile = g_pClientGame->GetResourceManager()->GetDownloadableResourceFile(strPath.ToLower());
 
-    // If we did not download this file, it has been script or user generated, nothing to verify for us
+    // Script or user generated file not in meta.xml
     if (pFile == nullptr)
-        return true;
+    {
+        SString localResourceDir = PathConform(m_pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, "")).Replace("\\", "/");
+        if (!localResourceDir.EndsWith("/"))
+            localResourceDir += "/";
+
+        const SString normalizedPath = PathConform(strPath).Replace("\\", "/");
+        if (!normalizedPath.BeginsWithI(localResourceDir))
+            return false;
+
+        if (!FileExists(strPath))
+            return false;
+
+        return outFileData.LoadFromFile(strPath);
+    }
 
     pFile->GenerateClientChecksum(outFileData);
     return pFile->DoesClientAndServerChecksumMatch();
