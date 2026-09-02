@@ -317,12 +317,8 @@ void CClientWebBrowser::Events_OnInputFocusChanged(bool bGainedFocus)
 
 bool CClientWebBrowser::Events_OnResourcePathCheck(SString& strURL)
 {
-    if (m_bBeingDestroyed)
+    if (m_bBeingDestroyed || !m_pResource)
         return false;
-
-    // If no resource is set, we are allowed to use the requested file
-    if (!m_pResource)
-        return true;
 
     CResource* pTempResource = m_pResource;  // Make a copy to ignore a changed resource
 
