@@ -338,8 +338,8 @@ bool CClientWebBrowser::Events_OnResourceFileCheck(const SString& strPath, CBuff
     // Allow unlisted or non-downloaded files if they belong to the owning resource
     if (pFile == nullptr)
     {
-        const std::filesystem::path resourceDir = std::filesystem::path(m_pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, "")).lexically_normal();
-        const std::filesystem::path targetFilePath = std::filesystem::path(strPath).lexically_normal();
+        const std::filesystem::path resourceDir = std::filesystem::path(m_pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, "").c_str()).lexically_normal();
+        const std::filesystem::path targetFilePath = std::filesystem::path(strPath.c_str()).lexically_normal();
 
         SString localResourceDir = PathConform(resourceDir.string()).Replace("\\", "/");
         if (!localResourceDir.EndsWith("/"))
