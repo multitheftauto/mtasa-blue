@@ -247,6 +247,52 @@ static void __declspec(naked) HOOK_CWaterCannon_RenderColor()
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
+// PushPeds only knocks down a ped standing within sqrt(5) (~2.24) units of one of the jet's own
+// recorded droplet points, measured from the ped's feet - fine for a real vehicle cannon, since its
+// arc has always sagged to near ground level by the time it reaches a target at a normal spray
+// angle/range. A script can aim a custom cannon level with someone's chest instead, where the beam
+// still visibly cuts off and splashes against them (Render's own hit test is a full-body raycast,
+// not a feet-anchored point check), but PushPeds's tighter test can miss every single droplet.
+// Widen the radius only when the cannon has no vehicle owner, so a real Firetruck/SWAT tank's own
+// spray is untouched; a stale/dangling owner pointer from a destroyed vehicle can't misfire this,
+// since PushPeds only ever runs against sections that are still genuinely in flight, and a vehicle
+// cannon's owner field is only ever cleared once none of its sections are left.
+//////////////////////////////////////////////////////////////////////////////////////////
+// >>> 0x72987D | D8 1D 80 8C 85 00 | fcomp dword ptr [0x00858C80]
+//     0x729883 | DF E0             | fnstsw ax
+static constexpr float CUSTOM_WATER_CANNON_HIT_RADIUS_SQUARED = 1.0f;  // radius 1.0, vs the native sqrt(5) (~2.24)
+
+#define HOOKPOS_CWaterCannon_PushPeds_HitRadius  0x72987D
+#define HOOKSIZE_CWaterCannon_PushPeds_HitRadius 6
+static constexpr std::uintptr_t CONTINUE_CWaterCannon_PushPeds_HitRadius = 0x729883;
+
+static void __declspec(naked) HOOK_CWaterCannon_PushPeds_HitRadius()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // [esp+0x1C] holds the cannon's own "this" pointer for the whole function (written once in
+        // the prologue); EDI, which held it earlier, has already been repurposed as a per-point
+        // record pointer by this point in the loop, so it can't be used here
+        mov     ebx, [esp+0x1C]
+        cmp     dword ptr [ebx], 0
+        jne     useOriginal
+
+        fcomp   CUSTOM_WATER_CANNON_HIT_RADIUS_SQUARED
+        jmp     continue_
+
+    useOriginal:
+        fcomp   ds:[0x858C80]           // Original comparison, byte-identical to the stolen instruction
+
+    continue_:
+        jmp     CONTINUE_CWaterCannon_PushPeds_HitRadius
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_WaterCannons
 //
@@ -256,6 +302,7 @@ void CMultiplayerSA::InitHooks_WaterCannons()
     EZHookInstall(CWaterCannons_UpdateCustomDispatch);
     EZHookInstall(CWaterCannons_RenderCustomDispatch);
     EZHookInstall(CWaterCannon_RenderColor);
+    EZHookInstall(CWaterCannon_PushPeds_HitRadius);
 
     MemSet(reinterpret_cast<void*>(PATCH_CWaterCannon_SoundGateOwnerCheck), 0x90, 2);
 }

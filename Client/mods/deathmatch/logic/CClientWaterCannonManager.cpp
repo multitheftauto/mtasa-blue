@@ -62,14 +62,14 @@ void CClientWaterCannonManager::DoPulse()
         pCannon->DoPulse();
 }
 
-bool CClientWaterCannonManager::IsKnockdownEnabled(void* pWaterCannonInterface) const
+CClientWaterCannon* CClientWaterCannonManager::GetByNativeHandle(void* pWaterCannonInterface) const
 {
     for (CClientWaterCannon* pCannon : m_List)
     {
         if (pCannon->GetNativeHandle() == pWaterCannonInterface)
-            return pCannon->IsKnockdownEnabled();
+            return pCannon;
     }
-    return true;
+    return nullptr;
 }
 
 void CClientWaterCannonManager::RemoveFromList(CClientWaterCannon* pCannon)

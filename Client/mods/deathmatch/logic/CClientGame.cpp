@@ -4941,10 +4941,31 @@ bool CClientGame::ObjectBreakHandler(CObjectSAInterface* pObjectInterface, CEnti
 bool CClientGame::WaterCannonHitHandler(CVehicleSAInterface* pCannonVehicle, CPedSAInterface* pHitPed, void* pWaterCannonInterface)
 {
     // A script-owned standalone cannon (createWaterCannon) has no vehicle to fire
-    // onClientPedHitByWaterCannon/onClientPlayerHitByWaterCannon against; let the native push and
-    // knockdown through as normal unless the script disabled it for this particular cannon
+    // onClientPedHitByWaterCannon/onClientPlayerHitByWaterCannon against; fire the same two events
+    // from the cannon element itself instead, so scripts get exactly the same notification (and the
+    // same chance to cancel the native knockdown) a real vehicle cannon gives them
     if (!pCannonVehicle)
-        return m_pManager->GetWaterCannonManager()->IsKnockdownEnabled(pWaterCannonInterface);
+    {
+        CClientWaterCannon* pWaterCannon = m_pManager->GetWaterCannonManager()->GetByNativeHandle(pWaterCannonInterface);
+        if (!pWaterCannon || !pWaterCannon->IsKnockdownEnabled())
+            return false;
+
+        CPools*                pPools = g_pGame->GetPools();
+        CClientPed*            pClientPed = nullptr;
+        SClientEntity<CPedSA>* pPedEntity = pPools->GetPed(reinterpret_cast<DWORD*>(pHitPed));
+        if (pPedEntity)
+            pClientPed = reinterpret_cast<CClientPed*>(pPedEntity->pClientEntity);
+
+        CLuaArguments Arguments;
+        if (pClientPed)
+            Arguments.PushElement(pClientPed);
+        else
+            Arguments.PushNil();
+
+        if (pClientPed && !IS_PLAYER(pClientPed))
+            return pWaterCannon->CallEvent("onClientPedHitByWaterCannon", Arguments, true);
+        return pWaterCannon->CallEvent("onClientPlayerHitByWaterCannon", Arguments, true);
+    }
 
     if (pCannonVehicle && pHitPed)
     {
