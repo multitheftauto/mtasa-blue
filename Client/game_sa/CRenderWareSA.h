@@ -18,6 +18,7 @@
 class CMatchChannelManager;
 class CModelTexturesInfo;
 struct RpAtomic;
+struct RwRaster;
 struct SShaderReplacementStats;
 struct STexInfo;
 struct STexTag;
@@ -29,6 +30,16 @@ struct SDffTexInfo
 {
     STexInfo* pTexInfo;
     uint      uiUsageCount;
+    uint      uiId;
+};
+
+//
+// One texture a clump registered, kept so removal never has to dereference anything that may be gone
+//
+struct SDffTexRef
+{
+    CD3DDUMMY* pD3DData;
+    uint       uiId;
 };
 
 class CRenderWareSA : public CRenderWare
@@ -159,6 +170,7 @@ public:
     static bool DoContainTheSameGeometry(RpClump* pClumpA, RpClump* pClumpB, RpAtomic* pAtomicB);
 
     void OnTextureStreamIn(STexInfo* pTexInfo);
+    void OnRasterDestroyed(RwRaster* pRaster);
     void OnTextureStreamOut(STexInfo* pTexInfo);
     void DisableGTAVertexShadersForAWhile();
     void UpdateDisableGTAVertexShadersTimer();
@@ -168,7 +180,8 @@ public:
     std::multimap<ushort, STexInfo*>                m_TexInfoMap;
     CFastHashMap<CD3DDUMMY*, STexInfo*>             m_D3DDataTexInfoMap;
     CFastHashMap<CD3DDUMMY*, SDffTexInfo>           m_DffTexInfoMap;
-    CFastHashMap<RpClump*, std::vector<CD3DDUMMY*>> m_DffClumpTextures;
+    CFastHashMap<RpClump*, std::vector<SDffTexRef>> m_DffClumpTextures;
+    uint                                            m_uiDffTexInfoId;
     CClientEntityBase*                              m_pRenderingClientEntity;
     ushort                                          m_usRenderingEntityModelId;
     int                                             m_iRenderingEntityType;

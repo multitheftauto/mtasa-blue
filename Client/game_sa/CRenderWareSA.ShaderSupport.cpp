@@ -302,7 +302,7 @@ void CRenderWareSA::ScriptAddedDff(RpClump* pClump)
     std::vector<RwTexture*> textureList;
     GetClumpTextures(textureList, pClump);
 
-    std::vector<CD3DDUMMY*> watchedTextures;
+    std::vector<SDffTexRef> watchedTextures;
     for (std::vector<RwTexture*>::iterator iter = textureList.begin(); iter != textureList.end(); iter++)
     {
         RwTexture* texture = *iter;
@@ -310,19 +310,25 @@ void CRenderWareSA::ScriptAddedDff(RpClump* pClump)
         if (!pD3DData)
             continue;
 
+        uint         uiId;
         SDffTexInfo* pDffTexInfo = MapFind(m_DffTexInfoMap, pD3DData);
         if (pDffTexInfo)
+        {
             pDffTexInfo->uiUsageCount++;
+            uiId = pDffTexInfo->uiId;
+        }
         else
         {
             // Kept out of m_TexInfoMap and m_D3DDataTexInfoMap, so txd and script texture removal cannot delete it
             STexInfo*   pTexInfo = new STexInfo(texture, texture->name, pD3DData);
-            SDffTexInfo dffTexInfo = {pTexInfo, 1};
+            SDffTexInfo dffTexInfo = {pTexInfo, 1, ++m_uiDffTexInfoId};
             MapSet(m_DffTexInfoMap, pD3DData, dffTexInfo);
             OnTextureStreamIn(pTexInfo);
+            uiId = dffTexInfo.uiId;
         }
 
-        watchedTextures.push_back(pD3DData);
+        SDffTexRef texRef = {pD3DData, uiId};
+        watchedTextures.push_back(texRef);
     }
 
     if (!watchedTextures.empty())
@@ -345,25 +351,50 @@ void CRenderWareSA::ScriptRemovedDff(RpClump* pClump)
 {
     TIMING_CHECKPOINT("+ScriptRemovedDff");
     // Release what the clump registered, as a texture's raster can be gone by now
-    std::vector<CD3DDUMMY*>* pWatchedTextures = MapFind(m_DffClumpTextures, pClump);
+    std::vector<SDffTexRef>* pWatchedTextures = MapFind(m_DffClumpTextures, pClump);
     if (pWatchedTextures)
     {
-        std::vector<CD3DDUMMY*> watchedTextures = *pWatchedTextures;
+        std::vector<SDffTexRef> watchedTextures = *pWatchedTextures;
         MapRemove(m_DffClumpTextures, pClump);
 
-        for (std::vector<CD3DDUMMY*>::iterator iter = watchedTextures.begin(); iter != watchedTextures.end(); iter++)
+        for (std::vector<SDffTexRef>::iterator iter = watchedTextures.begin(); iter != watchedTextures.end(); iter++)
         {
-            SDffTexInfo* pDffTexInfo = MapFind(m_DffTexInfoMap, *iter);
-            if (!pDffTexInfo || --pDffTexInfo->uiUsageCount > 0)
+            // Only ours: a raster destroy can have dropped the entry and another clump taken the reused key
+            SDffTexInfo* pDffTexInfo = MapFind(m_DffTexInfoMap, iter->pD3DData);
+            if (!pDffTexInfo || pDffTexInfo->uiId != iter->uiId || --pDffTexInfo->uiUsageCount > 0)
                 continue;
 
             STexInfo* pTexInfo = pDffTexInfo->pTexInfo;
-            MapRemove(m_DffTexInfoMap, *iter);
+            MapRemove(m_DffTexInfoMap, iter->pD3DData);
             OnTextureStreamOut(pTexInfo);
             delete pTexInfo;
         }
     }
     TIMING_CHECKPOINT("-ScriptRemovedDff");
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::OnRasterDestroyed
+//
+// Called before a raster is destroyed
+// Stop watching a replaced model texture keyed on its D3D texture, as that address can be reused
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::OnRasterDestroyed(RwRaster* pRaster)
+{
+    if (m_DffTexInfoMap.empty() || !pRaster || !pRaster->renderResource)
+        return;
+
+    CD3DDUMMY*   pD3DData = (CD3DDUMMY*)pRaster->renderResource;
+    SDffTexInfo* pDffTexInfo = MapFind(m_DffTexInfoMap, pD3DData);
+    if (!pDffTexInfo)
+        return;
+
+    STexInfo* pTexInfo = pDffTexInfo->pTexInfo;
+    MapRemove(m_DffTexInfoMap, pD3DData);
+    OnTextureStreamOut(pTexInfo);
+    delete pTexInfo;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -841,6 +872,42 @@ static void __declspec(naked) HOOK_RwTextureDestroy_Mid()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// RwRasterDestroy_Mid
+//
+// Check each destroyed raster, so we can stop watching replaced model textures keyed on it
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+__declspec(noinline) void OnMY_RwRasterDestroy_Mid(RwRaster* pRaster)
+{
+    pGame->GetRenderWareSA()->OnRasterDestroyed(pRaster);
+}
+
+// Hook info. multiplayer_sa hooks the first 5 bytes of RwRasterDestroy and returns to 0x07FB025
+#define HOOKPOS_RwRasterDestroy_Mid  0x07FB025
+#define HOOKSIZE_RwRasterDestroy_Mid 6
+DWORD                         RETURN_RwRasterDestroy_Mid = 0x07FB02B;
+static void __declspec(naked) HOOK_RwRasterDestroy_Mid()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    esi
+        call    OnMY_RwRasterDestroy_Mid
+        add     esp, 4*1
+        popad
+
+        push    esi
+        push    0x08E2518
+        jmp     RETURN_RwRasterDestroy_Mid
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // RwIm3DRenderIndexedPrimitive
 //
 // Classify what is going on here
@@ -1073,6 +1140,7 @@ void CRenderWareSA::StaticSetHooks()
 {
     EZHookInstall(RwTextureSetName);
     EZHookInstall(RwTextureDestroy_Mid);
+    EZHookInstall(RwRasterDestroy_Mid);
     EZHookInstall(RwIm3DRenderIndexedPrimitive);
     EZHookInstall(RwIm3DRenderPrimitive);
     EZHookInstall(RwIm2DRenderIndexedPrimitive);

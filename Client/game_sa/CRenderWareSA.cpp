@@ -199,6 +199,7 @@ CRenderWareSA::CRenderWareSA()
     m_iRenderingEntityType = TYPE_MASK_WORLD;
     m_GTAVertexShadersDisabledTimer.SetMaxIncrement(1000, true);
     m_bGTAVertexShadersEnabled = true;
+    m_uiDffTexInfoId = 0;
 }
 
 CRenderWareSA::~CRenderWareSA()
