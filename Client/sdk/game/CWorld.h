@@ -11,10 +11,12 @@
 
 #pragma once
 #include "CEntity.h"
+#include <CVector.h>
+#include <CVector2D.h>
+#include <cstddef>
+#include <cstdint>
 
 class CEntitySAInterface;
-class CVector;
-class CVector2D;
 class CColPoint;
 class CEntity;
 
@@ -71,6 +73,37 @@ struct STestSphereAgainstWorldResult
     CVector       entityRotation{};
     std::uint32_t lodID{0};
     eEntityType   type{ENTITY_TYPE_NOTHING};
+};
+
+enum class ECullZoneType : std::uint8_t
+{
+    ATTRIBUTE,
+    TUNNEL,
+    MIRROR,
+};
+
+struct SCullZoneDefinition
+{
+    ECullZoneType type{ECullZoneType::ATTRIBUTE};
+    float         centerX{};
+    float         centerY{};
+    float         centerZ{};
+    float         width{};
+    float         depth{};
+    float         height{};
+    float         rotationDegrees{};
+    std::uint16_t flags{};
+    float         mirrorV{};
+    float         mirrorNormalX{};
+    float         mirrorNormalY{};
+    float         mirrorNormalZ{1.0f};
+};
+
+struct SCullZoneInfo : SCullZoneDefinition
+{
+    std::uint32_t id{};
+    bool          enabled{};
+    bool          original{};
 };
 
 enum eDebugCaller
@@ -292,4 +325,15 @@ public:
 
     virtual CEntity* TestSphereAgainstWorld(const CVector& sphereCenter, float radius, CEntity* ignoredEntity, bool checkBuildings, bool checkVehicles,
                                             bool checkPeds, bool checkObjects, bool checkDummies, bool cameraIgnore, STestSphereAgainstWorldResult& result) = 0;
+
+    virtual std::size_t   GetCullZoneCount() = 0;
+    virtual bool          GetCullZoneByIndex(std::size_t index, SCullZoneInfo& outInfo) = 0;
+    virtual std::uint32_t CreateCullZone(const SCullZoneDefinition& definition, const void* owner) = 0;
+    virtual bool          SetCullZone(std::uint32_t id, const SCullZoneDefinition& definition, const void* owner) = 0;
+    virtual bool          SetCullZoneEnabled(std::uint32_t id, bool enabled, const void* owner) = 0;
+    virtual bool          RemoveCullZone(std::uint32_t id, const void* owner) = 0;
+    virtual bool          RestoreCullZone(std::uint32_t id, const void* owner) = 0;
+    virtual void          RemoveCullZoneChangesByOwner(const void* owner) = 0;
+    virtual void          SetCullMirrorZonesEnabled(bool enabled) = 0;
+    virtual void          UpdateCullZoneFlags(const CVector& playerPosition, const CVector& cameraPosition) = 0;
 };
