@@ -572,12 +572,7 @@ SBuildingRemoval* CBuildingRemovalSA::GetBuildingRemoval(CEntitySAInterface* pIn
     return NULL;
 }
 
-void CBuildingRemovalSA::AddDataBuilding(CEntitySAInterface* pInterface)
-{
-    RegisterDataBuilding(pInterface);
-}
-
-sDataBuildingRemovalItem* CBuildingRemovalSA::RegisterDataBuilding(CEntitySAInterface* pInterface)
+sDataBuildingRemovalItem* CBuildingRemovalSA::AddDataBuilding(CEntitySAInterface* pInterface)
 {
     if (m_pAddedEntities.find((DWORD)pInterface) != m_pAddedEntities.end() && m_pAddedEntities[(DWORD)pInterface] != false)
         return nullptr;
@@ -597,7 +592,7 @@ sDataBuildingRemovalItem* CBuildingRemovalSA::RegisterDataBuilding(CEntitySAInte
 // buildings) never re-stream, so without this check they would stay in the world even though a removal covers them
 void CBuildingRemovalSA::AddDataBuildingAndReapplyRemoval(CEntitySAInterface* pInterface)
 {
-    sDataBuildingRemovalItem* pBuildingRemovalItem = RegisterDataBuilding(pInterface);
+    sDataBuildingRemovalItem* pBuildingRemovalItem = AddDataBuilding(pInterface);
     if (!pBuildingRemovalItem)
         return;
 

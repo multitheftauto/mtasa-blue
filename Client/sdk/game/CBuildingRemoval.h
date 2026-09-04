@@ -114,7 +114,7 @@ public:
     virtual bool IsModelRemoved(uint16_t usModelID) = 0;
     virtual void ClearRemovedBuildingLists(size_t* pOutAmount = NULL) = 0;
     virtual bool RestoreBuilding(uint16_t usModelToRestore, float fDistance, float fX, float fY, float fZ, char cInterior, size_t* pOutAmount = NULL) = 0;
-    virtual void AddDataBuilding(CEntitySAInterface* pInterface) = 0;
+    virtual sDataBuildingRemovalItem* AddDataBuilding(CEntitySAInterface* pInterface) = 0;
     virtual void AddBinaryBuilding(CEntitySAInterface* pInterface) = 0;
     virtual void RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface) = 0;
     virtual bool IsObjectRemoved(CEntitySAInterface* pInterface) = 0;
