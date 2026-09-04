@@ -14,6 +14,7 @@
 #include "../luadefs/CLuaClientDefs.h"
 #include "../luadefs/CLuaVectorGraphicDefs.h"
 #include "../luadefs/CLuaPostfxDefs.h"
+#include <luadefs/CLuaEventDefs.h>
 
 using std::list;
 
@@ -285,4 +286,5 @@ void CLuaManager::LoadCFunctions()
     CLuaDiscordDefs::LoadFunctions();
     CLuaBuildingDefs::LoadFunctions();
     CLuaPostfxDefs::LoadFunctions();
+    CLuaEventDefs::LoadFunctions();
 }

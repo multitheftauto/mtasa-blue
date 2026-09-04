@@ -145,6 +145,8 @@ CClientEntity::~CClientEntity()
         SetCollidableWith(pEntity, true);
     }
 
+    g_pClientGame->GetEventsManager()->RemoveHandlersForEntity(this);
+
     // Remove from spatial database
     GetClientSpatialDatabase()->RemoveEntity(this);
 

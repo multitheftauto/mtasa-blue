@@ -267,8 +267,9 @@ public:
 
     unsigned int CountChildren() { return static_cast<unsigned int>(m_Children.size()); };
 
-    void GetChildren(lua_State* luaVM);
-    void GetChildrenByType(const char* szType, lua_State* luaVM);
+    void           GetChildren(lua_State* luaVM);
+    CChildListType GetChildren() const noexcept { return m_Children; }
+    void           GetChildrenByType(const char* szType, lua_State* luaVM);
 
     void AddCollision(CClientColShape* pShape) { m_Collisions.push_back(pShape); }
     void RemoveCollision(CClientColShape* pShape)
@@ -332,6 +333,14 @@ public:
     bool CanBeDestroyedByScript() { return m_canBeDestroyedByScript; }
     void SetCanBeDestroyedByScript(bool canBeDestroyedByScript) { m_canBeDestroyedByScript = canBeDestroyedByScript; }
 
+    std::uint32_t GetEventHandlersCount() const noexcept { return m_eventHandlersCounter; }
+    void          IncrementEventHandlersCount() noexcept { m_eventHandlersCounter++; }
+    void          DecrementEventHandlersCount() noexcept
+    {
+        if (m_eventHandlersCounter > 0)
+            m_eventHandlersCounter--;
+    }
+
     virtual bool IsOnFire() { return false; }
     virtual bool SetOnFire(bool onFire) { return false; }
 
@@ -378,6 +387,7 @@ protected:
     bool                              m_bWorldIgnored;
     bool                              m_bCallPropagationEnabled;
     bool                              m_bDisallowCollisions;
+    std::uint32_t                     m_eventHandlersCounter{0};
     bool                              m_canBeDestroyedByScript = true;  // If true, destroyElement function will
                                                                         // have no effect on this element
 public:

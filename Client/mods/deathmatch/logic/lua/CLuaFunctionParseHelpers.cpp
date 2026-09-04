@@ -964,6 +964,16 @@ ADD_ENUM(ENTITY_TYPE_DUMMY, "dummy")
 ADD_ENUM(ENTITY_TYPE_NOTINPOOLS, "unknown")
 IMPLEMENT_ENUM_END("entity-type")
 
+IMPLEMENT_ENUM_BEGIN(eClientEntityType)
+ADD_ENUM(eClientEntityType::CCLIENTUNKNOWN, "unknown")
+ADD_ENUM(eClientEntityType::CCLIENTBUILDING, "building")
+ADD_ENUM(eClientEntityType::CCLIENTVEHICLE, "vehicle")
+ADD_ENUM(eClientEntityType::CCLIENTPLAYER, "player")
+ADD_ENUM(eClientEntityType::CCLIENTPED, "ped")
+ADD_ENUM(eClientEntityType::CCLIENTOBJECT, "object")
+ADD_ENUM(eClientEntityType::CCLIENTDUMMY, "dummy")
+IMPLEMENT_ENUM_END("entity-type")
+
 IMPLEMENT_ENUM_CLASS_BEGIN(VehicleAudioSettingProperty)
 ADD_ENUM(VehicleAudioSettingProperty::DOOR_SOUND, "door-sound")
 ADD_ENUM(VehicleAudioSettingProperty::ENGINE_OFF_SOUND_BANK_ID, "engine-off-soundbank-id")
@@ -987,6 +997,12 @@ ADD_ENUM(PostFXType::BRIGHTNESS, "brightness")
 ADD_ENUM(PostFXType::CONTRAST, "contrast")
 ADD_ENUM(PostFXType::SATURATION, "saturation")
 IMPLEMENT_ENUM_CLASS_END("postfx-type")
+
+IMPLEMENT_ENUM_BEGIN(BuiltInEvent::Enum)
+ADD_ENUM(BuiltInEvent::ON_CLIENT_RENDER, "onClientRender")
+ADD_ENUM(BuiltInEvent::ON_CLIENT_PRE_RENDER, "onClientPreRender")
+ADD_ENUM(BuiltInEvent::ON_CLIENT_HUD_RENDER, "onClientHUDRender")
+IMPLEMENT_ENUM_END("builtin-event-name")
 
 //
 // CResource from userdata

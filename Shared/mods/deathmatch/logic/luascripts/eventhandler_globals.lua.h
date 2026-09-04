@@ -1,0 +1,66 @@
+#pragma once
+namespace EmbeddedLuaCode
+{
+    // Special function for calling event handlers
+    // We use a script because doing it in C++ is slower (and way more complex)
+
+    // Client and server code only differ in the absence of the `client` argument (on client side)
+#ifdef MTA_CLIENT
+    constexpr auto SetEventHandlerGlobals = R"~LUA~(
+function SetEventHandlerGlobals(handlerfn, _source, _this,  _sourceResource, _sourceResourceRoot, _eventName, ...)
+    -- save old globals
+    local oldSource = source
+    local oldThis = this
+    local oldSourceResource = sourceResource
+    local oldSourceResourceRoot = sourceResourceRoot
+    local oldEventName = eventName
+
+    -- set globals of this event
+    source = _source
+    this = _this
+    sourceResource = _sourceResource
+    sourceResourceRoot = _sourceResourceRoot
+    eventName = _eventName
+
+    handlerfn(...)
+
+    -- restore globals
+    source = oldSource
+    this = oldThis
+    sourceResource = oldSourceResource
+    sourceResourceRoot = oldSourceResourceRoot
+    eventName = oldEventName
+end
+    )~LUA~";
+#else
+    constexpr auto SetEventHandlerGlobals = R"~LUA~(
+function SetEventHandlerGlobals(handlerfn, _source, _this, _client, _sourceResource, _sourceResourceRoot, _eventName, ...)
+    -- save old globals
+    local oldSource = source
+    local oldThis = this
+    local oldClient = client
+    local oldSourceResource = sourceResource
+    local oldSourceResourceRoot = sourceResourceRoot
+    local oldEventName = eventName
+
+    -- set globals of this event
+    source = _source
+    this = _this
+    client = _client
+    sourceResource = _sourceResource
+    sourceResourceRoot = _sourceResourceRoot
+    eventName = _eventName
+
+    handlerfn(...)
+
+    -- restore globals
+    source = oldSource
+    this = oldThis
+    client = oldClient
+    sourceResource = oldSourceResource
+    sourceResourceRoot = oldSourceResourceRoot
+    eventName = oldEventName
+end
+    )~LUA~";
+#endif
+};

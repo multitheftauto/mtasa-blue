@@ -80,6 +80,8 @@ public:
 
     bool IsOOPEnabled() { return m_bEnableOOP; }
 
+    int GetEventHandlerGlobalsFuncRef() const noexcept { return m_eventHandlerGlobalsFuncRef; }
+
 private:
     void InitSecurity();
 
@@ -101,6 +103,8 @@ private:
     static SString                                  ms_strExpectedUndumpHash;
 
     bool m_bEnableOOP;
+
+    int m_eventHandlerGlobalsFuncRef;
 
 public:
     CFastHashMap<const void*, CRefInfo> m_CallbackTable;
