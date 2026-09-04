@@ -50,10 +50,6 @@ void CNametags::DoPulse()
     if (!m_bVisible)
         return;
 
-    // Grab the resolution width and height
-    static float fResWidth = static_cast<float>(g_pCore->GetGraphics()->GetViewportWidth());
-    static float fResHeight = static_cast<float>(g_pCore->GetGraphics()->GetViewportHeight());
-
     // Got any players that are not local?
     if (m_pPlayerManager->Count() <= 1 && !bRenderOwn)
         return;
@@ -234,10 +230,12 @@ void CNametags::DrawTagForPlayer(CClientPlayer* pPlayer, unsigned char ucAlpha)
     if (pPlayer->GetInterior() != m_ucInterior)
         return;
 
-    // Grab the resolution width and height
+    // Grab the resolution width and height. Read fresh each frame: the viewport can change
+    // on alt-tab/display switch, and a value cached on the first call misplaces every tag
+    // (and its health bar) until the client restarts.
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
-    static float        fResWidth = static_cast<float>(pGraphics->GetViewportWidth());
-    static float        fResHeight = static_cast<float>(pGraphics->GetViewportHeight());
+    const float         fResWidth = static_cast<float>(pGraphics->GetViewportWidth());
+    const float         fResHeight = static_cast<float>(pGraphics->GetViewportHeight());
 
     // Get the position
     CVector vecPosition;
