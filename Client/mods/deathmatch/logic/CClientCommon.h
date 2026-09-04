@@ -41,13 +41,6 @@
 // Defines the maximum size for a HTTP Download URL (with file / directory information appended)
 #define MAX_HTTP_DOWNLOAD_URL_WITH_FILE 768
 
-enum eHTTPDownloadType
-{
-    HTTP_DOWNLOAD_DISABLED = 0,
-    HTTP_DOWNLOAD_ENABLED_PORT,
-    HTTP_DOWNLOAD_ENABLED_URL
-};
-
 #define CHATCOLOR_DEFAULT 235, 221, 178
 #define CHATCOLOR_INFO    255, 100, 100
 

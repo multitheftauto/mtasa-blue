@@ -384,14 +384,14 @@ void CGameSA::StartGame()
  * Sets the part of the game loading process the game is in.
  * @param dwState DWORD containing a valid state 0 - 9
  */
-void CGameSA::SetSystemState(SystemState State)
+void CGameSA::SetSystemState(SystemState::Enum State)
 {
     MemPutFast<DWORD>(0xC8D4C0, (DWORD)State);  // gGameState
 }
 
-SystemState CGameSA::GetSystemState()
+SystemState::Enum CGameSA::GetSystemState()
 {
-    return *(SystemState*)0xC8D4C0;  // gGameState
+    return *(SystemState::Enum*)0xC8D4C0;  // gGameState
 }
 
 /**

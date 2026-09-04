@@ -405,8 +405,8 @@ public:
     float m_steeringLeftRight;
 
     // 1424
-    VehicleClass m_vehicleClass;
-    uint32_t     m_vehicleSubClass;
+    VehicleClass::Enum m_vehicleClass;
+    uint32_t           m_vehicleSubClass;
 
     int16_t    m_peviousRemapTxd;
     int16_t    m_remapTxd;
@@ -719,8 +719,8 @@ public:
 
     CAEVehicleAudioEntitySA* GetVehicleAudioEntity() { return m_pVehicleAudioEntity; };
 
-    bool GetDummyPosition(VehicleDummies dummy, CVector& position) const override;
-    bool SetDummyPosition(VehicleDummies dummy, const CVector& position) override;
+    bool GetDummyPosition(VehicleDummies::Enum dummy, CVector& position) const override;
+    bool SetDummyPosition(VehicleDummies::Enum dummy, const CVector& position) override;
 
     CVector*       GetDummyPositions() { return m_dummyPositions.data(); }
     const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
@@ -733,7 +733,7 @@ public:
     static bool GetVehiclesSunGlareEnabled();
 
 private:
-    static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies dummy, const CVector& position);
+    static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies::Enum dummy, const CVector& position);
 
     void           RecalculateSuspensionLines();
     void           RecalculateSwingingChassis();

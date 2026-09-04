@@ -45,9 +45,9 @@ public:
     void              SetInterface(CDoorSAInterface* doorInterface) { internalInterface = doorInterface; }
     CDoorSAInterface* GetInterface() { return internalInterface; };
 
-    float     GetAngleOpenRatio();
-    bool      IsClosed();
-    bool      IsFullyOpen();
-    void      Open(float fOpenRatio);
-    DoorState GetDoorState() { return (DoorState)GetInterface()->m_nDoorState; };
+    float           GetAngleOpenRatio();
+    bool            IsClosed();
+    bool            IsFullyOpen();
+    void            Open(float fOpenRatio);
+    DoorState::Enum GetDoorState() { return (DoorState::Enum)GetInterface()->m_nDoorState; };
 };

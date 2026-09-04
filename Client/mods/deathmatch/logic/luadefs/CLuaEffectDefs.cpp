@@ -643,8 +643,8 @@ int CLuaEffectDefs::SetEffectDensity(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaEffectDefs::FxCreateParticle(FxParticleSystems eParticleSystem, CVector vecPosition, CVector vecDirection, float fR, float fG, float fB, float fA,
-                                      std::optional<bool> bRandomizeColors, std::optional<std::uint32_t> iCount, std::optional<float> fBrightness,
+bool CLuaEffectDefs::FxCreateParticle(FxParticleSystems::Enum eParticleSystem, CVector vecPosition, CVector vecDirection, float fR, float fG, float fB,
+                                      float fA, std::optional<bool> bRandomizeColors, std::optional<std::uint32_t> iCount, std::optional<float> fBrightness,
                                       std::optional<float> fSize, std::optional<bool> bRandomizeSizes, std::optional<float> fLife)
 {
     return CStaticFunctionDefinitions::FxCreateParticle(eParticleSystem, vecPosition, vecDirection, fR / 255, fG / 255, fB / 255, fA / 255,
