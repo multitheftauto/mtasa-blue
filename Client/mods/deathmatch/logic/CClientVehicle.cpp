@@ -2846,13 +2846,13 @@ void CClientVehicle::Create()
         ResetInterpolation();
         ResetDoorInterpolation();
 
-        for (unsigned char i = 0; i < 6; ++i)
-            SetDoorOpenRatio(i, m_fDoorOpenRatio[i], 0, true);
-
         for (unsigned char i = 0; i < MAX_WINDOWS; ++i)
             SetWindowOpen(i, m_bWindowOpen[i]);
 
-        // Re-apply handling entry
+        // Re-apply handling entry before restoring the door open ratios below; the bonnet and boot
+        // hinge setup a handling change recalculates only takes effect for angles computed after it,
+        // so restoring an open door first would bake in the freshly (re)created vehicle's default
+        // hinge instead of the one this handling actually calls for.
         if (m_HandlingEntry)
         {
             m_pVehicle->SetHandlingData(m_HandlingEntry.get());
@@ -2874,6 +2874,9 @@ void CClientVehicle::Create()
             if (m_bHasCustomHandling)
                 ApplyHandling();
         }
+
+        for (unsigned char i = 0; i < 6; ++i)
+            SetDoorOpenRatio(i, m_fDoorOpenRatio[i], 0, true);
 
         // Applying wheel upgrades can change these values.
         // We should keep track of the original values to restore them
