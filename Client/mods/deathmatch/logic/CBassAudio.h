@@ -32,6 +32,7 @@ struct SSoundThreadVariables
     ZERO_ON_NEW
     SString            strURL;
     long               lFlags;
+    DWORD              dwDevice;
     DWORD              pSound;
     bool               bStreamCreateResult;
     std::list<double>  onClientSoundFinishedDownloadQueue;

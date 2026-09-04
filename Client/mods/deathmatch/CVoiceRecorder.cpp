@@ -16,6 +16,9 @@ CVoiceRecorder::CVoiceRecorder()
 {
     m_bEnabled = false;
 
+    // Starts on the microphone already chosen in the settings, even before any mod loads
+    g_pCore->GetCVars()->Get("audio_input_device", m_strSelectedDeviceName);
+
     m_VoiceState = VOICESTATE_AWAITING_INPUT;
     m_SampleRate = SAMPLERATE_WIDEBAND;
     m_ucQuality = 0;
@@ -105,7 +108,13 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
         for (PaDeviceIndex i = 0; i < Pa_GetDeviceCount(); i++)
         {
             const PaDeviceInfo* pInfo = Pa_GetDeviceInfo(i);
-            if (pInfo && pInfo->maxInputChannels > 0 && m_strSelectedDeviceName == pInfo->name)
+            if (!pInfo || pInfo->maxInputChannels <= 0 || !pInfo->name)
+                continue;
+
+            // This project only builds the DirectSound host API (pa_win_ds.c), whose names come
+            // straight from DirectSoundEnumerateA with no length cap. A prefix match could pick
+            // the wrong device just for sharing a long prefix
+            if (m_strSelectedDeviceName == pInfo->name)
             {
                 deviceIndex = i;
                 break;

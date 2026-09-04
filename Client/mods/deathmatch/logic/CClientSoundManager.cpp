@@ -27,8 +27,29 @@ CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
     // whatever device was default at Init time
     BASS_SetConfig(BASS_CONFIG_DEV_DEFAULT, TRUE);
 
+    // Opens BASS straight on the device remembered in the settings, so nothing needs moving
+    // afterward; -1 falls back to the system default if there is no preference or it's gone.
+    // Native audio is not restarted here, that would deadlock the mod load; it already opened on
+    // the same device via the GUID resolved earlier
+    DWORD       dwInitDevice = static_cast<DWORD>(-1);
+    std::string strPreferredDevice;
+    g_pCore->GetCVars()->Get("audio_output_device", strPreferredDevice);
+    if (!strPreferredDevice.empty())
+    {
+        BASS_DEVICEINFO info;
+        for (DWORD i = 0; BASS_GetDeviceInfo(i, &info); i++)
+        {
+            if ((info.flags & BASS_DEVICE_ENABLED) && info.name && strPreferredDevice == info.name)
+            {
+                dwInitDevice = i;
+                m_strPreferredOutputDeviceName = strPreferredDevice;
+                break;
+            }
+        }
+    }
+
     // Initialize BASS audio library
-    if (!BASS_Init(-1, 44100, NULL, NULL, NULL))
+    if (!BASS_Init(dwInitDevice, 44100, NULL, NULL, NULL))
         g_pCore->GetConsole()->Printf("BASS ERROR %d in Init", BASS_ErrorGetCode());
 
     // Load the Plugins
@@ -395,10 +416,28 @@ void CClientSoundManager::CollectOutputDeviceScanResult()
 
 bool CClientSoundManager::SetOutputDevice(const std::string& strDriver)
 {
+    const DWORD dwPreviousDevice = BASS_GetDevice();
+
+    // Already the active device; nothing to move, but still remember the preference so hotplug
+    // re-resolution keeps targeting it
+    BASS_DEVICEINFO current;
+    if (BASS_GetDeviceInfo(BASS_GetDevice(), &current) && current.name && (strDriver == current.name || (current.driver && strDriver == current.driver)))
+    {
+        m_strPreferredOutputDeviceName = current.name;
+        if (g_pMultiplayer)
+            g_pMultiplayer->SetPreferredAudioDeviceName(m_strPreferredOutputDeviceName);
+        return true;
+    }
+
     BASS_DEVICEINFO info;
     for (DWORD i = 0; BASS_GetDeviceInfo(i, &info); i++)
     {
-        if (!(info.flags & BASS_DEVICE_ENABLED) || !info.driver || strDriver != info.driver)
+        if (!(info.flags & BASS_DEVICE_ENABLED) || !info.driver)
+            continue;
+
+        // The settings identify devices by display name; a BASS driver string still matches for
+        // callers that pass one
+        if (strDriver != info.driver && (!info.name || strDriver != info.name))
             continue;
 
         if (!(info.flags & BASS_DEVICE_INIT) && !BASS_Init(i, 44100, NULL, NULL, NULL))
@@ -422,6 +461,15 @@ bool CClientSoundManager::SetOutputDevice(const std::string& strDriver)
             CClientPlayerVoice* pVoice = (*iter)->GetVoice();
             if (pVoice)
                 pVoice->MoveToDevice(i);
+        }
+
+        // Free the device we left; otherwise it stays initialised and BASS keeps offering it as
+        // the fallback "lowest initialised device" to any thread that hasn't picked one itself
+        if (dwPreviousDevice != static_cast<DWORD>(-1) && dwPreviousDevice != i)
+        {
+            BASS_SetDevice(dwPreviousDevice);
+            BASS_Free();
+            BASS_SetDevice(i);
         }
 
         // Restarts the native audio engine on this same device right away; also remembered so a

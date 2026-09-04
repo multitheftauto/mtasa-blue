@@ -104,6 +104,13 @@ public:
     void UpdateSoundOutputDeviceCombo();
     void UpdateSoundInputDeviceCombo();
 
+    // Bumped on WM_DEVICECHANGE so the combos refresh even while no mod is loaded
+    static void NotifyAudioDeviceChange() { ms_uiAudioDeviceChangeRevision++; }
+
+private:
+    static unsigned int ms_uiAudioDeviceChangeRevision;
+
+public:
     void UpdateVideoTab();
     void UpdatePostFxTab();
     void PopulateResolutionComboBox();

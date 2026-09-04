@@ -17,6 +17,9 @@
 #include <game/CSettings.h>
 #include "CSteamClient.h"
 #include "DXHook/CProxyDirect3DDevice9.h"
+#include <dsound.h>
+
+#pragma comment(lib, "dsound.lib")
 
 using namespace std;
 
@@ -1155,27 +1158,28 @@ void CSettings::CreateGUI()
     m_pCheckBoxUserAutoscan->AutoSize(NULL, 20.0f);
     m_pCheckBoxUserAutoscan->GetPosition(vecTemp, false);
 
+    // Right column, clear of the volume slider rows below
     m_pAudioOutputDeviceLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Output device")));
-    m_pAudioOutputDeviceLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f), false);
+    m_pAudioOutputDeviceLabel->SetPosition(CVector2D(tabPanelSize.fX - 330.0f, 13), false);
     m_pAudioOutputDeviceLabel->GetPosition(vecTemp, false);
     m_pAudioOutputDeviceLabel->AutoSize(NULL, 20.0f);
     m_pAudioOutputDeviceLabel->SetFont("default-bold-small");
 
     m_pSoundOutputDeviceCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAudio, ""));
-    m_pSoundOutputDeviceCombo->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
+    m_pSoundOutputDeviceCombo->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 22.0f));
     m_pSoundOutputDeviceCombo->SetSize(CVector2D(320.0f, 120.0f));
     m_pSoundOutputDeviceCombo->SetReadOnly(true);
     m_pSoundOutputDeviceCombo->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnSoundOutputDeviceChanged, this));
     m_pSoundOutputDeviceCombo->GetPosition(vecTemp, false);
 
     m_pAudioInputDeviceLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAudio, _("Microphone")));
-    m_pAudioInputDeviceLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f), false);
+    m_pAudioInputDeviceLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 38.0f), false);
     m_pAudioInputDeviceLabel->GetPosition(vecTemp, false);
     m_pAudioInputDeviceLabel->AutoSize(NULL, 20.0f);
     m_pAudioInputDeviceLabel->SetFont("default-bold-small");
 
     m_pSoundInputDeviceCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabAudio, ""));
-    m_pSoundInputDeviceCombo->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 30.0f));
+    m_pSoundInputDeviceCombo->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + 22.0f));
     m_pSoundInputDeviceCombo->SetSize(CVector2D(320.0f, 120.0f));
     m_pSoundInputDeviceCombo->SetReadOnly(true);
     m_pSoundInputDeviceCombo->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnSoundInputDeviceChanged, this));
@@ -2248,37 +2252,61 @@ void CSettings::UpdateAudioTab()
     m_pComboUsertrackMode->SetSelectedItemByIndex(gameSettings->GetUsertrackMode());
 }
 
+namespace
+{
+    BOOL CALLBACK AppendAudioDeviceNameCallback(GUID* pGuid, LPCSTR szDescription, LPCSTR szModule, LPVOID pContext)
+    {
+        // The first enumeration entry is the primary alias with a null GUID; only real devices matter here
+        if (pGuid && szDescription)
+            static_cast<std::vector<std::string>*>(pContext)->push_back(szDescription);
+        return TRUE;
+    }
+
+    std::vector<std::string> EnumerateAudioDeviceNames(bool bCapture)
+    {
+        std::vector<std::string> deviceNames;
+        if (bCapture)
+            DirectSoundCaptureEnumerateA(AppendAudioDeviceNameCallback, &deviceNames);
+        else
+            DirectSoundEnumerateA(AppendAudioDeviceNameCallback, &deviceNames);
+        return deviceNames;
+    }
+}  // namespace
+
+unsigned int CSettings::ms_uiAudioDeviceChangeRevision = 1;
+
+// The lists always come straight from DirectSound, so they work in the main menu and stay
+// identical once a mod loads. Selections are stored and applied by device name everywhere
 void CSettings::UpdateSoundOutputDeviceCombo()
 {
-    if (!CModManager::GetSingleton().IsLoaded() || !m_pWindow->IsVisible() || !m_pSoundOutputDeviceCombo || m_pSoundOutputDeviceCombo->IsOpen())
+    if (!m_pWindow->IsVisible() || !m_pSoundOutputDeviceCombo || m_pSoundOutputDeviceCombo->IsOpen())
         return;
 
-    CClientBase* pClient = CModManager::GetSingleton().GetClient();
-
-    unsigned int uiRevision = pClient->GetSoundOutputDeviceListRevision();
-    if (uiRevision == m_uiSoundOutputDeviceListRevision)
+    if (ms_uiAudioDeviceChangeRevision == m_uiSoundOutputDeviceListRevision)
         return;
 
     m_bUpdatingSoundOutputDeviceCombo = true;
-
-    std::vector<SSoundDeviceInfo> devices = pClient->GetSoundOutputDevices();
-    std::string                   strSelected = pClient->GetSoundOutputDeviceDriver();
-
     m_pSoundOutputDeviceCombo->Clear();
+
+    std::string strSelected;
+    CVARS_GET("audio_output_device", strSelected);
+
+    const std::vector<std::string> deviceNames = EnumerateAudioDeviceNames(false);
+
     int iSelect = 0;
-    for (size_t i = 0; i < devices.size(); i++)
+    for (size_t i = 0; i < deviceNames.size(); i++)
     {
-        CGUIListItem* pItem = m_pSoundOutputDeviceCombo->AddItem(devices[i].strName.c_str());
+        CGUIListItem* pItem = m_pSoundOutputDeviceCombo->AddItem(deviceNames[i].c_str());
         if (pItem)
-            pItem->SetData(devices[i].strDriver.c_str());
-        if (devices[i].strDriver == strSelected)
+            pItem->SetData(deviceNames[i].c_str());
+        if (deviceNames[i] == strSelected)
             iSelect = static_cast<int>(i);
     }
-    if (!devices.empty())
+    if (!deviceNames.empty())
         m_pSoundOutputDeviceCombo->SetSelectedItemByIndex(iSelect);
 
     m_bUpdatingSoundOutputDeviceCombo = false;
-    m_uiSoundOutputDeviceListRevision = uiRevision;
+    m_uiSoundOutputDeviceListRevision = ms_uiAudioDeviceChangeRevision;
 }
 
 bool CSettings::OnSoundOutputDeviceChanged(CGUIElement* pElement)
@@ -2290,47 +2318,54 @@ bool CSettings::OnSoundOutputDeviceChanged(CGUIElement* pElement)
     if (!pItem || !pItem->GetData())
         return true;
 
-    CModManager::GetSingleton().GetClient()->SetSoundOutputDevice(static_cast<const char*>(pItem->GetData()));
+    CVARS_SET("audio_output_device", pItem->GetText());
+
+    if (CModManager::GetSingleton().IsLoaded())
+        CModManager::GetSingleton().GetClient()->SetSoundOutputDevice(pItem->GetText());
+    else if (CMultiplayer* pMultiplayer = CCore::GetSingleton().GetMultiplayer())
+    {
+        // No mod running; retarget the native audio directly so the menu moves over live
+        pMultiplayer->SetPreferredAudioDeviceName(pItem->GetText());
+    }
     return true;
 }
 
 void CSettings::UpdateSoundInputDeviceCombo()
 {
-    if (!CModManager::GetSingleton().IsLoaded() || !m_pWindow->IsVisible() || !m_pSoundInputDeviceCombo || m_pSoundInputDeviceCombo->IsOpen())
+    if (!m_pWindow->IsVisible() || !m_pSoundInputDeviceCombo || m_pSoundInputDeviceCombo->IsOpen())
         return;
 
-    CClientBase* pClient = CModManager::GetSingleton().GetClient();
-
-    unsigned int uiRevision = pClient->GetSoundInputDeviceListRevision();
-    if (uiRevision == m_uiSoundInputDeviceListRevision)
+    if (ms_uiAudioDeviceChangeRevision == m_uiSoundInputDeviceListRevision)
         return;
 
     m_bUpdatingSoundInputDeviceCombo = true;
-
-    std::vector<SSoundDeviceInfo> devices = pClient->GetSoundInputDevices();
-    std::string                   strSelected = pClient->GetSoundInputDeviceName();
-
     m_pSoundInputDeviceCombo->Clear();
-    if (devices.empty())
+
+    std::string strSelected;
+    CVARS_GET("audio_input_device", strSelected);
+
+    const std::vector<std::string> deviceNames = EnumerateAudioDeviceNames(true);
+
+    if (deviceNames.empty())
     {
         m_pSoundInputDeviceCombo->AddItem(_("No microphone detected"));
     }
     else
     {
         int iSelect = 0;
-        for (size_t i = 0; i < devices.size(); i++)
+        for (size_t i = 0; i < deviceNames.size(); i++)
         {
-            CGUIListItem* pItem = m_pSoundInputDeviceCombo->AddItem(devices[i].strName.c_str());
+            CGUIListItem* pItem = m_pSoundInputDeviceCombo->AddItem(deviceNames[i].c_str());
             if (pItem)
-                pItem->SetData(devices[i].strDriver.c_str());
-            if (devices[i].strDriver == strSelected)
+                pItem->SetData(deviceNames[i].c_str());
+            if (deviceNames[i] == strSelected)
                 iSelect = static_cast<int>(i);
         }
         m_pSoundInputDeviceCombo->SetSelectedItemByIndex(iSelect);
     }
 
     m_bUpdatingSoundInputDeviceCombo = false;
-    m_uiSoundInputDeviceListRevision = uiRevision;
+    m_uiSoundInputDeviceListRevision = ms_uiAudioDeviceChangeRevision;
 }
 
 bool CSettings::OnSoundInputDeviceChanged(CGUIElement* pElement)
@@ -2342,7 +2377,11 @@ bool CSettings::OnSoundInputDeviceChanged(CGUIElement* pElement)
     if (!pItem || !pItem->GetData())
         return true;
 
-    CModManager::GetSingleton().GetClient()->SetSoundInputDevice(static_cast<const char*>(pItem->GetData()));
+    // Remember by name; the voice recorder resolves it when it starts
+    CVARS_SET("audio_input_device", pItem->GetText());
+
+    if (CModManager::GetSingleton().IsLoaded())
+        CModManager::GetSingleton().GetClient()->SetSoundInputDevice(pItem->GetText());
     return true;
 }
 

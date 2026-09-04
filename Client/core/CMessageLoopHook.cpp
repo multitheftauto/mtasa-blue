@@ -288,14 +288,32 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
         }
     }
 
-    // A HID device (e.g. joystick) was plugged in or removed
-    if (uMsg == WM_DEVICECHANGE && (wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE))
+    if (uMsg == WM_DEVICECHANGE)
     {
-        GetJoystickManager()->OnPossibleDeviceChange();
+        // Audio endpoints do not always raise arrival/removal, e.g. replugging into an existing
+        // jack, so the broader node change message refreshes the device pickers too
+        if (wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE || wParam == DBT_DEVNODES_CHANGED)
+            CSettings::NotifyAudioDeviceChange();
 
-        CModManager* pModManager = CModManager::GetSingletonPtr();
-        if (pModManager && pModManager->IsLoaded())
-            pModManager->GetClient()->OnPossibleAudioDeviceChange();
+        if (wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE)
+        {
+            // All three classes we registered for share this window, so only the broadcast's own
+            // class GUID says which one actually fired; without checking it, a joystick or
+            // microphone hotplug also restarts the native output audio hardware
+            const auto* pHeader = reinterpret_cast<const DEV_BROADCAST_HDR*>(lParam);
+            if (pHeader && pHeader->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+            {
+                const auto& classGuid = reinterpret_cast<const DEV_BROADCAST_DEVICEINTERFACE*>(pHeader)->dbcc_classguid;
+                if (IsEqualGUID(classGuid, GUID_DevInterfaceHID))
+                    GetJoystickManager()->OnPossibleDeviceChange();
+                else if (IsEqualGUID(classGuid, GUID_DevInterfaceAudioRender) || IsEqualGUID(classGuid, GUID_DevInterfaceAudioCapture))
+                {
+                    CModManager* pModManager = CModManager::GetSingletonPtr();
+                    if (pModManager && pModManager->IsLoaded())
+                        pModManager->GetClient()->OnPossibleAudioDeviceChange();
+                }
+            }
+        }
     }
 
     // Make sure our pointers are valid.
