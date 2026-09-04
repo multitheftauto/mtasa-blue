@@ -18,6 +18,7 @@ extern "C"
 #include <string>
 #include "json.h"
 #include "CStringName.h"
+#include <rapidjson/document.h>
 
 class CClientEntity;
 class CLuaArguments;
@@ -66,6 +67,7 @@ public:
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
     json_object* WriteToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    bool         ReadFromRapidValue(const rapidjson::Value& value, std::vector<CLuaArguments*>* pKnownTables = NULL);
     char*        WriteToString(char* szBuffer, int length);
 
     [[nodiscard]] bool IsString() const noexcept { return m_iType == LUA_TSTRING; }

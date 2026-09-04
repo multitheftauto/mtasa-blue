@@ -40,6 +40,7 @@ public:
     // JSON funcs
     LUA_DECLARE(toJSON);
     LUA_DECLARE(fromJSON);
+    static bool fromJSONAsync(lua_State* luaVM, std::string jsonString, CLuaFunctionRef callback);
 
     // PCRE functions
     LUA_DECLARE(PregFind);

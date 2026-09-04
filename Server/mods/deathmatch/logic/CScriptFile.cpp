@@ -65,6 +65,7 @@ bool CScriptFile::Load(CResource* pResourceForFilePath, eMode Mode)
         // Return whether we successfully opened it or not
         if (m_pFile)
         {
+            m_strAbsPath = strFilePath;
             CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromScriptID(m_uiScriptId);
             if (pResource && pResource->GetVirtualMachine())
                 pResource->GetVirtualMachine()->OnOpenFile(m_strFilename);

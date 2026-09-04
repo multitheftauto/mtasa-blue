@@ -19,6 +19,7 @@ extern "C"
 }
 #include "../common/CBitStream.h"
 #include "json.h"
+#include <rapidjson/document.h>
 
 class CElement;
 class CLuaArguments;
@@ -66,6 +67,7 @@ public:
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
     json_object* WriteToJSONObject(bool bSerialize = false, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL);
     bool         ReadFromJSONObject(json_object* object, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    bool         ReadFromRapidValue(const rapidjson::Value& value, std::vector<CLuaArguments*>* pKnownTables = NULL);
     char*        WriteToString(char* szBuffer, int length);
 
     bool IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
