@@ -16,6 +16,7 @@
 #include <game/CPedDamageResponse.h>
 #include <game/CEventList.h>
 #include <game/CEventDamage.h>
+#include "../game_sa/TaskAttackSA.h"
 
 class CEventDamageSAInterface;
 
@@ -46,6 +47,8 @@ extern CGame* pGameInterface;
 #define HOOKPOS_EndWorldColors                           0x561795
 #define HOOKPOS_CWorld_ProcessVerticalLineSectorList     0x563357
 #define HOOKPOS_ComputeDamageResponse_StartChoking       0x4C05B9
+#define HOOKPOS_ComputeDamageResponse_StealthKillTarget  0x4C035C
+#define FUNC_CTaskManager_GetActiveTask                  0x681720
 #define HOOKPOS_CAutomobile__ProcessSwingingDoor         0x6A9DAF
 
 #define FUNC_CStreaming_Update                     0x40E670
@@ -447,6 +450,7 @@ void HOOK_CObject_Render();
 void HOOK_EndWorldColors();
 void HOOK_CWorld_ProcessVerticalLineSectorList();
 void HOOK_ComputeDamageResponse_StartChoking();
+void HOOK_ComputeDamageResponse_StealthKillTarget();
 void HOOK_CollisionStreamRead();
 void HOOK_CPhysical_ApplyGravity();
 void HOOK_VehicleCamStart();
@@ -652,6 +656,7 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_EndWorldColors, (DWORD)HOOK_EndWorldColors, 5);
     HookInstall(HOOKPOS_CWorld_ProcessVerticalLineSectorList, (DWORD)HOOK_CWorld_ProcessVerticalLineSectorList, 8);
     HookInstall(HOOKPOS_ComputeDamageResponse_StartChoking, (DWORD)HOOK_ComputeDamageResponse_StartChoking, 7);
+    HookInstall(HOOKPOS_ComputeDamageResponse_StealthKillTarget, (DWORD)HOOK_ComputeDamageResponse_StealthKillTarget, 9);
     HookInstall(HOOKPOS_CollisionStreamRead, (DWORD)HOOK_CollisionStreamRead, 6);
     HookInstall(HOOKPOS_VehicleCamStart, (DWORD)HOOK_VehicleCamStart, 6);
     HookInstall(HOOKPOS_VehicleCamTargetZTweak, (DWORD)HOOK_VehicleCamTargetZTweak, 8);
@@ -4193,6 +4198,47 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
         mov     ecx, [edi]
         mov     eax, [ecx+0x47C]
         jmp     dwChokingChoke
+    }
+    // clang-format on
+}
+
+// CEventHandler::ComputeDamageResponse turns any damage into a stealth kill death while the
+// attacker still runs a CTaskSimpleStealthKill, without checking who that task is for; a knife
+// kill keeps it active for the whole animation, so a tear gas tick or a stray bullet from the
+// same attacker makes a nearby ped play the stealth death too.
+// The original code compares the task's type further down, but on any other task type this reads
+// a field that can't match the ped, so the outcome doesn't change
+bool _cdecl IsStealthKillTaskTarget(CTaskSimpleStealthKillSAInterface* pStealthKillTask, CPed* pPed)
+{
+    return pStealthKillTask && pStealthKillTask->m_pTarget == pPed;
+}
+
+DWORD                         RETURN_ComputeDamageResponse_StealthKillTarget = 0x4C0365;
+DWORD                         RETURN_ComputeDamageResponse_StealthKillSkip = 0x4C03D6;
+static void __declspec(naked) HOOK_ComputeDamageResponse_StealthKillTarget()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // Replaced code: ecx already points at the attacker's task manager and eax gets his active
+        // task. Past the hook nothing reads eax, ecx or edx before writing them, on either path.
+        mov     edx, FUNC_CTaskManager_GetActiveTask
+        call    edx
+
+        mov     ecx, [edi]
+        push    ecx
+        push    eax
+        call    IsStealthKillTaskTarget
+        add     esp, 8
+        test    al, al
+        jz      notTheTarget
+
+        jmp     RETURN_ComputeDamageResponse_StealthKillTarget
+
+        notTheTarget:
+        jmp     RETURN_ComputeDamageResponse_StealthKillSkip
     }
     // clang-format on
 }
