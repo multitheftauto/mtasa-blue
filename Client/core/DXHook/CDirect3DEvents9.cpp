@@ -577,43 +577,9 @@ void CDirect3DEvents9::OnRestore(IDirect3DDevice9* pDevice)
     CCore::GetSingleton().OnDeviceRestore();
 }
 
-int FilterException(uint exceptionCode);
-
-static void ReportOnPresentSEHFault(DWORD dwExceptionCode)
-{
-    // A nested fault can fire while this dialog pumps the message loop (the
-    // game frame keeps running). Show one dialog, then terminate immediately.
-    if (CLocalGUI::IsFaultDialogOpen())
-    {
-        TerminateProcess(GetCurrentProcess(), 9);
-        return;
-    }
-    CLocalGUI::SetFaultDialogOpen(true);
-
-    SString strMsg(
-        "Rendering fault during frame rendering (code 0x%08X).\n\n"
-        "Usually caused by missing GUI/loading-screen assets.\n\n"
-        "Please verify game files or reinstall.",
-        dwExceptionCode);
-    WriteDebugEvent(SString("OnPresent SEH fault code=0x%08X", dwExceptionCode));
-    MessageBoxUTF8(0, strMsg, _("Error") + _E("CC54"), MB_OK | MB_ICONERROR | MB_TOPMOST);
-    TerminateProcess(GetCurrentProcess(), 9);
-}
-
 void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice)
 {
-    __try
-    {
-        OnPresentInternal(pDevice, pStateDevice);
-    }
-    __except (FilterException(GetExceptionCode()))
-    {
-        ReportOnPresentSEHFault(GetExceptionCode());
-    }
-}
-
-void CDirect3DEvents9::OnPresentInternal(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice)
-{
+    // CEGUI faults are caught in CGUI_Impl::Draw; anything else goes to the crash handler.
     TIMING_CHECKPOINT("+OnPresent1");
     CGraphics::GetSingleton().SetSkipMTARenderThisFrame(false);
     // Start a new scene. This isn't ideal and is not really recommended by MSDN.
