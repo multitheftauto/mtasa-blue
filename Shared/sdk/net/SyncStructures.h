@@ -629,6 +629,11 @@ struct SCameraRotationSync : public ISyncStructure
     } data;
 };
 
+struct SCameraPitchSync : public SFloatAsBitsSync<8>
+{
+    SCameraPitchSync() : SFloatAsBitsSync<8>(-90.0f, 90.0f, false) {}
+};
+
 struct SKeysyncRotation : public ISyncStructure
 {
     bool Read(NetBitStreamInterface& bitStream)
