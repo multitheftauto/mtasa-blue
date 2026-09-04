@@ -4840,19 +4840,12 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
             return bAllowDamage;
         }
 
-        // Workaround: When a tyre-damage event is cancelled, the game's native code has
-        // already applied the physical "burst" state to the tyre before this hook even ran.
-        // On its next internal check (within the same game frame) it finds that state out
-        // of sync with the (unreduced) vehicle health and immediately re-invokes this same
-        // hook for the same tyre hit, which would otherwise fire onClientVehicleDamage a
-        // second time for one real hit. This does not happen for non-tyre damage, and does
-        // not happen when the event is left uncancelled (the health reduction that occurs
-        // then keeps the native state in sync, so there's nothing to "correct" and no retry).
-        // We can't reach into the native retry logic itself, so we detect and swallow the
-        // immediate duplicate here instead: same vehicle, same tyre, same loss amount,
-        // within the same frame as the previous call. Using the frame counter rather than a
-        // wall-clock time window makes this deterministic - the retry is a same-frame
-        // re-entry, not merely a "soon after" call.
+        // Cancelling tyre damage doesn't undo GTA's own "burst" state change on the tyre,
+        // which happens before this hook is even called. GTA then notices the health/tyre
+        // mismatch and calls us again for the same hit in the same frame, so we'd fire
+        // onClientVehicleDamage twice for one shot. Only affects tyres; only happens when
+        // cancelled. Filter out the same-frame repeat here since we can't touch the retry
+        // in GTA's code.
         if (ucTyre != UCHAR_INVALID_INDEX)
         {
             const bool bIsRetryOfSameHit = pVehicleInterface == m_pLastTyreDamageVehicleInterface && ucTyre == m_ucLastTyreDamageIndex &&
