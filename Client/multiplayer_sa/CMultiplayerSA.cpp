@@ -1586,6 +1586,7 @@ void CMultiplayerSA::InitHooks()
     InitHooks_VehicleDamage();
     InitHooks_VehicleLights();
     InitHooks_VehicleWeapons();
+    InitHooks_WaterCannons();
 
     InitHooks_Streaming();
     InitHooks_FrameRateFixes();
