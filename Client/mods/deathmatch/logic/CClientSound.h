@@ -93,7 +93,7 @@ public:
 
     bool  IsSoundStopped() { return m_pAudio == NULL; }
     DWORD GetChannelHandle();
-    bool IsFinished();
+    bool  IsFinished();
 
     bool IsSound3D() { return m_b3D; }
     bool IsSoundStream() { return m_bStream; }
