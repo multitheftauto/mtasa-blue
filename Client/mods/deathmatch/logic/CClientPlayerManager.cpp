@@ -106,7 +106,7 @@ CClientPlayer* CClientPlayerManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (pEntity && pEntity->GetType() == CCLIENTPLAYER)
+    if (pEntity && pEntity->GetType() == ElementType::PLAYER)
     {
         return static_cast<CClientPlayer*>(pEntity);
     }
@@ -155,7 +155,7 @@ CClientPlayer* CClientPlayerManager::Get(CPlayerPed* pPlayer, bool bValidatePoin
     else
     {
         CClientPed* pPed = reinterpret_cast<CClientPed*>(pPlayer->GetStoredPointer());
-        if (pPed->GetType() == CCLIENTPLAYER)
+        if (pPed->GetType() == ElementType::PLAYER)
         {
             return static_cast<CClientPlayer*>(pPed);
         }

@@ -19,7 +19,7 @@ CTeam::CTeam(CTeamManager* pTeamManager, CElement* pParent, const char* szName, 
 {
     m_pTeamManager = pTeamManager;
 
-    m_iType = CElement::TEAM;
+    m_iType = ElementType::TEAM;
     SetTypeName("team");
 
     SetTeamName(szName);

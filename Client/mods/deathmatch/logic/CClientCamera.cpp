@@ -175,7 +175,7 @@ void CClientCamera::DoPulse()
                 {
                     // Is the focused entity a vehicle, but the player doesn't have any occupied?
                     CClientVehicle* pVehicle = m_pFocusedPlayer->GetOccupiedVehicle();
-                    if (m_pFocusedEntity->GetType() == CCLIENTVEHICLE)
+                    if (m_pFocusedEntity->GetType() == ElementType::VEHICLE)
                     {
                         if (!pVehicle)
                         {
@@ -200,14 +200,14 @@ void CClientCamera::DoPulse()
                 float fRotation = 0;
                 if (m_pFocusedEntity)
                 {
-                    eClientEntityType eType = m_pFocusedEntity->GetType();
-                    if (eType == CCLIENTVEHICLE)
+                    ElementType::Enum eType = m_pFocusedEntity->GetType();
+                    if (eType == ElementType::VEHICLE)
                     {
                         CVector vecVehicleRotation;
                         static_cast<CClientVehicle*>((CClientEntity*)m_pFocusedEntity)->GetRotationRadians(vecVehicleRotation);
                         fRotation = vecVehicleRotation.fZ * 3.14159f / 180;
                     }
-                    else if (eType == CCLIENTPED || eType == CCLIENTPLAYER)
+                    else if (eType == ElementType::PED || eType == ElementType::PLAYER)
                     {
                         fRotation = static_cast<CClientPed*>((CClientEntity*)m_pFocusedEntity)->GetCurrentRotation();
                     }
@@ -420,7 +420,7 @@ void CClientCamera::SetOrbitTarget(const CVector& vecPosition)
         {
             CVector vecTargetPosition;
             pCameraTarget->GetPosition(vecTargetPosition);
-            if (pCameraTarget->GetType() == CCLIENTPLAYER)
+            if (pCameraTarget->GetType() == ElementType::PLAYER)
                 vecTargetPosition.fZ += 0.6f;
 
             CVector vecDirection = vecPosition - vecTargetPosition;
@@ -481,7 +481,7 @@ void CClientCamera::SetFocus(CClientEntity* pEntity, eCamMode eMode, bool bSmoot
             return;
         }
 
-        eClientEntityType eType = pEntity->GetType();
+        ElementType::Enum eType = pEntity->GetType();
 
         // Remove stream reference from the previous target
         if (m_pFocusedEntity && m_pFocusedEntity->IsStreamingCompatibleClass())
@@ -502,7 +502,7 @@ void CClientCamera::SetFocus(CClientEntity* pEntity, eCamMode eMode, bool bSmoot
             }
 
             // Hacky, used to follow peds
-            if (eMode == MODE_CAM_ON_A_STRING && (eType == CCLIENTPED || eType == CCLIENTPLAYER))
+            if (eMode == MODE_CAM_ON_A_STRING && (eType == ElementType::PED || eType == ElementType::PLAYER))
                 eMode = MODE_FOLLOWPED;
 
             // Do it

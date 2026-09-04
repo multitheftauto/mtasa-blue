@@ -1790,7 +1790,7 @@ void CClientGame::UpdatePlayerTarget()
             m_pTargetedEntity = NULL;
 
         // Store the last targeted player's id
-        if (m_pTargetedEntity && m_pTargetedEntity->GetType() == CCLIENTPLAYER)
+        if (m_pTargetedEntity && m_pTargetedEntity->GetType() == ElementType::PLAYER)
         {
             m_TargetedPlayerID = m_pTargetedEntity->GetID();
         }
@@ -3767,18 +3767,18 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
             ushort usModelId = 0xFFFF;
             switch (pClientEntity->GetType())
             {
-                case CCLIENTPED:
-                case CCLIENTPLAYER:
+                case ElementType::PED:
+                case ElementType::PLAYER:
                     iTypeMask = TYPE_MASK_PED;
                     usModelId = (ushort) static_cast<CClientPed*>(pClientEntity)->GetModel();
                     break;
-                case CCLIENTVEHICLE:
+                case ElementType::VEHICLE:
                     iTypeMask = TYPE_MASK_VEHICLE;
                     break;
-                case CCLIENTOBJECT:
+                case ElementType::OBJECT:
                     iTypeMask = TYPE_MASK_OBJECT;
                     break;
-                case CCLIENTBUILDING:
+                case ElementType::BUILDING:
                     iTypeMask = TYPE_MASK_WORLD;
                     break;
                 default:
@@ -4399,18 +4399,18 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
 
                 switch (pInflictingEntity->GetType())
                 {
-                    case CCLIENTPLAYER:
+                    case ElementType::PLAYER:
                     {
                         pInflictingPlayer = static_cast<CClientPlayer*>(pInflictingEntity);
                         break;
                     }
-                    case CCLIENTVEHICLE:
+                    case ElementType::VEHICLE:
                     {
                         CClientVehicle* pInflictingVehicle = static_cast<CClientVehicle*>(pInflictingEntity);
                         if (pInflictingVehicle && pInflictingVehicle->GetControllingPlayer())
                         {
                             CClientPed* pPed = static_cast<CClientPed*>(pInflictingVehicle->GetControllingPlayer());
-                            if (pPed && pPed->GetType() == CCLIENTPLAYER)
+                            if (pPed && pPed->GetType() == ElementType::PLAYER)
                                 pInflictingPlayer = static_cast<CClientPlayer*>(pPed);
                         }
                         break;
@@ -4556,7 +4556,7 @@ bool CClientGame::ApplyPedDamageFromGame(eWeaponType weaponUsed, float fDamage, 
         // Does this damage kill the player?
         if (fCurrentHealth == 0.0f)
         {
-            if (pDamagedPed->GetType() == CCLIENTPLAYER)
+            if (pDamagedPed->GetType() == ElementType::PLAYER)
             {
                 // Is the local player dying?
                 if (pDamagedPed->IsLocalPlayer() && fPreviousHealth > 0.0f)
@@ -5225,7 +5225,7 @@ void CClientGame::PostWeaponFire()
         }
         if (pPed)
         {
-            if (pPed->GetType() == CCLIENTPLAYER)
+            if (pPed->GetType() == ElementType::PLAYER)
             {
                 if (bShotCompensation)
                 {
@@ -5417,7 +5417,7 @@ void CClientGame::SendExplosionSync(const CVector& vecPosition, eExplosionType T
 
             // Because we use this packet to notify the server of blown vehicles,
             // we include a bit, whether the vehicle was blown without an explosion
-            if (pOrigin->GetType() == CCLIENTVEHICLE)
+            if (pOrigin->GetType() == ElementType::VEHICLE)
             {
                 auto vehicle = reinterpret_cast<CClientVehicle*>(pOrigin);
                 pBitStream->WriteBit(1);

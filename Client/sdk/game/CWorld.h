@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CEntity.h"
+#include "enums/ElementType.h"
 
 class CEntitySAInterface;
 class CVector;
@@ -65,12 +66,12 @@ struct SProcessLineOfSightMaterialInfoResult
 
 struct STestSphereAgainstWorldResult
 {
-    bool          collisionDetected{false};
-    std::uint32_t modelID{0};
-    CVector       entityPosition{};
-    CVector       entityRotation{};
-    std::uint32_t lodID{0};
-    eEntityType   type{ENTITY_TYPE_NOTHING};
+    bool              collisionDetected{false};
+    std::uint32_t     modelID{0};
+    CVector           entityPosition{};
+    CVector           entityRotation{};
+    std::uint32_t     lodID{0};
+    ElementType::Enum type{ElementType::UNKNOWN};
 };
 
 enum eDebugCaller

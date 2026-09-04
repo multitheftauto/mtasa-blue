@@ -64,7 +64,7 @@ void CEntityAddPacket::Add(CElement* pElement)
         // Jax: adding some checks here because map/element loading is all over the fucking place!
         switch (pElement->GetType())
         {
-            case CElement::COLSHAPE:
+            case ElementType::COLSHAPE:
             {
                 CColShape* pColShape = static_cast<CColShape*>(pElement);
                 // If its a server side element only, dont send it
@@ -141,27 +141,27 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
             switch (pElement->GetType())
             {
-                case CElement::VEHICLE:
+                case ElementType::VEHICLE:
                 {
                     CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
                     bCollisionsEnabled = pVehicle->GetCollisionEnabled();
                     break;
                 }
-                case CElement::OBJECT:
-                case CElement::WEAPON:
+                case ElementType::OBJECT:
+                case ElementType::WEAPON:
                 {
                     CObject* pObject = static_cast<CObject*>(pElement);
                     bCollisionsEnabled = pObject->GetCollisionEnabled();
                     break;
                 }
-                case CElement::BUILDING:
+                case ElementType::BUILDING:
                 {
                     CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
                     bCollisionsEnabled = pBuilding->GetCollisionEnabled();
                     break;
                 }
-                case CElement::PED:
-                case CElement::PLAYER:
+                case ElementType::PED:
+                case ElementType::PLAYER:
                 {
                     CPed* pPed = static_cast<CPed*>(pElement);
                     bCollisionsEnabled = pPed->GetCollisionEnabled();
@@ -210,8 +210,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
             // Write the rest depending on the type
             switch (ucEntityTypeID)
             {
-                case CElement::OBJECT:
-                case CElement::WEAPON:
+                case ElementType::OBJECT:
+                case ElementType::WEAPON:
                 {
                     CObject* pObject = static_cast<CObject*>(pElement);
 
@@ -297,7 +297,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // Respawnable
                     BitStream.WriteBit(pObject->IsRespawnEnabled());
 
-                    if (ucEntityTypeID == CElement::WEAPON)
+                    if (ucEntityTypeID == ElementType::WEAPON)
                     {
                         CCustomWeapon* pWeapon = static_cast<CCustomWeapon*>(pElement);
                         CElement*      pTarget = pWeapon->GetElementTarget();
@@ -383,7 +383,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                case CElement::PICKUP:
+                case ElementType::PICKUP:
                 {
                     CPickup* pPickup = static_cast<CPickup*>(pElement);
 
@@ -439,7 +439,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                case CElement::VEHICLE:
+                case ElementType::VEHICLE:
                 {
                     CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
 
@@ -687,7 +687,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                case CElement::MARKER:
+                case ElementType::MARKER:
                 {
                     CMarker* pMarker = static_cast<CMarker*>(pElement);
 
@@ -741,7 +741,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                case CElement::BLIP:
+                case ElementType::BLIP:
                 {
                     CBlip* pBlip = static_cast<CBlip*>(pElement);
 
@@ -772,7 +772,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                case CElement::RADAR_AREA:
+                case ElementType::RADAR_AREA:
                 {
                     CRadarArea* pArea = static_cast<CRadarArea*>(pElement);
 
@@ -802,33 +802,33 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                case CElement::WORLD_MESH_UNUSED:
-                {
-                    /*
-                    CWorldMesh* pMesh = static_cast < CWorldMesh* > ( pElement );
+                    // case ElementType::WORLD_MESH_UNUSED:
+                    {
+                        /*
+                        CWorldMesh* pMesh = static_cast < CWorldMesh* > ( pElement );
 
-                    // Write the name
-                    char* szName = pMesh->GetName ();
-                    unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
-                    BitStream.Write ( usNameLength );
-                    BitStream.Write ( szName, static_cast < int > ( usNameLength ) );
+                        // Write the name
+                        char* szName = pMesh->GetName ();
+                        unsigned short usNameLength = static_cast < unsigned short > ( strlen ( szName ) );
+                        BitStream.Write ( usNameLength );
+                        BitStream.Write ( szName, static_cast < int > ( usNameLength ) );
 
-                    // Write the position and rotation
-                    CVector vecTemp = pMesh->GetPosition ();
-                    BitStream.Write ( vecTemp.fX );
-                    BitStream.Write ( vecTemp.fY );
-                    BitStream.Write ( vecTemp.fZ );
+                        // Write the position and rotation
+                        CVector vecTemp = pMesh->GetPosition ();
+                        BitStream.Write ( vecTemp.fX );
+                        BitStream.Write ( vecTemp.fY );
+                        BitStream.Write ( vecTemp.fZ );
 
-                    vecTemp = pMesh->GetRotation ();
-                    BitStream.Write ( vecTemp.fX );
-                    BitStream.Write ( vecTemp.fY );
-                    BitStream.Write ( vecTemp.fZ );
-                    */
+                        vecTemp = pMesh->GetRotation ();
+                        BitStream.Write ( vecTemp.fX );
+                        BitStream.Write ( vecTemp.fY );
+                        BitStream.Write ( vecTemp.fZ );
+                        */
 
-                    break;
-                }
+                        // break;
+                    }
 
-                case CElement::TEAM:
+                case ElementType::TEAM:
                 {
                     CTeam* pTeam = static_cast<CTeam*>(pElement);
 
@@ -851,7 +851,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                case CElement::PED:
+                case ElementType::PED:
                 {
                     CPed* pPed = static_cast<CPed*>(pElement);
 
@@ -987,7 +987,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                case CElement::DUMMY:
+                case ElementType::DUMMY:
                 {
                     CDummy* pDummy = static_cast<CDummy*>(pElement);
 
@@ -1010,18 +1010,18 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                case CElement::PLAYER:
+                case ElementType::PLAYER:
                 {
                     break;
                 }
 
-                case CElement::SCRIPTFILE:
+                case ElementType::SCRIPTFILE:
                 {
                     // No extra data
                     break;
                 }
 
-                case CElement::COLSHAPE:
+                case ElementType::COLSHAPE:
                 {
                     CColShape* pColShape = static_cast<CColShape*>(pElement);
                     if (!pColShape->GetParentEntity())
@@ -1103,7 +1103,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                case CElement::WATER:
+                case ElementType::WATER:
                 {
                     CWater*       pWater = static_cast<CWater*>(pElement);
                     unsigned char ucNumVertices = (unsigned char)pWater->GetNumVertices();
@@ -1120,7 +1120,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     break;
                 }
 
-                case CElement::BUILDING:
+                case ElementType::BUILDING:
                 {
                     CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
 

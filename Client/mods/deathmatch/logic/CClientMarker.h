@@ -51,7 +51,7 @@ public:
 
     void DoPulse();
 
-    eClientEntityType GetType() const { return CCLIENTMARKER; }
+    ElementType::Enum GetType() const { return ElementType::MARKER; }
 
     CClientMarker::eMarkerType GetMarkerType() const;
     void                       SetMarkerType(CClientMarker::eMarkerType eType);

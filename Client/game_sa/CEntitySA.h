@@ -240,7 +240,7 @@ public:
     CEntitySAInterface* GetInterface() const { return m_pInterface; };
     void                SetInterface(CEntitySAInterface* intInterface) { m_pInterface = intInterface; };
 
-    bool IsPed() { return GetEntityType() == ENTITY_TYPE_PED; }
+    bool IsPed() { return GetEntityType() == EntityType::PED; }
     void UpdateRpHAnim();
     bool SetScaleInternal(const CVector& scale);
     void SetPosition(float fX, float fY, float fZ);
@@ -255,16 +255,16 @@ public:
     void SetUnderwater(bool bUnderwater);
     bool GetUnderwater();
 
-    virtual void RestoreLastGoodPhysicsState();
-    CVector*     GetPosition();
-    CVector*     GetPositionInternal();
-    CMatrix*     GetMatrix(CMatrix* matrix);
-    CMatrix*     GetMatrixInternal(CMatrix* matrix);
-    void         SetMatrix(CMatrix* matrix);
-    WORD         GetModelIndex();
-    eEntityType  GetEntityType();
-    bool         IsOnScreen();
-    bool         IsFullyVisible();
+    virtual void     RestoreLastGoodPhysicsState();
+    CVector*         GetPosition();
+    CVector*         GetPositionInternal();
+    CMatrix*         GetMatrix(CMatrix* matrix);
+    CMatrix*         GetMatrixInternal(CMatrix* matrix);
+    void             SetMatrix(CMatrix* matrix);
+    WORD             GetModelIndex();
+    EntityType::Enum GetEntityType();
+    bool             IsOnScreen();
+    bool             IsFullyVisible();
 
     bool IsVisible();
     void SetVisible(bool bVisible);

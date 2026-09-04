@@ -89,7 +89,7 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
 
             switch (pContactElement->GetType())
             {
-                case CElement::VEHICLE:
+                case ElementType::VEHICLE:
                     if (((CVehicle*)pContactElement)->GetSyncer() != pSourcePlayer)
                         radius = g_TickRateSettings.iVehicleContactSyncRadius;
                     break;

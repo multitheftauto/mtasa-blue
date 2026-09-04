@@ -43,7 +43,7 @@ public:
     void DoPulse();
     bool IsAttachable();
 
-    eClientEntityType GetType() const { return CCLIENTCOLSHAPE; }
+    ElementType::Enum GetType() const { return ElementType::COLSHAPE; }
 
     virtual void GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; };
     virtual void SetPosition(const CVector& vecPosition);

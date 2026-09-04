@@ -77,7 +77,7 @@ void CBuildingRemovalSA::RemoveBuilding(uint16_t usModelToRemove, float fRange, 
                     if (pInterface && pInterface != NULL)
                     {
                         // if the building type is dummy or building and it's not already being removed
-                        if ((pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY || pInterface->nType == ENTITY_TYPE_OBJECT) &&
+                        if ((pInterface->nType == EntityType::BUILDING || pInterface->nType == EntityType::DUMMY || pInterface->nType == EntityType::OBJECT) &&
                             pInterface->bRemoveFromWorld != 1)
                         {
                             if (!pInterface->IsPlaceableVTBL())
@@ -136,7 +136,7 @@ void CBuildingRemovalSA::RemoveBuilding(uint16_t usModelToRemove, float fRange, 
                     if (pInterface && pInterface != NULL)
                     {
                         // if the building type is dummy or building and it's not already being removed
-                        if ((pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY || pInterface->nType == ENTITY_TYPE_OBJECT) &&
+                        if ((pInterface->nType == EntityType::BUILDING || pInterface->nType == EntityType::DUMMY || pInterface->nType == EntityType::OBJECT) &&
                             pInterface->bRemoveFromWorld != 1)
                         {
                             if (!pInterface->IsPlaceableVTBL())
@@ -207,7 +207,7 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                             // Remove it from the binary list
                             pFind->m_pBinaryRemoveList->erase(entityIter++);
                             // if the building type is dummy or building and it's not already being removed
-                            if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
+                            if ((pEntity->nType == EntityType::BUILDING || pEntity->nType == EntityType::DUMMY || pEntity->nType == EntityType::OBJECT) &&
                                 pEntity->bRemoveFromWorld != 1)
                             {
                                 // Don't call this on entities being removed.
@@ -240,7 +240,7 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                         {
                             pFind->m_pDataRemoveList->erase(entityIter++);
                             // if the building type is dummy or building and it's not already being removed
-                            if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
+                            if ((pEntity->nType == EntityType::BUILDING || pEntity->nType == EntityType::DUMMY || pEntity->nType == EntityType::OBJECT) &&
                                 pEntity->bRemoveFromWorld != 1)
                             {
                                 if (!pEntity->IsPlaceableVTBL())
@@ -455,7 +455,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
                     if (pEntity && pEntity != NULL)
                     {
                         // if the building type is dummy or building and it's not already being removed
-                        if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
+                        if ((pEntity->nType == EntityType::BUILDING || pEntity->nType == EntityType::DUMMY || pEntity->nType == EntityType::OBJECT) &&
                             pEntity->bRemoveFromWorld != 1)
                         {
                             // Don't call this on entities being removed.
@@ -481,7 +481,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
                     if (pEntity && pEntity != NULL)
                     {
                         // if the building type is dummy or building and it's not already being removed
-                        if ((pEntity->nType == ENTITY_TYPE_BUILDING || pEntity->nType == ENTITY_TYPE_DUMMY || pEntity->nType == ENTITY_TYPE_OBJECT) &&
+                        if ((pEntity->nType == EntityType::BUILDING || pEntity->nType == EntityType::DUMMY || pEntity->nType == EntityType::OBJECT) &&
                             pEntity->bRemoveFromWorld != 1)
                         {
                             // Don't call this on entities being removed.

@@ -495,7 +495,7 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
         CPoolsSA* pPools = ((CPoolsSA*)pGame->GetPools());
         if (pPools)
         {
-            if (targetEntity && targetEntity->nType == ENTITY_TYPE_BUILDING)
+            if (targetEntity && targetEntity->nType == EntityType::BUILDING)
             {
                 pBuildingResult->bValid = true;
                 pBuildingResult->usModelID = targetEntity->m_nModelIndex;
@@ -513,7 +513,7 @@ bool CWorldSA::ProcessLineOfSight(const CVector* vecStart, const CVector* vecEnd
                     vecRotation = -vecRotation;
                 }
             }
-            if (targetEntity && targetEntity->nType == ENTITY_TYPE_OBJECT)
+            if (targetEntity && targetEntity->nType == EntityType::OBJECT)
             {
                 pBuildingResult->bValid = true;
                 pBuildingResult->usModelID = targetEntity->m_nModelIndex;
@@ -592,7 +592,7 @@ CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float rad
     }
     result.entityRotation = -result.entityRotation;
     result.lodID = entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0;
-    result.type = static_cast<eEntityType>(entity->nType);
+    result.type = ElementType::GetElementTypeFromEntityType(static_cast<EntityType::Enum>(entity->nType));
 
     return pGame->GetPools()->GetEntity(reinterpret_cast<DWORD*>(entity));
 }
