@@ -4842,20 +4842,21 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
 
         // Workaround: When a tyre-damage event is cancelled, the game's native code has
         // already applied the physical "burst" state to the tyre before this hook even ran.
-        // On its next internal check it finds that state out of sync with the (unreduced)
-        // vehicle health and immediately re-invokes this same hook for the same tyre hit,
-        // which would otherwise fire onClientVehicleDamage a second time for one real hit.
-        // This does not happen for non-tyre damage, and does not happen when the event is
-        // left uncancelled (the health reduction that occurs then keeps the native state in
-        // sync, so there's nothing to "correct" and no retry).
+        // On its next internal check (within the same game frame) it finds that state out
+        // of sync with the (unreduced) vehicle health and immediately re-invokes this same
+        // hook for the same tyre hit, which would otherwise fire onClientVehicleDamage a
+        // second time for one real hit. This does not happen for non-tyre damage, and does
+        // not happen when the event is left uncancelled (the health reduction that occurs
+        // then keeps the native state in sync, so there's nothing to "correct" and no retry).
         // We can't reach into the native retry logic itself, so we detect and swallow the
         // immediate duplicate here instead: same vehicle, same tyre, same loss amount,
-        // within a few milliseconds of the previous call.
+        // within the same frame as the previous call. Using the frame counter rather than a
+        // wall-clock time window makes this deterministic - the retry is a same-frame
+        // re-entry, not merely a "soon after" call.
         if (ucTyre != UCHAR_INVALID_INDEX)
         {
-            const unsigned long ulNowMs = CClientTime::GetTime();
-            const bool          bIsRetryOfSameHit = pVehicleInterface == m_pLastTyreDamageVehicleInterface && ucTyre == m_ucLastTyreDamageIndex &&
-                                           fLoss == m_fLastTyreDamageLoss && (ulNowMs - m_ulLastTyreDamageTickMs) <= 15;
+            const bool bIsRetryOfSameHit = pVehicleInterface == m_pLastTyreDamageVehicleInterface && ucTyre == m_ucLastTyreDamageIndex &&
+                                           fLoss == m_fLastTyreDamageLoss && m_uiFrameCount == m_uiLastTyreDamageFrame;
 
             if (bIsRetryOfSameHit)
             {
@@ -4867,7 +4868,7 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
             m_pLastTyreDamageVehicleInterface = pVehicleInterface;
             m_ucLastTyreDamageIndex = ucTyre;
             m_fLastTyreDamageLoss = fLoss;
-            m_ulLastTyreDamageTickMs = ulNowMs;
+            m_uiLastTyreDamageFrame = m_uiFrameCount;
         }
 
         CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
