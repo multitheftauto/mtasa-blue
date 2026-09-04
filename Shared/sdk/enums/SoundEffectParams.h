@@ -11,7 +11,7 @@
 
 #pragma once
 
-namespace eSoundEffectParams
+namespace SoundEffectParams
 {
     enum class Chorus
     {

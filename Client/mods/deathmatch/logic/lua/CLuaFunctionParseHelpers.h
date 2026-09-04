@@ -16,7 +16,6 @@
 #include <game/CStreaming.h>
 #include <type_traits>
 
-#include "enums/VehicleComponent.h"
 #include "enums/WeaponProperty.h"
 #include "enums/FxParticleSystems.h"
 #include "enums/WorldProperty.h"
@@ -54,11 +53,11 @@ DECLARE_ENUM(EEntityTypeMask);
 DECLARE_ENUM(eWeaponState);
 DECLARE_ENUM(eWeaponFlags);
 DECLARE_ENUM(ObjectProperty::Enum);
-DECLARE_ENUM_CLASS(ObjectGroupPhysicalProperties::Modifiable);
-DECLARE_ENUM_CLASS(ObjectGroupPhysicalProperties::DamageEffect);
-DECLARE_ENUM_CLASS(ObjectGroupPhysicalProperties::CollisionResponse);
-DECLARE_ENUM_CLASS(ObjectGroupPhysicalProperties::FxType);
-DECLARE_ENUM_CLASS(ObjectGroupPhysicalProperties::BreakMode);
+DECLARE_ENUM(ObjectGroupPhysicalProperties::Modifiable);
+DECLARE_ENUM(ObjectGroupPhysicalProperties::DamageEffect);
+DECLARE_ENUM(ObjectGroupPhysicalProperties::CollisionResponse);
+DECLARE_ENUM(ObjectGroupPhysicalProperties::FxType);
+DECLARE_ENUM(ObjectGroupPhysicalProperties::BreakMode);
 DECLARE_ENUM(eFontType);
 DECLARE_ENUM(eFontQuality);
 DECLARE_ENUM(eAudioLookupIndex);
@@ -81,15 +80,15 @@ DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
 DECLARE_ENUM_CLASS(eClientModelType);
 DECLARE_ENUM(SoundEffectType::Enum);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Chorus);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Compressor);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Distortion);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Echo);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Flanger);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Gargle);
-DECLARE_ENUM_CLASS(eSoundEffectParams::I3DL2Reverb);
-DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
+DECLARE_ENUM_CLASS(SoundEffectParams::Chorus);
+DECLARE_ENUM_CLASS(SoundEffectParams::Compressor);
+DECLARE_ENUM_CLASS(SoundEffectParams::Distortion);
+DECLARE_ENUM_CLASS(SoundEffectParams::Echo);
+DECLARE_ENUM_CLASS(SoundEffectParams::Flanger);
+DECLARE_ENUM_CLASS(SoundEffectParams::Gargle);
+DECLARE_ENUM_CLASS(SoundEffectParams::I3DL2Reverb);
+DECLARE_ENUM_CLASS(SoundEffectParams::ParamEq);
+DECLARE_ENUM_CLASS(SoundEffectParams::Reverb);
 DECLARE_ENUM_CLASS(eModelIdeFlag);
 DECLARE_ENUM_CLASS(_D3DFORMAT);
 DECLARE_ENUM_CLASS(eRenderStage);
@@ -483,39 +482,39 @@ inline SString GetClassTypeName(SoundEffectType::Enum*)
 {
     return "soundeffect-type";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Chorus*)
+inline SString GetClassTypeName(SoundEffectParams::Chorus*)
 {
     return "soundeffect-params-chorus";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Compressor*)
+inline SString GetClassTypeName(SoundEffectParams::Compressor*)
 {
     return "soundeffect-params-compressor";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Distortion*)
+inline SString GetClassTypeName(SoundEffectParams::Distortion*)
 {
     return "soundeffect-params-distortion";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Echo*)
+inline SString GetClassTypeName(SoundEffectParams::Echo*)
 {
     return "soundeffect-params-echo";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Flanger*)
+inline SString GetClassTypeName(SoundEffectParams::Flanger*)
 {
     return "soundeffect-params-flanger";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Gargle*)
+inline SString GetClassTypeName(SoundEffectParams::Gargle*)
 {
     return "soundeffect-params-gargle";
 }
-inline SString GetClassTypeName(eSoundEffectParams::I3DL2Reverb*)
+inline SString GetClassTypeName(SoundEffectParams::I3DL2Reverb*)
 {
     return "soundeffect-params-i3dl2reverb";
 }
-inline SString GetClassTypeName(eSoundEffectParams::ParamEq*)
+inline SString GetClassTypeName(SoundEffectParams::ParamEq*)
 {
     return "soundeffect-params-parameq";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Reverb*)
+inline SString GetClassTypeName(SoundEffectParams::Reverb*)
 {
     return "soundeffect-params-reverb";
 }

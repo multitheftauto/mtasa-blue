@@ -1457,7 +1457,7 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
         if (!pSound->IsFxEffectEnabled((std::uint32_t)eEffectType))
             return luaL_error(luaVM, "Effect's parameters can't be set unless it's enabled");
 
-        using namespace eSoundEffectParams;
+        using namespace SoundEffectParams;
         switch (eEffectType)
         {
             case SoundEffectType::FX_DX8_CHORUS:
@@ -1909,7 +1909,7 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
         if (!pSound->IsFxEffectEnabled((std::uint32_t)eEffectType))
             return luaL_error(luaVM, "Effect's parameters can't be set unless it's enabled");
 
-        using namespace eSoundEffectParams;
+        using namespace SoundEffectParams;
         switch (eEffectType)
         {
             case SoundEffectType::FX_DX8_CHORUS:
