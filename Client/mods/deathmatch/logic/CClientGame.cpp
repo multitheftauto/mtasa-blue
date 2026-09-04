@@ -4840,21 +4840,20 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
             return bAllowDamage;
         }
 
-        // Cancelling tyre damage doesn't undo GTA's own "burst" state change on the tyre,
-        // which happens before this hook is even called. GTA then notices the health/tyre
-        // mismatch and calls us again for the same hit in the same frame, so we'd fire
-        // onClientVehicleDamage twice for one shot. Only affects tyres; only happens when
-        // cancelled. Filter out the same-frame repeat here since we can't touch the retry
-        // in GTA's code.
-        if (ucTyre != UCHAR_INVALID_INDEX)
+        // Tyre damage can be processed through different paths in GTA's damage handling.
+        // For weapons with skills, GTA processes tyre damage in the weapon-skill path
+        // before the general entity damage handling. When tyre damage is cancelled,
+        // this can cause the same hit to reach this handler again in the same frame.
+        // Filter out the repeated callback so onClientVehicleDamage is not fired twice.
+        if (ucTyre != UCHAR_INVALID_INDEX && weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_TEC9)
         {
             const bool bIsRetryOfSameHit = pVehicleInterface == m_pLastTyreDamageVehicleInterface && ucTyre == m_ucLastTyreDamageIndex &&
                                            fLoss == m_fLastTyreDamageLoss && m_uiFrameCount == m_uiLastTyreDamageFrame;
 
             if (bIsRetryOfSameHit)
             {
-                // This is the engine's own retry for the hit we just processed, not a new
-                // hit - don't fire the Lua event again, just repeat our previous decision.
+                // Repeated callback for the same tyre hit in the same frame.
+                // Keep the decision from the original callback and don't fire the event again.
                 return m_bLastTyreDamageAllowed;
             }
 
