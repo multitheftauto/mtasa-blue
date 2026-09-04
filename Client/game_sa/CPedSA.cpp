@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CGameSA.h"
 #include "CPedSA.h"
+#include "CVisibilityPluginsSA.h"
 #include "CPedModelInfoSA.h"
 #include "CPlayerInfoSA.h"
 #include "CStatsSA.h"
@@ -30,14 +31,12 @@ namespace
 {
     constexpr std::uintptr_t FUNC_CRealTimeShadowManager_ReturnRealTimeShadow = 0x705B30;
     constexpr std::uintptr_t CLASS_CRealTimeShadowManager = 0xC40350;
-    constexpr std::uintptr_t FUNC_CVisibilityPlugins_GetClumpAlpha = 0x732B20;
     constexpr std::uintptr_t FUNC_CShadows_StoreShadowForPedObject = 0x707B40;
     constexpr std::uintptr_t CALL_CPed_PreRenderAfterTest_StoreShadowForPedObject = 0x5E6900;
 
     void __cdecl StoreShadowForPedObject(CPedSAInterface* ped, float displacementX, float displacementY, float frontX, float frontY, float sideX, float sideY)
     {
-        using GetClumpAlpha = int(__cdecl*)(RpClump*);
-        if (reinterpret_cast<GetClumpAlpha>(FUNC_CVisibilityPlugins_GetClumpAlpha)(ped->m_pRwObject) == 0)
+        if (CVisibilityPluginsSA::GetClumpAlpha(ped->m_pRwObject) == 0)
             return;
 
         using StoreShadow = void(__cdecl*)(CPedSAInterface*, float, float, float, float, float, float);

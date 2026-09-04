@@ -14,6 +14,12 @@
 
 #define FUNC_CVisibilityPlugins_InsertEntityIntoEntityList 0x733DD0
 
+int CVisibilityPluginsSA::GetClumpAlpha(RpClump* pClump)
+{
+    using GetClumpAlpha = int(__cdecl*)(RpClump*);
+    return reinterpret_cast<GetClumpAlpha>(0x732B20)(pClump);
+}
+
 void CVisibilityPluginsSA::SetClumpAlpha(RpClump* pClump, int iAlpha)
 {
     DWORD dwFunc = FUNC_CVisiblityPlugins_SetClumpAlpha;
