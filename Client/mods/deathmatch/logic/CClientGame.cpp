@@ -4840,6 +4840,36 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
             return bAllowDamage;
         }
 
+        // Workaround: When a tyre-damage event is cancelled, the game's native code has
+        // already applied the physical "burst" state to the tyre before this hook even ran.
+        // On its next internal check it finds that state out of sync with the (unreduced)
+        // vehicle health and immediately re-invokes this same hook for the same tyre hit,
+        // which would otherwise fire onClientVehicleDamage a second time for one real hit.
+        // This does not happen for non-tyre damage, and does not happen when the event is
+        // left uncancelled (the health reduction that occurs then keeps the native state in
+        // sync, so there's nothing to "correct" and no retry).
+        // We can't reach into the native retry logic itself, so we detect and swallow the
+        // immediate duplicate here instead: same vehicle, same tyre, same loss amount,
+        // within a few milliseconds of the previous call.
+        if (ucTyre != UCHAR_INVALID_INDEX)
+        {
+            const unsigned long ulNowMs = CClientTime::GetTime();
+            const bool          bIsRetryOfSameHit = pVehicleInterface == m_pLastTyreDamageVehicleInterface && ucTyre == m_ucLastTyreDamageIndex &&
+                                           fLoss == m_fLastTyreDamageLoss && (ulNowMs - m_ulLastTyreDamageTickMs) <= 15;
+
+            if (bIsRetryOfSameHit)
+            {
+                // This is the engine's own retry for the hit we just processed, not a new
+                // hit - don't fire the Lua event again, just repeat our previous decision.
+                return m_bLastTyreDamageAllowed;
+            }
+
+            m_pLastTyreDamageVehicleInterface = pVehicleInterface;
+            m_ucLastTyreDamageIndex = ucTyre;
+            m_fLastTyreDamageLoss = fLoss;
+            m_ulLastTyreDamageTickMs = ulNowMs;
+        }
+
         CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
 
         // GTA passes a zeroed position for explosion and fire damage, so report the vehicle position instead
@@ -4871,6 +4901,9 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         {
             bAllowDamage = false;
         }
+
+        if (ucTyre != UCHAR_INVALID_INDEX)
+            m_bLastTyreDamageAllowed = bAllowDamage;
     }
 
     return bAllowDamage;
