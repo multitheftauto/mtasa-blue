@@ -5360,7 +5360,14 @@ void CClientPed::UpdateAlphaAndVisibility()
         effectiveAlpha = 0;
 
     if (RpClump* clump = m_pPlayerPed->GetRpClump())
-        g_pGame->GetVisibilityPlugins()->SetClumpAlpha(clump, effectiveAlpha);
+    {
+        if (clump != m_pLastAlphaClump || effectiveAlpha != m_ucAppliedClumpAlpha)
+        {
+            m_pLastAlphaClump = clump;
+            m_ucAppliedClumpAlpha = effectiveAlpha;
+            g_pGame->GetVisibilityPlugins()->SetClumpAlpha(clump, effectiveAlpha);
+        }
+    }
 
     // GTA decides whether to create ped shadows from its visibility flag, not
     // the RenderWare clump alpha. Keep both states aligned at zero alpha.
