@@ -827,7 +827,7 @@ private:
     CEntitySAInterface* m_pLastTyreDamageVehicleInterface = nullptr;
     uchar               m_ucLastTyreDamageIndex = UCHAR_INVALID_INDEX;
     float               m_fLastTyreDamageLoss = 0.0f;
-    unsigned long       m_ulLastTyreDamageTickMs = 0;
+    uint                m_uiLastTyreDamageFrame = 0;
     bool                m_bLastTyreDamageAllowed = true;
 
     eWeaponSlot                            m_lastWeaponSlot;
