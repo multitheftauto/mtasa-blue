@@ -824,11 +824,11 @@ private:
     // Used by VehicleDamageHandler to detect and swallow the game engine's immediate
     // internal retry of a tyre-damage hit when that hit's event was cancelled (see comment
     // at the top of VehicleDamageHandler for the full explanation).
-    CEntitySAInterface* m_pLastTyreDamageVehicleInterface = nullptr;
-    uchar               m_ucLastTyreDamageIndex = UCHAR_INVALID_INDEX;
-    float               m_fLastTyreDamageLoss = 0.0f;
-    uint                m_uiLastTyreDamageFrame = 0;
-    bool                m_bLastTyreDamageAllowed = true;
+    CEntitySAInterface* m_pLastTyreDamageVehicleInterface{nullptr};
+    uchar               m_ucLastTyreDamageIndex{UCHAR_INVALID_INDEX};
+    float               m_fLastTyreDamageLoss{0.0f};
+    uint                m_uiLastTyreDamageFrame{0};
+    bool                m_bLastTyreDamageAllowed{true};
 
     eWeaponSlot                            m_lastWeaponSlot;
     SFixedArray<DWORD, WEAPONSLOT_MAX + 1> m_wasWeaponAmmoInClip;
