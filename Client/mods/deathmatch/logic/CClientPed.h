@@ -723,6 +723,8 @@ public:
     eMoveAnim                                m_MoveAnim;
     std::list<CClientProjectile*>            m_Projectiles;
     unsigned char                            m_ucAlpha;
+    unsigned char                            m_ucAppliedClumpAlpha{0};
+    const void*                              m_pLastAlphaClump{nullptr};
     float                                    m_fTargetRotation;
     int                                      m_iVehicleInOutState;
     bool                                     m_bRecreatingModel;
