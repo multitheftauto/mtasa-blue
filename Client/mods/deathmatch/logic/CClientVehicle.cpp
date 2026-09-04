@@ -1052,6 +1052,17 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         // Are we swapping from a vehicle without doors?
         bool bResetWheelAndDoorStates = (!CClientVehicleManager::HasDoors(m_usModel) || m_eVehicleType != CClientVehicleManager::GetVehicleType(usModel));
 
+        // For non-local (server-synchronized) vehicles transitioning to/from custom models,
+        // preserve the damage states if both models support doors and damage models.
+        if (!IsLocalEntity() && (!CClientVehicleManager::IsStandardModel(usModel) || !CClientVehicleManager::IsStandardModel(m_usModel)))
+        {
+            if (CClientVehicleManager::HasDoors(m_usModel) && CClientVehicleManager::HasDoors(usModel) &&
+                m_eVehicleType == CClientVehicleManager::GetVehicleType(usModel))
+            {
+                bResetWheelAndDoorStates = false;
+            }
+        }
+
         // Apply variant requirements
         if (ucVariant == 255 && ucVariant2 == 255)
             CClientVehicleManager::GetRandomVariation(usModel, ucVariant, ucVariant2);
@@ -1431,7 +1442,7 @@ unsigned char CClientVehicle::GetDoorStatus(unsigned char ucDoor)
 {
     if (ucDoor < MAX_DOORS)
     {
-        if (m_pVehicle && HasDamageModel())
+        if (m_pVehicle && HasDamageModel() && !m_bJustStreamedIn)
         {
             return m_pVehicle->GetDamageManager()->GetDoorStatus(static_cast<eDoors>(ucDoor));
         }
@@ -1478,7 +1489,7 @@ unsigned char CClientVehicle::GetPanelStatus(unsigned char ucPanel)
 {
     if (ucPanel < MAX_PANELS)
     {
-        if (m_pVehicle && HasDamageModel())
+        if (m_pVehicle && HasDamageModel() && !m_bJustStreamedIn)
             return m_pVehicle->GetDamageManager()->GetPanelStatus(ucPanel);
 
         return m_ucPanelStates[ucPanel];
@@ -1491,7 +1502,7 @@ unsigned char CClientVehicle::GetLightStatus(unsigned char ucLight)
 {
     if (ucLight < MAX_LIGHTS)
     {
-        if (m_pVehicle && HasDamageModel())
+        if (m_pVehicle && HasDamageModel() && !m_bJustStreamedIn)
             return m_pVehicle->GetDamageManager()->GetLightStatus(ucLight);
 
         return m_ucLightStates[ucLight];
