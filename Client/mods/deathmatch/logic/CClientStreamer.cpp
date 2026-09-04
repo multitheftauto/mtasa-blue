@@ -186,6 +186,9 @@ void                CClientStreamer::DoPulse(CVector& vecPosition)
         }
     }
 
+    if (m_ActiveElements.empty() && m_ToStreamOut.empty())
+        return;
+
     // Update distances every frame
     SetExpDistances(&m_ActiveElements);
     m_ActiveElements.sort(CompareExpDistance);
