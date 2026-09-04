@@ -44,7 +44,9 @@ private:
   std::map<std::string, std::string> metadata;
 
   std::string translate(const Entries& dict, const std::string& msgid);
+  std::string translate_impl(const Entries& dict, const std::string& msgid, bool silent);
   std::string translate_plural(const Entries& dict, const std::string& msgid, const std::string& msgidplural, int num);
+  std::string translate_plural_impl(const Entries& dict, const std::string& msgid, const std::string& msgidplural, int num, bool silent);
 
 public:
   /** Constructs a dictionary converting to the specified \a charset (default UTF-8) */
@@ -67,10 +69,19 @@ public:
   /** Translate the string \a msgid. */
   std::string translate(const std::string& msgid);
 
+  /** Translate the string \a msgid without logging warnings if not found.
+      Useful for hierarchical translation systems where failed local lookup
+      doesn't indicate an error. */
+  std::string translate_silent(const std::string& msgid);
+
   /** Translate the string \a msgid to its correct plural form, based
       on the number of items given by \a num. \a msgid_plural is \a msgid in
       plural form. */
   std::string translate_plural(const std::string& msgid, const std::string& msgidplural, int num);
+
+  /** Translate the string \a msgid to its correct plural form without logging
+      warnings if not found. Useful for hierarchical translation systems. */
+  std::string translate_plural_silent(const std::string& msgid, const std::string& msgidplural, int num);
 
   /** Translate the string \a msgid that is in context \a msgctx. A
       context is a way to disambiguate msgids that contain the same
