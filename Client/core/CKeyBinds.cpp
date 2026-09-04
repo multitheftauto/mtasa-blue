@@ -347,6 +347,11 @@ bool RemoveBindTypeBinds(Container& binds, bool isContainerMutable, KeyBindType 
 
 bool CKeyBinds::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+    // A fatal fault dialog is pumping messages; dont drive key or web input
+    // into the half-destroyed GUI state behind it.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return false;
+
     if (g_pCore->IsWebCoreLoaded() && !m_pCore->IsMenuVisible() && !m_pCore->GetConsole()->IsVisible() && !m_pCore->IsChatInputEnabled())
         g_pCore->GetWebCore()->ProcessInputMessage(uMsg, wParam, lParam);
 
@@ -383,6 +388,11 @@ bool CKeyBinds::ProcessCharacter(WPARAM wChar)
 
 bool CKeyBinds::ProcessKeyStroke(const SBindableKey* pKey, bool bState)
 {
+    // Same reason as ProcessMessage: OnLoseFocus also lands here when the
+    // fault dialog takes focus, and the menu reads below touch destroyed windows.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return false;
+
     m_bProcessingKeyStroke = true;
     // If the console, chat input or menu is up, ignore any messages and unset
     // any already pressed */
@@ -1803,6 +1813,11 @@ void CKeyBinds::DoPreFramePulse()
     m_pCore->GetGame()->GetPad()->GetCurrentControllerState(&cs);
     m_pCore->GetGame()->GetPad()->SetLastControllerState(&cs);
 
+    // A fatal fault dialog is pumping messages; bind handlers reach CEGUI, so
+    // leave queued binds alone until the dialog ends the process.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return;
+
     // HACK: chatbox binds
     if (m_pChatBoxBind)
     {
@@ -1921,6 +1936,11 @@ bool CKeyBinds::ControlLeftAndRight(CControllerState& cs)
 
 void CKeyBinds::DoPostFramePulse()
 {
+    // Same reason as DoPreFramePulse: control binds can invoke Lua handlers that
+    // reach CEGUI while a fatal fault dialog is pumping messages.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return;
+
     SystemState systemState = CCore::GetSingleton().GetGame()->GetSystemState();
 
     if (m_bWaitingToLoadDefaults &&

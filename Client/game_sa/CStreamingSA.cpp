@@ -55,6 +55,13 @@ namespace
     constexpr size_t MAX_STREAMS_NUM = 255;
     constexpr size_t MAX_IMAGES_NUM = MAX_STREAMS_NUM - RESERVED_STREAMS_NUM;
     constexpr size_t MIN_IMAGES_NUM = 6;  // GTA3(yes, it is presented twice), GTA_INT, CARREC, SCRIPT, CUTSCENE, PLAYER
+
+    // The game keeps fixed lists of the ped and vehicle models it tracks for population streaming.
+    // Vehicle slots are kept compact: valid entries come first, the rest are marked unused.
+    constexpr std::size_t  NUM_LOADED_PED_SLOTS = 8;
+    constexpr std::size_t  NUM_LOADED_VEHICLE_SLOTS = 23;
+    constexpr std::int32_t NUM_PED_SLOT_MAX_VALUE = 0xFFFF;
+    constexpr std::int16_t VEHICLE_SLOT_UNUSED = -1;
 }  // namespace
 
 bool IsUpgradeModelId(DWORD dwModelID)
@@ -538,4 +545,56 @@ void CStreamingSA::LoadSceneCollision(const CVector* position)
 {
     auto CStreaming_LoadSceneCollision = (void(__cdecl*)(const CVector*))FUNC_CStreaming_LoadSceneCollision;
     CStreaming_LoadSceneCollision(position);
+}
+
+std::uint32_t CStreamingSA::GetNumPedsLoaded() const noexcept
+{
+    return *reinterpret_cast<const std::uint32_t*>(VAR_CStreaming_msNumPedsLoaded);
+}
+
+bool CStreamingSA::IsModelInLoadedPedGroup(std::uint16_t modelId) const noexcept
+{
+    const auto* pPedSlots = reinterpret_cast<const std::int32_t*>(ARRAY_CStreaming_msPedsLoaded);
+    for (std::size_t i = 0; i < NUM_LOADED_PED_SLOTS; ++i)
+    {
+        const std::int32_t pedSlot = pPedSlots[i];
+        if (pedSlot < 0 || pedSlot > NUM_PED_SLOT_MAX_VALUE)
+            continue;
+
+        if (static_cast<std::uint16_t>(pedSlot) == modelId)
+            return true;
+    }
+    return false;
+}
+
+std::uint32_t CStreamingSA::GetNumLoadedVehicles() const noexcept
+{
+    const auto*   pVehicleSlots = reinterpret_cast<const std::int16_t*>(ARRAY_CStreaming_msVehiclesLoaded);
+    std::uint32_t count = 0;
+    for (std::size_t i = 0; i < NUM_LOADED_VEHICLE_SLOTS; ++i)
+    {
+        if (pVehicleSlots[i] == VEHICLE_SLOT_UNUSED)
+            break;
+
+        ++count;
+    }
+    return count;
+}
+
+bool CStreamingSA::IsModelInLoadedVehicleGroup(std::uint16_t modelId) const noexcept
+{
+    const auto* pVehicleSlots = reinterpret_cast<const std::int16_t*>(ARRAY_CStreaming_msVehiclesLoaded);
+    for (std::size_t i = 0; i < NUM_LOADED_VEHICLE_SLOTS; ++i)
+    {
+        const std::int16_t vehicleSlot = pVehicleSlots[i];
+        if (vehicleSlot == VEHICLE_SLOT_UNUSED)
+            break;
+
+        if (vehicleSlot < 0)
+            continue;
+
+        if (static_cast<std::uint16_t>(vehicleSlot) == modelId)
+            return true;
+    }
+    return false;
 }
