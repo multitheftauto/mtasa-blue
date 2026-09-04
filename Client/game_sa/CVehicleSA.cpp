@@ -31,6 +31,7 @@
 #include "gamesa_renderware.h"
 #include "CFireManagerSA.h"
 #include "enums/VehicleType.h"
+#include <game/CHandlingEntry.h>
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -1575,6 +1576,97 @@ void CVehicleSA::RecalculateHandling()
     // The swinging chassis flag is only applied once, inside the game's vehicle constructor.
     // Redo that setup here so a live handling change actually takes effect.
     RecalculateSwingingChassis();
+
+    // Same story as the chassis above: the door setup below is also only ever applied once, inside
+    // the game's vehicle constructor.
+    RecalculateDoorModelFlags();
+}
+
+// Mirrors the native vehicle constructor's bonnet, boot and NO_DOORS setup, so a live
+// REVERSE_BONNET, HANGING_BOOT, TAILGATE_BOOT or NO_DOORS change reaches an already spawned
+// vehicle instead of only ever taking effect for one created after the change.
+void CVehicleSA::RecalculateDoorModelFlags()
+{
+    if (GetVehicleInterface()->m_vehicleClass != VehicleClass::AUTOMOBILE)
+        return;
+
+    constexpr std::uint8_t  axisX = 0;
+    constexpr std::uint8_t  axisY = 1;
+    constexpr std::uint8_t  axisZ = 2;
+    constexpr std::uint8_t  axisNegY = 4;
+    constexpr std::uint8_t  axisNegZ = 5;
+    constexpr std::uint16_t extraBased = 0x10;
+    constexpr std::uint16_t extraLowGravity = 0x20;
+
+    auto*               pInt = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
+    const std::uint32_t uiModelFlags = m_pHandlingData->GetInterface()->uiModelFlags;
+
+    CDoorSAInterface& bonnet = pInt->m_doors[eDoors::BONNET];
+    if (uiModelFlags & MODELFLAGS_REVERSE_BONNET)
+    {
+        bonnet.m_fOpenAngle = -0.3f * PI;
+        bonnet.m_nAxis = axisX;
+        bonnet.m_nDirn = axisNegY | extraLowGravity;
+    }
+    else
+    {
+        bonnet.m_fOpenAngle = 0.3f * PI;
+        bonnet.m_nAxis = axisX;
+        bonnet.m_nDirn = axisY | extraLowGravity;
+    }
+    bonnet.m_fClosedAngle = 0.0f;
+
+    CDoorSAInterface& boot = pInt->m_doors[eDoors::BOOT];
+    if (uiModelFlags & MODELFLAGS_HANGING_BOOT)
+    {
+        boot.m_fOpenAngle = -0.4f * PI;
+        boot.m_nAxis = axisX;
+        boot.m_nDirn = axisNegZ | extraBased;
+    }
+    else if (uiModelFlags & MODELFLAGS_TAILGATE_BOOT)
+    {
+        boot.m_fOpenAngle = 0.5f * PI;
+        boot.m_nAxis = axisX;
+        boot.m_nDirn = axisZ | extraBased;
+    }
+    else
+    {
+        boot.m_fOpenAngle = -0.3f * PI;
+        boot.m_nAxis = axisX;
+        boot.m_nDirn = axisNegY | extraBased;
+    }
+    boot.m_fClosedAngle = 0.0f;
+
+    // Same constructor-only story again: NO_DOORS marks the four side doors missing once, at
+    // creation, and removing the flag doesn't restore them, since the constructor never does that
+    // either. The status alone isn't enough on a live vehicle, though; a locked vehicle's front
+    // doors quietly turn the request into a dent instead, so the door mesh is hidden directly here
+    // too.
+    if (uiModelFlags & MODELFLAGS_NO_DOORS)
+    {
+        struct SSideDoor
+        {
+            eDoors    id;
+            eCarNodes node;
+        };
+        static constexpr SSideDoor sideDoors[] = {
+            {eDoors::FRONT_LEFT_DOOR, eCarNodes::DOOR_LF},
+            {eDoors::FRONT_RIGHT_DOOR, eCarNodes::DOOR_RF},
+            {eDoors::REAR_LEFT_DOOR, eCarNodes::DOOR_LR},
+            {eDoors::REAR_RIGHT_DOOR, eCarNodes::DOOR_RR},
+        };
+
+        if (CDamageManager* pDamageManager = GetDamageManager())
+        {
+            for (const SSideDoor& sideDoor : sideDoors)
+            {
+                pDamageManager->SetDoorStatus(sideDoor.id, DT_DOOR_MISSING, false);
+
+                if (RwFrame* pFrame = pInt->m_aCarNodes[static_cast<std::size_t>(sideDoor.node)])
+                    pInt->SetComponentVisibility(pFrame, 0);  // ATOMIC_IS_NOT_PRESENT
+            }
+        }
+    }
 }
 
 void CVehicleSA::RecalculateSwingingChassis()

@@ -737,6 +737,7 @@ private:
 
     void           RecalculateSuspensionLines();
     void           RecalculateSwingingChassis();
+    void           RecalculateDoorModelFlags();
     void           CopyGlobalSuspensionLinesToPrivate();
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);
     void           FinalizeFramesList();
