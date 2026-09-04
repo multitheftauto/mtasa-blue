@@ -507,7 +507,7 @@ int CLuaUtilDefs::fromJSON(lua_State* luaVM)
             // GitHub Issue: #5287
             if (!lua_checkstack(luaVM, count))
             {
-                Converted.PushArgumentsAsTable(luaVM);
+                Converted.PushAsTable(luaVM, nullptr, true);
                 return 1;
             }
 
