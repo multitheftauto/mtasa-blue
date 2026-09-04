@@ -72,6 +72,7 @@ public:
     LUA_DECLARE(IsElementCallPropagationEnabled);
     LUA_DECLARE(IsElementWaitingForGroundToLoad);
     static bool IsElementOnFire(CClientEntity* entity) noexcept;
+    LUA_DECLARE(GetStreamedWorldModels);
 
     // Element set funcs
     LUA_DECLARE(CreateElement);
