@@ -88,7 +88,7 @@ namespace SharedUtil
 
     private:
         std::vector<std::thread> m_Workers;
-        bool                     m_Running = true;
+        bool                     m_Running = true;  // Guarded by m_TasksMutex
 
         std::queue<std::unique_ptr<SBaseTask>> m_Tasks;
         std::mutex                             m_TasksMutex;
