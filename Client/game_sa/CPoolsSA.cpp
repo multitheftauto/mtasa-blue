@@ -26,6 +26,7 @@
 #include "CTrailerSA.h"
 #include "CTrainSA.h"
 #include "CWorldSA.h"
+#include <game/CTrainTrackManager.h>
 
 #include "enums/VehicleClass.h"
 #include <new>
@@ -689,7 +690,8 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
     // Disable GetVehicle because CreateMissionTrain calls it before our CVehicleSA instance is inited
     m_bGetVehicleEnabled = false;
 
-    // Find closest track node
+    // The node search and CreateMissionTrain both handle a custom track exactly like a built-in one,
+    // so a train bound for either kind takes the same path through here
     float fRailDistance;
     int   iNodeId = pGame->GetWorld()->FindClosestRailTrackNode(vecPosition, ucTrackId, fRailDistance);
     int   iDesiredTrackId = ucTrackId;
