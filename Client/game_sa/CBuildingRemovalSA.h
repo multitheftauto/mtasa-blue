@@ -29,13 +29,13 @@ public:
     bool IsModelRemoved(uint16_t modelID) override;
     void ClearRemovedBuildingLists(uint* pOutAmount = NULL) override;
     sDataBuildingRemovalItem* AddDataBuilding(CEntitySAInterface* pInterface) override;
-    void RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface) override;
-    void AddBinaryBuilding(CEntitySAInterface* pInterface) override;
-    bool IsObjectRemoved(CEntitySAInterface* pInterface) override;
-    bool IsDataModelRemoved(uint16_t usModelID) override;
-    bool IsEntityRemoved(CEntitySAInterface* pInterface) override;
-    void DropCaches();
-    void AddDataBuildingAndReapplyRemoval(CEntitySAInterface* pInterface);
+    void                      RemoveWorldBuildingFromLists(CEntitySAInterface* pInterface) override;
+    void                      AddBinaryBuilding(CEntitySAInterface* pInterface) override;
+    bool                      IsObjectRemoved(CEntitySAInterface* pInterface) override;
+    bool                      IsDataModelRemoved(uint16_t usModelID) override;
+    bool                      IsEntityRemoved(CEntitySAInterface* pInterface) override;
+    void                      DropCaches();
+    void                      AddDataBuildingAndReapplyRemoval(CEntitySAInterface* pInterface);
 
 private:
     std::multimap<uint16_t, SBuildingRemoval*>*         m_pBuildingRemovals;
