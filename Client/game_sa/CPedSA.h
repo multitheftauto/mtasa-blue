@@ -368,6 +368,7 @@ public:
     void Init();
 
     void SetModelIndex(std::uint32_t modelIndex) override;
+    void SetVisible(bool visible) override;
 
     bool InternalAttachEntityToEntity(DWORD entityInterface, const CVector* position, const CVector* rotation) override;
     void DetachPedFromEntity() override;

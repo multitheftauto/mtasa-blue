@@ -58,11 +58,8 @@ CLocalGUI::~CLocalGUI()
 
 void CLocalGUI::SetSkin(const char* szName)
 {
-    // Guard against re-entrant calls. MessageBoxW pumps the message loop, so the
-    // fatal CC51 dialog below would otherwise trigger pulse calls that touch
-    // m_pConsole while windows are half-destroyed (DestroyWindows called but
-    // CreateWindows not yet reached). The guard also clears the flag if a
-    // window rebuild throws, so a failed skin change cannot disable later ones.
+    // CC51's pump runs pulse code on half-destroyed windows, so re-entrant
+    // calls are skipped. The guard clears on throw.
     static bool s_bInSetSkin = false;
     if (s_bInSetSkin)
         return;
@@ -73,8 +70,7 @@ void CLocalGUI::SetSkin(const char* szName)
         ~SetSkinGuard() { flag = false; }
     } guard(s_bInSetSkin);
 
-    // A fatal fault dialog may be pumping the message loop; do not rebuild the
-    // windows inside that pump.
+    // A fatal fault dialog is pumping messages; dont rebuild windows from inside it.
     if (CLocalGUI::IsFaultDialogOpen())
         return;
 
@@ -110,11 +106,9 @@ void CLocalGUI::SetSkin(const char* szName)
         }
         catch (...)
         {
-            // Both the selected and the default skin failed. MessageBoxW pumps the
-            // message loop (re-entrant), but the guard above prevents further damage
-            // before TerminateProcess takes effect. Mark the dialog as open so a
-            // nested fault during the pump terminates instead of stacking another.
+            // Mark both layers' dialog flags first, so a nested fault exits instead of stacking.
             CLocalGUI::SetFaultDialogOpen(true);
+            pGUI->SetFatalFaultDialogOpen(true);
             MessageBoxUTF8(0, _("The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."),
                            _("Error") + _E("CC51"), MB_OK | MB_ICONERROR | MB_TOPMOST);
             TerminateProcess(GetCurrentProcess(), 9);
@@ -139,13 +133,10 @@ void CLocalGUI::SetSkin(const char* szName)
 
 void CLocalGUI::ChangeLocale(const char* szName)
 {
-    // Guard against re-entrant calls while the windows are half-destroyed during
-    // a skin change (the fatal skin dialog pumps the message loop).
+    // Windows are gone mid-rebuild, or a fatal dialog is pumping messages.
     if (!m_pConsole) [[unlikely]]
         return;
 
-    // A fatal fault dialog may be pumping the message loop; do not rebuild the
-    // windows inside that pump.
     if (CLocalGUI::IsFaultDialogOpen())
         return;
 
@@ -344,6 +335,10 @@ void CLocalGUI::ApplyQueuedLocale()
     if (!m_bHasQueuedLocaleChange)
         return;
 
+    // Console is gone mid-rebuild; keep the request queued for a later pulse.
+    if (!m_pConsole)
+        return;
+
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();
 
     if (m_QueuedLocaleChange.empty())
@@ -390,6 +385,10 @@ void CLocalGUI::ApplyQueuedLocale()
 
 void CLocalGUI::DoPulse()
 {
+    // A fatal dialog is pumping messages; pulse work touches CEGUI and would throw.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return;
+
     m_pVersionUpdater->DoPulse();
 
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();
@@ -445,78 +444,39 @@ void CLocalGUI::DoPulse()
     // Show after any deferred locale/skin work so a prior prompt is not lost
     TryShowRestartPrompt();
 }
-// Set while a fatal GUI fault dialog is open, so a nested fault during the
-// dialog's message-loop pump terminates without stacking more dialogs.
+// True while the fatal CC51 dialog is open: nested faults exit instead of stacking.
 static bool s_bFaultDialogOpen = false;
 bool        CLocalGUI::IsFaultDialogOpen() noexcept
 {
-    return s_bFaultDialogOpen;
+    if (s_bFaultDialogOpen)
+        return true;
+
+    // CC54 does the same from the CEGUI layer.
+    if (CGUI* pGUI = CCore::GetSingleton().GetGUI())
+        return pGUI->IsFatalFaultDialogOpen();
+
+    return false;
 }
 void CLocalGUI::SetFaultDialogOpen(bool bOpen) noexcept
 {
     s_bFaultDialogOpen = bOpen;
 }
 
-// Error reporting for SEH faults in GUI rendering
-static void ReportGUISEHFault(DWORD dwExceptionCode, const char* szContext)
-{
-    // A nested fault can fire while this dialog pumps the message loop (the
-    // game frame keeps running). Show one dialog, then terminate immediately.
-    if (CLocalGUI::IsFaultDialogOpen())
-    {
-        TerminateProcess(GetCurrentProcess(), 9);
-        return;
-    }
-    CLocalGUI::SetFaultDialogOpen(true);
-
-    SString strMsg(
-        "Rendering fault in %s (code 0x%08X).\n\n"
-        "Usually caused by missing GUI/loading-screen assets.\n\n"
-        "Please verify game files or reinstall.",
-        szContext, dwExceptionCode);
-    WriteDebugEvent(SString("CLocalGUI::Draw SEH fault in %s code=0x%08X", szContext, dwExceptionCode));
-    MessageBoxUTF8(0, strMsg, _("Error") + _E("CC54"), MB_OK | MB_ICONERROR | MB_TOPMOST);
-    TerminateProcess(GetCurrentProcess(), 9);
-}
-
-// SEH filter for GUI rendering faults. Access violations and C++ exceptions
-// (CEGUI errors) are the common failures with missing or corrupt GUI assets;
-// other faults are left for the wider OnPresent guard.
-static int FilterGUISehFault(unsigned int uiExceptionCode)
-{
-    if (uiExceptionCode == EXCEPTION_ACCESS_VIOLATION || uiExceptionCode == CPP_EXCEPTION_CODE)
-        return EXCEPTION_EXECUTE_HANDLER;
-    return EXCEPTION_CONTINUE_SEARCH;
-}
-
-// SEH wrapper for the entire Draw body.
-static void DrawSEHGuard(CLocalGUI* pLocalGUI)
-{
-    __try
-    {
-        pLocalGUI->DrawInternal();
-    }
-    __except (FilterGUISehFault(GetExceptionCode()))
-    {
-        ReportGUISEHFault(GetExceptionCode(), "CLocalGUI::Draw");
-    }
-}
-
+// CEGUI faults are caught in CGUI_Impl::Draw; anything else goes to the crash handler.
 void CLocalGUI::Draw()
-{
-    DrawSEHGuard(this);
-}
-
-void CLocalGUI::DrawInternal()
 {
     // Get the game interface
     CGame*      pGame = CCore::GetSingleton().GetGame();
     SystemState systemState = pGame->GetSystemState();
     CGUI*       pGUI = CCore::GetSingleton().GetGUI();
 
-    // The windows may be half-destroyed while a fatal dialog pumps the message
-    // loop during a skin or locale change, so skip drawing until they are back.
+    // Windows are gone mid-rebuild; skip drawing until they are back.
     if (!m_pMainMenu) [[unlikely]]
+        return;
+
+    // A fatal dialog is pumping messages; dont redraw CEGUI or the same fault
+    // would rethrow each frame and terminate before the dialog can be read.
+    if (CLocalGUI::IsFaultDialogOpen())
         return;
 
     // Update mainmenu stuff
@@ -582,9 +542,14 @@ void CLocalGUI::Restore()
 
 void CLocalGUI::DrawMouseCursor()
 {
+    // Same reason as Draw: the fault dialog's pump must not re-enter CEGUI.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return;
+
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
-    pGUI->DrawMouseCursor();
+    if (pGUI)
+        pGUI->DrawMouseCursor();
 }
 
 CConsole* CLocalGUI::GetConsole()
@@ -933,6 +898,10 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 bool CLocalGUI::InputGoesToGUI()
 {
+    // A fatal fault dialog is pumping messages; dont route input into CEGUI.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return false;
+
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
     if (!pGUI)
         return false;
@@ -948,6 +917,8 @@ void CLocalGUI::ForceCursorVisible(bool bVisible)
 
 void CLocalGUI::UpdateCursor()
 {
+    // Only called from Draw, which already returns while a fatal fault dialog
+    // is open, so the CEGUI calls below never run against a broken GUI state.
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
     static DWORD dwWidth = CDirect3DData::GetSingleton().GetViewportWidth();
