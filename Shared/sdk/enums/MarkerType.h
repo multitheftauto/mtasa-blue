@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/MarkerType.h
+ *  FILE:        sdk/enums/MarkerType.h
  *  PURPOSE:     Header for common definitions
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/

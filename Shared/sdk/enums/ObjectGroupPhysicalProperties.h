@@ -2,7 +2,7 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
- *  FILE:        sdk/ObjectGroupPhysicalProperties.h
+ *  FILE:        sdk/enums/ObjectGroupPhysicalProperties.h
  *  PURPOSE:     Header for common definitions
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
