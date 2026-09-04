@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CLuaDefs.h"
+#include "lua/CLuaArguments.h"
 
 class CLuaClientDefs : public CLuaDefs
 {
@@ -19,13 +20,14 @@ public:
     static void LoadFunctions();
 
 private:
-    static bool SetTransferBoxVisible(bool visible);
-    static bool IsTransferBoxVisible();
-    static bool IsTransferBoxAlwaysVisible();
-    static bool ShowChat(bool bVisible, std::optional<bool> optInputBlocked);
-    static bool IsChatVisible();
-    static bool IsChatInputBlocked();
-    static bool ClearDebug();
-    static bool IsMTAWindowFocused();
-    static bool IsCapsLockEnabled();
+    static bool          SetTransferBoxVisible(bool visible);
+    static bool          IsTransferBoxVisible();
+    static bool          IsTransferBoxAlwaysVisible();
+    static bool          ShowChat(bool bVisible, std::optional<bool> optInputBlocked);
+    static bool          IsChatVisible();
+    static bool          IsChatInputBlocked();
+    static bool          ClearDebug();
+    static bool          IsMTAWindowFocused();
+    static bool          IsCapsLockEnabled();
+    static CLuaArguments GetCPUInfo();
 };

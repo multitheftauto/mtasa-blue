@@ -36,6 +36,17 @@ namespace SharedUtil
         SString strProductName;
     };
 
+    struct SCPUInfo
+    {
+        SString      strName;
+        unsigned int uiMaxClockSpeedMHz = 0;
+        unsigned int uiCores = 0;
+        unsigned int uiThreads = 0;
+        unsigned int uiL1CacheKB = 0;
+        unsigned int uiL2CacheKB = 0;
+        unsigned int uiL3CacheKB = 0;
+    };
+
     bool         QueryWMI(SQueryWMIResult& outResult, const SString& strQuery, const SString& strKeys, const SString& strNamespace = "CIMV2");
     SString      GetWMIOSVersion();
     unsigned int GetWMIVideoAdapterMemorySize(const unsigned long ulVen, const unsigned long ulDev);
@@ -45,6 +56,7 @@ namespace SharedUtil
     bool         IsHotFixInstalled(const SString& strHotFixId);
     bool         GetLibVersionInfo(const SString& strLibName, SLibVersionInfo* pOutLibVersionInfo);
     bool         Is64BitOS();
+    void         GetCPUInfo(SCPUInfo& outInfo);
 }  // namespace SharedUtil
 
 #endif
