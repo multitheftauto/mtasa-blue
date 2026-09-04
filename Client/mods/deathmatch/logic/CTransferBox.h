@@ -69,4 +69,8 @@ private:
 
     std::bitset<TB_VISIBILITY_SOURCES_SIZE> m_visible;
     bool                                    m_alwaysVisible = true;
+
+    uint64_t m_lastDownloadedSize = 0;
+    uint32_t m_lastTimeCheck = 0;
+    float    m_smoothedSpeed = 0.0f;
 };
