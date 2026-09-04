@@ -19,7 +19,8 @@ using std::list;
 static constexpr unsigned int kNumModelWorkerThreads = 2;
 
 // How long a worker sleeps between polls of an in-flight model request.
-static constexpr int kWorkerPollIntervalMs = 20;
+// Kept at 5ms so an async model load is noticed within a few ms of completing.
+static constexpr int kWorkerPollIntervalMs = 5;
 
 CClientModelRequestManager::CClientModelRequestManager()
 {
@@ -341,10 +342,6 @@ void CClientModelRequestManager::Cancel(CClientEntity* pEntity, bool bAllowQueue
 
     std::lock_guard<std::mutex> lock(m_Mutex);
 
-    // Check to ensure entity has not got its knickers in a twist
-    if (ListContains(m_CancelQueue, pEntity))
-        return;
-
     // Mark any matching, not-yet-finished entries as cancelled. We do NOT delete or erase them
     // here: a worker thread may currently own the entry. DoPulse() is the only place entries are
     // deleted, and only once bBackgroundProcessed is true, so it's always safe from there.
@@ -430,22 +427,6 @@ void CClientModelRequestManager::DoPulse()
 
         // No longer doing the pulse
         m_bDoingPulse = false;
-
-        // Cancel what we've scheduled for cancel now if anything
-        if (m_CancelQueue.size() > 0)
-        {
-            // Cancel every entity in our cancel list
-            list<CClientEntity*> cancelQueueCopy = m_CancelQueue;
-            m_CancelQueue.clear();
-
-            lock.unlock();
-            list<CClientEntity*>::iterator cancelIter = cancelQueueCopy.begin();
-            for (; cancelIter != cancelQueueCopy.end(); ++cancelIter)
-            {
-                Cancel(*cancelIter, false);
-            }
-            lock.lock();
-        }
     }
 }
 
