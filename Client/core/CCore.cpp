@@ -1423,7 +1423,12 @@ void CCore::DoPostFramePulse()
     if (!IsFocused() && m_bLastFocused)
     {
         // Fix for #4948
-        m_pKeyBinds->CallAllGTAControlBinds(CONTROL_BOTH, false);
+        // A fatal fault dialog takes focus while pumping messages; releasing the
+        // control binds runs Lua handlers that touch the half-destroyed GUI.
+        // Skipping the release is safe because both fault paths terminate the
+        // process when the dialog closes.
+        if (!CLocalGUI::IsFaultDialogOpen())
+            m_pKeyBinds->CallAllGTAControlBinds(CONTROL_BOTH, false);
         m_bLastFocused = false;
     }
     else if (IsFocused() && !m_bLastFocused)

@@ -173,4 +173,9 @@ public:
 
     virtual void         Cleanup() = 0;
     virtual CGUIElement* GetScriptRoot() = 0;
+
+    // Lets core know CC54 is open, and lets core report CC51 back to CEGUI. Both
+    // dialogs pump messages, so the other layer skips rebuilds and wont stack its own.
+    virtual void SetFatalFaultDialogOpen(bool bOpen) = 0;
+    virtual bool IsFatalFaultDialogOpen() const = 0;
 };
