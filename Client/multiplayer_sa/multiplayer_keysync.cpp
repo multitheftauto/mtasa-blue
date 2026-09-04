@@ -12,6 +12,7 @@
 #include "StdInc.h"
 
 #include <game/CWeaponStatManager.h>
+#include <cstdint>
 
 extern CMultiplayerSA* pMultiplayer;
 
@@ -73,9 +74,38 @@ namespace
     }
 }
 
+// Fight strafing needs mouse look, but CTaskSimpleFight::ProcessPed then uses
+// the observer's camera front vector to turn remote fighters. Skip only that
+// heading write remotely; local and native target-entity turning stay intact.
+#define HOOKPOS_CTaskSimpleFight_ProcessPed_CameraHeading   0x62A054
+#define HOOKSIZE_CTaskSimpleFight_ProcessPed_CameraHeading  5
+#define HOOKCHECK_CTaskSimpleFight_ProcessPed_CameraHeading 0xA1
+static const std::uint32_t RETURN_CTaskSimpleFight_ProcessPed_CameraHeading = 0x62A059;
+static const std::uint32_t SKIP_CTaskSimpleFight_ProcessPed_CameraHeading = 0x62A083;
+
+static void __declspec(naked) HOOK_CTaskSimpleFight_ProcessPed_CameraHeading()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // The replaced instruction only loads EAX. Neither continuation consumes
+    // integer flags before the epilogue overwrites them, so no save is needed.
+    // clang-format off
+    __asm
+    {
+        cmp     byte ptr [bNotInLocalContext], 0
+        jne     remote
+        mov     eax, dword ptr ds:[0xB6F32C]  // Original load of Cams[0].Front.x
+        jmp     dword ptr [RETURN_CTaskSimpleFight_ProcessPed_CameraHeading]
+    remote:
+        jmp     dword ptr [SKIP_CTaskSimpleFight_ProcessPed_CameraHeading]
+    }
+    // clang-format on
+}
+
 VOID InitKeysyncHooks()
 {
     // OutputDebugString("InitKeysyncHooks");
+    EZHookInstallChecked(CTaskSimpleFight_ProcessPed_CameraHeading);
     HookInstallMethod(VTBL_CPlayerPed__ProcessControl, (DWORD)HOOK_CPlayerPed__ProcessControl);
     HookInstallMethod(VTBL_CAutomobile__ProcessControl, (DWORD)HOOK_CAutomobile__ProcessControl);
     HookInstallMethod(VTBL_CMonsterTruck__ProcessControl, (DWORD)HOOK_CMonsterTruck__ProcessControl);
@@ -348,9 +378,9 @@ void SwitchContext(CPed* thePed)
                         }
                     }
 
-                    // Disable mouse look if they're not in a fight task and not aiming (strafing)
-                    // Fix GitHub Issue #395
-                    if (thePed->GetCurrentWeaponSlot() == eWeaponSlot::WEAPONSLOT_TYPE_UNARMED && data->m_pad.NewState.RightShoulder1 != 0 &&
+                    // Fight strafing needs mouse-look movement for every melee weapon,
+                    // including weapons outside the unarmed slot (GitHub Issue #395).
+                    if (pWeaponStat && pWeaponStat->GetFireType() == FIRETYPE_MELEE && data->m_pad.NewState.RightShoulder1 != 0 &&
                         thePed->GetPedIntelligence()->GetFightTask())
                         bDisableMouseLook = false;
 
@@ -546,6 +576,28 @@ struct CSavedRegs
 };
 static CSavedRegs PlayerPed__ProcessControl_Saved;
 
+static void ConsumeRemoteMeleeSpecialPress()
+{
+    if (!bNotInLocalContext || !pContextSwitchedPed)
+        return;
+
+    auto* pPad = static_cast<CPadSA*>(pGameInterface->GetPad())->GetInterface();
+    if ((!pPad->NewState.RightShoulder1 && !pPad->OldState.RightShoulder1) || (!pPad->NewState.ButtonTriangle && !pPad->OldState.ButtonTriangle))
+        return;
+
+    CWeapon*     pWeapon = pContextSwitchedPed->GetWeapon(pContextSwitchedPed->GetCurrentWeaponSlot());
+    CWeaponStat* pWeaponInfo = pWeapon ? pGameInterface->GetWeaponStatManager()->GetWeaponStats(pWeapon->GetType()) : nullptr;
+    if (!pWeaponInfo || pWeaponInfo->GetFireType() != FIRETYPE_MELEE)
+        return;
+
+    // GTA's MeleeAttackJustDown treats F as an edge, but remote OldState is
+    // otherwise advanced only by incoming packets. Consume this combat edge
+    // after one simulation step so a held packet cannot requeue command 12 on
+    // every frame. Preserve the held state and other controls (including normal
+    // vehicle entry); ReturnContextToLocalPlayer stores this history in the pad.
+    pPad->OldState.ButtonTriangle = pPad->NewState.ButtonTriangle;
+}
+
 static void __declspec(naked) HOOK_CPlayerPed__ProcessControl()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -581,6 +633,7 @@ static void __declspec(naked) HOOK_CPlayerPed__ProcessControl()
     }
     // clang-format on
 
+    ConsumeRemoteMeleeSpecialPress();
     ReturnContextToLocalPlayer();
 
     // clang-format off

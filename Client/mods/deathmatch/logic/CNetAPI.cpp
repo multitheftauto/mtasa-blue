@@ -1120,8 +1120,13 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     // here to keep the aim sync below consistent with our own pose.
     if (ControllerState.RightShoulder1 || ControllerState.ButtonCircle)
     {
-        CTask* pAttackTask = pPlayerModel->GetTaskManager()->GetTaskSecondary(TASK_SECONDARY_ATTACK);
-        if (!pAttackTask || pAttackTask->GetTaskType() != TASK_SIMPLE_USE_GUN)
+        CWeapon*     pWeapon = pPlayerModel->GetWeapon();
+        CWeaponStat* pWeaponInfo = pWeapon ? g_pGame->GetWeaponStatManager()->GetWeaponStats(pWeapon->GetType()) : nullptr;
+        // Melee uses a fight task, not USE_GUN. Clearing these inputs would alternate
+        // released puresync buttons with held keysync buttons and interrupt remote combat.
+        const bool bMelee = pWeaponInfo && pWeaponInfo->GetFireType() == FIRETYPE_MELEE;
+        CTask*     pAttackTask = pPlayerModel->GetTaskManager()->GetTaskSecondary(TASK_SECONDARY_ATTACK);
+        if (!bMelee && (!pAttackTask || pAttackTask->GetTaskType() != TASK_SIMPLE_USE_GUN))
         {
             ControllerState.RightShoulder1 = 0;
             ControllerState.ButtonCircle = 0;
