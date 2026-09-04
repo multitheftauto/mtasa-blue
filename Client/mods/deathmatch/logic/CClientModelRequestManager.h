@@ -63,7 +63,6 @@ private:
 
     bool                            m_bDoingPulse;
     std::list<SClientModelRequest*> m_Requests;
-    std::list<CClientEntity*>       m_CancelQueue;
 
     std::vector<std::thread>         m_WorkerThreads;
     std::queue<SClientModelRequest*> m_BackgroundQueue;
