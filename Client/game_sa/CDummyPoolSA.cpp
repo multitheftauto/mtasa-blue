@@ -13,6 +13,7 @@
 
 #include "StdInc.h"
 #include "CDummyPoolSA.h"
+#include "CBuildingRemovalSA.h"
 #include "CGameSA.h"
 #include <game/CWorld.h>
 
@@ -57,6 +58,8 @@ void CDummyPoolSA::RestoreBackup()
     if (!m_pOriginalElementsBackup)
         return;
 
+    auto* pBuildingRemoval = static_cast<CBuildingRemovalSA*>(pGame->GetBuildingRemoval());
+
     auto& originalData = *m_pOriginalElementsBackup;
     auto  pDummyPool = (*m_ppDummyPoolInterface);
     for (auto i = 0; i < MAX_DUMMIES_DEFAULT; i++)
@@ -68,6 +71,7 @@ void CDummyPoolSA::RestoreBackup()
             std::memcpy(pDummy, &originalData[i].second, sizeof(CEntitySAInterface));
 
             pGame->GetWorld()->Add(pDummy, CDummyPool_Constructor);
+            pBuildingRemoval->AddDataBuildingAndReapplyRemoval(pDummy);
         }
     }
 
