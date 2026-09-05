@@ -835,6 +835,13 @@ bool ProcessDamageEvent(CEventDamageSAInterface* event, CPedSAInterface* affects
 {
     if (m_pDamageHandler && event)
     {
+        // If damage was caused by fire and GTA SA did not populate an inflictor entity,
+        // attribute the damage to the creator entity attached to this burning ped's fire.
+        if (event->pInflictor == nullptr && affectsPed && affectsPed->pFireOnPed && affectsPed->pFireOnPed->entityCreator)
+        {
+            event->pInflictor = affectsPed->pFireOnPed->entityCreator;
+        }
+
         CPoolsSA*              pPools = (CPoolsSA*)pGameInterface->GetPools();
         SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)affectsPed);
         CPed*                  pPed = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
