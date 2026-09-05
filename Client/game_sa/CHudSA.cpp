@@ -14,6 +14,7 @@
 #include "CGameSA.h"
 #include "CCameraSA.h"
 #include "CPlayerInfoSA.h"
+#include "CPedSA.h"
 #include "TaskAttackSA.h"
 #include "CAERadioTrackManagerSA.h"
 
@@ -838,6 +839,155 @@ void CHudSA::RenderRadioName(float x, float y, const char* strRadio)
     RenderText(x, y, strRadio, componentProperties.radioName, pGame->GetAERadioTrackManager()->IsStationLoading());
 }
 
+static RwTexture* weaponTextures[50] = {nullptr};
+static RwTexture* sniperCrosshairTexture = nullptr;
+static RwTexture* cameraCrosshairTexture = nullptr;
+static bool       weaponsTxdLoaded = false;
+
+static void EnsureWeaponsTxdLoaded()
+{
+    if (weaponsTxdLoaded)
+        return;
+    weaponsTxdLoaded = true;
+
+    SString weaponsPath = CalcMTASAPath(PathJoin("MTA", "data", "weapons.txd"));
+    if (!FileExists(weaponsPath))
+        return;
+
+    auto addTxdSlot = reinterpret_cast<int (*)(const char*, const char*, bool)>(0x731C80);
+    auto loadTxd = reinterpret_cast<bool (*)(int, const char*)>(0x7320B0);
+    auto addRef = reinterpret_cast<void (*)(int)>(0x731A30);
+    auto pushCurrentTxd = reinterpret_cast<void (*)()>(0x7316B0);
+    auto setCurrentTxd = reinterpret_cast<void (*)(int, const char*)>(0x7319C0);
+    auto popCurrentTxd = reinterpret_cast<void (*)()>(0x7316A0);
+    auto setTexture = reinterpret_cast<void(__thiscall*)(void*, const char*)>(0x727270);
+
+    int txdSlot = addTxdSlot("hd_weapons", "hd_weapons", false);
+    if (txdSlot < 0 || !loadTxd(txdSlot, *weaponsPath))
+        return;
+
+    addRef(txdSlot);
+    pushCurrentTxd();
+    setCurrentTxd(txdSlot, nullptr);
+
+    static constexpr const char* weaponTextureNames[47] = {
+        "Fist",
+        "Brassknucles",
+        "Golfclub",
+        "Night Stick",
+        "Knife",
+        "Bat",
+        "Shovel",
+        "Poolcue",
+        "Katana",
+        "Chainsaw",  // 0-9
+        "Dildo 1",
+        "Dildo 2",
+        "Vibe 1",
+        "Vibe 2",
+        "Flowers",
+        "Cane",
+        "Grenade",
+        "Tear Gas",
+        "Molotov Cocktail",  // 10-18
+        nullptr,
+        nullptr,
+        nullptr,  // 19-21 (unused in GTA:SA)
+        "Pistol",
+        "Silenced Pistol",
+        "Desert Eagle",
+        "Shotgun",
+        "Sawnoff Shotgun",
+        "Combat Shotgun",  // 22-27
+        "Micro SMG",
+        "SMG",
+        "AK47",
+        "M4",
+        "Tec9",
+        "Riffle",
+        "Sniper Riffle",
+        "Rocket",
+        "Heatseeker",  // 28-36
+        "Flame Thrower",
+        "Minigun",
+        "Satchel Charges",
+        "Remote",
+        "Spray Can",
+        "Fire Extinguisher",  // 37-42
+        "Camera",
+        "Night-vision",
+        "Thermal-vision",
+        "Parachute"  // 43-46
+    };
+
+    void* tempSprite = nullptr;
+
+    for (int weaponId = 0; weaponId < 47; ++weaponId)
+    {
+        const char* name = weaponTextureNames[weaponId];
+        if (!name)
+            continue;
+
+        tempSprite = nullptr;
+        setTexture(&tempSprite, name);
+        RwTexture* texture = *reinterpret_cast<RwTexture**>(&tempSprite);
+        if (texture)
+        {
+            texture->flags = (texture->flags & ~0xFF) | 0x02;  // Linear filtering
+            weaponTextures[weaponId] = texture;
+        }
+    }
+
+    // Load sniper and camera crosshairs from weapons.txd
+    tempSprite = nullptr;
+    setTexture(&tempSprite, "snipercrosshair");
+    sniperCrosshairTexture = *reinterpret_cast<RwTexture**>(&tempSprite);
+    if (sniperCrosshairTexture)
+        sniperCrosshairTexture->flags = (sniperCrosshairTexture->flags & ~0xFF) | 0x02;
+
+    tempSprite = nullptr;
+    setTexture(&tempSprite, "cameracrosshair");
+    cameraCrosshairTexture = *reinterpret_cast<RwTexture**>(&tempSprite);
+    if (cameraCrosshairTexture)
+        cameraCrosshairTexture->flags = (cameraCrosshairTexture->flags & ~0xFF) | 0x02;
+
+    popCurrentTxd();
+}
+
+static RwTexture* HOOK_RwTexDictionaryFindHashNamedTexture_WeaponIcon(void* dict, uint hash)
+{
+    auto  getPlayerPed = reinterpret_cast<void* (*)(int)>(0x56E210);
+    void* playerPed = getPlayerPed(-1);
+    if (playerPed)
+    {
+        auto activeSlot = *reinterpret_cast<signed char*>(reinterpret_cast<std::uintptr_t>(playerPed) + 0x718);
+        auto activeWeapon = *reinterpret_cast<int*>(reinterpret_cast<std::uintptr_t>(playerPed) + 0x5A0 + activeSlot * 0x1C);
+        if (activeWeapon >= 0 && activeWeapon < 47 && weaponTextures[activeWeapon])
+            return weaponTextures[activeWeapon];
+    }
+
+    auto original = reinterpret_cast<RwTexture* (*)(void*, uint)>(0x734E50);
+    return original(dict, hash);
+}
+
+static RwTexture* HOOK_RwTexDictionaryFindHashNamedTexture_Crosshair(void* dict, uint hash)
+{
+    auto  getPlayerPed = reinterpret_cast<void* (*)(int)>(0x56E210);
+    void* playerPed = getPlayerPed(-1);
+    if (playerPed)
+    {
+        auto activeSlot = *reinterpret_cast<signed char*>(reinterpret_cast<std::uintptr_t>(playerPed) + 0x718);
+        auto activeWeapon = *reinterpret_cast<int*>(reinterpret_cast<std::uintptr_t>(playerPed) + 0x5A0 + activeSlot * 0x1C);
+        if (activeWeapon == 34 && sniperCrosshairTexture)
+            return sniperCrosshairTexture;
+        if (activeWeapon == 43 && cameraCrosshairTexture)
+            return cameraCrosshairTexture;
+    }
+
+    auto original = reinterpret_cast<RwTexture* (*)(void*, uint)>(0x734E50);
+    return original(dict, hash);
+}
+
 void __fastcall CHudSA::RenderWeaponIcon_Sprite(void* sprite, void*, CRect* rect, RwColor* color)
 {
     // Use custom position/size?
@@ -965,8 +1115,33 @@ static void HOOK_RenderHudBar(int playerId, int x, int y)
         CHudSA::RenderArmorBar(x, y);
 }
 
+using SharedUtil::CalcMTASAPath;
+using SharedUtil::PathJoin;
+
+static bool HOOK_CTxdStore_LoadTxd_Hud(int slot, const char* path)
+{
+    // Check if high-definition HUD TXD is available in MTA data directory
+    static SString mtaHudPath = CalcMTASAPath(PathJoin("MTA", "data", "hud.txd"));
+    if (FileExists(mtaHudPath))
+        path = *mtaHudPath;
+
+    bool result = reinterpret_cast<bool (*)(int, const char*)>(0x7320B0)(slot, path);
+    if (result)
+    {
+        EnsureWeaponsTxdLoaded();
+    }
+    return result;
+}
+
 void CHudSA::StaticSetHooks()
 {
+    // Hook CTxdStore::LoadTxd call inside CHud::Initialise at 0x5BA865 to support loading custom/HD hud.txd from MTA/data/
+    HookInstallCall(0x5BA865, reinterpret_cast<DWORD>(HOOK_CTxdStore_LoadTxd_Hud));
+
+    // Hook texture resolution for weapon icons and sniper/camera crosshairs to use HD textures
+    HookInstallCall(0x58D84B, reinterpret_cast<DWORD>(HOOK_RwTexDictionaryFindHashNamedTexture_WeaponIcon));
+    HookInstallCall(0x58E895, reinterpret_cast<DWORD>(HOOK_RwTexDictionaryFindHashNamedTexture_Crosshair));
+
     HookInstall(FUNC_RenderHealthBar, &HOOK_RenderHudBar, 11);
     HookInstall(FUNC_RenderBreathBar, &HOOK_RenderHudBar, 11);
     HookInstall(FUNC_RenderArmorBar, &HOOK_RenderHudBar, 11);
@@ -978,9 +1153,6 @@ void CHudSA::StaticSetHooks()
     HookInstallCall(0x58B156, (DWORD)&RenderVehicleName);
     HookInstallCall(0x58AE5D, (DWORD)&RenderZoneName);
     HookInstallCall(0x4E9FF1, (DWORD)&RenderRadioName);
-
-    HookInstallCall(0x58D988, (DWORD)&RenderWeaponIcon_Sprite);
-    HookInstallCall(0x58D8FD, (DWORD)&RenderWeaponIcon_XLU);
 
     HookInstall(0x58DFD3, &HOOK_RenderWanted);
 }
