@@ -2485,7 +2485,24 @@ void CClientVehicle::StreamedInPulse()
             {
                 CDoor* pDoor = m_pVehicle->GetDoor(i);
                 if (pDoor)
+                {
                     m_fDoorOpenRatio[i] = pDoor->GetAngleOpenRatio();
+
+                    // If a swinging door has reached the closed position while moving, latch it shut
+                    if (m_fDoorOpenRatio[i] <= 0.01f && m_bSwingingDoorsAllowed)
+                    {
+                        auto* damageManager = m_pVehicle->GetDamageManager();
+                        if (damageManager)
+                        {
+                            auto const status = damageManager->GetDoorStatus(static_cast<eDoors>(i));
+                            if (status == 1 || status == 3)  // DT_DOOR_SWINGING_FREE (1) or DT_DOOR_BASHED_AND_SWINGING_FREE (3)
+                            {
+                                damageManager->SetDoorStatus(static_cast<eDoors>(i), status - 1, false);  // Set to CLOSED (0 or 2)
+                                SetDoorOpenRatio(i, 0.0f, 0, true);
+                            }
+                        }
+                    }
+                }
             }
         }
 
@@ -4221,6 +4238,16 @@ void CClientVehicle::SetPedOccupiedVehicle(CClientPed* pClientPed, CClientVehicl
         pVehicle->AllowDoorRatioSetting(ucDoor, true);
     else if (uiSeat < 4)
         pVehicle->AllowDoorRatioSetting(uiSeat + 2, true);
+
+    // If the occupant has entered an automobile seat, close and latch the seat door smoothly so it doesn't snap or flap unlatched
+    if (uiSeat < 4 && CClientVehicleManager::HasDoors(pVehicle->GetModel()))
+    {
+        auto const seatDoor = (ucDoor != 0xFF) ? ucDoor : static_cast<std::uint8_t>(uiSeat + 2);
+        if (pVehicle->GetDoorOpenRatio(seatDoor) <= 0.1f)
+            pVehicle->SetDoorOpenRatio(seatDoor, 0.0f, 0, true);
+        else
+            pVehicle->SetDoorOpenRatio(seatDoor, 0.0f, 400, true);
+    }
 
     // Checks
     ValidatePedAndVehiclePair(pClientPed, pVehicle);
