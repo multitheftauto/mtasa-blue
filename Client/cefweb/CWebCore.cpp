@@ -146,7 +146,7 @@ bool CWebCore::Initialise(bool gpuEnabled)
     struct DllDirGuard
     {
         std::wstring dir;
-        bool         known   = true;
+        bool         known = true;
         bool         restore = true;
         explicit DllDirGuard(std::wstring d, bool isKnown) : dir(std::move(d)), known(isKnown) {}
         ~DllDirGuard()
