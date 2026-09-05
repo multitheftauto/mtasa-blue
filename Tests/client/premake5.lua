@@ -23,12 +23,14 @@ project "Tests_Client"
 	files {
 		"premake5.lua",
 		"**.h",
-		"**.cpp"
+		"**.cpp",
+		"../../Client/mods/deathmatch/logic/CRuntimeColModel.cpp"
 	}
 
 	defines {
 		"GTEST_HAS_PTHREAD=0",
 		"MTA_CLIENT",
+		"RUNTIME_COL_MODEL_STANDALONE",
 		"SHARED_UTIL_WITH_HASH_MAP",
 	}
 
