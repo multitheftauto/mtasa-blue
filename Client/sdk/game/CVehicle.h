@@ -198,6 +198,7 @@ public:
     virtual bool           IsDrowning() = 0;
     virtual bool           IsEngineOn() = 0;
     virtual bool           IsHandbrakeOn() = 0;
+    virtual bool           CanPedStepOutCar(bool bIgnoreSpeedUpright = false) = 0;
     virtual bool           IsRCVehicle() = 0;
     virtual bool           GetAlwaysLeaveSkidMarks() = 0;
     virtual bool           GetCanBeDamaged() = 0;

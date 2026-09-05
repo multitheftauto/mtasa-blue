@@ -170,7 +170,7 @@ public:
     eClientEntityType GetType() const { return CCLIENTVEHICLE; };
 
     const char*        GetNamePointer() { return m_pModelInfo->GetNameIfVehicle(); };
-    eClientVehicleType GetVehicleType() { return m_eVehicleType; };
+    eClientVehicleType GetVehicleType() const { return m_eVehicleType; };
 
     void GetPosition(CVector& vecPosition) const;
     void SetPosition(const CVector& vecPosition) { SetPosition(vecPosition, true); }
