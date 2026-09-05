@@ -3959,6 +3959,12 @@ void CClientGame::PostWorldProcessHandler()
 
 void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
 {
+    // Update native bone attachments directly after GTA computes ped bone matrices
+    if (m_pManager && m_pManager->GetPedManager())
+    {
+        m_pManager->GetPedManager()->UpdateBoneAttachments();
+    }
+
     CLuaArguments Arguments;
     m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
 }

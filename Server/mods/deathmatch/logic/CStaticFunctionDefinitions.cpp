@@ -1635,57 +1635,107 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
     return false;
 }
 
-bool CStaticFunctionDefinitions::AttachElements(CElement* pElement, CElement* pAttachedToElement, CVector& vecPosition, CVector& vecRotation)
+bool CStaticFunctionDefinitions::AttachElements(CElement* element, CElement* attachedToElement, CVector& position, CVector& rotation, eBone bone,
+                                                bool enableCollisions)
 {
-    assert(pElement);
-    assert(pAttachedToElement);
+    assert(element);
+    assert(attachedToElement);
 
-    if (!pElement->IsAttachToable() || !pAttachedToElement->IsAttachable() || pAttachedToElement->IsAttachedToElement(pElement) ||
-        pElement->GetDimension() != pAttachedToElement->GetDimension())
+    if (!element->IsAttachToable() || !attachedToElement->IsAttachable() || attachedToElement->IsAttachedToElement(element) ||
+        element->GetDimension() != attachedToElement->GetDimension())
     {
         return false;
     }
 
-    CLuaArguments Arguments;
-    Arguments.PushElement(pAttachedToElement);
-    Arguments.PushNumber(vecPosition.fX);
-    Arguments.PushNumber(vecPosition.fY);
-    Arguments.PushNumber(vecPosition.fZ);
-    Arguments.PushNumber(vecRotation.fX);
-    Arguments.PushNumber(vecRotation.fY);
-    Arguments.PushNumber(vecRotation.fZ);
+    CLuaArguments arguments;
+    arguments.PushElement(attachedToElement);
+    arguments.PushNumber(position.fX);
+    arguments.PushNumber(position.fY);
+    arguments.PushNumber(position.fZ);
+    arguments.PushNumber(rotation.fX);
+    arguments.PushNumber(rotation.fY);
+    arguments.PushNumber(rotation.fZ);
+    if (bone != BONE_ROOT)
+        arguments.PushNumber(static_cast<double>(bone));
 
-    if (!pElement->CallEvent("onElementAttach", Arguments))
+    if (!element->CallEvent("onElementAttach", arguments))
     {
         return false;
     }
 
-    pElement->SetAttachedOffsets(vecPosition, vecRotation);
-    ConvertDegreesToRadians(vecRotation);
-    pElement->AttachTo(pAttachedToElement);
+    element->SetAttachedOffsets(position, rotation);
+    ConvertDegreesToRadians(rotation);
+    element->AttachTo(attachedToElement, bone);
 
-    if (IS_MARKER(pElement))
+    if (bone != BONE_ROOT && !enableCollisions)
     {
-        CMarker* pMarker = static_cast<CMarker*>(pElement);
+        SetElementCollisionsEnabled(element, false);
+    }
+
+    if (IS_MARKER(element))
+    {
+        CMarker* marker = static_cast<CMarker*>(element);
         CVector  attachedPosition;
-        pMarker->GetAttachedPosition(attachedPosition);
-        pMarker->SetPosition(attachedPosition);
+        marker->GetAttachedPosition(attachedPosition);
+        marker->SetPosition(attachedPosition);
 
-        CColShape* pColShape = pMarker->GetColShape();
-        if (pColShape)
-            RefreshColShapeColliders(pColShape);
+        CColShape* colShape = marker->GetColShape();
+        if (colShape)
+            RefreshColShapeColliders(colShape);
     }
 
-    CBitStream BitStream;
-    BitStream.pBitStream->Write(pAttachedToElement->GetID());
-    BitStream.pBitStream->Write(vecPosition.fX);
-    BitStream.pBitStream->Write(vecPosition.fY);
-    BitStream.pBitStream->Write(vecPosition.fZ);
-    BitStream.pBitStream->Write(vecRotation.fX);
-    BitStream.pBitStream->Write(vecRotation.fY);
-    BitStream.pBitStream->Write(vecRotation.fZ);
-    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, ATTACH_ELEMENTS, *BitStream.pBitStream));
+    CBitStream bitStream;
+    bitStream.pBitStream->Write(attachedToElement->GetID());
+    bitStream.pBitStream->Write(position.fX);
+    bitStream.pBitStream->Write(position.fY);
+    bitStream.pBitStream->Write(position.fZ);
+    bitStream.pBitStream->Write(rotation.fX);
+    bitStream.pBitStream->Write(rotation.fY);
+    bitStream.pBitStream->Write(rotation.fZ);
+    bitStream.pBitStream->Write(static_cast<unsigned char>(bone));
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, ATTACH_ELEMENTS, *bitStream.pBitStream));
 
+    return true;
+}
+
+bool CStaticFunctionDefinitions::AttachElementToBone(CElement* element, CElement* attachedToElement, eBone bone, CVector& position, CVector& rotation,
+                                                     bool enableCollisions)
+{
+    if (!element || !attachedToElement)
+        return false;
+
+    if (bone < BONE_ROOT || bone > BONE_RIGHTFOOT)
+        return false;
+
+    if (!IS_PED(attachedToElement) && !IS_PLAYER(attachedToElement))
+        return false;
+
+    return AttachElements(element, attachedToElement, position, rotation, bone, enableCollisions);
+}
+
+bool CStaticFunctionDefinitions::DetachElementFromBone(CElement* element)
+{
+    if (!element || !element->IsAttachedToBone())
+        return false;
+
+    return DetachElements(element);
+}
+
+bool CStaticFunctionDefinitions::IsElementAttachedToBone(CElement* element, bool& isAttached)
+{
+    if (!element)
+        return false;
+
+    isAttached = element->IsAttachedToBone();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetElementAttachedBone(CElement* element, eBone& bone)
+{
+    if (!element || !element->IsAttachedToBone())
+        return false;
+
+    bone = element->GetAttachedBone();
     return true;
 }
 

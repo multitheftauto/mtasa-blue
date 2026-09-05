@@ -354,6 +354,9 @@ void CElementRPCs::AttachElements(CClientEntity* pSource, NetBitStreamInterface&
         return;
     }
 
+    unsigned char ucBone = BONE_ROOT;
+    bitStream.Read(ucBone);
+
     CClientEntity* pAttachedToEntity = CElementIDs::GetElement(usAttachedToID);
     if (!pAttachedToEntity)
     {
@@ -370,6 +373,8 @@ void CElementRPCs::AttachElements(CClientEntity* pSource, NetBitStreamInterface&
     Arguments.PushNumber(vecRotation.fX);
     Arguments.PushNumber(vecRotation.fY);
     Arguments.PushNumber(vecRotation.fZ);
+    if (ucBone != BONE_ROOT)
+        Arguments.PushNumber(static_cast<double>(ucBone));
 
     if (!pSource->CallEvent("onClientElementAttach", Arguments, true))
     {
@@ -379,7 +384,7 @@ void CElementRPCs::AttachElements(CClientEntity* pSource, NetBitStreamInterface&
     ConvertDegreesToRadians(vecRotation);
 
     pSource->SetAttachedOffsets(vecPosition, vecRotation);
-    pSource->AttachTo(pAttachedToEntity);
+    pSource->AttachTo(pAttachedToEntity, static_cast<eBone>(ucBone));
 }
 
 void CElementRPCs::DetachElements(CClientEntity* pSource, NetBitStreamInterface& bitStream)

@@ -2844,6 +2844,7 @@ retry:
     SPositionSync        attachedPosition(false);
     SRotationDegreesSync attachedRotation(false);
     ElementID            EntityAttachedToID;
+    unsigned char        ucAttachedBone = 0;
 
     // HACK: store new entities and link up anything depending on other entities after
     list<SEntityDependantStuff*> newEntitiesStuff;
@@ -2878,6 +2879,7 @@ retry:
                 bitStream.Read(EntityAttachedToID);
                 bitStream.Read(&attachedPosition);
                 bitStream.Read(&attachedRotation);
+                bitStream.Read(ucAttachedBone);
             }
 
             // Check element collisions enabled ( for use later on )
@@ -4246,9 +4248,15 @@ retry:
                 pStuff->Parent = ParentID;
                 pStuff->LowLodObjectID = LowLodObjectID;
                 if (bIsAttached)
+                {
                     pStuff->AttachedToID = EntityAttachedToID;
+                    pStuff->ucAttachedBone = ucAttachedBone;
+                }
                 else
+                {
                     pStuff->AttachedToID = INVALID_ELEMENT_ID;
+                    pStuff->ucAttachedBone = 0;
+                }
                 newEntitiesStuff.push_back(pStuff);
             }
 
@@ -4281,7 +4289,7 @@ retry:
             CClientEntity* pAttachedToEntity = CElementIDs::GetElement(TempAttachedToID);
             if (pAttachedToEntity)
             {
-                pTempEntity->AttachTo(pAttachedToEntity);
+                pTempEntity->AttachTo(pAttachedToEntity, static_cast<eBone>(pEntityStuff->ucAttachedBone));
             }
         }
 
@@ -5689,6 +5697,7 @@ SString CPacketHandler::EntityAddDebugRead(NetBitStreamInterface& bitStream)
     SPositionSync        attachedPosition(false);
     SRotationDegreesSync attachedRotation(false);
     ElementID            EntityAttachedToID;
+    unsigned char        ucAttachedBone = 0;
 
     // Read out the entity type id and the entity id
     ElementID      EntityID;
@@ -5707,6 +5716,7 @@ SString CPacketHandler::EntityAddDebugRead(NetBitStreamInterface& bitStream)
             bitStream.Read(EntityAttachedToID);
             bitStream.Read(&attachedPosition);
             bitStream.Read(&attachedRotation);
+            bitStream.Read(ucAttachedBone);
         }
 
         // Check element collisions enabled ( for use later on )
