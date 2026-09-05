@@ -1316,6 +1316,7 @@ static bool IsShaderTargetElement(CClientEntity* pElement)
         case CCLIENTBUILDING:
         case CCLIENTPICKUP:
         case CCLIENTPROJECTILE:
+        case CCLIENTSEARCHLIGHT:
             return true;
         default:
             return false;
@@ -1326,7 +1327,7 @@ static void ReadShaderTargetElement(CScriptArgReader& argStream, CClientEntity*&
 {
     argStream.ReadUserData(pElement, nullptr);
     if (!argStream.HasErrors() && pElement && !IsShaderTargetElement(pElement))
-        argStream.SetCustomError("targetElement must be a ped, player, vehicle, object, weapon, building, pickup or projectile", "Bad argument");
+        argStream.SetCustomError("targetElement must be a ped, player, vehicle, object, weapon, building, pickup, projectile or searchlight", "Bad argument");
 }
 
 int CLuaEngineDefs::EngineApplyShaderToWorldTexture(lua_State* luaVM)
