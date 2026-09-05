@@ -447,13 +447,11 @@ static void __declspec(naked) HOOK_StoreShadowForVehicle()
     // clang-format off
     __asm
     {
-        pushad
-        mov     eax, [esp+36]
+        mov     eax, [esp+4]
         push    eax
         call    IsVehicleShadowHidden
         add     esp, 4
         test    al, al
-        popad
         jz      visible
         retn
 
