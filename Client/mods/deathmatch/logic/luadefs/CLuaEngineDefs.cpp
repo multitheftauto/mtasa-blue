@@ -1303,6 +1303,32 @@ int CLuaEngineDefs::EngineReplaceVehiclePart(lua_State* luaVM)
     return 1;
 }
 
+// Element types the texture replacer can tell apart while they render
+static bool IsShaderTargetElement(CClientEntity* pElement)
+{
+    switch (pElement->GetType())
+    {
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
+        case CCLIENTVEHICLE:
+        case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
+        case CCLIENTBUILDING:
+        case CCLIENTPICKUP:
+        case CCLIENTPROJECTILE:
+            return true;
+        default:
+            return false;
+    }
+}
+
+static void ReadShaderTargetElement(CScriptArgReader& argStream, CClientEntity*& pElement)
+{
+    argStream.ReadUserData(pElement, nullptr);
+    if (!argStream.HasErrors() && pElement && !IsShaderTargetElement(pElement))
+        argStream.SetCustomError("targetElement must be a ped, player, vehicle, object, weapon, building, pickup or projectile", "Bad argument");
+}
+
 int CLuaEngineDefs::EngineApplyShaderToWorldTexture(lua_State* luaVM)
 {
     //  bool engineApplyShaderToWorldTexture ( element shader, string textureName, [ element targetElement, bool appendLayers ] )
@@ -1314,7 +1340,7 @@ int CLuaEngineDefs::EngineApplyShaderToWorldTexture(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pShader);
     argStream.ReadString(strTextureNameMatch);
-    argStream.ReadUserData(pElement, NULL);
+    ReadShaderTargetElement(argStream, pElement);
     argStream.ReadBool(bAppendLayers, true);
 
     if (!argStream.HasErrors())
@@ -1342,7 +1368,7 @@ int CLuaEngineDefs::EngineRemoveShaderFromWorldTexture(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pShader);
     argStream.ReadString(strTextureNameMatch);
-    argStream.ReadUserData(pElement, NULL);
+    ReadShaderTargetElement(argStream, pElement);
 
     if (!argStream.HasErrors())
     {

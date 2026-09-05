@@ -15,6 +15,9 @@ class CClientPickupManager;
 #include "CClientManager.h"
 #include "CClientPickup.h"
 #include <list>
+#include <unordered_map>
+
+class CEntitySAInterface;
 
 class CClientPickupManager
 {
@@ -45,16 +48,23 @@ public:
     void        RestreamPickups(unsigned short usModel);
     void        RestreamAllPickups();
 
+    CClientPickup* GetPickupByGameObject(const CEntitySAInterface* pGameObject) const;
+    void           OnGameObjectDestroyed(const CEntitySAInterface* pGameObject);
+
 private:
     CClientPickupManager(CClientManager* pManager);
     ~CClientPickupManager();
 
     void RemoveFromList(CClientPickup* pPickup);
+    void RegisterGameObject(const CEntitySAInterface* pGameObject, CClientPickup* pPickup);
+    void UnregisterGameObject(const CEntitySAInterface* pGameObject, const CClientPickup* pPickup);
 
     CClientManager* m_pManager;
 
     std::list<CClientPickup*> m_List;
     bool                      m_bDontRemoveFromList;
+
+    std::unordered_map<const CEntitySAInterface*, CClientPickup*> m_GameObjectMap;
 
     bool                m_bPickupProcessingDisabled;
     static unsigned int m_uiPickupCount;

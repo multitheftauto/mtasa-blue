@@ -70,6 +70,7 @@ void CClientPickupManager::DeleteAll()
 
     // Clear the list
     m_List.clear();
+    m_GameObjectMap.clear();
 
     // Restore previous processing state
     if (!wasDisabled)
@@ -122,6 +123,30 @@ unsigned short CClientPickupManager::GetWeaponModel(unsigned int uiWeaponID)
     }
 
     return 0;
+}
+
+CClientPickup* CClientPickupManager::GetPickupByGameObject(const CEntitySAInterface* pGameObject) const
+{
+    auto iter = m_GameObjectMap.find(pGameObject);
+    return iter != m_GameObjectMap.end() ? iter->second : nullptr;
+}
+
+void CClientPickupManager::OnGameObjectDestroyed(const CEntitySAInterface* pGameObject)
+{
+    m_GameObjectMap.erase(pGameObject);
+}
+
+void CClientPickupManager::RegisterGameObject(const CEntitySAInterface* pGameObject, CClientPickup* pPickup)
+{
+    m_GameObjectMap[pGameObject] = pPickup;
+}
+
+void CClientPickupManager::UnregisterGameObject(const CEntitySAInterface* pGameObject, const CClientPickup* pPickup)
+{
+    // The object slot can already belong to a newer pickup
+    auto iter = m_GameObjectMap.find(pGameObject);
+    if (iter != m_GameObjectMap.end() && iter->second == pPickup)
+        m_GameObjectMap.erase(iter);
 }
 
 void CClientPickupManager::RemoveFromList(CClientPickup* pPickup)
