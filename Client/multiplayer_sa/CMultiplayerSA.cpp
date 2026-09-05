@@ -38,7 +38,6 @@ extern CGame* pGameInterface;
 #define HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic 0x6FF35B
 #define HOOKPOS_Trailer_BreakTowLink                     0x6E0027
 #define HOOKPOS_CRadar__DrawRadarGangOverlay             0x586650
-#define HOOKPOS_CTaskComplexJump__CreateSubTask          0x67DABE
 #define HOOKPOS_CTrain_ProcessControl_Derail             0x6F8DBA
 #define HOOKPOS_CVehicle_SetupRender                     0x6D6512
 #define HOOKPOS_CVehicle_ResetAfterRender                0x6D0E3E
@@ -62,12 +61,10 @@ extern CGame* pGameInterface;
 DWORD RETURN_FxManager_CreateFxSystem = 0x4A9BE8;
 DWORD RETURN_FxManager_DestroyFxSystem = 0x4A9817;
 
-#define HOOKPOS_CCam_ProcessFixed                           0x51D470
-#define HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon 0x6859a0
-#define HOOKPOS_CPed_IsPlayer                               0x5DF8F0
+#define HOOKPOS_CCam_ProcessFixed 0x51D470
+#define HOOKPOS_CPed_IsPlayer     0x5DF8F0
 
 DWORD RETURN_CCam_ProcessFixed = 0x51D475;
-DWORD RETURN_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon = 0x6859A7;
 DWORD RETURN_CPed_IsPlayer = 0x5DF8F6;
 
 #define VAR_CollisionStreamRead_ModelInfo 0x9689E0
@@ -132,8 +129,6 @@ DWORD RETURN_CPhysical_ApplyGravity = 0x543093;
 
 #define HOOKPOS_CWorld_SetWorldOnFire 0x56B983
 DWORD RETURN_CWorld_SetWorldOnFire = 0x56B989;
-#define HOOKPOS_CTaskSimplePlayerOnFire_ProcessPed 0x6336DA
-DWORD RETURN_CTaskSimplePlayerOnFire_ProcessPed = 0x6336E0;
 #define HOOKPOS_CFire_ProcessFire 0x53AC1A
 DWORD RETURN_CFire_ProcessFire = 0x53AC1F;
 #define HOOKPOS_CExplosion_Update 0x7377D3
@@ -164,12 +159,6 @@ DWORD**       VAR_TagInfoArray = (DWORD**)0xA9A8C0;
 
 #define HOOKPOS_CPhysical_ProcessCollisionSectorList 0x54BB93
 DWORD RETURN_CPhysical_ProcessCollisionSectorList = 0x54BB9A;
-
-// CTaskSimpleClimb::ScanToGrabSectorList. Hooked right after its own collision check, so climb
-// and vault scans also skip entities excluded via setElementCollidableWith.
-#define HOOKPOS_CTaskSimpleClimb_ScanToGrabSectorList 0x67DF28
-DWORD RETURN_CTaskSimpleClimb_ScanToGrabSectorList = 0x67DF36;
-DWORD SKIP_CTaskSimpleClimb_ScanToGrabSectorList = 0x67E580;
 
 #define HOOKPOS_CheckAnimMatrix 0x7C5A5C
 DWORD RETURN_CheckAnimMatrix = 0x7C5A61;
@@ -274,9 +263,6 @@ constexpr const DWORD CALL_FROM_CPhysical_ApplyCollision_2 = 0x5490AE;
 constexpr const DWORD CALL_FROM_CPhysical_ApplySoftCollision = 0x54A816;
 
 #define HOOKPOS_FxManager_c__DestroyFxSystem 0x4A989A
-
-#define HOOKPOS_CTaskSimplyGangDriveBy__ProcessPed 0x62D5A7
-DWORD RETURN_CTaskSimplyGangDriveBy__ProcessPed = 0x62D5AC;
 
 #define HOOKPOS_CAERadioTrackManager__ChooseMusicTrackIndex 0x4EA296
 DWORD RETURN_CAERadioTrackManager__ChooseMusicTrackIndex = 0x4EA2A0;
@@ -412,12 +398,12 @@ IdleHandler*                               m_pIdleHandler = NULL;
 PreFxRenderHandler*                        m_pPreFxRenderHandler = NULL;
 PostColorFilterRenderHandler*              m_pPostColorFilterRenderHandler = nullptr;
 PreHudRenderHandler*                       m_pPreHudRenderHandler = NULL;
-ProcessCollisionHandler*                   m_pProcessCollisionHandler = NULL;
+ProcessCollisionHandler*                   CMultiplayerSA::m_pProcessCollisionHandler = NULL;
 HeliKillHandler*                           m_pHeliKillHandler = NULL;
 ObjectDamageHandler*                       m_pObjectDamageHandler = NULL;
 ObjectBreakHandler*                        m_pObjectBreakHandler = NULL;
 FxSystemDestructionHandler*                m_pFxSystemDestructionHandler = NULL;
-DrivebyAnimationHandler*                   m_pDrivebyAnimationHandler = NULL;
+DrivebyAnimationHandler*                   CMultiplayerSA::m_pDrivebyAnimationHandler = NULL;
 AudioZoneRadioSwitchHandler*               m_pAudioZoneRadioSwitchHandler = NULL;
 
 CEntitySAInterface* dwSavedPlayerPointer = 0;
@@ -433,12 +419,10 @@ void HOOK_CExplosion_AddExplosion();
 void HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic();
 void HOOK_Trailer_BreakTowLink();
 void HOOK_CRadar__DrawRadarGangOverlay();
-void HOOK_CTaskComplexJump__CreateSubTask();
 void HOOK_FxManager_CreateFxSystem();
 void HOOK_FxManager_DestroyFxSystem();
 void HOOK_CCam_ProcessFixed();
 void HOOK_Render3DStuff();
-void HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon();
 void HOOK_CPed_IsPlayer();
 void HOOK_CTrain_ProcessControl_Derail();
 void HOOK_CVehicle_SetupRender();
@@ -462,7 +446,6 @@ void HOOK_OccupiedVehicleBurnCheck();
 void HOOK_UnoccupiedVehicleBurnCheck();
 void HOOK_ApplyCarBlowHop();
 void HOOK_CWorld_SetWorldOnFire();
-void HOOK_CTaskSimplePlayerOnFire_ProcessPed();
 void HOOK_CFire_ProcessFire();
 void HOOK_CExplosion_Update();
 void HOOK_CWeapon_FireAreaEffect();
@@ -476,7 +459,6 @@ void HOOK_CEventHandler_ComputeKnockOffBikeResponse();
 void HOOK_CPed_GetWeaponSkill();
 void HOOK_CPed_AddGogglesModel();
 void HOOK_CPhysical_ProcessCollisionSectorList();
-void HOOK_CTaskSimpleClimb_ScanToGrabSectorList();
 void HOOK_CrashFix_Misc1();
 void HOOK_CrashFix_Misc2();
 void HOOK_CrashFix_Misc4();
@@ -553,8 +535,6 @@ void HOOK_CGlass_WindowRespondsToCollision();
 void HOOK_CGlass__BreakGlassPhysically();
 
 void HOOK_FxManager_c__DestroyFxSystem();
-
-void HOOK_CTaskSimpleGangDriveBy__ProcessPed();
 
 void HOOK_CAERadioTrackManager__ChooseMusicTrackIndex();
 
@@ -639,11 +619,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic, (DWORD)HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic, 6);
     HookInstall(HOOKPOS_Trailer_BreakTowLink, (DWORD)HOOK_Trailer_BreakTowLink, 6);
     HookInstall(HOOKPOS_CRadar__DrawRadarGangOverlay, (DWORD)HOOK_CRadar__DrawRadarGangOverlay, 6);
-    HookInstall(HOOKPOS_CTaskComplexJump__CreateSubTask, (DWORD)HOOK_CTaskComplexJump__CreateSubTask, 6);
     HookInstall(HOOKPOS_FxManager_CreateFxSystem, (DWORD)HOOK_FxManager_CreateFxSystem, 8);
     HookInstall(HOOKPOS_FxManager_DestroyFxSystem, (DWORD)HOOK_FxManager_DestroyFxSystem, 7);
     HookInstall(HOOKPOS_CCam_ProcessFixed, (DWORD)HOOK_CCam_ProcessFixed, 5);
-    HookInstall(HOOKPOS_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, (DWORD)HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon, 7);
     HookInstall(HOOKPOS_CPed_IsPlayer, (DWORD)HOOK_CPed_IsPlayer, 6);
     HookInstall(HOOKPOS_CTrain_ProcessControl_Derail, (DWORD)HOOK_CTrain_ProcessControl_Derail, 6);
     HookInstall(HOOKPOS_CVehicle_SetupRender, (DWORD)HOOK_CVehicle_SetupRender, 5);
@@ -666,7 +644,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_UnoccupiedVehicleBurnCheck, (DWORD)HOOK_UnoccupiedVehicleBurnCheck, 5);
     HookInstall(HOOKPOS_ApplyCarBlowHop, (DWORD)HOOK_ApplyCarBlowHop, 6);
     HookInstall(HOOKPOS_CWorld_SetWorldOnFire, (DWORD)HOOK_CWorld_SetWorldOnFire, 5);
-    HookInstall(HOOKPOS_CTaskSimplePlayerOnFire_ProcessPed, (DWORD)HOOK_CTaskSimplePlayerOnFire_ProcessPed, 5);
     HookInstall(HOOKPOS_CFire_ProcessFire, (DWORD)HOOK_CFire_ProcessFire, 5);
     HookInstall(HOOKPOS_CExplosion_Update, (DWORD)HOOK_CExplosion_Update, 5);
     HookInstall(HOOKPOS_CWeapon_FireAreaEffect, (DWORD)HOOK_CWeapon_FireAreaEffect, 5);
@@ -677,7 +654,6 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CPed_GetWeaponSkill, (DWORD)HOOK_CPed_GetWeaponSkill, 8);
     HookInstall(HOOKPOS_CPed_AddGogglesModel, (DWORD)HOOK_CPed_AddGogglesModel, 6);
     HookInstall(HOOKPOS_CPhysical_ProcessCollisionSectorList, (DWORD)HOOK_CPhysical_ProcessCollisionSectorList, 7);
-    HookInstall(HOOKPOS_CTaskSimpleClimb_ScanToGrabSectorList, (DWORD)HOOK_CTaskSimpleClimb_ScanToGrabSectorList, 8);
     HookInstall(HOOKPOS_CheckAnimMatrix, (DWORD)HOOK_CheckAnimMatrix, 5);
 
     HookInstall(HOOKPOS_VehColCB, (DWORD)HOOK_VehColCB, 29);
@@ -745,9 +721,6 @@ void CMultiplayerSA::InitHooks()
 
     // Post-destruction hook for FxSystems
     HookInstall(HOOKPOS_FxManager_c__DestroyFxSystem, (DWORD)HOOK_FxManager_c__DestroyFxSystem, 5);
-
-    // CTaskSimpleGangDriveBy::ProcessPed hook for disabling certain animations
-    HookInstall(HOOKPOS_CTaskSimplyGangDriveBy__ProcessPed, (DWORD)HOOK_CTaskSimpleGangDriveBy__ProcessPed, 5);
 
     SString strTrakLkupMd5 = CMD5Hasher::CalculateHexString(PathJoin(GetLaunchPath(), "audio", "CONFIG", "TrakLkup.dat"));
     if (strTrakLkupMd5 != "528E75D663B8BAE072A01351081A2145")
@@ -3295,73 +3268,6 @@ static void __declspec(naked) HOOK_CExplosion_AddExplosion()
     // clang-format on
 }
 
-CEntitySAInterface* entity;
-float*              entityEdgeHeight;
-float               edgeHeight;
-CVector*            pedPosition;
-
-bool processGrab()
-{
-    if (entity->nType == ENTITY_TYPE_OBJECT)
-    {
-        // CObjectSA * object = (CObjectSA*)entity;
-        // CModelInfo * info = pGameInterface->GetModelInfo(entity->m_nModelIndex);
-        if (entity->matrix)
-            edgeHeight = *entityEdgeHeight + entity->matrix->vPos.fZ;
-        else
-            edgeHeight = *entityEdgeHeight + entity->m_transform.m_translate.fZ;
-    }
-    else
-        edgeHeight = *entityEdgeHeight;
-
-    if (edgeHeight - pedPosition->fZ >= 1.4f)
-        return true;
-    return false;
-}
-
-// 0x67DABE
-static void __declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        mov     pedPosition, eax
-        mov     eax, [esi+28]
-        mov     entity, eax
-        mov     eax, esi
-        add     eax, 16
-        mov     entityEdgeHeight, eax
-        mov     eax, pedPosition
-        pushad
-    }
-    // clang-format on
-
-    if (processGrab())
-    {
-        // clang-format off
-        __asm
-        {
-            popad
-            mov     eax, 0x67DAD6
-            jmp     eax
-        }
-        // clang-format on
-    }
-    else
-    {
-        // clang-format off
-        __asm
-        {
-            popad
-            mov     eax, 0x67DAD1
-            jmp     eax
-        }
-        // clang-format on
-    }
-}
-
 char*  szCreateFxSystem_ExplosionType = 0;
 DWORD* pCreateFxSystem_Matrix = 0;
 DWORD* pNewCreateFxSystem_Matrix = 0;
@@ -3538,69 +3444,6 @@ static void __declspec(naked) HOOK_Render3DStuff()
         ret
     }
     // clang-format on
-}
-
-CPedSAInterface* pProcessPlayerWeaponPed = NULL;
-bool             ProcessPlayerWeapon()
-{
-    if (IsLocalPlayer(pProcessPlayerWeaponPed))
-        return true;
-
-    SClientEntity<CPedSA>* pPedClientEntity = pGameInterface->GetPools()->GetPed((DWORD*)pProcessPlayerWeaponPed);
-    CPlayerPed*            pPed = pPedClientEntity ? dynamic_cast<CPlayerPed*>(pPedClientEntity->pEntity) : nullptr;
-    if (pPed)
-    {
-        CRemoteDataStorageSA* pData = CRemoteDataSA::GetRemoteDataStorage(pPed);
-        if (pData)
-        {
-            if (pData->ProcessPlayerWeapon())
-            {
-                return true;
-            }
-        }
-    }
-    return false;
-}
-
-static void __declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    /*
-    006859A0  push        0FFFFFFFFh                        <hook>
-    006859A2  push        846BCEh                           <hook>
-    006859A7  mov         eax,dword ptr fs:[00000000h]      <return>
-    */
-    // clang-format off
-    __asm
-    {
-        mov     eax, [esp+4]
-        mov     pProcessPlayerWeaponPed, eax
-        pushad
-    }
-    // clang-format on
-    if (ProcessPlayerWeapon())
-    {
-        // clang-format off
-        __asm
-        {
-            popad
-            push    0FFFFFFFFh
-            push    846BCEh
-            jmp     RETURN_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon
-        }
-        // clang-format on
-    }
-    else
-    {
-        // clang-format off
-        __asm
-        {
-            popad
-            ret 4
-        }
-        // clang-format on
-    }
 }
 
 CPedSAInterface* pIsPlayerPed = NULL;
@@ -5821,25 +5664,6 @@ static void __declspec(naked) HOOK_CWorld_SetWorldOnFire()
     // clang-format on
 }
 
-static void __declspec(naked) HOOK_CTaskSimplePlayerOnFire_ProcessPed()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // Actually pass the fire's pCreatorEntity to the damage event (instead of a null pointer)
-    // clang-format off
-    __asm
-    {
-        push 3
-        push 0x25
-        push edx
-        mov eax, [edi+0x730]    // eax = pPed->pFire
-        mov eax, [eax+0x14]     // eax = pFire->pCreator
-        push eax
-        jmp RETURN_CTaskSimplePlayerOnFire_ProcessPed
-    }
-    // clang-format on
-}
-
 static void __declspec(naked) HOOK_CFire_ProcessFire()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -6330,7 +6154,7 @@ bool                  CPhysical_ProcessCollisionSectorList()
 {
     if (pCollisionPhysicalThis && pCollisionPhysical)
     {
-        if (m_pProcessCollisionHandler && !m_pProcessCollisionHandler(pCollisionPhysicalThis, pCollisionPhysical))
+        if (CMultiplayerSA::m_pProcessCollisionHandler && !CMultiplayerSA::m_pProcessCollisionHandler(pCollisionPhysicalThis, pCollisionPhysical))
         {
             return false;
         }
@@ -6375,59 +6199,6 @@ static void __declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList()
             test    edi, 1
             mov     edi, pCollisionPhysical
             jmp     RETURN_CPhysical_ProcessCollisionSectorList
-        }
-        // clang-format on
-    }
-}
-
-CEntitySAInterface* pClimbScanPedInterface;
-CEntitySAInterface* pClimbScanTargetInterface;
-BYTE                bClimbScanTargetUsesCollision;
-
-bool CTaskSimpleClimb_ShouldSkipEntity()
-{
-    // Same as the game's own check this replaces: no collision on the entity at all
-    if (!bClimbScanTargetUsesCollision)
-        return true;
-
-    // Also skip entities the ped was explicitly made non-collidable with (setElementCollidableWith)
-    if (pClimbScanPedInterface && pClimbScanTargetInterface && m_pProcessCollisionHandler)
-        return !m_pProcessCollisionHandler(pClimbScanPedInterface, pClimbScanTargetInterface);
-
-    return false;
-}
-
-static void __declspec(naked) HOOK_CTaskSimpleClimb_ScanToGrabSectorList()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        mov     pClimbScanPedInterface, ebx
-        mov     pClimbScanTargetInterface, esi
-        test    byte ptr [esi+1Ch], 1
-        mov     word ptr [esi+2Ch], cx
-        setne   al
-        mov     bClimbScanTargetUsesCollision, al
-    }
-    // clang-format on
-
-    if (CTaskSimpleClimb_ShouldSkipEntity())
-    {
-        // clang-format off
-        __asm
-        {
-            jmp     SKIP_CTaskSimpleClimb_ScanToGrabSectorList
-        }
-        // clang-format on
-    }
-    else
-    {
-        // clang-format off
-        __asm
-        {
-            jmp     RETURN_CTaskSimpleClimb_ScanToGrabSectorList
         }
         // clang-format on
     }
@@ -7677,46 +7448,6 @@ static void __declspec(naked) HOOK_FxManager_c__DestroyFxSystem()
         pop ebx
         pop ecx
         retn 4
-    }
-    // clang-format on
-}
-
-DWORD pProcessedGangDriveBySimpleTask;
-void  CTaskSimpleGangDriveBy__ProcessPed()
-{
-    AnimationId* pRequiredAnim = ((AnimationId*)(pProcessedGangDriveBySimpleTask + 0x24));
-    AssocGroupId requiredAnimGroup = *((AssocGroupId*)(pProcessedGangDriveBySimpleTask + 0x28));
-
-    if (m_pDrivebyAnimationHandler != NULL)
-        *pRequiredAnim = m_pDrivebyAnimationHandler(*pRequiredAnim, requiredAnimGroup);
-}
-
-DWORD                         RETURN_CTaskSimpleGangDriveBy_ProcessPed_Cancel = 0x62D5C1;
-static void __declspec(naked) HOOK_CTaskSimpleGangDriveBy__ProcessPed()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // esi contains 'this'
-    // clang-format off
-    __asm
-    {
-        mov pProcessedGangDriveBySimpleTask, esi
-        pushad
-    }
-    // clang-format on
-    CTaskSimpleGangDriveBy__ProcessPed();
-    // clang-format off
-    __asm
-    {
-        popad
-        // Replaced code
-        cmp[esi + 28h], edi                // .text:0062D5A7
-        jnz GangDriveBy_ProcessPed_Cancel  // .text:0062D5AA
-        // Return to original code
-        jmp RETURN_CTaskSimplyGangDriveBy__ProcessPed
-
-    GangDriveBy_ProcessPed_Cancel:
-        jmp RETURN_CTaskSimpleGangDriveBy_ProcessPed_Cancel
     }
     // clang-format on
 }
