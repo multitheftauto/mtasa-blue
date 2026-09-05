@@ -110,8 +110,60 @@ bool CWebCore::Initialise(bool gpuEnabled)
 
     // Set DLL directory for CEFLauncher subprocess to locate required libraries
     SString strCEFDir = PathJoin(strMTADir, "CEF");
+
 #ifdef _WIN32
-    SetDllDirectoryW(FromUTF8(strCEFDir));
+    // Save the previous DLL search directory so a failed init can put it back
+    std::wstring previousDllDir;
+    bool         previousDllDirKnown = true;
+    {
+        const DWORD len = GetDllDirectoryW(0, nullptr);
+        if (len > 0)
+        {
+            previousDllDir.resize(len);
+            // A successful read returns the path length without the trailing
+            // null, which is always smaller than the buffer size. A larger
+            // return means the path grew between the two calls and the buffer
+            // was not filled, so the previous path stays unknown.
+            const DWORD got = GetDllDirectoryW(len, previousDllDir.data());
+            if (got > 0 && got < len)
+            {
+                while (!previousDllDir.empty() && previousDllDir.back() == L'\0')
+                    previousDllDir.pop_back();
+            }
+            else
+            {
+                // The read failed or the buffer was too small, so the previous
+                // path is unknown. Leave the search path untouched on restore
+                // instead of clearing it.
+                previousDllDir.clear();
+                previousDllDirKnown = false;
+            }
+        }
+    }
+
+    // Guard: failed init restores the loader search path. A successful
+    // init keeps it, since CEF loads its DLLs on demand after initialization.
+    struct DllDirGuard
+    {
+        std::wstring dir;
+        bool         known = true;
+        bool         restore = true;
+        explicit DllDirGuard(std::wstring d, bool isKnown) : dir(std::move(d)), known(isKnown) {}
+        ~DllDirGuard()
+        {
+            if (restore && known)
+                SetDllDirectoryW(dir.empty() ? nullptr : dir.c_str());
+        }
+    } dllDirGuard(std::move(previousDllDir), previousDllDirKnown);
+
+    // CEFLauncher cannot find the CEF DLLs without this, so fail closed here
+    if (!SetDllDirectoryW(FromUTF8(strCEFDir)))
+    {
+        g_pCore->GetConsole()->Printf("CEF initialization skipped - failed to set DLL directory: %s", *strCEFDir);
+        AddReportLog(8032, SString("CEF initialization skipped - failed to set DLL directory: %s", *strCEFDir));
+        m_bInitialised = false;
+        return false;
+    }
 #else
     // On Wine/Proton: Use environment variable for library search
     const char* existingPath = std::getenv("LD_LIBRARY_PATH");
@@ -133,10 +185,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
         g_pCore->GetConsole()->Printf("DEBUG: CEF library path set via SetDllDirectoryW: %s", strCEFDir.c_str());
     }
 #endif
-
-    // Read GTA path from registry to pass to CEF subprocess
-    int           iRegistryResult = 0;
-    const SString strGTAPath = GetCommonRegistryValue("", "GTA:SA Path", &iRegistryResult);
 
     // Check if process is running with elevated privileges
     // CEF subprocesses may have communication issues when running elevated
@@ -223,7 +271,8 @@ bool CWebCore::Initialise(bool gpuEnabled)
     const fs::path savedCwd = fs::current_path(ec);
     if (ec)
     {
-        AddReportLog(8025, SString("Failed to get current directory: %s", ec.message().c_str()));
+        g_pCore->GetConsole()->Printf("CEF initialization skipped - Failed to get current directory: %s", ec.message().c_str());
+        AddReportLog(8025, SString("CEF initialization skipped - Failed to get current directory: %s", ec.message().c_str()));
         m_bInitialised = false;
         return false;
     }
@@ -245,7 +294,8 @@ bool CWebCore::Initialise(bool gpuEnabled)
     fs::current_path(fs::path(FromUTF8(strMTADir)), ec);
     if (ec)
     {
-        AddReportLog(8026, SString("Failed to change CWD to MTA dir: %s", ec.message().c_str()));
+        g_pCore->GetConsole()->Printf("CEF initialization skipped - Failed to change CWD to MTA dir: %s", ec.message().c_str());
+        AddReportLog(8029, SString("CEF initialization skipped - Failed to change CWD to MTA dir: %s", ec.message().c_str()));
         m_bInitialised = false;
         return false;
     }
@@ -261,7 +311,6 @@ bool CWebCore::Initialise(bool gpuEnabled)
 #endif
 
     CefSettings settings;
-    CefString(&settings.browser_subprocess_path).FromWString(FromUTF8(strLauncherPath));
 #ifndef CEF_ENABLE_SANDBOX
     settings.no_sandbox = true;
 #endif
@@ -280,12 +329,15 @@ bool CWebCore::Initialise(bool gpuEnabled)
     settings.windowless_rendering_enabled = true;
 
     // Wrap CefInitialize in try-catch for exception safety
+    bool bInitializeThrew = false;
     try
     {
         m_bInitialised = CefInitialize(mainArgs, settings, app, sandboxInfo);
     }
     catch (...)
     {
+        // Remember the throw so the failure log below is not written twice
+        bInitializeThrew = true;
         g_pCore->GetConsole()->Printf("CefInitialize threw exception - CEF features will be disabled");
         AddReportLog(8003, "CefInitialize threw exception - CEF features will be disabled");
         m_bInitialised = false;
@@ -295,10 +347,38 @@ bool CWebCore::Initialise(bool gpuEnabled)
 
     if (m_bInitialised)
     {
-        // Register custom scheme handler factory only if initialization succeeded
-        CefRegisterSchemeHandlerFactory("http", "mta", app);
+#ifdef _WIN32
+        // Keep the CEF DLL directory: CEF loads its DLLs on demand after init
+        dllDirGuard.restore = false;
+#endif
+        // Register custom scheme handler factory only if initialization succeeded.
+        // A missing handler breaks mta:// pages, so a throw or a failed
+        // registration disables browser features instead of running CEF
+        // half-registered. CEF is already up, so the DLL directory stays set.
+        bool bSchemeHandlerThrew = false;
+        bool bSchemeHandlerRegistered = false;
+        try
+        {
+            bSchemeHandlerRegistered = CefRegisterSchemeHandlerFactory("http", "mta", app);
+        }
+        catch (...)
+        {
+            bSchemeHandlerThrew = true;
+            g_pCore->GetConsole()->Printf("CefRegisterSchemeHandlerFactory threw exception - CEF features will be disabled");
+            AddReportLog(8030, "CefRegisterSchemeHandlerFactory threw exception - CEF features will be disabled");
+        }
+
+        if (!bSchemeHandlerRegistered)
+        {
+            if (!bSchemeHandlerThrew)
+            {
+                g_pCore->GetConsole()->Printf("CefRegisterSchemeHandlerFactory failed - CEF features will be disabled");
+                AddReportLog(8031, "CefRegisterSchemeHandlerFactory failed - CEF features will be disabled");
+            }
+            m_bInitialised = false;
+        }
     }
-    else
+    else if (!bInitializeThrew)
     {
         // Log initialization failure
         g_pCore->GetConsole()->Printf("CefInitialize failed - CEF features will be disabled");
