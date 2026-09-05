@@ -4906,6 +4906,103 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CElement* pElement, CElement* p
     return false;
 }
 
+bool CStaticFunctionDefinitions::SetCameraTarget(CElement* pElement, CElement* pTarget, const CVector& targetLookAt)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetCameraTarget(*iter, pTarget, targetLookAt))
+
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer*       pPlayer = static_cast<CPlayer*>(pElement);
+        CPlayerCamera* pCamera = pPlayer->GetCamera();
+        if (!pCamera)
+            return false;
+
+        // If we don't have a target, change it to the player
+        if (!pTarget)
+            pTarget = pPlayer;
+
+        // Make sure our target is supported
+        switch (pTarget->GetType())
+        {
+            case CElement::PLAYER:
+            case CElement::PED:
+            case CElement::VEHICLE:
+            {
+                pCamera->SetMode(CAMERAMODE_PLAYER);
+                pCamera->SetTarget(pTarget);
+                pCamera->SetRoll(0.0f);
+                pCamera->SetFOV(70.0f);
+
+                // Serialize sync context, target ID, and custom look-at 3D coordinates using byte-aligned type flag
+                constexpr unsigned char lookAtTypeCoords = 1;
+                CBitStream              bitStream;
+                bitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
+                bitStream.pBitStream->Write(pTarget->GetID());
+                bitStream.pBitStream->Write(lookAtTypeCoords);
+                bitStream.pBitStream->Write(targetLookAt.fX);
+                bitStream.pBitStream->Write(targetLookAt.fY);
+                bitStream.pBitStream->Write(targetLookAt.fZ);
+                pPlayer->Send(CLuaPacket(SET_CAMERA_TARGET, *bitStream.pBitStream));
+                return true;
+            }
+            default:
+                return false;
+        }
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetCameraTarget(CElement* pElement, CElement* pTarget, CElement* pTargetLookAtElement)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetCameraTarget(*iter, pTarget, pTargetLookAtElement))
+
+    if (!pTargetLookAtElement)
+        return SetCameraTarget(pElement, pTarget);
+
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer*       pPlayer = static_cast<CPlayer*>(pElement);
+        CPlayerCamera* pCamera = pPlayer->GetCamera();
+        if (!pCamera)
+            return false;
+
+        // If we don't have a target, change it to the player
+        if (!pTarget)
+            pTarget = pPlayer;
+
+        // Make sure our target is supported
+        switch (pTarget->GetType())
+        {
+            case CElement::PLAYER:
+            case CElement::PED:
+            case CElement::VEHICLE:
+            {
+                pCamera->SetMode(CAMERAMODE_PLAYER);
+                pCamera->SetTarget(pTarget);
+                pCamera->SetRoll(0.0f);
+                pCamera->SetFOV(70.0f);
+
+                // Serialize sync context, target ID, and custom look-at target element ID using byte-aligned type flag
+                constexpr unsigned char lookAtTypeElement = 2;
+                CBitStream              bitStream;
+                bitStream.pBitStream->Write(pCamera->GenerateSyncTimeContext());
+                bitStream.pBitStream->Write(pTarget->GetID());
+                bitStream.pBitStream->Write(lookAtTypeElement);
+                bitStream.pBitStream->Write(pTargetLookAtElement->GetID());
+                pPlayer->Send(CLuaPacket(SET_CAMERA_TARGET, *bitStream.pBitStream));
+                return true;
+            }
+            default:
+                return false;
+        }
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::SetCameraInterior(CElement* pElement, unsigned char ucInterior)
 {
     assert(pElement);

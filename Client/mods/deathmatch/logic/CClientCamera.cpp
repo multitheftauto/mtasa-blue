@@ -410,33 +410,48 @@ void CClientCamera::SetFixedTarget(const CVector& vecPosition, float fRoll)
 //
 // Make player 'orbit camera' rotate to face this point
 //
-void CClientCamera::SetOrbitTarget(const CVector& vecPosition)
+void CClientCamera::SetOrbitTarget(const CVector& vecPosition, CClientEntity* targetEntity)
 {
-    if (m_pCamera)
+    if (!m_pCamera)
+        return;
+
+    CClientEntity* cameraTarget = targetEntity;
+    if (!cameraTarget)
+        cameraTarget = GetTargetEntity();
+    if (!cameraTarget)
     {
-        CClientEntity* pCameraTarget = GetTargetEntity();
+        if (m_pFocusedEntity)
+            cameraTarget = m_pFocusedEntity;
+        else if (m_pFocusedPlayer)
+            cameraTarget = m_pFocusedPlayer;
+        else if (m_pPlayerManager)
+            cameraTarget = m_pPlayerManager->GetLocalPlayer();
+    }
 
-        if (pCameraTarget != nullptr)
+    if (cameraTarget != nullptr)
+    {
+        CVector targetPosition;
+        cameraTarget->GetPosition(targetPosition);
+        if (cameraTarget->GetType() == CCLIENTPLAYER || cameraTarget->GetType() == CCLIENTPED)
+            targetPosition.fZ += 0.6f;
+
+        CVector direction = vecPosition - targetPosition;
+        if (direction.Length() <= FLOAT_EPSILON)
+            return;
+        direction.Normalize();
+
+        float horizontalAngle = -std::atan2(direction.fX, direction.fY) - kPi / 2.0f;
+        float verticalAngle = std::asin(std::clamp(direction.fZ, -1.0f, 1.0f));
+
+        for (BYTE i = 0; i < 3; ++i)
         {
-            CVector vecTargetPosition;
-            pCameraTarget->GetPosition(vecTargetPosition);
-            if (pCameraTarget->GetType() == CCLIENTPLAYER)
-                vecTargetPosition.fZ += 0.6f;
-
-            CVector vecDirection = vecPosition - vecTargetPosition;
-            if (vecDirection.Length() <= FLOAT_EPSILON)
-                return;
-            vecDirection.Normalize();
-
-            float fAngleHorz = -atan2(vecDirection.fX, vecDirection.fY) - PI / 2;
-            float fAngleVert = asin(vecDirection.fZ);
-
-            CCam* pCam = m_pCamera->GetCam(m_pCamera->GetActiveCam());
-            if (!pCam)
-                return;
-
-            pCam->SetDirection(fAngleHorz, fAngleVert);
+            CCam* cam = m_pCamera->GetCam(i);
+            if (cam)
+                cam->SetDirection(horizontalAngle, verticalAngle);
         }
+
+        m_pCamera->SetPedOrientForBehindOrInFront(horizontalAngle - kPi);
+        m_pCamera->ClearCamDirectlyBehind();
     }
 }
 
