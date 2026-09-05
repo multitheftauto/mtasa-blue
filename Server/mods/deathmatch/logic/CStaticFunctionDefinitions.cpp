@@ -5691,11 +5691,11 @@ bool CStaticFunctionDefinitions::BlowVehicle(CElement* pElement, std::optional<b
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CVehicle* pVehicle, SColor& outColor)
+bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CVehicle* vehicle, SColor& outColor, HeadlightSide side)
 {
-    assert(pVehicle);
+    assert(vehicle);
 
-    outColor = pVehicle->GetHeadLightColor();
+    outColor = vehicle->GetHeadLightColor(side);
     return true;
 }
 
@@ -7527,19 +7527,32 @@ bool CStaticFunctionDefinitions::SetTrainPosition(CVehicle* pVehicle, float fPos
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleHeadLightColor(CVehicle* pVehicle, const SColor color)
+bool CStaticFunctionDefinitions::SetVehicleHeadLightColor(CVehicle* vehicle, const SColor color, HeadlightSide side)
 {
-    assert(pVehicle);
+    assert(vehicle);
 
-    if (color != pVehicle->GetHeadLightColor())
+    bool hasChanged = false;
+    if (side == HeadlightSide::Left || side == HeadlightSide::Both)
     {
-        pVehicle->SetHeadLightColor(color);
+        if (vehicle->GetHeadLightColor(HeadlightSide::Left) != color)
+            hasChanged = true;
+    }
+    if (side == HeadlightSide::Right || side == HeadlightSide::Both)
+    {
+        if (vehicle->GetHeadLightColor(HeadlightSide::Right) != color)
+            hasChanged = true;
+    }
 
-        CBitStream BitStream;
-        BitStream.pBitStream->Write(color.R);
-        BitStream.pBitStream->Write(color.G);
-        BitStream.pBitStream->Write(color.B);
-        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_VEHICLE_HEADLIGHT_COLOR, *BitStream.pBitStream));
+    if (hasChanged)
+    {
+        vehicle->SetHeadLightColor(color, side);
+
+        CBitStream bitStream;
+        bitStream.pBitStream->Write(color.R);
+        bitStream.pBitStream->Write(color.G);
+        bitStream.pBitStream->Write(color.B);
+        bitStream.pBitStream->Write(static_cast<std::uint8_t>(side));
+        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(vehicle, SET_VEHICLE_HEADLIGHT_COLOR, *bitStream.pBitStream));
     }
 
     return true;
