@@ -77,8 +77,7 @@ static CMappedArray<STxdStreamEvent> ms_txdStreamEventList;
 __declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
 {
     ushort usTxdId = (ushort)dwTxdId;
-    // Ensure there are no previous events for this txd
-    ms_txdStreamEventList.remove(STxdStreamEvent(false, usTxdId));
+    // Drop a duplicate 'added' only - a pending 'removed' still has to reach the watch
     ms_txdStreamEventList.remove(STxdStreamEvent(true, usTxdId));
     // Append 'added'
     ms_txdStreamEventList.push_back(STxdStreamEvent(true, usTxdId));
@@ -113,7 +112,7 @@ static void __declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 ////////////////////////////////////////////////////////////////
 __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 {
-    ushort usTxdId = (ushort)dwTxdId - pGame->GetBaseIDforTXD();
+    ushort usTxdId = (ushort)dwTxdId;
     // Ensure there are no previous events for this txd
     ms_txdStreamEventList.remove(STxdStreamEvent(true, usTxdId));
     ms_txdStreamEventList.remove(STxdStreamEvent(false, usTxdId));
@@ -131,9 +130,9 @@ static void __declspec(naked) HOOK_CTxdStore_RemoveTxd()
     {
         // Hooked from 731E90  6 bytes
 
-        // esi - txd id + 20000
+        // __cdecl txd id - esi still holds the caller's value at this address
         pushad
-        push    esi
+        push    [esp+32+4*1]
         call    OnStreamingRemoveTxd
         add     esp, 4
         popad

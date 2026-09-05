@@ -112,6 +112,25 @@ void CMatchChannelManager::RemoveTexture(STexInfo* pTexInfo)
     dassert(MapContains(pTexNameInfo->usedByTexInfoList, pTexInfo));
     MapRemove(pTexNameInfo->usedByTexInfoList, pTexInfo);
     pTexInfo->pAssociatedTexNameInfo = NULL;
+
+    MaybeDeleteTexNameInfo(pTexNameInfo);
+}
+
+//////////////////////////////////////////////////////////////////
+//
+// CMatchChannelManager::MaybeDeleteTexNameInfo
+//
+// Both lists together are every reference that can exist: the texinfos
+// pointing back at it, and the channels holding it in m_MatchedTextureList.
+//
+//////////////////////////////////////////////////////////////////
+void CMatchChannelManager::MaybeDeleteTexNameInfo(STexNameInfo* pTexNameInfo)
+{
+    if (pTexNameInfo->usedByTexInfoList.empty() && pTexNameInfo->matchChannelList.empty())
+    {
+        MapRemove(m_AllTextureList, pTexNameInfo->strTextureName);
+        delete pTexNameInfo;
+    }
 }
 
 //////////////////////////////////////////////////////////////////
@@ -614,6 +633,7 @@ void CMatchChannelManager::ProcessRematchTexturesQueue()
             pChannel->RemoveTexture(pTexNameInfo);
             MapRemove(pTexNameInfo->matchChannelList, pChannel);
             pTexNameInfo->ResetReplacementResults();  // Do this here as it won't get picked up in RecalcEverything now
+            MaybeDeleteTexNameInfo(pTexNameInfo);
         }
 
         // Rematch against texture list
@@ -822,6 +842,7 @@ void CMatchChannelManager::DeleteChannel(CMatchChannel* pChannel)
 
         // Reset shader matches now as this channel is going
         pTexNameInfo->ResetReplacementResults();
+        MaybeDeleteTexNameInfo(pTexNameInfo);
     }
 
 #ifdef SHADER_DEBUG_CHECKS
