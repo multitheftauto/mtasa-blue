@@ -9,6 +9,7 @@
 #pragma once
 
 class CLuaArgument;
+#include "LuaInlineUserdata.h"
 
 #include <optional>
 #include <variant>
@@ -324,10 +325,18 @@ struct CLuaFunctionParserBase
                 return false;
 
             using class_t = std::remove_pointer_t<T>;
-            int   tempIndex{index};
-            void* pValue = lua::PopPrimitive<void*>(L, tempIndex);
-            auto  result = iArgument == LUA_TLIGHTUSERDATA ? UserDataCast((class_t*)pValue, L) : UserDataCast(*reinterpret_cast<class_t**>(pValue), L);
-            return result != nullptr;
+            if constexpr (std::is_same_v<class_t, CLuaVector2D> || std::is_same_v<class_t, CLuaVector3D> || std::is_same_v<class_t, CLuaVector4D> ||
+                          std::is_same_v<class_t, CLuaMatrix>)
+            {
+                return lua_isclass(L, index, GetInlineUserdataClassName<class_t>());
+            }
+            else
+            {
+                int   tempIndex{index};
+                void* pValue = lua::PopPrimitive<void*>(L, tempIndex);
+                auto  result = iArgument == LUA_TLIGHTUSERDATA ? UserDataCast((class_t*)pValue, L) : UserDataCast(*reinterpret_cast<class_t**>(pValue), L);
+                return result != nullptr;
+            }
         }
 
         // dummy type is used as overload extension if one overload has fewer arguments
@@ -576,11 +585,23 @@ struct CLuaFunctionParserBase
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
+            int   targetIndex = index;
             void* pValue = lua::PopPrimitive<void*>(L, index);
-            auto  cast = [isLightUserData, pValue, L](auto null)
+            auto  cast = [isLightUserData, pValue, L, targetIndex](auto null)
             {
-                return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                       : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                using class_type = std::remove_pointer_t<decltype(null)>;
+                if constexpr (std::is_same_v<class_type, CLuaVector2D> || std::is_same_v<class_type, CLuaVector3D> ||
+                              std::is_same_v<class_type, CLuaVector4D> || std::is_same_v<class_type, CLuaMatrix>)
+                {
+                    if (lua_isclass(L, targetIndex, GetInlineUserdataClassName<class_type>()))
+                        return static_cast<decltype(null)>(pValue);
+                    return static_cast<decltype(null)>(nullptr);
+                }
+                else
+                {
+                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                }
             };
             // A vector2 may also be filled from a vector3/vector4
             if (CLuaVector2D* pVec2D = cast((CLuaVector2D*)0); pVec2D != nullptr)
@@ -607,11 +628,23 @@ struct CLuaFunctionParserBase
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
+            int   targetIndex = index;
             void* pValue = lua::PopPrimitive<void*>(L, index);
-            auto  cast = [isLightUserData, pValue, L](auto null)
+            auto  cast = [isLightUserData, pValue, L, targetIndex](auto null)
             {
-                return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                       : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                using class_type = std::remove_pointer_t<decltype(null)>;
+                if constexpr (std::is_same_v<class_type, CLuaVector2D> || std::is_same_v<class_type, CLuaVector3D> ||
+                              std::is_same_v<class_type, CLuaVector4D> || std::is_same_v<class_type, CLuaMatrix>)
+                {
+                    if (lua_isclass(L, targetIndex, GetInlineUserdataClassName<class_type>()))
+                        return static_cast<decltype(null)>(pValue);
+                    return static_cast<decltype(null)>(nullptr);
+                }
+                else
+                {
+                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                }
             };
             // A vector3 may also be filled from a vector4
             if (CLuaVector3D* pVec3D = cast((CLuaVector3D*)0); pVec3D != nullptr)
@@ -637,11 +670,23 @@ struct CLuaFunctionParserBase
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
+            int   targetIndex = index;
             void* pValue = lua::PopPrimitive<void*>(L, index);
-            auto  cast = [isLightUserData, pValue, L](auto null)
+            auto  cast = [isLightUserData, pValue, L, targetIndex](auto null)
             {
-                return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                       : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                using class_type = std::remove_pointer_t<decltype(null)>;
+                if constexpr (std::is_same_v<class_type, CLuaVector2D> || std::is_same_v<class_type, CLuaVector3D> ||
+                              std::is_same_v<class_type, CLuaVector4D> || std::is_same_v<class_type, CLuaMatrix>)
+                {
+                    if (lua_isclass(L, targetIndex, GetInlineUserdataClassName<class_type>()))
+                        return static_cast<decltype(null)>(pValue);
+                    return static_cast<decltype(null)>(nullptr);
+                }
+                else
+                {
+                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                }
             };
             // A vector3 may also be filled from a vector4
             if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
@@ -689,13 +734,24 @@ struct CLuaFunctionParserBase
 
             int   iType = lua_type(L, index);
             bool  isLightUserData = iType == LUA_TLIGHTUSERDATA;
+            int   targetIndex = index;
             void* pValue = lua::PopPrimitive<void*>(L, index);
-            auto  cast = [isLightUserData, pValue, L](auto null)
+            auto  cast = [isLightUserData, pValue, L, targetIndex](auto null)
             {
-                return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
-                                       : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                using class_type = std::remove_pointer_t<decltype(null)>;
+                if constexpr (std::is_same_v<class_type, CLuaMatrix>)
+                {
+                    if (lua_isclass(L, targetIndex, GetInlineUserdataClassName<class_type>()))
+                        return static_cast<decltype(null)>(pValue);
+                    return static_cast<decltype(null)>(nullptr);
+                }
+                else
+                {
+                    return isLightUserData ? UserDataCast(reinterpret_cast<decltype(null)>(pValue), L)
+                                           : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
+                }
             };
-            // A vector4 may also be filled from a CLuaMatrix
+            // A matrix may also be filled from a CLuaMatrix
             if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
                 return *pMatrix;
 
@@ -709,16 +765,29 @@ struct CLuaFunctionParserBase
         else if constexpr (std::is_pointer_v<T> && std::is_class_v<std::remove_pointer_t<T>>)
         {
             bool  isLightUserData = lua_type(L, index) == LUA_TLIGHTUSERDATA;
+            int   targetIndex = index;
             void* pValue = lua::PopPrimitive<void*>(L, index);
             using class_t = std::remove_pointer_t<T>;
-            auto result = isLightUserData ? UserDataCast((class_t*)pValue, L) : UserDataCast(*reinterpret_cast<class_t**>(pValue), L);
-            if (result)
-                return static_cast<T>(result);
+            if constexpr (std::is_same_v<class_t, CLuaVector2D> || std::is_same_v<class_t, CLuaVector3D> || std::is_same_v<class_t, CLuaVector4D> ||
+                          std::is_same_v<class_t, CLuaMatrix>)
+            {
+                if (lua_isclass(L, targetIndex, GetInlineUserdataClassName<class_t>()))
+                    return static_cast<T>(pValue);
 
-            // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
-            // underlying element is of a wrong type
-            SetBadArgumentError<T>(L, index - 1, pValue, isLightUserData);
-            return nullptr;
+                SetBadArgumentError<T>(L, index - 1, pValue, isLightUserData);
+                return nullptr;
+            }
+            else
+            {
+                auto result = isLightUserData ? UserDataCast((class_t*)pValue, L) : UserDataCast(*reinterpret_cast<class_t**>(pValue), L);
+                if (result)
+                    return static_cast<T>(result);
+
+                // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
+                // underlying element is of a wrong type
+                SetBadArgumentError<T>(L, index - 1, pValue, isLightUserData);
+                return nullptr;
+            }
         }
         else if constexpr (std::is_same_v<T, SColor>)
             return static_cast<unsigned long>(static_cast<int64_t>(lua::PopPrimitive<lua_Number>(L, index)));

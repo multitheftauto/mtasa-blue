@@ -11,18 +11,11 @@
 
 #pragma once
 
+#include "CMatrix.h"
+
 class CLuaMatrix : public CMatrix
 {
 public:
-    CLuaMatrix();
-    CLuaMatrix(const CMatrix& matrix);
-
-    ~CLuaMatrix();
-
-    unsigned int GetScriptID() const { return m_uiScriptID; }
-
-    static CLuaMatrix* GetFromScriptID(unsigned int uiScriptID);
-
-private:
-    unsigned int m_uiScriptID;
+    CLuaMatrix() : CMatrix() {}
+    CLuaMatrix(const CMatrix& matrix) : CMatrix(matrix) {}
 };

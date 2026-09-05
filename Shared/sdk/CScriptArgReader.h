@@ -18,6 +18,7 @@
 #include "CStringMap.h"
 #include "CScriptDebugging.h"
 #include "CStringName.h"
+#include "LuaInlineUserdata.h"
 
 #ifndef MTA_CLIENT
     #include "CGame.h"
@@ -860,11 +861,23 @@ protected:
         }
         else if (iArgument == LUA_TUSERDATA)
         {
-            outValue = (T*)UserDataCast(*((T**)lua_touserdata(m_luaVM, m_iIndex)), m_luaVM);
-            if (outValue)
+            if constexpr (is_inline_userdata_type<T>::value)
             {
-                m_iIndex++;
-                return;
+                if (lua_isclass(m_luaVM, m_iIndex, GetInlineUserdataClassName<T>()))
+                {
+                    outValue = static_cast<T*>(lua_touserdata(m_luaVM, m_iIndex));
+                    m_iIndex++;
+                    return;
+                }
+            }
+            else
+            {
+                outValue = (T*)UserDataCast(*((T**)lua_touserdata(m_luaVM, m_iIndex)), m_luaVM);
+                if (outValue)
+                {
+                    m_iIndex++;
+                    return;
+                }
             }
         }
         else if (iArgument == LUA_TNONE || iArgument == LUA_TNIL)
@@ -1340,8 +1353,15 @@ public:
         }
         else if (iArgument == LUA_TUSERDATA)
         {
-            if (UserDataCast(*((T**)lua_touserdata(m_luaVM, m_iIndex + iOffset)), m_luaVM))
-                return true;
+            if constexpr (is_inline_userdata_type<T>::value)
+            {
+                return lua_isclass(m_luaVM, m_iIndex + iOffset, GetInlineUserdataClassName<T>());
+            }
+            else
+            {
+                if (UserDataCast(*((T**)lua_touserdata(m_luaVM, m_iIndex + iOffset)), m_luaVM))
+                    return true;
+            }
         }
         return false;
     }
