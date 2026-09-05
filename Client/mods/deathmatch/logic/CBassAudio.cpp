@@ -182,6 +182,9 @@ bool CBassAudio::BeginLoadingMedia()
         m_pVars = new SSoundThreadVariables();
         m_pVars->strURL = m_strPath;
         m_pVars->lFlags = lFlags;
+        // BASS_SetDevice is per-thread; carry the selected device over so the new thread doesn't
+        // default to the lowest initialised one
+        m_pVars->dwDevice = BASS_GetDevice();
         HANDLE hThread = CreateThread(NULL, 0, reinterpret_cast<LPTHREAD_START_ROUTINE>(&CBassAudio::PlayStreamIntern), m_uiCallbackId, 0, NULL);
         if (!hThread)
         {
@@ -640,8 +643,12 @@ DWORD CBassAudio::PlayStreamIntern(LPVOID argument)
         pBassAudio->m_pVars->criticalSection.Lock();
         SString strURL = pBassAudio->m_pVars->strURL;
         long    lFlags = pBassAudio->m_pVars->lFlags;
+        DWORD   dwDevice = pBassAudio->m_pVars->dwDevice;
         pBassAudio->m_pVars->criticalSection.Unlock();
         UnlockCallbackId();
+
+        // Same per-thread requirement as above; must run before BASS_StreamCreateURL
+        BASS_SetDevice(dwDevice);
 
         // This can take a long time (30+ seconds on slow/failing connections).
         // The main thread will wait for it with WaitForAllStreamingThreads().
@@ -692,6 +699,11 @@ void CBassAudio::CompleteStreamConnect(HSTREAM pSound)
     if (pSound)
     {
         m_pSound = pSound;
+
+        // The connect can outlast a device switch; SetOutputDevice's migration loop only sees
+        // channels that already exist, so it would have skipped this one. Reapply against the
+        // device this thread has selected now, which is always the current one
+        BASS_ChannelSetDevice(pSound, BASS_GetDevice());
 
         BASS_ChannelGetAttribute(pSound, BASS_ATTRIB_FREQ, &m_fDefaultFrequency);
         BASS_ChannelSetAttribute(pSound, BASS_ATTRIB_FREQ, m_fPlaybackSpeed * m_fDefaultFrequency);

@@ -35,6 +35,17 @@ public:
     void GetPlayerNames(std::vector<SString>& vPlayerNames);
 
     void OnWindowFocusChange(bool state) override;
+    void OnPossibleAudioDeviceChange() override;
+
+    unsigned int                  GetSoundOutputDeviceListRevision() override;
+    std::vector<SSoundDeviceInfo> GetSoundOutputDevices() override;
+    std::string                   GetSoundOutputDeviceDriver() override;
+    bool                          SetSoundOutputDevice(const std::string& strDriver) override;
+
+    unsigned int                  GetSoundInputDeviceListRevision() override;
+    std::vector<SSoundDeviceInfo> GetSoundInputDevices() override;
+    std::string                   GetSoundInputDeviceName() override;
+    bool                          SetSoundInputDevice(const std::string& strName) override;
 
 private:
     struct InitializeArguments

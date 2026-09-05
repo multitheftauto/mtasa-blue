@@ -7187,6 +7187,53 @@ void CClientGame::OnWindowFocusChange(bool state)
     m_pRootEntity->CallEvent("onClientMTAFocusChange", Arguments, false);
 }
 
+void CClientGame::OnPossibleAudioDeviceChange()
+{
+    m_pManager->GetSoundManager()->OnPossibleDeviceChange();
+    m_pManager->GetSoundManager()->RestartNativeAudioOnNextPulse();
+    m_pVoiceRecorder->OnPossibleDeviceChange();
+}
+
+unsigned int CClientGame::GetSoundOutputDeviceListRevision()
+{
+    return m_pManager->GetSoundManager()->GetOutputDeviceListRevision();
+}
+
+std::vector<SSoundDeviceInfo> CClientGame::GetSoundOutputDevices()
+{
+    return m_pManager->GetSoundManager()->GetOutputDevices();
+}
+
+std::string CClientGame::GetSoundOutputDeviceDriver()
+{
+    return m_pManager->GetSoundManager()->GetOutputDeviceDriver();
+}
+
+bool CClientGame::SetSoundOutputDevice(const std::string& strDriver)
+{
+    return m_pManager->GetSoundManager()->SetOutputDevice(strDriver);
+}
+
+unsigned int CClientGame::GetSoundInputDeviceListRevision()
+{
+    return m_pVoiceRecorder->GetInputDeviceListRevision();
+}
+
+std::vector<SSoundDeviceInfo> CClientGame::GetSoundInputDevices()
+{
+    return m_pVoiceRecorder->GetInputDevices();
+}
+
+std::string CClientGame::GetSoundInputDeviceName()
+{
+    return m_pVoiceRecorder->GetInputDeviceName();
+}
+
+bool CClientGame::SetSoundInputDevice(const std::string& strName)
+{
+    return m_pVoiceRecorder->SetInputDevice(strName);
+}
+
 void CClientGame::InsertIFPPointerToMap(const unsigned int u32BlockNameHash, const std::shared_ptr<CClientIFP>& pIFP)
 {
     m_mapOfIfpPointers[u32BlockNameHash] = pIFP;

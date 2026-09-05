@@ -53,3 +53,32 @@ void CAEAudioHardwareSA::LoadSoundBank(short wSoundBankID, short wSoundBankSlotI
     }
     // clang-format on
 }
+
+void CAEAudioHardwareSA::Terminate()
+{
+    DWORD dwThis = (DWORD)m_pInterface;
+    DWORD dwFunc = FUNC_CAEAudioHardware__Terminate;
+    // clang-format off
+    __asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+    }
+    // clang-format on
+}
+
+bool CAEAudioHardwareSA::Initialise()
+{
+    DWORD dwThis = (DWORD)m_pInterface;
+    DWORD dwFunc = FUNC_CAEAudioHardware__Initialise;
+    bool  bReturn = false;
+    // clang-format off
+    __asm
+    {
+        mov     ecx, dwThis
+        call    dwFunc
+        mov     bReturn, al
+    }
+    // clang-format on
+    return bReturn;
+}

@@ -16,6 +16,9 @@ CVoiceRecorder::CVoiceRecorder()
 {
     m_bEnabled = false;
 
+    // Starts on the microphone already chosen in the settings, even before any mod loads
+    g_pCore->GetCVars()->Get("audio_input_device", m_strSelectedDeviceName);
+
     m_VoiceState = VOICESTATE_AWAITING_INPUT;
     m_SampleRate = SAMPLERATE_WIDEBAND;
     m_ucQuality = 0;
@@ -34,11 +37,19 @@ CVoiceRecorder::CVoiceRecorder()
     m_ulTimeOfLastSend = 0;
 
     m_uiBufferSizeBytes = 0;
+
+    m_uiLastServerSampleRate = 0;
+    m_uiLastBitrate = 0;
+
+    OnPossibleDeviceChange();
 }
 
 CVoiceRecorder::~CVoiceRecorder()
 {
     DeInit();
+
+    if (m_InputDeviceScanThread.joinable())
+        m_InputDeviceScanThread.join();
 }
 
 // TODO: Replace this with BASS
@@ -66,6 +77,9 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
     if (!bEnabled)  // If we aren't enabled, don't bother continuing
         return;
 
+    m_uiLastServerSampleRate = uiServerSampleRate;
+    m_uiLastBitrate = uiBitrate;
+
     std::unique_lock<std::mutex> lock(m_Mutex);
 
     // Convert the sample rate we received from the server (0-2) into an actual sample rate
@@ -88,9 +102,29 @@ void CVoiceRecorder::Init(bool bEnabled, unsigned int uiServerSampleRate, unsign
 
     PaError error = Pa_Initialize();
 
+    PaDeviceIndex deviceIndex = Pa_GetDefaultInputDevice();
+    if (!m_strSelectedDeviceName.empty())
+    {
+        for (PaDeviceIndex i = 0; i < Pa_GetDeviceCount(); i++)
+        {
+            const PaDeviceInfo* pInfo = Pa_GetDeviceInfo(i);
+            if (!pInfo || pInfo->maxInputChannels <= 0 || !pInfo->name)
+                continue;
+
+            // This project only builds the DirectSound host API (pa_win_ds.c), whose names come
+            // straight from DirectSoundEnumerateA with no length cap. A prefix match could pick
+            // the wrong device just for sharing a long prefix
+            if (m_strSelectedDeviceName == pInfo->name)
+            {
+                deviceIndex = i;
+                break;
+            }
+        }
+    }
+
     PaStreamParameters inputDevice;
     inputDevice.channelCount = 1;
-    inputDevice.device = Pa_GetDefaultInputDevice();
+    inputDevice.device = deviceIndex;
     inputDevice.sampleFormat = paInt16;
     inputDevice.hostApiSpecificStreamInfo = nullptr;
     inputDevice.suggestedLatency = 0;
@@ -236,6 +270,78 @@ void CVoiceRecorder::DeInit()
     m_uiBufferSizeBytes = 0;
 }
 
+std::vector<SSoundDeviceInfo> CVoiceRecorder::GetAvailableInputDevices()
+{
+    std::vector<SSoundDeviceInfo> devices;
+
+    bool bTerminateAfter = Pa_Initialize() == paNoError;
+    if (!bTerminateAfter && !m_pAudioStream)
+        return devices;
+
+    PaDeviceIndex defaultDevice = Pa_GetDefaultInputDevice();
+    for (PaDeviceIndex i = 0; i < Pa_GetDeviceCount(); i++)
+    {
+        const PaDeviceInfo* pInfo = Pa_GetDeviceInfo(i);
+        if (!pInfo || pInfo->maxInputChannels <= 0)
+            continue;
+
+        devices.push_back({pInfo->name ? pInfo->name : "", pInfo->name ? pInfo->name : "", i == defaultDevice});
+    }
+
+    // Only tear PortAudio back down if it wasn't already running for an active recording
+    if (bTerminateAfter && !m_pAudioStream)
+        Pa_Terminate();
+
+    return devices;
+}
+
+std::string CVoiceRecorder::GetInputDeviceName()
+{
+    return m_strSelectedDeviceName;
+}
+
+bool CVoiceRecorder::SetInputDevice(const std::string& strName)
+{
+    m_strSelectedDeviceName = strName;
+
+    if (m_bEnabled)
+        Init(true, m_uiLastServerSampleRate, m_ucQuality, m_uiLastBitrate);
+
+    return true;
+}
+
+void CVoiceRecorder::OnPossibleDeviceChange()
+{
+    if (m_bInputDeviceScanRunning)
+        return;
+
+    if (m_InputDeviceScanThread.joinable())
+        m_InputDeviceScanThread.join();
+
+    m_bInputDeviceScanRunning = true;
+    m_bInputDeviceScanReady = false;
+
+    m_InputDeviceScanThread = std::thread(
+        [this]()
+        {
+            m_InputDeviceScanResult = GetAvailableInputDevices();
+            m_bInputDeviceScanReady.store(true, std::memory_order_release);
+        });
+}
+
+void CVoiceRecorder::CollectInputDeviceScanResult()
+{
+    if (!m_bInputDeviceScanReady.load(std::memory_order_acquire))
+        return;
+
+    m_InputDeviceScanThread.join();
+    m_InputDevices = std::move(m_InputDeviceScanResult);
+    m_InputDeviceScanResult.clear();
+    m_bInputDeviceScanReady = false;
+    m_bInputDeviceScanRunning = false;
+    m_uiInputDeviceListRevision++;
+}
+
 const SpeexMode* CVoiceRecorder::getSpeexModeFromSampleRate()
 {
     switch (m_SampleRate)
@@ -322,6 +428,8 @@ bool CVoiceRecorder::GetPTTState()
 
 void CVoiceRecorder::DoPulse()
 {
+    CollectInputDeviceScanResult();
+
     std::lock_guard<std::mutex> lock(m_Mutex);
 
     // A missing buffer still needs the flush below to run, so it can reset the

@@ -15,6 +15,8 @@
 
 #define FUNC_CAEAudioHardware__IsSoundBankLoaded 0x4D88C0
 #define FUNC_CAEAudioHardware__LoadSoundBank     0x4D88A0
+#define FUNC_CAEAudioHardware__Terminate         0x4D97A0
+#define FUNC_CAEAudioHardware__Initialise        0x4D9930
 
 #define CLASS_CAEAudioHardware 0xB5F8B8
 
@@ -28,6 +30,8 @@ public:
     CAEAudioHardwareSA(CAEAudioHardwareSAInterface* pInterface);
     bool IsSoundBankLoaded(short wSoundBankID, short wSoundBankSlotID);
     void LoadSoundBank(short wSoundBankID, short wSoundBankSlotID);
+    void Terminate();
+    bool Initialise();
 
 private:
     CAEAudioHardwareSAInterface* m_pInterface;

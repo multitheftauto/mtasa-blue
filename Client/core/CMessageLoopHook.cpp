@@ -18,6 +18,10 @@ extern CCore* g_pCore;
 // GUID_DEVINTERFACE_HID, used to get notified when a HID device (e.g. a joystick) is plugged in or removed
 DEFINE_GUID(GUID_DevInterfaceHID, 0x4D1E55B2, 0xF16F, 0x11CF, 0x88, 0xCB, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30);
 
+// DEVINTERFACE_AUDIO_RENDER/CAPTURE, for output and microphone devices being plugged in or removed
+DEFINE_GUID(GUID_DevInterfaceAudioRender, 0xE6327CAD, 0xDCEC, 0x4949, 0xAE, 0x8A, 0x99, 0x1E, 0x97, 0x6A, 0x79, 0xD2);
+DEFINE_GUID(GUID_DevInterfaceAudioCapture, 0x2EEF81BE, 0x33FA, 0x4800, 0x96, 0x70, 0x1C, 0xD4, 0x74, 0x97, 0x2C, 0x3F);
+
 template <>
 CMessageLoopHook* CSingleton<CMessageLoopHook>::m_pSingleton = NULL;
 
@@ -36,6 +40,8 @@ CMessageLoopHook::CMessageLoopHook()
     m_bRefreshMsgQueueEnabled = true;
     m_MovementDummyWindow = NULL;
     m_hDeviceNotify = nullptr;
+    m_hAudioRenderDeviceNotify = nullptr;
+    m_hAudioCaptureDeviceNotify = nullptr;
 }
 
 CMessageLoopHook::~CMessageLoopHook()
@@ -81,6 +87,12 @@ void CMessageLoopHook::ApplyHook(HWND hFocusWindow)
         notificationFilter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
         notificationFilter.dbcc_classguid = GUID_DevInterfaceHID;
         m_hDeviceNotify = RegisterDeviceNotification(hFocusWindow, &notificationFilter, DEVICE_NOTIFY_WINDOW_HANDLE);
+
+        // Same idea for sound output and microphone devices
+        notificationFilter.dbcc_classguid = GUID_DevInterfaceAudioRender;
+        m_hAudioRenderDeviceNotify = RegisterDeviceNotification(hFocusWindow, &notificationFilter, DEVICE_NOTIFY_WINDOW_HANDLE);
+        notificationFilter.dbcc_classguid = GUID_DevInterfaceAudioCapture;
+        m_hAudioCaptureDeviceNotify = RegisterDeviceNotification(hFocusWindow, &notificationFilter, DEVICE_NOTIFY_WINDOW_HANDLE);
     }
 }
 
@@ -99,6 +111,18 @@ void CMessageLoopHook::RemoveHook()
         {
             UnregisterDeviceNotification(m_hDeviceNotify);
             m_hDeviceNotify = nullptr;
+        }
+
+        if (m_hAudioRenderDeviceNotify)
+        {
+            UnregisterDeviceNotification(m_hAudioRenderDeviceNotify);
+            m_hAudioRenderDeviceNotify = nullptr;
+        }
+
+        if (m_hAudioCaptureDeviceNotify)
+        {
+            UnregisterDeviceNotification(m_hAudioCaptureDeviceNotify);
+            m_hAudioCaptureDeviceNotify = nullptr;
         }
     }
 }
@@ -182,7 +206,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
             }
         }
 
-        // When updating m_bFocused in CClientGame from CPacketHandler (to fix another bug — see the note there),
+        // When updating m_bFocused in CClientGame from CPacketHandler (to fix another bug ï¿½ see the note there),
         // the window might not actually have focus at that moment (even though Windows reports it as focused).
         // In this case, isMTAWindowFocused returns false even though the window has focus.
         // Therefore, we need to intercept the window return operation and manually set the focus in CClientGame.
@@ -264,9 +288,33 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
         }
     }
 
-    // A HID device (e.g. joystick) was plugged in or removed
-    if (uMsg == WM_DEVICECHANGE && (wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE))
-        GetJoystickManager()->OnPossibleDeviceChange();
+    if (uMsg == WM_DEVICECHANGE)
+    {
+        // Audio endpoints do not always raise arrival/removal, e.g. replugging into an existing
+        // jack, so the broader node change message refreshes the device pickers too
+        if (wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE || wParam == DBT_DEVNODES_CHANGED)
+            CSettings::NotifyAudioDeviceChange();
+
+        if (wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE)
+        {
+            // All three classes we registered for share this window, so only the broadcast's own
+            // class GUID says which one actually fired; without checking it, a joystick or
+            // microphone hotplug also restarts the native output audio hardware
+            const auto* pHeader = reinterpret_cast<const DEV_BROADCAST_HDR*>(lParam);
+            if (pHeader && pHeader->dbch_devicetype == DBT_DEVTYP_DEVICEINTERFACE)
+            {
+                const auto& classGuid = reinterpret_cast<const DEV_BROADCAST_DEVICEINTERFACE*>(pHeader)->dbcc_classguid;
+                if (IsEqualGUID(classGuid, GUID_DevInterfaceHID))
+                    GetJoystickManager()->OnPossibleDeviceChange();
+                else if (IsEqualGUID(classGuid, GUID_DevInterfaceAudioRender) || IsEqualGUID(classGuid, GUID_DevInterfaceAudioCapture))
+                {
+                    CModManager* pModManager = CModManager::GetSingletonPtr();
+                    if (pModManager && pModManager->IsLoaded())
+                        pModManager->GetClient()->OnPossibleAudioDeviceChange();
+                }
+            }
+        }
+    }
 
     // Make sure our pointers are valid.
     if (pThis != NULL && hwnd == pThis->GetHookedWindowHandle() && g_pCore->AreModulesLoaded())

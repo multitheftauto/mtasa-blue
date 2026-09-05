@@ -860,6 +860,11 @@ bool CClientSound::IsFinished()
     return false;
 }
 
+DWORD CClientSound::GetChannelHandle()
+{
+    return m_pAudio ? m_pAudio->GetChannelHandle() : 0;
+}
+
 bool CClientSound::GetPan(float& fPan)
 {
     if (m_pAudio && !m_b3D)
