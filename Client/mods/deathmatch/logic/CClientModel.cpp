@@ -25,6 +25,11 @@ CClientModel::~CClientModel(void)
 
 bool CClientModel::Allocate(ushort usParentID)
 {
+    // Allocate() creates DFF model info. TXD and COL file-ID slots have a
+    // different layout and must never be passed to Make*Model below.
+    if (m_iModelID < 0 || static_cast<unsigned int>(m_iModelID) >= g_pGame->GetBaseIDforTXD())
+        return false;
+
     m_bAllocatedByUs = true;
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(m_iModelID, true);
@@ -153,12 +158,13 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             if (element.GetModel() != m_iModelID)
                 continue;
 
+            const unsigned short logicalModel = element.GetLogicalModel();
             if (element.IsStreamedIn())
                 element.StreamOutForABit();
 
             setElementModelLambda(element);
-
-            callElementChangeEvent(element, usParentID, m_iModelID);
+            element.SetLogicalModel(0xFFFF);
+            callElementChangeEvent(element, usParentID, logicalModel);
         }
     };
 
@@ -171,8 +177,10 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             if (element.GetModel() != m_iModelID)
                 continue;
 
+            const unsigned short logicalModel = element.GetLogicalModel();
             setElementModelLambda(element);
-            callElementChangeEvent(element, usParentID, m_iModelID);
+            element.SetLogicalModel(0xFFFF);
+            callElementChangeEvent(element, usParentID, logicalModel);
         }
     };
 
@@ -180,10 +188,15 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
     {
         case eClientModelType::PED:
         {
-            // If some ped is using this ID, change him to CJ
-            CClientPedManager* pPedManager = g_pClientGame->GetManager()->GetPedManager();
+            if (CClientPedManager* pPedManager = g_pClientGame->GetManager()->GetPedManager())
+            {
+                unloadModelsAndCallEvents(pPedManager->IterBegin(), pPedManager->IterEnd(), 0, [](auto& element) { element.SetModel(0); });
+            }
 
-            unloadModelsAndCallEvents(pPedManager->IterBegin(), pPedManager->IterEnd(), 0, [](auto& element) { element.SetModel(0); });
+            if (CClientPlayerManager* pPlayerManager = g_pClientGame->GetManager()->GetPlayerManager())
+            {
+                unloadModelsAndCallEvents(pPlayerManager->IterBegin(), pPlayerManager->IterEnd(), 0, [](auto& element) { element.SetModel(0); });
+            }
             break;
         }
         case eClientModelType::CLUMP:

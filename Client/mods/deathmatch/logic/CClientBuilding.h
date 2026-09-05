@@ -20,7 +20,8 @@ class CClientBuilding : public CClientEntity
     friend class CClientBuildingManager;
 
 public:
-    CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, const CVector& pos, const CVector& rot, uint8_t interior);
+    CClientBuilding(class CClientManager* pManager, ElementID ID, uint16_t usModelId, const CVector& pos, const CVector& rot, uint8_t interior,
+                    uint16_t logicalModel = 0xFFFF);
     ~CClientBuilding();
 
     void Unlink();
@@ -46,7 +47,9 @@ public:
     void RelateDimension(unsigned short usDimension);
 
     uint16_t GetModel() const noexcept { return m_usModelId; };
-    void     SetModel(uint16_t ulModel);
+    uint16_t GetLogicalModel() const noexcept { return m_logicalModel != 0xFFFF ? m_logicalModel : m_usModelId; }
+    void     SetLogicalModel(std::uint16_t logicalModel) noexcept { m_logicalModel = logicalModel; }
+    void     SetModel(uint16_t ulModel, uint16_t logicalModel = 0xFFFF);
 
     eClientEntityType GetType() const { return CCLIENTBUILDING; }
 
@@ -82,6 +85,7 @@ private:
 
     CBuilding*    m_pBuilding;
     uint16_t      m_usModelId;
+    uint16_t      m_logicalModel = 0xFFFF;
     CVector       m_vPos;
     CVector       m_vRot;
     uint8_t       m_interior;

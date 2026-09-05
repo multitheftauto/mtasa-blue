@@ -44,6 +44,7 @@
 #include "CMapManager.h"
 #include "CMarkerManager.h"
 #include "CHandlingManager.h"
+#include "models/CModelManager.h"
 #include "CScriptDebugging.h"
 #include "CBandwidthSettings.h"
 #include "CMainConfig.h"
@@ -618,6 +619,8 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         m_pRadarAreaManager = new CRadarAreaManager;
         m_pMarkerManager = new CMarkerManager(m_pColManager);
         m_HandlingManager = std::make_unique<CHandlingManager>();
+        m_modelManager = std::make_unique<CModelManager>();
+        m_modelManager->Initialize();
         m_pVehicleManager = new CVehicleManager;
         m_pPacketTranslator = new CPacketTranslator(m_pPlayerManager);
         m_pBanManager = new CBanManager;
@@ -1443,6 +1446,9 @@ void CGame::InitialDataStream(CPlayer& Player)
 
     // Tell him current bullet sync enabled weapons and vehicle extrapolation settings
     SendSyncSettings(&Player);
+
+    // Tell him all active custom server models before streaming entities
+    SendServerModels(&Player);
 
     // Tell the other players about him
     CPlayerListPacket PlayerNotice;
@@ -5288,5 +5294,45 @@ void CGame::ProcessClientTriggeredEventSpam()
             it = m_mapClientTriggeredEvents.erase(it);
         else
             it++;
+    }
+}
+
+void CGame::BroadcastAllocateServerModel(const SServerModelDefinition& definition)
+{
+    if (!m_pPlayerManager)
+        return;
+
+    CBitStream bitStream;
+    bitStream.pBitStream->Write(definition.logicalModelId);
+    bitStream.pBitStream->Write(definition.parentModelId);
+    bitStream.pBitStream->Write(static_cast<std::uint8_t>(definition.type));
+    bitStream.pBitStream->WriteString(definition.name);
+    m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(ALLOCATE_SERVER_MODEL, *bitStream.pBitStream));
+}
+
+void CGame::BroadcastFreeServerModel(std::uint16_t logicalModelId)
+{
+    if (!m_pPlayerManager)
+        return;
+
+    CBitStream bitStream;
+    bitStream.pBitStream->Write(logicalModelId);
+    m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(FREE_SERVER_MODEL, *bitStream.pBitStream));
+}
+
+void CGame::SendServerModels(CPlayer* player)
+{
+    if (!player || !m_modelManager)
+        return;
+
+    const auto definitions = m_modelManager->GetAllocatedModelDefinitions();
+    for (const auto& definition : definitions)
+    {
+        CBitStream bitStream;
+        bitStream.pBitStream->Write(definition.logicalModelId);
+        bitStream.pBitStream->Write(definition.parentModelId);
+        bitStream.pBitStream->Write(static_cast<std::uint8_t>(definition.type));
+        bitStream.pBitStream->WriteString(definition.name);
+        player->Send(CLuaPacket(ALLOCATE_SERVER_MODEL, *bitStream.pBitStream));
     }
 }

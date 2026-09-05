@@ -91,14 +91,17 @@ public:
         WEAPON_INVALID = 0xFF,
     };
 
-    CClientPickup(class CClientManager* pManager, ElementID ID, unsigned short usModel, CVector vecPosition = CVector(0, 0, 0));
+    CClientPickup(class CClientManager* pManager, ElementID ID, unsigned short usModel, CVector vecPosition = CVector(0, 0, 0),
+                  std::uint16_t logicalModel = 0xFFFF);
     ~CClientPickup();
 
     void Unlink();
 
     eClientEntityType GetType() const { return CCLIENTPICKUP; };
 
-    unsigned short GetModel() { return m_usModel; };
+    unsigned short GetModel() const { return m_usModel; };
+    std::uint16_t  GetLogicalModel() const { return m_logicalModel != 0xFFFF ? m_logicalModel : m_usModel; }
+    void           SetLogicalModel(std::uint16_t logicalModel) noexcept { m_logicalModel = logicalModel; }
 
     CPickup*       GetGamePickup() { return m_pPickup; };
     CObject*       GetGameObject() { return m_pObject; }
@@ -107,7 +110,7 @@ public:
 
     void GetPosition(CVector& vecPosition) const override;
     void SetPosition(const CVector& vecPosition);
-    void SetModel(unsigned short usModel);
+    void SetModel(unsigned short usModel, std::uint16_t logicalModel = 0xFFFF);
 
     void AttachTo(CClientEntity* pEntity) override;
 
@@ -133,6 +136,7 @@ private:
     CClientPickupManager* m_pPickupManager;
 
     unsigned short m_usModel;
+    std::uint16_t  m_logicalModel = 0xFFFF;
     CPickup*       m_pPickup;
     CObject*       m_pObject;
     CVector        m_vecPosition;

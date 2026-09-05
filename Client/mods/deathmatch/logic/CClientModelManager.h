@@ -15,6 +15,9 @@ class CClientModelManager;
 #include <list>
 #include <vector>
 #include <memory>
+#include <unordered_map>
+#include <string>
+#include <CServerModelDefinition.h>
 #include "CClientModel.h"
 
 #define MAX_MODEL_DFF_ID 20000
@@ -44,7 +47,34 @@ public:
 
     void DeallocateModelsAllocatedByResource(CResource* pResource);
 
+    bool AllocateServerModel(const SServerModelDefinition& definition);
+    bool FreeServerModel(std::uint16_t logicalModelId);
+    void ClearServerModels();
+
+    // Network entities carry stable server IDs, while GTA can only use a model slot
+    // that is free on this particular client. Keep that translation at the model boundary.
+    std::uint16_t ResolveServerModelID(std::uint16_t logicalModelId) const;
+    std::uint16_t GetServerModelID(std::uint16_t runtimeModelId) const;
+    int           GetServerModelRuntimeID(std::uint16_t logicalModelId) const;
+
+    // Resolve IDs supplied by scripts without ever allowing an unknown logical
+    // ID to reach GTA's fixed-size model arrays. runtimeModelId is always safe
+    // to pass to native engine APIs when this function succeeds.
+    bool ResolveModelID(std::uint32_t modelId, std::uint16_t& runtimeModelId, std::uint16_t* logicalModelId = nullptr, bool allowParentFallback = true) const;
+
+    const SServerModelDefinition* FindServerModelDefinition(std::uint16_t logicalModelId) const;
+    const SServerModelDefinition* FindServerModelDefinition(const std::string& name) const;
+
 private:
-    std::unique_ptr<std::shared_ptr<CClientModel>[]> m_Models;
-    unsigned int                                     m_modelCount = 0;
+    struct SServerModelEntry
+    {
+        SServerModelDefinition        definition;
+        int                           runtimeModelId = -1;
+        std::shared_ptr<CClientModel> model;
+    };
+
+    std::unique_ptr<std::shared_ptr<CClientModel>[]>     m_Models;
+    unsigned int                                         m_modelCount = 0;
+    std::unordered_map<std::uint16_t, SServerModelEntry> m_serverModels;
+    std::unordered_map<std::uint16_t, std::uint16_t>     m_serverModelByRuntime;
 };

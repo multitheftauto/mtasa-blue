@@ -77,6 +77,11 @@ CClientManager::~CClientManager()
     g_pClientGame->GetElementDeleter()->DoDeleteAll();
     g_pCore->GetGUI()->CleanDeadPool();
 
+    // Server model teardown restores live entities to their native parents and
+    // releases DFF/COL state. All managers used by that path must still exist.
+    delete m_pModelManager;
+    m_pModelManager = nullptr;
+
     delete m_pExplosionManager;
     m_pExplosionManager = NULL;
 
@@ -172,9 +177,6 @@ CClientManager::~CClientManager()
 
     delete m_pPointLightsManager;
     m_pPointLightsManager = NULL;
-
-    delete m_pModelManager;
-    m_pModelManager = nullptr;
 
     delete m_pImgManager;
     m_pImgManager = nullptr;

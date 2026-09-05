@@ -272,11 +272,15 @@ void CClientObject::UpdateVisibility()
     }
 }
 
-void CClientObject::SetModel(unsigned short usModel)
+void CClientObject::SetModel(unsigned short usModel, std::uint16_t logicalModel)
 {
     // Valid model ID?
     if (CClientObjectManager::IsValidModel(usModel))
     {
+        // Preserve the server identity separately from the GTA runtime slot.
+        // They can differ per client and can even share the parent on fallback.
+        m_logicalModel = logicalModel;
+
         // Destroy current model
         Destroy();
 

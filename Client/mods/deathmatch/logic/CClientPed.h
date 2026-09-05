@@ -207,7 +207,7 @@ public:
     // This function spawns/respawns this ped in any location. This will force a recreation
     // and restoration of initial state. This will also remove all weapons, unfreeze,
     // remove jetpack, etc...
-    void Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior);
+    void Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior, std::uint16_t logicalModel = 0xFFFF);
 
     void ResetInterpolation();
 
@@ -238,8 +238,14 @@ public:
     int  GetVehicleInOutState() const noexcept { return m_iVehicleInOutState; };
     void SetVehicleInOutState(int iState) noexcept { m_iVehicleInOutState = iState; };
 
+    // The logical ID is what scripts and net packets see, while m_ulModel is the
+    // actual GTA runtime slot. When a server model is freed, scripts listening to
+    // events observe the stable server identity through GetLogicalModel().
     unsigned long GetModel() const noexcept { return m_ulModel; };
-    bool          SetModel(unsigned long ulModel, bool bTemp = false);
+    std::uint16_t GetLogicalModel() const noexcept { return m_logicalModel != 0xFFFF ? m_logicalModel : static_cast<std::uint16_t>(m_ulModel); }
+    void          SetLogicalModel(std::uint16_t logicalModel) noexcept { m_logicalModel = logicalModel; }
+    bool          SetModel(unsigned long ulModel, bool bTemp = false, std::uint16_t logicalModel = 0xFFFF);
+    void          PrepareForModelFree(unsigned short usRuntimeModel);
 
     bool GetCanBeKnockedOffBike();
     void SetCanBeKnockedOffBike(bool bCanBeKnockedOffBike);
@@ -639,6 +645,7 @@ public:
     bool                        m_bIsLocalPlayer;
     int                         m_pRespawnState;
     unsigned long               m_ulModel;
+    std::uint16_t               m_logicalModel = 0xFFFF;
     CMatrix                     m_matFrozen;
     bool                        m_bRadioOn;
     unsigned char               m_ucRadioChannel;
@@ -781,6 +788,7 @@ public:
 
     // Hacks for player model replacement and weapon model replacement respectively
     unsigned long                 m_ulStoredModel;
+    std::uint16_t                 m_storedLogicalModel = 0xFFFF;
     std::list<SRestoreWeaponItem> m_RestoreWeaponList;
 
     CVector m_vecPrevTargetPosition;
