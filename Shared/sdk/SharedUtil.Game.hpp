@@ -253,4 +253,135 @@ namespace SharedUtil
         return SColorRGBA(r, g, b, 0);
     }
 
+    // Default GTA:SA emergency vehicle siren configurations derived from CAutomobile::PreRender (0x6AAB50) and CBike::PreRender (0x6BD090)
+    std::optional<SDefaultVehicleSirens> GetDefaultVehicleSirens(std::uint16_t modelId) noexcept
+    {
+        SDefaultVehicleSirens sirenData;
+
+        switch (modelId)
+        {
+            // Police LS / SF / LV
+            case 596:
+            case 597:
+            case 598:
+            {
+                sirenData.sirenCount = 2;
+                sirenData.sirenType = 2;
+                sirenData.flag360 = true;
+                sirenData.doLOSCheck = true;
+                sirenData.useRandomiser = true;
+                sirenData.sirenSilent = false;
+                sirenData.beacons[0] = {CVector(0.7f, -0.4f, 1.0f), SColorRGBA(0, 0, 255, 255), 0};
+                sirenData.beacons[1] = {CVector(-0.7f, -0.4f, 1.0f), SColorRGBA(255, 0, 0, 255), 0};
+                return sirenData;
+            }
+
+            // Police Ranger
+            case 599:
+            {
+                sirenData.sirenCount = 2;
+                sirenData.sirenType = 2;
+                sirenData.flag360 = true;
+                sirenData.doLOSCheck = true;
+                sirenData.useRandomiser = true;
+                sirenData.sirenSilent = false;
+                sirenData.beacons[0] = {CVector(0.7f, -0.1f, 1.2f), SColorRGBA(0, 0, 255, 255), 0};
+                sirenData.beacons[1] = {CVector(-0.7f, -0.1f, 1.2f), SColorRGBA(255, 0, 0, 255), 0};
+                return sirenData;
+            }
+
+            // Ambulance
+            case 416:
+            {
+                sirenData.sirenCount = 2;
+                sirenData.sirenType = 2;
+                sirenData.flag360 = true;
+                sirenData.doLOSCheck = true;
+                sirenData.useRandomiser = true;
+                sirenData.sirenSilent = false;
+                sirenData.beacons[0] = {CVector(0.6f, 0.9f, 1.2f), SColorRGBA(0, 0, 255, 255), 0};
+                sirenData.beacons[1] = {CVector(-0.6f, 0.9f, 1.2f), SColorRGBA(255, 0, 0, 255), 0};
+                return sirenData;
+            }
+
+            // Firetruck / Firetruck with ladder
+            case 407:
+            case 544:
+            {
+                sirenData.sirenCount = 2;
+                sirenData.sirenType = 2;
+                sirenData.flag360 = true;
+                sirenData.doLOSCheck = true;
+                sirenData.useRandomiser = true;
+                sirenData.sirenSilent = false;
+                sirenData.beacons[0] = {CVector(0.9f, 3.2f, 1.3f), SColorRGBA(255, 255, 0, 255), 0};
+                sirenData.beacons[1] = {CVector(-0.9f, 3.2f, 1.3f), SColorRGBA(255, 0, 0, 255), 0};
+                return sirenData;
+            }
+
+            // Enforcer
+            case 427:
+            {
+                sirenData.sirenCount = 2;
+                sirenData.sirenType = 2;
+                sirenData.flag360 = true;
+                sirenData.doLOSCheck = true;
+                sirenData.useRandomiser = true;
+                sirenData.sirenSilent = false;
+                sirenData.beacons[0] = {CVector(0.55f, 1.1f, 1.4f), SColorRGBA(0, 0, 255, 255), 0};
+                sirenData.beacons[1] = {CVector(-0.55f, 1.1f, 1.4f), SColorRGBA(255, 0, 0, 255), 0};
+                return sirenData;
+            }
+
+            // FBI Rancher & FBI Truck
+            case 490:
+            case 528:
+            {
+                sirenData.sirenCount = 1;
+                sirenData.sirenType = 1;
+                sirenData.flag360 = false;
+                sirenData.doLOSCheck = true;
+                sirenData.useRandomiser = false;
+                sirenData.sirenSilent = false;
+                sirenData.beacons[0] = {CVector(0.0f, 1.2f, 0.5f), SColorRGBA(0, 0, 255, 255), 0};
+                return sirenData;
+            }
+
+            // Police Bike (HPV-1000)
+            case 523:
+            {
+                sirenData.sirenCount = 2;
+                sirenData.sirenType = 2;
+                sirenData.flag360 = false;
+                sirenData.doLOSCheck = true;
+                sirenData.useRandomiser = true;
+                sirenData.sirenSilent = false;
+                sirenData.beacons[0] = {CVector(0.28f, 0.60f, 0.30f), SColorRGBA(0, 0, 255, 255), 0};
+                sirenData.beacons[1] = {CVector(-0.28f, 0.60f, 0.30f), SColorRGBA(255, 0, 0, 255), 0};
+                return sirenData;
+            }
+
+            // SWAT
+            case 601:
+            {
+                sirenData.sirenCount = 1;
+                sirenData.sirenType = 1;
+                sirenData.flag360 = true;
+                sirenData.doLOSCheck = true;
+                sirenData.useRandomiser = false;
+                sirenData.sirenSilent = false;
+                sirenData.beacons[0] = {CVector(0.0f, 0.0f, 1.2f), SColorRGBA(0, 0, 255, 255), 0};
+                return sirenData;
+            }
+
+            default:
+                return std::nullopt;
+        }
+    }
+
+    bool DoesVehicleModelHaveDefaultSirens(std::uint16_t modelId) noexcept
+    {
+        return GetDefaultVehicleSirens(modelId).has_value();
+    }
+
 }  // namespace SharedUtil
