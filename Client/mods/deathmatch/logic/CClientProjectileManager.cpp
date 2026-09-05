@@ -88,7 +88,8 @@ CClientProjectile* CClientProjectileManager::Get(CEntitySAInterface* pProjectile
     list<CClientProjectile*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); iter++)
     {
-        if ((*iter)->GetGameEntity()->GetInterface() == pProjectile)
+        CEntity* pGameEntity = (*iter)->GetGameEntity();
+        if (pGameEntity && pGameEntity->GetInterface() == pProjectile)
         {
             return (*iter);
         }

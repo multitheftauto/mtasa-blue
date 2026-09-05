@@ -25,6 +25,9 @@
 #define FAKE_D3DTEXTURE_NO_TEXTURE  ((CD3DDUMMY*)-9)
 #define FAKE_RWTEXTURE_NO_TEXTURE   ((RwTexture*)-10)
 #define FAKE_NAME_NO_TEXTURE        "unnamed"
+#define FAKE_D3DTEXTURE_SEARCHLIGHT ((CD3DDUMMY*)-11)
+#define FAKE_RWTEXTURE_SEARCHLIGHT  ((RwTexture*)-12)
+#define FAKE_NAME_SEARCHLIGHT       "searchlight"
 
 class CMatchChannel;
 class CMatchChannelManager;
