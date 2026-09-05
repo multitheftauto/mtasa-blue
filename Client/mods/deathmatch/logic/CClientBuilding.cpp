@@ -172,11 +172,22 @@ void CClientBuilding::Create()
     {
         m_pBuilding->SetUsesCollision(m_usesCollision);
     }
+
+    // Native entities are missing while the building is in another dimension (or the pool
+    // failed to allocate). Restore the GTA LOD link only when both sides exist.
     if (m_ucAlpha != 255)
         m_pBuilding->SetAlpha(m_ucAlpha);
+  
     if (m_pHighBuilding)
     {
-        m_pHighBuilding->GetBuildingEntity()->SetLod(m_pBuilding);
+        if (CBuilding* pHighEntity = m_pHighBuilding->GetBuildingEntity())
+            pHighEntity->SetLod(m_pBuilding);
+    }
+  
+    if (m_pLowBuilding)
+    {
+        if (CBuilding* pLowEntity = m_pLowBuilding->GetBuildingEntity())
+            m_pBuilding->SetLod(pLowEntity);
     }
 }
 
@@ -185,9 +196,10 @@ void CClientBuilding::Destroy()
     if (!m_pBuilding)
         return;
 
-    if (m_pHighBuilding && m_pHighBuilding->IsValid())
+    if (m_pHighBuilding)
     {
-        m_pHighBuilding->GetBuildingEntity()->SetLod(nullptr);
+        if (CBuilding* pHighEntity = m_pHighBuilding->GetBuildingEntity())
+            pHighEntity->SetLod(nullptr);
     }
     g_pGame->GetPools()->GetBuildingsPool().RemoveBuilding(m_pBuilding);
     m_pBuilding = nullptr;
@@ -207,11 +219,15 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
             pOveridedBuilding->SetLowLodBuilding();
         }
 
-        // Add new LOD
+        // Keep the MTA-level link even if native entities are not created yet
         m_pLowBuilding = pLod;
-        m_pBuilding->SetLod(pLod->GetBuildingEntity());
-
         pLod->SetHighLodBuilding(this);
+
+        if (m_pBuilding)
+        {
+            if (CBuilding* pLodEntity = pLod->GetBuildingEntity())
+                m_pBuilding->SetLod(pLodEntity);
+        }
     }
     else
     {
@@ -220,7 +236,8 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
         {
             m_pLowBuilding->SetHighLodBuilding();
         }
-        m_pBuilding->SetLod(nullptr);
+        if (m_pBuilding)
+            m_pBuilding->SetLod(nullptr);
         m_pLowBuilding = nullptr;
     }
     return true;
