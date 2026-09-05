@@ -315,6 +315,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(CClientGame::StaticGameRunNamedAnimDestructorHandler);
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
     g_pMultiplayer->SetRadarBlipRenderHandler(CClientGame::StaticRadarBlipRenderHandler);
+    g_pMultiplayer->SetMarkerRenderHandler(CClientGame::StaticMarkerRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
     g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedStepHandler);
@@ -531,6 +532,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(nullptr);
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
     g_pMultiplayer->SetRadarBlipRenderHandler(nullptr);
+    g_pMultiplayer->SetMarkerRenderHandler(nullptr);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
     g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
@@ -3816,6 +3818,35 @@ void CClientGame::StaticRadarBlipRenderHandler(int iBlipIndex)
         if (pBlip)
         {
             g_pGame->GetRenderWare()->SetRenderingClientEntity(pBlip, 0xFFFF, TYPE_MASK_OTHER);
+            return;
+        }
+    }
+
+    g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
+}
+
+// CHeli::ProcessControl registers the searchlight cone and corona of a helicopter with the vehicle pointer plus this
+static constexpr unsigned long HELI_SEARCHLIGHT_IDENTIFIER_OFFSET = 0xB;
+
+void CClientGame::StaticMarkerRenderHandler(unsigned long ulIdentifier)
+{
+    if (ulIdentifier)
+    {
+        CClientEntity* pEntity = g_pClientGame->GetManager()->GetMarkerManager()->GetEntityByIdentifier(ulIdentifier);
+        if (pEntity)
+        {
+            g_pGame->GetRenderWare()->SetRenderingClientEntity(pEntity, 0xFFFF, TYPE_MASK_OTHER);
+            return;
+        }
+
+        // The pool lookup rounds to the containing slot, so make sure the identifier really points at a vehicle
+        const unsigned long ulVehicleInterface = ulIdentifier - HELI_SEARCHLIGHT_IDENTIFIER_OFFSET;
+        CClientEntity*      pVehicle = g_pGame->GetPools()->GetClientEntity(reinterpret_cast<DWORD*>(ulVehicleInterface));
+        bool                bExact = pVehicle && pVehicle->GetType() == CCLIENTVEHICLE && pVehicle->GetGameEntity() &&
+                      reinterpret_cast<unsigned long>(pVehicle->GetGameEntity()->GetInterface()) == ulVehicleInterface;
+        if (bExact)
+        {
+            g_pGame->GetRenderWare()->SetRenderingClientEntity(pVehicle, static_cast<CClientVehicle*>(pVehicle)->GetModel(), TYPE_MASK_VEHICLE);
             return;
         }
     }

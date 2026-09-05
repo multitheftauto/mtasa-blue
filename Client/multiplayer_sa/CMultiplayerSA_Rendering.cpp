@@ -13,6 +13,7 @@
 extern CCoreInterface*           g_pCore;
 GameEntityRenderHandler*         pGameEntityRenderHandler = nullptr;
 RadarBlipRenderHandler*          pRadarBlipRenderHandler = nullptr;
+MarkerRenderHandler*             pMarkerRenderHandler = nullptr;
 PreRenderSkyHandler*             pPreRenderSkyHandlerHandler = nullptr;
 RenderHeliLightHandler*          pRenderHeliLightHandler = nullptr;
 RenderEverythingBarRoadsHandler* pRenderEverythingBarRoadsHandler = nullptr;
@@ -787,6 +788,126 @@ static void __declspec(naked) HOOK_CRadar_DrawCoordBlip()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// C3dMarkers::Render
+//
+// Detect 3D marker rendering (cylinder, arrow, ring and checkpoint geometry)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_MarkerRender_Pre(DWORD dwIdentifier)
+{
+    if (pMarkerRenderHandler)
+        pMarkerRenderHandler(dwIdentifier);
+}
+
+void OnMY_MarkerRender_Post()
+{
+    if (pMarkerRenderHandler)
+        pMarkerRenderHandler(0);
+}
+
+// Hook info
+#define HOOKPOS_C3dMarkers_Render_Marker 0x7250B1
+#define FUNC_C3dMarker_Render            0x7223D0
+#define OFFSET_C3dMarker_Identifier      0x54
+static void __declspec(naked) HOOK_C3dMarkers_Render_Marker()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    dword ptr [ecx+OFFSET_C3dMarker_Identifier]
+        call    OnMY_MarkerRender_Pre
+        add     esp, 4*1
+        popad
+
+        mov     eax, FUNC_C3dMarker_Render
+        call    eax
+
+        pushad
+        call    OnMY_MarkerRender_Post
+        popad
+        retn
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CCoronas::Render
+//
+// Detect corona rendering
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CCoronas_Render_Corona                0x6FB2E6
+#define HOOKSIZE_CCoronas_Render_Corona               5
+#define FUNC_CSprite_RenderOneXLUSprite_Rotate_Aspect 0x70D490
+#define OFFSET_CRegisteredCorona_EdiToIdentifier      0x2C  // edi points at the corona + 0x38, the identifier is at + 0x0C
+DWORD                         RETURN_CCoronas_Render_Corona = 0x6FB2EB;
+static void __declspec(naked) HOOK_CCoronas_Render_Corona()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    dword ptr [edi-OFFSET_CRegisteredCorona_EdiToIdentifier]
+        call    OnMY_MarkerRender_Pre
+        add     esp, 4*1
+        popad
+
+        // Arguments are still on the stack
+        mov     eax, FUNC_CSprite_RenderOneXLUSprite_Rotate_Aspect
+        call    eax
+
+        pushad
+        call    OnMY_MarkerRender_Post
+        popad
+        jmp     RETURN_CCoronas_Render_Corona
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CHeli::RenderAllHeliSearchLights
+//
+// Detect the game's own helicopter searchlight cone rendering (id = heli + 0xB, also the corona identifier)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CHeli_RenderAllHeliSearchLights_Cone  0x6C7CE8
+#define HOOKSIZE_CHeli_RenderAllHeliSearchLights_Cone 5
+#define FUNC_CHeli_SearchLightCone                    0x6C58E0
+DWORD                         RETURN_CHeli_RenderAllHeliSearchLights_Cone = 0x6C7CED;
+static void __declspec(naked) HOOK_CHeli_RenderAllHeliSearchLights_Cone()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    dword ptr [esp+20h]
+        call    OnMY_MarkerRender_Pre
+        add     esp, 4*1
+        popad
+
+        // Arguments are still on the stack
+        mov     eax, FUNC_CHeli_SearchLightCone
+        call    eax
+
+        pushad
+        call    OnMY_MarkerRender_Post
+        popad
+        jmp     RETURN_CHeli_RenderAllHeliSearchLights_Cone
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::SetGameEntityRenderHandler
 //
 //
@@ -794,6 +915,17 @@ static void __declspec(naked) HOOK_CRadar_DrawCoordBlip()
 void CMultiplayerSA::SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler)
 {
     pGameEntityRenderHandler = pHandler;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::SetMarkerRenderHandler
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::SetMarkerRenderHandler(MarkerRenderHandler* pHandler)
+{
+    pMarkerRenderHandler = pHandler;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1027,4 +1159,7 @@ void CMultiplayerSA::InitHooks_Rendering()
     EZHookInstall(CRenderer_EverythingBarRoads);
     HookInstallCall(HOOKPOS_CRadar_DrawBlips_CoordBlip, (DWORD)HOOK_CRadar_DrawCoordBlip);
     HookInstallCall(HOOKPOS_CRadar_DrawBlips_CoordBlipWaypoint, (DWORD)HOOK_CRadar_DrawCoordBlip);
+    HookInstallCall(HOOKPOS_C3dMarkers_Render_Marker, (DWORD)HOOK_C3dMarkers_Render_Marker);
+    EZHookInstall(CCoronas_Render_Corona);
+    EZHookInstall(CHeli_RenderAllHeliSearchLights_Cone);
 }

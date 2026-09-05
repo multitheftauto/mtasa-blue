@@ -1318,6 +1318,7 @@ static bool IsShaderTargetElement(CClientEntity* pElement)
         case CCLIENTPROJECTILE:
         case CCLIENTSEARCHLIGHT:
         case CCLIENTRADARMARKER:
+        case CCLIENTMARKER:
             return true;
         default:
             return false;
@@ -1328,7 +1329,7 @@ static void ReadShaderTargetElement(CScriptArgReader& argStream, CClientEntity*&
 {
     argStream.ReadUserData(pElement, nullptr);
     if (!argStream.HasErrors() && pElement && !IsShaderTargetElement(pElement))
-        argStream.SetCustomError("targetElement must be a ped, player, vehicle, object, weapon, building, pickup, projectile, searchlight or blip",
+        argStream.SetCustomError("targetElement must be a ped, player, vehicle, object, weapon, building, pickup, projectile, searchlight, blip or marker",
                                  "Bad argument");
 }
 

@@ -612,6 +612,7 @@ private:
     static bool StaticWorldSoundHandler(const SWorldSoundEvent& event);
     static void StaticGameEntityRenderHandler(CEntitySAInterface* pEntity);
     static void StaticRadarBlipRenderHandler(int iBlipIndex);
+    static void StaticMarkerRenderHandler(unsigned long ulIdentifier);
     static void StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
     static void StaticFxSystemDestructionHandler(void* pFxSAInterface);
     static void StaticPedStepHandler(CPedSAInterface* pPed, bool bFoot);
