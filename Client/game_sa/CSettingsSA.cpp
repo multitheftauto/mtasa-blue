@@ -40,6 +40,8 @@ void  HOOK_StoreShadowForVehicle();
 
 namespace
 {
+    constexpr std::uintptr_t FUNC_FindPlayerVehicle = 0x56E0D0;
+    constexpr std::uintptr_t CALL_CShadows_RenderExtraPlayerShadows_FindPlayerVehicle = 0x707FB6;
     constexpr std::uintptr_t FUNC_CStencilShadows_RenderForVehicle = 0x70FAE0;
     constexpr std::uintptr_t CALL_CStencilShadows_Process_RenderForVehicle = 0x711E26;
     struct VehicleStencilShadow
@@ -62,6 +64,15 @@ namespace
         // Native vehicles without an MTA wrapper must retain GTA's normal shadows.
         auto* const entry = pGame->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicle));
         return entry && entry->pEntity && entry->pEntity->GetAlpha() == 0;
+    }
+
+    CVehicleSAInterface* __cdecl FindPlayerVehicleForExtraShadows(int playerId, bool includeRemote)
+    {
+        using FindPlayerVehicle = CVehicleSAInterface*(__cdecl*)(int, bool);
+        auto* const vehicle = reinterpret_cast<FindPlayerVehicle>(FUNC_FindPlayerVehicle)(playerId, includeRemote);
+
+        // Returning no vehicle skips GTA's separate point-light shadows through its normal early exit.
+        return vehicle && IsVehicleShadowHidden(vehicle) ? nullptr : vehicle;
     }
 
     void __cdecl RenderVehicleStencilShadow(VehicleStencilShadow* shadow, CVector* cameraPosition)
@@ -92,6 +103,7 @@ CSettingsSA::CSettingsSA()
     SetAspectRatio(ASPECT_RATIO_4_3);
     HookInstall(HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5);
     HookInstall(HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9);
+    HookInstallCall(CALL_CShadows_RenderExtraPlayerShadows_FindPlayerVehicle, reinterpret_cast<DWORD>(FindPlayerVehicleForExtraShadows));
     HookInstallCall(CALL_CStencilShadows_Process_RenderForVehicle, reinterpret_cast<DWORD>(RenderVehicleStencilShadow));
     m_iDesktopWidth = 0;
     m_iDesktopHeight = 0;
