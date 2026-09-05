@@ -18,6 +18,7 @@
 #include "CSettingsSA.h"
 #include "CCameraSA.h"
 #include "CCamSA.h"
+#include "CVehicleSA.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -37,6 +38,46 @@ void HOOK_GetFxQuality();
 DWORD RETURN_StoreShadowForVehicle = 0x70BDA9;
 void  HOOK_StoreShadowForVehicle();
 
+namespace
+{
+    constexpr std::uintptr_t FUNC_CStencilShadows_RenderForVehicle = 0x70FAE0;
+    constexpr std::uintptr_t CALL_CStencilShadows_Process_RenderForVehicle = 0x711E26;
+    struct VehicleStencilShadow
+    {
+        CVehicleSAInterface*  owner;
+        short                 faceCount;
+        BYTE                  type;
+        BYTE                  padding;
+        DWORD                 capacity;
+        DWORD                 vertexCount;
+        CVector*              vertices;
+        VehicleStencilShadow* next;
+        VehicleStencilShadow* previous;
+    };
+    static_assert(sizeof(VehicleStencilShadow) == 0x1C);
+    static_assert(offsetof(VehicleStencilShadow, vertexCount) == 0xC);
+
+    bool __cdecl IsVehicleShadowHidden(CVehicleSAInterface* vehicle)
+    {
+        // Native vehicles without an MTA wrapper must retain GTA's normal shadows.
+        auto* const entry = pGame->GetPools()->GetVehicle(reinterpret_cast<DWORD*>(vehicle));
+        return entry && entry->pEntity && entry->pEntity->GetAlpha() == 0;
+    }
+
+    void __cdecl RenderVehicleStencilShadow(VehicleStencilShadow* shadow, CVector* cameraPosition)
+    {
+        if (IsVehicleShadowHidden(shadow->owner))
+        {
+            // Clear cached triangles too; GTA rebuilds them when alpha is restored.
+            shadow->vertexCount = 0;
+            return;
+        }
+
+        using RenderForVehicle = void(__cdecl*)(VehicleStencilShadow*, CVector*);
+        reinterpret_cast<RenderForVehicle>(FUNC_CStencilShadows_RenderForVehicle)(shadow, cameraPosition);
+    }
+}
+
 float ms_fVehicleLODDistance, ms_fTrainPlaneLODDistance, ms_fPedsLODDistance;
 
 CSettingsSA::CSettingsSA()
@@ -51,6 +92,7 @@ CSettingsSA::CSettingsSA()
     SetAspectRatio(ASPECT_RATIO_4_3);
     HookInstall(HOOKPOS_GetFxQuality, (DWORD)HOOK_GetFxQuality, 5);
     HookInstall(HOOKPOS_StoreShadowForVehicle, (DWORD)HOOK_StoreShadowForVehicle, 9);
+    HookInstallCall(CALL_CStencilShadows_Process_RenderForVehicle, reinterpret_cast<DWORD>(RenderVehicleStencilShadow));
     m_iDesktopWidth = 0;
     m_iDesktopHeight = 0;
     MemPut<BYTE>(0x6FF420, 0xC3);  // Truncate CalculateAspectRatio
@@ -396,7 +438,8 @@ static void __declspec(naked) HOOK_GetFxQuality()
     // clang-format on
 }
 
-// Hook to discover what vehicle will be calling GetFxQuality
+// Filter invisible vehicles before GTA selects static/dynamic blob shadows.
+// Unrefreshed static shadows expire normally. Also track the model for GetFxQuality.
 static void __declspec(naked) HOOK_StoreShadowForVehicle()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -404,6 +447,17 @@ static void __declspec(naked) HOOK_StoreShadowForVehicle()
     // clang-format off
     __asm
     {
+        pushad
+        mov     eax, [esp+36]
+        push    eax
+        call    IsVehicleShadowHidden
+        add     esp, 4
+        test    al, al
+        popad
+        jz      visible
+        retn
+
+    visible:
         // Hooked from 0x70BDA0  5 bytes
         mov     eax, [esp+4]            // Get vehicle
         mov     ax, [eax+34]            // pEntity->m_nModelIndex
