@@ -92,6 +92,9 @@ public:
     CClientPlayerVoice* GetVoice() { return m_voice; }
     void                SetPlayerVoice(CClientPlayerVoice* voice) { m_voice = voice; }
 
+    float GetCameraPitch() const { return m_fCameraPitch; }
+    void  SetCameraPitch(float fPitch) { m_fCameraPitch = fPitch; }
+
     float GetNametagDistance() { return m_fNametagDistance; }
     void  SetNametagDistance(float fDistance) { m_fNametagDistance = fDistance; }
 
@@ -161,6 +164,7 @@ private:
     unsigned int m_uiKeySyncCount;
     unsigned int m_uiVehicleSyncCount;
 
+    float m_fCameraPitch{};
     float m_fNametagDistance;
 
     bool m_bNetworkDead;
