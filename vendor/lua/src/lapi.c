@@ -28,6 +28,7 @@
 #include "ltm.h"
 #include "lundump.h"
 #include "lvm.h"
+#include "lvector.h"
 
 
 
@@ -398,6 +399,7 @@ LUA_API size_t lua_objlen (lua_State *L, int idx) {
     case LUA_TSTRING: return tsvalue(o)->len;
     case LUA_TUSERDATA: return uvalue(o)->len;
     case LUA_TTABLE: return luaH_getn(hvalue(o));
+    case LUA_TVEC: return 4;
     case LUA_TNUMBER: {
       size_t l;
       lua_lock(L);  /* `luaV_tostring' may create a new string */
@@ -438,11 +440,18 @@ LUA_API const void *lua_topointer (lua_State *L, int idx) {
     case LUA_TTABLE: return hvalue(o);
     case LUA_TFUNCTION: return clvalue(o);
     case LUA_TTHREAD: return thvalue(o);
+    case LUA_TVEC: return vvalue(o)->vec;
     case LUA_TUSERDATA:
     case LUA_TLIGHTUSERDATA:
       return lua_touserdata(L, idx);
     default: return NULL;
   }
+}
+
+/* LUA-VEC */
+LUA_API const float *lua_tovec (lua_State *L, int idx) {
+  StkId o = index2adr(L, idx);
+  return (!ttisvec(o)) ? NULL : vvalue(o)->vec;
 }
 
 
@@ -556,6 +565,15 @@ LUA_API int lua_pushthread (lua_State *L) {
   api_incr_top(L);
   lua_unlock(L);
   return (G(L)->mainthread == L);
+}
+
+/* LUA-VEC */
+LUA_API void lua_pushvec (lua_State *L, float x, float y, float z, float w) {
+  lua_lock(L);
+  luaC_checkGC(L);
+  setvvalue(L, L->top, luaVec_new(L, x, y, z, w));
+  api_incr_top(L);
+  lua_unlock(L);
 }
 
 

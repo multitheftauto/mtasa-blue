@@ -65,6 +65,7 @@ public:
     CLuaArgument* PushArgument(const CLuaArgument& argument);
     CLuaArgument* PushResource(CResource* pResource);
     CLuaArgument* PushTable(CLuaArguments* table);
+    CLuaArgument* PushVector(float x, float y, float z, float w = 0.0f);
 
     void DeleteArguments();
     void Pop();

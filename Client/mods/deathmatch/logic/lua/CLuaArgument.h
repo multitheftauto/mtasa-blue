@@ -22,8 +22,8 @@ extern "C"
 class CClientEntity;
 class CLuaArguments;
 
-#define LUA_TTABLEREF    9
-#define LUA_TSTRING_LONG 10
+#define LUA_TTABLEREF    11
+#define LUA_TSTRING_LONG 12
 
 class CLuaArgument
 {
@@ -49,6 +49,7 @@ public:
     void ReadScriptID(uint uiScriptID);
     void ReadElementID(ElementID ID);
     void ReadTable(class CLuaArguments* table);
+    void ReadVector(float x, float y, float z, float w = 0.0f);
 
     void Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = NULL) const;
 
@@ -61,6 +62,7 @@ public:
     void*          GetUserData() const { return m_pUserData; };
     CLuaArguments* GetTable() const { return m_pTableData; }
     CClientEntity* GetElement() const;
+    const float*   GetVector() const { return m_vecData; }
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
@@ -69,6 +71,7 @@ public:
     char*        WriteToString(char* szBuffer, int length);
 
     [[nodiscard]] bool IsString() const noexcept { return m_iType == LUA_TSTRING; }
+    [[nodiscard]] bool IsVector() const noexcept { return m_iType == LUA_TVEC; }
 
     [[nodiscard]] bool TryGetString(std::string_view& string) const noexcept
     {
@@ -121,6 +124,7 @@ private:
     void*          m_pUserData;
     CLuaArguments* m_pTableData;
     bool           m_bWeakTableRef;
+    float          m_vecData[4];
 
 #ifdef MTA_DEBUG
     std::string m_strFilename;
