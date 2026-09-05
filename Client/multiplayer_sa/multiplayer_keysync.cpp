@@ -80,8 +80,8 @@ namespace
 #define HOOKPOS_CTaskSimpleFight_ProcessPed_CameraHeading   0x62A054
 #define HOOKSIZE_CTaskSimpleFight_ProcessPed_CameraHeading  5
 #define HOOKCHECK_CTaskSimpleFight_ProcessPed_CameraHeading 0xA1
-static const std::uint32_t RETURN_CTaskSimpleFight_ProcessPed_CameraHeading = 0x62A059;
-static const std::uint32_t SKIP_CTaskSimpleFight_ProcessPed_CameraHeading = 0x62A083;
+constexpr std::uintptr_t RETURN_CTaskSimpleFight_ProcessPed_CameraHeading = 0x62A059;
+constexpr std::uintptr_t SKIP_CTaskSimpleFight_ProcessPed_CameraHeading = 0x62A083;
 
 static void __declspec(naked) HOOK_CTaskSimpleFight_ProcessPed_CameraHeading()
 {
