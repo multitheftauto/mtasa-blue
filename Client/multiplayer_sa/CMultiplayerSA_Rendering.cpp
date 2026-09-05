@@ -12,6 +12,7 @@
 #include <game/RenderWare.h>
 extern CCoreInterface*           g_pCore;
 GameEntityRenderHandler*         pGameEntityRenderHandler = nullptr;
+RadarBlipRenderHandler*          pRadarBlipRenderHandler = nullptr;
 PreRenderSkyHandler*             pPreRenderSkyHandlerHandler = nullptr;
 RenderHeliLightHandler*          pRenderHeliLightHandler = nullptr;
 RenderEverythingBarRoadsHandler* pRenderEverythingBarRoadsHandler = nullptr;
@@ -735,6 +736,57 @@ static void __declspec(naked) HOOK_RenderEffects_HeliLight()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CRadar::DrawBlips
+//
+// Detect radar blip rendering
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void OnMY_CRadar_DrawCoordBlip_Pre(int iBlipIndex)
+{
+    if (pRadarBlipRenderHandler)
+        pRadarBlipRenderHandler(iBlipIndex);
+}
+
+void OnMY_CRadar_DrawCoordBlip_Post()
+{
+    if (pRadarBlipRenderHandler)
+        pRadarBlipRenderHandler(-1);
+}
+
+// Hook info
+#define HOOKPOS_CRadar_DrawBlips_CoordBlip         0x588347
+#define HOOKPOS_CRadar_DrawBlips_CoordBlipWaypoint 0x588411  // second pass for the waypoint icon
+#define FUNC_CRadar_DrawCoordBlip                  0x586D60
+static void __declspec(naked) HOOK_CRadar_DrawCoordBlip()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    dword ptr [esp+24h]
+        call    OnMY_CRadar_DrawCoordBlip_Pre
+        add     esp, 4*1
+        popad
+
+        // Original call with its arguments
+        push    dword ptr [esp+8]
+        push    dword ptr [esp+8]
+        mov     eax, FUNC_CRadar_DrawCoordBlip
+        call    eax
+        add     esp, 4*2
+
+        pushad
+        call    OnMY_CRadar_DrawCoordBlip_Post
+        popad
+        retn
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::SetGameEntityRenderHandler
 //
 //
@@ -742,6 +794,17 @@ static void __declspec(naked) HOOK_RenderEffects_HeliLight()
 void CMultiplayerSA::SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler)
 {
     pGameEntityRenderHandler = pHandler;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMultiplayerSA::SetRadarBlipRenderHandler
+//
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+void CMultiplayerSA::SetRadarBlipRenderHandler(RadarBlipRenderHandler* pHandler)
+{
+    pRadarBlipRenderHandler = pHandler;
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -962,4 +1025,6 @@ void CMultiplayerSA::InitHooks_Rendering()
     EZHookInstallChecked(RwCameraSetNearClipPlane);
     EZHookInstall(RenderEffects_HeliLight);
     EZHookInstall(CRenderer_EverythingBarRoads);
+    HookInstallCall(HOOKPOS_CRadar_DrawBlips_CoordBlip, (DWORD)HOOK_CRadar_DrawCoordBlip);
+    HookInstallCall(HOOKPOS_CRadar_DrawBlips_CoordBlipWaypoint, (DWORD)HOOK_CRadar_DrawCoordBlip);
 }
