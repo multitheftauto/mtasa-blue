@@ -2414,6 +2414,7 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_BADDRIVEBYHITBOX, funBugs.data.bBadDrivebyHitboxes);
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_QUICKSTAND, funBugs.data.bQuickStand);
     g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_VEHICLE_RAPID_STOP, funBugs.data.vehicleRapidStop);
+    g_pClientGame->SetGlitchEnabled(CClientGame::GLITCH_FASTWEAPONSTRAFE, funBugs.data.bFastWeaponStrafe);
 
     SWorldSpecialPropertiesStateSync wsProps;
     if (!bitStream.Read(&wsProps))
