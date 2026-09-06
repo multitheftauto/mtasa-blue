@@ -36,6 +36,8 @@ public:
 
     bool GetSFXStatus(eAudioLookupIndex containerIndex);
 
+    bool ValidateSound(const SString& strSound, bool bIsRawData, SString* pOutError = nullptr);
+
     void AddToList(CClientSound* pSound);
     void RemoveFromList(CClientSound* pSound);
 
