@@ -58,14 +58,20 @@ namespace
 {
     constexpr DWORD NUM_AudioHardwareBankLoaderOffset = 0xD98;
 
+    constexpr DWORD NUM_AudioHardwareNumChannelsOffset = 0x8E;
+    constexpr DWORD NUM_AudioHardwareFreqScalingOffset = 0x310;
+
     constexpr DWORD NUM_BankLoaderSlotsOffset = 0x00;
+    constexpr DWORD NUM_BankLoaderBankLkupsOffset = 0x04;
     constexpr DWORD NUM_BankLoaderSlotCountOffset = 0x0C;
+    constexpr DWORD NUM_BankLoaderBankLkupCntOffset = 0x0E;
     constexpr DWORD NUM_BankLoaderBufferSizeOffset = 0x18;
     constexpr DWORD NUM_BankLoaderBufferOffset = 0x1C;
 
     constexpr DWORD NUM_BankSlotSize = 0x12D4;
     constexpr DWORD NUM_BankSlotOffsetBytesOffset = 0x00;
     constexpr DWORD NUM_BankSlotNumBytesOffset = 0x04;
+    constexpr DWORD NUM_BankSlotBankIdOffset = 0x10;
     constexpr DWORD NUM_BankSlotNumSoundsOffset = 0x12;
     constexpr DWORD NUM_BankSlotSoundsArrayOffset = 0x14;
 
@@ -74,8 +80,10 @@ namespace
     constexpr DWORD NUM_BankSlotItemLoopOffsetOffset = 0x04;
     constexpr DWORD NUM_BankSlotItemSampleFreqOffset = 0x08;
 
-    constexpr DWORD NUM_BankStreamHeaderSize = 0x12C4;
-    constexpr uint  NUM_MaxBankSounds = 400;
+    constexpr DWORD NUM_BankLookupSize = 0x0C;
+    constexpr DWORD NUM_BankLookupNumBytesOffset = 0x08;
+
+    constexpr uint NUM_MaxBankSounds = 400;
 
     const BYTE* GetBankLoader()
     {
@@ -114,7 +122,7 @@ namespace
         const uint uiOffsetBytes = *reinterpret_cast<const uint*>(pBankSlot + NUM_BankSlotOffsetBytesOffset);
         const uint uiNumBytes = *reinterpret_cast<const uint*>(pBankSlot + NUM_BankSlotNumBytesOffset);
 
-        if (uiOffsetBytes + uiNumBytes > uiBufferSize || uiNumBytes <= NUM_BankStreamHeaderSize)
+        if (uiOffsetBytes + uiNumBytes > uiBufferSize || uiNumBytes == 0)
             return nullptr;
 
         return pBuffer + uiOffsetBytes;
@@ -123,6 +131,24 @@ namespace
     const BYTE* GetBankSlotItem(const BYTE* pBankSlot, uint usIndex)
     {
         return pBankSlot + NUM_BankSlotSoundsArrayOffset + usIndex * NUM_BankSlotItemSize;
+    }
+
+    uint GetBankPcmSize(const BYTE* pBankSlot)
+    {
+        const BYTE* pBankLoader = GetBankLoader();
+        if (!pBankLoader)
+            return 0;
+
+        const BYTE* pBankLkups = *reinterpret_cast<BYTE* const*>(pBankLoader + NUM_BankLoaderBankLkupsOffset);
+        if (!pBankLkups)
+            return 0;
+
+        const ushort usBankLkupCnt = *reinterpret_cast<const ushort*>(pBankLoader + NUM_BankLoaderBankLkupCntOffset);
+        const short  sBankId = *reinterpret_cast<const short*>(pBankSlot + NUM_BankSlotBankIdOffset);
+        if (sBankId < 0 || sBankId >= static_cast<short>(usBankLkupCnt))
+            return 0;
+
+        return *reinterpret_cast<const uint*>(pBankLkups + sBankId * NUM_BankLookupSize + NUM_BankLookupNumBytesOffset);
     }
 }
 
@@ -161,12 +187,22 @@ bool CAEAudioHardwareSA::GetLoadedSoundInfo(unsigned short usBankSlot, unsigned 
     }
     else
     {
-        if (uiBufferOffset >= uiNumBytes - NUM_BankStreamHeaderSize)
-            return false;
-        uiSize = uiNumBytes - NUM_BankStreamHeaderSize - uiBufferOffset;
+        const uint uiBankPcmSize = GetBankPcmSize(pBankSlot);
+        if (uiBankPcmSize > 0)
+        {
+            if (uiBufferOffset >= uiBankPcmSize)
+                return false;
+            uiSize = uiBankPcmSize - uiBufferOffset;
+        }
+        else
+        {
+            if (uiBufferOffset >= uiNumBytes)
+                return false;
+            uiSize = uiNumBytes - uiBufferOffset;
+        }
     }
 
-    const BYTE* pPcmData = pSlotData + NUM_BankStreamHeaderSize + uiBufferOffset;
+    const BYTE* pPcmData = pSlotData + uiBufferOffset;
     if (pPcmData + uiSize > pSlotData + uiNumBytes)
         return false;
 
@@ -175,6 +211,20 @@ bool CAEAudioHardwareSA::GetLoadedSoundInfo(unsigned short usBankSlot, unsigned 
     uiOutSampleRate = *reinterpret_cast<const ushort*>(pItem + NUM_BankSlotItemSampleFreqOffset);
     iOutLoopStartOffset = *reinterpret_cast<const int*>(pItem + NUM_BankSlotItemLoopOffsetOffset);
     return true;
+}
+
+void CAEAudioHardwareSA::GetChannelFrequencyScalingFactors(float* pOutFactors, unsigned int uiMax) const
+{
+    if (!pOutFactors || uiMax == 0)
+        return;
+
+    const BYTE*  pBase = reinterpret_cast<const BYTE*>(m_pInterface);
+    const ushort usNumChannels = *reinterpret_cast<const ushort*>(pBase + NUM_AudioHardwareNumChannelsOffset);
+    const uint   uiCount = std::min<uint>(uiMax, usNumChannels);
+    const float* pFactors = reinterpret_cast<const float*>(pBase + NUM_AudioHardwareFreqScalingOffset);
+
+    for (uint i = 0; i < uiCount; ++i)
+        pOutFactors[i] = pFactors[i];
 }
 
 bool CAEAudioHardwareSA::PatchSoundBuffer(unsigned short usBankSlot, unsigned short usIndex, const void* pPcmData, unsigned int uiDataSize)
