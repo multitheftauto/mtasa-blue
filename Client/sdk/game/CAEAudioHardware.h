@@ -70,4 +70,5 @@ public:
                                     unsigned int& uiOutSampleRate, int& iOutLoopStartOffset) const = 0;
 
     virtual bool PatchSoundBuffer(unsigned short usBankSlot, unsigned short usIndex, const void* pPcmData, unsigned int uiDataSize) = 0;
+    virtual void GetChannelFrequencyScalingFactors(float* pOutFactors, unsigned int uiMax) const = 0;
 };
