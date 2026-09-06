@@ -319,6 +319,43 @@ void CClientSoundManager::UpdateVolume()
     BASS_SetConfig(BASS_CONFIG_GVOL_MUSIC, static_cast<DWORD>(fValue * 10000));
 }
 
+bool CClientSoundManager::ValidateSound(const SString& strSound, bool bIsRawData, SString* pOutError)
+{
+    HSTREAM hStream;
+    if (bIsRawData)
+        hStream = BASS_StreamCreateFile(true, strSound.data(), 0, static_cast<DWORD>(strSound.size()), BASS_STREAM_DECODE);
+    else
+        hStream = BASS_StreamCreateFile(false, FromUTF8(strSound), 0, 0, BASS_STREAM_DECODE | BASS_UNICODE);
+
+    if (!hStream)
+    {
+        if (pOutError)
+        {
+            const int   iError = BASS_ErrorGetCode();
+            const char* szReason = "audio could not be decoded";
+            switch (iError)
+            {
+                case BASS_ERROR_FILEOPEN:
+                    szReason = "file cannot be opened (missing or access denied)";
+                    break;
+                case BASS_ERROR_FILEFORM:
+                    szReason = "unsupported or corrupt audio format";
+                    break;
+                case BASS_ERROR_MEM:
+                    szReason = "out of memory";
+                    break;
+                default:
+                    break;
+            }
+            *pOutError = SString("%s (BASS error %d)", szReason, iError);
+        }
+        return false;
+    }
+
+    BASS_StreamFree(hStream);
+    return true;
+}
+
 //
 // Lists
 //
