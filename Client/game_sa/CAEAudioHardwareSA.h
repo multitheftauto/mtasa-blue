@@ -32,6 +32,7 @@ public:
     bool GetLoadedSoundInfo(unsigned short usBankSlot, unsigned short usIndex, void*& pOutPcmData, unsigned int& uiOutPcmSize, unsigned int& uiOutSampleRate,
                             int& iOutLoopStartOffset) const override;
     bool PatchSoundBuffer(unsigned short usBankSlot, unsigned short usIndex, const void* pPcmData, unsigned int uiDataSize) override;
+    void GetChannelFrequencyScalingFactors(float* pOutFactors, unsigned int uiMax) const override;
 
 private:
     CAEAudioHardwareSAInterface* m_pInterface;
