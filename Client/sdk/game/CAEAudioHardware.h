@@ -65,4 +65,9 @@ class CAEAudioHardware
 public:
     virtual bool IsSoundBankLoaded(short wSoundBankID, short wSoundBankSlotID) = 0;
     virtual void LoadSoundBank(short wSoundBankID, short wSoundBankSlotID) = 0;
+
+    virtual bool GetLoadedSoundInfo(unsigned short usBankSlot, unsigned short usIndex, void*& pOutPcmData, unsigned int& uiOutPcmSize,
+                                    unsigned int& uiOutSampleRate, int& iOutLoopStartOffset) const = 0;
+
+    virtual bool PatchSoundBuffer(unsigned short usBankSlot, unsigned short usIndex, const void* pPcmData, unsigned int uiDataSize) = 0;
 };
