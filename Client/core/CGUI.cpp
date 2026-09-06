@@ -466,9 +466,9 @@ void CLocalGUI::SetFaultDialogOpen(bool bOpen) noexcept
 void CLocalGUI::Draw()
 {
     // Get the game interface
-    CGame*      pGame = CCore::GetSingleton().GetGame();
-    SystemState systemState = pGame->GetSystemState();
-    CGUI*       pGUI = CCore::GetSingleton().GetGUI();
+    CGame*            pGame = CCore::GetSingleton().GetGame();
+    SystemState::Enum systemState = pGame->GetSystemState();
+    CGUI*             pGUI = CCore::GetSingleton().GetGUI();
 
     // Windows are gone mid-rebuild; skip drawing until they are back.
     if (!m_pMainMenu) [[unlikely]]

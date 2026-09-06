@@ -321,7 +321,7 @@ void CVehicleSA::Init()
     {
         for (size_t i = 0; i < m_dummyPositions.size(); ++i)
         {
-            m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((VehicleDummies)i);
+            m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((VehicleDummies::Enum)i);
         }
     }
 
@@ -359,7 +359,7 @@ void CVehicleSA::Init()
     // Initialize doors depending on the vehicle type.
     std::uint32_t doorArrayOffset;
 
-    switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
+    switch (static_cast<VehicleClass::Enum>(GetVehicleInterface()->m_vehicleClass))
     {
         case VehicleClass::AUTOMOBILE:
         case VehicleClass::MONSTER_TRUCK:
@@ -721,7 +721,7 @@ void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
 
 bool CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept
 {
-    VehicleClass m_eVehicleType = static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleSubClass);
+    VehicleClass::Enum m_eVehicleType = static_cast<VehicleClass::Enum>(GetVehicleInterface()->m_vehicleSubClass);
     switch (m_eVehicleType)
     {
         case VehicleClass::AUTOMOBILE:
@@ -1739,7 +1739,7 @@ void CVehicleSA::SetBikeWheelStatus(BYTE bWheel, BYTE bStatus)
 bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
 {
     auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
-    switch ((VehicleClass)vehicle->m_vehicleClass)
+    switch ((VehicleClass::Enum)vehicle->m_vehicleClass)
     {
         case VehicleClass::AUTOMOBILE:
             if (eWheelPosition < 4)
@@ -1755,7 +1755,7 @@ bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
 
 int CVehicleSA::GetWheelFrictionState(BYTE eWheelPosition)
 {
-    switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
+    switch (static_cast<VehicleClass::Enum>(GetVehicleInterface()->m_vehicleClass))
     {
         case VehicleClass::BIKE:
         case VehicleClass::BMX:
@@ -1853,7 +1853,7 @@ bool CVehicleSA::SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComp
     RwFrame* defaultBikeChassisFrame = nullptr;
 
     // CBike, CBmx, CBoat and CTrain don't inherit CAutomobile so let's do it manually!
-    switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
+    switch (static_cast<VehicleClass::Enum>(GetVehicleInterface()->m_vehicleClass))
     {
         case VehicleClass::AUTOMOBILE:
         case VehicleClass::MONSTER_TRUCK:
@@ -2664,7 +2664,7 @@ void CVehicleSA::UpdateLandingGearPosition()
     }
 }
 
-bool CVehicleSA::GetDummyPosition(VehicleDummies dummy, CVector& position) const
+bool CVehicleSA::GetDummyPosition(VehicleDummies::Enum dummy, CVector& position) const
 {
     if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
     {
@@ -2675,7 +2675,7 @@ bool CVehicleSA::GetDummyPosition(VehicleDummies dummy, CVector& position) const
     return false;
 }
 
-bool CVehicleSA::SetDummyPosition(VehicleDummies dummy, const CVector& position)
+bool CVehicleSA::SetDummyPosition(VehicleDummies::Enum dummy, const CVector& position)
 {
     if (dummy < VehicleDummies::LIGHT_FRONT_MAIN || dummy >= VehicleDummies::VEHICLE_DUMMY_COUNT)
         return false;
@@ -2693,7 +2693,7 @@ bool CVehicleSA::SetDummyPosition(VehicleDummies dummy, const CVector& position)
             CFxSystemSA::SetPosition(vehicle->m_fireParticle, position);
     }
 
-    bool isAutomobileClass = static_cast<VehicleClass>(vehicle->m_vehicleClass) == VehicleClass::AUTOMOBILE;
+    bool isAutomobileClass = static_cast<VehicleClass::Enum>(vehicle->m_vehicleClass) == VehicleClass::AUTOMOBILE;
 
     if (isAutomobileClass)
     {
@@ -2706,7 +2706,7 @@ bool CVehicleSA::SetDummyPosition(VehicleDummies dummy, const CVector& position)
 //
 // NOTE(botder): Move the code to CAutomobileSA::SetDummyPosition, when we start using CAutomobileSA
 //
-void CVehicleSA::SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies dummy, const CVector& position)
+void CVehicleSA::SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies::Enum dummy, const CVector& position)
 {
     if (dummy == VehicleDummies::EXHAUST)
     {

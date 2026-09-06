@@ -53,23 +53,23 @@ public:
     void     SetPosition(CVector* vecPosition);
     CVector* GetPosition(CVector* vecPosition);
 
-    PickupType  GetType();
-    void        SetType(PickupType type);
-    float       GetCurrentValue();
-    void        SetCurrentValue(float fCurrentValue);
-    void        SetRegenerationTime(DWORD dwTime);
-    void        SetMoneyPerDay(WORD wMoneyPerDay);
-    WORD        GetMoneyPerDay();
-    WORD        GetModel();
-    void        SetModel(WORD wModelIndex);  // do not export
-    PickupState GetState();
-    void        SetState(PickupState bState);
-    BYTE        GetAmmo();
-    void        SetAmmo(BYTE bAmmo);
-    long        GetMonetaryValue();
-    void        SetMonetaryValue(long lMonetaryValue);
-    BYTE        IsNearby();
-    bool        GiveUsAPickUpObject(int ForcedObjectIndex = -1);
-    void        GetRidOfObjects();
-    void        Remove();
+    PickupType::Enum  GetType();
+    void              SetType(PickupType::Enum type);
+    float             GetCurrentValue();
+    void              SetCurrentValue(float fCurrentValue);
+    void              SetRegenerationTime(DWORD dwTime);
+    void              SetMoneyPerDay(WORD wMoneyPerDay);
+    WORD              GetMoneyPerDay();
+    WORD              GetModel();
+    void              SetModel(WORD wModelIndex);  // do not export
+    PickupState::Enum GetState();
+    void              SetState(PickupState::Enum bState);
+    BYTE              GetAmmo();
+    void              SetAmmo(BYTE bAmmo);
+    long              GetMonetaryValue();
+    void              SetMonetaryValue(long lMonetaryValue);
+    BYTE              IsNearby();
+    bool              GiveUsAPickUpObject(int ForcedObjectIndex = -1);
+    void              GetRidOfObjects();
+    void              Remove();
 };

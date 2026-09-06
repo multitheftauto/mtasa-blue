@@ -864,7 +864,7 @@ static const DWORD CONTINUE_CAutomobile__GetTowBarPos = 0x6AF257;
 // Models that answer with their misc_a dummy, so a clone of one still tows. Tow truck and tractor
 // share a different branch below, handled by GetTowBarModelId; artict3 and the baggage boxes are
 // CTrailer, which overrides this function entirely.
-static constexpr bool HasTowBarDummy(VehicleType model)
+static constexpr bool HasTowBarDummy(VehicleType::Enum model)
 {
     switch (model)
     {
@@ -895,7 +895,7 @@ static std::uint32_t __fastcall GetTowBarModelId(CVehicleSAInterface* vehicle)
         return modelId;
 
     // Tow truck and tractor share a further branch below; let a clone's parent take it too.
-    const auto parentType = static_cast<VehicleType>(parentId);
+    const auto parentType = static_cast<VehicleType::Enum>(parentId);
     if (!HasTowBarDummy(parentType) && parentType != VehicleType::VT_TOWTRUCK && parentType != VehicleType::VT_TRACTOR)
         return modelId;
 
@@ -937,7 +937,7 @@ static void __declspec(naked) HOOK_CAutomobile__GetTowBarPos()
 static const DWORD CONTINUE_CAutomobile__GetTowBarPos_TugAttachWhitelist = 0x6AF2CC;
 static const DWORD SKIP_CAutomobile__GetTowBarPos_TugAttachWhitelist = 0x6AF300;
 
-static constexpr bool IsTugAttachable(VehicleType model)
+static constexpr bool IsTugAttachable(VehicleType::Enum model)
 {
     switch (model)
     {
@@ -954,11 +954,11 @@ static constexpr bool IsTugAttachable(VehicleType model)
 static bool __fastcall IsTugAttachableOrClone(CVehicleSAInterface* attachTo)
 {
     const std::uint32_t modelId = static_cast<std::uint32_t>(attachTo->m_nModelIndex);
-    if (IsTugAttachable(static_cast<VehicleType>(modelId)))
+    if (IsTugAttachable(static_cast<VehicleType::Enum>(modelId)))
         return true;
 
     CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
-    return modelInfo && IsTugAttachable(static_cast<VehicleType>(modelInfo->GetParentID()));
+    return modelInfo && IsTugAttachable(static_cast<VehicleType::Enum>(modelInfo->GetParentID()));
 }
 
 static void __declspec(naked) HOOK_CAutomobile__GetTowBarPos_TugAttachWhitelist()
@@ -1578,7 +1578,7 @@ static std::uint32_t __fastcall ResolveAircraftWeaponModelId(std::uint32_t model
     if (!modelInfo)
         return modelId;
 
-    switch (static_cast<VehicleType>(modelInfo->GetParentID()))
+    switch (static_cast<VehicleType::Enum>(modelInfo->GetParentID()))
     {
         case VehicleType::VT_SEASPAR:
         case VehicleType::VT_SPARROW:
@@ -1621,7 +1621,7 @@ static std::uint32_t __fastcall ResolveJetAudioModelId(std::uint32_t modelId)
     if (!modelInfo)
         return modelId;
 
-    switch (static_cast<VehicleType>(modelInfo->GetParentID()))
+    switch (static_cast<VehicleType::Enum>(modelInfo->GetParentID()))
     {
         case VehicleType::VT_SHAMAL:
         case VehicleType::VT_HYDRA:

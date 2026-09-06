@@ -1941,7 +1941,7 @@ void CKeyBinds::DoPostFramePulse()
     if (CLocalGUI::IsFaultDialogOpen())
         return;
 
-    SystemState systemState = CCore::GetSingleton().GetGame()->GetSystemState();
+    SystemState::Enum systemState = CCore::GetSingleton().GetGame()->GetSystemState();
 
     if (m_bWaitingToLoadDefaults &&
         (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME))  // Are GTA controls actually initialized?
@@ -2226,7 +2226,7 @@ bool CKeyBinds::LoadFromXML(CXMLNode* pMainNode)
     else
         bLoadDefaults = true;
 
-    SystemState systemState = CCore::GetSingleton().GetGame()->GetSystemState();
+    SystemState::Enum systemState = CCore::GetSingleton().GetGame()->GetSystemState();
     if (bLoadDefaults)
     {
         if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_PLAYING_GAME)  // Are GTA controls actually initialized?
