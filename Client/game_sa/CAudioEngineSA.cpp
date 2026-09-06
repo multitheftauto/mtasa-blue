@@ -555,10 +555,7 @@ bool CAudioEngineSA::OnWorldSound(CAESound* pAESound)
             pGameEntity = pAESound->pAudioEntity->pEntity;
 
         SWorldSoundEvent event = {
-            pAESound->usGroup,
-            pAESound->usIndex,
-            pGameEntity,
-            pAESound->m_vCurrPosn,
+            pAESound->usGroup, pAESound->usIndex, pGameEntity, pAESound->m_vCurrPosn, pAESound->m_fSoundDistance,
         };
 
         return m_pWorldSoundHandler(event);
