@@ -13,6 +13,7 @@
 
 #include <list>
 #include <unordered_map>
+#include <vector>
 #include <game/CAudioEngine.h>
 
 class CClientManager;
@@ -42,6 +43,12 @@ private:
         SString strSound;
         float   fMinDistance;
         float   fMaxDistance;
+
+        bool              bNativeWanted = false;
+        bool              bNativeApplied = false;
+        std::vector<char> pcmData;
+        std::vector<char> originalPcm;
+        uint              uiNativeLastTryTick = 0;
     };
 
     struct SLastPlayed
@@ -60,6 +67,10 @@ private:
     static uint MakeKey(uint uiGroup, uint uiIndex) { return (uiGroup << 16) | (uiIndex & 0xFFFF); }
 
     bool FindReplacement(uint uiGroup, uint uiIndex, const SReplacement** ppOutReplacement) const;
+
+    bool TryApplyNativeReplacement(SReplacement& replacement, uint uiGroup, uint uiIndex);
+    bool RestoreSoundBuffer(const SReplacement& replacement, uint uiGroup, uint uiIndex);
+    void ApplyNativeReplacements();
 
     CClientManager*                        m_pManager;
     std::unordered_map<uint, SReplacement> m_Replacements;
