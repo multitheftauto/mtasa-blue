@@ -26,6 +26,7 @@ struct SWorldSoundEvent
     unsigned int        uiIndex;
     CEntitySAInterface* pGameEntity;
     CVector             vecPosition;
+    float               fMaxDistance;
 };
 
 using WorldSoundHandler = bool(const SWorldSoundEvent& event);
