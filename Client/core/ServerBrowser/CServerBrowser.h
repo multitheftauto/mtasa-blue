@@ -106,7 +106,7 @@ public:
     void SetNextHistoryText(bool bDown);
 
     void OnQuickConnectButtonClick();
-    void NotifyServerExists(in_addr Address, ushort usPort);
+    void NotifyServerExists(in_addr Address, ushort usPort, const SString& strHost);
 
     void TabSkip(bool bBackwards);
 
