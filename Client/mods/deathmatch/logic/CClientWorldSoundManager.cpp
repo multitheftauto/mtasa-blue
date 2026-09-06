@@ -62,10 +62,18 @@ bool CClientWorldSoundManager::ReplaceSound(uint uiGroup, uint uiIndex, const SS
     replacement.uiNativeLastTryTick = 0;
 
     const uint uiKey = MakeKey(uiGroup, uiIndex);
+    auto       iterExisting = m_Replacements.find(uiKey);
+    if (iterExisting != m_Replacements.end())
+    {
+        replacement.originalPcm = std::move(iterExisting->second.originalPcm);
+    }
+
     m_Replacements[uiKey] = replacement;
 
     if (replacement.bNativeWanted)
-        TryApplyNativeReplacement(m_Replacements[uiKey], uiGroup, uiIndex);
+    {
+        m_Replacements[uiKey].bNativeApplied = TryApplyNativeReplacement(m_Replacements[uiKey], uiGroup, uiIndex);
+    }
 
     return true;
 }
@@ -165,7 +173,8 @@ bool CClientWorldSoundManager::TryApplyNativeReplacement(SReplacement& replaceme
 
     if (replacement.pcmData.empty())
     {
-        replacement.originalPcm.assign(static_cast<const char*>(pPcmData), static_cast<const char*>(pPcmData) + uiPcmSize);
+        if (replacement.originalPcm.empty())
+            replacement.originalPcm.assign(static_cast<const char*>(pPcmData), static_cast<const char*>(pPcmData) + uiPcmSize);
 
         if (!m_pManager->GetSoundManager()->DecodeToPcm(replacement.strSound, replacement.bRawData, uiSampleRate, replacement.pcmData))
             return false;
