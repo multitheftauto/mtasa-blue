@@ -15,6 +15,7 @@
 #include "CClientManager.h"
 #include "CClientSoundManager.h"
 #include <cmath>
+#include <game/CAEAudioHardware.h>
 #include <game/CPools.h>
 
 CClientWorldSoundManager::CClientWorldSoundManager(CClientManager* pManager) : m_pManager(pManager), m_uiLastPruneTick(0)
@@ -52,7 +53,20 @@ bool CClientWorldSoundManager::ReplaceSound(uint uiGroup, uint uiIndex, const SS
     if (!m_pManager->GetSoundManager()->ValidateSound(strSound, bIsRawData, pOutError))
         return false;
 
-    m_Replacements[MakeKey(uiGroup, uiIndex)] = {bIsRawData, strSound, std::max(0.0f, fMinDistance), std::max(0.0f, fMaxDistance)};
+    SReplacement replacement;
+    replacement.bRawData = bIsRawData;
+    replacement.strSound = strSound;
+    replacement.fMinDistance = std::max(0.0f, fMinDistance);
+    replacement.fMaxDistance = std::max(0.0f, fMaxDistance);
+    replacement.bNativeWanted = (uiIndex != static_cast<uint>(-1));
+    replacement.uiNativeLastTryTick = 0;
+
+    const uint uiKey = MakeKey(uiGroup, uiIndex);
+    m_Replacements[uiKey] = replacement;
+
+    if (replacement.bNativeWanted)
+        TryApplyNativeReplacement(m_Replacements[uiKey], uiGroup, uiIndex);
+
     return true;
 }
 
@@ -65,6 +79,7 @@ bool CClientWorldSoundManager::RestoreSound(uint uiGroup, uint uiIndex)
         {
             if ((iter->first >> 16) == uiGroup)
             {
+                RestoreSoundBuffer(iter->second, uiGroup, iter->first & 0xFFFF);
                 iter = m_Replacements.erase(iter);
                 bErased = true;
             }
@@ -74,11 +89,26 @@ bool CClientWorldSoundManager::RestoreSound(uint uiGroup, uint uiIndex)
         return bErased;
     }
 
-    return m_Replacements.erase(MakeKey(uiGroup, uiIndex)) > 0;
+    auto iter = m_Replacements.find(MakeKey(uiGroup, uiIndex));
+    if (iter == m_Replacements.end())
+        return false;
+
+    RestoreSoundBuffer(iter->second, uiGroup, uiIndex);
+    m_Replacements.erase(iter);
+    return true;
 }
 
 void CClientWorldSoundManager::RestoreAll()
 {
+    if (g_pGame)
+    {
+        for (auto& iter : m_Replacements)
+        {
+            const uint uiIndex = iter.first & 0xFFFF;
+            if (uiIndex != static_cast<uint>(-1))
+                RestoreSoundBuffer(iter.second, iter.first >> 16, uiIndex);
+        }
+    }
     m_Replacements.clear();
 }
 
@@ -117,10 +147,86 @@ bool CClientWorldSoundManager::FindReplacement(uint uiGroup, uint uiIndex, const
     return false;
 }
 
+bool CClientWorldSoundManager::TryApplyNativeReplacement(SReplacement& replacement, uint uiGroup, uint uiIndex)
+{
+    if (!g_pGame)
+        return false;
+
+    CAEAudioHardware* pAudioHardware = g_pGame->GetAEAudioHardware();
+    if (!pAudioHardware)
+        return false;
+
+    void* pPcmData = nullptr;
+    uint  uiPcmSize = 0;
+    uint  uiSampleRate = 0;
+    int   iLoopStartOffset = -1;
+    if (!pAudioHardware->GetLoadedSoundInfo(static_cast<ushort>(uiGroup), static_cast<ushort>(uiIndex), pPcmData, uiPcmSize, uiSampleRate, iLoopStartOffset))
+        return false;
+
+    if (replacement.pcmData.empty())
+    {
+        replacement.originalPcm.assign(static_cast<const char*>(pPcmData), static_cast<const char*>(pPcmData) + uiPcmSize);
+
+        if (!m_pManager->GetSoundManager()->DecodeToPcm(replacement.strSound, replacement.bRawData, uiSampleRate, replacement.pcmData))
+            return false;
+
+        if (replacement.pcmData.size() > uiPcmSize)
+            return false;
+    }
+
+    return pAudioHardware->PatchSoundBuffer(static_cast<ushort>(uiGroup), static_cast<ushort>(uiIndex), replacement.pcmData.data(),
+                                            static_cast<uint>(replacement.pcmData.size()));
+}
+
+bool CClientWorldSoundManager::RestoreSoundBuffer(const SReplacement& replacement, uint uiGroup, uint uiIndex)
+{
+    if (!replacement.bNativeApplied || replacement.originalPcm.empty() || !g_pGame)
+        return false;
+
+    CAEAudioHardware* pAudioHardware = g_pGame->GetAEAudioHardware();
+    if (!pAudioHardware)
+        return false;
+
+    return pAudioHardware->PatchSoundBuffer(static_cast<ushort>(uiGroup), static_cast<ushort>(uiIndex), replacement.originalPcm.data(),
+                                            static_cast<uint>(replacement.originalPcm.size()));
+}
+
+void CClientWorldSoundManager::ApplyNativeReplacements()
+{
+    const uint uiNow = GetTickCount32();
+
+    for (auto& iter : m_Replacements)
+    {
+        const uint uiIndex = iter.first & 0xFFFF;
+        if (uiIndex == static_cast<uint>(-1))
+            continue;
+
+        SReplacement& replacement = iter.second;
+        if (!replacement.bNativeWanted)
+            continue;
+
+        if (!replacement.bNativeApplied)
+        {
+            if (uiNow - replacement.uiNativeLastTryTick < 500)
+                continue;
+            replacement.uiNativeLastTryTick = uiNow;
+            replacement.bNativeApplied = TryApplyNativeReplacement(replacement, iter.first >> 16, uiIndex);
+        }
+        else if (uiNow - replacement.uiNativeLastTryTick > 1000)
+        {
+            replacement.uiNativeLastTryTick = uiNow;
+            TryApplyNativeReplacement(replacement, iter.first >> 16, uiIndex);
+        }
+    }
+}
+
 bool CClientWorldSoundManager::HandleWorldSound(const SWorldSoundEvent& event, bool bAllowPlay)
 {
     const SReplacement* pReplacement = nullptr;
     if (!FindReplacement(event.uiGroup, event.uiIndex, &pReplacement))
+        return false;
+
+    if (pReplacement->bNativeApplied)
         return false;
 
     if (bAllowPlay)
@@ -213,4 +319,6 @@ void CClientWorldSoundManager::DoPulse()
                 ++iter;
         }
     }
+
+    ApplyNativeReplacements();
 }
