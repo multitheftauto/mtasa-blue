@@ -54,6 +54,12 @@ class CAEVehicleAudioEntitySAInterface : public CAEAudioEntity
 {
 public:
     void AddAudioEvent(int eventId, float volume) { ((void(__thiscall*)(CAEVehicleAudioEntitySAInterface*, int, float))0x4F6420)(this, eventId, volume); }
+    void UpdateGenericVehicleSound(int soundType, int bankSlot, int bank, int sfx, float speed, float volume, float rollOff)
+    {
+        ((void(__thiscall*)(CAEVehicleAudioEntitySAInterface*, int, int, int, int, float, float, float))0x4FAD40)(this, soundType, bankSlot, bank, sfx,
+                                                                                                                speed, volume, rollOff);
+    }
+    void StopGenericEngineSound(int soundType) { ((void(__thiscall*)(CAEVehicleAudioEntitySAInterface*, int))0x4F6320)(this, soundType); }
     bool TerminateAudio() { return ((bool(__thiscall*)(CAEVehicleAudioEntitySAInterface*))0x4FB8C0)(this); }
     bool SoundJoin() { return ((bool(__thiscall*)(CAEVehicleAudioEntitySAInterface*))0x4F5700)(this); }
 
