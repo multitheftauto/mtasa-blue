@@ -2271,6 +2271,10 @@ void CNetAPI::ReadBulletsync(CClientPlayer* player, NetBitStreamInterface& strea
         !end.IsValid())
         return;
 
+    // Huge coordinates can crash other players
+    if (!start.IsInWorldBounds(true) || !end.IsInWorldBounds(true))
+        return;
+
     std::uint8_t order = 0;
     if (!stream.Read(order))
         return;
@@ -2321,6 +2325,10 @@ void CNetAPI::ReadWeaponBulletsync(CClientPlayer* player, NetBitStreamInterface&
     CVector end;
     if (!stream.Read(reinterpret_cast<char*>(&start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&end), sizeof(CVector)) || !start.IsValid() ||
         !end.IsValid())
+        return;
+
+    // Huge coordinates can crash other players
+    if (!start.IsInWorldBounds(true) || !end.IsInWorldBounds(true))
         return;
 
     uint8_t order = 0;

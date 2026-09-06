@@ -35,6 +35,10 @@ bool CCustomWeaponBulletSyncPacket::Read(NetBitStreamInterface& stream)
     if (!m_start.IsValid() || !m_end.IsValid())
         return false;
 
+    // Huge coordinates can crash other players
+    if (!m_start.IsInWorldBounds(true) || !m_end.IsInWorldBounds(true))
+        return false;
+
     if (!stream.Read(m_order))
         return false;
 

@@ -30,6 +30,10 @@ bool CSimBulletsyncPacket::Read(NetBitStreamInterface& stream)
     if (!m_cache.start.IsValid() || !m_cache.end.IsValid())
         return false;
 
+    // Huge coordinates can crash other players
+    if (!m_cache.start.IsInWorldBounds(true) || !m_cache.end.IsInWorldBounds(true))
+        return false;
+
     if (!stream.Read(m_cache.order))
         return false;
 

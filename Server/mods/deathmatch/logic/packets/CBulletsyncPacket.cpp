@@ -95,6 +95,10 @@ bool CBulletsyncPacket::ReadWeaponAndPositions(NetBitStreamInterface& stream)
     if (!IsValidVector(m_end))
         return false;
 
+    // Huge coordinates can crash other players
+    if (!m_start.IsInWorldBounds(true) || !m_end.IsInWorldBounds(true))
+        return false;
+
     if (!ValidateTrajectory())
         return false;
 
@@ -231,6 +235,10 @@ bool CBulletsyncPacket::Write(NetBitStreamInterface& stream) const
         return false;
 
     if (!IsValidVector(m_end))
+        return false;
+
+    // Huge coordinates can crash other players
+    if (!m_start.IsInWorldBounds(true) || !m_end.IsInWorldBounds(true))
         return false;
 
     if (!ValidateTrajectory())
