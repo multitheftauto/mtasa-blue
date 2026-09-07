@@ -26,6 +26,10 @@ public:
     LUA_DECLARE(SetWorldSoundEnabled);
     LUA_DECLARE(IsWorldSoundEnabled);
     LUA_DECLARE(ResetWorldSounds);
+    LUA_DECLARE(ReplaceWorldSound);
+    LUA_DECLARE(RestoreWorldSound);
+    LUA_DECLARE(RestoreAllWorldSounds);
+    LUA_DECLARE(IsWorldSoundReplaced);
     LUA_DECLARE(PlaySFX);
     LUA_DECLARE(PlaySFX3D);
     LUA_DECLARE(GetSFXStatus);
