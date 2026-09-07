@@ -24,10 +24,10 @@ void CLuaAudioDefs::LoadFunctions()
                                                                              {"setWorldSoundEnabled", SetWorldSoundEnabled},
                                                                              {"isWorldSoundEnabled", IsWorldSoundEnabled},
                                                                              {"resetWorldSounds", ResetWorldSounds},
-                                                                             {"replaceWorldSound", ReplaceWorldSound},
-                                                                             {"restoreWorldSound", RestoreWorldSound},
-                                                                             {"restoreAllWorldSounds", RestoreAllWorldSounds},
-                                                                             {"isWorldSoundReplaced", IsWorldSoundReplaced},
+                                                                             {"replaceWorldSound", ArgumentParser<ReplaceWorldSound>},
+                                                                             {"restoreWorldSound", ArgumentParser<RestoreWorldSound>},
+                                                                             {"restoreAllWorldSounds", ArgumentParser<RestoreAllWorldSounds>},
+                                                                             {"isWorldSoundReplaced", ArgumentParser<IsWorldSoundReplaced>},
                                                                              {"playSFX", PlaySFX},
                                                                              {"playSFX3D", PlaySFX3D},
                                                                              {"getSFXStatus", GetSFXStatus},
@@ -149,125 +149,54 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Sound3D", "Sound");
 }
 
-int CLuaAudioDefs::ReplaceWorldSound(lua_State* luaVM)
+bool CLuaAudioDefs::ReplaceWorldSound(lua_State* luaVM, std::string strSound, int group, std::optional<int> index, std::optional<float> fMinDistance,
+                                      std::optional<float> fMaxDistance)
 {
-    SString          strSound;
-    int              group;
-    int              index = -1;
-    float            fMinDistance = -1.0f;
-    float            fMaxDistance = -1.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strSound);
-    argStream.ReadNumber(group);
-    if (argStream.NextIsNumber())
-        argStream.ReadNumber(index);
-    if (argStream.NextIsNumber())
-        argStream.ReadNumber(fMinDistance);
-    if (argStream.NextIsNumber())
-        argStream.ReadNumber(fMaxDistance);
+    CLuaMain&  luaMain = lua_getownercluamain(luaVM);
+    CResource* pResource = luaMain.GetResource();
+    if (!pResource || !g_pClientGame || !g_pClientGame->GetWorldSoundManager())
+        return false;
 
-    if (argStream.HasErrors())
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
-    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-    if (!pLuaMain || !g_pClientGame)
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
-    CResource* pResource = pLuaMain->GetResource();
-    if (!pResource)
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
-    SString strOriginal = strSound;
-    SString strFilename;
-    bool    bIsRawData = false;
-    if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename, nullptr, true))
-        strSound = strFilename;
+    const int iIndex = index.value_or(-1);
+    SString   strSoundCopy = strSound;
+    SString   strFilename;
+    bool      bIsRawData = false;
+    if (CResourceManager::ParseResourcePathInput(strSoundCopy, pResource, &strFilename, nullptr, true))
+        strSoundCopy = strFilename;
     else
         bIsRawData = true;
 
-    if (!g_pClientGame->GetWorldSoundManager())
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
     SString strError;
-    bool    bSuccess = g_pClientGame->GetWorldSoundManager()->ReplaceSound(group, index, strSound, bIsRawData, fMinDistance, fMaxDistance, &strError);
+    bool    bSuccess = g_pClientGame->GetWorldSoundManager()->ReplaceSound(group, iIndex, strSoundCopy, bIsRawData, fMinDistance.value_or(-1.0f),
+                                                                           fMaxDistance.value_or(-1.0f), &strError);
     if (!bSuccess && !strError.empty())
-        m_pScriptDebugging->LogWarning(luaVM, "replaceWorldSound: %s (group %d, index %d, '%s')", strError.c_str(), group, index, strOriginal.c_str());
+        m_pScriptDebugging->LogWarning(luaVM, "replaceWorldSound: %s (group %d, index %d, '%s')", strError.c_str(), group, iIndex, strSound.c_str());
 
-    lua_pushboolean(luaVM, bSuccess);
-    return 1;
+    return bSuccess;
 }
 
-int CLuaAudioDefs::RestoreWorldSound(lua_State* luaVM)
+bool CLuaAudioDefs::RestoreWorldSound(int group, std::optional<int> index)
 {
-    int              group;
-    int              index = -1;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(group);
-    if (argStream.NextIsNumber())
-        argStream.ReadNumber(index);
-
-    if (argStream.HasErrors())
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
     if (!g_pClientGame || !g_pClientGame->GetWorldSoundManager())
-    {
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
+        return false;
 
-    bool bSuccess = g_pClientGame->GetWorldSoundManager()->RestoreSound(group, index);
-    lua_pushboolean(luaVM, bSuccess);
-    return 1;
+    return g_pClientGame->GetWorldSoundManager()->RestoreSound(group, index.value_or(-1));
 }
 
-int CLuaAudioDefs::RestoreAllWorldSounds(lua_State* luaVM)
+bool CLuaAudioDefs::RestoreAllWorldSounds()
 {
     if (g_pClientGame && g_pClientGame->GetWorldSoundManager())
         g_pClientGame->GetWorldSoundManager()->RestoreAll();
 
-    lua_pushboolean(luaVM, true);
-    return 1;
+    return true;
 }
 
-int CLuaAudioDefs::IsWorldSoundReplaced(lua_State* luaVM)
+bool CLuaAudioDefs::IsWorldSoundReplaced(int group, std::optional<int> index)
 {
-    int              group;
-    int              index = -1;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(group);
-    if (argStream.NextIsNumber())
-        argStream.ReadNumber(index);
-
-    if (argStream.HasErrors())
-    {
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
-    bool bReplaced = false;
     if (g_pClientGame && g_pClientGame->GetWorldSoundManager())
-        bReplaced = g_pClientGame->GetWorldSoundManager()->IsSoundReplaced(group, index);
+        return g_pClientGame->GetWorldSoundManager()->IsSoundReplaced(group, index.value_or(-1));
 
-    lua_pushboolean(luaVM, bReplaced);
-    return 1;
+    return false;
 }
 
 int CLuaAudioDefs::PlaySound(lua_State* luaVM)
