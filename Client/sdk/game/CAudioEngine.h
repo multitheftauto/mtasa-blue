@@ -27,6 +27,7 @@ struct SWorldSoundEvent
     CEntitySAInterface* pGameEntity;
     CVector             vecPosition;
     float               fMaxDistance;
+    bool                bLoop;
 };
 
 using WorldSoundHandler = bool(const SWorldSoundEvent& event);
@@ -77,4 +78,6 @@ public:
     virtual void          SetWorldSoundHandler(WorldSoundHandler* pHandler) = 0;
     virtual void          ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceType, CVector* pvecPosition, float f_2) = 0;
     virtual void          ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhysical* pPhysical) = 0;
+
+    virtual bool IsWorldSoundStillActive(uint uiGroup, uint uiIndex, CEntitySAInterface* pEntity) const = 0;
 };
