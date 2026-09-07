@@ -16,8 +16,6 @@
 #include <game/CPtrNodeSingleLinkPool.h>
 #include <lua/CLuaFunctionParser.h>
 #include "CLuaEngineDefs.h"
-#include "CClientWorldSoundManager.h"
-#include "CResourceManager.h"
 #include <enums/VehicleType.h>
 
 //! Set the CModelCacheManager limits
