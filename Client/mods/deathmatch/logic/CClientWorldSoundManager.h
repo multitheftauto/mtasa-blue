@@ -62,6 +62,9 @@ private:
         CClientSound*       pSound;
         CEntitySAInterface* pGameEntity;
         uint                uiStartTick;
+        uint                uiGroup;
+        uint                uiIndex;
+        bool                bLooping;
     };
 
     static uint MakeKey(uint uiGroup, uint uiIndex) { return (uiGroup << 16) | (uiIndex & 0xFFFF); }
