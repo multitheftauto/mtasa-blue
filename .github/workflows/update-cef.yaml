@@ -1,0 +1,86 @@
+name: Update CEF
+
+on:
+  schedule:
+    - cron: "0 8 * * 2"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-cef:
+    if: github.event.repository.fork == false
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: master
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Resolve latest stable minimal build
+        id: cef
+        run: |
+          set -euo pipefail
+          INSTALL_CEF="utils/buildactions/install_cef.lua"
+          CURRENT=$(grep -m1 '^local CEF_VERSION = ' "$INSTALL_CEF" | sed -E 's/.*"(.*)".*/\1/')
+
+          # Stream-parse index.json (not saved); same stable channel as install_cef.lua upgrade
+          LATEST=$(curl -fsSL "https://cef-builds.spotifycdn.com/index.json" | jq -r '
+            [.windows32.versions[] | select(.channel == "stable")]
+            | max_by(.cef_version | capture("^(?<a>[0-9]+)\\.(?<b>[0-9]+)\\.(?<c>[0-9]+)") | [.a, .b, .c] | map(tonumber))
+            | .cef_version
+          ')
+
+          echo "current=$CURRENT" >> "$GITHUB_OUTPUT"
+          echo "latest=$LATEST" >> "$GITHUB_OUTPUT"
+
+          if [ "$CURRENT" = "$LATEST" ]; then
+            echo "needs_update=false" >> "$GITHUB_OUTPUT"
+            echo "CEF is already up to date ($CURRENT)"
+          else
+            echo "needs_update=true" >> "$GITHUB_OUTPUT"
+            echo "CEF update available: $CURRENT -> $LATEST"
+          fi
+
+      - name: Download minimal build and compute SHA-256
+        if: steps.cef.outputs.needs_update == 'true'
+        id: hash
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.cef.outputs.latest }}"
+          URL="https://cef-builds.spotifycdn.com/cef_binary_${VERSION}_windows32_minimal.tar.bz2"
+          ARCHIVE="${{ runner.temp }}/cef_minimal.tar.bz2"
+          curl -fsSL "$URL" -o "$ARCHIVE"
+          echo "hash=$(sha256sum "$ARCHIVE" | awk '{print $1}')" >> "$GITHUB_OUTPUT"
+
+      - name: Update install_cef.lua
+        if: steps.cef.outputs.needs_update == 'true'
+        run: |
+          set -euo pipefail
+          FILE="utils/buildactions/install_cef.lua"
+          VERSION="${{ steps.cef.outputs.latest }}"
+          HASH="${{ steps.hash.outputs.hash }}"
+          sed -i "s|^local CEF_VERSION = \".*\"|local CEF_VERSION = \"${VERSION}\"|" "$FILE"
+          sed -i "s|^local CEF_HASH = \".*\"|local CEF_HASH = \"${HASH}\"|" "$FILE"
+
+      - name: Open pull request
+        if: steps.cef.outputs.needs_update == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          VERSION="${{ steps.cef.outputs.latest }}"
+          BRANCH="chore/cef-$(echo "$VERSION" | tr '+/' '-')"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$BRANCH"
+          git add utils/buildactions/install_cef.lua
+          git commit -m "Update CEF to ${VERSION}" -m "Automated update (stable windows32_minimal)."
+          git push -u origin "$BRANCH"
+          gh pr create \
+            --title "Update CEF to ${VERSION}" \
+            --body "" \
+            --base master \
+            --head "$BRANCH"
