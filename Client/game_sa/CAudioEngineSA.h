@@ -75,11 +75,9 @@ public:
     float               m_fCurrCamDist;       // +72
     float               m_fPrevCamDist;       // +76
     float               m_fTimeScale;         // +80
-    char                unk2;                 // +84 = 31488
-    char                unk3;                 // +85 = 1005
     union
     {
-        unsigned short m_wEnvironmentFlags;
+        unsigned short m_wEnvironmentFlags;  // +84
         struct
         {
             unsigned short m_bFrontEnd : 1;
@@ -97,17 +95,18 @@ public:
             unsigned short m_bForcedFront : 1;
         };
     };
-    unsigned short m_wIsUsed;               // +88
-    short          unk4;                    // +90 = 1005
-    short          m_wCurrentPlayPosition;  // +92
-    short          unk5;                    // +94 = 0
-    float          m_fFinalVolume;          // +96
-    float          m_fFrequency;            // +100
-    short          m_wPlayingState;         // +104
-    char           unk6[2];                 // +106
-    float          m_fSoundHeadRoom;        // +108
-    short          m_wSoundLength;          // +112
-    short          unk8;                    // +114
+    short m_nLoopCounter;          // +86    -1 = loop forever, >1 = replay N times, 0/1 = single play
+    short m_nMaxNumReplays;        // +88
+    short m_nIsUsed;               // +90    1 while the sound pool slot is in use
+    short m_wCurrentPlayPosition;  // +92
+    short m_wLastPlayPosition;     // +94
+    float m_fFinalVolume;          // +96
+    float m_fFrequency;            // +100
+    short m_wPlayingState;         // +104
+    char  unk6[2];                 // +106
+    float m_fSoundHeadRoom;        // +108
+    short m_wSoundLength;          // +112
+    short unk8;                    // +114
 };
 static_assert(sizeof(CAESound) == 0x74, "Invalid size for CAESound");
 
@@ -140,6 +139,7 @@ public:
     void          SetWorldSoundHandler(WorldSoundHandler* pHandler);
     void          ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceType, CVector* pvecPosition, float f_2);
     void          ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhysical* pPhysical);
+    bool          IsWorldSoundStillActive(uint uiGroup, uint uiIndex, CEntitySAInterface* pEntity) const;
 
     void UpdateAmbientSoundSettings();
     bool OnWorldSound(CAESound* pAESound);
