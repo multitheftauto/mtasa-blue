@@ -28,10 +28,6 @@ public:
     LUA_DECLARE(EngineRestoreCOL);
     LUA_DECLARE(EngineReplaceModel);
     LUA_DECLARE(EngineRestoreModel);
-    LUA_DECLARE(EngineReplaceWorldSound);
-    LUA_DECLARE(EngineRestoreWorldSound);
-    LUA_DECLARE(EngineRestoreAllWorldSounds);
-    LUA_DECLARE(EngineIsWorldSoundReplaced);
     LUA_DECLARE(EngineRequestModel);
     LUA_DECLARE(EngineFreeModel);
     LUA_DECLARE(EngineReplaceAnimation);
