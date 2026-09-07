@@ -36,8 +36,10 @@ CClientObjectManager::CClientObjectManager(CClientManager* pManager)
     // Initialize members
     m_pManager = pManager;
     m_bCanRemoveFromList = true;
-    m_uiMaxStreamedInCount = MAX_OBJECTS_MTA / 2;
-    m_uiMaxLowLodStreamedInCount = MAX_OBJECTS_MTA - m_uiMaxStreamedInCount;
+    // Default streaming caps = stock behaviour (500/500). Configurable at runtime via
+    // engineSetObjectStreamingLimits (raising trades FPS for density; draw-call bound).
+    m_uiMaxStreamedInCount = 500;
+    m_uiMaxLowLodStreamedInCount = 500;
 }
 
 CClientObjectManager::~CClientObjectManager()
@@ -291,6 +293,18 @@ bool CClientObjectManager::IsHardObjectLimitReached()
     }
 
     return g_pGame->GetPools()->GetObjectCount() >= MAX_OBJECTS_MTA;
+}
+
+bool CClientObjectManager::SetStreamingLimits(uint uiHighDetail, uint uiLowLod)
+{
+    if (uiHighDetail == 0 || uiLowLod == 0)
+        return false;
+    // High-detail and low-LOD objects share the same object pool, so the total must fit.
+    if (uiHighDetail + uiLowLod > MAX_OBJECTS_MTA)
+        return false;
+    m_uiMaxStreamedInCount = uiHighDetail;
+    m_uiMaxLowLodStreamedInCount = uiLowLod;
+    return true;
 }
 
 void CClientObjectManager::RestreamObjects(unsigned short usModel)
