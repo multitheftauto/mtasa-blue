@@ -408,6 +408,7 @@ PreWeatherUpdateHandler*                   m_pPreWeatherUpdateHandler = NULL;
 PreWorldProcessHandler*                    m_pPreWorldProcessHandler = NULL;
 PostWorldProcessHandler*                   m_pPostWorldProcessHandler = NULL;
 PostWorldProcessPedsAfterPreRenderHandler* m_postWorldProcessPedsAfterPreRenderHandler = nullptr;
+PreWaterRenderHandler*                     m_preWaterRenderHandler = nullptr;
 IdleHandler*                               m_pIdleHandler = NULL;
 PreFxRenderHandler*                        m_pPreFxRenderHandler = NULL;
 PostColorFilterRenderHandler*              m_pPostColorFilterRenderHandler = nullptr;
@@ -562,6 +563,8 @@ void HOOK_CAEVehicleAudioEntity__ProcessDummyHeli();
 void HOOK_CAEVehicleAudioEntity__ProcessDummyProp();
 
 void HOOK_Idle_CWorld_ProcessPedsAfterPreRender();
+
+void HOOK_RenderScene_PreWaterRender();
 
 void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio();
 void HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio();
@@ -760,6 +763,9 @@ void CMultiplayerSA::InitHooks()
     HookInstall(HOOKPOS_CAEVEhicleAudioEntity__ProcessDummyProp, (DWORD)HOOK_CAEVehicleAudioEntity__ProcessDummyProp, 5);
 
     HookInstall(HOOKPOS_Idle_CWorld_ProcessPedsAfterPreRender, (DWORD)HOOK_Idle_CWorld_ProcessPedsAfterPreRender, 5);
+
+    HookInstallCall(0x53E004, reinterpret_cast<DWORD>(HOOK_RenderScene_PreWaterRender));
+    HookInstallCall(0x53E142, reinterpret_cast<DWORD>(HOOK_RenderScene_PreWaterRender));
 
     HookInstall(HOOKPOS_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio,
                 (DWORD)HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio, 5);
@@ -2670,6 +2676,11 @@ void CMultiplayerSA::SetPostWorldProcessHandler(PostWorldProcessHandler* pHandle
 void CMultiplayerSA::SetPostWorldProcessPedsAfterPreRenderHandler(PostWorldProcessPedsAfterPreRenderHandler* pHandler)
 {
     m_postWorldProcessPedsAfterPreRenderHandler = pHandler;
+}
+
+void CMultiplayerSA::SetPreWaterRenderHandler(PreWaterRenderHandler* pHandler)
+{
+    m_preWaterRenderHandler = pHandler;
 }
 
 void CMultiplayerSA::SetIdleHandler(IdleHandler* pHandler)
@@ -8015,6 +8026,15 @@ static void __declspec(naked) HOOK_Idle_CWorld_ProcessPedsAfterPreRender()
        jmp RETURN_Idle_CWorld_ProcessPedsAfterPreRender
     }
     // clang-format on
+}
+
+static void HOOK_RenderScene_PreWaterRender()
+{
+    if (m_preWaterRenderHandler)
+        m_preWaterRenderHandler();
+
+    // Call CWaterLevel::RenderWater
+    ((void(__cdecl*)())0x6EF650)();
 }
 
 DWORD dwLastRequestedStation = -1;
