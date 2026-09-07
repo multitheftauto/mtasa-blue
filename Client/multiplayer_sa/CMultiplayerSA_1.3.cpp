@@ -159,13 +159,14 @@ void CMultiplayerSA::SetWaterCannonHitHandler(WaterCannonHitHandler* pHandler)
 
 CPedSAInterface*     pPedHitByWaterCannonInterface = NULL;
 CVehicleSAInterface* pVehicleWithTheCannonMounted = NULL;
+void*                pWaterCannonHitBy = NULL;
 bool                 TriggerTheEvent()
 {
     // Is our handler alive
     if (m_pWaterCannonHitHandler)
     {
         // Return our handlers return
-        return !m_pWaterCannonHitHandler(pVehicleWithTheCannonMounted, pPedHitByWaterCannonInterface);
+        return !m_pWaterCannonHitHandler(pVehicleWithTheCannonMounted, pPedHitByWaterCannonInterface, pWaterCannonHitBy);
     }
     return false;
 }
@@ -184,6 +185,7 @@ static void __declspec(naked) HOOK_CEventHitByWaterCannon()
         mov eax, [edx]
         mov pPedHitByWaterCannonInterface, esi
         mov pVehicleWithTheCannonMounted, eax
+        mov pWaterCannonHitBy, edx
     }
     // clang-format on
     if (TriggerTheEvent())
