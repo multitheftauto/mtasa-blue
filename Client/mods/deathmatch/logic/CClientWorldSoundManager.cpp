@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        mods/deathmatch/logic/CClientWorldSoundManager.cpp
- *  PURPOSE:     Client-side world sound replacement (engineReplaceWorldSound)
+ *  PURPOSE:     Client-side world sound replacement
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
