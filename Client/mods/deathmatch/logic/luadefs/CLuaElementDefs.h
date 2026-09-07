@@ -63,6 +63,7 @@ public:
     LUA_DECLARE(GetElementColShape);
     LUA_DECLARE(IsElementInWater);
     LUA_DECLARE(IsElementSyncer);
+    static std::vector<CClientEntity*> GetElementsSyncedByPlayer();
     LUA_DECLARE(IsElementCollidableWith);
     LUA_DECLARE(IsElementDoubleSided);
     LUA_DECLARE(GetElementCollisionsEnabled);

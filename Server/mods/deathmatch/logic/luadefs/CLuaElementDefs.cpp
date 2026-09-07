@@ -59,6 +59,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementHealth", getElementHealth},
         {"getElementModel", getElementModel},
         {"getElementSyncer", getElementSyncer},
+        {"getElementsSyncedByPlayer", ArgumentParser<GetElementsSyncedByPlayer>},
         {"getElementCollisionsEnabled", getElementCollisionsEnabled},
         {"getLowLODElement", getLowLODElement},
         {"isElementOnFire", ArgumentParser<IsElementOnFire>},
@@ -1382,6 +1383,38 @@ int CLuaElementDefs::getElementSyncer(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::vector<CElement*> CLuaElementDefs::GetElementsSyncedByPlayer(CPlayer* player)
+{
+    std::vector<CElement*> elements;
+
+    // Check all vehicles
+    for (CVehicle* pVehicle : m_pVehicleManager->GetVehicles())
+    {
+        if (pVehicle->GetSyncer() == player)
+            elements.push_back(pVehicle);
+    }
+
+    // Check all peds
+    for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); ++iter)
+    {
+        CPed* pPed = *iter;
+        if (pPed->GetSyncer() == player)
+            elements.push_back(pPed);
+    }
+
+#ifdef WITH_OBJECT_SYNC
+    // Check all objects
+    for (auto iter = m_pObjectManager->IterBegin(); iter != m_pObjectManager->IterEnd(); ++iter)
+    {
+        CObject* pObject = *iter;
+        if (pObject->GetSyncer() == player)
+            elements.push_back(pObject);
+    }
+#endif
+
+    return elements;
 }
 
 int CLuaElementDefs::getElementCollisionsEnabled(lua_State* luaVM)
