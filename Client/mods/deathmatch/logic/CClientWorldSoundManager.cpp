@@ -254,8 +254,11 @@ bool CClientWorldSoundManager::HandleWorldSound(const SWorldSoundEvent& event, b
 
         if (!bAlreadyPlayed)
         {
+            const bool bLoop = event.bLoop && event.uiGroup == BANKSLOT_HORNS && event.pGameEntity != nullptr && g_pGame &&
+                               g_pGame->GetPools()->GetVehicle((DWORD*)event.pGameEntity) != nullptr;
+
             CClientSound* pSound =
-                m_pManager->GetSoundManager()->PlaySound3D(pReplacement->strSound, false, pReplacement->bRawData, event.vecPosition, false, true);
+                m_pManager->GetSoundManager()->PlaySound3D(pReplacement->strSound, false, pReplacement->bRawData, event.vecPosition, bLoop, true);
             if (!pSound)
             {
                 return false;
@@ -284,7 +287,7 @@ bool CClientWorldSoundManager::HandleWorldSound(const SWorldSoundEvent& event, b
             pSound->SetVolume(fVolume);
 
             if (event.pGameEntity)
-                m_FollowSounds.push_back({pSound, event.pGameEntity, GetTickCount32()});
+                m_FollowSounds.push_back({pSound, event.pGameEntity, GetTickCount32(), event.uiGroup, event.uiIndex, bLoop});
 
             m_LastPlayed[uiKey] = {GetTickCount32(), event.vecPosition};
         }
@@ -301,10 +304,26 @@ void CClientWorldSoundManager::DoPulse()
     {
         SFollowSound& entry = *iter;
 
-        if (entry.pSound->IsFinished() || uiNow - entry.uiStartTick > 10000)
+        if (!entry.bLooping)
         {
-            iter = m_FollowSounds.erase(iter);
-            continue;
+            if (entry.pSound->IsFinished() || uiNow - entry.uiStartTick > 10000)
+            {
+                iter = m_FollowSounds.erase(iter);
+                continue;
+            }
+        }
+        else
+        {
+            const bool bOriginalActive =
+                g_pGame && g_pGame->GetAudioEngine() && g_pGame->GetAudioEngine()->IsWorldSoundStillActive(entry.uiGroup, entry.uiIndex, entry.pGameEntity);
+            const bool bSoundFinished = entry.pSound->IsFinished();
+            if (!bOriginalActive || bSoundFinished || uiNow - entry.uiStartTick > 60000)
+            {
+                if (!bSoundFinished)
+                    g_pClientGame->GetElementDeleter()->Delete(entry.pSound);
+                iter = m_FollowSounds.erase(iter);
+                continue;
+            }
         }
 
         if (CClientEntity* pEntity = g_pGame->GetPools()->GetClientEntity((DWORD*)entry.pGameEntity))
