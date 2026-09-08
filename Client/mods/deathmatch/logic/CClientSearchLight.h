@@ -25,7 +25,7 @@ public:
     eClientEntityType GetType() const { return CCLIENTSEARCHLIGHT; }
 
     // CClientEntity methods
-    virtual void GetPosition(CVector& vecPosition) const override { vecPosition = m_StartPosition; }            // required for streaming
+    virtual void GetPosition(CVector& vecPosition) const override { vecPosition = m_StartPosition; }  // required for streaming
     virtual void SetPosition(const CVector& vecPosition) override {}
 
     // CClientStreamElement methods
@@ -53,6 +53,9 @@ public:
     bool GetRenderSpot() const { return m_bRenderSpot; }
     void SetRenderSpot(bool renderSpot) { m_bRenderSpot = renderSpot; }
 
+    SColor GetColor() const noexcept { return m_color; }
+    void   SetColor(const SColor& color) noexcept { m_color = color; }
+
 protected:
     void Render();
 
@@ -63,4 +66,5 @@ private:
     float   m_StartRadius;
     float   m_EndRadius;
     bool    m_bRenderSpot;
+    SColor  m_color{SColorRGBA(200, 200, 255, 0)};
 };

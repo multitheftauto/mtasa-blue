@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CVertexStreamBoundingBoxManager.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 
 CVertexStreamBoundingBoxManager* CVertexStreamBoundingBoxManager::ms_Singleton = NULL;
 
@@ -37,7 +38,7 @@ namespace
 
         return fDistSq;
     }
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -298,8 +299,8 @@ bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox(SCurrentSta
         std::vector<uint32_t> indices(numIndices);
         {
             void* pIndexBytes = NULL;
-            if (FAILED(state.pIndexData->Lock(static_cast<UINT>(startByte), static_cast<UINT>(requiredBytes), &pIndexBytes,
-                                              D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
+            if (FAILED(
+                    state.pIndexData->Lock(static_cast<UINT>(startByte), static_cast<UINT>(requiredBytes), &pIndexBytes, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
                 return false;
 
             if (indexStride == sizeof(WORD))
@@ -332,10 +333,10 @@ bool CVertexStreamBoundingBoxManager::ComputeVertexStreamBoundingBox(SCurrentSta
             uint32_t v2 = indices[i + 2];
 
             if (v0 >= NumVerts || v1 >= NumVerts || v2 >= NumVerts)
-                continue;            // vert index out of range
+                continue;  // vert index out of range
 
             if (v0 == v1 || v0 == v2 || v1 == v2)
-                continue;            // degenerate tri
+                continue;  // degenerate tri
 
             // Get vertex positions from original stream
             CVector* pPos0 = (CVector*)(pSourceArrayBytes + v0 * StridePT);

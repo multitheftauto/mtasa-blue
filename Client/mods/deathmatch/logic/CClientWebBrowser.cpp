@@ -107,7 +107,7 @@ bool CClientWebBrowser::ExecuteJavascript(const SString& strJavascriptCode)
 {
     if (!m_pWebView)
         return false;
-    
+
     // Don't allow javascript code execution on remote websites
     if (!m_pWebView->IsLocal())
         return false;
@@ -212,7 +212,7 @@ void CClientWebBrowser::Events_OnCreated()
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     CallEvent("onClientBrowserCreated", Arguments, false);
 }
@@ -221,7 +221,7 @@ void CClientWebBrowser::Events_OnLoadingStart(const SString& strURL, bool bMainF
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     Arguments.PushBoolean(bMainFrame);
@@ -232,7 +232,7 @@ void CClientWebBrowser::Events_OnDocumentReady(const SString& strURL)
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     CallEvent("onClientBrowserDocumentReady", Arguments, false);
@@ -242,7 +242,7 @@ void CClientWebBrowser::Events_OnLoadingFailed(const SString& strURL, int errorC
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     Arguments.PushNumber(errorCode);
@@ -254,7 +254,7 @@ void CClientWebBrowser::Events_OnNavigate(const SString& strURL, bool bIsBlocked
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushString(strURL);
     Arguments.PushBoolean(bIsBlocked);
@@ -266,7 +266,7 @@ void CClientWebBrowser::Events_OnPopup(const SString& strTargetURL, const SStrin
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushString(strTargetURL);
     Arguments.PushString(strOpenerURL);
@@ -277,7 +277,7 @@ void CClientWebBrowser::Events_OnChangeCursor(unsigned char ucCursor)
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushNumber(ucCursor);
     CallEvent("onClientBrowserCursorChange", Arguments, false);
@@ -299,7 +299,7 @@ void CClientWebBrowser::Events_OnTooltip(const SString& strTooltip)
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushString(strTooltip);
     CallEvent("onClientBrowserTooltip", Arguments, false);
@@ -309,7 +309,7 @@ void CClientWebBrowser::Events_OnInputFocusChanged(bool bGainedFocus)
 {
     if (m_bBeingDestroyed)
         return;
-    
+
     CLuaArguments Arguments;
     Arguments.PushBoolean(bGainedFocus);
     CallEvent("onClientBrowserInputFocusChanged", Arguments, false);
@@ -317,14 +317,10 @@ void CClientWebBrowser::Events_OnInputFocusChanged(bool bGainedFocus)
 
 bool CClientWebBrowser::Events_OnResourcePathCheck(SString& strURL)
 {
-    if (m_bBeingDestroyed)
+    if (m_bBeingDestroyed || !m_pResource)
         return false;
 
-    // If no resource is set, we are allowed to use the requested file
-    if (!m_pResource)
-        return true;
-
-    CResource* pTempResource = m_pResource;            // Make a copy to ignore a changed resource
+    CResource* pTempResource = m_pResource;  // Make a copy to ignore a changed resource
 
     if (CResourceManager::ParseResourcePathInput(strURL, pTempResource, &strURL))
         return true;
@@ -334,18 +330,30 @@ bool CClientWebBrowser::Events_OnResourcePathCheck(SString& strURL)
 
 bool CClientWebBrowser::Events_OnResourceFileCheck(const SString& strPath, CBuffer& outFileData)
 {
-    if (m_bBeingDestroyed)
+    if (m_bBeingDestroyed || !m_pResource)
         return false;
-
-    // If no resource is set, we do not require to verify the file
-    if (!m_pResource)
-        return true;
 
     auto pFile = g_pClientGame->GetResourceManager()->GetDownloadableResourceFile(strPath.ToLower());
 
-    // If we did not download this file, it has been script or user generated, nothing to verify for us
+    // Allow unlisted or non-downloaded files if they belong to the owning resource
     if (pFile == nullptr)
-        return true;
+    {
+        const std::filesystem::path resourceDir = std::filesystem::path(m_pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, "").c_str()).lexically_normal();
+        const std::filesystem::path targetFilePath = std::filesystem::path(strPath.c_str()).lexically_normal();
+
+        SString localResourceDir = PathConform(resourceDir.string()).Replace("\\", "/");
+        if (!localResourceDir.EndsWith("/"))
+            localResourceDir += "/";
+
+        const SString normalizedPath = PathConform(targetFilePath.string()).Replace("\\", "/");
+        if (!normalizedPath.BeginsWithI(localResourceDir))
+            return false;
+
+        if (!FileExists(strPath))
+            return false;
+
+        return outFileData.LoadFromFile(strPath);
+    }
 
     pFile->GenerateClientChecksum(outFileData);
     return pFile->DoesClientAndServerChecksumMatch();
@@ -401,7 +409,7 @@ bool CClientWebBrowser::AddAjaxHandler(const SString& strURL, ajax_callback_t& h
 {
     if (!m_pWebView)
         return false;
-    
+
     if (!m_pWebView->RegisterAjaxHandler(strURL))
         return false;
 
@@ -413,7 +421,7 @@ bool CClientWebBrowser::RemoveAjaxHandler(const SString& strURL)
 {
     if (!m_pWebView)
         return false;
-    
+
     if (!m_pWebView->UnregisterAjaxHandler(strURL))
         return false;
 

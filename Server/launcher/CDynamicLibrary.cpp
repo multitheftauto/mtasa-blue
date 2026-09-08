@@ -32,10 +32,10 @@ bool CDynamicLibrary::Load(const char* szFilename)
     // Unload the previous library
     Unload();
 
-    // Load the new library
-    #ifdef WIN32
+// Load the new library
+#ifdef WIN32
     m_hModule = LoadLibrary(szFilename);
-    #else
+#else
     m_hModule = dlopen(szFilename, RTLD_NOW);
 
     // Output error if needed
@@ -43,7 +43,7 @@ bool CDynamicLibrary::Load(const char* szFilename)
     {
         printf("%s\n", dlerror());
     }
-    #endif
+#endif
 
     // Return whether we succeeded or not
     return m_hModule != 0;
@@ -54,11 +54,11 @@ void CDynamicLibrary::Unload()
     // Got a module?
     if (m_hModule != 0)
     {
-        #ifdef WIN32
+#ifdef WIN32
         FreeLibrary(m_hModule);
-        #else
+#else
         dlclose(m_hModule);
-        #endif
+#endif
 
         // Zero out our library as it's no longer valid
         m_hModule = 0;
@@ -75,9 +75,9 @@ void* CDynamicLibrary::GetProcedureAddress(const char* szProcName)
     // Got a module?
     if (m_hModule != 0)
     {
-        #ifdef WIN32
+#ifdef WIN32
         return GetProcAddress(m_hModule, szProcName);
-        #else
+#else
         char* szError = NULL;
         dlerror();
 
@@ -88,7 +88,7 @@ void* CDynamicLibrary::GetProcedureAddress(const char* szProcName)
         }
 
         return pFunc;
-        #endif
+#endif
     }
 
     return NULL;

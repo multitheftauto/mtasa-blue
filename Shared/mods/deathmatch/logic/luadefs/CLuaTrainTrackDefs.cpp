@@ -18,19 +18,19 @@
 
 void CLuaTrainTrackDefs::LoadFunctions()
 {
-    // CLuaCFunctions::AddFunction("getDefaultTrack", ArgumentParser<GetDefaultTrack>);
+    CLuaCFunctions::AddFunction("getDefaultTrack", ArgumentParser<GetDefaultTrack>);
 }
 
 void CLuaTrainTrackDefs::AddClass(lua_State* luaVM)
 {
-    // lua_newclass(luaVM);
+    lua_newclass(luaVM);
 
-    // lua_classfunction(luaVM, "getDefault", "getDefaultTrack");
+    lua_classfunction(luaVM, "getDefault", "getDefaultTrack");
 
-    // lua_registerclass(luaVM, "TrainTrack", "Element");
+    lua_registerclass(luaVM, "TrainTrack", "Element");
 }
 
-auto CLuaTrainTrackDefs::GetDefaultTrack(uchar trackID) -> CLuaTrainTrackDefs::TrainTrack
+CLuaTrainTrackDefs::TrainTrack CLuaTrainTrackDefs::GetDefaultTrack(uchar trackID)
 {
     if (trackID > 3)
         throw std::invalid_argument("Bad default track ID (0-3)");
@@ -38,6 +38,6 @@ auto CLuaTrainTrackDefs::GetDefaultTrack(uchar trackID) -> CLuaTrainTrackDefs::T
 #ifdef MTA_CLIENT
     return trackID;
 #else
-    return g_pGame->GetTrainTrackManager()->GetTrainTrackByIndex(trackID);
+    return g_pGame->GetTrainTrackManager()->GetDefaultTrackByIndex(trackID);
 #endif
 }

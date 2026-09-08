@@ -17,6 +17,7 @@
 #include "CBandwidthSettings.h"
 #include "ASE.h"
 #include "CGame.h"
+#include "CHTTPD.h"
 #include "net/SimHeaders.h"
 
 #ifdef WIN32
@@ -51,8 +52,8 @@ namespace
         return strResult;
     }
 
-    #define UDP_PACKET_OVERHEAD (28LL)
-}            // namespace
+#define UDP_PACKET_OVERHEAD (28LL)
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -237,11 +238,11 @@ SString CPerfStatServerInfoImpl::GetProcessMemoryUsage()
     long          rss;
 
     statStream >> pid >> comm >> state >> ppid >> pgrp >> session >> tty_nr >> tpgid >> flags >> minflt >> cminflt >> majflt >> cmajflt >> utime >> stime >>
-        cutime >> cstime >> priority >> nice >> O >> itrealvalue >> starttime >> vsize >> rss;            // don't care about the rest
+        cutime >> cstime >> priority >> nice >> O >> itrealvalue >> starttime >> vsize >> rss;  // don't care about the rest
 
     statStream.close();
 
-    long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024;            // in case x86-64 is configured to use 2MB pages
+    long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024;  // in case x86-64 is configured to use 2MB pages
     uint vm_usage = vsize / (1024 * 1024);
     uint resident_set = rss * page_size_kb / 1024;
 
@@ -391,7 +392,7 @@ void CPerfStatServerInfoImpl::GetStats(CPerfStatResult* pResult, const std::map<
     }
 
     SAllocationStats httpAllocationStats;
-    EHS::StaticGetAllocationStats(httpAllocationStats);
+    g_pGame->GetHTTPD()->GetAllocationStats(httpAllocationStats);
     m_InfoList.push_back(StringPair("HTTP allocated active", SString("%d KB", httpAllocationStats.uiActiveKBAllocated)));
 
     if (bIncludeDebugInfo)

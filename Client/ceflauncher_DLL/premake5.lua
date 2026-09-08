@@ -3,6 +3,7 @@ project "CEFLauncher DLL"
 	kind "SharedLib"
 	targetname "CEFLauncher_DLL"
 	targetdir(buildpath("mta/cef"))
+	clangtidy "On"
 
 	includedirs { "../../vendor/cef3/cef", "../../Shared/sdk" }
 	libdirs { "../../vendor/cef3/cef/Release" }

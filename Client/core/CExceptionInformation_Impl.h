@@ -65,6 +65,13 @@ public:
     [[nodiscard]] int                               GetUncaughtExceptionCount() const;
     void                                            CaptureCurrentException();
 
+    // Registry-resolved module info (independent source of truth, IDA-compatible offsets)
+    [[nodiscard]] bool        HasResolvedModuleInfo() const { return m_resolvedModuleInfo.resolved; }
+    [[nodiscard]] const char* GetResolvedModuleName() const { return m_resolvedModuleNameStorage.c_str(); }
+    [[nodiscard]] DWORD       GetResolvedModuleBase() const { return m_resolvedModuleInfo.moduleBase; }
+    [[nodiscard]] DWORD       GetResolvedRva() const { return m_resolvedModuleInfo.rva; }
+    [[nodiscard]] DWORD       GetResolvedIdaAddress() const { return m_resolvedModuleInfo.idaAddress; }
+
 private:
     std::uint32_t           m_uiCode;
     void*                   m_pAddress;
@@ -98,6 +105,22 @@ private:
     std::exception_ptr m_capturedException;
     int                m_uncaughtExceptionCount;
 
+public:
+    // Registry-resolved module info (independent source of truth)
+    // Public to allow SEH-protected helper functions to access
+    struct ResolvedInfo
+    {
+        bool  resolved = false;
+        DWORD moduleBase = 0;
+        DWORD rva = 0;
+        DWORD idaAddress = 0;
+    };
+
+private:
+    ResolvedInfo m_resolvedModuleInfo;
+    std::string  m_resolvedModuleNameStorage;
+
     void UpdateModuleBaseNameFromCurrentPath();
     void ClearModulePathState();
+    void ResolveModuleFromRegistrySafe(_EXCEPTION_POINTERS* pException);
 };

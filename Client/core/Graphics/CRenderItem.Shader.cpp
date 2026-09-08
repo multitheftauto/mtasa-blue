@@ -24,7 +24,7 @@ void CShaderItem::PostConstruct(CRenderItemManager* pManager, const SString& str
                                 float fPriority, float fMaxDistance, bool bLayered, bool bDebug, int iTypeMask, const EffectMacroList& macros)
 {
     m_fPriority = fPriority;
-    m_uiCreateTime = ms_uiCreateTimeCounter++;            // Priority tie breaker
+    m_uiCreateTime = ms_uiCreateTimeCounter++;  // Priority tie breaker
     m_fMaxDistanceSq = fMaxDistance * fMaxDistance;
     m_bLayered = bLayered;
     m_iTypeMask = iTypeMask;

@@ -2,8 +2,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2d3d942aa8adf891478198912ac0b233\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-08-31 20:09\n"
-"PO-Revision-Date: 2025-10-24 21:50\n"
+"POT-Creation-Date: 2026-01-06 11:14\n"
+"PO-Revision-Date: 2026-01-08 17:20\n"
 "Last-Translator: \n"
 "Language-Team: Serbian\n"
 "Language: srp\n"
@@ -147,72 +147,72 @@ msgid "The client is the program you run to play on a Multi Theft Auto server"
 msgstr "Klijent je program koji pokrećete da bi igrali na Multi Theft Auto serveru"
 
 #. INST_CLIENTSERVER
-#: Shared/installer/nightly.nsi:451
+#: Shared/installer/nightly.nsi:468
 msgid "Client and Server"
 msgstr "Klijent i Server"
 
 #. INST_SERVER
-#: Shared/installer/nightly.nsi:452
+#: Shared/installer/nightly.nsi:469
 msgid "Server only"
 msgstr "Samo Server"
 
 #. INST_STARTMENU_GROUP
-#: Shared/installer/nightly.nsi:466
+#: Shared/installer/nightly.nsi:483
 msgid "Start menu group"
 msgstr "Start menu grupa"
 
 #. INST_DESKTOP_ICON
-#: Shared/installer/nightly.nsi:467
+#: Shared/installer/nightly.nsi:484
 msgid "Desktop icon"
 msgstr "Desktop ikonica"
 
 #. INST_PROTOCOL
-#: Shared/installer/nightly.nsi:468
+#: Shared/installer/nightly.nsi:485
 msgid "Register mtasa:// protocol"
 msgstr "Registrovati mtasa:// protokol"
 
 #. INST_GAMES_EXPLORER
-#: Shared/installer/nightly.nsi:469
+#: Shared/installer/nightly.nsi:486
 msgid "Add to Games Explorer"
 msgstr "Dodati u Games Explorer"
 
 #. INST_DIRECTX
-#: Shared/installer/nightly.nsi:470
+#: Shared/installer/nightly.nsi:487
 msgid "Install DirectX"
 msgstr "Instalirati DirectX"
 
 #. INST_SEC_CLIENT
-#: Shared/installer/nightly.nsi:504
+#: Shared/installer/nightly.nsi:521
 msgid "Game client"
 msgstr "Klijent igre"
 
 #. INST_SEC_SERVER
-#: Shared/installer/nightly.nsi:505
+#: Shared/installer/nightly.nsi:522
 msgid "Dedicated server"
 msgstr "Namenski server"
 
 #. INST_SEC_CORE
-#: Shared/installer/nightly.nsi:506
+#: Shared/installer/nightly.nsi:523
 msgid "Core components"
 msgstr "Ključne komponente"
 
 #. INST_SEC_GAME
-#: Shared/installer/nightly.nsi:507
+#: Shared/installer/nightly.nsi:524
 msgid "Game module"
 msgstr "Modul igre"
 
 #. INFO_INPLACE_UPGRADE
-#: Shared/installer/nightly.nsi:509
+#: Shared/installer/nightly.nsi:526
 msgid "Performing in-place upgrade..."
 msgstr "Izvršavanje nadogradnje na mestu..."
 
 #. INFO_UPDATE_PERMISSIONS
-#: Shared/installer/nightly.nsi:510
+#: Shared/installer/nightly.nsi:527
 msgid "Updating permissions. This could take a few minutes..."
 msgstr "Ažuriranje dozvola. Može potrajati par minuta..."
 
 #. MSGBOX_INVALID_GTASA
-#: Shared/installer/nightly.nsi:511
+#: Shared/installer/nightly.nsi:528
 msgid "A valid Windows version of Grand Theft Auto: San Andreas was not detected.$\\r$\n"
 "However installation will continue.$\\r$\n"
 "Please reinstall if there are problems later."
@@ -221,42 +221,42 @@ msgstr "Validna Windows verzija Grand Theft Auto: San Andreas nije detektovana.$
 "Molimo vas ponovo instalirajte u slučaju da kasnije nastane problem."
 
 #. INST_SEC_CORE_RESOURCES
-#: Shared/installer/nightly.nsi:514
+#: Shared/installer/nightly.nsi:531
 msgid "Core Resources"
 msgstr "Ključni Resursi"
 
 #. INST_SEC_OPTIONAL_RESOURCES
-#: Shared/installer/nightly.nsi:515
+#: Shared/installer/nightly.nsi:532
 msgid "Optional Resources"
 msgstr "Opcionalni resursi"
 
 #. INST_SEC_EDITOR
-#: Shared/installer/nightly.nsi:516
+#: Shared/installer/nightly.nsi:533
 msgid "Editor"
 msgstr "Urednik"
 
 #. INST_SEC_DEVELOPER
-#: Shared/installer/nightly.nsi:993
+#: Shared/installer/nightly.nsi:1014
 msgid "Development"
 msgstr "Razvoj"
 
 #. UNINST_SUCCESS
-#: Shared/installer/nightly.nsi:1041
+#: Shared/installer/nightly.nsi:1062
 msgid "$(^Name) was successfully removed from your computer."
 msgstr "$(^Name) je uspešno uklonjen sa vašeg računara."
 
 #. UNINST_FAIL
-#: Shared/installer/nightly.nsi:1048
+#: Shared/installer/nightly.nsi:1069
 msgid "Uninstallation has failed!"
 msgstr "Uklanjanje nije uspelo!"
 
 #. UNINST_REQUEST
-#: Shared/installer/nightly.nsi:1056
+#: Shared/installer/nightly.nsi:1077
 msgid "Are you sure you want to completely remove $(^Name) and all of its components?"
 msgstr "Da li ste sigurni da želite potpuno ukloniti $(^Name) i sve njegove komponente?"
 
 #. UNINST_REQUEST_NOTE
-#: Shared/installer/nightly.nsi:1057
+#: Shared/installer/nightly.nsi:1078
 msgid "Uninstalling before update?$\\r$\n"
 "It is not necessary to uninstall before installing a new version of MTA:SA$\\r$\n"
 "Run the new installer to upgrade and preserve your settings."
@@ -265,32 +265,32 @@ msgstr "Ukloniti pre nadogradnje?$\\r$\n"
 "Pokrenite novi installer da nadogradite i sačuvate vaša podešavanja."
 
 #. UNINST_DATA_REQUEST
-#: Shared/installer/nightly.nsi:1070
+#: Shared/installer/nightly.nsi:1091
 msgid "Would you like to keep your data files (such as resources, screenshots and server configuration)? If you click no, any resources, configurations or screenshots you have created will be lost."
 msgstr "Da li želite da sačuvate datoteke sa podacima (kao na primer resurse, screenshot-ove i konfiguracije servera)? Ako kliknete ne, svi resursi, konfiguracije ili screenshot-ovi koje ste napravili biće izgubljeni."
 
 #. UAC_RIGHTS1
-#: Shared/installer/nightly.nsi:1253
+#: Shared/installer/nightly.nsi:1281
 msgid "This installer requires admin access, try again"
 msgstr "Ovaj installer zahteva administratorski pristup, pokušajte ponovo"
 
 #. UAC_RIGHTS_UN
-#: Shared/installer/nightly.nsi:1254
+#: Shared/installer/nightly.nsi:1282
 msgid "This uninstaller requires admin access, try again"
 msgstr "Ovaj uninstaller zahteva administratorski pristup, pokušajte ponovo"
 
 #. UAC_RIGHTS3
-#: Shared/installer/nightly.nsi:1255
+#: Shared/installer/nightly.nsi:1283
 msgid "Logon service not running, aborting!"
 msgstr "Servis za prijavljivanje ne radi, prekidanje!"
 
 #. UAC_RIGHTS4
-#: Shared/installer/nightly.nsi:1256
+#: Shared/installer/nightly.nsi:1284
 msgid "Unable to elevate"
 msgstr "Onemogućeno povećanje"
 
 #. INST_MTA_CONFLICT
-#: Shared/installer/nightly.nsi:1852
+#: Shared/installer/nightly.nsi:1880
 msgid "A different major version of MTA ($1) already exists at that path.$\n"
 "$\n"
 "MTA is designed for major versions to be installed in different paths.$\n"
@@ -301,7 +301,7 @@ msgstr "Druga glavna verzija MTA ($1) već postoji na ovoj putanji.$\n"
 "Da li ste sigurni da želite pisati preko MTA $1 u $INSTDIR ?"
 
 #. INST_GTA_CONFLICT
-#: Shared/installer/nightly.nsi:1856
+#: Shared/installer/nightly.nsi:1884
 msgid "MTA cannot be installed into the same directory as GTA:SA.$\n"
 "$\n"
 "Do you want to use the default install directory$\n"
@@ -312,7 +312,7 @@ msgstr "MTA ne može biti instaliran na istoj lokaciji kao GTA:SA.$\n"
 "$DEFAULT_INSTDIR ?"
 
 #. INST_GTA_ERROR1
-#: Shared/installer/nightly.nsi:1859
+#: Shared/installer/nightly.nsi:1887
 msgid "The selected directory does not exist.$\n"
 "$\n"
 "Please select the GTA:SA install directory"
@@ -321,7 +321,7 @@ msgstr "Odabrani direktorijum ne postoji.$\n"
 "Molimo vas odaberite GTA:SA direktorijum instalacije"
 
 #. INST_GTA_ERROR2
-#: Shared/installer/nightly.nsi:1861
+#: Shared/installer/nightly.nsi:1889
 msgid "Could not find GTA:SA installed at $GTA_DIR $\n"
 "$\n"
 "Are you sure you want to continue ?"
@@ -330,17 +330,17 @@ msgstr "Nismo mogli da pronađemo GTA:SA instaliran na $GTA_DIR $\n"
 "Da li ste sigurni da želite da nastavite?"
 
 #. INST_CHOOSE_LOC_TOP
-#: Shared/installer/nightly.nsi:1979
+#: Shared/installer/nightly.nsi:2007
 msgid "Choose Install Location"
 msgstr "Odaberi lokaciju instalacije"
 
 #. INST_CHOOSE_LOC
-#: Shared/installer/nightly.nsi:1980
+#: Shared/installer/nightly.nsi:2008
 msgid "Choose the folder in which to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 msgstr "Odaberi direktorijum gde će biti instaliran ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}"
 
 #. INST_CHOOSE_LOC2
-#: Shared/installer/nightly.nsi:1981
+#: Shared/installer/nightly.nsi:2009
 msgid "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} will be installed in the following folder.$\n"
 "To install in a different folder, click Browse and select another folder.$\n"
 "$\n"
@@ -351,62 +351,62 @@ msgstr "${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} biće instalirana u direktorij
 " Kliknite Dalje da nastavite."
 
 #. INST_CHOOSE_LOC3
-#: Shared/installer/nightly.nsi:1983
+#: Shared/installer/nightly.nsi:2011
 msgid "Destination Folder"
 msgstr "Odredišni direktorijum"
 
 #. INST_CHOOSE_LOC_BROWSE
-#: Shared/installer/nightly.nsi:1984
+#: Shared/installer/nightly.nsi:2012
 msgid "Browse..."
 msgstr "Izaberi..."
 
 #. INST_CHOOSE_LOC_DEFAULT
-#: Shared/installer/nightly.nsi:1985
+#: Shared/installer/nightly.nsi:2013
 msgid "Default"
 msgstr "Podrazumevano"
 
 #. INST_CHOOSE_LOC_LAST_USED
-#: Shared/installer/nightly.nsi:1986
+#: Shared/installer/nightly.nsi:2014
 msgid "Last used"
 msgstr "Poslednja korišćena"
 
 #. INST_CHOOSE_LOC_CUSTOM
-#: Shared/installer/nightly.nsi:1987
+#: Shared/installer/nightly.nsi:2015
 msgid "Custom"
 msgstr "Prilagođeno"
 
 #. INST_CHOOSE_LOC4
-#: Shared/installer/nightly.nsi:2165
+#: Shared/installer/nightly.nsi:2193
 msgid "Select the folder to install ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION} in:"
 msgstr "Odaberite direktorijum gde će biti instaliran ${PRODUCT_NAME_NO_VER} ${PRODUCT_VERSION}:"
 
 #. INST_LOC_OW
-#: Shared/installer/nightly.nsi:2183
+#: Shared/installer/nightly.nsi:2211
 msgid "Warning: A different major version of MTA ($1) already exists at that path."
 msgstr "Upozorenje: Druga glavna verzija MTA ($1) već postoji na ovoj putanji."
 
 #. INST_LOC_UPGRADE
-#: Shared/installer/nightly.nsi:2184
+#: Shared/installer/nightly.nsi:2212
 msgid "Installation type:  Upgrade"
 msgstr "Tip instalacije: Nadogradnja"
 
 #. NETTEST_TITLE1
-#: Shared/installer/nightly.nsi:2418
+#: Shared/installer/nightly.nsi:2446
 msgid "Online update"
 msgstr "Online ažuriranje"
 
 #. NETTEST_TITLE2
-#: Shared/installer/nightly.nsi:2419
+#: Shared/installer/nightly.nsi:2447
 msgid "Checking for update information"
 msgstr "Provera za informacije o ažuriranju"
 
 #. NETTEST_STATUS1
-#: Shared/installer/nightly.nsi:2420
+#: Shared/installer/nightly.nsi:2448
 msgid "Checking for installer update information..."
 msgstr "Provera za installer informacije o ažuriranju..."
 
 #. NETTEST_STATUS2
-#: Shared/installer/nightly.nsi:2421
+#: Shared/installer/nightly.nsi:2449
 msgid "Please ensure your firewall is not blocking"
 msgstr "Molimo vas uverite se da vaš firewall ne blokira"
 

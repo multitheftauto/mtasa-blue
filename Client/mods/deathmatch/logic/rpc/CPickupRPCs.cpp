@@ -69,7 +69,6 @@ void CPickupRPCs::SetPickupType(CClientEntity* pSource, NetBitStreamInterface& b
                 {
                     pPickup->SetModel(usModel);
                     pPickup->m_ucType = ucType;
-                    pPickup->SetModel(usModel);
                 }
             }
         }

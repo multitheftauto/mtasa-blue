@@ -18,7 +18,7 @@ class CLuaFunctionDefinitions;
 
 class CRegisteredCommands;
 
-#define LUA_DECLARE(x) static int x ( lua_State * luaVM );
+#define LUA_DECLARE(x) static int x(lua_State* luaVM);
 
 class CLuaFunctionDefs
 {

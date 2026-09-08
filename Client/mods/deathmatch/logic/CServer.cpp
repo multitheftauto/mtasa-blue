@@ -14,9 +14,9 @@
 #include <string_view>
 
 #ifdef MTA_DEBUG
-    #define SERVER_EXE_PATH "MTA Server_d.exe"
+    #define SERVER_EXE_PATH "MTA Server64_d.exe"
 #else
-    #define SERVER_EXE_PATH "MTA Server.exe"
+    #define SERVER_EXE_PATH "MTA Server64.exe"
 #endif
 
 constexpr UINT PROCESS_FORCEFULLY_TERMINATED = 0x90804050u;
@@ -118,9 +118,11 @@ bool CServer::Start(const char* configFileName)
     }
 
     // We write the event handle to standard input, which we then extract in CServerImpl::Run (Server Core).
-    DWORD bytesWritten{};
+    // Use uint64_t to ensure the handle value is correctly transferred between 32-bit and 64-bit processes.
+    DWORD    bytesWritten{};
+    uint64_t handleValue = reinterpret_cast<uint64_t>(readyEvent);
 
-    if (!WriteFile(in.Write, &readyEvent, sizeof(readyEvent), &bytesWritten, nullptr) || bytesWritten != sizeof(readyEvent))
+    if (!WriteFile(in.Write, &handleValue, sizeof(handleValue), &bytesWritten, nullptr) || bytesWritten != sizeof(handleValue))
     {
         g_pCore->GetConsole()->Printf("Server process failed to start [error: %08x]: failed to write ready event\n", GetLastError());
         CloseHandle(readyEvent);

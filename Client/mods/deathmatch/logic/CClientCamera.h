@@ -38,7 +38,7 @@ class CClientCamera final : public CClientEntity
     friend class CClientManager;
 
 public:
-    void Unlink(){};
+    void Unlink() {};
     void DoPulse();
 
     eClientEntityType GetType() const { return CCLIENTCAMERA; };
@@ -61,8 +61,8 @@ public:
 
         m_fFOV = fFOV;
     }
-    void  SetOrbitTarget(const CVector& vecPosition);
-    void  AttachTo(CClientEntity* pElement);
+    void SetOrbitTarget(const CVector& vecPosition);
+    void AttachTo(CClientEntity* pElement);
 
     void FadeIn(float fTime);
     void FadeOut(float fTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
@@ -81,6 +81,7 @@ public:
     eVehicleCamMode GetCameraVehicleViewMode();
     ePedCamMode     GetCameraPedViewMode();
     void            SetCameraClip(bool bObjects, bool bVehicles);
+    void            ResetCameraClip();
     void            GetCameraClip(bool& bObjects, bool& bVehicles);
 
     bool IsInFixedMode() { return m_bFixed; }
@@ -105,10 +106,10 @@ private:
     CMatrix     GetGtaMatrix() const;
     void        SetGtaMatrix(const CMatrix& matInNew, CCam* pCam = NULL) const;
 
-    void SetFocusToLocalPlayerImpl();
-    void InvalidateCachedTransforms() const;
-    void SetCenterOfWorldCached(const CVector* pPosition, float fRotationRadians);
-    void UpdateCenterOfWorldFromFixedMatrix();
+    void           SetFocusToLocalPlayerImpl();
+    void           InvalidateCachedTransforms() const;
+    void           SetCenterOfWorldCached(const CVector* pPosition, float fRotationRadians);
+    void           UpdateCenterOfWorldFromFixedMatrix();
     const CMatrix& AcquirePulseMatrix() const;
     const CVector& AcquirePulseEuler(const CMatrix& matrix) const;
 

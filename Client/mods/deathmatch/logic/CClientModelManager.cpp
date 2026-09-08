@@ -66,7 +66,7 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
 
 int CClientModelManager::GetFirstFreeModelID(void)
 {
-    const unsigned int uiMaxModelID = g_pGame->GetBaseIDforCOL();
+    const unsigned int uiMaxModelID = MAX_MODEL_DFF_ID;
     for (unsigned int i = 0; i < uiMaxModelID; i++)
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(i, true);
@@ -88,11 +88,12 @@ int CClientModelManager::GetFreeTxdModelID()
     return MAX_MODEL_DFF_ID + usTxdId;
 }
 
-std::shared_ptr<CClientModel>  CClientModelManager::FindModelByID(int iModelID)
+std::shared_ptr<CClientModel> CClientModelManager::FindModelByID(int iModelID)
 {
     int32_t iMaxModelId = g_pGame->GetBaseIDforCOL();
 
-    if (iModelID < iMaxModelId)
+    // Lua-facing callers can supply invalid IDs, so check both bounds before indexing the model array.
+    if (iModelID >= 0 && iModelID < iMaxModelId)
         return m_Models[iModelID];
 
     return nullptr;

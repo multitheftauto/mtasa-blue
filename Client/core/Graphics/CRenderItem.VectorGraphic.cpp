@@ -24,6 +24,9 @@ void CVectorGraphicItem::PostConstruct(CRenderItemManager* pManager, uint width,
     m_uiSizeY = height;
     m_uiSurfaceSizeX = width;
     m_uiSurfaceSizeY = height;
+    // lunasvg writes premultiplied ARGB into the surface; let the draw
+    // path use a PM-aware blend instead of unpremultiplying per pixel.
+    m_bPremultipliedAlpha = true;
 
     CreateUnderlyingData();
 }
@@ -51,6 +54,46 @@ void CVectorGraphicItem::PreDestruct()
 bool CVectorGraphicItem::IsValid()
 {
     return m_pD3DTexture != nullptr;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CVectorGraphicItem::TryEnsureValid
+//
+// Attempt to (re)create device resources if missing
+//
+////////////////////////////////////////////////////////////////
+bool CVectorGraphicItem::TryEnsureValid()
+{
+    if (IsValid())
+        return true;
+
+    if (!m_pManager || m_pManager->GetDeviceCooperativeLevel("VectorGraphicTryEnsureValid", false) != D3D_OK)
+        return false;
+
+    const uint kRetryIntervalMinMs = 250;
+    const uint kRetryIntervalMaxMs = 2000;
+    const uint uiNow = GetTickCount32();
+    if (m_uiEnsureDelayMs == 0)
+        m_uiEnsureDelayMs = kRetryIntervalMinMs;
+
+    if (uiNow - m_uiLastEnsureAttempt < m_uiEnsureDelayMs)
+        return false;
+
+    m_uiLastEnsureAttempt = uiNow;
+
+    if (m_pD3DRenderTargetSurface || m_pD3DTexture)
+        ReleaseUnderlyingData();
+
+    CreateUnderlyingData();
+    if (IsValid())
+    {
+        m_uiEnsureDelayMs = kRetryIntervalMinMs;
+        return true;
+    }
+
+    m_uiEnsureDelayMs = std::min(m_uiEnsureDelayMs * 2, kRetryIntervalMaxMs);
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////

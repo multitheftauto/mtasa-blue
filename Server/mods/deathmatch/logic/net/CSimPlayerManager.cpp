@@ -9,6 +9,9 @@
 
 #include "StdInc.h"
 #include "SimHeaders.h"
+#include "CGame.h"
+#include "CWeaponNames.h"
+#include "CWeaponStatManager.h"
 
 //
 // CSimPlayer object is created on CPlayer construction
@@ -41,7 +44,7 @@
 ///////////////////////////////////////////////////////////////////////////
 void CSimPlayerManager::AddSimPlayer(CPlayer* pPlayer)
 {
-    LockSimSystem();            // Prevent any sim activity on the sync thread
+    LockSimSystem();  // Prevent any sim activity on the sync thread
 
     // Create
     CSimPlayer* pSim = new CSimPlayer();
@@ -72,7 +75,7 @@ void CSimPlayerManager::AddSimPlayer(CPlayer* pPlayer)
 ///////////////////////////////////////////////////////////////////////////
 void CSimPlayerManager::RemoveSimPlayer(CPlayer* pPlayer)
 {
-    LockSimSystem();            // Prevent any sim activity on the sync thread
+    LockSimSystem();  // Prevent any sim activity on the sync thread
 
     // Check
     assert(pPlayer->m_pSimPlayer->m_pRealPlayer == pPlayer);
@@ -110,7 +113,7 @@ void CSimPlayerManager::RemoveSimPlayer(CPlayer* pPlayer)
 ///////////////////////////////////////////////////////////////////////////
 void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
 {
-    LockSimSystem();            // TODO - only lock the CSimPlayer
+    LockSimSystem();  // TODO - only lock the CSimPlayer
 
     // Get matching sim player
     CSimPlayer* pSim = pPlayer->m_pSimPlayer;
@@ -136,8 +139,25 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
     pSim->m_ucWeaponType = pPlayer->GetWeaponType();
     pSim->m_usVehicleModel = pVehicle ? pVehicle->GetModel() : 0;
     pSim->m_ucSyncTimeContext = pPlayer->GetSyncTimeContext();
-    pSim->m_ucOccupiedVehicleSeat = static_cast<unsigned char>(pPlayer->GetOccupiedVehicleSeat());
+    {
+        const uint uiSeat = pPlayer->GetOccupiedVehicleSeat();
+        pSim->m_ucOccupiedVehicleSeat = uiSeat <= 0xFF ? static_cast<unsigned char>(uiSeat) : 0xFF;
+    }
     pSim->m_fWeaponRange = pPlayer->GetWeaponRangeFromSlot();
+    pSim->m_vecPosition = pPlayer->GetPosition();
+    pSim->m_bIsSpawned = pPlayer->IsSpawned();
+    pSim->m_bIsDead = pPlayer->IsDead();
+    for (unsigned char slot = 0; slot < CSimPlayer::WEAPON_SLOT_COUNT && slot < WEAPON_SLOTS; slot++)
+    {
+        pSim->m_WeaponTypes[slot] = pPlayer->GetWeaponType(slot);
+        pSim->m_WeaponTotalAmmo[slot] = pPlayer->GetWeaponTotalAmmo(slot);
+        // Only weapons in the bullet sync set can reach the sim range gate,
+        // so only those slots need a snapshot. The widest tier matches the
+        // main path's gate source.
+        if (CWeaponStatManager::HasWeaponBulletSync(pSim->m_WeaponTypes[slot]))
+            pSim->m_fBulletSyncRangeHighest[slot] =
+                g_pGame->GetWeaponStatManager()->GetWeaponRangeFromSkillLevel(static_cast<eWeaponType>(pSim->m_WeaponTypes[slot]), 1000.0f);
+    }
     pSim->m_bVehicleHasHydraulics = pVehicle ? pVehicle->GetUpgrades()->HasUpgrade(1087) : false;
     pSim->m_bVehicleIsPlaneOrHeli = pVehicle ? pVehicle->GetVehicleType() == VEHICLE_PLANE || pVehicle->GetVehicleType() == VEHICLE_HELI : false;
     pSim->m_sharedControllerState.Copy(pPlayer->GetPad()->GetCurrentControllerState());
@@ -162,7 +182,7 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
             if (pSendSimPlayer && pSendSimPlayer->m_bDoneFirstUpdate)
                 pSim->m_PuresyncSendListFlat.push_back(pSendSimPlayer);
             else
-                pPlayer->m_bPureSyncSimSendListDirty = true;            // Retry next time
+                pPlayer->m_bPureSyncSimSendListDirty = true;  // Retry next time
         }
     }
 
@@ -228,7 +248,7 @@ bool CSimPlayerManager::HandlePlayerPureSync(const NetServerPlayerID& Socket, Ne
     if (!CNetBufferWatchDog::CanSendPacket(PACKET_ID_PLAYER_PURESYNC))
         return true;
 
-    LockSimSystem();            // Prevent player additions and deletions
+    LockSimSystem();  // Prevent player additions and deletions
 
     // Grab the source player
     CSimPlayer* pSourceSimPlayer = Get(Socket);
@@ -266,7 +286,7 @@ bool CSimPlayerManager::HandleVehiclePureSync(const NetServerPlayerID& Socket, N
     if (!CNetBufferWatchDog::CanSendPacket(PACKET_ID_PLAYER_VEHICLE_PURESYNC))
         return true;
 
-    LockSimSystem();            // Prevent player additions and deletions
+    LockSimSystem();  // Prevent player additions and deletions
 
     // Grab the source player
     CSimPlayer* pSourceSimPlayer = Get(Socket);
@@ -305,7 +325,7 @@ bool CSimPlayerManager::HandleKeySync(const NetServerPlayerID& Socket, NetBitStr
     if (!CNetBufferWatchDog::CanSendPacket(PACKET_ID_PLAYER_KEYSYNC))
         return true;
 
-    LockSimSystem();            // Prevent player additions and deletions
+    LockSimSystem();  // Prevent player additions and deletions
 
     // Grab the source player
     CSimPlayer* pSourceSimPlayer = Get(Socket);
@@ -346,6 +366,14 @@ bool CSimPlayerManager::HandleBulletSync(const NetServerPlayerID& socket, NetBit
         return true;
     }
 
+    // The player id and position snapshot are filled by the first puresync
+    // update. Relaying before that would broadcast an uninitialized id.
+    if (!player->m_bDoneFirstUpdate)
+    {
+        UnlockSimSystem();
+        return true;
+    }
+
     auto packet = std::make_unique<CSimBulletsyncPacket>(player->m_PlayerID);
     if (!packet->Read(*stream))
     {
@@ -353,11 +381,76 @@ bool CSimPlayerManager::HandleBulletSync(const NetServerPlayerID& socket, NetBit
         return true;
     }
 
-    if (!player->m_pRealPlayer->HasWeaponType(packet->m_cache.weapon))
+    // Mirror the main path validation against the main-thread refreshed
+    // snapshot. The sim thread never reads live player state.
+    if (!player->m_bIsSpawned || player->m_bIsDead)
     {
         UnlockSimSystem();
         return true;
     }
+
+    const CVector& shotStart = packet->m_cache.start.data.vecPosition;
+    const CVector& shotEnd = packet->m_cache.end.data.vecPosition;
+
+    const auto weaponType = static_cast<std::uint8_t>(packet->m_cache.weapon);
+
+    bool bHasWeapon = false;
+    for (unsigned char slot = 0; slot < CSimPlayer::WEAPON_SLOT_COUNT; slot++)
+    {
+        if (player->m_WeaponTypes[slot] == weaponType)
+        {
+            bHasWeapon = true;
+            break;
+        }
+    }
+    if (!bHasWeapon)
+    {
+        UnlockSimSystem();
+        return true;
+    }
+
+    const auto slot = CWeaponNames::GetSlotFromWeapon(weaponType);
+    if (slot >= CSimPlayer::WEAPON_SLOT_COUNT || player->m_WeaponTotalAmmo[slot] <= 0)
+    {
+        UnlockSimSystem();
+        return true;
+    }
+
+    // The snapshot holds the packet's weapon slot widest-tier range,
+    // matching the main path's gate source, so zone-0 viewers accept the
+    // same shots zone-1/2 viewers get. The tolerance and slack mirror the
+    // main path.
+    const float range = player->m_fBulletSyncRangeHighest[slot];
+    if (std::isfinite(range))
+    {
+        const float maxDistance = std::max(0.0f, range) * 1.1f + 15.0f;
+        const float distanceSq = (shotEnd - shotStart).LengthSquared();
+        if (distanceSq > maxDistance * maxDistance)
+        {
+            UnlockSimSystem();
+            return true;
+        }
+    }
+
+    // Shooter proximity mirrors the main path: 50 m on foot, 100 m in a
+    // vehicle. The early return above guarantees the snapshot position has
+    // been filled.
+    const float playerDistSq = (shotStart - player->m_vecPosition).LengthSquared();
+    const float maxShootDistanceSq = player->m_bHasOccupiedVehicle ? (100.0f * 100.0f) : (50.0f * 50.0f);
+    if (playerDistSq > maxShootDistanceSq)
+    {
+        UnlockSimSystem();
+        return true;
+    }
+
+    // Per-player fire rate gate, matching the main path: only accepted shots
+    // consume the budget, so junk traffic cannot starve legitimate shots.
+    if (player->m_BulletSyncRateTimer.Get() < 40)
+    {
+        UnlockSimSystem();
+        return true;
+    }
+    player->m_BulletSyncRateTimer.Reset();
 
     Broadcast(*packet, player->GetPuresyncSendList());
 
@@ -378,7 +471,7 @@ bool CSimPlayerManager::HandlePedTaskPacket(const NetServerPlayerID& Socket, Net
     if (!CNetBufferWatchDog::CanSendPacket(PACKET_ID_PED_TASK))
         return true;
 
-    LockSimSystem();            // Prevent player additions and deletions
+    LockSimSystem();  // Prevent player additions and deletions
 
     // Grab the source player
     CSimPlayer* pSourceSimPlayer = Get(Socket);

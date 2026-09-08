@@ -24,7 +24,7 @@ enum
 class CTaskComplexEnterCar : public virtual CTaskComplex
 {
 public:
-    virtual ~CTaskComplexEnterCar(){};
+    virtual ~CTaskComplexEnterCar() {};
 
     virtual int  GetTargetDoor() = 0;
     virtual void SetTargetDoor(int iDoor) = 0;
@@ -34,25 +34,25 @@ public:
 class CTaskComplexEnterCarAsDriver : public virtual CTaskComplexEnterCar
 {
 public:
-    virtual ~CTaskComplexEnterCarAsDriver(){};
+    virtual ~CTaskComplexEnterCarAsDriver() {};
 };
 
 class CTaskComplexEnterCarAsPassenger : public virtual CTaskComplexEnterCar
 {
 public:
-    virtual ~CTaskComplexEnterCarAsPassenger(){};
+    virtual ~CTaskComplexEnterCarAsPassenger() {};
 };
 
 class CTaskComplexEnterBoatAsDriver : public virtual CTaskComplex
 {
 public:
-    virtual ~CTaskComplexEnterBoatAsDriver(){};
+    virtual ~CTaskComplexEnterBoatAsDriver() {};
 };
 
 class CTaskComplexLeaveCar : public virtual CTaskComplex
 {
 public:
-    virtual ~CTaskComplexLeaveCar(){};
+    virtual ~CTaskComplexLeaveCar() {};
 
     virtual int GetTargetDoor() = 0;
 };

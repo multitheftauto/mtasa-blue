@@ -47,7 +47,7 @@ void CLogger::LogPrintfNoStamp(const char* szFormat, ...)
     HandleLogPrint(false, "", szBuffer, true, true);
 }
 
-#if 0   // Currently unused
+#if 0  // Currently unused
 void CLogger::LogPrintNoStamp ( const char* szText )
 {
     // Send to the console and logfile
@@ -68,7 +68,7 @@ void CLogger::ErrorPrintf(const char* szFormat, ...)
     HandleLogPrint(true, "ERROR: ", szBuffer, true, true);
 }
 
-#if 0   // Currently unused
+#if 0  // Currently unused
 void CLogger::DebugPrintf ( const char* szFormat, ... )
 {
     #ifdef MTA_DEBUG

@@ -16,7 +16,7 @@
 class CGUIScrollPane : public CGUIElement
 {
 public:
-    virtual ~CGUIScrollPane(){};
+    virtual ~CGUIScrollPane() {};
 
     virtual void SetHorizontalScrollBar(bool bEnabled) = 0;
     virtual void SetVerticalScrollBar(bool bEnabled) = 0;

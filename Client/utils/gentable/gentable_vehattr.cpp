@@ -50,6 +50,8 @@ int main()
     SetAttribute(table, 599, VEHICLE_HAS_SIRENS);
     SetAttribute(table, 601, VEHICLE_HAS_SIRENS);
     SetAttribute(table, 423, VEHICLE_HAS_SIRENS);
+    SetAttribute(table, 432, VEHICLE_HAS_SIRENS);
+    SetAttribute(table, 433, VEHICLE_HAS_SIRENS);
 
     SetAttribute(table, 592, VEHICLE_HAS_LANDING_GEARS);
     SetAttribute(table, 577, VEHICLE_HAS_LANDING_GEARS);

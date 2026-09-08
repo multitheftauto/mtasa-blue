@@ -4,7 +4,7 @@
  *
  *   The FreeType private base classes (body).
  *
- * Copyright (C) 1996-2025 by
+ * Copyright (C) 1996-2026 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -385,6 +385,7 @@
     FT_Pos   y_shift = 0;
     FT_Pos   x_left, y_top;
     FT_Pos   width, height, pitch;
+    FT_Bool  ret;
 
 
     if ( slot->format == FT_GLYPH_FORMAT_SVG )
@@ -495,6 +496,20 @@
     width  = pbox.xMax - pbox.xMin;
     height = pbox.yMax - pbox.yMin;
 
+    /* Flag the width or height unsuitable for rendering.   */
+    /* The limit is based on the ppem value when available. */
+    /* FT_Renderer modules should check the return value.   */
+    ret = FT_BOOL(     width >= 0x10000   ||    height >= 0x10000   ||
+                   pbox.xMin < -0x1000000 || pbox.xMax >= 0x1000000 ||
+                   pbox.yMin < -0x1000000 || pbox.yMax >= 0x1000000 ||
+             ( slot->face                                         &&
+               ( width  > 10 * slot->face->size->metrics.x_ppem ||
+                 height > 10 * slot->face->size->metrics.y_ppem ) ) );
+
+    if ( ret )
+      FT_TRACE3(( "ft_glyphslot_preset_bitmap: [%ld %ld %ld %ld]\n",
+                  pbox.xMin, pbox.yMin, pbox.xMax, pbox.yMax ));
+
     switch ( pixel_mode )
     {
     case FT_PIXEL_MODE_MONO:
@@ -524,15 +539,7 @@
     bitmap->rows       = (unsigned int)height;
     bitmap->pitch      = pitch;
 
-    if ( pbox.xMin < -0x8000 || pbox.xMax > 0x7FFF ||
-         pbox.yMin < -0x8000 || pbox.yMax > 0x7FFF )
-    {
-      FT_TRACE3(( "ft_glyphslot_preset_bitmap: [%ld %ld %ld %ld]\n",
-                  pbox.xMin, pbox.yMin, pbox.xMax, pbox.yMax ));
-      return 1;
-    }
-
-    return 0;
+    return ret;
   }
 
 
@@ -549,8 +556,7 @@
 
 
   FT_BASE_DEF( FT_Error )
-  ft_glyphslot_alloc_bitmap( FT_GlyphSlot  slot,
-                             FT_ULong      size )
+  ft_glyphslot_alloc_bitmap( FT_GlyphSlot  slot )
   {
     FT_Memory  memory = FT_FACE_MEMORY( slot->face );
     FT_Error   error;
@@ -561,7 +567,10 @@
     else
       slot->internal->flags |= FT_GLYPH_OWN_BITMAP;
 
-    FT_MEM_ALLOC( slot->bitmap.buffer, size );
+    /* dimensions must be preset */
+    FT_MEM_ALLOC_MULT( slot->bitmap.buffer,
+                       slot->bitmap.rows,
+                       slot->bitmap.pitch );
     return error;
   }
 
@@ -1413,7 +1422,10 @@
         if ( ( cur[0]->platform_id == TT_PLATFORM_MICROSOFT &&
                cur[0]->encoding_id == TT_MS_ID_UCS_4        )     ||
              ( cur[0]->platform_id == TT_PLATFORM_APPLE_UNICODE &&
-               cur[0]->encoding_id == TT_APPLE_ID_UNICODE_32    ) )
+               cur[0]->encoding_id == TT_APPLE_ID_UNICODE_32    ) ||
+             ( cur[0]->platform_id == TT_PLATFORM_APPLE_UNICODE &&
+               cur[0]->encoding_id == TT_APPLE_ID_FULL_UNICODE  &&
+               FT_Get_CMap_Format( cur[0] ) == 13               ) )
         {
           face->charmap = cur[0];
           return FT_Err_Ok;
@@ -2798,11 +2810,6 @@
       internal->refcount = 1;
 
       internal->no_stem_darkening = -1;
-
-#ifdef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
-      /* Per-face filtering can only be set up by FT_Face_Properties */
-      internal->lcd_filter_func = NULL;
-#endif
     }
 
     if ( aface )
@@ -4032,18 +4039,8 @@
       }
       else if ( properties->tag == FT_PARAM_TAG_LCD_FILTER_WEIGHTS )
       {
-#ifdef FT_CONFIG_OPTION_SUBPIXEL_RENDERING
-        if ( properties->data )
-        {
-          ft_memcpy( face->internal->lcd_weights,
-                     properties->data,
-                     FT_LCD_FILTER_FIVE_TAPS );
-          face->internal->lcd_filter_func = ft_lcd_filter_fir;
-        }
-#else
         error = FT_THROW( Unimplemented_Feature );
         goto Exit;
-#endif
       }
       else if ( properties->tag == FT_PARAM_TAG_RANDOM_SEED )
       {
@@ -4740,120 +4737,113 @@
     FT_Error     error = FT_Err_Ok;
     FT_Face      face  = slot->face;
     FT_Renderer  renderer;
+    FT_ListNode  node = NULL;
 
 
-    switch ( slot->format )
+    /* try to render colored glyph layers as a special case */
+    if ( slot->internal->load_flags & FT_LOAD_COLOR &&
+         slot->format == FT_GLYPH_FORMAT_OUTLINE    )
     {
-    default:
-      if ( slot->internal->load_flags & FT_LOAD_COLOR )
+      FT_LayerIterator  iterator;
+
+      FT_UInt  base_glyph = slot->glyph_index;
+
+      FT_Bool  have_layers;
+      FT_UInt  glyph_index;
+      FT_UInt  color_index;
+
+
+      iterator.p  = NULL;
+      have_layers = FT_Get_Color_Glyph_Layer( face,
+                                              base_glyph,
+                                              &glyph_index,
+                                              &color_index,
+                                              &iterator );
+      if ( have_layers )
       {
-        FT_LayerIterator  iterator;
-
-        FT_UInt  base_glyph = slot->glyph_index;
-
-        FT_Bool  have_layers;
-        FT_UInt  glyph_index;
-        FT_UInt  color_index;
-
-
-        /* check whether we have colored glyph layers */
-        iterator.p  = NULL;
-        have_layers = FT_Get_Color_Glyph_Layer( face,
-                                                base_glyph,
-                                                &glyph_index,
-                                                &color_index,
-                                                &iterator );
-        if ( have_layers )
+        error = FT_New_GlyphSlot( face, NULL );
+        if ( !error )
         {
-          error = FT_New_GlyphSlot( face, NULL );
-          if ( !error )
+          TT_Face       ttface = (TT_Face)face;
+          SFNT_Service  sfnt   = (SFNT_Service)ttface->sfnt;
+
+
+          do
           {
-            TT_Face       ttface = (TT_Face)face;
-            SFNT_Service  sfnt   = (SFNT_Service)ttface->sfnt;
+            FT_Int32  load_flags = slot->internal->load_flags;
 
 
-            do
-            {
-              FT_Int32  load_flags = slot->internal->load_flags;
+            /* disable the `FT_LOAD_COLOR' flag to avoid recursion */
+            /* right here in this function                         */
+            load_flags &= ~FT_LOAD_COLOR;
 
+            /* render into the new `face->glyph' glyph slot */
+            load_flags |= FT_LOAD_RENDER | FT_LOAD_NO_BITMAP;
 
-              /* disable the `FT_LOAD_COLOR' flag to avoid recursion */
-              /* right here in this function                         */
-              load_flags &= ~FT_LOAD_COLOR;
+            error = FT_Load_Glyph( face, glyph_index, load_flags );
+            if ( error )
+              break;
 
-              /* render into the new `face->glyph' glyph slot */
-              load_flags |= FT_LOAD_RENDER;
+            /* blend new `face->glyph' into old `slot'; */
+            /* at the first call, `slot' is still empty */
+            error = sfnt->colr_blend( ttface,
+                                      color_index,
+                                      slot,
+                                      face->glyph );
+            if ( error )
+              break;
 
-              error = FT_Load_Glyph( face, glyph_index, load_flags );
-              if ( error )
-                break;
-
-              /* blend new `face->glyph' into old `slot'; */
-              /* at the first call, `slot' is still empty */
-              error = sfnt->colr_blend( ttface,
-                                        color_index,
-                                        slot,
-                                        face->glyph );
-              if ( error )
-                break;
-
-            } while ( FT_Get_Color_Glyph_Layer( face,
-                                                base_glyph,
-                                                &glyph_index,
-                                                &color_index,
-                                                &iterator ) );
-
-            if ( !error )
-              slot->format = FT_GLYPH_FORMAT_BITMAP;
-
-            /* this call also restores `slot' as the glyph slot */
-            FT_Done_GlyphSlot( face->glyph );
-          }
+          } while ( FT_Get_Color_Glyph_Layer( face,
+                                              base_glyph,
+                                              &glyph_index,
+                                              &color_index,
+                                              &iterator ) );
 
           if ( !error )
-            return error;
+            slot->format = FT_GLYPH_FORMAT_BITMAP;
 
-          /* Failed to do the colored layer.  Draw outline instead. */
-          slot->format = FT_GLYPH_FORMAT_OUTLINE;
-        }
-      }
-
-      {
-        FT_ListNode  node = NULL;
-
-
-        /* small shortcut for the very common case */
-        if ( slot->format == FT_GLYPH_FORMAT_OUTLINE )
-        {
-          renderer = library->cur_renderer;
-          node     = library->renderers.head;
-        }
-        else
-          renderer = FT_Lookup_Renderer( library, slot->format, &node );
-
-        error = FT_ERR( Cannot_Render_Glyph );
-        while ( renderer )
-        {
-          error = renderer->render( renderer, slot, render_mode, NULL );
-          if ( !error                                   ||
-               FT_ERR_NEQ( error, Cannot_Render_Glyph ) )
-            break;
-
-          /* FT_Err_Cannot_Render_Glyph is returned if the render mode   */
-          /* is unsupported by the current renderer for this glyph image */
-          /* format.                                                     */
-
-          /* now, look for another renderer that supports the same */
-          /* format.                                               */
-          renderer = FT_Lookup_Renderer( library, slot->format, &node );
+          /* this call also restores `slot' as the glyph slot */
+          FT_Done_GlyphSlot( face->glyph );
         }
 
-        /* it is not an error if we cannot render a bitmap glyph */
-        if ( FT_ERR_EQ( error, Cannot_Render_Glyph ) &&
-             slot->format == FT_GLYPH_FORMAT_BITMAP  )
-          error = FT_Err_Ok;
+        if ( !error )
+          return error;
+
+        /* Failed to do the colored layer.  Draw outline instead. */
+        slot->format = FT_GLYPH_FORMAT_OUTLINE;
       }
     }
+
+    /* small shortcut for the very common case */
+    if ( slot->format == FT_GLYPH_FORMAT_OUTLINE )
+    {
+      renderer = library->cur_renderer;
+      node     = library->renderers.head;
+    }
+    else
+      renderer = FT_Lookup_Renderer( library, slot->format, &node );
+
+    error = FT_ERR( Cannot_Render_Glyph );
+    while ( renderer )
+    {
+      error = renderer->render( renderer, slot, render_mode, NULL );
+      if ( !error                                   ||
+           FT_ERR_NEQ( error, Cannot_Render_Glyph ) )
+        break;
+
+      /* FT_Err_Cannot_Render_Glyph is returned if the render mode   */
+      /* is unsupported by the current renderer for this glyph image */
+      /* format.                                                     */
+
+      /* now, look for another renderer that supports the same */
+      /* format.                                               */
+      renderer = FT_Lookup_Renderer( library, slot->format, &node );
+    }
+
+    /* it is not an error if we cannot render a bitmap glyph */
+    if ( FT_ERR_EQ( error, Cannot_Render_Glyph ) &&
+         slot->format == FT_GLYPH_FORMAT_BITMAP  )
+      error = FT_Err_Ok;
 
 #ifdef FT_DEBUG_LEVEL_TRACE
 

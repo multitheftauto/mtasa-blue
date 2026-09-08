@@ -32,13 +32,14 @@ static void InitializeGrenadeColModel()
         &colModelGrenade.m_data->m_spheres[0], colModelGrenade.m_sphere.m_radius * 0.75f, colModelGrenade.m_sphere.m_center, 56, 0, 255);
 }
 
-#define HOOKPOS_CTempColModels__Initialise 0x5BB87D
+#define HOOKPOS_CTempColModels__Initialise  0x5BB87D
 #define HOOKSIZE_CTempColModels__Initialise 0x6
-static const unsigned int RETURN_CTempColModels__Initialise = 0x5BB883;
+static const unsigned int     RETURN_CTempColModels__Initialise = 0x5BB883;
 static void __declspec(naked) HOOK_CTempColModels__Initialise()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov ds:[0x968FE4], edx
@@ -47,15 +48,17 @@ static void __declspec(naked) HOOK_CTempColModels__Initialise()
 
         jmp RETURN_CTempColModels__Initialise
     }
+    // clang-format on
 }
 
-#define HOOKPOS_CFileLoader__LoadWeaponObject 0x5B401E
+#define HOOKPOS_CFileLoader__LoadWeaponObject  0x5B401E
 #define HOOKSIZE_CFileLoader__LoadWeaponObject 0x5
-static const unsigned int RETURN_CFileLoader__LoadWeaponObject = 0x5B4023;
+static const unsigned int     RETURN_CFileLoader__LoadWeaponObject = 0x5B4023;
 static void __declspec(naked) HOOK_CFileLoader__LoadWeaponObject()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         mov eax, [esp+0x8]
@@ -75,6 +78,7 @@ static void __declspec(naked) HOOK_CFileLoader__LoadWeaponObject()
         push offset colModelGrenade
         jmp RETURN_CFileLoader__LoadWeaponObject
     }
+    // clang-format on
 }
 
 void CMultiplayerSA::InitHooks_ProjectileCollisionFix()

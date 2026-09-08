@@ -42,14 +42,15 @@ static void ColStoreRemoveRef(CObjectSAInterface* gameObject)
 // >>> 0x59F8D1 | 0D 00 00 01 00    | or      eax, 10000h
 // >>> 0x59F8D6 | 89 86 40 01 00 00 | mov     [esi+140h], eax
 //     0x59F8DC | 0F BF 4E 22       | movsx   ecx, word ptr [esi+22h]
-#define HOOKPOS_CObject_Init               0x59F8BE
-#define HOOKSIZE_CObject_Init              30
+#define HOOKPOS_CObject_Init  0x59F8BE
+#define HOOKSIZE_CObject_Init 30
 static const DWORD CONTINUE_CObject_Init = 0x59F8DC;
 
 static void __declspec(naked) HOOK_CObject_Init()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -65,6 +66,7 @@ static void __declspec(naked) HOOK_CObject_Init()
 
         jmp     CONTINUE_CObject_Init
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -83,14 +85,15 @@ static void __declspec(naked) HOOK_CObject_Init()
 // >>> 0x59F701 | E8 CA 10 E7 FF       | call    CColStore::RemoveRef(int)
 // >>> 0x59F706 | 83 C4 04             | add     esp, 4
 //     0x59F709 | 8B 3D 9C 44 B7 00    | mov     edi, ds:CPools::ms_pObjectPool
-#define HOOKPOS_CObject_Destructor               0x59F6EE
-#define HOOKSIZE_CObject_Destructor              27
+#define HOOKPOS_CObject_Destructor  0x59F6EE
+#define HOOKSIZE_CObject_Destructor 27
 static const DWORD CONTINUE_CObject_Destructor = 0x59F709;
 
 static void __declspec(naked) HOOK_CObject_Destructor()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         pushad
@@ -100,6 +103,7 @@ static void __declspec(naked) HOOK_CObject_Destructor()
         popad
         jmp     CONTINUE_CObject_Destructor
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

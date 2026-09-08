@@ -45,7 +45,8 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
         switch (policy)
         {
             case MultiCommandHandlerPolicy::BLOCK:
-                g_pGame->GetScriptDebugging()->LogError(pLuaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", szKey);
+                g_pGame->GetScriptDebugging()->LogError(
+                    pLuaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", szKey);
                 return false;
 
             case MultiCommandHandlerPolicy::WARN:
@@ -189,7 +190,7 @@ bool CRegisteredCommands::ProcessCommand(const char* szKey, const char* szArgume
             if (m_pACLManager->CanObjectUseRight(
                     pClient->GetAccount()->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, (*iter)->strKey,
                     CAccessControlListRight::RIGHT_TYPE_COMMAND,
-                    !(*iter)->bRestricted))            // If this command is restricted, the default access should be false unless granted specially
+                    !(*iter)->bRestricted))  // If this command is restricted, the default access should be false unless granted specially
             {
                 // Call it
                 CallCommandHandler((*iter)->pLuaMain, (*iter)->iLuaFunction, (*iter)->strKey, szArguments, pClient);

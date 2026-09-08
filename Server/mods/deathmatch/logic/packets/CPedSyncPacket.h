@@ -21,19 +21,19 @@ class CPedSyncPacket final : public CPacket
 public:
     struct SyncData
     {
-        ElementID           ID;
-        unsigned char       ucFlags;
-        std::uint8_t        flags2;
-        unsigned char       ucSyncTimeContext;
-        SPositionSync       position;
-        SPedRotationSync    rotation;
-        SVelocitySync       velocity;
-        float               fHealth;
-        float               fArmor;
-        bool                bOnFire;
-        bool                bIsInWater;
-        bool                isReloadingWeapon;
-        float               cameraRotation;
+        ElementID        ID;
+        unsigned char    ucFlags;
+        std::uint8_t     flags2;
+        unsigned char    ucSyncTimeContext;
+        SPositionSync    position;
+        SPedRotationSync rotation;
+        SVelocitySync    velocity;
+        float            fHealth;
+        float            fArmor;
+        bool             bOnFire;
+        bool             bIsInWater;
+        bool             isReloadingWeapon;
+        float            cameraRotation;
 
         bool ReadSpatialData(NetBitStreamInterface& BitStream);
         // Backward compatibility
@@ -42,7 +42,7 @@ public:
 
 public:
     // Used when receiving ped sync from clients, can contain multiple SyncData
-    CPedSyncPacket(){};
+    CPedSyncPacket() {};
     // Used when sending ped sync to clients, only contains one SyncData
     CPedSyncPacket(SyncData& pReadData);
 

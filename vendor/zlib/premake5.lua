@@ -2,6 +2,7 @@ project "zlib"
 	language "C"
 	kind "StaticLib"
 	targetname "zlib"
+	warnings "Off"
 
 	vpaths {
 		["Headers/*"] = "*.h",

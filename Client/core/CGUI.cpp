@@ -20,11 +20,11 @@ template <>
 CLocalGUI* CSingleton<CLocalGUI>::m_pSingleton = NULL;
 
 #ifndef HIWORD
-    #define HIWORD(l)           ((WORD)((DWORD_PTR)(l) >> 16))
+    #define HIWORD(l) ((WORD)((DWORD_PTR)(l) >> 16))
 #endif
-#define GET_WHEEL_DELTA_WPARAM(wParam)  ((short)HIWORD(wParam))
+#define GET_WHEEL_DELTA_WPARAM(wParam) ((short)HIWORD(wParam))
 
-const char* const DEFAULT_SKIN_NAME = "Default 2023";            // TODO: Change to whatever the default skin is if it changes
+const char* const DEFAULT_SKIN_NAME = "Default 2023";  // TODO: Change to whatever the default skin is if it changes
 
 CLocalGUI::CLocalGUI()
 {
@@ -45,6 +45,7 @@ CLocalGUI::CLocalGUI()
     m_LastSettingsRevision = -1;
     m_LocaleChangeCounter = 0;
     m_bHasQueuedLocaleChange = false;
+    m_bPendingRestartPrompt = false;
 }
 
 CLocalGUI::~CLocalGUI()
@@ -57,6 +58,22 @@ CLocalGUI::~CLocalGUI()
 
 void CLocalGUI::SetSkin(const char* szName)
 {
+    // CC51's pump runs pulse code on half-destroyed windows, so re-entrant
+    // calls are skipped. The guard clears on throw.
+    static bool s_bInSetSkin = false;
+    if (s_bInSetSkin)
+        return;
+    struct SetSkinGuard
+    {
+        bool& flag;
+        explicit SetSkinGuard(bool& inFlag) : flag(inFlag) { flag = true; }
+        ~SetSkinGuard() { flag = false; }
+    } guard(s_bInSetSkin);
+
+    // A fatal fault dialog is pumping messages; dont rebuild windows from inside it.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return;
+
     CVector2D consolePos, consoleSize;
 
     bool guiWasLoaded = m_pMainMenu != NULL;
@@ -89,7 +106,9 @@ void CLocalGUI::SetSkin(const char* szName)
         }
         catch (...)
         {
-            // Even the default skin doesn't work, so give up
+            // Mark both layers' dialog flags first, so a nested fault exits instead of stacking.
+            CLocalGUI::SetFaultDialogOpen(true);
+            pGUI->SetFatalFaultDialogOpen(true);
             MessageBoxUTF8(0, _("The skin you selected could not be loaded, and the default skin also could not be loaded, please reinstall MTA."),
                            _("Error") + _E("CC51"), MB_OK | MB_ICONERROR | MB_TOPMOST);
             TerminateProcess(GetCurrentProcess(), 9);
@@ -104,6 +123,8 @@ void CLocalGUI::SetSkin(const char* szName)
         CreateWindows(guiWasLoaded);
         m_pConsole->SetPosition(consolePos);
         m_pConsole->SetSize(consoleSize);
+        // QuestionBox was destroyed with MainMenu; re-show if settings still need a restart
+        TryShowRestartPrompt();
     }
 
     if (CCore::GetSingleton().GetConsole() && !error.empty())
@@ -112,6 +133,13 @@ void CLocalGUI::SetSkin(const char* szName)
 
 void CLocalGUI::ChangeLocale(const char* szName)
 {
+    // Windows are gone mid-rebuild, or a fatal dialog is pumping messages.
+    if (!m_pConsole) [[unlikely]]
+        return;
+
+    if (CLocalGUI::IsFaultDialogOpen())
+        return;
+
     bool guiWasLoaded = m_pMainMenu != NULL;
     assert(guiWasLoaded);
 
@@ -143,6 +171,8 @@ void CLocalGUI::ChangeLocale(const char* szName)
         CreateWindows(guiWasLoaded);
         m_pConsole->SetPosition(consolePos);
         m_pConsole->SetSize(consoleSize);
+        // QuestionBox was destroyed with MainMenu; re-show if settings still need a restart
+        TryShowRestartPrompt();
     }
 }
 
@@ -247,9 +277,66 @@ void CLocalGUI::RequestLocaleChange(const SString& strLocale)
         CVARS_SET("locale", m_LastLocaleName);
 }
 
+void CLocalGUI::RequestRestartPrompt()
+{
+    m_bPendingRestartPrompt = true;
+    TryShowRestartPrompt();
+}
+
+void CLocalGUI::TryShowRestartPrompt()
+{
+    if (!m_bPendingRestartPrompt || !m_pMainMenu)
+        return;
+
+    // Wait until locale/skin rebuilds finish so the prompt is not destroyed with MainMenu
+    if (m_bHasQueuedLocaleChange)
+        return;
+
+    SString strCurrentSkinName;
+    CVARS_GET("current_skin", strCurrentSkinName);
+    if (!strCurrentSkinName.empty() && strCurrentSkinName != m_LastSkinName)
+        return;
+
+    CQuestionBox* pQuestionBox = m_pMainMenu->GetQuestionWindow();
+    if (pQuestionBox->IsVisible())
+        return;
+
+    SString strMessage = _("Some settings will be changed when you next start MTA");
+    strMessage += _("\n\nDo you want to restart now?");
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(_("RESTART REQUIRED"));
+    pQuestionBox->SetMessage(strMessage);
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(RestartPromptCallBack);
+    pQuestionBox->Show();
+}
+
+void CLocalGUI::RestartPromptCallBack(void* pData, unsigned int uiButton)
+{
+    CLocalGUI* pLocalGUI = CLocalGUI::GetSingletonPtr();
+    if (!pLocalGUI)
+        return;
+
+    if (CMainMenu* pMainMenu = pLocalGUI->GetMainMenu())
+        pMainMenu->GetQuestionWindow()->Reset();
+
+    pLocalGUI->ClearRestartPrompt();
+
+    if (uiButton == 1)
+    {
+        SetOnQuitCommand("restart");
+        CCore::GetSingleton().Quit();
+    }
+}
+
 void CLocalGUI::ApplyQueuedLocale()
 {
     if (!m_bHasQueuedLocaleChange)
+        return;
+
+    // Console is gone mid-rebuild; keep the request queued for a later pulse.
+    if (!m_pConsole)
         return;
 
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();
@@ -264,7 +351,8 @@ void CLocalGUI::ApplyQueuedLocale()
 
     if (CCore::GetSingleton().GetModManager()->IsLoaded())
     {
-        CCore::GetSingleton().GetConsole()->Printf("Please disconnect before changing language");
+        if (CConsoleInterface* pConsole = CCore::GetSingleton().GetConsole())
+            pConsole->Printf("Please disconnect before changing language");
         if (cvars)
             cvars->Set("locale", m_LastLocaleName);
 
@@ -297,6 +385,10 @@ void CLocalGUI::ApplyQueuedLocale()
 
 void CLocalGUI::DoPulse()
 {
+    // A fatal dialog is pumping messages; pulse work touches CEGUI and would throw.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return;
+
     m_pVersionUpdater->DoPulse();
 
     CClientVariables* cvars = CCore::GetSingleton().GetCVars();
@@ -316,7 +408,8 @@ void CLocalGUI::DoPulse()
                 SetSkin(currentSkinName);
             else
             {
-                CCore::GetSingleton().GetConsole()->Printf("Please disconnect before changing skin");
+                if (CConsoleInterface* pConsole = CCore::GetSingleton().GetConsole())
+                    pConsole->Printf("Please disconnect before changing skin");
                 cvars->Set("current_skin", m_LastSkinName);
             }
         }
@@ -347,23 +440,55 @@ void CLocalGUI::DoPulse()
         if (m_LocaleChangeCounter >= 5)
             ApplyQueuedLocale();
     }
+
+    // Show after any deferred locale/skin work so a prior prompt is not lost
+    TryShowRestartPrompt();
+}
+// True while the fatal CC51 dialog is open: nested faults exit instead of stacking.
+static bool s_bFaultDialogOpen = false;
+bool        CLocalGUI::IsFaultDialogOpen() noexcept
+{
+    if (s_bFaultDialogOpen)
+        return true;
+
+    // CC54 does the same from the CEGUI layer.
+    if (CGUI* pGUI = CCore::GetSingleton().GetGUI())
+        return pGUI->IsFatalFaultDialogOpen();
+
+    return false;
+}
+void CLocalGUI::SetFaultDialogOpen(bool bOpen) noexcept
+{
+    s_bFaultDialogOpen = bOpen;
 }
 
+// CEGUI faults are caught in CGUI_Impl::Draw; anything else goes to the crash handler.
 void CLocalGUI::Draw()
 {
     // Get the game interface
-    CGame*       pGame = CCore::GetSingleton().GetGame();
-    SystemState  systemState = pGame->GetSystemState();
-    CGUI*        pGUI = CCore::GetSingleton().GetGUI();
+    CGame*            pGame = CCore::GetSingleton().GetGame();
+    SystemState::Enum systemState = pGame->GetSystemState();
+    CGUI*             pGUI = CCore::GetSingleton().GetGUI();
+
+    // Windows are gone mid-rebuild; skip drawing until they are back.
+    if (!m_pMainMenu) [[unlikely]]
+        return;
+
+    // A fatal dialog is pumping messages; dont redraw CEGUI or the same fault
+    // would rethrow each frame and terminate before the dialog can be read.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return;
 
     // Update mainmenu stuff
     m_pMainMenu->Update();
 
     // If we're ingame, make sure the chatbox is drawn
-    bool bChatVisible = (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());
+    bool bChatVisible =
+        (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());
     if (m_pChat->IsVisible() != bChatVisible)
         m_pChat->SetVisible(bChatVisible, !bChatVisible);
-    bool bDebugVisible = (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_pDebugViewVisible && !CCore::GetSingleton().IsOfflineMod());
+    bool bDebugVisible =
+        (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_pDebugViewVisible && !CCore::GetSingleton().IsOfflineMod());
     if (m_pDebugView->IsVisible() != bDebugVisible)
         m_pDebugView->SetVisible(bDebugVisible, true);
 
@@ -417,9 +542,14 @@ void CLocalGUI::Restore()
 
 void CLocalGUI::DrawMouseCursor()
 {
+    // Same reason as Draw: the fault dialog's pump must not re-enter CEGUI.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return;
+
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
-    pGUI->DrawMouseCursor();
+    if (pGUI)
+        pGUI->DrawMouseCursor();
 }
 
 CConsole* CLocalGUI::GetConsole()
@@ -743,7 +873,7 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 return true;
             case WM_IME_KEYDOWN:
             {
-                // Handle space/return seperately in this case
+                // Handle space/return separately in this case
                 if (wParam == VK_SPACE)
                     pGUI->ProcessCharacter(MapVirtualKey(wParam, MAPVK_VK_TO_CHAR));
 
@@ -768,25 +898,15 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
 
 bool CLocalGUI::InputGoesToGUI()
 {
+    // A fatal fault dialog is pumping messages; dont route input into CEGUI.
+    if (CLocalGUI::IsFaultDialogOpen())
+        return false;
+
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
     if (!pGUI)
         return false;
 
-    bool shouldShowCursorForGUI = false;
-    if (pGUI->GetGUIInputEnabled())
-    {
-        eInputMode inputMode = pGUI->GetGUIInputMode();
-        if (inputMode == INPUTMODE_NO_BINDS_ON_EDIT)
-        {
-            shouldShowCursorForGUI = true;
-        }
-        else if (inputMode == INPUTMODE_NO_BINDS)
-        {
-            shouldShowCursorForGUI = false;
-        }
-    }
-    
-    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || shouldShowCursorForGUI ||
+    return (IsConsoleVisible() || IsMainMenuVisible() || IsChatBoxInputEnabled() || m_bForceCursorVisible || pGUI->GetGUIInputEnabled() ||
             !CCore::GetSingleton().IsFocused() || IsWebRequestGUIVisible());
 }
 
@@ -797,6 +917,8 @@ void CLocalGUI::ForceCursorVisible(bool bVisible)
 
 void CLocalGUI::UpdateCursor()
 {
+    // Only called from Draw, which already returns while a fatal fault dialog
+    // is open, so the CEGUI calls below never run against a broken GUI state.
     CGUI* pGUI = CCore::GetSingleton().GetGUI();
 
     static DWORD dwWidth = CDirect3DData::GetSingleton().GetViewportWidth();
@@ -897,13 +1019,13 @@ DWORD CLocalGUI::TranslateScanCodeToGUIKey(DWORD dwCharacter)
         case VK_DELETE:
             return DIK_DELETE;
         case 0x56:
-            return DIK_V;            // V
+            return DIK_V;  // V
         case 0x43:
-            return DIK_C;            // C
+            return DIK_C;  // C
         case 0x58:
-            return DIK_X;            // X
+            return DIK_X;  // X
         case 0x41:
-            return DIK_A;            // A
+            return DIK_A;  // A
         default:
             return 0;
     }

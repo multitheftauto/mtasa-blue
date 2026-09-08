@@ -16,7 +16,7 @@
 class CGUITab : public CGUIElement
 {
 public:
-    virtual ~CGUITab(){};
+    virtual ~CGUITab() {};
 
     virtual void SetCaption(const char* szCaption) = 0;
 };

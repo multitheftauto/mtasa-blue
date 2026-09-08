@@ -32,7 +32,6 @@ void InitRwFunctions()
     RwTexDictionarySetCurrent = (RwTexDictionarySetCurrent_t)0x007F3A70;
     RwTexDictionaryForAllTextures = (RwTexDictionaryForAllTextures_t)0x007F3730;
     RwTexDictionaryAddTexture = (RwTexDictionaryAddTexture_t)0x007F3980;
-    RwTexDictionaryRemoveTexture = (RwTexDictionaryRemoveTexture_t)0x007F39C0;
     RwTexDictionaryStreamWrite = (RwTexDictionaryStreamWrite_t)0x008049F0;
     rwD3D9NativeTextureRead = (rwD3D9NativeTextureRead_t)0x004CD820;
     RpPrtStdGlobalDataSetStreamEmbedded = (RpPrtStdGlobalDataSetStreamEmbedded_t)0x0041B350;
@@ -90,14 +89,13 @@ void InitRwFunctions()
     RpHAnimIDGetIndex = (RpHAnimIDGetIndex_t)0x7C51A0;
     RpHAnimHierarchyGetMatrixArray = (RpHAnimHierarchyGetMatrixArray_t)0x7C5120;
     RtQuatRotate = (RtQuatRotate_t)0x7EB7C0;
-    
+
     SetTextureDict = (SetTextureDict_t)0x007319C0;
     LoadClumpFile = (LoadClumpFile_t)0x005371F0;
     LoadModel = (LoadModel_t)0x0040C6B0;
     LoadCollisionModel = (LoadCollisionModel_t)0x00537580;
     LoadCollisionModelVer2 = (LoadCollisionModelVer2_t)0x00537EE0;
     LoadCollisionModelVer3 = (LoadCollisionModelVer3_t)0x00537CE0;
-    LoadCollisionModelVer4 = (LoadCollisionModelVer4_t)0x00537AE0;
     CTxdStore_LoadTxd = (CTxdStore_LoadTxd_t)0x00731DD0;
     CTxdStore_GetTxd = (CTxdStore_GetTxd_t)0x00408340;
     CTxdStore_RemoveTxd = (CTxdStore_RemoveTxd_t)0x00731E90;

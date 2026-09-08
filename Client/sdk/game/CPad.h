@@ -15,31 +15,31 @@
 class CControllerState
 {
 public:
-    signed short LeftStickX;             // move/steer left (-128?)/right (+128)
-    signed short LeftStickY;             // move back(+128)/forwards(-128?)
-    signed short RightStickX;            // numpad 6(+128)/numpad 4(-128?)
+    signed short LeftStickX;   // move/steer left (-128?)/right (+128)
+    signed short LeftStickY;   // move back(+128)/forwards(-128?)
+    signed short RightStickX;  // numpad 6(+128)/numpad 4(-128?)
     signed short RightStickY;
 
     signed short LeftShoulder1;
     signed short LeftShoulder2;
-    signed short RightShoulder1;            // target / hand brake
+    signed short RightShoulder1;  // target / hand brake
     signed short RightShoulder2;
 
-    signed short DPadUp;              // radio change up
-    signed short DPadDown;            // radio change down
+    signed short DPadUp;    // radio change up
+    signed short DPadDown;  // radio change down
     signed short DPadLeft;
     signed short DPadRight;
 
     signed short Start;
     signed short Select;
 
-    signed short ButtonSquare;              // jump / reverse
-    signed short ButtonTriangle;            // get in/out
-    signed short ButtonCross;               // sprint / accelerate
-    signed short ButtonCircle;              // fire
+    signed short ButtonSquare;    // jump / reverse
+    signed short ButtonTriangle;  // get in/out
+    signed short ButtonCross;     // sprint / accelerate
+    signed short ButtonCircle;    // fire
 
     signed short ShockButtonL;
-    signed short ShockButtonR;            // look behind
+    signed short ShockButtonR;  // look behind
 
     signed short m_bChatIndicated;
     signed short m_bPedWalk;
@@ -63,4 +63,10 @@ public:
     virtual void              Clear() = 0;
     virtual void              SetHornHistoryValue(bool value) = 0;
     virtual void              SetLastTimeTouched(DWORD dwTime) = 0;
+
+    // PC never consumes these itself (CPad::ProcessPCSpecificStuff is a stub), so joystick
+    // code reads/ticks them to drive XInput rumble.
+    virtual short         GetShakeDur() = 0;
+    virtual unsigned char GetShakeFreq() = 0;
+    virtual void          SetShakeDur(short sShakeDur) = 0;
 };

@@ -29,6 +29,7 @@ CAnimBlendAssociationSAInterface* CAnimBlendAssocGroupSA::CopyAnimation(unsigned
 
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendAssocGroup_CopyAnimation;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
@@ -36,6 +37,7 @@ CAnimBlendAssociationSAInterface* CAnimBlendAssocGroupSA::CopyAnimation(unsigned
         call    dwFunc
         mov     pAnimAssociationReturn, eax
     }
+    // clang-format on
     return pAnimAssociationReturn;
 }
 
@@ -43,12 +45,14 @@ void CAnimBlendAssocGroupSA::InitEmptyAssociations(RpClump* pClump)
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendAssocGroup_InitEmptyAssociations;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         push    pClump
         call    dwFunc
     }
+    // clang-format on
 }
 
 bool CAnimBlendAssocGroupSA::IsCreated()
@@ -56,12 +60,14 @@ bool CAnimBlendAssocGroupSA::IsCreated()
     bool  bReturn;
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendAssocGroup_IsCreated;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     bReturn, al
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -70,12 +76,14 @@ int CAnimBlendAssocGroupSA::GetNumAnimations()
     int   iReturn;
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendAssocGroup_GetNumAnimations;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     iReturn, eax
     }
+    // clang-format on
     return iReturn;
 }
 
@@ -92,6 +100,7 @@ CAnimBlendStaticAssociation* CAnimBlendAssocGroupSA::GetAnimation(unsigned int I
     CAnimBlendStaticAssociation* pReturn;
     DWORD                        dwThis = (DWORD)m_pInterface;
     DWORD                        dwFunc = FUNC_CAnimBlendAssocGroup_GetAnimation;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
@@ -99,6 +108,7 @@ CAnimBlendStaticAssociation* CAnimBlendAssocGroupSA::GetAnimation(unsigned int I
         call    dwFunc
         mov     pReturn, eax
     }
+    // clang-format on
     return pReturn;
 }
 
@@ -124,12 +134,14 @@ void CAnimBlendAssocGroupSA::CreateAssociations(const char* szBlockName)
 {
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CAnimBlendAssocGroup_CreateAssociations;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         push    szBlockName
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CAnimBlendAssocGroupSA::SetupAnimBlock()

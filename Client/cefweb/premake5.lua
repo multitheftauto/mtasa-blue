@@ -3,6 +3,7 @@ project "Client Webbrowser"
 	kind "SharedLib"
 	targetname "cefweb"
 	targetdir(buildpath("mta"))
+	clangtidy "On"
 
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }

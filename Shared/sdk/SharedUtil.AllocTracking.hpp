@@ -18,17 +18,17 @@
 //
 #if WITH_ALLOC_TRACKING
 
-#undef map
-#ifdef WIN32
-    #undef malloc
-    #undef realloc
-    #undef calloc
-    #undef free
-    #define thread_id uint
-#else
-    #define GetCurrentThreadId pthread_self
-    #define thread_id pthread_t
-#endif
+    #undef map
+    #ifdef WIN32
+        #undef malloc
+        #undef realloc
+        #undef calloc
+        #undef free
+        #define thread_id uint
+    #else
+        #define GetCurrentThreadId pthread_self
+        #define thread_id          pthread_t
+    #endif
 
 namespace
 {
@@ -76,7 +76,7 @@ namespace
             return NULL;
         return &it->second;
     }
-}            // namespace
+}  // namespace
 
 struct CAllocInfo
 {
@@ -88,18 +88,18 @@ struct CAllocInfo
 };
 
 static int stats_ready = 1;
-#ifdef ALLOC_STATS_MODULE_NAME
-    #ifndef ALLOC_STATS_PRE_COUNT
-        #define ALLOC_STATS_PRE_COUNT 0     // Increase if crash at startup
-    #endif
+    #ifdef ALLOC_STATS_MODULE_NAME
+        #ifndef ALLOC_STATS_PRE_COUNT
+            #define ALLOC_STATS_PRE_COUNT 0  // Increase if crash at startup
+        #endif
 static int pre_count = ALLOC_STATS_PRE_COUNT;
-#else
-    #define ALLOC_STATS_MODULE_NAME "none"
+    #else
+        #define ALLOC_STATS_MODULE_NAME "none"
 static int pre_count = -1;
-#endif
+    #endif
 
-static int no_stuff = 0;            // No tracking when tracker is allocating
-#define INVALID_THREAD_ID (-2)
+static int no_stuff = 0;  // No tracking when tracker is allocating
+    #define INVALID_THREAD_ID (-2)
 
 typedef unsigned char BYTE;
 
@@ -309,7 +309,7 @@ public:
     {
         thread_id dwThreadWanting = GetCurrentThreadId();
         if (dwThreadWanting == dwThreadUsing)
-            return false;            // No tracking when tracker is allocating
+            return false;  // No tracking when tracker is allocating
         cs.Lock();
         dwThreadUsing = dwThreadWanting;
         return true;
@@ -463,12 +463,12 @@ MTAEXPORT unsigned long GetAllocStats(uint uiType, void* pOutData, unsigned long
     return 0;
 }
 
-#define map CMap
-#ifdef WIN32
-    #define malloc _malloc_
-    #define realloc _realloc_
-    #define calloc _calloc_
-    #define free _free_
-#endif
+    #define map CMap
+    #ifdef WIN32
+        #define malloc  _malloc_
+        #define realloc _realloc_
+        #define calloc  _calloc_
+        #define free    _free_
+    #endif
 
 #endif  // WITH_ALLOC_TRACKING

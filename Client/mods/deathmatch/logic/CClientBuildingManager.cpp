@@ -10,7 +10,7 @@
 
 #include "StdInc.h"
 
-constexpr float WORLD_DISTANCE_FROM_CENTER = 3000.0f;
+constexpr float  WORLD_DISTANCE_FROM_CENTER = 3000.0f;
 constexpr size_t PRESERVED_POOL_SIZE = 2000;
 constexpr size_t RESIZE_POOL_STEP = 5000;
 
@@ -43,6 +43,14 @@ void CClientBuildingManager::RemoveAll()
     m_bRemoveFromList = true;
 }
 
+void CClientBuildingManager::SetDimension(unsigned short usDimension)
+{
+    for (CClientBuilding* building : m_List)
+        building->RelateDimension(usDimension);
+
+    m_usDimension = usDimension;
+}
+
 bool CClientBuildingManager::Exists(CClientBuilding* pBuilding)
 {
     return std::find(m_List.begin(), m_List.end(), pBuilding) != m_List.end();
@@ -62,8 +70,8 @@ bool CClientBuildingManager::IsValidModel(uint16_t modelId)
     if (modelId >= static_cast<uint16_t>(g_pGame->GetBaseIDforTXD()))
         return false;
 
-     // Clothes and hands cause artefacts
-     if (384 <= modelId && modelId <= 397)
+    // Clothes and hands cause artefacts
+    if (384 <= modelId && modelId <= 397)
         return false;
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
@@ -103,7 +111,7 @@ void CClientBuildingManager::RestoreDestroyed()
             if (highLodBuilding && !highLodBuilding->IsValid())
                 hasInvalidLods = true;
             else
-                building->Create();
+                building->RelateDimension(m_usDimension);
         }
     }
 }

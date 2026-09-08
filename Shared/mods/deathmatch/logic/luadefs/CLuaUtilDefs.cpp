@@ -204,7 +204,7 @@ int CLuaUtilDefs::Split(lua_State* luaVM)
         wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiDelimiter), '\0'};
         strDelimiter = UTF16ToMbUTF8(wUNICODE);
     }
-    else            // It's already a string
+    else  // It's already a string
         argStream.ReadString(strDelimiter);
 
     if (!argStream.HasErrors())
@@ -497,9 +497,23 @@ int CLuaUtilDefs::fromJSON(lua_State* luaVM)
         CLuaArguments Converted;
         if (Converted.ReadFromJSONString(strJson))
         {
+            const int count = static_cast<int>(Converted.Count());
+
+            // Keep the original fromJSON behavior as long as all
+            // return values can fit on the Lua stack.
+            //
+            // If the root JSON is a large array and the values cannot
+            // be returned unpacked, return them as a single Lua table.
+            // GitHub Issue: #5287
+            if (!lua_checkstack(luaVM, count))
+            {
+                Converted.PushAsTable(luaVM, nullptr, true);
+                return 1;
+            }
+
             // Return it as data
             Converted.PushArguments(luaVM);
-            return static_cast<int>(Converted.Count());
+            return count;
         }
     }
     else
@@ -664,7 +678,7 @@ int CLuaUtilDefs::GetTok(lua_State* luaVM)
         wchar_t wUNICODE[2] = {static_cast<wchar_t>(uiDelimiter), '\0'};
         strDelimiter = UTF16ToMbUTF8(wUNICODE);
     }
-    else            // It's already a string
+    else  // It's already a string
         argStream.ReadString(strDelimiter);
 
     if (!argStream.HasErrors())
@@ -728,8 +742,12 @@ int CLuaUtilDefs::tocolor(lua_State* luaVM)
     if (!argStream.HasErrors())
     {
         // Make it into an unsigned long
-        unsigned long ulColor = COLOR_RGBA(static_cast<unsigned char>(iRed), static_cast<unsigned char>(iGreen),
-                                           static_cast<unsigned char>(iBlue), static_cast<unsigned char>(iAlpha));
+        const unsigned char ucRed = static_cast<unsigned char>(Clamp<int>(0, iRed, 255));
+        const unsigned char ucGreen = static_cast<unsigned char>(Clamp<int>(0, iGreen, 255));
+        const unsigned char ucBlue = static_cast<unsigned char>(Clamp<int>(0, iBlue, 255));
+        const unsigned char ucAlpha = static_cast<unsigned char>(Clamp<int>(0, iAlpha, 255));
+
+        unsigned long ulColor = COLOR_RGBA(ucRed, ucGreen, ucBlue, ucAlpha);
         lua_pushinteger(luaVM, static_cast<lua_Integer>(ulColor));
         return 1;
     }

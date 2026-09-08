@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "CAdditionalVertexStreamManager.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 #include <limits>
 #include <mutex>
 
@@ -78,7 +79,7 @@ namespace
     }
 
     std::mutex g_singletonMutex;
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -200,8 +201,6 @@ bool CAdditionalVertexStreamManager::MaybeSetAdditionalVertexStream(D3DPRIMITIVE
 ///////////////////////////////////////////////////////////////
 bool CAdditionalVertexStreamManager::SetAdditionalVertexStream(SCurrentStateInfo& state)
 {
-    HRESULT hr;
-
     // Get matching custom N vbuffer for std PT vbuffer
     SAdditionalStreamInfo* pAdditionalInfo = GetAdditionalStreamInfo(state.stream1.pStreamData);
     if (!pAdditionalInfo)
@@ -238,7 +237,7 @@ bool CAdditionalVertexStreamManager::SetAdditionalVertexStream(SCurrentStateInfo
         return false;
     uint ReadOffsetSize = static_cast<uint>(readOffsetSize64);
 
-    uint OffsetInBytesN = ConvertPTOffset(state.stream1.OffsetInBytes);
+    uint     OffsetInBytesN = ConvertPTOffset(state.stream1.OffsetInBytes);
     uint64_t writeOffsetStart64 = static_cast<uint64_t>(viMinBased) * StrideN + OffsetInBytesN;
     if (writeOffsetStart64 > std::numeric_limits<uint>::max())
         return false;
@@ -305,7 +304,7 @@ void CAdditionalVertexStreamManager::MaybeUnsetAdditionalVertexStream()
 
     if (m_pOldVertexDeclaration)
     {
-        HRESULT hr = m_pDevice->TestCooperativeLevel();
+        HRESULT    hr = m_pDevice->TestCooperativeLevel();
         const bool bDeviceOperational = (hr == D3D_OK);
 
         if (bDeviceOperational)
@@ -427,8 +426,8 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
         std::vector<uint32_t> indices(numIndices);
         {
             void* pIndexBytes = nullptr;
-            if (FAILED(state.pIndexData->Lock(static_cast<UINT>(startByte), static_cast<UINT>(requiredBytes), &pIndexBytes,
-                                              D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
+            if (FAILED(
+                    state.pIndexData->Lock(static_cast<UINT>(startByte), static_cast<UINT>(requiredBytes), &pIndexBytes, D3DLOCK_NOSYSLOCK | D3DLOCK_READONLY)))
                 return false;
 
             if (indexStride == sizeof(WORD))
@@ -462,10 +461,10 @@ bool CAdditionalVertexStreamManager::UpdateAdditionalStreamContent(SCurrentState
             uint32_t v2 = indices[i + 2];
 
             if (v0 >= NumVerts || v1 >= NumVerts || v2 >= NumVerts)
-                continue;            // vert index out of range
+                continue;  // vert index out of range
 
             if (v0 == v1 || v0 == v2 || v1 == v2)
-                continue;            // degenerate tri
+                continue;  // degenerate tri
 
             // Get vertex positions from original stream
             CVector* pPos0 = reinterpret_cast<CVector*>(pSourceArrayBytes + v0 * StridePT);
@@ -654,7 +653,7 @@ SAdditionalStreamInfo* CAdditionalVertexStreamManager::CreateAdditionalStreamInf
 
         // Create new stream
         info.Stride = sizeof(float) * 3;
-    UINT Size2 = ConvertPTSize(state.decl.VertexBufferDesc1.Size);
+        UINT Size2 = ConvertPTSize(state.decl.VertexBufferDesc1.Size);
         if (FAILED(m_pDevice->CreateVertexBuffer(Size2, D3DUSAGE_WRITEONLY, 0, D3DPOOL_MANAGED, &info.pStreamData, nullptr)))
         {
             SAFE_RELEASE(info.pVertexDeclaration);
@@ -705,7 +704,7 @@ void CAdditionalVertexStreamManager::OnVertexBufferRangeInvalidated(IDirect3DVer
             return;
         }
 
-    uint convertedOffset = ConvertPTOffset(Offset);
+        uint convertedOffset = ConvertPTOffset(Offset);
 
         uint verticesTouched = Size / 20;
         if ((Size % 20) != 0)
@@ -714,9 +713,8 @@ void CAdditionalVertexStreamManager::OnVertexBufferRangeInvalidated(IDirect3DVer
         if (verticesTouched == 0)
             verticesTouched = 1;
 
-    uint64_t convertedSize64 = static_cast<uint64_t>(verticesTouched) * static_cast<uint64_t>(pAdditionalInfo->Stride);
-    uint convertedSize = convertedSize64 > std::numeric_limits<uint>::max() ? std::numeric_limits<uint>::max()
-                                           : static_cast<uint>(convertedSize64);
+        uint64_t convertedSize64 = static_cast<uint64_t>(verticesTouched) * static_cast<uint64_t>(pAdditionalInfo->Stride);
+        uint     convertedSize = convertedSize64 > std::numeric_limits<uint>::max() ? std::numeric_limits<uint>::max() : static_cast<uint>(convertedSize64);
 
         pAdditionalInfo->ConvertedRanges.UnsetRange(convertedOffset, convertedSize);
     }

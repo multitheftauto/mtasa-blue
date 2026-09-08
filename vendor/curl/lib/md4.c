@@ -21,56 +21,65 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
 #include "curl_setup.h"
 
-#if defined(USE_CURL_NTLM_CORE)
+#ifdef USE_CURL_NTLM_CORE
 
-#include <string.h>
-
-#include "strdup.h"
 #include "curl_md4.h"
-#include "curlx/warnless.h"
 
 #ifdef USE_OPENSSL
 #include <openssl/opensslv.h>
-#if (OPENSSL_VERSION_NUMBER >= 0x30000000L) && !defined(USE_AMISSL)
+#if OPENSSL_VERSION_NUMBER >= 0x30000000L && !defined(USE_AMISSL)
 /* OpenSSL 3.0.0 marks the MD4 functions as deprecated */
 #define OPENSSL_NO_MD4
 #else
-/* Cover also OPENSSL_NO_MD4 configured in openssl */
+/* Cover also OPENSSL_NO_MD4 configured in OpenSSL */
 #include <openssl/opensslconf.h>
 #endif
 #endif /* USE_OPENSSL */
 
 #ifdef USE_WOLFSSL
 #include <wolfssl/options.h>
-#define VOID_MD4_INIT
-#ifdef NO_MD4
-#define WOLFSSL_NO_MD4
-#endif
 #endif
 
-#ifdef USE_MBEDTLS
-#include <mbedtls/version.h>
-#if MBEDTLS_VERSION_NUMBER >= 0x03000000
-#include <mbedtls/mbedtls_config.h>
-#else
-#include <mbedtls/config.h>
-#endif
-#if(MBEDTLS_VERSION_NUMBER >= 0x02070000) && \
-   (MBEDTLS_VERSION_NUMBER < 0x03000000)
-  #define HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS
-#endif
-#endif /* USE_MBEDTLS */
-
-#if defined(USE_GNUTLS)
-#include <nettle/md4.h>
 /* When OpenSSL or wolfSSL is available, we use their MD4 functions. */
-#elif defined(USE_WOLFSSL) && !defined(WOLFSSL_NO_MD4)
-#include <wolfssl/openssl/md4.h>
-#elif defined(USE_OPENSSL) && !defined(OPENSSL_NO_MD4)
+
+#if defined(USE_OPENSSL) && !defined(OPENSSL_NO_MD4)
 #include <openssl/md4.h>
+
+/* Map directly to OpenSSL implementation */
+#define my_md4_ctx    MD4_CTX
+#define my_md4_init   MD4_Init
+#define my_md4_update MD4_Update
+#define my_md4_final  MD4_Final
+
+#elif defined(USE_WOLFSSL) && !defined(NO_MD4)
+#include <wolfssl/wolfcrypt/md4.h>
+#include <wolfssl/version.h>
+
+#if LIBWOLFSSL_VERSION_HEX >= 0x05007006
+typedef wc_Md4 my_md4_ctx;
+#else
+typedef Md4 my_md4_ctx;
+#endif
+
+static int my_md4_init(my_md4_ctx *ctx)
+{
+  wc_InitMd4(ctx);
+  return 1;
+}
+
+static void my_md4_update(my_md4_ctx *ctx,
+                          const void *input, unsigned long len)
+{
+  wc_Md4Update(ctx, input, (word32)len);
+}
+
+static void my_md4_final(unsigned char *digest, my_md4_ctx *ctx)
+{
+  wc_Md4Final(ctx, digest);
+}
+
 #elif (defined(__MAC_OS_X_VERSION_MAX_ALLOWED) && \
               (__MAC_OS_X_VERSION_MAX_ALLOWED >= 1040) && \
        defined(__MAC_OS_X_VERSION_MIN_REQUIRED) && \
@@ -79,78 +88,36 @@
               (__IPHONE_OS_VERSION_MAX_ALLOWED >= 20000) && \
        defined(__IPHONE_OS_VERSION_MIN_REQUIRED) && \
               (__IPHONE_OS_VERSION_MIN_REQUIRED < 130000))
-#define AN_APPLE_OS
 #include <CommonCrypto/CommonDigest.h>
-#elif defined(USE_WIN32_CRYPTO)
-#include <wincrypt.h>
-#elif(defined(USE_MBEDTLS) && defined(MBEDTLS_MD4_C))
-#include <mbedtls/md4.h>
-#endif
 
-/* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
-#include "memdebug.h"
+typedef CC_MD4_CTX my_md4_ctx;
 
-
-#if defined(USE_GNUTLS)
-
-typedef struct md4_ctx MD4_CTX;
-
-static int MD4_Init(MD4_CTX *ctx)
-{
-  md4_init(ctx);
-  return 1;
-}
-
-static void MD4_Update(MD4_CTX *ctx, const void *data, unsigned long size)
-{
-  md4_update(ctx, size, data);
-}
-
-static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
-{
-  md4_digest(ctx, MD4_DIGEST_SIZE, result);
-}
-
-#elif defined(USE_WOLFSSL) && !defined(WOLFSSL_NO_MD4)
-
-#ifdef OPENSSL_COEXIST
-  #define MD4_CTX WOLFSSL_MD4_CTX
-  #define MD4_Init wolfSSL_MD4_Init
-  #define MD4_Update wolfSSL_MD4_Update
-  #define MD4_Final wolfSSL_MD4_Final
-#endif
-
-#elif defined(USE_OPENSSL) && !defined(OPENSSL_NO_MD4)
-
-#elif defined(AN_APPLE_OS)
-typedef CC_MD4_CTX MD4_CTX;
-
-static int MD4_Init(MD4_CTX *ctx)
+static int my_md4_init(my_md4_ctx *ctx)
 {
   return CC_MD4_Init(ctx);
 }
 
-static void MD4_Update(MD4_CTX *ctx, const void *data, unsigned long size)
+static void my_md4_update(my_md4_ctx *ctx,
+                          const void *input, unsigned long len)
 {
-  (void)CC_MD4_Update(ctx, data, (CC_LONG)size);
+  (void)CC_MD4_Update(ctx, input, (CC_LONG)len);
 }
 
-static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
+static void my_md4_final(unsigned char *digest, my_md4_ctx *ctx)
 {
-  (void)CC_MD4_Final(result, ctx);
+  (void)CC_MD4_Final(digest, ctx);
 }
 
 #elif defined(USE_WIN32_CRYPTO)
+#include <wincrypt.h>
 
 struct md4_ctx {
   HCRYPTPROV hCryptProv;
   HCRYPTHASH hHash;
 };
-typedef struct md4_ctx MD4_CTX;
+typedef struct md4_ctx my_md4_ctx;
 
-static int MD4_Init(MD4_CTX *ctx)
+static int my_md4_init(my_md4_ctx *ctx)
 {
   ctx->hCryptProv = 0;
   ctx->hHash = 0;
@@ -168,23 +135,19 @@ static int MD4_Init(MD4_CTX *ctx)
   return 1;
 }
 
-static void MD4_Update(MD4_CTX *ctx, const void *data, unsigned long size)
+static void my_md4_update(my_md4_ctx *ctx,
+                          const void *input, unsigned long len)
 {
-#ifdef __MINGW32CE__
-  CryptHashData(ctx->hHash, (BYTE *)CURL_UNCONST(data),
-                (unsigned int) size, 0);
-#else
-  CryptHashData(ctx->hHash, (const BYTE *)data, (unsigned int) size, 0);
-#endif
+  CryptHashData(ctx->hHash, (const BYTE *)input, (unsigned int)len, 0);
 }
 
-static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
+static void my_md4_final(unsigned char *digest, my_md4_ctx *ctx)
 {
   unsigned long length = 0;
 
   CryptGetHashParam(ctx->hHash, HP_HASHVAL, NULL, &length, 0);
   if(length == MD4_DIGEST_LENGTH)
-    CryptGetHashParam(ctx->hHash, HP_HASHVAL, result, &length, 0);
+    CryptGetHashParam(ctx->hHash, HP_HASHVAL, digest, &length, 0);
 
   if(ctx->hHash)
     CryptDestroyHash(ctx->hHash);
@@ -193,42 +156,26 @@ static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
     CryptReleaseContext(ctx->hCryptProv, 0);
 }
 
-#elif(defined(USE_MBEDTLS) && defined(MBEDTLS_MD4_C))
+#elif defined(USE_GNUTLS)
+#include <nettle/md4.h>
 
-struct md4_ctx {
-  void *data;
-  unsigned long size;
-};
-typedef struct md4_ctx MD4_CTX;
+typedef struct md4_ctx my_md4_ctx;
 
-static int MD4_Init(MD4_CTX *ctx)
+static int my_md4_init(my_md4_ctx *ctx)
 {
-  ctx->data = NULL;
-  ctx->size = 0;
+  md4_init(ctx);
   return 1;
 }
 
-static void MD4_Update(MD4_CTX *ctx, const void *data, unsigned long size)
+static void my_md4_update(my_md4_ctx *ctx,
+                          const void *input, unsigned long len)
 {
-  if(!ctx->data) {
-    ctx->data = Curl_memdup(data, size);
-    if(ctx->data)
-      ctx->size = size;
-  }
+  md4_update(ctx, len, input);
 }
 
-static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
+static void my_md4_final(unsigned char *digest, my_md4_ctx *ctx)
 {
-  if(ctx->data) {
-#if !defined(HAS_MBEDTLS_RESULT_CODE_BASED_FUNCTIONS)
-    mbedtls_md4(ctx->data, ctx->size, result);
-#else
-    (void) mbedtls_md4_ret(ctx->data, ctx->size, result);
-#endif
-
-    Curl_safefree(ctx->data);
-    ctx->size = 0;
-  }
+  md4_digest(ctx, MD4_DIGEST_SIZE, digest);
 }
 
 #else
@@ -239,7 +186,7 @@ static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
  * MD4 Message-Digest Algorithm (RFC 1320).
  *
  * Homepage:
- https://openwall.info/wiki/people/solar/software/public-domain-source-code/md4
+ * https://openwall.info/wiki/people/solar/software/public-domain-source-code/md4
  *
  * Author:
  * Alexander Peslyak, better known as Solar Designer <solar at openwall.com>
@@ -248,8 +195,8 @@ static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
  * claimed, and the software is hereby placed in the public domain. In case
  * this attempt to disclaim copyright and place the software in the public
  * domain is deemed null and void, then the software is Copyright (c) 2001
- * Alexander Peslyak and it is hereby released to the general public under the
- * following terms:
+ * Alexander Peslyak and it is hereby released to the general public under
+ * the following terms:
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted.
@@ -257,34 +204,15 @@ static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
  * There is ABSOLUTELY NO WARRANTY, express or implied.
  *
  * (This is a heavily cut-down "BSD license".)
- *
- * This differs from Colin Plumb's older public domain implementation in that
- * no exactly 32-bit integer data type is required (any 32-bit or wider
- * unsigned integer data type will do), there is no compile-time endianness
- * configuration, and the function prototypes match OpenSSL's. No code from
- * Colin Plumb's implementation has been reused; this comment merely compares
- * the properties of the two independent implementations.
- *
- * The primary goals of this implementation are portability and ease of use.
- * It is meant to be fast, but not as fast as possible. Some known
- * optimizations are not included to reduce source code size and avoid
- * compile-time configuration.
  */
 
-/* Any 32-bit or wider unsigned integer data type will do */
-typedef unsigned int MD4_u32plus;
-
 struct md4_ctx {
-  MD4_u32plus lo, hi;
-  MD4_u32plus a, b, c, d;
+  uint32_t lo, hi;
+  uint32_t a, b, c, d;
   unsigned char buffer[64];
-  MD4_u32plus block[16];
+  uint32_t block[16];
 };
-typedef struct md4_ctx MD4_CTX;
-
-static int MD4_Init(MD4_CTX *ctx);
-static void MD4_Update(MD4_CTX *ctx, const void *data, unsigned long size);
-static void MD4_Final(unsigned char *result, MD4_CTX *ctx);
+typedef struct md4_ctx my_md4_ctx;
 
 /*
  * The basic MD4 functions.
@@ -300,44 +228,39 @@ static void MD4_Final(unsigned char *result, MD4_CTX *ctx);
  * The MD4 transformation for all three rounds.
  */
 #define MD4_STEP(f, a, b, c, d, x, s) \
-        (a) += f((b), (c), (d)) + (x); \
-        (a) = (((a) << (s)) | (((a) & 0xffffffff) >> (32 - (s))));
+  (a) += f(b, c, d) + (x); \
+  (a) = (((a) << (s)) | (((a) & 0xffffffff) >> (32 - (s))));
 
 /*
  * SET reads 4 input bytes in little-endian byte order and stores them
  * in a properly aligned word in host byte order.
  *
- * The check for little-endian architectures that tolerate unaligned
- * memory accesses is just an optimization. Nothing will break if it
- * does not work.
+ * The check for little-endian architectures that tolerate unaligned memory
+ * accesses is an optimization. Nothing will break if it does not work.
  */
 #if defined(__i386__) || defined(__x86_64__) || defined(__vax__)
-#define MD4_SET(n) \
-        (*(const MD4_u32plus *)(const void *)&ptr[(n) * 4])
-#define MD4_GET(n) \
-        MD4_SET(n)
+#define MD4_SET(n) (*(const uint32_t *)(const void *)&ptr[(n) * 4])
+#define MD4_GET(n) MD4_SET(n)
 #else
-#define MD4_SET(n) \
-        (ctx->block[(n)] = \
-          (MD4_u32plus)ptr[(n) * 4] | \
-          ((MD4_u32plus)ptr[(n) * 4 + 1] << 8) | \
-          ((MD4_u32plus)ptr[(n) * 4 + 2] << 16) | \
-          ((MD4_u32plus)ptr[(n) * 4 + 3] << 24))
-#define MD4_GET(n) \
-        (ctx->block[(n)])
+#define MD4_SET(n) (ctx->block[n] =      \
+   (uint32_t)ptr[(n) * 4]              | \
+  ((uint32_t)ptr[((n) * 4) + 1] <<  8) | \
+  ((uint32_t)ptr[((n) * 4) + 2] << 16) | \
+  ((uint32_t)ptr[((n) * 4) + 3] << 24))
+#define MD4_GET(n) ctx->block[n]
 #endif
 
 /*
  * This processes one or more 64-byte data blocks, but does NOT update
  * the bit counters. There are no alignment requirements.
  */
-static const void *my_md4_body(MD4_CTX *ctx,
-                               const void *data, unsigned long size)
+static const void *my_md4_body(my_md4_ctx *ctx,
+                               const void *input, unsigned long size)
 {
   const unsigned char *ptr;
-  MD4_u32plus a, b, c, d;
+  uint32_t a, b, c, d;
 
-  ptr = (const unsigned char *)data;
+  ptr = (const unsigned char *)input;
 
   a = ctx->a;
   b = ctx->b;
@@ -345,14 +268,14 @@ static const void *my_md4_body(MD4_CTX *ctx,
   d = ctx->d;
 
   do {
-    MD4_u32plus saved_a, saved_b, saved_c, saved_d;
+    uint32_t saved_a, saved_b, saved_c, saved_d;
 
     saved_a = a;
     saved_b = b;
     saved_c = c;
     saved_d = d;
 
-/* Round 1 */
+    /* Round 1 */
     MD4_STEP(MD4_F, a, b, c, d, MD4_SET(0), 3)
     MD4_STEP(MD4_F, d, a, b, c, MD4_SET(1), 7)
     MD4_STEP(MD4_F, c, d, a, b, MD4_SET(2), 11)
@@ -370,7 +293,7 @@ static const void *my_md4_body(MD4_CTX *ctx,
     MD4_STEP(MD4_F, c, d, a, b, MD4_SET(14), 11)
     MD4_STEP(MD4_F, b, c, d, a, MD4_SET(15), 19)
 
-/* Round 2 */
+    /* Round 2 */
     MD4_STEP(MD4_G, a, b, c, d, MD4_GET(0) + 0x5a827999, 3)
     MD4_STEP(MD4_G, d, a, b, c, MD4_GET(4) + 0x5a827999, 5)
     MD4_STEP(MD4_G, c, d, a, b, MD4_GET(8) + 0x5a827999, 9)
@@ -388,7 +311,7 @@ static const void *my_md4_body(MD4_CTX *ctx,
     MD4_STEP(MD4_G, c, d, a, b, MD4_GET(11) + 0x5a827999, 9)
     MD4_STEP(MD4_G, b, c, d, a, MD4_GET(15) + 0x5a827999, 13)
 
-/* Round 3 */
+    /* Round 3 */
     MD4_STEP(MD4_H, a, b, c, d, MD4_GET(0) + 0x6ed9eba1, 3)
     MD4_STEP(MD4_H, d, a, b, c, MD4_GET(8) + 0x6ed9eba1, 9)
     MD4_STEP(MD4_H, c, d, a, b, MD4_GET(4) + 0x6ed9eba1, 11)
@@ -422,7 +345,7 @@ static const void *my_md4_body(MD4_CTX *ctx,
   return ptr;
 }
 
-static int MD4_Init(MD4_CTX *ctx)
+static int my_md4_init(my_md4_ctx *ctx)
 {
   ctx->a = 0x67452301;
   ctx->b = 0xefcdab89;
@@ -431,45 +354,47 @@ static int MD4_Init(MD4_CTX *ctx)
 
   ctx->lo = 0;
   ctx->hi = 0;
+
   return 1;
 }
 
-static void MD4_Update(MD4_CTX *ctx, const void *data, unsigned long size)
+static void my_md4_update(my_md4_ctx *ctx,
+                          const void *input, unsigned long len)
 {
-  MD4_u32plus saved_lo;
+  uint32_t saved_lo;
   unsigned long used;
 
   saved_lo = ctx->lo;
-  ctx->lo = (saved_lo + size) & 0x1fffffff;
+  ctx->lo = (saved_lo + len) & 0x1fffffff;
   if(ctx->lo < saved_lo)
     ctx->hi++;
-  ctx->hi += (MD4_u32plus)size >> 29;
+  ctx->hi += (uint32_t)len >> 29;
 
   used = saved_lo & 0x3f;
 
   if(used) {
     unsigned long available = 64 - used;
 
-    if(size < available) {
-      memcpy(&ctx->buffer[used], data, size);
+    if(len < available) {
+      memcpy(&ctx->buffer[used], input, len);
       return;
     }
 
-    memcpy(&ctx->buffer[used], data, available);
-    data = (const unsigned char *)data + available;
-    size -= available;
+    memcpy(&ctx->buffer[used], input, available);
+    input = (const unsigned char *)input + available;
+    len -= available;
     my_md4_body(ctx, ctx->buffer, 64);
   }
 
-  if(size >= 64) {
-    data = my_md4_body(ctx, data, size & ~(unsigned long)0x3f);
-    size &= 0x3f;
+  if(len >= 64) {
+    input = my_md4_body(ctx, input, len & ~(unsigned long)0x3f);
+    len &= 0x3f;
   }
 
-  memcpy(ctx->buffer, data, size);
+  memcpy(ctx->buffer, input, len);
 }
 
-static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
+static void my_md4_final(unsigned char *digest, my_md4_ctx *ctx)
 {
   unsigned long used, available;
 
@@ -489,53 +414,47 @@ static void MD4_Final(unsigned char *result, MD4_CTX *ctx)
   memset(&ctx->buffer[used], 0, available - 8);
 
   ctx->lo <<= 3;
-  ctx->buffer[56] = curlx_ultouc((ctx->lo)&0xff);
-  ctx->buffer[57] = curlx_ultouc((ctx->lo >> 8)&0xff);
-  ctx->buffer[58] = curlx_ultouc((ctx->lo >> 16)&0xff);
-  ctx->buffer[59] = curlx_ultouc((ctx->lo >> 24)&0xff);
-  ctx->buffer[60] = curlx_ultouc((ctx->hi)&0xff);
-  ctx->buffer[61] = curlx_ultouc((ctx->hi >> 8)&0xff);
-  ctx->buffer[62] = curlx_ultouc((ctx->hi >> 16)&0xff);
+  ctx->buffer[56] = curlx_ultouc((ctx->lo) & 0xff);
+  ctx->buffer[57] = curlx_ultouc((ctx->lo >> 8) & 0xff);
+  ctx->buffer[58] = curlx_ultouc((ctx->lo >> 16) & 0xff);
+  ctx->buffer[59] = curlx_ultouc((ctx->lo >> 24) & 0xff);
+  ctx->buffer[60] = curlx_ultouc((ctx->hi) & 0xff);
+  ctx->buffer[61] = curlx_ultouc((ctx->hi >> 8) & 0xff);
+  ctx->buffer[62] = curlx_ultouc((ctx->hi >> 16) & 0xff);
   ctx->buffer[63] = curlx_ultouc(ctx->hi >> 24);
 
   my_md4_body(ctx, ctx->buffer, 64);
 
-  result[0] = curlx_ultouc((ctx->a)&0xff);
-  result[1] = curlx_ultouc((ctx->a >> 8)&0xff);
-  result[2] = curlx_ultouc((ctx->a >> 16)&0xff);
-  result[3] = curlx_ultouc(ctx->a >> 24);
-  result[4] = curlx_ultouc((ctx->b)&0xff);
-  result[5] = curlx_ultouc((ctx->b >> 8)&0xff);
-  result[6] = curlx_ultouc((ctx->b >> 16)&0xff);
-  result[7] = curlx_ultouc(ctx->b >> 24);
-  result[8] = curlx_ultouc((ctx->c)&0xff);
-  result[9] = curlx_ultouc((ctx->c >> 8)&0xff);
-  result[10] = curlx_ultouc((ctx->c >> 16)&0xff);
-  result[11] = curlx_ultouc(ctx->c >> 24);
-  result[12] = curlx_ultouc((ctx->d)&0xff);
-  result[13] = curlx_ultouc((ctx->d >> 8)&0xff);
-  result[14] = curlx_ultouc((ctx->d >> 16)&0xff);
-  result[15] = curlx_ultouc(ctx->d >> 24);
+  digest[0] = curlx_ultouc((ctx->a) & 0xff);
+  digest[1] = curlx_ultouc((ctx->a >> 8) & 0xff);
+  digest[2] = curlx_ultouc((ctx->a >> 16) & 0xff);
+  digest[3] = curlx_ultouc(ctx->a >> 24);
+  digest[4] = curlx_ultouc((ctx->b) & 0xff);
+  digest[5] = curlx_ultouc((ctx->b >> 8) & 0xff);
+  digest[6] = curlx_ultouc((ctx->b >> 16) & 0xff);
+  digest[7] = curlx_ultouc(ctx->b >> 24);
+  digest[8] = curlx_ultouc((ctx->c) & 0xff);
+  digest[9] = curlx_ultouc((ctx->c >> 8) & 0xff);
+  digest[10] = curlx_ultouc((ctx->c >> 16) & 0xff);
+  digest[11] = curlx_ultouc(ctx->c >> 24);
+  digest[12] = curlx_ultouc((ctx->d) & 0xff);
+  digest[13] = curlx_ultouc((ctx->d >> 8) & 0xff);
+  digest[14] = curlx_ultouc((ctx->d >> 16) & 0xff);
+  digest[15] = curlx_ultouc(ctx->d >> 24);
 
   memset(ctx, 0, sizeof(*ctx));
 }
 
 #endif /* CRYPTO LIBS */
 
-CURLcode Curl_md4it(unsigned char *output, const unsigned char *input,
-                    const size_t len)
+CURLcode Curl_md4it(unsigned char *output,
+                    const unsigned char *input, const size_t len)
 {
-  MD4_CTX ctx;
-
-#ifdef VOID_MD4_INIT
-  MD4_Init(&ctx);
-#else
-  if(!MD4_Init(&ctx))
+  my_md4_ctx ctx;
+  if(!my_md4_init(&ctx))
     return CURLE_FAILED_INIT;
-#endif
-
-  MD4_Update(&ctx, input, curlx_uztoui(len));
-  MD4_Final(output, &ctx);
+  my_md4_update(&ctx, input, curlx_uztoui(len));
+  my_md4_final(output, &ctx);
   return CURLE_OK;
 }
 

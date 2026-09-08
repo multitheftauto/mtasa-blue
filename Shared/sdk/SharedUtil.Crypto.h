@@ -20,6 +20,8 @@
 #include <cryptopp/hex.h>
 #include <cryptopp/md5.h>
 #include <zlib/zlib.h>
+#include <cstdint>
+#include <cstdlib>
 #include "SString.h"
 
 namespace SharedUtil
@@ -176,19 +178,42 @@ namespace SharedUtil
         using namespace CryptoPP;
         using CryptoPP::byte;
 
-        AutoSeededRandomPool rnd;
+        // Use malloc to probe if allocation would succeed, bypassing MTA's custom OOM handler
+        // (which uses non-continuable SEH exceptions). Unlike new, malloc does not invoke _set_new_handler.
+        // Probe with 3x input size to cover: output buffer + Crypto++ internal buffers + StringSink allocations.
+        constexpr size_t kMaxProbeSize = SIZE_MAX / 3 - 256;
+        if (sData.size() > kMaxProbeSize)
+            return {SString(), SString()};
 
-        SString result;
-        SString sIv;
+        void* probe = std::malloc(sData.size() * 3 + 256);
+        if (!probe)
+            return {SString(), SString()};
+        std::free(probe);
 
-        sIv.resize(AES::BLOCKSIZE);
-        rnd.GenerateBlock((byte*)sIv.data(), sIv.size());
+        try
+        {
+            AutoSeededRandomPool rnd;
 
-        CTR_Mode<AES>::Encryption aesEncryption;
-        aesEncryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
-        StringSource ss(sData, true, new StreamTransformationFilter(aesEncryption, new StringSink(result)));
+            SString result;
+            SString sIv;
 
-        return {result, sIv};
+            // Pre-reserve output buffer - AES-CTR output size equals input size
+            // This avoids StringSink's doubling behavior on large inputs
+            result.reserve(sData.size());
+
+            sIv.resize(AES::BLOCKSIZE);
+            rnd.GenerateBlock((byte*)sIv.data(), sIv.size());
+
+            CTR_Mode<AES>::Encryption aesEncryption;
+            aesEncryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
+            StringSource ss(sData, true, new StreamTransformationFilter(aesEncryption, new StringSink(result)));
+
+            return {result, sIv};
+        }
+        catch (const std::exception&)
+        {
+            return {SString(), SString()};
+        }
     }
 
     inline SString Aes128decode(const SString& sData, const SString& sKey, SString sIv)
@@ -196,20 +221,43 @@ namespace SharedUtil
         using namespace CryptoPP;
         using CryptoPP::byte;
 
-        sIv.resize(AES::BLOCKSIZE);
-        SString result;
+        // Use malloc to probe if allocation would succeed, bypassing MTA's custom OOM handler
+        // (which uses non-continuable SEH exceptions). Unlike new, malloc does not invoke _set_new_handler.
+        // Probe with 3x input size to cover: output buffer + Crypto++ internal buffers + StringSink allocations.
+        constexpr size_t kMaxProbeSize = SIZE_MAX / 3 - 256;
+        if (sData.size() > kMaxProbeSize)
+            return SString();
 
-        CTR_Mode<AES>::Decryption aesDecryption;
-        aesDecryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
-        StringSource ss(sData, true, new StreamTransformationFilter(aesDecryption, new StringSink(result)));
+        void* probe = std::malloc(sData.size() * 3 + 256);
+        if (!probe)
+            return SString();
+        std::free(probe);
 
-        return result;
+        try
+        {
+            sIv.resize(AES::BLOCKSIZE);
+            SString result;
+
+            // Pre-reserve output buffer - AES-CTR output size equals input size
+            // This avoids StringSink's doubling behavior on large inputs
+            result.reserve(sData.size());
+
+            CTR_Mode<AES>::Decryption aesDecryption;
+            aesDecryption.SetKeyWithIV((byte*)sKey.data(), sKey.size(), (byte*)sIv.data());
+            StringSource ss(sData, true, new StreamTransformationFilter(aesDecryption, new StringSink(result)));
+
+            return result;
+        }
+        catch (const std::exception&)
+        {
+            return SString();
+        }
     }
 
     inline bool StringToZLibFormat(const std::string& format, int& outResult)
     {
         int value = atoi(format.c_str());
-        if ((value >= 9 && value <= 31) || (value >= -15 && value <= -9)) // allowed values: 9..31, -9..-15
+        if ((value >= 9 && value <= 31) || (value >= -15 && value <= -9))  // allowed values: 9..31, -9..-15
         {
             outResult = value;
             return true;
@@ -226,7 +274,7 @@ namespace SharedUtil
         if (result != Z_OK)
             return result;
 
-        output.resize(deflateBound(&stream, input.size())); // resize to the upper bound of what the compressed size might be
+        output.resize(deflateBound(&stream, input.size()));  // resize to the upper bound of what the compressed size might be
 
         stream.next_out = (Bytef*)output.data();
         stream.avail_out = output.size();
@@ -238,14 +286,14 @@ namespace SharedUtil
         result |= deflateEnd(&stream);
 
         if (result == Z_STREAM_END)
-            output.resize(stream.total_out); // resize to the actual size
+            output.resize(stream.total_out);  // resize to the actual size
 
         return result;
     }
 
     inline int ZLibUncompress(const std::string& input, std::string& output, int windowBits = 0)
     {
-        if (windowBits == 0 && input.size() >= 2) // try to determine format automatically
+        if (windowBits == 0 && input.size() >= 2)  // try to determine format automatically
         {
             if (input[0] == '\x1F' && input[1] == '\x8B')
                 windowBits = (int)ZLibFormat::GZIP;
@@ -265,7 +313,7 @@ namespace SharedUtil
 
         // Uncompress in chunks
         std::string buffer;
-        buffer.resize(std::min(stream.avail_in, 128000U)); // use input length for chunk size (capped to 128k bytes which should be efficient enough)
+        buffer.resize(std::min(stream.avail_in, 128000U));  // use input length for chunk size (capped to 128k bytes which should be efficient enough)
         while (true)
         {
             stream.next_out = (Bytef*)buffer.data();
@@ -275,7 +323,7 @@ namespace SharedUtil
             if (result != Z_OK && result != Z_STREAM_END)
                 break;
 
-            output.append(buffer, 0, stream.total_out - output.size()); // append only what was written to buffer
+            output.append(buffer, 0, stream.total_out - output.size());  // append only what was written to buffer
 
             if (result == Z_STREAM_END)
                 break;
@@ -284,4 +332,4 @@ namespace SharedUtil
         return result;
     }
 
-}            // namespace SharedUtil
+}  // namespace SharedUtil

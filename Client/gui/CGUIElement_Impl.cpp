@@ -14,9 +14,9 @@
 
 // Define no-drawing zones, a.k.a. the inside borders in the FrameWindow of BlueLook in pixels
 // If something is drawn inside of these areas, the theme border is drawn on top of it
-#define CGUI_NODRAW_LEFT 9.0f
-#define CGUI_NODRAW_RIGHT 9.0f
-#define CGUI_NODRAW_TOP 9.0f
+#define CGUI_NODRAW_LEFT   9.0f
+#define CGUI_NODRAW_RIGHT  9.0f
+#define CGUI_NODRAW_TOP    9.0f
 #define CGUI_NODRAW_BOTTOM 9.0f
 
 CGUIElement_Impl::CGUIElement_Impl()
@@ -220,7 +220,7 @@ void CGUIElement_Impl::AutoSize(const char* Text, float fPaddingX, float fPaddin
     const CEGUI::Font* pFont = m_pWindow->getFont();
     m_pWindow->setSize(CEGUI::Absolute,
                        CEGUI::Size(pFont->getTextExtent(CGUI_Impl::GetUTFString(Text ? Text : GetText())) + fPaddingX,
-                                   pFont->getFontHeight() + fPaddingY));            // Add hack factor to height to allow for long characters such as 'g' or 'j'
+                                   pFont->getFontHeight() + fPaddingY));  // Add hack factor to height to allow for long characters such as 'g' or 'j'
 }
 
 void CGUIElement_Impl::SetMinimumSize(const CVector2D& vecSize)
@@ -398,12 +398,18 @@ void CGUIElement_Impl::CorrectEdges()
 
 bool CGUIElement_Impl::SetFont(const char* szFontName)
 {
+    if (szFontName != nullptr && *szFontName != '\0')
+    {
+        if (!CEGUI::FontManager::getSingleton().isFontPresent(CEGUI::String(szFontName)))
+            return false;
+    }
+
     try
     {
         m_pWindow->setFont(CEGUI::String(szFontName));
         return true;
     }
-    catch (CEGUI::Exception e)
+    catch (const CEGUI::Exception&)
     {
         return false;
     }
@@ -421,7 +427,7 @@ std::string CGUIElement_Impl::GetFont()
             return strFontName.c_str();
         }
     }
-    catch (CEGUI::Exception e)
+    catch (const CEGUI::Exception&)
     {
     }
 
@@ -434,7 +440,7 @@ void CGUIElement_Impl::SetProperty(const char* szProperty, const char* szValue)
     {
         m_pWindow->setProperty(CGUI_Impl::GetUTFString(szProperty), CGUI_Impl::GetUTFString(szValue));
     }
-    catch (CEGUI::Exception e)
+    catch (const CEGUI::Exception&)
     {
     }
 }
@@ -447,7 +453,7 @@ std::string CGUIElement_Impl::GetProperty(const char* szProperty)
         // Return the string. std::string will copy it
         strValue = CGUI_Impl::GetUTFString(m_pWindow->getProperty(CGUI_Impl::GetUTFString(szProperty)).c_str());
     }
-    catch (CEGUI::Exception e)
+    catch (const CEGUI::Exception&)
     {
     }
 
@@ -462,11 +468,13 @@ void CGUIElement_Impl::FillProperties()
         CEGUI::String strKey = itPropertySet.getCurrentKey();
         CEGUI::String strValue = m_pWindow->getProperty(strKey);
 
-        CGUIProperty* pProperty = new CGUIProperty;
+        std::unique_ptr<CGUIProperty> pProperty = std::make_unique<CGUIProperty>();
         pProperty->strKey = strKey.c_str();
         pProperty->strValue = strValue.c_str();
 
-        m_Properties.push_back(pProperty);
+        // Hand over ownership only after push_back succeeds, so a throw still frees it.
+        m_Properties.push_back(pProperty.get());
+        pProperty.release();
         itPropertySet++;
     }
 }
@@ -484,6 +492,8 @@ void CGUIElement_Impl::EmptyProperties()
                 delete (*iter);
             }
         }
+        // Clear the nodes too, so callers see an empty list and can retry.
+        m_Properties.clear();
     }
 }
 
@@ -498,9 +508,17 @@ CGUIPropertyIter CGUIElement_Impl::GetPropertiesBegin()
         // Return the list begin iterator
         return m_Properties.begin();
     }
-    catch (CEGUI::Exception e)
+    catch (const CEGUI::Exception&)
     {
-        return *(CGUIPropertyIter*)NULL;
+        // Empty range instead of a null iterator; drop half-read entries for a clean retry.
+        EmptyProperties();
+        return m_Properties.end();
+    }
+    catch (const std::bad_alloc&)
+    {
+        // Rethrow, but drop partial entries first so a retry starts clean.
+        EmptyProperties();
+        throw;
     }
 }
 
@@ -512,12 +530,20 @@ CGUIPropertyIter CGUIElement_Impl::GetPropertiesEnd()
         if (m_Properties.empty())
             FillProperties();
 
-        // Return the list begin iterator
+        // Return the list end iterator
         return m_Properties.end();
     }
-    catch (CEGUI::Exception e)
+    catch (const CEGUI::Exception&)
     {
-        return *(CGUIPropertyIter*)NULL;
+        // Same as GetPropertiesBegin: empty range, partial entries dropped.
+        EmptyProperties();
+        return m_Properties.end();
+    }
+    catch (const std::bad_alloc&)
+    {
+        // Rethrow, but drop partial entries first so a retry starts clean.
+        EmptyProperties();
+        throw;
     }
 }
 

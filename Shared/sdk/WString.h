@@ -16,9 +16,9 @@
 #include "SString.h"
 
 #ifdef WIN32
-#ifndef va_copy
-    #define va_copy(dest, orig) (dest) = (orig)
-#endif
+    #ifndef va_copy
+        #define va_copy(dest, orig) (dest) = (orig)
+    #endif
 #endif
 
 //
@@ -36,7 +36,7 @@ public:
 
     WString(const char* szText);
 
-    WString(const char16_t* szText) : std::wstring(szText ? (const wchar_t*)szText : L""){};
+    WString(const char16_t* szText) : std::wstring(szText ? (const wchar_t*)szText : L"") {};
 
     explicit WString(const wchar_t* szFormat, ...) : std::wstring()
     {
@@ -74,7 +74,7 @@ public:
     WString operator+(const WString& other) const { return std::wstring(*this) + other; }
 
     // Assignment
-                   operator const wchar_t*() const { return c_str(); }            // Auto assign to const wchar_t* without using c_str()
+                   operator const wchar_t*() const { return c_str(); }  // Auto assign to const wchar_t* without using c_str()
     const wchar_t* operator*() const { return c_str(); }
 
     // Functions

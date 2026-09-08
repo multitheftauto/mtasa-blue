@@ -18,28 +18,28 @@
 #endif
 
 #ifdef __cplusplus
-    #define MTA_CH_NOEXCEPT noexcept
+    #define MTA_CH_NOEXCEPT  noexcept
     #define MTA_CH_NODISCARD [[nodiscard]]
-    extern "C"
-    {
+extern "C"
+{
 #else
     #define MTA_CH_NOEXCEPT
     #define MTA_CH_NODISCARD
 #endif
 
-MTA_CH_NODISCARD BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableAllHandlersAfterInitialization(void) MTA_CH_NOEXCEPT;
+    MTA_CH_NODISCARD BOOL BUGSUTIL_DLLINTERFACE __stdcall EnableAllHandlersAfterInitialization(void) MTA_CH_NOEXCEPT;
 
 #ifdef __cplusplus
-MTA_CH_NODISCARD BOOL BUGSUTIL_DLLINTERFACE __stdcall StartWatchdogThread(DWORD mainThreadId, DWORD timeoutSeconds = 20) MTA_CH_NOEXCEPT;
+    MTA_CH_NODISCARD BOOL BUGSUTIL_DLLINTERFACE __stdcall StartWatchdogThread(DWORD mainThreadId, DWORD timeoutSeconds = 20) MTA_CH_NOEXCEPT;
 #else
 MTA_CH_NODISCARD BOOL BUGSUTIL_DLLINTERFACE __stdcall StartWatchdogThread(DWORD mainThreadId, DWORD timeoutSeconds) MTA_CH_NOEXCEPT;
 #endif
 
-void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread(void) MTA_CH_NOEXCEPT;
-void BUGSUTIL_DLLINTERFACE __stdcall UpdateWatchdogHeartbeat(void) MTA_CH_NOEXCEPT;
+    void BUGSUTIL_DLLINTERFACE __stdcall StopWatchdogThread(void) MTA_CH_NOEXCEPT;
+    void BUGSUTIL_DLLINTERFACE __stdcall UpdateWatchdogHeartbeat(void) MTA_CH_NOEXCEPT;
 
 #ifdef __cplusplus
-    }
+}
 #endif
 
 #undef MTA_CH_NOEXCEPT

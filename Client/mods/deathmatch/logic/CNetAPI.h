@@ -21,9 +21,9 @@ class CNetAPI;
 #include "CTickRateSettings.h"
 
 // SYNC SETTINGS
-#define TICK_RATE       ( g_TickRateSettings.iPureSync )
-#define CAM_SYNC_RATE   ( g_TickRateSettings.iCamSync )
-#define TICK_RATE_AIM   ( std::min ( TICK_RATE, g_TickRateSettings.iKeySyncRotation ) )  // Keysync or puresync update the aim, so use the shortest interval
+#define TICK_RATE     (g_TickRateSettings.iPureSync)
+#define CAM_SYNC_RATE (g_TickRateSettings.iCamSync)
+#define TICK_RATE_AIM (std::min(TICK_RATE, g_TickRateSettings.iKeySyncRotation))  // Keysync or puresync update the aim, so use the shortest interval
 
 enum eServerRPCFunctions
 {
@@ -122,6 +122,6 @@ private:
     CControllerState m_LastSentControllerState;
     float            m_fLastSentCameraRotation;
     float            m_fLastSentAimY;
-    uchar            m_ucBulletSyncOrderCounter;
-    uchar            m_ucCustomWeaponBulletSyncOrderCounter;
+    unsigned long    m_ulDeadSyncGraceEndTime;
+    bool             m_bWasDeadOnNetwork;
 };

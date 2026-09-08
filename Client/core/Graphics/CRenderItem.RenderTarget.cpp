@@ -67,6 +67,8 @@ bool CRenderTargetItem::IsValid()
 void CRenderTargetItem::OnLostDevice()
 {
     ReleaseUnderlyingData();
+    m_uiLastEnsureAttempt = 0;
+    m_uiEnsureDelayMs = 0;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -79,6 +81,48 @@ void CRenderTargetItem::OnLostDevice()
 void CRenderTargetItem::OnResetDevice()
 {
     CreateUnderlyingData();
+    m_uiLastEnsureAttempt = 0;
+    m_uiEnsureDelayMs = 0;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderTargetItem::TryEnsureValid
+//
+// Attempt to (re)create device resources if missing
+//
+////////////////////////////////////////////////////////////////
+bool CRenderTargetItem::TryEnsureValid()
+{
+    if (IsValid())
+        return true;
+
+    if (!m_pManager || m_pManager->GetDeviceCooperativeLevel("RenderTargetTryEnsureValid", false) != D3D_OK)
+        return false;
+
+    const uint kRetryIntervalMinMs = 250;
+    const uint kRetryIntervalMaxMs = 2000;
+    const uint uiNow = GetTickCount32();
+    if (m_uiEnsureDelayMs == 0)
+        m_uiEnsureDelayMs = kRetryIntervalMinMs;
+
+    if (uiNow - m_uiLastEnsureAttempt < m_uiEnsureDelayMs)
+        return false;
+
+    m_uiLastEnsureAttempt = uiNow;
+
+    if (m_pD3DRenderTargetSurface || m_pD3DTexture || m_pD3DZStencilSurface || m_pD3DReadSurface)
+        ReleaseUnderlyingData();
+
+    CreateUnderlyingData();
+    if (IsValid())
+    {
+        m_uiEnsureDelayMs = kRetryIntervalMinMs;
+        return true;
+    }
+
+    m_uiEnsureDelayMs = std::min(m_uiEnsureDelayMs * 2, kRetryIntervalMaxMs);
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////
@@ -142,6 +186,7 @@ void CRenderTargetItem::CreateUnderlyingData()
     // Check depth buffer created
     if (!m_pD3DZStencilSurface)
     {
+        SAFE_RELEASE(m_pD3DRenderTargetSurface);
         SAFE_RELEASE(m_pD3DTexture);
         return;
     }

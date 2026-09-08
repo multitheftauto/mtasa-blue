@@ -48,7 +48,7 @@ protected:
     // Main thread variables
     CThreadHandle*              m_pServiceThreadHandle;
     std::set<CCompressJobData*> m_IgnoreResultList;
-    std::set<CCompressJobData*> m_FinishedList;            // Result has been used, will be deleted next pulse
+    std::set<CCompressJobData*> m_FinishedList;  // Result has been used, will be deleted next pulse
 
     // Other thread variables
     // -none-
@@ -317,7 +317,7 @@ bool CCompressorJobQueueImpl::PollCommand(CCompressJobData* pJobData, uint uiTim
 bool CCompressorJobQueueImpl::FreeCommand(CCompressJobData* pJobData)
 {
     if (MapContains(m_IgnoreResultList, pJobData))
-        return false;            // Already ignoring query handle
+        return false;  // Already ignoring query handle
 
     // if in command or result queue, then put in ignore result list
     bool bFound;
@@ -488,10 +488,10 @@ void CCompressorJobQueueImpl::ProcessCommand(CCompressJobData* pJobData)
 bool CCompressJobData::SetCallback(PFN_SCREENSHOT_CALLBACK pfnScreenShotCallback, uint uiTimeSpentInQueue)
 {
     if (callback.bSet)
-        return false;            // One has already been set
+        return false;  // One has already been set
 
     if (this->stage > EJobStage::RESULT)
-        return false;            // Too late to set a callback now
+        return false;  // Too late to set a callback now
 
     // Set new
     callback.uiTimeSpentInQueue = uiTimeSpentInQueue;

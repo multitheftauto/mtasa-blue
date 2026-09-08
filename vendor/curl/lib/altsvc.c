@@ -28,32 +28,40 @@
 #include "curl_setup.h"
 
 #if !defined(CURL_DISABLE_HTTP) && !defined(CURL_DISABLE_ALTSVC)
-#include <curl/curl.h>
 #include "urldata.h"
 #include "altsvc.h"
+#include "curl_fopen.h"
 #include "curl_get_line.h"
-#include "strcase.h"
 #include "parsedate.h"
-#include "sendf.h"
-#include "curlx/warnless.h"
-#include "fopen.h"
-#include "rename.h"
-#include "strdup.h"
+#include "curl_trc.h"
 #include "curlx/inet_pton.h"
 #include "curlx/strparse.h"
 #include "connect.h"
 
-/* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
-#include "memdebug.h"
-
-#define MAX_ALTSVC_LINE 4095
-#define MAX_ALTSVC_DATELEN 256
+#define MAX_ALTSVC_LINE    4095
+#define MAX_ALTSVC_DATELEN 17
 #define MAX_ALTSVC_HOSTLEN 2048
 #define MAX_ALTSVC_ALPNLEN 10
 
 #define H3VERSION "h3"
+
+#if defined(DEBUGBUILD) || defined(UNITTESTS)
+/* to play well with debug builds, we can *set* a fixed time this will
+   return */
+static time_t altsvc_debugtime(void *unused)
+{
+  const char *timestr = getenv("CURL_TIME");
+  (void)unused;
+  if(timestr) {
+    curl_off_t val;
+    curlx_str_number(&timestr, &val, TIME_T_MAX);
+    return (time_t)val;
+  }
+  return time(NULL);
+}
+#undef time
+#define time(x) altsvc_debugtime(x)
+#endif
 
 /* Given the ALPN ID, return the name */
 const char *Curl_alpnid2str(enum alpnid id)
@@ -70,13 +78,7 @@ const char *Curl_alpnid2str(enum alpnid id)
   }
 }
 
-
-static void altsvc_free(struct altsvc *as)
-{
-  free(as->src.host);
-  free(as->dst.host);
-  free(as);
-}
+#define altsvc_free(x) curlx_free(x)
 
 static struct altsvc *altsvc_createid(const char *srchost,
                                       size_t hlen,
@@ -87,38 +89,35 @@ static struct altsvc *altsvc_createid(const char *srchost,
                                       size_t srcport,
                                       size_t dstport)
 {
-  struct altsvc *as = calloc(1, sizeof(struct altsvc));
-  if(!as)
-    return NULL;
-  DEBUGASSERT(hlen);
-  DEBUGASSERT(dlen);
-  if(!hlen || !dlen)
-    /* bad input */
-    goto error;
+  struct altsvc *as;
   if((hlen > 2) && srchost[0] == '[') {
     /* IPv6 address, strip off brackets */
     srchost++;
     hlen -= 2;
   }
-  else if(srchost[hlen - 1] == '.') {
+  else if(hlen && (srchost[hlen - 1] == '.')) {
     /* strip off trailing dot */
     hlen--;
-    if(!hlen)
-      goto error;
   }
   if((dlen > 2) && dsthost[0] == '[') {
     /* IPv6 address, strip off brackets */
     dsthost++;
     dlen -= 2;
   }
+  if(!hlen || !dlen)
+    /* bad input */
+    return NULL;
+  /* struct size plus both strings */
+  as = curlx_calloc(1, sizeof(struct altsvc) + (hlen + 1) + (dlen + 1));
+  if(!as)
+    return NULL;
+  as->src.host = (char *)as + sizeof(struct altsvc);
+  memcpy(as->src.host, srchost, hlen);
+  /* the null terminator is already there */
 
-  as->src.host = Curl_memdup0(srchost, hlen);
-  if(!as->src.host)
-    goto error;
-
-  as->dst.host = Curl_memdup0(dsthost, dlen);
-  if(!as->dst.host)
-    goto error;
+  as->dst.host = (char *)as + sizeof(struct altsvc) + hlen + 1;
+  memcpy(as->dst.host, dsthost, dlen);
+  /* the null terminator is already there */
 
   as->src.alpnid = srcalpnid;
   as->dst.alpnid = dstalpnid;
@@ -126,9 +125,6 @@ static struct altsvc *altsvc_createid(const char *srchost,
   as->dst.port = (unsigned short)dstport;
 
   return as;
-error:
-  altsvc_free(as);
-  return NULL;
 }
 
 static struct altsvc *altsvc_create(struct Curl_str *srchost,
@@ -138,16 +134,28 @@ static struct altsvc *altsvc_create(struct Curl_str *srchost,
                                     size_t srcport,
                                     size_t dstport)
 {
-  enum alpnid dstalpnid =
-    Curl_alpn2alpnid(curlx_str(dstalpn), curlx_strlen(dstalpn));
-  enum alpnid srcalpnid =
-    Curl_alpn2alpnid(curlx_str(srcalpn), curlx_strlen(srcalpn));
+  enum alpnid dstalpnid = Curl_str2alpnid(dstalpn);
+  enum alpnid srcalpnid = Curl_str2alpnid(srcalpn);
   if(!srcalpnid || !dstalpnid)
     return NULL;
   return altsvc_createid(curlx_str(srchost), curlx_strlen(srchost),
                          curlx_str(dsthost), curlx_strlen(dsthost),
                          srcalpnid, dstalpnid,
                          srcport, dstport);
+}
+
+/* append the new entry to the list after possibly removing an old entry
+   first */
+static void altsvc_append(struct altsvcinfo *asi, struct altsvc *as)
+{
+  while(Curl_llist_count(&asi->list) >= MAX_ALTSVC_ENTRIES) {
+    /* It's full. Remove the first entry in the list */
+    struct Curl_llist_node *e = Curl_llist_head(&asi->list);
+    struct altsvc *oldas = Curl_node_elem(e);
+    Curl_node_remove(e);
+    altsvc_free(oldas);
+  }
+  Curl_llist_append(&asi->list, as, &as->node);
 }
 
 /* only returns SERIOUS errors */
@@ -186,22 +194,26 @@ static CURLcode altsvc_add(struct altsvcinfo *asi, const char *line)
      curlx_str_newline(&line))
     ;
   else {
-    struct altsvc *as;
     char dbuf[MAX_ALTSVC_DATELEN + 1];
-    time_t expires;
+    time_t expires = 0;
+    time_t now = time(NULL);
 
     /* The date parser works on a null-terminated string. The maximum length
        is upheld by curlx_str_quotedword(). */
     memcpy(dbuf, curlx_str(&date), curlx_strlen(&date));
     dbuf[curlx_strlen(&date)] = 0;
-    expires = Curl_getdate_capped(dbuf);
-    as = altsvc_create(&srchost, &dsthost, &srcalpn, &dstalpn,
-                       (size_t)srcport, (size_t)dstport);
-    if(as) {
-      as->expires = expires;
-      as->prio = 0; /* not supported to just set zero */
-      as->persist = persist ? 1 : 0;
-      Curl_llist_append(&asi->list, as, &as->node);
+    Curl_getdate_capped(dbuf, &expires);
+
+    if(now < expires) {
+      struct altsvc *as = altsvc_create(&srchost, &dsthost, &srcalpn, &dstalpn,
+                                        (size_t)srcport, (size_t)dstport);
+      if(as) {
+        as->expires = expires;
+        as->persist = persist ? 1 : 0;
+        altsvc_append(asi, as);
+      }
+      else
+        return CURLE_OUT_OF_MEMORY;
     }
   }
 
@@ -223,23 +235,30 @@ static CURLcode altsvc_load(struct altsvcinfo *asi, const char *file)
 
   /* we need a private copy of the filename so that the altsvc cache file
      name survives an easy handle reset */
-  free(asi->filename);
-  asi->filename = strdup(file);
+  curlx_free(asi->filename);
+  asi->filename = curlx_strdup(file);
   if(!asi->filename)
     return CURLE_OUT_OF_MEMORY;
 
-  fp = fopen(file, FOPEN_READTEXT);
+  fp = curlx_fopen(file, FOPEN_READTEXT);
   if(fp) {
-    struct dynbuf buf;
-    curlx_dyn_init(&buf, MAX_ALTSVC_LINE);
-    while(Curl_get_line(&buf, fp)) {
-      const char *lineptr = curlx_dyn_ptr(&buf);
-      curlx_str_passblanks(&lineptr);
-      if(curlx_str_single(&lineptr, '#'))
-        altsvc_add(asi, lineptr);
+    curlx_struct_stat stat;
+    if((curlx_fstat(fileno(fp), &stat) == -1) || !S_ISDIR(stat.st_mode)) {
+      bool eof = FALSE;
+      struct dynbuf buf;
+      curlx_dyn_init(&buf, MAX_ALTSVC_LINE);
+      do {
+        result = Curl_get_line(&buf, fp, &eof);
+        if(!result) {
+          const char *lineptr = curlx_dyn_ptr(&buf);
+          curlx_str_passblanks(&lineptr);
+          if(curlx_str_single(&lineptr, '#'))
+            altsvc_add(asi, lineptr);
+        }
+      } while(!result && !eof);
+      curlx_dyn_free(&buf); /* free the line buffer */
     }
-    curlx_dyn_free(&buf); /* free the line buffer */
-    fclose(fp);
+    curlx_fclose(fp);
   }
   return result;
 }
@@ -247,7 +266,6 @@ static CURLcode altsvc_load(struct altsvcinfo *asi, const char *file)
 /*
  * Write this single altsvc entry to a single output line
  */
-
 static CURLcode altsvc_out(struct altsvc *as, FILE *fp)
 {
   struct tm stamp;
@@ -255,39 +273,39 @@ static CURLcode altsvc_out(struct altsvc *as, FILE *fp)
   const char *dst6_post = "";
   const char *src6_pre = "";
   const char *src6_post = "";
-  CURLcode result = Curl_gmtime(as->expires, &stamp);
+  CURLcode result = curlx_gmtime(as->expires, &stamp);
   if(result)
     return result;
 #ifdef USE_IPV6
   else {
     char ipv6_unused[16];
-    if(1 == curlx_inet_pton(AF_INET6, as->dst.host, ipv6_unused)) {
+    if(curlx_inet_pton(AF_INET6, as->dst.host, ipv6_unused) == 1) {
       dst6_pre = "[";
       dst6_post = "]";
     }
-    if(1 == curlx_inet_pton(AF_INET6, as->src.host, ipv6_unused)) {
+    if(curlx_inet_pton(AF_INET6, as->src.host, ipv6_unused) == 1) {
       src6_pre = "[";
       src6_post = "]";
     }
   }
 #endif
-  fprintf(fp,
-          "%s %s%s%s %u "
-          "%s %s%s%s %u "
-          "\"%d%02d%02d "
-          "%02d:%02d:%02d\" "
-          "%u %u\n",
-          Curl_alpnid2str(as->src.alpnid),
-          src6_pre, as->src.host, src6_post,
-          as->src.port,
+  curl_mfprintf(fp,
+                "%s %s%s%s %u "
+                "%s %s%s%s %u "
+                "\"%d%02d%02d "
+                "%02d:%02d:%02d\" "
+                "%d 0\n", /* prio still always zero */
+                Curl_alpnid2str(as->src.alpnid),
+                src6_pre, as->src.host, src6_post,
+                as->src.port,
 
-          Curl_alpnid2str(as->dst.alpnid),
-          dst6_pre, as->dst.host, dst6_post,
-          as->dst.port,
+                Curl_alpnid2str(as->dst.alpnid),
+                dst6_pre, as->dst.host, dst6_post,
+                as->dst.port,
 
-          stamp.tm_year + 1900, stamp.tm_mon + 1, stamp.tm_mday,
-          stamp.tm_hour, stamp.tm_min, stamp.tm_sec,
-          as->persist, as->prio);
+                stamp.tm_year + 1900, stamp.tm_mon + 1, stamp.tm_mday,
+                stamp.tm_hour, stamp.tm_min, stamp.tm_sec,
+                as->persist);
   return CURLE_OK;
 }
 
@@ -299,7 +317,7 @@ static CURLcode altsvc_out(struct altsvc *as, FILE *fp)
  */
 struct altsvcinfo *Curl_altsvc_init(void)
 {
-  struct altsvcinfo *asi = calloc(1, sizeof(struct altsvcinfo));
+  struct altsvcinfo *asi = curlx_calloc(1, sizeof(struct altsvcinfo));
   if(!asi)
     return NULL;
   Curl_llist_init(&asi->list, NULL);
@@ -328,10 +346,18 @@ CURLcode Curl_altsvc_load(struct altsvcinfo *asi, const char *file)
 /*
  * Curl_altsvc_ctrl() passes on the external bitmask.
  */
-CURLcode Curl_altsvc_ctrl(struct altsvcinfo *asi, const long ctrl)
+CURLcode Curl_altsvc_ctrl(struct Curl_easy *data, const long ctrl)
 {
-  DEBUGASSERT(asi);
-  asi->flags = ctrl;
+  DEBUGASSERT(data);
+  if(!ctrl)
+    return CURLE_BAD_FUNCTION_ARGUMENT;
+
+  if(!data->asi) {
+    data->asi = Curl_altsvc_init();
+    if(!data->asi)
+      return CURLE_OUT_OF_MEMORY;
+  }
+  data->asi->flags = ctrl;
   return CURLE_OK;
 }
 
@@ -339,20 +365,20 @@ CURLcode Curl_altsvc_ctrl(struct altsvcinfo *asi, const long ctrl)
  * Curl_altsvc_cleanup() frees an altsvc cache instance and all associated
  * resources.
  */
-void Curl_altsvc_cleanup(struct altsvcinfo **altsvcp)
+void Curl_altsvc_cleanup(struct altsvcinfo **asi)
 {
-  if(*altsvcp) {
+  if(*asi) {
     struct Curl_llist_node *e;
     struct Curl_llist_node *n;
-    struct altsvcinfo *altsvc = *altsvcp;
+    struct altsvcinfo *altsvc = *asi;
     for(e = Curl_llist_head(&altsvc->list); e; e = n) {
       struct altsvc *as = Curl_node_elem(e);
       n = Curl_node_next(e);
       altsvc_free(as);
     }
-    free(altsvc->filename);
-    free(altsvc);
-    *altsvcp = NULL; /* clear the pointer */
+    curlx_free(altsvc->filename);
+    curlx_free(altsvc);
+    *asi = NULL; /* clear the pointer */
   }
 }
 
@@ -360,21 +386,21 @@ void Curl_altsvc_cleanup(struct altsvcinfo **altsvcp)
  * Curl_altsvc_save() writes the altsvc cache to a file.
  */
 CURLcode Curl_altsvc_save(struct Curl_easy *data,
-                          struct altsvcinfo *altsvc, const char *file)
+                          struct altsvcinfo *asi, const char *file)
 {
   CURLcode result = CURLE_OK;
   FILE *out;
   char *tempstore = NULL;
 
-  if(!altsvc)
+  if(!asi)
     /* no cache activated */
     return CURLE_OK;
 
   /* if not new name is given, use the one we stored from the load */
-  if(!file && altsvc->filename)
-    file = altsvc->filename;
+  if(!file && asi->filename)
+    file = asi->filename;
 
-  if((altsvc->flags & CURLALTSVC_READONLYFILE) || !file || !file[0])
+  if((asi->flags & CURLALTSVC_READONLYFILE) || !file || !file[0])
     /* marked as read-only, no file or zero length filename */
     return CURLE_OK;
 
@@ -385,21 +411,21 @@ CURLcode Curl_altsvc_save(struct Curl_easy *data,
     fputs("# Your alt-svc cache. https://curl.se/docs/alt-svc.html\n"
           "# This file was generated by libcurl! Edit at your own risk.\n",
           out);
-    for(e = Curl_llist_head(&altsvc->list); e; e = n) {
+    for(e = Curl_llist_head(&asi->list); e; e = n) {
       struct altsvc *as = Curl_node_elem(e);
       n = Curl_node_next(e);
       result = altsvc_out(as, out);
       if(result)
         break;
     }
-    fclose(out);
-    if(!result && tempstore && Curl_rename(tempstore, file))
+    curlx_fclose(out);
+    if(!result && tempstore && curlx_rename(tempstore, file))
       result = CURLE_WRITE_ERROR;
 
     if(result && tempstore)
       unlink(tempstore);
   }
-  free(tempstore);
+  curlx_free(tempstore);
   return result;
 }
 
@@ -416,7 +442,7 @@ static bool hostcompare(const char *host, const char *check)
   if(hlen != clen)
     /* they cannot match if they have different lengths */
     return FALSE;
-  return strncasecompare(host, check, hlen);
+  return curl_strnequal(host, check, hlen);
 }
 
 /* altsvc_flush() removes all alternatives for this source origin from the
@@ -437,24 +463,6 @@ static void altsvc_flush(struct altsvcinfo *asi, enum alpnid srcalpnid,
     }
   }
 }
-
-#if defined(DEBUGBUILD) || defined(UNITTESTS)
-/* to play well with debug builds, we can *set* a fixed time this will
-   return */
-static time_t altsvc_debugtime(void *unused)
-{
-  const char *timestr = getenv("CURL_TIME");
-  (void)unused;
-  if(timestr) {
-    curl_off_t val;
-    curlx_str_number(&timestr, &val, TIME_T_MAX);
-    return (time_t)val;
-  }
-  return time(NULL);
-}
-#undef time
-#define time(x) altsvc_debugtime(x)
-#endif
 
 /*
  * Curl_altsvc_parse() takes an incoming alt-svc response header and stores
@@ -477,18 +485,11 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
   unsigned short dstport = srcport; /* the same by default */
   size_t entries = 0;
   struct Curl_str alpn;
-  const char *sp;
-  time_t maxage = 24 * 3600; /* default is 24 hours */
-  bool persist = FALSE;
-#ifdef CURL_DISABLE_VERBOSE_STRINGS
-  (void)data;
-#endif
 
   DEBUGASSERT(asi);
 
   /* initial check for "clear" */
-  if(!curlx_str_until(&p, &alpn, MAX_ALTSVC_LINE, ';') &&
-     !curlx_str_single(&p, ';')) {
+  if(!curlx_str_cspn(&p, &alpn, ";\n\r")) {
     curlx_str_trimblanks(&alpn);
     /* "clear" is a magic keyword */
     if(curlx_str_casecompare(&alpn, "clear")) {
@@ -505,47 +506,12 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
 
   curlx_str_trimblanks(&alpn);
 
-  /* Handle the optional 'ma' and 'persist' flags once first, as they need to
-     be known for each alternative service. Unknown flags are skipped. */
-  sp = strchr(p, ';');
-  if(sp) {
-    sp++; /* pass the semicolon */
-    for(;;) {
-      struct Curl_str name;
-      struct Curl_str val;
-      const char *vp;
-      curl_off_t num;
-      bool quoted;
-      /* allow some extra whitespaces around name and value */
-      if(curlx_str_until(&sp, &name, 20, '=') ||
-         curlx_str_single(&sp, '=') ||
-         curlx_str_until(&sp, &val, 80, ';'))
-        break;
-      curlx_str_trimblanks(&name);
-      curlx_str_trimblanks(&val);
-      /* the value might be quoted */
-      vp = curlx_str(&val);
-      quoted = (*vp == '\"');
-      if(quoted)
-        vp++;
-      if(!curlx_str_number(&vp, &num, TIME_T_MAX)) {
-        if(curlx_str_casecompare(&name, "ma"))
-          maxage = (time_t)num;
-        else if(curlx_str_casecompare(&name, "persist") && (num == 1))
-          persist = TRUE;
-      }
-      if(quoted && curlx_str_single(&sp, '\"'))
-        break;
-      if(curlx_str_single(&sp, ';'))
-        break;
-    }
-  }
-
   do {
     if(!curlx_str_single(&p, '=')) {
+      time_t maxage = 24 * 3600; /* default is 24 hours */
+      bool persist = FALSE;
       /* [protocol]="[host][:port], [protocol]="[host][:port]" */
-      enum alpnid dstalpnid =
-        Curl_alpn2alpnid(curlx_str(&alpn), curlx_strlen(&alpn));
+      enum alpnid dstalpnid = Curl_str2alpnid(&alpn);
       if(!curlx_str_single(&p, '\"')) {
         struct Curl_str dsthost;
         curl_off_t port = 0;
@@ -558,7 +524,7 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
             }
           }
           else {
-            /* IPv6 host name */
+            /* IPv6 hostname */
             if(curlx_str_until(&p, &dsthost, MAX_IPADR_LEN, ']') ||
                curlx_str_single(&p, ']')) {
               infof(data, "Bad alt-svc IPv6 hostname, ignoring.");
@@ -582,6 +548,45 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
         if(curlx_str_single(&p, '\"'))
           break;
 
+        /* Handle the optional 'ma' and 'persist' flags. Unknown flags are
+           skipped. */
+        curlx_str_passblanks(&p);
+        if(!curlx_str_single(&p, ';')) {
+          for(;;) {
+            struct Curl_str name;
+            struct Curl_str val;
+            const char *vp;
+            curl_off_t num;
+            bool quoted;
+            /* allow some extra whitespaces around name and value */
+            if(curlx_str_until(&p, &name, 20, '=') ||
+               curlx_str_single(&p, '=') ||
+               curlx_str_cspn(&p, &val, ",;"))
+              break;
+            curlx_str_trimblanks(&name);
+            curlx_str_trimblanks(&val);
+            /* the value might be quoted */
+            vp = curlx_str(&val);
+            quoted = (*vp == '\"');
+            if(quoted)
+              vp++;
+            if(!curlx_str_number(&vp, &num, TIME_T_MAX)) {
+              if(curlx_str_casecompare(&name, "ma"))
+                maxage = (time_t)num;
+              else if(curlx_str_casecompare(&name, "persist") && (num == 1))
+                persist = TRUE;
+            }
+            else
+              break;
+            p = vp; /* point to the byte ending the value */
+            curlx_str_passblanks(&p);
+            if(quoted && curlx_str_single(&p, '\"'))
+              break;
+            curlx_str_passblanks(&p);
+            if(curlx_str_single(&p, ';'))
+              break;
+          }
+        }
         if(dstalpnid) {
           if(!entries++)
             /* Flush cached alternatives for this source origin, if any - when
@@ -602,11 +607,13 @@ CURLcode Curl_altsvc_parse(struct Curl_easy *data,
             else
               as->expires = maxage + secs;
             as->persist = persist;
-            Curl_llist_append(&asi->list, as, &as->node);
+            altsvc_append(asi, as);
             infof(data, "Added alt-svc: %.*s:%d over %s",
                   (int)curlx_strlen(&dsthost), curlx_str(&dsthost),
                   dstport, Curl_alpnid2str(dstalpnid));
           }
+          else
+            return CURLE_OUT_OF_MEMORY;
         }
       }
       else
@@ -636,7 +643,8 @@ bool Curl_altsvc_lookup(struct altsvcinfo *asi,
                         enum alpnid srcalpnid, const char *srchost,
                         int srcport,
                         struct altsvc **dstentry,
-                        const int versions) /* one or more bits */
+                        const int versions, /* one or more bits */
+                        bool *psame_destination)
 {
   struct Curl_llist_node *e;
   struct Curl_llist_node *n;
@@ -645,6 +653,7 @@ bool Curl_altsvc_lookup(struct altsvcinfo *asi,
   DEBUGASSERT(srchost);
   DEBUGASSERT(dstentry);
 
+  *psame_destination = FALSE;
   for(e = Curl_llist_head(&asi->list); e; e = n) {
     struct altsvc *as = Curl_node_elem(e);
     n = Curl_node_next(e);
@@ -660,10 +669,16 @@ bool Curl_altsvc_lookup(struct altsvcinfo *asi,
        (versions & (int)as->dst.alpnid)) {
       /* match */
       *dstentry = as;
+      *psame_destination = (srcport == as->dst.port) &&
+                           hostcompare(srchost, as->dst.host);
       return TRUE;
     }
   }
   return FALSE;
 }
+
+#if defined(DEBUGBUILD) || defined(UNITTESTS)
+#undef time
+#endif
 
 #endif /* !CURL_DISABLE_HTTP && !CURL_DISABLE_ALTSVC */

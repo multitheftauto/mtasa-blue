@@ -2,8 +2,9 @@ project "discord-rpc"
 	targetname "discord-rpc"
 	language "C++"
 	kind "StaticLib"
+	warnings "Off"
 
-	includedirs { 
+	includedirs {
 		"discord/include",
 		"discord/thirdparty/rapidjson/include"
 	}

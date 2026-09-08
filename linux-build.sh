@@ -53,9 +53,6 @@ case $BUILD_CONFIG in
 esac
 
 case $BUILD_ARCHITECTURE in
-    32|x86)
-        CONFIG=${BUILD_CONFIG}_x86
-    ;;
     64|x64)
         CONFIG=${BUILD_CONFIG}_x64
     ;;

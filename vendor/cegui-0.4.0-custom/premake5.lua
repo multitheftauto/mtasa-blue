@@ -2,6 +2,7 @@ project "CEGUI"
 	language "C++"
 	kind "StaticLib"
 	targetname "CEGUI"
+	warnings "Off"
 
 	pchheader "StdInc.h"
 	pchsource "src/StdInc.cpp"
@@ -47,7 +48,7 @@ project "CEGUI"
 
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
-	
+
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" }
 

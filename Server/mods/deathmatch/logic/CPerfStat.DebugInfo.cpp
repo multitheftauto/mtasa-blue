@@ -20,7 +20,7 @@ namespace
         SString strHead;
         SString strData;
     };
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //

@@ -47,33 +47,6 @@ struct HandleDeleter
 
 using HandleScope = std::unique_ptr<std::remove_pointer_t<HANDLE>, HandleDeleter>;
 
-namespace
-{
-DWORD GetProcessBaseName(HANDLE process, LPWSTR buffer, DWORD bufferLength)
-{
-    using ModuleBaseNameFn = DWORD(WINAPI*)(HANDLE, HMODULE, LPWSTR, DWORD);
-    ModuleBaseNameFn       moduleBaseNameFn = nullptr;
-
-    if (HMODULE kernel32 = GetModuleHandleW(L"kernel32.dll"); kernel32 != nullptr)
-    {
-        if (SharedUtil::TryGetProcAddress(kernel32, "K32GetModuleBaseNameW", moduleBaseNameFn) ||
-            SharedUtil::TryGetProcAddress(kernel32, "GetModuleBaseNameW", moduleBaseNameFn))
-        {
-            return moduleBaseNameFn(process, nullptr, buffer, bufferLength);
-        }
-    }
-
-    HMODULE psapi = GetModuleHandleW(L"psapi.dll");
-    if (psapi == nullptr)
-        psapi = LoadLibraryW(L"psapi.dll");
-
-    if (psapi != nullptr && SharedUtil::TryGetProcAddress(psapi, "GetModuleBaseNameW", moduleBaseNameFn))
-        return moduleBaseNameFn(process, nullptr, buffer, bufferLength);
-
-    return 0;
-}
-}            // namespace
-
 struct SignerInfo
 {
     SignerInfo(HCRYPTMSG Msg)
@@ -177,7 +150,8 @@ static bool IsBinarySignatureTrusted(const wchar_t* filePath)
     trustData.dwUnionChoice = WTD_CHOICE_FILE;
     trustData.pFile = &fileInfo;
     trustData.dwStateAction = WTD_STATEACTION_VERIFY;
-    trustData.dwProvFlags = WTD_SAFER_FLAG;
+    trustData.dwProvFlags =
+        WTD_SAFER_FLAG | WTD_REVOCATION_CHECK_NONE | WTD_CACHE_ONLY_URL_RETRIEVAL;  // Offline verify: no network fetch during signature checks.
 
     GUID policyGUID = WINTRUST_ACTION_GENERIC_VERIFY_V2;
     LONG trustError = WinVerifyTrust(NULL, &policyGUID, &trustData);
@@ -185,7 +159,10 @@ static bool IsBinarySignatureTrusted(const wchar_t* filePath)
     trustData.dwStateAction = WTD_STATEACTION_CLOSE;
     WinVerifyTrust(NULL, &policyGUID, &trustData);
 
-    return trustError == ERROR_SUCCESS || trustError == CERT_E_UNTRUSTEDROOT || trustError == CERT_E_CHAINING || trustError == TRUST_E_TIME_STAMP;
+    // Cache-only keeps chain faults inside the tolerated set below; expiry
+    // Dont remove CERT_E_CHAINING or CERT_E_EXPIRED without revisiting the flags above.
+    return trustError == ERROR_SUCCESS || trustError == CERT_E_UNTRUSTEDROOT || trustError == CERT_E_CHAINING || trustError == TRUST_E_TIME_STAMP ||
+           trustError == CERT_E_EXPIRED;
 }
 
 /**
@@ -351,12 +328,19 @@ static bool IsSteamProcess(DWORD pid)
 
     HandleScope closeProcess{process};
 
-    wchar_t processName[MAX_PATH];
+    wchar_t     processNameBuf[MAX_PATH];
+    const DWORD processNameLen = GetProcessImageFileNameW(process, processNameBuf, MAX_PATH);
 
-    if (GetProcessBaseName(process, processName, static_cast<DWORD>(sizeof(processName) / sizeof(processName[0]))) == 0)
+    if (!processNameLen)
         return false;
 
-    if (wcsicmp(processName, L"steam.exe") != 0)
+    CharLowerW(processNameBuf);
+
+    std::wstring_view processName(processNameBuf, processNameLen);
+
+    using namespace std::string_view_literals;
+
+    if (processName != L"steam.exe"sv && !processName.ends_with(L"\\steam.exe"sv))
         return false;
 
     DWORD exitCode = 0;

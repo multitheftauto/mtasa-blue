@@ -14,11 +14,11 @@
 using std::list;
 
 static const SFixedArray<unsigned short, 47> g_usWeaponModels = {{
-    0,   331, 333, 334, 335, 336, 337, 338, 339, 341,            // 9
-    321, 322, 323, 324, 325, 326, 342, 343, 344, 0,              // 19
-    0,   0,   346, 347, 348, 349, 350, 351, 352, 353,            // 29
-    355, 356, 372, 357, 358, 359, 360, 361, 362, 363,            // 39
-    364, 365, 366, 367, 368, 369, 371                            // 46
+    0,   331, 333, 334, 335, 336, 337, 338, 339, 341,  // 9
+    321, 322, 323, 324, 325, 326, 342, 343, 344, 0,    // 19
+    0,   0,   346, 347, 348, 349, 350, 351, 352, 353,  // 29
+    355, 356, 372, 357, 358, 359, 360, 361, 362, 363,  // 39
+    364, 365, 366, 367, 368, 369, 371                  // 46
 }};
 
 unsigned int CClientPickupManager::m_uiPickupCount = 0;
@@ -51,6 +51,13 @@ CClientPickup* CClientPickupManager::Get(ElementID ID)
 
 void CClientPickupManager::DeleteAll()
 {
+    // Disable pickup processing during mass deletion to prevent crashes
+    bool wasDisabled = m_bPickupProcessingDisabled;
+    if (!wasDisabled)
+    {
+        SetPickupProcessingDisabled(true);
+    }
+
     // Delete each pickup
     m_bDontRemoveFromList = true;
     list<CClientPickup*>::const_iterator iter = m_List.begin();
@@ -63,6 +70,12 @@ void CClientPickupManager::DeleteAll()
 
     // Clear the list
     m_List.clear();
+
+    // Restore previous processing state
+    if (!wasDisabled)
+    {
+        SetPickupProcessingDisabled(false);
+    }
 }
 
 bool CClientPickupManager::Exists(CClientPickup* pPickup)
@@ -97,8 +110,8 @@ bool CClientPickupManager::IsValidWeaponID(unsigned short usWeaponID)
 
 bool CClientPickupManager::IsPickupLimitReached()
 {
-    // Max 600 pickups
-    return (m_uiPickupCount >= 64);
+    // GTA:SA supports max 620 pickups
+    return (m_uiPickupCount >= 620);
 }
 
 unsigned short CClientPickupManager::GetWeaponModel(unsigned int uiWeaponID)

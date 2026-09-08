@@ -23,8 +23,8 @@
 #include "CDatabaseManager.h"
 #include "CRegistry.h"
 
-#define BLOCKED_DB_FILE_NAME    "fileblock.db"
-#define BLOCKED_DB_TABLE_NAME   "`block_reasons`"
+#define BLOCKED_DB_FILE_NAME  "fileblock.db"
+#define BLOCKED_DB_TABLE_NAME "`block_reasons`"
 
 // SResInfo - Item in list of potential resources - Used in Refresh()
 struct SResInfo
@@ -252,6 +252,15 @@ bool CResourceManager::Refresh(bool bRefreshAll, const SString strJustThisResour
     {
         CResource* pResource = m_resourcesToStartAfterRefresh.front();
         m_resourcesToStartAfterRefresh.pop_front();
+        if (pResource->HasResourceChanged())
+        {
+            // Files changed since Load(); reload to refresh checksums
+            if (!Reload(pResource))
+            {
+                CLogger::LogPrintf("Resource '%s' has changed but reload failed; skipping start\n", pResource->GetName().c_str());
+                continue;
+            }
+        }
         pResource->Start();
     }
 
@@ -427,7 +436,7 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
     CResource* pResource = GetResource(szResourceName);
     if (pResource)
     {
-        if (!pResource->HasResourceChanged())
+        if (pResource->IsLoaded() && !pResource->HasResourceChanged())
         {
             // Already loaded and no reload required
             return pResource;
@@ -549,7 +558,7 @@ CResource* CResourceManager::GetResourceFromNetID(unsigned short usNetID)
     {
         if ((*iter)->GetNetID() == usNetID)
         {
-            assert(0);            // Should be in map
+            assert(0);  // Should be in map
             return (*iter);
         }
     }
@@ -1359,11 +1368,11 @@ void CResourceManager::ReevaluateSyncMapElementDataOption()
     {
         if (iter->second)
         {
-            bSyncMapElementData = true;            // Any 'true' will stop the set
+            bSyncMapElementData = true;  // Any 'true' will stop the set
             break;
         }
         else
-            bSyncMapElementData = false;            // Need at least one 'false' to set
+            bSyncMapElementData = false;  // Need at least one 'false' to set
     }
 
     // Apply

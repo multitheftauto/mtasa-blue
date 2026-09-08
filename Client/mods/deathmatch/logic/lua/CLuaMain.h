@@ -33,7 +33,7 @@ struct CRefInfo
     int               iFunction;
 };
 
-class CLuaMain            //: public CClient
+class CLuaMain  //: public CClient
 {
 public:
     ZERO_ON_NEW
@@ -90,7 +90,7 @@ private:
     lua_State*        m_luaVM;
     CLuaTimerManager* m_pLuaTimerManager;
 
-    bool m_bBeingDeleted;            // prevent it being deleted twice
+    bool m_bBeingDeleted;  // prevent it being deleted twice
 
     CElapsedTime m_FunctionEnterTimer;
 

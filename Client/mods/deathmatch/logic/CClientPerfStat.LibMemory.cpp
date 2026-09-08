@@ -42,7 +42,7 @@ namespace
         CDynamicLibrary* pLibrary;
         PFNGETALLOCSTATS pfnGetAllocStats;
     };
-}            // namespace
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -219,14 +219,14 @@ void CClientPerfStatLibMemoryImpl::GetLibMemoryStats(CClientPerfStatResult* pRes
                 CLibraryInfo info;
                 bool         bModDir = libs[i].bModDir;
                 info.strName = libs[i].szName;
-                #if MTA_DEBUG
+#if MTA_DEBUG
                 info.strName += "_d";
-                #endif
-                #ifdef WIN32
+#endif
+#ifdef WIN32
                 info.strName += ".dll";
-                #else
+#else
                 info.strName += ".so";
-                #endif
+#endif
                 info.pLibrary = new CDynamicLibrary();
 
                 SString strPathFilename;

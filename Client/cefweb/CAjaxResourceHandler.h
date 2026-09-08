@@ -25,7 +25,7 @@ public:
 
     std::vector<std::string>& GetGetData() override { return m_vecGetData; }
     std::vector<std::string>& GetPostData() override { return m_vecPostData; }
-    void SetResponse(std::string data) override;
+    void                      SetResponse(std::string data) override;
 
     // CefResourceHandler
     virtual void Cancel() override;
@@ -37,7 +37,7 @@ public:
     DISALLOW_COPY_AND_ASSIGN(CAjaxResourceHandler);
 
 private:
-    CefRefPtr<CefCallback> m_callback;
+    CefRefPtr<CefCallback>   m_callback;
     std::vector<std::string> m_vecGetData;
     std::vector<std::string> m_vecPostData;
     std::string              m_strResponse;

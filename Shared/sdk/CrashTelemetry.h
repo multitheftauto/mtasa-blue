@@ -24,132 +24,129 @@ namespace CrashTelemetry
 {
     struct Context
     {
-        std::size_t requestedSize{0};
-        const void* resourcePointer{nullptr};
-        std::array<char, 64> resourceTag{};
-        std::array<char, 128> detail{};
+        std::size_t                           requestedSize{0};
+        const void*                           resourcePointer{nullptr};
+        std::array<char, 64>                  resourceTag{};
+        std::array<char, 128>                 detail{};
         std::chrono::system_clock::time_point timestamp{};
-        std::uint32_t threadId{0};
-        bool hasData{false};
+        std::uint32_t                         threadId{0};
+        bool                                  hasData{false};
     };
 
-#if defined(MTA_CLIENT)
-#    include <algorithm>
-#    include <cstring>
-#    include <cstdio>
-#    include <functional>
-#    include <thread>
+    #if defined(MTA_CLIENT)
+        #include <algorithm>
+        #include <cstring>
+        #include <cstdio>
+        #include <functional>
+        #include <thread>
 
-namespace detail
-{
-    constexpr std::size_t kHistoryCapacity = 6;
-
-    template <std::size_t N>
-    inline void CopyInto(std::array<char, N>& destination, const char* source) noexcept
+    namespace detail
     {
-        if (destination.empty())
-            return;
+        constexpr std::size_t kHistoryCapacity = 6;
 
-        const std::size_t maxCopy = N - 1;
-        const std::size_t copyLength = (source != nullptr) ? std::min<std::size_t>(std::strlen(source), maxCopy) : 0;
-
-        if (copyLength != 0)
+        template <std::size_t N>
+        inline void CopyInto(std::array<char, N>& destination, const char* source) noexcept
         {
-            std::memcpy(destination.data(), source, copyLength);
-            destination[copyLength] = '\0';
-        }
-        else
-        {
-            destination[0] = '\0';
-        }
+            if (destination.empty())
+                return;
 
-        if (copyLength + 1 < N)
-        {
-            std::fill(destination.begin() + static_cast<std::ptrdiff_t>(copyLength + 1), destination.end(), '\0');
-        }
-    }
+            const std::size_t maxCopy = N - 1;
+            const std::size_t copyLength = (source != nullptr) ? std::min<std::size_t>(std::strlen(source), maxCopy) : 0;
 
-    inline std::uint32_t GetThreadIdentifier() noexcept
-    {
-#    if defined(_WIN32)
-        return static_cast<std::uint32_t>(::GetCurrentThreadId());
-#    else
-        const auto hashed = std::hash<std::thread::id>{}(std::this_thread::get_id());
-        return static_cast<std::uint32_t>(hashed & 0xFFFFFFFFu);
-#    endif
-    }
-
-    struct ThreadState
-    {
-        Context current{};
-        std::array<Context, kHistoryCapacity> history{};
-        std::size_t nextSlot = 0;
-        std::size_t size = 0;
-        std::size_t lastFailureSize = 0;
-        Context lastManualScope{};
-        bool     lastManualScopeValid = false;
-
-        void PushSnapshot() noexcept
-        {
-            history[nextSlot] = current;
-            history[nextSlot].hasData = true;
-            nextSlot = (nextSlot + 1) % kHistoryCapacity;
-            if (size < kHistoryCapacity)
-                ++size;
-        }
-
-        template <typename Callback>
-        void VisitNewestFirst(Callback&& callback) const noexcept
-        {
-            for (std::size_t i = 0; i < size; ++i)
+            if (copyLength != 0)
             {
-                const auto slotIndex = (nextSlot + kHistoryCapacity - 1 - i) % kHistoryCapacity;
-                const Context& entry = history[slotIndex];
-                if (!entry.hasData)
-                    continue;
+                std::memcpy(destination.data(), source, copyLength);
+                destination[copyLength] = '\0';
+            }
+            else
+            {
+                destination[0] = '\0';
+            }
 
-                callback(entry);
+            if (copyLength + 1 < N)
+            {
+                std::fill(destination.begin() + static_cast<std::ptrdiff_t>(copyLength + 1), destination.end(), '\0');
             }
         }
-    };
 
-    inline ThreadState& GetThreadState() noexcept
-    {
-        thread_local ThreadState state{};
-        return state;
-    }
+        inline std::uint32_t GetThreadIdentifier() noexcept
+        {
+        #if defined(_WIN32)
+            return static_cast<std::uint32_t>(::GetCurrentThreadId());
+        #else
+            const auto hashed = std::hash<std::thread::id>{}(std::this_thread::get_id());
+            return static_cast<std::uint32_t>(hashed & 0xFFFFFFFFu);
+        #endif
+        }
 
-    inline bool ContextEquals(const Context& lhs, const Context& rhs) noexcept
-    {
-        if (!lhs.hasData || !rhs.hasData)
-            return false;
+        struct ThreadState
+        {
+            Context                               current{};
+            std::array<Context, kHistoryCapacity> history{};
+            std::size_t                           nextSlot = 0;
+            std::size_t                           size = 0;
+            std::size_t                           lastFailureSize = 0;
+            Context                               lastManualScope{};
+            bool                                  lastManualScopeValid = false;
 
-        if (lhs.requestedSize != rhs.requestedSize || lhs.resourcePointer != rhs.resourcePointer || lhs.threadId != rhs.threadId
-            || lhs.timestamp != rhs.timestamp)
-            return false;
+            void PushSnapshot() noexcept
+            {
+                history[nextSlot] = current;
+                history[nextSlot].hasData = true;
+                nextSlot = (nextSlot + 1) % kHistoryCapacity;
+                if (size < kHistoryCapacity)
+                    ++size;
+            }
 
-        if (std::memcmp(lhs.resourceTag.data(), rhs.resourceTag.data(), lhs.resourceTag.size()) != 0)
-            return false;
+            template <typename Callback>
+            void VisitNewestFirst(Callback&& callback) const noexcept
+            {
+                for (std::size_t i = 0; i < size; ++i)
+                {
+                    const auto     slotIndex = (nextSlot + kHistoryCapacity - 1 - i) % kHistoryCapacity;
+                    const Context& entry = history[slotIndex];
+                    if (!entry.hasData)
+                        continue;
 
-        if (std::memcmp(lhs.detail.data(), rhs.detail.data(), lhs.detail.size()) != 0)
-            return false;
+                    callback(entry);
+                }
+            }
+        };
 
-        return true;
-    }
+        inline ThreadState& GetThreadState() noexcept
+        {
+            thread_local ThreadState state{};
+            return state;
+        }
 
-    inline void RecordManualScopeSnapshot() noexcept
-    {
-        ThreadState& state = GetThreadState();
-        state.lastManualScope = state.current;
-        state.lastManualScope.hasData = true;
-        state.lastManualScopeValid = true;
-    }
-}            // namespace detail
+        inline bool ContextEquals(const Context& lhs, const Context& rhs) noexcept
+        {
+            if (!lhs.hasData || !rhs.hasData)
+                return false;
 
-    inline void SetAllocationContext(std::size_t sizeBytes,
-                                     const void* resourcePtr,
-                                     const char* resourceTag,
-                                     const char* detail) noexcept
+            if (lhs.requestedSize != rhs.requestedSize || lhs.resourcePointer != rhs.resourcePointer || lhs.threadId != rhs.threadId ||
+                lhs.timestamp != rhs.timestamp)
+                return false;
+
+            if (std::memcmp(lhs.resourceTag.data(), rhs.resourceTag.data(), lhs.resourceTag.size()) != 0)
+                return false;
+
+            if (std::memcmp(lhs.detail.data(), rhs.detail.data(), lhs.detail.size()) != 0)
+                return false;
+
+            return true;
+        }
+
+        inline void RecordManualScopeSnapshot() noexcept
+        {
+            ThreadState& state = GetThreadState();
+            state.lastManualScope = state.current;
+            state.lastManualScope.hasData = true;
+            state.lastManualScopeValid = true;
+        }
+    }  // namespace detail
+
+    inline void SetAllocationContext(std::size_t sizeBytes, const void* resourcePtr, const char* resourceTag, const char* detail) noexcept
     {
         Context& current = detail::GetThreadState().current;
         current.requestedSize = sizeBytes;
@@ -195,21 +192,24 @@ namespace detail
     inline std::string BuildAllocationTelemetryNote() noexcept
     {
         std::array<Context, detail::kHistoryCapacity> snapshot{};
-        std::size_t snapshotCount = 0;
-        const auto  now = std::chrono::system_clock::now();
+        std::size_t                                   snapshotCount = 0;
+        const auto                                    now = std::chrono::system_clock::now();
 
         const auto& threadState = detail::GetThreadState();
-        threadState.VisitNewestFirst([&](const Context& entry) {
-            if (snapshotCount < snapshot.size())
-                snapshot[snapshotCount++] = entry;
-        });
+        threadState.VisitNewestFirst(
+            [&](const Context& entry)
+            {
+                if (snapshotCount < snapshot.size())
+                    snapshot[snapshotCount++] = entry;
+            });
 
         const std::size_t recordedSize = GetRecordedAllocationSize();
 
         std::string note;
         note.reserve(640);
 
-        auto appendEntryLine = [&](const Context& entry, std::size_t index, bool includeIndexLabel) {
+        auto appendEntryLine = [&](const Context& entry, std::size_t index, bool includeIndexLabel)
+        {
             std::size_t sizeToReport = entry.requestedSize;
             if (includeIndexLabel && index == 0 && recordedSize != 0)
             {
@@ -233,58 +233,26 @@ namespace detail
             {
                 if (includeIndexLabel)
                 {
-                    _snprintf_s(line,
-                                sizeof(line),
-                                _TRUNCATE,
-                                "  #%zu requested=%zu bytes, tag=%s, detail=%s, object=0x%p, thread=%lu, age=%llims\n",
-                                index,
-                                sizeToReport,
-                                resourceTag,
-                                detailText,
-                                entry.resourcePointer,
-                                static_cast<unsigned long>(threadId),
-                                ageMs);
+                    _snprintf_s(line, sizeof(line), _TRUNCATE, "  #%zu requested=%zu bytes, tag=%s, detail=%s, object=0x%p, thread=%lu, age=%llims\n", index,
+                                sizeToReport, resourceTag, detailText, entry.resourcePointer, static_cast<unsigned long>(threadId), ageMs);
                 }
                 else
                 {
-                    _snprintf_s(line,
-                                sizeof(line),
-                                _TRUNCATE,
-                                "  requested=%zu bytes, tag=%s, detail=%s, object=0x%p, thread=%lu, age=%llims\n",
-                                sizeToReport,
-                                resourceTag,
-                                detailText,
-                                entry.resourcePointer,
-                                static_cast<unsigned long>(threadId),
-                                ageMs);
+                    _snprintf_s(line, sizeof(line), _TRUNCATE, "  requested=%zu bytes, tag=%s, detail=%s, object=0x%p, thread=%lu, age=%llims\n", sizeToReport,
+                                resourceTag, detailText, entry.resourcePointer, static_cast<unsigned long>(threadId), ageMs);
                 }
             }
             else
             {
                 if (includeIndexLabel)
                 {
-                    _snprintf_s(line,
-                                sizeof(line),
-                                _TRUNCATE,
-                                "  #%zu requested=%zu bytes, tag=%s, detail=%s, object=0x%p, thread=%lu\n",
-                                index,
-                                sizeToReport,
-                                resourceTag,
-                                detailText,
-                                entry.resourcePointer,
-                                static_cast<unsigned long>(threadId));
+                    _snprintf_s(line, sizeof(line), _TRUNCATE, "  #%zu requested=%zu bytes, tag=%s, detail=%s, object=0x%p, thread=%lu\n", index, sizeToReport,
+                                resourceTag, detailText, entry.resourcePointer, static_cast<unsigned long>(threadId));
                 }
                 else
                 {
-                    _snprintf_s(line,
-                                sizeof(line),
-                                _TRUNCATE,
-                                "  requested=%zu bytes, tag=%s, detail=%s, object=0x%p, thread=%lu\n",
-                                sizeToReport,
-                                resourceTag,
-                                detailText,
-                                entry.resourcePointer,
-                                static_cast<unsigned long>(threadId));
+                    _snprintf_s(line, sizeof(line), _TRUNCATE, "  requested=%zu bytes, tag=%s, detail=%s, object=0x%p, thread=%lu\n", sizeToReport, resourceTag,
+                                detailText, entry.resourcePointer, static_cast<unsigned long>(threadId));
                 }
             }
 
@@ -294,11 +262,7 @@ namespace detail
         if (snapshotCount == 0)
         {
             char buffer[160]{};
-            _snprintf_s(buffer,
-                        sizeof(buffer),
-                        _TRUNCATE,
-                        "Allocation telemetry: requested=%zu bytes (no tagged context available)\n",
-                        recordedSize);
+            _snprintf_s(buffer, sizeof(buffer), _TRUNCATE, "Allocation telemetry: requested=%zu bytes (no tagged context available)\n", recordedSize);
             note += buffer;
         }
         else
@@ -311,7 +275,7 @@ namespace detail
         }
 
         const bool hasManualScope = threadState.lastManualScopeValid && threadState.lastManualScope.hasData;
-        bool manualScopeCapturedInRing = false;
+        bool       manualScopeCapturedInRing = false;
         if (hasManualScope)
         {
             for (std::size_t i = 0; i < snapshotCount; ++i)
@@ -326,8 +290,7 @@ namespace detail
 
         if (!hasManualScope)
         {
-            note +=
-                "CrashTelemetry::Scope annotations: none executed on this thread before crash; instrument entry points to capture context.\n";
+            note += "CrashTelemetry::Scope annotations: none executed on this thread before crash; instrument entry points to capture context.\n";
         }
         else if (!manualScopeCapturedInRing)
         {
@@ -344,10 +307,7 @@ namespace detail
     class Scope
     {
     public:
-        Scope(std::size_t sizeBytes,
-              const void* resourcePtr,
-              const char* resourceTag,
-              const char* detail) noexcept
+        Scope(std::size_t sizeBytes, const void* resourcePtr, const char* resourceTag, const char* detail) noexcept
             : m_previous(CaptureContext()), m_restore(true)
         {
             SetAllocationContext(sizeBytes, resourcePtr, resourceTag, detail);
@@ -373,21 +333,33 @@ namespace detail
         Context m_previous{};
         bool    m_restore{false};
     };
-#else
-    inline void RecordAllocationFailureSize(std::size_t) noexcept {}
-    inline std::size_t GetRecordedAllocationSize() noexcept { return 0; }
-    inline void SetAllocationContext(std::size_t,
-                                     const void*,
-                                     const char*,
-                                     const char*) noexcept
+    #else
+    inline void RecordAllocationFailureSize(std::size_t) noexcept
+    {
+    }
+    inline std::size_t GetRecordedAllocationSize() noexcept
+    {
+        return 0;
+    }
+    inline void SetAllocationContext(std::size_t, const void*, const char*, const char*) noexcept
     {
     }
 
-    inline void ClearAllocationContext() noexcept {}
+    inline void ClearAllocationContext() noexcept
+    {
+    }
 
-    inline Context CaptureContext() noexcept { return Context{}; }
-    inline void RestoreContext(const Context&) noexcept {}
-    inline std::string BuildAllocationTelemetryNote() noexcept { return {}; }
+    inline Context CaptureContext() noexcept
+    {
+        return Context{};
+    }
+    inline void RestoreContext(const Context&) noexcept
+    {
+    }
+    inline std::string BuildAllocationTelemetryNote() noexcept
+    {
+        return {};
+    }
 
     class Scope
     {
@@ -400,6 +372,6 @@ namespace detail
         Scope(Scope&&) = delete;
         Scope& operator=(Scope&&) = delete;
     };
-#endif
-}            // namespace CrashTelemetry
+    #endif
+}  // namespace CrashTelemetry
 #endif

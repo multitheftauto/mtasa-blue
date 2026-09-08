@@ -20,18 +20,26 @@ extern CGameSA* pGame;
 
 CRect* CPhysicalSAInterface::GetBoundRect_(CRect* pRect)
 {
-    // Validate collision model before accessing radius
     CVector boundCentre;
     CEntitySAInterface::GetBoundCentre(&boundCentre);
-    CBaseModelInfoSAInterface* pModelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex);
 
-    // Validate model info and collision model before accessing
+    // Validate model info and collision model before deref. The streaming
+    // system can strip a model's collision data while leaving pColModel
+    // non-null (dangling), or release the model info entirely when entities
+    // from a recycled sector are re-added via building removal. Dereferencing
+    // without a guard here can write into arbitrary memory.
+    CBaseModelInfoSAInterface* pModelInfo = CModelInfoSAInterface::GetModelInfo(m_nModelIndex);
     if (!pModelInfo || !pModelInfo->pColModel)
+    {
+        // Always initialize output rect to avoid leaking stale caller data.
+        *pRect = CRect(boundCentre.fX, boundCentre.fY, boundCentre.fX, boundCentre.fY);
+        pRect->FixIncorrectTopLeft();
         return pRect;
+    }
 
     float fRadius = pModelInfo->pColModel->m_sphere.m_radius;
     *pRect = CRect(boundCentre.fX - fRadius, boundCentre.fY - fRadius, boundCentre.fX + fRadius, boundCentre.fY + fRadius);
-    pRect->FixIncorrectTopLeft();            // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
+    pRect->FixIncorrectTopLeft();  // Fix #1613: custom map collision crashes in CPhysical class (infinite loop)
     return pRect;
 }
 
@@ -82,12 +90,14 @@ CVector* CPhysicalSA::GetMoveSpeedInternal(CVector* vecMoveSpeed)
     DWORD dwFunc = FUNC_GetMoveSpeed;
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
     }
+    // clang-format on
     MemCpyFast(vecMoveSpeed, (void*)dwReturn, sizeof(CVector));
     return vecMoveSpeed;
 }
@@ -97,12 +107,14 @@ CVector* CPhysicalSA::GetTurnSpeedInternal(CVector* vecTurnSpeed)
     DWORD dwFunc = FUNC_GetTurnSpeed;
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
     }
+    // clang-format on
     MemCpyFast(vecTurnSpeed, (void*)dwReturn, sizeof(CVector));
     return vecTurnSpeed;
 }
@@ -113,12 +125,14 @@ void CPhysicalSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
     DWORD dwThis = (DWORD)((CPhysicalSAInterface*)GetInterface());
     DWORD dwReturn = 0;
 
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
         mov     dwReturn, eax
     }
+    // clang-format on
     MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
 
     if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
@@ -204,11 +218,13 @@ void CPhysicalSA::ProcessCollision()
     DWORD dwFunc = FUNC_ProcessCollision;
     DWORD dwThis = (DWORD)GetInterface();
 
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CPhysicalSA::AddToMovingList()
@@ -216,11 +232,13 @@ void CPhysicalSA::AddToMovingList()
     DWORD dwFunc = FUNC_CPhysical_AddToMovingList;
     DWORD dwThis = (DWORD)GetInterface();
 
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 float CPhysicalSA::GetDamageImpulseMagnitude()
@@ -244,8 +262,6 @@ CEntity* CPhysicalSA::GetDamageEntity()
     return nullptr;
 }
 
-// Stores a raw pointer to the entity. Call ResetLastDamage() when the entity
-// is destroyed to prevent dangling pointer access.
 void CPhysicalSA::SetDamageEntity(CEntity* pEntity)
 {
     CEntitySA* pEntitySA = dynamic_cast<CEntitySA*>(pEntity);
@@ -253,7 +269,6 @@ void CPhysicalSA::SetDamageEntity(CEntity* pEntity)
         ((CPhysicalSAInterface*)GetInterface())->m_pCollidedEntity = pEntitySA->GetInterface();
 }
 
-// Clears the damage entity pointer and magnitude
 void CPhysicalSA::ResetLastDamage()
 {
     ((CPhysicalSAInterface*)GetInterface())->m_fDamageImpulseMagnitude = 0.0f;
@@ -289,6 +304,7 @@ void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, 
     if (((CPhysicalSAInterface*)GetInterface())->m_pAttachedEntity == NULL)
         return;
 
+    // clang-format off
     __asm
     {
         push    bUnk
@@ -298,6 +314,7 @@ void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, 
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
 }
 
 bool CPhysicalSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CVector* vecPosition, const CVector* vecRotation)
@@ -305,6 +322,7 @@ bool CPhysicalSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CV
     DWORD dwFunc = FUNC_AttachEntityToEntity;
     DWORD dwThis = (DWORD)GetInterface();
     DWORD dwReturn = 0;
+    // clang-format off
     __asm
     {
         mov     ecx, vecRotation
@@ -320,6 +338,7 @@ bool CPhysicalSA::InternalAttachEntityToEntity(DWORD dwEntityInterface, const CV
         call    dwFunc
         mov     dwReturn, eax
     }
+    // clang-format on
     return (dwReturn != NULL);
 }
 

@@ -23,7 +23,7 @@ public:
     // The following parameter is used when Blip Type is CAR, CHAR or OBJECT
     long PoolIndex;
     // The following parameter is used when Blip Type is COORDS
-    CVector position;            // vec2DBlip;
+    CVector position;  // vec2DBlip;
 
     WORD ReferenceIndex;
 
@@ -52,10 +52,10 @@ public:
 
     void Init();
 
-    void                SetSprite(MarkerSprite Sprite);
-    void                SetDisplay(MarkerDisplay wDisplay);
+    void                SetSprite(MarkerSprite::Enum Sprite);
+    void                SetDisplay(MarkerDisplay::Enum wDisplay);
     void                SetScale(WORD wScale);
-    void                SetColor(MarkerColor color);
+    void                SetColor(MarkerColor::Enum color);
     void                SetColor(const SharedUtil::SColor color);
     void                Remove();
     bool                IsActive();

@@ -64,9 +64,9 @@ void CLatentTransferManager::DoPulse()
     // Smooth out time between calls, with more resistance when rising
     int iBetweenCallsChange = iDeltaTimeMs - m_iTimeMsBetweenCalls;
     if (iBetweenCallsChange > 0)
-        m_iTimeMsBetweenCalls += std::min(iBetweenCallsChange, std::max(1, m_iTimeMsBetweenCalls / 10));            // 10% max when rising
+        m_iTimeMsBetweenCalls += std::min(iBetweenCallsChange, std::max(1, m_iTimeMsBetweenCalls / 10));  // 10% max when rising
     else
-        m_iTimeMsBetweenCalls -= std::min(-iBetweenCallsChange, std::max(1, m_iTimeMsBetweenCalls / 5));            // 20% max when falling
+        m_iTimeMsBetweenCalls -= std::min(-iBetweenCallsChange, std::max(1, m_iTimeMsBetweenCalls / 5));  // 20% max when falling
 
     m_iTimeMsBetweenCalls = Clamp(1, m_iTimeMsBetweenCalls, 100);
 
@@ -141,7 +141,7 @@ void CLatentTransferManager::AddSendBatchBegin(unsigned char ucPacketId, NetBitS
 
     // Copy data from bitstream into buffer
     buffer.SetSize(uiHeadSize + uiBitStreamBytesUsed);
-    *(buffer.GetData() + buffer.GetSize() - 1) = 0;            // Zero last byte of destination buffer
+    *(buffer.GetData() + buffer.GetSize() - 1) = 0;  // Zero last byte of destination buffer
     pBitStream->ResetReadPointer();
     pBitStream->ReadBits(buffer.GetData() + uiHeadSize, uiBitStreamBitsUsed);
 
@@ -375,7 +375,7 @@ bool DoStaticProcessPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBi
 
 void DoDisconnectRemote(NetPlayerID remoteId, const SString& strReason)
 {
-    g_pCore->ShowMessageBox(_("Error") + _E("CD61"), strReason, MB_BUTTON_OK | MB_ICON_ERROR);            // DoDisconnectRemote
+    g_pCore->ShowMessageBox(_("Error") + _E("CD61"), strReason, MB_BUTTON_OK | MB_ICON_ERROR);  // DoDisconnectRemote
     g_pCore->GetModManager()->RequestUnload();
 }
 
@@ -407,13 +407,21 @@ bool DoSendPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamIn
 
 bool DoStaticProcessPacket(unsigned char ucPacketID, NetPlayerID remoteId, NetBitStreamInterface* pBitStream, ushort usResourceNetId)
 {
-    // Check if latent packet should be ignored
-    if (usResourceNetId != 0xFFFF)
-    {
-        CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromNetID(usResourceNetId);
-        if (!pResource)
-            return true;
-    }
+    // triggerLatentServerEvent is the only legitimate client-to-server latent
+    // path. It always sends PACKET_ID_LUA_EVENT with a valid resource net ID.
+    // Reject any other packet ID to prevent arbitrary packet handler dispatch
+    // via the latent transfer channel (e.g. routing PACKET_ID_PLAYER_MODINFO
+    // through a 100MB reassembled buffer to cause an unbounded heap storm).
+    if (ucPacketID != PACKET_ID_LUA_EVENT)
+        return false;
+
+    if (usResourceNetId == 0xFFFF)
+        return false;
+
+    CResource* pResource = g_pGame->GetResourceManager()->GetResourceFromNetID(usResourceNetId);
+    if (!pResource)
+        return true;
+
     return CGame::StaticProcessPacket(ucPacketID, remoteId, pBitStream, NULL);
 }
 

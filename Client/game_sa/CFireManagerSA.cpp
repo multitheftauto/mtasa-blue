@@ -19,8 +19,7 @@ extern CGameSA* pGame;
 CFireManagerSA::CFireManagerSA()
 {
     for (int i = 0; i < MAX_FIRES; i++)
-        Fires[i] = new CFireSA(
-            (CFireSAInterface*)(CLASS_CFireManager + 40 * i));            // + 4 because thats the position of CFire array in CFireManager (see source)
+        Fires[i] = new CFireSA((CFireSAInterface*)(CLASS_CFireManager + 40 * i));  // + 4 because thats the position of CFire array in CFireManager (see source)
 }
 
 CFireManagerSA::~CFireManagerSA()
@@ -38,6 +37,7 @@ void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
     float fZ = vecPosition.fZ;
     DWORD dwFunction = FUNC_ExtinguishPoint;
 
+    // clang-format off
     __asm
     {
         mov     ecx, CLASS_CFireManager
@@ -47,6 +47,7 @@ void CFireManagerSA::ExtinguishPoint(CVector& vecPosition, float fRadius)
         push    fX
         call    dwFunction
     }
+    // clang-format on
 }
 
 CFire* CFireManagerSA::StartFire(CEntity* entityTarget, CEntity* entityCreator, float fSize = DEFAULT_FIRE_PARTICLE_SIZE)

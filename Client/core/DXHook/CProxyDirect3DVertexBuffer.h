@@ -24,8 +24,8 @@ class CProxyDirect3DVertexBuffer : public IDirect3DVertexBuffer9
 public:
     /*** IUnknown methods ***/
     HRESULT __stdcall QueryInterface(REFIID riid, void** ppvObj);
-    ULONG __stdcall AddRef() { return m_pOriginal->AddRef(); }
-    ULONG __stdcall Release();
+    ULONG __stdcall   AddRef() { return m_pOriginal->AddRef(); }
+    ULONG __stdcall   Release();
 
     /*** IDirect3DResource9 methods ***/
     HRESULT __stdcall GetDevice(IDirect3DDevice9** ppDevice) { return m_pOriginal->GetDevice(ppDevice); }
@@ -35,9 +35,9 @@ public:
     }
     HRESULT __stdcall GetPrivateData(REFGUID refguid, void* pData, DWORD* pSizeOfData) { return m_pOriginal->GetPrivateData(refguid, pData, pSizeOfData); }
     HRESULT __stdcall FreePrivateData(REFGUID refguid) { return m_pOriginal->FreePrivateData(refguid); }
-    DWORD __stdcall SetPriority(DWORD PriorityNew) { return m_pOriginal->SetPriority(PriorityNew); }
-    DWORD __stdcall GetPriority() { return m_pOriginal->GetPriority(); }
-    void __stdcall PreLoad() { m_pOriginal->PreLoad(); }
+    DWORD __stdcall   SetPriority(DWORD PriorityNew) { return m_pOriginal->SetPriority(PriorityNew); }
+    DWORD __stdcall   GetPriority() { return m_pOriginal->GetPriority(); }
+    void __stdcall    PreLoad() { m_pOriginal->PreLoad(); }
     D3DRESOURCETYPE __stdcall GetType() { return m_pOriginal->GetType(); }
 
     /*** IDirect3DVertexBuffer9 methods ***/
@@ -58,12 +58,12 @@ protected:
     DWORD                                   m_dwUsage;
     DWORD                                   m_dwFVF;
     D3DPOOL                                 m_pool;
-    CProxyDirect3DDevice9::SResourceMemory& m_stats;
+    CProxyDirect3DDevice9::SResourceMemory* m_pStats;
 
-    bool                 m_bFallbackActive;
-    UINT                 m_fallbackOffset;
-    UINT                 m_fallbackSize;
-    DWORD                m_fallbackFlags;
-    std::vector<uint8_t> m_fallbackStorage;
+    bool                         m_bFallbackActive;
+    UINT                         m_fallbackOffset;
+    UINT                         m_fallbackSize;
+    DWORD                        m_fallbackFlags;
+    std::vector<uint8_t>         m_fallbackStorage;
     SharedUtil::CCriticalSection m_fallbackCS;
 };

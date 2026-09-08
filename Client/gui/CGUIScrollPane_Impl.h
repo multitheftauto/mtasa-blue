@@ -37,7 +37,7 @@ public:
 
     eCGUIType GetType() { return CGUI_SCROLLPANE; };
 
-    #include "CGUIElement_Inc.h"
+#include "CGUIElement_Inc.h"
 
 private:
     class CGUI_Impl* m_pGUI;

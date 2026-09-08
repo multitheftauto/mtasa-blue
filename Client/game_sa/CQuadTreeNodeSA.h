@@ -14,7 +14,7 @@
 #include "CPtrNodeSingleListSA.h"
 #include "CRect.h"
 
-template<class T>
+template <class T>
 class CQuadTreeNodesSAInterface
 {
 public:
@@ -22,13 +22,13 @@ public:
     char AddItem(T* item, CRect* boudingBox);
 
 private:
-    float              m_fX;
-    float              m_fY;
-    float              m_fW;
-    float              m_fH;
+    float                            m_fX;
+    float                            m_fY;
+    float                            m_fW;
+    float                            m_fH;
     CPtrNodeSingleListSAInterface<T> m_pItemList;
-    CQuadTreeNodesSAInterface<T>* m_childrens[4];
-    uint32_t           m_level;
+    CQuadTreeNodesSAInterface<T>*    m_childrens[4];
+    uint32_t                         m_level;
 };
 static_assert(sizeof(CQuadTreeNodesSAInterface<void>) == 0x28, "Wrong CQuadTreeNodesSAInterface size");
 

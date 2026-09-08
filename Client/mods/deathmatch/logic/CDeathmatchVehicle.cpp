@@ -42,6 +42,18 @@ void CDeathmatchVehicle::SetIsSyncing(bool bIsSyncing)
 
 bool CDeathmatchVehicle::SyncDamageModel()
 {
+    // Do not sync damage for blown vehicles. Once destroyed, further
+    // damage state changes (e.g. from physics collision or burn explosions)
+    // would only re-spawn flying components and excess explosions on all
+    // clients without meaningful effect.
+    if (IsBlown())
+        return false;
+
+    // Do not send premature damage sync states if the vehicle clump has just been
+    // recreated/streamed in and its cached damage states are awaiting application in StreamedInPulse.
+    if (m_bJustStreamedIn)
+        return false;
+
     SVehicleDamageSync damage(true, true, true, true, true);
     bool               bChanges = false;
 

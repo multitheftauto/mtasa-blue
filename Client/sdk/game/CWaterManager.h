@@ -35,6 +35,6 @@ public:
     virtual bool TestLineAgainstWater(const CVector& vecStart, const CVector& vecEnd, CVector* vecCollision) = 0;
 
     virtual void UndoChanges(void* pChangeSource = NULL) = 0;
-    virtual void RebuildIndex() = 0;            // Call this after moving a polygon's vertices
-    virtual void Reset() = 0;                   // Reset all water to SA default
+    virtual void RebuildIndex() = 0;  // Call this after moving a polygon's vertices
+    virtual void Reset() = 0;         // Reset all water to SA default
 };

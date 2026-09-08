@@ -12,7 +12,7 @@
 
 extern "C"
 {
-    #include "lua.h"
+#include "lua.h"
 }
 
 #include <net/bitstream.h>
@@ -32,6 +32,8 @@ class CLuaArguments;
 class CLuaArguments
 {
 public:
+    static constexpr unsigned int MaxBitStreamTableReadDepth = 64;
+
     CLuaArguments() {}
     CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
     CLuaArguments(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
@@ -50,7 +52,7 @@ public:
     bool CallGlobal(class CLuaMain* pLuaMain, const char* szFunction, CLuaArguments* returnValues = NULL) const;
 
     void ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
-    void PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = nullptr) const;
+    void PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = nullptr, bool isArray = false) const;
 
     CLuaArgument* PushNil();
     CLuaArgument* PushBoolean(bool bBool);
@@ -67,7 +69,7 @@ public:
     void DeleteArguments();
     void Pop();
 
-    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
     void         ValidateTableKeys();
     bool         ReadFromJSONString(const char* szJSON);

@@ -26,6 +26,7 @@ bool CCarEnterExitSA::GetNearestCarDoor(CPed* pPed, CVehicle* pVehicle, CVector*
     {
         CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
         CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
+        // clang-format off
         __asm
         {
             push    pDoor
@@ -36,6 +37,7 @@ bool CCarEnterExitSA::GetNearestCarDoor(CPed* pPed, CVehicle* pVehicle, CVector*
             add     esp, 0x10
             mov     bReturn, al
         }
+        // clang-format on
     }
 
     return bReturn;
@@ -54,6 +56,7 @@ bool CCarEnterExitSA::GetNearestCarPassengerDoor(CPed* pPed, CVehicle* pVehicle,
     {
         CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
         CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
+        // clang-format off
         __asm
         {
             push    ebx
@@ -73,6 +76,7 @@ bool CCarEnterExitSA::GetNearestCarPassengerDoor(CPed* pPed, CVehicle* pVehicle,
             mov     bReturn, al
             pop     ebx
         }
+        // clang-format on
     }
 
     return bReturn;
@@ -103,6 +107,7 @@ int CCarEnterExitSA::ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle)
     {
         CPedSAInterface*     pPedInterface = pPedSA->GetPedInterface();
         CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
+        // clang-format off
         __asm
         {
             push    pPedInterface
@@ -111,6 +116,7 @@ int CCarEnterExitSA::ComputeTargetDoorToExit(CPed* pPed, CVehicle* pVehicle)
             add     esp, 8
             mov     door, eax
         }
+        // clang-format on
 
         switch (door)
         {
@@ -185,6 +191,7 @@ bool CCarEnterExitSA::IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVec
         if (pVehicleSA)
         {
             CVehicleSAInterface* pVehicleInterface = pVehicleSA->GetVehicleInterface();
+            // clang-format off
             __asm
             {
                 push    pUnknown
@@ -194,6 +201,7 @@ bool CCarEnterExitSA::IsRoomForPedToLeaveCar(CVehicle* pVehicle, int iDoor, CVec
                 add     esp, 12
                 mov     bRet, al
             }
+            // clang-format on
         }
     }
 

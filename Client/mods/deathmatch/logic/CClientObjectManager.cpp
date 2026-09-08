@@ -91,6 +91,21 @@ CClientObject* CClientObjectManager::Get(ElementID ID)
 
 bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
 {
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulObjectModel);
+    if (!pModelInfo || !pModelInfo->GetInterface())
+        return false;
+
+    // Custom models allocated via engineRequestModel have a parent ID
+    if (pModelInfo->GetParentID() != 0)
+    {
+        eModelInfoType eType = pModelInfo->GetModelType();
+        // Custom object models must not be ped or vehicle types
+        if (eType == eModelInfoType::PED || eType == eModelInfoType::VEHICLE)
+            return false;
+        return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON || eType == eModelInfoType::TIME);
+    }
+
+    // Standard GTA models must be in valid range
     if (ulObjectModel >= static_cast<unsigned long>(g_pGame->GetBaseIDforTXD()))
         return false;
 
@@ -100,10 +115,6 @@ bool CClientObjectManager::IsValidModel(unsigned long ulObjectModel)
 
     // These cutscene objects cause crash (Github #424)
     if (300 <= ulObjectModel && ulObjectModel <= 314)
-        return false;
-
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulObjectModel);
-    if (!pModelInfo || !pModelInfo->GetInterface())
         return false;
 
     if (!pModelInfo->IsAllocatedInArchive())
@@ -272,8 +283,7 @@ bool CClientObjectManager::IsHardObjectLimitReached()
                 "CClientObjectManager reached limit -"
                 " ENTRY_INFO_NODES:%d/%d"
                 " POINTER_DOUBLE_LINKS:%d/%d",
-                m_iEntryInfoNodeEntries, MAX_ENTRY_INFO_NODES_MTA,
-                m_iPointerNodeDoubleLinkEntries, MAX_POINTER_DOUBLE_LINKS_MTA);
+                m_iEntryInfoNodeEntries, MAX_ENTRY_INFO_NODES_MTA, m_iPointerNodeDoubleLinkEntries, MAX_POINTER_DOUBLE_LINKS_MTA);
             g_pCore->GetConsole()->Echo(strMessage);
             AddReportLog(7430, strMessage);
         }

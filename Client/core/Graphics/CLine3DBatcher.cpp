@@ -11,6 +11,7 @@
 
 #include <StdInc.h>
 #include "CLine3DBatcher.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 
 ////////////////////////////////////////////////////////////////
 //

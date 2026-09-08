@@ -84,14 +84,14 @@ Function .onInit
 
 	; Try to find previously saved MTA:SA install path
 	ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas All\${0.0}" "Last Install Location"
-	${If} $Install_Dir == "" 
+	${If} $Install_Dir == ""
 		ReadRegStr $Install_Dir HKLM "SOFTWARE\Multi Theft Auto: San Andreas ${0.0}" "Last Install Location"
 	${EndIf}
-	${If} $Install_Dir == "" 
+	${If} $Install_Dir == ""
 		strcpy $Install_Dir "$PROGRAMFILES\MTA San Andreas ${0.0}"
 	${EndIf}
 	strcpy $INSTDIR $Install_Dir
-	
+
 	InitPluginsDir
 	;File /oname=$PLUGINSDIR\serialdialog.ini "serialdialog.ini"
 FunctionEnd
@@ -141,9 +141,14 @@ Section "Data files" SEC01
 	File "${FILES_ROOT}\MTA San Andreas\mta\vog.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\vvo.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\vvof.dll"
-	
+
 	File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_43.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_47.dll"
+	!ifdef MTA_MAETRO
+		File /oname=d3dcompiler_47.dll "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_47.maetro.dll"
+	!else
+		File "${FILES_ROOT}\MTA San Andreas\mta\d3dcompiler_47.dll"
+	!endif
 	File "${FILES_ROOT}\MTA San Andreas\mta\libEGL.dll"
 	File "${FILES_ROOT}\MTA San Andreas\mta\libGLESv2.dll"
 
@@ -155,13 +160,13 @@ Section "Data files" SEC01
     File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.lnf.xml"
     File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.png"
     File "${FILES_ROOT}\MTA San Andreas\skins\Classic\CGUI.xml"
-    
+
     SetOutPath "$INSTDIR\skins\Default"
     File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.is.xml"
     File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.lnf.xml"
     File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.png"
     File "${FILES_ROOT}\MTA San Andreas\skins\Default\CGUI.xml"
-                
+
     SetOutPath "$INSTDIR\skins\Lighter black"
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.is.xml"
     File "${FILES_ROOT}\MTA San Andreas\skins\Lighter black\CGUI.lnf.xml"
@@ -185,7 +190,7 @@ Section "Data files" SEC01
     File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.lnf.xml"
     File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.png"
     File "${FILES_ROOT}\MTA San Andreas\skins\GWEN Orange\CGUI.xml"
-	
+
 	SetOutPath "$INSTDIR\MTA\cgui"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Falagard.xsd"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\Font.xsd"
@@ -207,7 +212,7 @@ Section "Data files" SEC01
 
 	SetOutPath "$INSTDIR\MTA\cgui\images\transferset"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\transferset\*.png"
-	
+
 	SetOutPath "$INSTDIR\MTA\cgui\images\serverbrowser"
 	File "${FILES_ROOT}\MTA San Andreas\mta\cgui\images\serverbrowser\*.png"
 

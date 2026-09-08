@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CChecksum.h"
 
 using std::list;
 
@@ -19,6 +20,8 @@ CResourceManager::CResourceManager()
 
 CResourceManager::~CResourceManager()
 {
+    CChecksum::ClearChecksumCache();
+
     while (!m_resources.empty())
     {
         CResource* pResource = m_resources.back();
@@ -57,7 +60,7 @@ CResource* CResourceManager::GetResourceFromNetID(unsigned short usNetID)
     {
         if ((*iter)->GetNetID() == usNetID)
         {
-            assert(0);            // Should be in map
+            assert(0);  // Should be in map
             return (*iter);
         }
     }
@@ -99,15 +102,26 @@ CResource* CResourceManager::GetResource(const char* szResourceName)
 
 void CResourceManager::OnDownloadGroupFinished()
 {
+    CDownloadableResource::EndChecksumBatch();
+
     // Try to load newly ready resources
     for (std::list<CResource*>::const_iterator iter = m_resources.begin(); iter != m_resources.end(); ++iter)
     {
         CResource* pResource = *iter;
         if (!pResource->IsActive())
         {
-            // Stop as soon as we hit a resource which hasn't downloaded yet (as per previous behaviour)
+            if (!pResource->CanBeLoaded())
+            {
+                // Stop as soon as we hit a resource which hasn't downloaded yet (as per previous behaviour)
+                if (pResource->IsWaitingForInitialDownloads())
+                    break;
+
+                continue;
+            }
+
             if (pResource->IsWaitingForInitialDownloads())
                 break;
+
             pResource->Load();
         }
     }
@@ -241,8 +255,6 @@ void CResourceManager::OnFileModifedByScript(const SString& strInFilename, const
     if (pResourceFile && !pResourceFile->IsModifedByScript())
     {
         pResourceFile->SetModifedByScript(true);
-        SString strMessage("Resource file modifed by script (%s): %s ", *strReason, *ConformResourcePath(strInFilename));
-        AddReportLog(7059, strMessage + g_pNet->GetConnectedServer(true), 10);
     }
 }
 
@@ -272,8 +284,9 @@ void CResourceManager::ValidateResourceFile(const SString& strInFilename, const 
                 CMD5Hasher::ConvertToHex(checksum.md5, szMd5);
                 char szMd5Wanted[33];
                 CMD5Hasher::ConvertToHex(pResourceFile->GetServerChecksum().md5, szMd5Wanted);
-                SString strMessage("%s [Expected Size:%d MD5:%s][Got Size:%d MD5:%s] ", *ConformResourcePath(strInFilename), pResourceFile->GetDownloadSize(),
-                                   szMd5Wanted, (int)FileSize(strInFilename), szMd5);
+                const int iGotSize = buffer ? static_cast<int>(bufferSize) : static_cast<int>(FileSize(strInFilename));
+                SString   strMessage("%s [Expected Size:%d CRC:%08lX MD5:%s][Got Size:%d CRC:%08lX MD5:%s] ", *ConformResourcePath(strInFilename),
+                                     pResourceFile->GetDownloadSize(), pResourceFile->GetServerChecksum().ulCRC, szMd5Wanted, iGotSize, checksum.ulCRC, szMd5);
                 if (pResourceFile->IsDownloaded())
                 {
                     strMessage = "Resource file unexpected change: " + strMessage;

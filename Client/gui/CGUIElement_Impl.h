@@ -20,7 +20,7 @@ namespace CEGUI
 {
     class Window;
     class EventArgs;
-}            // namespace CEGUI
+}  // namespace CEGUI
 class CGUI_Impl;
 
 class CGUIElement_Impl : public CGUIElement
@@ -166,4 +166,20 @@ protected:
 
     GUI_CALLBACK_MOUSE m_OnClickWithArgs;
     GUI_CALLBACK_KEY   m_OnKeyDownWithArgs;
+};
+
+class CGUIDefaultWindow_Impl : public CGUIElement_Impl
+{
+public:
+    CGUIDefaultWindow_Impl(CGUI_Impl* gui, CEGUI::Window* window)
+    {
+        SetManager(gui);
+        m_pWindow = window;
+        if (m_pWindow)
+            m_pWindow->setUserData(reinterpret_cast<void*>(this));
+    }
+
+    virtual ~CGUIDefaultWindow_Impl() { DestroyElement(); }
+
+    eCGUIType GetType() override { return CGUI_WINDOW; }
 };

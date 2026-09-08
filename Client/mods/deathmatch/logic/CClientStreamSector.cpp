@@ -137,24 +137,32 @@ void CClientStreamSector::CompareSurroundings(CClientStreamSector* pSector, list
     }
 }
 
-void CClientStreamSector::AddElements(list<CClientStreamElement*>* pList)
+void CClientStreamSector::AddElements(list<CClientStreamElement*>* pList, std::unordered_set<CClientStreamElement*>* pSet)
 {
     list<CClientStreamElement*>::iterator iter = m_Elements.begin();
     for (; iter != m_Elements.end(); iter++)
     {
-        // Don't add if already in the list
-        if (ListContains(*pList, *iter))
+        // Don't add if already in the list (O(1) if set provided)
+        if (pSet)
+        {
+            if (pSet->count(*iter))
+                continue;
+            pSet->insert(*iter);
+        }
+        else if (ListContains(*pList, *iter))
             continue;
 
         pList->push_back(*iter);
     }
 }
 
-void CClientStreamSector::RemoveElements(list<CClientStreamElement*>* pList)
+void CClientStreamSector::RemoveElements(list<CClientStreamElement*>* pList, std::unordered_set<CClientStreamElement*>* pSet)
 {
     list<CClientStreamElement*>::iterator iter = m_Elements.begin();
     for (; iter != m_Elements.end(); iter++)
     {
         pList->remove(*iter);
+        if (pSet)
+            pSet->erase(*iter);
     }
 }

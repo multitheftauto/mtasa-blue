@@ -16,7 +16,7 @@
 
 class CEntitySAInterface;
 
-class CExplosionSAInterface            // 124 bytes, ok
+class CExplosionSAInterface  // 124 bytes, ok
 {
 public:
     eExplosionType      m_ExplosionType;
@@ -24,15 +24,15 @@ public:
     float               m_fExplosionRadius;
     float               m_fExplosionPropagationRate;
     CEntitySAInterface* m_pEntExplosionOwner;
-    CEntitySAInterface* m_pExplodingEntity;            // 28
+    CEntitySAInterface* m_pExplodingEntity;  // 28
     DWORD               m_TimeExpires;
     float               m_DamagePercentage;
-    BYTE                m_cExplosionActive;            // 36
+    BYTE                m_cExplosionActive;  // 36
     BYTE                m_nTriggerExplosionSfx;
     BYTE                m_bMakeSound;
-    float               m_ParticleTimer;              // 40
-    DWORD               m_ActivationTime;             // 44
-    float               m_fExplosionForce;            // 48
+    float               m_ParticleTimer;    // 40
+    DWORD               m_ActivationTime;   // 44
+    float               m_fExplosionForce;  // 48
     float               m_fGroundZ;
     DWORD               m_fuelTime;
     CVector             m_fuelDir[3];

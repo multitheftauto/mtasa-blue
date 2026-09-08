@@ -21,7 +21,7 @@ namespace
     D3DPRESENT_PARAMETERS* ms_pPresentationParameters = NULL;
     IDirect3DDevice9**     ms_ppReturnedDeviceInterface = NULL;
     bool                   ms_hasDeviceArgs = false;
-}            // namespace
+}  // namespace
 
 DWORD RESTORE_Addr_PreCreateDevice;
 DWORD RESTORE_Size_PreCreateDevice;
@@ -38,9 +38,7 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
                               D3DPRESENT_PARAMETERS* pPresentationParameters, IDirect3DDevice9** ppReturnedDeviceInterface)
 {
     // Safely unpatch with validation
-    if (RESTORE_Addr_PreCreateDevice && 
-        RESTORE_Size_PreCreateDevice > 0 && 
-        RESTORE_Size_PreCreateDevice <= sizeof(RESTORE_Bytes_PreCreateDevice))
+    if (RESTORE_Addr_PreCreateDevice && RESTORE_Size_PreCreateDevice > 0 && RESTORE_Size_PreCreateDevice <= sizeof(RESTORE_Bytes_PreCreateDevice))
     {
         MemCpy((PVOID)RESTORE_Addr_PreCreateDevice, RESTORE_Bytes_PreCreateDevice, RESTORE_Size_PreCreateDevice);
     }
@@ -67,13 +65,14 @@ void _cdecl OnPreCreateDevice(IDirect3D9* pDirect3D, UINT Adapter, D3DDEVTYPE De
 }
 
 // Hook info
-#define HOOKPOS_PreCreateDevice             0x007F675B
-#define HOOKSIZE_PreCreateDevice            6
-DWORD RETURN_PreCreateDevice = 0x07F6781;
+#define HOOKPOS_PreCreateDevice  0x007F675B
+#define HOOKSIZE_PreCreateDevice 6
+DWORD                         RETURN_PreCreateDevice = 0x07F6781;
 static void __declspec(naked) HOOK_PreCreateDevice()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Run replaced code - these pushes create the original function parameters
@@ -92,19 +91,23 @@ static void __declspec(naked) HOOK_PreCreateDevice()
         push    ecx                                // pDirect3D
 
         // Now we have 7 parameters on stack (28 bytes)
-        // Stack layout: [pDirect3D][Adapter][DeviceType][hFocusWindow][BehaviorFlags][pPresentationParameters][ppReturnedDeviceInterface]
+        // Stack layout at ESP: [pDirect3D][Adapter][DeviceType][hFocusWindow][BehaviorFlags][pPresentationParameters][ppReturnedDeviceInterface]
 
-        pushad  // Save all registers (32 bytes)
+        pushad  // Save all registers (32 bytes), ESP now at ESP-32
         
-        // Pass parameters to OnPreCreateDevice - stack offset is now 32 (pushad) + 28 (pushes) = 60
-        push    [esp+60+24]                        // ppReturnedDeviceInterface
-        push    [esp+60+20]                        // pPresentationParameters
-        lea     eax,[esp+60+16]                    // BehaviorFlags as pointer
-        push    eax                                
-        push    [esp+60+12]                        // hFocusWindow
-        push    [esp+60+8]                         // DeviceType
-        push    [esp+60+4]                         // Adapter
-        push    [esp+60+0]                         // pDirect3D
+        // Pass parameters to OnPreCreateDevice
+        // After pushad, params start at ESP+32. Each push decreases ESP by 4,
+        // so [esp+32+4*6] effectively walks backward through the params:
+        // 1st access: ESP+56 = ppReturnedDeviceInterface, then ESP -= 4
+        // 2nd access: ESP+56 = pPresentationParameters (was at ESP+52), etc.
+        push    [esp+32+4*6]                       // ppReturnedDeviceInterface
+        push    [esp+32+4*6]                       // pPresentationParameters
+        lea     eax,[esp+32+4*6]                   // BehaviorFlags as pointer
+        push    eax
+        push    [esp+32+4*6]                       // hFocusWindow
+        push    [esp+32+4*6]                       // DeviceType
+        push    [esp+32+4*6]                       // Adapter
+        push    [esp+32+4*6]                       // pDirect3D
         call    OnPreCreateDevice
         add     esp, 4*7
         popad
@@ -112,6 +115,7 @@ static void __declspec(naked) HOOK_PreCreateDevice()
         // Continue
         jmp     RETURN_PreCreateDevice
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -155,21 +159,22 @@ HRESULT _cdecl OnPostCreateDevice(HRESULT hResult)
         return hResult;
     }
 
-    HRESULT result = g_pCore->OnPostCreateDevice(hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags, ms_pPresentationParameters,
-                                                 ms_ppReturnedDeviceInterface);
+    HRESULT result = g_pCore->OnPostCreateDevice(hResult, ms_pDirect3D, ms_Adapter, ms_DeviceType, ms_hFocusWindow, ms_BehaviorFlags,
+                                                 ms_pPresentationParameters, ms_ppReturnedDeviceInterface);
     ms_hasDeviceArgs = false;
     return result;
 }
 
 // Hook info
-#define HOOKPOS_PostCreateDevice            0x07F6784
-#define HOOKSIZE_PostCreateDevice           6
-DWORD RETURN_PostCreateDevice = 0x07F678A;
-DWORD RETURN_PostCreateDeviceB = 0x07F6799;
+#define HOOKPOS_PostCreateDevice  0x07F6784
+#define HOOKSIZE_PostCreateDevice 6
+DWORD                         RETURN_PostCreateDevice = 0x07F678A;
+DWORD                         RETURN_PostCreateDeviceB = 0x07F6799;
 static void __declspec(naked) HOOK_PostCreateDevice()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
+    // clang-format off
     __asm
     {
         // Replaced code
@@ -190,6 +195,7 @@ static void __declspec(naked) HOOK_PostCreateDevice()
 ok:
         jmp     RETURN_PostCreateDeviceB
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

@@ -7,31 +7,31 @@
 // (C) 2003 Zachary Hansen xaxxon@slackworks.com
 // (C) Hugo Etchegoyen hetchego@hasar.com
 //
-// Distribution under the GPL or LGPL overrides any other restrictions, as in the PCRE license
+// Distribution under the GPL or LGPL overrides any other restrictions, as in the PCRE2 license
 //
 ////////////////////////////////////////////////////////////////////////////////////////////////
-	
+
 #include "pme.h"
-	
+
 unsigned int PME::DeterminePcreOptions ( const std::string & opts ///< perl style character modifiers -- i.e. "gi" is global, case-insensitive
  )
 {
 	unsigned int return_opts = 0;
 	if ( strchr ( opts.c_str ( ), 'i' ) ) {
-		return_opts |= PCRE_CASELESS;
+		return_opts |= PCRE2_CASELESS;
 	}
 	if ( strchr ( opts.c_str ( ), 'm' ) ) {
-		return_opts |= PCRE_MULTILINE;
+		return_opts |= PCRE2_MULTILINE;
 	}
 	if ( strchr ( opts.c_str ( ), 's' ) ) {
-		return_opts |= PCRE_DOTALL;
+		return_opts |= PCRE2_DOTALL;
 	}
 	if ( strchr ( opts.c_str ( ), 'x' ) ) {
-		return_opts |= PCRE_EXTENDED;
+		return_opts |= PCRE2_EXTENDED;
 	}
 	// not perl compatible
 	if ( strchr ( opts.c_str ( ), 'U' ) ) {
-		return_opts |= PCRE_UNGREEDY;
+		return_opts |= PCRE2_UNGREEDY;
 	}
 
 	// if 'g' is set, it stores the previous
@@ -51,21 +51,21 @@ PME::options()
 	return _opts;
 }
 
-void					
+void
 PME::options(unsigned opts ///< PCRE-style option flags to be set on PME object
 )
 {
 	_opts = opts;
 }
 
-void 
+void
 PME::compile(const std::string & s ///< string to compile into regular expression
 )
 {
-	const char * errorptr;
-	int erroroffset;
-	
-	re = pcre_compile(s.c_str(), _opts, &errorptr, &erroroffset, 0);
+	int errorcode;
+	PCRE2_SIZE erroroffset;
+
+	re = pcre2_compile((PCRE2_SPTR)s.c_str(), PCRE2_ZERO_TERMINATED, _opts, &errorcode, &erroroffset, NULL);
 
 	if ( re != NULL ) {
 		nValid = 1;
@@ -75,54 +75,47 @@ PME::compile(const std::string & s ///< string to compile into regular expressio
 
 }
 
-pcre *
-PME::clone_re(pcre * re ///< PME object to clone
+pcre2_code *
+PME::clone_re(pcre2_code * re ///< pcre2_code object to clone
 )
 {
 	if ( !re )
 		return 0;
-	int size;
-	pcre_fullinfo(re, 0, PCRE_INFO_SIZE, &size);
-	pcre * newre = (pcre *) new char[size];
-
-	memcpy(newre, re, size);
-	return newre;
+	// PCRE2 provides a built-in copy function
+	return pcre2_code_copy(re);
 }
 
-PME::PME( ) 
+PME::PME( )
 {
 	reset ( );
 	_opts = 9;
 	re = NULL;
-	extra = NULL;
 	lastglobalposition = 0;
 	m_isglobal = 0;
 	nMatches = 0;
 }
 
-PME::PME(const std::string & s ///< string to copmile into regular expression
-			 , unsigned opts ///< PCRE-style option flags to be set on PME object
+PME::PME(const std::string & s ///< string to compile into regular expression
+			 , unsigned opts ///< PCRE2-style option flags to be set on PME object
 )
 {
 	reset ( );
 	m_isglobal = 0;
 	_opts = opts;
 	compile(s);
-	extra = NULL;
 	lastglobalposition = 0;
 	nMatches = 0;
 
 }
 
 PME::PME ( const std::string & s, ///< string to compile into regular expression
-		   const std::string & opts ///< perl-style character flags to be set on PME object 
+		   const std::string & opts ///< perl-style character flags to be set on PME object
 )
 {
 	reset ( );
 	m_isglobal = 0;
 	_opts = DeterminePcreOptions ( opts );
 	compile ( s );
-	extra = NULL;
 	lastglobalposition = 0;
 	nMatches = 0;
 
@@ -130,14 +123,13 @@ PME::PME ( const std::string & s, ///< string to compile into regular expression
 
 
 PME::PME(const char * s, ///< string to compile into regular expression
-			 unsigned opts ///< PCRE-style option flags to be set on PME object
+			 unsigned opts ///< PCRE2-style option flags to be set on PME object
 )
 {
 	reset ( );
 	m_isglobal = 0;
 	_opts = opts;
 	compile(s);
-	extra = NULL;
 	lastglobalposition = 0;
 	nMatches = 0;
 
@@ -151,21 +143,19 @@ PME::PME ( const char * s, ///< string to compile into regular expression
 	m_isglobal = 0;
 	_opts = DeterminePcreOptions ( opts );
 	compile ( s );
-	extra = NULL;
 	lastglobalposition = 0;
 	nMatches = 0;
 
 }
 
 
-PME::PME(const PME & r ///< PME object to make copy of 
+PME::PME(const PME & r ///< PME object to make copy of
 )
 {
 	reset ( );
 	m_isglobal = 0;
 	_opts = r._opts;
 	re = clone_re(r.re);
-	extra = NULL;
 	lastglobalposition = 0;
 	nMatches = 0;
 
@@ -175,7 +165,7 @@ PME::PME(const PME & r ///< PME object to make copy of
 PME::~PME()
 {
 	if ( re )
-		pcre_free ( re );
+		pcre2_code_free ( re );
 }
 
 
@@ -184,10 +174,13 @@ PME::match(const std::string & s, ///< s String to match against
 			 unsigned offset ///< offset Offset at which to start matching
 			 )
 {
-	int msize;
-	pcre_fullinfo(re, 0, PCRE_INFO_CAPTURECOUNT, &msize);
+	uint32_t msize;
+	pcre2_pattern_info(re, PCRE2_INFO_CAPTURECOUNT, &msize);
 	msize = 3*(msize+1);
 	int *m = new int[msize];
+
+	// Create match data for this match attempt
+	pcre2_match_data *match_data = pcre2_match_data_create(msize / 3, NULL);
 
 	vector<markers> marks;
 
@@ -202,13 +195,23 @@ PME::match(const std::string & s, ///< s String to match against
 	}
 
 	//fprintf ( stderr, "string: '%s' length: %d offset: %d\n", s.c_str ( ), s.length ( ), offset );
-	nMatches = pcre_exec(re, extra, s.c_str(), s.length(), offset, 0, m, msize);
-	//fprintf ( stderr, "pcre_exec result = %d\n", nMatches );
+	nMatches = pcre2_match(re, (PCRE2_SPTR)s.c_str(), s.length(), offset, 0, match_data, NULL);
+	//fprintf ( stderr, "pcre2_match result = %d\n", nMatches );
+
+	if (nMatches > 0)
+	{
+		PCRE2_SIZE *ovector = pcre2_get_ovector_pointer(match_data);
+		for ( int i = 0; i < nMatches; i++ ) {
+			m[i*2]   = (int)ovector[i*2];
+			m[i*2+1] = (int)ovector[i*2+1];
+		}
+	}
 
 	for ( int i = 0, *p = m ; i < nMatches ; i++, p+=2 ) {
 		marks.push_back(markers(p[0], p[1]));
 	}
 
+	pcre2_match_data_free(match_data);
 	delete[] m;
 
 	// store the last set of results locally, as well as returning them
@@ -218,7 +221,7 @@ PME::match(const std::string & s, ///< s String to match against
 
 	if ( m_isglobal ) {
 
-		if ( nMatches == PCRE_ERROR_NOMATCH ) {
+		if ( nMatches == PCRE2_ERROR_NOMATCH ) {
 //			fprintf ( stderr, "PME RESETTING: reset for no match\n" );
 			lastglobalposition = 0; // reset the position for next match (perl does this)
 		} else if ( nMatches > 0 ) {
@@ -274,7 +277,7 @@ void PME::reset ( )
 
 }
 
-/** Splits into at most maxfields.  If maxfields is unspecified or 0, 
+/** Splits into at most maxfields.  If maxfields is unspecified or 0,
  ** trailing empty matches are discarded.  If maxfields is positive,
  ** no more than maxfields fields will be returned and trailing empty
  ** matches are preserved.  If maxfields is empty, all fields (including
@@ -287,12 +290,12 @@ PME::split(const std::string & s, unsigned maxfields)
 	/// stores the marks for the split
 	vector<markers> oMarks;
 
-	// this is a list of current trailing empty matches if maxfields is 
+	// this is a list of current trailing empty matches if maxfields is
 	//   unspecified or 0.  If there is stuff in it and a non-empty match
-	//   is found, then everything in here is pushed into oMarks and then 
+	//   is found, then everything in here is pushed into oMarks and then
 	//   the new match is pushed on.  If the end of the string is reached
 	//   and there are empty matches in here, they are discarded.
-	vector<markers> oCurrentTrailingEmpties; 
+	vector<markers> oCurrentTrailingEmpties;
 
 	int nOffset = 0;
 	unsigned int nMatchesFound = 0;
@@ -309,17 +312,17 @@ PME::split(const std::string & s, unsigned maxfields)
 		// check to see if the match is empty
 		if ( nOffset != m_marks [ 0 ].first ) {
 			//fprintf ( stderr, "Match is not empty\n" );
-			// if this one isn't empty, then make sure to push anything from 
+			// if this one isn't empty, then make sure to push anything from
 			//   oCurrentTrailingEmpties into oMarks
 			oMarks.insert ( oMarks.end ( ),
 							oCurrentTrailingEmpties.begin ( ),
 							oCurrentTrailingEmpties.end ( ) );
 
-			// grab from nOffset to m_marks[0].first and again from m_marks[0].second to 
+			// grab from nOffset to m_marks[0].first and again from m_marks[0].second to
 			//   the end of the string
 			oMarks.push_back ( markers ( nOffset, m_marks [ 0 ].first ) );
 
-		} 
+		}
 		// else the match was empty and we have to do some checking
 		//   to see what to do
 		else {
@@ -333,7 +336,7 @@ PME::split(const std::string & s, unsigned maxfields)
 			// else we keep all the matches, empty or no
 			else {
 				//fprintf ( stderr, "Keeping empty match\n" );
-				// grab from nOffset to m_marks[0].first and again from m_marks[0].second to 
+				// grab from nOffset to m_marks[0].first and again from m_marks[0].second to
 				//   the end of the string
 				oMarks.push_back ( markers ( nOffset, m_marks [ 0 ].first ) );
 
@@ -343,10 +346,10 @@ PME::split(const std::string & s, unsigned maxfields)
 
 		// set nOffset to the beginning of the second part of the split
 		nOffset = m_marks [ 0 ].second;
-		
+
 		fflush ( stdout );
 
-	} // end while ( match ( ... ) ) 
+	} // end while ( match ( ... ) )
 
 	//fprintf ( stderr, "***match status = %d offset = %d\n", nMatchStatus, nOffset);
 
@@ -355,21 +358,21 @@ PME::split(const std::string & s, unsigned maxfields)
 	if ( nMatchesFound == 0 ) {
 //		printf ( "Putting the whole thing in..\n" );
 		oMarks.push_back ( markers ( 0, s.length ( ) ) );
-	} 	
-	// if we ran out of matches, then append the rest of the string 
+	}
+	// if we ran out of matches, then append the rest of the string
 	//   onto the end of the last split field
-	else if ( maxfields > 0 && 
+	else if ( maxfields > 0 &&
 		 nMatchesFound >= maxfields ) {
 //		printf ( "Something else..\n" );
 		oMarks [ oMarks.size ( ) - 1 ].second = s.length ( );
-	} 
+	}
 	// else we have to add another entry for the end of the string
 	else {
 //		printf ( "Something REALLY else..\n" );
 		oMarks.push_back ( markers ( m_marks [ 0 ].second, s.length ( ) ) );
 	}
 
-	
+
 	m_marks = oMarks;
 
 	//fprintf ( stderr, "match returning %d\n", m_marks.size ( ) );
@@ -380,28 +383,9 @@ PME::split(const std::string & s, unsigned maxfields)
 
 void PME::study()
 {
-
-	const char * errorptr = NULL;
-	
-	extra = pcre_study( re, 
-						0, // no options exist
-						&errorptr );
-
-	// check for error condition
-	if ( errorptr != NULL ) {
-		
-		if ( extra != NULL ) {
-
-			pcre_free ( extra );
-
-		}
-
-		extra = NULL;
-
-	} 
-
-	return;
-
+	// PCRE2 studies patterns automatically during compilation.
+	// JIT compilation can be optionally enabled via pcre2_jit_compile(),
+	// but for backwards compatibility this is a no-op.
 }
 
 
@@ -416,28 +400,28 @@ std::string PME::operator[](int index)
 
 std::string PME::UpdateReplacementString ( const std::string & r ) {
 	std::string finalreplacement = r;
-	
+
 	// search for each backref and store it out
 	PME dollars ( "\\$([0-9]+)", "g" );
-	
+
 	// search each backref
 	while ( /*int numdollars =*/ dollars.match ( r ) ) {
-		
+
 		// create a regex to replace the backref
 		stringstream regextext;
 		regextext << "[$]" << dollars[1];
 		PME dollarsub ( regextext.str ( ) );
-		
+
 		// do the replacement, telling it not to look for backref
-		finalreplacement = dollarsub.sub ( finalreplacement, 
+		finalreplacement = dollarsub.sub ( finalreplacement,
 										   (*this)[atoi(dollars[1].c_str())],
 										   0 );
-		
-		
+
+
 	}
 
 	return finalreplacement;
-	
+
 }
 
 
@@ -445,15 +429,15 @@ std::string PME::UpdateReplacementString ( const std::string & r ) {
 std::string PME::sub ( const std::string & s, const std::string & r,
 						 int dodollarsubstitution )
 {
-	
+
 	std::stringstream newstream;
-		
+
 	if ( m_isglobal ) {
-			
+
 		int endoflastmatch = 0;
-			
+
 		while ( match ( s ) ) {
-				
+
 			// copy from the end of the last match to the beginning of the current match, then
 			//   copy in the replacement
 			newstream << s.substr ( endoflastmatch, m_marks[0].first - endoflastmatch );
@@ -467,7 +451,7 @@ std::string PME::sub ( const std::string & s, const std::string & r,
 			}
 
 			newstream << finalreplacement;
-			
+
 			endoflastmatch = m_marks[0].second;
 		}
 
@@ -479,18 +463,18 @@ std::string PME::sub ( const std::string & s, const std::string & r,
 		int nMatches = match ( s );
 
 		if ( nMatches > 0 ) {
-			
+
 			std::string finalreplacement = r;
-			
-			
+
+
 			if ( dodollarsubstitution ) {
-				
+
 				finalreplacement = UpdateReplacementString ( r );
-				
+
 			}
-			
-			
-			
+
+
+
 			newstream << s.substr ( 0, m_marks[0].first );
 			newstream << finalreplacement;
 			newstream << s.substr ( m_marks[0].second );
@@ -507,9 +491,9 @@ std::string PME::sub ( const std::string & s, const std::string & r,
 }
 
 
-StringVector PME::GetStringVector ( ) 
+StringVector PME::GetStringVector ( )
 {
-	
+
 	StringVector oStringVector;
 
 	for ( int nCurrentMatch = 0;

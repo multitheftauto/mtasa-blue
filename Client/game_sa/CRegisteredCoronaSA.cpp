@@ -75,7 +75,7 @@ void CRegisteredCoronaSA::SetTexture(RwTexture* texture)
     internalInterface->pTex = texture;
 }
 
-void CRegisteredCoronaSA::SetTexture(CoronaType texture)
+void CRegisteredCoronaSA::SetTexture(CoronaType::Enum texture)
 {
     CCoronasSA* coronas = ((CCoronasSA*)pGame->GetCoronas());
     RwTexture*  tex = coronas->GetTexture(texture);
@@ -124,7 +124,7 @@ void CRegisteredCoronaSA::Init(DWORD Identifier)
     internalInterface->FlareType = 0;
     internalInterface->ReflectionType = 0;
     internalInterface->JustCreated = 1;
-    internalInterface->RegisteredThisFrame = 1;            // won't appear in-game without this
+    internalInterface->RegisteredThisFrame = 1;  // won't appear in-game without this
 }
 
 void CRegisteredCoronaSA::Refresh()
