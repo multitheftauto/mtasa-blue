@@ -43,7 +43,7 @@ CSphere CClientColCircle::GetWorldBoundingSphere()
 //
 void CClientColCircle::DebugRender(const CVector& vecPosition, float fDrawRadius)
 {
-    SColorARGB          color(128, 0, 255, 255);
+    SColor              color = GetDebugColor(SColorARGB(128, 0, 255, 255));
     float               fLineWidth = 4.f + pow(m_fRadius, 0.5f);
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
 
