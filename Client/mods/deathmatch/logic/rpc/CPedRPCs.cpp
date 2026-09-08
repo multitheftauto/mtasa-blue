@@ -79,6 +79,8 @@ void CPedRPCs::SetPedRotation(CClientEntity* pSource, NetBitStreamInterface& bit
 
             if (!IS_PLAYER(pPed))
                 pPed->SetCameraRotation(rotation.data.fRotation);
+
+            pPed->SetScriptRotationOverride(CVector(0.0f, 0.0f, rotation.data.fRotation), ucNewWay == 1);
             pPed->SetSyncTimeContext(ucTimeContext);
         }
     }
