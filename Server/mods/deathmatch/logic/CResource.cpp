@@ -599,7 +599,7 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
 #ifdef WIN32
             const std::filesystem::path filePath(SharedUtil::FromUTF8(strPath).c_str());
 #else
-            const std::filesystem::path filePath(strPath);
+            const std::filesystem::path filePath(strPath.c_str());
 #endif
 
             std::error_code writeTimeError;
@@ -766,7 +766,7 @@ bool CResource::HasResourceChanged()
 #ifdef WIN32
             const std::filesystem::path filePath(SharedUtil::FromUTF8(strPath).c_str());
 #else
-            const std::filesystem::path filePath(strPath);
+            const std::filesystem::path filePath(strPath.c_str());
 #endif
 
             std::error_code writeTimeError;
