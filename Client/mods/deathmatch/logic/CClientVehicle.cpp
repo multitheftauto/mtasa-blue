@@ -705,26 +705,28 @@ void CClientVehicle::ProcessDoorInterpolation()
 
 void CClientVehicle::SetDoorOpenRatio(unsigned char ucDoor, float fRatio, unsigned long ulDelay, bool bForced)
 {
-    unsigned char ucSeat;
-
     if (ucDoor <= 5)
     {
         bool bAllow = m_bAllowDoorRatioSetting[ucDoor];
 
-        // Prevent setting the door angle ratio while a ped is entering/leaving the vehicle.
-        if (bAllow && bForced == false)
+        // Prevent setting the door angle ratio while a ped is in the middle of entering/leaving the vehicle.
+        if (bAllow && !bForced)
         {
             switch (ucDoor)
             {
                 case 2:
-                    bAllow = m_pOccupyingDriver == 0;
+                    // Allow if no one is currently entering as driver, or if occupying driver has finished entering and is seated
+                    bAllow = (m_pOccupyingDriver == nullptr) || (m_pOccupyingDriver == m_pDriver);
                     break;
                 case 3:
                 case 4:
                 case 5:
-                    ucSeat = ucDoor - 2;
-                    bAllow = m_pOccupyingPassengers[ucSeat] == 0;
+                {
+                    const unsigned char seatIndex = ucDoor - 3;
+                    // Allow if seat is vacant, or if occupying passenger has finished entering and is seated
+                    bAllow = (m_pOccupyingPassengers[seatIndex] == nullptr) || (m_pOccupyingPassengers[seatIndex] == m_pPassengers[seatIndex]);
                     break;
+                }
             }
         }
 
