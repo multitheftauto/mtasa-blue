@@ -4880,6 +4880,55 @@ CMatrix gravcam_matInvertGravity;
 CMatrix gravcam_matVehicleTransform;
 CVector gravcam_vecVehicleVelocity;
 
+// VAR_VehicleCameraView (0xB6F0DC) comes from game_sa/CCameraSA.h via StdInc.h
+#define VEHICLE_CAM_VIEW_MODE_COUNT 6  // see eVehicleCamMode
+
+static CVector gravcam_vehicleCamViewOffsets[VEHICLE_CAM_VIEW_MODE_COUNT];
+static bool    gravcam_bVehicleCamViewOffsetActive = false;
+
+static void UpdateVehicleCamViewOffsetActive()
+{
+    for (const CVector& vecOffset : gravcam_vehicleCamViewOffsets)
+    {
+        if (vecOffset.LengthSquared() > 0.0f)
+        {
+            gravcam_bVehicleCamViewOffsetActive = true;
+            return;
+        }
+    }
+
+    gravcam_bVehicleCamViewOffsetActive = false;
+}
+
+static const CVector* GetActiveVehicleCamViewOffset()
+{
+    if (!gravcam_bVehicleCamViewOffsetActive)
+        return nullptr;
+
+    const unsigned char ucViewMode = *(unsigned char*)VAR_VehicleCameraView;
+    if (ucViewMode >= VEHICLE_CAM_VIEW_MODE_COUNT)
+        return nullptr;
+
+    return &gravcam_vehicleCamViewOffsets[ucViewMode];
+}
+
+// Translates the camera space offset into world space using the camera's current orbit
+// angle, so that "right" and "towards the vehicle" follow the camera instead of the
+// world axes. Beta is only updated later in CCam::Process_FollowCar_SA, so this basis
+// is one frame behind - not noticeable for an offset of a few units, and it matches the
+// value the surrounding SA code uses at this point.
+static CVector GetVehicleCamViewOffsetInWorldSpace(DWORD dwCam, const CVector& vecOffset)
+{
+    const float fPhi = *(float*)(dwCam + 0xBC);
+
+    // Direction from the vehicle towards the camera, flattened onto the gravity plane
+    const CVector vecBack = gravcam_matGravity.vRight * cos(fPhi) + gravcam_matGravity.vFront * sin(fPhi);
+    // Right hand side of the camera
+    const CVector vecRight = gravcam_matGravity.vFront * cos(fPhi) - gravcam_matGravity.vRight * sin(fPhi);
+
+    return vecRight * vecOffset.fX - vecBack * vecOffset.fY + gravcam_matGravity.vUp * vecOffset.fZ;
+}
+
 bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
 {
     // Inverse transform some things so that they match a downward pointing gravity.
@@ -4935,10 +4984,14 @@ fail:
 
 // ---------------------------------------------------
 
-void _cdecl VehicleCamTargetZTweak(CVector* pvecCamTarget, float fTargetZTweak)
+void _cdecl VehicleCamTargetZTweak(CVector* pvecCamTarget, float fTargetZTweak, DWORD dwCam)
 {
     // Replacement for "vecCamTarget = vecCarPosition + (0, 0, 1)*fZTweak"
     *pvecCamTarget += gravcam_matGravity.vUp * fTargetZTweak;
+
+    const CVector* pViewOffset = GetActiveVehicleCamViewOffset();
+    if (pViewOffset)
+        *pvecCamTarget += GetVehicleCamViewOffsetInWorldSpace(dwCam, *pViewOffset);
 }
 
 static void __declspec(naked) HOOK_VehicleCamTargetZTweak()
@@ -4951,10 +5004,11 @@ static void __declspec(naked) HOOK_VehicleCamTargetZTweak()
         fstp st
 
         lea eax, [esp+0x48]
-        push [esp+0x30]
-        push eax
+        push esi                  // pCam
+        push [esp+0x34]           // fTargetZTweak
+        push eax                  // pvecCamTarget
         call VehicleCamTargetZTweak
-        add esp, 8
+        add esp, 0xC
 
         fld [esp+0x30]
         fadd [esp+0x7C]
@@ -5162,6 +5216,35 @@ static void __declspec(naked) HOOK_VehicleCamEnd()
         jmp RETURN_VehicleCamEnd
     }
     // clang-format on
+}
+
+// ---------------------------------------------------
+
+bool CMultiplayerSA::SetVehicleCameraViewOffset(unsigned char ucViewMode, const CVector& vecOffset)
+{
+    if (ucViewMode >= VEHICLE_CAM_VIEW_MODE_COUNT)
+        return false;
+
+    gravcam_vehicleCamViewOffsets[ucViewMode] = vecOffset;
+    UpdateVehicleCamViewOffsetActive();
+    return true;
+}
+
+bool CMultiplayerSA::GetVehicleCameraViewOffset(unsigned char ucViewMode, CVector& vecOffset)
+{
+    if (ucViewMode >= VEHICLE_CAM_VIEW_MODE_COUNT)
+        return false;
+
+    vecOffset = gravcam_vehicleCamViewOffsets[ucViewMode];
+    return true;
+}
+
+void CMultiplayerSA::ResetVehicleCameraViewOffsets()
+{
+    for (CVector& vecOffset : gravcam_vehicleCamViewOffsets)
+        vecOffset = CVector();
+
+    gravcam_bVehicleCamViewOffsetActive = false;
 }
 
 // ---------------------------------------------------

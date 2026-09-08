@@ -700,6 +700,28 @@ eVehicleCamMode CClientCamera::GetCameraVehicleViewMode()
     return (eVehicleCamMode)m_pCamera->GetCameraVehicleViewMode();
 }
 
+bool CClientCamera::SetVehicleViewOffset(eVehicleCamMode eMode, const CVector& vecOffset)
+{
+    if (!g_pMultiplayer)
+        return false;
+
+    return g_pMultiplayer->SetVehicleCameraViewOffset(static_cast<unsigned char>(eMode), vecOffset);
+}
+
+bool CClientCamera::GetVehicleViewOffset(eVehicleCamMode eMode, CVector& vecOffset)
+{
+    if (!g_pMultiplayer)
+        return false;
+
+    return g_pMultiplayer->GetVehicleCameraViewOffset(static_cast<unsigned char>(eMode), vecOffset);
+}
+
+void CClientCamera::ResetVehicleViewOffsets()
+{
+    if (g_pMultiplayer)
+        g_pMultiplayer->ResetVehicleCameraViewOffsets();
+}
+
 ePedCamMode CClientCamera::GetCameraPedViewMode()
 {
     if (!m_pCamera)
