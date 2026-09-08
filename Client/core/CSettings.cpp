@@ -1906,6 +1906,15 @@ void CSettings::CreateGUI()
     m_pProcessAffinityCheckbox->AutoSize(nullptr, 20.0f);
     vecTemp.fY += fLineHeight;
 
+    // Allow disabling cached IMG reads for users experiencing streaming issues.
+    m_pIMGFileCachingCheckbox =
+        reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Cache game files in memory (requires restart)"), true));
+    m_pIMGFileCachingCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pIMGFileCachingCheckbox->AutoSize(nullptr, 20.0f);
+    m_pIMGFileCachingCheckbox->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
+    m_pIMGFileCachingCheckbox->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
+    vecTemp.fY += fLineHeight;
+
     // Auto updater section label
     m_pAdvancedUpdaterLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Auto updater")));
     m_pAdvancedUpdaterLabel->SetPosition(CVector2D(vecTemp.fX - 10.0f, vecTemp.fY));
@@ -4162,6 +4171,9 @@ void CSettings::LoadData()
     CVARS_GET("photosaving", bVar);
     m_pPhotoSavingCheckbox->SetSelected(bVar);
 
+    CVARS_GET("img_file_caching", bVar);
+    m_pIMGFileCachingCheckbox->SetSelected(bVar);
+
     // Process CPU Affinity
     CVARS_GET("process_cpu_affinity", bVar);
     m_pProcessAffinityCheckbox->SetSelected(bVar);
@@ -4606,6 +4618,11 @@ void CSettings::SaveData()
     CVARS_SET("photosaving", photoSaving);
     CScreenShot::SetPhotoSavingInsideDocuments(photoSaving);
 
+    // Archive handles retain their opening flags, so save the preference and request a restart.
+    const bool bIMGFileCaching = m_pIMGFileCachingCheckbox->GetSelected();
+    const bool bIMGFileCachingChanged = bIMGFileCaching != CVARS_GET_VALUE<bool>("img_file_caching");
+    CVARS_SET("img_file_caching", bIMGFileCaching);
+
     // Process CPU Affinity
     bool affinity = m_pProcessAffinityCheckbox->GetSelected();
     CVARS_SET("process_cpu_affinity", affinity);
@@ -4794,7 +4811,7 @@ void CSettings::SaveData()
 
     // Ask to restart?
     if (bIsVideoModeChanged || bIsAntiAliasingChanged || bIsCustomizedSAFilesChanged || processsDPIAwareChanged || bBrowserGPUSettingChanged ||
-        bBrowserVideoAccelSettingChanged)
+        bBrowserVideoAccelSettingChanged || bIMGFileCachingChanged)
         ShowRestartQuestion();
     else if (CModManager::GetSingleton().IsLoaded() && bBrowserSettingChanged)
         ShowDisconnectQuestion();
@@ -6122,6 +6139,11 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
         strText = std::string(_("Auto updater:")) + " " + std::string(_("Select default to automatically install important updates."));
     else if (pCheckBox && pCheckBox == m_pProcessAffinityCheckbox)
         strText = std::string(_("CPU affinity:")) + " " + std::string(_("Only change if you're having stability issues."));
+    else if (pCheckBox && pCheckBox == m_pIMGFileCachingCheckbox)
+        strText =
+            _("Lets Windows cache IMG game archives in RAM by removing FILE_FLAG_NO_BUFFERING. Enabled by default to reduce disk reads and potentially "
+              "reduce loading stutter on SSDs and HDDs. Older HDDs do not automatically benefit from disabling it. Try turning it off if performance worsens. "
+              "Requires restarting MTA.");
 
     if (strText != "")
         m_pAdvancedSettingDescriptionLabel->SetText(strText.c_str());

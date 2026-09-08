@@ -228,10 +228,6 @@ CGameSA::CGameSA()
         MemPut<WORD>(0x05B8E55, MAX_RWOBJECT_INSTANCES * 12);  // Default is 1000 * 12
         MemPut<WORD>(0x05B8EB0, MAX_RWOBJECT_INSTANCES * 12);  // Default is 1000 * 12
 
-        // Remove FILE_FLAG_NO_BUFFERING from GTA SA's IMG archive reads, following SilentPatch's approach.
-        // This allows Windows to cache file data, potentially reducing disk I/O and improving streaming performance.
-        MemPut<uint8_t>(0x406BC6, 0xEB);
-
         // Increase matrix array size
         MemPut<int>(0x054F3A1, MAX_OBJECTS * 3);  // Default is 900
 

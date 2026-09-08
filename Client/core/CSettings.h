@@ -240,6 +240,7 @@ protected:
     CGUICheckBox*  m_pPhotoSavingCheckbox;
     CGUICheckBox*  m_pCheckBoxAskBeforeDisconnect;
     CGUICheckBox*  m_pProcessAffinityCheckbox;
+    CGUICheckBox*  m_pIMGFileCachingCheckbox;
     CGUILabel*     m_pUpdateBuildTypeLabel;
     CGUIComboBox*  m_pUpdateBuildTypeCombo;
     CGUILabel*     m_pUpdateAutoInstallLabel;
