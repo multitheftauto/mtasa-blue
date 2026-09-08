@@ -424,8 +424,7 @@ static bool IsValidDXVKBinary(const SString& strPath)
     if (pData[0] != 'M' || pData[1] != 'Z')
         return false;
 
-    const unsigned int uiPe = pData[0x3C] | (pData[0x3D] << 8) | (pData[0x3E] << 16) |
-                              (static_cast<unsigned int>(pData[0x3F]) << 24);
+    const unsigned int uiPe = pData[0x3C] | (pData[0x3D] << 8) | (pData[0x3E] << 16) | (static_cast<unsigned int>(pData[0x3F]) << 24);
     if (uiPe == 0 || uiPe + 6 > strData.length() || pData[uiPe] != 'P' || pData[uiPe + 1] != 'E' || pData[uiPe + 2] != 0 || pData[uiPe + 3] != 0)
         return false;
 
