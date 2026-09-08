@@ -16,7 +16,6 @@
 #include <game/CStreaming.h>
 #include <type_traits>
 
-#include "enums/VehicleComponent.h"
 #include "enums/WeaponProperty.h"
 #include "enums/FxParticleSystems.h"
 #include "enums/WorldProperty.h"
@@ -43,7 +42,7 @@ DECLARE_ENUM(eAmbientSoundType)
 DECLARE_ENUM(eCGUIType);
 DECLARE_ENUM(eDxTestMode)
 DECLARE_ENUM(eWeaponType)
-DECLARE_ENUM_CLASS(WeaponProperty)
+DECLARE_ENUM(WeaponProperty::Enum)
 DECLARE_ENUM(eWeaponSkill)
 DECLARE_ENUM(ERenderFormat);
 DECLARE_ENUM(ETextureType);
@@ -53,13 +52,12 @@ DECLARE_ENUM(EBlendModeType)
 DECLARE_ENUM(EEntityTypeMask);
 DECLARE_ENUM(eWeaponState);
 DECLARE_ENUM(eWeaponFlags);
-DECLARE_ENUM_CLASS(VehicleComponent);
-DECLARE_ENUM_CLASS(ObjectProperty);
-DECLARE_ENUM_CLASS(ObjectGroupPhysicalProperties::Modifiable);
-DECLARE_ENUM_CLASS(ObjectGroupPhysicalProperties::DamageEffect);
-DECLARE_ENUM_CLASS(ObjectGroupPhysicalProperties::CollisionResponse);
-DECLARE_ENUM_CLASS(ObjectGroupPhysicalProperties::FxType);
-DECLARE_ENUM_CLASS(ObjectGroupPhysicalProperties::BreakMode);
+DECLARE_ENUM(ObjectProperty::Enum);
+DECLARE_ENUM(ObjectGroupPhysicalProperties::Modifiable);
+DECLARE_ENUM(ObjectGroupPhysicalProperties::DamageEffect);
+DECLARE_ENUM(ObjectGroupPhysicalProperties::CollisionResponse);
+DECLARE_ENUM(ObjectGroupPhysicalProperties::FxType);
+DECLARE_ENUM(ObjectGroupPhysicalProperties::BreakMode);
 DECLARE_ENUM(eFontType);
 DECLARE_ENUM(eFontQuality);
 DECLARE_ENUM(eAudioLookupIndex);
@@ -71,9 +69,9 @@ DECLARE_ENUM(eTrayIconType)
 DECLARE_ENUM(eCursorType)
 DECLARE_ENUM(eWheelPosition)
 DECLARE_ENUM(D3DPRIMITIVETYPE);
-DECLARE_ENUM_CLASS(VehicleDummies);
+DECLARE_ENUM(VehicleDummies::Enum);
 DECLARE_ENUM_CLASS(eGrainMultiplierType);
-DECLARE_ENUM_CLASS(ResizableVehicleWheelGroup);
+DECLARE_ENUM(ResizableVehicleWheelGroup::Enum);
 DECLARE_ENUM(eSurfaceProperties);
 DECLARE_ENUM(eSurfaceAudio);
 DECLARE_ENUM(eSurfaceBulletEffect);
@@ -81,29 +79,29 @@ DECLARE_ENUM(eSurfaceWheelEffect);
 DECLARE_ENUM(eSurfaceSkidMarkType);
 DECLARE_ENUM(eSurfaceAdhesionGroup);
 DECLARE_ENUM_CLASS(eClientModelType);
-DECLARE_ENUM_CLASS(SoundEffectType);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Chorus);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Compressor);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Distortion);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Echo);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Flanger);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Gargle);
-DECLARE_ENUM_CLASS(eSoundEffectParams::I3DL2Reverb);
-DECLARE_ENUM_CLASS(eSoundEffectParams::ParamEq);
-DECLARE_ENUM_CLASS(eSoundEffectParams::Reverb);
+DECLARE_ENUM(SoundEffectType::Enum);
+DECLARE_ENUM_CLASS(SoundEffectParams::Chorus);
+DECLARE_ENUM_CLASS(SoundEffectParams::Compressor);
+DECLARE_ENUM_CLASS(SoundEffectParams::Distortion);
+DECLARE_ENUM_CLASS(SoundEffectParams::Echo);
+DECLARE_ENUM_CLASS(SoundEffectParams::Flanger);
+DECLARE_ENUM_CLASS(SoundEffectParams::Gargle);
+DECLARE_ENUM_CLASS(SoundEffectParams::I3DL2Reverb);
+DECLARE_ENUM_CLASS(SoundEffectParams::ParamEq);
+DECLARE_ENUM_CLASS(SoundEffectParams::Reverb);
 DECLARE_ENUM_CLASS(eModelIdeFlag);
 DECLARE_ENUM_CLASS(_D3DFORMAT);
 DECLARE_ENUM_CLASS(eRenderStage);
-DECLARE_ENUM_CLASS(FxParticleSystems);
+DECLARE_ENUM(FxParticleSystems::Enum);
 DECLARE_ENUM(ePools);
-DECLARE_ENUM_CLASS(WorldProperty);
+DECLARE_ENUM(WorldProperty::Enum);
 DECLARE_ENUM_CLASS(eModelLoadState);
 DECLARE_ENUM_CLASS(PreloadAreaOption);
 DECLARE_ENUM_CLASS(RestreamOption);
 DECLARE_ENUM_CLASS(taskType);
 DECLARE_ENUM(eEntityType);
-DECLARE_ENUM_CLASS(VehicleAudioSettingProperty);
-DECLARE_ENUM_CLASS(PostFXType);
+DECLARE_ENUM(VehicleAudioSettingProperty::Enum);
+DECLARE_ENUM(PostFXType::Enum);
 
 class CRemoteCall;
 
@@ -452,7 +450,7 @@ inline SString GetClassTypeName(D3DPRIMITIVETYPE*)
 {
     return "primitive-type";
 }
-inline SString GetClassTypeName(VehicleDummies*)
+inline SString GetClassTypeName(VehicleDummies::Enum*)
 {
     return "vehicle-dummy";
 }
@@ -480,47 +478,47 @@ inline SString GetClassTypeName(eSurfaceAdhesionGroup*)
 {
     return "surface-adhesion-group";
 }
-inline SString GetClassTypeName(SoundEffectType*)
+inline SString GetClassTypeName(SoundEffectType::Enum*)
 {
     return "soundeffect-type";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Chorus*)
+inline SString GetClassTypeName(SoundEffectParams::Chorus*)
 {
     return "soundeffect-params-chorus";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Compressor*)
+inline SString GetClassTypeName(SoundEffectParams::Compressor*)
 {
     return "soundeffect-params-compressor";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Distortion*)
+inline SString GetClassTypeName(SoundEffectParams::Distortion*)
 {
     return "soundeffect-params-distortion";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Echo*)
+inline SString GetClassTypeName(SoundEffectParams::Echo*)
 {
     return "soundeffect-params-echo";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Flanger*)
+inline SString GetClassTypeName(SoundEffectParams::Flanger*)
 {
     return "soundeffect-params-flanger";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Gargle*)
+inline SString GetClassTypeName(SoundEffectParams::Gargle*)
 {
     return "soundeffect-params-gargle";
 }
-inline SString GetClassTypeName(eSoundEffectParams::I3DL2Reverb*)
+inline SString GetClassTypeName(SoundEffectParams::I3DL2Reverb*)
 {
     return "soundeffect-params-i3dl2reverb";
 }
-inline SString GetClassTypeName(eSoundEffectParams::ParamEq*)
+inline SString GetClassTypeName(SoundEffectParams::ParamEq*)
 {
     return "soundeffect-params-parameq";
 }
-inline SString GetClassTypeName(eSoundEffectParams::Reverb*)
+inline SString GetClassTypeName(SoundEffectParams::Reverb*)
 {
     return "soundeffect-params-reverb";
 }
-inline SString GetClassTypeName(WorldProperty*)
+inline SString GetClassTypeName(WorldProperty::Enum*)
 {
     return "world-property";
 }
@@ -530,7 +528,7 @@ inline SString GetClassTypeName(CClientVectorGraphic*)
     return "svg";
 }
 
-inline SString GetClassByTypeName(VehicleAudioSettingProperty)
+inline SString GetClassByTypeName(VehicleAudioSettingProperty::Enum)
 {
     return "vehicle-audio-setting";
 }
@@ -625,5 +623,5 @@ void CheckCanAccessOtherResourceFile(CScriptArgReader& argStream, CResource* pTh
 //
 // Other misc helpers
 //
-bool IsWeaponPropertyFlag(WeaponProperty weaponProperty);
-uint GetWeaponPropertyFlagBit(WeaponProperty weaponProperty);
+bool IsWeaponPropertyFlag(WeaponProperty::Enum weaponProperty);
+uint GetWeaponPropertyFlagBit(WeaponProperty::Enum weaponProperty);

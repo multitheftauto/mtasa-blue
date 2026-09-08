@@ -1115,7 +1115,7 @@ void __fastcall ProcessCustomSirenSound(CAEVehicleAudioEntitySAInterface* audioE
     // BOAT through this enum's last entry, TRAILLER, get the extra processing here; TRAILLER is this
     // enum's name for what the native code and CAEVehicleAudioEntity.h's own eVehicleAudioType both
     // call SPECIAL. Native's out of range NO_VEHICLE, past this enum entirely, has no case either way.
-    const VehicleSoundType audioType = audioEntity->m_nSettings.m_eVehicleSoundType;
+    const VehicleSoundType::Enum audioType = audioEntity->m_nSettings.m_eVehicleSoundType;
     if (audioType < VehicleSoundType::BOAT || audioType > VehicleSoundType::TRAILLER)
         return;
 
