@@ -1482,6 +1482,8 @@ void CheckDataFiles()
         ExitProcess(EXIT_ERROR);
     }
 
+    // No-op known incompatible/broken d3d9.dll versions from the launch directory
+    // By using file version we account for variants as well. The array is extendable, but primarily for D3D9.dll 6.3.9600.17415 (MTA top 5 crash)
     {
         struct SIncompatibleVersion
         {
