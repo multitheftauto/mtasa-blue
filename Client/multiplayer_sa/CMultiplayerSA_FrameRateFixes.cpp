@@ -16,6 +16,7 @@ static unsigned int nLastFrameTime = 0;
 constexpr float kOriginalTimeStep = 50.0f / 30.0f;
 
 // Fixes player movement issue while aiming and walking on high FPS.
+// Only rescales the compare threshold; m_MoveCmd's reset is NOPed separately in InitHooks_FrameRateFixes.
 #define HOOKPOS_CTaskSimpleUseGun__SetMoveAnim  0x61E4F2
 #define HOOKSIZE_CTaskSimpleUseGun__SetMoveAnim 0x6
 const unsigned int            RETURN_CTaskSimpleUseGun__SetMoveAnim = 0x61E4F8;
@@ -907,6 +908,10 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CFallingGlassPane__Update_A);
     EZHookInstall(CFallingGlassPane__Update_B);
     EZHookInstall(CFallingGlassPane__Update_C);
+
+    // Fixes camera jitter while aiming and walking at high FPS.
+    // CTaskSimpleUseGun::SetMoveAnim
+    MemSet((void*)0x61E5E4, 0x90, 0x6);
 
     // Fixes slow camera movement towards the back of the vehicle on high FPS.
     // CCam::Process_FollowCar_SA
