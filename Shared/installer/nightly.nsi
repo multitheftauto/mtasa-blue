@@ -719,6 +719,10 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
             File "${FILES_ROOT}\maetro32.dll"
         !endif
 
+        SetOutPath "$INSTDIR\MTA\dxvk"
+        File /nonfatal "${FILES_ROOT}\mta\dxvk\d3d9.dll"
+        File /nonfatal "${FILES_ROOT}\mta\dxvk\dxgi.dll"
+
 
 	# Added as per https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef
 	# Not currently using \mta\cef\ due to https://github.com/chromiumembedded/cef/issues/3749#issuecomment-2278568964 (it's already crashing and likely won't remain supported)
@@ -1150,6 +1154,7 @@ Section Uninstall
         RmDir /r "$INSTDIR\MTA\cgui"
         RmDir /r "$INSTDIR\MTA\data"
         RmDir /r "$INSTDIR\MTA\CEF"
+        RmDir /r "$INSTDIR\MTA\dxvk"
         RmDir /r "$INSTDIR\MTA\locale"
         Delete "$INSTDIR\MTA\*.dll"
         Delete "$INSTDIR\MTA\*.exe"
