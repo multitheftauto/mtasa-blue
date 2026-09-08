@@ -1,0 +1,53 @@
+#version 450
+#extension GL_GOOGLE_include_directive : enable
+
+#include "d3d9_convert_common.h"
+
+layout(constant_id = 1225) const bool s_is_uyvy = false;
+
+layout(
+  local_size_x = 8,
+  local_size_y = 8,
+  local_size_z = 1) in;
+
+layout(binding = 0)
+writeonly uniform image2D dst;
+
+layout(binding = 1) uniform usamplerBuffer src;
+
+layout(push_constant)
+uniform u_info_t {
+  uvec2 extent;
+} u_info;
+
+void main() {
+  ivec3 thread_id = ivec3(gl_GlobalInvocationID);
+
+  if (all(lessThan(thread_id.xy, u_info.extent))) {
+    uint offset = thread_id.x
+                + thread_id.y * u_info.extent.x;
+
+    uint value = texelFetch(src, int(offset)).r;
+
+    vec4 data = unpackUnorm4x8(value);
+
+    // Flip around stuff for UYVY
+    if (s_is_uyvy)
+      data = data.yxwz;
+
+    float y0 = data.x - (16   / 255.0);
+    float u  = data.y - (128  / 255.0);
+    float y1 = data.z - (16   / 255.0);
+    float v  = data.w - (128  / 255.0);
+
+    vec4 color0 = convertYUV(vec3(y0, u, v));
+    vec4 color1 = convertYUV(vec3(y1, u, v));
+
+    // YUY2 has a macropixel of [2, 1]
+    // so we write 2 pixels in this run.
+    ivec2 writePos = thread_id.xy * ivec2(2, 1);
+    
+    imageStore(dst, ivec2(writePos.x,     writePos.y), color0);
+    imageStore(dst, ivec2(writePos.x + 1, writePos.y), color1);
+  }
+}
