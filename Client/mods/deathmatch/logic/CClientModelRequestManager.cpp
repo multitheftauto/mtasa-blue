@@ -247,89 +247,55 @@ bool CClientModelRequestManager::Request(unsigned short usModelID, CClientEntity
         list<SClientModelRequest*>::iterator iter;
         if (GetRequestEntry(pRequester, iter))
         {
-            // Get the entry
-            pEntry = *iter;
+            SClientModelRequest* pExisting = *iter;
 
-            // The same model?
-            if (pInfo == pEntry->pModel)
-            {
-                // He has to wait more for it
+            if (pInfo == pExisting->pModel)
                 return false;
-            }
-            else
-            {
-                // Remove the reference to the old model
-                {
-                    std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
-                    pEntry->pModel->RemoveRef();
-                }
 
-                // Is it loaded? Only safe to check/consume synchronously here if no worker
-                // currently owns this entry (i.e. it already finished processing).
-                bool bAlreadyLoaded = pEntry->bBackgroundProcessed && pInfo->IsLoaded();
-                if (bAlreadyLoaded)
-                {
-                    // Delete it, remove it from the list and return true.
-                    delete pEntry;
-                    m_Requests.erase(iter);
-
-                    std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
-                    pInfo->MakeCustomModel();
-                    return true;
-                }
-                else
-                {
-                    // If not loaded (or a worker still owns this entry), replace the model
-                    // we're going to load and hand it back to the background queue.
-                    pEntry->pModel = pInfo;
-                    pEntry->requestTimer.Reset();
-                    pEntry->bBackgroundProcessed = false;
-
-                    {
-                        std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
-                        pInfo->ModelAddRef(NON_BLOCKING, "CClientModelRequestManager::Request");
-                    }
-
-                    m_BackgroundQueue.push(pEntry);
-                    lock.unlock();
-                    m_Cv.notify_one();
-
-                    // He has to wait for it.
-                    return false;
-                }
-            }
-        }
-        else
-        {
-            // Already loaded? Don't bother adding to the list.
+            bool bNewModelLoaded;
             {
                 std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
-                if (pInfo->IsLoaded())
-                {
-                    pInfo->MakeCustomModel();
-                    return true;
-                }
-
-                // Request it
-                pInfo->ModelAddRef(NON_BLOCKING, "CClientModelRequestManager::Request #2");
+                bNewModelLoaded = pExisting->bBackgroundProcessed && pInfo->IsLoaded();
             }
 
-            // Add him to the list over models we're waiting for.
-            pEntry = new SClientModelRequest;
-            pEntry->pModel = pInfo;
-            pEntry->pEntity = pRequester;
-            pEntry->requestTimer.SetMaxIncrement(500);
-            pEntry->requestTimer.Reset();
-            m_Requests.push_back(pEntry);
+            if (bNewModelLoaded)
+            {
+                CModelInfo* pOldModel = pExisting->pModel;
+                delete pExisting;
+                m_Requests.erase(iter);
 
-            // Hand it to the workers to poll/retry in the background.
-            m_BackgroundQueue.push(pEntry);
-            lock.unlock();
-            m_Cv.notify_one();
+                std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
+                pOldModel->RemoveRef();
+                pInfo->MakeCustomModel();
+                return true;
+            }
 
-            // Return false. Caller needs to wait.
-            return false;
+            pExisting->bCancelled = true;
         }
+
+        {
+            std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
+            if (pInfo->IsLoaded())
+            {
+                pInfo->MakeCustomModel();
+                return true;
+            }
+
+            pInfo->ModelAddRef(NON_BLOCKING, "CClientModelRequestManager::Request #2");
+        }
+
+        pEntry = new SClientModelRequest;
+        pEntry->pModel = pInfo;
+        pEntry->pEntity = pRequester;
+        pEntry->requestTimer.SetMaxIncrement(500);
+        pEntry->requestTimer.Reset();
+        m_Requests.push_back(pEntry);
+
+        m_BackgroundQueue.push(pEntry);
+        lock.unlock();
+        m_Cv.notify_one();
+
+        return false;
     }
 
     // Error, model is bad. Caller should not do this.
@@ -436,8 +402,7 @@ bool CClientModelRequestManager::GetRequestEntry(CClientEntity* pRequester, list
     std::list<SClientModelRequest*>::iterator iter = m_Requests.begin();
     for (; iter != m_Requests.end(); iter++)
     {
-        // Same requester as we check for? He has requested something.
-        if ((*iter)->pEntity == pRequester)
+        if ((*iter)->pEntity == pRequester && !(*iter)->bCancelled)
         {
             // Pass out the iterator entry and return true
             iterOut = iter;
