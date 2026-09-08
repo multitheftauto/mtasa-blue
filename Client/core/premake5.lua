@@ -71,6 +71,10 @@ project "Client Core"
 		"%[%{!wks.location}/../utils/gen_language_list.exe] %[%{!wks.location}/../Shared/data/MTA San Andreas/MTA/locale] %[languages.generated.h]"
 	}
 
+	postbuildcommands {
+		"\"$(SolutionDir)..\\utils\\dxvk-1.10.3\\build-mta.bat\" \"$(SolutionDir)..\\Bin\\mta\\dxvk\"",
+	}
+
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
