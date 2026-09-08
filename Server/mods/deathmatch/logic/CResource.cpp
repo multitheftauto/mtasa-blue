@@ -596,14 +596,36 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
             pResourceFile->SetLastChecksum(checksum);
             pResourceFile->SetLastFileSizeHint(FileSize(strPath));
 
-            std::error_code ec;
-            auto            lastWriteTime = std::filesystem::last_write_time(strPath.c_str(), ec);
-            auto            lastFileSize = std::filesystem::file_size(strPath.c_str(), ec);
-            if (!ec)
+#ifdef WIN32
+            const std::filesystem::path filePath(SharedUtil::FromUTF8(strPath).c_str());
+#else
+            const std::filesystem::path filePath(strPath);
+#endif
+
+            std::error_code writeTimeError;
+            const auto      lastWriteTime = std::filesystem::last_write_time(filePath, writeTimeError);
+
+            std::error_code fileSizeError;
+            const auto      lastFileSize = std::filesystem::file_size(filePath, fileSizeError);
+
+            if (!writeTimeError && !fileSizeError)
             {
                 pResourceFile->SetLastWriteTime(lastWriteTime);
                 pResourceFile->SetLastFileSize(lastFileSize);
                 pResourceFile->SetHasFileMetadata(true);
+            }
+            else
+            {
+                if (writeTimeError)
+                {
+                    CLogger::LogPrintf("WARNING: Failed to get last write time for '%s' in resource '%s': %s\n", pResourceFile->GetName(),
+                                       m_strResourceName.c_str(), writeTimeError.message().c_str());
+                }
+                if (fileSizeError)
+                {
+                    CLogger::LogPrintf("WARNING: Failed to get file size for '%s' in resource '%s': %s\n", pResourceFile->GetName(), m_strResourceName.c_str(),
+                                       fileSizeError.message().c_str());
+                }
             }
 
             // Copy file to http holding directory
@@ -738,21 +760,45 @@ bool CResource::HasResourceChanged()
         if (!GetFilePath(pResourceFile->GetName(), strPath))
             return true;
 
-        bool bNeedsChecksumCheck = true;
+        bool needsChecksumCheck = true;
         if (pResourceFile->HasFileMetadata())
         {
-            std::error_code ec;
-            auto            currentWriteTime = std::filesystem::last_write_time(strPath.c_str(), ec);
-            auto            currentFileSize = std::filesystem::file_size(strPath.c_str(), ec);
+#ifdef WIN32
+            const std::filesystem::path filePath(SharedUtil::FromUTF8(strPath).c_str());
+#else
+            const std::filesystem::path filePath(strPath);
+#endif
 
-            if (!ec && currentWriteTime == pResourceFile->GetLastWriteTime() && currentFileSize == pResourceFile->GetLastFileSize())
+            std::error_code writeTimeError;
+            const auto      currentWriteTime = std::filesystem::last_write_time(filePath, writeTimeError);
+
+            std::error_code fileSizeError;
+            const auto      currentFileSize = std::filesystem::file_size(filePath, fileSizeError);
+
+            if (!writeTimeError && !fileSizeError)
             {
-                bNeedsChecksumCheck = false;
+                if (currentWriteTime == pResourceFile->GetLastWriteTime() && currentFileSize == pResourceFile->GetLastFileSize())
+                {
+                    needsChecksumCheck = false;
+                }
+            }
+            else
+            {
+                if (writeTimeError)
+                {
+                    CLogger::LogPrintf("WARNING: Failed to get last write time for '%s' in resource '%s': %s\n", pResourceFile->GetName(),
+                                       m_strResourceName.c_str(), writeTimeError.message().c_str());
+                }
+                if (fileSizeError)
+                {
+                    CLogger::LogPrintf("WARNING: Failed to get file size for '%s' in resource '%s': %s\n", pResourceFile->GetName(), m_strResourceName.c_str(),
+                                       fileSizeError.message().c_str());
+                }
             }
         }
 
         CChecksum checksum = pResourceFile->GetLastChecksum();
-        if (bNeedsChecksumCheck)
+        if (needsChecksumCheck)
         {
             checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
 
@@ -1922,10 +1968,10 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
     CaseInsensitiveStringSet existingClientFiles;
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
-        bool bIsClientFile = (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT ||
-                              pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
-                              pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE);
-        if (bIsClientFile)
+        bool isClientFile = (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT ||
+                             pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
+                             pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE);
+        if (isClientFile)
             existingClientFiles.insert(pResourceFile->GetName());
     }
 
@@ -2144,10 +2190,10 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
     CaseInsensitiveStringSet existingServerFiles;
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
-        bool bIsClientFile = (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT ||
-                              pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
-                              pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE);
-        if (bIsClientFile)
+        bool isClientFile = (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT ||
+                             pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
+                             pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE);
+        if (isClientFile)
             existingClientFiles.insert(pResourceFile->GetName());
         else
             existingServerFiles.insert(pResourceFile->GetName());
