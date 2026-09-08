@@ -19,6 +19,7 @@ class CEntity;
 class CEntitySAInterface;
 class CPhysical;
 class CVector;
+class CAESound;
 
 struct SWorldSoundEvent
 {
@@ -28,6 +29,7 @@ struct SWorldSoundEvent
     CVector             vecPosition;
     float               fMaxDistance;
     bool                bLoop;
+    CAESound*           pAESound;
 };
 
 using WorldSoundHandler = bool(const SWorldSoundEvent& event);
@@ -76,6 +78,7 @@ public:
     virtual bool          IsWorldSoundEnabled(uint uiGroup, uint uiIndex) = 0;
     virtual void          ResetWorldSounds() = 0;
     virtual void          SetWorldSoundHandler(WorldSoundHandler* pHandler) = 0;
+    virtual void          SetWorldSoundMaxDistance(CAESound* pAESound, float fMaxDistance) = 0;
     virtual void          ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceType, CVector* pvecPosition, float f_2) = 0;
     virtual void          ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhysical* pPhysical) = 0;
 

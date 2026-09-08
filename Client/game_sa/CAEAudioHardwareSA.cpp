@@ -213,6 +213,19 @@ bool CAEAudioHardwareSA::GetLoadedSoundInfo(unsigned short usBankSlot, unsigned 
     return true;
 }
 
+uint CAEAudioHardwareSA::GetNumSoundsInBankSlot(unsigned short usBankSlot) const
+{
+    const BYTE* pBankSlot = GetBankSlot(usBankSlot);
+    if (!pBankSlot)
+        return 0;
+
+    const short sNumSounds = *reinterpret_cast<const short*>(pBankSlot + NUM_BankSlotNumSoundsOffset);
+    if (sNumSounds <= 0)
+        return 0;
+
+    return static_cast<uint>(std::min<short>(sNumSounds, NUM_MaxBankSounds));
+}
+
 void CAEAudioHardwareSA::GetChannelFrequencyScalingFactors(float* pOutFactors, unsigned int uiMax) const
 {
     if (!pOutFactors || uiMax == 0)
@@ -225,6 +238,24 @@ void CAEAudioHardwareSA::GetChannelFrequencyScalingFactors(float* pOutFactors, u
 
     for (uint i = 0; i < uiCount; ++i)
         pOutFactors[i] = pFactors[i];
+}
+
+bool CAEAudioHardwareSA::SetSoundSampleRate(unsigned short usBankSlot, unsigned short usIndex, unsigned short usSampleRate)
+{
+    const BYTE* pBankSlot = GetBankSlot(usBankSlot);
+    if (!pBankSlot)
+        return false;
+
+    const short sNumSounds = *reinterpret_cast<const short*>(pBankSlot + NUM_BankSlotNumSoundsOffset);
+    if (sNumSounds < 0 || usIndex >= static_cast<uint>(sNumSounds) || usIndex >= NUM_MaxBankSounds)
+        return false;
+
+    BYTE* pItem = const_cast<BYTE*>(GetBankSlotItem(pBankSlot, usIndex));
+    if (!pItem)
+        return false;
+
+    *reinterpret_cast<unsigned short*>(pItem + NUM_BankSlotItemSampleFreqOffset) = usSampleRate;
+    return true;
 }
 
 bool CAEAudioHardwareSA::PatchSoundBuffer(unsigned short usBankSlot, unsigned short usIndex, const void* pPcmData, unsigned int uiDataSize)

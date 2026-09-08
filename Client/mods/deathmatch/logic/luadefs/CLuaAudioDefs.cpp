@@ -13,6 +13,7 @@
 #include <lua/CLuaFunctionParser.h>
 #include "CBassAudio.h"
 #include "CClientWorldSoundManager.h"
+#include <game/CAEAudioHardware.h>
 
 void CLuaAudioDefs::LoadFunctions()
 {
@@ -28,6 +29,7 @@ void CLuaAudioDefs::LoadFunctions()
                                                                              {"restoreWorldSound", ArgumentParser<RestoreWorldSound>},
                                                                              {"restoreAllWorldSounds", ArgumentParser<RestoreAllWorldSounds>},
                                                                              {"isWorldSoundReplaced", ArgumentParser<IsWorldSoundReplaced>},
+                                                                             {"getWorldSoundBankSlotInfo", ArgumentParser<GetWorldSoundBankSlotInfo>},
                                                                              {"playSFX", PlaySFX},
                                                                              {"playSFX3D", PlaySFX3D},
                                                                              {"getSFXStatus", GetSFXStatus},
@@ -197,6 +199,25 @@ bool CLuaAudioDefs::IsWorldSoundReplaced(int group, std::optional<int> index)
         return g_pClientGame->GetWorldSoundManager()->IsSoundReplaced(group, index.value_or(-1));
 
     return false;
+}
+
+std::variant<bool, CLuaMultiReturn<uint, uint>> CLuaAudioDefs::GetWorldSoundBankSlotInfo(int group, int index)
+{
+    if (!g_pGame || group < 0 || group > 44 || index < 0 || index > 399)
+        return false;
+
+    CAEAudioHardware* pAudioHardware = g_pGame->GetAEAudioHardware();
+    if (!pAudioHardware)
+        return false;
+
+    void* pPcmData = nullptr;
+    uint  uiPcmSize = 0;
+    uint  uiSampleRate = 0;
+    int   iLoopStartOffset = -1;
+    if (!pAudioHardware->GetLoadedSoundInfo(static_cast<ushort>(group), static_cast<ushort>(index), pPcmData, uiPcmSize, uiSampleRate, iLoopStartOffset))
+        return false;
+
+    return std::tuple(uiPcmSize, uiSampleRate);
 }
 
 int CLuaAudioDefs::PlaySound(lua_State* luaVM)

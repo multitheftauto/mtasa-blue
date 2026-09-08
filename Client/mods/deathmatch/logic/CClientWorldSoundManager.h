@@ -11,13 +11,11 @@
 
 #pragma once
 
-#include <list>
 #include <unordered_map>
 #include <vector>
 #include <game/CAudioEngine.h>
 
 class CClientManager;
-class CClientSound;
 
 class CClientWorldSoundManager
 {
@@ -31,8 +29,7 @@ public:
     void RestoreAll();
 
     bool IsSoundReplaced(uint uiGroup, uint uiIndex) const;
-
-    bool HandleWorldSound(const SWorldSoundEvent& event, bool bAllowPlay);
+    bool HandleWorldSound(const SWorldSoundEvent& event);
 
     void DoPulse();
 
@@ -44,27 +41,14 @@ private:
         float   fMinDistance;
         float   fMaxDistance;
 
-        bool              bNativeWanted = false;
-        bool              bNativeApplied = false;
-        std::vector<char> pcmData;
-        std::vector<char> originalPcm;
-        uint              uiNativeLastTryTick = 0;
-    };
-
-    struct SLastPlayed
-    {
-        uint    uiTick;
-        CVector vecPosition;
-    };
-
-    struct SFollowSound
-    {
-        CClientSound*       pSound;
-        CEntitySAInterface* pGameEntity;
-        uint                uiStartTick;
-        uint                uiGroup;
-        uint                uiIndex;
-        bool                bLooping;
+        bool                                        bWholeGroup = false;
+        bool                                        bNativeWanted = false;
+        bool                                        bNativeApplied = false;
+        bool                                        bResultLogged = false;
+        std::unordered_map<uint, std::vector<char>> pcmByRate;
+        std::unordered_map<uint, std::vector<char>> originalPcm;
+        std::unordered_map<uint, ushort>            originalRate;
+        uint                                        uiNativeLastTryTick = 0;
     };
 
     static uint MakeKey(uint uiGroup, uint uiIndex) { return (uiGroup << 16) | (uiIndex & 0xFFFF); }
@@ -72,12 +56,11 @@ private:
     bool FindReplacement(uint uiGroup, uint uiIndex, const SReplacement** ppOutReplacement) const;
 
     bool TryApplyNativeReplacement(SReplacement& replacement, uint uiGroup, uint uiIndex);
-    bool RestoreSoundBuffer(const SReplacement& replacement, uint uiGroup, uint uiIndex);
+    bool PatchSoundBufferIndex(SReplacement& replacement, uint uiGroup, uint uiIndex);
+    bool RestoreSoundBuffer(const SReplacement& replacement, uint uiGroup);
     void ApplyNativeReplacements();
+    void LogResult(SReplacement& replacement, uint uiGroup, uint uiIndex, const SString& strResult, bool bWarning);
 
     CClientManager*                        m_pManager;
     std::unordered_map<uint, SReplacement> m_Replacements;
-    std::unordered_map<uint, SLastPlayed>  m_LastPlayed;
-    std::list<SFollowSound>                m_FollowSounds;
-    uint                                   m_uiLastPruneTick;
 };

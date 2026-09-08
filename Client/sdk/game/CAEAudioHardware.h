@@ -69,6 +69,9 @@ public:
     virtual bool GetLoadedSoundInfo(unsigned short usBankSlot, unsigned short usIndex, void*& pOutPcmData, unsigned int& uiOutPcmSize,
                                     unsigned int& uiOutSampleRate, int& iOutLoopStartOffset) const = 0;
 
+    virtual uint GetNumSoundsInBankSlot(unsigned short usBankSlot) const = 0;
+
     virtual bool PatchSoundBuffer(unsigned short usBankSlot, unsigned short usIndex, const void* pPcmData, unsigned int uiDataSize) = 0;
+    virtual bool SetSoundSampleRate(unsigned short usBankSlot, unsigned short usIndex, unsigned short usSampleRate) = 0;
     virtual void GetChannelFrequencyScalingFactors(float* pOutFactors, unsigned int uiMax) const = 0;
 };

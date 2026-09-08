@@ -562,12 +562,21 @@ bool CAudioEngineSA::OnWorldSound(CAESound* pAESound)
             pAESound->m_vCurrPosn,
             pAESound->m_fSoundDistance,
             pAESound->usGroup == BANKSLOT_HORNS || pAESound->m_nLoopCounter < 0 || pAESound->m_nLoopCounter > 1,
+            pAESound,
         };
 
         return m_pWorldSoundHandler(event);
     }
 
     return true;
+}
+
+void CAudioEngineSA::SetWorldSoundMaxDistance(CAESound* pAESound, float fMaxDistance)
+{
+    if (!pAESound || fMaxDistance <= 0.0f)
+        return;
+
+    pAESound->m_fSoundDistance = fMaxDistance;
 }
 
 bool CAudioEngineSA::IsWorldSoundStillActive(uint uiGroup, uint uiIndex, CEntitySAInterface* pEntity) const

@@ -31,7 +31,9 @@ public:
 
     bool GetLoadedSoundInfo(unsigned short usBankSlot, unsigned short usIndex, void*& pOutPcmData, unsigned int& uiOutPcmSize, unsigned int& uiOutSampleRate,
                             int& iOutLoopStartOffset) const override;
+    uint GetNumSoundsInBankSlot(unsigned short usBankSlot) const override;
     bool PatchSoundBuffer(unsigned short usBankSlot, unsigned short usIndex, const void* pPcmData, unsigned int uiDataSize) override;
+    bool SetSoundSampleRate(unsigned short usBankSlot, unsigned short usIndex, unsigned short usSampleRate) override;
     void GetChannelFrequencyScalingFactors(float* pOutFactors, unsigned int uiMax) const override;
 
 private:

@@ -6638,10 +6638,8 @@ bool CClientGame::WorldSoundHandler(const SWorldSoundEvent& event)
         bAllowPlay = pEntity->CallEvent("onClientWorldSound", Arguments, true);
     }
 
-    if (m_pWorldSoundManager && m_pWorldSoundManager->HandleWorldSound(event, bAllowPlay))
-    {
-        return false;
-    }
+    if (m_pWorldSoundManager)
+        m_pWorldSoundManager->HandleWorldSound(event);
 
     return bAllowPlay;
 }
