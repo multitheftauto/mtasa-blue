@@ -1720,7 +1720,7 @@ void CSettings::CreateGUI()
     vecTemp = CVector2D(12.f, 12.f);
     float fComboWidth = 170.f;
     float fHeaderHeight = 20;
-    float fLineHeight = 27;
+    float fLineHeight = 25;
 
     // Misc section label
     m_pAdvancedMiscLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Misc")));
@@ -1906,9 +1906,9 @@ void CSettings::CreateGUI()
     m_pProcessAffinityCheckbox->AutoSize(nullptr, 20.0f);
     vecTemp.fY += fLineHeight;
 
-    // Allow disabling cached IMG reads for users experiencing streaming issues.
+    // Let users opt into Windows caching while preserving GTA's original IMG reads by default.
     m_pIMGFileCachingCheckbox =
-        reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Cache game files in memory (requires restart)"), true));
+        reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Enable Windows file caching for IMG archives"), false));
     m_pIMGFileCachingCheckbox->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
     m_pIMGFileCachingCheckbox->AutoSize(nullptr, 20.0f);
     m_pIMGFileCachingCheckbox->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
@@ -1966,11 +1966,11 @@ void CSettings::CreateGUI()
     vecTemp.fX -= fComboWidth + 15;
 
     // Description label
-    vecTemp.fY += 15.0f;
+    vecTemp.fY += 2.0f;
     m_pAdvancedSettingDescriptionLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, ""));
-    m_pAdvancedSettingDescriptionLabel->SetPosition(CVector2D(vecTemp.fX + 10.f, vecTemp.fY));
-    m_pAdvancedSettingDescriptionLabel->SetFont("default-bold-small");
-    m_pAdvancedSettingDescriptionLabel->SetSize(CVector2D(500.0f, 95.0f));
+    m_pAdvancedSettingDescriptionLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
+    m_pAdvancedSettingDescriptionLabel->SetFont("default");
+    m_pAdvancedSettingDescriptionLabel->SetSize(CVector2D(std::max(1.0f, tabPanelSize.fX - 2.0f * vecTemp.fX), 95.0f));
     m_pAdvancedSettingDescriptionLabel->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER_WORDWRAP);
 
     // Set up the events
@@ -6141,9 +6141,8 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
         strText = std::string(_("CPU affinity:")) + " " + std::string(_("Only change if you're having stability issues."));
     else if (pCheckBox && pCheckBox == m_pIMGFileCachingCheckbox)
         strText =
-            _("Lets Windows cache IMG game archives in RAM by removing FILE_FLAG_NO_BUFFERING. Enabled by default to reduce disk reads and potentially "
-              "reduce loading stutter on SSDs and HDDs. Older HDDs do not automatically benefit from disabling it. Try turning it off if performance worsens. "
-              "Requires restarting MTA.");
+            _("Off by default to preserve GTA's original behavior. When enabled, removes FILE_FLAG_NO_BUFFERING so Windows can cache IMG game archives in RAM. "
+              "This may reduce disk reads and loading stutter on SSDs and HDDs. Try turning it off if performance worsens. Requires restarting MTA.");
 
     if (strText != "")
         m_pAdvancedSettingDescriptionLabel->SetText(strText.c_str());
