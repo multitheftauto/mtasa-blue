@@ -5932,8 +5932,7 @@ bool CSettings::OnEnableVulkanClick(CGUIElement* pElement)
         CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
         pQuestionBox->Reset();
         pQuestionBox->SetTitle(_("VULKAN FILES MISSING OR DAMAGED"));
-        pQuestionBox->SetMessage(
-            _("The Vulkan files are missing or damaged,\nso this option cannot be enabled."));
+        pQuestionBox->SetMessage(_("The Vulkan files are missing or damaged,\nso this option cannot be enabled."));
         pQuestionBox->SetButton(0, _("OK"));
         pQuestionBox->SetCallback(VulkanNotSupportedCallBack);
         pQuestionBox->Show();
@@ -5947,8 +5946,7 @@ bool CSettings::OnEnableVulkanClick(CGUIElement* pElement)
         CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
         pQuestionBox->Reset();
         pQuestionBox->SetTitle(_("VULKAN NOT SUPPORTED"));
-        pQuestionBox->SetMessage(
-            _("Vulkan is not available on your system,\nso this option cannot be enabled."));
+        pQuestionBox->SetMessage(_("Vulkan is not available on your system,\nso this option cannot be enabled."));
         pQuestionBox->SetButton(0, _("OK"));
         pQuestionBox->SetCallback(VulkanNotSupportedCallBack);
         pQuestionBox->Show();
