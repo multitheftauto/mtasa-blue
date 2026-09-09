@@ -79,8 +79,8 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerAnnounceValue", SetPlayerAnnounceValue},
 
         // Audio funcs
-        {"playMissionAudio", ArgumentParserWarn<false, PlayMissionAudio>},
-        {"preloadMissionAudio", ArgumentParserWarn<false, PreloadMissionAudio>},
+        // {"playMissionAudio", ArgumentParserWarn<false, PlayMissionAudio>},
+        // {"preloadMissionAudio", ArgumentParserWarn<false, PreloadMissionAudio>},
         {"playSoundFrontEnd", ArgumentParserWarn<false, PlaySoundFrontEnd>},
 
         // Input funcs
