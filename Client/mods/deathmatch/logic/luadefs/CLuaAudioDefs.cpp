@@ -12,6 +12,46 @@
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 #include "CBassAudio.h"
+#include <cmath>
+
+static bool IsValidFFTBandCount(int iLength, int iBands)
+{
+    return iBands >= 0 && iBands <= iLength / 2;
+}
+
+static float* ProcessFFTData(float* fData, int iLength, int iBands)
+{
+    if (iBands == 0 || fData == nullptr)
+        return fData;
+
+    float* fDataNew = new float[iBands];
+    int    bC = 0;
+    iBands--;
+    for (int x = 0; x <= iBands; x++)
+    {
+        float fPeak = 0.0;
+
+        double bB = pow(2, x * 10.0 / iBands);
+
+        if (bB > (iLength / 2) - 1)
+            bB = (iLength / 2) - 1;
+
+        if (bB <= bC)
+            bB = bC + 1;
+
+        while (bC < bB)
+        {
+            if (fPeak < fData[1 + bC])
+            {
+                fDataNew[x] = fData[1 + bC];
+                fPeak = fData[1 + bC];
+            }
+            bC = bC + 1;
+        }
+    }
+    delete[] fData;
+    return fDataNew;
+}
 
 void CLuaAudioDefs::LoadFunctions()
 {
@@ -169,10 +209,11 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, con
     // ) Fixes #6507 - Caz
     if (pResource)
     {
-        CClientSound* pSound =
-            CStaticFunctionDefinitions::PlaySound(pResource, strSoundPath, bIsURL, bIsRawData, bLoop.value_or(false), bThrottle.value_or(true));
+        CClientSound* pSound = m_pManager->GetSoundManager()->PlaySound2D(strSoundPath, bIsURL, bIsRawData, bLoop.value_or(false), bThrottle.value_or(true));
         if (pSound)
         {
+            pSound->SetParent(pResource->GetResourceDynamicEntity());
+
             // call onClientSoundStarted
             CLuaArguments Arguments;
             Arguments.PushString("play");  // Reason
@@ -211,9 +252,11 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, c
     if (pResource)
     {
         CClientSound* pSound =
-            CStaticFunctionDefinitions::PlaySound3D(pResource, strSoundPath, bIsURL, bIsRawData, vecPosition, bLoop.value_or(false), bThrottle.value_or(true));
+            m_pManager->GetSoundManager()->PlaySound3D(strSoundPath, bIsURL, bIsRawData, vecPosition, bLoop.value_or(false), bThrottle.value_or(true));
         if (pSound)
         {
+            pSound->SetParent(pResource->GetResourceDynamicEntity());
+
             // call onClientSoundStarted
             CLuaArguments Arguments;
             Arguments.PushString("play");  // Reason
@@ -228,43 +271,62 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, c
 
 bool CLuaAudioDefs::StopSound(CClientSound* pSound)
 {
-    return pSound && CStaticFunctionDefinitions::StopSound(*pSound);
+    if (!pSound)
+        return false;
+
+    CLuaArguments Arguments;
+    Arguments.PushString("destroyed");
+    pSound->CallEvent("onClientSoundStopped", Arguments, false);
+    g_pClientGame->GetElementDeleter()->Delete(pSound);
+    return true;
 }
 
 bool CLuaAudioDefs::SetSoundPosition(std::variant<CClientSound*, CClientPlayer*> sound, double dPosition)
 {
     if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
-        return CStaticFunctionDefinitions::SetSoundPosition(**pSound, dPosition);
+        return (*pSound)->SetPlayPosition(dPosition);
     else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
-        return CStaticFunctionDefinitions::SetSoundPosition(**pPlayer, dPosition);
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice)
+        {
+            pVoice->SetPlayPosition(dPosition);
+            return true;
+        }
+    }
     return false;
 }
 
 std::variant<double, bool> CLuaAudioDefs::GetSoundPosition(std::variant<CClientSound*, CClientPlayer*> sound)
 {
-    double dPosition = 0;
-    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundPosition(**pSound, dPosition))
-        return dPosition;
-    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer && CStaticFunctionDefinitions::GetSoundPosition(**pPlayer, dPosition))
-        return dPosition;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        return (*pSound)->GetPlayPosition();
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice)
+            return pVoice->GetPlayPosition();
+    }
     return false;
 }
 
 std::variant<double, bool> CLuaAudioDefs::GetSoundLength(std::variant<CClientSound*, CClientPlayer*> sound)
 {
-    double dLength = 0;
-    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundLength(**pSound, dLength))
-        return dLength;
-    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer && CStaticFunctionDefinitions::GetSoundLength(**pPlayer, dLength))
-        return dLength;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        return (*pSound)->GetLength();
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice)
+            return pVoice->GetLength();
+    }
     return false;
 }
 
 std::variant<double, bool> CLuaAudioDefs::GetSoundBufferLength(CClientSound* pSound)
 {
-    double dBufferLength = 0;
-    if (pSound && CStaticFunctionDefinitions::GetSoundBufferLength(*pSound, dBufferLength))
-        return dBufferLength;
+    if (pSound && pSound->IsSoundStream())
+        return pSound->GetBufferLength();
     return false;
 }
 
@@ -281,75 +343,129 @@ bool CLuaAudioDefs::IsSoundLooped(CClientSound* pSound)
 bool CLuaAudioDefs::SetSoundPaused(std::variant<CClientSound*, CClientPlayer*> sound, bool bPaused)
 {
     if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
-        return CStaticFunctionDefinitions::SetSoundPaused(**pSound, bPaused);
+    {
+        (*pSound)->SetPaused(bPaused);
+        return true;
+    }
     else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
-        return CStaticFunctionDefinitions::SetSoundPaused(**pPlayer, bPaused);
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice)
+        {
+            pVoice->SetPaused(bPaused);
+            return true;
+        }
+    }
     return false;
 }
 
 bool CLuaAudioDefs::IsSoundPaused(std::variant<CClientSound*, CClientPlayer*> sound)
 {
-    bool bPaused = false;
-    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::IsSoundPaused(**pSound, bPaused))
-        return bPaused;
-    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer && CStaticFunctionDefinitions::IsSoundPaused(**pPlayer, bPaused))
-        return bPaused;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        return (*pSound)->IsPaused();
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice)
+            return pVoice->IsPaused();
+    }
     return false;
 }
 
 bool CLuaAudioDefs::SetSoundVolume(std::variant<CClientSound*, CClientPlayer*> sound, float fVolume)
 {
     if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
-        return CStaticFunctionDefinitions::SetSoundVolume(**pSound, fVolume);
+    {
+        (*pSound)->SetVolume(fVolume);
+        return true;
+    }
     else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
-        return CStaticFunctionDefinitions::SetSoundVolume(**pPlayer, fVolume);
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice)
+        {
+            pVoice->SetVolume(fVolume);
+            return true;
+        }
+    }
     return false;
 }
 
 std::variant<float, bool> CLuaAudioDefs::GetSoundVolume(std::variant<CClientSound*, CClientPlayer*> sound)
 {
-    float fVolume = 0.0f;
-    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundVolume(**pSound, fVolume))
-        return fVolume;
-    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer && CStaticFunctionDefinitions::GetSoundVolume(**pPlayer, fVolume))
-        return fVolume;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        return (*pSound)->GetVolume();
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice)
+            return pVoice->GetVolume();
+    }
     return false;
 }
 
 bool CLuaAudioDefs::SetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> sound, float fSpeed)
 {
     if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
-        return CStaticFunctionDefinitions::SetSoundSpeed(**pSound, fSpeed);
+    {
+        (*pSound)->SetPlaybackSpeed(fSpeed);
+        return true;
+    }
     else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
-        return CStaticFunctionDefinitions::SetSoundSpeed(**pPlayer, fSpeed);
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice)
+        {
+            pVoice->SetPlaybackSpeed(fSpeed);
+            return true;
+        }
+    }
     return false;
 }
 
 bool CLuaAudioDefs::SetSoundProperties(CClientSound* pSound, float fSampleRate, float fTempo, float fPitch, std::optional<bool> bReversed)
 {
-    return pSound && CStaticFunctionDefinitions::SetSoundProperties(*pSound, fSampleRate, fTempo, fPitch, bReversed.value_or(false));
+    if (pSound && !pSound->IsSoundStream())
+    {
+        pSound->ApplyFXModifications(fSampleRate, fTempo, fPitch, bReversed.value_or(false));
+        return true;
+    }
+
+    return false;
 }
 
 std::variant<CLuaMultiReturn<float, float, float, bool>, bool> CLuaAudioDefs::GetSoundProperties(CClientSound* pSound)
 {
-    float fSampleRate = 0.0f, fTempo = 0.0f, fPitch = 0.0f;
-    bool  bReversed = false;
-    if (pSound && CStaticFunctionDefinitions::GetSoundProperties(*pSound, fSampleRate, fTempo, fPitch, bReversed))
+    if (pSound)
+    {
+        float fSampleRate = 0.0f, fTempo = 0.0f, fPitch = 0.0f;
+        bool  bReversed = false;
+        pSound->GetFXModifications(fSampleRate, fTempo, fPitch, bReversed);
         return CLuaMultiReturn<float, float, float, bool>{fSampleRate, fTempo, fPitch, bReversed};
+    }
     return false;
 }
 
 std::variant<std::unordered_map<int, float>, bool> CLuaAudioDefs::GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*> sound, int iLength,
                                                                                   std::optional<int> iBands)
 {
+    if (!IsValidFFTBandCount(iLength, iBands.value_or(0)))
+        return false;
+
     float* pData = nullptr;
     if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
-        pData = CStaticFunctionDefinitions::GetSoundFFTData(**pSound, iLength, iBands.value_or(0));
+        pData = (*pSound)->GetFFTData(iLength);
     else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
-        pData = CStaticFunctionDefinitions::GetSoundFFTData(**pPlayer, iLength, iBands.value_or(0));
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice && pVoice->IsActive())
+            pData = pVoice->GetFFTData(iLength);
+    }
 
     if (!pData)
         return false;
+
+    pData = ProcessFFTData(pData, iLength, iBands.value_or(0));
 
     const int                      iSize = iBands.value_or(0) == 0 ? iLength / 2 : iBands.value_or(0) - 1;
     std::unordered_map<int, float> data;
@@ -365,9 +481,13 @@ std::variant<std::unordered_map<int, float>, bool> CLuaAudioDefs::GetSoundWaveDa
 {
     float* pData = nullptr;
     if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
-        pData = CStaticFunctionDefinitions::GetSoundWaveData(**pSound, iLength);
+        pData = (*pSound)->GetWaveData(iLength);
     else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
-        pData = CStaticFunctionDefinitions::GetSoundWaveData(**pPlayer, iLength);
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice && pVoice->IsActive())
+            pData = pVoice->GetWaveData(iLength);
+    }
     else
         return false;
 
@@ -385,66 +505,90 @@ std::variant<std::unordered_map<int, float>, bool> CLuaAudioDefs::GetSoundWaveDa
 
 std::variant<CLuaMultiReturn<unsigned int, unsigned int>, bool> CLuaAudioDefs::GetSoundLevelData(std::variant<CClientSound*, CClientPlayer*> sound)
 {
-    DWORD dwLeft = 0, dwRight = 0;
-    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundLevelData(**pSound, dwLeft, dwRight))
-        return CLuaMultiReturn<unsigned int, unsigned int>{(unsigned int)dwLeft, (unsigned int)dwRight};
-    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound);
-             pPlayer && *pPlayer && CStaticFunctionDefinitions::GetSoundLevelData(**pPlayer, dwLeft, dwRight))
-        return CLuaMultiReturn<unsigned int, unsigned int>{(unsigned int)dwLeft, (unsigned int)dwRight};
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+    {
+        DWORD dwData = (*pSound)->GetLevelData();
+        if (dwData != 0)
+            return CLuaMultiReturn<unsigned int, unsigned int>{LOWORD(dwData), HIWORD(dwData)};
+    }
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice && pVoice->IsActive())
+        {
+            DWORD dwData = pVoice->GetLevelData();
+            if (dwData != 0)
+                return CLuaMultiReturn<unsigned int, unsigned int>{LOWORD(dwData), HIWORD(dwData)};
+        }
+    }
     return false;
 }
 
 std::variant<float, bool> CLuaAudioDefs::GetSoundBPM(CClientSound* pSound)
 {
-    float fBPM = 0.0f;
-    if (pSound && CStaticFunctionDefinitions::GetSoundBPM(*pSound, fBPM))
-        return fBPM;
+    if (pSound)
+    {
+        float fBPM = pSound->GetSoundBPM();
+        if (fBPM != 0.0f)
+            return fBPM;
+    }
     return false;
 }
 
 bool CLuaAudioDefs::SetSoundPanEnabled(CClientSound* pSound, bool bEnabled)
 {
-    return pSound && CStaticFunctionDefinitions::SetSoundPanEnabled(*pSound, bEnabled);
+    return pSound && pSound->SetPanEnabled(bEnabled);
 }
 
 bool CLuaAudioDefs::IsSoundPanEnabled(CClientSound* pSound)
 {
-    return pSound && CStaticFunctionDefinitions::IsSoundPanEnabled(*pSound);
+    return pSound && pSound->IsPanEnabled();
 }
 
 std::variant<float, bool> CLuaAudioDefs::GetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> sound)
 {
-    float fSpeed = 0.0f;
-    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundSpeed(**pSound, fSpeed))
-        return fSpeed;
-    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer && CStaticFunctionDefinitions::GetSoundSpeed(**pPlayer, fSpeed))
-        return fSpeed;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        return (*pSound)->GetPlaybackSpeed();
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice)
+            return pVoice->GetPlaybackSpeed();
+    }
     return false;
 }
 
 bool CLuaAudioDefs::SetSoundMinDistance(CClientSound* pSound, float fDistance)
 {
-    return pSound && CStaticFunctionDefinitions::SetSoundMinDistance(*pSound, fDistance);
+    if (pSound)
+    {
+        pSound->SetMinDistance(fDistance);
+        return true;
+    }
+    return false;
 }
 
 std::variant<float, bool> CLuaAudioDefs::GetSoundMinDistance(CClientSound* pSound)
 {
-    float fDistance = 0.0f;
-    if (pSound && CStaticFunctionDefinitions::GetSoundMinDistance(*pSound, fDistance))
-        return fDistance;
+    if (pSound)
+        return pSound->GetMinDistance();
     return false;
 }
 
 bool CLuaAudioDefs::SetSoundMaxDistance(CClientSound* pSound, float fDistance)
 {
-    return pSound && CStaticFunctionDefinitions::SetSoundMaxDistance(*pSound, fDistance);
+    if (pSound)
+    {
+        pSound->SetMaxDistance(fDistance);
+        return true;
+    }
+    return false;
 }
 
 std::variant<float, bool> CLuaAudioDefs::GetSoundMaxDistance(CClientSound* pSound)
 {
-    float fDistance = 0.0f;
-    if (pSound && CStaticFunctionDefinitions::GetSoundMaxDistance(*pSound, fDistance))
-        return fDistance;
+    if (pSound)
+        return pSound->GetMaxDistance();
     return false;
 }
 
@@ -456,17 +600,17 @@ std::variant<SString, std::unordered_map<std::string, std::string>, bool> CLuaAu
 
     if (strFormat.has_value() && !strFormat.value().empty())
     {
-        SString strMetaTags;
-        if (CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, SString(strFormat.value()), strMetaTags) && !strMetaTags.empty())
+        SString strMetaTags = pSound->GetMetaTags(SString(strFormat.value()));
+        if (!strMetaTags.empty())
             return strMetaTags;
         return false;
     }
 
-    SString                                      strMetaTags;
     std::unordered_map<std::string, std::string> tags;
     const auto                                   AddTag = [&](const char* szFormat, const char* szKey)
     {
-        if (CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, szFormat, strMetaTags) && !strMetaTags.empty())
+        SString strMetaTags = pSound->GetMetaTags(szFormat);
+        if (!strMetaTags.empty())
             tags.emplace(szKey, strMetaTags);
     };
     AddTag("%TITL", "title");
@@ -487,10 +631,15 @@ std::variant<SString, std::unordered_map<std::string, std::string>, bool> CLuaAu
 
 bool CLuaAudioDefs::SetSoundEffectEnabled(std::variant<CClientSound*, CClientPlayer*> sound, const std::string strEffectName, std::optional<bool> bEnable)
 {
+    int iFxEffect = m_pManager->GetSoundManager()->GetFxEffectFromName(strEffectName);
+
     if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
-        return CStaticFunctionDefinitions::SetSoundEffectEnabled(**pSound, strEffectName, bEnable.value_or(false));
+        return iFxEffect >= 0 && (*pSound)->SetFxEffect(iFxEffect, bEnable.value_or(false));
     else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
-        return CStaticFunctionDefinitions::SetSoundEffectEnabled(**pPlayer, strEffectName, bEnable.value_or(false));
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        return pVoice && iFxEffect >= 0 && pVoice->SetFxEffect(iFxEffect, bEnable.value_or(false));
+    }
     return false;
 }
 
@@ -1202,7 +1351,8 @@ bool CLuaAudioDefs::PlaySoundFrontEnd(unsigned char ucSound)
     if (ucSound > 101)
         throw std::invalid_argument("Invalid sound ID specified. Valid sound IDs are 0 - 101.");
 
-    return CStaticFunctionDefinitions::PlaySoundFrontEnd(ucSound);
+    g_pGame->GetAudioEngine()->PlayFrontEndSound(ucSound);
+    return true;
 }
 
 int CLuaAudioDefs::SetAmbientSoundEnabled(lua_State* luaVM)
@@ -1348,10 +1498,14 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX(lua_State* luaVM, eAudi
     else
         return false;
 
-    CResource*    pResource = &lua_getownerresource(luaVM);
-    CClientSound* pSound;
-    if (CStaticFunctionDefinitions::PlaySFX(pResource, containerIndex, iBankIndex, iAudioIndex, bLoop.value_or(false), pSound))
+    CResource* pResource = &lua_getownerresource(luaVM);
+
+    CClientSound* pSound = m_pManager->GetSoundManager()->PlayGTASFX(containerIndex, iBankIndex, iAudioIndex, bLoop.value_or(false));
+    if (pSound)
+    {
+        pSound->SetParent(pResource->GetResourceDynamicEntity());
         return pSound;
+    }
 
     return false;
 }
@@ -1368,10 +1522,14 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX3D(lua_State* luaVM, eAu
     else
         return false;
 
-    CResource*    pResource = &lua_getownerresource(luaVM);
-    CClientSound* pSound;
-    if (CStaticFunctionDefinitions::PlaySFX3D(pResource, containerIndex, iBankIndex, iAudioIndex, vecPosition, bLoop.value_or(false), pSound))
+    CResource* pResource = &lua_getownerresource(luaVM);
+
+    CClientSound* pSound = m_pManager->GetSoundManager()->PlayGTASFX3D(containerIndex, iBankIndex, iAudioIndex, vecPosition, bLoop.value_or(false));
+    if (pSound)
+    {
+        pSound->SetParent(pResource->GetResourceDynamicEntity());
         return pSound;
+    }
 
     return false;
 }
@@ -1379,10 +1537,7 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX3D(lua_State* luaVM, eAu
 std::variant<bool, std::nullptr_t> CLuaAudioDefs::GetSFXStatus(eAudioLookupIndex containerIndex)
 {
     //  bool getSFXStatus ( string audioContainer )
-    bool bNotCut = false;
-    if (CStaticFunctionDefinitions::GetSFXStatus(containerIndex, bNotCut))
-        return bNotCut;
-    return nullptr;
+    return m_pManager->GetSoundManager()->GetSFXStatus(containerIndex);
 }
 
 bool CLuaAudioDefs::SetSoundPan(std::variant<CClientSound*, CClientPlayer*> sound, float fPan)
@@ -1390,9 +1545,12 @@ bool CLuaAudioDefs::SetSoundPan(std::variant<CClientSound*, CClientPlayer*> soun
     //  setSoundPan ( sound theSound, float pan )
     //  setSoundPan ( player thePlayer, float pan )
     if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
-        return CStaticFunctionDefinitions::SetSoundPan(**pSound, fPan);
+        return (*pSound)->SetPan(fPan);
     else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
-        return CStaticFunctionDefinitions::SetSoundPan(**pPlayer, fPan);
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        return pVoice && pVoice->SetPan(fPan);
+    }
     return false;
 }
 
@@ -1400,26 +1558,34 @@ std::variant<float, bool> CLuaAudioDefs::GetSoundPan(std::variant<CClientSound*,
 {
     //  getSoundPan ( element theSound )
     //  getSoundPan ( player thePlayer )
-    float fPan = 0.0f;
-    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundPan(**pSound, fPan))
-        return fPan;
-    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer && CStaticFunctionDefinitions::GetSoundPan(**pPlayer, fPan))
-        return fPan;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+    {
+        float fPan = 0.0f;
+        if ((*pSound)->GetPan(fPan))
+            return fPan;
+    }
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+    {
+        CClientPlayerVoice* pVoice = (*pPlayer)->GetVoice();
+        if (pVoice)
+        {
+            float fPan = 0.0f;
+            if (pVoice->GetPan(fPan))
+                return fPan;
+        }
+    }
     return false;
 }
 
 // Radio
 bool CLuaAudioDefs::SetRadioChannel(unsigned char ucChannel)
 {
-    return CStaticFunctionDefinitions::SetRadioChannel(ucChannel);
+    return m_pPlayerManager->GetLocalPlayer()->SetCurrentRadioChannel(ucChannel);
 }
 
 std::variant<unsigned char, bool> CLuaAudioDefs::GetRadioChannel()
 {
-    unsigned char ucChannel = 0;
-    if (CStaticFunctionDefinitions::GetRadioChannel(ucChannel))
-        return ucChannel;
-    return false;
+    return m_pPlayerManager->GetLocalPlayer()->GetCurrentRadioChannel();
 }
 
 std::variant<const char*, bool> CLuaAudioDefs::GetRadioChannelName(int iChannel)

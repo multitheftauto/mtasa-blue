@@ -15,6 +15,9 @@
 #include "CStaticFunctionDefinitions.h"
 #include "CScriptArgReader.h"
 #include "CKeyBinds.h"
+#include "packets/CLuaPacket.h"
+#include <net/rpc_enums.h>
+#include <net/SyncStructures.h>
 
 void CLuaPlayerDefs::LoadFunctions()
 {
@@ -1896,7 +1899,29 @@ bool CLuaPlayerDefs::PlaySoundFrontEnd(CElement* pElement, unsigned char ucSound
     if (ucSound > 101)
         throw std::invalid_argument("Invalid sound ID specified. Valid sound IDs are 0 - 101.");
 
-    return CStaticFunctionDefinitions::PlaySoundFrontEnd(pElement, ucSound);
+    assert(pElement);
+
+    if (pElement->CountChildren() && pElement->IsCallPropagationEnabled())
+    {
+        CElementListSnapshotRef pList = pElement->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++)
+            if (!(*iter)->IsBeingDeleted())
+                PlaySoundFrontEnd(*iter, ucSound);
+    }
+
+    if (IS_PLAYER(pElement))
+    {
+        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+
+        CBitStream                     BitStream;
+        SIntegerSync<unsigned char, 7> sound(ucSound);
+        BitStream.pBitStream->Write(&sound);
+
+        pPlayer->Send(CLuaPacket(PLAY_SOUND, *BitStream.pBitStream));
+        return true;
+    }
+
+    return false;
 }
 
 int CLuaPlayerDefs::KickPlayer(lua_State* luaVM)
