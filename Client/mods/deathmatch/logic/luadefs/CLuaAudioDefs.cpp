@@ -33,6 +33,7 @@ static std::unique_ptr<float[]> ProcessFFTData(std::unique_ptr<float[]> data, in
     auto newData = std::make_unique<float[]>(bands);
     int  bandCounter = 0;
     bands--;
+
     for (int x = 0; x <= bands; x++)
     {
         float peak = 0.0;
@@ -52,15 +53,18 @@ static std::unique_ptr<float[]> ProcessFFTData(std::unique_ptr<float[]> data, in
                 newData[x] = data[1 + bandCounter];
                 peak = data[1 + bandCounter];
             }
+
             bandCounter = bandCounter + 1;
         }
     }
+
     return newData;
 }
 
 static bool IsSoundURL(const std::string& soundPath) noexcept
 {
     const auto ToLower = [](char c) { return std::tolower(static_cast<unsigned char>(c)); };
+
     return (std::ranges::starts_with(soundPath, std::string_view{"http"}, {}, ToLower, ToLower) ||
             std::ranges::starts_with(soundPath, std::string_view{"ftp"}, {}, ToLower, ToLower)) &&
            (soundPath.length() <= 2048 || soundPath.find('\n') == std::string::npos);
@@ -150,9 +154,11 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, c
 bool CLuaAudioDefs::StopSound(CClientSound* sound)
 {
     CLuaArguments Arguments;
+
     Arguments.PushString("destroyed");
     sound->CallEvent("onClientSoundStopped", Arguments, false);
     g_pClientGame->GetElementDeleter()->Delete(sound);
+
     return true;
 }
 
@@ -169,6 +175,7 @@ bool CLuaAudioDefs::SetSoundPosition(std::variant<CClientSound*, CClientPlayer*>
             return true;
         }
     }
+
     return false;
 }
 
@@ -182,6 +189,7 @@ std::variant<double, bool> CLuaAudioDefs::GetSoundPosition(std::variant<CClientS
         if (voice)
             return voice->GetPlayPosition();
     }
+
     return false;
 }
 
@@ -195,6 +203,7 @@ std::variant<double, bool> CLuaAudioDefs::GetSoundLength(std::variant<CClientSou
         if (voice)
             return voice->GetLength();
     }
+
     return false;
 }
 
@@ -229,6 +238,7 @@ bool CLuaAudioDefs::SetSoundPaused(std::variant<CClientSound*, CClientPlayer*> s
             return true;
         }
     }
+
     return false;
 }
 
@@ -242,6 +252,7 @@ bool CLuaAudioDefs::IsSoundPaused(std::variant<CClientSound*, CClientPlayer*> so
         if (voice)
             return voice->IsPaused();
     }
+
     return false;
 }
 
@@ -261,6 +272,7 @@ bool CLuaAudioDefs::SetSoundVolume(std::variant<CClientSound*, CClientPlayer*> s
             return true;
         }
     }
+
     return false;
 }
 
@@ -274,6 +286,7 @@ std::variant<float, bool> CLuaAudioDefs::GetSoundVolume(std::variant<CClientSoun
         if (voice)
             return voice->GetVolume();
     }
+
     return false;
 }
 
@@ -293,6 +306,7 @@ bool CLuaAudioDefs::SetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> so
             return true;
         }
     }
+
     return false;
 }
 
@@ -311,7 +325,9 @@ auto CLuaAudioDefs::GetSoundProperties(CClientSound* sound) noexcept
 {
     float sampleRate = 0.0f, tempo = 0.0f, pitch = 0.0f;
     bool  reversed = false;
+
     sound->GetFXModifications(sampleRate, tempo, pitch, reversed);
+
     return CLuaMultiReturn<float, float, float, bool>{sampleRate, tempo, pitch, reversed};
 }
 
@@ -341,7 +357,9 @@ auto CLuaAudioDefs::GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*> 
 
     const int                      size = numBands == 0 ? length / 2 : numBands - 1;
     std::unordered_map<int, float> data;
+
     data.reserve(size + 1);
+
     for (int i = 0; i <= size; i++)
         data.emplace(i, fftData[i]);
 
@@ -353,6 +371,7 @@ auto CLuaAudioDefs::GetSoundWaveData(std::variant<CClientSound*, CClientPlayer*>
     using ResultType = std::variant<std::unordered_map<int, float>, bool>;
 
     float* waveData = nullptr;
+
     if (auto* soundElement = std::get_if<CClientSound*>(&sound))
         waveData = (*soundElement)->GetWaveData(length);
     else if (auto* player = std::get_if<CClientPlayer*>(&sound))
@@ -367,6 +386,7 @@ auto CLuaAudioDefs::GetSoundWaveData(std::variant<CClientSound*, CClientPlayer*>
 
     std::unordered_map<int, float> data;
     data.reserve(length);
+
     for (int i = 0; i < length; i++)
         data.emplace(i, waveData[i]);
 
@@ -395,6 +415,7 @@ auto CLuaAudioDefs::GetSoundLevelData(std::variant<CClientSound*, CClientPlayer*
                 return ResultType{CLuaMultiReturn<std::uint32_t, std::uint32_t>{LOWORD(levelData), HIWORD(levelData)}};
         }
     }
+
     return ResultType{false};
 }
 
@@ -424,6 +445,7 @@ std::variant<float, bool> CLuaAudioDefs::GetSoundSpeed(std::variant<CClientSound
         if (voice)
             return voice->GetPlaybackSpeed();
     }
+
     return false;
 }
 
@@ -469,6 +491,7 @@ auto CLuaAudioDefs::GetSoundMetaTags(CClientSound* sound, std::optional<std::str
         if (!metaTags.empty())
             tags.emplace(key, std::move(metaTags));
     };
+
     AddTag("%TITL", "title");
     AddTag("%ARTI", "artist");
     AddTag("%ALBM", "album");
@@ -482,6 +505,7 @@ auto CLuaAudioDefs::GetSoundMetaTags(CClientSound* sound, std::optional<std::str
     AddTag("%AART", "album_artist");
     AddTag("streamName", "stream_name");
     AddTag("streamTitle", "stream_title");
+
     return ResultType{tags};
 }
 
@@ -496,6 +520,7 @@ bool CLuaAudioDefs::SetSoundEffectEnabled(std::variant<CClientSound*, CClientPla
         CClientPlayerVoice* voice = (*player)->GetVoice();
         return voice && fxEffect >= 0 && voice->SetFxEffect(fxEffect, enable.value_or(false));
     }
+
     return false;
 }
 
@@ -560,6 +585,7 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
     //  bool setSoundEffectParameter ( sound/player sound, string effectName, string effectParameter, var effectParameterValue  )
     CClientSound*      soundElement = nullptr;
     PlayerVoiceWrapper playerVoice;
+
     if (auto* soundPtr = std::get_if<CClientSound*>(&sound))
         soundElement = *soundPtr;
     else if (auto* playerPtr = std::get_if<CClientPlayer*>(&sound))
@@ -590,6 +616,7 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
             out = *valuePtr;
             return true;
         }
+
         return false;
     };
 
@@ -1221,6 +1248,7 @@ bool CLuaAudioDefs::PlaySoundFrontEnd(std::uint8_t sound)
         throw std::invalid_argument("Invalid sound ID specified. Valid sound IDs are 0 - 101.");
 
     g_pGame->GetAudioEngine()->PlayFrontEndSound(sound);
+
     return true;
 }
 
@@ -1251,6 +1279,7 @@ bool CLuaAudioDefs::SetWorldSoundEnabled(int group, std::variant<int, bool> inde
 
     // The second argument is the enabled state, so the third argument is the immediate flag
     g_pGame->GetAudioEngine()->SetWorldSoundEnabled(group, -1, std::get<bool>(indexOrEnabled), enabled.value_or(false));
+
     return true;
 }
 
@@ -1299,6 +1328,7 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX3D(lua_State* luaVM, eAu
 {
     //  sound playSFX3D ( string audioContainer, int bankIndex, int audioIndex, float posX, float posY, float posZ [, loop = false ] )
     int bankIndex;
+
     if (containerIndex == AUDIO_LOOKUP_RADIO)
     {
         if (auto* radioIndex = std::get_if<eRadioStreamIndex>(&bank))
@@ -1340,6 +1370,7 @@ bool CLuaAudioDefs::SetSoundPan(std::variant<CClientSound*, CClientPlayer*> soun
         CClientPlayerVoice* voice = (*player)->GetVoice();
         return voice && voice->SetPan(pan);
     }
+
     return false;
 }
 
@@ -1363,6 +1394,7 @@ std::variant<float, bool> CLuaAudioDefs::GetSoundPan(std::variant<CClientSound*,
                 return pan;
         }
     }
+
     return false;
 }
 
@@ -1384,6 +1416,7 @@ std::variant<const char*, bool> CLuaAudioDefs::GetRadioChannelName(std::uint32_t
 
     if (static_cast<std::size_t>(channel) < radioStations.size())
         return radioStations[channel];
+
     return false;
 }
 
