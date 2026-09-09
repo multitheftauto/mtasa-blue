@@ -53,137 +53,6 @@ static float* ProcessFFTData(float* data, int length, int bands)
     return newData;
 }
 
-void CLuaAudioDefs::LoadFunctions()
-{
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{// Audio funcs
-                                                                             {"playSoundFrontEnd", ArgumentParserWarn<false, PlaySoundFrontEnd>},
-                                                                             {"setAmbientSoundEnabled", SetAmbientSoundEnabled},
-                                                                             {"isAmbientSoundEnabled", IsAmbientSoundEnabled},
-                                                                             {"resetAmbientSounds", ResetAmbientSounds},
-                                                                             {"setWorldSoundEnabled", SetWorldSoundEnabled},
-                                                                             {"isWorldSoundEnabled", IsWorldSoundEnabled},
-                                                                             {"resetWorldSounds", ResetWorldSounds},
-                                                                             {"playSFX", ArgumentParserWarn<false, PlaySFX>},
-                                                                             {"playSFX3D", ArgumentParserWarn<false, PlaySFX3D>},
-                                                                             {"getSFXStatus", ArgumentParserWarn<nullptr, GetSFXStatus>},
-
-                                                                             // Sound effects and synth funcs
-                                                                             {"playSound", ArgumentParserWarn<false, PlaySound>},
-                                                                             {"playSound3D", ArgumentParserWarn<false, PlaySound3D>},
-                                                                             {"stopSound", ArgumentParserWarn<false, StopSound>},
-                                                                             {"setSoundPosition", ArgumentParserWarn<false, SetSoundPosition>},
-                                                                             {"getSoundPosition", ArgumentParserWarn<false, GetSoundPosition>},
-                                                                             {"getSoundLength", ArgumentParserWarn<false, GetSoundLength>},
-                                                                             {"getSoundBufferLength", ArgumentParserWarn<nullptr, GetSoundBufferLength>},
-                                                                             {"setSoundLooped", ArgumentParser<SetSoundLooped>},
-                                                                             {"isSoundLooped", ArgumentParser<IsSoundLooped>},
-                                                                             {"setSoundPaused", ArgumentParserWarn<false, SetSoundPaused>},
-                                                                             {"isSoundPaused", ArgumentParserWarn<false, IsSoundPaused>},
-                                                                             {"setSoundVolume", ArgumentParserWarn<false, SetSoundVolume>},
-                                                                             {"getSoundVolume", ArgumentParserWarn<false, GetSoundVolume>},
-                                                                             {"setSoundSpeed", ArgumentParserWarn<false, SetSoundSpeed>},
-                                                                             {"getSoundSpeed", ArgumentParserWarn<false, GetSoundSpeed>},
-                                                                             {"setSoundProperties", ArgumentParserWarn<false, SetSoundProperties>},
-                                                                             {"getSoundProperties", ArgumentParserWarn<false, GetSoundProperties>},
-                                                                             {"getSoundFFTData", ArgumentParserWarn<false, GetSoundFFTData>},
-                                                                             {"getSoundWaveData", ArgumentParserWarn<false, GetSoundWaveData>},
-                                                                             {"getSoundLevelData", ArgumentParserWarn<false, GetSoundLevelData>},
-                                                                             {"getSoundBPM", ArgumentParserWarn<false, GetSoundBPM>},
-                                                                             {"setSoundPanningEnabled", ArgumentParserWarn<false, SetSoundPanEnabled>},
-                                                                             {"isSoundPanningEnabled", ArgumentParserWarn<false, IsSoundPanEnabled>},
-                                                                             {"setSoundMinDistance", ArgumentParserWarn<false, SetSoundMinDistance>},
-                                                                             {"getSoundMinDistance", ArgumentParserWarn<false, GetSoundMinDistance>},
-                                                                             {"setSoundMaxDistance", ArgumentParserWarn<false, SetSoundMaxDistance>},
-                                                                             {"getSoundMaxDistance", ArgumentParserWarn<false, GetSoundMaxDistance>},
-                                                                             {"getSoundMetaTags", ArgumentParserWarn<false, GetSoundMetaTags>},
-                                                                             {"setSoundEffectEnabled", ArgumentParserWarn<false, SetSoundEffectEnabled>},
-                                                                             {"getSoundEffects", ArgumentParserWarn<false, GetSoundEffects>},
-                                                                             {"setSoundEffectParameter", ArgumentParserWarn<false, SetSoundEffectParameter>},
-                                                                             {"getSoundEffectParameters", ArgumentParserWarn<false, GetSoundEffectParameters>},
-                                                                             {"setSoundPan", ArgumentParserWarn<false, SetSoundPan>},
-                                                                             {"getSoundPan", ArgumentParserWarn<false, GetSoundPan>},
-
-                                                                             // Radio funcs
-                                                                             {"setRadioChannel", ArgumentParserWarn<false, SetRadioChannel>},
-                                                                             {"getRadioChannel", ArgumentParserWarn<false, GetRadioChannel>},
-                                                                             {"getRadioChannelName", ArgumentParserWarn<false, GetRadioChannelName>},
-
-                                                                             // Dev funcs
-                                                                             {"showSound", ArgumentParser<ShowSound>},
-                                                                             {"isShowSoundEnabled", ArgumentParser<IsShowSoundEnabled>}};
-
-    // Add functions
-    for (const auto& [name, func] : functions)
-        CLuaCFunctions::AddFunction(name, func);
-}
-
-void CLuaAudioDefs::AddClass(lua_State* luaVM)
-{
-    // 2D
-    lua_newclass(luaVM);
-
-    lua_classfunction(luaVM, "create", "playSound");
-    lua_classfunction(luaVM, "playFrontEnd", "playSoundFrontEnd");
-    lua_classfunction(luaVM, "stop", "stopSound");
-
-    lua_classfunction(luaVM, "isPaused", "isSoundPaused");
-    lua_classfunction(luaVM, "setEffectEnabled", "setSoundEffectEnabled");
-    lua_classfunction(luaVM, "setEffectParameter", "setSoundEffectParameter");
-    lua_classfunction(luaVM, "setPlaybackPosition", "setSoundPosition");
-    lua_classfunction(luaVM, "setSpeed", "setSoundSpeed");
-    lua_classfunction(luaVM, "setVolume", "setSoundVolume");
-    lua_classfunction(luaVM, "setPaused", "setSoundPaused");
-    lua_classfunction(luaVM, "setLooped", "setSoundLooped");
-    lua_classfunction(luaVM, "setPan", "setSoundPan");
-    lua_classfunction(luaVM, "setPanningEnabled", "setSoundPanningEnabled");
-    lua_classfunction(luaVM, "setProperties", "setSoundProperties");
-
-    lua_classfunction(luaVM, "getLength", "getSoundLength");
-    lua_classfunction(luaVM, "getBufferLength", "getSoundBufferLength");
-    lua_classfunction(luaVM, "isLooped", "isSoundLooped");
-    lua_classfunction(luaVM, "getMetaTags", "getSoundMetaTags");
-    lua_classfunction(luaVM, "getBPM", "getSoundBPM");
-    lua_classfunction(luaVM, "getFFTData", "getSoundFFTData");
-    lua_classfunction(luaVM, "getWaveData", "getSoundWaveData");
-    lua_classfunction(luaVM, "getLevelData", "getSoundLevelData");
-    lua_classfunction(luaVM, "getEffects", "getSoundEffects");
-    lua_classfunction(luaVM, "getEffectParameters", "getSoundEffectParameters");
-    lua_classfunction(luaVM, "getPlaybackPosition", "getSoundPosition");
-    lua_classfunction(luaVM, "getSpeed", "getSoundSpeed");
-    lua_classfunction(luaVM, "getVolume", "getSoundVolume");
-    lua_classfunction(luaVM, "getPan", "getSoundPan");
-    lua_classfunction(luaVM, "isPanningEnabled", "isSoundPanningEnabled");
-    lua_classfunction(luaVM, "getProperties", "getSoundProperties");
-
-    lua_classvariable(luaVM, "playbackPosition", "setSoundPosition", "getSoundPosition");
-    lua_classvariable(luaVM, "speed", "setSoundSpeed", "getSoundSpeed");
-    lua_classvariable(luaVM, "volume", "setSoundVolume", "getSoundVolume");
-    lua_classvariable(luaVM, "looped", "setSoundLooped", "isSoundLooped");
-    lua_classvariable(luaVM, "paused", "setSoundPaused", "isSoundPaused");
-    lua_classvariable(luaVM, "pan", "setSoundPan", "getSoundPan");
-    lua_classvariable(luaVM, "panningEnabled", "setSoundPanningEnabled", "isSoundPanningEnabled");
-    lua_classvariable(luaVM, "length", NULL, "getSoundLength");
-    lua_classvariable(luaVM, "bufferLength", NULL, "getSoundBufferLength");
-
-    lua_registerclass(luaVM, "Sound", "Element");
-
-    // 3D
-    lua_newclass(luaVM);
-
-    lua_classfunction(luaVM, "create", "playSound3D");
-
-    lua_classfunction(luaVM, "getMaxDistance", "getSoundMaxDistance");
-    lua_classfunction(luaVM, "getMinDistance", "getSoundMinDistance");
-
-    lua_classfunction(luaVM, "setMaxDistance", "setSoundMaxDistance");
-    lua_classfunction(luaVM, "setMinDistance", "setSoundMinDistance");
-
-    lua_classvariable(luaVM, "maxDistance", "setSoundMaxDistance", "getSoundMaxDistance");
-    lua_classvariable(luaVM, "minDistance", "setSoundMinDistance", "getSoundMinDistance");
-
-    lua_registerclass(luaVM, "Sound3D", "Sound");
-}
-
 std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, const std::string path, std::optional<bool> loop, std::optional<bool> throttle)
 {
     CResource* pResource = &lua_getownerresource(luaVM);
@@ -1593,4 +1462,133 @@ bool CLuaAudioDefs::ShowSound(bool state)
 bool CLuaAudioDefs::IsShowSoundEnabled()
 {
     return g_pClientGame->GetShowSound();
+}
+
+void CLuaAudioDefs::LoadFunctions()
+{
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{// Audio funcs
+                                                                             {"playSoundFrontEnd", ArgumentParserWarn<false, PlaySoundFrontEnd>},
+                                                                             {"setAmbientSoundEnabled", SetAmbientSoundEnabled},
+                                                                             {"isAmbientSoundEnabled", IsAmbientSoundEnabled},
+                                                                             {"resetAmbientSounds", ResetAmbientSounds},
+                                                                             {"setWorldSoundEnabled", SetWorldSoundEnabled},
+                                                                             {"isWorldSoundEnabled", IsWorldSoundEnabled},
+                                                                             {"resetWorldSounds", ResetWorldSounds},
+                                                                             {"playSFX", ArgumentParserWarn<false, PlaySFX>},
+                                                                             {"playSFX3D", ArgumentParserWarn<false, PlaySFX3D>},
+                                                                             {"getSFXStatus", ArgumentParserWarn<nullptr, GetSFXStatus>},
+
+                                                                             // Sound effects and synth funcs
+                                                                             {"playSound", ArgumentParserWarn<false, PlaySound>},
+                                                                             {"playSound3D", ArgumentParserWarn<false, PlaySound3D>},
+                                                                             {"stopSound", ArgumentParserWarn<false, StopSound>},
+                                                                             {"setSoundPosition", ArgumentParserWarn<false, SetSoundPosition>},
+                                                                             {"getSoundPosition", ArgumentParserWarn<false, GetSoundPosition>},
+                                                                             {"getSoundLength", ArgumentParserWarn<false, GetSoundLength>},
+                                                                             {"getSoundBufferLength", ArgumentParserWarn<nullptr, GetSoundBufferLength>},
+                                                                             {"setSoundLooped", ArgumentParser<SetSoundLooped>},
+                                                                             {"isSoundLooped", ArgumentParser<IsSoundLooped>},
+                                                                             {"setSoundPaused", ArgumentParserWarn<false, SetSoundPaused>},
+                                                                             {"isSoundPaused", ArgumentParserWarn<false, IsSoundPaused>},
+                                                                             {"setSoundVolume", ArgumentParserWarn<false, SetSoundVolume>},
+                                                                             {"getSoundVolume", ArgumentParserWarn<false, GetSoundVolume>},
+                                                                             {"setSoundSpeed", ArgumentParserWarn<false, SetSoundSpeed>},
+                                                                             {"getSoundSpeed", ArgumentParserWarn<false, GetSoundSpeed>},
+                                                                             {"setSoundProperties", ArgumentParserWarn<false, SetSoundProperties>},
+                                                                             {"getSoundProperties", ArgumentParserWarn<false, GetSoundProperties>},
+                                                                             {"getSoundFFTData", ArgumentParserWarn<false, GetSoundFFTData>},
+                                                                             {"getSoundWaveData", ArgumentParserWarn<false, GetSoundWaveData>},
+                                                                             {"getSoundLevelData", ArgumentParserWarn<false, GetSoundLevelData>},
+                                                                             {"getSoundBPM", ArgumentParserWarn<false, GetSoundBPM>},
+                                                                             {"setSoundPanningEnabled", ArgumentParserWarn<false, SetSoundPanEnabled>},
+                                                                             {"isSoundPanningEnabled", ArgumentParserWarn<false, IsSoundPanEnabled>},
+                                                                             {"setSoundMinDistance", ArgumentParserWarn<false, SetSoundMinDistance>},
+                                                                             {"getSoundMinDistance", ArgumentParserWarn<false, GetSoundMinDistance>},
+                                                                             {"setSoundMaxDistance", ArgumentParserWarn<false, SetSoundMaxDistance>},
+                                                                             {"getSoundMaxDistance", ArgumentParserWarn<false, GetSoundMaxDistance>},
+                                                                             {"getSoundMetaTags", ArgumentParserWarn<false, GetSoundMetaTags>},
+                                                                             {"setSoundEffectEnabled", ArgumentParserWarn<false, SetSoundEffectEnabled>},
+                                                                             {"getSoundEffects", ArgumentParserWarn<false, GetSoundEffects>},
+                                                                             {"setSoundEffectParameter", ArgumentParserWarn<false, SetSoundEffectParameter>},
+                                                                             {"getSoundEffectParameters", ArgumentParserWarn<false, GetSoundEffectParameters>},
+                                                                             {"setSoundPan", ArgumentParserWarn<false, SetSoundPan>},
+                                                                             {"getSoundPan", ArgumentParserWarn<false, GetSoundPan>},
+
+                                                                             // Radio funcs
+                                                                             {"setRadioChannel", ArgumentParserWarn<false, SetRadioChannel>},
+                                                                             {"getRadioChannel", ArgumentParserWarn<false, GetRadioChannel>},
+                                                                             {"getRadioChannelName", ArgumentParserWarn<false, GetRadioChannelName>},
+
+                                                                             // Dev funcs
+                                                                             {"showSound", ArgumentParser<ShowSound>},
+                                                                             {"isShowSoundEnabled", ArgumentParser<IsShowSoundEnabled>}};
+
+    // Add functions
+    for (const auto& [name, func] : functions)
+        CLuaCFunctions::AddFunction(name, func);
+}
+
+void CLuaAudioDefs::AddClass(lua_State* luaVM)
+{
+    lua_newclass(luaVM);
+
+    lua_classfunction(luaVM, "create", "playSound");
+    lua_classfunction(luaVM, "playFrontEnd", "playSoundFrontEnd");
+    lua_classfunction(luaVM, "stop", "stopSound");
+
+    lua_classfunction(luaVM, "isPaused", "isSoundPaused");
+    lua_classfunction(luaVM, "setEffectEnabled", "setSoundEffectEnabled");
+    lua_classfunction(luaVM, "setEffectParameter", "setSoundEffectParameter");
+    lua_classfunction(luaVM, "setPlaybackPosition", "setSoundPosition");
+    lua_classfunction(luaVM, "setSpeed", "setSoundSpeed");
+    lua_classfunction(luaVM, "setVolume", "setSoundVolume");
+    lua_classfunction(luaVM, "setPaused", "setSoundPaused");
+    lua_classfunction(luaVM, "setLooped", "setSoundLooped");
+    lua_classfunction(luaVM, "setPan", "setSoundPan");
+    lua_classfunction(luaVM, "setPanningEnabled", "setSoundPanningEnabled");
+    lua_classfunction(luaVM, "setProperties", "setSoundProperties");
+
+    lua_classfunction(luaVM, "getLength", "getSoundLength");
+    lua_classfunction(luaVM, "getBufferLength", "getSoundBufferLength");
+    lua_classfunction(luaVM, "isLooped", "isSoundLooped");
+    lua_classfunction(luaVM, "getMetaTags", "getSoundMetaTags");
+    lua_classfunction(luaVM, "getBPM", "getSoundBPM");
+    lua_classfunction(luaVM, "getFFTData", "getSoundFFTData");
+    lua_classfunction(luaVM, "getWaveData", "getSoundWaveData");
+    lua_classfunction(luaVM, "getLevelData", "getSoundLevelData");
+    lua_classfunction(luaVM, "getEffects", "getSoundEffects");
+    lua_classfunction(luaVM, "getEffectParameters", "getSoundEffectParameters");
+    lua_classfunction(luaVM, "getPlaybackPosition", "getSoundPosition");
+    lua_classfunction(luaVM, "getSpeed", "getSoundSpeed");
+    lua_classfunction(luaVM, "getVolume", "getSoundVolume");
+    lua_classfunction(luaVM, "getPan", "getSoundPan");
+    lua_classfunction(luaVM, "isPanningEnabled", "isSoundPanningEnabled");
+    lua_classfunction(luaVM, "getProperties", "getSoundProperties");
+
+    lua_classvariable(luaVM, "playbackPosition", "setSoundPosition", "getSoundPosition");
+    lua_classvariable(luaVM, "speed", "setSoundSpeed", "getSoundSpeed");
+    lua_classvariable(luaVM, "volume", "setSoundVolume", "getSoundVolume");
+    lua_classvariable(luaVM, "looped", "setSoundLooped", "isSoundLooped");
+    lua_classvariable(luaVM, "paused", "setSoundPaused", "isSoundPaused");
+    lua_classvariable(luaVM, "pan", "setSoundPan", "getSoundPan");
+    lua_classvariable(luaVM, "panningEnabled", "setSoundPanningEnabled", "isSoundPanningEnabled");
+    lua_classvariable(luaVM, "length", NULL, "getSoundLength");
+    lua_classvariable(luaVM, "bufferLength", NULL, "getSoundBufferLength");
+
+    lua_registerclass(luaVM, "Sound", "Element");
+
+    lua_newclass(luaVM);
+
+    lua_classfunction(luaVM, "create", "playSound3D");
+
+    lua_classfunction(luaVM, "getMaxDistance", "getSoundMaxDistance");
+    lua_classfunction(luaVM, "getMinDistance", "getSoundMinDistance");
+
+    lua_classfunction(luaVM, "setMaxDistance", "setSoundMaxDistance");
+    lua_classfunction(luaVM, "setMinDistance", "setSoundMinDistance");
+
+    lua_classvariable(luaVM, "maxDistance", "setSoundMaxDistance", "getSoundMaxDistance");
+    lua_classvariable(luaVM, "minDistance", "setSoundMinDistance", "getSoundMinDistance");
+
+    lua_registerclass(luaVM, "Sound3D", "Sound");
 }
