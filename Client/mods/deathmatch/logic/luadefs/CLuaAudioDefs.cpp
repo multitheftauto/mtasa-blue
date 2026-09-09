@@ -182,8 +182,9 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "minDistance", "setSoundMinDistance", "getSoundMinDistance");
 
     lua_registerclass(luaVM, "Sound3D", "Sound");
-}std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, const std::string path, std::optional<bool> loop,
-                                                           std::optional<bool> throttle)
+}
+
+std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, const std::string path, std::optional<bool> loop, std::optional<bool> throttle)
 {
     CResource* pResource = &lua_getownerresource(luaVM);
 
