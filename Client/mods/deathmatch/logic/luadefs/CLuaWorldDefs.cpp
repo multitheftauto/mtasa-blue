@@ -14,6 +14,8 @@
 #include <game/CCoronas.h>
 #include <game/CClock.h>
 #include "lua/CLuaFunctionParser.h"
+#include <game/CPools.h>
+#include "../game_sa/CPoolsSA.h"
 
 void CLuaWorldDefs::LoadFunctions()
 {
@@ -23,6 +25,7 @@ void CLuaWorldDefs::LoadFunctions()
         {"getColorFilter", ArgumentParser<GetColorFilter>},
         {"getRoofPosition", GetRoofPosition},
         {"getGroundPosition", GetGroundPosition},
+        {"getStreamedWorldModels", GetStreamedWorldModels},
         {"processLineAgainstMesh", ArgumentParser<ProcessLineAgainstMesh>},
         {"processLineOfSight", ProcessLineOfSight},
         {"getWorldFromScreenPosition", GetWorldFromScreenPosition},
@@ -249,6 +252,120 @@ int CLuaWorldDefs::GetRoofPosition(lua_State* luaVM)
 
     // Return false
     lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaWorldDefs::GetStreamedWorldModels(lua_State* luaVM)
+{
+    lua_newtable(luaVM);
+
+    constexpr float fRadToDeg = 180.0f / 3.14159265358979323846f;
+    int             iIndex = 1;
+
+    auto* ppBuildingPool = reinterpret_cast<CPoolSAInterface<CBuildingSAInterface>**>(CLASS_CBuildingPool);
+    auto* ppObjectPool = reinterpret_cast<CPoolSAInterface<CObjectSAInterface>**>(CLASS_CObjectPool);
+
+    CPools* pPools = g_pGame->GetPools();
+
+    auto PushNumberField = [&](const char* szKey, lua_Number number)
+    {
+        lua_pushstring(luaVM, szKey);
+        lua_pushnumber(luaVM, number);
+        lua_settable(luaVM, -3);
+    };
+
+    auto PushBoolField = [&](const char* szKey, bool bValue)
+    {
+        lua_pushstring(luaVM, szKey);
+        lua_pushboolean(luaVM, bValue);
+        lua_settable(luaVM, -3);
+    };
+
+    auto PushStringField = [&](const char* szKey, const char* szValue)
+    {
+        lua_pushstring(luaVM, szKey);
+        lua_pushstring(luaVM, szValue);
+        lua_settable(luaVM, -3);
+    };
+
+    auto ProcessPool = [&](auto* pPool, const char* szType, bool bIsObject)
+    {
+        if (!pPool || !pPool->m_pObjects || !pPool->m_byteMap)
+            return;
+
+        for (int i = 0; i < pPool->m_nSize; ++i)
+        {
+            if (pPool->IsEmpty(i))
+                continue;
+
+            auto* pInterface = pPool->GetObject(i);
+
+            if (!pInterface || !pInterface->m_pRwObject)
+                continue;
+
+            if (pPools->GetClientEntity(reinterpret_cast<DWORD*>(pInterface)))
+                continue;
+
+            CVector vecPosObj = pInterface->HasMatrix() ? pInterface->matrix->vPos : pInterface->m_transform.m_translate;
+            CVector vecRot;
+
+            if (pInterface->HasMatrix())
+            {
+                CVector vRight = pInterface->matrix->vRight;
+                CVector vFront = pInterface->matrix->vFront;
+                CVector vUp = pInterface->matrix->vUp;
+
+                vRight.Normalize();
+                vFront.Normalize();
+                vUp.Normalize();
+
+                vecRot.fX = asin(std::clamp(vFront.fZ, -1.0f, 1.0f));
+                vecRot.fY = atan2(-vRight.fZ, vUp.fZ);
+                vecRot.fZ = atan2(-vFront.fX, vFront.fY);
+            }
+
+            lua_pushnumber(luaVM, static_cast<lua_Number>(iIndex++));
+            lua_newtable(luaVM);
+
+            PushStringField("type", szType);
+            PushNumberField("model", pInterface->m_nModelIndex);
+
+            PushNumberField("x", vecPosObj.fX);
+            PushNumberField("y", vecPosObj.fY);
+            PushNumberField("z", vecPosObj.fZ);
+
+            PushNumberField("rx", vecRot.fX * fRadToDeg);
+            PushNumberField("ry", vecRot.fY * fRadToDeg);
+            PushNumberField("rz", vecRot.fZ * fRadToDeg);
+
+            PushNumberField("interior", pInterface->m_areaCode);
+            PushNumberField("ipl", pInterface->m_iplIndex);
+
+            PushNumberField("lodModel", pInterface->m_pLod ? pInterface->m_pLod->m_nModelIndex : 0);
+
+            PushBoolField("lod", pInterface->m_pLod != nullptr);
+            PushBoolField("collisions", pInterface->bUsesCollision);
+            PushBoolField("isStatic", pInterface->bIsStatic);
+            PushBoolField("visible", pInterface->bIsVisible);
+
+            if (bIsObject)
+            {
+                auto* pObject = static_cast<const CObjectSAInterface*>(static_cast<const CEntitySAInterface*>(pInterface));
+
+                PushNumberField("health", pObject->fHealth);
+                PushNumberField("scale", pObject->fScale);
+            }
+
+            lua_settable(luaVM, -3);
+        }
+    };
+
+    if (ppBuildingPool && *ppBuildingPool)
+        ProcessPool(*ppBuildingPool, "building", false);
+
+    if (ppObjectPool && *ppObjectPool)
+        ProcessPool(*ppObjectPool, "object", true);
+
     return 1;
 }
 
