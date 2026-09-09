@@ -519,6 +519,7 @@ auto CLuaAudioDefs::GetSoundEffects(std::variant<CClientSound*, CClientPlayer*> 
 
         if (!playerVoice)
             return ResultType{false};
+
         for (const auto& [name, fxEffect] : fxEffects)
             result.emplace(name, playerVoice->IsFxEffectEnabled(fxEffect));
 
