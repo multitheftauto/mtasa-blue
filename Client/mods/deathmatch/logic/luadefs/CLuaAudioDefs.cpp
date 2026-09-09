@@ -144,7 +144,8 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Sound3D", "Sound");
 }
 
-std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, const std::string strSound, std::optional<bool> bLoop, std::optional<bool> bThrottle)
+std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, const std::string strSound, std::optional<bool> bLoop,
+                                                           std::optional<bool> bThrottle)
 {
     CResource* pResource = &lua_getownerresource(luaVM);
 
@@ -168,7 +169,8 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, con
     // ) Fixes #6507 - Caz
     if (pResource)
     {
-        CClientSound* pSound = CStaticFunctionDefinitions::PlaySound(pResource, strSoundPath, bIsURL, bIsRawData, bLoop.value_or(false), bThrottle.value_or(true));
+        CClientSound* pSound =
+            CStaticFunctionDefinitions::PlaySound(pResource, strSoundPath, bIsURL, bIsRawData, bLoop.value_or(false), bThrottle.value_or(true));
         if (pSound)
         {
             // call onClientSoundStarted
@@ -208,8 +210,8 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, c
     // ) Fixes #6507 - Caz
     if (pResource)
     {
-        CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D(pResource, strSoundPath, bIsURL, bIsRawData, vecPosition, bLoop.value_or(false),
-                                                                       bThrottle.value_or(true));
+        CClientSound* pSound =
+            CStaticFunctionDefinitions::PlaySound3D(pResource, strSoundPath, bIsURL, bIsRawData, vecPosition, bLoop.value_or(false), bThrottle.value_or(true));
         if (pSound)
         {
             // call onClientSoundStarted
@@ -349,8 +351,8 @@ std::variant<std::unordered_map<int, float>, bool> CLuaAudioDefs::GetSoundFFTDat
     if (!pData)
         return false;
 
-    const int                        iSize = iBands.value_or(0) == 0 ? iLength / 2 : iBands.value_or(0) - 1;
-    std::unordered_map<int, float>   data;
+    const int                      iSize = iBands.value_or(0) == 0 ? iLength / 2 : iBands.value_or(0) - 1;
+    std::unordered_map<int, float> data;
     for (int i = 0; i <= iSize; i++)
         data.emplace(i, pData[i]);
 
@@ -386,8 +388,8 @@ std::variant<CLuaMultiReturn<unsigned int, unsigned int>, bool> CLuaAudioDefs::G
     DWORD dwLeft = 0, dwRight = 0;
     if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundLevelData(**pSound, dwLeft, dwRight))
         return CLuaMultiReturn<unsigned int, unsigned int>{(unsigned int)dwLeft, (unsigned int)dwRight};
-    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer &&
-             CStaticFunctionDefinitions::GetSoundLevelData(**pPlayer, dwLeft, dwRight))
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound);
+             pPlayer && *pPlayer && CStaticFunctionDefinitions::GetSoundLevelData(**pPlayer, dwLeft, dwRight))
         return CLuaMultiReturn<unsigned int, unsigned int>{(unsigned int)dwLeft, (unsigned int)dwRight};
     return false;
 }
@@ -446,7 +448,7 @@ std::variant<float, bool> CLuaAudioDefs::GetSoundMaxDistance(CClientSound* pSoun
     return false;
 }
 
-std::variant<SString, std::unordered_map<std::string, std::string>, bool> CLuaAudioDefs::GetSoundMetaTags(CClientSound* pSound,
+std::variant<SString, std::unordered_map<std::string, std::string>, bool> CLuaAudioDefs::GetSoundMetaTags(CClientSound*              pSound,
                                                                                                           std::optional<std::string> strFormat)
 {
     if (!pSound)
@@ -460,9 +462,9 @@ std::variant<SString, std::unordered_map<std::string, std::string>, bool> CLuaAu
         return false;
     }
 
-    SString                              strMetaTags;
+    SString                                      strMetaTags;
     std::unordered_map<std::string, std::string> tags;
-    const auto AddTag = [&](const char* szFormat, const char* szKey)
+    const auto                                   AddTag = [&](const char* szFormat, const char* szKey)
     {
         if (CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, szFormat, strMetaTags) && !strMetaTags.empty())
             tags.emplace(szKey, strMetaTags);
@@ -543,7 +545,7 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                                             std::string strEffectParameter, std::variant<float, bool> value)
 {
     //  bool setSoundEffectParameter ( sound/player sound, string effectName, string effectParameter, var effectParameterValue  )
-    CClientSound*      pSound = nullptr;
+    CClientSound*       pSound = nullptr;
     SPlayerVoiceWrapper playerVoice;
     if (auto* pSoundPtr = std::get_if<CClientSound*>(&sound); pSoundPtr && *pSoundPtr)
         pSound = *pSoundPtr;
@@ -1037,7 +1039,7 @@ std::variant<std::unordered_map<std::string, std::variant<float, int, bool>>, bo
     std::variant<CClientSound*, CClientPlayer*> sound, SoundEffectType::Enum eEffectType)
 {
     //  table getSoundEffectParameters ( sound/player sound, string effectName )
-    CClientSound*      pSound = nullptr;
+    CClientSound*       pSound = nullptr;
     SPlayerVoiceWrapper playerVoice;
     if (auto* pSoundPtr = std::get_if<CClientSound*>(&sound); pSoundPtr && *pSoundPtr)
         pSound = *pSoundPtr;
@@ -1060,12 +1062,9 @@ std::variant<std::unordered_map<std::string, std::variant<float, int, bool>>, bo
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxChorusParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
-                        {EnumToString(Chorus::WET_DRY_MIX), fxChorusParams.fWetDryMix},
-                        {EnumToString(Chorus::DEPTH), fxChorusParams.fDepth},
-                        {EnumToString(Chorus::FEEDBACK), fxChorusParams.fFeedback},
-                        {EnumToString(Chorus::FREQUENCY), fxChorusParams.fFrequency},
-                        {EnumToString(Chorus::WAVEFORM), (int)fxChorusParams.lWaveform},
-                        {EnumToString(Chorus::DELAY), fxChorusParams.fDelay},
+                        {EnumToString(Chorus::WET_DRY_MIX), fxChorusParams.fWetDryMix},  {EnumToString(Chorus::DEPTH), fxChorusParams.fDepth},
+                        {EnumToString(Chorus::FEEDBACK), fxChorusParams.fFeedback},      {EnumToString(Chorus::FREQUENCY), fxChorusParams.fFrequency},
+                        {EnumToString(Chorus::WAVEFORM), (int)fxChorusParams.lWaveform}, {EnumToString(Chorus::DELAY), fxChorusParams.fDelay},
                         {EnumToString(Chorus::PHASE), (int)fxChorusParams.lPhase},
                     };
                 }
@@ -1077,12 +1076,9 @@ std::variant<std::unordered_map<std::string, std::variant<float, int, bool>>, bo
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxCompressorParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
-                        {EnumToString(Compressor::GAIN), fxCompressorParams.fGain},
-                        {EnumToString(Compressor::ATTACK), fxCompressorParams.fAttack},
-                        {EnumToString(Compressor::RELEASE), fxCompressorParams.fRelease},
-                        {EnumToString(Compressor::THRESHOLD), fxCompressorParams.fThreshold},
-                        {EnumToString(Compressor::RATIO), fxCompressorParams.fRatio},
-                        {EnumToString(Compressor::PREDELAY), fxCompressorParams.fPredelay},
+                        {EnumToString(Compressor::GAIN), fxCompressorParams.fGain},       {EnumToString(Compressor::ATTACK), fxCompressorParams.fAttack},
+                        {EnumToString(Compressor::RELEASE), fxCompressorParams.fRelease}, {EnumToString(Compressor::THRESHOLD), fxCompressorParams.fThreshold},
+                        {EnumToString(Compressor::RATIO), fxCompressorParams.fRatio},     {EnumToString(Compressor::PREDELAY), fxCompressorParams.fPredelay},
                     };
                 }
                 break;
@@ -1108,10 +1104,8 @@ std::variant<std::unordered_map<std::string, std::variant<float, int, bool>>, bo
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxEchoParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
-                        {EnumToString(Echo::WET_DRY_MIX), fxEchoParams.fWetDryMix},
-                        {EnumToString(Echo::FEEDBACK), fxEchoParams.fFeedback},
-                        {EnumToString(Echo::LEFT_DELAY), fxEchoParams.fLeftDelay},
-                        {EnumToString(Echo::RIGHT_DELAY), fxEchoParams.fRightDelay},
+                        {EnumToString(Echo::WET_DRY_MIX), fxEchoParams.fWetDryMix},    {EnumToString(Echo::FEEDBACK), fxEchoParams.fFeedback},
+                        {EnumToString(Echo::LEFT_DELAY), fxEchoParams.fLeftDelay},     {EnumToString(Echo::RIGHT_DELAY), fxEchoParams.fRightDelay},
                         {EnumToString(Echo::PAN_DELAY), (bool)fxEchoParams.lPanDelay},
                     };
                 }
@@ -1123,12 +1117,9 @@ std::variant<std::unordered_map<std::string, std::variant<float, int, bool>>, bo
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxFlangerParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
-                        {EnumToString(Flanger::WET_DRY_MIX), fxFlangerParams.fWetDryMix},
-                        {EnumToString(Flanger::DEPTH), fxFlangerParams.fDepth},
-                        {EnumToString(Flanger::FEEDBACK), fxFlangerParams.fFeedback},
-                        {EnumToString(Flanger::FREQUENCY), fxFlangerParams.fFrequency},
-                        {EnumToString(Flanger::WAVEFORM), (int)fxFlangerParams.lWaveform},
-                        {EnumToString(Flanger::DELAY), fxFlangerParams.fDelay},
+                        {EnumToString(Flanger::WET_DRY_MIX), fxFlangerParams.fWetDryMix},  {EnumToString(Flanger::DEPTH), fxFlangerParams.fDepth},
+                        {EnumToString(Flanger::FEEDBACK), fxFlangerParams.fFeedback},      {EnumToString(Flanger::FREQUENCY), fxFlangerParams.fFrequency},
+                        {EnumToString(Flanger::WAVEFORM), (int)fxFlangerParams.lWaveform}, {EnumToString(Flanger::DELAY), fxFlangerParams.fDelay},
                         {EnumToString(Flanger::PHASE), (int)fxFlangerParams.lPhase},
                     };
                 }
@@ -1366,7 +1357,7 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX(lua_State* luaVM, eAudi
 }
 
 std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX3D(lua_State* luaVM, eAudioLookupIndex containerIndex, std::variant<int, eRadioStreamIndex> bankIndex,
-                                                          int iAudioIndex, CVector vecPosition, std::optional<bool> bLoop)
+                                                           int iAudioIndex, CVector vecPosition, std::optional<bool> bLoop)
 {
     //  sound playSFX3D ( string audioContainer, int bankIndex, int audioIndex, float posX, float posY, float posZ [, loop = false ] )
     int iBankIndex;
