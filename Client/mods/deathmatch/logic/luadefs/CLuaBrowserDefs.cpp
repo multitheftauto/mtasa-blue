@@ -174,7 +174,7 @@ bool CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM, std::vector<std::s
         std::transform(sPages.begin(), sPages.end(), sPages.begin(), [pWebCore](const auto& url) { return pWebCore->GetDomainFromURL(url); });
     }
 
-    CLuaFunctionRef functionRef = callbackFunction.value_or(CLuaFunctionRef());
+    CLuaFunctionRef    functionRef = callbackFunction.value_or(CLuaFunctionRef());
     WebRequestCallback callback = [=](bool bAllow, const std::unordered_set<SString>& domains)
     {
         // Test if luaVM is still available
@@ -207,7 +207,7 @@ bool CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM, std::vector<std::s
 }
 
 bool CLuaBrowserDefs::LoadBrowserURL(CClientWebBrowser* pWebBrowser, const std::string strURL, std::optional<std::string> strPostData,
-                                    std::optional<bool> bURLEncoded)
+                                     std::optional<bool> bURLEncoded)
 {
     //  bool loadBrowserURL ( browser webBrowser, string url [, string postData = "", bool postURLEncoded = true ] )
     // Are we dealing with a remote website?
