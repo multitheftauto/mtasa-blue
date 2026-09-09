@@ -45,6 +45,7 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_bVisible = false;
     m_bInputBlocked = false;
     m_bInputVisible = false;
+    m_bInputPreview = false;
     m_pFont = m_pManager->GetClearFont();
     m_pDXFont = NULL;
     SetDxFont(g_pCore->GetGraphics()->GetFont());
@@ -146,6 +147,9 @@ void CChat::LoadCVars()
     CVARS_GET("chat_position_horizontal", (unsigned int&)m_ePositionHorizontal);
     CVARS_GET("chat_position_vertical", (unsigned int&)m_ePositionVertical);
     CVARS_GET("chat_text_alignment", (unsigned int&)m_eTextAlign);
+
+    if (m_bInputPreview)
+        SetInputText(m_strInputText.c_str());
 }
 
 //
@@ -381,7 +385,7 @@ void CChat::DrawInputLine(bool bUsingOutline)
         }
     }
 
-    if (m_bInputVisible)
+    if (m_bInputVisible || m_bInputPreview)
     {
         float     fLineDifference = CChat::GetFontHeight(m_vecScale.fY);
         bool      bInputShadow = (m_InputColor.A * m_fInputBackgroundAlpha == 0.f) && !bUsingOutline;
@@ -479,7 +483,7 @@ void CChat::UpdateSmoothScroll(float* pfPixelScroll, int* piLineScroll)
     //
     // Also update input background alpha
     //
-    fTarget = (m_bInputVisible) ? 1.0f : 0.0f;
+    fTarget = (m_bInputVisible || m_bInputPreview) ? 1.0f : 0.0f;
     fMaxAmount = fDeltaSeconds * 5.0f;  // 0.2 seconds fade time
     m_fInputBackgroundAlpha += Clamp(-fMaxAmount, fTarget - m_fInputBackgroundAlpha, fMaxAmount);
 }
@@ -855,6 +859,15 @@ void CChat::SetInputVisible(bool bVisible)
     }
 
     m_bInputVisible = bVisible;
+}
+
+void CChat::SetInputPreview(const char* szText)
+{
+    m_bInputPreview = (szText != nullptr);
+    if (m_bInputPreview)
+        SetInputText(szText);
+    else
+        ClearInput();
 }
 
 void CChat::SetNumLines(unsigned int uiNumLines)
@@ -1318,6 +1331,9 @@ void CChatInputLine::Draw(CVector2D& position, unsigned char alpha, bool shadow,
 
     if (g_pChat->m_InputTextColor.A > 0 && m_Sections.size() > 0)
     {
+        for (auto& section : m_Sections)
+            section.SetColor(g_pChat->m_InputTextColor);
+
         m_Sections[0].Draw(CVector2D(position.fX + m_Prefix.GetWidth(), position.fY), g_pChat->m_InputTextColor.A, shadow, outline, renderBounds);
 
         float lineDifference = CChat::GetFontHeight(g_pChat->m_vecScale.fY);

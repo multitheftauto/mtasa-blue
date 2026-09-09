@@ -173,6 +173,8 @@ public:
     bool IsInputVisible() const { return !m_bInputBlocked && m_bInputVisible; }
     void SetInputVisible(bool bVisible);
 
+    void SetInputPreview(const char* szText);
+
     bool CanTakeInput() { return !CLocalGUI::GetSingleton().GetConsole()->IsVisible() && IsInputVisible(); };
 
     void ResetHistoryChanges();
@@ -270,6 +272,7 @@ protected:
     bool  m_bVisible;
     bool  m_bInputBlocked;
     bool  m_bInputVisible;
+    bool  m_bInputPreview;
     int   m_iScrollingBack;          // Non zero if currently scrolling back
     float m_fCssStyleOverrideAlpha;  // For fading out 'CssStyle' effect. (When entering text or scrolling back)
     float m_fBackgroundAlpha;

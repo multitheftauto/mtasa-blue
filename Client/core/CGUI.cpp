@@ -482,11 +482,52 @@ void CLocalGUI::Draw()
     // Update mainmenu stuff
     m_pMainMenu->Update();
 
-    // If we're ingame, make sure the chatbox is drawn
-    bool bChatVisible =
-        (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_bChatboxVisible && !CCore::GetSingleton().IsOfflineMod());
-    if (m_pChat->IsVisible() != bChatVisible)
-        m_pChat->SetVisible(bChatVisible, !bChatVisible);
+    // If we're ingame, make sure the chatbox is drawn. Also show it as a preview while the chatbox settings are open (Interface tab), both in the main menu and in-game, so its appearance can be adjusted without having to join a server.
+    bool bIsIngame = systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && !CCore::GetSingleton().IsOfflineMod();
+    bool bChatPreview = m_pMainMenu->GetSettingsWindow()->IsChatTabVisible();
+    bool bChatVisible = (bIsIngame && m_bChatboxVisible) || bChatPreview;
+
+    bool bChatInputBlocked = !bChatVisible || bChatPreview;
+    if (m_pChat->IsVisible() != bChatVisible || m_pChat->IsInputBlocked() != bChatInputBlocked)
+        m_pChat->SetVisible(bChatVisible, bChatInputBlocked);
+
+    if (bChatPreview && !bIsIngame)
+    {
+        const unsigned int uiRevision = CCore::GetSingleton().GetCVars()->GetRevision();
+        if (!m_bChatPreviewActive || uiRevision != m_uiChatPreviewRevision)
+        {
+            m_uiChatPreviewRevision = uiRevision;
+            m_pChat->Clear();
+            m_pChat->Output("Multi Theft Auto: What more could you want? Multi Theft Auto provides the best online Grand Theft Auto experience there is.");
+            m_pChat->Output(
+                "Multi Theft Auto: If you've played Grand Theft Auto online in the past, you'll know that the accuracy of the reproduction of other player's "
+                "actions often leaves a lot to be desired. This is a hard thing to get perfect, but Multi Theft Auto has the best GTA synchronization out "
+                "there "
+                "and it's getting better all the time! Want to shoot someone's limbs one by one? MTA makes that possible!");
+            m_pChat->Output(
+                "Multi Theft Auto: Online games are all about their community, and Multi Theft Auto has a great community! We've got a great forum where you "
+                "can "
+                "get support for any problems you have playing MTA, get help with scripting problems or just hang out and chat. We also run a special site for "
+                "downloading game modes and maps that members of the community have created.");
+            m_bChatPreviewActive = true;
+        }
+    }
+    else if (!bChatPreview && m_bChatPreviewActive)
+    {
+        m_pChat->Clear();
+        m_bChatPreviewActive = false;
+    }
+
+    if (bChatPreview && !m_bChatInputPreviewActive)
+    {
+        m_pChat->SetInputPreview("Your message here...");
+        m_bChatInputPreviewActive = true;
+    }
+    else if (!bChatPreview && m_bChatInputPreviewActive)
+    {
+        m_pChat->SetInputPreview(nullptr);
+        m_bChatInputPreviewActive = false;
+    }
     bool bDebugVisible =
         (systemState == SystemState::GS_PLAYING_GAME && m_pMainMenu->GetIsIngame() && m_pDebugViewVisible && !CCore::GetSingleton().IsOfflineMod());
     if (m_pDebugView->IsVisible() != bDebugVisible)
@@ -496,7 +537,8 @@ void CLocalGUI::Draw()
     UpdateCursor();
 
     // Draw the chat
-    m_pChat->Draw(true, true);
+    if (!bChatPreview)
+        m_pChat->Draw(true, true);
     // Draw the debugger
     m_pDebugView->Draw(true, false);
 
@@ -516,6 +558,9 @@ void CLocalGUI::Draw()
             bDelayedFrame = true;
         }
     }
+
+    if (bChatPreview)
+        m_pChat->Draw(true, true);
 }
 
 void CLocalGUI::Invalidate()

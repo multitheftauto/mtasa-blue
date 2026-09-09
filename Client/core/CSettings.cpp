@@ -2168,6 +2168,9 @@ void CSettings::Update()
     m_dwFrameCount++;
 
     UpdateCaptureAxis();
+
+    if (IsChatTabVisible())
+        LiveUpdateChatSettings();
 }
 
 void CSettings::UpdateAudioTab()
@@ -3199,6 +3202,7 @@ void CSettings::CreateInterfaceTabGUI()
             m_pChatHorizontalCombo->AddItem(_("Right"))->SetData((void*)Chat::Position::Horizontal::RIGHT);
             m_pChatHorizontalCombo->SetReadOnly(true);
             m_pChatHorizontalCombo->SetSelectedItemByIndex(0);
+            m_pChatHorizontalCombo->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnChatHorizontalComboChanged, this));
 
             pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabLayout, strVertical));
             pLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY));
@@ -3213,6 +3217,7 @@ void CSettings::CreateInterfaceTabGUI()
             m_pChatVerticalCombo->AddItem(_("Bottom"))->SetData((void*)Chat::Position::Vertical::BOTTOM);
             m_pChatVerticalCombo->SetReadOnly(true);
             m_pChatVerticalCombo->SetSelectedItemByIndex(0);
+            m_pChatVerticalCombo->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnChatVerticalComboChanged, this));
 
             pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabLayout, strTextAlign));
             pLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY));
@@ -3226,6 +3231,7 @@ void CSettings::CreateInterfaceTabGUI()
             m_pChatTextAlignCombo->AddItem(_("Right"))->SetData((void*)Chat::Text::Align::RIGHT);
             m_pChatTextAlignCombo->SetReadOnly(true);
             m_pChatTextAlignCombo->SetSelectedItemByIndex(0);
+            m_pChatTextAlignCombo->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnChatTextAlignComboChanged, this));
 
             pLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabLayout, strXOffset));
             pLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY + fLineSizeY + fLineGapY));
@@ -3879,6 +3885,11 @@ bool CSettings::IsVisible()
     return m_pWindow->IsVisible();
 }
 
+bool CSettings::IsChatTabVisible()
+{
+    return IsVisible() && m_pTabs->IsTabSelected(m_pTabInterface);
+}
+
 void CSettings::SetIsModLoaded(bool bLoaded)
 {
     m_bIsModLoaded = bLoaded;
@@ -3928,6 +3939,8 @@ bool CSettings::OnCancelButtonClick(CGUIElement* pElement)
     SetSFXVolume(m_fOldSFXVolume);
     CVARS_SET("mtavolume", m_fOldMTAVolume);
     CVARS_SET("voicevolume", m_fOldVoiceVolume);
+
+    RestoreChatSettings();
 
     // restore old audio mute settings
     CVARS_SET("mute_master_when_minimized", m_bOldMuteMaster);
@@ -4248,20 +4261,25 @@ void CSettings::LoadData()
     if (iVar > Chat::Position::Horizontal::RIGHT)
         iVar = Chat::Position::Horizontal::LEFT;
     m_pChatHorizontalCombo->SetSelectedItemByIndex(iVar);
+    m_iChatHorizontalValue = iVar;
 
     CVARS_GET("chat_position_vertical", iVar);
     if (iVar > Chat::Position::Vertical::BOTTOM)
         iVar = Chat::Position::Vertical::TOP;
     m_pChatVerticalCombo->SetSelectedItemByIndex(iVar);
+    m_iChatVerticalValue = iVar;
     CVARS_GET("chat_text_alignment", iVar);
     if (iVar > Chat::Text::Align::RIGHT)
         iVar = Chat::Text::Align::LEFT;
     m_pChatTextAlignCombo->SetSelectedItemByIndex(iVar);
+    m_iChatTextAlignValue = iVar;
 
     CVARS_GET("chat_position_offset_x", strVar);
     m_pChatOffsetX->SetText(strVar.c_str());
     CVARS_GET("chat_position_offset_y", strVar);
     m_pChatOffsetY->SetText(strVar.c_str());
+
+    SnapshotChatSettings();
 
     // Interface
     CVARS_GET("server_can_flash_window", bVar);
@@ -4675,47 +4693,7 @@ void CSettings::SaveData()
     }
 
     // Chat
-    SaveChatColor(Chat::ColorType::BG, "chat_color");
-    SaveChatColor(Chat::ColorType::TEXT, "chat_text_color");
-    SaveChatColor(Chat::ColorType::INPUT_BG, "chat_input_color");
-    SaveChatColor(Chat::ColorType::INPUT_TEXT, "chat_input_text_color");
-    for (int iFont = 0; iFont < Chat::ColorType::MAX; iFont++)
-    {
-        if (m_pRadioChatFont[iFont]->GetSelected())
-        {
-            CVARS_SET("chat_font", iFont);
-            break;
-        }
-    }
-
-    strVar = m_pChatScaleX->GetText() + " " + m_pChatScaleY->GetText();
-    CVARS_SET("chat_scale", strVar);
-    CVARS_SET("chat_lines", m_pChatLines->GetText());
-    CVARS_SET("chat_width", m_pChatWidth->GetText());
-    CVARS_SET("chat_css_style_text", m_pChatCssText->GetSelected());
-    CVARS_SET("chat_css_style_background", m_pChatCssBackground->GetSelected());
-    CVARS_SET("chat_nickcompletion", m_pChatNickCompletion->GetSelected());
-    CVARS_SET("chat_text_outline", m_pChatTextBlackOutline->GetSelected());
-    CVARS_SET("chat_line_life", GetMilliseconds(m_pChatLineLife));
-    CVARS_SET("chat_line_fade_out", GetMilliseconds(m_pChatLineFadeout));
-
-    CVARS_SET("chat_position_offset_x", m_pChatOffsetX->GetText());
-    CVARS_SET("chat_position_offset_y", m_pChatOffsetY->GetText());
-    if (CGUIListItem* pSelected = m_pChatHorizontalCombo->GetSelectedItem())
-    {
-        int iSelected = (int)pSelected->GetData();
-        CVARS_SET("chat_position_horizontal", iSelected);
-    }
-    if (CGUIListItem* pSelected = m_pChatVerticalCombo->GetSelectedItem())
-    {
-        int iSelected = (int)pSelected->GetData();
-        CVARS_SET("chat_position_vertical", iSelected);
-    }
-    if (CGUIListItem* pSelected = m_pChatTextAlignCombo->GetSelectedItem())
-    {
-        int iSelected = (int)pSelected->GetData();
-        CVARS_SET("chat_text_alignment", iSelected);
-    }
+    SaveChatSettings();
 
     // Interface
     CVARS_SET("server_can_flash_window", m_pFlashWindow->GetSelected());
@@ -5014,12 +4992,13 @@ void CSettings::SaveChatColor(eChatColorType eType, const char* szCVar)
 
 CColor CSettings::GetChatColorValues(eChatColorType eType)
 {
-    // Retrieve the color according to the scrollbar values
+    // Retrieve the color according to the scrollbar values (rounded, so saving an unchanged
+    // colour round-trips exactly instead of drifting by one step each time)
     CColor pColor;
-    pColor.R = m_pChatRed[eType]->GetScrollPosition() * 255;
-    pColor.G = m_pChatGreen[eType]->GetScrollPosition() * 255;
-    pColor.B = m_pChatBlue[eType]->GetScrollPosition() * 255;
-    pColor.A = m_pChatAlpha[eType]->GetScrollPosition() * 255;
+    pColor.R = static_cast<uchar>(m_pChatRed[eType]->GetScrollPosition() * 255.0f + 0.5f);
+    pColor.G = static_cast<uchar>(m_pChatGreen[eType]->GetScrollPosition() * 255.0f + 0.5f);
+    pColor.B = static_cast<uchar>(m_pChatBlue[eType]->GetScrollPosition() * 255.0f + 0.5f);
+    pColor.A = static_cast<uchar>(m_pChatAlpha[eType]->GetScrollPosition() * 255.0f + 0.5f);
     return pColor;
 }
 
@@ -5030,6 +5009,175 @@ void CSettings::SetChatColorValues(eChatColorType eType, CColor pColor)
     m_pChatGreen[eType]->SetScrollPosition((float)pColor.G / 255.0f);
     m_pChatBlue[eType]->SetScrollPosition((float)pColor.B / 255.0f);
     m_pChatAlpha[eType]->SetScrollPosition((float)pColor.A / 255.0f);
+}
+
+void CSettings::SaveChatSettings()
+{
+    SaveChatColor(Chat::ColorType::BG, "chat_color");
+    SaveChatColor(Chat::ColorType::TEXT, "chat_text_color");
+    SaveChatColor(Chat::ColorType::INPUT_BG, "chat_input_color");
+    SaveChatColor(Chat::ColorType::INPUT_TEXT, "chat_input_text_color");
+    for (int iFont = 0; iFont < Chat::Font::MAX; iFont++)
+    {
+        if (m_pRadioChatFont[iFont]->GetSelected())
+        {
+            CVARS_SET("chat_font", iFont);
+            break;
+        }
+    }
+
+    SString strVar = m_pChatScaleX->GetText() + " " + m_pChatScaleY->GetText();
+    CVARS_SET("chat_scale", strVar);
+    CVARS_SET("chat_lines", m_pChatLines->GetText());
+    CVARS_SET("chat_width", m_pChatWidth->GetText());
+    CVARS_SET("chat_css_style_text", m_pChatCssText->GetSelected());
+    CVARS_SET("chat_css_style_background", m_pChatCssBackground->GetSelected());
+    CVARS_SET("chat_nickcompletion", m_pChatNickCompletion->GetSelected());
+    CVARS_SET("chat_text_outline", m_pChatTextBlackOutline->GetSelected());
+    CVARS_SET("chat_line_life", GetMilliseconds(m_pChatLineLife));
+    CVARS_SET("chat_line_fade_out", GetMilliseconds(m_pChatLineFadeout));
+
+    CVARS_SET("chat_position_offset_x", m_pChatOffsetX->GetText());
+    CVARS_SET("chat_position_offset_y", m_pChatOffsetY->GetText());
+
+    CVARS_SET("chat_position_horizontal", m_iChatHorizontalValue);
+    CVARS_SET("chat_position_vertical", m_iChatVerticalValue);
+    CVARS_SET("chat_text_alignment", m_iChatTextAlignValue);
+}
+
+SString CSettings::GetChatSettingsSignature()
+{
+    SString strSignature;
+
+    for (int iColor = 0; iColor < Chat::ColorType::MAX; iColor++)
+    {
+        const CColor color = GetChatColorValues(static_cast<eChatColorType>(iColor));
+        strSignature += SString("%d,%d,%d,%d|", color.R, color.G, color.B, color.A);
+    }
+
+    for (int iFont = 0; iFont < Chat::Font::MAX; iFont++)
+        strSignature += m_pRadioChatFont[iFont]->GetSelected() ? "1" : "0";
+
+    strSignature += "|" + m_pChatLines->GetText();
+    strSignature += "|" + m_pChatScaleX->GetText();
+    strSignature += "|" + m_pChatScaleY->GetText();
+    strSignature += "|" + m_pChatWidth->GetText();
+
+    strSignature += SString("|%d|%d|%d|%d", m_pChatCssText->GetSelected(), m_pChatCssBackground->GetSelected(), m_pChatNickCompletion->GetSelected(),
+                            m_pChatTextBlackOutline->GetSelected());
+
+    strSignature += "|" + m_pChatLineLife->GetText();
+    strSignature += "|" + m_pChatLineFadeout->GetText();
+    strSignature += "|" + m_pChatOffsetX->GetText();
+    strSignature += "|" + m_pChatOffsetY->GetText();
+
+    strSignature += SString("|%d", m_iChatHorizontalValue);
+    strSignature += SString("|%d", m_iChatVerticalValue);
+    strSignature += SString("|%d", m_iChatTextAlignValue);
+
+    return strSignature;
+}
+
+bool CSettings::OnChatHorizontalComboChanged(CGUIElement* pElement)
+{
+    if (CGUIListItem* pSelected = m_pChatHorizontalCombo->GetSelectedItem())
+        m_iChatHorizontalValue = static_cast<int>(reinterpret_cast<uintptr_t>(pSelected->GetData()));
+    LiveUpdateChatSettings();
+    return true;
+}
+
+bool CSettings::OnChatVerticalComboChanged(CGUIElement* pElement)
+{
+    if (CGUIListItem* pSelected = m_pChatVerticalCombo->GetSelectedItem())
+        m_iChatVerticalValue = static_cast<int>(reinterpret_cast<uintptr_t>(pSelected->GetData()));
+    LiveUpdateChatSettings();
+    return true;
+}
+
+bool CSettings::OnChatTextAlignComboChanged(CGUIElement* pElement)
+{
+    if (CGUIListItem* pSelected = m_pChatTextAlignCombo->GetSelectedItem())
+        m_iChatTextAlignValue = static_cast<int>(reinterpret_cast<uintptr_t>(pSelected->GetData()));
+    LiveUpdateChatSettings();
+    return true;
+}
+
+void CSettings::LiveUpdateChatSettings()
+{
+    SString strSignature = GetChatSettingsSignature();
+    if (strSignature != m_strChatSettingsSignature)
+    {
+        m_strChatSettingsSignature = strSignature;
+        SaveChatSettings();
+    }
+}
+
+void CSettings::SnapshotChatSettings()
+{
+    std::string strVar;
+    CVARS_GET("chat_color", strVar);
+    m_strOldChatColor = strVar;
+    CVARS_GET("chat_text_color", strVar);
+    m_strOldChatTextColor = strVar;
+    CVARS_GET("chat_input_color", strVar);
+    m_strOldChatInputColor = strVar;
+    CVARS_GET("chat_input_text_color", strVar);
+    m_strOldChatInputTextColor = strVar;
+    CVARS_GET("chat_font", strVar);
+    m_strOldChatFont = strVar;
+    CVARS_GET("chat_lines", strVar);
+    m_strOldChatLines = strVar;
+    CVARS_GET("chat_scale", strVar);
+    m_strOldChatScale = strVar;
+    CVARS_GET("chat_width", strVar);
+    m_strOldChatWidth = strVar;
+    CVARS_GET("chat_css_style_text", strVar);
+    m_strOldChatCssStyleText = strVar;
+    CVARS_GET("chat_css_style_background", strVar);
+    m_strOldChatCssStyleBackground = strVar;
+    CVARS_GET("chat_nickcompletion", strVar);
+    m_strOldChatNickCompletion = strVar;
+    CVARS_GET("chat_text_outline", strVar);
+    m_strOldChatTextOutline = strVar;
+    CVARS_GET("chat_line_life", strVar);
+    m_strOldChatLineLife = strVar;
+    CVARS_GET("chat_line_fade_out", strVar);
+    m_strOldChatLineFadeOut = strVar;
+    CVARS_GET("chat_position_horizontal", strVar);
+    m_strOldChatPositionHorizontal = strVar;
+    CVARS_GET("chat_position_vertical", strVar);
+    m_strOldChatPositionVertical = strVar;
+    CVARS_GET("chat_text_alignment", strVar);
+    m_strOldChatTextAlignment = strVar;
+    CVARS_GET("chat_position_offset_x", strVar);
+    m_strOldChatPositionOffsetX = strVar;
+    CVARS_GET("chat_position_offset_y", strVar);
+    m_strOldChatPositionOffsetY = strVar;
+
+    m_strChatSettingsSignature.clear();
+}
+
+void CSettings::RestoreChatSettings()
+{
+    CVARS_SET("chat_color", m_strOldChatColor);
+    CVARS_SET("chat_text_color", m_strOldChatTextColor);
+    CVARS_SET("chat_input_color", m_strOldChatInputColor);
+    CVARS_SET("chat_input_text_color", m_strOldChatInputTextColor);
+    CVARS_SET("chat_font", m_strOldChatFont);
+    CVARS_SET("chat_lines", m_strOldChatLines);
+    CVARS_SET("chat_scale", m_strOldChatScale);
+    CVARS_SET("chat_width", m_strOldChatWidth);
+    CVARS_SET("chat_css_style_text", m_strOldChatCssStyleText);
+    CVARS_SET("chat_css_style_background", m_strOldChatCssStyleBackground);
+    CVARS_SET("chat_nickcompletion", m_strOldChatNickCompletion);
+    CVARS_SET("chat_text_outline", m_strOldChatTextOutline);
+    CVARS_SET("chat_line_life", m_strOldChatLineLife);
+    CVARS_SET("chat_line_fade_out", m_strOldChatLineFadeOut);
+    CVARS_SET("chat_position_horizontal", m_strOldChatPositionHorizontal);
+    CVARS_SET("chat_position_vertical", m_strOldChatPositionVertical);
+    CVARS_SET("chat_text_alignment", m_strOldChatTextAlignment);
+    CVARS_SET("chat_position_offset_x", m_strOldChatPositionOffsetX);
+    CVARS_SET("chat_position_offset_y", m_strOldChatPositionOffsetY);
 }
 
 void CSettings::LoadChatPresets()
