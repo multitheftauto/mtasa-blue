@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
 
 class CLuaCameraDefs : public CLuaDefs
 {
@@ -18,13 +19,16 @@ public:
     static void LoadFunctions();
 
     // Get functions
-    LUA_DECLARE_OOP(getCameraMatrix);
-    LUA_DECLARE(getCameraTarget);
-    LUA_DECLARE(getCameraInterior);
+    static std::variant<CLuaMultiReturn<float, float, float, float, float, float, float, float>, bool> GetCameraMatrix(CPlayer* pPlayer);
+    LUA_DECLARE(OOP_getCameraMatrix);
+    static std::variant<CElement*, bool>     GetCameraTarget(CPlayer* pPlayer);
+    static std::variant<unsigned char, bool> GetCameraInterior(CPlayer* pPlayer);
 
     // Set functions
-    LUA_DECLARE(setCameraMatrix);
-    LUA_DECLARE(setCameraTarget);
-    LUA_DECLARE(setCameraInterior);
-    LUA_DECLARE(fadeCamera);
+    static bool SetCameraMatrix(CElement* pPlayer, std::variant<CLuaMatrix*, CVector> matrixOrPosition, std::optional<CVector> vecLookAt,
+                                std::optional<float> fRoll, std::optional<float> fFOV);
+    static bool SetCameraTarget(lua_State* luaVM, CElement* pPlayer, std::optional<CElement*> pTarget);
+    static bool SetCameraInterior(CElement* pElement, unsigned char ucInterior);
+    static bool FadeCamera(CElement* pPlayer, bool bFadeIn, std::optional<float> fFadeTime, std::optional<unsigned char> ucRed,
+                           std::optional<unsigned char> ucGreen, std::optional<unsigned char> ucBlue);
 };

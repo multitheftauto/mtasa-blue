@@ -28,19 +28,19 @@ void CLuaCameraDefs::LoadFunctions()
         {"getCameraTarget", ArgumentParserWarn<false, GetCameraTarget>},
         {"getCameraInterior", ArgumentParserWarn<false, GetCameraInterior>},
         {"getCameraGoggleEffect", ArgumentParserWarn<false, GetCameraGoggleEffect>},
-        {"getCameraFieldOfView", GetCameraFieldOfView},
+        {"getCameraFieldOfView", ArgumentParserWarn<false, GetCameraFieldOfView>},
         {"getCameraDrunkLevel", ArgumentParserWarn<false, GetCameraDrunkLevel>},
 
         // Cam set funcs
-        {"setCameraMatrix", SetCameraMatrix},
-        {"setCameraFieldOfView", SetCameraFieldOfView},
-        {"setCameraTarget", SetCameraTarget},
-        {"setCameraInterior", SetCameraInterior},
-        {"fadeCamera", FadeCamera},
-        {"setCameraClip", SetCameraClip},
-        {"getCameraClip", GetCameraClip},
+        {"setCameraMatrix", ArgumentParserWarn<false, SetCameraMatrix>},
+        {"setCameraFieldOfView", ArgumentParserWarn<false, SetCameraFieldOfView>},
+        {"setCameraTarget", ArgumentParserWarn<false, SetCameraTarget>},
+        {"setCameraInterior", ArgumentParserWarn<false, SetCameraInterior>},
+        {"fadeCamera", ArgumentParserWarn<false, FadeCamera>},
+        {"setCameraClip", ArgumentParserWarn<false, SetCameraClip>},
+        {"getCameraClip", ArgumentParserWarn<false, GetCameraClip>},
         {"setCameraViewMode", ArgumentParserWarn<false, SetCameraViewMode>},
-        {"setCameraGoggleEffect", SetCameraGoggleEffect},
+        {"setCameraGoggleEffect", ArgumentParserWarn<false, SetCameraGoggleEffect>},
         {"setCameraDrunkLevel", ArgumentParserWarn<false, SetCameraDrunkLevel>},
 
         {"shakeCamera", ArgumentParser<ShakeCamera>},
@@ -166,253 +166,106 @@ unsigned char CLuaCameraDefs::GetCameraDrunkLevel()
     return g_pGame->GetPlayerInfo()->GetCamDrunkLevel();
 }
 
-int CLuaCameraDefs::SetCameraMatrix(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraMatrix(std::variant<CLuaMatrix*, CVector> matrixOrPosition, std::optional<CVector> vecLookAt, std::optional<float> fRoll,
+                                     std::optional<float> fFOV)
 {
-    CVector          vecPosition;
-    CVector          vecLookAt;
-    float            fRoll = 0.0f;
-    float            fFOV = 70.0f;
-    CScriptArgReader argStream(luaVM);
-    bool             bLookAtValid;
+    CVector vecPosition;
+    CVector lookAt;
+    bool    bLookAtValid = false;
 
-    if (argStream.NextIsUserDataOfType<CLuaMatrix>())
+    if (auto* pMatrix = std::get_if<CLuaMatrix*>(&matrixOrPosition))
     {
-        CLuaMatrix* pMatrix;
-        argStream.ReadUserData(pMatrix);
-
-        vecPosition = pMatrix->GetPosition();
-        vecLookAt = pMatrix->GetRotation();
+        vecPosition = (*pMatrix)->GetPosition();
+        lookAt = (*pMatrix)->GetRotation();
         bLookAtValid = true;
     }
     else
     {
-        argStream.ReadVector3D(vecPosition);
-        bLookAtValid = argStream.NextIsVector3D();
-        argStream.ReadVector3D(vecLookAt, CVector());
-    }
-
-    argStream.ReadNumber(fRoll, 0.0f);
-    argStream.ReadNumber(fFOV, 70.0f);
-    if (fFOV <= 0.0f || fFOV >= 180.0f)
-        fFOV = 70.0f;
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetCameraMatrix(vecPosition, bLookAtValid ? &vecLookAt : nullptr, fRoll, fFOV))
+        vecPosition = std::get<CVector>(matrixOrPosition);
+        if (vecLookAt.has_value())
         {
-            lua_pushboolean(luaVM, true);
-            return 1;
+            lookAt = vecLookAt.value();
+            bLookAtValid = true;
         }
     }
+
+    float fFOVValue = fFOV.value_or(70.0f);
+    if (fFOVValue <= 0.0f || fFOVValue >= 180.0f)
+        fFOVValue = 70.0f;
+
+    return CStaticFunctionDefinitions::SetCameraMatrix(vecPosition, bLookAtValid ? &lookAt : nullptr, fRoll.value_or(0.0f), fFOVValue);
+}
+
+// Only when onfoot/invehicle
+bool CLuaCameraDefs::SetCameraFieldOfView(eFieldOfViewMode eMode, float fFOV, std::optional<bool> instant)
+{
+    if (fFOV < 0 || fFOV > 179)
+        throw std::invalid_argument("Invalid FOV range (0-179)");
+
+    bool bInstant = instant.value_or(false);
+    if (eMode == FOV_MODE_PLAYER)
+        g_pGame->GetSettings()->SetFieldOfViewPlayer(fFOV, true, bInstant);
+    else if (eMode == FOV_MODE_VEHICLE)
+        g_pGame->GetSettings()->SetFieldOfViewVehicle(fFOV, true, bInstant);
+    else if (eMode == FOV_MODE_VEHICLE_MAX)
+        g_pGame->GetSettings()->SetFieldOfViewVehicleMax(fFOV, true, bInstant);
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        throw std::invalid_argument(SString("Enum not yet implemented: " + EnumToString(eMode)));
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return true;
 }
 
 // Only when onfoot/invehicle
-int CLuaCameraDefs::SetCameraFieldOfView(lua_State* luaVM)
+std::variant<float, bool> CLuaCameraDefs::GetCameraFieldOfView(eFieldOfViewMode eMode)
 {
-    float            fFOV;
-    eFieldOfViewMode eMode;
-    bool             instant;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(eMode);
-    argStream.ReadNumber(fFOV);
-    argStream.ReadBool(instant, false);
+    if (eMode == FOV_MODE_PLAYER)
+        return g_pGame->GetSettings()->GetFieldOfViewPlayer();
+    else if (eMode == FOV_MODE_VEHICLE)
+        return g_pGame->GetSettings()->GetFieldOfViewVehicle();
+    else if (eMode == FOV_MODE_VEHICLE_MAX)
+        return g_pGame->GetSettings()->GetFieldOfViewVehicleMax();
 
-    if (!argStream.HasErrors())
-    {
-        while (true)
-        {
-            if (fFOV < 0 || fFOV > 179)
-            {
-                argStream.SetCustomError("Invalid FOV range (0-179)");
-                break;
-            }
-
-            if (eMode == FOV_MODE_PLAYER)
-            {
-                g_pGame->GetSettings()->SetFieldOfViewPlayer(fFOV, true, instant);
-            }
-            else if (eMode == FOV_MODE_VEHICLE)
-            {
-                g_pGame->GetSettings()->SetFieldOfViewVehicle(fFOV, true, instant);
-            }
-            else if (eMode == FOV_MODE_VEHICLE_MAX)
-            {
-                g_pGame->GetSettings()->SetFieldOfViewVehicleMax(fFOV, true, instant);
-            }
-            else
-            {
-                argStream.m_iIndex = 1;
-                argStream.SetCustomError(SString("Enum not yet implemented: " + EnumToString(eMode)));
-                break;
-            }
-
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-
-    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    lua_pushboolean(luaVM, false);
-    return 1;
+    throw std::invalid_argument(SString("Enum not yet implemented: " + EnumToString(eMode)));
 }
 
-// Only when onfoot/invehicle
-int CLuaCameraDefs::GetCameraFieldOfView(lua_State* luaVM)
-{
-    eFieldOfViewMode eMode;
-    CScriptArgReader argStream(luaVM);
-
-    argStream.ReadEnumString(eMode);
-
-    if (!argStream.HasErrors())
-    {
-        float fFOV;
-        if (eMode == FOV_MODE_PLAYER)
-            fFOV = g_pGame->GetSettings()->GetFieldOfViewPlayer();
-        else if (eMode == FOV_MODE_VEHICLE)
-            fFOV = g_pGame->GetSettings()->GetFieldOfViewVehicle();
-        else if (eMode == FOV_MODE_VEHICLE_MAX)
-            fFOV = g_pGame->GetSettings()->GetFieldOfViewVehicleMax();
-        else
-        {
-            argStream.m_iIndex = 1;
-            m_pScriptDebugging->LogCustom(luaVM, SString("Enum not yet implemented: " + EnumToString(eMode)));
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-
-        lua_pushnumber(luaVM, fFOV);
-        return 1;
-    }
-
-    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaCameraDefs::SetCameraTarget(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraTarget(lua_State* luaVM, std::variant<CClientEntity*, CVector> target)
 {
     //  bool setCameraTarget ( element target = nil ) or setCameraTarget ( float x, float y, float z )
-
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientEntity>())
+    if (auto* pTarget = std::get_if<CClientEntity*>(&target))
     {
-        CClientEntity* pTarget;
-        argStream.ReadUserData(pTarget);
+        if (*pTarget && (*pTarget)->GetType() != CCLIENTPLAYER)
+            MinClientReqCheck(luaVM, MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player");
 
-        if (pTarget->GetType() != CCLIENTPLAYER)
-            MinClientReqCheck(argStream, MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player");
-
-        if (!argStream.HasErrors())
-        {
-            if (CStaticFunctionDefinitions::SetCameraTarget(pTarget))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-    {
-        CVector vecTarget;
-        argStream.ReadVector3D(vecTarget);
-
-        if (!argStream.HasErrors())
-        {
-            if (CStaticFunctionDefinitions::SetCameraTarget(vecTarget))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
+        return CStaticFunctionDefinitions::SetCameraTarget(*pTarget);
     }
 
-    if (argStream.HasErrors())
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetCameraTarget(std::get<CVector>(target));
 }
 
-int CLuaCameraDefs::SetCameraInterior(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraInterior(unsigned char ucInterior)
 {
-    unsigned char    ucInterior = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(ucInterior);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetCameraInterior(ucInterior))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetCameraInterior(ucInterior);
 }
 
-int CLuaCameraDefs::FadeCamera(lua_State* luaVM)
+bool CLuaCameraDefs::FadeCamera(bool bFadeIn, std::optional<float> fFadeTime, std::optional<unsigned char> ucRed, std::optional<unsigned char> ucGreen,
+                                std::optional<unsigned char> ucBlue)
 {
-    bool          bFadeIn = false;
-    unsigned char ucRed = 0;
-    unsigned char ucGreen = 0;
-    unsigned char ucBlue = 0;
-    float         fFadeTime = 1.0f;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadBool(bFadeIn);
-    argStream.ReadNumber(fFadeTime, 1.0f);
-    argStream.ReadNumber(ucRed, 0);
-    argStream.ReadNumber(ucGreen, 0);
-    argStream.ReadNumber(ucBlue, 0);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::FadeCamera(bFadeIn, fFadeTime, ucRed, ucGreen, ucBlue))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::FadeCamera(bFadeIn, fFadeTime.value_or(1.0f), ucRed.value_or(0), ucGreen.value_or(0), ucBlue.value_or(0));
 }
 
-int CLuaCameraDefs::SetCameraClip(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraClip(std::optional<bool> bObjects, std::optional<bool> bVehicles)
 {
-    bool bObjects = true;
-    bool bVehicles = true;
+    m_pManager->GetCamera()->SetCameraClip(bObjects.value_or(true), bVehicles.value_or(true));
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadBool(bObjects, true);
-    argStream.ReadBool(bVehicles, true);
-
-    m_pManager->GetCamera()->SetCameraClip(bObjects, bVehicles);
-
-    lua_pushboolean(luaVM, true);
-    return 1;
+    return true;
 }
 
-int CLuaCameraDefs::GetCameraClip(lua_State* luaVM)
+CLuaMultiReturn<bool, bool> CLuaCameraDefs::GetCameraClip()
 {
     bool bObjects, bVehicles;
     m_pManager->GetCamera()->GetCameraClip(bObjects, bVehicles);
 
-    lua_pushboolean(luaVM, bObjects);
-    lua_pushboolean(luaVM, bVehicles);
-    return 2;
+    return {bObjects, bVehicles};
 }
 
 bool CLuaCameraDefs::SetCameraViewMode(std::optional<unsigned char> ucVehicleViewMode, std::optional<unsigned char> ucPedViewMode)
@@ -428,51 +281,29 @@ bool CLuaCameraDefs::SetCameraViewMode(std::optional<unsigned char> ucVehicleVie
     return true;
 }
 
-int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraGoggleEffect(std::string strMode, std::optional<bool> bNoiseEnabled)
 {
-    SString          strMode;
-    bool             bNoiseEnabled;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strMode);
-    argStream.ReadBool(bNoiseEnabled, true);
-
-    if (!argStream.HasErrors())
+    bool bNoise = bNoiseEnabled.value_or(true);
+    if (strMode.compare("nightvision") == 0)
     {
-        bool bSuccess = false;
-
-        if (strMode.compare("nightvision") == 0)
-        {
-            g_pMultiplayer->SetNightVisionEnabled(true, bNoiseEnabled);
-            g_pMultiplayer->SetThermalVisionEnabled(false, true);
-
-            bSuccess = true;
-        }
-        else if (strMode.compare("thermalvision") == 0)
-        {
-            g_pMultiplayer->SetNightVisionEnabled(false, true);
-            g_pMultiplayer->SetThermalVisionEnabled(true, bNoiseEnabled);
-
-            bSuccess = true;
-        }
-        else if (strMode.compare("normal") == 0)
-        {
-            g_pMultiplayer->SetNightVisionEnabled(false, true);
-            g_pMultiplayer->SetThermalVisionEnabled(false, true);
-
-            bSuccess = true;
-        }
-
-        if (bSuccess)
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        g_pMultiplayer->SetNightVisionEnabled(true, bNoise);
+        g_pMultiplayer->SetThermalVisionEnabled(false, true);
+        return true;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    else if (strMode.compare("thermalvision") == 0)
+    {
+        g_pMultiplayer->SetNightVisionEnabled(false, true);
+        g_pMultiplayer->SetThermalVisionEnabled(true, bNoise);
+        return true;
+    }
+    else if (strMode.compare("normal") == 0)
+    {
+        g_pMultiplayer->SetNightVisionEnabled(false, true);
+        g_pMultiplayer->SetThermalVisionEnabled(false, true);
+        return true;
+    }
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
 bool CLuaCameraDefs::SetCameraDrunkLevel(short drunkLevel)

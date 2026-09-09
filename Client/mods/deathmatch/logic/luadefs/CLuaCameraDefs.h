@@ -29,19 +29,21 @@ public:
     static std::variant<CClientEntity*, bool>                                      GetCameraTarget();
     static unsigned char                                                           GetCameraInterior();
     static std::string                                                             GetCameraGoggleEffect();
-    LUA_DECLARE(GetCameraFieldOfView);
-    static unsigned char GetCameraDrunkLevel();
+    static std::variant<float, bool>                                               GetCameraFieldOfView(eFieldOfViewMode eMode);
+    static unsigned char                                                           GetCameraDrunkLevel();
 
     // Cam set funcs
-    LUA_DECLARE(SetCameraMatrix);
-    LUA_DECLARE(SetCameraTarget);
-    LUA_DECLARE(SetCameraInterior);
-    LUA_DECLARE(SetCameraFieldOfView);
-    LUA_DECLARE(FadeCamera);
-    LUA_DECLARE(SetCameraClip);
-    LUA_DECLARE(GetCameraClip);
-    LUA_DECLARE(SetCameraGoggleEffect);
-    static bool SetCameraDrunkLevel(short drunkLevel);
+    static bool SetCameraMatrix(std::variant<CLuaMatrix*, CVector> matrixOrPosition, std::optional<CVector> vecLookAt, std::optional<float> fRoll,
+                                std::optional<float> fFOV);
+    static bool SetCameraTarget(lua_State* luaVM, std::variant<CClientEntity*, CVector> target);
+    static bool SetCameraInterior(unsigned char ucInterior);
+    static bool SetCameraFieldOfView(eFieldOfViewMode eMode, float fFOV, std::optional<bool> instant);
+    static bool FadeCamera(bool bFadeIn, std::optional<float> fFadeTime, std::optional<unsigned char> ucRed, std::optional<unsigned char> ucGreen,
+                           std::optional<unsigned char> ucBlue);
+    static bool SetCameraClip(std::optional<bool> bObjects, std::optional<bool> bVehicles);
+    static CLuaMultiReturn<bool, bool> GetCameraClip();
+    static bool                        SetCameraGoggleEffect(std::string strMode, std::optional<bool> bNoiseEnabled);
+    static bool                        SetCameraDrunkLevel(short drunkLevel);
 
     // Cam do funcs
     static bool ShakeCamera(float radius, std::optional<float> x, std::optional<float> y, std::optional<float> z) noexcept;
