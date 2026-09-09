@@ -572,17 +572,44 @@ SBuildingRemoval* CBuildingRemovalSA::GetBuildingRemoval(CEntitySAInterface* pIn
     return NULL;
 }
 
-void CBuildingRemovalSA::AddDataBuilding(CEntitySAInterface* pInterface)
+sDataBuildingRemovalItem* CBuildingRemovalSA::AddDataBuilding(CEntitySAInterface* pInterface)
 {
-    if (m_pAddedEntities.find((DWORD)pInterface) == m_pAddedEntities.end() || m_pAddedEntities[(DWORD)pInterface] == false)
-    {
-        // Create a new building removal
-        sDataBuildingRemovalItem* pBuildingRemoval = new sDataBuildingRemovalItem(pInterface, true);
-        // Insert it with the model index so we can fast lookup
-        m_pDataBuildings->insert(std::pair<uint16_t, sDataBuildingRemovalItem*>((uint16_t)pInterface->m_nModelIndex, pBuildingRemoval));
-        m_pAddedEntities[(DWORD)pInterface] = true;
-        m_pRemovedEntities[(DWORD)pInterface] = false;
-    }
+    if (m_pAddedEntities.find((DWORD)pInterface) != m_pAddedEntities.end() && m_pAddedEntities[(DWORD)pInterface] != false)
+        return nullptr;
+
+    // Create a new building removal
+    sDataBuildingRemovalItem* pBuildingRemoval = new sDataBuildingRemovalItem(pInterface, true);
+    // Insert it with the model index so we can fast lookup
+    m_pDataBuildings->insert(std::pair<uint16_t, sDataBuildingRemovalItem*>((uint16_t)pInterface->m_nModelIndex, pBuildingRemoval));
+    m_pAddedEntities[(DWORD)pInterface] = true;
+    m_pRemovedEntities[(DWORD)pInterface] = false;
+    return pBuildingRemoval;
+}
+
+// Register a world entity restored from a pool backup and re-apply an active removeWorldModel removal covering it.
+// The backup restore re-adds every entity to the world, but only entities in dynamically streamed IPL sectors get
+// re-checked against the removal rules by the stream-in hooks. Always-loaded entities (LODs and other data
+// buildings) never re-stream, so without this check they would stay in the world even though a removal covers them
+void CBuildingRemovalSA::AddDataBuildingAndReapplyRemoval(CEntitySAInterface* pInterface)
+{
+    sDataBuildingRemovalItem* pBuildingRemovalItem = AddDataBuilding(pInterface);
+    if (!pBuildingRemovalItem)
+        return;
+
+    if ((pInterface->nType != ENTITY_TYPE_BUILDING && pInterface->nType != ENTITY_TYPE_DUMMY && pInterface->nType != ENTITY_TYPE_OBJECT) ||
+        pInterface->bRemoveFromWorld == 1 || pInterface->IsPlaceableVTBL())
+        return;
+
+    SBuildingRemoval* pRemoval = GetBuildingRemoval(pInterface);
+    if (!pRemoval)
+        return;
+
+    // Set the count so the remove/restore bookkeeping stays consistent
+    pBuildingRemovalItem->m_iCount = 1;
+    // Add the entity to the removal list and remove it from the world again
+    pRemoval->AddDataBuilding(pInterface);
+    pGame->GetWorld()->Remove(pInterface, BuildingRemovalRestoreBackup);
+    m_pRemovedEntities[(DWORD)pInterface] = true;
 }
 
 void CBuildingRemovalSA::AddBinaryBuilding(CEntitySAInterface* pInterface)

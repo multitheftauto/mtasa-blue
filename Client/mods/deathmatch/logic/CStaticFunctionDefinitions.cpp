@@ -3239,7 +3239,7 @@ bool CStaticFunctionDefinitions::SetVehicleDoorState(CClientEntity& Entity, unsi
 
         if (ucDoor < MAX_DOORS)
         {
-            switch (static_cast<VehicleType>(Vehicle.GetModel()))
+            switch (static_cast<VehicleType::Enum>(Vehicle.GetModel()))
             {
                 case VehicleType::VT_BFINJECT:
                 case VehicleType::VT_RCBANDIT:
@@ -3794,7 +3794,7 @@ bool CStaticFunctionDefinitions::IsVehicleWindowOpen(CClientVehicle& Vehicle, uc
     return Vehicle.IsWindowOpen(ucWindow);
 }
 
-bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, VehicleDummies eDummies, CVector& vecPosition)
+bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usModel, VehicleDummies::Enum eDummies, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
@@ -3808,7 +3808,7 @@ bool CStaticFunctionDefinitions::SetVehicleModelDummyPosition(unsigned short usM
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, VehicleDummies eDummies, CVector& vecPosition)
+bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usModel, VehicleDummies::Enum eDummies, CVector& vecPosition)
 {
     if (CClientVehicleManager::IsValidModel(usModel))
     {
@@ -3822,7 +3822,7 @@ bool CStaticFunctionDefinitions::GetVehicleModelDummyPosition(unsigned short usM
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleModelDummyDefaultPosition(unsigned short usModel, VehicleDummies eDummy, CVector& vecPosition)
+bool CStaticFunctionDefinitions::GetVehicleModelDummyDefaultPosition(unsigned short usModel, VehicleDummies::Enum eDummy, CVector& vecPosition)
 {
     CModelInfo* modelInfo = g_pGame->GetModelInfo(usModel);
 
@@ -7767,7 +7767,7 @@ bool CStaticFunctionDefinitions::FireWeapon(CClientWeapon* pWeapon)
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty eProperty, short& sData)
+bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty::Enum eProperty, short& sData)
 {
     if (pWeapon)
     {
@@ -7780,7 +7780,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, Weapo
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty eProperty, CVector& vecData)
+bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty::Enum eProperty, CVector& vecData)
 {
     if (pWeapon)
     {
@@ -7794,7 +7794,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, Weapo
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty eProperty, float& fData)
+bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty::Enum eProperty, float& fData)
 {
     if (pWeapon)
     {
@@ -7817,7 +7817,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(CClientWeapon* pWeapon, Weapo
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty eProperty, short sData)
+bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty::Enum eProperty, short sData)
 {
     if (pWeapon)
     {
@@ -7830,7 +7830,7 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, Weapo
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty eProperty, const CVector& vecData)
+bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty::Enum eProperty, const CVector& vecData)
 {
     if (pWeapon)
     {
@@ -7845,7 +7845,7 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, Weapo
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty eProperty, float fData)
+bool CStaticFunctionDefinitions::SetWeaponProperty(CClientWeapon* pWeapon, WeaponProperty::Enum eProperty, float fData)
 {
     if (pWeapon)
     {
@@ -8126,9 +8126,9 @@ bool CStaticFunctionDefinitions::FxAddFootSplash(CVector& vecPosition)
     return true;
 }
 
-bool CStaticFunctionDefinitions::FxCreateParticle(FxParticleSystems eFxParticle, CVector& vecPosition, CVector& vecDirection, float fR, float fG, float fB,
-                                                  float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes,
-                                                  float fLife)
+bool CStaticFunctionDefinitions::FxCreateParticle(FxParticleSystems::Enum eFxParticle, CVector& vecPosition, CVector& vecDirection, float fR, float fG,
+                                                  float fB, float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize,
+                                                  bool bRandomizeSizes, float fLife)
 {
     g_pGame->GetFx()->AddParticle(eFxParticle, vecPosition, vecDirection, fR, fG, fB, fA, bRandomizeColors, iCount, fBrightness, fSize, bRandomizeSizes, fLife);
     return true;
@@ -8648,7 +8648,7 @@ SString CStaticFunctionDefinitions::GetVersionSortable()
 }
 
 /* Handling functions */
-bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, unsigned int uiValue)
+bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty::Enum eProperty, unsigned int uiValue)
 {
     if (pEntry)
     {
@@ -8691,7 +8691,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, Handli
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, unsigned char ucValue)
+bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty::Enum eProperty, unsigned char ucValue)
 {
     if (pEntry)
     {
@@ -8727,7 +8727,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, Handli
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, float fValue)
+bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty::Enum eProperty, float fValue)
 {
     if (pEntry)
     {
@@ -8942,7 +8942,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, Handli
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, CVector vecValue)
+bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty::Enum eProperty, CVector vecValue)
 {
     if (pEntry)
     {
@@ -8959,7 +8959,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, Handli
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, std::string strValue)
+bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, HandlingProperty::Enum eProperty, std::string strValue)
 {
     if (pEntry)
     {
@@ -9075,7 +9075,7 @@ bool CStaticFunctionDefinitions::SetEntryHandling(CHandlingEntry* pEntry, Handli
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, unsigned char ucValue)
+bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty::Enum eProperty, unsigned char ucValue)
 {
     assert(pVehicle);
 
@@ -9092,7 +9092,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, Ha
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, unsigned int uiValue)
+bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty::Enum eProperty, unsigned int uiValue)
 {
     assert(pVehicle);
 
@@ -9109,7 +9109,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, Ha
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, float fValue)
+bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty::Enum eProperty, float fValue)
 {
     assert(pVehicle);
 
@@ -9126,7 +9126,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, Ha
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, std::string strValue)
+bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty::Enum eProperty, std::string strValue)
 {
     assert(pVehicle);
 
@@ -9143,7 +9143,7 @@ bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, Ha
     return false;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, CVector vecValue)
+bool CStaticFunctionDefinitions::SetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty::Enum eProperty, CVector vecValue)
 {
     assert(pVehicle);
 
@@ -9216,7 +9216,7 @@ bool CStaticFunctionDefinitions::ResetVehicleHandling(CClientVehicle* pVehicle)
     return true;
 }
 
-bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CClientVehicle* pVehicle, HandlingProperty eProperty)
+bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CClientVehicle* pVehicle, HandlingProperty::Enum eProperty)
 {
     assert(pVehicle);
 
@@ -9268,9 +9268,9 @@ bool CStaticFunctionDefinitions::ResetVehicleHandlingProperty(CClientVehicle* pV
     return false;
 }
 
-HandlingProperty CStaticFunctionDefinitions::GetVehicleHandlingEnum(std::string strProperty)
+HandlingProperty::Enum CStaticFunctionDefinitions::GetVehicleHandlingEnum(std::string strProperty)
 {
-    HandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
+    HandlingProperty::Enum eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
     if (eProperty > HandlingProperty::HANDLING_NONE)
     {
         return eProperty;
@@ -9278,7 +9278,7 @@ HandlingProperty CStaticFunctionDefinitions::GetVehicleHandlingEnum(std::string 
     return HandlingProperty::HANDLING_MAX;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, CVector& vecValue)
+bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty::Enum eProperty, CVector& vecValue)
 {
     assert(pVehicle);
 
@@ -9291,7 +9291,7 @@ bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, Ha
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, float& fValue)
+bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty::Enum eProperty, float& fValue)
 {
     assert(pVehicle);
 
@@ -9304,7 +9304,7 @@ bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, Ha
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, std::string& strValue)
+bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty::Enum eProperty, std::string& strValue)
 {
     assert(pVehicle);
 
@@ -9317,7 +9317,7 @@ bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, Ha
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, unsigned int& uiValue)
+bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty::Enum eProperty, unsigned int& uiValue)
 {
     assert(pVehicle);
 
@@ -9329,7 +9329,7 @@ bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, Ha
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty eProperty, unsigned char& ucValue)
+bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, HandlingProperty::Enum eProperty, unsigned char& ucValue)
 {
     assert(pVehicle);
 
@@ -9341,7 +9341,7 @@ bool CStaticFunctionDefinitions::GetVehicleHandling(CClientVehicle* pVehicle, Ha
     return false;
 }
 
-bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, float& fValue)
+bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty::Enum eProperty, float& fValue)
 {
     if (pEntry)
     {
@@ -9420,7 +9420,7 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, Handli
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, unsigned int& uiValue)
+bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty::Enum eProperty, unsigned int& uiValue)
 {
     if (pEntry)
     {
@@ -9445,7 +9445,7 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, Handli
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, unsigned char& ucValue)
+bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty::Enum eProperty, unsigned char& ucValue)
 {
     if (pEntry)
     {
@@ -9464,7 +9464,7 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, Handli
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, CVector& vecValue)
+bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty::Enum eProperty, CVector& vecValue)
 {
     if (pEntry)
     {
@@ -9483,7 +9483,7 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, Handli
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty eProperty, std::string& strValue)
+bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, HandlingProperty::Enum eProperty, std::string& strValue)
 {
     if (pEntry)
     {
@@ -9555,7 +9555,7 @@ bool CStaticFunctionDefinitions::GetEntryHandling(CHandlingEntry* pEntry, Handli
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float& fData)
+bool CStaticFunctionDefinitions::GetWeaponProperty(WeaponProperty::Enum eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float& fData)
 {
     if (eProperty == WeaponProperty::WEAPON_INVALID_PROPERTY)
         return false;
@@ -9660,7 +9660,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(WeaponProperty eProperty, eWe
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int& sData)
+bool CStaticFunctionDefinitions::GetWeaponProperty(WeaponProperty::Enum eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int& sData)
 {
     if (eProperty == WeaponProperty::WEAPON_INVALID_PROPERTY)
         return false;
@@ -9741,7 +9741,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(WeaponProperty eProperty, eWe
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponProperty(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector& vecData)
+bool CStaticFunctionDefinitions::GetWeaponProperty(WeaponProperty::Enum eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector& vecData)
 {
     if (eProperty == WeaponProperty::WEAPON_INVALID_PROPERTY)
         return false;
@@ -9766,7 +9766,7 @@ bool CStaticFunctionDefinitions::GetWeaponProperty(WeaponProperty eProperty, eWe
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetWeaponPropertyFlag(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable)
+bool CStaticFunctionDefinitions::GetWeaponPropertyFlag(WeaponProperty::Enum eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable)
 {
     CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetWeaponStats(eWeapon, eSkillLevel);
     if (!pWeaponInfo)
@@ -9782,7 +9782,7 @@ bool CStaticFunctionDefinitions::GetWeaponPropertyFlag(WeaponProperty eProperty,
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float& fData)
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(WeaponProperty::Enum eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, float& fData)
 {
     if (eProperty == WeaponProperty::WEAPON_INVALID_PROPERTY)
         return false;
@@ -9888,7 +9888,7 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(WeaponProperty ePrope
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int& sData)
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(WeaponProperty::Enum eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, int& sData)
 {
     if (eProperty == WeaponProperty::WEAPON_INVALID_PROPERTY)
         return false;
@@ -9969,7 +9969,7 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(WeaponProperty ePrope
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector& vecData)
+bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(WeaponProperty::Enum eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, CVector& vecData)
 {
     if (eProperty == WeaponProperty::WEAPON_INVALID_PROPERTY)
         return false;
@@ -9994,7 +9994,7 @@ bool CStaticFunctionDefinitions::GetOriginalWeaponProperty(WeaponProperty ePrope
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetOriginalWeaponPropertyFlag(WeaponProperty eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable)
+bool CStaticFunctionDefinitions::GetOriginalWeaponPropertyFlag(WeaponProperty::Enum eProperty, eWeaponType eWeapon, eWeaponSkill eSkillLevel, bool& bEnable)
 {
     CWeaponStat* pWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(eWeapon, eSkillLevel);
     if (!pWeaponInfo)

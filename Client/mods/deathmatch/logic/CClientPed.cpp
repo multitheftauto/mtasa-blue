@@ -1194,7 +1194,7 @@ CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClos
             continue;
 
         // Should we take the position from the closest door instead of center of vehicle
-        if (bGetPositionFromClosestDoor && static_cast<VehicleType>(pTempVehicle->GetModel()) != VehicleType::VT_RCBARON)
+        if (bGetPositionFromClosestDoor && static_cast<VehicleType::Enum>(pTempVehicle->GetModel()) != VehicleType::VT_RCBARON)
         {
             // Get the closest front-door
             CVector vecFrontPos;
@@ -1692,11 +1692,8 @@ bool CClientPed::IsVisible()
 
 void CClientPed::SetVisible(bool bVisible)
 {
-    if (m_pPlayerPed)
-    {
-        m_pPlayerPed->SetVisible(bVisible);
-    }
     m_bVisible = bVisible;
+    UpdateAlphaAndVisibility();
 }
 
 bool CClientPed::GetUsesCollision()
@@ -2973,14 +2970,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         if (m_pAnimationBlock && m_bisCurrentAnimationCustom)
             UpdateCustomPartialAnimationBones();
 
-        // Update our alpha
-        unsigned char ucAlpha = m_ucAlpha;
-        // Are we in a different interior to the camera? set our alpha to 0
-        if (m_ucInterior != g_pGame->GetWorld()->GetCurrentArea())
-            ucAlpha = 0;
-        RpClump* pClump = m_pPlayerPed->GetRpClump();
-        if (pClump)
-            g_pGame->GetVisibilityPlugins()->SetClumpAlpha(pClump, ucAlpha);
+        UpdateAlphaAndVisibility();
 
         // Grab our current position
         CVector vecPosition = *m_pPlayerPed->GetPosition();
@@ -4615,7 +4605,7 @@ void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, 
     CTask* pTask = 0;
     if (m_pTaskManager)
         pTask = m_pTaskManager->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
-    auto usVehicleModel = static_cast<VehicleType>(pVehicle->GetModel());
+    auto usVehicleModel = static_cast<VehicleType::Enum>(pVehicle->GetModel());
     if (((pTask && pTask->GetTaskType() == TASK_COMPLEX_IN_WATER) || pVehicle->IsOnWater()) &&
         (usVehicleModel == VehicleType::VT_SKIMMER || usVehicleModel == VehicleType::VT_SEASPAR || usVehicleModel == VehicleType::VT_LEVIATHN ||
          usVehicleModel == VehicleType::VT_VORTEX))
@@ -5356,14 +5346,25 @@ float CClientPed::GetDistanceFromCentreOfMassToBaseOfModel()
 
 void CClientPed::SetAlpha(unsigned char ucAlpha)
 {
-    /* Handled in ::StreamedInPulse
-    if ( m_pPlayerPed )
-    {
-        RpClump * pClump = m_pPlayerPed->GetRpClump ();
-        if ( pClump ) g_pGame->GetVisibilityPlugins ()->SetClumpAlpha ( pClump, ucAlpha );
-    }
-    */
     m_ucAlpha = ucAlpha;
+    UpdateAlphaAndVisibility();
+}
+
+void CClientPed::UpdateAlphaAndVisibility()
+{
+    if (!m_pPlayerPed)
+        return;
+
+    unsigned char effectiveAlpha = m_ucAlpha;
+    if (m_ucInterior != g_pGame->GetWorld()->GetCurrentArea())
+        effectiveAlpha = 0;
+
+    if (RpClump* clump = m_pPlayerPed->GetRpClump())
+        g_pGame->GetVisibilityPlugins()->SetClumpAlpha(clump, effectiveAlpha);
+
+    // GTA decides whether to create ped shadows from its visibility flag, not
+    // the RenderWare clump alpha. Keep both states aligned at zero alpha.
+    m_pPlayerPed->SetVisible(m_bVisible && effectiveAlpha != 0);
 }
 
 void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCameraCut)
@@ -6751,7 +6752,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger, std::op
         return false;
 
     // Stop if the ped is swimming and the vehicle model cannot be entered from water (fixes #1990)
-    auto vehicleModel = static_cast<VehicleType>(pVehicle->GetModel());
+    auto vehicleModel = static_cast<VehicleType::Enum>(pVehicle->GetModel());
 
     if (IsInWater() && !(vehicleModel == VehicleType::VT_SKIMMER || vehicleModel == VehicleType::VT_SEASPAR || vehicleModel == VehicleType::VT_LEVIATHN ||
                          vehicleModel == VehicleType::VT_VORTEX))

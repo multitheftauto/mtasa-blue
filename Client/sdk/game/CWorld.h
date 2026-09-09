@@ -103,6 +103,7 @@ enum eDebugCaller
     CBuilding_SetLod,
     CDummyPool_Constructor,
     CDummyPool_Destructor,
+    BuildingRemovalRestoreBackup,
 };
 
 enum eSurfaceProperties
