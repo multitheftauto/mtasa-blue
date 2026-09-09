@@ -5024,6 +5024,7 @@ void CSettings::SaveChatSettings()
     SaveChatColor(Chat::ColorType::TEXT, "chat_text_color");
     SaveChatColor(Chat::ColorType::INPUT_BG, "chat_input_color");
     SaveChatColor(Chat::ColorType::INPUT_TEXT, "chat_input_text_color");
+
     for (int iFont = 0; iFont < Chat::Font::MAX; iFont++)
     {
         if (m_pRadioChatFont[iFont]->GetSelected())
@@ -5035,6 +5036,7 @@ void CSettings::SaveChatSettings()
 
     SString strVar = m_pChatScaleX->GetText() + " " + m_pChatScaleY->GetText();
     CVARS_SET("chat_scale", strVar);
+
     CVARS_SET("chat_lines", m_pChatLines->GetText());
     CVARS_SET("chat_width", m_pChatWidth->GetText());
     CVARS_SET("chat_css_style_text", m_pChatCssText->GetSelected());
@@ -5089,7 +5091,9 @@ bool CSettings::OnChatHorizontalComboChanged(CGUIElement* pElement)
 {
     if (CGUIListItem* pSelected = m_pChatHorizontalCombo->GetSelectedItem())
         m_iChatHorizontalValue = static_cast<int>(reinterpret_cast<uintptr_t>(pSelected->GetData()));
+
     LiveUpdateChatSettings();
+
     return true;
 }
 
@@ -5097,7 +5101,9 @@ bool CSettings::OnChatVerticalComboChanged(CGUIElement* pElement)
 {
     if (CGUIListItem* pSelected = m_pChatVerticalCombo->GetSelectedItem())
         m_iChatVerticalValue = static_cast<int>(reinterpret_cast<uintptr_t>(pSelected->GetData()));
+
     LiveUpdateChatSettings();
+
     return true;
 }
 
@@ -5105,13 +5111,16 @@ bool CSettings::OnChatTextAlignComboChanged(CGUIElement* pElement)
 {
     if (CGUIListItem* pSelected = m_pChatTextAlignCombo->GetSelectedItem())
         m_iChatTextAlignValue = static_cast<int>(reinterpret_cast<uintptr_t>(pSelected->GetData()));
+
     LiveUpdateChatSettings();
+
     return true;
 }
 
 void CSettings::LiveUpdateChatSettings()
 {
     SString strSignature = GetChatSettingsSignature();
+
     if (strSignature != m_strChatSettingsSignature)
     {
         m_strChatSettingsSignature = strSignature;
@@ -5122,6 +5131,7 @@ void CSettings::LiveUpdateChatSettings()
 void CSettings::SnapshotChatSettings()
 {
     std::string strVar;
+
     CVARS_GET("chat_color", strVar);
     m_strOldChatColor = strVar;
     CVARS_GET("chat_text_color", strVar);

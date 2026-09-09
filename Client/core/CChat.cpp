@@ -189,9 +189,12 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline, const CRect2D* pClip
     }
 
     bool bUsingOutline = m_bTextBlackOutline && bAllowOutline && bUseCacheTexture;
+
     if (pClipRect)
         SetScissor(true, pClipRect);
+
     DrawInputLine(bUsingOutline);
+
     if (pClipRect)
         SetScissor(false, nullptr);
 
@@ -211,9 +214,12 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline, const CRect2D* pClip
     // Get drawList for the chat box text. The background box is rendered inside GetDrawList, so it must be scissored as well, otherwise it would cover the
     // settings window and the text drawn by the other clipped draw calls
     SDrawList drawList;
+
     if (pClipRect)
         SetScissor(true, pClipRect);
+
     GetDrawList(drawList, bUsingOutline);
+
     if (pClipRect)
         SetScissor(false, nullptr);
 
@@ -228,9 +234,12 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline, const CRect2D* pClip
     {
         if (pClipRect)
             SetScissor(true, pClipRect);
+
         DrawDrawList(drawList, chatTopLeft);
+
         if (pClipRect)
             SetScissor(false, nullptr);
+
         return;
     }
 
@@ -270,11 +279,15 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline, const CRect2D* pClip
     if (!m_pCacheTexture)
     {
         drawList.bOutline = false;  // Outline too slow without cache texture
+
         if (pClipRect)
             SetScissor(true, pClipRect);
+
         DrawDrawList(drawList, chatTopLeft);
+
         if (pClipRect)
             SetScissor(false, nullptr);
+
         return;
     }
 
@@ -904,6 +917,7 @@ void CChat::SetInputVisible(bool bVisible)
 void CChat::SetInputPreview(const char* szText)
 {
     m_bInputPreview = (szText != nullptr);
+
     if (m_bInputPreview)
         SetInputText(szText);
     else
