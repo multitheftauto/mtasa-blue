@@ -87,9 +87,9 @@ public:
     LUA_DECLARE(ToggleAllControls);
 
     // Audio funcs
-    static bool PlaySoundFrontEnd(CElement* element, unsigned char sound);
-    LUA_DECLARE(PlayMissionAudio);
-    LUA_DECLARE(PreloadMissionAudio);
+    static bool PlaySoundFrontEnd(CPlayer* element, std::uint8_t sound);
+    static bool PlayMissionAudio(CPlayer* player, std::uint16_t slot);
+    static bool PreloadMissionAudio(CPlayer* player, std::uint16_t sound, std::uint16_t slot);
 
     // Cursor funcs
     LUA_DECLARE(IsCursorShowing);

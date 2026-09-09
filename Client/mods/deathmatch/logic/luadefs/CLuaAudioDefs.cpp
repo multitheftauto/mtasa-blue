@@ -12,10 +12,16 @@
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 #include "CBassAudio.h"
-#include <cmath>
 
-static bool IsValidFFTBandCount(int length, int bands)
+#include <array>
+#include <cctype>
+#include <cmath>
+#include <memory>
+#include <ranges>
+
+static bool IsValidFFTBandCount(int length, int bands) noexcept
 {
+    // BASS provides iLength / 2 spectrum values, so additional bands cannot be populated without reading beyond the FFT data.
     return bands >= 0 && bands <= length / 2;
 }
 
@@ -24,14 +30,14 @@ static float* ProcessFFTData(float* data, int length, int bands)
     if (bands == 0 || data == nullptr)
         return data;
 
-    float* newData = new float[bands];
-    int    bandCounter = 0;
+    std::unique_ptr<float[]> newData = std::make_unique<float[]>(bands);
+    int                      bandCounter = 0;
     bands--;
     for (int x = 0; x <= bands; x++)
     {
         float peak = 0.0;
 
-        double bandRange = pow(2, x * 10.0 / bands);
+        double bandRange = std::pow(2.0, x * 10.0 / bands);
 
         if (bandRange > (length / 2) - 1)
             bandRange = (length / 2) - 1;
@@ -50,37 +56,39 @@ static float* ProcessFFTData(float* data, int length, int bands)
         }
     }
     delete[] data;
-    return newData;
+    return newData.release();
 }
 
 std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, const std::string path, std::optional<bool> loop, std::optional<bool> throttle)
 {
-    CResource* pResource = &lua_getownerresource(luaVM);
+    CResource* resource = &lua_getownerresource(luaVM);
 
     std::string soundPath = path;
     std::string filename;
     bool        isURL = false;
     bool        isRawData = false;
 
-    if (CResourceManager::ParseResourcePathInput(soundPath, pResource, &filename, nullptr, true))
+    if (CResourceManager::ParseResourcePathInput(soundPath, resource, &filename, nullptr, true))
         soundPath = filename;
     else
     {
-        if ((stricmp(soundPath.substr(0, 4).c_str(), "http") == 0 || stricmp(soundPath.substr(0, 3).c_str(), "ftp") == 0) &&
+        const auto ToLower = [](char c) { return std::tolower(static_cast<unsigned char>(c)); };
+        if ((std::ranges::equal(soundPath | std::views::take(4), std::string_view{"http"}, {}, ToLower, ToLower) ||
+             std::ranges::equal(soundPath | std::views::take(3), std::string_view{"ftp"}, {}, ToLower, ToLower)) &&
             (soundPath.length() <= 2048 || soundPath.find('\n') == std::string::npos))
             isURL = true;
         else
             isRawData = true;
     }
 
-    // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
+    // ParseResourcePathInput changes resource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
     // ) Fixes #6507 - Caz
-    if (pResource)
+    if (resource)
     {
         CClientSound* sound = m_pManager->GetSoundManager()->PlaySound2D(soundPath, isURL, isRawData, loop.value_or(false), throttle.value_or(true));
         if (sound)
         {
-            sound->SetParent(pResource->GetResourceDynamicEntity());
+            sound->SetParent(resource->GetResourceDynamicEntity());
 
             // call onClientSoundStarted
             CLuaArguments Arguments;
@@ -94,36 +102,37 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, con
     return false;
 }
 
-std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, const std::string path, CVector vecPosition, std::optional<bool> loop,
+std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, const std::string path, CVector position, std::optional<bool> loop,
                                                              std::optional<bool> throttle)
 {
-    CResource* pResource = &lua_getownerresource(luaVM);
+    CResource* resource = &lua_getownerresource(luaVM);
 
     std::string soundPath = path;
     std::string filename;
     bool        isURL = false;
     bool        isRawData = false;
 
-    if (CResourceManager::ParseResourcePathInput(soundPath, pResource, &filename, nullptr, true))
+    if (CResourceManager::ParseResourcePathInput(soundPath, resource, &filename, nullptr, true))
         soundPath = filename;
     else
     {
-        if ((stricmp(soundPath.substr(0, 4).c_str(), "http") == 0 || stricmp(soundPath.substr(0, 3).c_str(), "ftp") == 0) &&
+        const auto ToLower = [](char c) { return std::tolower(static_cast<unsigned char>(c)); };
+        if ((std::ranges::equal(soundPath | std::views::take(4), std::string_view{"http"}, {}, ToLower, ToLower) ||
+             std::ranges::equal(soundPath | std::views::take(3), std::string_view{"ftp"}, {}, ToLower, ToLower)) &&
             (soundPath.length() <= 2048 || soundPath.find('\n') == std::string::npos))
             isURL = true;
         else
             isRawData = true;
     }
 
-    // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
+    // ParseResourcePathInput changes resource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
     // ) Fixes #6507 - Caz
-    if (pResource)
+    if (resource)
     {
-        CClientSound* sound =
-            m_pManager->GetSoundManager()->PlaySound3D(soundPath, isURL, isRawData, vecPosition, loop.value_or(false), throttle.value_or(true));
+        CClientSound* sound = m_pManager->GetSoundManager()->PlaySound3D(soundPath, isURL, isRawData, position, loop.value_or(false), throttle.value_or(true));
         if (sound)
         {
-            sound->SetParent(pResource->GetResourceDynamicEntity());
+            sound->SetParent(resource->GetResourceDynamicEntity());
 
             // call onClientSoundStarted
             CLuaArguments Arguments;
@@ -148,9 +157,9 @@ bool CLuaAudioDefs::StopSound(CClientSound* sound)
 
 bool CLuaAudioDefs::SetSoundPosition(std::variant<CClientSound*, CClientPlayer*> sound, double position)
 {
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
         return (*soundElement)->SetPlayPosition(position);
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice)
@@ -164,9 +173,9 @@ bool CLuaAudioDefs::SetSoundPosition(std::variant<CClientSound*, CClientPlayer*>
 
 std::variant<double, bool> CLuaAudioDefs::GetSoundPosition(std::variant<CClientSound*, CClientPlayer*> sound)
 {
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
         return (*soundElement)->GetPlayPosition();
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice)
@@ -177,9 +186,9 @@ std::variant<double, bool> CLuaAudioDefs::GetSoundPosition(std::variant<CClientS
 
 std::variant<double, bool> CLuaAudioDefs::GetSoundLength(std::variant<CClientSound*, CClientPlayer*> sound)
 {
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
         return (*soundElement)->GetLength();
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice)
@@ -190,9 +199,7 @@ std::variant<double, bool> CLuaAudioDefs::GetSoundLength(std::variant<CClientSou
 
 std::variant<double, bool> CLuaAudioDefs::GetSoundBufferLength(CClientSound* sound)
 {
-    if (sound->IsSoundStream())
-        return sound->GetBufferLength();
-    return false;
+    return sound->IsSoundStream() ? sound->GetBufferLength() : false;
 }
 
 bool CLuaAudioDefs::SetSoundLooped(CClientSound* sound, bool loop)
@@ -200,19 +207,19 @@ bool CLuaAudioDefs::SetSoundLooped(CClientSound* sound, bool loop)
     return sound->SetLooped(loop);
 }
 
-bool CLuaAudioDefs::IsSoundLooped(CClientSound* sound)
+bool CLuaAudioDefs::IsSoundLooped(CClientSound* sound) noexcept
 {
     return sound->IsLooped();
 }
 
 bool CLuaAudioDefs::SetSoundPaused(std::variant<CClientSound*, CClientPlayer*> sound, bool paused)
 {
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
     {
         (*soundElement)->SetPaused(paused);
         return true;
     }
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice)
@@ -224,11 +231,11 @@ bool CLuaAudioDefs::SetSoundPaused(std::variant<CClientSound*, CClientPlayer*> s
     return false;
 }
 
-bool CLuaAudioDefs::IsSoundPaused(std::variant<CClientSound*, CClientPlayer*> sound)
+bool CLuaAudioDefs::IsSoundPaused(std::variant<CClientSound*, CClientPlayer*> sound) noexcept
 {
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
         return (*soundElement)->IsPaused();
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice)
@@ -239,12 +246,12 @@ bool CLuaAudioDefs::IsSoundPaused(std::variant<CClientSound*, CClientPlayer*> so
 
 bool CLuaAudioDefs::SetSoundVolume(std::variant<CClientSound*, CClientPlayer*> sound, float volume)
 {
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
     {
         (*soundElement)->SetVolume(volume);
         return true;
     }
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice)
@@ -256,11 +263,11 @@ bool CLuaAudioDefs::SetSoundVolume(std::variant<CClientSound*, CClientPlayer*> s
     return false;
 }
 
-std::variant<float, bool> CLuaAudioDefs::GetSoundVolume(std::variant<CClientSound*, CClientPlayer*> sound)
+std::variant<float, bool> CLuaAudioDefs::GetSoundVolume(std::variant<CClientSound*, CClientPlayer*> sound) noexcept
 {
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
         return (*soundElement)->GetVolume();
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice)
@@ -271,12 +278,12 @@ std::variant<float, bool> CLuaAudioDefs::GetSoundVolume(std::variant<CClientSoun
 
 bool CLuaAudioDefs::SetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> sound, float speed)
 {
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
     {
         (*soundElement)->SetPlaybackSpeed(speed);
         return true;
     }
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice)
@@ -299,7 +306,7 @@ bool CLuaAudioDefs::SetSoundProperties(CClientSound* sound, float sampleRate, fl
     return false;
 }
 
-auto CLuaAudioDefs::GetSoundProperties(CClientSound* sound)
+auto CLuaAudioDefs::GetSoundProperties(CClientSound* sound) noexcept
 {
     float sampleRate = 0.0f, tempo = 0.0f, pitch = 0.0f;
     bool  reversed = false;
@@ -315,9 +322,9 @@ auto CLuaAudioDefs::GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*> 
         return ResultType{false};
 
     float* fftData = nullptr;
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
         fftData = (*soundElement)->GetFFTData(length);
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice && voice->IsActive())
@@ -344,16 +351,14 @@ auto CLuaAudioDefs::GetSoundWaveData(std::variant<CClientSound*, CClientPlayer*>
     using ResultType = std::variant<std::unordered_map<int, float>, bool>;
 
     float* waveData = nullptr;
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
         waveData = (*soundElement)->GetWaveData(length);
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice && voice->IsActive())
             waveData = voice->GetWaveData(length);
     }
-    else
-        return ResultType{false};
 
     if (!waveData)
         return ResultType{false};
@@ -371,20 +376,20 @@ auto CLuaAudioDefs::GetSoundLevelData(std::variant<CClientSound*, CClientPlayer*
 {
     using ResultType = std::variant<CLuaMultiReturn<std::uint32_t, std::uint32_t>, bool>;
 
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
     {
         std::uint32_t levelData = (*soundElement)->GetLevelData();
         if (levelData != 0)
-            return ResultType{CLuaMultiReturn<std::uint32_t, std::uint32_t>{levelData & 0xFFFF, levelData >> 16}};
+            return ResultType{CLuaMultiReturn<std::uint32_t, std::uint32_t>{LOWORD(levelData), HIWORD(levelData)}};
     }
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice && voice->IsActive())
         {
             std::uint32_t levelData = voice->GetLevelData();
             if (levelData != 0)
-                return ResultType{CLuaMultiReturn<std::uint32_t, std::uint32_t>{levelData & 0xFFFF, levelData >> 16}};
+                return ResultType{CLuaMultiReturn<std::uint32_t, std::uint32_t>{LOWORD(levelData), HIWORD(levelData)}};
         }
     }
     return ResultType{false};
@@ -393,26 +398,24 @@ auto CLuaAudioDefs::GetSoundLevelData(std::variant<CClientSound*, CClientPlayer*
 std::variant<float, bool> CLuaAudioDefs::GetSoundBPM(CClientSound* sound)
 {
     float bpm = sound->GetSoundBPM();
-    if (bpm != 0.0f)
-        return bpm;
-    return false;
+    return bpm != 0.0f ? bpm : false;
 }
 
-bool CLuaAudioDefs::SetSoundPanEnabled(CClientSound* sound, bool enabled)
+bool CLuaAudioDefs::SetSoundPanEnabled(CClientSound* sound, bool enabled) noexcept
 {
     return sound->SetPanEnabled(enabled);
 }
 
-bool CLuaAudioDefs::IsSoundPanEnabled(CClientSound* sound)
+bool CLuaAudioDefs::IsSoundPanEnabled(CClientSound* sound) noexcept
 {
     return sound->IsPanEnabled();
 }
 
-std::variant<float, bool> CLuaAudioDefs::GetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> sound)
+std::variant<float, bool> CLuaAudioDefs::GetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> sound) noexcept
 {
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
         return (*soundElement)->GetPlaybackSpeed();
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice)
@@ -421,13 +424,13 @@ std::variant<float, bool> CLuaAudioDefs::GetSoundSpeed(std::variant<CClientSound
     return false;
 }
 
-bool CLuaAudioDefs::SetSoundMinDistance(CClientSound* sound, float distance)
+bool CLuaAudioDefs::SetSoundMinDistance(CClientSound* sound, float distance) noexcept
 {
     sound->SetMinDistance(distance);
     return true;
 }
 
-std::variant<float, bool> CLuaAudioDefs::GetSoundMinDistance(CClientSound* sound)
+std::variant<float, bool> CLuaAudioDefs::GetSoundMinDistance(CClientSound* sound) noexcept
 {
     return sound->GetMinDistance();
 }
@@ -438,7 +441,7 @@ bool CLuaAudioDefs::SetSoundMaxDistance(CClientSound* sound, float distance)
     return true;
 }
 
-std::variant<float, bool> CLuaAudioDefs::GetSoundMaxDistance(CClientSound* sound)
+std::variant<float, bool> CLuaAudioDefs::GetSoundMaxDistance(CClientSound* sound) noexcept
 {
     return sound->GetMaxDistance();
 }
@@ -449,7 +452,7 @@ auto CLuaAudioDefs::GetSoundMetaTags(CClientSound* sound, std::optional<std::str
 
     if (format.has_value() && !format.value().empty())
     {
-        std::string metaTags = sound->GetMetaTags(SString(format.value()));
+        std::string metaTags = sound->GetMetaTags(format.value());
         if (!metaTags.empty())
             return ResultType{metaTags};
         return ResultType{false};
@@ -460,7 +463,7 @@ auto CLuaAudioDefs::GetSoundMetaTags(CClientSound* sound, std::optional<std::str
     {
         std::string metaTags = sound->GetMetaTags(tagFormat);
         if (!metaTags.empty())
-            tags.emplace(key, metaTags);
+            tags.emplace(key, std::move(metaTags));
     };
     AddTag("%TITL", "title");
     AddTag("%ARTI", "artist");
@@ -482,9 +485,9 @@ bool CLuaAudioDefs::SetSoundEffectEnabled(std::variant<CClientSound*, CClientPla
 {
     int fxEffect = m_pManager->GetSoundManager()->GetFxEffectFromName(effectName);
 
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
         return fxEffect >= 0 && (*soundElement)->SetFxEffect(fxEffect, enable.value_or(false));
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         return voice && fxEffect >= 0 && voice->SetFxEffect(fxEffect, enable.value_or(false));
@@ -497,21 +500,21 @@ auto CLuaAudioDefs::GetSoundEffects(std::variant<CClientSound*, CClientPlayer*> 
     using ResultType = std::variant<std::unordered_map<std::string, bool>, bool>;
 
     std::unordered_map<std::string, bool> result;
-    const std::map<std::string, int>      iFxEffects = m_pManager->GetSoundManager()->GetFxEffects();
+    const std::map<std::string, int>&     fxEffects = m_pManager->GetSoundManager()->GetFxEffects();
 
-    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
     {
-        for (const auto& [name, iFxEffect] : iFxEffects)
-            result.emplace(name, (*pSound)->IsFxEffectEnabled(iFxEffect));
+        for (const auto& [name, fxEffect] : fxEffects)
+            result.emplace(name, (*soundElement)->IsFxEffectEnabled(fxEffect));
         return ResultType{result};
     }
-    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
-        CClientPlayerVoice* pPlayerVoice = (*pPlayer)->GetVoice();
-        if (!pPlayerVoice)
+        CClientPlayerVoice* playerVoice = (*player)->GetVoice();
+        if (!playerVoice)
             return ResultType{false};
-        for (const auto& [name, iFxEffect] : iFxEffects)
-            result.emplace(name, pPlayerVoice->IsFxEffectEnabled(iFxEffect));
+        for (const auto& [name, fxEffect] : fxEffects)
+            result.emplace(name, playerVoice->IsFxEffectEnabled(fxEffect));
         return ResultType{result};
     }
     return ResultType{false};
@@ -519,51 +522,49 @@ auto CLuaAudioDefs::GetSoundEffects(std::variant<CClientSound*, CClientPlayer*> 
 
 // This wrapper eliminates the need in additional methods inside CClientPlayer.
 // It doesn't look right to put them there.
-struct SPlayerVoiceWrapper
+struct PlayerVoiceWrapper
 {
-    CClientPlayer* pPlayer{};
+    CClientPlayer* player{};
 
-    bool IsFxEffectEnabled(std::uint32_t uiFxEffect)
+    bool IsFxEffectEnabled(std::uint32_t fxEffect)
     {
-        CClientPlayerVoice* pVoice = pPlayer->GetVoice();
-        return pVoice ? pVoice->IsFxEffectEnabled(uiFxEffect) : false;
+        CClientPlayerVoice* voice = player->GetVoice();
+        return voice ? voice->IsFxEffectEnabled(fxEffect) : false;
     }
 
-    bool SetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
+    bool SetFxEffectParameters(std::uint32_t fxEffect, void* params)
     {
-        CClientPlayerVoice* pVoice = pPlayer->GetVoice();
-        return pVoice ? pVoice->SetFxEffectParameters(uiFxEffect, params) : false;
+        CClientPlayerVoice* voice = player->GetVoice();
+        return voice ? voice->SetFxEffectParameters(fxEffect, params) : false;
     }
-    bool GetFxEffectParameters(std::uint32_t uiFxEffect, void* params)
+    bool GetFxEffectParameters(std::uint32_t fxEffect, void* params)
     {
-        CClientPlayerVoice* pVoice = pPlayer->GetVoice();
-        return pVoice ? pVoice->GetFxEffectParameters(uiFxEffect, params) : false;
+        CClientPlayerVoice* voice = player->GetVoice();
+        return voice ? voice->GetFxEffectParameters(fxEffect, params) : false;
     }
 };
 
-bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientPlayer*> sound, SoundEffectType::Enum eEffectType,
-                                            std::string strEffectParameter, std::variant<float, bool> value)
+bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientPlayer*> sound, SoundEffectType::Enum effectType, std::string effectParameter,
+                                            std::variant<float, bool> value)
 {
     //  bool setSoundEffectParameter ( sound/player sound, string effectName, string effectParameter, var effectParameterValue  )
-    CClientSound*       pSound = nullptr;
-    SPlayerVoiceWrapper playerVoice;
-    if (auto* pSoundPtr = std::get_if<CClientSound*>(&sound); pSoundPtr && *pSoundPtr)
-        pSound = *pSoundPtr;
-    else if (auto* pPlayerPtr = std::get_if<CClientPlayer*>(&sound); pPlayerPtr && *pPlayerPtr)
-        playerVoice.pPlayer = *pPlayerPtr;
-    else
-        return false;
+    CClientSound*      soundElement = nullptr;
+    PlayerVoiceWrapper playerVoice;
+    if (auto* soundPtr = std::get_if<CClientSound*>(&sound))
+        soundElement = *soundPtr;
+    else if (auto* playerPtr = std::get_if<CClientPlayer*>(&sound))
+        playerVoice.player = *playerPtr;
 
     // Call `SetFxEffectParameters` and log errors if any
-    const auto SetParamWithErrorLog = [&eEffectType](auto* pSound, auto effectParam, auto& params)
+    const auto SetParamWithErrorLog = [&effectType](auto* soundElement, auto effectParam, auto& params)
     {
         // Try setting parameter
-        if (pSound->SetFxEffectParameters((uint)eEffectType, &params))
+        if (soundElement->SetFxEffectParameters((uint)effectType, &params))
             return true;
 
         // Unsuccessful, log error. (Hard error on usage mistakes)
         // `luaL_error` with a format string straight out crashes, so we have to do it this way..
-        const SString msg("BASS Error %i, after setting parameter %s -> %s. (Message: %s)", CBassAudio::ErrorGetCode(), EnumToString(eEffectType).c_str(),
+        const SString msg("BASS Error %i, after setting parameter %s -> %s. (Message: %s)", CBassAudio::ErrorGetCode(), EnumToString(effectType).c_str(),
                           EnumToString(effectParam).c_str(), CBassAudio::ErrorGetMessage());
 
         // Do not use `luaL_error` here and pass in `msg` as the format string,
@@ -574,31 +575,31 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
 
     const auto ReadFloatValue = [&value](auto& out)
     {
-        if (auto* pValue = std::get_if<float>(&value))
+        if (auto* valuePtr = std::get_if<float>(&value))
         {
-            out = *pValue;
+            out = *valuePtr;
             return true;
         }
         return false;
     };
 
-    const auto ProcessSoundParams = [&](auto* pSound)
+    const auto ProcessSoundParams = [&](auto* soundElement)
     {
-        if (!pSound->IsFxEffectEnabled((std::uint32_t)eEffectType))
+        if (!soundElement->IsFxEffectEnabled((std::uint32_t)effectType))
             throw LuaFunctionError("Effect's parameters can't be set unless it's enabled");
 
         using namespace SoundEffectParams;
-        switch (eEffectType)
+        switch (effectType)
         {
             case SoundEffectType::FX_DX8_CHORUS:
             {
                 BASS_DX8_CHORUS params;
-                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
+                soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
-                Chorus eEffectParameter;
-                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                Chorus effectParameterType;
+                if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
-                switch (eEffectParameter)
+                switch (effectParameterType)
                 {
                     case Chorus::WET_DRY_MIX:
                     {
@@ -644,17 +645,17 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                     }
                 }
 
-                return SetParamWithErrorLog(pSound, eEffectParameter, params);
+                return SetParamWithErrorLog(soundElement, effectParameterType, params);
             }
             case SoundEffectType::FX_DX8_COMPRESSOR:
             {
                 BASS_DX8_COMPRESSOR params;
-                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
+                soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
-                Compressor eEffectParameter;
-                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                Compressor effectParameterType;
+                if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
-                switch (eEffectParameter)
+                switch (effectParameterType)
                 {
                     case Compressor::GAIN:
                     {
@@ -694,17 +695,17 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                     }
                 }
 
-                return SetParamWithErrorLog(pSound, eEffectParameter, params);
+                return SetParamWithErrorLog(soundElement, effectParameterType, params);
             }
             case SoundEffectType::FX_DX8_DISTORTION:
             {
                 BASS_DX8_DISTORTION params;
-                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
+                soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
-                Distortion eEffectParameter;
-                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                Distortion effectParameterType;
+                if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
-                switch (eEffectParameter)
+                switch (effectParameterType)
                 {
                     case Distortion::GAIN:
                     {
@@ -738,17 +739,17 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                     }
                 }
 
-                return SetParamWithErrorLog(pSound, eEffectParameter, params);
+                return SetParamWithErrorLog(soundElement, effectParameterType, params);
             }
             case SoundEffectType::FX_DX8_ECHO:
             {
                 BASS_DX8_ECHO params;
-                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
+                soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
-                Echo eEffectParameter;
-                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                Echo effectParameterType;
+                if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
-                switch (eEffectParameter)
+                switch (effectParameterType)
                 {
                     case Echo::WET_DRY_MIX:
                     {
@@ -776,25 +777,25 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                     }
                     case Echo::PAN_DELAY:
                     {
-                        if (auto* pValue = std::get_if<bool>(&value))
-                            params.lPanDelay = *pValue;
+                        if (auto* valuePtr = std::get_if<bool>(&value))
+                            params.lPanDelay = *valuePtr;
                         else
                             return false;
                         break;
                     }
                 }
 
-                return SetParamWithErrorLog(pSound, eEffectParameter, params);
+                return SetParamWithErrorLog(soundElement, effectParameterType, params);
             }
             case SoundEffectType::FX_DX8_FLANGER:
             {
                 BASS_DX8_FLANGER params;
-                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
+                soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
-                Flanger eEffectParameter;
-                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                Flanger effectParameterType;
+                if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
-                switch (eEffectParameter)
+                switch (effectParameterType)
                 {
                     case Flanger::WET_DRY_MIX:
                     {
@@ -840,17 +841,17 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                     }
                 }
 
-                return SetParamWithErrorLog(pSound, eEffectParameter, params);
+                return SetParamWithErrorLog(soundElement, effectParameterType, params);
             }
             case SoundEffectType::FX_DX8_GARGLE:
             {
                 BASS_DX8_GARGLE params;
-                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
+                soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
-                Gargle eEffectParameter;
-                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                Gargle effectParameterType;
+                if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
-                switch (eEffectParameter)
+                switch (effectParameterType)
                 {
                     case Gargle::RATE_HZ:
                     {
@@ -866,17 +867,17 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                     }
                 }
 
-                return SetParamWithErrorLog(pSound, eEffectParameter, params);
+                return SetParamWithErrorLog(soundElement, effectParameterType, params);
             }
             case SoundEffectType::FX_DX8_I3DL2REVERB:
             {
                 BASS_DX8_I3DL2REVERB params;
-                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
+                soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
-                I3DL2Reverb eEffectParameter;
-                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                I3DL2Reverb effectParameterType;
+                if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
-                switch (eEffectParameter)
+                switch (effectParameterType)
                 {
                     case I3DL2Reverb::ROOM:
                     {
@@ -952,17 +953,17 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                     }
                 }
 
-                return SetParamWithErrorLog(pSound, eEffectParameter, params);
+                return SetParamWithErrorLog(soundElement, effectParameterType, params);
             }
             case SoundEffectType::FX_DX8_PARAMEQ:
             {
                 BASS_DX8_PARAMEQ params;
-                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
+                soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
-                ParamEq eEffectParameter;
-                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                ParamEq effectParameterType;
+                if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
-                switch (eEffectParameter)
+                switch (effectParameterType)
                 {
                     case ParamEq::CENTER:
                     {
@@ -984,17 +985,17 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                     }
                 }
 
-                return SetParamWithErrorLog(pSound, eEffectParameter, params);
+                return SetParamWithErrorLog(soundElement, effectParameterType, params);
             }
             case SoundEffectType::FX_DX8_REVERB:
             {
                 BASS_DX8_REVERB params;
-                pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
+                soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
-                Reverb eEffectParameter;
-                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                Reverb effectParameterType;
+                if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
-                switch (eEffectParameter)
+                switch (effectParameterType)
                 {
                     case Reverb::IN_GAIN:
                     {
@@ -1022,51 +1023,52 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                     }
                 }
 
-                return SetParamWithErrorLog(pSound, eEffectParameter, params);
+                return SetParamWithErrorLog(soundElement, effectParameterType, params);
             }
         }
 
         return false;
     };
 
-    if (pSound)
-        return ProcessSoundParams(pSound);
+    if (soundElement)
+        return ProcessSoundParams(soundElement);
     else
         return ProcessSoundParams(&playerVoice);
 }
 
-auto CLuaAudioDefs::GetSoundEffectParameters(std::variant<CClientSound*, CClientPlayer*> sound, SoundEffectType::Enum eEffectType)
+auto CLuaAudioDefs::GetSoundEffectParameters(std::variant<CClientSound*, CClientPlayer*> sound, SoundEffectType::Enum effectType)
 {
     //  table getSoundEffectParameters ( sound/player sound, string effectName )
     using ResultType = std::variant<std::unordered_map<std::string, std::variant<float, int, bool>>, bool>;
 
-    CClientSound*       pSound = nullptr;
-    SPlayerVoiceWrapper playerVoice;
-    if (auto* pSoundPtr = std::get_if<CClientSound*>(&sound); pSoundPtr && *pSoundPtr)
-        pSound = *pSoundPtr;
-    else if (auto* pPlayerPtr = std::get_if<CClientPlayer*>(&sound); pPlayerPtr && *pPlayerPtr)
-        playerVoice.pPlayer = *pPlayerPtr;
-    else
-        return ResultType{false};
+    CClientSound*      soundElement = nullptr;
+    PlayerVoiceWrapper playerVoice;
+    if (auto* soundPtr = std::get_if<CClientSound*>(&sound))
+        soundElement = *soundPtr;
+    else if (auto* playerPtr = std::get_if<CClientPlayer*>(&sound))
+        playerVoice.player = *playerPtr;
 
-    const auto ProcessSoundParams = [&](auto* pSound) -> std::variant<std::unordered_map<std::string, std::variant<float, int, bool>>, bool>
+    const auto ProcessSoundParams = [&](auto* soundElement) -> std::variant<std::unordered_map<std::string, std::variant<float, int, bool>>, bool>
     {
-        if (!pSound->IsFxEffectEnabled((std::uint32_t)eEffectType))
+        if (!soundElement->IsFxEffectEnabled((std::uint32_t)effectType))
             throw LuaFunctionError("Effect's parameters can't be set unless it's enabled");
 
         using namespace SoundEffectParams;
-        switch (eEffectType)
+        switch (effectType)
         {
             case SoundEffectType::FX_DX8_CHORUS:
             {
                 BASS_DX8_CHORUS fxChorusParams;
-                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxChorusParams))
+                if (soundElement->GetFxEffectParameters((uint)effectType, &fxChorusParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
-                        {EnumToString(Chorus::WET_DRY_MIX), fxChorusParams.fWetDryMix},  {EnumToString(Chorus::DEPTH), fxChorusParams.fDepth},
-                        {EnumToString(Chorus::FEEDBACK), fxChorusParams.fFeedback},      {EnumToString(Chorus::FREQUENCY), fxChorusParams.fFrequency},
-                        {EnumToString(Chorus::WAVEFORM), (int)fxChorusParams.lWaveform}, {EnumToString(Chorus::DELAY), fxChorusParams.fDelay},
-                        {EnumToString(Chorus::PHASE), (int)fxChorusParams.lPhase},
+                        {EnumToString(Chorus::WET_DRY_MIX), fxChorusParams.fWetDryMix},
+                        {EnumToString(Chorus::DEPTH), fxChorusParams.fDepth},
+                        {EnumToString(Chorus::FEEDBACK), fxChorusParams.fFeedback},
+                        {EnumToString(Chorus::FREQUENCY), fxChorusParams.fFrequency},
+                        {EnumToString(Chorus::WAVEFORM), static_cast<int>(fxChorusParams.lWaveform)},
+                        {EnumToString(Chorus::DELAY), fxChorusParams.fDelay},
+                        {EnumToString(Chorus::PHASE), static_cast<int>(fxChorusParams.lPhase)},
                     };
                 }
                 break;
@@ -1074,7 +1076,7 @@ auto CLuaAudioDefs::GetSoundEffectParameters(std::variant<CClientSound*, CClient
             case SoundEffectType::FX_DX8_COMPRESSOR:
             {
                 BASS_DX8_COMPRESSOR fxCompressorParams;
-                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxCompressorParams))
+                if (soundElement->GetFxEffectParameters((uint)effectType, &fxCompressorParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
                         {EnumToString(Compressor::GAIN), fxCompressorParams.fGain},       {EnumToString(Compressor::ATTACK), fxCompressorParams.fAttack},
@@ -1087,7 +1089,7 @@ auto CLuaAudioDefs::GetSoundEffectParameters(std::variant<CClientSound*, CClient
             case SoundEffectType::FX_DX8_DISTORTION:
             {
                 BASS_DX8_DISTORTION fxDistortionParams;
-                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxDistortionParams))
+                if (soundElement->GetFxEffectParameters((uint)effectType, &fxDistortionParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
                         {EnumToString(Distortion::GAIN), fxDistortionParams.fGain},
@@ -1102,12 +1104,14 @@ auto CLuaAudioDefs::GetSoundEffectParameters(std::variant<CClientSound*, CClient
             case SoundEffectType::FX_DX8_ECHO:
             {
                 BASS_DX8_ECHO fxEchoParams;
-                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxEchoParams))
+                if (soundElement->GetFxEffectParameters((uint)effectType, &fxEchoParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
-                        {EnumToString(Echo::WET_DRY_MIX), fxEchoParams.fWetDryMix},    {EnumToString(Echo::FEEDBACK), fxEchoParams.fFeedback},
-                        {EnumToString(Echo::LEFT_DELAY), fxEchoParams.fLeftDelay},     {EnumToString(Echo::RIGHT_DELAY), fxEchoParams.fRightDelay},
-                        {EnumToString(Echo::PAN_DELAY), (bool)fxEchoParams.lPanDelay},
+                        {EnumToString(Echo::WET_DRY_MIX), fxEchoParams.fWetDryMix},
+                        {EnumToString(Echo::FEEDBACK), fxEchoParams.fFeedback},
+                        {EnumToString(Echo::LEFT_DELAY), fxEchoParams.fLeftDelay},
+                        {EnumToString(Echo::RIGHT_DELAY), fxEchoParams.fRightDelay},
+                        {EnumToString(Echo::PAN_DELAY), static_cast<bool>(fxEchoParams.lPanDelay)},
                     };
                 }
                 break;
@@ -1115,13 +1119,16 @@ auto CLuaAudioDefs::GetSoundEffectParameters(std::variant<CClientSound*, CClient
             case SoundEffectType::FX_DX8_FLANGER:
             {
                 BASS_DX8_FLANGER fxFlangerParams;
-                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxFlangerParams))
+                if (soundElement->GetFxEffectParameters((uint)effectType, &fxFlangerParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
-                        {EnumToString(Flanger::WET_DRY_MIX), fxFlangerParams.fWetDryMix},  {EnumToString(Flanger::DEPTH), fxFlangerParams.fDepth},
-                        {EnumToString(Flanger::FEEDBACK), fxFlangerParams.fFeedback},      {EnumToString(Flanger::FREQUENCY), fxFlangerParams.fFrequency},
-                        {EnumToString(Flanger::WAVEFORM), (int)fxFlangerParams.lWaveform}, {EnumToString(Flanger::DELAY), fxFlangerParams.fDelay},
-                        {EnumToString(Flanger::PHASE), (int)fxFlangerParams.lPhase},
+                        {EnumToString(Flanger::WET_DRY_MIX), fxFlangerParams.fWetDryMix},
+                        {EnumToString(Flanger::DEPTH), fxFlangerParams.fDepth},
+                        {EnumToString(Flanger::FEEDBACK), fxFlangerParams.fFeedback},
+                        {EnumToString(Flanger::FREQUENCY), fxFlangerParams.fFrequency},
+                        {EnumToString(Flanger::WAVEFORM), static_cast<int>(fxFlangerParams.lWaveform)},
+                        {EnumToString(Flanger::DELAY), fxFlangerParams.fDelay},
+                        {EnumToString(Flanger::PHASE), static_cast<int>(fxFlangerParams.lPhase)},
                     };
                 }
                 break;
@@ -1129,11 +1136,11 @@ auto CLuaAudioDefs::GetSoundEffectParameters(std::variant<CClientSound*, CClient
             case SoundEffectType::FX_DX8_GARGLE:
             {
                 BASS_DX8_GARGLE fxGargleParams;
-                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxGargleParams))
+                if (soundElement->GetFxEffectParameters((uint)effectType, &fxGargleParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
-                        {EnumToString(Gargle::RATE_HZ), (int)fxGargleParams.dwRateHz},
-                        {EnumToString(Gargle::WAVE_SHAPE), (int)fxGargleParams.dwWaveShape},
+                        {EnumToString(Gargle::RATE_HZ), static_cast<int>(fxGargleParams.dwRateHz)},
+                        {EnumToString(Gargle::WAVE_SHAPE), static_cast<int>(fxGargleParams.dwWaveShape)},
                     };
                 }
                 break;
@@ -1141,17 +1148,17 @@ auto CLuaAudioDefs::GetSoundEffectParameters(std::variant<CClientSound*, CClient
             case SoundEffectType::FX_DX8_I3DL2REVERB:
             {
                 BASS_DX8_I3DL2REVERB fxI3DL2ReverbParams;
-                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxI3DL2ReverbParams))
+                if (soundElement->GetFxEffectParameters((uint)effectType, &fxI3DL2ReverbParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
-                        {EnumToString(I3DL2Reverb::ROOM), (int)fxI3DL2ReverbParams.lRoom},
-                        {EnumToString(I3DL2Reverb::ROOM_HF), (int)fxI3DL2ReverbParams.lRoomHF},
+                        {EnumToString(I3DL2Reverb::ROOM), static_cast<int>(fxI3DL2ReverbParams.lRoom)},
+                        {EnumToString(I3DL2Reverb::ROOM_HF), static_cast<int>(fxI3DL2ReverbParams.lRoomHF)},
                         {EnumToString(I3DL2Reverb::ROOM_ROLLOFF_FACTOR), fxI3DL2ReverbParams.flRoomRolloffFactor},
                         {EnumToString(I3DL2Reverb::DECAY_TIME), fxI3DL2ReverbParams.flDecayTime},
                         {EnumToString(I3DL2Reverb::DECAY_HF_RATIO), fxI3DL2ReverbParams.flDecayHFRatio},
-                        {EnumToString(I3DL2Reverb::REFLECTIONS), (int)fxI3DL2ReverbParams.lReflections},
+                        {EnumToString(I3DL2Reverb::REFLECTIONS), static_cast<int>(fxI3DL2ReverbParams.lReflections)},
                         {EnumToString(I3DL2Reverb::REFLECTIONS_DELAY), fxI3DL2ReverbParams.flReflectionsDelay},
-                        {EnumToString(I3DL2Reverb::REVERB), (int)fxI3DL2ReverbParams.lReverb},
+                        {EnumToString(I3DL2Reverb::REVERB), static_cast<int>(fxI3DL2ReverbParams.lReverb)},
                         {EnumToString(I3DL2Reverb::REVERB_DELAY), fxI3DL2ReverbParams.flReverbDelay},
                         {EnumToString(I3DL2Reverb::DIFFUSION), fxI3DL2ReverbParams.flDiffusion},
                         {EnumToString(I3DL2Reverb::DENSITY), fxI3DL2ReverbParams.flDensity},
@@ -1163,7 +1170,7 @@ auto CLuaAudioDefs::GetSoundEffectParameters(std::variant<CClientSound*, CClient
             case SoundEffectType::FX_DX8_PARAMEQ:
             {
                 BASS_DX8_PARAMEQ fxParameqParams;
-                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxParameqParams))
+                if (soundElement->GetFxEffectParameters((uint)effectType, &fxParameqParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
                         {EnumToString(ParamEq::CENTER), fxParameqParams.fCenter},
@@ -1176,7 +1183,7 @@ auto CLuaAudioDefs::GetSoundEffectParameters(std::variant<CClientSound*, CClient
             case SoundEffectType::FX_DX8_REVERB:
             {
                 BASS_DX8_REVERB fxReverbParams;
-                if (pSound->GetFxEffectParameters((uint)eEffectType, &fxReverbParams))
+                if (soundElement->GetFxEffectParameters((uint)effectType, &fxReverbParams))
                 {
                     return std::unordered_map<std::string, std::variant<float, int, bool>>{
                         {EnumToString(Reverb::IN_GAIN), fxReverbParams.fInGain},
@@ -1192,13 +1199,13 @@ auto CLuaAudioDefs::GetSoundEffectParameters(std::variant<CClientSound*, CClient
         return false;
     };
 
-    if (pSound)
-        return ProcessSoundParams(pSound);
+    if (soundElement)
+        return ProcessSoundParams(soundElement);
     else
         return ProcessSoundParams(&playerVoice);
 }
 
-bool CLuaAudioDefs::PlaySoundFrontEnd(unsigned char sound)
+bool CLuaAudioDefs::PlaySoundFrontEnd(std::uint8_t sound)
 {
     if (sound > 101)
         throw std::invalid_argument("Invalid sound ID specified. Valid sound IDs are 0 - 101.");
@@ -1207,135 +1214,45 @@ bool CLuaAudioDefs::PlaySoundFrontEnd(unsigned char sound)
     return true;
 }
 
-int CLuaAudioDefs::SetAmbientSoundEnabled(lua_State* luaVM)
+bool CLuaAudioDefs::SetAmbientSoundEnabled(std::optional<eAmbientSoundType> type, bool enabled)
 {
-    eAmbientSoundType eType;
-    bool              bEnabled;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(eType, AMBIENT_SOUND_GENERAL);
-    argStream.ReadBool(bEnabled);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetAmbientSoundEnabled(eType, bEnabled))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    g_pGame->GetAudioEngine()->SetAmbientSoundEnabled(type.value_or(AMBIENT_SOUND_GENERAL), enabled);
+    return true;
 }
 
-int CLuaAudioDefs::IsAmbientSoundEnabled(lua_State* luaVM)
+bool CLuaAudioDefs::IsAmbientSoundEnabled(eAmbientSoundType type)
 {
-    eAmbientSoundType eType;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(eType);
-
-    if (!argStream.HasErrors())
-    {
-        bool bResultEnabled;
-        if (CStaticFunctionDefinitions::IsAmbientSoundEnabled(eType, bResultEnabled))
-        {
-            lua_pushboolean(luaVM, bResultEnabled);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return g_pGame->GetAudioEngine()->IsAmbientSoundEnabled(type);
 }
 
-int CLuaAudioDefs::ResetAmbientSounds(lua_State* luaVM)
+bool CLuaAudioDefs::ResetAmbientSounds()
 {
-    if (CStaticFunctionDefinitions::ResetAmbientSounds())
-    {
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogBadType(luaVM);
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    g_pGame->GetAudioEngine()->ResetAmbientSounds();
+    return true;
 }
 
-int CLuaAudioDefs::SetWorldSoundEnabled(lua_State* luaVM)
+bool CLuaAudioDefs::SetWorldSoundEnabled(int group, std::variant<int, bool> indexOrEnabled, std::optional<bool> enabled, std::optional<bool> immediate)
 {
-    //  setWorldSoundEnabled ( int group, [int index, ], bool enable [, bool immediate = false ] )
-    int  group;
-    int  index = -1;
-    bool bEnabled;
-    bool bImmediate;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(group);
-    if (!argStream.NextIsBool())
-        argStream.ReadNumber(index);
-    argStream.ReadBool(bEnabled);
-    argStream.ReadBool(bImmediate, false);
-
-    if (!argStream.HasErrors())
+    if (auto* index = std::get_if<int>(&indexOrEnabled))
     {
-        if (CStaticFunctionDefinitions::SetWorldSoundEnabled(group, index, bEnabled, bImmediate))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        g_pGame->GetAudioEngine()->SetWorldSoundEnabled(group, *index, enabled.value_or(false), immediate.value_or(false));
+        return true;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    // The second argument is the enabled state, so the third argument is the immediate flag
+    g_pGame->GetAudioEngine()->SetWorldSoundEnabled(group, -1, std::get<bool>(indexOrEnabled), enabled.value_or(false));
+    return true;
 }
 
-int CLuaAudioDefs::IsWorldSoundEnabled(lua_State* luaVM)
+bool CLuaAudioDefs::IsWorldSoundEnabled(int group, std::optional<int> index)
 {
-    //  bool isWorldSoundEnabled ( int group, [int index] )
-    int group;
-    int index;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(group);
-    argStream.ReadNumber(index, -1);
-
-    if (!argStream.HasErrors())
-    {
-        bool bResultEnabled;
-        if (CStaticFunctionDefinitions::IsWorldSoundEnabled(group, index, bResultEnabled))
-        {
-            lua_pushboolean(luaVM, bResultEnabled);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return g_pGame->GetAudioEngine()->IsWorldSoundEnabled(group, index.value_or(-1));
 }
 
-int CLuaAudioDefs::ResetWorldSounds(lua_State* luaVM)
+bool CLuaAudioDefs::ResetWorldSounds()
 {
-    if (CStaticFunctionDefinitions::ResetWorldSounds())
-    {
-        lua_pushboolean(luaVM, true);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogBadType(luaVM);
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    g_pGame->GetAudioEngine()->ResetWorldSounds();
+    return true;
 }
 
 std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX(lua_State* luaVM, eAudioLookupIndex containerIndex, std::variant<int, eRadioStreamIndex> bank,
@@ -1346,16 +1263,16 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX(lua_State* luaVM, eAudi
     if (auto* bankValue = std::get_if<int>(&bank))
         bankIndex = *bankValue;
     else if (containerIndex == AUDIO_LOOKUP_RADIO)
-        bankIndex = static_cast<int>(std::get<eRadioStreamIndex>(bank));
+        bankIndex = static_cast<int>(*std::get_if<eRadioStreamIndex>(&bank));
     else
         return false;
 
-    CResource* pResource = &lua_getownerresource(luaVM);
+    CResource* resource = &lua_getownerresource(luaVM);
 
     CClientSound* sound = m_pManager->GetSoundManager()->PlayGTASFX(containerIndex, bankIndex, audioIndex, loop.value_or(false));
     if (sound)
     {
-        sound->SetParent(pResource->GetResourceDynamicEntity());
+        sound->SetParent(resource->GetResourceDynamicEntity());
         return sound;
     }
 
@@ -1363,30 +1280,30 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX(lua_State* luaVM, eAudi
 }
 
 std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX3D(lua_State* luaVM, eAudioLookupIndex containerIndex, std::variant<int, eRadioStreamIndex> bank,
-                                                           int audioIndex, CVector vecPosition, std::optional<bool> loop)
+                                                           int audioIndex, CVector position, std::optional<bool> loop)
 {
     //  sound playSFX3D ( string audioContainer, int bankIndex, int audioIndex, float posX, float posY, float posZ [, loop = false ] )
     int bankIndex;
     if (auto* bankValue = std::get_if<int>(&bank))
         bankIndex = *bankValue;
     else if (containerIndex == AUDIO_LOOKUP_RADIO)
-        bankIndex = static_cast<int>(std::get<eRadioStreamIndex>(bank));
+        bankIndex = static_cast<int>(*std::get_if<eRadioStreamIndex>(&bank));
     else
         return false;
 
-    CResource* pResource = &lua_getownerresource(luaVM);
+    CResource* resource = &lua_getownerresource(luaVM);
 
-    CClientSound* sound = m_pManager->GetSoundManager()->PlayGTASFX3D(containerIndex, bankIndex, audioIndex, vecPosition, loop.value_or(false));
+    CClientSound* sound = m_pManager->GetSoundManager()->PlayGTASFX3D(containerIndex, bankIndex, audioIndex, position, loop.value_or(false));
     if (sound)
     {
-        sound->SetParent(pResource->GetResourceDynamicEntity());
+        sound->SetParent(resource->GetResourceDynamicEntity());
         return sound;
     }
 
     return false;
 }
 
-auto CLuaAudioDefs::GetSFXStatus(eAudioLookupIndex containerIndex)
+auto CLuaAudioDefs::GetSFXStatus(eAudioLookupIndex containerIndex) noexcept
 {
     //  bool getSFXStatus ( string audioContainer )
     return m_pManager->GetSoundManager()->GetSFXStatus(containerIndex);
@@ -1396,9 +1313,9 @@ bool CLuaAudioDefs::SetSoundPan(std::variant<CClientSound*, CClientPlayer*> soun
 {
     //  setSoundPan ( sound theSound, float pan )
     //  setSoundPan ( player thePlayer, float pan )
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
         return (*soundElement)->SetPan(pan);
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         return voice && voice->SetPan(pan);
@@ -1410,13 +1327,13 @@ std::variant<float, bool> CLuaAudioDefs::GetSoundPan(std::variant<CClientSound*,
 {
     //  getSoundPan ( element theSound )
     //  getSoundPan ( player thePlayer )
-    if (auto* soundElement = std::get_if<CClientSound*>(&sound); soundElement && *soundElement)
+    if (auto* soundElement = std::get_if<CClientSound*>(&sound))
     {
         float pan = 0.0f;
         if ((*soundElement)->GetPan(pan))
             return pan;
     }
-    else if (auto* player = std::get_if<CClientPlayer*>(&sound); player && *player)
+    else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice)
@@ -1435,22 +1352,22 @@ bool CLuaAudioDefs::SetRadioChannel(unsigned char channel)
     return m_pPlayerManager->GetLocalPlayer()->SetCurrentRadioChannel(channel);
 }
 
-auto CLuaAudioDefs::GetRadioChannel()
+auto CLuaAudioDefs::GetRadioChannel() noexcept
 {
     return m_pPlayerManager->GetLocalPlayer()->GetCurrentRadioChannel();
 }
 
-std::variant<const char*, bool> CLuaAudioDefs::GetRadioChannelName(int channel)
+std::variant<const char*, bool> CLuaAudioDefs::GetRadioChannelName(std::uint32_t channel) noexcept
 {
-    static const SFixedArray<const char*, 13> szRadioStations = {{"Radio off", "Playback FM", "K-Rose", "K-DST", "Bounce FM", "SF-UR", "Radio Los Santos",
-                                                                  "Radio X", "CSR 103.9", "K-Jah West", "Master Sounds 98.3", "WCTR", "User Track Player"}};
+    static constexpr std::array<const char*, 13> radioStations = {{"Radio off", "Playback FM", "K-Rose", "K-DST", "Bounce FM", "SF-UR", "Radio Los Santos",
+                                                                   "Radio X", "CSR 103.9", "K-Jah West", "Master Sounds 98.3", "WCTR", "User Track Player"}};
 
-    if (channel >= 0 && channel < NUMELMS(szRadioStations))
-        return szRadioStations[channel];
+    if (channel < NUMELMS(radioStations))
+        return radioStations[channel];
     return false;
 }
 
-bool CLuaAudioDefs::ShowSound(bool state)
+bool CLuaAudioDefs::ShowSound(bool state) noexcept
 {
     if (!g_pClientGame->GetDevelopmentMode())
         return false;
@@ -1459,7 +1376,7 @@ bool CLuaAudioDefs::ShowSound(bool state)
     return true;
 }
 
-bool CLuaAudioDefs::IsShowSoundEnabled()
+bool CLuaAudioDefs::IsShowSoundEnabled() noexcept
 {
     return g_pClientGame->GetShowSound();
 }
@@ -1468,12 +1385,12 @@ void CLuaAudioDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{// Audio funcs
                                                                              {"playSoundFrontEnd", ArgumentParserWarn<false, PlaySoundFrontEnd>},
-                                                                             {"setAmbientSoundEnabled", SetAmbientSoundEnabled},
-                                                                             {"isAmbientSoundEnabled", IsAmbientSoundEnabled},
-                                                                             {"resetAmbientSounds", ResetAmbientSounds},
-                                                                             {"setWorldSoundEnabled", SetWorldSoundEnabled},
-                                                                             {"isWorldSoundEnabled", IsWorldSoundEnabled},
-                                                                             {"resetWorldSounds", ResetWorldSounds},
+                                                                             {"setAmbientSoundEnabled", ArgumentParserWarn<false, SetAmbientSoundEnabled>},
+                                                                             {"isAmbientSoundEnabled", ArgumentParserWarn<false, IsAmbientSoundEnabled>},
+                                                                             {"resetAmbientSounds", ArgumentParserWarn<false, ResetAmbientSounds>},
+                                                                             {"setWorldSoundEnabled", ArgumentParserWarn<false, SetWorldSoundEnabled>},
+                                                                             {"isWorldSoundEnabled", ArgumentParserWarn<false, IsWorldSoundEnabled>},
+                                                                             {"resetWorldSounds", ArgumentParserWarn<false, ResetWorldSounds>},
                                                                              {"playSFX", ArgumentParserWarn<false, PlaySFX>},
                                                                              {"playSFX3D", ArgumentParserWarn<false, PlaySFX3D>},
                                                                              {"getSFXStatus", ArgumentParserWarn<nullptr, GetSFXStatus>},
