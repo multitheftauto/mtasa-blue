@@ -40,6 +40,7 @@
 #include <windowsx.h>
 #include "CServerInfo.h"
 #include "CClientPed.h"
+#include "CClientWorldSoundManager.h"
 
 SString StringZeroPadout(const SString& strInput, uint uiPadoutSize)
 {
@@ -199,6 +200,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     // Create the manager and grab the most important pointers
     m_pManager = new CClientManager;
+    m_pWorldSoundManager = new CClientWorldSoundManager(m_pManager);
     m_pCamera = m_pManager->GetCamera();
     m_pMarkerManager = m_pManager->GetMarkerManager();
     m_pObjectManager = m_pManager->GetObjectManager();
@@ -563,6 +565,7 @@ CClientGame::~CClientGame()
 
     // Destroy our stuff
     SAFE_DELETE(m_pManager);  // Will trigger onClientResourceStop
+    SAFE_DELETE(m_pWorldSoundManager);
     SAFE_DELETE(m_pNametags);
     SAFE_DELETE(m_pSyncDebug);
     SAFE_DELETE(m_pNetworkStats);
@@ -1557,6 +1560,11 @@ void CClientGame::DoPulses2(bool bCalledFromIdle)
     }
 
     m_pManager->DoPulse(bDoStandardPulses, bDoVehicleManagerPulse);
+
+    if (m_pWorldSoundManager)
+    {
+        m_pWorldSoundManager->DoPulse();
+    }
 
     if (bDoStandardPulses)
     {
@@ -6618,6 +6626,7 @@ bool CClientGame::WorldSoundHandler(const SWorldSoundEvent& event)
     if (!pEntity)
         pEntity = GetRootEntity();
 
+    bool bAllowPlay = true;
     if (pEntity)
     {
         CLuaArguments Arguments;
@@ -6626,10 +6635,13 @@ bool CClientGame::WorldSoundHandler(const SWorldSoundEvent& event)
         Arguments.PushNumber(event.vecPosition.fX);
         Arguments.PushNumber(event.vecPosition.fY);
         Arguments.PushNumber(event.vecPosition.fZ);
-        return pEntity->CallEvent("onClientWorldSound", Arguments, true);
+        bAllowPlay = pEntity->CallEvent("onClientWorldSound", Arguments, true);
     }
 
-    return true;
+    if (m_pWorldSoundManager)
+        m_pWorldSoundManager->HandleWorldSound(event);
+
+    return bAllowPlay;
 }
 
 //////////////////////////////////////////////////////////////////

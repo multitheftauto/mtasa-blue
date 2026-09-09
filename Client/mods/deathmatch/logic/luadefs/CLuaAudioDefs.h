@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
 
 class CLuaAudioDefs : public CLuaDefs
 {
@@ -26,6 +27,14 @@ public:
     LUA_DECLARE(SetWorldSoundEnabled);
     LUA_DECLARE(IsWorldSoundEnabled);
     LUA_DECLARE(ResetWorldSounds);
+
+    static bool ReplaceWorldSound(lua_State* luaVM, std::string strSound, int group, std::optional<int> index, std::optional<float> fMinDistance,
+                                  std::optional<float> fMaxDistance);
+    static bool RestoreWorldSound(int group, std::optional<int> index);
+    static bool RestoreAllWorldSounds();
+    static bool IsWorldSoundReplaced(int group, std::optional<int> index);
+    static std::variant<bool, CLuaMultiReturn<uint, uint>> GetWorldSoundBankSlotInfo(int group, int index);
+
     LUA_DECLARE(PlaySFX);
     LUA_DECLARE(PlaySFX3D);
     LUA_DECLARE(GetSFXStatus);

@@ -12,6 +12,8 @@
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 #include "CBassAudio.h"
+#include "CClientWorldSoundManager.h"
+#include <game/CAEAudioHardware.h>
 
 void CLuaAudioDefs::LoadFunctions()
 {
@@ -23,6 +25,11 @@ void CLuaAudioDefs::LoadFunctions()
                                                                              {"setWorldSoundEnabled", SetWorldSoundEnabled},
                                                                              {"isWorldSoundEnabled", IsWorldSoundEnabled},
                                                                              {"resetWorldSounds", ResetWorldSounds},
+                                                                             {"replaceWorldSound", ArgumentParser<ReplaceWorldSound>},
+                                                                             {"restoreWorldSound", ArgumentParser<RestoreWorldSound>},
+                                                                             {"restoreAllWorldSounds", ArgumentParser<RestoreAllWorldSounds>},
+                                                                             {"isWorldSoundReplaced", ArgumentParser<IsWorldSoundReplaced>},
+                                                                             {"getWorldSoundBankSlotInfo", ArgumentParser<GetWorldSoundBankSlotInfo>},
                                                                              {"playSFX", PlaySFX},
                                                                              {"playSFX3D", PlaySFX3D},
                                                                              {"getSFXStatus", GetSFXStatus},
@@ -142,6 +149,75 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "minDistance", "setSoundMinDistance", "getSoundMinDistance");
 
     lua_registerclass(luaVM, "Sound3D", "Sound");
+}
+
+bool CLuaAudioDefs::ReplaceWorldSound(lua_State* luaVM, std::string strSound, int group, std::optional<int> index, std::optional<float> fMinDistance,
+                                      std::optional<float> fMaxDistance)
+{
+    CLuaMain&  luaMain = lua_getownercluamain(luaVM);
+    CResource* pResource = luaMain.GetResource();
+    if (!pResource || !g_pClientGame || !g_pClientGame->GetWorldSoundManager())
+        return false;
+
+    const int iIndex = index.value_or(-1);
+    SString   strSoundCopy = strSound;
+    SString   strFilename;
+    bool      bIsRawData = false;
+    if (CResourceManager::ParseResourcePathInput(strSoundCopy, pResource, &strFilename, nullptr, true))
+        strSoundCopy = strFilename;
+    else
+        bIsRawData = true;
+
+    SString strError;
+    bool    bSuccess = g_pClientGame->GetWorldSoundManager()->ReplaceSound(group, iIndex, strSoundCopy, bIsRawData, fMinDistance.value_or(-1.0f),
+                                                                           fMaxDistance.value_or(-1.0f), &strError);
+    if (!bSuccess && !strError.empty())
+        m_pScriptDebugging->LogWarning(luaVM, "replaceWorldSound: %s (group %d, index %d, '%s')", strError.c_str(), group, iIndex, strSound.c_str());
+
+    return bSuccess;
+}
+
+bool CLuaAudioDefs::RestoreWorldSound(int group, std::optional<int> index)
+{
+    if (!g_pClientGame || !g_pClientGame->GetWorldSoundManager())
+        return false;
+
+    return g_pClientGame->GetWorldSoundManager()->RestoreSound(group, index.value_or(-1));
+}
+
+bool CLuaAudioDefs::RestoreAllWorldSounds()
+{
+    if (g_pClientGame && g_pClientGame->GetWorldSoundManager())
+        g_pClientGame->GetWorldSoundManager()->RestoreAll();
+
+    return true;
+}
+
+bool CLuaAudioDefs::IsWorldSoundReplaced(int group, std::optional<int> index)
+{
+    if (g_pClientGame && g_pClientGame->GetWorldSoundManager())
+        return g_pClientGame->GetWorldSoundManager()->IsSoundReplaced(group, index.value_or(-1));
+
+    return false;
+}
+
+std::variant<bool, CLuaMultiReturn<uint, uint>> CLuaAudioDefs::GetWorldSoundBankSlotInfo(int group, int index)
+{
+    if (!g_pGame || group < 0 || group > 44 || index < 0 || index > 399)
+        return false;
+
+    CAEAudioHardware* pAudioHardware = g_pGame->GetAEAudioHardware();
+    if (!pAudioHardware)
+        return false;
+
+    void* pPcmData = nullptr;
+    uint  uiPcmSize = 0;
+    uint  uiSampleRate = 0;
+    int   iLoopStartOffset = -1;
+    if (!pAudioHardware->GetLoadedSoundInfo(static_cast<ushort>(group), static_cast<ushort>(index), pPcmData, uiPcmSize, uiSampleRate, iLoopStartOffset))
+        return false;
+
+    return std::tuple(uiPcmSize, uiSampleRate);
 }
 
 int CLuaAudioDefs::PlaySound(lua_State* luaVM)

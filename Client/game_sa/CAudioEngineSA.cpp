@@ -14,6 +14,7 @@
 #include "CAEAudioHardwareSA.h"
 #include "CAudioEngineSA.h"
 #include "CGameSA.h"
+#include "CPadSA.h"
 #include "CPhysicalSA.h"
 #include "CSettingsSA.h"
 
@@ -559,12 +560,59 @@ bool CAudioEngineSA::OnWorldSound(CAESound* pAESound)
             pAESound->usIndex,
             pGameEntity,
             pAESound->m_vCurrPosn,
+            pAESound->m_fSoundDistance,
+            pAESound->usGroup == BANKSLOT_HORNS || pAESound->m_nLoopCounter < 0 || pAESound->m_nLoopCounter > 1,
+            pAESound,
         };
 
         return m_pWorldSoundHandler(event);
     }
 
     return true;
+}
+
+void CAudioEngineSA::SetWorldSoundMaxDistance(CAESound* pAESound, float fMaxDistance)
+{
+    if (!pAESound || fMaxDistance <= 0.0f)
+        return;
+
+    pAESound->m_fSoundDistance = fMaxDistance;
+}
+
+bool CAudioEngineSA::IsWorldSoundStillActive(uint uiGroup, uint uiIndex, CEntitySAInterface* pEntity) const
+{
+    if (uiGroup == BANKSLOT_HORNS)
+    {
+        auto* pPad = dynamic_cast<CPadSA*>(pGame ? pGame->GetPad() : nullptr);
+        if (!pPad)
+            return false;
+
+        const auto* pPadInterface = pPad->GetInterface();
+        for (uint uiHistoryIndex = 0; uiHistoryIndex < MAX_HORN_HISTORY; ++uiHistoryIndex)
+        {
+            if (pPadInterface->bHornHistory[uiHistoryIndex])
+                return true;
+        }
+        return false;
+    }
+
+    const auto* pSoundManager = reinterpret_cast<const CAESoundManagerSAInterface*>(CLASS_CAESoundManager);
+    if (!pSoundManager)
+        return false;
+
+    for (const CAESound& sound : pSoundManager->m_aSound)
+    {
+        if (sound.m_nIsUsed != 0 && sound.usGroup == uiGroup && sound.usIndex == uiIndex)
+        {
+            if (!pEntity)
+                return true;
+            if (sound.pGameEntity == pEntity)
+                return true;
+            if (sound.pAudioEntity && sound.pAudioEntity->pEntity == pEntity)
+                return true;
+        }
+    }
+    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
