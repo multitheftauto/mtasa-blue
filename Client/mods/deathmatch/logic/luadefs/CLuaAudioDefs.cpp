@@ -25,13 +25,13 @@ static bool IsValidFFTBandCount(int length, int bands) noexcept
     return bands >= 0 && bands <= length / 2;
 }
 
-static float* ProcessFFTData(float* data, int length, int bands)
+static std::unique_ptr<float[]> ProcessFFTData(std::unique_ptr<float[]> data, int length, int bands)
 {
     if (bands == 0 || data == nullptr)
         return data;
 
-    std::unique_ptr<float[]> newData = std::make_unique<float[]>(bands);
-    int                      bandCounter = 0;
+    auto newData = std::make_unique<float[]>(bands);
+    int  bandCounter = 0;
     bands--;
     for (int x = 0; x <= bands; x++)
     {
@@ -55,8 +55,15 @@ static float* ProcessFFTData(float* data, int length, int bands)
             bandCounter = bandCounter + 1;
         }
     }
-    delete[] data;
-    return newData.release();
+    return newData;
+}
+
+static bool IsSoundURL(const std::string& soundPath)
+{
+    const auto ToLower = [](char c) { return std::tolower(static_cast<unsigned char>(c)); };
+    return (std::ranges::starts_with(soundPath, std::string_view{"http"}, {}, ToLower, ToLower) ||
+            std::ranges::starts_with(soundPath, std::string_view{"ftp"}, {}, ToLower, ToLower)) &&
+           (soundPath.length() <= 2048 || soundPath.find('\n') == std::string::npos);
 }
 
 std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, const std::string path, std::optional<bool> loop, std::optional<bool> throttle)
@@ -72,10 +79,7 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, con
         soundPath = filename;
     else
     {
-        const auto ToLower = [](char c) { return std::tolower(static_cast<unsigned char>(c)); };
-        if ((std::ranges::equal(soundPath | std::views::take(4), std::string_view{"http"}, {}, ToLower, ToLower) ||
-             std::ranges::equal(soundPath | std::views::take(3), std::string_view{"ftp"}, {}, ToLower, ToLower)) &&
-            (soundPath.length() <= 2048 || soundPath.find('\n') == std::string::npos))
+        if (IsSoundURL(soundPath))
             isURL = true;
         else
             isRawData = true;
@@ -116,10 +120,7 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, c
         soundPath = filename;
     else
     {
-        const auto ToLower = [](char c) { return std::tolower(static_cast<unsigned char>(c)); };
-        if ((std::ranges::equal(soundPath | std::views::take(4), std::string_view{"http"}, {}, ToLower, ToLower) ||
-             std::ranges::equal(soundPath | std::views::take(3), std::string_view{"ftp"}, {}, ToLower, ToLower)) &&
-            (soundPath.length() <= 2048 || soundPath.find('\n') == std::string::npos))
+        if (IsSoundURL(soundPath))
             isURL = true;
         else
             isRawData = true;
@@ -321,28 +322,26 @@ auto CLuaAudioDefs::GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*> 
     if (!IsValidFFTBandCount(length, bands.value_or(0)))
         return ResultType{false};
 
-    float* fftData = nullptr;
+    std::unique_ptr<float[]> fftData;
     if (auto* soundElement = std::get_if<CClientSound*>(&sound))
-        fftData = (*soundElement)->GetFFTData(length);
+        fftData.reset((*soundElement)->GetFFTData(length));
     else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* voice = (*player)->GetVoice();
         if (voice && voice->IsActive())
-            fftData = voice->GetFFTData(length);
+            fftData.reset(voice->GetFFTData(length));
     }
 
     if (!fftData)
         return ResultType{false};
 
-    fftData = ProcessFFTData(fftData, length, bands.value_or(0));
+    fftData = ProcessFFTData(std::move(fftData), length, bands.value_or(0));
 
     const int                      size = bands.value_or(0) == 0 ? length / 2 : bands.value_or(0) - 1;
     std::unordered_map<int, float> data;
     for (int i = 0; i <= size; i++)
         data.emplace(i, fftData[i]);
 
-    // Deallocate our data array here after it's used.
-    delete[] fftData;
     return ResultType{data};
 }
 
@@ -1262,8 +1261,8 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX(lua_State* luaVM, eAudi
     int bankIndex;
     if (auto* bankValue = std::get_if<int>(&bank))
         bankIndex = *bankValue;
-    else if (containerIndex == AUDIO_LOOKUP_RADIO)
-        bankIndex = static_cast<int>(*std::get_if<eRadioStreamIndex>(&bank));
+    else if (auto* radioIndex = std::get_if<eRadioStreamIndex>(&bank))
+        bankIndex = static_cast<int>(*radioIndex);
     else
         return false;
 
@@ -1286,8 +1285,8 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX3D(lua_State* luaVM, eAu
     int bankIndex;
     if (auto* bankValue = std::get_if<int>(&bank))
         bankIndex = *bankValue;
-    else if (containerIndex == AUDIO_LOOKUP_RADIO)
-        bankIndex = static_cast<int>(*std::get_if<eRadioStreamIndex>(&bank));
+    else if (auto* radioIndex = std::get_if<eRadioStreamIndex>(&bank))
+        bankIndex = static_cast<int>(*radioIndex);
     else
         return false;
 
@@ -1362,7 +1361,7 @@ std::variant<const char*, bool> CLuaAudioDefs::GetRadioChannelName(std::uint32_t
     static constexpr std::array<const char*, 13> radioStations = {{"Radio off", "Playback FM", "K-Rose", "K-DST", "Bounce FM", "SF-UR", "Radio Los Santos",
                                                                    "Radio X", "CSR 103.9", "K-Jah West", "Master Sounds 98.3", "WCTR", "User Track Player"}};
 
-    if (channel < NUMELMS(radioStations))
+    if (static_cast<std::size_t>(channel) < radioStations.size())
         return radioStations[channel];
     return false;
 }
