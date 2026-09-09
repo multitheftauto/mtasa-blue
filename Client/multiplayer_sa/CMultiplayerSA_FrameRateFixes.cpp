@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <algorithm>
+#include <cmath>
 
 static bool         bWouldBeNewFrame = false;
 static unsigned int nLastFrameTime = 0;
@@ -818,6 +820,313 @@ static void __declspec(naked)   HOOK_CWeapon_Update()
     // clang-format on
 }
 
+// Governs pedestrian push velocity on unoccupied vehicles during collisions.
+// In GTA:SA, CPhysical::ApplyCollision adds an impulse to velocity on every contact frame.
+// At high framerates, these impulses occur far more frequently than at 30 FPS, overpowering
+// tire friction and causing the vehicle to accelerate unnaturally fast.
+// This caps push velocity using momentum conservation to maintain consistent vehicle weight across framerates.
+static void GovernPedPushVehicleVelocity(CPhysicalSAInterface* vehicle, CPhysicalSAInterface* ped, const CVector& initialLinearVelocity,
+                                         const CVector& initialAngularVelocity, const CVector& pedLinearVelocity, CVector& currentLinearVelocity,
+                                         CVector& currentAngularVelocity)
+{
+    if (!vehicle || !ped)
+        return;
+
+    // Only govern collisions on unoccupied vehicles (no driver present)
+    const auto* vehicleInterface = reinterpret_cast<const CVehicleSAInterface*>(vehicle);
+    if (vehicleInterface->pDriver != nullptr)
+        return;
+
+    // Prevent vehicle tilting or flipping from push contact
+    currentAngularVelocity.fX = initialAngularVelocity.fX;
+    currentAngularVelocity.fY = initialAngularVelocity.fY;
+
+    // Keep vertical velocity unaffected by push contact
+    currentLinearVelocity.fZ = initialLinearVelocity.fZ;
+
+    const CVector deltaVelocity = currentLinearVelocity - initialLinearVelocity;
+    const float   deltaMagnitudeSquared = (deltaVelocity.fX * deltaVelocity.fX) + (deltaVelocity.fY * deltaVelocity.fY);
+    if (deltaMagnitudeSquared <= 0.000001f)
+        return;
+
+    const float deltaMagnitude = std::sqrt(deltaMagnitudeSquared);
+    const float pushDirectionX = deltaVelocity.fX / deltaMagnitude;
+    const float pushDirectionY = deltaVelocity.fY / deltaMagnitude;
+
+    const float pedForwardSpeed = (pedLinearVelocity.fX * pushDirectionX) + (pedLinearVelocity.fY * pushDirectionY);
+    if (pedForwardSpeed <= 0.0f)
+    {
+        currentLinearVelocity = initialLinearVelocity;
+        currentAngularVelocity = initialAngularVelocity;
+        return;
+    }
+
+    const float     timeStep = *reinterpret_cast<const float*>(0xB7CB5C);
+    constexpr float baselineTimeStep = 1.0f;
+    const float     timeStepRatio = std::clamp(timeStep / baselineTimeStep, 0.001f, 1.0f);
+
+    constexpr float playerPushMassMultiplier = 10.0f;
+    const float     effectivePedMass = ped->m_fMass * playerPushMassMultiplier;
+    const float     vehicleMass = vehicle->m_fMass;
+    const float     maximumPushVelocity = pedForwardSpeed * (effectivePedMass / (effectivePedMass + vehicleMass));
+
+    float forwardX = 0.0f;
+    float forwardY = 1.0f;
+    float rightX = 1.0f;
+    float rightY = 0.0f;
+
+    if (vehicle->matrix != nullptr)
+    {
+        forwardX = vehicle->matrix->vFront.fX;
+        forwardY = vehicle->matrix->vFront.fY;
+        rightX = vehicle->matrix->vRight.fX;
+        rightY = vehicle->matrix->vRight.fY;
+    }
+    else
+    {
+        const float heading = vehicle->m_transform.m_heading;
+        forwardX = -std::sin(heading);
+        forwardY = std::cos(heading);
+        rightX = std::cos(heading);
+        rightY = std::sin(heading);
+    }
+
+    const float forwardLen = std::sqrt((forwardX * forwardX) + (forwardY * forwardY));
+    if (forwardLen > 0.0001f)
+    {
+        forwardX /= forwardLen;
+        forwardY /= forwardLen;
+    }
+
+    const float rightLen = std::sqrt((rightX * rightX) + (rightY * rightY));
+    if (rightLen > 0.0001f)
+    {
+        rightX /= rightLen;
+        rightY /= rightLen;
+    }
+
+    const float initialForwardSpeed = (initialLinearVelocity.fX * forwardX) + (initialLinearVelocity.fY * forwardY);
+    const float initialLateralSpeed = (initialLinearVelocity.fX * rightX) + (initialLinearVelocity.fY * rightY);
+
+    float currentForwardSpeed = (currentLinearVelocity.fX * forwardX) + (currentLinearVelocity.fY * forwardY);
+    float currentLateralSpeed = (currentLinearVelocity.fX * rightX) + (currentLinearVelocity.fY * rightY);
+
+    const float deltaForwardSpeed = currentForwardSpeed - initialForwardSpeed;
+    currentForwardSpeed = initialForwardSpeed + (deltaForwardSpeed * timeStepRatio);
+
+    constexpr float wakeUpThreshold = 0.008f;
+    if (std::abs(initialForwardSpeed) < 0.001f && std::abs(currentForwardSpeed) < wakeUpThreshold && std::abs(deltaForwardSpeed) > 0.001f)
+    {
+        currentForwardSpeed = (deltaForwardSpeed > 0.0f) ? wakeUpThreshold : -wakeUpThreshold;
+    }
+
+    const float allowedForwardSpeedMax = std::max(initialForwardSpeed, maximumPushVelocity);
+    const float allowedForwardSpeedMin = std::min(initialForwardSpeed, -maximumPushVelocity);
+    currentForwardSpeed = std::clamp(currentForwardSpeed, allowedForwardSpeedMin, allowedForwardSpeedMax);
+
+    const float deltaLateralSpeed = currentLateralSpeed - initialLateralSpeed;
+    currentLateralSpeed = initialLateralSpeed + (deltaLateralSpeed * timeStepRatio);
+
+    constexpr float lateralScrubRatio = 0.10f;
+    const float     maximumLateralVelocity = maximumPushVelocity * lateralScrubRatio;
+    const float     allowedLateralSpeedMax = std::max(initialLateralSpeed, maximumLateralVelocity);
+    const float     allowedLateralSpeedMin = std::min(initialLateralSpeed, -maximumLateralVelocity);
+    currentLateralSpeed = std::clamp(currentLateralSpeed, allowedLateralSpeedMin, allowedLateralSpeedMax);
+
+    currentLinearVelocity.fX = (currentForwardSpeed * forwardX) + (currentLateralSpeed * rightX);
+    currentLinearVelocity.fY = (currentForwardSpeed * forwardY) + (currentLateralSpeed * rightY);
+
+    // Scale collision yaw impulse so rotational torque delivered per second is invariant across framerates
+    const float deltaAngularZ = currentAngularVelocity.fZ - initialAngularVelocity.fZ;
+    currentAngularVelocity.fZ = initialAngularVelocity.fZ + (deltaAngularZ * timeStepRatio);
+
+    // Physical angular velocity limit derived from conservation of angular momentum at the vehicle corner
+    constexpr float cornerLeverArm = 2.2f;
+    const float     vehicleTurnMass = (vehicle->m_fTurnMass > 0.0f) ? vehicle->m_fTurnMass : (vehicleMass * 2.5f);
+    const float     maximumAngularVelocity =
+        (cornerLeverArm * effectivePedMass * pedForwardSpeed) / (vehicleTurnMass + (effectivePedMass * cornerLeverArm * cornerLeverArm));
+
+    const float allowedYawSpeedMax = std::max(initialAngularVelocity.fZ, maximumAngularVelocity);
+    const float allowedYawSpeedMin = std::min(initialAngularVelocity.fZ, -maximumAngularVelocity);
+    currentAngularVelocity.fZ = std::clamp(currentAngularVelocity.fZ, allowedYawSpeedMin, allowedYawSpeedMax);
+}
+
+#define CALL_CPhysical__ApplyCollision_1    0x54BDB2
+#define CALL_CPhysical__ApplyCollision_2    0x54BF78
+#define CALL_CPhysical__ApplyCollision_3    0x54C23A
+#define CALL_CPhysical__ApplyCollision_4    0x54C435
+#define CALL_CPhysical__ApplyCollision_5    0x54D17E
+#define CALL_CPhysical__ApplyCollision_6    0x54D27E
+#define CALL_CPhysical__ApplyCollision_7    0x54D3FE
+#define CALL_CPhysical__ApplyCollision_8    0x54D4D2
+#define CALL_CPhysical__ApplyCollisionAlt_1 0x54C9FA
+#define CALL_CPhysical__ApplyCollisionAlt_2 0x54CAC2
+
+static bool __fastcall HOOK_CPhysical__ApplyCollision(CPhysicalSAInterface* thisEntity, void* /*edx*/, CEntitySAInterface* collidedEntity,
+                                                      CColPointSAInterface* colPoint, float* thisDamageIntensity, float* collidedDamageIntensity)
+{
+    const CVector initialThisLinearVelocity = thisEntity ? thisEntity->m_vecLinearVelocity : CVector{};
+    const CVector initialThisAngularVelocity = thisEntity ? thisEntity->m_vecAngularVelocity : CVector{};
+
+    auto*   collidedPhysical = reinterpret_cast<CPhysicalSAInterface*>(collidedEntity);
+    CVector initialCollidedLinearVelocity{};
+    CVector initialCollidedAngularVelocity{};
+    if (collidedPhysical)
+    {
+        initialCollidedLinearVelocity = collidedPhysical->m_vecLinearVelocity;
+        initialCollidedAngularVelocity = collidedPhysical->m_vecAngularVelocity;
+    }
+
+    using ApplyCollisionFn = bool(__thiscall*)(CPhysicalSAInterface*, CEntitySAInterface*, CColPointSAInterface*, float*, float*);
+    const auto originalApplyCollision = reinterpret_cast<ApplyCollisionFn>(0x548680);
+
+    const bool result = originalApplyCollision(thisEntity, collidedEntity, colPoint, thisDamageIntensity, collidedDamageIntensity);
+
+    if (result && thisEntity && collidedEntity)
+    {
+        // Entity types: 2 = Vehicle, 3 = Ped (from CEntitySAInterface::nType bitfield)
+        const uint8 thisType = thisEntity->nType;
+        const uint8 collidedType = collidedEntity->nType;
+
+        if (thisType == 2 && collidedType == 3 && collidedPhysical)
+        {
+            GovernPedPushVehicleVelocity(thisEntity, collidedPhysical, initialThisLinearVelocity, initialThisAngularVelocity, initialCollidedLinearVelocity,
+                                         thisEntity->m_vecLinearVelocity, thisEntity->m_vecAngularVelocity);
+        }
+        else if (thisType == 3 && collidedType == 2 && collidedPhysical)
+        {
+            GovernPedPushVehicleVelocity(collidedPhysical, thisEntity, initialCollidedLinearVelocity, initialCollidedAngularVelocity, initialThisLinearVelocity,
+                                         collidedPhysical->m_vecLinearVelocity, collidedPhysical->m_vecAngularVelocity);
+        }
+    }
+
+    return result;
+}
+
+static bool __fastcall HOOK_CPhysical__ApplyCollisionAlt(CPhysicalSAInterface* thisEntity, void* /*edx*/, CPhysicalSAInterface* collidedEntity,
+                                                         CColPointSAInterface* colPoint, float* damageIntensity, CVector* outLinearVelocity,
+                                                         CVector* outAngularVelocity)
+{
+    const CVector initialLinearVelocity = outLinearVelocity ? *outLinearVelocity : CVector{};
+    const CVector initialAngularVelocity = outAngularVelocity ? *outAngularVelocity : CVector{};
+
+    const CVector collidedLinearVelocity = collidedEntity ? collidedEntity->m_vecLinearVelocity : CVector{};
+
+    using ApplyCollisionAltFn = bool(__thiscall*)(CPhysicalSAInterface*, CPhysicalSAInterface*, CColPointSAInterface*, float*, CVector*, CVector*);
+    const auto originalApplyCollisionAlt = reinterpret_cast<ApplyCollisionAltFn>(0x544D50);
+
+    const bool result = originalApplyCollisionAlt(thisEntity, collidedEntity, colPoint, damageIntensity, outLinearVelocity, outAngularVelocity);
+
+    if (result && thisEntity && collidedEntity && outLinearVelocity && outAngularVelocity)
+    {
+        // Entity types: 2 = Vehicle, 3 = Ped
+        const uint8 thisType = thisEntity->nType;
+        const uint8 collidedType = collidedEntity->nType;
+
+        if (thisType == 2 && collidedType == 3)
+        {
+            GovernPedPushVehicleVelocity(thisEntity, collidedEntity, initialLinearVelocity, initialAngularVelocity, collidedLinearVelocity, *outLinearVelocity,
+                                         *outAngularVelocity);
+        }
+    }
+
+    return result;
+}
+
+// In GTA:SA (30 FPS, timeStep = 1.66667f), vehicles sleep after 10 still frames (~333 ms).
+// At high framerates (e.g. 240 FPS), 10 frames elapse in only ~41 ms, deactivating unoccupied vehicles
+// before suspension springs can lift the chassis and causing bottomed-out suspension on spawn.
+// Scaling the threshold dynamically by timeStep maintains an invariant settling window (~400 ms).
+static uint8 __cdecl CalculateVehicleSleepFrameThreshold() noexcept
+{
+    const float timeStep = *reinterpret_cast<const float*>(0xB7CB5C);
+    if (timeStep <= 0.0001f)
+        return 10;
+
+    constexpr float baselineNumerator = 20.0f;
+    const float     rawThreshold = baselineNumerator / timeStep;
+    return static_cast<uint8>(std::clamp(std::round(rawThreshold), 10.0f, 240.0f));
+}
+
+// Fixes bottomed-out vehicle suspension when spawning or dropping at high framerates.
+// CAutomobile::ProcessControl
+#define HOOKPOS_CAutomobile__ProcessControl_SleepThreshold  0x6B1D34
+#define HOOKSIZE_CAutomobile__ProcessControl_SleepThreshold 10
+static const unsigned int     RETURN_CAutomobile__ProcessControl_SleepThreshold = 0x6B1D3E;
+static void __declspec(naked) HOOK_CAutomobile__ProcessControl_SleepThreshold()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push ecx
+        push edx
+        call CalculateVehicleSleepFrameThreshold
+        mov bl, al
+        pop edx
+        pop ecx
+
+        mov al, dl
+        cmp al, bl
+        mov [esi+0xB8], dl
+        jmp RETURN_CAutomobile__ProcessControl_SleepThreshold
+    }
+    // clang-format on
+}
+
+// Fixes bottomed-out bike suspension when spawning or dropping at high framerates.
+// CBike::ProcessControl
+#define HOOKPOS_CBike__ProcessControl_SleepThreshold  0x6B997C
+#define HOOKSIZE_CBike__ProcessControl_SleepThreshold 8
+static const unsigned int     RETURN_CBike__ProcessControl_SleepThreshold = 0x6B9984;
+static void __declspec(naked) HOOK_CBike__ProcessControl_SleepThreshold()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push ecx
+        push edx
+        call CalculateVehicleSleepFrameThreshold
+        pop edx
+        pop ecx
+
+        cmp cl, al
+        mov [esi+0xB8], cl
+        jmp RETURN_CBike__ProcessControl_SleepThreshold
+    }
+    // clang-format on
+}
+
+// CBike::ProcessControl sleep counter clamp
+#define HOOKPOS_CBike__ProcessControl_SleepClamp  0x6B99C5
+#define HOOKSIZE_CBike__ProcessControl_SleepClamp 16
+static const unsigned int     RETURN_CBike__ProcessControl_SleepClamp = 0x6B99D5;
+static void __declspec(naked) HOOK_CBike__ProcessControl_SleepClamp()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push ecx
+        push edx
+        call CalculateVehicleSleepFrameThreshold
+        pop edx
+        pop ecx
+
+        cmp [esi+0xB8], al
+        jbe clamp_done
+        mov [esi+0xB8], al
+
+    clamp_done:
+        jmp RETURN_CBike__ProcessControl_SleepClamp
+    }
+    // clang-format on
+}
+
 #define HOOKPOS_CPhysical__ApplyAirResistance  0x544D29
 #define HOOKSIZE_CPhysical__ApplyAirResistance 5
 static const unsigned int     RETURN_CPhysical__ApplyAirResistance = 0x544D4D;
@@ -954,4 +1263,17 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CTaskSimpleSwim__ProcessSwimmingResistance);
 
     EZHookInstall(CWeapon_Update);
+    EZHookInstall(CAutomobile__ProcessControl_SleepThreshold);
+    EZHookInstall(CBike__ProcessControl_SleepThreshold);
+    EZHookInstall(CBike__ProcessControl_SleepClamp);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_1, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_2, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_3, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_4, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_5, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_6, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_7, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_8, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollisionAlt_1, (DWORD)HOOK_CPhysical__ApplyCollisionAlt);
+    HookInstallCall(CALL_CPhysical__ApplyCollisionAlt_2, (DWORD)HOOK_CPhysical__ApplyCollisionAlt);
 }
