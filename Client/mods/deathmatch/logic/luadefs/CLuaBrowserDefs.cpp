@@ -135,6 +135,7 @@ std::variant<CClientWebBrowser*, bool> CLuaBrowserDefs::CreateBrowser(lua_State*
 
         CClientWebBrowser* browserTexture = g_pClientGame->GetManager()->GetRenderElementManager()->CreateWebBrowser(
             static_cast<int>(size.fX), static_cast<int>(size.fY), isLocal, transparent.value_or(false));
+
         if (browserTexture)
         {
             // Make it a child of the resource's file root ** CHECK  Should parent be fileResource, and element added to parentResource's ElementGroup? **
@@ -143,6 +144,7 @@ std::variant<CClientWebBrowser*, bool> CLuaBrowserDefs::CreateBrowser(lua_State*
             // Set our owner resource
             browserTexture->SetResource(parentResource);
         }
+
         return browserTexture;
     }
 
@@ -182,6 +184,7 @@ bool CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM, std::vector<std::s
         if (m_pLuaManager->IsLuaVMValid(luaVM) && VERIFY_FUNCTION(functionRef))
         {
             CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+
             if (!luaMain)
                 return;
 
@@ -190,20 +193,25 @@ bool CLuaBrowserDefs::RequestBrowserDomains(lua_State* luaVM, std::vector<std::s
 
             CLuaArguments LuaTable;
             int           i = 0;
+
             for (const auto& domain : domains)
             {
                 LuaTable.PushNumber(++i);
                 LuaTable.PushString(domain);
             }
+
             arguments.PushTable(&LuaTable);
             arguments.Call(luaMain, functionRef);
         }
     };
 
     auto webCore = g_pCore->GetWebCore();
+
     if (!webCore)
         return false;
+
     webCore->RequestPages(urls, VERIFY_FUNCTION(functionRef) ? &callback : nullptr);
+
     return true;
 }
 
@@ -313,10 +321,12 @@ std::optional<bool> CLuaBrowserDefs::IsBrowserDomainBlocked(const std::string ur
 {
     //  bool isBrowserDomainBlocked ( string domain, bool isURL )
     auto webCore = g_pCore->GetWebCore();
+
     if (!webCore)
         return std::nullopt;
 
     SString domain = url;
+
     if (isURL.value_or(false))
         domain = webCore->GetDomainFromURL(domain);
 
@@ -334,6 +344,7 @@ bool CLuaBrowserDefs::FocusBrowser(std::optional<CClientWebBrowser*> browser)
         auto webCore = g_pCore->GetWebCore();
         if (webCore)
             webCore->SetFocusedWebView(nullptr);
+
         return true;
     }
 
@@ -375,6 +386,7 @@ std::unordered_map<std::string, bool> CLuaBrowserDefs::GetBrowserSettings()
         {"RemoteJavascript", webCore ? webCore->GetRemoteJavascriptEnabled() : false},
         {"PluginsEnabled", false},
     };
+
     return settings;
 }
 
@@ -382,6 +394,7 @@ bool CLuaBrowserDefs::GetBrowserSource(lua_State* luaVM, CClientWebBrowser* brow
 {
     //  bool getBrowserSource ( browser webBrowser, function callback )
     CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+
     if (luaMain && VERIFY_FUNCTION(callbackFunction))
     {
         browser->GetSourceCode(
