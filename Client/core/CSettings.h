@@ -92,6 +92,7 @@ public:
     void SetVisible(bool bVisible);
     bool IsVisible();
     bool IsChatTabVisible();
+    void GetWindowRect(CRect2D& outRect);
 
     void SetIsModLoaded(bool bLoaded);
 

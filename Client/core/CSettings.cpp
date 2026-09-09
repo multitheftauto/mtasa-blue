@@ -3890,6 +3890,13 @@ bool CSettings::IsChatTabVisible()
     return IsVisible() && m_pTabs->IsTabSelected(m_pTabInterface);
 }
 
+void CSettings::GetWindowRect(CRect2D& outRect)
+{
+    CVector2D vecPosition = m_pWindow->GetPosition(false);
+    CVector2D vecSize = m_pWindow->GetSize(false);
+    outRect = CRect2D(vecPosition.fX, vecPosition.fY, vecPosition.fX + vecSize.fX, vecPosition.fY + vecSize.fY);
+}
+
 void CSettings::SetIsModLoaded(bool bLoaded)
 {
     m_bIsModLoaded = bLoaded;

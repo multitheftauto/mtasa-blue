@@ -160,7 +160,7 @@ public:
     CChat(CGUI* pManager, const CVector2D& vecPosition);
     virtual ~CChat();
 
-    virtual void Draw(bool bUseCacheTexture, bool bAllowOutline);
+    virtual void Draw(bool bUseCacheTexture, bool bAllowOutline, const CRect2D* pClipRect = nullptr);
     virtual void Output(const char* szText, bool bColorCoded = true);
     void         Clear();
     void         ClearInput();

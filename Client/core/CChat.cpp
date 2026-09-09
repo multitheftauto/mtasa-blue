@@ -155,8 +155,27 @@ void CChat::LoadCVars()
 //
 // Draw
 //
-void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
+void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline, const CRect2D* pClipRect)
 {
+    auto SetScissor = [](bool bEnabled, const CRect2D* pRect)
+    {
+        IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
+        if (bEnabled)
+        {
+            RECT rect;
+            rect.left = static_cast<LONG>(std::max(0.0f, pRect->fX1));
+            rect.top = static_cast<LONG>(std::max(0.0f, pRect->fY1));
+            rect.right = static_cast<LONG>(std::max(0.0f, pRect->fX2));
+            rect.bottom = static_cast<LONG>(std::max(0.0f, pRect->fY2));
+            pDevice->SetScissorRect(&rect);
+            pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
+        }
+        else
+        {
+            pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+        }
+    };
+
     // Are we visible and is input blocked?
     if (!m_bVisible && m_bInputBlocked)
         return;
@@ -170,7 +189,11 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     }
 
     bool bUsingOutline = m_bTextBlackOutline && bAllowOutline && bUseCacheTexture;
+    if (pClipRect)
+        SetScissor(true, pClipRect);
     DrawInputLine(bUsingOutline);
+    if (pClipRect)
+        SetScissor(false, nullptr);
 
     if (m_bInputVisible)
     {
@@ -185,9 +208,13 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     if (!m_bVisible)
         return;
 
-    // Get drawList for the chat box text
+    // Get drawList for the chat box text. The background box is rendered inside GetDrawList, so it must be scissored as well, otherwise it would cover the settings window and the text drawn by the other clipped draw calls
     SDrawList drawList;
+    if (pClipRect)
+        SetScissor(true, pClipRect);
     GetDrawList(drawList, bUsingOutline);
+    if (pClipRect)
+        SetScissor(false, nullptr);
 
     // Calc some size info
     CVector2D chatTopLeft(drawList.renderBounds.fX1, drawList.renderBounds.fY1);
@@ -198,7 +225,11 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     // If we are not using a cache texture, just render the text directly to the screen
     if (!bUseCacheTexture)
     {
+        if (pClipRect)
+            SetScissor(true, pClipRect);
         DrawDrawList(drawList, chatTopLeft);
+        if (pClipRect)
+            SetScissor(false, nullptr);
         return;
     }
 
@@ -238,7 +269,11 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     if (!m_pCacheTexture)
     {
         drawList.bOutline = false;  // Outline too slow without cache texture
+        if (pClipRect)
+            SetScissor(true, pClipRect);
         DrawDrawList(drawList, chatTopLeft);
+        if (pClipRect)
+            SetScissor(false, nullptr);
         return;
     }
 
@@ -259,9 +294,13 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     }
 
     // Draw the cache texture
+    if (pClipRect)
+        SetScissor(true, pClipRect);
     pGraphics->SetBlendMode(EBlendMode::ADD);
     pGraphics->DrawTexture(m_pCacheTexture, chatTopLeft.fX, chatTopLeft.fY);
     pGraphics->SetBlendMode(EBlendMode::BLEND);
+    if (pClipRect)
+        SetScissor(false, nullptr);
 }
 
 //
