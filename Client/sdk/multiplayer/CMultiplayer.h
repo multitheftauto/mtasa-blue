@@ -132,6 +132,8 @@ typedef void(GameProjectileDestructHandler)(CEntitySAInterface* pProjectile);
 typedef void(GameModelRemoveHandler)(ushort usModelId);
 typedef void(GameRunNamedAnimDestructorHandler)(class CTaskSimpleRunNamedAnimSAInterface* pTask);
 typedef void(GameEntityRenderHandler)(CEntitySAInterface* pEntity);
+typedef void(RadarBlipRenderHandler)(int iBlipIndex);
+typedef void(MarkerRenderHandler)(unsigned long ulIdentifier);
 typedef void(FxSystemDestructionHandler)(void* pFxSA);
 typedef AnimationId(DrivebyAnimationHandler)(AnimationId animGroup, AssocGroupId animId);
 typedef void(PedStepHandler)(CPedSAInterface* pPed, bool bFoot);
@@ -258,6 +260,8 @@ public:
     virtual void  SetGameModelRemoveHandler(GameModelRemoveHandler* pHandler) = 0;
     virtual void  SetGameRunNamedAnimDestructorHandler(GameRunNamedAnimDestructorHandler* pHandler) = 0;
     virtual void  SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler) = 0;
+    virtual void  SetRadarBlipRenderHandler(RadarBlipRenderHandler* pHandler) = 0;
+    virtual void  SetMarkerRenderHandler(MarkerRenderHandler* pHandler) = 0;
     virtual void  SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler) = 0;
     virtual void  SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler) = 0;
     virtual void  SetPedStepHandler(PedStepHandler* pHandler) = 0;

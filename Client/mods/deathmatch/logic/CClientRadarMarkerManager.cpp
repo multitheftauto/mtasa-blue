@@ -54,7 +54,14 @@ void CClientRadarMarkerManager::DeleteAll()
 
     // Clear the list
     m_Markers.clear();
+    m_GameMarkerMap.clear();
     m_bCanRemoveFromList = true;
+}
+
+CClientRadarMarker* CClientRadarMarkerManager::GetMarkerByGameMarker(const CMarker* pGameMarker) const
+{
+    auto iter = m_GameMarkerMap.find(pGameMarker);
+    return iter != m_GameMarkerMap.end() ? iter->second : nullptr;
 }
 
 CClientRadarMarker* CClientRadarMarkerManager::Get(ElementID ID)

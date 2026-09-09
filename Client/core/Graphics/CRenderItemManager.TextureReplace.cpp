@@ -80,7 +80,7 @@ void CRenderItemManager::RemoveClientEntityRefs(CClientEntityBase* pClientEntity
 SShaderItemLayers* CRenderItemManager::GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData)
 {
     // Save texture usage for later
-    MapInsert(m_FrameTextureUsage, pD3DData);
+    MapInsert(m_FrameTextureUsage, m_pRenderWare->ResolveD3DData(pD3DData));
 
     return m_pRenderWare->GetAppliedShaderForD3DData(pD3DData);
 }

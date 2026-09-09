@@ -24,6 +24,7 @@
 #include <game/CGarages.h>
 #include <game/CPedIntelligence.h>
 #include <game/CPlayerInfo.h>
+#include <game/CRadar.h>
 #include <game/CSettings.h>
 #include <game/CStreaming.h>
 #include <game/CTaskManager.h>
@@ -313,6 +314,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetGameModelRemoveHandler(CClientGame::StaticGameModelRemoveHandler);
     g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(CClientGame::StaticGameRunNamedAnimDestructorHandler);
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
+    g_pMultiplayer->SetRadarBlipRenderHandler(CClientGame::StaticRadarBlipRenderHandler);
+    g_pMultiplayer->SetMarkerRenderHandler(CClientGame::StaticMarkerRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
     g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedStepHandler);
@@ -528,6 +531,8 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetGameModelRemoveHandler(NULL);
     g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(nullptr);
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
+    g_pMultiplayer->SetRadarBlipRenderHandler(nullptr);
+    g_pMultiplayer->SetMarkerRenderHandler(nullptr);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
     g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
@@ -3761,6 +3766,15 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         CPools* pPools = g_pGame->GetPools();
         // Map to client entity and pass to the texture replacer
         CClientEntity* pClientEntity = pPools->GetClientEntity((DWORD*)pGameEntity);
+        if (!pClientEntity)
+        {
+            // Pickup and projectile objects are not registered in the object pool. The interface type is not visible
+            // here, so every miss pays for the two lookups: a hash find while pickups exist and a walk of the (short) projectile list.
+            CClientManager* pManager = g_pClientGame->GetManager();
+            pClientEntity = pManager->GetPickupManager()->GetPickupByGameObject(pGameEntity);
+            if (!pClientEntity)
+                pClientEntity = pManager->GetProjectileManager()->Get(pGameEntity);
+        }
         if (pClientEntity)
         {
             int    iTypeMask;
@@ -3776,6 +3790,8 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
                     iTypeMask = TYPE_MASK_VEHICLE;
                     break;
                 case CCLIENTOBJECT:
+                case CCLIENTPICKUP:
+                case CCLIENTPROJECTILE:
                     iTypeMask = TYPE_MASK_OBJECT;
                     break;
                 case CCLIENTBUILDING:
@@ -3791,6 +3807,51 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
     }
 
     g_pGame->GetRenderWare()->SetRenderingClientEntity(NULL, 0xFFFF, TYPE_MASK_WORLD);
+}
+
+void CClientGame::StaticRadarBlipRenderHandler(int iBlipIndex)
+{
+    if (iBlipIndex >= 0)
+    {
+        CMarker*            pGameMarker = g_pGame->GetRadar()->GetMarker(iBlipIndex);
+        CClientRadarMarker* pBlip = g_pClientGame->GetManager()->GetRadarMarkerManager()->GetMarkerByGameMarker(pGameMarker);
+        if (pBlip)
+        {
+            g_pGame->GetRenderWare()->SetRenderingClientEntity(pBlip, 0xFFFF, TYPE_MASK_OTHER);
+            return;
+        }
+    }
+
+    g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
+}
+
+// CHeli::ProcessControl registers the searchlight cone and corona of a helicopter with the vehicle pointer plus this
+static constexpr unsigned long HELI_SEARCHLIGHT_IDENTIFIER_OFFSET = 0xB;
+
+void CClientGame::StaticMarkerRenderHandler(unsigned long ulIdentifier)
+{
+    if (ulIdentifier)
+    {
+        CClientEntity* pEntity = g_pClientGame->GetManager()->GetMarkerManager()->GetEntityByIdentifier(ulIdentifier);
+        if (pEntity)
+        {
+            g_pGame->GetRenderWare()->SetRenderingClientEntity(pEntity, 0xFFFF, TYPE_MASK_OTHER);
+            return;
+        }
+
+        // The pool lookup rounds to the containing slot, so make sure the identifier really points at a vehicle
+        const unsigned long ulVehicleInterface = ulIdentifier - HELI_SEARCHLIGHT_IDENTIFIER_OFFSET;
+        CClientEntity*      pVehicle = g_pGame->GetPools()->GetClientEntity(reinterpret_cast<DWORD*>(ulVehicleInterface));
+        bool                bExact = pVehicle && pVehicle->GetType() == CCLIENTVEHICLE && pVehicle->GetGameEntity() &&
+                      reinterpret_cast<unsigned long>(pVehicle->GetGameEntity()->GetInterface()) == ulVehicleInterface;
+        if (bExact)
+        {
+            g_pGame->GetRenderWare()->SetRenderingClientEntity(pVehicle, static_cast<CClientVehicle*>(pVehicle)->GetModel(), TYPE_MASK_VEHICLE);
+            return;
+        }
+    }
+
+    g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
 }
 
 void CClientGame::StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
@@ -5033,6 +5094,9 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
 // Clear stale pool entries to prevent dangling pointer crashes in GetClientEntity/GetEntity.
 void CClientGame::GameObjectDestructHandler(CEntitySAInterface* pObject)
 {
+    if (m_pManager)
+        m_pManager->GetPickupManager()->OnGameObjectDestroyed(pObject);
+
     if (auto* pSlot = g_pGame->GetPools()->GetObject(reinterpret_cast<DWORD*>(pObject)))
     {
         pSlot->pEntity = nullptr;

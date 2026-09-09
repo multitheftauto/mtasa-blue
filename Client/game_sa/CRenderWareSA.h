@@ -101,6 +101,7 @@ public:
     const char*        GetTextureName(CD3DDUMMY* pD3DData);
     void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask);
     SShaderItemLayers* GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData);
+    CD3DDUMMY*         ResolveD3DData(CD3DDUMMY* pD3DData);
     void               AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority,
                                            bool bShaderLayered, int iTypeMask, uint uiShaderCreateTime, bool bShaderUsesVertexShader, bool bAppendLayers);
     void               AppendSubtractiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch);
@@ -167,4 +168,7 @@ public:
     bool                                m_bGTAVertexShadersEnabled;
     std::set<RwTexture*>                m_SpecialTextures;
     static int                          ms_iRenderingType;
+    static CD3DDUMMY*                   ms_pNoTextureD3DData;  // Fake texture used for draws without a texture
+    static RwTexture*                   ms_pSearchLightSpotTexture;
+    RwTexture*                          GetSearchLightSpotTexture();
 };

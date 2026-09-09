@@ -12,6 +12,10 @@
 #include "StdInc.h"
 #include "CPointLightsSA.h"
 #include "CEntitySA.h"
+#include "CRenderWareSA.h"
+#include "CGameSA.h"
+
+extern CGameSA* pGame;
 
 using CHeli_SearchLightCone_t = void(__cdecl*)(int handleId, CVector startPos, CVector endPos, float radius1, float unknownConstant, int unkown1,
                                                bool renderSpot, CVector* unkown3, CVector* unkown4, CVector* unknown5, int unknown6, float radius2);
@@ -118,6 +122,11 @@ static void CSearchLight_RenderShadow(char type, void* texture, CVector* pos, fl
 {
     // Get original color intensity multiplier
     float colorIntensity = static_cast<float>(intensity) / 128.0f;
+
+    // The game draws the spot with the texture of the street lamp light pools, so a shader could not address
+    // one without the other. Give the searchlights a texture of their own.
+    if (RwTexture* pSpotTexture = pGame->GetRenderWareSA()->GetSearchLightSpotTexture())
+        texture = pSpotTexture;
 
     // CShadows::StoreShadowToBeRendered
     ((void(__cdecl*)(char, void*, CVector*, float, float, float, float, std::int16_t, unsigned char, unsigned char, unsigned char, float, bool, float, void*,

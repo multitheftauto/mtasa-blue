@@ -28,6 +28,7 @@ CClientCorona::CClientCorona(CClientMarker* pThis)
     // Pick an unique identifier
     static unsigned long ulIdentifier = 0xFFFFFFFF;
     m_ulIdentifier = --ulIdentifier;
+    g_pClientGame->GetManager()->GetMarkerManager()->RegisterIdentifier(m_ulIdentifier, pThis);
 }
 
 CClientCorona::~CClientCorona()
@@ -38,6 +39,7 @@ CClientCorona::~CClientCorona()
     {
         pCorona->Disable();
     }
+    g_pClientGame->GetManager()->GetMarkerManager()->UnregisterIdentifier(m_ulIdentifier);
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pThis, NULL);
 }
 
