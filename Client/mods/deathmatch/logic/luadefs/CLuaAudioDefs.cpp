@@ -458,6 +458,7 @@ auto CLuaAudioDefs::GetSoundMetaTags(CClientSound* sound, std::optional<std::str
         std::string metaTags = sound->GetMetaTags(format.value());
         if (!metaTags.empty())
             return ResultType{metaTags};
+
         return ResultType{false};
     }
 
@@ -509,17 +510,21 @@ auto CLuaAudioDefs::GetSoundEffects(std::variant<CClientSound*, CClientPlayer*> 
     {
         for (const auto& [name, fxEffect] : fxEffects)
             result.emplace(name, (*soundElement)->IsFxEffectEnabled(fxEffect));
+
         return ResultType{result};
     }
     else if (auto* player = std::get_if<CClientPlayer*>(&sound))
     {
         CClientPlayerVoice* playerVoice = (*player)->GetVoice();
+
         if (!playerVoice)
             return ResultType{false};
         for (const auto& [name, fxEffect] : fxEffects)
             result.emplace(name, playerVoice->IsFxEffectEnabled(fxEffect));
+
         return ResultType{result};
     }
+
     return ResultType{false};
 }
 
@@ -540,6 +545,7 @@ struct PlayerVoiceWrapper
         CClientPlayerVoice* voice = player->GetVoice();
         return voice ? voice->SetFxEffectParameters(fxEffect, params) : false;
     }
+
     bool GetFxEffectParameters(std::uint32_t fxEffect, void* params)
     {
         CClientPlayerVoice* voice = player->GetVoice();
