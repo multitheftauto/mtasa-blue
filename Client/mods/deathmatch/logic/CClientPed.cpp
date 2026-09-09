@@ -4926,35 +4926,16 @@ bool CClientPed::GetShotData(CVector* pvecOrigin, CVector* pvecTarget, CVector* 
                 vecTarget = vecOrigin;
                 vecTarget.fZ += fRange;
             }
-            else if (Controller.RightShoulder1 == 255)  // First-person weapons, crosshair active: sync the crosshair
+            else if (pVehicle)
             {
+                // Align drive-by aiming ray directly with camera sightline matching GTA:SA
                 g_pGame->GetCamera()->Find3rdPersonCamTargetVector(fRange, &vecGunMuzzle, &vecOrigin, &vecTarget);
-                // Apply shoot through walls fix
-                vecOrigin = AdjustShotOriginForWalls(vecOrigin, vecTarget, 0.5f);
             }
-            else if (pVehicle)  // Drive-by/vehicle weapons: camera origin as origin, performing collision tests
+            else if (Controller.RightShoulder1 == 255)
             {
-                CColPoint* pCollision;
-                CMatrix    mat;
-                bool       bCollision;
-
-                g_pGame->GetCamera()->GetMatrix(&mat);
-
-                CVector vecCameraOrigin = mat.vPos;
-                CVector vecTemp = vecCameraOrigin;
-                g_pGame->GetCamera()->Find3rdPersonCamTargetVector(fRange, &vecCameraOrigin, &vecTemp, &vecTarget);
-
-                bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&mat.vPos, &vecTarget, &pCollision, NULL);
-                if (pCollision)
-                {
-                    if (bCollision)
-                    {
-                        CVector vecBullet = pCollision->GetPosition() - vecOrigin;
-                        vecBullet.Normalize();
-                        vecTarget = vecOrigin + (vecBullet * fRange);
-                    }
-                    pCollision->Destroy();
-                }
+                // On-foot crosshair active: sync along sightline and adjust for wall clipping
+                g_pGame->GetCamera()->Find3rdPersonCamTargetVector(fRange, &vecGunMuzzle, &vecOrigin, &vecTarget);
+                vecOrigin = AdjustShotOriginForWalls(vecOrigin, vecTarget, 0.5f);
             }
             else
             {
