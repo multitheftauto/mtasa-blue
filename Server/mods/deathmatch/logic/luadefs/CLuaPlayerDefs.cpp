@@ -78,7 +78,7 @@ void CLuaPlayerDefs::LoadFunctions()
         // Audio funcs
         // {"playMissionAudio", CLuaFunctionDefinitions::PlayMissionAudio},
         // {"preloadMissionAudio", CLuaFunctionDefinitions::PreloadMissionAudio},
-        {"playSoundFrontEnd", PlaySoundFrontEnd},
+        {"playSoundFrontEnd", ArgumentParserWarn<false, PlaySoundFrontEnd>},
 
         // Input funcs
         {"bindKey", BindKey},
@@ -1891,33 +1891,12 @@ int CLuaPlayerDefs::ToggleAllControls(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPlayerDefs::PlaySoundFrontEnd(lua_State* luaVM)
+bool CLuaPlayerDefs::PlaySoundFrontEnd(CElement* pElement, unsigned char ucSound)
 {
-    CElement*     pElement;
-    unsigned char ucSound;
+    if (ucSound > 101)
+        throw std::invalid_argument("Invalid sound ID specified. Valid sound IDs are 0 - 101.");
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(ucSound);
-
-    if (!argStream.HasErrors())
-    {
-        if (ucSound <= 101)
-        {
-            if (CStaticFunctionDefinitions::PlaySoundFrontEnd(pElement, ucSound))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogError(luaVM, "Invalid sound ID specified. Valid sound IDs are 0 - 101.");
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::PlaySoundFrontEnd(pElement, ucSound);
 }
 
 int CLuaPlayerDefs::KickPlayer(lua_State* luaVM)

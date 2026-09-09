@@ -16,57 +16,57 @@
 void CLuaAudioDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{// Audio funcs
-                                                                             {"playSoundFrontEnd", PlaySoundFrontEnd},
+                                                                             {"playSoundFrontEnd", ArgumentParserWarn<false, PlaySoundFrontEnd>},
                                                                              {"setAmbientSoundEnabled", SetAmbientSoundEnabled},
                                                                              {"isAmbientSoundEnabled", IsAmbientSoundEnabled},
                                                                              {"resetAmbientSounds", ResetAmbientSounds},
                                                                              {"setWorldSoundEnabled", SetWorldSoundEnabled},
                                                                              {"isWorldSoundEnabled", IsWorldSoundEnabled},
                                                                              {"resetWorldSounds", ResetWorldSounds},
-                                                                             {"playSFX", PlaySFX},
-                                                                             {"playSFX3D", PlaySFX3D},
-                                                                             {"getSFXStatus", GetSFXStatus},
+                                                                             {"playSFX", ArgumentParserWarn<false, PlaySFX>},
+                                                                             {"playSFX3D", ArgumentParserWarn<false, PlaySFX3D>},
+                                                                             {"getSFXStatus", ArgumentParserWarn<nullptr, GetSFXStatus>},
 
                                                                              // Sound effects and synth funcs
-                                                                             {"playSound", PlaySound},
-                                                                             {"playSound3D", PlaySound3D},
-                                                                             {"stopSound", StopSound},
-                                                                             {"setSoundPosition", SetSoundPosition},
-                                                                             {"getSoundPosition", GetSoundPosition},
-                                                                             {"getSoundLength", GetSoundLength},
-                                                                             {"getSoundBufferLength", GetSoundBufferLength},
+                                                                             {"playSound", ArgumentParserWarn<false, PlaySound>},
+                                                                             {"playSound3D", ArgumentParserWarn<false, PlaySound3D>},
+                                                                             {"stopSound", ArgumentParserWarn<false, StopSound>},
+                                                                             {"setSoundPosition", ArgumentParserWarn<false, SetSoundPosition>},
+                                                                             {"getSoundPosition", ArgumentParserWarn<false, GetSoundPosition>},
+                                                                             {"getSoundLength", ArgumentParserWarn<false, GetSoundLength>},
+                                                                             {"getSoundBufferLength", ArgumentParserWarn<nullptr, GetSoundBufferLength>},
                                                                              {"setSoundLooped", ArgumentParser<SetSoundLooped>},
                                                                              {"isSoundLooped", ArgumentParser<IsSoundLooped>},
-                                                                             {"setSoundPaused", SetSoundPaused},
-                                                                             {"isSoundPaused", IsSoundPaused},
-                                                                             {"setSoundVolume", SetSoundVolume},
-                                                                             {"getSoundVolume", GetSoundVolume},
-                                                                             {"setSoundSpeed", SetSoundSpeed},
-                                                                             {"getSoundSpeed", GetSoundSpeed},
-                                                                             {"setSoundProperties", SetSoundProperties},
-                                                                             {"getSoundProperties", GetSoundProperties},
-                                                                             {"getSoundFFTData", GetSoundFFTData},
-                                                                             {"getSoundWaveData", GetSoundWaveData},
-                                                                             {"getSoundLevelData", GetSoundLevelData},
-                                                                             {"getSoundBPM", GetSoundBPM},
-                                                                             {"setSoundPanningEnabled", SetSoundPanEnabled},
-                                                                             {"isSoundPanningEnabled", IsSoundPanEnabled},
-                                                                             {"setSoundMinDistance", SetSoundMinDistance},
-                                                                             {"getSoundMinDistance", GetSoundMinDistance},
-                                                                             {"setSoundMaxDistance", SetSoundMaxDistance},
-                                                                             {"getSoundMaxDistance", GetSoundMaxDistance},
-                                                                             {"getSoundMetaTags", GetSoundMetaTags},
-                                                                             {"setSoundEffectEnabled", SetSoundEffectEnabled},
-                                                                             {"getSoundEffects", GetSoundEffects},
-                                                                             {"setSoundEffectParameter", SetSoundEffectParameter},
-                                                                             {"getSoundEffectParameters", GetSoundEffectParameters},
-                                                                             {"setSoundPan", SetSoundPan},
-                                                                             {"getSoundPan", GetSoundPan},
+                                                                             {"setSoundPaused", ArgumentParserWarn<false, SetSoundPaused>},
+                                                                             {"isSoundPaused", ArgumentParserWarn<false, IsSoundPaused>},
+                                                                             {"setSoundVolume", ArgumentParserWarn<false, SetSoundVolume>},
+                                                                             {"getSoundVolume", ArgumentParserWarn<false, GetSoundVolume>},
+                                                                             {"setSoundSpeed", ArgumentParserWarn<false, SetSoundSpeed>},
+                                                                             {"getSoundSpeed", ArgumentParserWarn<false, GetSoundSpeed>},
+                                                                             {"setSoundProperties", ArgumentParserWarn<false, SetSoundProperties>},
+                                                                             {"getSoundProperties", ArgumentParserWarn<false, GetSoundProperties>},
+                                                                             {"getSoundFFTData", ArgumentParserWarn<false, GetSoundFFTData>},
+                                                                             {"getSoundWaveData", ArgumentParserWarn<false, GetSoundWaveData>},
+                                                                             {"getSoundLevelData", ArgumentParserWarn<false, GetSoundLevelData>},
+                                                                             {"getSoundBPM", ArgumentParserWarn<false, GetSoundBPM>},
+                                                                             {"setSoundPanningEnabled", ArgumentParserWarn<false, SetSoundPanEnabled>},
+                                                                             {"isSoundPanningEnabled", ArgumentParserWarn<false, IsSoundPanEnabled>},
+                                                                             {"setSoundMinDistance", ArgumentParserWarn<false, SetSoundMinDistance>},
+                                                                             {"getSoundMinDistance", ArgumentParserWarn<false, GetSoundMinDistance>},
+                                                                             {"setSoundMaxDistance", ArgumentParserWarn<false, SetSoundMaxDistance>},
+                                                                             {"getSoundMaxDistance", ArgumentParserWarn<false, GetSoundMaxDistance>},
+                                                                             {"getSoundMetaTags", ArgumentParserWarn<false, GetSoundMetaTags>},
+                                                                             {"setSoundEffectEnabled", ArgumentParserWarn<false, SetSoundEffectEnabled>},
+                                                                             {"getSoundEffects", ArgumentParserWarn<false, GetSoundEffects>},
+                                                                             {"setSoundEffectParameter", ArgumentParserWarn<false, SetSoundEffectParameter>},
+                                                                             {"getSoundEffectParameters", ArgumentParserWarn<false, GetSoundEffectParameters>},
+                                                                             {"setSoundPan", ArgumentParserWarn<false, SetSoundPan>},
+                                                                             {"getSoundPan", ArgumentParserWarn<false, GetSoundPan>},
 
                                                                              // Radio funcs
-                                                                             {"setRadioChannel", SetRadioChannel},
-                                                                             {"getRadioChannel", GetRadioChannel},
-                                                                             {"getRadioChannelName", GetRadioChannelName},
+                                                                             {"setRadioChannel", ArgumentParserWarn<false, SetRadioChannel>},
+                                                                             {"getRadioChannel", ArgumentParserWarn<false, GetRadioChannel>},
+                                                                             {"getRadioChannelName", ArgumentParserWarn<false, GetRadioChannelName>},
 
                                                                              // Dev funcs
                                                                              {"showSound", ArgumentParser<ShowSound>},
@@ -144,322 +144,126 @@ void CLuaAudioDefs::AddClass(lua_State* luaVM)
     lua_registerclass(luaVM, "Sound3D", "Sound");
 }
 
-int CLuaAudioDefs::PlaySound(lua_State* luaVM)
+std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, const std::string strSound, std::optional<bool> bLoop, std::optional<bool> bThrottle)
 {
-    SString          strSound = "";
-    bool             bLoop = false;
-    bool             bThrottle = true;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strSound);
-    argStream.ReadBool(bLoop, false);
-    argStream.ReadBool(bThrottle, true);
+    CResource* pResource = &lua_getownerresource(luaVM);
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
-        {
-            CResource* pResource = luaMain->GetResource();
-            if (pResource)
-            {
-                SString strFilename;
-                bool    bIsURL = false;
-                bool    bIsRawData = false;
+    SString strSoundPath = SString(strSound);
+    SString strFilename;
+    bool    bIsURL = false;
+    bool    bIsRawData = false;
 
-                if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename, nullptr, true))
-                    strSound = strFilename;
-                else
-                {
-                    if ((stricmp(strSound.Left(4), "http") == 0 || stricmp(strSound.Left(3), "ftp") == 0) &&
-                        (strSound.length() <= 2048 || strSound.find('\n') == SString::npos))
-                        bIsURL = true;
-                    else
-                        bIsRawData = true;
-                }
-
-                // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
-                // ) Fixes #6507 - Caz
-                if (pResource)
-                {
-                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound(pResource, strSound, bIsURL, bIsRawData, bLoop, bThrottle);
-                    if (pSound)
-                    {
-                        // call onClientSoundStarted
-                        CLuaArguments Arguments;
-                        Arguments.PushString("play");  // Reason
-                        pSound->CallEvent("onClientSoundStarted", Arguments, false);
-
-                        lua_pushelement(luaVM, pSound);
-                        return 1;
-                    }
-                }
-            }
-        }
-    }
+    if (CResourceManager::ParseResourcePathInput(strSoundPath, pResource, &strFilename, nullptr, true))
+        strSoundPath = strFilename;
     else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::PlaySound3D(lua_State* luaVM)
-{
-    SString          strSound = "";
-    CVector          vecPosition;
-    bool             bLoop = false;
-    bool             bThrottle = false;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strSound);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadBool(bLoop, false);
-    argStream.ReadBool(bThrottle, true);
-
-    if (!argStream.HasErrors())
     {
-        CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (luaMain)
-        {
-            CResource* pResource = luaMain->GetResource();
-            if (pResource)
-            {
-                SString strFilename;
-                bool    bIsURL = false;
-                bool    bIsRawData = false;
-                if (CResourceManager::ParseResourcePathInput(strSound, pResource, &strFilename, nullptr, true))
-                    strSound = strFilename;
-                else
-                {
-                    if ((stricmp(strSound.Left(4), "http") == 0 || stricmp(strSound.Left(3), "ftp") == 0) &&
-                        (strSound.length() <= 2048 || strSound.find('\n') == SString::npos))
-                        bIsURL = true;
-                    else
-                        bIsRawData = true;
-                }
-
-                // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
-                // ) Fixes #6507 - Caz
-                if (pResource)
-                {
-                    CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D(pResource, strSound, bIsURL, bIsRawData, vecPosition, bLoop, bThrottle);
-                    if (pSound)
-                    {
-                        // call onClientSoundStarted
-                        CLuaArguments Arguments;
-                        Arguments.PushString("play");  // Reason
-                        pSound->CallEvent("onClientSoundStarted", Arguments, false);
-
-                        lua_pushelement(luaVM, pSound);
-                        return 1;
-                    }
-                }
-            }
-        }
+        if ((stricmp(strSoundPath.Left(4), "http") == 0 || stricmp(strSoundPath.Left(3), "ftp") == 0) &&
+            (strSoundPath.length() <= 2048 || strSoundPath.find('\n') == SString::npos))
+            bIsURL = true;
+        else
+            bIsRawData = true;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::StopSound(lua_State* luaVM)
-{
-    CClientSound*    pSound = NULL;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-
-    if (!argStream.HasErrors())
+    // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
+    // ) Fixes #6507 - Caz
+    if (pResource)
     {
+        CClientSound* pSound = CStaticFunctionDefinitions::PlaySound(pResource, strSoundPath, bIsURL, bIsRawData, bLoop.value_or(false), bThrottle.value_or(true));
         if (pSound)
         {
-            if (CStaticFunctionDefinitions::StopSound(*pSound))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+            // call onClientSoundStarted
+            CLuaArguments Arguments;
+            Arguments.PushString("play");  // Reason
+            pSound->CallEvent("onClientSoundStarted", Arguments, false);
+
+            return pSound;
         }
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
-int CLuaAudioDefs::SetSoundPosition(lua_State* luaVM)
+std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, const std::string strSound, CVector vecPosition, std::optional<bool> bLoop,
+                                                             std::optional<bool> bThrottle)
 {
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    double           dPosition = 0.0;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
+    CResource* pResource = &lua_getownerresource(luaVM);
+
+    SString strSoundPath = SString(strSound);
+    SString strFilename;
+    bool    bIsURL = false;
+    bool    bIsRawData = false;
+
+    if (CResourceManager::ParseResourcePathInput(strSoundPath, pResource, &strFilename, nullptr, true))
+        strSoundPath = strFilename;
     else
     {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
+        if ((stricmp(strSoundPath.Left(4), "http") == 0 || stricmp(strSoundPath.Left(3), "ftp") == 0) &&
+            (strSoundPath.length() <= 2048 || strSoundPath.find('\n') == SString::npos))
+            bIsURL = true;
+        else
+            bIsRawData = true;
     }
-    argStream.ReadNumber(dPosition);
 
-    if (!argStream.HasErrors())
+    // ParseResourcePathInput changes pResource in some cases e.g. an invalid resource URL - crun playSound( ":myNotRunningResource/music/track.mp3"
+    // ) Fixes #6507 - Caz
+    if (pResource)
     {
+        CClientSound* pSound = CStaticFunctionDefinitions::PlaySound3D(pResource, strSoundPath, bIsURL, bIsRawData, vecPosition, bLoop.value_or(false),
+                                                                       bThrottle.value_or(true));
         if (pSound)
         {
-            if (CStaticFunctionDefinitions::SetSoundPosition(*pSound, dPosition))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else if (pPlayer)
-        {
-            if (CStaticFunctionDefinitions::SetSoundPosition(*pPlayer, dPosition))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
+            // call onClientSoundStarted
+            CLuaArguments Arguments;
+            Arguments.PushString("play");  // Reason
+            pSound->CallEvent("onClientSoundStarted", Arguments, false);
+
+            return pSound;
         }
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
-int CLuaAudioDefs::GetSoundPosition(lua_State* luaVM)
+bool CLuaAudioDefs::StopSound(CClientSound* pSound)
 {
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
-    }
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            double dPosition = 0;
-            if (CStaticFunctionDefinitions::GetSoundPosition(*pSound, dPosition))
-            {
-                lua_pushnumber(luaVM, dPosition);
-                return 1;
-            }
-        }
-        else if (pPlayer)
-        {
-            double dPosition = 0;
-            if (CStaticFunctionDefinitions::GetSoundPosition(*pPlayer, dPosition))
-            {
-                lua_pushnumber(luaVM, dPosition);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return pSound && CStaticFunctionDefinitions::StopSound(*pSound);
 }
 
-int CLuaAudioDefs::GetSoundLength(lua_State* luaVM)
+bool CLuaAudioDefs::SetSoundPosition(std::variant<CClientSound*, CClientPlayer*> sound, double dPosition)
 {
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
-    }
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            double dLength = 0;
-            if (CStaticFunctionDefinitions::GetSoundLength(*pSound, dLength))
-            {
-                lua_pushnumber(luaVM, dLength);
-                return 1;
-            }
-        }
-        else if (pPlayer)
-        {
-            double dLength = 0;
-            if (CStaticFunctionDefinitions::GetSoundLength(*pPlayer, dLength))
-            {
-                lua_pushnumber(luaVM, dLength);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        return CStaticFunctionDefinitions::SetSoundPosition(**pSound, dPosition);
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+        return CStaticFunctionDefinitions::SetSoundPosition(**pPlayer, dPosition);
+    return false;
 }
 
-int CLuaAudioDefs::GetSoundBufferLength(lua_State* luaVM)
+std::variant<double, bool> CLuaAudioDefs::GetSoundPosition(std::variant<CClientSound*, CClientPlayer*> sound)
 {
-    CClientSound* pSound;
+    double dPosition = 0;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundPosition(**pSound, dPosition))
+        return dPosition;
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer && CStaticFunctionDefinitions::GetSoundPosition(**pPlayer, dPosition))
+        return dPosition;
+    return false;
+}
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
+std::variant<double, bool> CLuaAudioDefs::GetSoundLength(std::variant<CClientSound*, CClientPlayer*> sound)
+{
+    double dLength = 0;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundLength(**pSound, dLength))
+        return dLength;
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer && CStaticFunctionDefinitions::GetSoundLength(**pPlayer, dLength))
+        return dLength;
+    return false;
+}
 
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            double dBufferLength = 0;
-            if (CStaticFunctionDefinitions::GetSoundBufferLength(*pSound, dBufferLength))
-            {
-                lua_pushnumber(luaVM, dBufferLength);
-                return 1;
-            }
-            else
-            {
-                lua_pushboolean(luaVM, false);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushnil(luaVM);
-    return 1;
+std::variant<double, bool> CLuaAudioDefs::GetSoundBufferLength(CClientSound* pSound)
+{
+    double dBufferLength = 0;
+    if (pSound && CStaticFunctionDefinitions::GetSoundBufferLength(*pSound, dBufferLength))
+        return dBufferLength;
+    return false;
 }
 
 bool CLuaAudioDefs::SetSoundLooped(CClientSound* pSound, bool bLoop)
@@ -472,925 +276,243 @@ bool CLuaAudioDefs::IsSoundLooped(CClientSound* pSound)
     return pSound->IsLooped();
 }
 
-int CLuaAudioDefs::SetSoundPaused(lua_State* luaVM)
+bool CLuaAudioDefs::SetSoundPaused(std::variant<CClientSound*, CClientPlayer*> sound, bool bPaused)
 {
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    bool             bPaused = false;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        return CStaticFunctionDefinitions::SetSoundPaused(**pSound, bPaused);
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+        return CStaticFunctionDefinitions::SetSoundPaused(**pPlayer, bPaused);
+    return false;
+}
+
+bool CLuaAudioDefs::IsSoundPaused(std::variant<CClientSound*, CClientPlayer*> sound)
+{
+    bool bPaused = false;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::IsSoundPaused(**pSound, bPaused))
+        return bPaused;
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer && CStaticFunctionDefinitions::IsSoundPaused(**pPlayer, bPaused))
+        return bPaused;
+    return false;
+}
+
+bool CLuaAudioDefs::SetSoundVolume(std::variant<CClientSound*, CClientPlayer*> sound, float fVolume)
+{
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        return CStaticFunctionDefinitions::SetSoundVolume(**pSound, fVolume);
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+        return CStaticFunctionDefinitions::SetSoundVolume(**pPlayer, fVolume);
+    return false;
+}
+
+std::variant<float, bool> CLuaAudioDefs::GetSoundVolume(std::variant<CClientSound*, CClientPlayer*> sound)
+{
+    float fVolume = 0.0f;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundVolume(**pSound, fVolume))
+        return fVolume;
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer && CStaticFunctionDefinitions::GetSoundVolume(**pPlayer, fVolume))
+        return fVolume;
+    return false;
+}
+
+bool CLuaAudioDefs::SetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> sound, float fSpeed)
+{
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        return CStaticFunctionDefinitions::SetSoundSpeed(**pSound, fSpeed);
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+        return CStaticFunctionDefinitions::SetSoundSpeed(**pPlayer, fSpeed);
+    return false;
+}
+
+bool CLuaAudioDefs::SetSoundProperties(CClientSound* pSound, float fSampleRate, float fTempo, float fPitch, std::optional<bool> bReversed)
+{
+    return pSound && CStaticFunctionDefinitions::SetSoundProperties(*pSound, fSampleRate, fTempo, fPitch, bReversed.value_or(false));
+}
+
+std::variant<CLuaMultiReturn<float, float, float, bool>, bool> CLuaAudioDefs::GetSoundProperties(CClientSound* pSound)
+{
+    float fSampleRate = 0.0f, fTempo = 0.0f, fPitch = 0.0f;
+    bool  bReversed = false;
+    if (pSound && CStaticFunctionDefinitions::GetSoundProperties(*pSound, fSampleRate, fTempo, fPitch, bReversed))
+        return CLuaMultiReturn<float, float, float, bool>{fSampleRate, fTempo, fPitch, bReversed};
+    return false;
+}
+
+std::variant<std::unordered_map<int, float>, bool> CLuaAudioDefs::GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*> sound, int iLength,
+                                                                                  std::optional<int> iBands)
+{
+    float* pData = nullptr;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        pData = CStaticFunctionDefinitions::GetSoundFFTData(**pSound, iLength, iBands.value_or(0));
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+        pData = CStaticFunctionDefinitions::GetSoundFFTData(**pPlayer, iLength, iBands.value_or(0));
+
+    if (!pData)
         return false;
-    }
-    argStream.ReadBool(bPaused);
 
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::SetSoundPaused(*pSound, bPaused))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else if (pPlayer)
-        {
-            if (CStaticFunctionDefinitions::SetSoundPaused(*pPlayer, bPaused))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    const int                        iSize = iBands.value_or(0) == 0 ? iLength / 2 : iBands.value_or(0) - 1;
+    std::unordered_map<int, float>   data;
+    for (int i = 0; i <= iSize; i++)
+        data.emplace(i, pData[i]);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    // Deallocate our data array here after it's used.
+    delete[] pData;
+    return data;
 }
 
-int CLuaAudioDefs::IsSoundPaused(lua_State* luaVM)
+std::variant<std::unordered_map<int, float>, bool> CLuaAudioDefs::GetSoundWaveData(std::variant<CClientSound*, CClientPlayer*> sound, int iLength)
 {
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
+    float* pData = nullptr;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        pData = CStaticFunctionDefinitions::GetSoundWaveData(**pSound, iLength);
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+        pData = CStaticFunctionDefinitions::GetSoundWaveData(**pPlayer, iLength);
     else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
         return false;
-    }
 
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            bool bPaused = false;
-            if (CStaticFunctionDefinitions::IsSoundPaused(*pSound, bPaused))
-            {
-                lua_pushboolean(luaVM, bPaused);
-                return 1;
-            }
-        }
-        else if (pPlayer)
-        {
-            bool bPaused = false;
-            if (CStaticFunctionDefinitions::IsSoundPaused(*pPlayer, bPaused))
-            {
-                lua_pushboolean(luaVM, bPaused);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::SetSoundVolume(lua_State* luaVM)
-{
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    float            fVolume = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
+    if (!pData)
         return false;
-    }
-    argStream.ReadNumber(fVolume);
 
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::SetSoundVolume(*pSound, fVolume))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else if (pPlayer)
-        {
-            if (CStaticFunctionDefinitions::SetSoundVolume(*pPlayer, fVolume))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    std::unordered_map<int, float> data;
+    for (int i = 0; i < iLength; i++)
+        data.emplace(i, pData[i]);
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    // Deallocate our data array here after it's used.
+    delete[] pData;
+    return data;
 }
 
-int CLuaAudioDefs::GetSoundVolume(lua_State* luaVM)
+std::variant<CLuaMultiReturn<unsigned int, unsigned int>, bool> CLuaAudioDefs::GetSoundLevelData(std::variant<CClientSound*, CClientPlayer*> sound)
 {
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
+    DWORD dwLeft = 0, dwRight = 0;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundLevelData(**pSound, dwLeft, dwRight))
+        return CLuaMultiReturn<unsigned int, unsigned int>{(unsigned int)dwLeft, (unsigned int)dwRight};
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer &&
+             CStaticFunctionDefinitions::GetSoundLevelData(**pPlayer, dwLeft, dwRight))
+        return CLuaMultiReturn<unsigned int, unsigned int>{(unsigned int)dwLeft, (unsigned int)dwRight};
+    return false;
+}
+
+std::variant<float, bool> CLuaAudioDefs::GetSoundBPM(CClientSound* pSound)
+{
+    float fBPM = 0.0f;
+    if (pSound && CStaticFunctionDefinitions::GetSoundBPM(*pSound, fBPM))
+        return fBPM;
+    return false;
+}
+
+bool CLuaAudioDefs::SetSoundPanEnabled(CClientSound* pSound, bool bEnabled)
+{
+    return pSound && CStaticFunctionDefinitions::SetSoundPanEnabled(*pSound, bEnabled);
+}
+
+bool CLuaAudioDefs::IsSoundPanEnabled(CClientSound* pSound)
+{
+    return pSound && CStaticFunctionDefinitions::IsSoundPanEnabled(*pSound);
+}
+
+std::variant<float, bool> CLuaAudioDefs::GetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> sound)
+{
+    float fSpeed = 0.0f;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundSpeed(**pSound, fSpeed))
+        return fSpeed;
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer && CStaticFunctionDefinitions::GetSoundSpeed(**pPlayer, fSpeed))
+        return fSpeed;
+    return false;
+}
+
+bool CLuaAudioDefs::SetSoundMinDistance(CClientSound* pSound, float fDistance)
+{
+    return pSound && CStaticFunctionDefinitions::SetSoundMinDistance(*pSound, fDistance);
+}
+
+std::variant<float, bool> CLuaAudioDefs::GetSoundMinDistance(CClientSound* pSound)
+{
+    float fDistance = 0.0f;
+    if (pSound && CStaticFunctionDefinitions::GetSoundMinDistance(*pSound, fDistance))
+        return fDistance;
+    return false;
+}
+
+bool CLuaAudioDefs::SetSoundMaxDistance(CClientSound* pSound, float fDistance)
+{
+    return pSound && CStaticFunctionDefinitions::SetSoundMaxDistance(*pSound, fDistance);
+}
+
+std::variant<float, bool> CLuaAudioDefs::GetSoundMaxDistance(CClientSound* pSound)
+{
+    float fDistance = 0.0f;
+    if (pSound && CStaticFunctionDefinitions::GetSoundMaxDistance(*pSound, fDistance))
+        return fDistance;
+    return false;
+}
+
+std::variant<SString, std::unordered_map<std::string, std::string>, bool> CLuaAudioDefs::GetSoundMetaTags(CClientSound* pSound,
+                                                                                                          std::optional<std::string> strFormat)
+{
+    if (!pSound)
         return false;
-    }
 
-    if (!argStream.HasErrors())
+    if (strFormat.has_value() && !strFormat.value().empty())
     {
-        if (pSound)
-        {
-            float fVolume = 0.0f;
-            if (CStaticFunctionDefinitions::GetSoundVolume(*pSound, fVolume))
-            {
-                lua_pushnumber(luaVM, fVolume);
-                return 1;
-            }
-        }
-        else if (pPlayer)
-        {
-            float fVolume = 0.0f;
-            if (CStaticFunctionDefinitions::GetSoundVolume(*pPlayer, fVolume))
-            {
-                lua_pushnumber(luaVM, fVolume);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::SetSoundSpeed(lua_State* luaVM)
-{
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    float            fSpeed = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
-    }
-    argStream.ReadNumber(fSpeed);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::SetSoundSpeed(*pSound, fSpeed))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else if (pPlayer)
-        {
-            if (CStaticFunctionDefinitions::SetSoundSpeed(*pPlayer, fSpeed))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::SetSoundProperties(lua_State* luaVM)
-{
-    CClientSound*    pSound = NULL;
-    bool             bReversed = false;
-    float            fSampleRate = 0.0f, fTempo = 0.0f, fPitch = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-    argStream.ReadNumber(fSampleRate);
-    argStream.ReadNumber(fTempo);
-    argStream.ReadNumber(fPitch);
-    argStream.ReadBool(bReversed, false);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::SetSoundProperties(*pSound, fSampleRate, fTempo, fPitch, bReversed))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::GetSoundProperties(lua_State* luaVM)
-{
-    CClientSound*    pSound = NULL;
-    bool             bReversed = false;
-    float            fSampleRate = 0.0f, fTempo = 0.0f, fPitch = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::GetSoundProperties(*pSound, fSampleRate, fTempo, fPitch, bReversed))
-            {
-                lua_pushnumber(luaVM, fSampleRate);
-                lua_pushnumber(luaVM, fTempo);
-                lua_pushnumber(luaVM, fPitch);
-                lua_pushboolean(luaVM, bReversed);
-                return 4;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::GetSoundFFTData(lua_State* luaVM)
-{
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    float*           pData = NULL;
-    int              iLength = 0;
-    int              iBands = 0;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
-    }
-    argStream.ReadNumber(iLength);
-    argStream.ReadNumber(iBands, 0);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            pData = CStaticFunctionDefinitions::GetSoundFFTData(*pSound, iLength, iBands);
-        }
-        else if (pPlayer)
-        {
-            pData = CStaticFunctionDefinitions::GetSoundFFTData(*pPlayer, iLength, iBands);
-        }
-        if (pData != NULL)
-        {
-            if (iBands == 0)
-            {
-                // Create a new table
-                lua_newtable(luaVM);
-                for (int i = 0; i <= iLength / 2; i++)
-                {
-                    lua_pushnumber(luaVM, i);
-                    lua_pushnumber(luaVM, pData[i]);
-                    lua_settable(luaVM, -3);
-                }
-            }
-            else
-            {
-                // Create a new table
-                lua_newtable(luaVM);
-                for (int i = 0; i <= iBands - 1; i++)
-                {
-                    lua_pushnumber(luaVM, i);
-                    lua_pushnumber(luaVM, pData[i]);
-                    lua_settable(luaVM, -3);
-                }
-            }
-            // Deallocate our data array here after it's used.
-            delete[] pData;
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::GetSoundWaveData(lua_State* luaVM)
-{
-    CClientSound*    pSound = NULL;
-    CClientPlayer*   pPlayer = NULL;
-    float*           pData = NULL;
-    int              iLength = 0;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-    argStream.ReadNumber(iLength);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound != NULL)
-        {
-            pData = CStaticFunctionDefinitions::GetSoundWaveData(*pSound, iLength);
-        }
-        else if (pPlayer != NULL)
-        {
-            pData = CStaticFunctionDefinitions::GetSoundWaveData(*pPlayer, iLength);
-        }
-        else
-        {
-            m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-        if (pData != NULL)
-        {
-            // Create a new table
-            lua_newtable(luaVM);
-            for (int i = 0; i < iLength; i++)
-            {
-                lua_pushnumber(luaVM, i);
-                lua_pushnumber(luaVM, pData[i]);
-                lua_settable(luaVM, -3);
-            }
-            // Deallocate our data array here after it's used.
-            delete[] pData;
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::GetSoundLevelData(lua_State* luaVM)
-{
-    CClientSound*    pSound = NULL;
-    CClientPlayer*   pPlayer = NULL;
-    DWORD            dwLeft = 0, dwRight = 0;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound != NULL && CStaticFunctionDefinitions::GetSoundLevelData(*pSound, dwLeft, dwRight))
-        {
-            lua_pushnumber(luaVM, dwLeft);
-            lua_pushnumber(luaVM, dwRight);
-            return 2;
-        }
-        else if (pPlayer != NULL && CStaticFunctionDefinitions::GetSoundLevelData(*pPlayer, dwLeft, dwRight))
-        {
-            lua_pushnumber(luaVM, dwLeft);
-            lua_pushnumber(luaVM, dwRight);
-            return 2;
-        }
-        else
-        {
-            lua_pushboolean(luaVM, false);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::GetSoundBPM(lua_State* luaVM)
-{
-    CClientSound*    pSound = NULL;
-    float            fBPM = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::GetSoundBPM(*pSound, fBPM))
-        {
-            lua_pushnumber(luaVM, fBPM);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::SetSoundPanEnabled(lua_State* luaVM)
-{
-    CClientSound*    pSound = NULL;
-    bool             bEnabled = true;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-    argStream.ReadBool(bEnabled);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::SetSoundPanEnabled(*pSound, bEnabled))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::IsSoundPanEnabled(lua_State* luaVM)
-{
-    CClientSound*    pSound = NULL;
-    bool             bEnabled = true;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::IsSoundPanEnabled(*pSound))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::GetSoundSpeed(lua_State* luaVM)
-{
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
+        SString strMetaTags;
+        if (CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, SString(strFormat.value()), strMetaTags) && !strMetaTags.empty())
+            return strMetaTags;
         return false;
     }
 
-    if (!argStream.HasErrors())
+    SString                              strMetaTags;
+    std::unordered_map<std::string, std::string> tags;
+    const auto AddTag = [&](const char* szFormat, const char* szKey)
     {
-        if (pSound)
-        {
-            float fSpeed = 0.0f;
-            if (CStaticFunctionDefinitions::GetSoundSpeed(*pSound, fSpeed))
-            {
-                lua_pushnumber(luaVM, fSpeed);
-                return 1;
-            }
-        }
-        else if (pPlayer)
-        {
-            float fSpeed = 0.0f;
-            if (CStaticFunctionDefinitions::GetSoundSpeed(*pPlayer, fSpeed))
-            {
-                lua_pushnumber(luaVM, fSpeed);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+        if (CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, szFormat, strMetaTags) && !strMetaTags.empty())
+            tags.emplace(szKey, strMetaTags);
+    };
+    AddTag("%TITL", "title");
+    AddTag("%ARTI", "artist");
+    AddTag("%ALBM", "album");
+    AddTag("%GNRE", "genre");
+    AddTag("%YEAR", "year");
+    AddTag("%CMNT", "comment");
+    AddTag("%TRCK", "track");
+    AddTag("%COMP", "composer");
+    AddTag("%COPY", "copyright");
+    AddTag("%SUBT", "subtitle");
+    AddTag("%AART", "album_artist");
+    AddTag("streamName", "stream_name");
+    AddTag("streamTitle", "stream_title");
+    return tags;
 }
 
-int CLuaAudioDefs::SetSoundMinDistance(lua_State* luaVM)
+bool CLuaAudioDefs::SetSoundEffectEnabled(std::variant<CClientSound*, CClientPlayer*> sound, const std::string strEffectName, std::optional<bool> bEnable)
 {
-    CClientSound*    pSound = NULL;
-    float            fDistance = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-    argStream.ReadNumber(fDistance);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::SetSoundMinDistance(*pSound, fDistance))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        return CStaticFunctionDefinitions::SetSoundEffectEnabled(**pSound, strEffectName, bEnable.value_or(false));
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+        return CStaticFunctionDefinitions::SetSoundEffectEnabled(**pPlayer, strEffectName, bEnable.value_or(false));
+    return false;
 }
 
-int CLuaAudioDefs::GetSoundMinDistance(lua_State* luaVM)
+std::variant<std::unordered_map<std::string, bool>, bool> CLuaAudioDefs::GetSoundEffects(std::variant<CClientSound*, CClientPlayer*> sound)
 {
-    CClientSound*    pSound = NULL;
-    float            fDistance = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
+    std::unordered_map<std::string, bool> result;
+    const std::map<std::string, int>      iFxEffects = m_pManager->GetSoundManager()->GetFxEffects();
 
-    if (!argStream.HasErrors())
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
     {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::GetSoundMinDistance(*pSound, fDistance))
-            {
-                lua_pushnumber(luaVM, fDistance);
-                return 1;
-            }
-        }
+        for (const auto& [name, iFxEffect] : iFxEffects)
+            result.emplace(name, (*pSound)->IsFxEffectEnabled(iFxEffect));
+        return result;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::SetSoundMaxDistance(lua_State* luaVM)
-{
-    CClientSound*    pSound = NULL;
-    float            fDistance = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-    argStream.ReadNumber(fDistance);
-
-    if (!argStream.HasErrors())
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
     {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::SetSoundMaxDistance(*pSound, fDistance))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
+        CClientPlayerVoice* pPlayerVoice = (*pPlayer)->GetVoice();
+        if (!pPlayerVoice)
+            return false;
+        for (const auto& [name, iFxEffect] : iFxEffects)
+            result.emplace(name, pPlayerVoice->IsFxEffectEnabled(iFxEffect));
+        return result;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::GetSoundMaxDistance(lua_State* luaVM)
-{
-    CClientSound*    pSound = NULL;
-    float            fDistance = 0.0f;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::GetSoundMaxDistance(*pSound, fDistance))
-            {
-                lua_pushnumber(luaVM, fDistance);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::GetSoundMetaTags(lua_State* luaVM)
-{
-    CClientSound*    pSound = NULL;
-    SString          strFormat = "";
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pSound);
-    argStream.ReadString(strFormat, "");
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            SString strMetaTags = "";
-            if (strFormat != "")
-            {
-                if (CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, strFormat, strMetaTags))
-                {
-                    if (!strMetaTags.empty())
-                    {
-                        lua_pushstring(luaVM, strMetaTags);
-                        return 1;
-                    }
-                }
-            }
-            else
-            {
-                lua_newtable(luaVM);
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%TITL", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "title");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%ARTI", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "artist");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%ALBM", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "album");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%GNRE", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "genre");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%YEAR", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "year");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%CMNT", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "comment");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%TRCK", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "track");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%COMP", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "composer");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%COPY", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "copyright");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%SUBT", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "subtitle");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "%AART", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "album_artist");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "streamName", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "stream_name");
-                }
-                CStaticFunctionDefinitions::GetSoundMetaTags(*pSound, "streamTitle", strMetaTags);
-                if (!strMetaTags.empty())
-                {
-                    lua_pushstring(luaVM, strMetaTags);
-                    lua_setfield(luaVM, -2, "stream_title");
-                }
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::SetSoundEffectEnabled(lua_State* luaVM)
-{
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    SString          strEffectName = "";
-    bool             bEnable = false;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
-    }
-    argStream.ReadString(strEffectName);
-    argStream.ReadBool(bEnable, false);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            if (CStaticFunctionDefinitions::SetSoundEffectEnabled(*pSound, strEffectName, bEnable))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else if (pPlayer)
-        {
-            if (CStaticFunctionDefinitions::SetSoundEffectEnabled(*pPlayer, strEffectName, bEnable))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaAudioDefs::GetSoundEffects(lua_State* luaVM)
-{
-    CClientPlayer*   pPlayer = NULL;
-    CClientSound*    pSound = NULL;
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
-    }
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-        {
-            std::map<std::string, int> iFxEffects = m_pManager->GetSoundManager()->GetFxEffects();
-            lua_newtable(luaVM);
-            for (std::map<std::string, int>::const_iterator iter = iFxEffects.begin(); iter != iFxEffects.end(); ++iter)
-            {
-                lua_pushboolean(luaVM, pSound->IsFxEffectEnabled((*iter).second));
-                lua_setfield(luaVM, -2, (*iter).first.c_str());
-            }
-            return 1;
-        }
-        else if (pPlayer)
-        {
-            CClientPlayerVoice*        pPlayerVoice = pPlayer->GetVoice();
-            std::map<std::string, int> iFxEffects = m_pManager->GetSoundManager()->GetFxEffects();
-            lua_newtable(luaVM);
-            for (std::map<std::string, int>::const_iterator iter = iFxEffects.begin(); iter != iFxEffects.end(); ++iter)
-            {
-                lua_pushboolean(luaVM, pPlayerVoice->IsFxEffectEnabled((*iter).second));
-                lua_setfield(luaVM, -2, (*iter).first.c_str());
-            }
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
 // This wrapper eliminates the need in additional methods inside CClientPlayer.
@@ -1417,24 +539,25 @@ struct SPlayerVoiceWrapper
     }
 };
 
-int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
+bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientPlayer*> sound, SoundEffectType::Enum eEffectType,
+                                            std::string strEffectParameter, std::variant<float, bool> value)
 {
     //  bool setSoundEffectParameter ( sound/player sound, string effectName, string effectParameter, var effectParameterValue  )
-    CClientSound*         pSound{};
-    SPlayerVoiceWrapper   playerVoice;
-    SoundEffectType::Enum eEffectType;
-
-    CScriptArgReader argStream(luaVM);
+    CClientSound*      pSound = nullptr;
+    SPlayerVoiceWrapper playerVoice;
+    if (auto* pSoundPtr = std::get_if<CClientSound*>(&sound); pSoundPtr && *pSoundPtr)
+        pSound = *pSoundPtr;
+    else if (auto* pPlayerPtr = std::get_if<CClientPlayer*>(&sound); pPlayerPtr && *pPlayerPtr)
+        playerVoice.pPlayer = *pPlayerPtr;
+    else
+        return false;
 
     // Call `SetFxEffectParameters` and log errors if any
-    const auto SetParamWithErrorLog = [luaVM, &eEffectType](auto* pSound, auto effectParam, auto& params)
+    const auto SetParamWithErrorLog = [&eEffectType](auto* pSound, auto effectParam, auto& params)
     {
         // Try setting parameter
         if (pSound->SetFxEffectParameters((uint)eEffectType, &params))
-        {
-            lua::Push(luaVM, true);
-            return 1;
-        }
+            return true;
 
         // Unsuccessful, log error. (Hard error on usage mistakes)
         // `luaL_error` with a format string straight out crashes, so we have to do it this way..
@@ -1444,18 +567,23 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
         // Do not use `luaL_error` here and pass in `msg` as the format string,
         // user could inject parameters into the format string, and that would be bad :D
         // The below code is based on the code from `luaL_error`
-        luaL_where(luaVM, 1);
-        lua::Push(luaVM, msg);
-        lua_concat(luaVM, 2);
-        lua_error(luaVM);
-
-        return 1;
+        throw std::invalid_argument(msg.c_str());
     };
 
-    const auto ProcessSoundParams = [&eEffectType, luaVM, &argStream, &SetParamWithErrorLog](auto* pSound)
+    const auto ReadFloatValue = [&value](auto& out)
+    {
+        if (auto* pValue = std::get_if<float>(&value))
+        {
+            out = *pValue;
+            return true;
+        }
+        return false;
+    };
+
+    const auto ProcessSoundParams = [&](auto* pSound)
     {
         if (!pSound->IsFxEffectEnabled((std::uint32_t)eEffectType))
-            return luaL_error(luaVM, "Effect's parameters can't be set unless it's enabled");
+            throw LuaFunctionError("Effect's parameters can't be set unless it's enabled");
 
         using namespace SoundEffectParams;
         switch (eEffectType)
@@ -1466,48 +594,53 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                 pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Chorus eEffectParameter;
-                argStream.ReadEnumString(eEffectParameter);
+                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                    return false;
                 switch (eEffectParameter)
                 {
                     case Chorus::WET_DRY_MIX:
                     {
-                        argStream.ReadNumber(params.fWetDryMix);
+                        if (!ReadFloatValue(params.fWetDryMix))
+                            return false;
                         break;
                     }
                     case Chorus::DEPTH:
                     {
-                        argStream.ReadNumber(params.fDepth);
+                        if (!ReadFloatValue(params.fDepth))
+                            return false;
                         break;
                     }
                     case Chorus::FEEDBACK:
                     {
-                        argStream.ReadNumber(params.fFeedback);
+                        if (!ReadFloatValue(params.fFeedback))
+                            return false;
                         break;
                     }
                     case Chorus::FREQUENCY:
                     {
-                        argStream.ReadNumber(params.fFrequency);
+                        if (!ReadFloatValue(params.fFrequency))
+                            return false;
                         break;
                     }
                     case Chorus::WAVEFORM:
                     {
-                        argStream.ReadNumber(params.lWaveform);
+                        if (!ReadFloatValue(params.lWaveform))
+                            return false;
                         break;
                     }
                     case Chorus::DELAY:
                     {
-                        argStream.ReadNumber(params.fDelay);
+                        if (!ReadFloatValue(params.fDelay))
+                            return false;
                         break;
                     }
                     case Chorus::PHASE:
                     {
-                        argStream.ReadNumber(params.lPhase);
+                        if (!ReadFloatValue(params.lPhase))
+                            return false;
                         break;
                     }
                 }
-
-                if (argStream.HasErrors())
-                    break;
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
@@ -1517,43 +650,47 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                 pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Compressor eEffectParameter;
-                argStream.ReadEnumString(eEffectParameter);
+                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                    return false;
                 switch (eEffectParameter)
                 {
                     case Compressor::GAIN:
                     {
-                        argStream.ReadNumber(params.fGain);
+                        if (!ReadFloatValue(params.fGain))
+                            return false;
                         break;
                     }
                     case Compressor::ATTACK:
                     {
-                        argStream.ReadNumber(params.fAttack);
+                        if (!ReadFloatValue(params.fAttack))
+                            return false;
                         break;
                     }
                     case Compressor::RELEASE:
                     {
-                        argStream.ReadNumber(params.fRelease);
+                        if (!ReadFloatValue(params.fRelease))
+                            return false;
                         break;
                     }
                     case Compressor::THRESHOLD:
                     {
-                        argStream.ReadNumber(params.fThreshold);
+                        if (!ReadFloatValue(params.fThreshold))
+                            return false;
                         break;
                     }
                     case Compressor::RATIO:
                     {
-                        argStream.ReadNumber(params.fRatio);
+                        if (!ReadFloatValue(params.fRatio))
+                            return false;
                         break;
                     }
                     case Compressor::PREDELAY:
                     {
-                        argStream.ReadNumber(params.fPredelay);
+                        if (!ReadFloatValue(params.fPredelay))
+                            return false;
                         break;
                     }
                 }
-
-                if (argStream.HasErrors())
-                    break;
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
@@ -1563,38 +700,41 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                 pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Distortion eEffectParameter;
-                argStream.ReadEnumString(eEffectParameter);
+                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                    return false;
                 switch (eEffectParameter)
                 {
                     case Distortion::GAIN:
                     {
-                        argStream.ReadNumber(params.fGain);
+                        if (!ReadFloatValue(params.fGain))
+                            return false;
                         break;
                     }
                     case Distortion::EDGE:
                     {
-                        argStream.ReadNumber(params.fEdge);
+                        if (!ReadFloatValue(params.fEdge))
+                            return false;
                         break;
                     }
                     case Distortion::POST_EQ_CENTER_FREQUENCY:
                     {
-                        argStream.ReadNumber(params.fPostEQCenterFrequency);
+                        if (!ReadFloatValue(params.fPostEQCenterFrequency))
+                            return false;
                         break;
                     }
                     case Distortion::POST_EQ_BANDWIDTH:
                     {
-                        argStream.ReadNumber(params.fPostEQBandwidth);
+                        if (!ReadFloatValue(params.fPostEQBandwidth))
+                            return false;
                         break;
                     }
                     case Distortion::PRE_LOWPASS_CUTOFF:
                     {
-                        argStream.ReadNumber(params.fPreLowpassCutoff);
+                        if (!ReadFloatValue(params.fPreLowpassCutoff))
+                            return false;
                         break;
                     }
                 }
-
-                if (argStream.HasErrors())
-                    break;
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
@@ -1604,40 +744,43 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                 pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Echo eEffectParameter;
-                argStream.ReadEnumString(eEffectParameter);
+                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                    return false;
                 switch (eEffectParameter)
                 {
                     case Echo::WET_DRY_MIX:
                     {
-                        argStream.ReadNumber(params.fWetDryMix);
+                        if (!ReadFloatValue(params.fWetDryMix))
+                            return false;
                         break;
                     }
                     case Echo::FEEDBACK:
                     {
-                        argStream.ReadNumber(params.fFeedback);
+                        if (!ReadFloatValue(params.fFeedback))
+                            return false;
                         break;
                     }
                     case Echo::LEFT_DELAY:
                     {
-                        argStream.ReadNumber(params.fLeftDelay);
+                        if (!ReadFloatValue(params.fLeftDelay))
+                            return false;
                         break;
                     }
                     case Echo::RIGHT_DELAY:
                     {
-                        argStream.ReadNumber(params.fRightDelay);
+                        if (!ReadFloatValue(params.fRightDelay))
+                            return false;
                         break;
                     }
                     case Echo::PAN_DELAY:
                     {
-                        bool bPanDelay;
-                        argStream.ReadBool(bPanDelay);
-                        params.lPanDelay = bPanDelay;
+                        if (auto* pValue = std::get_if<bool>(&value))
+                            params.lPanDelay = *pValue;
+                        else
+                            return false;
                         break;
                     }
                 }
-
-                if (argStream.HasErrors())
-                    break;
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
@@ -1647,48 +790,53 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                 pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Flanger eEffectParameter;
-                argStream.ReadEnumString(eEffectParameter);
+                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                    return false;
                 switch (eEffectParameter)
                 {
                     case Flanger::WET_DRY_MIX:
                     {
-                        argStream.ReadNumber(params.fWetDryMix);
+                        if (!ReadFloatValue(params.fWetDryMix))
+                            return false;
                         break;
                     }
                     case Flanger::DEPTH:
                     {
-                        argStream.ReadNumber(params.fDepth);
+                        if (!ReadFloatValue(params.fDepth))
+                            return false;
                         break;
                     }
                     case Flanger::FEEDBACK:
                     {
-                        argStream.ReadNumber(params.fFeedback);
+                        if (!ReadFloatValue(params.fFeedback))
+                            return false;
                         break;
                     }
                     case Flanger::FREQUENCY:
                     {
-                        argStream.ReadNumber(params.fFrequency);
+                        if (!ReadFloatValue(params.fFrequency))
+                            return false;
                         break;
                     }
                     case Flanger::WAVEFORM:
                     {
-                        argStream.ReadNumber(params.lWaveform);
+                        if (!ReadFloatValue(params.lWaveform))
+                            return false;
                         break;
                     }
                     case Flanger::DELAY:
                     {
-                        argStream.ReadNumber(params.fDelay);
+                        if (!ReadFloatValue(params.fDelay))
+                            return false;
                         break;
                     }
                     case Flanger::PHASE:
                     {
-                        argStream.ReadNumber(params.lPhase);
+                        if (!ReadFloatValue(params.lPhase))
+                            return false;
                         break;
                     }
                 }
-
-                if (argStream.HasErrors())
-                    break;
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
@@ -1698,23 +846,23 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                 pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Gargle eEffectParameter;
-                argStream.ReadEnumString(eEffectParameter);
+                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                    return false;
                 switch (eEffectParameter)
                 {
                     case Gargle::RATE_HZ:
                     {
-                        argStream.ReadNumber(params.dwRateHz);
+                        if (!ReadFloatValue(params.dwRateHz))
+                            return false;
                         break;
                     }
                     case Gargle::WAVE_SHAPE:
                     {
-                        argStream.ReadNumber(params.dwWaveShape);
+                        if (!ReadFloatValue(params.dwWaveShape))
+                            return false;
                         break;
                     }
                 }
-
-                if (argStream.HasErrors())
-                    break;
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
@@ -1724,73 +872,83 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                 pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 I3DL2Reverb eEffectParameter;
-                argStream.ReadEnumString(eEffectParameter);
+                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                    return false;
                 switch (eEffectParameter)
                 {
                     case I3DL2Reverb::ROOM:
                     {
-                        argStream.ReadNumber(params.lRoom);
+                        if (!ReadFloatValue(params.lRoom))
+                            return false;
                         break;
                     }
                     case I3DL2Reverb::ROOM_HF:
                     {
-                        argStream.ReadNumber(params.lRoomHF);
+                        if (!ReadFloatValue(params.lRoomHF))
+                            return false;
                         break;
                     }
                     case I3DL2Reverb::ROOM_ROLLOFF_FACTOR:
                     {
-                        argStream.ReadNumber(params.flRoomRolloffFactor);
+                        if (!ReadFloatValue(params.flRoomRolloffFactor))
+                            return false;
                         break;
                     }
                     case I3DL2Reverb::DECAY_TIME:
                     {
-                        argStream.ReadNumber(params.flDecayTime);
+                        if (!ReadFloatValue(params.flDecayTime))
+                            return false;
                         break;
                     }
                     case I3DL2Reverb::DECAY_HF_RATIO:
                     {
-                        argStream.ReadNumber(params.flDecayHFRatio);
+                        if (!ReadFloatValue(params.flDecayHFRatio))
+                            return false;
                         break;
                     }
                     case I3DL2Reverb::REFLECTIONS:
                     {
-                        argStream.ReadNumber(params.lReflections);
+                        if (!ReadFloatValue(params.lReflections))
+                            return false;
                         break;
                     }
                     case I3DL2Reverb::REFLECTIONS_DELAY:
                     {
-                        argStream.ReadNumber(params.flReflectionsDelay);
+                        if (!ReadFloatValue(params.flReflectionsDelay))
+                            return false;
                         break;
                     }
                     case I3DL2Reverb::REVERB:
                     {
-                        argStream.ReadNumber(params.lReverb);
+                        if (!ReadFloatValue(params.lReverb))
+                            return false;
                         break;
                     }
                     case I3DL2Reverb::REVERB_DELAY:
                     {
-                        argStream.ReadNumber(params.flReverbDelay);
+                        if (!ReadFloatValue(params.flReverbDelay))
+                            return false;
                         break;
                     }
                     case I3DL2Reverb::DIFFUSION:
                     {
-                        argStream.ReadNumber(params.flDiffusion);
+                        if (!ReadFloatValue(params.flDiffusion))
+                            return false;
                         break;
                     }
                     case I3DL2Reverb::DENSITY:
                     {
-                        argStream.ReadNumber(params.flDensity);
+                        if (!ReadFloatValue(params.flDensity))
+                            return false;
                         break;
                     }
                     case I3DL2Reverb::HF_REFERENCE:
                     {
-                        argStream.ReadNumber(params.flHFReference);
+                        if (!ReadFloatValue(params.flHFReference))
+                            return false;
                         break;
                     }
                 }
-
-                if (argStream.HasErrors())
-                    break;
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
@@ -1800,28 +958,29 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                 pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 ParamEq eEffectParameter;
-                argStream.ReadEnumString(eEffectParameter);
+                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                    return false;
                 switch (eEffectParameter)
                 {
                     case ParamEq::CENTER:
                     {
-                        argStream.ReadNumber(params.fCenter);
+                        if (!ReadFloatValue(params.fCenter))
+                            return false;
                         break;
                     }
                     case ParamEq::BANDWIDTH:
                     {
-                        argStream.ReadNumber(params.fBandwidth);
+                        if (!ReadFloatValue(params.fBandwidth))
+                            return false;
                         break;
                     }
                     case ParamEq::GAIN:
                     {
-                        argStream.ReadNumber(params.fGain);
+                        if (!ReadFloatValue(params.fGain))
+                            return false;
                         break;
                     }
                 }
-
-                if (argStream.HasErrors())
-                    break;
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
@@ -1831,83 +990,66 @@ int CLuaAudioDefs::SetSoundEffectParameter(lua_State* luaVM)
                 pSound->GetFxEffectParameters((std::uint32_t)eEffectType, &params);
 
                 Reverb eEffectParameter;
-                argStream.ReadEnumString(eEffectParameter);
+                if (!StringToEnum(strEffectParameter, eEffectParameter))
+                    return false;
                 switch (eEffectParameter)
                 {
                     case Reverb::IN_GAIN:
                     {
-                        argStream.ReadNumber(params.fInGain);
+                        if (!ReadFloatValue(params.fInGain))
+                            return false;
                         break;
                     }
                     case Reverb::REVERB_MIX:
                     {
-                        argStream.ReadNumber(params.fReverbMix);
+                        if (!ReadFloatValue(params.fReverbMix))
+                            return false;
                         break;
                     }
                     case Reverb::REVERB_TIME:
                     {
-                        argStream.ReadNumber(params.fReverbTime);
+                        if (!ReadFloatValue(params.fReverbTime))
+                            return false;
                         break;
                     }
                     case Reverb::HIGH_FREQ_RT_RATIO:
                     {
-                        argStream.ReadNumber(params.fHighFreqRTRatio);
+                        if (!ReadFloatValue(params.fHighFreqRTRatio))
+                            return false;
                         break;
                     }
                 }
-
-                if (argStream.HasErrors())
-                    break;
 
                 return SetParamWithErrorLog(pSound, eEffectParameter, params);
             }
         }
 
-        lua_pushboolean(luaVM, false);
-        return 1;
+        return false;
     };
 
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-        argStream.ReadUserData(pSound);
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-        argStream.ReadUserData(playerVoice.pPlayer);
+    if (pSound)
+        return ProcessSoundParams(pSound);
     else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
-    }
-    argStream.ReadEnumString(eEffectType);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-            return ProcessSoundParams(pSound);
-        else if (playerVoice.pPlayer)
-            return ProcessSoundParams(&playerVoice);
-        else
-            assert(nullptr && "Unreachable");
-    }
-
-    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+        return ProcessSoundParams(&playerVoice);
 }
 
-int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
+std::variant<std::unordered_map<std::string, std::variant<float, int, bool>>, bool> CLuaAudioDefs::GetSoundEffectParameters(
+    std::variant<CClientSound*, CClientPlayer*> sound, SoundEffectType::Enum eEffectType)
 {
     //  table getSoundEffectParameters ( sound/player sound, string effectName )
-    CClientSound*         pSound{};
-    SPlayerVoiceWrapper   playerVoice;
-    SoundEffectType::Enum eEffectType;
+    CClientSound*      pSound = nullptr;
+    SPlayerVoiceWrapper playerVoice;
+    if (auto* pSoundPtr = std::get_if<CClientSound*>(&sound); pSoundPtr && *pSoundPtr)
+        pSound = *pSoundPtr;
+    else if (auto* pPlayerPtr = std::get_if<CClientPlayer*>(&sound); pPlayerPtr && *pPlayerPtr)
+        playerVoice.pPlayer = *pPlayerPtr;
+    else
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-
-    const auto ProcessSoundParams = [luaVM, &eEffectType](auto* pSound)
+    const auto ProcessSoundParams = [&](auto* pSound) -> std::variant<std::unordered_map<std::string, std::variant<float, int, bool>>, bool>
     {
         if (!pSound->IsFxEffectEnabled((std::uint32_t)eEffectType))
-            return luaL_error(luaVM, "Effect's parameters can't be set unless it's enabled");
+            throw LuaFunctionError("Effect's parameters can't be set unless it's enabled");
 
         using namespace SoundEffectParams;
         switch (eEffectType)
@@ -1917,29 +1059,15 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 BASS_DX8_CHORUS fxChorusParams;
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxChorusParams))
                 {
-                    lua_createtable(luaVM, 0, 7);
-
-                    lua_pushnumber(luaVM, fxChorusParams.fWetDryMix);
-                    lua_setfield(luaVM, -2, EnumToString(Chorus::WET_DRY_MIX));
-
-                    lua_pushnumber(luaVM, fxChorusParams.fDepth);
-                    lua_setfield(luaVM, -2, EnumToString(Chorus::DEPTH));
-
-                    lua_pushnumber(luaVM, fxChorusParams.fFeedback);
-                    lua_setfield(luaVM, -2, EnumToString(Chorus::FEEDBACK));
-
-                    lua_pushnumber(luaVM, fxChorusParams.fFrequency);
-                    lua_setfield(luaVM, -2, EnumToString(Chorus::FREQUENCY));
-
-                    lua_pushnumber(luaVM, fxChorusParams.lWaveform);
-                    lua_setfield(luaVM, -2, EnumToString(Chorus::WAVEFORM));
-
-                    lua_pushnumber(luaVM, fxChorusParams.fDelay);
-                    lua_setfield(luaVM, -2, EnumToString(Chorus::DELAY));
-
-                    lua_pushnumber(luaVM, fxChorusParams.lPhase);
-                    lua_setfield(luaVM, -2, EnumToString(Chorus::PHASE));
-                    return 1;
+                    return std::unordered_map<std::string, std::variant<float, int, bool>>{
+                        {EnumToString(Chorus::WET_DRY_MIX), fxChorusParams.fWetDryMix},
+                        {EnumToString(Chorus::DEPTH), fxChorusParams.fDepth},
+                        {EnumToString(Chorus::FEEDBACK), fxChorusParams.fFeedback},
+                        {EnumToString(Chorus::FREQUENCY), fxChorusParams.fFrequency},
+                        {EnumToString(Chorus::WAVEFORM), (int)fxChorusParams.lWaveform},
+                        {EnumToString(Chorus::DELAY), fxChorusParams.fDelay},
+                        {EnumToString(Chorus::PHASE), (int)fxChorusParams.lPhase},
+                    };
                 }
                 break;
             }
@@ -1948,26 +1076,14 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 BASS_DX8_COMPRESSOR fxCompressorParams;
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxCompressorParams))
                 {
-                    lua_createtable(luaVM, 0, 6);
-
-                    lua_pushnumber(luaVM, fxCompressorParams.fGain);
-                    lua_setfield(luaVM, -2, EnumToString(Compressor::GAIN));
-
-                    lua_pushnumber(luaVM, fxCompressorParams.fAttack);
-                    lua_setfield(luaVM, -2, EnumToString(Compressor::ATTACK));
-
-                    lua_pushnumber(luaVM, fxCompressorParams.fRelease);
-                    lua_setfield(luaVM, -2, EnumToString(Compressor::RELEASE));
-
-                    lua_pushnumber(luaVM, fxCompressorParams.fThreshold);
-                    lua_setfield(luaVM, -2, EnumToString(Compressor::THRESHOLD));
-
-                    lua_pushnumber(luaVM, fxCompressorParams.fRatio);
-                    lua_setfield(luaVM, -2, EnumToString(Compressor::RATIO));
-
-                    lua_pushnumber(luaVM, fxCompressorParams.fPredelay);
-                    lua_setfield(luaVM, -2, EnumToString(Compressor::PREDELAY));
-                    return 1;
+                    return std::unordered_map<std::string, std::variant<float, int, bool>>{
+                        {EnumToString(Compressor::GAIN), fxCompressorParams.fGain},
+                        {EnumToString(Compressor::ATTACK), fxCompressorParams.fAttack},
+                        {EnumToString(Compressor::RELEASE), fxCompressorParams.fRelease},
+                        {EnumToString(Compressor::THRESHOLD), fxCompressorParams.fThreshold},
+                        {EnumToString(Compressor::RATIO), fxCompressorParams.fRatio},
+                        {EnumToString(Compressor::PREDELAY), fxCompressorParams.fPredelay},
+                    };
                 }
                 break;
             }
@@ -1976,23 +1092,13 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 BASS_DX8_DISTORTION fxDistortionParams;
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxDistortionParams))
                 {
-                    lua_createtable(luaVM, 0, 5);
-
-                    lua_pushnumber(luaVM, fxDistortionParams.fGain);
-                    lua_setfield(luaVM, -2, EnumToString(Distortion::GAIN));
-
-                    lua_pushnumber(luaVM, fxDistortionParams.fEdge);
-                    lua_setfield(luaVM, -2, EnumToString(Distortion::EDGE));
-
-                    lua_pushnumber(luaVM, fxDistortionParams.fPostEQCenterFrequency);
-                    lua_setfield(luaVM, -2, EnumToString(Distortion::POST_EQ_CENTER_FREQUENCY));
-
-                    lua_pushnumber(luaVM, fxDistortionParams.fPostEQBandwidth);
-                    lua_setfield(luaVM, -2, EnumToString(Distortion::POST_EQ_BANDWIDTH));
-
-                    lua_pushnumber(luaVM, fxDistortionParams.fPreLowpassCutoff);
-                    lua_setfield(luaVM, -2, EnumToString(Distortion::PRE_LOWPASS_CUTOFF));
-                    return 1;
+                    return std::unordered_map<std::string, std::variant<float, int, bool>>{
+                        {EnumToString(Distortion::GAIN), fxDistortionParams.fGain},
+                        {EnumToString(Distortion::EDGE), fxDistortionParams.fEdge},
+                        {EnumToString(Distortion::POST_EQ_CENTER_FREQUENCY), fxDistortionParams.fPostEQCenterFrequency},
+                        {EnumToString(Distortion::POST_EQ_BANDWIDTH), fxDistortionParams.fPostEQBandwidth},
+                        {EnumToString(Distortion::PRE_LOWPASS_CUTOFF), fxDistortionParams.fPreLowpassCutoff},
+                    };
                 }
                 break;
             }
@@ -2001,23 +1107,13 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 BASS_DX8_ECHO fxEchoParams;
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxEchoParams))
                 {
-                    lua_createtable(luaVM, 0, 5);
-
-                    lua_pushnumber(luaVM, fxEchoParams.fWetDryMix);
-                    lua_setfield(luaVM, -2, EnumToString(Echo::WET_DRY_MIX));
-
-                    lua_pushnumber(luaVM, fxEchoParams.fFeedback);
-                    lua_setfield(luaVM, -2, EnumToString(Echo::FEEDBACK));
-
-                    lua_pushnumber(luaVM, fxEchoParams.fLeftDelay);
-                    lua_setfield(luaVM, -2, EnumToString(Echo::LEFT_DELAY));
-
-                    lua_pushnumber(luaVM, fxEchoParams.fRightDelay);
-                    lua_setfield(luaVM, -2, EnumToString(Echo::RIGHT_DELAY));
-
-                    lua_pushboolean(luaVM, fxEchoParams.lPanDelay);
-                    lua_setfield(luaVM, -2, EnumToString(Echo::PAN_DELAY));
-                    return 1;
+                    return std::unordered_map<std::string, std::variant<float, int, bool>>{
+                        {EnumToString(Echo::WET_DRY_MIX), fxEchoParams.fWetDryMix},
+                        {EnumToString(Echo::FEEDBACK), fxEchoParams.fFeedback},
+                        {EnumToString(Echo::LEFT_DELAY), fxEchoParams.fLeftDelay},
+                        {EnumToString(Echo::RIGHT_DELAY), fxEchoParams.fRightDelay},
+                        {EnumToString(Echo::PAN_DELAY), (bool)fxEchoParams.lPanDelay},
+                    };
                 }
                 break;
             }
@@ -2026,29 +1122,15 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 BASS_DX8_FLANGER fxFlangerParams;
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxFlangerParams))
                 {
-                    lua_createtable(luaVM, 0, 7);
-
-                    lua_pushnumber(luaVM, fxFlangerParams.fWetDryMix);
-                    lua_setfield(luaVM, -2, EnumToString(Flanger::WET_DRY_MIX));
-
-                    lua_pushnumber(luaVM, fxFlangerParams.fDepth);
-                    lua_setfield(luaVM, -2, EnumToString(Flanger::DEPTH));
-
-                    lua_pushnumber(luaVM, fxFlangerParams.fFeedback);
-                    lua_setfield(luaVM, -2, EnumToString(Flanger::FEEDBACK));
-
-                    lua_pushnumber(luaVM, fxFlangerParams.fFrequency);
-                    lua_setfield(luaVM, -2, EnumToString(Flanger::FREQUENCY));
-
-                    lua_pushnumber(luaVM, fxFlangerParams.lWaveform);
-                    lua_setfield(luaVM, -2, EnumToString(Flanger::WAVEFORM));
-
-                    lua_pushnumber(luaVM, fxFlangerParams.fDelay);
-                    lua_setfield(luaVM, -2, EnumToString(Flanger::DELAY));
-
-                    lua_pushnumber(luaVM, fxFlangerParams.lPhase);
-                    lua_setfield(luaVM, -2, EnumToString(Flanger::PHASE));
-                    return 1;
+                    return std::unordered_map<std::string, std::variant<float, int, bool>>{
+                        {EnumToString(Flanger::WET_DRY_MIX), fxFlangerParams.fWetDryMix},
+                        {EnumToString(Flanger::DEPTH), fxFlangerParams.fDepth},
+                        {EnumToString(Flanger::FEEDBACK), fxFlangerParams.fFeedback},
+                        {EnumToString(Flanger::FREQUENCY), fxFlangerParams.fFrequency},
+                        {EnumToString(Flanger::WAVEFORM), (int)fxFlangerParams.lWaveform},
+                        {EnumToString(Flanger::DELAY), fxFlangerParams.fDelay},
+                        {EnumToString(Flanger::PHASE), (int)fxFlangerParams.lPhase},
+                    };
                 }
                 break;
             }
@@ -2057,14 +1139,10 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 BASS_DX8_GARGLE fxGargleParams;
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxGargleParams))
                 {
-                    lua_createtable(luaVM, 0, 2);
-
-                    lua_pushnumber(luaVM, fxGargleParams.dwRateHz);
-                    lua_setfield(luaVM, -2, EnumToString(Gargle::RATE_HZ));
-
-                    lua_pushnumber(luaVM, fxGargleParams.dwWaveShape);
-                    lua_setfield(luaVM, -2, EnumToString(Gargle::WAVE_SHAPE));
-                    return 1;
+                    return std::unordered_map<std::string, std::variant<float, int, bool>>{
+                        {EnumToString(Gargle::RATE_HZ), (int)fxGargleParams.dwRateHz},
+                        {EnumToString(Gargle::WAVE_SHAPE), (int)fxGargleParams.dwWaveShape},
+                    };
                 }
                 break;
             }
@@ -2073,44 +1151,20 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 BASS_DX8_I3DL2REVERB fxI3DL2ReverbParams;
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxI3DL2ReverbParams))
                 {
-                    lua_createtable(luaVM, 0, 12);
-
-                    lua_pushnumber(luaVM, fxI3DL2ReverbParams.lRoom);
-                    lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::ROOM));
-
-                    lua_pushnumber(luaVM, fxI3DL2ReverbParams.lRoomHF);
-                    lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::ROOM_HF));
-
-                    lua_pushnumber(luaVM, fxI3DL2ReverbParams.flRoomRolloffFactor);
-                    lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::ROOM_ROLLOFF_FACTOR));
-
-                    lua_pushnumber(luaVM, fxI3DL2ReverbParams.flDecayTime);
-                    lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::DECAY_TIME));
-
-                    lua_pushnumber(luaVM, fxI3DL2ReverbParams.flDecayHFRatio);
-                    lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::DECAY_HF_RATIO));
-
-                    lua_pushnumber(luaVM, fxI3DL2ReverbParams.lReflections);
-                    lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::REFLECTIONS));
-
-                    lua_pushnumber(luaVM, fxI3DL2ReverbParams.flReflectionsDelay);
-                    lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::REFLECTIONS_DELAY));
-
-                    lua_pushnumber(luaVM, fxI3DL2ReverbParams.lReverb);
-                    lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::REVERB));
-
-                    lua_pushnumber(luaVM, fxI3DL2ReverbParams.flReverbDelay);
-                    lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::REVERB_DELAY));
-
-                    lua_pushnumber(luaVM, fxI3DL2ReverbParams.flDiffusion);
-                    lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::DIFFUSION));
-
-                    lua_pushnumber(luaVM, fxI3DL2ReverbParams.flDensity);
-                    lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::DENSITY));
-
-                    lua_pushnumber(luaVM, fxI3DL2ReverbParams.flHFReference);
-                    lua_setfield(luaVM, -2, EnumToString(I3DL2Reverb::HF_REFERENCE));
-                    return 1;
+                    return std::unordered_map<std::string, std::variant<float, int, bool>>{
+                        {EnumToString(I3DL2Reverb::ROOM), (int)fxI3DL2ReverbParams.lRoom},
+                        {EnumToString(I3DL2Reverb::ROOM_HF), (int)fxI3DL2ReverbParams.lRoomHF},
+                        {EnumToString(I3DL2Reverb::ROOM_ROLLOFF_FACTOR), fxI3DL2ReverbParams.flRoomRolloffFactor},
+                        {EnumToString(I3DL2Reverb::DECAY_TIME), fxI3DL2ReverbParams.flDecayTime},
+                        {EnumToString(I3DL2Reverb::DECAY_HF_RATIO), fxI3DL2ReverbParams.flDecayHFRatio},
+                        {EnumToString(I3DL2Reverb::REFLECTIONS), (int)fxI3DL2ReverbParams.lReflections},
+                        {EnumToString(I3DL2Reverb::REFLECTIONS_DELAY), fxI3DL2ReverbParams.flReflectionsDelay},
+                        {EnumToString(I3DL2Reverb::REVERB), (int)fxI3DL2ReverbParams.lReverb},
+                        {EnumToString(I3DL2Reverb::REVERB_DELAY), fxI3DL2ReverbParams.flReverbDelay},
+                        {EnumToString(I3DL2Reverb::DIFFUSION), fxI3DL2ReverbParams.flDiffusion},
+                        {EnumToString(I3DL2Reverb::DENSITY), fxI3DL2ReverbParams.flDensity},
+                        {EnumToString(I3DL2Reverb::HF_REFERENCE), fxI3DL2ReverbParams.flHFReference},
+                    };
                 }
                 break;
             }
@@ -2119,17 +1173,11 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 BASS_DX8_PARAMEQ fxParameqParams;
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxParameqParams))
                 {
-                    lua_createtable(luaVM, 0, 3);
-
-                    lua_pushnumber(luaVM, fxParameqParams.fCenter);
-                    lua_setfield(luaVM, -2, EnumToString(ParamEq::CENTER));
-
-                    lua_pushnumber(luaVM, fxParameqParams.fBandwidth);
-                    lua_setfield(luaVM, -2, EnumToString(ParamEq::BANDWIDTH));
-
-                    lua_pushnumber(luaVM, fxParameqParams.fGain);
-                    lua_setfield(luaVM, -2, EnumToString(ParamEq::GAIN));
-                    return 1;
+                    return std::unordered_map<std::string, std::variant<float, int, bool>>{
+                        {EnumToString(ParamEq::CENTER), fxParameqParams.fCenter},
+                        {EnumToString(ParamEq::BANDWIDTH), fxParameqParams.fBandwidth},
+                        {EnumToString(ParamEq::GAIN), fxParameqParams.fGain},
+                    };
                 }
                 break;
             }
@@ -2138,83 +1186,32 @@ int CLuaAudioDefs::GetSoundEffectParameters(lua_State* luaVM)
                 BASS_DX8_REVERB fxReverbParams;
                 if (pSound->GetFxEffectParameters((uint)eEffectType, &fxReverbParams))
                 {
-                    lua_createtable(luaVM, 0, 4);
-
-                    lua_pushnumber(luaVM, fxReverbParams.fInGain);
-                    lua_setfield(luaVM, -2, EnumToString(Reverb::IN_GAIN));
-
-                    lua_pushnumber(luaVM, fxReverbParams.fReverbMix);
-                    lua_setfield(luaVM, -2, EnumToString(Reverb::REVERB_MIX));
-
-                    lua_pushnumber(luaVM, fxReverbParams.fReverbTime);
-                    lua_setfield(luaVM, -2, EnumToString(Reverb::REVERB_TIME));
-
-                    lua_pushnumber(luaVM, fxReverbParams.fHighFreqRTRatio);
-                    lua_setfield(luaVM, -2, EnumToString(Reverb::HIGH_FREQ_RT_RATIO));
-                    return 1;
+                    return std::unordered_map<std::string, std::variant<float, int, bool>>{
+                        {EnumToString(Reverb::IN_GAIN), fxReverbParams.fInGain},
+                        {EnumToString(Reverb::REVERB_MIX), fxReverbParams.fReverbMix},
+                        {EnumToString(Reverb::REVERB_TIME), fxReverbParams.fReverbTime},
+                        {EnumToString(Reverb::HIGH_FREQ_RT_RATIO), fxReverbParams.fHighFreqRTRatio},
+                    };
                 }
                 break;
             }
         }
 
-        lua_pushboolean(luaVM, false);
-        return 1;
+        return false;
     };
 
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-        argStream.ReadUserData(pSound);
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-        argStream.ReadUserData(playerVoice.pPlayer);
+    if (pSound)
+        return ProcessSoundParams(pSound);
     else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return false;
-    }
-    argStream.ReadEnumString(eEffectType);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound)
-            return ProcessSoundParams(pSound);
-        else if (playerVoice.pPlayer)
-            return ProcessSoundParams(&playerVoice);
-        else
-            assert(nullptr && "Unreachable");
-    }
-
-    m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+        return ProcessSoundParams(&playerVoice);
 }
 
-int CLuaAudioDefs::PlaySoundFrontEnd(lua_State* luaVM)
+bool CLuaAudioDefs::PlaySoundFrontEnd(unsigned char ucSound)
 {
-    CClientSound*    pSound = NULL;
-    CVector          vecPosition;
-    unsigned char    ucSound = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(ucSound);
+    if (ucSound > 101)
+        throw std::invalid_argument("Invalid sound ID specified. Valid sound IDs are 0 - 101.");
 
-    if (!argStream.HasErrors())
-    {
-        if (ucSound <= 101)
-        {
-            if (CStaticFunctionDefinitions::PlaySoundFrontEnd(ucSound))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogError(luaVM, "Invalid sound ID specified. Valid sound IDs are 0 - 101.");
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::PlaySoundFrontEnd(ucSound);
 }
 
 int CLuaAudioDefs::SetAmbientSoundEnabled(lua_State* luaVM)
@@ -2348,265 +1345,100 @@ int CLuaAudioDefs::ResetWorldSounds(lua_State* luaVM)
     return 1;
 }
 
-int CLuaAudioDefs::PlaySFX(lua_State* luaVM)
+std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX(lua_State* luaVM, eAudioLookupIndex containerIndex, std::variant<int, eRadioStreamIndex> bankIndex,
+                                                         int iAudioIndex, std::optional<bool> bLoop)
 {
     //  sound playSFX ( string audioContainer, int bankIndex, int audioIndex [, loop = false ] )
-    eAudioLookupIndex containerIndex;
-    int               iBankIndex;
-    int               iAudioIndex;
-    bool              bLoop;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(containerIndex);
-
-    if (!argStream.HasErrors() && containerIndex == AUDIO_LOOKUP_RADIO)
-        argStream.ReadEnumString<eRadioStreamIndex>((eRadioStreamIndex&)iBankIndex);
+    int iBankIndex;
+    if (auto* pBankIndex = std::get_if<int>(&bankIndex))
+        iBankIndex = *pBankIndex;
+    else if (containerIndex == AUDIO_LOOKUP_RADIO)
+        iBankIndex = static_cast<int>(std::get<eRadioStreamIndex>(bankIndex));
     else
-        argStream.ReadNumber(iBankIndex);
+        return false;
 
-    argStream.ReadNumber(iAudioIndex);
-    argStream.ReadBool(bLoop, false);
+    CResource*    pResource = &lua_getownerresource(luaVM);
+    CClientSound* pSound;
+    if (CStaticFunctionDefinitions::PlaySFX(pResource, containerIndex, iBankIndex, iAudioIndex, bLoop.value_or(false), pSound))
+        return pSound;
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CClientSound* pSound;
-                if (CStaticFunctionDefinitions::PlaySFX(pResource, containerIndex, iBankIndex, iAudioIndex, bLoop, pSound))
-                {
-                    lua_pushelement(luaVM, pSound);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
-int CLuaAudioDefs::PlaySFX3D(lua_State* luaVM)
+std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX3D(lua_State* luaVM, eAudioLookupIndex containerIndex, std::variant<int, eRadioStreamIndex> bankIndex,
+                                                          int iAudioIndex, CVector vecPosition, std::optional<bool> bLoop)
 {
     //  sound playSFX3D ( string audioContainer, int bankIndex, int audioIndex, float posX, float posY, float posZ [, loop = false ] )
-    eAudioLookupIndex containerIndex;
-    int               iBankIndex;
-    int               iAudioIndex;
-    CVector           vecPosition;
-    bool              bLoop;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(containerIndex);
-
-    if (!argStream.HasErrors() && containerIndex == AUDIO_LOOKUP_RADIO)
-        argStream.ReadEnumString<eRadioStreamIndex>((eRadioStreamIndex&)iBankIndex);
+    int iBankIndex;
+    if (auto* pBankIndex = std::get_if<int>(&bankIndex))
+        iBankIndex = *pBankIndex;
+    else if (containerIndex == AUDIO_LOOKUP_RADIO)
+        iBankIndex = static_cast<int>(std::get<eRadioStreamIndex>(bankIndex));
     else
-        argStream.ReadNumber(iBankIndex);
+        return false;
 
-    argStream.ReadNumber(iAudioIndex);
-    argStream.ReadVector3D(vecPosition);
-    argStream.ReadBool(bLoop, false);
+    CResource*    pResource = &lua_getownerresource(luaVM);
+    CClientSound* pSound;
+    if (CStaticFunctionDefinitions::PlaySFX3D(pResource, containerIndex, iBankIndex, iAudioIndex, vecPosition, bLoop.value_or(false), pSound))
+        return pSound;
 
-    if (!argStream.HasErrors())
-    {
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CResource* pResource = pLuaMain->GetResource();
-            if (pResource)
-            {
-                CClientSound* pSound;
-                if (CStaticFunctionDefinitions::PlaySFX3D(pResource, containerIndex, iBankIndex, iAudioIndex, vecPosition, bLoop, pSound))
-                {
-                    lua_pushelement(luaVM, pSound);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
-int CLuaAudioDefs::GetSFXStatus(lua_State* luaVM)
+std::variant<bool, std::nullptr_t> CLuaAudioDefs::GetSFXStatus(eAudioLookupIndex containerIndex)
 {
     //  bool getSFXStatus ( string audioContainer )
-    eAudioLookupIndex containerIndex;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(containerIndex);
-
-    if (!argStream.HasErrors())
-    {
-        bool bNotCut;
-        if (CStaticFunctionDefinitions::GetSFXStatus(containerIndex, bNotCut))
-        {
-            lua_pushboolean(luaVM, bNotCut);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushnil(luaVM);
-    return 1;
+    bool bNotCut = false;
+    if (CStaticFunctionDefinitions::GetSFXStatus(containerIndex, bNotCut))
+        return bNotCut;
+    return nullptr;
 }
 
-int CLuaAudioDefs::SetSoundPan(lua_State* luaVM)
+bool CLuaAudioDefs::SetSoundPan(std::variant<CClientSound*, CClientPlayer*> sound, float fPan)
 {
     //  setSoundPan ( sound theSound, float pan )
     //  setSoundPan ( player thePlayer, float pan )
-    CClientSound*  pSound = NULL;
-    CClientPlayer* pPlayer = NULL;
-    float          fPan;
-
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
-    argStream.ReadNumber(fPan);
-
-    if (!argStream.HasErrors())
-    {
-        if (pSound && CStaticFunctionDefinitions::SetSoundPan(*pSound, fPan))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-        else if (pPlayer && CStaticFunctionDefinitions::SetSoundPan(*pPlayer, fPan))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound)
+        return CStaticFunctionDefinitions::SetSoundPan(**pSound, fPan);
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer)
+        return CStaticFunctionDefinitions::SetSoundPan(**pPlayer, fPan);
+    return false;
 }
 
-int CLuaAudioDefs::GetSoundPan(lua_State* luaVM)
+std::variant<float, bool> CLuaAudioDefs::GetSoundPan(std::variant<CClientSound*, CClientPlayer*> sound)
 {
     //  getSoundPan ( element theSound )
     //  getSoundPan ( player thePlayer )
-    CClientSound*  pSound = NULL;
-    CClientPlayer* pPlayer = NULL;
-
-    CScriptArgReader argStream(luaVM);
-    if (argStream.NextIsUserDataOfType<CClientSound>())
-    {
-        argStream.ReadUserData(pSound);
-    }
-    else if (argStream.NextIsUserDataOfType<CClientPlayer>())
-    {
-        argStream.ReadUserData(pPlayer);
-    }
-    else
-    {
-        m_pScriptDebugging->LogBadPointer(luaVM, "sound/player", 1);
-        lua_pushboolean(luaVM, false);
-        return 1;
-    }
-
-    if (!argStream.HasErrors())
-    {
-        float fPan = 0.0;
-        if (pSound && CStaticFunctionDefinitions::GetSoundPan(*pSound, fPan))
-        {
-            lua_pushnumber(luaVM, fPan);
-            return 1;
-        }
-        else if (pPlayer && CStaticFunctionDefinitions::GetSoundPan(*pPlayer, fPan))
-        {
-            lua_pushnumber(luaVM, fPan);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    float fPan = 0.0f;
+    if (auto* pSound = std::get_if<CClientSound*>(&sound); pSound && *pSound && CStaticFunctionDefinitions::GetSoundPan(**pSound, fPan))
+        return fPan;
+    else if (auto* pPlayer = std::get_if<CClientPlayer*>(&sound); pPlayer && *pPlayer && CStaticFunctionDefinitions::GetSoundPan(**pPlayer, fPan))
+        return fPan;
+    return false;
 }
 
 // Radio
-int CLuaAudioDefs::SetRadioChannel(lua_State* luaVM)
+bool CLuaAudioDefs::SetRadioChannel(unsigned char ucChannel)
 {
-    unsigned char    ucChannel = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(ucChannel);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetRadioChannel(ucChannel))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetRadioChannel(ucChannel);
 }
 
-int CLuaAudioDefs::GetRadioChannel(lua_State* luaVM)
+std::variant<unsigned char, bool> CLuaAudioDefs::GetRadioChannel()
 {
     unsigned char ucChannel = 0;
     if (CStaticFunctionDefinitions::GetRadioChannel(ucChannel))
-    {
-        lua_pushnumber(luaVM, ucChannel);
-        return 1;
-    }
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+        return ucChannel;
+    return false;
 }
 
-int CLuaAudioDefs::GetRadioChannelName(lua_State* luaVM)
+std::variant<const char*, bool> CLuaAudioDefs::GetRadioChannelName(int iChannel)
 {
     static const SFixedArray<const char*, 13> szRadioStations = {{"Radio off", "Playback FM", "K-Rose", "K-DST", "Bounce FM", "SF-UR", "Radio Los Santos",
                                                                   "Radio X", "CSR 103.9", "K-Jah West", "Master Sounds 98.3", "WCTR", "User Track Player"}};
 
-    int              iChannel = 0;
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(iChannel);
-
-    if (!argStream.HasErrors())
-    {
-        if (iChannel >= 0 && iChannel < NUMELMS(szRadioStations))
-        {
-            lua_pushstring(luaVM, szRadioStations[iChannel]);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (iChannel >= 0 && iChannel < NUMELMS(szRadioStations))
+        return szRadioStations[iChannel];
+    return false;
 }
 
 bool CLuaAudioDefs::ShowSound(bool state)
