@@ -208,7 +208,8 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline, const CRect2D* pClip
     if (!m_bVisible)
         return;
 
-    // Get drawList for the chat box text. The background box is rendered inside GetDrawList, so it must be scissored as well, otherwise it would cover the settings window and the text drawn by the other clipped draw calls
+    // Get drawList for the chat box text. The background box is rendered inside GetDrawList, so it must be scissored as well, otherwise it would cover the
+    // settings window and the text drawn by the other clipped draw calls
     SDrawList drawList;
     if (pClipRect)
         SetScissor(true, pClipRect);
