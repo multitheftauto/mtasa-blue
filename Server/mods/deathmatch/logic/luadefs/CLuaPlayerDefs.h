@@ -87,7 +87,7 @@ public:
     LUA_DECLARE(ToggleAllControls);
 
     // Audio funcs
-    static bool PlaySoundFrontEnd(CElement* pElement, unsigned char ucSound);
+    static bool PlaySoundFrontEnd(CElement* element, unsigned char sound);
     LUA_DECLARE(PlayMissionAudio);
     LUA_DECLARE(PreloadMissionAudio);
 

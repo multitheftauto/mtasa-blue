@@ -20,64 +20,61 @@ public:
     static void AddClass(lua_State* luaVM);
 
     // Audio funcs
-    static bool PlaySoundFrontEnd(unsigned char ucSound);
+    static bool PlaySoundFrontEnd(unsigned char sound);
     LUA_DECLARE(SetAmbientSoundEnabled);
     LUA_DECLARE(IsAmbientSoundEnabled);
     LUA_DECLARE(ResetAmbientSounds);
     LUA_DECLARE(SetWorldSoundEnabled);
     LUA_DECLARE(IsWorldSoundEnabled);
     LUA_DECLARE(ResetWorldSounds);
-    static std::variant<CClientSound*, bool>  PlaySFX(lua_State* luaVM, eAudioLookupIndex containerIndex, std::variant<int, eRadioStreamIndex> bankIndex,
-                                                      int iAudioIndex, std::optional<bool> bLoop);
-    static std::variant<CClientSound*, bool>  PlaySFX3D(lua_State* luaVM, eAudioLookupIndex containerIndex, std::variant<int, eRadioStreamIndex> bankIndex,
-                                                        int iAudioIndex, CVector vecPosition, std::optional<bool> bLoop);
-    static std::variant<bool, std::nullptr_t> GetSFXStatus(eAudioLookupIndex containerIndex);
+    static std::variant<CClientSound*, bool>  PlaySFX(lua_State* luaVM, eAudioLookupIndex containerIndex, std::variant<int, eRadioStreamIndex> bank,
+                                                      int audioIndex, std::optional<bool> loop);
+    static std::variant<CClientSound*, bool>  PlaySFX3D(lua_State* luaVM, eAudioLookupIndex containerIndex, std::variant<int, eRadioStreamIndex> bank,
+                                                        int audioIndex, CVector vecPosition, std::optional<bool> loop);
+    static auto GetSFXStatus(eAudioLookupIndex containerIndex);
 
     // Sound effects and synth functions
-    static std::variant<CClientSound*, bool> PlaySound(lua_State* luaVM, const std::string strSound, std::optional<bool> bLoop, std::optional<bool> bThrottle);
-    static std::variant<CClientSound*, bool> PlaySound3D(lua_State* luaVM, const std::string strSound, CVector vecPosition, std::optional<bool> bLoop,
-                                                         std::optional<bool> bThrottle);
-    static bool                              StopSound(CClientSound* pSound);
-    static bool                              SetSoundPosition(std::variant<CClientSound*, CClientPlayer*> sound, double dPosition);
+    static std::variant<CClientSound*, bool> PlaySound(lua_State* luaVM, const std::string path, std::optional<bool> loop, std::optional<bool> throttle);
+    static std::variant<CClientSound*, bool> PlaySound3D(lua_State* luaVM, const std::string path, CVector vecPosition, std::optional<bool> loop,
+                                                         std::optional<bool> throttle);
+    static bool                              StopSound(CClientSound* sound);
+    static bool                              SetSoundPosition(std::variant<CClientSound*, CClientPlayer*> sound, double position);
     static std::variant<double, bool>        GetSoundPosition(std::variant<CClientSound*, CClientPlayer*> sound);
     static std::variant<double, bool>        GetSoundLength(std::variant<CClientSound*, CClientPlayer*> sound);
-    static std::variant<double, bool>        GetSoundBufferLength(CClientSound* pSound);
-    static bool                              SetSoundLooped(CClientSound* pSound, bool bLoop);
-    static bool                              IsSoundLooped(CClientSound* pSound);
-    static bool                              SetSoundPaused(std::variant<CClientSound*, CClientPlayer*> sound, bool bPaused);
+    static std::variant<double, bool>        GetSoundBufferLength(CClientSound* sound);
+    static bool                              SetSoundLooped(CClientSound* sound, bool loop);
+    static bool                              IsSoundLooped(CClientSound* sound);
+    static bool                              SetSoundPaused(std::variant<CClientSound*, CClientPlayer*> sound, bool paused);
     static bool                              IsSoundPaused(std::variant<CClientSound*, CClientPlayer*> sound);
-    static bool                              SetSoundVolume(std::variant<CClientSound*, CClientPlayer*> sound, float fVolume);
+    static bool                              SetSoundVolume(std::variant<CClientSound*, CClientPlayer*> sound, float volume);
     static std::variant<float, bool>         GetSoundVolume(std::variant<CClientSound*, CClientPlayer*> sound);
-    static bool                              SetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> sound, float fSpeed);
+    static bool                              SetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> sound, float speed);
     static std::variant<float, bool>         GetSoundSpeed(std::variant<CClientSound*, CClientPlayer*> sound);
-    static bool SetSoundProperties(CClientSound* pSound, float fSampleRate, float fTempo, float fPitch, std::optional<bool> bReversed);
-    static std::variant<CLuaMultiReturn<float, float, float, bool>, bool>  GetSoundProperties(CClientSound* pSound);
-    static std::variant<std::unordered_map<int, float>, bool>              GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*> sound, int iLength,
-                                                                                           std::optional<int> iBands);
-    static std::variant<std::unordered_map<int, float>, bool>              GetSoundWaveData(std::variant<CClientSound*, CClientPlayer*> sound, int iLength);
-    static std::variant<CLuaMultiReturn<unsigned int, unsigned int>, bool> GetSoundLevelData(std::variant<CClientSound*, CClientPlayer*> sound);
-    static std::variant<float, bool>                                       GetSoundBPM(CClientSound* pSound);
-    static bool                                                            SetSoundPanEnabled(CClientSound* pSound, bool bEnabled);
-    static bool                                                            IsSoundPanEnabled(CClientSound* pSound);
-    static bool                                                            SetSoundMinDistance(CClientSound* pSound, float fDistance);
-    static std::variant<float, bool>                                       GetSoundMinDistance(CClientSound* pSound);
-    static bool                                                            SetSoundMaxDistance(CClientSound* pSound, float fDistance);
-    static std::variant<float, bool>                                       GetSoundMaxDistance(CClientSound* pSound);
-    static std::variant<SString, std::unordered_map<std::string, std::string>, bool> GetSoundMetaTags(CClientSound*              pSound,
-                                                                                                      std::optional<std::string> strFormat);
-    static bool SetSoundEffectEnabled(std::variant<CClientSound*, CClientPlayer*> sound, const std::string strEffectName, std::optional<bool> bEnable);
-    static std::variant<std::unordered_map<std::string, bool>, bool> GetSoundEffects(std::variant<CClientSound*, CClientPlayer*> sound);
+    static bool SetSoundProperties(CClientSound* sound, float sampleRate, float tempo, float pitch, std::optional<bool> reversed);
+    static auto GetSoundProperties(CClientSound* sound);
+    static auto GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*> sound, int length, std::optional<int> bands);
+    static auto GetSoundWaveData(std::variant<CClientSound*, CClientPlayer*> sound, int length);
+    static auto GetSoundLevelData(std::variant<CClientSound*, CClientPlayer*> sound);
+    static std::variant<float, bool>                                       GetSoundBPM(CClientSound* sound);
+    static bool                                                            SetSoundPanEnabled(CClientSound* sound, bool enabled);
+    static bool                                                            IsSoundPanEnabled(CClientSound* sound);
+    static bool                                                            SetSoundMinDistance(CClientSound* sound, float distance);
+    static std::variant<float, bool>                                       GetSoundMinDistance(CClientSound* sound);
+    static bool                                                            SetSoundMaxDistance(CClientSound* sound, float distance);
+    static std::variant<float, bool>                                       GetSoundMaxDistance(CClientSound* sound);
+    static auto GetSoundMetaTags(CClientSound* sound, std::optional<std::string> format);
+    static bool SetSoundEffectEnabled(std::variant<CClientSound*, CClientPlayer*> sound, const std::string effectName, std::optional<bool> enable);
+    static auto GetSoundEffects(std::variant<CClientSound*, CClientPlayer*> sound);
     static bool SetSoundEffectParameter(std::variant<CClientSound*, CClientPlayer*> sound, SoundEffectType::Enum eEffectType, std::string strEffectParameter,
                                         std::variant<float, bool> value);
-    static std::variant<std::unordered_map<std::string, std::variant<float, int, bool>>, bool> GetSoundEffectParameters(
-        std::variant<CClientSound*, CClientPlayer*> sound, SoundEffectType::Enum eEffectType);
-    static bool                      SetSoundPan(std::variant<CClientSound*, CClientPlayer*> sound, float fPan);
+    static auto GetSoundEffectParameters(std::variant<CClientSound*, CClientPlayer*> sound, SoundEffectType::Enum eEffectType);
+    static bool                      SetSoundPan(std::variant<CClientSound*, CClientPlayer*> sound, float pan);
     static std::variant<float, bool> GetSoundPan(std::variant<CClientSound*, CClientPlayer*> sound);
 
     // Radio functions
-    static bool                              SetRadioChannel(unsigned char ucChannel);
-    static std::variant<unsigned char, bool> GetRadioChannel();
-    static std::variant<const char*, bool>   GetRadioChannelName(int iChannel);
+    static bool                              SetRadioChannel(unsigned char channel);
+    static auto GetRadioChannel();
+    static std::variant<const char*, bool>   GetRadioChannelName(int channel);
 
     static bool ShowSound(bool state);
     static bool IsShowSoundEnabled();

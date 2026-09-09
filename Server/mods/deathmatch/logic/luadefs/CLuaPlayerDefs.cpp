@@ -1894,30 +1894,30 @@ int CLuaPlayerDefs::ToggleAllControls(lua_State* luaVM)
     return 1;
 }
 
-bool CLuaPlayerDefs::PlaySoundFrontEnd(CElement* pElement, unsigned char ucSound)
+bool CLuaPlayerDefs::PlaySoundFrontEnd(CElement* element, unsigned char sound)
 {
-    if (ucSound > 101)
+    if (sound > 101)
         throw std::invalid_argument("Invalid sound ID specified. Valid sound IDs are 0 - 101.");
 
-    assert(pElement);
+    assert(element);
 
-    if (pElement->CountChildren() && pElement->IsCallPropagationEnabled())
+    if (element->CountChildren() && element->IsCallPropagationEnabled())
     {
-        CElementListSnapshotRef pList = pElement->GetChildrenListSnapshot();
-        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++)
+        CElementListSnapshotRef children = element->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = children->begin(); iter != children->end(); iter++)
             if (!(*iter)->IsBeingDeleted())
-                PlaySoundFrontEnd(*iter, ucSound);
+                PlaySoundFrontEnd(*iter, sound);
     }
 
-    if (IS_PLAYER(pElement))
+    if (IS_PLAYER(element))
     {
-        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
+        CPlayer* player = static_cast<CPlayer*>(element);
 
-        CBitStream                     BitStream;
-        SIntegerSync<unsigned char, 7> sound(ucSound);
-        BitStream.pBitStream->Write(&sound);
+        CBitStream                     bitStream;
+        SIntegerSync<unsigned char, 7> soundSync(sound);
+        bitStream.pBitStream->Write(&soundSync);
 
-        pPlayer->Send(CLuaPacket(PLAY_SOUND, *BitStream.pBitStream));
+        player->Send(CLuaPacket(PLAY_SOUND, *bitStream.pBitStream));
         return true;
     }
 
