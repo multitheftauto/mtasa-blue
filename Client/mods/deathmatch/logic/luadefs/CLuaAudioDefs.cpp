@@ -58,7 +58,7 @@ static std::unique_ptr<float[]> ProcessFFTData(std::unique_ptr<float[]> data, in
     return newData;
 }
 
-static bool IsSoundURL(const std::string& soundPath)
+static bool IsSoundURL(const std::string& soundPath) noexcept
 {
     const auto ToLower = [](char c) { return std::tolower(static_cast<unsigned char>(c)); };
     return (std::ranges::starts_with(soundPath, std::string_view{"http"}, {}, ToLower, ToLower) ||
@@ -319,7 +319,9 @@ auto CLuaAudioDefs::GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*> 
 {
     using ResultType = std::variant<std::unordered_map<int, float>, bool>;
 
-    if (!IsValidFFTBandCount(length, bands.value_or(0)))
+    const int numBands = bands.value_or(0);
+
+    if (!IsValidFFTBandCount(length, numBands))
         return ResultType{false};
 
     std::unique_ptr<float[]> fftData;
@@ -335,10 +337,11 @@ auto CLuaAudioDefs::GetSoundFFTData(std::variant<CClientSound*, CClientPlayer*> 
     if (!fftData)
         return ResultType{false};
 
-    fftData = ProcessFFTData(std::move(fftData), length, bands.value_or(0));
+    fftData = ProcessFFTData(std::move(fftData), length, numBands);
 
-    const int                      size = bands.value_or(0) == 0 ? length / 2 : bands.value_or(0) - 1;
+    const int                      size = numBands == 0 ? length / 2 : numBands - 1;
     std::unordered_map<int, float> data;
+    data.reserve(size + 1);
     for (int i = 0; i <= size; i++)
         data.emplace(i, fftData[i]);
 
@@ -363,6 +366,7 @@ auto CLuaAudioDefs::GetSoundWaveData(std::variant<CClientSound*, CClientPlayer*>
         return ResultType{false};
 
     std::unordered_map<int, float> data;
+    data.reserve(length);
     for (int i = 0; i < length; i++)
         data.emplace(i, waveData[i]);
 
@@ -1259,10 +1263,15 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX(lua_State* luaVM, eAudi
 {
     //  sound playSFX ( string audioContainer, int bankIndex, int audioIndex [, loop = false ] )
     int bankIndex;
-    if (auto* bankValue = std::get_if<int>(&bank))
+    if (containerIndex == AUDIO_LOOKUP_RADIO)
+    {
+        if (auto* radioIndex = std::get_if<eRadioStreamIndex>(&bank))
+            bankIndex = static_cast<int>(*radioIndex);
+        else
+            return false;
+    }
+    else if (auto* bankValue = std::get_if<int>(&bank))
         bankIndex = *bankValue;
-    else if (auto* radioIndex = std::get_if<eRadioStreamIndex>(&bank))
-        bankIndex = static_cast<int>(*radioIndex);
     else
         return false;
 
@@ -1283,10 +1292,15 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX3D(lua_State* luaVM, eAu
 {
     //  sound playSFX3D ( string audioContainer, int bankIndex, int audioIndex, float posX, float posY, float posZ [, loop = false ] )
     int bankIndex;
-    if (auto* bankValue = std::get_if<int>(&bank))
+    if (containerIndex == AUDIO_LOOKUP_RADIO)
+    {
+        if (auto* radioIndex = std::get_if<eRadioStreamIndex>(&bank))
+            bankIndex = static_cast<int>(*radioIndex);
+        else
+            return false;
+    }
+    else if (auto* bankValue = std::get_if<int>(&bank))
         bankIndex = *bankValue;
-    else if (auto* radioIndex = std::get_if<eRadioStreamIndex>(&bank))
-        bankIndex = static_cast<int>(*radioIndex);
     else
         return false;
 
