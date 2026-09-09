@@ -33,15 +33,15 @@ public:
     static bool        SetBrowserRenderingPaused(CClientWebBrowser* browser, bool paused);
     static bool        IsBrowserRenderingPaused(CClientWebBrowser* browser);
     static bool        ExecuteBrowserJavascript(CClientWebBrowser* browser, const std::string javascriptCode);
-    LUA_DECLARE(GetBrowserVolume);
-    static bool                       SetBrowserVolume(std::variant<CClientWebBrowser*, float> webBrowserOrVolume, std::optional<float> volume);
-    static std::optional<bool>        IsBrowserDomainBlocked(const std::string url, std::optional<bool> isURL);
-    static bool                       FocusBrowser(std::optional<CClientWebBrowser*> browser);
-    static bool                       IsBrowserFocused(CClientWebBrowser* browser);
-    static bool                       SetBrowserProperty(CClientWebBrowser* browser, const std::string key, const std::string value);
-    static std::optional<std::string> GetBrowserProperty(CClientWebBrowser* browser, const std::string key);
-    static auto                       GetBrowserSettings();
-    static bool                       GetBrowserSource(lua_State* luaVM, CClientWebBrowser* browser, CLuaFunctionRef callbackFunction);
+    static float       GetBrowserVolume(CClientWebBrowser* browser);
+    static bool        SetBrowserVolume(std::variant<CClientWebBrowser*, float> webBrowserOrVolume, std::optional<float> volume);
+    static std::optional<bool>                   IsBrowserDomainBlocked(const std::string url, std::optional<bool> isURL);
+    static bool                                  FocusBrowser(std::optional<CClientWebBrowser*> browser);
+    static bool                                  IsBrowserFocused(CClientWebBrowser* browser);
+    static bool                                  SetBrowserProperty(CClientWebBrowser* browser, const std::string key, const std::string value);
+    static std::optional<std::string>            GetBrowserProperty(CClientWebBrowser* browser, const std::string key);
+    static std::unordered_map<std::string, bool> GetBrowserSettings();
+    static bool                                  GetBrowserSource(lua_State* luaVM, CClientWebBrowser* browser, CLuaFunctionRef callbackFunction);
     static bool SetBrowserAjaxHandler(lua_State* luaVM, CClientWebBrowser* browser, const std::string url, std::optional<CLuaFunctionRef> callbackFunction);
     static bool CanBrowserNavigateBack(CClientWebBrowser* browser);
     static bool CanBrowserNavigateForward(CClientWebBrowser* browser);
@@ -50,7 +50,8 @@ public:
     static bool ReloadBrowserPage(CClientWebBrowser* browser, std::optional<bool> ignoreCache);
     static bool ToggleBrowserDevTools(CClientWebBrowser* browser, bool visible);
     static bool ResizeBrowser(CClientWebBrowser* browser, CVector2D size);
-    LUA_DECLARE(GUICreateBrowser);
-    LUA_DECLARE(GUIGetBrowser);
-    static bool IsBrowserGPUEnabled() noexcept;
+    static std::variant<CClientGUIElement*, bool> GUICreateBrowser(lua_State* luaVM, CVector2D position, CVector2D size, bool isLocal, bool isTransparent,
+                                                                   std::optional<bool> relative, std::optional<CClientGUIElement*> parent);
+    static std::variant<CClientWebBrowser*, bool> GUIGetBrowser(CClientGUIElement* guiElement);
+    static bool                                   IsBrowserGPUEnabled() noexcept;
 };
