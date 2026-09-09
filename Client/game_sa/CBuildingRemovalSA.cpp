@@ -596,7 +596,7 @@ void CBuildingRemovalSA::AddDataBuildingAndReapplyRemoval(CEntitySAInterface* pI
     if (!pBuildingRemovalItem)
         return;
 
-    if ((pInterface->nType != ENTITY_TYPE_BUILDING && pInterface->nType != ENTITY_TYPE_DUMMY && pInterface->nType != ENTITY_TYPE_OBJECT) ||
+    if ((pInterface->nType != EntityType::BUILDING && pInterface->nType != EntityType::DUMMY && pInterface->nType != EntityType::OBJECT) ||
         pInterface->bRemoveFromWorld == 1 || pInterface->IsPlaceableVTBL())
         return;
 
