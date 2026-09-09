@@ -60,7 +60,7 @@ CClientRadarArea* CClientRadarAreaManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (pEntity && pEntity->GetType() == CCLIENTRADARAREA)
+    if (pEntity && pEntity->GetType() == ElementType::RADAR_AREA)
     {
         return static_cast<CClientRadarArea*>(pEntity);
     }

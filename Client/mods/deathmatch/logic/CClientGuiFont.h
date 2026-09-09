@@ -8,6 +8,8 @@
  *
  *****************************************************************************/
 
+#include "enums/ElementType.h"
+
 class CClientGuiFont : public CClientRenderElement
 {
     DECLARE_CLASS(CClientGuiFont, CClientRenderElement)
@@ -15,7 +17,7 @@ public:
     CClientGuiFont(CClientManager* pManager, ElementID ID, CGuiFontItem* pFontItem);
     ~CClientGuiFont();
 
-    eClientEntityType GetType() const { return CCLIENTGUIFONT; }
+    ElementType::Enum GetType() const { return ElementType::GUIFONT; }
     void              Unlink();
 
     // CClientGuiFont methods

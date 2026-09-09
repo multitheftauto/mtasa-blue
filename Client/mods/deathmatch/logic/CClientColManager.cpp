@@ -60,18 +60,18 @@ void CClientColManager::DoHitDetectionForColShape(CClientColShape* pShape)
         CClientEntity* pEntity = *it;
         switch (pEntity->GetType())
         {
-            case CCLIENTRADARMARKER:
-            case CCLIENTRADARAREA:
-            case CCLIENTTEAM:
-            case CCLIENTGUI:
-            case CCLIENTCOLSHAPE:
-            case CCLIENTDUMMY:
-            case SCRIPTFILE:
-            case CCLIENTDFF:
-            case CCLIENTCOL:
-            case CCLIENTTXD:
-            case CCLIENTIMG:
-            case CCLIENTSOUND:
+            case ElementType::BLIP:
+            case ElementType::RADAR_AREA:
+            case ElementType::TEAM:
+            case ElementType::GUI:
+            case ElementType::COLSHAPE:
+            case ElementType::DUMMY:
+            case ElementType::SCRIPTFILE:
+            case ElementType::DFF:
+            case ElementType::COL:
+            case ElementType::TXD:
+            case ElementType::IMG:
+            case ElementType::SOUND:
                 break;
             default:
                 if (pEntity->GetParent())
@@ -111,7 +111,7 @@ void CClientColManager::DoHitDetectionForEntity(const CVector& vecNowPosition, f
 
     // Extract colshapes
     for (CClientEntityResult ::const_iterator it = queryResult.begin(); it != queryResult.end(); ++it)
-        if ((*it)->GetType() == CCLIENTCOLSHAPE)
+        if ((*it)->GetType() == ElementType::COLSHAPE)
             shortList[(CClientColShape*)*it] = 1;
 
     // Add existing collisions, so they can be disconnected if required

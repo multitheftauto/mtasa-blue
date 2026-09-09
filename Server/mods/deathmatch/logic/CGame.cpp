@@ -2956,7 +2956,7 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
         {
             switch (explosionSource->GetType())
             {
-                case CElement::PLAYER:
+                case ElementType::PLAYER:
                 {
                     // Shift the relative explosion position to an absolute position in the world.
                     CVehicle* occupiedVehicle = static_cast<CPlayer*>(explosionSource)->GetOccupiedVehicle();
@@ -2971,7 +2971,7 @@ void CGame::Packet_ExplosionSync(CExplosionSyncPacket& Packet)
 
                     break;
                 }
-                case CElement::VEHICLE:
+                case ElementType::VEHICLE:
                 {
                     // Shift the relative explosion position to an absolute position in the world.
                     explosionPosition += explosionSource->GetPosition();
@@ -4095,7 +4095,7 @@ void CGame::Packet_Voice_Data(CVoiceDataPacket& Packet)
                         {
                             // Add element decendants
                             std::vector<CPlayer*> descendantList;
-                            pBroadcastElement->GetDescendantsByType(descendantList, CElement::PLAYER);
+                            pBroadcastElement->GetDescendantsByType(descendantList, ElementType::PLAYER);
                             for (std::vector<CPlayer*>::const_iterator iter = descendantList.begin(); iter != descendantList.end(); ++iter)
                             {
                                 playerSendMap.insert(*iter);
@@ -4163,7 +4163,7 @@ void CGame::Packet_Voice_End(CVoiceEndPacket& Packet)
                 {
                     // Add element decendants
                     std::vector<CPlayer*> descendantList;
-                    pBroadcastElement->GetDescendantsByType(descendantList, CElement::PLAYER);
+                    pBroadcastElement->GetDescendantsByType(descendantList, ElementType::PLAYER);
                     for (std::vector<CPlayer*>::const_iterator iter = descendantList.begin(); iter != descendantList.end(); ++iter)
                     {
                         playerSendMap.insert(*iter);

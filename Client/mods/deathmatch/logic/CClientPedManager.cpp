@@ -53,7 +53,7 @@ CClientPed* CClientPedManager::Get(ElementID ID, bool bCheckPlayers)
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (pEntity && (pEntity->GetType() == CCLIENTPED || (bCheckPlayers && pEntity->GetType() == CCLIENTPLAYER)))
+    if (pEntity && (pEntity->GetType() == ElementType::PED || (bCheckPlayers && pEntity->GetType() == ElementType::PLAYER)))
     {
         return static_cast<CClientPed*>(pEntity);
     }

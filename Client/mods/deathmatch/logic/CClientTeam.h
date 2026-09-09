@@ -26,7 +26,7 @@ public:
                 unsigned char ucBlue = 0);
     ~CClientTeam();
 
-    eClientEntityType GetType() const { return CCLIENTTEAM; }
+    ElementType::Enum GetType() const { return ElementType::TEAM; }
 
     void Unlink();
 

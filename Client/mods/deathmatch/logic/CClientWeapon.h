@@ -48,7 +48,7 @@ public:
     CClientWeapon(CClientManager* pManager, ElementID ID, eWeaponType type);
     ~CClientWeapon();
 
-    eClientEntityType GetType() const { return CCLIENTWEAPON; };
+    ElementType::Enum GetType() const { return ElementType::WEAPON; };
 
     eWeaponType    GetWeaponType() { return m_Type; }
     eWeaponState   GetWeaponState() { return m_State; }

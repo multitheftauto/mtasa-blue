@@ -33,7 +33,7 @@ public:
     CClientDFF(class CClientManager* pManager, ElementID ID);
     ~CClientDFF();
 
-    eClientEntityType GetType() const { return CCLIENTDFF; }
+    ElementType::Enum GetType() const { return ElementType::DFF; }
 
     bool Load(bool isRaw, SString input);
 

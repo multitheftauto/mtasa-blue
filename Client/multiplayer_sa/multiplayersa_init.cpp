@@ -86,7 +86,7 @@ void LogEvent(uint uiDebugId, const char* szType, const char* szContext, const c
 void CallGameEntityRenderHandler(CEntitySAInterface* pEntity)
 {
     // Only call if not a dummy
-    if (!pEntity || pEntity->nType != ENTITY_TYPE_DUMMY)
+    if (!pEntity || pEntity->nType != EntityType::DUMMY)
         if (pGameEntityRenderHandler)
             pGameEntityRenderHandler(pEntity);
 }

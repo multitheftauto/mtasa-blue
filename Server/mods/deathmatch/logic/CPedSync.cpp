@@ -356,7 +356,7 @@ void CPedSync::UpdateNearPlayersList()
         for (CElement* pElement : resultNearCamera)
         {
             // Make sure it's a ped
-            if (pElement->GetType() != CElement::PED)
+            if (pElement->GetType() != ElementType::PED)
                 continue;
 
             CPed* pPed = static_cast<CPed*>(pElement);

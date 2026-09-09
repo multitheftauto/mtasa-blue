@@ -48,7 +48,7 @@ public:
     uint16_t GetModel() const noexcept { return m_usModelId; };
     void     SetModel(uint16_t ulModel);
 
-    eClientEntityType GetType() const { return CCLIENTBUILDING; }
+    ElementType::Enum GetType() const { return ElementType::BUILDING; }
 
     bool GetUsesCollision() const noexcept { return m_usesCollision; }
     void SetUsesCollision(bool state);

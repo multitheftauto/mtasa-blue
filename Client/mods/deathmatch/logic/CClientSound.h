@@ -31,7 +31,7 @@ public:
 
     virtual CSphere GetWorldBoundingSphere();
 
-    eClientEntityType GetType() const { return CCLIENTSOUND; }
+    ElementType::Enum GetType() const { return ElementType::SOUND; }
 
     bool Play(const SString& strPath, bool bLoop);
     bool Play(void* pMemory, unsigned int uiLength, bool bLoop);

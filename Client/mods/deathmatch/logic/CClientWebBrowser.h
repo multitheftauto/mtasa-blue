@@ -20,7 +20,7 @@ class CClientWebBrowser : public CClientTexture, public CWebBrowserEventsInterfa
 public:
     CClientWebBrowser(CClientManager* pManager, ElementID ID, CWebBrowserItem* pWebBrowserItem, bool bLocal, bool bTransparent);
     ~CClientWebBrowser();
-    eClientEntityType GetType() const { return CCLIENTBROWSER; }
+    ElementType::Enum GetType() const { return ElementType::BROWSER; }
     virtual void      Unlink() override;
 
     CWebBrowserItem*   GetWebBrowserItem() { return (CWebBrowserItem*)m_pRenderItem; }

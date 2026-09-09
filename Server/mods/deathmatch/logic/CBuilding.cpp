@@ -20,7 +20,7 @@ extern CGame* g_pGame;
 CBuilding::CBuilding(CElement* pParent, CBuildingManager* pBuildingManager) : CElement(pParent)
 {
     // Init
-    m_iType = CElement::BUILDING;
+    m_iType = ElementType::BUILDING;
     SetTypeName("building");
 
     m_pBuildingManager = pBuildingManager;
@@ -38,7 +38,7 @@ CBuilding::CBuilding(CElement* pParent, CBuildingManager* pBuildingManager) : CE
 CBuilding::CBuilding(const CBuilding& Copy) : CElement(Copy.m_pParent), m_pLowLodBuilding(Copy.m_pLowLodBuilding)
 {
     // Init
-    m_iType = CElement::BUILDING;
+    m_iType = ElementType::BUILDING;
     SetTypeName("building");
 
     m_pBuildingManager = Copy.m_pBuildingManager;

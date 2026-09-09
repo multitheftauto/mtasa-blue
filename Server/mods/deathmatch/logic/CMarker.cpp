@@ -27,7 +27,7 @@ CMarker::CMarker(CMarkerManager* pMarkerManager, CColManager* pColManager, CElem
     // Init
     m_pMarkerManager = pMarkerManager;
     m_pColManager = pColManager;
-    m_iType = CElement::MARKER;
+    m_iType = ElementType::MARKER;
     SetTypeName("marker");
     m_ucType = TYPE_CHECKPOINT;
     m_fSize = 4.0f;

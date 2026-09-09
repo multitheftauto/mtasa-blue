@@ -3302,7 +3302,7 @@ CVector*            pedPosition;
 
 bool processGrab()
 {
-    if (entity->nType == ENTITY_TYPE_OBJECT)
+    if (entity->nType == EntityType::OBJECT)
     {
         // CObjectSA * object = (CObjectSA*)entity;
         // CModelInfo * info = pGameInterface->GetModelInfo(entity->m_nModelIndex);
@@ -6839,7 +6839,7 @@ void HideEntitySomehow()
         SBuildingRemoval* pBuildingRemoval = pGameInterface->GetBuildingRemoval()->GetBuildingRemoval(pInterface);
         // Remove down the LOD tree
         if (pBuildingRemoval && pInterface && pInterface != NULL && pInterface->bIsProcObject == 0 &&
-            (pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY))
+            (pInterface->nType == EntityType::BUILDING || pInterface->nType == EntityType::DUMMY))
         {
             // Add the LOD to the list
             pBuildingRemoval->AddBinaryBuilding(pInterface);
@@ -6854,7 +6854,7 @@ void HideEntitySomehow()
         // Init pInterface with the Initial model
         CEntitySAInterface* pInterface = pLODInterface;
         if (pInterface && pInterface != NULL && pInterface->bIsProcObject == 0 &&
-            (pInterface->nType == ENTITY_TYPE_BUILDING || pInterface->nType == ENTITY_TYPE_DUMMY))
+            (pInterface->nType == EntityType::BUILDING || pInterface->nType == EntityType::DUMMY))
         {
             pGameInterface->GetBuildingRemoval()->AddBinaryBuilding(pInterface);
         }
@@ -7016,7 +7016,7 @@ static void __declspec(naked) HOOK_ConvertToObject_CPopulationManageDummy()
 CEntitySAInterface* pBuildingRemove = NULL;
 void                RemovePointerToBuilding()
 {
-    if (pBuildingRemove->nType == ENTITY_TYPE_BUILDING || pBuildingRemove->nType == ENTITY_TYPE_DUMMY || pBuildingRemove->nType == ENTITY_TYPE_OBJECT)
+    if (pBuildingRemove->nType == EntityType::BUILDING || pBuildingRemove->nType == EntityType::DUMMY || pBuildingRemove->nType == EntityType::OBJECT)
     {
         pGameInterface->GetBuildingRemoval()->RemoveWorldBuildingFromLists(pBuildingRemove);
     }

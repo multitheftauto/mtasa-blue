@@ -8,13 +8,15 @@
  *
  *****************************************************************************/
 
+#include "enums/ElementType.h"
+
 class CClientShader : public CClientMaterial
 {
     DECLARE_CLASS(CClientShader, CClientMaterial)
 public:
     CClientShader(CClientManager* pManager, ElementID ID, CShaderItem* pShaderItem);
 
-    eClientEntityType GetType() const { return CCLIENTSHADER; }
+    ElementType::Enum GetType() const { return ElementType::SHADER; }
 
     // CClientShader methods
     CShaderItem* GetShaderItem() { return (CShaderItem*)m_pRenderItem; }

@@ -21,26 +21,27 @@
 #include "Enums.h"
 #include "CElementGroup.h"
 #include "CStringName.h"
+#include "enums/ElementType.h"
 
 // Used to check fast version of getElementsByType
 // #define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
 
-#define IS_BLIP(element)             ((element)->GetType() == CElement::BLIP)
-#define IS_COLSHAPE(element)         ((element)->GetType() == CElement::COLSHAPE)
-#define IS_DUMMY(element)            ((element)->GetType() == CElement::DUMMY)
-#define IS_FILE(element)             ((element)->GetType() == CElement::SCRIPTFILE)
-#define IS_MARKER(element)           ((element)->GetType() == CElement::MARKER)
-#define IS_OBJECT(element)           ((element)->GetType() == CElement::OBJECT)
+#define IS_BLIP(element)             ((element)->GetType() == ElementType::BLIP)
+#define IS_COLSHAPE(element)         ((element)->GetType() == ElementType::COLSHAPE)
+#define IS_DUMMY(element)            ((element)->GetType() == ElementType::DUMMY)
+#define IS_FILE(element)             ((element)->GetType() == ElementType::SCRIPTFILE)
+#define IS_MARKER(element)           ((element)->GetType() == ElementType::MARKER)
+#define IS_OBJECT(element)           ((element)->GetType() == ElementType::OBJECT)
 #define IS_PERPLAYER_ENTITY(element) ((element)->IsPerPlayerEntity())
-#define IS_PICKUP(element)           ((element)->GetType() == CElement::PICKUP)
-#define IS_PED(element)              ((element)->GetType() == CElement::PLAYER || (element)->GetType() == CElement::PED)
-#define IS_PLAYER(element)           ((element)->GetType() == CElement::PLAYER)
-#define IS_RADAR_AREA(element)       ((element)->GetType() == CElement::RADAR_AREA)
-#define IS_VEHICLE(element)          ((element)->GetType() == CElement::VEHICLE)
-#define IS_CONSOLE(element)          ((element)->GetType() == CElement::CONSOLE)
-#define IS_TEAM(element)             ((element)->GetType() == CElement::TEAM)
-#define IS_WATER(element)            ((element)->GetType() == CElement::WATER)
-#define IS_WEAPON(element)           ((element)->GetType() == CElement::WEAPON)
+#define IS_PICKUP(element)           ((element)->GetType() == ElementType::PICKUP)
+#define IS_PED(element)              ((element)->GetType() == ElementType::PLAYER || (element)->GetType() == ElementType::PED)
+#define IS_PLAYER(element)           ((element)->GetType() == ElementType::PLAYER)
+#define IS_RADAR_AREA(element)       ((element)->GetType() == ElementType::RADAR_AREA)
+#define IS_VEHICLE(element)          ((element)->GetType() == ElementType::VEHICLE)
+#define IS_CONSOLE(element)          ((element)->GetType() == ElementType::CONSOLE)
+#define IS_TEAM(element)             ((element)->GetType() == ElementType::TEAM)
+#define IS_WATER(element)            ((element)->GetType() == ElementType::WATER)
+#define IS_WEAPON(element)           ((element)->GetType() == ElementType::WEAPON)
 
 class CLuaMain;
 
@@ -50,42 +51,14 @@ typedef CFastList<CElement*> CElementListType;
 typedef std::vector<CElement*>                CElementListSnapshot;
 typedef std::shared_ptr<CElementListSnapshot> CElementListSnapshotRef;
 
+typedef ElementType::Enum EElementType;
+
 class CElement
 {
     friend class CPerPlayerEntity;
     friend class CBlip;
     friend class CPlayer;
     friend class CPlayerCamera;
-
-public:
-    enum EElementType
-    {
-        DUMMY,
-        PLAYER,
-        VEHICLE,
-        OBJECT,
-        MARKER,
-        BLIP,
-        PICKUP,
-        RADAR_AREA,
-        SPAWNPOINT_DEPRECATED,
-        REMOTECLIENT_DEPRECATED,
-        CONSOLE,
-        PATH_NODE_UNUSED,
-        WORLD_MESH_UNUSED,
-        TEAM,
-        PED,
-        COLSHAPE,
-        SCRIPTFILE,
-        WATER,
-        WEAPON,
-        DATABASE_CONNECTION,
-        TRAIN_TRACK,
-        ROOT,
-        UNKNOWN,
-        BUILDING,
-        _POINTLIGHTS,  // client only
-    };
 
 public:
     CElement(CElement* pParent);
@@ -310,5 +283,3 @@ private:
     static void _GetEntitiesFromRoot(unsigned int uiTypeHash, std::map<CElement*, int>& mapResults);
 #endif
 };
-
-typedef CElement::EElementType EElementType;

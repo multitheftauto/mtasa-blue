@@ -43,7 +43,7 @@ CPlayer::CPlayer(CPlayerManager* pPlayerManager, class CScriptDebugging* pScript
     m_pScriptDebugging = pScriptDebugging;
     m_PlayerSocket = PlayerSocket;
 
-    m_iType = CElement::PLAYER;
+    m_iType = ElementType::PLAYER;
     SetTypeName("player");
     m_bIsPlayer = true;
     m_bDoNotSendEntities = false;
@@ -791,11 +791,11 @@ void CPlayer::UpdateOthersNearList()
 
             // Merge
             for (CElementResult::const_iterator it = resultNearCamera.begin(); it != resultNearCamera.end(); ++it)
-                if ((*it)->GetType() == CElement::PLAYER)
+                if ((*it)->GetType() == ElementType::PLAYER)
                     mergedList.insert((CPlayer*)*it);
 
             for (CElementResult::const_iterator it = resultNearPlayer.begin(); it != resultNearPlayer.end(); ++it)
-                if ((*it)->GetType() == CElement::PLAYER)
+                if ((*it)->GetType() == ElementType::PLAYER)
                     mergedList.insert((CPlayer*)*it);
 
             // Copy to resultNearBoth
@@ -807,7 +807,7 @@ void CPlayer::UpdateOthersNearList()
     // Accurately check distance to other players, and put this player in their near list
     for (CElementResult::const_iterator it = resultNearBoth.begin(); it != resultNearBoth.end(); ++it)
     {
-        if ((*it)->GetType() == CElement::PLAYER)
+        if ((*it)->GetType() == ElementType::PLAYER)
         {
             CPlayer* pOtherPlayer = (CPlayer*)*it;
             if (pOtherPlayer != this)

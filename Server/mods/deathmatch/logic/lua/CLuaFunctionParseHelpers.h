@@ -35,7 +35,7 @@ DECLARE_ENUM(eWeaponSkill);
 DECLARE_ENUM(eWeaponState);
 DECLARE_ENUM(eWeaponFlags);
 DECLARE_ENUM(CAccessControlListRight::ERightType);
-DECLARE_ENUM(CElement::EElementType);
+DECLARE_ENUM(ElementType::Enum);
 DECLARE_ENUM(CAccountPassword::EAccountPasswordType);
 DECLARE_ENUM_CLASS(ESyncType);
 DECLARE_ENUM_CLASS(eCustomDataClientTrust)
@@ -72,63 +72,63 @@ inline eEntityType GetClassType(CElement*)
 }
 inline eEntityType GetClassType(class CPlayer*)
 {
-    return CElement::PLAYER;
+    return ElementType::PLAYER;
 }
 inline eEntityType GetClassType(class CVehicle*)
 {
-    return CElement::VEHICLE;
+    return ElementType::VEHICLE;
 }
 inline eEntityType GetClassType(class CBlip*)
 {
-    return CElement::BLIP;
+    return ElementType::BLIP;
 }
 inline eEntityType GetClassType(class CObject*)
 {
-    return CElement::OBJECT;
+    return ElementType::OBJECT;
 }
 inline eEntityType GetClassType(class CPickup*)
 {
-    return CElement::PICKUP;
+    return ElementType::PICKUP;
 }
 inline eEntityType GetClassType(class CRadarArea*)
 {
-    return CElement::RADAR_AREA;
+    return ElementType::RADAR_AREA;
 }
 inline eEntityType GetClassType(class CMarker*)
 {
-    return CElement::MARKER;
+    return ElementType::MARKER;
 }
 inline eEntityType GetClassType(class CTeam*)
 {
-    return CElement::TEAM;
+    return ElementType::TEAM;
 }
 inline eEntityType GetClassType(class CPed*)
 {
-    return CElement::PED;
+    return ElementType::PED;
 }
 inline eEntityType GetClassType(class CColShape*)
 {
-    return CElement::COLSHAPE;
+    return ElementType::COLSHAPE;
 }
 inline eEntityType GetClassType(class CDummy*)
 {
-    return CElement::DUMMY;
+    return ElementType::DUMMY;
 }
 inline eEntityType GetClassType(class CScriptFile*)
 {
-    return CElement::SCRIPTFILE;
+    return ElementType::SCRIPTFILE;
 }
 inline eEntityType GetClassType(class CWater*)
 {
-    return CElement::WATER;
+    return ElementType::WATER;
 }
 inline eEntityType GetClassType(class CDatabaseConnectionElement*)
 {
-    return CElement::DATABASE_CONNECTION;
+    return ElementType::DATABASE_CONNECTION;
 }
 inline eEntityType GetClassType(class CCustomWeapon*)
 {
-    return CElement::WEAPON;
+    return ElementType::WEAPON;
 }
 
 // class -> class name

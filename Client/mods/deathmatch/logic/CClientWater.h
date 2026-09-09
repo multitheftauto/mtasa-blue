@@ -24,7 +24,7 @@ public:
     bool Destroy();
     bool Exists() { return m_pPoly != nullptr; }
 
-    eClientEntityType GetType() const { return CCLIENTWATER; }
+    ElementType::Enum GetType() const { return ElementType::WATER; }
     int               GetNumVertices() const;
     void              GetPosition(CVector& vecPosition) const;
     bool              GetVertexPosition(int iVertexIndex, CVector& vecPosition);

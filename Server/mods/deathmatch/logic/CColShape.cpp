@@ -21,7 +21,7 @@ CColShape::CColShape(CColManager* pManager, CElement* pParent, bool bIsPartnered
     m_bIsEnabled = true;
     m_bAutoCallEvent = true;
     m_pCallback = NULL;
-    m_iType = COLSHAPE;
+    m_iType = ElementType::COLSHAPE;
     m_bPartnered = bIsPartnered;
 
     SetTypeName("colshape");
