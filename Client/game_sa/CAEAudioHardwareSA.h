@@ -22,6 +22,9 @@
 
 class CAEAudioHardwareSAInterface
 {
+public:
+    void Terminate() { reinterpret_cast<void(__thiscall*)(CAEAudioHardwareSAInterface*)>(FUNC_CAEAudioHardware__Terminate)(this); }
+    bool Initialise() { return reinterpret_cast<bool(__thiscall*)(CAEAudioHardwareSAInterface*)>(FUNC_CAEAudioHardware__Initialise)(this); }
 };
 
 class CAEAudioHardwareSA : public CAEAudioHardware

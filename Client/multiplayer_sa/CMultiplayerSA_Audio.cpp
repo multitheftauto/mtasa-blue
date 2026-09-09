@@ -68,18 +68,18 @@ namespace
 {
     struct SFindDeviceContext
     {
-        const std::string* pstrName;
-        bool               bFound;
+        const std::string* name;
+        bool               found;
         GUID               guid;
     };
 
-    BOOL CALLBACK FindDeviceByNameCallback(GUID* pGuid, LPCSTR strDescription, LPCSTR strModule, LPVOID pContext)
+    BOOL CALLBACK FindDeviceByNameCallback(GUID* guid, LPCSTR strDescription, LPCSTR strModule, LPVOID context)
     {
-        auto* pFindContext = static_cast<SFindDeviceContext*>(pContext);
-        if (pGuid && strDescription && *pFindContext->pstrName == strDescription)
+        auto* findContext = static_cast<SFindDeviceContext*>(context);
+        if (guid && strDescription && *findContext->name == strDescription)
         {
-            pFindContext->guid = *pGuid;
-            pFindContext->bFound = true;
+            findContext->guid = *guid;
+            findContext->found = true;
             return FALSE;
         }
         return TRUE;
@@ -124,33 +124,33 @@ static constexpr std::uint32_t  MAX_CD_STREAM_HANDLES = 32;
 
 static void ReleaseLeakedSfxPakStreamHandles()
 {
-    const std::uintptr_t pBankLoader = *reinterpret_cast<std::uintptr_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_MP3BankLoader);
-    if (!pBankLoader)
+    const std::uintptr_t bankLoader = *reinterpret_cast<std::uintptr_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_MP3BankLoader);
+    if (!bankLoader)
         return;
 
-    const std::uint16_t usPakCount = *reinterpret_cast<std::uint16_t*>(pBankLoader + OFFSET_CAEBankLoader_PakLkupCount);
-    std::int32_t* const pStreamHandles = *reinterpret_cast<std::int32_t**>(pBankLoader + OFFSET_CAEBankLoader_StreamHandles);
-    if (!pStreamHandles)
+    const std::uint16_t pakCount = *reinterpret_cast<std::uint16_t*>(bankLoader + OFFSET_CAEBankLoader_PakLkupCount);
+    std::int32_t* const streamHandles = *reinterpret_cast<std::int32_t**>(bankLoader + OFFSET_CAEBankLoader_StreamHandles);
+    if (!streamHandles)
         return;
 
-    HANDLE* const pGlobalStreamHandles = reinterpret_cast<HANDLE*>(VAR_GStreamFileHandles);
-    for (std::uint16_t i = 0; i < usPakCount; i++)
+    HANDLE* const globalStreamHandles = reinterpret_cast<HANDLE*>(VAR_GStreamFileHandles);
+    for (std::uint16_t i = 0; i < pakCount; i++)
     {
         // CdStreamOpen returns 0 both on a failed open and on a legitimate slot-0 open; slot 0 in
         // practice always belongs to the game's own boot-time streaming archives, opened before
         // any SFX pak, so skipping 0 here is the safe reading either way
-        if (pStreamHandles[i] == 0)
+        if (streamHandles[i] == 0)
             continue;
 
-        const std::uint32_t uiIndex = static_cast<std::uint32_t>(pStreamHandles[i]) >> CD_STREAM_HANDLE_BITS;
-        if (uiIndex >= MAX_CD_STREAM_HANDLES)
+        const std::uint32_t index = static_cast<std::uint32_t>(streamHandles[i]) >> CD_STREAM_HANDLE_BITS;
+        if (index >= MAX_CD_STREAM_HANDLES)
             continue;
 
-        HANDLE& hFile = pGlobalStreamHandles[uiIndex];
-        if (hFile && hFile != INVALID_HANDLE_VALUE)
+        HANDLE& file = globalStreamHandles[index];
+        if (file && file != INVALID_HANDLE_VALUE)
         {
-            CloseHandle(hFile);
-            hFile = nullptr;
+            CloseHandle(file);
+            file = nullptr;
         }
     }
 }
@@ -165,14 +165,14 @@ static constexpr std::uintptr_t OFFSET_AEAudioHardware_DSCapsFreeHw3DAllBuffers 
 
 static void LogAudioHardwareState()
 {
-    const bool          bInitialised = *reinterpret_cast<bool*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_Initialised);
-    const bool          bHwMixAvailable = *reinterpret_cast<bool*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_HardwareMixAvailable);
-    const std::uint16_t usNumAvailableChannels = *reinterpret_cast<std::uint16_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_NumAvailableChannels);
-    const std::uint16_t usNumChannels = *reinterpret_cast<std::uint16_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_NumChannels);
-    const std::uint32_t uiFreeHw3DAllBuffers = *reinterpret_cast<std::uint32_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_DSCapsFreeHw3DAllBuffers);
+    const bool          initialised = *reinterpret_cast<bool*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_Initialised);
+    const bool          hwMixAvailable = *reinterpret_cast<bool*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_HardwareMixAvailable);
+    const std::uint16_t numAvailableChannels = *reinterpret_cast<std::uint16_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_NumAvailableChannels);
+    const std::uint16_t numChannels = *reinterpret_cast<std::uint16_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_NumChannels);
+    const std::uint32_t freeHw3DAllBuffers = *reinterpret_cast<std::uint32_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_DSCapsFreeHw3DAllBuffers);
 
-    OutputDebugLine(SString("[Audio] post-Initialise state: initialised=%d hwMix=%d numChannels=%d numAvailable=%d freeHw3DBuffers=%u", bInitialised,
-                            bHwMixAvailable, usNumChannels, usNumAvailableChannels, uiFreeHw3DAllBuffers));
+    OutputDebugLine(SString("[Audio] post-Initialise state: initialised=%d hwMix=%d numChannels=%d numAvailable=%d freeHw3DBuffers=%u", initialised,
+                            hwMixAvailable, numChannels, numAvailableChannels, freeHw3DAllBuffers));
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -230,30 +230,30 @@ static void PartialTerminateAudioDevice()
 
     // Each channel deleted through its own vtable's scalar deleting destructor (arg 1 also frees
     // the memory), the same call the real Terminate() makes for this array
-    void** const ppChannels = reinterpret_cast<void**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_Channels);
+    void** const channels = reinterpret_cast<void**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_Channels);
     for (std::uint32_t i = 0; i < MAX_NUM_AUDIO_CHANNELS; i++)
     {
-        if (void* pChannel = ppChannels[i])
+        if (void* channel = channels[i])
         {
-            void** const pVtable = *reinterpret_cast<void***>(pChannel);
-            reinterpret_cast<void(__thiscall*)(void*, int)>(pVtable[0])(pChannel, 1);
-            ppChannels[i] = nullptr;
+            void** const vtable = *reinterpret_cast<void***>(channel);
+            reinterpret_cast<void(__thiscall*)(void*, int)>(vtable[0])(channel, 1);
+            channels[i] = nullptr;
         }
     }
     *reinterpret_cast<void**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_StreamingChannel) = nullptr;
 
-    IDirectSound3DListener*& pListener = *reinterpret_cast<IDirectSound3DListener**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_DirectSound3DListener);
-    if (pListener)
+    IDirectSound3DListener*& listener = *reinterpret_cast<IDirectSound3DListener**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_DirectSound3DListener);
+    if (listener)
     {
-        pListener->Release();
-        pListener = nullptr;
+        listener->Release();
+        listener = nullptr;
     }
 
-    IDirectSound8*& pDevice = *reinterpret_cast<IDirectSound8**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_DSDevice);
-    if (pDevice)
+    IDirectSound8*& device = *reinterpret_cast<IDirectSound8**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_DSDevice);
+    if (device)
     {
-        pDevice->Release();
-        pDevice = nullptr;
+        device->Release();
+        device = nullptr;
     }
 
     *reinterpret_cast<bool*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_Initialised) = false;
@@ -261,90 +261,90 @@ static void PartialTerminateAudioDevice()
 
 static bool PartialInitialiseAudioDevice()
 {
-    IDirectSound8*& pDevice = *reinterpret_cast<IDirectSound8**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_DSDevice);
+    IDirectSound8*& device = *reinterpret_cast<IDirectSound8**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_DSDevice);
 
     CoInitialize(nullptr);
 
     typedef HRESULT(WINAPI * EAXDirectSoundCreate8Func)(const GUID*, IDirectSound8**, IUnknown*);
-    const auto  pfnCreate = *reinterpret_cast<EAXDirectSoundCreate8Func*>(FUNC_EAXDirectSoundCreate8);
-    const GUID* pGuid = g_bHasPreferredAudioDeviceGuid ? &g_PreferredAudioDeviceGuid : nullptr;
-    if (FAILED(pfnCreate(pGuid, &pDevice, nullptr)))
+    const auto  create = *reinterpret_cast<EAXDirectSoundCreate8Func*>(FUNC_EAXDirectSoundCreate8);
+    const GUID* guid = g_bHasPreferredAudioDeviceGuid ? &g_PreferredAudioDeviceGuid : nullptr;
+    if (FAILED(create(guid, &device, nullptr)))
         return false;
 
     DSCAPS& dsCaps = *reinterpret_cast<DSCAPS*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_DSCaps);
     dsCaps.dwSize = sizeof(DSCAPS);
-    pDevice->GetCaps(&dsCaps);
+    device->GetCaps(&dsCaps);
 
-    const HWND hWindow = *reinterpret_cast<HWND*>(*reinterpret_cast<std::uintptr_t*>(VAR_GameWindowHandlePtr));
-    if (FAILED(pDevice->SetCooperativeLevel(hWindow, DSSCL_PRIORITY)))
+    const HWND window = *reinterpret_cast<HWND*>(*reinterpret_cast<std::uintptr_t*>(VAR_GameWindowHandlePtr));
+    if (FAILED(device->SetCooperativeLevel(window, DSSCL_PRIORITY)))
         return false;
 
-    const bool bListenerOk = reinterpret_cast<bool(__thiscall*)(void*, std::uint32_t, std::uint32_t, std::uint32_t)>(FUNC_InitDirectSoundListener)(
+    const bool listenerOk = reinterpret_cast<bool(__thiscall*)(void*, std::uint32_t, std::uint32_t, std::uint32_t)>(FUNC_InitDirectSoundListener)(
         reinterpret_cast<void*>(OBJ_AEAudioHardware), 2, 48000, 16);
-    if (!bListenerOk)
+    if (!listenerOk)
         return false;
 
-    DWORD& dwSpeakerConfig = *reinterpret_cast<DWORD*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_SpeakerConfig);
-    pDevice->GetSpeakerConfig(&dwSpeakerConfig);
+    DWORD& speakerConfig = *reinterpret_cast<DWORD*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_SpeakerConfig);
+    device->GetSpeakerConfig(&speakerConfig);
 
-    void*&      pStreamingChannelSlot = *reinterpret_cast<void**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_StreamingChannel);
-    void* const pStreamingChannel = reinterpret_cast<void*(__cdecl*)(std::size_t)>(FUNC_OperatorNew)(0x60098);
-    if (!pStreamingChannel)
+    void*&      streamingChannelSlot = *reinterpret_cast<void**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_StreamingChannel);
+    void* const streamingChannel = reinterpret_cast<void*(__cdecl*)(std::size_t)>(FUNC_OperatorNew)(0x60098);
+    if (!streamingChannel)
         return false;
-    reinterpret_cast<void(__thiscall*)(void*, IDirectSound8*, std::uint16_t)>(FUNC_CAEStreamingChannel_Constructor)(pStreamingChannel, pDevice, 0);
-    pStreamingChannelSlot = pStreamingChannel;
-    reinterpret_cast<void(__thiscall*)(void*)>(FUNC_CAEStreamingChannel_Initialise)(pStreamingChannel);
+    reinterpret_cast<void(__thiscall*)(void*, IDirectSound8*, std::uint16_t)>(FUNC_CAEStreamingChannel_Constructor)(streamingChannel, device, 0);
+    streamingChannelSlot = streamingChannel;
+    reinterpret_cast<void(__thiscall*)(void*)>(FUNC_CAEStreamingChannel_Initialise)(streamingChannel);
 
-    const std::uint32_t uiFreeHw3DAllBuffers = *reinterpret_cast<std::uint32_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_DSCapsFreeHw3DAllBuffers);
-    std::uint16_t&      usNumChannels = *reinterpret_cast<std::uint16_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_NumChannels);
-    bool&               bHwMixAvailable = *reinterpret_cast<bool*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_HardwareMixAvailable);
-    if (uiFreeHw3DAllBuffers < 0x18)
+    const std::uint32_t freeHw3DAllBuffers = *reinterpret_cast<std::uint32_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_DSCapsFreeHw3DAllBuffers);
+    std::uint16_t&      numChannels = *reinterpret_cast<std::uint16_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_NumChannels);
+    bool&               hwMixAvailable = *reinterpret_cast<bool*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_HardwareMixAvailable);
+    if (freeHw3DAllBuffers < 0x18)
     {
-        usNumChannels = 0x30;
-        bHwMixAvailable = false;
+        numChannels = 0x30;
+        hwMixAvailable = false;
     }
     else
     {
-        usNumChannels = static_cast<std::uint16_t>(std::min<std::uint32_t>(uiFreeHw3DAllBuffers, 0x40) - 7);
-        bHwMixAvailable = true;
+        numChannels = static_cast<std::uint16_t>(std::min<std::uint32_t>(freeHw3DAllBuffers, 0x40) - 7);
+        hwMixAvailable = true;
     }
 
-    void** const ppChannels = reinterpret_cast<void**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_Channels);
-    for (std::uint16_t i = 1; i < usNumChannels; i++)
+    void** const channels = reinterpret_cast<void**>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_Channels);
+    for (std::uint16_t i = 1; i < numChannels; i++)
     {
-        void* const pChannel = reinterpret_cast<void*(__cdecl*)(std::size_t)>(FUNC_OperatorNew)(0x90);
-        if (pChannel)
+        void* const channel = reinterpret_cast<void*(__cdecl*)(std::size_t)>(FUNC_OperatorNew)(0x90);
+        if (channel)
             reinterpret_cast<void(__thiscall*)(void*, IDirectSound8*, std::uint16_t, bool, std::uint32_t, std::uint16_t)>(FUNC_CAEStaticChannel_Constructor)(
-                pChannel, pDevice, i, bHwMixAvailable, 44100, 16);
-        ppChannels[i] = pChannel;
+                channel, device, i, hwMixAvailable, 44100, 16);
+        channels[i] = channel;
     }
-    ppChannels[0] = pStreamingChannel;
+    channels[0] = streamingChannel;
 
-    reinterpret_cast<void(__thiscall*)(void*, float)>(FUNC_CAEAudioChannel_SetVolume)(pStreamingChannel, -100.0f);
+    reinterpret_cast<void(__thiscall*)(void*, float)>(FUNC_CAEAudioChannel_SetVolume)(streamingChannel, -100.0f);
     *reinterpret_cast<std::int16_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_ChannelFlags0) = 0x37;
 
     reinterpret_cast<void(__thiscall*)(void*)>(FUNC_CAESmoothFadeThread_Initialise)(reinterpret_cast<void*>(VAR_AudioSmoothFadeThreadHandle));
     reinterpret_cast<void(__thiscall*)(void*)>(FUNC_CAESmoothFadeThread_Start)(reinterpret_cast<void*>(VAR_AudioSmoothFadeThreadHandle));
 
-    void* const pStreamThread = reinterpret_cast<void*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_StreamThread);
-    reinterpret_cast<void(__thiscall*)(void*, void*)>(FUNC_CAEStreamThread_Initialise)(pStreamThread, pStreamingChannel);
-    reinterpret_cast<void(__thiscall*)(void*)>(FUNC_CAEStreamThread_Start)(pStreamThread);
+    void* const streamThread = reinterpret_cast<void*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_StreamThread);
+    reinterpret_cast<void(__thiscall*)(void*, void*)>(FUNC_CAEStreamThread_Initialise)(streamThread, streamingChannel);
+    reinterpret_cast<void(__thiscall*)(void*)>(FUNC_CAEStreamThread_Start)(streamThread);
 
-    *reinterpret_cast<std::uint16_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_NumAvailableChannels) = usNumChannels;
+    *reinterpret_cast<std::uint16_t*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_NumAvailableChannels) = numChannels;
     *reinterpret_cast<bool*>(OBJ_AEAudioHardware + OFFSET_AEAudioHardware_Initialised) = true;
     return true;
 }
 
 void CMultiplayerSA::RestartAudioHardware()
 {
-    CAEAudioHardware* pAEAudioHardware = pGameInterface->GetAEAudioHardware();
-    if (!pAEAudioHardware)
+    CAEAudioHardware* audioHardware = pGameInterface->GetAEAudioHardware();
+    if (!audioHardware)
         return;
 
     // Try the device-only path first: lighter, faster, and it never touches the SFX pak/bank
     // loader that three investigation passes never found the fault in. Two attempts, since the
     // driver can briefly report the old device as still allocated while it finishes releasing it
-    for (int iAttempt = 0; iAttempt < 2; iAttempt++)
+    for (int attempt = 0; attempt < 2; attempt++)
     {
         PartialTerminateAudioDevice();
         CloseLeakedAudioThreadHandle(VAR_AudioStreamThreadHandle);
@@ -363,18 +363,18 @@ void CMultiplayerSA::RestartAudioHardware()
 
     // Same teardown/rebuild the game already does once at normal startup, just run again on
     // demand; causes the same brief hitch, but never needs a full game restart to take effect
-    for (int iAttempt = 0; iAttempt < 4; iAttempt++)
+    for (int attempt = 0; attempt < 4; attempt++)
     {
         // Must run before Terminate deletes the bank loader. Safe to call again on a retry too:
         // Initialise() unconditionally allocates and repopulates a fresh loader, reopening every
         // pak's CD stream, before any of its own failure paths can return
         ReleaseLeakedSfxPakStreamHandles();
 
-        pAEAudioHardware->Terminate();
+        audioHardware->Terminate();
         CloseLeakedAudioThreadHandle(VAR_AudioStreamThreadHandle);
         CloseLeakedAudioThreadHandle(VAR_AudioSmoothFadeThreadHandle);
 
-        if (pAEAudioHardware->Initialise())
+        if (audioHardware->Initialise())
         {
             LogAudioHardwareState();
             return;
@@ -392,7 +392,7 @@ void CMultiplayerSA::RestartAudioHardware()
 
 void CMultiplayerSA::SetPreferredAudioDeviceName(const std::string& strName)
 {
-    const bool bHadGuid = g_bHasPreferredAudioDeviceGuid;
+    const bool hadGuid = g_bHasPreferredAudioDeviceGuid;
     const GUID oldGuid = g_PreferredAudioDeviceGuid;
 
     if (strName.empty())
@@ -402,14 +402,14 @@ void CMultiplayerSA::SetPreferredAudioDeviceName(const std::string& strName)
         SFindDeviceContext findContext{&strName, false, {}};
         DirectSoundEnumerateA(FindDeviceByNameCallback, &findContext);
 
-        g_bHasPreferredAudioDeviceGuid = findContext.bFound;
-        if (findContext.bFound)
+        g_bHasPreferredAudioDeviceGuid = findContext.found;
+        if (findContext.found)
             g_PreferredAudioDeviceGuid = findContext.guid;
     }
 
     // Already open on this device; restarting again is wasteful at best and can deadlock if this
     // lands mid join while the game is streaming audio banks
-    if (bHadGuid == g_bHasPreferredAudioDeviceGuid && (!bHadGuid || IsEqualGUID(oldGuid, g_PreferredAudioDeviceGuid)))
+    if (hadGuid == g_bHasPreferredAudioDeviceGuid && (!hadGuid || IsEqualGUID(oldGuid, g_PreferredAudioDeviceGuid)))
         return;
 
     RestartAudioHardware();
@@ -434,7 +434,7 @@ void CMultiplayerSA::InitHooks_Audio()
     {
         SFindDeviceContext findContext{&strPreferredDevice, false, {}};
         DirectSoundEnumerateA(FindDeviceByNameCallback, &findContext);
-        if (findContext.bFound)
+        if (findContext.found)
         {
             g_PreferredAudioDeviceGuid = findContext.guid;
             g_bHasPreferredAudioDeviceGuid = true;

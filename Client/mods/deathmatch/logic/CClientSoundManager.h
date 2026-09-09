@@ -54,8 +54,8 @@ public:
 
     void                                 OnPossibleDeviceChange();
     void                                 RestartNativeAudioOnNextPulse() { m_bNativeAudioRestartPending = true; }
-    const std::vector<SSoundDeviceInfo>& GetOutputDevices() const { return m_OutputDevices; }
-    unsigned int                         GetOutputDeviceListRevision() const { return m_uiOutputDeviceListRevision; }
+    const std::vector<SSoundDeviceInfo>& GetOutputDevices() const noexcept { return m_OutputDevices; }
+    unsigned int                         GetOutputDeviceListRevision() const noexcept { return m_uiOutputDeviceListRevision; }
 
     void UpdateDistanceStreaming(const CVector& vecListenerPosition);
 

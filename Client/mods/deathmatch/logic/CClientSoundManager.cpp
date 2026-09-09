@@ -17,7 +17,6 @@ using SharedUtil::CalcMTASAPath;
 using std::list;
 
 extern CCoreInterface* g_pCore;
-extern CMultiplayer*   g_pMultiplayer;
 
 CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
 {

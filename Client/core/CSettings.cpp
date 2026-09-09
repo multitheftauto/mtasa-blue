@@ -2294,7 +2294,7 @@ void CSettings::UpdateSoundOutputDeviceCombo()
     const std::vector<std::string> deviceNames = EnumerateAudioDeviceNames(false);
 
     int iSelect = 0;
-    for (size_t i = 0; i < deviceNames.size(); i++)
+    for (std::size_t i = 0; i < deviceNames.size(); i++)
     {
         CGUIListItem* pItem = m_pSoundOutputDeviceCombo->AddItem(deviceNames[i].c_str());
         if (pItem)
@@ -2353,7 +2353,7 @@ void CSettings::UpdateSoundInputDeviceCombo()
     else
     {
         int iSelect = 0;
-        for (size_t i = 0; i < deviceNames.size(); i++)
+        for (std::size_t i = 0; i < deviceNames.size(); i++)
         {
             CGUIListItem* pItem = m_pSoundInputDeviceCombo->AddItem(deviceNames[i].c_str());
             if (pItem)

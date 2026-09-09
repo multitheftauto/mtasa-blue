@@ -72,8 +72,8 @@ public:
     bool                          SetInputDevice(const std::string& strName);
 
     void                                 OnPossibleDeviceChange();
-    const std::vector<SSoundDeviceInfo>& GetInputDevices() const { return m_InputDevices; }
-    unsigned int                         GetInputDeviceListRevision() const { return m_uiInputDeviceListRevision; }
+    const std::vector<SSoundDeviceInfo>& GetInputDevices() const noexcept { return m_InputDevices; }
+    unsigned int                         GetInputDeviceListRevision() const noexcept { return m_uiInputDeviceListRevision; }
 
 private:
     void DeInit();
