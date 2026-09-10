@@ -121,7 +121,7 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
     if (!CModelInfoSA::IsVehicleModel(model))
         return nullptr;
 
-    auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(model)->GetVehicleType());
+    auto vehicleClass = static_cast<VehicleClass::Enum>(pGame->GetModelInfo(model)->GetVehicleType());
 
     std::unique_ptr<CVehicleSA> vehicle = nullptr;
 

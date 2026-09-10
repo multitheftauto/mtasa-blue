@@ -203,13 +203,13 @@ public:
     virtual void*        SetVehicleSuspensionData(void* pSuspensionLines) = 0;
     virtual CVector      GetVehicleExhaustFumesPosition() = 0;
     virtual void         SetVehicleExhaustFumesPosition(const CVector& position) = 0;
-    virtual CVector      GetVehicleDummyDefaultPosition(VehicleDummies eDummy) = 0;
-    virtual CVector      GetVehicleDummyPosition(VehicleDummies eDummy) = 0;
+    virtual CVector      GetVehicleDummyDefaultPosition(VehicleDummies::Enum eDummy) = 0;
+    virtual CVector      GetVehicleDummyPosition(VehicleDummies::Enum eDummy) = 0;
     virtual bool         GetVehicleDummyPositions(std::array<CVector, static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT)>& positions) const = 0;
-    virtual void         SetVehicleDummyPosition(VehicleDummies eDummy, const CVector& vecPosition) = 0;
+    virtual void         SetVehicleDummyPosition(VehicleDummies::Enum eDummy, const CVector& vecPosition) = 0;
     virtual void         ResetVehicleDummies(bool bRemoveFromDummiesMap) = 0;
-    virtual float        GetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup) = 0;
-    virtual void         SetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup, float fWheelSize) = 0;
+    virtual float        GetVehicleWheelSize(ResizableVehicleWheelGroup::Enum eWheelGroup) = 0;
+    virtual void         SetVehicleWheelSize(ResizableVehicleWheelGroup::Enum eWheelGroup, float fWheelSize) = 0;
     virtual void         ResetVehicleWheelSizes(std::pair<float, float>* defaultSizes = nullptr) = 0;
 
     // Init the supported upgrades structure

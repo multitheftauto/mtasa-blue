@@ -19,6 +19,7 @@
 #define FRAME_INCOMING_BUFFER_COUNT 100
 
 #include <mutex>
+#include <atomic>
 #include <speex/speex.h>
 #include <speex/speex_preprocess.h>
 #include <portaudio/portaudio.h>
@@ -71,8 +72,8 @@ private:
     static int PACallback(const void* inputBuffer, void* outputBuffer, unsigned long frameCount, const PaStreamCallbackTimeInfo* timeInfo,
                           PaStreamCallbackFlags statusFlags, void* userData);
 
-    bool        m_bEnabled;
-    eVoiceState m_VoiceState;
+    std::atomic<bool> m_bEnabled;
+    eVoiceState       m_VoiceState;
 
     PaStream* m_pAudioStream;
 
@@ -83,7 +84,6 @@ private:
     int            m_iSpeexOutgoingFrameSampleCount;
     unsigned int   m_uiOutgoingReadIndex;
     unsigned int   m_uiOutgoingWriteIndex;
-    bool           m_bIsSendingVoiceData;
     bool           m_bOutgoingBufferFull;
 
     unsigned long m_ulTimeOfLastSend;

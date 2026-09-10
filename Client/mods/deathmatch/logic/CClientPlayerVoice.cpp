@@ -73,13 +73,12 @@ void CALLBACK BASS_VoiceStateChange(HSYNC handle, DWORD channel, DWORD data, voi
 
 void CClientPlayerVoice::Init()
 {
-    // Grab our sample rate and quality
+    // Grab our sample rate
     m_SampleRate = m_pVoiceRecorder->GetSampleRate();
-    unsigned char ucQuality = m_pVoiceRecorder->GetSampleQuality();
 
     // Setup our BASS playback device
     m_pBassPlaybackStream = BASS_StreamCreate(m_SampleRate / VOICE_SAMPLE_SIZE, 2, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL);
-    BASS_ChannelSetSync(m_pBassPlaybackStream, BASS_SYNC_STALL, 0, &BASS_VoiceStateChange, this);
+    m_hStallSync = BASS_ChannelSetSync(m_pBassPlaybackStream, BASS_SYNC_STALL, 0, &BASS_VoiceStateChange, this);
 
     // Cap the queue BASS keeps for push streams at one second of audio, so a
     // paused or flooded stream cannot grow memory without bound; frames past
@@ -97,20 +96,30 @@ void CClientPlayerVoice::Init()
     const SpeexMode* speexMode = m_pVoiceRecorder->getSpeexModeFromSampleRate();
     m_pSpeexDecoderState = speex_decoder_init(speexMode);
 
-    // Initialize our speex decoder
-    speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexIncomingFrameSampleCount);
-    speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_SET_QUALITY, &ucQuality);
+    // A failed decoder creation leaves a null handle, so skip the config chain;
+    // the frame paths drop undecodable frames the same way
+    if (m_pSpeexDecoderState)
+    {
+        // Initialize our speex decoder
+        speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_GET_FRAME_SIZE, &m_iSpeexIncomingFrameSampleCount);
+        int iQuality = static_cast<int>(m_pVoiceRecorder->GetSampleQuality());
+        speex_decoder_ctl(m_pSpeexDecoderState, SPEEX_SET_QUALITY, &iQuality);
+    }
 }
 
 void CClientPlayerVoice::DeInit()
 {
     if (m_pBassPlaybackStream)
     {
+        // Remove the stall callback before freeing the stream so BASS cannot
+        // call back into this object after the stream is gone
+        BASS_ChannelRemoveSync(m_pBassPlaybackStream, m_hStallSync);
         BASS_ChannelStop(m_pBassPlaybackStream);
         BASS_StreamFree(m_pBassPlaybackStream);
     }
 
     m_pBassPlaybackStream = NULL;
+    m_hStallSync = 0;
 
     if (m_pSpeexDecoderState)
         speex_decoder_destroy(m_pSpeexDecoderState);
@@ -264,6 +273,9 @@ CClientPlayerVoice::EVoiceFrameResult CClientPlayerVoice::ProcessFrame(const uns
     // start event or active state is published; that state would otherwise stay
     // stuck active until destruction, with no BASS stall signal to end it
     if (!m_pBassPlaybackStream)
+        return EVoiceFrameResult::Suppressed;
+
+    if (!m_pSpeexDecoderState)
         return EVoiceFrameResult::Suppressed;
 
     char      pTempBuffer[2048];

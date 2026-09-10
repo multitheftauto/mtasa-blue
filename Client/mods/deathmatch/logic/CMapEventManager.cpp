@@ -194,8 +194,12 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     if (bEnabled)
                         g_pCore->LogEvent(0, "Lua Event", luaMain->GetScriptName(), szName);
 
-                    if (!g_pClientGame->GetDebugHookManager()->OnPreEventFunction(szName, Arguments, pSource, nullptr, pMapEvent))
-                        continue;
+                    CDebugHookManager* debugHookManager = g_pClientGame->GetDebugHookManager();
+                    if (debugHookManager->HasPreEventFunctionHooks())
+                    {
+                        if (!debugHookManager->OnPreEventFunction(szName, Arguments, pSource, nullptr, pMapEvent))
+                            continue;
+                    }
 
                     // Store the current values of the globals
                     lua_getglobal(pState, "source");
@@ -251,7 +255,8 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     pMapEvent->Call(Arguments);
                     bCalled = true;
 
-                    g_pClientGame->GetDebugHookManager()->OnPostEventFunction(szName, Arguments, pSource, nullptr, pMapEvent);
+                    if (debugHookManager->HasPostEventFunctionHooks())
+                        debugHookManager->OnPostEventFunction(szName, Arguments, pSource, nullptr, pMapEvent);
 
                     // Reset the globals on that VM
                     OldSource.Push(pState);

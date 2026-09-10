@@ -435,8 +435,12 @@ bool CElement::AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFuncti
 
 bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller)
 {
-    if (!g_pGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, pCaller))
-        return false;
+    CDebugHookManager* debugHookManager = g_pGame->GetDebugHookManager();
+    if (debugHookManager->HasPreEventHooks())
+    {
+        if (!debugHookManager->OnPreEvent(szName, Arguments, this, pCaller))
+            return false;
+    }
 
     CEvents* pEvents = g_pGame->GetEvents();
 
@@ -452,7 +456,8 @@ bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPl
     // Tell the event manager that we're done calling the event
     pEvents->PostEventPulse();
 
-    g_pGame->GetDebugHookManager()->OnPostEvent(szName, Arguments, this, pCaller);
+    if (debugHookManager->HasPostEventHooks())
+        debugHookManager->OnPostEvent(szName, Arguments, this, pCaller);
 
     // Return whether our event was cancelled or not
     return (!pEvents->WasEventCancelled());

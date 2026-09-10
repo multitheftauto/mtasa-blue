@@ -39,7 +39,7 @@ void CMarkerSA::Init()
  * Set the sprite used for this marker
  * @param wSprite a valid eMarkerSprite value. MARKER_SPRITE_NONE for the default sprite.
  */
-void CMarkerSA::SetSprite(MarkerSprite Sprite = MarkerSprite::MARKER_SPRITE_NONE)
+void CMarkerSA::SetSprite(MarkerSprite::Enum Sprite = MarkerSprite::MARKER_SPRITE_NONE)
 {
     if (Sprite >= MarkerSprite::MARKER_SPRITE_NONE && Sprite <= MarkerSprite::MARKER_SPRITE_SPRAY)
     {
@@ -50,7 +50,7 @@ void CMarkerSA::SetSprite(MarkerSprite Sprite = MarkerSprite::MARKER_SPRITE_NONE
 /**
  * Sets how the marker is displayed in-game
  */
-void CMarkerSA::SetDisplay(MarkerDisplay wDisplay)
+void CMarkerSA::SetDisplay(MarkerDisplay::Enum wDisplay)
 {
     internalInterface->nBlipDisplayFlag = (BYTE)wDisplay;
 }
@@ -69,7 +69,7 @@ void CMarkerSA::SetScale(WORD wScale = MARKER_SCALE_NORMAL)
  * Sets the color of the marker when MARKER_SPRITE_NONE is used
  * @param color eMarkerColor containing a valid colour id
  */
-void CMarkerSA::SetColor(MarkerColor color)
+void CMarkerSA::SetColor(MarkerColor::Enum color)
 {
     if (color >= MarkerColor::MARKER_COLOR_PLUM && color <= MarkerColor::MARKER_COLOR_DARK_TURQUOISE)
     {

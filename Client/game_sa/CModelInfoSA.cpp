@@ -27,15 +27,15 @@ extern CGameSA*        pGame;
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                                        CModelInfoSA::ms_RestreamTxdIDMap;
-std::map<DWORD, float>                                               CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::map<DWORD, unsigned short>                                      CModelInfoSA::ms_ModelDefaultFlagsMap;
-std::map<DWORD, BYTE>                                                CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
-std::unordered_map<std::uint32_t, std::map<VehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
-std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>               CModelInfoSA::ms_ModelDefaultModelTimeInfo;
-std::unordered_map<DWORD, unsigned short>                            CModelInfoSA::ms_OriginalObjectPropertiesGroups;
-std::unordered_map<DWORD, std::pair<float, float>>                   CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
-std::map<unsigned short, int>                                        CModelInfoSA::ms_DefaultTxdIDMap;
+std::map<unsigned short, int>                                              CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<DWORD, float>                                                     CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::map<DWORD, unsigned short>                                            CModelInfoSA::ms_ModelDefaultFlagsMap;
+std::map<DWORD, BYTE>                                                      CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::unordered_map<std::uint32_t, std::map<VehicleDummies::Enum, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
+std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                     CModelInfoSA::ms_ModelDefaultModelTimeInfo;
+std::unordered_map<DWORD, unsigned short>                                  CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, std::pair<float, float>>                         CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
+std::map<unsigned short, int>                                              CModelInfoSA::ms_DefaultTxdIDMap;
 
 union tIdeFlags
 {
@@ -1357,7 +1357,7 @@ bool CModelInfoSA::GetVehicleDummyPositions(std::array<CVector, static_cast<std:
     return true;
 }
 
-CVector CModelInfoSA::GetVehicleDummyDefaultPosition(VehicleDummies eDummy)
+CVector CModelInfoSA::GetVehicleDummyDefaultPosition(VehicleDummies::Enum eDummy)
 {
     if (!IsVehicle())
         return CVector();
@@ -1384,7 +1384,7 @@ CVector CModelInfoSA::GetVehicleDummyDefaultPosition(VehicleDummies eDummy)
     return vec;
 }
 
-CVector CModelInfoSA::GetVehicleDummyPosition(VehicleDummies eDummy)
+CVector CModelInfoSA::GetVehicleDummyPosition(VehicleDummies::Enum eDummy)
 {
     if (!IsVehicle())
         return CVector();
@@ -1397,7 +1397,7 @@ CVector CModelInfoSA::GetVehicleDummyPosition(VehicleDummies eDummy)
     return pVehicleModel->pVisualInfo->vecDummies[(std::size_t)eDummy];
 }
 
-void CModelInfoSA::SetVehicleDummyPosition(VehicleDummies eDummy, const CVector& vecPosition)
+void CModelInfoSA::SetVehicleDummyPosition(VehicleDummies::Enum eDummy, const CVector& vecPosition)
 {
     if (!IsVehicle())
         return;
@@ -1410,7 +1410,7 @@ void CModelInfoSA::SetVehicleDummyPosition(VehicleDummies eDummy, const CVector&
     auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
     {
-        ms_ModelDefaultDummiesPosition.insert({m_dwModelID, std::map<VehicleDummies, CVector>()});
+        ms_ModelDefaultDummiesPosition.insert({m_dwModelID, std::map<VehicleDummies::Enum, CVector>()});
         // Increment this model references count, so we don't unload it before we have a chance to reset the positions
         m_pInterface->usNumberOfRefs++;
     }
@@ -1460,7 +1460,7 @@ void CModelInfoSA::ResetAllVehicleDummies()
     ms_ModelDefaultDummiesPosition.clear();
 }
 
-float CModelInfoSA::GetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup)
+float CModelInfoSA::GetVehicleWheelSize(ResizableVehicleWheelGroup::Enum eWheelGroup)
 {
     if (!IsVehicle())
         return 0.0f;
@@ -1477,7 +1477,7 @@ float CModelInfoSA::GetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup)
     return 0.0f;
 }
 
-void CModelInfoSA::SetVehicleWheelSize(ResizableVehicleWheelGroup eWheelGroup, float fWheelSize)
+void CModelInfoSA::SetVehicleWheelSize(ResizableVehicleWheelGroup::Enum eWheelGroup, float fWheelSize)
 {
     if (!IsVehicle())
         return;
