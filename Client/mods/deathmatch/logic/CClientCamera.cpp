@@ -11,7 +11,9 @@
 #include <StdInc.h>
 #include <game/CCam.h>
 #include <array>
+#include <charconv>
 #include <cmath>
+#include <optional>
 #include <utility>
 
 #define PI_2 6.283185307179586476925286766559f
@@ -158,33 +160,35 @@ void CClientCamera::PersistViewModes()
 
         // Read as text and validate strictly; the settings file is hand editable, and a lenient
         // numeric read would turn garbage or an empty value into mode zero
-        const auto GetStoredViewMode = [](const char* szName, int iMinMode, int iMaxMode)
+        const auto GetStoredViewMode = [](const char* name, std::uint8_t minMode, std::uint8_t maxMode) -> std::optional<std::uint8_t>
         {
-            std::string strValue;
-            g_pCore->GetCVars()->Get(szName, strValue);
-            if (strValue.size() != 1 || strValue[0] < '0' || strValue[0] > '9')
-                return -1;
+            std::string value;
+            g_pCore->GetCVars()->Get(name, value);
 
-            const int iValue = strValue[0] - '0';
-            return (iValue >= iMinMode && iValue <= iMaxMode) ? iValue : -1;
+            std::uint8_t parsedMode = 0;
+            const auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), parsedMode);
+            if (ec != std::errc{} || ptr != value.data() + value.size())
+                return std::nullopt;
+
+            return (parsedMode >= minMode && parsedMode <= maxMode) ? std::optional{parsedMode} : std::nullopt;
         };
 
-        const int iVehicleViewMode =
-            GetStoredViewMode("camera_vehicle_view", static_cast<int>(eVehicleCamMode::BUMPER), static_cast<int>(eVehicleCamMode::CINEMATIC));
+        const std::optional<std::uint8_t> vehicleViewMode =
+            GetStoredViewMode("camera_vehicle_view", static_cast<std::uint8_t>(eVehicleCamMode::BUMPER), static_cast<std::uint8_t>(eVehicleCamMode::CINEMATIC));
         // The native ped view modes run from 1 to 3; ePedCamMode does not match them
-        const int iPedViewMode = GetStoredViewMode("camera_ped_view", 1, 3);
+        const std::optional<std::uint8_t> pedViewMode = GetStoredViewMode("camera_ped_view", 1, 3);
 
-        if (iVehicleViewMode >= 0)
-            SetCameraVehicleViewMode(static_cast<eVehicleCamMode>(iVehicleViewMode));
-        if (iPedViewMode >= 0)
-            SetCameraPedViewMode(static_cast<ePedCamMode>(iPedViewMode));
+        if (vehicleViewMode)
+            SetCameraVehicleViewMode(static_cast<eVehicleCamMode>(*vehicleViewMode));
+        if (pedViewMode)
+            SetCameraPedViewMode(static_cast<ePedCamMode>(*pedViewMode));
 
         m_ucLastVehicleViewMode = static_cast<unsigned char>(GetCameraVehicleViewMode());
         m_ucLastPedViewMode = static_cast<unsigned char>(GetCameraPedViewMode());
 
         // Heal missing or mangled entries and flush right away; waiting for the quit save
         // would lose them if the game does not close cleanly
-        if (iVehicleViewMode != m_ucLastVehicleViewMode || iPedViewMode != m_ucLastPedViewMode)
+        if (vehicleViewMode != m_ucLastVehicleViewMode || pedViewMode != m_ucLastPedViewMode)
         {
             g_pCore->GetCVars()->Set("camera_vehicle_view", static_cast<int>(m_ucLastVehicleViewMode));
             g_pCore->GetCVars()->Set("camera_ped_view", static_cast<int>(m_ucLastPedViewMode));
@@ -193,15 +197,15 @@ void CClientCamera::PersistViewModes()
         return;
     }
 
-    const unsigned char ucVehicleViewMode = static_cast<unsigned char>(GetCameraVehicleViewMode());
-    const unsigned char ucPedViewMode = static_cast<unsigned char>(GetCameraPedViewMode());
-    if (ucVehicleViewMode == m_ucLastVehicleViewMode && ucPedViewMode == m_ucLastPedViewMode)
+    const unsigned char vehicleViewMode = static_cast<unsigned char>(GetCameraVehicleViewMode());
+    const unsigned char pedViewMode = static_cast<unsigned char>(GetCameraPedViewMode());
+    if (vehicleViewMode == m_ucLastVehicleViewMode && pedViewMode == m_ucLastPedViewMode)
         return;
 
-    m_ucLastVehicleViewMode = ucVehicleViewMode;
-    m_ucLastPedViewMode = ucPedViewMode;
-    g_pCore->GetCVars()->Set("camera_vehicle_view", static_cast<int>(ucVehicleViewMode));
-    g_pCore->GetCVars()->Set("camera_ped_view", static_cast<int>(ucPedViewMode));
+    m_ucLastVehicleViewMode = vehicleViewMode;
+    m_ucLastPedViewMode = pedViewMode;
+    g_pCore->GetCVars()->Set("camera_vehicle_view", static_cast<int>(vehicleViewMode));
+    g_pCore->GetCVars()->Set("camera_ped_view", static_cast<int>(pedViewMode));
     g_pCore->SaveConfig();
 }
 
