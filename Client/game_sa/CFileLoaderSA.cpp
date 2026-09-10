@@ -54,12 +54,16 @@ CEntitySAInterface* CFileLoaderSA::LoadObjectInstance(const char* szLine)
     return CFileLoader_LoadObjectInstance(szLine);
 }
 
+class CDamagableModelInfo;
+
 class CAtomicModelInfo
 {
 public:
     void DeleteRwObject() { ((void(__thiscall*)(CAtomicModelInfo*))(*(void***)this)[8])(this); }
 
     void SetAtomic(RpAtomic* atomic) { ((void(__thiscall*)(CAtomicModelInfo*, RpAtomic*))(*(void***)this)[15])(this, atomic); }
+
+    CDamagableModelInfo* AsDamageAtomicModelInfoPtr() { return ((CDamagableModelInfo * (__thiscall*)(CAtomicModelInfo*))(*(void***)this)[2])(this); }
 };
 
 class CDamagableModelInfo
@@ -210,12 +214,19 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
         GetNameAndDamage(frameNodeName, name, bDamage);
     }
 
+    CDamagableModelInfo* pDamagableModelInfo = bDamage ? pAtomicModelInfo->AsDamageAtomicModelInfoPtr() : nullptr;
+    if (bDamage && !pDamagableModelInfo)
+    {
+        // Returning null would stop RpClumpForAllAtomics, so leave the atomic with the clump
+        pRelatedModelInfo->bAtomicNotConsumed = true;
+        return atomic;
+    }
+
     CVisibilityPlugins_SetAtomicRenderCallback(atomic, 0);
 
     RpAtomic* pOldAtomic = reinterpret_cast<RpAtomic*>(pBaseModelInfo->pRwObject);
     if (bDamage)
     {
-        auto pDamagableModelInfo = reinterpret_cast<CDamagableModelInfo*>(pAtomicModelInfo);
         pDamagableModelInfo->SetDamagedAtomic(atomic);
     }
     else
