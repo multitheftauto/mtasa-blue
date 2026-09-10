@@ -1033,22 +1033,29 @@ static bool __fastcall HOOK_CPhysical__ApplyCollisionAlt(CPhysicalSAInterface* t
     return result;
 }
 
+static float scaledVehicleStillVelocityThreshold = 0.0045f;
+
 // In GTA:SA (30 FPS, timeStep = 1.66667f), vehicles sleep after 10 still frames (~333 ms).
-// At high framerates (e.g. 240 FPS), 10 frames elapse in only ~41 ms, deactivating unoccupied vehicles
-// before suspension springs can lift the chassis and causing bottomed-out suspension on spawn.
-// Scaling the threshold dynamically by timeStep maintains an invariant settling window (~400 ms).
+// At high framerates (e.g. 240 FPS), 10 frames elapse in only ~41 ms, putting unoccupied
+// vehicles to sleep prematurely while suspension springs are still oscillating or settling.
+// Scaling GTA:SA's 10-frame threshold by (kOriginalTimeStep / timeStep) preserves
+// an invariant ~333 ms stillness window across all framerates with zero magic numbers.
 static uint8 __cdecl CalculateVehicleSleepFrameThreshold() noexcept
 {
     const float timeStep = *reinterpret_cast<const float*>(0xB7CB5C);
     if (timeStep <= 0.0001f)
         return 10;
 
-    constexpr float baselineNumerator = 20.0f;
-    const float     rawThreshold = baselineNumerator / timeStep;
+    // Scale the stationary vehicle damping velocity threshold (0.0045f in GTA:SA)
+    // to preserve framerate-invariant stillness sensitivity across all framerates.
+    scaledVehicleStillVelocityThreshold = 0.0045f * (timeStep / kOriginalTimeStep);
+
+    constexpr float originalSleepFrames = 10.0f;
+    const float     rawThreshold = originalSleepFrames * (kOriginalTimeStep / timeStep);
     return static_cast<uint8>(std::clamp(std::round(rawThreshold), 10.0f, 240.0f));
 }
 
-// Fixes bottomed-out vehicle suspension when spawning or dropping at high framerates.
+// Fixes bottomed-out or stretched vehicle suspension when spawning or dropping at high framerates.
 // CAutomobile::ProcessControl
 #define HOOKPOS_CAutomobile__ProcessControl_SleepThreshold  0x6B1D34
 #define HOOKSIZE_CAutomobile__ProcessControl_SleepThreshold 10
@@ -1075,7 +1082,7 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessControl_SleepThreshold()
     // clang-format on
 }
 
-// Fixes bottomed-out bike suspension when spawning or dropping at high framerates.
+// Fixes bottomed-out or stretched bike suspension when spawning or dropping at high framerates.
 // CBike::ProcessControl
 #define HOOKPOS_CBike__ProcessControl_SleepThreshold  0x6B997C
 #define HOOKSIZE_CBike__ProcessControl_SleepThreshold 8
@@ -1266,6 +1273,24 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CAutomobile__ProcessControl_SleepThreshold);
     EZHookInstall(CBike__ProcessControl_SleepThreshold);
     EZHookInstall(CBike__ProcessControl_SleepClamp);
+
+    // Prevent unoccupied vehicles from instantly sleeping on frame 1 via the idle bypass flag,
+    // which froze vehicle suspension stretched at spawn before gravity could settle the chassis.
+    MemSet((void*)0x6B1AF5, 0x90, 5);
+    MemSet((void*)0x6B9850, 0x90, 5);
+
+    // Prevent stationary damping from wiping vertical velocity (moveSpeed.z = 0), which
+    // choked gravitational settling at high FPS where per-frame gravity is below 0.0045f.
+    MemSet((void*)0x6B361C, 0x90, 3);
+    MemSet((void*)0x6BC18F, 0x90, 3);
+
+    // Scale the stationary damping threshold (0.0045f) to preserve framerate-invariant stillness sensitivity.
+    MemPut(0x6B33F8, &scaledVehicleStillVelocityThreshold);
+    MemPut(0x6B340E, &scaledVehicleStillVelocityThreshold);
+    MemPut(0x6B3424, &scaledVehicleStillVelocityThreshold);
+    MemPut(0x6BC103, &scaledVehicleStillVelocityThreshold);
+    MemPut(0x6BC119, &scaledVehicleStillVelocityThreshold);
+    MemPut(0x6BC12B, &scaledVehicleStillVelocityThreshold);
     HookInstallCall(CALL_CPhysical__ApplyCollision_1, (DWORD)HOOK_CPhysical__ApplyCollision);
     HookInstallCall(CALL_CPhysical__ApplyCollision_2, (DWORD)HOOK_CPhysical__ApplyCollision);
     HookInstallCall(CALL_CPhysical__ApplyCollision_3, (DWORD)HOOK_CPhysical__ApplyCollision);
