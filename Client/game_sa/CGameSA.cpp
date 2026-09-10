@@ -1119,6 +1119,10 @@ void CGameSA::RestoreGameWorld()
 
 bool CGameSA::SetBuildingPoolSize(size_t size)
 {
+    // The underlying GTA pool stores its capacity as a signed integer.
+    if (size > static_cast<size_t>(std::numeric_limits<int>::max()))
+        return false;
+
     const bool shouldRemoveWorld = !m_isGameWorldRemoved;
 
     const int iCurrentBuildingPoolSize = m_Pools->GetBuildingsPool().GetSize();
