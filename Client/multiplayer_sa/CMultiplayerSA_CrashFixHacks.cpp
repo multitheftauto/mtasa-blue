@@ -3572,7 +3572,8 @@ static void __declspec(naked) HOOK_RpAnimBlendClumpGetFirstAssociation()
 ////////////////////////////////////////////////////////////////////////
 // CAnimManager::BlendAnimation
 //
-// Adds a nullptr check for the clump object pointer.
+// Adds a nullptr check for the clump object pointer, and range checks for the group and animation
+// ids; an out of range group walks unmapped memory and an unstreamed group hands back garbage.
 //
 // >>> 0x4D4610 | 83 EC 14          | sub esp, 14h
 // >>> 0x4D4613 | 8B 4C 24 18       | mov ecx, [esp+18h]
@@ -3591,13 +3592,69 @@ static void __declspec(naked) HOOK_CAnimManager__BlendAnimation()
     {
         mov     eax, [esp+4]            // RpClump* clump
         test    eax, eax
-        jnz     continueAfterFixLocation
-        retn
+        jz      returnNull
 
-        continueAfterFixLocation:
+        mov     eax, [esp+8]                  // animation group id
+        cmp     eax, dword ptr ds:[0B4EA28h]  // CAnimManager::ms_numAnimAssocDefinitions
+        jae     returnNull
+
+        mov     ecx, dword ptr ds:[0B4EA34h]  // CAnimManager::ms_aAnimAssocGroups
+        lea     eax, [eax+eax*4]
+        mov     edx, [esp+0Ch]                // animation id
+        sub     edx, [ecx+eax*4+0Ch]          // - CAnimBlendAssocGroup::m_IdOffset
+        cmp     edx, [ecx+eax*4+8]            // CAnimBlendAssocGroup::m_NumAnims, zero while the group's block isn't streamed in
+        jae     returnNull
+
         sub     esp, 14h
         mov     ecx, [esp+18h]
         jmp     CONTINUE_CAnimManager__BlendAnimation
+
+    returnNull:
+        xor     eax, eax
+        retn
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CTaskSimpleDie::StartAnim
+//
+// Stores whatever BlendAnimation returned and calls SetFinishCallback on it with no checks; a ped
+// dying with an animation from a group whose IFP block isn't streamed in gets null back here.
+// Leaving m_animAssociation null and skipping the rest makes ProcessPed call StartAnim again on
+// the next tick.
+//
+// >>> 0x637554 | 83 C4 10       | add     esp, 10h
+// >>> 0x637557 | 56             | push    esi
+// >>> 0x637558 | 68 10 FC 62 00 | push    62FC10h
+//     0x63755D | 8B C8          | mov     ecx, eax
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CTaskSimpleDie_StartAnim   0x637554
+#define HOOKSIZE_CTaskSimpleDie_StartAnim  9
+#define HOOKCHECK_CTaskSimpleDie_StartAnim 0x83
+static DWORD CONTINUE_CTaskSimpleDie_StartAnim = 0x63755D;
+static DWORD SKIP_CTaskSimpleDie_StartAnim = 0x6375AB;
+
+static void __declspec(naked) HOOK_CTaskSimpleDie_StartAnim()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        add     esp, 10h
+        test    eax, eax
+        jz      skipDieAnim
+
+        // Replaced code
+        push    esi
+        push    62FC10h
+        jmp     CONTINUE_CTaskSimpleDie_StartAnim
+
+    skipDieAnim:
+        // Straight to the epilogue; the skipped tail only wires up the returned animation and
+        // finalizes the death state, all of which runs on the retry
+        jmp     SKIP_CTaskSimpleDie_StartAnim
     }
     // clang-format on
 }
@@ -4167,6 +4224,7 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(RpClumpForAllAtomics);
     EZHookInstall(RpAnimBlendClumpGetFirstAssociation);
     EZHookInstall(CAnimManager__BlendAnimation);
+    EZHookInstallChecked(CTaskSimpleDie_StartAnim);
     EZHookInstall(FxSystemBP_c__Load);
     EZHookInstall(FxPrim_c__Enable);
     EZHookInstall(CFire_ProcessFire);
