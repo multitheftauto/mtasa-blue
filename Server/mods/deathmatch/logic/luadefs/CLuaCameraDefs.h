@@ -19,16 +19,15 @@ public:
     static void LoadFunctions();
 
     // Get functions
-    static std::variant<CLuaMultiReturn<float, float, float, float, float, float, float, float>, bool> GetCameraMatrix(CPlayer* pPlayer);
-    LUA_DECLARE(OOP_getCameraMatrix);
-    static std::variant<CElement*, bool>     GetCameraTarget(CPlayer* pPlayer);
-    static std::variant<unsigned char, bool> GetCameraInterior(CPlayer* pPlayer);
+    static std::variant<CLuaMultiReturn<float, float, float, float, float, float, float, float>, bool> GetCameraMatrix(CPlayer* player);
+    static std::variant<CElement*, bool>                                                               GetCameraTarget(CPlayer* player);
+    static std::variant<std::uint8_t, bool>                                                            GetCameraInterior(CPlayer* player);
 
     // Set functions
-    static bool SetCameraMatrix(CElement* pPlayer, std::variant<CLuaMatrix*, CVector> matrixOrPosition, std::optional<CVector> vecLookAt,
-                                std::optional<float> fRoll, std::optional<float> fFOV);
-    static bool SetCameraTarget(lua_State* luaVM, CElement* pPlayer, std::optional<CElement*> pTarget);
-    static bool SetCameraInterior(CElement* pElement, unsigned char ucInterior);
-    static bool FadeCamera(CElement* pPlayer, bool bFadeIn, std::optional<float> fFadeTime, std::optional<unsigned char> ucRed,
-                           std::optional<unsigned char> ucGreen, std::optional<unsigned char> ucBlue);
+    static bool SetCameraMatrix(CElement* element, std::variant<CLuaMatrix*, CVector> matrixOrPosition, std::optional<CVector> lookAt,
+                                std::optional<float> roll, std::optional<float> fov);
+    static bool SetCameraTarget(lua_State* luaVM, CElement* element, std::optional<CElement*> target);
+    static bool SetCameraInterior(CElement* element, std::uint8_t interior);
+    static bool FadeCamera(CElement* element, bool fadeIn, std::optional<float> fadeTime, std::optional<std::uint8_t> red, std::optional<std::uint8_t> green,
+                           std::optional<std::uint8_t> blue);
 };
