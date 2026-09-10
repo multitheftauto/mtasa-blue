@@ -15,6 +15,7 @@
 #include "StdInc.h"
 #include "CResource.h"
 #include "CResourceManager.h"
+#include "models/CModelManager.h"
 #include "CResourceChecker.h"
 #include "CResourceHTMLItem.h"
 #include "CResourceConfigItem.h"
@@ -1340,6 +1341,10 @@ bool CResource::Stop(bool bManualStop)
 
     // Tell the module manager we have stopped
     g_pGame->GetLuaManager()->GetLuaModuleManager()->ResourceStopped(m_pVM->GetVirtualMachine());
+
+    // Free custom models allocated by this resource
+    if (g_pGame->GetModelManager())
+        g_pGame->GetModelManager()->FreeModelsByResource(this);
 
     // Remove the temporary XML storage node
     if (m_pNodeStorage)

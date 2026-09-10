@@ -178,16 +178,17 @@ bool CClientPlayerManager::IsPlayerLimitReached()
 
 bool CClientPlayerManager::IsValidModel(unsigned long ulModel)
 {
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel);
-    if (!pModelInfo || !pModelInfo->GetInterface())
+    if (ulModel >= static_cast<unsigned long>(g_pGame->GetBaseIDforTXD()))
         return false;
 
-    // Custom models allocated via engineRequestModel have a parent ID
-    if (pModelInfo->GetParentID() != 0)
-        return pModelInfo->GetModelType() == eModelInfoType::PED;
+    // Dynamically allocated ped slots can occupy native holes such as 74 or
+    // use CJ (0) as their parent, neither of which is reliably identifiable via
+    // CModelInfo::GetParentID. The model manager is authoritative for those slots.
+    if (const std::shared_ptr<CClientModel> customModel = g_pClientGame->GetManager()->GetModelManager()->FindModelByID(static_cast<int>(ulModel)))
+        return customModel->GetModelType() == eClientModelType::PED;
 
-    // Standard GTA models must be in valid range
-    if (ulModel >= static_cast<unsigned long>(g_pGame->GetBaseIDforTXD()))
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel);
+    if (!pModelInfo || !pModelInfo->GetInterface())
         return false;
 
     return pModelInfo->IsPlayerModel();

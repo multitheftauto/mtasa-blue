@@ -99,6 +99,14 @@ public:
     static bool EngineRestreamModel(std::uint16_t modelId);
     static void EngineRestream(std::optional<RestreamOption> option);
 
+    static std::variant<uint16_t, bool>    EngineGetModelRuntimeID(uint16_t logicalModelId);
+    static std::variant<uint16_t, bool>    EngineGetModelLogicalID(uint16_t runtimeModelId);
+    static std::variant<std::string, bool> EngineGetModelName(uint32_t modelId);
+    static std::variant<uint16_t, bool>    EngineGetModelFromName(std::string modelName);
+    static std::variant<uint16_t, bool>    EngineGetModelParent(uint32_t modelId);
+    static std::variant<std::string, bool> EngineGetModelType(uint32_t modelId);
+    static bool                            EngineIsModelCustom(uint32_t modelId);
+
 private:
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);

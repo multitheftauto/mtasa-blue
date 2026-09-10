@@ -562,17 +562,24 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
     if (!bitStream.Read(usModel))
         return;
 
+    unsigned short runtimeModel = usModel;
+    unsigned short logicalModel = 0xFFFF;
+    if (g_pClientGame && g_pClientGame->GetManager() && g_pClientGame->GetManager()->GetModelManager())
+    {
+        g_pClientGame->GetManager()->GetModelManager()->ResolveModelID(usModel, runtimeModel, &logicalModel);
+    }
+
     switch (pSource->GetType())
     {
         case CCLIENTPED:
         case CCLIENTPLAYER:
         {
             CClientPed*          pPed = static_cast<CClientPed*>(pSource);
-            const unsigned short usCurrentModel = static_cast<ushort>(pPed->GetModel());
+            const unsigned short usCurrentModel = static_cast<ushort>(pPed->GetLogicalModel());
 
-            if (usCurrentModel != usModel)
+            if (usCurrentModel != usModel || pPed->GetModel() != runtimeModel)
             {
-                if (pPed->SetModel(usModel))
+                if (pPed->SetModel(runtimeModel, false, logicalModel))
                 {
                     CLuaArguments Arguments;
                     Arguments.PushNumber(usCurrentModel);
@@ -594,11 +601,12 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
             }
 
             CClientVehicle*      pVehicle = static_cast<CClientVehicle*>(pSource);
-            const unsigned short usCurrentModel = pVehicle->GetModel();
+            const unsigned short usCurrentModel = pVehicle->GetLogicalModel();
 
-            if (usCurrentModel != usModel)
+            if (usCurrentModel != usModel || pVehicle->GetModel() != runtimeModel)
             {
-                pVehicle->SetModelBlocking(usModel, ucVariant, ucVariant2);
+                pVehicle->SetLogicalModel(logicalModel);
+                pVehicle->SetModelBlocking(runtimeModel, ucVariant, ucVariant2);
 
                 CLuaArguments Arguments;
                 Arguments.PushNumber(usCurrentModel);
@@ -613,11 +621,11 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
         case CCLIENTWEAPON:
         {
             CClientObject*       pObject = static_cast<CClientObject*>(pSource);
-            const unsigned short usCurrentModel = pObject->GetModel();
+            const unsigned short usCurrentModel = pObject->GetLogicalModel();
 
-            if (usCurrentModel != usModel)
+            if (usCurrentModel != usModel || pObject->GetModel() != runtimeModel)
             {
-                pObject->SetModel(usModel);
+                pObject->SetModel(runtimeModel, logicalModel);
                 CLuaArguments Arguments;
                 Arguments.PushNumber(usCurrentModel);
                 Arguments.PushNumber(usModel);
@@ -629,15 +637,31 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
         case CCLIENTBUILDING:
         {
             CClientBuilding* building = static_cast<CClientBuilding*>(pSource);
-            const auto       currentModel = building->GetModel();
+            const auto       currentModel = building->GetLogicalModel();
 
             if (currentModel != usModel)
             {
-                building->SetModel(usModel);
+                building->SetModel(runtimeModel, logicalModel);
                 CLuaArguments Arguments;
                 Arguments.PushNumber(currentModel);
                 Arguments.PushNumber(usModel);
                 building->CallEvent("onClientElementModelChange", Arguments, true);
+            }
+
+            break;
+        }
+        case CCLIENTPICKUP:
+        {
+            CClientPickup* pickup = static_cast<CClientPickup*>(pSource);
+            const auto     currentModel = pickup->GetLogicalModel();
+
+            if (currentModel != usModel)
+            {
+                pickup->SetModel(runtimeModel, logicalModel);
+                CLuaArguments Arguments;
+                Arguments.PushNumber(currentModel);
+                Arguments.PushNumber(usModel);
+                pickup->CallEvent("onClientElementModelChange", Arguments, true);
             }
 
             break;

@@ -58,6 +58,7 @@ class CGame;
 
 #include "CLightsyncManager.h"
 #include "CBanManager.h"
+#include <CServerModelDefinition.h>
 
 // Forward declarations
 class ASE;
@@ -107,6 +108,7 @@ class CTrainTrackManager;
 class CWeaponStatManager;
 class CBuildingRemovalManager;
 class CVehicleSoundSettingsManager;
+class CModelManager;
 
 class CCustomWeaponManager;
 class COpenPortsTester;
@@ -222,6 +224,7 @@ public:
 
     CMainConfig*            GetConfig() { return m_pMainConfig; }
     CHandlingManager*       GetHandlingManager() const noexcept { return m_HandlingManager.get(); }
+    CModelManager*          GetModelManager() const noexcept { return m_modelManager.get(); }
     CMapManager*            GetMapManager() { return m_pMapManager; }
     CPlayerManager*         GetPlayerManager() { return m_pPlayerManager; }
     CObjectManager*         GetObjectManager() { return m_pObjectManager; }
@@ -275,6 +278,10 @@ public:
     void InitialDataStream(CPlayer& Player);
     void QuitPlayer(CPlayer& Player, CClient::eQuitReasons Reason = CClient::QUIT_QUIT, bool bSayInConsole = true, const char* szKickReason = "None",
                     const char* szResponsiblePlayer = "None");
+
+    void BroadcastAllocateServerModel(const SServerModelDefinition& definition);
+    void BroadcastFreeServerModel(std::uint16_t logicalModelId);
+    void SendServerModels(CPlayer* player);
 
     class CLuaManager* GetLuaManager() { return m_pLuaManager; };
 
@@ -579,6 +586,7 @@ private:
     CZoneNames*                       m_pZoneNames;
     ASE*                              m_pASE;
     std::unique_ptr<CHandlingManager> m_HandlingManager;
+    std::unique_ptr<CModelManager>    m_modelManager;
     CRPCFunctions*                    m_pRPCFunctions;
     CLanBroadcast*                    m_pLanBroadcast;
     CWaterManager*                    m_pWaterManager;

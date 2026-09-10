@@ -867,11 +867,14 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
         unsigned char    ucFightingStyle = 0;
         SEntityAlphaSync alpha;
         unsigned char    ucInterior = 0;
+        unsigned short   usRuntimeModel = 0;
+        unsigned short   usLogicalModel = 0xFFFF;
         if (bIsSpawned)  // Always true for newer server builds.
         {
             // Read out the player model id
             bitStream.ReadCompressed(usPlayerModelID);
-            if (!CClientPlayerManager::IsValidModel(usPlayerModelID))
+            if (!g_pClientGame->GetManager()->GetModelManager()->ResolveModelID(usPlayerModelID, usRuntimeModel, &usLogicalModel) ||
+                !CClientPlayerManager::IsValidModel(usRuntimeModel))
             {
                 RaiseProtocolError(10);
                 return;
@@ -974,7 +977,7 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
         if (bIsSpawned)  // Always true for newer server builds.
         {
             // Give him the correct skin
-            pPlayer->SetModel(usPlayerModelID);
+            pPlayer->SetModel(usRuntimeModel, false, usLogicalModel);
 
             // Not in a vehicle?
             if (ID == INVALID_ELEMENT_ID)
@@ -1161,8 +1164,16 @@ void CPacketHandler::Packet_PlayerSpawn(NetBitStreamInterface& bitStream)
         // Remove jetpack
         pPlayer->SetHasJetPack(false);
 
+        unsigned short usRuntimeModel = 0;
+        unsigned short usLogicalModel = 0xFFFF;
+        if (!g_pClientGame->GetManager()->GetModelManager()->ResolveModelID(usPlayerModelID, usRuntimeModel, &usLogicalModel) ||
+            !CClientPlayerManager::IsValidModel(usRuntimeModel))
+        {
+            usRuntimeModel = 0;
+        }
+
         // Spawn him
-        pPlayer->Spawn(vecPosition, fRotation, usPlayerModelID, ucInterior);
+        pPlayer->Spawn(vecPosition, fRotation, usRuntimeModel, ucInterior, usLogicalModel);
 
         // Set his dimension
         pPlayer->SetDimension(usDimension);
@@ -3009,10 +3020,12 @@ retry:
                     bitStream.Read(&rotationRadians);
                     if (bitStream.ReadCompressed(usObjectID) && bitStream.Read(&alpha))
                     {
-                        // Valid object id?
-                        if (!CClientObjectManager::IsValidModel(usObjectID))
+                        std::uint16_t runtimeObjectId = 1700;
+                        std::uint16_t logicalObjectId = 0xFFFF;
+                        if (!g_pClientGame->GetManager()->GetModelManager()->ResolveModelID(usObjectID, runtimeObjectId, &logicalObjectId) ||
+                            !CClientObjectManager::IsValidModel(runtimeObjectId))
                         {
-                            usObjectID = 1700;
+                            runtimeObjectId = 1700;
                         }
 
                         // Low LOD stuff
@@ -3025,9 +3038,10 @@ retry:
                             // Create the object and put it at its position
 #ifdef WITH_OBJECT_SYNC
                             pObject = new CDeathmatchObject(g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, g_pClientGame->m_pObjectSync,
-                                                            EntityID, usObjectID);
+                                                            EntityID, runtimeObjectId);
 #else
-                            pObject = new CDeathmatchObject(g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID, bIsLowLod);
+                            pObject =
+                                new CDeathmatchObject(g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, runtimeObjectId, bIsLowLod);
 #endif
                         }
                         else if (ucEntityTypeID == CClientGame::WEAPON)
@@ -3037,6 +3051,7 @@ retry:
                         pEntity = pObject;
                         if (pObject)
                         {
+                            pObject->SetLogicalModel(logicalObjectId);
                             pObject->SetOrientation(position.data.vecPosition, rotationRadians.data.vecRotation);
                             pObject->SetAlpha(alpha.data.ucAlpha);
                         }
@@ -3217,8 +3232,13 @@ retry:
                     bitStream.Read(&position);
                     if (bitStream.ReadCompressed(usModel) && bitStream.ReadBit(bIsVisible) && bitStream.Read(&pickupType))
                     {
+                        unsigned short runtimePickupModel = usModel;
+                        unsigned short logicalPickupModel = 0xFFFF;
+                        g_pClientGame->GetManager()->GetModelManager()->ResolveModelID(usModel, runtimePickupModel, &logicalPickupModel);
+
                         // Create the pickup with the given position and model
-                        CClientPickup* pPickup = new CClientPickup(g_pClientGame->m_pManager, EntityID, usModel, position.data.vecPosition);
+                        CClientPickup* pPickup =
+                            new CClientPickup(g_pClientGame->m_pManager, EntityID, runtimePickupModel, position.data.vecPosition, logicalPickupModel);
                         pEntity = pPickup;
 
                         pPickup->m_ucType = pickupType.data.ucType;
@@ -3280,7 +3300,10 @@ retry:
                     std::uint16_t usModel = 0xFFFF;
                     bitStream.Read(usModel);
 
-                    if (!CClientVehicleManager::IsValidModel(usModel))
+                    std::uint16_t runtimeModel = 0xFFFF;
+                    std::uint16_t logicalModel = 0xFFFF;
+                    if (!g_pClientGame->GetManager()->GetModelManager()->ResolveModelID(usModel, runtimeModel, &logicalModel) ||
+                        !CClientVehicleManager::IsValidModel(runtimeModel))
                     {
                         RaiseEntityAddError(39);
                         return;
@@ -3358,14 +3381,15 @@ retry:
                     }
 
                     // Create it
-                    CDeathmatchVehicle* pVehicle =
-                        new CDeathmatchVehicle(g_pClientGame->m_pManager, g_pClientGame->m_pUnoccupiedVehicleSync, EntityID, usModel, ucVariant, ucVariant2);
+                    CDeathmatchVehicle* pVehicle = new CDeathmatchVehicle(g_pClientGame->m_pManager, g_pClientGame->m_pUnoccupiedVehicleSync, EntityID,
+                                                                          runtimeModel, ucVariant, ucVariant2);
                     pEntity = pVehicle;
                     if (!pVehicle)
                     {
                         RaiseEntityAddError(65);
                         return;
                     }
+                    pVehicle->SetLogicalModel(logicalModel);
 
                     // Set the health, blow state, color and paintjob
                     pVehicle->SetHealth(health.data.fValue);
@@ -3845,7 +3869,11 @@ retry:
                     // Read out the model
                     unsigned short usModel;
                     bitStream.ReadCompressed(usModel);
-                    if (!CClientPlayerManager::IsValidModel(usModel))
+
+                    unsigned short runtimeModel = 0;
+                    unsigned short logicalModel = 0xFFFF;
+                    if (!g_pClientGame->GetManager()->GetModelManager()->ResolveModelID(usModel, runtimeModel, &logicalModel) ||
+                        !CClientPlayerManager::IsValidModel(runtimeModel))
                     {
                         RaiseEntityAddError(51);
                         return;
@@ -3884,7 +3912,8 @@ retry:
                     bool bIsHeadless = bitStream.ReadBit();
                     bool bIsFrozen = bitStream.ReadBit();
 
-                    CClientPed* pPed = new CClientPed(g_pClientGame->m_pManager, usModel, EntityID);
+                    CClientPed* pPed = new CClientPed(g_pClientGame->m_pManager, runtimeModel, EntityID);
+                    pPed->SetLogicalModel(logicalModel);
                     pEntity = pPed;
 
                     pPed->SetPosition(position.data.vecPosition);
@@ -4206,12 +4235,17 @@ retry:
                     bitStream.Read(&rotationRadians);
                     bitStream.ReadCompressed(modelId);
 
-                    if (!CClientBuildingManager::IsValidModel(modelId))
-                        modelId = 1700;
+                    std::uint16_t runtimeModel = 1700;
+                    std::uint16_t logicalModel = 0xFFFF;
+                    if (!g_pClientGame->GetManager()->GetModelManager()->ResolveModelID(modelId, runtimeModel, &logicalModel) ||
+                        !CClientBuildingManager::IsValidModel(runtimeModel))
+                    {
+                        runtimeModel = 1700;
+                    }
 
                     bitStream.Read(LowLodObjectID);
-                    CClientBuilding* pBuilding = new CClientBuilding(g_pClientGame->m_pManager, EntityID, modelId, position.data.vecPosition,
-                                                                     rotationRadians.data.vecRotation, ucInterior);
+                    CClientBuilding* pBuilding = new CClientBuilding(g_pClientGame->m_pManager, EntityID, runtimeModel, position.data.vecPosition,
+                                                                     rotationRadians.data.vecRotation, ucInterior, logicalModel);
 
                     pBuilding->SetUsesCollision(bCollisonsEnabled);
                     pEntity = pBuilding;

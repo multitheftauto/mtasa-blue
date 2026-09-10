@@ -233,6 +233,8 @@ public:
     void SetTurretRotation(float fHorizontal, float fVertical);
 
     unsigned short GetModel() { return m_usModel; };
+    std::uint16_t  GetLogicalModel() const noexcept { return m_logicalModel != 0xFFFF ? m_logicalModel : m_usModel; }
+    void           SetLogicalModel(std::uint16_t logicalModel) noexcept { m_logicalModel = logicalModel; }
     void           SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
 
     unsigned char GetVariant() { return m_ucVariation; };
@@ -743,6 +745,7 @@ protected:
     unsigned char                  m_ucFellThroughMapCount;
     SFixedArray<bool, MAX_WINDOWS> m_bWindowOpen;
     std::shared_ptr<CClientModel>  m_clientModel;
+    std::uint16_t                  m_logicalModel = 0xFFFF;
 
 public:
 #ifdef MTA_DEBUG

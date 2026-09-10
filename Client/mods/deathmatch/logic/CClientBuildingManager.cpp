@@ -67,15 +67,23 @@ void CClientBuildingManager::RemoveFromList(CClientBuilding* pBuilding)
 
 bool CClientBuildingManager::IsValidModel(uint16_t modelId)
 {
+    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
+    if (!pModelInfo || !pModelInfo->GetInterface())
+        return false;
+
+    // Runtime slots allocated for server object models are not IMG archive
+    // entries. Their parent/type metadata is the authoritative validation path.
+    if (pModelInfo->GetParentID() != 0)
+    {
+        const eModelInfoType type = pModelInfo->GetModelType();
+        return type == eModelInfoType::CLUMP || type == eModelInfoType::ATOMIC || type == eModelInfoType::WEAPON || type == eModelInfoType::TIME;
+    }
+
     if (modelId >= static_cast<uint16_t>(g_pGame->GetBaseIDforTXD()))
         return false;
 
     // Clothes and hands cause artefacts
     if (384 <= modelId && modelId <= 397)
-        return false;
-
-    CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
-    if (!pModelInfo || !pModelInfo->GetInterface())
         return false;
 
     if (!pModelInfo->IsAllocatedInArchive())

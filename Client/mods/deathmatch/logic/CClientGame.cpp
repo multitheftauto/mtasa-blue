@@ -6902,6 +6902,13 @@ bool CClientGame::TriggerBrowserRequestResultEvent(const std::unordered_set<SStr
 
 bool CClientGame::RestreamModel(std::uint16_t model)
 {
+    std::uint16_t runtimeModel = model;
+    if (m_pManager && m_pManager->GetModelManager())
+    {
+        m_pManager->GetModelManager()->ResolveModelID(model, runtimeModel);
+    }
+    model = runtimeModel;
+
     // Is this a vehicle ID?
     if (CClientVehicleManager::IsValidModel(model))
     {
@@ -6927,7 +6934,8 @@ bool CClientGame::RestreamModel(std::uint16_t model)
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
         m_pManager->GetObjectManager()->RestreamObjects(model);
-        g_pGame->GetModelInfo(model)->RestreamIPL();
+        if (auto* modelInfo = g_pGame->GetModelInfo(model))
+            modelInfo->RestreamIPL();
 
         return true;
     }

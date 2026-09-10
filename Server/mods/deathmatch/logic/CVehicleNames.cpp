@@ -12,6 +12,8 @@
 #include "StdInc.h"
 #include "CVehicleNames.h"
 #include "CVehicleManager.h"
+#include "CGame.h"
+#include "models/CModelManager.h"
 
 const char* szVehicleNameEmpty = "";
 
@@ -236,13 +238,27 @@ static const SFixedArray<SVehicleName, 212> VehicleNames = {{{"Landstalker"},
 
 bool CVehicleNames::IsValidModel(unsigned long ulModel)
 {
+    if (g_pGame && g_pGame->GetModelManager())
+        return g_pGame->GetModelManager()->IsValidModel(ulModel, eModelType::VEHICLE);
+
     return ulModel >= 400 && ulModel <= 611;
 }
 
 const char* CVehicleNames::GetVehicleName(unsigned long ulModel)
 {
+    if (g_pGame && g_pGame->GetModelManager())
+    {
+        auto model = g_pGame->GetModelManager()->FindModel(ulModel);
+        if (model && model->GetModelType() == eModelType::VEHICLE)
+        {
+            auto vehicleModel = std::dynamic_pointer_cast<CModelVehicle>(model);
+            if (vehicleModel)
+                return vehicleModel->GetName().c_str();
+        }
+    }
+
     // Valid?
-    if (IsValidModel(ulModel) && ((ulModel - 400) < NUMELMS(VehicleNames)))
+    if (IsValidModel(ulModel) && ulModel >= 400 && ((ulModel - 400) < NUMELMS(VehicleNames)))
     {
         // Look it up in the table
         return VehicleNames[ulModel - 400].szName;

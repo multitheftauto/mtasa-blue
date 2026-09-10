@@ -18,6 +18,7 @@
 #include "luadefs/CLuaHTTPDefs.h"
 #include "luadefs/CLuaUtilDefs.h"
 #include "luadefs/CLuaElementDefs.h"
+#include "luadefs/CLuaEngineDefs.h"
 #include "luadefs/CLuaAccountDefs.h"
 #include "luadefs/CLuaACLDefs.h"
 #include "luadefs/CLuaBanDefs.h"
@@ -219,6 +220,7 @@ void CLuaManager::LoadCFunctions()
     CLuaColShapeDefs::LoadFunctions();
     CLuaDatabaseDefs::LoadFunctions();
     CLuaElementDefs::LoadFunctions();
+    CLuaEngineDefs::LoadFunctions();
     CLuaHandlingDefs::LoadFunctions();
     CLuaMarkerDefs::LoadFunctions();
     CLuaNetworkDefs::LoadFunctions();

@@ -11,6 +11,8 @@
 
 #include "StdInc.h"
 #include "CVehicleManager.h"
+#include "CGame.h"
+#include "models/CModelManager.h"
 #include "Utils.h"
 #include "lua/LuaCommon.h"
 
@@ -423,15 +425,32 @@ bool CVehicleManager::Exists(CVehicle* pVehicle)
 
 bool CVehicleManager::IsValidModel(unsigned int ulVehicleModel)
 {
+    if (g_pGame && g_pGame->GetModelManager())
+        return g_pGame->GetModelManager()->IsValidModel(ulVehicleModel, eModelType::VEHICLE);
+
     return ulVehicleModel >= 400 && ulVehicleModel <= 611;
 }
 
 eVehicleType CVehicleManager::GetVehicleType(unsigned short usModel)
 {
+    if (g_pGame && g_pGame->GetModelManager())
+    {
+        auto model = g_pGame->GetModelManager()->FindModel(usModel);
+        if (model && model->GetModelType() == eModelType::VEHICLE)
+        {
+            auto vehicleModel = std::dynamic_pointer_cast<CModelVehicle>(model);
+            if (vehicleModel)
+                return vehicleModel->GetVehicleType();
+        }
+    }
+
     if (!IsValidModel(usModel))
         return VEHICLE_NONE;
 
-    return gs_vehicleTypes[usModel - 400];
+    if (usModel >= 400 && usModel <= 611)
+        return gs_vehicleTypes[usModel - 400];
+
+    return VEHICLE_NONE;
 }
 
 bool CVehicleManager::IsValidUpgrade(unsigned short usUpgrade)
@@ -441,7 +460,18 @@ bool CVehicleManager::IsValidUpgrade(unsigned short usUpgrade)
 
 unsigned int CVehicleManager::GetMaxPassengers(unsigned int uiVehicleModel)
 {
-    if (IsValidModel(uiVehicleModel))
+    if (g_pGame && g_pGame->GetModelManager())
+    {
+        auto model = g_pGame->GetModelManager()->FindModel(uiVehicleModel);
+        if (model && model->GetModelType() == eModelType::VEHICLE)
+        {
+            auto vehicleModel = std::dynamic_pointer_cast<CModelVehicle>(model);
+            if (vehicleModel)
+                return vehicleModel->GetMaxPassengers();
+        }
+    }
+
+    if (IsValidModel(uiVehicleModel) && uiVehicleModel >= 400 && uiVehicleModel <= 611)
     {
         return g_ucMaxPassengers[uiVehicleModel - 400];
     }
@@ -454,8 +484,25 @@ void CVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& 
     RandomizeRandomSeed();
     ucVariant = 255;
     ucVariant2 = 255;
+
+    std::uint8_t variantsCount = 255;
+    if (g_pGame && g_pGame->GetModelManager())
+    {
+        auto model = g_pGame->GetModelManager()->FindModel(usModel);
+        if (model && model->GetModelType() == eModelType::VEHICLE)
+        {
+            auto vehicleModel = std::dynamic_pointer_cast<CModelVehicle>(model);
+            if (vehicleModel)
+                variantsCount = vehicleModel->GetVariantsCount();
+        }
+    }
+    else if (usModel >= 400 && usModel <= 611)
+    {
+        variantsCount = g_ucVariants[usModel - 400];
+    }
+
     // Valid model?
-    if (IsValidModel(usModel) && g_ucVariants[usModel - 400] != 255)
+    if (IsValidModel(usModel) && variantsCount != 255)
     {
         // caddy || cropduster
         if (usModel == 457 || usModel == 512)
@@ -472,7 +519,7 @@ void CVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& 
         else if (usModel == 535)
         {
             // Slamvan has steering wheel "extras" we want one of those so default cannot be an option.
-            ucVariant = (rand() % (g_ucVariants[usModel - 400] + 1));
+            ucVariant = (rand() % (variantsCount + 1));
             return;
         }
         // NRG 500 || BF400
@@ -493,43 +540,62 @@ void CVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& 
         // e.g. ( rand () % ( 5 + 2 ) ) - 1
         // Can generate 6 then minus 1 = 5
         // Can generate 0 then minus 1 = -1 (255) (default model with nothing)
-        ucVariant = (rand() % (g_ucVariants[usModel - 400] + 2)) - 1;
+        ucVariant = (rand() % (variantsCount + 2)) - 1;
     }
+}
+
+static unsigned long GetVehicleAttributesHelper(unsigned int uiModel)
+{
+    if (g_pGame && g_pGame->GetModelManager())
+    {
+        auto model = g_pGame->GetModelManager()->FindModel(uiModel);
+        if (model && model->GetModelType() == eModelType::VEHICLE)
+        {
+            auto vehicleModel = std::dynamic_pointer_cast<CModelVehicle>(model);
+            if (vehicleModel)
+                return vehicleModel->GetAttributes();
+        }
+    }
+
+    if (uiModel >= 400 && uiModel <= 611)
+        return g_ulVehicleAttributes[uiModel - 400];
+
+    return 0;
 }
 
 bool CVehicleManager::HasTurret(unsigned int uiModel)
 {
-    return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_TURRENT));
+    return (IsValidModel(uiModel) && (GetVehicleAttributesHelper(uiModel) & VEHICLE_HAS_TURRENT));
 }
 
 bool CVehicleManager::HasSirens(unsigned int uiModel)
 {
-    return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_SIRENS));
+    return (IsValidModel(uiModel) && (GetVehicleAttributesHelper(uiModel) & VEHICLE_HAS_SIRENS));
 }
 
 bool CVehicleManager::HasTaxiLight(unsigned int uiModel)
 {
-    return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_TAXI_LIGHTS));
+    return (IsValidModel(uiModel) && (GetVehicleAttributesHelper(uiModel) & VEHICLE_HAS_TAXI_LIGHTS));
 }
 
 bool CVehicleManager::HasLandingGears(unsigned int uiModel)
 {
-    return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_LANDING_GEARS));
+    return (IsValidModel(uiModel) && (GetVehicleAttributesHelper(uiModel) & VEHICLE_HAS_LANDING_GEARS));
 }
 
 bool CVehicleManager::HasAdjustableProperty(unsigned int uiModel)
 {
-    return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_ADJUSTABLE_PROPERTY));
+    return (IsValidModel(uiModel) && (GetVehicleAttributesHelper(uiModel) & VEHICLE_HAS_ADJUSTABLE_PROPERTY));
 }
 
 bool CVehicleManager::HasSmokeTrail(unsigned int uiModel)
 {
-    return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_SMOKE_TRAIL));
+    return (IsValidModel(uiModel) && (GetVehicleAttributesHelper(uiModel) & VEHICLE_HAS_SMOKE_TRAIL));
 }
 
 bool CVehicleManager::IsTrailer(unsigned int uiVehicleModel)
 {
-    return (IsValidModel(uiVehicleModel) && (gs_vehicleTypes[uiVehicleModel - 400] == VEHICLE_TRAILER));
+    return (IsValidModel(uiVehicleModel) && (GetVehicleType(uiVehicleModel) == VEHICLE_TRAILER));
 }
 
 bool CVehicleManager::HasDamageModel(unsigned short usModel)
