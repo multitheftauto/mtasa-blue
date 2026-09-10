@@ -525,6 +525,7 @@ private:
     void Packet_PlayerNetworkStatus(class CPlayerNetworkStatusPacket& Packet);
     void Packet_PlayerResourceStart(class CPlayerResourceStartPacket& Packet);
     void Packet_PlayerWorldSpecialProperty(class CPlayerWorldSpecialPropertyPacket& packet) noexcept;
+    void Packet_PedHit(class CPedHitPacket& packet) noexcept;
 
     static void PlayerCompleteConnect(CPlayer* pPlayer);
 
