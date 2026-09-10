@@ -13,11 +13,13 @@
 #include <lua/CLuaFunctionParser.h>
 #include "CBassAudio.h"
 
+#include <algorithm>
 #include <array>
 #include <cctype>
 #include <cmath>
 #include <memory>
 #include <ranges>
+#include <stdexcept>
 
 static bool IsValidFFTBandCount(int length, int bands) noexcept
 {
@@ -70,14 +72,15 @@ static bool IsSoundURL(const std::string& soundPath) noexcept
            (soundPath.length() <= 2048 || soundPath.find('\n') == std::string::npos);
 }
 
-static SString SanitizeSoundPath(const std::string& path)
+static std::string SanitizeSoundPath(std::string_view path)
 {
-    constexpr size_t MAX_LOGGED_LENGTH = 256;
+    constexpr std::size_t MAX_LOGGED_LENGTH = 256;
 
-    SString      result;
-    const size_t length = (path.size() < MAX_LOGGED_LENGTH) ? path.size() : MAX_LOGGED_LENGTH;
+    std::string       result;
+    const std::size_t length = std::min(path.size(), MAX_LOGGED_LENGTH);
+    result.reserve(length + (path.size() > MAX_LOGGED_LENGTH ? 3 : 0));
 
-    for (size_t i = 0; i < length; i++)
+    for (std::size_t i = 0; i < length; i++)
     {
         const unsigned char c = static_cast<unsigned char>(path[i]);
         result += (std::isprint(c) && c != '\n' && c != '\r' && c != '\t') ? static_cast<char>(c) : '?';
@@ -102,7 +105,7 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, con
     {
         if (!FileExists(filename.c_str()))
         {
-            m_pScriptDebugging->LogWarning(luaVM, SString("Bad usage @ 'playSound' [Unable to load sound '%s']", *SanitizeSoundPath(path)));
+            throw LuaFunctionError(SString("Unable to load sound '%s'.", SanitizeSoundPath(path).c_str()), true);
         }
 
         soundPath = filename;
@@ -152,7 +155,7 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, c
     {
         if (!FileExists(filename.c_str()))
         {
-            m_pScriptDebugging->LogWarning(luaVM, SString("Bad usage @ 'playSound3D' [Unable to load sound '%s']", *SanitizeSoundPath(path)));
+            throw LuaFunctionError(SString("Unable to load sound '%s'.", SanitizeSoundPath(path).c_str()), true);
         }
 
         soundPath = filename;
