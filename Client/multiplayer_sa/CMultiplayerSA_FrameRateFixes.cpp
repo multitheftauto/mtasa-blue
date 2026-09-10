@@ -849,6 +849,55 @@ static void __declspec(naked) HOOK_CPhysical__ApplyAirResistance()
     // clang-format on
 }
 
+// Fixes excessive chassis roll acceleration and violent swaying at high FPS by scaling the lateral impulse by delta time.
+#define HOOKPOS_CDoor__Process_ChassisImpulse  0x6F42D5
+#define HOOKSIZE_CDoor__Process_ChassisImpulse 0xE
+static const unsigned int     RETURN_CDoor__Process_ChassisImpulse = 0x6F42E3;
+static void __declspec(naked) HOOK_CDoor__Process_ChassisImpulse()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fld ds:[0x872328]           // 0.025f (DOOR_APPLY_RATE_CHASSIS)
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 50.0f / 30.0f (1.6666667f)
+        fmul st, st(1)              // * z
+        fadd dword ptr [esi+0x14]   // + m_fAngVel
+        fstp dword ptr [esi+0x14]   // store m_fAngVel
+        jmp RETURN_CDoor__Process_ChassisImpulse
+    }
+    // clang-format on
+}
+
+// Fixes high-frequency chassis oscillation and visual wheel protrusion by integrating angular velocity proportionally to delta time.
+#define HOOKPOS_CDoor__Process_ChassisAngle  0x6F4422
+#define HOOKSIZE_CDoor__Process_ChassisAngle 0x8
+static const unsigned int     RETURN_CDoor__Process_ChassisAngle = 0x6F442A;
+static void __declspec(naked) HOOK_CDoor__Process_ChassisAngle()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fld dword ptr [esi+0x14]    // m_fAngVel
+        mov ecx, ebx                // ecx = m_nDirn
+
+        test bp, bp                 // DOOR_EXTRA_CHASSIS (0x40)
+        jz not_chassis
+
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 50.0f / 30.0f (1.6666667f)
+
+    not_chassis:
+        fadd dword ptr [esi+0x0C]   // + m_fAngle
+        jmp RETURN_CDoor__Process_ChassisAngle
+    }
+    // clang-format on
+}
+
 template <unsigned int returnAddress>
 static void __declspec(naked) HOOK_VehicleRapidStopFix()
 {
@@ -954,4 +1003,6 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CTaskSimpleSwim__ProcessSwimmingResistance);
 
     EZHookInstall(CWeapon_Update);
+    EZHookInstall(CDoor__Process_ChassisImpulse);
+    EZHookInstall(CDoor__Process_ChassisAngle);
 }
