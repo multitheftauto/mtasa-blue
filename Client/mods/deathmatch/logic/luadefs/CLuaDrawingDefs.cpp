@@ -599,38 +599,55 @@ int CLuaDrawingDefs::DxDrawPrimitive3D(lua_State* luaVM)
     D3DPRIMITIVETYPE ePrimitiveType;
     auto             pVecVertices = new std::vector<PrimitiveVertice>();
     eRenderStage     renderStage{eRenderStage::POST_FX};
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(ePrimitiveType);
-    if (argStream.NextIsBool())
-        renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
-    else
-        argStream.ReadEnumString(renderStage, eRenderStage::POST_FX);
+    bool             bHasArgumentErrors{false};
 
-    std::vector<double> vecTableContent;
-
-    while (argStream.NextIsTable())
+    // Lua errors use longjmp, so leave this scope normally to release parser allocations before raising the error.
     {
-        vecTableContent.clear();
+        CScriptArgReader argStream(luaVM);
+        argStream.ReadEnumString(ePrimitiveType);
+        if (argStream.NextIsBool())
+            renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
+        else
+            argStream.ReadEnumString(renderStage, eRenderStage::POST_FX);
 
-        argStream.ReadNumberTable(vecTableContent);
-        switch (vecTableContent.size())
+        std::vector<double> vecTableContent;
+
+        while (argStream.NextIsTable())
         {
-            case Primitive3DVerticeSizes::VERT_XYZ:
-                pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
-                                                         static_cast<float>(vecTableContent[2]), (DWORD)0xFFFFFFFF});
-                break;
-            case Primitive3DVerticeSizes::VERT_XYZ_COLOR:
-                pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
-                                                         static_cast<float>(vecTableContent[2]), static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3]))});
-                break;
-            default:
-                argStream.SetCustomError(SString("Expected table with 3 or 4 numbers, got %i numbers", vecTableContent.size()).c_str());
-                break;
+            vecTableContent.clear();
+
+            argStream.ReadNumberTable(vecTableContent);
+            switch (vecTableContent.size())
+            {
+                case Primitive3DVerticeSizes::VERT_XYZ:
+                    pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
+                                                             static_cast<float>(vecTableContent[2]), (DWORD)0xFFFFFFFF});
+                    break;
+                case Primitive3DVerticeSizes::VERT_XYZ_COLOR:
+                    pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
+                                                             static_cast<float>(vecTableContent[2]),
+                                                             static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3]))});
+                    break;
+                default:
+                    argStream.SetCustomError(SString("Expected table with 3 or 4 numbers, got %i numbers", vecTableContent.size()).c_str());
+                    break;
+            }
+        }
+
+        bHasArgumentErrors = argStream.HasErrors();
+        if (bHasArgumentErrors)
+        {
+            luaL_where(luaVM, 1);
+            lua_pushstring(luaVM, argStream.GetFullErrorMessage());
+            lua_concat(luaVM, 2);
         }
     }
 
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    if (bHasArgumentErrors)
+    {
+        delete pVecVertices;
+        return lua_error(luaVM);
+    }
 
     if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
@@ -652,43 +669,58 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive3D(lua_State* luaVM)
     auto             pVecVertices = new std::vector<PrimitiveMaterialVertice>();
     CClientMaterial* pMaterialElement;
     eRenderStage     renderStage{eRenderStage::POST_FX};
+    bool             bHasArgumentErrors{false};
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(ePrimitiveType);
-    MixedReadMaterialString(argStream, pMaterialElement);
-    if (argStream.NextIsBool())
-        renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
-    else
-        argStream.ReadEnumString(renderStage, eRenderStage::POST_FX);
-
-    std::vector<double> vecTableContent;
-
-    while (argStream.NextIsTable())
+    // Lua errors use longjmp, so leave this scope normally to release parser allocations before raising the error.
     {
-        vecTableContent.clear();
+        CScriptArgReader argStream(luaVM);
+        argStream.ReadEnumString(ePrimitiveType);
+        MixedReadMaterialString(argStream, pMaterialElement);
+        if (argStream.NextIsBool())
+            renderStage = argStream.ReadBool() ? eRenderStage::POST_GUI : eRenderStage::POST_FX;
+        else
+            argStream.ReadEnumString(renderStage, eRenderStage::POST_FX);
 
-        argStream.ReadNumberTable(vecTableContent);
-        switch (vecTableContent.size())
+        std::vector<double> vecTableContent;
+
+        while (argStream.NextIsTable())
         {
-            case Primitive3DVerticeSizes::VERT_XYZ_UV:
-                pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
-                                                                 static_cast<float>(vecTableContent[2]), (DWORD)0xFFFFFFFF,
-                                                                 static_cast<float>(vecTableContent[3]), static_cast<float>(vecTableContent[4])});
-                break;
-            case Primitive3DVerticeSizes::VERT_XYZ_COLOR_UV:
-                pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
-                                                                 static_cast<float>(vecTableContent[2]),
-                                                                 static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3])),
-                                                                 static_cast<float>(vecTableContent[4]), static_cast<float>(vecTableContent[5])});
-                break;
-            default:
-                argStream.SetCustomError(SString("Expected table with 5 or 6 numbers, got %i numbers", vecTableContent.size()).c_str());
-                break;
+            vecTableContent.clear();
+
+            argStream.ReadNumberTable(vecTableContent);
+            switch (vecTableContent.size())
+            {
+                case Primitive3DVerticeSizes::VERT_XYZ_UV:
+                    pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
+                                                                     static_cast<float>(vecTableContent[2]), (DWORD)0xFFFFFFFF,
+                                                                     static_cast<float>(vecTableContent[3]), static_cast<float>(vecTableContent[4])});
+                    break;
+                case Primitive3DVerticeSizes::VERT_XYZ_COLOR_UV:
+                    pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]),
+                                                                     static_cast<float>(vecTableContent[2]),
+                                                                     static_cast<DWORD>(static_cast<int64_t>(vecTableContent[3])),
+                                                                     static_cast<float>(vecTableContent[4]), static_cast<float>(vecTableContent[5])});
+                    break;
+                default:
+                    argStream.SetCustomError(SString("Expected table with 5 or 6 numbers, got %i numbers", vecTableContent.size()).c_str());
+                    break;
+            }
+        }
+
+        bHasArgumentErrors = argStream.HasErrors();
+        if (bHasArgumentErrors)
+        {
+            luaL_where(luaVM, 1);
+            lua_pushstring(luaVM, argStream.GetFullErrorMessage());
+            lua_concat(luaVM, 2);
         }
     }
 
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    if (bHasArgumentErrors)
+    {
+        delete pVecVertices;
+        return lua_error(luaVM);
+    }
 
     if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
@@ -709,35 +741,51 @@ int CLuaDrawingDefs::DxDrawPrimitive(lua_State* luaVM)
     D3DPRIMITIVETYPE ePrimitiveType;
     auto             pVecVertices = new std::vector<PrimitiveVertice>();
     bool             bPostGUI;
+    bool             bHasArgumentErrors{false};
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(ePrimitiveType);
-    argStream.ReadBool(bPostGUI);
-
-    std::vector<double> vecTableContent;
-
-    while (argStream.NextIsTable())
+    // Lua errors use longjmp, so leave this scope normally to release parser allocations before raising the error.
     {
-        vecTableContent.clear();
+        CScriptArgReader argStream(luaVM);
+        argStream.ReadEnumString(ePrimitiveType);
+        argStream.ReadBool(bPostGUI);
 
-        argStream.ReadNumberTable(vecTableContent);
-        switch (vecTableContent.size())
+        std::vector<double> vecTableContent;
+
+        while (argStream.NextIsTable())
         {
-            case PrimitiveVerticeSizes::VERT_XY:
-                pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0, (DWORD)0xFFFFFFFF});
-                break;
-            case PrimitiveVerticeSizes::VERT_XY_COLOR:
-                pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0,
-                                                         static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2]))});
-                break;
-            default:
-                argStream.SetCustomError(SString("Expected table with 2 or 3 numbers, got %i numbers", vecTableContent.size()).c_str());
-                break;
+            vecTableContent.clear();
+
+            argStream.ReadNumberTable(vecTableContent);
+            switch (vecTableContent.size())
+            {
+                case PrimitiveVerticeSizes::VERT_XY:
+                    pVecVertices->push_back(
+                        PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0, (DWORD)0xFFFFFFFF});
+                    break;
+                case PrimitiveVerticeSizes::VERT_XY_COLOR:
+                    pVecVertices->push_back(PrimitiveVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0,
+                                                             static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2]))});
+                    break;
+                default:
+                    argStream.SetCustomError(SString("Expected table with 2 or 3 numbers, got %i numbers", vecTableContent.size()).c_str());
+                    break;
+            }
+        }
+
+        bHasArgumentErrors = argStream.HasErrors();
+        if (bHasArgumentErrors)
+        {
+            luaL_where(luaVM, 1);
+            lua_pushstring(luaVM, argStream.GetFullErrorMessage());
+            lua_concat(luaVM, 2);
         }
     }
 
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    if (bHasArgumentErrors)
+    {
+        delete pVecVertices;
+        return lua_error(luaVM);
+    }
 
     if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
@@ -759,39 +807,54 @@ int CLuaDrawingDefs::DxDrawMaterialPrimitive(lua_State* luaVM)
     auto             pVecVertices = new std::vector<PrimitiveMaterialVertice>();
     CClientMaterial* pMaterialElement;
     bool             bPostGUI;
+    bool             bHasArgumentErrors{false};
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadEnumString(ePrimitiveType);
-    MixedReadMaterialString(argStream, pMaterialElement);
-    argStream.ReadBool(bPostGUI);
-
-    std::vector<double> vecTableContent;
-
-    while (argStream.NextIsTable())
+    // Lua errors use longjmp, so leave this scope normally to release parser allocations before raising the error.
     {
-        vecTableContent.clear();
+        CScriptArgReader argStream(luaVM);
+        argStream.ReadEnumString(ePrimitiveType);
+        MixedReadMaterialString(argStream, pMaterialElement);
+        argStream.ReadBool(bPostGUI);
 
-        argStream.ReadNumberTable(vecTableContent);
-        switch (vecTableContent.size())
+        std::vector<double> vecTableContent;
+
+        while (argStream.NextIsTable())
         {
-            case PrimitiveVerticeSizes::VERT_XY_UV:
-                pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0,
-                                                                 (DWORD)0xFFFFFFFF, static_cast<float>(vecTableContent[2]),
-                                                                 static_cast<float>(vecTableContent[3])});
-                break;
-            case PrimitiveVerticeSizes::VERT_XY_COLOR_UV:
-                pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0,
-                                                                 static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2])),
-                                                                 static_cast<float>(vecTableContent[3]), static_cast<float>(vecTableContent[4])});
-                break;
-            default:
-                argStream.SetCustomError(SString("Expected table with 4 or 5 numbers, got %i numbers", vecTableContent.size()).c_str());
-                break;
+            vecTableContent.clear();
+
+            argStream.ReadNumberTable(vecTableContent);
+            switch (vecTableContent.size())
+            {
+                case PrimitiveVerticeSizes::VERT_XY_UV:
+                    pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0,
+                                                                     (DWORD)0xFFFFFFFF, static_cast<float>(vecTableContent[2]),
+                                                                     static_cast<float>(vecTableContent[3])});
+                    break;
+                case PrimitiveVerticeSizes::VERT_XY_COLOR_UV:
+                    pVecVertices->push_back(PrimitiveMaterialVertice{static_cast<float>(vecTableContent[0]), static_cast<float>(vecTableContent[1]), 0,
+                                                                     static_cast<DWORD>(static_cast<int64_t>(vecTableContent[2])),
+                                                                     static_cast<float>(vecTableContent[3]), static_cast<float>(vecTableContent[4])});
+                    break;
+                default:
+                    argStream.SetCustomError(SString("Expected table with 4 or 5 numbers, got %i numbers", vecTableContent.size()).c_str());
+                    break;
+            }
+        }
+
+        bHasArgumentErrors = argStream.HasErrors();
+        if (bHasArgumentErrors)
+        {
+            luaL_where(luaVM, 1);
+            lua_pushstring(luaVM, argStream.GetFullErrorMessage());
+            lua_concat(luaVM, 2);
         }
     }
 
-    if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    if (bHasArgumentErrors)
+    {
+        delete pVecVertices;
+        return lua_error(luaVM);
+    }
 
     if (g_pCore->GetGraphics()->IsValidPrimitiveSize(pVecVertices->size(), ePrimitiveType))
     {
