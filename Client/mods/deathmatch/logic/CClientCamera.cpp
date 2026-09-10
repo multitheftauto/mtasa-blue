@@ -736,18 +736,13 @@ void CClientCamera::ToggleCameraFixedMode(bool bEnabled)
 {
     if (bEnabled)
     {
-        CClientPlayer*  pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
-        CClientVehicle* pLocalVehicle = NULL;
+        CClientPlayer* pLocalPlayer = m_pManager->GetPlayerManager()->GetLocalPlayer();
 
-        // Get the local vehicle, if any
-        if (pLocalPlayer)
-            pLocalVehicle = pLocalPlayer->GetOccupiedVehicle();
-
-        // Use the local vehicle, otherwise use the local player
-        if (pLocalVehicle)
-            SetFocus(pLocalVehicle, MODE_FIXED, false);
-        else
-            SetFocus(pLocalPlayer, MODE_FIXED, false);
+        // Anchor on the player ped; the cast picks the entity overload, skipping its vehicle
+        // redirect. GTA keeps a tracked reference to the entity handed to TakeControl, and a
+        // vehicle destroyed while the camera is fixed makes it quietly retarget the camera,
+        // desyncing our fixed state. The ped doesn't get destroyed from under us.
+        SetFocus(static_cast<CClientEntity*>(pLocalPlayer), MODE_FIXED, false);
 
         // Set the target position
         SetFocus(&m_matFixedMatrix.vPos, false);
