@@ -20,9 +20,14 @@
 #include "multiplayersa_init.h"
 #include "multiplayer_keysync.h"
 #include "multiplayer_hooksystem.h"
-#include "..\game_sa\CCameraSA.h"
-#include "..\game_sa\CEntitySA.h"
-#include "..\game_sa\CPedSA.h"
-#include "..\game_sa\CProjectileSA.h"
+#include "../game_sa/CCameraSA.h"
+#include "../game_sa/CEntitySA.h"
+#include "../game_sa/CPedSA.h"
+#include "../game_sa/CProjectileSA.h"
+#include "../game_sa/CFireSA.h"
+#include "../game_sa/CFireManagerSA.h"
+#include "../game_sa/CPoolsSA.h"
+#include "../game_sa/CPoolSAInterface.h"
+#include "../game_sa/CWeaponInfoSA.h"
 
 extern CMultiplayerSA* pMultiplayer;

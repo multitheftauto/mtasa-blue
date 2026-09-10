@@ -10,8 +10,9 @@
 
 #include "StdInc.h"
 #include <game/CEventDamage.h>
-#include "../game_sa/CWeaponInfoSA.h"
+
 extern EDamageReasonType g_GenerateDamageEventReason;
+extern FireHandler*      m_pFireHandler;
 static CElapsedTime      ms_LastFxTimer;
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -290,6 +291,224 @@ static void _declspec(naked) HOOK_CWaterLevel_TestLineAgainstWater()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CWorld::SetWorldOnFire
+//
+// Passes the creator entity parameter (creatorEntity) to CFireManager::StartFire
+// instead of passing a null pointer, so world fire damage is attributed to the creator entity.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CWorld_SetWorldOnFire  0x56B983
+#define HOOKSIZE_CWorld_SetWorldOnFire 5
+static constexpr std::uintptr_t RETURN_CWorld_SetWorldOnFire = 0x56B989;
+
+static void __declspec(naked) HOOK_CWorld_SetWorldOnFire()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // Actually pass the creator entity parameter to CFireManager::StartFire (instead of null)
+    // clang-format off
+    __asm
+    {
+        push    7000
+        push    [esp + 18h + 14h]
+        jmp     RETURN_CWorld_SetWorldOnFire
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CFire::ProcessFire
+//
+// Sets new fire instances spawned from existing fire (creeping fire) to inherit
+// the parent fire's creator entity.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CFire_ProcessFire  0x53AC1A
+#define HOOKSIZE_CFire_ProcessFire 5
+static constexpr std::uintptr_t RETURN_CFire_ProcessFire = 0x53AC1F;
+
+static void __declspec(naked) HOOK_CFire_ProcessFire()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // Set the new fire's creator to the parent fire's creator
+    // clang-format off
+    __asm
+    {
+        mov     eax, 0x53A450       // CCreepingFire::TryToStartFireAtCoors
+        call    eax
+        test    eax, eax
+        jz      fail
+        mov     ecx, [esi + 14h]
+        mov     [eax + 14h], ecx
+
+    fail:
+        jmp     RETURN_CFire_ProcessFire
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CWeapon::FireAreaEffect
+//
+// Sets new creeping fire instances spawned by area effect weapons (e.g. Flamethrower / Molotov)
+// to inherit the weapon owner entity.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CWeapon_FireAreaEffect  0x73EBFE
+#define HOOKSIZE_CWeapon_FireAreaEffect 5
+static constexpr std::uintptr_t RETURN_CWeapon_FireAreaEffect = 0x73EC06;
+
+static void __declspec(naked) HOOK_CWeapon_FireAreaEffect()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // Set the new fire's creator to the weapon owner
+    // clang-format off
+    __asm
+    {
+        mov     eax, 0x53A450       // CCreepingFire::TryToStartFireAtCoors
+        call    eax
+        add     esp, 1Ch            // Pop the 7 arguments pushed before the call
+        test    eax, eax
+        jz      fail
+        mov     ecx, [esp + 54h]    // owner argument is at [esp + 54h] after popping the 28 bytes
+        mov     [eax + 14h], ecx    // set fire->entityCreator
+
+    fail:
+        jmp     RETURN_CWeapon_FireAreaEffect
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CFire::ProcessFire (Ped Check)
+//
+// In original GTA:SA single-player, creeping/ground fire only checked FindPlayerPed(-1).
+// This hook replaces the hardcoded local player check with a loop over CPools::ms_pPedPool
+// so that all script-created peds, bots, and remote players catch fire when walking over
+// fire on the ground.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static void OnProcessPedsNearFire(CFireSAInterface* fire)
+{
+    if (!fire || !fire->bActive)
+        return;
+
+    // Only check ground / creeping fire (skip fire attached to peds, vehicles, or objects)
+    if (fire->entityTarget != nullptr)
+        return;
+
+    auto* pedPool = *reinterpret_cast<CPoolSAInterface<CPedSAInterface>**>(CLASS_CPedPool);
+    if (!pedPool)
+        return;
+
+    // GTA SA ped pool slot stride (1988)
+    constexpr std::uint32_t pedStride = 1988;
+    auto*                   poolBase = reinterpret_cast<std::uint8_t*>(pedPool->m_pObjects);
+
+    for (int i = 0; i < pedPool->m_nSize; ++i)
+    {
+        if (pedPool->IsEmpty(i))
+            continue;
+
+        auto* ped = reinterpret_cast<CPedSAInterface*>(poolBase + i * pedStride);
+        if (!ped)
+            continue;
+
+        // Skip if ped is already on fire
+        if (ped->pFireOnPed != nullptr)
+            continue;
+
+        // Skip if ped is dead or dying
+        if (ped->fHealth <= 0.0f)
+            continue;
+
+        // Skip if ped is inside a vehicle
+        if (ped->pVehicle != nullptr)
+            continue;
+
+        // Skip if ped is attached to another entity
+        if (ped->m_pAttachedEntity != nullptr || ped->bAttachedToEntity)
+            continue;
+
+        // Skip if ped is fire proof or invulnerable
+        if (ped->bFireProof || ped->bInvulnerable)
+            continue;
+
+        // Fast AABB Manhattan pre-filter (radius ~1.095m -> box threshold 1.1m) to reject distant peds with zero math
+        const CVector& pedPosition = ped->matrix ? ped->matrix->vPos : ped->m_transform.m_translate;
+        const float    deltaX = std::abs(pedPosition.fX - fire->vecPosition.fX);
+        if (deltaX >= 1.1f)
+            continue;
+
+        const float deltaY = std::abs(pedPosition.fY - fire->vecPosition.fY);
+        if (deltaY >= 1.1f)
+            continue;
+
+        const float deltaZ = std::abs(pedPosition.fZ - fire->vecPosition.fZ);
+        if (deltaZ >= 1.1f)
+            continue;
+
+        // Exact 3D distance squared check (threshold 1.2)
+        const float distanceSquared = deltaX * deltaX + deltaY * deltaY + deltaZ * deltaZ;
+        if (distanceSquared >= 1.2f)
+            continue;
+
+        // Validate entityCreator to ensure it points to a valid live ped entity
+        CEntitySAInterface* validCreator = nullptr;
+        if (fire->entityCreator)
+        {
+            const auto creatorPed = reinterpret_cast<CPedSAInterface*>(fire->entityCreator);
+            if (pedPool->IsContains(pedPool->GetObjectIndexSafe(creatorPed)))
+                validCreator = fire->entityCreator;
+        }
+
+        // Check friendly fire / team rules if a fire handler is registered
+        if (m_pFireHandler && !m_pFireHandler(reinterpret_cast<CEntitySAInterface*>(ped), validCreator))
+            continue;
+
+        // If local player or player ped, call CPlayerPed::DoStuffToGoOnFire
+        if (ped->IsPlayer())
+        {
+            using DoStuffToGoOnFire_t = void(__thiscall*)(CPedSAInterface*);
+            reinterpret_cast<DoStuffToGoOnFire_t>(0x60A020)(ped);
+        }
+
+        // Start fire on the ped using native CFireManager::StartFire
+        using StartFire_t = CFireSAInterface*(__thiscall*)(void*, CEntitySAInterface*, CEntitySAInterface*, float, std::uint8_t, std::uint32_t, std::int8_t);
+        reinterpret_cast<StartFire_t>(0x53A050)(reinterpret_cast<void*>(CLASS_CFireManager), reinterpret_cast<CEntitySAInterface*>(ped), validCreator, 0.8f, 1,
+                                                7000, 100);
+    }
+}
+
+#define HOOKPOS_CFire_ProcessFire_PedCheck  0x53A7B4
+#define HOOKSIZE_CFire_ProcessFire_PedCheck 5
+static constexpr std::uintptr_t RETURN_CFire_ProcessFire_PedCheck = 0x53A8C5;
+
+static void __declspec(naked) HOOK_CFire_ProcessFire_PedCheck()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    esi                 // CFireSAInterface* (this pointer in CFire::ProcessFire)
+        call    OnProcessPedsNearFire
+        add     esp, 4
+        popad
+
+        jmp     RETURN_CFire_ProcessFire_PedCheck
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::InitHooks_Weapons
 //
 // Setup hooks
@@ -302,4 +521,8 @@ void CMultiplayerSA::InitHooks_Weapons()
     EZHookInstall(Fx_AddBulletImpact);
     EZHookInstall(CVisibilityPlugins_RenderWeaponPedsForPC);
     EZHookInstall(CWaterLevel_TestLineAgainstWater);
+    EZHookInstall(CWorld_SetWorldOnFire);
+    EZHookInstall(CFire_ProcessFire);
+    EZHookInstall(CFire_ProcessFire_PedCheck);
+    EZHookInstall(CWeapon_FireAreaEffect);
 }
