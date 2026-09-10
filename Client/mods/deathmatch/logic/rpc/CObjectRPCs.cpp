@@ -33,12 +33,21 @@ void CObjectRPCs::DestroyAllObjects(NetBitStreamInterface& bitStream)
 
 void CObjectRPCs::SetObjectRotation(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
+    // Read out the new rotation
+    CVector vecRotation;
+
+    if (pSource->GetType() == CCLIENTBUILDING)
+    {
+        if (bitStream.Read(vecRotation.fX) && bitStream.Read(vecRotation.fY) && bitStream.Read(vecRotation.fZ))
+            static_cast<CClientBuilding*>(pSource)->SetRotationRadians(vecRotation);
+
+        return;
+    }
+
     // Grab the object
     CDeathmatchObject* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
     if (pObject)
     {
-        // Read out the new rotation
-        CVector vecRotation;
         if (bitStream.Read(vecRotation.fX) && bitStream.Read(vecRotation.fY) && bitStream.Read(vecRotation.fZ))
         {
             // Set the new rotation

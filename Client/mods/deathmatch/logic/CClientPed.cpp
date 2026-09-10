@@ -3163,7 +3163,10 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     {
         if (m_ulLastTimeBeganCrouch >= ulNow - 600.0f * fSpeedRatio)
         {
-            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
+            // Zero jump/sprint unless fastfire is enabled. Even then, keep them zeroed while the crouch key is held,
+            // otherwise a key bound to both sprint and crouch (e.g. space) wedges the duck animation,
+            // leaving the player crouched and unable to move or fire until performing a melee attack
+            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE) || Current.ShockButtonL != 0)
             {
                 Current.ButtonSquare = 0;
                 Current.ButtonCross = 0;
