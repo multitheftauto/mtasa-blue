@@ -814,6 +814,22 @@ bool CLocalGUI::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lPara
                 return false;
             }
 
+            case WM_SYSKEYDOWN:
+            case WM_SYSKEYUP:
+            {
+                // While Alt is held every key arrives as a system key message. Keep the modifier state of the GUI in
+                // step anyway, otherwise a Control or Shift released with Alt down stays pressed for it and the next
+                // letter acts as a shortcut. Nothing is consumed, so Alt+F4 and Alt+Enter still reach the window.
+                if (wParam == VK_CONTROL || wParam == VK_SHIFT)
+                {
+                    DWORD dwTemp = TranslateScanCodeToGUIKey(wParam);
+                    if (dwTemp > 0)
+                        pGUI->ProcessKeyboardInput(dwTemp, uMsg == WM_SYSKEYDOWN);
+                }
+
+                return false;
+            }
+
             case WM_IME_COMPOSITION:
             {
                 if (lParam & GCS_RESULTSTR)
