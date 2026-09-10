@@ -16,7 +16,6 @@
 #include <game/CPedDamageResponse.h>
 #include <game/CEventList.h>
 #include <game/CEventDamage.h>
-#include "../game_sa/TaskAttackSA.h"
 
 class CEventDamageSAInterface;
 
@@ -4210,12 +4209,12 @@ static void __declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
 // a field that can't match the ped, so the outcome doesn't change
 bool _cdecl IsStealthKillTaskTarget(CTaskSimpleStealthKillSAInterface* pStealthKillTask, CPed* pPed)
 {
-    return pStealthKillTask && pStealthKillTask->m_pTarget == pPed;
+    return pStealthKillTask && pStealthKillTask->m_target == pPed;
 }
 
-DWORD                         RETURN_ComputeDamageResponse_StealthKillTarget = 0x4C0365;
-DWORD                         RETURN_ComputeDamageResponse_StealthKillSkip = 0x4C03D6;
-static void __declspec(naked) HOOK_ComputeDamageResponse_StealthKillTarget()
+static constexpr std::uintptr_t RETURN_ComputeDamageResponse_StealthKillTarget = 0x4C0365;
+static constexpr std::uintptr_t RETURN_ComputeDamageResponse_StealthKillSkip = 0x4C03D6;
+static void __declspec(naked)   HOOK_ComputeDamageResponse_StealthKillTarget()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
