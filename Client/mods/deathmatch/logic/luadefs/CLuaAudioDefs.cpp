@@ -70,6 +70,25 @@ static bool IsSoundURL(const std::string& soundPath) noexcept
            (soundPath.length() <= 2048 || soundPath.find('\n') == std::string::npos);
 }
 
+static SString SanitizeSoundPath(const std::string& path)
+{
+    constexpr size_t MAX_LOGGED_LENGTH = 256;
+
+    SString      result;
+    const size_t length = (path.size() < MAX_LOGGED_LENGTH) ? path.size() : MAX_LOGGED_LENGTH;
+
+    for (size_t i = 0; i < length; i++)
+    {
+        const unsigned char c = static_cast<unsigned char>(path[i]);
+        result += (std::isprint(c) && c != '\n' && c != '\r' && c != '\t') ? static_cast<char>(c) : '?';
+    }
+
+    if (path.size() > MAX_LOGGED_LENGTH)
+        result += "...";
+
+    return result;
+}
+
 std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, const std::string path, std::optional<bool> loop, std::optional<bool> throttle)
 {
     CResource* resource = &lua_getownerresource(luaVM);
@@ -80,7 +99,14 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, con
     bool        isRawData = false;
 
     if (CResourceManager::ParseResourcePathInput(soundPath, resource, &filename, nullptr, true))
+    {
+        if (!FileExists(filename.c_str()))
+        {
+            m_pScriptDebugging->LogWarning(luaVM, SString("Bad usage @ 'playSound' [Unable to load sound '%s']", *SanitizeSoundPath(path)));
+        }
+
         soundPath = filename;
+    }
     else
     {
         if (IsSoundURL(soundPath))
@@ -121,7 +147,14 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, c
     bool        isRawData = false;
 
     if (CResourceManager::ParseResourcePathInput(soundPath, resource, &filename, nullptr, true))
+    {
+        if (!FileExists(filename.c_str()))
+        {
+            m_pScriptDebugging->LogWarning(luaVM, SString("Bad usage @ 'playSound3D' [Unable to load sound '%s']", *SanitizeSoundPath(path)));
+        }
+
         soundPath = filename;
+    }
     else
     {
         if (IsSoundURL(soundPath))
