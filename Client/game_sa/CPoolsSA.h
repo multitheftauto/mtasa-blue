@@ -91,6 +91,7 @@ public:
     int  GetNumberOfUsedSpaces(ePools pools);
     int  GetPoolDefaultCapacity(ePools pool);
     int  GetPoolDefaultModdedCapacity(ePools pool);
+    int  GetPoolMaxCapacity(ePools pool) override;
     int  GetPoolCapacity(ePools pool);
     void SetPoolCapacity(ePools pool, int iValue);
 
