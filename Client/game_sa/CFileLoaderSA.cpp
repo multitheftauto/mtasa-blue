@@ -155,6 +155,7 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
         CVehicleModelInfo_UseCommonVehicleTexDicationary();
     }
 
+    // CStreaming::ConvertBufferToObject, this function's only caller, already reads the leading UV anim dictionary chunk.
     const unsigned int rwID_CLUMP = 16;
     if (RwStreamFindChunk(stream, rwID_CLUMP, nullptr, nullptr))
     {
@@ -187,6 +188,28 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
         CVehicleModelInfo_StopUsingCommonVehicleTexDicationary();
     }
     return true;
+}
+
+// The atomic level MatFX flag alone does not animate UV coordinates; each material also needs
+// its own effect type set, or the render pipeline keeps sampling static UVs.
+static constexpr std::uint32_t RP_UVANIM_DUAL_PASS_CHANNEL = 1;
+
+static RpMaterial* EnableMaterialUVAnimCB(RpMaterial* material, void* data)
+{
+    if (!material || !RpMaterialUVAnimExists(material))
+        return material;
+
+    RpMatFXAtomicEnableEffects(static_cast<RpAtomic*>(data));
+
+    const bool bDual = RpMaterialUVAnimGetInterpolator(material, RP_UVANIM_DUAL_PASS_CHANNEL) != nullptr;
+    RpMatFXMaterialSetEffects(material, bDual ? rpMATFXEFFECTDUALUVTRANSFORM : rpMATFXEFFECTUVTRANSFORM);
+    return material;
+}
+
+static void EnableUVAnimIfPresent(RpAtomic* atomic)
+{
+    if (atomic->geometry)
+        RpGeometryForAllMaterials(atomic->geometry, EnableMaterialUVAnimCB, atomic);
 }
 
 RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo* pRelatedModelInfo)
@@ -227,6 +250,7 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     RwFrame* newFrame = RwFrameCreate();
     RpAtomicSetFrame(atomic, newFrame);
     CVisibilityPlugins_SetAtomicId(atomic, gAtomicModelId);
+    EnableUVAnimIfPresent(atomic);
 
     // Fix #359: engineReplaceModel memory leak
     if (!bDamage && pRelatedModelInfo->bDeleteOldRwObject)
