@@ -98,6 +98,43 @@ CHudSA::CHudSA()
 
 void CHudSA::Disable(bool bDisabled)
 {
+    // Persistent state requested through the showhud command; temporary suppression owners are tracked separately
+    if (m_isEnabled == !bDisabled)
+        return;
+
+    m_isEnabled = !bDisabled;
+    ApplyVisibilityState();
+}
+
+bool CHudSA::IsDisabled() const noexcept
+{
+    return !m_isEnabled || m_isSuppressed;
+}
+
+void CHudSA::SetSuppressed(bool bSuppressed)
+{
+    if (m_isSuppressed == bSuppressed)
+        return;
+
+    m_isSuppressed = bSuppressed;
+    ApplyVisibilityState();
+}
+
+void CHudSA::ResetVisibilityState()
+{
+    m_isEnabled = true;
+    m_isSuppressed = false;
+    ApplyVisibilityState();
+}
+
+void CHudSA::ApplyVisibilityState()
+{
+    const bool bDisabled = IsDisabled();
+
+    // Avoid rewriting GTA code when overlapping owners do not change the effective HUD state
+    if (m_isAppliedDisabled == bDisabled)
+        return;
+
     if (bDisabled)
         MemPut<BYTE>(FUNC_Draw, 0xC3);
     else
@@ -108,11 +145,8 @@ void CHudSA::Disable(bool bDisabled)
         MemPut<BYTE>(FUNC_DrawRadarPlanB, 0xC3);
     else
         MemPut<BYTE>(FUNC_DrawRadarPlanB, 0x83);
-}
 
-bool CHudSA::IsDisabled()
-{
-    return *(BYTE*)FUNC_Draw == 0xC3;
+    m_isAppliedDisabled = bDisabled;
 }
 
 //
@@ -130,9 +164,9 @@ void CHudSA::InitComponentList()
         {1, HUD_VEHICLE_NAME, 1, FUNC_DrawVehicleName, 1, 0xCC, 0xC3},
         {1, HUD_AREA_NAME, 1, FUNC_DrawAreaName, 1, 0xCC, 0xC3},
         {1, HUD_RADAR, 1, FUNC_DrawRadar, 1, 0xCC, 0xC3},
-        {1, HUD_RADAR_MAP, 1, FUNC_CRadar_DrawRadarMap, 1, 0xCC, 0xC3},
-        {1, HUD_RADAR_BLIPS, 1, FUNC_CRadar_DrawBlips, 1, 0xCC, 0xC3},
-        {1, HUD_RADAR_ALTIMETER, 1, CODE_ShowRadarAltimeter, 2, 0xCC, 0xEB30},
+        {1, HUD_RADAR_MAP, 1, FUNC_CRadar_DrawRadarMap, 1, 0xCC, 0xC3, HUD_RADAR},
+        {1, HUD_RADAR_BLIPS, 1, FUNC_CRadar_DrawBlips, 1, 0xCC, 0xC3, HUD_RADAR},
+        {1, HUD_RADAR_ALTIMETER, 1, CODE_ShowRadarAltimeter, 2, 0xCC, 0xEB30, HUD_RADAR},
         {1, HUD_CLOCK, 0, VAR_DisableClock, 1, 1, 0},
         {1, HUD_RADIO, 1, FUNC_DrawRadioName, 1, 0xCC, 0xC3},
         {1, HUD_WANTED, 1, FUNC_DrawWantedLevel, 1, 0xCC, 0xC3},
@@ -179,6 +213,11 @@ void CHudSA::SetComponentVisible(eHudComponent component, bool bVisible)
         // Poke bytes
         uchar* pSrc = (uchar*)(bVisible ? &pComponent->origData : &pComponent->disabledData);
         uchar* pDest = (uchar*)(pComponent->uiDataAddr);
+
+        // Avoid unnecessary unprotect/write cycles when the component is already in the requested state
+        if (std::memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
+            return;
+
         for (uint i = 0; i < pComponent->uiDataSize; i++)
         {
             if (pComponent->type != HUD_CLOCK)
@@ -192,6 +231,9 @@ void CHudSA::SetComponentVisible(eHudComponent component, bool bVisible)
 //
 // CHudSA::IsComponentVisible
 //
+// Reports the state requested through SetComponentVisible only; global HUD visibility is
+// intentionally ignored so scripts can distinguish "disabled by script" from "hidden by showhud"
+//
 bool CHudSA::IsComponentVisible(eHudComponent component)
 {
     SHudComponent* pComponent = MapFind(m_HudComponentMap, component);
@@ -200,10 +242,41 @@ bool CHudSA::IsComponentVisible(eHudComponent component)
         // Determine if invisible by matching data with disabled values
         uchar* pSrc = (uchar*)(&pComponent->disabledData);
         uchar* pDest = (uchar*)(pComponent->uiDataAddr);
-        if (memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
+        if (std::memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
             return false;  // Matches disabled bytes
         return true;
     }
+    return false;
+}
+
+//
+// CHudSA::IsComponentEffectivelyVisible
+//
+// Reports whether the component can actually render on screen right now: the global HUD state
+// (showhud command, fullscreen player map) and every containing component in the draw path are
+// taken into account
+//
+bool CHudSA::IsComponentEffectivelyVisible(eHudComponent component)
+{
+    if (IsDisabled())
+        return false;
+
+    // A child component cannot render while any containing component in its draw path is disabled.
+    // Bound the traversal so malformed component metadata can never loop forever
+    SHudComponent* pComponent = MapFind(m_HudComponentMap, component);
+    for (std::size_t depth = 0; pComponent && depth < m_HudComponentMap.size(); ++depth)
+    {
+        const uchar* pSrc = (const uchar*)(&pComponent->disabledData);
+        const uchar* pDest = (const uchar*)(pComponent->uiDataAddr);
+        if (std::memcmp(pDest, pSrc, pComponent->uiDataSize) == 0)
+            return false;  // Matches disabled bytes
+
+        if (pComponent->parent == HUD_ALL)
+            return true;
+
+        pComponent = MapFind(m_HudComponentMap, pComponent->parent);
+    }
+
     return false;
 }
 

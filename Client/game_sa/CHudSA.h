@@ -68,6 +68,8 @@ struct SHudComponent
     DWORD         uiDataSize;
     DWORD         origData;
     DWORD         disabledData;
+    // Components rendered inside another HUD component cannot draw while their parent is hidden
+    eHudComponent parent{HUD_ALL};
 };
 
 enum class eHudColour
@@ -176,13 +178,18 @@ class CHudSA : public CHud
 {
 public:
     CHudSA();
-    void Disable(bool bDisabled);
-    bool IsDisabled();
-    void SetComponentVisible(eHudComponent component, bool bVisible);
-    bool IsComponentVisible(eHudComponent component);
-    void AdjustComponents(float fAspectRatio);
-    void ResetComponentAdjustment();
-    bool IsCrosshairVisible();
+    void Disable(bool bDisabled) override;
+    bool IsDisabled() const noexcept override;
+    void SetComponentVisible(eHudComponent component, bool bVisible) override;
+    bool IsComponentVisible(eHudComponent component) override;
+    void AdjustComponents(float fAspectRatio) override;
+    void ResetComponentAdjustment() override;
+    bool IsCrosshairVisible() override;
+
+    bool IsEnabled() const noexcept override { return m_isEnabled; }
+    void SetSuppressed(bool bSuppressed) override;
+    void ResetVisibilityState() override;
+    bool IsComponentEffectivelyVisible(eHudComponent component) override;
 
     bool IsComponentBar(const eHudComponent& component) const noexcept override;
     bool IsComponentText(const eHudComponent& component) const noexcept override;
@@ -276,6 +283,7 @@ public:
 
 private:
     void InitComponentList();
+    void ApplyVisibilityState();
     void UpdateStreetchCalculations();
     void ResetComponent(SComponentPlacement& placement, bool resetSize) noexcept;
     void ResetComponentFontData(const eHudComponent& component, const eHudComponentProperty& property) noexcept;
@@ -299,6 +307,13 @@ private:
 
 private:
     std::map<eHudComponent, SHudComponent> m_HudComponentMap;
+
+    // Persistent visibility requested through the showhud command
+    bool m_isEnabled{true};
+    // Last state actually written into GTA code, used to avoid redundant memory patching
+    bool m_isAppliedDisabled{false};
+    // Temporary suppression (e.g. the fullscreen player map) without changing showhud preference
+    bool m_isSuppressed{false};
 
     float* m_pfAspectRatioMultiplicator;
     float* m_pfCameraCrosshairScale;
