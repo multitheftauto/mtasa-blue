@@ -124,6 +124,8 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, con
         {
             sound->SetParent(resource->GetResourceDynamicEntity());
 
+            sound->SetLuaDebugInfo(m_pScriptDebugging->GetLuaDebugInfo(luaVM));
+
             // call onClientSoundStarted
             CLuaArguments Arguments;
             Arguments.PushString("play");  // Reason
@@ -171,6 +173,8 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, c
         if (sound)
         {
             sound->SetParent(resource->GetResourceDynamicEntity());
+
+            sound->SetLuaDebugInfo(m_pScriptDebugging->GetLuaDebugInfo(luaVM));
 
             // call onClientSoundStarted
             CLuaArguments Arguments;
