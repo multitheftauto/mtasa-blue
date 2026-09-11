@@ -121,13 +121,16 @@ private:
 
     CGUILabel* m_pLabelVersionTag;
 
-    bool  m_bForceCursorVisible;
-    bool  m_bChatboxVisible;
-    bool  m_bChatboxInputBlocked;
-    bool  m_pDebugViewVisible;
-    bool  m_bGUIHasInput;
-    int   m_uiActiveCompositionSize;
-    POINT m_StoredMousePosition;
+    bool         m_bForceCursorVisible;
+    bool         m_bChatboxVisible;
+    bool         m_bChatPreviewActive = false;
+    bool         m_bChatInputPreviewActive = false;
+    unsigned int m_uiChatPreviewRevision = 0;
+    bool         m_bChatboxInputBlocked;
+    bool         m_pDebugViewVisible;
+    bool         m_bGUIHasInput;
+    int          m_uiActiveCompositionSize;
+    POINT        m_StoredMousePosition;
 
     int     m_LastSettingsRevision;  // the revision number the last time we saw the skin change
     SString m_LastSkinName;

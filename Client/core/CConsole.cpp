@@ -462,6 +462,20 @@ CVector2D CConsole::GetPosition()
     return CVector2D();
 }
 
+void CConsole::GetWindowRect(CRect2D& outRect)
+{
+    if (m_pWindow)
+    {
+        CVector2D vecPosition = m_pWindow->GetPosition(false);
+        CVector2D vecSize = m_pWindow->GetSize(false);
+        outRect = CRect2D(vecPosition.fX, vecPosition.fY, vecPosition.fX + vecSize.fX, vecPosition.fY + vecSize.fY);
+    }
+    else
+    {
+        outRect = CRect2D();
+    }
+}
+
 void CConsole::SetPosition(CVector2D& vecPosition)
 {
     if (m_pWindow)
