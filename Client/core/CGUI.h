@@ -55,6 +55,10 @@ public:
     void Invalidate();
     void Restore();
 
+    // True while a fatal fault dialog (CC51 or CC54) is open; rebuilds wait and nested faults exit.
+    static bool IsFaultDialogOpen() noexcept;
+    static void SetFaultDialogOpen(bool bOpen) noexcept;
+
     void DrawMouseCursor();
     void SetCursorPos(int iX, int iY, bool bForce = false, bool overrideStored = true);
 

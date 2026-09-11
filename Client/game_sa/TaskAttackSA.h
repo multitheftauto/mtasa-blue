@@ -191,3 +191,17 @@ public:
     CTaskSimpleFightSA() {};
     CTaskSimpleFightSA(CEntity* pTargetEntity, int nCommand, unsigned int nIdlePeriod = 10000);
 };
+
+class CTaskSimpleStealthKillSAInterface : public CTaskSimpleSAInterface
+{
+public:
+    bool                   m_keepTargetAlive;
+    CPed*                  m_target;
+    AssocGroupId           m_animGroup;
+    bool                   m_isAborting;
+    bool                   m_isFinished;
+    CAnimBlendAssociation* m_anim;
+    unsigned int           m_spentWaitingMs;
+};
+
+static_assert(sizeof(CTaskSimpleStealthKillSAInterface) == 0x20, "Invalid CTaskSimpleStealthKillSAInterface size");

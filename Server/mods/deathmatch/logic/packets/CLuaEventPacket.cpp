@@ -12,11 +12,6 @@
 #include "StdInc.h"
 #include "CLuaEventPacket.h"
 
-namespace
-{
-    constexpr int MAX_LUA_EVENT_ARGUMENTS_SIZE = 1024 * 1024;
-}
-
 CLuaEventPacket::CLuaEventPacket()
 {
     m_ElementID = INVALID_ELEMENT_ID;
@@ -37,7 +32,7 @@ bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream)
     {
         if (usNameLength < (MAX_EVENT_NAME_LENGTH - 1) && BitStream.ReadStringCharacters(m_strName, usNameLength) && BitStream.Read(m_ElementID))
         {
-            if (BitStream.GetNumberOfUnreadBits() > MAX_LUA_EVENT_ARGUMENTS_SIZE * 8)
+            if (BitStream.GetNumberOfUnreadBits() > MAX_LUA_LATENT_EVENT_ARGUMENTS_SIZE * 8)
                 return false;
 
             // Faster than using a constructor

@@ -496,7 +496,7 @@ unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
 bool CClientVehicleManager::IsValidSeat(unsigned long ulModel, unsigned char ucSeat)
 {
     // Camper only has 3 seats (0-2)
-    if (static_cast<VehicleType>(ulModel) == VehicleType::VT_CAMPER && ucSeat > 2)
+    if (static_cast<VehicleType::Enum>(ulModel) == VehicleType::VT_CAMPER && ucSeat > 2)
         return false;
 
     // Get the maximum passenger count for the vehicle
@@ -722,7 +722,15 @@ bool CClientVehicleManager::HasDoors(unsigned long ulModel)
 
     if (HasDamageModel(ulModel) == true)
     {
-        switch (static_cast<VehicleType>(ulModel))
+        // Custom models allocated via engineRequestModel inherit properties from their parent model.
+        if (!IsStandardModel(ulModel) && IsValidModel(ulModel))
+        {
+            CModelInfo* pModelInfo = g_pGame->GetModelInfo(ulModel);
+            if (pModelInfo && pModelInfo->GetParentID() != 0)
+                ulModel = pModelInfo->GetParentID();
+        }
+
+        switch (static_cast<VehicleType::Enum>(ulModel))
         {
             case VehicleType::VT_BFINJECT:
             case VehicleType::VT_RCBANDIT:

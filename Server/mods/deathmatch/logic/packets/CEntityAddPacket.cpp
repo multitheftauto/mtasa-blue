@@ -659,6 +659,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.WriteBit(false);
 
                     unsigned char ucSirenCount = pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
+                    if (ucSirenCount > SIREN_COUNT_MAX)
+                        ucSirenCount = SIREN_COUNT_MAX;
                     unsigned char ucSirenType = pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
                     bool          bSync = pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
                     BitStream.WriteBit(bSync);

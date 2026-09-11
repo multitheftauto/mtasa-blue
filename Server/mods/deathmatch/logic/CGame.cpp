@@ -987,7 +987,7 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
     m_pAccountManager->Load();
 
     // Register our packethandler
-    g_pNetServer->RegisterPacketHandler(CGame::StaticProcessPacket);
+    g_pNetServer->RegisterPacketHandler(CGame::StaticProcessNetworkPacket);
 
     CalculateMinClientRequirement();
 
@@ -1124,6 +1124,18 @@ void CGame::StartOpenPortsTest()
 {
     if (m_pOpenPortsTester)
         m_pOpenPortsTester->Start();
+}
+
+bool CGame::StaticProcessNetworkPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* pBitStream,
+                                       SNetExtraInfo* pNetExtraInfo)
+{
+    if (ucPacketID == PACKET_ID_LUA_EVENT)
+    {
+        if (pBitStream->GetNumberOfUnreadBits() > CLuaEventPacket::MAX_LUA_EVENT_ARGUMENTS_SIZE * 8)
+            return false;
+    }
+
+    return StaticProcessPacket(ucPacketID, Socket, pBitStream, pNetExtraInfo);
 }
 
 bool CGame::StaticProcessPacket(unsigned char ucPacketID, const NetServerPlayerID& Socket, NetBitStreamInterface* pBitStream, SNetExtraInfo* pNetExtraInfo)

@@ -23,6 +23,10 @@
 #define FUNC_CStreaming_LoadScene                0x40EB70
 #define FUNC_CStreaming_LoadSceneCollision       0x40ED80
 
+#define ARRAY_CStreaming_msPedsLoaded     0x8E4C00
+#define VAR_CStreaming_msNumPedsLoaded    0x8E4BB0
+#define ARRAY_CStreaming_msVehiclesLoaded 0x8E4C24
+
 struct CArchiveInfo
 {
     char  szName[40];
@@ -81,6 +85,11 @@ public:
 
     void LoadScene(const CVector* position);
     void LoadSceneCollision(const CVector* position);
+
+    std::uint32_t GetNumPedsLoaded() const noexcept override;
+    bool          IsModelInLoadedPedGroup(std::uint16_t modelId) const noexcept override;
+    std::uint32_t GetNumLoadedVehicles() const noexcept override;
+    bool          IsModelInLoadedVehicleGroup(std::uint16_t modelId) const noexcept override;
 
 private:
     void AllocateArchive();
