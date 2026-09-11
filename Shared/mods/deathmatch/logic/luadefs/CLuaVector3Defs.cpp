@@ -40,6 +40,15 @@ void CLuaVector3Defs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "dot", Dot);
     lua_classfunction(luaVM, "intersectsSegmentTriangle", ArgumentParser<IntersectsSegmentTriangle>);
 
+    lua_classfunction(luaVM, "set", InPlaceSet);
+    lua_classfunction(luaVM, "add", InPlaceAdd);
+    lua_classfunction(luaVM, "sub", InPlaceSub);
+    lua_classfunction(luaVM, "mul", InPlaceMul);
+    lua_classfunction(luaVM, "div", InPlaceDiv);
+    lua_classfunction(luaVM, "scale", InPlaceMul);
+    lua_classfunction(luaVM, "addScaled", InPlaceAddScaled);
+    lua_classfunction(luaVM, "setCross", InPlaceSetCross);
+
     lua_classfunction(luaVM, "getLength", GetLength);
     lua_classfunction(luaVM, "getSquaredLength", GetLengthSquared);
     lua_classfunction(luaVM, "getNormalized", GetNormalized);
@@ -65,6 +74,15 @@ void CLuaVector3Defs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "cross", "", Cross);
     lua_classfunction(luaVM, "dot", "", Dot);
     lua_classfunction(luaVM, "intersectsSegmentTriangle", "", ArgumentParser<IntersectsSegmentTriangle>);
+
+    lua_classfunction(luaVM, "set", "", InPlaceSet);
+    lua_classfunction(luaVM, "add", "", InPlaceAdd);
+    lua_classfunction(luaVM, "sub", "", InPlaceSub);
+    lua_classfunction(luaVM, "mul", "", InPlaceMul);
+    lua_classfunction(luaVM, "div", "", InPlaceDiv);
+    lua_classfunction(luaVM, "scale", "", InPlaceMul);
+    lua_classfunction(luaVM, "addScaled", "", InPlaceAddScaled);
+    lua_classfunction(luaVM, "setCross", "", InPlaceSetCross);
 
     lua_classfunction(luaVM, "getLength", "", GetLength);
     lua_classfunction(luaVM, "getSquaredLength", "", GetLengthSquared);
@@ -716,6 +734,304 @@ int CLuaVector3Defs::Eq(lua_State* luaVM)
     {
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
     }
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVector3Defs::InPlaceSet(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    CLuaVector3D*    targetVector = nullptr;
+    argStream.ReadUserData(targetVector);
+
+    if (argStream.NextIsUserData())
+    {
+        CLuaVector3D* sourceVector = nullptr;
+        argStream.ReadUserData(sourceVector);
+        if (!argStream.HasErrors() && targetVector && sourceVector)
+        {
+            targetVector->fX = sourceVector->fX;
+            targetVector->fY = sourceVector->fY;
+            targetVector->fZ = sourceVector->fZ;
+            lua_pushvalue(luaVM, 1);
+            return 1;
+        }
+    }
+    else
+    {
+        float x = 0.0f;
+        float y = 0.0f;
+        float z = 0.0f;
+        argStream.ReadNumber(x);
+        argStream.ReadNumber(y);
+        argStream.ReadNumber(z);
+        if (!argStream.HasErrors() && targetVector)
+        {
+            targetVector->fX = x;
+            targetVector->fY = y;
+            targetVector->fZ = z;
+            lua_pushvalue(luaVM, 1);
+            return 1;
+        }
+    }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVector3Defs::InPlaceAdd(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    CLuaVector3D*    targetVector = nullptr;
+    argStream.ReadUserData(targetVector);
+
+    if (argStream.NextIsUserData())
+    {
+        CLuaVector3D* sourceVector = nullptr;
+        argStream.ReadUserData(sourceVector);
+        if (!argStream.HasErrors() && targetVector && sourceVector)
+        {
+            targetVector->fX += sourceVector->fX;
+            targetVector->fY += sourceVector->fY;
+            targetVector->fZ += sourceVector->fZ;
+            lua_pushvalue(luaVM, 1);
+            return 1;
+        }
+    }
+    else
+    {
+        float x = 0.0f;
+        float y = 0.0f;
+        float z = 0.0f;
+        argStream.ReadNumber(x);
+        argStream.ReadNumber(y);
+        argStream.ReadNumber(z);
+        if (!argStream.HasErrors() && targetVector)
+        {
+            targetVector->fX += x;
+            targetVector->fY += y;
+            targetVector->fZ += z;
+            lua_pushvalue(luaVM, 1);
+            return 1;
+        }
+    }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVector3Defs::InPlaceSub(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    CLuaVector3D*    targetVector = nullptr;
+    argStream.ReadUserData(targetVector);
+
+    if (argStream.NextIsUserData())
+    {
+        CLuaVector3D* sourceVector = nullptr;
+        argStream.ReadUserData(sourceVector);
+        if (!argStream.HasErrors() && targetVector && sourceVector)
+        {
+            targetVector->fX -= sourceVector->fX;
+            targetVector->fY -= sourceVector->fY;
+            targetVector->fZ -= sourceVector->fZ;
+            lua_pushvalue(luaVM, 1);
+            return 1;
+        }
+    }
+    else
+    {
+        float x = 0.0f;
+        float y = 0.0f;
+        float z = 0.0f;
+        argStream.ReadNumber(x);
+        argStream.ReadNumber(y);
+        argStream.ReadNumber(z);
+        if (!argStream.HasErrors() && targetVector)
+        {
+            targetVector->fX -= x;
+            targetVector->fY -= y;
+            targetVector->fZ -= z;
+            lua_pushvalue(luaVM, 1);
+            return 1;
+        }
+    }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVector3Defs::InPlaceMul(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    CLuaVector3D*    targetVector = nullptr;
+    argStream.ReadUserData(targetVector);
+
+    if (argStream.NextIsUserData())
+    {
+        CLuaVector3D* sourceVector = nullptr;
+        argStream.ReadUserData(sourceVector);
+        if (!argStream.HasErrors() && targetVector && sourceVector)
+        {
+            targetVector->fX *= sourceVector->fX;
+            targetVector->fY *= sourceVector->fY;
+            targetVector->fZ *= sourceVector->fZ;
+            lua_pushvalue(luaVM, 1);
+            return 1;
+        }
+    }
+    else if (argStream.NextIsNumber())
+    {
+        float factorX = 0.0f;
+        argStream.ReadNumber(factorX);
+        if (argStream.NextIsNumber())
+        {
+            float factorY = 0.0f;
+            float factorZ = 0.0f;
+            argStream.ReadNumber(factorY);
+            argStream.ReadNumber(factorZ);
+            if (!argStream.HasErrors() && targetVector)
+            {
+                targetVector->fX *= factorX;
+                targetVector->fY *= factorY;
+                targetVector->fZ *= factorZ;
+                lua_pushvalue(luaVM, 1);
+                return 1;
+            }
+        }
+        else
+        {
+            if (!argStream.HasErrors() && targetVector)
+            {
+                targetVector->fX *= factorX;
+                targetVector->fY *= factorX;
+                targetVector->fZ *= factorX;
+                lua_pushvalue(luaVM, 1);
+                return 1;
+            }
+        }
+    }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVector3Defs::InPlaceDiv(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    CLuaVector3D*    targetVector = nullptr;
+    argStream.ReadUserData(targetVector);
+
+    if (argStream.NextIsUserData())
+    {
+        CLuaVector3D* sourceVector = nullptr;
+        argStream.ReadUserData(sourceVector);
+        if (!argStream.HasErrors() && targetVector && sourceVector)
+        {
+            targetVector->fX /= sourceVector->fX;
+            targetVector->fY /= sourceVector->fY;
+            targetVector->fZ /= sourceVector->fZ;
+            lua_pushvalue(luaVM, 1);
+            return 1;
+        }
+    }
+    else if (argStream.NextIsNumber())
+    {
+        float divisorX = 0.0f;
+        argStream.ReadNumber(divisorX);
+        if (argStream.NextIsNumber())
+        {
+            float divisorY = 0.0f;
+            float divisorZ = 0.0f;
+            argStream.ReadNumber(divisorY);
+            argStream.ReadNumber(divisorZ);
+            if (!argStream.HasErrors() && targetVector)
+            {
+                targetVector->fX /= divisorX;
+                targetVector->fY /= divisorY;
+                targetVector->fZ /= divisorZ;
+                lua_pushvalue(luaVM, 1);
+                return 1;
+            }
+        }
+        else
+        {
+            if (!argStream.HasErrors() && targetVector)
+            {
+                targetVector->fX /= divisorX;
+                targetVector->fY /= divisorX;
+                targetVector->fZ /= divisorX;
+                lua_pushvalue(luaVM, 1);
+                return 1;
+            }
+        }
+    }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVector3Defs::InPlaceAddScaled(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    CLuaVector3D*    targetVector = nullptr;
+    CLuaVector3D*    sourceVector = nullptr;
+    float            scaleFactor = 1.0f;
+
+    argStream.ReadUserData(targetVector);
+    argStream.ReadUserData(sourceVector);
+    argStream.ReadNumber(scaleFactor);
+
+    if (!argStream.HasErrors() && targetVector && sourceVector)
+    {
+        targetVector->fX += sourceVector->fX * scaleFactor;
+        targetVector->fY += sourceVector->fY * scaleFactor;
+        targetVector->fZ += sourceVector->fZ * scaleFactor;
+        lua_pushvalue(luaVM, 1);
+        return 1;
+    }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaVector3Defs::InPlaceSetCross(lua_State* luaVM)
+{
+    CScriptArgReader argStream(luaVM);
+    CLuaVector3D*    targetVector = nullptr;
+    CLuaVector3D*    sourceVector = nullptr;
+
+    argStream.ReadUserData(targetVector);
+    argStream.ReadUserData(sourceVector);
+
+    if (!argStream.HasErrors() && targetVector && sourceVector)
+    {
+        targetVector->CrossProduct(sourceVector);
+        lua_pushvalue(luaVM, 1);
+        return 1;
+    }
+
+    if (argStream.HasErrors())
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
     return 1;
