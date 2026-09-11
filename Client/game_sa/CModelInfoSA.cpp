@@ -726,6 +726,8 @@ bool CModelInfoSA::GetIdeFlag(eModelIdeFlag eIdeFlag)
             return m_pInterface->bDontCollideWithFlyer;
         case eModelIdeFlag::DISABLE_BACKFACE_CULLING:
             return !m_pInterface->bIsBackfaceCulled;
+        case eModelIdeFlag::REALLY_DRAW_LAST:
+            return ShouldRenderAfterScene();
         default:
             return false;
     }
