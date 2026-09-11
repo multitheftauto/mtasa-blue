@@ -13,6 +13,12 @@
 #include "CLuaArgument.h"
 #include "CLuaArguments.h"
 #include "LuaCommon.h"
+#include "lua/CLuaVector2.h"
+#include "lua/CLuaVector3.h"
+#include "lua/CLuaVector4.h"
+#include "lua/CLuaMatrix.h"
+#include "CLuaFunctionParseHelpers.h"
+#include "net/SyncStructures.h"
 #include "CGame.h"
 #include "CElementIDs.h"
 #include "CScriptDebugging.h"
@@ -31,6 +37,7 @@ CLuaArgument::CLuaArgument()
     m_iType = LUA_TNIL;
     m_pTableData = NULL;
     m_pUserData = NULL;
+    m_matrixData = nullptr;
     m_bWeakTableRef = false;
 }
 
@@ -38,6 +45,7 @@ CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArgume
 {
     // Initialize and call our = on the argument
     m_pTableData = NULL;
+    m_matrixData = nullptr;
     CopyRecursive(Argument, pKnownTables);
 }
 
@@ -45,6 +53,7 @@ CLuaArgument::CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const v
 {
     // Read the argument out of the lua VM
     m_pTableData = NULL;
+    m_matrixData = nullptr;
     Read(luaVM, iArgument, pKnownTables);
 }
 
@@ -108,6 +117,23 @@ void CLuaArgument::CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLua
         case LUA_TSTRING:
         {
             m_strString = Argument.m_strString;
+            break;
+        }
+
+        case LUA_TVECTOR2:
+        case LUA_TVECTOR3:
+        case LUA_TVECTOR4:
+        {
+            m_vectorData = Argument.m_vectorData;
+            break;
+        }
+
+        case LUA_TMATRIX:
+        {
+            if (Argument.m_matrixData)
+                m_matrixData = new CMatrix(*Argument.m_matrixData);
+            else
+                m_matrixData = nullptr;
             break;
         }
 
@@ -196,7 +222,27 @@ void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
 
             case LUA_TUSERDATA:
             {
-                m_pUserData = *((void**)lua_touserdata(luaVM, iArgument));
+                void* pData = *((void**)lua_touserdata(luaVM, iArgument));
+                if (CLuaVector3D* vector3 = UserDataCast((CLuaVector3D*)pData, luaVM))
+                {
+                    ReadVector(*vector3);
+                }
+                else if (CLuaVector2D* vector2 = UserDataCast((CLuaVector2D*)pData, luaVM))
+                {
+                    ReadVector(*vector2);
+                }
+                else if (CLuaVector4D* vector4 = UserDataCast((CLuaVector4D*)pData, luaVM))
+                {
+                    ReadVector(*vector4);
+                }
+                else if (CLuaMatrix* matrix = UserDataCast((CLuaMatrix*)pData, luaVM))
+                {
+                    ReadMatrix(*matrix);
+                }
+                else
+                {
+                    m_pUserData = pData;
+                }
                 break;
             }
 
@@ -301,6 +347,33 @@ void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKn
             break;
         }
 
+        case LUA_TVECTOR2:
+        {
+            lua_pushvector(luaVM, CVector2D(m_vectorData.fX, m_vectorData.fY));
+            break;
+        }
+
+        case LUA_TVECTOR3:
+        {
+            lua_pushvector(luaVM, CVector(m_vectorData.fX, m_vectorData.fY, m_vectorData.fZ));
+            break;
+        }
+
+        case LUA_TVECTOR4:
+        {
+            lua_pushvector(luaVM, m_vectorData);
+            break;
+        }
+
+        case LUA_TMATRIX:
+        {
+            if (m_matrixData)
+                lua_pushmatrix(luaVM, *m_matrixData);
+            else
+                lua_pushnil(luaVM);
+            break;
+        }
+
         default:
         {
             // Unexpected type, keep the stack balanced for callers
@@ -392,6 +465,44 @@ void CLuaArgument::ReadScriptID(uint uiScriptID)
     m_pUserData = reinterpret_cast<void*>(uiScriptID);
 }
 
+void CLuaArgument::ReadVector(const CVector2D& vector)
+{
+    m_strString = "";
+    DeleteTableData();
+    m_iType = LUA_TVECTOR2;
+    m_vectorData.fX = vector.fX;
+    m_vectorData.fY = vector.fY;
+    m_vectorData.fZ = 0.0f;
+    m_vectorData.fW = 0.0f;
+}
+
+void CLuaArgument::ReadVector(const CVector& vector)
+{
+    m_strString = "";
+    DeleteTableData();
+    m_iType = LUA_TVECTOR3;
+    m_vectorData.fX = vector.fX;
+    m_vectorData.fY = vector.fY;
+    m_vectorData.fZ = vector.fZ;
+    m_vectorData.fW = 0.0f;
+}
+
+void CLuaArgument::ReadVector(const CVector4D& vector)
+{
+    m_strString = "";
+    DeleteTableData();
+    m_iType = LUA_TVECTOR4;
+    m_vectorData = vector;
+}
+
+void CLuaArgument::ReadMatrix(const CMatrix& matrix)
+{
+    m_strString = "";
+    DeleteTableData();
+    m_iType = LUA_TMATRIX;
+    m_matrixData = new CMatrix(matrix);
+}
+
 CElement* CLuaArgument::GetElement() const
 {
     ElementID ID = TO_ELEMENTID(m_pUserData);
@@ -426,6 +537,18 @@ bool CLuaArgument::GetAsString(SString& strBuffer)
             else
                 strBuffer = SString("%f", m_Number);
 
+            break;
+        case LUA_TVECTOR2:
+            strBuffer = SString("Vector2(%.3f, %.3f)", m_vectorData.fX, m_vectorData.fY);
+            break;
+        case LUA_TVECTOR3:
+            strBuffer = SString("Vector3(%.3f, %.3f, %.3f)", m_vectorData.fX, m_vectorData.fY, m_vectorData.fZ);
+            break;
+        case LUA_TVECTOR4:
+            strBuffer = SString("Vector4(%.3f, %.3f, %.3f, %.3f)", m_vectorData.fX, m_vectorData.fY, m_vectorData.fZ, m_vectorData.fW);
+            break;
+        case LUA_TMATRIX:
+            strBuffer = "Matrix(...)";
             break;
         default:
             return false;
@@ -588,6 +711,53 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
                 }
                 break;
             }
+
+            // Vector2 type
+            case LUA_TVECTOR2:
+            {
+                float x, y;
+                if (bitStream.Read(x) && bitStream.Read(y))
+                {
+                    ReadVector(CVector2D(x, y));
+                }
+                break;
+            }
+
+            // Vector3 type
+            case LUA_TVECTOR3:
+            {
+                float x, y, z;
+                if (bitStream.Read(x) && bitStream.Read(y) && bitStream.Read(z))
+                {
+                    ReadVector(CVector(x, y, z));
+                }
+                break;
+            }
+
+            // Vector4 type
+            case LUA_TVECTOR4:
+            {
+                float x, y, z, w;
+                if (bitStream.Read(x) && bitStream.Read(y) && bitStream.Read(z) && bitStream.Read(w))
+                {
+                    ReadVector(CVector4D(x, y, z, w));
+                }
+                break;
+            }
+
+            // Matrix type
+            case LUA_TMATRIX:
+            {
+                CMatrix matrix;
+                if (bitStream.Read(matrix.vRight.fX) && bitStream.Read(matrix.vRight.fY) && bitStream.Read(matrix.vRight.fZ) &&
+                    bitStream.Read(matrix.vFront.fX) && bitStream.Read(matrix.vFront.fY) && bitStream.Read(matrix.vFront.fZ) && bitStream.Read(matrix.vUp.fX) &&
+                    bitStream.Read(matrix.vUp.fY) && bitStream.Read(matrix.vUp.fZ) && bitStream.Read(matrix.vPos.fX) && bitStream.Read(matrix.vPos.fY) &&
+                    bitStream.Read(matrix.vPos.fZ))
+                {
+                    ReadMatrix(matrix);
+                }
+                break;
+            }
         }
     }
     else
@@ -715,6 +885,62 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
             break;
         }
 
+        // Vector2 argument
+        case LUA_TVECTOR2:
+        {
+            type.data.ucType = LUA_TVECTOR2;
+            bitStream.Write(&type);
+            bitStream.Write(m_vectorData.fX);
+            bitStream.Write(m_vectorData.fY);
+            break;
+        }
+
+        // Vector3 argument
+        case LUA_TVECTOR3:
+        {
+            type.data.ucType = LUA_TVECTOR3;
+            bitStream.Write(&type);
+            bitStream.Write(m_vectorData.fX);
+            bitStream.Write(m_vectorData.fY);
+            bitStream.Write(m_vectorData.fZ);
+            break;
+        }
+
+        // Vector4 argument
+        case LUA_TVECTOR4:
+        {
+            type.data.ucType = LUA_TVECTOR4;
+            bitStream.Write(&type);
+            bitStream.Write(m_vectorData.fX);
+            bitStream.Write(m_vectorData.fY);
+            bitStream.Write(m_vectorData.fZ);
+            bitStream.Write(m_vectorData.fW);
+            break;
+        }
+
+        // Matrix argument
+        case LUA_TMATRIX:
+        {
+            type.data.ucType = LUA_TMATRIX;
+            bitStream.Write(&type);
+            if (m_matrixData)
+            {
+                bitStream.Write(m_matrixData->vRight.fX);
+                bitStream.Write(m_matrixData->vRight.fY);
+                bitStream.Write(m_matrixData->vRight.fZ);
+                bitStream.Write(m_matrixData->vFront.fX);
+                bitStream.Write(m_matrixData->vFront.fY);
+                bitStream.Write(m_matrixData->vFront.fZ);
+                bitStream.Write(m_matrixData->vUp.fX);
+                bitStream.Write(m_matrixData->vUp.fY);
+                bitStream.Write(m_matrixData->vUp.fZ);
+                bitStream.Write(m_matrixData->vPos.fX);
+                bitStream.Write(m_matrixData->vPos.fY);
+                bitStream.Write(m_matrixData->vPos.fZ);
+            }
+            break;
+        }
+
         // Element argument
         case LUA_TLIGHTUSERDATA:
         case LUA_TUSERDATA:
@@ -727,6 +953,47 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
                 type.data.ucType = LUA_TUSERDATA;
                 bitStream.Write(&type);
                 bitStream.Write(pElement->GetID());
+            }
+            else if (CLuaVector3D* vector3 = UserDataCast((CLuaVector3D*)m_pUserData, nullptr))
+            {
+                type.data.ucType = LUA_TVECTOR3;
+                bitStream.Write(&type);
+                bitStream.Write(vector3->fX);
+                bitStream.Write(vector3->fY);
+                bitStream.Write(vector3->fZ);
+            }
+            else if (CLuaVector2D* vector2 = UserDataCast((CLuaVector2D*)m_pUserData, nullptr))
+            {
+                type.data.ucType = LUA_TVECTOR2;
+                bitStream.Write(&type);
+                bitStream.Write(vector2->fX);
+                bitStream.Write(vector2->fY);
+            }
+            else if (CLuaVector4D* vector4 = UserDataCast((CLuaVector4D*)m_pUserData, nullptr))
+            {
+                type.data.ucType = LUA_TVECTOR4;
+                bitStream.Write(&type);
+                bitStream.Write(vector4->fX);
+                bitStream.Write(vector4->fY);
+                bitStream.Write(vector4->fZ);
+                bitStream.Write(vector4->fW);
+            }
+            else if (CLuaMatrix* matrix = UserDataCast((CLuaMatrix*)m_pUserData, nullptr))
+            {
+                type.data.ucType = LUA_TMATRIX;
+                bitStream.Write(&type);
+                bitStream.Write(matrix->vRight.fX);
+                bitStream.Write(matrix->vRight.fY);
+                bitStream.Write(matrix->vRight.fZ);
+                bitStream.Write(matrix->vFront.fX);
+                bitStream.Write(matrix->vFront.fY);
+                bitStream.Write(matrix->vFront.fZ);
+                bitStream.Write(matrix->vUp.fX);
+                bitStream.Write(matrix->vUp.fY);
+                bitStream.Write(matrix->vUp.fZ);
+                bitStream.Write(matrix->vPos.fX);
+                bitStream.Write(matrix->vPos.fY);
+                bitStream.Write(matrix->vPos.fZ);
             }
             else
             {
@@ -785,6 +1052,11 @@ void CLuaArgument::DeleteTableData()
         if (!m_bWeakTableRef)
             delete m_pTableData;
         m_pTableData = NULL;
+    }
+    if (m_matrixData)
+    {
+        delete m_matrixData;
+        m_matrixData = nullptr;
     }
 }
 
@@ -845,6 +1117,41 @@ json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaA
                 g_pGame->GetScriptDebugging()->LogError(NULL, "Couldn't convert argument list to JSON. Invalid string specified, limit is 65535 characters.");
             }
             break;
+        }
+        case LUA_TVECTOR2:
+        {
+            json_object* jsonObject = json_object_new_object();
+            json_object_object_add(jsonObject, "x", json_object_new_double(m_vectorData.fX));
+            json_object_object_add(jsonObject, "y", json_object_new_double(m_vectorData.fY));
+            return jsonObject;
+        }
+        case LUA_TVECTOR3:
+        {
+            json_object* jsonObject = json_object_new_object();
+            json_object_object_add(jsonObject, "x", json_object_new_double(m_vectorData.fX));
+            json_object_object_add(jsonObject, "y", json_object_new_double(m_vectorData.fY));
+            json_object_object_add(jsonObject, "z", json_object_new_double(m_vectorData.fZ));
+            return jsonObject;
+        }
+        case LUA_TVECTOR4:
+        {
+            json_object* jsonObject = json_object_new_object();
+            json_object_object_add(jsonObject, "x", json_object_new_double(m_vectorData.fX));
+            json_object_object_add(jsonObject, "y", json_object_new_double(m_vectorData.fY));
+            json_object_object_add(jsonObject, "z", json_object_new_double(m_vectorData.fZ));
+            json_object_object_add(jsonObject, "w", json_object_new_double(m_vectorData.fW));
+            return jsonObject;
+        }
+        case LUA_TMATRIX:
+        {
+            if (!m_matrixData)
+                return json_object_new_null();
+            json_object* jsonArray = json_object_new_array();
+            float        buffer[16];
+            m_matrixData->GetBuffer(buffer);
+            for (int i = 0; i < 16; ++i)
+                json_object_array_add(jsonArray, json_object_new_double(buffer[i]));
+            return jsonArray;
         }
         case LUA_TLIGHTUSERDATA:
         case LUA_TUSERDATA:
@@ -1002,6 +1309,32 @@ bool CLuaArgument::IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaA
         case LUA_TSTRING:
         {
             return m_strString == compareTo.m_strString;
+        }
+        case LUA_TVECTOR2:
+        {
+            return m_vectorData.fX == compareTo.m_vectorData.fX && m_vectorData.fY == compareTo.m_vectorData.fY;
+        }
+        case LUA_TVECTOR3:
+        {
+            return m_vectorData.fX == compareTo.m_vectorData.fX && m_vectorData.fY == compareTo.m_vectorData.fY && m_vectorData.fZ == compareTo.m_vectorData.fZ;
+        }
+        case LUA_TVECTOR4:
+        {
+            return m_vectorData.fX == compareTo.m_vectorData.fX && m_vectorData.fY == compareTo.m_vectorData.fY &&
+                   m_vectorData.fZ == compareTo.m_vectorData.fZ && m_vectorData.fW == compareTo.m_vectorData.fW;
+        }
+        case LUA_TMATRIX:
+        {
+            if (m_matrixData && compareTo.m_matrixData)
+            {
+                return m_matrixData->vRight.fX == compareTo.m_matrixData->vRight.fX && m_matrixData->vRight.fY == compareTo.m_matrixData->vRight.fY &&
+                       m_matrixData->vRight.fZ == compareTo.m_matrixData->vRight.fZ && m_matrixData->vFront.fX == compareTo.m_matrixData->vFront.fX &&
+                       m_matrixData->vFront.fY == compareTo.m_matrixData->vFront.fY && m_matrixData->vFront.fZ == compareTo.m_matrixData->vFront.fZ &&
+                       m_matrixData->vUp.fX == compareTo.m_matrixData->vUp.fX && m_matrixData->vUp.fY == compareTo.m_matrixData->vUp.fY &&
+                       m_matrixData->vUp.fZ == compareTo.m_matrixData->vUp.fZ && m_matrixData->vPos.fX == compareTo.m_matrixData->vPos.fX &&
+                       m_matrixData->vPos.fY == compareTo.m_matrixData->vPos.fY && m_matrixData->vPos.fZ == compareTo.m_matrixData->vPos.fZ;
+            }
+            return m_matrixData == compareTo.m_matrixData;
         }
     }
 
