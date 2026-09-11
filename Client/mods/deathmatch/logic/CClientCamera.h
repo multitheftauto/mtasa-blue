@@ -141,9 +141,9 @@ private:
     float           m_lastCenterOfWorldRot;
     bool            m_hasCenterOfWorld;
 
-    bool          m_bViewModesRestored{false};
-    unsigned char m_ucLastVehicleViewMode{0};
-    unsigned char m_ucLastPedViewMode{0};
+    bool         m_viewModesRestored{false};
+    std::uint8_t m_lastVehicleViewMode{0};
+    std::uint8_t m_lastPedViewMode{0};
 
     CCamera* m_pCamera;
 };
