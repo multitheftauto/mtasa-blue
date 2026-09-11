@@ -234,6 +234,7 @@ void CSettings::ResetGuiPointers()
     m_pCheckBoxBlur = NULL;
     m_pCheckBoxCoronaReflections = NULL;
     m_pCheckBoxDynamicPedShadows = NULL;
+    m_pCheckBoxEnableDXVK = NULL;
     m_pFieldOfViewLabel = NULL;
     m_pFieldOfView = NULL;
     m_pFieldOfViewValueLabel = NULL;
@@ -1245,6 +1246,12 @@ void CSettings::CreateGUI()
     m_pCheckBoxVSync = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("V-Sync"), true));
     m_pCheckBoxVSync->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY + 3.0f));
     m_pCheckBoxVSync->AutoSize(NULL, 20.0f);
+    m_pCheckBoxVSync->GetPosition(vecTemp, false);
+    m_pCheckBoxVSync->GetSize(vecSize);
+
+    m_pCheckBoxEnableDXVK = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Enable Vulkan"), true));
+    m_pCheckBoxEnableDXVK->SetPosition(CVector2D(vecTemp.fX + vecSize.fX + 10.0f, vecTemp.fY));
+    m_pCheckBoxEnableDXVK->AutoSize(NULL, 20.0f);
 
     // Reset position to leftmost
     m_pFullscreenStyleLabel->GetPosition(vecTemp, false);
@@ -2007,6 +2014,7 @@ void CSettings::CreateGUI()
     m_pCheckBoxWindowed->SetClickHandler(GUI_CALLBACK(&CSettings::OnWindowedClick, this));
     m_pCheckBoxDPIAware->SetClickHandler(GUI_CALLBACK(&CSettings::OnDPIAwareClick, this));
     m_pCheckBoxVSync->SetClickHandler(GUI_CALLBACK(&CSettings::OnVSyncClick, this));
+    m_pCheckBoxEnableDXVK->SetClickHandler(GUI_CALLBACK(&CSettings::OnEnableVulkanClick, this));
     m_pCheckBoxShowUnsafeResolutions->SetClickHandler(GUI_CALLBACK(&CSettings::ShowUnsafeResolutionsClick, this));
     m_pButtonBrowserBlacklistAdd->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistAdd, this));
     m_pButtonBrowserBlacklistRemove->SetClickHandler(GUI_CALLBACK(&CSettings::OnBrowserBlacklistRemove, this));
@@ -2339,6 +2347,11 @@ void CSettings::UpdateVideoTab()
     bool bDynamicPedShadows;
     CVARS_GET("dynamic_ped_shadows", bDynamicPedShadows);
     m_pCheckBoxDynamicPedShadows->SetSelected(bDynamicPedShadows);
+
+    // Enable Vulkan
+    bool bEnableDXVK;
+    CVARS_GET("dxvk_enabled", bEnableDXVK);
+    m_pCheckBoxEnableDXVK->SetSelected(bEnableDXVK);
 
     // Enable dynamic ped shadows checkbox if visual quality option is set to high or very high
     m_pCheckBoxDynamicPedShadows->SetEnabled(FxQuality >= 2);
@@ -4555,6 +4568,10 @@ void CSettings::SaveData()
     CVARS_SET("dynamic_ped_shadows", bDynamicPedShadows);
     gameSettings->SetDynamicPedShadowsEnabled(bDynamicPedShadows);
 
+    // Enable Vulkan
+    bool bEnableDXVK = m_pCheckBoxEnableDXVK->GetSelected();
+    CVARS_SET("dxvk_enabled", bEnableDXVK);
+
     // Fast clothes loading
     if (CGUIListItem* pSelected = m_pFastClothesCombo->GetSelectedItem())
     {
@@ -5891,6 +5908,89 @@ bool CSettings::OnVSyncClick(CGUIElement* pElement)
 {
     CCore::GetSingleton().GetFPSLimiter()->SetDisplayVSync(m_pCheckBoxVSync->GetSelected());
     return true;
+}
+
+static void VulkanNotSupportedCallBack(void* userdata, unsigned int uiButton);
+
+//
+// OnEnableVulkanClick
+//
+bool CSettings::OnEnableVulkanClick(CGUIElement* pElement)
+{
+    if (!m_pCheckBoxEnableDXVK->GetSelected())
+    {
+        CVARS_SET("dxvk_enabled", false);
+        CCore::GetSingleton().SaveConfig();
+        ShowRestartQuestion();
+        return true;
+    }
+
+    if (GetApplicationSettingInt("dxvk", "files_ok") != 1)
+    {
+        m_pCheckBoxEnableDXVK->SetSelected(false);
+
+        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+        pQuestionBox->Reset();
+        pQuestionBox->SetTitle(_("VULKAN FILES MISSING OR DAMAGED"));
+        pQuestionBox->SetMessage(_("The Vulkan files are missing or damaged,\nso this option cannot be enabled."));
+        pQuestionBox->SetButton(0, _("OK"));
+        pQuestionBox->SetCallback(VulkanNotSupportedCallBack);
+        pQuestionBox->Show();
+        return true;
+    }
+
+    if (GetApplicationSettingInt("dxvk", "vulkan_supported") != 1)
+    {
+        m_pCheckBoxEnableDXVK->SetSelected(false);
+
+        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+        pQuestionBox->Reset();
+        pQuestionBox->SetTitle(_("VULKAN NOT SUPPORTED"));
+        pQuestionBox->SetMessage(_("Vulkan is not available on your system,\nso this option cannot be enabled."));
+        pQuestionBox->SetButton(0, _("OK"));
+        pQuestionBox->SetCallback(VulkanNotSupportedCallBack);
+        pQuestionBox->Show();
+        return true;
+    }
+
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(_("ENABLE VULKAN"));
+    pQuestionBox->SetMessage(
+        _("Vulkan can increase your frame rate by making better use of your graphics card.\n\n"
+          "When you first enable it, you may notice minor stuttering while the shader cache is built.\n"
+          "This is temporary and everything will run smoothly once the cache is complete.\n\n"
+          "Are you sure you want to enable Vulkan?"));
+    pQuestionBox->SetButton(0, _("No"));
+    pQuestionBox->SetButton(1, _("Yes"));
+    pQuestionBox->SetCallback(EnableVulkanQuestionCallBack, this);
+    pQuestionBox->Show();
+
+    return true;
+}
+
+static void VulkanNotSupportedCallBack(void* userdata, unsigned int uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+}
+
+void CSettings::EnableVulkanQuestionCallBack(void* userdata, unsigned int uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+
+    auto* pSettings = static_cast<CSettings*>(userdata);
+    if (!pSettings)
+        return;
+
+    if (uiButton == 0)
+    {
+        pSettings->m_pCheckBoxEnableDXVK->SetSelected(false);
+        return;
+    }
+
+    CVARS_SET("dxvk_enabled", true);
+    CCore::GetSingleton().SaveConfig();
+    pSettings->ShowRestartQuestion();
 }
 
 static void CPUAffinityQuestionCallBack(void* userdata, unsigned int button)
