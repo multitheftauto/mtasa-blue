@@ -26,11 +26,11 @@ public:
 
     void RemoveAllWithBackup() override;
     void RestoreBackup() override;
-    void UpdateBuildingLods(const std::uint32_t offset);
+    void UpdateBuildingLods(const std::uint32_t offset, const std::uintptr_t oldPoolStart, const std::uintptr_t oldPoolEnd) override;
 
 private:
-    void UpdateBackupLodOffset(const std::uint32_t offest);
-    void UpdateLodsOffestInPool(const std::uint32_t offset);
+    void UpdateBackupLodOffset(const std::uint32_t offset, const std::uintptr_t oldPoolStart, const std::uintptr_t oldPoolEnd);
+    void UpdateLodsOffestInPool(const std::uint32_t offset, const std::uintptr_t oldPoolStart, const std::uintptr_t oldPoolEnd);
 
 private:
     CPoolSAInterface<CEntitySAInterface>** m_ppDummyPoolInterface;
