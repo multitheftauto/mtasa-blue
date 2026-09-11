@@ -159,8 +159,7 @@ void CLatentReceiver::OnReceive(NetBitStreamInterface* pBitStream)
     //
     if (activeRx.uiWritePosition > activeRx.buffer.GetSize() || usSizeSent > activeRx.buffer.GetSize() - activeRx.uiWritePosition)
     {
-        return OnReceiveError(
-            SString("Buffer would overflow (size:%u pos:%u chunk:%u)", activeRx.buffer.GetSize(), activeRx.uiWritePosition, usSizeSent));
+        return OnReceiveError(SString("Buffer would overflow (size:%u pos:%u chunk:%u)", activeRx.buffer.GetSize(), activeRx.uiWritePosition, usSizeSent));
     }
 
     if (bIsTail && activeRx.uiWritePosition + usSizeSent != activeRx.buffer.GetSize())
