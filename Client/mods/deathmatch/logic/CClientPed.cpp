@@ -15,6 +15,7 @@
 #include <game/CCam.h>
 #include <game/CCarEnterExit.h>
 #include <game/CColPoint.h>
+#include <game/CDoor.h>
 #include <game/CPedIntelligence.h>
 #include <game/CPedSound.h>
 #include <game/CStreaming.h>
@@ -1620,7 +1621,9 @@ CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
 
     if (pVehicle)
     {
-        pVehicle->SetSwingingDoorsAllowed(false);
+        // Only disable swinging doors if the driver left the vehicle, so passenger doors can continue swinging with physics
+        if (pVehicle->GetOccupant(0) == this || pVehicle->m_pOccupyingDriver == this)
+            pVehicle->SetSwingingDoorsAllowed(false);
 
         // Warp the player out of the vehicle
         CVehicle* pGameVehicle = pVehicle->m_pVehicle;
