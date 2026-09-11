@@ -85,6 +85,15 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
         modelInfo->SetObjectPropertiesGroup(MODEL_PROPERTIES_GROUP_STATIC);
 
+    // Fix vehicle tuning models (e.g. exh_*) spinning endlessly. Their model info flags get misread as special types (like CRANE) in LoadObjectInstance,
+    // causing PreRender to rewrite their matrix each frame.
+    auto*      pModelInterface = modelInfo->GetInterface();
+    const bool bVehicleTuningPart = pModelInterface && modelInfo->GetModelType() == eModelInfoType::ATOMIC && pModelInterface->bWetRoadReflection;
+    const auto prevSpecialType = bVehicleTuningPart ? pModelInterface->eSpecialModelType : eModelSpecialType::NONE;
+
+    if (prevSpecialType != eModelSpecialType::NONE)
+        pModelInterface->eSpecialModelType = eModelSpecialType::NONE;
+
     // Load building
     SFileObjectInstance instance{};
     instance.modelID = modelId;
@@ -99,9 +108,11 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     pBuilding->m_pLod = nullptr;
     pBuilding->m_iplIndex = 0;
 
-    // Restore changed properties group
+    // Restore changed properties group and special model type
     if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
         modelInfo->SetObjectPropertiesGroup(prevGroup);
+    if (prevSpecialType != eModelSpecialType::NONE)
+        pModelInterface->eSpecialModelType = prevSpecialType;
 
     // Always stream model collosion
     // TODO We can setup collison bounding box and use GTA streamer for it
