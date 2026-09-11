@@ -75,6 +75,7 @@ bool CClientBuildingManager::IsValidModel(uint16_t modelId)
         return false;
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
+
     if (!pModelInfo || !pModelInfo->GetInterface())
         return false;
 
@@ -82,6 +83,7 @@ bool CClientBuildingManager::IsValidModel(uint16_t modelId)
         return false;
 
     eModelInfoType eType = pModelInfo->GetModelType();
+
     return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON || eType == eModelInfoType::TIME);
 }
 

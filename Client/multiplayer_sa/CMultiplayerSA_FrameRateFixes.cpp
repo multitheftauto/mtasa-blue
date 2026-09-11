@@ -773,6 +773,77 @@ static void __declspec(naked) HOOK_CTaskSimpleSwim__ProcessSwimmingResistance()
     // clang-format on
 }
 
+// Fixes diving too deep on high FPS (#3344). HOOK_CTaskSimpleSwim__ProcessSwimmingResistance above scales every
+// component of the target velocity by kOriginalTimeStep / timestep, which is right for x and y (per-frame animation
+// shifts) but not for the dive velocity in z, an absolute speed. Scale it the other way here so the two cancel out.
+#define HOOKPOS_CTaskSimpleSwim__ProcessSwimmingResistance_DiveSpeed  0x68A42B
+#define HOOKSIZE_CTaskSimpleSwim__ProcessSwimmingResistance_DiveSpeed 6
+static constexpr std::uintptr_t RETURN_CTaskSimpleSwim__ProcessSwimmingResistance_DiveSpeed = 0x68A431;
+static void __declspec(naked)   HOOK_CTaskSimpleSwim__ProcessSwimmingResistance_DiveSpeed()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fmul    ds:[0x858EF4]           // Original: the dive speed, -0.1f
+        fmul    ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
+        fdiv    kOriginalTimeStep       // 1.666f
+        jmp     RETURN_CTaskSimpleSwim__ProcessSwimmingResistance_DiveSpeed
+    }
+    // clang-format on
+}
+
+// Same for the constant buoyancy of the underwater swim state, which every dive ends in, against the same
+// HOOK_CTaskSimpleSwim__ProcessSwimmingResistance scaling
+#define HOOKPOS_CTaskSimpleSwim__ProcessSwimmingResistance_Buoyancy  0x68A4CA
+#define HOOKSIZE_CTaskSimpleSwim__ProcessSwimmingResistance_Buoyancy 6
+static constexpr std::uintptr_t RETURN_CTaskSimpleSwim__ProcessSwimmingResistance_Buoyancy = 0x68A4D0;
+static void __declspec(naked)   HOOK_CTaskSimpleSwim__ProcessSwimmingResistance_Buoyancy()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fld     ds:[0x8708CC]           // Original: the buoyancy of the underwater state, 0.01f
+        fmul    ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
+        fdiv    kOriginalTimeStep       // 1.666f
+        faddp   st(1), st               // Original: add it to the target velocity
+        jmp     RETURN_CTaskSimpleSwim__ProcessSwimmingResistance_Buoyancy
+    }
+    // clang-format on
+}
+
+// cBuoyancy::CalcBuoyancyForce takes the whole vertical momentum off the upward impulse once the entity rises faster
+// than four times what the impulse gives it. The impulse scales with the timestep, the momentum does not, so on high
+// FPS the damping sets in at a fraction of the 30 FPS rise speed and holds a surfacing ped down. Scale the momentum
+// by the same ratio for peds, which covers every ped in water, not only the swimming local player.
+#define HOOKPOS_cBuoyancy__CalcBuoyancyForce_Damping  0x6C27B7
+#define HOOKSIZE_cBuoyancy__CalcBuoyancyForce_Damping 6
+static constexpr std::uintptr_t RETURN_cBuoyancy__CalcBuoyancyForce_Damping = 0x6C27BD;
+static void __declspec(naked)   HOOK_cBuoyancy__CalcBuoyancyForce_Damping()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fld     dword ptr [eax+8Ch]     // Original: CPhysical::m_fMass, multiplied with the vertical speed next
+        push    edx
+        mov     dl, byte ptr [eax+36h]  // CEntitySAInterface::nType, a 3 bit field
+        and     dl, 7
+        cmp     dl, ENTITY_TYPE_PED
+        pop     edx
+        jne     done
+        fmul    ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
+        fdiv    kOriginalTimeStep       // 1.666f
+    done:
+        jmp     RETURN_cBuoyancy__CalcBuoyancyForce_Damping
+    }
+    // clang-format on
+}
+
 // Fixes invisible weapon particles (extinguisher, spraycan, flamethrower) at high FPS
 #define HOOKPOS_CWeapon_Update  0x73DC3D
 #define HOOKSIZE_CWeapon_Update 5
@@ -845,6 +916,55 @@ static void __declspec(naked) HOOK_CPhysical__ApplyAirResistance()
         fmul [esi+0x58]
         fstp [esi+0x58]
         jmp RETURN_CPhysical__ApplyAirResistance
+    }
+    // clang-format on
+}
+
+// Fixes excessive chassis roll acceleration and violent swaying at high FPS by scaling the lateral impulse by delta time.
+#define HOOKPOS_CDoor__Process_ChassisImpulse  0x6F42D5
+#define HOOKSIZE_CDoor__Process_ChassisImpulse 0xE
+static const unsigned int     RETURN_CDoor__Process_ChassisImpulse = 0x6F42E3;
+static void __declspec(naked) HOOK_CDoor__Process_ChassisImpulse()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fld ds:[0x872328]           // 0.025f (DOOR_APPLY_RATE_CHASSIS)
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 50.0f / 30.0f (1.6666667f)
+        fmul st, st(1)              // * z
+        fadd dword ptr [esi+0x14]   // + m_fAngVel
+        fstp dword ptr [esi+0x14]   // store m_fAngVel
+        jmp RETURN_CDoor__Process_ChassisImpulse
+    }
+    // clang-format on
+}
+
+// Fixes high-frequency chassis oscillation and visual wheel protrusion by integrating angular velocity proportionally to delta time.
+#define HOOKPOS_CDoor__Process_ChassisAngle  0x6F4422
+#define HOOKSIZE_CDoor__Process_ChassisAngle 0x8
+static const unsigned int     RETURN_CDoor__Process_ChassisAngle = 0x6F442A;
+static void __declspec(naked) HOOK_CDoor__Process_ChassisAngle()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fld dword ptr [esi+0x14]    // m_fAngVel
+        mov ecx, ebx                // ecx = m_nDirn
+
+        test bp, bp                 // DOOR_EXTRA_CHASSIS (0x40)
+        jz not_chassis
+
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 50.0f / 30.0f (1.6666667f)
+
+    not_chassis:
+        fadd dword ptr [esi+0x0C]   // + m_fAngle
+        jmp RETURN_CDoor__Process_ChassisAngle
     }
     // clang-format on
 }
@@ -952,6 +1072,11 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CTaskSimpleSwim__ProcessEffects);
     EZHookInstall(CTaskSimpleSwim__ProcessEffectsBubbleFix);
     EZHookInstall(CTaskSimpleSwim__ProcessSwimmingResistance);
+    EZHookInstall(CTaskSimpleSwim__ProcessSwimmingResistance_DiveSpeed);
+    EZHookInstall(CTaskSimpleSwim__ProcessSwimmingResistance_Buoyancy);
+    EZHookInstall(cBuoyancy__CalcBuoyancyForce_Damping);
 
     EZHookInstall(CWeapon_Update);
+    EZHookInstall(CDoor__Process_ChassisImpulse);
+    EZHookInstall(CDoor__Process_ChassisAngle);
 }

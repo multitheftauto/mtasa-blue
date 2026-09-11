@@ -7273,11 +7273,26 @@ bool CStaticFunctionDefinitions::UnbindKey(const char* szKey, CLuaMain* pLuaMain
         }
     }
 
-    if ((pKey && (m_pScriptKeyBinds->RemoveKeyFunction(pScriptKey, pLuaMain, bCheckHitState, bHitState, iLuaFunction) ||
-                  pKeyBinds->RemoveFunction(pKey, CClientGame::StaticProcessClientKeyBind, bCheckHitState, bHitState))) ||
-        (pControl && (m_pScriptKeyBinds->RemoveControlFunction(pScriptControl, pLuaMain, bCheckHitState, bHitState, iLuaFunction) ||
-                      pKeyBinds->RemoveControlFunction(pControl, CClientGame::StaticProcessClientControlBind, true, bHitState))))
+    // One core bind per key and state dispatches every script bind on it, so it may only go once none of them is left
+    if (pKey)
     {
+        if (!m_pScriptKeyBinds->RemoveKeyFunction(pScriptKey, pLuaMain, bCheckHitState, bHitState, iLuaFunction))
+            return false;
+
+        if (!m_pScriptKeyBinds->KeyFunctionExists(pScriptKey, nullptr, bCheckHitState, bHitState))
+            pKeyBinds->RemoveFunction(pKey, CClientGame::StaticProcessClientKeyBind, bCheckHitState, bHitState);
+
+        return true;
+    }
+
+    if (pControl)
+    {
+        if (!m_pScriptKeyBinds->RemoveControlFunction(pScriptControl, pLuaMain, bCheckHitState, bHitState, iLuaFunction))
+            return false;
+
+        if (!m_pScriptKeyBinds->ControlFunctionExists(pScriptControl, nullptr, bCheckHitState, bHitState))
+            pKeyBinds->RemoveControlFunction(pControl, CClientGame::StaticProcessClientControlBind, true, bHitState);
+
         return true;
     }
 
