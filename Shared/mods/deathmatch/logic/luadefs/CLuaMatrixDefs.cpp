@@ -21,7 +21,6 @@ void CLuaMatrixDefs::AddClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classmetamethod(luaVM, "__tostring", ToString);
-    lua_classmetamethod(luaVM, "__gc", Destroy);
 
     lua_classmetamethod(luaVM, "__add", Add);
     lua_classmetamethod(luaVM, "__sub", Sub);
@@ -122,15 +121,13 @@ int CLuaMatrixDefs::Create(lua_State* luaVM)
 
 int CLuaMatrixDefs::Destroy(lua_State* luaVM)
 {
-    CLuaMatrix* pMatrix = NULL;
+    CLuaMatrix* pMatrix = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pMatrix);
 
     if (!argStream.HasErrors())
     {
-        delete pMatrix;
-        lua_addtotalbytes(luaVM, -LUA_GC_EXTRA_BYTES);
         lua_pushboolean(luaVM, true);
         return 1;
     }
