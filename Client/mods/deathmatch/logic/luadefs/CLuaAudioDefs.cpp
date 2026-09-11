@@ -70,6 +70,26 @@ static bool IsSoundURL(const std::string& soundPath) noexcept
            (soundPath.length() <= 2048 || soundPath.find('\n') == std::string::npos);
 }
 
+static std::string SanitizeSoundPath(std::string_view path)
+{
+    constexpr std::size_t MAX_LOGGED_LENGTH = 256;
+
+    std::string       result;
+    const std::size_t length = std::min(path.size(), MAX_LOGGED_LENGTH);
+    result.reserve(length + (path.size() > MAX_LOGGED_LENGTH ? 3 : 0));
+
+    for (std::size_t i = 0; i < length; i++)
+    {
+        const unsigned char c = static_cast<unsigned char>(path[i]);
+        result += (std::isprint(c) && c != '\n' && c != '\r' && c != '\t') ? static_cast<char>(c) : '?';
+    }
+
+    if (path.size() > MAX_LOGGED_LENGTH)
+        result += "...";
+
+    return result;
+}
+
 std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, const std::string path, std::optional<bool> loop, std::optional<bool> throttle)
 {
     CResource* resource = &lua_getownerresource(luaVM);
@@ -80,7 +100,14 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, con
     bool        isRawData = false;
 
     if (CResourceManager::ParseResourcePathInput(soundPath, resource, &filename, nullptr, true))
+    {
+        if (!FileExists(filename.c_str()))
+        {
+            throw LuaFunctionError(SString("Unable to load sound '%s'.", SanitizeSoundPath(path).c_str()), true);
+        }
+
         soundPath = filename;
+    }
     else
     {
         if (IsSoundURL(soundPath))
@@ -98,6 +125,8 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, con
         if (sound)
         {
             sound->SetParent(resource->GetResourceDynamicEntity());
+
+            sound->SetLuaDebugInfo(m_pScriptDebugging->GetLuaDebugInfo(luaVM));
 
             // call onClientSoundStarted
             CLuaArguments Arguments;
@@ -122,7 +151,14 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, c
     bool        isRawData = false;
 
     if (CResourceManager::ParseResourcePathInput(soundPath, resource, &filename, nullptr, true))
+    {
+        if (!FileExists(filename.c_str()))
+        {
+            throw LuaFunctionError(SString("Unable to load sound '%s'.", SanitizeSoundPath(path).c_str()), true);
+        }
+
         soundPath = filename;
+    }
     else
     {
         if (IsSoundURL(soundPath))
@@ -140,6 +176,8 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, c
         if (sound)
         {
             sound->SetParent(resource->GetResourceDynamicEntity());
+
+            sound->SetLuaDebugInfo(m_pScriptDebugging->GetLuaDebugInfo(luaVM));
 
             // call onClientSoundStarted
             CLuaArguments Arguments;
