@@ -1131,7 +1131,8 @@ bool CGame::StaticProcessNetworkPacket(unsigned char ucPacketID, const NetServer
 {
     if (ucPacketID == PACKET_ID_LUA_EVENT)
     {
-        if (pBitStream->GetNumberOfUnreadBits() > CLuaEventPacket::MAX_LUA_EVENT_ARGUMENTS_SIZE * 8)
+        if (pBitStream->GetNumberOfUnreadBits() >
+            (CLuaEventPacket::MAX_LUA_EVENT_ARGUMENTS_SIZE + CLuaEventPacket::LUA_EVENT_ENVELOPE_HEADROOM) * 8)
             return false;
     }
 
