@@ -5485,8 +5485,10 @@ void CClientPed::SetTargetPosition(const CVector& vecPosition, unsigned long ulD
     {
         if (m_interp.pTargetOriginSource)
             m_interp.pTargetOriginSource->RemoveOriginSourceUser(this);
+
         if (pTargetOriginSource)
             pTargetOriginSource->AddOriginSourceUser(this);
+
         m_interp.pTargetOriginSource = pTargetOriginSource;
     }
 

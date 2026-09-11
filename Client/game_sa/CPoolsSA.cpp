@@ -874,6 +874,11 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
     return 0;
 }
 
+int CPoolsSA::GetPoolMaxCapacity(ePools pool) const noexcept
+{
+    return pool == BUILDING_POOL ? static_cast<int>(CBuildingsPoolSA::MAX_CAPACITY) : std::numeric_limits<int>::max();
+}
+
 int CPoolsSA::GetPoolDefaultModdedCapacity(ePools pool)
 {
     switch (pool)
