@@ -43,6 +43,7 @@
 #include "packets/CPlayerDiagnosticPacket.h"
 #include "packets/CPlayerModInfoPacket.h"
 #include "packets/CPlayerACInfoPacket.h"
+#include "packets/CPlayerCPUInfoPacket.h"
 #include "packets/CPlayerScreenShotPacket.h"
 #include "packets/CUnoccupiedVehiclePushPacket.h"
 #include "packets/CPlayerNoSocketPacket.h"
@@ -191,6 +192,10 @@ CPacket* CPacketTranslator::Translate(const NetServerPlayerID& Socket, ePacketID
 
         case PACKET_ID_PLAYER_ACINFO:
             pTemp = new CPlayerACInfoPacket;
+            break;
+
+        case PACKET_ID_PLAYER_CPUINFO:
+            pTemp = new CPlayerCPUInfoPacket;
             break;
 
         case PACKET_ID_PLAYER_SCREENSHOT:

@@ -12,7 +12,9 @@
 #ifdef MTA_CLIENT
 
     #define _WIN32_DCOM
+    #include <algorithm>
     #include <comdef.h>
+    #include <intrin.h>
     #include <Wbemidl.h>
 
     #pragma comment(lib, "wbemuuid.lib")
@@ -536,6 +538,98 @@ bool SharedUtil::Is64BitOS()
     }
 
     return bIs64BitOS;
+}
+
+/////////////////////////////////////////////////////////////////////
+//
+// GetCPUInfo
+//
+// CPUID brand string, registry ~MHz, and GetLogicalProcessorInformation
+// for cores/threads/cache. Cached because the hardware does not change.
+//
+/////////////////////////////////////////////////////////////////////
+void SharedUtil::GetCPUInfo(SCPUInfo& outInfo)
+{
+    static SCPUInfo cached{};
+    static bool     bReady = false;
+
+    if (bReady)
+    {
+        outInfo = cached;
+        return;
+    }
+
+    int cpuInfo[4] = {};
+    __cpuid(cpuInfo, 0x80000000);
+    if (static_cast<unsigned int>(cpuInfo[0]) >= 0x80000004)
+    {
+        char szBrand[49] = {};
+        __cpuid(reinterpret_cast<int*>(szBrand), 0x80000002);
+        __cpuid(reinterpret_cast<int*>(szBrand + 16), 0x80000003);
+        __cpuid(reinterpret_cast<int*>(szBrand + 32), 0x80000004);
+        cached.strName = SStringX(szBrand).Trim();
+    }
+
+    HKEY hKey = nullptr;
+    if (RegOpenKeyExA(HKEY_LOCAL_MACHINE, "HARDWARE\\DESCRIPTION\\System\\CentralProcessor\\0", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+    {
+        DWORD dwMHz = 0;
+        DWORD dwSize = sizeof(dwMHz);
+        DWORD dwType = 0;
+        if (RegQueryValueExA(hKey, "~MHz", nullptr, &dwType, reinterpret_cast<LPBYTE>(&dwMHz), &dwSize) == ERROR_SUCCESS && dwType == REG_DWORD)
+            cached.uiMaxClockSpeedMHz = dwMHz;
+
+        if (cached.strName.empty())
+        {
+            char  szName[64] = {};
+            DWORD dwNameSize = sizeof(szName);
+            dwType = 0;
+            if (RegQueryValueExA(hKey, "ProcessorNameString", nullptr, &dwType, reinterpret_cast<LPBYTE>(szName), &dwNameSize) == ERROR_SUCCESS &&
+                dwType == REG_SZ)
+                cached.strName = SStringX(szName).Trim();
+        }
+
+        RegCloseKey(hKey);
+    }
+
+    SYSTEM_INFO sysInfo{};
+    GetNativeSystemInfo(&sysInfo);
+    cached.uiThreads = sysInfo.dwNumberOfProcessors;
+
+    DWORD dwBufferSize = 0;
+    GetLogicalProcessorInformation(nullptr, &dwBufferSize);
+    if (GetLastError() == ERROR_INSUFFICIENT_BUFFER && dwBufferSize >= sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION))
+    {
+        std::vector<SYSTEM_LOGICAL_PROCESSOR_INFORMATION> buffer(dwBufferSize / sizeof(SYSTEM_LOGICAL_PROCESSOR_INFORMATION));
+        if (GetLogicalProcessorInformation(buffer.data(), &dwBufferSize))
+        {
+            unsigned int uiCores = 0;
+            for (const auto& info : buffer)
+            {
+                if (info.Relationship == RelationProcessorCore)
+                    ++uiCores;
+                else if (info.Relationship == RelationCache)
+                {
+                    const unsigned int uiSizeKB = info.Cache.Size / 1024;
+                    if (info.Cache.Level == 1)
+                        cached.uiL1CacheKB = std::max(cached.uiL1CacheKB, uiSizeKB);
+                    else if (info.Cache.Level == 2)
+                        cached.uiL2CacheKB = std::max(cached.uiL2CacheKB, uiSizeKB);
+                    else if (info.Cache.Level == 3)
+                        cached.uiL3CacheKB = std::max(cached.uiL3CacheKB, uiSizeKB);
+                }
+            }
+            cached.uiCores = uiCores != 0 ? uiCores : cached.uiThreads;
+        }
+    }
+
+    if (cached.uiThreads == 0)
+        cached.uiThreads = 1;
+    if (cached.uiCores == 0)
+        cached.uiCores = cached.uiThreads;
+
+    bReady = true;
+    outInfo = cached;
 }
 
 #endif  // MTA_CLIENT

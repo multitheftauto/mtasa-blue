@@ -11,6 +11,8 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include "lua/CLuaArguments.h"
+#include <variant>
 
 class CLuaPlayerDefs : public CLuaDefs
 {
@@ -46,7 +48,8 @@ public:
     LUA_DECLARE(GetPlayerAccount);
     LUA_DECLARE(GetPlayerVersion);
     LUA_DECLARE(GetPlayerACInfo);
-    static unsigned int GetPlayerScriptDebugLevel(CPlayer* const player);
+    static std::variant<CLuaArguments, bool> GetPlayerCPUInfo(CPlayer* const player);
+    static unsigned int                      GetPlayerScriptDebugLevel(CPlayer* const player);
 
     // Player set functions
     LUA_DECLARE(SetPlayerMoney);
