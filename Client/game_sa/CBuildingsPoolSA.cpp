@@ -42,6 +42,7 @@ inline bool CBuildingsPoolSA::AddBuildingToPool(CClientBuilding* pClientBuilding
         return false;
 
     std::int32_t iElementIndexInPool = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pInterface);
+
     if (iElementIndexInPool == -1)
         return false;
 
@@ -82,6 +83,7 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
 
     // Change the properties group to force dynamic models to be created as buildings instead of dummies
     auto prevGroup = modelInfo->GetObjectPropertiesGroup();
+
     if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
         modelInfo->SetObjectPropertiesGroup(MODEL_PROPERTIES_GROUP_STATIC);
 
@@ -140,6 +142,7 @@ void CBuildingsPoolSA::RemoveBuilding(CBuilding* pBuilding)
     CBuildingSAInterface* pInterface = pBuilding->GetBuildingInterface();
 
     std::int32_t iElementIndexInPool = (*m_ppBuildingPoolInterface)->GetObjectIndexSafe(pInterface);
+
     if (iElementIndexInPool == -1)
         return;
 
