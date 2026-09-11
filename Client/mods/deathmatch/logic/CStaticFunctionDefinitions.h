@@ -217,7 +217,7 @@ public:
     static bool            GetTrainSpeed(CClientVehicle& Vehicle, float& fSpeed);
     static bool            GetTrainPosition(CClientVehicle& Vehicle, float& fPosition);
     static bool            IsTrainChainEngine(CClientVehicle& Vehicle, bool& bChainEngine);
-    static bool            GetVehicleHeadLightColor(CClientVehicle& Vehicle, SColor& outColor);
+    static bool            GetVehicleHeadLightColor(CClientVehicle& Vehicle, SColor& outColor, HeadlightSide side = HeadlightSide::Left);
     static bool            GetVehicleCurrentGear(CClientVehicle& Vehicle, unsigned short& currentGear);
     static bool            GetVehicleVariant(CClientVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2);
     static bool            IsVehicleNitroRecharging(CClientVehicle& Vehicle, bool& bRecharging);
@@ -266,7 +266,7 @@ public:
     static bool SetTrainDirection(CClientVehicle& Vehicle, bool bDirection);
     static bool SetTrainSpeed(CClientVehicle& Vehicle, float fSpeed);
     static bool SetTrainPosition(CClientVehicle& Vehicle, float fPosition);
-    static bool SetVehicleHeadLightColor(CClientEntity& Vehicle, const SColor color);
+    static bool SetVehicleHeadLightColor(CClientEntity& Vehicle, const SColor color, HeadlightSide side = HeadlightSide::Both);
     static bool SetVehicleDoorOpenRatio(CClientEntity& Vehicle, unsigned char ucDoor, float fRatio, unsigned long ulTime = 0);
     static bool SetVehicleSirens(CClientVehicle& pVehicle, unsigned char ucSirenID, SSirenInfo tSirenInfo);
     static bool SetVehicleNitroActivated(CClientEntity& Entity, bool bActivated);
