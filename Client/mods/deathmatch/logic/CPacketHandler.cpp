@@ -4218,10 +4218,20 @@ retry:
                         modelId = 1700;
 
                     bitStream.Read(LowLodObjectID);
+
+                    CVector vecScale(1.0f, 1.0f, 1.0f);
+                    if (bitStream.Can(eBitStreamVersion::BuildingScale))
+                    {
+                        bitStream.Read(vecScale.fX);
+                        bitStream.Read(vecScale.fY);
+                        bitStream.Read(vecScale.fZ);
+                    }
+
                     CClientBuilding* pBuilding = new CClientBuilding(g_pClientGame->m_pManager, EntityID, modelId, position.data.vecPosition,
                                                                      rotationRadians.data.vecRotation, ucInterior);
 
                     pBuilding->SetUsesCollision(bCollisonsEnabled);
+                    pBuilding->SetScale(vecScale);
                     pEntity = pBuilding;
                     break;
                 }

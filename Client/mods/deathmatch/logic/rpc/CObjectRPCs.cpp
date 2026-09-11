@@ -19,6 +19,7 @@ void CObjectRPCs::LoadFunctions()
     AddHandler(MOVE_OBJECT, MoveObject, "MoveObject");
     AddHandler(STOP_OBJECT, StopObject, "StopObject");
     AddHandler(SET_OBJECT_SCALE, SetObjectScale, "SetObjectScale");
+    AddHandler(SET_ELEMENT_SCALE, SetElementScale, "SetElementScale");
     AddHandler(SET_OBJECT_VISIBLE_IN_ALL_DIMENSIONS, SetObjectVisibleInAllDimensions, "SetObjectVisibleInAllDimensions");
     AddHandler(SET_OBJECT_BREAKABLE, SetObjectBreakable, "SetObjectBreakable");
     AddHandler(BREAK_OBJECT, BreakObject, "BreakObject");
@@ -112,6 +113,31 @@ void CObjectRPCs::SetObjectScale(CClientEntity* pSource, NetBitStreamInterface& 
         bitStream.Read(vecScale.fY);
         bitStream.Read(vecScale.fZ);
 
+        pObject->SetScale(vecScale);
+    }
+}
+
+void CObjectRPCs::SetElementScale(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    CVector vecScale;
+
+    bitStream.Read(vecScale.fX);
+    vecScale.fY = vecScale.fX;
+    vecScale.fZ = vecScale.fX;
+
+    bitStream.Read(vecScale.fY);
+    bitStream.Read(vecScale.fZ);
+
+    if (pSource->GetType() == CCLIENTBUILDING)
+    {
+        static_cast<CClientBuilding*>(pSource)->SetScale(vecScale);
+        return;
+    }
+
+    CDeathmatchObject* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
+
+    if (pObject)
+    {
         pObject->SetScale(vecScale);
     }
 }

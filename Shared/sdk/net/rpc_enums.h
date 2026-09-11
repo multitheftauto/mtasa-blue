@@ -295,5 +295,7 @@ enum eElementRPCFunctions
 
     SET_CUSTOM_WEAPON_WEAPON_RANGE,
 
+    SET_ELEMENT_SCALE,
+
     NUM_RPC_FUNCS  // Add above this line
 };

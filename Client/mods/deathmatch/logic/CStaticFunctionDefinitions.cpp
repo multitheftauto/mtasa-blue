@@ -463,6 +463,23 @@ bool CStaticFunctionDefinitions::GetElementRotation(CClientEntity& Entity, CVect
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetElementScale(CClientEntity& Entity, CVector& vecScale)
+{
+    if (IS_OBJECT(&Entity))
+    {
+        static_cast<CClientObject&>(Entity).GetScale(vecScale);
+        return true;
+    }
+
+    if (Entity.GetType() == CCLIENTBUILDING)
+    {
+        vecScale = static_cast<CClientBuilding&>(Entity).GetScale();
+        return true;
+    }
+
+    return false;
+}
+
 bool CStaticFunctionDefinitions::GetElementVelocity(CClientEntity& Entity, CVector& vecVelocity)
 {
     int iType = Entity.GetType();
@@ -1193,6 +1210,25 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
     }
 
     return true;
+}
+
+bool CStaticFunctionDefinitions::SetElementScale(CClientEntity& Entity, const CVector& vecScale)
+{
+    RUN_CHILDREN(SetElementScale(**iter, vecScale))
+
+    if (IS_OBJECT(&Entity))
+    {
+        static_cast<CDeathmatchObject&>(Entity).SetScale(vecScale);
+        return true;
+    }
+
+    if (Entity.GetType() == CCLIENTBUILDING)
+    {
+        static_cast<CClientBuilding&>(Entity).SetScale(vecScale);
+        return true;
+    }
+
+    return false;
 }
 
 bool CStaticFunctionDefinitions::SetElementVelocity(CClientEntity& Entity, const CVector& vecVelocity)

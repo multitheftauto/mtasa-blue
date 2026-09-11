@@ -21,6 +21,7 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
       m_pBuilding(nullptr),
       m_usesCollision(true),
       m_ucAlpha(255),
+      m_vecScale(1.0f, 1.0f, 1.0f),
       m_pHighBuilding(nullptr),
       m_pLowBuilding(nullptr)
 {
@@ -155,6 +156,26 @@ void CClientBuilding::SetAlpha(unsigned char ucAlpha)
         m_pBuilding->SetAlpha(ucAlpha);
 }
 
+void CClientBuilding::SetScale(const CVector& vecScale)
+{
+    m_vecScale = vecScale;
+
+    if (m_vecScale.fX == 1.0f && m_vecScale.fY == 1.0f && m_vecScale.fZ == 1.0f)
+        m_pBuildingManager->RemoveFromScaledList(this);
+    else
+        m_pBuildingManager->AddToScaledList(this);
+
+    ApplyScale();
+}
+
+void CClientBuilding::ApplyScale()
+{
+    if (!m_pBuilding)
+        return;
+
+    m_pBuilding->SetScaleInternal(m_vecScale);
+}
+
 void CClientBuilding::Create()
 {
     if (m_pBuilding)
@@ -180,6 +201,9 @@ void CClientBuilding::Create()
 
     if (m_ucAlpha != 255)
         m_pBuilding->SetAlpha(m_ucAlpha);
+
+    if (m_vecScale.fX != 1.0f || m_vecScale.fY != 1.0f || m_vecScale.fZ != 1.0f)
+        ApplyScale();
 
     if (m_pHighBuilding)
     {
