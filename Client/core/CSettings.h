@@ -101,7 +101,16 @@ public:
     void UpdateJoypadTab();
 
     void UpdateAudioTab();
+    void UpdateSoundOutputDeviceCombo();
+    void UpdateSoundInputDeviceCombo();
 
+    // Bumped on WM_DEVICECHANGE so the combos refresh even while no mod is loaded
+    static void NotifyAudioDeviceChange() { ms_uiAudioDeviceChangeRevision++; }
+
+private:
+    static unsigned int ms_uiAudioDeviceChangeRevision;
+
+public:
     void UpdateVideoTab();
     void UpdatePostFxTab();
     void PopulateResolutionComboBox();
@@ -280,6 +289,16 @@ protected:
     CGUIComboBox*  m_pComboUsertrackMode;
     CGUIButton*    m_pAudioDefButton;
 
+    CGUILabel*    m_pAudioOutputDeviceLabel;
+    CGUIComboBox* m_pSoundOutputDeviceCombo;
+    unsigned int  m_uiSoundOutputDeviceListRevision;
+    bool          m_bUpdatingSoundOutputDeviceCombo;
+
+    CGUILabel*    m_pAudioInputDeviceLabel;
+    CGUIComboBox* m_pSoundInputDeviceCombo;
+    unsigned int  m_uiSoundInputDeviceListRevision;
+    bool          m_bUpdatingSoundInputDeviceCombo;
+
     CGUIGridList* m_pBindsList;
     CGUIButton*   m_pBindsDefButton;
     CGUIHandle    m_hBind, m_hPriKey, m_hSecKeys[SecKeyNum];
@@ -379,6 +398,8 @@ protected:
 
     bool OnJoypadTextChanged(CGUIElement* pElement);
     bool OnJoypadDeviceChanged(CGUIElement* pElement);
+    bool OnSoundOutputDeviceChanged(CGUIElement* pElement);
+    bool OnSoundInputDeviceChanged(CGUIElement* pElement);
     bool OnJoypadVibrationClick(CGUIElement* pElement);
     bool OnAxisSelectClick(CGUIElement* pElement);
     bool OnAudioDefaultClick(CGUIElement* pElement);
