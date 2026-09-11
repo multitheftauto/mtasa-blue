@@ -676,6 +676,9 @@ void CModelInfoSA::SetIdeFlag(eModelIdeFlag eIdeFlag, bool bState)
         case eModelIdeFlag::DISABLE_BACKFACE_CULLING:
             m_pInterface->bIsBackfaceCulled = !bState;
             break;
+        case eModelIdeFlag::REALLY_DRAW_LAST:
+            SetRenderingAfterScene(bState);
+            break;
         default:
             break;
     }
