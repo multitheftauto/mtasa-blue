@@ -319,3 +319,25 @@ bool CClientPedManager::IsValidWeaponModel(DWORD dwModel)
 
     return false;
 }
+
+void CClientPedManager::UpdateBoneAttachments()
+{
+    // Update streamed-in peds
+    for (CClientPed* ped : m_StreamedIn)
+    {
+        if (ped)
+            ped->UpdateBoneAttachments();
+    }
+
+    // Update players
+    auto* playerManager = m_pManager->GetPlayerManager();
+    if (playerManager)
+    {
+        for (auto iter = playerManager->IterBegin(); iter != playerManager->IterEnd(); ++iter)
+        {
+            CClientPlayer* player = *iter;
+            if (player)
+                player->UpdateBoneAttachments();
+        }
+    }
+}

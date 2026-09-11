@@ -69,6 +69,7 @@ CElement::CElement(CElement* pParent)
     m_pEventManager = new CMapEventManager;
 
     m_pAttachedTo = NULL;
+    m_attachedBone = BONE_ROOT;
 }
 
 CElement::~CElement()
@@ -1148,10 +1149,16 @@ CClient* CElement::GetClient()
 
 void CElement::AttachTo(CElement* pElement)
 {
+    AttachTo(pElement, BONE_ROOT);
+}
+
+void CElement::AttachTo(CElement* pElement, eBone bone)
+{
     if (m_pAttachedTo)
         m_pAttachedTo->RemoveAttachedElement(this);
 
     m_pAttachedTo = pElement;
+    m_attachedBone = bone;
 
     if (m_pAttachedTo)
         m_pAttachedTo->AddAttachedElement(this);

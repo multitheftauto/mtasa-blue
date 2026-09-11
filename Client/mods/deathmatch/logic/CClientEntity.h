@@ -17,6 +17,7 @@ class CClientEntity;
 #include <core/CClientEntityBase.h>
 #include "logic/CClientEntityRefManager.h"
 #include "CStringName.h"
+#include <game/CPed.h>
 class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType
@@ -236,8 +237,12 @@ public:
 
     CClientEntity* GetAttachedTo() { return m_pAttachedToEntity; }
     virtual void   AttachTo(CClientEntity* pEntity);
+    virtual void   AttachTo(CClientEntity* entity, eBone bone);
     virtual void   GetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
     virtual void   SetAttachedOffsets(CVector& vecPosition, CVector& vecRotation);
+    eBone          GetAttachedBone() const { return m_attachedBone; }
+    void           SetAttachedBone(eBone bone) { m_attachedBone = bone; }
+    bool           IsAttachedToBone() const { return m_attachedBone != BONE_ROOT; }
     bool           IsEntityAttached(CClientEntity* pEntity);
     bool           IsAttachedToElement(CClientEntity* pEntity, bool bRecursive = true);
     uint           GetAttachedEntityCount() { return m_AttachedEntities.size(); }
@@ -360,6 +365,7 @@ protected:
     CClientEntity*              m_pAttachedToEntity;
     CVector                     m_vecAttachedPosition;
     CVector                     m_vecAttachedRotation;
+    eBone                       m_attachedBone;
     std::vector<CClientEntity*> m_AttachedEntities;
     bool                        m_bDisallowAttaching;  // Protect against attaching in destructor
 

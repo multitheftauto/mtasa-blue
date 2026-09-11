@@ -272,6 +272,9 @@ public:
     bool GetUsesCollision();
     void SetUsesCollision(bool bUsesCollision);
 
+    bool GetBoneMatrix(eBone bone, CMatrix& outMatrix);
+    void UpdateBoneAttachments();
+
     float GetMaxHealth();
     float GetHealth();
     void  SetHealth(float fHealth);
