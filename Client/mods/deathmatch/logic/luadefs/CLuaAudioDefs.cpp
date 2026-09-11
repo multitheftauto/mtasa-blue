@@ -13,13 +13,11 @@
 #include <lua/CLuaFunctionParser.h>
 #include "CBassAudio.h"
 
-#include <algorithm>
 #include <array>
 #include <cctype>
 #include <cmath>
 #include <memory>
 #include <ranges>
-#include <stdexcept>
 
 static bool IsValidFFTBandCount(int length, int bands) noexcept
 {
