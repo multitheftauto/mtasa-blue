@@ -384,6 +384,7 @@ void CClientVehicle::GetPosition(CVector& vecPosition) const
 static bool CanMoveOccupantWithVehicle(CClientPed* pOccupant)
 {
     const int iState = pOccupant->GetVehicleInOutState();
+
     return (iState != VEHICLE_INOUT_GETTING_OUT && iState != VEHICLE_INOUT_GETTING_JACKED) || pOccupant->GetRealOccupiedVehicle();
 }
 
@@ -394,6 +395,7 @@ void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpol
     {
         // If move is big enough, do ground checks
         float DistanceMoved = (m_Matrix.vPos - vecPosition).Length();
+
         if (DistanceMoved > 50 && !IsFrozen() && bAllowGroundLoadFreeze)
             SetFrozenWaitingForGroundToLoad(true, true);
     }
@@ -408,6 +410,7 @@ void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpol
         {
             CVector vecMoveSpeed;
             m_pVehicle->GetMoveSpeed(&vecMoveSpeed);
+
             if (vecMoveSpeed.fX == 0.0f && vecMoveSpeed.fY == 0.0f && vecMoveSpeed.fZ == 0.0f)
             {
                 vecMoveSpeed.fZ -= 0.01f;
@@ -415,6 +418,7 @@ void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpol
             }
         }
     }
+
     // Have we moved to a different position?
     if (m_Matrix.vPos != vecPosition)
     {
