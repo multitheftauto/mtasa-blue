@@ -57,6 +57,7 @@ public:
     static bool           GetElementMatrix(CElement* pElement, CMatrix& matrix);
     static bool           GetElementPosition(CElement* pElement, CVector& vecPosition);
     static bool           GetElementRotation(CElement* pElement, CVector& vecRotation, eEulerRotationOrder rotationOrder);
+    static bool           GetElementScale(CElement* pElement, CVector& vecScale);
     static bool           GetElementVelocity(CElement* pElement, CVector& vecVelocity);
     static bool           GetElementTurnVelocity(CElement* pElement, CVector& vecTurnVelocity);
     static bool           GetElementInterior(CElement* pElement, unsigned char& ucInterior);
@@ -93,6 +94,7 @@ public:
     static bool SetElementMatrix(CElement* pElement, const CMatrix& matrix);
     static bool SetElementPosition(CElement* pElement, const CVector& vecPosition, bool bWarp = true);
     static bool SetElementRotation(CElement* pElement, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay);
+    static bool SetElementScale(CElement* pElement, const CVector& vecScale);
     static bool SetElementVelocity(CElement* pElement, const CVector& vecVelocity);
     static bool SetElementAngularVelocity(CElement* pElement, const CVector& vecTurnVelocity);
     static bool SetElementVisibleTo(CElement* pElement, CElement* pReference, bool bVisible);

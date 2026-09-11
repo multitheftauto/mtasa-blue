@@ -25,6 +25,7 @@ CBuilding::CBuilding(CElement* pParent, CBuildingManager* pBuildingManager) : CE
 
     m_pBuildingManager = pBuildingManager;
     m_model = 0xFFFF;
+    m_vecScale = CVector(1.0f, 1.0f, 1.0f);
     m_bDoubleSided = false;
     m_bCollisionsEnabled = true;
     m_ucAlpha = 255;
@@ -46,6 +47,7 @@ CBuilding::CBuilding(const CBuilding& Copy) : CElement(Copy.m_pParent), m_pLowLo
     m_bDoubleSided = Copy.m_bDoubleSided;
     m_vecPosition = Copy.m_vecPosition;
     m_vecRotation = Copy.m_vecRotation;
+    m_vecScale = Copy.m_vecScale;
     m_bCollisionsEnabled = Copy.m_bCollisionsEnabled;
     m_ucAlpha = Copy.m_ucAlpha;
     m_pHighLodBuilding = nullptr;

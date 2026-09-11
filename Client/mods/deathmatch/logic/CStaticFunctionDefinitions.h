@@ -62,6 +62,7 @@ public:
     static bool           GetElementMatrix(CClientEntity& Entity, CMatrix& matrix);
     static bool           GetElementPosition(CClientEntity& Entity, CVector& vecPosition);
     static bool           GetElementRotation(CClientEntity& Entity, CVector& vecRotation, eEulerRotationOrder rotationOrder);
+    static bool           GetElementScale(CClientEntity& Entity, CVector& vecScale);
     static bool           GetElementVelocity(CClientEntity& Entity, CVector& vecVelocity);
     static bool           GetElementTurnVelocity(CClientEntity& Entity, CVector& vecTurnVelocity);
     static bool           GetElementInterior(CClientEntity& Entity, unsigned char& ucInterior);
@@ -91,6 +92,7 @@ public:
     static bool          SetElementMatrix(CClientEntity& Entity, const CMatrix& matrix);
     static bool          SetElementPosition(CClientEntity& Entity, const CVector& vecPosition, bool bWarp = true);
     static bool          SetElementRotation(CClientEntity& Entity, const CVector& vecRotation, eEulerRotationOrder rotationOrder, bool bNewWay);
+    static bool          SetElementScale(CClientEntity& Entity, const CVector& vecScale);
     static bool          SetElementVelocity(CClientEntity& Element, const CVector& vecVelocity);
     static bool          SetElementAngularVelocity(CClientEntity& Element, const CVector& vecTurnVelocity);
     static bool          SetElementParent(CClientEntity& Element, CClientEntity& Parent, CLuaMain* pLuaMain);

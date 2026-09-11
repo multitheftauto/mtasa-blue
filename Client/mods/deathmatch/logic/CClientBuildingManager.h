@@ -41,7 +41,12 @@ public:
     void RestoreDestroyed();
     void RestoreDestroyedSafe();
 
+    void UpdateScaledBuildings();
+
 private:
+    void AddToScaledList(CClientBuilding* pBuilding);
+    void RemoveFromScaledList(CClientBuilding* pBuilding);
+
     bool DoPoolResize(size_t newCapacity);
     void AddToList(CClientBuilding* pBuilding)
     {
@@ -51,6 +56,7 @@ private:
     void RemoveFromList(CClientBuilding* pBuilding);
 
     std::list<CClientBuilding*> m_List;
+    std::list<CClientBuilding*> m_ScaledBuildings;
     bool                        m_bRemoveFromList;
     unsigned short              m_usDimension{0};
 };
