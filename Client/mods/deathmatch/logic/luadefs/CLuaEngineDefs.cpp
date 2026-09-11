@@ -1158,7 +1158,7 @@ int CLuaEngineDefs::EngineResetModelLODDistance(lua_State* luaVM)
     argStream.ReadString(strModel);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     uint32_t    modelId = CModelNames::ResolveModelID(strModel);
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
@@ -1581,7 +1581,7 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     }
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     CLuaMain*  pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     CResource* pParentResource = pLuaMain->GetResource();
@@ -2017,7 +2017,7 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
         if (modelId >= g_pGame->GetBaseIDforTXD())
         {
             argStream.SetCustomError(SString("Expected model ID in range [0-%u] at argument 1", g_pGame->GetBaseIDforTXD() - 1));
-            return luaL_error(luaVM, argStream.GetFullErrorMessage());
+            return argStream.ThrowError();
         }
 
         if (auto pModelInfo = g_pGame->GetModelInfo(modelId); pModelInfo != nullptr)
@@ -2030,7 +2030,7 @@ int CLuaEngineDefs::EngineGetModelPhysicalPropertiesGroup(lua_State* luaVM)
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
 
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
@@ -2048,13 +2048,13 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
         if (modelId > g_pGame->GetBaseIDforTXD() - 1)
         {
             argStream.SetCustomError(SString("Expected model ID in range [0-%u] at argument 1", g_pGame->GetBaseIDforTXD() - 1));
-            return luaL_error(luaVM, argStream.GetFullErrorMessage());
+            return argStream.ThrowError();
         }
 
         if (iNewGroup < -1 || iNewGroup > 159)
         {
             argStream.SetCustomError("Expected group ID in range [0-159] or -1 at argument 1");
-            return luaL_error(luaVM, argStream.GetFullErrorMessage());
+            return argStream.ThrowError();
         }
 
         if (auto pModelInfo = g_pGame->GetModelInfo(modelId); pModelInfo != nullptr)
@@ -2067,7 +2067,7 @@ int CLuaEngineDefs::EngineSetModelPhysicalPropertiesGroup(lua_State* luaVM)
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
 
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
@@ -2083,7 +2083,7 @@ int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
         if (modelId > g_pGame->GetBaseIDforTXD() - 1)
         {
             argStream.SetCustomError(SString("Expected model ID in range [0-%u] at argument 1", g_pGame->GetBaseIDforTXD() - 1));
-            return luaL_error(luaVM, argStream.GetFullErrorMessage());
+            return argStream.ThrowError();
         }
 
         if (auto pModelInfo = g_pGame->GetModelInfo(modelId); pModelInfo != nullptr)
@@ -2096,7 +2096,7 @@ int CLuaEngineDefs::EngineRestoreModelPhysicalPropertiesGroup(lua_State* luaVM)
         argStream.SetCustomError("Expected valid model ID at argument 1");
     }
 
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 std::unordered_map<ObjectGroupPhysicalProperties::Modifiable, std::function<void(CObjectGroupPhysicalProperties*, float)>> g_GroupPropertiesSettersFloat{
@@ -2135,19 +2135,19 @@ int CLuaEngineDefs::EngineSetObjectGroupPhysicalProperty(lua_State* luaVM)
     argStream.ReadEnumString(eProperty);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (iGivenGroup < 0 || iGivenGroup > 159)
     {
         argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
     }
 
     auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(static_cast<unsigned char>(iGivenGroup));
     if (!pGroup)
     {
         argStream.SetCustomError("Expected valid group ID at argument 1");
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
     }
 
     switch (eProperty)
@@ -2284,7 +2284,7 @@ int CLuaEngineDefs::EngineSetObjectGroupPhysicalProperty(lua_State* luaVM)
         }
     }
 
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 std::unordered_map<ObjectGroupPhysicalProperties::Modifiable, std::function<float(CObjectGroupPhysicalProperties*)>> g_GroupPropertiesGettersFloat{
@@ -2319,19 +2319,19 @@ int CLuaEngineDefs::EngineGetObjectGroupPhysicalProperty(lua_State* luaVM)
     argStream.ReadEnumString(eProperty);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (iGivenGroup < 0 || iGivenGroup > 159)
     {
         argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
     }
 
     auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(static_cast<unsigned char>(iGivenGroup));
     if (!pGroup)
     {
         argStream.SetCustomError("Expected valid group ID at argument 1");
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
     }
 
     switch (eProperty)
@@ -2408,7 +2408,7 @@ int CLuaEngineDefs::EngineGetObjectGroupPhysicalProperty(lua_State* luaVM)
         }
     }
 
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
@@ -2420,19 +2420,19 @@ int CLuaEngineDefs::EngineRestoreObjectGroupPhysicalProperties(lua_State* luaVM)
     argStream.ReadNumber(iGivenGroup);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (iGivenGroup < 0 || iGivenGroup > 159)
     {
         argStream.SetCustomError("Expected group ID in range [0-159] at argument 1");
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
     }
 
     auto pGroup = g_pGame->GetObjectGroupPhysicalProperties(static_cast<unsigned char>(iGivenGroup));
     if (!pGroup)
     {
         argStream.SetCustomError("Expected valid group ID at argument 1");
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
     }
 
     pGroup->RestoreDefault();

@@ -224,7 +224,7 @@ int CLuaXMLDefs::xmlLoadString(lua_State* luaVM)
     argStream.ReadString(strXmlContent);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     // Grab our resource
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);

@@ -18,19 +18,7 @@ class CLuaArgument;
 #include "lua/CLuaStackChecker.h"
 #include "lua/LuaBasic.h"
 #include <lua/CLuaMultiReturn.h>
-
-class LuaFunctionError
-{
-protected:
-    const char* m_message;
-    bool        m_bWarning;
-
-public:
-    constexpr LuaFunctionError(const char* what, bool throwWarning = true) noexcept : m_message(what), m_bWarning(throwWarning) {}
-
-    constexpr const char* what() const noexcept { return m_message; }
-    constexpr bool        IsWarning() const noexcept { return m_bWarning; }
-};
+#include "CLuaFunctionError.h"
 
 using LuaVarArgs = std::optional<CLuaArguments>;
 
