@@ -432,6 +432,14 @@ CLuaArgument* CLuaArguments::PushTable(CLuaArguments* table)
     return pArgument;
 }
 
+CLuaArgument* CLuaArguments::PushVector(float x, float y, float z, float w)
+{
+    CLuaArgument* pArgument = new CLuaArgument();
+    pArgument->ReadVector(x, y, z, w);
+    m_Arguments.push_back(pArgument);
+    return pArgument;
+}
+
 // Gets rid of all the arguments in the list
 void CLuaArguments::DeleteArguments()
 {

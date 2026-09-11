@@ -92,6 +92,10 @@ typedef void * (*lua_Alloc) (void *ud, void *ptr, size_t osize, size_t nsize);
 #define LUA_TFUNCTION		6
 #define LUA_TUSERDATA		7
 #define LUA_TTHREAD		8
+#define LUA_TVEC		9
+
+/* LUA_VEC - Number of components in a vec */
+#define LUA_VEC_SIZE		4
 
 
 
@@ -170,6 +174,7 @@ LUA_API lua_CFunction   (lua_tocfunction) (lua_State *L, int idx);
 LUA_API void	       *(lua_touserdata) (lua_State *L, int idx);
 LUA_API lua_State      *(lua_tothread) (lua_State *L, int idx);
 LUA_API const void     *(lua_topointer) (lua_State *L, int idx);
+LUA_API const float    *(lua_tovec) (lua_State *L, int idx);
 
 // Custom function added by MTA
 LUA_API unsigned        (lua_tostringhash) (lua_State *L, int idx);
@@ -190,6 +195,7 @@ LUA_API void  (lua_pushcclosure) (lua_State *L, lua_CFunction fn, int n);
 LUA_API void  (lua_pushboolean) (lua_State *L, int b);
 LUA_API void  (lua_pushlightuserdata) (lua_State *L, void *p);
 LUA_API int   (lua_pushthread) (lua_State *L);
+LUA_API void  (lua_pushvec) (lua_State *L, float x, float y, float z, float w);
 
 /*
 ** get functions (Lua -> stack)
@@ -296,6 +302,7 @@ LUA_API void lua_setallocf (lua_State *L, lua_Alloc f, void *ud);
 #define lua_isthread(L,n)	(lua_type(L, (n)) == LUA_TTHREAD)
 #define lua_isnone(L,n)		(lua_type(L, (n)) == LUA_TNONE)
 #define lua_isnoneornil(L, n)	(lua_type(L, (n)) <= 0)
+#define lua_isvec(L, n)		(lua_type(L, (n)) == LUA_TVEC)
 
 #define lua_pushliteral(L, s)	\
 	lua_pushlstring(L, "" s, (sizeof(s)/sizeof(char))-1)

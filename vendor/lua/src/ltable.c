@@ -91,6 +91,15 @@ static Node *hashnum (const Table *t, lua_Number n) {
   return hashmod(t, a[0]);
 }
 
+/*
+** hash for Vectors (LUA-VEC)
+*/
+static Node *hashvec (const Table *t, const float *v) {
+  unsigned int a[4];
+  memcpy(a, v, sizeof(a));
+  unsigned int h = a[0] ^ (a[1] << 5) ^ (a[2] << 11) ^ (a[3] << 17);
+  return hashmod(t, h);
+}
 
 
 /*
@@ -107,6 +116,8 @@ static Node *mainposition (const Table *t, const TValue *key) {
       return hashboolean(t, bvalue(key));
     case LUA_TLIGHTUSERDATA:
       return hashpointer(t, pvalue(key));
+    case LUA_TVEC:
+      return hashvec(t, vvalue(key)->vec);
     default:
       return hashpointer(t, gcvalue(key));
   }

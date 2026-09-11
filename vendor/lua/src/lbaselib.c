@@ -340,6 +340,23 @@ static int luaB_assert (lua_State *L) {
 
 
 static int luaB_unpack (lua_State *L) {
+  if (lua_type(L, 1) == LUA_TVEC) {
+    const float *v = lua_tovec(L, 1);
+    if (v != NULL) {
+      if (v[3] == 0.0f) {
+        lua_pushnumber(L, (lua_Number)v[0]);
+        lua_pushnumber(L, (lua_Number)v[1]);
+        lua_pushnumber(L, (lua_Number)v[2]);
+        return 3;
+      } else {
+        lua_pushnumber(L, (lua_Number)v[0]);
+        lua_pushnumber(L, (lua_Number)v[1]);
+        lua_pushnumber(L, (lua_Number)v[2]);
+        lua_pushnumber(L, (lua_Number)v[3]);
+        return 4;
+      }
+    }
+  }
   int i, e, n;
   luaL_checktype(L, 1, LUA_TTABLE);
   i = luaL_optint(L, 2, 1);
@@ -410,6 +427,19 @@ static int luaB_tostring (lua_State *L) {
     case LUA_TNIL:
       lua_pushliteral(L, "nil");
       break;
+    case LUA_TVEC: {
+      const float *v = lua_tovec(L, 1);
+      if (v != NULL) {
+        if (v[3] == 0.0f) {
+          lua_pushfstring(L, "vector(%f, %f, %f)", (double)v[0], (double)v[1], (double)v[2]);
+        } else {
+          lua_pushfstring(L, "vector(%f, %f, %f, %f)", (double)v[0], (double)v[1], (double)v[2], (double)v[3]);
+        }
+      } else {
+        lua_pushliteral(L, "vector");
+      }
+      break;
+    }
     default:
       lua_pushfstring(L, "%s: %p", luaL_typename(L, 1), lua_topointer(L, 1));
       break;
