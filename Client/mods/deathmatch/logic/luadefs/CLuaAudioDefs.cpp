@@ -94,6 +94,7 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, con
     if (resource)
     {
         CClientSound* sound = m_pManager->GetSoundManager()->PlaySound2D(soundPath, isURL, isRawData, loop.value_or(false), throttle.value_or(true));
+
         if (sound)
         {
             sound->SetParent(resource->GetResourceDynamicEntity());
@@ -135,6 +136,7 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, c
     if (resource)
     {
         CClientSound* sound = m_pManager->GetSoundManager()->PlaySound3D(soundPath, isURL, isRawData, position, loop.value_or(false), throttle.value_or(true));
+
         if (sound)
         {
             sound->SetParent(resource->GetResourceDynamicEntity());
@@ -626,6 +628,7 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
             throw LuaFunctionError("Effect's parameters can't be set unless it's enabled");
 
         using namespace SoundEffectParams;
+
         switch (effectType)
         {
             case SoundEffectType::FX_DX8_CHORUS:
@@ -634,8 +637,10 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                 soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
                 Chorus effectParameterType;
+
                 if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
+
                 switch (effectParameterType)
                 {
                     case Chorus::WET_DRY_MIX:
@@ -690,8 +695,10 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                 soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
                 Compressor effectParameterType;
+
                 if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
+
                 switch (effectParameterType)
                 {
                     case Compressor::GAIN:
@@ -740,8 +747,10 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                 soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
                 Distortion effectParameterType;
+
                 if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
+
                 switch (effectParameterType)
                 {
                     case Distortion::GAIN:
@@ -784,8 +793,10 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                 soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
                 Echo effectParameterType;
+
                 if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
+
                 switch (effectParameterType)
                 {
                     case Echo::WET_DRY_MIX:
@@ -830,8 +841,10 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                 soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
                 Flanger effectParameterType;
+
                 if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
+
                 switch (effectParameterType)
                 {
                     case Flanger::WET_DRY_MIX:
@@ -886,8 +899,10 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                 soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
                 Gargle effectParameterType;
+
                 if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
+
                 switch (effectParameterType)
                 {
                     case Gargle::RATE_HZ:
@@ -912,8 +927,10 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                 soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
                 I3DL2Reverb effectParameterType;
+
                 if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
+
                 switch (effectParameterType)
                 {
                     case I3DL2Reverb::ROOM:
@@ -998,8 +1015,10 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                 soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
                 ParamEq effectParameterType;
+
                 if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
+
                 switch (effectParameterType)
                 {
                     case ParamEq::CENTER:
@@ -1030,8 +1049,10 @@ bool CLuaAudioDefs::SetSoundEffectParameter(std::variant<CClientSound*, CClientP
                 soundElement->GetFxEffectParameters((std::uint32_t)effectType, &params);
 
                 Reverb effectParameterType;
+
                 if (!StringToEnum(effectParameter, effectParameterType))
                     return false;
+
                 switch (effectParameterType)
                 {
                     case Reverb::IN_GAIN:
@@ -1080,6 +1101,7 @@ auto CLuaAudioDefs::GetSoundEffectParameters(std::variant<CClientSound*, CClient
 
     CClientSound*      soundElement = nullptr;
     PlayerVoiceWrapper playerVoice;
+
     if (auto* soundPtr = std::get_if<CClientSound*>(&sound))
         soundElement = *soundPtr;
     else if (auto* playerPtr = std::get_if<CClientPlayer*>(&sound))

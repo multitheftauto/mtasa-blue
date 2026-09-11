@@ -203,4 +203,5 @@ public:
     CAnimBlendAssociation* m_anim;
     unsigned int           m_spentWaitingMs;
 };
+
 static_assert(sizeof(CTaskSimpleStealthKillSAInterface) == 0x20, "Invalid CTaskSimpleStealthKillSAInterface size");
