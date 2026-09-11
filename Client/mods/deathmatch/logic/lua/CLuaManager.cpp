@@ -218,9 +218,9 @@ void CLuaManager::LoadCFunctions()
         {"toggleAllControls", CLuaFunctionDefs::ToggleAllControls},
 
         // Command funcs
-        {"addCommandHandler", CLuaFunctionDefs::AddCommandHandler},
-        {"removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler},
-        {"executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler},
+        {"addCommandHandler", CLuaDefs::ArgumentParser<CLuaFunctionDefs::AddCommandHandler>},
+        {"removeCommandHandler", CLuaDefs::ArgumentParser<CLuaFunctionDefs::RemoveCommandHandler>},
+        {"executeCommandHandler", CLuaDefs::ArgumentParser<CLuaFunctionDefs::ExecuteCommandHandler>},
         {"getCommandHandlers", CLuaFunctionDefs::GetCommandHandlers},
 
         // Utility

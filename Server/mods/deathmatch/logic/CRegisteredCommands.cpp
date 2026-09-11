@@ -22,9 +22,9 @@
 #include "CScriptDebugging.h"
 #include "CMainConfig.h"
 
-CRegisteredCommands::CRegisteredCommands(CAccessControlListManager* pACLManager)
+CRegisteredCommands::CRegisteredCommands(CAccessControlListManager* aclManager)
 {
-    m_pACLManager = pACLManager;
+    m_pACLManager = aclManager;
     m_bIteratingList = false;
 }
 
@@ -33,24 +33,24 @@ CRegisteredCommands::~CRegisteredCommands()
     ClearCommands();
 }
 
-bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bRestricted, bool bCaseSensitive)
+bool CRegisteredCommands::AddCommand(CLuaMain* luaMain, const char* commandName, const CLuaFunctionRef& luaFunction, bool restricted, bool caseSensitive)
 {
-    assert(pLuaMain);
-    assert(szKey);
+    assert(luaMain);
+    assert(commandName);
 
-    if (CommandExists(szKey, nullptr))
+    if (CommandExists(commandName, nullptr))
     {
-        auto policy = static_cast<MultiCommandHandlerPolicy>(g_pGame->GetConfig()->GetAllowMultiCommandHandlers());
+        const auto policy = static_cast<MultiCommandHandlerPolicy>(g_pGame->GetConfig()->GetAllowMultiCommandHandlers());
 
         switch (policy)
         {
             case MultiCommandHandlerPolicy::BLOCK:
                 g_pGame->GetScriptDebugging()->LogError(
-                    pLuaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", szKey);
+                    luaMain->GetVM(), "addCommandHandler: Duplicate command registration blocked for '%s' (multiple handlers disabled)", commandName);
                 return false;
 
             case MultiCommandHandlerPolicy::WARN:
-                g_pGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "Attempt to register duplicate command '%s'", szKey);
+                g_pGame->GetScriptDebugging()->LogWarning(luaMain->GetVM(), "Attempt to register duplicate command '%s'", commandName);
                 break;
 
             case MultiCommandHandlerPolicy::ALLOW:
@@ -60,48 +60,45 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
     }
 
     // Check if we already have this key and handler
-    SCommand* pCommand = GetCommand(szKey, pLuaMain);
+    SCommand* existingCommand = GetCommand(commandName, luaMain);
 
-    if (pCommand && iLuaFunction == pCommand->iLuaFunction)
+    if (existingCommand && luaFunction == existingCommand->luaFunction)
         return false;
 
     // Create the entry
-    pCommand = new SCommand;
-    pCommand->pLuaMain = pLuaMain;
-    pCommand->strKey.AssignLeft(szKey, MAX_REGISTERED_COMMAND_LENGTH);
-    pCommand->iLuaFunction = iLuaFunction;
-    pCommand->bRestricted = bRestricted;
-    pCommand->bCaseSensitive = bCaseSensitive;
+    auto command = new SCommand;
+    command->luaMain = luaMain;
+    command->commandName.AssignLeft(commandName, MAX_REGISTERED_COMMAND_LENGTH);
+    command->luaFunction = luaFunction;
+    command->restricted = restricted;
+    command->caseSensitive = caseSensitive;
 
     // Add it to our list
-    m_Commands.push_back(pCommand);
+    m_Commands.push_back(command);
 
     return true;
 }
 
-bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction)
+bool CRegisteredCommands::RemoveCommand(CLuaMain* luaMain, const char* commandName, const CLuaFunctionRef& luaFunction)
 {
-    assert(pLuaMain);
-    assert(szKey);
+    assert(luaMain);
+    assert(commandName);
 
     // Call the handler for every virtual machine that matches the given key
-    int                            iCompareResult;
-    bool                           bFound = false;
+    bool                           found = false;
     std::list<SCommand*>::iterator iter = m_Commands.begin();
 
     while (iter != m_Commands.end())
     {
-        if ((*iter)->bCaseSensitive)
-            iCompareResult = strcmp((*iter)->strKey.c_str(), szKey);
-        else
-            iCompareResult = stricmp((*iter)->strKey.c_str(), szKey);
+        const int compareResult =
+            (*iter)->caseSensitive ? strcmp((*iter)->commandName.c_str(), commandName) : stricmp((*iter)->commandName.c_str(), commandName);
 
         // Matching VM's and names?
-        if ((*iter)->pLuaMain == pLuaMain && iCompareResult == 0)
+        if ((*iter)->luaMain == luaMain && compareResult == 0)
         {
-            if (VERIFY_FUNCTION(iLuaFunction) && (*iter)->iLuaFunction != iLuaFunction)
+            if (VERIFY_FUNCTION(luaFunction) && (*iter)->luaFunction != luaFunction)
             {
-                iter++;
+                ++iter;
                 continue;
             }
 
@@ -117,30 +114,28 @@ bool CRegisteredCommands::RemoveCommand(CLuaMain* pLuaMain, const char* szKey, c
                 iter = m_Commands.erase(iter);
             }
 
-            bFound = true;
+            found = true;
         }
         else
             ++iter;
     }
 
-    return bFound;
+    return found;
 }
 
 void CRegisteredCommands::ClearCommands()
 {
     // Delete all the commands
-    std::list<SCommand*>::const_iterator iter = m_Commands.begin();
-
-    for (; iter != m_Commands.end(); iter++)
-        delete *iter;
+    for (SCommand* command : m_Commands)
+        delete command;
 
     // Clear the list
     m_Commands.clear();
 }
 
-void CRegisteredCommands::CleanUpForVM(CLuaMain* pLuaMain)
+void CRegisteredCommands::CleanUpForVM(CLuaMain* luaMain)
 {
-    assert(pLuaMain);
+    assert(luaMain);
 
     // Delete every command that matches
     std::list<SCommand*>::iterator iter = m_Commands.begin();
@@ -148,7 +143,7 @@ void CRegisteredCommands::CleanUpForVM(CLuaMain* pLuaMain)
     while (iter != m_Commands.end())
     {
         // Matching VM's?
-        if ((*iter)->pLuaMain == pLuaMain)
+        if ((*iter)->luaMain == luaMain)
         {
             // Delete the entry and remove it from the list
             delete *iter;
@@ -159,42 +154,39 @@ void CRegisteredCommands::CleanUpForVM(CLuaMain* pLuaMain)
     }
 }
 
-bool CRegisteredCommands::CommandExists(const char* szKey, CLuaMain* pLuaMain)
+bool CRegisteredCommands::CommandExists(const char* commandName, CLuaMain* luaMain)
 {
-    assert(szKey);
+    assert(commandName);
 
-    return GetCommand(szKey, pLuaMain) != nullptr;
+    return GetCommand(commandName, luaMain) != nullptr;
 }
 
-bool CRegisteredCommands::ProcessCommand(const char* szKey, const char* szArguments, CClient* pClient)
+bool CRegisteredCommands::ProcessCommand(const char* commandName, const char* arguments, CClient* client)
 {
-    assert(szKey);
+    assert(commandName);
 
     // Call the handler for every virtual machine that matches the given key
-    bool                                 bHandled = false;
-    int                                  iCompareResult;
+    bool                                 handled = false;
     std::list<SCommand*>::const_iterator iter = m_Commands.begin();
 
     m_bIteratingList = true;
 
-    for (; iter != m_Commands.end(); iter++)
+    for (; iter != m_Commands.end(); ++iter)
     {
-        if ((*iter)->bCaseSensitive)
-            iCompareResult = strcmp((*iter)->strKey.c_str(), szKey);
-        else
-            iCompareResult = stricmp((*iter)->strKey.c_str(), szKey);
+        const int compareResult =
+            (*iter)->caseSensitive ? strcmp((*iter)->commandName.c_str(), commandName) : stricmp((*iter)->commandName.c_str(), commandName);
 
         // Matching names?
-        if (iCompareResult == 0)
+        if (compareResult == 0)
         {
             if (m_pACLManager->CanObjectUseRight(
-                    pClient->GetAccount()->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, (*iter)->strKey,
+                    client->GetAccount()->GetName().c_str(), CAccessControlListGroupObject::OBJECT_TYPE_USER, (*iter)->commandName,
                     CAccessControlListRight::RIGHT_TYPE_COMMAND,
-                    !(*iter)->bRestricted))  // If this command is restricted, the default access should be false unless granted specially
+                    !(*iter)->restricted))  // If this command is restricted, the default access should be false unless granted specially
             {
                 // Call it
-                CallCommandHandler((*iter)->pLuaMain, (*iter)->iLuaFunction, (*iter)->strKey, szArguments, pClient);
-                bHandled = true;
+                CallCommandHandler((*iter)->luaMain, (*iter)->luaFunction, (*iter)->commandName, arguments, client);
+                handled = true;
             }
         }
     }
@@ -203,124 +195,125 @@ bool CRegisteredCommands::ProcessCommand(const char* szKey, const char* szArgume
     TakeOutTheTrash();
 
     // Return whether some handler was called or not
-    return bHandled;
+    return handled;
 }
 
-CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand(const char* szKey, class CLuaMain* pLuaMain)
+CRegisteredCommands::SCommand* CRegisteredCommands::GetCommand(const char* commandName, class CLuaMain* luaMain)
 {
-    assert(szKey);
+    assert(commandName);
 
     // Try to find an entry with a matching name in our list
-    int                                  iCompareResult;
-    std::list<SCommand*>::const_iterator iter = m_Commands.begin();
-
-    for (; iter != m_Commands.end(); iter++)
+    for (SCommand* command : m_Commands)
     {
-        if ((*iter)->bCaseSensitive)
-            iCompareResult = strcmp((*iter)->strKey.c_str(), szKey);
-        else
-            iCompareResult = stricmp((*iter)->strKey.c_str(), szKey);
+        const int compareResult =
+            command->caseSensitive ? strcmp(command->commandName.c_str(), commandName) : stricmp(command->commandName.c_str(), commandName);
 
         // Matching name and no given VM or matching VM
-        if (iCompareResult == 0 && (!pLuaMain || pLuaMain == (*iter)->pLuaMain))
-            return *iter;
+        if (compareResult == 0 && (!luaMain || luaMain == command->luaMain))
+            return command;
     }
 
     // Doesn't exist
     return nullptr;
 }
 
-void CRegisteredCommands::CallCommandHandler(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments,
-                                             CClient* pClient)
+void CRegisteredCommands::CallCommandHandler(CLuaMain* luaMain, const CLuaFunctionRef& luaFunction, const char* commandName, const char* arguments,
+                                             CClient* client)
 {
-    assert(pLuaMain);
-    assert(szKey);
+    assert(luaMain);
+    assert(commandName);
 
-    CLuaArguments Arguments;
+    CLuaArguments luaArguments;
 
     // First, try to call a handler with the same number of arguments
-    if (pClient)
+    if (client)
     {
-        switch (pClient->GetClientType())
+        switch (client->GetClientType())
         {
             case CClient::CLIENT_PLAYER:
             {
-                Arguments.PushElement(static_cast<CPlayer*>(pClient));
+                luaArguments.PushElement(static_cast<CPlayer*>(client));
                 break;
             }
             case CClient::CLIENT_CONSOLE:
             {
-                Arguments.PushElement(static_cast<CConsoleClient*>(pClient));
+                luaArguments.PushElement(static_cast<CConsoleClient*>(client));
                 break;
             }
             default:
             {
-                Arguments.PushBoolean(false);
+                luaArguments.PushBoolean(false);
                 break;
             }
         }
     }
     else
-        Arguments.PushBoolean(false);
+        luaArguments.PushBoolean(false);
 
-    Arguments.PushString(szKey);
+    luaArguments.PushString(commandName);
 
-    if (szArguments)
+    if (arguments && *arguments)
     {
-        // Create a copy and strtok modifies the string
-        char* szTempArguments = new char[strlen(szArguments) + 1];
-        strcpy(szTempArguments, szArguments);
+        // Avoid dynamic heap allocations for typical command arguments (< 512 bytes)
+        char                    stackBuffer[512];
+        char*                   argumentBuffer = stackBuffer;
+        const size_t            argumentLength = strlen(arguments);
+        std::unique_ptr<char[]> heapBuffer;
 
-        char* arg;
-        arg = strtok(szTempArguments, " ");
+        if (argumentLength >= sizeof(stackBuffer))
+        {
+            heapBuffer = std::make_unique<char[]>(argumentLength + 1);
+            argumentBuffer = heapBuffer.get();
+        }
+
+        memcpy(argumentBuffer, arguments, argumentLength + 1);
+        char* arg = strtok(argumentBuffer, " ");
 
         while (arg)
         {
-            Arguments.PushString(arg);
+            luaArguments.PushString(arg);
             arg = strtok(nullptr, " ");
         }
-
-        delete[] szTempArguments;
     }
 
     // Call the handler with the arguments we pushed
-    Arguments.Call(pLuaMain, iLuaFunction);
+    luaArguments.Call(luaMain, luaFunction);
 }
 
 void CRegisteredCommands::GetCommands(lua_State* luaVM)
 {
-    unsigned int uiIndex = 0;
+    unsigned int index = 0;
 
     lua_newtable(luaVM);
 
-    for (SCommand* pCommand : m_Commands)
+    for (SCommand* command : m_Commands)
     {
         // Create an entry table: {'command', resource}
-        lua_pushinteger(luaVM, ++uiIndex);
+        lua_pushinteger(luaVM, ++index);
         lua_createtable(luaVM, 0, 2);
         {
-            lua_pushstring(luaVM, pCommand->strKey.c_str());
+            lua_pushstring(luaVM, command->commandName.c_str());
             lua_rawseti(luaVM, -2, 1);
 
-            lua_pushresource(luaVM, pCommand->pLuaMain->GetResource());
+            lua_pushresource(luaVM, command->luaMain->GetResource());
             lua_rawseti(luaVM, -2, 2);
         }
         lua_settable(luaVM, -3);
     }
 }
 
-void CRegisteredCommands::GetCommands(lua_State* luaVM, CLuaMain* pTargetLuaMain)
+void CRegisteredCommands::GetCommands(lua_State* luaVM, CLuaMain* targetLuaMain)
 {
-    unsigned int uiIndex = 0;
+    unsigned int index = 0;
 
     lua_newtable(luaVM);
 
-    for (SCommand* pCommand : m_Commands)
+    for (SCommand* command : m_Commands)
     {
-        if (pCommand->pLuaMain == pTargetLuaMain)
+        if (command->luaMain == targetLuaMain)
         {
-            lua_pushinteger(luaVM, ++uiIndex);
-            lua_pushstring(luaVM, pCommand->strKey.c_str());
+            lua_pushinteger(luaVM, ++index);
+            lua_pushstring(luaVM, command->commandName.c_str());
             lua_settable(luaVM, -3);
         }
     }
