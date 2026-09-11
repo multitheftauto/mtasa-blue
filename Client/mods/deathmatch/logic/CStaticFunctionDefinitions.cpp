@@ -5207,6 +5207,61 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity)
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity, const CVector& vecTarget)
+{
+    if (!m_pCamera || !pEntity)
+        return false;
+
+    if (pEntity->IsBeingDeleted())
+        return false;
+
+    // Check if the camera is already focused on this entity to avoid unnecessary full camera reset
+    bool isAlreadyTargeted = false;
+    if (pEntity->GetType() == CCLIENTPLAYER)
+    {
+        CClientPlayer* player = static_cast<CClientPlayer*>(pEntity);
+        if (player->IsLocalPlayer())
+        {
+            if (!m_pCamera->IsInFixedMode() && m_pCamera->GetFocusedPlayer() == nullptr && m_pCamera->GetFocusedEntity() == nullptr)
+                isAlreadyTargeted = true;
+        }
+        else
+        {
+            if (m_pCamera->GetFocusedPlayer() == player)
+                isAlreadyTargeted = true;
+        }
+    }
+    else
+    {
+        if (m_pCamera->GetFocusedEntity() == pEntity)
+            isAlreadyTargeted = true;
+    }
+
+    if (!isAlreadyTargeted)
+    {
+        if (!SetCameraTarget(pEntity))
+            return false;
+    }
+
+    // Immediately orient the follow camera towards the requested 3D coordinates
+    m_pCamera->SetOrbitTarget(vecTarget, pEntity);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity, CClientEntity* pTargetLookAtEntity)
+{
+    if (!pTargetLookAtEntity || pTargetLookAtEntity->IsBeingDeleted())
+        return false;
+
+    // Compute look-at position from the target look-at entity (adding eye offset for peds/players)
+    CVector lookAtPosition;
+    pTargetLookAtEntity->GetPosition(lookAtPosition);
+    if (pTargetLookAtEntity->GetType() == CCLIENTPLAYER || pTargetLookAtEntity->GetType() == CCLIENTPED)
+        lookAtPosition.fZ += 0.6f;
+
+    return SetCameraTarget(pEntity, lookAtPosition);
+}
+
 bool CStaticFunctionDefinitions::SetCameraTarget(const CVector& vecTarget)
 {
     if (!m_pCamera)

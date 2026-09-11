@@ -157,4 +157,6 @@ public:
     virtual bool         GetTransitionMatrix(CMatrix& matrix) const = 0;
 
     virtual bool IsSphereVisible(CVector* center, float radius) const = 0;
+    virtual void ClearCamDirectlyBehind() noexcept = 0;
+    virtual void SetPedOrientForBehindOrInFront(float angle) noexcept = 0;
 };

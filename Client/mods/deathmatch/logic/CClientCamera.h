@@ -61,13 +61,14 @@ public:
 
         m_fFOV = fFOV;
     }
-    void SetOrbitTarget(const CVector& vecPosition);
+    void SetOrbitTarget(const CVector& vecPosition, CClientEntity* targetEntity = nullptr);
     void AttachTo(CClientEntity* pElement);
 
     void FadeIn(float fTime);
     void FadeOut(float fTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
 
     CClientPlayer* GetFocusedPlayer() { return m_pFocusedPlayer; };
+    CClientEntity* GetFocusedEntity() { return m_pFocusedEntity; };
     void           SetFocus(CClientEntity* pEntity, eCamMode eMode, bool bSmoothTransition = false);
     void           SetFocus(CClientPlayer* pPlayer, eCamMode eMode, bool bSmoothTransition = false);
     void           SetFocusToLocalPlayer();
