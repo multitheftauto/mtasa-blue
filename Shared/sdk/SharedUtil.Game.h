@@ -12,6 +12,10 @@
 
 #include "SharedUtil.IntTypes.h"
 #include "SharedUtil.Misc.h"
+#include "CVector.h"
+#include <array>
+#include <cstdint>
+#include <optional>
 
 namespace SharedUtil
 {
@@ -132,4 +136,26 @@ namespace SharedUtil
 #define WD_COUNTER_CRASH_CHAIN_BEFORE_ONLINE_GAME    "CR1"  // Counts consecutive crashes before the online game starts
 #define WD_COUNTER_CRASH_CHAIN_BEFORE_LOADING_SCREEN "CR2"  // Counts consecutive crashes before the loading screen is shown
 #define WD_COUNTER_CRASH_CHAIN_BEFORE_USED_MAIN_MENU "CR3"  // Counts consecutive crashes before the main menu is used
+
+    struct SDefaultSirenBeacon
+    {
+        CVector       position;
+        SColor        color;
+        std::uint32_t minAlpha{0};
+    };
+
+    struct SDefaultVehicleSirens
+    {
+        std::uint8_t                       sirenCount{0};
+        std::uint8_t                       sirenType{0};
+        bool                               flag360{false};
+        bool                               doLOSCheck{true};
+        bool                               useRandomiser{true};
+        bool                               sirenSilent{false};
+        std::array<SDefaultSirenBeacon, 8> beacons{};
+    };
+
+    // Retrieves the native GTA:SA siren configuration and coordinates for emergency vehicles
+    std::optional<SDefaultVehicleSirens> GetDefaultVehicleSirens(std::uint16_t modelId) noexcept;
+    bool                                 DoesVehicleModelHaveDefaultSirens(std::uint16_t modelId) noexcept;
 }  // namespace SharedUtil
