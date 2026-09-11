@@ -9,11 +9,29 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CWeaponInfo.h>
+#include <algorithm>
 
 static bool         bWouldBeNewFrame = false;
 static unsigned int nLastFrameTime = 0;
 
 constexpr float kOriginalTimeStep = 50.0f / 30.0f;
+
+// GTA:SA 16-frame counter ceiling at 30 FPS (0x215)
+constexpr unsigned int ThrowableGrenadeTargetMaxMs = 533u;
+
+// 5 frames at 30 FPS: button debounce duration
+constexpr unsigned int ThrowableQuickTapFloorMs = 160u;
+
+// Animation sequence duration to fire keyframe: START_THROW (200ms) + animLoopFire (241ms)
+constexpr unsigned int ThrowableGrenadeHighFpsMaxMs = 441u;
+
+// Satchel sequence duration to fire keyframe: START_THROW (200ms) + animLoop2Fire (155ms)
+constexpr unsigned int ThrowableSatchelHighFpsMaxMs = 355u;
+
+// Compensates for Euler integration and ground slide truncation to equalize throw distance across all frame rates
+constexpr unsigned int ThrowableSatchelNativeMaxMs = 433u;
+constexpr unsigned int ThrowableSatchelMaxFpsCompensationMs = 28u;
 
 // Fixes player movement issue while aiming and walking on high FPS.
 // Only rescales the compare threshold; m_MoveCmd's reset is NOPed separately in InitHooks_FrameRateFixes.
@@ -969,6 +987,84 @@ static void __declspec(naked) HOOK_CDoor__Process_ChassisAngle()
     // clang-format on
 }
 
+// Normalizes throwable attack button counter across all frame rates so quick-taps, partial holds, and full charges
+// produce identical launch speed and trajectory at 240 FPS as native 30 FPS.
+static void FixThrowableThrowCounter(unsigned int* buttonCounter, bool isButtonReleased, unsigned int weaponType)
+{
+    if (!buttonCounter)
+        return;
+
+    const bool isSatchel = (weaponType == WEAPONTYPE_REMOTE_SATCHEL_CHARGE);
+
+    unsigned int targetMax = ThrowableGrenadeTargetMaxMs;
+    if (isSatchel)
+    {
+        const float timeStep = *reinterpret_cast<const float*>(0xB7CB5C);
+        const float timeStepFactor = std::clamp(timeStep / kOriginalTimeStep, 0.0f, 1.0f);
+        const float fpsCompensation = static_cast<float>(ThrowableSatchelMaxFpsCompensationMs) * (1.0f - timeStepFactor);
+        targetMax = ThrowableSatchelNativeMaxMs + static_cast<unsigned int>(fpsCompensation);
+    }
+
+    const unsigned int highFpsMax = isSatchel ? ThrowableSatchelHighFpsMaxMs : ThrowableGrenadeHighFpsMaxMs;
+
+    // Full charge: player held the button all the way until the throw release keyframe, or counter reached high-FPS ceiling
+    if (!isButtonReleased || *buttonCounter >= highFpsMax)
+    {
+        *buttonCounter = targetMax;
+        return;
+    }
+
+    // Quick-tap: enforce native 30 FPS floor
+    if (*buttonCounter <= ThrowableQuickTapFloorMs)
+    {
+        *buttonCounter = ThrowableQuickTapFloorMs;
+        return;
+    }
+
+    // Partial charge: scale linearly between [floor, highFpsMax] -> [floor, targetMax]
+    if (highFpsMax > ThrowableQuickTapFloorMs)
+    {
+        const float progress = static_cast<float>(*buttonCounter - ThrowableQuickTapFloorMs) / static_cast<float>(highFpsMax - ThrowableQuickTapFloorMs);
+        *buttonCounter = ThrowableQuickTapFloorMs + static_cast<unsigned int>(progress * static_cast<float>(targetMax - ThrowableQuickTapFloorMs));
+    }
+
+    if (*buttonCounter > targetMax)
+        *buttonCounter = targetMax;
+}
+
+#define HOOKPOS_CTaskSimpleThrowProjectile__ProcessPed_Force  0x62B01E
+#define HOOKSIZE_CTaskSimpleThrowProjectile__ProcessPed_Force 0xF
+static const unsigned int     RETURN_CTaskSimpleThrowProjectile__ProcessPed_Force = 0x62B02D;
+static void __declspec(naked) HOOK_CTaskSimpleThrowProjectile__ProcessPed_Force()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        // Retrieve active weapon type from ped (edi)
+        movsx eax, byte ptr [edi+0x718]
+        imul eax, 0x1C
+        mov eax, [edi+eax+0x5A0]
+        push eax
+
+        // Retrieve isButtonReleased from CTaskSimpleThrowProjectile (ebx+0x0A)
+        movzx edx, byte ptr [ebx+0x0A]
+        push edx
+
+        // Pass pointer to buttonCounter (ebx+0x20)
+        lea ecx, [ebx+0x20]
+        push ecx
+
+        call FixThrowableThrowCounter
+        add esp, 12
+        popad
+        jmp RETURN_CTaskSimpleThrowProjectile__ProcessPed_Force
+    }
+    // clang-format on
+}
+
 template <unsigned int returnAddress>
 static void __declspec(naked) HOOK_VehicleRapidStopFix()
 {
@@ -1079,4 +1175,5 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CWeapon_Update);
     EZHookInstall(CDoor__Process_ChassisImpulse);
     EZHookInstall(CDoor__Process_ChassisAngle);
+    EZHookInstall(CTaskSimpleThrowProjectile__ProcessPed_Force);
 }
