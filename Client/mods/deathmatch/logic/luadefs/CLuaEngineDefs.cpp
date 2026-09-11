@@ -2578,10 +2578,10 @@ bool CLuaEngineDefs::EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t
         return false;
     }
 
-    const size_t maxSize = g_pGame->GetPools()->GetPoolMaxCapacity(pool);
+    const std::size_t maxSize = g_pGame->GetPools()->GetPoolMaxCapacity(pool);
     if (newSize > maxSize)
     {
-        m_pScriptDebugging->LogWarning(luaVM, "Cannot set the pool capacity to more than the maximum capacity.");
+        m_pScriptDebugging->LogWarning(luaVM, SString("Cannot set the pool capacity to more than the maximum capacity (%d).", maxSize));
         return false;
     }
 
