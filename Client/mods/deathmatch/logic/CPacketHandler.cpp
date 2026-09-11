@@ -1923,6 +1923,7 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                         // A jack victim also leaves through here when the jacker aborts, and his drag
                         // animation may still be playing on clients watching it; let it finish.
                         bool bDontWarpIfGettingDraggedOut = pPed->IsLocalPlayer() || pPed->IsSyncing() || pPed->IsGettingJacked();
+
                         pPed->RemoveFromVehicle(bDontWarpIfGettingDraggedOut);
 
                         if (ucSeat == 0)
@@ -2078,6 +2079,7 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                                 // The confirmation only waits for the jacker's own enter animation, so it can arrive while
                                 // the jacked ped's drag animation still plays on clients watching it; let it finish.
                                 bool bDontWarpIfGettingDraggedOut = pOutsidePed->IsLocalPlayer() || pOutsidePed->IsSyncing() || pOutsidePed->IsGettingJacked();
+
                                 pOutsidePed->RemoveFromVehicle(bDontWarpIfGettingDraggedOut);
 
                                 // Reset interpolation so he won't appear on the roof of the vehicle until next sync

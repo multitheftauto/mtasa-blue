@@ -94,8 +94,10 @@ void CElementRPCs::SetElementData(CClientEntity* pSource, NetBitStreamInterface&
             CLogger::ErrorPrintf("RPC SetElementData name length > MAX_CUSTOMDATA_NAME_LENGTH");
             return;
         }
+
         SString      strName;
         CLuaArgument Argument;
+
         if (bitStream.ReadStringCharacters(strName, usNameLength) && Argument.ReadFromBitStream(bitStream))
         {
             pSource->SetCustomData(CStringName{strName}, Argument);
@@ -113,6 +115,7 @@ void CElementRPCs::RemoveElementData(CClientEntity* pSource, NetBitStreamInterfa
         SString strName;
 
         // Read out the name plus whether it's recursive or not
+
         if (bitStream.ReadStringCharacters(strName, usNameLength) && bitStream.ReadBit(bRecursive))
         {
             // Remove that name
