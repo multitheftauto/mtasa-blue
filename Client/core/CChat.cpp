@@ -1112,6 +1112,17 @@ float CChat::GetTextExtent(const char* szText, float fScale)
     return g_pCore->GetGraphics()->GetDXTextExtent(szText, fScale, g_pChat->m_pDXFont);
 }
 
+SString CChat::BidifyText(const char* szText)
+{
+    if (!szText || szText[0] == '\0')
+        return SString();
+
+    if (!g_pChat || !g_pChat->m_pManager)
+        return szText;
+
+    return g_pChat->m_pManager->BidifyText(szText);
+}
+
 void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX,
                            float fScaleY, bool bOutline, const CRect2D& RenderBounds)
 {
@@ -1175,6 +1186,12 @@ CChatLine::CChatLine()
 void CChatLine::UpdateCreationTime()
 {
     m_ulCreationTime = GetTickCount32();
+}
+
+void CChatLine::ApplyBidi()
+{
+    for (auto& section : m_Sections)
+        section.SetText(section.m_text.c_str());
 }
 
 //
@@ -1243,10 +1260,12 @@ const char* CChatLine::Format(const char* text, float width, CColor& color, bool
 
     if (*sectionEnd == '\0')
     {
+        ApplyBidi();
         return nullptr;
     }
     else if (*sectionEnd == '\n')
     {
+        ApplyBidi();
         return CalcAnsiPtr(text, sectionEnd + 1);
     }
     else
@@ -1259,6 +1278,7 @@ const char* CChatLine::Format(const char* text, float width, CColor& color, bool
             {
                 // The line consists of one huge word. Leave the one section we created as it
                 // is (with the huge word cut off) and return remaining as the rest of the word
+                ApplyBidi();
                 return CalcAnsiPtr(text, sectionEnd);
             }
             else
@@ -1275,6 +1295,7 @@ const char* CChatLine::Format(const char* text, float width, CColor& color, bool
             wstrTemp.resize(lastWrapPoint - sectionStart);
             last.m_text = UTF16ToMbUTF8(wstrTemp);
         }
+        ApplyBidi();
         return CalcAnsiPtr(text, lastWrapPoint);
     }
 }
@@ -1364,6 +1385,12 @@ CChatLineSection& CChatLineSection::operator=(const CChatLineSection& other)
     m_cachedWidth = other.m_cachedWidth;
     m_cachedLength = other.m_cachedLength;
     return *this;
+}
+
+void CChatLineSection::SetText(const char* text)
+{
+    m_text = CChat::BidifyText(text);
+    InvalidateCache();
 }
 
 void CChatLineSection::Draw(const CVector2D& position, unsigned char alpha, bool shadow, bool outline, const CRect2D& renderBounds)
