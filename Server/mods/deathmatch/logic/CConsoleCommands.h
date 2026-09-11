@@ -68,4 +68,5 @@ public:
     static bool DebugJoinFlood(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
     static bool DebugUpTime(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
     static bool FakeLag(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
+    static bool ClearScreen(class CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient);
 };

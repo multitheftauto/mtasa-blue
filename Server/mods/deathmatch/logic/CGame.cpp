@@ -453,11 +453,12 @@ void CGame::GetTag(char* szInfoTag, int iInfoTag)
 
     if (!GetConfig()->GetThreadNetEnabled())
     {
-        strInfoTag += SString(" %c:%c: %u fps", 130, 130, g_pGame->GetServerFPS());
+        strInfoTag += SString(" %c:%c: %u logic / %u fps limit", 130, 130, g_pGame->GetServerFPS(), m_pMainConfig->GetFPSLimit());
     }
     else
     {
-        strInfoTag += SString(" %c:%c: %u fps (%u)", 130, 130, g_pGame->GetSyncFPS(), g_pGame->GetServerFPS());
+        strInfoTag +=
+            SString(" %c:%c: %u sync / %u logic / %u fps limit", 130, 130, g_pGame->GetSyncFPS(), g_pGame->GetServerFPS(), m_pMainConfig->GetFPSLimit());
     }
 
     STRNCPY(szInfoTag, *strInfoTag, iInfoTag);
