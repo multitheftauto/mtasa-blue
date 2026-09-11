@@ -43,9 +43,11 @@ CDownloadableResource::CDownloadableResource(CResource* pResource, eResourceType
     m_uiDownloadSize = uiDownloadSize;
     m_uiHttpServerIndex = 0;
     m_bModifedByScript = false;
-    m_bClientChecksumVerified = false;
+    if (m_bAutoDownload)
+        GenerateClientChecksum();
+    else
+        m_bClientChecksumVerified = false;
 
-    GenerateClientChecksum();
     g_pClientGame->GetResourceManager()->OnAddResourceFile(this);
 }
 

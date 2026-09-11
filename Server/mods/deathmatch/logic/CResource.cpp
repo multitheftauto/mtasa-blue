@@ -35,13 +35,36 @@
 #include <net/SimHeaders.h>
 #include <zip.h>
 #include <glob/glob.h>
-#include "CStaticFunctionDefinitions.h"
+#include <unordered_set>
 
 #ifdef WIN32
     #include <zip/iowin32.h>
 #else
     #include <utime.h>
 #endif
+
+namespace
+{
+    struct CaseInsensitiveStringHasher
+    {
+        std::size_t operator()(const std::string& key) const noexcept
+        {
+            std::size_t hash = 0;
+            for (char c : key)
+            {
+                hash = hash * 31 + static_cast<unsigned char>(tolower(c));
+            }
+            return hash;
+        }
+    };
+
+    struct CaseInsensitiveStringEqual
+    {
+        bool operator()(const std::string& a, const std::string& b) const noexcept { return stricmp(a.c_str(), b.c_str()) == 0; }
+    };
+
+    using CaseInsensitiveStringSet = std::unordered_set<std::string, CaseInsensitiveStringHasher, CaseInsensitiveStringEqual>;
+}
 
 #ifndef MAX_PATH
     #define MAX_PATH 260
@@ -573,6 +596,38 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
             pResourceFile->SetLastChecksum(checksum);
             pResourceFile->SetLastFileSizeHint(FileSize(strPath));
 
+#ifdef WIN32
+            const std::filesystem::path filePath(SharedUtil::FromUTF8(strPath).c_str());
+#else
+            const std::filesystem::path filePath(strPath.c_str());
+#endif
+
+            std::error_code writeTimeError;
+            const auto      lastWriteTime = std::filesystem::last_write_time(filePath, writeTimeError);
+
+            std::error_code fileSizeError;
+            const auto      lastFileSize = std::filesystem::file_size(filePath, fileSizeError);
+
+            if (!writeTimeError && !fileSizeError)
+            {
+                pResourceFile->SetLastWriteTime(lastWriteTime);
+                pResourceFile->SetLastFileSize(lastFileSize);
+                pResourceFile->SetHasFileMetadata(true);
+            }
+            else
+            {
+                if (writeTimeError)
+                {
+                    CLogger::LogPrintf("WARNING: Failed to get last write time for '%s' in resource '%s': %s\n", pResourceFile->GetName(),
+                                       m_strResourceName.c_str(), writeTimeError.message().c_str());
+                }
+                if (fileSizeError)
+                {
+                    CLogger::LogPrintf("WARNING: Failed to get file size for '%s' in resource '%s': %s\n", pResourceFile->GetName(), m_strResourceName.c_str(),
+                                       fileSizeError.message().c_str());
+                }
+            }
+
             // Copy file to http holding directory
             switch (pResourceFile->GetType())
             {
@@ -580,6 +635,14 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
                 case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
                 case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                 {
+                    // Files marked download="false" are not served via HTTP cache, so skip copying and redundant hashing
+                    if (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE)
+                    {
+                        auto* pClientFile = static_cast<CResourceClientFileItem*>(pResourceFile);
+                        if (!pClientFile->IsAutoDownload())
+                            break;
+                    }
+
                     SString strCachedFilePath = pResourceFile->GetCachedPathFilename();
 
                     if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
@@ -697,10 +760,51 @@ bool CResource::HasResourceChanged()
         if (!GetFilePath(pResourceFile->GetName(), strPath))
             return true;
 
-        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
+        bool needsChecksumCheck = true;
+        if (pResourceFile->HasFileMetadata())
+        {
+#ifdef WIN32
+            const std::filesystem::path filePath(SharedUtil::FromUTF8(strPath).c_str());
+#else
+            const std::filesystem::path filePath(strPath.c_str());
+#endif
 
-        if (pResourceFile->GetLastChecksum() != checksum)
-            return true;
+            std::error_code writeTimeError;
+            const auto      currentWriteTime = std::filesystem::last_write_time(filePath, writeTimeError);
+
+            std::error_code fileSizeError;
+            const auto      currentFileSize = std::filesystem::file_size(filePath, fileSizeError);
+
+            if (!writeTimeError && !fileSizeError)
+            {
+                if (currentWriteTime == pResourceFile->GetLastWriteTime() && currentFileSize == pResourceFile->GetLastFileSize())
+                {
+                    needsChecksumCheck = false;
+                }
+            }
+            else
+            {
+                if (writeTimeError)
+                {
+                    CLogger::LogPrintf("WARNING: Failed to get last write time for '%s' in resource '%s': %s\n", pResourceFile->GetName(),
+                                       m_strResourceName.c_str(), writeTimeError.message().c_str());
+                }
+                if (fileSizeError)
+                {
+                    CLogger::LogPrintf("WARNING: Failed to get file size for '%s' in resource '%s': %s\n", pResourceFile->GetName(), m_strResourceName.c_str(),
+                                       fileSizeError.message().c_str());
+                }
+            }
+        }
+
+        CChecksum checksum = pResourceFile->GetLastChecksum();
+        if (needsChecksumCheck)
+        {
+            checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
+
+            if (pResourceFile->GetLastChecksum() != checksum)
+                return true;
+        }
 
         // Also check if file in http cache has been externally altered
         switch (pResourceFile->GetType())
@@ -709,6 +813,13 @@ bool CResource::HasResourceChanged()
             case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
             case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
             {
+                if (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE)
+                {
+                    auto* pClientFile = static_cast<CResourceClientFileItem*>(pResourceFile);
+                    if (!pClientFile->IsAutoDownload())
+                        break;
+                }
+
                 string    strCachedFilePath = pResourceFile->GetCachedPathFilename();
                 CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
 
@@ -1854,6 +1965,16 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
 {
     int i = 0;
 
+    CaseInsensitiveStringSet existingClientFiles;
+    for (CResourceFile* pResourceFile : m_ResourceFiles)
+    {
+        bool isClientFile = (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT ||
+                             pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
+                             pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE);
+        if (isClientFile)
+            existingClientFiles.insert(pResourceFile->GetName());
+    }
+
     // Loop through the included files
     for (CXMLNode* pFile = pRoot->FindSubNode("file", i); pFile != nullptr; pFile = pRoot->FindSubNode("file", ++i))
     {
@@ -1908,7 +2029,7 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
                 {
                     std::string strFullFilename;
 
-                    if (IsFilenameUsed(strFilePath, true))
+                    if (existingClientFiles.find(strFilePath) != existingClientFiles.end())
                     {
                         CLogger::LogPrintf("WARNING: Ignoring duplicate client file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilePath.c_str());
                         continue;
@@ -1917,6 +2038,7 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
                     if (GetFilePath(strFilePath.c_str(), strFullFilename))
                     {
                         m_ResourceFiles.push_back(new CResourceClientFileItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes, bDownload));
+                        existingClientFiles.insert(strFilePath);
                     }
                 }
 
@@ -2060,10 +2182,22 @@ bool CResource::ReadIncludedExports(CXMLNode* pRoot)
 
     return true;
 }
-
 bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
 {
     int i = 0;
+
+    CaseInsensitiveStringSet existingClientFiles;
+    CaseInsensitiveStringSet existingServerFiles;
+    for (CResourceFile* pResourceFile : m_ResourceFiles)
+    {
+        bool isClientFile = (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT ||
+                             pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
+                             pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE);
+        if (isClientFile)
+            existingClientFiles.insert(pResourceFile->GetName());
+        else
+            existingServerFiles.insert(pResourceFile->GetName());
+    }
 
     // Loop through all script nodes under the root
     for (CXMLNode* pScript = pRoot->FindSubNode("script", i); pScript != nullptr; pScript = pRoot->FindSubNode("script", ++i))
@@ -2135,14 +2269,14 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
                     {
                         // Check if the filename is already used by this resource
 
-                        if (bClient && IsFilenameUsed(strFilePath, true))
+                        if (bClient && existingClientFiles.find(strFilePath) != existingClientFiles.end())
                         {
                             CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
                                                strFilePath.c_str());
                             bLoadClient = false;
                         }
 
-                        if (bServer && IsFilenameUsed(strFilePath, false))
+                        if (bServer && existingServerFiles.find(strFilePath) != existingServerFiles.end())
                         {
                             CLogger::LogPrintf("WARNING: Ignoring duplicate script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
                                                strFilePath.c_str());
@@ -2153,10 +2287,16 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
                         // Create it depending on the type (client or server or shared) and add it to the list of resource files
 
                         if (bLoadServer)
+                        {
                             m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes));
+                            existingServerFiles.insert(strFilePath);
+                        }
 
                         if (bLoadClient)
+                        {
                             m_ResourceFiles.push_back(new CResourceClientScriptItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes));
+                            existingClientFiles.insert(strFilePath);
+                        }
                     }
                 }
 
