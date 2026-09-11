@@ -39,7 +39,6 @@
 #include "CKeyGenSA.h"
 #include "CObjectGroupPhysicalPropertiesSA.h"
 #include "CPadSA.h"
-#include "CPathFindSA.h"
 #include "CPickupsSA.h"
 #include "CPlayerInfoSA.h"
 #include "CPointLightsSA.h"
@@ -239,7 +238,6 @@ CGameSA::CGameSA()
         CPlayerPedSA::StaticSetHooks();
         CRenderWareSA::StaticSetHooks();
         CRenderWareSA::StaticSetClothesReplacingHooks();
-        CPathFindSA::StaticSetHooks();
         CTasksSA::StaticSetHooks();
         CPedSA::StaticSetHooks();
         CSettingsSA::StaticSetHooks();
