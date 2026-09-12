@@ -2786,27 +2786,42 @@ void CGraphics::DrawProgressMessage(bool bPreserveBackbuffer)
 //
 /////////////////////////////////////////////////////////////
 bool CGraphics::ResizeTextureData(const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight,
-                                  CBuffer& outBuffer)
+                                  CBuffer& outBuffer, uint d3dNewFormat)
 {
     bool               bResult = false;
     IDirect3DSurface9* pCurrentSurface = NULL;
     IDirect3DSurface9* pNewSurface = NULL;
 
+    // Output format defaults to the source format.
+    const D3DFORMAT destFormat = d3dNewFormat ? (D3DFORMAT)d3dNewFormat : (D3DFORMAT)d3dFormat;
+    const bool      bConvertFormat = destFormat != (D3DFORMAT)d3dFormat;
+
     do
     {
-        // Create surfaces
-        if (FAILED(g_pGraphics->GetDevice()->CreateOffscreenPlainSurface(uiWidth, uiHeight, (D3DFORMAT)d3dFormat, D3DPOOL_SCRATCH, &pCurrentSurface, NULL)))
-            break;
-        if (FAILED(g_pGraphics->GetDevice()->CreateOffscreenPlainSurface(uiNewWidth, uiNewHeight, (D3DFORMAT)d3dFormat, D3DPOOL_SCRATCH, &pNewSurface, NULL)))
+        // Destination surface (resized and/or reformatted)
+        if (FAILED(g_pGraphics->GetDevice()->CreateOffscreenPlainSurface(uiNewWidth, uiNewHeight, destFormat, D3DPOOL_SCRATCH, &pNewSurface, NULL)))
             break;
 
-        // Data in
-        if (!CopyDataToSurface(pCurrentSurface, (const BYTE*)pData, uiDataPitch))
-            break;
-
-        // Resize
-        if (FAILED(D3DXLoadSurfaceFromSurface(pNewSurface, NULL, NULL, pCurrentSurface, NULL, NULL, D3DX_FILTER_TRIANGLE, 0)))
-            break;
+        if (bConvertFormat)
+        {
+            // Format conversion (e.g. a DXT-compressed source to A8R8G8B8). Load straight from
+            // memory: D3DXLoadSurfaceFromMemory decodes the source format (decompressing DXT) and
+            // resizes into the destination surface in one step. This is more reliable than copying
+            // compressed blocks into an intermediate surface by hand.
+            RECT srcRect = {0, 0, (LONG)uiWidth, (LONG)uiHeight};
+            if (FAILED(D3DXLoadSurfaceFromMemory(pNewSurface, NULL, NULL, pData, (D3DFORMAT)d3dFormat, uiDataPitch, NULL, &srcRect, D3DX_FILTER_TRIANGLE, 0)))
+                break;
+        }
+        else
+        {
+            // Same-format resize: copy the source pixels into a matching surface and resize
+            if (FAILED(g_pGraphics->GetDevice()->CreateOffscreenPlainSurface(uiWidth, uiHeight, (D3DFORMAT)d3dFormat, D3DPOOL_SCRATCH, &pCurrentSurface, NULL)))
+                break;
+            if (!CopyDataToSurface(pCurrentSurface, (const BYTE*)pData, uiDataPitch))
+                break;
+            if (FAILED(D3DXLoadSurfaceFromSurface(pNewSurface, NULL, NULL, pCurrentSurface, NULL, NULL, D3DX_FILTER_TRIANGLE, 0)))
+                break;
+        }
 
         // Data out
         if (!CopyDataFromSurface(pNewSurface, outBuffer))
