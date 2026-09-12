@@ -808,6 +808,17 @@ namespace
     {
         return CVector(NormaliseOccluderAngle(vecRotation.fX), NormaliseOccluderAngle(vecRotation.fY), NormaliseOccluderAngle(vecRotation.fZ));
     }
+
+    // An entry is the centre and the extents as int16 in quarter units, three byte angles and a link
+    // word. The extents are stored Y, X, Z and the angles Z, Y, X, the order AddOne writes them in.
+    void DecodeOccluder(const std::uint8_t* pBytes, CVector& vecPosition, CVector& vecSize, CVector& vecRotation)
+    {
+        const auto* pWords = reinterpret_cast<const std::int16_t*>(pBytes);
+
+        vecPosition = CVector(pWords[0] * 0.25f, pWords[1] * 0.25f, pWords[2] * 0.25f);
+        vecSize = CVector(pWords[4] * 0.25f, pWords[3] * 0.25f, pWords[5] * 0.25f);
+        vecRotation = CVector(pBytes[0x0E] * OCCLUDER_ANGLE_STEP, pBytes[0x0D] * OCCLUDER_ANGLE_STEP, pBytes[0x0C] * OCCLUDER_ANGLE_STEP);
+    }
 }  // namespace
 
 void CWorldSA::CaptureOccluderBaseline()
@@ -815,18 +826,32 @@ void CWorldSA::CaptureOccluderBaseline()
     if (m_bOccluderBaselineTaken)
         return;
 
-    const uint uiCount = *(uint*)VAR_COcclusion_NumOccluders;
-    const uint uiInteriorCount = *(uint*)VAR_COcclusion_NumInteriorOccluders;
+    // The map's occluders are whatever the IPL loader left in the two arrays. They are kept byte for
+    // byte, so a rebuild can hand them back exactly as they were loaded.
+    const uint uiCount = std::min<uint>(*(uint*)VAR_COcclusion_NumOccluders, COCCLUSION_MAX_OCCLUDERS);
+    const uint uiInteriorCount = std::min<uint>(*(uint*)VAR_COcclusion_NumInteriorOccluders, COCCLUSION_MAX_INTERIOR_OCCLUDERS);
 
-    m_OccluderBaseline.resize(uiCount * COCCLUSION_ENTRY_SIZE);
-    if (!m_OccluderBaseline.empty())
-        MemCpyFast(m_OccluderBaseline.data(), (void*)ARRAY_COcclusion_Occluders, m_OccluderBaseline.size());
+    m_VanillaOccluders.reserve(uiCount + uiInteriorCount);
+    for (uint i = 0; i < uiCount; i++)
+    {
+        SVanillaOccluder occluder;
+        occluder.uiId = m_uiNextOccluderId++;
+        occluder.uiSlot = i;
+        occluder.bInterior = false;
+        MemCpyFast(occluder.aBytes, (void*)(ARRAY_COcclusion_Occluders + i * COCCLUSION_ENTRY_SIZE), COCCLUSION_ENTRY_SIZE);
+        m_VanillaOccluders.push_back(occluder);
+    }
 
-    m_InteriorOccluderBaseline.resize(uiInteriorCount * COCCLUSION_ENTRY_SIZE);
-    if (!m_InteriorOccluderBaseline.empty())
-        MemCpyFast(m_InteriorOccluderBaseline.data(), (void*)ARRAY_COcclusion_InteriorOccluders, m_InteriorOccluderBaseline.size());
+    for (uint i = 0; i < uiInteriorCount; i++)
+    {
+        SVanillaOccluder occluder;
+        occluder.uiId = m_uiNextOccluderId++;
+        occluder.uiSlot = i;
+        occluder.bInterior = true;
+        MemCpyFast(occluder.aBytes, (void*)(ARRAY_COcclusion_InteriorOccluders + i * COCCLUSION_ENTRY_SIZE), COCCLUSION_ENTRY_SIZE);
+        m_VanillaOccluders.push_back(occluder);
+    }
 
-    MemCpyFast(m_OccluderBaselineHeads, (void*)VAR_COcclusion_ListHeads, sizeof(m_OccluderBaselineHeads));
     m_bOccluderBaselineTaken = true;
 }
 
@@ -834,18 +859,74 @@ void CWorldSA::RebuildOccluders()
 {
     CaptureOccluderBaseline();
 
-    // Put the map back exactly as it was loaded, heads included, then let the engine thread the
-    // lists itself by replaying every scripted occluder through its own AddOne.
-    if (!m_OccluderBaseline.empty())
-        MemCpyFast((void*)ARRAY_COcclusion_Occluders, m_OccluderBaseline.data(), m_OccluderBaseline.size());
-    if (!m_InteriorOccluderBaseline.empty())
-        MemCpyFast((void*)ARRAY_COcclusion_InteriorOccluders, m_InteriorOccluderBaseline.data(), m_InteriorOccluderBaseline.size());
+    // COcclusion::Init empties both arrays and all four list heads. Everything still enabled then goes
+    // back in through the game's own AddOne, which is what threads the lists: a dummy box takes the
+    // slot and the loaded bytes are written over it afterwards, leaving the link word the engine just
+    // set. Only the flag in its top bit belongs to the entry, so that bit is carried over.
+    ((void(__cdecl*)())FUNC_COcclusion_Init)();
 
-    MemPutFast<uint>(VAR_COcclusion_NumOccluders, m_OccluderBaseline.size() / COCCLUSION_ENTRY_SIZE);
-    MemPutFast<uint>(VAR_COcclusion_NumInteriorOccluders, m_InteriorOccluderBaseline.size() / COCCLUSION_ENTRY_SIZE);
-    MemCpyFast((void*)VAR_COcclusion_ListHeads, m_OccluderBaselineHeads, sizeof(m_OccluderBaselineHeads));
+    // A forced restore, a resource stopping while another filled the freed slots, can ask for more
+    // entries than fit. Scripted boxes keep their slots because their ids are live; the map occluders
+    // that do not fit stay out and come back on the first rebuild that has room for them.
+    uint uiBudget[2] = {COCCLUSION_MAX_OCCLUDERS, COCCLUSION_MAX_INTERIOR_OCCLUDERS};
+    for (const SScriptedOccluder& occluder : m_ScriptedOccluders)
+    {
+        uint& uiRoom = uiBudget[occluder.bInterior ? 1 : 0];
+        if (uiRoom > 0)
+            uiRoom--;
+    }
 
     const auto pfnAddOne = (COcclusion_AddOne_t)FUNC_COcclusion_AddOne;
+    for (SVanillaOccluder& occluder : m_VanillaOccluders)
+    {
+        occluder.bActive = false;
+        occluder.uiSlot = OCCLUDER_SLOT_NONE;
+
+        if (!occluder.setDisabledBy.empty())
+            continue;
+
+        uint& uiRoom = uiBudget[occluder.bInterior ? 1 : 0];
+        if (uiRoom == 0)
+            continue;
+
+        const DWORD dwCountAddress = occluder.bInterior ? VAR_COcclusion_NumInteriorOccluders : VAR_COcclusion_NumOccluders;
+        const DWORD dwArrayAddress = occluder.bInterior ? ARRAY_COcclusion_InteriorOccluders : ARRAY_COcclusion_Occluders;
+        const uint  uiIndex = *(uint*)dwCountAddress;
+
+        // An edited one goes in through AddOne with its own geometry, so the engine encodes it and the
+        // loaded bytes are left alone for the restore. An untouched one takes a dummy box and has its
+        // bytes written over it.
+        if (occluder.bEdited)
+            pfnAddOne(occluder.vecEditPosition.fX, occluder.vecEditPosition.fY, occluder.vecEditPosition.fZ, occluder.vecEditSize.fX, occluder.vecEditSize.fY,
+                      occluder.vecEditSize.fZ, occluder.vecEditRotation.fZ, occluder.vecEditRotation.fY, occluder.vecEditRotation.fX, 0,
+                      occluder.bInterior ? 1 : 0);
+        else
+            pfnAddOne(0.0f, 0.0f, 0.0f, 1.0f, 1.0f, 1.0f, 0.0f, 0.0f, 0.0f, 0, occluder.bInterior ? 1 : 0);
+
+        if (*(uint*)dwCountAddress != uiIndex + 1)
+            continue;
+
+        uiRoom--;
+        occluder.bActive = true;
+        occluder.uiSlot = uiIndex;
+
+        if (occluder.bEdited)
+            continue;
+
+        const DWORD dwEntry = dwArrayAddress + uiIndex * COCCLUSION_ENTRY_SIZE;
+        if (occluder.bInterior)
+        {
+            MemCpyFast((void*)dwEntry, occluder.aBytes, COCCLUSION_ENTRY_SIZE);
+        }
+        else
+        {
+            const std::uint16_t usLink = *(std::uint16_t*)(dwEntry + 0x10);
+            const std::uint16_t usFlag = *(const std::uint16_t*)(occluder.aBytes + 0x10) & 0x8000;
+            MemCpyFast((void*)dwEntry, occluder.aBytes, 0x10);
+            MemPutFast<std::uint16_t>(dwEntry + 0x10, (usLink & 0x7FFF) | usFlag);
+        }
+    }
+
     for (SScriptedOccluder& occluder : m_ScriptedOccluders)
     {
         const DWORD dwCountAddress = occluder.bInterior ? VAR_COcclusion_NumInteriorOccluders : VAR_COcclusion_NumOccluders;
@@ -869,22 +950,96 @@ void CWorldSA::RestartOccluderListWalk()
     MemPutFast<std::uint16_t>(VAR_COcclusion_ListHeads + 12, 0xFFFF);
 }
 
+uint CWorldSA::CountEnabledVanillaOccluders(bool bInterior) const
+{
+    return std::count_if(m_VanillaOccluders.begin(), m_VanillaOccluders.end(),
+                         [bInterior](const SVanillaOccluder& occluder) { return occluder.bInterior == bInterior && occluder.setDisabledBy.empty(); });
+}
+
+uint CWorldSA::CountScriptedOccluders(bool bInterior) const
+{
+    return std::count_if(m_ScriptedOccluders.begin(), m_ScriptedOccluders.end(),
+                         [bInterior](const SScriptedOccluder& occluder) { return occluder.bInterior == bInterior; });
+}
+
+uint CWorldSA::GetOccluderPoolMax(bool bInterior)
+{
+    return bInterior ? COCCLUSION_MAX_INTERIOR_OCCLUDERS : COCCLUSION_MAX_OCCLUDERS;
+}
+
+bool CWorldSA::IsOccluderPoolFull(bool bInterior) const
+{
+    return CountEnabledVanillaOccluders(bInterior) + CountScriptedOccluders(bInterior) >= GetOccluderPoolMax(bInterior);
+}
+
 void CWorldSA::GetOccluderCapacity(bool bInterior, uint& uiOutUsed, uint& uiOutFree)
 {
     CaptureOccluderBaseline();
 
-    const size_t sizeBaseline = bInterior ? m_InteriorOccluderBaseline.size() : m_OccluderBaseline.size();
-    const uint   uiMax = bInterior ? COCCLUSION_MAX_INTERIOR_OCCLUDERS : COCCLUSION_MAX_OCCLUDERS;
-    const uint   uiVanilla = sizeBaseline / COCCLUSION_ENTRY_SIZE;
-    const uint   uiScriptable = uiMax > uiVanilla ? uiMax - uiVanilla : 0;
+    const uint uiMax = GetOccluderPoolMax(bInterior);
 
-    uiOutUsed = std::count_if(m_ScriptedOccluders.begin(), m_ScriptedOccluders.end(),
-                              [bInterior](const SScriptedOccluder& occluder) { return occluder.bInterior == bInterior; });
-    uiOutFree = uiScriptable > uiOutUsed ? uiScriptable - uiOutUsed : 0;
+    uiOutUsed = CountScriptedOccluders(bInterior);
+
+    const uint uiTaken = CountEnabledVanillaOccluders(bInterior) + uiOutUsed;
+    uiOutFree = uiMax > uiTaken ? uiMax - uiTaken : 0;
+}
+
+void CWorldSA::GetOccluders(bool bInterior, std::vector<SOccluderInfo>& outList)
+{
+    CaptureOccluderBaseline();
+
+    for (const SVanillaOccluder& occluder : m_VanillaOccluders)
+    {
+        if (occluder.bInterior != bInterior)
+            continue;
+
+        SOccluderInfo info;
+        info.uiId = occluder.uiId;
+        if (occluder.bEdited)
+        {
+            info.vecPosition = occluder.vecEditPosition;
+            info.vecSize = occluder.vecEditSize;
+            info.vecRotation = occluder.vecEditRotation - CVector(OCCLUDER_ANGLE_STEP / 2.0f, OCCLUDER_ANGLE_STEP / 2.0f, OCCLUDER_ANGLE_STEP / 2.0f);
+        }
+        else
+        {
+            DecodeOccluder(occluder.aBytes, info.vecPosition, info.vecSize, info.vecRotation);
+        }
+        info.bInterior = bInterior;
+        info.bEnabled = occluder.setDisabledBy.empty();
+        info.bActive = occluder.bActive;
+        info.bScripted = false;
+        info.pChangeSource = nullptr;
+        outList.push_back(info);
+    }
+
+    for (const SScriptedOccluder& occluder : m_ScriptedOccluders)
+    {
+        if (occluder.bInterior != bInterior)
+            continue;
+
+        SOccluderInfo info;
+        info.uiId = occluder.uiId;
+        info.vecPosition = occluder.vecPosition;
+        info.vecSize = occluder.vecSize;
+        // the stored angles carry the half step that turns the engine's truncation into a rounding
+        info.vecRotation = occluder.vecRotation - CVector(OCCLUDER_ANGLE_STEP / 2.0f, OCCLUDER_ANGLE_STEP / 2.0f, OCCLUDER_ANGLE_STEP / 2.0f);
+        info.bInterior = bInterior;
+        info.bEnabled = true;
+        info.bActive = true;
+        info.bScripted = true;
+        info.pChangeSource = occluder.pChangeSource;
+        outList.push_back(info);
+    }
 }
 
 bool CWorldSA::AddOccluder(const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation, bool bInterior, void* pChangeSource, uint& uiOutId)
 {
+    // Everything here belongs to the resource that asked for it, and an unowned entry would never be
+    // unwound when that resource stops
+    if (!pChangeSource)
+        return false;
+
     if (!IsOccluderGeometryValid(vecPosition, vecSize, vecRotation))
         return false;
 
@@ -911,13 +1066,14 @@ bool CWorldSA::AddOccluder(const CVector& vecPosition, const CVector& vecSize, c
     const auto  pfnAddOne = (COcclusion_AddOne_t)FUNC_COcclusion_AddOne;
     pfnAddOne(occluder.vecPosition.fX, occluder.vecPosition.fY, occluder.vecPosition.fZ, occluder.vecSize.fX, occluder.vecSize.fY, occluder.vecSize.fZ,
               occluder.vecRotation.fZ, occluder.vecRotation.fY, occluder.vecRotation.fX, 0, occluder.bInterior ? 1 : 0);
+    RestartOccluderListWalk();
+
     if (*(uint*)dwCountAddress != uiCountBefore + 1)
     {
         m_ScriptedOccluders.pop_back();
         return false;
     }
     m_ScriptedOccluders.back().uiSlot = uiCountBefore;
-    RestartOccluderListWalk();
 
     uiOutId = occluder.uiId;
     return true;
@@ -927,24 +1083,39 @@ bool CWorldSA::AddOccluder(const CVector& vecPosition, const CVector& vecSize, c
 // appended past the live count, its first sixteen bytes are copied over the target and the count and
 // the list heads are put back, which leaves the scratch entry outside the count and unreachable from
 // any list. The link word at +0x10 is never touched, so the lists and the walk cursor survive.
-bool CWorldSA::WriteOccluderInPlace(const SScriptedOccluder& occluder, const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation)
+bool CWorldSA::WriteOccluderInPlace(uint uiSlot, bool bInterior, const CVector& vecHeldPosition, const CVector& vecPosition, const CVector& vecSize,
+                                    const CVector& vecRotation)
 {
-    const DWORD dwCountAddress = occluder.bInterior ? VAR_COcclusion_NumInteriorOccluders : VAR_COcclusion_NumOccluders;
-    const DWORD dwArrayAddress = occluder.bInterior ? ARRAY_COcclusion_InteriorOccluders : ARRAY_COcclusion_Occluders;
-    const uint  uiMax = occluder.bInterior ? COCCLUSION_MAX_INTERIOR_OCCLUDERS : COCCLUSION_MAX_OCCLUDERS;
+    const DWORD dwCountAddress = bInterior ? VAR_COcclusion_NumInteriorOccluders : VAR_COcclusion_NumOccluders;
+    const DWORD dwArrayAddress = bInterior ? ARRAY_COcclusion_InteriorOccluders : ARRAY_COcclusion_Occluders;
 
-    const uint uiCount = *(uint*)dwCountAddress;
-    if (occluder.uiSlot >= uiCount || uiCount >= uiMax)
+    if (uiSlot >= *(uint*)dwCountAddress)
+        return false;
+
+    // The scratch entry has to land inside an array, and the entry format is the same in both, so a
+    // full pool can borrow the other one. One past either array is not an option: interior index 40
+    // is VAR_COcclusion_NumOccluders itself.
+    bool bScratchInterior = bInterior;
+    if (*(uint*)(bScratchInterior ? VAR_COcclusion_NumInteriorOccluders : VAR_COcclusion_NumOccluders) >=
+        (uint)(bScratchInterior ? COCCLUSION_MAX_INTERIOR_OCCLUDERS : COCCLUSION_MAX_OCCLUDERS))
+        bScratchInterior = !bScratchInterior;
+
+    const DWORD dwScratchCountAddress = bScratchInterior ? VAR_COcclusion_NumInteriorOccluders : VAR_COcclusion_NumOccluders;
+    const DWORD dwScratchArrayAddress = bScratchInterior ? ARRAY_COcclusion_InteriorOccluders : ARRAY_COcclusion_Occluders;
+    const uint  uiScratchMax = bScratchInterior ? COCCLUSION_MAX_INTERIOR_OCCLUDERS : COCCLUSION_MAX_OCCLUDERS;
+
+    const uint uiScratchCount = *(uint*)dwScratchCountAddress;
+    if (uiScratchCount >= uiScratchMax)
         return false;
 
     // The slot has to still hold this box. Anything else means the index went stale and the caller
     // has to take the rebuild instead of writing over a stranger. The centre is the first three
     // int16 of the entry, in quarter units.
-    const DWORD   dwTarget = dwArrayAddress + occluder.uiSlot * COCCLUSION_ENTRY_SIZE;
+    const DWORD   dwTarget = dwArrayAddress + uiSlot * COCCLUSION_ENTRY_SIZE;
     const auto*   pWords = reinterpret_cast<const std::int16_t*>(dwTarget);
-    const CVector vecHeldPosition(pWords[0] * 0.25f, pWords[1] * 0.25f, pWords[2] * 0.25f);
+    const CVector vecSlotPosition(pWords[0] * 0.25f, pWords[1] * 0.25f, pWords[2] * 0.25f);
 
-    const CVector vecDrift = vecHeldPosition - occluder.vecPosition;
+    const CVector vecDrift = vecSlotPosition - vecHeldPosition;
     if (std::fabs(vecDrift.fX) > OCCLUDER_QUARTER_UNIT || std::fabs(vecDrift.fY) > OCCLUDER_QUARTER_UNIT || std::fabs(vecDrift.fZ) > OCCLUDER_QUARTER_UNIT)
         return false;
 
@@ -953,36 +1124,43 @@ bool CWorldSA::WriteOccluderInPlace(const SScriptedOccluder& occluder, const CVe
 
     const auto pfnAddOne = (COcclusion_AddOne_t)FUNC_COcclusion_AddOne;
     pfnAddOne(vecPosition.fX, vecPosition.fY, vecPosition.fZ, vecSize.fX, vecSize.fY, vecSize.fZ, vecRotation.fZ, vecRotation.fY, vecRotation.fX, 0,
-              occluder.bInterior ? 1 : 0);
+              bScratchInterior ? 1 : 0);
 
-    // A dropped call writes nothing, so there is nothing to undo
-    if (*(uint*)dwCountAddress != uiCount + 1)
+    // A dropped call writes nothing, so only the heads have to go back
+    if (*(uint*)dwScratchCountAddress != uiScratchCount + 1)
+    {
+        MemCpyFast((void*)VAR_COcclusion_ListHeads, uiHeads, sizeof(uiHeads));
         return false;
+    }
 
-    MemCpyFast((void*)dwTarget, (void*)(dwArrayAddress + uiCount * COCCLUSION_ENTRY_SIZE), 0x10);
+    MemCpyFast((void*)dwTarget, (void*)(dwScratchArrayAddress + uiScratchCount * COCCLUSION_ENTRY_SIZE), 0x10);
 
-    MemPutFast<uint>(dwCountAddress, uiCount);
+    MemPutFast<uint>(dwScratchCountAddress, uiScratchCount);
     MemCpyFast((void*)VAR_COcclusion_ListHeads, uiHeads, sizeof(uiHeads));
     return true;
 }
 
 bool CWorldSA::SetOccluder(uint uiId, const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation, void* pChangeSource)
 {
+    if (!pChangeSource)
+        return false;
+
     if (!IsOccluderGeometryValid(vecPosition, vecSize, vecRotation))
         return false;
 
     const auto iter =
         std::find_if(m_ScriptedOccluders.begin(), m_ScriptedOccluders.end(), [uiId](const SScriptedOccluder& occluder) { return occluder.uiId == uiId; });
     if (iter == m_ScriptedOccluders.end())
-        return false;
+        return SetVanillaOccluder(uiId, vecPosition, vecSize, vecRotation, pChangeSource);
 
-    if (pChangeSource && iter->pChangeSource != pChangeSource)
+    // A resource can only edit the occluders it created itself
+    if (iter->pChangeSource != pChangeSource)
         return false;
 
     // The slot is never given up, so unlike a remove and add this cannot half succeed and leave the
     // caller with nothing when another resource takes the freed slot in between.
     const CVector vecNormalised = NormaliseOccluderRotation(vecRotation);
-    const bool    bInPlace = WriteOccluderInPlace(*iter, vecPosition, vecSize, vecNormalised);
+    const bool    bInPlace = WriteOccluderInPlace(iter->uiSlot, iter->bInterior, iter->vecPosition, vecPosition, vecSize, vecNormalised);
 
     iter->vecPosition = vecPosition;
     iter->vecSize = vecSize;
@@ -994,26 +1172,216 @@ bool CWorldSA::SetOccluder(uint uiId, const CVector& vecPosition, const CVector&
     return true;
 }
 
+// Editing a map occluder replaces its geometry without losing the loaded bytes, so engineRestoreOccluder
+// still hands back exactly what the IPL loader wrote. One resource owns an edit at a time, the same way
+// a scripted occluder belongs to its creator.
+// Where the occluder is now, which is the edit when there is one. The radius forms, the getter and
+// the staleness guard all have to agree on this or they act on different geometry.
+CVector CWorldSA::GetVanillaOccluderCentre(const SVanillaOccluder& occluder)
+{
+    if (occluder.bEdited)
+        return occluder.vecEditPosition;
+
+    CVector vecCentre, vecSize, vecRotation;
+    DecodeOccluder(occluder.aBytes, vecCentre, vecSize, vecRotation);
+    return vecCentre;
+}
+
+bool CWorldSA::SetVanillaOccluder(uint uiId, const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation, void* pChangeSource)
+{
+    CaptureOccluderBaseline();
+
+    const auto vanilla =
+        std::find_if(m_VanillaOccluders.begin(), m_VanillaOccluders.end(), [uiId](const SVanillaOccluder& occluder) { return occluder.uiId == uiId; });
+    if (vanilla == m_VanillaOccluders.end())
+        return false;
+
+    if (vanilla->bEdited && vanilla->pEditSource != pChangeSource)
+        return false;
+
+    const CVector vecNormalised = NormaliseOccluderRotation(vecRotation);
+
+    // Held out of the array by someone, so there is nothing to write yet; it comes back edited
+    if (!vanilla->bActive)
+    {
+        vanilla->bEdited = true;
+        vanilla->pEditSource = pChangeSource;
+        vanilla->vecEditPosition = vecPosition;
+        vanilla->vecEditSize = vecSize;
+        vanilla->vecEditRotation = vecNormalised;
+        return true;
+    }
+
+    const bool bInPlace = WriteOccluderInPlace(vanilla->uiSlot, vanilla->bInterior, GetVanillaOccluderCentre(*vanilla), vecPosition, vecSize, vecNormalised);
+
+    vanilla->bEdited = true;
+    vanilla->pEditSource = pChangeSource;
+    vanilla->vecEditPosition = vecPosition;
+    vanilla->vecEditSize = vecSize;
+    vanilla->vecEditRotation = vecNormalised;
+
+    if (!bInPlace)
+        RebuildOccluders();
+
+    return true;
+}
+
 bool CWorldSA::RemoveOccluder(uint uiId, void* pChangeSource)
 {
+    if (!pChangeSource)
+        return false;
+
     const auto iter =
         std::find_if(m_ScriptedOccluders.begin(), m_ScriptedOccluders.end(), [uiId](const SScriptedOccluder& occluder) { return occluder.uiId == uiId; });
-    if (iter == m_ScriptedOccluders.end())
+    if (iter != m_ScriptedOccluders.end())
+    {
+        // A resource can only remove the occluders it created itself
+        if (iter->pChangeSource != pChangeSource)
+            return false;
+
+        m_ScriptedOccluders.erase(iter);
+        RebuildOccluders();
+        return true;
+    }
+
+    CaptureOccluderBaseline();
+
+    // A map occluder is not deleted, it is left out of the rebuild while at least one resource asks
+    // for that, and its slot is capacity for engineAddOccluder in the meantime.
+    const auto vanilla =
+        std::find_if(m_VanillaOccluders.begin(), m_VanillaOccluders.end(), [uiId](const SVanillaOccluder& occluder) { return occluder.uiId == uiId; });
+    if (vanilla == m_VanillaOccluders.end())
         return false;
 
-    // A resource can only remove the occluders it created itself
-    if (pChangeSource && iter->pChangeSource != pChangeSource)
+    if (!vanilla->setDisabledBy.insert(pChangeSource).second)
         return false;
 
-    m_ScriptedOccluders.erase(iter);
-    RebuildOccluders();
+    if (vanilla->setDisabledBy.size() == 1)
+        RebuildOccluders();
+
     return true;
+}
+
+bool CWorldSA::RestoreOccluder(uint uiId, void* pChangeSource)
+{
+    if (!pChangeSource)
+        return false;
+
+    CaptureOccluderBaseline();
+
+    const auto vanilla =
+        std::find_if(m_VanillaOccluders.begin(), m_VanillaOccluders.end(), [uiId](const SVanillaOccluder& occluder) { return occluder.uiId == uiId; });
+    if (vanilla == m_VanillaOccluders.end())
+        return false;
+
+    // Coming back means taking a slot again, and a script may have filled the pool in the meantime.
+    // The test has to happen before the erase, or this entry is counted as enabled already.
+    if (WouldReEnable(*vanilla, pChangeSource) && IsOccluderPoolFull(vanilla->bInterior))
+        return false;
+
+    // Restoring means the occluder goes back to what the map loaded, so this source's edit goes too
+    bool bDropped = false;
+    if (vanilla->bEdited && vanilla->pEditSource == pChangeSource)
+    {
+        vanilla->bEdited = false;
+        vanilla->pEditSource = nullptr;
+        bDropped = true;
+    }
+
+    if (vanilla->setDisabledBy.erase(pChangeSource) == 0 && !bDropped)
+        return false;
+
+    if (bDropped || vanilla->setDisabledBy.empty())
+        RebuildOccluders();
+
+    return true;
+}
+
+uint CWorldSA::RemoveOccludersInRadius(const CVector& vecPosition, float fRadius, bool bInterior, void* pChangeSource)
+{
+    if (!pChangeSource)
+        return 0;
+
+    CaptureOccluderBaseline();
+
+    uint uiCount = 0;
+    bool bNeedsRebuild = false;
+    for (SVanillaOccluder& occluder : m_VanillaOccluders)
+    {
+        if (occluder.bInterior != bInterior)
+            continue;
+
+        if ((GetVanillaOccluderCentre(occluder) - vecPosition).Length() > fRadius)
+            continue;
+
+        if (!occluder.setDisabledBy.insert(pChangeSource).second)
+            continue;
+
+        bNeedsRebuild = bNeedsRebuild || occluder.setDisabledBy.size() == 1;
+        uiCount++;
+    }
+
+    if (bNeedsRebuild)
+        RebuildOccluders();
+
+    return uiCount;
+}
+
+uint CWorldSA::RestoreOccludersInRadius(const CVector& vecPosition, float fRadius, bool bInterior, void* pChangeSource)
+{
+    if (!pChangeSource)
+        return 0;
+
+    CaptureOccluderBaseline();
+
+    const uint uiMax = GetOccluderPoolMax(bInterior);
+    uint       uiTaken = CountEnabledVanillaOccluders(bInterior) + CountScriptedOccluders(bInterior);
+
+    uint uiCount = 0;
+    bool bNeedsRebuild = false;
+    for (SVanillaOccluder& occluder : m_VanillaOccluders)
+    {
+        if (occluder.bInterior != bInterior)
+            continue;
+
+        if ((GetVanillaOccluderCentre(occluder) - vecPosition).Length() > fRadius)
+            continue;
+
+        // Leave the ones there is no room for disabled, so the count is what actually came back
+        const bool bWouldReEnable = WouldReEnable(occluder, pChangeSource);
+        if (bWouldReEnable && uiTaken >= uiMax)
+            continue;
+
+        // Restoring means the map gets its own geometry back, so this source's edit goes with the mark
+        bool bDropped = false;
+        if (occluder.bEdited && occluder.pEditSource == pChangeSource)
+        {
+            occluder.bEdited = false;
+            occluder.pEditSource = nullptr;
+            bDropped = true;
+            bNeedsRebuild = true;
+        }
+
+        if (occluder.setDisabledBy.erase(pChangeSource) == 0 && !bDropped)
+            continue;
+
+        uiCount++;
+        if (bWouldReEnable)
+        {
+            uiTaken++;
+            bNeedsRebuild = true;
+        }
+    }
+
+    if (bNeedsRebuild)
+        RebuildOccluders();
+
+    return uiCount;
 }
 
 void CWorldSA::UndoOccluderChanges(void* pChangeSource)
 {
-    if (m_ScriptedOccluders.empty())
-        return;
+    bool bChanged = false;
 
     if (pChangeSource)
     {
@@ -1021,15 +1389,45 @@ void CWorldSA::UndoOccluderChanges(void* pChangeSource)
         m_ScriptedOccluders.erase(std::remove_if(m_ScriptedOccluders.begin(), m_ScriptedOccluders.end(),
                                                  [pChangeSource](const SScriptedOccluder& occluder) { return occluder.pChangeSource == pChangeSource; }),
                                   m_ScriptedOccluders.end());
-        if (m_ScriptedOccluders.size() == sizeBefore)
-            return;
+        bChanged = m_ScriptedOccluders.size() != sizeBefore;
+
+        for (SVanillaOccluder& occluder : m_VanillaOccluders)
+        {
+            if (occluder.setDisabledBy.erase(pChangeSource) != 0 && occluder.setDisabledBy.empty())
+                bChanged = true;
+
+            if (occluder.bEdited && occluder.pEditSource == pChangeSource)
+            {
+                occluder.bEdited = false;
+                occluder.pEditSource = nullptr;
+                bChanged = true;
+            }
+        }
     }
     else
     {
+        bChanged = !m_ScriptedOccluders.empty();
         m_ScriptedOccluders.clear();
+
+        for (SVanillaOccluder& occluder : m_VanillaOccluders)
+        {
+            if (!occluder.setDisabledBy.empty())
+            {
+                occluder.setDisabledBy.clear();
+                bChanged = true;
+            }
+
+            if (occluder.bEdited)
+            {
+                occluder.bEdited = false;
+                occluder.pEditSource = nullptr;
+                bChanged = true;
+            }
+        }
     }
 
-    RebuildOccluders();
+    if (bChanged)
+        RebuildOccluders();
 }
 
 void CWorldSA::FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition)
