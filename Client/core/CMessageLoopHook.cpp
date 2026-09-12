@@ -81,6 +81,15 @@ void CMessageLoopHook::ApplyHook(HWND hFocusWindow)
         notificationFilter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
         notificationFilter.dbcc_classguid = GUID_DevInterfaceHID;
         m_hDeviceNotify = RegisterDeviceNotification(hFocusWindow, &notificationFilter, DEVICE_NOTIFY_WINDOW_HANDLE);
+
+        // Register for raw mouse input so we can detect mouse deltas even when the cursor is
+        // hidden or clamped (WM_MOUSEMOVE only gives clamped absolute coordinates).
+        RAWINPUTDEVICE rid = {};
+        rid.usUsagePage = 0x01;            // HID_USAGE_PAGE_GENERIC
+        rid.usUsage = 0x02;                // HID_USAGE_GENERIC_MOUSE
+        rid.dwFlags = RIDEV_INPUTSINK;     // Receive input even when unfocused
+        rid.hwndTarget = hFocusWindow;
+        RegisterRawInputDevices(&rid, 1, sizeof(rid));
     }
 }
 
@@ -182,7 +191,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
             }
         }
 
-        // When updating m_bFocused in CClientGame from CPacketHandler (to fix another bug — see the note there),
+        // When updating m_bFocused in CClientGame from CPacketHandler (to fix another bug - see the note there),
         // the window might not actually have focus at that moment (even though Windows reports it as focused).
         // In this case, isMTAWindowFocused returns false even though the window has focus.
         // Therefore, we need to intercept the window return operation and manually set the focus in CClientGame.

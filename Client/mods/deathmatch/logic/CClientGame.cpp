@@ -2586,6 +2586,34 @@ bool CClientGame::ProcessMessageForCursorEvents(HWND hwnd, UINT uMsg, WPARAM wPa
             }
             break;
         }
+        case WM_INPUT:
+        {
+            UINT dwSize = 0;
+            GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, nullptr, &dwSize, sizeof(RAWINPUTHEADER));
+            if (dwSize == 0)
+                break;
+
+            std::vector<BYTE> buffer(dwSize);
+            if (GetRawInputData(reinterpret_cast<HRAWINPUT>(lParam), RID_INPUT, buffer.data(), &dwSize, sizeof(RAWINPUTHEADER)) != dwSize)
+                break;
+
+            const RAWINPUT* raw = reinterpret_cast<const RAWINPUT*>(buffer.data());
+            if (raw->header.dwType != RIM_TYPEMOUSE)
+                break;
+
+            LONG lDeltaX = raw->data.mouse.lLastX;
+            LONG lDeltaY = raw->data.mouse.lLastY;
+
+            if (lDeltaX == 0 && lDeltaY == 0)
+                break;
+
+            // Raw mouse delta — works regardless of cursor visibility or camera target
+            CLuaArguments Arguments;
+            Arguments.PushNumber(static_cast<double>(lDeltaX));
+            Arguments.PushNumber(static_cast<double>(lDeltaY));
+            m_pRootEntity->CallEvent("onClientMouseMove", Arguments, false);
+            break;
+        }
     }
     return false;
 }
@@ -2769,6 +2797,7 @@ void CClientGame::AddBuiltInEvents()
     // Cursor events
     m_Events.AddEvent("onClientClick", "button, state, screenX, screenY, worldX, worldY, worldZ, gui_clicked", NULL, false);
     m_Events.AddEvent("onClientCursorMove", "relativeX, relativeX, absoluteX, absoluteY, worldX, worldY, worldZ", NULL, false);
+    m_Events.AddEvent("onClientMouseMove", "deltaX, deltaY", NULL, false);
 
     // Marker events
     m_Events.AddEvent("onClientMarkerHit", "entity, matchingDimension", nullptr, false);
