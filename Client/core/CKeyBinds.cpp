@@ -2004,8 +2004,14 @@ void CKeyBinds::DoPostFramePulse()
             }
             else
             {
-                cs.RightShoulder2 = g_bcControls[1].bState ? 255 : 0;  // Next Weapon
-                cs.LeftShoulder2 = g_bcControls[2].bState ? 255 : 0;   // Previous Weapon
+                bool bNextWeapon = g_bcControls[1].bState;
+                bool bPreviousWeapon = g_bcControls[2].bState;
+
+                if (bNextWeapon && bPreviousWeapon)
+                    bNextWeapon = bPreviousWeapon = false;
+
+                cs.RightShoulder2 = bNextWeapon ? 255 : 0;     // Next Weapon
+                cs.LeftShoulder2 = bPreviousWeapon ? 255 : 0;  // Previous Weapon
             }
 
             if (!ControlForwardsBackWards(cs))
