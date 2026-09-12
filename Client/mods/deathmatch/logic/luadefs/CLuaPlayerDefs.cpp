@@ -852,8 +852,8 @@ bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eH
     if (component == HUD_ALL)
     {
         static constexpr eHudComponent resettableComponents[] = {
-            HUD_AMMO,      HUD_WEAPON, HUD_HEALTH,  HUD_BREATH, HUD_ARMOUR,     HUD_MONEY, HUD_VEHICLE_NAME, HUD_AREA_NAME,
-            HUD_RADAR,     HUD_CLOCK,  HUD_RADIO,   HUD_WANTED, HUD_CROSSHAIR,  HUD_VITAL_STATS, HUD_HELP_TEXT,
+            HUD_AMMO,  HUD_WEAPON, HUD_HEALTH, HUD_BREATH, HUD_ARMOUR,    HUD_MONEY,       HUD_VEHICLE_NAME, HUD_AREA_NAME,
+            HUD_RADAR, HUD_CLOCK,  HUD_RADIO,  HUD_WANTED, HUD_CROSSHAIR, HUD_VITAL_STATS, HUD_HELP_TEXT,
         };
 
         for (eHudComponent comp : resettableComponents)

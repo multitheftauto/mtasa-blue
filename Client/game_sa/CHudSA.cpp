@@ -1026,7 +1026,7 @@ void CHudSA::BeginRadarTransform() noexcept
     ms_RadarTransform.bActive = false;
     ms_bRadarCustomColor = false;
 
-    const SHudComponentData& radar = componentProperties.radar;
+    const SHudComponentData&   radar = componentProperties.radar;
     const SComponentPlacement& placement = radar.placement;
 
     HudPlacement::SRect customRect;
@@ -1059,7 +1059,7 @@ void CHudSA::EndRadarTransform() noexcept
 //
 HudPlacement::SVertexPlacement CHudSA::GetCrosshairPlacement() noexcept
 {
-    const SHudComponentData& crosshair = componentProperties.crosshair;
+    const SHudComponentData&   crosshair = componentProperties.crosshair;
     const SComponentPlacement& placement = crosshair.placement;
 
     HudPlacement::SRect customRect;
@@ -1155,8 +1155,8 @@ void CHudSA::RenderCrosshairSprite(CVector vecPos, CVector2D vecHalfSize, std::u
             usIntensity = ucAlpha;
     }
 
-    using RenderOneXLUSpriteFunc = void(__cdecl*)(CVector, CVector2D, std::uint8_t, std::uint8_t, std::uint8_t, std::uint16_t, float, std::uint8_t,
-                                                  std::uint8_t, std::uint8_t);
+    using RenderOneXLUSpriteFunc =
+        void(__cdecl*)(CVector, CVector2D, std::uint8_t, std::uint8_t, std::uint8_t, std::uint16_t, float, std::uint8_t, std::uint8_t, std::uint8_t);
     ((RenderOneXLUSpriteFunc)FUNC_CSprite_RenderOneXLUSprite)(vecPos, vecHalfSize, ucRed, ucGreen, ucBlue, usIntensity, fRhw, ucAlpha, ucUDir, ucVDir);
 }
 

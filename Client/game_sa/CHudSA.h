@@ -315,7 +315,7 @@ private:
                                      std::uint8_t a, std::uint8_t uDir, std::uint8_t vDir);
 
     static void __fastcall RenderCrosshair_Sprite(void* sprite, void*, CRect* rect, RwColor* color);
-    static void          RenderCrosshair_Rect(CRect* rect, RwColor* color);
+    static void            RenderCrosshair_Rect(CRect* rect, RwColor* color);
 
     static void RenderWanted(bool empty, float x, float y, const char* strLevel);
 
