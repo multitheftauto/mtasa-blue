@@ -29,6 +29,7 @@ CSingularFileDownload::CSingularFileDownload(CResource* pResource, const char* s
 
     m_bBeingDeleted = false;
 
+    CChecksum::InvalidateChecksumCacheEntry(m_strName);
     GenerateClientChecksum();
 
     if (!DoesClientAndServerChecksumMatch())
