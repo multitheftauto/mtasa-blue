@@ -51,8 +51,13 @@ CConsole::CConsole(CGUI* pManager, CGUIElement* pParent)
 
     m_pHistory->SetTextChangedHandler(GUI_CALLBACK(&CConsole::History_OnTextChanged, this));
 
-    // Load the console history from a file
-    m_pConsoleHistory->LoadFromFile(MTA_CONSOLE_INPUT_LOG_PATH);
+    // Load the console history from a file - use -cl2 suffix for secondary client
+    SString strInputLogPath = MTA_CONSOLE_INPUT_LOG_PATH;
+    if (g_pCore->IsSecondaryClient())
+    {
+        strInputLogPath.Replace(".log", "-cl2.log");
+    }
+    m_pConsoleHistory->LoadFromFile(strInputLogPath);
 }
 
 CConsole::~CConsole()
