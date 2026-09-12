@@ -31,6 +31,7 @@
 // to one of two fixed arrays and returns nothing, dropping the call silently when the array is full.
 // The centre is stored as int16 in quarter units, the extents are truncated to whole units first and
 // the angles are byte angles of 360/256 degrees; all of them truncate toward zero.
+#define FUNC_COcclusion_Init                0x71DCA0
 #define FUNC_COcclusion_AddOne              0x71DCD0
 #define VAR_COcclusion_NumOccluders         0xC73F98
 #define ARRAY_COcclusion_Occluders          0xC73FA0
@@ -42,8 +43,9 @@
 // whose heads and cursor live here. The interior array has no lists and is scanned up to its count.
 // Editing the lists by hand can cross link them, which hangs the render loop, so every removal
 // rebuilds the array from a snapshot instead.
-#define VAR_COcclusion_ListHeads   0x8D5D68
-#define COCCLUSION_LIST_HEAD_COUNT 4
+// Four 16 bit words four bytes apart: the far list head, the near list head, the walk cursor and the
+// entry before it. COcclusion::Init writes 0xFFFF to all four.
+#define VAR_COcclusion_ListHeads 0x8D5D68
 
 #define COCCLUSION_MAX_OCCLUDERS                     1000
 #define COCCLUSION_MAX_INTERIOR_OCCLUDERS            40
@@ -97,6 +99,10 @@ public:
     bool  GetOcclusionsEnabled();
     bool  AddOccluder(const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation, bool bInterior, void* pChangeSource, uint& uiOutId);
     bool  RemoveOccluder(uint uiId, void* pChangeSource);
+    bool  RestoreOccluder(uint uiId, void* pChangeSource);
+    uint  RemoveOccludersInRadius(const CVector& vecPosition, float fRadius, bool bInterior, void* pChangeSource);
+    uint  RestoreOccludersInRadius(const CVector& vecPosition, float fRadius, bool bInterior, void* pChangeSource);
+    void  GetOccluders(bool bInterior, std::vector<SOccluderInfo>& outList);
     void  GetOccluderCapacity(bool bInterior, uint& uiOutUsed, uint& uiOutFree);
     void  UndoOccluderChanges(void* pChangeSource = nullptr);
     void  FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition);
@@ -123,16 +129,35 @@ private:
         void*   pChangeSource;
     };
 
-    void CaptureOccluderBaseline();
-    void RebuildOccluders();
-    void RestartOccluderListWalk();
+    // The map's own occluders are kept exactly as the loader left them. Disabling one is a set
+    // membership on the MTA side, so a rebuild can leave it out and hand its slot to a script.
+    struct SVanillaOccluder
+    {
+        uint            uiId;
+        bool            bInterior;
+        std::uint8_t    aBytes[COCCLUSION_ENTRY_SIZE];
+        std::set<void*> setDisabledBy;
+        bool            bActive{true};
+    };
+
+    void        CaptureOccluderBaseline();
+    void        RebuildOccluders();
+    void        RestartOccluderListWalk();
+    uint        CountEnabledVanillaOccluders(bool bInterior) const;
+    uint        CountScriptedOccluders(bool bInterior) const;
+    bool        IsOccluderPoolFull(bool bInterior) const;
+    static uint GetOccluderPoolMax(bool bInterior);
+
+    // True when lifting this source's mark is the one that puts the occluder back in the array
+    static bool WouldReEnable(const SVanillaOccluder& occluder, void* pChangeSource)
+    {
+        return occluder.setDisabledBy.size() == 1 && occluder.setDisabledBy.count(pChangeSource) == 1;
+    }
 
     bool                           m_bOccluderBaselineTaken = false;
     uint                           m_uiNextOccluderId = 1;
     std::vector<SScriptedOccluder> m_ScriptedOccluders;
-    std::vector<std::uint8_t>      m_OccluderBaseline;
-    std::vector<std::uint8_t>      m_InteriorOccluderBaseline;
-    std::uint32_t                  m_OccluderBaselineHeads[COCCLUSION_LIST_HEAD_COUNT] = {};
+    std::vector<SVanillaOccluder>  m_VanillaOccluders;
 
     float         m_fAircraftMaxHeight;
     CSurfaceType* m_pSurfaceInfo;

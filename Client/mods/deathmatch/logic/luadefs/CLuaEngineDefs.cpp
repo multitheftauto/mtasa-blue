@@ -96,6 +96,10 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineAddClothingTXD", ArgumentParser<EngineAddClothingTXD>},
         {"engineAddOccluder", ArgumentParser<EngineAddOccluder>},
         {"engineRemoveOccluder", ArgumentParser<EngineRemoveOccluder>},
+        {"engineRestoreOccluder", ArgumentParser<EngineRestoreOccluder>},
+        {"engineRemoveOccluders", ArgumentParser<EngineRemoveOccluders>},
+        {"engineRestoreOccluders", ArgumentParser<EngineRestoreOccluders>},
+        {"engineGetOccluders", EngineGetOccluders},
         {"engineGetOccluderCapacity", ArgumentParser<EngineGetOccluderCapacity>},
         {"engineReplaceCOL", EngineReplaceCOL},
         {"engineRestoreCOL", EngineRestoreCOL},
@@ -716,6 +720,99 @@ bool CLuaEngineDefs::EngineRemoveOccluder(lua_State* const luaVM, std::uint32_t 
         return false;
 
     return g_pGame->GetWorld()->RemoveOccluder(uiId, pLuaMain->GetResource());
+}
+
+bool CLuaEngineDefs::EngineRestoreOccluder(lua_State* const luaVM, std::uint32_t uiId)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    return g_pGame->GetWorld()->RestoreOccluder(uiId, pLuaMain->GetResource());
+}
+
+std::uint32_t CLuaEngineDefs::EngineRemoveOccluders(lua_State* const luaVM, float fX, float fY, float fZ, float fRadius, std::optional<bool> bInterior)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return 0;
+
+    if (!std::isfinite(fRadius) || fRadius <= 0.0f)
+        throw std::invalid_argument(SString("Expected a positive radius at argument 4, got %g", fRadius));
+
+    return g_pGame->GetWorld()->RemoveOccludersInRadius(CVector(fX, fY, fZ), fRadius, bInterior.value_or(false), pLuaMain->GetResource());
+}
+
+std::uint32_t CLuaEngineDefs::EngineRestoreOccluders(lua_State* const luaVM, float fX, float fY, float fZ, float fRadius, std::optional<bool> bInterior)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return 0;
+
+    if (!std::isfinite(fRadius) || fRadius <= 0.0f)
+        throw std::invalid_argument(SString("Expected a positive radius at argument 4, got %g", fRadius));
+
+    return g_pGame->GetWorld()->RestoreOccludersInRadius(CVector(fX, fY, fZ), fRadius, bInterior.value_or(false), pLuaMain->GetResource());
+}
+
+int CLuaEngineDefs::EngineGetOccluders(lua_State* luaVM)
+{
+    bool bInterior = false;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(bInterior, false);
+
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    std::vector<SOccluderInfo> occluders;
+    g_pGame->GetWorld()->GetOccluders(bInterior, occluders);
+
+    lua_createtable(luaVM, static_cast<int>(occluders.size()), 0);
+
+    int iIndex = 1;
+    for (const SOccluderInfo& info : occluders)
+    {
+        lua_createtable(luaVM, 0, 8);
+
+        lua_pushstring(luaVM, "id");
+        lua_pushnumber(luaVM, info.uiId);
+        lua_settable(luaVM, -3);
+
+        const char* const szKeys[9] = {"x", "y", "z", "sizeX", "sizeY", "sizeZ", "rotX", "rotY", "rotZ"};
+        const float       fValues[9] = {info.vecPosition.fX, info.vecPosition.fY, info.vecPosition.fZ, info.vecSize.fX,    info.vecSize.fY,
+                                        info.vecSize.fZ,     info.vecRotation.fX, info.vecRotation.fY, info.vecRotation.fZ};
+        for (int i = 0; i < 9; i++)
+        {
+            lua_pushstring(luaVM, szKeys[i]);
+            lua_pushnumber(luaVM, fValues[i]);
+            lua_settable(luaVM, -3);
+        }
+
+        lua_pushstring(luaVM, "interior");
+        lua_pushboolean(luaVM, info.bInterior);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "enabled");
+        lua_pushboolean(luaVM, info.bEnabled);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "active");
+        lua_pushboolean(luaVM, info.bActive);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "scripted");
+        lua_pushboolean(luaVM, info.bScripted);
+        lua_settable(luaVM, -3);
+
+        lua_rawseti(luaVM, -2, iIndex++);
+    }
+
+    return 1;
 }
 
 CLuaMultiReturn<std::uint32_t, std::uint32_t> CLuaEngineDefs::EngineGetOccluderCapacity(std::optional<bool> bInterior)
