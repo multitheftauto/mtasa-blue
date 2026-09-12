@@ -450,6 +450,8 @@ bool CConnectManager::CheckNickProvided(const char* szNick)
         return false;
     if (stricmp(szNick, "server") == 0)
         return false;
+    if (strchr(szNick, '`') != nullptr)
+        return false;
     return true;
 }
 

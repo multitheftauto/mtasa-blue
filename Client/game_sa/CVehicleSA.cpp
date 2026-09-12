@@ -30,11 +30,34 @@
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
 #include "CFireManagerSA.h"
+#include "enums/VehicleType.h"
+#include <game/CHandlingEntry.h>
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
 static BOOL m_bVehicleSunGlare = false;
+
+// PreRender re-asserts rpATOMICRENDER on all wheel atomics every frame, which re-shows
+// the Rhino's middle wheels that SetupModelNodes hides at init. Re-clear the flag here so
+// it stays the last write of the frame and the wheels remain invisible like in vanilla.
+static RwObject* __cdecl ClearAtomicRenderFlagCB(RwObject* object, void* /*data*/)
+{
+    object->flags &= ~0x04;  // rpATOMICRENDER
+    return object;
+}
+
+static void __fastcall RehideRhinoMiddleWheels(CAutomobileSAInterface* vehicle)
+{
+    if (!vehicle || vehicle->m_nModelIndex != 432 /* Rhino */)
+        return;
+
+    for (auto comp : {eCarNodes::WHEEL_LM, eCarNodes::WHEEL_RM})
+    {
+        if (RwFrame* frame = vehicle->m_aCarNodes[static_cast<std::size_t>(comp)])
+            RwFrameForAllObjects(frame, (void*)ClearAtomicRenderFlagCB, nullptr);
+    }
+}
 
 static void __declspec(naked) HOOK_Vehicle_PreRender(void)
 {
@@ -51,6 +74,13 @@ static void __declspec(naked) HOOK_Vehicle_PreRender(void)
         call    eax
 
         noglare:
+        // Re-hide Rhino middle wheels after PreRender's generic-car block re-shows them.
+        // esi still points to the CAutomobileSAInterface at this hook site.
+        pushad
+        mov     ecx, esi
+        call    RehideRhinoMiddleWheels
+        popad
+
         mov     [esp+0D4h], edi
         push    6ABD04h
         retn
@@ -67,6 +97,13 @@ static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleI
 
     if (vehicle->pEntity->GetVehicleRotorState())
     {
+        // Blown aircraft must not re-enter the custom rotor processing path. With
+        // vehicle_engine_autostart disabled this path moves unattended aircraft to
+        // STATUS_PHYSICS, which lets wreck contacts repeatedly create GTA flying
+        // components/explosions after the vehicle has already blown up.
+        if (vehicle->pEntity->GetHealth() <= 0.0f)
+            return false;
+
         if (g_pCore->GetMultiplayer()->IsVehicleEngineAutoStartEnabled())  // keep default behavior
             return true;
 
@@ -284,7 +321,7 @@ void CVehicleSA::Init()
     {
         for (size_t i = 0; i < m_dummyPositions.size(); ++i)
         {
-            m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((VehicleDummies)i);
+            m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((VehicleDummies::Enum)i);
         }
     }
 
@@ -322,7 +359,7 @@ void CVehicleSA::Init()
     // Initialize doors depending on the vehicle type.
     std::uint32_t doorArrayOffset;
 
-    switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
+    switch (static_cast<VehicleClass::Enum>(GetVehicleInterface()->m_vehicleClass))
     {
         case VehicleClass::AUTOMOBILE:
         case VehicleClass::MONSTER_TRUCK:
@@ -684,7 +721,7 @@ void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
 
 bool CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept
 {
-    VehicleClass m_eVehicleType = static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleSubClass);
+    VehicleClass::Enum m_eVehicleType = static_cast<VehicleClass::Enum>(GetVehicleInterface()->m_vehicleSubClass);
     switch (m_eVehicleType)
     {
         case VehicleClass::AUTOMOBILE:
@@ -1535,6 +1572,146 @@ void CVehicleSA::RecalculateHandling()
         GetVehicleInterface ()->fDragCoeff = pGame->GetHandlingManager()->GetBasicDragCoeff();
     else*/
     // pInt->fDragCoeff = m_pHandlingData->GetInterface()->fDragCoeff / 1000 * pGame->GetHandlingManager()->GetDragMultiplier();
+
+    // The swinging chassis flag is only applied once, inside the game's vehicle constructor.
+    // Redo that setup here so a live handling change actually takes effect.
+    RecalculateSwingingChassis();
+
+    // Same story as the chassis above: the door setup below is also only ever applied once, inside
+    // the game's vehicle constructor.
+    RecalculateDoorModelFlags();
+}
+
+// Mirrors the native vehicle constructor's bonnet, boot and NO_DOORS setup, so a live
+// REVERSE_BONNET, HANGING_BOOT, TAILGATE_BOOT or NO_DOORS change reaches an already spawned
+// vehicle instead of only ever taking effect for one created after the change.
+void CVehicleSA::RecalculateDoorModelFlags()
+{
+    if (GetVehicleInterface()->m_vehicleClass != VehicleClass::AUTOMOBILE)
+        return;
+
+    constexpr std::uint8_t  axisX = 0;
+    constexpr std::uint8_t  axisY = 1;
+    constexpr std::uint8_t  axisZ = 2;
+    constexpr std::uint8_t  axisNegY = 4;
+    constexpr std::uint8_t  axisNegZ = 5;
+    constexpr std::uint16_t extraBased = 0x10;
+    constexpr std::uint16_t extraLowGravity = 0x20;
+
+    auto*               pInt = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
+    const std::uint32_t uiModelFlags = m_pHandlingData->GetInterface()->uiModelFlags;
+
+    CDoorSAInterface& bonnet = pInt->m_doors[eDoors::BONNET];
+    if (uiModelFlags & MODELFLAGS_REVERSE_BONNET)
+    {
+        bonnet.m_fOpenAngle = -0.3f * PI;
+        bonnet.m_nAxis = axisX;
+        bonnet.m_nDirn = axisNegY | extraLowGravity;
+    }
+    else
+    {
+        bonnet.m_fOpenAngle = 0.3f * PI;
+        bonnet.m_nAxis = axisX;
+        bonnet.m_nDirn = axisY | extraLowGravity;
+    }
+    bonnet.m_fClosedAngle = 0.0f;
+
+    CDoorSAInterface& boot = pInt->m_doors[eDoors::BOOT];
+    if (uiModelFlags & MODELFLAGS_HANGING_BOOT)
+    {
+        boot.m_fOpenAngle = -0.4f * PI;
+        boot.m_nAxis = axisX;
+        boot.m_nDirn = axisNegZ | extraBased;
+    }
+    else if (uiModelFlags & MODELFLAGS_TAILGATE_BOOT)
+    {
+        boot.m_fOpenAngle = 0.5f * PI;
+        boot.m_nAxis = axisX;
+        boot.m_nDirn = axisZ | extraBased;
+    }
+    else
+    {
+        boot.m_fOpenAngle = -0.3f * PI;
+        boot.m_nAxis = axisX;
+        boot.m_nDirn = axisNegY | extraBased;
+    }
+    boot.m_fClosedAngle = 0.0f;
+
+    // Same constructor-only story again: NO_DOORS marks the four side doors missing once, at
+    // creation, and removing the flag doesn't restore them, since the constructor never does that
+    // either. The status alone isn't enough on a live vehicle, though; a locked vehicle's front
+    // doors quietly turn the request into a dent instead, so the door mesh is hidden directly here
+    // too.
+    if (uiModelFlags & MODELFLAGS_NO_DOORS)
+    {
+        struct SSideDoor
+        {
+            eDoors    id;
+            eCarNodes node;
+        };
+        static constexpr SSideDoor sideDoors[] = {
+            {eDoors::FRONT_LEFT_DOOR, eCarNodes::DOOR_LF},
+            {eDoors::FRONT_RIGHT_DOOR, eCarNodes::DOOR_RF},
+            {eDoors::REAR_LEFT_DOOR, eCarNodes::DOOR_LR},
+            {eDoors::REAR_RIGHT_DOOR, eCarNodes::DOOR_RR},
+        };
+
+        if (CDamageManager* pDamageManager = GetDamageManager())
+        {
+            for (const SSideDoor& sideDoor : sideDoors)
+            {
+                pDamageManager->SetDoorStatus(sideDoor.id, DT_DOOR_MISSING, false);
+
+                if (RwFrame* pFrame = pInt->m_aCarNodes[static_cast<std::size_t>(sideDoor.node)])
+                    pInt->SetComponentVisibility(pFrame, 0);  // ATOMIC_IS_NOT_PRESENT
+            }
+        }
+    }
+}
+
+void CVehicleSA::RecalculateSwingingChassis()
+{
+    if (GetVehicleInterface()->m_vehicleClass != VehicleClass::AUTOMOBILE)
+        return;
+
+    constexpr std::uint16_t axisZ = 2;
+    constexpr std::uint16_t axisNegY = 4;
+    constexpr std::uint16_t extraChassis = 0x40;
+    constexpr std::uint16_t extraFixedState = 0x80;
+    constexpr std::uint16_t extraFiretruck = 0x100;
+
+    auto&               chassis = static_cast<CAutomobileSAInterface*>(GetVehicleInterface())->m_swingingChassis;
+    const std::uint16_t modelID = GetModelIndex();
+
+    // The Firela's ladder reuses this same slot for its own animation, so it must never be overridden by the swinging chassis flag.
+    if (modelID == static_cast<std::uint16_t>(VehicleType::VT_FIRELA))
+    {
+        chassis.m_fOpenAngle = 0.1f * PI;
+        chassis.m_fClosedAngle = -0.1f * PI;
+        chassis.m_nAxis = axisZ;
+        chassis.m_nDirn = axisNegY | extraFixedState | extraFiretruck;
+        chassis.m_nDoorState = static_cast<std::uint8_t>(DoorState::DOOR_HIT_MAX_END);
+        return;
+    }
+
+    if (!(GetVehicleInterface()->dwHandlingFlags & HANDLING_SwingingChassis_Flag))
+    {
+        chassis = {};  // Flag off: reset so the chassis can't swing anymore
+        return;
+    }
+
+    // Same per-model angle multiplier the game's vehicle constructor uses
+    float angleMultiplier = 0.02f;
+    if (modelID == static_cast<std::uint16_t>(VehicleType::VT_COPCARVG) || modelID == static_cast<std::uint16_t>(VehicleType::VT_ESPERANT))
+        angleMultiplier = 0.03f;
+    else if (modelID == static_cast<std::uint16_t>(VehicleType::VT_STRETCH))
+        angleMultiplier = 0.01f;
+
+    chassis.m_fOpenAngle = angleMultiplier * PI;
+    chassis.m_fClosedAngle = -angleMultiplier * PI;
+    chassis.m_nAxis = axisZ;
+    chassis.m_nDirn = axisNegY | extraChassis | extraFixedState;
+    chassis.m_nDoorState = static_cast<std::uint8_t>(DoorState::DOOR_HIT_MAX_END);
 }
 
 void CVehicleSA::BurstTyre(BYTE bTyre)
@@ -1562,7 +1739,7 @@ void CVehicleSA::SetBikeWheelStatus(BYTE bWheel, BYTE bStatus)
 bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
 {
     auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
-    switch ((VehicleClass)vehicle->m_vehicleClass)
+    switch ((VehicleClass::Enum)vehicle->m_vehicleClass)
     {
         case VehicleClass::AUTOMOBILE:
             if (eWheelPosition < 4)
@@ -1578,7 +1755,7 @@ bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
 
 int CVehicleSA::GetWheelFrictionState(BYTE eWheelPosition)
 {
-    switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
+    switch (static_cast<VehicleClass::Enum>(GetVehicleInterface()->m_vehicleClass))
     {
         case VehicleClass::BIKE:
         case VehicleClass::BMX:
@@ -1676,7 +1853,7 @@ bool CVehicleSA::SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComp
     RwFrame* defaultBikeChassisFrame = nullptr;
 
     // CBike, CBmx, CBoat and CTrain don't inherit CAutomobile so let's do it manually!
-    switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
+    switch (static_cast<VehicleClass::Enum>(GetVehicleInterface()->m_vehicleClass))
     {
         case VehicleClass::AUTOMOBILE:
         case VehicleClass::MONSTER_TRUCK:
@@ -1965,6 +2142,9 @@ void CVehicleSA::RecalculateSuspensionLines()
 
 void CVehicleSA::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount)
 {
+    if (ucSirenCount > SIREN_COUNT_MAX)
+        ucSirenCount = SIREN_COUNT_MAX;
+
     m_tSirenInfo.m_bOverrideSirens = true;
     m_tSirenInfo.m_ucSirenType = ucSirenType;
     m_tSirenInfo.m_ucSirenCount = ucSirenCount;
@@ -1972,11 +2152,18 @@ void CVehicleSA::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSi
 
 void CVehicleSA::SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
     m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
 }
 
 void CVehicleSA::GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+    {
+        vecPos = CVector();
+        return;
+    }
     vecPos = m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions;
 }
 
@@ -2477,7 +2664,7 @@ void CVehicleSA::UpdateLandingGearPosition()
     }
 }
 
-bool CVehicleSA::GetDummyPosition(VehicleDummies dummy, CVector& position) const
+bool CVehicleSA::GetDummyPosition(VehicleDummies::Enum dummy, CVector& position) const
 {
     if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
     {
@@ -2488,7 +2675,7 @@ bool CVehicleSA::GetDummyPosition(VehicleDummies dummy, CVector& position) const
     return false;
 }
 
-bool CVehicleSA::SetDummyPosition(VehicleDummies dummy, const CVector& position)
+bool CVehicleSA::SetDummyPosition(VehicleDummies::Enum dummy, const CVector& position)
 {
     if (dummy < VehicleDummies::LIGHT_FRONT_MAIN || dummy >= VehicleDummies::VEHICLE_DUMMY_COUNT)
         return false;
@@ -2506,7 +2693,7 @@ bool CVehicleSA::SetDummyPosition(VehicleDummies dummy, const CVector& position)
             CFxSystemSA::SetPosition(vehicle->m_fireParticle, position);
     }
 
-    bool isAutomobileClass = static_cast<VehicleClass>(vehicle->m_vehicleClass) == VehicleClass::AUTOMOBILE;
+    bool isAutomobileClass = static_cast<VehicleClass::Enum>(vehicle->m_vehicleClass) == VehicleClass::AUTOMOBILE;
 
     if (isAutomobileClass)
     {
@@ -2519,7 +2706,7 @@ bool CVehicleSA::SetDummyPosition(VehicleDummies dummy, const CVector& position)
 //
 // NOTE(botder): Move the code to CAutomobileSA::SetDummyPosition, when we start using CAutomobileSA
 //
-void CVehicleSA::SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies dummy, const CVector& position)
+void CVehicleSA::SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies::Enum dummy, const CVector& position)
 {
     if (dummy == VehicleDummies::EXHAUST)
     {

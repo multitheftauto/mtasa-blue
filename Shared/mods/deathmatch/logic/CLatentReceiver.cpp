@@ -128,6 +128,13 @@ void CLatentReceiver::OnReceive(NetBitStreamInterface* pBitStream)
         if (uiFinalSize > 100 * 1024 * 1024)
             return OnReceiveError("uiFinalSize too large");
 
+        // uiFinalSize includes the 5-byte CATEGORY_PACKET wrapper and the
+        // serialized event envelope. Keep 10 MiB available for argument data
+        // while allowing a small amount of protocol overhead.
+        constexpr uint LATENT_PACKET_MAX_SIZE = 10 * 1024 * 1024 + 64 * 1024;
+        if (usCategory == CATEGORY_PACKET && uiFinalSize > LATENT_PACKET_MAX_SIZE)
+            return OnReceiveError("CATEGORY_PACKET payload too large");
+
         activeRx.usId = usId;
         activeRx.bReceiveStarted = true;
         activeRx.usCategory = usCategory;
@@ -150,8 +157,10 @@ void CLatentReceiver::OnReceive(NetBitStreamInterface* pBitStream)
     //
     // Read body
     //
-    if (activeRx.uiWritePosition + usSizeSent > activeRx.buffer.GetSize())
-        return OnReceiveError("Buffer would overflow");
+    if (activeRx.uiWritePosition > activeRx.buffer.GetSize() || usSizeSent > activeRx.buffer.GetSize() - activeRx.uiWritePosition)
+    {
+        return OnReceiveError(SString("Buffer would overflow (size:%u pos:%u chunk:%u)", activeRx.buffer.GetSize(), activeRx.uiWritePosition, usSizeSent));
+    }
 
     if (bIsTail && activeRx.uiWritePosition + usSizeSent != activeRx.buffer.GetSize())
         return OnReceiveError("Buffer size wrong");

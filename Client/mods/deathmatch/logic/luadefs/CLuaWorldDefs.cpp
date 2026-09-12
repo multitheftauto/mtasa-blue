@@ -2103,7 +2103,7 @@ bool CLuaWorldDefs::ResetCoronaReflectionsEnabled()
     return true;
 }
 
-std::variant<bool, float, CLuaMultiReturn<float, float, float>> CLuaWorldDefs::GetWorldProperty(WorldProperty property)
+std::variant<bool, float, CLuaMultiReturn<float, float, float>> CLuaWorldDefs::GetWorldProperty(WorldProperty::Enum property)
 {
     switch (property)
     {
@@ -2171,7 +2171,7 @@ std::variant<bool, float, CLuaMultiReturn<float, float, float>> CLuaWorldDefs::G
     return false;
 }
 
-bool CLuaWorldDefs::SetWorldProperty(WorldProperty property, float arg1, std::optional<float> arg2, std::optional<float> arg3)
+bool CLuaWorldDefs::SetWorldProperty(WorldProperty::Enum property, float arg1, std::optional<float> arg2, std::optional<float> arg3)
 {
     if (arg2.has_value() && arg3.has_value())
     {
@@ -2236,7 +2236,7 @@ bool CLuaWorldDefs::SetWorldProperty(WorldProperty property, float arg1, std::op
     return false;
 }
 
-bool CLuaWorldDefs::ResetWorldProperty(WorldProperty property)
+bool CLuaWorldDefs::ResetWorldProperty(WorldProperty::Enum property)
 {
     switch (property)
     {
@@ -2373,6 +2373,7 @@ CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, fl
     CEntity* entity = g_pGame->GetWorld()->TestSphereAgainstWorld(
         sphereCenter, radius, ignoredEntity.has_value() ? ignoredEntity.value()->GetGameEntity() : nullptr, checkBuildings.value_or(true),
         checkVehicles.value_or(true), checkPeds.value_or(true), checkObjects.value_or(true), checkDummies.value_or(true), cameraIgnore.value_or(false), result);
+
     if (entity)
         collidedEntity = reinterpret_cast<CClientEntity*>(entity->GetStoredPointer());
 

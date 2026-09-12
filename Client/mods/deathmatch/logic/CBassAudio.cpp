@@ -244,6 +244,7 @@ bool CBassAudio::BeginLoadingMedia()
                     if (it == ms_FailedAudioFiles.end() || (dwCurrentTime - it->second) >= FAILED_LOAD_RETRY_DELAY)
                     {
                         bShouldTry = true;
+
                         // Mark as failed/in-progress immediately
                         // and to ensure failure is cached if ConvertFileToMono fails
                         ms_FailedAudioFiles[m_strPath] = dwCurrentTime;
@@ -331,12 +332,15 @@ bool CBassAudio::BeginLoadingMedia()
             g_pCore->GetConsole()->Printf("BASS ERROR %d in BASS_FX_BPM_BeatCallbackSet  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D,
                                           m_bLoop);
         }
+
         m_pSound = BASS_FX_TempoCreate(m_pSound, lFlags | BASS_FX_FREESOURCE);
+
         if (!m_pSound)
         {
             g_pCore->GetConsole()->Printf("BASS ERROR %d in CreateTempo  path:%s  3d:%d  loop:%d", BASS_ErrorGetCode(), *m_strPath, m_b3D, m_bLoop);
             return false;
         }
+
         BASS_ChannelGetAttribute(m_pSound, BASS_ATTRIB_TEMPO, &m_fTempo);
         BASS_ChannelGetAttribute(m_pSound, BASS_ATTRIB_TEMPO_PITCH, &m_fPitch);
         BASS_ChannelGetAttribute(m_pSound, BASS_ATTRIB_TEMPO_FREQ, &m_fSampleRate);
@@ -519,10 +523,10 @@ HSTREAM CBassAudio::ConvertFileToMono(const SString& strPath)
     DWORD decodedLength = BASS_ChannelGetData(decoder, data, length);  // decode data
     BASS_StreamFree(decoder);                                          // free the decoder/mixer
 
-    if (decodedLength == static_cast<DWORD>(-1))
+    if (decodedLength == 0 || decodedLength == static_cast<DWORD>(-1))
     {
         free(data);
-        return 0;  // decode failed
+        return 0;  // no decoded data
     }
 
     HSTREAM stream = BASS_StreamCreate(ci.freq, 1, BASS_STREAM_AUTOFREE, STREAMPROC_PUSH, NULL);  // create stream
@@ -532,7 +536,7 @@ HSTREAM CBassAudio::ConvertFileToMono(const SString& strPath)
         return 0;  // stream creation failed
     }
 
-    if (!BASS_StreamPutData(stream, data, decodedLength))  // set the stream data
+    if (BASS_StreamPutData(stream, data, decodedLength) == static_cast<DWORD>(-1))  // set the stream data
     {
         free(data);
         BASS_StreamFree(stream);
@@ -1077,6 +1081,7 @@ float* CBassAudio::GetWaveData(int iLength)
     }
     return NULL;
 }
+
 DWORD CBassAudio::GetLevelData()
 {
     if (m_pSound)

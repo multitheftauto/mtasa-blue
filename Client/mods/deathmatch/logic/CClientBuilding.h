@@ -37,13 +37,24 @@ public:
     bool SetMatrix(const CMatrix& matrix) override;
 
     void SetInterior(uint8_t ucInterior) override;
+    void SetDimension(unsigned short usDimension) override;
+
+    // Buildings aren't a CClientStreamElement, so unlike objects/peds/vehicles they get no
+    // automatic dimension-based streaming; this is what the manager calls on every building
+    // whenever the local player's dimension changes, and what our own SetDimension calls to
+    // re-evaluate this one building right after its own dimension changes.
+    void RelateDimension(unsigned short usDimension);
 
     uint16_t GetModel() const noexcept { return m_usModelId; };
     void     SetModel(uint16_t ulModel);
 
     eClientEntityType GetType() const { return CCLIENTBUILDING; }
 
+    bool GetUsesCollision() const noexcept { return m_usesCollision; }
     void SetUsesCollision(bool state);
+
+    unsigned char GetAlpha() const noexcept { return m_ucAlpha; }
+    void          SetAlpha(unsigned char ucAlpha);
 
     void Create();
     void Destroy();
@@ -69,12 +80,13 @@ private:
 private:
     CClientBuildingManager* m_pBuildingManager;
 
-    CBuilding* m_pBuilding;
-    uint16_t   m_usModelId;
-    CVector    m_vPos;
-    CVector    m_vRot;
-    uint8_t    m_interior;
-    bool       m_usesCollision;
+    CBuilding*    m_pBuilding;
+    uint16_t      m_usModelId;
+    CVector       m_vPos;
+    CVector       m_vRot;
+    uint8_t       m_interior;
+    bool          m_usesCollision;
+    unsigned char m_ucAlpha;
 
     CClientBuilding* m_pHighBuilding;
     CClientBuilding* m_pLowBuilding;

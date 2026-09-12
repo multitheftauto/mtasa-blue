@@ -148,6 +148,15 @@ void CClientStreamElement::StreamOutForABit()
 {
     // Remove asap, very messy
     InternalStreamOut();
+
+    // This is a deliberate, temporary stream-out (e.g. engineReplaceModel / model restore
+    // via RestreamObjects/RestreamPeds/etc). Unlike a distance-based stream-out it must be
+    // allowed to stream back in immediately. Otherwise the anti-thrash cooldown added in #4744
+    // (minStreamInDelayAfterOutMs in CClientStreamer::Restream) keeps the element - and its
+    // collision - streamed out for >1s, which makes players fall through restreamed ground/objects.
+    // Clearing the timestamp restores the documented "stream back in next frame" behaviour without
+    // re-introducing the #4744 ping-pong (which only goes through the distance-based InternalStreamOut).
+    m_lastStreamOutTime = 0u;
 }
 
 void CClientStreamElement::SetDimension(unsigned short usDimension)

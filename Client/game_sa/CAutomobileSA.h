@@ -73,9 +73,8 @@ public:
     unsigned short            m_wVoodooSuspension;
     int                       m_dwBusDoorTimerEnd;
     int                       m_dwBusDoorTimerStart;
-    float                     field_878;
-    float                     wheelOffsetZ[4];
-    int                       field_88C[3];
+    float                     m_aSuspensionSpringLength[4];
+    float                     m_aSuspensionLineLength[4];
     float                     m_fFrontHeightAboveRoad;
     float                     m_fRearHeightAboveRoad;
     float                     m_fCarTraction;

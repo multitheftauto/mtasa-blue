@@ -18,9 +18,6 @@ MTAEXPORT CXML* InitXMLInterface(const char* szSaveFlagDirectory)
     // Initialize and do any file recovery as necessary
     CXMLFileImpl::InitFileRecovery(szSaveFlagDirectory);
 
-    // this is required during parsing, see resources project fallout/help.xml @r659
-    TiXmlBase::SetCondenseWhiteSpace(false);
-
     pXMLInterface = new CXMLImpl;
     return pXMLInterface;
 }

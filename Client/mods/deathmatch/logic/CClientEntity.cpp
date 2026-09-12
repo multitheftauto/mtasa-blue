@@ -743,8 +743,12 @@ bool CClientEntity::AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaF
 
 bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren, const char* minClientVersion)
 {
-    if (!g_pClientGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, NULL))
-        return false;
+    CDebugHookManager* debugHookManager = g_pClientGame->GetDebugHookManager();
+    if (debugHookManager->HasPreEventHooks())
+    {
+        if (!debugHookManager->OnPreEvent(szName, Arguments, this, nullptr))
+            return false;
+    }
 
     TIMEUS startTime = GetTimeUs();
 
@@ -772,7 +776,8 @@ bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments
             TIMING_DETAIL(SString("Event: %s [%d ms]", szName, deltaTimeUs / 1000));
     }
 
-    g_pClientGame->GetDebugHookManager()->OnPostEvent(szName, Arguments, this, NULL);
+    if (debugHookManager->HasPostEventHooks())
+        debugHookManager->OnPostEvent(szName, Arguments, this, nullptr);
 
     // Return whether it got cancelled or not
     return (!pEvents->WasEventCancelled());
@@ -1192,6 +1197,21 @@ void CClientEntity::DoAttaching()
 
         if (!SetMatrix(returnMatrix))
             SetPosition(returnMatrix.vPos);
+
+        // Moving us can run script events (a colshape firing hit/leave events here), and a
+        // handler may have detached us, so make sure we are still attached before going on
+        if (!m_pAttachedToEntity)
+            return;
+
+        // The game only recalculates an entity's surface brightness from its surroundings
+        // while it's not attached to anything (see CObject::PreRender), so an attached
+        // entity would otherwise stay stuck at its default (too bright) value forever.
+        // Keep it in sync with whatever it's attached to every frame, same as vanilla
+        // hand-held objects already do with their owning ped.
+        CPhysical* pThisPhysical = dynamic_cast<CPhysical*>(GetGameEntity());
+        CPhysical* pAttachedToPhysical = dynamic_cast<CPhysical*>(m_pAttachedToEntity->GetGameEntity());
+        if (pThisPhysical && pAttachedToPhysical)
+            pThisPhysical->SetLighting(pAttachedToPhysical->GetLighting());
     }
 }
 

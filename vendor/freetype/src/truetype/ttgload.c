@@ -4,7 +4,7 @@
  *
  *   TrueType Glyph Loader (body).
  *
- * Copyright (C) 1996-2025 by
+ * Copyright (C) 1996-2026 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -345,8 +345,8 @@
     FT_Byte*        limit      = load->limit;
     FT_GlyphLoader  gloader    = load->gloader;
     FT_Outline*     outline    = &gloader->current.outline;
-    FT_Int          n_contours = load->n_contours;
-    FT_Int          n_points;
+    FT_UInt         n_contours = (FT_UInt)load->n_contours;
+    FT_UInt         n_points;
     FT_UShort       n_ins;
 
     FT_Byte         *flag, *flag_limit;
@@ -354,7 +354,6 @@
     FT_Vector       *vec, *vec_limit;
     FT_Pos          x, y;
     FT_UShort       *cont, *cont_limit;
-    FT_Int          last;
 
 
     /* check that we can add the contours to the glyph */
@@ -363,27 +362,25 @@
       goto Fail;
 
     /* check space for contours array + instructions count */
-    if ( n_contours >= 0xFFF || p + 2 * n_contours + 2 > limit )
+    if ( n_contours >= 0xFFFU || p + 2 * n_contours + 2 > limit )
       goto Invalid_Outline;
 
     /* reading the contours' endpoints & number of points */
     cont       = outline->contours;
     cont_limit = cont + n_contours;
 
-    last = -1;
+    n_points = 0;
     for ( ; cont < cont_limit; cont++ )
     {
       *cont = FT_NEXT_USHORT( p );
 
-      if ( *cont <= last )
+      if ( *cont < n_points )
         goto Invalid_Outline;
 
-      last = *cont;
+      n_points = *cont + 1U;
     }
 
-    n_points = last + 1;
-
-    FT_TRACE5(( "  # of points: %d\n", n_points ));
+    FT_TRACE5(( "  # of points: %u\n", n_points ));
 
     /* note that we will add four phantom points later */
     error = FT_GLYPHLOADER_CHECK_POINTS( gloader, n_points + 4, 0 );
@@ -1185,9 +1182,7 @@
 
 
     /* make room for phantom points */
-    error = FT_GLYPHLOADER_CHECK_POINTS( loader->gloader,
-                                         outline->n_points + 4,
-                                         0 );
+    error = FT_GLYPHLOADER_CHECK_POINTS( loader->gloader, 4, 0 );
     if ( error )
       return error;
 
@@ -1424,6 +1419,14 @@
     if ( recurse_count )
       FT_TRACE5(( "  nesting level: %u\n", recurse_count ));
 #endif
+
+    /* arbitrary recursion limit */
+    if ( recurse_count > 100 )
+    {
+      FT_TRACE4(( "load_truetype_glyph: recursion depth exceeded\n" ));
+      error = FT_THROW( Invalid_Composite );
+      goto Exit;
+    }
 
     /* some fonts have an incorrect value of `maxComponentDepth' */
     if ( recurse_count > face->max_profile.maxComponentDepth )
@@ -2217,6 +2220,10 @@
       exec = size->context;
 
 #ifdef TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL
+      /* reset backward compatibility; note that */
+      /* the CVT program always runs without it  */
+      exec->backward_compatibility = 0;
+
       if ( driver->interpreter_version == TT_INTERPRETER_VERSION_40 )
       {
         grayscale = FALSE;
@@ -2253,9 +2260,7 @@
           return error;
       }
 
-      error = TT_Load_Context( exec, face, size );
-      if ( error )
-        return error;
+      TT_Load_Context( exec, face, size );
 
       /* check whether the cvt program has disabled hinting */
       if ( size->GS.instruct_control & 1 )
@@ -2283,8 +2288,7 @@
            mode != FT_RENDER_MODE_MONO                              &&
            !FT_IS_TRICKY( glyph->face )                             )
         exec->backward_compatibility = ( size->GS.instruct_control & 4 ) ^ 4;
-      else
-        exec->backward_compatibility = 0;
+
 #endif /* TT_SUPPORT_SUBPIXEL_HINTING_MINIMAL */
 
       loader->exec = exec;

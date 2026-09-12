@@ -327,6 +327,12 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pCore->GetKeyBinds()->SetCharacterKeyHandler(CClientGame::StaticCharacterKeyHandler);
     g_pNet->RegisterPacketHandler(CClientGame::StaticProcessPacket);
 
+    // Set json-c double serialization to 16 significant digits instead of the
+    // default %.17g. At 17 digits, IEEE 754 rounding artifacts from the least
+    // significant bit become visible (e.g. 5.1 becomes "5.1000000000000001").
+    // This API survives json-c upgrades so the source files don't need patching.
+    json_c_set_serialization_double_format("%.16g", JSON_C_OPTION_GLOBAL);
+
     m_pLuaManager = new CLuaManager(this);
     m_pScriptDebugging = new CScriptDebugging(m_pLuaManager);
     m_pScriptDebugging->SetLogfile(CalcMTASAPath("mta\\logs\\clientscript.log"), 3);
@@ -1627,6 +1633,10 @@ bool CClientGame::IsNickValid(const char* szNick)
         {
             return false;
         }
+        if (ucTemp == '`')  // Match server-side CheckNickProvided backtick rejection
+        {
+            return false;
+        }
     }
 
     // Nickname is valid, return true
@@ -2186,6 +2196,7 @@ void CClientGame::SetAllDimensions(unsigned short usDimension)
     m_pManager->GetSoundManager()->SetDimension(usDimension);
     m_pManager->GetPointLightsManager()->SetDimension(usDimension);
     m_pManager->GetWaterManager()->SetDimension(usDimension);
+    m_pManager->GetBuildingManager()->SetDimension(usDimension);
     m_pNametags->SetDimension(usDimension);
     m_pCamera->SetDimension(usDimension);
 }
@@ -3653,6 +3664,9 @@ void CClientGame::StaticPostWorldProcessPedsAfterPreRenderHandler()
 
 void CClientGame::StaticPreFxRenderHandler()
 {
+    // RenderFadingInEntities is done at this point, so alpha entity list callbacks
+    // no longer reference CModelRenderer's queue elements.
+    g_pClientGame->GetModelRenderer()->NotifyFrameEnd();
     g_pCore->OnPreFxRender();
 }
 
@@ -3909,28 +3923,22 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWeatherUpdateHandler()
 {
-    // Fix #4803 (building light flicker): Re-apply MTA's weather state BEFORE
-    // CWeather::Update runs. CWeather::Update detects a clock wrap when setTime()
-    // jumps the game clock past InterpolationValue and re-derives Rain, Foggyness,
-    // CloudCoverage, ExtraSunnyness, SunGlare, HeatHaze, etc. from a freshly-picked
-    // weather pair. Those globals drive cloud, fog and night-time building light
-    // rendering for the rest of the frame, and PreWorldProcessHandler runs too late
-    // to undo the damage. Pre-syncing Old/New/InterpolationValue here keeps the
-    // wrap branch from firing.
+    // Fix #4803: Set MTA's weather types and zero InterpolationValue BEFORE
+    // CWeather::Update runs. Zeroing InterpolationValue prevents the wrap branch
+    // from ever firing (engine_interp >= 0 is always true), so the engine computes
+    // all weather globals (Foggyness, Rain, etc.) from MTA's weather pair.
     if (m_pManager->IsGameLoaded() && m_pBlendedWeather)
         m_pBlendedWeather->DoPulse();
 }
 
 void CClientGame::PreWorldProcessHandler()
 {
-    // Fix #4803: Re-apply MTA's weather state before CTimeCycle::CalcColoursForPoint()
-    // reads the weather globals for rendering. The engine's CWeather::Update() (0x53BFC2)
-    // runs earlier in CGame::Process() and can overwrite OldWeatherType/NewWeatherType
-    // when setTime() causes a clock wrap. This hook (at CWorld::Process, 0x53C095) runs
-    // after that overwrite but before CalcColoursForPoint (0x53C0DA) consumes the values,
-    // ensuring the rendered frame always uses MTA's intended weather.
+    // Re-apply MTA's weather types before CTimeCycle::CalcColoursForPoint() (0x53C0DA).
+    // Only set OldWeatherType/NewWeatherType — do NOT touch InterpolationValue here,
+    // so CalcColoursForPoint uses the same engine-computed value that CWeather::Update
+    // used for weather globals (Foggyness, etc.), keeping everything consistent.
     if (m_pManager->IsGameLoaded() && m_pBlendedWeather)
-        m_pBlendedWeather->DoPulse();
+        m_pBlendedWeather->ReapplyWeatherTypes();
 }
 
 void CClientGame::PostWorldProcessHandler()
@@ -4090,6 +4098,13 @@ bool CClientGame::AssocGroupCopyAnimationHandler(CAnimBlendAssociationSAInterfac
             pAnimAssociation->SetFlags(pOriginalAnimStaticAssoc->GetFlags());
             pAnimAssociation->SetAnimID(pOriginalAnimStaticAssoc->GetAnimID());
             pAnimAssociation->SetAnimGroup(pOriginalAnimStaticAssoc->GetAnimGroup());
+
+            // A partial anim (e.g. weapon fire) only animates part of the skeleton and leaves the rest to
+            // whatever movement anim is playing. Loading an IFP pads its animations out to all 32 bones,
+            // so without this the replacement would also drive the root, pelvis and legs with a fixed pose
+            // and the ped would go rigid.
+            if (pAnimAssociation->IsPartial())
+                pAnimAssociation->RestrictToBonesOf(pOriginalAnimStaticAssoc->GetInterface());
         }
     }
 
@@ -4825,7 +4840,35 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
             return bAllowDamage;
         }
 
+        // Tyre damage can be processed through different paths in GTA's damage handling.
+        // For weapons with skills, GTA processes tyre damage in the weapon-skill path
+        // before the general entity damage handling. When tyre damage is cancelled,
+        // this can cause the same hit to reach this handler again in the same frame.
+        // Filter out the repeated callback so onClientVehicleDamage is not fired twice.
+        if (ucTyre != UCHAR_INVALID_INDEX && weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_TEC9)
+        {
+            const bool bIsRetryOfSameHit = pVehicleInterface == m_pLastTyreDamageVehicleInterface && ucTyre == m_ucLastTyreDamageIndex &&
+                                           fLoss == m_fLastTyreDamageLoss && m_uiFrameCount == m_uiLastTyreDamageFrame;
+
+            if (bIsRetryOfSameHit)
+            {
+                // Repeated callback for the same tyre hit in the same frame.
+                // Keep the decision from the original callback and don't fire the event again.
+                return m_bLastTyreDamageAllowed;
+            }
+
+            m_pLastTyreDamageVehicleInterface = pVehicleInterface;
+            m_ucLastTyreDamageIndex = ucTyre;
+            m_fLastTyreDamageLoss = fLoss;
+            m_uiLastTyreDamageFrame = m_uiFrameCount;
+        }
+
         CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
+
+        // GTA passes a zeroed position for explosion and fire damage, so report the vehicle position instead
+        CVector vecEventDamagePos = vecDamagePos;
+        if (vecEventDamagePos == CVector())
+            pClientVehicle->GetPosition(vecEventDamagePos);
 
         // Compose arguments
         // attacker, weapon, loss, damagepos, tyreIdx
@@ -4839,9 +4882,9 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         else
             Arguments.PushNil();
         Arguments.PushNumber(fLoss);
-        Arguments.PushNumber(vecDamagePos.fX);
-        Arguments.PushNumber(vecDamagePos.fY);
-        Arguments.PushNumber(vecDamagePos.fZ);
+        Arguments.PushNumber(vecEventDamagePos.fX);
+        Arguments.PushNumber(vecEventDamagePos.fY);
+        Arguments.PushNumber(vecEventDamagePos.fZ);
         if (ucTyre != UCHAR_INVALID_INDEX)
             Arguments.PushNumber(ucTyre);
         else
@@ -4851,6 +4894,9 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         {
             bAllowDamage = false;
         }
+
+        if (ucTyre != UCHAR_INVALID_INDEX)
+            m_bLastTyreDamageAllowed = bAllowDamage;
     }
 
     return bAllowDamage;
@@ -5246,6 +5292,8 @@ void CClientGame::PostWeaponFire()
                 else
                     Arguments.PushNil();
 
+                // Lets SetDoingGangDriveby(false) defer the task abort instead of running it re-entrantly.
+                pPed->SetProcessingWeaponFireEvent(true);
                 if (IS_PLAYER(pPed))
                 {
                     CVector vecOrigin;
@@ -5257,6 +5305,9 @@ void CClientGame::PostWeaponFire()
                 }
                 else
                     pPed->CallEvent("onClientPedWeaponFire", Arguments, true);
+
+                // Make sure to reset the weapon fire event state
+                pPed->SetProcessingWeaponFireEvent(false);
             }
             pPed->PostWeaponFire();
 #ifdef MTA_DEBUG

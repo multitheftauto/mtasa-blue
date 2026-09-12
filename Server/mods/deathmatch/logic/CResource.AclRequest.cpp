@@ -175,8 +175,8 @@ void CResource::RefreshAutoPermissions(CXMLNode* pNodeAclRequest)
     for (std::vector<CAclRightName>::iterator iter = unusedRightNameMap.begin(); iter != unusedRightNameMap.end(); ++iter)
         GetAutoAcl()->RemoveRight(iter->GetName(), iter->GetType());
 
-    // If any rights are pending, print message
-    if (bHasPending)
+    // If any rights are pending and not already granted through other acl groups, print message
+    if (bHasPending && !HasAutoPermissions(pNodeAclRequest))
     {
         CLogger::LogPrintf("Resource '%s' requests some acl rights. Use the command 'aclrequest list %s'\n", GetName().c_str(), GetName().c_str());
     }

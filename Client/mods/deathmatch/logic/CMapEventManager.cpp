@@ -178,7 +178,8 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     int luaStackPointer = lua_gettop(pState);
 #endif
 
-                    TIMEUS startTime = GetTimeUs();
+                    const bool   timingActive = CClientPerfStatLuaTiming::GetSingleton()->IsActive();
+                    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
                     // Aspect ratio adjustment bodges
                     if (pMapEvent->ShouldAllowAspectRatioAdjustment())
@@ -193,8 +194,12 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     if (bEnabled)
                         g_pCore->LogEvent(0, "Lua Event", luaMain->GetScriptName(), szName);
 
-                    if (!g_pClientGame->GetDebugHookManager()->OnPreEventFunction(szName, Arguments, pSource, nullptr, pMapEvent))
-                        continue;
+                    CDebugHookManager* debugHookManager = g_pClientGame->GetDebugHookManager();
+                    if (debugHookManager->HasPreEventFunctionHooks())
+                    {
+                        if (!debugHookManager->OnPreEventFunction(szName, Arguments, pSource, nullptr, pMapEvent))
+                            continue;
+                    }
 
                     // Store the current values of the globals
                     lua_getglobal(pState, "source");
@@ -250,7 +255,8 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     pMapEvent->Call(Arguments);
                     bCalled = true;
 
-                    g_pClientGame->GetDebugHookManager()->OnPostEventFunction(szName, Arguments, pSource, nullptr, pMapEvent);
+                    if (debugHookManager->HasPostEventFunctionHooks())
+                        debugHookManager->OnPostEventFunction(szName, Arguments, pSource, nullptr, pMapEvent);
 
                     // Reset the globals on that VM
                     OldSource.Push(pState);
@@ -279,13 +285,16 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                         g_bAllowAspectRatioAdjustment = false;
                     }
 
-                    TIMEUS deltaTimeUs = GetTimeUs() - startTime;
+                    if (timingActive)
+                    {
+                        TIMEUS deltaTimeUs = GetTimeUs() - startTime;
 
-                    if (deltaTimeUs > 3000)
-                        if (IS_TIMING_CHECKPOINTS())
-                            strStatus += SString(" (%s %d ms)", luaMain->GetScriptName(), deltaTimeUs / 1000);
+                        if (deltaTimeUs > 3000)
+                            if (IS_TIMING_CHECKPOINTS())
+                                strStatus += SString(" (%s %d ms)", luaMain->GetScriptName(), deltaTimeUs / 1000);
 
-                    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(luaMain, szName, deltaTimeUs);
+                        CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(luaMain, szName, deltaTimeUs);
+                    }
                 }
             }
         }

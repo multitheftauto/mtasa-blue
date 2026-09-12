@@ -740,7 +740,7 @@ bool CPixelsManager::GetPlainDimensions(const CPixels& pixels, uint& uiOutWidth,
         const ushort* pPlainTail = (const ushort*)(pData + uiDataSize - SIZEOF_PLAIN_TAIL);
         uiOutWidth = pPlainTail[0];
         uiOutHeight = pPlainTail[1];
-        uint uiPlainByteSize = uiOutWidth * uiOutHeight * 4 + SIZEOF_PLAIN_TAIL;
+        const uint64_t uiPlainByteSize = static_cast<uint64_t>(uiOutWidth) * static_cast<uint64_t>(uiOutHeight) * 4ULL + SIZEOF_PLAIN_TAIL;
         if (uiDataSize == uiPlainByteSize)
             return true;
     }

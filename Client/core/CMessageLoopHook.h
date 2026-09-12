@@ -41,6 +41,7 @@ private:
     bool         m_bRefreshMsgQueueEnabled;
     POINT        m_MoveOffset;
     HWND         m_MovementDummyWindow;
+    HDEVNOTIFY   m_hDeviceNotify;
 
     static WPARAM m_LastVirtualKeyCode;
     static UCHAR  m_LastScanCode;

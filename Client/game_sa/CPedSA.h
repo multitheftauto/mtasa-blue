@@ -49,7 +49,9 @@ class CVehicleSAInterface;
 
 // CPedClothesDesc && CClothes
 #define FUNC_CPedClothesDesc__SetTextureAndModel 0x5A8080  // CPedClothesDesc::SetTextureAndModel
+#define FUNC_CPedClothesDesc__Initialise         0x5A78F0  // CPedClothesDesc::Initialise
 #define FUNC_CClothes__RebuildPlayer             0x5A82C0  // CClothes::RebuildPlayer
+#define SIZEOF_CPedClothesDesc                   0x78
 
 // CAEPedWeaponAudioEntity
 #define FUNC_CAEPedWeaponAudioEntity__AddAudioEvent 0x4E69F0  // CAEPedWeaponAudioEntity::AddAudioEvent
@@ -366,6 +368,7 @@ public:
     void Init();
 
     void SetModelIndex(std::uint32_t modelIndex) override;
+    void SetVisible(bool visible) override;
 
     bool InternalAttachEntityToEntity(DWORD entityInterface, const CVector* position, const CVector* rotation) override;
     void DetachPedFromEntity() override;
@@ -480,7 +483,8 @@ public:
     std::unique_ptr<CPedIK> GetPedIK() override { return std::make_unique<CPedIKSA>(GetPedIKInterface()); }
 
     CEntitySAInterface* GetTargetedObject() const override { return GetPedInterface()->pTargetedObject; }
-    PedState            GetPedState() const override { return static_cast<PedState>(GetPedInterface()->pedState); }
+    PedState::Enum      GetPedState() const override { return static_cast<PedState::Enum>(GetPedInterface()->pedState); }
+    void                SetPedState(PedState::Enum state) override { GetPedInterface()->pedState = static_cast<int>(state); }
 
     void GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const override;
 

@@ -79,4 +79,7 @@ public:
     CPadSAInterface*  GetInterface() { return internalInterface; };
     void              SetHornHistoryValue(bool value);
     void              SetLastTimeTouched(DWORD dwTime);
+    short             GetShakeDur();
+    unsigned char     GetShakeFreq();
+    void              SetShakeDur(short sShakeDur);
 };

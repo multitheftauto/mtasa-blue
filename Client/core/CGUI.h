@@ -55,6 +55,10 @@ public:
     void Invalidate();
     void Restore();
 
+    // True while a fatal fault dialog (CC51 or CC54) is open; rebuilds wait and nested faults exit.
+    static bool IsFaultDialogOpen() noexcept;
+    static void SetFaultDialogOpen(bool bOpen) noexcept;
+
     void DrawMouseCursor();
     void SetCursorPos(int iX, int iY, bool bForce = false, bool overrideStored = true);
 
@@ -94,9 +98,17 @@ public:
 
     void RequestLocaleChange(const SString& strLocale);
 
+    // Locale/skin changes destroy MainMenu (and its QuestionBox). Keep the restart
+    // requirement across that rebuild so resolution/etc. prompts are not lost.
+    void RequestRestartPrompt();
+
 private:
     void UpdateCursor();
     void ApplyQueuedLocale();
+    void TryShowRestartPrompt();
+    void ClearRestartPrompt() { m_bPendingRestartPrompt = false; }
+
+    static void RestartPromptCallBack(void* pData, unsigned int uiButton);
 
     DWORD TranslateScanCodeToGUIKey(DWORD dwCharacter);
 
@@ -123,4 +135,5 @@ private:
     uint    m_LocaleChangeCounter;
     SString m_QueuedLocaleChange;
     bool    m_bHasQueuedLocaleChange;
+    bool    m_bPendingRestartPrompt;
 };

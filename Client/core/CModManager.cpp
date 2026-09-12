@@ -103,9 +103,6 @@ void CModManager::DoPulsePostFrame()
 
     handleStateChange();  // Handle state changes after pulse
 
-    // TODO: ENSURE "CModManager::DoPulsePostFrame" IS THE LAST THING BEFORE THE FRAME ENDS
-    CCore::GetSingleton().GetFPSLimiter()->OnFrameEnd();  // Apply FPS limiting
-
     TIMING_GRAPH("-DoPulsePostFrame");
     TIMING_GRAPH("");
 }

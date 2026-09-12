@@ -59,7 +59,7 @@ public:
     }
     ElementID& operator-=(const ElementID& ID)
     {
-        m_value += ID.m_value;
+        m_value -= ID.m_value;
         return *this;
     }
     ElementID operator+(const ElementID& ID) const { return m_value + ID.m_value; }

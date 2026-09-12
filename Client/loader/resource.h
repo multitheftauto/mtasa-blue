@@ -42,6 +42,7 @@
 #define IDC_CHECK_REMEMBER          1038
 #define IDC_OPTIMUS_TEXT4           1039
 #define IDC_SEND_DUMP_LABEL         1040
+#define IDC_CHECKBOX_GROUP          1041
 
 // Next default values for new objects
 //

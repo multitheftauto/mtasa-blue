@@ -379,7 +379,7 @@ void CClientStreamer::Restream(bool bMovedFar)
     // Avoid swap ping-pong when two candidates are almost the same distance.
     // Distances are squared, so compare against squared hysteresis too.
     constexpr float         swapHysteresisDistanceSq = 10.0f * 10.0f;
-    constexpr std::uint32_t minStreamInDelayAfterOutMs = 1200u;
+    constexpr std::uint32_t minStreamInDelayAfterOutMs = 100u;
     const std::uint32_t     currentTime = static_cast<std::uint32_t>(CClientTime::GetTime());
 
     // Limit distance stream in/out rate

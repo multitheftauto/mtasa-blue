@@ -21,14 +21,11 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-#include "../curl_setup.h"
+#include "curl_setup.h"
 
-#if defined(USE_SECTRANSP) || defined(USE_MBEDTLS) || \
-    defined(USE_BEARSSL) || defined(USE_RUSTLS)
-#include "cipher_suite.h"
-#include "../curl_printf.h"
-#include "../strcase.h"
-#include <string.h>
+#if defined(USE_MBEDTLS) || defined(USE_RUSTLS)
+
+#include "vtls/cipher_suite.h"
 
 /*
  * To support the CURLOPT_SSL_CIPHER_LIST option on SSL backends
@@ -72,7 +69,7 @@ static const char *cs_txt =
   "ECDH" "\0"
   "ECDHE" "\0"
   "ECDSA" "\0"
-  "EDE" "\0"
+  "EDE" "\0" /* spellchecker:disable-line */
   "GCM" "\0"
   "MD5" "\0"
   "NULL" "\0"
@@ -82,28 +79,13 @@ static const char *cs_txt =
   "SHA" "\0"
   "SHA256" "\0"
   "SHA384" "\0"
-#if defined(USE_MBEDTLS)
+#ifdef USE_MBEDTLS
   "ARIA" "\0"
   "ARIA128" "\0"
   "ARIA256" "\0"
   "CAMELLIA" "\0"
   "CAMELLIA128" "\0"
   "CAMELLIA256" "\0"
-#endif
-#if defined(USE_SECTRANSP)
-  "40" "\0"
-  "ADH" "\0"
-  "AECDH" "\0"
-  "anon" "\0"
-  "DES40" "\0"
-  "DH" "\0"
-  "DSS" "\0"
-  "EDH" "\0"
-  "EXP" "\0"
-  "EXPORT" "\0"
-  "IDEA" "\0"
-  "RC2" "\0"
-  "RC4" "\0"
 #endif
 ;
 /* Indexes of above cs_txt */
@@ -128,7 +110,7 @@ enum {
   CS_TXT_IDX_ECDH,
   CS_TXT_IDX_ECDHE,
   CS_TXT_IDX_ECDSA,
-  CS_TXT_IDX_EDE,
+  CS_TXT_IDX_EDE, /* spellchecker:disable-line */
   CS_TXT_IDX_GCM,
   CS_TXT_IDX_MD5,
   CS_TXT_IDX_NULL,
@@ -138,7 +120,7 @@ enum {
   CS_TXT_IDX_SHA,
   CS_TXT_IDX_SHA256,
   CS_TXT_IDX_SHA384,
-#if defined(USE_MBEDTLS)
+#ifdef USE_MBEDTLS
   CS_TXT_IDX_ARIA,
   CS_TXT_IDX_ARIA128,
   CS_TXT_IDX_ARIA256,
@@ -146,42 +128,27 @@ enum {
   CS_TXT_IDX_CAMELLIA128,
   CS_TXT_IDX_CAMELLIA256,
 #endif
-#if defined(USE_SECTRANSP)
-  CS_TXT_IDX_40,
-  CS_TXT_IDX_ADH,
-  CS_TXT_IDX_AECDH,
-  CS_TXT_IDX_anon,
-  CS_TXT_IDX_DES40,
-  CS_TXT_IDX_DH,
-  CS_TXT_IDX_DSS,
-  CS_TXT_IDX_EDH,
-  CS_TXT_IDX_EXP,
-  CS_TXT_IDX_EXPORT,
-  CS_TXT_IDX_IDEA,
-  CS_TXT_IDX_RC2,
-  CS_TXT_IDX_RC4,
-#endif
   CS_TXT_LEN,
 };
 
-#define CS_ZIP_IDX(a, b, c, d, e, f, g, h)             \
-{                                                      \
-  (uint8_t) ((((a) << 2) & 0xFF) | ((b) & 0x3F) >> 4), \
-  (uint8_t) ((((b) << 4) & 0xFF) | ((c) & 0x3F) >> 2), \
-  (uint8_t) ((((c) << 6) & 0xFF) | ((d) & 0x3F)),      \
-  (uint8_t) ((((e) << 2) & 0xFF) | ((f) & 0x3F) >> 4), \
-  (uint8_t) ((((f) << 4) & 0xFF) | ((g) & 0x3F) >> 2), \
-  (uint8_t) ((((g) << 6) & 0xFF) | ((h) & 0x3F))       \
+#define CS_ZIP_IDX(a, b, c, d, e, f, g, h)            \
+{                                                     \
+  (uint8_t)((((a) << 2) & 0xFF) | ((b) & 0x3F) >> 4), \
+  (uint8_t)((((b) << 4) & 0xFF) | ((c) & 0x3F) >> 2), \
+  (uint8_t)((((c) << 6) & 0xFF) | ((d) & 0x3F)),      \
+  (uint8_t)((((e) << 2) & 0xFF) | ((f) & 0x3F) >> 4), \
+  (uint8_t)((((f) << 4) & 0xFF) | ((g) & 0x3F) >> 2), \
+  (uint8_t)((((g) << 6) & 0xFF) | ((h) & 0x3F))       \
 }
-#define CS_ENTRY(id, a, b, c, d, e, f, g, h)           \
-{                                                      \
-  id,                                                  \
-  CS_ZIP_IDX(                                          \
-    CS_TXT_IDX_ ## a, CS_TXT_IDX_ ## b,                \
-    CS_TXT_IDX_ ## c, CS_TXT_IDX_ ## d,                \
-    CS_TXT_IDX_ ## e, CS_TXT_IDX_ ## f,                \
-    CS_TXT_IDX_ ## g, CS_TXT_IDX_ ## h                 \
-  )                                                    \
+#define CS_ENTRY(id, a, b, c, d, e, f, g, h) \
+{                                            \
+  id,                                        \
+  CS_ZIP_IDX(                                \
+    CS_TXT_IDX_ ## a, CS_TXT_IDX_ ## b,      \
+    CS_TXT_IDX_ ## c, CS_TXT_IDX_ ## d,      \
+    CS_TXT_IDX_ ## e, CS_TXT_IDX_ ## f,      \
+    CS_TXT_IDX_ ## g, CS_TXT_IDX_ ## h       \
+  )                                          \
 }
 
 struct cs_entry {
@@ -190,15 +157,13 @@ struct cs_entry {
 };
 
 /* !checksrc! disable COMMANOSPACE all */
-static const struct cs_entry cs_list [] = {
+static const struct cs_entry cs_list[] = {
   /* TLS 1.3 ciphers */
-#if defined(USE_SECTRANSP) || defined(USE_MBEDTLS) || defined(USE_RUSTLS)
   CS_ENTRY(0x1301, TLS,AES,128,GCM,SHA256,,,),
   CS_ENTRY(0x1302, TLS,AES,256,GCM,SHA384,,,),
   CS_ENTRY(0x1303, TLS,CHACHA20,POLY1305,SHA256,,,,),
   CS_ENTRY(0x1304, TLS,AES,128,CCM,SHA256,,,),
   CS_ENTRY(0x1305, TLS,AES,128,CCM,8,SHA256,,),
-#endif
   /* TLS 1.2 ciphers */
   CS_ENTRY(0xC02B, TLS,ECDHE,ECDSA,WITH,AES,128,GCM,SHA256),
   CS_ENTRY(0xC02B, ECDHE,ECDSA,AES128,GCM,SHA256,,,),
@@ -212,7 +177,7 @@ static const struct cs_entry cs_list [] = {
   CS_ENTRY(0xCCA8, ECDHE,RSA,CHACHA20,POLY1305,,,,),
   CS_ENTRY(0xCCA9, TLS,ECDHE,ECDSA,WITH,CHACHA20,POLY1305,SHA256,),
   CS_ENTRY(0xCCA9, ECDHE,ECDSA,CHACHA20,POLY1305,,,,),
-#if defined(USE_SECTRANSP) || defined(USE_MBEDTLS) || defined(USE_BEARSSL)
+#ifdef USE_MBEDTLS
   CS_ENTRY(0x002F, TLS,RSA,WITH,AES,128,CBC,SHA,),
   CS_ENTRY(0x002F, AES128,SHA,,,,,,),
   CS_ENTRY(0x0035, TLS,RSA,WITH,AES,256,CBC,SHA,),
@@ -265,8 +230,6 @@ static const struct cs_entry cs_list [] = {
   CS_ENTRY(0xC031, ECDH,RSA,AES128,GCM,SHA256,,,),
   CS_ENTRY(0xC032, TLS,ECDH,RSA,WITH,AES,256,GCM,SHA384),
   CS_ENTRY(0xC032, ECDH,RSA,AES256,GCM,SHA384,,,),
-#endif
-#if defined(USE_SECTRANSP) || defined(USE_MBEDTLS)
   CS_ENTRY(0x0001, TLS,RSA,WITH,NULL,MD5,,,),
   CS_ENTRY(0x0001, NULL,MD5,,,,,,),
   CS_ENTRY(0x0002, TLS,RSA,WITH,NULL,SHA,,,),
@@ -353,20 +316,6 @@ static const struct cs_entry cs_list [] = {
   CS_ENTRY(0xC036, ECDHE,PSK,AES256,CBC,SHA,,,),
   CS_ENTRY(0xCCAB, TLS,PSK,WITH,CHACHA20,POLY1305,SHA256,,),
   CS_ENTRY(0xCCAB, PSK,CHACHA20,POLY1305,,,,,),
-#endif
-#if defined(USE_SECTRANSP) || defined(USE_BEARSSL)
-  CS_ENTRY(0x000A, TLS,RSA,WITH,3DES,EDE,CBC,SHA,),
-  CS_ENTRY(0x000A, DES,CBC3,SHA,,,,,),
-  CS_ENTRY(0xC003, TLS,ECDH,ECDSA,WITH,3DES,EDE,CBC,SHA),
-  CS_ENTRY(0xC003, ECDH,ECDSA,DES,CBC3,SHA,,,),
-  CS_ENTRY(0xC008, TLS,ECDHE,ECDSA,WITH,3DES,EDE,CBC,SHA),
-  CS_ENTRY(0xC008, ECDHE,ECDSA,DES,CBC3,SHA,,,),
-  CS_ENTRY(0xC00D, TLS,ECDH,RSA,WITH,3DES,EDE,CBC,SHA),
-  CS_ENTRY(0xC00D, ECDH,RSA,DES,CBC3,SHA,,,),
-  CS_ENTRY(0xC012, TLS,ECDHE,RSA,WITH,3DES,EDE,CBC,SHA),
-  CS_ENTRY(0xC012, ECDHE,RSA,DES,CBC3,SHA,,,),
-#endif
-#if defined(USE_MBEDTLS) || defined(USE_BEARSSL)
   CS_ENTRY(0xC09C, TLS,RSA,WITH,AES,128,CCM,,),
   CS_ENTRY(0xC09C, AES128,CCM,,,,,,),
   CS_ENTRY(0xC09D, TLS,RSA,WITH,AES,256,CCM,,),
@@ -383,143 +332,6 @@ static const struct cs_entry cs_list [] = {
   CS_ENTRY(0xC0AE, ECDHE,ECDSA,AES128,CCM8,,,,),
   CS_ENTRY(0xC0AF, TLS,ECDHE,ECDSA,WITH,AES,256,CCM,8),
   CS_ENTRY(0xC0AF, ECDHE,ECDSA,AES256,CCM8,,,,),
-#endif
-#if defined(USE_SECTRANSP)
-  /* entries marked bc are backward compatible aliases for old OpenSSL names */
-  CS_ENTRY(0x0003, TLS,RSA,EXPORT,WITH,RC4,40,MD5,),
-  CS_ENTRY(0x0003, EXP,RC4,MD5,,,,,),
-  CS_ENTRY(0x0004, TLS,RSA,WITH,RC4,128,MD5,,),
-  CS_ENTRY(0x0004, RC4,MD5,,,,,,),
-  CS_ENTRY(0x0005, TLS,RSA,WITH,RC4,128,SHA,,),
-  CS_ENTRY(0x0005, RC4,SHA,,,,,,),
-  CS_ENTRY(0x0006, TLS,RSA,EXPORT,WITH,RC2,CBC,40,MD5),
-  CS_ENTRY(0x0006, EXP,RC2,CBC,MD5,,,,),
-  CS_ENTRY(0x0007, TLS,RSA,WITH,IDEA,CBC,SHA,,),
-  CS_ENTRY(0x0007, IDEA,CBC,SHA,,,,,),
-  CS_ENTRY(0x0008, TLS,RSA,EXPORT,WITH,DES40,CBC,SHA,),
-  CS_ENTRY(0x0008, EXP,DES,CBC,SHA,,,,),
-  CS_ENTRY(0x0009, TLS,RSA,WITH,DES,CBC,SHA,,),
-  CS_ENTRY(0x0009, DES,CBC,SHA,,,,,),
-  CS_ENTRY(0x000B, TLS,DH,DSS,EXPORT,WITH,DES40,CBC,SHA),
-  CS_ENTRY(0x000B, EXP,DH,DSS,DES,CBC,SHA,,),
-  CS_ENTRY(0x000C, TLS,DH,DSS,WITH,DES,CBC,SHA,),
-  CS_ENTRY(0x000C, DH,DSS,DES,CBC,SHA,,,),
-  CS_ENTRY(0x000D, TLS,DH,DSS,WITH,3DES,EDE,CBC,SHA),
-  CS_ENTRY(0x000D, DH,DSS,DES,CBC3,SHA,,,),
-  CS_ENTRY(0x000E, TLS,DH,RSA,EXPORT,WITH,DES40,CBC,SHA),
-  CS_ENTRY(0x000E, EXP,DH,RSA,DES,CBC,SHA,,),
-  CS_ENTRY(0x000F, TLS,DH,RSA,WITH,DES,CBC,SHA,),
-  CS_ENTRY(0x000F, DH,RSA,DES,CBC,SHA,,,),
-  CS_ENTRY(0x0010, TLS,DH,RSA,WITH,3DES,EDE,CBC,SHA),
-  CS_ENTRY(0x0010, DH,RSA,DES,CBC3,SHA,,,),
-  CS_ENTRY(0x0011, TLS,DHE,DSS,EXPORT,WITH,DES40,CBC,SHA),
-  CS_ENTRY(0x0011, EXP,DHE,DSS,DES,CBC,SHA,,),
-  CS_ENTRY(0x0011, EXP,EDH,DSS,DES,CBC,SHA,,), /* bc */
-  CS_ENTRY(0x0012, TLS,DHE,DSS,WITH,DES,CBC,SHA,),
-  CS_ENTRY(0x0012, DHE,DSS,DES,CBC,SHA,,,),
-  CS_ENTRY(0x0012, EDH,DSS,DES,CBC,SHA,,,), /* bc */
-  CS_ENTRY(0x0013, TLS,DHE,DSS,WITH,3DES,EDE,CBC,SHA),
-  CS_ENTRY(0x0013, DHE,DSS,DES,CBC3,SHA,,,),
-  CS_ENTRY(0x0013, EDH,DSS,DES,CBC3,SHA,,,), /* bc */
-  CS_ENTRY(0x0014, TLS,DHE,RSA,EXPORT,WITH,DES40,CBC,SHA),
-  CS_ENTRY(0x0014, EXP,DHE,RSA,DES,CBC,SHA,,),
-  CS_ENTRY(0x0014, EXP,EDH,RSA,DES,CBC,SHA,,), /* bc */
-  CS_ENTRY(0x0015, TLS,DHE,RSA,WITH,DES,CBC,SHA,),
-  CS_ENTRY(0x0015, DHE,RSA,DES,CBC,SHA,,,),
-  CS_ENTRY(0x0015, EDH,RSA,DES,CBC,SHA,,,), /* bc */
-  CS_ENTRY(0x0016, TLS,DHE,RSA,WITH,3DES,EDE,CBC,SHA),
-  CS_ENTRY(0x0016, DHE,RSA,DES,CBC3,SHA,,,),
-  CS_ENTRY(0x0016, EDH,RSA,DES,CBC3,SHA,,,), /* bc */
-  CS_ENTRY(0x0017, TLS,DH,anon,EXPORT,WITH,RC4,40,MD5),
-  CS_ENTRY(0x0017, EXP,ADH,RC4,MD5,,,,),
-  CS_ENTRY(0x0018, TLS,DH,anon,WITH,RC4,128,MD5,),
-  CS_ENTRY(0x0018, ADH,RC4,MD5,,,,,),
-  CS_ENTRY(0x0019, TLS,DH,anon,EXPORT,WITH,DES40,CBC,SHA),
-  CS_ENTRY(0x0019, EXP,ADH,DES,CBC,SHA,,,),
-  CS_ENTRY(0x001A, TLS,DH,anon,WITH,DES,CBC,SHA,),
-  CS_ENTRY(0x001A, ADH,DES,CBC,SHA,,,,),
-  CS_ENTRY(0x001B, TLS,DH,anon,WITH,3DES,EDE,CBC,SHA),
-  CS_ENTRY(0x001B, ADH,DES,CBC3,SHA,,,,),
-  CS_ENTRY(0x0030, TLS,DH,DSS,WITH,AES,128,CBC,SHA),
-  CS_ENTRY(0x0030, DH,DSS,AES128,SHA,,,,),
-  CS_ENTRY(0x0031, TLS,DH,RSA,WITH,AES,128,CBC,SHA),
-  CS_ENTRY(0x0031, DH,RSA,AES128,SHA,,,,),
-  CS_ENTRY(0x0032, TLS,DHE,DSS,WITH,AES,128,CBC,SHA),
-  CS_ENTRY(0x0032, DHE,DSS,AES128,SHA,,,,),
-  CS_ENTRY(0x0034, TLS,DH,anon,WITH,AES,128,CBC,SHA),
-  CS_ENTRY(0x0034, ADH,AES128,SHA,,,,,),
-  CS_ENTRY(0x0036, TLS,DH,DSS,WITH,AES,256,CBC,SHA),
-  CS_ENTRY(0x0036, DH,DSS,AES256,SHA,,,,),
-  CS_ENTRY(0x0037, TLS,DH,RSA,WITH,AES,256,CBC,SHA),
-  CS_ENTRY(0x0037, DH,RSA,AES256,SHA,,,,),
-  CS_ENTRY(0x0038, TLS,DHE,DSS,WITH,AES,256,CBC,SHA),
-  CS_ENTRY(0x0038, DHE,DSS,AES256,SHA,,,,),
-  CS_ENTRY(0x003A, TLS,DH,anon,WITH,AES,256,CBC,SHA),
-  CS_ENTRY(0x003A, ADH,AES256,SHA,,,,,),
-  CS_ENTRY(0x003E, TLS,DH,DSS,WITH,AES,128,CBC,SHA256),
-  CS_ENTRY(0x003E, DH,DSS,AES128,SHA256,,,,),
-  CS_ENTRY(0x003F, TLS,DH,RSA,WITH,AES,128,CBC,SHA256),
-  CS_ENTRY(0x003F, DH,RSA,AES128,SHA256,,,,),
-  CS_ENTRY(0x0040, TLS,DHE,DSS,WITH,AES,128,CBC,SHA256),
-  CS_ENTRY(0x0040, DHE,DSS,AES128,SHA256,,,,),
-  CS_ENTRY(0x0068, TLS,DH,DSS,WITH,AES,256,CBC,SHA256),
-  CS_ENTRY(0x0068, DH,DSS,AES256,SHA256,,,,),
-  CS_ENTRY(0x0069, TLS,DH,RSA,WITH,AES,256,CBC,SHA256),
-  CS_ENTRY(0x0069, DH,RSA,AES256,SHA256,,,,),
-  CS_ENTRY(0x006A, TLS,DHE,DSS,WITH,AES,256,CBC,SHA256),
-  CS_ENTRY(0x006A, DHE,DSS,AES256,SHA256,,,,),
-  CS_ENTRY(0x006C, TLS,DH,anon,WITH,AES,128,CBC,SHA256),
-  CS_ENTRY(0x006C, ADH,AES128,SHA256,,,,,),
-  CS_ENTRY(0x006D, TLS,DH,anon,WITH,AES,256,CBC,SHA256),
-  CS_ENTRY(0x006D, ADH,AES256,SHA256,,,,,),
-  CS_ENTRY(0x008A, TLS,PSK,WITH,RC4,128,SHA,,),
-  CS_ENTRY(0x008A, PSK,RC4,SHA,,,,,),
-  CS_ENTRY(0x008B, TLS,PSK,WITH,3DES,EDE,CBC,SHA,),
-  CS_ENTRY(0x008B, PSK,3DES,EDE,CBC,SHA,,,),
-  CS_ENTRY(0x008E, TLS,DHE,PSK,WITH,RC4,128,SHA,),
-  CS_ENTRY(0x008E, DHE,PSK,RC4,SHA,,,,),
-  CS_ENTRY(0x008F, TLS,DHE,PSK,WITH,3DES,EDE,CBC,SHA),
-  CS_ENTRY(0x008F, DHE,PSK,3DES,EDE,CBC,SHA,,),
-  CS_ENTRY(0x0092, TLS,RSA,PSK,WITH,RC4,128,SHA,),
-  CS_ENTRY(0x0092, RSA,PSK,RC4,SHA,,,,),
-  CS_ENTRY(0x0093, TLS,RSA,PSK,WITH,3DES,EDE,CBC,SHA),
-  CS_ENTRY(0x0093, RSA,PSK,3DES,EDE,CBC,SHA,,),
-  CS_ENTRY(0x00A0, TLS,DH,RSA,WITH,AES,128,GCM,SHA256),
-  CS_ENTRY(0x00A0, DH,RSA,AES128,GCM,SHA256,,,),
-  CS_ENTRY(0x00A1, TLS,DH,RSA,WITH,AES,256,GCM,SHA384),
-  CS_ENTRY(0x00A1, DH,RSA,AES256,GCM,SHA384,,,),
-  CS_ENTRY(0x00A2, TLS,DHE,DSS,WITH,AES,128,GCM,SHA256),
-  CS_ENTRY(0x00A2, DHE,DSS,AES128,GCM,SHA256,,,),
-  CS_ENTRY(0x00A3, TLS,DHE,DSS,WITH,AES,256,GCM,SHA384),
-  CS_ENTRY(0x00A3, DHE,DSS,AES256,GCM,SHA384,,,),
-  CS_ENTRY(0x00A4, TLS,DH,DSS,WITH,AES,128,GCM,SHA256),
-  CS_ENTRY(0x00A4, DH,DSS,AES128,GCM,SHA256,,,),
-  CS_ENTRY(0x00A5, TLS,DH,DSS,WITH,AES,256,GCM,SHA384),
-  CS_ENTRY(0x00A5, DH,DSS,AES256,GCM,SHA384,,,),
-  CS_ENTRY(0x00A6, TLS,DH,anon,WITH,AES,128,GCM,SHA256),
-  CS_ENTRY(0x00A6, ADH,AES128,GCM,SHA256,,,,),
-  CS_ENTRY(0x00A7, TLS,DH,anon,WITH,AES,256,GCM,SHA384),
-  CS_ENTRY(0x00A7, ADH,AES256,GCM,SHA384,,,,),
-  CS_ENTRY(0xC002, TLS,ECDH,ECDSA,WITH,RC4,128,SHA,),
-  CS_ENTRY(0xC002, ECDH,ECDSA,RC4,SHA,,,,),
-  CS_ENTRY(0xC007, TLS,ECDHE,ECDSA,WITH,RC4,128,SHA,),
-  CS_ENTRY(0xC007, ECDHE,ECDSA,RC4,SHA,,,,),
-  CS_ENTRY(0xC00C, TLS,ECDH,RSA,WITH,RC4,128,SHA,),
-  CS_ENTRY(0xC00C, ECDH,RSA,RC4,SHA,,,,),
-  CS_ENTRY(0xC011, TLS,ECDHE,RSA,WITH,RC4,128,SHA,),
-  CS_ENTRY(0xC011, ECDHE,RSA,RC4,SHA,,,,),
-  CS_ENTRY(0xC015, TLS,ECDH,anon,WITH,NULL,SHA,,),
-  CS_ENTRY(0xC015, AECDH,NULL,SHA,,,,,),
-  CS_ENTRY(0xC016, TLS,ECDH,anon,WITH,RC4,128,SHA,),
-  CS_ENTRY(0xC016, AECDH,RC4,SHA,,,,,),
-  CS_ENTRY(0xC017, TLS,ECDH,anon,WITH,3DES,EDE,CBC,SHA),
-  CS_ENTRY(0xC017, AECDH,DES,CBC3,SHA,,,,),
-  CS_ENTRY(0xC018, TLS,ECDH,anon,WITH,AES,128,CBC,SHA),
-  CS_ENTRY(0xC018, AECDH,AES128,SHA,,,,,),
-  CS_ENTRY(0xC019, TLS,ECDH,anon,WITH,AES,256,CBC,SHA),
-  CS_ENTRY(0xC019, AECDH,AES256,SHA,,,,,),
-#endif
-#if defined(USE_MBEDTLS)
   /* entries marked ns are "non-standard", they are not in OpenSSL */
   CS_ENTRY(0x0041, TLS,RSA,WITH,CAMELLIA,128,CBC,SHA,),
   CS_ENTRY(0x0041, CAMELLIA128,SHA,,,,,,),
@@ -727,10 +539,9 @@ static const struct cs_entry cs_list [] = {
 };
 #define CS_LIST_LEN CURL_ARRAYSIZE(cs_list)
 
-static int cs_str_to_zip(const char *cs_str, size_t cs_len,
-                         uint8_t zip[6])
+static int cs_str_to_zip(const char *cs_str, size_t cs_len, uint8_t zip[6])
 {
-  uint8_t indexes[8] = {0};
+  uint8_t indexes[8] = { 0 };
   const char *entry, *cur;
   const char *nxt = cs_str;
   const char *end = cs_str + cs_len;
@@ -739,7 +550,7 @@ static int cs_str_to_zip(const char *cs_str, size_t cs_len,
   size_t len;
 
   /* split the cipher string by '-' or '_' */
-  if(strncasecompare(cs_str, "TLS", 3))
+  if(curl_strnequal(cs_str, "TLS", 3))
     separator = '_';
 
   do {
@@ -748,37 +559,37 @@ static int cs_str_to_zip(const char *cs_str, size_t cs_len,
 
     /* determine the length of the part */
     cur = nxt;
-    for(; nxt < end && *nxt != '\0' && *nxt != separator; nxt++);
+    for(; nxt < end && *nxt != '\0' && *nxt != separator; nxt++)
+      ;
     len = nxt - cur;
 
     /* lookup index for the part (skip empty string at 0) */
     for(idx = 1, entry = cs_txt + 1; idx < CS_TXT_LEN; idx++) {
       size_t elen = strlen(entry);
-      if(elen == len && strncasecompare(entry, cur, len))
+      if(elen == len && curl_strnequal(entry, cur, len))
         break;
       entry += elen + 1;
     }
     if(idx == CS_TXT_LEN)
       return -1;
 
-    indexes[i++] = (uint8_t) idx;
+    indexes[i++] = (uint8_t)idx;
   } while(nxt < end && *(nxt++) != '\0');
 
   /* zip the 8 indexes into 48 bits */
-  zip[0] = (uint8_t) (indexes[0] << 2 | (indexes[1] & 0x3F) >> 4);
-  zip[1] = (uint8_t) (indexes[1] << 4 | (indexes[2] & 0x3F) >> 2);
-  zip[2] = (uint8_t) (indexes[2] << 6 | (indexes[3] & 0x3F));
-  zip[3] = (uint8_t) (indexes[4] << 2 | (indexes[5] & 0x3F) >> 4);
-  zip[4] = (uint8_t) (indexes[5] << 4 | (indexes[6] & 0x3F) >> 2);
-  zip[5] = (uint8_t) (indexes[6] << 6 | (indexes[7] & 0x3F));
+  zip[0] = (uint8_t)(indexes[0] << 2 | (indexes[1] & 0x3F) >> 4);
+  zip[1] = (uint8_t)(indexes[1] << 4 | (indexes[2] & 0x3F) >> 2);
+  zip[2] = (uint8_t)(indexes[2] << 6 | (indexes[3] & 0x3F));
+  zip[3] = (uint8_t)(indexes[4] << 2 | (indexes[5] & 0x3F) >> 4);
+  zip[4] = (uint8_t)(indexes[5] << 4 | (indexes[6] & 0x3F) >> 2);
+  zip[5] = (uint8_t)(indexes[6] << 6 | (indexes[7] & 0x3F));
 
   return 0;
 }
 
-static int cs_zip_to_str(const uint8_t zip[6],
-                         char *buf, size_t buf_size)
+static int cs_zip_to_str(const uint8_t zip[6], char *buf, size_t buf_size)
 {
-  uint8_t indexes[8] = {0};
+  uint8_t indexes[8] = { 0 };
   const char *entry;
   char separator = '-';
   int idx, i, r;
@@ -809,9 +620,9 @@ static int cs_zip_to_str(const uint8_t zip[6],
 
     /* append the part string to the buffer */
     if(i > 0)
-      r = msnprintf(&buf[len], buf_size - len, "%c%s", separator, entry);
+      r = curl_msnprintf(&buf[len], buf_size - len, "%c%s", separator, entry);
     else
-      r = msnprintf(&buf[len], buf_size - len, "%s", entry);
+      r = curl_msnprintf(&buf[len], buf_size - len, "%s", entry);
 
     if(r < 0)
       return -1;
@@ -839,13 +650,12 @@ uint16_t Curl_cipher_suite_lookup_id(const char *cs_str, size_t cs_len)
 static bool cs_is_separator(char c)
 {
   switch(c) {
-    case ' ':
-    case '\t':
-    case ':':
-    case ',':
-    case ';':
-      return TRUE;
-    default:;
+  case ' ':
+  case '\t':
+  case ':':
+  case ',':
+  case ';':
+    return TRUE;
   }
   return FALSE;
 }
@@ -853,10 +663,12 @@ static bool cs_is_separator(char c)
 uint16_t Curl_cipher_suite_walk_str(const char **str, const char **end)
 {
   /* move string pointer to first non-separator or end of string */
-  for(; cs_is_separator(*str[0]); (*str)++);
+  for(; cs_is_separator(*str[0]); (*str)++)
+    ;
 
   /* move end pointer to next separator or end of string */
-  for(*end = *str; *end[0] != '\0' && !cs_is_separator(*end[0]); (*end)++);
+  for(*end = *str; *end[0] != '\0' && !cs_is_separator(*end[0]); (*end)++)
+    ;
 
   return Curl_cipher_suite_lookup_id(*str, *end - *str);
 }
@@ -882,10 +694,9 @@ int Curl_cipher_suite_get_str(uint16_t id, char *buf, size_t buf_size,
     r = cs_zip_to_str(cs_list[j].zip, buf, buf_size);
 
   if(r < 0)
-    msnprintf(buf, buf_size, "TLS_UNKNOWN_0x%04x", id);
+    curl_msnprintf(buf, buf_size, "TLS_UNKNOWN_0x%04x", id);
 
   return r;
 }
 
-#endif /* defined(USE_SECTRANSP) || defined(USE_MBEDTLS) || \
-          defined(USE_BEARSSL) || defined(USE_RUSTLS) */
+#endif /* defined(USE_MBEDTLS) || defined(USE_RUSTLS) */

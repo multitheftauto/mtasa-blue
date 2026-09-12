@@ -63,4 +63,10 @@ public:
     virtual void              Clear() = 0;
     virtual void              SetHornHistoryValue(bool value) = 0;
     virtual void              SetLastTimeTouched(DWORD dwTime) = 0;
+
+    // PC never consumes these itself (CPad::ProcessPCSpecificStuff is a stub), so joystick
+    // code reads/ticks them to drive XInput rumble.
+    virtual short         GetShakeDur() = 0;
+    virtual unsigned char GetShakeFreq() = 0;
+    virtual void          SetShakeDur(short sShakeDur) = 0;
 };

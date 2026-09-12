@@ -650,6 +650,15 @@ SString CInstallManager::_CheckForWerCrash()
         {
             const auto  regs = WerCrash::ExtractRegistersFromMinidump(fullPath);
             const DWORD exceptionCode = regs.valid ? regs.exceptionCode : EXCEPTION_STACK_BUFFER_OVERRUN;
+
+            // Skip non-fail-fast dumps (e.g. 0xE06D7363 C++ exceptions) -
+            // those are handled by the normal crash handler, not the WER path.
+            if (regs.valid && exceptionCode != EXCEPTION_STACK_BUFFER_OVERRUN && exceptionCode != EXCEPTION_HEAP_CORRUPTION)
+            {
+                OutputDebugStringA(SString("_CheckForWerCrash: Skipping dump %s with non-fail-fast exception code 0x%08X\n", dumpFile.c_str(), exceptionCode));
+                continue;
+            }
+
             const char* exceptionName = (exceptionCode == EXCEPTION_STACK_BUFFER_OVERRUN) ? "Stack Buffer Overrun"
                                         : (exceptionCode == EXCEPTION_HEAP_CORRUPTION)    ? "Heap Corruption"
                                                                                           : "Security Exception";
@@ -796,6 +805,16 @@ SString CInstallManager::_CheckForWerCrash()
 
                 const auto  regs = WerCrash::ExtractRegistersFromMinidump(fullPath);
                 const DWORD exceptionCode = regs.valid ? regs.exceptionCode : EXCEPTION_STACK_BUFFER_OVERRUN;
+
+                // Skip non-fail-fast dumps (e.g. 0xE06D7363 C++ exceptions) -
+                // those are handled by the normal crash handler, not the WER path.
+                if (regs.valid && exceptionCode != EXCEPTION_STACK_BUFFER_OVERRUN && exceptionCode != EXCEPTION_HEAP_CORRUPTION)
+                {
+                    OutputDebugStringA(
+                        SString("_CheckForWerCrash: Skipping WER dump %s with non-fail-fast exception code 0x%08X\n", dumpFile.c_str(), exceptionCode));
+                    continue;
+                }
+
                 const char* exceptionName = (exceptionCode == EXCEPTION_STACK_BUFFER_OVERRUN) ? "Stack Buffer Overrun"
                                             : (exceptionCode == EXCEPTION_HEAP_CORRUPTION)    ? "Heap Corruption"
                                                                                               : "Security Exception";

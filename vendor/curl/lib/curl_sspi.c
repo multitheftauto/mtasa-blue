@@ -21,38 +21,13 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
 #include "curl_setup.h"
 
 #ifdef USE_WINDOWS_SSPI
 
-#include <curl/curl.h>
 #include "curl_sspi.h"
+#include "curlx/strdup.h"
 #include "curlx/multibyte.h"
-#include "system_win32.h"
-#include "curlx/version_win32.h"
-#include "curlx/warnless.h"
-
-/* The last #include files should be: */
-#include "curl_memory.h"
-#include "memdebug.h"
-
-/* We use our own typedef here since some headers might lack these */
-typedef PSecurityFunctionTable (APIENTRY *INITSECURITYINTERFACE_FN)(VOID);
-
-/* See definition of SECURITY_ENTRYPOINT in sspi.h */
-#ifdef UNICODE
-#  ifdef UNDER_CE
-#    define SECURITYENTRYPOINT L"InitSecurityInterfaceW"
-#  else
-#    define SECURITYENTRYPOINT "InitSecurityInterfaceW"
-#  endif
-#else
-#  define SECURITYENTRYPOINT "InitSecurityInterfaceA"
-#endif
-
-/* Handle of security.dll or secur32.dll, depending on Windows version */
-HMODULE Curl_hSecDll = NULL;
 
 /* Pointer to SSPI dispatch table */
 PSecurityFunctionTable Curl_pSecFn = NULL;
@@ -76,31 +51,10 @@ PSecurityFunctionTable Curl_pSecFn = NULL;
  */
 CURLcode Curl_sspi_global_init(void)
 {
-  INITSECURITYINTERFACE_FN pInitSecurityInterface;
-
   /* If security interface is not yet initialized try to do this */
-  if(!Curl_hSecDll) {
-    /* Security Service Provider Interface (SSPI) functions are located in
-     * security.dll on WinNT 4.0 and in secur32.dll on Win9x. Win2K and XP
-     * have both these DLLs (security.dll forwards calls to secur32.dll) */
-
-    /* Load SSPI dll into the address space of the calling process */
-    if(curlx_verify_windows_version(4, 0, 0, PLATFORM_WINNT, VERSION_EQUAL))
-      Curl_hSecDll = Curl_load_library(TEXT("security.dll"));
-    else
-      Curl_hSecDll = Curl_load_library(TEXT("secur32.dll"));
-    if(!Curl_hSecDll)
-      return CURLE_FAILED_INIT;
-
-    /* Get address of the InitSecurityInterfaceA function from the SSPI dll */
-    pInitSecurityInterface =
-      CURLX_FUNCTION_CAST(INITSECURITYINTERFACE_FN,
-                          (GetProcAddress(Curl_hSecDll, SECURITYENTRYPOINT)));
-    if(!pInitSecurityInterface)
-      return CURLE_FAILED_INIT;
-
+  if(!Curl_pSecFn) {
     /* Get pointer to Security Service Provider Interface dispatch table */
-    Curl_pSecFn = pInitSecurityInterface();
+    Curl_pSecFn = InitSecurityInterface();
     if(!Curl_pSecFn)
       return CURLE_FAILED_INIT;
   }
@@ -119,9 +73,7 @@ CURLcode Curl_sspi_global_init(void)
  */
 void Curl_sspi_global_cleanup(void)
 {
-  if(Curl_hSecDll) {
-    FreeLibrary(Curl_hSecDll);
-    Curl_hSecDll = NULL;
+  if(Curl_pSecFn) {
     Curl_pSecFn = NULL;
   }
 }
@@ -174,46 +126,62 @@ CURLcode Curl_create_sspi_identity(const char *userp, const char *passwdp,
   }
 
   /* Setup the identity's user and length */
-  dup_user.tchar_ptr = _tcsdup(user.tchar_ptr);
+  dup_user.tchar_ptr = curlx_tcsdup(user.tchar_ptr);
   if(!dup_user.tchar_ptr) {
-    curlx_unicodefree(useranddomain.tchar_ptr);
+    curlx_free(useranddomain.tchar_ptr);
     return CURLE_OUT_OF_MEMORY;
   }
-  identity->User = dup_user.tbyte_ptr;
-  identity->UserLength = curlx_uztoul(_tcslen(dup_user.tchar_ptr));
-  dup_user.tchar_ptr = NULL;
 
   /* Setup the identity's domain and length */
-  dup_domain.tchar_ptr = malloc(sizeof(TCHAR) * (domlen + 1));
+  dup_domain.tchar_ptr = curlx_malloc(sizeof(TCHAR) * (domlen + 1));
   if(!dup_domain.tchar_ptr) {
-    curlx_unicodefree(useranddomain.tchar_ptr);
+    curlx_free(dup_user.tchar_ptr);
+    curlx_free(useranddomain.tchar_ptr);
     return CURLE_OUT_OF_MEMORY;
   }
-  _tcsncpy(dup_domain.tchar_ptr, domain.tchar_ptr, domlen);
-  *(dup_domain.tchar_ptr + domlen) = TEXT('\0');
-  identity->Domain = dup_domain.tbyte_ptr;
-  identity->DomainLength = curlx_uztoul(domlen);
-  dup_domain.tchar_ptr = NULL;
+  if(_tcsncpy_s(dup_domain.tchar_ptr, domlen + 1, domain.tchar_ptr, domlen)) {
+    curlx_free(dup_user.tchar_ptr);
+    curlx_free(dup_domain.tchar_ptr);
+    curlx_free(useranddomain.tchar_ptr);
+    return CURLE_OUT_OF_MEMORY;
+  }
 
-  curlx_unicodefree(useranddomain.tchar_ptr);
+  curlx_free(useranddomain.tchar_ptr);
 
   /* Setup the identity's password and length */
   passwd.tchar_ptr = curlx_convert_UTF8_to_tchar(passwdp);
-  if(!passwd.tchar_ptr)
+  if(!passwd.tchar_ptr) {
+    curlx_free(dup_user.tchar_ptr);
+    curlx_free(dup_domain.tchar_ptr);
     return CURLE_OUT_OF_MEMORY;
-  dup_passwd.tchar_ptr = _tcsdup(passwd.tchar_ptr);
+  }
+  dup_passwd.tchar_ptr = curlx_tcsdup(passwd.tchar_ptr);
   if(!dup_passwd.tchar_ptr) {
-    curlx_unicodefree(passwd.tchar_ptr);
+    curlx_free(dup_user.tchar_ptr);
+    curlx_free(dup_domain.tchar_ptr);
+    curlx_free(passwd.tchar_ptr);
     return CURLE_OUT_OF_MEMORY;
   }
   identity->Password = dup_passwd.tbyte_ptr;
   identity->PasswordLength = curlx_uztoul(_tcslen(dup_passwd.tchar_ptr));
   dup_passwd.tchar_ptr = NULL;
 
-  curlx_unicodefree(passwd.tchar_ptr);
+  curlx_free(passwd.tchar_ptr);
+
+  identity->User = dup_user.tbyte_ptr;
+  identity->UserLength = curlx_uztoul(_tcslen(dup_user.tchar_ptr));
+  dup_user.tchar_ptr = NULL;
+  identity->Domain = dup_domain.tbyte_ptr;
+  identity->DomainLength = curlx_uztoul(domlen);
+  dup_domain.tchar_ptr = NULL;
 
   /* Setup the identity's flags */
-  identity->Flags = SECFLAG_WINNT_AUTH_IDENTITY;
+  identity->Flags = (unsigned long)
+#ifdef UNICODE
+    SEC_WINNT_AUTH_IDENTITY_UNICODE;
+#else
+    SEC_WINNT_AUTH_IDENTITY_ANSI;
+#endif
 
   return CURLE_OK;
 }
@@ -230,9 +198,9 @@ CURLcode Curl_create_sspi_identity(const char *userp, const char *passwdp,
 void Curl_sspi_free_identity(SEC_WINNT_AUTH_IDENTITY *identity)
 {
   if(identity) {
-    Curl_safefree(identity->User);
-    Curl_safefree(identity->Password);
-    Curl_safefree(identity->Domain);
+    curlx_safefree(identity->User);
+    curlx_safefree(identity->Password);
+    curlx_safefree(identity->Domain);
   }
 }
 

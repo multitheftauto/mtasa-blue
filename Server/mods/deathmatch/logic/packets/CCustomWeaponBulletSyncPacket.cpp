@@ -9,6 +9,7 @@
 
 #include "StdInc.h"
 #include "CCustomWeaponBulletSyncPacket.h"
+#include "CBulletsyncPacket.h"
 #include "net/SyncStructures.h"
 #include "CPlayer.h"
 #include "lua/CLuaFunctionParseHelpers.h"
@@ -20,7 +21,14 @@ CCustomWeaponBulletSyncPacket::CCustomWeaponBulletSyncPacket(CPlayer* player)
 
 bool CCustomWeaponBulletSyncPacket::Read(NetBitStreamInterface& stream)
 {
-    if (m_pSourceElement)
+    // Read only when the source player is known, matching CBulletsyncPacket::Read
+    if (!m_pSourceElement)
+        return false;
+
+    CPlayer* pPlayer = static_cast<CPlayer*>(m_pSourceElement);
+
+    // Mirror the player path: a dead or not-yet-spawned player cannot fire
+    if (!pPlayer || !pPlayer->IsSpawned() || pPlayer->IsDead())
         return false;
 
     ElementID id = INVALID_ELEMENT_ID;
@@ -28,14 +36,50 @@ bool CCustomWeaponBulletSyncPacket::Read(NetBitStreamInterface& stream)
         return false;
 
     m_weapon = GetElementFromId<CCustomWeapon>(id);
-
-    if (!stream.Read(reinterpret_cast<char*>(&m_start), sizeof(CVector)) || !stream.Read(reinterpret_cast<char*>(&m_end), sizeof(CVector)))
+    if (!m_weapon)
         return false;
 
-    if (!m_start.IsValid() || !m_end.IsValid())
+    m_weaponID = id;
+
+    if (!stream.Read(&m_start) || !stream.Read(&m_end))
         return false;
 
-    if (!stream.Read(m_order))
+    if (!m_start.data.vecPosition.IsValid() || !m_end.data.vecPosition.IsValid())
+        return false;
+
+    // Huge coordinates could crash other players
+    if (!m_start.data.vecPosition.IsInWorldBounds(true) || !m_end.data.vecPosition.IsInWorldBounds(true))
+        return false;
+
+    // Mirror the player path proximity check so a hacked client cannot
+    // report shots from anywhere on the map
+    const CVector& playerPos = pPlayer->GetPosition();
+    float          dx = m_start.data.vecPosition.fX - playerPos.fX;
+    float          dy = m_start.data.vecPosition.fY - playerPos.fY;
+    float          dz = m_start.data.vecPosition.fZ - playerPos.fZ;
+    float          distSq = dx * dx + dy * dy + dz * dz;
+
+    // Allow larger distance if player is in vehicle (vehicle guns have offsets,
+    // plus vehicle size, plus network lag compensation)
+    const float maxShootDistanceSq = pPlayer->GetOccupiedVehicle() ? (100.0f * 100.0f) : (50.0f * 50.0f);
+    if (distSq > maxShootDistanceSq)
+        return false;
+
+    // Scripted custom weapons can outrange the stock bullet sync set, so the
+    // shot length cap follows the weapon's own stat instead of the fixed
+    // 400 m cap. A zero, negative or non-finite scripted range falls back to
+    // the fixed cap.
+    const float movementSq = (m_end.data.vecPosition - m_start.data.vecPosition).LengthSquared();
+    if (!std::isfinite(movementSq))
+        return false;
+
+    CWeaponStat* pWeaponStat = m_weapon->GetWeaponStat();
+    float        range = pWeaponStat ? pWeaponStat->GetWeaponRange() : 0.0f;
+    if (!std::isfinite(range))
+        range = 0.0f;
+
+    const float maxDistance = std::max(400.0f, std::max(0.0f, range) * 1.1f + 15.0f);
+    if (movementSq < CBulletsyncPacket::MIN_DISTANCE_SQ || movementSq > maxDistance * maxDistance)
         return false;
 
     return true;
@@ -50,10 +94,9 @@ bool CCustomWeaponBulletSyncPacket::Write(NetBitStreamInterface& stream) const
     auto  id = player->GetID();
 
     stream.Write(id);
-    stream.Write(m_weapon->GetID());
-    stream.Write(reinterpret_cast<const char*>(&m_start), sizeof(CVector));
-    stream.Write(reinterpret_cast<const char*>(&m_end), sizeof(CVector));
-    stream.Write(m_order);
+    stream.Write(m_weaponID);
+    stream.Write(&m_start);
+    stream.Write(&m_end);
 
     return true;
 }

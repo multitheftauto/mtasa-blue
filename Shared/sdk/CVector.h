@@ -197,16 +197,25 @@ public:
         return false;
     }
 
-    bool IsValid() const
-    {
-        const float values[3] = {fX, fY, fZ};
-        for (std::size_t i = 0; i < 3; ++i)
-        {
-            if (std::isnan(values[i]) || std::isinf(values[i]))
-                return false;
-        }
+    [[nodiscard]] bool IsValid() const noexcept { return std::isfinite(fX) && std::isfinite(fY) && std::isfinite(fZ); }
 
-        return true;
+    // Checks if the vector is within the world bounds.
+    // If maxLimit = false (default), it checks coordinates in the range -3000 to 3000.
+    // If maxLimit = true, it checks the full map range from -8192 to 8192.
+    // Currently, the effective map size is limited to 16384x16384 due to synchronization constraints.
+    // Z follows the sync layer position limit instead of the map bound, so
+    // high-altitude and deep-underground shots on custom maps are accepted.
+    [[nodiscard]] bool IsInWorldBounds(bool maxLimit = false) const noexcept
+    {
+        const float minXY = maxLimit ? -8192.0f : -3000.0f;
+        const float maxXY = maxLimit ? 8192.0f : 3000.0f;
+        // Matches SYNC_POSITION_LIMIT in net/SyncStructures.h, which already
+        // bounds Z on the wire. A tighter range would reject legitimate shots
+        // without adding any protection the wire doesnt already provide.
+        const float minZ = -100000.0f;
+        const float maxZ = 100000.0f;
+
+        return fX >= minXY && fX <= maxXY && fY >= minXY && fY <= maxXY && fZ >= minZ && fZ <= maxZ;
     }
 
     constexpr CVector operator+(const CVector& vecRight) const noexcept { return CVector(fX + vecRight.fX, fY + vecRight.fY, fZ + vecRight.fZ); }

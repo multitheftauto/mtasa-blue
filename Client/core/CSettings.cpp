@@ -296,9 +296,6 @@ void CSettings::ResetGuiPointers()
     m_pProgressAnimationCombo = NULL;
     m_pDebugSettingLabel = NULL;
     m_pDebugSettingCombo = NULL;
-    m_pWin8Label = NULL;
-    m_pWin8ColorCheckBox = NULL;
-    m_pWin8MouseCheckBox = NULL;
     m_pPhotoSavingCheckbox = NULL;
     m_pCheckBoxAskBeforeDisconnect = NULL;
     m_pProcessAffinityCheckbox = NULL;
@@ -346,12 +343,15 @@ void CSettings::ResetGuiPointers()
     m_pBindsList = NULL;
     m_pBindsDefButton = NULL;
 
-    m_pJoypadName = NULL;
-    m_pJoypadUnderline = NULL;
+    m_pJoypadDeviceCombo = NULL;
     m_pEditDeadzone = NULL;
     m_pEditSaturation = NULL;
+    m_pEditTriggerDeadzone = NULL;
+    m_pEditTriggerSaturation = NULL;
+    m_pCheckBoxJoypadVibration = NULL;
     m_pJoypadLabels.clear();
     m_pJoypadButtons.clear();
+    m_bUpdatingJoypadCombo = false;
 
     m_pSelectedBind = NULL;
 
@@ -445,33 +445,23 @@ CSettings::CSettings()
 
     // Keep exact slider values in CVARs. Fall back to reconstructed values for
     // one-time migration when those keys do not exist yet.
-    if (clientVars.Exists("radiovolume") && clientVars.Exists("sfxvolume"))
+    if (clientVars.Exists("radiovolume"))
     {
         CVARS_GET("radiovolume", fRadioVolume);
+    }
+    else
+    {
+        fRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
+        CVARS_SET("radiovolume", fRadioVolume);
+    }
+
+    if (clientVars.Exists("sfxvolume"))
+    {
         CVARS_GET("sfxvolume", fSFXVolume);
     }
     else
     {
-        // GTA stores radio/SFX as values already multiplied by master volume.
-        // The UI sliders represent the unscaled channel volumes, so recover them
-        // by dividing by the persisted master value during startup.
-        const float fMasterVolume = std::max(0.0f, std::min(CVARS_GET_VALUE<float>("mastervolume"), 1.0f));
-        const float fStoredRadioVolume = (float)gameSettings->GetRadioVolume() / 64.0f;
-        const float fStoredSFXVolume = (float)gameSettings->GetSFXVolume() / 64.0f;
-
-        if (fMasterVolume > 0.0001f)
-        {
-            fRadioVolume = fStoredRadioVolume / fMasterVolume;
-            fSFXVolume = fStoredSFXVolume / fMasterVolume;
-        }
-        else
-        {
-            // If master was zero we cannot recover hidden channel values.
-            fRadioVolume = fStoredRadioVolume;
-            fSFXVolume = fStoredSFXVolume;
-        }
-
-        CVARS_SET("radiovolume", fRadioVolume);
+        fSFXVolume = (float)gameSettings->GetSFXVolume() / 64.0f;
         CVARS_SET("sfxvolume", fSFXVolume);
     }
 
@@ -740,19 +730,21 @@ void CSettings::CreateGUI()
     // Advanced Joypad settings
     {
         m_JoypadSettingsRevision = -1;
+        m_JoypadDeviceListRevision = -1;
 
         CJoystickManagerInterface* JoyMan = GetJoystickManager();
 
-        m_pJoypadName = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls));
-        m_pJoypadName->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
-        m_pJoypadName->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
-        m_pJoypadName->SetPosition(CVector2D(270, vecTemp.fY));
+        m_pJoypadDeviceCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabControls, ""));
+        m_pJoypadDeviceCombo->SetPosition(CVector2D(11, vecTemp.fY));
+        m_pJoypadDeviceCombo->SetSize(CVector2D(320.0f, 120.0f));
+        m_pJoypadDeviceCombo->SetReadOnly(true);
+        m_pJoypadDeviceCombo->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnJoypadDeviceChanged, this));
 
-        m_pJoypadUnderline = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls));
-        m_pJoypadUnderline->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
-        m_pJoypadUnderline->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
-        m_pJoypadUnderline->SetPosition(CVector2D(270, vecTemp.fY + 2));
-        vecTemp.fY += 50;
+        m_pCheckBoxJoypadVibration = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabControls, _("Vibration"), true));
+        m_pCheckBoxJoypadVibration->SetPosition(CVector2D(340, vecTemp.fY + 3.0f));
+        m_pCheckBoxJoypadVibration->AutoSize(NULL, 20.0f);
+        m_pCheckBoxJoypadVibration->SetClickHandler(GUI_CALLBACK(&CSettings::OnJoypadVibrationClick, this));
+        vecTemp.fY += 32;
 
         m_pEditDeadzone = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(pTabControls));
         m_pEditDeadzone->SetPosition(CVector2D(10, vecTemp.fY));
@@ -766,17 +758,41 @@ void CSettings::CreateGUI()
         m_pEditSaturation->SetSize(CVector2D(45.0f, 24.0f));
         m_pEditSaturation->SetMaxLength(3);
         m_pEditSaturation->SetTextChangedHandler(GUI_CALLBACK(&CSettings::OnJoypadTextChanged, this));
+        vecTemp.fY += 31;
 
-        CGUILabel* pLabelDeadZone = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Dead Zone")));
+        m_pEditTriggerDeadzone = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(pTabControls));
+        m_pEditTriggerDeadzone->SetPosition(CVector2D(10, vecTemp.fY));
+        m_pEditTriggerDeadzone->SetSize(CVector2D(45.0f, 24.0f));
+        m_pEditTriggerDeadzone->SetMaxLength(3);
+        m_pEditTriggerDeadzone->SetTextChangedHandler(GUI_CALLBACK(&CSettings::OnJoypadTextChanged, this));
+        vecTemp.fY += 31;
+
+        m_pEditTriggerSaturation = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(pTabControls));
+        m_pEditTriggerSaturation->SetPosition(CVector2D(10, vecTemp.fY));
+        m_pEditTriggerSaturation->SetSize(CVector2D(45.0f, 24.0f));
+        m_pEditTriggerSaturation->SetMaxLength(3);
+        m_pEditTriggerSaturation->SetTextChangedHandler(GUI_CALLBACK(&CSettings::OnJoypadTextChanged, this));
+
+        CGUILabel* pLabelDeadZone = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Stick dead zone")));
         pLabelDeadZone->SetPosition(m_pEditDeadzone->GetPosition() + CVector2D(52.f, 1.f));
         pLabelDeadZone->AutoSize();
         pLabelDeadZone->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
 
-        CGUILabel* pLabelSaturation = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Saturation")));
+        CGUILabel* pLabelSaturation = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Stick saturation")));
         pLabelSaturation->SetPosition(m_pEditSaturation->GetPosition() + CVector2D(52.f, 1.f));
         pLabelSaturation->AutoSize();
         pLabelSaturation->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
-        vecTemp.fY += 106;
+
+        CGUILabel* pLabelTriggerDeadZone = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Trigger dead zone")));
+        pLabelTriggerDeadZone->SetPosition(m_pEditTriggerDeadzone->GetPosition() + CVector2D(52.f, 1.f));
+        pLabelTriggerDeadZone->AutoSize();
+        pLabelTriggerDeadZone->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
+
+        CGUILabel* pLabelTriggerSaturation = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Trigger saturation")));
+        pLabelTriggerSaturation->SetPosition(m_pEditTriggerSaturation->GetPosition() + CVector2D(52.f, 1.f));
+        pLabelTriggerSaturation->AutoSize();
+        pLabelTriggerSaturation->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
+        vecTemp.fY += 44;
 
         CGUILabel* pLabelHelp = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Use the 'Binds' tab for joypad buttons.")));
         pLabelHelp->SetPosition(CVector2D(10, vecTemp.fY));
@@ -1864,33 +1880,6 @@ void CSettings::CreateGUI()
     vecTemp.fX = 22.f;
     vecTemp.fY += fLineHeight;
 
-    // Windows 8 compatibility
-    m_pWin8Label = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Windows 8 compatibility:")));
-    m_pWin8Label->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
-    m_pWin8Label->AutoSize();
-
-    m_pWin8ColorCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("16-bit color")));
-    m_pWin8ColorCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
-    m_pWin8ColorCheckBox->AutoSize(NULL, 20.0f);
-    vecTemp.fX += 140;
-
-    m_pWin8MouseCheckBox = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabAdvanced, _("Mouse fix")));
-    m_pWin8MouseCheckBox->SetPosition(CVector2D(vecTemp.fX + fIndentX, vecTemp.fY));
-    m_pWin8MouseCheckBox->AutoSize(NULL, 20.0f);
-    vecTemp.fY += fLineHeight;
-    vecTemp.fX -= 140;
-
-    // Hide if not Win8
-    if (atoi(GetApplicationSetting("real-os-version")) != 8)
-    {
-#ifndef MTA_DEBUG  // Don't hide when debugging
-        m_pWin8Label->SetVisible(false);
-        m_pWin8ColorCheckBox->SetVisible(false);
-        m_pWin8MouseCheckBox->SetVisible(false);
-        vecTemp.fY -= fLineHeight;
-#endif
-    }
-
     // Cache path info
     m_pCachePathLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Client resource files:")));
     m_pCachePathLabel->SetPosition(CVector2D(vecTemp.fX, vecTemp.fY));
@@ -2087,12 +2076,6 @@ void CSettings::CreateGUI()
     m_pUpdateBuildTypeCombo->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pUpdateBuildTypeCombo->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
 
-    m_pWin8ColorCheckBox->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
-    m_pWin8ColorCheckBox->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
-
-    m_pWin8MouseCheckBox->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
-    m_pWin8MouseCheckBox->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
-
     m_pUpdateAutoInstallLabel->SetMouseEnterHandler(GUI_CALLBACK(&CSettings::OnShowAdvancedSettingDescription, this));
     m_pUpdateAutoInstallLabel->SetMouseLeaveHandler(GUI_CALLBACK(&CSettings::OnHideAdvancedSettingDescription, this));
 
@@ -2132,29 +2115,10 @@ void CSettings::DestroyGUI()
     ResetGuiPointers();
 }
 
-void RestartCallBack(void* ptr, unsigned int uiButton)
-{
-    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
-
-    if (uiButton == 1)
-    {
-        SetOnQuitCommand("restart");
-        CCore::GetSingleton().Quit();
-    }
-}
-
 void CSettings::ShowRestartQuestion()
 {
-    SString strMessage = _("Some settings will be changed when you next start MTA");
-    strMessage += _("\n\nDo you want to restart now?");
-    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
-    pQuestionBox->Reset();
-    pQuestionBox->SetTitle(_("RESTART REQUIRED"));
-    pQuestionBox->SetMessage(strMessage);
-    pQuestionBox->SetButton(0, _("No"));
-    pQuestionBox->SetButton(1, _("Yes"));
-    pQuestionBox->SetCallback(RestartCallBack);
-    pQuestionBox->Show();
+    // Persist across Interface locale/skin rebuilds (they destroy MainMenu's QuestionBox)
+    CLocalGUI::GetSingleton().RequestRestartPrompt();
 }
 
 void DisconnectCallback(void* ptr, unsigned int uiButton)
@@ -2258,6 +2222,11 @@ void CSettings::UpdateVideoTab()
     GetVideoModeManager()->GetNextVideoMode(iNextVidMode, bNextWindowed, bNextFSMinimize, iNextFullscreenStyle);
 
     m_pCheckBoxMipMapping->SetSelected(gameSettings->IsMipMappingEnabled());
+
+    bool bVSync = true;
+    CVARS_GET("vsync", bVSync);
+    m_pCheckBoxVSync->SetSelected(bVSync);
+
     m_pCheckBoxWindowed->SetSelected(bNextWindowed);
     m_pCheckBoxMinimize->SetSelected(bNextFSMinimize);
     m_pDrawDistance->SetScrollPosition((gameSettings->GetDrawDistance() - 0.925f) / 0.8749f);
@@ -2539,6 +2508,9 @@ void CSettings::ProcessJoypad()
     // Update from GUI
     GetJoystickManager()->SetDeadZone(atoi(m_pEditDeadzone->GetText().c_str()));
     GetJoystickManager()->SetSaturation(atoi(m_pEditSaturation->GetText().c_str()));
+    GetJoystickManager()->SetTriggerDeadZone(atoi(m_pEditTriggerDeadzone->GetText().c_str()));
+    GetJoystickManager()->SetTriggerSaturation(atoi(m_pEditTriggerSaturation->GetText().c_str()));
+    GetJoystickManager()->SetVibrationEnabled(m_pCheckBoxJoypadVibration->GetSelected());
 
     GetJoystickManager()->SaveToXML();
 }
@@ -2612,38 +2584,53 @@ void CSettings::UpdateJoypadTab()
 {
     CJoystickManagerInterface* JoyMan = GetJoystickManager();
 
-    // Has anything changed?
-    if (m_JoypadSettingsRevision == JoyMan->GetSettingsRevision())
+    const bool bSettingsChanged = m_JoypadSettingsRevision != JoyMan->GetSettingsRevision();
+    const bool bDeviceListChanged = m_JoypadDeviceListRevision != JoyMan->GetDeviceListRevision();
+
+    if (!bSettingsChanged && !bDeviceListChanged)
         return;
 
-    // Update the joystick name
-    string strJoystickName = JoyMan->IsJoypadConnected() ? JoyMan->GetControllerName() : _("Joypad not detected  -  Check connections and restart game");
+    if (bDeviceListChanged && m_pWindow->IsVisible() && m_pJoypadDeviceCombo && !m_pJoypadDeviceCombo->IsOpen())
+    {
+        m_bUpdatingJoypadCombo = true;
+        std::vector<SJoystickDeviceChoice> devices = JoyMan->GetAvailableControllers();
+        std::string                        strSelected = JoyMan->GetSelectedControllerId();
+        m_pJoypadDeviceCombo->Clear();
+        int iSelect = 0;
+        for (size_t i = 0; i < devices.size(); i++)
+        {
+            CGUIListItem* pItem = m_pJoypadDeviceCombo->AddItem(devices[i].strName.c_str());
+            if (pItem)
+                pItem->SetData(devices[i].strId.c_str());
+            if (devices[i].strId == strSelected)
+                iSelect = static_cast<int>(i);
+        }
+        if (!devices.empty())
+            m_pJoypadDeviceCombo->SetSelectedItemByIndex(iSelect);
+        m_bUpdatingJoypadCombo = false;
+        m_JoypadDeviceListRevision = JoyMan->GetDeviceListRevision();
+    }
 
-    m_pJoypadName->SetPosition(CVector2D(270, m_pJoypadName->GetPosition().fY));
-    m_pJoypadName->SetText(strJoystickName.c_str());
-    m_pJoypadName->AutoSize(strJoystickName.c_str());
-    m_pJoypadName->SetPosition(m_pJoypadName->GetPosition() - CVector2D(m_pJoypadName->GetSize().fX * 0.5, 0.0f));
+    if (!bSettingsChanged)
+        return;
 
-    // Joystick name underline
-    string strUnderline = "";
-    int    inumChars = m_pJoypadName->GetSize().fX / 7.f + 0.5f;
-    for (int i = 0; i < inumChars; i++)
-        strUnderline = strUnderline + "_";
-
-    m_pJoypadUnderline->SetPosition(CVector2D(270, m_pJoypadUnderline->GetPosition().fY));
-    m_pJoypadUnderline->SetText(strUnderline.c_str());
-    m_pJoypadUnderline->AutoSize(strUnderline.c_str());
-    m_pJoypadUnderline->SetPosition(m_pJoypadUnderline->GetPosition() - CVector2D(m_pJoypadUnderline->GetSize().fX * 0.5, 0.0f));
-    m_pJoypadUnderline->SetVisible(JoyMan->IsJoypadConnected());
+    if (m_pCheckBoxJoypadVibration)
+        m_pCheckBoxJoypadVibration->SetSelected(JoyMan->GetVibrationEnabled());
 
     // Update DeadZone and Saturation edit boxes
     char szDeadzone[32] = "";
     char szSaturation[32] = "";
+    char szTriggerDeadzone[32] = "";
+    char szTriggerSaturation[32] = "";
     snprintf(szDeadzone, 10, "%d", JoyMan->GetDeadZone());
     snprintf(szSaturation, 10, "%d", JoyMan->GetSaturation());
+    snprintf(szTriggerDeadzone, 10, "%d", JoyMan->GetTriggerDeadZone());
+    snprintf(szTriggerSaturation, 10, "%d", JoyMan->GetTriggerSaturation());
 
     m_pEditDeadzone->SetText(szDeadzone);
     m_pEditSaturation->SetText(szSaturation);
+    m_pEditTriggerDeadzone->SetText(szTriggerDeadzone);
+    m_pEditTriggerSaturation->SetText(szTriggerSaturation);
 
     // Update axes labels and buttons
     for (int i = 0; i < JoyMan->GetOutputCount() && i < (int)m_pJoypadButtons.size(); i++)
@@ -2669,10 +2656,35 @@ bool CSettings::OnJoypadTextChanged(CGUIElement* pElement)
     // Update from GUI
     GetJoystickManager()->SetDeadZone(atoi(m_pEditDeadzone->GetText().c_str()));
     GetJoystickManager()->SetSaturation(atoi(m_pEditSaturation->GetText().c_str()));
+    GetJoystickManager()->SetTriggerDeadZone(atoi(m_pEditTriggerDeadzone->GetText().c_str()));
+    GetJoystickManager()->SetTriggerSaturation(atoi(m_pEditTriggerSaturation->GetText().c_str()));
 
     // Dont immediately read back these settings
     m_JoypadSettingsRevision = GetJoystickManager()->GetSettingsRevision();
 
+    return true;
+}
+
+bool CSettings::OnJoypadDeviceChanged(CGUIElement* pElement)
+{
+    if (m_bUpdatingJoypadCombo || !m_pJoypadDeviceCombo)
+        return true;
+
+    CGUIListItem* pItem = m_pJoypadDeviceCombo->GetSelectedItem();
+    if (!pItem || !pItem->GetData())
+        return true;
+
+    GetJoystickManager()->SetSelectedControllerId(static_cast<const char*>(pItem->GetData()));
+    m_JoypadSettingsRevision = -1;
+    m_JoypadDeviceListRevision = -1;
+    UpdateJoypadTab();
+    return true;
+}
+
+bool CSettings::OnJoypadVibrationClick(CGUIElement* pElement)
+{
+    GetJoystickManager()->SetVibrationEnabled(m_pCheckBoxJoypadVibration->GetSelected());
+    m_JoypadSettingsRevision = GetJoystickManager()->GetSettingsRevision();
     return true;
 }
 
@@ -2816,6 +2828,7 @@ void CSettings::SetRadioVolume(float fVolume)
     fVolume = std::max(0.0f, std::min(fVolume, 1.0f));
 
     m_fRadioVolume = fVolume;
+    CVARS_SET("radiovolume", fVolume);
 
     CCore::GetSingleton().GetGame()->GetSettings()->SetRadioVolume(m_fRadioVolume * CVARS_GET_VALUE<float>("mastervolume") * 64.0f);
 }
@@ -2825,6 +2838,7 @@ void CSettings::SetSFXVolume(float fVolume)
     fVolume = std::max(0.0f, std::min(fVolume, 1.0f));
 
     m_fSFXVolume = fVolume;
+    CVARS_SET("sfxvolume", fVolume);
 
     CCore::GetSingleton().GetGame()->GetSettings()->SetSFXVolume(m_fSFXVolume * CVARS_GET_VALUE<float>("mastervolume") * 64.0f);
 }
@@ -4144,14 +4158,6 @@ void CSettings::LoadData()
     else if (iVar == 1)
         m_pProgressAnimationCombo->SetText(_("Default"));
 
-    // Windows 8 16-bit color
-    iVar = GetApplicationSettingInt("Win8Color16");
-    m_pWin8ColorCheckBox->SetSelected(iVar != 0);
-
-    // Windows 8 mouse fix
-    iVar = GetApplicationSettingInt("Win8MouseFix");
-    m_pWin8MouseCheckBox->SetSelected(iVar != 0);
-
     // Save camera photos inside user documents folder
     CVARS_GET("photosaving", bVar);
     m_pPhotoSavingCheckbox->SetSelected(bVar);
@@ -4209,9 +4215,10 @@ void CSettings::LoadData()
     {
         CVARS_GET("chat_scale", strVar);
         stringstream ss(strVar);
-        m_pChatScaleX->SetText(SString("%1.1f", atof(strVar.c_str())));
         ss >> strVar;
-        m_pChatScaleY->SetText(SString("%1.1f", atof(strVar.c_str())));
+        m_pChatScaleX->SetText(strVar.c_str());
+        ss >> strVar;
+        m_pChatScaleY->SetText(strVar.c_str());
     }
     catch (...)
     {
@@ -4593,12 +4600,6 @@ void CSettings::SaveData()
         int iSelected = (int)pSelected->GetData();
         CVARS_SET("progress_animation", iSelected);
     }
-
-    // Windows 8 16-bit color
-    SetApplicationSettingInt("Win8Color16", m_pWin8ColorCheckBox->GetSelected());
-
-    // Windows 8 mouse fix
-    SetApplicationSettingInt("Win8MouseFix", m_pWin8MouseCheckBox->GetSelected());
 
     // Save photos in documents folder
     bool photoSaving = m_pPhotoSavingCheckbox->GetSelected();
@@ -5076,22 +5077,22 @@ void CSettings::LoadSkins()
 
 void CSettings::LoadChatColorFromString(eChatColorType eType, const string& strColor)
 {
-    CColor       pColor;
     stringstream ss(strColor);
-    int          iR, iG, iB, iA;
 
-    try
-    {
-        ss >> iR >> iG >> iB >> iA;
-        pColor.R = static_cast<unsigned char>(iR);
-        pColor.G = static_cast<unsigned char>(iG);
-        pColor.B = static_cast<unsigned char>(iB);
-        pColor.A = static_cast<unsigned char>(iA);
-        SetChatColorValues(eType, pColor);
-    }
-    catch (...)
-    {
-    }
+    int iR, iG, iB;
+    if (!(ss >> iR >> iG >> iB))
+        return;
+
+    int iA;
+    if (!(ss >> iA))
+        iA = 255;
+
+    CColor pColor;
+    pColor.R = static_cast<unsigned char>(iR);
+    pColor.G = static_cast<unsigned char>(iG);
+    pColor.B = static_cast<unsigned char>(iB);
+    pColor.A = static_cast<unsigned char>(iA);
+    SetChatColorValues(eType, pColor);
 }
 
 int CSettings::GetMilliseconds(CGUIEdit* pEdit)
@@ -6119,10 +6120,6 @@ bool CSettings::OnShowAdvancedSettingDescription(CGUIElement* pElement)
         strText = std::string(_("Auto updater:")) + " " + std::string(_("Select default unless you like filling out bug reports."));
     else if (pLabel && pLabel == m_pUpdateAutoInstallLabel || pComboBox && pComboBox == m_pUpdateAutoInstallCombo)
         strText = std::string(_("Auto updater:")) + " " + std::string(_("Select default to automatically install important updates."));
-    else if (pCheckBox && pCheckBox == m_pWin8ColorCheckBox)
-        strText = std::string(_("16-bit color:")) + " " + std::string(_("Enable 16 bit color modes - Requires MTA restart"));
-    else if (pCheckBox && pCheckBox == m_pWin8MouseCheckBox)
-        strText = std::string(_("Mouse fix:")) + " " + std::string(_("Mouse movement fix - May need PC restart"));
     else if (pCheckBox && pCheckBox == m_pProcessAffinityCheckbox)
         strText = std::string(_("CPU affinity:")) + " " + std::string(_("Only change if you're having stability issues."));
 

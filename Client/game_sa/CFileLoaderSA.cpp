@@ -149,6 +149,7 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
     auto                       pAtomicModelInfo = reinterpret_cast<CAtomicModelInfo*>(pBaseModelInfo);
 
     bool bUseCommonVehicleTexDictionary = false;
+
     if (pAtomicModelInfo && pBaseModelInfo->bWetRoadReflection)
     {
         bUseCommonVehicleTexDictionary = true;
@@ -156,9 +157,11 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
     }
 
     const unsigned int rwID_CLUMP = 16;
+
     if (RwStreamFindChunk(stream, rwID_CLUMP, nullptr, nullptr))
     {
         RpClump* pReadClump = RpClumpStreamRead(stream);
+
         if (!pReadClump)
         {
             if (bUseCommonVehicleTexDictionary)
@@ -169,6 +172,7 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
         }
 
         gAtomicModelId = modelId;
+
         SRelatedModelInfo relatedModelInfo = {0};
         relatedModelInfo.pClump = pReadClump;
         relatedModelInfo.bDeleteOldRwObject = false;
@@ -186,6 +190,7 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
     {
         CVehicleModelInfo_StopUsingCommonVehicleTexDicationary();
     }
+
     return true;
 }
 
@@ -213,6 +218,7 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     CVisibilityPlugins_SetAtomicRenderCallback(atomic, 0);
 
     RpAtomic* pOldAtomic = reinterpret_cast<RpAtomic*>(pBaseModelInfo->pRwObject);
+
     if (bDamage)
     {
         auto pDamagableModelInfo = reinterpret_cast<CDamagableModelInfo*>(pAtomicModelInfo);
@@ -224,6 +230,7 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     }
 
     RpClumpRemoveAtomic(pRelatedModelInfo->pClump, atomic);
+
     RwFrame* newFrame = RwFrameCreate();
     RpAtomicSetFrame(atomic, newFrame);
     CVisibilityPlugins_SetAtomicId(atomic, gAtomicModelId);
@@ -265,6 +272,7 @@ CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine)
        but custom exporters might not contain the normalization. And we must do it instead.
    */
     const float fLenSq = inst.rotation.LengthSquared();
+
     if (fLenSq > 0.0f && std::fabs(fLenSq - 1.0f) > std::numeric_limits<float>::epsilon())
     {
         const float fLength = std::sqrt(fLenSq);
