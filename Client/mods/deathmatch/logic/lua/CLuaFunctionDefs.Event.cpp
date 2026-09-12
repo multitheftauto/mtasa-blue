@@ -323,9 +323,10 @@ int CLuaFunctionDefs::TriggerLatentServerEvent(lua_State* luaVM)
         }
 
         // Trigger it
-        if (CStaticFunctionDefinitions::TriggerLatentServerEvent(strName, *pCallWithEntity, Arguments, iBandwidth, pLuaMain, usResourceNetId))
+        SSendHandle eventID = CStaticFunctionDefinitions::TriggerLatentServerEvent(strName, *pCallWithEntity, Arguments, iBandwidth, pLuaMain, usResourceNetId);
+        if (eventID >= 0)
         {
-            lua_pushboolean(luaVM, true);
+            lua_pushnumber(luaVM, eventID);
             return 1;
         }
     }
