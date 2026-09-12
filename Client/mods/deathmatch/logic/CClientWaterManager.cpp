@@ -24,7 +24,6 @@ void CClientWaterManager::ReceiveWaveSync(NetBitStreamInterface& stream)
     if (serverTime <= m_lastWaveServerTime)
         return;
 
-    // Use the existing transport ping; no separate clock request is needed.
     const auto now = GetTickCount64_();
     m_waveTargetTimeOffset = static_cast<double>(serverTime) + std::max(0, g_pNet->GetPing()) * 0.5 - static_cast<double>(now);
     if (!m_lastWaveServerTime)
@@ -41,14 +40,10 @@ void CClientWaterManager::UpdateWavePhase()
         return;
 
     const auto now = GetTickCount64_();
-
-    // Correct at at most 2% so packet jitter cannot snap water or buoyancy.
-    // Real elapsed time keeps different FPS/game speeds on the same wave clock.
     const double correction = std::max(0LL, now - m_lastWaveUpdate) * 0.02;
     m_waveTimeOffset += std::clamp(m_waveTargetTimeOffset - m_waveTimeOffset, -correction, correction);
     m_lastWaveUpdate = now;
 
-    // 105000 ms is the common period of GTA's 5000/3500/3000 ms waves.
     const auto phase = static_cast<DWORD>(std::fmod(static_cast<double>(now) + m_waveTimeOffset, 105000.0));
     g_pGame->GetWaterManager()->SetWavePhase(phase);
 }
