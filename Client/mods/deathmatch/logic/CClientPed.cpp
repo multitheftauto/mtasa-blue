@@ -6076,7 +6076,7 @@ void CClientPed::UpdateAnimationProgressAndSpeed()
                 progress = std::fmod(elapsedTime * m_AnimationCache.speed, animLength) / animLength;
             else
                 // For non-looped animations, limit duration to animLength if time exceeds it
-                progress = (elapsedTime / (m_AnimationCache.iTime <= animLength ? m_AnimationCache.iTime : animLength)) * m_AnimationCache.speed;
+                progress = elapsedTime / ((m_AnimationCache.iTime <= animLength ? m_AnimationCache.iTime : animLength) / m_AnimationCache.speed);
         }
     }
     else

@@ -1779,6 +1779,6 @@ namespace SharedUtil
             return it->second;
         }
 
-        return 0.0f;
+        return 1.0f;
     }
 };
