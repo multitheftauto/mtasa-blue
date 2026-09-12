@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <cmath>
 #include <game/CColPoint.h>
 #include <game/CObjectGroupPhysicalProperties.h>
 #include <game/CStreaming.h>
@@ -93,6 +94,13 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineLoadIFP", EngineLoadIFP},
         {"engineImportTXD", EngineImportTXD},
         {"engineAddClothingTXD", ArgumentParser<EngineAddClothingTXD>},
+        {"engineAddOccluder", ArgumentParser<EngineAddOccluder>},
+        {"engineRemoveOccluder", ArgumentParser<EngineRemoveOccluder>},
+        {"engineRestoreOccluder", ArgumentParser<EngineRestoreOccluder>},
+        {"engineRemoveOccluders", ArgumentParser<EngineRemoveOccluders>},
+        {"engineRestoreOccluders", ArgumentParser<EngineRestoreOccluders>},
+        {"engineGetOccluders", EngineGetOccluders},
+        {"engineGetOccluderCapacity", ArgumentParser<EngineGetOccluderCapacity>},
         {"engineReplaceCOL", EngineReplaceCOL},
         {"engineRestoreCOL", EngineRestoreCOL},
         {"engineReplaceModel", EngineReplaceModel},
@@ -676,6 +684,143 @@ bool CLuaEngineDefs::EngineAddClothingTXD(CClientTXD* pTXD, std::string strModel
         throw std::invalid_argument(SString("Texture already added (%*s)", (int)strModelName.length(), strModelName.data()));
 
     return true;
+}
+
+std::variant<std::uint32_t, bool> CLuaEngineDefs::EngineAddOccluder(lua_State* const luaVM, float fX, float fY, float fZ, float fSizeX, float fSizeY,
+                                                                    float fSizeZ, std::optional<float> fRotX, std::optional<float> fRotY,
+                                                                    std::optional<float> fRotZ, std::optional<bool> bInterior)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    const float fCoords[3] = {fX, fY, fZ};
+    for (int i = 0; i < 3; ++i)
+        if (std::fabs(fCoords[i]) > 8000.0f)
+            throw std::invalid_argument(SString("Expected position in range -8000 - 8000 at argument %d, got %g", i + 1, fCoords[i]));
+
+    const float fSizes[3] = {fSizeX, fSizeY, fSizeZ};
+    for (int i = 0; i < 3; ++i)
+        if (fSizes[i] < 1.0f || fSizes[i] > 8000.0f)
+            throw std::invalid_argument(SString("Expected size in range 1 - 8000 at argument %d, got %g", i + 4, fSizes[i]));
+
+    unsigned int uiId = 0;
+    if (!g_pGame->GetWorld()->AddOccluder(CVector(fX, fY, fZ), CVector(fSizeX, fSizeY, fSizeZ),
+                                          CVector(fRotX.value_or(0.0f), fRotY.value_or(0.0f), fRotZ.value_or(0.0f)), bInterior.value_or(false),
+                                          pLuaMain->GetResource(), uiId))
+        return false;
+
+    return uiId;
+}
+
+bool CLuaEngineDefs::EngineRemoveOccluder(lua_State* const luaVM, std::uint32_t uiId)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    return g_pGame->GetWorld()->RemoveOccluder(uiId, pLuaMain->GetResource());
+}
+
+bool CLuaEngineDefs::EngineRestoreOccluder(lua_State* const luaVM, std::uint32_t uiId)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    return g_pGame->GetWorld()->RestoreOccluder(uiId, pLuaMain->GetResource());
+}
+
+std::uint32_t CLuaEngineDefs::EngineRemoveOccluders(lua_State* const luaVM, float fX, float fY, float fZ, float fRadius, std::optional<bool> bInterior)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return 0;
+
+    if (!std::isfinite(fRadius) || fRadius <= 0.0f)
+        throw std::invalid_argument(SString("Expected a positive radius at argument 4, got %g", fRadius));
+
+    return g_pGame->GetWorld()->RemoveOccludersInRadius(CVector(fX, fY, fZ), fRadius, bInterior.value_or(false), pLuaMain->GetResource());
+}
+
+std::uint32_t CLuaEngineDefs::EngineRestoreOccluders(lua_State* const luaVM, float fX, float fY, float fZ, float fRadius, std::optional<bool> bInterior)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return 0;
+
+    if (!std::isfinite(fRadius) || fRadius <= 0.0f)
+        throw std::invalid_argument(SString("Expected a positive radius at argument 4, got %g", fRadius));
+
+    return g_pGame->GetWorld()->RestoreOccludersInRadius(CVector(fX, fY, fZ), fRadius, bInterior.value_or(false), pLuaMain->GetResource());
+}
+
+int CLuaEngineDefs::EngineGetOccluders(lua_State* luaVM)
+{
+    bool bInterior = false;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadBool(bInterior, false);
+
+    if (argStream.HasErrors())
+    {
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    std::vector<SOccluderInfo> occluders;
+    g_pGame->GetWorld()->GetOccluders(bInterior, occluders);
+
+    lua_createtable(luaVM, static_cast<int>(occluders.size()), 0);
+
+    int iIndex = 1;
+    for (const SOccluderInfo& info : occluders)
+    {
+        lua_createtable(luaVM, 0, 8);
+
+        lua_pushstring(luaVM, "id");
+        lua_pushnumber(luaVM, info.uiId);
+        lua_settable(luaVM, -3);
+
+        const char* const szKeys[9] = {"x", "y", "z", "sizeX", "sizeY", "sizeZ", "rotX", "rotY", "rotZ"};
+        const float       fValues[9] = {info.vecPosition.fX, info.vecPosition.fY, info.vecPosition.fZ, info.vecSize.fX,    info.vecSize.fY,
+                                        info.vecSize.fZ,     info.vecRotation.fX, info.vecRotation.fY, info.vecRotation.fZ};
+        for (int i = 0; i < 9; i++)
+        {
+            lua_pushstring(luaVM, szKeys[i]);
+            lua_pushnumber(luaVM, fValues[i]);
+            lua_settable(luaVM, -3);
+        }
+
+        lua_pushstring(luaVM, "interior");
+        lua_pushboolean(luaVM, info.bInterior);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "enabled");
+        lua_pushboolean(luaVM, info.bEnabled);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "active");
+        lua_pushboolean(luaVM, info.bActive);
+        lua_settable(luaVM, -3);
+
+        lua_pushstring(luaVM, "scripted");
+        lua_pushboolean(luaVM, info.bScripted);
+        lua_settable(luaVM, -3);
+
+        lua_rawseti(luaVM, -2, iIndex++);
+    }
+
+    return 1;
+}
+
+CLuaMultiReturn<std::uint32_t, std::uint32_t> CLuaEngineDefs::EngineGetOccluderCapacity(std::optional<bool> bInterior)
+{
+    unsigned int uiUsed = 0;
+    unsigned int uiFree = 0;
+    g_pGame->GetWorld()->GetOccluderCapacity(bInterior.value_or(false), uiUsed, uiFree);
+    return {uiUsed, uiFree};
 }
 
 CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string strRelativeFilePath)
