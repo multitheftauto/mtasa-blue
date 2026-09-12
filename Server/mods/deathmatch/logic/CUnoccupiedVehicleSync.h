@@ -34,9 +34,6 @@ public:
     CPlayer* FindPlayerCloseToVehicle(CVehicle* pVehicle, float fMaxDistance);
     void     ResyncForPlayer(CPlayer* pPlayer);
 
-    void SetSyncerAsPersistent(bool bPersist) { m_bSyncPersist = bPersist; };
-    bool IsSyncerPersistent() { return m_bSyncPersist; };
-
 private:
     void Update();
     void UpdateVehicle(CVehicle* pVehicle);
@@ -52,6 +49,4 @@ private:
     CVehicleManager* m_pVehicleManager;
 
     CElapsedTime m_UpdateTimer;
-
-    bool m_bSyncPersist = false;
 };

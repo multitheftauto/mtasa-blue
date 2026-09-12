@@ -676,6 +676,12 @@ void CVehicle::SetSyncer(CPlayer* pPlayer)
 
         // Set it
         m_pSyncer = pPlayer;
+
+        // Persistence was granted for one specific syncer, so it dies with the assignment. Clearing
+        // it here covers every route that drops a syncer, including CPlayer's destructor, which
+        // reaches SetSyncer directly without going through CUnoccupiedVehicleSync::StopSync.
+        if (!pPlayer)
+            m_bSyncerPersistent = false;
     }
 }
 
