@@ -31,6 +31,14 @@ float CHudSA::calcStreetchX = 0.0f;
 float CHudSA::calcStreetchY = 0.0f;
 float CHudSA::blinkingBarHPValue = 10.0f;
 
+HudPlacement::SVertexTransform CHudSA::ms_RadarTransform{};
+bool                           CHudSA::ms_bRadarCustomColor = false;
+HudPlacement::SRgba            CHudSA::ms_RadarTint{};
+
+HudPlacement::SVertexTransform CHudSA::ms_CrosshairTransform{};
+bool                           CHudSA::ms_bCrosshairCustomColor = false;
+HudPlacement::SRgba            CHudSA::ms_CrosshairTint{};
+
 constexpr RwColor COLOR_BLACK = RwColor{0, 0, 0, 255};
 
 // CSprite2d::DrawBarChart
@@ -58,7 +66,9 @@ std::unordered_map<eHudComponent, SHudComponentData> defaultComponentProperties 
     {HUD_WEAPON, {RwColor{255, 255, 255, 255}, RwColor{255, 255, 255, 255}}},
     {HUD_WANTED,
      {CHudSA::GetHUDColour(eHudColour::GOLD), RwColor{0, 0, 0, 170}, false, false, COLOR_BLACK, eFontAlignment::ALIGN_RIGHT, eFontStyle::FONT_GOTHIC, 1, 0,
-      true}}};
+      true}},
+    {HUD_RADAR, {RwColor{255, 255, 255, 255}}},
+    {HUD_CROSSHAIR, {RwColor{255, 255, 255, 255}}}};
 
 CHudSA::CHudSA()
 {
@@ -94,6 +104,8 @@ CHudSA::CHudSA()
     componentProperties.radioName = MapGet(defaultComponentProperties, HUD_RADIO);
     componentProperties.weaponIcon = MapGet(defaultComponentProperties, HUD_WEAPON);
     componentProperties.wanted = MapGet(defaultComponentProperties, HUD_WANTED);
+    componentProperties.radar = MapGet(defaultComponentProperties, HUD_RADAR);
+    componentProperties.crosshair = MapGet(defaultComponentProperties, HUD_CROSSHAIR);
 }
 
 void CHudSA::Disable(bool bDisabled)
@@ -266,6 +278,43 @@ void CHudSA::UpdateStreetchCalculations()
     wantedPlacement.height = calcStreetchY * 1.21f;
     wantedPlacement.width = calcStreetchX * 0.6f;
     wantedPlacement.setDefaultXY = false;
+
+    const HudPlacement::SRect radarRect = GetRadarDefaultRect();
+
+    SComponentPlacement& radarPlacement = componentProperties.radar.placement;
+    radarPlacement.x = radarRect.x;
+    radarPlacement.y = radarRect.y;
+    radarPlacement.width = radarRect.width;
+    radarPlacement.height = radarRect.height;
+    radarPlacement.setDefaultXY = false;
+
+    const HudPlacement::SRect crosshairRect = GetCrosshairDefaultRect();
+
+    SComponentPlacement& crosshairPlacement = componentProperties.crosshair.placement;
+    crosshairPlacement.x = crosshairRect.x;
+    crosshairPlacement.y = crosshairRect.y;
+    crosshairPlacement.width = crosshairRect.width;
+    crosshairPlacement.height = crosshairRect.height;
+    crosshairPlacement.setDefaultXY = false;
+}
+
+//
+// CHudSA::GetRadarDefaultRect
+//
+HudPlacement::SRect CHudSA::GetRadarDefaultRect() noexcept
+{
+    const float fStretchX = static_cast<float>(rsGlobal->maximumWidth) * (*reinterpret_cast<float*>(VAR_AspectRatioMultX));
+    const float fStretchY = static_cast<float>(rsGlobal->maximumHeight) * (*reinterpret_cast<float*>(VAR_AspectRatioMult));
+
+    return HudPlacement::GetDefaultRect(fStretchX, fStretchY, static_cast<float>(rsGlobal->maximumHeight));
+}
+
+//
+// CHudSA::GetCrosshairDefaultRect
+//
+HudPlacement::SRect CHudSA::GetCrosshairDefaultRect() noexcept
+{
+    return HudPlacement::GetCrosshairDefaultRect(static_cast<float>(rsGlobal->maximumWidth), static_cast<float>(rsGlobal->maximumHeight));
 }
 
 //
@@ -505,7 +554,7 @@ void CHudSA::ResetComponentFontData(const eHudComponent& component, const eHudCo
     }
 }
 
-SHudComponentData& CHudSA::GetHudComponentRef(const eHudComponent& component) const noexcept
+SHudComponentData& CHudSA::GetHudComponentRef(const eHudComponent& component) noexcept
 {
     switch (component)
     {
@@ -531,6 +580,10 @@ SHudComponentData& CHudSA::GetHudComponentRef(const eHudComponent& component) co
             return componentProperties.weaponIcon;
         case HUD_WANTED:
             return componentProperties.wanted;
+        case HUD_RADAR:
+            return componentProperties.radar;
+        case HUD_CROSSHAIR:
+            return componentProperties.crosshair;
         default:
             break;
     }
@@ -965,8 +1018,226 @@ static void HOOK_RenderHudBar(int playerId, int x, int y)
         CHudSA::RenderArmorBar(x, y);
 }
 
+//
+// CHudSA::BeginRadarTransform
+//
+void CHudSA::BeginRadarTransform() noexcept
+{
+    ms_RadarTransform.bActive = false;
+    ms_bRadarCustomColor = false;
+
+    const SHudComponentData&   radar = componentProperties.radar;
+    const SComponentPlacement& placement = radar.placement;
+
+    HudPlacement::SRect customRect;
+    customRect.x = placement.customX;
+    customRect.y = placement.customY;
+    customRect.width = placement.customWidth;
+    customRect.height = placement.customHeight;
+
+    ms_RadarTransform = HudPlacement::BuildTransform(GetRadarDefaultRect(), placement.useCustomPosition, placement.useCustomSize, customRect);
+
+    const std::uint8_t ucAlpha = radar.useCustomAlpha ? radar.fillColor.a : 255;
+    if (radar.fillColor.r != 255 || radar.fillColor.g != 255 || radar.fillColor.b != 255 || ucAlpha != 255)
+    {
+        ms_RadarTint = HudPlacement::SRgba{radar.fillColor.r, radar.fillColor.g, radar.fillColor.b, ucAlpha};
+        ms_bRadarCustomColor = true;
+    }
+}
+
+//
+// CHudSA::EndRadarTransform
+//
+void CHudSA::EndRadarTransform() noexcept
+{
+    ms_RadarTransform.bActive = false;
+    ms_bRadarCustomColor = false;
+}
+
+//
+// CHudSA::GetCrosshairPlacement
+//
+HudPlacement::SVertexPlacement CHudSA::GetCrosshairPlacement() noexcept
+{
+    const SHudComponentData&   crosshair = componentProperties.crosshair;
+    const SComponentPlacement& placement = crosshair.placement;
+
+    HudPlacement::SRect customRect;
+    customRect.x = placement.customX;
+    customRect.y = placement.customY;
+    customRect.width = placement.customWidth;
+    customRect.height = placement.customHeight;
+
+    HudPlacement::SVertexPlacement result;
+    result.transform = HudPlacement::BuildTransform(GetCrosshairDefaultRect(), placement.useCustomPosition, placement.useCustomSize, customRect);
+
+    const std::uint8_t ucAlpha = crosshair.useCustomAlpha ? crosshair.fillColor.a : 255;
+    if (crosshair.fillColor.r != 255 || crosshair.fillColor.g != 255 || crosshair.fillColor.b != 255 || ucAlpha != 255)
+    {
+        result.color = HudPlacement::SRgba{crosshair.fillColor.r, crosshair.fillColor.g, crosshair.fillColor.b, ucAlpha};
+        result.bUseColor = true;
+    }
+
+    return result;
+}
+
+//
+// CHudSA::BeginCrosshairTransform
+//
+void CHudSA::BeginCrosshairTransform() noexcept
+{
+    const HudPlacement::SVertexPlacement placement = GetCrosshairPlacement();
+
+    ms_CrosshairTransform = placement.transform;
+    ms_CrosshairTint = placement.color;
+    ms_bCrosshairCustomColor = placement.bUseColor;
+}
+
+//
+// CHudSA::EndCrosshairTransform
+//
+void CHudSA::EndCrosshairTransform() noexcept
+{
+    ms_CrosshairTransform.bActive = false;
+    ms_bCrosshairCustomColor = false;
+}
+
+//
+// CHudSA::RenderCrosshair_Sprite
+//
+void __fastcall CHudSA::RenderCrosshair_Sprite(void* pSprite, void*, CRect* pRect, RwColor* pColor)
+{
+    BeginCrosshairTransform();
+
+    ((void(__thiscall*)(void*, CRect*, RwColor*))FUNC_CSprite2d_Draw)(pSprite, pRect, pColor);
+
+    EndCrosshairTransform();
+}
+
+//
+// CHudSA::RenderCrosshair_Rect
+//
+void CHudSA::RenderCrosshair_Rect(CRect* pRect, RwColor* pColor)
+{
+    BeginCrosshairTransform();
+
+    ((void(__cdecl*)(CRect*, RwColor*))FUNC_CSprite2d_DrawRect)(pRect, pColor);
+
+    EndCrosshairTransform();
+}
+
+//
+// CHudSA::RenderCrosshairSprite
+//
+void CHudSA::RenderCrosshairSprite(CVector vecPos, CVector2D vecHalfSize, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue,
+                                   std::uint16_t usIntensity, float fRhw, std::uint8_t ucAlpha, std::uint8_t ucUDir, std::uint8_t ucVDir)
+{
+    const HudPlacement::SVertexPlacement placement = GetCrosshairPlacement();
+
+    if (placement.transform.bActive)
+    {
+        vecPos.fX = placement.transform.fScaleX * vecPos.fX + placement.transform.fOffsetX;
+        vecPos.fY = placement.transform.fScaleY * vecPos.fY + placement.transform.fOffsetY;
+        vecHalfSize.fX *= placement.transform.fScaleX;
+        vecHalfSize.fY *= placement.transform.fScaleY;
+    }
+
+    if (placement.bUseColor)
+    {
+        const auto ucModulate = [](std::uint8_t ucValue, std::uint8_t ucTint) { return static_cast<std::uint8_t>((ucValue * ucTint + 127) / 255); };
+
+        ucRed = ucModulate(ucRed, placement.color.r);
+        ucGreen = ucModulate(ucGreen, placement.color.g);
+        ucBlue = ucModulate(ucBlue, placement.color.b);
+        ucAlpha = ucModulate(ucAlpha, placement.color.a);
+
+        if (placement.color.a != 255)
+            usIntensity = ucAlpha;
+    }
+
+    using RenderOneXLUSpriteFunc =
+        void(__cdecl*)(CVector, CVector2D, std::uint8_t, std::uint8_t, std::uint8_t, std::uint16_t, float, std::uint8_t, std::uint8_t, std::uint8_t);
+    ((RenderOneXLUSpriteFunc)FUNC_CSprite_RenderOneXLUSprite)(vecPos, vecHalfSize, ucRed, ucGreen, ucBlue, usIntensity, fRhw, ucAlpha, ucUDir, ucVDir);
+}
+
+//
+// CHudSA::ApplyHudVertexTransform
+//
+void CHudSA::ApplyHudVertexTransform(void* pVertices, int iNumVertices) noexcept
+{
+    if (!pVertices || iNumVertices <= 0)
+        return;
+
+    HudPlacement::SVertexPlacement placement;
+
+    if (ms_RadarTransform.bActive || ms_bRadarCustomColor)
+    {
+        placement.transform = ms_RadarTransform;
+        placement.color = ms_RadarTint;
+        placement.bUseColor = ms_bRadarCustomColor;
+    }
+    else if (ms_CrosshairTransform.bActive || ms_bCrosshairCustomColor)
+    {
+        placement.transform = ms_CrosshairTransform;
+        placement.color = ms_CrosshairTint;
+        placement.bUseColor = ms_bCrosshairCustomColor;
+    }
+    else
+    {
+        return;
+    }
+
+    constexpr int VERTEX_FLOATS = 7;
+    constexpr int VERTEX_COLOR = 4;
+
+    float* pFloats = static_cast<float*>(pVertices);
+    for (int i = 0; i < iNumVertices; i++, pFloats += VERTEX_FLOATS)
+    {
+        if (placement.transform.bActive)
+            HudPlacement::ApplyToVertex(placement.transform, pFloats[0], pFloats[1]);
+
+        if (placement.bUseColor)
+        {
+            std::uint32_t* pColor = reinterpret_cast<std::uint32_t*>(pFloats + VERTEX_COLOR);
+            *pColor = HudPlacement::ModulateArgb(*pColor, placement.color);
+        }
+    }
+}
+
+static void HookCallsToTarget(DWORD dwStart, DWORD dwEnd, DWORD dwTarget, DWORD dwHookHandler)
+{
+    for (DWORD dwAddr = dwStart; dwAddr + 5 <= dwEnd; dwAddr++)
+    {
+        if (*(BYTE*)dwAddr != 0xE8 || dwAddr + 5 + *(DWORD*)(dwAddr + 1) != dwTarget)
+            continue;
+
+        HookInstallCall(dwAddr, dwHookHandler);
+    }
+}
+
+//
+// CHudSA::RenderRadar
+//
+void CHudSA::RenderRadar()
+{
+    BeginRadarTransform();
+
+    ((void(__cdecl*)())FUNC_DrawRadar)();
+
+    EndRadarTransform();
+}
+
+//
+// CHudSA::StaticSetHooks
+//
 void CHudSA::StaticSetHooks()
 {
+    HookInstallCall(CALLER_DrawRadar, (DWORD)&RenderRadar);
+
+    HookCallsToTarget(FUNC_DrawCrossHairs, DRAW_CROSSHAIRS_END, FUNC_CSprite2d_Draw, (DWORD)&RenderCrosshair_Sprite);
+    HookCallsToTarget(FUNC_DrawCrossHairs, DRAW_CROSSHAIRS_END, FUNC_CSprite2d_DrawRect, (DWORD)&RenderCrosshair_Rect);
+    HookCallsToTarget(FUNC_DrawCrossHairs, DRAW_CROSSHAIRS_END, FUNC_CSprite_RenderOneXLUSprite, (DWORD)&RenderCrosshairSprite);
+
     HookInstall(FUNC_RenderHealthBar, &HOOK_RenderHudBar, 11);
     HookInstall(FUNC_RenderBreathBar, &HOOK_RenderHudBar, 11);
     HookInstall(FUNC_RenderArmorBar, &HOOK_RenderHudBar, 11);
