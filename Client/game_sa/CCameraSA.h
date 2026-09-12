@@ -419,6 +419,8 @@ public:
     float        GetTransitionFOV() const override;
     bool         GetTransitionMatrix(CMatrix& matrix) const override;
     bool         IsSphereVisible(CVector* center, float radius) const override;
+    void         SetScriptViewModeCycling(bool bEnabled) override;
+    void         ApplyScriptCamSwitch() override;
 
     // Additional overload not in base interface
     virtual CCam* GetCam(CCamSAInterface* camInterface);

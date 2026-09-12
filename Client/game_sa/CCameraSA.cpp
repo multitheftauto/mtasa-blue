@@ -57,6 +57,21 @@ static std::atomic<uint8_t> s_cameraClipMask{static_cast<uint8_t>(CameraClipFlag
 DWORD RETURN_Camera_CollisionDetection = 0x520195;
 void  HOOK_Camera_CollisionDetection();
 
+#define PATCH_CamControl_VehicleViewCycleGate 0x5281BD
+#define PATCH_CamControl_PedViewCycleGate     0x528D6D
+#define PATCH_CamControl_ViewChangeSoundGate  0x52B6DA
+
+#define FUNC_CEntity_CleanUpOldReference 0x571A00
+#define FUNC_CEntity_RegisterReference   0x571B70
+
+// The interface layout past its SA update marker is stale, so these fields are read absolutely
+#define VAR_CameraTargetEntity    0xB6F980
+#define VAR_CameraFixedModeVector 0xB6F888
+#define VAR_CameraModeToGoTo      0xB6FC60
+#define VAR_CameraTypeOfSwitch    0xB6FC64
+
+static bool s_scriptViewModeCycling = false;
+
 CCameraSA::CCameraSA(CCameraSAInterface* cameraInterface)
 {
     if (!cameraInterface)
@@ -703,6 +718,90 @@ void CCameraSA::SetCameraVehicleViewMode(BYTE dwCamMode)
 void CCameraSA::SetCameraPedViewMode(BYTE dwCamMode)
 {
     MemPutFast<BYTE>(VAR_PedCameraView, dwCamMode);
+}
+
+// CamControl only cycles the view modes and plays the change camera click while the camera belongs
+// to the player, and its zoom easing follows script values while a script owns it; open those
+// gates and keep the indices driving the zoom so the native cycling works on script cameras too
+void CCameraSA::SetScriptViewModeCycling(bool bEnabled)
+{
+    CCameraSAInterface* cameraInterface = GetInterface();
+    if (!cameraInterface)
+        return;
+
+    if (bEnabled)
+    {
+        cameraInterface->m_bUseScriptZoomValuePed = false;
+        cameraInterface->m_bUseScriptZoomValueCar = false;
+    }
+
+    if (bEnabled == s_scriptViewModeCycling)
+        return;
+    s_scriptViewModeCycling = bEnabled;
+
+    constexpr BYTE nops[6] = {0x90, 0x90, 0x90, 0x90, 0x90, 0x90};
+    constexpr BYTE vehicleCycleGate[6] = {0x0F, 0x85, 0xA3, 0x00, 0x00, 0x00};
+    constexpr BYTE pedCycleGate[2] = {0x75, 0x4E};
+    constexpr BYTE soundGate[2] = {0x75, 0x3F};
+
+    if (bEnabled)
+    {
+        MemCpy((void*)PATCH_CamControl_VehicleViewCycleGate, nops, sizeof(vehicleCycleGate));
+        MemCpy((void*)PATCH_CamControl_PedViewCycleGate, nops, sizeof(pedCycleGate));
+        MemCpy((void*)PATCH_CamControl_ViewChangeSoundGate, nops, sizeof(soundGate));
+    }
+    else
+    {
+        MemCpy((void*)PATCH_CamControl_VehicleViewCycleGate, vehicleCycleGate, sizeof(vehicleCycleGate));
+        MemCpy((void*)PATCH_CamControl_PedViewCycleGate, pedCycleGate, sizeof(pedCycleGate));
+        MemCpy((void*)PATCH_CamControl_ViewChangeSoundGate, soundGate, sizeof(soundGate));
+    }
+}
+
+// CamControl consumes a TakeControl request in its jumpcut block, which switches the active cam
+// mode and target; commit it right away so refocusing between a ped and a vehicle takes effect
+// even when that block gets starved under script control. Mirrors the code at 0x52B351
+void CCameraSA::ApplyScriptCamSwitch()
+{
+    CCameraSAInterface* cameraInterface = GetInterface();
+    if (!cameraInterface)
+        return;
+
+    CEntitySAInterface* pTargetEntity = *(CEntitySAInterface**)VAR_CameraTargetEntity;
+    if (!cameraInterface->m_bStartInterScript || *(WORD*)VAR_CameraTypeOfSwitch != 2 || !pTargetEntity)
+        return;
+
+    CCamSAInterface& activeCam = cameraInterface->Cams[cameraInterface->ActiveCam];
+    activeCam.Mode = static_cast<short>(*(WORD*)VAR_CameraModeToGoTo);
+    activeCam.ResetStatics = true;
+    activeCam.m_cvecCamFixedModeVector = *(CVector*)VAR_CameraFixedModeVector;
+
+    CEntitySAInterface** ppCamTarget = &activeCam.CamTargetEntity;
+    CEntitySAInterface*  pOldTarget = *ppCamTarget;
+    DWORD                dwCleanUpOldReference = FUNC_CEntity_CleanUpOldReference;
+    DWORD                dwRegisterReference = FUNC_CEntity_RegisterReference;
+    // clang-format off
+    __asm
+    {
+        mov     eax, ppCamTarget
+        mov     ecx, pOldTarget
+        test    ecx, ecx
+        jz      noOldTarget
+        push    eax
+        call    dwCleanUpOldReference
+        mov     eax, ppCamTarget
+    noOldTarget:
+        mov     ecx, pTargetEntity
+        mov     [eax], ecx
+        push    eax
+        call    dwRegisterReference
+    }
+    // clang-format on
+
+    cameraInterface->m_bJust_Switched = 1;
+    cameraInterface->m_uiTransitionState = 0;
+    cameraInterface->m_vecDoingSpecialInterPolation = false;
+    cameraInterface->m_bStartInterScript = false;
 }
 
 void CCameraSA::SetShakeForce(float fShakeForce)
