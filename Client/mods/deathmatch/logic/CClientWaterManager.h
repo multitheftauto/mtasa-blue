@@ -14,6 +14,7 @@ class CClientWaterManager;
 
 #include "CClientManager.h"
 #include "CClientWater.h"
+#include <cstdint>
 
 class CClientWaterManager
 {
@@ -35,6 +36,8 @@ public:
 
     float GetWaveLevel();
     void  SetWaveLevel(float fWaveLevel);
+    void  UpdateWavePhase();
+    void  ReceiveWaveSync(NetBitStreamInterface& stream);
 
     unsigned short GetDimension() { return m_usDimension; };
     void           SetDimension(unsigned short usDimension);
@@ -54,4 +57,8 @@ private:
     std::list<CClientWater*> m_List;
     bool                     m_bDontRemoveFromList;
     unsigned short           m_usDimension;
+    std::uint64_t            m_lastWaveServerTime = 0;
+    long long                m_lastWaveUpdate = 0;
+    double                   m_waveTimeOffset = 0;
+    double                   m_waveTargetTimeOffset = 0;
 };

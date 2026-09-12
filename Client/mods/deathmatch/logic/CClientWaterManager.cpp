@@ -9,8 +9,44 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <algorithm>
+#include <cmath>
 
 using std::list;
+
+void CClientWaterManager::ReceiveWaveSync(NetBitStreamInterface& stream)
+{
+    unsigned int timeLow{}, timeHigh{};
+    if (!stream.Read(timeLow) || !stream.Read(timeHigh))
+        return;
+
+    const auto serverTime = (static_cast<std::uint64_t>(timeHigh) << 32) | timeLow;
+    if (serverTime <= m_lastWaveServerTime)
+        return;
+
+    const auto now = GetTickCount64_();
+    m_waveTargetTimeOffset = static_cast<double>(serverTime) + std::max(0, g_pNet->GetPing()) * 0.5 - static_cast<double>(now);
+    if (!m_lastWaveServerTime)
+    {
+        m_waveTimeOffset = m_waveTargetTimeOffset;
+        m_lastWaveUpdate = now;
+    }
+    m_lastWaveServerTime = serverTime;
+}
+
+void CClientWaterManager::UpdateWavePhase()
+{
+    if (!m_lastWaveServerTime)
+        return;
+
+    const auto now = GetTickCount64_();
+    const double correction = std::max(0LL, now - m_lastWaveUpdate) * 0.02;
+    m_waveTimeOffset += std::clamp(m_waveTargetTimeOffset - m_waveTimeOffset, -correction, correction);
+    m_lastWaveUpdate = now;
+
+    const auto phase = static_cast<DWORD>(std::fmod(static_cast<double>(now) + m_waveTimeOffset, 105000.0));
+    g_pGame->GetWaterManager()->SetWavePhase(phase);
+}
 
 CClientWaterManager::CClientWaterManager(CClientManager* pManager)
 {
