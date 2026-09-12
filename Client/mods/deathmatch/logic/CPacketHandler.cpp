@@ -490,7 +490,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     }
 
     std::int64_t serverLocalTick;
-    bitStream.Read(serverLocalTick);
+    bitStream.ReadInt64(serverLocalTick);
     g_pClientGame->SetTimeOffsetFromServer(serverLocalTick - GetLocalTick());
 }
 
@@ -1036,7 +1036,7 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
                 bitStream.ReadBit(freezeLastFrame);
                 bitStream.Read(blendTime);
                 bitStream.ReadBit(taskRestore);
-                bitStream.Read(startTime);
+                bitStream.ReadInt64(startTime);
                 bitStream.Read(speed);
 
                 // Run anim
@@ -4014,7 +4014,7 @@ retry:
                         bitStream.ReadBit(freezeLastFrame);
                         bitStream.Read(blendTime);
                         bitStream.ReadBit(taskRestore);
-                        bitStream.Read(startTime);
+                        bitStream.ReadInt64(startTime);
                         bitStream.Read(speed);
 
                         // Run anim

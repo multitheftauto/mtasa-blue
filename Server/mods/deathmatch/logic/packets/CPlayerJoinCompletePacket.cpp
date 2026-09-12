@@ -121,7 +121,7 @@ bool CPlayerJoinCompletePacket::Write(NetBitStreamInterface& BitStream) const
     }
 
     BitStream.WriteString(m_szServerName);
-    BitStream.Write(m_serverTime);
+    BitStream.WriteInt64(m_serverTime);
 
     return true;
 }

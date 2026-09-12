@@ -976,7 +976,7 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
 
                         // Write start time & speed
-                        BitStream.Write(animData.startTime);
+                        BitStream.WriteInt64(animData.startTime);
                         BitStream.Write(animData.speed);
                     }
 

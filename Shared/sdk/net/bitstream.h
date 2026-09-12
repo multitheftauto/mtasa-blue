@@ -372,11 +372,21 @@ public:
         return ReadStringCharacters(result, uiLength);
     }
 
-#if !defined(__linux__)
-    void Write(std::int64_t input) { WriteBits<std::int64_t>(&input, sizeof(input) * 8); }
+    void WriteInt64(std::int64_t v)
+    {
+        Write(static_cast<uint>(static_cast<std::uint64_t>(v) >> 32));
+        Write(static_cast<uint>(static_cast<std::uint64_t>(v)));
+    }
 
-    bool Read(std::int64_t& output) { return ReadBits<std::int64_t>(&output, sizeof(output) * 8); }
-#endif
+    bool ReadInt64(std::int64_t& v)
+    {
+        uint hi, lo;
+        if (!Read(hi) || !Read(lo))
+            return false;
+
+        v = static_cast<std::int64_t>((static_cast<std::uint64_t>(hi) << 32) | lo);
+        return true;
+    }
 
 #ifdef MTA_CLIENT
     #define MAX_ELEMENTS MAX_CLIENT_ELEMENTS
