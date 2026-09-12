@@ -259,6 +259,10 @@ public:
     unsigned int GetOccupiedVehicleSeat() { return m_uiVehicleSeat; };
     CVehicle*    SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat);
 
+    CVehicle*    GetVehicleOccupiedOnDeath() { return m_pVehicleOnDeath; };
+    unsigned int GetVehicleOccupiedSeatOnDeath() { return m_uiVehicleSeatOnDeath; };
+    void         SetVehicleOccupiedOnDeath(CVehicle* pVehicle, unsigned int uiSeat);
+
     unsigned int GetVehicleAction() { return m_uiVehicleAction; };
     void         SetVehicleAction(unsigned int uiAction);
 
@@ -358,6 +362,9 @@ protected:
     CVehicle*    m_pVehicle;
     unsigned int m_uiVehicleSeat;
     unsigned int m_uiVehicleAction;
+
+    CVehicle*    m_pVehicleOnDeath;
+    unsigned int m_uiVehicleSeatOnDeath;
 
     bool m_bSyncable;
     bool m_bCollisionsEnabled;
