@@ -2690,6 +2690,9 @@ void CPacketHandler::Packet_MapInfo(NetBitStreamInterface& bitStream)
     bitStream.ReadBit(bOcclusionsEnabled);
 
     g_pGame->GetWorld()->SetOcclusionsEnabled(bOcclusionsEnabled);
+
+    if (bitStream.Can(eBitStreamVersion::WaterWaveSync))
+        g_pClientGame->GetManager()->GetWaterManager()->ReceiveWaveSync(bitStream);
 }
 
 void CPacketHandler::Packet_PartialPacketInfo(NetBitStreamInterface& bitStream)
