@@ -36,6 +36,12 @@ MTAEXPORT CGame* GetGameInterface(CCoreInterface* pCore)
     pGame = new CGameSA;
     g_pCore = pCore;
 
+    // Remove FILE_FLAG_NO_BUFFERING to let Windows cache IMG reads and reduce disk I/O.
+    // Apply this before CdStreamInit opens archives; existing handles require a restart to change their flags.
+    bool bIMGFileCaching = false;
+    pCore->GetCVars()->Get("img_file_caching", bIMGFileCaching);
+    MemPut<uint8_t>(0x406BC6, bIMGFileCaching ? 0xEB : 0x77);
+
     return (CGame*)pGame;
 }
 

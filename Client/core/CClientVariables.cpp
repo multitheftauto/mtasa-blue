@@ -398,6 +398,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("browser_enable_gpu", true);                 // Enable GPU in CEF? (allows stuff like WebGL to function)
     DEFAULT("browser_enable_video_acceleration", true);  // Enable hardware video decoding in CEF?
     DEFAULT("process_cpu_affinity", true);               // Set CPU 0 affinity to improve game performance and fix the known issue in single-threaded games
+    DEFAULT("img_file_caching", false);                  // Preserve GTA's original IMG read behavior unless caching is explicitly enabled
     DEFAULT("ask_before_disconnect", true);              // Ask before disconnecting from a server
     DEFAULT("allow_steam_client", false);                // Allow connecting with the local Steam client (to set GTA:SA ingame status)
     DEFAULT("use_mouse_sensitivity_for_aiming",
