@@ -283,6 +283,11 @@ public:
     virtual float GetAircraftMaxVelocity() = 0;
     virtual void  SetOcclusionsEnabled(bool bEnabled) = 0;
     virtual bool  GetOcclusionsEnabled() = 0;
+    virtual bool  AddOccluder(const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation, bool bInterior, void* pChangeSource,
+                              unsigned int& uiOutId) = 0;
+    virtual bool  RemoveOccluder(unsigned int uiId, void* pChangeSource) = 0;
+    virtual void  GetOccluderCapacity(bool bInterior, unsigned int& uiOutUsed, unsigned int& uiOutFree) = 0;
+    virtual void  UndoOccluderChanges(void* pChangeSource = nullptr) = 0;
     virtual void  FindWorldPositionForRailTrackPosition(float fRailTrackPosition, int iTrackId, CVector* pOutVecPosition) = 0;
     virtual int   FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance) = 0;
     virtual bool  CalculateImpactPosition(const CVector& vecInputStart, CVector& vecInputEnd) = 0;
