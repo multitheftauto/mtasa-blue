@@ -98,9 +98,13 @@ private:
         ushort usAdjustableProperty;
 
         float fRailPosition;
-        uchar ucRailTrack;
         bool  bRailDirection;
         float fRailSpeed;
+
+        bool      bRailHasTrack;
+        bool      bRailIsDefaultTrack;
+        uchar     ucRailDefaultTrackId;
+        ElementID RailTrackElementID;
 
         SFixedArray<float, 4> fDoorOpenRatio;
 

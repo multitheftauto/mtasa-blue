@@ -34,6 +34,7 @@ class CClientManager;
 #define IS_PICKUP(entity)        ((entity)->GetType() == CCLIENTPICKUP)
 #define IS_RADAR_AREA(entity)    ((entity)->GetType() == CCLIENTRADARAREA)
 #define IS_COLSHAPE(entity)      ((entity)->GetType() == CCLIENTCOLSHAPE)
+#define IS_TRAIN_TRACK(entity)   ((entity)->GetType() == CCLIENTTRAINTRACK)
 #define IS_PROJECTILE(entity)    ((entity)->GetType() == CCLIENTPROJECTILE)
 #define IS_GUI(entity)           ((entity)->GetType() == CCLIENTGUI)
 #define IS_IFP(entity)           ((entity)->GetType() == CCLIENTIFP)
@@ -81,6 +82,7 @@ enum eClientEntityType
     CCLIENTUNKNOWN,
     CCLIENTIMG,
     CCLIENTBUILDING,
+    CCLIENTTRAINTRACK,
 };
 
 class CEntity;
@@ -146,6 +148,7 @@ enum eCClientEntityClassTypes
     CLASS_CClientSearchLight,
     CLASS_CClientIMG,
     CLASS_CClientBuilding,
+    CLASS_CClientTrainTrack,
 };
 
 class CClientEntity : public CClientEntityBase

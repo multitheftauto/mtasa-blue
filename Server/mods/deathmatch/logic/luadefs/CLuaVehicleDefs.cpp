@@ -2817,14 +2817,20 @@ bool CLuaVehicleDefs::SetTrainTrack(CVehicle* pVehicle, CTrainTrack* pTrainTrack
     else if (pVehicle->IsDerailed())
         return false;
 
-    // TODO(qaisjp, feature/custom-train-tracks): this needs to support non-default train tracks
-    if (!pTrainTrack->IsDefault())
-        throw std::invalid_argument("setTrainTrack only supports default train tracks");
-
     pVehicle->SetTrainTrack(pTrainTrack);
 
     CBitStream BitStream;
-    BitStream.pBitStream->Write(pTrainTrack->GetDefaultTrackId());
+    BitStream.pBitStream->WriteBit(true);
+    if (pTrainTrack->IsDefault())
+    {
+        BitStream.pBitStream->WriteBit(true);
+        BitStream.pBitStream->Write(pTrainTrack->GetDefaultTrackId());
+    }
+    else
+    {
+        BitStream.pBitStream->WriteBit(false);
+        BitStream.pBitStream->Write(pTrainTrack->GetID());
+    }
 
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pVehicle, SET_TRAIN_TRACK, *BitStream.pBitStream));
 

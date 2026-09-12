@@ -13,14 +13,13 @@
 #include "CVehicleManager.h"
 #include "CGame.h"
 
-CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId)
+CTrainTrack::CTrainTrack(CTrainTrackManager* pManager, const std::vector<STrackNode>& nodes, CElement* pParent, uchar defaultTrackId)
     : CElement(pParent), m_pManager(pManager)
 {
     m_iType = CElement::TRAIN_TRACK;
     SetTypeName("train-track");
 
     m_Nodes = nodes;
-    m_LinkLastNodes = linkLastNodes;
     m_DefaultTrackId = defaultTrackId;
 }
 
@@ -39,24 +38,4 @@ CTrainTrack::~CTrainTrack()
 
     // Unreference train track
     m_pManager->DestroyTrainTrack(this);
-}
-
-bool CTrainTrack::SetTrackNodePosition(uint nodeIndex, const CVector& position)
-{
-    if (nodeIndex >= m_Nodes.size())
-        return false;
-
-    auto& node = m_Nodes[nodeIndex];
-    node.position = position;
-    return true;
-}
-
-bool CTrainTrack::GetTrackNodePosition(uint nodeIndex, CVector& position)
-{
-    if (nodeIndex >= m_Nodes.size())
-        return false;
-
-    auto& node = m_Nodes[nodeIndex];
-    position = node.position;
-    return true;
 }
