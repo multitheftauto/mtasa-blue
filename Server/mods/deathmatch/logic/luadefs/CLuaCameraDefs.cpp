@@ -11,8 +11,10 @@
 
 #include "StdInc.h"
 #include "CLuaCameraDefs.h"
-#include "CStaticFunctionDefinitions.h"
-#include "CScriptArgReader.h"
+#include "CPlayerCamera.h"
+#include "CameraScriptShared.h"
+#include "packets/CLuaPacket.h"
+#include <net/rpc_enums.h>
 
 #define MIN_SERVER_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-9.20979"
 
@@ -20,15 +22,15 @@ void CLuaCameraDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
         // Get functions
-        {"getCameraMatrix", getCameraMatrix},
-        {"getCameraTarget", getCameraTarget},
-        {"getCameraInterior", getCameraInterior},
+        {"getCameraMatrix", ArgumentParserWarn<false, GetCameraMatrix>},
+        {"getCameraTarget", ArgumentParserWarn<false, GetCameraTarget>},
+        {"getCameraInterior", ArgumentParserWarn<false, GetCameraInterior>},
 
         // Set functions
-        {"setCameraMatrix", setCameraMatrix},
-        {"setCameraTarget", setCameraTarget},
-        {"setCameraInterior", setCameraInterior},
-        {"fadeCamera", fadeCamera},
+        {"setCameraMatrix", ArgumentParserWarn<false, SetCameraMatrix>},
+        {"setCameraTarget", ArgumentParserWarn<false, SetCameraTarget>},
+        {"setCameraInterior", ArgumentParserWarn<false, SetCameraInterior>},
+        {"fadeCamera", ArgumentParserWarn<false, FadeCamera>},
     };
 
     // Add functions
@@ -36,240 +38,282 @@ void CLuaCameraDefs::LoadFunctions()
         CLuaCFunctions::AddFunction(name, func);
 }
 
-int CLuaCameraDefs::getCameraMatrix(lua_State* luaVM)
+std::variant<CLuaMultiReturn<float, float, float, float, float, float, float, float>, bool> CLuaCameraDefs::GetCameraMatrix(CPlayer* player)
 {
     //  float cameraX, float cameraY, float cameraZ, float targetX, float targetY, float targetZ, float roll, float fov getCameraMatrix ( player thePlayer )
-    CPlayer* pPlayer;
+    CPlayerCamera* camera = player->GetCamera();
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
+    if (!camera)
+        return false;
 
-    if (!argStream.HasErrors())
-    {
-        CVector vecPosition, vecLookAt;
-        float   fRoll, fFOV;
-        if (CStaticFunctionDefinitions::GetCameraMatrix(pPlayer, vecPosition, vecLookAt, fRoll, fFOV))
-        {
-            lua_pushnumber(luaVM, vecPosition.fX);
-            lua_pushnumber(luaVM, vecPosition.fY);
-            lua_pushnumber(luaVM, vecPosition.fZ);
-            lua_pushnumber(luaVM, vecLookAt.fX);
-            lua_pushnumber(luaVM, vecLookAt.fY);
-            lua_pushnumber(luaVM, vecLookAt.fZ);
-            lua_pushnumber(luaVM, fRoll);
-            lua_pushnumber(luaVM, fFOV);
-            return 8;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+    CVector position, lookAt;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    camera->GetPosition(position);
+    camera->GetLookAt(lookAt);
+
+    return CLuaMultiReturn<float, float, float, float, float, float, float, float>{position.fX, position.fY, position.fZ,       lookAt.fX,
+                                                                                   lookAt.fY,   lookAt.fZ,   camera->GetRoll(), camera->GetFOV()};
 }
 
-int CLuaCameraDefs::OOP_getCameraMatrix(lua_State* luaVM)
-{
-    // Needs further attention before adding
-    CPlayer* pPlayer;
-
-    CScriptArgReader argStream(luaVM);
-
-    argStream.ReadUserData(pPlayer);
-
-    if (!argStream.HasErrors())
-    {
-        CMatrix matrix;
-        // pPlayer->GetCamera ()->GetMatrix ( matrix );
-
-        lua_pushmatrix(luaVM, matrix);
-        return 1;
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
-}
-
-int CLuaCameraDefs::getCameraTarget(lua_State* luaVM)
+std::variant<CElement*, bool> CLuaCameraDefs::GetCameraTarget(CPlayer* player)
 {
     //  element getCameraTarget ( player thePlayer )
-    CPlayer* pPlayer;
+    CPlayerCamera* camera = player->GetCamera();
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
+    if (!camera)
+        return false;
 
-    if (!argStream.HasErrors())
+    // Only allow this if we're targeting a player
+    if (camera->GetMode() == CAMERAMODE_PLAYER)
     {
-        CElement* pTarget = CStaticFunctionDefinitions::GetCameraTarget(pPlayer);
-        if (pTarget)
-        {
-            lua_pushelement(luaVM, pTarget);
-            return 1;
-        }
+        if (CElement* target = camera->GetTarget())
+            return target;
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return false;
 }
 
-int CLuaCameraDefs::getCameraInterior(lua_State* luaVM)
+std::variant<std::uint8_t, bool> CLuaCameraDefs::GetCameraInterior(CPlayer* player)
 {
     //  int getCameraInterior ( player thePlayer )
-    CPlayer* pPlayer;
+    CPlayerCamera* camera = player->GetCamera();
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
+    if (!camera)
+        return false;
 
-    if (!argStream.HasErrors())
-    {
-        unsigned char ucInterior;
-        if (CStaticFunctionDefinitions::GetCameraInterior(pPlayer, ucInterior))
-        {
-            lua_pushnumber(luaVM, ucInterior);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return static_cast<std::uint8_t>(camera->GetInterior());
 }
 
-int CLuaCameraDefs::setCameraMatrix(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraMatrix(CElement* element, std::variant<CLuaMatrix*, CVector> matrixOrPosition, std::optional<CVector> lookAt,
+                                     std::optional<float> roll, std::optional<float> fov)
 {
     //  bool setCameraMatrix ( player thePlayer, float positionX, float positionY, float positionZ [, float lookAtX, float lookAtY, float lookAtZ, float roll =
     //  0, float fov = 70 ] )
-    CElement* pPlayer;
-    CVector   vecPosition;
-    CVector   vecLookAt;
-    float     fRoll;
-    float     fFOV;
+    CVector position;
+    CVector lookAtValue;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
-
-    if (argStream.NextIsUserDataOfType<CLuaMatrix>())
+    if (auto* matrix = std::get_if<CLuaMatrix*>(&matrixOrPosition))
     {
-        CLuaMatrix* pMatrix;
-        argStream.ReadUserData(pMatrix);
-
-        vecPosition = pMatrix->GetPosition();
-        vecLookAt = pMatrix->GetRotation();
+        position = (*matrix)->GetPosition();
+        lookAtValue = (*matrix)->GetRotation();
     }
     else
     {
-        argStream.ReadVector3D(vecPosition);
-        argStream.ReadVector3D(vecLookAt, CVector());
+        position = std::get<CVector>(matrixOrPosition);
+        lookAtValue = lookAt.value_or(CVector());
     }
 
-    argStream.ReadNumber(fRoll, 0.0f);
-    argStream.ReadNumber(fFOV, 70.0f);
+    if (!CameraScriptShared::IsFiniteVector(position))
+        throw std::invalid_argument("Invalid matrix/position (values out of range)");
 
-    if (!argStream.HasErrors())
+    if (!CameraScriptShared::IsFiniteVector(lookAtValue))
+        throw std::invalid_argument("Invalid lookAt (values out of range)");
+
+    const float rollValue = CameraScriptShared::NormalizeRoll(roll.value_or(0.0f));
+
+    float fovValue = fov.value_or(70.0f);
+
+    if (fovValue <= 0.0f || fovValue >= 180.0f)
+        fovValue = 70.0f;
+
+    auto ApplyToPlayer = [&](CElement* playerElement)
     {
-        if (fFOV <= 0.0f || fFOV >= 180.0f)
-            fFOV = 70.0f;
+        if (!IS_PLAYER(playerElement))
+            return false;
 
-        if (CStaticFunctionDefinitions::SetCameraMatrix(pPlayer, vecPosition, &vecLookAt, fRoll, fFOV))
+        CPlayer*       player = static_cast<CPlayer*>(playerElement);
+        CPlayerCamera* camera = player->GetCamera();
+
+        if (!camera)
+            return false;
+
+        camera->SetMode(CAMERAMODE_FIXED);
+        camera->SetMatrix(position, lookAtValue);
+        camera->SetRoll(rollValue);
+        camera->SetFOV(fovValue);
+
+        CBitStream BitStream;
+
+        BitStream.pBitStream->Write(camera->GenerateSyncTimeContext());
+
+        BitStream.pBitStream->Write(position.fX);
+        BitStream.pBitStream->Write(position.fY);
+        BitStream.pBitStream->Write(position.fZ);
+
+        BitStream.pBitStream->Write(lookAtValue.fX);
+        BitStream.pBitStream->Write(lookAtValue.fY);
+        BitStream.pBitStream->Write(lookAtValue.fZ);
+
+        if (rollValue != 0.0f || fovValue != CameraScriptShared::kDefaultFOV)
         {
-            lua_pushboolean(luaVM, true);
-            return 1;
+            BitStream.pBitStream->Write(rollValue);
+            BitStream.pBitStream->Write(fovValue);
         }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+        player->Send(CLuaPacket(SET_CAMERA_MATRIX, *BitStream.pBitStream));
+
+        return true;
+    };
+
+    if (element->CountChildren() && element->IsCallPropagationEnabled())
+    {
+        CElementListSnapshotRef children = element->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = children->begin(); iter != children->end(); iter++)
+            if (!(*iter)->IsBeingDeleted())
+                SetCameraMatrix(*iter, position, lookAtValue, rollValue, fovValue);
+    }
+
+    return ApplyToPlayer(element);
 }
 
-int CLuaCameraDefs::setCameraTarget(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraTarget(lua_State* luaVM, CElement* element, std::optional<CElement*> target)
 {
     //  bool setCameraTarget ( player thePlayer [, element target = nil ] )
-    CElement* pPlayer;
-    CElement* pTarget;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
-    argStream.ReadUserData(pTarget, NULL);
-
-    if (pTarget && pTarget->GetType() != CElement::PLAYER)
-        MinServerReqCheck(argStream, MIN_SERVER_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player");
-
-    if (!argStream.HasErrors())
+    if (target.has_value() && target.value() && target.value()->GetType() != CElement::PLAYER)
     {
-        if (CStaticFunctionDefinitions::SetCameraTarget(pPlayer, pTarget))
+        CLuaMain* luaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+        if (luaMain && luaMain->GetResource() && luaMain->GetResource()->GetMinServerRequirement() < MIN_SERVER_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS)
         {
-            lua_pushboolean(luaVM, true);
-            return 1;
+#if MTASA_VERSION_TYPE >= VERSION_TYPE_UNTESTED
+            throw std::invalid_argument(SString("<min_mta_version> section in the meta.xml is incorrect or missing (expected at least server %s because %s)",
+                                                MIN_SERVER_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player"));
+#endif
         }
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CElement* targetValue = target.value_or(nullptr);
+
+    auto ApplyToPlayer = [&](CElement* playerElement)
+    {
+        if (!IS_PLAYER(playerElement))
+            return false;
+
+        CPlayer*       player = static_cast<CPlayer*>(playerElement);
+        CPlayerCamera* camera = player->GetCamera();
+
+        if (!camera)
+            return false;
+
+        // If we don't have a target, change it to the player
+        CElement* effectiveTarget = targetValue ? targetValue : player;
+
+        switch (effectiveTarget->GetType())
+        {
+            case CElement::PLAYER:
+            case CElement::PED:
+            case CElement::VEHICLE:
+            {
+                camera->SetMode(CAMERAMODE_PLAYER);
+                camera->SetTarget(effectiveTarget);
+                camera->SetRoll(0.0f);
+                camera->SetFOV(70.0f);
+
+                CBitStream BitStream;
+
+                BitStream.pBitStream->Write(camera->GenerateSyncTimeContext());
+                BitStream.pBitStream->Write(effectiveTarget->GetID());
+
+                player->Send(CLuaPacket(SET_CAMERA_TARGET, *BitStream.pBitStream));
+
+                return true;
+            }
+            default:
+                return false;
+        }
+    };
+
+    if (element->CountChildren() && element->IsCallPropagationEnabled())
+    {
+        CElementListSnapshotRef children = element->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = children->begin(); iter != children->end(); iter++)
+            if (!(*iter)->IsBeingDeleted())
+                SetCameraTarget(luaVM, *iter, targetValue);
+    }
+
+    return ApplyToPlayer(element);
 }
 
-int CLuaCameraDefs::setCameraInterior(lua_State* luaVM)
+bool CLuaCameraDefs::SetCameraInterior(CElement* element, std::uint8_t interior)
 {
     //  bool setCameraInterior ( player thePlayer, int interior )
-    CElement*     pElement;
-    unsigned char ucInterior;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(ucInterior);
-
-    if (!argStream.HasErrors())
+    auto ApplyToPlayer = [&](CElement* playerElement)
     {
-        if (CStaticFunctionDefinitions::SetCameraInterior(pElement, ucInterior))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        if (!IS_PLAYER(playerElement))
+            return false;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+        CPlayer*       player = static_cast<CPlayer*>(playerElement);
+        CPlayerCamera* camera = player->GetCamera();
+
+        if (!camera)
+            return false;
+
+        if (camera->GetInterior() == interior)
+            return false;
+
+        camera->SetInterior(interior);
+
+        CBitStream BitStream;
+
+        BitStream.pBitStream->Write(interior);
+
+        player->Send(CLuaPacket(SET_CAMERA_INTERIOR, *BitStream.pBitStream));
+
+        return true;
+    };
+
+    if (element->CountChildren() && element->IsCallPropagationEnabled())
+    {
+        CElementListSnapshotRef children = element->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = children->begin(); iter != children->end(); iter++)
+            if (!(*iter)->IsBeingDeleted())
+                SetCameraInterior(*iter, interior);
+    }
+
+    return ApplyToPlayer(element);
 }
 
-int CLuaCameraDefs::fadeCamera(lua_State* luaVM)
+bool CLuaCameraDefs::FadeCamera(CElement* element, bool fadeIn, std::optional<float> fadeTime, std::optional<std::uint8_t> red,
+                                std::optional<std::uint8_t> green, std::optional<std::uint8_t> blue)
 {
     //  bool fadeCamera ( player thePlayer, bool fadeIn, [ float timeToFade = 1.0, int red = 0, int green = 0, int blue = 0 ] )
-    CElement*     pPlayer;
-    bool          bFadeIn;
-    float         fFadeTime;
-    unsigned char ucRed;
-    unsigned char ucGreen;
-    unsigned char ucBlue;
+    const float        fadeTimeValue = fadeTime.value_or(1.0f);
+    const std::uint8_t redValue = red.value_or(0);
+    const std::uint8_t greenValue = green.value_or(0);
+    const std::uint8_t blueValue = blue.value_or(0);
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
-    argStream.ReadBool(bFadeIn);
-    argStream.ReadNumber(fFadeTime, 1.0f);
-    argStream.ReadNumber(ucRed, 0);
-    argStream.ReadNumber(ucGreen, 0);
-    argStream.ReadNumber(ucBlue, 0);
-
-    if (!argStream.HasErrors())
+    auto ApplyToPlayer = [&](CElement* playerElement)
     {
-        if (CStaticFunctionDefinitions::FadeCamera(pPlayer, bFadeIn, fFadeTime, ucRed, ucGreen, ucBlue))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        if (!IS_PLAYER(playerElement))
+            return false;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+        CPlayer* player = static_cast<CPlayer*>(playerElement);
+
+        const std::uint8_t fadeInValue = fadeIn ? 1 : 0;
+
+        CBitStream BitStream;
+
+        BitStream.pBitStream->Write(fadeInValue);
+        BitStream.pBitStream->Write(fadeTimeValue);
+
+        if (!fadeIn)
+        {
+            BitStream.pBitStream->Write(redValue);
+            BitStream.pBitStream->Write(greenValue);
+            BitStream.pBitStream->Write(blueValue);
+        }
+
+        player->Send(CLuaPacket(FADE_CAMERA, *BitStream.pBitStream));
+
+        return true;
+    };
+
+    if (element->CountChildren() && element->IsCallPropagationEnabled())
+    {
+        CElementListSnapshotRef children = element->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = children->begin(); iter != children->end(); iter++)
+            if (!(*iter)->IsBeingDeleted())
+                FadeCamera(*iter, fadeIn, fadeTimeValue, redValue, greenValue, blueValue);
+    }
+
+    return ApplyToPlayer(element);
 }
