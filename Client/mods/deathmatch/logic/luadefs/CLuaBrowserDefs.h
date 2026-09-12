@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <core/CWebCoreInterface.h>
 
 class CLuaBrowserDefs : public CLuaDefs
 {
@@ -18,38 +19,39 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    LUA_DECLARE(CreateBrowser);
-    LUA_DECLARE(IsBrowserSupported);
-    LUA_DECLARE(RequestBrowserDomains);
-    LUA_DECLARE(LoadBrowserURL);
-    LUA_DECLARE(IsBrowserLoading);
-    LUA_DECLARE(InjectBrowserMouseMove);
-    LUA_DECLARE(InjectBrowserMouseDown);
-    LUA_DECLARE(InjectBrowserMouseUp);
-    LUA_DECLARE(InjectBrowserMouseWheel);
-    LUA_DECLARE(GetBrowserTitle);
-    LUA_DECLARE(GetBrowserURL);
-    LUA_DECLARE(SetBrowserRenderingPaused);
-    static bool IsBrowserRenderingPaused(CClientWebBrowser* browser);
-    LUA_DECLARE(ExecuteBrowserJavascript);
-    LUA_DECLARE(GetBrowserVolume);
-    LUA_DECLARE(SetBrowserVolume);
-    LUA_DECLARE(IsBrowserDomainBlocked);
-    LUA_DECLARE(FocusBrowser);
-    LUA_DECLARE(IsBrowserFocused);
-    LUA_DECLARE(SetBrowserProperty);
-    LUA_DECLARE(GetBrowserProperty);
-    LUA_DECLARE(GetBrowserSettings);
-    LUA_DECLARE(GetBrowserSource);
-    LUA_DECLARE(SetBrowserAjaxHandler);
-    LUA_DECLARE(CanBrowserNavigateBack);
-    LUA_DECLARE(CanBrowserNavigateForward);
-    LUA_DECLARE(NavigateBrowserForward);
-    LUA_DECLARE(NavigateBrowserBack);
-    LUA_DECLARE(ReloadBrowserPage);
-    LUA_DECLARE(ToggleBrowserDevTools);
-    LUA_DECLARE(ResizeBrowser);
-    LUA_DECLARE(GUICreateBrowser);
-    LUA_DECLARE(GUIGetBrowser);
-    static bool IsBrowserGPUEnabled() noexcept;
+    static std::variant<CClientWebBrowser*, bool> CreateBrowser(lua_State* luaVM, CVector2D size, bool isLocal, std::optional<bool> transparent);
+    static bool                                   RequestBrowserDomains(lua_State* luaVM, std::vector<std::string> pages, std::optional<bool> isURL,
+                                                                        std::optional<CLuaFunctionRef> callbackFunction);
+    static bool        LoadBrowserURL(CClientWebBrowser* browser, const std::string url, std::optional<std::string> postData, std::optional<bool> urlEncoded);
+    static bool        IsBrowserLoading(CClientWebBrowser* browser);
+    static bool        InjectBrowserMouseMove(CClientWebBrowser* browser, CVector2D position);
+    static bool        InjectBrowserMouseDown(CClientWebBrowser* browser, eWebBrowserMouseButton mouseButton, std::optional<bool> doubleClick);
+    static bool        InjectBrowserMouseUp(CClientWebBrowser* browser, eWebBrowserMouseButton mouseButton);
+    static bool        InjectBrowserMouseWheel(CClientWebBrowser* browser, int scrollVert, int scrollHorz);
+    static std::string GetBrowserTitle(CClientWebBrowser* browser);
+    static std::string GetBrowserURL(CClientWebBrowser* browser);
+    static bool        SetBrowserRenderingPaused(CClientWebBrowser* browser, bool paused);
+    static bool        IsBrowserRenderingPaused(CClientWebBrowser* browser);
+    static bool        ExecuteBrowserJavascript(CClientWebBrowser* browser, const std::string javascriptCode);
+    static float       GetBrowserVolume(CClientWebBrowser* browser);
+    static bool        SetBrowserVolume(std::variant<CClientWebBrowser*, float> webBrowserOrVolume, std::optional<float> volume);
+    static std::optional<bool>                   IsBrowserDomainBlocked(const std::string url, std::optional<bool> isURL);
+    static bool                                  FocusBrowser(std::optional<CClientWebBrowser*> browser);
+    static bool                                  IsBrowserFocused(CClientWebBrowser* browser);
+    static bool                                  SetBrowserProperty(CClientWebBrowser* browser, const std::string key, const std::string value);
+    static std::optional<std::string>            GetBrowserProperty(CClientWebBrowser* browser, const std::string key);
+    static std::unordered_map<std::string, bool> GetBrowserSettings();
+    static bool                                  GetBrowserSource(lua_State* luaVM, CClientWebBrowser* browser, CLuaFunctionRef callbackFunction);
+    static bool SetBrowserAjaxHandler(lua_State* luaVM, CClientWebBrowser* browser, const std::string url, std::optional<CLuaFunctionRef> callbackFunction);
+    static bool CanBrowserNavigateBack(CClientWebBrowser* browser);
+    static bool CanBrowserNavigateForward(CClientWebBrowser* browser);
+    static bool NavigateBrowserBack(CClientWebBrowser* browser);
+    static bool NavigateBrowserForward(CClientWebBrowser* browser);
+    static bool ReloadBrowserPage(CClientWebBrowser* browser, std::optional<bool> ignoreCache);
+    static bool ToggleBrowserDevTools(CClientWebBrowser* browser, bool visible);
+    static bool ResizeBrowser(CClientWebBrowser* browser, CVector2D size);
+    static std::variant<CClientGUIElement*, bool> GUICreateBrowser(lua_State* luaVM, CVector2D position, CVector2D size, bool isLocal, bool isTransparent,
+                                                                   std::optional<bool> relative, std::optional<CClientGUIElement*> parent);
+    static std::variant<CClientWebBrowser*, bool> GUIGetBrowser(CClientGUIElement* guiElement);
+    static bool                                   IsBrowserGPUEnabled() noexcept;
 };
