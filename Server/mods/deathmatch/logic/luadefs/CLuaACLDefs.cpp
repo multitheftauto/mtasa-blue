@@ -418,7 +418,6 @@ int CLuaACLDefs::aclListRights(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Loop through ACL
-        char                                           szRightName[128];
         CAccessControlListRight::ERightType            eType;
         unsigned int                                   uiIndex = 0;
         list<CAccessControlListRight*>::const_iterator iter = pACL->IterBegin();
@@ -429,35 +428,36 @@ int CLuaACLDefs::aclListRights(lua_State* luaVM)
             if (!bAll && eType != eAllowed)
                 continue;
 
+            const char* szPrefix = "unknown.";
             switch (eType)
             {
                 case CAccessControlListRight::RIGHT_TYPE_COMMAND:
-                    strcpy(szRightName, "command.");
+                    szPrefix = "command.";
                     break;
 
                 case CAccessControlListRight::RIGHT_TYPE_FUNCTION:
-                    strcpy(szRightName, "function.");
+                    szPrefix = "function.";
                     break;
 
                 case CAccessControlListRight::RIGHT_TYPE_RESOURCE:
-                    strcpy(szRightName, "resource.");
+                    szPrefix = "resource.";
                     break;
 
                 case CAccessControlListRight::RIGHT_TYPE_GENERAL:
-                    strcpy(szRightName, "general.");
+                    szPrefix = "general.";
                     break;
 
                 default:
-                    strcpy(szRightName, "unknown.");
                     break;
             }
 
             // Append right name
-            strncat(szRightName, (*iter)->GetRightName(), NUMELMS(szRightName) - 1);
+            SString strRightName = szPrefix;
+            strRightName += (*iter)->GetRightName();
 
             // Push its name onto the table
             lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushstring(luaVM, szRightName);
+            lua_pushstring(luaVM, strRightName);
             lua_settable(luaVM, -3);
         }
 
@@ -803,29 +803,30 @@ int CLuaACLDefs::aclGroupListObjects(lua_State* luaVM)
         lua_newtable(luaVM);
 
         // Loop through ACL stuff
-        char                                                 szBuffer[255];
         unsigned int                                         uiIndex = 0;
         list<CAccessControlListGroupObject*>::const_iterator iter = pGroup->IterBeginObjects();
         for (; iter != pGroup->IterEndObjects(); ++iter)
         {
             // Put the base type depending on the type
+            const char* szPrefix = "";
             switch ((*iter)->GetObjectType())
             {
                 case CAccessControlListGroupObject::OBJECT_TYPE_RESOURCE:
-                    strcpy(szBuffer, "resource.");
+                    szPrefix = "resource.";
                     break;
 
                 case CAccessControlListGroupObject::OBJECT_TYPE_USER:
-                    strcpy(szBuffer, "user.");
+                    szPrefix = "user.";
                     break;
             };
 
             // Append the object name
-            strncat(szBuffer, (*iter)->GetObjectName(), 254);
+            SString strObjectName = szPrefix;
+            strObjectName += (*iter)->GetObjectName();
 
             // Push its name onto the table
             lua_pushnumber(luaVM, ++uiIndex);
-            lua_pushstring(luaVM, szBuffer);
+            lua_pushstring(luaVM, strObjectName);
             lua_settable(luaVM, -3);
         }
         // Return the table
