@@ -3923,7 +3923,6 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWeatherUpdateHandler()
 {
-    // CTimer has advanced, but water physics and rendering have not run yet.
     // Refresh even after a long frame or pause, using the shared real-time phase.
     m_pManager->GetWaterManager()->UpdateWavePhase();
 

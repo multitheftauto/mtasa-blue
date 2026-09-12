@@ -214,8 +214,6 @@ bool CNetAPI::ProcessPacket(unsigned char bytePacketID, NetBitStreamInterface& B
                 m_bVehicleLastReturn = false;
             }
 
-            // The server clock travels with the existing acknowledgement, so
-            // waves need neither a separate packet nor a client sync authority.
             if (BitStream.Can(eBitStreamVersion::WaterWaveSync))
                 m_pManager->GetWaterManager()->ReceiveWaveSync(BitStream);
 
