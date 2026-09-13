@@ -4644,7 +4644,7 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
                 // Store anim data
                 std::int64_t startTime = GetLocalTick();
                 pPed->SetAnimationData(SPlayerAnimData{blockName, animName, iTime, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame, iBlend,
-                                                           bTaskToBeRestoredOnAnimEnd, startTime});
+                                                       bTaskToBeRestoredOnAnimEnd, startTime});
 
                 BitStream.pBitStream->WriteString<unsigned char>(blockName);
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
@@ -4750,7 +4750,9 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const 
         if (pPed->IsSpawned() && !animName.empty())
         {
             SPlayerAnimData data = pPed->GetAnimationData();
-            if (data.IsAnimating() && data.animName == animName)
+            bool            match = data.IsAnimating() && data.animName == animName;
+
+            if (match)
             {
                 float length = GetAnimationLength(animName);
                 if (length > 0.0f)
@@ -4798,6 +4800,10 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const 
             CBitStream BitStream;
             BitStream.pBitStream->WriteString<unsigned char>(animName);
             BitStream.pBitStream->Write(fSpeed);
+
+            BitStream.pBitStream->WriteBit(match);
+            if (match)
+                BitStream.pBitStream->WriteInt64(data.startTime);
 
             pPed->SetAnimationSpeed(fSpeed);
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_SPEED, *BitStream.pBitStream));

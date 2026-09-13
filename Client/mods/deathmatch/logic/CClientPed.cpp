@@ -5896,23 +5896,45 @@ bool CClientPed::IsRunningAnimation()
 
 bool CClientPed::IsAnimationInProgress()
 {
-    bool constAnim = m_AnimationCache.bLoop || m_AnimationCache.bFreezeLastFrame;
+    // 1. !isLoop && freeze -> plays full length
+    // 2. !isLoop && !freeze -> plays for customTime (if < 0, full length; if == 0, 0)
+    // 3. isLoop && !freeze -> plays for customTime if > 0, otherwise infinite if < 0
+    // 4. isLoop && freeze -> acts like infinite loop without freezing last frame
+
+    bool isLoop = m_AnimationCache.bLoop;
+    bool freeze = m_AnimationCache.bFreezeLastFrame;
+
+    if (freeze)
+        return true;
 
     if (!m_pAnimationBlock)
-        return constAnim;
-
-    float elapsedTime = static_cast<float>(g_pClientGame->GetSyncedTime() - m_AnimationCache.startTime) / 1000.0f;
+        return isLoop;
 
     auto animBlendHierarchy = g_pGame->GetAnimManager()->GetAnimation(m_AnimationCache.strName.c_str(), m_pAnimationBlock);
     if (!animBlendHierarchy)
-        return constAnim;
+        return isLoop;
 
     float animLength = animBlendHierarchy->GetTotalTime();
-    float time = std::clamp(static_cast<float>(m_AnimationCache.iTime), -1.0f, animLength);
-    if (time < 0 && !constAnim)
-        time = animLength;
+    float elapsedTime = static_cast<float>(g_pClientGame->GetSyncedTime() - m_AnimationCache.startTime) / 1000.0f;
+    float customTime = (m_AnimationCache.iTime < 0) ? -1.0f : (static_cast<float>(m_AnimationCache.iTime) / 1000.0f);
+    float effectiveDuration = animLength;
 
-    return constAnim || elapsedTime < time;
+    if (!isLoop)
+    {
+        if (customTime == 0.0f)
+            effectiveDuration = 0.0f;
+        else if (customTime > 0.0f)
+            effectiveDuration = std::min(customTime, animLength);
+    }
+    else
+    {
+        if (customTime < 0.0f)
+            return true;
+
+        effectiveDuration = customTime;
+    }
+
+    return elapsedTime < effectiveDuration;
 }
 
 void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
@@ -6069,7 +6091,8 @@ void CClientPed::UpdateAnimationProgressAndSpeed()
         return;
 
     // Default to current progress to preserve state if paused or skipped
-    float progress = animAssoc->GetCurrentProgress();
+    float animLength = animAssoc->GetLength();
+    float progress = animAssoc->GetCurrentProgress() / animLength;
 
     // Process explicit cached progress independently of playback speed
     if (!std::isnan(m_AnimationCache.progress))
@@ -6080,7 +6103,6 @@ void CClientPed::UpdateAnimationProgressAndSpeed()
     else if (m_AnimationCache.speed > 0.0f)
     {
         // Time-derived progress calculation requires a positive speed
-        float animLength = animAssoc->GetLength();
         float elapsedTime = static_cast<float>(g_pClientGame->GetSyncedTime() - m_AnimationCache.startTime) / 1000.0f;
         float speed = m_AnimationCache.speed;
 
@@ -6105,7 +6127,7 @@ void CClientPed::UpdateAnimationProgressAndSpeed()
         else if (isLoop && !freeze)
         {
             if (customTime >= 0.0f)
-                effectiveDuration = std::min(customTime, animLength);
+                effectiveDuration = customTime;
         }
 
         if (effectiveDuration <= 0.0f)

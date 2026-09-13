@@ -285,8 +285,7 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                         pPed->m_AnimationCache.speed = 1.0f;
                         pPed->m_AnimationCache.updateInNextFrame = true;
 
-                        if (isGTAAnim)
-                            pPed->SetHasSyncedAnim(true);
+                        pPed->SetHasSyncedAnim(true);
                     }
                 }
             }
@@ -322,12 +321,19 @@ void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInter
                         pPed->m_AnimationCache.startTime = time;
 
                     if (pAnimAssociation)
+                    {
                         pAnimAssociation->SetCurrentProgress(fProgress);
-                    else if (match)
-                        pPed->m_AnimationCache.updateInNextFrame = true;
 
-                    if (match)
+                        if (pPed->m_AnimationCache.speed == 0.0f)
+                            pPed->m_AnimationCache.progress = fProgress;
+                        else
+                            pPed->m_AnimationCache.progress = -1.0f;
+                    }
+                    else if (match)
+                    {
                         pPed->m_AnimationCache.progress = fProgress;
+                        pPed->m_AnimationCache.updateInNextFrame = true;
+                    }
                 }
             }
             else
@@ -355,6 +361,10 @@ void CPedRPCs::SetPedAnimationSpeed(CClientEntity* pSource, NetBitStreamInterfac
 
                 if (match)
                     pPed->m_AnimationCache.speed = fSpeed;
+
+                std::int64_t time{};
+                if (bitStream.ReadBit() && bitStream.ReadInt64(time))
+                    pPed->m_AnimationCache.startTime = time;
 
                 if (pAnimAssociation)
                     pAnimAssociation->SetCurrentSpeed(fSpeed);

@@ -1773,7 +1773,7 @@ namespace SharedUtil
     inline float GetAnimationLength(const std::string& name)
     {
         std::string lower(name);
-        std::transform(lower.begin(), lower.end(), lower.begin(), ::tolower);
+        std::transform(lower.begin(), lower.end(), lower.begin(), [](unsigned char c) { return std::tolower(c); });
 
         if (auto it = g_animationDurations.find(lower); it != g_animationDurations.end())
         {

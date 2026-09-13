@@ -111,13 +111,20 @@ void CPedSync::UpdateAllSyncer()
                 if (!keepsStateForever)
                 {
                     float animLengthMs = animLength * 1000.0f;
-
                     float effectiveDurationMs = animLengthMs;
 
-                    if (time == 0)
-                        effectiveDurationMs = 0.0f;
-                    else if (time > 0)
-                        effectiveDurationMs = std::min(static_cast<float>(time), animLengthMs);
+                    if (!isLoop)
+                    {
+                        if (time == 0)
+                            effectiveDurationMs = 0.0f;
+                        else if (time > 0)
+                            effectiveDurationMs = std::min(static_cast<float>(time), animLengthMs);
+                    }
+                    else
+                    {
+                        if (time > 0)
+                            effectiveDurationMs = static_cast<float>(time);
+                    }
 
                     if (animData.speed > 0.0f)
                     {
