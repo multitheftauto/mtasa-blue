@@ -2962,7 +2962,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
 
         // Are we need to update anim speed & progress?
         // We need to do it here because the anim starts in the next frame after calling RunNamedAnimation
-        if (m_pAnimationBlock && m_AnimationCache.updateInNextFrame && IsAnimationInProgress())
+        if (m_pAnimationBlock && m_AnimationCache.updateInNextFrame && (IsAnimationInProgress() || !std::isnan(m_AnimationCache.progress)))
             UpdateAnimationProgressAndSpeed();
 
         // Same "next frame" issue as above: the gateway swap to our custom hierarchy (see
@@ -5907,7 +5907,12 @@ bool CClientPed::IsAnimationInProgress()
     if (!animBlendHierarchy)
         return constAnim;
 
-    return constAnim || elapsedTime < animBlendHierarchy->GetTotalTime();
+    float animLength = animBlendHierarchy->GetTotalTime();
+    float time = std::clamp(static_cast<float>(m_AnimationCache.iTime), -1.0f, animLength);
+    if (time < 0 && !constAnim)
+        time = animLength;
+
+    return constAnim || elapsedTime < time;
 }
 
 void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
