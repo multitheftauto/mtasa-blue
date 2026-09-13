@@ -327,7 +327,7 @@ void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInter
                         if (pPed->m_AnimationCache.speed == 0.0f)
                             pPed->m_AnimationCache.progress = fProgress;
                         else
-                            pPed->m_AnimationCache.progress = -1.0f;
+                            pPed->m_AnimationCache.progress = std::numeric_limits<float>::quiet_NaN();
                     }
                     else if (match)
                     {

@@ -5930,8 +5930,8 @@ bool CClientPed::IsAnimationInProgress()
     {
         if (customTime < 0.0f)
             return true;
-
-        effectiveDuration = customTime;
+        else if (customTime > 0.0f)
+            effectiveDuration = customTime;
     }
 
     return elapsedTime < effectiveDuration;
@@ -6126,7 +6126,7 @@ void CClientPed::UpdateAnimationProgressAndSpeed()
         }
         else if (isLoop && !freeze)
         {
-            if (customTime >= 0.0f)
+            if (customTime > 0.0f)
                 effectiveDuration = customTime;
         }
 
