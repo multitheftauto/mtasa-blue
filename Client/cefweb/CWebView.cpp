@@ -21,6 +21,29 @@
 namespace
 {
     const int CEF_PIXEL_STRIDE = 4;
+
+    constexpr auto RESUME_FRAME_GUARD_DURATION = std::chrono::milliseconds(1000);
+
+    size_t CountVisiblePixels(const byte* pData, size_t uiDataSize, int iWidth, int iHeight)
+    {
+        if (!pData || iWidth <= 0 || iHeight <= 0)
+            return 0;
+
+        const auto pixelCount = static_cast<size_t>(iWidth) * static_cast<size_t>(iHeight);
+        if (uiDataSize < pixelCount * CEF_PIXEL_STRIDE)
+            return 0;
+
+        constexpr size_t SAMPLE_STRIDE = 16;
+
+        size_t visiblePixels = 0;
+        for (size_t i = 0; i < pixelCount; i += SAMPLE_STRIDE)
+        {
+            if (pData[i * CEF_PIXEL_STRIDE + 3] != 0)
+                ++visiblePixels;
+        }
+
+        return visiblePixels;
+    }
 }
 
 CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent)
@@ -286,6 +309,7 @@ void CWebView::SetRenderingPaused(bool bPaused)
 {
     // Store pause state even when the host is not created yet so async
     // browser creation cannot lose the requested visibility state.
+    const bool wasPaused = m_bIsRenderingPaused;
     m_bIsRenderingPaused = bPaused;
 
     if (m_pWebView)
@@ -304,6 +328,14 @@ void CWebView::SetRenderingPaused(bool bPaused)
         }
         else
         {
+            if (wasPaused)
+            {
+                std::lock_guard<std::mutex> lock{m_RenderData.dataMutex};
+                m_RenderData.awaitingResumeFrame = true;
+                m_RenderData.resumeGuardVisiblePixels = 0;
+                m_RenderData.resumeFrameDeadline = std::chrono::steady_clock::now() + RESUME_FRAME_GUARD_DURATION;
+            }
+
             // WasHidden(false) does not produce OnPaint with external begin-frame
             // scheduling. Request a full frame so CSS hover / compositor updates
             // are not left on the last cached texture.
@@ -403,6 +435,14 @@ void CWebView::UpdateTexture()
         m_RenderData.changed = false;
     }
 
+    if (m_RenderData.awaitingResumeFrame && std::chrono::steady_clock::now() >= m_RenderData.resumeFrameDeadline)
+    {
+        m_RenderData.awaitingResumeFrame = false;
+
+        if (m_pWebView)
+            m_pWebView->GetHost()->Invalidate(PET_VIEW);
+    }
+
     // After device reset (minimize/restore), force full copy from our buffer to new texture
     if (m_pWebBrowserRenderItem->m_bTextureWasRecreated)
     {
@@ -418,6 +458,26 @@ void CWebView::UpdateTexture()
 
     if (m_RenderData.changed || m_RenderData.popupShown) [[likely]]
     {
+        if (m_RenderData.changed && m_RenderData.awaitingResumeFrame && m_RenderData.buffer)
+        {
+            const auto visiblePixels = CountVisiblePixels(m_RenderData.buffer.get(), m_RenderData.bufferSize, m_RenderData.width, m_RenderData.height);
+
+            const bool bLostContent = m_RenderData.resumeGuardVisiblePixels != 0 && visiblePixels * 2 < m_RenderData.resumeGuardVisiblePixels;
+
+            if (visiblePixels == 0 || bLostContent)
+            {
+                m_RenderData.changed = false;
+                m_RenderData.popupShown = false;
+
+                if (m_pWebView)
+                    m_pWebView->GetHost()->Invalidate(PET_VIEW);
+
+                return;
+            }
+
+            m_RenderData.resumeGuardVisiblePixels = visiblePixels;
+        }
+
         // Lock surface with D3DLOCK_DISCARD for dynamic textures - tells driver we'll overwrite entire content
         // This avoids GPU stalls waiting for previous frame to finish rendering
         D3DLOCKED_RECT LockedRect;

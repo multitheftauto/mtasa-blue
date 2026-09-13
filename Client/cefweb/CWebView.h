@@ -299,6 +299,10 @@ private:
         CefRect                 popupRect;
         bool                    popupShown = false;
         std::unique_ptr<byte[]> popupBuffer;
+
+        size_t                                resumeGuardVisiblePixels = 0;
+        bool                                  awaitingResumeFrame = false;
+        std::chrono::steady_clock::time_point resumeFrameDeadline{};
     } m_RenderData;
 
     CWebBrowserEventsInterface* m_pEventsInterface;
