@@ -809,7 +809,7 @@ void CCore::ShowErrorMessageBox(const SString& strTitle, SString strMessage, con
 // Show message box with possibility of on-line help
 //  + with net error code appended to message and trouble link
 //
-void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink, bool bLinkRequiresErrorCode)
+void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink, bool bLinkRequiresErrorCode, bool bAllowReconnect)
 {
     uint uiErrorCode = CCore::GetSingleton().GetNetwork()->GetExtendedErrorCode();
     if (uiErrorCode != 0)
@@ -824,7 +824,42 @@ void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, 
         strTroubleLink = "";  // No link if no error code
 
     AddReportLog(7100, SString("Core - NetError (%s) (%s)", *strTitle, *strMessage));
+
+    // The plain error box holds a single button, so a reconnect option needs the question box instead
+    if (bAllowReconnect && strTroubleLink.empty())
+    {
+        ShowReconnectErrorMessageBox(strTitle, strMessage);
+        return;
+    }
+
     ShowErrorMessageBox(strTitle, strMessage, strTroubleLink);
+}
+
+//
+// Show message box offering to reconnect to the server we just lost
+//
+void CCore::ShowReconnectErrorMessageBox(const SString& strTitle, const SString& strMessage)
+{
+    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+    pQuestionBox->Reset();
+    pQuestionBox->SetTitle(strTitle);
+    pQuestionBox->SetMessage(strMessage);
+    pQuestionBox->SetButton(0, _("OK"));
+    pQuestionBox->SetButton(1, _("Reconnect"));
+    pQuestionBox->SetCallback(CCore::ReconnectMessageBoxCallBack);
+    pQuestionBox->Show();
+}
+
+//
+// Callback used in CCore::ShowReconnectErrorMessageBox
+//
+void CCore::ReconnectMessageBoxCallBack(void* pData, uint uiButton)
+{
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow()->Reset();
+
+    // Reconnect only arms a flag here; CConnectManager waits for the network itself and shows its own box
+    if (uiButton == 1)
+        CCore::GetSingleton().Reconnect(nullptr, 0, nullptr, false);
 }
 
 //
