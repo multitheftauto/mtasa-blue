@@ -256,9 +256,12 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
                         }
                     }
                 }
+
                 // Remove the building from the list
                 m_pBuildingRemovals->erase(iter++);
+
                 delete pFind;
+
                 // Success! don't return incase there are any others to delete
                 bSuccess = true;
             }
@@ -268,6 +271,7 @@ bool CBuildingRemovalSA::RestoreBuilding(uint16_t usModelToRestore, float fRange
         else
             iter++;
     }
+
     std::pair<std::multimap<uint16_t, sDataBuildingRemovalItem*>::iterator, std::multimap<uint16_t, sDataBuildingRemovalItem*>::iterator>
                                                                        dataBuildingIterators = m_pDataBuildings->equal_range(usModelToRestore);
     std::multimap<uint16_t, sDataBuildingRemovalItem*>::const_iterator iterator = dataBuildingIterators.first;
@@ -367,6 +371,7 @@ bool CBuildingRemovalSA::IsRemovedModelInRadius(SIPLInst* pInst)
             }
         }
     }
+
     return false;
 }
 
@@ -400,6 +405,7 @@ bool CBuildingRemovalSA::IsObjectRemoved(CEntitySAInterface* pInterface)
                 }
 
                 float fDistance = sqrt(fDistanceX * fDistanceX + fDistanceY * fDistanceY + fDistanceZ * fDistanceZ);
+
                 // is it in the removal spheres radius if so return else keep looking
                 if (fDistance <= pFind->m_fRadius)
                 {
@@ -408,6 +414,7 @@ bool CBuildingRemovalSA::IsObjectRemoved(CEntitySAInterface* pInterface)
             }
         }
     }
+
     return false;
 }
 
@@ -500,6 +507,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
         else
             iter++;
     }
+
     // Init some variables
     std::multimap<uint16_t, sDataBuildingRemovalItem*>::const_iterator iterator = m_pDataBuildings->begin();
     // Loop through the data building list
@@ -512,6 +520,7 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
             pFound->m_iCount = 0;
         }
     }
+
     // Init some variables
     std::multimap<uint16_t, sBuildingRemovalItem*>::const_iterator iteratorBinary = m_pBinaryBuildings->begin();
     // Loop through the data building list
@@ -524,10 +533,13 @@ void CBuildingRemovalSA::ClearRemovedBuildingLists(uint* pOutAmount)
             pFoundBinary->m_iCount = 0;
         }
     }
+
     // Delete old building lists
     delete m_pBuildingRemovals;
+
     // Create new
     m_pBuildingRemovals = new std::multimap<uint16_t, SBuildingRemoval*>;
+
     m_pRemovedEntities.clear();
     m_pAddedEntities.clear();
 
@@ -579,10 +591,13 @@ sDataBuildingRemovalItem* CBuildingRemovalSA::AddDataBuilding(CEntitySAInterface
 
     // Create a new building removal
     sDataBuildingRemovalItem* pBuildingRemoval = new sDataBuildingRemovalItem(pInterface, true);
+
     // Insert it with the model index so we can fast lookup
     m_pDataBuildings->insert(std::pair<uint16_t, sDataBuildingRemovalItem*>((uint16_t)pInterface->m_nModelIndex, pBuildingRemoval));
+
     m_pAddedEntities[(DWORD)pInterface] = true;
     m_pRemovedEntities[(DWORD)pInterface] = false;
+
     return pBuildingRemoval;
 }
 
@@ -618,8 +633,10 @@ void CBuildingRemovalSA::AddBinaryBuilding(CEntitySAInterface* pInterface)
     {
         // Create a new building removal
         sBuildingRemovalItem* pBuildingRemoval = new sBuildingRemovalItem(pInterface, false);
+
         // Insert it with the model index so we can fast lookup
         m_pBinaryBuildings->insert(std::pair<uint16_t, sBuildingRemovalItem*>((uint16_t)pInterface->m_nModelIndex, pBuildingRemoval));
+
         m_pAddedEntities[(DWORD)pInterface] = true;
         m_pRemovedEntities[(DWORD)pInterface] = false;
     }
