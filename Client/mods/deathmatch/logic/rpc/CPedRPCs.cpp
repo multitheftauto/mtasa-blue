@@ -252,16 +252,23 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
         {
             if (!blockName.empty())
             {
-                std::string animName;
-                int         iTime;
-                int         iBlend = 250;
-                bool        bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd;
+                std::string  animName;
+                int          iTime;
+                int          iBlend = 250;
+                bool         bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame, bTaskToBeRestoredOnAnimEnd;
+                bool         isGTAAnim;
+                std::int64_t startTime{};
 
                 if (bitStream.ReadString<unsigned char>(animName) && bitStream.Read(iTime) && bitStream.ReadBit(bLoop) && bitStream.ReadBit(bUpdatePosition) &&
                     bitStream.ReadBit(bInterruptible) && bitStream.ReadBit(bFreezeLastFrame))
                 {
                     bitStream.Read(iBlend);
                     bitStream.ReadBit(bTaskToBeRestoredOnAnimEnd);
+                    bitStream.ReadBit(isGTAAnim);
+
+                    if (isGTAAnim)
+                        bitStream.ReadInt64(startTime);
+
                     if (!pPed->IsDucked())
                     {
                         bTaskToBeRestoredOnAnimEnd = false;
@@ -274,9 +281,9 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                         pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
                         pPed->SetTaskTypeToBeRestoredOnAnimEnd((eTaskType)TASK_SIMPLE_DUCK);
 
-                        pPed->m_AnimationCache.startTime = GetTimestamp();
+                        pPed->m_AnimationCache.startTime = isGTAAnim ? startTime : g_pClientGame->GetSyncedTime();
                         pPed->m_AnimationCache.speed = 1.0f;
-                        pPed->m_AnimationCache.progress = 0.0f;
+                        pPed->m_AnimationCache.updateInNextFrame = true;
 
                         pPed->SetHasSyncedAnim(true);
                     }
@@ -307,10 +314,25 @@ void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInter
                 if (bitStream.Read(fProgress))
                 {
                     auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), animName.c_str());
+                    bool match = animName == pPed->m_AnimationCache.strName;
+
+                    std::int64_t time{};
+                    if (bitStream.ReadBit() && bitStream.ReadInt64(time))
+                        pPed->m_AnimationCache.startTime = time;
+
                     if (pAnimAssociation)
                     {
                         pAnimAssociation->SetCurrentProgress(fProgress);
+
+                        if (pPed->m_AnimationCache.speed == 0.0f)
+                            pPed->m_AnimationCache.progress = fProgress;
+                        else
+                            pPed->m_AnimationCache.progress = std::numeric_limits<float>::quiet_NaN();
+                    }
+                    else if (match)
+                    {
                         pPed->m_AnimationCache.progress = fProgress;
+                        pPed->m_AnimationCache.updateInNextFrame = true;
                     }
                 }
             }
@@ -335,11 +357,19 @@ void CPedRPCs::SetPedAnimationSpeed(CClientEntity* pSource, NetBitStreamInterfac
             if (bitStream.Read(fSpeed))
             {
                 auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(pPed->GetClump(), animName.c_str());
-                if (pAnimAssociation)
-                {
-                    pAnimAssociation->SetCurrentSpeed(fSpeed);
+                bool match = animName == pPed->m_AnimationCache.strName;
+
+                if (match)
                     pPed->m_AnimationCache.speed = fSpeed;
-                }
+
+                std::int64_t time{};
+                if (bitStream.ReadBit() && bitStream.ReadInt64(time))
+                    pPed->m_AnimationCache.startTime = time;
+
+                if (pAnimAssociation)
+                    pAnimAssociation->SetCurrentSpeed(fSpeed);
+                else if (match)
+                    pPed->m_AnimationCache.updateInNextFrame = true;
             }
         }
     }

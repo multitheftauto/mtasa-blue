@@ -2323,13 +2323,16 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
         CClientPed& Ped = static_cast<CClientPed&>(Entity);
         if (strBlockName && szAnimName)
         {
+            bool success = false;
+
             std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(strBlockName);
             if (pBlock)
             {
                 Ped.SetCurrentAnimationCustom(false);
                 Ped.SetNextAnimationNormal();
                 Ped.RunNamedAnimation(pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame);
-                return true;
+
+                success = true;
             }
             else
             {
@@ -2348,12 +2351,16 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
 
                         const char* szGateWayAnimationName = g_pGame->GetAnimManager()->GetGateWayAnimationName();
                         Ped.RunNamedAnimation(pBlock, szGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame);
-                        return true;
+
+                        success = true;
                     }
                 }
             }
 
-            Ped.m_AnimationCache.startTime = GetTimestamp();
+            if (success)
+                Ped.m_AnimationCache.startTime = g_pClientGame->GetSyncedTime();
+
+            return success;
         }
         else
         {
@@ -2375,13 +2382,20 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CClientEntity& Entity, 
         if (!strAnimName.empty())
         {
             auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
+            bool match = (strAnimName == Ped.m_AnimationCache.strName);
+
             if (pAnimAssociation)
             {
                 pAnimAssociation->SetCurrentProgress(fProgress);
-                return true;
+                Ped.m_AnimationCache.progress = std::numeric_limits<float>::quiet_NaN();
+            }
+            else if (match)
+            {
+                Ped.m_AnimationCache.progress = fProgress;
+                Ped.m_AnimationCache.updateInNextFrame = true;
             }
 
-            Ped.m_AnimationCache.progress = fProgress;
+            return true;
         }
         else
         {
@@ -2404,13 +2418,22 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CClientEntity& Entity, con
         if (!strAnimName.empty())
         {
             auto pAnimAssociation = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(Ped.GetClump(), strAnimName);
+            bool match = (strAnimName == Ped.m_AnimationCache.strName);
+
             if (pAnimAssociation)
             {
                 pAnimAssociation->SetCurrentSpeed(fSpeed);
-                return true;
+
+                if (match)
+                    Ped.m_AnimationCache.speed = fSpeed;
+            }
+            else if (match)
+            {
+                Ped.m_AnimationCache.speed = fSpeed;
+                Ped.m_AnimationCache.updateInNextFrame = true;
             }
 
-            Ped.m_AnimationCache.speed = fSpeed;
+            return true;
         }
     }
 

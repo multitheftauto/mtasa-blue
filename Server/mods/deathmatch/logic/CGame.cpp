@@ -1080,6 +1080,9 @@ bool CGame::Start(int iArgumentCount, char* szArguments[])
         }
     }
 
+    // Init std::chrono::steady_clock
+    GetLocalTick();
+
     // Done
     // If you're ever going to change this message, update the "server ready" determination
     // inside CServer.cpp in deathmatch mod aswell.
