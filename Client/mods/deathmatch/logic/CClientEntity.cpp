@@ -44,6 +44,7 @@ CClientEntity::CClientEntity(ElementID ID) : ClassInit(this)
     m_pEventManager = new CMapEventManager;
 
     m_pAttachedToEntity = NULL;
+    m_attachedBone = BONE_ROOT;
 
     m_strTypeName = "unknown";
     m_uiTypeHash = GetTypeHashFromString(m_strTypeName);
@@ -629,8 +630,13 @@ bool CClientEntity::IsOutOfBounds()
 
 void CClientEntity::AttachTo(CClientEntity* pEntity)
 {
+    AttachTo(pEntity, BONE_ROOT);
+}
+
+void CClientEntity::AttachTo(CClientEntity* entity, eBone bone)
+{
     // Handle attach attempt during entity destructor
-    if (pEntity)
+    if (entity)
     {
         if (m_bDisallowAttaching)
         {
@@ -638,9 +644,9 @@ void CClientEntity::AttachTo(CClientEntity* pEntity)
             return;
         }
 
-        if (pEntity->m_bDisallowAttaching)
+        if (entity->m_bDisallowAttaching)
         {
-            assert(!pEntity->m_pAttachedToEntity && pEntity->m_AttachedEntities.empty());
+            assert(!entity->m_pAttachedToEntity && entity->m_AttachedEntities.empty());
             return;
         }
     }
@@ -651,7 +657,8 @@ void CClientEntity::AttachTo(CClientEntity* pEntity)
         ListRemove(m_pAttachedToEntity->m_AttachedEntities, this);
     }
 
-    m_pAttachedToEntity = pEntity;
+    m_pAttachedToEntity = entity;
+    m_attachedBone = bone;
 
     if (m_pAttachedToEntity)
     {
@@ -659,7 +666,7 @@ void CClientEntity::AttachTo(CClientEntity* pEntity)
         m_pAttachedToEntity->m_AttachedEntities.push_back(this);
     }
 
-    InternalAttachTo(pEntity);
+    InternalAttachTo(entity);
 }
 
 void CClientEntity::InternalAttachTo(CClientEntity* pEntity)
@@ -669,45 +676,59 @@ void CClientEntity::InternalAttachTo(CClientEntity* pEntity)
     {
         if (pEntity)
         {
-            switch (pEntity->GetType())
+            if (m_attachedBone != BONE_ROOT && (pEntity->GetType() == CCLIENTPED || pEntity->GetType() == CCLIENTPLAYER))
             {
-                case CCLIENTVEHICLE:
+                // For native bone attachment, detach from GTA's physical root attachment
+                // so MTA's DoAttaching controls the matrix right after bone animation updates
+                pThis->DetachEntityFromEntity(0, 0, 0, 0);
+
+                if (GetType() == CCLIENTOBJECT || GetType() == CCLIENTWEAPON)
                 {
-                    CVehicle* pGameVehicle = static_cast<CClientVehicle*>(pEntity)->GetGameVehicle();
-                    if (pGameVehicle)
-                    {
-                        pThis->AttachEntityToEntity(*pGameVehicle, m_vecAttachedPosition, m_vecAttachedRotation);
-                    }
-                    break;
+                    static_cast<CClientObject*>(this)->SetCollisionEnabled(false);
                 }
-                case CCLIENTPED:
-                case CCLIENTPLAYER:
+            }
+            else
+            {
+                switch (pEntity->GetType())
                 {
-                    CPlayerPed* pGamePed = static_cast<CClientPed*>(pEntity)->GetGamePlayer();
-                    if (pGamePed)
+                    case CCLIENTVEHICLE:
                     {
-                        pThis->AttachEntityToEntity(*pGamePed, m_vecAttachedPosition, m_vecAttachedRotation);
+                        CVehicle* pGameVehicle = static_cast<CClientVehicle*>(pEntity)->GetGameVehicle();
+                        if (pGameVehicle)
+                        {
+                            pThis->AttachEntityToEntity(*pGameVehicle, m_vecAttachedPosition, m_vecAttachedRotation);
+                        }
+                        break;
                     }
-                    break;
-                }
-                case CCLIENTOBJECT:
-                case CCLIENTWEAPON:
-                {
-                    CObject* pGameObject = static_cast<CClientObject*>(pEntity)->GetGameObject();
-                    if (pGameObject)
+                    case CCLIENTPED:
+                    case CCLIENTPLAYER:
                     {
-                        pThis->AttachEntityToEntity(*pGameObject, m_vecAttachedPosition, m_vecAttachedRotation);
+                        CPlayerPed* pGamePed = static_cast<CClientPed*>(pEntity)->GetGamePlayer();
+                        if (pGamePed)
+                        {
+                            pThis->AttachEntityToEntity(*pGamePed, m_vecAttachedPosition, m_vecAttachedRotation);
+                        }
+                        break;
                     }
-                    break;
-                }
-                case CCLIENTPICKUP:
-                {
-                    CObject* pGameObject = static_cast<CClientPickup*>(pEntity)->GetGameObject();
-                    if (pGameObject)
+                    case CCLIENTOBJECT:
+                    case CCLIENTWEAPON:
                     {
-                        pThis->AttachEntityToEntity(*pGameObject, m_vecAttachedPosition, m_vecAttachedRotation);
+                        CObject* pGameObject = static_cast<CClientObject*>(pEntity)->GetGameObject();
+                        if (pGameObject)
+                        {
+                            pThis->AttachEntityToEntity(*pGameObject, m_vecAttachedPosition, m_vecAttachedRotation);
+                        }
+                        break;
                     }
-                    break;
+                    case CCLIENTPICKUP:
+                    {
+                        CObject* pGameObject = static_cast<CClientPickup*>(pEntity)->GetGameObject();
+                        if (pGameObject)
+                        {
+                            pThis->AttachEntityToEntity(*pGameObject, m_vecAttachedPosition, m_vecAttachedRotation);
+                        }
+                        break;
+                    }
                 }
             }
         }
@@ -1190,8 +1211,20 @@ void CClientEntity::DoAttaching()
     if (m_pAttachedToEntity)
     {
         CMatrix matrix, returnMatrix;
-        if (!m_pAttachedToEntity->GetMatrix(matrix))
-            m_pAttachedToEntity->GetPosition(matrix.vPos);
+        if (m_attachedBone != BONE_ROOT && (m_pAttachedToEntity->GetType() == CCLIENTPED || m_pAttachedToEntity->GetType() == CCLIENTPLAYER))
+        {
+            auto* ped = static_cast<CClientPed*>(m_pAttachedToEntity);
+            if (!ped->GetBoneMatrix(m_attachedBone, matrix))
+            {
+                if (!m_pAttachedToEntity->GetMatrix(matrix))
+                    m_pAttachedToEntity->GetPosition(matrix.vPos);
+            }
+        }
+        else
+        {
+            if (!m_pAttachedToEntity->GetMatrix(matrix))
+                m_pAttachedToEntity->GetPosition(matrix.vPos);
+        }
 
         AttachedMatrix(matrix, returnMatrix, m_vecAttachedPosition, m_vecAttachedRotation);
 
