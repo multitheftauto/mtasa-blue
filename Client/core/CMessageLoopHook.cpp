@@ -11,8 +11,12 @@
 
 #include "StdInc.h"
 #include <game/CGame.h>
+#include <dbt.h>
 
 extern CCore* g_pCore;
+
+// GUID_DEVINTERFACE_HID, used to get notified when a HID device (e.g. a joystick) is plugged in or removed
+DEFINE_GUID(GUID_DevInterfaceHID, 0x4D1E55B2, 0xF16F, 0x11CF, 0x88, 0xCB, 0x00, 0x11, 0x11, 0x00, 0x00, 0x30);
 
 template <>
 CMessageLoopHook* CSingleton<CMessageLoopHook>::m_pSingleton = NULL;
@@ -31,6 +35,7 @@ CMessageLoopHook::CMessageLoopHook()
     m_HookedWindowHandle = NULL;
     m_bRefreshMsgQueueEnabled = true;
     m_MovementDummyWindow = NULL;
+    m_hDeviceNotify = nullptr;
 }
 
 CMessageLoopHook::~CMessageLoopHook()
@@ -68,6 +73,14 @@ void CMessageLoopHook::ApplyHook(HWND hFocusWindow)
         wcDummy.lpszClassName = "MovementDummy";
         wcDummy.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
         RegisterClassEx(&wcDummy);
+
+        // Get notified of HID devices (e.g. joysticks) being plugged in or removed, so we can
+        // check for one straight away instead of waiting for the next scheduled retry
+        DEV_BROADCAST_DEVICEINTERFACE notificationFilter = {};
+        notificationFilter.dbcc_size = sizeof(notificationFilter);
+        notificationFilter.dbcc_devicetype = DBT_DEVTYP_DEVICEINTERFACE;
+        notificationFilter.dbcc_classguid = GUID_DevInterfaceHID;
+        m_hDeviceNotify = RegisterDeviceNotification(hFocusWindow, &notificationFilter, DEVICE_NOTIFY_WINDOW_HANDLE);
     }
 }
 
@@ -81,6 +94,12 @@ void CMessageLoopHook::RemoveHook()
         // Reset the window handle and procedure variables.
         m_HookedWindowProc = NULL;
         m_HookedWindowHandle = NULL;
+
+        if (m_hDeviceNotify)
+        {
+            UnregisterDeviceNotification(m_hDeviceNotify);
+            m_hDeviceNotify = nullptr;
+        }
     }
 }
 
@@ -245,6 +264,10 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
         }
     }
 
+    // A HID device (e.g. joystick) was plugged in or removed
+    if (uMsg == WM_DEVICECHANGE && (wParam == DBT_DEVICEARRIVAL || wParam == DBT_DEVICEREMOVECOMPLETE))
+        GetJoystickManager()->OnPossibleDeviceChange();
+
     // Make sure our pointers are valid.
     if (pThis != NULL && hwnd == pThis->GetHookedWindowHandle() && g_pCore->AreModulesLoaded())
     {
@@ -358,7 +381,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     // If CTRL and Tab are pressed, Trigger a skip
                     if ((uMsg == WM_KEYDOWN && wParam == VK_TAB))
                     {
-                        SystemState systemState = g_pCore->GetGame()->GetSystemState();
+                        SystemState::Enum systemState = g_pCore->GetGame()->GetSystemState();
                         if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_INIT_PLAYING_GAME ||
                             systemState == SystemState::GS_PLAYING_GAME)
                         {
@@ -382,7 +405,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     }
                     if ((uMsg == WM_KEYDOWN && (wParam >= VK_1 && wParam <= VK_9)))
                     {
-                        SystemState systemState = g_pCore->GetGame()->GetSystemState();
+                        SystemState::Enum systemState = g_pCore->GetGame()->GetSystemState();
                         if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_INIT_PLAYING_GAME ||
                             systemState == SystemState::GS_PLAYING_GAME)
                         {
@@ -407,7 +430,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     // If F8 is pressed, we show/hide the console
                     if ((uMsg == WM_KEYDOWN && wParam == VK_F8) || (uMsg == WM_CHAR && wParam == '`'))
                     {
-                        SystemState systemState = g_pCore->GetGame()->GetSystemState();
+                        SystemState::Enum systemState = g_pCore->GetGame()->GetSystemState();
                         if (CLocalGUI::GetSingleton().IsConsoleVisible() || systemState == SystemState::GS_FRONTEND ||
                             systemState == SystemState::GS_INIT_PLAYING_GAME || systemState == SystemState::GS_PLAYING_GAME)
                         {
