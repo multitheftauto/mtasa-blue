@@ -126,7 +126,7 @@ namespace pcrecpp
         // Construct and compile a pattern with the given options.
         // On compilation failure, the pattern is set to NULL and all
         // match operations will return false.
-        RE(const std::string& pattern, const RE_Options& options) : m_pCode(nullptr), m_pMatchContext(nullptr)
+        RE(const std::string& pattern, const RE_Options& options) : m_pCode(nullptr), m_pMatchContext(nullptr), m_captureCount(0)
         {
             int        errorcode;
             PCRE2_SIZE erroroffset;
@@ -142,6 +142,8 @@ namespace pcrecpp
                 pcre2_get_error_message(errorcode, buffer, sizeof(buffer));
                 return;
             }
+
+            pcre2_pattern_info(m_pCode, PCRE2_INFO_CAPTURECOUNT, &m_captureCount);
 
             // Create a match context with explicit limits to keep the work
             // done by a single match bounded. If creation fails we fall back to
@@ -165,6 +167,8 @@ namespace pcrecpp
         // Non-copyable, non-movable (simplifies ownership)
         RE(const RE&) = delete;
         RE& operator=(const RE&) = delete;
+
+        int NumberOfCapturingGroups() const noexcept { return static_cast<int>(m_captureCount); }
 
         ////////////////////////////////////////////////////////////////////
         // PartialMatch - returns true if the pattern matches anywhere in str
@@ -257,22 +261,31 @@ namespace pcrecpp
             {
                 // Get the ovector (pair of start/end offsets for the match)
                 PCRE2_SIZE* ovector = pcre2_get_ovector_pointer(matchData);
-                PCRE2_SIZE  start = ovector[0];
-                PCRE2_SIZE  end = ovector[1];
+                PCRE2_SIZE  fullStart = ovector[0];
+                PCRE2_SIZE  fullEnd = ovector[1];
 
                 // Defensive bounds check: a well-formed match is always within
                 // the subject, but verify before doing pointer arithmetic.
-                if (start <= end && end <= pInput->size())
+                if (fullStart <= fullEnd && fullEnd <= pInput->size())
                 {
-                    // Extract matched substring
-                    pOutput->assign(pInput->data() + start, end - start);
+                    if (m_captureCount > 0)
+                    {
+                        if (rc > 1 && ovector[2] != PCRE2_UNSET && ovector[3] != PCRE2_UNSET && ovector[2] <= ovector[3] && ovector[3] <= pInput->size())
+                            pOutput->assign(pInput->data() + ovector[2], ovector[3] - ovector[2]);
+                        else
+                            pOutput->clear();
+                    }
+                    else
+                    {
+                        pOutput->assign(pInput->data() + fullStart, fullEnd - fullStart);
+                    }
 
                     // Guarantee forward progress. A zero-width match (e.g.
                     // patterns like "x*" or "\\b") matches the empty string
                     // without advancing; consuming 0 bytes would let a caller
                     // loop without making progress. Advance by at least one
                     // code unit in that case.
-                    PCRE2_SIZE consume = (end > start) ? end : end + 1;
+                    PCRE2_SIZE consume = (fullEnd > fullStart) ? fullEnd : fullEnd + 1;
                     if (consume > pInput->size())
                         consume = pInput->size();
                     pInput->remove_prefix(consume);
@@ -289,6 +302,7 @@ namespace pcrecpp
     private:
         pcre2_code*          m_pCode;
         pcre2_match_context* m_pMatchContext;
+        uint32_t             m_captureCount;
     };
 
 }  // namespace pcrecpp
