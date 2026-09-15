@@ -212,6 +212,9 @@ void COMMAND_RadioNext(const char* szCmdLine)
 {
     if (g_pClientGame)
     {
+        if (g_pClientGame->GetPlayerMap() && g_pClientGame->GetPlayerMap()->IsPlayerMapShowing())
+            return;
+
         CClientPlayer* pPlayer = g_pClientGame->GetPlayerManager()->GetLocalPlayer();
         if (pPlayer)
         {
@@ -224,6 +227,9 @@ void COMMAND_RadioPrevious(const char* szCmdLine)
 {
     if (g_pClientGame)
     {
+        if (g_pClientGame->GetPlayerMap() && g_pClientGame->GetPlayerMap()->IsPlayerMapShowing())
+            return;
+
         CClientPlayer* pPlayer = g_pClientGame->GetPlayerManager()->GetLocalPlayer();
         if (pPlayer)
         {
@@ -263,77 +269,29 @@ void COMMAND_PlayerMapZoomOut(const char* szCmdLine)
 void COMMAND_PlayerMapMoveNorth(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsPlayerMapShowing())
-        return;
-
-    if (playerMap->IsMovingNorth())
-        playerMap->SetMovingNorth(false);
-    else if (playerMap->IsMovingSouth())
-        playerMap->SetMovingSouth(false);
-    else
-    {
-        playerMap->SetMovingNorth(true);
-        playerMap->SetMovingSouth(false);
-        playerMap->SetMovingEast(false);
-        playerMap->SetMovingWest(false);
-    }
+    if (playerMap && playerMap->IsPlayerMapShowing())
+        playerMap->MoveNorth();
 }
 
 void COMMAND_PlayerMapMoveSouth(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsPlayerMapShowing())
-        return;
-
-    if (playerMap->IsMovingSouth())
-        playerMap->SetMovingSouth(false);
-    else if (playerMap->IsMovingNorth())
-        playerMap->SetMovingNorth(false);
-    else
-    {
-        playerMap->SetMovingNorth(false);
-        playerMap->SetMovingSouth(true);
-        playerMap->SetMovingEast(false);
-        playerMap->SetMovingWest(false);
-    }
+    if (playerMap && playerMap->IsPlayerMapShowing())
+        playerMap->MoveSouth();
 }
 
 void COMMAND_PlayerMapMoveEast(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsPlayerMapShowing())
-        return;
-
-    if (playerMap->IsMovingEast())
-        playerMap->SetMovingEast(false);
-    else if (playerMap->IsMovingWest())
-        playerMap->SetMovingWest(false);
-    else
-    {
-        playerMap->SetMovingNorth(false);
-        playerMap->SetMovingSouth(false);
-        playerMap->SetMovingEast(true);
-        playerMap->SetMovingWest(false);
-    }
+    if (playerMap && playerMap->IsPlayerMapShowing())
+        playerMap->MoveEast();
 }
 
 void COMMAND_PlayerMapMoveWest(const char* szCmdLine)
 {
     CPlayerMap* playerMap = g_pClientGame->GetPlayerMap();
-    if (!playerMap->IsPlayerMapShowing())
-        return;
-
-    if (playerMap->IsMovingWest())
-        playerMap->SetMovingWest(false);
-    else if (playerMap->IsMovingEast())
-        playerMap->SetMovingEast(false);
-    else
-    {
-        playerMap->SetMovingNorth(false);
-        playerMap->SetMovingSouth(false);
-        playerMap->SetMovingEast(false);
-        playerMap->SetMovingWest(true);
-    }
+    if (playerMap && playerMap->IsPlayerMapShowing())
+        playerMap->MoveWest();
 }
 
 void COMMAND_PlayerMapAttach(const char* szCmdLine)
