@@ -83,7 +83,7 @@ int CLuaElementDefs::HasElementData(lua_State* luaVM)
 
     if (argStream.HasErrors())
     {
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
     }
 
     if (key->length() > MAX_CUSTOMDATA_NAME_LENGTH)

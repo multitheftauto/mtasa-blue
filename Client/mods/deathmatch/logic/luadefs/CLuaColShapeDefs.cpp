@@ -419,7 +419,7 @@ int CLuaColShapeDefs::GetColShapeRadius(lua_State* luaVM)
     argStream.ReadUserData(pColShape);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     float fRadius;
     if (CStaticFunctionDefinitions::GetColShapeRadius(pColShape, fRadius))
@@ -429,7 +429,7 @@ int CLuaColShapeDefs::GetColShapeRadius(lua_State* luaVM)
     }
 
     argStream.SetCustomError("ColShape must be Circle, Sphere or Tube");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaColShapeDefs::SetColShapeRadius(lua_State* luaVM)
@@ -442,7 +442,7 @@ int CLuaColShapeDefs::SetColShapeRadius(lua_State* luaVM)
     argStream.ReadNumber(fRadius);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (CStaticFunctionDefinitions::SetColShapeRadius(pColShape, fRadius))
     {
@@ -451,7 +451,7 @@ int CLuaColShapeDefs::SetColShapeRadius(lua_State* luaVM)
     }
 
     argStream.SetCustomError("ColShape must be Circle, Sphere or Tube");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaColShapeDefs::GetColShapeSize(lua_State* luaVM)
@@ -462,7 +462,7 @@ int CLuaColShapeDefs::GetColShapeSize(lua_State* luaVM)
     argStream.ReadUserData(pColShape);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     switch (pColShape->GetShapeType())
     {
@@ -490,7 +490,7 @@ int CLuaColShapeDefs::GetColShapeSize(lua_State* luaVM)
     }
 
     argStream.SetCustomError("ColShape must be Rectangle, Cuboid or Tube");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaColShapeDefs::OOP_GetColShapeSize(lua_State* luaVM)
@@ -501,7 +501,7 @@ int CLuaColShapeDefs::OOP_GetColShapeSize(lua_State* luaVM)
     argStream.ReadUserData(pColShape);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     switch (pColShape->GetShapeType())
     {
@@ -526,7 +526,7 @@ int CLuaColShapeDefs::OOP_GetColShapeSize(lua_State* luaVM)
     }
 
     argStream.SetCustomError("ColShape must be Rectangle, Cuboid or Tube");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaColShapeDefs::SetColShapeSize(lua_State* luaVM)
@@ -538,7 +538,7 @@ int CLuaColShapeDefs::SetColShapeSize(lua_State* luaVM)
     argStream.ReadUserData(pColShape);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     switch (pColShape->GetShapeType())
     {
@@ -569,7 +569,7 @@ int CLuaColShapeDefs::SetColShapeSize(lua_State* luaVM)
     }
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     CStaticFunctionDefinitions::SetColShapeSize(pColShape, vecSize);
 
@@ -585,7 +585,7 @@ int CLuaColShapeDefs::GetColPolygonPoints(lua_State* luaVM)
     argStream.ReadUserData(pColShape);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
@@ -614,7 +614,7 @@ int CLuaColShapeDefs::GetColPolygonPoints(lua_State* luaVM)
     }
 
     argStream.SetCustomError("ColShape must be Polygon");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaColShapeDefs::OOP_GetColPolygonPoints(lua_State* luaVM)
@@ -625,7 +625,7 @@ int CLuaColShapeDefs::OOP_GetColPolygonPoints(lua_State* luaVM)
     argStream.ReadUserData(pColShape);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
@@ -644,7 +644,7 @@ int CLuaColShapeDefs::OOP_GetColPolygonPoints(lua_State* luaVM)
     }
 
     argStream.SetCustomError("ColShape must be Polygon");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaColShapeDefs::GetColPolygonPointPosition(lua_State* luaVM)
@@ -657,7 +657,7 @@ int CLuaColShapeDefs::GetColPolygonPointPosition(lua_State* luaVM)
     argStream.ReadNumber(uiPointIndex);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
@@ -676,7 +676,7 @@ int CLuaColShapeDefs::GetColPolygonPointPosition(lua_State* luaVM)
     }
 
     argStream.SetCustomError("ColShape must be Polygon");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaColShapeDefs::OOP_GetColPolygonPointPosition(lua_State* luaVM)
@@ -689,7 +689,7 @@ int CLuaColShapeDefs::OOP_GetColPolygonPointPosition(lua_State* luaVM)
     argStream.ReadNumber(uiPointIndex);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
@@ -708,7 +708,7 @@ int CLuaColShapeDefs::OOP_GetColPolygonPointPosition(lua_State* luaVM)
     }
 
     argStream.SetCustomError("ColShape must be Polygon");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaColShapeDefs::SetColPolygonPointPosition(lua_State* luaVM)
@@ -723,7 +723,7 @@ int CLuaColShapeDefs::SetColPolygonPointPosition(lua_State* luaVM)
     argStream.ReadVector2D(vecPoint);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
@@ -741,7 +741,7 @@ int CLuaColShapeDefs::SetColPolygonPointPosition(lua_State* luaVM)
     }
 
     argStream.SetCustomError("ColShape must be Polygon");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaColShapeDefs::AddColPolygonPoint(lua_State* luaVM)
@@ -756,7 +756,7 @@ int CLuaColShapeDefs::AddColPolygonPoint(lua_State* luaVM)
     argStream.ReadNumber(uiPointIndex, 0);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
@@ -778,7 +778,7 @@ int CLuaColShapeDefs::AddColPolygonPoint(lua_State* luaVM)
     }
 
     argStream.SetCustomError("ColShape must be Polygon");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 int CLuaColShapeDefs::RemoveColPolygonPoint(lua_State* luaVM)
@@ -791,7 +791,7 @@ int CLuaColShapeDefs::RemoveColPolygonPoint(lua_State* luaVM)
     argStream.ReadNumber(uiPointIndex);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     if (pColShape->GetShapeType() == COLSHAPE_POLYGON)
     {
@@ -814,7 +814,7 @@ int CLuaColShapeDefs::RemoveColPolygonPoint(lua_State* luaVM)
     }
 
     argStream.SetCustomError("ColShape must be Polygon");
-    return luaL_error(luaVM, argStream.GetFullErrorMessage());
+    return argStream.ThrowError();
 }
 
 CLuaMultiReturn<float, float> CLuaColShapeDefs::GetColPolygonHeight(CClientColPolygon* pColPolygon)
