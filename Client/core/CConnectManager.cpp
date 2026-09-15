@@ -136,7 +136,7 @@ bool CConnectManager::Connect(const char* szHost, unsigned short usPort, const c
 
     m_bIsConnecting = true;
     m_tConnectStarted = time(NULL);
-    m_bHasTriedSecondConnect = false;
+    m_uiConnectAttempt = 1;
 
     // Load server password
     if (m_strPassword.empty())
@@ -258,18 +258,22 @@ void CConnectManager::DoPulse()
 
         int iConnectTimeDelta = time(NULL) - m_tConnectStarted;
 
-        // Try connect again if no response after 4 seconds
-        if (iConnectTimeDelta >= 4 && !m_bHasTriedSecondConnect && g_pCore->GetNetwork()->GetExtendedErrorCode() == 0)
+        // Retry the connection every RETRY_INTERVAL_SEC if no response, up to MAX_CONNECT_ATTEMPTS
+        unsigned int uiExpectedAttempt = (iConnectTimeDelta / RETRY_INTERVAL_SEC) + 1;
+        if (uiExpectedAttempt > m_uiConnectAttempt && m_uiConnectAttempt < MAX_CONNECT_ATTEMPTS &&
+            g_pCore->GetNetwork()->GetExtendedErrorCode() == 0)
         {
-            m_bHasTriedSecondConnect = true;
+            m_uiConnectAttempt = uiExpectedAttempt;
             SString strAddress = inet_ntoa(m_Address);
             g_pCore->GetNetwork()->StartNetwork(strAddress, m_usPort, CVARS_GET_VALUE<bool>("packet_tag"));
+
+            SString strBuffer(_("Connecting to %s:%u ... (attempt %u/%u)"), m_strHost.c_str(), m_usPort, m_uiConnectAttempt, MAX_CONNECT_ATTEMPTS);
+            CCore::GetSingleton().ShowMessageBox(_("CONNECTING"), strBuffer, MB_BUTTON_CANCEL | MB_ICON_INFO, m_pOnCancelClick);
         }
 
-        // Time to timeout the connection?
-        if (iConnectTimeDelta >= 8)
+        // Time to timeout after all attempts have been exhausted
+        if (iConnectTimeDelta >= RETRY_INTERVAL_SEC * static_cast<int>(MAX_CONNECT_ATTEMPTS))
         {
-            // Show a message that the connection timed out and abort
             g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CC23"), _("Connection timed out"), "connect-timed-out", true);
             Abort();
         }
