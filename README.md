@@ -32,6 +32,9 @@ Our project's code repository can be found on the [multitheftauto/mtasa-blue](ht
 
 ### Build Instructions
 
+> [!WARNING]
+> We're dropping support for x86 servers on ALL platform. You need to build an x64 server from now on.
+
 #### Windows
 
 Prerequisites
@@ -50,7 +53,7 @@ Visit the wiki article ["Compiling MTASA"](https://wiki.multitheftauto.com/wiki/
 
 #### GNU/Linux
 
-You can build the MTA:SA server on GNU/Linux distributions only for x86, x86_64, armhf and arm64 CPU architectures. ARM architectures are currently in **experimental phase**, which means they're unstable, untested and may crash randomly. Beware that we only officially support building from x86_64 and that includes cross-compiling for x86, arm and arm64.
+You can build the MTA:SA server on GNU/Linux distributions only for x86_64, armhf and arm64 CPU architectures. ARM architectures are currently in **experimental phase**, which means they're unstable, untested and may crash randomly. Beware that we only officially support building from x86_64 and that includes cross-compiling for arm and arm64.
 
 **Build dependencies**
 
