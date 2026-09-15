@@ -76,7 +76,7 @@ class CHud
 {
 public:
     virtual void Disable(bool bDisabled) = 0;
-    virtual bool IsDisabled() = 0;
+    virtual bool IsDisabled() const noexcept = 0;
     virtual void SetComponentVisible(eHudComponent component, bool bVisible) = 0;
     virtual bool IsComponentVisible(eHudComponent component) = 0;
     virtual void AdjustComponents(float fAspectRatio) = 0;
@@ -133,4 +133,9 @@ public:
     virtual bool GetComponentUseCustomAlpha(const eHudComponent& component) const noexcept = 0;
 
     virtual CVector2D GetComponentTextSize(const eHudComponent& component) const = 0;
+
+    virtual bool IsEnabled() const noexcept = 0;
+    virtual void SetSuppressed(bool bSuppressed) = 0;
+    virtual void ResetVisibilityState() = 0;
+    virtual bool IsComponentEffectivelyVisible(eHudComponent component) = 0;
 };
