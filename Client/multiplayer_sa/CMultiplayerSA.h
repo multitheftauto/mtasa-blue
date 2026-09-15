@@ -375,6 +375,9 @@ public:
     static char* ms_PlayerImgCachePtr;
     bool         m_bBadDrivebyHitboxesDisabled;
 
+    static ProcessCollisionHandler* m_pProcessCollisionHandler;
+    static DrivebyAnimationHandler* m_pDrivebyAnimationHandler;
+
 private:
     std::vector<char>   m_PlayerImgCache;
     EFastClothesLoading m_FastClothesLoading;
