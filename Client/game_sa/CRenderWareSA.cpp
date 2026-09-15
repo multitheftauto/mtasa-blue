@@ -199,6 +199,7 @@ CRenderWareSA::CRenderWareSA()
     m_iRenderingEntityType = TYPE_MASK_WORLD;
     m_GTAVertexShadersDisabledTimer.SetMaxIncrement(1000, true);
     m_bGTAVertexShadersEnabled = true;
+    m_uiDffTexInfoId = 0;
 }
 
 CRenderWareSA::~CRenderWareSA()
@@ -317,6 +318,8 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
 
     // close the stream
     RwStreamClose(streamModel, NULL);
+
+    ScriptAddedDff(pClump);
 
     return pClump;
 }
@@ -648,7 +651,10 @@ void CRenderWareSA::ReplaceCollisions(CColModel* pCol, unsigned short usModelID)
 void CRenderWareSA::DestroyDFF(RpClump* pClump)
 {
     if (pClump)
+    {
+        ScriptRemovedDff(pClump);
         RpClumpDestroy(pClump);
+    }
 }
 
 // Destroys a TXD instance
@@ -931,6 +937,40 @@ bool CRenderWareSA::StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::GetClumpTextures
+//
+// Get the distinct textures the materials of a clump are bound to
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::GetClumpTextures(std::vector<RwTexture*>& outTextureList, RpClump* pClump)
+{
+    if (!pClump)
+        return;
+
+    RpClumpForAllAtomics(
+        pClump,
+        [](RpAtomic* pAtomic, void* pData)
+        {
+            if (!pAtomic->geometry)
+                return true;
+
+            std::vector<RwTexture*>& textureList = *reinterpret_cast<std::vector<RwTexture*>*>(pData);
+            RpMaterials&             materials = pAtomic->geometry->materials;
+
+            for (int i = 0; i < materials.entries; i++)
+            {
+                RpMaterial* pMaterial = materials.materials[i];
+                if (pMaterial && pMaterial->texture && !ListContains(textureList, pMaterial->texture))
+                    textureList.push_back(pMaterial->texture);
+            }
+
+            return true;
+        },
+        &outTextureList);
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::GetTextureName
 //
 // Only called by CRenderItemManager::GetVisibleTextureNames ?
@@ -941,6 +981,9 @@ const char* CRenderWareSA::GetTextureName(CD3DDUMMY* pD3DData)
     STexInfo** ppTexInfo = MapFind(m_D3DDataTexInfoMap, pD3DData);
     if (ppTexInfo)
         return (*ppTexInfo)->strTextureName;
+    SDffTexInfo* pDffTexInfo = MapFind(m_DffTexInfoMap, pD3DData);
+    if (pDffTexInfo)
+        return pDffTexInfo->pTexInfo->strTextureName;
     if (!pD3DData)
         return FAKE_NAME_NO_TEXTURE;
     return "";
