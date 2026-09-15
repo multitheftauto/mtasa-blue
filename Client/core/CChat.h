@@ -67,7 +67,7 @@ public:
 
     void        Draw(const CVector2D& position, unsigned char alpha, bool shadow, bool outline, const CRect2D& renderBounds);
     float       GetWidth() const;
-    const char* GetText() { return m_text.c_str(); }
+    const char* GetText() const { return m_text.c_str(); }
     void        SetText(const char* text) { m_text = text; }
     void        GetColor(CColor& color) { color = m_color; }
     void        SetColor(const CColor& color) { m_color = color; }
@@ -90,6 +90,8 @@ public:
     virtual float       GetWidth() const;
     bool                IsActive() { return m_bActive; }
     void                SetActive(bool active) { m_bActive = active; }
+
+    const std::vector<CChatLineSection>& GetSections() const { return m_Sections; }
 
     unsigned long GetCreationTime() { return m_ulCreationTime; }
     void          UpdateCreationTime();
@@ -165,6 +167,10 @@ public:
     void         Clear();
     void         ClearInput();
     bool         CharacterKeyHandler(CGUIKeyEventArgs KeyboardArgs);
+    bool         SpecialKeyHandler(CGUIKeyEventArgs KeyboardArgs);
+    bool         OnInputMouseDown(CGUIMouseEventArgs MouseArgs);
+    bool         OnInputMouseMove(CGUIMouseEventArgs MouseArgs);
+    bool         OnInputMouseUp(CGUIMouseEventArgs MouseArgs);
     void         SetDxFont(LPD3DXFONT pDXFont);
 
     bool IsVisible() { return m_bVisible; }
@@ -215,6 +221,24 @@ public:
 private:
     void LoadCVars();
 
+    // Caret/selection helpers (all indices are in UTF-16 code unit space, matching MbUTF8ToUTF16)
+    bool HasSelection() const { return m_iSelectionAnchor != m_iCaretIndex; }
+    void GetSelectionRange(int& iStart, int& iEnd) const;
+    void SetCaretPosition(int iNewCaret, bool bExtendSelection);
+    int  ClampCaretIndex(int iIndex) const;
+    int  FindWordBoundary(const std::wstring& wstrText, int iFromIndex, bool bForward) const;
+
+    void DeleteSelection();
+    void DeleteCharBeforeCaret();
+    void DeleteCharAfterCaret();
+    void DeleteWordBeforeCaret();
+    void InsertTextAtCaret(const std::wstring& wstrInsertText);
+
+    void GetWrappedLineTexts(std::vector<std::wstring>& outLines) const;
+    void MapCaretIndexToLineAndX(int iCaretIndex, int& outLineIndex, float& outX) const;
+    int  MapScreenPosToCaretIndex(const CVector2D& vecScreenPos) const;
+    void DrawInputCaretAndSelection();
+
 protected:
     virtual void UpdatePosition();
 
@@ -260,6 +284,12 @@ protected:
 
     std::string m_strInputText;
     std::string m_strCommand;
+
+    // Caret/selection state for the input line (UTF-16 code unit indices into m_strInputText)
+    int   m_iCaretIndex = 0;
+    int   m_iSelectionAnchor = 0;
+    bool  m_bMouseSelecting = false;
+    float m_fCaretBlinkTimer = 0.0f;  // GetSecondCount() value the blink phase is measured from
 
     // Contains a saved copy of initial input text when navigating history entries
     std::string m_strSavedInputText;
