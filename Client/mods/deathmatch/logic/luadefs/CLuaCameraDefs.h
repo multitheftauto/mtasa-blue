@@ -22,6 +22,11 @@ public:
     static bool SetCameraViewMode(std::optional<unsigned char> usVehicleViewMode, std::optional<unsigned char> usPedViewMode);
     static CLuaMultiReturn<unsigned char, unsigned char> GetCameraViewMode();
 
+    static bool SetCameraVehicleViewOffset(unsigned char ucViewMode, std::optional<float> fOffsetX, std::optional<float> fOffsetY,
+                                           std::optional<float> fOffsetZ);
+    static CLuaMultiReturn<float, float, float> GetCameraVehicleViewOffset(unsigned char ucViewMode);
+    static bool                                 ResetCameraVehicleViewOffset(std::optional<unsigned char> ucViewMode);
+
     // Cam get funcs
     static std::variant<CClientCamera*, bool>                                      GetCamera();
     static CLuaMultiReturn<float, float, float, float, float, float, float, float> GetCameraMatrix();
