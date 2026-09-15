@@ -44,6 +44,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementMatrix", getElementMatrix},
         {"getElementPosition", getElementPosition},
         {"getElementRotation", getElementRotation},
+        {"getElementScale", getElementScale},
         {"getElementVelocity", getElementVelocity},
         {"getElementAngularVelocity", getElementTurnVelocity},
         {"getElementsByType", getElementsByType},
@@ -88,6 +89,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementMatrix", setElementMatrix},
         {"setElementPosition", setElementPosition},
         {"setElementRotation", setElementRotation},
+        {"setElementScale", setElementScale},
         {"setElementVelocity", setElementVelocity},
         {"setElementAngularVelocity", setElementTurnVelocity},
         {"setElementVisibleTo", setElementVisibleTo},
@@ -733,6 +735,32 @@ int CLuaElementDefs::OOP_getElementRotation(lua_State* luaVM)
 
         lua_pushvector(luaVM, vecRotation);
         return 1;
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::getElementScale(lua_State* luaVM)
+{
+    //  float float float getElementScale ( element theElement )
+    CElement* pElement;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (!argStream.HasErrors())
+    {
+        CVector vecScale;
+        if (CStaticFunctionDefinitions::GetElementScale(pElement, vecScale))
+        {
+            lua_pushnumber(luaVM, vecScale.fX);
+            lua_pushnumber(luaVM, vecScale.fY);
+            lua_pushnumber(luaVM, vecScale.fZ);
+            return 3;
+        }
     }
     else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -1890,6 +1918,42 @@ int CLuaElementDefs::OOP_setElementRotation(lua_State* luaVM)
             rotationOrder = EULER_ZYX;
 
         if (CStaticFunctionDefinitions::SetElementRotation(pElement, vecRotation, rotationOrder, true))
+        {
+            lua_pushboolean(luaVM, true);
+            return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaElementDefs::setElementScale(lua_State* luaVM)
+{
+    //  bool setElementScale ( element theElement, float scale )
+    //  bool setElementScale ( element theElement, float x, float y, float z )
+    CElement* pElement;
+    CVector   vecScale;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+
+    if (argStream.NextIsVector3D())
+    {
+        argStream.ReadVector3D(vecScale);
+    }
+    else
+    {
+        argStream.ReadNumber(vecScale.fX);
+        argStream.ReadNumber(vecScale.fY, vecScale.fX);
+        argStream.ReadNumber(vecScale.fZ, vecScale.fX);
+    }
+
+    if (!argStream.HasErrors())
+    {
+        if (CStaticFunctionDefinitions::SetElementScale(pElement, vecScale))
         {
             lua_pushboolean(luaVM, true);
             return 1;

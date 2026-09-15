@@ -1253,6 +1253,27 @@ bool CStaticFunctionDefinitions::GetElementRotation(CElement* pElement, CVector&
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetElementScale(CElement* pElement, CVector& vecScale)
+{
+    assert(pElement);
+
+    switch (pElement->GetType())
+    {
+        case CElement::OBJECT:
+        {
+            vecScale = static_cast<CObject*>(pElement)->GetScale();
+            return true;
+        }
+        case CElement::BUILDING:
+        {
+            vecScale = static_cast<CBuilding*>(pElement)->GetScale();
+            return true;
+        }
+        default:
+            return false;
+    }
+}
+
 bool CStaticFunctionDefinitions::GetElementVelocity(CElement* pElement, CVector& vecVelocity)
 {
     assert(pElement);
@@ -1445,6 +1466,34 @@ bool CStaticFunctionDefinitions::SetElementRotation(CElement* pElement, const CV
         default:
             return false;
     }
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetElementScale(CElement* pElement, const CVector& vecScale)
+{
+    assert(pElement);
+    RUN_CHILDREN(SetElementScale(*iter, vecScale))
+
+    switch (pElement->GetType())
+    {
+        case CElement::OBJECT:
+            static_cast<CObject*>(pElement)->SetScale(vecScale);
+            break;
+        case CElement::BUILDING:
+            static_cast<CBuilding*>(pElement)->SetScale(vecScale);
+            break;
+        default:
+            return false;
+    }
+
+    CBitStream BitStream;
+
+    BitStream.pBitStream->Write(vecScale.fX);
+    BitStream.pBitStream->Write(vecScale.fY);
+    BitStream.pBitStream->Write(vecScale.fZ);
+
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_SCALE, *BitStream.pBitStream));
 
     return true;
 }

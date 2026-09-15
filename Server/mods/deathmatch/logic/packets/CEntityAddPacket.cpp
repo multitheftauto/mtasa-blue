@@ -1139,6 +1139,15 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     CBuilding* pLowLodBuilding = pBuilding->GetLowLodElement();
                     ElementID  lowLodBuildingID = pLowLodBuilding ? pLowLodBuilding->GetID() : INVALID_ELEMENT_ID;
                     BitStream.Write(lowLodBuildingID);
+
+                    if (BitStream.Can(eBitStreamVersion::BuildingScale))
+                    {
+                        const CVector& vecScale = pBuilding->GetScale();
+                        BitStream.Write(vecScale.fX);
+                        BitStream.Write(vecScale.fY);
+                        BitStream.Write(vecScale.fZ);
+                    }
+
                     break;
                 }
 
