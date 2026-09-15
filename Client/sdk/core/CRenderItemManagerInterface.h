@@ -190,6 +190,10 @@ public:
     virtual bool           IsUsingDefaultRenderTarget() = 0;
     virtual HRESULT        HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
                                              int Filter) = 0;
+    // Swap a file texture's D3D resource in-place (used by async dxCreateTexture).
+    // bTreatAsPixels uses the pixels decoder (PNG/DDS/PLAIN); otherwise the file-in-memory path (2D/cube/volume).
+    virtual bool ReplaceFileTextureFromMemory(CTextureItem* pTextureItem, const void* pData, uint uiSize, bool bMipMaps, ERenderFormat format,
+                                              bool bTreatAsPixels) = 0;
 };
 
 ////////////////////////////////////////////////////////////////
@@ -474,7 +478,10 @@ class CFileTextureItem : public CTextureItem
     void         CreateUnderlyingData(const SString& strFilename, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format);
     void         CreateUnderlyingData(const CPixels* pPixels, bool bMipMaps, ERenderFormat format);
     void         CreateUnderlyingData(bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format, ETextureType textureType, uint uiVolumeDepth);
+    void         CreateUnderlyingDataFromFileMemory(const void* pData, uint uiSize, bool bMipMaps, uint uiSizeX, uint uiSizeY, ERenderFormat format);
     void         ReleaseUnderlyingData();
+    bool         ReplaceFromFileMemory(const void* pData, uint uiSize, bool bMipMaps, ERenderFormat format);
+    bool         ReplaceFromPixels(const CPixels* pPixels, bool bMipMaps, ERenderFormat format);
 
     uint         m_uiVolumeDepth;
     ETextureType m_TextureType;
