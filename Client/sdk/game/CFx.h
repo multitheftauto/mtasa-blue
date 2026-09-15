@@ -12,6 +12,35 @@
 #pragma once
 #include "enums/FxParticleSystems.h"
 
+#include <SharedUtil.Misc.h>
+class CVector2D;
+struct IDirect3DBaseTexture9;
+enum class eShadowTextureType
+{
+    CAR,
+    PED,
+    HELI,
+    BIKE,
+    RCBARON,
+    EXPLOSION,
+    HEADLIGHT1,
+    HEADLIGHT2,
+    BLOOD,
+    HANDMAN,
+    WINCRACK,
+    LAMP,
+    COUNT
+
+};
+
+enum class eShadowType
+{
+    NONE,
+    DEFAULT,
+    ADDITIVE,
+    INVCOLOR,
+};
+
 class CEntity;
 class CVector;
 class CVehicle;
@@ -37,4 +66,8 @@ public:
     virtual void TriggerFootSplash(CVector& vecPosition) = 0;
     virtual void AddParticle(FxParticleSystems::Enum eFxParticle, const CVector& vecPosition, const CVector& vecDirection, float fR, float fG, float fB,
                              float fA, bool bRandomizeColors, std::uint32_t iCount, float fBrightness, float fSize, bool bRandomizeSizes, float fLife) = 0;
+    virtual bool AddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2,
+                           SharedUtil::SColor color, eShadowType shadowType, float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings,
+                           IDirect3DBaseTexture9* customTexture = nullptr) = 0;
+    virtual void ClearCustomShadows(bool force = false) = 0;
 };
