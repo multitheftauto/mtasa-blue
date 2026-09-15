@@ -194,6 +194,8 @@ public:
 
     // Ped set funcs
     static bool SetPedArmor(CElement* pElement, float armor);
+    static void SendHealthCorrectionToPlayer(CPed* pPed, CPlayer* pPlayer, float fHealth);
+    static void SendArmorCorrectionToPlayer(CPed* pPed, CPlayer* pPlayer, float fArmor);
     // pSkipBroadcastPlayer: optional player excluded from the CPlayerWastedPacket / CPedWastedPacket broadcast.
     // Used by SetElementHealth(player, 0) so the dying player is killed server-side and other clients are
     // notified, but the originating client is NOT pushed into a forced TaskComplexDie via the wasted packet.

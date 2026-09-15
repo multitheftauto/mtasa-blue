@@ -13,6 +13,7 @@
 #include "CPlayerPuresyncPacket.h"
 #include "CElementIDs.h"
 #include "CWeaponNames.h"
+#include "CStaticFunctionDefinitions.h"
 #include "Utils.h"
 #include "CTickRateSettings.h"
 #include <net/SyncStructures.h>
@@ -185,18 +186,18 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         SPlayerHealthSync health;
         if (!BitStream.Read(&health))
             return false;
-        float fHealth = health.data.fValue;
+        const float fIncomingHealth = health.data.fValue;
 
         // Armor
         SPlayerArmorSync armor;
         if (!BitStream.Read(&armor))
             return false;
 
-        float fArmor = armor.data.fValue;
-        float fOldArmor = pSourcePlayer->GetArmor();
-        float fArmorLoss = fOldArmor - fArmor;
-
-        pSourcePlayer->SetArmor(fArmor);
+        const float fIncomingArmor = armor.data.fValue;
+        float       fHealth = pSourcePlayer->ValidateIncomingSyncHealth(fIncomingHealth);
+        float       fArmor = pSourcePlayer->ValidateIncomingSyncArmor(fIncomingArmor);
+        const float fOldArmor = pSourcePlayer->GetArmor();
+        const float fArmorLoss = fOldArmor - fArmor;
 
         // Read out and set the camera rotation
         SCameraRotationSync camRotation;
@@ -325,6 +326,12 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         float fOldHealth = pSourcePlayer->GetHealth();
         float fHealthLoss = fOldHealth - fHealth;
         pSourcePlayer->SetHealth(fHealth);
+        pSourcePlayer->SetArmor(fArmor);
+
+        if (fHealth != fIncomingHealth)
+            CStaticFunctionDefinitions::SendHealthCorrectionToPlayer(pSourcePlayer, pSourcePlayer, fHealth);
+        if (fArmor != fIncomingArmor)
+            CStaticFunctionDefinitions::SendArmorCorrectionToPlayer(pSourcePlayer, pSourcePlayer, fArmor);
 
         // Less than last packet's frame?
         if (fHealthLoss > 0 || fArmorLoss > 0)

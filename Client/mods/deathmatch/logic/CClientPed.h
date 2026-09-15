@@ -274,9 +274,11 @@ public:
 
     float GetMaxHealth();
     float GetHealth();
+    float GetSyncedHealth() const noexcept { return m_fHealth; }
     void  SetHealth(float fHealth);
     void  InternalSetHealth(float fHealth);
     float GetArmor() const noexcept;
+    float GetSyncedArmor() const noexcept { return m_armor; }
     void  SetArmor(float armor) noexcept;
     float GetOxygenLevel();
     void  SetOxygenLevel(float fOxygen);
