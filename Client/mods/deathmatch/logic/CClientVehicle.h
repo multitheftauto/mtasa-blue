@@ -516,6 +516,8 @@ public:
     bool SetComponentPosition(const SString& vehicleComponent, CVector vecPosition, EComponentBaseType base = EComponentBase::PARENT);
     bool GetComponentPosition(const SString& vehicleComponent, CVector& vecPosition, EComponentBaseType base = EComponentBase::PARENT);
 
+    void ApplyWheelComponentPositionsAfterPreRender();
+
     bool ResetComponentRotation(const SString& vehicleComponent);
     bool SetComponentRotation(const SString& vehicleComponent, CVector vecRotation, EComponentBaseType base = EComponentBase::PARENT);
     bool GetComponentRotation(const SString& vehicleComponent, CVector& vecRotation, EComponentBaseType base = EComponentBase::PARENT);
