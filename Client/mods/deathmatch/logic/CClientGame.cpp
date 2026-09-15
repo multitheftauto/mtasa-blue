@@ -4707,7 +4707,13 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicl
 
             pVehicleClientEntity->CallEvent("onClientVehicleCollision", Arguments, true);
 
-            // Update the colliding vehicle, because it might have been invalidated in onClientVehicleCollision (e.g. fixVehicle)
+            // Update the colliding vehicle, because it might have been invalidated in onClientVehicleCollision (e.g. fixVehicle, destroyElement)
+            if (pVehicleClientEntity->IsBeingDeleted() || !pVehicleClientEntity->GetGameEntity())
+            {
+                pCollidingVehicle = nullptr;
+                return true;
+            }
+
             pCollidingVehicle = reinterpret_cast<CVehicleSAInterface*>(pVehicleClientEntity->GetGameEntity()->GetInterface());
 
             // Allocate a BitStream
