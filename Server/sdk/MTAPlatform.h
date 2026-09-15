@@ -58,10 +58,16 @@ extern "C" bool g_bNoTopBar;
 typedef int socklen_t;
 
 // Define keys
-    #define KEY_BACKSPACE 0x08
-    #define KEY_EXTENDED  0xE0
-    #define KEY_LEFT      0x4B
-    #define KEY_RIGHT     0x4D
-    #define KEY_UP        0x48
-    #define KEY_DOWN      0x50
+    #define KEY_BACKSPACE  0x08
+    #define KEY_EXTENDED   0xE0
+    #define KEY_LEFT       0x4B
+    #define KEY_RIGHT      0x4D
+    #define KEY_UP         0x48
+    #define KEY_DOWN       0x50
+    #define KEY_HOME       0x47
+    #define KEY_END        0x4F
+    #define KEY_DELETE     0x53
+    #define KEY_INSERT     0x52
+    #define KEY_CTRL_LEFT  0x73
+    #define KEY_CTRL_RIGHT 0x74
 #endif
