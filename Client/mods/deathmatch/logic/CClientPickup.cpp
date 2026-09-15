@@ -35,6 +35,8 @@ CClientPickup::CClientPickup(CClientManager* pManager, ElementID ID, unsigned sh
     m_fAmount = 0.0f;
     m_usAmmo = 0;
 
+    RefreshStreamDistance();
+
     // Make sure our streamer knows where we are to start with
     UpdateStreamPosition(m_vecPosition = vecPosition);
 }
@@ -90,6 +92,7 @@ void CClientPickup::SetModel(unsigned short usModel)
         // Set the model and recreate the pickup
         m_usModel = usModel;
         UpdateSpatialData();
+        RefreshStreamDistance();
         ReCreate();
     }
 }

@@ -85,6 +85,8 @@ CClientPed::CClientPed(CClientManager* pManager, unsigned long ulModelID, Elemen
 
     // Add it to our ped manager
     pManager->GetPedManager()->AddToList(this);
+
+    RefreshStreamDistance();
 }
 
 CClientPed::CClientPed(CClientManager* pManager, unsigned long ulModelID, ElementID ID, bool bIsLocalPlayer)
@@ -1075,6 +1077,7 @@ bool CClientPed::SetModel(unsigned long ulModel, bool bTemp)
             m_ulModel = ulModel;
             m_pModelInfo = g_pGame->GetModelInfo(ulModel);
             UpdateSpatialData();
+            RefreshStreamDistance();
 
             // Are we loaded?
             if (m_pPlayerPed)

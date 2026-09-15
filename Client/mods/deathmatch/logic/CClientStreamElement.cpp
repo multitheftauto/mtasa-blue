@@ -18,11 +18,17 @@ CClientStreamElement::CClientStreamElement(CClientStreamer* pStreamer, ElementID
     m_pStreamRow = NULL;
     m_pStreamSector = NULL;
     m_fExpDistance = 0.0f;
+    m_fStreamPriority = 0.0f;
+    m_fCustomStreamDistance = 0.0f;
     m_bStreamedIn = false;
     m_bAttemptingToStreamIn = false;
     m_lastStreamOutTime = 0u;
     m_usStreamReferences = 0;
     m_usStreamReferencesScript = 0;
+
+    // AddElement() already needs a usable range, but our type and model are only assigned by the
+    // derived constructor, which calls RefreshStreamDistance() once it can resolve overrides.
+    ApplyStreamDistance(m_pStreamer->GetDefaultStreamDistance());
     m_pStreamer->AddElement(this);
 
     m_fCachedRadius = 0;
@@ -33,6 +39,41 @@ CClientStreamElement::CClientStreamElement(CClientStreamer* pStreamer, ElementID
 CClientStreamElement::~CClientStreamElement()
 {
     m_pStreamer->RemoveElement(this);
+}
+
+void CClientStreamElement::ApplyStreamDistance(float fDistance)
+{
+    m_fStreamDistance = fDistance;
+    m_fStreamDistanceExp = fDistance * fDistance;
+
+    // Mirror the streamer's stream-out hysteresis so custom ranges don't flicker at the border
+    const float fThreshold = fDistance + CClientStreamer::STREAM_OUT_EXTRA_DISTANCE;
+    m_fStreamThresholdExp = fThreshold * fThreshold;
+
+    m_fInvStreamDistanceExp = (m_fStreamDistanceExp > 0.0f) ? (1.0f / m_fStreamDistanceExp) : 0.0f;
+}
+
+void CClientStreamElement::RefreshStreamDistance()
+{
+    if (!m_pManager)
+        return;
+
+    const float fResolved = m_pManager->ResolveStreamDistance(this);
+    if (fResolved == m_fStreamDistance)
+        return;
+
+    ApplyStreamDistance(fResolved);
+    m_pStreamer->OnElementStreamDistanceChanged(this);
+}
+
+void CClientStreamElement::SetCustomStreamDistance(std::optional<float> distance)
+{
+    const float fCustom = distance.value_or(0.0f);
+    if (fCustom == m_fCustomStreamDistance)
+        return;
+
+    m_fCustomStreamDistance = fCustom;
+    RefreshStreamDistance();
 }
 
 void CClientStreamElement::UpdateStreamPosition(const CVector& vecPosition)
