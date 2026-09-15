@@ -53,6 +53,13 @@ enum eDoorLock : int32_t
     DOOR_LOCK_SKIP_SHUT_DOORS,
 };
 
+enum class HeadlightSide : std::uint8_t
+{
+    Left = 0,
+    Right = 1,
+    Both = 2
+};
+
 #define SIREN_TYPE_FIRST 1
 #define SIREN_TYPE_LAST  6
 #define SIREN_ID_MAX     7
@@ -275,8 +282,8 @@ public:
     virtual void GetGravity(CVector* pvecGravity) const = 0;
     virtual void SetGravity(const CVector* pvecGravity) = 0;
 
-    virtual SColor GetHeadLightColor() = 0;
-    virtual void   SetHeadLightColor(const SColor color) = 0;
+    virtual SColor GetHeadLightColor(HeadlightSide side = HeadlightSide::Left) = 0;
+    virtual void   SetHeadLightColor(const SColor color, HeadlightSide side = HeadlightSide::Both) = 0;
 
     virtual bool    SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1) = 0;
     virtual void    SetWheelVisibility(eWheelPosition wheel, bool bVisible) = 0;

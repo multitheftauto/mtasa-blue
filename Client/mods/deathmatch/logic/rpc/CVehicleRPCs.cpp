@@ -548,15 +548,17 @@ void CVehicleRPCs::SetTrainPosition(CClientEntity* pSource, NetBitStreamInterfac
     }
 }
 
-void CVehicleRPCs::SetVehicleHeadLightColor(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+void CVehicleRPCs::SetVehicleHeadLightColor(CClientEntity* source, NetBitStreamInterface& bitStream)
 {
     SColorRGBA color(255, 255, 255, 255);
     if (bitStream.Read(color.R) && bitStream.Read(color.G) && bitStream.Read(color.B))
     {
-        CClientVehicle* pVehicle = m_pVehicleManager->Get(pSource->GetID());
-        if (pVehicle)
+        std::uint8_t sideValue = static_cast<std::uint8_t>(HeadlightSide::Both);
+        bitStream.Read(sideValue);
+
+        if (auto* vehicle = m_pVehicleManager->Get(source->GetID()))
         {
-            pVehicle->SetHeadLightColor(color);
+            vehicle->SetHeadLightColor(color, static_cast<HeadlightSide>(sideValue));
         }
     }
 }

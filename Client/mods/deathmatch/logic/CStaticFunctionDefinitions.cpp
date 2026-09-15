@@ -3026,9 +3026,9 @@ bool CStaticFunctionDefinitions::GetVehicleVariant(CClientVehicle* pVehicle, uns
     return true;
 }
 
-bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CClientVehicle& Vehicle, SColor& outColor)
+bool CStaticFunctionDefinitions::GetVehicleHeadLightColor(CClientVehicle& Vehicle, SColor& outColor, HeadlightSide side)
 {
-    outColor = Vehicle.GetHeadLightColor();
+    outColor = Vehicle.GetHeadLightColor(side);
     return true;
 }
 
@@ -3588,14 +3588,14 @@ bool CStaticFunctionDefinitions::SetTrainPosition(CClientVehicle& Vehicle, float
     return true;
 }
 
-bool CStaticFunctionDefinitions::SetVehicleHeadLightColor(CClientEntity& Entity, const SColor color)
+bool CStaticFunctionDefinitions::SetVehicleHeadLightColor(CClientEntity& Entity, const SColor color, HeadlightSide side)
 {
-    RUN_CHILDREN(SetVehicleHeadLightColor(**iter, color))
+    RUN_CHILDREN(SetVehicleHeadLightColor(**iter, color, side))
 
     if (IS_VEHICLE(&Entity))
     {
         CClientVehicle& Vehicle = static_cast<CClientVehicle&>(Entity);
-        Vehicle.SetHeadLightColor(color);
+        Vehicle.SetHeadLightColor(color, side);
         return true;
     }
 
