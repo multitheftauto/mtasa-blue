@@ -160,7 +160,7 @@ public:
     CChat(CGUI* pManager, const CVector2D& vecPosition);
     virtual ~CChat();
 
-    virtual void Draw(bool bUseCacheTexture, bool bAllowOutline);
+    virtual void Draw(bool bUseCacheTexture, bool bAllowOutline, const CRect2D* pClipRect = nullptr);
     virtual void Output(const char* szText, bool bColorCoded = true);
     void         Clear();
     void         ClearInput();
@@ -172,6 +172,8 @@ public:
     bool IsInputBlocked() const { return m_bInputBlocked; }
     bool IsInputVisible() const { return !m_bInputBlocked && m_bInputVisible; }
     void SetInputVisible(bool bVisible);
+
+    void SetInputPreview(const char* szText);
 
     bool CanTakeInput() { return !CLocalGUI::GetSingleton().GetConsole()->IsVisible() && IsInputVisible(); };
 
@@ -270,6 +272,7 @@ protected:
     bool  m_bVisible;
     bool  m_bInputBlocked;
     bool  m_bInputVisible;
+    bool  m_bInputPreview;
     int   m_iScrollingBack;          // Non zero if currently scrolling back
     float m_fCssStyleOverrideAlpha;  // For fading out 'CssStyle' effect. (When entering text or scrolling back)
     float m_fBackgroundAlpha;

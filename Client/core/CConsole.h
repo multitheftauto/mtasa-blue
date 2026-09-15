@@ -52,6 +52,7 @@ public:
     void ResetAutoCompleteMatch();
 
     CVector2D GetPosition();
+    void      GetWindowRect(CRect2D& outRect);
     void      SetPosition(CVector2D& vecPosition);
 
     CVector2D GetSize();
