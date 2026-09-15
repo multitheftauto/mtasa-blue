@@ -21,7 +21,6 @@ void CLuaVector2Defs::AddClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classmetamethod(luaVM, "__tostring", ToString);
-    lua_classmetamethod(luaVM, "__gc", Destroy);
 
     lua_classmetamethod(luaVM, "__add", Add);
     lua_classmetamethod(luaVM, "__sub", Sub);
@@ -139,15 +138,13 @@ int CLuaVector2Defs::Create(lua_State* luaVM)
 
 int CLuaVector2Defs::Destroy(lua_State* luaVM)
 {
-    CLuaVector2D* pVector = NULL;
+    CLuaVector2D* pVector = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
 
     if (!argStream.HasErrors())
     {
-        delete pVector;
-        lua_addtotalbytes(luaVM, -LUA_GC_EXTRA_BYTES);
         lua_pushboolean(luaVM, true);
         return 1;
     }

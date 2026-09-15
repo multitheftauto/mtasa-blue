@@ -11,19 +11,12 @@
 
 #pragma once
 
+#include "CVector4D.h"
+
 class CLuaVector4D : public CVector4D
 {
 public:
-    CLuaVector4D();
-    CLuaVector4D(const CVector4D& vector);
-    CLuaVector4D(float fX, float fY, float fZ, float fW);
-
-    ~CLuaVector4D();
-
-    unsigned int GetScriptID() const { return m_uiScriptID; }
-
-    static CLuaVector4D* GetFromScriptID(unsigned int uiScriptID);
-
-private:
-    unsigned int m_uiScriptID;
+    CLuaVector4D() : CVector4D() {}
+    CLuaVector4D(const CVector4D& vector) : CVector4D(vector) {}
+    CLuaVector4D(float fX, float fY, float fZ, float fW) : CVector4D(fX, fY, fZ, fW) {}
 };
