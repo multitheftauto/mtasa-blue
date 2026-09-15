@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CGameSA.h"
 #include "CPedSA.h"
+#include "CVisibilityPluginsSA.h"
 #include "CPedModelInfoSA.h"
 #include "CPlayerInfoSA.h"
 #include "CStatsSA.h"
@@ -25,6 +26,23 @@
 extern CGameSA* pGame;
 
 static bool g_onlyUpdateRotations = false;
+
+namespace
+{
+    constexpr std::uintptr_t FUNC_CRealTimeShadowManager_ReturnRealTimeShadow = 0x705B30;
+    constexpr std::uintptr_t CLASS_CRealTimeShadowManager = 0xC40350;
+    constexpr std::uintptr_t FUNC_CShadows_StoreShadowForPedObject = 0x707B40;
+    constexpr std::uintptr_t CALL_CPed_PreRenderAfterTest_StoreShadowForPedObject = 0x5E6900;
+
+    void __cdecl StoreShadowForPedObject(CPedSAInterface* ped, float displacementX, float displacementY, float frontX, float frontY, float sideX, float sideY)
+    {
+        if (CVisibilityPluginsSA::GetClumpAlpha(ped->m_pRwObject) == 0)
+            return;
+
+        using StoreShadow = void(__cdecl*)(CPedSAInterface*, float, float, float, float, float, float);
+        reinterpret_cast<StoreShadow>(FUNC_CShadows_StoreShadowForPedObject)(ped, displacementX, displacementY, frontX, frontY, sideX, sideY);
+    }
+}
 
 CPedSA::~CPedSA()
 {
@@ -78,6 +96,20 @@ void CPedSA::SetModelIndex(std::uint32_t modelIndex)
 
     std::uint32_t type = modelInfo->pedType;
     GetPedInterface()->pedSound.m_bIsFemale = type == 5 || type == 22;
+}
+
+void CPedSA::SetVisible(bool visible)
+{
+    CEntitySA::SetVisible(visible);
+
+    CShadowDataSA* shadow = GetPedInterface()->m_pShadowData;
+    if (visible || !shadow)
+        return;
+
+    // Real-time shadows are owned separately from the ped. Return an existing
+    // shadow immediately so an invisible ped cannot leave it fading in-world.
+    using ReturnRealTimeShadow = void(__thiscall*)(void*, CShadowDataSA*);
+    reinterpret_cast<ReturnRealTimeShadow>(FUNC_CRealTimeShadowManager_ReturnRealTimeShadow)(reinterpret_cast<void*>(CLASS_CRealTimeShadowManager), shadow);
 }
 
 bool CPedSA::AddProjectile(eWeaponType weaponType, CVector origin, float force, CVector* target, CEntity* targetEntity)
@@ -753,6 +785,10 @@ void CPedSA::StaticSetHooks()
 {
     EZHookInstall(CPed_PreRenderAfterTest);
     EZHookInstall(CPed_PreRenderAfterTest_Mid);
+
+    // GTA's player-specific blob-shadow path assumes that the local player is
+    // always opaque. Do not enqueue it when MTA has made the clump invisible.
+    HookInstallCall(CALL_CPed_PreRenderAfterTest_StoreShadowForPedObject, reinterpret_cast<DWORD>(StoreShadowForPedObject));
 
     HookInstallCall(0x68025A, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleJetPack::ProcessPed
     HookInstallCall(0x64DB4D, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleCarGetIn::ProcessPed
