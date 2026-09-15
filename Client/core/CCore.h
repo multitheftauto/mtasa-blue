@@ -171,7 +171,6 @@ public:
     void        ShowErrorMessageBox(const SString& strTitle, SString strMessage, const SString& strTroubleLink = "");
     void        ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink = "", bool bLinkRequiresErrorCode = false,
                                        bool bAllowReconnect = false);
-    void        ShowReconnectErrorMessageBox(const SString& strTitle, const SString& strMessage);
     static void ErrorMessageBoxCallBack(void* pData, uint uiButton);
     static void ReconnectMessageBoxCallBack(void* pData, uint uiButton);
     bool        IsOfflineMod() { return m_bIsOfflineMod; }

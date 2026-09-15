@@ -828,7 +828,16 @@ void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, 
     // The plain error box holds a single button, so a reconnect option needs the question box instead
     if (bAllowReconnect && strTroubleLink.empty())
     {
-        ShowReconnectErrorMessageBox(strTitle, strMessage);
+        CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
+        pQuestionBox->Reset();
+        pQuestionBox->SetTitle(strTitle);
+        pQuestionBox->SetMessage(strMessage);
+        pQuestionBox->SetIcon(CGUI_ICON_MESSAGEBOX_ERROR);
+        pQuestionBox->SetButton(0, _("OK"));
+        pQuestionBox->SetButton(1, _("Reconnect"));
+        pQuestionBox->SetCallback(CCore::ReconnectMessageBoxCallBack);
+        pQuestionBox->SetAutoCloseOnConnect(true);
+        pQuestionBox->Show();
         return;
     }
 
@@ -836,22 +845,7 @@ void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, 
 }
 
 //
-// Show message box offering to reconnect to the server we just lost
-//
-void CCore::ShowReconnectErrorMessageBox(const SString& strTitle, const SString& strMessage)
-{
-    CQuestionBox* pQuestionBox = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetQuestionWindow();
-    pQuestionBox->Reset();
-    pQuestionBox->SetTitle(strTitle);
-    pQuestionBox->SetMessage(strMessage);
-    pQuestionBox->SetButton(0, _("OK"));
-    pQuestionBox->SetButton(1, _("Reconnect"));
-    pQuestionBox->SetCallback(CCore::ReconnectMessageBoxCallBack);
-    pQuestionBox->Show();
-}
-
-//
-// Callback used in CCore::ShowReconnectErrorMessageBox
+// Callback used by the reconnect box in CCore::ShowNetErrorMessageBox
 //
 void CCore::ReconnectMessageBoxCallBack(void* pData, uint uiButton)
 {
