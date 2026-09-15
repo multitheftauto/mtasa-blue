@@ -56,8 +56,8 @@ public:
     virtual ERenderFormat  GetDepthBufferFormat() { return m_depthBufferFormat; }
     virtual void           SaveReadableDepthBuffer();
     virtual void           FlushNonAARenderTarget();
-    virtual HRESULT        HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface,
-                                             CONST RECT* pDestRect, int Filter);
+    virtual HRESULT        HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
+                                             int Filter);
 
     // CRenderItemManager
     void NotifyContructRenderItem(CRenderItem* pItem);
@@ -65,6 +65,7 @@ public:
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void OnLostDevice();
     void OnResetDevice();
+    void OnViewportSizeChanged(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
     void UpdateBackBufferCopySize();
     bool SaveDefaultRenderTarget();
     bool IsUsingDefaultRenderTarget();
@@ -77,6 +78,8 @@ public:
 
     HRESULT GetDeviceCooperativeLevel(const char* szContext, bool bLogLost = true) const;
 
+    void RetryInvalidRenderTargets();
+
     static int GetBitsPerPixel(D3DFORMAT Format);
     static int GetPitchDivisor(D3DFORMAT Format);
     static int CalcD3DResourceMemoryKBUsage(IDirect3DResource9* pD3DResource);
@@ -88,6 +91,8 @@ public:
     IDirect3DDevice9* m_pDevice;
 
 protected:
+    void TryRecreateInvalidRenderTargets();
+
     std::set<CRenderItem*>   m_CreatedItemList;
     IDirect3DSurface9*       m_pDefaultD3DRenderTarget;
     IDirect3DSurface9*       m_pDefaultD3DZStencilSurface;
@@ -120,4 +125,8 @@ protected:
     IDirect3DSurface9*       m_pNonAARenderTarget;
     IDirect3DTexture9*       m_pNonAARenderTargetTexture;
     bool                     m_bIsSwiftShader;
+    uint                     m_uiLastRenderTargetRetryTime;
+    uint                     m_uiRenderTargetRetryDelayMs;
+    uint                     m_uiRenderTargetRetryAttempts;
+    uint                     m_uiRenderTargetRetryCooldownUntil;
 };

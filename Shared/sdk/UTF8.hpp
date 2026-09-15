@@ -26,14 +26,14 @@
 #include "UTF8.h"
 
 /* Return code if invalid. (xxx_mbtowc, xxx_wctomb) */
-#define RET_ILSEQ      0
+#define RET_ILSEQ 0
 /* Return code if only a shift sequence of n bytes was read. (xxx_mbtowc) */
-#define RET_TOOFEW(n)  (-1-(n))
+#define RET_TOOFEW(n) (-1 - (n))
 /* Return code if output buffer is too small. (xxx_wctomb, xxx_reset) */
-#define RET_TOOSMALL   -1
+#define RET_TOOSMALL -1
 /* Replacement character for invalid multibyte sequence or wide character. */
-#define BAD_WCHAR ((wchar_t) 0xfffd)
-#define BAD_CHAR '?'
+#define BAD_WCHAR ((wchar_t)0xfffd)
+#define BAD_CHAR  '?'
 
 int utf8_mbtowc(wchar_t* pwc, const unsigned char* src, int src_len)
 {

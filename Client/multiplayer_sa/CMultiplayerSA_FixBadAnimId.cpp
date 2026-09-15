@@ -50,14 +50,14 @@ eAnimID _cdecl OnCAnimBlendAssocGroupCopyAnimation_FixBadAnim(eAnimGroup* pAnimG
     if (pGroup->pAssociationsArray)
     {
         CAnimBlendStaticAssociationSAInterface* pAssociation = pGroup->pAssociationsArray + iUseAnimId;
-        if (pAssociation && pAssociation->pAnimHeirarchy == NULL)
+        if (pAssociation && pAssociation->pAnimHierarchy == NULL)
         {
             // Choose another animId
             int iNewAnimId = iUseAnimId;
             for (int i = 0; i < pGroup->iNumAnimations; i++)
             {
                 pAssociation = pGroup->pAssociationsArray + i;
-                if (pAssociation->pAnimHeirarchy)
+                if (pAssociation->pAnimHierarchy)
                 {
                     // Find closest valid anim id
                     if (abs(iUseAnimId - i) < abs(iUseAnimId - iNewAnimId) || iNewAnimId == iUseAnimId)
@@ -92,9 +92,9 @@ void _cdecl OnGetAnimHierarchyFromSkinClump(RpClump* pRpClump, void* pRpHAnimHie
     }
 }
 
-#define HOOKPOS_GetAnimHierarchyFromSkinClump        0x734A5D
-#define HOOKSIZE_GetAnimHierarchyFromSkinClump       7
-DWORD RETURN_GetAnimHierarchyFromSkinClump = 0x734A64;
+#define HOOKPOS_GetAnimHierarchyFromSkinClump  0x734A5D
+#define HOOKSIZE_GetAnimHierarchyFromSkinClump 7
+DWORD                         RETURN_GetAnimHierarchyFromSkinClump = 0x734A64;
 static void __declspec(naked) HOOK_GetAnimHierarchyFromSkinClump()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;

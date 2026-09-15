@@ -146,19 +146,17 @@ void CDamageManagerSA::SetPanelStatus(BYTE bPanel, BYTE bPanelStatus, bool spawn
                 }
                 // clang-format on
             }
-            else
-                reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface)->SetPanelDamage(bPanel, breakGlass, spawnFlyingComponent);
+            else reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface)->SetPanelDamage(bPanel, breakGlass, spawnFlyingComponent);
         }
     }
 }
 
 void CDamageManagerSA::SetPanelStatus(unsigned long ulStatus, bool spawnFlyingComponent, bool breakGlass)
 {
-    unsigned int uiIndex;
-
-    for (uiIndex = 0; uiIndex < MAX_PANELS; uiIndex++)
+    for (unsigned int uiIndex = 0; uiIndex < MAX_PANELS; ++uiIndex)
     {
-        SetPanelStatus(static_cast<eDoors>(uiIndex), static_cast<unsigned char>(ulStatus), spawnFlyingComponent, breakGlass);
+        const BYTE bPanelStatus = static_cast<BYTE>(ulStatus & 0x0F);
+        SetPanelStatus(static_cast<BYTE>(uiIndex), bPanelStatus, spawnFlyingComponent, breakGlass);
         ulStatus >>= 4;
     }
 }
@@ -273,19 +271,19 @@ int CDamageManagerSA::GetCarNodeIndexFromPanel(std::uint8_t panelId) noexcept
     switch (panelId)
     {
         case 0:
-            index = 15; // PANEL_WING_LF
+            index = 15;  // PANEL_WING_LF
             break;
         case 1:
-            index = 14; // PANEL_WING_RF
+            index = 14;  // PANEL_WING_RF
             break;
         case 4:
-            index = 18; // PANEL_WINDSCREEN
+            index = 18;  // PANEL_WINDSCREEN
             break;
         case 5:
-            index = 12; // BUMP_FRONT
+            index = 12;  // BUMP_FRONT
             break;
         case 6:
-            index = 13; // BUMP_REAR
+            index = 13;  // BUMP_REAR
             break;
     }
 

@@ -14,8 +14,8 @@
 #include <game/TaskPhysicalResponse.h>
 #include "TaskSA.h"
 
-#define FUNC_CTaskSimpleChoking__Constructor                0x6202C0
-#define FUNC_CTaskSimpleChoking__UpdateChoke                0x620660
+#define FUNC_CTaskSimpleChoking__Constructor 0x6202C0
+#define FUNC_CTaskSimpleChoking__UpdateChoke 0x620660
 
 class CTaskSimpleChokingSAInterface : public CTaskSimpleSAInterface
 {
@@ -31,7 +31,7 @@ public:
 class CTaskSimpleChokingSA : public virtual CTaskSimpleSA, public virtual CTaskSimpleChoking
 {
 public:
-    CTaskSimpleChokingSA(){};
+    CTaskSimpleChokingSA() {};
     CTaskSimpleChokingSA(CPed* pAttacker, bool bIsTearGas);
 
     CPed*        GetAttacker();

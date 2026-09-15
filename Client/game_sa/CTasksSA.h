@@ -71,8 +71,8 @@ public:
     CTaskSimpleDuck*      CreateTaskSimpleDuck(eDuckControlTypes nDuckControl, unsigned short nLengthOfDuck = 0, unsigned short nUseShotsWhizzingEvents = -1);
     CTaskSimpleChoking*   CreateTaskSimpleChoking(CPed* pAttacker, bool bIsTearGas);
 
-    CTaskSimpleClimb* CreateTaskSimpleClimb(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType, eClimbHeights nHeight = CLIMB_GRAB,
-                                            const bool bForceClimb = false);
+    CTaskSimpleClimb*   CreateTaskSimpleClimb(CEntitySAInterface* pClimbEnt, const CVector& vecTarget, float fHeading, unsigned char nSurfaceType,
+                                              eClimbHeights nHeight = CLIMB_GRAB, const bool bForceClimb = false);
     CTaskSimpleJetPack* CreateTaskSimpleJetpack(const CVector* pVecTargetPos = NULL, float fCruiseHeight = 10.0f, int nHoverTime = 0);
 
     CTaskSimpleRunAnim*      CreateTaskSimpleRunAnim(const AssocGroupId animGroup, const AnimationId animID, const float fBlendDelta, const int iTaskType,

@@ -166,16 +166,21 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     // Grab the current VM
                     lua_State* pState = pMapEvent->GetVM()->GetVM();
 
-                    LUA_CHECKSTACK(pState, 1);            // Ensure some room
+                    LUA_CHECKSTACK(pState, 1);  // Ensure some room
 
-                    #if MTA_DEBUG
+#if MTA_DEBUG
                     int luaStackPointer = lua_gettop(pState);
-                    #endif
+#endif
 
-                    TIMEUS startTime = GetTimeUs();
+                    const bool   timingActive = CPerfStatLuaTiming::GetSingleton()->IsActive();
+                    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
-                    if (!g_pGame->GetDebugHookManager()->OnPreEventFunction(szName, Arguments, pSource, pCaller, pMapEvent))
-                        continue;
+                    CDebugHookManager* debugHookManager = g_pGame->GetDebugHookManager();
+                    if (debugHookManager->HasPreEventFunctionHooks())
+                    {
+                        if (!debugHookManager->OnPreEventFunction(szName, Arguments, pSource, pCaller, pMapEvent))
+                            continue;
+                    }
 
                     // Store the current values of the globals
                     lua_getglobal(pState, "source");
@@ -246,7 +251,8 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     pMapEvent->Call(Arguments);
                     bCalled = true;
 
-                    g_pGame->GetDebugHookManager()->OnPostEventFunction(szName, Arguments, pSource, pCaller, pMapEvent);
+                    if (debugHookManager->HasPostEventFunctionHooks())
+                        debugHookManager->OnPostEventFunction(szName, Arguments, pSource, pCaller, pMapEvent);
 
                     // Reset the globals on that VM
                     OldSource.Push(pState);
@@ -267,11 +273,14 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     OldClient.Push(pState);
                     lua_setglobal(pState, "client");
 
-                    #if MTA_DEBUG
+#if MTA_DEBUG
                     assert(lua_gettop(pState) == luaStackPointer);
-                    #endif
+#endif
 
-                    CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pMapEvent->GetVM(), szName, GetTimeUs() - startTime);
+                    if (timingActive)
+                    {
+                        CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pMapEvent->GetVM(), szName, GetTimeUs() - startTime);
+                    }
                 }
             }
         }

@@ -15,6 +15,7 @@
 #include "CGame.h"
 #include "CMainConfig.h"
 #include "CRegistry.h"
+#include "CHTTPD.h"
 #include <net/ns_common.h>
 
 namespace
@@ -52,7 +53,7 @@ namespace
         BWSTAT_INDEX_COUNT,
     };
 
-    #define BW_STATS_TABLE_NAME     "`perfstats_bandwidth_usage`"
+#define BW_STATS_TABLE_NAME "`perfstats_bandwidth_usage`"
 
     SFixedArray<SString, 4> BWStatIndexNameList = {{
         "Special",
@@ -83,11 +84,17 @@ namespace
     }
 
     // Unix time in, stats hours out
-    uint UnixTimeToStatsHours(time_t tTime) { return static_cast<uint>((tTime - 1293861600UL) / 3600UL); }
+    uint UnixTimeToStatsHours(time_t tTime)
+    {
+        return static_cast<uint>((tTime - 1293861600UL) / 3600UL);
+    }
 
     // Stats hours in, unix time out
-    time_t StatsHoursToUnixTime(uint uiStatsHours) { return uiStatsHours * 3600UL + 1293861600UL; }
-}            // namespace
+    time_t StatsHoursToUnixTime(uint uiStatsHours)
+    {
+        return uiStatsHours * 3600UL + 1293861600UL;
+    }
+}  // namespace
 
 ///////////////////////////////////////////////////////////////
 //
@@ -302,8 +309,8 @@ void CPerfStatBandwidthUsageImpl::LoadStats()
 
         // Special item
         const SNetStatHistoryType& type = m_History[BWSTAT_INDEX_SPECIAL];
-        uint                       uiStatsHoursThen = (uint)type.itemList[0].llGameSent;            // Hours since 1/1/2011
-        uint                       uiStatsHoursNow = UnixTimeToStatsHours(tTime);                   // Hours since 1/1/2011
+        uint                       uiStatsHoursThen = (uint)type.itemList[0].llGameSent;  // Hours since 1/1/2011
+        uint                       uiStatsHoursNow = UnixTimeToStatsHours(tTime);         // Hours since 1/1/2011
         int                        iHoursElpased = uiStatsHoursNow - uiStatsHoursThen;
 
         // Max elapsed time of 13 months
@@ -424,7 +431,7 @@ void CPerfStatBandwidthUsageImpl::RecordStats()
     long long llDeltaUDPByteResentCount = std::max<long long>(0LL, liveStats.llOutgoingUDPByteResentCount - m_PrevLiveStats.llOutgoingUDPByteResentCount);
     m_PrevLiveStats = liveStats;
 
-    long long llHttpTotalBytesSent = EHS::StaticGetTotalBytesSent();
+    long long llHttpTotalBytesSent = g_pGame->GetHTTPD()->GetTotalBytesSent();
     long long llDeltaHttpBytesSent = std::max(0LL, llHttpTotalBytesSent - m_llPrevHttpTotalBytesSent);
     m_llPrevHttpTotalBytesSent = llHttpTotalBytesSent;
 
@@ -482,7 +489,7 @@ void CPerfStatBandwidthUsageImpl::AddSampleAtTime(time_t tTime, long long llGame
         else if (i == BWSTAT_INDEX_SPECIAL)
         {
             // Calculate special value
-            uint uiStatsHours = UnixTimeToStatsHours(tTime);            // Hours since 1/1/2011
+            uint uiStatsHours = UnixTimeToStatsHours(tTime);  // Hours since 1/1/2011
             if (uiStatsHours != (uint)type.itemList[0].llGameSent)
             {
                 type.itemList[0].bDirty = true;

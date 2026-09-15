@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "GuiCleanup.h"
 #include "CEGUIExceptions.h"
+#include <core/D3DProxyDeviceGuids.h>
 #include <SharedUtil.Misc.h>
 
 using std::list;
@@ -34,47 +35,62 @@ void CGUI_Impl::DestroyElementRecursive(CGUIElement* pElement)
     delete pElement;
 }
 
-#define CGUI_MTA_DEFAULT_FONT       "tahoma.ttf"        // %WINDIR%/font/<...>
-#define CGUI_MTA_DEFAULT_FONT_BOLD  "tahomabd.ttf"      // %WINDIR%/font/<...>
-#define CGUI_MTA_CLEAR_FONT         "verdana.ttf"       // %WINDIR%/font/<...>
+#define CGUI_MTA_DEFAULT_FONT      "tahoma.ttf"    // %WINDIR%/font/<...>
+#define CGUI_MTA_DEFAULT_FONT_BOLD "tahomabd.ttf"  // %WINDIR%/font/<...>
+#define CGUI_MTA_CLEAR_FONT        "verdana.ttf"   // %WINDIR%/font/<...>
 
-#define CGUI_MTA_DEFAULT_REG        "Tahoma (TrueType)"
-#define CGUI_MTA_DEFAULT_REG_BOLD   "Tahoma Bold (TrueType)"
-#define CGUI_MTA_CLEAR_REG          "Verdana (TrueType)"
+#define CGUI_MTA_DEFAULT_REG      "Tahoma (TrueType)"
+#define CGUI_MTA_DEFAULT_REG_BOLD "Tahoma Bold (TrueType)"
+#define CGUI_MTA_CLEAR_REG        "Verdana (TrueType)"
 
-#define CGUI_MTA_SUBSTITUTE_FONT    "cgui/unifont.ttf"  // GTA/MTA/<...>
-#define CGUI_MTA_SANS_FONT          "cgui/sans.ttf"     // GTA/MTA/<...>
-#define CGUI_SA_HEADER_FONT         "cgui/saheader.ttf" // GTA/MTA/<...>
-#define CGUI_SA_GOTHIC_FONT         "cgui/sagothic.ttf" // GTA/MTA/<...>
-#define CGUI_SA_HEADER_SIZE         26
-#define CGUI_SA_GOTHIC_SIZE         47
-#define CGUI_MTA_SANS_FONT_SIZE     9
+#define CGUI_MTA_SUBSTITUTE_FONT "cgui/unifont.ttf"   // GTA/MTA/<...>
+#define CGUI_MTA_SANS_FONT       "cgui/sans.ttf"      // GTA/MTA/<...>
+#define CGUI_SA_HEADER_FONT      "cgui/saheader.ttf"  // GTA/MTA/<...>
+#define CGUI_SA_GOTHIC_FONT      "cgui/sagothic.ttf"  // GTA/MTA/<...>
+#define CGUI_SA_HEADER_SIZE      26
+#define CGUI_SA_GOTHIC_SIZE      47
+#define CGUI_MTA_SANS_FONT_SIZE  9
 
-CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) : 
-    m_HasSchemeLoaded(false), 
-    m_fCurrentServerCursorAlpha(1.0f),
-    m_pDevice(pDevice),
-    m_pRenderer(nullptr),
-    m_pSystem(nullptr),
-    m_pFontManager(nullptr),
-    m_pImageSetManager(nullptr),
-    m_pSchemeManager(nullptr),
-    m_pWindowManager(nullptr),
-    m_pTop(nullptr),
-    m_pCursor(nullptr),
-    m_pDefaultFont(nullptr),
-    m_pSmallFont(nullptr),
-    m_pBoldFont(nullptr),
-    m_pClearFont(nullptr),
-    m_pSAHeaderFont(nullptr),
-    m_pSAGothicFont(nullptr),
-    m_pSansFont(nullptr),
-    m_pUniFont(nullptr),
-    m_nextRedrawHandle(1),
-    m_ulPreviousUnique(0),
-    m_eInputMode(INPUTMODE_NO_BINDS_ON_EDIT),
-    m_Channel(INPUT_CORE)
+CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice)
+    : m_HasSchemeLoaded(false),
+      m_fCurrentServerCursorAlpha(1.0f),
+      m_pDevice(pDevice),
+      m_pRenderer(nullptr),
+      m_pSystem(nullptr),
+      m_pFontManager(nullptr),
+      m_pImageSetManager(nullptr),
+      m_pSchemeManager(nullptr),
+      m_pWindowManager(nullptr),
+      m_pTop(nullptr),
+      m_ScriptTop(nullptr),
+      m_ScriptRoot(nullptr),
+      m_pCursor(nullptr),
+      m_pDefaultFont(nullptr),
+      m_pSmallFont(nullptr),
+      m_pBoldFont(nullptr),
+      m_pClearFont(nullptr),
+      m_pSAHeaderFont(nullptr),
+      m_pSAGothicFont(nullptr),
+      m_pSansFont(nullptr),
+      m_pUniFont(nullptr),
+      m_nextRedrawHandle(1),
+      m_ulPreviousUnique(0),
+      m_eInputMode(INPUTMODE_NO_BINDS_ON_EDIT),
+      m_Channel(INPUT_CORE)
 {
+#ifdef MTA_DEBUG
+    {
+        IUnknown*     pProxyMarker = nullptr;
+        const HRESULT hr = pDevice ? pDevice->QueryInterface(CProxyDirect3DDevice9_GUID, reinterpret_cast<void**>(&pProxyMarker)) : E_POINTER;
+        if (SUCCEEDED(hr) && pProxyMarker)
+        {
+            pProxyMarker->Release();
+        }
+        else
+        {
+        }
+    }
+#endif
     m_RenderOkTimer.SetMaxIncrement(100);
 
     // Callback arrays are default-initialized to empty state by their constructors
@@ -106,7 +122,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) :
         m_pUniFont = (CGUIFont_Impl*)CreateFnt("unifont", CGUI_MTA_SUBSTITUTE_FONT, 9, 0, false);
         m_pFontManager->setSubstituteFont(m_pUniFont->GetFont());
     }
-    catch (CEGUI::InvalidRequestException e)
+    catch (const CEGUI::Exception& e)
     {
         SString strMessage = e.getMessage().c_str();
         BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading fonts!\n\n%s", *strMessage));
@@ -124,7 +140,7 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) :
         m_pSAGothicFont = (CGUIFont_Impl*)CreateFnt("sa-gothic", CGUI_SA_GOTHIC_FONT, CGUI_SA_GOTHIC_SIZE, 0, true);
         m_pSansFont = (CGUIFont_Impl*)CreateFnt("sans", CGUI_MTA_SANS_FONT, CGUI_MTA_SANS_FONT_SIZE, 0, false);
     }
-    catch (CEGUI::InvalidRequestException e)
+    catch (const CEGUI::Exception& e)
     {
         SString strMessage = e.getMessage().c_str();
         BrowseToSolution("create-fonts", EXIT_GAME_FIRST | ASK_GO_ONLINE, SString("Error loading fonts!\n\n%s", *strMessage));
@@ -133,6 +149,12 @@ CGUI_Impl::CGUI_Impl(IDirect3DDevice9* pDevice) :
 
 CGUI_Impl::~CGUI_Impl()
 {
+    if (m_ScriptRoot)
+    {
+        delete m_ScriptRoot;
+        m_ScriptRoot = nullptr;
+    }
+
     // Clean up font objects to prevent memory leaks
     delete m_pUniFont;
     delete m_pDefaultFont;
@@ -142,7 +164,7 @@ CGUI_Impl::~CGUI_Impl()
     delete m_pSAHeaderFont;
     delete m_pSAGothicFont;
     delete m_pSansFont;
-    
+
     // Clean up CEGUI system - this automatically deletes the renderer
     delete CEGUI::System::getSingletonPtr();
     // DO NOT delete m_pRenderer - it's already deleted by System destructor
@@ -156,6 +178,16 @@ void CGUI_Impl::CreateRootWindow()
     // Create dummy GUI root
     m_pTop = reinterpret_cast<CEGUI::DefaultWindow*>(m_pWindowManager->createWindow("DefaultWindow", "guiroot"));
     m_pSystem->setGUISheet(m_pTop);
+
+    // Create a dedicated script GUI root container to isolate script elements from MTA Core UI (Main Menu & Console).
+    // This ensures script AlwaysOnTop elements can never render above system UI while preserving AlwaysOnTop among script elements.
+    m_ScriptTop = reinterpret_cast<CEGUI::DefaultWindow*>(m_pWindowManager->createWindow("DefaultWindow", "guiroot_script"));
+    m_ScriptTop->setRect(CEGUI::Relative, CEGUI::Rect(0.0f, 0.0f, 1.0f, 1.0f));
+    m_ScriptTop->setMousePassThroughEnabled(true);
+    m_ScriptTop->setDestroyedByParent(false);
+    m_pTop->addChildWindow(m_ScriptTop);
+
+    m_ScriptRoot = new CGUIDefaultWindow_Impl(this, m_ScriptTop);
 }
 
 void CGUI_Impl::SetSkin(const char* szName)
@@ -168,9 +200,20 @@ void CGUI_Impl::SetSkin(const char* szName)
 
     PushGuiWorkingDirectory(CalcMTASAPath(PathJoin("skins", szName)));
 
-    CEGUI::Scheme* scheme = CEGUI::SchemeManager::getSingleton().loadScheme("CGUI.xml");
-    m_CurrentSchemeName = scheme->getName().c_str();
-    m_HasSchemeLoaded = true;
+    // Pop the working directory before the exception reaches the fallback skin,
+    // or later asset loads resolve inside the failed skin and healthy installs look broken.
+    CEGUI::Scheme* scheme;
+    try
+    {
+        scheme = CEGUI::SchemeManager::getSingleton().loadScheme("CGUI.xml");
+        m_CurrentSchemeName = scheme->getName().c_str();
+        m_HasSchemeLoaded = true;
+    }
+    catch (...)
+    {
+        PopGuiWorkingDirectory();
+        throw;
+    }
 
     PopGuiWorkingDirectory();
 
@@ -229,41 +272,102 @@ CVector2D CGUI_Impl::GetResolution()
     return CVector2D(m_pRenderer->getWidth(), m_pRenderer->getHeight());
 }
 
+namespace
+{
+    // True while the CC54 dialog is open: nested faults exit instead of stacking.
+    bool s_bCEGUIFaultDialogOpen = false;
+
+    void ShowFatalCEGUIException(const CEGUI::Exception& exception, const char* szContext)
+    {
+        if (s_bCEGUIFaultDialogOpen)
+        {
+            // Nested fault in the first dialog's pump: exit instead of stacking another.
+            TerminateProcess(GetCurrentProcess(), 9);
+            return;
+        }
+        s_bCEGUIFaultDialogOpen = true;
+
+        WriteDebugEvent(SString("CGUI_Impl::%s - CEGUI exception: %s", szContext, exception.getMessage().c_str()));
+        SString strMsg(
+            "%s\n\n"
+            "Usually caused by missing GUI/loading-screen assets.\n\n"
+            "Please verify game files or reinstall MTA.",
+            exception.getMessage().c_str());
+        MessageBoxUTF8(0, strMsg, _("Error") + _E("CC54"), MB_OK | MB_ICONERROR | MB_TOPMOST);
+        TerminateProcess(GetCurrentProcess(), 9);
+    }
+}
+
+void CGUI_Impl::SetFatalFaultDialogOpen(bool bOpen)
+{
+    // Core sets this for CC51 too, so a CEGUI fault in its pump exits instead of stacking CC54.
+    s_bCEGUIFaultDialogOpen = bOpen;
+}
+
+bool CGUI_Impl::IsFatalFaultDialogOpen() const
+{
+    return s_bCEGUIFaultDialogOpen;
+}
+
 void CGUI_Impl::SetResolution(float fWidth, float fHeight)
 {
-    reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->setDisplaySize(CEGUI::Size(fWidth, fHeight));
+    try
+    {
+        reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->setDisplaySize(CEGUI::Size(fWidth, fHeight));
+    }
+    catch (const CEGUI::Exception& exception)
+    {
+        // Reachable from the vid command when the video mode changes.
+        ShowFatalCEGUIException(exception, "SetResolution");
+    }
 }
 
 void CGUI_Impl::Draw()
 {
-    // Redraw the changed elements
-    if (!m_RedrawQueue.empty())
+    try
     {
-        for (const auto handle : m_RedrawQueue)
+        // Redraw the changed elements
+        if (!m_RedrawQueue.empty())
         {
-            if (CGUIElement* pElement = ResolveRedrawHandle(handle))
+            for (const auto handle : m_RedrawQueue)
             {
-                pElement->ForceRedraw();
+                if (CGUIElement* pElement = ResolveRedrawHandle(handle))
+                {
+                    pElement->ForceRedraw();
+                }
+            }
+            m_RedrawQueue.clear();
+        }
+
+        if (!m_pSystem->renderGUI())
+        {
+            if (m_RenderOkTimer.Get() > 4000)
+            {
+                // 4 seconds and over 40 failed calls means we have a problem
+                BrowseToSolution("gui-render", EXIT_GAME_FIRST, "Some sort of DirectX problem has occurred");
             }
         }
-        m_RedrawQueue.clear();
+        else
+            m_RenderOkTimer.Reset();
     }
-
-    if (!m_pSystem->renderGUI())
+    catch (const CEGUI::Exception& exception)
     {
-        if (m_RenderOkTimer.Get() > 4000)
-        {
-            // 4 seconds and over 40 failed calls means we have a problem
-            BrowseToSolution("gui-render", EXIT_GAME_FIRST, "Some sort of DirectX problem has occurred");
-        }
+        // Missing or corrupt GUI assets throw here; show one clear error and exit.
+        ShowFatalCEGUIException(exception, "Draw");
     }
-    else
-        m_RenderOkTimer.Reset();
 }
 
 void CGUI_Impl::Invalidate()
 {
-    reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->preD3DReset();
+    try
+    {
+        reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->preD3DReset();
+    }
+    catch (const CEGUI::Exception& exception)
+    {
+        // A CEGUI fault here unwinds through the D3D reset path and crashes harder in COM.
+        ShowFatalCEGUIException(exception, "Invalidate");
+    }
 }
 
 void CGUI_Impl::Restore()
@@ -272,16 +376,22 @@ void CGUI_Impl::Restore()
     {
         reinterpret_cast<CEGUI::DirectX9Renderer*>(m_pRenderer)->postD3DReset();
     }
-    catch (CEGUI::RendererException& exception)
+    catch (const CEGUI::Exception& exception)
     {
-        MessageBox(0, exception.getMessage().c_str(), "CEGUI Exception", MB_OK | MB_ICONERROR | MB_TOPMOST);
-        TerminateProcess(GetCurrentProcess(), 1);
+        ShowFatalCEGUIException(exception, "Restore");
     }
 }
 
 void CGUI_Impl::DrawMouseCursor()
 {
-    CEGUI::MouseCursor::getSingleton().draw();
+    try
+    {
+        CEGUI::MouseCursor::getSingleton().draw();
+    }
+    catch (const CEGUI::Exception& exception)
+    {
+        ShowFatalCEGUIException(exception, "DrawMouseCursor");
+    }
 }
 
 void CGUI_Impl::ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX, unsigned long ulY, CGUIMouseButton eMouseButton)
@@ -339,24 +449,24 @@ bool CGUI_Impl::GetGUIInputEnabled()
         {
             if (m_pTop)
             {
-                CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
-                if (!pActiveWindow || pActiveWindow == m_pTop || !pActiveWindow->isVisible())
+                CEGUI::Window* activeWindow = m_pTop->getActiveChild();
+                if (!activeWindow || activeWindow == m_pTop || activeWindow == m_ScriptTop || !activeWindow->isVisible())
                 {
                     return false;
                 }
-                if (pActiveWindow->getType() == "CGUI/Editbox")
+                if (activeWindow->getType() == "CGUI/Editbox")
                 {
-                    CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(pActiveWindow);
+                    CEGUI::Editbox* pEditBox = reinterpret_cast<CEGUI::Editbox*>(activeWindow);
                     return (!pEditBox->isReadOnly() && pEditBox->hasInputFocus());
                 }
-                else if (pActiveWindow->getType() == "CGUI/MultiLineEditbox")
+                else if (activeWindow->getType() == "CGUI/MultiLineEditbox")
                 {
-                    CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(pActiveWindow);
+                    CEGUI::MultiLineEditbox* pMultiLineEditBox = reinterpret_cast<CEGUI::MultiLineEditbox*>(activeWindow);
                     return (!pMultiLineEditBox->isReadOnly() && pMultiLineEditBox->hasInputFocus());
                 }
-                else if (pActiveWindow->getType() == CGUIWEBBROWSER_NAME)
+                else if (activeWindow->getType() == CGUIWEBBROWSER_NAME)
                 {
-                    auto pElement = reinterpret_cast<CGUIElement_Impl*>(pActiveWindow->getUserData());
+                    auto pElement = reinterpret_cast<CGUIElement_Impl*>(activeWindow->getUserData());
                     if (pElement->GetType() == CGUI_WEBBROWSER)
                     {
                         auto pWebBrowser = reinterpret_cast<CGUIWebBrowser_Impl*>(pElement);
@@ -384,13 +494,13 @@ eInputMode CGUI_Impl::GetGUIInputMode()
 
 CEGUI::String CGUI_Impl::GetUTFString(const char* szInput)
 {
-    CEGUI::String strUTF = (CEGUI::utf8*)szInput;            // Convert into a CEGUI String
+    CEGUI::String strUTF = (CEGUI::utf8*)szInput;  // Convert into a CEGUI String
     return strUTF;
 }
 
 CEGUI::String CGUI_Impl::GetUTFString(const std::string& strInput)
 {
-    CEGUI::String strUTF = (CEGUI::utf8*)strInput.c_str();            // Convert into a CEGUI String
+    CEGUI::String strUTF = (CEGUI::utf8*)strInput.c_str();  // Convert into a CEGUI String
     return strUTF;
 }
 
@@ -453,8 +563,9 @@ CGUIFont* CGUI_Impl::CreateFntFromWinFont(const char* szFontName, const char* sz
             {
                 pResult = (CGUIFont_Impl*)CreateFnt(szFontName, lookList[i], uSize, uFlags, bAutoScale);
             }
-            catch (CEGUI::Exception e)
+            catch (const CEGUI::Exception&)
             {
+                // Try the next location; failure is reported after the loop.
             }
         }
 
@@ -617,7 +728,7 @@ bool CGUI_Impl::LoadImageset(const SString& strFilename)
     {
         return GetImageSetManager()->createImageset(strFilename, "", true) != NULL;
     }
-    catch (CEGUI::AlreadyExistsException exc)
+    catch (const CEGUI::AlreadyExistsException&)
     {
         return true;
     }
@@ -860,7 +971,7 @@ bool CGUI_Impl::Event_KeyDown(const CEGUI::EventArgs& Args)
                 CEGUI::Window* Wnd = reinterpret_cast<CEGUI::Window*>(KeyboardArgs.window);
                 if (Wnd->getType() == "CGUI/Editbox" || Wnd->getType() == "CGUI/MultiLineEditbox")
                 {
-                    SString clipboardUtf8 = SharedUtil::GetClipboardText();
+                    SString      clipboardUtf8 = SharedUtil::GetClipboardText();
                     std::wstring strClipboardText;
                     try
                     {
@@ -1048,7 +1159,16 @@ void CGUI_Impl::SetDefaultGuiWorkingDirectory(const SString& strDir)
 void CGUI_Impl::PushGuiWorkingDirectory(const SString& strDir)
 {
     m_GuiWorkingDirectoryStack.push_back(PathConform(strDir + "\\"));
-    ApplyGuiWorkingDirectory();
+    try
+    {
+        ApplyGuiWorkingDirectory();
+    }
+    catch (...)
+    {
+        // Applying failed: drop the pushed entry, or a later Pop restores the wrong directory.
+        m_GuiWorkingDirectoryStack.pop_back();
+        throw;
+    }
 }
 
 void CGUI_Impl::PopGuiWorkingDirectory(const SString& strDirCheck)
@@ -1062,7 +1182,8 @@ void CGUI_Impl::PopGuiWorkingDirectory(const SString& strDirCheck)
         if (!strDirCheck.empty())
         {
             const SString& strWas = m_GuiWorkingDirectoryStack.back();
-            if (strDirCheck != strWas)
+            // Push conforms paths, so compare conformed.
+            if (PathConform(strDirCheck + "\\") != strWas)
             {
                 OutputDebugLine(SString("CGUI_Impl::PopWorkingDirectory - Mismatch. Got '%s', expected '%s'", *strWas, *strDirCheck));
             }
@@ -1165,18 +1286,18 @@ bool CGUI_Impl::Event_MouseButtonDown(const CEGUI::EventArgs& Args)
     CGUIElement* pElement = reinterpret_cast<CGUIElement*>(wnd->getUserData());
 
     // Call global and object handlers
-    if (pElement)
+    if (pElement && pElement != m_ScriptRoot)
         pElement->Event_OnMouseButtonDown();
     else
     {
         if (m_pTop)
         {
-            // If there's no element, we're probably dealing with the root element
-            CEGUI::Window* pActiveWindow = m_pTop->getActiveChild();
-            if (m_pTop == wnd && pActiveWindow)
+            // If there's no element (or root element), we're probably dealing with the root background
+            CEGUI::Window* activeWindow = m_pTop->getActiveChild();
+            if ((m_pTop == wnd || m_ScriptTop == wnd) && activeWindow)
             {
                 // Deactivate active window to trigger onClientGUIBlur
-                pActiveWindow->deactivate();
+                activeWindow->deactivate();
             }
         }
     }
@@ -1416,15 +1537,14 @@ bool CGUI_Impl::Event_RedrawRequested(const CEGUI::EventArgs& Args)
 
     // Get the master window (walks up parent hierarchy for child widgets)
     CEGUI::Window* pMasterWindow = GetMasterWindow(e.window);
-    
+
     CGUIElement* pElement = reinterpret_cast<CGUIElement*>(pMasterWindow->getUserData());
     if (pElement)
     {
-        // Add to queue for crash-protected deferred redraw
         AddToRedrawQueue(pElement);
     }
-    
-    // Always redraw the event source immediately for responsiveness
+
+    // Immediate redraw of event source for visual responsiveness
     e.window->forceRedraw();
 
     return true;
@@ -1486,35 +1606,23 @@ void CGUI_Impl::AddToRedrawQueue(CGUIElement* pWindow)
     if (handle == kInvalidRedrawHandle)
         return;
 
-    // Manage the redraw queue, if we redraw the parent of the window passed,
-    // we should not add it to the redraw queue, and if the children are queued,
-    // remove them.
-    for (auto iter = m_RedrawQueue.begin(); iter != m_RedrawQueue.end(); )
+    if (m_RedrawRegistry.find(handle) == m_RedrawRegistry.end())
+        return;
+
+    // If parent is already queued, skip adding chidl
+    // (parent redraw will cover children)
+    if (CGUIElement* pParent = pWindow->GetParent())
     {
-        CGUIElement* pQueued = ResolveRedrawHandle(*iter);
-        if (!pQueued)
+        if (auto* pParentImpl = dynamic_cast<CGUIElement_Impl*>(pParent))
         {
-            iter = m_RedrawQueue.erase(iter);
-            continue;
+            const std::uint32_t parentHandle = pParentImpl->GetRedrawHandle();
+            if (parentHandle != kInvalidRedrawHandle && m_RedrawQueue.count(parentHandle) > 0)
+                return;
         }
-
-        if (pWindow->GetParent() == pQueued)
-        {
-            return;
-        }
-        if (pQueued->GetParent() == pWindow)
-        {
-            iter = m_RedrawQueue.erase(iter);
-            continue;
-        }
-        if (pQueued == pWindow)
-        {
-            return;
-        }
-
-        ++iter;
     }
-    m_RedrawQueue.push_back(handle);
+
+    // insertion with automatic deduplication
+    m_RedrawQueue.insert(handle);
 }
 
 void CGUI_Impl::RemoveFromRedrawQueue(CGUIElement* pWindow)
@@ -1527,7 +1635,7 @@ void CGUI_Impl::RemoveFromRedrawQueue(CGUIElement* pWindow)
     if (handle == kInvalidRedrawHandle)
         return;
 
-    m_RedrawQueue.remove(handle);
+    m_RedrawQueue.erase(handle);
 }
 
 std::uint32_t CGUI_Impl::RegisterRedrawHandle(CGUIElement_Impl* pElement)
@@ -1551,7 +1659,7 @@ void CGUI_Impl::ReleaseRedrawHandle(std::uint32_t handle)
         return;
 
     m_RedrawRegistry.erase(handle);
-    m_RedrawQueue.remove(handle);
+    m_RedrawQueue.erase(handle);
 }
 
 CGUIElement* CGUI_Impl::ResolveRedrawHandle(std::uint32_t handle) const
@@ -1568,8 +1676,7 @@ CGUIElement* CGUI_Impl::ResolveRedrawHandle(std::uint32_t handle) const
 
 CGUIButton* CGUI_Impl::CreateButton(CGUIElement* pParent, const char* szCaption)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateButton(wnd, szCaption);
+    return _CreateButton(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption);
 }
 
 CGUIButton* CGUI_Impl::CreateButton(CGUITab* pParent, const char* szCaption)
@@ -1580,8 +1687,7 @@ CGUIButton* CGUI_Impl::CreateButton(CGUITab* pParent, const char* szCaption)
 
 CGUICheckBox* CGUI_Impl::CreateCheckBox(CGUIElement* pParent, const char* szCaption, bool bChecked)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateCheckBox(wnd, szCaption, bChecked);
+    return _CreateCheckBox(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption, bChecked);
 }
 
 CGUICheckBox* CGUI_Impl::CreateCheckBox(CGUITab* pParent, const char* szCaption, bool bChecked)
@@ -1592,8 +1698,7 @@ CGUICheckBox* CGUI_Impl::CreateCheckBox(CGUITab* pParent, const char* szCaption,
 
 CGUIRadioButton* CGUI_Impl::CreateRadioButton(CGUIElement* pParent, const char* szCaption)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateRadioButton(wnd, szCaption);
+    return _CreateRadioButton(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption);
 }
 
 CGUIRadioButton* CGUI_Impl::CreateRadioButton(CGUITab* pParent, const char* szCaption)
@@ -1604,8 +1709,7 @@ CGUIRadioButton* CGUI_Impl::CreateRadioButton(CGUITab* pParent, const char* szCa
 
 CGUIEdit* CGUI_Impl::CreateEdit(CGUIElement* pParent, const char* szText)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateEdit(wnd, szText);
+    return _CreateEdit(dynamic_cast<CGUIElement_Impl*>(pParent), szText);
 }
 
 CGUIEdit* CGUI_Impl::CreateEdit(CGUITab* pParent, const char* szText)
@@ -1616,8 +1720,7 @@ CGUIEdit* CGUI_Impl::CreateEdit(CGUITab* pParent, const char* szText)
 
 CGUIGridList* CGUI_Impl::CreateGridList(CGUIElement* pParent, bool bFrame)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateGridList(wnd, bFrame);
+    return _CreateGridList(dynamic_cast<CGUIElement_Impl*>(pParent), bFrame);
 }
 
 CGUIGridList* CGUI_Impl::CreateGridList(CGUITab* pParent, bool bFrame)
@@ -1628,8 +1731,7 @@ CGUIGridList* CGUI_Impl::CreateGridList(CGUITab* pParent, bool bFrame)
 
 CGUILabel* CGUI_Impl::CreateLabel(CGUIElement* pParent, const char* szCaption)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateLabel(wnd, szCaption);
+    return _CreateLabel(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption);
 }
 
 CGUILabel* CGUI_Impl::CreateLabel(CGUITab* pParent, const char* szCaption)
@@ -1645,8 +1747,7 @@ CGUILabel* CGUI_Impl::CreateLabel(const char* szCaption)
 
 CGUIProgressBar* CGUI_Impl::CreateProgressBar(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateProgressBar(wnd);
+    return _CreateProgressBar(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIProgressBar* CGUI_Impl::CreateProgressBar(CGUITab* pParent)
@@ -1657,8 +1758,7 @@ CGUIProgressBar* CGUI_Impl::CreateProgressBar(CGUITab* pParent)
 
 CGUIMemo* CGUI_Impl::CreateMemo(CGUIElement* pParent, const char* szText)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateMemo(wnd, szText);
+    return _CreateMemo(dynamic_cast<CGUIElement_Impl*>(pParent), szText);
 }
 
 CGUIMemo* CGUI_Impl::CreateMemo(CGUITab* pParent, const char* szText)
@@ -1669,8 +1769,7 @@ CGUIMemo* CGUI_Impl::CreateMemo(CGUITab* pParent, const char* szText)
 
 CGUIStaticImage* CGUI_Impl::CreateStaticImage(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateStaticImage(wnd);
+    return _CreateStaticImage(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIStaticImage* CGUI_Impl::CreateStaticImage(CGUITab* pParent)
@@ -1692,8 +1791,7 @@ CGUIStaticImage* CGUI_Impl::CreateStaticImage()
 
 CGUITabPanel* CGUI_Impl::CreateTabPanel(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateTabPanel(wnd);
+    return _CreateTabPanel(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUITabPanel* CGUI_Impl::CreateTabPanel(CGUITab* pParent)
@@ -1714,8 +1812,7 @@ CGUIScrollPane* CGUI_Impl::CreateScrollPane()
 
 CGUIScrollPane* CGUI_Impl::CreateScrollPane(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateScrollPane(wnd);
+    return _CreateScrollPane(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIScrollPane* CGUI_Impl::CreateScrollPane(CGUITab* pParent)
@@ -1726,8 +1823,7 @@ CGUIScrollPane* CGUI_Impl::CreateScrollPane(CGUITab* pParent)
 
 CGUIScrollBar* CGUI_Impl::CreateScrollBar(bool bHorizontal, CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateScrollBar(bHorizontal, wnd);
+    return _CreateScrollBar(bHorizontal, dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIScrollBar* CGUI_Impl::CreateScrollBar(bool bHorizontal, CGUITab* pParent)
@@ -1738,8 +1834,7 @@ CGUIScrollBar* CGUI_Impl::CreateScrollBar(bool bHorizontal, CGUITab* pParent)
 
 CGUIComboBox* CGUI_Impl::CreateComboBox(CGUIElement* pParent, const char* szCaption)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateComboBox(wnd, szCaption);
+    return _CreateComboBox(dynamic_cast<CGUIElement_Impl*>(pParent), szCaption);
 }
 
 CGUIComboBox* CGUI_Impl::CreateComboBox(CGUIComboBox* pParent, const char* szCaption)
@@ -1750,8 +1845,7 @@ CGUIComboBox* CGUI_Impl::CreateComboBox(CGUIComboBox* pParent, const char* szCap
 
 CGUIWebBrowser* CGUI_Impl::CreateWebBrowser(CGUIElement* pParent)
 {
-    CGUIWindow_Impl* wnd = reinterpret_cast<CGUIWindow_Impl*>(pParent);
-    return _CreateWebBrowser(wnd);
+    return _CreateWebBrowser(dynamic_cast<CGUIElement_Impl*>(pParent));
 }
 
 CGUIWebBrowser* CGUI_Impl::CreateWebBrowser(CGUITab* pParent)
@@ -1830,6 +1924,13 @@ void CGUI_Impl::Cleanup()
     {
         CleanDeadPool();
 
+        if (m_ScriptRoot)
+        {
+            delete m_ScriptRoot;
+            m_ScriptRoot = nullptr;
+        }
+
+        m_ScriptTop = nullptr;
         m_pTop = nullptr;
 
         if (m_pWindowManager)
@@ -1845,11 +1946,13 @@ void CGUI_Impl::Cleanup()
     catch (const std::exception& e)
     {
         WriteDebugEvent(SString("CGUI_Impl::Cleanup - Exception: %s", e.what()));
+        m_ScriptTop = nullptr;
         m_pTop = nullptr;
     }
     catch (...)
     {
         WriteDebugEvent("CGUI_Impl::Cleanup() failed with unknown exception");
+        m_ScriptTop = nullptr;
         m_pTop = nullptr;
     }
 }

@@ -26,6 +26,20 @@ void CFileLoaderSA::StaticSetHooks()
     HookInstall(0x5371F0, (DWORD)CFileLoader_LoadAtomicFile, 5);
     HookInstall(0x537150, (DWORD)CFileLoader_SetRelatedModelInfoCB, 5);
     HookInstall(0x538690, (DWORD)CFileLoader_LoadObjectInstance, 5);
+
+    // Preserve m_pLod for buildings sharing one LOD entity at scene-load time.
+    // Vanilla _LinkLods (0x5B51E0) walks the IPL instance list and, when several
+    // high-detail buildings reference the same LOD instance, deregisters all but
+    // the last sibling by writing 0 to their m_pLod field at 0x5B52F8
+    // (mov dword ptr [esi+30h], 0). The decrement of the LOD's numChildren a few
+    // bytes earlier is what brings the count down to 1 so the final sibling can
+    // pick up the shared-collision path; that is intentional and is left intact.
+    // Nulling m_pLod is order-dependent and visibly strands many shared-LOD
+    // billboards (e.g. BillBd3 / model 1260) with no LOD reference at runtime,
+    // which breaks LOD-aware lookups (collision queries, processLineOfSight LOD
+    // model id, etc.). NOPing the 7-byte store keeps every sibling linked while
+    // the per-model collision swap still happens exactly once.
+    MemSet((void*)0x5B52F8, 0x90, 7);
 }
 
 CEntitySAInterface* CFileLoaderSA::LoadObjectInstance(SFileObjectInstance* obj)
@@ -66,7 +80,8 @@ void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& 
 {
     const auto nodeNameLen = strlen(nodeName);
 
-    const auto NodeNameEndsWith = [=](const char* with) {
+    const auto NodeNameEndsWith = [=](const char* with)
+    {
         const auto withLen = strlen(with);
         // dassert(withLen <= nodeNameLen);
         return withLen <= nodeNameLen /*dont bother checking otherwise, because it might cause a crash*/
@@ -75,7 +90,8 @@ void GetNameAndDamage(const char* nodeName, char (&outName)[OutBuffSize], bool& 
 
     // Copy `nodeName` into `outName` with `off` trimmed from the end
     // Eg.: `dmg_dam` with `off = 4` becomes `dmg`
-    const auto TerminatedCopy = [&](size_t off) {
+    const auto TerminatedCopy = [&](size_t off)
+    {
         dassert(nodeNameLen >= off && nodeNameLen - off < OutBuffSize);
         const size_t copyLen = std::min(nodeNameLen - off, OutBuffSize - 1);
         strncpy_s(outName, nodeName, copyLen);
@@ -127,20 +143,13 @@ static void CVehicleModelInfo_StopUsingCommonVehicleTexDicationary()
 static auto          CModelInfo_ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 static unsigned int& gAtomicModelId = *reinterpret_cast<unsigned int*>(DWORD_AtomicsReplacerModelID);
 
-namespace
-{
-    bool RelatedModelInfoShim(RpAtomic* atomic, void* context)
-    {
-        return CFileLoader_SetRelatedModelInfoCB(atomic, static_cast<SRelatedModelInfo*>(context)) != nullptr;
-    }
-}
-
 bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
 {
     CBaseModelInfoSAInterface* pBaseModelInfo = CModelInfo_ms_modelInfoPtrs[modelId];
     auto                       pAtomicModelInfo = reinterpret_cast<CAtomicModelInfo*>(pBaseModelInfo);
 
     bool bUseCommonVehicleTexDictionary = false;
+
     if (pAtomicModelInfo && pBaseModelInfo->bWetRoadReflection)
     {
         bUseCommonVehicleTexDictionary = true;
@@ -148,9 +157,11 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
     }
 
     const unsigned int rwID_CLUMP = 16;
+
     if (RwStreamFindChunk(stream, rwID_CLUMP, nullptr, nullptr))
     {
         RpClump* pReadClump = RpClumpStreamRead(stream);
+
         if (!pReadClump)
         {
             if (bUseCommonVehicleTexDictionary)
@@ -161,11 +172,12 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
         }
 
         gAtomicModelId = modelId;
+
         SRelatedModelInfo relatedModelInfo = {0};
         relatedModelInfo.pClump = pReadClump;
         relatedModelInfo.bDeleteOldRwObject = false;
 
-        RpClumpForAllAtomics(pReadClump, RelatedModelInfoShim, &relatedModelInfo);
+        RpClumpForAllAtomics(pReadClump, reinterpret_cast<RpClumpForAllAtomicsCB_t>(CFileLoader_SetRelatedModelInfoCB), &relatedModelInfo);
         RpClumpDestroy(pReadClump);
     }
 
@@ -178,6 +190,7 @@ bool CFileLoader_LoadAtomicFile(RwStream* stream, unsigned int modelId)
     {
         CVehicleModelInfo_StopUsingCommonVehicleTexDicationary();
     }
+
     return true;
 }
 
@@ -205,6 +218,7 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     CVisibilityPlugins_SetAtomicRenderCallback(atomic, 0);
 
     RpAtomic* pOldAtomic = reinterpret_cast<RpAtomic*>(pBaseModelInfo->pRwObject);
+
     if (bDamage)
     {
         auto pDamagableModelInfo = reinterpret_cast<CDamagableModelInfo*>(pAtomicModelInfo);
@@ -216,6 +230,7 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     }
 
     RpClumpRemoveAtomic(pRelatedModelInfo->pClump, atomic);
+
     RwFrame* newFrame = RwFrameCreate();
     RpAtomicSetFrame(atomic, newFrame);
     CVisibilityPlugins_SetAtomicId(atomic, gAtomicModelId);
@@ -242,11 +257,12 @@ CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine)
     SFileObjectInstance inst;
 
     // Use safer scanf with width specifier to prevent buffer overflow
-    int result = sscanf(szLine, "%d %23s %d %f %f %f %f %f %f %f %d", &inst.modelID, szModelName, &inst.interiorID, &inst.position.fX, &inst.position.fY, &inst.position.fZ,
-           &inst.rotation.fX, &inst.rotation.fY, &inst.rotation.fZ, &inst.rotation.fW, &inst.lod);
-    
+    int result = sscanf(szLine, "%d %23s %d %f %f %f %f %f %f %f %d", &inst.modelID, szModelName, &inst.interiorID, &inst.position.fX, &inst.position.fY,
+                        &inst.position.fZ, &inst.rotation.fX, &inst.rotation.fY, &inst.rotation.fZ, &inst.rotation.fW, &inst.lod);
+
     // Check if all expected fields were parsed
-    if (result != 11) {
+    if (result != 11)
+    {
         // Return null or handle error appropriately
         return nullptr;
     }
@@ -256,6 +272,7 @@ CEntitySAInterface* CFileLoader_LoadObjectInstance(const char* szLine)
        but custom exporters might not contain the normalization. And we must do it instead.
    */
     const float fLenSq = inst.rotation.LengthSquared();
+
     if (fLenSq > 0.0f && std::fabs(fLenSq - 1.0f) > std::numeric_limits<float>::epsilon())
     {
         const float fLength = std::sqrt(fLenSq);

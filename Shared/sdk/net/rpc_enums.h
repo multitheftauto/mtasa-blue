@@ -290,8 +290,10 @@ enum eElementRPCFunctions
     SPAWN_VEHICLE_FLYING_COMPONENT,
 
     SET_VEHICLE_NITRO_ACTIVATED,
-  
+
     SET_ELEMENT_ON_FIRE,
 
-    NUM_RPC_FUNCS            // Add above this line
+    SET_CUSTOM_WEAPON_WEAPON_RANGE,
+
+    NUM_RPC_FUNCS  // Add above this line
 };

@@ -1,12 +1,13 @@
 
 // Pragmas
-#pragma warning (disable:4250)
+#pragma warning(disable : 4250)
 
 #include <windows.h>
 #define MTA_CLIENT
 #define SHARED_UTIL_WITH_HASH_MAP
 #define SHARED_UTIL_WITH_FAST_HASH_MAP
 #define SHARED_UTIL_WITH_SYS_INFO
+#define MTASA_EXPORT_SHARED_UTIL
 #include "SharedUtil.h"
 #include "SharedUtil.MemAccess.h"
 #include <stdio.h>
@@ -23,5 +24,6 @@
 #include "..\game_sa\CEntitySA.h"
 #include "..\game_sa\CPedSA.h"
 #include "..\game_sa\CProjectileSA.h"
+#include "..\game_sa\TaskAttackSA.h"
 
 extern CMultiplayerSA* pMultiplayer;

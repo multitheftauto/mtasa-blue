@@ -34,12 +34,12 @@ enum
     WANDER_TYPE_PROSTITUTE
 };
 
-#define NO_WANDER_TYPE      9999
+#define NO_WANDER_TYPE 9999
 
 class CTaskComplexWander : public virtual CTaskComplex
 {
 public:
-    virtual ~CTaskComplexWander(){};
+    virtual ~CTaskComplexWander() {};
 
     virtual CNodeAddress* GetNextNode() = 0;
     virtual CNodeAddress* GetLastNode() = 0;
@@ -50,5 +50,5 @@ public:
 class CTaskComplexWanderStandard : public virtual CTaskComplexWander
 {
 public:
-    virtual ~CTaskComplexWanderStandard(){};
+    virtual ~CTaskComplexWanderStandard() {};
 };

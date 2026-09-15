@@ -39,11 +39,11 @@ public:
     unsigned short                     m_usBitStreamVersion;
     NetServerPlayerID                  m_PlayerSocket;
     std::vector<CSimPlayer*>           m_PuresyncSendListFlat;
-    std::multimap<ushort, CSimPlayer*> m_PuresyncSendListGrouped;            // Send list grouped by bitstream version
+    std::multimap<ushort, CSimPlayer*> m_PuresyncSendListGrouped;  // Send list grouped by bitstream version
     bool                               m_bSendListChanged;
     bool                               m_bHasOccupiedVehicle;
     bool                               m_bIsExitingVehicle;
-    CControllerState                   m_sharedControllerState;            // Updated by CSim*Packet code
+    CControllerState                   m_sharedControllerState;  // Updated by CSim*Packet code
 
     // Used in CSimPlayerPuresyncPacket and CSimVehiclePuresyncPacket
     ElementID m_PlayerID;
@@ -57,6 +57,26 @@ public:
     float                 m_fWeaponRange;
     uint                  m_uiVehicleDamageInfoSendPhase;
     SSimVehicleDamageInfo m_VehicleDamageInfo;
+
+    // Used in bullet sync validation (HandleBulletSync)
+    CVector      m_vecPosition;
+    CElapsedTime m_BulletSyncRateTimer;
+
+    // Bullet sync validation snapshot, refreshed by UpdateSimPlayer on the
+    // main thread. The sim thread must not read live player state, so the
+    // sim path's possession, ammo and range checks run against these copies.
+    static constexpr std::size_t WEAPON_SLOT_COUNT = 13;  // Matches WEAPON_SLOTS in CPed.h
+    bool                         m_bIsSpawned{};
+    bool                         m_bIsDead{};
+    unsigned char                m_WeaponTypes[WEAPON_SLOT_COUNT]{};
+    unsigned short               m_WeaponTotalAmmo[WEAPON_SLOT_COUNT]{};
+    // Widest-tier range per weapon slot, for the range gate in
+    // HandleBulletSync. The gate measures the packet's weapon, so keying by
+    // slot keeps a shooter from relaying shots the main path rejects when
+    // the held weapon outranges the fired one, and from dropping shots of a
+    // weapon selected after the last refresh. Computed on the main thread
+    // because the sim thread cannot consult the mutable weapon stat tables.
+    float m_fBulletSyncRangeHighest[WEAPON_SLOT_COUNT]{};
 
     // Used in CSimKeysyncPacket
     bool m_bVehicleHasHydraulics;

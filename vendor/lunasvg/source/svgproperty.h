@@ -12,9 +12,9 @@ enum class PropertyID : uint8_t {
     Alignment_Baseline,
     Baseline_Shift,
     Class,
-    ClipPathUnits,
     Clip_Path,
     Clip_Rule,
+    ClipPathUnits,
     Color,
     Cx,
     Cy,
@@ -38,16 +38,18 @@ enum class PropertyID : uint8_t {
     Height,
     Href,
     Id,
-    MarkerHeight,
-    MarkerUnits,
-    MarkerWidth,
+    LengthAdjust,
+    Letter_Spacing,
     Marker_End,
     Marker_Mid,
     Marker_Start,
+    MarkerHeight,
+    MarkerUnits,
+    MarkerWidth,
     Mask,
+    Mask_Type,
     MaskContentUnits,
     MaskUnits,
-    Mask_Type,
     Offset,
     Opacity,
     Orient,
@@ -55,6 +57,7 @@ enum class PropertyID : uint8_t {
     PatternContentUnits,
     PatternTransform,
     PatternUnits,
+    Pointer_Events,
     Points,
     PreserveAspectRatio,
     R,
@@ -76,11 +79,15 @@ enum class PropertyID : uint8_t {
     Stroke_Width,
     Style,
     Text_Anchor,
+    Text_Orientation,
+    TextLength,
     Transform,
     ViewBox,
     Visibility,
-    WhiteSpace,
+    White_Space,
     Width,
+    Word_Spacing,
+    Writing_Mode,
     X,
     X1,
     X2,
@@ -154,6 +161,20 @@ enum class Overflow : uint8_t {
     Hidden
 };
 
+enum class PointerEvents : uint8_t {
+    None,
+    Auto,
+    Stroke,
+    Fill,
+    Painted,
+    Visible,
+    VisibleStroke,
+    VisibleFill,
+    VisiblePainted,
+    BoundingBox,
+    All
+};
+
 enum class FontStyle : uint8_t {
     Normal,
     Italic
@@ -205,6 +226,16 @@ enum class WhiteSpace : uint8_t {
     Preserve
 };
 
+enum class WritingMode : uint8_t {
+    Horizontal,
+    Vertical
+};
+
+enum class TextOrientation : uint8_t {
+    Mixed,
+    Upright
+};
+
 enum class Direction : uint8_t {
     Ltr,
     Rtl
@@ -223,6 +254,11 @@ enum class Units : uint8_t {
 enum class MarkerUnits : uint8_t {
     StrokeWidth,
     UserSpaceOnUse
+};
+
+enum class LengthAdjust : uint8_t {
+    Spacing,
+    SpacingAndGlyphs
 };
 
 template<typename Enum>

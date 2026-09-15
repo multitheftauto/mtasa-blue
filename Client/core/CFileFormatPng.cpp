@@ -258,7 +258,6 @@ void my_png_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
     stream->WriteBytes(data, length);
 }
 
-
 ///////////////////////////////////////////////////////////////
 //
 // PngEncode
@@ -268,9 +267,9 @@ void my_png_write_data(png_structp png_ptr, png_bytep data, png_size_t length)
 ///////////////////////////////////////////////////////////////
 bool PngEncode(uint uiWidth, uint uiHeight, const void* pData, uint uiDataSize, CBuffer& outBuffer)
 {
-    BYTE** ppScreenData = NULL;
+    BYTE**      ppScreenData = NULL;
     png_struct* png_ptr = NULL;
-    png_info* info_ptr = NULL;
+    png_info*   info_ptr = NULL;
 
     try
     {
@@ -302,7 +301,8 @@ bool PngEncode(uint uiWidth, uint uiHeight, const void* pData, uint uiDataSize, 
         png_set_write_fn(png_ptr, &stream, my_png_write_data, NULL);
         png_set_filter(png_ptr, 0, PNG_FILTER_NONE);
         png_set_compression_level(png_ptr, 1);
-        png_set_IHDR(png_ptr, info_ptr, uiWidth, uiHeight, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT, PNG_FILTER_TYPE_DEFAULT);
+        png_set_IHDR(png_ptr, info_ptr, uiWidth, uiHeight, 8, PNG_COLOR_TYPE_RGB_ALPHA, PNG_INTERLACE_NONE, PNG_COMPRESSION_TYPE_DEFAULT,
+                     PNG_FILTER_TYPE_DEFAULT);
         png_set_rows(png_ptr, info_ptr, ppScreenData);
         png_write_png(png_ptr, info_ptr, PNG_TRANSFORM_BGR /*| PNG_TRANSFORM_STRIP_ALPHA*/, NULL);
         png_write_end(png_ptr, info_ptr);
@@ -316,7 +316,8 @@ bool PngEncode(uint uiWidth, uint uiHeight, const void* pData, uint uiDataSize, 
         {
             for (uint y = 0; y < uiHeight; y++)
             {
-                if (ppScreenData[y]) delete[] ppScreenData[y];
+                if (ppScreenData[y])
+                    delete[] ppScreenData[y];
             }
             delete[] ppScreenData;
         }

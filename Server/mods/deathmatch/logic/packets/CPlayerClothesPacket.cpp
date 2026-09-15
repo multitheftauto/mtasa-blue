@@ -18,8 +18,8 @@ CPlayerClothesPacket::~CPlayerClothesPacket()
     std::vector<SPlayerClothes*>::iterator iter = m_List.begin();
     for (; iter != m_List.end(); ++iter)
     {
-        delete[](*iter)->szTexture;
-        delete[](*iter)->szModel;
+        delete[] (*iter)->szTexture;
+        delete[] (*iter)->szModel;
         delete *iter;
     }
     m_List.clear();

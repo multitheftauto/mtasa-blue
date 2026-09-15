@@ -17,8 +17,8 @@
 class CAudioContainerLookupTableSA;
 
 #define VALIDATE_BUFFER_SIZE 4096
-#define NUM_BEAT_ENTRIES 1000
-#define NUM_LENGTH_ENTRIES 8
+#define NUM_BEAT_ENTRIES     1000
+#define NUM_LENGTH_ENTRIES   8
 
 struct SAudioEntrySA
 {
@@ -32,27 +32,27 @@ static_assert(sizeof(SAudioEntrySA) == 0xC, "Invalid size for SAudioLookupEntryS
 struct SAudioBankHeaderSA
 {
     int           numSounds;
-    SAudioEntrySA sounds[400];            // Todo: optimize this (dynamic allocation)
+    SAudioEntrySA sounds[400];  // Todo: optimize this (dynamic allocation)
 };
 
 struct SRiffWavePCMHeader
 {
-    uint32 chunkId;              // big-endian // 0
-    uint32 chunkSize;            // 4
-    uint32 format;               // big-endian // 8
+    uint32 chunkId;    // big-endian // 0
+    uint32 chunkSize;  // 4
+    uint32 format;     // big-endian // 8
 
-    uint32 subchunk1Id;              // big-endian // 12
-    uint32 subchunk1Size;            // 16
-    uint16 audioFormat;              // 20
-    uint16 numChannels;              // 22
-    uint32 sampleRate;               // 24
-    uint32 byteRate;                 // 28
-    uint16 blockAlign;               // 32
-    uint16 bitsPerSample;            // 34
+    uint32 subchunk1Id;    // big-endian // 12
+    uint32 subchunk1Size;  // 16
+    uint16 audioFormat;    // 20
+    uint16 numChannels;    // 22
+    uint32 sampleRate;     // 24
+    uint32 byteRate;       // 28
+    uint16 blockAlign;     // 32
+    uint16 bitsPerSample;  // 34
 
-    uint32 subchunk2Id;              // big-endian // 36
-    uint32 subchunk2Size;            // 40
-};                                   // size = 44 = 0x2C
+    uint32 subchunk2Id;    // big-endian // 36
+    uint32 subchunk2Size;  // 40
+};  // size = 44 = 0x2C
 static_assert(sizeof(SRiffWavePCMHeader) == 0x2C, "Invalid size for SRiffWavePCMHeader");
 
 // Documentation by SAAT //

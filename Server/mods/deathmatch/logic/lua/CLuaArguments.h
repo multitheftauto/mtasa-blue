@@ -13,7 +13,7 @@
 
 extern "C"
 {
-    #include "lua.h"
+#include "lua.h"
 }
 
 #include "CLuaArgument.h"
@@ -44,6 +44,8 @@ class CLuaArguments;
 class CLuaArguments
 {
 public:
+    static constexpr unsigned int MaxBitStreamTableReadDepth = 64;
+
     CLuaArguments() {}
     CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
 
@@ -62,7 +64,7 @@ public:
     bool CallGlobal(class CLuaMain* pLuaMain, const char* szFunction, CLuaArguments* returnValues = NULL) const;
 
     void ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
-    void PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = nullptr) const;
+    void PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = nullptr, bool isArray = false) const;
 
     CLuaArgument* PushNil();
     CLuaArgument* PushBoolean(bool bBool);
@@ -89,7 +91,7 @@ public:
     void ValidateTableKeys();
     void Pop();
 
-    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL);
+    bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
     bool         ReadFromJSONString(const char* szJSON);
     bool         WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables = NULL) const;
     bool         WriteToJSONString(std::string& strJSON, bool bSerialize = false, int flags = JSON_C_TO_STRING_PLAIN);

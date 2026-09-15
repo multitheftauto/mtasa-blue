@@ -36,6 +36,8 @@ public:
     bool GetBoundingBox(CVector& vecMin, CVector& vecMax);
 
     void ToggleHelpText();
+    void MarkViewportRefreshPending();
+    void ClearMovementFlags();
 
 protected:
     void InternalSetPlayerMapEnabled(bool bEnabled);
@@ -117,7 +119,7 @@ private:
     unsigned long m_ulUpdateTime;
 
     std::vector<std::shared_ptr<CClientTextDisplay>> m_HelpTextList;
-    bool                             m_bHideHelpText;
+    bool                                             m_bHideHelpText;
 
     bool m_bHudVisible;
     bool m_bChatVisible;
@@ -125,4 +127,5 @@ private:
     bool m_bRadarVisible;
     bool m_bDebugVisible;
     bool m_bTextVisible;
+    bool m_bPendingViewportRefresh = false;
 };

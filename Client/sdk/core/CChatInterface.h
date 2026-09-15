@@ -57,7 +57,7 @@ namespace Chat
                 BOTTOM = 2
             };
         }
-    }            // namespace Position
+    }  // namespace Position
 
     namespace Text
     {
@@ -69,8 +69,8 @@ namespace Chat
                 RIGHT = 1
             };
         }
-    }            // namespace Text
-}            // namespace Chat
+    }  // namespace Text
+}  // namespace Chat
 
 typedef Chat::Font::eFont                       eChatFont;
 typedef Chat::ColorType::eType                  eChatColorType;

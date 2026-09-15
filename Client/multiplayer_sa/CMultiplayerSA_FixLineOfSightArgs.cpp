@@ -33,7 +33,7 @@ namespace
             vecEnd = vecStart + CVector(0, 0, 0.01f);
         }
     }
-}            // namespace
+}  // namespace
 
 ////////////////////////////////////////////////////////////////
 //
@@ -48,9 +48,9 @@ void _cdecl OnCWorld_ProcessLineOfSight(CVector* pvecStart, CVector* pvecEnd)
 }
 
 // Hook info
-#define HOOKPOS_CWorld_ProcessLineOfSight        0x56BA00
-#define HOOKSIZE_CWorld_ProcessLineOfSight       12
-DWORD RETURN_CWorld_ProcessLineOfSight = 0x56BA0C;
+#define HOOKPOS_CWorld_ProcessLineOfSight  0x56BA00
+#define HOOKSIZE_CWorld_ProcessLineOfSight 12
+DWORD                         RETURN_CWorld_ProcessLineOfSight = 0x56BA0C;
 static void __declspec(naked) HOOK_CWorld_ProcessLineOfSight()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -85,9 +85,9 @@ void _cdecl OnCWorld_GetIsLineOfSightClear(CVector* pvecStart, CVector* pvecEnd)
 }
 
 // Hook info
-#define HOOKPOS_CWorld_GetIsLineOfSightClear        0x56A490
-#define HOOKSIZE_CWorld_GetIsLineOfSightClear       12
-DWORD RETURN_CWorld_GetIsLineOfSightClear = 0x56A49C;
+#define HOOKPOS_CWorld_GetIsLineOfSightClear  0x56A490
+#define HOOKSIZE_CWorld_GetIsLineOfSightClear 12
+DWORD                         RETURN_CWorld_GetIsLineOfSightClear = 0x56A49C;
 static void __declspec(naked) HOOK_CWorld_GetIsLineOfSightClear()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;

@@ -214,7 +214,7 @@ static bool matchPseudoClassSelector(const PseudoClassSelector& selector, const 
         while(sibling) {
             if(sibling->id() == element->id())
                 return false;
-            sibling = element->previousElement();
+            sibling = sibling->previousElement();
         }
 
         return true;
@@ -225,7 +225,7 @@ static bool matchPseudoClassSelector(const PseudoClassSelector& selector, const 
         while(sibling) {
             if(sibling->id() == element->id())
                 return false;
-            sibling = element->nextElement();
+            sibling = sibling->nextElement();
         }
 
         return true;
@@ -571,6 +571,9 @@ static RuleDataList parseStyleSheet(std::string_view input)
                 for(const auto& attributeSelector : simpleSelector.attributeSelectors) {
                     specificity += (attributeSelector.id == PropertyID::Id) ? 0x10000 : 0x100;
                 }
+                for(const auto& pseudoClassSelector : simpleSelector.pseudoClassSelectors) {
+                    specificity += 0x100;
+                }
             }
 
             rules.emplace_back(selector, rule.declarations, specificity, rules.size());
@@ -738,6 +741,17 @@ bool Document::parse(const char* data, size_t length)
     };
 
     std::string_view input(data, length);
+    if(length >= 3) {
+        auto buffer = (const uint8_t*)(data);
+
+        const auto c1 = buffer[0];
+        const auto c2 = buffer[1];
+        const auto c3 = buffer[2];
+        if(c1 == 0xEF && c2 == 0xBB && c3 == 0xBF) {
+            input.remove_prefix(3);
+        }
+    }
+
     while(!input.empty()) {
         if(currentElement) {
             auto text = input.substr(0, input.find('<'));

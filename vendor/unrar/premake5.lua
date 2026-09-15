@@ -2,6 +2,7 @@ project "unrar"
 	language "C++"
 	kind "StaticLib"
 	targetname "unrar"
+	warnings "Off"
 
 	defines { "RARDLL" }
 

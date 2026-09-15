@@ -72,16 +72,16 @@ bool CScriptDebugging::CheckForSufficientDebugLevel(std::uint8_t playerDebugLeve
 {
     switch (messageDebugLevel)
     {
-    case MESSAGE_TYPE_ERROR:
-        return playerDebugLevel >= ERRORS_ONLY;
-    case MESSAGE_TYPE_WARNING:
-        return playerDebugLevel >= ERRORS_AND_WARNINGS;
-    case MESSAGE_TYPE_INFO:
-    case MESSAGE_TYPE_CUSTOM:
-    case MESSAGE_TYPE_DEBUG:
-        return playerDebugLevel == ALL;
-    default:
-        break;
+        case MESSAGE_TYPE_ERROR:
+            return playerDebugLevel >= ERRORS_ONLY;
+        case MESSAGE_TYPE_WARNING:
+            return playerDebugLevel >= ERRORS_AND_WARNINGS;
+        case MESSAGE_TYPE_INFO:
+        case MESSAGE_TYPE_CUSTOM:
+        case MESSAGE_TYPE_DEBUG:
+            return playerDebugLevel == ALL;
+        default:
+            break;
     }
 
     return false;
@@ -291,7 +291,7 @@ void CScriptDebugging::LogString(const char* szPrePend, const SLuaDebugInfo& lua
 }
 
 //
-// Get best debug info we possibly can from the relevent lua state
+// Get best debug info we possibly can from the relevant lua state
 //
 const SLuaDebugInfo& CScriptDebugging::GetLuaDebugInfo(lua_State* luaVM)
 {

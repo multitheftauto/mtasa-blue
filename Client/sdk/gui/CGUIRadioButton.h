@@ -17,7 +17,7 @@
 class CGUIRadioButton : public CGUIElement
 {
 public:
-    virtual ~CGUIRadioButton(){};
+    virtual ~CGUIRadioButton() {};
 
     virtual void SetSelected(bool bSelected) = 0;
     virtual bool GetSelected() = 0;

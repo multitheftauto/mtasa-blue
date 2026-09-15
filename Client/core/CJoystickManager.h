@@ -11,6 +11,15 @@
 
 #pragma once
 
+#include <string>
+#include <vector>
+
+struct SJoystickDeviceChoice
+{
+    std::string strId;
+    std::string strName;
+};
+
 class CJoystickManagerInterface
 {
 public:
@@ -23,16 +32,27 @@ public:
 
     // Status
     virtual bool IsJoypadConnected() = 0;
+    virtual void OnPossibleDeviceChange() = 0;
 
     // Settings
-    virtual std::string GetControllerName() = 0;
-    virtual int         GetDeadZone() = 0;
-    virtual int         GetSaturation() = 0;
-    virtual void        SetDeadZone(int iDeadZone) = 0;
-    virtual void        SetSaturation(int iSaturation) = 0;
-    virtual int         GetSettingsRevision() = 0;
-    virtual void        SetDefaults() = 0;
-    virtual bool        SaveToXML() = 0;
+    virtual std::string                        GetControllerName() = 0;
+    virtual int                                GetDeadZone() = 0;
+    virtual int                                GetSaturation() = 0;
+    virtual int                                GetTriggerDeadZone() = 0;
+    virtual int                                GetTriggerSaturation() = 0;
+    virtual void                               SetDeadZone(int iDeadZone) = 0;
+    virtual void                               SetSaturation(int iSaturation) = 0;
+    virtual void                               SetTriggerDeadZone(int iDeadZone) = 0;
+    virtual void                               SetTriggerSaturation(int iSaturation) = 0;
+    virtual bool                               GetVibrationEnabled() = 0;
+    virtual void                               SetVibrationEnabled(bool bEnabled) = 0;
+    virtual std::string                        GetSelectedControllerId() = 0;
+    virtual void                               SetSelectedControllerId(const std::string& strId) = 0;
+    virtual std::vector<SJoystickDeviceChoice> GetAvailableControllers() = 0;
+    virtual int                                GetSettingsRevision() = 0;
+    virtual int                                GetDeviceListRevision() = 0;
+    virtual void                               SetDefaults() = 0;
+    virtual bool                               SaveToXML() = 0;
 
     // Binding
     virtual int         GetOutputCount() = 0;
@@ -48,11 +68,11 @@ CJoystickManagerInterface* NewJoystickManager();
 CJoystickManagerInterface* GetJoystickManager();
 
 // Custom VK_ codes for the joystick buttons - Starts at VK_JOY(1)
-#define VK_JOY(x)       ( 0x100+(x) )
+#define VK_JOY(x) (0x100 + (x))
 // Custom VK_ codes for the joystick pov hat - Starts at VK_POV(1)
-#define VK_POV(x)       ( 0x150+(x) )
+#define VK_POV(x) (0x150 + (x))
 // Custom VK_ codes for the joystick axes - Starts at VK_AXIS(1)
-#define VK_AXIS(x)      ( 0x160+(x) )
+#define VK_AXIS(x) (0x160 + (x))
 
 // Unique numbers for the joystick buttons - Used to identify buttons in the GTA settings
-#define GTA_KEY_JOY(x)  ( 500+(x) )
+#define GTA_KEY_JOY(x) (500 + (x))

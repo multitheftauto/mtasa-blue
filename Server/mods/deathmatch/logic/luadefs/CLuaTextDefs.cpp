@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CLuaTextDefs.h"
 #include "CScriptArgReader.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaTextDefs::LoadFunctions()
 {
@@ -71,7 +72,7 @@ void CLuaTextDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "destroy", "textDestroyTextItem");
 
     lua_classfunction(luaVM, "getColor", "textItemGetColor");
-    lua_classfunction(luaVM, "getPosition", "textItemGetPosition");
+    lua_classfunction(luaVM, "getPosition", "textItemGetPosition", ArgumentParserWarn<false, OOP_textItemGetPosition>);
     lua_classfunction(luaVM, "getPriority", "textItemGetPriority");
     lua_classfunction(luaVM, "getScale", "textItemGetScale");
     lua_classfunction(luaVM, "getText", "textItemGetText");
@@ -85,7 +86,7 @@ void CLuaTextDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "priority", "textItemSetPriority", "textItemGetPriority");
     lua_classvariable(luaVM, "scale", "textItemSetScale", "textItemGetScale");
     lua_classvariable(luaVM, "text", "textItemSetText", "textItemGetText");
-    lua_classvariable(luaVM, "position", "textItemSetPosition", "textItemGetPosition");
+    lua_classvariable(luaVM, "position", "textItemSetPosition", "textItemGetPosition", textItemSetPosition, ArgumentParserWarn<false, OOP_textItemGetPosition>);
 
     lua_registerclass(luaVM, "TextItem");
 }
@@ -174,14 +175,14 @@ int CLuaTextDefs::textCreateTextItem(lua_State* luaVM)
     {
         unsigned char ucFormat = 0;
         if (strHorzAlign == "center")
-            ucFormat |= 0x00000001;            // DT_CENTER
+            ucFormat |= 0x00000001;  // DT_CENTER
         else if (strHorzAlign == "right")
-            ucFormat |= 0x00000002;            // DT_RIGHT
+            ucFormat |= 0x00000002;  // DT_RIGHT
 
         if (strVertAlign == "center")
-            ucFormat |= 0x00000004;            // DT_VCENTER
+            ucFormat |= 0x00000004;  // DT_VCENTER
         else if (strVertAlign == "bottom")
-            ucFormat |= 0x00000008;            // DT_BOTTOM
+            ucFormat |= 0x00000008;  // DT_BOTTOM
 
         // Grab our virtual machine
         CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
@@ -444,13 +445,13 @@ int CLuaTextDefs::textItemGetScale(lua_State* luaVM)
 
 int CLuaTextDefs::textItemSetPosition(lua_State* luaVM)
 {
+    // Accept Vector2 as well so textItem.position = Vector2(...) works via the OOP property
     CTextItem* pTextItem;
     CVector2D  vecPosition;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pTextItem);
-    argStream.ReadNumber(vecPosition.fX);
-    argStream.ReadNumber(vecPosition.fY);
+    argStream.ReadVector2D(vecPosition);
 
     if (!argStream.HasErrors())
     {
@@ -485,6 +486,17 @@ int CLuaTextDefs::textItemGetPosition(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<CLuaMultiReturn<float, float>, CVector2D> CLuaTextDefs::OOP_textItemGetPosition(lua_State* luaVM, CTextItem* textItem)
+{
+    const CVector2D& vecPosition = textItem->GetPosition();
+
+    // Keep returning two floats when the caller assigns two results
+    if (lua_ncallresult(luaVM) == 2)
+        return CLuaMultiReturn<float, float>(vecPosition.fX, vecPosition.fY);
+
+    return vecPosition;
 }
 
 int CLuaTextDefs::textItemSetColor(lua_State* luaVM)

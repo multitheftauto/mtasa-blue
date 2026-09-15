@@ -15,6 +15,7 @@
 #include "CWaterManager.h"
 #include "CPlayerManager.h"
 #include "CMarkerManager.h"
+#include "CBuildingManager.h"
 #include "CWater.h"
 #include "CMarker.h"
 #include "CBlip.h"
@@ -104,7 +105,7 @@ CElement* CMapManager::LoadMapData(CResource& Loader, CElement& Parent, CXMLNode
         return pLoadedRoot;
     }
 
-    // If unsuccessfull, destroy the new elements. Remember removing it from our element group.
+    // If unsuccessful, destroy the new elements. Remember removing it from our element group.
     CElementGroup*                    pElementGroup = Loader.GetElementGroup();
     vector<CElement*>::const_iterator iter = ElementsAdded.begin();
     for (; iter != ElementsAdded.end(); iter++)
@@ -280,6 +281,17 @@ void CMapManager::SendMapInformation(CPlayer& Player)
 
     marker.Set("Water");
 
+    // Add the buildings to the packet
+    CBuildingManager*                     pBuildingManager = g_pGame->GetBuildingManager();
+    CFastList<CBuilding*>::const_iterator iterBuilding = pBuildingManager->IterBegin();
+    for (; iterBuilding != pBuildingManager->IterEnd(); iterBuilding++)
+    {
+        CBuilding* pBuilding = *iterBuilding;
+        EntityPacket.Add(pBuilding);
+    }
+
+    marker.Set("Building");
+
     // Send it
     Player.Send(EntityPacket);
 
@@ -372,8 +384,8 @@ void CMapManager::BroadcastResourceElements(CElement* pResourceElement, CElement
     CEntityAddPacket Packet;
     Packet.Add(pResourceElement);
 
-    std::set<CElement*>            doneElements;              // Lookup map of elements already processed
-    std::vector<CPerPlayerEntity*> pPerPlayerList;            // A list of per player elements we will process the last
+    std::set<CElement*>            doneElements;    // Lookup map of elements already processed
+    std::vector<CPerPlayerEntity*> pPerPlayerList;  // A list of per player elements we will process the last
 
     if (pResourceElement->CountChildren() > 0)
         BroadcastElementChildren(pResourceElement, Packet, pPerPlayerList, doneElements);
@@ -524,11 +536,11 @@ void CMapManager::OnPlayerJoin(CPlayer& Player)
     // Send the packet to the given player
     Player.Send(CMapInfoPacket(ucCurrentWeather, ucWeatherBlendingTo, ucBlendedWeatherHour, ucClockHour, ucClockMin, ulMinuteDuration, bNametagsEnabled,
                                bRadarEnabled, fGravity, fGameSpeed, fWaveHeight, worldWaterLevelInfo, bHasSkyGradient, garageStates, ucTopRed, ucTopGreen,
-                               ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue, bHasHeatHaze, heatHazeSettings, fps, bCloudsEnabled,
-                               fJetpackMaxHeight, bOverrideWaterColor, ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha, bInteriorSoundsEnabled,
-                               bOverrideRainLevel, fRainLevel, bOverrideSunSize, fSunSize, bOverrideSunColor, ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG,
-                               ucCoronaB, bOverrideWindVelocity, fWindVelX, fWindVelY, fWindVelZ, bOverrideFarClipDistance, fFarClip, bOverrideFogDistance,
-                               fFogDistance, fAircraftMaxHeight, fAircraftMaxVelocity, bOverrideMoonSize, iMoonSize));
+                               ucTopBlue, ucBottomRed, ucBottomGreen, ucBottomBlue, bHasHeatHaze, heatHazeSettings, fps, bCloudsEnabled, fJetpackMaxHeight,
+                               bOverrideWaterColor, ucWaterRed, ucWaterGreen, ucWaterBlue, ucWaterAlpha, bInteriorSoundsEnabled, bOverrideRainLevel, fRainLevel,
+                               bOverrideSunSize, fSunSize, bOverrideSunColor, ucCoreR, ucCoreG, ucCoreB, ucCoronaR, ucCoronaG, ucCoronaB, bOverrideWindVelocity,
+                               fWindVelX, fWindVelY, fWindVelZ, bOverrideFarClipDistance, fFarClip, bOverrideFogDistance, fFogDistance, fAircraftMaxHeight,
+                               fAircraftMaxVelocity, bOverrideMoonSize, iMoonSize));
 
     marker.Set("SendMapInfoPacket");
 
@@ -714,7 +726,7 @@ void CMapManager::SetUpVisibleToReferences(CElement* pElement)
 
 void CMapManager::ProcessVisibleToData(CPerPlayerEntity& Entity)
 {
-    // Grab the visibleTo custom data and parse it to add the neccessary references
+    // Grab the visibleTo custom data and parse it to add the necessary references
     char szBuffer[256];
     szBuffer[255] = 0;
     if (Entity.GetCustomDataString("visibleTo", szBuffer, 256, true))

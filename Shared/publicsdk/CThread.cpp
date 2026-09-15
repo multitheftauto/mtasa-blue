@@ -22,7 +22,7 @@ CThread::CThread()
 {
     m_pThreadData = NULL;
     m_pArg = NULL;
-#ifdef WIN32    // Win32 threads
+#ifdef WIN32  // Win32 threads
     m_hThread = NULL;
 #endif
 }
@@ -34,22 +34,22 @@ CThread::~CThread()
 
 bool CThread::Start(CThreadData* pData)
 {
-    if (pData == NULL)            // pData HAS to be valid
+    if (pData == NULL)  // pData HAS to be valid
         return false;
 
     Stop();
     Arg(pData);
 
-    #ifdef WIN32    // Win32 threads
+#ifdef WIN32  // Win32 threads
     m_hThread = CreateThread(NULL, 0, &CThread::EntryPoint, this, 0, NULL);
     return m_hThread != NULL;
-    #else           // POSIX threads
+#else  // POSIX threads
     if (pthread_create(&m_hThread, NULL, CThread::EntryPoint, this))
     {
         // something bad happened
         return false;
     }
-    #endif
+#endif
     return true;
 }
 
@@ -65,32 +65,32 @@ void CThread::Stop()
 
 bool CThread::TryLock(ThreadMutex* Mutex)
 {
-    #ifdef WIN32
+#ifdef WIN32
     if (TryEnterCriticalSection(Mutex) != 0)
         return true;
-    #else
+#else
     if (pthread_mutex_trylock(Mutex) == 0)
         return true;
-    #endif
+#endif
     return false;
 }
 
 void CThread::Lock(ThreadMutex* Mutex)
 {
-    #ifdef WIN32    // Win32 threads
+#ifdef WIN32  // Win32 threads
     EnterCriticalSection(Mutex);
-    #else           // POSIX threads
+#else  // POSIX threads
     pthread_mutex_lock(Mutex);
-    #endif
+#endif
 }
 
 void CThread::Unlock(ThreadMutex* Mutex)
 {
-    #ifdef WIN32    // Win32 threads
+#ifdef WIN32  // Win32 threads
     LeaveCriticalSection(Mutex);
-    #else           // POSIX threads
+#else  // POSIX threads
     pthread_mutex_unlock(Mutex);
-    #endif
+#endif
 }
 
 int CThread::Run(CThreadData* arg)
@@ -98,13 +98,13 @@ int CThread::Run(CThreadData* arg)
     return Execute(arg);
 }
 
-#ifdef WIN32    // Win32 threads
+#ifdef WIN32  // Win32 threads
 DWORD CThread::EntryPoint(void* pThis)
 {
     CThread* pt = (CThread*)pThis;
     return pt->Run(pt->Arg());
 }
-#else           // POSIX threads
+#else  // POSIX threads
 void* CThread::EntryPoint(void* pThis)
 {
     CThread* pt = (CThread*)pThis;

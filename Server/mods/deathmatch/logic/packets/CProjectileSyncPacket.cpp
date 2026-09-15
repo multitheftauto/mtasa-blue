@@ -44,10 +44,10 @@ bool CProjectileSyncPacket::Read(NetBitStreamInterface& BitStream)
 
     switch (m_ucWeaponType)
     {
-        case 16:            // WEAPONTYPE_GRENADE
-        case 17:            // WEAPONTYPE_TEARGAS
-        case 18:            // WEAPONTYPE_MOLOTOV
-        case 39:            // WEAPONTYPE_REMOTE_SATCHEL_CHARGE
+        case 16:  // WEAPONTYPE_GRENADE
+        case 17:  // WEAPONTYPE_TEARGAS
+        case 18:  // WEAPONTYPE_MOLOTOV
+        case 39:  // WEAPONTYPE_REMOTE_SATCHEL_CHARGE
         {
             SFloatSync<7, 17> projectileForce;
             if (!BitStream.Read(&projectileForce))
@@ -61,8 +61,8 @@ bool CProjectileSyncPacket::Read(NetBitStreamInterface& BitStream)
 
             break;
         }
-        case 19:            // WEAPONTYPE_ROCKET
-        case 20:            // WEAPONTYPE_ROCKET_HS
+        case 19:  // WEAPONTYPE_ROCKET
+        case 20:  // WEAPONTYPE_ROCKET_HS
         {
             if (!BitStream.ReadBit(m_bHasTarget))
                 return false;
@@ -83,8 +83,8 @@ bool CProjectileSyncPacket::Read(NetBitStreamInterface& BitStream)
 
             break;
         }
-        case 58:            // WEAPONTYPE_FLARE
-        case 21:            // WEAPONTYPE_FREEFALL_BOMB
+        case 58:  // WEAPONTYPE_FLARE
+        case 21:  // WEAPONTYPE_FREEFALL_BOMB
             break;
 
         default:
@@ -101,8 +101,8 @@ bool CProjectileSyncPacket::Write(NetBitStreamInterface& BitStream) const
         BitStream.WriteBit(true);
         BitStream.Write(m_pSourceElement->GetID());
 
-        unsigned int uiLatency = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
-        auto         usLatency = static_cast<unsigned short>(uiLatency);
+        const unsigned int   uiPing = static_cast<CPlayer*>(m_pSourceElement)->GetPing();
+        const unsigned short usLatency = uiPing <= 0xFFFF ? static_cast<unsigned short>(uiPing) : 0xFFFF;
         BitStream.WriteCompressed(usLatency);
     }
     else
@@ -128,10 +128,10 @@ bool CProjectileSyncPacket::Write(NetBitStreamInterface& BitStream) const
 
     switch (m_ucWeaponType)
     {
-        case 16:            // WEAPONTYPE_GRENADE
-        case 17:            // WEAPONTYPE_TEARGAS
-        case 18:            // WEAPONTYPE_MOLOTOV
-        case 39:            // WEAPONTYPE_REMOTE_SATCHEL_CHARGE
+        case 16:  // WEAPONTYPE_GRENADE
+        case 17:  // WEAPONTYPE_TEARGAS
+        case 18:  // WEAPONTYPE_MOLOTOV
+        case 39:  // WEAPONTYPE_REMOTE_SATCHEL_CHARGE
         {
             SFloatSync<7, 17> projectileForce;
             projectileForce.data.fValue = m_fForce;
@@ -143,8 +143,8 @@ bool CProjectileSyncPacket::Write(NetBitStreamInterface& BitStream) const
 
             break;
         }
-        case 19:            // WEAPONTYPE_ROCKET
-        case 20:            // WEAPONTYPE_ROCKET_HS
+        case 19:  // WEAPONTYPE_ROCKET
+        case 20:  // WEAPONTYPE_ROCKET_HS
         {
             if (m_TargetID != INVALID_ELEMENT_ID)
             {
@@ -164,7 +164,7 @@ bool CProjectileSyncPacket::Write(NetBitStreamInterface& BitStream) const
 
             break;
         }
-        case 58:            // WEAPONTYPE_FLARE
+        case 58:  // WEAPONTYPE_FLARE
             break;
     }
 

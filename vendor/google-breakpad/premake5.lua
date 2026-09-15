@@ -2,6 +2,7 @@ project "breakpad"
 	language "C++"
 	kind "StaticLib"
 	targetname "breakpad"
+	warnings "Off"
 
 	includedirs { "src", "src/third_party/glog/src" }
 	vpaths {

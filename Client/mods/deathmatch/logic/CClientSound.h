@@ -89,7 +89,7 @@ public:
     bool SetFxEffectParameters(uint uiFxEffect, void* params);
     bool GetFxEffectParameters(uint uiFxEffect, void* params);
 
-    void Unlink(){};
+    void Unlink() {};
 
     bool IsSoundStopped() { return m_pAudio == NULL; }
     bool IsFinished();

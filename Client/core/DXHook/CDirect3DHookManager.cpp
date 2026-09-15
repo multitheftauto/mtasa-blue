@@ -3,7 +3,7 @@
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
  *  FILE:        Client/core/DXHook/CDirect3DHookManager.cpp
- *  PURPOSE:     Direct3D version independant hook manager
+ *  PURPOSE:     Direct3D version independent hook manager
  *
  *  Multi Theft Auto is available from https://multitheftauto.com/
  *

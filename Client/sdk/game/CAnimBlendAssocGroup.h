@@ -387,9 +387,9 @@ enum class eAnimID : int
     ANIM_ID_BIKE_DRIVEBYRHS = 203,
     ANIM_ID_BIKE_DRIVEBYFT = 204,
     ANIM_ID_BIKE_PASSENGER = 205,
-    ANIM_ID_BIKE_BUNNYHOP = 206,            // bicycle anim
-    ANIM_ID_BIKE_PEDAL = 207,               // bicycle anim
-    ANIM_ID_BIKE_SPRINT = 208,              // bicycle anim
+    ANIM_ID_BIKE_BUNNYHOP = 206,  // bicycle anim
+    ANIM_ID_BIKE_PEDAL = 207,     // bicycle anim
+    ANIM_ID_BIKE_SPRINT = 208,    // bicycle anim
     ANIM_ID_FIGHT_1 = 214,
     ANIM_ID_FIGHT_2 = 215,
     ANIM_ID_FIGHT_3 = 216,

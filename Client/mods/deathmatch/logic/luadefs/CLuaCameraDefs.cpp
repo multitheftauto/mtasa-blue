@@ -481,7 +481,7 @@ bool CLuaCameraDefs::SetCameraDrunkLevel(short drunkLevel)
         throw std::invalid_argument("Invalid range (0-255)");
 
     CPlayerInfo* pPlayerInfo = g_pGame->GetPlayerInfo();
-    pPlayerInfo->SetCamDrunkLevel(static_cast<byte>(drunkLevel));
+    pPlayerInfo->SetCamDrunkLevel(static_cast<unsigned char>(drunkLevel));
 
     return true;
 }
@@ -560,7 +560,7 @@ bool CLuaCameraDefs::ShakeCamera(float radius, std::optional<float> x, std::opti
     if (!x || !y || !z)
     {
         const auto* player = CStaticFunctionDefinitions::GetLocalPlayer();
-        CVector out;
+        CVector     out;
         player->GetPosition(out);
         x = out.fX;
         y = out.fY;

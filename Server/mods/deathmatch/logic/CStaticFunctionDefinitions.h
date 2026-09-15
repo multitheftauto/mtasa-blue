@@ -194,8 +194,13 @@ public:
 
     // Ped set funcs
     static bool SetPedArmor(CElement* pElement, float armor);
+    // pSkipBroadcastPlayer: optional player excluded from the CPlayerWastedPacket / CPedWastedPacket broadcast.
+    // Used by SetElementHealth(player, 0) so the dying player is killed server-side and other clients are
+    // notified, but the originating client is NOT pushed into a forced TaskComplexDie via the wasted packet.
+    // That keeps GTA's natural death path on the originator, which is required for instant-respawn flows
+    // (e.g. race maps with respawntime=0) to cancel cleanly. See PR #4486 / regression on race instant respawn.
     static bool KillPed(CElement* pElement, CElement* pKiller = NULL, unsigned char ucKillerWeapon = 0xFF, unsigned char ucBodyPart = 0xFF,
-                        bool bStealth = false);
+                        bool bStealth = false, CPlayer* pSkipBroadcastPlayer = nullptr);
     static bool SetPedRotation(CElement* pElement, float fRotation, bool bNewWay);
     static bool SetPedStat(CElement* pElement, unsigned short usStat, float fValue);
     static bool AddPedClothes(CElement* pElement, const char* szTexture, const char* szModel, unsigned char ucType);
@@ -208,11 +213,11 @@ public:
     static bool SetPedGravity(CElement* pElement, float fGravity);
     static bool SetPedChoking(CElement* pElement, bool bChoking);
     static bool SetPedWeaponSlot(CElement* pElement, unsigned char ucWeaponSlot);
-    static bool WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat = 0);
+    static bool WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehicle, unsigned int uiSeat = 0, CResource* pCallingResource = nullptr);
     static bool RemovePedFromVehicle(CElement* pElement);
     static bool SetPedDoingGangDriveby(CElement* pElement, bool bGangDriveby);
     static bool SetPedAnimation(CElement* pElement, const SString& blockName, const SString& animName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
-                                bool bInterruptable, bool bFreezeLastFrame, bool bTaskToBeRestoredOnAnimEnd);
+                                bool bInterruptible, bool bFreezeLastFrame, bool bTaskToBeRestoredOnAnimEnd);
     static bool SetPedAnimationProgress(CElement* pElement, const SString& animName, float fProgress);
     static bool SetPedAnimationSpeed(CElement* pElement, const SString& animName, float fSpeed);
     static bool SetPedOnFire(CElement* pElement, bool bIsOnFire);
@@ -243,7 +248,7 @@ public:
     // Vehicle create/destroy functions
     static CVehicle* CreateVehicle(CResource* pResource, unsigned short usModel, const CVector& vecPosition, const CVector& vecRotation, const char* szRegPlate,
                                    unsigned char ucVariant, unsigned char ucVariant2, bool bSynced);
-    static bool SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::uint8_t nodeIndex, std::uint8_t collisionType, std::int32_t removalTime = -1);
+    static bool      SpawnVehicleFlyingComponent(CVehicle* const vehicle, std::uint8_t nodeIndex, std::uint8_t collisionType, std::int32_t removalTime = -1);
 
     // Vehicle get functions
     static bool  GetVehicleVariant(CVehicle* pVehicle, unsigned char& ucVariant, unsigned char& ucVariant2);
@@ -314,7 +319,8 @@ public:
     static bool SetVehicleDoorState(CElement* pElement, unsigned char ucDoor, unsigned char ucState, bool spawnFlyingComponent);
     static bool SetVehicleWheelStates(CElement* pElement, int iFrontLeft, int iRearLeft = -1, int iFrontRight = -1, int iRearRight = -1);
     static bool SetVehicleLightState(CElement* pElement, unsigned char ucLight, unsigned char ucState);
-    static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState, bool spawnFlyingComponent = true, bool breakGlass = false);
+    static bool SetVehiclePanelState(CElement* pElement, unsigned char ucPanel, unsigned char ucState, bool spawnFlyingComponent = true,
+                                     bool breakGlass = false);
     static bool SetVehicleIdleRespawnDelay(CElement* pElement, unsigned long ulTime);
     static bool SetVehicleRespawnDelay(CElement* pElement, unsigned long ulTime);
     static bool GetVehicleRespawnPosition(CElement* pElement, CVector& vecPosition);
@@ -371,7 +377,8 @@ public:
     static bool RemoveVehicleSirens(CVehicle* pVehicle);
 
     // Marker create/destroy functions
-    static CMarker* CreateMarker(CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo, bool ignoreAlphaLimits);
+    static CMarker* CreateMarker(CResource* pResource, const CVector& vecPosition, const char* szType, float fSize, const SColor color, CElement* pVisibleTo,
+                                 bool ignoreAlphaLimits);
 
     // Marker get functions
     static bool GetMarkerCount(unsigned int& uiCount);

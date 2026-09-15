@@ -27,21 +27,21 @@ namespace WerCrash
 
     struct MinidumpRegisters
     {
-        bool valid = false;
-        DWORD eax = 0, ebx = 0, ecx = 0, edx = 0;
-        DWORD esi = 0, edi = 0, ebp = 0, esp = 0, eip = 0;
-        DWORD eflags = 0;
-        WORD cs = 0, ds = 0, es = 0, fs = 0, gs = 0, ss = 0;
-        DWORD exceptionCode = 0;
+        bool    valid = false;
+        DWORD   eax = 0, ebx = 0, ecx = 0, edx = 0;
+        DWORD   esi = 0, edi = 0, ebp = 0, esp = 0, eip = 0;
+        DWORD   eflags = 0;
+        WORD    cs = 0, ds = 0, es = 0, fs = 0, gs = 0, ss = 0;
+        DWORD   exceptionCode = 0;
         DWORD64 exceptionAddress = 0;
     };
 
     struct WerDumpResult
     {
-        SString path;
-        SString sourceFilename;
+        SString           path;
+        SString           sourceFilename;
         MinidumpRegisters regs;
-        SString stackTrace;
+        SString           stackTrace;
     };
 
     struct ModuleEntry
@@ -65,17 +65,15 @@ namespace WerCrash
     };
 
     [[nodiscard]] MinidumpRegisters ExtractRegistersFromMinidump(const SString& dumpPath);
-    [[nodiscard]] SString ExtractStackTraceFromMinidump(const SString& dumpPath, const MinidumpRegisters& regs);
+    [[nodiscard]] SString           ExtractStackTraceFromMinidump(const SString& dumpPath, const MinidumpRegisters& regs);
 
-    void AppendWerInfoToDump(const SString& dumpPath, const SString& moduleName, DWORD offset, DWORD exceptionCode,
-                            const MinidumpRegisters& regs);
+    void AppendWerInfoToDump(const SString& dumpPath, const SString& moduleName, DWORD offset, DWORD exceptionCode, const MinidumpRegisters& regs);
 
-    [[nodiscard]] SString RenameWerDumpToMtaFormat(const SString& sourcePath, const SString& dumpDir,
-                                                  const SString& moduleName, DWORD offset, DWORD exceptionCode,
-                                                  const MinidumpRegisters& regs);
+    [[nodiscard]] SString RenameWerDumpToMtaFormat(const SString& sourcePath, const SString& dumpDir, const SString& moduleName, DWORD offset,
+                                                   DWORD exceptionCode, const MinidumpRegisters& regs);
 
-    [[nodiscard]] WerDumpResult FindAndRenameWerDump(const SString& dumpDir, const SString& moduleName, DWORD offset,
-                                                     DWORD exceptionCode, const std::optional<FileTimeDuration>& processCreationTime);
+    [[nodiscard]] WerDumpResult FindAndRenameWerDump(const SString& dumpDir, const SString& moduleName, DWORD offset, DWORD exceptionCode,
+                                                     const std::optional<FileTimeDuration>& processCreationTime);
 
     [[nodiscard]] bool IsFileRecentEnough(HANDLE hFile, std::uint64_t maxAgeMinutes = 15) noexcept;
 

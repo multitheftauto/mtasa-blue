@@ -38,14 +38,14 @@ class CGUI;
 #include "CGUITypes.h"
 
 // Path defines for CGUI
-#define CGUI_ICON_MESSAGEBOX_INFO       "cgui\\images\\info.png"
-#define CGUI_ICON_MESSAGEBOX_QUESTION   "cgui\\images\\question.png"
-#define CGUI_ICON_MESSAGEBOX_WARNING    "cgui\\images\\warning.png"
-#define CGUI_ICON_MESSAGEBOX_ERROR      "cgui\\images\\error.png"
-#define CGUI_ICON_SERVER_PASSWORD       "cgui\\images\\locked.png"
-#define CGUI_GetMaxTextExtent(...) GetMaxTextExtent(__VA_ARGS__, SString())
+#define CGUI_ICON_MESSAGEBOX_INFO     "cgui\\images\\info.png"
+#define CGUI_ICON_MESSAGEBOX_QUESTION "cgui\\images\\question.png"
+#define CGUI_ICON_MESSAGEBOX_WARNING  "cgui\\images\\warning.png"
+#define CGUI_ICON_MESSAGEBOX_ERROR    "cgui\\images\\error.png"
+#define CGUI_ICON_SERVER_PASSWORD     "cgui\\images\\locked.png"
+#define CGUI_GetMaxTextExtent(...)    GetMaxTextExtent(__VA_ARGS__, SString())
 
-#define CHECK_CHANNEL(channel) assert ( (channel) >= 0 && (channel) < INPUT_CHANNEL_COUNT )
+#define CHECK_CHANNEL(channel) assert((channel) >= 0 && (channel) < INPUT_CHANNEL_COUNT)
 
 class CGUI
 {
@@ -171,5 +171,11 @@ public:
     virtual CGUIWindow* LoadLayout(CGUIElement* pParent, const SString& strFilename) = 0;
     virtual bool        LoadImageset(const SString& strFilename) = 0;
 
-    virtual void Cleanup() = 0;
+    virtual void         Cleanup() = 0;
+    virtual CGUIElement* GetScriptRoot() = 0;
+
+    // Lets core know CC54 is open, and lets core report CC51 back to CEGUI. Both
+    // dialogs pump messages, so the other layer skips rebuilds and wont stack its own.
+    virtual void SetFatalFaultDialogOpen(bool bOpen) = 0;
+    virtual bool IsFatalFaultDialogOpen() const = 0;
 };

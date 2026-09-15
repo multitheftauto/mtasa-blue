@@ -1,13 +1,14 @@
 project "Lua_Server"
 	language "C++"
 	targetname "lua5.1"
+	warnings "Off"
 
-	vpaths { 
+	vpaths {
 		["Headers"] = "**.h",
 		["Sources"] = "**.c",
 		["*"] = "premake5.lua"
 	}
-	
+
 	files {
 		"premake5.lua",
 		"src/**.c",
@@ -40,23 +41,23 @@ if os.target() == "windows" then
 		targetname "lua5.1c"
 		targetdir(buildpath("mods/deathmatch"))
 
-		vpaths { 
+		vpaths {
 			["Headers"] = "**.h",
 			["Sources"] = "**.c",
 			["*"] = "premake5.lua"
 		}
-	
+
 		files {
 			"premake5.lua",
 			"src/**.c",
 			"src/**.h",
 		}
-	
+
 		defines {
 			"LUA_USE_APICHECK",
 			"LUA_BUILD_AS_DLL"
 		}
 
         filter "platforms:not x86"
-            flags { "ExcludeFromBuild" } 
+            flags { "ExcludeFromBuild" }
 end
