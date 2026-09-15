@@ -14,6 +14,35 @@
 static bool    s_bChecksumBatchActive = false;
 static int64_t s_checksumBatchAccumMs = 0;
 
+static bool IsEmptyFileChecksum(const CChecksum& checksum)
+{
+    static const CChecksum emptyFileChecksum = CChecksum::GenerateChecksumFromBuffer("", 0);
+    return checksum == emptyFileChecksum;
+}
+
+// A download that is still writing the file makes it read as zero bytes, whose checksum is a valid
+// but meaningless value. Retry briefly so a race is not reported to the player as a file mismatch.
+// A file that does not exist yet checksums to CChecksum() instead, so it never enters this path.
+static CChecksum GenerateChecksumWithEmptyFileRetry(const SString& strFilename, uint uiExpectedSize)
+{
+    constexpr int MAX_ATTEMPTS = 5;
+    constexpr int RETRY_DELAY_MS = 20;
+
+    CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strFilename);
+
+    if (uiExpectedSize == 0)
+        return checksum;
+
+    for (int attempt = 1; attempt < MAX_ATTEMPTS && IsEmptyFileChecksum(checksum); ++attempt)
+    {
+        Sleep(RETRY_DELAY_MS);
+        CChecksum::InvalidateChecksumCacheEntry(strFilename);
+        checksum = CChecksum::GenerateChecksumFromFileUnsafe(strFilename);
+    }
+
+    return checksum;
+}
+
 void CDownloadableResource::BeginChecksumBatch()
 {
     if (!s_bChecksumBatchActive)
@@ -72,7 +101,7 @@ CChecksum CDownloadableResource::GenerateClientChecksum()
     }
 
     long long startMs = GetTickCount64_();
-    m_LastClientChecksum = CChecksum::GenerateChecksumFromFileUnsafe(m_strName);
+    m_LastClientChecksum = GenerateChecksumWithEmptyFileRetry(m_strName, m_uiDownloadSize);
     m_bClientChecksumVerified = true;
 
     if (s_bChecksumBatchActive)
