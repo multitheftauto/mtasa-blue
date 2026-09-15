@@ -18,18 +18,19 @@ class CDirect3DEvents9
 public:
     static void    OnDirect3DDeviceCreate(IDirect3DDevice9* pDevice);
     static void    OnDirect3DDeviceDestroy(IDirect3DDevice9* pDevice);
-    static void    OnPresent(IDirect3DDevice9* pDevice);
+    static void    OnPresent(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice);
     static void    OnBeginScene(IDirect3DDevice9* pDevice);
     static bool    OnEndScene(IDirect3DDevice9* pDevice);
     static void    OnInvalidate(IDirect3DDevice9* pDevice);
     static void    OnRestore(IDirect3DDevice9* pDevice);
-    static HRESULT OnDrawPrimitive(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex, UINT PrimitiveCount);
-    static HRESULT DrawPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex, UINT PrimitiveCount,
-                                       CShaderItem* pShaderItem, bool bIsLayer);
-    static HRESULT OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex, UINT NumVertices,
-                                          UINT startIndex, UINT primCount);
-    static HRESULT DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex,
-                                              UINT NumVertices, UINT startIndex, UINT primCount, CShaderItem* pShaderItem, bool bIsLayer,
+    static HRESULT OnDrawPrimitive(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex,
+                                   UINT PrimitiveCount);
+    static HRESULT DrawPrimitiveShader(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex,
+                                       UINT PrimitiveCount, CShaderItem* pShaderItem, bool bIsLayer);
+    static HRESULT OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex,
+                                          UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount);
+    static HRESULT DrawIndexedPrimitiveShader(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice, D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex,
+                                              UINT MinVertexIndex, UINT NumVertices, UINT startIndex, UINT primCount, CShaderItem* pShaderItem, bool bIsLayer,
                                               bool bCanBecomeActiveShader);
     static HRESULT DrawPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, UINT StartVertex, UINT PrimitiveCount);
     static HRESULT DrawIndexedPrimitiveGuarded(IDirect3DDevice9* pDevice, D3DPRIMITIVETYPE PrimitiveType, INT BaseVertexIndex, UINT MinVertexIndex,
@@ -78,7 +79,7 @@ public:
     static HRESULT SetVertexDeclaration(IDirect3DDevice9* pDevice, IDirect3DVertexDeclaration9* pDecl);
     static void    CheckForScreenShot();
     static ERenderFormat DiscoverReadableDepthFormat(IDirect3DDevice9* pDevice, D3DMULTISAMPLE_TYPE multisampleType, bool bWindowed);
-    static void          CloseActiveShader(bool bDeviceOperational = true);
+    static void          CloseActiveShader(bool bDeviceOperational = true, IDirect3DDevice9* pStateDevice = nullptr);
 
     static IDirect3DVertexBuffer9* GetRealVertexBuffer(IDirect3DVertexBuffer9* pVertexBuffer);
     static IDirect3DIndexBuffer9*  GetRealIndexBuffer(IDirect3DIndexBuffer9* pIndexBuffer);

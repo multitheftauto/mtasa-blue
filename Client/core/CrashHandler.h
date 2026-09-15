@@ -44,14 +44,8 @@ constexpr DWORD CPP_EXCEPTION_CODE = 0xE06D7363;
 constexpr DWORD STATUS_INVALID_CRUNTIME_PARAMETER_CODE = 0xC0000417;
 constexpr DWORD STATUS_STACK_BUFFER_OVERRUN_CODE = 0xC0000409;
 constexpr DWORD STATUS_HEAP_CORRUPTION_CODE = 0xC0000374;
-// STATUS_FATAL_USER_CALLBACK_EXCEPTION (0xC000041D):
-// This exception type occurs when an exception happens inside a Windows system callback
-// (e.g., window procedures, DLL callbacks, kernel-to-user transitions) and cannot be
-// properly unwound. Special handling is required as:
-// - The stack may be corrupted or incomplete
-// - Context may not have full information
-// - Stack walking may fail or cause secondary exceptions
-// - Module resolution may point to trampolines instead of actual code
+// STATUS_FATAL_USER_CALLBACK_EXCEPTION (0xC000041D) can occur in Windows callback
+// transitions with unreliable unwind/context data, so crash handling treats it as fatal.
 constexpr DWORD STATUS_FATAL_USER_CALLBACK_EXCEPTION = 0xC000041D;
 constexpr DWORD CUSTOM_EXCEPTION_CODE_WATCHDOG_TIMEOUT = 0xE0000001;
 
@@ -63,23 +57,6 @@ constexpr int EXIT_CODE_CRASH = 3;
 
 constexpr std::size_t DEBUG_BUFFER_SIZE_LARGE = 512;
 
-constexpr DWORD EXCEPTION_BREAKPOINT_NONFATAL = 0x80000003;
-constexpr DWORD EXCEPTION_SINGLE_STEP_NONFATAL = 0x80000004;
-constexpr DWORD EXCEPTION_GUARD_PAGE_NONFATAL = 0x80000001;
-constexpr DWORD EXCEPTION_INVALID_HANDLE_NONFATAL = 0xC0000008;
-constexpr DWORD EXCEPTION_ARRAY_BOUNDS_EXCEEDED_NONFATAL = 0xC000008C;
-constexpr DWORD EXCEPTION_FLT_DENORMAL_OPERAND_NONFATAL = 0xC000008D;
-constexpr DWORD EXCEPTION_FLT_DIVIDE_BY_ZERO_NONFATAL = 0xC000008E;
-constexpr DWORD EXCEPTION_FLT_INEXACT_RESULT_NONFATAL = 0xC000008F;
-constexpr DWORD EXCEPTION_FLT_INVALID_OPERATION_NONFATAL = 0xC0000090;
-constexpr DWORD EXCEPTION_FLT_OVERFLOW_NONFATAL = 0xC0000091;
-constexpr DWORD EXCEPTION_FLT_STACK_CHECK_NONFATAL = 0xC0000092;
-constexpr DWORD EXCEPTION_FLT_UNDERFLOW_NONFATAL = 0xC0000093;
-constexpr DWORD EXCEPTION_INT_DIVIDE_BY_ZERO_NONFATAL = 0xC0000094;
-constexpr DWORD EXCEPTION_INT_OVERFLOW_NONFATAL = 0xC0000095;
-constexpr DWORD EXCEPTION_PRIV_INSTRUCTION_NONFATAL = 0xC0000096;
-constexpr DWORD EXCEPTION_NONCONTINUABLE_EXCEPTION_NONFATAL = 0xC0000025;
-
 inline constexpr std::string_view DEBUG_PREFIX_CRASH = "CrashHandler: ";
 inline constexpr std::string_view DEBUG_PREFIX_SEH = "SEH: ";
 inline constexpr std::string_view DEBUG_PREFIX_CPP = "C++ TERMINATE: ";
@@ -89,17 +66,22 @@ inline constexpr std::string_view DEBUG_PREFIX_EXCEPTION_INFO = "ExceptionInfo: 
 inline constexpr std::string_view DEBUG_PREFIX_WATCHDOG = "WATCHDOG: ";
 inline constexpr std::string_view DEBUG_SEPARATOR = "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!\n";
 // Helpers implemented in CrashHandler.cpp to avoid __try in inline functions
-void OutputDebugStringSafeImpl(const char* message);
-void SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args);
-void SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args);
+void                     OutputDebugStringSafeImpl(const char* message);
+void                     SafeDebugPrintImpl(char* buffer, std::size_t bufferSize, const char* format, va_list args);
+void                     SafeDebugPrintPrefixedImpl(const char* prefix, std::size_t prefixLen, const char* format, va_list args);
+extern thread_local bool g_bCrashHandlerStackOverflow;
 
 // Helper to safely call OutputDebugStringA with SEH guards
 inline void OutputDebugStringSafe(const char* message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     OutputDebugStringSafeImpl(message);
 }
 inline void SafeDebugOutput(std::string_view message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     const char* data = message.data();
     std::size_t remaining = message.size();
 
@@ -125,12 +107,16 @@ inline void SafeDebugOutput(std::string_view message)
 // Overload for C-string literals (backward compatibility)
 inline void SafeDebugOutput(const char* message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     OutputDebugStringSafeImpl(message);
 }
 
 // Overload for std::string (for string_view concatenation)
 inline void SafeDebugOutput(const std::string& message)
 {
+    if (g_bCrashHandlerStackOverflow)
+        return;
     if (!message.empty())
     {
         OutputDebugStringSafeImpl(message.c_str());
@@ -269,4 +255,5 @@ extern "C"
 namespace CrashHandler
 {
     [[nodiscard]] bool ProcessHasLocalDebugSymbols();
+    [[nodiscard]] bool InitializeSymbolHandler();
 }

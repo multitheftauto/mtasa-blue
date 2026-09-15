@@ -9,8 +9,8 @@ local CEF_URL_PREFIX = "https://cef-builds.spotifycdn.com/cef_binary_"
 local CEF_URL_SUFFIX = "_windows32_minimal.tar.bz2"
 
 -- Change here to update CEF version
-local CEF_VERSION = "143.0.14+gdd46a37+chromium-143.0.7499.193"
-local CEF_HASH = "b1a4e9649dc8aefedbf1aa5797376b1fe12ef29d14c7f722a3a58fa95150a496"
+local CEF_VERSION = "152.0.5+gb129680+chromium-152.0.7977.54"
+local CEF_HASH = "ad0a3de19a23791cdbeb7eea11ad3af4e2216ea818f047d24c9114c721661c2f"
 
 -- Stuck in the past for maetro
 if os.getenv("MTA_MAETRO") == "true" then

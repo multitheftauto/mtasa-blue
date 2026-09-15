@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CGameSA.h"
 #include "CPedSA.h"
+#include "CVisibilityPluginsSA.h"
 #include "CPedModelInfoSA.h"
 #include "CPlayerInfoSA.h"
 #include "CStatsSA.h"
@@ -20,10 +21,28 @@
 #include "CProjectileInfoSA.h"
 #include "CWeaponStatManagerSA.h"
 #include "CFireManagerSA.h"
+#include "gamesa_renderware.h"
 
 extern CGameSA* pGame;
 
 static bool g_onlyUpdateRotations = false;
+
+namespace
+{
+    constexpr std::uintptr_t FUNC_CRealTimeShadowManager_ReturnRealTimeShadow = 0x705B30;
+    constexpr std::uintptr_t CLASS_CRealTimeShadowManager = 0xC40350;
+    constexpr std::uintptr_t FUNC_CShadows_StoreShadowForPedObject = 0x707B40;
+    constexpr std::uintptr_t CALL_CPed_PreRenderAfterTest_StoreShadowForPedObject = 0x5E6900;
+
+    void __cdecl StoreShadowForPedObject(CPedSAInterface* ped, float displacementX, float displacementY, float frontX, float frontY, float sideX, float sideY)
+    {
+        if (CVisibilityPluginsSA::GetClumpAlpha(ped->m_pRwObject) == 0)
+            return;
+
+        using StoreShadow = void(__cdecl*)(CPedSAInterface*, float, float, float, float, float, float);
+        reinterpret_cast<StoreShadow>(FUNC_CShadows_StoreShadowForPedObject)(ped, displacementX, displacementY, frontX, frontY, sideX, sideY);
+    }
+}
 
 CPedSA::~CPedSA()
 {
@@ -77,6 +96,20 @@ void CPedSA::SetModelIndex(std::uint32_t modelIndex)
 
     std::uint32_t type = modelInfo->pedType;
     GetPedInterface()->pedSound.m_bIsFemale = type == 5 || type == 22;
+}
+
+void CPedSA::SetVisible(bool visible)
+{
+    CEntitySA::SetVisible(visible);
+
+    CShadowDataSA* shadow = GetPedInterface()->m_pShadowData;
+    if (visible || !shadow)
+        return;
+
+    // Real-time shadows are owned separately from the ped. Return an existing
+    // shadow immediately so an invisible ped cannot leave it fading in-world.
+    using ReturnRealTimeShadow = void(__thiscall*)(void*, CShadowDataSA*);
+    reinterpret_cast<ReturnRealTimeShadow>(FUNC_CRealTimeShadowManager_ReturnRealTimeShadow)(reinterpret_cast<void*>(CLASS_CRealTimeShadowManager), shadow);
 }
 
 bool CPedSA::AddProjectile(eWeaponType weaponType, CVector origin, float force, CVector* target, CEntity* targetEntity)
@@ -212,8 +245,8 @@ void CPedSA::ClearWeapons()
 
 void CPedSA::RemoveWeaponModel(std::uint32_t model)
 {
-    // void __thiscall CPed::RemoveWeaponModel(CPed *this, int modelID)
-    ((void(__thiscall*)(CEntitySAInterface*, std::uint32_t))FUNC_RemoveWeaponModel)(m_pInterface, model);
+    if (auto* pedInterface = GetPedInterface())
+        pedInterface->RemoveWeaponModel(model);
 }
 
 void CPedSA::ClearWeapon(eWeaponType weaponType)
@@ -305,7 +338,10 @@ CVector* CPedSA::GetTransformedBonePosition(eBone bone, CVector* position)
 
     // NOTE(botder): A crash used to occur at 0x7C51A8 in RpHAnimIDGetIndex, because the clump pointer might have been null
     // for a broken model.
-    if (entity->m_pRwObject)
+    // NOTE: A further crash occurs at 0x7C51B9 in RpHAnimIDGetIndex when the clump exists but lacks animation hierarchy data,
+    // because GTA:SA's GetTransformedBonePosition doesn't check if GetAnimHierarchyFromSkinClump returns NULL.
+    RpClump* clump = reinterpret_cast<RpClump*>(entity->m_pRwObject);
+    if (clump && GetAnimHierarchyFromSkinClump(clump))
         // RwV3D *__thiscall CPed::GetTransformedBonePosition(CPed *this, RwV3D *pointsIn, int boneId, char bUpdateBones)
         ((RwV3d * (__thiscall*)(CEntitySAInterface*, CVector*, eBone, bool)) FUNC_GetTransformedBonePosition)(entity, position, bone, true);
 
@@ -594,6 +630,73 @@ void CPedSA::SetInWaterFlags(bool inWater)
     physicalInterface->bSubmergedInWater = inWater;
 }
 
+void __fastcall CPedSA::RemoveWeaponWhenEnteringVehicle(CPedSAInterface* pedInterface, void*, int jetpack)
+{
+    if (!pedInterface)
+        return;
+
+    pedInterface->RemoveWeaponWhenEnteringVehicle(jetpack == 1);
+}
+
+void CPedSAInterface::RemoveWeaponWhenEnteringVehicle(bool jetpack)
+{
+    // Bugfix #3659 (allow switch weapons while using jetpack - see PR #3573)
+    if (!jetpack)
+    {
+        if (auto* playerData = pPlayerData)
+            playerData->m_bInVehicleDontAllowWeaponChange = true;
+    }
+
+    if (savedWeapon != eWeaponType::WEAPONTYPE_UNIDENTIFIED)
+        return;
+
+    eWeaponSlot newSlot = WEAPONSLOT_MAX;
+
+    if (IsPlayer())
+    {
+        auto* playerInfo = pGame->GetPlayerInfo();
+        if (playerInfo && playerInfo->CanDoDriveBy())
+        {
+            const auto& smg = Weapons[WEAPONSLOT_TYPE_SMG];
+            const auto& shotgun = Weapons[WEAPONSLOT_TYPE_SHOTGUN];
+            const auto& pistol = Weapons[WEAPONSLOT_TYPE_HANDGUN];
+
+            const bool hasSMG = (smg.m_eWeaponType == eWeaponType::WEAPONTYPE_MICRO_UZI || smg.m_eWeaponType == eWeaponType::WEAPONTYPE_TEC9 ||
+                                 (jetpack && smg.m_eWeaponType == eWeaponType::WEAPONTYPE_MP5)) &&
+                                smg.m_ammoTotal > 0;
+
+            const bool hasSawnoff = jetpack && shotgun.m_eWeaponType == eWeaponType::WEAPONTYPE_SAWNOFF_SHOTGUN && shotgun.m_ammoTotal > 0;
+
+            const bool hasPistol = jetpack && pistol.m_eWeaponType == eWeaponType::WEAPONTYPE_PISTOL && pistol.m_ammoTotal > 0;
+
+            if (hasSMG)
+            {
+                newSlot = WEAPONSLOT_TYPE_SMG;
+            }
+            else if (hasSawnoff)  // Bugfix - the default here was WEAPONSLOT_TYPE_HANDGUN
+            {
+                newSlot = WEAPONSLOT_TYPE_SHOTGUN;
+            }
+            else if (hasPistol)
+            {
+                newSlot = WEAPONSLOT_TYPE_HANDGUN;
+            }
+        }
+    }
+
+    if (newSlot != WEAPONSLOT_MAX)
+    {
+        savedWeapon = Weapons[bCurrentWeaponSlot].m_eWeaponType;
+        SetCurrentWeapon(newSlot);
+    }
+    else if (!jetpack)  // Bugfix #508 (weapons are invisible when wearing jetpack - see PR #3559)
+    {
+        auto weaponType = Weapons[bCurrentWeaponSlot].m_eWeaponType;
+        auto model = pGame->GetWeaponInfo(weaponType, eWeaponSkill::WEAPONSKILL_STD)->GetModel();
+        RemoveWeaponModel(model);
+    }
+}
+
 ////////////////////////////////////////////////////////////////
 //
 // CPed_PreRenderAfterTest
@@ -682,4 +785,13 @@ void CPedSA::StaticSetHooks()
 {
     EZHookInstall(CPed_PreRenderAfterTest);
     EZHookInstall(CPed_PreRenderAfterTest_Mid);
+
+    // GTA's player-specific blob-shadow path assumes that the local player is
+    // always opaque. Do not enqueue it when MTA has made the clump invisible.
+    HookInstallCall(CALL_CPed_PreRenderAfterTest_StoreShadowForPedObject, reinterpret_cast<DWORD>(StoreShadowForPedObject));
+
+    HookInstallCall(0x68025A, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleJetPack::ProcessPed
+    HookInstallCall(0x64DB4D, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleCarGetIn::ProcessPed
+    HookInstallCall(0x64BCA3, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleCarSetPedInAsDriver::ProcessPed
+    HookInstallCall(0x64B876, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleCarSetPedInAsPassenger::ProcessPed
 }

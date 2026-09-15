@@ -11,12 +11,12 @@
 
 #include "StdInc.h"
 #include <core/CCoreInterface.h>
+#include <game/CAESoundManager.h>
 #include <multiplayer/CMultiplayer.h>
 #include "CAutomobileSA.h"
 #include "CBikeSA.h"
 #include "CCameraSA.h"
 #include "CColModelSA.h"
-#include "CColModelGuard.h"
 #include "CFxManagerSA.h"
 #include "CFxSystemSA.h"
 #include "CGameSA.h"
@@ -31,11 +31,33 @@
 #include "gamesa_renderware.h"
 #include "CFireManagerSA.h"
 #include "enums/VehicleType.h"
+#include <game/CHandlingEntry.h>
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
 
 static BOOL m_bVehicleSunGlare = false;
+
+// PreRender re-asserts rpATOMICRENDER on all wheel atomics every frame, which re-shows
+// the Rhino's middle wheels that SetupModelNodes hides at init. Re-clear the flag here so
+// it stays the last write of the frame and the wheels remain invisible like in vanilla.
+static RwObject* __cdecl ClearAtomicRenderFlagCB(RwObject* object, void* /*data*/)
+{
+    object->flags &= ~0x04;  // rpATOMICRENDER
+    return object;
+}
+
+static void __fastcall RehideRhinoMiddleWheels(CAutomobileSAInterface* vehicle)
+{
+    if (!vehicle || vehicle->m_nModelIndex != 432 /* Rhino */)
+        return;
+
+    for (auto comp : {eCarNodes::WHEEL_LM, eCarNodes::WHEEL_RM})
+    {
+        if (RwFrame* frame = vehicle->m_aCarNodes[static_cast<std::size_t>(comp)])
+            RwFrameForAllObjects(frame, (void*)ClearAtomicRenderFlagCB, nullptr);
+    }
+}
 
 static void __declspec(naked) HOOK_Vehicle_PreRender(void)
 {
@@ -52,6 +74,13 @@ static void __declspec(naked) HOOK_Vehicle_PreRender(void)
         call    eax
 
         noglare:
+        // Re-hide Rhino middle wheels after PreRender's generic-car block re-shows them.
+        // esi still points to the CAutomobileSAInterface at this hook site.
+        pushad
+        mov     ecx, esi
+        call    RehideRhinoMiddleWheels
+        popad
+
         mov     [esp+0D4h], edi
         push    6ABD04h
         retn
@@ -68,6 +97,13 @@ static bool __fastcall CanProcessFlyingCarStuff(CAutomobileSAInterface* vehicleI
 
     if (vehicle->pEntity->GetVehicleRotorState())
     {
+        // Blown aircraft must not re-enter the custom rotor processing path. With
+        // vehicle_engine_autostart disabled this path moves unattended aircraft to
+        // STATUS_PHYSICS, which lets wreck contacts repeatedly create GTA flying
+        // components/explosions after the vehicle has already blown up.
+        if (vehicle->pEntity->GetHealth() <= 0.0f)
+            return false;
+
         if (g_pCore->GetMultiplayer()->IsVehicleEngineAutoStartEnabled())  // keep default behavior
             return true;
 
@@ -147,8 +183,29 @@ static void __declspec(naked) HOOK_CPlane_ProcessFlyingCarStuff()
     // clang-format on
 }
 
+#define NUM_FirstStreamEngineSlot    7
+#define NUM_LastStreamEngineSlot     16
+#define NUM_AllSoundIndices          0xFFFFFFFF
+#define NUM_ResidentEngineSlot       40
+#define NUM_LocalVehicleAudioContext 0x0
+#define VAR_VehicleAudioContext      0x50230C
+
 namespace
 {
+    void CancelVehicleAudioSlots(CAEVehicleAudioEntitySAInterface* pAudioInterface)
+    {
+        auto* pSoundManager = pGame ? pGame->GetAESoundManager() : nullptr;
+        if (!pAudioInterface || !pSoundManager)
+            return;
+
+        if (pAudioInterface->m_wEngineBankSlotId >= NUM_FirstStreamEngineSlot && pAudioInterface->m_wEngineBankSlotId <= NUM_LastStreamEngineSlot)
+            pSoundManager->CancelSoundsInBankSlot(pAudioInterface->m_wEngineBankSlotId, NUM_AllSoundIndices);
+
+        if (pAudioInterface->m_bPlayerDriver || pAudioInterface->m_bPlayerPassenger ||
+            *reinterpret_cast<const BYTE*>(VAR_VehicleAudioContext) == NUM_LocalVehicleAudioContext)
+            pSoundManager->CancelSoundsInBankSlot(NUM_ResidentEngineSlot, NUM_AllSoundIndices);
+    }
+
     bool ClumpDumpCB(RpAtomic* pAtomic, void* data)
     {
         CVehicleSA* pVehicleSA = (CVehicleSA*)data;
@@ -183,7 +240,7 @@ namespace
                 RwFrameDump(ret, pVehicleSA);
             }
             // don't re-add, check ret for validity, if it has an empty string at this point it isn't a variant or it's already added
-            if (pVehicleSA->IsComponentPresent(ret->szName) == false && ret->szName[0] != '\0')
+            if (pVehicleSA->IsComponentPresent(ret->szName) == false && ret->szName != "")
             {
                 pVehicleSA->AddComponent(ret, true);
             }
@@ -211,6 +268,41 @@ namespace
     {
         RwFrameForAllObjects(frame, (void*)GetAllAtomicObjectCB, &result);
     }
+
+    int GetComponentIDFromName(const SString& name)
+    {
+        if (name == "bonnet_dummy")
+            return eDoors::BONNET;
+        else if (name == "boot_dummy")
+            return eDoors::BOOT;
+        else if (name == "door_lf_dummy")
+            return eDoors::FRONT_LEFT_DOOR;
+        else if (name == "door_rf_dummy")
+            return eDoors::FRONT_RIGHT_DOOR;
+        else if (name == "door_lb_dummy")
+            return eDoors::REAR_LEFT_DOOR;
+        else if (name == "door_rb_dummy")
+            return eDoors::REAR_RIGHT_DOOR;
+        else if (name == "bump_front_dummy")
+            return ePanels::FRONT_BUMPER;
+        else if (name == "bump_rear_dummy")
+            return ePanels::REAR_BUMPER;
+        else if (name == "windscreen_dummy")
+            return ePanels::WINDSCREEN_PANEL;
+    }
+
+    VehicleComponentType GetComponentTypeFromName(const SString& name)
+    {
+        if (name == "bonnet_dummy" || name == "boot_dummy" || name == "door_lf_dummy" || name == "door_rf_dummy" || name == "door_lb_dummy" ||
+            name == "door_rb_dummy")
+            return VehicleComponentType::DOOR;
+        else if (name == "bump_front_dummy" || name == "bump_rear_dummy" || name == "windscreen_dummy")
+            return VehicleComponentType::PANEL;
+        else if (name == "wheel_lb_dummy" || name == "wheel_rb_dummy" || name == "wheel_lf_dummy" || name == "wheel_rf_dummy")
+            return VehicleComponentType::WHEEL;
+
+        return VehicleComponentType::NONE;
+    }
 }  // namespace
 
 void CVehicleSA::Init()
@@ -229,7 +321,7 @@ void CVehicleSA::Init()
     {
         for (size_t i = 0; i < m_dummyPositions.size(); ++i)
         {
-            m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((VehicleDummies)i);
+            m_dummyPositions[i] = modelInfo->GetVehicleDummyPosition((VehicleDummies::Enum)i);
         }
     }
 
@@ -267,7 +359,7 @@ void CVehicleSA::Init()
     // Initialize doors depending on the vehicle type.
     std::uint32_t doorArrayOffset;
 
-    switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
+    switch (static_cast<VehicleClass::Enum>(GetVehicleInterface()->m_vehicleClass))
     {
         case VehicleClass::AUTOMOBILE:
         case VehicleClass::MONSTER_TRUCK:
@@ -629,7 +721,7 @@ void CVehicleSA::SetPlaneRotorSpeed(float fSpeed)
 
 bool CVehicleSA::SetVehicleWheelRotation(float fWheelRot1, float fWheelRot2, float fWheelRot3, float fWheelRot4) noexcept
 {
-    VehicleClass m_eVehicleType = static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleSubClass);
+    VehicleClass::Enum m_eVehicleType = static_cast<VehicleClass::Enum>(GetVehicleInterface()->m_vehicleSubClass);
     switch (m_eVehicleType)
     {
         case VehicleClass::AUTOMOBILE:
@@ -1480,6 +1572,146 @@ void CVehicleSA::RecalculateHandling()
         GetVehicleInterface ()->fDragCoeff = pGame->GetHandlingManager()->GetBasicDragCoeff();
     else*/
     // pInt->fDragCoeff = m_pHandlingData->GetInterface()->fDragCoeff / 1000 * pGame->GetHandlingManager()->GetDragMultiplier();
+
+    // The swinging chassis flag is only applied once, inside the game's vehicle constructor.
+    // Redo that setup here so a live handling change actually takes effect.
+    RecalculateSwingingChassis();
+
+    // Same story as the chassis above: the door setup below is also only ever applied once, inside
+    // the game's vehicle constructor.
+    RecalculateDoorModelFlags();
+}
+
+// Mirrors the native vehicle constructor's bonnet, boot and NO_DOORS setup, so a live
+// REVERSE_BONNET, HANGING_BOOT, TAILGATE_BOOT or NO_DOORS change reaches an already spawned
+// vehicle instead of only ever taking effect for one created after the change.
+void CVehicleSA::RecalculateDoorModelFlags()
+{
+    if (GetVehicleInterface()->m_vehicleClass != VehicleClass::AUTOMOBILE)
+        return;
+
+    constexpr std::uint8_t  axisX = 0;
+    constexpr std::uint8_t  axisY = 1;
+    constexpr std::uint8_t  axisZ = 2;
+    constexpr std::uint8_t  axisNegY = 4;
+    constexpr std::uint8_t  axisNegZ = 5;
+    constexpr std::uint16_t extraBased = 0x10;
+    constexpr std::uint16_t extraLowGravity = 0x20;
+
+    auto*               pInt = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
+    const std::uint32_t uiModelFlags = m_pHandlingData->GetInterface()->uiModelFlags;
+
+    CDoorSAInterface& bonnet = pInt->m_doors[eDoors::BONNET];
+    if (uiModelFlags & MODELFLAGS_REVERSE_BONNET)
+    {
+        bonnet.m_fOpenAngle = -0.3f * PI;
+        bonnet.m_nAxis = axisX;
+        bonnet.m_nDirn = axisNegY | extraLowGravity;
+    }
+    else
+    {
+        bonnet.m_fOpenAngle = 0.3f * PI;
+        bonnet.m_nAxis = axisX;
+        bonnet.m_nDirn = axisY | extraLowGravity;
+    }
+    bonnet.m_fClosedAngle = 0.0f;
+
+    CDoorSAInterface& boot = pInt->m_doors[eDoors::BOOT];
+    if (uiModelFlags & MODELFLAGS_HANGING_BOOT)
+    {
+        boot.m_fOpenAngle = -0.4f * PI;
+        boot.m_nAxis = axisX;
+        boot.m_nDirn = axisNegZ | extraBased;
+    }
+    else if (uiModelFlags & MODELFLAGS_TAILGATE_BOOT)
+    {
+        boot.m_fOpenAngle = 0.5f * PI;
+        boot.m_nAxis = axisX;
+        boot.m_nDirn = axisZ | extraBased;
+    }
+    else
+    {
+        boot.m_fOpenAngle = -0.3f * PI;
+        boot.m_nAxis = axisX;
+        boot.m_nDirn = axisNegY | extraBased;
+    }
+    boot.m_fClosedAngle = 0.0f;
+
+    // Same constructor-only story again: NO_DOORS marks the four side doors missing once, at
+    // creation, and removing the flag doesn't restore them, since the constructor never does that
+    // either. The status alone isn't enough on a live vehicle, though; a locked vehicle's front
+    // doors quietly turn the request into a dent instead, so the door mesh is hidden directly here
+    // too.
+    if (uiModelFlags & MODELFLAGS_NO_DOORS)
+    {
+        struct SSideDoor
+        {
+            eDoors    id;
+            eCarNodes node;
+        };
+        static constexpr SSideDoor sideDoors[] = {
+            {eDoors::FRONT_LEFT_DOOR, eCarNodes::DOOR_LF},
+            {eDoors::FRONT_RIGHT_DOOR, eCarNodes::DOOR_RF},
+            {eDoors::REAR_LEFT_DOOR, eCarNodes::DOOR_LR},
+            {eDoors::REAR_RIGHT_DOOR, eCarNodes::DOOR_RR},
+        };
+
+        if (CDamageManager* pDamageManager = GetDamageManager())
+        {
+            for (const SSideDoor& sideDoor : sideDoors)
+            {
+                pDamageManager->SetDoorStatus(sideDoor.id, DT_DOOR_MISSING, false);
+
+                if (RwFrame* pFrame = pInt->m_aCarNodes[static_cast<std::size_t>(sideDoor.node)])
+                    pInt->SetComponentVisibility(pFrame, 0);  // ATOMIC_IS_NOT_PRESENT
+            }
+        }
+    }
+}
+
+void CVehicleSA::RecalculateSwingingChassis()
+{
+    if (GetVehicleInterface()->m_vehicleClass != VehicleClass::AUTOMOBILE)
+        return;
+
+    constexpr std::uint16_t axisZ = 2;
+    constexpr std::uint16_t axisNegY = 4;
+    constexpr std::uint16_t extraChassis = 0x40;
+    constexpr std::uint16_t extraFixedState = 0x80;
+    constexpr std::uint16_t extraFiretruck = 0x100;
+
+    auto&               chassis = static_cast<CAutomobileSAInterface*>(GetVehicleInterface())->m_swingingChassis;
+    const std::uint16_t modelID = GetModelIndex();
+
+    // The Firela's ladder reuses this same slot for its own animation, so it must never be overridden by the swinging chassis flag.
+    if (modelID == static_cast<std::uint16_t>(VehicleType::VT_FIRELA))
+    {
+        chassis.m_fOpenAngle = 0.1f * PI;
+        chassis.m_fClosedAngle = -0.1f * PI;
+        chassis.m_nAxis = axisZ;
+        chassis.m_nDirn = axisNegY | extraFixedState | extraFiretruck;
+        chassis.m_nDoorState = static_cast<std::uint8_t>(DoorState::DOOR_HIT_MAX_END);
+        return;
+    }
+
+    if (!(GetVehicleInterface()->dwHandlingFlags & HANDLING_SwingingChassis_Flag))
+    {
+        chassis = {};  // Flag off: reset so the chassis can't swing anymore
+        return;
+    }
+
+    // Same per-model angle multiplier the game's vehicle constructor uses
+    float angleMultiplier = 0.02f;
+    if (modelID == static_cast<std::uint16_t>(VehicleType::VT_COPCARVG) || modelID == static_cast<std::uint16_t>(VehicleType::VT_ESPERANT))
+        angleMultiplier = 0.03f;
+    else if (modelID == static_cast<std::uint16_t>(VehicleType::VT_STRETCH))
+        angleMultiplier = 0.01f;
+
+    chassis.m_fOpenAngle = angleMultiplier * PI;
+    chassis.m_fClosedAngle = -angleMultiplier * PI;
+    chassis.m_nAxis = axisZ;
+    chassis.m_nDirn = axisNegY | extraChassis | extraFixedState;
+    chassis.m_nDoorState = static_cast<std::uint8_t>(DoorState::DOOR_HIT_MAX_END);
 }
 
 void CVehicleSA::BurstTyre(BYTE bTyre)
@@ -1507,7 +1739,7 @@ void CVehicleSA::SetBikeWheelStatus(BYTE bWheel, BYTE bStatus)
 bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
 {
     auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
-    switch ((VehicleClass)vehicle->m_vehicleClass)
+    switch ((VehicleClass::Enum)vehicle->m_vehicleClass)
     {
         case VehicleClass::AUTOMOBILE:
             if (eWheelPosition < 4)
@@ -1523,8 +1755,20 @@ bool CVehicleSA::IsWheelCollided(BYTE eWheelPosition)
 
 int CVehicleSA::GetWheelFrictionState(BYTE eWheelPosition)
 {
-    auto vehicle = static_cast<CAutomobileSAInterface*>(GetInterface());
-    return vehicle->m_wheelFrictionState[eWheelPosition];
+    switch (static_cast<VehicleClass::Enum>(GetVehicleInterface()->m_vehicleClass))
+    {
+        case VehicleClass::BIKE:
+        case VehicleClass::BMX:
+        {
+            auto* bikeInterface = static_cast<CBikeSAInterface*>(GetVehicleInterface());
+            return bikeInterface->m_aiWheelState[eWheelPosition];
+        }
+        default:
+        {
+            auto* vehicleInterface = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
+            return vehicleInterface->m_wheelFrictionState[eWheelPosition];
+        }
+    }
 }
 
 void CVehicleSA::SetTaxiLightOn(bool bLightOn)
@@ -1609,7 +1853,7 @@ bool CVehicleSA::SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComp
     RwFrame* defaultBikeChassisFrame = nullptr;
 
     // CBike, CBmx, CBoat and CTrain don't inherit CAutomobile so let's do it manually!
-    switch (static_cast<VehicleClass>(GetVehicleInterface()->m_vehicleClass))
+    switch (static_cast<VehicleClass::Enum>(GetVehicleInterface()->m_vehicleClass))
     {
         case VehicleClass::AUTOMOBILE:
         case VehicleClass::MONSTER_TRUCK:
@@ -1814,14 +2058,15 @@ bool CVehicleSA::UpdateMovingCollision(float fAngle)
 
 void* CVehicleSA::GetPrivateSuspensionLines()
 {
-    if (m_pSuspensionLines == nullptr)
+    if (m_pSuspensionLines == NULL)
     {
         CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-        if (!pModelInfo)
-            return nullptr;
-
-        CBaseModelInfoSAInterface* pInterface = pModelInfo->GetInterface();
-        CColDataSA*                pColData = (pInterface && pInterface->pColModel) ? pInterface->pColModel->m_data : nullptr;
+        // Validate the model/collision chain before deref. During streaming
+        // GC races any of these pointers can be transiently null while a
+        // CAutomobile still runs a tick on the entity.
+        CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+        CColModelSAInterface*      pColModel = pInterface ? pInterface->pColModel : nullptr;
+        CColDataSA*                pColData = pColModel ? pColModel->m_data : nullptr;
         if (pModelInfo->IsMonsterTruck())
         {
             // Monster truck suspension data is 0x90 BYTES rather than 0x80 (some extra stuff I guess)
@@ -1834,9 +2079,11 @@ void* CVehicleSA::GetPrivateSuspensionLines()
         }
         else
         {
-            // CAutomobile allocates wheels * 32 (0x20)
-            const std::size_t numLines = pColData ? std::min<std::size_t>(pColData->m_numSuspensionLines, MAX_SUSPENSION_LINES) : MAX_SUSPENSION_LINES;
-            m_pSuspensionLines = new BYTE[numLines * SUSPENSION_SIZE_STANDARD];
+            // CAutomobile allocates wheels * 32 (0x20). Fall back to a safe
+            // default count when col data is unavailable so we never allocate
+            // from a garbage size and never deref a null pColData.
+            const std::size_t numLines = pColData ? pColData->m_numSuspensionLines : 4;
+            m_pSuspensionLines = new BYTE[numLines * 0x20];
         }
     }
 
@@ -1846,86 +2093,58 @@ void* CVehicleSA::GetPrivateSuspensionLines()
 void CVehicleSA::CopyGlobalSuspensionLinesToPrivate()
 {
     CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
-    if (!pModelInfo)
-        return;
-
-    // Protect collision model from streaming GC
-    CColModelGuard guard(static_cast<CModelInfoSA*>(pModelInfo));
-    if (!guard.IsValid())
-        return;
-
-    CColDataSA* pColData = guard.GetColData();
+    // Same guard as GetPrivateSuspensionLines: the streaming GC can yank
+    // collision data out from under us, leaving dangling pointers here.
+    CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
+    CColModelSAInterface*      pColModel = pInterface ? pInterface->pColModel : nullptr;
+    CColDataSA*                pColData = pColModel ? pColModel->m_data : nullptr;
     if (!pColData || !pColData->m_suspensionLines)
         return;
 
-    void* pPrivateLines = GetPrivateSuspensionLines();
-    if (!pPrivateLines)
-        return;
-
-    // Determine copy size based on vehicle type
-    std::size_t copySize = 0;
     if (pModelInfo->IsMonsterTruck())
     {
-        // Monster trucks: 0x90 bytes
-        copySize = SUSPENSION_SIZE_MONSTER_TRUCK;
+        // Monster trucks are 0x90 bytes not 0x80
+        memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, 0x90);
     }
     else if (pModelInfo->IsBike())
     {
-        // Bikes: 0x80 bytes (2 wheels with extra data)
-        copySize = SUSPENSION_SIZE_BIKE;
+        // Bikes are 0x80 bytes not 0x40
+        memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, 0x80);
     }
     else
     {
-        // CAutomobile: wheels * 0x20 bytes
-        const std::size_t numLines = std::min<std::size_t>(pColData->m_numSuspensionLines, MAX_SUSPENSION_LINES);
-        copySize = numLines * SUSPENSION_SIZE_STANDARD;
-    }
-
-    if (copySize > 0 && copySize <= MAX_SUSPENSION_LINES * SUSPENSION_SIZE_STANDARD)
-    {
-        memcpy(pPrivateLines, pColData->m_suspensionLines, copySize);
+        // CAutomobile allocates wheels * 32 (0x20)
+        memcpy(GetPrivateSuspensionLines(), pColData->m_suspensionLines, pColData->m_numSuspensionLines * 0x20);
     }
 }
 
 void CVehicleSA::RecalculateSuspensionLines()
 {
     CHandlingEntry* pHandlingEntry = GetHandlingData();
-    if (!pHandlingEntry)
-        return;
 
-    const std::uint32_t dwModel = GetModelIndex();
-
+    DWORD       dwModel = GetModelIndex();
     CModelInfo* pModelInfo = pGame->GetModelInfo(dwModel);
-    if (!pModelInfo || !pModelInfo->GetInterface())
+    if (!pModelInfo)
         return;
 
-    // Only for vehicles with suspension lines
-    if (!(pModelInfo->IsMonsterTruck() || pModelInfo->IsCar()))
-        return;
+    // Only cars and monster trucks use this suspension setup path.
+    if ((pModelInfo->IsMonsterTruck() || pModelInfo->IsCar()))
+    {
+        // Trains (Their trailers do as well!)
+        if (pModelInfo->IsTrain() || dwModel == 571 || dwModel == 570 || dwModel == 569 || dwModel == 590)
+            return;
 
-    // Skip trains and their trailers (no suspension lines)
-    if (pModelInfo->IsTrain() || dwModel == static_cast<std::uint32_t>(VehicleType::VT_FREIFLAT) ||
-        dwModel == static_cast<std::uint32_t>(VehicleType::VT_STREAKC) || dwModel == static_cast<std::uint32_t>(VehicleType::VT_FREIBOX))
-        return;
+        GetVehicleInterface()->SetupSuspensionLines();
 
-    // Protect collision model before accessing suspension data
-    CColModelGuard guard(static_cast<CModelInfoSA*>(pModelInfo));
-    if (!guard.IsValid())
-        return;
-
-    CVehicleSAInterface* pVehicleInterface = GetVehicleInterface();
-    if (!pVehicleInterface)
-        return;
-
-    // Safe to call now - collision is protected by guard
-    pVehicleInterface->SetupSuspensionLines();
-
-    // Copy to private storage while still protected
-    CopyGlobalSuspensionLinesToPrivate();
+        CopyGlobalSuspensionLinesToPrivate();
+    }
 }
 
 void CVehicleSA::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount)
 {
+    if (ucSirenCount > SIREN_COUNT_MAX)
+        ucSirenCount = SIREN_COUNT_MAX;
+
     m_tSirenInfo.m_bOverrideSirens = true;
     m_tSirenInfo.m_ucSirenType = ucSirenType;
     m_tSirenInfo.m_ucSirenCount = ucSirenCount;
@@ -1933,11 +2152,18 @@ void CVehicleSA::GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSi
 
 void CVehicleSA::SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+        return;
     m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions = vecPos;
 }
 
 void CVehicleSA::GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos)
 {
+    if (ucSirenID >= SIREN_COUNT_MAX)
+    {
+        vecPos = CVector();
+        return;
+    }
     vecPos = m_tSirenInfo.m_tSirenInfo[ucSirenID].m_vecSirenPositions;
 }
 
@@ -2194,7 +2420,7 @@ void CVehicleSA::AddComponent(RwFrame* pFrame, bool bReadOnly)
         return;
 
     // if the frame already exists ignore it
-    if (IsComponentPresent(pFrame->szName) || pFrame->szName[0] == '\0')
+    if (IsComponentPresent(pFrame->szName) || pFrame->szName == "")
         return;
 
     SString strName = pFrame->szName;
@@ -2273,17 +2499,58 @@ bool CVehicleSA::SetComponentVisible(const SString& vehicleComponent, bool bRequ
 
         if (bRequestVisible && uiNumAtomicsCurrentlyVisible == 0)
         {
-            // Make atomic (undamaged version) visible. TODO - Check if damaged version should be made visible instead
+            bool isComponentDamaged = false;
+            bool isComponentFallenOff = false;
+            int  componentID = GetComponentIDFromName(vehicleComponent);
+            auto damageManager = GetDamageManager();
+
+            switch (GetComponentTypeFromName(vehicleComponent))
+            {
+                case VehicleComponentType::DOOR:
+                {
+                    std::uint8_t doorStatus = damageManager->GetDoorStatus(static_cast<eDoors>(componentID));
+
+                    isComponentDamaged = (doorStatus > 1);
+                    isComponentFallenOff = (doorStatus == 4);
+                    break;
+                }
+                case VehicleComponentType::PANEL:
+                {
+                    std::uint8_t panelStatus = damageManager->GetPanelStatus(static_cast<std::uint8_t>(componentID));
+
+                    isComponentDamaged = (panelStatus > 0);
+                    isComponentFallenOff = (panelStatus == 3);
+                    break;
+                }
+                default:
+                    break;
+            }
+
+            // We don't want to show the component that fell off
+            if (isComponentFallenOff)
+                return false;
+
+            // Make atomic visible.
             for (uint i = 0; i < atomicList.size(); i++)
             {
                 RwObject* pAtomic = atomicList[i];
                 int       AtomicId = pGame->GetVisibilityPlugins()->GetAtomicId(pAtomic);
 
-                if (!(AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED))
-                {
-                    // Either only one version, or two versions and this is the undamaged one
+                const bool bHasDamagedVersion = (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_DAMAGED) != 0;
+                const bool bHasUndamagedVersion = (AtomicId & ATOMIC_ID_FLAG_TWO_VERSIONS_UNDAMAGED) != 0;
+
+                // If this atomic has no two-version flags, it is a single-version component and
+                // should always be shown when visibility is requested.
+                bool bShouldShow = (!bHasDamagedVersion && !bHasUndamagedVersion);
+
+                // For two-version components, show the matching damage state.
+                if (isComponentDamaged)
+                    bShouldShow = bShouldShow || bHasDamagedVersion;
+                else
+                    bShouldShow = bShouldShow || bHasUndamagedVersion;
+
+                if (bShouldShow)
                     pAtomic->flags |= 0x04;
-                }
             }
         }
         else if (!bRequestVisible && uiNumAtomicsCurrentlyVisible > 0)
@@ -2397,7 +2664,7 @@ void CVehicleSA::UpdateLandingGearPosition()
     }
 }
 
-bool CVehicleSA::GetDummyPosition(VehicleDummies dummy, CVector& position) const
+bool CVehicleSA::GetDummyPosition(VehicleDummies::Enum dummy, CVector& position) const
 {
     if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
     {
@@ -2408,7 +2675,7 @@ bool CVehicleSA::GetDummyPosition(VehicleDummies dummy, CVector& position) const
     return false;
 }
 
-bool CVehicleSA::SetDummyPosition(VehicleDummies dummy, const CVector& position)
+bool CVehicleSA::SetDummyPosition(VehicleDummies::Enum dummy, const CVector& position)
 {
     if (dummy < VehicleDummies::LIGHT_FRONT_MAIN || dummy >= VehicleDummies::VEHICLE_DUMMY_COUNT)
         return false;
@@ -2426,7 +2693,7 @@ bool CVehicleSA::SetDummyPosition(VehicleDummies dummy, const CVector& position)
             CFxSystemSA::SetPosition(vehicle->m_fireParticle, position);
     }
 
-    bool isAutomobileClass = static_cast<VehicleClass>(vehicle->m_vehicleClass) == VehicleClass::AUTOMOBILE;
+    bool isAutomobileClass = static_cast<VehicleClass::Enum>(vehicle->m_vehicleClass) == VehicleClass::AUTOMOBILE;
 
     if (isAutomobileClass)
     {
@@ -2439,7 +2706,7 @@ bool CVehicleSA::SetDummyPosition(VehicleDummies dummy, const CVector& position)
 //
 // NOTE(botder): Move the code to CAutomobileSA::SetDummyPosition, when we start using CAutomobileSA
 //
-void CVehicleSA::SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies dummy, const CVector& position)
+void CVehicleSA::SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies::Enum dummy, const CVector& position)
 {
     if (dummy == VehicleDummies::EXHAUST)
     {
@@ -2459,15 +2726,7 @@ bool CVehicleSA::SetPlateText(const SString& strText)
     CModelInfo* pModelInfo = pGame->GetModelInfo(GetModelIndex());
     if (!pModelInfo)
         return false;
-
-    auto* pVehicleModelInfo = static_cast<CVehicleModelInfoSAInterface*>(pModelInfo->GetInterface());
-    if (!pVehicleModelInfo)
-    {
-        pModelInfo->Request(BLOCKING, "SetPlateText");
-        pVehicleModelInfo = static_cast<CVehicleModelInfoSAInterface*>(pModelInfo->GetInterface());
-        if (!pVehicleModelInfo)
-            return false;
-    }
+    CVehicleModelInfoSAInterface* pVehicleModelInfo = (CVehicleModelInfoSAInterface*)pModelInfo->GetInterface();
 
     // Copy text
     strncpy(pVehicleModelInfo->plateText, *strText, 8);
@@ -2532,7 +2791,14 @@ bool CVehicleSA::SetWindowOpenFlagState(unsigned char ucWindow, bool bState)
 
 void CVehicleSA::ReinitAudio()
 {
+    if (!m_pVehicleAudioEntity)
+        return;
+
     auto* audioInterface = m_pVehicleAudioEntity->GetInterface();
+    if (!audioInterface)
+        return;
+
+    CancelVehicleAudioSlots(audioInterface);
 
     audioInterface->TerminateAudio();
     audioInterface->InitAudio(GetVehicleInterface());

@@ -20,6 +20,7 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
       m_interior(interior),
       m_pBuilding(nullptr),
       m_usesCollision(true),
+      m_ucAlpha(255),
       m_pHighBuilding(nullptr),
       m_pLowBuilding(nullptr)
 {
@@ -27,7 +28,7 @@ CClientBuilding::CClientBuilding(class CClientManager* pManager, ElementID ID, u
     m_pModelInfo = g_pGame->GetModelInfo(usModelId);
     SetTypeName("building");
     m_pBuildingManager->AddToList(this);
-    Create();
+    RelateDimension(m_pBuildingManager->GetDimension());
     UpdateSpatialData();
 }
 
@@ -42,10 +43,12 @@ void CClientBuilding::Unlink()
     {
         m_pHighBuilding->SetLowLodBuilding();
     }
+
     if (m_pLowBuilding)
     {
         SetLowLodBuilding();
     }
+
     Destroy();
 }
 
@@ -56,6 +59,7 @@ void CClientBuilding::SetPosition(const CVector& vecPosition)
 
     if (m_vPos == vecPosition)
         return;
+
     m_vPos = vecPosition;
     Recreate();
     UpdateSpatialData();
@@ -65,6 +69,7 @@ void CClientBuilding::SetRotationRadians(const CVector& vecRadians)
 {
     if (m_vRot == vecRadians)
         return;
+
     m_vRot = vecRadians;
     Recreate();
 }
@@ -93,8 +98,23 @@ void CClientBuilding::SetInterior(uint8_t ucInterior)
 {
     if (m_interior == ucInterior)
         return;
+
     m_interior = ucInterior;
     Recreate();
+}
+
+void CClientBuilding::SetDimension(unsigned short usDimension)
+{
+    CClientEntity::SetDimension(usDimension);
+    RelateDimension(m_pBuildingManager->GetDimension());
+}
+
+void CClientBuilding::RelateDimension(unsigned short usDimension)
+{
+    if (usDimension == GetDimension())
+        Create();
+    else
+        Destroy();
 }
 
 void CClientBuilding::SetModel(uint16_t model)
@@ -126,6 +146,15 @@ void CClientBuilding::SetUsesCollision(bool state)
     m_usesCollision = state;
 }
 
+void CClientBuilding::SetAlpha(unsigned char ucAlpha)
+{
+    m_ucAlpha = ucAlpha;
+    // Buildings are not CObject, so they never hit the per-entity object alpha hook. Apply
+    // SetRwObjectAlpha on the game entity (and again in Create after Recreate).
+    if (m_pBuilding)
+        m_pBuilding->SetAlpha(ucAlpha);
+}
+
 void CClientBuilding::Create()
 {
     if (m_pBuilding)
@@ -139,6 +168,8 @@ void CClientBuilding::Create()
     if (!m_pBuilding)
         return;
 
+    m_pBuilding->SetStoredPointer(this);
+
     if (m_bDoubleSidedInit)
         m_pBuilding->SetBackfaceCulled(!m_bDoubleSided);
 
@@ -146,6 +177,10 @@ void CClientBuilding::Create()
     {
         m_pBuilding->SetUsesCollision(m_usesCollision);
     }
+
+    if (m_ucAlpha != 255)
+        m_pBuilding->SetAlpha(m_ucAlpha);
+
     if (m_pHighBuilding)
     {
         m_pHighBuilding->GetBuildingEntity()->SetLod(m_pBuilding);
@@ -161,6 +196,7 @@ void CClientBuilding::Destroy()
     {
         m_pHighBuilding->GetBuildingEntity()->SetLod(nullptr);
     }
+
     g_pGame->GetPools()->GetBuildingsPool().RemoveBuilding(m_pBuilding);
     m_pBuilding = nullptr;
 }
@@ -174,6 +210,7 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
 
         // Unlink old high lod element
         CClientBuilding* pOveridedBuilding = pLod->GetHighLodBuilding();
+
         if (pOveridedBuilding && pOveridedBuilding != this)
         {
             pOveridedBuilding->SetLowLodBuilding();
@@ -192,6 +229,7 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
         {
             m_pLowBuilding->SetHighLodBuilding();
         }
+
         m_pBuilding->SetLod(nullptr);
         m_pLowBuilding = nullptr;
     }

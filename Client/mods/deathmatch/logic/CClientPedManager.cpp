@@ -39,13 +39,10 @@ void CClientPedManager::DeleteAll()
 
 void CClientPedManager::DoPulse(bool bDoStandardPulses)
 {
-    CClientPed* pPed = NULL;
     // Loop through our streamed-in peds
-    vector<CClientPed*>           List = m_StreamedIn;
-    vector<CClientPed*>::iterator iter = List.begin();
-    for (; iter != List.end(); ++iter)
+    for (uint i = 0; i < m_StreamedIn.size(); i++)
     {
-        pPed = *iter;
+        CClientPed* pPed = m_StreamedIn[i];
         // We should have a game ped here
         assert(pPed->GetGamePlayer());
         pPed->StreamedInPulse(bDoStandardPulses);

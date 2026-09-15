@@ -30,7 +30,7 @@ float CStatsSA::GetStatValue(unsigned short usIndex)
     return fReturn;
 }
 
-void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
+void CStatsSA::ModifyStat(unsigned short usIndex, float fAmount)
 {
     DWORD dwFunc = FUNC_ModifyStat;
     DWORD dwStatIndex = usIndex;
@@ -38,7 +38,7 @@ void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
     // clang-format off
     __asm
     {
-        push    fAmmount
+        push    fAmount
         push    dwStatIndex
         call    dwFunc
         add     esp, 8
@@ -46,7 +46,7 @@ void CStatsSA::ModifyStat(unsigned short usIndex, float fAmmount)
     // clang-format on
 }
 
-void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
+void CStatsSA::SetStatValue(unsigned short usIndex, float fAmount)
 {
     DWORD dwFunc = FUNC_SetStatValue;
     DWORD dwStatIndex = usIndex;
@@ -54,7 +54,7 @@ void CStatsSA::SetStatValue(unsigned short usIndex, float fAmmount)
     // clang-format off
     __asm
     {
-        push    fAmmount
+        push    fAmount
         push    dwStatIndex
         call    dwFunc
         add     esp, 8

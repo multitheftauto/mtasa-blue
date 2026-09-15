@@ -31,6 +31,7 @@ CLuaArgument::CLuaArgument()
     m_iType = LUA_TNIL;
     m_pTableData = NULL;
     m_pUserData = NULL;
+    m_bWeakTableRef = false;
 }
 
 CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
@@ -58,7 +59,7 @@ void CLuaArgument::CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLua
     // Clear the string
     m_strString = "";
 
-    // Destroy our old tabledata if neccessary
+    // Destroy our old tabledata if necessary
     DeleteTableData();
 
 #ifdef MTA_DEBUG
@@ -240,62 +241,71 @@ void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
 
 void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables) const
 {
-    // Got any type?
-    if (m_iType != LUA_TNONE)
-    {
-        // Make sure the stack has enough room
-        LUA_CHECKSTACK(luaVM, 1);
+    // Make sure the stack has enough room
+    LUA_CHECKSTACK(luaVM, 1);
 
-        // Push it depending on the type
-        switch (m_iType)
+    // Push it depending on the type
+    switch (m_iType)
+    {
+        case LUA_TNIL:
         {
-            case LUA_TNIL:
+            lua_pushnil(luaVM);
+            break;
+        }
+
+        case LUA_TBOOLEAN:
+        {
+            lua_pushboolean(luaVM, m_bBoolean);
+            break;
+        }
+
+        case LUA_TLIGHTUSERDATA:
+        case LUA_TUSERDATA:
+        {
+            lua_pushuserdata(luaVM, m_pUserData);
+            break;
+        }
+
+        case LUA_TNUMBER:
+        {
+            lua_pushnumber(luaVM, m_Number);
+            break;
+        }
+
+        case LUA_TTABLE:
+        {
+            if (!m_pTableData)
             {
                 lua_pushnil(luaVM);
                 break;
             }
 
-            case LUA_TBOOLEAN:
+            int* pTableId;
+            if (pKnownTables && (pTableId = MapFind(*pKnownTables, m_pTableData)))
             {
-                lua_pushboolean(luaVM, m_bBoolean);
-                break;
+                lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
+                lua_pushnumber(luaVM, *pTableId);
+                lua_gettable(luaVM, -2);
+                lua_remove(luaVM, -2);
             }
+            else
+            {
+                m_pTableData->PushAsTable(luaVM, pKnownTables);
+            }
+            break;
+        }
 
-            case LUA_TLIGHTUSERDATA:
-            case LUA_TUSERDATA:
-            {
-                lua_pushuserdata(luaVM, m_pUserData);
-                break;
-            }
+        case LUA_TSTRING:
+        {
+            lua_pushlstring(luaVM, m_strString.c_str(), m_strString.length());
+            break;
+        }
 
-            case LUA_TNUMBER:
-            {
-                lua_pushnumber(luaVM, m_Number);
-                break;
-            }
-
-            case LUA_TTABLE:
-            {
-                int* pThingy;
-                if (pKnownTables && (pThingy = MapFind(*pKnownTables, m_pTableData)))
-                {
-                    lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
-                    lua_pushnumber(luaVM, *pThingy);
-                    lua_gettable(luaVM, -2);
-                    lua_remove(luaVM, -2);
-                }
-                else
-                {
-                    m_pTableData->PushAsTable(luaVM, pKnownTables);
-                }
-                break;
-            }
-
-            case LUA_TSTRING:
-            {
-                lua_pushlstring(luaVM, m_strString.c_str(), m_strString.length());
-                break;
-            }
+        default:
+        {
+            // Unexpected type, keep the stack balanced for callers
+            lua_pushnil(luaVM);
+            break;
         }
     }
 }
@@ -425,9 +435,10 @@ bool CLuaArgument::GetAsString(SString& strBuffer)
 }
 
 // Can't use bitStream.Version() here as it is sometimes not set
-bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables, unsigned int uiDepth)
 {
     DeleteTableData();
+    m_iType = LUA_TNIL;
     SLuaTypeSync type;
 
     // Read out the type
@@ -483,8 +494,11 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             case LUA_TTABLE:
             {
                 m_pTableData = new CLuaArguments();
-                if (!m_pTableData->ReadFromBitStream(bitStream, pKnownTables))
+                if (!m_pTableData->ReadFromBitStream(bitStream, pKnownTables, uiDepth + 1))
+                {
+                    DeleteTableData();
                     return false;
+                }
                 m_bWeakTableRef = false;
                 m_iType = LUA_TTABLE;
                 m_pTableData->ValidateTableKeys();
@@ -716,7 +730,7 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
             }
             else
             {
-                // Jax: this just spams the script debugger, it's not really neccesary
+                // Jax: this just spams the script debugger, it's not really necessary
                 // LogUnableToPacketize ( "Couldn't packetize argument list, invalid element specified." );
 
                 // Write a nil though so other side won't get out of sync

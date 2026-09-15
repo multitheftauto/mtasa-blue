@@ -31,7 +31,6 @@ public:
     bool              Import(unsigned short usModelID);
     static bool       IsImportableModel(unsigned short usModelID);
     static bool       IsTXDData(const SString& strData);
-    const SString&    GetLastError() const { return m_strLastError; }
 
 private:
     bool LoadFromFile(SString filePath);
@@ -41,7 +40,6 @@ private:
     bool GetFilenameToUse(SString& strOutFilename);
 
     SString              m_strFilename;
-    SString              m_strLastError;
     bool                 m_bFilteringEnabled;
     bool                 m_bIsRawData;
     bool                 m_bUsingFileDataForClothes;

@@ -81,11 +81,14 @@ public:
 
     void Callback_OnCollision(CClientColShape& Shape, CClientEntity& Entity);
     void Callback_OnLeave(CClientColShape& Shape, CClientEntity& Entity);
+    bool ShouldTrackCollision(CClientColShape& Shape, CClientEntity& Entity);
 
     virtual CSphere GetWorldBoundingSphere();
 
     void SetIgnoreAlphaLimits(bool ignore);
     bool AreAlphaLimitsIgnored() const noexcept { return m_pMarker->AreAlphaLimitsIgnored(); };
+
+    bool IsOnScreen() const;
 
 protected:
     void StreamIn(bool bInstantly);

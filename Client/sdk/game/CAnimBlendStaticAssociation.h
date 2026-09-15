@@ -28,6 +28,6 @@ public:
     virtual short                                   GetAnimID() = 0;
     virtual short                                   GetAnimGroup() = 0;
     virtual short                                   GetFlags() = 0;
-    virtual CAnimBlendHierarchySAInterface*         GetAnimHierachyInterface() = 0;
+    virtual CAnimBlendHierarchySAInterface*         GetAnimHierarchyInterface() = 0;
     virtual CAnimBlendStaticAssociationSAInterface* GetInterface() = 0;
 };

@@ -67,11 +67,12 @@ public:
     void     SetPullTowardsCamera(float fPullTowardsCamera);
     void     SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha);
     void     SetTexture(RwTexture* texture);
-    void     SetTexture(CoronaType texture);
+    void     SetTexture(CoronaType::Enum texture);
     BYTE     GetFlareType();
     void     SetFlareType(BYTE fFlareType);
     void     SetReflectionType(BYTE reflectionType);
     DWORD    GetIdentifier() { return internalInterface->Identifier; }
+    float    GetNearClipDistance() override { return internalInterface->PullTowardsCam; }
     DWORD    GetID();
     void     Init(DWORD Identifier);
     void     Disable();

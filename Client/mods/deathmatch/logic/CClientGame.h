@@ -531,6 +531,7 @@ private:
     bool OnSize(CGUIElement* pElement);
     bool OnFocusGain(CGUIFocusEventArgs Args);
     bool OnFocusLoss(CGUIFocusEventArgs Args);
+    void TriggerGUIClickEvent(CGUIMouseEventArgs Args, const char* szState, const char* minClientVersion);
 
     // Network update functions
     void DoVehicleInKeyCheck();
@@ -576,6 +577,7 @@ private:
     static void                              StaticRenderHeliLightHandler();
     static void                              StaticRenderEverythingBarRoadsHandler();
     static bool                              StaticChokingHandler(unsigned char ucWeaponType);
+    static void                              StaticPreWeatherUpdateHandler();
     static void                              StaticPreWorldProcessHandler();
     static void                              StaticPostWorldProcessHandler();
     static void                              StaticPostWorldProcessPedsAfterPreRenderHandler();
@@ -625,6 +627,7 @@ private:
     void                              Render3DStuffHandler();
     void                              PreRenderSkyHandler();
     bool                              ChokingHandler(unsigned char ucWeaponType);
+    void                              PreWeatherUpdateHandler();
     void                              PreWorldProcessHandler();
     void                              PostWorldProcessHandler();
     void                              PostWorldProcessPedsAfterPreRenderHandler();
@@ -817,6 +820,15 @@ private:
     unsigned long  m_ulDamageTime;
     bool           m_bDamageSent;
     bool           m_serverProcessedDeath{false};  // Flag to track server-processed deaths
+
+    // Used by VehicleDamageHandler to detect and swallow the game engine's immediate
+    // internal retry of a tyre-damage hit when that hit's event was cancelled (see comment
+    // at the top of VehicleDamageHandler for the full explanation).
+    CEntitySAInterface* m_pLastTyreDamageVehicleInterface{nullptr};
+    uchar               m_ucLastTyreDamageIndex{UCHAR_INVALID_INDEX};
+    float               m_fLastTyreDamageLoss{0.0f};
+    uint                m_uiLastTyreDamageFrame{0};
+    bool                m_bLastTyreDamageAllowed{true};
 
     eWeaponSlot                            m_lastWeaponSlot;
     SFixedArray<DWORD, WEAPONSLOT_MAX + 1> m_wasWeaponAmmoInClip;

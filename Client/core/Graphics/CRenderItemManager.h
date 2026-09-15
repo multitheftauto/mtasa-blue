@@ -65,9 +65,11 @@ public:
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void OnLostDevice();
     void OnResetDevice();
+    void OnViewportSizeChanged(uint uiNewViewportSizeX, uint uiNewViewportSizeY);
     void UpdateBackBufferCopySize();
     bool SaveDefaultRenderTarget();
     bool IsUsingDefaultRenderTarget();
+    bool IsCustomRenderTargetActive() const { return m_pDefaultD3DRenderTarget != nullptr; }
     bool ChangeRenderTarget(uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface);
     void RemoveShaderItemFromWatchLists(CShaderItem* pShaderItem);
     void UpdateMemoryUsage();
@@ -76,6 +78,8 @@ public:
     void NotifyShaderItemUsesMultipleRenderTargets(CShaderItem* pShaderItem, bool bUsesMultipleRenderTargets);
 
     HRESULT GetDeviceCooperativeLevel(const char* szContext, bool bLogLost = true) const;
+
+    void RetryInvalidRenderTargets();
 
     static int GetBitsPerPixel(D3DFORMAT Format);
     static int GetPitchDivisor(D3DFORMAT Format);
@@ -88,6 +92,8 @@ public:
     IDirect3DDevice9* m_pDevice;
 
 protected:
+    void TryRecreateInvalidRenderTargets();
+
     std::set<CRenderItem*>   m_CreatedItemList;
     IDirect3DSurface9*       m_pDefaultD3DRenderTarget;
     IDirect3DSurface9*       m_pDefaultD3DZStencilSurface;
@@ -120,4 +126,8 @@ protected:
     IDirect3DSurface9*       m_pNonAARenderTarget;
     IDirect3DTexture9*       m_pNonAARenderTargetTexture;
     bool                     m_bIsSwiftShader;
+    uint                     m_uiLastRenderTargetRetryTime;
+    uint                     m_uiRenderTargetRetryDelayMs;
+    uint                     m_uiRenderTargetRetryAttempts;
+    uint                     m_uiRenderTargetRetryCooldownUntil;
 };

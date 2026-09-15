@@ -12,6 +12,7 @@
 #include <StdInc.h>
 #include "CTileBatcher.h"
 #include "CMaterialLine3DBatcher.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 
 SMaterialLine3DItem* CMaterialLine3DBatcher::ms_pLines = NULL;
 
@@ -127,7 +128,7 @@ void CMaterialLine3DBatcher::Flush()
     std::vector<uint> indexList;
     indexList.resize(uiNumLines);
     uint* pIndices = &indexList[0];
-    uint  uiNumIndicies = 0;
+    uint  uiNumIndices = 0;
 
     // Calculate distances
     for (uint i = 0; i < uiNumLines; i++)
@@ -148,12 +149,12 @@ void CMaterialLine3DBatcher::Flush()
                 continue;
         }
         // Add the index for this line to the draw list
-        pIndices[uiNumIndicies++] = i;
+        pIndices[uiNumIndices++] = i;
     }
 
-    if (uiNumIndicies > 0)
+    if (uiNumIndices > 0)
     {
-        indexList.resize(uiNumIndicies);
+        indexList.resize(uiNumIndices);
 
         // Sort index list by distance
         ms_pLines = &m_LineList[0];
@@ -163,12 +164,12 @@ void CMaterialLine3DBatcher::Flush()
 
         // Draw index list, batching by material
         uint uiBatchFirstIndex = 0;
-        for (uint i = 0; i < uiNumIndicies; i++)
+        for (uint i = 0; i < uiNumIndices; i++)
         {
             const SMaterialLine3DItem& item = ms_pLines[pIndices[i]];
 
             // Flush batch if this is the last index, or the next one uses a different material
-            if ((i == uiNumIndicies - 1) || item.pMaterial != ms_pLines[pIndices[i + 1]].pMaterial)
+            if ((i == uiNumIndices - 1) || item.pMaterial != ms_pLines[pIndices[i + 1]].pMaterial)
             {
                 uint* pBatchIndices = &pIndices[uiBatchFirstIndex];
                 uint  uiNumBatchLines = i - uiBatchFirstIndex + 1;
@@ -277,8 +278,22 @@ void CMaterialLine3DBatcher::DrawBatch(const CVector& vecCameraPos, uint* pBatch
     if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
     {
         // Draw using texture
-        m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
-        m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
+        bool bDrawTexture = true;
+        if (CRenderTargetItem* pRenderTarget = DynamicCast<CRenderTargetItem>(pTextureItem))
+        {
+            if (!pRenderTarget->TryEnsureValid())
+                bDrawTexture = false;
+        }
+        else if (CScreenSourceItem* pScreenSource = DynamicCast<CScreenSourceItem>(pTextureItem))
+        {
+            if (!pScreenSource->TryEnsureValid())
+                bDrawTexture = false;
+        }
+        if (bDrawTexture && pTextureItem->m_pD3DTexture)
+        {
+            m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
+            m_pDevice->DrawPrimitiveUP(D3DPT_TRIANGLELIST, PrimitiveCount, pVertexStreamZeroData, VertexStreamZeroStride);
+        }
     }
     else if (CShaderInstance* pShaderInstance = DynamicCast<CShaderInstance>(pMaterial))
     {

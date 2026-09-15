@@ -15,6 +15,13 @@
 #include "SString.h"
 #include "WString.h"
 
+#if defined(_WIN32) && defined(MTA_CLIENT)
+// Workaround to prevent pulling in the fat windows.h header
+// Callers that need WIN32_FILE_ATTRIBUTE_DATA as a value type must include <windows.h> after all.
+struct _WIN32_FILE_ATTRIBUTE_DATA;
+typedef struct _WIN32_FILE_ATTRIBUTE_DATA WIN32_FILE_ATTRIBUTE_DATA;
+#endif
+
 namespace SharedUtil
 {
     //
@@ -31,7 +38,8 @@ namespace SharedUtil
     bool FileLoad(std::nothrow_t, const SString& filePath, SString& outBuffer, size_t maxSize = INT_MAX, size_t offset = 0) noexcept;
 
 #if defined(_WIN32) && defined(MTA_CLIENT)
-    bool FileLoadWithTimeout(const SString& filePath, SString& outBuffer, DWORD timeoutMs) noexcept;
+    bool GetFileAttributesExWithTimeout(const wchar_t* path, WIN32_FILE_ATTRIBUTE_DATA& attr, unsigned long timeoutMs) noexcept;
+    bool FileLoadWithTimeout(const SString& filePath, SString& outBuffer, unsigned long timeoutMs) noexcept;
 #endif
 
     //

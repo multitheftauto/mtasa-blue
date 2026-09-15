@@ -74,10 +74,11 @@ std::vector<DWORD> GetGTAProcessList();
 bool CommandLineContains(const SString& strText);
 void DisplayErrorMessageBox(const SString& strMessage, const SString& strErrorCode = "", const SString& strTroubleType = "");
 
-auto GetMTARootDirectory() -> std::filesystem::path;
-auto GetGameBaseDirectory() -> std::filesystem::path;
-auto GetGameLaunchDirectory() -> std::filesystem::path;
-auto GetGameExecutablePath() -> std::filesystem::path;
+auto    GetMTARootDirectory() -> std::filesystem::path;
+auto    GetGameBaseDirectory() -> std::filesystem::path;
+auto    GetGameLaunchDirectory() -> std::filesystem::path;
+auto    GetGameExecutablePath() -> std::filesystem::path;
+SString GetInstallPathForLauncher();
 
 void            SetMTASAPathSource(bool bReadFromRegistry);
 SString         GetMTASAPath();
@@ -126,6 +127,7 @@ bool               VerifyEmbeddedSignature(const SString& strFilename);
 void               LogSettings();
 SString            PadLeft(const SString& strText, uint uiNumSpaces, char cCharacter);
 bool               IsDeviceSelectionDialogOpen(DWORD processID);
+bool               IsGameWindowOpen(DWORD processID);
 std::vector<DWORD> MyEnumProcesses(bool bInclude64bit = false, bool bIncludeCurrent = false);
 SString            GetProcessPathFilename(DWORD processID);
 SString            GetProcessFilename(DWORD processID);

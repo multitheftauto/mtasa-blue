@@ -610,6 +610,26 @@ void CVehicleUpgrades::ForceAddUpgrade(unsigned short usUpgrade)
         CVehicle* pVehicle = m_pVehicle->GetGameVehicle();
         if (pVehicle)
         {
+            // Spoiler upgrades (slot 2) must not be applied if the vehicle model
+            // doesn't have the "ug_spoiler" frame. Otherwise, SA's AddUpgrade will
+            // call GetFrameFromId and get NULL, triggering the crash-fix fallback
+            // that attaches the spoiler to the wrong frame.
+            if (ucSlot == 2)
+            {
+                CModelInfo* pVehicleModelInfo = g_pGame->GetModelInfo(m_pVehicle->GetModel());
+                if (!pVehicleModelInfo)
+                    return;
+
+                if (pVehicleModelInfo->GetParentID() != 0)
+                    pVehicleModelInfo = g_pGame->GetModelInfo(pVehicleModelInfo->GetParentID());
+
+                if (!pVehicleModelInfo || !pVehicleModelInfo->GetVehicleSupportedUpgrades().m_bSpoiler)
+                {
+                    // Vehicle doesn't support this spoiler upgrade - skip it
+                    return;
+                }
+            }
+
             // Grab the upgrade model
             CModelInfo* pModelInfo = g_pGame->GetModelInfo(usUpgrade);
             if (pModelInfo)

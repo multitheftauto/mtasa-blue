@@ -714,6 +714,13 @@ void CClientCamera::SetCameraClip(bool bObjects, bool bVehicles)
     m_pCamera->SetCameraClip(bObjects, bVehicles);
 }
 
+void CClientCamera::ResetCameraClip()
+{
+    if (!m_pCamera)
+        return;
+    m_pCamera->ResetCameraClip();
+}
+
 void CClientCamera::GetCameraClip(bool& bObjects, bool& bVehicles)
 {
     if (!m_pCamera)

@@ -10,6 +10,8 @@
 #include "StdInc.h"
 #include "CRenderItem.EffectParameters.h"
 
+#include <DXHook/CProxyDirect3DDevice9.h>
+
 #include <cctype>
 #include <cstdlib>
 #include <limits>
@@ -376,7 +378,9 @@ HRESULT CEffectParameters::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
     LPDIRECT3DDEVICE9 pDevice = nullptr;
     m_pD3DEffect->GetDevice(&pDevice);
 
-    bool bCanBindRenderTargets = (pDevice != nullptr);
+    bool                     bCanBindRenderTargets = (pDevice != nullptr);
+    CScopedActiveProxyDevice proxyDevice;
+    IDirect3DDevice9*        pStateDevice = proxyDevice ? static_cast<IDirect3DDevice9*>(proxyDevice.Get()) : pDevice;
     if (pDevice)
     {
         const HRESULT hrCooperativeLevel = pDevice->TestCooperativeLevel();
@@ -403,7 +407,8 @@ HRESULT CEffectParameters::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
                     HRESULT            hrSurface = ((IDirect3DTexture9*)pD3DTexture)->GetSurfaceLevel(0, &pD3DSurface);
                     if (hrSurface == D3D_OK && pD3DSurface)
                     {
-                        pDevice->SetRenderTarget(i + 1, pD3DSurface);
+                        if (pStateDevice)
+                            pStateDevice->SetRenderTarget(i + 1, pD3DSurface);
                         SAFE_RELEASE(pD3DSurface);
                     }
                 }
@@ -435,6 +440,8 @@ HRESULT CEffectParameters::End(bool bDeviceOperational)
     {
         LPDIRECT3DDEVICE9 pDevice = nullptr;
         m_pD3DEffect->GetDevice(&pDevice);
+        CScopedActiveProxyDevice proxyDevice;
+        IDirect3DDevice9*        pStateDevice = proxyDevice ? static_cast<IDirect3DDevice9*>(proxyDevice.Get()) : pDevice;
 
         if (pDevice)
         {
@@ -448,7 +455,8 @@ HRESULT CEffectParameters::End(bool bDeviceOperational)
             if (bCanTouchDevice)
             {
                 for (uint i = 0; i < m_SecondaryRenderTargetList.size(); i++)
-                    pDevice->SetRenderTarget(i + 1, nullptr);
+                    if (pStateDevice)
+                        pStateDevice->SetRenderTarget(i + 1, nullptr);
             }
 
             SAFE_RELEASE(pDevice);
@@ -571,13 +579,17 @@ bool CEffectParameters::ApplyCommonHandles()
         D3DXCOLOR   strongestDiffuse(0, 0, 0, 0);
         D3DXCOLOR   strongestSpecular(0, 0, 0, 0);
         D3DXVECTOR3 strongestDirection(0, 0, -1);
-        for (uint i = 0; i < 4; i++)
+        // The vehicle pipeline reserves slot 7 for its specular directional
+        // light. Include it without broadening the existing selection of GTA's
+        // temporary world lights in slots 0 through 3.
+        constexpr DWORD COMMON_EFFECT_LIGHT_SLOTS[] = {0, 1, 2, 3, 7};
+        for (const DWORD lightSlot : COMMON_EFFECT_LIGHT_SLOTS)
         {
             BOOL bEnabled;
-            if (SUCCEEDED(pDevice->GetLightEnable(i, &bEnabled)) && bEnabled)
+            if (SUCCEEDED(pDevice->GetLightEnable(lightSlot, &bEnabled)) && bEnabled)
             {
                 D3DLIGHT9 D3DLight;
-                pDevice->GetLight(i, &D3DLight);
+                pDevice->GetLight(lightSlot, &D3DLight);
                 if (D3DLight.Type == D3DLIGHT_DIRECTIONAL)
                 {
                     totalAmbient += D3DLight.Ambient;
@@ -1068,7 +1080,7 @@ bool CEffectParameters::TryParseSpecialParameter(D3DXHANDLE hParameter, const D3
 //
 // CEffectParameters::IsSecondaryRenderTarget
 //
-// Return true if paramter is flagged for use as a secondary render target texture
+// Return true if parameter is flagged for use as a secondary render target texture
 //
 ////////////////////////////////////////////////////////////////
 bool CEffectParameters::IsSecondaryRenderTarget(D3DXHANDLE hParameter, const D3DXPARAMETER_DESC& ParameterDesc)

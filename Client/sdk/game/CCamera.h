@@ -139,6 +139,7 @@ public:
     virtual RwMatrix* GetLTM() = 0;
     virtual CEntity*  GetTargetEntity() = 0;
     virtual void      SetCameraClip(bool bObjects, bool bVehicles) = 0;
+    virtual void      ResetCameraClip() = 0;
     virtual void      GetCameraClip(bool& bObjects, bool& bVehicles) = 0;
     virtual void      SetCameraVehicleViewMode(BYTE dwCamMode) = 0;
     virtual void      SetCameraPedViewMode(BYTE dwCamMode) = 0;
@@ -154,4 +155,6 @@ public:
     virtual bool         IsInTransition() const = 0;
     virtual float        GetTransitionFOV() const = 0;
     virtual bool         GetTransitionMatrix(CMatrix& matrix) const = 0;
+
+    virtual bool IsSphereVisible(CVector* center, float radius) const = 0;
 };

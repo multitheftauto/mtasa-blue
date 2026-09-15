@@ -61,6 +61,12 @@ CBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::uint16_
     if (!pBuilding)
         return nullptr;
 
+    CElementGroup* pGroup = pResource->GetElementGroup();
+    if (pGroup)
+    {
+        pGroup->Add(pBuilding);
+    }
+
     pBuilding->SetPosition(pos);
     pBuilding->SetRotation(rot.value());
     pBuilding->SetModel(modelId);

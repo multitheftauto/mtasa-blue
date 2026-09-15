@@ -269,7 +269,6 @@ void CClientPlayer::DischargeWeapon(eWeaponType weaponType, const CVector& vecSt
         if (weaponType != GetCurrentWeaponType())
         {
             GiveWeapon(weaponType, 99, true);
-            AddReportLog(5432, SString("DischargeWeapon adding missing weapon %d (%s)", weaponType, GetNick()), 30);
         }
 
         // Check weapon matches and is enabled for bullet sync

@@ -22,7 +22,8 @@ extern CClientGame* g_pClientGame;
 
 CLuaArguments::CLuaArguments(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
 {
-    ReadFromBitStream(bitStream, pKnownTables);
+    if (!ReadFromBitStream(bitStream, pKnownTables))
+        DeleteArguments();
 }
 
 CLuaArguments::CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
@@ -143,16 +144,18 @@ void CLuaArguments::PushArguments(lua_State* luaVM) const
     }
 }
 
-void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables) const
+void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables, bool isArray) const
 {
     // Ensure there is enough space on the Lua stack
     LUA_CHECKSTACK(luaVM, 4);
 
-    bool bKnownTablesCreated = false;
+    bool                              usedLocalKnownTables = false;
+    CFastHashMap<CLuaArguments*, int> localKnownTables;
+
     if (!pKnownTables)
     {
-        pKnownTables = new CFastHashMap<CLuaArguments*, int>();
-        bKnownTablesCreated = true;
+        pKnownTables = &localKnownTables;
+        usedLocalKnownTables = true;
 
         lua_newtable(luaVM);
         // using registry to make it fail safe, else we'd have to carry
@@ -171,21 +174,33 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
     lua_pop(luaVM, 1);
     pKnownTables->insert(std::make_pair((CLuaArguments*)this, size));
 
-    vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
-    for (; iter != m_Arguments.end() && (iter + 1) != m_Arguments.end(); iter++)
+    // map
+    if (!isArray)
     {
-        (*iter)->Push(luaVM, pKnownTables);  // index
-        iter++;
-        (*iter)->Push(luaVM, pKnownTables);  // value
-        lua_settable(luaVM, -3);
+        vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
+        for (; iter != m_Arguments.end() && (iter + 1) != m_Arguments.end(); iter++)
+        {
+            (*iter)->Push(luaVM, pKnownTables);  // index
+            iter++;
+            (*iter)->Push(luaVM, pKnownTables);  // value
+            lua_settable(luaVM, -3);
+        }
+    }
+    else  // array
+    {
+        int index = 1;
+        for (auto iter = m_Arguments.begin(); iter != m_Arguments.end(); ++iter)
+        {
+            (*iter)->Push(luaVM, pKnownTables);
+            lua_rawseti(luaVM, -2, index++);
+        }
     }
 
-    if (bKnownTablesCreated)
+    if (usedLocalKnownTables)
     {
         // clear the cache
         lua_pushnil(luaVM);
         lua_setfield(luaVM, LUA_REGISTRYINDEX, "cache");
-        delete pKnownTables;
     }
 }
 
@@ -200,14 +215,26 @@ void CLuaArguments::PushArguments(const CLuaArguments& Arguments)
 bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments* returnValues) const
 {
     assert(pLuaMain);
-    TIMEUS startTime = GetTimeUs();
+    const bool   timingActive = CClientPerfStatLuaTiming::GetSingleton()->IsActive();
+    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
-    // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine();
     assert(luaVM);
-    LUA_CHECKSTACK(luaVM, 2);
+    LUA_CHECKSTACK(luaVM, 1);
     int luaStackPointer = lua_gettop(luaVM);
+
+    // Get the function from the registry
     lua_getref(luaVM, iLuaFunction.ToInt());
+
+    // If that function doesn't exist, return false
+    if (lua_isnil(luaVM, -1))
+    {
+        // cleanup the stack
+        while (lua_gettop(luaVM) - luaStackPointer > 0)
+            lua_pop(luaVM, 1);
+
+        return false;
+    }
 
     // Push our arguments onto the stack
     PushArguments(luaVM);
@@ -244,7 +271,10 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
             lua_pop(luaVM, 1);
     }
 
-    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, pLuaMain->GetFunctionTag(iLuaFunction.ToInt()), GetTimeUs() - startTime);
+    if (timingActive)
+    {
+        CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, pLuaMain->GetFunctionTag(iLuaFunction.ToInt()), GetTimeUs() - startTime);
+    }
     return true;
 }
 
@@ -252,7 +282,8 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
 {
     assert(pLuaMain);
     assert(szFunction);
-    TIMEUS startTime = GetTimeUs();
+    const bool   timingActive = CClientPerfStatLuaTiming::GetSingleton()->IsActive();
+    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine();
@@ -308,7 +339,10 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
             lua_pop(luaVM, 1);
     }
 
-    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, szFunction, GetTimeUs() - startTime);
+    if (timingActive)
+    {
+        CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, szFunction, GetTimeUs() - startTime);
+    }
     return true;
 }
 
@@ -459,8 +493,11 @@ void CLuaArguments::ValidateTableKeys()
     }
 }
 
-bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables)
+bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables, unsigned int uiDepth)
 {
+    if (uiDepth > MaxBitStreamTableReadDepth)
+        return false;
+
     bool bKnownTablesCreated = false;
     if (!pKnownTables)
     {
@@ -471,10 +508,26 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
     unsigned int uiNumArgs;
     if (bitStream.ReadCompressed(uiNumArgs))
     {
+        // Each argument needs at least 4 bits (SLuaTypeSync), reject obviously corrupt counts
+        int unreadBits = bitStream.GetNumberOfUnreadBits();
+        if (unreadBits < 0 || uiNumArgs > static_cast<unsigned int>(unreadBits) / 4)
+        {
+            if (bKnownTablesCreated)
+                delete pKnownTables;
+            return false;
+        }
+
         pKnownTables->push_back(this);
         for (unsigned int ui = 0; ui < uiNumArgs; ++ui)
         {
-            CLuaArgument* pArgument = new CLuaArgument(bitStream, pKnownTables);
+            CLuaArgument* pArgument = new CLuaArgument();
+            if (!pArgument->ReadFromBitStream(bitStream, pKnownTables, uiDepth + 1))
+            {
+                delete pArgument;
+                if (bKnownTablesCreated)
+                    delete pKnownTables;
+                return false;
+            }
             m_Arguments.push_back(pArgument);
         }
     }

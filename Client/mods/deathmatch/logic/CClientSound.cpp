@@ -597,6 +597,7 @@ float* CClientSound::GetWaveData(int iLength)
     }
     return NULL;
 }
+
 bool CClientSound::SetPanEnabled(bool bPan)
 {
     if (m_b3D)
@@ -679,7 +680,12 @@ bool CClientSound::SetFxEffect(uint uiFxEffect, bool bEnable)
     m_EnabledEffects[uiFxEffect] = bEnable;
 
     if (m_pAudio)
+    {
         m_pAudio->SetFxEffects(&m_EnabledEffects[0], NUMELMS(m_EnabledEffects));
+        // Report the BASS-effective outcome: an effect the OS doesn't provide
+        // (e.g. I3DL2REVERB on Windows 11 24H2, #4259) won't actually engage.
+        return m_pAudio->IsFxEffectEnabled(uiFxEffect) == bEnable;
+    }
 
     return true;
 }
@@ -688,6 +694,8 @@ bool CClientSound::IsFxEffectEnabled(uint uiFxEffect)
 {
     if (uiFxEffect >= NUMELMS(m_EnabledEffects))
         return false;
+    if (m_pAudio)
+        return m_pAudio->IsFxEffectEnabled(uiFxEffect);
     return m_EnabledEffects[uiFxEffect] ? true : false;
 }
 
@@ -730,13 +738,17 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
     {
         // Update our position and velocity if we're attached
         CClientEntity* pAttachedToEntity = GetAttachedTo();
+
         if (pAttachedToEntity)
         {
             GetPosition(m_vecPosition);
             DoAttaching();
+
             CVector vecVelocity;
+
             if (CStaticFunctionDefinitions::GetElementVelocity(*pAttachedToEntity, vecVelocity))
                 SetVelocity(vecVelocity);
+
             // Update our spatial data position
             UpdateSpatialData();
         }

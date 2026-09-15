@@ -12,6 +12,8 @@
 
 #include "CStaticFunctionDefinitions.h"
 
+void NetServer_NotifyHqReachable(bool bReachable);
+
 enum
 {
     HQCOMMS_STAGE_NONE,
@@ -118,6 +120,7 @@ public:
         if (result.bSuccess)
         {
             m_Stage = HQCOMMS_STAGE_TIMER;
+            NetServer_NotifyHqReachable(true);
             CBitStream bitStream(result.pData, result.dataSize);
 
             // Process various parts of returned data
@@ -131,6 +134,7 @@ public:
         else
         {
             m_Stage = HQCOMMS_STAGE_TIMER;
+            NetServer_NotifyHqReachable(false);
         }
     }
 
@@ -158,7 +162,7 @@ public:
         }
     }
 
-    // Messsage for this server from HQ
+    // Message for this server from HQ
     void ProcessMessage(CBitStream& bitStream)
     {
         int     iMessageAlwaysPrint = 0;

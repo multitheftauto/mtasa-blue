@@ -32,12 +32,6 @@ struct RwTexture;
 
 #define SIZEOF_CHELI 2584
 
-// Suspension line sizes for different vehicle types
-#define MAX_SUSPENSION_LINES          6
-#define SUSPENSION_SIZE_STANDARD      0x20  // Standard wheel: 32 bytes
-#define SUSPENSION_SIZE_BIKE          0x80  // Bike: 128 bytes (2 wheels with extra data)
-#define SUSPENSION_SIZE_MONSTER_TRUCK 0x90  // Monster truck: 144 bytes
-
 #define FUNC_CCarCtrlCreateCarForScript          0x431f80
 #define FUNC_CVehicle_AddVehicleUpgrade          0x6E3290
 #define FUNC_CVehicle_RemoveVehicleUpgrade       0x6DF930
@@ -92,8 +86,9 @@ struct RwTexture;
 #define FUNC_CAutomobile__GetDoorAngleOpenRatio 0x6A2270
 #define FUNC_CTrain__GetDoorAngleOpenRatio      0x6F59C0
 
-#define HANDLING_NOS_Flag        0x00080000
-#define HANDLING_Hydraulics_Flag 0x00020000
+#define HANDLING_NOS_Flag             0x00080000
+#define HANDLING_Hydraulics_Flag      0x00020000
+#define HANDLING_SwingingChassis_Flag 0x10000000
 
 #define VAR_CVehicle_Variation1 0x8A6458
 #define VAR_CVehicle_Variation2 0x8A6459
@@ -143,7 +138,7 @@ struct CVehicleFlags
     unsigned char bLowVehicle : 1;        // Need this for sporty type cars to use low getting-in/out anims
     unsigned char bComedyControls : 1;    // Will make the car hard to control (hopefully in a funny way)
     unsigned char bWarnedPeds : 1;        // Has scan and warn peds of danger been processed?
-    unsigned char bCraneMessageDone : 1;  // A crane message has been printed for this car allready
+    unsigned char bCraneMessageDone : 1;  // A crane message has been printed for this car already
     // unsigned char bExtendedRange: 1; // This vehicle needs to be a bit further away to get deleted
     unsigned char bTakeLessDamage : 1;  // This vehicle is stronger (takes about 1/4 of damage)
 
@@ -410,8 +405,8 @@ public:
     float m_steeringLeftRight;
 
     // 1424
-    VehicleClass m_vehicleClass;
-    uint32_t     m_vehicleSubClass;
+    VehicleClass::Enum m_vehicleClass;
+    uint32_t           m_vehicleSubClass;
 
     int16_t    m_peviousRemapTxd;
     int16_t    m_remapTxd;
@@ -454,7 +449,6 @@ public:
     ~CVehicleSA();
 
     CVehicleSAInterface* GetVehicleInterface() { return reinterpret_cast<CVehicleSAInterface*>(GetInterface()); }
-    CVehicleSAInterface* GetVehicleInterface() const { return reinterpret_cast<CVehicleSAInterface*>(m_pInterface); }
 
     void Init();
 
@@ -662,18 +656,32 @@ public:
 
     void GiveVehicleSirens(unsigned char ucSirenType, unsigned char ucSirenCount);
     void RemoveVehicleSirens() { m_tSirenInfo.m_bOverrideSirens = false; }
-    void SetVehicleSirenMinimumAlpha(unsigned char ucSirenCount, DWORD dwPercentage)
+    void SetVehicleSirenMinimumAlpha(unsigned char ucSirenID, DWORD dwPercentage)
     {
-        m_tSirenInfo.m_tSirenInfo[ucSirenCount].m_dwMinSirenAlpha = dwPercentage;
+        if (ucSirenID >= SIREN_COUNT_MAX)
+            return;
+        m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha = dwPercentage;
     }
-    void               SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos);
-    void               GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos);
-    unsigned char      GetVehicleSirenCount() { return m_tSirenInfo.m_ucSirenCount; }
-    unsigned char      GetVehicleSirenType() { return m_tSirenInfo.m_ucSirenType; }
-    DWORD              GetVehicleSirenMinimumAlpha(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha; }
-    SharedUtil::SColor GetVehicleSirenColour(unsigned char ucSirenID) { return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour; }
-    void               SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour)
+    void          SetVehicleSirenPosition(unsigned char ucSirenID, CVector vecPos);
+    void          GetVehicleSirenPosition(unsigned char ucSirenID, CVector& vecPos);
+    unsigned char GetVehicleSirenCount() { return m_tSirenInfo.m_ucSirenCount; }
+    unsigned char GetVehicleSirenType() { return m_tSirenInfo.m_ucSirenType; }
+    DWORD         GetVehicleSirenMinimumAlpha(unsigned char ucSirenID)
     {
+        if (ucSirenID >= SIREN_COUNT_MAX)
+            return 0;
+        return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_dwMinSirenAlpha;
+    }
+    SharedUtil::SColor GetVehicleSirenColour(unsigned char ucSirenID)
+    {
+        if (ucSirenID >= SIREN_COUNT_MAX)
+            return SharedUtil::SColor();
+        return m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour;
+    }
+    void SetVehicleSirenColour(unsigned char ucSirenID, SharedUtil::SColor tVehicleSirenColour)
+    {
+        if (ucSirenID >= SIREN_COUNT_MAX)
+            return;
         m_tSirenInfo.m_tSirenInfo[ucSirenID].m_RGBBeaconColour = tVehicleSirenColour;
     }
     void                              SetVehicleCurrentSirenID(unsigned char ucCurrentSirenID) { m_tSirenInfo.m_ucCurrentSirenID = ucCurrentSirenID; }
@@ -711,8 +719,8 @@ public:
 
     CAEVehicleAudioEntitySA* GetVehicleAudioEntity() { return m_pVehicleAudioEntity; };
 
-    bool GetDummyPosition(VehicleDummies dummy, CVector& position) const override;
-    bool SetDummyPosition(VehicleDummies dummy, const CVector& position) override;
+    bool GetDummyPosition(VehicleDummies::Enum dummy, CVector& position) const override;
+    bool SetDummyPosition(VehicleDummies::Enum dummy, const CVector& position) override;
 
     CVector*       GetDummyPositions() { return m_dummyPositions.data(); }
     const CVector* GetDummyPositions() const override { return m_dummyPositions.data(); }
@@ -725,9 +733,11 @@ public:
     static bool GetVehiclesSunGlareEnabled();
 
 private:
-    static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies dummy, const CVector& position);
+    static void SetAutomobileDummyPosition(CAutomobileSAInterface* automobile, VehicleDummies::Enum dummy, const CVector& position);
 
     void           RecalculateSuspensionLines();
+    void           RecalculateSwingingChassis();
+    void           RecalculateDoorModelFlags();
     void           CopyGlobalSuspensionLinesToPrivate();
     SVehicleFrame* GetVehicleComponent(const SString& vehicleComponent);
     void           FinalizeFramesList();

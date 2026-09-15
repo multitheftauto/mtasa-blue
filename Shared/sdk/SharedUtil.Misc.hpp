@@ -29,7 +29,7 @@
     #define SHAREDUTIL_PLATFORM_WINDOWS 1
 #endif
 
-#if defined(__linux__) || defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+#if defined(__linux__) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
     #include <fstream>
     #include <string>
     #include <sstream>
@@ -203,6 +203,20 @@ static void InitializeProcessBaseDir(SString& strProcessBaseDir)
 
                                 if (folderName == L"mta")
                                 {
+                                    const SString strCurrentPath = ToUTF8(currentPath.wstring());
+                                    const bool    bHasKnownModule =
+                                        FileExists(PathJoin(strCurrentPath, "core.dll")) || FileExists(PathJoin(strCurrentPath, "core_d.dll")) ||
+                                        FileExists(PathJoin(strCurrentPath, "loader.dll")) || FileExists(PathJoin(strCurrentPath, "loader_d.dll"));
+
+                                    if (!bHasKnownModule)
+                                    {
+                                        if (currentPath.has_parent_path())
+                                            currentPath = currentPath.parent_path();
+                                        else
+                                            break;
+                                        continue;
+                                    }
+
                                     // Found MTA folder - base directory is its parent
                                     // Stop searching immediately to avoid finding outer "MTA" folders (e.g user with custom intall dir)
                                     if (currentPath.has_parent_path())
@@ -360,29 +374,187 @@ SString SharedUtil::GetParentProcessPathFilename(int pid)
 }
 
 //
+// Set the MTASA base dir manually
+//
+static SString strInstallRootOverride;
+
+void SharedUtil::SetMTASABaseDirOverride(const SString& strPath)
+{
+    strInstallRootOverride = strPath;
+}
+
+bool SharedUtil::IsUsableMtasaInstallRoot(const SString& strPath)
+{
+    if (strPath.empty())
+        return false;
+
+    return FileExists(PathJoin(strPath, "Multi Theft Auto.exe")) || FileExists(PathJoin(strPath, "Multi Theft Auto_d.exe")) ||
+           FileExists(PathJoin(strPath, "mta", "core.dll")) || FileExists(PathJoin(strPath, "MTA", "core.dll")) ||
+           FileExists(PathJoin(strPath, "mta", "core_d.dll")) || FileExists(PathJoin(strPath, "MTA", "core_d.dll"));
+}
+
+// A path inside upcache\_<archive>_tmp_<n> is an auto-update extraction directory.
+// It can look like a usable install root while it exists, but it must not be kept as the real install root.
+bool SharedUtil::IsTemporaryUpdateLaunchPath(const SString& strLaunchPath)
+{
+    if (strLaunchPath.empty())
+        return false;
+
+    const SString strNormalizedLaunchPath = PathConform(strLaunchPath).TrimEnd("\\");
+    if (strNormalizedLaunchPath.empty())
+        return false;
+
+    const SString strLeaf = ExtractFilename(strNormalizedLaunchPath);
+    if (!strLeaf.BeginsWith("_") || !strLeaf.ContainsI("_tmp_"))
+        return false;
+
+    const SString strParent = ExtractFilename(ExtractPath(strNormalizedLaunchPath));
+    return strParent.CompareI("upcache");
+}
+
+// Read Last Run Location from a specific registry view. viewFlag should be one of
+// KEY_WOW64_64KEY, KEY_WOW64_32KEY, or 0 (no view override). Returns empty on any failure.
+// Oversized values are rejected without allocation so a malformed registry entry on the U01
+// recovery path cannot turn into a large allocation; the same 1 MB cap is used by the generic
+// ReadRegistryStringValue helper later in this file.
+static SString ReadInstallRootRegistryValueView(REGSAM viewFlag)
+{
+    constexpr DWORD kMaxRegistryValueBytes = 1024u * 1024u;
+
+    const WString wstrSubKey = FromUTF8(PathJoin(GetProductRegistryPath(), GetMajorVersionString()).TrimEnd("\\"));
+    const WString wstrValue = FromUTF8("Last Run Location");
+
+    HKEY hkTemp = NULL;
+    if (RegOpenKeyExW(HKEY_LOCAL_MACHINE, wstrSubKey, 0, KEY_READ | viewFlag, &hkTemp) != ERROR_SUCCESS || !hkTemp)
+        return "";
+
+    DWORD dwType = REG_SZ;
+    DWORD dwSize = 0;
+    LONG  result = RegQueryValueExW(hkTemp, wstrValue, NULL, &dwType, NULL, &dwSize);
+    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize == 0 || dwSize > kMaxRegistryValueBytes ||
+        (dwSize % sizeof(wchar_t)) != 0)
+    {
+        RegCloseKey(hkTemp);
+        return "";
+    }
+
+    std::vector<wchar_t> buffer((dwSize / sizeof(wchar_t)) + 1u, L'\0');
+    result = RegQueryValueExW(hkTemp, wstrValue, NULL, &dwType, reinterpret_cast<LPBYTE>(buffer.data()), &dwSize);
+    RegCloseKey(hkTemp);
+
+    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize > kMaxRegistryValueBytes || (dwSize % sizeof(wchar_t)) != 0)
+        return "";
+
+    buffer[dwSize / sizeof(wchar_t)] = L'\0';
+
+    // Expand environment variable references for REG_EXPAND_SZ values so callers see a real
+    // filesystem path. Without this, a value like "%ProgramFiles%\..." would fail validation.
+    // The expansion is bounded by the same 1 MB cap so a value containing a self-referential or
+    // explosive expansion cannot trigger a large allocation here.
+    if (dwType == REG_EXPAND_SZ)
+    {
+        constexpr DWORD kMaxExpandChars = kMaxRegistryValueBytes / sizeof(wchar_t);
+        const DWORD     expandedChars = ExpandEnvironmentStringsW(buffer.data(), nullptr, 0);
+        if (expandedChars > 0 && expandedChars <= kMaxExpandChars)
+        {
+            std::vector<wchar_t> expanded(expandedChars, L'\0');
+            if (ExpandEnvironmentStringsW(buffer.data(), expanded.data(), expandedChars))
+                return ToUTF8(expanded.data());
+        }
+    }
+
+    return ToUTF8(buffer.data());
+}
+
+//
 // Get startup directory as saved in the registry by the launcher
 // Used in the Win32 Client only
 //
 SString SharedUtil::GetMTASABaseDir()
 {
+    if (!strInstallRootOverride.empty())
+        return strInstallRootOverride;
+
     static SString strInstallRoot;
+    static SString strInstallRootSource;
     if (strInstallRoot.empty())
     {
         if (IsGTAProcess())
         {
-            // Try to get base dir from parent process
-            strInstallRoot = ExtractPath(GetParentProcessPathFilename(GetCurrentProcessId()));
+            // Try to get base dir from parent process. Validate the candidate against the same
+            // install-root checks used elsewhere and reject temp update paths so the parent-process
+            // branch cannot point this process at a directory that is about to be deleted.
+            SString strParentDir = ExtractPath(GetParentProcessPathFilename(GetCurrentProcessId()));
+            if (SharedUtil::IsUsableMtasaInstallRoot(strParentDir) && !SharedUtil::IsTemporaryUpdateLaunchPath(strParentDir))
+            {
+                strInstallRoot = strParentDir;
+                strInstallRootSource = "parent process";
+            }
         }
         if (strInstallRoot.empty())
         {
-            strInstallRoot = GetRegistryValue("", "Last Run Location");
+            HMODULE hCoreModule = nullptr;
+    #ifdef MTA_DEBUG
+            if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, L"core_d.dll", &hCoreModule))
+    #endif
+                GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, L"core.dll", &hCoreModule);
+
+            if (hCoreModule)
+            {
+                strInstallRoot = GetMTAProcessBaseDir();
+                if (!strInstallRoot.empty())
+                    strInstallRootSource = "loaded core module";
+            }
+        }
+        if (strInstallRoot.empty())
+        {
+            // Read each registry view independently and apply install-root validation per view, so a
+            // stale or temp-path value in one view cannot shadow a usable real install root in
+            // another. Order: 64-bit view, 32-bit view, default view.
+            REGSAM viewFlags[3] = {0, 0, 0};
+            int    viewCount = 0;
+    #if defined(KEY_WOW64_64KEY)
+            viewFlags[viewCount++] = KEY_WOW64_64KEY;
+    #endif
+    #if defined(KEY_WOW64_32KEY)
+            viewFlags[viewCount++] = KEY_WOW64_32KEY;
+    #endif
+            viewFlags[viewCount++] = 0;
+
+            SString strFirstNonEmptyRegistryValue;
+            for (int i = 0; i < viewCount && strInstallRoot.empty(); ++i)
+            {
+                const SString strCandidate = ReadInstallRootRegistryValueView(viewFlags[i]);
+                if (strCandidate.empty())
+                    continue;
+                if (strFirstNonEmptyRegistryValue.empty())
+                    strFirstNonEmptyRegistryValue = strCandidate;
+                if (SharedUtil::IsUsableMtasaInstallRoot(strCandidate) && !SharedUtil::IsTemporaryUpdateLaunchPath(strCandidate))
+                {
+                    strInstallRoot = strCandidate;
+                    strInstallRootSource = (viewFlags[i] == 0) ? "registry" :
+    #if defined(KEY_WOW64_64KEY)
+                                           (viewFlags[i] == KEY_WOW64_64KEY) ? "registry64"
+                                                                             :
+    #endif
+                                                                             "registry32";
+                }
+            }
             if (strInstallRoot.empty())
             {
+                if (!strFirstNonEmptyRegistryValue.empty())
+                {
+                    AddReportLog(1042, SString("GetMTASABaseDir: ignoring unusable registry path '%s'", strFirstNonEmptyRegistryValue.c_str()), 1);
+                }
+                AddReportLog(1042, "GetMTASABaseDir: unable to resolve install root", 1);
                 MessageBoxUTF8(0, _("Multi Theft Auto has not been installed properly, please reinstall."), _("Error") + _E("U01"),
                                MB_OK | MB_ICONERROR | MB_TOPMOST);
                 TerminateProcess(GetCurrentProcess(), 9);
             }
         }
+
+        if (!strInstallRoot.empty())
+            AddReportLog(1042, SString("GetMTASABaseDir: resolved '%s' via %s", strInstallRoot.c_str(), strInstallRootSource.c_str()), 1);
     }
     return strInstallRoot;
 }
@@ -401,8 +573,34 @@ SString SharedUtil::CalcMTASAPath(const SString& strPath)
 //
 bool SharedUtil::IsGTAProcess()
 {
+    static int iResult = -1;
+    if (iResult != -1)
+        return iResult != 0;
+
     SString strLaunchPathFilename = GetLaunchPathFilename();
-    return strLaunchPathFilename.EndsWithI("gta_sa.exe");
+    SString strExecutable = ExtractFilename(strLaunchPathFilename);
+
+    if (strExecutable.EndsWithI("gta_sa.exe"))
+    {
+        iResult = 1;
+        return true;
+    }
+
+    if (strExecutable.EndsWithI("Multi Theft Auto.exe"))
+    {
+        iResult = 0;
+        return false;
+    }
+
+    SString strBaseDir = ExtractPath(strLaunchPathFilename);
+    if (FileExists(PathJoin(strBaseDir, "models", "gta3.img")) || FileExists(PathJoin(strBaseDir, "data", "gta3.dat")))
+    {
+        iResult = 1;
+        return true;
+    }
+
+    iResult = 0;
+    return false;
 }
 
 bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
@@ -438,7 +636,7 @@ bool SharedUtil::IsReadablePointer(const void* ptr, size_t size)
     }
 
     return true;
-    #elif defined(LINUX_x86) || defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
+    #elif defined(LINUX_x64) || defined(LINUX_arm) || defined(LINUX_arm64)
     static_assert(sizeof(uintptr_t) <= sizeof(unsigned long long), "Unexpected uintptr_t size");
 
     std::ifstream maps("/proc/self/maps");
@@ -615,6 +813,7 @@ namespace
                 return ToUTF8(expandedString);
             }
         }
+
         WString fallback;
         fallback.assign(raw);
         return ToUTF8(fallback);
@@ -814,6 +1013,7 @@ namespace
 
         return success;
     }
+
 }
 
 static SString ReadRegistryStringValue(HKEY hkRoot, const char* szSubKey, const char* szValue, int* iResult)
@@ -975,6 +1175,12 @@ void SharedUtil::SetOnQuitCommand(const SString& strOperation, const SString& st
 void SharedUtil::SetOnRestartCommand(const SString& strOperation, const SString& strFile, const SString& strParameters, const SString& strDirectory,
                                      const SString& strShowCmd)
 {
+    if (strOperation.empty() && strFile.empty() && strParameters.empty() && strDirectory.empty() && strShowCmd.empty())
+    {
+        SetRegistryValue("", "OnRestartCommand", "");
+        return;
+    }
+
     // Encode into a string and set a registry key
     SString strVersion("%d.%d.%d-%d.%05d", MTASA_VERSION_MAJOR, MTASA_VERSION_MINOR, MTASA_VERSION_MAINTENANCE, MTASA_VERSION_TYPE, MTASA_VERSION_BUILD);
     SString strValue("%s\t%s\t%s\t%s\t%s\t%s", strOperation.c_str(), strFile.c_str(), strParameters.c_str(), strDirectory.c_str(), strShowCmd.c_str(),
@@ -988,7 +1194,6 @@ void SharedUtil::SetOnRestartCommand(const SString& strOperation, const SString&
 bool SharedUtil::GetOnRestartCommand(SString& strOperation, SString& strFile, SString& strParameters, SString& strDirectory, SString& strShowCmd)
 {
     SString strOnRestartCommand = GetRegistryValue("", "OnRestartCommand");
-    SetOnRestartCommand("");
 
     std::vector<SString> vecParts;
     strOnRestartCommand.Split("\t", vecParts);
@@ -1005,6 +1210,14 @@ bool SharedUtil::GetOnRestartCommand(SString& strOperation, SString& strFile, SS
             return true;
         }
         AddReportLog(4000, SString("OnRestartCommand disregarded due to version change %s -> %s", vecParts[5].c_str(), strVersion.c_str()));
+        SetOnRestartCommand("");
+        return false;
+    }
+
+    if (!strOnRestartCommand.empty())
+    {
+        AddReportLog(4001, SString("OnRestartCommand disregarded due to invalid format '%s'", strOnRestartCommand.c_str()));
+        SetOnRestartCommand("");
     }
     return false;
 }
@@ -1808,47 +2021,25 @@ bool SharedUtil::ShellExecuteNonBlocking(const SString& strAction, const SString
 #endif  // MTA_CLIENT
 
 #ifdef SHAREDUTIL_PLATFORM_WINDOWS
-    #define _WIN32_WINNT_WIN8 0x0602
-///////////////////////////////////////////////////////////////////////////
-//
-// SharedUtil::IsWindowsVersionOrGreater
-//
-// From Windows Kits\8.1 VersionHelpers.h
-// (Ignores compatibility mode)
-//
-///////////////////////////////////////////////////////////////////////////
-bool SharedUtil::IsWindowsVersionOrGreater(WORD wMajorVersion, WORD wMinorVersion, WORD wServicePackMajor)
+    #define _WIN32_WINNT_WIN8  0x0602
+    #define _WIN32_WINNT_WIN10 0x0A00
+
+bool SharedUtil::IsWindows10OrGreater()
 {
-    OSVERSIONINFOEXW osvi = {sizeof(osvi), 0, 0, 0, 0, {0}, 0, 0};
-    DWORDLONG const  dwlConditionMask =
-        VerSetConditionMask(VerSetConditionMask(VerSetConditionMask(0, VER_MAJORVERSION, VER_GREATER_EQUAL), VER_MINORVERSION, VER_GREATER_EQUAL),
-                            VER_SERVICEPACKMAJOR, VER_GREATER_EQUAL);
+    using RtlGetVersionFn = LONG(WINAPI*)(OSVERSIONINFOEXW*);
+    if (HMODULE ntdll = GetModuleHandleW(L"ntdll.dll"))
+    {
+        RtlGetVersionFn pfnRtlGetVersion = reinterpret_cast<RtlGetVersionFn>(GetProcAddress(ntdll, "RtlGetVersion"));
+        if (pfnRtlGetVersion)
+        {
+            OSVERSIONINFOEXW info{};
+            info.dwOSVersionInfoSize = sizeof(info);
+            if (pfnRtlGetVersion(&info) == 0 /* STATUS_SUCCESS */)
+                return info.dwMajorVersion >= 10;
+        }
+    }
 
-    osvi.dwMajorVersion = wMajorVersion;
-    osvi.dwMinorVersion = wMinorVersion;
-    osvi.wServicePackMajor = wServicePackMajor;
-
-    return VerifyVersionInfoW(&osvi, VER_MAJORVERSION | VER_MINORVERSION | VER_SERVICEPACKMAJOR, dwlConditionMask) != FALSE;
-}
-
-bool SharedUtil::IsWindowsXPSP3OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WINXP), LOBYTE(_WIN32_WINNT_WINXP), 3);
-}
-
-bool SharedUtil::IsWindowsVistaOrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_VISTA), LOBYTE(_WIN32_WINNT_VISTA), 0);
-}
-
-bool SharedUtil::IsWindows7OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN7), LOBYTE(_WIN32_WINNT_WIN7), 0);
-}
-
-bool SharedUtil::IsWindows8OrGreater()
-{
-    return IsWindowsVersionOrGreater(HIBYTE(_WIN32_WINNT_WIN8), LOBYTE(_WIN32_WINNT_WIN8), 0);
+    return false;
 }
 #endif  // SHAREDUTIL_PLATFORM_WINDOWS
 
@@ -2605,6 +2796,7 @@ namespace SharedUtil
     #elif defined(WIN_arm) || defined(WIN_arm64)
         return 0;
     #else
+        // clang-format off
         _asm
         {
             mov eax, 1
@@ -2612,6 +2804,7 @@ namespace SharedUtil
             shr ebx, 24
             mov eax, ebx
         }
+            // clang-format on
     #endif
     }
 

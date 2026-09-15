@@ -10,71 +10,74 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+using namespace tinyxml2;
 
 #define XML_ATTRIBUTE_VALUE_BUFFER 40
 
-CXMLAttributeImpl::CXMLAttributeImpl(CXMLAttributesImpl& Attributes, TiXmlElement& Node, const std::string& strName)
-    : m_ulID(INVALID_XML_ID),
-      m_bUsingIDs(Attributes.IsUsingIDs()),
-      m_Attributes(Attributes),
-      m_Node(Node),
-      m_Attribute(*new TiXmlAttribute(strName.c_str(), ""))
+CXMLAttributeImpl::CXMLAttributeImpl(CXMLAttributesImpl& Attributes, XMLElement& Node, const std::string& strName)
+    : m_ulID(INVALID_XML_ID), m_bUsingIDs(Attributes.IsUsingIDs()), m_Attributes(Attributes), m_Node(Node), m_pAttribute(nullptr)
 {
-    // Init and link it to the node
     m_bDeleteAttribute = true;
-    Node.AddAttribute(m_Attribute);
+    Node.SetAttribute(strName.c_str(), "");
+    m_pAttribute = Node.FindAttribute(strName.c_str());
 
-    // Add us to parent list, if any
     m_Attributes.AddToList(this);
 
-    // Add to array over XML stuff
     if (m_bUsingIDs)
         m_ulID = CXMLArray::PopUniqueID(this);
 }
 
-CXMLAttributeImpl::CXMLAttributeImpl(CXMLAttributesImpl& Attributes, TiXmlElement& Node, TiXmlAttribute& Attribute)
-    : m_ulID(INVALID_XML_ID), m_bUsingIDs(Attributes.IsUsingIDs()), m_Attributes(Attributes), m_Node(Node), m_Attribute(Attribute)
+CXMLAttributeImpl::CXMLAttributeImpl(CXMLAttributesImpl& Attributes, XMLElement& Node, const XMLAttribute& Attribute)
+    : m_ulID(INVALID_XML_ID), m_bUsingIDs(Attributes.IsUsingIDs()), m_Attributes(Attributes), m_Node(Node), m_pAttribute(&Attribute)
 {
-    // Init
     m_bDeleteAttribute = true;
 
-    // Add us to parent list, if any
     m_Attributes.AddToList(this);
 
-    // Add to array over XML stuff
     if (m_bUsingIDs)
         m_ulID = CXMLArray::PopUniqueID(this);
 }
 
 CXMLAttributeImpl::~CXMLAttributeImpl()
 {
-    // Remove from array over XML stuff
     if (m_bUsingIDs)
         CXMLArray::PushUniqueID(this);
 
-    // Delete the attribute from the node aswell if we're supposed to
-    if (m_bDeleteAttribute)
+    if (m_bDeleteAttribute && m_pAttribute)
     {
-        m_Node.RemoveAttribute(GetName());
+        m_Node.DeleteAttribute(m_pAttribute->Name());
     }
 
-    // Remove us from parent list
     m_Attributes.RemoveFromList(this);
 }
 
 const std::string CXMLAttributeImpl::GetName() const
 {
-    return std::string(m_Attribute.Name());
+    return m_pAttribute ? std::string(m_pAttribute->Name()) : std::string{};
 }
 
 const std::string& CXMLAttributeImpl::GetValue() const
 {
-    return m_Attribute.ValueStr();
+    if (m_pAttribute)
+    {
+        const char* szValue = m_pAttribute->Value();
+        if (szValue)
+        {
+            m_strValueCache = szValue;
+            return m_strValueCache;
+        }
+    }
+    static std::string empty;
+    return empty;
 }
 
 void CXMLAttributeImpl::SetValue(const char* szValue)
 {
-    m_Attribute.SetValue(szValue);
+    if (m_pAttribute)
+    {
+        m_Node.SetAttribute(m_pAttribute->Name(), szValue);
+        m_pAttribute = m_Node.FindAttribute(m_pAttribute->Name());
+    }
 }
 
 void CXMLAttributeImpl::SetValue(bool bValue)

@@ -270,4 +270,6 @@ public:
     float        GetBikeFrontWheelDist() { return internalInterface->fBikeFrontWheelDist; }
     std::uint8_t GetMaxHealth() const { return internalInterface->MaxHealth; }
     std::uint8_t GetMaxArmor() const { return internalInterface->MaxArmour; }
+
+    bool CanDoDriveBy() const override { return internalInterface->bCanDoDriveBy; }
 };

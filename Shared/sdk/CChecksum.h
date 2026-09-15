@@ -82,7 +82,7 @@ public:
         catch (...)
         {
         }
-        bool          hasMeta = !wide.empty() && GetFileAttributesExW(wide.c_str(), GetFileExInfoStandard, &attr);
+        bool          hasMeta = !wide.empty() && SharedUtil::GetFileAttributesExWithTimeout(wide.c_str(), attr, 500);
         std::uint64_t sz = 0, mt = 0;
         if (hasMeta)
         {
@@ -100,32 +100,18 @@ public:
         }
 
         SString buf;
-        if (!SharedUtil::FileLoadWithTimeout(strFilename, buf, 10000))
+        if (!SharedUtil::FileLoadWithTimeout(strFilename, buf, 2000))
         {
-            if (!SharedUtil::FileExists(strFilename))
-                return SString("File not found: %s", strFilename.c_str());
-
-            CChecksum r;
-            errno = 0;
-            r.ulCRC = CRCGenerator::GetCRCFromFile(strFilename);
-            if (errno || !CMD5Hasher().Calculate(strFilename, r.md5))
-                return SString("Could not read: %s", strFilename.c_str());
-
-            if (hasMeta && GetFileAttributesExW(wide.c_str(), GetFileExInfoStandard, &attr) &&
-                sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
-                mt == ((std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime))
-            {
-                std::lock_guard<std::mutex> l(CacheMtx());
-                Cache()[key] = {sz, mt, r.ulCRC, r.md5};
-            }
-            return r;
+            if (!hasMeta)
+                return SString("File not found or inaccessible: %s", strFilename.c_str());
+            return SString("Could not read: %s", strFilename.c_str());
         }
 
         CChecksum r;
         r.ulCRC = CRCGenerator::GetCRCFromBuffer(buf.data(), buf.size());
         CMD5Hasher().Calculate(buf.data(), buf.size(), r.md5);
 
-        if (hasMeta && GetFileAttributesExW(wide.c_str(), GetFileExInfoStandard, &attr) &&
+        if (hasMeta && SharedUtil::GetFileAttributesExWithTimeout(wide.c_str(), attr, 500) &&
             sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
             mt == ((std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime))
         {

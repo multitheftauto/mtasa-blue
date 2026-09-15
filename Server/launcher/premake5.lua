@@ -26,6 +26,8 @@ project "Launcher"
 	filter "system:windows"
 		targetname "MTA Server"
 		staticruntime "On"
+		-- Server requires Windows 10+ (cpp-httplib)
+		defines { "_WIN32_WINNT=0x0A00" }
 		files {
 			"launcher.rc",
 			"resource/mtaicon.ico"
@@ -53,3 +55,7 @@ project "Launcher"
 
 	filter { "system:windows", "platforms:arm64" }
 		targetname "MTA Server ARM64"
+
+	-- 32-bit Windows server is no longer supported
+	filter { "system:windows", "platforms:x86" }
+		flags { "ExcludeFromBuild" }

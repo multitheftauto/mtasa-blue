@@ -22,6 +22,7 @@
 #include <game/CBuildingRemoval.h>
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
+#include "enums/HTTPDownloadType.h"
 
 using std::list;
 
@@ -30,7 +31,7 @@ class CCore;
 std::wstring utf8_mbstowcs(const std::string& str);
 std::string  utf8_wcstombs(const std::wstring& wstr);
 
-// TODO: Make this independant of g_pClientGame. Just moved it here to get it out of the
+// TODO: Make this independent of g_pClientGame. Just moved it here to get it out of the
 //       horribly big CClientGame file.
 bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterface& bitStream)
 {
@@ -419,7 +420,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     bitStream.Read(usHTTPDownloadPort);
 
     SString strExternalHTTPDownloadURL;
-    if (ucHTTPDownloadType == HTTP_DOWNLOAD_ENABLED_URL)
+    if (ucHTTPDownloadType == HTTPDownloadType::HTTP_DOWNLOAD_ENABLED_URL)
     {
         bitStream.ReadString(strExternalHTTPDownloadURL);
     }
@@ -467,6 +468,12 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     g_pClientGame->m_pLocalPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
 
     g_pCore->UpdateRecentlyPlayed();
+
+    // Update focus state after joining
+    // m_bFocused is set in the CClientGame constructor - immediately after clicking "join."
+    // This means that if the window loses focus while joining the game, the game still believes it has focus,
+    // and isMTAWindowFocused returns true even when the user is doing anything outside the MTA window.
+    g_pClientGame->m_bFocused = g_pCore->IsFocused();
 
     auto discord = g_pCore->GetDiscord();
     if (discord && discord->IsDiscordRPCEnabled())
@@ -1653,7 +1660,11 @@ void CPacketHandler::Packet_VehicleDamageSync(NetBitStreamInterface& bitStream)
         CDeathmatchVehicle* pVehicle = static_cast<CDeathmatchVehicle*>(g_pClientGame->m_pVehicleManager->Get(ID));
         if (pVehicle)
         {
-            bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
+            // Do not spawn flying components for already-blown vehicles.
+            // Physics collisions and burn explosions can trigger repeated
+            // damage syncs which would each spawn flying components on an
+            // already-destroyed vehicle.
+            bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS) && !pVehicle->IsBlown();
 
             for (unsigned char i = 0; i < MAX_DOORS; ++i)
             {
@@ -1839,7 +1850,9 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                                 {
                                     // Desynced? Outside but supposed to be in
                                     // For local player or synced peds this is taken care of in CClientPed::UpdateVehicleInOut()
-                                    if (pJacked->GetOccupiedVehicle() && !pJacked->GetRealOccupiedVehicle())
+                                    // Not while his drag animation still plays; an aborted jack ends with him out anyway,
+                                    // and his own client is about to notify that.
+                                    if (pJacked->GetOccupiedVehicle() && !pJacked->GetRealOccupiedVehicle() && !pJacked->IsGettingJacked())
                                     {
                                         // Warp him back in
                                         pJacked->WarpIntoVehicle(pJacked->GetOccupiedVehicle(), pJacked->GetOccupiedVehicleSeat());
@@ -1907,7 +1920,10 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                             pPed->ResetVehicleInOut();
 
                         // Make sure we're removed from the vehicle
-                        bool bDontWarpIfGettingDraggedOut = pPed->IsLocalPlayer() || pPed->IsSyncing();
+                        // A jack victim also leaves through here when the jacker aborts, and his drag
+                        // animation may still be playing on clients watching it; let it finish.
+                        bool bDontWarpIfGettingDraggedOut = pPed->IsLocalPlayer() || pPed->IsSyncing() || pPed->IsGettingJacked();
+
                         pPed->RemoveFromVehicle(bDontWarpIfGettingDraggedOut);
 
                         if (ucSeat == 0)
@@ -2060,7 +2076,10 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                                 }
 
                                 // Warp him out
-                                bool bDontWarpIfGettingDraggedOut = pOutsidePed->IsLocalPlayer() || pOutsidePed->IsSyncing();
+                                // The confirmation only waits for the jacker's own enter animation, so it can arrive while
+                                // the jacked ped's drag animation still plays on clients watching it; let it finish.
+                                bool bDontWarpIfGettingDraggedOut = pOutsidePed->IsLocalPlayer() || pOutsidePed->IsSyncing() || pOutsidePed->IsGettingJacked();
+
                                 pOutsidePed->RemoveFromVehicle(bDontWarpIfGettingDraggedOut);
 
                                 // Reset interpolation so he won't appear on the roof of the vehicle until next sync
@@ -3215,16 +3234,16 @@ retry:
                         {
                             case CClientPickup::ARMOR:
                             {
-                                SPlayerHealthSync health;
-                                if (bitStream.Read(&health))
-                                    pPickup->m_fAmount = health.data.fValue;
+                                SPlayerArmorSync armor;
+                                if (bitStream.Read(&armor))
+                                    pPickup->m_fAmount = armor.data.fValue;
                                 break;
                             }
                             case CClientPickup::HEALTH:
                             {
-                                SPlayerArmorSync armor;
-                                if (bitStream.Read(&armor))
-                                    pPickup->m_fAmount = armor.data.fValue;
+                                SPlayerHealthSync health;
+                                if (bitStream.Read(&health))
+                                    pPickup->m_fAmount = health.data.fValue;
                                 break;
                             }
                             case CClientPickup::WEAPON:
@@ -3362,7 +3381,9 @@ retry:
                     pVehicle->SetPaintjob(paintjob.data.ucPaintjob);
                     pVehicle->SetColor(vehColor);
 
-                    bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS);
+                    // Do not spawn flying components for already-blown vehicles
+                    // when applying damage states.
+                    bool flyingComponents = g_pClientGame->IsWorldSpecialProperty(WorldSpecialProperty::FLYINGCOMPONENTS) && !pVehicle->IsBlown();
                     // Setup our damage model
                     for (unsigned char i = 0; i < MAX_DOORS; i++)
                         pVehicle->SetDoorStatus(i, damage.data.ucDoorStates[i], flyingComponents);
@@ -3563,11 +3584,20 @@ retry:
                         bitStream.Read(ucSirenCount);
                         bitStream.Read(ucSirenType);
 
-                        pVehicle->GiveVehicleSirens(ucSirenType, ucSirenCount);
+                        // The count comes straight off the wire and is used to index a fixed size array.
+                        // Keep reading the entries the packet claims to hold so the stream stays aligned,
+                        // but only store the ones that fit.
+                        unsigned char ucStoredSirenCount = std::min<unsigned char>(ucSirenCount, SIREN_COUNT_MAX);
+
+                        pVehicle->GiveVehicleSirens(ucSirenType, ucStoredSirenCount);
                         for (unsigned char i = 0; i < ucSirenCount; i++)
                         {
                             SVehicleSirenSync sirenData;
                             bitStream.Read(&sirenData);
+
+                            if (i >= ucStoredSirenCount)
+                                continue;
+
                             pVehicle->SetVehicleSirenPosition(i, sirenData.data.m_vecSirenPositions);
                             pVehicle->SetVehicleSirenColour(i, sirenData.data.m_colSirenColour);
                             pVehicle->SetVehicleSirenMinimumAlpha(i, sirenData.data.m_dwSirenMinAlpha);
@@ -3968,7 +3998,7 @@ retry:
                         int         time, blendTime;
                         bool        looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
                         float       speed;
-                        double      startTime;
+                        float       elapsedTime;
 
                         // Read data
                         bitStream.ReadString(blockName);
@@ -3980,13 +4010,17 @@ retry:
                         bitStream.ReadBit(freezeLastFrame);
                         bitStream.Read(blendTime);
                         bitStream.ReadBit(taskRestore);
-                        bitStream.Read(startTime);
+                        bitStream.Read(elapsedTime);
                         bitStream.Read(speed);
+
+                        // Server sends elapsed time rather than start time due to bitstream limitations regarding 64 bit integers.
+                        const uint64_t nowTick = GetTickCount64_();
+                        const int64_t  startTime = nowTick - elapsedTime;
 
                         // Run anim
                         CStaticFunctionDefinitions::SetPedAnimation(*pPed, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable,
                                                                     freezeLastFrame);
-                        pPed->m_AnimationCache.startTime = static_cast<std::int64_t>(startTime);
+                        pPed->m_AnimationCache.startTime = startTime;
                         pPed->m_AnimationCache.speed = speed;
                         pPed->m_AnimationCache.progress = 0.0f;
 
@@ -4166,11 +4200,6 @@ retry:
                         pWater =
                             new CClientWater(g_pClientGame->GetManager(), EntityID, vecVertices[0], vecVertices[1], vecVertices[2], vecVertices[3], bShallow);
                     }
-                    if (!pWater->Exists())
-                    {
-                        delete pWater;
-                        pWater = NULL;
-                    }
                     pEntity = pWater;
                     break;
                 }
@@ -4193,6 +4222,7 @@ retry:
                                                                      rotationRadians.data.vecRotation, ucInterior);
 
                     pBuilding->SetUsesCollision(bCollisonsEnabled);
+                    pEntity = pBuilding;
                     break;
                 }
 
@@ -5005,27 +5035,33 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
             szName[usNameLength] = 0;
 
             // Read out the arguments aswell
-            CLuaArguments Arguments(bitStream);
-
-            // Grab the event. Does it exist and is it remotely triggerable?
-            SEvent* pEvent = g_pClientGame->m_Events.Get(szName);
-            if (pEvent)
+            CLuaArguments Arguments;
+            if (!Arguments.ReadFromBitStream(bitStream))
             {
-                if (pEvent->bAllowRemoteTrigger)
-                {
-                    // Grab the element we trigger it on
-                    CClientEntity* pEntity = CElementIDs::GetElement(EntityID);
-                    if (pEntity)
-                    {
-                        pEntity->CallEvent(szName, Arguments, true);
-                    }
-                }
-                else
-                    g_pClientGame->m_pScriptDebugging->LogError(NULL, "Server triggered clientside event %s, but event is not marked as remotely triggerable",
-                                                                szName);
+                g_pClientGame->m_pScriptDebugging->LogError(nullptr, "Server triggered clientside event %s with invalid argument data", szName);
             }
             else
-                g_pClientGame->m_pScriptDebugging->LogError(NULL, "Server triggered clientside event %s, but event is not added clientside", szName);
+            {
+                // Grab the event. Does it exist and is it remotely triggerable?
+                SEvent* pEvent = g_pClientGame->m_Events.Get(szName);
+                if (pEvent)
+                {
+                    if (pEvent->bAllowRemoteTrigger)
+                    {
+                        // Grab the element we trigger it on
+                        CClientEntity* pEntity = CElementIDs::GetElement(EntityID);
+                        if (pEntity)
+                        {
+                            pEntity->CallEvent(szName, Arguments, true);
+                        }
+                    }
+                    else
+                        g_pClientGame->m_pScriptDebugging->LogError(
+                            nullptr, "Server triggered clientside event %s, but event is not marked as remotely triggerable", szName);
+                }
+                else
+                    g_pClientGame->m_pScriptDebugging->LogError(nullptr, "Server triggered clientside event %s, but event is not added clientside", szName);
+            }
         }
 
         // Delete event name again
@@ -5144,6 +5180,8 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
                                                                   strMinClientReq, bEnableOOP);
     if (pResource)
     {
+        CDownloadableResource::BeginChecksumBatch();
+
         pResource->SetRemainingNoClientCacheScripts(usNoClientCacheScriptCount);
         pResource->SetDownloadPriorityGroup(iDownloadPriorityGroup);
         pResource->SetStartCounter(startCounter);
@@ -5308,6 +5346,8 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
             // Are there any resources to being downloaded?
             if (!g_pClientGame->GetResourceFileDownloadManager()->IsTransferringInitialFiles())
             {
+                CDownloadableResource::EndChecksumBatch();
+
                 // Load the resource now
                 if (pResource->CanBeLoaded())
                 {
@@ -5322,6 +5362,7 @@ void CPacketHandler::Packet_ResourceStart(NetBitStreamInterface& bitStream)
 
     if (bFatalError)
     {
+        CDownloadableResource::EndChecksumBatch();
         g_pClientGame->m_pResourceManager->Remove(pResource);
         RaiseFatalError(2081);
     }
@@ -5437,7 +5478,7 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
 
         if (pPlayer && bitStream.Read(voiceBufferLength) && voiceBufferLength <= 2048)
         {
-            const auto voiceBuffer = new unsigned char[voiceBufferLength];
+            unsigned char voiceBuffer[2048];
 
             if (bitStream.Read(reinterpret_cast<char*>(voiceBuffer), voiceBufferLength))
             {
@@ -5446,8 +5487,6 @@ void CPacketHandler::Packet_VoiceData(NetBitStreamInterface& bitStream)
                     pPlayer->GetVoice()->DecodeAndBuffer(voiceBuffer, voiceBufferLength);
                 }
             }
-
-            delete[] voiceBuffer;
         }
     }
 }

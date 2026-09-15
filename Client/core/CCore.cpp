@@ -38,6 +38,11 @@ using namespace std;
 
 namespace fs = std::filesystem;
 
+// Set to true to enable the freeze watchdog (monitors main thread responsiveness)
+// Do NOT enable it unless you run a QA testing cycle (see commit desc: 3e54dcb2742bccf0319b9552b2ed5a2c0a012425)
+constexpr bool  bFreezeWatchdogEnabled = false;
+constexpr DWORD uiFreezeWatchdogTimeoutSeconds = 30;  // Player won't be patient beyond this; we get no info
+
 static float fTest = 1;
 
 extern CCore* g_pCore;
@@ -128,6 +133,7 @@ CCore::CCore()
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
+    m_uiNextRenderTargetRetryTime = 0;
     m_DiagnosticDebug = EDiagnosticDebug::NONE;
 
     // Create our Direct3DData handler.
@@ -182,7 +188,8 @@ CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
 
-    StopWatchdogThread();
+    if constexpr (bFreezeWatchdogEnabled)
+        StopWatchdogThread();
 
     // Reset Discord rich presence
     if (m_pDiscordRichPresence)
@@ -644,9 +651,11 @@ bool CCore::IsCursorForcedVisible()
 
 void CCore::ApplyConsoleSettings()
 {
-    CVector2D vec;
     CConsole* pConsole = m_pLocalGUI->GetConsole();
+    if (!pConsole) [[unlikely]]
+        return;
 
+    CVector2D vec;
     CVARS_GET("console_pos", vec);
     pConsole->SetPosition(vec);
     CVARS_GET("console_size", vec);
@@ -691,8 +700,8 @@ void CCore::ApplyGameSettings()
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
     pController->SetVerticalAimSensitivitySameAsHorizontal(CVARS_GET_VALUE<bool>("use_mouse_sensitivity_for_aiming"));
     CVARS_GET("mastervolume", fVal);
-    pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
-    pGameSettings->SetSFXVolume(pGameSettings->GetSFXVolume() * fVal);
+    pGameSettings->SetRadioVolume(CVARS_GET_VALUE<float>("radiovolume") * fVal * 64.0f);
+    pGameSettings->SetSFXVolume(CVARS_GET_VALUE<float>("sfxvolume") * fVal * 64.0f);
 }
 
 void CCore::SetConnected(bool bConnected)
@@ -948,7 +957,7 @@ void LoadModule(CModuleLoader& m_Loader, const SString& strName, const SString& 
     // Save current directory (shouldn't change anyway)
     SString strSavedCwd = GetSystemCurrentDirectory();
 
-    // Load approrpiate compilation-specific library.
+    // Load appropriate compilation-specific library.
 #ifdef MTA_DEBUG
     SString strModuleFileName = strModuleName + "_d.dll";
 #else
@@ -1051,6 +1060,19 @@ void CCore::DeinitGUI()
 void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
+
+    // Apply CPU affinity here (GTA allocates threads on startup, so we have to do it here instead of earlier)
+    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
+    if (!affinity)
+        return;
+
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+    HANDLE    process = GetCurrentProcess();
+    BOOL      result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (result)
+        SetProcessAffinityMask(process, mask & ~1);
 }
 
 void CCore::CreateGUI()
@@ -1285,7 +1307,8 @@ void CCore::DoPreFramePulse()
 {
     TIMING_CHECKPOINT("+CorePreFrame");
 
-    UpdateWatchdogHeartbeat();
+    if constexpr (bFreezeWatchdogEnabled)
+        UpdateWatchdogHeartbeat();
 
     m_pKeyBinds->DoPreFramePulse();
 
@@ -1344,10 +1367,12 @@ void CCore::DoPostFramePulse()
             WatchDogCompletedSection("L3");  // No hang on startup
 
             // Start watchdog thread now that initial loading is complete
-            // Use 120 second timeout to allow for large mod asset loading
-            if (!StartWatchdogThread(GetCurrentThreadId(), 120))
+            if constexpr (bFreezeWatchdogEnabled)
             {
-                WriteDebugEvent("CCore: WARNING - Failed to start watchdog thread");
+                if (!StartWatchdogThread(GetCurrentThreadId(), uiFreezeWatchdogTimeoutSeconds))
+                {
+                    WriteDebugEvent("CCore: WARNING - Failed to start watchdog thread");
+                }
             }
 
             // Disable vsync while it's all dark
@@ -1398,7 +1423,12 @@ void CCore::DoPostFramePulse()
     if (!IsFocused() && m_bLastFocused)
     {
         // Fix for #4948
-        m_pKeyBinds->CallAllGTAControlBinds(CONTROL_BOTH, false);
+        // A fatal fault dialog takes focus while pumping messages; releasing the
+        // control binds runs Lua handlers that touch the half-destroyed GUI.
+        // Skipping the release is safe because both fault paths terminate the
+        // process when the dialog closes.
+        if (!CLocalGUI::IsFaultDialogOpen())
+            m_pKeyBinds->CallAllGTAControlBinds(CONTROL_BOTH, false);
         m_bLastFocused = false;
     }
     else if (IsFocused() && !m_bLastFocused)
@@ -1891,7 +1921,6 @@ void CCore::OnPostColorFilterRender()
 
 void CCore::ApplyCoreInitSettings()
 {
-#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN)
     bool aware = CVARS_GET_VALUE<bool>("process_dpi_aware");
 
     // The minimum supported client for the function below is Windows Vista (Longhorn).
@@ -1899,7 +1928,6 @@ void CCore::ApplyCoreInitSettings()
     // https://learn.microsoft.com/en-us/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows
     if (aware)
         SetProcessDPIAware();
-#endif
 
     int revision = GetApplicationSettingInt("reset-settings-revision");
 
@@ -1920,18 +1948,6 @@ void CCore::ApplyCoreInitSettings()
     int       priority = CVARS_GET_VALUE<int>("process_priority") % 3;
 
     SetPriorityClass(process, priorities[priority]);
-
-    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
-
-    if (!affinity)
-        return;
-
-    DWORD_PTR mask;
-    DWORD_PTR sys;
-    BOOL      result = GetProcessAffinityMask(process, &mask, &sys);
-
-    if (result)
-        SetProcessAffinityMask(process, mask & ~1);
 }
 
 //
@@ -1993,6 +2009,7 @@ void CCore::OnDeviceRestore()
 {
     m_iUnminimizeFrameCounter = 4;  // Tell script we have restored after 4 frames to avoid double sends
     m_bDidRecreateRenderTargets = true;
+    m_uiNextRenderTargetRetryTime = 0;
 }
 
 //
@@ -2016,6 +2033,13 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
+    const uint uiNow = GetTickCount32();
+    if (uiNow >= m_uiNextRenderTargetRetryTime)
+    {
+        CGraphics::GetSingleton().RetryInvalidRenderTargets();
+        m_uiNextRenderTargetRetryTime = uiNow + 250;
+    }
+
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff
@@ -2076,7 +2100,7 @@ void CCore::CalculateStreamingMemoryRange()
     float fMaxAmount = EvalSamplePosition<float>(maxPoints, NUMELMS(maxPoints), iSystemRamMB);
 
     // Scale max if gta3.img is over 1GB
-    SString strGta3imgFilename = PathJoin(GetLaunchPath(), "models", "gta3.img");
+    SString strGta3imgFilename = PathJoin(UTF8FilePath(g_gtaDirectory), "models", "gta3.img");
     uint    uiFileSizeMB = FileSize(strGta3imgFilename) / 0x100000LL;
     float   fSizeScale = UnlerpClamped(1024, uiFileSizeMB, 2048);
     fMaxAmount += fMaxAmount * fSizeScale;

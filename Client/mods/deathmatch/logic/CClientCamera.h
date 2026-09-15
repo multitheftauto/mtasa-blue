@@ -81,6 +81,7 @@ public:
     eVehicleCamMode GetCameraVehicleViewMode();
     ePedCamMode     GetCameraPedViewMode();
     void            SetCameraClip(bool bObjects, bool bVehicles);
+    void            ResetCameraClip();
     void            GetCameraClip(bool& bObjects, bool& bVehicles);
 
     bool IsInFixedMode() { return m_bFixed; }

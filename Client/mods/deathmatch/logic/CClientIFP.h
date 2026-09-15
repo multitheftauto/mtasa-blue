@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include <bitset>
 #include "CClientEntity.h"
 #include "CFileReader.h"
 #include "CIFPAnimations.h"
@@ -211,6 +212,7 @@ public:
     const unsigned int& GetBlockNameHash() { return m_u32Hashkey; }
 
     CAnimBlendHierarchySAInterface* GetAnimationHierarchy(const SString& strAnimationName);
+    std::bitset<32>                 GetAnimatedBonesMask(const SString& strAnimationName);
     std::shared_ptr<CIFPAnimations> GetIFPAnimationsPointer() { return m_pIFPAnimations; }
 
     // Sorta a hack that these are required by CClientEntity...
@@ -223,7 +225,7 @@ private:
     void ReadIFPVersion1();
     void ReadIFPVersion2(bool bAnp3);
 
-    WORD         ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
+    WORD         ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, std::bitset<32>& outAnimatedBonesMask);
     WORD         ReadSequences(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
     WORD         ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
     WORD         ReadSequencesVersion2(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& MapOfSequences);
@@ -247,6 +249,11 @@ private:
     {
         BYTE*  pKeyFrames = pAnimationSequence->GetKeyFrames();
         size_t iSizeInBytes = sizeof(T) * iFrames;
+        if (!pKeyFrames)
+        {
+            SkipBytes(static_cast<std::uint32_t>(iSizeInBytes));
+            return;
+        }
         ReadBytes(pKeyFrames, iSizeInBytes);
     }
 
@@ -255,7 +262,7 @@ private:
     void  InitializeAnimationSequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& strName, const std::int32_t& iBoneID);
     void  PreProcessAnimationHierarchy(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
     void  MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>&                 pAnimationHierarchy,
-                                   std::map<DWORD, std::unique_ptr<CAnimBlendSequence>>& mapOfSequences);
+                                   std::map<DWORD, std::unique_ptr<CAnimBlendSequence>>& mapOfSequences, std::bitset<32>& outAnimatedBonesMask);
     BYTE* AllocateSequencesMemory(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy);
 
     void    InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence>& pAnimationSequence, const SString& BoneName, const DWORD& dwBoneID);
@@ -267,6 +274,7 @@ private:
 
     eFrameType   GetFrameTypeFromFourCC(const char* szFourCC);
     size_t       GetSizeOfCompressedFrame(eFrameType FrameType);
+    size_t       GetSourceFrameDataSize(eFrameType iFrameType);
     std::int32_t GetBoneIDFromName(const SString& strBoneName);
     SString      GetCorrectBoneNameFromName(const SString& strBoneName);
     SString      GetCorrectBoneNameFromID(const std::int32_t& iBoneID);

@@ -20,7 +20,7 @@ class CResourceFile;
 #pragma once
 
 #include "CChecksum.h"
-#include "ehs/ehs.h"
+#include "httpd/Types.h"
 
 class CResourceFile
 {

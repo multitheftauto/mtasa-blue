@@ -25,6 +25,7 @@ CDiscordRichPresence::CDiscordRichPresence() : m_uiDiscordAppStart(0), m_uiDisco
 
     m_strDiscordAppState.clear();
     m_strDiscordCustomResourceName.clear();
+    m_bDiscordRPCEnabled = false;
     m_bConnected = false;
 }
 

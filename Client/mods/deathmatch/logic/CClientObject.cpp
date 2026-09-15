@@ -136,13 +136,25 @@ void CClientObject::GetRotationDegrees(CVector& vecRotation) const
 
 void CClientObject::GetRotationRadians(CVector& vecRotation) const
 {
-    if (m_pObject && m_pAttachedToEntity)  // Temp fix for static objects->
+    if (m_pObject)
     {
-        // We've been returning the rotation that got set last so far (::m_vecRotation)..
-        //   but we need to get the real rotation for when the game moves the objects..
         CMatrix matTemp;
-        m_pObject->GetMatrix(&matTemp);
-        vecRotation = matTemp.GetRotation();
+        if (m_pObject->GetMatrix(&matTemp))
+        {
+            // Must use ZXY decomposition to match GTA's SetOrientation (0x439A80).
+            // CMatrix::GetRotation() uses a different convention, so the round-trip
+            // through StreamedInPulse would corrupt m_vecRotation on each frame.
+            CVector vecScale = matTemp.GetScale();
+            CVector vRight = matTemp.vRight / vecScale.fX;
+            CVector vFront = matTemp.vFront / vecScale.fY;
+            CVector vUp = matTemp.vUp / vecScale.fZ;
+
+            vecRotation.fX = asin(std::clamp(vFront.fZ, -1.0f, 1.0f));
+            vecRotation.fY = atan2(-vRight.fZ, vUp.fZ);
+            vecRotation.fZ = atan2(-vFront.fX, vFront.fY);
+        }
+        else
+            vecRotation = m_vecRotation;
     }
     else
     {
@@ -645,16 +657,28 @@ void CClientObject::StreamedInPulse()
     // Are we not frozen
     if (!m_bIsFrozen)
     {
-        // Grab our actual position (as GTA moves it too)
-        CVector vecPosition = *m_pObject->GetPosition();
-
-        // Has it moved without MTA knowing?
-        if (vecPosition != m_vecPosition)
+        // Model physics enabled?
+        if ((m_pModelInfo && m_pModelInfo->GetObjectPropertiesGroup() != -1) || !m_pModelInfo)
         {
-            m_vecPosition = vecPosition;
+            // Grab our actual position & rotation (as GTA moves it too)
+            CVector vecPosition = *m_pObject->GetPosition();
 
-            // Update our streaming position
-            UpdateStreamPosition(m_vecPosition);
+            CVector vecRot;
+            GetRotationRadians(vecRot);
+
+            // Has it moved without MTA knowing?
+            if (vecPosition != m_vecPosition)
+            {
+                m_vecPosition = vecPosition;
+
+                // Update our streaming position
+                UpdateStreamPosition(m_vecPosition);
+            }
+
+            if (vecRot != m_vecRotation)
+            {
+                m_vecRotation = vecRot;
+            }
         }
     }
 }

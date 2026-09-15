@@ -588,7 +588,7 @@ CEntity* CWorldSA::TestSphereAgainstWorld(const CVector& sphereCenter, float rad
     {
         result.entityPosition = entity->m_transform.m_translate;
         result.entityRotation.fX = result.entityRotation.fY = 0.0f;
-        result.entityRotation.fZ = entity->m_transform.m_heading * (180.0f / std::numbers::pi_v<float>);
+        result.entityRotation.fZ = entity->m_transform.m_heading * (180.0f / std::numbers::pi);
     }
     result.entityRotation = -result.entityRotation;
     result.lodID = entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0;
@@ -789,10 +789,8 @@ int CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutT
             {
                 SRailNodeSA& railNode = aTrackNodes[ucTrackId][i];
 
-                const float fDeltaZ = vecPosition.fZ - railNode.sZ * 0.125f;
-                const float fDeltaY = vecPosition.fY - railNode.sY * 0.125f;
-                const float fDeltaX = vecPosition.fX - railNode.sX * 0.125f;
-                const float fDistance = std::sqrt(fDeltaZ * fDeltaZ + fDeltaY * fDeltaY + fDeltaX * fDeltaX);
+                float fDistance = sqrtf(powf(vecPosition.fZ - railNode.sZ * 0.125f, 2) + powf(vecPosition.fY - railNode.sY * 0.125f, 2) +
+                                        powf(vecPosition.fX - railNode.sX * 0.125f, 2));
                 if (fDistance < fMinDistance)
                 {
                     fMinDistance = fDistance;

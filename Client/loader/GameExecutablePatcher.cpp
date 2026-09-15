@@ -153,7 +153,7 @@ public:
  */
 class LibraryRedirectionPatch final
 {
-    static constexpr auto LIBRARY_NAME_BEFORE = "WINMM.dll";           // Do not correct this value. It must be equal to the one in the original binary.
+    static constexpr auto LIBRARY_NAME_BEFORE = "WINMM.dll\x00\x02";   // Do not correct this value. It must be equal to the one in the original binary.
     static constexpr auto LIBRARY_NAME_AFTER = LOADER_PROXY_DLL_NAME;  // This must be equal to the library produced by 'Loader Proxy' project.
 
     static auto GetImportDescriptor(PatchableExecutable& pe) -> IMAGE_IMPORT_DESCRIPTOR*
@@ -195,7 +195,7 @@ public:
                 if (stricmp(LIBRARY_NAME_AFTER, name))
                     continue;
 
-                strcpy(name, LIBRARY_NAME_BEFORE);
+                memcpy(name, LIBRARY_NAME_BEFORE, 11);
                 return;
             }
         }

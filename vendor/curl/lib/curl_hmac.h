@@ -26,9 +26,7 @@
 
 #if (defined(USE_CURL_NTLM_CORE) && !defined(USE_WINDOWS_SSPI)) ||      \
   !defined(CURL_DISABLE_AWS) || !defined(CURL_DISABLE_DIGEST_AUTH) ||   \
-  defined(USE_SSL)
-
-#include <curl/curl.h>
+  defined(USE_LIBSSH2) || defined(USE_SSL)
 
 #define HMAC_MD5_LENGTH 16
 
@@ -48,7 +46,6 @@ struct HMAC_params {
   unsigned int     resultlen; /* Result length (bytes). */
 };
 
-
 /* HMAC computation context. */
 struct HMAC_context {
   const struct HMAC_params *hash; /* Hash function definition. */
@@ -56,19 +53,18 @@ struct HMAC_context {
   void *hashctxt2;         /* Hash function context 2. */
 };
 
-
 /* Prototypes. */
 struct HMAC_context *Curl_HMAC_init(const struct HMAC_params *hashparams,
                                     const unsigned char *key,
                                     unsigned int keylen);
-int Curl_HMAC_update(struct HMAC_context *context,
-                     const unsigned char *data,
-                     unsigned int len);
-int Curl_HMAC_final(struct HMAC_context *context, unsigned char *result);
+void Curl_HMAC_update(struct HMAC_context *ctxt,
+                      const unsigned char *data,
+                      unsigned int len);
+int Curl_HMAC_final(struct HMAC_context *ctxt, unsigned char *output);
 
 CURLcode Curl_hmacit(const struct HMAC_params *hashparams,
                      const unsigned char *key, const size_t keylen,
-                     const unsigned char *data, const size_t datalen,
+                     const unsigned char *data, size_t datalen,
                      unsigned char *output);
 
 #endif
