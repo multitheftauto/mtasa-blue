@@ -67,17 +67,45 @@ bool CSimVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
         {
             // Train specific data
             float fRailPosition = 0.0f;
-            uchar ucRailTrack = 0;
             bool  bRailDirection = false;
             float fRailSpeed = 0.0f;
-            if (!BitStream.Read(fRailPosition) || !BitStream.ReadBit(bRailDirection) || !BitStream.Read(ucRailTrack) || !BitStream.Read(fRailSpeed))
+            if (!BitStream.Read(fRailPosition) || !BitStream.ReadBit(bRailDirection) || !BitStream.Read(fRailSpeed))
             {
                 return false;
             }
+
+            // A train can be on no track (nil), one of the 4 default tracks, or a custom track element
+            bool bRailHasTrack = false;
+            if (!BitStream.ReadBit(bRailHasTrack))
+                return false;
+
+            bool      bRailIsDefaultTrack = false;
+            uchar     ucRailDefaultTrackId = 0;
+            ElementID RailTrackElementID;
+            if (bRailHasTrack)
+            {
+                if (!BitStream.ReadBit(bRailIsDefaultTrack))
+                    return false;
+
+                if (bRailIsDefaultTrack)
+                {
+                    if (!BitStream.Read(ucRailDefaultTrackId))
+                        return false;
+                }
+                else
+                {
+                    if (!BitStream.Read(RailTrackElementID))
+                        return false;
+                }
+            }
+
             m_Cache.fRailPosition = fRailPosition;
             m_Cache.bRailDirection = bRailDirection;
-            m_Cache.ucRailTrack = ucRailTrack;
             m_Cache.fRailSpeed = fRailSpeed;
+            m_Cache.bRailHasTrack = bRailHasTrack;
+            m_Cache.bRailIsDefaultTrack = bRailIsDefaultTrack;
+            m_Cache.ucRailDefaultTrackId = ucRailDefaultTrackId;
+            m_Cache.RailTrackElementID = RailTrackElementID;
         }
 
         // Read the camera orientation
@@ -291,8 +319,18 @@ bool CSimVehiclePuresyncPacket::Write(NetBitStreamInterface& BitStream) const
             {
                 BitStream.Write(m_Cache.fRailPosition);
                 BitStream.WriteBit(m_Cache.bRailDirection);
-                BitStream.Write(m_Cache.ucRailTrack);
                 BitStream.Write(m_Cache.fRailSpeed);
+
+                // Mirrors CVehiclePuresyncPacket::Write; re-sends whatever was cached in Read as-is
+                BitStream.WriteBit(m_Cache.bRailHasTrack);
+                if (m_Cache.bRailHasTrack)
+                {
+                    BitStream.WriteBit(m_Cache.bRailIsDefaultTrack);
+                    if (m_Cache.bRailIsDefaultTrack)
+                        BitStream.Write(m_Cache.ucRailDefaultTrackId);
+                    else
+                        BitStream.Write(m_Cache.RailTrackElementID);
+                }
             }
 
             // Vehicle rotation
