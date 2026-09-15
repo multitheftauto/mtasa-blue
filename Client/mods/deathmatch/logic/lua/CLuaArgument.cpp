@@ -125,6 +125,15 @@ void CLuaArgument::CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLua
             break;
         }
 
+        case LUA_TVEC:
+        {
+            m_vecData[0] = Argument.m_vecData[0];
+            m_vecData[1] = Argument.m_vecData[1];
+            m_vecData[2] = Argument.m_vecData[2];
+            m_vecData[3] = Argument.m_vecData[3];
+            break;
+        }
+
         default:
             break;
     }
@@ -173,6 +182,12 @@ bool CLuaArgument::CompareRecursive(const CLuaArgument& Argument, std::set<CLuaA
         case LUA_TNUMBER:
         {
             return m_Number == Argument.m_Number;
+        }
+
+        case LUA_TVEC:
+        {
+            return m_vecData[0] == Argument.m_vecData[0] && m_vecData[1] == Argument.m_vecData[1] && m_vecData[2] == Argument.m_vecData[2] &&
+                   m_vecData[3] == Argument.m_vecData[3];
         }
 
         case LUA_TTABLE:
@@ -286,6 +301,19 @@ void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
                 break;
             }
 
+            case LUA_TVEC:
+            {
+                const float* v = lua_tovec(luaVM, iArgument);
+                if (v)
+                {
+                    m_vecData[0] = v[0];
+                    m_vecData[1] = v[1];
+                    m_vecData[2] = v[2];
+                    m_vecData[3] = v[3];
+                }
+                break;
+            }
+
             case LUA_TFUNCTION:
             {
                 // TODO: add function reading (has to work inside tables too)
@@ -322,6 +350,17 @@ void CLuaArgument::ReadNumber(double dNumber)
     m_iType = LUA_TNUMBER;
     DeleteTableData();
     m_Number = dNumber;
+}
+
+void CLuaArgument::ReadVector(float x, float y, float z, float w)
+{
+    m_strString = "";
+    m_iType = LUA_TVEC;
+    DeleteTableData();
+    m_vecData[0] = x;
+    m_vecData[1] = y;
+    m_vecData[2] = z;
+    m_vecData[3] = w;
 }
 
 void CLuaArgument::ReadString(const std::string& string)
@@ -426,6 +465,12 @@ void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKn
         case LUA_TNUMBER:
         {
             lua_pushnumber(luaVM, m_Number);
+            break;
+        }
+
+        case LUA_TVEC:
+        {
+            lua_pushvec(luaVM, m_vecData[0], m_vecData[1], m_vecData[2], m_vecData[3]);
             break;
         }
 
@@ -626,6 +671,17 @@ bool CLuaArgument::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vect
             }
             break;
         }
+
+        // Vector type
+        case LUA_TVEC:
+        {
+            m_iType = LUA_TVEC;
+            bitStream.Read(m_vecData[0]);
+            bitStream.Read(m_vecData[1]);
+            bitStream.Read(m_vecData[2]);
+            bitStream.Read(m_vecData[3]);
+            break;
+        }
     }
     return true;
 }
@@ -783,6 +839,18 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
             break;
         }
 
+        // Vector argument
+        case LUA_TVEC:
+        {
+            type.data.ucType = LUA_TVEC;
+            bitStream.Write(&type);
+            bitStream.Write(m_vecData[0]);
+            bitStream.Write(m_vecData[1]);
+            bitStream.Write(m_vecData[2]);
+            bitStream.Write(m_vecData[3]);
+            break;
+        }
+
         // Unpacketizable type.
         default:
         {
@@ -921,6 +989,15 @@ json_object* CLuaArgument::WriteToJSONObject(bool bSerialize, CFastHashMap<CLuaA
             }
             break;
         }
+        case LUA_TVEC:
+        {
+            json_object* jsonArray = json_object_new_array();
+            json_object_array_add(jsonArray, json_object_new_double(m_vecData[0]));
+            json_object_array_add(jsonArray, json_object_new_double(m_vecData[1]));
+            json_object_array_add(jsonArray, json_object_new_double(m_vecData[2]));
+            json_object_array_add(jsonArray, json_object_new_double(m_vecData[3]));
+            return jsonArray;
+        }
         default:
         {
             g_pClientGame->GetScriptDebugging()->LogError(
@@ -983,6 +1060,11 @@ char* CLuaArgument::WriteToString(char* szBuffer, int length)
                 g_pClientGame->GetScriptDebugging()->LogError(NULL, "String is too long. Limit is 65535 characters.");
             }
             break;
+        }
+        case LUA_TVEC:
+        {
+            snprintf(szBuffer, length, "vector(%f,%f,%f,%f)", m_vecData[0], m_vecData[1], m_vecData[2], m_vecData[3]);
+            return szBuffer;
         }
         case LUA_TLIGHTUSERDATA:
         case LUA_TUSERDATA:
