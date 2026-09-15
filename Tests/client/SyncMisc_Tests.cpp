@@ -309,6 +309,24 @@ TEST(SLuaTypeSync, RoundTrip)
     EXPECT_EQ(9, out.data.ucType);
 }
 
+TEST(SLuaTypeSync, RoundTrip_VectorAndMatrix)
+{
+    const unsigned char types[] = {LUA_TVECTOR2, LUA_TVECTOR3, LUA_TVECTOR4, LUA_TMATRIX};
+
+    for (unsigned char typeVal : types)
+    {
+        MockBitStream bs;
+        SLuaTypeSync  sync;
+        sync.data.ucType = typeVal;
+        sync.Write(bs);
+        EXPECT_EQ(4, bs.GetNumberOfBitsUsed());
+        bs.ResetReadPointer();
+        SLuaTypeSync out;
+        EXPECT_TRUE(out.Read(bs));
+        EXPECT_EQ(typeVal, out.data.ucType);
+    }
+}
+
 // Mouse button: 3-bit value (left=1, middle=2, right=3, etc.).
 TEST(SMouseButtonSync, RoundTrip)
 {
