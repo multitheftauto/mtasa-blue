@@ -4094,6 +4094,40 @@ static int _cdecl CFileLoader_LoadVehicleObject_sscanf(const char* s, const char
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CPathFind's per map area path node loader calls malloc() for m_pPathNodes[area] (offset
+// 0x804) without checking the result, then loops over it using m_dwNumNodes[area] (offset
+// 0xfa4) as the count. If the allocation fails, that loop dereferences a null pointer and
+// crashes.
+//
+// Right where the node count gets loaded for the loop's bound check, this hook also checks
+// whether m_pPathNodes[area] is null, and if so forces the count to 0 so the loop is skipped.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CPathFind_LoadPathNodeCount_Mid  0x0156F966
+#define HOOKSIZE_CPathFind_LoadPathNodeCount_Mid 7
+DWORD                         RETURN_CPathFind_LoadPathNodeCount_Mid = 0x0156F96D;
+static void __declspec(naked) HOOK_CPathFind_LoadPathNodeCount_Mid()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // Replicate the overwritten instruction: EAX = m_dwNumNodes[area]
+        mov     eax, dword ptr [esi + edi*4 + 0x0fa4]
+
+        // If m_pPathNodes[area] failed to allocate, force the node count to 0 for this loop
+        cmp     dword ptr [esi + edi*4 + 0x804], 0
+        jne     nodesOk
+        xor     eax, eax
+        nodesOk:
+        jmp     RETURN_CPathFind_LoadPathNodeCount_Mid
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 ////////////////////////////////////////////////////////////////////////
@@ -4191,4 +4225,9 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
 
     // Fix uninitialized wheel scale in CFileLoader::LoadVehicleObject on Win11 24H2
     HookInstallCall(CALL_CFileLoader_LoadVehicleObject_sscanf, (DWORD)CFileLoader_LoadVehicleObject_sscanf);
+
+    // This address sits further into the executable than EZHookInstall's normal range check
+    // allows, so it is installed with HookInstallFast instead; the page is unprotected up front
+    // in SetInitialVirtualProtect
+    HookInstallFast(HOOKPOS_CPathFind_LoadPathNodeCount_Mid, (DWORD)HOOK_CPathFind_LoadPathNodeCount_Mid, HOOKSIZE_CPathFind_LoadPathNodeCount_Mid);
 }
