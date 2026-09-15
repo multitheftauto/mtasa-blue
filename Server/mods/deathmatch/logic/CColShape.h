@@ -51,6 +51,13 @@ public:
     bool GetAutoCallEvent() { return m_bAutoCallEvent; };
     void SetAutoCallEvent(bool bAutoCallEvent) { m_bAutoCallEvent = bAutoCallEvent; };
 
+    bool IsDimensionCheckEnabled() { return m_bCheckDimension; };
+    void SetDimensionCheckEnabled(bool bCheckDimension) { m_bCheckDimension = bCheckDimension; };
+    bool IsInteriorCheckEnabled() { return m_bCheckInterior; };
+    void SetInteriorCheckEnabled(bool bCheckInterior) { m_bCheckInterior = bCheckInterior; };
+
+    bool IsCollisionAllowed(CElement& Element);
+
     void AddCollider(CElement* pElement) { m_Colliders.push_back(pElement); }
     void RemoveCollider(CElement* pElement) { m_Colliders.remove(pElement); }
     bool ColliderExists(CElement* pElement);
@@ -71,6 +78,8 @@ private:
     bool                m_bIsEnabled;
     class CColCallback* m_pCallback;
     bool                m_bAutoCallEvent;
+    bool                m_bCheckDimension;
+    bool                m_bCheckInterior;
 
     std::list<CElement*> m_Colliders;
 

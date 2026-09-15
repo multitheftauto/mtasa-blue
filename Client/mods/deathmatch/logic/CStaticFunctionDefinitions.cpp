@@ -1404,6 +1404,8 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
         case CCLIENTBUILDING:
         {
             Entity.SetDimension(usDimension);
+            RefreshElementCollisions(&Entity);
+
             return true;
         }
 
@@ -1417,6 +1419,8 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
             }
 
             Ped.SetDimension(usDimension);
+            RefreshElementCollisions(&Ped);
+
             return true;
         }
     }
@@ -7596,6 +7600,18 @@ bool CStaticFunctionDefinitions::GetColShapeRadius(CClientColShape* pColShape, f
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetColShapeCheckDimension(CClientColShape* pColShape, bool& bCheckDimension)
+{
+    bCheckDimension = pColShape->IsDimensionCheckEnabled();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetColShapeCheckInterior(CClientColShape* pColShape, bool& bCheckInterior)
+{
+    bCheckInterior = pColShape->IsInteriorCheckEnabled();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetColShapeRadius(CClientColShape* pColShape, float fRadius)
 {
     if (fRadius < 0.0f)
@@ -7618,6 +7634,20 @@ bool CStaticFunctionDefinitions::SetColShapeRadius(CClientColShape* pColShape, f
 
     RefreshColShapeColliders(pColShape);
 
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeCheckDimension(CClientColShape* pColShape, bool bCheckDimension)
+{
+    pColShape->SetDimensionCheckEnabled(bCheckDimension);
+    RefreshColShapeColliders(pColShape);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeCheckInterior(CClientColShape* pColShape, bool bCheckInterior)
+{
+    pColShape->SetInteriorCheckEnabled(bCheckInterior);
+    RefreshColShapeColliders(pColShape);
     return true;
 }
 
@@ -7717,6 +7747,35 @@ void CStaticFunctionDefinitions::RefreshColShapeColliders(CClientColShape* pColS
     CVector vecRootPosition;
     m_pRootEntity->GetPosition(vecRootPosition);
     m_pColManager->DoHitDetection(vecRootPosition, 0.0f, m_pRootEntity, pColShape, true);
+}
+
+void CStaticFunctionDefinitions::RefreshElementCollisions(CClientEntity* pEntity)
+{
+    switch (pEntity->GetType())
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+        case CCLIENTVEHICLE:
+        {
+            CVector vecEntityPosition;
+            pEntity->GetPosition(vecEntityPosition);
+            m_pColManager->DoHitDetection(vecEntityPosition, 0.0f, pEntity);
+            break;
+        }
+        case CCLIENTCOLSHAPE:
+            RefreshColShapeColliders(static_cast<CClientColShape*>(pEntity));
+            break;
+        case CCLIENTMARKER:
+        case CCLIENTPICKUP:
+        {
+            CClientColShape* pColShape = GetElementColShape(pEntity);
+            if (pColShape)
+                RefreshColShapeColliders(pColShape);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 CClientColShape* CStaticFunctionDefinitions::GetElementColShape(CClientEntity* pEntity)

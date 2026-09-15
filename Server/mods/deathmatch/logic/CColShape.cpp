@@ -20,6 +20,8 @@ CColShape::CColShape(CColManager* pManager, CElement* pParent, bool bIsPartnered
     // Init
     m_bIsEnabled = true;
     m_bAutoCallEvent = true;
+    m_bCheckDimension = false;
+    m_bCheckInterior = false;
     m_pCallback = NULL;
     m_iType = COLSHAPE;
     m_bPartnered = bIsPartnered;
@@ -87,6 +89,17 @@ void CColShape::CallLeaveCallback(CElement& Element)
     {
         m_pCallback->Callback_OnLeave(*this, Element);
     }
+}
+
+bool CColShape::IsCollisionAllowed(CElement& Element)
+{
+    if (m_bCheckDimension && GetDimension() != Element.GetDimension())
+        return false;
+
+    if (m_bCheckInterior && GetInterior() != Element.GetInterior())
+        return false;
+
+    return true;
 }
 
 bool CColShape::ColliderExists(CElement* pElement)

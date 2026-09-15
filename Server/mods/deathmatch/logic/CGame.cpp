@@ -1725,8 +1725,8 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPedDamage", "loss", NULL, false);
 
     // Element events
-    m_Events.AddEvent("onElementColShapeHit", "colshape, matchingDimension", NULL, false);
-    m_Events.AddEvent("onElementColShapeLeave", "colshape, matchingDimension", NULL, false);
+    m_Events.AddEvent("onElementColShapeHit", "colshape, matchingDimension, dimension, interior", NULL, false);
+    m_Events.AddEvent("onElementColShapeLeave", "colshape, matchingDimension, dimension, interior", NULL, false);
     m_Events.AddEvent("onElementClicked", "button, state, clicker, posX, posY, posZ", NULL, false);
     m_Events.AddEvent("onElementDataChange", "key, oldValue", NULL, false);
     m_Events.AddEvent("onElementDestroy", "", NULL, false);
@@ -1742,8 +1742,8 @@ void CGame::AddBuiltInEvents()
     // Radar area events
 
     // Shape events
-    m_Events.AddEvent("onColShapeHit", "entity, matchingDimension", NULL, false);
-    m_Events.AddEvent("onColShapeLeave", "entity, matchingDimension", NULL, false);
+    m_Events.AddEvent("onColShapeHit", "entity, matchingDimension, dimension, interior", NULL, false);
+    m_Events.AddEvent("onColShapeLeave", "entity, matchingDimension, dimension, interior", NULL, false);
 
     // Vehicle events
     m_Events.AddEvent("onVehicleDamage", "loss", NULL, false);

@@ -682,14 +682,19 @@ public:
     static CClientColShape*     GetElementColShape(CClientEntity* pEntity);
     static bool                 IsInsideColShape(CClientColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void                 RefreshColShapeColliders(CClientColShape* pColShape);
+    static void                 RefreshElementCollisions(CClientEntity* pEntity);
 
     // Shape get functions
     static bool GetColShapeRadius(CClientColShape* pColShape, float& fRadius);
+    static bool GetColShapeCheckDimension(CClientColShape* pColShape, bool& bCheckDimension);
+    static bool GetColShapeCheckInterior(CClientColShape* pColShape, bool& bCheckInterior);
     static bool GetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint);
 
     // Shape set functions
     static bool SetColShapeRadius(CClientColShape* pColShape, float fRadius);
     static bool SetColShapeSize(CClientColShape* pColShape, CVector& vecSize);
+    static bool SetColShapeCheckDimension(CClientColShape* pColShape, bool bCheckDimension);
+    static bool SetColShapeCheckInterior(CClientColShape* pColShape, bool bCheckInterior);
     static bool SetColPolygonPointPosition(CClientColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
 
     static bool AddColPolygonPoint(CClientColPolygon* pColPolygon, const CVector2D& vecPoint);

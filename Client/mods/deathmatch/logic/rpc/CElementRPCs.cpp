@@ -325,6 +325,7 @@ void CElementRPCs::SetElementDimension(CClientEntity* pSource, NetBitStreamInter
                 }
 
                 pPlayer->SetDimension(usDimension);
+                CStaticFunctionDefinitions::RefreshElementCollisions(pPlayer);
             }
         }
         else
@@ -340,6 +341,7 @@ void CElementRPCs::SetElementDimension(CClientEntity* pSource, NetBitStreamInter
             }
 
             pSource->SetDimension(usDimension);
+            CStaticFunctionDefinitions::RefreshElementCollisions(pSource);
         }
     }
 }

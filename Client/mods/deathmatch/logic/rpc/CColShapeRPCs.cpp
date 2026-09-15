@@ -16,6 +16,8 @@ void CColShapeRPCs::LoadFunctions(void)
 {
     AddHandler(SET_COLSHAPE_RADIUS, SetColShapeRadius, "SetColShapeRadius");
     AddHandler(SET_COLSHAPE_SIZE, SetColShapeSize, "SetColShapeSize");
+    AddHandler(SET_COLSHAPE_CHECK_DIMENSION, SetColShapeCheckDimension, "SetColShapeCheckDimension");
+    AddHandler(SET_COLSHAPE_CHECK_INTERIOR, SetColShapeCheckInterior, "SetColShapeCheckInterior");
     AddHandler(UPDATE_COLPOLYGON_POINT, UpdateColPolygonPoint, "UpdateColPolygonPoint");
     AddHandler(ADD_COLPOLYGON_POINT, AddColPolygonPoint, "AddColPolygonPoint");
     AddHandler(REMOVE_COLPOLYGON_POINT, RemoveColPolygonPoint, "RemoveColPolygonPoint");
@@ -39,6 +41,26 @@ void CColShapeRPCs::SetColShapeSize(CClientEntity* pSource, NetBitStreamInterfac
     {
         CClientColShape* pColShape = static_cast<CClientColShape*>(pSource);
         CStaticFunctionDefinitions::SetColShapeSize(pColShape, vecSize);
+    }
+}
+
+void CColShapeRPCs::SetColShapeCheckDimension(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    bool bCheckDimension;
+    if (bitStream.ReadBit(bCheckDimension))
+    {
+        CClientColShape* pColShape = static_cast<CClientColShape*>(pSource);
+        CStaticFunctionDefinitions::SetColShapeCheckDimension(pColShape, bCheckDimension);
+    }
+}
+
+void CColShapeRPCs::SetColShapeCheckInterior(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    bool bCheckInterior;
+    if (bitStream.ReadBit(bCheckInterior))
+    {
+        CClientColShape* pColShape = static_cast<CClientColShape*>(pSource);
+        CStaticFunctionDefinitions::SetColShapeCheckInterior(pColShape, bCheckInterior);
     }
 }
 

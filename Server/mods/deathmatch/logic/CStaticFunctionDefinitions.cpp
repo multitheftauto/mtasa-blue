@@ -1664,9 +1664,13 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         case CElement::WATER:
         {
             pElement->SetDimension(usDimension);
+
             CBitStream bitStream;
             bitStream.pBitStream->Write(usDimension);
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream));
+
+            RefreshElementCollisions(pElement);
+
             return true;
         }
         default:
@@ -9977,6 +9981,18 @@ bool CStaticFunctionDefinitions::GetColShapeRadius(CColShape* pColShape, float& 
     return true;
 }
 
+bool CStaticFunctionDefinitions::GetColShapeCheckDimension(CColShape* pColShape, bool& bCheckDimension)
+{
+    bCheckDimension = pColShape->IsDimensionCheckEnabled();
+    return true;
+}
+
+bool CStaticFunctionDefinitions::GetColShapeCheckInterior(CColShape* pColShape, bool& bCheckInterior)
+{
+    bCheckInterior = pColShape->IsInteriorCheckEnabled();
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetColShapeRadius(CColShape* pColShape, float fRadius)
 {
     if (fRadius < 0.0f)
@@ -10003,6 +10019,32 @@ bool CStaticFunctionDefinitions::SetColShapeRadius(CColShape* pColShape, float f
     CBitStream BitStream;
     BitStream.pBitStream->Write(fRadius);
     m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_RADIUS, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeCheckDimension(CColShape* pColShape, bool bCheckDimension)
+{
+    pColShape->SetDimensionCheckEnabled(bCheckDimension);
+
+    RefreshColShapeColliders(pColShape);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit(bCheckDimension);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_CHECK_DIMENSION, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeCheckInterior(CColShape* pColShape, bool bCheckInterior)
+{
+    pColShape->SetInteriorCheckEnabled(bCheckInterior);
+
+    RefreshColShapeColliders(pColShape);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit(bCheckInterior);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pColShape, SET_COLSHAPE_CHECK_INTERIOR, *BitStream.pBitStream));
 
     return true;
 }
@@ -10137,6 +10179,37 @@ void CStaticFunctionDefinitions::RefreshColShapeColliders(CColShape* pColShape)
 {
     CElement* pRoot = m_pMapManager->GetRootElement();
     m_pColManager->DoHitDetection(pRoot->GetPosition(), pRoot, pColShape, true);
+}
+
+void CStaticFunctionDefinitions::RefreshElementCollisions(CElement* pElement)
+{
+    switch (pElement->GetType())
+    {
+        case CElement::PLAYER:
+        case CElement::PED:
+        case CElement::VEHICLE:
+            m_pColManager->DoHitDetection(pElement->GetPosition(), pElement);
+            break;
+        case CElement::COLSHAPE:
+            RefreshColShapeColliders(static_cast<CColShape*>(pElement));
+            break;
+        case CElement::MARKER:
+        {
+            CColShape* pColShape = static_cast<CMarker*>(pElement)->GetColShape();
+            if (pColShape)
+                RefreshColShapeColliders(pColShape);
+            break;
+        }
+        case CElement::PICKUP:
+        {
+            CColShape* pColShape = static_cast<CPickup*>(pElement)->GetColShape();
+            if (pColShape)
+                RefreshColShapeColliders(pColShape);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 bool CStaticFunctionDefinitions::GetWeaponNameFromID(unsigned char ucID, char* szName)
