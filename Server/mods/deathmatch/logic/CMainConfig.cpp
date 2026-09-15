@@ -1540,7 +1540,9 @@ const std::vector<SIntSetting>& CMainConfig::GetIntSettingList()
         {true, true, 0, 1, 1, "resource_client_file_checks", &m_checkResourceClientFiles, nullptr},
         {true, true, 0, 1, 2, "allow_multi_command_handlers", &m_allowMultiCommandHandlers, &CMainConfig::OnAllowMultiCommandHandlersChange},
         {true, true, 50, 100, 1000, "voice_packets_interval", &m_voicePacketsInterval, nullptr},
-        {true, true, 1, 32, 200, "max_voice_packets_per_interval", &m_maxVoicePacketsPerInterval, nullptr},
+        // Senders drain their full backlog in one flush on release, so leave
+        // room above the steady rate for post-stall catch-up bursts
+        {true, true, 1, 64, 200, "max_voice_packets_per_interval", &m_maxVoicePacketsPerInterval, nullptr},
         {true, true, 128, 512, 2048, "max_voice_buffer_size", &m_maxVoiceBufferSize, nullptr},
     };
 
