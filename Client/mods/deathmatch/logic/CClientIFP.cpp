@@ -143,7 +143,7 @@ void CClientIFP::ReadIFPVersion2(bool bAnp3)
     }
 }
 
-WORD CClientIFP::ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, std::bitset<32>& outAnimatedBonesMask)
+WORD CClientIFP::ReadSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, std::bitset<64>& outAnimatedBonesMask)
 {
     SequenceMapType MapOfSequences;
     WORD            wUnknownSequences = ReadSequences(pAnimationHierarchy, MapOfSequences);
@@ -513,7 +513,7 @@ void CClientIFP::PreProcessAnimationHierarchy(std::unique_ptr<CAnimBlendHierarch
 }
 
 void CClientIFP::MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy, SequenceMapType& mapOfSequences,
-                                          std::bitset<32>& outAnimatedBonesMask)
+                                          std::bitset<64>& outAnimatedBonesMask)
 {
     for (size_t SequenceIndex = 0; SequenceIndex < m_kcIFPSequences; SequenceIndex++)
     {
@@ -593,7 +593,7 @@ void CClientIFP::InsertAnimationDummySequence(std::unique_ptr<CAnimBlendSequence
 void CClientIFP::CopyDummyKeyFrameByBoneID(BYTE* pKeyFrames, DWORD dwBoneID)
 {
     /* FrameData structure:
-    * 
+    *
     struct KeyFrame
     {
         short quaternionX;
@@ -1381,7 +1381,7 @@ CAnimBlendHierarchySAInterface* CClientIFP::GetAnimationHierarchy(const SString&
     return nullptr;
 }
 
-std::bitset<32> CClientIFP::GetAnimatedBonesMask(const SString& strAnimationName)
+std::bitset<64> CClientIFP::GetAnimatedBonesMask(const SString& strAnimationName)
 {
     const unsigned int uiAnimationNameHash = HashString(strAnimationName.ToLower());
     auto               it = std::find_if(m_pVecAnimations->begin(), m_pVecAnimations->end(),
