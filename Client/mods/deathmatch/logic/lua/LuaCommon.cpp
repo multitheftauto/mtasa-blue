@@ -264,9 +264,56 @@ void lua_getclass(lua_State* luaVM, const char* szName)
     lua_remove(luaVM, -2);  // class
 }
 
+static void FlattenClassTable(lua_State* luaVM, int childIndex, int parentIndex, const char* tableName)
+{
+    const int absChild = (childIndex > 0) ? childIndex : lua_gettop(luaVM) + childIndex + 1;
+    const int absParent = (parentIndex > 0) ? parentIndex : lua_gettop(luaVM) + parentIndex + 1;
+
+    lua_pushstring(luaVM, tableName);
+    lua_rawget(luaVM, absParent);
+    if (!lua_istable(luaVM, -1))
+    {
+        lua_pop(luaVM, 1);
+        return;
+    }
+
+    lua_pushstring(luaVM, tableName);
+    lua_rawget(luaVM, absChild);
+    if (!lua_istable(luaVM, -1))
+    {
+        lua_pop(luaVM, 2);
+        return;
+    }
+
+    // Iterate over the parent table and copy missing entries to the child table
+    lua_pushnil(luaVM);
+    while (lua_next(luaVM, -3) != 0)
+    {
+        // Check if the child class already overrides this key
+        lua_pushvalue(luaVM, -2);
+        lua_rawget(luaVM, -4);
+
+        if (lua_isnil(luaVM, -1))
+        {
+            lua_pop(luaVM, 1);
+            lua_pushvalue(luaVM, -2);
+            lua_pushvalue(luaVM, -2);
+            lua_rawset(luaVM, -5);
+        }
+        else
+        {
+            lua_pop(luaVM, 1);
+        }
+
+        lua_pop(luaVM, 1);
+    }
+
+    lua_pop(luaVM, 2);
+}
+
 void lua_registerclass(lua_State* luaVM, const char* szName, const char* szParent)
 {
-    if (szParent != NULL)
+    if (szParent != nullptr)
     {
         lua_pushstring(luaVM, "mt");           // class table, "mt"
         lua_rawget(luaVM, LUA_REGISTRYINDEX);  // class table, mt table
@@ -274,6 +321,14 @@ void lua_registerclass(lua_State* luaVM, const char* szName, const char* szParen
 
         // Error if we can't find the parent class to extend from
         assert(lua_istable(luaVM, -1));
+
+        // Flatten parent methods and properties into child metatables to achieve O(1) direct lookups
+        const int childIndex = lua_gettop(luaVM) - 2;
+        const int parentIndex = lua_gettop(luaVM);
+
+        FlattenClassTable(luaVM, childIndex, parentIndex, "__class");
+        FlattenClassTable(luaVM, childIndex, parentIndex, "__get");
+        FlattenClassTable(luaVM, childIndex, parentIndex, "__set");
 
         lua_setfield(luaVM, -3, "__parent");  // class table, mt table
 
