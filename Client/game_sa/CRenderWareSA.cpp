@@ -416,8 +416,13 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
             }
 
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface();
+            const unsigned short       usTxdId = pModelInfoInterface->usTextureDictionary;
             CBaseModelInfo_SetClump(pModelInfoInterface, pNewClone);
             RpClumpDestroy(pOldClump);
+
+            // SetClump adds a reference to the model's TXD for the new clump, and RpClumpDestroy does not
+            // give back the one the old clump held (CClumpModelInfo::DeleteRwObject would). Remove it again.
+            CTxdStore_RemoveRef(usTxdId);
         }
     }
 
