@@ -29,6 +29,8 @@ static bool g_onlyUpdateRotations = false;
 
 namespace
 {
+    constexpr std::uint8_t PED_NODE_HEAD = 2;
+
     constexpr std::uintptr_t FUNC_CRealTimeShadowManager_ReturnRealTimeShadow = 0x705B30;
     constexpr std::uintptr_t CLASS_CRealTimeShadowManager = 0xC40350;
     constexpr std::uintptr_t FUNC_CShadows_StoreShadowForPedObject = 0x707B40;
@@ -351,6 +353,32 @@ CVector* CPedSA::GetTransformedBonePosition(eBone bone, CVector* position)
         *position = *GetPosition();
 
     return position;
+}
+
+void CPedSA::UpdateRpHAnim()
+{
+    CEntitySA::UpdateRpHAnim();
+
+    const auto* pedInterface = GetPedInterface();
+    if (!pedInterface->pedFlags.bRemoveHead || pedInterface->bodyPartToRemove != PED_NODE_HEAD)
+        return;
+
+    RpClump*          clump = GetRpClump();
+    RpHAnimHierarchy* animHierarchy = clump ? GetAnimHierarchyFromSkinClump(clump) : nullptr;
+    if (!animHierarchy)
+        return;
+
+    constexpr eBone removedBones[] = {BONE_NECK, BONE_HEAD2, BONE_HEAD1, BONE_HEAD};
+    constexpr RwV3d hiddenScale{0.0f, 0.0f, 0.0f};
+
+    RwMatrix* boneMatrices = RpHAnimHierarchyGetMatrixArray(animHierarchy);
+
+    for (const auto boneId : removedBones)
+    {
+        const int matrixIndex = RpHAnimIDGetIndex(animHierarchy, boneId);
+        if (matrixIndex != -1)
+            RwMatrixScale(&boneMatrices[matrixIndex], &hiddenScale, TRANSFORM_BEFORE);
+    }
 }
 
 //
