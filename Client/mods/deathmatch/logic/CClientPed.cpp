@@ -7425,3 +7425,14 @@ void CClientPed::RunSwimTask() const
 
     inWaterTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_EVENT_RESPONSE_NONTEMP, true);
 }
+
+CTaskSimpleUseGun* CClientPed::GetUseGunTask() const
+{
+    if (!m_pPlayerPed)
+        return nullptr;
+
+    CPedIntelligence* intelligence = m_pPlayerPed->GetPedIntelligence();
+    assert(intelligence);
+
+    return intelligence->GetTaskUseGun();
+}
