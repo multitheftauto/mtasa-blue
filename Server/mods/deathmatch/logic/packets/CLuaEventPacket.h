@@ -17,6 +17,12 @@
 class CLuaEventPacket final : public CPacket
 {
 public:
+    static constexpr int LUA_EVENT_ENVELOPE_HEADROOM = 64 * 1024;
+    // Limit for the size of the arguments in a single triggerEvent. (1MB)
+    static constexpr int MAX_LUA_EVENT_ARGUMENTS_SIZE = 1024 * 1024;
+    // Limit for the size of the arguments in a single triggerLatentEvent. (10MB)
+    static constexpr int MAX_LUA_LATENT_EVENT_ARGUMENTS_SIZE = 10 * 1024 * 1024;
+
     CLuaEventPacket();
     CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments* pArguments);
 
