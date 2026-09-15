@@ -1577,7 +1577,14 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
             break;
     }
 
-    m_pCustomClump = success ? pClump : nullptr;
+    if (success)
+        m_pCustomClump = pClump;
+    else if (m_pCustomClump == pClump)
+    {
+        // A deferred custom model failed when it was first applied, so do not retry it every time the model streams in.
+        // When a different replacement is rejected, keep the previous custom clump active and restorable by its owner.
+        m_pCustomClump = nullptr;
+    }
     return success;
 }
 
