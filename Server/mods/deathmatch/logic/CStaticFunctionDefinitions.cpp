@@ -2461,7 +2461,10 @@ CVehicle* CStaticFunctionDefinitions::GetPedOccupiedVehicle(CPed* pPed)
 {
     assert(pPed);
 
-    return pPed->GetOccupiedVehicle();
+    if (CVehicle* pVehicle = pPed->GetOccupiedVehicle())
+        return pVehicle;
+
+    return pPed->IsDead() ? pPed->GetVehicleOccupiedOnDeath() : NULL;
 }
 
 bool CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat(CPed* pPed, unsigned int& uiSeat)
@@ -2473,6 +2476,13 @@ bool CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat(CPed* pPed, unsigned 
         uiSeat = pPed->GetOccupiedVehicleSeat();
         return true;
     }
+
+    if (pPed->IsDead() && pPed->GetVehicleOccupiedOnDeath())
+    {
+        uiSeat = pPed->GetVehicleOccupiedSeatOnDeath();
+        return true;
+    }
+
     return false;
 }
 
@@ -3961,11 +3971,15 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
                 pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
             // Remove him from any occupied vehicle
+            // The client keeps the ped paired with the vehicle until it respawns,
+            // so remember it and let the occupied-vehicle getters report it while dead
             CVehicle* pVehicle = pPed->GetOccupiedVehicle();
             if (pVehicle)
             {
-                pVehicle->SetOccupant(NULL, pPed->GetOccupiedVehicleSeat());
+                const unsigned int uiOccupiedSeat = pPed->GetOccupiedVehicleSeat();
+                pVehicle->SetOccupant(NULL, uiOccupiedSeat);
                 pPed->SetOccupiedVehicle(NULL, 0);
+                pPed->SetVehicleOccupiedOnDeath(pVehicle, uiOccupiedSeat);
             }
 
             // Update the ped
