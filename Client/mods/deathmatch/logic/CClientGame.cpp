@@ -315,6 +315,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(CClientGame::StaticGameRunNamedAnimDestructorHandler);
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
     g_pMultiplayer->SetRadarBlipRenderHandler(CClientGame::StaticRadarBlipRenderHandler);
+    g_pMultiplayer->SetMarkerRenderHandler(CClientGame::StaticMarkerRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
     g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedStepHandler);
@@ -531,6 +532,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(nullptr);
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
     g_pMultiplayer->SetRadarBlipRenderHandler(nullptr);
+    g_pMultiplayer->SetMarkerRenderHandler(nullptr);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
     g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
@@ -3816,6 +3818,21 @@ void CClientGame::StaticRadarBlipRenderHandler(int iBlipIndex)
         if (pBlip)
         {
             g_pGame->GetRenderWare()->SetRenderingClientEntity(pBlip, 0xFFFF, TYPE_MASK_OTHER);
+            return;
+        }
+    }
+
+    g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
+}
+
+void CClientGame::StaticMarkerRenderHandler(unsigned long ulIdentifier)
+{
+    if (ulIdentifier)
+    {
+        CClientEntity* pEntity = g_pClientGame->GetManager()->GetMarkerManager()->GetEntityByIdentifier(ulIdentifier);
+        if (pEntity)
+        {
+            g_pGame->GetRenderWare()->SetRenderingClientEntity(pEntity, 0xFFFF, TYPE_MASK_OTHER);
             return;
         }
     }

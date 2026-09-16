@@ -149,6 +149,7 @@ public:
     void SetGameRunNamedAnimDestructorHandler(GameRunNamedAnimDestructorHandler* pHandler);
     void SetGameEntityRenderHandler(GameEntityRenderHandler* pHandler);
     void SetRadarBlipRenderHandler(RadarBlipRenderHandler* pHandler);
+    void SetMarkerRenderHandler(MarkerRenderHandler* pHandler);
     void SetFxSystemDestructionHandler(FxSystemDestructionHandler* pHandler);
     void SetDrivebyAnimationHandler(DrivebyAnimationHandler* pHandler);
     void SetPedStepHandler(PedStepHandler* pHandler);
