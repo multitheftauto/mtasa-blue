@@ -163,7 +163,7 @@ CResource::~CResource()
     // Undo all changes to water
     g_pGame->GetWaterManager()->UndoChanges(this);
 
-    // Remove the occluders this resource added
+    // Undo all changes to occluders
     g_pGame->GetWorld()->UndoOccluderChanges(this);
 
     // Cancel all downloads started by this resource
