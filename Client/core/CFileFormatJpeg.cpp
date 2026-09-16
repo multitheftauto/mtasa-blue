@@ -27,6 +27,17 @@ static void JpegErrorExit(j_common_ptr cinfo)
     longjmp(myerr->setjmp_buffer, 1);
 }
 
+// Mirrors my_mem_destination_mgr in jdatadst.c, after growth only newbuffer points at the live output buffer
+struct JpegMemDestinationManager
+{
+    struct jpeg_destination_mgr pub;
+    unsigned char**             outbuffer;
+    size_t*                     outsize;
+    unsigned char*              newbuffer;
+    JOCTET*                     buffer;
+    size_t                      bufsize;
+};
+
 bool IsJpeg(const void* pData, uint uiDataSize)
 {
     if (!pData || uiDataSize == 0)
@@ -264,6 +275,8 @@ bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, 
     {
         if (pOutError)
             *pOutError = "JPEG encode error (libjpeg internal error)";
+        if (cinfo.dest)
+            free(reinterpret_cast<JpegMemDestinationManager*>(cinfo.dest)->newbuffer);
         jpeg_destroy_compress(&cinfo);
         return false;
     }
@@ -323,6 +336,7 @@ bool JpegEncode(uint uiWidth, uint uiHeight, uint uiQuality, const void* pData, 
         {
             if (pOutError)
                 *pOutError = "Failed to write JPEG scanline " + std::to_string(cinfo.next_scanline) + " of " + std::to_string(cinfo.image_height);
+            free(reinterpret_cast<JpegMemDestinationManager*>(cinfo.dest)->newbuffer);
             jpeg_destroy_compress(&cinfo);
             return false;
         }
