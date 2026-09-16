@@ -182,7 +182,7 @@ void CClientBuilding::Create()
     // failed to allocate). Restore the GTA LOD link only when both sides exist.
     if (m_ucAlpha != 255)
         m_pBuilding->SetAlpha(m_ucAlpha);
-  
+
     if (m_ucAlpha != 255)
         m_pBuilding->SetAlpha(m_ucAlpha);
 
@@ -191,7 +191,7 @@ void CClientBuilding::Create()
         if (CBuilding* pHighEntity = m_pHighBuilding->GetBuildingEntity())
             pHighEntity->SetLod(m_pBuilding);
     }
-  
+
     if (m_pLowBuilding)
     {
         if (CBuilding* pLowEntity = m_pLowBuilding->GetBuildingEntity())
