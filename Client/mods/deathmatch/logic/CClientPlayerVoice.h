@@ -112,6 +112,7 @@ private:
     int             m_iSpeexIncomingFrameSampleCount;
     float           m_fVolume;
     float           m_fVolumeScale;
+    unsigned long   m_ulVolumeScaleCheckTime = 0;
 
     // Playback altering stuff
     float m_fPitch;
