@@ -577,8 +577,12 @@ void CDirect3DEvents9::OnRestore(IDirect3DDevice9* pDevice)
     CCore::GetSingleton().OnDeviceRestore();
 }
 
+static bool g_bDualPassAlpha = true;
+
 void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice)
 {
+    CVARS_GET("dualpass_alpha", g_bDualPassAlpha);
+
     // CEGUI faults are caught in CGUI_Impl::Draw; anything else goes to the crash handler.
     TIMING_CHECKPOINT("+OnPresent1");
     CGraphics::GetSingleton().SetSkipMTARenderThisFrame(false);
@@ -761,7 +765,7 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive(IDirect3DDevice9* pDevice, IDirect3DDe
         // dual pass over it draws the sub-ref gradient in pass 2, which is what kept the LV neon
         // lines smeared no matter what the game side ALPHAREF was set to.
         const bool bGameAlphaTestActive = g_pDeviceState->RenderState.ALPHATESTENABLE && g_pDeviceState->RenderState.ALPHAREF > 2;
-        if (!bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
+        if (g_bDualPassAlpha && !bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
             !g_pDeviceState->VertexDeclState.PositionT)
         {
             // Save current alpha test state
@@ -1013,7 +1017,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, IDir
         // is already running a meaningful alpha test, it clips transparent pixels before z-write
         // on its own and the dual pass would draw the sub-ref gradient in pass 2.
         const bool bGameAlphaTestActive = g_pDeviceState->RenderState.ALPHATESTENABLE && g_pDeviceState->RenderState.ALPHAREF > 2;
-        if (!bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
+        if (g_bDualPassAlpha && !bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
             !g_pDeviceState->VertexDeclState.PositionT)
         {
             // Save current alpha test state
