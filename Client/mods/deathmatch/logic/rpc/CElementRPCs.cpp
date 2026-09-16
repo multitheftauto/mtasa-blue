@@ -94,8 +94,10 @@ void CElementRPCs::SetElementData(CClientEntity* pSource, NetBitStreamInterface&
             CLogger::ErrorPrintf("RPC SetElementData name length > MAX_CUSTOMDATA_NAME_LENGTH");
             return;
         }
+
         SString      strName;
         CLuaArgument Argument;
+
         if (bitStream.ReadStringCharacters(strName, usNameLength) && Argument.ReadFromBitStream(bitStream))
         {
             pSource->SetCustomData(CStringName{strName}, Argument);
@@ -113,6 +115,7 @@ void CElementRPCs::RemoveElementData(CClientEntity* pSource, NetBitStreamInterfa
         SString strName;
 
         // Read out the name plus whether it's recursive or not
+
         if (bitStream.ReadStringCharacters(strName, usNameLength) && bitStream.ReadBit(bRecursive))
         {
             // Remove that name
@@ -175,6 +178,9 @@ void CElementRPCs::SetElementVelocity(CClientEntity* pSource, NetBitStreamInterf
     CVector vecVelocity;
     if (bitStream.Read(vecVelocity.fX) && bitStream.Read(vecVelocity.fY) && bitStream.Read(vecVelocity.fZ))
     {
+        if (!vecVelocity.IsValid())
+            return;
+
         switch (pSource->GetType())
         {
             case CCLIENTPED:
@@ -217,6 +223,9 @@ void CElementRPCs::SetElementAngularVelocity(CClientEntity* pSource, NetBitStrea
     CVector vecTurnVelocity;
     if (bitStream.Read(vecTurnVelocity.fX) && bitStream.Read(vecTurnVelocity.fY) && bitStream.Read(vecTurnVelocity.fZ))
     {
+        if (!vecTurnVelocity.IsValid())
+            return;
+
         switch (pSource->GetType())
         {
             case CCLIENTPED:
@@ -458,6 +467,16 @@ void CElementRPCs::SetElementAlpha(CClientEntity* pSource, NetBitStreamInterface
                 pObject->SetAlpha(ucAlpha);
                 break;
             }
+            case CCLIENTBUILDING:
+            {
+                static_cast<CClientBuilding*>(pSource)->SetAlpha(ucAlpha);
+                break;
+            }
+            case CCLIENTPROJECTILE:
+            {
+                static_cast<CClientProjectile*>(pSource)->SetAlpha(ucAlpha);
+                break;
+            }
             default:
                 break;
         }
@@ -669,6 +688,7 @@ void CElementRPCs::SetElementCollisionsEnabled(CClientEntity* pSource, NetBitStr
             }
 
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetCollisionEnabled(bEnable);
@@ -708,9 +728,15 @@ void CElementRPCs::SetElementFrozen(CClientEntity* pSource, NetBitStreamInterfac
             }
 
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetFrozen(bFrozen);
+                break;
+            }
+            case CCLIENTPROJECTILE:
+            {
+                static_cast<CClientProjectile*>(pSource)->SetFrozen(bFrozen);
                 break;
             }
         }
