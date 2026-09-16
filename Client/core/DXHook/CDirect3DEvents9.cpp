@@ -1384,33 +1384,52 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational, IDirect3DDevic
 // This function checks the sizes are valid
 //
 /////////////////////////////////////////////////////////////
+bool ShouldUpdateDeviceStateCache();
+
 bool AreVertexStreamsBigEnough(IDirect3DDevice9* pDevice, uint viMinBased, uint viMaxBased)
 {
+    // The proxy mirrors every stream the game sets, so the sizes are known without asking D3D
+    const bool bUseCache = ShouldUpdateDeviceStateCache();
+
     // Check each stream used
     for (uint i = 0; i < NUMELMS(g_pDeviceState->VertexDeclState.bUsesStreamAtIndex); i++)
     {
         if (g_pDeviceState->VertexDeclState.bUsesStreamAtIndex[i])
         {
-            IDirect3DVertexBuffer9* pStreamData = NULL;
-            UINT                    StreamOffset;
-            UINT                    StreamStride;
-            pDevice->GetStreamSource(i, &pStreamData, &StreamOffset, &StreamStride);
+            UINT StreamOffset;
+            UINT StreamStride;
+            UINT StreamSize;
 
-            if (pStreamData)
+            if (bUseCache)
             {
+                const auto& stream = g_pDeviceState->VertexStreams[i];
+                if (!stream.StreamData)
+                    continue;
+                StreamOffset = stream.StreamOffset;
+                StreamStride = stream.StreamStride;
+                StreamSize = stream.StreamSize;
+            }
+            else
+            {
+                IDirect3DVertexBuffer9* pStreamData = NULL;
+                pDevice->GetStreamSource(i, &pStreamData, &StreamOffset, &StreamStride);
+                if (!pStreamData)
+                    continue;
+
                 D3DVERTEXBUFFER_DESC VertexBufferDesc;
                 pStreamData->GetDesc(&VertexBufferDesc);
                 SAFE_RELEASE(pStreamData);
-
-                uint ReadOffsetStart = viMinBased * StreamStride + StreamOffset;
-                uint ReadOffsetSize = (viMaxBased - viMinBased) * StreamStride;
-
-                uint MinSizeVertexBufferShouldBe = ReadOffsetStart + ReadOffsetSize;
-
-                // Check vertex buffer is big enough to do the draw
-                if (VertexBufferDesc.Size < MinSizeVertexBufferShouldBe)
-                    return false;
+                StreamSize = VertexBufferDesc.Size;
             }
+
+            uint ReadOffsetStart = viMinBased * StreamStride + StreamOffset;
+            uint ReadOffsetSize = (viMaxBased - viMinBased) * StreamStride;
+
+            uint MinSizeVertexBufferShouldBe = ReadOffsetStart + ReadOffsetSize;
+
+            // Check vertex buffer is big enough to do the draw
+            if (StreamSize < MinSizeVertexBufferShouldBe)
+                return false;
         }
     }
     return true;

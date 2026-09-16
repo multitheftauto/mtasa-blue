@@ -1828,9 +1828,13 @@ HRESULT CProxyDirect3DDevice9::SetStreamSource(UINT StreamNumber, IDirect3DVerte
 {
     if (StreamNumber < NUMELMS(DeviceState.VertexStreams) && ShouldUpdateDeviceStateCache())
     {
-        // Avoid validation overhead since vertex buffers come from D3D9 driver
         if (DeviceState.VertexStreams[StreamNumber].StreamData != pStreamData)
+        {
             ReplaceInterface(DeviceState.VertexStreams[StreamNumber].StreamData, pStreamData);
+
+            D3DVERTEXBUFFER_DESC desc{};
+            DeviceState.VertexStreams[StreamNumber].StreamSize = (pStreamData && SUCCEEDED(pStreamData->GetDesc(&desc))) ? desc.Size : 0;
+        }
         DeviceState.VertexStreams[StreamNumber].StreamOffset = OffsetInBytes;
         DeviceState.VertexStreams[StreamNumber].StreamStride = Stride;
     }
