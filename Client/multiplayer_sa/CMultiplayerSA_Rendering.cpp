@@ -872,6 +872,42 @@ static void __declspec(naked) HOOK_CCoronas_Render_Corona()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CHeli::RenderAllHeliSearchLights
+//
+// Detect the game's own helicopter searchlight cone rendering (id = heli + 0xB, also the corona identifier)
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CHeli_RenderAllHeliSearchLights_Cone  0x6C7CE8
+#define HOOKSIZE_CHeli_RenderAllHeliSearchLights_Cone 5
+#define FUNC_CHeli_SearchLightCone                    0x6C58E0
+DWORD                         RETURN_CHeli_RenderAllHeliSearchLights_Cone = 0x6C7CED;
+static void __declspec(naked) HOOK_CHeli_RenderAllHeliSearchLights_Cone()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    dword ptr [esp+20h]
+        call    OnMY_MarkerRender_Pre
+        add     esp, 4*1
+        popad
+
+        // Arguments are still on the stack
+        mov     eax, FUNC_CHeli_SearchLightCone
+        call    eax
+
+        pushad
+        call    OnMY_MarkerRender_Post
+        popad
+        jmp     RETURN_CHeli_RenderAllHeliSearchLights_Cone
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::SetGameEntityRenderHandler
 //
 //
@@ -1125,4 +1161,5 @@ void CMultiplayerSA::InitHooks_Rendering()
     HookInstallCall(HOOKPOS_CRadar_DrawBlips_CoordBlipWaypoint, (DWORD)HOOK_CRadar_DrawCoordBlip);
     HookInstallCall(HOOKPOS_C3dMarkers_Render_Marker, (DWORD)HOOK_C3dMarkers_Render_Marker);
     EZHookInstall(CCoronas_Render_Corona);
+    EZHookInstall(CHeli_RenderAllHeliSearchLights_Cone);
 }
