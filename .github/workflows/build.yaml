@@ -37,9 +37,8 @@ jobs:
 
       - name: Restore vs2022
         run: |
-          git fetch origin 6ccea706e4b49f6bdb013b554cd8ac5bf4ed8a6c
-          git checkout 6ccea706e4b49f6bdb013b554cd8ac5bf4ed8a6c -- README.md
-          git revert 6ccea706e4b49f6bdb013b554cd8ac5bf4ed8a6c --no-commit
+          sed -i 's/vs2026/vs2022/g' win-create-projects.bat
+          sed -i 's/toolset "v145"/toolset "v143"/' premake5.lua
         shell: bash
 
       - name: Install CEF
