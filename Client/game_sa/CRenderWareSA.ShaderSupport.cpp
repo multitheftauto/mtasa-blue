@@ -36,7 +36,8 @@ enum
     RT_3DNI,
 };
 
-int CRenderWareSA::ms_iRenderingType = 0;
+int        CRenderWareSA::ms_iRenderingType = 0;
+CD3DDUMMY* CRenderWareSA::ms_pNoTextureD3DData = FAKE_D3DTEXTURE_NO_TEXTURE;
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -430,6 +431,21 @@ void CRenderWareSA::SetRenderingClientEntity(CClientEntityBase* pClientEntity, u
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::ResolveD3DData
+//
+// Draws without a texture are keyed by a fake texture ('unnamed', or 'searchlight' for
+// the helicopter searchlight cones) when doing a 3d model like render
+//
+////////////////////////////////////////////////////////////////
+CD3DDUMMY* CRenderWareSA::ResolveD3DData(CD3DDUMMY* pD3DData)
+{
+    if (pD3DData == nullptr && CRenderWareSA::ms_iRenderingType == RT_NONE)
+        return CRenderWareSA::ms_pNoTextureD3DData;
+    return pD3DData;
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::GetAppliedShaderForD3DData
 //
 //
@@ -439,11 +455,7 @@ SShaderItemLayers* CRenderWareSA::GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData
 {
     m_uiReplacementRequestCounter++;
 
-    // If rendering with no texture, and doing an 3d model like render, use the 'unnamed' texinfo
-    if (pD3DData == NULL && CRenderWareSA::ms_iRenderingType == RT_NONE)
-        pD3DData = FAKE_D3DTEXTURE_NO_TEXTURE;
-
-    STexInfo* pTexInfo = MapFindRef(m_D3DDataTexInfoMap, pD3DData);
+    STexInfo* pTexInfo = MapFindRef(m_D3DDataTexInfoMap, ResolveD3DData(pD3DData));
 
     if (!pTexInfo)
         return NULL;
@@ -600,6 +612,12 @@ void CRenderWareSA::Initialize()
     {
         // Make a fake texinfo to handle all non-textures
         STexInfo* pTexInfo = CreateTexInfo(FAKE_RWTEXTURE_NO_TEXTURE, FAKE_NAME_NO_TEXTURE, FAKE_D3DTEXTURE_NO_TEXTURE);
+        OnTextureStreamIn(pTexInfo);
+    }
+    if (!MapContains(m_D3DDataTexInfoMap, FAKE_D3DTEXTURE_SEARCHLIGHT))
+    {
+        // Helicopter searchlight cones draw without a texture too, give them a name of their own
+        STexInfo* pTexInfo = CreateTexInfo(FAKE_RWTEXTURE_SEARCHLIGHT, FAKE_NAME_SEARCHLIGHT, FAKE_D3DTEXTURE_SEARCHLIGHT);
         OnTextureStreamIn(pTexInfo);
     }
 }
@@ -768,6 +786,9 @@ __declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Pre(DWORD dwAddrCall
         dwAddrCalledFrom == ADDR_CWaterCannon_Render_RenderPrimitive)
     {
         CRenderWareSA::ms_iRenderingType = RT_NONE;  // Treat these items like world models
+        // The searchlight cones get a texture name of their own, so a shader can target them without every other untextured draw
+        if (dwAddrCalledFrom == ADDR_CHeli_SearchLightCone_RenderPrimitive)
+            CRenderWareSA::ms_pNoTextureD3DData = FAKE_D3DTEXTURE_SEARCHLIGHT;
     }
     else
     {
@@ -778,6 +799,7 @@ __declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Pre(DWORD dwAddrCall
 __declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Post(DWORD dwAddrCalledFrom)
 {
     CRenderWareSA::ms_iRenderingType = RT_NONE;
+    CRenderWareSA::ms_pNoTextureD3DData = FAKE_D3DTEXTURE_NO_TEXTURE;
 }
 
 // Hook info
