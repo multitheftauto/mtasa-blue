@@ -469,8 +469,8 @@ void CMainMenu::Update()
     }
 
     // Get the game interface and the system state
-    CGame*      pGame = CCore::GetSingleton().GetGame();
-    SystemState systemState = pGame->GetSystemState();
+    CGame*            pGame = CCore::GetSingleton().GetGame();
+    SystemState::Enum systemState = pGame->GetSystemState();
 
     m_Credits.Update();
     m_Settings.Update();

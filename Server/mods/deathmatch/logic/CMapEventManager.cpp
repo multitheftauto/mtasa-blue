@@ -172,10 +172,15 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     int luaStackPointer = lua_gettop(pState);
 #endif
 
-                    TIMEUS startTime = GetTimeUs();
+                    const bool   timingActive = CPerfStatLuaTiming::GetSingleton()->IsActive();
+                    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
-                    if (!g_pGame->GetDebugHookManager()->OnPreEventFunction(szName, Arguments, pSource, pCaller, pMapEvent))
-                        continue;
+                    CDebugHookManager* debugHookManager = g_pGame->GetDebugHookManager();
+                    if (debugHookManager->HasPreEventFunctionHooks())
+                    {
+                        if (!debugHookManager->OnPreEventFunction(szName, Arguments, pSource, pCaller, pMapEvent))
+                            continue;
+                    }
 
                     // Store the current values of the globals
                     lua_getglobal(pState, "source");
@@ -246,7 +251,8 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     pMapEvent->Call(Arguments);
                     bCalled = true;
 
-                    g_pGame->GetDebugHookManager()->OnPostEventFunction(szName, Arguments, pSource, pCaller, pMapEvent);
+                    if (debugHookManager->HasPostEventFunctionHooks())
+                        debugHookManager->OnPostEventFunction(szName, Arguments, pSource, pCaller, pMapEvent);
 
                     // Reset the globals on that VM
                     OldSource.Push(pState);
@@ -271,7 +277,10 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     assert(lua_gettop(pState) == luaStackPointer);
 #endif
 
-                    CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pMapEvent->GetVM(), szName, GetTimeUs() - startTime);
+                    if (timingActive)
+                    {
+                        CPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pMapEvent->GetVM(), szName, GetTimeUs() - startTime);
+                    }
                 }
             }
         }

@@ -579,6 +579,7 @@ protected:
     void Init(CClientManager* pManager, unsigned long ulModelID, bool bIsLocalPlayer);
 
     void StreamedInPulse(bool bDoStandardPulses);
+    void UpdateAlphaAndVisibility();
     void ApplyControllerStateFixes(CControllerState& Current);
 
     void Interpolate();
