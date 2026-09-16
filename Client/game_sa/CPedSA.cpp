@@ -18,6 +18,7 @@
 #include "CStatsSA.h"
 #include "CTaskManagerSA.h"
 #include "CTasksSA.h"
+#include "TaskJumpFallSA.h"
 #include "CProjectileInfoSA.h"
 #include "CWeaponStatManagerSA.h"
 #include "CFireManagerSA.h"
@@ -41,6 +42,30 @@ namespace
 
         using StoreShadow = void(__cdecl*)(CPedSAInterface*, float, float, float, float, float, float);
         reinterpret_cast<StoreShadow>(FUNC_CShadows_StoreShadowForPedObject)(ped, displacementX, displacementY, frontX, frontY, sideX, sideY);
+    }
+
+    constexpr std::uintptr_t FUNC_CTaskSimpleJetPack_RenderJetPack = 0x67F6A0;
+    constexpr std::uintptr_t CALL_CPed_Render_RenderJetPack = 0x5E793E;
+    constexpr std::uintptr_t FUNC_CVisibilityPlugins_RenderPedCB = 0x7335B0;
+
+    bool RenderJetPackAtomicAsPed(RpAtomic* atomic, void*)
+    {
+        atomic->renderCallback = reinterpret_cast<RpAtomicCallback>(FUNC_CVisibilityPlugins_RenderPedCB);
+        return true;
+    }
+
+    // The jetpack is its own clump drawn with the default atomic renderer, so it ignores the alpha
+    // MTA puts on the ped clump. Give it the ped renderer and the ped's alpha right before it is drawn
+    void __fastcall RenderJetPack(CTaskSimpleJetPackSAInterface* task, void*, CPedSAInterface* ped)
+    {
+        if (task->m_pJetPackClump && ped->m_pRwObject)
+        {
+            pGame->GetVisibilityPlugins()->SetClumpAlpha(task->m_pJetPackClump, CVisibilityPluginsSA::GetClumpAlpha(ped->m_pRwObject));
+            RpClumpForAllAtomics(task->m_pJetPackClump, RenderJetPackAtomicAsPed, nullptr);
+        }
+
+        using Render = void(__thiscall*)(CTaskSimpleJetPackSAInterface*, CPedSAInterface*);
+        reinterpret_cast<Render>(FUNC_CTaskSimpleJetPack_RenderJetPack)(task, ped);
     }
 }
 
@@ -789,6 +814,7 @@ void CPedSA::StaticSetHooks()
     // GTA's player-specific blob-shadow path assumes that the local player is
     // always opaque. Do not enqueue it when MTA has made the clump invisible.
     HookInstallCall(CALL_CPed_PreRenderAfterTest_StoreShadowForPedObject, reinterpret_cast<DWORD>(StoreShadowForPedObject));
+    HookInstallCall(CALL_CPed_Render_RenderJetPack, reinterpret_cast<DWORD>(RenderJetPack));
 
     HookInstallCall(0x68025A, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleJetPack::ProcessPed
     HookInstallCall(0x64DB4D, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleCarGetIn::ProcessPed
