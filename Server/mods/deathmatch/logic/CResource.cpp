@@ -1442,6 +1442,9 @@ bool CResource::DestroyVM()
     m_pRootElement->DeleteEvents(m_pVM, true);
     g_pGame->GetElementDeleter()->CleanUpForVM(m_pVM);
 
+    // Anything still deferred was queued by this VM's scripts and must not run on a later start
+    m_PendingClientSyncCallbacks.clear();
+
     // Delete the virtual machine
     m_pResourceManager->NotifyResourceVMClose(this, m_pVM);
     g_pGame->GetLuaManager()->RemoveVirtualMachine(m_pVM);
