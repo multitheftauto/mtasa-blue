@@ -936,6 +936,15 @@ static void __declspec(naked) HOOK_CRenderer_EverythingBarRoads()
 //////////////////////////////////////////////////////////////////////////////////////////
 void CMultiplayerSA::InitHooks_Rendering()
 {
+    // GTA assigns main-world temporary directional lights to slots 1 through 6,
+    // but the vehicle env-map pipeline overwrites slot 1 with its specular light.
+    // Reserve slot 7 for the specular light so headlights can illuminate vehicle
+    // materials without being discarded immediately before the draw.
+    constexpr BYTE VEHICLE_SPECULAR_LIGHT_SLOT = 7;
+    MemPut<BYTE>(0x5D9A88, VEHICLE_SPECULAR_LIGHT_SLOT);  // RwD3D9SetLight
+    MemPut<BYTE>(0x5D9A91, VEHICLE_SPECULAR_LIGHT_SLOT);  // RwD3D9EnableLight(TRUE)
+    MemPut<BYTE>(0x5D9F1F, VEHICLE_SPECULAR_LIGHT_SLOT);  // RwD3D9EnableLight(FALSE)
+
     EZHookInstall(CallIdle);
     EZHookInstall(CEntity_Render);
     EZHookInstall(CEntity_RenderOneNonRoad);

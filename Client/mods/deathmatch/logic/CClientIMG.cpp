@@ -224,6 +224,11 @@ bool CClientIMG::LinkModel(unsigned int uiModelID, size_t uiFileID)
     if (CClientVehicleManager::IsValidModel(uiModelID))
         g_pClientGame->GetVehicleManager()->RestreamVehicles(static_cast<unsigned short>(uiModelID));
 
+    // Weapon models already in a ped's hand keep their old RW clump until the weapon slot is
+    // re-requested, same as vehicles above (see CClientDFF::ReplaceWeaponModel for the equivalent case)
+    if (CClientPedManager::IsValidWeaponModel(uiModelID))
+        g_pClientGame->GetPedManager()->RestreamWeapon(static_cast<unsigned short>(uiModelID));
+
     g_pGame->GetStreaming()->SetStreamingInfo(uiModelID, m_ucArchiveID, pFileInfo->uiOffset, pFileInfo->usSize);
 
     return true;

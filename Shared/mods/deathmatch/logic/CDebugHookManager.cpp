@@ -206,47 +206,51 @@ void GetDebugInfo(lua_State* luaVM, lua_Debug& debugInfo, const char*& szFilenam
 
 ///////////////////////////////////////////////////////////////
 //
-// GetMapEventDebugInfo
+// GetFunctionDebugInfo
 //
-// Get current Lua source file and line number
+// Get current Lua source file and line number for a specific Lua function
 //
 ///////////////////////////////////////////////////////////////
-void GetMapEventDebugInfo(CMapEvent* pMapEvent, const char*& szFilename, int& iLineNumber)
+void GetFunctionDebugInfo(CLuaMain* luaMain, const CLuaFunctionRef& functionRef, const char*& filename, int& lineNumber)
 {
-    CLuaMain* pLuaMain = pMapEvent->GetVM();
-
-    if (!pLuaMain)
+    if (!luaMain)
         return;
 
-    lua_State* luaVM = pLuaMain->GetVirtualMachine();
+    lua_State* luaVM = luaMain->GetVirtualMachine();
 
-    if (!luaVM)
+    if (!luaVM || functionRef.ToInt() <= 0)
         return;
 
-    const CLuaFunctionRef& iLuaFunction = pMapEvent->GetLuaFunction();
-    lua_Debug              debugInfo;
-    lua_getref(luaVM, iLuaFunction.ToInt());
+    lua_Debug debugInfo;
+    lua_getref(luaVM, functionRef.ToInt());
 
     if (lua_getinfo(luaVM, ">lS", &debugInfo))
     {
         // Make sure this function isn't defined in a string
         if (debugInfo.source[0] == '@')
         {
-            szFilename = debugInfo.source;
-            iLineNumber = debugInfo.currentline != -1 ? debugInfo.currentline : debugInfo.linedefined;
+            filename = debugInfo.source;
+            lineNumber = debugInfo.currentline != -1 ? debugInfo.currentline : debugInfo.linedefined;
         }
         else
         {
-            szFilename = debugInfo.short_src;
+            filename = debugInfo.short_src;
         }
 
         // Remove path
-        if (const char* szNext = strrchr(szFilename, '\\'))
-            szFilename = szNext + 1;
+        if (const char* next = strrchr(filename, '\\'))
+            filename = next + 1;
 
-        if (const char* szNext = strrchr(szFilename, '/'))
-            szFilename = szNext + 1;
+        if (const char* next = strrchr(filename, '/'))
+            filename = next + 1;
     }
+}
+
+// Backward-compatible wrapper for Server CMapEvent
+void GetMapEventDebugInfo(CMapEvent* mapEvent, const char*& filename, int& lineNumber)
+{
+    if (mapEvent)
+        GetFunctionDebugInfo(mapEvent->GetVM(), mapEvent->GetLuaFunction(), filename, lineNumber);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -431,19 +435,28 @@ void CDebugHookManager::GetEventCallHookArguments(CLuaArguments& NewArguments, c
 // Returns false if function call should be skipped
 //
 ///////////////////////////////////////////////////////////////
-bool CDebugHookManager::OnPreEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
+bool CDebugHookManager::OnPreEventFunction(const char* name, const CLuaArguments& args, CElement* source, CPlayer* caller, CLuaMain* functionLuaMain,
+                                           const CLuaFunctionRef& functionRef)
 {
     if (m_PreEventFunctionHookList.empty())
         return true;
 
     // Check if named event function is pre hooked
-    if (!IsNameAllowed(szName, m_PreEventFunctionHookList))
+    if (!IsNameAllowed(name, m_PreEventFunctionHookList))
         return true;
 
-    CLuaArguments NewArguments;
-    GetEventFunctionCallHookArguments(NewArguments, szName, Arguments, pSource, pCaller, pMapEvent);
+    CLuaArguments newArgs;
+    GetEventFunctionCallHookArguments(newArgs, name, args, source, caller, functionLuaMain, functionRef);
 
-    return CallHook(szName, m_PreEventFunctionHookList, NewArguments);
+    return CallHook(name, m_PreEventFunctionHookList, newArgs);
+}
+
+bool CDebugHookManager::OnPreEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
+{
+    if (!pMapEvent)
+        return true;
+
+    return OnPreEventFunction(szName, Arguments, pSource, pCaller, pMapEvent->GetVM(), pMapEvent->GetLuaFunction());
 }
 
 ///////////////////////////////////////////////////////////////
@@ -453,19 +466,28 @@ bool CDebugHookManager::OnPreEventFunction(const char* szName, const CLuaArgumen
 // Called after a Lua event function is called
 //
 ///////////////////////////////////////////////////////////////
-void CDebugHookManager::OnPostEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
+void CDebugHookManager::OnPostEventFunction(const char* name, const CLuaArguments& args, CElement* source, CPlayer* caller, CLuaMain* functionLuaMain,
+                                            const CLuaFunctionRef& functionRef)
 {
     if (m_PostEventFunctionHookList.empty())
         return;
 
     // Check if named event function is post hooked
-    if (!IsNameAllowed(szName, m_PostEventFunctionHookList))
+    if (!IsNameAllowed(name, m_PostEventFunctionHookList))
         return;
 
-    CLuaArguments NewArguments;
-    GetEventFunctionCallHookArguments(NewArguments, szName, Arguments, pSource, pCaller, pMapEvent);
+    CLuaArguments newArgs;
+    GetEventFunctionCallHookArguments(newArgs, name, args, source, caller, functionLuaMain, functionRef);
 
-    CallHook(szName, m_PostEventFunctionHookList, NewArguments);
+    CallHook(name, m_PostEventFunctionHookList, newArgs);
+}
+
+void CDebugHookManager::OnPostEventFunction(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
+{
+    if (!pMapEvent)
+        return;
+
+    OnPostEventFunction(szName, Arguments, pSource, pCaller, pMapEvent->GetVM(), pMapEvent->GetLuaFunction());
 }
 
 ///////////////////////////////////////////////////////////////
@@ -475,49 +497,55 @@ void CDebugHookManager::OnPostEventFunction(const char* szName, const CLuaArgume
 // Get call hook arguments for OnPre/PostEventFunction
 //
 ///////////////////////////////////////////////////////////////
+void CDebugHookManager::GetEventFunctionCallHookArguments(CLuaArguments& newArguments, const SString& name, const CLuaArguments& args, CElement* source,
+                                                          CPlayer* caller, CLuaMain* functionLuaMain, const CLuaFunctionRef& functionRef)
+{
+    CLuaMain*  eventLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
+    CResource* eventResource = eventLuaMain ? eventLuaMain->GetResource() : nullptr;
+
+    // Get file/line number for event trigger point
+    const char* eventFilename = "";
+    int         eventLineNumber = 0;
+    lua_Debug   eventDebugInfo;
+    lua_State*  eventLuaVM = eventLuaMain ? eventLuaMain->GetVM() : nullptr;
+    if (eventLuaVM)
+        GetDebugInfo(eventLuaVM, eventDebugInfo, eventFilename, eventLineNumber);
+
+    // Get file/line number for target handler function
+    const char* functionFilename = "";
+    int         functionLineNumber = 0;
+    GetFunctionDebugInfo(functionLuaMain, functionRef, functionFilename, functionLineNumber);
+
+    CResource* functionResource = functionLuaMain ? functionLuaMain->GetResource() : nullptr;
+
+    // resource eventResource, string eventName, element eventSource, element eventClient, string eventFilename, int eventLineNumber,
+    if (eventResource)
+        newArguments.PushResource(eventResource);
+    else
+        newArguments.PushNil();
+
+    newArguments.PushString(name);
+    newArguments.PushElement(source);
+    newArguments.PushElement(caller);
+    newArguments.PushString(eventFilename);
+    newArguments.PushNumber(eventLineNumber);
+
+    // resource functionResource, string functionFilename, int functionLineNumber, ...args
+    if (functionResource)
+        newArguments.PushResource(functionResource);
+    else
+        newArguments.PushNil();
+
+    newArguments.PushString(functionFilename);
+    newArguments.PushNumber(functionLineNumber);
+    newArguments.PushArguments(args);
+}
+
 void CDebugHookManager::GetEventFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments,
                                                           CElement* pSource, CPlayer* pCaller, CMapEvent* pMapEvent)
 {
-    CLuaMain*  pEventLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
-    CResource* pEventResource = pEventLuaMain ? pEventLuaMain->GetResource() : NULL;
-
-    // Get file/line number for event
-    const char* szEventFilename = "";
-    int         iEventLineNumber = 0;
-    lua_Debug   eventDebugInfo;
-    lua_State*  eventLuaVM = pEventLuaMain ? pEventLuaMain->GetVM() : NULL;
-    if (eventLuaVM)
-        GetDebugInfo(eventLuaVM, eventDebugInfo, szEventFilename, iEventLineNumber);
-
-    // Get file/line number for function
-    const char* szFunctionFilename = "";
-    int         iFunctionLineNumber = 0;
-    GetMapEventDebugInfo(pMapEvent, szFunctionFilename, iFunctionLineNumber);
-
-    CLuaMain*  pFunctionLuaMain = pMapEvent->GetVM();
-    CResource* pFunctionResource = pFunctionLuaMain ? pFunctionLuaMain->GetResource() : NULL;
-
-    // resource eventResource, string eventName, element eventSource, element eventClient, string eventFilename, int eventLineNumber,
-    if (pEventResource)
-        NewArguments.PushResource(pEventResource);
-    else
-        NewArguments.PushNil();
-
-    NewArguments.PushString(strName);
-    NewArguments.PushElement(pSource);
-    NewArguments.PushElement(pCaller);
-    NewArguments.PushString(szEventFilename);
-    NewArguments.PushNumber(iEventLineNumber);
-
-    // resource functionResource, string functionFilename, int functionLineNumber, ...args
-    if (pFunctionResource)
-        NewArguments.PushResource(pFunctionResource);
-    else
-        NewArguments.PushNil();
-
-    NewArguments.PushString(szFunctionFilename);
-    NewArguments.PushNumber(iFunctionLineNumber);
-    NewArguments.PushArguments(Arguments);
+    if (pMapEvent)
+        GetEventFunctionCallHookArguments(NewArguments, strName, Arguments, pSource, pCaller, pMapEvent->GetVM(), pMapEvent->GetLuaFunction());
 }
 
 ///////////////////////////////////////////////////////////////

@@ -71,6 +71,7 @@ public:
     void                InitHooks_VehicleCollision();
     void                InitHooks_VehicleDummies();
     void                InitHooks_Vehicles();
+    void                InitHooks_VehicleSirens();
     void                InitHooks_Rendering();
     void                InitHooks_LicensePlate();
     void                InitHooks_VehicleLights();

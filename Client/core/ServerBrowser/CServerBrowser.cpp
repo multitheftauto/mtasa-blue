@@ -2276,7 +2276,7 @@ void CServerBrowser::LoadOptions(CXMLNode* pNode)
 
                     CXMLAttribute* pDisabled = pSubNode->GetAttributes().Find("disabled");
                     if (pDisabled)
-                        m_pTab[listIndex]->SetEnabled(pDisabled->GetValue().compare("1") == 0);
+                        m_pTab[listIndex]->SetEnabled(pDisabled->GetValue().compare("1") != 0);
 
                     // restore the active tab
                     CXMLAttribute* pActiveTab = pSubNode->GetAttributes().Find("active");
