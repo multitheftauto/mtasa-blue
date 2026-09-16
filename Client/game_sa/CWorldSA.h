@@ -145,9 +145,19 @@ private:
         std::uint8_t    aBytes[COCCLUSION_ENTRY_SIZE];
         std::set<void*> setDisabledBy;
         bool            bActive{true};
+
+        // An edit replaces the loaded geometry until the resource that made it restores the occluder
+        // or stops. The loaded bytes are kept either way, so a restore is still byte exact.
+        bool    bEdited = false;
+        CVector vecEditPosition;
+        CVector vecEditSize;
+        CVector vecEditRotation;
+        void*   pEditSource = nullptr;
     };
 
-    bool           WriteOccluderInPlace(const SScriptedOccluder& occluder, const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation);
+    bool           WriteOccluderInPlace(uint uiSlot, bool bInterior, const CVector& vecHeldPosition, const CVector& vecPosition, const CVector& vecSize,
+                                        const CVector& vecRotation);
+    bool           SetVanillaOccluder(uint uiId, const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation, void* pChangeSource);
     static CVector GetVanillaOccluderCentre(const SVanillaOccluder& occluder);
     void           CaptureOccluderBaseline();
     void           RebuildOccluders();
