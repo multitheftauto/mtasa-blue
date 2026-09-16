@@ -324,6 +324,7 @@ private:
     int                                  m_iAutoDeadZoneCounter;
     bool                                 m_bLoggedNoJoystick;
     string                               m_strSelectedControllerId;
+    SParsedControllerId                  m_ParsedControllerId;
     bool                                 m_bVibrationEnabled;
     bool                                 m_bVibrationWasActive;
     CElapsedTime                         m_VibrationTimer;
@@ -783,14 +784,20 @@ void CJoystickManager::DoPulse()
         {
             // Not using XInput yet and no DirectInput joystick either. Auto mode may pick up an
             // XInput pad that appeared after startup; a user-picked DirectInput device stays put.
-            SParsedControllerId parsed = ParseControllerId(m_strSelectedControllerId);
-            if (parsed.type != SParsedControllerId::DirectInput)
+            // Empty XInput slots are only probed every few seconds, like IsXInputDeviceAttached does.
+            if (m_ParsedControllerId.type != SParsedControllerId::DirectInput && m_XInputReattachTimer.Get() >= m_uiXInputReattachDelay)
             {
-                int iXInputIndex = (parsed.type == SParsedControllerId::XInput) ? parsed.iXInputIndex : FindFirstXInputIndex();
+                int iXInputIndex = (m_ParsedControllerId.type == SParsedControllerId::XInput) ? m_ParsedControllerId.iXInputIndex : FindFirstXInputIndex();
                 if (iXInputIndex >= 0)
                 {
                     m_iXInputUserIndex = iXInputIndex;
                     m_bUseXInput = true;
+                }
+                else
+                {
+                    // Only on a miss, so IsXInputDeviceAttached can attach a found pad right away
+                    m_XInputReattachTimer.Reset();
+                    m_uiXInputReattachDelay = JOYSTICK_RETRY_DELAY_MS;
                 }
             }
 
@@ -2073,7 +2080,8 @@ void CJoystickManager::ApplyControllerSelection(bool bReleaseCurrent)
     m_bPreferredInstanceValid = false;
     m_iXInputUserIndex = 0;
 
-    SParsedControllerId parsed = ParseControllerId(m_strSelectedControllerId);
+    m_ParsedControllerId = ParseControllerId(m_strSelectedControllerId);
+    const SParsedControllerId& parsed = m_ParsedControllerId;
 
     if (parsed.type == SParsedControllerId::XInput)
     {
