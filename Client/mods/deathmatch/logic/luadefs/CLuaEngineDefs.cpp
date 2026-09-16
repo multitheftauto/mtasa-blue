@@ -95,6 +95,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineImportTXD", EngineImportTXD},
         {"engineAddClothingTXD", ArgumentParser<EngineAddClothingTXD>},
         {"engineAddOccluder", ArgumentParser<EngineAddOccluder>},
+        {"engineSetOccluder", ArgumentParser<EngineSetOccluder>},
         {"engineRemoveOccluder", ArgumentParser<EngineRemoveOccluder>},
         {"engineGetOccluderCapacity", ArgumentParser<EngineGetOccluderCapacity>},
         {"engineReplaceCOL", EngineReplaceCOL},
@@ -682,6 +683,19 @@ bool CLuaEngineDefs::EngineAddClothingTXD(CClientTXD* pTXD, std::string strModel
     return true;
 }
 
+static void ValidateOccluderGeometry(float fX, float fY, float fZ, float fSizeX, float fSizeY, float fSizeZ, int iFirstArgument)
+{
+    const float fCoords[3] = {fX, fY, fZ};
+    for (int i = 0; i < 3; ++i)
+        if (std::fabs(fCoords[i]) > 8000.0f)
+            throw std::invalid_argument(SString("Expected position in range -8000 - 8000 at argument %d, got %g", iFirstArgument + i, fCoords[i]));
+
+    const float fSizes[3] = {fSizeX, fSizeY, fSizeZ};
+    for (int i = 0; i < 3; ++i)
+        if (fSizes[i] < 1.0f || fSizes[i] > 8000.0f)
+            throw std::invalid_argument(SString("Expected size in range 1 - 8000 at argument %d, got %g", iFirstArgument + 3 + i, fSizes[i]));
+}
+
 std::variant<std::uint32_t, bool> CLuaEngineDefs::EngineAddOccluder(lua_State* const luaVM, float fX, float fY, float fZ, float fSizeX, float fSizeY,
                                                                     float fSizeZ, std::optional<float> fRotX, std::optional<float> fRotY,
                                                                     std::optional<float> fRotZ, std::optional<bool> bInterior)
@@ -690,15 +704,7 @@ std::variant<std::uint32_t, bool> CLuaEngineDefs::EngineAddOccluder(lua_State* c
     if (!pLuaMain)
         return false;
 
-    const float fCoords[3] = {fX, fY, fZ};
-    for (int i = 0; i < 3; ++i)
-        if (std::fabs(fCoords[i]) > 8000.0f)
-            throw std::invalid_argument(SString("Expected position in range -8000 - 8000 at argument %d, got %g", i + 1, fCoords[i]));
-
-    const float fSizes[3] = {fSizeX, fSizeY, fSizeZ};
-    for (int i = 0; i < 3; ++i)
-        if (fSizes[i] < 1.0f || fSizes[i] > 8000.0f)
-            throw std::invalid_argument(SString("Expected size in range 1 - 8000 at argument %d, got %g", i + 4, fSizes[i]));
+    ValidateOccluderGeometry(fX, fY, fZ, fSizeX, fSizeY, fSizeZ, 1);
 
     unsigned int uiId = 0;
     if (!g_pGame->GetWorld()->AddOccluder(CVector(fX, fY, fZ), CVector(fSizeX, fSizeY, fSizeZ),
@@ -707,6 +713,19 @@ std::variant<std::uint32_t, bool> CLuaEngineDefs::EngineAddOccluder(lua_State* c
         return false;
 
     return uiId;
+}
+
+bool CLuaEngineDefs::EngineSetOccluder(lua_State* const luaVM, std::uint32_t uiId, float fX, float fY, float fZ, float fSizeX, float fSizeY, float fSizeZ,
+                                       std::optional<float> fRotX, std::optional<float> fRotY, std::optional<float> fRotZ)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    ValidateOccluderGeometry(fX, fY, fZ, fSizeX, fSizeY, fSizeZ, 2);
+
+    return g_pGame->GetWorld()->SetOccluder(uiId, CVector(fX, fY, fZ), CVector(fSizeX, fSizeY, fSizeZ),
+                                            CVector(fRotX.value_or(0.0f), fRotY.value_or(0.0f), fRotZ.value_or(0.0f)), pLuaMain->GetResource());
 }
 
 bool CLuaEngineDefs::EngineRemoveOccluder(lua_State* const luaVM, std::uint32_t uiId)

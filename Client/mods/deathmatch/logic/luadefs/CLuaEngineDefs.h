@@ -64,7 +64,9 @@ public:
     static std::variant<std::uint32_t, bool> EngineAddOccluder(lua_State* const luaVM, float fX, float fY, float fZ, float fSizeX, float fSizeY, float fSizeZ,
                                                                std::optional<float> fRotX, std::optional<float> fRotY, std::optional<float> fRotZ,
                                                                std::optional<bool> bInterior);
-    static bool                              EngineRemoveOccluder(lua_State* const luaVM, std::uint32_t uiId);
+    static bool EngineSetOccluder(lua_State* const luaVM, std::uint32_t uiId, float fX, float fY, float fZ, float fSizeX, float fSizeY, float fSizeZ,
+                                  std::optional<float> fRotX, std::optional<float> fRotY, std::optional<float> fRotZ);
+    static bool EngineRemoveOccluder(lua_State* const luaVM, std::uint32_t uiId);
     static CLuaMultiReturn<std::uint32_t, std::uint32_t>   EngineGetOccluderCapacity(std::optional<bool> bInterior);
     static uint                                            EngineGetModelFlags(uint uiModelID);
     static bool                                            EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags);

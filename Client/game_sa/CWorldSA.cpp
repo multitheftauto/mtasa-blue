@@ -764,6 +764,10 @@ namespace
     constexpr float OCCLUDER_MAX_COORD = 8000.0f;
     constexpr float OCCLUDER_MIN_SIZE = 1.0f;
 
+    // The centre is stored as int16 in quarter units, so a decode can sit one step below the value
+    // that was asked for
+    constexpr float OCCLUDER_QUARTER_UNIT = 0.26f;
+
     // Byte angles of 360/256 degrees
     constexpr float OCCLUDER_ANGLE_STEP = 360.0f / 256.0f;
 
@@ -781,6 +785,28 @@ namespace
     bool IsFiniteVector(const CVector& vec)
     {
         return std::isfinite(vec.fX) && std::isfinite(vec.fY) && std::isfinite(vec.fZ);
+    }
+
+    bool IsOccluderGeometryValid(const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation)
+    {
+        if (!IsFiniteVector(vecPosition) || !IsFiniteVector(vecSize) || !IsFiniteVector(vecRotation))
+            return false;
+
+        if (std::fabs(vecPosition.fX) > OCCLUDER_MAX_COORD || std::fabs(vecPosition.fY) > OCCLUDER_MAX_COORD || std::fabs(vecPosition.fZ) > OCCLUDER_MAX_COORD)
+            return false;
+
+        if (vecSize.fX < OCCLUDER_MIN_SIZE || vecSize.fY < OCCLUDER_MIN_SIZE || vecSize.fZ < OCCLUDER_MIN_SIZE)
+            return false;
+
+        if (vecSize.fX > OCCLUDER_MAX_COORD || vecSize.fY > OCCLUDER_MAX_COORD || vecSize.fZ > OCCLUDER_MAX_COORD)
+            return false;
+
+        return true;
+    }
+
+    CVector NormaliseOccluderRotation(const CVector& vecRotation)
+    {
+        return CVector(NormaliseOccluderAngle(vecRotation.fX), NormaliseOccluderAngle(vecRotation.fY), NormaliseOccluderAngle(vecRotation.fZ));
     }
 }  // namespace
 
@@ -820,10 +846,15 @@ void CWorldSA::RebuildOccluders()
     MemCpyFast((void*)VAR_COcclusion_ListHeads, m_OccluderBaselineHeads, sizeof(m_OccluderBaselineHeads));
 
     const auto pfnAddOne = (COcclusion_AddOne_t)FUNC_COcclusion_AddOne;
-    for (const SScriptedOccluder& occluder : m_ScriptedOccluders)
+    for (SScriptedOccluder& occluder : m_ScriptedOccluders)
     {
+        const DWORD dwCountAddress = occluder.bInterior ? VAR_COcclusion_NumInteriorOccluders : VAR_COcclusion_NumOccluders;
+        const uint  uiIndex = *(uint*)dwCountAddress;
+
         pfnAddOne(occluder.vecPosition.fX, occluder.vecPosition.fY, occluder.vecPosition.fZ, occluder.vecSize.fX, occluder.vecSize.fY, occluder.vecSize.fZ,
                   occluder.vecRotation.fZ, occluder.vecRotation.fY, occluder.vecRotation.fX, 0, occluder.bInterior ? 1 : 0);
+
+        occluder.uiSlot = (*(uint*)dwCountAddress == uiIndex + 1) ? uiIndex : OCCLUDER_SLOT_NONE;
     }
 
     RestartOccluderListWalk();
@@ -854,16 +885,7 @@ void CWorldSA::GetOccluderCapacity(bool bInterior, uint& uiOutUsed, uint& uiOutF
 
 bool CWorldSA::AddOccluder(const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation, bool bInterior, void* pChangeSource, uint& uiOutId)
 {
-    if (!IsFiniteVector(vecPosition) || !IsFiniteVector(vecSize) || !IsFiniteVector(vecRotation))
-        return false;
-
-    if (std::fabs(vecPosition.fX) > OCCLUDER_MAX_COORD || std::fabs(vecPosition.fY) > OCCLUDER_MAX_COORD || std::fabs(vecPosition.fZ) > OCCLUDER_MAX_COORD)
-        return false;
-
-    if (vecSize.fX < OCCLUDER_MIN_SIZE || vecSize.fY < OCCLUDER_MIN_SIZE || vecSize.fZ < OCCLUDER_MIN_SIZE)
-        return false;
-
-    if (vecSize.fX > OCCLUDER_MAX_COORD || vecSize.fY > OCCLUDER_MAX_COORD || vecSize.fZ > OCCLUDER_MAX_COORD)
+    if (!IsOccluderGeometryValid(vecPosition, vecSize, vecRotation))
         return false;
 
     // AddOne returns nothing and drops the call when the array is full, so the room has to be
@@ -877,7 +899,7 @@ bool CWorldSA::AddOccluder(const CVector& vecPosition, const CVector& vecSize, c
     occluder.uiId = m_uiNextOccluderId++;
     occluder.vecPosition = vecPosition;
     occluder.vecSize = vecSize;
-    occluder.vecRotation = CVector(NormaliseOccluderAngle(vecRotation.fX), NormaliseOccluderAngle(vecRotation.fY), NormaliseOccluderAngle(vecRotation.fZ));
+    occluder.vecRotation = NormaliseOccluderRotation(vecRotation);
     occluder.bInterior = bInterior;
     occluder.pChangeSource = pChangeSource;
     m_ScriptedOccluders.push_back(occluder);
@@ -894,9 +916,81 @@ bool CWorldSA::AddOccluder(const CVector& vecPosition, const CVector& vecSize, c
         m_ScriptedOccluders.pop_back();
         return false;
     }
+    m_ScriptedOccluders.back().uiSlot = uiCountBefore;
     RestartOccluderListWalk();
 
     uiOutId = occluder.uiId;
+    return true;
+}
+
+// Rewrites an entry without disturbing the arrays. COcclusion::AddOne is the encoder: the new box is
+// appended past the live count, its first sixteen bytes are copied over the target and the count and
+// the list heads are put back, which leaves the scratch entry outside the count and unreachable from
+// any list. The link word at +0x10 is never touched, so the lists and the walk cursor survive.
+bool CWorldSA::WriteOccluderInPlace(const SScriptedOccluder& occluder, const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation)
+{
+    const DWORD dwCountAddress = occluder.bInterior ? VAR_COcclusion_NumInteriorOccluders : VAR_COcclusion_NumOccluders;
+    const DWORD dwArrayAddress = occluder.bInterior ? ARRAY_COcclusion_InteriorOccluders : ARRAY_COcclusion_Occluders;
+    const uint  uiMax = occluder.bInterior ? COCCLUSION_MAX_INTERIOR_OCCLUDERS : COCCLUSION_MAX_OCCLUDERS;
+
+    const uint uiCount = *(uint*)dwCountAddress;
+    if (occluder.uiSlot >= uiCount || uiCount >= uiMax)
+        return false;
+
+    // The slot has to still hold this box. Anything else means the index went stale and the caller
+    // has to take the rebuild instead of writing over a stranger. The centre is the first three
+    // int16 of the entry, in quarter units.
+    const DWORD   dwTarget = dwArrayAddress + occluder.uiSlot * COCCLUSION_ENTRY_SIZE;
+    const auto*   pWords = reinterpret_cast<const std::int16_t*>(dwTarget);
+    const CVector vecHeldPosition(pWords[0] * 0.25f, pWords[1] * 0.25f, pWords[2] * 0.25f);
+
+    const CVector vecDrift = vecHeldPosition - occluder.vecPosition;
+    if (std::fabs(vecDrift.fX) > OCCLUDER_QUARTER_UNIT || std::fabs(vecDrift.fY) > OCCLUDER_QUARTER_UNIT || std::fabs(vecDrift.fZ) > OCCLUDER_QUARTER_UNIT)
+        return false;
+
+    std::uint32_t uiHeads[COCCLUSION_LIST_HEAD_COUNT];
+    MemCpyFast(uiHeads, (void*)VAR_COcclusion_ListHeads, sizeof(uiHeads));
+
+    const auto pfnAddOne = (COcclusion_AddOne_t)FUNC_COcclusion_AddOne;
+    pfnAddOne(vecPosition.fX, vecPosition.fY, vecPosition.fZ, vecSize.fX, vecSize.fY, vecSize.fZ, vecRotation.fZ, vecRotation.fY, vecRotation.fX, 0,
+              occluder.bInterior ? 1 : 0);
+
+    // A dropped call writes nothing, so there is nothing to undo
+    if (*(uint*)dwCountAddress != uiCount + 1)
+        return false;
+
+    MemCpyFast((void*)dwTarget, (void*)(dwArrayAddress + uiCount * COCCLUSION_ENTRY_SIZE), 0x10);
+
+    MemPutFast<uint>(dwCountAddress, uiCount);
+    MemCpyFast((void*)VAR_COcclusion_ListHeads, uiHeads, sizeof(uiHeads));
+    return true;
+}
+
+bool CWorldSA::SetOccluder(uint uiId, const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation, void* pChangeSource)
+{
+    if (!IsOccluderGeometryValid(vecPosition, vecSize, vecRotation))
+        return false;
+
+    const auto iter =
+        std::find_if(m_ScriptedOccluders.begin(), m_ScriptedOccluders.end(), [uiId](const SScriptedOccluder& occluder) { return occluder.uiId == uiId; });
+    if (iter == m_ScriptedOccluders.end())
+        return false;
+
+    if (pChangeSource && iter->pChangeSource != pChangeSource)
+        return false;
+
+    // The slot is never given up, so unlike a remove and add this cannot half succeed and leave the
+    // caller with nothing when another resource takes the freed slot in between.
+    const CVector vecNormalised = NormaliseOccluderRotation(vecRotation);
+    const bool    bInPlace = WriteOccluderInPlace(*iter, vecPosition, vecSize, vecNormalised);
+
+    iter->vecPosition = vecPosition;
+    iter->vecSize = vecSize;
+    iter->vecRotation = vecNormalised;
+
+    if (!bInPlace)
+        RebuildOccluders();
+
     return true;
 }
 

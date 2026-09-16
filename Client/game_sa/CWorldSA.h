@@ -45,6 +45,9 @@
 #define VAR_COcclusion_ListHeads   0x8D5D68
 #define COCCLUSION_LIST_HEAD_COUNT 4
 
+// An index into one of the two arrays, or OCCLUDER_SLOT_NONE when the box did not get a slot
+#define OCCLUDER_SLOT_NONE 0xFFFFFFFF
+
 #define COCCLUSION_MAX_OCCLUDERS                     1000
 #define COCCLUSION_MAX_INTERIOR_OCCLUDERS            40
 #define COCCLUSION_ENTRY_SIZE                        18
@@ -96,6 +99,7 @@ public:
     void  SetOcclusionsEnabled(bool bEnabled);
     bool  GetOcclusionsEnabled();
     bool  AddOccluder(const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation, bool bInterior, void* pChangeSource, uint& uiOutId);
+    bool  SetOccluder(uint uiId, const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation, void* pChangeSource);
     bool  RemoveOccluder(uint uiId, void* pChangeSource);
     void  GetOccluderCapacity(bool bInterior, uint& uiOutUsed, uint& uiOutFree);
     void  UndoOccluderChanges(void* pChangeSource = nullptr);
@@ -116,6 +120,7 @@ private:
     struct SScriptedOccluder
     {
         uint    uiId;
+        uint    uiSlot = OCCLUDER_SLOT_NONE;
         CVector vecPosition;
         CVector vecSize;
         CVector vecRotation;
@@ -123,6 +128,7 @@ private:
         void*   pChangeSource;
     };
 
+    bool WriteOccluderInPlace(const SScriptedOccluder& occluder, const CVector& vecPosition, const CVector& vecSize, const CVector& vecRotation);
     void CaptureOccluderBaseline();
     void RebuildOccluders();
     void RestartOccluderListWalk();
