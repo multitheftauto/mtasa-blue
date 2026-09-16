@@ -498,7 +498,10 @@ public:
     static bool IsVehicleModel(std::uint32_t model) noexcept;
 
 private:
-    void CopyStreamingInfoFromModel(ushort usCopyFromModelID);
-    void RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
-    void SetModelSpecialType(eModelSpecialType eType, bool bState);
+    void          CopyStreamingInfoFromModel(ushort usCopyFromModelID);
+    CModelInfoSA* GetPairedTimeModel();
+    void          ApplyCustomColModel(CColModel* pColModel);
+    void          RestoreCustomColModel();
+    void          RwSetSupportedUpgrades(RwFrame* parent, DWORD dwModel);
+    void          SetModelSpecialType(eModelSpecialType eType, bool bState);
 };
