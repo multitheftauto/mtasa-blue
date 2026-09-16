@@ -1197,6 +1197,9 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
 
 bool CStaticFunctionDefinitions::SetElementVelocity(CClientEntity& Entity, const CVector& vecVelocity)
 {
+    if (!vecVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetElementVelocity(**iter, vecVelocity))
 
     int iType = Entity.GetType();
@@ -1244,6 +1247,9 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CClientEntity& Entity, const
 
 bool CStaticFunctionDefinitions::SetElementAngularVelocity(CClientEntity& Entity, const CVector& vecTurnVelocity)
 {
+    if (!vecTurnVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetElementAngularVelocity(**iter, vecTurnVelocity))
 
     int iType = Entity.GetType();
@@ -3149,6 +3155,9 @@ bool CStaticFunctionDefinitions::SetVehicleSirensOn(CClientEntity& Entity, bool 
 
 bool CStaticFunctionDefinitions::SetVehicleTurnVelocity(CClientEntity& Entity, const CVector& vecTurnVelocity)
 {
+    if (!vecTurnVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetVehicleTurnVelocity(**iter, vecTurnVelocity))
 
     if (IS_VEHICLE(&Entity))

@@ -4091,9 +4091,9 @@ void CClientPed::_ChangeModel()
                 m_pPlayerPed->RebuildPlayer();
             }
 
-            // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
+            // Remove reference to the old model we used
             if (pLoadedModel)
-                pLoadedModel->RemoveRef(true);
+                pLoadedModel->RemoveRef();
             pLoadedModel = NULL;
 
             // Warp into it again
