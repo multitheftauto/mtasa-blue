@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <cmath>
 #include <game/CColPoint.h>
 #include <game/CObjectGroupPhysicalProperties.h>
 #include <game/CStreaming.h>
@@ -93,6 +94,9 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineLoadIFP", EngineLoadIFP},
         {"engineImportTXD", EngineImportTXD},
         {"engineAddClothingTXD", ArgumentParser<EngineAddClothingTXD>},
+        {"engineAddOccluder", ArgumentParser<EngineAddOccluder>},
+        {"engineRemoveOccluder", ArgumentParser<EngineRemoveOccluder>},
+        {"engineGetOccluderCapacity", ArgumentParser<EngineGetOccluderCapacity>},
         {"engineReplaceCOL", EngineReplaceCOL},
         {"engineRestoreCOL", EngineRestoreCOL},
         {"engineReplaceModel", EngineReplaceModel},
@@ -676,6 +680,50 @@ bool CLuaEngineDefs::EngineAddClothingTXD(CClientTXD* pTXD, std::string strModel
         throw std::invalid_argument(SString("Texture already added (%*s)", (int)strModelName.length(), strModelName.data()));
 
     return true;
+}
+
+std::variant<std::uint32_t, bool> CLuaEngineDefs::EngineAddOccluder(lua_State* const luaVM, float fX, float fY, float fZ, float fSizeX, float fSizeY,
+                                                                    float fSizeZ, std::optional<float> fRotX, std::optional<float> fRotY,
+                                                                    std::optional<float> fRotZ, std::optional<bool> bInterior)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    const float fCoords[3] = {fX, fY, fZ};
+    for (int i = 0; i < 3; ++i)
+        if (std::fabs(fCoords[i]) > 8000.0f)
+            throw std::invalid_argument(SString("Expected position in range -8000 - 8000 at argument %d, got %g", i + 1, fCoords[i]));
+
+    const float fSizes[3] = {fSizeX, fSizeY, fSizeZ};
+    for (int i = 0; i < 3; ++i)
+        if (fSizes[i] < 1.0f || fSizes[i] > 8000.0f)
+            throw std::invalid_argument(SString("Expected size in range 1 - 8000 at argument %d, got %g", i + 4, fSizes[i]));
+
+    unsigned int uiId = 0;
+    if (!g_pGame->GetWorld()->AddOccluder(CVector(fX, fY, fZ), CVector(fSizeX, fSizeY, fSizeZ),
+                                          CVector(fRotX.value_or(0.0f), fRotY.value_or(0.0f), fRotZ.value_or(0.0f)), bInterior.value_or(false),
+                                          pLuaMain->GetResource(), uiId))
+        return false;
+
+    return uiId;
+}
+
+bool CLuaEngineDefs::EngineRemoveOccluder(lua_State* const luaVM, std::uint32_t uiId)
+{
+    CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!pLuaMain)
+        return false;
+
+    return g_pGame->GetWorld()->RemoveOccluder(uiId, pLuaMain->GetResource());
+}
+
+CLuaMultiReturn<std::uint32_t, std::uint32_t> CLuaEngineDefs::EngineGetOccluderCapacity(std::optional<bool> bInterior)
+{
+    unsigned int uiUsed = 0;
+    unsigned int uiFree = 0;
+    g_pGame->GetWorld()->GetOccluderCapacity(bInterior.value_or(false), uiUsed, uiFree);
+    return {uiUsed, uiFree};
 }
 
 CClientIMG* CLuaEngineDefs::EngineLoadIMG(lua_State* const luaVM, std::string strRelativeFilePath)

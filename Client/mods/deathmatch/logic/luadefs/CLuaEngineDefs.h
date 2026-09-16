@@ -59,8 +59,13 @@ public:
     LUA_DECLARE(EngineGetObjectGroupPhysicalProperty)
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
 
-    static bool                                            EngineAddClothingModel(CClientDFF* pDff, std::string strModelName);
-    static bool                                            EngineAddClothingTXD(CClientTXD* pTxd, std::string strModelName);
+    static bool                              EngineAddClothingModel(CClientDFF* pDff, std::string strModelName);
+    static bool                              EngineAddClothingTXD(CClientTXD* pTxd, std::string strModelName);
+    static std::variant<std::uint32_t, bool> EngineAddOccluder(lua_State* const luaVM, float fX, float fY, float fZ, float fSizeX, float fSizeY, float fSizeZ,
+                                                               std::optional<float> fRotX, std::optional<float> fRotY, std::optional<float> fRotZ,
+                                                               std::optional<bool> bInterior);
+    static bool                              EngineRemoveOccluder(lua_State* const luaVM, std::uint32_t uiId);
+    static CLuaMultiReturn<std::uint32_t, std::uint32_t>   EngineGetOccluderCapacity(std::optional<bool> bInterior);
     static uint                                            EngineGetModelFlags(uint uiModelID);
     static bool                                            EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags);
     static bool                                            EngineGetModelFlag(uint uiModelID, eModelIdeFlag eFlag);
