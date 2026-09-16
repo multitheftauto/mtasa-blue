@@ -2799,6 +2799,7 @@ void CMultiplayerSA::SetCenterOfWorld(CEntity* entity, CVector* vecPosition, FLO
 
 void _declspec(naked) HOOK_FindPlayerCoors()
 {
+    // clang-format off
     _asm
     {
         // Only set our world of center if we have a center of world set
@@ -2807,12 +2808,12 @@ void _declspec(naked) HOOK_FindPlayerCoors()
         test    al, al
         jz      dontset
 
-            // Only set our world of center if bInStreamingUpdate is true
+        // Only set our world of center if bInStreamingUpdate is true
         mov     al, bInStreamingUpdate
         test    al, al
         jz      dontset
 
-            // Move our center of world into gta's senter of world when it requests so
+        // Move our center of world into gta's senter of world when it requests so
         pop     eax
         lea     esi, vecCenterOfWorld
         mov     edi, [esp+4]
@@ -2822,7 +2823,7 @@ void _declspec(naked) HOOK_FindPlayerCoors()
         movsd
         retn
 
-            // Continue. Don't replace the world center.
+        // Continue. Don't replace the world center.
         dontset:
         pop     eax
         mov     eax, [esp+8]
@@ -2831,6 +2832,7 @@ void _declspec(naked) HOOK_FindPlayerCoors()
         add     ecx, 6
         jmp     ecx
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CStreaming_Update_Caller()
@@ -2840,10 +2842,13 @@ void _declspec(naked) HOOK_CStreaming_Update_Caller()
     0053BF0B   E8 6027EDFF      CALL gta_sa.0040E670
     */
 
+    // clang-format off
     _asm
-        {// Store all registers
+    {
+        // Store all registers
         pushad
-        }
+    }
+    // clang-format on
 
     // We're now in the streaming update
     bInStreamingUpdate = true;
@@ -2852,6 +2857,7 @@ void _declspec(naked) HOOK_CStreaming_Update_Caller()
     if (activeEntityForStreaming)
     {
         // Do something...
+        // clang-format off
         _asm
         {
             mov     edi, FUNC_CPlayerInfoBase
@@ -2860,20 +2866,24 @@ void _declspec(naked) HOOK_CStreaming_Update_Caller()
             mov     ebx, activeEntityForStreaming
             mov     [edi], ebx
         }
+        // clang-format on
     }
 
+    // clang-format off
     _asm
     {
         mov     edi, eax
 
-         // Call FUNC_CStreaming_Update
+        // Call FUNC_CStreaming_Update
         mov     eax, FUNC_CStreaming_Update
         call    eax
     }
+    // clang-format on
 
     // We have an entity for streaming?
     if (activeEntityForStreaming)
     {
+        // clang-format off
         _asm
         {
             // ...
@@ -2881,20 +2891,23 @@ void _declspec(naked) HOOK_CStreaming_Update_Caller()
             mov     ebx, dwSavedPlayerPointer
             mov     [edi], ebx
         }
+        // clang-format on
     }
 
     // We're no longer in streaming update
     bInStreamingUpdate = false;
+    // clang-format off
     _asm
     {
         // Restore registers
         popad
 
-            // Continue at the old func
+        // Continue at the old func
         mov     eax, HOOKPOS_CStreaming_Update_Caller
         add     eax, 7
         jmp     eax
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CHud_Draw_Caller()
@@ -2903,6 +2916,7 @@ void _declspec(naked) HOOK_CHud_Draw_Caller()
     0053E4FA   . E8 318BFCFF                          CALL gta_sa_u.00507030
     0053E4FF   . E8 DC150500                          CALL gta_sa_u.0058FAE0
     */
+    // clang-format off
     _asm
     {
         pushad
@@ -2910,19 +2924,23 @@ void _declspec(naked) HOOK_CHud_Draw_Caller()
         mov     edx, FUNC_CAudioEngine__DisplayRadioStationName
         call    edx
     }
+    // clang-format on
 
     if (!bSetCenterOfWorld)
     {
+        // clang-format off
         _asm
         {
             mov     edx, FUNC_CHud_Draw
             call    edx
         }
+        // clang-format on
     }
     else
     {
         /*if ( activeEntityForStreaming )
         {
+            // clang-format off
             _asm
             {
                 mov     edi, FUNC_CPlayerInfoBase
@@ -2931,28 +2949,34 @@ void _declspec(naked) HOOK_CHud_Draw_Caller()
                 mov     ebx, activeEntityForStreaming
                 mov     [edi], ebx
             }
+            // clang-format on
         }*/
 
         if (!bHideRadar)
         {
+            // clang-format off
             _asm
             {
                 mov     edx, 0x58A330
                 call    edx
             }
+            // clang-format on
         }
 
         /*if ( activeEntityForStreaming )
         {
+            // clang-format off
             _asm
             {
                 mov     edi, FUNC_CPlayerInfoBase
                 mov     ebx, dwSavedPlayerPointer
                 mov     [edi], ebx
             }
+            // clang-format on
         }*/
     }
 
+    // clang-format off
     _asm
     {
         popad
@@ -2961,6 +2985,7 @@ void _declspec(naked) HOOK_CHud_Draw_Caller()
         add     eax, 10
         jmp     eax
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_FindPlayerCentreOfWorld()
@@ -2970,6 +2995,7 @@ void _declspec(naked) HOOK_FindPlayerCentreOfWorld()
     0056E254  |. 85C0           TEST EAX,EAX
     */
 
+    // clang-format off
     _asm
     {
         mov     al, bSetCenterOfWorld
@@ -2988,6 +3014,7 @@ void _declspec(naked) HOOK_FindPlayerCentreOfWorld()
         lea     eax, vecCenterOfWorld
         retn
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_FindPlayerHeading()
@@ -2997,6 +3024,7 @@ void _declspec(naked) HOOK_FindPlayerHeading()
     0056E454  |. 8BD1           MOV EDX,ECX
     */
 
+    // clang-format off
     _asm
     {
         // Jump if bSetCenterOfWorld is true
@@ -3009,27 +3037,29 @@ void _declspec(naked) HOOK_FindPlayerHeading()
         mov     ecx, [esp+4]
         mov     edx, ecx
 
-            // Return to the hookpos
+        // Return to the hookpos
         mov     eax, HOOKPOS_FindPlayerHeading
         add     eax, 6
         jmp     eax
 
-            // ..
+        // ..
         hascenter:
         fld     fFalseHeading
         retn
     }
+    // clang-format on
 }
 
 // this hook adds a null check to prevent the game crashing when objects are placed really high up (issue 517)
 void _declspec(naked) HOOK_CCustomRoadsignMgr__RenderRoadsignAtomic()
 {
+    // clang-format off
     _asm
     {
         cmp     esi, 0
         jz      no_render
 
-         // original code
+        // original code
         mov     eax, dword ptr[esi+4]
         fsub    [eax+64]
         mov     edx, HOOKPOS_CCustomRoadsignMgr__RenderRoadsignAtomic
@@ -3039,6 +3069,7 @@ no_render:
         mov     edx, 0x6FF40B
         jmp     edx
     }
+    // clang-format on
 }
 
 bool CallBreakTowLinkHandler(CVehicleSAInterface* vehicle)
@@ -3054,52 +3085,64 @@ bool CallBreakTowLinkHandler(CVehicleSAInterface* vehicle)
 
 void _declspec(naked) HOOK_CRadar__DrawRadarGangOverlay()
 {
+    // clang-format off
     _asm
     {
         pushad
     }
+    // clang-format on
 
     if (m_pDrawRadarAreasHandler) m_pDrawRadarAreasHandler();
 
+    // clang-format off
     _asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 CVehicleSAInterface* towingVehicle;
 
 void _declspec(naked) HOOK_Trailer_BreakTowLink()
 {
+    // clang-format off
     _asm
     {
         mov     towingVehicle, ecx
         pushad
     }
+    // clang-format on
 
     if (CallBreakTowLinkHandler(towingVehicle))
     {
+        // clang-format off
         _asm
         {
             popad
             call    dword ptr [edx+0xF8]
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             popad
         }
+        // clang-format on
     }
 
+    // clang-format off
     _asm
     {
         mov     ecx, HOOKPOS_Trailer_BreakTowLink
         add     ecx, 6
         jmp     ecx
     }
+    // clang-format on
 }
 
 eExplosionType explosionType;
@@ -3130,6 +3173,7 @@ bool CallExplosionHandler()
 
 void _declspec(naked) HOOK_CExplosion_AddExplosion()
 {
+    // clang-format off
     _asm
     {
         // Check if explosions are disabled.
@@ -3139,11 +3183,11 @@ void _declspec(naked) HOOK_CExplosion_AddExplosion()
         pop         eax
         jz          checkexplosionhandler
 
-            // If they are, just return now
+        // If they are, just return now
         retn
 
-                // Check the explosion handler. So we can call it if it exists. Jump over the explosion
-                // handler part if we have none
+        // Check the explosion handler. So we can call it if it exists. Jump over the explosion
+        // handler part if we have none
         checkexplosionhandler:
         push        eax
         mov         eax, m_pExplosionHandler
@@ -3151,7 +3195,7 @@ void _declspec(naked) HOOK_CExplosion_AddExplosion()
         pop         eax
         jz          noexplosionhandler
 
-             // Extract arguments....
+        // Extract arguments....
         push    esi
         push    edi
 
@@ -3166,7 +3210,7 @@ void _declspec(naked) HOOK_CExplosion_AddExplosion()
 
         lea     edi, vecExplosionLocation
         mov     esi, esp
-        add     esi, 24  // 3 DWORDS and RETURN address and 2 STORED REGISTERS
+        add     esi, 24 // 3 DWORDS and RETURN address and 2 STORED REGISTERS
         movsd
         movsd
         movsd
@@ -3174,42 +3218,49 @@ void _declspec(naked) HOOK_CExplosion_AddExplosion()
         pop     edi
         pop     esi
 
-                 // Store registers for calling this handler
+        // Store registers for calling this handler
         pushad
     }
+    // clang-format on
 
     // Call the explosion handler
     if (!CallExplosionHandler())
     {
+        // clang-format off
         _asm
         {
             popad
-            retn  // if they return false from the handler, they don't want the explosion to show
+            retn // if they return false from the handler, they don't want the explosion to show
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             popad
         }
+        // clang-format on
     }
 
+    // clang-format off
     _asm
     {
         noexplosionhandler:
 
-     // Replaced code
+        // Replaced code
         sub     esp, 0x1C
         push    ebx
         push    ebp
         push    esi
 
-         // Return to the calling function and resume (do the explosion)
+        // Return to the calling function and resume (do the explosion)
         mov     edx, HOOKPOS_CExplosion_AddExplosion
         add     edx, 6
         jmp     edx
     }
+    // clang-format on
 }
 
 CEntitySAInterface* entity;
@@ -3239,6 +3290,7 @@ bool processGrab()
 // 0x67DABE
 void _declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
 {
+    // clang-format off
     _asm
     {
         mov     pedPosition, eax
@@ -3250,24 +3302,29 @@ void _declspec(naked) HOOK_CTaskComplexJump__CreateSubTask()
         mov     eax, pedPosition
         pushad
     }
+    // clang-format on
 
     if (processGrab())
     {
+        // clang-format off
         _asm
         {
             popad
             mov     eax, 0x67DAD6
             jmp     eax
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             popad
             mov     eax, 0x67DAD1
             jmp     eax
         }
+        // clang-format on
     }
 }
 
@@ -3277,19 +3334,21 @@ DWORD* pNewCreateFxSystem_Matrix = 0;
 
 void _declspec(naked) HOOK_FxManager_CreateFxSystem()
 {
+    // clang-format off
     _asm
     {
         // Store the explosion type
         mov eax, [esp+4]
         mov szCreateFxSystem_ExplosionType, eax
 
-            // Store the vector
+        // Store the vector
         mov eax, [esp+12]
         mov pCreateFxSystem_Matrix, eax
 
-            // Store all the registers on the stack
+        // Store all the registers on the stack
         pushad
     }
+    // clang-format on
 
     // If we got a matrix and it is an explosion type?
     if (pCreateFxSystem_Matrix != 0 && strncmp(szCreateFxSystem_ExplosionType, "explosion", 9) == 0)
@@ -3307,22 +3366,24 @@ void _declspec(naked) HOOK_FxManager_CreateFxSystem()
         pNewCreateFxSystem_Matrix = pCreateFxSystem_Matrix;
     }
 
+    // clang-format off
     _asm
     {
         // Restore the registers
         popad
 
-            // Put the new vector back onto the stack
+        // Put the new vector back onto the stack
         mov         eax, pNewCreateFxSystem_Matrix
         mov         [esp+12], eax
 
-            // The original code we replaced
+        // The original code we replaced
         mov         eax, [esp+16]
         mov         edx, [esp+8]
 
         // Jump back to the rest of the function we hooked
         jmp         RETURN_FxManager_CreateFxSystem
     }
+    // clang-format on
 }
 
 DWORD  dwDestroyFxSystem_Pointer = 0;
@@ -3330,14 +3391,17 @@ DWORD* pDestroyFxSystem_Matrix = 0;
 
 void _declspec(naked) HOOK_FxManager_DestroyFxSystem()
 {
+    // clang-format off
     _asm
-        {// Grab the FxSystem that's being destroyed
+    {
+        // Grab the FxSystem that's being destroyed
         mov eax, [esp+4]
         mov dwDestroyFxSystem_Pointer, eax
 
-             // Store all the registers on the stack
+        // Store all the registers on the stack
         pushad
-        }
+    }
+    // clang-format on
 
     // Grab the matrix pointer in it
     pDestroyFxSystem_Matrix = *((DWORD**)(dwDestroyFxSystem_Pointer + 12));
@@ -3345,12 +3409,13 @@ void _declspec(naked) HOOK_FxManager_DestroyFxSystem()
     // Delete it if it's in our list
     RemoveFxSystemPointer(pDestroyFxSystem_Matrix);
 
+    // clang-format off
     _asm
     {
         // Restore the registers
         popad
 
-            // The original code we replaced
+        // The original code we replaced
         push        ecx
         push        ebx
         push        edi
@@ -3359,6 +3424,7 @@ void _declspec(naked) HOOK_FxManager_DestroyFxSystem()
         // Jump back to the rest of the function we hooked
         jmp         RETURN_FxManager_DestroyFxSystem
     }
+    // clang-format on
 }
 
 bool CCam_ProcessFixed(class CCamSAInterface* pCamInterface)
@@ -3376,20 +3442,25 @@ CCamSAInterface* CCam_ProcessFixed_pCam;
 
 void _declspec(naked) HOOK_CCam_ProcessFixed()
 {
+    // clang-format off
     _asm
     {
         mov CCam_ProcessFixed_pCam, ecx
     }
+    // clang-format on
 
     if (CCam_ProcessFixed(CCam_ProcessFixed_pCam))
     {
+        // clang-format off
         _asm
-            {
+        {
             ret 10h
-            }
+        }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             mov ecx, CCam_ProcessFixed_pCam
@@ -3398,23 +3469,28 @@ void _declspec(naked) HOOK_CCam_ProcessFixed()
             push ebp
             jmp RETURN_CCam_ProcessFixed
         }
+        // clang-format on
     }
 }
 
 void _declspec(naked) HOOK_Render3DStuff()
 {
+    // clang-format off
     _asm
     {
         pushad
     }
+    // clang-format on
     if (m_pRender3DStuffHandler) m_pRender3DStuffHandler();
 
+    // clang-format off
     _asm
     {
         popad
         mov eax, FUNC_Render3DStuff
         jmp eax
     }
+    // clang-format on
 }
 
 CPedSAInterface* pProcessPlayerWeaponPed = NULL;
@@ -3446,14 +3522,17 @@ void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon()
     006859A2  push        846BCEh                           <hook>
     006859A7  mov         eax,dword ptr fs:[00000000h]      <return>
     */
+    // clang-format off
     _asm
     {
         mov     eax, [esp+4]
         mov     pProcessPlayerWeaponPed, eax
         pushad
     }
+    // clang-format on
     if (ProcessPlayerWeapon())
     {
+        // clang-format off
         _asm
         {
             popad
@@ -3461,14 +3540,17 @@ void _declspec(naked) HOOK_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon()
             push    846BCEh
             jmp     RETURN_CTaskSimplePlayerOnFoot_ProcessPlayerWeapon
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
-            {
+        {
             popad
             ret 4
-            }
+        }
+        // clang-format on
     }
 }
 
@@ -3484,28 +3566,34 @@ void _declspec(naked) HOOK_CPed_IsPlayer()
     005DF8F0  mov         eax,dword ptr [ecx+598h]      <hook>
     005DF8F6  test        eax,eax                       <return>
     */
+    // clang-format off
     _asm
     {
         mov    pIsPlayerPed, ecx
         pushad
     }
+    // clang-format on
     if (IsPlayer())
     {
+        // clang-format off
         _asm
         {
             popad
             mov         eax,dword ptr [ecx+598h]
             jmp         RETURN_CPed_IsPlayer
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             popad
             xor         al, al
             ret
         }
+        // clang-format on
     }
 }
 
@@ -3521,33 +3609,40 @@ void CRunningScript_Process()
 
         char szModelName[64];
         strcpy(szModelName, "player");
+        // clang-format off
         _asm
-            {
+        {
             push    26
             lea     eax, szModelName
             push    eax
             push    0
             call    dwFunc
             add     esp, 12
-            }
+        }
+        // clang-format on
 
         dwFunc = 0x40EA10;  // load all requested models
+        // clang-format off
         _asm
-            {
+        {
             push    1
             call    dwFunc
             add     esp, 4
-            }
+        }
+        // clang-format on
 
         dwFunc = 0x60D790;  // setup player ped
+        // clang-format off
         _asm
-            {
+        {
             push    0
             call    dwFunc
             add     esp, 4
-            }
+        }
+        // clang-format on
 
         /*dwFunc = 0x05E47E0; // set created by
+        // clang-format off
         _asm
         {
             mov     edi, 0xB7CD98
@@ -3555,53 +3650,65 @@ void CRunningScript_Process()
             push    2
             call    dwFunc
         }
+        // clang-format on
 
         dwFunc = 0x609520; // deactivate player ped
+        // clang-format off
         _asm
         {
             push    0
             call    dwFunc
             add     esp, 4
         }
+        // clang-format on
 */
         dwFunc = 0x420B80;  // set position
         fX = 2488.562f;
         fY = -1666.864f;
         fZ = 12.8757f;
+        // clang-format off
         _asm
-            {
+        {
             mov     edi, 0xB7CD98
             push    fZ
             push    fY
             push    fX
             mov     ecx, [edi]
             call    dwFunc
-            }
+        }
+        // clang-format on
         /*
         dwFunc = 0x609540; // reactivate player ped
+        // clang-format off
         _asm
         {
             push    0
             call    dwFunc
             add     esp, 4
         }
+        // clang-format on
 
         dwFunc = 0x61A5A0; // CTask::operator new
+        // clang-format off
         _asm
         {
             push    28
             call    dwFunc
             add     esp, 4
         }
+        // clang-format on
 
         dwFunc = 0x685750; // CTaskSimplePlayerOnFoot::CTaskSimplePlayerOnFoot
+        // clang-format off
         _asm
         {
             mov     ecx, eax
             call    dwFunc
         }
+        // clang-format on
 
         dwFunc = 0x681AF0; // set task
+        // clang-format off
         _asm
         {
             mov     edi, 0xB7CD98
@@ -3613,6 +3720,7 @@ void CRunningScript_Process()
             push    eax
             call    dwFunc
         }
+        // clang-format on
 */
 
         bHasProcessedScript = true;
@@ -3621,24 +3729,29 @@ void CRunningScript_Process()
 
 void _declspec(naked) HOOK_CRunningScript_Process()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
-        }
+    }
+    // clang-format on
 
     CRunningScript_Process();
 
+    // clang-format off
     _asm
     {
         popad
         retn
     }
+    // clang-format on
 }
 
 static CVehicleSAInterface* pDerailingTrain = NULL;
 void _declspec(naked)       HOOK_CTrain_ProcessControl_Derail()
 {
     // If the train wouldn't derail, don't modify anything
+    // clang-format off
     _asm
     {
         jnp     train_would_derail
@@ -3648,26 +3761,31 @@ train_would_derail:
         pushad
         mov     pDerailingTrain, esi
     }
+    // clang-format on
 
     // At this point we know that GTA wants to derail the train
     if (pDerailingTrain->m_pVehicle->IsDerailable())
     {
         // Go back to the derailment code
+        // clang-format off
         _asm
         {
             popad
             mov     eax, 0x6F8DC0
             jmp     eax
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             popad
             mov     eax, 0x6F8F89
             jmp     eax
         }
+        // clang-format on
     }
 }
 
@@ -3692,12 +3810,14 @@ static void SetEntityAlphaHooked(DWORD dwEntity, DWORD dwCallback, DWORD dwAlpha
 
         // Call SetRwObjectAlpha
         DWORD dwFunc = FUNC_SetRwObjectAlpha;
+        // clang-format off
         _asm
-            {
+        {
             mov     ecx, dwEntity
             push    dwAlpha
             call    dwFunc
-            }
+        }
+        // clang-format on
 
         // Restore the GTA callbacks
         MemPutFast<DWORD>(0x5332A2, (DWORD)(0x533280));
@@ -3765,14 +3885,17 @@ static void SetVehicleAlpha()
 static DWORD          dwCVehicle_SetupRender_ret = 0x6D6517;
 void _declspec(naked) HOOK_CVehicle_SetupRender()
 {
+    // clang-format off
     _asm
-        {
+    {
         mov     dwAlphaEntity, esi
         pushad
-        }
+    }
+    // clang-format on
 
     SetVehicleAlpha();
 
+    // clang-format off
     _asm
     {
         popad
@@ -3780,18 +3903,22 @@ void _declspec(naked) HOOK_CVehicle_SetupRender()
         test    eax, eax
         jmp     dwCVehicle_SetupRender_ret
     }
+    // clang-format on
 }
 
 static DWORD          dwCVehicle_ResetAfterRender_ret = 0x6D0E43;
 void _declspec(naked) HOOK_CVehicle_ResetAfterRender()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
-        }
+    }
+    // clang-format on
 
     RestoreAlphaValues();
 
+    // clang-format off
     _asm
     {
         popad
@@ -3799,6 +3926,7 @@ void _declspec(naked) HOOK_CVehicle_ResetAfterRender()
         test    eax, eax
         jmp     dwCVehicle_ResetAfterRender_ret
     }
+    // clang-format on
 }
 
 /**
@@ -3832,34 +3960,41 @@ static void SetObjectAlpha()
 DWORD                 dwCObjectRenderRet = 0;
 void _declspec(naked) HOOK_CObject_PostRender()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
-        }
+    }
+    // clang-format on
 
     TIMING_CHECKPOINT("-ObjRndr");
     RestoreAlphaValues();
 
+    // clang-format off
     _asm
     {
         popad
         mov         edx, dwCObjectRenderRet
         jmp         edx
     }
+    // clang-format on
 }
 
 // Note: This hook is also called for world objects (light poles, wooden fences, etc).
 void _declspec(naked) HOOK_CObject_Render()
 {
+    // clang-format off
     _asm
-        {
+    {
         mov         dwAlphaEntity, ecx
         pushad
-        }
+    }
+    // clang-format on
 
     TIMING_CHECKPOINT("+ObjRndr");
     SetObjectAlpha();
 
+    // clang-format off
     _asm
     {
         popad
@@ -3869,23 +4004,37 @@ void _declspec(naked) HOOK_CObject_Render()
         mov         [esp], edx
         pushad
     }
+    // clang-format on
 
     if (bObjectIsAGangTag) goto render_a_tag;
 
+    // clang-format off
     _asm
-        {
-        popad
-        jmp         FUNC_CEntity_Render
-        }
-
-    render_a_tag : _asm
     {
         popad
-            // We simulate here the header of the CEntity::Render function
-            // but then go straight to CTagManager::RenderTagForPC.
-            push ecx push esi mov eax,
-            [esi + 0x18] test eax, eax jz no_clump mov eax, 0x534331 jmp eax no_clump : mov eax, 0x5343EB jmp eax
+        jmp         FUNC_CEntity_Render
     }
+    // clang-format on
+
+    render_a_tag :
+        // clang-format off
+    _asm
+    {
+        popad
+        // We simulate here the header of the CEntity::Render function
+        // but then go straight to CTagManager::RenderTagForPC.
+        push        ecx
+        push        esi
+        mov         eax, [esi+0x18]
+        test        eax, eax
+        jz          no_clump
+        mov         eax, 0x534331
+        jmp         eax
+    no_clump:
+        mov         eax, 0x5343EB
+        jmp         eax
+    }
+    // clang-format on
 }
 
 void _cdecl DoEndWorldColorsPokes()
@@ -3942,11 +4091,13 @@ void _cdecl DoEndWorldColorsPokes()
 // Note: This hook is called at the end of the function that sets the world colours (sky gradient, water colour, etc).
 void _declspec(naked) HOOK_EndWorldColors()
 {
-    _asm
+    // clang-format off
+     _asm
     {
         call DoEndWorldColorsPokes
         ret
     }
+    // clang-format on
 }
 
 // This hook modifies the code in CWorld::ProcessVerticalLineSectorList to
@@ -3959,6 +4110,7 @@ static DWORD          dwProcessVerticalEndLooping = 0x56335F;
 static DWORD          dwGlobalListOfObjects = 0xB9ACCC;
 void _declspec(naked) HOOK_CWorld_ProcessVerticalLineSectorList()
 {
+    // clang-format off
     _asm
     {
         test    ebp, ebp
@@ -3980,6 +4132,7 @@ stop_looping:
         mov     dwObjectsChecked, 0
         jmp     dwProcessVerticalEndLooping
     }
+    // clang-format on
 }
 
 // Hook to detect when a player is choking
@@ -3988,27 +4141,35 @@ static DWORD          dwChokingDontchoke = 0x4C0620;
 static unsigned char  ucChokingWeaponType = 0;
 void _declspec(naked) HOOK_ComputeDamageResponse_StartChoking()
 {
+    // clang-format off
     _asm
     {
         pushad
         mov     al, [esp+0x8C]
         mov     ucChokingWeaponType, al
     }
+    // clang-format on
 
     if (m_pChokingHandler && m_pChokingHandler(ucChokingWeaponType) == false) goto dont_choke;
 
+    // clang-format off
     _asm
-        {
+    {
         popad
         mov     ecx, [edi]
         mov     eax, [ecx+0x47C]
         jmp     dwChokingChoke
-        }
-
-    dont_choke : _asm
-    {
-        popad jmp dwChokingDontchoke
     }
+    // clang-format on
+
+    dont_choke :
+        // clang-format off
+    _asm
+    {
+        popad
+        jmp     dwChokingDontchoke
+    }
+    // clang-format on
 }
 
 void CMultiplayerSA::DisableEnterExitVehicleKey(bool bDisabled)
@@ -4190,15 +4351,17 @@ void CMultiplayerSA::ConvertEulerAnglesToMatrix(CMatrix& Matrix, float fX, float
     CMatrix_Padded* pMatrixPadded = &matrixPadded;
     DWORD           dwFunc = FUNC_CMatrix__ConvertFromEulerAngles;
     int             iUnknown = 21;
+    // clang-format off
     _asm
-        {
+    {
         push    iUnknown
         push    fZ
         push    fY
         push    fX
         mov     ecx, pMatrixPadded
         call    dwFunc
-        }
+    }
+    // clang-format on
 
     // Convert the result matrix to the CMatrix we know
     matrixPadded.ConvertToMatrix(Matrix);
@@ -4217,6 +4380,7 @@ void CMultiplayerSA::ConvertMatrixToEulerAngles(const CMatrix& Matrix, float& fX
     float* pfY = &fY;
     float* pfZ = &fZ;
     int    iUnknown = 21;
+    // clang-format off
     _asm
     {
         push    iUnknown
@@ -4226,6 +4390,7 @@ void CMultiplayerSA::ConvertMatrixToEulerAngles(const CMatrix& Matrix, float& fX
         mov     ecx, pMatrixPadded
         call    dwFunc
     }
+    // clang-format on
 }
 
 void CMultiplayerSA::RebuildMultiplayerPlayer(CPed* player)
@@ -4327,28 +4492,34 @@ void _declspec(naked) HOOK_CollisionStreamRead()
 {
     if (*(DWORD*)VAR_CollisionStreamRead_ModelInfo)
     {
+        // clang-format off
         _asm
         {
             mov eax, dword ptr fs:[0]
             jmp RETURN_CollisionStreamRead
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             ret
         }
+        // clang-format on
     }
 }
 
 unsigned char         ucDesignatedLightState = 0;
 void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState()
 {
+    // clang-format off
     _asm
     {
         pushad
     }
+    // clang-format on
 
     if (ucTrafficLightState == 0 || ucTrafficLightState == 5 || ucTrafficLightState == 8)
     {
@@ -4364,20 +4535,24 @@ void _declspec(naked) HOOK_CTrafficLights_GetPrimaryLightState()
     }
     else ucDesignatedLightState = 2;  // Red
 
+    // clang-format off
     _asm
     {
         popad
         mov al, ucDesignatedLightState
         retn
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState()
 {
+    // clang-format off
     _asm
     {
         pushad
     }
+    // clang-format on
 
     if (ucTrafficLightState == 3 || ucTrafficLightState == 5 || ucTrafficLightState == 7)
     {
@@ -4393,20 +4568,24 @@ void _declspec(naked) HOOK_CTrafficLights_GetSecondaryLightState()
     }
     else ucDesignatedLightState = 2;  // Red
 
+    // clang-format off
     _asm
     {
         popad
         mov al, ucDesignatedLightState
         retn
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CTrafficLights_DisplayActualLight()
 {
+    // clang-format off
     _asm
     {
         pushad
     }
+    // clang-format on
 
     if (ucTrafficLightState == 2)
     {
@@ -4421,12 +4600,14 @@ void _declspec(naked) HOOK_CTrafficLights_DisplayActualLight()
         ucDesignatedLightState = 2;
     }
 
+    // clang-format off
     _asm
     {
         popad
         movzx eax, ucDesignatedLightState
         jmp RETURN_CTrafficLights_DisplayActualLight
     }
+    // clang-format on
 }
 
 static CVehicleSAInterface* pHandlingDriveTypeVeh = NULL;
@@ -4450,18 +4631,21 @@ void CheckVehicleMaxGear()
 
 void _declspec(naked) HOOK_Transmission_CalculateDriveAcceleration()
 {
+    // clang-format off
     _asm
-        {
+    {
         push eax
         mov pCurTransmission, ecx
         mov eax, [esp+0xC]
         mov pCurGear, eax
         pop eax
         pushad
-        }
+    }
+    // clang-format on
 
     CheckVehicleMaxGear();
 
+    // clang-format off
     _asm
     {
         popad
@@ -4469,42 +4653,51 @@ void _declspec(naked) HOOK_Transmission_CalculateDriveAcceleration()
         mov edx, [eax]
         jmp RETURN_Transmission_CalculateDriveAcceleration
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_isVehDriveTypeNotRWD()
 {
     // Get the Vehicle interface from esi
+    // clang-format off
     _asm
-        {
+    {
          mov pHandlingDriveTypeVeh, esi
-        }
+    }
+    // clang-format on
 
     GetVehicleDriveType();
 
     // push our drive type into bl :)
+    // clang-format off
     _asm
     {
         mov bl, ucDriveType
         jmp RETURN_CHandlingData_isNotRWD
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_isVehDriveTypeNotFWD()
 {
     // Get the Vehicle SA interface from esi
+    // clang-format off
     _asm
-        {
+    {
          mov pHandlingDriveTypeVeh, esi
-        }
+    }
+    // clang-format on
 
     GetVehicleDriveType();
 
     // push our drive type into bl :)
+    // clang-format off
     _asm
     {
         mov bl, ucDriveType
         jmp RETURN_CHandlingData_isNotFWD
     }
+    // clang-format on
 }
 
 unsigned char CMultiplayerSA::GetTrafficLightState()
@@ -4560,13 +4753,15 @@ void CMultiplayerSA::AllowCreatedObjectsInVerticalLineTest(bool bOn)
 void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
 {
     DWORD dwType;
+    // clang-format off
     _asm
     {
         mov ecx, dwThis
-        mov eax, 0x46A2C0  // CEntity::GetType
+        mov eax, 0x46A2C0       // CEntity::GetType
         call eax
         mov dwType, eax
     }
+    // clang-format on
 
     float fTimeStep = *(float*)0xB7CB5C;
     float fGravity = *(float*)0x863984;
@@ -4594,17 +4789,20 @@ void _cdecl CPhysical_ApplyGravity(DWORD dwThis)
 const float           kfTimeStepOrg = 5.0f / 3.0f;
 void _declspec(naked) HOOK_CVehicle_ApplyBoatWaterResistance()
 {
+    // clang-format off
     _asm
     {
-        fmul    ds : 0x871DDC  // Original constant used in code
-        fmul    ds : 0xB7CB5C  // Multiply by current timestep
-        fdiv    kfTimeStepOrg  // Divide by desired timestep, used at 30fps
+        fmul    ds : 0x871DDC   // Original constant used in code
+        fmul    ds : 0xB7CB5C   // Multiply by current timestep
+        fdiv    kfTimeStepOrg   // Divide by desired timestep, used at 30fps
         jmp     RETURN_CVehicle_ApplyBoatWaterResistance
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CPhysical_ApplyGravity()
 {
+    // clang-format off
     _asm
     {
         push esi
@@ -4612,6 +4810,7 @@ void _declspec(naked) HOOK_CPhysical_ApplyGravity()
         add esp, 4
         jmp RETURN_CPhysical_ApplyGravity
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -4685,6 +4884,7 @@ bool _cdecl VehicleCamStart(DWORD dwCam, DWORD pVehicleInterface)
 
 void _declspec(naked) HOOK_VehicleCamStart()
 {
+    // clang-format off
     _asm
     {
         push edi
@@ -4701,6 +4901,7 @@ fail:
         add esp, 4
         jmp RETURN_VehicleCamStart_failure
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -4713,6 +4914,7 @@ void _cdecl VehicleCamTargetZTweak(CVector* pvecCamTarget, float fTargetZTweak)
 
 void _declspec(naked) HOOK_VehicleCamTargetZTweak()
 {
+    // clang-format off
     _asm
     {
         fstp st
@@ -4736,6 +4938,7 @@ void _declspec(naked) HOOK_VehicleCamTargetZTweak()
         cmp eax, 1
         jmp RETURN_VehicleCamTargetZTweak
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -4750,9 +4953,10 @@ void _cdecl VehicleCamLookDir1(DWORD dwCam, DWORD pVehicleInterface)
 
 void _declspec(naked) HOOK_VehicleCamLookDir1()
 {
+    // clang-format off
     _asm
     {
-        mov eax, 0x59C910  // CVector::Normalise
+        mov eax, 0x59C910       // CVector::Normalise
         call eax
 
         push edi
@@ -4762,6 +4966,7 @@ void _declspec(naked) HOOK_VehicleCamLookDir1()
 
         jmp RETURN_VehicleCamLookDir1
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -4783,6 +4988,7 @@ bool _cdecl VehicleCamLookDir2(DWORD dwCam)
 
 void _declspec(naked) HOOK_VehicleCamLookDir2()
 {
+    // clang-format off
     _asm
     {
         push esi
@@ -4794,6 +5000,7 @@ void _declspec(naked) HOOK_VehicleCamLookDir2()
         push 4
         jmp RETURN_VehicleCamLookDir2
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -4809,20 +5016,22 @@ void _cdecl VehicleCamHistory(DWORD dwCam, CVector* pvecTarget, float fTargetThe
 
 void _declspec(naked) HOOK_VehicleCamHistory()
 {
+    // clang-format off
     _asm
     {
-        push [esp+0x0+0x7C]  // zoom
-        push [esp+0x4+0x2C]  // radius
-        push [esp+0x8+0x14]  // targetTheta
+        push [esp+0x0+0x7C]       // zoom
+        push [esp+0x4+0x2C]       // radius
+        push [esp+0x8+0x14]       // targetTheta
         lea eax, [esp+0xC+0x48]
-        push eax  // pvecTarget
-        push esi  // pCam
+        push eax                  // pvecTarget
+        push esi                  // pCam
         call VehicleCamHistory
         add esp, 0x14
 
         mov eax, [esp+0x24]
         jmp RETURN_VehicleCamHistory
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -4842,18 +5051,19 @@ void _cdecl VehicleCamUp(DWORD dwCam)
 
 void _declspec(naked) HOOK_VehicleCamUp()
 {
+    // clang-format off
     _asm
     {
         mov edx, ecx
-        mov ecx, [ecx+0x21C]  // CCam::pTargetEntity
-        mov eax, 0x46A2C0  // CEntity::GetType
+        mov ecx, [ecx+0x21C]        // CCam::pTargetEntity
+        mov eax, 0x46A2C0           // CEntity::GetType
         call eax
 
-        cmp al, 2  // Is it a vehicle?
+        cmp al, 2                   // Is it a vehicle?
         jz docustom
 
         mov ecx, edx
-        mov eax, 0x509CE0  // CCam::GetVectorsReadyForRW
+        mov eax, 0x509CE0           // CCam::GetVectorsReadyForRW
         jmp eax
 
 docustom:
@@ -4862,6 +5072,7 @@ docustom:
         add esp, 4
         ret
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -4880,6 +5091,7 @@ void _cdecl VehicleCamEnd(DWORD pVehicleInterface)
 
 void _declspec(naked) HOOK_VehicleCamEnd()
 {
+    // clang-format off
     _asm
     {
         mov ds:[0xB6F020], edx
@@ -4890,6 +5102,7 @@ void _declspec(naked) HOOK_VehicleCamEnd()
 
         jmp RETURN_VehicleCamEnd
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -4903,6 +5116,7 @@ void _cdecl VehicleLookBehind(DWORD dwCam, CVector* pvecEntityPos, float fDistan
 
 void _declspec(naked) HOOK_VehicleLookBehind()
 {
+    // clang-format off
     _asm
     {
         push [esp+0x14]
@@ -4912,7 +5126,7 @@ void _declspec(naked) HOOK_VehicleLookBehind()
         call VehicleLookBehind
         add esp, 0xC
 
-        mov eax, [esp+0x1C]  // vecTemp = vecEntityPos
+        mov eax, [esp+0x1C]     // vecTemp = vecEntityPos
         mov ecx, [esp+0x1C+4]
         mov edx, [esp+0x1C+8]
         mov [esp+0x34],   eax
@@ -4920,11 +5134,12 @@ void _declspec(naked) HOOK_VehicleLookBehind()
         mov [esp+0x34+8], edx
 
         mov ds:[0xB7CD68], ebx  // IgnoreEntity
-        mov ds:[0xB6FC70], 0  // NumExtraIgnoreEntities
+        mov ds:[0xB6FC70], 0    // NumExtraIgnoreEntities
 
-        mov eax, ebx  // pEntity
+        mov eax, ebx            // pEntity
         jmp RETURN_VehicleLookBehind
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -4938,6 +5153,7 @@ void _cdecl VehicleLookAside(DWORD dwCam, CVector* pvecEntityPos, float fDirecti
 
 void _declspec(naked) HOOK_VehicleLookAside()
 {
+    // clang-format off
     _asm
     {
         push [esp+0x14]
@@ -4952,6 +5168,7 @@ void _declspec(naked) HOOK_VehicleLookAside()
         mov ecx, [esi+0x21C]
         jmp RETURN_VehicleLookAside
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -4976,6 +5193,7 @@ float _cdecl VehicleBurnCheck(DWORD pVehicleInterface)
 
 void _declspec(naked) HOOK_OccupiedVehicleBurnCheck()
 {
+    // clang-format off
     _asm
     {
         push eax
@@ -4983,10 +5201,12 @@ void _declspec(naked) HOOK_OccupiedVehicleBurnCheck()
         add esp, 4
         jmp RETURN_OccupiedVehicleBurnCheck
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_UnoccupiedVehicleBurnCheck()
 {
+    // clang-format off
     _asm
     {
         mov word ptr [esp+0x78], cx
@@ -4996,6 +5216,7 @@ void _declspec(naked) HOOK_UnoccupiedVehicleBurnCheck()
         add esp, 4
         jmp RETURN_UnoccupiedVehicleBurnCheck
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -5018,6 +5239,7 @@ void _cdecl ApplyVehicleBlowHop(DWORD pVehicleInterface)
 
 void _declspec(naked) HOOK_ApplyCarBlowHop()
 {
+    // clang-format off
     _asm
     {
         push esi
@@ -5031,6 +5253,7 @@ void _declspec(naked) HOOK_ApplyCarBlowHop()
         mov [esi+0x36], dl
         jmp RETURN_ApplyCarBlowHop
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -5038,15 +5261,18 @@ void _declspec(naked) HOOK_ApplyCarBlowHop()
 DWORD                 CALL_CWorld_Process = 0x5684a0;
 void _declspec(naked) HOOK_CGame_Process()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
-        }
+    }
+    // clang-format on
 
     TIMING_CHECKPOINT("+CWorld_Process");
     if (m_pPreWorldProcessHandler)
         m_pPreWorldProcessHandler();
 
+    // clang-format off
     _asm
     {
         popad
@@ -5054,16 +5280,19 @@ void _declspec(naked) HOOK_CGame_Process()
         mov     ecx, 0B72978h
         pushad
     }
+    // clang-format on
 
     if (m_pPostWorldProcessHandler) m_pPostWorldProcessHandler();
 
     TIMING_CHECKPOINT("-CWorld_Process");
 
+    // clang-format off
     _asm
     {
         popad
         jmp     RETURN_CGame_Process;
     }
+    // clang-format on
 }
 
 void __cdecl HandleIdle()
@@ -5083,11 +5312,13 @@ DWORD                 CALL_CGame_Process = 0x53BEE0;
 void _declspec(naked) HOOK_Idle()
 {
     TIMING_CHECKPOINT("+CGame_Process");
+    // clang-format off
     _asm
-        {
+    {
         call    CALL_CGame_Process
         pushad
-        }
+    }
+    // clang-format on
 
     TIMING_CHECKPOINT("-CGame_Process");
 
@@ -5096,17 +5327,20 @@ void _declspec(naked) HOOK_Idle()
         HandleIdle();
     TIMING_CHECKPOINT("-Idle");
 
+    // clang-format off
     _asm
     {
         popad
         mov     ecx, 0B6BC90h
         jmp     RETURN_Idle
     }
+    // clang-format on
 }
 
 // Hooked from 0049E650 5 bytes
 void _declspec(naked) HOOK_PreFxRender()
 {
+    // clang-format off
     _asm
     {
         pushad
@@ -5114,51 +5348,62 @@ void _declspec(naked) HOOK_PreFxRender()
         cmp     eax,0
         jne skip
     }
+    // clang-format on
 
     if (m_pPreFxRenderHandler) m_pPreFxRenderHandler();
 
+    // clang-format off
     _asm
     {
 skip:
         popad
         jmp     RETURN_PreFxRender  // 00404D1E
     }
+    // clang-format on
 }
 
 // Hooked from 00705099  5 bytes
 void _declspec(naked) HOOK_PostColorFilterRender()
 {
+    // clang-format off
     _asm
     {
         pushad
     }
+    // clang-format on
 
     if (m_pPostColorFilterRenderHandler) m_pPostColorFilterRenderHandler();
 
+    // clang-format off
     _asm
     {
         popad
         mov al, ds:0C402BAh
         jmp     RETURN_PostColorFilterRender  // 0070509E
     }
+    // clang-format on
 }
 
 // Hooked from 0053EAD8  5 bytes
 void _declspec(naked) HOOK_PreHUDRender()
 {
+    // clang-format off
     _asm
     {
         pushad
     }
+    // clang-format on
 
     if (m_pPreHudRenderHandler) m_pPreHudRenderHandler();
 
+    // clang-format off
     _asm
     {
         popad
         mov     eax, ds:0B6F0B8h
         jmp     RETURN_PreHUDRender  // 0053EADD
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -5223,6 +5468,7 @@ void vehicle_lights_init()
 CVehicleSAInterface*  pLightsVehicleInterface = NULL;
 void _declspec(naked) HOOK_CVehicle_DoVehicleLights()
 {
+    // clang-format off
     _asm
     {
         mov     pLightsVehicleInterface, ecx
@@ -5230,6 +5476,7 @@ void _declspec(naked) HOOK_CVehicle_DoVehicleLights()
         sub     esp,3Ch
         jmp     RETURN_CVehicle_DoVehicleLights
     }
+    // clang-format on
 }
 
 unsigned long ulHeadLightR = 0, ulHeadLightG = 0, ulHeadLightB = 0;
@@ -5252,12 +5499,14 @@ void          CVehicle_GetHeadLightColor(CVehicleSAInterface* pInterface, float 
 CVehicleSAInterface*  pHeadLightBeamVehicleInterface = NULL;
 void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam_1()
 {
+    // clang-format off
     _asm
     {
         mov     pHeadLightBeamVehicleInterface, ecx
         sub     esp, 94h
         jmp     RETURN_CVehicle_DoHeadLightBeam_1
     }
+    // clang-format on
 }
 
 RwVertex*    pHeadLightVerts = NULL;
@@ -5276,35 +5525,42 @@ void         CVehicle_DoHeadLightBeam()
 
 void _declspec(naked) HOOK_CVehicle_DoHeadLightBeam_2()
 {
+    // clang-format off
     _asm
-        {
+    {
         mov     eax, [esp]
         mov     pHeadLightVerts, eax
         mov     eax, [esp+4]
         mov     uiHeadLightNumVerts, eax
         pushad
-        }
+    }
+    // clang-format on
 
     CVehicle_DoHeadLightBeam();
 
+    // clang-format off
     _asm
     {
         popad
         mov     dword ptr ds:[0C4B950h],5
         jmp     RETURN_CVehicle_DoHeadLightBeam_2
     }
+    // clang-format on
 }
 
 DWORD                 dwCCoronas_RegisterCorona = 0x6FC580;
 void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_1()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
-        }
+    }
+    // clang-format on
 
     CVehicle_GetHeadLightColor(pLightsVehicleInterface, 160.0f, 160.0f, 140.0f);
 
+    // clang-format off
     _asm
     {
         popad
@@ -5314,24 +5570,28 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_1()
         mov     [esp+12], eax
         mov     eax, ulHeadLightB
         mov     [esp+16], eax
-         // mov     eax, ulHeadLightA
-         // mov     [esp+20], eax
+        //mov     eax, ulHeadLightA
+        //mov     [esp+20], eax
 
         call    dwCCoronas_RegisterCorona
         add     esp,54h
         jmp     RETURN_CVehicle_DoHeadLightEffect_1
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_2()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
-        }
+    }
+    // clang-format on
 
     CVehicle_GetHeadLightColor(pLightsVehicleInterface, 160.0f, 160.0f, 140.0f);
 
+    // clang-format off
     _asm
     {
         popad
@@ -5341,25 +5601,29 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightEffect_2()
         mov     [esp+12], eax
         mov     eax, ulHeadLightB
         mov     [esp+16], eax
-         // mov     eax, ulHeadLightA
-         // mov     [esp+20], eax
+        //mov     eax, ulHeadLightA
+        //mov     [esp+20], eax
 
         call    dwCCoronas_RegisterCorona
         add     esp, 54h
         jmp     RETURN_CVehicle_DoHeadLightEffect_2
     }
+    // clang-format on
 }
 
 DWORD                 dwCShadows_StoreCarLightShadow = 0x70C500;
 void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
-        }
+    }
+    // clang-format on
 
     CVehicle_GetHeadLightColor(pLightsVehicleInterface, 45.0f, 45.0f, 45.0f);
 
+    // clang-format off
     _asm
     {
         popad
@@ -5374,17 +5638,21 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionTwin()
         add     esp, 4Ch
         jmp     RETURN_CVehicle_DoHeadLightReflectionTwin
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
-        }
+    }
+    // clang-format on
 
     CVehicle_GetHeadLightColor(pLightsVehicleInterface, 45.0f, 45.0f, 45.0f);
 
+    // clang-format off
     _asm
     {
         popad
@@ -5399,6 +5667,7 @@ void _declspec(naked) HOOK_CVehicle_DoHeadLightReflectionSingle()
         add     esp, 30h
         jmp     RETURN_CVehicle_DoHeadLightReflectionSingle
     }
+    // clang-format on
 }
 
 #endif  // ENABLE_VEHICLE_HEADLIGHT_COLOR
@@ -5411,35 +5680,40 @@ void _declspec(naked) HOOK_CWorld_SetWorldOnFire()
 {
     // Actually pass the pCreatorEntity parameter that this function receives to CFireManager::StartFire
     // (instead of a null pointer)
+    // clang-format off
     _asm
     {
         push 7000
         push [esp+0x18+0x14]
         jmp RETURN_CWorld_SetWorldOnFire
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CTaskSimplePlayerOnFire_ProcessPed()
 {
     // Actually pass the fire's pCreatorEntity to the damage event (instead of a null pointer)
+    // clang-format off
     _asm
     {
         push 3
         push 0x25
         push edx
-        mov eax, [edi+0x730]  // eax = pPed->pFire
-        mov eax, [eax+0x14]  // eax = pFire->pCreator
+        mov eax, [edi+0x730]    // eax = pPed->pFire
+        mov eax, [eax+0x14]     // eax = pFire->pCreator
         push eax
         jmp RETURN_CTaskSimplePlayerOnFire_ProcessPed
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CFire_ProcessFire()
 {
     // Set the new fire's creator to the original fire's creator
+    // clang-format off
     _asm
     {
-        mov eax, 0x53A450  // CCreepingFire::TryToStartFireAtCoors
+        mov eax, 0x53A450       // CCreepingFire::TryToStartFireAtCoors
         call eax
         test eax, eax
         jz fail
@@ -5448,14 +5722,16 @@ void _declspec(naked) HOOK_CFire_ProcessFire()
 fail:
         jmp RETURN_CFire_ProcessFire
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CExplosion_Update()
 {
     // Set the new fire's creator to the explosion's creator
+    // clang-format off
     _asm
     {
-        mov eax, 0x53A450  // CCreepingFire::TryToStartFireAtCoors
+        mov eax, 0x53A450       // CCreepingFire::TryToStartFireAtCoors
         call eax
         test eax, eax
         jz fail
@@ -5464,14 +5740,16 @@ void _declspec(naked) HOOK_CExplosion_Update()
 fail:
         jmp RETURN_CExplosion_Update
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CWeapon_FireAreaEffect()
 {
     // Set the new fire's creator to the weapon's owner
+    // clang-format off
     _asm
     {
-        mov eax, 0x53A450  // CCreepingFire::TryToStartFireAtCoors
+        mov eax, 0x53A450       // CCreepingFire::TryToStartFireAtCoors
         call eax
         test eax, eax
         jz fail
@@ -5480,6 +5758,7 @@ void _declspec(naked) HOOK_CWeapon_FireAreaEffect()
 fail:
         jmp RETURN_CWeapon_FireAreaEffect
     }
+    // clang-format on
 }
 
 // ---------------------------------------------------
@@ -5569,16 +5848,17 @@ void CPlantMgr_Render_Post()
 
 void _declspec(naked) HOOK_RenderScene_Plants()
 {
+    // clang-format off
     _asm
     {
         pushad
         call    CPlantMgr_Render_Pre
         popad
 
-        push 1  // bRenderingBeforeWater
-        movzx eax, bl  // bCamBelowWater
+        push 1                  // bRenderingBeforeWater
+        movzx eax, bl           // bCamBelowWater
         push eax
-        mov eax, 0x5DBAE0  // CPlantMgr::Render
+        mov eax, 0x5DBAE0       // CPlantMgr::Render
         call eax
         add esp, 8
 
@@ -5587,20 +5867,22 @@ void _declspec(naked) HOOK_RenderScene_Plants()
         popad
         ret
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_RenderScene_end()
 {
+    // clang-format off
     _asm
     {
         pushad
         call    CPlantMgr_Render_Pre
         popad
 
-        push 0  // bRenderingBeforeWater
-        movzx eax, bl  // bCamBelowWater
+        push 0                  // bRenderingBeforeWater
+        movzx eax, bl           // bCamBelowWater
         push eax
-        mov eax, 0x5DBAE0  // CPlantMgr::Render
+        mov eax, 0x5DBAE0       // CPlantMgr::Render
         call eax
         add esp, 8
 
@@ -5613,6 +5895,7 @@ void _declspec(naked) HOOK_RenderScene_end()
         mov eax, 0x7113B0
         jmp eax
     }
+    // clang-format on
 }
 
 bool _cdecl IsPlantBelowWater(float fPlantZ, float fWaterZ)
@@ -5623,24 +5906,25 @@ bool _cdecl IsPlantBelowWater(float fPlantZ, float fWaterZ)
 void _declspec(naked) HOOK_CPlantMgr_Render()
 {
     // (bCamBelowWater, bRenderingBeforeWater)
+    // clang-format off
     _asm
     {
         sub esp, 4
         mov eax, esp
         push 0
         push 0
-        push eax  // pWaterLevel
-        push [ebp+8]  // Plant position
+        push eax                // pWaterLevel
+        push [ebp+8]            // Plant position
         push [ebp+4]
         push [ebp]
-        mov eax, 0x6E8580  // CWaterLevel::GetWaterLevelNoWaves
+        mov eax, 0x6E8580       // CWaterLevel::GetWaterLevelNoWaves
         call eax
         add esp, 0x18
         add esp, 4
         test al, al
-        jnz watercheck  // only compare plant.z to water level if there actually is water here
+        jnz watercheck          // only compare plant.z to water level if there actually is water here
 
-        xor eax, eax  // if there's no water, assume "plant above water"
+        xor eax, eax            // if there's no water, assume "plant above water"
         jmp rendercheck
 
 watercheck:
@@ -5650,10 +5934,10 @@ watercheck:
         add esp, 8
 
 rendercheck:
-          // NOTE: Causes some foliage not generating in certain places when uncommented (see also: PR #2679)
-          // xor eax, [esp+0x88+4]   // Decide whether or not to draw the plant right now
-          // cmp eax, [esp+0x88+8]
-          // jnz fail
+        // NOTE: Causes some foliage not generating in certain places when uncommented (see also: PR #2679)
+        // xor eax, [esp+0x88+4]   // Decide whether or not to draw the plant right now
+        // cmp eax, [esp+0x88+8]
+        // jnz fail
 
         mov ax, [esi-0x10]
         mov edx, edi
@@ -5663,6 +5947,7 @@ rendercheck:
 fail:
         jmp RETURN_CPlantMgr_Render_fail
     }
+    // clang-format on
 }
 
 /* This hook called from CEventHandler::ComputeKnockOffBikeResponse makes sure the
@@ -5692,23 +5977,27 @@ void                     CEventHandler_ComputeKnockOffBikeResponse()
 DWORD                 dw_CEventDamage_AffectsPed = 0x4b35a0;
 void _declspec(naked) HOOK_CEventHandler_ComputeKnockOffBikeResponse()
 {
+    // clang-format off
     _asm
-        {
+    {
         mov     pBikeDamageInterface, ecx
         mov     pBikePedInterface, edx
         mov     eax, [edi+40]
         mov     fBikeDamage, eax
 
         pushad
-        }
+    }
+    // clang-format on
     CEventHandler_ComputeKnockOffBikeResponse();
 
+    // clang-format off
     _asm
     {
         popad
         call    dw_CEventDamage_AffectsPed
         jmp     RETURN_CEventHandler_ComputeKnockOffBikeResponse
     }
+    // clang-format on
 }
 
 CPedSAInterface* weaponSkillPed;
@@ -5754,6 +6043,7 @@ bool             CPed_GetWeaponSkill()
 
 void _declspec(naked) HOOK_CPed_GetWeaponSkill()
 {
+    // clang-format off
     _asm
     {
         mov     weaponSkillPed, ecx
@@ -5761,18 +6051,22 @@ void _declspec(naked) HOOK_CPed_GetWeaponSkill()
         mov     weaponSkillWeapon, eax
         pushad
     }
+    // clang-format on
 
     if (CPed_GetWeaponSkill())
     {
+        // clang-format off
         _asm
-            {
+        {
             popad
             mov     al, weaponSkill
             retn    4
-            }
+        }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             popad
@@ -5781,6 +6075,7 @@ void _declspec(naked) HOOK_CPed_GetWeaponSkill()
             cmp     esi, 16h
             jmp     RETURN_CPed_GetWeaponSkill
         }
+        // clang-format on
     }
 }
 
@@ -5795,6 +6090,7 @@ bool _cdecl CPed_AddGogglesModelCheck(void* pPedInterface)
 
 void _declspec(naked) HOOK_CPed_AddGogglesModel()
 {
+    // clang-format off
     _asm
     {
         push esi
@@ -5810,6 +6106,7 @@ void _declspec(naked) HOOK_CPed_AddGogglesModel()
     skip:
         jmp RETURN_CPed_AddGogglesModel
     }
+    // clang-format on
 }
 
 void CMultiplayerSA::DeleteAndDisableGangTags()
@@ -5827,20 +6124,24 @@ void CMultiplayerSA::DeleteAndDisableGangTags()
             DWORD* pTagInterface = VAR_TagInfoArray[i << 1];
             if (pTagInterface)
             {
+                // clang-format off
                 _asm
-                    {
+                {
                     push pTagInterface
                     call dwFunc
                     add esp, 4
-                    }
+                }
+                // clang-format on
             }
         }
 
         dwFunc = FUNC_CTagManager_ShutdownForRestart;
+        // clang-format off
         _asm
-            {
+        {
             call dwFunc
-            }
+        }
+        // clang-format on
 
         // Disallow spraying gang tags
         // Nop the whole CTagManager::IsTag function and replace its body with:
@@ -5891,16 +6192,19 @@ bool                  CPhysical_ProcessCollisionSectorList()
 
 void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList()
 {
+    // clang-format off
     _asm
     {
         mov     pCollisionPhysicalThis, esi
         mov     pCollisionPhysical, edi
         pushad
     }
+    // clang-format on
 
     // Carry on with collision? (sets the CElement->bUsesCollision flag check)
     if (CPhysical_ProcessCollisionSectorList())
     {
+        // clang-format off
         _asm
         {
             popad
@@ -5908,9 +6212,11 @@ void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList()
             test    byte ptr [edi+1Ch], 1
             jmp     RETURN_CPhysical_ProcessCollisionSectorList
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             popad
@@ -5920,6 +6226,7 @@ void _declspec(naked) HOOK_CPhysical_ProcessCollisionSectorList()
             mov     edi, pCollisionPhysical
             jmp     RETURN_CPhysical_ProcessCollisionSectorList
         }
+        // clang-format on
     }
 }
 
@@ -5973,22 +6280,24 @@ void _cdecl CheckMatrix(float* pMatrix)
 // hooked at 7C5A5C 5 bytes
 void _declspec(naked) HOOK_CheckAnimMatrix()
 {
+    // clang-format off
     _asm
     {
         // Replaced code
         lea     ecx, [esp+054h]
         pushad
 
-            // Verify matrix
+        // Verify matrix
         push ecx
         call CheckMatrix
         add esp, 4
 
         popad
-            // continue standard path
+        // continue standard path
         push    eax
-        jmp     RETURN_CheckAnimMatrix  // 7C5A61
+        jmp     RETURN_CheckAnimMatrix      // 7C5A61
     }
+    // clang-format on
 }
 
 static SColor vehColors[4];
@@ -6005,6 +6314,7 @@ void _cdecl SaveVehColors(DWORD dwThis)
 
 void _declspec(naked) HOOK_VehCol()
 {
+    // clang-format off
     _asm
     {
         // Get vehColors for this vehicle
@@ -6014,7 +6324,7 @@ void _declspec(naked) HOOK_VehCol()
         add esp, 4
         popad
 
-            // Hooked from 006D6603  9 bytes
+        // Hooked from 006D6603  9 bytes
         mov         dl, 3
         mov         al, 2
         mov         cl, 1
@@ -6025,10 +6335,12 @@ void _declspec(naked) HOOK_VehCol()
 
         jmp     RETURN_VehCol  // 006D660C
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_VehColCB()
 {
+    // clang-format off
     _asm
     {
         // Hooked from 004C838D  29 bytes
@@ -6045,6 +6357,7 @@ void _declspec(naked) HOOK_VehColCB()
 
         jmp     RETURN_VehColCB  // 004C83AA
     }
+    // clang-format on
 }
 
 // Check if this vehicle is allowed to process swinging doors.
@@ -6063,28 +6376,34 @@ static bool        AllowSwingingDoors()
 
 void _declspec(naked) HOOK_CAutomobile__ProcessSwingingDoor()
 {
+    // clang-format off
     _asm
     {
         mov     dwSwingingDoorAutomobile, esi
         mov     ecx, [esi+eax*4+0x648]
         pushad
     }
+    // clang-format on
 
     if (AllowSwingingDoors())
     {
+        // clang-format off
         _asm
         {
             popad
             jmp     dwSwingingRet1
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             popad
             jmp     dwSwingingRet2
         }
+        // clang-format on
     }
 }
 
@@ -6127,17 +6446,20 @@ bool                 CheckHasSuspensionChanged()
 }
 void _declspec(naked) HOOK_ProcessVehicleCollision()
 {
+    // clang-format off
     _asm
     {
         mov     pSuspensionInterface, esi
         pushad
     }
+    // clang-format on
 
     if (CheckHasSuspensionChanged())
     {
         // When the vehicle's collision is about to be processed, set its per-vehicle
         // suspension lines as the per-model suspension lines, and restore the per-model lines
         // afterwards
+        // clang-format off
         _asm
         {
             popad
@@ -6155,7 +6477,7 @@ void _declspec(naked) HOOK_ProcessVehicleCollision()
                 push dword ptr [esp+0x18+0xC]
                 push dword ptr [esp+0x1C+8]
                 push dword ptr [esp+0x20+4]
-                mov eax, 0x4185C0  // CCollision::ProcessColModels
+                mov eax, 0x4185C0       // CCollision::ProcessColModels
                 call eax
                 add esp, 0x20
 
@@ -6171,15 +6493,18 @@ void _declspec(naked) HOOK_ProcessVehicleCollision()
             pop eax
             ret
         }
+        // clang-format on
     }
     else
     {
         // Skip our code in this case because they haven't changed anything so it'l just cause problems.
+        // clang-format off
         _asm
         {
             popad
             jmp dwSuspensionChangedJump
         }
+        // clang-format on
     }
 }
 
@@ -6233,21 +6558,25 @@ bool CheckRemovedModel()
 // Hook 1
 void _declspec(naked) HOOK_LoadIPLInstance()
 {
+    // clang-format off
     _asm
     {
         pushad
         mov pEntityWorldAdd, ecx
     }
+    // clang-format on
     if (pEntityWorldAdd)
     {
         CheckRemovedModel();
     }
+    // clang-format off
     _asm
     {
         popad
         jmp CALL_LoadIPLInstance
         jmp RETURN_LoadIPLInstance
     }
+    // clang-format on
 }
 static bool bTest = false;
 // Binary
@@ -6292,17 +6621,21 @@ void HideEntitySomehow()
 // Hook 2
 void _declspec(naked) HOOK_CWorld_LOD_SETUP()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
         mov pLODInterface, esi
-        }
+    }
+    // clang-format on
     HideEntitySomehow();
+    // clang-format off
     _asm
     {
         popad
         jmp CALL_CWorld_LODSETUP
     }
+    // clang-format on
 }
 
 CEntitySAInterface* pBuildingAdd = NULL;
@@ -6318,17 +6651,21 @@ void                StorePointerToBuilding()
 // tries to remove.)
 void _declspec(naked) Hook_AddBuildingInstancesToWorld()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
         mov pBuildingAdd, edx
-        }
+    }
+    // clang-format on
     StorePointerToBuilding();
+    // clang-format off
     _asm
     {
         popad
         jmp JMP_CWorld_Add_AddBuildingInstancesToWorld_CALL_CWorldAdd
     }
+    // clang-format on
 }
 
 bool CheckForRemoval()
@@ -6350,19 +6687,23 @@ bool CheckForRemoval()
 // Call to CWorld::Add in CPopulation::ConvertToRealObject we just use this to get a list of pointers to valid objects for instant removal
 void _declspec(naked) Hook_CWorld_ADD_CPopulation_ConvertToRealObject()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
         mov pBuildingAdd, esi
         mov pLODInterface, esi
-        }
+    }
+    // clang-format on
     StorePointerToBuilding();
+    // clang-format off
     _asm
     {
         popad
         jmp JMP_CWorld_Add_CPopulation_ConvertToRealObject_CallCWorldAdd
         jmp JMP_CWorld_Add_CPopulation_ConvertToRealObject_Retn
     }
+    // clang-format on
 }
 
 void RemoveObjectIfNeeded()
@@ -6389,18 +6730,32 @@ void RemoveObjectIfNeeded()
 // on stream in -> create and remove it from the world just after so we can restore easily
 void _declspec(naked) HOOK_ConvertToObject_CPopulationManageDummy()
 {
+    // clang-format off
     _asm
     {
         pushad
         mov pBuildingAdd, edx
         mov pLODInterface, edx
     }
-    _asm {popad push edx call CALL_Convert_To_Real_Object_CPopulation_ManageDummy pop ecx mov pLODInterface, ecx pushad} RemoveObjectIfNeeded();
+    // clang-format on
+    // clang-format off
+    _asm
+    {
+        popad
+        push edx
+        call CALL_Convert_To_Real_Object_CPopulation_ManageDummy
+        pop ecx
+        mov pLODInterface, ecx
+        pushad
+    }  // clang-format on
+    RemoveObjectIfNeeded();
+    // clang-format off
     _asm
     {
         popad
         jmp JMP_RETN_Cancel_CPopulation_ManageDummy
     }
+    // clang-format on
 }
 
 CEntitySAInterface* pBuildingRemove = NULL;
@@ -6417,13 +6772,15 @@ DWORD dwCWorldRemove = 0x563280;
 // remove the new dummy if we need to do so before returning
 void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
         mov pBuildingRemove, esi
         mov pBuildingAdd, edi
         mov pLODInterface, edi
-        }
+    }
+    // clang-format on
     TIMING_CHECKPOINT("+RemovePointerToBuilding");
     RemovePointerToBuilding();
     StorePointerToBuilding();
@@ -6434,11 +6791,13 @@ void _declspec(naked) HOOK_CWorld_Remove_CPopulation_ConvertToDummyObject()
         RemoveObjectIfNeeded();
 
     TIMING_CHECKPOINT("-RemovePointerToBuilding");
+    // clang-format off
     _asm
     {
         popad
         jmp dwCWorldRemove
     }
+    // clang-format on
 }
 // if it's replaced get rid of it
 void RemoveDummyIfReplaced()
@@ -6457,27 +6816,32 @@ void RemoveDummyIfReplaced()
 // Function that handles dummy -> object so we can cancel this process if need be
 void _declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
         mov pLODInterface, edi
         mov pBuildingAdd, edi
-        }
+    }
+    // clang-format on
 
     TIMING_CHECKPOINT("+CheckForRemoval");
     StorePointerToBuilding();
     if (CheckForRemoval())
     {
         TIMING_CHECKPOINT("-CheckForRemoval");
+        // clang-format off
         _asm
         {
             popad
             jmp JMP_RETN_Cancelled_CPopulation_ConvertToDummyObject
         }
+        // clang-format on
     }
     else
     {
         TIMING_CHECKPOINT("-CheckForRemoval");
+        // clang-format off
         _asm
         {
             popad
@@ -6485,61 +6849,75 @@ void _declspec(naked) HOOK_CWorld_Add_CPopulation_ConvertToDummyObject()
             call CALL_CWorld_Add_CPopulation_ConvertToDummyObject
             jmp JMP_RETN_Called_CPopulation_ConvertToDummyObject
         }
+        // clang-format on
     }
 }
 
 // Destructors to catch element deletion so we can delete their entries
 void _declspec(naked) Hook_CBuilding_DTR()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
         mov pBuildingRemove, ecx
-        }
+    }
+    // clang-format on
     RemovePointerToBuilding();
+    // clang-format off
     _asm
     {
         popad
         jmp JMP_CBuilding_DTR
     }
+    // clang-format on
 }
 
 void _declspec(naked) Hook_CDummy_DTR()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
         mov pBuildingRemove, ecx
-        }
+    }
+    // clang-format on
     RemovePointerToBuilding();
+    // clang-format off
     _asm
     {
         popad
         jmp JMP_CDummy_DTR
     }
+    // clang-format on
 }
 
 DWORD                 dwObjectVtbl = 0x866F60;
 void _declspec(naked) Hook_CObject_DTR()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
         mov pBuildingRemove, esi
-        }
+    }
+    // clang-format on
     RemovePointerToBuilding();
+    // clang-format off
     _asm
     {
         popad
         mov dword ptr [esi], offset dwObjectVtbl
         jmp JMP_CObject_DTR
     }
+    // clang-format on
 }
 
 static DWORD          dwEntityVtbl;
 static DWORD          dwMultResult;
 void _declspec(naked) HOOK_CEntity_IsOnScreen_FixObjectScale()
 {
+    // clang-format off
     _asm
     {
         push    0xB6FA74
@@ -6548,20 +6926,32 @@ void _declspec(naked) HOOK_CEntity_IsOnScreen_FixObjectScale()
         mov     eax, [esi]
         mov     dwEntityVtbl, eax
     }
+    // clang-format on
 
     if (dwEntityVtbl == 0x866F60) goto IsOnScreen_IsObject;
 
+    // clang-format off
     _asm
-        {
+    {
         popad
         mov     esi, ecx
         jmp     JMP_CEntity_IsOnScreen_FixObjectsScale
-        }
-
-    IsOnScreen_IsObject : _asm
-    {
-        popad fld[eax + 0x24] fld[esi + 0x15C] fmulp st(1), st(0) fstp dwMultResult mov esi, dwMultResult jmp JMP_CEntity_IsOnScreen_FixObjectsScale
     }
+    // clang-format on
+
+    IsOnScreen_IsObject :
+        // clang-format off
+    _asm
+    {
+        popad
+        fld     [eax+0x24]
+        fld     [esi+0x15C]
+        fmulp   st(1), st(0)
+        fstp    dwMultResult
+        mov     esi, dwMultResult
+        jmp     JMP_CEntity_IsOnScreen_FixObjectsScale
+    }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -6569,21 +6959,23 @@ void _declspec(naked) HOOK_CEntity_IsOnScreen_FixObjectScale()
 // hooked at 5A82C0 8 bytes
 void _declspec(naked) HOOK_CClothes_RebuildPlayer()
 {
+    // clang-format off
     _asm
     {
         push    esi
         mov     esi, [esp+8]
         movsx   eax, word ptr [esi+34]
         cmp     eax, 0
-        jne     cont  // Not CJ, so skip
+        jne     cont        // Not CJ, so skip
 
-         // continue standard path
+        // continue standard path
         mov     eax, [esi+18h]
         jmp     RETURN_CClothes_RebuildPlayera  // 005A82C8
 
     cont:
         jmp     RETURN_CClothes_RebuildPlayerb  // 005A837F
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlayerVehicle()
@@ -6592,11 +6984,13 @@ void _declspec(naked) HOOK_CProjectileInfo_Update_FindLocalPlayer_FindLocalPlaye
     // 00739570 E8 5B 4B E3 FF                          call    FindPlayerVehicle < HOOK >
     // Checks if the creator is the local player ped or the creator is the local player peds vehicle else decreases the velocity substantially.
     // We are forcing it to think the creator is not the local player ped or his vehicle for this specific check
+    // clang-format off
     _asm
     {
         xor eax, eax
         retn
     }
+    // clang-format on
 }
 
 void CMultiplayerSA::SetAutomaticVehicleStartupOnPedEnter(bool bSet)
@@ -6654,6 +7048,7 @@ void _declspec(naked) HOOK_CHeli_ProcessHeliKill()
     // We hook just after the check if he's touched the blade as before that it's just got the results of if he's near enough the heli to hit the blades
     // esi = Heli
     // edi = ped
+    // clang-format off
     _asm
     {
         pushfd
@@ -6661,30 +7056,35 @@ void _declspec(naked) HOOK_CHeli_ProcessHeliKill()
         mov pHeliKiller, esi
         mov pHitByHeli, edi
     }
+    // clang-format on
     //   Call our event
     if (CallHeliKillEvent() == false)
     {
+        // clang-format off
         _asm
         {
             popad
             popfd
-             // Go to the end of the while loop and let it start again
+            // Go to the end of the while loop and let it start again
             jmp RETURN_CHeli_ProcessHeliKill_RETN_Cancel
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             popad
             popfd
-             // do our JNZ
+            // do our JNZ
             jnz lp1
-                 // if it failed do our continue
+            // if it failed do our continue
             jmp RETURN_CHeli_ProcessHeliKill_RETN_Cont_Zero
 
 lp1:        jmp RETURN_CHeli_ProcessHeliKill_6DB437h
         }
+        // clang-format on
     }
 }
 
@@ -6713,6 +7113,7 @@ void _declspec(naked) HOOK_CObject_ProcessDamage()
     // .text:005A0E07                 fsubr   dword ptr [esi+154h]
     // .text:005A0E0D                 fst     dword ptr [esi+154h]
 
+    // clang-format off
     _asm
     {
         pushad
@@ -6720,19 +7121,23 @@ void _declspec(naked) HOOK_CObject_ProcessDamage()
         mov     pObjectAttacker, edi
         fst     dword ptr fNewObjectHealth
     }
+    // clang-format on
     if (TriggerObjectDamageEvent())
     {
         bObjectDamaged = true;
+        // clang-format off
         _asm
         {
             popad
             fst     dword ptr [esi+154h]
             jmp     RETURN_CObject_ProcessDamage
         }
+        // clang-format on
     }
     else
     {
         bObjectDamaged = false;
+        // clang-format off
         _asm
         {
             popad
@@ -6740,6 +7145,7 @@ void _declspec(naked) HOOK_CObject_ProcessDamage()
             fdecstp
             jmp     RETURN_CObject_ProcessDamage_Cancel
         }
+        // clang-format on
     }
 }
 
@@ -6755,10 +7161,12 @@ bool          TriggerObjectBreakEvent()
 
 void _declspec(naked) HOOK_CObject_ProcessBreak()
 {
+    // clang-format off
     _asm
-        {
+    {
         pushad
-        }
+    }
+    // clang-format on
     ucColDamageEffect = *(unsigned char*)((DWORD)pDamagedObject + 324);
 
     if (ucColDamageEffect != NULL)
@@ -6768,27 +7176,32 @@ void _declspec(naked) HOOK_CObject_ProcessBreak()
             if (!TriggerObjectBreakEvent())
             {
                 bObjectDamaged = false;
+                // clang-format off
                 _asm
                 {
                     popad
                     jmp     RETURN_CObject_ProcessDamage_Cancel
                 }
+                // clang-format on
             }
         }
     }
 
+    // clang-format off
     _asm
     {
         popad
         cmp     eax, 0C9h
         jmp     RETURN_CObject_ProcessBreak
     }
+    // clang-format on
 }
 
 void _declspec(naked) HOOK_CObject_ProcessCollision()
 {
     if (bObjectDamaged)
     {
+        // clang-format off
         _asm
         {
             test    byte ptr [esi+1Ch], 1
@@ -6798,35 +7211,42 @@ void _declspec(naked) HOOK_CObject_ProcessCollision()
         checkfordynamic:
             jmp     JMP_DynamicObject_Cond_Zero
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             jmp     RETURN_CObject_ProcessCollision
         }
+        // clang-format on
     }
 }
 
 DWORD                 WindowRespondsToCollision_CalledFrom = 0;
 void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
 {
+    // clang-format off
     _asm
-        {
+    {
         push eax
         mov eax, [esp + 4]
         mov WindowRespondsToCollision_CalledFrom, eax
         pop eax
-        }
+    }
+    // clang-format on
 
     pObjectAttacker = nullptr;
 
     if (WindowRespondsToCollision_CalledFrom != CALL_FROM_CGlass_WindowRespondsToExplosion)
     {
+        // clang-format off
         _asm
         {
             mov pDamagedObject, esi
         }
+        // clang-format on
     }
 
     // Get attacker for the glass break
@@ -6834,21 +7254,26 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
         WindowRespondsToCollision_CalledFrom == CALL_FROM_CPhysical_ApplyCollision_2 ||
         WindowRespondsToCollision_CalledFrom == CALL_FROM_CPhysical_ApplySoftCollision)
     {
+        // clang-format off
         _asm
         {
             mov pObjectAttacker, edi
         }
+        // clang-format on
     }
 
     if (WindowRespondsToCollision_CalledFrom == CALL_FROM_CGlass_WasGlassHitByBullet)
     {
+        // clang-format off
         _asm
         {
-            mov pObjectAttacker, ebx  // WasGlassHitByBullet called from CWeapon::DoBulletImpact
+            mov pObjectAttacker, ebx // WasGlassHitByBullet called from CWeapon::DoBulletImpact
         }
+        // clang-format on
 
         if (!pObjectAttacker || (pObjectAttacker && !pObjectAttacker->m_pRwObject))  // WasGlassHitByBullet called from CBulletInfo::Update
         {
+            // clang-format off
             _asm
             {
                 push ecx
@@ -6856,16 +7281,19 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
                 mov pObjectAttacker, ecx
                 pop ecx
             }
+            // clang-format on
         }
     }
 
     if (WindowRespondsToCollision_CalledFrom == CALL_FROM_CGlass_WindowRespondsToExplosion)
     {
+        // clang-format off
         _asm
         {
             mov pDamagedObject, edx
             mov pObjectAttacker, ebp
         }
+        // clang-format on
     }
 
     if (pObjectAttacker && !pObjectAttacker->m_pRwObject)  // Still wrong?
@@ -6873,6 +7301,7 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
 
     if (TriggerObjectBreakEvent())
     {
+        // clang-format off
         _asm
         {
             sub esp, 68h
@@ -6880,13 +7309,16 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
             mov esi, [esp+6Ch+4]
             jmp RETURN_CGlass_WindowRespondsToCollision
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             retn
         }
+        // clang-format on
     }
 }
 
@@ -6894,6 +7326,7 @@ void _declspec(naked) HOOK_CGlass_WindowRespondsToCollision()
 DWORD                 dummy_404350 = 0x404350;
 void _declspec(naked) HOOK_CGlass__BreakGlassPhysically()
 {
+    // clang-format off
     _asm
     {
         mov     pDamagedObject, esi
@@ -6902,19 +7335,23 @@ void _declspec(naked) HOOK_CGlass__BreakGlassPhysically()
         mov     pObjectAttacker, ecx
         pop     ecx
     }
+    // clang-format on
 
     if (TriggerObjectBreakEvent())
     {
+        // clang-format off
         _asm
         {
             // restore replaced part
             push    dummy_404350
-                // jump outside of the hook
+            // jump outside of the hook
             jmp     RETURN_CGlass__BreakGlassPhysically
         }
+        // clang-format on
     }
     else
     {
+        // clang-format off
         _asm
         {
             pop     edi
@@ -6924,6 +7361,7 @@ void _declspec(naked) HOOK_CGlass__BreakGlassPhysically()
             add     esp, 0BCh
             retn
         }
+        // clang-format on
     }
 }
 
@@ -6938,25 +7376,29 @@ void  FxManager_c__DestroyFxSystem()
 
 void _declspec(naked) HOOK_FxManager_c__DestroyFxSystem()
 {
+    // clang-format off
     _asm
-        {
+    {
         mov pFxSystemToBeDestroyed, edi
         pushad
-        }
+    }
+    // clang-format on
 
     FxManager_c__DestroyFxSystem();
 
+    // clang-format off
     _asm
-        {
+    {
         popad
 
-             // Replaced code
+        // Replaced code
         add esp, 4
         pop edi
         pop ebx
         pop ecx
         retn 4
-        }
+    }
+    // clang-format on
 }
 
 DWORD pProcessedGangDriveBySimpleTask;
@@ -6973,24 +7415,28 @@ DWORD                 RETURN_CTaskSimpleGangDriveBy_ProcessPed_Cancel = 0x62D5C1
 void _declspec(naked) HOOK_CTaskSimpleGangDriveBy__ProcessPed()
 {
     // esi contains 'this'
+    // clang-format off
     _asm
-        {
+    {
         mov pProcessedGangDriveBySimpleTask, esi
         pushad
-        }
+    }
+    // clang-format on
     CTaskSimpleGangDriveBy__ProcessPed();
+    // clang-format off
     _asm
     {
         popad
-         // Replaced code
-        cmp[esi + 28h], edi  // .text:0062D5A7
+        // Replaced code
+        cmp[esi + 28h], edi                // .text:0062D5A7
         jnz GangDriveBy_ProcessPed_Cancel  // .text:0062D5AA
-                                           // Return to original code
+        // Return to original code
         jmp RETURN_CTaskSimplyGangDriveBy__ProcessPed
 
     GangDriveBy_ProcessPed_Cancel:
         jmp RETURN_CTaskSimpleGangDriveBy_ProcessPed_Cancel
     }
+    // clang-format on
 }
 
 eRadioStationID dwStationID = UNKNOWN;
@@ -7167,72 +7613,83 @@ void _declspec(naked) HOOK_CAERadioTrackManager__ChooseMusicTrackIndex()
     // esi is our station id
     // al has the random number picked (music id the game wants to play)
 
+    // clang-format off
     _asm
     {
-        add esp, 8  // fix the stack from the function call above as we overrote this instruction
-        pushad  // save our registers
-        mov dwStationID, esi  // save esi, we need the station ID above
-        mov bTrackID, al  // save our track ID which we need to figure out if we can play it.
+        add esp, 8              // fix the stack from the function call above as we overrote this instruction
+        pushad                  // save our registers
+        mov dwStationID, esi    // save esi, we need the station ID above
+        mov bTrackID, al        // save our track ID which we need to figure out if we can play it.
     }
+    // clang-format on
 
     // returns true if this is a restricted song
     if (ChooseMusicTrackIndex_SteamFix())
     {
+        // clang-format off
         _asm
         {
             // pop the stack
             popad
-                // go back to generating a number again, this is so that we don't get stuck in an infinite loop if we tried to increment or decrement
-                // SA tries to avoid playing the same songs close together so it won't play anything that's already played once until we have done a full loop
-                // as such generating a new ID is better than trying to fix it (this is how the game naturally works anyway)
+            // go back to generating a number again, this is so that we don't get stuck in an infinite loop if we tried to increment or decrement
+            // SA tries to avoid playing the same songs close together so it won't play anything that's already played once until we have done a full loop
+            // as such generating a new ID is better than trying to fix it (this is how the game naturally works anyway)
             jmp RETURN_CAERadioTrackManager__ChooseMusicTrackIndex_Regenerate
         }
+        // clang-format on
     }
     // looks good, carry on
+    // clang-format off
     _asm
     {
         // pop the stack
         popad
-            // this number of tracks needs fixing because we need the game to know about the deletions here as it is used for the wrap around logic of radio
+        // this number of tracks needs fixing because we need the game to know about the deletions here as it is used for the wrap around logic of radio
         mov ecx, dwNumberOfTracks
-            // jump back to normal processing
+        // jump back to normal processing
         jmp RETURN_CAERadioTrackManager__ChooseMusicTrackIndex
     }
+    // clang-format on
 }
 
 // Use AI heli rotor sound if player sound bank is not loaded
 void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyHeli()
 {
+    // clang-format off
     _asm
     {
         // push our argument
         push    [esp+8Ch+4]
         mov     ecx, esi
-            // call twin function
+        // call twin function
         call    dwFUNC_CAEVehicleAudioEntity__ProcessAIHeli
-                // go back
+        // go back
         jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyHeli
     }
+    // clang-format on
 }
 
 // Use AI plane propeller sound if player sound bank is not loaded
 void _declspec(naked) HOOK_CAEVehicleAudioEntity__ProcessDummyProp()
 {
+    // clang-format off
     _asm
     {
         // push our argument
         push    [esp+98h+4]
         mov     ecx, esi
-            // call twin function
+        // call twin function
         call    dwFUNC_CAEVehicleAudioEntity__ProcessAIProp
-                // go back
+        // go back
         jmp     RETURN_CAEVEhicleAudioEntity__ProcessDummyProp
     }
+    // clang-format on
 }
 
 const float           kfTimeStepOriginal = 1.66f;
 void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
 {
+    // clang-format off
     _asm
     {
         fsub    st, st(1)
@@ -7261,6 +7718,7 @@ void _declspec(naked) HOOK_CTaskSimpleSwim_ProcessSwimmingResistance()
 
         jmp     RETURN_CTaskSimpleSwim_ProcessSwimmingResistance
     }
+    // clang-format on
 }
 
 void PostCWorld_ProcessPedsAfterPreRender()
@@ -7294,12 +7752,14 @@ void PostCWorld_ProcessPedsAfterPreRender()
 const DWORD           CWorld_ProcessPedsAfterPreRender = 0x563430;
 void _declspec(naked) HOOK_Idle_CWorld_ProcessPedsAfterPreRender()
 {
+    // clang-format off
     __asm
     {
        call CWorld_ProcessPedsAfterPreRender
        call PostCWorld_ProcessPedsAfterPreRender
        jmp RETURN_Idle_CWorld_ProcessPedsAfterPreRender
     }
+    // clang-format on
 }
 
 DWORD dwLastRequestedStation = -1;
@@ -7318,6 +7778,7 @@ void  CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_ChangeStation(DWORD 
 // Start radio after entering audio zone
 void _declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StartRadio()
 {
+    // clang-format off
     _asm
     {
         push    [esi+3]
@@ -7330,11 +7791,13 @@ void _declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume
         add     esp, 36
         retn
     }
+    // clang-format on
 }
 
 // Stop radio after leaving audio zone
 void _declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume_StopRadio()
 {
+    // clang-format off
     _asm
     {
         push    0
@@ -7347,6 +7810,7 @@ void _declspec(naked) HOOK_CAEAmbienceTrackManager__UpdateAmbienceTrackAndVolume
         add     esp, 36
         retn
     }
+    // clang-format on
 }
 
 static void AddVehicleColoredDebris(CAutomobileSAInterface* pVehicleInterface, CVector& vecPosition, int count)
@@ -7369,17 +7833,19 @@ static void AddVehicleColoredDebris(CAutomobileSAInterface* pVehicleInterface, C
 const DWORD           RETURN_CAutomobile__dmgDrawCarCollidingParticles = 0x6A7081;
 void _declspec(naked) HOOK_CAutomobile__dmgDrawCarCollidingParticles()
 {
+    // clang-format off
     _asm
     {
         lea eax, [esp + 0x1C]
-        push ebp  // count
-        push eax  // pos
-        push edi  // vehicle
+        push ebp                // count
+        push eax                // pos
+        push edi                // vehicle
         call AddVehicleColoredDebris
         add esp, 12
 
         jmp RETURN_CAutomobile__dmgDrawCarCollidingParticles
     }
+    // clang-format on
 }
 
 // Reimplement camera photo creation
@@ -7392,6 +7858,7 @@ static void TakePhotograph()
 const DWORD           RETURN_CWeapon__TakePhotograph = 0x73C273;
 void _declspec(naked) HOOK_CWeapon__TakePhotograph()
 {
+    // clang-format off
     _asm
     {
         // Restore instructions replaced by hook
@@ -7400,9 +7867,10 @@ void _declspec(naked) HOOK_CWeapon__TakePhotograph()
 
         call    TakePhotograph
 
-                // Go back
+        // Go back
         jmp     RETURN_CWeapon__TakePhotograph
     }
+    // clang-format on
 }
 
 // Disable camera collisions for projectiles and detached vehicle parts
@@ -7434,6 +7902,7 @@ bool CanEntityCollideWithCamera(CEntitySAInterface* pEntity)
 
 void _declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
 {
+    // clang-format off
     _asm
     {
         // Restore instructions replaced by hook
@@ -7443,13 +7912,13 @@ void _declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
         // Store all registers
         pushad
 
-            // Do our stuff
-        push    esi  // pEntity
+        // Do our stuff
+        push    esi // pEntity
         call    CanEntityCollideWithCamera
         add     esp, 4
         test    al, al
 
-            // Restore registers
+        // Restore registers
         popad
 
         jnz     out1
@@ -7458,4 +7927,5 @@ void _declspec(naked) HOOK_CCollision__CheckCameraCollisionObjects()
     out1: jmp   RETURN_CCollision__CheckCameraCollisionObjects
     out2: jmp   RETURN_CCollision__CheckCameraCollisionObjects_2
     }
+    // clang-format on
 }

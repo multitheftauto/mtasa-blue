@@ -87,6 +87,7 @@ __declspec(noinline) void _cdecl OnStreamingAddedTxd(DWORD dwTxdId)
 // called from streaming on TXD create
 void _declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 {
+    // clang-format off
     _asm
     {
         // Hooked from 731D55  6 bytes
@@ -98,10 +99,11 @@ void _declspec(naked) HOOK_CTxdStore_SetupTxdParent()
         add esp, 4
         popad
 
-            // orig
+        // orig
         mov     esi, ds:00C8800Ch
         jmp     RETURN_CTxdStore_SetupTxdParent  // 731D5B
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -120,6 +122,7 @@ __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 // called from streaming on TXD destroy
 void _declspec(naked) HOOK_CTxdStore_RemoveTxd()
 {
+    // clang-format off
     _asm
     {
         // Hooked from 731E90  6 bytes
@@ -131,10 +134,11 @@ void _declspec(naked) HOOK_CTxdStore_RemoveTxd()
         add esp, 4
         popad
 
-            // orig
+        // orig
         mov     ecx, ds:00C8800Ch
-        jmp     RETURN_CTxdStore_RemoveTxd  // 731E96
+        jmp     RETURN_CTxdStore_RemoveTxd      // 731E96
     }
+    // clang-format on
 }
 
 ////////////////////////////////////////////////////////////////
@@ -692,6 +696,7 @@ __declspec(noinline) void OnMY_RwTextureSetName(DWORD dwAddrCalledFrom, RwTextur
 DWORD                 RETURN_RwTextureSetName = 0x7F38A9;
 void _declspec(naked) HOOK_RwTextureSetName()
 {
+    // clang-format off
     _asm
     {
         pushad
@@ -706,6 +711,7 @@ void _declspec(naked) HOOK_RwTextureSetName()
         mov     ecx, ds:0x0C97B24
         jmp     RETURN_RwTextureSetName
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -726,6 +732,7 @@ __declspec(noinline) void OnMY_RwTextureDestroy_Mid(RwTexture* pTexture)
 DWORD                 RETURN_RwTextureDestroy_Mid = 0x07F3839;
 void _declspec(naked) HOOK_RwTextureDestroy_Mid()
 {
+    // clang-format off
     _asm
     {
         pushad
@@ -737,6 +744,7 @@ void _declspec(naked) HOOK_RwTextureDestroy_Mid()
         push    0x08E23CC
         jmp     RETURN_RwTextureDestroy_Mid
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -770,6 +778,7 @@ __declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Post(DWORD dwAddrCal
 DWORD                 RETURN_RwIm3DRenderIndexedPrimitive = 0x07EF555;
 void _declspec(naked) HOOK_RwIm3DRenderIndexedPrimitive()
 {
+    // clang-format off
     _asm
     {
         pushad
@@ -794,6 +803,7 @@ inner:
         mov     eax, ds:0x0C9C078
         jmp     RETURN_RwIm3DRenderIndexedPrimitive
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -819,6 +829,7 @@ __declspec(noinline) void OnMY_RwIm3DRenderPrimitive_Post(DWORD dwAddrCalledFrom
 DWORD                 RETURN_RwIm3DRenderPrimitive = 0x07EF6B6;
 void _declspec(naked) HOOK_RwIm3DRenderPrimitive()
 {
+    // clang-format off
     _asm
     {
         pushad
@@ -843,6 +854,7 @@ inner:
         mov     ecx, ds:0x0C97B24
         jmp     RETURN_RwIm3DRenderPrimitive
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -868,6 +880,7 @@ __declspec(noinline) void OnMY_RwIm2DRenderIndexedPrimitive_Post(DWORD dwAddrCal
 DWORD                 RETURN_RwIm2DRenderIndexedPrimitive = 0x0403927;
 void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
 {
+    // clang-format off
     _asm
     {
         pushad
@@ -894,6 +907,7 @@ void _declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
 inner:
         jmp     RETURN_RwIm2DRenderIndexedPrimitive
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -919,6 +933,7 @@ __declspec(noinline) void OnMY_RwIm2DRenderPrimitive_Post(DWORD dwAddrCalledFrom
 DWORD                 RETURN_RwIm2DRenderPrimitive = 0x0734E95;
 void _declspec(naked) HOOK_RwIm2DRenderPrimitive()
 {
+    // clang-format off
     _asm
     {
         pushad
@@ -944,6 +959,7 @@ inner:
         mov     eax, ds:0x0C97B24
         jmp     RETURN_RwIm2DRenderPrimitive
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

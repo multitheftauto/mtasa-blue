@@ -345,6 +345,7 @@ void _cdecl OnCClothesBuilderCreateSkinnedClumpPost(RpClump* pRpClumpResult, RpC
 DWORD                 RETURN_CClothesBuilderCreateSkinnedClump = 0x5A69D6;
 void _declspec(naked) HOOK_CClothesBuilderCreateSkinnedClump()
 {
+    // clang-format off
     _asm
     {
         pushad
@@ -360,7 +361,7 @@ void _declspec(naked) HOOK_CClothesBuilderCreateSkinnedClump()
 
         mov     eax,[esp-32-4*5]
         cmp     eax, 0
-        jnz     done  // Use our supplied clump ?
+        jnz     done        // Use our supplied clump ?
 
         push    [esp+0+4*5]
         push    [esp+0+4*5]
@@ -384,10 +385,11 @@ done:
         retn
 
 inside:
-               // Original code
+        // Original code
         sub     esp, 0D4h
         jmp     RETURN_CClothesBuilderCreateSkinnedClump
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////

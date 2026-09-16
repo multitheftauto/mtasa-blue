@@ -504,6 +504,7 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
     DWORD dwReturn;
     DWORD dwFunction = FUNC_GetPed;
 
+    // clang-format off
     _asm {
         mov     ecx, dword ptr ds : [CLASS_CPool_Ped]
         push    dwGameRef
@@ -511,6 +512,7 @@ CPedSAInterface* CPoolsSA::GetPedInterface(DWORD dwGameRef)
         add     esp, 0x4
         mov     dwReturn, eax
     }
+    // clang-format on
 
     CPedSAInterface* pInterface = (CPedSAInterface*)dwReturn;
     return pInterface;
@@ -1073,6 +1075,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
     int iOut = -2;
     if (*(DWORD*)dwThis != NULL)
     {
+        // clang-format off
         _asm
         {
             mov     ecx, dwThis
@@ -1081,6 +1084,7 @@ int CPoolsSA::GetNumberOfUsedSpaces(ePools pool)
             mov     iOut, eax
 
         }
+        // clang-format on
     }
 
     return iOut;
