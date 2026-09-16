@@ -169,4 +169,6 @@ public:
     std::set<RwTexture*>                m_SpecialTextures;
     static int                          ms_iRenderingType;
     static CD3DDUMMY*                   ms_pNoTextureD3DData;  // Fake texture used for draws without a texture
+    static RwTexture*                   ms_pSearchLightSpotTexture;
+    RwTexture*                          GetSearchLightSpotTexture();
 };

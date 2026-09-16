@@ -15,6 +15,7 @@
 #include "CGameSA.h"
 #include "CRenderWareSA.ShaderMatching.h"
 #include "CRenderWareSA.ShaderSupport.h"
+#include "gamesa_renderware.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -25,6 +26,8 @@ extern CGameSA*        pGame;
 #define ADDR_CClothesBuilder_ConstructTextures_End                   0x05A6520
 #define ADDR_CVehicle_DoHeadLightBeam_RenderPrimitive                0x06E13CD
 #define ADDR_CHeli_SearchLightCone_RenderPrimitive                   0x06C62AD
+#define VAR_CShadows_gpShadowExplosionTex                            0x0C403F4
+#define FAKE_NAME_SEARCHLIGHT_SPOT                                   "shad_searchlight"
 #define ADDR_CWaterCannon_Render_RenderPrimitive                     0x072956B
 
 enum
@@ -38,6 +41,7 @@ enum
 
 int        CRenderWareSA::ms_iRenderingType = 0;
 CD3DDUMMY* CRenderWareSA::ms_pNoTextureD3DData = FAKE_D3DTEXTURE_NO_TEXTURE;
+RwTexture* CRenderWareSA::ms_pSearchLightSpotTexture = nullptr;
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -427,6 +431,67 @@ void CRenderWareSA::SetRenderingClientEntity(CClientEntityBase* pClientEntity, u
     m_pRenderingClientEntity = pClientEntity;
     m_usRenderingEntityModelId = usModelId;
     m_iRenderingEntityType = iTypeMask;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetSearchLightSpotTexture
+//
+// The ground spot of a searchlight is drawn by CShadows with the same texture as the
+// light pools of street lamps. Give the searchlights a copy of that texture under a
+// name of their own, so a shader can address the spots without touching the lamps
+// while the spots look exactly as they do in the game.
+//
+////////////////////////////////////////////////////////////////
+RwTexture* CRenderWareSA::GetSearchLightSpotTexture()
+{
+    if (ms_pSearchLightSpotTexture)
+        return ms_pSearchLightSpotTexture;
+
+    RwTexture* pSource = *reinterpret_cast<RwTexture**>(VAR_CShadows_gpShadowExplosionTex);
+    if (!pSource || !pSource->raster || !pSource->raster->renderResource)
+        return nullptr;
+
+    // Read the game texture as plain BGRA rows (the pixels manager also decompresses DXT)
+    CPixelsManagerInterface* pPixelsManager = g_pCore->GetGraphics()->GetPixelsManager();
+    CPixels                  sourcePixels;
+    uint                     uiWidth = 0, uiHeight = 0;
+    if (!pPixelsManager->GetTexturePixels(reinterpret_cast<IDirect3DBaseTexture9*>(pSource->raster->renderResource), sourcePixels) ||
+        !pPixelsManager->GetPixelsSize(sourcePixels, uiWidth, uiHeight) || uiWidth == 0 || uiHeight == 0)
+        return nullptr;
+
+    RwRaster* pRaster = RwRasterCreate(uiWidth, uiHeight, 32, RASTER_TYPE_TEXTURE | RASTER_FORMAT_8888);
+    if (!pRaster)
+        return nullptr;
+
+    if (!RwRasterLock(pRaster, 0, RASTER_LOCK_WRITE) || !pRaster->pixels)
+    {
+        RwRasterDestroy(pRaster);
+        return nullptr;
+    }
+
+    // The sdk struct calls it numLevels, but RenderWare keeps the row stride of the locked raster there
+    const uint uiSourcePitch = uiWidth * sizeof(DWORD);
+    int        iStride = pRaster->numLevels;
+    if (iStride <= 0)
+        iStride = uiSourcePitch;
+    for (uint y = 0; y < uiHeight; y++)
+        memcpy(pRaster->pixels + y * iStride, sourcePixels.GetData() + y * uiSourcePitch, uiSourcePitch);
+    RwRasterUnlock(pRaster);
+
+    RwTexture* pTexture = RwTextureCreate(pRaster);
+    if (!pTexture)
+    {
+        RwRasterDestroy(pRaster);
+        return nullptr;
+    }
+    strncpy(pTexture->name, FAKE_NAME_SEARCHLIGHT_SPOT, RW_TEXTURE_NAME_LENGTH - 1);
+    pTexture->flags = pSource->flags;
+    ms_pSearchLightSpotTexture = pTexture;
+
+    // Make it known to the texture replacer under its own name
+    OnTextureStreamIn(CreateTexInfo(pTexture, FAKE_NAME_SEARCHLIGHT_SPOT, reinterpret_cast<CD3DDUMMY*>(pRaster->renderResource)));
+    return pTexture;
 }
 
 ////////////////////////////////////////////////////////////////
