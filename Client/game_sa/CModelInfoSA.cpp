@@ -26,15 +26,15 @@ extern CGameSA*        pGame;
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
-std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::map<DWORD, unsigned short>                                       CModelInfoSA::ms_ModelDefaultFlagsMap;
-std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::map<unsigned short, int>                                        CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<DWORD, float>                                               CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::map<DWORD, unsigned short>                                      CModelInfoSA::ms_ModelDefaultFlagsMap;
+std::map<DWORD, BYTE>                                                CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<std::uint32_t, std::map<VehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
-std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfoSA::ms_ModelDefaultModelTimeInfo;
-std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
-std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
-std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
+std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>               CModelInfoSA::ms_ModelDefaultModelTimeInfo;
+std::unordered_map<DWORD, unsigned short>                            CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, std::pair<float, float>>                   CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
+std::map<unsigned short, int>                                        CModelInfoSA::ms_DefaultTxdIDMap;
 
 union tIdeFlags
 {
@@ -111,12 +111,12 @@ bool CModelInfoSA::IsBoat()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
-    {
+        {
         push    ModelID
         call    dwFunction
         mov     bReturn, al
         add     esp, 4
-    }
+        }
     return bReturn;
 }
 
@@ -126,12 +126,12 @@ bool CModelInfoSA::IsCar()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
-    {
+        {
         push    ModelID
         call    dwFunction
         mov     bReturn, al
         add     esp, 4
-    }
+        }
     return bReturn;
 }
 
@@ -141,12 +141,12 @@ bool CModelInfoSA::IsTrain()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
-    {
+        {
         push    ModelID
         call    dwFunction
         mov     bReturn, al
         add     esp, 4
-    }
+        }
     return bReturn;
 }
 
@@ -156,12 +156,12 @@ bool CModelInfoSA::IsHeli()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
-    {
+        {
         push    ModelID
         call    dwFunction
         mov     bReturn, al
         add     esp, 4
-    }
+        }
     return bReturn;
 }
 
@@ -171,12 +171,12 @@ bool CModelInfoSA::IsPlane()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
-    {
+        {
         push    ModelID
         call    dwFunction
         mov     bReturn, al
         add     esp, 4
-    }
+        }
     return bReturn;
 }
 
@@ -186,12 +186,12 @@ bool CModelInfoSA::IsBike()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
-    {
+        {
         push    ModelID
         call    dwFunction
         mov     bReturn, al
         add     esp, 4
-    }
+        }
     return bReturn;
 }
 
@@ -201,12 +201,12 @@ bool CModelInfoSA::IsFakePlane()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
-    {
+        {
         push    ModelID
         call    dwFunction
         mov     bReturn, al
         add     esp, 4
-    }
+        }
     return bReturn;
 }
 
@@ -216,12 +216,12 @@ bool CModelInfoSA::IsMonsterTruck()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
-    {
+        {
         push    ModelID
         call    dwFunction
         mov     bReturn, al
         add     esp, 4
-    }
+        }
     return bReturn;
 }
 
@@ -231,12 +231,12 @@ bool CModelInfoSA::IsQuadBike()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
-    {
+        {
         push    ModelID
         call    dwFunction
         mov     bReturn, al
         add     esp, 4
-    }
+        }
     return bReturn;
 }
 
@@ -246,12 +246,12 @@ bool CModelInfoSA::IsBmx()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
-    {
+        {
         push    ModelID
         call    dwFunction
         mov     bReturn, al
         add     esp, 4
-    }
+        }
     return bReturn;
 }
 
@@ -261,12 +261,12 @@ bool CModelInfoSA::IsTrailer()
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
     _asm
-    {
+        {
         push    ModelID
         call    dwFunction
         mov     bReturn, al
         add     esp, 4
-    }
+        }
     return bReturn;
 }
 
@@ -317,8 +317,8 @@ char* CModelInfoSA::GetNameIfVehicle()
     DWORD ModelID = m_dwModelID;
     DWORD dwReturn = 0;
 
-        _asm
-        {
+    _asm
+    {
             push    eax
             push    ebx
             push    ecx
@@ -338,7 +338,7 @@ char* CModelInfoSA::GetNameIfVehicle()
             pop     ecx
             pop     ebx
             pop     eax
-        }
+    }
     return (char*)dwReturn;
 }
 
@@ -512,8 +512,8 @@ void CModelInfoSA::SetFlags(unsigned short usFlags)
         MapSet(ms_ModelDefaultFlagsMap, m_dwModelID, m_pInterface->usFlags);
 
     // Don't change bIsColLoaded flag
-    usFlags &= 0xFF7F;                                  // Disable flag in input
-    usFlags |= m_pInterface->usFlags & 0x80;            // Apply current bIsColLoaded flag
+    usFlags &= 0xFF7F;                        // Disable flag in input
+    usFlags |= m_pInterface->usFlags & 0x80;  // Apply current bIsColLoaded flag
 
     m_pInterface->usFlags = usFlags;
 }
@@ -533,7 +533,7 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
 
     // Default value is 0xC0 (bIsColLoaded + bIsBackfaceCulled)
     // But bIsColLoaded should not be changed
-    m_pInterface->usFlags &= 0x80;            // Reset all flags except bIsColLoaded
+    m_pInterface->usFlags &= 0x80;  // Reset all flags except bIsColLoaded
     m_pInterface->bIsBackfaceCulled = true;
 
     // setBaseModelInfoFlags
@@ -747,7 +747,7 @@ bool CModelInfoSA::IsValid()
 {
     if (m_dwModelID >= MODELINFO_DFF_MAX && m_dwModelID < MODELINFO_TXD_MAX)
         return !pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(m_dwModelID - MODELINFO_DFF_MAX);
-        
+
     if (m_dwModelID >= pGame->GetBaseIDforTXD() && m_dwModelID < pGame->GetCountOfAllFileIDs())
         return true;
 
@@ -828,11 +828,12 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
 void CModelInfoSA::ResetTextureDictionaryID()
 {
     const auto it = ms_DefaultTxdIDMap.find(m_dwModelID);
-    if (it == ms_DefaultTxdIDMap.end()) {
+    if (it == ms_DefaultTxdIDMap.end())
+    {
         return;
     }
     SetTextureDictionaryID(it->second);
-    ms_DefaultTxdIDMap.erase(it); // Only erase after calling the function above [otherwise gets reinserted]
+    ms_DefaultTxdIDMap.erase(it);  // Only erase after calling the function above [otherwise gets reinserted]
 }
 
 void CModelInfoSA::StaticResetTextureDictionaries()
@@ -1006,10 +1007,10 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
                 // Log info
                 OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex,
                                           i / 2 % NUM_StreamSectorRows, i / 2 / NUM_StreamSectorCols));
-                // Assert in debug
-                #if MTA_DEBUG
+// Assert in debug
+#if MTA_DEBUG
                 assert(static_cast<std::size_t*>(pEntity->GetVTBL())[CEntity_DeleteRwObject_VTBL_OFFSET] != 0x00534030);
-                #endif
+#endif
                 pSectorEntry = (DWORD*)pSectorEntry[1];
                 continue;
             }
@@ -1019,11 +1020,11 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
                     _asm
-                    {
+                        {
                         mov ecx, pEntity
                         mov eax, [ecx]
                         call dword ptr [eax+20h]
-                    }
+                        }
                     removedModels.insert(pEntity->m_nModelIndex);
                 }
             }
@@ -1043,11 +1044,11 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
                     _asm
-                    {
+                        {
                         mov ecx, pEntity
                         mov eax, [ecx]
                         call dword ptr [eax+20h]
-                    }
+                        }
                     removedModels.insert(pEntity->m_nModelIndex);
                 }
             }
@@ -1386,7 +1387,7 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
 
     auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
-        return;            // Early out in case the model doesn't have any dummies modified
+        return;  // Early out in case the model doesn't have any dummies modified
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
     for (const auto& dummy : ms_ModelDefaultDummiesPosition[m_dwModelID])
@@ -1833,7 +1834,7 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
 void CModelInfoSA::MakeClumpModel(ushort usBaseID)
 {
     CClumpModelInfoSAInterface* pNewInterface = new CClumpModelInfoSAInterface();
-    CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];
+    CBaseModelInfoSAInterface*  pBaseObjectInfo = ppModelInfo[usBaseID];
     MemCpyFast(pNewInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
     pNewInterface->usNumberOfRefs = 0;
     pNewInterface->pRwObject = nullptr;
@@ -1923,9 +1924,9 @@ __declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest,
 }
 
 // Hook info
-#define HOOKPOS_NodeNameStreamRead                         0x072FA68
-#define HOOKSIZE_NodeNameStreamRead                        15
-DWORD RETURN_NodeNameStreamRead = 0x072FA77;
+#define HOOKPOS_NodeNameStreamRead  0x072FA68
+#define HOOKSIZE_NodeNameStreamRead 15
+DWORD                 RETURN_NodeNameStreamRead = 0x072FA77;
 void _declspec(naked) HOOK_NodeNameStreamRead()
 {
     _asm
@@ -2104,7 +2105,7 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 eModelInfoType CModelInfoSA::GetModelType()
 {
     if (auto pInterface = GetInterface())
-        return ((eModelInfoType(*)())pInterface->VFTBL->GetModelType)();
+        return ((eModelInfoType (*)())pInterface->VFTBL->GetModelType)();
 
     return eModelInfoType::UNKNOWN;
 }

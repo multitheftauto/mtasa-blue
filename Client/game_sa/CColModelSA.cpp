@@ -18,10 +18,10 @@ CColModelSA::CColModelSA()
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CColModel_Constructor;
     _asm
-    {
+        {
         mov     ecx, dwThis
         call    dwFunc
-    }
+        }
     m_bDestroyInterface = true;
 }
 
