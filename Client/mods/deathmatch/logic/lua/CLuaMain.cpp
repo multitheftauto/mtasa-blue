@@ -58,6 +58,13 @@ CLuaMain::~CLuaMain()
     // Delete the timer manager
     delete m_pLuaTimerManager;
 
+    // Eventually delete the XML files the LUA script didn't
+    for (auto& xmlFile : m_XMLFiles)
+    {
+        delete xmlFile;
+    }
+    m_XMLFiles.clear();
+
     CClientPerfStatLuaMemory::GetSingleton()->OnLuaMainDestroy(this);
     CClientPerfStatLuaTiming::GetSingleton()->OnLuaMainDestroy(this);
 }
