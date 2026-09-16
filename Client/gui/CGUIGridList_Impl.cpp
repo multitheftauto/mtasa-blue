@@ -493,6 +493,10 @@ int CGUIGridList_Impl::SetItemText(int iRow, int hColumn, const char* szText, bo
 
         if (!pItem)
         {
+            // setItem throws for an invalid position, check before allocating so the item is not leaked
+            if ((uint)iRow >= list->getRowCount() || (uint)columnIndex >= list->getColumnCount())
+                return 0;
+
             pItem = new CGUIListItem_Impl(szText, bNumber);
             CEGUI::ListboxItem* pListboxItem = pItem->GetListItem();
             list->setItem(pListboxItem, CEGUI::MCLGridRef(iRow, columnIndex), bFast);
