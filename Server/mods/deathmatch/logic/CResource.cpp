@@ -552,12 +552,10 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
                 return SString();
 
             auto checksumOrError = CChecksum::GenerateChecksumFromFile(strPath);
-            if (std::holds_alternative<std::string>(checksumOrError))
-            {
-                return SString(std::get<std::string>(checksumOrError));
-            }
+            if (!checksumOrError)
+                return SString(checksumOrError.error());
 
-            CChecksum checksum = std::get<CChecksum>(checksumOrError);
+            CChecksum checksum = *checksumOrError;
 
             // Check if file is blocked before persisting the checksum, so that
             // blocked files never have their checksum stored on the CResourceFile.

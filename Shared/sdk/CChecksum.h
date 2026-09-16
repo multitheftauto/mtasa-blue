@@ -16,11 +16,11 @@
 #include <chrono>
 #include <cstdint>
 #include <cstring>
+#include <expected>
 #include <mutex>
 #include <string>
 #include <thread>
 #include <unordered_map>
-#include <variant>
 #include "SharedUtil.Hash.h"
 #include "SharedUtil.File.h"
 #include "SString.h"
@@ -50,7 +50,7 @@ public:
 
     // Results are cached per path and reused while the size and last write time stay the same,
     // so re-checking an unchanged file costs one stat instead of a full read
-    static std::variant<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
+    static std::expected<CChecksum, std::string> GenerateChecksumFromFile(const SString& strFilename)
     {
         const std::string strKey = CacheKey(strFilename);
 
@@ -73,7 +73,7 @@ public:
         CChecksum   result;
         std::string strError;
         if (!HashFile(strFilename, result, strError))
-            return strError;
+            return std::unexpected(strError);
 
         // Only remember the result if nothing wrote to the file while we were reading it
         SFileStamp stampAfter;
@@ -88,16 +88,7 @@ public:
 
     // GenerateChecksumFromFileUnsafe should never ever be used unless you are a bad person. Or unless you really know what you're doing.
     // If it's the latter, please leave a code comment somewhere explaining why. Otherwise we'll think it's just code that hasn't been migrated yet.
-    static CChecksum GenerateChecksumFromFileUnsafe(const SString& strFilename)
-    {
-        auto result = GenerateChecksumFromFile(strFilename);
-
-        // If it holds an error message, just return a default CChecksum
-        if (std::holds_alternative<std::string>(result))
-            return CChecksum();
-
-        return std::get<CChecksum>(result);
-    }
+    static CChecksum GenerateChecksumFromFileUnsafe(const SString& strFilename) { return GenerateChecksumFromFile(strFilename).value_or(CChecksum()); }
 
     static CChecksum GenerateChecksumFromBuffer(const char* cpBuffer, unsigned long ulLength)
     {
