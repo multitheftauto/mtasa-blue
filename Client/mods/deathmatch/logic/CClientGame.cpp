@@ -3761,6 +3761,15 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
         CPools* pPools = g_pGame->GetPools();
         // Map to client entity and pass to the texture replacer
         CClientEntity* pClientEntity = pPools->GetClientEntity((DWORD*)pGameEntity);
+        if (!pClientEntity)
+        {
+            // Pickup and projectile objects are not registered in the object pool. The interface type is not visible
+            // here, so every miss pays for the two lookups: a hash find while pickups exist and a walk of the (short) projectile list.
+            CClientManager* pManager = g_pClientGame->GetManager();
+            pClientEntity = pManager->GetPickupManager()->GetPickupByGameObject(pGameEntity);
+            if (!pClientEntity)
+                pClientEntity = pManager->GetProjectileManager()->Get(pGameEntity);
+        }
         if (pClientEntity)
         {
             int    iTypeMask;
@@ -3776,6 +3785,8 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
                     iTypeMask = TYPE_MASK_VEHICLE;
                     break;
                 case CCLIENTOBJECT:
+                case CCLIENTPICKUP:
+                case CCLIENTPROJECTILE:
                     iTypeMask = TYPE_MASK_OBJECT;
                     break;
                 case CCLIENTBUILDING:
@@ -5033,6 +5044,9 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
 // Clear stale pool entries to prevent dangling pointer crashes in GetClientEntity/GetEntity.
 void CClientGame::GameObjectDestructHandler(CEntitySAInterface* pObject)
 {
+    if (m_pManager)
+        m_pManager->GetPickupManager()->OnGameObjectDestroyed(pObject);
+
     if (auto* pSlot = g_pGame->GetPools()->GetObject(reinterpret_cast<DWORD*>(pObject)))
     {
         pSlot->pEntity = nullptr;
