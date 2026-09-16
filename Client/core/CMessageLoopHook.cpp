@@ -85,9 +85,9 @@ void CMessageLoopHook::ApplyHook(HWND hFocusWindow)
         // Register for raw mouse input so we can detect mouse deltas even when the cursor is
         // hidden or clamped (WM_MOUSEMOVE only gives clamped absolute coordinates).
         RAWINPUTDEVICE rid = {};
-        rid.usUsagePage = 0x01;            // HID_USAGE_PAGE_GENERIC
-        rid.usUsage = 0x02;                // HID_USAGE_GENERIC_MOUSE
-        rid.dwFlags = RIDEV_INPUTSINK;     // Receive input even when unfocused
+        rid.usUsagePage = 0x01;         // HID_USAGE_PAGE_GENERIC
+        rid.usUsage = 0x02;             // HID_USAGE_GENERIC_MOUSE
+        rid.dwFlags = RIDEV_INPUTSINK;  // Receive input even when unfocused
         rid.hwndTarget = hFocusWindow;
         RegisterRawInputDevices(&rid, 1, sizeof(rid));
     }
