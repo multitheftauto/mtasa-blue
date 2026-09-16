@@ -157,7 +157,28 @@ void CGUIGridList_Impl::RemoveColumn(unsigned int uiColumn)
 {
     try
     {
-        reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->removeColumn(GetColumnIndex(uiColumn));
+        CEGUI::MultiColumnList* pList = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow);
+        const int               columnIndex = GetColumnIndex(uiColumn);
+
+        // CEGUI only deletes auto-deleted items, ours are owned by the wrappers in m_Items
+        std::vector<CEGUI::ListboxItem*> removedItems;
+        const uint                       rowCount = pList->getRowCount();
+        for (uint i = 0; i < rowCount; ++i)
+        {
+            if (CEGUI::ListboxItem* pItem = pList->getItemAtGridReference(CEGUI::MCLGridRef(i, columnIndex)))
+                removedItems.push_back(pItem);
+        }
+
+        pList->removeColumn(columnIndex);
+
+        for (CEGUI::ListboxItem* pItem : removedItems)
+        {
+            if (const auto it = m_Items.find(pItem); it != m_Items.end())
+            {
+                delete it->second;
+                m_Items.erase(it);
+            }
+        }
     }
     catch (CEGUI::Exception)
     {
@@ -301,7 +322,27 @@ void CGUIGridList_Impl::RemoveRow(int iRow)
 {
     try
     {
-        return reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow)->removeRow(iRow);
+        CEGUI::MultiColumnList* pList = reinterpret_cast<CEGUI::MultiColumnList*>(m_pWindow);
+
+        // CEGUI only deletes auto-deleted items, ours are owned by the wrappers in m_Items
+        std::vector<CEGUI::ListboxItem*> removedItems;
+        const uint                       columnCount = pList->getColumnCount();
+        for (uint i = 0; i < columnCount; ++i)
+        {
+            if (CEGUI::ListboxItem* pItem = pList->getItemAtGridReference(CEGUI::MCLGridRef(iRow, i)))
+                removedItems.push_back(pItem);
+        }
+
+        pList->removeRow(iRow);
+
+        for (CEGUI::ListboxItem* pItem : removedItems)
+        {
+            if (const auto it = m_Items.find(pItem); it != m_Items.end())
+            {
+                delete it->second;
+                m_Items.erase(it);
+            }
+        }
     }
     catch (CEGUI::Exception)
     {
