@@ -46,21 +46,21 @@ void CColShapeRPCs::SetColShapeSize(CClientEntity* pSource, NetBitStreamInterfac
 
 void CColShapeRPCs::SetColShapeCheckDimension(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    bool bCheckDimension;
-    if (bitStream.ReadBit(bCheckDimension))
+    bool enabled;
+    if (bitStream.ReadBit(enabled))
     {
-        CClientColShape* pColShape = static_cast<CClientColShape*>(pSource);
-        CStaticFunctionDefinitions::SetColShapeCheckDimension(pColShape, bCheckDimension);
+        auto* colShape = static_cast<CClientColShape*>(pSource);
+        CStaticFunctionDefinitions::SetColShapeCheckDimension(colShape, enabled);
     }
 }
 
 void CColShapeRPCs::SetColShapeCheckInterior(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    bool bCheckInterior;
-    if (bitStream.ReadBit(bCheckInterior))
+    bool enabled;
+    if (bitStream.ReadBit(enabled))
     {
-        CClientColShape* pColShape = static_cast<CClientColShape*>(pSource);
-        CStaticFunctionDefinitions::SetColShapeCheckInterior(pColShape, bCheckInterior);
+        auto* colShape = static_cast<CClientColShape*>(pSource);
+        CStaticFunctionDefinitions::SetColShapeCheckInterior(colShape, enabled);
     }
 }
 

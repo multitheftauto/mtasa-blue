@@ -23,10 +23,10 @@ void CLuaColShapeDefs::LoadFunctions()
 
                                                                              {"getColShapeRadius", GetColShapeRadius},
                                                                              {"setColShapeRadius", SetColShapeRadius},
-                                                                             {"getColShapeCheckDimension", GetColShapeCheckDimension},
-                                                                             {"setColShapeCheckDimension", SetColShapeCheckDimension},
-                                                                             {"getColShapeCheckInterior", GetColShapeCheckInterior},
-                                                                             {"setColShapeCheckInterior", SetColShapeCheckInterior},
+                                                                             {"getColShapeCheckDimension", ArgumentParser<GetColShapeCheckDimension>},
+                                                                             {"setColShapeCheckDimension", ArgumentParser<SetColShapeCheckDimension>},
+                                                                             {"getColShapeCheckInterior", ArgumentParser<GetColShapeCheckInterior>},
+                                                                             {"setColShapeCheckInterior", ArgumentParser<SetColShapeCheckInterior>},
                                                                              {"getColShapeSize", GetColShapeSize},
                                                                              {"setColShapeSize", SetColShapeSize},
                                                                              {"getColPolygonPoints", GetColPolygonPoints},
@@ -65,10 +65,10 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getRadius", GetColShapeRadius);
     lua_classfunction(luaVM, "setRadius", SetColShapeRadius);
-    lua_classfunction(luaVM, "getCheckDimension", GetColShapeCheckDimension);
-    lua_classfunction(luaVM, "setCheckDimension", SetColShapeCheckDimension);
-    lua_classfunction(luaVM, "getCheckInterior", GetColShapeCheckInterior);
-    lua_classfunction(luaVM, "setCheckInterior", SetColShapeCheckInterior);
+    lua_classfunction(luaVM, "getCheckDimension", ArgumentParser<GetColShapeCheckDimension>);
+    lua_classfunction(luaVM, "setCheckDimension", ArgumentParser<SetColShapeCheckDimension>);
+    lua_classfunction(luaVM, "getCheckInterior", ArgumentParser<GetColShapeCheckInterior>);
+    lua_classfunction(luaVM, "setCheckInterior", ArgumentParser<SetColShapeCheckInterior>);
     lua_classfunction(luaVM, "getSize", OOP_GetColShapeSize);
     lua_classfunction(luaVM, "setSize", SetColShapeSize);
     lua_classfunction(luaVM, "getPoints", OOP_GetColPolygonPoints);
@@ -462,102 +462,28 @@ int CLuaColShapeDefs::SetColShapeRadius(lua_State* luaVM)
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
 }
 
-int CLuaColShapeDefs::GetColShapeCheckDimension(lua_State* luaVM)
+bool CLuaColShapeDefs::GetColShapeCheckDimension(CClientColShape* colShape)
 {
-    //  bool getColShapeCheckDimension ( colshape theShape )
-    CClientColShape* pColShape;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-
-    if (!argStream.HasErrors())
-    {
-        bool bCheckDimension = false;
-        if (CStaticFunctionDefinitions::GetColShapeCheckDimension(pColShape, bCheckDimension))
-        {
-            lua_pushboolean(luaVM, bCheckDimension);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    //  bool getColShapeCheckDimension ( colshape theColShape )
+    return colShape->IsDimensionCheckEnabled();
 }
 
-int CLuaColShapeDefs::SetColShapeCheckDimension(lua_State* luaVM)
+bool CLuaColShapeDefs::SetColShapeCheckDimension(CClientColShape* colShape, bool enabled)
 {
-    //  bool setColShapeCheckDimension ( colshape theShape, bool checkDimension )
-    CClientColShape* pColShape;
-    bool             bCheckDimension;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-    argStream.ReadBool(bCheckDimension);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetColShapeCheckDimension(pColShape, bCheckDimension))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    //  bool setColShapeCheckDimension ( colshape theColShape, bool enabled )
+    return CStaticFunctionDefinitions::SetColShapeCheckDimension(colShape, enabled);
 }
 
-int CLuaColShapeDefs::GetColShapeCheckInterior(lua_State* luaVM)
+bool CLuaColShapeDefs::GetColShapeCheckInterior(CClientColShape* colShape)
 {
-    //  bool getColShapeCheckInterior ( colshape theShape )
-    CClientColShape* pColShape;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-
-    if (!argStream.HasErrors())
-    {
-        bool bCheckInterior = false;
-        if (CStaticFunctionDefinitions::GetColShapeCheckInterior(pColShape, bCheckInterior))
-        {
-            lua_pushboolean(luaVM, bCheckInterior);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    //  bool getColShapeCheckInterior ( colshape theColShape )
+    return colShape->IsInteriorCheckEnabled();
 }
 
-int CLuaColShapeDefs::SetColShapeCheckInterior(lua_State* luaVM)
+bool CLuaColShapeDefs::SetColShapeCheckInterior(CClientColShape* colShape, bool enabled)
 {
-    //  bool setColShapeCheckInterior ( colshape theShape, bool checkInterior )
-    CClientColShape* pColShape;
-    bool             bCheckInterior;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pColShape);
-    argStream.ReadBool(bCheckInterior);
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetColShapeCheckInterior(pColShape, bCheckInterior))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    //  bool setColShapeCheckInterior ( colshape theColShape, bool enabled )
+    return CStaticFunctionDefinitions::SetColShapeCheckInterior(colShape, enabled);
 }
 
 int CLuaColShapeDefs::GetColShapeSize(lua_State* luaVM)

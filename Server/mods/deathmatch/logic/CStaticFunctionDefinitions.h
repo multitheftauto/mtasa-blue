@@ -477,19 +477,17 @@ public:
     static class CColTube*      CreateColTube(CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight);
     static bool                 IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void                 RefreshColShapeColliders(CColShape* pColShape);
-    static void                 RefreshElementCollisions(CElement* pElement);
+    static void                 RefreshElementCollisions(CElement* element);
 
     // Shape get functions
     static bool GetColShapeRadius(CColShape* pColShape, float& fRadius);
-    static bool GetColShapeCheckDimension(CColShape* pColShape, bool& bCheckDimension);
-    static bool GetColShapeCheckInterior(CColShape* pColShape, bool& bCheckInterior);
     static bool GetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, CVector2D& vecPoint);
 
     // Shape set functions
     static bool SetColShapeRadius(CColShape* pColShape, float fRadius);
     static bool SetColShapeSize(CColShape* pColShape, CVector& vecSize);
-    static bool SetColShapeCheckDimension(CColShape* pColShape, bool bCheckDimension);
-    static bool SetColShapeCheckInterior(CColShape* pColShape, bool bCheckInterior);
+    static bool SetColShapeCheckDimension(CColShape* colShape, bool enabled);
+    static bool SetColShapeCheckInterior(CColShape* colShape, bool enabled);
     static bool SetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
 
     static bool AddColPolygonPoint(CColPolygon* pColPolygon, const CVector2D& vecPoint);

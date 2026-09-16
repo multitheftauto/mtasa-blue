@@ -29,10 +29,10 @@ public:
 
     LUA_DECLARE(GetColShapeRadius);
     LUA_DECLARE(SetColShapeRadius);
-    LUA_DECLARE(GetColShapeCheckDimension);
-    LUA_DECLARE(SetColShapeCheckDimension);
-    LUA_DECLARE(GetColShapeCheckInterior);
-    LUA_DECLARE(SetColShapeCheckInterior);
+    static bool GetColShapeCheckDimension(CClientColShape* colShape);
+    static bool GetColShapeCheckInterior(CClientColShape* colShape);
+    static bool SetColShapeCheckDimension(CClientColShape* colShape, bool enabled);
+    static bool SetColShapeCheckInterior(CClientColShape* colShape, bool enabled);
     LUA_DECLARE_OOP(GetColShapeSize);
     LUA_DECLARE(SetColShapeSize);
     LUA_DECLARE_OOP(GetColPolygonPoints);

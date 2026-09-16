@@ -63,12 +63,12 @@ public:
     bool GetAutoCallEvent() { return m_bAutoCallEvent; };
     void SetAutoCallEvent(bool bAutoCallEvent) { m_bAutoCallEvent = bAutoCallEvent; };
 
-    bool IsDimensionCheckEnabled() { return m_bCheckDimension; };
-    void SetDimensionCheckEnabled(bool bCheckDimension) { m_bCheckDimension = bCheckDimension; };
-    bool IsInteriorCheckEnabled() { return m_bCheckInterior; };
-    void SetInteriorCheckEnabled(bool bCheckInterior) { m_bCheckInterior = bCheckInterior; };
+    bool IsDimensionCheckEnabled() { return m_checkDimension; };
+    void SetDimensionCheckEnabled(bool enabled) { m_checkDimension = enabled; };
+    bool IsInteriorCheckEnabled() { return m_checkInterior; };
+    void SetInteriorCheckEnabled(bool enabled) { m_checkInterior = enabled; };
 
-    bool IsCollisionAllowed(CClientEntity& Entity);
+    bool IsCollisionAllowed(CClientEntity& entity);
 
     void                                AddCollider(CClientEntity* pEntity) { m_Colliders.push_back(pEntity); }
     void                                RemoveCollider(CClientEntity* pEntity) { m_Colliders.remove(pEntity); }
@@ -89,7 +89,7 @@ private:
     class CClientColManager*  m_pColManager;
     CClientColCallback*       m_pCallback;
     bool                      m_bAutoCallEvent;
-    bool                      m_bCheckDimension;
-    bool                      m_bCheckInterior;
+    bool                      m_checkDimension;
+    bool                      m_checkInterior;
     CFastList<CClientEntity*> m_Colliders;
 };
