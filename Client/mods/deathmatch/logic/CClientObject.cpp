@@ -658,7 +658,7 @@ void CClientObject::StreamedInPulse()
     if (!m_bIsFrozen)
     {
         // Model physics enabled?
-        if ((m_pModelInfo && m_pModelInfo->GetObjectPropertiesGroup() != -1) || !m_pModelInfo)
+        if ((m_pModelInfo && m_pModelInfo->GetObjectPropertiesGroup() != MODEL_PROPERTIES_GROUP_STATIC) || !m_pModelInfo)
         {
             // Grab our actual position & rotation (as GTA moves it too)
             CVector vecPosition = *m_pObject->GetPosition();
