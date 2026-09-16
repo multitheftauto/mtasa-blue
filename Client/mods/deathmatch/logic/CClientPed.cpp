@@ -3978,6 +3978,9 @@ void CClientPed::_DestroyLocalModel()
 
     g_pGame->GetPools()->InvalidateLocalPlayerClientEntity();
 
+    // Flush the tasks first, they cache anim associations that go with the clump on a model change
+    m_pPlayerPed->SetInitialState();
+
     // Make sure we are CJ again
     if (m_pPlayerPed->GetModelIndex() != 0)
     {
