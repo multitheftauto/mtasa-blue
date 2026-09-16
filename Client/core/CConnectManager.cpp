@@ -260,8 +260,7 @@ void CConnectManager::DoPulse()
 
         // Retry the connection every RETRY_INTERVAL_SEC if no response, up to MAX_CONNECT_ATTEMPTS
         unsigned int uiExpectedAttempt = (iConnectTimeDelta / RETRY_INTERVAL_SEC) + 1;
-        if (uiExpectedAttempt > m_uiConnectAttempt && m_uiConnectAttempt < MAX_CONNECT_ATTEMPTS &&
-            g_pCore->GetNetwork()->GetExtendedErrorCode() == 0)
+        if (uiExpectedAttempt > m_uiConnectAttempt && m_uiConnectAttempt < MAX_CONNECT_ATTEMPTS && g_pCore->GetNetwork()->GetExtendedErrorCode() == 0)
         {
             m_uiConnectAttempt = uiExpectedAttempt;
             SString strAddress = inet_ntoa(m_Address);
