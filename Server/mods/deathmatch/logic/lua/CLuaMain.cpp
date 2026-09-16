@@ -476,8 +476,6 @@ bool CLuaMain::DestroyXML(CXMLFile* pFile)
 
 bool CLuaMain::DestroyXML(CXMLNode* pRootNode)
 {
-    if (m_XMLFiles.empty())
-        return false;
     for (CXMLFile* pFile : m_XMLFiles)
     {
         if (pFile)
@@ -486,11 +484,19 @@ bool CLuaMain::DestroyXML(CXMLNode* pRootNode)
             {
                 m_XMLFiles.remove(pFile);
                 delete pFile;
-                break;
+                return true;
             }
         }
     }
-    return true;
+    for (auto iter = m_XMLStringNodes.begin(); iter != m_XMLStringNodes.end(); ++iter)
+    {
+        if ((*iter)->node == pRootNode)
+        {
+            m_XMLStringNodes.erase(iter);
+            return true;
+        }
+    }
+    return false;
 }
 
 bool CLuaMain::SaveXML(CXMLNode* pRootNode)
