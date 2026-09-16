@@ -190,6 +190,12 @@ void CClientPlayerVoice::DoPulse()
         }
     }
 
+    // The cvars are looked up by name, a few times a second is plenty for a volume slider
+    const unsigned long ulNow = CClientTime::GetTime();
+    if (ulNow - m_ulVolumeScaleCheckTime < 250)
+        return;
+    m_ulVolumeScaleCheckTime = ulNow;
+
     float fPreviousVolume = 0.0f;
     g_pCore->GetCVars()->Get("voicevolume", fPreviousVolume);
     fPreviousVolume *= g_pCore->GetCVars()->GetValue<float>("mastervolume", 1.0f);
