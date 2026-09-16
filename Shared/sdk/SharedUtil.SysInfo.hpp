@@ -567,7 +567,7 @@ void SharedUtil::GetCPUInfo(SCPUInfo& outInfo)
         __cpuid(reinterpret_cast<int*>(szBrand), 0x80000002);
         __cpuid(reinterpret_cast<int*>(szBrand + 16), 0x80000003);
         __cpuid(reinterpret_cast<int*>(szBrand + 32), 0x80000004);
-        cached.strName = SStringX(szBrand).Trim();
+        cached.strName = SStringX(szBrand).TrimStart(" ").TrimEnd(" ");
     }
 
     HKEY hKey = nullptr;
@@ -586,7 +586,7 @@ void SharedUtil::GetCPUInfo(SCPUInfo& outInfo)
             dwType = 0;
             if (RegQueryValueExA(hKey, "ProcessorNameString", nullptr, &dwType, reinterpret_cast<LPBYTE>(szName), &dwNameSize) == ERROR_SUCCESS &&
                 dwType == REG_SZ)
-                cached.strName = SStringX(szName).Trim();
+                cached.strName = SStringX(szName).TrimStart(" ").TrimEnd(" ");
         }
 
         RegCloseKey(hKey);
