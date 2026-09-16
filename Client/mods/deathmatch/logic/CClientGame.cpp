@@ -24,6 +24,7 @@
 #include <game/CGarages.h>
 #include <game/CPedIntelligence.h>
 #include <game/CPlayerInfo.h>
+#include <game/CRadar.h>
 #include <game/CSettings.h>
 #include <game/CStreaming.h>
 #include <game/CTaskManager.h>
@@ -313,6 +314,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     g_pMultiplayer->SetGameModelRemoveHandler(CClientGame::StaticGameModelRemoveHandler);
     g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(CClientGame::StaticGameRunNamedAnimDestructorHandler);
     g_pMultiplayer->SetGameEntityRenderHandler(CClientGame::StaticGameEntityRenderHandler);
+    g_pMultiplayer->SetRadarBlipRenderHandler(CClientGame::StaticRadarBlipRenderHandler);
     g_pMultiplayer->SetFxSystemDestructionHandler(CClientGame::StaticFxSystemDestructionHandler);
     g_pMultiplayer->SetDrivebyAnimationHandler(CClientGame::StaticDrivebyAnimationHandler);
     g_pMultiplayer->SetPedStepHandler(CClientGame::StaticPedStepHandler);
@@ -528,6 +530,7 @@ CClientGame::~CClientGame()
     g_pMultiplayer->SetGameModelRemoveHandler(NULL);
     g_pMultiplayer->SetGameRunNamedAnimDestructorHandler(nullptr);
     g_pMultiplayer->SetGameEntityRenderHandler(NULL);
+    g_pMultiplayer->SetRadarBlipRenderHandler(nullptr);
     g_pMultiplayer->SetDrivebyAnimationHandler(nullptr);
     g_pMultiplayer->SetPedStepHandler(nullptr);
     g_pMultiplayer->SetVehicleWeaponHitHandler(nullptr);
@@ -3802,6 +3805,22 @@ void CClientGame::StaticGameEntityRenderHandler(CEntitySAInterface* pGameEntity)
     }
 
     g_pGame->GetRenderWare()->SetRenderingClientEntity(NULL, 0xFFFF, TYPE_MASK_WORLD);
+}
+
+void CClientGame::StaticRadarBlipRenderHandler(int iBlipIndex)
+{
+    if (iBlipIndex >= 0)
+    {
+        CMarker*            pGameMarker = g_pGame->GetRadar()->GetMarker(iBlipIndex);
+        CClientRadarMarker* pBlip = g_pClientGame->GetManager()->GetRadarMarkerManager()->GetMarkerByGameMarker(pGameMarker);
+        if (pBlip)
+        {
+            g_pGame->GetRenderWare()->SetRenderingClientEntity(pBlip, 0xFFFF, TYPE_MASK_OTHER);
+            return;
+        }
+    }
+
+    g_pGame->GetRenderWare()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
 }
 
 void CClientGame::StaticTaskSimpleBeHitHandler(CPedSAInterface* pPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
