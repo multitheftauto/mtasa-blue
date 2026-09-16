@@ -173,6 +173,9 @@ void CElementRPCs::SetElementVelocity(CClientEntity* pSource, NetBitStreamInterf
     CVector vecVelocity;
     if (bitStream.Read(vecVelocity.fX) && bitStream.Read(vecVelocity.fY) && bitStream.Read(vecVelocity.fZ))
     {
+        if (!vecVelocity.IsValid())
+            return;
+
         switch (pSource->GetType())
         {
             case CCLIENTPED:
@@ -215,6 +218,9 @@ void CElementRPCs::SetElementAngularVelocity(CClientEntity* pSource, NetBitStrea
     CVector vecTurnVelocity;
     if (bitStream.Read(vecTurnVelocity.fX) && bitStream.Read(vecTurnVelocity.fY) && bitStream.Read(vecTurnVelocity.fZ))
     {
+        if (!vecTurnVelocity.IsValid())
+            return;
+
         switch (pSource->GetType())
         {
             case CCLIENTPED:

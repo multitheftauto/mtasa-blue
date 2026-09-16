@@ -1398,6 +1398,9 @@ bool CStaticFunctionDefinitions::SetElementRotation(CElement* pElement, const CV
 bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CVector& vecVelocity)
 {
     assert(pElement);
+    if (!vecVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetElementVelocity(*iter, vecVelocity))
 
     int iType = pElement->GetType();
@@ -1440,6 +1443,9 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CV
 bool CStaticFunctionDefinitions::SetElementAngularVelocity(CElement* pElement, const CVector& vecTurnVelocity)
 {
     assert(pElement);
+    if (!vecTurnVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetElementAngularVelocity(*iter, vecTurnVelocity))
 
     int iType = pElement->GetType();
@@ -6572,6 +6578,9 @@ bool CStaticFunctionDefinitions::SetVehicleTaxiLightOn(CElement* pElement, bool 
 bool CStaticFunctionDefinitions::SetVehicleTurnVelocity(CElement* pElement, const CVector& vecTurnVelocity)
 {
     assert(pElement);
+    if (!vecTurnVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetVehicleTurnVelocity(*iter, vecTurnVelocity))
 
     if (IS_VEHICLE(pElement))
