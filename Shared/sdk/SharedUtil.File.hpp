@@ -167,19 +167,6 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
         return false;
     }
 
-    WIN32_FILE_ATTRIBUTE_DATA fileAttributeData;
-
-    if (!GetFileAttributesExW(wideFilePath, GetFileExInfoStandard, &fileAttributeData))
-        return false;
-
-    if (fileAttributeData.nFileSizeHigh > 0 || fileAttributeData.nFileSizeLow > GIBIBYTE)
-        return false;
-
-    DWORD fileSize = fileAttributeData.nFileSizeLow;
-
-    if (fileSize == 0 || fileSize <= static_cast<DWORD>(offset))
-        return true;
-
     constexpr int MAX_RETRY_ATTEMPTS = 20;
     constexpr int RETRY_DELAY_MS = 10;
 
@@ -200,6 +187,21 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
 
     if (handle == INVALID_HANDLE_VALUE)
         return false;
+
+    LARGE_INTEGER fileSizeResult{};
+    if (!GetFileSizeEx(handle, &fileSizeResult) || fileSizeResult.HighPart > 0 || fileSizeResult.LowPart > GIBIBYTE)
+    {
+        CloseHandle(handle);
+        return false;
+    }
+
+    DWORD fileSize = fileSizeResult.LowPart;
+
+    if (fileSize == 0 || fileSize <= static_cast<DWORD>(offset))
+    {
+        CloseHandle(handle);
+        return true;
+    }
 
     if (offset > 0)
     {
@@ -1857,18 +1859,45 @@ bool SharedUtil::FileLoadWithTimeout(const SString& filePath, SString& outBuffer
     if (wideFilePath.empty())
         return false;
 
+    // Only a hang guard, the directory entry lags behind a file that is still open for writing
     WIN32_FILE_ATTRIBUTE_DATA attr;
-    if (!GetFileAttributesExWithTimeout(wideFilePath.c_str(), attr, timeoutMs) || attr.nFileSizeHigh > 0)
+    if (!GetFileAttributesExWithTimeout(wideFilePath.c_str(), attr, timeoutMs))
         return false;
 
-    DWORD fileSize = attr.nFileSizeLow;
-    if (fileSize == 0)
-        return true;
+    constexpr int MAX_OPEN_ATTEMPTS = 20;
+    constexpr int OPEN_RETRY_DELAY_MS = 10;
 
-    HANDLE fh = CreateFileW(wideFilePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING,
-                            FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
+    HANDLE fh = INVALID_HANDLE_VALUE;
+    for (int attempt = 0; attempt < MAX_OPEN_ATTEMPTS; ++attempt)
+    {
+        fh = CreateFileW(wideFilePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING,
+                         FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
+        if (fh != INVALID_HANDLE_VALUE)
+            break;
+
+        const DWORD errorCode = GetLastError();
+        if (errorCode != ERROR_SHARING_VIOLATION && errorCode != ERROR_LOCK_VIOLATION)
+            return false;
+
+        if (attempt + 1 < MAX_OPEN_ATTEMPTS)
+            Sleep(OPEN_RETRY_DELAY_MS);
+    }
     if (fh == INVALID_HANDLE_VALUE)
         return false;
+
+    LARGE_INTEGER fileSizeResult{};
+    if (!GetFileSizeEx(fh, &fileSizeResult) || fileSizeResult.HighPart > 0)
+    {
+        CloseHandle(fh);
+        return false;
+    }
+
+    const DWORD fileSize = fileSizeResult.LowPart;
+    if (fileSize == 0)
+    {
+        CloseHandle(fh);
+        return true;
+    }
 
     HANDLE ev = CreateEventW(nullptr, TRUE, FALSE, nullptr);
     if (!ev)

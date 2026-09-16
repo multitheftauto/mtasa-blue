@@ -111,7 +111,7 @@ public:
         r.ulCRC = CRCGenerator::GetCRCFromBuffer(buf.data(), buf.size());
         CMD5Hasher().Calculate(buf.data(), buf.size(), r.md5);
 
-        if (hasMeta && SharedUtil::GetFileAttributesExWithTimeout(wide.c_str(), attr, 500) &&
+        if (hasMeta && buf.size() == sz && SharedUtil::GetFileAttributesExWithTimeout(wide.c_str(), attr, 500) &&
             sz == ((std::uint64_t(attr.nFileSizeHigh) << 32) | attr.nFileSizeLow) &&
             mt == ((std::uint64_t(attr.ftLastWriteTime.dwHighDateTime) << 32) | attr.ftLastWriteTime.dwLowDateTime))
         {
