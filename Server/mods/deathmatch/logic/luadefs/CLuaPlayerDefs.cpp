@@ -16,6 +16,9 @@
 #include "CScriptArgReader.h"
 #include "CKeyBinds.h"
 #include "lua/CLuaFunctionParser.h"
+#include "packets/CLuaPacket.h"
+#include <net/rpc_enums.h>
+#include <net/SyncStructures.h>
 
 void CLuaPlayerDefs::LoadFunctions()
 {
@@ -78,9 +81,9 @@ void CLuaPlayerDefs::LoadFunctions()
         {"setPlayerAnnounceValue", SetPlayerAnnounceValue},
 
         // Audio funcs
-        // {"playMissionAudio", CLuaFunctionDefinitions::PlayMissionAudio},
-        // {"preloadMissionAudio", CLuaFunctionDefinitions::PreloadMissionAudio},
-        {"playSoundFrontEnd", PlaySoundFrontEnd},
+        // {"playMissionAudio", ArgumentParserWarn<false, PlayMissionAudio>},
+        // {"preloadMissionAudio", ArgumentParserWarn<false, PreloadMissionAudio>},
+        {"playSoundFrontEnd", ArgumentParserWarn<false, PlaySoundFrontEnd>},
 
         // Input funcs
         {"bindKey", BindKey},
@@ -1925,33 +1928,25 @@ int CLuaPlayerDefs::ToggleAllControls(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPlayerDefs::PlaySoundFrontEnd(lua_State* luaVM)
+bool CLuaPlayerDefs::PlaySoundFrontEnd(CPlayer* element, std::uint8_t sound)
 {
-    CElement*     pElement;
-    unsigned char ucSound;
+    if (sound > 101)
+        throw std::invalid_argument("Invalid sound ID specified. Valid sound IDs are 0 - 101.");
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(ucSound);
-
-    if (!argStream.HasErrors())
+    if (element->CountChildren() && element->IsCallPropagationEnabled())
     {
-        if (ucSound <= 101)
-        {
-            if (CStaticFunctionDefinitions::PlaySoundFrontEnd(pElement, ucSound))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogError(luaVM, "Invalid sound ID specified. Valid sound IDs are 0 - 101.");
+        CElementListSnapshotRef children = element->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = children->begin(); iter != children->end(); iter++)
+            if (!(*iter)->IsBeingDeleted() && IS_PLAYER(*iter))
+                PlaySoundFrontEnd(static_cast<CPlayer*>(*iter), sound);
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CBitStream                     bitStream;
+    SIntegerSync<unsigned char, 7> soundSync(sound);
+    bitStream.pBitStream->Write(&soundSync);
+
+    element->Send(CLuaPacket(PLAY_SOUND, *bitStream.pBitStream));
+    return true;
 }
 
 int CLuaPlayerDefs::KickPlayer(lua_State* luaVM)
@@ -2134,68 +2129,39 @@ int CLuaPlayerDefs::BanPlayer(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPlayerDefs::PlayMissionAudio(lua_State* luaVM)
+bool CLuaPlayerDefs::PlayMissionAudio(CPlayer* player, std::uint16_t slot)
 {
-    CElement*      pElement;
-    CVector        vecPosition;
-    unsigned short usSlot;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(usSlot);
-
-    if (argStream.NextCouldBeNumber())
+    if (player->CountChildren() && player->IsCallPropagationEnabled())
     {
-        argStream.ReadVector3D(vecPosition);
-
-        if (!argStream.HasErrors())
-        {
-            if (CStaticFunctionDefinitions::PlayMissionAudio(pElement, &vecPosition, usSlot))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-        else
-            m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        CElementListSnapshotRef children = player->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = children->begin(); iter != children->end(); iter++)
+            if (!(*iter)->IsBeingDeleted() && IS_PLAYER(*iter))
+                PlayMissionAudio(static_cast<CPlayer*>(*iter), slot);
     }
-    else if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::PlayMissionAudio(pElement, NULL, usSlot))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CBitStream bitStream;
+    bitStream.pBitStream->Write(static_cast<unsigned char>(AUDIO_MISSION_PLAY));
+    bitStream.pBitStream->Write(slot);
+
+    player->Send(CLuaPacket(PLAY_SOUND, *bitStream.pBitStream));
+    return true;
 }
 
-int CLuaPlayerDefs::PreloadMissionAudio(lua_State* luaVM)
+bool CLuaPlayerDefs::PreloadMissionAudio(CPlayer* player, std::uint16_t sound, std::uint16_t slot)
 {
-    CElement*      pElement;
-    unsigned short usSound;
-    unsigned short usSlot;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pElement);
-    argStream.ReadNumber(usSound);
-    argStream.ReadNumber(usSlot);
-
-    if (!argStream.HasErrors())
+    if (player->CountChildren() && player->IsCallPropagationEnabled())
     {
-        if (CStaticFunctionDefinitions::PreloadMissionAudio(pElement, usSound, usSlot))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        CElementListSnapshotRef children = player->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = children->begin(); iter != children->end(); iter++)
+            if (!(*iter)->IsBeingDeleted() && IS_PLAYER(*iter))
+                PreloadMissionAudio(static_cast<CPlayer*>(*iter), sound, slot);
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    CBitStream bitStream;
+    bitStream.pBitStream->Write(static_cast<unsigned char>(AUDIO_MISSION_PRELOAD));
+    bitStream.pBitStream->Write(sound);
+    bitStream.pBitStream->Write(slot);
+
+    player->Send(CLuaPacket(PLAY_SOUND, *bitStream.pBitStream));
+    return true;
 }
