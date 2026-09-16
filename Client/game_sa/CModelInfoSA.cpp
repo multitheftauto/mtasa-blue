@@ -934,6 +934,7 @@ void CModelInfoSA::StaticResetModelTimes()
     {
         x.first->m_nTimeOn = x.second->m_nTimeOn;
         x.first->m_nTimeOff = x.second->m_nTimeOff;
+        delete x.second;
     }
     ms_ModelDefaultModelTimeInfo.clear();
 }
@@ -1968,8 +1969,17 @@ void CModelInfoSA::DeallocateModel(void)
             delete reinterpret_cast<CClumpModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
             break;
         case eModelInfoType::TIME:
-            delete reinterpret_cast<CTimeModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+        {
+            CTimeModelInfoSAInterface* pTimeModelInfo = reinterpret_cast<CTimeModelInfoSAInterface*>(ppModelInfo[m_dwModelID]);
+            auto                       iter = ms_ModelDefaultModelTimeInfo.find(&pTimeModelInfo->timeInfo);
+            if (iter != ms_ModelDefaultModelTimeInfo.end())
+            {
+                delete iter->second;
+                ms_ModelDefaultModelTimeInfo.erase(iter);
+            }
+            delete pTimeModelInfo;
             break;
+        }
         default:
             break;
     }
