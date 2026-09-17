@@ -24,6 +24,30 @@ namespace
 
     constexpr auto RESUME_FRAME_GUARD_DURATION = std::chrono::milliseconds(1000);
 
+    constexpr auto PAUSE_FLUSH_DURATION = std::chrono::milliseconds(400);
+
+    uint64_t GetFrameSignature(const byte* pData, size_t uiDataSize, int iWidth, int iHeight)
+    {
+        if (!pData || iWidth <= 0 || iHeight <= 0)
+            return 0;
+
+        const auto pixelCount = static_cast<size_t>(iWidth) * static_cast<size_t>(iHeight);
+        if (uiDataSize < pixelCount * CEF_PIXEL_STRIDE)
+            return 0;
+
+        constexpr size_t SAMPLE_STRIDE = 32;
+
+        uint64_t hash = 1469598103934665603ull;
+        for (size_t i = 0; i < pixelCount; i += SAMPLE_STRIDE)
+        {
+            uint32_t pixel;
+            std::memcpy(&pixel, pData + i * CEF_PIXEL_STRIDE, sizeof(pixel));
+            hash = (hash ^ pixel) * 1099511628211ull;
+        }
+
+        return hash;
+    }
+
     size_t CountVisiblePixels(const byte* pData, size_t uiDataSize, int iWidth, int iHeight)
     {
         if (!pData || iWidth <= 0 || iHeight <= 0)
@@ -314,8 +338,6 @@ void CWebView::SetRenderingPaused(bool bPaused)
 
     if (m_pWebView)
     {
-        m_pWebView->GetHost()->WasHidden(bPaused);
-
         if (bPaused)
         {
             // Free memory held by render data when paused
@@ -325,6 +347,10 @@ void CWebView::SetRenderingPaused(bool bPaused)
             m_RenderData.buffer.reset();
             m_RenderData.bufferSize = 0;
             m_RenderData.popupBuffer.reset();
+
+            m_RenderData.pauseFlushActive = true;
+            m_RenderData.pauseFlushSignature = m_RenderData.lastFrameSignature;
+            m_RenderData.pauseFlushDeadline = std::chrono::steady_clock::now() + PAUSE_FLUSH_DURATION;
         }
         else
         {
@@ -334,13 +360,9 @@ void CWebView::SetRenderingPaused(bool bPaused)
                 m_RenderData.awaitingResumeFrame = true;
                 m_RenderData.resumeGuardVisiblePixels = 0;
                 m_RenderData.resumeFrameDeadline = std::chrono::steady_clock::now() + RESUME_FRAME_GUARD_DURATION;
+                m_RenderData.pauseFlushActive = false;
             }
 
-            // WasHidden(false) does not produce OnPaint with external begin-frame
-            // scheduling. Request a full frame so CSS hover / compositor updates
-            // are not left on the last cached texture.
-            m_pWebView->GetHost()->WasResized();
-            m_pWebView->GetHost()->Invalidate(PET_VIEW);
             m_pWebView->GetHost()->SendExternalBeginFrame();
         }
     }
@@ -420,6 +442,14 @@ void CWebView::UpdateTexture()
         return;
     }
 
+    if (m_bIsRenderingPaused && m_RenderData.pauseFlushActive) [[unlikely]]
+    {
+        if (std::chrono::steady_clock::now() >= m_RenderData.pauseFlushDeadline || m_RenderData.lastFrameSignature != m_RenderData.pauseFlushSignature)
+            m_RenderData.pauseFlushActive = false;
+        else if (m_pWebView)
+            m_pWebView->GetHost()->SendExternalBeginFrame();
+    }
+
     // Discard current buffer if size doesn't match
     // This happens when resizing the browser as OnPaint is called asynchronously
     if (m_RenderData.changed && (m_pWebBrowserRenderItem->m_uiSizeX != m_RenderData.width || m_pWebBrowserRenderItem->m_uiSizeY != m_RenderData.height))
@@ -430,7 +460,7 @@ void CWebView::UpdateTexture()
         if (m_pWebView)
         {
             m_pWebView->GetHost()->WasResized();
-            m_pWebView->GetHost()->Invalidate(PET_VIEW);
+            m_pWebView->GetHost()->SendExternalBeginFrame();
         }
         m_RenderData.changed = false;
     }
@@ -440,7 +470,7 @@ void CWebView::UpdateTexture()
         m_RenderData.awaitingResumeFrame = false;
 
         if (m_pWebView)
-            m_pWebView->GetHost()->Invalidate(PET_VIEW);
+            m_pWebView->GetHost()->SendExternalBeginFrame();
     }
 
     // After device reset (minimize/restore), force full copy from our buffer to new texture
@@ -470,7 +500,7 @@ void CWebView::UpdateTexture()
                 m_RenderData.popupShown = false;
 
                 if (m_pWebView)
-                    m_pWebView->GetHost()->Invalidate(PET_VIEW);
+                    m_pWebView->GetHost()->SendExternalBeginFrame();
 
                 return;
             }
@@ -520,6 +550,8 @@ void CWebView::UpdateTexture()
             if (m_RenderData.changed) [[likely]]
             {
                 m_RenderData.changed = false;
+
+                m_RenderData.lastFrameSignature = GetFrameSignature(sourceData, m_RenderData.bufferSize, m_RenderData.width, m_RenderData.height);
 
                 // Always do full frame copy since D3DLOCK_DISCARD invalidates entire texture
                 // Our buffer contains the complete frame from OnPaint's full memcpy
@@ -1416,14 +1448,9 @@ void CWebView::OnAfterCreated(CefRefPtr<CefBrowser> browser)
     // Set web view reference
     m_pWebView = browser;
 
-    // Sync host visibility with the stored rendering state. This prevents
-    // newly created browsers from becoming permanently hidden when pause
-    // state changes race against async host creation.
-    m_pWebView->GetHost()->WasHidden(m_bIsRenderingPaused);
+    m_pWebView->GetHost()->WasHidden(false);
 
-    // Force an initial repaint to populate the texture even for pages that
-    // become visually static immediately after load.
-    m_pWebView->GetHost()->Invalidate(PET_VIEW);
+    m_pWebView->GetHost()->SendExternalBeginFrame();
 
     // If we have a pending URL from lazy loading, load it now
     if (!m_strPendingURL.empty())

@@ -303,6 +303,11 @@ private:
         size_t                                resumeGuardVisiblePixels = 0;
         bool                                  awaitingResumeFrame = false;
         std::chrono::steady_clock::time_point resumeFrameDeadline{};
+
+        uint64_t                              lastFrameSignature = 0;
+        bool                                  pauseFlushActive = false;
+        uint64_t                              pauseFlushSignature = 0;
+        std::chrono::steady_clock::time_point pauseFlushDeadline{};
     } m_RenderData;
 
     CWebBrowserEventsInterface* m_pEventsInterface;
