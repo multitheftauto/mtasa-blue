@@ -732,6 +732,7 @@ CVehicle* CPoolsSA::AddTrain(CClientVehicle* pClientVehicle, const CVector& vecP
     }
 
     train->SetMoveSpeed(CVector());
+    train->DumpVehicleFrames();
     return train.release();
 }
 
