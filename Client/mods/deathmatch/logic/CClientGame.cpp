@@ -4840,7 +4840,35 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
             return bAllowDamage;
         }
 
+        // Tyre damage can be processed through different paths in GTA's damage handling.
+        // For weapons with skills, GTA processes tyre damage in the weapon-skill path
+        // before the general entity damage handling. When tyre damage is cancelled,
+        // this can cause the same hit to reach this handler again in the same frame.
+        // Filter out the repeated callback so onClientVehicleDamage is not fired twice.
+        if (ucTyre != UCHAR_INVALID_INDEX && weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_TEC9)
+        {
+            const bool bIsRetryOfSameHit = pVehicleInterface == m_pLastTyreDamageVehicleInterface && ucTyre == m_ucLastTyreDamageIndex &&
+                                           fLoss == m_fLastTyreDamageLoss && m_uiFrameCount == m_uiLastTyreDamageFrame;
+
+            if (bIsRetryOfSameHit)
+            {
+                // Repeated callback for the same tyre hit in the same frame.
+                // Keep the decision from the original callback and don't fire the event again.
+                return m_bLastTyreDamageAllowed;
+            }
+
+            m_pLastTyreDamageVehicleInterface = pVehicleInterface;
+            m_ucLastTyreDamageIndex = ucTyre;
+            m_fLastTyreDamageLoss = fLoss;
+            m_uiLastTyreDamageFrame = m_uiFrameCount;
+        }
+
         CClientEntity* pClientAttacker = pPools->GetClientEntity((DWORD*)pAttackerInterface);
+
+        // GTA passes a zeroed position for explosion and fire damage, so report the vehicle position instead
+        CVector vecEventDamagePos = vecDamagePos;
+        if (vecEventDamagePos == CVector())
+            pClientVehicle->GetPosition(vecEventDamagePos);
 
         // Compose arguments
         // attacker, weapon, loss, damagepos, tyreIdx
@@ -4854,9 +4882,9 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         else
             Arguments.PushNil();
         Arguments.PushNumber(fLoss);
-        Arguments.PushNumber(vecDamagePos.fX);
-        Arguments.PushNumber(vecDamagePos.fY);
-        Arguments.PushNumber(vecDamagePos.fZ);
+        Arguments.PushNumber(vecEventDamagePos.fX);
+        Arguments.PushNumber(vecEventDamagePos.fY);
+        Arguments.PushNumber(vecEventDamagePos.fZ);
         if (ucTyre != UCHAR_INVALID_INDEX)
             Arguments.PushNumber(ucTyre);
         else
@@ -4866,6 +4894,9 @@ bool CClientGame::VehicleDamageHandler(CEntitySAInterface* pVehicleInterface, fl
         {
             bAllowDamage = false;
         }
+
+        if (ucTyre != UCHAR_INVALID_INDEX)
+            m_bLastTyreDamageAllowed = bAllowDamage;
     }
 
     return bAllowDamage;
@@ -5000,6 +5031,9 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
 
 // Called when GTA:SA destroys an entity (e.g., during map streaming).
 // Clear stale pool entries to prevent dangling pointer crashes in GetClientEntity/GetEntity.
+// Note: This may leak the CObjectSA/CVehicleSA/CPedSA wrapper if MTA created it, but we cannot
+// safely delete it here since the game entity is mid-destruction. The leak is acceptable
+// as this is an abnormal code path (GTA destroying MTA-managed entities).
 void CClientGame::GameObjectDestructHandler(CEntitySAInterface* pObject)
 {
     if (auto* pSlot = g_pGame->GetPools()->GetObject(reinterpret_cast<DWORD*>(pObject)))

@@ -343,12 +343,15 @@ void CSettings::ResetGuiPointers()
     m_pBindsList = NULL;
     m_pBindsDefButton = NULL;
 
-    m_pJoypadName = NULL;
-    m_pJoypadUnderline = NULL;
+    m_pJoypadDeviceCombo = NULL;
     m_pEditDeadzone = NULL;
     m_pEditSaturation = NULL;
+    m_pEditTriggerDeadzone = NULL;
+    m_pEditTriggerSaturation = NULL;
+    m_pCheckBoxJoypadVibration = NULL;
     m_pJoypadLabels.clear();
     m_pJoypadButtons.clear();
+    m_bUpdatingJoypadCombo = false;
 
     m_pSelectedBind = NULL;
 
@@ -727,19 +730,21 @@ void CSettings::CreateGUI()
     // Advanced Joypad settings
     {
         m_JoypadSettingsRevision = -1;
+        m_JoypadDeviceListRevision = -1;
 
         CJoystickManagerInterface* JoyMan = GetJoystickManager();
 
-        m_pJoypadName = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls));
-        m_pJoypadName->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
-        m_pJoypadName->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
-        m_pJoypadName->SetPosition(CVector2D(270, vecTemp.fY));
+        m_pJoypadDeviceCombo = reinterpret_cast<CGUIComboBox*>(pManager->CreateComboBox(pTabControls, ""));
+        m_pJoypadDeviceCombo->SetPosition(CVector2D(11, vecTemp.fY));
+        m_pJoypadDeviceCombo->SetSize(CVector2D(320.0f, 120.0f));
+        m_pJoypadDeviceCombo->SetReadOnly(true);
+        m_pJoypadDeviceCombo->SetSelectionHandler(GUI_CALLBACK(&CSettings::OnJoypadDeviceChanged, this));
 
-        m_pJoypadUnderline = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls));
-        m_pJoypadUnderline->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
-        m_pJoypadUnderline->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
-        m_pJoypadUnderline->SetPosition(CVector2D(270, vecTemp.fY + 2));
-        vecTemp.fY += 50;
+        m_pCheckBoxJoypadVibration = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabControls, _("Vibration"), true));
+        m_pCheckBoxJoypadVibration->SetPosition(CVector2D(340, vecTemp.fY + 3.0f));
+        m_pCheckBoxJoypadVibration->AutoSize(NULL, 20.0f);
+        m_pCheckBoxJoypadVibration->SetClickHandler(GUI_CALLBACK(&CSettings::OnJoypadVibrationClick, this));
+        vecTemp.fY += 32;
 
         m_pEditDeadzone = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(pTabControls));
         m_pEditDeadzone->SetPosition(CVector2D(10, vecTemp.fY));
@@ -753,17 +758,41 @@ void CSettings::CreateGUI()
         m_pEditSaturation->SetSize(CVector2D(45.0f, 24.0f));
         m_pEditSaturation->SetMaxLength(3);
         m_pEditSaturation->SetTextChangedHandler(GUI_CALLBACK(&CSettings::OnJoypadTextChanged, this));
+        vecTemp.fY += 31;
 
-        CGUILabel* pLabelDeadZone = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Dead Zone")));
+        m_pEditTriggerDeadzone = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(pTabControls));
+        m_pEditTriggerDeadzone->SetPosition(CVector2D(10, vecTemp.fY));
+        m_pEditTriggerDeadzone->SetSize(CVector2D(45.0f, 24.0f));
+        m_pEditTriggerDeadzone->SetMaxLength(3);
+        m_pEditTriggerDeadzone->SetTextChangedHandler(GUI_CALLBACK(&CSettings::OnJoypadTextChanged, this));
+        vecTemp.fY += 31;
+
+        m_pEditTriggerSaturation = reinterpret_cast<CGUIEdit*>(pManager->CreateEdit(pTabControls));
+        m_pEditTriggerSaturation->SetPosition(CVector2D(10, vecTemp.fY));
+        m_pEditTriggerSaturation->SetSize(CVector2D(45.0f, 24.0f));
+        m_pEditTriggerSaturation->SetMaxLength(3);
+        m_pEditTriggerSaturation->SetTextChangedHandler(GUI_CALLBACK(&CSettings::OnJoypadTextChanged, this));
+
+        CGUILabel* pLabelDeadZone = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Stick dead zone")));
         pLabelDeadZone->SetPosition(m_pEditDeadzone->GetPosition() + CVector2D(52.f, 1.f));
         pLabelDeadZone->AutoSize();
         pLabelDeadZone->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
 
-        CGUILabel* pLabelSaturation = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Saturation")));
+        CGUILabel* pLabelSaturation = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Stick saturation")));
         pLabelSaturation->SetPosition(m_pEditSaturation->GetPosition() + CVector2D(52.f, 1.f));
         pLabelSaturation->AutoSize();
         pLabelSaturation->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
-        vecTemp.fY += 106;
+
+        CGUILabel* pLabelTriggerDeadZone = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Trigger dead zone")));
+        pLabelTriggerDeadZone->SetPosition(m_pEditTriggerDeadzone->GetPosition() + CVector2D(52.f, 1.f));
+        pLabelTriggerDeadZone->AutoSize();
+        pLabelTriggerDeadZone->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
+
+        CGUILabel* pLabelTriggerSaturation = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Trigger saturation")));
+        pLabelTriggerSaturation->SetPosition(m_pEditTriggerSaturation->GetPosition() + CVector2D(52.f, 1.f));
+        pLabelTriggerSaturation->AutoSize();
+        pLabelTriggerSaturation->SetVerticalAlign(CGUI_ALIGN_VERTICALCENTER);
+        vecTemp.fY += 44;
 
         CGUILabel* pLabelHelp = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabControls, _("Use the 'Binds' tab for joypad buttons.")));
         pLabelHelp->SetPosition(CVector2D(10, vecTemp.fY));
@@ -2479,6 +2508,9 @@ void CSettings::ProcessJoypad()
     // Update from GUI
     GetJoystickManager()->SetDeadZone(atoi(m_pEditDeadzone->GetText().c_str()));
     GetJoystickManager()->SetSaturation(atoi(m_pEditSaturation->GetText().c_str()));
+    GetJoystickManager()->SetTriggerDeadZone(atoi(m_pEditTriggerDeadzone->GetText().c_str()));
+    GetJoystickManager()->SetTriggerSaturation(atoi(m_pEditTriggerSaturation->GetText().c_str()));
+    GetJoystickManager()->SetVibrationEnabled(m_pCheckBoxJoypadVibration->GetSelected());
 
     GetJoystickManager()->SaveToXML();
 }
@@ -2552,38 +2584,53 @@ void CSettings::UpdateJoypadTab()
 {
     CJoystickManagerInterface* JoyMan = GetJoystickManager();
 
-    // Has anything changed?
-    if (m_JoypadSettingsRevision == JoyMan->GetSettingsRevision())
+    const bool bSettingsChanged = m_JoypadSettingsRevision != JoyMan->GetSettingsRevision();
+    const bool bDeviceListChanged = m_JoypadDeviceListRevision != JoyMan->GetDeviceListRevision();
+
+    if (!bSettingsChanged && !bDeviceListChanged)
         return;
 
-    // Update the joystick name
-    string strJoystickName = JoyMan->IsJoypadConnected() ? JoyMan->GetControllerName() : _("Joypad not detected  -  Check connections and restart game");
+    if (bDeviceListChanged && m_pWindow->IsVisible() && m_pJoypadDeviceCombo && !m_pJoypadDeviceCombo->IsOpen())
+    {
+        m_bUpdatingJoypadCombo = true;
+        std::vector<SJoystickDeviceChoice> devices = JoyMan->GetAvailableControllers();
+        std::string                        strSelected = JoyMan->GetSelectedControllerId();
+        m_pJoypadDeviceCombo->Clear();
+        int iSelect = 0;
+        for (size_t i = 0; i < devices.size(); i++)
+        {
+            CGUIListItem* pItem = m_pJoypadDeviceCombo->AddItem(devices[i].strName.c_str());
+            if (pItem)
+                pItem->SetData(devices[i].strId.c_str());
+            if (devices[i].strId == strSelected)
+                iSelect = static_cast<int>(i);
+        }
+        if (!devices.empty())
+            m_pJoypadDeviceCombo->SetSelectedItemByIndex(iSelect);
+        m_bUpdatingJoypadCombo = false;
+        m_JoypadDeviceListRevision = JoyMan->GetDeviceListRevision();
+    }
 
-    m_pJoypadName->SetPosition(CVector2D(270, m_pJoypadName->GetPosition().fY));
-    m_pJoypadName->SetText(strJoystickName.c_str());
-    m_pJoypadName->AutoSize(strJoystickName.c_str());
-    m_pJoypadName->SetPosition(m_pJoypadName->GetPosition() - CVector2D(m_pJoypadName->GetSize().fX * 0.5, 0.0f));
+    if (!bSettingsChanged)
+        return;
 
-    // Joystick name underline
-    string strUnderline = "";
-    int    inumChars = m_pJoypadName->GetSize().fX / 7.f + 0.5f;
-    for (int i = 0; i < inumChars; i++)
-        strUnderline = strUnderline + "_";
-
-    m_pJoypadUnderline->SetPosition(CVector2D(270, m_pJoypadUnderline->GetPosition().fY));
-    m_pJoypadUnderline->SetText(strUnderline.c_str());
-    m_pJoypadUnderline->AutoSize(strUnderline.c_str());
-    m_pJoypadUnderline->SetPosition(m_pJoypadUnderline->GetPosition() - CVector2D(m_pJoypadUnderline->GetSize().fX * 0.5, 0.0f));
-    m_pJoypadUnderline->SetVisible(JoyMan->IsJoypadConnected());
+    if (m_pCheckBoxJoypadVibration)
+        m_pCheckBoxJoypadVibration->SetSelected(JoyMan->GetVibrationEnabled());
 
     // Update DeadZone and Saturation edit boxes
     char szDeadzone[32] = "";
     char szSaturation[32] = "";
+    char szTriggerDeadzone[32] = "";
+    char szTriggerSaturation[32] = "";
     snprintf(szDeadzone, 10, "%d", JoyMan->GetDeadZone());
     snprintf(szSaturation, 10, "%d", JoyMan->GetSaturation());
+    snprintf(szTriggerDeadzone, 10, "%d", JoyMan->GetTriggerDeadZone());
+    snprintf(szTriggerSaturation, 10, "%d", JoyMan->GetTriggerSaturation());
 
     m_pEditDeadzone->SetText(szDeadzone);
     m_pEditSaturation->SetText(szSaturation);
+    m_pEditTriggerDeadzone->SetText(szTriggerDeadzone);
+    m_pEditTriggerSaturation->SetText(szTriggerSaturation);
 
     // Update axes labels and buttons
     for (int i = 0; i < JoyMan->GetOutputCount() && i < (int)m_pJoypadButtons.size(); i++)
@@ -2609,10 +2656,35 @@ bool CSettings::OnJoypadTextChanged(CGUIElement* pElement)
     // Update from GUI
     GetJoystickManager()->SetDeadZone(atoi(m_pEditDeadzone->GetText().c_str()));
     GetJoystickManager()->SetSaturation(atoi(m_pEditSaturation->GetText().c_str()));
+    GetJoystickManager()->SetTriggerDeadZone(atoi(m_pEditTriggerDeadzone->GetText().c_str()));
+    GetJoystickManager()->SetTriggerSaturation(atoi(m_pEditTriggerSaturation->GetText().c_str()));
 
     // Dont immediately read back these settings
     m_JoypadSettingsRevision = GetJoystickManager()->GetSettingsRevision();
 
+    return true;
+}
+
+bool CSettings::OnJoypadDeviceChanged(CGUIElement* pElement)
+{
+    if (m_bUpdatingJoypadCombo || !m_pJoypadDeviceCombo)
+        return true;
+
+    CGUIListItem* pItem = m_pJoypadDeviceCombo->GetSelectedItem();
+    if (!pItem || !pItem->GetData())
+        return true;
+
+    GetJoystickManager()->SetSelectedControllerId(static_cast<const char*>(pItem->GetData()));
+    m_JoypadSettingsRevision = -1;
+    m_JoypadDeviceListRevision = -1;
+    UpdateJoypadTab();
+    return true;
+}
+
+bool CSettings::OnJoypadVibrationClick(CGUIElement* pElement)
+{
+    GetJoystickManager()->SetVibrationEnabled(m_pCheckBoxJoypadVibration->GetSelected());
+    m_JoypadSettingsRevision = GetJoystickManager()->GetSettingsRevision();
     return true;
 }
 

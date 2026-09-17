@@ -49,6 +49,11 @@ bool CDeathmatchVehicle::SyncDamageModel()
     if (IsBlown())
         return false;
 
+    // Do not send premature damage sync states if the vehicle clump has just been
+    // recreated/streamed in and its cached damage states are awaiting application in StreamedInPulse.
+    if (m_bJustStreamedIn)
+        return false;
+
     SVehicleDamageSync damage(true, true, true, true, true);
     bool               bChanges = false;
 

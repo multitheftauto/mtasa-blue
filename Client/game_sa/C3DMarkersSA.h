@@ -28,7 +28,8 @@ public:
     C3DMarkersSA();
     ~C3DMarkersSA();
 
-    C3DMarker* CreateMarker(DWORD Identifier, T3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g, BYTE b, BYTE a);
+    C3DMarker* CreateMarker(DWORD Identifier, T3DMarkerType::Enum dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g, BYTE b,
+                            BYTE a);
     C3DMarker* FindFreeMarker();
     C3DMarker* FindMarker(DWORD Identifier) override;
     void       ReinitMarkers();

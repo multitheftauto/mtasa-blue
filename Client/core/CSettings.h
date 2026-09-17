@@ -284,13 +284,17 @@ protected:
     CGUIButton*   m_pBindsDefButton;
     CGUIHandle    m_hBind, m_hPriKey, m_hSecKeys[SecKeyNum];
 
-    CGUILabel*               m_pJoypadName;
-    CGUILabel*               m_pJoypadUnderline;
+    CGUIComboBox*            m_pJoypadDeviceCombo;
     CGUIEdit*                m_pEditDeadzone;
     CGUIEdit*                m_pEditSaturation;
+    CGUIEdit*                m_pEditTriggerDeadzone;
+    CGUIEdit*                m_pEditTriggerSaturation;
+    CGUICheckBox*            m_pCheckBoxJoypadVibration;
     std::vector<CGUILabel*>  m_pJoypadLabels;
     std::vector<CGUIButton*> m_pJoypadButtons;
     int                      m_JoypadSettingsRevision;
+    int                      m_JoypadDeviceListRevision;
+    bool                     m_bUpdatingJoypadCombo;
 
     CGUILabel*     m_pControlsMouseLabel;
     CGUICheckBox*  m_pInvertMouse;
@@ -374,6 +378,8 @@ protected:
     bool          m_bBrowserListsLoadEnabled;
 
     bool OnJoypadTextChanged(CGUIElement* pElement);
+    bool OnJoypadDeviceChanged(CGUIElement* pElement);
+    bool OnJoypadVibrationClick(CGUIElement* pElement);
     bool OnAxisSelectClick(CGUIElement* pElement);
     bool OnAudioDefaultClick(CGUIElement* pElement);
     bool OnControlsDefaultClick(CGUIElement* pElement);

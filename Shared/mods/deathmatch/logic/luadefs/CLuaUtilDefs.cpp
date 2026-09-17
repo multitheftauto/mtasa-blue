@@ -497,9 +497,23 @@ int CLuaUtilDefs::fromJSON(lua_State* luaVM)
         CLuaArguments Converted;
         if (Converted.ReadFromJSONString(strJson))
         {
+            const int count = static_cast<int>(Converted.Count());
+
+            // Keep the original fromJSON behavior as long as all
+            // return values can fit on the Lua stack.
+            //
+            // If the root JSON is a large array and the values cannot
+            // be returned unpacked, return them as a single Lua table.
+            // GitHub Issue: #5287
+            if (!lua_checkstack(luaVM, count))
+            {
+                Converted.PushAsTable(luaVM, nullptr, true);
+                return 1;
+            }
+
             // Return it as data
             Converted.PushArguments(luaVM);
-            return static_cast<int>(Converted.Count());
+            return count;
         }
     }
     else
