@@ -119,27 +119,19 @@ void CObjectRPCs::SetObjectScale(CClientEntity* pSource, NetBitStreamInterface& 
 
 void CObjectRPCs::SetElementScale(CClientEntity* pSource, NetBitStreamInterface& bitStream)
 {
-    CVector vecScale;
-
-    bitStream.Read(vecScale.fX);
-    vecScale.fY = vecScale.fX;
-    vecScale.fZ = vecScale.fX;
-
-    bitStream.Read(vecScale.fY);
-    bitStream.Read(vecScale.fZ);
+    CVector scale;
+    bitStream.Read(scale.fX);
+    bitStream.Read(scale.fY);
+    bitStream.Read(scale.fZ);
 
     if (pSource->GetType() == CCLIENTBUILDING)
     {
-        static_cast<CClientBuilding*>(pSource)->SetScale(vecScale);
+        static_cast<CClientBuilding*>(pSource)->SetScale(scale);
         return;
     }
 
-    CDeathmatchObject* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID()));
-
-    if (pObject)
-    {
-        pObject->SetScale(vecScale);
-    }
+    if (auto* object = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(pSource->GetID())))
+        object->SetScale(scale);
 }
 
 void CObjectRPCs::SetObjectVisibleInAllDimensions(CClientEntity* pSource, NetBitStreamInterface& bitStream)

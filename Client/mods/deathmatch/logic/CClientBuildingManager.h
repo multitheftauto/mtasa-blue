@@ -44,8 +44,8 @@ public:
     void UpdateScaledBuildings();
 
 private:
-    void AddToScaledList(CClientBuilding* pBuilding);
-    void RemoveFromScaledList(CClientBuilding* pBuilding);
+    void AddToScaledList(CClientBuilding* building);
+    void RemoveFromScaledList(CClientBuilding* building);
 
     bool DoPoolResize(size_t newCapacity);
     void AddToList(CClientBuilding* pBuilding)

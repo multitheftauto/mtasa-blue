@@ -28,7 +28,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementMatrix", GetElementMatrix},
         {"getElementPosition", GetElementPosition},
         {"getElementRotation", GetElementRotation},
-        {"getElementScale", GetElementScale},
+        {"getElementScale", ArgumentParser<GetElementScale>},
         {"getElementVelocity", GetElementVelocity},
         {"getElementAngularVelocity", GetElementTurnVelocity},
         {"getElementType", GetElementType},
@@ -83,7 +83,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementMatrix", SetElementMatrix},
         {"setElementPosition", SetElementPosition},
         {"setElementRotation", SetElementRotation},
-        {"setElementScale", SetElementScale},
+        {"setElementScale", ArgumentParser<SetElementScale>},
         {"setElementVelocity", SetElementVelocity},
         {"setElementAngularVelocity", SetElementAngularVelocity},
         {"setElementInterior", SetElementInterior},
@@ -551,30 +551,17 @@ int CLuaElementDefs::OOP_GetElementRotation(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::GetElementScale(lua_State* luaVM)
+std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> CLuaElementDefs::GetElementScale(lua_State* luaVM, CClientEntity* entity)
 {
     //  float, float, float getElementScale ( element theElement )
-    CClientEntity* pEntity = NULL;
+    CVector scale;
+    if (!CStaticFunctionDefinitions::GetElementScale(*entity, scale))
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
+    if (lua_ncallresult(luaVM) == 3)
+        return CLuaMultiReturn<float, float, float>(scale.fX, scale.fY, scale.fZ);
 
-    if (!argStream.HasErrors())
-    {
-        CVector vecScale;
-        if (CStaticFunctionDefinitions::GetElementScale(*pEntity, vecScale))
-        {
-            lua_pushnumber(luaVM, vecScale.fX);
-            lua_pushnumber(luaVM, vecScale.fY);
-            lua_pushnumber(luaVM, vecScale.fZ);
-            return 3;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return scale;
 }
 
 int CLuaElementDefs::GetElementVelocity(lua_State* luaVM)
@@ -2006,40 +1993,14 @@ int CLuaElementDefs::OOP_SetElementRotation(lua_State* luaVM)
     return 1;
 }
 
-int CLuaElementDefs::SetElementScale(lua_State* luaVM)
+bool CLuaElementDefs::SetElementScale(CClientEntity* entity, std::variant<CVector, float> scale)
 {
     //  bool setElementScale ( element theElement, float scale )
     //  bool setElementScale ( element theElement, float x, float y, float z )
-    CClientEntity* pEntity;
-    CVector        vecScale;
+    if (const auto* uniformScale = std::get_if<float>(&scale))
+        return CStaticFunctionDefinitions::SetElementScale(*entity, CVector(*uniformScale, *uniformScale, *uniformScale));
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pEntity);
-
-    if (argStream.NextIsVector3D())
-    {
-        argStream.ReadVector3D(vecScale);
-    }
-    else
-    {
-        argStream.ReadNumber(vecScale.fX);
-        argStream.ReadNumber(vecScale.fY, vecScale.fX);
-        argStream.ReadNumber(vecScale.fZ, vecScale.fX);
-    }
-
-    if (!argStream.HasErrors())
-    {
-        if (CStaticFunctionDefinitions::SetElementScale(*pEntity, vecScale))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return CStaticFunctionDefinitions::SetElementScale(*entity, std::get<CVector>(scale));
 }
 
 int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)

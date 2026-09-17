@@ -3959,8 +3959,8 @@ void CClientGame::PostWorldProcessHandler()
 
 void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
 {
-    if (CClientBuildingManager* pBuildingManager = m_pManager->GetBuildingManager())
-        pBuildingManager->UpdateScaledBuildings();
+    if (auto* buildingManager = m_pManager->GetBuildingManager())
+        buildingManager->UpdateScaledBuildings();
 
     CLuaArguments Arguments;
     m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);

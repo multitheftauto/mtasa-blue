@@ -40,7 +40,7 @@ public:
     LUA_DECLARE_OOP(getElementMatrix);
     LUA_DECLARE_OOP(getElementPosition);
     LUA_DECLARE_OOP(getElementRotation);
-    LUA_DECLARE(getElementScale);
+    static std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> getElementScale(lua_State* luaVM, CElement* element);
     LUA_DECLARE_OOP(getElementVelocity);
     LUA_DECLARE_OOP(getElementTurnVelocity);
     LUA_DECLARE(getElementType);
@@ -95,7 +95,7 @@ public:
     LUA_DECLARE(setElementMatrix);
     LUA_DECLARE(setElementPosition);
     LUA_DECLARE_OOP(setElementRotation);
-    LUA_DECLARE(setElementScale);
+    static bool setElementScale(CElement* element, std::variant<CVector, float> scale);
     LUA_DECLARE(setElementVelocity);
     LUA_DECLARE(setElementTurnVelocity);
     LUA_DECLARE(setElementInterior);

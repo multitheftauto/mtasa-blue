@@ -1142,10 +1142,10 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
 
                     if (BitStream.Can(eBitStreamVersion::BuildingScale))
                     {
-                        const CVector& vecScale = pBuilding->GetScale();
-                        BitStream.Write(vecScale.fX);
-                        BitStream.Write(vecScale.fY);
-                        BitStream.Write(vecScale.fZ);
+                        const CVector& scale = pBuilding->GetScale();
+                        BitStream.Write(scale.fX);
+                        BitStream.Write(scale.fY);
+                        BitStream.Write(scale.fZ);
                     }
 
                     break;
