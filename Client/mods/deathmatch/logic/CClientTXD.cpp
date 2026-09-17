@@ -78,7 +78,7 @@ bool CClientTXD::Import(unsigned short usModelID)
     if (usModelID >= CLOTHES_TEX_ID_FIRST && usModelID <= CLOTHES_TEX_ID_LAST)
     {
         if (m_FileData.empty() && m_bIsRawData)
-            return false;            // Raw data has been freed already because texture was first used as non-clothes
+            return false;  // Raw data has been freed already because texture was first used as non-clothes
 
         // If using for clothes only, unload 'replacing model textures' stuff to save memory
         if (!m_ReplacementTextures.textures.empty() && m_ReplacementTextures.usedInModelIds.empty())
