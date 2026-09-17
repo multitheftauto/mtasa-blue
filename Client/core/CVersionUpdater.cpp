@@ -16,6 +16,12 @@
 #include "CFilePathTranslator.h"
 #include "SharedUtil.Thread.h"
 #include <charconv>
+#include <filesystem>
+#include <unzip.h>
+#include <iowin32.h>
+
+extern std::filesystem::path g_gtaDirectory;
+extern std::filesystem::path g_mtaDirectory;
 
 ///////////////////////////////////////////////////////////////
 //
@@ -2133,6 +2139,73 @@ void CVersionUpdater::_QUpdateNewsResult()
 #endif
 }
 
+// Give up on the scan below if the file system is unusually slow, rather than freeze the game
+constexpr long long DATA_FILE_SCAN_TIMEOUT_MS = 2000;
+
+/**
+ * @brief Collects the GTA:SA files which differ from the original copies MTA ships in mta/sa.dat.
+ */
+static std::vector<SString> FindModifiedGtaDataFiles()
+{
+    std::vector<SString> modifiedFiles;
+
+    zlib_filefunc64_def fileFunctions;
+    fill_win32_filefunc64W(&fileFunctions);
+
+    const std::wstring strArchivePath = (g_mtaDirectory / "MTA" / "sa.dat").wstring();
+    unzFile            archive = unzOpen2_64(strArchivePath.c_str(), &fileFunctions);
+
+    if (!archive)
+        return modifiedFiles;
+
+    const SString   strGtaDirectory = UTF8FilePath(g_gtaDirectory);
+    const long long llDeadline = GetTickCount64_() + DATA_FILE_SCAN_TIMEOUT_MS;
+    bool            bMapsReported = false;
+
+    for (int status = unzGoToFirstFile(archive); status == UNZ_OK; status = unzGoToNextFile(archive))
+    {
+        if (GetTickCount64_() > llDeadline)
+            break;
+
+        char          szEntryName[MAX_PATH] = {};
+        unz_file_info entryInfo = {};
+
+        if (unzGetCurrentFileInfo(archive, &entryInfo, szEntryName, NUMELMS(szEntryName) - 1, nullptr, 0, nullptr, 0) != UNZ_OK)
+            continue;
+
+        const SString strEntryName = SStringX(szEntryName).ToLower();
+        const bool    bIsMap = strEntryName.BeginsWith("data/maps/");
+
+        if (strEntryName.EndsWith("/") || (bIsMap && bMapsReported))
+            continue;
+
+        const SString strFilePath = PathJoin(strGtaDirectory, strEntryName);
+        const uint64  ullFileSize = FileSize(strFilePath);
+
+        if (ullFileSize == 0)
+            continue;
+
+        if (ullFileSize == entryInfo.uncompressed_size)
+        {
+            std::vector<char> fileContents;
+
+            if (!FileLoad(strFilePath, fileContents))
+                continue;
+
+            const uLong ulChecksum = crc32(crc32(0, Z_NULL, 0), reinterpret_cast<const Bytef*>(fileContents.data()), static_cast<uInt>(fileContents.size()));
+
+            if (ulChecksum == entryInfo.crc)
+                continue;
+        }
+
+        bMapsReported |= bIsMap;
+        modifiedFiles.push_back(bIsMap ? SStringX("data/maps") : strEntryName);
+    }
+
+    unzClose(archive);
+    return modifiedFiles;
+}
+
 ///////////////////////////////////////////////////////////////
 //
 // CVersionUpdater::_DialogDataFilesQuestion
@@ -2145,14 +2218,35 @@ void CVersionUpdater::_DialogDataFilesQuestion()
     // If using customized SA files, advise user to stop using customized SA files
     if (GetApplicationSettingInt("customized-sa-files-using"))
     {
+        // Keep the list short enough that the dialog still fits on a 640x480 screen
+        constexpr size_t MAX_LISTED_FILES = 6;
+
+        const std::vector<SString> modifiedFiles = FindModifiedGtaDataFiles();
+        const size_t               numListed = std::min(modifiedFiles.size(), MAX_LISTED_FILES);
+
         GetQuestionBox().Reset();
         GetQuestionBox().SetTitle(_("CUSTOMIZED GTA:SA FILES"));
-        SString strMessage;
-        strMessage += "This server is blocking your customized GTA:SA files.";
-        strMessage += "\n\nTo join this server please uncheck:";
+        SString strMessage = _("This server is blocking your customized GTA:SA files.");
+        strMessage += "\n\n";
+
+        if (numListed)
+        {
+            strMessage += _("These GTA:SA data files do not match the originals:\n(Other files may differ too.)");
+            strMessage += "\n\n";
+
+            for (size_t i = 0; i < numListed; i++)
+                strMessage += SString("- %s\n", *modifiedFiles[i]);
+
+            if (modifiedFiles.size() > numListed)
+                strMessage += SString(_("- ...and %u more"), static_cast<uint>(modifiedFiles.size() - numListed)) + "\n";
+
+            strMessage += "\n";
+        }
+
+        strMessage += _("To join this server please uncheck:");
         strMessage += "\nSettings->Multiplayer->Use customized GTA:SA files";
         strMessage += "\n\n";
-        GetQuestionBox().SetMessage(_(strMessage));
+        GetQuestionBox().SetMessage(strMessage);
         GetQuestionBox().SetButton(0, _("Ok"));
         GetQuestionBox().Show();
         _PollAnyButton();
