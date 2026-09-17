@@ -67,9 +67,9 @@ void CNewsBrowser::InitNewsItemList()
     {
         SString strItemDir = directoryList[directoryList.size() - 1 - i];
         if (strItemDir < strOldestPost)
-            continue;            // Post too old
+            continue;  // Post too old
         if (m_NewsitemList.size() >= uiMaxHistoryLength)
-            continue;            // Post count too high
+            continue;  // Post count too high
 
         SNewsItem newsItem;
         newsItem.strContentFullDir = PathJoin(strAllNewsDir, strItemDir);
@@ -200,6 +200,9 @@ void CNewsBrowser::CreateGUI()
 ////////////////////////////////////////////////////
 void CNewsBrowser::DestroyGUI()
 {
+    if (!m_pWindow && !m_pTabPanel && !m_pButtonOK && !m_pButtonNewsLink)
+        return;
+
     // Clean up the main UI elements in reverse order of creation
     SAFE_DELETE(m_pTabPanel);  // This will destroy all tabs and their children
     SAFE_DELETE(m_pButtonOK);
@@ -236,16 +239,25 @@ void CNewsBrowser::AddNewsTab(const SNewsItem& newsItem)
     // Switch cwd
     pManager->PushGuiWorkingDirectory(newsItem.strContentFullDir);
 
-    // Load files
-    CGUIWindow* pWindow = LoadLayoutAndImages(m_pScrollPane, newsItem);
-    m_TabContentList.push_back(pWindow);
-
-    // Set tab name from content window title
-    if (pWindow)
+    try
     {
-        SString strTitle = pWindow->GetText();
-        if (!strTitle.empty())
-            pTab->SetText(strTitle);
+        // Load files
+        CGUIWindow* pWindow = LoadLayoutAndImages(m_pScrollPane, newsItem);
+        m_TabContentList.push_back(pWindow);
+
+        // Set tab name from content window title
+        if (pWindow)
+        {
+            SString strTitle = pWindow->GetText();
+            if (!strTitle.empty())
+                pTab->SetText(strTitle);
+        }
+    }
+    catch (...)
+    {
+        // Pop before rethrowing, or later asset loads resolve inside the failed dir and healthy installs look broken.
+        pManager->PopGuiWorkingDirectory(newsItem.strContentFullDir);
+        throw;
     }
 
     // Restore cwd

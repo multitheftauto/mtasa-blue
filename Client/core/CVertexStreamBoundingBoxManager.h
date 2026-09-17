@@ -75,15 +75,17 @@ private:
     SCurrentStateInfo2(const SCurrentStateInfo2& other);
     SCurrentStateInfo2& operator=(const SCurrentStateInfo2& other);
 
-public:
-    SCurrentStateInfo2() { ZERO_POD_STRUCT(this); }
-
-    ~SCurrentStateInfo2()
+    void ReleaseComReferences()
     {
         SAFE_RELEASE(stream.pStreamData);
         SAFE_RELEASE(pIndexData);
         SAFE_RELEASE(decl.pVertexDeclaration);
     }
+
+public:
+    SCurrentStateInfo2() { ZERO_POD_STRUCT(this); }
+
+    ~SCurrentStateInfo2() { ReleaseComReferences(); }
 
     // Info to DrawIndexPrimitive
     struct
@@ -132,6 +134,8 @@ public:
     void  OnVertexBufferRangeInvalidated(IDirect3DVertexBuffer9* pStreamData, uint Offset, uint Size);
 
     static CVertexStreamBoundingBoxManager* GetSingleton();
+    static CVertexStreamBoundingBoxManager* GetExistingSingleton();
+    static void                             DestroySingleton();
 
 protected:
     float CalcDistanceSq(const SCurrentStateInfo2& state, const CBox& boundingBox);

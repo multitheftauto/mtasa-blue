@@ -13,7 +13,7 @@
 
 CGUITab_Impl::CGUITab_Impl(CGUI_Impl* pGUI, CGUIElement_Impl* pParent, const char* szCaption)
 {
-    m_pManager = pGUI;
+    SetManager(pGUI);
 
     // Get an unique identifier for CEGUI
     char szUnique[CGUI_CHAR_SIZE];

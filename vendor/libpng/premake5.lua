@@ -3,6 +3,7 @@ project "libpng"
     language "C"
     architecture "x86"
     systemversion "latest"
+	warnings "Off"
 
     targetdir "bin"
     objdir "obj"

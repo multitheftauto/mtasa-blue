@@ -1,4 +1,4 @@
-/*****************************************************************************
+﻿/*****************************************************************************
  *
  *  PROJECT:     Multi Theft Auto v1.0
  *  LICENSE:     See LICENSE in the top level directory
@@ -51,14 +51,21 @@ void CElementDeleter::DoDeleteAll()
         delete *m_List.begin();
 }
 
-void CElementDeleter::Unreference(CElement* element)
+void CElementDeleter::Unreference(CElement* pElement)
 {
-    m_List.remove(element);
+    m_List.remove(pElement);
 }
 
-bool CElementDeleter::IsBeingDeleted(CElement* element) const
+bool CElementDeleter::IsBeingDeleted(CElement* pElement)
 {
-    return ListContains(m_List, element);
+    return ListContains(m_List, pElement);
+}
+
+void CElementDeleter::CleanUpForVM(CLuaMain* pLuaMain)
+{
+    CElementListType::const_iterator iter = m_List.begin();
+    for (; iter != m_List.end(); iter++)
+        (*iter)->DeleteEvents(pLuaMain, false);
 }
 
 void CElementDeleter::DeleteTree(CElement* rootElement, bool unlink, bool updatePerPlayerEntities)
@@ -90,7 +97,7 @@ void CElementDeleter::DeleteTree(CElement* rootElement, bool unlink, bool update
     {
         element->ClearChildren();
         element->SetParentObject(nullptr, false);
-        
+
         if (unlink)
             element->Unlink();
     }
@@ -110,10 +117,4 @@ void CElementDeleter::CollectTreeElements(CElement* element, std::vector<CElemen
     {
         CollectTreeElements(*iter, elements);
     }
-}
-
-void CElementDeleter::CleanUpForVM(CLuaMain* luaMain)
-{
-    for (auto* element : m_List)
-        element->DeleteEvents(luaMain, false);
 }

@@ -20,11 +20,13 @@ void CLuaSearchLightDefs::LoadFunctions()
         {"getSearchLightEndPosition", GetSearchLightEndPosition},
         {"getSearchLightStartRadius", GetSearchLightStartRadius},
         {"getSearchLightEndRadius", GetSearchLightEndRadius},
+        {"getSearchLightColor", ArgumentParser<GetSearchLightColor>},
 
         {"setSearchLightStartPosition", SetSearchLightStartPosition},
         {"setSearchLightEndPosition", SetSearchLightEndPosition},
         {"setSearchLightStartRadius", SetSearchLightStartRadius},
         {"setSearchLightEndRadius", SetSearchLightEndRadius},
+        {"setSearchLightColor", ArgumentParser<SetSearchLightColor>},
     };
 
     // Add functions
@@ -311,4 +313,15 @@ int CLuaSearchLightDefs::OOP_GetSearchLightEndPosition(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t> CLuaSearchLightDefs::GetSearchLightColor(CClientSearchLight* searchLight)
+{
+    SColor color = searchLight->GetColor();
+    return CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>{color.R, color.G, color.B, color.A};
+}
+
+void CLuaSearchLightDefs::SetSearchLightColor(CClientSearchLight* searchLight, SColor color)
+{
+    searchLight->SetColor(color);
 }

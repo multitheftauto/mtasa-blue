@@ -110,7 +110,7 @@ CDatabaseConnectionMySql::CDatabaseConnectionMySql(CDatabaseType* pManager, cons
     m_handle = mysql_init(NULL);
     if (m_handle)
     {
-        bool reconnect = m_bAutomaticReconnect;
+        bool       reconnect = m_bAutomaticReconnect;
         uint const ssl_mode = m_bUseSSL ? SSL_MODE_REQUIRED : SSL_MODE_DISABLED;
         mysql_options(m_handle, MYSQL_OPT_RECONNECT, &reconnect);
         mysql_options(m_handle, MYSQL_OPT_SSL_MODE, &ssl_mode);

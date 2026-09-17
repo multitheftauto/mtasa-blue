@@ -3,7 +3,15 @@ project "Loader Proxy"
 	kind "SharedLib"
 	targetname "mtasa"
 	targetdir(buildpath("mta"))
-	targetsuffix ""
+	clangtidy "On"
+
+	filter "configurations:Debug"
+		targetsuffix "_d"
+
+	filter "configurations:Release or configurations:Nightly"
+		targetsuffix ""
+
+	filter {}
 
 	vpaths {
 		["Headers/*"] = "**.h",

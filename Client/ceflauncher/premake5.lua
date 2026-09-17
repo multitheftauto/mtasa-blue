@@ -5,6 +5,7 @@ project "CEFLauncher"
 	targetdir(buildpath("mta/cef"))
 	includedirs { "../sdk" }
 	links { "CEFLauncher DLL"}
+	clangtidy "On"
 
 	vpaths {
 		["Headers/*"] = "**.h",
@@ -20,8 +21,31 @@ project "CEFLauncher"
 		"*.manifest",
 	}
 
+	filter "system:windows"
+		buildoptions {
+			"/Zc:inline",
+			"/Zc:throwingNew",
+			"/diagnostics:caret",
+			"/sdl",
+			"/guard:cf"
+		}
+		editandcontinue "Off"
+		linkoptions { "/guard:cf" }
+
+	filter {"system:windows", "configurations:Debug"}
+		defines { "_DEBUG" }
+		runtime "Debug"
+
+	filter {"system:windows", "configurations:Release"}
+		optimize "Speed"
+		defines { "NDEBUG" }
+
+	filter {"system:windows", "configurations:Nightly"}
+		optimize "Speed"
+		defines { "NDEBUG" }
+
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
-	
+
 	filter "system:not windows"
 		flags { "ExcludeFromBuild" }

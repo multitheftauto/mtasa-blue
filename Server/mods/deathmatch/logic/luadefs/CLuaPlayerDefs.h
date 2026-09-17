@@ -38,8 +38,8 @@ public:
     LUA_DECLARE(GetPlayerNametagColor);
     LUA_DECLARE(IsPlayerNametagShowing);
     LUA_DECLARE(GetPlayerSerial);
-    LUA_DECLARE(GetPlayerCommunityID);            // deprecate me
-    LUA_DECLARE(GetPlayerUserName);               // deprecate me
+    LUA_DECLARE(GetPlayerCommunityID);  // deprecate me
+    LUA_DECLARE(GetPlayerUserName);     // deprecate me
     LUA_DECLARE(GetPlayerBlurLevel);
     LUA_DECLARE(GetPlayerName);
     LUA_DECLARE(GetPlayerIP);
@@ -53,7 +53,7 @@ public:
     LUA_DECLARE(GivePlayerMoney);
     LUA_DECLARE(TakePlayerMoney);
     LUA_DECLARE(SpawnPlayer);
-    LUA_DECLARE(ShowPlayerHudComponent);            // deprecate me
+    LUA_DECLARE(ShowPlayerHudComponent);  // deprecate me
     LUA_DECLARE(SetPlayerWantedLevel);
     LUA_DECLARE(ForcePlayerMap);
     LUA_DECLARE(SetPlayerNametagText);
@@ -87,9 +87,9 @@ public:
     LUA_DECLARE(ToggleAllControls);
 
     // Audio funcs
-    LUA_DECLARE(PlaySoundFrontEnd);
-    LUA_DECLARE(PlayMissionAudio);
-    LUA_DECLARE(PreloadMissionAudio);
+    static bool PlaySoundFrontEnd(CPlayer* element, std::uint8_t sound);
+    static bool PlayMissionAudio(CPlayer* player, std::uint16_t slot);
+    static bool PreloadMissionAudio(CPlayer* player, std::uint16_t sound, std::uint16_t slot);
 
     // Cursor funcs
     LUA_DECLARE(IsCursorShowing);

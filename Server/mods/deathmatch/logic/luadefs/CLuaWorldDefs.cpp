@@ -16,84 +16,85 @@
 
 void CLuaWorldDefs::LoadFunctions()
 {
-    constexpr static const std::pair<const char*, lua_CFunction> functions[]{// Get
-                                                                             {"getTime", getTime},
-                                                                             {"getWeather", getWeather},
-                                                                             {"getZoneName", getZoneName},
-                                                                             {"getGravity", getGravity},
-                                                                             {"getGameSpeed", getGameSpeed},
-                                                                             {"getWaveHeight", getWaveHeight},
-                                                                             {"getFPSLimit", getFPSLimit},
-                                                                             {"getMinuteDuration", getMinuteDuration},
-                                                                             {"getTrafficLightState", getTrafficLightState},
-                                                                             {"getJetpackMaxHeight", getJetpackMaxHeight},
-                                                                             {"getSkyGradient", getSkyGradient},
-                                                                             {"getHeatHaze", getHeatHaze},
-                                                                             {"getJetpackWeaponEnabled", getJetpackWeaponEnabled},
-                                                                             {"getCloudsEnabled", getCloudsEnabled},
-                                                                             {"getInteriorSoundsEnabled", getInteriorSoundsEnabled},
-                                                                             {"getRainLevel", getRainLevel},
-                                                                             {"getSunSize", getSunSize},
-                                                                             {"getSunColor", getSunColor},
-                                                                             {"getWindVelocity", getWindVelocity},
-                                                                             {"getFarClipDistance", getFarClipDistance},
-                                                                             {"getFogDistance", getFogDistance},
-                                                                             {"getAircraftMaxHeight", getAircraftMaxHeight},
-                                                                             {"getAircraftMaxVelocity", getAircraftMaxVelocity},
-                                                                             {"getOcclusionsEnabled", getOcclusionsEnabled},
-                                                                             {"getMoonSize", getMoonSize},
+    constexpr static const std::pair<const char*, lua_CFunction> functions[]{
+        // Get
+        {"getTime", getTime},
+        {"getWeather", getWeather},
+        {"getZoneName", getZoneName},
+        {"getGravity", getGravity},
+        {"getGameSpeed", getGameSpeed},
+        {"getWaveHeight", getWaveHeight},
+        {"getFPSLimit", getFPSLimit},
+        {"getMinuteDuration", getMinuteDuration},
+        {"getTrafficLightState", getTrafficLightState},
+        {"getJetpackMaxHeight", getJetpackMaxHeight},
+        {"getSkyGradient", getSkyGradient},
+        {"getHeatHaze", getHeatHaze},
+        {"getJetpackWeaponEnabled", getJetpackWeaponEnabled},
+        {"getCloudsEnabled", getCloudsEnabled},
+        {"getInteriorSoundsEnabled", getInteriorSoundsEnabled},
+        {"getRainLevel", getRainLevel},
+        {"getSunSize", getSunSize},
+        {"getSunColor", getSunColor},
+        {"getWindVelocity", getWindVelocity},
+        {"getFarClipDistance", getFarClipDistance},
+        {"getFogDistance", getFogDistance},
+        {"getAircraftMaxHeight", getAircraftMaxHeight},
+        {"getAircraftMaxVelocity", getAircraftMaxVelocity},
+        {"getOcclusionsEnabled", getOcclusionsEnabled},
+        {"getMoonSize", getMoonSize},
 
-                                                                             // Set
-                                                                             {"setTime", setTime},
-                                                                             {"setWeather", setWeather},
-                                                                             {"setWeatherBlended", setWeatherBlended},
-                                                                             {"setGravity", setGravity},
-                                                                             {"setGameSpeed", setGameSpeed},
-                                                                             {"setWaveHeight", setWaveHeight},
-                                                                             {"setSkyGradient", setSkyGradient},
-                                                                             {"setHeatHaze", setHeatHaze},
-                                                                             {"setFPSLimit", setFPSLimit},
-                                                                             {"setMinuteDuration", setMinuteDuration},
-                                                                             {"setGarageOpen", setGarageOpen},
-                                                                             {"setGlitchEnabled", setGlitchEnabled},
-                                                                             {"setCloudsEnabled", setCloudsEnabled},
-                                                                             {"setTrafficLightState", setTrafficLightState},
-                                                                             {"setTrafficLightsLocked", setTrafficLightsLocked},
-                                                                             {"setJetpackMaxHeight", setJetpackMaxHeight},
-                                                                             {"setInteriorSoundsEnabled", setInteriorSoundsEnabled},
-                                                                             {"setRainLevel", setRainLevel},
-                                                                             {"setSunSize", setSunSize},
-                                                                             {"setSunColor", setSunColor},
-                                                                             {"setWindVelocity", setWindVelocity},
-                                                                             {"setFarClipDistance", setFarClipDistance},
-                                                                             {"setFogDistance", setFogDistance},
-                                                                             {"setAircraftMaxHeight", setAircraftMaxHeight},
-                                                                             {"setAircraftMaxVelocity", setAircraftMaxVelocity},
-                                                                             {"setOcclusionsEnabled", setOcclusionsEnabled},
-                                                                             {"setMoonSize", setMoonSize},
-                                                                             {"setJetpackWeaponEnabled", setJetpackWeaponEnabled},
-                                                                             {"setWorldSpecialPropertyEnabled", ArgumentParserWarn<false, setWorldSpecialPropertyEnabled>},
+        // Set
+        {"setTime", setTime},
+        {"setWeather", setWeather},
+        {"setWeatherBlended", setWeatherBlended},
+        {"setGravity", setGravity},
+        {"setGameSpeed", setGameSpeed},
+        {"setWaveHeight", setWaveHeight},
+        {"setSkyGradient", setSkyGradient},
+        {"setHeatHaze", setHeatHaze},
+        {"setFPSLimit", setFPSLimit},
+        {"setMinuteDuration", setMinuteDuration},
+        {"setGarageOpen", setGarageOpen},
+        {"setGlitchEnabled", setGlitchEnabled},
+        {"setCloudsEnabled", setCloudsEnabled},
+        {"setTrafficLightState", setTrafficLightState},
+        {"setTrafficLightsLocked", setTrafficLightsLocked},
+        {"setJetpackMaxHeight", setJetpackMaxHeight},
+        {"setInteriorSoundsEnabled", setInteriorSoundsEnabled},
+        {"setRainLevel", setRainLevel},
+        {"setSunSize", setSunSize},
+        {"setSunColor", setSunColor},
+        {"setWindVelocity", setWindVelocity},
+        {"setFarClipDistance", setFarClipDistance},
+        {"setFogDistance", setFogDistance},
+        {"setAircraftMaxHeight", setAircraftMaxHeight},
+        {"setAircraftMaxVelocity", setAircraftMaxVelocity},
+        {"setOcclusionsEnabled", setOcclusionsEnabled},
+        {"setMoonSize", setMoonSize},
+        {"setJetpackWeaponEnabled", setJetpackWeaponEnabled},
+        {"setWorldSpecialPropertyEnabled", ArgumentParserWarn<false, setWorldSpecialPropertyEnabled>},
 
-                                                                             // Reset
-                                                                             {"resetSkyGradient", resetSkyGradient},
-                                                                             {"resetHeatHaze", resetHeatHaze},
-                                                                             {"resetRainLevel", resetRainLevel},
-                                                                             {"resetSunSize", resetSunSize},
-                                                                             {"resetSunColor", resetSunColor},
-                                                                             {"resetWindVelocity", resetWindVelocity},
-                                                                             {"resetFarClipDistance", resetFarClipDistance},
-                                                                             {"resetFogDistance", resetFogDistance},
-                                                                             {"removeWorldModel", RemoveWorldModel},
-                                                                             {"restoreWorldModel", RestoreWorldModel},
-                                                                             {"restoreAllWorldModels", RestoreAllWorldModels},
-                                                                             {"resetMoonSize", resetMoonSize},
-                                                                             {"resetWorldProperties", ArgumentParser<ResetWorldProperties>},
+        // Reset
+        {"resetSkyGradient", resetSkyGradient},
+        {"resetHeatHaze", resetHeatHaze},
+        {"resetRainLevel", resetRainLevel},
+        {"resetSunSize", resetSunSize},
+        {"resetSunColor", resetSunColor},
+        {"resetWindVelocity", resetWindVelocity},
+        {"resetFarClipDistance", resetFarClipDistance},
+        {"resetFogDistance", resetFogDistance},
+        {"removeWorldModel", RemoveWorldModel},
+        {"restoreWorldModel", RestoreWorldModel},
+        {"restoreAllWorldModels", RestoreAllWorldModels},
+        {"resetMoonSize", resetMoonSize},
+        {"resetWorldProperties", ArgumentParser<ResetWorldProperties>},
 
-                                                                             // Check
-                                                                             {"isGarageOpen", isGarageOpen},
-                                                                             {"isGlitchEnabled", isGlitchEnabled},
-                                                                             {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, isWorldSpecialPropertyEnabled>},
-                                                                             {"areTrafficLightsLocked", areTrafficLightsLocked}};
+        // Check
+        {"isGarageOpen", isGarageOpen},
+        {"isGlitchEnabled", isGlitchEnabled},
+        {"isWorldSpecialPropertyEnabled", ArgumentParserWarn<false, isWorldSpecialPropertyEnabled>},
+        {"areTrafficLightsLocked", areTrafficLightsLocked}};
 
     // Add functions
     for (const auto& [name, func] : functions)
@@ -119,11 +120,11 @@ int CLuaWorldDefs::getTime(lua_State* luaVM)
 
 int CLuaWorldDefs::getWeather(lua_State* luaVM)
 {
-    unsigned char ucWeather, ucWeatherBlendingTo;
+    unsigned char ucWeather;
+    unsigned char ucWeatherBlendingTo;
     if (CStaticFunctionDefinitions::GetWeather(ucWeather, ucWeatherBlendingTo))
     {
         lua_pushnumber(luaVM, static_cast<lua_Number>(ucWeather));
-
         if (ucWeatherBlendingTo != 0xFF)
             lua_pushnumber(luaVM, static_cast<lua_Number>(ucWeatherBlendingTo));
         else
@@ -202,14 +203,11 @@ int CLuaWorldDefs::getWaveHeight(lua_State* luaVM)
 
 int CLuaWorldDefs::getFPSLimit(lua_State* luaVM)
 {
-    unsigned short usLimit;
-    if (CStaticFunctionDefinitions::GetFPSLimit(usLimit))
-    {
-        lua_pushnumber(luaVM, usLimit);
-        return 1;
-    }
+    // int getFPSLimit ()
+    std::uint16_t fpsLimit;
+    CStaticFunctionDefinitions::GetFPSLimit(fpsLimit);
 
-    lua_pushboolean(luaVM, false);
+    lua_pushnumber(luaVM, fpsLimit);
     return 1;
 }
 
@@ -1130,15 +1128,15 @@ int CLuaWorldDefs::RestoreAllWorldModels(lua_State* luaVM)
 
 int CLuaWorldDefs::setFPSLimit(lua_State* luaVM)
 {
-    //  bool setFPSLimit ( int fpsLimit )
-    unsigned short usLimit;
+    // bool setFPSLimit ( int fpsLimit )
+    std::uint16_t fps;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadNumber(usLimit);
+    argStream.ReadNumber(fps);
 
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetFPSLimit(usLimit, false))
+        if (CStaticFunctionDefinitions::SetFPSLimit(fps, false))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -1450,7 +1448,11 @@ int CLuaWorldDefs::getOcclusionsEnabled(lua_State* luaVM)
     return 1;
 }
 
-void CLuaWorldDefs::ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties, std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds, std::optional<bool> resetGlitches, std::optional<bool> resetJetpackWeapons) noexcept
+void CLuaWorldDefs::ResetWorldProperties(std::optional<bool> resetSpecialWorldProperties, std::optional<bool> resetWorldProperties,
+                                         std::optional<bool> resetWeatherProperties, std::optional<bool> resetLODs, std::optional<bool> resetSounds,
+                                         std::optional<bool> resetGlitches, std::optional<bool> resetJetpackWeapons) noexcept
 {
-    g_pGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialWorldProperties.value_or(true), resetWorldProperties.value_or(true), resetWeatherProperties.value_or(true), resetLODs.value_or(true), resetSounds.value_or(true), resetGlitches.value_or(true), resetJetpackWeapons.value_or(true)});
+    g_pGame->ResetWorldProperties(ResetWorldPropsInfo{resetSpecialWorldProperties.value_or(true), resetWorldProperties.value_or(true),
+                                                      resetWeatherProperties.value_or(true), resetLODs.value_or(true), resetSounds.value_or(true),
+                                                      resetGlitches.value_or(true), resetJetpackWeapons.value_or(true)});
 }

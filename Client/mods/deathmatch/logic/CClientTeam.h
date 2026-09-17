@@ -41,9 +41,9 @@ public:
     bool GetFriendlyFire() { return m_bFriendlyFire; }
     void SetFriendlyFire(bool bFriendlyFire) { m_bFriendlyFire = bFriendlyFire; }
 
-    void AddPlayer(CClientPlayer* pPlayer, bool bChangePlayer = false);
-    void RemovePlayer(CClientPlayer* pPlayer, bool bChangePlayer = false);
-    void RemoveAll();
+    void                        AddPlayer(CClientPlayer* pPlayer, bool bChangePlayer = false);
+    void                        RemovePlayer(CClientPlayer* pPlayer, bool bChangePlayer = false);
+    void                        RemoveAll();
     std::vector<CClientPlayer*> GetPlayers() const;
 
     bool Exists(CClientPlayer* pPlayer);

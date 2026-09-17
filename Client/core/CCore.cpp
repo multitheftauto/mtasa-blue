@@ -15,7 +15,10 @@
 #include <Accctrl.h>
 #include <Aclapi.h>
 #include <filesystem>
-#include "Userenv.h"        // This will enable SharedUtil::ExpandEnvString
+#include <fstream>
+#include <array>
+#include <algorithm>
+#include "Userenv.h"  // This will enable SharedUtil::ExpandEnvString
 #define ALLOC_STATS_MODULE_NAME "core"
 #include "SharedUtil.hpp"
 #include <clocale>
@@ -27,11 +30,18 @@
 #include <ServerBrowser/CServerCache.h>
 #include "CDiscordRichPresence.h"
 #include "CSteamClient.h"
+#include "CCrashDumpWriter.h"
+#include "FastFailCrashHandler/WerCrashHandler.h"
 
 using SharedUtil::CalcMTASAPath;
 using namespace std;
 
 namespace fs = std::filesystem;
+
+// Set to true to enable the freeze watchdog (monitors main thread responsiveness)
+// Do NOT enable it unless you run a QA testing cycle (see commit desc: 3e54dcb2742bccf0319b9552b2ed5a2c0a012425)
+constexpr bool  bFreezeWatchdogEnabled = false;
+constexpr DWORD uiFreezeWatchdogTimeoutSeconds = 30;  // Player won't be patient beyond this; we get no info
 
 static float fTest = 1;
 
@@ -44,7 +54,7 @@ extern fs::path g_gtaDirectory;
 template <>
 CCore* CSingleton<CCore>::m_pSingleton = NULL;
 
-static auto Win32LoadLibraryA = static_cast<decltype(&LoadLibraryA)>(nullptr);
+static auto                Win32LoadLibraryA = LoadLibraryA;
 static constexpr long long TIME_DISCORD_UPDATE_RICH_PRESENCE_RATE = 10000;
 
 static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
@@ -56,7 +66,7 @@ static HMODULE WINAPI SkipDirectPlay_LoadLibraryA(LPCSTR fileName)
     if (!StrCmpIA("enbseries\\enbhelper.dll", fileName))
     {
         std::error_code ec;
-        
+
         // Try to load enbhelper.dll from our custom launch directory first.
         const fs::path inLaunchDir = fs::path{FromUTF8(GetLaunchPath())} / "enbseries" / "enbhelper.dll";
 
@@ -123,12 +133,16 @@ CCore::CCore()
     m_bDestroyMessageBox = false;
     m_bCursorToggleControls = false;
     m_bLastFocused = true;
+    m_uiNextRenderTargetRetryTime = 0;
     m_DiagnosticDebug = EDiagnosticDebug::NONE;
 
     // Create our Direct3DData handler.
     m_pDirect3DData = new CDirect3DData;
 
     WriteDebugEvent("CCore::CCore");
+
+    // Store initial module bases (will be updated more comprehensively later)
+    WerCrash::UpdateModuleBases();
 
     m_pKeyBinds = new CKeyBinds(this);
 
@@ -146,10 +160,11 @@ CCore::CCore()
     // Setup our hooks.
     ApplyHooks();
 
-    // No initial fps limit
-    m_bDoneFrameRateLimit = false;
-    m_uiFrameRateLimit = 0;
-    m_uiServerFrameRateLimit = 0;
+    m_pModelCacheManager = nullptr;
+    m_iDummyProgressValue = 0;
+    m_DummyProgressTimerHandle = NULL;
+    m_bDummyProgressUpdateAlways = false;
+
     m_iUnminimizeFrameCounter = 0;
     m_bDidRecreateRenderTargets = false;
     m_fMinStreamingMemory = 0;
@@ -157,7 +172,9 @@ CCore::CCore()
     m_bGettingIdleCallsFromMultiplayer = false;
     m_bWindowsTimerEnabled = false;
     m_timeDiscordAppLastUpdate = 0;
-    m_CurrentRefreshRate = 60;
+
+    // Initialize FPS limiter
+    m_pFPSLimiter = std::make_unique<FPSLimiter::FPSLimiter>();
 
     // Create tray icon
     m_pTrayIcon = new CTrayIcon();
@@ -171,6 +188,9 @@ CCore::~CCore()
 {
     WriteDebugEvent("CCore::~CCore");
 
+    if constexpr (bFreezeWatchdogEnabled)
+        StopWatchdogThread();
+
     // Reset Discord rich presence
     if (m_pDiscordRichPresence)
         m_pDiscordRichPresence.reset();
@@ -180,6 +200,8 @@ CCore::~CCore()
     // Destroy tray icon
     delete m_pTrayIcon;
 
+    m_pFPSLimiter.reset();
+
     // This will set the GTA volume to the GTA volume value in the settings,
     // and is not affected by the master volume setting.
     m_pLocalGUI->GetMainMenu()->GetSettingsWindow()->ResetGTAVolume();
@@ -187,9 +209,26 @@ CCore::~CCore()
     // Remove input hook
     CMessageLoopHook::GetSingleton().RemoveHook();
 
+    if (m_bWindowsTimerEnabled)
+    {
+        KillTimer(GetHookedWindow(), IDT_TIMER1);
+        m_bWindowsTimerEnabled = false;
+    }
+
+    extern int ms_iDummyProgressTimerCounter;
+
+    if (m_DummyProgressTimerHandle != NULL)
+    {
+        DeleteTimerQueueTimer(NULL, m_DummyProgressTimerHandle, INVALID_HANDLE_VALUE);
+        m_DummyProgressTimerHandle = NULL;
+        ms_iDummyProgressTimerCounter = 0;
+    }
+
     // Delete the mod manager
     delete m_pModManager;
     SAFE_DELETE(m_pMessageBox);
+
+    SAFE_DELETE(m_pModelCacheManager);
 
     // Destroy early subsystems
     m_bModulesLoaded = false;
@@ -224,6 +263,8 @@ CCore::~CCore()
     // Delete lazy subsystems
     DestroyGUI();
     DestroyXML();
+
+    SAFE_DELETE(g_pLocalization);
 
     // Delete keybinds
     delete m_pKeyBinds;
@@ -610,9 +651,11 @@ bool CCore::IsCursorForcedVisible()
 
 void CCore::ApplyConsoleSettings()
 {
-    CVector2D vec;
     CConsole* pConsole = m_pLocalGUI->GetConsole();
+    if (!pConsole) [[unlikely]]
+        return;
 
+    CVector2D vec;
     CVARS_GET("console_pos", vec);
     pConsole->SetPosition(vec);
     CVARS_GET("console_size", vec);
@@ -655,15 +698,16 @@ void CCore::ApplyGameSettings()
     CVARS_GET("dynamic_ped_shadows", bVal);
     pGameSettings->SetDynamicPedShadowsEnabled(bVal);
     pController->SetVerticalAimSensitivityRawValue(CVARS_GET_VALUE<float>("vertical_aim_sensitivity"));
+    pController->SetVerticalAimSensitivitySameAsHorizontal(CVARS_GET_VALUE<bool>("use_mouse_sensitivity_for_aiming"));
     CVARS_GET("mastervolume", fVal);
-    pGameSettings->SetRadioVolume(pGameSettings->GetRadioVolume() * fVal);
-    pGameSettings->SetSFXVolume(pGameSettings->GetSFXVolume() * fVal);
+    pGameSettings->SetRadioVolume(CVARS_GET_VALUE<float>("radiovolume") * fVal * 64.0f);
+    pGameSettings->SetSFXVolume(CVARS_GET_VALUE<float>("sfxvolume") * fVal * 64.0f);
 }
 
 void CCore::SetConnected(bool bConnected)
 {
     m_pLocalGUI->GetMainMenu()->SetIsIngame(bConnected);
-    UpdateIsWindowMinimized();            // Force update of stuff
+    UpdateIsWindowMinimized();  // Force update of stuff
 
     if (g_pCore->GetCVars()->GetValue("allow_discord_rpc", false))
     {
@@ -777,7 +821,7 @@ void CCore::ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, 
             strTroubleLink += SString("&neterrorcode=%08X", uiErrorCode);
     }
     else if (bLinkRequiresErrorCode)
-        strTroubleLink = "";            // No link if no error code
+        strTroubleLink = "";  // No link if no error code
 
     AddReportLog(7100, SString("Core - NetError (%s) (%s)", *strTitle, *strMessage));
     ShowErrorMessageBox(strTitle, strMessage, strTroubleLink);
@@ -913,7 +957,7 @@ void LoadModule(CModuleLoader& m_Loader, const SString& strName, const SString& 
     // Save current directory (shouldn't change anyway)
     SString strSavedCwd = GetSystemCurrentDirectory();
 
-    // Load approrpiate compilation-specific library.
+    // Load appropriate compilation-specific library.
 #ifdef MTA_DEBUG
     SString strModuleFileName = strModuleName + "_d.dll";
 #else
@@ -1016,6 +1060,19 @@ void CCore::DeinitGUI()
 void CCore::InitGUI(IDirect3DDevice9* pDevice)
 {
     m_pGUI = InitModule<CGUI>(m_GUIModule, "GUI", "InitGUIInterface", pDevice);
+
+    // Apply CPU affinity here (GTA allocates threads on startup, so we have to do it here instead of earlier)
+    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
+    if (!affinity)
+        return;
+
+    DWORD_PTR mask;
+    DWORD_PTR sys;
+    HANDLE    process = GetCurrentProcess();
+    BOOL      result = GetProcessAffinityMask(process, &mask, &sys);
+
+    if (result)
+        SetProcessAffinityMask(process, mask & ~1);
 }
 
 void CCore::CreateGUI()
@@ -1072,6 +1129,16 @@ void CCore::CreateXML()
         if (!m_pConfigFile)
         {
             assert(false);
+
+            if (m_pXML)
+            {
+                using PFNReleaseXMLInterface = void (*)();
+                if (auto pfnRelease = reinterpret_cast<PFNReleaseXMLInterface>(m_XMLModule.GetFunctionPointer("ReleaseXMLInterface")))
+                    pfnRelease();
+            }
+
+            m_pXML = NULL;
+            m_XMLModule.UnloadModule();
             return;
         }
 
@@ -1123,10 +1190,14 @@ void CCore::DestroyXML()
     {
         SaveConfig(true);
         delete m_pConfigFile;
+        m_pConfigFile = nullptr;
     }
 
     if (m_pXML)
     {
+        using PFNReleaseXMLInterface = void (*)();
+        if (auto pfnRelease = reinterpret_cast<PFNReleaseXMLInterface>(m_XMLModule.GetFunctionPointer("ReleaseXMLInterface")))
+            pfnRelease();
         m_pXML = NULL;
     }
 
@@ -1156,8 +1227,48 @@ CWebCoreInterface* CCore::GetWebCore()
         cvars->Get("browser_enable_gpu", gpuEnabled);
 
         m_pWebCore = CreateModule<CWebCoreInterface>(m_WebCoreModule, "CefWeb", "cefweb", "InitWebCoreInterface", this);
-        m_pWebCore->Initialise(gpuEnabled);
+        if (!m_pWebCore)
+        {
+            WriteDebugEvent("CCore::GetWebCore - CreateModule failed");
+            return nullptr;
+        }
+
+        // Log current working directory
+        wchar_t cwdBeforeWebInit[32768]{};
+        DWORD   cwdBeforeWebInitLen = GetCurrentDirectoryW(32768, cwdBeforeWebInit);
+        if (cwdBeforeWebInitLen > 0)
+        {
+            WriteDebugEvent(SString("CCore::GetWebCore - CWD before Initialise: %S", cwdBeforeWebInit));
+        }
+
+        // Keep m_pWebCore alive even if Initialise() fails
+        // CefInitialize() can only be called once per process
+        // Deleting and recreating m_pWebCore causes repeated initialization attempts
+        // Track initialization state via IsInitialised() instead
+        bool bInitSuccess = false;
+        try
+        {
+            bInitSuccess = m_pWebCore->Initialise(gpuEnabled);
+        }
+        catch (...)
+        {
+            WriteDebugEvent("CCore::GetWebCore - Initialise threw exception");
+            bInitSuccess = false;
+        }
+
+        if (!bInitSuccess)
+        {
+            WriteDebugEvent("CCore::GetWebCore - Initialise failed");
+            return nullptr;
+        }
     }
+    else
+    {
+        // On subsequent calls, check if initialization succeeded
+        if (!m_pWebCore->IsInitialised())
+            return nullptr;
+    }
+
     return m_pWebCore;
 }
 
@@ -1195,6 +1306,9 @@ bool CCore::IsWindowMinimized()
 void CCore::DoPreFramePulse()
 {
     TIMING_CHECKPOINT("+CorePreFrame");
+
+    if constexpr (bFreezeWatchdogEnabled)
+        UpdateWatchdogHeartbeat();
 
     m_pKeyBinds->DoPreFramePulse();
 
@@ -1249,12 +1363,26 @@ void CCore::DoPostFramePulse()
 
         if (m_menuFrame == 1)
         {
-            WatchDogCompletedSection("L2");            // gta_sa.set seems ok
-            WatchDogCompletedSection("L3");            // No hang on startup
-            HandleCrashDumpEncryption();
+            WatchDogCompletedSection("L2");  // gta_sa.set seems ok
+            WatchDogCompletedSection("L3");  // No hang on startup
+
+            // Start watchdog thread now that initial loading is complete
+            if constexpr (bFreezeWatchdogEnabled)
+            {
+                if (!StartWatchdogThread(GetCurrentThreadId(), uiFreezeWatchdogTimeoutSeconds))
+                {
+                    WriteDebugEvent("CCore: WARNING - Failed to start watchdog thread");
+                }
+            }
 
             // Disable vsync while it's all dark
             m_pGame->DisableVSync();
+        }
+
+        if (!m_bCrashDumpEncryptionDone && m_menuFrame >= 5 && m_pNet && m_pNet->IsReady())
+        {
+            m_bCrashDumpEncryptionDone = true;
+            HandleCrashDumpEncryption();
         }
 
         if (m_menuFrame >= 5 && !m_isNetworkReady && m_pNet->IsReady())
@@ -1295,7 +1423,12 @@ void CCore::DoPostFramePulse()
     if (!IsFocused() && m_bLastFocused)
     {
         // Fix for #4948
-        m_pKeyBinds->CallAllGTAControlBinds(CONTROL_BOTH, false);
+        // A fatal fault dialog takes focus while pumping messages; releasing the
+        // control binds runs Lua handlers that touch the half-destroyed GUI.
+        // Skipping the release is safe because both fault paths terminate the
+        // process when the dialog closes.
+        if (!CLocalGUI::IsFaultDialogOpen())
+            m_pKeyBinds->CallAllGTAControlBinds(CONTROL_BOTH, false);
         m_bLastFocused = false;
     }
     else if (IsFocused() && !m_bLastFocused)
@@ -1303,7 +1436,7 @@ void CCore::DoPostFramePulse()
         m_bLastFocused = true;
     }
 
-    GetJoystickManager()->DoPulse();            // Note: This may indirectly call CMessageLoopHook::ProcessMessage
+    GetJoystickManager()->DoPulse();  // Note: This may indirectly call CMessageLoopHook::ProcessMessage
     m_pKeyBinds->DoPostFramePulse();
 
     if (m_pWebCore)
@@ -1347,7 +1480,7 @@ void CCore::OnModUnload()
     m_pKeyBinds->RemoveAllControlFunctions();
 
     // Reset client script frame rate limit
-    m_uiClientScriptFrameRateLimit = 0;
+    GetFPSLimiter()->SetClientEnforcedFPS(FPSLimits::FPS_UNLIMITED);
 
     // Clear web whitelist
     if (m_pWebCore)
@@ -1461,7 +1594,7 @@ void CCore::Quit(bool bInstantly)
         // Show that we are quiting (for the crash dump filename)
         SetApplicationSettingInt("last-server-ip", 1);
 
-        WatchDogBeginSection("Q0");            // Allow loader to detect freeze on exit
+        WatchDogBeginSection("Q0");  // Allow loader to detect freeze on exit
 
         // Hide game window to make quit look instant
         PostQuitMessage(0);
@@ -1470,13 +1603,13 @@ void CCore::Quit(bool bInstantly)
         // Destroy the client
         CModManager::GetSingleton().Unload();
 
-        // Destroy ourself
-        delete CCore::GetSingletonPtr();
-
         WatchDogCompletedSection("Q0");
 
-        // Use TerminateProcess for now as exiting the normal way crashes
+        // Use TerminateProcess before destroying CCore to ensure clean exit code (Exiting the normal way also crashes).
         TerminateProcess(GetCurrentProcess(), 0);
+
+        // Destroy ourself (unreachable but kept for completeness)
+        delete CCore::GetSingletonPtr();
     }
     else
     {
@@ -1751,18 +1884,23 @@ void CCore::UpdateRecentlyPlayed()
     std::string  strHost;
     CVARS_GET("host", strHost);
     CVARS_GET("port", uiPort);
+
+    if (uiPort == 0 || uiPort > 0xFFFF)
+        return;
+
+    const ushort usPort = static_cast<ushort>(uiPort);
     // Save the connection details into the recently played servers list
     in_addr Address;
     if (CServerListItem::Parse(strHost.c_str(), Address))
     {
         CServerBrowser* pServerBrowser = CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser();
         CServerList*    pRecentList = pServerBrowser->GetRecentList();
-        pRecentList->Remove(Address, static_cast<ushort>(uiPort));
-        pRecentList->AddUnique(Address, static_cast<ushort>(uiPort), true);
+        pRecentList->Remove(Address, usPort);
+        pRecentList->AddUnique(Address, usPort, true);
 
         pServerBrowser->SaveRecentlyPlayedList();
         if (!m_pConnectManager->m_strLastPassword.empty())
-            pServerBrowser->SetServerPassword(strHost + ":" + SString("%u", uiPort), m_pConnectManager->m_strLastPassword);
+            pServerBrowser->SetServerPassword(strHost + ":" + SString("%u", usPort), m_pConnectManager->m_strLastPassword);
     }
     // Save our configuration file
     CCore::GetSingleton().SaveConfig();
@@ -1772,8 +1910,8 @@ void CCore::OnPostColorFilterRender()
 {
     if (!CGraphics::GetSingleton().HasLine3DPostFXQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPostFXQueueItems())
         return;
-    
-    CGraphics::GetSingleton().EnteringMTARenderZone();      
+
+    CGraphics::GetSingleton().EnteringMTARenderZone();
 
     CGraphics::GetSingleton().DrawPrimitive3DPostFXQueue();
     CGraphics::GetSingleton().DrawLine3DPostFXQueue();
@@ -1783,7 +1921,6 @@ void CCore::OnPostColorFilterRender()
 
 void CCore::ApplyCoreInitSettings()
 {
-#if (_WIN32_WINNT >= _WIN32_WINNT_LONGHORN)
     bool aware = CVARS_GET_VALUE<bool>("process_dpi_aware");
 
     // The minimum supported client for the function below is Windows Vista (Longhorn).
@@ -1791,7 +1928,6 @@ void CCore::ApplyCoreInitSettings()
     // https://learn.microsoft.com/en-us/windows/win32/hidpi/high-dpi-desktop-application-development-on-windows
     if (aware)
         SetProcessDPIAware();
-#endif
 
     int revision = GetApplicationSettingInt("reset-settings-revision");
 
@@ -1807,23 +1943,11 @@ void CCore::ApplyCoreInitSettings()
         SetApplicationSettingInt("reset-settings-revision", 21486);
     }
 
-    HANDLE process = GetCurrentProcess();
+    HANDLE    process = GetCurrentProcess();
     const int priorities[] = {NORMAL_PRIORITY_CLASS, ABOVE_NORMAL_PRIORITY_CLASS, HIGH_PRIORITY_CLASS};
-    int priority = CVARS_GET_VALUE<int>("process_priority") % 3;
+    int       priority = CVARS_GET_VALUE<int>("process_priority") % 3;
 
     SetPriorityClass(process, priorities[priority]);
-
-    bool affinity = CVARS_GET_VALUE<bool>("process_cpu_affinity");
-
-    if (!affinity)
-        return;
-
-    DWORD_PTR mask;
-    DWORD_PTR sys;
-    BOOL result = GetProcessAffinityMask(process, &mask, &sys);
-
-    if (result)
-        SetProcessAffinityMask(process, mask & ~1);
 }
 
 //
@@ -1831,141 +1955,14 @@ void CCore::ApplyCoreInitSettings()
 //
 void CCore::OnGameTimerUpdate()
 {
-    ApplyQueuedFrameRateLimit();
+    // NOTE: (pxd) We are handling the frame limiting updates
+    // earlier in the callpath (CModManager::DoPulsePreFrame, CModManager::DoPulsePostFrame)
 }
 
-//
-// Recalculate FPS limit to use
-//
-// Uses client rate from config
-// Uses client rate from script
-// Uses server rate from argument, or last time if not supplied
-//
-void CCore::RecalculateFrameRateLimit(uint uiServerFrameRateLimit, bool bLogToConsole)
+void CCore::OnFPSLimitChange(std::uint16_t fps)
 {
-    // Save rate from server if valid
-    if (uiServerFrameRateLimit != -1)
-        m_uiServerFrameRateLimit = uiServerFrameRateLimit;
-
-    // Start with value set by the server
-    m_uiFrameRateLimit = m_uiServerFrameRateLimit;
-
-    // Apply client config setting
-    uint uiClientConfigRate;
-    g_pCore->GetCVars()->Get("fps_limit", uiClientConfigRate);
-    if (uiClientConfigRate > 0)
-        uiClientConfigRate = std::max(45U, uiClientConfigRate);
-    // Lowest wins (Although zero is highest)
-    if ((m_uiFrameRateLimit == 0 || uiClientConfigRate < m_uiFrameRateLimit) && uiClientConfigRate > 0)
-        m_uiFrameRateLimit = uiClientConfigRate;
-
-    // Apply client script setting
-    uint uiClientScriptRate = m_uiClientScriptFrameRateLimit;
-    // Lowest wins (Although zero is highest)
-    if ((m_uiFrameRateLimit == 0 || uiClientScriptRate < m_uiFrameRateLimit) && uiClientScriptRate > 0)
-        m_uiFrameRateLimit = uiClientScriptRate;
-
-    if (!IsConnected())
-        m_uiFrameRateLimit = m_CurrentRefreshRate;
-
-    // Removes Limiter from Frame Graph if limit is zero and skips frame limit
-    if (m_uiFrameRateLimit == 0)
-    {
-        m_bQueuedFrameRateValid = false;
-        GetGraphStats()->RemoveTimingPoint("Limiter");
-    }
-
-    // Print new limits to the console
-    if (bLogToConsole)
-    {
-        SString strStatus("Server FPS limit: %d", m_uiServerFrameRateLimit);
-        if (m_uiFrameRateLimit != m_uiServerFrameRateLimit)
-            strStatus += SString(" (Using %d)", m_uiFrameRateLimit);
-        CCore::GetSingleton().GetConsole()->Print(strStatus);
-    }
-}
-
-//
-// Change client rate as set by script
-//
-void CCore::SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit)
-{
-    m_uiClientScriptFrameRateLimit = uiClientScriptFrameRateLimit;
-    RecalculateFrameRateLimit(-1, false);
-}
-
-void CCore::SetCurrentRefreshRate(uint value)
-{
-    m_CurrentRefreshRate = value;
-    RecalculateFrameRateLimit(-1, false);
-}
-
-//
-// Make sure the frame rate limit has been applied since the last call
-//
-void CCore::EnsureFrameRateLimitApplied()
-{
-    if (!m_bDoneFrameRateLimit)
-    {
-        ApplyFrameRateLimit();
-    }
-    m_bDoneFrameRateLimit = false;
-}
-
-//
-// Do FPS limiting
-//
-// This is called once a frame even if minimized
-//
-void CCore::ApplyFrameRateLimit(uint uiOverrideRate)
-{
-    TIMING_CHECKPOINT("-CallIdle1");
-    ms_TimingCheckpoints.EndTimingCheckpoints();
-
-    // Frame rate limit stuff starts here
-    m_bDoneFrameRateLimit = true;
-
-    uint uiUseRate = uiOverrideRate != -1 ? uiOverrideRate : m_uiFrameRateLimit;
-
-    if (uiUseRate > 0)
-    {
-        // Apply previous frame rate if is hasn't been done yet
-        ApplyQueuedFrameRateLimit();
-
-        // Limit is usually applied in OnGameTimerUpdate
-        m_uiQueuedFrameRate = uiUseRate;
-        m_bQueuedFrameRateValid = true;
-    }
-
-    DoReliablePulse();
-
-    TIMING_GRAPH("FrameEnd");
-    TIMING_GRAPH("");
-}
-
-//
-// Frame rate limit (wait) is done here.
-//
-void CCore::ApplyQueuedFrameRateLimit()
-{
-    if (m_bQueuedFrameRateValid)
-    {
-        m_bQueuedFrameRateValid = false;
-        // Calc required time in ms between frames
-        const double dTargetTimeToUse = 1000.0 / m_uiQueuedFrameRate;
-
-        while (true)
-        {
-            // See if we need to wait
-            double dSpare = dTargetTimeToUse - m_FrameRateTimer.Get();
-            if (dSpare <= 0.0)
-                break;
-            if (dSpare >= 10.0)
-                Sleep(1);
-        }
-        m_FrameRateTimer.Reset();
-        TIMING_GRAPH("Limiter");
-    }
+    if (m_pNet != nullptr && IsWebCoreLoaded())  // We have to wait for the network module to be loaded
+        GetWebCore()->OnFPSLimitChange(fps);
 }
 
 //
@@ -1982,7 +1979,7 @@ void CCore::DoReliablePulse()
 
     // Non frame rate limit stuff
     if (IsWindowMinimized())
-        m_iUnminimizeFrameCounter = 4;            // Tell script we have unminimized after a short delay
+        m_iUnminimizeFrameCounter = 4;  // Tell script we have unminimized after a short delay
 
     UpdateModuleTickCount64();
 }
@@ -2010,8 +2007,9 @@ void CCore::OnTimingDetail(const char* szTag)
 //
 void CCore::OnDeviceRestore()
 {
-    m_iUnminimizeFrameCounter = 4;            // Tell script we have restored after 4 frames to avoid double sends
+    m_iUnminimizeFrameCounter = 4;  // Tell script we have restored after 4 frames to avoid double sends
     m_bDidRecreateRenderTargets = true;
+    m_uiNextRenderTargetRetryTime = 0;
 }
 
 //
@@ -2020,7 +2018,7 @@ void CCore::OnDeviceRestore()
 void CCore::OnPreFxRender()
 {
     if (!CGraphics::GetSingleton().HasLine3DPreGUIQueueItems() && !CGraphics::GetSingleton().HasPrimitive3DPreGUIQueueItems())
-        return;    
+        return;
 
     CGraphics::GetSingleton().EnteringMTARenderZone();
 
@@ -2035,7 +2033,14 @@ void CCore::OnPreFxRender()
 //
 void CCore::OnPreHUDRender()
 {
-    CGraphics::GetSingleton().EnteringMTARenderZone();    
+    const uint uiNow = GetTickCount32();
+    if (uiNow >= m_uiNextRenderTargetRetryTime)
+    {
+        CGraphics::GetSingleton().RetryInvalidRenderTargets();
+        m_uiNextRenderTargetRetryTime = uiNow + 250;
+    }
+
+    CGraphics::GetSingleton().EnteringMTARenderZone();
 
     // Maybe capture screen and other stuff
     CGraphics::GetSingleton().GetRenderItemManager()->DoPulse();
@@ -2095,7 +2100,7 @@ void CCore::CalculateStreamingMemoryRange()
     float fMaxAmount = EvalSamplePosition<float>(maxPoints, NUMELMS(maxPoints), iSystemRamMB);
 
     // Scale max if gta3.img is over 1GB
-    SString strGta3imgFilename = PathJoin(GetLaunchPath(), "models", "gta3.img");
+    SString strGta3imgFilename = PathJoin(UTF8FilePath(g_gtaDirectory), "models", "gta3.img");
     uint    uiFileSizeMB = FileSize(strGta3imgFilename) / 0x100000LL;
     float   fSizeScale = UnlerpClamped(1024, uiFileSizeMB, 2048);
     fMaxAmount += fMaxAmount * fSizeScale;
@@ -2150,6 +2155,11 @@ void CCore::OnCrashAverted(uint uiId)
 void CCore::OnEnterCrashZone(uint uiId)
 {
     CCrashDumpWriter::OnEnterCrashZone(uiId);
+}
+
+void CCore::UpdateWerCrashModuleBases()
+{
+    WerCrash::UpdateModuleBases();
 }
 
 //
@@ -2227,6 +2237,52 @@ void CCore::HandleIdlePulse()
         m_pModManager->GetClient()->IdleHandler();
 }
 
+namespace
+{
+    bool IsCoreDump(const SString& filePath)
+    {
+        constexpr std::array<std::uint32_t, 4> markers = {
+            0x734C4F50,  // 'POLs'
+            0x73443344,  // 'D3Ds'
+            0x73474F4C,  // 'LOGs'
+            0x73524557   // 'WERs' - WER fail-fast crash info
+        };
+
+        constexpr std::size_t tailSize = 64 * 1024;
+        constexpr std::size_t minFileSize = 1024;
+
+        std::ifstream file(FromUTF8(filePath), std::ios::binary | std::ios::ate);
+        if (!file)
+            return false;
+
+        const auto fileSize = file.tellg();
+        if (fileSize < static_cast<std::streamoff>(minFileSize))
+            return false;
+
+        const auto readSize = std::min(static_cast<std::size_t>(fileSize), tailSize);
+        const auto readStart = static_cast<std::streamoff>(fileSize) - static_cast<std::streamoff>(readSize);
+
+        file.seekg(readStart);
+        std::vector<char> buffer(readSize);
+        file.read(buffer.data(), static_cast<std::streamsize>(readSize));
+
+        const auto bytesRead = static_cast<std::size_t>(file.gcount());
+        if (bytesRead < sizeof(std::uint32_t))
+            return false;
+
+        for (std::size_t i = 0; i + sizeof(std::uint32_t) <= bytesRead; ++i)
+        {
+            std::uint32_t value;
+            std::memcpy(&value, buffer.data() + i, sizeof(std::uint32_t));
+
+            if (std::find(markers.begin(), markers.end(), value) != markers.end())
+                return true;
+        }
+
+        return false;
+    }
+}
+
 //
 // Handle encryption of Windows crash dump files
 //
@@ -2260,7 +2316,13 @@ void CCore::HandleCrashDumpEncryption()
             SString        strPublicPathFilename = PathJoin(strDumpDirPublicPath, strPublicFilename);
             if (!FileExists(strPublicPathFilename))
             {
-                GetNetwork()->EncryptDumpfile(strPrivatePathFilename, strPublicPathFilename);
+                if (!IsCoreDump(strPrivatePathFilename))
+                    continue;
+
+                if (CNet* pNet = GetNetwork(); pNet && pNet->IsReady())
+                {
+                    pNet->EncryptDumpfile(strPrivatePathFilename, strPublicPathFilename);
+                }
             }
         }
     }
@@ -2396,7 +2458,8 @@ SString CCore::GetBlueCopyrightString()
 
 // Set streaming memory size override [See `engineStreamingSetMemorySize`]
 // Use `0` to turn it off, and thus restore the value to the `cvar` setting
-void CCore::SetCustomStreamingMemory(size_t sizeBytes) {
+void CCore::SetCustomStreamingMemory(size_t sizeBytes)
+{
     // NOTE: The override is applied to the game in `CClientGame::DoPulsePostFrame`
     // There's no specific reason we couldn't do it here, but we wont
     m_CustomStreamingMemoryLimitBytes = sizeBytes;
@@ -2410,9 +2473,8 @@ bool CCore::IsUsingCustomStreamingMemorySize()
 // Streaming memory size used [In Bytes]
 size_t CCore::GetStreamingMemory()
 {
-    return IsUsingCustomStreamingMemorySize()
-        ? m_CustomStreamingMemoryLimitBytes
-        : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024; // MB to B conversion
+    return IsUsingCustomStreamingMemorySize() ? m_CustomStreamingMemoryLimitBytes
+                                              : CVARS_GET_VALUE<size_t>("streaming_memory") * 1024 * 1024;  // MB to B conversion
 }
 
 // Discord rich presence

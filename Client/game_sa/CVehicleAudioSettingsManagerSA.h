@@ -24,7 +24,7 @@ public:
     CVehicleAudioSettingsManagerSA();
 
     std::unique_ptr<CVehicleAudioSettingsEntry> CreateVehicleAudioSettingsData(uint32_t modelId) override;
-    CVehicleAudioSettingsEntry& GetVehicleModelAudioSettingsData(uint32_t modelId) noexcept override;
+    CVehicleAudioSettingsEntry&                 GetVehicleModelAudioSettingsData(uint32_t modelId) noexcept override;
 
     void ResetModelSettings(uint32_t modelId) noexcept override;
     void ResetAudioSettingsData() noexcept override;
@@ -35,7 +35,7 @@ public:
     static void StaticSetHooks() noexcept;
 
 private:
-    size_t GetVehicleModelAudioSettingsID(uint32_t modelId) const noexcept { return modelId - 400; };
+    size_t GetVehicleModelAudioSettingsID(uint32_t modelId) const noexcept;
 
 private:
     // Array with the model audio settings entries

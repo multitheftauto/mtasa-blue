@@ -11,6 +11,7 @@
  *****************************************************************************/
 #include <StdInc.h>
 #include "CMaterialPrimitive3DBatcher.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 ////////////////////////////////////////////////////////////////
 //
 // CMaterialPrimitive3DBatcher::CMaterialPrimitive3DBatcher
@@ -20,6 +21,11 @@
 ////////////////////////////////////////////////////////////////
 CMaterialPrimitive3DBatcher::CMaterialPrimitive3DBatcher(bool bPreGUI, CGraphics* pGraphics) : m_bPreGUI(bPreGUI), m_pGraphics(pGraphics)
 {
+}
+
+CMaterialPrimitive3DBatcher::~CMaterialPrimitive3DBatcher()
+{
+    ClearQueue();
 }
 ////////////////////////////////////////////////////////////////
 //
@@ -118,6 +124,20 @@ void CMaterialPrimitive3DBatcher::Flush()
 
         if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
         {
+            if (CRenderTargetItem* pRenderTarget = DynamicCast<CRenderTargetItem>(pTextureItem))
+            {
+                if (!pRenderTarget->TryEnsureValid())
+                    continue;
+            }
+            else if (CScreenSourceItem* pScreenSource = DynamicCast<CScreenSourceItem>(pTextureItem))
+            {
+                if (!pScreenSource->TryEnsureValid())
+                    continue;
+            }
+
+            if (!pTextureItem->m_pD3DTexture)
+                continue;
+
             m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
             DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), pVertexStreamZeroData, uiVertexStreamZeroStride);
         }
@@ -158,6 +178,7 @@ void CMaterialPrimitive3DBatcher::Flush()
         }
         pLastMaterial = pMaterial;
         pMaterial->Release();
+        primitive.pMaterial = nullptr;
     }
 
     // Clean up
@@ -175,7 +196,9 @@ void CMaterialPrimitive3DBatcher::ClearQueue()
     // Clean up
     for (auto& primitive : m_primitiveList)
     {
+        SAFE_RELEASE(primitive.pMaterial);
         delete primitive.pVecVertices;
+        primitive.pVecVertices = nullptr;
     }
 
     m_primitiveList.clear();

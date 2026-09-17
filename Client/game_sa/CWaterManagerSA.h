@@ -15,17 +15,18 @@
 #include <game/CWaterManager.h>
 #include "CWaterSA.h"
 
-#define DEFAULT_WATER_LEVEL                0.0f
-#define DEFAULT_WAVE_LEVEL                 0.0f
+#define DEFAULT_WATER_LEVEL 0.0f
+#define DEFAULT_WAVE_LEVEL  0.0f
 
-#define FUNC_ReadWaterConfiguration        0x6EAE80         // ()
-#define FUNC_CreateWaterVertex             0x6E5A40         // (word x, word y, float z, float unknown, float height, word flow)
-#define FUNC_CreateWaterQuad               0x6E7EF0         // (word x1, word y1, float z1, float unknown1, float height1, word flow1, word x2, ..., word x3, ..., word x4, ..., word flags)
-#define FUNC_CreateWaterTriangle           0x6E7D40         // (word x1, word y1, float z1, float unknown1, float height1, word flow1, word x2, ..., word x3, ..., word flags)
-#define FUNC_BuildWaterIndex               0x6E7B30         // ()
-#define FUNC_AddWaterPolyToZone            0x6E5750         // (zoneColumn, zoneRow, polyID, polyType)
-#define FUNC_GetWaterLevel                 0x6EB690
-#define FUNC_TestLineAgainstWater          0x6E61B0
+#define FUNC_ReadWaterConfiguration 0x6EAE80  // ()
+#define FUNC_CreateWaterVertex      0x6E5A40  // (word x, word y, float z, float unknown, float height, word flow)
+#define FUNC_CreateWaterQuad \
+    0x6E7EF0  // (word x1, word y1, float z1, float unknown1, float height1, word flow1, word x2, ..., word x3, ..., word x4, ..., word flags)
+#define FUNC_CreateWaterTriangle  0x6E7D40  // (word x1, word y1, float z1, float unknown1, float height1, word flow1, word x2, ..., word x3, ..., word flags)
+#define FUNC_BuildWaterIndex      0x6E7B30  // ()
+#define FUNC_AddWaterPolyToZone   0x6E5750  // (zoneColumn, zoneRow, polyID, polyType)
+#define FUNC_GetWaterLevel        0x6EB690
+#define FUNC_TestLineAgainstWater 0x6E61B0
 
 typedef void(__cdecl* ReadWaterConfiguration_t)();
 typedef WORD(__cdecl* CreateWaterVertex_t)(long lX, long lY, float fZ, float fUnknown, float fHeight, WORD wFlow);
@@ -33,27 +34,27 @@ typedef void(__cdecl* BuildWaterIndex_t)();
 typedef bool(__cdecl* TestLineAgainstWater_t)(float fStartX, float fStartY, float fStartZ, float fEndX, float fEndY, float fEndZ, CVector* pvecCollision);
 typedef bool(__cdecl* GetWaterLevel_t)(float fX, float fY, float fZ, float* pfLevel, bool bCheckWaves, CVector* pvecUnknown);
 
-#define VAR_NumWaterVertices               0xC2288C
-#define VAR_NumWaterQuads                  0xC22888
-#define VAR_NumWaterTriangles              0xC22884
-#define VAR_NumWaterZonePolys              0xC215F0
-#define VAR_WaveLevel                      0xC812E8
+#define VAR_NumWaterVertices  0xC2288C
+#define VAR_NumWaterQuads     0xC22888
+#define VAR_NumWaterTriangles 0xC22884
+#define VAR_NumWaterZonePolys 0xC215F0
+#define VAR_WaveLevel         0xC812E8
 
-#define NUM_DefWaterVertices               0x3FD        // Sizes of pools reserved in gta_sa.exe
-#define NUM_DefWaterQuads                  0x12D
-#define NUM_DefWaterTriangles              0x6
-#define NUM_DefWaterZonePolys              0x2BC
-#define NUM_NewWaterVertices               0x600        // Sizes of replacement pools in MTA
-#define NUM_NewWaterQuads                  0x200
-#define NUM_NewWaterTriangles              0x20
-#define NUM_NewWaterZonePolys              0x400
-#define NUM_WaterZones                     (12 * 12)
+#define NUM_DefWaterVertices  0x3FD  // Sizes of pools reserved in gta_sa.exe
+#define NUM_DefWaterQuads     0x12D
+#define NUM_DefWaterTriangles 0x6
+#define NUM_DefWaterZonePolys 0x2BC
+#define NUM_NewWaterVertices  0x600  // Sizes of replacement pools in MTA
+#define NUM_NewWaterQuads     0x200
+#define NUM_NewWaterTriangles 0x20
+#define NUM_NewWaterZonePolys 0x400
+#define NUM_WaterZones        (12 * 12)
 
-#define ARRAY_WaterVertices                0xC22910
-#define ARRAY_WaterQuads                   0xC21C90
-#define ARRAY_WaterTriangles               0xC22854
-#define ARRAY_WaterZones                   0xC21B70
-#define ARRAY_WaterZonePolys               0xC215F8
+#define ARRAY_WaterVertices  0xC22910
+#define ARRAY_WaterQuads     0xC21C90
+#define ARRAY_WaterTriangles 0xC22854
+#define ARRAY_WaterZones     0xC21B70
+#define ARRAY_WaterZonePolys 0xC215F8
 
 // -------------------------------
 // SA interfaces

@@ -144,9 +144,9 @@ enum eTaskType
     TASK_COMPLEX_FACIAL,
     TASK_SIMPLE_AFFECT_SECONDARY_BEHAVIOUR,
     TASK_SIMPLE_HOLD_ENTITY,
-    TASK_SIMPLE_PICKUP_ENTITY,                // these three aren't really secondary tasks
-    TASK_SIMPLE_PUTDOWN_ENTITY,               // but they exist around the secondary hold entity
-    TASK_COMPLEX_GO_PICKUP_ENTITY,            // task at the start and finish
+    TASK_SIMPLE_PICKUP_ENTITY,      // these three aren't really secondary tasks
+    TASK_SIMPLE_PUTDOWN_ENTITY,     // but they exist around the secondary hold entity
+    TASK_COMPLEX_GO_PICKUP_ENTITY,  // task at the start and finish
     TASK_SIMPLE_DUCK_WHILE_SHOTS_WHIZZING,
     // SCRIPT_DECISION
 
@@ -415,8 +415,8 @@ enum eTaskType
     TASK_SIMPLE_GANG_DRIVEBY,
     // SCRIPT_DECISION
 
-    TASK_COMPLEX_KILL_PED_ON_FOOT_TIMED,                  // SCRIPT_DECISION
-    TASK_COMPLEX_KILL_PED_ON_FOOT_STAND_STILL,            // SCRIPT_DECISION
+    TASK_COMPLEX_KILL_PED_ON_FOOT_TIMED,        // SCRIPT_DECISION
+    TASK_COMPLEX_KILL_PED_ON_FOOT_STAND_STILL,  // SCRIPT_DECISION
     TASK_UNUSED2,
     TASK_KILL_PED_ON_FOOT_WHILE_DUCKING,
     // SCRIPT_DECISION

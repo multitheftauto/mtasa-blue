@@ -15,7 +15,7 @@
 
 CGUIComboBox_Impl::CGUIComboBox_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* szCaption)
 {
-    m_pManager = pGUI;
+    SetManager(pGUI);
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique[CGUI_CHAR_SIZE];
@@ -83,7 +83,7 @@ bool CGUIComboBox_Impl::RemoveItem(int index)
     try
     {
         CEGUI::ListboxItem* pItem = reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->getListboxItemFromIndex(index);
-        if (pItem->isSelected())            // if this is currently selected, let's update the editbox.
+        if (pItem->isSelected())  // if this is currently selected, let's update the editbox.
         {
             m_pWindow->setText(storedCaption);
         }
@@ -178,7 +178,7 @@ bool CGUIComboBox_Impl::SetItemText(int index, const char* szText)
     {
         CEGUI::ListboxItem* pItem = reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->getListboxItemFromIndex(index);
         pItem->setText(CGUI_Impl::GetUTFString(szText), NULL);
-        if (pItem->isSelected())            // if this is currently selected, let's update the editbox.
+        if (pItem->isSelected())  // if this is currently selected, let's update the editbox.
         {
             m_pWindow->setText(CGUI_Impl::GetUTFString(szText));
         }

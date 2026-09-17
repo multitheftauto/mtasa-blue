@@ -15,6 +15,9 @@ class CGUI_Impl;
 
 #include <gui/CGUI.h>
 #include <list>
+#include <unordered_map>
+#include <unordered_set>
+#include <cstdint>
 #include <windows.h>
 
 #define CGUI_CHAR_SIZE 6
@@ -55,11 +58,13 @@ namespace CEGUI
     class EventArgs;
     class GUISheet;
     typedef GUISheet DefaultWindow;
-}            // namespace CEGUI
+}  // namespace CEGUI
 
 class CGUI_Impl : public CGUI, public CGUITabList
 {
 public:
+    static constexpr std::uint32_t kInvalidRedrawHandle = 0;
+
     CGUI_Impl(IDirect3DDevice9* pDevice);
     ~CGUI_Impl();
 
@@ -69,6 +74,9 @@ public:
     void Draw();
     void Invalidate();
     void Restore();
+
+    void SetFatalFaultDialogOpen(bool bOpen) override;
+    bool IsFatalFaultDialogOpen() const override;
 
     void DrawMouseCursor();
 
@@ -82,8 +90,7 @@ public:
     eInputMode           GetGUIInputMode();
     static CEGUI::String GetUTFString(const char* szInput);
     static CEGUI::String GetUTFString(const std::string& strInput);
-    static CEGUI::String GetUTFString(const CEGUI::String& strInput);            // Not defined
-
+    static CEGUI::String GetUTFString(const CEGUI::String& strInput);  // Not defined
     //
     CGUIMessageBox* CreateMessageBox(const char* szTitle, const char* szMessage, unsigned int uiFlags);
 
@@ -276,10 +283,17 @@ public:
     void RemoveFromRedrawQueue(CGUIElement* pWindow);
 
     void        CleanDeadPool();
+    void        DestroyElementRecursive(CGUIElement* pElement);
     CGUIWindow* LoadLayout(CGUIElement* pParent, const SString& strFilename);
     bool        LoadImageset(const SString& strFilename);
 
+    // Cleanup CEGUI active resources (dead pool)
+    void Cleanup();
+
+    CGUIElement* GetScriptRoot() override { return m_ScriptRoot; }
+
 private:
+    friend class CGUIElement_Impl;
     CGUIButton*      _CreateButton(CGUIElement_Impl* pParent = NULL, const char* szCaption = "");
     CGUICheckBox*    _CreateCheckBox(CGUIElement_Impl* pParent = NULL, const char* szCaption = "", bool bChecked = false);
     CGUIRadioButton* _CreateRadioButton(CGUIElement_Impl* pParent = NULL, const char* szCaption = "");
@@ -310,6 +324,8 @@ private:
     CEGUI::WindowManager*   m_pWindowManager;
 
     CEGUI::DefaultWindow* m_pTop;
+    CEGUI::DefaultWindow* m_ScriptTop;
+    CGUIElement*          m_ScriptRoot;
     const CEGUI::Image*   m_pCursor;
     float                 m_fCurrentServerCursorAlpha;
 
@@ -322,7 +338,13 @@ private:
     CGUIFont_Impl* m_pSansFont;
     CGUIFont_Impl* m_pUniFont;
 
-    std::list<CGUIElement*> m_RedrawQueue;
+    std::unordered_set<std::uint32_t>               m_RedrawQueue;
+    std::unordered_map<std::uint32_t, CGUIElement*> m_RedrawRegistry;
+    std::uint32_t                                   m_nextRedrawHandle;
+
+    std::uint32_t RegisterRedrawHandle(CGUIElement_Impl* pElement);
+    void          ReleaseRedrawHandle(std::uint32_t handle);
+    CGUIElement*  ResolveRedrawHandle(std::uint32_t handle) const;
 
     unsigned long m_ulPreviousUnique;
 
@@ -350,4 +372,6 @@ private:
     bool         m_HasSchemeLoaded;
     SString      m_CurrentSchemeName;
     CElapsedTime m_RenderOkTimer;
+
+    void CreateRootWindow();
 };

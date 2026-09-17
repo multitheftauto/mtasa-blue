@@ -14,11 +14,11 @@
 #include <game/CRadar.h>
 #include "CMarkerSA.h"
 
-#define ARRAY_CMarker                       0xBA86F0
-#define MAX_MARKERS                         175
+#define ARRAY_CMarker 0xBA86F0
+#define MAX_MARKERS   175
 
-#define FUNC_DrawAreaOnRadar                0x5853d0
-#define FUNC_SetCoordBlip                   0x583820
+#define FUNC_DrawAreaOnRadar 0x5853d0
+#define FUNC_SetCoordBlip    0x583820
 
 class CRadarSA : public CRadar
 {

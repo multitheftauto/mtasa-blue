@@ -16,7 +16,7 @@
 
 using std::list;
 
-#define OBJECT_SYNC_RATE   ( g_TickRateSettings.iObjectSync )
+    #define OBJECT_SYNC_RATE (g_TickRateSettings.iObjectSync)
 
 CObjectSync::CObjectSync(CClientObjectManager* pObjectManager)
 {
@@ -97,15 +97,16 @@ void CObjectSync::Packet_ObjectStartSync(NetBitStreamInterface& BitStream)
             SRotationRadiansSync rotation;
             if (BitStream.Read(&position) && BitStream.Read(&rotation))
             {
-                // Disabled due to problem when attached in the editor - issue #5886
-                #if 0
+    // Disabled due to problem when attached in the editor - issue #5886
+    #if 0
                 pObject->SetOrientation ( position.data.vecPosition, rotation.data.vecRotation );
-                #endif
+    #endif
             }
             // No velocity due to issue #3522
 
             // Read out the health
             SObjectHealthSync health;
+
             if (BitStream.Read(&health))
             {
                 pObject->SetHealth(health.data.fValue);
@@ -177,13 +178,16 @@ void CObjectSync::Packet_ObjectSync(NetBitStreamInterface& BitStream)
 
         // Grab the object
         CDeathmatchObject* pObject = static_cast<CDeathmatchObject*>(m_pObjectManager->Get(ID));
+
         // Only update the sync if this packet is from the same context
         if (pObject && pObject->CanUpdateSync(ucSyncTimeContext))
         {
             if (flags & 0x1)
                 pObject->SetPosition(position.data.vecPosition);
+
             if (flags & 0x2)
                 pObject->SetRotationRadians(rotation.data.vecRotation);
+
             if (flags & 0x4)
                 pObject->SetHealth(health.data.fValue);
         }
@@ -219,8 +223,10 @@ void CObjectSync::WriteObjectInformation(NetBitStreamInterface* pBitStream, CDea
 
     if (vecPosition != pObject->m_LastSyncedData.vecPosition)
         ucFlags |= 0x1;
+
     if (vecRotation != pObject->m_LastSyncedData.vecRotation)
         ucFlags |= 0x2;
+
     if (pObject->GetHealth() != pObject->m_LastSyncedData.fHealth)
         ucFlags |= 0x4;
 

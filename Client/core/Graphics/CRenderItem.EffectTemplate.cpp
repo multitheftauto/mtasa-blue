@@ -9,6 +9,7 @@
 
 #include "StdInc.h"
 #include "CRenderItem.EffectTemplate.h"
+#include <DXHook/CProxyDirect3DDevice9.h>
 #include <DXHook/CProxyDirect3DEffect.h>
 
 ///////////////////////////////////////////////////////////////
@@ -108,11 +109,11 @@ namespace
         STDMETHOD(Close)(LPCVOID pData)
         {
             // Free memory allocated for file contents
-            delete pData;
+            free(const_cast<void*>(pData));
             return S_OK;
         }
     };
-}            // namespace
+}  // namespace
 
 ////////////////////////////////////////////////////////////////
 //
@@ -153,7 +154,7 @@ void CEffectTemplate::PreDestruct()
 int CEffectTemplate::GetTicksSinceLastUsed()
 {
     if (m_uiCloneCount != 0)
-        return 0;            // Used right now
+        return 0;  // Used right now
 
     CTickCount delta = CTickCount::Now(true) - m_TickCountLastUsed;
     return static_cast<int>(delta.ToLongLong()) + 1;
@@ -224,7 +225,7 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
     macroList.back().Definition = NULL;
 
     // Compile effect
-    DWORD dwFlags = D3DXFX_LARGEADDRESSAWARE;            // D3DXSHADER_PARTIALPRECISION, D3DXSHADER_DEBUG, D3DXFX_NOT_CLONEABLE;
+    DWORD dwFlags = D3DXFX_LARGEADDRESSAWARE;  // D3DXSHADER_PARTIALPRECISION, D3DXSHADER_DEBUG, D3DXFX_NOT_CLONEABLE;
     if (bDebug)
         dwFlags |= D3DXSHADER_DEBUG;
 
@@ -300,14 +301,22 @@ void CEffectTemplate::CreateUnderlyingData(const SString& strFile, const SString
         }
 
         // Try resetting samplers if 1st attempt failed
-        LPDIRECT3DDEVICE9 pDevice;
-        m_pD3DEffect->GetDevice(&pDevice);
-        for (uint i = 0; i < 16; i++)
+        CScopedActiveProxyDevice proxyDevice;
+        IDirect3DDevice9*        pSamplerDevice = proxyDevice ? static_cast<IDirect3DDevice9*>(proxyDevice.Get()) : nullptr;
+        LPDIRECT3DDEVICE9        pDevice = nullptr;
+        if (!pSamplerDevice && SUCCEEDED(m_pD3DEffect->GetDevice(&pDevice)) && pDevice)
+            pSamplerDevice = pDevice;
+
+        if (pSamplerDevice)
         {
-            pDevice->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
-            pDevice->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
-            pDevice->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+            for (uint i = 0; i < 16; i++)
+            {
+                pSamplerDevice->SetSamplerState(i, D3DSAMP_MAGFILTER, D3DTEXF_LINEAR);
+                pSamplerDevice->SetSamplerState(i, D3DSAMP_MINFILTER, D3DTEXF_LINEAR);
+                pSamplerDevice->SetSamplerState(i, D3DSAMP_MIPFILTER, D3DTEXF_LINEAR);
+            }
         }
+        SAFE_RELEASE(pDevice);
     }
 
     // Set technique

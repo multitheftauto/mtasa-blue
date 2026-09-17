@@ -26,6 +26,7 @@ void CLuaResourceDefs::LoadFunctions()
         {"getResourceGUIElement", GetResourceGUIElement},
         {"getResourceDynamicElementRoot", GetResourceDynamicElementRoot},
         {"getResourceExportedFunctions", GetResourceExportedFunctions},
+        {"getResources", ArgumentParser<GetResources>},
         {"getResourceState", GetResourceState},
         {"loadstring", LoadString},
         {"load", Load},
@@ -89,7 +90,7 @@ int CLuaResourceDefs::Call(lua_State* luaVM)
                 args.ReadArguments(luaVM, 3);
                 CLuaArguments returns;
 
-                LUA_CHECKSTACK(targetLuaVM, 1);            // Ensure some room
+                LUA_CHECKSTACK(targetLuaVM, 1);  // Ensure some room
 
                 // Lets grab the original hidden variables so we can restore them later
                 lua_getglobal(targetLuaVM, "sourceResource");
@@ -409,6 +410,11 @@ int CLuaResourceDefs::GetResourceState(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::vector<CResource*> CLuaResourceDefs::GetResources()
+{
+    return {m_pResourceManager->IterBegin(), m_pResourceManager->IterEnd()};
 }
 
 int CLuaResourceDefs::LoadString(lua_State* luaVM)

@@ -30,7 +30,7 @@
 extern CGame* g_pGame;
 
 #if defined(_MSC_VER)
-#pragma warning(disable : 4355)            // warning C4355: 'this' : used in base member initializer list
+    #pragma warning(disable : 4355)  // warning C4355: 'this' : used in base member initializer list
 #endif
 
 CElement::CElement(CElement* pParent)
@@ -356,7 +356,7 @@ void CElement::ClearChildren()
     assert(m_pParent != this);
 
     // Process our children - Move up to our parent
-    if (!m_Children.empty())            // This check reduces cpu usage when unloading large maps (due to recursion)
+    if (!m_Children.empty())  // This check reduces cpu usage when unloading large maps (due to recursion)
     {
         while (!m_Children.empty())
             (*m_Children.begin())->SetParentObject(m_pParent, false);
@@ -435,8 +435,12 @@ bool CElement::AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFuncti
 
 bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller)
 {
-    if (!g_pGame->GetDebugHookManager()->OnPreEvent(szName, Arguments, this, pCaller))
-        return false;
+    CDebugHookManager* debugHookManager = g_pGame->GetDebugHookManager();
+    if (debugHookManager->HasPreEventHooks())
+    {
+        if (!debugHookManager->OnPreEvent(szName, Arguments, this, pCaller))
+            return false;
+    }
 
     CEvents* pEvents = g_pGame->GetEvents();
 
@@ -452,7 +456,8 @@ bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPl
     // Tell the event manager that we're done calling the event
     pEvents->PostEventPulse();
 
-    g_pGame->GetDebugHookManager()->OnPostEvent(szName, Arguments, this, pCaller);
+    if (debugHookManager->HasPostEventHooks())
+        debugHookManager->OnPostEvent(szName, Arguments, this, pCaller);
 
     // Return whether our event was cancelled or not
     return (!pEvents->WasEventCancelled());
@@ -508,12 +513,12 @@ void CElement::ReadCustomData(CEvents* pEvents, CXMLNode& Node)
     }
 }
 
-CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESyncType* pSyncType, eCustomDataClientTrust* clientChangesMode)
+CLuaArgument* CElement::GetCustomData(const CStringName& name, bool bInheritData, ESyncType* pSyncType, eCustomDataClientTrust* clientChangesMode)
 {
-    assert(szName);
+    assert(name);
 
     // Grab it and return a pointer to the variable
-    SCustomData* pData = m_CustomData.Get(szName);
+    SCustomData* pData = m_CustomData.Get(name);
     if (pData)
     {
         if (pSyncType)
@@ -528,7 +533,7 @@ CLuaArgument* CElement::GetCustomData(const char* szName, bool bInheritData, ESy
     // If none, try returning parent's custom data
     if (bInheritData && m_pParent)
     {
-        return m_pParent->GetCustomData(szName, true, pSyncType, clientChangesMode);
+        return m_pParent->GetCustomData(name, true, pSyncType, clientChangesMode);
     }
 
     // None available
@@ -540,20 +545,20 @@ CLuaArguments* CElement::GetAllCustomData(CLuaArguments* table)
     assert(table);
 
     // Grab it and return a pointer to the variable
-    map<string, SCustomData>::const_iterator iter = m_CustomData.IterBegin();
+    auto iter = m_CustomData.IterBegin();
     for (; iter != m_CustomData.IterEnd(); iter++)
     {
-        table->PushString(iter->first.c_str());                // key
-        table->PushArgument(iter->second.Variable);            // value
+        table->PushString(iter->first);              // key
+        table->PushArgument(iter->second.Variable);  // value
     }
 
     return table;
 }
 
-bool CElement::GetCustomDataString(const char* szName, char* pOut, size_t sizeBuffer, bool bInheritData)
+bool CElement::GetCustomDataString(const CStringName& name, char* pOut, size_t sizeBuffer, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    CLuaArgument* pData = GetCustomData(name, bInheritData);
     if (pData)
     {
         // Make sure it gets 0 terminated
@@ -589,10 +594,10 @@ bool CElement::GetCustomDataString(const char* szName, char* pOut, size_t sizeBu
     return false;
 }
 
-bool CElement::GetCustomDataInt(const char* szName, int& iOut, bool bInheritData)
+bool CElement::GetCustomDataInt(const CStringName& name, int& iOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    CLuaArgument* pData = GetCustomData(name, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -627,10 +632,10 @@ bool CElement::GetCustomDataInt(const char* szName, int& iOut, bool bInheritData
     return false;
 }
 
-bool CElement::GetCustomDataFloat(const char* szName, float& fOut, bool bInheritData)
+bool CElement::GetCustomDataFloat(const CStringName& name, float& fOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    CLuaArgument* pData = GetCustomData(name, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -654,10 +659,10 @@ bool CElement::GetCustomDataFloat(const char* szName, float& fOut, bool bInherit
     return false;
 }
 
-bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritData)
+bool CElement::GetCustomDataBool(const CStringName& name, bool& bOut, bool bInheritData)
 {
     // Grab the custom data variable
-    CLuaArgument* pData = GetCustomData(szName, bInheritData);
+    CLuaArgument* pData = GetCustomData(name, bInheritData);
     if (pData)
     {
         // Write the content depending on what type it is
@@ -709,78 +714,96 @@ bool CElement::GetCustomDataBool(const char* szName, bool& bOut, bool bInheritDa
     return false;
 }
 
-void CElement::SetCustomData(const char* szName, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
+bool CElement::SetCustomData(const CStringName& name, const CLuaArgument& Variable, ESyncType syncType, CPlayer* pClient, bool bTriggerEvent)
 {
-    assert(szName);
-    if (strlen(szName) > MAX_CUSTOMDATA_NAME_LENGTH)
+    assert(name);
+    if (name->length() > MAX_CUSTOMDATA_NAME_LENGTH)
     {
         // Don't allow it to be set if the name is too long
-        CLogger::ErrorPrintf("Custom data name too long (%s)\n", *SStringX(szName).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
-        return;
+        CLogger::ErrorPrintf("Custom data name too long (%s)\n", *SStringX(name.ToCString()).Left(MAX_CUSTOMDATA_NAME_LENGTH + 1));
+        return false;
     }
 
-    // Grab the old variable
+    // Grab the old variable and sync type
     CLuaArgument       oldVariable;
-    const SCustomData* pData = m_CustomData.Get(szName);
+    ESyncType          oldSyncType = ESyncType::LOCAL;
+    const SCustomData* pData = m_CustomData.Get(name);
     if (pData)
     {
         oldVariable = pData->Variable;
+        oldSyncType = pData->syncType;
     }
 
     // Set the new data
-    m_CustomData.Set(szName, Variable, syncType);
+    m_CustomData.Set(name, Variable, syncType);
 
     if (bTriggerEvent)
     {
         // Trigger the onElementDataChange event on us
         CLuaArguments Arguments;
-        Arguments.PushString(szName);
+        Arguments.PushString(name);
         Arguments.PushArgument(oldVariable);
         Arguments.PushArgument(Variable);
-        CallEvent("onElementDataChange", Arguments, pClient);
+        if (!CallEvent("onElementDataChange", Arguments, pClient))
+        {
+            // Event was cancelled, restore previous value
+            if (pData)
+                m_CustomData.Set(name, oldVariable, oldSyncType);
+            else
+                m_CustomData.Delete(name);
+            return false;
+        }
     }
+    return true;
 }
 
-void CElement::DeleteCustomData(const char* szName)
+bool CElement::DeleteCustomData(const CStringName& name)
 {
     // Grab the old variable
-    SCustomData* pData = m_CustomData.Get(szName);
+    SCustomData* pData = m_CustomData.Get(name);
     if (pData)
     {
-        CLuaArgument oldVariable;
-        oldVariable = pData->Variable;
+        CLuaArgument oldVariable = pData->Variable;
+        ESyncType    oldSyncType = pData->syncType;
 
         // Delete the custom data
-        m_CustomData.Delete(szName);
+        m_CustomData.Delete(name);
 
         // Trigger the onElementDataChange event on us
         CLuaArguments Arguments;
-        Arguments.PushString(szName);
+        Arguments.PushString(name);
         Arguments.PushArgument(oldVariable);
-        Arguments.PushArgument(CLuaArgument());            // Use nil as the new value to indicate the data has been removed
-        CallEvent("onElementDataChange", Arguments);
+        Arguments.PushArgument(CLuaArgument());  // Use nil as the new value to indicate the data has been removed
+        if (!CallEvent("onElementDataChange", Arguments))
+        {
+            // Event was cancelled, restore previous value
+            m_CustomData.Set(name, oldVariable, oldSyncType);
+            return false;
+        }
+        return true;
     }
+    return false;
 }
 
 // Used to send the root element data when a player joins
 void CElement::SendAllCustomData(CPlayer* pPlayer)
 {
-    for (map<std::string, SCustomData>::const_iterator iter = m_CustomData.SyncedIterBegin(); iter != m_CustomData.SyncedIterEnd(); ++iter)
+    for (auto iter = m_CustomData.SyncedIterBegin(); iter != m_CustomData.SyncedIterEnd(); ++iter)
     {
-        const std::string& strName = iter->first;
+        const CStringName& name = iter->first;
         const SCustomData& customData = iter->second;
 
         if (customData.syncType == ESyncType::LOCAL)
             continue;
 
         // Tell our clients to update their data
-        unsigned short usNameLength = static_cast<unsigned short>(strName.length());
+        unsigned short usNameLength = static_cast<unsigned short>(name->length());
         CBitStream     BitStream;
         BitStream.pBitStream->WriteCompressed(usNameLength);
-        BitStream.pBitStream->Write(strName.c_str(), usNameLength);
+        BitStream.pBitStream->Write(name.ToCString(), usNameLength);
         customData.Variable.WriteToBitStream(*BitStream.pBitStream);
 
-        if (customData.syncType == ESyncType::BROADCAST || pPlayer->IsSubscribed(this, strName))
+        if (customData.syncType == ESyncType::BROADCAST || pPlayer->IsSubscribed(this, name))
             pPlayer->Send(CElementRPCPacket(this, SET_ELEMENT_DATA, *BitStream.pBitStream));
     }
 }
@@ -847,7 +870,7 @@ bool CElement::LoadFromCustomData(CEvents* pEvents, CXMLNode& Node)
 void CElement::OnSubtreeAdd(CElement* pElement)
 {
     // Call the event on the elements that references us
-    if (!m_ElementReferenced.empty())            // This check reduces cpu usage when loading large maps (due to recursion)
+    if (!m_ElementReferenced.empty())  // This check reduces cpu usage when loading large maps (due to recursion)
     {
         std::list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
         for (; iter != m_ElementReferenced.end(); iter++)
@@ -866,7 +889,7 @@ void CElement::OnSubtreeAdd(CElement* pElement)
 void CElement::OnSubtreeRemove(CElement* pElement)
 {
     // Call the event on the elements that references us
-    if (!m_ElementReferenced.empty())            // This check reduces cpu usage when unloading large maps (due to recursion)
+    if (!m_ElementReferenced.empty())  // This check reduces cpu usage when unloading large maps (due to recursion)
     {
         std::list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
         for (; iter != m_ElementReferenced.end(); iter++)
@@ -1020,7 +1043,7 @@ void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Argume
 
     // Call it on all our children
     CElementListSnapshotRef childrenList = GetChildrenListSnapshot();
-	for (CElement* pElement : *childrenList)
+    for (CElement* pElement : *childrenList)
     {
         if (!pElement->IsBeingDeleted())
         {
@@ -1180,7 +1203,7 @@ bool CElement::IsAttachedToElement(CElement* pElement, bool bRecursive)
                 return true;
 
             if (!std::get<bool>(history.insert(pCurrent)))
-                break;            // This should not be possible, but you never know
+                break;  // This should not be possible, but you never know
         }
 
         return false;
@@ -1237,14 +1260,15 @@ void CElement::GetAttachedPosition(CVector& vecPosition)
 {
     if (m_pAttachedTo)
     {
-        CVector vecRotation;
+        // Get the position of the element we're attached to
         vecPosition = m_pAttachedTo->GetPosition();
-        m_pAttachedTo->GetRotation(vecRotation);
 
-        CVector vecPositionOffset = m_vecAttachedPosition;
-        // This works when rotating around z axis. Other axes need testing.
-        RotateVector(vecPositionOffset, CVector(vecRotation.fX, vecRotation.fY, -vecRotation.fZ));
-        vecPosition += vecPositionOffset;
+        // Get the parent's matrix
+        CMatrix matParent;
+        m_pAttachedTo->GetMatrix(matParent);
+
+        // Apply the transformation
+        vecPosition += matParent.TransformVectorByRotation(m_vecAttachedPosition);
     }
 }
 
@@ -1253,7 +1277,9 @@ void CElement::GetAttachedRotation(CVector& vecRotation)
     if (m_pAttachedTo)
     {
         m_pAttachedTo->GetRotation(vecRotation);
+        ConvertRadiansToDegrees(vecRotation);
         vecRotation += m_vecAttachedRotation;
+        ConvertDegreesToRadians(vecRotation);
     }
 }
 

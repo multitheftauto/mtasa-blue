@@ -14,9 +14,16 @@
 
 #define FUNC_CVisibilityPlugins_InsertEntityIntoEntityList 0x733DD0
 
+int CVisibilityPluginsSA::GetClumpAlpha(RpClump* pClump)
+{
+    using GetClumpAlpha = int(__cdecl*)(RpClump*);
+    return reinterpret_cast<GetClumpAlpha>(0x732B20)(pClump);
+}
+
 void CVisibilityPluginsSA::SetClumpAlpha(RpClump* pClump, int iAlpha)
 {
     DWORD dwFunc = FUNC_CVisiblityPlugins_SetClumpAlpha;
+    // clang-format off
     __asm
     {
         push    iAlpha
@@ -24,6 +31,7 @@ void CVisibilityPluginsSA::SetClumpAlpha(RpClump* pClump, int iAlpha)
         call    dwFunc
         add     esp, 0x8
     }
+    // clang-format on
 }
 
 // Some AtomicId bits are:
@@ -44,6 +52,7 @@ int CVisibilityPluginsSA::GetAtomicId(RwObject* pAtomic)
 {
     DWORD dwFunc = FUNC_CVisibilityPlugins_GetAtomicId;
     int   iResult = 0;
+    // clang-format off
     __asm
     {
         push    pAtomic
@@ -51,10 +60,19 @@ int CVisibilityPluginsSA::GetAtomicId(RwObject* pAtomic)
         add     esp, 0x4
         mov     iResult, eax
     }
+    // clang-format on
     return iResult;
 }
 
 bool CVisibilityPluginsSA::InsertEntityIntoEntityList(void* entity, float distance, void* callback)
 {
     return ((bool(_cdecl*)(void*, float, void*))FUNC_CVisibilityPlugins_InsertEntityIntoEntityList)(entity, distance, callback);
+}
+
+bool CVisibilityPluginsSA::IsAtomicVisible(RpAtomic* atomic) const
+{
+    if (!atomic)
+        return false;
+
+    return ((bool(__cdecl*)(RpAtomic*))0x732990)(atomic);
 }

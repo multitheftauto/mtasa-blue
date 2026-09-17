@@ -2,6 +2,8 @@
  *
  *  PROJECT:     Multi Theft Auto
  *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        mods/deathmatch/logic/packets/CEntityRemoveTreePacket.h
+ *  PURPOSE:     Entity tree remove packet class
  *
  *  Multi Theft Auto is available from https://www.multitheftauto.com/
  *
@@ -12,6 +14,8 @@
 #include "CPacket.h"
 #include <vector>
 
+class CElement;
+
 class CEntityRemoveTreePacket final : public CPacket
 {
 public:
@@ -20,9 +24,9 @@ public:
 
     bool Write(NetBitStreamInterface& bitStream) const override;
 
-    void AddRootElement(CElement* element) { m_rootElements.push_back(element); }
-    void Clear() noexcept { m_rootElements.clear(); }
-    bool IsEmpty() const noexcept { return m_rootElements.empty(); }
+    void        AddRootElement(CElement* element) { m_rootElements.push_back(element); }
+    void        Clear() noexcept { m_rootElements.clear(); }
+    bool        IsEmpty() const noexcept { return m_rootElements.empty(); }
     std::size_t GetRootElementCount() const noexcept { return m_rootElements.size(); }
 
 private:

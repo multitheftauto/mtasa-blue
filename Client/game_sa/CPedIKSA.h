@@ -49,7 +49,7 @@ typedef struct
 class CPedIKSAInterface
 {
 public:
-    CPedSAInterface* ThisPed;            // 528
+    CPedSAInterface* ThisPed;  // 528
     LimbOrientation  m_torsoOrien;
     float            m_fSlopePitch;
     float            m_fSlopePitchLimitMult;

@@ -57,6 +57,7 @@ void CBuildingSA::SetLod(CBuilding* pLod)
     else
     {
         CEntitySAInterface* pCurrentLod = m_pInterface->m_pLod;
+
         if (pCurrentLod)
         {
             pGame->GetWorld()->Remove(pCurrentLod, CBuilding_SetLod);
@@ -91,6 +92,7 @@ void CBuildingSA::ReallocateMatrix()
     newMatrix->m_pNext = nullptr;
 
     m_pInterface->RemoveMatrix();
+
     m_pInterface->matrix = reinterpret_cast<CMatrix_Padded*>(newMatrix);
 }
 
@@ -106,5 +108,6 @@ void CBuildingSA::RemoveAllocatedMatrix()
 
     g_matrixPool.RemoveItem(reinterpret_cast<CMatrixLinkSAInterface*>(m_pInterface->matrix));
     g_matrixPool.SetCapacity(0);
+
     m_pInterface->matrix = nullptr;
 }

@@ -338,11 +338,11 @@ void CPlayerManager::Broadcast(const CPacket& Packet, const std::multimap<ushort
 bool CPlayerManager::IsValidPlayerModel(unsigned short model)
 {
     if (model > 312)
-        return false;            // TODO: On client side maybe check if a model was allocated with engineRequestModel and it is a ped
+        return false;  // TODO: On client side maybe check if a model was allocated with engineRequestModel and it is a ped
 
     switch (model)
     {
-        case 74:            // Missing skin
+        case 74:  // Missing skin
         case 149:
         case 208:
             return false;
@@ -351,7 +351,7 @@ bool CPlayerManager::IsValidPlayerModel(unsigned short model)
     }
 }
 
-void CPlayerManager::ClearElementData(CElement* pElement, const std::string& name)
+void CPlayerManager::ClearElementData(CElement* pElement, CStringName name)
 {
     list<CPlayer*>::const_iterator iter = m_Players.begin();
     for (; iter != m_Players.end(); iter++)

@@ -13,7 +13,6 @@
 
 #include "CElement.h"
 #include <list>
-#include <vector>
 
 class CElementDeleter
 {
@@ -26,9 +25,10 @@ public:
 
     bool IsBeingDeleted(CElement* element) const;
     void Unreference(CElement* element);
+
     void CleanUpForVM(CLuaMain* luaMain);
 
 private:
-    void CollectTreeElements(CElement* element, std::vector<CElement*>& elements);
+    void             CollectTreeElements(CElement* element, std::vector<CElement*>& elements);
     CElementListType m_List;
 };

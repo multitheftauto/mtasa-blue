@@ -26,14 +26,14 @@ public:
 
     void RemoveAllWithBackup() override;
     void RestoreBackup() override;
-    void UpdateBuildingLods(const std::uint32_t offset);
+    void UpdateBuildingLods(const std::uint32_t offset, const std::uintptr_t oldPoolStart, const std::uintptr_t oldPoolEnd) override;
 
 private:
-    void UpdateBackupLodOffset(const std::uint32_t offest);
-    void UpdateLodsOffestInPool(const std::uint32_t offset);
+    void UpdateBackupLodOffset(const std::uint32_t offset, const std::uintptr_t oldPoolStart, const std::uintptr_t oldPoolEnd);
+    void UpdateLodsOffestInPool(const std::uint32_t offset, const std::uintptr_t oldPoolStart, const std::uintptr_t oldPoolEnd);
 
 private:
-    CPoolSAInterface<CEntitySAInterface>**  m_ppDummyPoolInterface;
+    CPoolSAInterface<CEntitySAInterface>** m_ppDummyPoolInterface;
 
     using building_buffer_t = std::uint8_t[sizeof(CEntitySAInterface)];
     using pool_backup_t = std::array<std::pair<bool, building_buffer_t>, MAX_DUMMIES_DEFAULT>;

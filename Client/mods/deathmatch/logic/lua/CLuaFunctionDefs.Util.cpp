@@ -12,7 +12,7 @@
 
 int CLuaFunctionDefs::GetValidPedModels(lua_State* luaVM)
 {
-    bool includeCustom;
+    bool             includeCustom;
     CScriptArgReader argStream(luaVM);
     argStream.ReadBool(includeCustom, true);
 
@@ -227,7 +227,6 @@ int CLuaFunctionDefs::GetKeyboardLayout(lua_State* luaVM)
 {
     const char* readingLayout = "ltr";
 
-#if _WIN32_WINNT >= _WIN32_WINNT_WIN7
     DWORD readingLayoutValue = 0;
 
     if (::GetLocaleInfoEx(LOCALE_NAME_USER_DEFAULT, LOCALE_IREADINGLAYOUT | LOCALE_RETURN_NUMBER, reinterpret_cast<LPWSTR>(&readingLayoutValue),
@@ -235,36 +234,22 @@ int CLuaFunctionDefs::GetKeyboardLayout(lua_State* luaVM)
     {
         switch (readingLayoutValue)
         {
-            case 0:            // Left to right (English)
+            case 0:  // Left to right (English)
                 readingLayout = "ltr";
                 break;
-            case 1:            // Right to left (Arabic, Hebrew, and Persian)
+            case 1:  // Right to left (Arabic, Hebrew, and Persian)
                 readingLayout = "rtl";
                 break;
-            case 2:            // Vertical top to bottom with columns to the left and also left to right (Japanese)
+            case 2:  // Vertical top to bottom with columns to the left and also left to right (Japanese)
                 readingLayout = "ttb-rtl-ltr";
                 break;
-            case 3:            // Vertical top to bottom with columns proceeding to the right (Mongolian)
+            case 3:  // Vertical top to bottom with columns proceeding to the right (Mongolian)
                 readingLayout = "ttb-ltr";
                 break;
             default:
                 break;
         }
     }
-
-#else
-    HKL             keyboardLayout = ::GetKeyboardLayout(0 /* current thread*/);
-    LCID            locale = MAKELCID(LOWORD(keyboardLayout), SORT_DEFAULT);
-    LOCALESIGNATURE localeSignature = {};
-
-    if (GetLocaleInfoW(locale, LOCALE_FONTSIGNATURE, reinterpret_cast<LPWSTR>(&localeSignature), sizeof(localeSignature) / sizeof(WCHAR)) != 0)
-    {
-        if ((localeSignature.lsUsb[3] & 0x08000000) != 0)
-        {
-            readingLayout = "rtl";
-        }
-    }
-#endif
 
     lua_createtable(luaVM, 0, 1);
     lua_pushstring(luaVM, "readingLayout");
@@ -293,7 +278,7 @@ int CLuaFunctionDefs::GetPerformanceStats(lua_State* luaVM)
         for (int c = 0; c < Result.ColumnCount(); c++)
         {
             const SString& name = Result.ColumnName(c);
-            lua_pushnumber(luaVM, c + 1);            // row index number (starting at 1, not 0)
+            lua_pushnumber(luaVM, c + 1);  // row index number (starting at 1, not 0)
             lua_pushlstring(luaVM, name.c_str(), name.length());
             lua_settable(luaVM, -3);
         }
@@ -301,10 +286,10 @@ int CLuaFunctionDefs::GetPerformanceStats(lua_State* luaVM)
         lua_newtable(luaVM);
         for (int r = 0; r < Result.RowCount(); r++)
         {
-            lua_newtable(luaVM);                     // new table
-            lua_pushnumber(luaVM, r + 1);            // row index number (starting at 1, not 0)
-            lua_pushvalue(luaVM, -2);                // value
-            lua_settable(luaVM, -4);                 // refer to the top level table
+            lua_newtable(luaVM);           // new table
+            lua_pushnumber(luaVM, r + 1);  // row index number (starting at 1, not 0)
+            lua_pushvalue(luaVM, -2);      // value
+            lua_settable(luaVM, -4);       // refer to the top level table
 
             for (int c = 0; c < Result.ColumnCount(); c++)
             {
@@ -313,7 +298,7 @@ int CLuaFunctionDefs::GetPerformanceStats(lua_State* luaVM)
                 lua_pushlstring(luaVM, cell.c_str(), cell.length());
                 lua_settable(luaVM, -3);
             }
-            lua_pop(luaVM, 1);            // pop the inner table
+            lua_pop(luaVM, 1);  // pop the inner table
         }
         return 2;
     }

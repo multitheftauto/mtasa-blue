@@ -212,9 +212,9 @@ void CWorldRPCs::ResetMapInfo(NetBitStreamInterface& bitStream)
 
 void CWorldRPCs::SetFPSLimit(NetBitStreamInterface& bitStream)
 {
-    short sFPSLimit;
-    bitStream.Read(sFPSLimit);
-    g_pCore->RecalculateFrameRateLimit(sFPSLimit);
+    std::uint16_t fps;
+    bitStream.Read(fps);
+    CStaticFunctionDefinitions::SetServerFPSLimit(fps);
 }
 
 void CWorldRPCs::SetGarageOpen(NetBitStreamInterface& bitStream)
@@ -425,7 +425,7 @@ void CWorldRPCs::SetWeaponProperty(NetBitStreamInterface& bitStream)
     {
         CWeaponStat* pWeaponInfo =
             g_pGame->GetWeaponStatManager()->GetWeaponStats(static_cast<eWeaponType>(ucWeapon), static_cast<eWeaponSkill>(ucWeaponSkill));
-        switch (static_cast<WeaponProperty>(ucProperty))
+        switch (static_cast<WeaponProperty::Enum>(ucProperty))
         {
             case WeaponProperty::WEAPON_WEAPON_RANGE:
             {
@@ -553,7 +553,7 @@ void CWorldRPCs::SetWeaponProperty(NetBitStreamInterface& bitStream)
             {
                 bool bEnable;
                 bitStream.ReadBit(bEnable);
-                uint uiFlagBit = GetWeaponPropertyFlagBit((WeaponProperty)ucProperty);
+                uint uiFlagBit = GetWeaponPropertyFlagBit((WeaponProperty::Enum)ucProperty);
                 if (bEnable)
                     pWeaponInfo->SetFlagBits(uiFlagBit);
                 else

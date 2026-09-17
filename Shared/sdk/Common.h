@@ -11,19 +11,22 @@
 
 #pragma once
 
+#include <cstdint>
+#include <limits>
+
 // Min and max number of characters in player serial
 #define MIN_SERIAL_LENGTH 1
 #define MAX_SERIAL_LENGTH 32
 
 // Network disconnection reason (message) size
-#define NET_DISCONNECT_REASON_SIZE  256
+#define NET_DISCONNECT_REASON_SIZE 256
 
 // Element IDs
 #define RESERVED_ELEMENT_ID 0xFFFFFFFE
-#define INVALID_ELEMENT_ID 0xFFFFFFFF
+#define INVALID_ELEMENT_ID  0xFFFFFFFF
 
 // Element name characteristics
-#define MAX_TYPENAME_LENGTH 32
+#define MAX_TYPENAME_LENGTH     32
 #define MAX_ELEMENT_NAME_LENGTH 64
 
 // Allow 2^17 server elements and 2^17 client elements
@@ -56,7 +59,7 @@ public:
     }
     ElementID& operator-=(const ElementID& ID)
     {
-        m_value += ID.m_value;
+        m_value -= ID.m_value;
         return *this;
     }
     ElementID operator+(const ElementID& ID) const { return m_value + ID.m_value; }
@@ -83,18 +86,50 @@ private:
 #define MAX_EVENT_NAME_LENGTH 512
 
 // LAN packet broadcasting port
-#define SERVER_LIST_BROADCAST_PORT          34219
+#define SERVER_LIST_BROADCAST_PORT 34219
 
 // Server game to query port offset (gameport + offset = queryport)
-#define SERVER_LIST_QUERY_PORT_OFFSET       123
+#define SERVER_LIST_QUERY_PORT_OFFSET 123
 
 // LAN packet broadcasting string
-#define SERVER_LIST_CLIENT_BROADCAST_STR    "MTA-CLIENT"
-#define SERVER_LIST_SERVER_BROADCAST_STR    "MTA-SERVER"
+#define SERVER_LIST_CLIENT_BROADCAST_STR "MTA-CLIENT"
+#define SERVER_LIST_SERVER_BROADCAST_STR "MTA-SERVER"
 
 // Defines the min/max size for the player nick for use in the core module
-#define MIN_PLAYER_NICK_LENGTH          1
-#define MAX_PLAYER_NICK_LENGTH          22
+#define MIN_PLAYER_NICK_LENGTH 1
+#define MAX_PLAYER_NICK_LENGTH 22
 
 // Maximum number of players that can be packed in a single lightweight puresync packet
-#define LIGHTSYNC_MAX_PLAYERS               32
+#define LIGHTSYNC_MAX_PLAYERS 32
+
+// Frame rate limits
+namespace FPSLimits
+{
+    constexpr std::uint16_t FPS_MAX = std::numeric_limits<std::uint16_t>::max();  // Maximum allowed frame rate limit
+    constexpr std::uint16_t FPS_MIN = 25;                                         // Minimum allowed frame rate limit
+    constexpr std::uint16_t FPS_UNLIMITED = 0;                                    // Unlimited frame rate (no limit)
+
+    // Takes a FPS value and
+    // 1. Returns if `fpsToValidate` was valid
+    // 2. Writes clamped value to `outValidFps` reference
+    inline bool IsValidAndSetValid(std::uint16_t fpsToValidate, std::uint16_t& outValidFps) noexcept
+    {
+        if (fpsToValidate == FPS_UNLIMITED)
+        {
+            outValidFps = FPS_UNLIMITED;
+            return true;
+        }
+        if (fpsToValidate < FPS_MIN)
+        {
+            outValidFps = FPS_MIN;
+            return false;
+        }
+        if (fpsToValidate > FPS_MAX)
+        {
+            outValidFps = FPS_MAX;
+            return false;
+        }
+        outValidFps = fpsToValidate;
+        return true;
+    }
+}  // namespace FPSLimits

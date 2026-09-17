@@ -178,5 +178,9 @@ enum ePacketID
     PACKET_ID_DISCORD_JOIN,
     PACKET_ID_PLAYER_RESOURCE_START,
     PACKET_ID_PLAYER_WORLD_SPECIAL_PROPERTY,
-    PACKET_ID_ENTITY_REMOVE_TREE
+    PACKET_ID_ENTITY_REMOVE_TREE,
+
+    // Keep all packet ids above this line so NUM_PACKETS always reflects the
+    // complete range used by packet iteration code.
+    NUM_PACKETS
 };

@@ -13,7 +13,7 @@
 
 #include <CClientCommon.h>
 #include "CDeathmatchVehicle.h"
-#define MIN_ROTATION_DIFF   0.1
+#define MIN_ROTATION_DIFF 0.1
 class CUnoccupiedVehicleSync
 {
 public:

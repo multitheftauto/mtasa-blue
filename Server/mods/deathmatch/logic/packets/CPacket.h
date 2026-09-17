@@ -35,7 +35,7 @@ class CPacket
 {
 public:
     CPacket();
-    virtual ~CPacket(){};
+    virtual ~CPacket() {};
 
     virtual bool            RequiresSourcePlayer() const { return true; }
     virtual bool            HasSimHandler() const { return false; }

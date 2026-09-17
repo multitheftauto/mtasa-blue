@@ -95,9 +95,9 @@ HRESULT CEffectWrap::Begin(UINT* pPasses, DWORD Flags, bool bWorldRender)
 // Ensures secondary render targets are unset
 //
 ////////////////////////////////////////////////////////////////
-HRESULT CEffectWrap::End()
+HRESULT CEffectWrap::End(bool bDeviceOperational)
 {
-    return m_pEffectTemplate->End();
+    return m_pEffectTemplate->End(bDeviceOperational);
 }
 
 ////////////////////////////////////////////////////////////////

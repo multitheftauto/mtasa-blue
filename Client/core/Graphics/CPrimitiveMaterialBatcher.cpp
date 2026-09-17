@@ -10,6 +10,7 @@
  *****************************************************************************/
 #include <StdInc.h>
 #include "CPrimitiveMaterialBatcher.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 ////////////////////////////////////////////////////////////////
 //
 // CPrimitiveMaterialBatcher::CPrimitiveMaterialBatcher
@@ -30,6 +31,7 @@ CPrimitiveMaterialBatcher::CPrimitiveMaterialBatcher(CGraphics* graphics)
 ////////////////////////////////////////////////////////////////
 CPrimitiveMaterialBatcher::~CPrimitiveMaterialBatcher()
 {
+    ClearQueue();
 }
 ////////////////////////////////////////////////////////////////
 //
@@ -41,6 +43,7 @@ CPrimitiveMaterialBatcher::~CPrimitiveMaterialBatcher()
 void CPrimitiveMaterialBatcher::OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY)
 {
     m_pDevice = pDevice;
+
     // Cache matrices
     UpdateMatrices(fViewportSizeX, fViewportSizeY);
 }
@@ -159,6 +162,20 @@ void CPrimitiveMaterialBatcher::Flush()
         if (CTextureItem* pTextureItem = DynamicCast<CTextureItem>(pMaterial))
         {
             // Draw using texture
+            if (CRenderTargetItem* pRenderTarget = DynamicCast<CRenderTargetItem>(pTextureItem))
+            {
+                if (!pRenderTarget->TryEnsureValid())
+                    continue;
+            }
+            else if (CScreenSourceItem* pScreenSource = DynamicCast<CScreenSourceItem>(pTextureItem))
+            {
+                if (!pScreenSource->TryEnsureValid())
+                    continue;
+            }
+
+            if (!pTextureItem->m_pD3DTexture)
+                continue;
+
             if (pMaterial != pLastMaterial)
             {
                 m_pDevice->SetTexture(0, pTextureItem->m_pD3DTexture);
@@ -203,6 +220,7 @@ void CPrimitiveMaterialBatcher::Flush()
         }
         pLastMaterial = pMaterial;
         m_pGraphics->RemoveQueueRef(pMaterial);
+        primitive.pMaterial = nullptr;
     }
 
     // Clean up
@@ -257,7 +275,13 @@ void CPrimitiveMaterialBatcher::ClearQueue()
     // Clean up
     for (auto& primitive : m_primitiveList)
     {
+        if (primitive.pMaterial)
+        {
+            m_pGraphics->RemoveQueueRef(primitive.pMaterial);
+            primitive.pMaterial = nullptr;
+        }
         delete primitive.pVecVertices;
+        primitive.pVecVertices = nullptr;
     }
 
     size_t prevSize = m_primitiveList.size();
@@ -273,5 +297,7 @@ void CPrimitiveMaterialBatcher::ClearQueue()
 ////////////////////////////////////////////////////////////////
 void CPrimitiveMaterialBatcher::AddPrimitive(D3DPRIMITIVETYPE eType, CMaterialItem* pMaterial, std::vector<PrimitiveMaterialVertice>* pVecVertices)
 {
+    if (pMaterial)
+        m_pGraphics->AddQueueRef(pMaterial);
     m_primitiveList.push_back({eType, pMaterial, pVecVertices});
 }

@@ -35,13 +35,15 @@ using SVGTextPositionList = std::vector<SVGTextPosition>;
 struct SVGTextFragment {
     explicit SVGTextFragment(const SVGTextPositioningElement* element) : element(element) {}
     const SVGTextPositioningElement* element;
+    Transform lengthAdjustTransform;
     size_t offset = 0;
     size_t length = 0;
+    bool startsNewTextChunk = false;
     float x = 0;
     float y = 0;
-    float angle = 0;
     float width = 0;
-    bool startsNewTextChunk = false;
+    float height = 0;
+    float angle = 0;
 };
 
 using SVGTextFragmentList = std::vector<SVGTextFragment>;
@@ -77,11 +79,19 @@ public:
     const LengthList& dy() const { return m_dy.values(); }
     const NumberList& rotate() const { return m_rotate.values(); }
 
+    const SVGLength& textLength() const { return m_textLength; }
+    LengthAdjust lengthAdjust() const { return m_lengthAdjust.value(); }
+
     const Font& font() const { return m_font; }
     const SVGPaintServer& fill() const { return m_fill; }
     const SVGPaintServer& stroke() const { return m_stroke; }
 
+    bool isVerticalWritingMode() const { return m_writing_mode == WritingMode::Vertical; }
+    bool isUprightTextOrientation() const { return m_text_orientation == TextOrientation::Upright; }
+
     float stroke_width() const { return m_stroke_width; }
+    float letter_spacing() const { return m_letter_spacing; }
+    float word_spacing() const { return m_word_spacing; }
     float baseline_offset() const { return m_baseline_offset; }
     AlignmentBaseline alignment_baseline() const { return m_alignment_baseline; }
     DominantBaseline dominant_baseline() const { return m_dominant_baseline; }
@@ -99,16 +109,23 @@ private:
     SVGLengthList m_dy;
     SVGNumberList m_rotate;
 
+    SVGLength m_textLength;
+    SVGEnumeration<LengthAdjust> m_lengthAdjust;
+
     Font m_font;
     SVGPaintServer m_fill;
     SVGPaintServer m_stroke;
 
     float m_stroke_width = 1.f;
+    float m_letter_spacing = 0.f;
+    float m_word_spacing = 0.f;
     float m_baseline_offset = 0.f;
     AlignmentBaseline m_alignment_baseline = AlignmentBaseline::Auto;
     DominantBaseline m_dominant_baseline = DominantBaseline::Auto;
     TextAnchor m_text_anchor = TextAnchor::Start;
     WhiteSpace m_white_space = WhiteSpace::Default;
+    WritingMode m_writing_mode = WritingMode::Horizontal;
+    TextOrientation m_text_orientation = TextOrientation::Mixed;
     Direction m_direction = Direction::Ltr;
 };
 

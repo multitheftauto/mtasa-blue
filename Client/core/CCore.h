@@ -41,6 +41,7 @@ class CDiscordInterface;
 #include <ijsify.h>
 #include <core/CWebCoreInterface.h>
 #include "CTrayIcon.h"
+#include "FPSLimiter.h"
 
 #define DIRECTINPUT_VERSION 0x0800
 #include <dinput.h>
@@ -54,15 +55,15 @@ class CDiscordInterface;
 #define MTA_CONSOLE_LOG_PATH       "mta/logs/console.log"
 #define MTA_CONSOLE_INPUT_LOG_PATH "mta/logs/console-input.log"
 #define CONFIG_ROOT                "mainconfig"
-#define CONFIG_NODE_CVARS          "settings"            // cvars node
-#define CONFIG_NODE_KEYBINDS       "binds"               // keybinds node
+#define CONFIG_NODE_CVARS          "settings"  // cvars node
+#define CONFIG_NODE_KEYBINDS       "binds"     // keybinds node
 #define CONFIG_NODE_JOYPAD         "joypad"
 #define CONFIG_NODE_UPDATER        "updater"
-#define CONFIG_NODE_SERVER_INT     "internet_servers"                   // backup of last successful master server list query
-#define CONFIG_NODE_SERVER_FAV     "favourite_servers"                  // favourite servers list node
-#define CONFIG_NODE_SERVER_REC     "recently_played_servers"            // recently played servers list node
-#define CONFIG_NODE_SERVER_OPTIONS "serverbrowser_options"              // saved options for the server browser
-#define CONFIG_NODE_SERVER_SAVED   "server_passwords"                   // This contains saved passwords (as appose to save_server_passwords which is a setting)
+#define CONFIG_NODE_SERVER_INT     "internet_servers"         // backup of last successful master server list query
+#define CONFIG_NODE_SERVER_FAV     "favourite_servers"        // favourite servers list node
+#define CONFIG_NODE_SERVER_REC     "recently_played_servers"  // recently played servers list node
+#define CONFIG_NODE_SERVER_OPTIONS "serverbrowser_options"    // saved options for the server browser
+#define CONFIG_NODE_SERVER_SAVED   "server_passwords"         // This contains saved passwords (as appose to save_server_passwords which is a setting)
 #define CONFIG_NODE_SERVER_HISTORY "connect_history"
 #define CONFIG_INTERNET_LIST_TAG   "internet_server"
 #define CONFIG_FAVOURITE_LIST_TAG  "favourite_server"
@@ -104,9 +105,11 @@ public:
     CLocalGUI*                         GetLocalGUI();
     CLocalizationInterface*            GetLocalization() { return g_pLocalization; };
     CWebCoreInterface*                 GetWebCore();
+    CWebCoreInterface*                 GetWebCoreUnchecked() { return m_pWebCore; }  // For cleanup in destructors only - bypasses initialization check
     CTrayIconInterface*                GetTrayIcon() { return m_pTrayIcon; };
     std::shared_ptr<CDiscordInterface> GetDiscord();
     CSteamClient*                      GetSteamClient() { return m_steamClient.get(); }
+    FPSLimiter::FPSLimiterInterface*   GetFPSLimiter() const noexcept { return m_pFPSLimiter.get(); }
 
     void SaveConfig(bool bWaitUntilFinished = false);
 
@@ -187,7 +190,7 @@ public:
     void DestroyGUI();
 
     // Web
-    bool IsWebCoreLoaded() { return m_pWebCore != nullptr; }
+    bool IsWebCoreLoaded() { return m_pWebCore != nullptr && m_pWebCore->IsInitialised(); }
     void DestroyWeb();
 
     // Hooks
@@ -214,19 +217,15 @@ public:
 
     // Misc
     void RegisterCommands();
-    bool IsValidNick(const char* szNick);            // Move somewhere else
+    bool IsValidNick(const char* szNick);  // Move somewhere else
     void Quit(bool bInstantly = true);
     void InitiateUpdate(const char* szType, const char* szData, const char* szHost) { m_pLocalGUI->InitiateUpdate(szType, szData, szHost); }
     bool IsOptionalUpdateInfoRequired(const char* szHost) { return m_pLocalGUI->IsOptionalUpdateInfoRequired(szHost); }
     void InitiateDataFilesFix() { m_pLocalGUI->InitiateDataFilesFix(); }
 
-    uint GetFrameRateLimit() { return m_uiFrameRateLimit; }
-    void RecalculateFrameRateLimit(uint uiServerFrameRateLimit = -1, bool bLogToConsole = true);
-    void ApplyFrameRateLimit(uint uiOverrideRate = -1);
-    void ApplyQueuedFrameRateLimit();
-    void EnsureFrameRateLimitApplied();
-    void SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit);
-    void SetCurrentRefreshRate(uint value);
+    // FPS Limiter
+    void OnFPSLimitChange(std::uint16_t fps);
+
     void DoReliablePulse();
 
     bool IsTimingCheckpoints();
@@ -252,6 +251,7 @@ public:
     void                 OnDeviceRestore();
     void                 OnCrashAverted(uint uiId);
     void                 OnEnterCrashZone(uint uiId);
+    void                 UpdateWerCrashModuleBases();
     void                 LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0);
     bool                 GetDebugIdEnabled(uint uiDebugId);
     EDiagnosticDebugType GetDiagnosticDebug();
@@ -294,6 +294,9 @@ public:
     const SString& GetLastConnectedServerName() const { return m_strLastConnectedServerName; }
     void           SetLastConnectedServerName(const SString& strServerName) { m_strLastConnectedServerName = strServerName; }
 
+    void SetCurrentRefreshRate(uint uiRefreshRate) { m_uiCurrentRefreshRate = uiRefreshRate; }
+    uint GetCurrentRefreshRate() const { return m_uiCurrentRefreshRate; }
+
     void OnPostColorFilterRender() override;
 
 private:
@@ -310,12 +313,13 @@ private:
     CModelCacheManager* m_pModelCacheManager;
 
     // Instances (put new classes here!)
-    CXMLFile*                             m_pConfigFile;
-    CClientVariables                      m_ClientVariables;
-    CWebCoreInterface*                    m_pWebCore = nullptr;
-    CTrayIcon*                            m_pTrayIcon;
-    std::unique_ptr<CSteamClient>         m_steamClient;
-    std::shared_ptr<CDiscordRichPresence> m_pDiscordRichPresence;
+    CXMLFile*                               m_pConfigFile;
+    CClientVariables                        m_ClientVariables;
+    CWebCoreInterface*                      m_pWebCore = nullptr;
+    CTrayIcon*                              m_pTrayIcon;
+    std::unique_ptr<CSteamClient>           m_steamClient;
+    std::shared_ptr<CDiscordRichPresence>   m_pDiscordRichPresence;
+    std::unique_ptr<FPSLimiter::FPSLimiter> m_pFPSLimiter;
 
     // Hook interfaces.
     CMessageLoopHook*        m_pMessageLoopHook;
@@ -327,6 +331,7 @@ private:
     int  m_iUnminimizeFrameCounter;
     bool m_bDidRecreateRenderTargets;
     bool m_bIsWindowMinimized;
+    uint m_uiNextRenderTargetRetryTime;
 
     // Module loader objects.
     CModuleLoader m_GameModule;
@@ -355,6 +360,7 @@ private:
 
     unsigned short    m_menuFrame{};
     bool              m_isNetworkReady{};
+    bool              m_bCrashDumpEncryptionDone{};
     bool              m_bIsOfflineMod;
     bool              m_bCursorToggleControls;
     pfnProcessMessage m_pfnMessageProcessor;
@@ -369,14 +375,6 @@ private:
     bool m_bQuitOnPulse;
     bool m_bDestroyMessageBox;
 
-    bool                 m_bDoneFrameRateLimit;
-    uint                 m_uiServerFrameRateLimit;
-    uint                 m_uiClientScriptFrameRateLimit;
-    uint                 m_uiFrameRateLimit;
-    CElapsedTimeHD       m_FrameRateTimer;
-    uint                 m_uiQueuedFrameRate;
-    bool                 m_bQueuedFrameRateValid;
-    uint                 m_CurrentRefreshRate;
     bool                 m_requestNewNickname{false};
     EDiagnosticDebugType m_DiagnosticDebug;
 
@@ -399,11 +397,12 @@ private:
     bool    m_bFakeLagCommandEnabled;
 
     SString m_strLastConnectedServerName{};
+    uint    m_uiCurrentRefreshRate{};
 
     // Command line
     static void                        ParseCommandLine(std::map<std::string, std::string>& options, const char*& szArgs, const char** pszNoValOptions = NULL);
-    std::map<std::string, std::string> m_CommandLineOptions;            // e.g. "-o option" -> {"o" = "option"}
-    const char*                        m_szCommandLineArgs;             // Everything that comes after the options
+    std::map<std::string, std::string> m_CommandLineOptions;  // e.g. "-o option" -> {"o" = "option"}
+    const char*                        m_szCommandLineArgs;   // Everything that comes after the options
 
     long long m_timeDiscordAppLastUpdate;
 };

@@ -17,9 +17,9 @@ class CSettings;
 #include "CMainMenu.h"
 #include "CCore.h"
 
-#define SKINS_PATH                    "skins/*"
-#define CHAT_PRESETS_PATH             "mta/config/chatboxpresets.xml"
-#define CHAT_PRESETS_ROOT             "chatboxpresets"
+#define SKINS_PATH        "skins/*"
+#define CHAT_PRESETS_PATH "mta/config/chatboxpresets.xml"
+#define CHAT_PRESETS_ROOT "chatboxpresets"
 
 // #define SHOWALLSETTINGS
 
@@ -56,7 +56,7 @@ struct SKeyBindSection
         if (szOriginalTitle)
             delete[] szOriginalTitle;
     }
-    int                 currentIndex;            // temporarily stores the index while the list is being created
+    int                 currentIndex;  // temporarily stores the index while the list is being created
     char*               szTitle;
     char*               szOriginalTitle;
     int                 rowCount;
@@ -103,6 +103,7 @@ public:
     void UpdateAudioTab();
 
     void UpdateVideoTab();
+    void UpdatePostFxTab();
     void PopulateResolutionComboBox();
     void UpdateFullScreenComboBoxEnabled();
 
@@ -122,21 +123,28 @@ public:
     void ShowRichPresenceShareDataQuestionBox() const;
 
 protected:
-    const static int SecKeyNum = 3;            // Number of secondary keys
+    const static int SecKeyNum = 3;  // Number of secondary keys
 
     // Keep these protected so we can access them in the event handlers of CClientGame
-    CGUIElement*  m_pWindow;
-    CGUITabPanel* m_pTabs;
-    CGUITab*      m_pTabInterface;
-    CGUITab*      m_pTabBrowser;
-    CGUIButton*   m_pButtonOK;
-    CGUIButton*   m_pButtonCancel;
-    CGUILabel*    m_pLabelNick;
-    CGUIButton*   m_pButtonGenerateNick;
-    CGUIStaticImage*   m_pButtonGenerateNickIcon;
-    CGUIEdit*     m_pEditNick;
-    CGUICheckBox* m_pSavePasswords;
-    CGUICheckBox* m_pAutoRefreshBrowser;
+    CGUIElement*     m_pWindow;
+    CGUITabPanel*    m_pTabs;
+    CGUITab*         m_pTabMultiplayer;
+    CGUITab*         m_pTabVideo;
+    CGUITab*         m_pTabInterface;
+    CGUITab*         m_pTabBrowser;
+    CGUITab*         m_pTabPostFX;
+    CGUITab*         m_pTabAudio;
+    CGUITab*         m_pTabBinds;
+    CGUITab*         m_pTabControls;
+    CGUITab*         m_pTabAdvanced;
+    CGUIButton*      m_pButtonOK;
+    CGUIButton*      m_pButtonCancel;
+    CGUILabel*       m_pLabelNick;
+    CGUIButton*      m_pButtonGenerateNick;
+    CGUIStaticImage* m_pButtonGenerateNickIcon;
+    CGUIEdit*        m_pEditNick;
+    CGUICheckBox*    m_pSavePasswords;
+    CGUICheckBox*    m_pAutoRefreshBrowser;
 
     CGUILabel*     m_pVideoGeneralLabel;
     CGUILabel*     m_pVideoResolutionLabel;
@@ -177,6 +185,21 @@ protected:
     CGUILabel*     m_pBrightnessLabel;
     CGUIScrollBar* m_pBrightness;
     CGUILabel*     m_pBrightnessValueLabel;
+    CGUICheckBox*  m_pBorderlessGammaToggle;
+    CGUIScrollBar* m_pBorderlessGamma;
+    CGUILabel*     m_pBorderlessGammaValueLabel;
+    CGUICheckBox*  m_pBorderlessBrightnessToggle;
+    CGUIScrollBar* m_pBorderlessBrightness;
+    CGUILabel*     m_pBorderlessBrightnessValueLabel;
+    CGUICheckBox*  m_pBorderlessContrastToggle;
+    CGUIScrollBar* m_pBorderlessContrast;
+    CGUILabel*     m_pBorderlessContrastValueLabel;
+    CGUICheckBox*  m_pBorderlessSaturationToggle;
+    CGUIScrollBar* m_pBorderlessSaturation;
+    CGUILabel*     m_pBorderlessSaturationValueLabel;
+    CGUICheckBox*  m_pCheckBoxApplyBorderless;
+    CGUICheckBox*  m_pCheckBoxApplyFullscreen;
+    CGUIButton*    m_pPostFXDefButton;
     CGUILabel*     m_pAnisotropicLabel;
     CGUIScrollBar* m_pAnisotropic;
     CGUILabel*     m_pAnisotropicValueLabel;
@@ -195,6 +218,7 @@ protected:
     CGUILabel*     m_pAdvancedSettingDescriptionLabel;
     CGUILabel*     m_pFullscreenStyleLabel;
     CGUIComboBox*  m_pFullscreenStyleCombo;
+    CGUICheckBox*  m_pCheckBoxVSync;
     CGUILabel*     m_pPriorityLabel;
     CGUIComboBox*  m_pPriorityCombo;
     CGUILabel*     m_pPlayerMapImageLabel;
@@ -213,9 +237,6 @@ protected:
     CGUIComboBox*  m_pProgressAnimationCombo;
     CGUILabel*     m_pDebugSettingLabel;
     CGUIComboBox*  m_pDebugSettingCombo;
-    CGUILabel*     m_pWin8Label;
-    CGUICheckBox*  m_pWin8ColorCheckBox;
-    CGUICheckBox*  m_pWin8MouseCheckBox;
     CGUICheckBox*  m_pPhotoSavingCheckbox;
     CGUICheckBox*  m_pCheckBoxAskBeforeDisconnect;
     CGUICheckBox*  m_pProcessAffinityCheckbox;
@@ -263,13 +284,17 @@ protected:
     CGUIButton*   m_pBindsDefButton;
     CGUIHandle    m_hBind, m_hPriKey, m_hSecKeys[SecKeyNum];
 
-    CGUILabel*               m_pJoypadName;
-    CGUILabel*               m_pJoypadUnderline;
+    CGUIComboBox*            m_pJoypadDeviceCombo;
     CGUIEdit*                m_pEditDeadzone;
     CGUIEdit*                m_pEditSaturation;
+    CGUIEdit*                m_pEditTriggerDeadzone;
+    CGUIEdit*                m_pEditTriggerSaturation;
+    CGUICheckBox*            m_pCheckBoxJoypadVibration;
     std::vector<CGUILabel*>  m_pJoypadLabels;
     std::vector<CGUIButton*> m_pJoypadButtons;
     int                      m_JoypadSettingsRevision;
+    int                      m_JoypadDeviceListRevision;
+    bool                     m_bUpdatingJoypadCombo;
 
     CGUILabel*     m_pControlsMouseLabel;
     CGUICheckBox*  m_pInvertMouse;
@@ -281,6 +306,7 @@ protected:
     CGUILabel*     m_pLabelVerticalAimSensitivity;
     CGUIScrollBar* m_pVerticalAimSensitivity;
     CGUILabel*     m_pLabelVerticalAimSensitivityValue;
+    CGUICheckBox*  m_pCheckboxVerticalAimSensitivity;
 
     CGUILabel*       m_pControlsJoypadLabel;
     CGUIScrollPane*  m_pControlsInputTypePane;
@@ -338,17 +364,22 @@ protected:
     CGUIButton*   m_pButtonBrowserBlacklistAdd;
     CGUIGridList* m_pGridBrowserBlacklist;
     CGUIButton*   m_pButtonBrowserBlacklistRemove;
+    CGUIButton*   m_pButtonBrowserBlacklistRemoveAll;
     CGUILabel*    m_pLabelBrowserCustomWhitelist;
     CGUIEdit*     m_pEditBrowserWhitelistAdd;
     CGUILabel*    m_pLabelBrowserWhitelistAdd;
     CGUIButton*   m_pButtonBrowserWhitelistAdd;
     CGUIGridList* m_pGridBrowserWhitelist;
     CGUIButton*   m_pButtonBrowserWhitelistRemove;
+    CGUIButton*   m_pButtonBrowserWhitelistRemoveAll;
     CGUICheckBox* m_pCheckBoxBrowserGPUEnabled;
+    CGUICheckBox* m_pCheckBoxBrowserVideoAccelEnabled;
     bool          m_bBrowserListsChanged;
     bool          m_bBrowserListsLoadEnabled;
 
     bool OnJoypadTextChanged(CGUIElement* pElement);
+    bool OnJoypadDeviceChanged(CGUIElement* pElement);
+    bool OnJoypadVibrationClick(CGUIElement* pElement);
     bool OnAxisSelectClick(CGUIElement* pElement);
     bool OnAudioDefaultClick(CGUIElement* pElement);
     bool OnControlsDefaultClick(CGUIElement* pElement);
@@ -361,6 +392,17 @@ protected:
     bool OnFieldOfViewChanged(CGUIElement* pElement);
     bool OnDrawDistanceChanged(CGUIElement* pElement);
     bool OnBrightnessChanged(CGUIElement* pElement);
+    bool OnBorderlessGammaChanged(CGUIElement* pElement);
+    bool OnBorderlessBrightnessChanged(CGUIElement* pElement);
+    bool OnBorderlessContrastChanged(CGUIElement* pElement);
+    bool OnBorderlessSaturationChanged(CGUIElement* pElement);
+    bool OnBorderlessGammaToggleClicked(CGUIElement* pElement);
+    bool OnBorderlessBrightnessToggleClicked(CGUIElement* pElement);
+    bool OnBorderlessContrastToggleClicked(CGUIElement* pElement);
+    bool OnBorderlessSaturationToggleClicked(CGUIElement* pElement);
+    bool OnBorderlessApplyBorderlessClicked(CGUIElement* pElement);
+    bool OnBorderlessApplyFullscreenClicked(CGUIElement* pElement);
+    bool OnPostFXDefaultClick(CGUIElement* pElement);
     bool OnAnisotropicChanged(CGUIElement* pElement);
     bool OnMapAlphaChanged(CGUIElement* pElement);
     bool OnMasterVolumeChanged(CGUIElement* pElement);
@@ -383,10 +425,12 @@ protected:
     bool OnVerticalAimSensitivityChanged(CGUIElement* pElement);
     bool OnBrowserBlacklistAdd(CGUIElement* pElement);
     bool OnBrowserBlacklistRemove(CGUIElement* pElement);
+    bool OnBrowserBlacklistRemoveAll(CGUIElement* pElement);
     bool OnBrowserBlacklistDomainAddFocused(CGUIElement* pElement);
     bool OnBrowserBlacklistDomainAddDefocused(CGUIElement* pElement);
     bool OnBrowserWhitelistAdd(CGUIElement* pElement);
     bool OnBrowserWhitelistRemove(CGUIElement* pElement);
+    bool OnBrowserWhitelistRemoveAll(CGUIElement* pElement);
     bool OnBrowserWhitelistDomainAddFocused(CGUIElement* pElement);
     bool OnBrowserWhitelistDomainAddDefocused(CGUIElement* pElement);
 
@@ -406,10 +450,12 @@ protected:
     bool ShowUnsafeResolutionsClick(CGUIElement* pElement);
     bool OnWindowedClick(CGUIElement* pElement);
     bool OnDPIAwareClick(CGUIElement* pElement);
+    bool OnVSyncClick(CGUIElement* pElement);
     bool OnShowAdvancedSettingDescription(CGUIElement* pElement);
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
     bool OnAffinityClick(CGUIElement* pElement);
+    bool OnMouseAimingClick(CGUIElement* pElement);
     void ReloadBrowserLists();
 
 private:
@@ -436,6 +482,9 @@ private:
     void ResetGTAVolume();
     void SetRadioVolume(float fVolume);
     void SetSFXVolume(float fVolume);
+    void RefreshBorderlessDisplayCalibration();
+    void UpdateBorderlessAdjustmentControls();
+    void ResetGuiPointers();
 
     unsigned int m_uiCaptureKey;
     bool         m_bCaptureKey;

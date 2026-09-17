@@ -8,6 +8,11 @@
  *
  *****************************************************************************/
 #pragma once
+
+#include <functional>
+#include <string>
+#include <vector>
+
 #include "CWebCoreInterface.h"
 
 class CWebBrowserEventsInterface;
@@ -17,6 +22,7 @@ class CWebViewInterface
 public:
     virtual void Initialise() = 0;
     virtual void SetWebBrowserEvents(CWebBrowserEventsInterface* pInterface) = 0;
+    virtual void ClearWebBrowserEvents(CWebBrowserEventsInterface* pInterface) = 0;
     virtual bool LoadURL(const SString& strURL, bool bFilterEnabled = true, const SString& strPostData = SString(), bool bURLEncoded = true) = 0;
     virtual bool IsLoading() = 0;
     virtual void SetBeingDestroyed(bool state) = 0;
@@ -51,7 +57,7 @@ public:
     virtual CVector2D GetSize() = 0;
 
     // Ajax Handlers
-    using ajax_callback_t = const std::function<const SString(std::vector<SString>& vecGet, std::vector<SString>& vecPost)>;
+    using ajax_callback_t = const std::function<const std::string(std::vector<std::string>& vecGet, std::vector<std::string>& vecPost)>;
 
     virtual bool RegisterAjaxHandler(const SString& strURL) = 0;
     virtual bool UnregisterAjaxHandler(const SString& strURL) = 0;

@@ -9,14 +9,18 @@
 #pragma once
 #include <cef3/cef/include/cef_app.h>
 #include <cef3/cef/include/cef_scheme.h>
+#include <cef3/cef/include/cef_browser_process_handler.h>
 
-class CWebApp : public CefApp, public CefSchemeHandlerFactory
+class CWebApp : public CefApp, public CefSchemeHandlerFactory, public CefBrowserProcessHandler
 {
 public:
     // Error Handler
     static CefRefPtr<CefResourceHandler> HandleError(const SString& strError, unsigned int uiError);
 
     virtual void OnBeforeCommandLineProcessing(const CefString& process_type, CefRefPtr<CefCommandLine> command_line) override;
+    virtual void OnBeforeChildProcessLaunch(CefRefPtr<CefCommandLine> command_line) override;
+
+    virtual CefRefPtr<CefBrowserProcessHandler> GetBrowserProcessHandler() override;
 
     // CefSchemeHandlerFactory methods
     virtual CefRefPtr<CefResourceHandler> Create(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& scheme_name,

@@ -3,6 +3,7 @@ project "Client Webbrowser"
 	kind "SharedLib"
 	targetname "cefweb"
 	targetdir(buildpath("mta"))
+	clangtidy "On"
 
 	filter "system:windows"
 		includedirs { "../../vendor/sparsehash/src/windows" }
@@ -36,6 +37,8 @@ project "Client Webbrowser"
 		"**.h",
 		"**.cpp"
 	}
+
+	filter {}
 
 	links {
 		"libcef", "CEF", "Psapi.lib", "version.lib", "Winmm.lib", "Ws2_32.lib", "DbgHelp.lib"

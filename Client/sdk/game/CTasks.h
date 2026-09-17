@@ -46,6 +46,7 @@ class CTaskSimpleRunNamedAnim;
 class CTaskSimpleStealthKill;
 class CTaskSimpleTriggerLookAt;
 class CTaskSimpleUseGun;
+class CTaskComplexInWater;
 class CVector;
 class CVehicle;
 
@@ -95,6 +96,8 @@ public:
     virtual CTaskSimpleRunNamedAnim* CreateTaskSimpleRunNamedAnim(const char* pAnimName, const char* pAnimGroupName, const int flags, const float fBlendDelta,
                                                                   const int iTime = -1, const bool bDontInterrupt = false, const bool bRunInSequence = false,
                                                                   const bool bOffsetPed = false, const bool bHoldLastFrame = false) = 0;
+
+    virtual CTaskComplexInWater* CreateTaskComplexInWater() = 0;
 
     virtual CTaskComplexDie* CreateTaskComplexDie(const eWeaponType eMeansOfDeath = WEAPONTYPE_UNARMED, const AssocGroupId animGroup = 0 /*ANIM_STD_PED*/,
                                                   const AnimationId anim = 0 /*ANIM_STD_KO_FRONT*/, const float fBlendDelta = 4.0f,

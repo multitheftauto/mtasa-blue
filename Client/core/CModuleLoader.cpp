@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <SharedUtil.Misc.h>
 
 using std::string;
 
@@ -62,14 +63,14 @@ PVOID CModuleLoader::GetFunctionPointer(const string& FunctionName)
 {
     if (m_bStatus)
     {
-        FARPROC fpProcAddr;
-
-        fpProcAddr = GetProcAddress(m_hLoadedModule, FunctionName.c_str());
+        FARPROC fpProcAddr = nullptr;
+        if (!SharedUtil::TryGetProcAddress(m_hLoadedModule, FunctionName.c_str(), fpProcAddr))
+            return nullptr;
 
         return static_cast<PVOID>(fpProcAddr);
     }
     else
-        return NULL;
+        return nullptr;
 }
 
 const SString& CModuleLoader::GetLastErrorMessage() const

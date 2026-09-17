@@ -87,7 +87,7 @@ public:
     virtual CPed* AddPed(class CClientPed* pClientPed, DWORD* pGameInterface) = 0;
     virtual void  RemovePed(CPed* pPed, bool bDelete = true) = 0;
 
-    virtual SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface) = 0;            // not sure we really want this here
+    virtual SClientEntity<CPedSA>* GetPed(DWORD* pGameInterface) = 0;  // not sure we really want this here
     virtual SClientEntity<CPedSA>* GetPed(size_t pos) = 0;
     virtual CPed*                  GetPedFromRef(DWORD dwGameRef) = 0;
     virtual unsigned long          GetPedCount() = 0;
@@ -103,14 +103,15 @@ public:
     virtual int  GetNumberOfUsedSpaces(ePools pool) = 0;
     virtual int  GetPoolDefaultCapacity(ePools pool) = 0;
     virtual int  GetPoolDefaultModdedCapacity(ePools pool) = 0;
+    virtual int  GetPoolMaxCapacity(ePools pool) const noexcept = 0;
     virtual int  GetPoolCapacity(ePools pool) = 0;
     virtual void SetPoolCapacity(ePools pool, int iValue) = 0;
 
     virtual void ResetPedPoolCount() = 0;
     virtual void InvalidateLocalPlayerClientEntity() = 0;
 
-    virtual CBuildingsPool& GetBuildingsPool() noexcept = 0;
-    virtual CDummyPool&     GetDummyPool() noexcept = 0;
-    virtual CTxdPool&       GetTxdPool() noexcept = 0;
+    virtual CBuildingsPool&         GetBuildingsPool() noexcept = 0;
+    virtual CDummyPool&             GetDummyPool() noexcept = 0;
+    virtual CTxdPool&               GetTxdPool() noexcept = 0;
     virtual CPtrNodeSingleLinkPool& GetPtrNodeSingleLinkPool() noexcept = 0;
 };

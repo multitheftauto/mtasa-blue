@@ -62,7 +62,7 @@ protected:
     SString   m_strFileName;
 
 private:
-    bool Query(const char* szQuery, CRegistryResult* pResult);            // Not defined to catch incorrect usage
+    bool Query(const char* szQuery, CRegistryResult* pResult);  // Not defined to catch incorrect usage
 };
 
 struct CRegistryResultCell
@@ -126,9 +126,9 @@ struct CRegistryResultCell
         return 0;
     }
 
-    int nType;              // Type identifier, SQLITE_*
-    int nLength;            // Length in bytes if nType == SQLITE_BLOB or SQLITE_TEXT
-                            //    (includes zero terminator if TEXT)
+    int nType;    // Type identifier, SQLITE_*
+    int nLength;  // Length in bytes if nType == SQLITE_BLOB or SQLITE_TEXT
+                  //    (includes zero terminator if TEXT)
     long long int  nVal;
     float          fVal;
     unsigned char* pVal;

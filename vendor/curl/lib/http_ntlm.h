@@ -23,7 +23,6 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
 #include "curl_setup.h"
 
 #if !defined(CURL_DISABLE_HTTP) && defined(USE_NTLM)
@@ -35,10 +34,6 @@ CURLcode Curl_input_ntlm(struct Curl_easy *data, bool proxy,
 /* this is for creating NTLM header output */
 CURLcode Curl_output_ntlm(struct Curl_easy *data, bool proxy);
 
-void Curl_http_auth_cleanup_ntlm(struct connectdata *conn);
-
-#else /* !CURL_DISABLE_HTTP && USE_NTLM */
-#define Curl_http_auth_cleanup_ntlm(x)
 #endif
 
 #endif /* HEADER_CURL_HTTP_NTLM_H */

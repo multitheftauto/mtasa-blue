@@ -18,7 +18,9 @@
 #include <game/RenderWareD3D.h>
 #include "CColModelSA.h"
 #include "CFileLoaderSA.h"
+#include "CAnimManagerSA.h"
 #include "CGameSA.h"
+#include "CModelInfoSA.h"
 #include "CRenderWareSA.h"
 #include "CRenderWareSA.ShaderMatching.h"
 #include "gamesa_renderware.h"
@@ -30,10 +32,10 @@ extern CGameSA*        pGame;
 // RwFrameForAllObjects struct and callback used to replace dynamic vehicle parts
 struct SReplaceParts
 {
-    const char*        szName;                    // name of the part you want to replace (e.g. 'door_lf' or 'door_rf')
-    unsigned char      ucIndex;                   // index counter for internal usage (0 is the 'ok' part model, 1 is the 'dam' part model)
-    RpAtomicContainer* pReplacements;             // replacement atomics
-    unsigned int       uiReplacements;            // number of replacements
+    const char*        szName;          // name of the part you want to replace (e.g. 'door_lf' or 'door_rf')
+    unsigned char      ucIndex;         // index counter for internal usage (0 is the 'ok' part model, 1 is the 'dam' part model)
+    RpAtomicContainer* pReplacements;   // replacement atomics
+    unsigned int       uiReplacements;  // number of replacements
 };
 static RwObject* ReplacePartsCB(RwObject* object, SReplaceParts* data)
 {
@@ -82,10 +84,10 @@ static bool AddAllAtomicsCB(RpAtomic* atomic, void* pClump)
 // RpClumpForAllAtomics struct and callback used to replace all wheels with a given wheel model
 struct SReplaceWheels
 {
-    const char*        szName;                    // name of the new wheel model
-    RpClump*           pClump;                    // the vehicle's clump
-    RpAtomicContainer* pReplacements;             // replacement atomics
-    unsigned int       uiReplacements;            // number of replacements
+    const char*        szName;          // name of the new wheel model
+    RpClump*           pClump;          // the vehicle's clump
+    RpAtomicContainer* pReplacements;   // replacement atomics
+    unsigned int       uiReplacements;  // number of replacements
 };
 static bool ReplaceWheelsCB(RpAtomic* atomic, void* pData)
 {
@@ -122,9 +124,9 @@ static bool ReplaceWheelsCB(RpAtomic* atomic, void* pData)
 // RpClumpForAllAtomics struct and callback used to replace all atomics for a vehicle
 struct SReplaceAll
 {
-    RpClump*           pClump;                    // the vehicle's clump
-    RpAtomicContainer* pReplacements;             // replacement atomics
-    unsigned int       uiReplacements;            // number of replacements
+    RpClump*           pClump;          // the vehicle's clump
+    RpAtomicContainer* pReplacements;   // replacement atomics
+    unsigned int       uiReplacements;  // number of replacements
 };
 static bool ReplaceAllCB(RpAtomic* atomic, void* pData)
 {
@@ -166,8 +168,8 @@ static bool ReplaceAllCB(RpAtomic* atomic, void* pData)
 // RpClumpForAllAtomics struct and callback used to load the atomics from a specific clump into a container
 struct SLoadAtomics
 {
-    RpAtomicContainer* pReplacements;             // replacement atomics
-    unsigned int       uiReplacements;            // number of replacements
+    RpAtomicContainer* pReplacements;   // replacement atomics
+    unsigned int       uiReplacements;  // number of replacements
 };
 static bool LoadAtomicsCB(RpAtomic* atomic, void* pData)
 {
@@ -283,7 +285,6 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
         return NULL;
     }
 
-    // rockstar's collision hack: set the global particle emitter to the modelinfo pointer of this model
     if (bLoadEmbeddedCollisions)
     {
         // Vehicles have their collision loaded through the CollisionModel plugin, so we need to remove the current collision to prevent a memory leak.
@@ -292,18 +293,29 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
         if (modelInfo)
         {
             if (auto* modelInfoInterface = modelInfo->GetInterface())
-                ((void(__thiscall*)(CBaseModelInfoSAInterface*))0x4C4C40)(modelInfoInterface); // CBaseModelInfo::DeleteCollisionModel
+                ((void(__thiscall*)(CBaseModelInfoSAInterface*))0x4C4C40)(modelInfoInterface);  // CBaseModelInfo::DeleteCollisionModel
         }
 
+        // rockstar's collision hack
+        // It sets the pointer CCollisionPlugin::ms_currentModel to the model info of the given vehicle in order to correctly set up the vehicle’s
+        // collision during collision plugin reading (0x41B2BD).
         RpPrtStdGlobalDataSetStreamEmbedded((void*)pPool[usModelID]);
+
+        // Call CVehicleModelInfo::UseCommonVehicleTexDicationary
+        ((void(__cdecl*)())0x4C75A0)();
     }
 
     // read the clump with all its extensions
     RpClump* pClump = RpClumpStreamRead(streamModel);
 
-    // reset collision hack
     if (bLoadEmbeddedCollisions)
-        RpPrtStdGlobalDataSetStreamEmbedded(NULL);
+    {
+        // reset collision hack
+        RpPrtStdGlobalDataSetStreamEmbedded(nullptr);
+
+        // Call CVehicleModelInfo::StopUsingCommonVehicleTexDicationary
+        ((void(__cdecl*)())0x4C75C0)();
+    }
 
     // close the stream
     RwStreamClose(streamModel, NULL);
@@ -318,7 +330,8 @@ void CRenderWareSA::GetClumpAtomicList(RpClump* pClump, std::vector<RpAtomic*>& 
 {
     RpClumpForAllAtomics(
         pClump,
-        [](RpAtomic* pAtomic, void* pData) {
+        [](RpAtomic* pAtomic, void* pData)
+        {
             reinterpret_cast<std::vector<RpAtomic*>*>(pData)->push_back(pAtomic);
             return true;
         },
@@ -407,6 +420,14 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface();
             CBaseModelInfo_SetClump(pModelInfoInterface, pNewClone);
             RpClumpDestroy(pOldClump);
+
+            // SetClump took a reference on the TXD and the anim block for the new clump. The old clump took the
+            // same ones when it was set and only DeleteRwObject gives them back, so return them here
+            CTxdStore_RemoveRef(pModelInfoInterface->usTextureDictionary);
+
+            const uint uiAnimFileIndex = static_cast<CModelInfoSA*>(pModelInfo)->GetAnimFileIndex();
+            if (uiAnimFileIndex != 0xffffffff)
+                pGame->GetAnimManager()->RemoveAnimBlockRef(uiAnimFileIndex);
         }
     }
 
@@ -450,6 +471,21 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
     // Load the col model
     if (header.version[0] == 'C' && header.version[1] == 'O' && header.version[2] == 'L')
     {
+        constexpr DWORD COL_FILE_INFO_SIZE = sizeof(header.version) + sizeof(header.size);
+        constexpr DWORD COL_MODEL_NAME_SIZE = sizeof(header.name);
+        constexpr DWORD GTA_COL2_HEADER_SIZE = 0x4C;
+        constexpr DWORD GTA_COL3_HEADER_SIZE = 0x58;
+
+        // GTA trusts the declared size when reading its version header and copying data. COL archives can contain trailing entries, so require the first entry
+        // to fit rather than requiring it to consume the entire buffer.
+        const uint64_t totalSize = static_cast<uint64_t>(header.size) + COL_FILE_INFO_SIZE;
+        if (header.size < COL_MODEL_NAME_SIZE || totalSize > buffer.size())
+            return NULL;
+
+        const DWORD dataSize = header.size - COL_MODEL_NAME_SIZE;
+        if ((header.version[3] == '2' && dataSize < GTA_COL2_HEADER_SIZE) || (header.version[3] == '3' && dataSize < GTA_COL3_HEADER_SIZE))
+            return NULL;
+
         unsigned char* pModelData = (unsigned char*)buffer.data() + sizeof(ColModelFileHeader);
 
         // Create a new CColModel
@@ -461,11 +497,11 @@ CColModel* CRenderWareSA::ReadCOL(const SString& buffer)
         }
         else if (header.version[3] == '2')
         {
-            LoadCollisionModelVer2(pModelData, header.size - 0x18, pColModel->GetInterface(), NULL);
+            LoadCollisionModelVer2(pModelData, dataSize, pColModel->GetInterface(), NULL);
         }
         else if (header.version[3] == '3')
         {
-            LoadCollisionModelVer3(pModelData, header.size - 0x18, pColModel->GetInterface(), NULL);
+            LoadCollisionModelVer3(pModelData, dataSize, pColModel->GetInterface(), NULL);
         }
 
         // Return the collision model

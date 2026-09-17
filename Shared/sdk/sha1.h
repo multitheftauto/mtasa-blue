@@ -30,22 +30,22 @@
 #include <string.h>
 
 #if defined(_MSC_VER) && !defined(EFIX64) && !defined(EFI32)
-#include <basetsd.h>
+    #include <basetsd.h>
 typedef UINT32 uint32_t;
 #else
-#include <inttypes.h>
+    #include <inttypes.h>
 #endif
 
-#define POLARSSL_ERR_SHA1_FILE_IO_ERROR                -0x0076  /**< Read/write error in file. */
+#define POLARSSL_ERR_SHA1_FILE_IO_ERROR -0x0076 /**< Read/write error in file. */
 
 #if !defined(POLARSSL_SHA1_ALT)
     // Regular implementation
     //
 
-#ifdef __cplusplus
+    #ifdef __cplusplus
 extern "C"
 {
-#endif
+    #endif
 
     /**
      * \brief          SHA-1 context structure
@@ -101,12 +101,12 @@ extern "C"
     /* Internal use */
     void sha1_process(sha1_context* ctx, const unsigned char data[64]);
 
-#ifdef __cplusplus
+    #ifdef __cplusplus
 }
-#endif
+    #endif
 
-#else  /* POLARSSL_SHA1_ALT */
-#include "sha1_alt.h"
+#else /* POLARSSL_SHA1_ALT */
+    #include "sha1_alt.h"
 #endif /* POLARSSL_SHA1_ALT */
 
 #ifdef __cplusplus

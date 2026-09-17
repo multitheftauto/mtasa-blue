@@ -145,6 +145,7 @@ end
 
 local function check_rapid(should_upgrade)
 	local has_rapid_dir = os.isdir(RAPID_PATH)
+	local is_installed = has_rapid_dir and os.isfile(RAPID_PATH .. "include/rapidjson/document.h")
 
 	-- Check file hash
 	local archive_path = RAPID_TEMP
@@ -152,7 +153,7 @@ local function check_rapid(should_upgrade)
 	if hash_passed then
 		print("rapidjson consistency checks succeeded")
 
-		if has_rapid_dir then
+		if is_installed then
 			return
 		end
 	else
@@ -190,7 +191,7 @@ local function check_rapid(should_upgrade)
 	end
 
 	-- Delete old rapidjson files
-	if has_discord_dir then
+	if has_rapid_dir then
 		if not os.rmdir(RAPID_PATH) then
 			errormsg("ERROR: Could not delete rapidjson folder")
 			os.exit(1)

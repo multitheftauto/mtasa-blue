@@ -8,6 +8,10 @@
  *
  *****************************************************************************/
 
+#pragma once
+
+#include <atomic>
+
 DEFINE_GUID(CProxyDirect3DEffect_GUID, 0x128A025E, 0x0123, 0x04F1, 0x40, 0x60, 0x53, 0x19, 0x44, 0x56, 0x59, 0x42);
 
 class CProxyDirect3DEffect : public ID3DXEffect
@@ -15,8 +19,8 @@ class CProxyDirect3DEffect : public ID3DXEffect
 public:
     // ID3DXBaseEffect
     HRESULT __stdcall QueryInterface(REFIID iid, LPVOID* ppv);
-    ULONG __stdcall AddRef() { return m_pOriginal->AddRef(); }
-    ULONG __stdcall Release();
+    ULONG __stdcall   AddRef();
+    ULONG __stdcall   Release();
 
     // Descs
     HRESULT __stdcall GetDesc(D3DXEFFECT_DESC* pDesc) { return m_pOriginal->GetDesc(pDesc); }
@@ -113,10 +117,10 @@ public:
     HRESULT __stdcall GetPool(LPD3DXEFFECTPOOL* ppPool) { return m_pOriginal->GetPool(ppPool); }
 
     // Selecting and setting a technique
-    HRESULT __stdcall SetTechnique(D3DXHANDLE hTechnique) { return m_pOriginal->SetTechnique(hTechnique); }
+    HRESULT __stdcall    SetTechnique(D3DXHANDLE hTechnique) { return m_pOriginal->SetTechnique(hTechnique); }
     D3DXHANDLE __stdcall GetCurrentTechnique() { return m_pOriginal->GetCurrentTechnique(); }
-    HRESULT __stdcall ValidateTechnique(D3DXHANDLE hTechnique) { return m_pOriginal->ValidateTechnique(hTechnique); }
-    HRESULT __stdcall FindNextValidTechnique(D3DXHANDLE hTechnique, D3DXHANDLE* pTechnique)
+    HRESULT __stdcall    ValidateTechnique(D3DXHANDLE hTechnique) { return m_pOriginal->ValidateTechnique(hTechnique); }
+    HRESULT __stdcall    FindNextValidTechnique(D3DXHANDLE hTechnique, D3DXHANDLE* pTechnique)
     {
         return m_pOriginal->FindNextValidTechnique(hTechnique, pTechnique);
     }
@@ -145,10 +149,10 @@ public:
     HRESULT __stdcall GetStateManager(LPD3DXEFFECTSTATEMANAGER* ppManager) { return m_pOriginal->GetStateManager(ppManager); }
 
     // Parameter blocks
-    HRESULT __stdcall BeginParameterBlock() { return m_pOriginal->BeginParameterBlock(); }
+    HRESULT __stdcall    BeginParameterBlock() { return m_pOriginal->BeginParameterBlock(); }
     D3DXHANDLE __stdcall EndParameterBlock() { return m_pOriginal->EndParameterBlock(); }
-    HRESULT __stdcall ApplyParameterBlock(D3DXHANDLE hParameterBlock) { return m_pOriginal->ApplyParameterBlock(hParameterBlock); }
-    HRESULT __stdcall DeleteParameterBlock(D3DXHANDLE hParameterBlock) { return m_pOriginal->DeleteParameterBlock(hParameterBlock); }
+    HRESULT __stdcall    ApplyParameterBlock(D3DXHANDLE hParameterBlock) { return m_pOriginal->ApplyParameterBlock(hParameterBlock); }
+    HRESULT __stdcall    DeleteParameterBlock(D3DXHANDLE hParameterBlock) { return m_pOriginal->DeleteParameterBlock(hParameterBlock); }
 
     // Cloning
     HRESULT __stdcall CloneEffect(LPDIRECT3DDEVICE9 pDevice, LPD3DXEFFECT* ppEffect);
@@ -164,10 +168,12 @@ public:
     virtual ~CProxyDirect3DEffect();
 
     ID3DXEffect* GetOriginal() { return m_pOriginal; }
+    bool         IsOriginalValid() const;
 
 protected:
     ID3DXEffect*                            m_pOriginal;
-    CProxyDirect3DDevice9::SResourceMemory& m_stats;
+    CProxyDirect3DDevice9::SResourceMemory* m_pStats;
+    std::atomic<LONG>                       m_lRefCount{1};
 };
 
 HRESULT WINAPI MyD3DXCreateEffectFromFile(LPDIRECT3DDEVICE9 pDevice, LPCSTR pSrcFile, CONST D3DXMACRO* pDefines, LPD3DXINCLUDE pInclude, DWORD Flags,

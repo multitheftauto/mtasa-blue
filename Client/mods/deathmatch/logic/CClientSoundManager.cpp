@@ -42,7 +42,8 @@ CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
         g_pCore->GetConsole()->Printf("BASS ERROR %d in PluginLoad WEBM", BASS_ErrorGetCode());
 
     BASS_SetConfig(BASS_CONFIG_NET_PREBUF, 0);
-    BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1);            // Allow playlists
+    BASS_SetConfig(BASS_CONFIG_NET_PLAYLIST, 1);  // Allow playlists
+    BASS_SetConfig(BASS_CONFIG_NET_TIMEOUT, 15000);
 
     m_strUserAgent = SString("MTA:SA Server %s - See http://mtasa.com/agent/", g_pNet->GetConnectedServer(true));
     BASS_SetConfigPtr(BASS_CONFIG_NET_AGENT, (void*)*m_strUserAgent);
@@ -69,8 +70,18 @@ CClientSoundManager::CClientSoundManager(CClientManager* pClientManager)
 CClientSoundManager::~CClientSoundManager()
 {
     ProcessStopQueues(true);
+
+    // Signal stream threads to exit as soon as their blocking call returns
+    SignalStreamingThreadsToStop();
+
+    // Stopping and freeing BASS should lead any pending BASS_StreamCreateURL to abort/return.
+    // This makes threads exit quickly
     BASS_Stop();
     BASS_Free();
+
+    // Now wait for threads to finish - they should exit almost immediately since BASS was freed.
+    // Use a short timeout since the blocking call should have been interrupted.
+    WaitForAllStreamingThreads(3000);
 }
 
 void CClientSoundManager::DoPulse()
@@ -112,11 +123,12 @@ void CClientSoundManager::DoPulse()
         {
             // call onClientSoundStopped
             CLuaArguments Arguments;
-            Arguments.PushString("finished");            // Reason
+            Arguments.PushString("finished");  // Reason
             pSound->CallEvent("onClientSoundStopped", Arguments, false);
             g_pClientGame->GetElementDeleter()->Delete(pSound);
         }
     }
+
     UpdateDistanceStreaming(vecCameraPosition);
     ProcessStopQueues();
 }
@@ -138,9 +150,13 @@ CClientSound* CClientSoundManager::PlaySound2D(const SString& strSound, bool bIs
     {
         size_t size = strSound.size();
         void*  pMemory = new char[size];
+
         memcpy(pMemory, strSound.data(), size);
+
         if (pSound->Play((void*)pMemory, size, bLoop))
             return pSound;
+
+        // Note: pMemory is already owned by pSound via AdoptBuffer, don't delete it here
     }
     else if (pSound->Play(strSound, bLoop))
         return pSound;
@@ -174,12 +190,16 @@ CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIs
     {
         size_t size = strSound.size();
         void*  pMemory = new char[size];
+
         memcpy(pMemory, strSound.data(), size);
+
         if (pSound->Play3D((void*)pMemory, size, bLoop))
         {
             pSound->SetPosition(vecPosition);
             return pSound;
         }
+
+        // Note: pMemory is already owned by pSound via AdoptBuffer, don't delete it here
     }
     else if (pSound->Play3D(strSound, bLoop))
     {
@@ -225,11 +245,13 @@ CClientSound* CClientSoundManager::PlayGTASFX(eAudioLookupIndex containerIndex, 
     }
 
     CClientSound* pSound = PlaySound2D(pAudioData, uiAudioLength, bLoop);
+
     if (pSound)
     {
         CGameSettings* gameSettings = g_pGame->GetSettings();
         pSound->SetVolume(gameSettings->GetSFXVolume() / 255.0f);
     }
+
     return pSound;
 }
 
@@ -253,11 +275,13 @@ CClientSound* CClientSoundManager::PlayGTASFX3D(eAudioLookupIndex containerIndex
     }
 
     CClientSound* pSound = PlaySound3D(pAudioData, uiAudioLength, vecPosition, bLoop);
+
     if (pSound)
     {
         CGameSettings* gameSettings = g_pGame->GetSettings();
         pSound->SetVolume(gameSettings->GetSFXVolume() / 255.0f);
     }
+
     return pSound;
 }
 
@@ -275,6 +299,7 @@ int CClientSoundManager::GetFxEffectFromName(const std::string& strEffectName)
     {
         return it->second;
     }
+
     return -1;
 }
 
@@ -395,6 +420,7 @@ void CClientSoundManager::QueueChannelStop(DWORD pSound)
 {
     // Always not main thread
     dassert(!IsMainThread());
+
     m_CS.Lock();
     m_ChannelStopQueue.push_back(pSound);
     m_CS.Unlock();
@@ -421,6 +447,7 @@ void CClientSoundManager::ProcessStopQueues(bool bFlush)
         std::vector<DWORD> channelStopList = m_ChannelStopQueue;
         m_ChannelStopQueue.clear();
         m_CS.Unlock();
+
         for (unsigned int i = 0; i < channelStopList.size(); i++)
         {
             BASS_ChannelStop(channelStopList[i]);
@@ -431,7 +458,7 @@ void CClientSoundManager::ProcessStopQueues(bool bFlush)
     {
         if (iter->second.Get() > 100 || bFlush)
         {
-            delete iter->first;            // This will cause BASS_ChannelStop
+            delete iter->first;  // This will cause BASS_ChannelStop
             m_AudioStopQueue.erase(iter++);
         }
         else

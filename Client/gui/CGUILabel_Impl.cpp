@@ -15,7 +15,7 @@
 
 CGUILabel_Impl::CGUILabel_Impl(CGUI_Impl* pGUI, CGUIElement* pParent, const char* szText)
 {
-    m_pManager = pGUI;
+    SetManager(pGUI);
 
     // Get an unique identifier for CEGUI (gah, there's gotta be an another way)
     char szUnique[CGUI_CHAR_SIZE];
@@ -157,7 +157,7 @@ float CGUILabel_Impl::GetTextExtent()
             }
             return fMax;
         }
-        catch (CEGUI::Exception e)
+        catch (const CEGUI::Exception&)
         {
         }
     }

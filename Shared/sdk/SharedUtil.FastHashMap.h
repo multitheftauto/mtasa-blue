@@ -16,16 +16,16 @@
     #define CFastHashMap std::CMap
 #else
 
-#ifdef WIN32
-    #pragma push_macro("assert")
-#endif
+    #ifdef WIN32
+        #pragma push_macro("assert")
+    #endif
 
-#include <google/dense_hash_map>
-#undef BASE_TEMPLATE_UTIL_H_ // HACK: Sparsehash and CEF share the same include guard name (NEVER USE MACROS AS INCLUDE GUARDS)
+    #include <google/dense_hash_map>
+    #undef BASE_TEMPLATE_UTIL_H_  // HACK: Sparsehash and CEF share the same include guard name (NEVER USE MACROS AS INCLUDE GUARDS)
 
-#ifdef WIN32
-    #pragma pop_macro("assert")
-#endif
+    #ifdef WIN32
+        #pragma pop_macro("assert")
+    #endif
 
 //
 // Default keys for pointers
@@ -136,7 +136,7 @@ namespace SharedUtil
         }
         return it->second;
     }
-}            // namespace SharedUtil
+}  // namespace SharedUtil
 
 inline SString GetEmptyMapKey(SString*)
 {

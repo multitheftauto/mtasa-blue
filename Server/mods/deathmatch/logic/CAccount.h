@@ -27,10 +27,10 @@ public:
 
     enum EAccountPasswordType
     {
-        NONE,            // "" (empty string) possibly means 'not a password'
+        NONE,  // "" (empty string) possibly means 'not a password'
         PLAINTEXT,
-        MD5,              // pass stored as sha256(md5)+salt+type, stored as "1"
-        SHA256            // pass stored as sha256(plaintext)+salt+type, stored as "0"
+        MD5,    // pass stored as sha256(md5)+salt+type, stored as "1"
+        SHA256  // pass stored as sha256(plaintext)+salt+type, stored as "0"
     };
 
 protected:
@@ -39,7 +39,7 @@ protected:
     SString m_strSha256;
     SString m_strSalt;
 
-    SString m_strType;            // can be "1", "0" or "" as shown in EAccountPasswordType
+    SString m_strType;  // can be "1", "0" or "" as shown in EAccountPasswordType
 };
 
 enum class EAccountType

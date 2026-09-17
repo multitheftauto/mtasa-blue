@@ -14,6 +14,7 @@
 #include "Dialogs.h"
 #include "Main.h"
 #include <unrar/dll.hpp>
+#include <algorithm>
 #include <optional>
 #include <memory>
 #include <filesystem>
@@ -237,7 +238,7 @@ static void GetArchiveFilesInDirectory(const SString& directory, std::vector<Man
 }
 
 /**
- * @brief Terminates every process locking a file with the user's consent.
+ * @brief Tries to clear file locks by terminating other processes with the user's consent.
  * @param absolutePath The path to the file to check
  * @param displayName Name of the file in the user prompt
  * @return True if the file is not locked (anymore), false otherwise
@@ -246,9 +247,29 @@ static bool TerminateFileLockingProcesses(const SString& absolutePath, const SSt
 {
     WString            filePath(absolutePath);
     std::vector<DWORD> processIds = GetProcessListUsingFile(filePath);
+    const DWORD        currentProcessId = GetCurrentProcessId();
+
+    const auto RemoveCurrentProcessId = [&]()
+    {
+        const auto newEnd = std::remove(processIds.begin(), processIds.end(), currentProcessId);
+        const bool removedCurrentProcess = newEnd != processIds.end();
+        processIds.erase(newEnd, processIds.end());
+        return removedCurrentProcess;
+    };
+
+    const auto FailOnCurrentProcessLock = [&]()
+    {
+        AddReportLog(5055, SString("TerminateFileLockingProcesses: current process %lu is locking '%s'", currentProcessId, absolutePath.c_str()));
+        return false;
+    };
 
     while (true)
     {
+        const bool currentProcessLocksFile = RemoveCurrentProcessId();
+
+        if (currentProcessLocksFile)
+            return FailOnCurrentProcessLock();
+
         if (processIds.empty())
             return true;
 
@@ -274,6 +295,10 @@ static bool TerminateFileLockingProcesses(const SString& absolutePath, const SSt
             "MTA: San Andreas", MB_CANCELTRYCONTINUE | MB_ICONQUESTION | MB_TOPMOST);
 
         processIds = GetProcessListUsingFile(filePath);
+        const bool currentProcessLocksFileAfterPrompt = RemoveCurrentProcessId();
+
+        if (currentProcessLocksFileAfterPrompt)
+            return FailOnCurrentProcessLock();
 
         if (processIds.empty())
             return true;
@@ -572,7 +597,7 @@ static int RunInstall()
     {
         SString archiveDirectory, archiveFileName;
         sourceRoot.Split("\\", &archiveDirectory, &archiveFileName, -1);
-        archiveFileName = archiveFileName.SubStr(1).SplitLeft("_tmp_", nullptr, -1);            // Cut archive name out of '_<archiveFileName>_tmp_'
+        archiveFileName = archiveFileName.SubStr(1).SplitLeft("_tmp_", nullptr, -1);  // Cut archive name out of '_<archiveFileName>_tmp_'
 
         archivePath = MakeGenericPath(PathJoin(archiveDirectory, archiveFileName));
     }
@@ -584,6 +609,12 @@ static int RunInstall()
     }
 
     const SString targetRoot = PathConform(GetMTASAPath());
+
+    if (sourceRoot.CompareI(targetRoot))
+    {
+        AddReportLog(5055, SString("RunInstall: Refusing to install from and to the same directory '%s'", sourceRoot.c_str()));
+        return 9;
+    }
 
     if (!DirectoryExists(targetRoot))
     {
@@ -603,6 +634,20 @@ static int RunInstall()
 
     if (archiveFiles.empty())
         return 0;
+
+    // Check if server is installed, if not, skip server files during update
+    if (!DirectoryExists(CalcMTASAPath("server")))
+    {
+        // Filter out server files
+        size_t originalCount = archiveFiles.size();
+        archiveFiles.erase(std::remove_if(archiveFiles.begin(), archiveFiles.end(), [](const ManifestFile& file)
+                                          { return file.relativePath.compare(0, 7, "server/") == 0 || file.relativePath.compare(0, 7, "server\\") == 0; }),
+                           archiveFiles.end());
+
+        size_t filteredCount = originalCount - archiveFiles.size();
+        if (filteredCount > 0)
+            OutputDebugLine(SString("RunInstall: Skipped %zu server files (server not installed)", filteredCount));
+    }
 
     // Create a backup directory for disaster recovery.
     const SString backupRoot = CreateWritableDirectory(sourceRoot + "_bak_");
@@ -638,7 +683,8 @@ static int RunInstall()
     if (files.empty())
         return 0;
 
-    // Check if any executable or library is locked by any process and terminate it with the user's consent.
+    // Binary replacements can fail after backup work has started, so clear blocking locks before
+    // any file copy starts.
     for (const InstallableFile& file : files)
     {
         if (file.relativePath.EndsWithI(".exe") || file.relativePath.EndsWithI(".dll"))
@@ -803,7 +849,8 @@ static int RunInstall()
     else
         OutputDebugLine(SString("RunInstall: Updated %zu files", files.size()));
 
-    const auto Rollback = [&]() {
+    const auto Rollback = [&]()
+    {
         if (size_t disasterCounter = RunRollback(files); disasterCounter > 0)
         {
             // Do not delete the backup directory if we need it for recovery.
@@ -913,7 +960,11 @@ SString CheckOnRestartCommand()
             //
 
             if (strFile.empty() || !FileExists(strFile))
+            {
+                AddReportLog(4047, SString("CheckOnRestartCommand: update archive missing '%s'", strFile.c_str()));
+                SetOnRestartCommand("");
                 return "FileMissing";
+            }
 
             // Make temp path name and go there
             SString strArchivePath, strArchiveName;
@@ -922,12 +973,18 @@ SString CheckOnRestartCommand()
             const SString sourceRoot = MakeUniquePath(strArchivePath + "\\_" + strArchiveName + "_tmp_");
 
             if (!MkDir(sourceRoot))
+            {
+                AddReportLog(4047, SString("CheckOnRestartCommand: failed to create temp dir '%s'", sourceRoot.c_str()));
                 return "FileError1";
+            }
 
             DirectoryDeleteScope deleteSourceRoot(sourceRoot);
 
             if (!SetCurrentDirectory(sourceRoot))
+            {
+                AddReportLog(4047, SString("CheckOnRestartCommand: failed to enter temp dir '%s'", sourceRoot.c_str()));
                 return "FileError2";
+            }
 
             // Start progress bar
             if (!strParameters.Contains("hideprogress"))
@@ -947,7 +1004,10 @@ SString CheckOnRestartCommand()
             StopPseudoProgress();
 
             if (!success)
+            {
+                AddReportLog(4047, SString("CheckOnRestartCommand: failed to extract or execute update '%s'", strFile.c_str()));
                 return "FileError3";
+            }
 
             deleteSourceRoot.Release();
 
@@ -961,6 +1021,7 @@ SString CheckOnRestartCommand()
         else
         {
             AddReportLog(5052, SString("CheckOnRestartCommand: Unknown restart command %s", strOperation.c_str()));
+            SetOnRestartCommand("");
         }
     }
 

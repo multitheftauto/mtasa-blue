@@ -8,6 +8,7 @@
  *
  *****************************************************************************/
 #pragma once
+#include <windows.h>
 #include <cef3/cef/include/cef_v8.h>
 #include <SString.h>
 
@@ -18,18 +19,27 @@ bool isKeyDown(WPARAM wParam)
 
 int GetCefKeyboardModifiers(WPARAM wParam, LPARAM lParam)
 {
+    // Optimization for Wine: Use GetKeyboardState to fetch all key states in one go
+    // instead of multiple GetKeyState calls which can be slow due to round-trips.
+    BYTE keyState[256];
+    if (!GetKeyboardState(keyState))
+        return 0;
+
+    auto checkKey = [&](int key) { return (keyState[key] & 0x80) != 0; };
+    auto checkToggle = [&](int key) { return (keyState[key] & 1) != 0; };
+
     int modifiers = 0;
-    if (isKeyDown(VK_SHIFT))
+    if (checkKey(VK_SHIFT))
         modifiers |= EVENTFLAG_SHIFT_DOWN;
-    if (isKeyDown(VK_CONTROL))
+    if (checkKey(VK_CONTROL))
         modifiers |= EVENTFLAG_CONTROL_DOWN;
-    if (isKeyDown(VK_MENU))
+    if (checkKey(VK_MENU))
         modifiers |= EVENTFLAG_ALT_DOWN;
 
     // Low bit set from GetKeyState indicates "toggled".
-    if (::GetKeyState(VK_NUMLOCK) & 1)
+    if (checkToggle(VK_NUMLOCK))
         modifiers |= EVENTFLAG_NUM_LOCK_ON;
-    if (::GetKeyState(VK_CAPITAL) & 1)
+    if (checkToggle(VK_CAPITAL))
         modifiers |= EVENTFLAG_CAPS_LOCK_ON;
 
     switch (wParam)
@@ -71,21 +81,21 @@ int GetCefKeyboardModifiers(WPARAM wParam, LPARAM lParam)
             modifiers |= EVENTFLAG_IS_KEY_PAD;
             break;
         case VK_SHIFT:
-            if (isKeyDown(VK_LSHIFT))
+            if (checkKey(VK_LSHIFT))
                 modifiers |= EVENTFLAG_IS_LEFT;
-            else if (isKeyDown(VK_RSHIFT))
+            else if (checkKey(VK_RSHIFT))
                 modifiers |= EVENTFLAG_IS_RIGHT;
             break;
         case VK_CONTROL:
-            if (isKeyDown(VK_LCONTROL))
+            if (checkKey(VK_LCONTROL))
                 modifiers |= EVENTFLAG_IS_LEFT;
-            else if (isKeyDown(VK_RCONTROL))
+            else if (checkKey(VK_RCONTROL))
                 modifiers |= EVENTFLAG_IS_RIGHT;
             break;
         case VK_MENU:
-            if (isKeyDown(VK_LMENU))
+            if (checkKey(VK_LMENU))
                 modifiers |= EVENTFLAG_IS_LEFT;
-            else if (isKeyDown(VK_RMENU))
+            else if (checkKey(VK_RMENU))
                 modifiers |= EVENTFLAG_IS_RIGHT;
             break;
         case VK_LWIN:

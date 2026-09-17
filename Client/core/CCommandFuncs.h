@@ -13,7 +13,7 @@
 
 #include <string>
 
-#define DECLARE_COMMAND_HANDLER(a) static void a ( const char * szParameters );
+#define DECLARE_COMMAND_HANDLER(a) static void a(const char* szParameters);
 
 class CCommandFuncs
 {

@@ -1,5 +1,5 @@
-#ifndef HEADER_CURL_SSH_H
-#define HEADER_CURL_SSH_H
+#ifndef HEADER_CURL_VSSH_SSH_H
+#define HEADER_CURL_VSSH_SSH_H
 /***************************************************************************
  *                                  _   _ ____  _
  *  Project                     ___| | | |  _ \| |
@@ -23,10 +23,15 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
+#include "curl_setup.h"
+#include "urldata.h"
 
-#include "../curl_setup.h"
+extern const struct Curl_protocol Curl_protocol_sftp;
+extern const struct Curl_protocol Curl_protocol_scp;
 
-#if defined(USE_LIBSSH2)
+#ifdef USE_SSH
+
+#ifdef USE_LIBSSH2
 #include <libssh2.h>
 #include <libssh2_sftp.h>
 #elif defined(USE_LIBSSH)
@@ -34,12 +39,7 @@
 #define SSH_SUPPRESS_DEPRECATED
 #include <libssh/libssh.h>
 #include <libssh/sftp.h>
-#elif defined(USE_WOLFSSH)
-#include <wolfssh/ssh.h>
-#include <wolfssh/wolfsftp.h>
 #endif
-
-#include "curl_path.h"
 
 /* meta key for storing protocol meta at easy handle */
 #define CURL_META_SSH_EASY   "meta:proto:ssh:easy"
@@ -123,7 +123,7 @@ typedef enum {
    Everything that is strictly related to a connection is banned from this
    struct. */
 struct SSHPROTO {
-  char *path;                  /* the path we operate on */
+  char *path;        /* the path we operate on, at least one byte long */
 #ifdef USE_LIBSSH2
   struct dynbuf readdir_link;
   struct dynbuf readdir;
@@ -152,17 +152,18 @@ struct ssh_conn {
   char *quote_path1;          /* two generic pointers for the QUOTE stuff */
   char *quote_path2;
 
-  char *homedir;              /* when doing SFTP we figure out home dir in the
-                                 connect phase */
+  char *homedir;              /* when doing SFTP we figure out home directory
+                                 in the connect phase */
   /* end of READDIR stuff */
 
   int secondCreateDirs;         /* counter use by the code to see if the
                                    second attempt has been made to change
                                    to/create a directory */
-  int orig_waitfor;             /* default READ/WRITE bits wait for */
+  int waitfor;                  /* REQ_IO_RECV/REQ_IO_SEND bits overriding
+                                   pollset given flags */
   char *slash_pos;              /* used by the SFTP_CREATE_DIRS state */
 
-#if defined(USE_LIBSSH)
+#ifdef USE_LIBSSH
   CURLcode actualcode;        /* the actual error code */
   char *readdir_linkPath;
   size_t readdir_len;
@@ -180,10 +181,13 @@ struct ssh_conn {
 
   unsigned sftp_recv_state; /* 0 or 1 */
 #if LIBSSH_VERSION_INT > SSH_VERSION_INT(0, 11, 0)
-  sftp_aio sftp_aio;
+  sftp_aio sftp_recv_aio;
+
+  sftp_aio sftp_send_aio;
   unsigned sftp_send_state; /* 0 or 1 */
-#endif
+#else
   int sftp_file_index; /* for async read */
+#endif
   sftp_attributes readdir_attrs; /* used by the SFTP readdir actions */
   sftp_attributes readdir_link_attrs; /* used by the SFTP readdir actions */
   sftp_attributes quote_attrs; /* used by the SFTP_QUOTE state */
@@ -191,6 +195,7 @@ struct ssh_conn {
   const char *readdir_filename; /* points within readdir_attrs */
   const char *readdir_longentry;
   char *readdir_tmp;
+  BIT(initialised);
 #elif defined(USE_LIBSSH2)
   LIBSSH2_SESSION *ssh_session; /* Secure Shell session */
   LIBSSH2_CHANNEL *ssh_channel; /* Secure Shell channel handle */
@@ -207,15 +212,7 @@ struct ssh_conn {
   struct libssh2_agent_publickey *sshagent_identity;
   struct libssh2_agent_publickey *sshagent_prev_identity;
   LIBSSH2_KNOWNHOSTS *kh;
-#elif defined(USE_WOLFSSH)
-  CURLcode actualcode;        /* the actual error code */
-  WOLFSSH *ssh_session;
-  WOLFSSH_CTX *ctx;
-  word32 handleSz;
-  byte handle[WOLFSSH_MAX_HANDLE];
-  curl_off_t offset;
 #endif /* USE_LIBSSH */
-  BIT(initialised);
   BIT(authed);                /* the connection has been authenticated fine */
   BIT(acceptfail);            /* used by the SFTP_QUOTE (continue if
                                  quote command fails) */
@@ -223,26 +220,32 @@ struct ssh_conn {
 
 #ifdef USE_LIBSSH
 #if LIBSSH_VERSION_INT < SSH_VERSION_INT(0, 9, 0)
-#  error "SCP/SFTP protocols require libssh 0.9.0 or later"
+#error "SCP/SFTP protocols require libssh 0.9.0 or later"
 #endif
 #endif
 
-#if defined(USE_LIBSSH2)
+#ifdef USE_LIBSSH2
 
 /* Feature detection based on version numbers to better work with
    non-configure platforms */
 
 #if !defined(LIBSSH2_VERSION_NUM) || (LIBSSH2_VERSION_NUM < 0x010208)
-#  error "SCP/SFTP protocols require libssh2 1.2.8 or later"
+#error "SCP/SFTP protocols require libssh2 1.2.8 or later"
 /* 1.2.8 was released on April 5 2011 */
 #endif
 
 #endif /* USE_LIBSSH2 */
 
-#ifdef USE_SSH
+#ifdef CURLVERBOSE
+const char *Curl_ssh_statename(sshstate state);
+#else
+#define Curl_ssh_statename(x) ""
+#endif
+void Curl_ssh_set_state(struct Curl_easy *data,
+                        struct ssh_conn *sshc,
+                        sshstate nowstate);
 
-extern const struct Curl_handler Curl_handler_scp;
-extern const struct Curl_handler Curl_handler_sftp;
+#define myssh_to(x, y, z) Curl_ssh_set_state(x, y, z)
 
 /* generic SSH backend functions */
 CURLcode Curl_ssh_init(void);
@@ -250,11 +253,10 @@ void Curl_ssh_cleanup(void);
 void Curl_ssh_version(char *buffer, size_t buflen);
 void Curl_ssh_attach(struct Curl_easy *data,
                      struct connectdata *conn);
-#else
-/* for non-SSH builds */
+#else /* !USE_SSH */
 #define Curl_ssh_cleanup()
-#define Curl_ssh_attach(x,y)
+#define Curl_ssh_attach(x, y)
 #define Curl_ssh_init() 0
-#endif
+#endif /* USE_SSH */
 
 #endif /* HEADER_CURL_SSH_H */

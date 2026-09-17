@@ -25,8 +25,8 @@ enum
 
 enum eSecondaryTaskType
 {
-    TASK_SECONDARY_ATTACK = 0,            // want duck to be after attack
-    TASK_SECONDARY_DUCK,                  // because attack controls ducking movement
+    TASK_SECONDARY_ATTACK = 0,  // want duck to be after attack
+    TASK_SECONDARY_DUCK,        // because attack controls ducking movement
     TASK_SECONDARY_SAY,
     TASK_SECONDARY_FACIAL_COMPLEX,
     TASK_SECONDARY_PARTIAL_ANIM,
@@ -46,7 +46,6 @@ enum taskType
     PRIMARY_TASK = 0,
     SECONDARY_TASK
 };
-
 
 class CTaskManager
 {

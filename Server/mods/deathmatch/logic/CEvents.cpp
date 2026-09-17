@@ -125,7 +125,12 @@ void CEvents::RemoveAllEvents()
 
 void CEvents::PreEventPulse()
 {
+    // Save outer event's cancel state (boolean + reason) so nested events cannot
+    // clobber it. Restored in PostEventPulse. Fixes the nested cancel-reason loss
+    // that motivated #4529 without changing cancel-boolean semantics (which were
+    // already correctly stacked here, and which #4873 relied on).
     m_CancelledList.push_back(m_bEventCancelled);
+    m_LastErrorList.push_back(m_strLastError);
     m_bEventCancelled = false;
     m_bWasEventCancelled = false;
     m_strLastError = "";
@@ -136,6 +141,10 @@ void CEvents::PostEventPulse()
     m_bWasEventCancelled = m_bEventCancelled;
     m_bEventCancelled = m_CancelledList.back() ? true : false;
     m_CancelledList.pop_back();
+    // Mirrors m_bWasEventCancelled above, before restoring the outer reason.
+    m_strWasLastError = m_strLastError;
+    m_strLastError = m_LastErrorList.back();
+    m_LastErrorList.pop_back();
 }
 
 void CEvents::CancelEvent(bool bCancelled)
@@ -157,4 +166,9 @@ bool CEvents::WasEventCancelled()
 const char* CEvents::GetLastError()
 {
     return m_strLastError;
+}
+
+const char* CEvents::WasLastError()
+{
+    return m_strWasLastError;
 }

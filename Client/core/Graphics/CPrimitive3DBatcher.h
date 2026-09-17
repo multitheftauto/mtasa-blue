@@ -25,11 +25,13 @@ class CPrimitive3DBatcher
 {
 public:
     CPrimitive3DBatcher(bool bPreGUI);
+    ~CPrimitive3DBatcher();
     void OnDeviceCreate(IDirect3DDevice9* pDevice, float fViewportSizeX, float fViewportSizeY);
     void Flush();
     void AddPrimitive(D3DPRIMITIVETYPE eType, std::vector<PrimitiveVertice>* pVecVertices);
     void DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollectionSize, const void* pDataAddr, size_t uiVertexStride);
     bool HasItems() const { return !m_primitiveList.empty(); }
+    void ClearQueue();
 
 protected:
     bool                      m_bPreGUI;

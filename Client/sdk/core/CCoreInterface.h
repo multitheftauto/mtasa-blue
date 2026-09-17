@@ -24,6 +24,7 @@
 #include "CTrayIconInterface.h"
 #include "CChatInterface.h"
 #include "CDiscordInterface.h"
+#include "FPSLimiterInterface.h"
 #include "xml/CXML.h"
 #include <gui/CGUI.h>
 
@@ -41,7 +42,7 @@ enum eCoreVersion
 };
 
 #ifndef WITH_TIMING_CHECKPOINTS
-    #define WITH_TIMING_CHECKPOINTS 1            // Comment this line to remove timing checkpoint code
+    #define WITH_TIMING_CHECKPOINTS 1  // Comment this line to remove timing checkpoint code
 #endif
 
 #if WITH_TIMING_CHECKPOINTS
@@ -79,8 +80,10 @@ public:
     virtual CCVarsInterface*                   GetCVars() = 0;
     virtual CLocalizationInterface*            GetLocalization() = 0;
     virtual CWebCoreInterface*                 GetWebCore() = 0;
+    virtual CWebCoreInterface*                 GetWebCoreUnchecked() = 0;  // For cleanup in destructors only - bypasses initialization check
     virtual CTrayIconInterface*                GetTrayIcon() = 0;
     virtual std::shared_ptr<CDiscordInterface> GetDiscord() = 0;
+    virtual FPSLimiter::FPSLimiterInterface*   GetFPSLimiter() const noexcept = 0;
 
     // Temporary functions for r1
     virtual void DebugEcho(const char* szText) = 0;
@@ -143,18 +146,13 @@ public:
     virtual bool IsOptionalUpdateInfoRequired(const char* szHost) = 0;
     virtual void InitiateDataFilesFix() = 0;
 
-    virtual uint GetFrameRateLimit() = 0;
-    virtual void RecalculateFrameRateLimit(uint uiServerFrameRateLimit = -1, bool bLogToConsole = true) = 0;
-    virtual void ApplyFrameRateLimit(uint uiOverrideRate = -1) = 0;
-    virtual void EnsureFrameRateLimitApplied() = 0;
-    virtual void SetClientScriptFrameRateLimit(uint uiClientScriptFrameRateLimit) = 0;
-
     virtual void                 OnPreFxRender() = 0;
     virtual void                 OnPreHUDRender() = 0;
     virtual uint                 GetMinStreamingMemory() = 0;
     virtual uint                 GetMaxStreamingMemory() = 0;
     virtual void                 OnCrashAverted(uint uiId) = 0;
     virtual void                 OnEnterCrashZone(uint uiId) = 0;
+    virtual void                 UpdateWerCrashModuleBases() = 0;
     virtual void                 LogEvent(uint uiDebugId, const char* szType, const char* szContext, const char* szBody, uint uiAddReportLogId = 0) = 0;
     virtual bool                 GetDebugIdEnabled(uint uiDebugId) = 0;
     virtual EDiagnosticDebugType GetDiagnosticDebug() = 0;

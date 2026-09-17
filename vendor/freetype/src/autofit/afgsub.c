@@ -4,7 +4,7 @@
  *
  *   Auto-fitter routines to parse the GSUB table (body).
  *
- * Copyright (C) 2025 by
+ * Copyright (C) 2025-2026 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * This file is part of the FreeType project, and may only be used,
@@ -15,14 +15,15 @@
  *
  */
 
-#ifdef FT_CONFIG_OPTION_USE_HARFBUZZ
-
 
 #include <freetype/freetype.h>
 #include <freetype/tttables.h>
 #include <freetype/tttags.h>
 
 #include <freetype/internal/ftstream.h>
+
+
+#ifdef FT_CONFIG_OPTION_USE_HARFBUZZ
 
 #include "afglobal.h"
 #include "afgsub.h"
@@ -66,6 +67,8 @@
     {
       FT_UInt   rangeCount = FT_NEXT_USHORT( p );
       FT_Byte*  limit      = p + rangeCount * 6;
+      FT_UInt   startGlyphID;
+      FT_UInt   endGlyphID = 0;
 
 
       if ( table_limit < limit )
@@ -73,14 +76,15 @@
 
       while ( p < limit )
       {
-        FT_UInt  startGlyphID = FT_NEXT_USHORT( p );
-        FT_UInt  endGlyphID   = FT_NEXT_USHORT( p );
-
-
-        if ( startGlyphID > endGlyphID )
+        startGlyphID = FT_NEXT_USHORT( p );
+        if ( startGlyphID < endGlyphID )
           return FALSE;
 
-        count += endGlyphID - startGlyphID + 1;
+        endGlyphID = FT_NEXT_USHORT( p );
+        if ( endGlyphID < startGlyphID )
+          return FALSE;
+
+        count += ++endGlyphID - startGlyphID;
 
         /* We don't validate coverage indices. */
         p += 2;
@@ -363,11 +367,13 @@
     }
 
     globals->gsub                          = gsub;
+    globals->gsub_lookup_count             = lookupCount;
     globals->gsub_lookups_single_alternate = gsub_lookups_single_alternate;
 
     return;
 
   Fail:
+    globals->gsub_lookup_count = 0;
     FT_FREE( gsub );
     FT_FREE( gsub_lookups_single_alternate );
   }

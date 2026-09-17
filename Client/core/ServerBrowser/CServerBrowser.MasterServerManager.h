@@ -11,6 +11,7 @@ public:
     virtual void Refresh() = 0;
     virtual bool HasData() = 0;
     virtual bool ParseList(CServerListItemList& itemList) = 0;
+    virtual void CancelRefresh() = 0;
 };
 
 CMasterServerManagerInterface* NewMasterServerManager();

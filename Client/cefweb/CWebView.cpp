@@ -13,6 +13,10 @@
 #include <cef3/cef/include/cef_parser.h>
 #include <cef3/cef/include/cef_task.h>
 #include "CWebDevTools.h"
+#include <chrono>
+#include "CWebViewAuth.h"  // AUTH: IPC validation helpers
+#include <utility>
+#include <algorithm>
 
 namespace
 {
@@ -21,12 +25,21 @@ namespace
 
 CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool bTransparent)
 {
+    m_pEventTarget = std::make_shared<FEventTarget>();
     m_bIsLocal = bIsLocal;
     m_bIsTransparent = bTransparent;
     m_pWebBrowserRenderItem = pWebBrowserRenderItem;
+    if (m_pWebBrowserRenderItem)
+        m_pWebBrowserRenderItem->AddRef();
+
     m_pEventsInterface = nullptr;
     m_bBeingDestroyed = false;
+    m_bIsRenderingPaused = false;
     m_fVolume = 1.0f;
+    m_bHasInputFocus = false;
+    m_vecMousePosition = {0, 0};
+    m_vecPendingMousePosition = {0, 0};
+    m_lastMouseMoveTime = std::chrono::steady_clock::now();
     memset(m_mouseButtonStates, 0, sizeof(m_mouseButtonStates));
 
     // Initialise properties
@@ -35,33 +48,112 @@ CWebView::CWebView(bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem, bool b
 
 CWebView::~CWebView()
 {
+    m_bBeingDestroyed = true;
+
+    if (m_pEventTarget)
+        m_pEventTarget->Clear(m_pEventsInterface);
+
     if (IsMainThread())
     {
-        if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
-            g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
+        if (auto pWebCore = g_pCore->GetWebCore(); pWebCore)
+        {
+            if (pWebCore->GetFocusedWebView() == this)
+                pWebCore->SetFocusedWebView(nullptr);
+        }
     }
 
-    // Make sure we don't dead lock the CEF render thread
-    ResumeCefThread();
+    if (m_pWebBrowserRenderItem)
+    {
+        m_pWebBrowserRenderItem->Release();
+        m_pWebBrowserRenderItem = nullptr;
+    }
 
-    // Ensure that CefRefPtr::~CefRefPtr doesn't try to release it twice (it has already been released in CWebView::OnBeforeClose)
-    m_pWebView = nullptr;
+    // Clean up AJAX handlers to prevent accumulation
+    m_AjaxHandlers.clear();
+
+    // Break circular reference: ensure browser reference is cleared
+    // This is to prevent memory leaks from CWebView <-> CefBrowser cycles
+    if (m_pWebView)
+    {
+        // Stop any loading immediately
+        m_pWebView->StopLoad();
+
+        // Navigate to blank page to force V8/DOM cleanup and release video/audio resources
+        // We do this BEFORE hiding to ensure the navigation request is processed
+        m_pWebView->GetMainFrame()->LoadURL("about:blank");
+
+        // Notify that the browser is hidden and lost focus to release rendering resources
+        m_pWebView->GetHost()->WasHidden(true);
+        m_pWebView->GetHost()->SetFocus(false);
+
+        // Force close the browser host to ensure the renderer process terminates immediately
+        m_pWebView->GetHost()->CloseBrowser(true);
+        m_pWebView = nullptr;
+    }
 
     OutputDebugLine("CWebView::~CWebView");
 }
 
+void CWebView::SetWebBrowserEvents(CWebBrowserEventsInterface* pInterface)
+{
+    m_pEventsInterface = pInterface;
+
+    if (m_pEventTarget)
+        m_pEventTarget->Assign(pInterface);
+}
+
+void CWebView::ClearWebBrowserEvents(CWebBrowserEventsInterface* pInterface)
+{
+    if (m_pEventTarget)
+        m_pEventTarget->Clear(pInterface);
+
+    if (m_pEventsInterface == pInterface)
+        m_pEventsInterface = nullptr;
+}
+
+void CWebView::QueueBrowserEvent(const char* name, std::function<void(CWebBrowserEventsInterface*)>&& fn)
+{
+    auto target = m_pEventTarget;
+    if (!target)
+        return;
+
+    const auto token = target->CreateDispatchToken();
+
+    g_pCore->GetWebCore()->AddEventToEventQueue(
+        [target, token, fn = std::move(fn)]() mutable
+        {
+            if (!target)
+                return;
+
+            target->Dispatch(token, fn);
+        },
+        this, name);
+}
+
 void CWebView::Initialise()
 {
+    // Create the CEF browser eagerly so onClientBrowserCreated fires
+    // even if loadBrowserURL hasn't been called yet.
+    // Scripts rely on this event to know when the browser is ready.
+    EnsureBrowserCreated();
+}
+
+bool CWebView::EnsureBrowserCreated()
+{
+    if (m_bBrowserCreated || m_bBeingDestroyed)
+        return m_bBrowserCreated;
+
     // Initialise the web session (which holds the actual settings) in in-memory mode
     CefBrowserSettings browserSettings;
-    browserSettings.windowless_frame_rate = g_pCore->GetFrameRateLimit();
+    browserSettings.windowless_frame_rate = g_pCore->GetFPSLimiter()->GetFPSTarget();
     browserSettings.javascript_access_clipboard = cef_state_t::STATE_DISABLED;
     browserSettings.javascript_dom_paste = cef_state_t::STATE_DISABLED;
     browserSettings.webgl = cef_state_t::STATE_ENABLED;
 
     if (!m_bIsLocal)
     {
-        bool bEnabledJavascript = g_pCore->GetWebCore()->GetRemoteJavascriptEnabled();
+        const auto pWebCore = g_pCore->GetWebCore();
+        const bool bEnabledJavascript = pWebCore ? pWebCore->GetRemoteJavascriptEnabled() : false;
         browserSettings.javascript = bEnabledJavascript ? cef_state_t::STATE_ENABLED : cef_state_t::STATE_DISABLED;
     }
 
@@ -72,7 +164,12 @@ void CWebView::Initialise()
     CefWindowInfo windowInfo;
     windowInfo.SetAsWindowless(g_pCore->GetHookedWindow());
 
+    // Enable external begin frame scheduling - allows MTA to control when CEF renders
+    windowInfo.external_begin_frame_enabled = true;
+
     CefBrowserHost::CreateBrowser(windowInfo, this, "", browserSettings, nullptr, nullptr);
+    m_bBrowserCreated = true;
+    return true;
 }
 
 void CWebView::CloseBrowser()
@@ -80,25 +177,53 @@ void CWebView::CloseBrowser()
     // CefBrowserHost::CloseBrowser calls the destructor after the browser has been destroyed
     m_bBeingDestroyed = true;
 
-    // Make sure we don't dead lock the CEF render thread
-    ResumeCefThread();
+    // Clear AJAX handlers early to prevent late event processing
+    m_AjaxHandlers.clear();
 
     if (m_pWebView)
+    {
+        // Stop any loading immediately
+        m_pWebView->StopLoad();
+
+        // Navigate to blank page to force V8/DOM cleanup and release video/audio resources
+        // We do this BEFORE hiding to ensure the navigation request is processed
+        m_pWebView->GetMainFrame()->LoadURL("about:blank");
+
+        // Notify that the browser is hidden and lost focus to release rendering resources
+        m_pWebView->GetHost()->WasHidden(true);
+        m_pWebView->GetHost()->SetFocus(false);
+
         m_pWebView->GetHost()->CloseBrowser(true);
+        m_pWebView = nullptr;
+    }
 }
 
 bool CWebView::LoadURL(const SString& strURL, bool bFilterEnabled, const SString& strPostData, bool bURLEncoded)
 {
+    // Lazy creation: create browser on first use
+    EnsureBrowserCreated();
+
+    // If browser isn't ready yet (async creation), store the URL to load when ready
     if (!m_pWebView)
-        return false;
+    {
+        m_strPendingURL = strURL;
+        m_bPendingURLFilterEnabled = bFilterEnabled;
+        m_strPendingPostData = strPostData;
+        m_bPendingURLEncoded = bURLEncoded;
+        return true;  // Return true - we'll load it when browser is ready
+    }
 
     CefURLParts urlParts;
     if (strURL.empty() || !CefParseURL(strURL, urlParts))
-        return false;            // Invalid URL
+        return false;  // Invalid URL
 
     // Are we allowed to browse this website?
-    if (bFilterEnabled && g_pCore->GetWebCore()->GetDomainState(UTF16ToMbUTF8(urlParts.host.str), true) != eURLState::WEBPAGE_ALLOWED)
-        return false;
+    if (bFilterEnabled)
+    {
+        auto pWebCore = g_pCore->GetWebCore();
+        if (pWebCore && pWebCore->GetDomainState(UTF16ToMbUTF8(urlParts.host.str), true) != eURLState::WEBPAGE_ALLOWED)
+            return false;
+    }
 
     // Load it!
     auto pFrame = m_pWebView->GetMainFrame();
@@ -159,10 +284,33 @@ const SString& CWebView::GetTitle()
 
 void CWebView::SetRenderingPaused(bool bPaused)
 {
+    // Store pause state even when the host is not created yet so async
+    // browser creation cannot lose the requested visibility state.
+    m_bIsRenderingPaused = bPaused;
+
     if (m_pWebView)
     {
         m_pWebView->GetHost()->WasHidden(bPaused);
-        m_bIsRenderingPaused = bPaused;
+
+        if (bPaused)
+        {
+            // Free memory held by render data when paused
+            std::lock_guard<std::mutex> lock{m_RenderData.dataMutex};
+            m_RenderData.changed = false;
+            m_RenderData.popupShown = false;
+            m_RenderData.buffer.reset();
+            m_RenderData.bufferSize = 0;
+            m_RenderData.popupBuffer.reset();
+        }
+        else
+        {
+            // WasHidden(false) does not produce OnPaint with external begin-frame
+            // scheduling. Request a full frame so CSS hover / compositor updates
+            // are not left on the last cached texture.
+            m_pWebView->GetHost()->WasResized();
+            m_pWebView->GetHost()->Invalidate(PET_VIEW);
+            m_pWebView->GetHost()->SendExternalBeginFrame();
+        }
     }
 }
 
@@ -176,120 +324,247 @@ void CWebView::Focus(bool state)
     if (m_pWebView)
         m_pWebView->GetHost()->SetFocus(state);
 
+    auto pWebCore = g_pCore->GetWebCore();
+    if (!pWebCore)
+        return;
+
     if (state)
-        g_pCore->GetWebCore()->SetFocusedWebView(this);
-    else if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
-        g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
+        pWebCore->SetFocusedWebView(this);
+    else if (pWebCore->GetFocusedWebView() == this)
+        pWebCore->SetFocusedWebView(nullptr);
 }
 
 void CWebView::ClearTexture()
 {
-    IDirect3DSurface9* pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
-    if (!pD3DSurface)
+    if (!m_pWebBrowserRenderItem) [[unlikely]]
+        return;
+
+    auto* const pD3DSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
+    if (!pD3DSurface) [[unlikely]]
         return;
 
     D3DSURFACE_DESC SurfaceDesc;
-    if (FAILED(pD3DSurface->GetDesc(&SurfaceDesc)))
+    if (FAILED(pD3DSurface->GetDesc(&SurfaceDesc))) [[unlikely]]
         return;
 
     D3DLOCKED_RECT LockedRect;
-    if (SUCCEEDED(pD3DSurface->LockRect(&LockedRect, NULL, D3DLOCK_DISCARD)))
+    if (SUCCEEDED(pD3DSurface->LockRect(&LockedRect, nullptr, D3DLOCK_DISCARD)))
     {
-        memset(LockedRect.pBits, 0xFF, SurfaceDesc.Height * LockedRect.Pitch);
+        // Check for integer overflow in size calculation: height * pitch must fit in size_t
+        // Ensure both are positive and that multiplication won't overflow
+        if (SurfaceDesc.Height > 0 && LockedRect.Pitch > 0 && static_cast<size_t>(SurfaceDesc.Height) <= SIZE_MAX / static_cast<size_t>(LockedRect.Pitch))
+            [[likely]]
+        {
+            const auto memsetSize = static_cast<size_t>(SurfaceDesc.Height) * static_cast<size_t>(LockedRect.Pitch);
+            std::memset(LockedRect.pBits, 0xFF, memsetSize);
+        }
         pD3DSurface->UnlockRect();
     }
 }
 
+void CWebView::RestoreTexture()
+{
+    {
+        const std::scoped_lock lock(m_RenderData.dataMutex);
+        if (!m_RenderData.buffer || m_RenderData.bufferSize == 0)
+            return;
+
+        // Reuse the retained CEF frame so screenshot filtering is not visible while an asynchronous repaint is pending.
+        m_RenderData.changed = true;
+    }
+
+    UpdateTexture();
+}
+
 void CWebView::UpdateTexture()
 {
-    std::lock_guard<std::mutex> lock(m_RenderData.dataMutex);
+    const std::scoped_lock lock(m_RenderData.dataMutex);
 
-    auto pSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
-    if (m_bBeingDestroyed || !pSurface)
+    // Validate render item exists before accessing
+    if (!m_pWebBrowserRenderItem) [[unlikely]]
+    {
         m_RenderData.changed = m_RenderData.popupShown = false;
+        return;
+    }
+
+    auto* const pSurface = m_pWebBrowserRenderItem->m_pD3DRenderTargetSurface;
+    if (m_bBeingDestroyed) [[unlikely]]
+    {
+        m_RenderData.changed = m_RenderData.popupShown = false;
+        return;
+    }
+
+    if (!pSurface) [[unlikely]]
+    {
+        // Keep pending frame flags intact. Surface recreation can lag one or
+        // more pulses; clearing flags here can permanently drop the only paint
+        // we received for static pages and leave the browser visually blank.
+        return;
+    }
 
     // Discard current buffer if size doesn't match
     // This happens when resizing the browser as OnPaint is called asynchronously
     if (m_RenderData.changed && (m_pWebBrowserRenderItem->m_uiSizeX != m_RenderData.width || m_pWebBrowserRenderItem->m_uiSizeY != m_RenderData.height))
-        m_RenderData.changed = false;
-
-    if (m_RenderData.changed || m_RenderData.popupShown)
     {
-        // Lock surface
-        D3DLOCKED_RECT LockedRect;
-        if (SUCCEEDED(pSurface->LockRect(&LockedRect, nullptr, 0)))
+        // Request a fresh paint at the current render size. Without this,
+        // we can drop the only buffered frame and remain visually blank
+        // until the page generates another update on its own.
+        if (m_pWebView)
         {
-            // Dirty rect implementation, don't use this as loops are significantly slower than memcpy
-            const auto destData = static_cast<byte*>(LockedRect.pBits);
-            const auto sourceData = static_cast<const byte*>(m_RenderData.buffer);
-            const auto destPitch = LockedRect.Pitch;
-            const auto sourcePitch = m_RenderData.width * CEF_PIXEL_STRIDE;
+            m_pWebView->GetHost()->WasResized();
+            m_pWebView->GetHost()->Invalidate(PET_VIEW);
+        }
+        m_RenderData.changed = false;
+    }
 
-            // Update view area
-            if (m_RenderData.changed)
-            {
-                // Update changed state
-                m_RenderData.changed = false;
+    // After device reset (minimize/restore), force full copy from our buffer to new texture
+    if (m_pWebBrowserRenderItem->m_bTextureWasRecreated)
+    {
+        m_pWebBrowserRenderItem->m_bTextureWasRecreated = false;
 
-                if (m_RenderData.dirtyRects.size() > 0 && m_RenderData.dirtyRects[0].width == m_RenderData.width &&
-                    m_RenderData.dirtyRects[0].height == m_RenderData.height)
-                {
-                    // Note that D3D texture size can be hardware dependent(especially with dynamic texture)
-                    // When destination and source pitches differ we must copy pixels row by row
-                    if (destPitch == sourcePitch)
-                        memcpy(destData, sourceData, destPitch * m_RenderData.height);
-                    else
-                    {
-                        for (int y = 0; y < m_RenderData.height; ++y)
-                        {
-                            const int sourceIndex = y * sourcePitch;
-                            const int destIndex = y * destPitch;
-
-                            memcpy(&destData[destIndex], &sourceData[sourceIndex], std::min(sourcePitch, destPitch));
-                        }
-                    }
-                }
-                else
-                {
-                    // Update dirty rects
-                    for (const auto& rect : m_RenderData.dirtyRects)
-                    {
-                        for (int y = rect.y; y < rect.y + rect.height; ++y)
-                        {
-                            // Note that D3D texture size can be hardware dependent(especially with dynamic texture)
-                            // We cannot be sure that source and destination pitches are the same
-                            const int sourceIndex = y * sourcePitch + rect.x * CEF_PIXEL_STRIDE;
-                            const int destIndex = y * destPitch + rect.x * CEF_PIXEL_STRIDE;
-
-                            memcpy(&destData[destIndex], &sourceData[sourceIndex], rect.width * CEF_PIXEL_STRIDE);
-                        }
-                    }
-                }
-            }
-
-            // Update popup area (override certain areas of the view texture)
-            const bool popupSizeMismatches = m_RenderData.popupRect.x + m_RenderData.popupRect.width >= (int)m_pWebBrowserRenderItem->m_uiSizeX ||
-                                             m_RenderData.popupRect.y + m_RenderData.popupRect.height >= (int)m_pWebBrowserRenderItem->m_uiSizeY;
-
-            if (m_RenderData.popupShown && !popupSizeMismatches)
-            {
-                const auto popupPitch = m_RenderData.popupRect.width * CEF_PIXEL_STRIDE;
-                for (int y = 0; y < m_RenderData.popupRect.height; ++y)
-                {
-                    const int sourceIndex = y * popupPitch;
-                    const int destIndex = (y + m_RenderData.popupRect.y) * destPitch + m_RenderData.popupRect.x * CEF_PIXEL_STRIDE;
-
-                    memcpy(&destData[destIndex], &m_RenderData.popupBuffer[sourceIndex], popupPitch);
-                }
-            }
-
-            // Unlock surface
-            pSurface->UnlockRect();
+        // If we have valid buffer data matching texture size, trigger full update
+        if (m_RenderData.buffer && m_RenderData.bufferSize > 0 && m_RenderData.width == static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeX) &&
+            m_RenderData.height == static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeY))
+        {
+            m_RenderData.changed = true;
         }
     }
 
-    m_RenderData.cefThreadState = ECefThreadState::Running;
-    m_RenderData.cefThreadCv.notify_all();
+    if (m_RenderData.changed || m_RenderData.popupShown) [[likely]]
+    {
+        // Lock surface with D3DLOCK_DISCARD for dynamic textures - tells driver we'll overwrite entire content
+        // This avoids GPU stalls waiting for previous frame to finish rendering
+        D3DLOCKED_RECT LockedRect;
+        if (SUCCEEDED(pSurface->LockRect(&LockedRect, nullptr, D3DLOCK_DISCARD)))
+        {
+            auto* const       destData = static_cast<byte*>(LockedRect.pBits);
+            const auto* const sourceData = m_RenderData.buffer.get();
+            const auto        destPitch = LockedRect.Pitch;
+
+            // Validate destination pitch
+            if (destPitch <= 0) [[unlikely]]
+            {
+                pSurface->UnlockRect();
+                m_RenderData.changed = false;
+                m_RenderData.popupShown = false;
+                return;
+            }
+
+            // Validate sourcePitch calculation won't overflow
+            constexpr auto maxWidthForPitch = INT_MAX / CEF_PIXEL_STRIDE;
+            if (m_RenderData.width > maxWidthForPitch) [[unlikely]]
+            {
+                pSurface->UnlockRect();
+                m_RenderData.changed = false;
+                m_RenderData.popupShown = false;
+                return;
+            }
+            const auto sourcePitch = m_RenderData.width * CEF_PIXEL_STRIDE;
+
+            // Validate source buffer exists before accessing it
+            if (!sourceData) [[unlikely]]
+            {
+                pSurface->UnlockRect();
+                m_RenderData.changed = false;
+                m_RenderData.popupShown = false;
+                return;
+            }
+
+            // Update view area
+            if (m_RenderData.changed) [[likely]]
+            {
+                m_RenderData.changed = false;
+
+                // Always do full frame copy since D3DLOCK_DISCARD invalidates entire texture
+                // Our buffer contains the complete frame from OnPaint's full memcpy
+                if (destPitch == sourcePitch) [[likely]]
+                {
+                    if (m_RenderData.height > 0 && static_cast<size_t>(m_RenderData.height) > SIZE_MAX / static_cast<size_t>(destPitch)) [[unlikely]]
+                    {
+                        pSurface->UnlockRect();
+                        m_RenderData.changed = false;
+                        m_RenderData.popupShown = false;
+                        return;
+                    }
+                    std::memcpy(destData, sourceData, static_cast<size_t>(destPitch) * static_cast<size_t>(m_RenderData.height));
+                }
+                else
+                {
+                    // Row-by-row copy when pitches differ
+                    if (destPitch <= 0 || sourcePitch <= 0) [[unlikely]]
+                    {
+                        pSurface->UnlockRect();
+                        m_RenderData.changed = false;
+                        m_RenderData.popupShown = false;
+                        return;
+                    }
+
+                    if (m_RenderData.height > 0 && (static_cast<size_t>(m_RenderData.height) > SIZE_MAX / static_cast<size_t>(destPitch) ||
+                                                    static_cast<size_t>(m_RenderData.height) > SIZE_MAX / static_cast<size_t>(sourcePitch))) [[unlikely]]
+                    {
+                        pSurface->UnlockRect();
+                        m_RenderData.changed = false;
+                        m_RenderData.popupShown = false;
+                        return;
+                    }
+
+                    for (int y = 0; y < m_RenderData.height; ++y)
+                    {
+                        const auto sourceIndex = static_cast<size_t>(y) * static_cast<size_t>(sourcePitch);
+                        const auto destIndex = static_cast<size_t>(y) * static_cast<size_t>(destPitch);
+                        const auto copySize = std::min(static_cast<size_t>(sourcePitch), static_cast<size_t>(destPitch));
+
+                        std::memcpy(&destData[destIndex], &sourceData[sourceIndex], copySize);
+                    }
+                }
+            }
+
+            // Update popup area
+            const auto& popupRect = m_RenderData.popupRect;
+            const auto  renderWidth = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeX);
+            const auto  renderHeight = static_cast<int>(m_pWebBrowserRenderItem->m_uiSizeY);
+            const auto  popupSizeMismatches = popupRect.x < 0 || popupRect.y < 0 || popupRect.width <= 0 || popupRect.height <= 0 ||
+                                             popupRect.x >= renderWidth || popupRect.y >= renderHeight || popupRect.width > renderWidth ||
+                                             popupRect.height > renderHeight || popupRect.x > renderWidth - popupRect.width ||
+                                             popupRect.y > renderHeight - popupRect.height;
+
+            if (m_RenderData.popupShown && !popupSizeMismatches && m_RenderData.popupBuffer) [[likely]]
+            {
+                constexpr auto maxWidthForPopupPitch = INT_MAX / CEF_PIXEL_STRIDE;
+                if (popupRect.width > maxWidthForPopupPitch) [[unlikely]]
+                {
+                    pSurface->UnlockRect();
+                    m_RenderData.popupShown = false;
+                    return;
+                }
+                const auto popupPitch = popupRect.width * CEF_PIXEL_STRIDE;
+
+                if (static_cast<size_t>(destPitch) < static_cast<size_t>(popupRect.x + popupRect.width) * CEF_PIXEL_STRIDE) [[unlikely]]
+                {
+                    pSurface->UnlockRect();
+                    m_RenderData.popupShown = false;
+                    return;
+                }
+
+                for (int y = 0; y < popupRect.height; ++y)
+                {
+                    const auto sourceIndex = static_cast<size_t>(y) * static_cast<size_t>(popupPitch);
+                    const auto destY = static_cast<size_t>(popupRect.y) + static_cast<size_t>(y);
+                    const auto destIndex = destY * static_cast<size_t>(destPitch) + static_cast<size_t>(popupRect.x) * CEF_PIXEL_STRIDE;
+
+                    std::memcpy(&destData[destIndex], &m_RenderData.popupBuffer[sourceIndex], static_cast<size_t>(popupPitch));
+                }
+            }
+
+            pSurface->UnlockRect();
+        }
+        else
+        {
+            OutputDebugLine("[CWebView] UpdateTexture: LockRect failed");
+            // Keep pending frame flags so we retry on the next pulse instead
+            // of dropping the frame after a transient D3D lock failure.
+        }
+    }
 }
 
 void CWebView::ExecuteJavascript(const SString& strJavascriptCode)
@@ -325,11 +600,32 @@ void CWebView::InjectMouseMove(int iPosX, int iPosY)
     if (!m_pWebView)
         return;
 
+    // Throttle mouse move events to reduce excessive CEF repaints
+    // Allow ~60 mouse updates per second (16ms interval)
+    constexpr auto MOUSE_THROTTLE_INTERVAL = std::chrono::milliseconds(16);
+    auto           now = std::chrono::steady_clock::now();
+
+    // Always update the pending position
+    m_vecPendingMousePosition.x = iPosX;
+    m_vecPendingMousePosition.y = iPosY;
+
+    // Check if enough time has passed since last mouse move
+    if (now - m_lastMouseMoveTime < MOUSE_THROTTLE_INTERVAL)
+    {
+        // Store as pending - will be sent on next allowed interval or on click
+        m_bHasPendingMouseMove = true;
+        return;
+    }
+
+    // Send the mouse move event
+    m_lastMouseMoveTime = now;
+    m_bHasPendingMouseMove = false;
+
     CefMouseEvent mouseEvent;
     mouseEvent.x = iPosX;
     mouseEvent.y = iPosY;
 
-    // Set modifiers from mouse states (yeah, using enum values as indices isn't best practise, but it's the easiest solution here)
+    // Set modifiers from mouse states
     if (m_mouseButtonStates[BROWSER_MOUSEBUTTON_LEFT])
         mouseEvent.modifiers |= EVENTFLAG_LEFT_MOUSE_BUTTON;
     if (m_mouseButtonStates[BROWSER_MOUSEBUTTON_MIDDLE])
@@ -347,6 +643,19 @@ void CWebView::InjectMouseDown(eWebBrowserMouseButton mouseButton, int count)
 {
     if (!m_pWebView)
         return;
+
+    // Flush any pending mouse move before click to ensure accurate position
+    if (m_bHasPendingMouseMove)
+    {
+        m_vecMousePosition.x = m_vecPendingMousePosition.x;
+        m_vecMousePosition.y = m_vecPendingMousePosition.y;
+        m_bHasPendingMouseMove = false;
+
+        CefMouseEvent moveEvent;
+        moveEvent.x = m_vecMousePosition.x;
+        moveEvent.y = m_vecMousePosition.y;
+        m_pWebView->GetHost()->SendMouseMoveEvent(moveEvent, false);
+    }
 
     CefMouseEvent mouseEvent;
     mouseEvent.x = m_vecMousePosition.x;
@@ -405,13 +714,20 @@ bool CWebView::SetAudioVolume(float fVolume)
         "tags = document.getElementsByTagName('video'); for (var i = 0; i<tags.length; ++i) { mta_adjustAudioVol(tags[i], %f); }",
         fVolume, fVolume);
 
+    // Note: GetFrameNames is deprecated, but no modern alternative exists for audio volume control
+    // This is a legacy thing that works with CEF3
     std::vector<CefString> frameNames;
     m_pWebView->GetFrameNames(frameNames);
 
     for (auto& name : frameNames)
     {
+#ifdef MTA_MAETRO
+        auto frame = m_pWebView->GetFrame(name);
+#else
         auto frame = m_pWebView->GetFrameByName(name);
-        frame->ExecuteJavaScript(strJSCode, "", 0);
+#endif
+        if (frame)
+            frame->ExecuteJavaScript(strJSCode, "", 0);
     }
     m_fVolume = fVolume;
     return true;
@@ -425,7 +741,7 @@ void CWebView::GetSourceCode(const std::function<void(const std::string& code)>&
     class MyStringVisitor : public CefStringVisitor
     {
     private:
-        CWebView*                               webView;
+        CefRefPtr<CWebView>                     webView;
         std::function<void(const std::string&)> callback;
 
     public:
@@ -433,11 +749,15 @@ void CWebView::GetSourceCode(const std::function<void(const std::string& code)>&
 
         virtual void Visit(const CefString& code) override
         {
+            // Check if webview is being destroyed to prevent UAF
+            if (webView->IsBeingDestroyed())
+                return;
+
             // Limit to 2MiB for now to prevent freezes (TODO: Optimize that and increase later)
             if (code.size() <= 2097152)
             {
                 // Call callback on main thread
-                g_pCore->GetWebCore()->AddEventToEventQueue(std::bind(callback, code), webView, "GetSourceCode_Visit");
+                g_pCore->GetWebCore()->AddEventToEventQueue(std::bind(callback, code), webView.get(), "GetSourceCode_Visit");
             }
         }
 
@@ -450,18 +770,23 @@ void CWebView::GetSourceCode(const std::function<void(const std::string& code)>&
 
 void CWebView::Resize(const CVector2D& size)
 {
+    // Validate render item exists
+    if (!m_pWebBrowserRenderItem) [[unlikely]]
+        return;
+
     // Resize underlying texture
     m_pWebBrowserRenderItem->Resize(size);
 
     // Send resize event to CEF
     if (m_pWebView)
         m_pWebView->GetHost()->WasResized();
-
-    ResumeCefThread();
 }
 
 CVector2D CWebView::GetSize()
 {
+    if (!m_pWebBrowserRenderItem) [[unlikely]]
+        return CVector2D(0.0f, 0.0f);
+
     return CVector2D(static_cast<float>(m_pWebBrowserRenderItem->m_uiSizeX), static_cast<float>(m_pWebBrowserRenderItem->m_uiSizeY));
 }
 
@@ -470,11 +795,16 @@ bool CWebView::GetFullPathFromLocal(SString& strPath)
     bool result = false;
 
     g_pCore->GetWebCore()->WaitForTask(
-        [&](bool aborted) {
+        [&](bool aborted)
+        {
             if (aborted)
                 return;
 
-            result = m_pEventsInterface->Events_OnResourcePathCheck(strPath);
+            auto* events = m_pEventsInterface;
+            if (!events)
+                return;
+
+            result = events->Events_OnResourcePathCheck(strPath);
         },
         this);
 
@@ -483,8 +813,8 @@ bool CWebView::GetFullPathFromLocal(SString& strPath)
 
 bool CWebView::RegisterAjaxHandler(const SString& strURL)
 {
-    auto result = m_AjaxHandlers.insert(strURL);
-    return result.second;
+    auto [iter, inserted] = m_AjaxHandlers.insert(strURL);
+    return inserted;
 }
 
 bool CWebView::UnregisterAjaxHandler(const SString& strURL)
@@ -500,8 +830,12 @@ bool CWebView::HasAjaxHandler(const SString& strURL)
 
 void CWebView::HandleAjaxRequest(const SString& strURL, CAjaxResourceHandler* pHandler)
 {
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnAjaxRequest, m_pEventsInterface, pHandler, strURL);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "AjaxResourceRequest");
+    // Only queue event if not being destroyed to prevent UAF
+    if (!m_bBeingDestroyed)
+    {
+        QueueBrowserEvent("AjaxResourceRequest",
+                          [handler = pHandler, url = strURL](CWebBrowserEventsInterface* iface) { iface->Events_OnAjaxRequest(handler, url); });
+    }
 }
 
 bool CWebView::ToggleDevTools(bool visible)
@@ -517,11 +851,16 @@ bool CWebView::VerifyFile(const SString& strPath, CBuffer& outFileData)
     bool result = false;
 
     g_pCore->GetWebCore()->WaitForTask(
-        [&](bool aborted) {
+        [&](bool aborted)
+        {
             if (aborted)
                 return;
 
-            result = m_pEventsInterface->Events_OnResourceFileCheck(strPath, outFileData);
+            auto* events = m_pEventsInterface;
+            if (!events)
+                return;
+
+            result = events->Events_OnResourceFileCheck(strPath, outFileData);
         },
         this);
 
@@ -593,41 +932,15 @@ void CWebView::Refresh(bool bIgnoreCache)
 bool CWebView::OnProcessMessageReceived(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, CefProcessId source_process,
                                         CefRefPtr<CefProcessMessage> message)
 {
+    if (m_bBeingDestroyed)
+        return false;
+
     CefRefPtr<CefListValue> argList = message->GetArgumentList();
     if (message->GetName() == "TriggerLuaEvent")
-    {
-        if (!m_bIsLocal)
-            return true;
+        return WebViewAuth::HandleTriggerLuaEvent(this, argList, m_bIsLocal);  // AUTH
 
-        // Get event name
-        CefString eventName = argList->GetString(0);
-
-        // Get number of arguments from IPC process message
-        int numArgs = argList->GetInt(1);
-
-        // Get args
-        std::vector<std::string> args;
-        for (int i = 2; i < numArgs + 2; ++i)
-        {
-            args.push_back(argList->GetString(i));
-        }
-
-        // Queue event to run on the main thread
-        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnTriggerEvent, m_pEventsInterface, SString(eventName), args);
-        g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnProcessMessageReceived1");
-
-        // The message was handled
-        return true;
-    }
     if (message->GetName() == "InputFocus")
-    {
-        // Retrieve arguments from process message
-        m_bHasInputFocus = argList->GetBool(0);
-
-        // Queue event to run on the main thread
-        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnInputFocusChanged, m_pEventsInterface, m_bHasInputFocus);
-        g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnProcessMessageReceived2");
-    }
+        return WebViewAuth::HandleInputFocus(this, argList, m_bIsLocal);  // AUTH
 
     // The message wasn't handled
     return false;
@@ -644,7 +957,7 @@ void CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
     rect.x = 0;
     rect.y = 0;
 
-    if (m_bBeingDestroyed)
+    if (m_bBeingDestroyed || !m_pWebBrowserRenderItem) [[unlikely]]
     {
         rect.width = 1;
         rect.height = 1;
@@ -681,11 +994,19 @@ void CWebView::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect)
 {
     std::lock_guard<std::mutex> lock{m_RenderData.dataMutex};
 
+    // If dimensions change, the current popup buffer is no longer valid for the new size
+    // We must release it to prevent UpdateTexture from reading past the end of the buffer
+    // using the new (larger) dimensions
+    if (m_RenderData.popupRect.width != rect.width || m_RenderData.popupRect.height != rect.height)
+    {
+        m_RenderData.popupBuffer.reset();
+    }
+
     // Update rect
     m_RenderData.popupRect = rect;
 
-    // Resize buffer
-    m_RenderData.popupBuffer.reset(new byte[rect.width * rect.height * CEF_PIXEL_STRIDE]);
+    // Note: Don't allocate buffer here - OnPaint may provide different dimensions
+    // Buffer allocation moved to OnPaint to prevent dimension mismatch
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -698,32 +1019,95 @@ void CWebView::OnPopupSize(CefRefPtr<CefBrowser> browser, const CefRect& rect)
 void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintElementType paintType, const CefRenderHandler::RectList& dirtyRects,
                        const void* buffer, int width, int height)
 {
-    if (m_bBeingDestroyed)
+    if (m_bBeingDestroyed) [[unlikely]]
         return;
 
-    std::unique_lock<std::mutex> lock(m_RenderData.dataMutex);
+    std::unique_lock lock(m_RenderData.dataMutex);
 
     // Copy popup buffer
     if (paintType == PET_POPUP)
     {
-        if (m_RenderData.popupBuffer)
+        // Validate buffer parameter from CEF
+        if (!buffer || width <= 0 || height <= 0) [[unlikely]]
+            return;
+
+        // Allocate buffer based on actual paint dimensions, not OnPopupSize rect
+        // This prevents buffer overflow when CEF provides different dimensions
+        // Check for integer overflow in size calculation: width * height * CEF_PIXEL_STRIDE must fit in size_t
+        constexpr auto maxDimension = INT_MAX / CEF_PIXEL_STRIDE;
+        if (width > maxDimension || height > maxDimension) [[unlikely]]
+            return;  // Individual dimension too large
+        if (static_cast<size_t>(width) > SIZE_MAX / (static_cast<size_t>(height) * CEF_PIXEL_STRIDE)) [[unlikely]]
+            return;  // width * height * stride would overflow
+
+        const auto requiredSize = static_cast<size_t>(width) * static_cast<size_t>(height) * CEF_PIXEL_STRIDE;
+
+        // Calculate current size safely to avoid overflow
+        size_t      currentSize = 0;
+        const auto& popupRect = m_RenderData.popupRect;
+        if (popupRect.width > 0 && popupRect.height > 0 && popupRect.width <= maxDimension && popupRect.height <= maxDimension &&
+            static_cast<size_t>(popupRect.width) <= SIZE_MAX / (static_cast<size_t>(popupRect.height) * CEF_PIXEL_STRIDE)) [[likely]]
         {
-            memcpy(m_RenderData.popupBuffer.get(), buffer, width * height * CEF_PIXEL_STRIDE);
+            currentSize = static_cast<size_t>(popupRect.width) * static_cast<size_t>(popupRect.height) * CEF_PIXEL_STRIDE;
         }
 
-        return;            // We don't have to wait as we've copied the buffer already
+        // Reallocate if size changed or buffer doesn't exist
+        if (!m_RenderData.popupBuffer || requiredSize != currentSize) [[unlikely]]
+        {
+            m_RenderData.popupBuffer = std::make_unique<byte[]>(requiredSize);
+            // Update rect to reflect actual dimensions
+            m_RenderData.popupRect.width = width;
+            m_RenderData.popupRect.height = height;
+        }
+
+        std::memcpy(m_RenderData.popupBuffer.get(), buffer, requiredSize);
+
+        return;
     }
 
-    // Store render data
-    m_RenderData.buffer = buffer;
+    // Validate main frame buffer parameter
+    if (!buffer || width <= 0 || height <= 0) [[unlikely]]
+    {
+        m_RenderData.changed = false;
+        return;
+    }
+
+    // Check for integer overflow in size calculation
+    constexpr auto maxDimension = INT_MAX / CEF_PIXEL_STRIDE;
+    if (width > maxDimension || height > maxDimension) [[unlikely]]
+    {
+        m_RenderData.changed = false;
+        return;
+    }
+
+    const auto requiredSize = static_cast<size_t>(width) * static_cast<size_t>(height) * CEF_PIXEL_STRIDE;
+    if (static_cast<size_t>(width) > SIZE_MAX / (static_cast<size_t>(height) * CEF_PIXEL_STRIDE)) [[unlikely]]
+    {
+        m_RenderData.changed = false;
+        return;
+    }
+
+    // Allocate or reallocate buffer if size changed
+    const bool bSizeChanged = !m_RenderData.buffer || m_RenderData.bufferSize != requiredSize;
+    if (bSizeChanged) [[unlikely]]
+    {
+        m_RenderData.buffer = std::make_unique<byte[]>(requiredSize);
+        m_RenderData.bufferSize = requiredSize;
+        // Zero-initialize new buffer to avoid garbage pixels in areas not painted yet
+        std::memset(m_RenderData.buffer.get(), 0, requiredSize);
+    }
+
+    // Always do a full copy from CEF's buffer
+    // CEF's buffer contains the complete frame state, and dirty rects indicate what changed
+    // However, we must copy the full buffer because:
+    // 1. Our intermediate buffer may be stale if frames were skipped
+    // 2. CEF may combine multiple
+    // 3. Partial copies can cause rendering artifacts with popups/modals
+    std::memcpy(m_RenderData.buffer.get(), buffer, requiredSize);
+
     m_RenderData.width = width;
     m_RenderData.height = height;
-    m_RenderData.dirtyRects = dirtyRects;
     m_RenderData.changed = true;
-
-    // Wait for the main thread to handle drawing the texture
-    m_RenderData.cefThreadState = ECefThreadState::Wait;
-    m_RenderData.cefThreadCv.wait(lock, [&]() { return m_RenderData.cefThreadState == ECefThreadState::Running; });
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -734,13 +1118,14 @@ void CWebView::OnPaint(CefRefPtr<CefBrowser> browser, CefRenderHandler::PaintEle
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnLoadStart(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, TransitionType transitionType)
 {
+    // Note: TransitionType parameter is deprecated in CEF3 but still required by virtual interface override
     SString strURL = UTF16ToMbUTF8(frame->GetURL());
     if (strURL == "blank")
         return;
 
     // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnLoadingStart, m_pEventsInterface, strURL, frame->IsMain());
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnLoadStart");
+    QueueBrowserEvent("OnLoadStart",
+                      [url = strURL, isMain = frame->IsMain()](CWebBrowserEventsInterface* iface) { iface->Events_OnLoadingStart(url, isMain); });
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -759,8 +1144,7 @@ void CWebView::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fram
         SString strURL = UTF16ToMbUTF8(frame->GetURL());
 
         // Queue event to run on the main thread
-        auto func = std::bind(&CWebBrowserEventsInterface::Events_OnDocumentReady, m_pEventsInterface, strURL);
-        g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnLoadEnd");
+        QueueBrowserEvent("OnLoadEnd", [url = strURL](CWebBrowserEventsInterface* iface) { iface->Events_OnDocumentReady(url); });
     }
 }
 
@@ -777,8 +1161,8 @@ void CWebView::OnLoadError(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fr
     SString strURL = UTF16ToMbUTF8(frame->GetURL());
 
     // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnLoadingFailed, m_pEventsInterface, strURL, errorCode, SString(errorText));
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnLoadError");
+    QueueBrowserEvent("OnLoadError", [url = strURL, errorCode, errorDescription = SString(errorText)](CWebBrowserEventsInterface* iface) mutable
+                      { iface->Events_OnLoadingFailed(url, errorCode, errorDescription); });
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -800,7 +1184,7 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
 
     CefURLParts urlParts;
     if (!CefParseURL(request->GetURL(), urlParts))
-        return true;            // Cancel if invalid URL (this line will normally not be executed)
+        return true;  // Cancel if invalid URL (this line will normally not be executed)
 
     bool    bResult;
     WString scheme = urlParts.scheme.str;
@@ -810,22 +1194,22 @@ bool CWebView::OnBeforeBrowse(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame>
         if (host != "mta")
         {
             if (IsLocal() || g_pCore->GetWebCore()->GetDomainState(host, true) != eURLState::WEBPAGE_ALLOWED)
-                bResult = true;            // Block remote here
+                bResult = true;  // Block remote here
             else
-                bResult = false;            // Allow
+                bResult = false;  // Allow
         }
         else
             bResult = false;
     }
     else
-        bResult = true;            // Block other schemes
+        bResult = true;  // Block other schemes
 
     // Check if we're in the browser's main frame or only a frame element of the current page
     bool bIsMainFrame = frame->IsMain();
 
     // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnNavigate, m_pEventsInterface, SString(request->GetURL()), bResult, bIsMainFrame);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnNavigate");
+    QueueBrowserEvent("OnNavigate", [url = SString(request->GetURL()), blocked = bResult, isMain = bIsMainFrame](CWebBrowserEventsInterface* iface) mutable
+                      { iface->Events_OnNavigate(url, blocked, isMain); });
 
     // Return execution to CEF
     return bResult;
@@ -844,7 +1228,7 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
     // Mostly the same as CWebView::OnBeforeBrowse
     CefURLParts urlParts;
     if (!CefParseURL(request->GetURL(), urlParts))
-        return RV_CANCEL;            // Cancel if invalid URL (this line will normally not be executed)
+        return RV_CANCEL;  // Cancel if invalid URL (this line will normally not be executed)
 
     SString domain = UTF16ToMbUTF8(urlParts.host.str);
 
@@ -870,6 +1254,10 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
 
             request->SetHeaderMap(headerMap);
         }
+
+        // Fix youtube embed (#4531)
+        if (domain == "www.youtube.com" && UTF16ToMbUTF8(urlParts.path.str).find("/embed") == 0)
+            request->SetReferrer("https://mtasa.com/", REFERRER_POLICY_ORIGIN);
     }
 
     WString scheme = urlParts.scheme.str;
@@ -878,17 +1266,18 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
         if (domain != "mta")
         {
             if (IsLocal())
-                return RV_CANCEL;            // Block remote requests in local mode generally
+                return RV_CANCEL;  // Block remote requests in local mode generally
 
             eURLState urlState = g_pCore->GetWebCore()->GetDomainState(domain, true);
             if (urlState != eURLState::WEBPAGE_ALLOWED)
             {
                 // Trigger onClientBrowserResourceBlocked event
-                auto func = std::bind(&CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString(request->GetURL()), domain,
-                                      urlState == eURLState::WEBPAGE_NOT_LISTED ? 0 : 1);
-                g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnResourceBlocked");
+                QueueBrowserEvent(
+                    "OnResourceBlocked",
+                    [url = SString(request->GetURL()), domain, reason = static_cast<unsigned char>(urlState == eURLState::WEBPAGE_NOT_LISTED ? 0 : 1)](
+                        CWebBrowserEventsInterface* iface) mutable { iface->Events_OnResourceBlocked(url, domain, reason); });
 
-                return RV_CANCEL;            // Block if explicitly forbidden
+                return RV_CANCEL;  // Block if explicitly forbidden
             }
 
             // Allow
@@ -903,9 +1292,8 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
     }
 
     // Trigger onClientBrowserResourceBlocked event
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnResourceBlocked, m_pEventsInterface, SString(request->GetURL()), "",
-                          2);            // reason 1 := blocked protocol scheme
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnResourceBlocked");
+    QueueBrowserEvent("OnResourceBlocked",
+                      [url = SString(request->GetURL())](CWebBrowserEventsInterface* iface) mutable { iface->Events_OnResourceBlocked(url, "", 2); });
 
     // Block everything else
     return RV_CANCEL;
@@ -920,13 +1308,16 @@ CefResourceRequestHandler::ReturnValue CWebView::OnBeforeResourceLoad(CefRefPtr<
 void CWebView::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 {
     // Remove events owned by this webview and invoke left callbacks
-    g_pCore->GetWebCore()->RemoveWebViewEvents(this);
+    if (auto pWebCore = g_pCore->GetWebCore(); pWebCore) [[likely]]
+    {
+        pWebCore->RemoveWebViewEvents(this);
+
+        // Remove focused web view reference
+        if (pWebCore->GetFocusedWebView() == this)
+            pWebCore->SetFocusedWebView(nullptr);
+    }
 
     m_pWebView = nullptr;
-
-    // Remove focused web view reference
-    if (g_pCore->GetWebCore()->GetFocusedWebView() == this)
-        g_pCore->GetWebCore()->SetFocusedWebView(nullptr);
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -936,10 +1327,17 @@ void CWebView::OnBeforeClose(CefRefPtr<CefBrowser> browser)
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
+#ifdef MTA_MAETRO
+bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, const CefString& target_url, const CefString& target_frame_name,
+                             CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture, const CefPopupFeatures& popupFeatures,
+                             CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings, CefRefPtr<CefDictionaryValue>& extra_info,
+                             bool* no_javascript_access)
+#else
 bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> frame, int popup_id, const CefString& target_url,
                              const CefString& target_frame_name, CefLifeSpanHandler::WindowOpenDisposition target_disposition, bool user_gesture,
                              const CefPopupFeatures& popupFeatures, CefWindowInfo& windowInfo, CefRefPtr<CefClient>& client, CefBrowserSettings& settings,
                              CefRefPtr<CefDictionaryValue>& extra_info, bool* no_javascript_access)
+#endif
 {
     // ATTENTION: This method is called on the IO thread
 
@@ -948,8 +1346,8 @@ bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
     SString strOpenerURL = UTF16ToMbUTF8(frame->GetURL());
 
     // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnPopup, m_pEventsInterface, strTagetURL, strOpenerURL);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnBeforePopup");
+    QueueBrowserEvent("OnBeforePopup",
+                      [target = strTagetURL, opener = strOpenerURL](CWebBrowserEventsInterface* iface) { iface->Events_OnPopup(target, opener); });
 
     // Block popups generally
     return true;
@@ -963,12 +1361,42 @@ bool CWebView::OnBeforePopup(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> 
 ////////////////////////////////////////////////////////////////////
 void CWebView::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 {
+    if (m_bBeingDestroyed)
+    {
+        browser->GetHost()->CloseBrowser(true);
+        return;
+    }
+
     // Set web view reference
     m_pWebView = browser;
 
+    // Sync host visibility with the stored rendering state. This prevents
+    // newly created browsers from becoming permanently hidden when pause
+    // state changes race against async host creation.
+    m_pWebView->GetHost()->WasHidden(m_bIsRenderingPaused);
+
+    // Force an initial repaint to populate the texture even for pages that
+    // become visually static immediately after load.
+    m_pWebView->GetHost()->Invalidate(PET_VIEW);
+
+    // If we have a pending URL from lazy loading, load it now
+    if (!m_strPendingURL.empty())
+    {
+        SString pendingURL = m_strPendingURL;
+        bool    filterEnabled = m_bPendingURLFilterEnabled;
+        SString postData = m_strPendingPostData;
+        bool    urlEncoded = m_bPendingURLEncoded;
+
+        // Clear pending state before loading to prevent recursion
+        m_strPendingURL.clear();
+        m_strPendingPostData.clear();
+
+        // Load the pending URL
+        LoadURL(pendingURL, filterEnabled, postData, urlEncoded);
+    }
+
     // Call created event callback
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnCreated, m_pEventsInterface);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnAfterCreated");
+    QueueBrowserEvent("OnAfterCreated", [](CWebBrowserEventsInterface* iface) { iface->Events_OnCreated(); });
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -996,9 +1424,14 @@ bool CWebView::OnJSDialog(CefRefPtr<CefBrowser> browser, const CefString& origin
 // //
 //                                                                //
 ////////////////////////////////////////////////////////////////////
+#ifdef MTA_MAETRO
+bool CWebView::OnFileDialog(CefRefPtr<CefBrowser> browser, CefDialogHandler::FileDialogMode mode, const CefString& title, const CefString& default_file_path,
+                            const std::vector<CefString>& accept_filters, CefRefPtr<CefFileDialogCallback> callback)
+#else
 bool CWebView::OnFileDialog(CefRefPtr<CefBrowser> browser, FileDialogMode mode, const CefString& title, const CefString& default_file_path,
-        const std::vector<CefString>& accept_filters, const std::vector<CefString>& accept_extensions, const std::vector<CefString>& accept_descriptions,
-        CefRefPtr<CefFileDialogCallback> callback)
+                            const std::vector<CefString>& accept_filters, const std::vector<CefString>& accept_extensions,
+                            const std::vector<CefString>& accept_descriptions, CefRefPtr<CefFileDialogCallback> callback)
+#endif
 {
     // Don't show the dialog
     return true;
@@ -1024,8 +1457,7 @@ void CWebView::OnTitleChange(CefRefPtr<CefBrowser> browser, const CefString& tit
 bool CWebView::OnTooltip(CefRefPtr<CefBrowser> browser, CefString& title)
 {
     // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnTooltip, m_pEventsInterface, UTF16ToMbUTF8(title));
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnTooltip");
+    QueueBrowserEvent("OnTooltip", [tooltip = UTF16ToMbUTF8(title)](CWebBrowserEventsInterface* iface) mutable { iface->Events_OnTooltip(tooltip); });
 
     return true;
 }
@@ -1039,14 +1471,14 @@ bool CWebView::OnTooltip(CefRefPtr<CefBrowser> browser, CefString& title)
 ////////////////////////////////////////////////////////////////////
 bool CWebView::OnConsoleMessage(CefRefPtr<CefBrowser> browser, cef_log_severity_t level, const CefString& message, const CefString& source, int line)
 {
+    // Note: cef_log_severity_t parameter is deprecated in CEF3 but required for virtual override
     // Redirect console message to debug window (if development mode is enabled)
     if (g_pCore->GetWebCore()->IsTestModeEnabled())
     {
         g_pCore->GetWebCore()->AddEventToEventQueue(
-            [message, source]() {
-                g_pCore->DebugPrintfColor("[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8(message).c_str(), UTF16ToMbUTF8(source).c_str());
-            },
-            this, "OnConsoleMessage");
+            [message, source]()
+            { g_pCore->DebugPrintfColor("[BROWSER] Console: %s (%s)", 255, 0, 0, UTF16ToMbUTF8(message).c_str(), UTF16ToMbUTF8(source).c_str()); }, this,
+            "OnConsoleMessage");
     }
 
     return true;
@@ -1064,8 +1496,7 @@ bool CWebView::OnCursorChange(CefRefPtr<CefBrowser> browser, CefCursorHandle cur
     unsigned char cursorIndex = static_cast<unsigned char>(type);
 
     // Queue event to run on the main thread
-    auto func = std::bind(&CWebBrowserEventsInterface::Events_OnChangeCursor, m_pEventsInterface, cursorIndex);
-    g_pCore->GetWebCore()->AddEventToEventQueue(func, this, "OnCursorChange");
+    QueueBrowserEvent("OnCursorChange", [cursorIndex](CWebBrowserEventsInterface* iface) { iface->Events_OnChangeCursor(cursorIndex); });
 
     return false;
 }
@@ -1082,15 +1513,4 @@ void CWebView::OnBeforeContextMenu(CefRefPtr<CefBrowser> browser, CefRefPtr<CefF
 {
     // Show no context menu
     model->Clear();
-}
-
-void CWebView::ResumeCefThread()
-{
-    {
-        // It's recommended to unlock a mutex before the cv notifying to avoid a possible pessimization
-        std::unique_lock<std::mutex> lock(m_RenderData.dataMutex);
-        m_RenderData.cefThreadState = ECefThreadState::Running;
-    }
-
-    m_RenderData.cefThreadCv.notify_all();
 }

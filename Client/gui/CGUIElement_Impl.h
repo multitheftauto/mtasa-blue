@@ -14,18 +14,21 @@
 #include <gui/CGUIElement.h>
 
 #include <list>
+#include <cstdint>
 
 namespace CEGUI
 {
     class Window;
     class EventArgs;
-}            // namespace CEGUI
+}  // namespace CEGUI
 class CGUI_Impl;
 
 class CGUIElement_Impl : public CGUIElement
 {
 public:
     CGUIElement_Impl();
+
+    void SetManager(CGUI_Impl* pManager);
 
     void SetVisible(bool bVisible);
     bool IsVisible();
@@ -90,7 +93,10 @@ public:
     void         SetParent(CGUIElement* pParent);
     CGUIElement* GetParent();
 
-    CEGUI::Window* GetWindow();
+    CEGUI::Window* GetWindow() const { return m_pWindow; }
+    CGUI_Impl*     GetManager() const { return m_pManager; }
+    std::uint32_t  GetRedrawHandle() const { return m_redrawHandle; }
+    void           UnregisterFromRedrawQueue();
 
     void ForceRedraw();
 
@@ -140,6 +146,8 @@ protected:
 
     CGUI_Impl* m_pManager;
 
+    std::uint32_t m_redrawHandle;
+
     void* m_pData;
 
     std::list<CGUIProperty*> m_Properties;
@@ -158,4 +166,20 @@ protected:
 
     GUI_CALLBACK_MOUSE m_OnClickWithArgs;
     GUI_CALLBACK_KEY   m_OnKeyDownWithArgs;
+};
+
+class CGUIDefaultWindow_Impl : public CGUIElement_Impl
+{
+public:
+    CGUIDefaultWindow_Impl(CGUI_Impl* gui, CEGUI::Window* window)
+    {
+        SetManager(gui);
+        m_pWindow = window;
+        if (m_pWindow)
+            m_pWindow->setUserData(reinterpret_cast<void*>(this));
+    }
+
+    virtual ~CGUIDefaultWindow_Impl() { DestroyElement(); }
+
+    eCGUIType GetType() override { return CGUI_WINDOW; }
 };

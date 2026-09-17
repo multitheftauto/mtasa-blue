@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaWaterDefs::LoadFunctions()
 {
@@ -41,14 +42,14 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "createWater");
     lua_classfunction(luaVM, "testLineAgainst", "testLineAgainstWater");
-    lua_classfunction(luaVM, "isDrawnLast", "isWaterDrawnLast");            // Drawn last property affects all water instances
+    lua_classfunction(luaVM, "isDrawnLast", "isWaterDrawnLast");  // Drawn last property affects all water instances
     lua_classfunction(luaVM, "setDrawnLast", "setWaterDrawnLast");
 
     // Static variables (not implemented yet!)
     // lua_classvariable ( luaVM, "drawnLast", "setWaterDrawnLast", "isWaterDrawnLast" );
 
     lua_classfunction(luaVM, "getLevel", "getWaterLevel");
-    lua_classfunction(luaVM, "getVertexPosition", "getWaterVertexPosition");
+    lua_classfunction(luaVM, "getVertexPosition", ArgumentParserWarn<false, OOP_GetWaterVertexPosition>);
     lua_classfunction(luaVM, "getWaveHeight", "getWaveHeight");
     lua_classfunction(luaVM, "getColor", "getWaterColor");
 
@@ -80,7 +81,7 @@ int CLuaWaterDefs::CreateWater(lua_State* luaVM)
     argStream.ReadVector3D(v1);
     argStream.ReadVector3D(v2);
     argStream.ReadVector3D(v3);
-    bool bIsQuad = argStream.NextCouldBeNumber(2);            // Check for existence of v4.fZ
+    bool bIsQuad = argStream.NextCouldBeNumber(2);  // Check for existence of v4.fZ
     if (bIsQuad)
     {
         argStream.ReadVector3D(v4);
@@ -427,4 +428,18 @@ int CLuaWaterDefs::GetWaterVertexPosition(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> CLuaWaterDefs::OOP_GetWaterVertexPosition(lua_State* luaVM, CClientWater* water,
+                                                                                                            int vertexIndex)
+{
+    CVector vecPosition;
+    if (!CStaticFunctionDefinitions::GetWaterVertexPosition(water, vertexIndex, vecPosition))
+        return false;
+
+    // Keep returning three floats when the caller assigns three results
+    if (lua_ncallresult(luaVM) == 3)
+        return CLuaMultiReturn<float, float, float>(vecPosition.fX, vecPosition.fY, vecPosition.fZ);
+
+    return vecPosition;
 }

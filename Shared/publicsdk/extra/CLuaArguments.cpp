@@ -98,7 +98,7 @@ bool CLuaArguments::Call(lua_State* luaVM, const char* szFunction) const
     if (iret == LUA_ERRRUN || iret == LUA_ERRMEM)
     {
         const char* szRes = lua_tostring(luaVM, -1);
-        return false;            // the function call failed
+        return false;  // the function call failed
     }
 
     return true;

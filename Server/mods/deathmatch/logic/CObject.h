@@ -106,9 +106,9 @@ private:
 protected:
     bool m_bCollisionsEnabled;
 
-    const bool            m_bIsLowLod;                    // true if this object is low LOD
-    CObject*              m_pLowLodObject;                // Pointer to low LOD version of this object
-    std::vector<CObject*> m_HighLodObjectList;            // List of objects that use this object as a low LOD version
+    const bool            m_bIsLowLod;          // true if this object is low LOD
+    CObject*              m_pLowLodObject;      // Pointer to low LOD version of this object
+    std::vector<CObject*> m_HighLodObjectList;  // List of objects that use this object as a low LOD version
 
 public:
     CPositionRotationAnimation* m_pMoveAnimation;

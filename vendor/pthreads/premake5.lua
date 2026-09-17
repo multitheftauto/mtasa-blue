@@ -3,6 +3,7 @@ project "pthread"
 	kind "SharedLib"
 	targetname "pthread"
 	targetdir(buildpath("server"))
+	warnings "Off"
 
 	includedirs {
 		"include"

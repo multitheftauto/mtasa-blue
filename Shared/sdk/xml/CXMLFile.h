@@ -22,7 +22,7 @@ class CXMLNode;
 class CXMLFile : public CXMLCommon
 {
 public:
-    virtual ~CXMLFile(){};
+    virtual ~CXMLFile() {};
 
     virtual const char* GetFilename() = 0;
     virtual void        SetFilename(const char* szFilename) = 0;

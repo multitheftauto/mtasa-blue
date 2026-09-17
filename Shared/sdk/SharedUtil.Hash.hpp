@@ -13,6 +13,10 @@
 #include "sha2.hpp"
 #include <random>
 #include <algorithm>
+#include <memory>
+#include <climits>
+#include <cstdint>
+#include <cstdlib>
 #include "SharedUtil.Hash.h"
 #include "SharedUtil.File.h"
 
@@ -20,64 +24,71 @@ namespace bcrypt
 {
     extern "C"
     {
-        #include <bcrypt/ow-crypt.h>
+#include <bcrypt/ow-crypt.h>
     }
-}            // namespace bcrypt
+}  // namespace bcrypt
 
 namespace SharedUtil
 {
-    #define S11 7
-    #define S12 12
-    #define S13 17
-    #define S14 22
-    #define S21 5
-    #define S22 9
-    #define S23 14
-    #define S24 20
-    #define S31 4
-    #define S32 11
-    #define S33 16
-    #define S34 23
-    #define S41 6
-    #define S42 10
-    #define S43 15
-    #define S44 21
+#define S11 7
+#define S12 12
+#define S13 17
+#define S14 22
+#define S21 5
+#define S22 9
+#define S23 14
+#define S24 20
+#define S31 4
+#define S32 11
+#define S33 16
+#define S34 23
+#define S41 6
+#define S42 10
+#define S43 15
+#define S44 21
 
-    CMD5Hasher::CMD5Hasher() {}
+    CMD5Hasher::CMD5Hasher()
+    {
+    }
 
-    CMD5Hasher::~CMD5Hasher() {}
+    CMD5Hasher::~CMD5Hasher()
+    {
+    }
 
     bool CMD5Hasher::Calculate(const char* szFilename, MD5& md5Result)
     {
-        // CRYPT_START
-        // Try to load the file
-        FILE* pFile = File::Fopen(szFilename, "rb");
+        FILE* pFile = File::FopenExclusive(szFilename, "rb");
         if (pFile)
         {
-            // Init
             Init();
 
-            // Hash it
-            unsigned char Buffer[65536];
-            while (unsigned int uiRead = static_cast<unsigned int>(fread(Buffer, 1, 65536, pFile)))
+            constexpr size_t bufferSize = 65536;
+            unsigned char    Buffer[bufferSize];
+            while (true)
             {
-                Update(Buffer, uiRead);
+                size_t bytesRead = fread(Buffer, 1, bufferSize, pFile);
+                if (bytesRead == 0)
+                {
+                    if (ferror(pFile))
+                    {
+                        fclose(pFile);
+                        errno = EIO;
+                        return false;
+                    }
+                    break;
+                }
+                Update(Buffer, static_cast<unsigned int>(bytesRead));
             }
 
-            // Finalize
             Finalize();
 
-            // Close it
             fclose(pFile);
 
-            // Success
             memcpy(md5Result.data, m_digest, 16);
             return true;
         }
 
-        // Failed
         return false;
-        // CRYPT_END
     }
 
     bool CMD5Hasher::Calculate(const void* pBuffer, size_t sizeLength, MD5& md5Result)
@@ -147,7 +158,7 @@ namespace SharedUtil
     {
         // CRYPT_START
         unsigned int input_index, buffer_index;
-        unsigned int buffer_space;            // how much space is left in buffer
+        unsigned int buffer_space;  // how much space is left in buffer
 
         // Compute number of bytes mod 64
         buffer_index = (unsigned int)((m_count[0] >> 3) & 0x3F);
@@ -160,10 +171,10 @@ namespace SharedUtil
 
         m_count[1] += ((unsigned int)input_length >> 29);
 
-        buffer_space = 64 - buffer_index;            // how much space is left in buffer
+        buffer_space = 64 - buffer_index;  // how much space is left in buffer
 
         // Transform as many times as possible.
-        if (input_length >= buffer_space)            // ie. we have enough to fill the buffer
+        if (input_length >= buffer_space)  // ie. we have enough to fill the buffer
         {
             // fill the rest of the buffer and transform
             memcpy(m_buffer + buffer_index, input, buffer_space);
@@ -175,11 +186,11 @@ namespace SharedUtil
                 Transform(input + input_index);
             }
 
-            buffer_index = 0;            // so we can buffer remaining
+            buffer_index = 0;  // so we can buffer remaining
         }
         else
         {
-            input_index = 0;            // so we can buffer the whole input
+            input_index = 0;  // so we can buffer the whole input
         }
 
         // and here we do the buffering:
@@ -212,7 +223,10 @@ namespace SharedUtil
         memset(m_buffer, 0, sizeof(m_buffer));
     }
 
-    const unsigned char* CMD5Hasher::GetResult() const { return m_digest; }
+    const unsigned char* CMD5Hasher::GetResult() const
+    {
+        return m_digest;
+    }
 
     void CMD5Hasher::Transform(unsigned char block[64])
     {
@@ -323,15 +337,30 @@ namespace SharedUtil
                 ((unsigned int)input[j]) | (((unsigned int)input[j + 1]) << 8) | (((unsigned int)input[j + 2]) << 16) | (((unsigned int)input[j + 3]) << 24);
     }
 
-    inline unsigned int CMD5Hasher::RotateLeft(unsigned int x, unsigned int n) { return (x << n) | (x >> (32 - n)); }
+    inline unsigned int CMD5Hasher::RotateLeft(unsigned int x, unsigned int n)
+    {
+        return (x << n) | (x >> (32 - n));
+    }
 
-    inline unsigned int CMD5Hasher::F(unsigned int x, unsigned int y, unsigned int z) { return (x & y) | (~x & z); }
+    inline unsigned int CMD5Hasher::F(unsigned int x, unsigned int y, unsigned int z)
+    {
+        return (x & y) | (~x & z);
+    }
 
-    inline unsigned int CMD5Hasher::G(unsigned int x, unsigned int y, unsigned int z) { return (x & z) | (y & ~z); }
+    inline unsigned int CMD5Hasher::G(unsigned int x, unsigned int y, unsigned int z)
+    {
+        return (x & z) | (y & ~z);
+    }
 
-    inline unsigned int CMD5Hasher::H(unsigned int x, unsigned int y, unsigned int z) { return x ^ y ^ z; }
+    inline unsigned int CMD5Hasher::H(unsigned int x, unsigned int y, unsigned int z)
+    {
+        return x ^ y ^ z;
+    }
 
-    inline unsigned int CMD5Hasher::I(unsigned int x, unsigned int y, unsigned int z) { return y ^ (x | ~z); }
+    inline unsigned int CMD5Hasher::I(unsigned int x, unsigned int y, unsigned int z)
+    {
+        return y ^ (x | ~z);
+    }
 
     inline void CMD5Hasher::FF(unsigned int& a, unsigned int b, unsigned int c, unsigned int d, unsigned int x, unsigned int s, unsigned int ac)
     {
@@ -361,18 +390,21 @@ namespace SharedUtil
     // Implementation of Bob Jenkin's awesome hash function
     // Ref: https://burtleburtle.net/bob/hash/doobs.html
     //
-    unsigned int HashString(const char* szString) { return HashString(szString, (unsigned int)strlen(szString)); }
+    unsigned int HashString(const char* szString)
+    {
+        return HashString(szString, (unsigned int)strlen(szString));
+    }
 
     unsigned int HashString(const char* szString, unsigned int length)
     {
-        const char*  k;                  //< pointer to the string data to be hashed
-        unsigned int a, b, c;            //< temporary variables
-        unsigned int len;                //< length of the string left
+        const char*  k;        //< pointer to the string data to be hashed
+        unsigned int a, b, c;  //< temporary variables
+        unsigned int len;      //< length of the string left
 
         k = szString;
         len = length;
         a = b = 0x9e3779b9;
-        c = 0xabcdef89;            // initval, arbitrarily set
+        c = 0xabcdef89;  // initval, arbitrarily set
 
         while (len >= 12)
         {
@@ -416,7 +448,7 @@ namespace SharedUtil
         // Handle the last 11 remaining bytes
         // Note: All cases fall through
 
-        c += length;            // Lower byte of c gets used for length
+        c += length;  // Lower byte of c gets used for length
 
         switch (len)
         {
@@ -545,20 +577,32 @@ namespace SharedUtil
             if (c < 16)
             {
                 if ((i & 1) == 0)
-                    pOutput[i / 2] = (c << 4);            // First nibble
+                    pOutput[i / 2] = (c << 4);  // First nibble
                 else
-                    pOutput[i / 2] |= c;            // Second nibble
+                    pOutput[i / 2] |= c;  // Second nibble
             }
         }
     }
 
-    void GenerateSha256(const void* pData, uint uiLength, uchar output[32]) { sha256((const uchar*)pData, uiLength, output); }
+    void GenerateSha256(const void* pData, uint uiLength, uchar output[32])
+    {
+        sha256((const uchar*)pData, uiLength, output);
+    }
 
-    SString GenerateSha256HexString(const void* pData, uint uiLength) { return GenerateHashHexString(EHashFunction::SHA256, pData, uiLength); }
+    SString GenerateSha256HexString(const void* pData, uint uiLength)
+    {
+        return GenerateHashHexString(EHashFunction::SHA256, pData, uiLength);
+    }
 
-    SString GenerateSha256HexString(const SString& strData) { return GenerateHashHexString(EHashFunction::SHA256, strData); }
+    SString GenerateSha256HexString(const SString& strData)
+    {
+        return GenerateHashHexString(EHashFunction::SHA256, strData);
+    }
 
-    SString GenerateSha256HexStringFromFile(const SString& strFilename) { return GenerateHashHexStringFromFile(EHashFunction::SHA256, strFilename); }
+    SString GenerateSha256HexStringFromFile(const SString& strFilename)
+    {
+        return GenerateHashHexStringFromFile(EHashFunction::SHA256, strFilename);
+    }
 
     SString GenerateHashHexString(EHashFunctionType hashFunction, const void* pData, uint uiLength)
     {
@@ -749,20 +793,38 @@ namespace SharedUtil
             k[i] = keybuffer[i];
 
         // Copy the input string to a buffer of size multiple of 4
-        int strbuflen = str.length();
-        if (strbuflen == 0)
+        if (str.length() == 0 || str.length() > static_cast<size_t>(INT_MAX - 4))
             return;
+        int strbuflen = static_cast<int>(str.length());
         if ((strbuflen % 4) > 0)
             strbuflen += 4 - (strbuflen % 4);
-        unsigned char* strbuf = new unsigned char[strbuflen];
-        memset(strbuf, 0, strbuflen);
-        memcpy(strbuf, str.c_str(), str.length());
+
+        // Use malloc to probe if allocation would succeed, bypassing MTA's custom OOM handler
+        // (which uses non-continuable SEH exceptions). Unlike new, malloc does not invoke _set_new_handler.
+        // Probe for working buffer (strbuflen) + output string with capacity headroom (2 * (strbuflen + 4))
+        // to account for std::string's capacity doubling behavior during repeated appends.
+        constexpr size_t kMaxProbeSize = SIZE_MAX / 3 - 8;
+        if (static_cast<size_t>(strbuflen) > kMaxProbeSize)
+            return;
+
+        size_t totalProbeSize = static_cast<size_t>(strbuflen) * 3 + 8;
+        void*  probe = std::malloc(totalProbeSize);
+        if (!probe)
+            return;
+        std::free(probe);
+
+        std::unique_ptr<unsigned char, decltype(&std::free)> strbuf(static_cast<unsigned char*>(std::malloc(strbuflen)), &std::free);
+        if (!strbuf)
+            return;
+
+        memset(strbuf.get(), 0, strbuflen);
+        memcpy(strbuf.get(), str.c_str(), str.length());
 
         // Encode it!
         v[1] = 0;
         for (int i = 0; i < strbuflen; i += 4)
         {
-            v[0] = *(unsigned int*)&strbuf[i];
+            v[0] = *(unsigned int*)&strbuf.get()[i];
 
             encodeXtea(&v[0], &w[0], &k[0]);
             out->append((char*)&w[0], 4);
@@ -770,8 +832,6 @@ namespace SharedUtil
             v[1] = w[1];
         }
         out->append((char*)&v[1], 4);
-
-        delete[] strbuf;
     }
 
     void TeaDecode(const SString& str, const SString& key, SString* out)
@@ -789,7 +849,9 @@ namespace SharedUtil
         out->clear();
 
         // Count the number of passes that we need
-        int numBlocks = str.length() / 4;
+        if (str.length() > static_cast<size_t>(INT_MAX))
+            return;
+        int numBlocks = static_cast<int>(str.length() / 4);
         int numPasses = numBlocks - 1;
 
         if (numPasses <= 0)
@@ -803,9 +865,25 @@ namespace SharedUtil
         for (int i = 0; i < 4; ++i)
             k[i] = keybuffer[i];
 
-        // Create a temporary buffer to store the result
-        unsigned char* buffer = new unsigned char[numPasses * 4 + 4];
-        memset(buffer, 0, numPasses * 4 + 4);
+        // Use malloc to probe if allocation would succeed, bypassing MTA's custom OOM handler
+        // (which uses non-continuable SEH exceptions). Unlike new, malloc does not invoke _set_new_handler.
+        // Probe for working buffer (numPasses * 4 + 4) + output string (numPasses * 4) to cover out->assign() allocation.
+        constexpr size_t kMaxNumPasses = (SIZE_MAX - 4) / 8;
+        if (static_cast<size_t>(numPasses) > kMaxNumPasses)
+            return;
+
+        size_t workingSize = static_cast<size_t>(numPasses) * 4 + 4;
+        size_t outputSize = static_cast<size_t>(numPasses) * 4;
+        void*  probe = std::malloc(workingSize + outputSize);
+        if (!probe)
+            return;
+        std::free(probe);
+
+        std::unique_ptr<unsigned char, decltype(&std::free)> buffer(static_cast<unsigned char*>(std::malloc(workingSize)), &std::free);
+        if (!buffer)
+            return;
+
+        memset(buffer.get(), 0, workingSize);
 
         // Decode it!
         const char* p = str.c_str();
@@ -814,11 +892,10 @@ namespace SharedUtil
         {
             v[0] = *(unsigned int*)&p[(numPasses - i - 1) * 4];
             decodeXtea(&v[0], &w[0], &k[0]);
-            *(unsigned int*)&buffer[(numPasses - i - 1) * 4] = w[0];
+            *(unsigned int*)&buffer.get()[(numPasses - i - 1) * 4] = w[0];
             v[1] = w[1];
         }
 
-        out->assign((char*)buffer, numPasses * 4);
-        delete[] buffer;
+        out->assign((char*)buffer.get(), numPasses * 4);
     }
-}            // namespace SharedUtil
+}  // namespace SharedUtil

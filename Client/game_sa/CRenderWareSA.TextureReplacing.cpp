@@ -106,7 +106,7 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
         {
             pReplacementTextures->textures[i]->txd = NULL;
             if (bFilteringEnabled)
-                pReplacementTextures->textures[i]->flags = 0x1102;            // Enable filtering (otherwise textures are pixely)
+                pReplacementTextures->textures[i]->flags = 0x1102;  // Enable filtering (otherwise textures are pixely)
         }
 
         // Make the txd forget it has any textures and destroy it
@@ -146,7 +146,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
     // Already done for this txd?
     if (ListContains(pReplacementTextures->usedInTxdIds, pInfo->usTxdId))
-        return true;            // Return true as model may need restreaming
+        return true;  // Return true as model may need restreaming
 
     //
     // Add section for this txd
@@ -255,7 +255,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         if (pInfo->usedByReplacements.empty())
         {
             // txd should now contain the same textures as 'originalTextures'
-        #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
             std::vector<RwTexture*> currentTextures;
             GetTxdTextures(currentTextures, pInfo->pTxd);
             assert(currentTextures.size() == pInfo->originalTextures.size());
@@ -269,7 +269,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
 
             int32_t refsCount = CTxdStore_GetNumRefs(pInfo->usTxdId);
             assert(refsCount > 0 && "Should have at least one TXD reference here");
-        #endif
+#endif
             // Remove info
             CTxdStore_RemoveRef(pInfo->usTxdId);
             MapRemove(ms_ModelTexturesInfoMap, usTxdId);

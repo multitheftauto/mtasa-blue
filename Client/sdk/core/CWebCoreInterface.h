@@ -50,6 +50,7 @@ class CWebCoreInterface
 public:
     virtual ~CWebCoreInterface() {}
     virtual bool Initialise(bool gpuEnabled) = 0;
+    virtual bool IsInitialised() const noexcept = 0;
 
     virtual CWebViewInterface* CreateWebView(unsigned int uiWidth, unsigned int uiHeight, bool bIsLocal, CWebBrowserItem* pWebBrowserRenderItem,
                                              bool bTransparent) = 0;
@@ -84,6 +85,8 @@ public:
 
     virtual void OnPreScreenshot() = 0;
     virtual void OnPostScreenshot() = 0;
+
+    virtual void OnFPSLimitChange(std::uint16_t fps) = 0;
 
     virtual bool SetGlobalAudioVolume(float fVolume) = 0;
 

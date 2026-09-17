@@ -17,11 +17,13 @@ CColModelSA::CColModelSA()
     m_pInterface = new CColModelSAInterface;
     DWORD dwThis = (DWORD)m_pInterface;
     DWORD dwFunc = FUNC_CColModel_Constructor;
+    // clang-format off
     __asm
     {
         mov     ecx, dwThis
         call    dwFunc
     }
+    // clang-format on
     m_bDestroyInterface = true;
 }
 
@@ -37,11 +39,13 @@ CColModelSA::~CColModelSA()
     {
         DWORD dwThis = (DWORD)m_pInterface;
         DWORD dwFunc = FUNC_CColModel_Destructor;
+        // clang-format off
         __asm
         {
             mov     ecx, dwThis
             call    dwFunc
         }
+        // clang-format on
         delete m_pInterface;
     }
 }

@@ -18,9 +18,9 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
 {
     //  var getElementData ( element theElement, string key [, inherit = true] )
 
-    CElement* pElement;
+    CElement*   pElement;
     CStringName key;
-    bool      bInherit;
+    bool        bInherit;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
@@ -42,9 +42,9 @@ int CLuaElementDefs::GetElementData(lua_State* luaVM)
             }
 
 #ifdef MTA_CLIENT
-            CLuaArgument* pVariable = pElement->GetCustomData(key.ToCString(), bInherit);
+            CLuaArgument* pVariable = pElement->GetCustomData(key, bInherit);
 #else
-            CLuaArgument* pVariable = CStaticFunctionDefinitions::GetElementData(pElement, key.ToCString(), bInherit);
+            CLuaArgument* pVariable = CStaticFunctionDefinitions::GetElementData(pElement, key, bInherit);
 #endif
             if (pVariable)
             {
@@ -72,9 +72,9 @@ int CLuaElementDefs::HasElementData(lua_State* luaVM)
 {
     //  bool hasElementData ( element theElement, string key [, bool inherit = true ] )
 
-    CElement* pElement;
+    CElement*   pElement;
     CStringName key;
-    bool      bInherit;
+    bool        bInherit;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);

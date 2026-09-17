@@ -11,6 +11,7 @@
  *****************************************************************************/
 #include <StdInc.h>
 #include "CPrimitive3DBatcher.h"
+#include "DXHook/CProxyDirect3DDevice9.h"
 ////////////////////////////////////////////////////////////////
 //
 // CPrimitive3DBatcher::CPrimitive3DBatcher
@@ -20,6 +21,11 @@
 ////////////////////////////////////////////////////////////////
 CPrimitive3DBatcher::CPrimitive3DBatcher(bool bPreGUI) : m_bPreGUI(bPreGUI)
 {
+}
+
+CPrimitive3DBatcher::~CPrimitive3DBatcher()
+{
+    ClearQueue();
 }
 ////////////////////////////////////////////////////////////////
 //
@@ -97,13 +103,8 @@ void CPrimitive3DBatcher::Flush()
         DrawPrimitive(primitive.eType, primitive.pVecVertices->size(), &primitive.pVecVertices->at(0), VertexStreamZeroStride);
     }
 
-    // Clean up
-    for (auto& primitive : m_primitiveList)
-    {
-        delete primitive.pVecVertices;
-    }
-
-    m_primitiveList.clear();
+    // Clean up queued primitives now that they are flushed
+    ClearQueue();
 
     if (g_pDeviceState->AdapterState.bRequiresClipping)
         m_pDevice->SetRenderState(D3DRS_CLIPPING, FALSE);
@@ -155,4 +156,15 @@ void CPrimitive3DBatcher::DrawPrimitive(D3DPRIMITIVETYPE eType, size_t iCollecti
 void CPrimitive3DBatcher::AddPrimitive(D3DPRIMITIVETYPE eType, std::vector<PrimitiveVertice>* pVecVertices)
 {
     m_primitiveList.push_back({eType, pVecVertices});
+}
+
+void CPrimitive3DBatcher::ClearQueue()
+{
+    for (auto& primitive : m_primitiveList)
+    {
+        delete primitive.pVecVertices;
+        primitive.pVecVertices = nullptr;
+    }
+
+    m_primitiveList.clear();
 }

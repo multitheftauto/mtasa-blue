@@ -157,5 +157,16 @@ void CClientColModel::InternalRestore(unsigned short usModel)
 // Return true if data looks like COL file contents
 bool CClientColModel::IsCOLData(const SString& strData)
 {
-    return strData.length() > 32 && memcmp(strData, "COL", 3) == 0 && strData[7] == 0;
+    // COL file format: version[4] + size[4] + name[24] = minimum 32 bytes
+    // Version is 4-char string: "COLL", "COL2", "COL3", or "COL4" (not null-terminated)
+    if (strData.length() < 32)
+        return false;
+
+    // Check if starts with "COL" magic number
+    if (memcmp(strData, "COL", 3) != 0)
+        return false;
+
+    // Validate 4th character is valid version indicator
+    const char versionChar = strData[3];
+    return versionChar == 'L' || versionChar == '2' || versionChar == '3' || versionChar == '4';
 }
