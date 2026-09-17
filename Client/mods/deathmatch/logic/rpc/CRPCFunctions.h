@@ -60,6 +60,7 @@ protected:
     static class CClientTeamManager*        m_pTeamManager;
     static class CClientPedManager*         m_pPedManager;
     static class CClientWaterManager*       m_pWaterManager;
+    static class CClientTrainTrackManager*  m_pTrainTrackManager;
 
     static class CBlendedWeather* m_pBlendedWeather;
     static class CClientGame*     m_pClientGame;
