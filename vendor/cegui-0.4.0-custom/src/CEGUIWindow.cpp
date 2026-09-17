@@ -29,6 +29,7 @@
 #include "CEGUIWindowManager.h"
 #include "CEGUISystem.h"
 #include "CEGUIFontManager.h"
+#include "CEGUIFont.h"
 #include "CEGUIImagesetManager.h"
 #include "CEGUIImageset.h"
 #include "CEGUIMouseCursor.h"
@@ -42,6 +43,25 @@
 // Start of CEGUI namespace section
 namespace CEGUI
 {
+namespace {
+    bool getColorCodesEnabledForWindow(const CEGUI::Window* window)
+    {
+        const CEGUI::Window* curr = window;
+        while (curr)
+        {
+            if (curr->isUserStringDefined("ColorCodesEnabled"))
+                return curr->getUserString("ColorCodesEnabled") == "True";
+            
+            // Stop inheriting if the window is not an auto-window
+            if (curr->getName().find("__auto_") == CEGUI::String::npos)
+                break;
+                
+            curr = curr->getParent();
+        }
+        return false;
+    }
+}
+
 const String Window::EventNamespace("Window");
 
 /*************************************************************************
@@ -1973,7 +1993,15 @@ void Window::render(void)
 
 	// perform drawing for 'this' Window
 	Renderer* renderer = System::getSingleton().getRenderer();
+	
+	// Set per-window color codes flag before geometry is generated.
+	// We do this here so widgets that override drawSelf (like Falagard buttons) still respect it.
+	Font::s_colorCodesEnabled = getColorCodesEnabledForWindow(this);
+	
 	drawSelf(renderer->getCurrentZ());
+	
+	Font::s_colorCodesEnabled = false;
+	
 	renderer->advanceZValue();
 
 	// render any child windows

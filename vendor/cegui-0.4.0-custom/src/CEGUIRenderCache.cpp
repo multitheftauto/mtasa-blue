@@ -84,8 +84,10 @@ namespace CEGUI
 
             finalRect = (*text).target_area;
             finalRect.offset(basePos);
+            Font::s_colorCodesEnabled = (*text).colorCodesEnabled; // Temporarily restore the color codes toggle state for this text block
             (*text).source_font->drawText((*text).text, finalRect, baseZ + (*text).z_offset, *finalClipper, (*text).formatting, (*text).colours);
         }
+        Font::s_colorCodesEnabled = false; // Reset to default state
 
     }
 
@@ -127,6 +129,7 @@ namespace CEGUI
         txtinf.z_offset     = zOffset;
         txtinf.colours      = cols;
         txtinf.clipToDisplay = clipToDisplay;
+        txtinf.colorCodesEnabled = Font::s_colorCodesEnabled; // Cache the current color code formatting enablement status
 
         if (clipper)
         {
