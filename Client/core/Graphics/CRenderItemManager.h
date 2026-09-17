@@ -58,6 +58,8 @@ public:
     virtual void           FlushNonAARenderTarget();
     virtual HRESULT        HandleStretchRect(IDirect3DSurface9* pSourceSurface, CONST RECT* pSourceRect, IDirect3DSurface9* pDestSurface, CONST RECT* pDestRect,
                                              int Filter);
+    virtual bool           ReplaceFileTextureFromMemory(CTextureItem* pTextureItem, const void* pData, uint uiSize, bool bMipMaps, ERenderFormat format,
+                                                        bool bTreatAsPixels);
 
     // CRenderItemManager
     void NotifyContructRenderItem(CRenderItem* pItem);
