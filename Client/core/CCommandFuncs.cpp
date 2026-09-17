@@ -159,8 +159,7 @@ void CCommandFuncs::Time(const char* szParameters)
     CCore::GetSingleton().ChatEchoColor(strTimeAndDate, 255, 100, 100);
 }
 
-// this fails randomly, see comments in CConsole
-void CCommandFuncs::Clear(const char* szParameters)
+void CCommandFuncs::Clear(const char*)
 {
     CCore::GetSingleton().GetConsole()->Clear();
 }
