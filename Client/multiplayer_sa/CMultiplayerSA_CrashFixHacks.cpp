@@ -4226,8 +4226,5 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     // Fix uninitialized wheel scale in CFileLoader::LoadVehicleObject on Win11 24H2
     HookInstallCall(CALL_CFileLoader_LoadVehicleObject_sscanf, (DWORD)CFileLoader_LoadVehicleObject_sscanf);
 
-    // This address sits further into the executable than EZHookInstall's normal range check
-    // allows, so it is installed with HookInstallFast instead; the page is unprotected up front
-    // in SetInitialVirtualProtect
-    HookInstallFast(HOOKPOS_CPathFind_LoadPathNodeCount_Mid, (DWORD)HOOK_CPathFind_LoadPathNodeCount_Mid, HOOKSIZE_CPathFind_LoadPathNodeCount_Mid);
+    EZHookInstall(CPathFind_LoadPathNodeCount_Mid);
 }
