@@ -18,7 +18,9 @@ public:
     LUA_DECLARE(GetTime);
     LUA_DECLARE(GetGroundPosition);
     LUA_DECLARE(GetRoofPosition);
-    LUA_DECLARE(GetStreamedWorldModels);
+
+    static std::vector<CLuaArguments> GetWorldModels(std::optional<float> maxDistance);
+
     static std::variant<bool, CLuaMultiReturn<bool, float, float, const char*, const char*, float, float, float>> ProcessLineAgainstMesh(CClientEntity* e,
                                                                                                                                          CVector        start,
                                                                                                                                          CVector        end);

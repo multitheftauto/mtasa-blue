@@ -15,7 +15,7 @@
 #include <game/CClock.h>
 #include "lua/CLuaFunctionParser.h"
 #include <game/CPools.h>
-#include "../game_sa/CPoolsSA.h"
+#include <game_sa/CPoolsSA.h>
 
 void CLuaWorldDefs::LoadFunctions()
 {
@@ -25,7 +25,7 @@ void CLuaWorldDefs::LoadFunctions()
         {"getColorFilter", ArgumentParser<GetColorFilter>},
         {"getRoofPosition", GetRoofPosition},
         {"getGroundPosition", GetGroundPosition},
-        {"getStreamedWorldModels", GetStreamedWorldModels},
+        {"getWorldModels", ArgumentParser<GetWorldModels>},
         {"processLineAgainstMesh", ArgumentParser<ProcessLineAgainstMesh>},
         {"processLineOfSight", ProcessLineOfSight},
         {"getWorldFromScreenPosition", GetWorldFromScreenPosition},
@@ -255,118 +255,133 @@ int CLuaWorldDefs::GetRoofPosition(lua_State* luaVM)
     return 1;
 }
 
-int CLuaWorldDefs::GetStreamedWorldModels(lua_State* luaVM)
+namespace
 {
-    lua_newtable(luaVM);
+    constexpr float RADIANS_TO_DEGREES = 180.0f / 3.14159265358979323846f;
 
-    constexpr float fRadToDeg = 180.0f / 3.14159265358979323846f;
-    int             iIndex = 1;
-
-    auto* ppBuildingPool = reinterpret_cast<CPoolSAInterface<CBuildingSAInterface>**>(CLASS_CBuildingPool);
-    auto* ppObjectPool = reinterpret_cast<CPoolSAInterface<CObjectSAInterface>**>(CLASS_CObjectPool);
-
-    CPools* pPools = g_pGame->GetPools();
-
-    auto PushNumberField = [&](const char* szKey, lua_Number number)
+    void PushNumberField(CLuaArguments& model, const char* key, double value)
     {
-        lua_pushstring(luaVM, szKey);
-        lua_pushnumber(luaVM, number);
-        lua_settable(luaVM, -3);
-    };
+        model.PushString(key);
+        model.PushNumber(value);
+    }
 
-    auto PushBoolField = [&](const char* szKey, bool bValue)
+    void PushBoolField(CLuaArguments& model, const char* key, bool value)
     {
-        lua_pushstring(luaVM, szKey);
-        lua_pushboolean(luaVM, bValue);
-        lua_settable(luaVM, -3);
-    };
+        model.PushString(key);
+        model.PushBoolean(value);
+    }
 
-    auto PushStringField = [&](const char* szKey, const char* szValue)
+    void PushStringField(CLuaArguments& model, const char* key, const char* value)
     {
-        lua_pushstring(luaVM, szKey);
-        lua_pushstring(luaVM, szValue);
-        lua_settable(luaVM, -3);
-    };
+        model.PushString(key);
+        model.PushString(value);
+    }
 
-    auto ProcessPool = [&](auto* pPool, const char* szType, bool bIsObject)
+    CVector GetZxyRotation(const CEntitySAInterface& entity)
     {
-        if (!pPool || !pPool->m_pObjects || !pPool->m_byteMap)
+        if (!entity.matrix)
+        {
+            return CVector(0.0f, 0.0f, entity.m_transform.m_heading);
+        }
+
+        CVector right = entity.matrix->vRight;
+        CVector front = entity.matrix->vFront;
+        CVector up = entity.matrix->vUp;
+
+        right.Normalize();
+        front.Normalize();
+        up.Normalize();
+
+        return CVector(std::asin(std::clamp(front.fZ, -1.0f, 1.0f)), std::atan2(-right.fZ, up.fZ), std::atan2(-front.fX, front.fY));
+    }
+
+    template <typename PoolInterface>
+    void AppendPoolModels(CPoolSAInterface<PoolInterface>* pool, const char* typeName, const CVector& referencePosition, float maxDistanceSquared,
+                          std::vector<CLuaArguments>& outModels)
+    {
+        if (!pool || !pool->m_pObjects || !pool->m_byteMap)
             return;
 
-        for (int i = 0; i < pPool->m_nSize; ++i)
+        auto* pools = g_pGame->GetPools();
+        if (!pools)
+            return;
+
+        for (std::int32_t index = 0; index < pool->m_nSize; index++)
         {
-            if (pPool->IsEmpty(i))
+            if (pool->IsEmpty(index))
                 continue;
 
-            auto* pInterface = pPool->GetObject(i);
-
-            if (!pInterface || !pInterface->m_pRwObject)
+            auto* entity = pool->GetObject(index);
+            if (!entity)
                 continue;
 
-            if (pPools->GetClientEntity(reinterpret_cast<DWORD*>(pInterface)))
+            if (pools->GetClientEntity(reinterpret_cast<DWORD*>(entity)))
                 continue;
 
-            CVector vecPosObj = pInterface->HasMatrix() ? pInterface->matrix->vPos : pInterface->m_transform.m_translate;
-            CVector vecRot;
+            const CVector position = entity->HasMatrix() ? entity->matrix->vPos : entity->m_transform.m_translate;
 
-            if (pInterface->HasMatrix())
+            const float offsetX = position.fX - referencePosition.fX;
+            const float offsetY = position.fY - referencePosition.fY;
+            const float offsetZ = position.fZ - referencePosition.fZ;
+            if (offsetX * offsetX + offsetY * offsetY + offsetZ * offsetZ > maxDistanceSquared)
+                continue;
+
+            const CVector rotation = GetZxyRotation(*entity);
+
+            outModels.emplace_back();
+            CLuaArguments& model = outModels.back();
+            PushStringField(model, "type", typeName);
+            PushNumberField(model, "model", entity->m_nModelIndex);
+            PushNumberField(model, "x", position.fX);
+            PushNumberField(model, "y", position.fY);
+            PushNumberField(model, "z", position.fZ);
+            PushNumberField(model, "rx", rotation.fX * RADIANS_TO_DEGREES);
+            PushNumberField(model, "ry", rotation.fY * RADIANS_TO_DEGREES);
+            PushNumberField(model, "rz", rotation.fZ * RADIANS_TO_DEGREES);
+            PushNumberField(model, "interior", entity->m_areaCode);
+            PushNumberField(model, "ipl", entity->m_iplIndex);
+            PushNumberField(model, "lodModel", entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0);
+            PushBoolField(model, "lod", entity->m_pLod != nullptr);
+            PushBoolField(model, "collisions", entity->bUsesCollision);
+            PushBoolField(model, "isStatic", entity->bIsStatic);
+            PushBoolField(model, "visible", entity->bIsVisible);
+
+            if constexpr (std::is_same_v<PoolInterface, CObjectSAInterface>)
             {
-                CVector vRight = pInterface->matrix->vRight;
-                CVector vFront = pInterface->matrix->vFront;
-                CVector vUp = pInterface->matrix->vUp;
-
-                vRight.Normalize();
-                vFront.Normalize();
-                vUp.Normalize();
-
-                vecRot.fX = asin(std::clamp(vFront.fZ, -1.0f, 1.0f));
-                vecRot.fY = atan2(-vRight.fZ, vUp.fZ);
-                vecRot.fZ = atan2(-vFront.fX, vFront.fY);
+                const CObjectSAInterface* object = entity;
+                PushNumberField(model, "health", object->fHealth);
+                PushNumberField(model, "scale", object->fScale);
             }
-
-            lua_pushnumber(luaVM, static_cast<lua_Number>(iIndex++));
-            lua_newtable(luaVM);
-
-            PushStringField("type", szType);
-            PushNumberField("model", pInterface->m_nModelIndex);
-
-            PushNumberField("x", vecPosObj.fX);
-            PushNumberField("y", vecPosObj.fY);
-            PushNumberField("z", vecPosObj.fZ);
-
-            PushNumberField("rx", vecRot.fX * fRadToDeg);
-            PushNumberField("ry", vecRot.fY * fRadToDeg);
-            PushNumberField("rz", vecRot.fZ * fRadToDeg);
-
-            PushNumberField("interior", pInterface->m_areaCode);
-            PushNumberField("ipl", pInterface->m_iplIndex);
-
-            PushNumberField("lodModel", pInterface->m_pLod ? pInterface->m_pLod->m_nModelIndex : 0);
-
-            PushBoolField("lod", pInterface->m_pLod != nullptr);
-            PushBoolField("collisions", pInterface->bUsesCollision);
-            PushBoolField("isStatic", pInterface->bIsStatic);
-            PushBoolField("visible", pInterface->bIsVisible);
-
-            if (bIsObject)
-            {
-                auto* pObject = static_cast<const CObjectSAInterface*>(static_cast<const CEntitySAInterface*>(pInterface));
-
-                PushNumberField("health", pObject->fHealth);
-                PushNumberField("scale", pObject->fScale);
-            }
-
-            lua_settable(luaVM, -3);
         }
-    };
+    }
+}
 
-    if (ppBuildingPool && *ppBuildingPool)
-        ProcessPool(*ppBuildingPool, "building", false);
+std::vector<CLuaArguments> CLuaWorldDefs::GetWorldModels(std::optional<float> maxDistance)
+{
+    if (maxDistance.has_value() && *maxDistance < 0.0f)
+        throw LuaFunctionError("The argument maxDistance cannot have a negative value.");
 
-    if (ppObjectPool && *ppObjectPool)
-        ProcessPool(*ppObjectPool, "object", true);
+    std::vector<CLuaArguments> models;
 
-    return 1;
+    CVector referencePosition;
+    float   maxDistanceSquared = std::numeric_limits<float>::max();
+
+    if (maxDistance.has_value())
+    {
+        if (const auto* localPlayer = CStaticFunctionDefinitions::GetLocalPlayer())
+        {
+            localPlayer->GetPosition(referencePosition);
+            maxDistanceSquared = *maxDistance * *maxDistance;
+        }
+    }
+
+    auto* buildingPool = *reinterpret_cast<CPoolSAInterface<CBuildingSAInterface>**>(CLASS_CBuildingPool);
+    auto* objectPool = *reinterpret_cast<CPoolSAInterface<CObjectSAInterface>**>(CLASS_CObjectPool);
+
+    AppendPoolModels(buildingPool, "building", referencePosition, maxDistanceSquared, models);
+    AppendPoolModels(objectPool, "object", referencePosition, maxDistanceSquared, models);
+
+    return models;
 }
 
 std::variant<bool, CLuaMultiReturn<bool, float, float, const char*, const char*, float, float, float>> CLuaWorldDefs::ProcessLineAgainstMesh(CClientEntity* e,
