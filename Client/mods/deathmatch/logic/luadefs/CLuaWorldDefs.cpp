@@ -25,7 +25,7 @@ void CLuaWorldDefs::LoadFunctions()
         {"getColorFilter", ArgumentParser<GetColorFilter>},
         {"getRoofPosition", GetRoofPosition},
         {"getGroundPosition", GetGroundPosition},
-        {"getWorldModels", ArgumentParser<GetWorldModels>},
+        {"getStreamedWorldModels", ArgumentParser<GetStreamedWorldModels>},
         {"processLineAgainstMesh", ArgumentParser<ProcessLineAgainstMesh>},
         {"processLineOfSight", ProcessLineOfSight},
         {"getWorldFromScreenPosition", GetWorldFromScreenPosition},
@@ -356,7 +356,7 @@ namespace
     }
 }
 
-std::vector<CLuaArguments> CLuaWorldDefs::GetWorldModels(std::optional<float> maxDistance)
+std::vector<CLuaArguments> CLuaWorldDefs::GetStreamedWorldModels(std::optional<float> maxDistance)
 {
     if (maxDistance.has_value() && *maxDistance < 0.0f)
         throw LuaFunctionError("The argument maxDistance cannot have a negative value.");
