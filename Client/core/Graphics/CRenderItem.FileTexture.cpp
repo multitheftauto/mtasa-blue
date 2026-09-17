@@ -9,6 +9,49 @@
 
 #include "StdInc.h"
 
+namespace
+{
+    // Upload PLAIN (BGRA) CPixels to a new D3DFMT_A8R8G8B8 texture, used for any input format that D3DX cannot decode itself
+    // The caller must have already converted the source to EPixelsFormat::PLAIN via CPixelsManager
+    bool CreateD3DTextureFromPlainPixels(IDirect3DDevice9* pDevice, CPixelsManagerInterface* pPixelsManager, const CPixels& plain, bool bMipMaps,
+                                         IDirect3DTexture9*& pOutTexture, uint& uiOutWidth, uint& uiOutHeight)
+    {
+        pOutTexture = NULL;
+
+        uint uiWidth = 0, uiHeight = 0;
+        if (!pPixelsManager->GetPixelsSize(plain, uiWidth, uiHeight) || uiWidth == 0 || uiHeight == 0)
+            return false;
+
+        IDirect3DTexture9* pD3DTex = NULL;
+        int                iMipLevels = bMipMaps ? 0 : 1;  // 0 = full chain
+        if (FAILED(D3DXCreateTexture(pDevice, uiWidth, uiHeight, iMipLevels, 0, D3DFMT_A8R8G8B8, D3DPOOL_MANAGED, &pD3DTex)))
+            return false;
+
+        D3DLOCKED_RECT locked = {};
+        if (FAILED(pD3DTex->LockRect(0, &locked, NULL, 0)))
+        {
+            pD3DTex->Release();
+            return false;
+        }
+
+        const uint  uiRowBytes = uiWidth * 4;
+        const BYTE* pSrc = reinterpret_cast<const BYTE*>(plain.GetData());
+        BYTE*       pDst = reinterpret_cast<BYTE*>(locked.pBits);
+        for (uint y = 0; y < uiHeight; ++y)
+            memcpy(pDst + y * locked.Pitch, pSrc + y * uiRowBytes, uiRowBytes);
+
+        pD3DTex->UnlockRect(0);
+
+        if (bMipMaps)
+            D3DXFilterTexture(pD3DTex, NULL, D3DX_DEFAULT, D3DX_DEFAULT);
+
+        pOutTexture = pD3DTex;
+        uiOutWidth = uiWidth;
+        uiOutHeight = uiHeight;
+        return true;
+    }
+}
+
 ////////////////////////////////////////////////////////////////
 //
 // CFileTextureItem::PostConstruct
@@ -94,6 +137,45 @@ void CFileTextureItem::CreateUnderlyingData(const SString& strFilename, bool bMi
 {
     assert(!m_pD3DTexture);
 
+    // D3DX cannot decode every format we support, so we need to perform the following steps:
+    // Load the file, ask CPixelsManager what it is, and if it's not something D3DX can handle, convert to PLAIN and upload manually
+    if (strFilename.EndsWithI(".webp"))
+    {
+        std::vector<char> fileBytes;
+        if (FileLoad(strFilename, fileBytes) && !fileBytes.empty())
+        {
+            CPixelsManagerInterface* pPixelsManager = CCore::GetSingleton().GetGraphics()->GetPixelsManager();
+
+            CPixels srcPixels;
+            srcPixels.externalData.pData = fileBytes.data();
+            srcPixels.externalData.uiSize = (uint)fileBytes.size();
+
+            if (pPixelsManager->GetPixelsFormat(srcPixels) == EPixelsFormat::WEBP)
+            {
+                CPixels plainPixels;
+                if (!pPixelsManager->ChangePixelsFormat(srcPixels, plainPixels, EPixelsFormat::PLAIN))
+                    return;
+
+                IDirect3DTexture9* pD3DTex = NULL;
+                uint               uiWidth = 0, uiHeight = 0;
+                if (!CreateD3DTextureFromPlainPixels(m_pDevice, pPixelsManager, plainPixels, bMipMaps, pD3DTex, uiWidth, uiHeight))
+                    return;
+
+                m_uiSizeX = uiWidth;
+                m_uiSizeY = uiHeight;
+
+                D3DSURFACE_DESC desc;
+                pD3DTex->GetLevelDesc(0, &desc);
+                m_uiSurfaceSizeX = desc.Width;
+                m_uiSurfaceSizeY = desc.Height;
+
+                m_pD3DTexture = pD3DTex;
+                m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage(m_pD3DTexture);
+                return;
+            }
+        }
+    }
+
     D3DXIMAGE_INFO imageInfo;
     if (FAILED(D3DXGetImageInfoFromFile(strFilename, &imageInfo)))
         return;
@@ -163,12 +245,36 @@ void CFileTextureItem::CreateUnderlyingData(const CPixels* pInPixels, bool bMipM
     CPixelsManagerInterface* pPixelsManager = CCore::GetSingleton().GetGraphics()->GetPixelsManager();
 
     // Copy from plain
-    const CPixels* pPixels = pInPixels;
-    CPixels        pixelsTemp;
-    if (pPixelsManager->GetPixelsFormat(*pPixels) == EPixelsFormat::PLAIN)
+    const CPixels*    pPixels = pInPixels;
+    CPixels           pixelsTemp;
+    EPixelsFormatType inFormat = pPixelsManager->GetPixelsFormat(*pPixels);
+    if (inFormat == EPixelsFormat::PLAIN)
     {
         pPixelsManager->ChangePixelsFormat(*pPixels, pixelsTemp, EPixelsFormat::PNG);
         pPixels = &pixelsTemp;
+    }
+    else if (inFormat == EPixelsFormat::WEBP)  // any format that D3DX cannot decode itself
+    {
+        CPixels plainPixels;
+        if (!pPixelsManager->ChangePixelsFormat(*pPixels, plainPixels, EPixelsFormat::PLAIN))
+            return;
+
+        IDirect3DTexture9* pD3DTex = NULL;
+        uint               uiWidth = 0, uiHeight = 0;
+        if (!CreateD3DTextureFromPlainPixels(m_pDevice, pPixelsManager, plainPixels, bMipMaps, pD3DTex, uiWidth, uiHeight))
+            return;
+
+        m_uiSizeX = uiWidth;
+        m_uiSizeY = uiHeight;
+
+        D3DSURFACE_DESC desc;
+        pD3DTex->GetLevelDesc(0, &desc);
+        m_uiSurfaceSizeX = desc.Width;
+        m_uiSurfaceSizeY = desc.Height;
+
+        m_pD3DTexture = pD3DTex;
+        m_iMemoryKBUsed = CRenderItemManager::CalcD3DResourceMemoryKBUsage(m_pD3DTexture);
+        return;
     }
 
     D3DXIMAGE_INFO imageInfo;
