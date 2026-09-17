@@ -36,6 +36,7 @@ class CClientProjectile;
 class CClientVehicle;
 class CTask;
 class CTaskSimpleSwim;
+class CTaskSimpleUseGun;
 
 enum eDelayedSyncData
 {
@@ -571,6 +572,8 @@ public:
 
     CTaskSimpleSwim* GetSwimmingTask() const;
     void             RunSwimTask() const;
+
+    CTaskSimpleUseGun* GetUseGunTask() const;
 
 protected:
     // This constructor is for peds managed by a player. These are unknown to the ped manager.

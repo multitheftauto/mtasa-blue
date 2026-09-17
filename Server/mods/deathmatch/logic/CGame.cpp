@@ -66,6 +66,7 @@
 #include "packets/CPlayerListPacket.h"
 #include "packets/CPlayerClothesPacket.h"
 #include "packets/CPlayerWorldSpecialPropertyPacket.h"
+#include "packets/CPedHitPacket.h"
 #include "packets/CServerInfoSyncPacket.h"
 #include "packets/CLuaPacket.h"
 #include "../utils/COpenPortsTester.h"
@@ -1371,6 +1372,12 @@ bool CGame::ProcessPacket(CPacket& Packet)
             return true;
         }
 
+        case PACKET_ID_PED_HIT:
+        {
+            Packet_PedHit(static_cast<CPedHitPacket&>(Packet));
+            return true;
+        }
+
         default:
             break;
     }
@@ -1723,6 +1730,7 @@ void CGame::AddBuiltInEvents()
     m_Events.AddEvent("onPedWeaponSwitch", "previous, current", NULL, false);
     m_Events.AddEvent("onPedWeaponReload", "weapon, clip, ammo", nullptr, false);
     m_Events.AddEvent("onPedDamage", "loss", NULL, false);
+    m_Events.AddEvent("onPedHit", "attacker, weapon, bodypart, loss", nullptr, false);
 
     // Element events
     m_Events.AddEvent("onElementColShapeHit", "colshape, matchingDimension", NULL, false);
@@ -4549,6 +4557,26 @@ void CGame::Packet_PlayerWorldSpecialProperty(CPlayerWorldSpecialPropertyPacket&
     arguments.PushBoolean(enabled);
 
     player->CallEvent("onPlayerChangesWorldSpecialProperty", arguments, nullptr);
+}
+
+void CGame::Packet_PedHit(CPedHitPacket& packet) noexcept
+{
+    CPlayer* player = packet.GetSourcePlayer();
+    if (!player)
+        return;
+
+    CElement* damagedPed = CElementIDs::GetElement(packet.GetDamagedPed());
+    CElement* attacker = CElementIDs::GetElement(packet.GetAttacker());
+    if (!damagedPed || !attacker)
+        return;
+
+    CLuaArguments arguments;
+    arguments.PushElement(attacker);
+    arguments.PushNumber(packet.GetWeaponType());
+    arguments.PushNumber(packet.GetHitZone());
+    arguments.PushNumber(packet.GetDamage());
+
+    damagedPed->CallEvent("onPedHit", arguments, nullptr);
 }
 
 void CGame::Packet_PlayerModInfo(CPlayerModInfoPacket& Packet)
