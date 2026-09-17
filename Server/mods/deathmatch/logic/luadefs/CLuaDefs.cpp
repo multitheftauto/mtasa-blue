@@ -47,6 +47,7 @@ CObjectManager*            CLuaDefs::m_pObjectManager = NULL;
 CBuildingManager*          CLuaDefs::m_pBuildingManager = nullptr;
 CPickupManager*            CLuaDefs::m_pPickupManager = NULL;
 CPlayerManager*            CLuaDefs::m_pPlayerManager = NULL;
+CPedManager*               CLuaDefs::m_pPedManager = NULL;
 CRadarAreaManager*         CLuaDefs::m_pRadarAreaManager = NULL;
 CRegisteredCommands*       CLuaDefs::m_pRegisteredCommands;
 CElement*                  CLuaDefs::m_pRootElement = NULL;
@@ -71,6 +72,7 @@ void CLuaDefs::Initialize(CGame* pGame)
     m_pBuildingManager = pGame->GetBuildingManager();
     m_pPickupManager = pGame->GetPickupManager();
     m_pPlayerManager = pGame->GetPlayerManager();
+    m_pPedManager = pGame->GetPedManager();
     m_pRadarAreaManager = pGame->GetRadarAreaManager();
     m_pRegisteredCommands = pGame->GetRegisteredCommands();
     m_pScriptDebugging = pGame->GetScriptDebugging();
