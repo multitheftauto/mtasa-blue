@@ -12,6 +12,9 @@
 #pragma once
 #include "CLuaDefs.h"
 #include <lua/CLuaMultiReturn.h>
+#include <cstdint>
+#include <optional>
+#include <variant>
 
 class CLuaCameraDefs : public CLuaDefs
 {
