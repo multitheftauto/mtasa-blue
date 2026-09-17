@@ -54,8 +54,11 @@ private:
     bool           m_bIsConnecting;
     bool           m_bReconnect;
     bool           m_bSave;
-    time_t         m_tConnectStarted;
-    bool           m_bHasTriedSecondConnect;
+    time_t       m_tConnectStarted;
+    unsigned int m_uiConnectAttempt;
+
+    static constexpr unsigned int MAX_CONNECT_ATTEMPTS = 5;
+    static constexpr int          RETRY_INTERVAL_SEC = 4;
 
     GUI_CALLBACK* m_pOnCancelClick;
 
