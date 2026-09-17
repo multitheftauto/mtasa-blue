@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: MTA San Andreas 1.x\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-07 01:56+0000\n"
+"POT-Creation-Date: 2026-09-14 02:25+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -111,16 +111,16 @@ msgstr ""
 msgid "Information"
 msgstr ""
 
-#: Client/game_sa/CSettingsSA.cpp:833
+#: Client/game_sa/CSettingsSA.cpp:897
 msgid "Can't find valid screen resolution."
 msgstr ""
 
 #. Confirm that res should be used
-#: Client/game_sa/CSettingsSA.cpp:909
+#: Client/game_sa/CSettingsSA.cpp:973
 msgid "Are you sure you want to use this screen resolution?"
 msgstr ""
 
-#: Client/game_sa/CSettingsSA.cpp:911 Client/loader/Dialogs.cpp:127
+#: Client/game_sa/CSettingsSA.cpp:975 Client/loader/Dialogs.cpp:127
 msgid "MTA: San Andreas"
 msgstr ""
 

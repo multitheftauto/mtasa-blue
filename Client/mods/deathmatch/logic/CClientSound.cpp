@@ -597,6 +597,7 @@ float* CClientSound::GetWaveData(int iLength)
     }
     return NULL;
 }
+
 bool CClientSound::SetPanEnabled(bool bPan)
 {
     if (m_b3D)
@@ -737,13 +738,17 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
     {
         // Update our position and velocity if we're attached
         CClientEntity* pAttachedToEntity = GetAttachedTo();
+
         if (pAttachedToEntity)
         {
             GetPosition(m_vecPosition);
             DoAttaching();
+
             CVector vecVelocity;
+
             if (CStaticFunctionDefinitions::GetElementVelocity(*pAttachedToEntity, vecVelocity))
                 SetVelocity(vecVelocity);
+
             // Update our spatial data position
             UpdateSpatialData();
         }
