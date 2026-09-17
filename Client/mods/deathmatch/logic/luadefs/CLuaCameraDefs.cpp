@@ -15,7 +15,6 @@
 #include <game/CSettings.h>
 #include <game/CCam.h>
 #include <lua/CLuaFunctionParser.h>
-
 #include <CameraScriptShared.h>
 #include <cmath>
 #include <numbers>
@@ -98,28 +97,40 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
 
     lua_classvariable(luaVM, "position", ArgumentParserWarn<false, OOP_SetCameraPosition>, ArgumentParserWarn<false, OOP_GetCameraPosition>);
     lua_classvariable(luaVM, "rotation", ArgumentParserWarn<false, OOP_SetCameraRotation>, ArgumentParserWarn<false, OOP_GetCameraRotation>);
-    lua_classvariable(luaVM, "matrix", NULL, ArgumentParserWarn<false, OOP_GetCameraMatrix>);
+    lua_classvariable(luaVM, "matrix", nullptr, ArgumentParserWarn<false, OOP_GetCameraMatrix>);
     lua_classvariable(luaVM, "type", nullptr, ArgumentParser<GetElementType>);
 
     lua_registerstaticclass(luaVM, "Camera");
 }
 
-std::variant<CClientCamera*, bool> CLuaCameraDefs::GetCamera()
+bool CLuaCameraDefs::SetCameraViewMode(std::optional<std::uint8_t> vehicleViewMode, std::optional<std::uint8_t> pedViewMode)
 {
     CClientCamera* camera = g_pClientGame->GetManager()->GetCamera();
 
-    if (camera)
-        return camera;
+    if (vehicleViewMode)
+        camera->SetCameraVehicleViewMode(static_cast<eVehicleCamMode>(vehicleViewMode.value()));
 
-    return false;
+    if (pedViewMode)
+        camera->SetCameraPedViewMode(static_cast<ePedCamMode>(pedViewMode.value()));
+
+    return true;
+}
+
+std::variant<CClientCamera*, bool> CLuaCameraDefs::GetCamera()
+{
+    CClientCamera* camera = g_pClientGame->GetManager()->GetCamera();
+    if (!camera)
+        return false;
+
+    return camera;
 }
 
 CLuaMultiReturn<std::uint8_t, std::uint8_t> CLuaCameraDefs::GetCameraViewMode()
 {
     CClientCamera* camera = g_pClientGame->GetManager()->GetCamera();
 
-    std::uint8_t vehicleMode = static_cast<std::uint8_t>(camera->GetCameraVehicleViewMode());
-    std::uint8_t pedMode = static_cast<std::uint8_t>(camera->GetCameraPedViewMode());
+    const std::uint8_t vehicleMode = static_cast<std::uint8_t>(camera->GetCameraVehicleViewMode());
+    const std::uint8_t pedMode = static_cast<std::uint8_t>(camera->GetCameraPedViewMode());
 
     return {vehicleMode, pedMode};
 }
@@ -131,31 +142,30 @@ CLuaMultiReturn<float, float, float, float, float, float, float, float> CLuaCame
     if (!camera)
         throw std::invalid_argument("Camera not available");
 
-    CVector position, lookAt;
-    float   roll = 0.0f;
-
+    CVector position;
     camera->GetPosition(position);
+
+    CVector lookAt;
+    float   roll = 0.0f;
     camera->GetFixedTarget(lookAt, &roll);
 
-    float fov = camera->GetAccurateFOV();
+    const float fov = camera->GetAccurateFOV();
 
     if (roll == 0.0f)
     {
         CMatrix matrix;
         camera->GetMatrix(matrix);
 
-        CVector worldUp(0.0f, 0.0f, 1.0f);
-        CVector cameraUp = matrix.vUp;
-        CVector cameraRight = matrix.vRight;
+        const CVector worldUp(0.0f, 0.0f, 1.0f);
 
-        CVector projectedUp = cameraUp - matrix.vFront * cameraUp.DotProduct(&matrix.vFront);
+        CVector projectedUp = matrix.vUp - matrix.vFront * matrix.vUp.DotProduct(&matrix.vFront);
 
         if (projectedUp.Length() > FLOAT_EPSILON)
         {
             projectedUp.Normalize();
 
-            float cosRoll = worldUp.DotProduct(&projectedUp);
-            float sinRoll = cameraRight.DotProduct(&worldUp);
+            const float cosRoll = worldUp.DotProduct(&projectedUp);
+            const float sinRoll = matrix.vRight.DotProduct(&worldUp);
 
             roll = std::atan2(sinRoll, cosRoll) * (180.0f / std::numbers::pi_v<float>);
         }
@@ -199,15 +209,33 @@ std::uint8_t CLuaCameraDefs::GetCameraInterior()
 
 std::string CLuaCameraDefs::GetCameraGoggleEffect()
 {
-    const bool isNightVision = g_pMultiplayer->IsNightVisionEnabled();
-    const bool isThermalVision = g_pMultiplayer->IsThermalVisionEnabled();
-
-    if (isNightVision)
+    if (g_pMultiplayer->IsNightVisionEnabled())
         return "nightvision";
-    else if (isThermalVision)
+
+    if (g_pMultiplayer->IsThermalVisionEnabled())
         return "thermalvision";
-    else
-        return "normal";
+
+    return "normal";
+}
+
+// Only when onfoot/invehicle
+std::variant<float, bool> CLuaCameraDefs::GetCameraFieldOfView(eFieldOfViewMode mode)
+{
+    auto* settings = g_pGame->GetSettings();
+
+    switch (mode)
+    {
+        case FOV_MODE_PLAYER:
+            return settings->GetFieldOfViewPlayer();
+        case FOV_MODE_VEHICLE:
+            return settings->GetFieldOfViewVehicle();
+        case FOV_MODE_VEHICLE_MAX:
+            return settings->GetFieldOfViewVehicleMax();
+        default:
+            break;
+    }
+
+    throw std::invalid_argument(SString("Enum not yet implemented: " + EnumToString(mode)));
 }
 
 std::uint8_t CLuaCameraDefs::GetCameraDrunkLevel()
@@ -237,9 +265,9 @@ bool CLuaCameraDefs::SetCameraMatrix(std::variant<CLuaMatrix*, CVector> matrixOr
     {
         position = std::get<CVector>(matrixOrPosition);
 
-        if (lookAt.has_value())
+        if (lookAt)
         {
-            lookAtValue = lookAt.value();
+            lookAtValue = *lookAt;
             lookAtValid = true;
         }
     }
@@ -252,10 +280,9 @@ bool CLuaCameraDefs::SetCameraMatrix(std::variant<CLuaMatrix*, CVector> matrixOr
 
     const float rollValue = CameraScriptShared::NormalizeRoll(roll.value_or(0.0f));
 
-    float fovValue = fov.value_or(70.0f);
-
+    float fovValue = fov.value_or(CameraScriptShared::kDefaultFOV);
     if (fovValue <= 0.0f || fovValue >= 180.0f)
-        fovValue = 70.0f;
+        fovValue = CameraScriptShared::kDefaultFOV;
 
     if (!camera->IsInFixedMode())
         camera->ToggleCameraFixedMode(true);
@@ -279,91 +306,68 @@ bool CLuaCameraDefs::SetCameraMatrix(std::variant<CLuaMatrix*, CVector> matrixOr
 // Only when onfoot/invehicle
 bool CLuaCameraDefs::SetCameraFieldOfView(eFieldOfViewMode mode, float fov, std::optional<bool> instant)
 {
-    if (fov < 0 || fov > 179)
+    if (fov < 0.0f || fov > 179.0f)
         throw std::invalid_argument("Invalid FOV range (0-179)");
 
-    const bool isInstant = instant.value_or(false);
+    const bool applyInstantly = instant.value_or(false);
 
-    if (mode == FOV_MODE_PLAYER)
-        g_pGame->GetSettings()->SetFieldOfViewPlayer(fov, true, isInstant);
-    else if (mode == FOV_MODE_VEHICLE)
-        g_pGame->GetSettings()->SetFieldOfViewVehicle(fov, true, isInstant);
-    else if (mode == FOV_MODE_VEHICLE_MAX)
-        g_pGame->GetSettings()->SetFieldOfViewVehicleMax(fov, true, isInstant);
-    else
-        throw std::invalid_argument(SString("Enum not yet implemented: " + EnumToString(mode)));
-
-    return true;
-}
-
-// Only when onfoot/invehicle
-std::variant<float, bool> CLuaCameraDefs::GetCameraFieldOfView(eFieldOfViewMode mode)
-{
-    if (mode == FOV_MODE_PLAYER)
-        return g_pGame->GetSettings()->GetFieldOfViewPlayer();
-    else if (mode == FOV_MODE_VEHICLE)
-        return g_pGame->GetSettings()->GetFieldOfViewVehicle();
-    else if (mode == FOV_MODE_VEHICLE_MAX)
-        return g_pGame->GetSettings()->GetFieldOfViewVehicleMax();
-
-    throw std::invalid_argument(SString("Enum not yet implemented: " + EnumToString(mode)));
+    switch (mode)
+    {
+        case FOV_MODE_PLAYER:
+            g_pGame->GetSettings()->SetFieldOfViewPlayer(fov, true, applyInstantly);
+            return true;
+        case FOV_MODE_VEHICLE:
+            g_pGame->GetSettings()->SetFieldOfViewVehicle(fov, true, applyInstantly);
+            return true;
+        case FOV_MODE_VEHICLE_MAX:
+            g_pGame->GetSettings()->SetFieldOfViewVehicleMax(fov, true, applyInstantly);
+            return true;
+        default:
+            throw std::invalid_argument(SString("Enum not yet implemented: " + EnumToString(mode)));
+    }
 }
 
 bool CLuaCameraDefs::SetCameraTarget(lua_State* luaVM, std::variant<CClientEntity*, CVector> target)
 {
     //  bool setCameraTarget ( element target = nil ) or setCameraTarget ( float x, float y, float z )
-    if (auto* pTarget = std::get_if<CClientEntity*>(&target))
+    CClientCamera* camera = m_pManager->GetCamera();
+
+    if (!camera)
+        return false;
+
+    if (auto* entity = std::get_if<CClientEntity*>(&target))
     {
-        if (!*pTarget)
+        if (!*entity || (*entity)->IsBeingDeleted())
             return false;
 
-        if ((*pTarget)->IsBeingDeleted())
-            return false;
-
-        if ((*pTarget)->GetType() != CCLIENTPLAYER)
+        if ((*entity)->GetType() != CCLIENTPLAYER)
             MinClientReqCheck(luaVM, MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player");
 
-        CClientCamera* camera = m_pManager->GetCamera();
-
-        if (!camera)
-            return false;
-
-        switch ((*pTarget)->GetType())
+        switch ((*entity)->GetType())
         {
             case CCLIENTPLAYER:
             {
-                CClientPlayer* player = static_cast<CClientPlayer*>(*pTarget);
+                CClientPlayer* player = static_cast<CClientPlayer*>(*entity);
                 if (player->IsLocalPlayer())
-                {
                     camera->SetFocusToLocalPlayer();
-                }
                 else
-                {
-                    // TODO: stream in the player here (needs to be done through the streamer)
-
                     camera->SetFocus(player, MODE_CAM_ON_A_STRING, false);
-                }
-                break;
+                return true;
             }
             case CCLIENTPED:
             case CCLIENTVEHICLE:
             {
                 camera->Reset();
-                camera->SetFocus(*pTarget, MODE_CAM_ON_A_STRING, false);
-                break;
+                camera->SetFocus(*entity, MODE_CAM_ON_A_STRING, false);
+                return true;
             }
             default:
                 return false;
         }
-
-        return true;
     }
 
-    CClientCamera* camera = m_pManager->GetCamera();
-    if (!camera)
-        return false;
-
     camera->SetOrbitTarget(std::get<CVector>(target));
+
     return true;
 }
 
@@ -394,12 +398,14 @@ bool CLuaCameraDefs::FadeCamera(bool fadeIn, std::optional<float> fadeTime, std:
     if (fadeIn)
     {
         camera->FadeIn(fadeTimeValue);
+
         if (g_pGame && g_pGame->GetHud())
             g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, !g_pClientGame->GetHudAreaNameDisabled());
     }
     else
     {
         camera->FadeOut(fadeTimeValue, red.value_or(0), green.value_or(0), blue.value_or(0));
+
         if (g_pGame && g_pGame->GetHud())
             g_pGame->GetHud()->SetComponentVisible(HUD_AREA_NAME, false);
     }
@@ -410,50 +416,38 @@ bool CLuaCameraDefs::FadeCamera(bool fadeIn, std::optional<float> fadeTime, std:
 bool CLuaCameraDefs::SetCameraClip(std::optional<bool> objects, std::optional<bool> vehicles)
 {
     m_pManager->GetCamera()->SetCameraClip(objects.value_or(true), vehicles.value_or(true));
-
     return true;
 }
 
 CLuaMultiReturn<bool, bool> CLuaCameraDefs::GetCameraClip()
 {
-    bool isObjects = false;
-    bool isVehicles = false;
+    bool objects = false;
+    bool vehicles = false;
 
-    m_pManager->GetCamera()->GetCameraClip(isObjects, isVehicles);
+    m_pManager->GetCamera()->GetCameraClip(objects, vehicles);
 
-    return {isObjects, isVehicles};
-}
-
-bool CLuaCameraDefs::SetCameraViewMode(std::optional<std::uint8_t> vehicleViewMode, std::optional<std::uint8_t> pedViewMode)
-{
-    CClientCamera* camera = g_pClientGame->GetManager()->GetCamera();
-
-    if (vehicleViewMode)
-        camera->SetCameraVehicleViewMode(static_cast<eVehicleCamMode>(vehicleViewMode.value()));
-
-    if (pedViewMode)
-        camera->SetCameraPedViewMode(static_cast<ePedCamMode>(pedViewMode.value()));
-
-    return true;
+    return {objects, vehicles};
 }
 
 bool CLuaCameraDefs::SetCameraGoggleEffect(std::string mode, std::optional<bool> noiseEnabled)
 {
-    const bool isNoiseEnabled = noiseEnabled.value_or(true);
+    const bool useNoise = noiseEnabled.value_or(true);
 
-    if (mode.compare("nightvision") == 0)
+    if (mode == "nightvision")
     {
-        g_pMultiplayer->SetNightVisionEnabled(true, isNoiseEnabled);
+        g_pMultiplayer->SetNightVisionEnabled(true, useNoise);
         g_pMultiplayer->SetThermalVisionEnabled(false, true);
         return true;
     }
-    else if (mode.compare("thermalvision") == 0)
+
+    if (mode == "thermalvision")
     {
         g_pMultiplayer->SetNightVisionEnabled(false, true);
-        g_pMultiplayer->SetThermalVisionEnabled(true, isNoiseEnabled);
+        g_pMultiplayer->SetThermalVisionEnabled(true, useNoise);
         return true;
     }
-    else if (mode.compare("normal") == 0)
+
+    if (mode == "normal")
     {
         g_pMultiplayer->SetNightVisionEnabled(false, true);
         g_pMultiplayer->SetThermalVisionEnabled(false, true);
@@ -469,8 +463,7 @@ bool CLuaCameraDefs::SetCameraDrunkLevel(std::int16_t level)
         throw std::invalid_argument("Invalid range (0-255)");
 
     CPlayerInfo* playerInfo = g_pGame->GetPlayerInfo();
-
-    playerInfo->SetCamDrunkLevel(static_cast<unsigned char>(level));
+    playerInfo->SetCamDrunkLevel(static_cast<std::uint8_t>(level));
 
     return true;
 }
@@ -485,7 +478,6 @@ CVector CLuaCameraDefs::OOP_GetCameraPosition() noexcept
 bool CLuaCameraDefs::OOP_SetCameraPosition(CVector position)
 {
     CClientCamera* camera = m_pManager->GetCamera();
-
     if (!camera->IsInFixedMode())
         camera->ToggleCameraFixedMode(true);
 
@@ -504,7 +496,6 @@ CVector CLuaCameraDefs::OOP_GetCameraRotation() noexcept
 bool CLuaCameraDefs::OOP_SetCameraRotation(CVector rotation)
 {
     CClientCamera* camera = m_pManager->GetCamera();
-
     if (!camera->IsInFixedMode())
         camera->ToggleCameraFixedMode(true);
 
@@ -524,13 +515,12 @@ bool CLuaCameraDefs::ShakeCamera(float radius, std::optional<float> x, std::opti
     {
         const auto* player = m_pPlayerManager->GetLocalPlayer();
 
-        CVector out;
+        CVector position;
+        player->GetPosition(position);
 
-        player->GetPosition(out);
-
-        x = out.fX;
-        y = out.fY;
-        z = out.fZ;
+        x = position.fX;
+        y = position.fY;
+        z = position.fZ;
     }
 
     m_pManager->GetCamera()->ShakeCamera(radius, *x, *y, *z);
