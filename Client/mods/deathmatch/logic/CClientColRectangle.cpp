@@ -50,7 +50,7 @@ void CClientColRectangle::DebugRender(const CVector& vecPosition, float fDrawRad
     CVector vecOrigin(m_vecPosition.fX + m_vecSize.fX * 0.5f, m_vecPosition.fY + m_vecSize.fY * 0.5f, vecPosition.fZ);
     CVector vecSize(m_vecSize.fX, m_vecSize.fY, fDrawRadius * 2.f);
 
-    SColorARGB          color(128, 255, 0, 255);
+    SColor              color = GetDebugColor(SColorARGB(128, 255, 0, 255));
     float               fLineWidth = 4.f + pow(std::max(m_vecSize.fX, m_vecSize.fY) * 0.5f, 0.5f);
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
 
