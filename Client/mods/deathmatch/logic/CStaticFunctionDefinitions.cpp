@@ -246,7 +246,14 @@ bool CStaticFunctionDefinitions::WasEventCancelled()
 bool CStaticFunctionDefinitions::DownloadFile(CResource* pResource, const char* szFile, CResource* pRequestResource, CChecksum checksum)
 {
     SString strHTTPDownloadURLFull("%s/%s/%s", g_pClientGame->GetHTTPURL().c_str(), pResource->GetName(), szFile);
-    SString strPath("%s\\resources\\%s\\%s", g_pClientGame->GetFileCacheRoot(), pResource->GetName(), szFile);
+
+    // Use resources-cl2 for secondary client to avoid file protection conflicts
+    SString strResourcesDir = "resources";
+    if (g_pCore->IsSecondaryClient())
+    {
+        strResourcesDir = "resources-cl2";
+    }
+    SString strPath("%s\\%s\\%s\\%s", g_pClientGame->GetFileCacheRoot(), *strResourcesDir, pResource->GetName(), szFile);
 
     // Call SingularFileDownloadManager
     if (g_pClientGame->GetSingularFileDownloadManager())

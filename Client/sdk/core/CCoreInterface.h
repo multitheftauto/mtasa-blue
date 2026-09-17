@@ -131,6 +131,7 @@ public:
     virtual HWND GetHookedWindow() = 0;
     virtual bool IsFocused() = 0;
     virtual bool IsWindowMinimized() = 0;
+    virtual bool IsSecondaryClient() = 0;
 
     virtual void SaveConfig(bool bWaitUntilFinished = false) = 0;
     virtual void UpdateRecentlyPlayed() = 0;
