@@ -1644,12 +1644,14 @@ bool CServerBrowser::OnConnectClick(CGUIElement* pElement)
     return true;
 }
 
-void CServerBrowser::NotifyServerExists(in_addr Address, ushort usPort)
+void CServerBrowser::NotifyServerExists(in_addr Address, ushort usPort, const SString& strHost)
 {
     // If the connect button was pressed, and the server exists, add it to the history
     CServerList* pHistoryList = GetHistoryList();
     pHistoryList->Remove(Address, usPort);
-    pHistoryList->AddUnique(Address, usPort);
+    CServerListItem* pItem = pHistoryList->AddUnique(Address, usPort);
+    if (pItem && CServerListItem::IsHostName(strHost.c_str()))
+        pItem->strHostName = strHost;
     while (pHistoryList->GetServerCount() > 11)
     {
         CServerListItem* pLast = *pHistoryList->IteratorBegin();
@@ -1785,7 +1787,8 @@ bool CServerBrowser::OnFavouritesClick(CGUIElement* pElement)
     {
         in_addr Address;
 
-        CServerListItem::Parse(strHost.c_str(), Address);
+        if (!CServerListItem::Parse(strHost.c_str(), Address))
+            return true;
 
         // Do we have this entry already?  If so, remove it
         if (m_ServersFavourites.Remove(Address, usPort))
@@ -1799,8 +1802,11 @@ bool CServerBrowser::OnFavouritesClick(CGUIElement* pElement)
             return true;
         }
 
-        if (m_ServersFavourites.AddUnique(Address, usPort))
+        if (CServerListItem* pItem = m_ServersFavourites.AddUnique(Address, usPort))
         {
+            if (CServerListItem::IsHostName(strHost.c_str()))
+                pItem->strHostName = strHost;
+
             SaveFavouritesList();
             RequestFilterRefresh(ServerBrowserTypes::FAVOURITES, true);
             for (std::size_t iconIndex = 0; iconIndex < std::size(m_pAddressFavoriteIcon); ++iconIndex)
@@ -2130,12 +2136,23 @@ bool CServerBrowser::LoadServerList(CXMLNode* pNode, const std::string& strTagNa
             CXMLAttribute* pPortAttribute = pSubNode->GetAttributes().Find("port");
             if (pHostAttribute && pPortAttribute)
             {
-                if (CServerListItem::Parse(pHostAttribute->GetValue().c_str(), Address))
+                const std::string strHost = pHostAttribute->GetValue();
+                iPort = atoi(pPortAttribute->GetValue().c_str());
+                if (iPort <= 0 || iPort > 0xFFFF)
+                    continue;
+
+                if (!CServerListItem::Parse(strHost.c_str(), Address))
                 {
-                    iPort = atoi(pPortAttribute->GetValue().c_str());
-                    if (iPort > 0 && iPort <= 0xFFFF)
-                        pList->AddUnique(Address, static_cast<ushort>(iPort));
+                    if (!CServerListItem::IsHostName(strHost.c_str()))
+                        continue;
+
+                    // Hostname failed to resolve, keep the entry anyway so it isn't dropped from the config on the next save
+                    Address.S_un.S_addr = 0;
                 }
+
+                CServerListItem* pItem = pList->AddUnique(Address, static_cast<ushort>(iPort));
+                if (pItem && CServerListItem::IsHostName(strHost.c_str()))
+                    pItem->strHostName = strHost;
             }
         }
     }
