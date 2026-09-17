@@ -38,7 +38,7 @@ public:
     bool AddVisibleToReference(CElement* pElement);
     bool RemoveVisibleToReference(CElement* pElement);
     void ClearVisibleToReferences();
-    bool IsVisibleToElement(CElement* pElement);
+    bool IsVisibleToElement(CElement* element);
 
     bool IsVisibleToPlayer(CPlayer& Player);
 
@@ -57,11 +57,11 @@ protected:
 private:
     void RemoveIdenticalEntries(std::set<class CPlayer*>& List1, std::set<class CPlayer*>& List2);
 
-    bool SetElementVisibility(CElement* pElement, bool bVisible);
+    bool SetElementVisibility(CElement* element, bool visible);
 
-    void UpdatePlayersBelow(CElement* pElement);
-    void HidePlayersBelow(CElement* pElement);
-    void SyncPlayerVisibility(class CPlayer* pPlayer);
+    void UpdatePlayersBelow(CElement* element);
+    void HidePlayersBelow(CElement* element);
+    void SyncPlayerVisibility(class CPlayer* player);
 
     void AddPlayerReference(class CPlayer* pPlayer);
     void RemovePlayerReference(class CPlayer* pPlayer);
