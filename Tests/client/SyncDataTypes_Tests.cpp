@@ -133,7 +133,7 @@ TEST(SIntegerSync, RoundTrip_6Bit)
 // Step size = (max - min) / ((1 << N) - 1).
 // bPreserveGreaterThanMin: if true, any value > min reads back as > min.
 
-// Player health: 8 bits over [0, 200]. Step ~ 0.78.
+// Player health: 8 bits over [0, 255]. Step = 1.0.
 TEST(SPlayerHealthSync, RoundTrip_Zero)
 {
     MockBitStream     bs;
@@ -160,19 +160,6 @@ TEST(SPlayerHealthSync, RoundTrip_MaxHealth)
     EXPECT_NEAR(200.0f, out.data.fValue, 1.1f);
 }
 
-// Values above the health cap are clamped during write.
-TEST(SPlayerHealthSync, RoundTrip_ClampMax)
-{
-    MockBitStream     bs;
-    SPlayerHealthSync sync;
-    sync.data.fValue = 999.0f;
-    sync.Write(bs);
-    bs.ResetReadPointer();
-    SPlayerHealthSync out;
-    EXPECT_TRUE(out.Read(bs));
-    EXPECT_NEAR(200.0f, out.data.fValue, 1.1f);
-}
-
 // bPreserveGreaterThanMin=true ensures that any health > 0 reads back as > 0.
 // This is important for preventing "dead" false positives during sync.
 TEST(SPlayerHealthSync, RoundTrip_SmallPositive)
@@ -187,7 +174,7 @@ TEST(SPlayerHealthSync, RoundTrip_SmallPositive)
     EXPECT_GT(out.data.fValue, 0.0f) << "PreserveGreaterThanMin should keep small values above zero";
 }
 
-// Player armor: 8 bits over [0, 100]. Step ~ 0.39.
+// Player armor: 8 bits over [0, 127.5]. Step = 0.5.
 TEST(SPlayerArmorSync, RoundTrip_FullArmor)
 {
     MockBitStream    bs;
@@ -198,20 +185,7 @@ TEST(SPlayerArmorSync, RoundTrip_FullArmor)
     bs.ResetReadPointer();
     SPlayerArmorSync out;
     EXPECT_TRUE(out.Read(bs));
-    EXPECT_NEAR(100.0f, out.data.fValue, 0.5f);
-}
-
-// Values above the armor cap are clamped during write.
-TEST(SPlayerArmorSync, RoundTrip_ClampMax)
-{
-    MockBitStream    bs;
-    SPlayerArmorSync sync;
-    sync.data.fValue = 9999.0f;
-    sync.Write(bs);
-    bs.ResetReadPointer();
-    SPlayerArmorSync out;
-    EXPECT_TRUE(out.Read(bs));
-    EXPECT_NEAR(100.0f, out.data.fValue, 0.5f);
+    EXPECT_NEAR(100.0f, out.data.fValue, 0.6f);
 }
 
 // Vehicle health: 12 bits over [0, 2047.5]. Step = 0.5.

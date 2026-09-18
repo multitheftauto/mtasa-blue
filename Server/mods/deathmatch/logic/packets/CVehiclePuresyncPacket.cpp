@@ -18,7 +18,6 @@
 #include "Utils.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "net/SyncStructures.h"
-#include "CStaticFunctionDefinitions.h"
 
 extern CGame* g_pGame;
 
@@ -297,10 +296,9 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             SPlayerHealthSync health;
             if (!BitStream.Read(&health))
                 return false;
-            const float fIncomingHealth = health.data.fValue;
+            float fHealth = std::clamp(health.data.fValue, 0.0f, pSourcePlayer->GetMaxHealth());
 
             float fOldHealth = pSourcePlayer->GetHealth();
-            float fHealth = pSourcePlayer->ValidateIncomingSyncHealth(fIncomingHealth);
             float fHealthLoss = fOldHealth - fHealth;
 
             // Less than last packet's frame?
@@ -321,17 +319,13 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             }
             pSourcePlayer->SetHealth(fHealth);
 
-            if (fHealth != fIncomingHealth)
-                CStaticFunctionDefinitions::SendHealthCorrectionToPlayer(pSourcePlayer, pSourcePlayer, fHealth);
-
             // Armor
             SPlayerArmorSync armor;
             if (!BitStream.Read(&armor))
                 return false;
-            const float fIncomingArmor = armor.data.fValue;
+            float fArmor = armor.data.fValue;
 
             float fOldArmor = pSourcePlayer->GetArmor();
-            float fArmor = pSourcePlayer->ValidateIncomingSyncArmor(fIncomingArmor);
             float fArmorLoss = fOldArmor - fArmor;
 
             // Less than last packet's frame?
@@ -351,9 +345,6 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                 pSourcePlayer->CallEvent("onPlayerDamage", Arguments);
             }
             pSourcePlayer->SetArmor(fArmor);
-
-            if (fArmor != fIncomingArmor)
-                CStaticFunctionDefinitions::SendArmorCorrectionToPlayer(pSourcePlayer, pSourcePlayer, fArmor);
 
             // Flags
             SVehiclePuresyncFlags flags;

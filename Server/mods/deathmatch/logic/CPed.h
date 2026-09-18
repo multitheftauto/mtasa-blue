@@ -23,16 +23,6 @@
 #define WEAPON_SLOTS         13
 #define STEALTH_KILL_RANGE   2.5f
 
-struct SHealthArmorAuth
-{
-    float     fExpectedValue = -1.0f;
-    long long llAuthorizeTime = 0;
-};
-
-static constexpr long long HEALTH_ARMOR_AUTH_TIMEOUT_MS = 3000;
-static constexpr float     HEALTH_AUTH_EPSILON = 1.5f;
-static constexpr float     ARMOR_AUTH_EPSILON = 1.0f;
-
 enum ePedMoveAnim
 {
     MOVE_DEFAULT = 0,
@@ -206,11 +196,6 @@ public:
     float GetArmor() const noexcept { return m_armor; }
     void  SetArmor(float armor) noexcept { m_armor = std::clamp(armor, 0.0f, 100.0f); }
 
-    void  AuthorizeHealthChange(float fExpectedValue) noexcept;
-    void  AuthorizeArmorChange(float fExpectedValue) noexcept;
-    float ValidateIncomingSyncHealth(float fIncomingHealth) noexcept;
-    float ValidateIncomingSyncArmor(float fIncomingArmor) noexcept;
-
     float GetPlayerStat(unsigned short usStat) { return (usStat < NUM_PLAYER_STATS) ? m_fStats[usStat] : 0; }
     void  SetPlayerStat(unsigned short usStat, float fValue)
     {
@@ -369,9 +354,6 @@ protected:
     SPlayerAnimData                      m_animData{};
     float                                m_cameraRotation{};
     bool                                 m_hanging{false};  // Is the player hanging during a climb task?
-
-    SHealthArmorAuth m_healthAuth;
-    SHealthArmorAuth m_armorAuth;
 
     CVehicle*    m_pVehicle;
     unsigned int m_uiVehicleSeat;

@@ -358,16 +358,14 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
     // And health
     if (ucFlags & 0x08)
     {
-        const float fHealth = std::clamp(pPed->GetSyncedHealth(), 0.0f, pPed->GetMaxHealth());
-        pBitStream->Write(fHealth);
-        pPed->m_LastSyncedData->fHealth = fHealth;
+        pBitStream->Write(pPed->GetHealth());
+        pPed->m_LastSyncedData->fHealth = pPed->GetHealth();
     }
 
     if (ucFlags & 0x10)
     {
-        const float fArmor = std::clamp(pPed->GetSyncedArmor(), 0.0f, 100.0f);
-        pBitStream->Write(fArmor);
-        pPed->m_LastSyncedData->fArmour = fArmor;
+        pBitStream->Write(pPed->GetArmor());
+        pPed->m_LastSyncedData->fArmour = pPed->GetArmor();
     }
 
     if (flags2 & 0x01)
