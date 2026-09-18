@@ -1963,8 +1963,10 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
                 return false;
             if (!CVehicleManager::IsValidModel(usModel))
                 return false;
-            unsigned short usOldModel = pVehicle->GetModel();  // Get the old model
-            CLuaArguments  Arguments;
+            unsigned short      usOldModel = pVehicle->GetModel();  // Get the old model
+            const unsigned char ucOldVariant = pVehicle->GetVariant();
+            const unsigned char ucOldVariant2 = pVehicle->GetVariant2();
+            CLuaArguments       Arguments;
             Arguments.PushNumber(usOldModel);
             pVehicle->SetModel(usModel);    // Set the new model
             Arguments.PushNumber(usModel);  // Get the new model
@@ -1977,6 +1979,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             {
                 // Change canceled
                 pVehicle->SetModel(usOldModel);
+                pVehicle->SetVariants(ucOldVariant, ucOldVariant2);
                 return false;
             }
 
