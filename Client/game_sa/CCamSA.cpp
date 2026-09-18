@@ -101,6 +101,16 @@ void CCamSA::SetDirection(float fHorizontal, float fVertical)
     if (!std::isfinite(fHorizontal) || !std::isfinite(fVertical))
         return;
 
-    m_pInterface->m_fHorizontalAngle = WrapAngleRad(fHorizontal);
-    m_pInterface->m_fVerticalAngle = WrapAngleRad(fVertical);
+    const float wrappedHorizontal = WrapAngleRad(fHorizontal);
+    const float wrappedVertical = WrapAngleRad(fVertical);
+
+    m_pInterface->m_fHorizontalAngle = wrappedHorizontal;
+    m_pInterface->m_fVerticalAngle = wrappedVertical;
+    m_pInterface->m_fTargetBeta = wrappedHorizontal;
+    m_pInterface->m_fTrueBeta = wrappedHorizontal;
+    m_pInterface->m_fTrueAlpha = wrappedVertical;
+    m_pInterface->m_fTransitionBeta = wrappedHorizontal;
+    m_pInterface->m_fBufferedTargetBeta = wrappedHorizontal;
+    m_pInterface->m_fBufferedTargetOrientation = wrappedHorizontal;
+    m_pInterface->ResetStatics = false;
 }
