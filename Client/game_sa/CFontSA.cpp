@@ -185,3 +185,54 @@ eFontStyle CFontSA::GetFontStyle()
 
     return eFontStyle::FONT_MENU;
 }
+
+using SharedUtil::CalcMTASAPath;
+using SharedUtil::PathJoin;
+
+static bool HOOK_CTxdStore_LoadTxd_Fonts(int slot, const char* path)
+{
+    // Check if custom or high-definition font TXD is available in MTA data directory
+    static SString mtaFontsPath = CalcMTASAPath(PathJoin("MTA", "data", "fonts.txd"));
+    if (FileExists(mtaFontsPath))
+        path = *mtaFontsPath;
+
+    return reinterpret_cast<bool (*)(int, const char*)>(0x7320B0)(slot, path);
+}
+
+static void HOOK_CFont_Initialise_Post()
+{
+    // Call original readFontsDat (0x7187C0)
+    ((void (*)())0x7187C0)();
+
+    // Automatically apply crisp high-definition bilinear filtering to font rasters
+    CFontSA::ApplyHDTextureFiltering();
+}
+
+void CFontSA::StaticSetHooks()
+{
+    // Hook CTxdStore::LoadTxd call inside CFont::Initialise at 0x5BA6A4 to support HD font TXDs
+    HookInstallCall(0x5BA6A4, reinterpret_cast<DWORD>(HOOK_CTxdStore_LoadTxd_Fonts));
+
+    // Hook CFont::Initialise (0x5BA690) at call to readFontsDat (0x5BA6E5)
+    HookInstallCall(0x5BA6E5, reinterpret_cast<DWORD>(HOOK_CFont_Initialise_Post));
+}
+
+void CFontSA::ApplyHDTextureFiltering()
+{
+    // CFont::Sprite[0] (0xC71AD0) is font2 (Pricedown, Subtitles, Challenges)
+    // CFont::Sprite[1] (0xC71AD4) is font1 (Menu, Secondary fonts)
+    RwTexture** fontTexture2 = reinterpret_cast<RwTexture**>(0xC71AD0);
+    RwTexture** fontTexture1 = reinterpret_cast<RwTexture**>(0xC71AD4);
+
+    if (fontTexture2 && *fontTexture2)
+    {
+        // Enforce high-quality linear filtering (0x02 = rwFILTERLINEAR) on the font raster
+        (*fontTexture2)->flags = ((*fontTexture2)->flags & ~0xFF) | 0x02;
+    }
+
+    if (fontTexture1 && *fontTexture1)
+    {
+        // Enforce high-quality linear filtering (0x02 = rwFILTERLINEAR) on the font raster
+        (*fontTexture1)->flags = ((*fontTexture1)->flags & ~0xFF) | 0x02;
+    }
+}
