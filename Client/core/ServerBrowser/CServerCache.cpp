@@ -211,6 +211,12 @@ bool CServerCache::LoadServerCache()
 ///////////////////////////////////////////////////////////////
 void CServerCache::SaveServerCache(bool bWaitUntilFinished)
 {
+    // Finish the previous snapshot before checking for changes made during its save.
+    while (bWaitUntilFinished && ms_bIsSaving.load(std::memory_order_acquire))
+    {
+        Sleep(1);
+    }
+
     // Check if we need to save
     if (m_bListChanged && !ms_bIsSaving.load(std::memory_order_acquire))
     {
