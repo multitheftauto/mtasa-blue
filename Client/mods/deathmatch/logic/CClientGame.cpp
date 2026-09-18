@@ -4707,13 +4707,7 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicl
 
             pVehicleClientEntity->CallEvent("onClientVehicleCollision", Arguments, true);
 
-            // Update the colliding vehicle, because it might have been invalidated in onClientVehicleCollision (e.g. fixVehicle, destroyElement)
-            if (pVehicleClientEntity->IsBeingDeleted() || !pVehicleClientEntity->GetGameEntity())
-            {
-                pCollidingVehicle = nullptr;
-                return true;
-            }
-
+            // Update the colliding vehicle, because it might have been invalidated in onClientVehicleCollision (e.g. fixVehicle)
             pCollidingVehicle = reinterpret_cast<CVehicleSAInterface*>(pVehicleClientEntity->GetGameEntity()->GetInterface());
 
             // Allocate a BitStream
@@ -5037,6 +5031,9 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
 
 // Called when GTA:SA destroys an entity (e.g., during map streaming).
 // Clear stale pool entries to prevent dangling pointer crashes in GetClientEntity/GetEntity.
+// Note: This may leak the CObjectSA/CVehicleSA/CPedSA wrapper if MTA created it, but we cannot
+// safely delete it here since the game entity is mid-destruction. The leak is acceptable
+// as this is an abnormal code path (GTA destroying MTA-managed entities).
 void CClientGame::GameObjectDestructHandler(CEntitySAInterface* pObject)
 {
     if (auto* pSlot = g_pGame->GetPools()->GetObject(reinterpret_cast<DWORD*>(pObject)))

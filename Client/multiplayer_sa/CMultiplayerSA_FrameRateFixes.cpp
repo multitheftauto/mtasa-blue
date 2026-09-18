@@ -1104,107 +1104,6 @@ static bool __fastcall HOOK_CPhysical__ApplyCollisionAlt(CPhysicalSAInterface* t
     return result;
 }
 
-static float scaledVehicleStillVelocityThreshold = 0.0045f;
-
-// In GTA:SA (30 FPS, timeStep = 1.66667f), vehicles sleep after 10 still frames (~333 ms).
-// At high framerates (e.g. 240 FPS), 10 frames elapse in only ~41 ms, putting unoccupied
-// vehicles to sleep prematurely while suspension springs are still oscillating or settling.
-// Scaling GTA:SA's 10-frame threshold by (kOriginalTimeStep / timeStep) preserves
-// an invariant ~333 ms stillness window across all framerates with zero magic numbers.
-static uint8 __cdecl CalculateVehicleSleepFrameThreshold() noexcept
-{
-    const float timeStep = *reinterpret_cast<const float*>(0xB7CB5C);
-    if (timeStep <= 0.0001f)
-        return 10;
-
-    // Scale the stationary vehicle damping velocity threshold (0.0045f in GTA:SA)
-    // to preserve framerate-invariant stillness sensitivity across all framerates.
-    scaledVehicleStillVelocityThreshold = 0.0045f * (timeStep / kOriginalTimeStep);
-
-    constexpr float originalSleepFrames = 10.0f;
-    const float     rawThreshold = originalSleepFrames * (kOriginalTimeStep / timeStep);
-    return static_cast<uint8>(std::clamp(std::round(rawThreshold), 10.0f, 240.0f));
-}
-
-// Fixes bottomed-out or stretched vehicle suspension when spawning or dropping at high framerates.
-// CAutomobile::ProcessControl
-#define HOOKPOS_CAutomobile__ProcessControl_SleepThreshold  0x6B1D34
-#define HOOKSIZE_CAutomobile__ProcessControl_SleepThreshold 10
-static const unsigned int     RETURN_CAutomobile__ProcessControl_SleepThreshold = 0x6B1D3E;
-static void __declspec(naked) HOOK_CAutomobile__ProcessControl_SleepThreshold()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        push ecx
-        push edx
-        call CalculateVehicleSleepFrameThreshold
-        mov bl, al
-        pop edx
-        pop ecx
-
-        mov al, dl
-        cmp al, bl
-        mov [esi+0xB8], dl
-        jmp RETURN_CAutomobile__ProcessControl_SleepThreshold
-    }
-    // clang-format on
-}
-
-// Fixes bottomed-out or stretched bike suspension when spawning or dropping at high framerates.
-// CBike::ProcessControl
-#define HOOKPOS_CBike__ProcessControl_SleepThreshold  0x6B997C
-#define HOOKSIZE_CBike__ProcessControl_SleepThreshold 8
-static const unsigned int     RETURN_CBike__ProcessControl_SleepThreshold = 0x6B9984;
-static void __declspec(naked) HOOK_CBike__ProcessControl_SleepThreshold()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        push ecx
-        push edx
-        call CalculateVehicleSleepFrameThreshold
-        pop edx
-        pop ecx
-
-        cmp cl, al
-        mov [esi+0xB8], cl
-        jmp RETURN_CBike__ProcessControl_SleepThreshold
-    }
-    // clang-format on
-}
-
-// CBike::ProcessControl sleep counter clamp
-#define HOOKPOS_CBike__ProcessControl_SleepClamp  0x6B99C5
-#define HOOKSIZE_CBike__ProcessControl_SleepClamp 16
-static const unsigned int     RETURN_CBike__ProcessControl_SleepClamp = 0x6B99D5;
-static void __declspec(naked) HOOK_CBike__ProcessControl_SleepClamp()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        push ecx
-        push edx
-        call CalculateVehicleSleepFrameThreshold
-        pop edx
-        pop ecx
-
-        cmp [esi+0xB8], al
-        jbe clamp_done
-        mov [esi+0xB8], al
-
-    clamp_done:
-        jmp RETURN_CBike__ProcessControl_SleepClamp
-    }
-    // clang-format on
-}
-
 #define HOOKPOS_CPhysical__ApplyAirResistance  0x544D29
 #define HOOKSIZE_CPhysical__ApplyAirResistance 5
 static const unsigned int     RETURN_CPhysical__ApplyAirResistance = 0x544D4D;
@@ -1396,27 +1295,6 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CDoor__Process_ChassisImpulse);
     EZHookInstall(CDoor__Process_ChassisAngle);
 
-    EZHookInstall(CAutomobile__ProcessControl_SleepThreshold);
-    EZHookInstall(CBike__ProcessControl_SleepThreshold);
-    EZHookInstall(CBike__ProcessControl_SleepClamp);
-
-    // Prevent unoccupied vehicles from instantly sleeping on frame 1 via the idle bypass flag,
-    // which froze vehicle suspension stretched at spawn before gravity could settle the chassis.
-    MemSet((void*)0x6B1AF5, 0x90, 5);
-    MemSet((void*)0x6B9850, 0x90, 5);
-
-    // Prevent stationary damping from wiping vertical velocity (moveSpeed.z = 0), which
-    // choked gravitational settling at high FPS where per-frame gravity is below 0.0045f.
-    MemSet((void*)0x6B361C, 0x90, 3);
-    MemSet((void*)0x6BC18F, 0x90, 3);
-
-    // Scale the stationary damping threshold (0.0045f) to preserve framerate-invariant stillness sensitivity.
-    MemPut(0x6B33F8, &scaledVehicleStillVelocityThreshold);
-    MemPut(0x6B340E, &scaledVehicleStillVelocityThreshold);
-    MemPut(0x6B3424, &scaledVehicleStillVelocityThreshold);
-    MemPut(0x6BC103, &scaledVehicleStillVelocityThreshold);
-    MemPut(0x6BC119, &scaledVehicleStillVelocityThreshold);
-    MemPut(0x6BC12B, &scaledVehicleStillVelocityThreshold);
     HookInstallCall(CALL_CPhysical__ApplyCollision_1, (DWORD)HOOK_CPhysical__ApplyCollision);
     HookInstallCall(CALL_CPhysical__ApplyCollision_2, (DWORD)HOOK_CPhysical__ApplyCollision);
     HookInstallCall(CALL_CPhysical__ApplyCollision_3, (DWORD)HOOK_CPhysical__ApplyCollision);
