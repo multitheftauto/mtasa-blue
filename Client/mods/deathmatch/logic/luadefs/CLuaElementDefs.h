@@ -104,4 +104,7 @@ public:
     LUA_DECLARE(SetElementCallPropagationEnabled);
     static bool SetElementLighting(CClientEntity* entity, float lighting);
     static bool SetElementOnFire(CClientEntity* entity, bool onFire) noexcept;
+
+private:
+    static bool ApplyElementScale(CClientEntity* entity, const CVector& vecScale);
 };

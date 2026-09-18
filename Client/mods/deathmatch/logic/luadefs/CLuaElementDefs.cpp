@@ -13,6 +13,8 @@
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 #include "CLuaElementDefs.h"
+#include "CClientBuilding.h"
+#include "CClientObject.h"
 using std::list;
 
 void CLuaElementDefs::LoadFunctions()
@@ -555,7 +557,12 @@ std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> CLuaElementDef
 {
     //  float, float, float getElementScale ( element theElement )
     CVector scale;
-    if (!CStaticFunctionDefinitions::GetElementScale(*entity, scale))
+
+    if (entity->GetType() == CCLIENTBUILDING)
+        scale = static_cast<CClientBuilding*>(entity)->GetScale();
+    else if (IS_OBJECT(entity))
+        static_cast<CClientObject*>(entity)->GetScale(scale);
+    else
         return false;
 
     if (lua_ncallresult(luaVM) == 3)
@@ -1998,9 +2005,36 @@ bool CLuaElementDefs::SetElementScale(CClientEntity* entity, std::variant<CVecto
     //  bool setElementScale ( element theElement, float scale )
     //  bool setElementScale ( element theElement, float x, float y, float z )
     if (const auto* uniformScale = std::get_if<float>(&scale))
-        return CStaticFunctionDefinitions::SetElementScale(*entity, CVector(*uniformScale, *uniformScale, *uniformScale));
+        return ApplyElementScale(entity, CVector(*uniformScale, *uniformScale, *uniformScale));
 
-    return CStaticFunctionDefinitions::SetElementScale(*entity, std::get<CVector>(scale));
+    return ApplyElementScale(entity, std::get<CVector>(scale));
+}
+
+bool CLuaElementDefs::ApplyElementScale(CClientEntity* entity, const CVector& vecScale)
+{
+    if (entity->CountChildren() && entity->IsCallPropagationEnabled())
+    {
+        CElementListSnapshotRef pList = entity->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++)
+        {
+            if (!(*iter)->IsBeingDeleted())
+                ApplyElementScale(*iter, vecScale);
+        }
+    }
+
+    if (IS_OBJECT(entity))
+    {
+        static_cast<CClientObject*>(entity)->SetScale(vecScale);
+        return true;
+    }
+
+    if (entity->GetType() == CCLIENTBUILDING)
+    {
+        static_cast<CClientBuilding*>(entity)->SetScale(vecScale);
+        return true;
+    }
+
+    return false;
 }
 
 int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)

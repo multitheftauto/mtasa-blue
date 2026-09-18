@@ -438,11 +438,11 @@ int CLuaObjectDefs::StopObject(lua_State* luaVM)
 int CLuaObjectDefs::SetObjectScale(lua_State* luaVM)
 {
     //  bool setObjectScale ( object theObject, float scale )
-    CClientObject* pObject;
+    CClientObject* pEntity;
     CVector        vecScale;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pObject);
+    argStream.ReadUserData(pEntity);
 
     // Caz - This function looks totally wrong
     // the function is designed to support the following syntaxes
@@ -462,7 +462,7 @@ int CLuaObjectDefs::SetObjectScale(lua_State* luaVM)
     }
     if (!argStream.HasErrors())
     {
-        if (CStaticFunctionDefinitions::SetObjectScale(*pObject, vecScale))
+        if (CStaticFunctionDefinitions::SetObjectScale(*pEntity, vecScale))
         {
             lua_pushboolean(luaVM, true);
             return 1;

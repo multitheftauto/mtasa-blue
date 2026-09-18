@@ -110,4 +110,7 @@ public:
     LUA_DECLARE(setLowLODElement);
     LUA_DECLARE(setElementCallPropagationEnabled);
     static bool SetElementOnFire(CElement* element, bool onFire) noexcept;
+
+private:
+    static bool applyElementScale(CElement* element, const CVector& vecScale);
 };

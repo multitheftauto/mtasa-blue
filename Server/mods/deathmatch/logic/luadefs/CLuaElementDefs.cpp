@@ -15,6 +15,9 @@
 #include "CScriptArgReader.h"
 #include "CDummy.h"
 #include "Utils.h"
+#include "CBuilding.h"
+#include "CObject.h"
+#include "packets/CElementRPCPacket.h"
 
 void CLuaElementDefs::LoadFunctions()
 {
@@ -747,8 +750,18 @@ std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> CLuaElementDef
 {
     //  float float float getElementScale ( element theElement )
     CVector scale;
-    if (!CStaticFunctionDefinitions::GetElementScale(element, scale))
-        return false;
+
+    switch (element->GetType())
+    {
+        case CElement::OBJECT:
+            scale = static_cast<CObject*>(element)->GetScale();
+            break;
+        case CElement::BUILDING:
+            scale = static_cast<CBuilding*>(element)->GetScale();
+            break;
+        default:
+            return false;
+    }
 
     if (lua_ncallresult(luaVM) == 3)
         return CLuaMultiReturn<float, float, float>(scale.fX, scale.fY, scale.fZ);
@@ -1922,9 +1935,42 @@ bool CLuaElementDefs::setElementScale(CElement* element, std::variant<CVector, f
     //  bool setElementScale ( element theElement, float scale )
     //  bool setElementScale ( element theElement, float x, float y, float z )
     if (const auto* uniformScale = std::get_if<float>(&scale))
-        return CStaticFunctionDefinitions::SetElementScale(element, CVector(*uniformScale, *uniformScale, *uniformScale));
+        return applyElementScale(element, CVector(*uniformScale, *uniformScale, *uniformScale));
 
-    return CStaticFunctionDefinitions::SetElementScale(element, std::get<CVector>(scale));
+    return applyElementScale(element, std::get<CVector>(scale));
+}
+
+bool CLuaElementDefs::applyElementScale(CElement* element, const CVector& vecScale)
+{
+    if (element->CountChildren() && element->IsCallPropagationEnabled())
+    {
+        CElementListSnapshotRef pList = element->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++)
+        {
+            if (!(*iter)->IsBeingDeleted())
+                applyElementScale(*iter, vecScale);
+        }
+    }
+
+    switch (element->GetType())
+    {
+        case CElement::OBJECT:
+            static_cast<CObject*>(element)->SetScale(vecScale);
+            break;
+        case CElement::BUILDING:
+            static_cast<CBuilding*>(element)->SetScale(vecScale);
+            break;
+        default:
+            return false;
+    }
+
+    CBitStream bitStream;
+    bitStream.pBitStream->Write(vecScale.fX);
+    bitStream.pBitStream->Write(vecScale.fY);
+    bitStream.pBitStream->Write(vecScale.fZ);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(element, SET_ELEMENT_SCALE, *bitStream.pBitStream));
+
+    return true;
 }
 
 int CLuaElementDefs::setElementVelocity(lua_State* luaVM)
