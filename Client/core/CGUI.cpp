@@ -488,7 +488,7 @@ void CLocalGUI::Draw()
     bool bChatPreview = m_pMainMenu->GetSettingsWindow()->IsChatTabVisible();
     bool bChatVisible = (bIsIngame && m_bChatboxVisible) || bChatPreview;
 
-    bool bChatInputBlocked = !bChatVisible || bChatPreview;
+    bool bChatInputBlocked = !bChatVisible || bChatPreview || m_bChatboxInputBlocked;
 
     if (m_pChat->IsVisible() != bChatVisible || m_pChat->IsInputBlocked() != bChatInputBlocked)
         m_pChat->SetVisible(bChatVisible, bChatInputBlocked);
