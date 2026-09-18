@@ -12,6 +12,8 @@
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 #include "CBassAudio.h"
+#include "CClientWorldSoundManager.h"
+#include <game/CAEAudioHardware.h>
 
 #include <array>
 #include <cctype>
@@ -1316,6 +1318,83 @@ bool CLuaAudioDefs::ResetWorldSounds()
     return true;
 }
 
+bool CLuaAudioDefs::ReplaceWorldSound(lua_State* luaVM, const std::string path, int group, std::optional<int> index, std::optional<float> minDistance,
+                                      std::optional<float> maxDistance)
+{
+    CResource* resource = &lua_getownerresource(luaVM);
+    if (!resource || !g_pClientGame || !g_pClientGame->GetWorldSoundManager())
+        return false;
+
+    if (group < 0 || group > BANKSLOT_44)
+        throw LuaFunctionError("replaceWorldSound: invalid sound group (valid range is 0-44)");
+
+    const int soundIndex = index.value_or(-1);
+    if (soundIndex < -1)
+        throw LuaFunctionError("replaceWorldSound: invalid sound index (minimum is -1)");
+
+    std::string resolvedPath;
+    const bool  isRawData = !CResourceManager::ParseResourcePathInput(path, resource, &resolvedPath, nullptr, true);
+
+    const SString soundSource = isRawData ? path : resolvedPath;
+
+    SString    error;
+    const bool replaced = g_pClientGame->GetWorldSoundManager()->ReplaceSound(static_cast<uint>(group), static_cast<uint>(soundIndex), soundSource, isRawData,
+                                                                              minDistance.value_or(-1.0f), maxDistance.value_or(-1.0f), &error);
+    if (!replaced && !error.empty())
+        m_pScriptDebugging->LogCustom(luaVM, SString("replaceWorldSound: %s", error.c_str()).c_str());
+
+    return replaced;
+}
+
+bool CLuaAudioDefs::RestoreWorldSound(int group, std::optional<int> index)
+{
+    if (!g_pClientGame || !g_pClientGame->GetWorldSoundManager())
+        return false;
+
+    return g_pClientGame->GetWorldSoundManager()->RestoreSound(static_cast<uint>(group), static_cast<uint>(index.value_or(-1)));
+}
+
+bool CLuaAudioDefs::RestoreAllWorldSounds()
+{
+    if (g_pClientGame && g_pClientGame->GetWorldSoundManager())
+        g_pClientGame->GetWorldSoundManager()->RestoreAll();
+
+    return true;
+}
+
+bool CLuaAudioDefs::IsWorldSoundReplaced(int group, std::optional<int> index)
+{
+    if (g_pClientGame && g_pClientGame->GetWorldSoundManager())
+        return g_pClientGame->GetWorldSoundManager()->IsSoundReplaced(static_cast<uint>(group), static_cast<uint>(index.value_or(-1)));
+
+    return false;
+}
+
+std::variant<bool, CLuaMultiReturn<uint, uint>> CLuaAudioDefs::GetWorldSoundBankSlotInfo(int group, int index)
+{
+    if (group < 0 || group > BANKSLOT_44)
+        throw LuaFunctionError("getWorldSoundBankSlotInfo: invalid sound group (valid range is 0-44)");
+
+    if (index < 0)
+        throw LuaFunctionError("getWorldSoundBankSlotInfo: invalid sound index (cannot be negative)");
+
+    if (!g_pGame)
+        return false;
+
+    CAEAudioHardware* audioHardware = g_pGame->GetAEAudioHardware();
+    if (!audioHardware)
+        return false;
+
+    void* pcmData = nullptr;
+    uint  pcmSize = 0;
+    uint  sampleRate = 0;
+    int   loopStartOffset = -1;
+    if (!audioHardware->GetLoadedSoundInfo(static_cast<ushort>(group), static_cast<ushort>(index), pcmData, pcmSize, sampleRate, loopStartOffset))
+        return false;
+
+    return std::tuple(pcmSize, sampleRate);
+}
+
 std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySFX(lua_State* luaVM, eAudioLookupIndex containerIndex, std::variant<int, eRadioStreamIndex> bank,
                                                          int audioIndex, std::optional<bool> loop)
 {
@@ -1466,6 +1545,11 @@ void CLuaAudioDefs::LoadFunctions()
                                                                              {"setWorldSoundEnabled", ArgumentParserWarn<false, SetWorldSoundEnabled>},
                                                                              {"isWorldSoundEnabled", ArgumentParserWarn<false, IsWorldSoundEnabled>},
                                                                              {"resetWorldSounds", ArgumentParserWarn<false, ResetWorldSounds>},
+                                                                             {"replaceWorldSound", ArgumentParser<ReplaceWorldSound>},
+                                                                             {"restoreWorldSound", ArgumentParser<RestoreWorldSound>},
+                                                                             {"restoreAllWorldSounds", ArgumentParser<RestoreAllWorldSounds>},
+                                                                             {"isWorldSoundReplaced", ArgumentParser<IsWorldSoundReplaced>},
+                                                                             {"getWorldSoundBankSlotInfo", ArgumentParser<GetWorldSoundBankSlotInfo>},
                                                                              {"playSFX", ArgumentParserWarn<false, PlaySFX>},
                                                                              {"playSFX3D", ArgumentParserWarn<false, PlaySFX3D>},
                                                                              {"getSFXStatus", ArgumentParserWarn<nullptr, GetSFXStatus>},
