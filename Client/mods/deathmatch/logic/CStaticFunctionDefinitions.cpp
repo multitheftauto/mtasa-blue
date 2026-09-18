@@ -1410,6 +1410,8 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
         case CCLIENTBUILDING:
         {
             Entity.SetDimension(usDimension);
+            RefreshElementCollisions(&Entity);
+
             return true;
         }
 
@@ -1423,6 +1425,8 @@ bool CStaticFunctionDefinitions::SetElementDimension(CClientEntity& Entity, unsi
             }
 
             Ped.SetDimension(usDimension);
+            RefreshElementCollisions(&Ped);
+
             return true;
         }
     }
@@ -7630,6 +7634,20 @@ bool CStaticFunctionDefinitions::SetColShapeRadius(CClientColShape* pColShape, f
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetColShapeCheckDimension(CClientColShape* colShape, bool enabled)
+{
+    colShape->SetDimensionCheckEnabled(enabled);
+    RefreshColShapeColliders(colShape);
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeCheckInterior(CClientColShape* colShape, bool enabled)
+{
+    colShape->SetInteriorCheckEnabled(enabled);
+    RefreshColShapeColliders(colShape);
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetColShapeSize(CClientColShape* pColShape, CVector& vecSize)
 {
     if (vecSize.fX < 0.0f)
@@ -7726,6 +7744,35 @@ void CStaticFunctionDefinitions::RefreshColShapeColliders(CClientColShape* pColS
     CVector vecRootPosition;
     m_pRootEntity->GetPosition(vecRootPosition);
     m_pColManager->DoHitDetection(vecRootPosition, 0.0f, m_pRootEntity, pColShape, true);
+}
+
+void CStaticFunctionDefinitions::RefreshElementCollisions(CClientEntity* entity)
+{
+    switch (entity->GetType())
+    {
+        case CCLIENTPLAYER:
+        case CCLIENTPED:
+        case CCLIENTVEHICLE:
+        {
+            CVector entityPosition;
+            entity->GetPosition(entityPosition);
+            m_pColManager->DoHitDetection(entityPosition, 0.0f, entity);
+            break;
+        }
+        case CCLIENTCOLSHAPE:
+            RefreshColShapeColliders(static_cast<CClientColShape*>(entity));
+            break;
+        case CCLIENTMARKER:
+        case CCLIENTPICKUP:
+        {
+            CClientColShape* colShape = GetElementColShape(entity);
+            if (colShape)
+                RefreshColShapeColliders(colShape);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 CClientColShape* CStaticFunctionDefinitions::GetElementColShape(CClientEntity* pEntity)

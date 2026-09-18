@@ -4084,6 +4084,11 @@ retry:
                     bool bAutoCallEvent;
                     bitStream.ReadBit(bAutoCallEvent);
 
+                    bool bCheckDimension;
+                    bool bCheckInterior;
+                    bitStream.ReadBit(bCheckDimension);
+                    bitStream.ReadBit(bCheckInterior);
+
                     CClientColShape* pShape = NULL;
 
                     // Type-dependant stuff
@@ -4163,6 +4168,8 @@ retry:
                     {
                         pShape->SetEnabled(bEnabled);
                         pShape->SetAutoCallEvent(bAutoCallEvent);
+                        pShape->SetDimensionCheckEnabled(bCheckDimension);
+                        pShape->SetInteriorCheckEnabled(bCheckInterior);
                     }
 
                     break;
