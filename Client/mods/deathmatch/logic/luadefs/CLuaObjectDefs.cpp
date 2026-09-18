@@ -438,7 +438,7 @@ int CLuaObjectDefs::StopObject(lua_State* luaVM)
 int CLuaObjectDefs::SetObjectScale(lua_State* luaVM)
 {
     //  bool setObjectScale ( object theObject, float scale )
-    CClientObject* pEntity;
+    CClientEntity* pEntity;
     CVector        vecScale;
 
     CScriptArgReader argStream(luaVM);
