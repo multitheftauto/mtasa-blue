@@ -91,6 +91,13 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
         modelInfo->SetObjectPropertiesGroup(MODEL_PROPERTIES_GROUP_STATIC);
 
+    auto*      modelInfoInterface = modelInfo->GetInterface();
+    const bool isVehicleTuningPart = modelInfoInterface && modelInfo->GetModelType() == eModelInfoType::ATOMIC && modelInfoInterface->bWetRoadReflection;
+    const auto prevSpecialType = isVehicleTuningPart ? modelInfoInterface->eSpecialModelType : eModelSpecialType::NONE;
+
+    if (prevSpecialType != eModelSpecialType::NONE)
+        modelInfoInterface->eSpecialModelType = eModelSpecialType::NONE;
+
     // Load building
     SFileObjectInstance instance{};
     instance.modelID = modelId;
@@ -105,9 +112,11 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     pBuilding->m_pLod = nullptr;
     pBuilding->m_iplIndex = 0;
 
-    // Restore changed properties group
+    // Restore changed properties group and special model type
     if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
         modelInfo->SetObjectPropertiesGroup(prevGroup);
+    if (prevSpecialType != eModelSpecialType::NONE)
+        modelInfoInterface->eSpecialModelType = prevSpecialType;
 
     // Always stream model collosion
     // TODO We can setup collison bounding box and use GTA streamer for it
