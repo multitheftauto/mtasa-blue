@@ -22,6 +22,7 @@
 #include "CBlip.h"
 #include "CWater.h"
 #include "CBuilding.h"
+#include "CBuildingManager.h"
 #include "CPlayerCamera.h"
 #include <cmath>
 #include "CElementDeleter.h"
@@ -714,6 +715,12 @@ bool CStaticFunctionDefinitions::GetElementModel(CElement* pElement, unsigned sh
             usModel = pObject->GetModel();
             break;
         }
+        case CElement::BUILDING:
+        {
+            CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+            usModel = pBuilding->GetModel();
+            break;
+        }
         case CElement::PICKUP:
         {
             CPickup* pPickup = static_cast<CPickup*>(pElement);
@@ -1227,6 +1234,18 @@ bool CStaticFunctionDefinitions::GetElementRotation(CElement* pElement, CVector&
 
             break;
         }
+        case CElement::BUILDING:
+        {
+            CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+            pBuilding->GetRotation(vecRotation);
+            ConvertRadiansToDegrees(vecRotation);
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
+            }
+
+            break;
+        }
         default:
             return false;
     }
@@ -1399,6 +1418,28 @@ bool CStaticFunctionDefinitions::SetElementRotation(CElement* pElement, const CV
                 CVector vZXY = ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY);
                 SetObjectRotation(pObject, vZXY);
             }
+
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+            CVector    vecRadians = vecRotation;
+
+            if (argumentRotOrder != EULER_DEFAULT && argumentRotOrder != EULER_ZXY)
+            {
+                vecRadians = ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY);
+            }
+
+            ConvertDegreesToRadians(vecRadians);
+            pBuilding->SetRotation(vecRadians);
+
+            CBitStream BitStream;
+            BitStream.pBitStream->Write(vecRadians.fX);
+            BitStream.pBitStream->Write(vecRadians.fY);
+            BitStream.pBitStream->Write(vecRadians.fZ);
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pBuilding, SET_OBJECT_ROTATION, *BitStream.pBitStream));
+
             break;
         }
         default:
@@ -1411,6 +1452,9 @@ bool CStaticFunctionDefinitions::SetElementRotation(CElement* pElement, const CV
 bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CVector& vecVelocity)
 {
     assert(pElement);
+    if (!vecVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetElementVelocity(*iter, vecVelocity))
 
     int iType = pElement->GetType();
@@ -1453,6 +1497,9 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CV
 bool CStaticFunctionDefinitions::SetElementAngularVelocity(CElement* pElement, const CVector& vecTurnVelocity)
 {
     assert(pElement);
+    if (!vecTurnVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetElementAngularVelocity(*iter, vecTurnVelocity))
 
     int iType = pElement->GetType();
@@ -1973,6 +2020,31 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             {
                 // Change canceled
                 pObject->SetModel(usOldModel);
+                return false;
+            }
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+            if (pBuilding->GetModel() == usModel)
+                return false;
+            if (!CBuildingManager::IsValidModel(usModel))
+                return false;
+            unsigned short usOldModel = pBuilding->GetModel();  // Get the old model
+            CLuaArguments  Arguments;
+            Arguments.PushNumber(usOldModel);
+            pBuilding->SetModel(usModel);   // Set the new model
+            Arguments.PushNumber(usModel);  // Get the new model
+            bool bContinue = pBuilding->CallEvent("onElementModelChange", Arguments);
+            // Check for another call to setElementModel
+            if (usModel != pBuilding->GetModel())
+                return false;
+
+            if (!bContinue)
+            {
+                // Change canceled
+                pBuilding->SetModel(usOldModel);
                 return false;
             }
             break;
@@ -6755,6 +6827,9 @@ bool CStaticFunctionDefinitions::SetVehicleTaxiLightOn(CElement* pElement, bool 
 bool CStaticFunctionDefinitions::SetVehicleTurnVelocity(CElement* pElement, const CVector& vecTurnVelocity)
 {
     assert(pElement);
+    if (!vecTurnVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetVehicleTurnVelocity(*iter, vecTurnVelocity))
 
     if (IS_VEHICLE(pElement))
