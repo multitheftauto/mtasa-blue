@@ -45,6 +45,7 @@ CChat::CChat(CGUI* pManager, const CVector2D& vecPosition)
     m_bVisible = false;
     m_bInputBlocked = false;
     m_bInputVisible = false;
+    m_bInputPreview = false;
     m_pFont = m_pManager->GetClearFont();
     m_pDXFont = NULL;
     SetDxFont(g_pCore->GetGraphics()->GetFont());
@@ -146,13 +147,35 @@ void CChat::LoadCVars()
     CVARS_GET("chat_position_horizontal", (unsigned int&)m_ePositionHorizontal);
     CVARS_GET("chat_position_vertical", (unsigned int&)m_ePositionVertical);
     CVARS_GET("chat_text_alignment", (unsigned int&)m_eTextAlign);
+
+    if (m_bInputPreview)
+        SetInputText(m_strInputText.c_str());
 }
 
 //
 // Draw
 //
-void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
+void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline, const CRect2D* pClipRect)
 {
+    auto SetScissor = [](bool bEnabled, const CRect2D* pRect)
+    {
+        IDirect3DDevice9* pDevice = g_pCore->GetGraphics()->GetDevice();
+        if (bEnabled)
+        {
+            RECT rect;
+            rect.left = static_cast<LONG>(std::max(0.0f, pRect->fX1));
+            rect.top = static_cast<LONG>(std::max(0.0f, pRect->fY1));
+            rect.right = static_cast<LONG>(std::max(0.0f, pRect->fX2));
+            rect.bottom = static_cast<LONG>(std::max(0.0f, pRect->fY2));
+            pDevice->SetScissorRect(&rect);
+            pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, TRUE);
+        }
+        else
+        {
+            pDevice->SetRenderState(D3DRS_SCISSORTESTENABLE, FALSE);
+        }
+    };
+
     // Are we visible and is input blocked?
     if (!m_bVisible && m_bInputBlocked)
         return;
@@ -166,7 +189,14 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     }
 
     bool bUsingOutline = m_bTextBlackOutline && bAllowOutline && bUseCacheTexture;
+
+    if (pClipRect)
+        SetScissor(true, pClipRect);
+
     DrawInputLine(bUsingOutline);
+
+    if (pClipRect)
+        SetScissor(false, nullptr);
 
     if (m_bInputVisible)
     {
@@ -181,9 +211,17 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     if (!m_bVisible)
         return;
 
-    // Get drawList for the chat box text
+    // Get drawList for the chat box text. The background box is rendered inside GetDrawList, so it must be scissored as well, otherwise it would cover the
+    // settings window and the text drawn by the other clipped draw calls
     SDrawList drawList;
+
+    if (pClipRect)
+        SetScissor(true, pClipRect);
+
     GetDrawList(drawList, bUsingOutline);
+
+    if (pClipRect)
+        SetScissor(false, nullptr);
 
     // Calc some size info
     CVector2D chatTopLeft(drawList.renderBounds.fX1, drawList.renderBounds.fY1);
@@ -194,7 +232,14 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     // If we are not using a cache texture, just render the text directly to the screen
     if (!bUseCacheTexture)
     {
+        if (pClipRect)
+            SetScissor(true, pClipRect);
+
         DrawDrawList(drawList, chatTopLeft);
+
+        if (pClipRect)
+            SetScissor(false, nullptr);
+
         return;
     }
 
@@ -234,7 +279,15 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     if (!m_pCacheTexture)
     {
         drawList.bOutline = false;  // Outline too slow without cache texture
+
+        if (pClipRect)
+            SetScissor(true, pClipRect);
+
         DrawDrawList(drawList, chatTopLeft);
+
+        if (pClipRect)
+            SetScissor(false, nullptr);
+
         return;
     }
 
@@ -255,9 +308,13 @@ void CChat::Draw(bool bUseCacheTexture, bool bAllowOutline)
     }
 
     // Draw the cache texture
+    if (pClipRect)
+        SetScissor(true, pClipRect);
     pGraphics->SetBlendMode(EBlendMode::ADD);
     pGraphics->DrawTexture(m_pCacheTexture, chatTopLeft.fX, chatTopLeft.fY);
     pGraphics->SetBlendMode(EBlendMode::BLEND);
+    if (pClipRect)
+        SetScissor(false, nullptr);
 }
 
 //
@@ -381,7 +438,7 @@ void CChat::DrawInputLine(bool bUsingOutline)
         }
     }
 
-    if (m_bInputVisible)
+    if (m_bInputVisible || m_bInputPreview)
     {
         float     fLineDifference = CChat::GetFontHeight(m_vecScale.fY);
         bool      bInputShadow = (m_InputColor.A * m_fInputBackgroundAlpha == 0.f) && !bUsingOutline;
@@ -479,7 +536,7 @@ void CChat::UpdateSmoothScroll(float* pfPixelScroll, int* piLineScroll)
     //
     // Also update input background alpha
     //
-    fTarget = (m_bInputVisible) ? 1.0f : 0.0f;
+    fTarget = (m_bInputVisible || m_bInputPreview) ? 1.0f : 0.0f;
     fMaxAmount = fDeltaSeconds * 5.0f;  // 0.2 seconds fade time
     m_fInputBackgroundAlpha += Clamp(-fMaxAmount, fTarget - m_fInputBackgroundAlpha, fMaxAmount);
 }
@@ -855,6 +912,16 @@ void CChat::SetInputVisible(bool bVisible)
     }
 
     m_bInputVisible = bVisible;
+}
+
+void CChat::SetInputPreview(const char* szText)
+{
+    m_bInputPreview = (szText != nullptr);
+
+    if (m_bInputPreview)
+        SetInputText(szText);
+    else
+        ClearInput();
 }
 
 void CChat::SetNumLines(unsigned int uiNumLines)
@@ -1318,6 +1385,9 @@ void CChatInputLine::Draw(CVector2D& position, unsigned char alpha, bool shadow,
 
     if (g_pChat->m_InputTextColor.A > 0 && m_Sections.size() > 0)
     {
+        for (auto& section : m_Sections)
+            section.SetColor(g_pChat->m_InputTextColor);
+
         m_Sections[0].Draw(CVector2D(position.fX + m_Prefix.GetWidth(), position.fY), g_pChat->m_InputTextColor.A, shadow, outline, renderBounds);
 
         float lineDifference = CChat::GetFontHeight(g_pChat->m_vecScale.fY);
