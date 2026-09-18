@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "CRegisteredCommands.h"
 
 int CLuaFunctionDefs::AddCommandHandler(lua_State* luaVM)
 {
@@ -90,7 +91,8 @@ int CLuaFunctionDefs::ExecuteCommandHandler(lua_State* luaVM)
         if (pLuaMain)
         {
             // Call it
-            if (m_pRegisteredCommands->ProcessCommand(strKey, strArgs))
+            CommandExecutionResult result = m_pRegisteredCommands->ProcessCommand(strKey, strArgs, true);
+            if (result.wasExecuted && !result.wasCancelled)
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
