@@ -236,7 +236,7 @@ int CLuaWorldDefs::GetRoofPosition(lua_State* luaVM)
     argStream.ReadVector3D(vecStart);
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     // Get the ground position and return it
     bool  bOutResult;

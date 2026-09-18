@@ -139,7 +139,7 @@ int CLuaBrowserDefs::CreateBrowser(lua_State* luaVM)
     }
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     const auto pWebCore = g_pCore->GetWebCore();
     if (!pWebCore)
@@ -292,7 +292,7 @@ int CLuaBrowserDefs::LoadBrowserURL(lua_State* luaVM)
     }
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     lua_pushboolean(luaVM, false);
     return 1;
@@ -984,7 +984,7 @@ int CLuaBrowserDefs::GUICreateBrowser(lua_State* luaVM)
     }
 
     if (argStream.HasErrors())
-        return luaL_error(luaVM, argStream.GetFullErrorMessage());
+        return argStream.ThrowError();
 
     lua_pushboolean(luaVM, false);
     return 1;
