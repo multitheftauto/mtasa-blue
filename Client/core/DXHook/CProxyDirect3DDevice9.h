@@ -508,6 +508,7 @@ public:
         IDirect3DVertexBuffer9* StreamData;
         UINT                    StreamOffset;
         UINT                    StreamStride;
+        UINT                    StreamSize;
     };
 
     // Saved from last scene render

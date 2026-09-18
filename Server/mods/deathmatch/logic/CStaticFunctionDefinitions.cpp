@@ -4470,13 +4470,19 @@ bool CStaticFunctionDefinitions::WarpPedIntoVehicle(CPed* pPed, CVehicle* pVehic
                     // they have instead of just dropping it - the vehicle itself isn't synced to clients yet
                     // either, and an RPC referencing an unknown element there would leave the server and clients
                     // permanently disagreeing about whether this ped is in a vehicle.
-                    auto sendWarpRpc = [pPed, pVehicle, uiSeat]()
+                    // Captured by id since a deferred run may outlive either element
+                    auto sendWarpRpc = [pedID = pPed->GetID(), vehicleID = pVehicle->GetID(), uiSeat]()
                     {
+                        CElement* pPedElement = CElementIDs::GetElement(pedID);
+                        CElement* pVehicleElement = CElementIDs::GetElement(vehicleID);
+                        if (!pPedElement || !pVehicleElement || pPedElement->IsBeingDeleted() || pVehicleElement->IsBeingDeleted())
+                            return;
+
                         CBitStream BitStream;
-                        BitStream.pBitStream->Write(pVehicle->GetID());
+                        BitStream.pBitStream->Write(vehicleID);
                         BitStream.pBitStream->Write(static_cast<unsigned char>(uiSeat));
-                        BitStream.pBitStream->Write(pPed->GenerateSyncTimeContext());
-                        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream));
+                        BitStream.pBitStream->Write(pPedElement->GenerateSyncTimeContext());
+                        m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPedElement, WARP_PED_INTO_VEHICLE, *BitStream.pBitStream));
                     };
 
                     if (pCallingResource)

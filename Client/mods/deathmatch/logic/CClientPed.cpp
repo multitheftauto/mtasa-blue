@@ -118,6 +118,7 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_eTaskTypeToBeRestoredOnAnimEnd = TASK_SIMPLE_PLAYER_ON_FOOT;
     m_bisNextAnimationCustom = false;
     m_bisCurrentAnimationCustom = false;
+    m_bCustomAnimBonesPending = false;
     m_strCustomIFPBlockName = "Default";
     m_strCustomIFPAnimationName = "Default";
     m_u32CustomBlockNameHash = 0;
@@ -2968,7 +2969,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         // Same "next frame" issue as above: the gateway swap to our custom hierarchy (see
         // CClientGame::BlendAnimationHierarchyHandler) only takes effect in the game's animation blend
         // a frame after RunNamedAnimation was called, so we can only trim a partial anim's padding once
-        // it's actually playing. Runs every frame while a custom animation is active; cheap and idempotent.
+        // it's actually playing.
         if (m_pAnimationBlock && m_bisCurrentAnimationCustom)
             UpdateCustomPartialAnimationBones();
 
@@ -6077,8 +6078,19 @@ void CClientPed::UpdateAnimationProgressAndSpeed()
     m_AnimationCache.progressWaitForStreamIn = false;
 }
 
+void CClientPed::SetCurrentAnimationCustom(bool bCustom) noexcept
+{
+    m_bisCurrentAnimationCustom = bCustom;
+    // The game builds its association right after this, so restrict the bones on the next pulse
+    m_bCustomAnimBonesPending = bCustom;
+}
+
 void CClientPed::UpdateCustomPartialAnimationBones()
 {
+    if (!m_bCustomAnimBonesPending)
+        return;
+    m_bCustomAnimBonesPending = false;
+
     std::shared_ptr<CClientIFP> pIFP = GetCustomAnimationIFP();
     if (!pIFP)
         return;
@@ -6098,8 +6110,14 @@ void CClientPed::UpdateCustomPartialAnimationBones()
         return;
 
     auto pCustomAnimAssociation = GetAnimAssociation(pCustomHierarchyInterface);
-    if (pCustomAnimAssociation)
-        pCustomAnimAssociation->RestrictToBones(animatedBonesMask);
+    if (!pCustomAnimAssociation)
+    {
+        // Not in the clump yet, try again next pulse
+        m_bCustomAnimBonesPending = true;
+        return;
+    }
+
+    pCustomAnimAssociation->RestrictToBones(animatedBonesMask);
 }
 
 void CClientPed::PostWeaponFire()

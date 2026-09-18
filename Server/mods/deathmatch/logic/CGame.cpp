@@ -4361,7 +4361,7 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
             if (!info.bInProgress || info.usNextPartNumber != Packet.m_usPartNumber || info.usScreenShotId != Packet.m_usScreenShotId)
             {
                 info.bInProgress = false;
-                info.buffer.Clear();
+                info.buffer = CBuffer();
 
                 // Check if new start
                 if (Packet.m_usPartNumber == 0)
@@ -4391,7 +4391,7 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
                 {
                     info.bInProgress = false;
                     info.bRequested = false;
-                    info.buffer.Clear();
+                    info.buffer = CBuffer();
                     return;
                 }
 
@@ -4400,7 +4400,7 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
                 {
                     info.bInProgress = false;
                     info.bRequested = false;
-                    info.buffer.Clear();
+                    info.buffer = CBuffer();
                     return;
                 }
 
@@ -4424,7 +4424,7 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
 
                     info.bInProgress = false;
                     info.bRequested = false;
-                    info.buffer.Clear();
+                    info.buffer = CBuffer();
                 }
             }
         }

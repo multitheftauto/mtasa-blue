@@ -288,6 +288,7 @@ void CScreenShot::StartSaveThread()
         ms_bIsSaving = true;
         SetThreadPriority(hThread, THREAD_PRIORITY_LOWEST);
         ResumeThread(hThread);
+        CloseHandle(hThread);
     }
 }
 

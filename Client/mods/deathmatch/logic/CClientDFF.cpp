@@ -63,7 +63,8 @@ RpClump* CClientDFF::GetLoadedClump(ushort usModelId)
             info.pClump = g_pGame->GetRenderWare()->ReadDFF(NULL, m_RawDataBuffer, usModelId, CClientVehicleManager::IsValidModel(usModelId));
 
             // Remove raw data from memory (can only do one replace when using raw data)
-            SString().swap(m_RawDataBuffer);
+            if (!m_bUsingRawDataForClothes)
+                SString().swap(m_RawDataBuffer);
         }
     }
 
@@ -113,7 +114,12 @@ bool CClientDFF::AddClothingModel(const std::string& modelName)
             return false;
     }
 
-    return g_pGame->GetRenderWare()->ClothesAddFile(m_RawDataBuffer.data(), m_RawDataBuffer.size(), modelName.c_str());
+    if (!g_pGame->GetRenderWare()->ClothesAddFile(m_RawDataBuffer.data(), m_RawDataBuffer.size(), modelName.c_str()))
+        return false;
+
+    // The clothes system keeps the m_RawDataBuffer pointer, so GetLoadedClump must not free the buffer
+    m_bUsingRawDataForClothes = true;
+    return true;
 }
 
 bool CClientDFF::ReplaceModel(unsigned short usModel, bool bAlphaTransparency)
@@ -337,6 +343,7 @@ bool CClientDFF::ReplaceClothes(ushort usModel)
     }
 
     m_Replaced.push_back(usModel);
+    m_bUsingRawDataForClothes = true;
     g_pGame->GetRenderWare()->ClothesAddReplacement(m_RawDataBuffer.data(), m_RawDataBuffer.size(), usModel - CLOTHES_MODEL_ID_FIRST);
     return true;
 }

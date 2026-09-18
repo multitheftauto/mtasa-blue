@@ -352,6 +352,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("blur", 1);                                                     // Enable blur
     DEFAULT("corona_reflections", 0);                                       // Disable corona rain reflections
     DEFAULT("dynamic_ped_shadows", 0);                                      // Disable dynamic ped shadows
+    DEFAULT("dualpass_alpha", 1);                                           // Draw transparent textures in two passes
     DEFAULT("fast_clothes_loading", 1);                                     // 0-off 1-auto 2-on
     DEFAULT("allow_screen_upload", 1);                                      // 0-off 1-on
     DEFAULT("allow_external_sounds", 1);                                    // 0-off 1-on

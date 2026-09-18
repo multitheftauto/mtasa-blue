@@ -1185,6 +1185,26 @@ bool CClientEntity::IsAttachToable()
     return false;
 }
 
+// Runs every frame for every attached entity, so skip the RTTI walk for the common types
+static CPhysical* GetGamePhysical(CClientEntity* pEntity)
+{
+    switch (pEntity->GetType())
+    {
+        case CCLIENTPED:
+        case CCLIENTPLAYER:
+            return static_cast<CClientPed*>(pEntity)->GetGamePlayer();
+        case CCLIENTVEHICLE:
+            return static_cast<CClientVehicle*>(pEntity)->GetGameVehicle();
+        case CCLIENTOBJECT:
+        case CCLIENTWEAPON:
+            return static_cast<CClientObject*>(pEntity)->GetGameObject();
+        case CCLIENTPICKUP:
+            return static_cast<CClientPickup*>(pEntity)->GetGameObject();
+        default:
+            return dynamic_cast<CPhysical*>(pEntity->GetGameEntity());
+    }
+}
+
 void CClientEntity::DoAttaching()
 {
     if (m_pAttachedToEntity)
@@ -1208,8 +1228,8 @@ void CClientEntity::DoAttaching()
         // entity would otherwise stay stuck at its default (too bright) value forever.
         // Keep it in sync with whatever it's attached to every frame, same as vanilla
         // hand-held objects already do with their owning ped.
-        CPhysical* pThisPhysical = dynamic_cast<CPhysical*>(GetGameEntity());
-        CPhysical* pAttachedToPhysical = dynamic_cast<CPhysical*>(m_pAttachedToEntity->GetGameEntity());
+        CPhysical* pThisPhysical = GetGamePhysical(this);
+        CPhysical* pAttachedToPhysical = GetGamePhysical(m_pAttachedToEntity);
         if (pThisPhysical && pAttachedToPhysical)
             pThisPhysical->SetLighting(pAttachedToPhysical->GetLighting());
     }

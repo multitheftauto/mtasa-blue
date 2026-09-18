@@ -231,6 +231,7 @@ void CSettings::ResetGuiPointers()
     m_pCheckBoxTyreSmokeParticles = NULL;
     m_pCheckBoxHighDetailVehicles = NULL;
     m_pCheckBoxHighDetailPeds = NULL;
+    m_pCheckBoxDualPassAlpha = NULL;
     m_pCheckBoxBlur = NULL;
     m_pCheckBoxCoronaReflections = NULL;
     m_pCheckBoxDynamicPedShadows = NULL;
@@ -1471,6 +1472,10 @@ void CSettings::CreateGUI()
     m_pCheckBoxHighDetailPeds->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 110.0f));
     m_pCheckBoxHighDetailPeds->AutoSize(NULL, 20.0f);
 
+    m_pCheckBoxDualPassAlpha = reinterpret_cast<CGUICheckBox*>(pManager->CreateCheckBox(pTabVideo, _("Draw transparent textures in two passes"), true));
+    m_pCheckBoxDualPassAlpha->SetPosition(CVector2D(vecTemp.fX + 245.0f, fPosY + 130.0f));
+    m_pCheckBoxDualPassAlpha->AutoSize(NULL, 20.0f);
+
     vecTemp.fY += 10;
 
     m_pTabs->GetSize(vecTemp);
@@ -2338,6 +2343,10 @@ void CSettings::UpdateVideoTab()
     CVARS_GET("high_detail_peds", bHighDetailPeds);
     m_pCheckBoxHighDetailPeds->SetSelected(bHighDetailPeds);
 
+    bool bDualPassAlpha;
+    CVARS_GET("dualpass_alpha", bDualPassAlpha);
+    m_pCheckBoxDualPassAlpha->SetSelected(bDualPassAlpha);
+
     // Blur
     bool bBlur;
     CVARS_GET("blur", bBlur);
@@ -2738,6 +2747,7 @@ bool CSettings::OnVideoDefaultClick(CGUIElement* pElement)
     CVARS_SET("tyre_smoke_enabled", true);
     CVARS_SET("high_detail_vehicles", false);
     CVARS_SET("high_detail_peds", false);
+    CVARS_SET("dualpass_alpha", true);
     CVARS_SET("blur", true);
     CVARS_SET("corona_reflections", false);
     CVARS_SET("dynamic_ped_shadows", false);
@@ -4552,6 +4562,8 @@ void CSettings::SaveData()
     bool bHighDetailPeds = m_pCheckBoxHighDetailPeds->GetSelected();
     CVARS_SET("high_detail_peds", bHighDetailPeds);
     gameSettings->ResetPedsLODDistance(false);
+
+    CVARS_SET("dualpass_alpha", m_pCheckBoxDualPassAlpha->GetSelected());
 
     // Blur
     bool bBlur = m_pCheckBoxBlur->GetSelected();
