@@ -96,13 +96,17 @@ void CTransferBox::Hide()
     UpdateWindowVisibility();
 
     m_downloadTotalSize = 0;
+
+    m_lastDownloadedSize = 0;
+    m_lastTimeCheck = 0;
+    m_smoothedSpeed = 0.0f;
 }
 
 void CTransferBox::SetDownloadProgress(uint64_t downloadedSizeTotal)
 {
     uint32_t currentTime = GetTickCount32();
 
-    if (m_lastTimeCheck == 0)
+    if (m_lastTimeCheck == 0 || downloadedSizeTotal < m_lastDownloadedSize)
     {
         m_lastTimeCheck = currentTime;
         m_lastDownloadedSize = downloadedSizeTotal;
@@ -134,7 +138,9 @@ void CTransferBox::SetDownloadProgress(uint64_t downloadedSizeTotal)
     SString total = GetDataUnit(m_downloadTotalSize);
 
     SString speedStr;
-    if (m_smoothedSpeed >= 1024.0f * 1024.0f)
+    if (m_smoothedSpeed >= 1024.0f * 1024.0f * 1024.0f)
+        speedStr = SString(_("%.2f GB/s"), m_smoothedSpeed / (1024.0f * 1024.0f * 1024.0f));
+    else if (m_smoothedSpeed >= 1024.0f * 1024.0f)
         speedStr = SString(_("%.2f MB/s"), m_smoothedSpeed / (1024.0f * 1024.0f));
     else if (m_smoothedSpeed >= 1024.0f)
         speedStr = SString(_("%.2f KB/s"), m_smoothedSpeed / 1024.0f);
