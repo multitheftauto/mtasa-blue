@@ -4091,9 +4091,9 @@ void CClientPed::_ChangeModel()
                 m_pPlayerPed->RebuildPlayer();
             }
 
-            // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
+            // Remove reference to the old model we used
             if (pLoadedModel)
-                pLoadedModel->RemoveRef(true);
+                pLoadedModel->RemoveRef();
             pLoadedModel = NULL;
 
             // Warp into it again
@@ -6093,7 +6093,7 @@ void CClientPed::UpdateCustomPartialAnimationBones()
 
     // Bones the source IFP animation doesn't define are padded out to a fixed pose (see CClientIFP),
     // so a full mask means there's nothing to restrict and we can skip finding the association at all.
-    std::bitset<32> animatedBonesMask = pIFP->GetAnimatedBonesMask(strCustomAnimName);
+    std::bitset<64> animatedBonesMask = pIFP->GetAnimatedBonesMask(strCustomAnimName);
     if (animatedBonesMask.all())
         return;
 

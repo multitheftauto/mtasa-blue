@@ -136,6 +136,10 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
             Packet_EntityRemove(bitStream);
             return true;
 
+        case PACKET_ID_ENTITY_REMOVE_TREE:
+            Packet_EntityRemoveTree(bitStream);
+            return true;
+
         // Respawns/hides pickups
         case PACKET_ID_PICKUP_HIDESHOW:
             Packet_PickupHideShow(bitStream);
@@ -4391,6 +4395,118 @@ void CPacketHandler::Packet_EntityRemove(NetBitStreamInterface& bitStream)
             }
         }
     }
+}
+
+void CPacketHandler::Packet_EntityRemoveTree(NetBitStreamInterface& bitStream)
+{
+    // unsigned short (2) - number of root elements
+    // ElementID      (2) - root element ids (repeating)
+
+    unsigned short rootElementCount = 0;
+    if (!bitStream.ReadCompressed(rootElementCount))
+        return;
+
+    std::vector<CClientEntity*> rootElements;
+    rootElements.reserve(rootElementCount);
+
+    for (unsigned short i = 0; i < rootElementCount; ++i)
+    {
+        ElementID rootID = INVALID_ELEMENT_ID;
+        if (!bitStream.Read(rootID))
+            return;
+
+        CClientEntity* rootEntity = CElementIDs::GetElement(rootID);
+        if (rootEntity)
+        {
+            if (rootEntity->GetType() == CCLIENTPLAYER)
+            {
+                // Protocol error 72: Entity tree root cannot be a player
+                RaiseProtocolError(72);
+                return;
+            }
+            rootElements.push_back(rootEntity);
+        }
+    }
+
+    for (auto* rootEntity : rootElements)
+    {
+        RemoveEntityTree(rootEntity);
+    }
+}
+
+void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
+{
+    if (!rootEntity || rootEntity->IsSystemEntity())
+        return;
+
+    std::vector<CClientEntity*> entitiesToDelete;
+    CollectEntityTree(rootEntity, entitiesToDelete);
+
+    CMappedList<CClientPed*>* pedList = nullptr;
+    CMappedList<CClientPed*>  listOfPeds;
+
+    auto getPedList = [&]() -> CMappedList<CClientPed*>&
+    {
+        if (!pedList)
+        {
+            listOfPeds = g_pClientGame->GetPedSync()->GetList();
+            listOfPeds.push_front(g_pClientGame->GetLocalPlayer());
+            pedList = &listOfPeds;
+        }
+        return *pedList;
+    };
+
+    for (auto* entity : entitiesToDelete)
+    {
+        if (entity->IsSystemEntity())
+            continue;
+
+        const auto entityType = entity->GetType();
+        if (entityType == CCLIENTVEHICLE)
+        {
+            const ElementID entityID = entity->GetID();
+            for (auto* ped : getPedList())
+            {
+                if (ped->m_VehicleInOutID == entityID)
+                    ped->ResetVehicleInOut();
+
+                if (ped->m_bNoNewVehicleTask && ped->m_NoNewVehicleTaskReasonID == entityID)
+                {
+                    ped->m_bNoNewVehicleTask = false;
+                    ped->m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
+                }
+            }
+        }
+        else if (entityType == CCLIENTPED)
+        {
+            auto* removedPed = static_cast<CClientPed*>(entity);
+            for (auto* ped : getPedList())
+            {
+                if (ped->m_bIsGettingJacked && ped->m_pGettingJackedBy == removedPed)
+                {
+                    ped->ResetVehicleInOut();
+                    ped->RemoveFromVehicle(false);
+                    ped->SetVehicleInOutState(VEHICLE_INOUT_NONE);
+                }
+            }
+        }
+
+        entity->DeleteClientChildren();
+        g_pClientGame->m_ElementDeleter.Delete(entity);
+    }
+}
+
+void CPacketHandler::CollectEntityTree(CClientEntity* entity, std::vector<CClientEntity*>& entities)
+{
+    if (!entity)
+        return;
+
+    for (auto iter = entity->IterBegin(); iter != entity->IterEnd(); ++iter)
+    {
+        CollectEntityTree(*iter, entities);
+    }
+
+    entities.push_back(entity);
 }
 
 void CPacketHandler::Packet_PickupHideShow(NetBitStreamInterface& bitStream)
