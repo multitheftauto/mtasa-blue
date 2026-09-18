@@ -302,6 +302,15 @@ void CWebView::SetRenderingPaused(bool bPaused)
             m_RenderData.bufferSize = 0;
             m_RenderData.popupBuffer.reset();
         }
+        else
+        {
+            // WasHidden(false) does not produce OnPaint with external begin-frame
+            // scheduling. Request a full frame so CSS hover / compositor updates
+            // are not left on the last cached texture.
+            m_pWebView->GetHost()->WasResized();
+            m_pWebView->GetHost()->Invalidate(PET_VIEW);
+            m_pWebView->GetHost()->SendExternalBeginFrame();
+        }
     }
 }
 
@@ -351,6 +360,20 @@ void CWebView::ClearTexture()
         }
         pD3DSurface->UnlockRect();
     }
+}
+
+void CWebView::RestoreTexture()
+{
+    {
+        const std::scoped_lock lock(m_RenderData.dataMutex);
+        if (!m_RenderData.buffer || m_RenderData.bufferSize == 0)
+            return;
+
+        // Reuse the retained CEF frame so screenshot filtering is not visible while an asynchronous repaint is pending.
+        m_RenderData.changed = true;
+    }
+
+    UpdateTexture();
 }
 
 void CWebView::UpdateTexture()

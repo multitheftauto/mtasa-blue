@@ -2373,6 +2373,7 @@ CLuaMultiReturn<bool, CClientEntity*, int, float, float, float, float, float, fl
     CEntity* entity = g_pGame->GetWorld()->TestSphereAgainstWorld(
         sphereCenter, radius, ignoredEntity.has_value() ? ignoredEntity.value()->GetGameEntity() : nullptr, checkBuildings.value_or(true),
         checkVehicles.value_or(true), checkPeds.value_or(true), checkObjects.value_or(true), checkDummies.value_or(true), cameraIgnore.value_or(false), result);
+
     if (entity)
         collidedEntity = reinterpret_cast<CClientEntity*>(entity->GetStoredPointer());
 
