@@ -356,15 +356,47 @@ static bool ProbeD3D9Create(HMODULE hD3d9)
     return false;
 }
 
+static constexpr int DXVK_NEGATIVE_PROBE_RECHECK_LAUNCHES = 3;
+
+static SString GetDXVKStageFilesId()
+{
+    SString strId;
+    for (const char* szName : DXVK_LIBRARY_NAMES)
+    {
+        const SString strPath = GetDXVKStageFile(szName);
+
+        WIN32_FILE_ATTRIBUTE_DATA fileInfo = {};
+        if (!GetFileAttributesExW(FromUTF8(strPath).c_str(), GetFileExInfoStandard, &fileInfo))
+            return "";
+
+        strId += SString("%u_%u_%u_%u;", fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh, fileInfo.ftLastWriteTime.dwLowDateTime,
+                         fileInfo.ftLastWriteTime.dwHighDateTime);
+    }
+    return strId;
+}
+
 static bool ProbeVulkanSupport(const SString& strStageDir)
 {
     const SString strStageD3d9 = PathJoin(strStageDir, "d3d9.dll");
     if (!FileExists(strStageD3d9))
         return false;
 
-    const SString strFilesHash = CMD5Hasher::CalculateHexString(strStageD3d9) + CMD5Hasher::CalculateHexString(PathJoin(strStageDir, "dxgi.dll"));
-    if (GetApplicationSettingInt("dxvk", "vulkan_supported") == 1 && GetApplicationSetting("dxvk", "probe_file_hash") == strFilesHash)
-        return true;
+    const SString strFilesId = GetDXVKStageFilesId();
+    if (strFilesId.empty())
+        return false;
+
+    if (GetApplicationSetting("dxvk", "probe_files_id") == strFilesId)
+    {
+        if (GetApplicationSettingInt("dxvk", "vulkan_supported") == 1)
+            return true;
+
+        const int iLaunchesSinceProbe = GetApplicationSettingInt("dxvk", "probe_launches_since_unsupported");
+        if (iLaunchesSinceProbe < DXVK_NEGATIVE_PROBE_RECHECK_LAUNCHES)
+        {
+            SetApplicationSettingInt("dxvk", "probe_launches_since_unsupported", iLaunchesSinceProbe + 1);
+            return false;
+        }
+    }
 
     const SString strProbeD3d9 = PathJoin(strStageDir, SString("d3d9_probe_%d.dll", GetCurrentProcessId()));
     if (!CopyFileW(FromUTF8(strStageD3d9).c_str(), FromUTF8(strProbeD3d9).c_str(), FALSE))
@@ -379,8 +411,8 @@ static bool ProbeVulkanSupport(const SString& strStageDir)
 
     FileDelete(strProbeD3d9);
 
-    if (bSupported)
-        SetApplicationSetting("dxvk", "probe_file_hash", strFilesHash);
+    SetApplicationSetting("dxvk", "probe_files_id", strFilesId);
+    SetApplicationSettingInt("dxvk", "probe_launches_since_unsupported", bSupported ? 0 : 1);
 
     return bSupported;
 }
@@ -413,22 +445,31 @@ void SetDXVKEnabledSetting(bool bEnable)
 
 static bool IsValidDXVKBinary(const SString& strPath)
 {
-    if (FileSize(strPath) < 1000000)
+    const uint64 uiFileSize = FileSize(strPath);
+    if (uiFileSize < 1000000)
         return false;
 
-    SString strData;
-    if (!FileLoad(strPath, strData) || strData.length() < 0x40)
+    SString strDosHeader;
+    if (!FileLoad(strPath, strDosHeader, 0x40) || strDosHeader.length() < 0x40)
         return false;
 
-    const unsigned char* pData = reinterpret_cast<const unsigned char*>(strData.c_str());
-    if (pData[0] != 'M' || pData[1] != 'Z')
+    const unsigned char* pDosHeader = reinterpret_cast<const unsigned char*>(strDosHeader.c_str());
+    if (pDosHeader[0] != 'M' || pDosHeader[1] != 'Z')
         return false;
 
-    const unsigned int uiPe = pData[0x3C] | (pData[0x3D] << 8) | (pData[0x3E] << 16) | (static_cast<unsigned int>(pData[0x3F]) << 24);
-    if (uiPe == 0 || uiPe + 6 > strData.length() || pData[uiPe] != 'P' || pData[uiPe + 1] != 'E' || pData[uiPe + 2] != 0 || pData[uiPe + 3] != 0)
+    const unsigned int uiPe = pDosHeader[0x3C] | (pDosHeader[0x3D] << 8) | (pDosHeader[0x3E] << 16) | (static_cast<unsigned int>(pDosHeader[0x3F]) << 24);
+    if (uiPe == 0 || uiPe >= uiFileSize)
         return false;
 
-    const unsigned short usMachine = static_cast<unsigned short>(pData[uiPe + 4] | (pData[uiPe + 5] << 8));
+    SString strPeHeader;
+    if (!FileLoad(strPath, strPeHeader, 0x8, static_cast<int>(uiPe)) || strPeHeader.length() < 6)
+        return false;
+
+    const unsigned char* pPeHeader = reinterpret_cast<const unsigned char*>(strPeHeader.c_str());
+    if (pPeHeader[0] != 'P' || pPeHeader[1] != 'E' || pPeHeader[2] != 0 || pPeHeader[3] != 0)
+        return false;
+
+    const unsigned short usMachine = static_cast<unsigned short>(pPeHeader[4] | (pPeHeader[5] << 8));
     if (usMachine != 0x014C)
         return false;
 
