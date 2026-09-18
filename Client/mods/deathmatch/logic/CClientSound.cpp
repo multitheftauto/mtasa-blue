@@ -28,6 +28,7 @@ CClientSound::CClientSound(CClientManager* pManager, ElementID ID) : ClassInit(t
     m_bPan = true;
     m_fPan = 0.0f;
     m_bThrottle = false;
+    m_bStreamFailureWarned = false;
 
     m_uiBufferLength = 0;
     m_uiFrameNumberCreated = g_pClientGame->GetFrameCount();
@@ -810,6 +811,12 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
         }
         else if (eventInfo.type == SOUND_EVENT_STREAM_RESULT)
         {
+            if (!eventInfo.bBool && !m_bStreamFailureWarned)
+            {
+                m_bStreamFailureWarned = true;
+                g_pClientGame->GetScriptDebugging()->LogWarning(m_LuaDebugInfo, SString("Unable to stream sound '%s'", *m_strPath));
+            }
+
             // Call onClientSoundStream Lua event
             CLuaArguments Arguments;
             Arguments.PushBoolean(eventInfo.bBool);
