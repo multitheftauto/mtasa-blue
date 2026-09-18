@@ -1622,6 +1622,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
             if ((*iter)->IsSpawned())
             {
                 (*iter)->SetDimension(usDimension);
+                RefreshElementCollisions(*iter);
             }
         }
     }
