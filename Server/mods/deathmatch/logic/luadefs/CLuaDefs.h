@@ -72,7 +72,7 @@ protected:
     static CMainConfig*               m_pMainConfig;
     static inline CLuaModuleManager*  m_pLuaModuleManager = nullptr;
 
-protected:
+public:
     // Old style: Only warn on failure. This should
     // not be used for new functions. ReturnOnError
     // must be a value to use as result on invalid argument

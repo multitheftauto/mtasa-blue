@@ -71,9 +71,9 @@ void CLuaFunctionDefs::LoadFunctions()
 #endif
 
         // Console funcs
-        {"addCommandHandler", CLuaFunctionDefs::AddCommandHandler},
-        {"removeCommandHandler", CLuaFunctionDefs::RemoveCommandHandler},
-        {"executeCommandHandler", CLuaFunctionDefs::ExecuteCommandHandler},
+        {"addCommandHandler", ArgumentParser<CLuaFunctionDefs::AddCommandHandler>},
+        {"removeCommandHandler", ArgumentParser<CLuaFunctionDefs::RemoveCommandHandler>},
+        {"executeCommandHandler", ArgumentParser<CLuaFunctionDefs::ExecuteCommandHandler>},
         {"getCommandHandlers", CLuaFunctionDefs::GetCommandHandlers},
 
         // Loaded map funcs

@@ -15,6 +15,11 @@ class CLuaFunctionDefinitions;
 #include "LuaCommon.h"
 #include "CLuaMain.h"
 #include "CLuaTimerManager.h"
+#include "CLuaFunctionRef.h"
+#include <optional>
+#include <string>
+#include <variant>
+#include <vector>
 
 class CRegisteredCommands;
 
@@ -98,9 +103,11 @@ public:
     LUA_DECLARE(ToggleAllControls);
 
     // Command funcs
-    LUA_DECLARE(AddCommandHandler);
-    LUA_DECLARE(RemoveCommandHandler);
-    LUA_DECLARE(ExecuteCommandHandler);
+    static bool AddCommandHandler(lua_State* luaVM, std::variant<std::string, std::vector<std::string>> commandNames, CLuaFunctionRef handlerFunction,
+                                  std::optional<bool> maybeCaseSensitive);
+    static bool RemoveCommandHandler(lua_State* luaVM, std::variant<std::string, std::vector<std::string>> commandNames,
+                                     std::optional<CLuaFunctionRef> maybeHandlerFunction);
+    static bool ExecuteCommandHandler(lua_State* luaVM, std::string commandName, std::optional<std::string> maybeArgs);
     LUA_DECLARE(GetCommandHandlers);
 
     // Utility
