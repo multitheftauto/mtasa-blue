@@ -14,7 +14,6 @@
 #include "CAEAudioHardwareSA.h"
 #include "CAudioEngineSA.h"
 #include "CGameSA.h"
-#include "CPadSA.h"
 #include "CPhysicalSA.h"
 #include "CSettingsSA.h"
 
@@ -556,13 +555,7 @@ bool CAudioEngineSA::OnWorldSound(CAESound* pAESound)
             pGameEntity = pAESound->pAudioEntity->pEntity;
 
         SWorldSoundEvent event = {
-            pAESound->usGroup,
-            pAESound->usIndex,
-            pGameEntity,
-            pAESound->m_vCurrPosn,
-            pAESound->m_fSoundDistance,
-            pAESound->usGroup == BANKSLOT_HORNS || pAESound->m_nLoopCounter < 0 || pAESound->m_nLoopCounter > 1,
-            pAESound,
+            pAESound->usGroup, pAESound->usIndex, pGameEntity, pAESound->m_vCurrPosn, pAESound->m_fSoundDistance, pAESound,
         };
 
         return m_pWorldSoundHandler(event);
@@ -571,48 +564,34 @@ bool CAudioEngineSA::OnWorldSound(CAESound* pAESound)
     return true;
 }
 
-void CAudioEngineSA::SetWorldSoundMaxDistance(CAESound* pAESound, float fMaxDistance)
+void CAudioEngineSA::SetWorldSoundAudibleRange(CAESound* pAESound, float fAudibleRange, float fMinDistance)
 {
-    if (!pAESound || fMaxDistance <= 0.0f)
+    if (!pAESound || fAudibleRange <= 0.0f)
         return;
 
-    pAESound->m_fSoundDistance = fMaxDistance;
+    const float fDistance = pAESound->m_fCurrCamDist;
+    if (fMinDistance > 0.0f && fDistance > 0.0f && fDistance < fMinDistance)
+        pAESound->m_fSoundDistance = fAudibleRange * (fDistance / fMinDistance);
+    else
+        pAESound->m_fSoundDistance = fAudibleRange;
 }
 
-bool CAudioEngineSA::IsWorldSoundStillActive(uint uiGroup, uint uiIndex, CEntitySAInterface* pEntity) const
+void CAudioEngineSA::UpdateWorldSoundAudibleRange(uint uiGroup, uint uiIndex, float fAudibleRange, float fMinDistance)
 {
-    if (uiGroup == BANKSLOT_HORNS)
-    {
-        auto* pPad = dynamic_cast<CPadSA*>(pGame ? pGame->GetPad() : nullptr);
-        if (!pPad)
-            return false;
-
-        const auto* pPadInterface = pPad->GetInterface();
-        for (uint uiHistoryIndex = 0; uiHistoryIndex < MAX_HORN_HISTORY; ++uiHistoryIndex)
-        {
-            if (pPadInterface->bHornHistory[uiHistoryIndex])
-                return true;
-        }
-        return false;
-    }
-
-    const auto* pSoundManager = reinterpret_cast<const CAESoundManagerSAInterface*>(CLASS_CAESoundManager);
+    auto* pSoundManager = reinterpret_cast<CAESoundManagerSAInterface*>(CLASS_CAESoundManager);
     if (!pSoundManager)
-        return false;
+        return;
 
-    for (const CAESound& sound : pSoundManager->m_aSound)
+    const bool bAnyIndex = uiIndex == static_cast<uint>(-1);
+    for (CAESound& sound : pSoundManager->m_aSound)
     {
-        if (sound.m_nIsUsed != 0 && sound.usGroup == uiGroup && sound.usIndex == uiIndex)
-        {
-            if (!pEntity)
-                return true;
-            if (sound.pGameEntity == pEntity)
-                return true;
-            if (sound.pAudioEntity && sound.pAudioEntity->pEntity == pEntity)
-                return true;
-        }
+        if (sound.usGroup != static_cast<ushort>(uiGroup))
+            continue;
+        if (!bAnyIndex && sound.usIndex != static_cast<ushort>(uiIndex))
+            continue;
+
+        SetWorldSoundAudibleRange(&sound, fAudibleRange, fMinDistance);
     }
-    return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////

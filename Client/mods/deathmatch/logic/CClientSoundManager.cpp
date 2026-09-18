@@ -356,6 +356,23 @@ bool CClientSoundManager::ValidateSound(const SString& strSound, bool bIsRawData
     return true;
 }
 
+static void DownmixPcmToMono(std::vector<char>& pcm, uint uiChannels)
+{
+    const uint uiFrames = static_cast<uint>(pcm.size()) / (sizeof(short) * uiChannels);
+    short*     pSamples = reinterpret_cast<short*>(pcm.data());
+
+    for (uint uiFrame = 0; uiFrame < uiFrames; ++uiFrame)
+    {
+        int iMixed = 0;
+        for (uint uiChannel = 0; uiChannel < uiChannels; ++uiChannel)
+            iMixed += pSamples[uiFrame * uiChannels + uiChannel];
+
+        pSamples[uiFrame] = static_cast<short>(iMixed / static_cast<int>(uiChannels));
+    }
+
+    pcm.resize(uiFrames * sizeof(short));
+}
+
 bool CClientSoundManager::DecodeToPcm(const SString& strSound, bool bIsRawData, uint uiSampleRate, std::vector<char>& outPcm) const
 {
     outPcm.clear();
@@ -368,6 +385,15 @@ bool CClientSoundManager::DecodeToPcm(const SString& strSound, bool bIsRawData, 
 
     if (!hStream)
         return false;
+
+    BASS_CHANNELINFO channelInfo;
+    if (!BASS_ChannelGetInfo(hStream, &channelInfo) || (channelInfo.origres != 0 && channelInfo.origres != 16))
+    {
+        BASS_StreamFree(hStream);
+        return false;
+    }
+
+    const uint uiChannels = channelInfo.chans > 1 ? channelInfo.chans : 1;
 
     if (uiSampleRate > 0)
         BASS_ChannelSetAttribute(hStream, BASS_ATTRIB_FREQ, static_cast<float>(uiSampleRate));
@@ -383,6 +409,9 @@ bool CClientSoundManager::DecodeToPcm(const SString& strSound, bool bIsRawData, 
             break;
         outPcm.insert(outPcm.end(), buffer, buffer + dwRead);
     }
+
+    if (uiChannels > 1)
+        DownmixPcmToMono(outPcm, uiChannels);
 
     BASS_StreamFree(hStream);
     return !outPcm.empty();

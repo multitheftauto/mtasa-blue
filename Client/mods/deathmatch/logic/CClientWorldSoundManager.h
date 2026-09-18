@@ -29,7 +29,7 @@ public:
     void RestoreAll();
 
     bool IsSoundReplaced(uint uiGroup, uint uiIndex) const;
-    bool HandleWorldSound(const SWorldSoundEvent& event);
+    void HandleWorldSound(const SWorldSoundEvent& event);
 
     void DoPulse();
 
@@ -40,6 +40,7 @@ private:
         SString strSound;
         float   fMinDistance;
         float   fMaxDistance;
+        float   fOriginalRange = 0.0f;
 
         bool                                        bWholeGroup = false;
         bool                                        bNativeWanted = false;
@@ -55,9 +56,14 @@ private:
 
     bool FindReplacement(uint uiGroup, uint uiIndex, const SReplacement** ppOutReplacement) const;
 
+    void ApplyAudibleRanges();
+    void ApplyAudibleRange(const SReplacement& replacement, CAESound* pAESound);
+    void RestoreAudibleRange(const SReplacement& replacement, uint uiGroup, uint uiIndex);
     bool TryApplyNativeReplacement(SReplacement& replacement, uint uiGroup, uint uiIndex);
     bool PatchSoundBufferIndex(SReplacement& replacement, uint uiGroup, uint uiIndex);
     bool RestoreSoundBuffer(const SReplacement& replacement, uint uiGroup);
+    bool RestoreSoundBufferIndex(const SReplacement& replacement, uint uiGroup, uint uiIndex);
+    void ReapplyGroupReplacement(uint uiGroup);
     void ApplyNativeReplacements();
     void LogResult(SReplacement& replacement, uint uiGroup, uint uiIndex, const SString& strResult, bool bWarning);
 

@@ -137,10 +137,10 @@ public:
     bool          IsWorldSoundEnabled(uint uiGroup, uint uiIndex);
     void          ResetWorldSounds();
     void          SetWorldSoundHandler(WorldSoundHandler* pHandler);
-    void          SetWorldSoundMaxDistance(CAESound* pAESound, float fMaxDistance);
+    void          SetWorldSoundAudibleRange(CAESound* pAESound, float fAudibleRange, float fMinDistance);
+    void          UpdateWorldSoundAudibleRange(uint uiGroup, uint uiIndex, float fAudibleRange, float fMinDistance);
     void          ReportBulletHit(CEntity* pEntity, unsigned char ucSurfaceType, CVector* pvecPosition, float f_2);
     void          ReportWeaponEvent(int iEvent, eWeaponType weaponType, CPhysical* pPhysical);
-    bool          IsWorldSoundStillActive(uint uiGroup, uint uiIndex, CEntitySAInterface* pEntity) const;
 
     void UpdateAmbientSoundSettings();
     bool OnWorldSound(CAESound* pAESound);

@@ -29,6 +29,13 @@ CClientWorldSoundManager::~CClientWorldSoundManager()
 bool CClientWorldSoundManager::ReplaceSound(uint uiGroup, uint uiIndex, const SString& strSound, bool bIsRawData, float fMinDistance, float fMaxDistance,
                                             SString* pOutError)
 {
+    if (uiGroup > BANKSLOT_44)
+    {
+        if (pOutError)
+            *pOutError = SString("invalid sound group %u (the valid range is 0-%u)", uiGroup, static_cast<uint>(BANKSLOT_44));
+        return false;
+    }
+
     if (uiIndex != static_cast<uint>(-1) && uiIndex > 399)
     {
         if (pOutError)
@@ -49,6 +56,20 @@ bool CClientWorldSoundManager::ReplaceSound(uint uiGroup, uint uiIndex, const SS
         return false;
     }
 
+    if (uiIndex != static_cast<uint>(-1) && g_pGame)
+    {
+        if (CAEAudioHardware* pAudioHardware = g_pGame->GetAEAudioHardware())
+        {
+            const uint uiNumSounds = pAudioHardware->GetNumSoundsInBankSlot(static_cast<ushort>(uiGroup));
+            if (uiNumSounds > 0 && uiIndex >= uiNumSounds)
+            {
+                if (pOutError)
+                    *pOutError = SString("invalid sound index %u (group %u has %u sounds)", uiIndex, uiGroup, uiNumSounds);
+                return false;
+            }
+        }
+    }
+
     if (!m_pManager->GetSoundManager()->ValidateSound(strSound, bIsRawData, pOutError))
         return false;
 
@@ -67,6 +88,17 @@ bool CClientWorldSoundManager::ReplaceSound(uint uiGroup, uint uiIndex, const SS
     {
         replacement.originalPcm = std::move(iterExisting->second.originalPcm);
         replacement.pcmByRate = std::move(iterExisting->second.pcmByRate);
+        replacement.fOriginalRange = iterExisting->second.fOriginalRange;
+    }
+    else if (!replacement.bWholeGroup)
+    {
+        auto iterGroup = m_Replacements.find(MakeKey(uiGroup, static_cast<uint>(-1)));
+        if (iterGroup != m_Replacements.end() && iterGroup->second.originalPcm.contains(uiIndex))
+        {
+            RestoreSoundBufferIndex(iterGroup->second, uiGroup, uiIndex);
+            iterGroup->second.originalPcm.erase(uiIndex);
+            iterGroup->second.originalRate.erase(uiIndex);
+        }
     }
 
     m_Replacements[uiKey] = std::move(replacement);
@@ -85,6 +117,7 @@ bool CClientWorldSoundManager::RestoreSound(uint uiGroup, uint uiIndex)
             if ((iter->first >> 16) == uiGroup)
             {
                 RestoreSoundBuffer(iter->second, uiGroup);
+                RestoreAudibleRange(iter->second, uiGroup, iter->first & 0xFFFF);
                 iter = m_Replacements.erase(iter);
                 bErased = true;
             }
@@ -99,7 +132,22 @@ bool CClientWorldSoundManager::RestoreSound(uint uiGroup, uint uiIndex)
         return false;
 
     RestoreSoundBuffer(iter->second, uiGroup);
+    RestoreAudibleRange(iter->second, uiGroup, uiIndex);
+
+    auto iterGroup = m_Replacements.find(MakeKey(uiGroup, static_cast<uint>(-1)));
+    if (iterGroup != m_Replacements.end())
+    {
+        auto iterPcm = iter->second.originalPcm.find(uiIndex);
+        if (iterPcm != iter->second.originalPcm.end())
+        {
+            iterGroup->second.originalPcm[uiIndex] = iterPcm->second;
+            if (auto iterRate = iter->second.originalRate.find(uiIndex); iterRate != iter->second.originalRate.end())
+                iterGroup->second.originalRate[uiIndex] = iterRate->second;
+        }
+    }
+
     m_Replacements.erase(iter);
+    ReapplyGroupReplacement(uiGroup);
     return true;
 }
 
@@ -108,7 +156,10 @@ void CClientWorldSoundManager::RestoreAll()
     if (g_pGame)
     {
         for (auto& iter : m_Replacements)
+        {
             RestoreSoundBuffer(iter.second, iter.first >> 16);
+            RestoreAudibleRange(iter.second, iter.first >> 16, iter.first & 0xFFFF);
+        }
     }
     m_Replacements.clear();
 }
@@ -163,6 +214,9 @@ bool CClientWorldSoundManager::TryApplyNativeReplacement(SReplacement& replaceme
         bool       bAnyApplied = false;
         for (uint i = 0; i < uiNumSounds; ++i)
         {
+            if (m_Replacements.contains(MakeKey(uiGroup, i)))
+                continue;
+
             if (PatchSoundBufferIndex(replacement, uiGroup, i))
                 bAnyApplied = true;
         }
@@ -287,26 +341,41 @@ bool CClientWorldSoundManager::PatchSoundBufferIndex(SReplacement& replacement, 
 
 bool CClientWorldSoundManager::RestoreSoundBuffer(const SReplacement& replacement, uint uiGroup)
 {
-    if (replacement.originalPcm.empty() || !g_pGame)
+    bool bRestored = false;
+    for (const auto& entry : replacement.originalPcm)
+    {
+        if (RestoreSoundBufferIndex(replacement, uiGroup, entry.first))
+            bRestored = true;
+    }
+    return bRestored;
+}
+
+bool CClientWorldSoundManager::RestoreSoundBufferIndex(const SReplacement& replacement, uint uiGroup, uint uiIndex)
+{
+    auto iterPcm = replacement.originalPcm.find(uiIndex);
+    if (iterPcm == replacement.originalPcm.end() || !g_pGame)
         return false;
 
     CAEAudioHardware* pAudioHardware = g_pGame->GetAEAudioHardware();
     if (!pAudioHardware)
         return false;
 
-    bool bRestored = false;
-    for (const auto& entry : replacement.originalPcm)
-    {
-        const ushort usIndex = static_cast<ushort>(entry.first);
-        if (pAudioHardware->PatchSoundBuffer(static_cast<ushort>(uiGroup), usIndex, entry.second.data(), static_cast<uint>(entry.second.size())))
-        {
-            auto iterRate = replacement.originalRate.find(entry.first);
-            if (iterRate != replacement.originalRate.end())
-                pAudioHardware->SetSoundSampleRate(static_cast<ushort>(uiGroup), usIndex, iterRate->second);
-            bRestored = true;
-        }
-    }
-    return bRestored;
+    if (!pAudioHardware->PatchSoundBuffer(static_cast<ushort>(uiGroup), static_cast<ushort>(uiIndex), iterPcm->second.data(),
+                                          static_cast<uint>(iterPcm->second.size())))
+        return false;
+
+    auto iterRate = replacement.originalRate.find(uiIndex);
+    if (iterRate != replacement.originalRate.end())
+        pAudioHardware->SetSoundSampleRate(static_cast<ushort>(uiGroup), static_cast<ushort>(uiIndex), iterRate->second);
+
+    return true;
+}
+
+void CClientWorldSoundManager::ReapplyGroupReplacement(uint uiGroup)
+{
+    auto iter = m_Replacements.find(MakeKey(uiGroup, static_cast<uint>(-1)));
+    if (iter != m_Replacements.end())
+        TryApplyNativeReplacement(iter->second, uiGroup, static_cast<uint>(-1));
 }
 
 void CClientWorldSoundManager::LogResult(SReplacement& replacement, uint uiGroup, uint uiIndex, const SString& strResult, bool bWarning)
@@ -351,7 +420,7 @@ void CClientWorldSoundManager::ApplyNativeReplacements()
     }
 }
 
-bool CClientWorldSoundManager::HandleWorldSound(const SWorldSoundEvent& event)
+void CClientWorldSoundManager::HandleWorldSound(const SWorldSoundEvent& event)
 {
     SReplacement* pReplacement = nullptr;
     auto          iter = m_Replacements.find(MakeKey(event.uiGroup, event.uiIndex));
@@ -365,7 +434,7 @@ bool CClientWorldSoundManager::HandleWorldSound(const SWorldSoundEvent& event)
     }
 
     if (!pReplacement)
-        return false;
+        return;
 
     const uint uiNow = GetTickCount32();
     if (!pReplacement->bNativeApplied && uiNow - pReplacement->uiNativeLastTryTick >= 500)
@@ -374,13 +443,62 @@ bool CClientWorldSoundManager::HandleWorldSound(const SWorldSoundEvent& event)
         pReplacement->bNativeApplied = TryApplyNativeReplacement(*pReplacement, event.uiGroup, event.uiIndex);
     }
 
-    if (pReplacement->fMaxDistance > 0.0f && event.pAESound && g_pGame && g_pGame->GetAudioEngine())
-        g_pGame->GetAudioEngine()->SetWorldSoundMaxDistance(event.pAESound, pReplacement->fMaxDistance);
+    if (pReplacement->fOriginalRange <= 0.0f)
+        pReplacement->fOriginalRange = event.fRollOffFactor;
 
-    return false;
+    ApplyAudibleRange(*pReplacement, event.pAESound);
+}
+
+void CClientWorldSoundManager::ApplyAudibleRange(const SReplacement& replacement, CAESound* pAESound)
+{
+    if (!pAESound || (replacement.fMinDistance <= 0.0f && replacement.fMaxDistance <= 0.0f))
+        return;
+
+    CAudioEngine* pAudioEngine = g_pGame ? g_pGame->GetAudioEngine() : nullptr;
+    if (!pAudioEngine)
+        return;
+
+    const float fAudibleRange = replacement.fMaxDistance > 0.0f ? replacement.fMaxDistance : replacement.fOriginalRange;
+    if (fAudibleRange <= 0.0f)
+        return;
+
+    pAudioEngine->SetWorldSoundAudibleRange(pAESound, fAudibleRange, replacement.fMinDistance);
+}
+
+void CClientWorldSoundManager::RestoreAudibleRange(const SReplacement& replacement, uint uiGroup, uint uiIndex)
+{
+    if (replacement.fOriginalRange <= 0.0f || !g_pGame)
+        return;
+
+    if (CAudioEngine* pAudioEngine = g_pGame->GetAudioEngine())
+        pAudioEngine->UpdateWorldSoundAudibleRange(uiGroup, uiIndex, replacement.fOriginalRange, 0.0f);
+}
+
+void CClientWorldSoundManager::ApplyAudibleRanges()
+{
+    if (m_Replacements.empty() || !g_pGame)
+        return;
+
+    CAudioEngine* pAudioEngine = g_pGame->GetAudioEngine();
+    if (!pAudioEngine)
+        return;
+
+    for (const auto& iter : m_Replacements)
+    {
+        const SReplacement& replacement = iter.second;
+        if (replacement.fMinDistance <= 0.0f && replacement.fMaxDistance <= 0.0f)
+            continue;
+
+        const float fAudibleRange = replacement.fMaxDistance > 0.0f ? replacement.fMaxDistance : replacement.fOriginalRange;
+        if (fAudibleRange <= 0.0f)
+            continue;
+
+        pAudioEngine->UpdateWorldSoundAudibleRange(iter.first >> 16, iter.first & 0xFFFF, fAudibleRange, replacement.fMinDistance);
+    }
 }
 
 void CClientWorldSoundManager::DoPulse()
 {
     ApplyNativeReplacements();
+    ApplyAudibleRanges();
 }

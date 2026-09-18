@@ -160,9 +160,20 @@ bool CLuaAudioDefs::ReplaceWorldSound(lua_State* luaVM, std::string strSound, in
         return false;
 
     const int iIndex = index.value_or(-1);
-    SString   strSoundCopy = strSound;
-    SString   strFilename;
-    bool      bIsRawData = false;
+    if (group < 0 || group > BANKSLOT_44)
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "replaceWorldSound: invalid sound group %d (the valid range is 0-%d)", group, static_cast<int>(BANKSLOT_44));
+        return false;
+    }
+    if (iIndex < -1 || iIndex > 399)
+    {
+        m_pScriptDebugging->LogWarning(luaVM, "replaceWorldSound: invalid sound index %d (the valid range is -1 to 399)", iIndex);
+        return false;
+    }
+
+    SString strSoundCopy = strSound;
+    SString strFilename;
+    bool    bIsRawData = false;
     if (CResourceManager::ParseResourcePathInput(strSoundCopy, pResource, &strFilename, nullptr, true))
         strSoundCopy = strFilename;
     else
