@@ -321,11 +321,20 @@ bool CBuildingsPoolSA::Resize(int size)
     auto*     pool = (*m_ppBuildingPoolInterface);
     const int currentSize = pool->m_nSize;
 
-    // Clear before the malloc calls so the rollback Resize(currentSize), called on
-    // allocation failure below, always runs the link sweeps regardless of whether
-    // RemoveAllWithBackup had set this flag before the outer call.
     const bool skipLinkSweeps = m_bLinkSweepsDone;
     m_bLinkSweepsDone = false;
+
+    // Allocate every replacement block first so a failure leaves the old pool and its world pointers intact.
+    CBuildingSAInterface* newObjects = MemSA::malloc_struct<CBuildingSAInterface>(size);
+    if (!newObjects)
+        return false;
+
+    tPoolObjectFlags* newBytemap = MemSA::malloc_struct<tPoolObjectFlags>(size);
+    if (!newBytemap)
+    {
+        MemSA::free(newObjects);
+        return false;
+    }
 
     try
     {
@@ -333,26 +342,14 @@ bool CBuildingsPoolSA::Resize(int size)
     }
     catch (const std::bad_alloc&)
     {
+        MemSA::free(newBytemap);
+        MemSA::free(newObjects);
         return false;
     }
     catch (const std::length_error&)
     {
-        return false;
-    }
-
-    // Allocate every replacement block first so a failure leaves the old pool and its world pointers intact.
-    CBuildingSAInterface* newObjects = MemSA::malloc_struct<CBuildingSAInterface>(size);
-    if (newObjects == nullptr)
-    {
-        m_buildingPool.entities.resize(currentSize);
-        return false;
-    }
-
-    tPoolObjectFlags* newBytemap = MemSA::malloc_struct<tPoolObjectFlags>(size);
-    if (newBytemap == nullptr)
-    {
+        MemSA::free(newBytemap);
         MemSA::free(newObjects);
-        m_buildingPool.entities.resize(currentSize);
         return false;
     }
 
