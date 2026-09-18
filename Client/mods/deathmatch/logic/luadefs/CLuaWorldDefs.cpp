@@ -339,9 +339,9 @@ namespace
             PushNumberField(model, "ry", rotation.fY * RADIANS_TO_DEGREES);
             PushNumberField(model, "rz", rotation.fZ * RADIANS_TO_DEGREES);
             PushNumberField(model, "interior", entity->m_areaCode);
-            PushNumberField(model, "ipl", entity->m_iplIndex);
+            PushNumberField(model, "iplIndex", entity->m_iplIndex);
             PushNumberField(model, "lodModel", entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0);
-            PushBoolField(model, "lod", entity->m_pLod != nullptr);
+            PushBoolField(model, "hasLod", entity->m_pLod != nullptr);
             PushBoolField(model, "collisions", entity->bUsesCollision);
             PushBoolField(model, "isStatic", entity->bIsStatic);
             PushBoolField(model, "visible", entity->bIsVisible);
@@ -368,11 +368,12 @@ std::vector<CLuaArguments> CLuaWorldDefs::GetStreamedWorldModels(std::optional<f
 
     if (maxDistance.has_value())
     {
-        if (const auto* localPlayer = CStaticFunctionDefinitions::GetLocalPlayer())
-        {
-            localPlayer->GetPosition(referencePosition);
-            maxDistanceSquared = *maxDistance * *maxDistance;
-        }
+        const auto* localPlayer = g_pClientGame->GetLocalPlayer();
+        if (!localPlayer)
+            throw LuaFunctionError("The argument maxDistance cannot be used without a local player.");
+
+        localPlayer->GetPosition(referencePosition);
+        maxDistanceSquared = *maxDistance * *maxDistance;
     }
 
     auto* buildingPool = *reinterpret_cast<CPoolSAInterface<CBuildingSAInterface>**>(CLASS_CBuildingPool);
