@@ -9,30 +9,16 @@
  *****************************************************************************/
 
 #include "StdInc.h"
-#include <chrono>
 
 using std::list;
-
-// Number of background worker threads used to poll/re-request models that are still loading.
-// Kept small: all engine calls are serialized behind m_ModelInfoMutex anyway, so more threads
-// would just contend on that lock rather than do useful parallel work.
-static constexpr unsigned int kNumModelWorkerThreads = 2;
-
-// How long a worker sleeps between polls of an in-flight model request.
-// Kept at 5ms so an async model load is noticed within a few ms of completing.
-static constexpr int kWorkerPollIntervalMs = 5;
 
 CClientModelRequestManager::CClientModelRequestManager()
 {
     m_bDoingPulse = false;
-    StartWorkers(kNumModelWorkerThreads);
 }
 
 CClientModelRequestManager::~CClientModelRequestManager()
 {
-    // Stop workers first so nothing is touching m_Requests/entries while we tear them down.
-    StopWorkers();
-
     // Delete all our requests.
     list<SClientModelRequest*>::iterator iter;
     for (iter = m_Requests.begin(); iter != m_Requests.end(); iter++)
@@ -43,107 +29,12 @@ CClientModelRequestManager::~CClientModelRequestManager()
     m_Requests.clear();
 }
 
-void CClientModelRequestManager::StartWorkers(unsigned int uiNumThreads)
-{
-    m_bShutdownWorkers = false;
-    m_WorkerThreads.reserve(uiNumThreads);
-    for (unsigned int i = 0; i < uiNumThreads; ++i)
-        m_WorkerThreads.emplace_back(&CClientModelRequestManager::WorkerLoop, this);
-}
-
-void CClientModelRequestManager::StopWorkers()
-{
-    {
-        std::lock_guard<std::mutex> lock(m_Mutex);
-        m_bShutdownWorkers = true;
-    }
-    m_Cv.notify_all();
-
-    for (auto& thread : m_WorkerThreads)
-    {
-        if (thread.joinable())
-            thread.join();
-    }
-    m_WorkerThreads.clear();
-}
-
-// Runs on a background thread. Pops entries off m_BackgroundQueue and polls/retries them until
-// they're either loaded or cancelled, then hands them back to the main thread via
-// bBackgroundProcessed. Never deletes an entry and never calls ModelRequestCallback/MakeCustomModel
-// itself - that stays on the main thread inside DoPulse().
-void CClientModelRequestManager::WorkerLoop()
-{
-    for (;;)
-    {
-        SClientModelRequest* pEntry = nullptr;
-
-        // Wait for work or shutdown
-        {
-            std::unique_lock<std::mutex> lock(m_Mutex);
-            m_Cv.wait(lock, [this] { return m_bShutdownWorkers || !m_BackgroundQueue.empty(); });
-
-            if (m_bShutdownWorkers)
-                return;
-
-            pEntry = m_BackgroundQueue.front();
-            m_BackgroundQueue.pop();
-        }
-
-        // Process this entry until it's loaded or cancelled
-        for (;;)
-        {
-            if (m_bShutdownWorkers || pEntry->bCancelled.load())
-            {
-                // Hand back to the main thread for cleanup. Don't touch the engine or the
-                // entity - Cancel()/the destructor already own responsibility for that.
-                pEntry->bBackgroundProcessed = true;
-                break;
-            }
-
-            // Snapshot the fields we need under the lock, since Request() can reassign
-            // pModel/reset requestTimer on the main thread while this entry is in flight.
-            CModelInfo* pModel;
-            bool        bShouldRetry;
-            {
-                std::lock_guard<std::mutex> lock(m_Mutex);
-                pModel = pEntry->pModel;
-                bShouldRetry = pEntry->requestTimer.Get() > 2000;
-                if (bShouldRetry)
-                    pEntry->requestTimer.Reset();
-            }
-
-            bool bLoaded;
-            {
-                std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
-                bLoaded = pModel->IsLoaded();
-                if (!bLoaded && bShouldRetry)
-                {
-                    // Request it again. Don't add a reference, or we screw up the reference count.
-                    if (g_pGame->IsASyncLoadingEnabled())
-                        pModel->Request(NON_BLOCKING, "CClientModelRequestManager::WorkerLoop #1");
-                    else
-                        pModel->Request(BLOCKING, "CClientModelRequestManager::WorkerLoop #2");
-                }
-            }
-
-            if (bLoaded)
-            {
-                pEntry->bBackgroundProcessed = true;
-                break;
-            }
-
-            std::this_thread::sleep_for(std::chrono::milliseconds(kWorkerPollIntervalMs));
-        }
-    }
-}
-
 bool CClientModelRequestManager::IsLoaded(unsigned short usModelID)
 {
     // Grab the model info
     CModelInfo* pInfo = g_pGame->GetModelInfo(usModelID);
     if (pInfo)
     {
-        std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
         return pInfo->IsLoaded() ? true : false;
     }
 
@@ -152,8 +43,6 @@ bool CClientModelRequestManager::IsLoaded(unsigned short usModelID)
 
 bool CClientModelRequestManager::IsRequested(CModelInfo* pModelInfo)
 {
-    std::lock_guard<std::mutex> lock(m_Mutex);
-
     // Look through the list
     std::list<SClientModelRequest*>::iterator iter = m_Requests.begin();
     for (; iter != m_Requests.end(); iter++)
@@ -173,8 +62,6 @@ bool CClientModelRequestManager::HasRequested(CClientEntity* pRequester)
 {
     assert(pRequester);
 
-    std::lock_guard<std::mutex> lock(m_Mutex);
-
     // Look through the list
     std::list<SClientModelRequest*>::iterator iter = m_Requests.begin();
     for (; iter != m_Requests.end(); iter++)
@@ -193,8 +80,6 @@ bool CClientModelRequestManager::HasRequested(CClientEntity* pRequester)
 CModelInfo* CClientModelRequestManager::GetRequestedModelInfo(CClientEntity* pRequester)
 {
     assert(pRequester);
-
-    std::lock_guard<std::mutex> lock(m_Mutex);
 
     // Look through the list
     std::list<SClientModelRequest*>::iterator iter = m_Requests.begin();
@@ -218,7 +103,6 @@ bool CClientModelRequestManager::RequestBlocking(unsigned short usModelID, const
     CModelInfo* pInfo = g_pGame->GetModelInfo(usModelID);
     if (pInfo)
     {
-        std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
         pInfo->Request(BLOCKING, szTag);
         if (pInfo->IsLoaded())
         {
@@ -241,61 +125,73 @@ bool CClientModelRequestManager::Request(unsigned short usModelID, CClientEntity
     CModelInfo* pInfo = g_pGame->GetModelInfo(usModelID);
     if (pInfo)
     {
-        std::unique_lock<std::mutex> lock(m_Mutex);
-
         // Has it already requested something?
         list<SClientModelRequest*>::iterator iter;
         if (GetRequestEntry(pRequester, iter))
         {
-            SClientModelRequest* pExisting = *iter;
+            // Get the entry
+            pEntry = *iter;
 
-            if (pInfo == pExisting->pModel)
+            // The same model?
+            if (pInfo == pEntry->pModel)
+            {
+                // He has to wait more for it
                 return false;
-
-            bool bNewModelLoaded;
-            {
-                std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
-                bNewModelLoaded = pExisting->bBackgroundProcessed && pInfo->IsLoaded();
             }
-
-            if (bNewModelLoaded)
+            else
             {
-                CModelInfo* pOldModel = pExisting->pModel;
-                delete pExisting;
-                m_Requests.erase(iter);
+                // Remove the reference to the old model
+                pEntry->pModel->RemoveRef();
 
-                std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
-                pOldModel->RemoveRef();
-                pInfo->MakeCustomModel();
-                return true;
+                // Is it loaded?
+                if (pInfo->IsLoaded())
+                {
+                    // Delete it, remove the it from the list and return true.
+                    delete pEntry;
+                    m_Requests.erase(iter);
+
+                    pInfo->MakeCustomModel();
+                    return true;
+                }
+                else
+                {
+                    // If not loaded. Replace the model we're going to load.
+                    // Also remember that we requested it now.
+                    pEntry->pModel = pInfo;
+                    pEntry->requestTimer.Reset();
+
+                    // Start loading the new model.
+                    pInfo->ModelAddRef(NON_BLOCKING, "CClientModelRequestManager::Request");
+
+                    // He has to wait for it.
+                    return false;
+                }
             }
-
-            pExisting->bCancelled = true;
         }
-
+        else
         {
-            std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
+            // Already loaded? Don't bother adding to the list.
             if (pInfo->IsLoaded())
             {
                 pInfo->MakeCustomModel();
+
                 return true;
             }
 
+            // Request it
             pInfo->ModelAddRef(NON_BLOCKING, "CClientModelRequestManager::Request #2");
+
+            // Add him to the list over models we're waiting for.
+            pEntry = new SClientModelRequest;
+            pEntry->pModel = pInfo;
+            pEntry->pEntity = pRequester;
+            pEntry->requestTimer.SetMaxIncrement(500);
+            pEntry->requestTimer.Reset();
+            m_Requests.push_back(pEntry);
+
+            // Return false. Caller needs to wait.
+            return false;
         }
-
-        pEntry = new SClientModelRequest;
-        pEntry->pModel = pInfo;
-        pEntry->pEntity = pRequester;
-        pEntry->requestTimer.SetMaxIncrement(500);
-        pEntry->requestTimer.Reset();
-        m_Requests.push_back(pEntry);
-
-        m_BackgroundQueue.push(pEntry);
-        lock.unlock();
-        m_Cv.notify_one();
-
-        return false;
     }
 
     // Error, model is bad. Caller should not do this.
@@ -306,89 +202,102 @@ void CClientModelRequestManager::Cancel(CClientEntity* pEntity, bool bAllowQueue
 {
     assert(pEntity);
 
-    std::lock_guard<std::mutex> lock(m_Mutex);
-
-    // Mark any matching, not-yet-finished entries as cancelled. We do NOT delete or erase them
-    // here: a worker thread may currently own the entry. DoPulse() is the only place entries are
-    // deleted, and only once bBackgroundProcessed is true, so it's always safe from there.
-    for (auto* pEntry : m_Requests)
+    // Anything requested by the given class?
+    for (list<SClientModelRequest*>::iterator iter = m_Requests.begin(); iter != m_Requests.end();)
     {
-        if (pEntry->pEntity == pEntity)
-            pEntry->bCancelled = true;
-    }
+        SClientModelRequest* pEntry = *iter;
 
-    m_Cv.notify_all();
+        if (pEntry->pEntity != pEntity)
+        {
+            ++iter;
+            continue;
+        }
+
+        if (m_bDoingPulse)
+        {
+            pEntry->bCancelled = true;
+            ++iter;
+            continue;
+        }
+
+        // Unreference the reference we added to it.
+        pEntry->pModel->RemoveRef();
+
+        // Delete the entry
+        delete pEntry;
+
+        // Remove from the list
+        iter = m_Requests.erase(iter);
+    }
 }
 
 void CClientModelRequestManager::DoPulse()
 {
-    std::unique_lock<std::mutex> lock(m_Mutex);
-
     // Any requests?
     if (m_Requests.size() > 0)
     {
         // We are now doing the pulse
         m_bDoingPulse = true;
 
-        // Reap entries a worker has finished with (loaded or cancelled) and remove them from the list
+        // Call the callback for those finished loading and remove them from the list
         SClientModelRequest*                 pEntry;
         list<SClientModelRequest*>::iterator iter;
         for (iter = m_Requests.begin(); iter != m_Requests.end();)
         {
             pEntry = *iter;
 
-            // Still being processed by a worker? Leave it alone.
-            if (!pEntry->bBackgroundProcessed)
-            {
-                ++iter;
-                continue;
-            }
-
             if (pEntry->bCancelled)
             {
-                // Cancelled: undo the reference we added and just drop it, no callback.
-                CModelInfo* pModel = pEntry->pModel;
+                // Unreference the reference we added to it.
+                pEntry->pModel->RemoveRef();
 
+                // Delete the entry
                 delete pEntry;
+
+                // Remove from the list
                 iter = m_Requests.erase(iter);
-
-                std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
-                pModel->RemoveRef();
-
                 continue;
             }
 
-            // Copy then remove from the list because the request is complete and we don't want it
-            // modified in Request()
-            CModelInfo*    pModel = pEntry->pModel;
-            CClientEntity* pEntity = pEntry->pEntity;
-
-            delete pEntry;
-            iter = m_Requests.erase(iter);
-
-            // Engine work + the callback happen with the manager's own mutex unlocked, so that
-            // ModelRequestCallback is free to call back into Request()/Cancel() without deadlocking.
-            lock.unlock();
-
+            // Is it loaded?
+            if (pEntry->pModel->IsLoaded())
             {
-                std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
+                // Copy then remove from the list because the request is complete and we don't want it modified in Request()
+                const SClientModelRequest entryCopy = *pEntry;
+                delete pEntry;
+                m_Requests.erase(iter);
+
                 // Make sure custom things are replaced
-                pModel->MakeCustomModel();
-            }
+                entryCopy.pModel->MakeCustomModel();
 
-            // Create ped/object/vehicle using the loaded model (this can eventually trigger script events)
-            pEntity->ModelRequestCallback(pModel);
+                // Create ped/object/vehicle using the loaded model (this can eventually trigger script events)
+                entryCopy.pEntity->ModelRequestCallback(entryCopy.pModel);
 
-            {
                 // Unreference us from the model (callback should've added a reference!)
-                std::lock_guard<std::mutex> engineLock(m_ModelInfoMutex);
-                pModel->RemoveRef();
+                entryCopy.pModel->RemoveRef();
+
+                // Restart loop because m_Requests may have been changed
+                iter = m_Requests.begin();
             }
+            else
+            {
+                // Been more than 2 seconds since we requested it? Request it again.
+                if (pEntry->requestTimer.Get() > 2000)
+                {
+                    // Request it again. Don't add reference, or we screw up the
+                    // reference count.
+                    if (g_pGame->IsASyncLoadingEnabled())
+                        pEntry->pModel->Request(NON_BLOCKING, "CClientModelRequestManager::DoPulse #1");
+                    else
+                        pEntry->pModel->Request(BLOCKING, "CClientModelRequestManager::DoPulse #2");
 
-            lock.lock();
+                    // Remember now as the time we requested it.
+                    pEntry->requestTimer.Reset();
+                }
 
-            // The list may have changed while unlocked - restart the scan.
-            iter = m_Requests.begin();
+                // Increment iterator
+                ++iter;
+            }
         }
 
         // No longer doing the pulse
@@ -402,6 +311,7 @@ bool CClientModelRequestManager::GetRequestEntry(CClientEntity* pRequester, list
     std::list<SClientModelRequest*>::iterator iter = m_Requests.begin();
     for (; iter != m_Requests.end(); iter++)
     {
+        // Same requester as we check for? He has requested something.
         if ((*iter)->pEntity == pRequester && !(*iter)->bCancelled)
         {
             // Pass out the iterator entry and return true
