@@ -265,8 +265,8 @@ int CLuaObjectDefs::GetObjectProperties(lua_State* luaVM)
 int CLuaObjectDefs::GetObjectProperty(lua_State* luaVM)
 {
     //  float, float, float getObjectProperty ( object theObject, string property )
-    CClientObject* pObject;
-    ObjectProperty eProp;
+    CClientObject*       pObject;
+    ObjectProperty::Enum eProp;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pObject);
@@ -623,8 +623,8 @@ int CLuaObjectDefs::SetObjectMass(lua_State* luaVM)
 int CLuaObjectDefs::SetObjectProperty(lua_State* luaVM)
 {
     //  bool setObjectProperty ( object theObject, string property, ... )
-    CClientEntity* pEntity;
-    ObjectProperty eProp;
+    CClientEntity*       pEntity;
+    ObjectProperty::Enum eProp;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);

@@ -22,6 +22,7 @@
 #include <game/CBuildingRemoval.h>
 #include "net/SyncStructures.h"
 #include "CServerInfo.h"
+#include "enums/HTTPDownloadType.h"
 
 using std::list;
 
@@ -133,6 +134,10 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
         // Deletes vehicles
         case PACKET_ID_ENTITY_REMOVE:
             Packet_EntityRemove(bitStream);
+            return true;
+
+        case PACKET_ID_ENTITY_REMOVE_TREE:
+            Packet_EntityRemoveTree(bitStream);
             return true;
 
         // Respawns/hides pickups
@@ -419,7 +424,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     bitStream.Read(usHTTPDownloadPort);
 
     SString strExternalHTTPDownloadURL;
-    if (ucHTTPDownloadType == HTTP_DOWNLOAD_ENABLED_URL)
+    if (ucHTTPDownloadType == HTTPDownloadType::HTTP_DOWNLOAD_ENABLED_URL)
     {
         bitStream.ReadString(strExternalHTTPDownloadURL);
     }
@@ -1849,7 +1854,9 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                                 {
                                     // Desynced? Outside but supposed to be in
                                     // For local player or synced peds this is taken care of in CClientPed::UpdateVehicleInOut()
-                                    if (pJacked->GetOccupiedVehicle() && !pJacked->GetRealOccupiedVehicle())
+                                    // Not while his drag animation still plays; an aborted jack ends with him out anyway,
+                                    // and his own client is about to notify that.
+                                    if (pJacked->GetOccupiedVehicle() && !pJacked->GetRealOccupiedVehicle() && !pJacked->IsGettingJacked())
                                     {
                                         // Warp him back in
                                         pJacked->WarpIntoVehicle(pJacked->GetOccupiedVehicle(), pJacked->GetOccupiedVehicleSeat());
@@ -1917,7 +1924,10 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                             pPed->ResetVehicleInOut();
 
                         // Make sure we're removed from the vehicle
-                        bool bDontWarpIfGettingDraggedOut = pPed->IsLocalPlayer() || pPed->IsSyncing();
+                        // A jack victim also leaves through here when the jacker aborts, and his drag
+                        // animation may still be playing on clients watching it; let it finish.
+                        bool bDontWarpIfGettingDraggedOut = pPed->IsLocalPlayer() || pPed->IsSyncing() || pPed->IsGettingJacked();
+
                         pPed->RemoveFromVehicle(bDontWarpIfGettingDraggedOut);
 
                         if (ucSeat == 0)
@@ -2070,7 +2080,10 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                                 }
 
                                 // Warp him out
-                                bool bDontWarpIfGettingDraggedOut = pOutsidePed->IsLocalPlayer() || pOutsidePed->IsSyncing();
+                                // The confirmation only waits for the jacker's own enter animation, so it can arrive while
+                                // the jacked ped's drag animation still plays on clients watching it; let it finish.
+                                bool bDontWarpIfGettingDraggedOut = pOutsidePed->IsLocalPlayer() || pOutsidePed->IsSyncing() || pOutsidePed->IsGettingJacked();
+
                                 pOutsidePed->RemoveFromVehicle(bDontWarpIfGettingDraggedOut);
 
                                 // Reset interpolation so he won't appear on the roof of the vehicle until next sync
@@ -4213,6 +4226,7 @@ retry:
                                                                      rotationRadians.data.vecRotation, ucInterior);
 
                     pBuilding->SetUsesCollision(bCollisonsEnabled);
+                    pEntity = pBuilding;
                     break;
                 }
 
@@ -4381,6 +4395,118 @@ void CPacketHandler::Packet_EntityRemove(NetBitStreamInterface& bitStream)
             }
         }
     }
+}
+
+void CPacketHandler::Packet_EntityRemoveTree(NetBitStreamInterface& bitStream)
+{
+    // unsigned short (2) - number of root elements
+    // ElementID      (2) - root element ids (repeating)
+
+    unsigned short rootElementCount = 0;
+    if (!bitStream.ReadCompressed(rootElementCount))
+        return;
+
+    std::vector<CClientEntity*> rootElements;
+    rootElements.reserve(rootElementCount);
+
+    for (unsigned short i = 0; i < rootElementCount; ++i)
+    {
+        ElementID rootID = INVALID_ELEMENT_ID;
+        if (!bitStream.Read(rootID))
+            return;
+
+        CClientEntity* rootEntity = CElementIDs::GetElement(rootID);
+        if (rootEntity)
+        {
+            if (rootEntity->GetType() == CCLIENTPLAYER)
+            {
+                // Protocol error 72: Entity tree root cannot be a player
+                RaiseProtocolError(72);
+                return;
+            }
+            rootElements.push_back(rootEntity);
+        }
+    }
+
+    for (auto* rootEntity : rootElements)
+    {
+        RemoveEntityTree(rootEntity);
+    }
+}
+
+void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
+{
+    if (!rootEntity || rootEntity->IsSystemEntity())
+        return;
+
+    std::vector<CClientEntity*> entitiesToDelete;
+    CollectEntityTree(rootEntity, entitiesToDelete);
+
+    CMappedList<CClientPed*>* pedList = nullptr;
+    CMappedList<CClientPed*>  listOfPeds;
+
+    auto getPedList = [&]() -> CMappedList<CClientPed*>&
+    {
+        if (!pedList)
+        {
+            listOfPeds = g_pClientGame->GetPedSync()->GetList();
+            listOfPeds.push_front(g_pClientGame->GetLocalPlayer());
+            pedList = &listOfPeds;
+        }
+        return *pedList;
+    };
+
+    for (auto* entity : entitiesToDelete)
+    {
+        if (entity->IsSystemEntity())
+            continue;
+
+        const auto entityType = entity->GetType();
+        if (entityType == CCLIENTVEHICLE)
+        {
+            const ElementID entityID = entity->GetID();
+            for (auto* ped : getPedList())
+            {
+                if (ped->m_VehicleInOutID == entityID)
+                    ped->ResetVehicleInOut();
+
+                if (ped->m_bNoNewVehicleTask && ped->m_NoNewVehicleTaskReasonID == entityID)
+                {
+                    ped->m_bNoNewVehicleTask = false;
+                    ped->m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
+                }
+            }
+        }
+        else if (entityType == CCLIENTPED)
+        {
+            auto* removedPed = static_cast<CClientPed*>(entity);
+            for (auto* ped : getPedList())
+            {
+                if (ped->m_bIsGettingJacked && ped->m_pGettingJackedBy == removedPed)
+                {
+                    ped->ResetVehicleInOut();
+                    ped->RemoveFromVehicle(false);
+                    ped->SetVehicleInOutState(VEHICLE_INOUT_NONE);
+                }
+            }
+        }
+
+        entity->DeleteClientChildren();
+        g_pClientGame->m_ElementDeleter.Delete(entity);
+    }
+}
+
+void CPacketHandler::CollectEntityTree(CClientEntity* entity, std::vector<CClientEntity*>& entities)
+{
+    if (!entity)
+        return;
+
+    for (auto iter = entity->IterBegin(); iter != entity->IterEnd(); ++iter)
+    {
+        CollectEntityTree(*iter, entities);
+    }
+
+    entities.push_back(entity);
 }
 
 void CPacketHandler::Packet_PickupHideShow(NetBitStreamInterface& bitStream)
