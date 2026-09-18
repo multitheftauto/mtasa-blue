@@ -11,6 +11,8 @@
 
 #pragma once
 
+#include <map>
+
 #include "CElement.h"
 #include "packets/CPacket.h"
 
@@ -36,7 +38,7 @@ public:
     bool AddVisibleToReference(CElement* pElement);
     bool RemoveVisibleToReference(CElement* pElement);
     void ClearVisibleToReferences();
-    bool IsVisibleToReferenced(CElement* pElement);
+    bool IsVisibleToElement(CElement* element);
 
     bool IsVisibleToPlayer(CPlayer& Player);
 
@@ -52,16 +54,19 @@ protected:
     void BroadcastOnlyVisible(const CPacket& Packet);
     bool m_bIsSynced;
 
-    std::list<CElement*> m_ElementReferences;
-
 private:
     void RemoveIdenticalEntries(std::set<class CPlayer*>& List1, std::set<class CPlayer*>& List2);
 
-    void AddPlayersBelow(CElement* pElement, std::set<class CPlayer*>& Added);
-    void RemovePlayersBelow(CElement* pElement, std::set<class CPlayer*>& Removed);
+    bool SetElementVisibility(CElement* element, bool visible);
+
+    void UpdatePlayersBelow(CElement* element);
+    void HidePlayersBelow(CElement* element);
+    void SyncPlayerVisibility(class CPlayer* player);
 
     void AddPlayerReference(class CPlayer* pPlayer);
     void RemovePlayerReference(class CPlayer* pPlayer);
+
+    std::map<CElement*, bool> m_ElementVisibility;
 
     std::set<CPlayer*> m_PlayersAdded;
     std::set<CPlayer*> m_PlayersRemoved;
