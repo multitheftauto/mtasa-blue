@@ -3942,8 +3942,8 @@ void CClientGame::PreWorldProcessHandler()
 
 void CClientGame::PostWorldProcessHandler()
 {
-    if (m_pManager->IsGameLoaded())
-        m_pManager->GetPedManager()->ReapplyScriptRotations();
+    // CWorld::Process has just overwritten ped headings, restore script-set ones before onClientPreRender, sync and rendering read them
+    m_pManager->GetPedManager()->ReapplyScriptRotations();
 
     m_pManager->GetMarkerManager()->DoPulse();
     m_pManager->GetPointLightsManager()->DoPulse();
@@ -3961,9 +3961,6 @@ void CClientGame::PostWorldProcessHandler()
 
 void CClientGame::PostWorldProcessPedsAfterPreRenderHandler()
 {
-    if (m_pManager->IsGameLoaded())
-        m_pManager->GetPedManager()->ReapplyScriptRotations();
-
     CLuaArguments Arguments;
     m_pRootEntity->CallEvent("onClientPedsProcessed", Arguments, false);
 }

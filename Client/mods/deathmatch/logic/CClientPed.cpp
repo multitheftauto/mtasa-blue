@@ -738,25 +738,26 @@ void CClientPed::SetCurrentRotationNew(float fRotation)
     SetRotationRadiansNew(CVector(0, 0, fRotation));
 }
 
-void CClientPed::SetScriptRotationOverride(const CVector& vecRotationRadians, bool bNewWay)
+void CClientPed::SetScriptRotationOverride(const CVector& vecRotationRadians)
 {
+    // GTA can only overwrite the heading of a streamed in ped
+    if (!m_pPlayerPed)
+        return;
+
     m_bHasScriptRotationOverride = true;
-    m_bScriptRotationNewWay = bNewWay;
     m_vecScriptRotation = vecRotationRadians;
 }
 
 void CClientPed::ReapplyScriptRotationIfNeeded()
 {
-    if (!m_bHasScriptRotationOverride || !m_pPlayerPed)
+    if (!m_bHasScriptRotationOverride)
         return;
 
-    if (GetRealOccupiedVehicle())
-        return;
+    // One-shot, a lasting override would stop the ped from ever turning again
+    m_bHasScriptRotationOverride = false;
 
-    if (m_bScriptRotationNewWay)
+    if (m_pPlayerPed && !GetRealOccupiedVehicle())
         SetRotationRadiansNew(m_vecScriptRotation);
-    else
-        SetRotationRadians(m_vecScriptRotation);
 }
 
 void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior)
@@ -800,7 +801,6 @@ void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned sho
 
     // Set some states
     SetFrozen(false);
-    ClearScriptRotationOverride();
     Teleport(vecPosition);
     SetCurrentRotationNew(fRotation);
     SetHealth(GetMaxHealth());
@@ -3376,6 +3376,9 @@ float CClientPed::GetCurrentRotation()
 
 void CClientPed::SetCurrentRotation(float fRotation, bool bIncludeTarget)
 {
+    // A newer rotation write supersedes a pending script rotation
+    m_bHasScriptRotationOverride = false;
+
     if (m_pPlayerPed)
     {
         m_pPlayerPed->SetCurrentRotation(fRotation);
