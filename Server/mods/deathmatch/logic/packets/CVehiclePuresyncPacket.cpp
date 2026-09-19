@@ -162,6 +162,9 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                         CLuaArguments Arguments;
                         Arguments.PushNumber(fDeltaHealth);
                         pVehicle->CallEvent("onVehicleDamage", Arguments);
+                        // Skip health write if the event destroyed this vehicle.
+                        if (pVehicle->IsBeingDeleted())
+                            return false;
                     }
                 }
                 pVehicle->SetHealth(fHealth);
@@ -216,6 +219,8 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                                 CLuaArguments Arguments;
                                 Arguments.PushElement(pTowedByVehicle);
                                 pCurrentTrailer->CallEvent("onTrailerDetach", Arguments);
+                                if (pTowedByVehicle->IsBeingDeleted() || pTrailer->IsBeingDeleted())
+                                    return false;
                             }
 
                             // If something else is towing this trailer
@@ -233,6 +238,8 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                                 CLuaArguments Arguments;
                                 Arguments.PushElement(pCurrentVehicle);
                                 pTrailer->CallEvent("onTrailerDetach", Arguments);
+                                if (pTowedByVehicle->IsBeingDeleted() || pTrailer->IsBeingDeleted())
+                                    return false;
                             }
 
                             pTowedByVehicle->SetTowedVehicle(pTrailer);
@@ -242,6 +249,8 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                             CLuaArguments Arguments;
                             Arguments.PushElement(pTowedByVehicle);
                             bool bContinue = pTrailer->CallEvent("onTrailerAttach", Arguments);
+                            if (pTowedByVehicle->IsBeingDeleted() || pTrailer->IsBeingDeleted())
+                                return false;
 
                             // Attach or detach trailers depending on the event outcome
                             CVehicleTrailerPacket TrailerPacket(pTowedByVehicle, pTrailer, bContinue);
@@ -272,6 +281,9 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
                     CLuaArguments Arguments;
                     Arguments.PushElement(pTowedByVehicle);
                     pCurrentTrailer->CallEvent("onTrailerDetach", Arguments);
+                    // Skip later vehicle writes if the event destroyed the vehicle.
+                    if (pVehicle->IsBeingDeleted())
+                        return false;
                 }
             }
 

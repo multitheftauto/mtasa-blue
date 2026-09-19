@@ -22,6 +22,7 @@
 #include "CBlip.h"
 #include "CWater.h"
 #include "CBuilding.h"
+#include "CBuildingManager.h"
 #include "CPlayerCamera.h"
 #include <cmath>
 #include "CElementDeleter.h"
@@ -204,8 +205,8 @@ bool CStaticFunctionDefinitions::TriggerEvent(const char* szName, CElement* pEle
     if (m_pEvents->Exists(szName))
     {
         // Call the event
-        pElement->CallEvent(szName, Arguments);
-        bWasCanceled = m_pEvents->WasEventCancelled();
+        bool bSuccess = pElement->CallEvent(szName, Arguments);
+        bWasCanceled = m_pEvents->WasEventCancelled() || !bSuccess;
         return true;
     }
 
@@ -625,9 +626,15 @@ bool CStaticFunctionDefinitions::GetElementAlpha(CElement* pElement, unsigned ch
             break;
         }
         case CElement::OBJECT:
+        case CElement::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             ucAlpha = pObject->GetAlpha();
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            ucAlpha = static_cast<CBuilding*>(pElement)->GetAlpha();
             break;
         }
         case CElement::MARKER:
@@ -708,6 +715,12 @@ bool CStaticFunctionDefinitions::GetElementModel(CElement* pElement, unsigned sh
             usModel = pObject->GetModel();
             break;
         }
+        case CElement::BUILDING:
+        {
+            CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+            usModel = pBuilding->GetModel();
+            break;
+        }
         case CElement::PICKUP:
         {
             CPickup* pPickup = static_cast<CPickup*>(pElement);
@@ -770,6 +783,7 @@ bool CStaticFunctionDefinitions::GetElementCollisionsEnabled(CElement* pElement)
             return pVehicle->GetCollisionEnabled();
         }
         case CElement::OBJECT:
+        case CElement::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             return pObject->GetCollisionEnabled();
@@ -811,6 +825,7 @@ bool CStaticFunctionDefinitions::IsElementFrozen(CElement* pElement, bool& bFroz
             break;
         }
         case CElement::OBJECT:
+        case CElement::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             bFrozen = pObject->IsFrozen();
@@ -1219,6 +1234,18 @@ bool CStaticFunctionDefinitions::GetElementRotation(CElement* pElement, CVector&
 
             break;
         }
+        case CElement::BUILDING:
+        {
+            CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+            pBuilding->GetRotation(vecRotation);
+            ConvertRadiansToDegrees(vecRotation);
+            if (desiredRotOrder != EULER_DEFAULT && desiredRotOrder != EULER_ZXY)
+            {
+                vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, desiredRotOrder);
+            }
+
+            break;
+        }
         default:
             return false;
     }
@@ -1391,6 +1418,28 @@ bool CStaticFunctionDefinitions::SetElementRotation(CElement* pElement, const CV
                 CVector vZXY = ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY);
                 SetObjectRotation(pObject, vZXY);
             }
+
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+            CVector    vecRadians = vecRotation;
+
+            if (argumentRotOrder != EULER_DEFAULT && argumentRotOrder != EULER_ZXY)
+            {
+                vecRadians = ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_ZXY);
+            }
+
+            ConvertDegreesToRadians(vecRadians);
+            pBuilding->SetRotation(vecRadians);
+
+            CBitStream BitStream;
+            BitStream.pBitStream->Write(vecRadians.fX);
+            BitStream.pBitStream->Write(vecRadians.fY);
+            BitStream.pBitStream->Write(vecRadians.fZ);
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pBuilding, SET_OBJECT_ROTATION, *BitStream.pBitStream));
+
             break;
         }
         default:
@@ -1403,6 +1452,9 @@ bool CStaticFunctionDefinitions::SetElementRotation(CElement* pElement, const CV
 bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CVector& vecVelocity)
 {
     assert(pElement);
+    if (!vecVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetElementVelocity(*iter, vecVelocity))
 
     int iType = pElement->GetType();
@@ -1445,6 +1497,9 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CV
 bool CStaticFunctionDefinitions::SetElementAngularVelocity(CElement* pElement, const CVector& vecTurnVelocity)
 {
     assert(pElement);
+    if (!vecTurnVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetElementAngularVelocity(*iter, vecTurnVelocity))
 
     int iType = pElement->GetType();
@@ -1506,6 +1561,34 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
     if (ucInterior != pElement->GetInterior())
     {
         pElement->SetInterior(ucInterior);
+
+        // Re-evaluate marker/pickup collisions after interior changes
+        switch (pElement->GetType())
+        {
+            case CElement::PLAYER:
+            case CElement::PED:
+            case CElement::VEHICLE:
+                m_pColManager->DoHitDetection(pElement->GetPosition(), pElement);
+                break;
+            case CElement::MARKER:
+            {
+                CMarker*   pMarker = static_cast<CMarker*>(pElement);
+                CColShape* pColShape = pMarker->GetColShape();
+                if (pColShape)
+                    RefreshColShapeColliders(pColShape);
+                break;
+            }
+            case CElement::PICKUP:
+            {
+                CPickup*   pPickup = static_cast<CPickup*>(pElement);
+                CColShape* pColShape = pPickup->GetColShape();
+                if (pColShape)
+                    RefreshColShapeColliders(pColShape);
+                break;
+            }
+            default:
+                break;
+        }
 
         // Tell everyone
         CBitStream BitStream;
@@ -1730,9 +1813,15 @@ bool CStaticFunctionDefinitions::SetElementAlpha(CElement* pElement, unsigned ch
             break;
         }
         case CElement::OBJECT:
+        case CElement::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->SetAlpha(ucAlpha);
+            break;
+        }
+        case CElement::BUILDING:
+        {
+            static_cast<CBuilding*>(pElement)->SetAlpha(ucAlpha);
             break;
         }
         case CElement::MARKER:
@@ -1935,6 +2024,31 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             }
             break;
         }
+        case CElement::BUILDING:
+        {
+            CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
+            if (pBuilding->GetModel() == usModel)
+                return false;
+            if (!CBuildingManager::IsValidModel(usModel))
+                return false;
+            unsigned short usOldModel = pBuilding->GetModel();  // Get the old model
+            CLuaArguments  Arguments;
+            Arguments.PushNumber(usOldModel);
+            pBuilding->SetModel(usModel);   // Set the new model
+            Arguments.PushNumber(usModel);  // Get the new model
+            bool bContinue = pBuilding->CallEvent("onElementModelChange", Arguments);
+            // Check for another call to setElementModel
+            if (usModel != pBuilding->GetModel())
+                return false;
+
+            if (!bContinue)
+            {
+                // Change canceled
+                pBuilding->SetModel(usOldModel);
+                return false;
+            }
+            break;
+        }
         default:
             return false;
     }
@@ -2042,6 +2156,7 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CElement* pElement,
             break;
         }
         case CElement::OBJECT:
+        case CElement::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->SetCollisionEnabled(bEnable);
@@ -2091,6 +2206,7 @@ bool CStaticFunctionDefinitions::SetElementFrozen(CElement* pElement, bool bFroz
             break;
         }
         case CElement::OBJECT:
+        case CElement::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->SetFrozen(bFrozen);
@@ -3347,6 +3463,8 @@ bool CStaticFunctionDefinitions::TakePlayerScreenShot(CElement* pElement, uint u
         BitStream.pBitStream->Write(pResource->GetNetID());
         BitStream.pBitStream->Write(GetTickCount32());
         pPlayer->Send(CLuaPacket(TAKE_PLAYER_SCREEN_SHOT, *BitStream.pBitStream));
+
+        pPlayer->GetScreenShotInfo().bRequested = true;
 
         return true;
     }
@@ -5174,8 +5292,7 @@ bool CStaticFunctionDefinitions::GiveVehicleSirens(CVehicle* pVehicle, unsigned 
 {
     assert(pVehicle);
     eVehicleType vehicleType = CVehicleManager::GetVehicleType(pVehicle->GetModel());
-    // Won't work with below.
-    if (vehicleType != VEHICLE_CAR && vehicleType != VEHICLE_MONSTERTRUCK && vehicleType != VEHICLE_QUADBIKE)
+    if (vehicleType == VEHICLE_NONE)
         return false;
 
     if (ucSirenType < 1 || ucSirenType > 6)
@@ -5213,9 +5330,7 @@ bool CStaticFunctionDefinitions::SetVehicleSirens(CVehicle* pVehicle, unsigned c
 {
     assert(pVehicle);
     eVehicleType vehicleType = CVehicleManager::GetVehicleType(pVehicle->GetModel());
-    // Won't work with below.
-    if (vehicleType != VEHICLE_PLANE && vehicleType != VEHICLE_BOAT && vehicleType != VEHICLE_TRAILER && vehicleType != VEHICLE_HELI &&
-        vehicleType != VEHICLE_BIKE && vehicleType != VEHICLE_BMX)
+    if (vehicleType != VEHICLE_NONE)
     {
         if (ucSirenID <= SIREN_ID_MAX)
         {
@@ -6712,6 +6827,9 @@ bool CStaticFunctionDefinitions::SetVehicleTaxiLightOn(CElement* pElement, bool 
 bool CStaticFunctionDefinitions::SetVehicleTurnVelocity(CElement* pElement, const CVector& vecTurnVelocity)
 {
     assert(pElement);
+    if (!vecTurnVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetVehicleTurnVelocity(*iter, vecTurnVelocity))
 
     if (IS_VEHICLE(pElement))
@@ -7910,6 +8028,10 @@ CMarker* CStaticFunctionDefinitions::CreateMarker(CResource* pResource, const CV
                 pMarker->RemoveVisibleToReference(m_pMapManager->GetRootElement());
                 pMarker->AddVisibleToReference(pVisibleTo);
             }
+
+            CColShape* pColShape = pMarker->GetColShape();
+            if (pColShape)
+                RefreshColShapeColliders(pColShape);
 
             // Tell everyone about it
             if (pResource->IsClientSynced())
@@ -10149,6 +10271,13 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(CCustomWeapon* pWeapon, eWeap
         if (eProperty == WEAPON_WEAPON_RANGE)
         {
             pWeapon->GetWeaponStat()->SetWeaponRange(fData);
+
+            // Sync the range to the clients so their per-shot acceptance cap
+            // stays in line with the server's. Both ends reject shots beyond
+            // this range, so they must use the same value.
+            CBitStream BitStream;
+            BitStream.pBitStream->Write(fData);
+            m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pWeapon, SET_CUSTOM_WEAPON_WEAPON_RANGE, *BitStream.pBitStream));
             return true;
         }
     }
@@ -10406,7 +10535,7 @@ bool CStaticFunctionDefinitions::SetWeaponOwner(CCustomWeapon* pWeapon, CPlayer*
 
 bool CStaticFunctionDefinitions::GetBodyPartName(unsigned char ucID, char* szName)
 {
-    if (ucID <= 59)
+    if (ucID < 10)
     {
         // Grab the name and check it's length
         const char* szNamePointer = CPlayer::GetBodyPartName(ucID);
