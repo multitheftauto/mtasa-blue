@@ -202,6 +202,9 @@ public:
     void SetRotationRadiansNew(const CVector& vecRotation);
     void SetCurrentRotationNew(float fRotation);
 
+    void SetScriptRotationOverride(const CVector& vecRotationRadians);
+    void ReapplyScriptRotationIfNeeded();
+
     void Teleport(const CVector& vecPosition);
 
     // This function spawns/respawns this ped in any location. This will force a recreation
@@ -293,6 +296,8 @@ public:
     void SetIsDead(bool bDead) noexcept { m_bDead = bDead; };
     void Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bStealth = false, bool bSetDirectlyDead = false, AssocGroupId animGroup = 0,
               AnimationId animID = 15);
+    // Holds the death animation on its last frame so a recreated ped is posed at once.
+    void FreezeDeathAnimationOnLastFrame();
     void StealthKill(CClientPed* pPed);
     void BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId);
 
@@ -577,6 +582,7 @@ protected:
     void Init(CClientManager* pManager, unsigned long ulModelID, bool bIsLocalPlayer);
 
     void StreamedInPulse(bool bDoStandardPulses);
+    void UpdateAlphaAndVisibility();
     void ApplyControllerStateFixes(CControllerState& Current);
 
     void Interpolate();
@@ -701,6 +707,8 @@ public:
     float                                    m_fHealth;
     float                                    m_armor;
     bool                                     m_bDead;
+    AssocGroupId                             m_deathAnimGroup;
+    AnimationId                              m_deathAnimID;
     bool                                     m_bWorldIgnored;
     float                                    m_fCurrentRotation;
     float                                    m_fMoveSpeed;
@@ -749,6 +757,8 @@ public:
     uint                                     m_uiFrameLastRebuildPlayer;
     bool                                     m_bIsSyncing;
     bool                                     m_shouldRecreate{false};
+    bool                                     m_bHasScriptRotationOverride{};
+    CVector                                  m_vecScriptRotation{};
 
     bool             m_bBulletImpactData;
     CClientEntityPtr m_pBulletImpactEntity;

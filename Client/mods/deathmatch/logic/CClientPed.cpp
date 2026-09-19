@@ -161,6 +161,9 @@ void CClientPed::Init(CClientManager* pManager, unsigned long ulModelID, bool bI
     m_fHealth = 100.0f;
     m_armor = 0.0f;
     m_bDead = false;
+    // Kill() defaults; poses a ped that was already dead before we ever saw it alive.
+    m_deathAnimGroup = 0;
+    m_deathAnimID = 15;
     m_bWorldIgnored = false;
     m_fCurrentRotation = 0.0f;
     m_fMoveSpeed = 0.0f;
@@ -738,6 +741,28 @@ void CClientPed::SetCurrentRotationNew(float fRotation)
     SetRotationRadiansNew(CVector(0, 0, fRotation));
 }
 
+void CClientPed::SetScriptRotationOverride(const CVector& vecRotationRadians)
+{
+    // GTA can only overwrite the heading of a streamed in ped
+    if (!m_pPlayerPed)
+        return;
+
+    m_bHasScriptRotationOverride = true;
+    m_vecScriptRotation = vecRotationRadians;
+}
+
+void CClientPed::ReapplyScriptRotationIfNeeded()
+{
+    if (!m_bHasScriptRotationOverride)
+        return;
+
+    // One-shot, a lasting override would stop the ped from ever turning again
+    m_bHasScriptRotationOverride = false;
+
+    if (m_pPlayerPed && !GetRealOccupiedVehicle())
+        SetRotationRadiansNew(m_vecScriptRotation);
+}
+
 void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior)
 {
     // Remove us from our car
@@ -1191,7 +1216,7 @@ CClientVehicle* CClientPed::GetClosestEnterableVehicle(bool bGetPositionFromClos
             continue;
 
         // Should we take the position from the closest door instead of center of vehicle
-        if (bGetPositionFromClosestDoor && static_cast<VehicleType>(pTempVehicle->GetModel()) != VehicleType::VT_RCBARON)
+        if (bGetPositionFromClosestDoor && static_cast<VehicleType::Enum>(pTempVehicle->GetModel()) != VehicleType::VT_RCBARON)
         {
             // Get the closest front-door
             CVector vecFrontPos;
@@ -1640,7 +1665,9 @@ CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
                 bSkipWarpIfGettingOut = false;
 
             // Jax: this should be safe, doesn't remove the player if he's getting dragged out already (fix for getting stuck on back after being jacked)
-            if (!bSkipWarpIfGettingOut || (!IsGettingOutOfVehicle()))
+            // IsGettingOutOfVehicle only covers the voluntary leave car task; a jack victim's drag task
+            // got ripped away mid animation here and the warp put him on the vehicle roof for a moment.
+            if (!bSkipWarpIfGettingOut || (!IsGettingOutOfVehicle() && !IsGettingJacked()))
             {
                 // Warp the player out
                 InternalRemoveFromVehicle(pGameVehicle);
@@ -1689,11 +1716,8 @@ bool CClientPed::IsVisible()
 
 void CClientPed::SetVisible(bool bVisible)
 {
-    if (m_pPlayerPed)
-    {
-        m_pPlayerPed->SetVisible(bVisible);
-    }
     m_bVisible = bVisible;
+    UpdateAlphaAndVisibility();
 }
 
 bool CClientPed::GetUsesCollision()
@@ -1889,6 +1913,20 @@ bool CClientPed::IsDead()
     return m_bDead;
 }
 
+void CClientPed::FreezeDeathAnimationOnLastFrame()
+{
+    std::unique_ptr<CAnimBlendAssociation> pAnimAssoc = BlendAnimation(m_deathAnimGroup, m_deathAnimID, 1000.0f);
+    if (!pAnimAssoc)
+        return;
+
+    // Full blend amount applies the pose on this frame instead of easing in from the idle the recreated
+    // ped starts on. Death animations don't loop, so full progress clamps to the last frame and a zero
+    // speed holds it there.
+    pAnimAssoc->SetBlendAmount(1.0f);
+    pAnimAssoc->SetCurrentProgress(1.0f);
+    pAnimAssoc->SetCurrentSpeed(0.0f);
+}
+
 void CClientPed::BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPart, int hitBodySide, int weaponId)
 {
     CPlayerPed* pPedAttacker = pClientPedAttacker->GetGamePlayer();
@@ -1904,8 +1942,10 @@ void CClientPed::BeHit(CClientPed* pClientPedAttacker, ePedPieceTypes hitBodyPar
 
 void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bStealth, bool bSetDirectlyDead, AssocGroupId animGroup, AnimationId animID)
 {
-    // Don't change task if already dead or dying
-    if (m_pPlayerPed && !IsDead() && !IsDying())
+    // Don't change task if already dead or dying. bSetDirectlyDead restores the dead state onto a ped
+    // the streamer just recreated; that ped holds no tasks yet, while IsDead() still reports the cached
+    // m_bDead left over from the original death and would veto giving it the dead task.
+    if (m_pPlayerPed && !IsDying() && (bSetDirectlyDead || !IsDead()))
     {
         // Do we have the in_water task?
         CTask* pTask = m_pTaskManager->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
@@ -1925,12 +1965,16 @@ void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bSt
 
         if (bSetDirectlyDead)
         {
-            // TODO: Avoid the animation, try to make it go directly to the last animation frame.
             pTask = g_pGame->GetTasks()->CreateTaskSimpleDead(GetTickCount32(), true);
             if (pTask)
             {
                 pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_DEFAULT);
             }
+
+            // The task only marks the ped dead on its next update and never poses one killed on foot,
+            // leaving the game free to run a death sequence of its own first.
+            m_pPlayerPed->SetPedState(PedState::PED_DEAD);
+            FreezeDeathAnimationOnLastFrame();
         }
         else if (bStealth)
         {
@@ -1973,6 +2017,13 @@ void CClientPed::Kill(eWeaponType weaponType, unsigned char ucBodypart, bool bSt
     // Clear the targeting marker so it doesn't stay on screen after death
     if (m_pPlayerPed)
         m_pPlayerPed->SetTargetedEntity(nullptr);
+
+    // Kept here rather than read back off the ped, which may be streamed out when the pose is restored.
+    if (!bSetDirectlyDead)
+    {
+        m_deathAnimGroup = animGroup;
+        m_deathAnimID = animID;
+    }
 
     m_bDead = true;
 }
@@ -2943,14 +2994,7 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         if (m_pAnimationBlock && m_bisCurrentAnimationCustom)
             UpdateCustomPartialAnimationBones();
 
-        // Update our alpha
-        unsigned char ucAlpha = m_ucAlpha;
-        // Are we in a different interior to the camera? set our alpha to 0
-        if (m_ucInterior != g_pGame->GetWorld()->GetCurrentArea())
-            ucAlpha = 0;
-        RpClump* pClump = m_pPlayerPed->GetRpClump();
-        if (pClump)
-            g_pGame->GetVisibilityPlugins()->SetClumpAlpha(pClump, ucAlpha);
+        UpdateAlphaAndVisibility();
 
         // Grab our current position
         CVector vecPosition = *m_pPlayerPed->GetPosition();
@@ -3143,28 +3187,37 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     {
         if (m_ulLastTimeBeganCrouch >= ulNow - 600.0f * fSpeedRatio)
         {
-            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
+            // Zero jump/sprint unless fastfire is enabled. Even then, keep them zeroed while the crouch key is held,
+            // otherwise a key bound to both sprint and crouch (e.g. space) wedges the duck animation,
+            // leaving the player crouched and unable to move or fire until performing a melee attack
+            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE) || Current.ShockButtonL != 0)
             {
                 Current.ButtonSquare = 0;
                 Current.ButtonCross = 0;
             }
-            // Disable the fire keys whilst crouching as well
-            Current.ButtonCircle = 0;
-            Current.LeftShoulder1 = 0;
+            // Disable the fire keys whilst crouching as well unless crouchbug or fastfire glitch is enabled
+            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_CROUCHBUG) && !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
+            {
+                Current.ButtonCircle = 0;
+                Current.LeftShoulder1 = 0;
+            }
             if (m_ulLastTimeBeganCrouch >= ulNow - 400.0f * fSpeedRatio)
             {
-                // Disable double crouching (another anim cut)
-                if (g_pClientGame->IsUsingAlternatePulseOrder())
-                    Current.ShockButtonL = 255;  // Do this differently if we have changed the pulse order
-                else
-                    Current.ShockButtonL = 0;
+                // Disable double crouching (another anim cut) unless glitch is enabled
+                if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_CROUCHBUG) && !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
+                {
+                    if (g_pClientGame->IsUsingAlternatePulseOrder())
+                        Current.ShockButtonL = 255;  // Do this differently if we have changed the pulse order
+                    else
+                        Current.ShockButtonL = 0;
+                }
             }
         }
     }
-    // If we just started aiming, make sure they dont try and crouch
+    // If we just started aiming, make sure they dont try and crouch unless crouchbug or fastfire is enabled
     else if ((m_ulLastTimeBeganAiming != 0 && m_ulLastTimeBeganAiming >= ulNow - 300.0f * fSpeedRatio) || (ulNow - m_ulLastTimeFired) <= 300.0f * fSpeedRatio)
     {
-        if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
+        if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_CROUCHBUG) && !g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
         {
             Current.ShockButtonL = 0;
         }
@@ -3204,7 +3257,8 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     {
         // Entering as driver or passenger?
         int iTaskType = pTask->GetTaskType();
-        if (iTaskType == TASK_COMPLEX_ENTER_CAR_AS_DRIVER || iTaskType == TASK_COMPLEX_ENTER_CAR_AS_PASSENGER || iTaskType == TASK_COMPLEX_ENTER_BOAT_AS_DRIVER)
+        if (iTaskType == TASK_COMPLEX_ENTER_CAR_AS_DRIVER || iTaskType == TASK_COMPLEX_ENTER_CAR_AS_PASSENGER ||
+            iTaskType == TASK_COMPLEX_ENTER_BOAT_AS_DRIVER || iTaskType == TASK_SIMPLE_NAMED_ANIM || iTaskType == TASK_SIMPLE_ANIM)
         {
             // Don't allow the aiming key (RightShoulder1)
             // This fixes bug allowing you to run around in aim mode while
@@ -3365,6 +3419,9 @@ float CClientPed::GetCurrentRotation()
 
 void CClientPed::SetCurrentRotation(float fRotation, bool bIncludeTarget)
 {
+    // A newer rotation write supersedes a pending script rotation
+    m_bHasScriptRotationOverride = false;
+
     if (m_pPlayerPed)
     {
         m_pPlayerPed->SetCurrentRotation(fRotation);
@@ -4059,9 +4116,9 @@ void CClientPed::_ChangeModel()
                 m_pPlayerPed->RebuildPlayer();
             }
 
-            // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
+            // Remove reference to the old model we used
             if (pLoadedModel)
-                pLoadedModel->RemoveRef(true);
+                pLoadedModel->RemoveRef();
             pLoadedModel = NULL;
 
             // Warp into it again
@@ -4578,7 +4635,7 @@ void CClientPed::_GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, 
     CTask* pTask = 0;
     if (m_pTaskManager)
         pTask = m_pTaskManager->GetTask(TASK_PRIORITY_EVENT_RESPONSE_NONTEMP);
-    auto usVehicleModel = static_cast<VehicleType>(pVehicle->GetModel());
+    auto usVehicleModel = static_cast<VehicleType::Enum>(pVehicle->GetModel());
     if (((pTask && pTask->GetTaskType() == TASK_COMPLEX_IN_WATER) || pVehicle->IsOnWater()) &&
         (usVehicleModel == VehicleType::VT_SKIMMER || usVehicleModel == VehicleType::VT_SEASPAR || usVehicleModel == VehicleType::VT_LEVIATHN ||
          usVehicleModel == VehicleType::VT_VORTEX))
@@ -4899,35 +4956,16 @@ bool CClientPed::GetShotData(CVector* pvecOrigin, CVector* pvecTarget, CVector* 
                 vecTarget = vecOrigin;
                 vecTarget.fZ += fRange;
             }
-            else if (Controller.RightShoulder1 == 255)  // First-person weapons, crosshair active: sync the crosshair
+            else if (pVehicle)
             {
+                // Align drive-by aiming ray directly with camera sightline matching GTA:SA
                 g_pGame->GetCamera()->Find3rdPersonCamTargetVector(fRange, &vecGunMuzzle, &vecOrigin, &vecTarget);
-                // Apply shoot through walls fix
-                vecOrigin = AdjustShotOriginForWalls(vecOrigin, vecTarget, 0.5f);
             }
-            else if (pVehicle)  // Drive-by/vehicle weapons: camera origin as origin, performing collision tests
+            else if (Controller.RightShoulder1 == 255)
             {
-                CColPoint* pCollision;
-                CMatrix    mat;
-                bool       bCollision;
-
-                g_pGame->GetCamera()->GetMatrix(&mat);
-
-                CVector vecCameraOrigin = mat.vPos;
-                CVector vecTemp = vecCameraOrigin;
-                g_pGame->GetCamera()->Find3rdPersonCamTargetVector(fRange, &vecCameraOrigin, &vecTemp, &vecTarget);
-
-                bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&mat.vPos, &vecTarget, &pCollision, NULL);
-                if (pCollision)
-                {
-                    if (bCollision)
-                    {
-                        CVector vecBullet = pCollision->GetPosition() - vecOrigin;
-                        vecBullet.Normalize();
-                        vecTarget = vecOrigin + (vecBullet * fRange);
-                    }
-                    pCollision->Destroy();
-                }
+                // On-foot crosshair active: sync along sightline and adjust for wall clipping
+                g_pGame->GetCamera()->Find3rdPersonCamTargetVector(fRange, &vecGunMuzzle, &vecOrigin, &vecTarget);
+                vecOrigin = AdjustShotOriginForWalls(vecOrigin, vecTarget, 0.5f);
             }
             else
             {
@@ -5319,14 +5357,25 @@ float CClientPed::GetDistanceFromCentreOfMassToBaseOfModel()
 
 void CClientPed::SetAlpha(unsigned char ucAlpha)
 {
-    /* Handled in ::StreamedInPulse
-    if ( m_pPlayerPed )
-    {
-        RpClump * pClump = m_pPlayerPed->GetRpClump ();
-        if ( pClump ) g_pGame->GetVisibilityPlugins ()->SetClumpAlpha ( pClump, ucAlpha );
-    }
-    */
     m_ucAlpha = ucAlpha;
+    UpdateAlphaAndVisibility();
+}
+
+void CClientPed::UpdateAlphaAndVisibility()
+{
+    if (!m_pPlayerPed)
+        return;
+
+    unsigned char effectiveAlpha = m_ucAlpha;
+    if (m_ucInterior != g_pGame->GetWorld()->GetCurrentArea())
+        effectiveAlpha = 0;
+
+    if (RpClump* clump = m_pPlayerPed->GetRpClump())
+        g_pGame->GetVisibilityPlugins()->SetClumpAlpha(clump, effectiveAlpha);
+
+    // GTA decides whether to create ped shadows from its visibility flag, not
+    // the RenderWare clump alpha. Keep both states aligned at zero alpha.
+    m_pPlayerPed->SetVisible(m_bVisible && effectiveAlpha != 0);
 }
 
 void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCameraCut)
@@ -5452,15 +5501,19 @@ void CClientPed::SetTargetPosition(const CVector& vecPosition, unsigned long ulD
     if (pTargetOriginSource)
         pTargetOriginSource->GetPosition(vecOrigin);
 
-    UpdateUnderFloorFix(vecPosition, vecOrigin);
+    // This one warps on its own, so it gets the same jack window as UpdateTargetPosition
+    if (!IsGettingJacked())
+        UpdateUnderFloorFix(vecPosition, vecOrigin);
 
     // Update the references to the contact entity
     if (pTargetOriginSource != m_interp.pTargetOriginSource)
     {
         if (m_interp.pTargetOriginSource)
             m_interp.pTargetOriginSource->RemoveOriginSourceUser(this);
+
         if (pTargetOriginSource)
             pTargetOriginSource->AddOriginSourceUser(this);
+
         m_interp.pTargetOriginSource = pTargetOriginSource;
     }
 
@@ -5505,6 +5558,11 @@ void CClientPed::RemoveTargetPosition()
 
 void CClientPed::UpdateTargetPosition()
 {
+    // The jack drag task positions the ped itself for its whole length; synced positions applied
+    // over it fight the animation frame by frame, so let it finish and resume then.
+    if (IsGettingJacked())
+        return;
+
     if (HasTargetPosition())
     {
         unsigned long ulCurrentTime = CClientTime::GetTime();
@@ -5936,6 +5994,8 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
             if (pTask)
             {
                 pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+                KillTaskSecondary(TASK_SECONDARY_ATTACK);
+                KillTaskSecondary(TASK_SECONDARY_IK);
                 g_pClientGame->InsertRunNamedAnimTaskToMap(reinterpret_cast<CTaskSimpleRunNamedAnimSAInterface*>(pTask->GetInterface()), this);
             }
         }
@@ -6058,7 +6118,7 @@ void CClientPed::UpdateCustomPartialAnimationBones()
 
     // Bones the source IFP animation doesn't define are padded out to a fixed pose (see CClientIFP),
     // so a full mask means there's nothing to restrict and we can skip finding the association at all.
-    std::bitset<32> animatedBonesMask = pIFP->GetAnimatedBonesMask(strCustomAnimName);
+    std::bitset<64> animatedBonesMask = pIFP->GetAnimatedBonesMask(strCustomAnimName);
     if (animatedBonesMask.all())
         return;
 
@@ -6712,7 +6772,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger, std::op
         return false;
 
     // Stop if the ped is swimming and the vehicle model cannot be entered from water (fixes #1990)
-    auto vehicleModel = static_cast<VehicleType>(pVehicle->GetModel());
+    auto vehicleModel = static_cast<VehicleType::Enum>(pVehicle->GetModel());
 
     if (IsInWater() && !(vehicleModel == VehicleType::VT_SKIMMER || vehicleModel == VehicleType::VT_SEASPAR || vehicleModel == VehicleType::VT_LEVIATHN ||
                          vehicleModel == VehicleType::VT_VORTEX))

@@ -31,6 +31,8 @@
 #include "CHTTPD.h"
 #include "Utils.h"
 #include "packets/CResourceClientScriptsPacket.h"
+#include "packets/CEntityRemoveTreePacket.h"
+#include "CResourceMapItem.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include <net/SimHeaders.h>
 #include <zip.h>
@@ -1331,6 +1333,26 @@ bool CResource::Stop(bool bManualStop)
 
     m_TemporaryIncludes.clear();
 
+    // Send bulk tree removal packet for the resource element to joined players
+    if (m_pResourceElement)
+    {
+        CEntityRemoveTreePacket removeTreePacket;
+        removeTreePacket.AddRootElement(m_pResourceElement);
+        g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removeTreePacket);
+
+        if (m_pDefaultElementGroup)
+            m_pDefaultElementGroup->SetTreeRoot(m_pResourceElement);
+
+        for (CResourceFile* resourceFile : m_ResourceFiles)
+        {
+            if (auto* mapItem = dynamic_cast<CResourceMapItem*>(resourceFile))
+            {
+                if (mapItem->GetElementGroup())
+                    mapItem->GetElementGroup()->SetTreeRoot(m_pResourceElement);
+            }
+        }
+    }
+
     // Stop all the resource files we have. The files we share with our clients we remove from the resource file list.
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
@@ -1360,26 +1382,17 @@ bool CResource::Stop(bool bManualStop)
 
     OnResourceStateChange("loaded");
 
-    // Remove the resource element from the client
-    CEntityRemovePacket removePacket;
-
-    if (m_pResourceElement)
-    {
-        removePacket.Add(m_pResourceElement);
-        g_pGame->GetElementDeleter()->Delete(m_pResourceElement);
-        m_pResourceElement = nullptr;
-    }
-
-    // Remove the dynamic resource element from the client
     if (m_pResourceDynamicElementRoot)
     {
-        removePacket.Add(m_pResourceDynamicElementRoot);
-        g_pGame->GetElementDeleter()->Delete(m_pResourceDynamicElementRoot);
+        g_pGame->GetElementDeleter()->DeleteTree(m_pResourceDynamicElementRoot);
         m_pResourceDynamicElementRoot = nullptr;
     }
 
-    // Broadcast the packet to joined players
-    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
+    if (m_pResourceElement)
+    {
+        g_pGame->GetElementDeleter()->DeleteTree(m_pResourceElement);
+        m_pResourceElement = nullptr;
+    }
 
     // Clear the list of players where this resource is running
     std::exchange(m_isRunningForPlayer, {});
@@ -2207,24 +2220,43 @@ bool CResource::ReadIncludedMaps(CXMLNode* pRoot)
 
             if (!strFilename.empty())
             {
-                std::string strFullFilename;
                 ReplaceSlashes(strFilename);
 
-                if (IsFilenameUsed(strFilename, false))
-                {
-                    CLogger::LogPrintf("WARNING: Duplicate map file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                }
-
-                // Grab the file (evt extract it). Make a map item resource and put it into the resourcefiles list
-                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-                {
-                    m_ResourceFiles.push_back(new CResourceMapItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, iDimension));
-                }
-                else
+                if (!IsValidFilePath(strFilename.c_str()))
                 {
                     m_strFailureReason = SString("Couldn't find map %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
+                }
+
+                std::vector<std::string> vecFiles = GetFilePaths(strFilename.c_str());
+
+                if (glob::has_magic(strFilename))
+                    m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
+
+                if (vecFiles.empty())
+                {
+                    if (glob::has_magic(strFilename))
+                        continue;
+
+                    m_strFailureReason = SString("Couldn't find map %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
+
+                for (const std::string& strFilePath : vecFiles)
+                {
+                    std::string strFullFilename;
+
+                    if (IsFilenameUsed(strFilePath, false))
+                    {
+                        CLogger::LogPrintf("WARNING: Duplicate map file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilePath.c_str());
+                    }
+
+                    if (GetFilePath(strFilePath.c_str(), strFullFilename))
+                    {
+                        m_ResourceFiles.push_back(new CResourceMapItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes, iDimension));
+                    }
                 }
             }
             else

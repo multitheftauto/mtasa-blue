@@ -17,12 +17,18 @@ uint CWeaponStat::ms_uiAllWeaponStatsRevision = 0;
 
 CWeaponStat::CWeaponStat(eWeaponType weaponType, eWeaponSkill skillLevel)
 {
+    // LoadDefault only fills weapon types 22 to 42, so start blank so the
+    // other types read fixed zeros instead of uninitialized memory.
+    memset(&tWeaponStats, 0, sizeof(tWeaponStats));
     this->weaponType = weaponType;
     this->skillLevel = skillLevel;
     this->m_bChanged = false;
 }
 CWeaponStat::CWeaponStat()
 {
+    memset(&tWeaponStats, 0, sizeof(tWeaponStats));
+    this->weaponType = WEAPONTYPE_UNARMED;
+    this->skillLevel = WEAPONSKILL_STD;
     this->m_bChanged = false;
 }
 CWeaponStat::~CWeaponStat()
@@ -78,7 +84,8 @@ void CWeaponStat::HandleFlagsValueChange(DWORD newValue)
         {
             // Revert anim group to default
             CWeaponStat* pOriginalWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(GetWeaponType(), GetWeaponSkillLevel());
-            SetAnimGroup(pOriginalWeaponInfo->GetAnimGroup());
+            if (pOriginalWeaponInfo)
+                SetAnimGroup(pOriginalWeaponInfo->GetAnimGroup());
         }
     }
     else if (!IsFlagSet(WEAPONTYPE_TWIN_PISTOLS) && (newValue & WEAPONTYPE_TWIN_PISTOLS))
@@ -93,11 +100,15 @@ void CWeaponStat::HandleFlagsValueChange(DWORD newValue)
         }
     }
 
+    // The anim flag checks below need the original data for this type;
+    // types without it keep the anim bits off, so scripts cannot add
+    // anims the base weapon does not support.
+
     // Don't allow setting of anim reload flag unless original has it
     if (!IsFlagSet(WEAPONTYPE_ANIM_RELOAD) && (newValue & WEAPONTYPE_ANIM_RELOAD))
     {
         CWeaponStat* pOriginalWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(GetWeaponType(), GetWeaponSkillLevel());
-        if (!pOriginalWeaponInfo->IsFlagSet(WEAPONTYPE_ANIM_RELOAD))
+        if (!pOriginalWeaponInfo || !pOriginalWeaponInfo->IsFlagSet(WEAPONTYPE_ANIM_RELOAD))
             newValue &= ~WEAPONTYPE_ANIM_RELOAD;
     }
 
@@ -105,7 +116,7 @@ void CWeaponStat::HandleFlagsValueChange(DWORD newValue)
     if (!IsFlagSet(WEAPONTYPE_ANIM_CROUCHFIRE) && (newValue & WEAPONTYPE_ANIM_CROUCHFIRE))
     {
         CWeaponStat* pOriginalWeaponInfo = g_pGame->GetWeaponStatManager()->GetOriginalWeaponStats(GetWeaponType(), GetWeaponSkillLevel());
-        if (!pOriginalWeaponInfo->IsFlagSet(WEAPONTYPE_ANIM_CROUCHFIRE))
+        if (!pOriginalWeaponInfo || !pOriginalWeaponInfo->IsFlagSet(WEAPONTYPE_ANIM_CROUCHFIRE))
             newValue &= ~WEAPONTYPE_ANIM_CROUCHFIRE;
     }
 

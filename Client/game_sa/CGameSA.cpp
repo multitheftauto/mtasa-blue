@@ -384,14 +384,14 @@ void CGameSA::StartGame()
  * Sets the part of the game loading process the game is in.
  * @param dwState DWORD containing a valid state 0 - 9
  */
-void CGameSA::SetSystemState(SystemState State)
+void CGameSA::SetSystemState(SystemState::Enum State)
 {
     MemPutFast<DWORD>(0xC8D4C0, (DWORD)State);  // gGameState
 }
 
-SystemState CGameSA::GetSystemState()
+SystemState::Enum CGameSA::GetSystemState()
 {
-    return *(SystemState*)0xC8D4C0;  // gGameState
+    return *(SystemState::Enum*)0xC8D4C0;  // gGameState
 }
 
 /**
@@ -1119,6 +1119,10 @@ void CGameSA::RestoreGameWorld()
 
 bool CGameSA::SetBuildingPoolSize(size_t size)
 {
+    // The underlying GTA pool stores its capacity as a signed integer.
+    if (size > static_cast<size_t>(std::numeric_limits<int>::max()))
+        return false;
+
     const bool shouldRemoveWorld = !m_isGameWorldRemoved;
 
     const int iCurrentBuildingPoolSize = m_Pools->GetBuildingsPool().GetSize();

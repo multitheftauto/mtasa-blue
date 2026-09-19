@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CElementRPCs.h"
 #include "net/SyncStructures.h"
+#include "game/CWeaponStat.h"
 
 using std::list;
 
@@ -45,6 +46,7 @@ void CElementRPCs::LoadFunctions()
     AddHandler(SET_CUSTOM_WEAPON_FLAGS, SetCustomWeaponFlags, "setWeaponFlags");
     AddHandler(SET_CUSTOM_WEAPON_FIRING_RATE, SetCustomWeaponFiringRate, "setWeaponFiringRate");
     AddHandler(RESET_CUSTOM_WEAPON_FIRING_RATE, ResetCustomWeaponFiringRate, "resetWeaponFiringRate");
+    AddHandler(SET_CUSTOM_WEAPON_WEAPON_RANGE, SetCustomWeaponWeaponRange, "setWeaponWeaponRange");
     AddHandler(SET_WEAPON_OWNER, SetWeaponOwner, "setWeaponOwner");
     AddHandler(SET_CUSTOM_WEAPON_FLAGS, SetWeaponConfig, "setWeaponFlags");
     AddHandler(SET_PROPAGATE_CALLS_ENABLED, SetCallPropagationEnabled, "setCallPropagationEnabled");
@@ -92,8 +94,10 @@ void CElementRPCs::SetElementData(CClientEntity* pSource, NetBitStreamInterface&
             CLogger::ErrorPrintf("RPC SetElementData name length > MAX_CUSTOMDATA_NAME_LENGTH");
             return;
         }
+
         SString      strName;
         CLuaArgument Argument;
+
         if (bitStream.ReadStringCharacters(strName, usNameLength) && Argument.ReadFromBitStream(bitStream))
         {
             pSource->SetCustomData(CStringName{strName}, Argument);
@@ -111,6 +115,7 @@ void CElementRPCs::RemoveElementData(CClientEntity* pSource, NetBitStreamInterfa
         SString strName;
 
         // Read out the name plus whether it's recursive or not
+
         if (bitStream.ReadStringCharacters(strName, usNameLength) && bitStream.ReadBit(bRecursive))
         {
             // Remove that name
@@ -173,6 +178,9 @@ void CElementRPCs::SetElementVelocity(CClientEntity* pSource, NetBitStreamInterf
     CVector vecVelocity;
     if (bitStream.Read(vecVelocity.fX) && bitStream.Read(vecVelocity.fY) && bitStream.Read(vecVelocity.fZ))
     {
+        if (!vecVelocity.IsValid())
+            return;
+
         switch (pSource->GetType())
         {
             case CCLIENTPED:
@@ -215,6 +223,9 @@ void CElementRPCs::SetElementAngularVelocity(CClientEntity* pSource, NetBitStrea
     CVector vecTurnVelocity;
     if (bitStream.Read(vecTurnVelocity.fX) && bitStream.Read(vecTurnVelocity.fY) && bitStream.Read(vecTurnVelocity.fZ))
     {
+        if (!vecTurnVelocity.IsValid())
+            return;
+
         switch (pSource->GetType())
         {
             case CCLIENTPED:
@@ -456,6 +467,16 @@ void CElementRPCs::SetElementAlpha(CClientEntity* pSource, NetBitStreamInterface
                 pObject->SetAlpha(ucAlpha);
                 break;
             }
+            case CCLIENTBUILDING:
+            {
+                static_cast<CClientBuilding*>(pSource)->SetAlpha(ucAlpha);
+                break;
+            }
+            case CCLIENTPROJECTILE:
+            {
+                static_cast<CClientProjectile*>(pSource)->SetAlpha(ucAlpha);
+                break;
+            }
             default:
                 break;
         }
@@ -667,6 +688,7 @@ void CElementRPCs::SetElementCollisionsEnabled(CClientEntity* pSource, NetBitStr
             }
 
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetCollisionEnabled(bEnable);
@@ -706,9 +728,15 @@ void CElementRPCs::SetElementFrozen(CClientEntity* pSource, NetBitStreamInterfac
             }
 
             case CCLIENTOBJECT:
+            case CCLIENTWEAPON:
             {
                 CClientObject* pObject = static_cast<CClientObject*>(pSource);
                 pObject->SetFrozen(bFrozen);
+                break;
+            }
+            case CCLIENTPROJECTILE:
+            {
+                static_cast<CClientProjectile*>(pSource)->SetFrozen(bFrozen);
                 break;
             }
         }
@@ -840,6 +868,16 @@ void CElementRPCs::ResetCustomWeaponFiringRate(CClientEntity* pSource, NetBitStr
     {
         CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
         pWeapon->ResetWeaponFireTime();
+    }
+}
+
+void CElementRPCs::SetCustomWeaponWeaponRange(CClientEntity* pSource, NetBitStreamInterface& bitStream)
+{
+    float fRange = 0.0f;
+    if (bitStream.Read(fRange) && pSource->GetType() == CCLIENTWEAPON)
+    {
+        CClientWeapon* pWeapon = static_cast<CClientWeapon*>(pSource);
+        pWeapon->GetWeaponStat()->SetWeaponRange(fRange);
     }
 }
 
