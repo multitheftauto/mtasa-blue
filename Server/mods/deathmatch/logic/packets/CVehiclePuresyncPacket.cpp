@@ -323,7 +323,7 @@ bool CVehiclePuresyncPacket::Read(NetBitStreamInterface& BitStream)
             SPlayerArmorSync armor;
             if (!BitStream.Read(&armor))
                 return false;
-            float fArmor = armor.data.fValue;
+            float fArmor = std::clamp(armor.data.fValue, 0.0f, 100.0f);
 
             float fOldArmor = pSourcePlayer->GetArmor();
             float fArmorLoss = fOldArmor - fArmor;
