@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include <d3dx9shader.h>
 #include <game/CRenderWare.h>
+#include <game/CFx.h>
 #define DECLARE_PROFILER_SECTION_CDirect3DEvents9
 #include "profiler/SharedUtil.Profiler.h"
 #include "CProxyDirect3DVertexBuffer.h"
@@ -509,6 +510,9 @@ bool CDirect3DEvents9::OnEndScene(IDirect3DDevice9* pDevice)
 void CDirect3DEvents9::OnInvalidate(IDirect3DDevice9* pDevice)
 {
     WriteDebugEvent("CDirect3DEvents9::OnInvalidate");
+
+    if (auto game = g_pCore->GetGame())
+        game->GetFx()->ClearCustomShadows(true);
 
     const HRESULT hrCooperativeLevel = pDevice->TestCooperativeLevel();
     const bool    bDeviceOperational = (hrCooperativeLevel == D3D_OK);

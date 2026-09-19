@@ -14,6 +14,7 @@
 #include <game/CRenderWare.h>
 #include <game/CHud.h>
 #include <game/CStreaming.h>
+#include <game/CFx.h>
 #include <type_traits>
 
 #include "enums/WeaponProperty.h"
@@ -93,6 +94,8 @@ DECLARE_ENUM_CLASS(eModelIdeFlag);
 DECLARE_ENUM_CLASS(_D3DFORMAT);
 DECLARE_ENUM_CLASS(eRenderStage);
 DECLARE_ENUM(FxParticleSystems::Enum);
+DECLARE_ENUM_CLASS(eShadowTextureType);
+DECLARE_ENUM_CLASS(eShadowType);
 DECLARE_ENUM(ePools);
 DECLARE_ENUM(WorldProperty::Enum);
 DECLARE_ENUM_CLASS(eModelLoadState);

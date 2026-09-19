@@ -31,6 +31,9 @@ class FxSystem_c;
 #define FUNC_CFx_TriggerBulletSplash 0x4a10e0
 #define FUNC_CFx_TriggerFootSplash   0x4a1150
 #define FUNC_FXSystem_c_AddParticle  0x4AA440
+#define FUNC_FXSystem_StoreShadows   0x707390
+#define VAR_FXSystem_StoreShadows    0xC403DC
+#define TEXTURE_FXSystem_Shadow      0xC403E0
 
 class CFxSAInterface
 {
@@ -61,6 +64,11 @@ class CFxSA : public CFx
 public:
     CFxSA(CFxSAInterface* pInterface) { m_pInterface = pInterface; }
 
+    ~CFxSA();
+    void ClearCustomShadows(bool force = false) override;
+    bool AddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color,
+                   eShadowType shadowType, float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings, IDirect3DBaseTexture9* customTexture = nullptr);
+    static bool IsShadowsLimitReached();
     void AddBlood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness);
     void AddWood(CVector& vecPosition, CVector& vecDirection, int iCount, float fBrightness);
     void AddSparks(CVector& vecPosition, CVector& vecDirection, float fForce, int iCount, CVector vecAcrossLine, unsigned char ucBlurIf0, float fSpread,
