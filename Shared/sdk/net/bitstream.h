@@ -40,6 +40,10 @@ enum class eBitStreamVersion : unsigned short
     // YYYY-MM-DD
     // Name,
 
+    // Sync vehicle health up to MAX_VEHICLE_HEALTH
+    // 2026-09-16
+    VehicleHealth_MaxRange,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
