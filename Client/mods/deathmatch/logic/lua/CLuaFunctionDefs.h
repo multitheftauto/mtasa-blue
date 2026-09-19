@@ -64,15 +64,6 @@ public:
     LUA_DECLARE(AddClothingModel);
     LUA_DECLARE(RemoveClothingModel);
 
-    // Cursor funcs
-    LUA_DECLARE(GetCursorPosition);
-    LUA_DECLARE(SetCursorPosition);
-    LUA_DECLARE(IsCursorShowing);
-    LUA_DECLARE(GetCursorAlpha);
-    LUA_DECLARE(SetCursorAlpha);
-
-    LUA_DECLARE(ShowCursor);
-
     // Util functions to make scripting easier for the end user
     // Some of these are based on standard mIRC script funcs as a lot of people will be used to them
     LUA_DECLARE(GetValidPedModels);
