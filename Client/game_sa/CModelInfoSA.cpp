@@ -26,15 +26,15 @@ extern CGameSA*        pGame;
 CBaseModelInfoSAInterface** CModelInfoSAInterface::ms_modelInfoPtrs = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
 
-std::map<unsigned short, int>                                         CModelInfoSA::ms_RestreamTxdIDMap;
-std::map<DWORD, float>                                                CModelInfoSA::ms_ModelDefaultLodDistanceMap;
-std::map<DWORD, unsigned short>                                       CModelInfoSA::ms_ModelDefaultFlagsMap;
-std::map<DWORD, BYTE>                                                 CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
+std::map<unsigned short, int>                                        CModelInfoSA::ms_RestreamTxdIDMap;
+std::map<DWORD, float>                                               CModelInfoSA::ms_ModelDefaultLodDistanceMap;
+std::map<DWORD, unsigned short>                                      CModelInfoSA::ms_ModelDefaultFlagsMap;
+std::map<DWORD, BYTE>                                                CModelInfoSA::ms_ModelDefaultAlphaTransparencyMap;
 std::unordered_map<std::uint32_t, std::map<VehicleDummies, CVector>> CModelInfoSA::ms_ModelDefaultDummiesPosition;
-std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>                CModelInfoSA::ms_ModelDefaultModelTimeInfo;
-std::unordered_map<DWORD, unsigned short>                             CModelInfoSA::ms_OriginalObjectPropertiesGroups;
-std::unordered_map<DWORD, std::pair<float, float>>                    CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
-std::map<unsigned short, int>                                         CModelInfoSA::ms_DefaultTxdIDMap;
+std::map<CTimeInfoSAInterface*, CTimeInfoSAInterface*>               CModelInfoSA::ms_ModelDefaultModelTimeInfo;
+std::unordered_map<DWORD, unsigned short>                            CModelInfoSA::ms_OriginalObjectPropertiesGroups;
+std::unordered_map<DWORD, std::pair<float, float>>                   CModelInfoSA::ms_VehicleModelDefaultWheelSizes;
+std::map<unsigned short, int>                                        CModelInfoSA::ms_DefaultTxdIDMap;
 
 union tIdeFlags
 {
@@ -110,6 +110,7 @@ bool CModelInfoSA::IsBoat()
     DWORD dwFunction = FUNC_IsBoatModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
+    // clang-format off
     _asm
     {
         push    ModelID
@@ -117,6 +118,7 @@ bool CModelInfoSA::IsBoat()
         mov     bReturn, al
         add     esp, 4
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -125,6 +127,7 @@ bool CModelInfoSA::IsCar()
     DWORD dwFunction = FUNC_IsCarModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
+    // clang-format off
     _asm
     {
         push    ModelID
@@ -132,6 +135,7 @@ bool CModelInfoSA::IsCar()
         mov     bReturn, al
         add     esp, 4
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -140,6 +144,7 @@ bool CModelInfoSA::IsTrain()
     DWORD dwFunction = FUNC_IsTrainModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
+    // clang-format off
     _asm
     {
         push    ModelID
@@ -147,6 +152,7 @@ bool CModelInfoSA::IsTrain()
         mov     bReturn, al
         add     esp, 4
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -155,6 +161,7 @@ bool CModelInfoSA::IsHeli()
     DWORD dwFunction = FUNC_IsHeliModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
+    // clang-format off
     _asm
     {
         push    ModelID
@@ -162,6 +169,7 @@ bool CModelInfoSA::IsHeli()
         mov     bReturn, al
         add     esp, 4
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -170,6 +178,7 @@ bool CModelInfoSA::IsPlane()
     DWORD dwFunction = FUNC_IsPlaneModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
+    // clang-format off
     _asm
     {
         push    ModelID
@@ -177,6 +186,7 @@ bool CModelInfoSA::IsPlane()
         mov     bReturn, al
         add     esp, 4
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -185,6 +195,7 @@ bool CModelInfoSA::IsBike()
     DWORD dwFunction = FUNC_IsBikeModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
+    // clang-format off
     _asm
     {
         push    ModelID
@@ -192,6 +203,7 @@ bool CModelInfoSA::IsBike()
         mov     bReturn, al
         add     esp, 4
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -200,6 +212,7 @@ bool CModelInfoSA::IsFakePlane()
     DWORD dwFunction = FUNC_IsFakePlaneModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
+    // clang-format off
     _asm
     {
         push    ModelID
@@ -207,6 +220,7 @@ bool CModelInfoSA::IsFakePlane()
         mov     bReturn, al
         add     esp, 4
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -215,6 +229,7 @@ bool CModelInfoSA::IsMonsterTruck()
     DWORD dwFunction = FUNC_IsMonsterTruckModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
+    // clang-format off
     _asm
     {
         push    ModelID
@@ -222,6 +237,7 @@ bool CModelInfoSA::IsMonsterTruck()
         mov     bReturn, al
         add     esp, 4
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -230,6 +246,7 @@ bool CModelInfoSA::IsQuadBike()
     DWORD dwFunction = FUNC_IsQuadBikeModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
+    // clang-format off
     _asm
     {
         push    ModelID
@@ -237,6 +254,7 @@ bool CModelInfoSA::IsQuadBike()
         mov     bReturn, al
         add     esp, 4
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -245,6 +263,7 @@ bool CModelInfoSA::IsBmx()
     DWORD dwFunction = FUNC_IsBmxModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
+    // clang-format off
     _asm
     {
         push    ModelID
@@ -252,6 +271,7 @@ bool CModelInfoSA::IsBmx()
         mov     bReturn, al
         add     esp, 4
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -260,6 +280,7 @@ bool CModelInfoSA::IsTrailer()
     DWORD dwFunction = FUNC_IsTrailerModel;
     DWORD ModelID = m_dwModelID;
     bool  bReturn = false;
+    // clang-format off
     _asm
     {
         push    ModelID
@@ -267,6 +288,7 @@ bool CModelInfoSA::IsTrailer()
         mov     bReturn, al
         add     esp, 4
     }
+    // clang-format on
     return bReturn;
 }
 
@@ -317,6 +339,7 @@ char* CModelInfoSA::GetNameIfVehicle()
     DWORD ModelID = m_dwModelID;
     DWORD dwReturn = 0;
 
+    // clang-format off
         _asm
         {
             push    eax
@@ -339,6 +362,7 @@ char* CModelInfoSA::GetNameIfVehicle()
             pop     ebx
             pop     eax
         }
+    // clang-format on
     return (char*)dwReturn;
 }
 
@@ -349,12 +373,14 @@ uint CModelInfoSA::GetAnimFileIndex()
     uint  uiReturn = 0;
     if (dwFunc)
     {
+        // clang-format off
         _asm
         {
             mov     ecx, dwThis
             call    dwFunc
             mov     uiReturn, eax
         }
+        // clang-format on
     }
     return uiReturn;
 }
@@ -512,8 +538,8 @@ void CModelInfoSA::SetFlags(unsigned short usFlags)
         MapSet(ms_ModelDefaultFlagsMap, m_dwModelID, m_pInterface->usFlags);
 
     // Don't change bIsColLoaded flag
-    usFlags &= 0xFF7F;                                  // Disable flag in input
-    usFlags |= m_pInterface->usFlags & 0x80;            // Apply current bIsColLoaded flag
+    usFlags &= 0xFF7F;                        // Disable flag in input
+    usFlags |= m_pInterface->usFlags & 0x80;  // Apply current bIsColLoaded flag
 
     m_pInterface->usFlags = usFlags;
 }
@@ -533,7 +559,7 @@ void CModelInfoSA::SetIdeFlags(unsigned int uiFlags)
 
     // Default value is 0xC0 (bIsColLoaded + bIsBackfaceCulled)
     // But bIsColLoaded should not be changed
-    m_pInterface->usFlags &= 0x80;            // Reset all flags except bIsColLoaded
+    m_pInterface->usFlags &= 0x80;  // Reset all flags except bIsColLoaded
     m_pInterface->bIsBackfaceCulled = true;
 
     // setBaseModelInfoFlags
@@ -733,6 +759,7 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
     DWORD         dwFunc = FUNC_GetBoundingBox;
     DWORD         ModelID = m_dwModelID;
     CBoundingBox* dwReturn = 0;
+    // clang-format off
     _asm
     {
         push    ModelID
@@ -740,6 +767,7 @@ CBoundingBox* CModelInfoSA::GetBoundingBox()
         add     esp, 4
         mov     dwReturn, eax
     }
+    // clang-format on
     return dwReturn;
 }
 
@@ -747,7 +775,7 @@ bool CModelInfoSA::IsValid()
 {
     if (m_dwModelID >= MODELINFO_DFF_MAX && m_dwModelID < MODELINFO_TXD_MAX)
         return !pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(m_dwModelID - MODELINFO_DFF_MAX);
-        
+
     if (m_dwModelID >= pGame->GetBaseIDforTXD() && m_dwModelID < pGame->GetCountOfAllFileIDs())
         return true;
 
@@ -767,6 +795,7 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
     DWORD dwModelInfo = 0;
     DWORD ModelID = m_dwModelID;
     float fReturn = 0;
+    // clang-format off
     _asm {
         mov     eax, ModelID
 
@@ -783,6 +812,7 @@ float CModelInfoSA::GetDistanceFromCentreOfMassToBaseOfModel()
         fstp    fReturn
 skip:
     }
+    // clang-format on
     return fReturn;
 }
 
@@ -828,11 +858,12 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
 void CModelInfoSA::ResetTextureDictionaryID()
 {
     const auto it = ms_DefaultTxdIDMap.find(m_dwModelID);
-    if (it == ms_DefaultTxdIDMap.end()) {
+    if (it == ms_DefaultTxdIDMap.end())
+    {
         return;
     }
     SetTextureDictionaryID(it->second);
-    ms_DefaultTxdIDMap.erase(it); // Only erase after calling the function above [otherwise gets reinserted]
+    ms_DefaultTxdIDMap.erase(it);  // Only erase after calling the function above [otherwise gets reinserted]
 }
 
 void CModelInfoSA::StaticResetTextureDictionaries()
@@ -1006,10 +1037,10 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
                 // Log info
                 OutputDebugString(SString("Entity 0x%08x (with model %d) at ARRAY_StreamSectors[%d,%d] is invalid\n", pEntity, pEntity->m_nModelIndex,
                                           i / 2 % NUM_StreamSectorRows, i / 2 / NUM_StreamSectorCols));
-                // Assert in debug
-                #if MTA_DEBUG
+// Assert in debug
+#if MTA_DEBUG
                 assert(static_cast<std::size_t*>(pEntity->GetVTBL())[CEntity_DeleteRwObject_VTBL_OFFSET] != 0x00534030);
-                #endif
+#endif
                 pSectorEntry = (DWORD*)pSectorEntry[1];
                 continue;
             }
@@ -1018,12 +1049,14 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             {
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
+                    // clang-format off
                     _asm
                     {
                         mov ecx, pEntity
                         mov eax, [ecx]
                         call dword ptr [eax+20h]
                     }
+                    // clang-format on
                     removedModels.insert(pEntity->m_nModelIndex);
                 }
             }
@@ -1042,12 +1075,14 @@ void CModelInfoSA::StaticFlushPendingRestreamIPL()
             {
                 if (!pEntity->bStreamingDontDelete && !pEntity->bImBeingRendered)
                 {
+                    // clang-format off
                     _asm
                     {
                         mov ecx, pEntity
                         mov eax, [ecx]
                         call dword ptr [eax+20h]
                     }
+                    // clang-format on
                     removedModels.insert(pEntity->m_nModelIndex);
                 }
             }
@@ -1118,11 +1153,13 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
         {
             DWORD                      dwFunction = FUNC_RemoveRef;
             CBaseModelInfoSAInterface* pInterface = m_pInterface;
+            // clang-format off
             _asm
             {
                 mov     ecx, pInterface
                 call    dwFunction
             }
+            // clang-format on
         }
     }
 
@@ -1191,6 +1228,7 @@ short CModelInfoSA::GetAvailableVehicleMod(unsigned short usUpgrade)
     if (usUpgrade >= 1000 && usUpgrade <= 1193)
     {
         DWORD ModelID = m_dwModelID;
+        // clang-format off
         _asm
         {
             mov     eax, ModelID
@@ -1205,6 +1243,7 @@ short CModelInfoSA::GetAvailableVehicleMod(unsigned short usUpgrade)
             mov     ax, [eax+edx*2+0x2D6]
             mov     sreturn, ax
         }
+        // clang-format on
     }
     return sreturn;
 }
@@ -1213,6 +1252,7 @@ bool CModelInfoSA::IsUpgradeAvailable(eVehicleUpgradePosn posn)
 {
     bool  bRet = false;
     DWORD ModelID = m_dwModelID;
+    // clang-format off
     _asm
     {
         mov     eax, ModelID
@@ -1232,6 +1272,7 @@ bool CModelInfoSA::IsUpgradeAvailable(eVehicleUpgradePosn posn)
 
         mov     bRet, al
     }
+    // clang-format on
     return bRet;
 }
 
@@ -1239,6 +1280,7 @@ void CModelInfoSA::SetCustomCarPlateText(const char* szText)
 {
     char* szStoredText;
     DWORD ModelID = m_dwModelID;
+    // clang-format off
     _asm
     {
         push    ecx
@@ -1253,6 +1295,7 @@ void CModelInfoSA::SetCustomCarPlateText(const char* szText)
         mov     szStoredText, ecx
         pop     ecx
     }
+    // clang-format on
 
     if (szText) strncpy(szStoredText, szText, 8);
     else szStoredText[0] = 0;
@@ -1263,6 +1306,7 @@ unsigned int CModelInfoSA::GetNumRemaps()
     DWORD        dwFunc = FUNC_CVehicleModelInfo__GetNumRemaps;
     DWORD        ModelID = m_dwModelID;
     unsigned int uiReturn = 0;
+    // clang-format off
     _asm
     {
         mov     ecx, ModelID
@@ -1275,6 +1319,7 @@ unsigned int CModelInfoSA::GetNumRemaps()
         call    dwFunc
         mov     uiReturn, eax
     }
+    // clang-format on
     return uiReturn;
 }
 
@@ -1386,7 +1431,7 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
 
     auto iter = ms_ModelDefaultDummiesPosition.find(m_dwModelID);
     if (iter == ms_ModelDefaultDummiesPosition.end())
-        return;            // Early out in case the model doesn't have any dummies modified
+        return;  // Early out in case the model doesn't have any dummies modified
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
     for (const auto& dummy : ms_ModelDefaultDummiesPosition[m_dwModelID])
@@ -1799,7 +1844,7 @@ void CModelInfoSA::MakeTimedObjectModel(ushort usBaseID)
 void CModelInfoSA::MakeClumpModel(ushort usBaseID)
 {
     CClumpModelInfoSAInterface* pNewInterface = new CClumpModelInfoSAInterface();
-    CBaseModelInfoSAInterface* pBaseObjectInfo = ppModelInfo[usBaseID];
+    CBaseModelInfoSAInterface*  pBaseObjectInfo = ppModelInfo[usBaseID];
     MemCpyFast(pNewInterface, pBaseObjectInfo, sizeof(CClumpModelInfoSAInterface));
     pNewInterface->usNumberOfRefs = 0;
     pNewInterface->pRwObject = nullptr;
@@ -1889,11 +1934,12 @@ __declspec(noinline) void OnMY_NodeNameStreamRead(RwStream* stream, char* pDest,
 }
 
 // Hook info
-#define HOOKPOS_NodeNameStreamRead                         0x072FA68
-#define HOOKSIZE_NodeNameStreamRead                        15
-DWORD RETURN_NodeNameStreamRead = 0x072FA77;
+#define HOOKPOS_NodeNameStreamRead  0x072FA68
+#define HOOKSIZE_NodeNameStreamRead 15
+DWORD                 RETURN_NodeNameStreamRead = 0x072FA77;
 void _declspec(naked) HOOK_NodeNameStreamRead()
 {
+    // clang-format off
     _asm
     {
         pushad
@@ -1906,6 +1952,7 @@ void _declspec(naked) HOOK_NodeNameStreamRead()
 
         jmp     RETURN_NodeNameStreamRead
     }
+    // clang-format on
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -2070,7 +2117,7 @@ void CModelInfoSA::RestoreAllObjectsPropertiesGroups()
 eModelInfoType CModelInfoSA::GetModelType()
 {
     if (auto pInterface = GetInterface())
-        return ((eModelInfoType(*)())pInterface->VFTBL->GetModelType)();
+        return ((eModelInfoType (*)())pInterface->VFTBL->GetModelType)();
 
     return eModelInfoType::UNKNOWN;
 }

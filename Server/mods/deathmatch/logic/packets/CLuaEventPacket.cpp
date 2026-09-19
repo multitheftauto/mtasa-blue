@@ -14,7 +14,7 @@
 
 namespace
 {
-constexpr int MAX_LUA_EVENT_ARGUMENTS_SIZE = 1024 * 1024;
+    constexpr int MAX_LUA_EVENT_ARGUMENTS_SIZE = 1024 * 1024;
 }
 
 CLuaEventPacket::CLuaEventPacket()

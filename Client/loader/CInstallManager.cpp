@@ -655,8 +655,7 @@ SString CInstallManager::_CheckForWerCrash()
             // those are handled by the normal crash handler, not the WER path.
             if (regs.valid && exceptionCode != EXCEPTION_STACK_BUFFER_OVERRUN && exceptionCode != EXCEPTION_HEAP_CORRUPTION)
             {
-                OutputDebugStringA(SString("_CheckForWerCrash: Skipping dump %s with non-fail-fast exception code 0x%08X\n",
-                                           dumpFile.c_str(), exceptionCode));
+                OutputDebugStringA(SString("_CheckForWerCrash: Skipping dump %s with non-fail-fast exception code 0x%08X\n", dumpFile.c_str(), exceptionCode));
                 continue;
             }
 
@@ -807,8 +806,8 @@ SString CInstallManager::_CheckForWerCrash()
                 // those are handled by the normal crash handler, not the WER path.
                 if (regs.valid && exceptionCode != EXCEPTION_STACK_BUFFER_OVERRUN && exceptionCode != EXCEPTION_HEAP_CORRUPTION)
                 {
-                    OutputDebugStringA(SString("_CheckForWerCrash: Skipping WER dump %s with non-fail-fast exception code 0x%08X\n",
-                                               dumpFile.c_str(), exceptionCode));
+                    OutputDebugStringA(
+                        SString("_CheckForWerCrash: Skipping WER dump %s with non-fail-fast exception code 0x%08X\n", dumpFile.c_str(), exceptionCode));
                     continue;
                 }
 

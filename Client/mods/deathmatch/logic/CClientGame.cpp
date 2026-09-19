@@ -113,7 +113,7 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     m_lMoney = 0;
     m_dwWanted = 0;
     m_timeLastDiscordStateUpdate = 0;
-    m_lastWeaponSlot = WEAPONSLOT_MAX;            // last stored weapon slot, for weapon slot syncing to server (sets to invalid value)
+    m_lastWeaponSlot = WEAPONSLOT_MAX;  // last stored weapon slot, for weapon slot syncing to server (sets to invalid value)
     ResetAmmoInClip();
 
     m_bFocused = g_pCore->IsFocused();
@@ -375,12 +375,9 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     SetupGlobalLuaEvents();
 
     // Setup default states for Rich Presence
-    g_vehicleTypePrefixes = {
-        _("Flying a UFO around"),      _("Cruising around"),            _("Riding the waves of"),
-        _("Riding the train in"),      _("Flying around"),              _("Flying around"),
-        _("Riding around"),            _("Monster truckin' around"),    _("Quaddin' around"),
-        _("Bunny hopping around"),     _("Doing weird stuff in")
-    };
+    g_vehicleTypePrefixes = {_("Flying a UFO around"), _("Cruising around"),      _("Riding the waves of"), _("Riding the train in"),
+                             _("Flying around"),       _("Flying around"),        _("Riding around"),       _("Monster truckin' around"),
+                             _("Quaddin' around"),     _("Bunny hopping around"), _("Doing weird stuff in")};
 
     g_playerTaskStates = {
         {TASK_COMPLEX_JUMP, {true, _("Climbing around in"), TASK_SIMPLE_CLIMB}},
@@ -409,7 +406,7 @@ CClientGame::~CClientGame()
     m_bBeingDeleted = true;
     // Remove active projectile references to local player
     if (auto pLocalPlayer = g_pClientGame->GetLocalPlayer())
-        g_pGame->GetProjectileInfo()->RemoveEntityReferences(pLocalPlayer->GetGameEntity());    
+        g_pGame->GetProjectileInfo()->RemoveEntityReferences(pLocalPlayer->GetGameEntity());
 
     // Stop all explosions. Unfortunately this doesn't fix the crash
     // if a vehicle is destroyed while it explodes.
@@ -545,7 +542,7 @@ CClientGame::~CClientGame()
     }
 
     // Destroy our stuff
-    SAFE_DELETE(m_pManager);            // Will trigger onClientResourceStop
+    SAFE_DELETE(m_pManager);  // Will trigger onClientResourceStop
     SAFE_DELETE(m_pNametags);
     SAFE_DELETE(m_pSyncDebug);
     SAFE_DELETE(m_pNetworkStats);
@@ -937,8 +934,8 @@ void CClientGame::DoPulsePostFrame()
         // Draw network trouble message if required
         if (m_pNetAPI->IsNetworkTrouble())
         {
-            int iPosX = uiWidth / 2;                    // Half way across
-            int iPosY = uiHeight * 45 / 100;            // 45/100 down
+            int iPosX = uiWidth / 2;          // Half way across
+            int iPosY = uiHeight * 45 / 100;  // 45/100 down
             g_pCore->GetGraphics()->DrawString(iPosX, iPosY, iPosX, iPosY, COLOR_ARGB(255, 255, 0, 0), "*** NETWORK TROUBLE ***", 2.0f, 2.0f,
                                                DT_NOCLIP | DT_CENTER);
         }
@@ -1030,12 +1027,12 @@ void CClientGame::DoPulsePostFrame()
                     }
 
                     auto taskManager = pLocalPlayer->GetTaskManager();
-                    auto task = taskManager->GetActiveTask();                    
+                    auto task = taskManager->GetActiveTask();
                     auto pVehicle = pLocalPlayer->GetOccupiedVehicle();
                     bool useZoneName = true;
 
                     const eClientVehicleType vehicleType = (pVehicle) ? CClientVehicleManager::GetVehicleType(pVehicle->GetModel()) : CLIENTVEHICLE_NONE;
-                    std::string discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType).c_str() : _("Walking around ");
+                    std::string              discordState = (pVehicle) ? g_vehicleTypePrefixes.at(vehicleType).c_str() : _("Walking around ");
 
                     if (task && task->IsValid())
                     {
@@ -1051,7 +1048,7 @@ void CClientGame::DoPulsePostFrame()
                         }
 
                         // Check for non-matching sub/secondary tasks and remove them
-                        for (auto it = taskStates.begin(); it != taskStates.end(); )
+                        for (auto it = taskStates.begin(); it != taskStates.end();)
                         {
                             const STaskState& taskState = (*it);
 
@@ -1079,12 +1076,12 @@ void CClientGame::DoPulsePostFrame()
                         if (stateCount > 0)
                         {
                             std::srand(GetTickCount64_());
-                            const int  index = (std::rand() % stateCount);
+                            const int   index = (std::rand() % stateCount);
                             const auto& taskState = taskStates[index];
 
                             discordState = taskState.strState;
                             useZoneName = taskState.bUseZone;
-                        }                                       
+                        }
 
                         if (useZoneName)
                         {
@@ -1389,7 +1386,7 @@ void CClientGame::DoPulses()
                 {
                     case RID_RSA_PUBLIC_KEY_MISMATCH:
                         strError = _("Disconnected: unknown protocol error");
-                        strErrorCode = _E("CD10");            // encryption key mismatch
+                        strErrorCode = _E("CD10");  // encryption key mismatch
                         break;
                     case RID_REMOTE_DISCONNECTION_NOTIFICATION:
                         strError = _("Disconnected: disconnected remotely");
@@ -1455,7 +1452,7 @@ void CClientGame::DoPulses()
         m_pLocalPlayer->UpdateVehicleInOut();
         UpdatePlayerTarget();
         UpdatePlayerWeapons();
-        UpdateTrailers();            // Test: Does it always work without this check?
+        UpdateTrailers();  // Test: Does it always work without this check?
         UpdateStunts();
         // Clear last damager if more than 2 seconds old
         if (CClientTime::GetTime() - m_ulDamageTime > 2000)
@@ -2204,16 +2201,16 @@ bool CClientGame::KeyStrokeHandler(const SString& strKey, bool bState, bool bIsC
             if (g_pCore->IsMenuVisible() || (g_pCore->GetConsole()->IsInputActive() && bIsConsoleInputKey) ||
                 (pFocusedBrowser && !pFocusedBrowser->IsLocal() && !isMouseKey))
 
-                bIgnore = true;            // Ignore this keydown and the matching keyup
+                bIgnore = true;  // Ignore this keydown and the matching keyup
             else
-                MapInsert(m_AllowKeyUpMap, strKey);            // Use this keydown and the matching keyup
+                MapInsert(m_AllowKeyUpMap, strKey);  // Use this keydown and the matching keyup
         }
         else
         {
             if (!MapContains(m_AllowKeyUpMap, strKey))
-                bIgnore = true;            // Ignore this keyup
+                bIgnore = true;  // Ignore this keyup
             else
-                MapRemove(m_AllowKeyUpMap, strKey);            // Use this keyup
+                MapRemove(m_AllowKeyUpMap, strKey);  // Use this keyup
         }
 
         if (!bIgnore)
@@ -3067,7 +3064,7 @@ void CClientGame::UpdateMimics()
         }
 
         // Simulate lag (or not)
-        if (!m_bMimicLag || CClientTime::GetTime() >= m_ulLastMimicLag + 200)            // TICK_RATE )
+        if (!m_bMimicLag || CClientTime::GetTime() >= m_ulLastMimicLag + 200)  // TICK_RATE )
         {
             m_ulLastMimicLag = CClientTime::GetTime();
 
@@ -3465,7 +3462,7 @@ void CClientGame::Event_OnIngame()
 
     // Reset anything from last game
     ResetMapInfo();
-    g_pGame->GetWaterManager()->Reset();            // Deletes all custom water elements, ResetMapInfo only reverts changes to water level
+    g_pGame->GetWaterManager()->Reset();  // Deletes all custom water elements, ResetMapInfo only reverts changes to water level
     g_pGame->GetWaterManager()->SetWaterDrawnLast(true);
     m_pCamera->SetCameraClip(true, true);
 
@@ -4284,7 +4281,7 @@ bool CClientGame::DamageHandler(CPed* pDamagePed, CEventDamage* pEvent)
             CClientPlayer* pInflictingPlayer = DynamicCast<CClientPlayer>(pInflictingEntity);
             if (pInflictingPlayer && !pInflictingPlayer->IsLocalPlayer())
             {
-                bool bBulletSyncShot = (g_iDamageEventLimit != -1);            // Called from discharge weapon
+                bool bBulletSyncShot = (g_iDamageEventLimit != -1);  // Called from discharge weapon
                 bool bBulletSyncWeapon = GetWeaponTypeUsesBulletSync(weaponUsed);
 
                 if (bBulletSyncShot)
@@ -4581,7 +4578,8 @@ void CClientGame::DeathHandler(CPed* pKilledPedSA, unsigned char ucDeathReason, 
 }
 
 bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicle, CEntitySAInterface* pCollidedWith, int iModelIndex, float fDamageImpulseMag,
-                                          float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity, bool isProjectile)
+                                          float fCollidingDamageImpulseMag, uint16 usPieceType, CVector vecCollisionPos, CVector vecCollisionVelocity,
+                                          bool isProjectile)
 {
     if (pCollidingVehicle && pCollidedWith)
     {
@@ -4596,7 +4594,8 @@ bool CClientGame::VehicleCollisionHandler(CVehicleSAInterface*& pCollidingVehicl
             }
 
             CClientVehicle* pClientVehicle = static_cast<CClientVehicle*>(pVehicleClientEntity);
-            CClientEntity*  pCollidedWithClientEntity = !isProjectile ? pPools->GetClientEntity((DWORD*)pCollidedWith) : m_pManager->GetProjectileManager()->Get(pCollidedWith);
+            CClientEntity*  pCollidedWithClientEntity =
+                !isProjectile ? pPools->GetClientEntity((DWORD*)pCollidedWith) : m_pManager->GetProjectileManager()->Get(pCollidedWith);
 
             CLuaArguments Arguments;
             if (pCollidedWithClientEntity)
@@ -5033,7 +5032,7 @@ bool CClientGame::PreWeaponFire(CPlayerPed* pPlayerPed, bool bStopIfUsingBulletS
         if (pPlayer && !pPlayer->IsLocalPlayer())
         {
             if (bStopIfUsingBulletSync && pPlayer->IsCurrentWeaponUsingBulletSync())
-                return false;            // Don't apply shot compensation & tell caller to not do bullet trace
+                return false;  // Don't apply shot compensation & tell caller to not do bullet trace
 
             if (bShotCompensation)
             {
@@ -5369,7 +5368,7 @@ void CClientGame::SendProjectileSync(CClientProjectile* pProjectile)
 
         // Write the projectile's model
         if (pBitStream->Version() >= 0x4F)
-            if (pBitStream->Version() >= 0x52 || pOriginSource)            // Fix possible error for 0x51 server
+            if (pBitStream->Version() >= 0x52 || pOriginSource)  // Fix possible error for 0x51 server
                 pBitStream->Write(pProjectile->GetModel());
 
         switch (weaponType)
@@ -5641,10 +5640,8 @@ void CClientGame::DoWastedCheck(ElementID damagerID, unsigned char ucWeapon, uns
             const auto discord = g_pCore->GetDiscord();
             if (discord && discord->IsDiscordRPCEnabled() && discord->IsDiscordCustomDetailsDisallowed())
             {
-                static const std::vector<std::string> states{
-                    _("In a ditch"), _("En-route to hospital"), _("Meeting their maker"),
-                    _("Regretting their decisions"), _("Wasted")
-                };
+                static const std::vector<std::string> states{_("In a ditch"), _("En-route to hospital"), _("Meeting their maker"),
+                                                             _("Regretting their decisions"), _("Wasted")};
 
                 const std::string& state = states[rand() % states.size()];
                 discord->SetPresenceState(state.c_str(), false);
@@ -6552,8 +6549,11 @@ void CClientGame::OutputServerInfo()
 
     {
         SString     strEnabledGlitches;
-        const char* szGlitchNames[] = {"Quick reload",         "Fast fire",  "Fast move", "Crouch bug", "Close damage", "Hit anim", "Fast sprint",
-                                       "Bad driveby hitboxes", "Quick stand", "Kickout of vehicle on model replace"};
+        const char* szGlitchNames[] = {"Quick reload", "Fast fire",
+                                       "Fast move",    "Crouch bug",
+                                       "Close damage", "Hit anim",
+                                       "Fast sprint",  "Bad driveby hitboxes",
+                                       "Quick stand",  "Kickout of vehicle on model replace"};
         for (uint i = 0; i < NUM_GLITCHES; i++)
         {
             if (IsGlitchEnabled(i))
