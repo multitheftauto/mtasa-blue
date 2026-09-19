@@ -343,7 +343,7 @@ void CResource::Load()
             // Load the file
             std::vector<char> buffer;
             const bool        bLoaded = FileLoad(pResourceFile->GetName(), buffer);
-            const char* pBufferData = buffer.empty() ? nullptr : &buffer.at(0);
+            const char*       pBufferData = buffer.empty() ? nullptr : &buffer.at(0);
 
             DECLARE_PROFILER_SECTION(OnPreLoadScript)
             // Check the contents
@@ -575,8 +575,8 @@ void CResource::HandleDownloadedFileTrouble(CResourceFile* pResourceFile, bool b
     {
         SString strGotMd5 = ConvertDataToHexString(clientChecksum.md5.data, sizeof(MD5));
         SString strWantedMd5 = ConvertDataToHexString(pResourceFile->GetServerChecksum().md5.data, sizeof(MD5));
-        errorMessage = SString("Got CRC:%08lX MD5:%s, wanted CRC:%08lX MD5:%s", clientChecksum.ulCRC, *strGotMd5,
-                               pResourceFile->GetServerChecksum().ulCRC, *strWantedMd5);
+        errorMessage =
+            SString("Got CRC:%08lX MD5:%s, wanted CRC:%08lX MD5:%s", clientChecksum.ulCRC, *strGotMd5, pResourceFile->GetServerChecksum().ulCRC, *strWantedMd5);
     }
 
     SString strFilename = ExtractFilename(PathConform(pResourceFile->GetShortName()));

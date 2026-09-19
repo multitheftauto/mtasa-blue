@@ -106,7 +106,7 @@ bool CRenderWareSA::ModelInfoTXDLoadTextures(SReplacementTextures* pReplacementT
         {
             pReplacementTextures->textures[i]->txd = NULL;
             if (bFilteringEnabled)
-                pReplacementTextures->textures[i]->flags = 0x1102;            // Enable filtering (otherwise textures are pixely)
+                pReplacementTextures->textures[i]->flags = 0x1102;  // Enable filtering (otherwise textures are pixely)
         }
 
         // Make the txd forget it has any textures and destroy it
@@ -146,7 +146,7 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 
     // Already done for this txd?
     if (ListContains(pReplacementTextures->usedInTxdIds, pInfo->usTxdId))
-        return true;            // Return true as model may need restreaming
+        return true;  // Return true as model may need restreaming
 
     //
     // Add section for this txd
@@ -255,7 +255,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         if (pInfo->usedByReplacements.empty())
         {
             // txd should now contain the same textures as 'originalTextures'
-        #ifdef MTA_DEBUG
+#ifdef MTA_DEBUG
             std::vector<RwTexture*> currentTextures;
             GetTxdTextures(currentTextures, pInfo->pTxd);
             // Size mismatch can occur when the TXD state has become inconsistent
@@ -273,17 +273,19 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
             }
             else
             {
-                OutputDebugStringA(SString("CRenderWareSA: TXD %u texture count mismatch after replacement removal"
-                                           " (current=%zu expected=%zu)\n",
-                                           pInfo->usTxdId, currentTextures.size(), pInfo->originalTextures.size()));
+                OutputDebugStringA(
+                    SString("CRenderWareSA: TXD %u texture count mismatch after replacement removal"
+                            " (current=%zu expected=%zu)\n",
+                            pInfo->usTxdId, currentTextures.size(), pInfo->originalTextures.size()));
             }
 
             int32_t refsCount = CTxdStore_GetNumRefs(pInfo->usTxdId);
             if (refsCount <= 0)
-                OutputDebugStringA(SString("CRenderWareSA: TXD %u has no references during removal (refsCount=%d)"
-                                           " - SA streaming may have already released it\n",
-                                           pInfo->usTxdId, refsCount));
-        #endif
+                OutputDebugStringA(
+                    SString("CRenderWareSA: TXD %u has no references during removal (refsCount=%d)"
+                            " - SA streaming may have already released it\n",
+                            pInfo->usTxdId, refsCount));
+#endif
             // Remove info - only call RemoveRef if there's actually a reference to remove
             if (CTxdStore_GetNumRefs(pInfo->usTxdId) > 0)
                 CTxdStore_RemoveRef(pInfo->usTxdId);
