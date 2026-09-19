@@ -70,7 +70,12 @@ bool CClientTXD::AddClothingTexture(const std::string& modelName)
             return false;
     }
 
-    return g_pGame->GetRenderWare()->ClothesAddFile(m_FileData.data(), m_FileData.size(), modelName.c_str());
+    if (!g_pGame->GetRenderWare()->ClothesAddFile(m_FileData.data(), m_FileData.size(), modelName.c_str()))
+        return false;
+
+    // The clothes system keeps the m_FileData pointer, so Import must not free the buffer
+    m_bUsingFileDataForClothes = true;
+    return true;
 }
 
 bool CClientTXD::Import(unsigned short usModelID)

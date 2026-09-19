@@ -88,6 +88,13 @@ bool CGUIComboBox_Impl::RemoveItem(int index)
             m_pWindow->setText(storedCaption);
         }
         reinterpret_cast<CEGUI::Combobox*>(m_pWindow)->removeItem(pItem);
+
+        // CEGUI only deletes auto-deleted items, ours are owned by the wrappers in m_Items
+        if (const auto it = m_Items.find(pItem); it != m_Items.end())
+        {
+            delete it->second;
+            m_Items.erase(it);
+        }
         return true;
     }
     catch (...)

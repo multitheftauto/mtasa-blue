@@ -577,8 +577,12 @@ void CDirect3DEvents9::OnRestore(IDirect3DDevice9* pDevice)
     CCore::GetSingleton().OnDeviceRestore();
 }
 
+static bool g_bDualPassAlpha = true;
+
 void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice)
 {
+    CVARS_GET("dualpass_alpha", g_bDualPassAlpha);
+
     // CEGUI faults are caught in CGUI_Impl::Draw; anything else goes to the crash handler.
     TIMING_CHECKPOINT("+OnPresent1");
     CGraphics::GetSingleton().SetSkipMTARenderThisFrame(false);
@@ -761,7 +765,7 @@ HRESULT CDirect3DEvents9::OnDrawPrimitive(IDirect3DDevice9* pDevice, IDirect3DDe
         // dual pass over it draws the sub-ref gradient in pass 2, which is what kept the LV neon
         // lines smeared no matter what the game side ALPHAREF was set to.
         const bool bGameAlphaTestActive = g_pDeviceState->RenderState.ALPHATESTENABLE && g_pDeviceState->RenderState.ALPHAREF > 2;
-        if (!bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
+        if (g_bDualPassAlpha && !bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
             !g_pDeviceState->VertexDeclState.PositionT)
         {
             // Save current alpha test state
@@ -1013,7 +1017,7 @@ HRESULT CDirect3DEvents9::OnDrawIndexedPrimitive(IDirect3DDevice9* pDevice, IDir
         // is already running a meaningful alpha test, it clips transparent pixels before z-write
         // on its own and the dual pass would draw the sub-ref gradient in pass 2.
         const bool bGameAlphaTestActive = g_pDeviceState->RenderState.ALPHATESTENABLE && g_pDeviceState->RenderState.ALPHAREF > 2;
-        if (!bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
+        if (g_bDualPassAlpha && !bGameAlphaTestActive && g_pDeviceState->RenderState.ALPHABLENDENABLE && g_pDeviceState->RenderState.ZWRITEENABLE &&
             !g_pDeviceState->VertexDeclState.PositionT)
         {
             // Save current alpha test state
@@ -1329,19 +1333,8 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational, IDirect3DDevic
     if (!pShaderItem)
         return;
 
-    if (!SharedUtil::IsReadablePointer(pShaderItem, sizeof(void*)))
-        return;
-
     SResolvedShaderState shaderState;
-    bool                 bHasShaderState = TryResolveShaderState(pShaderItem, shaderState);
-
-    if (bHasShaderState)
-    {
-        if (shaderState.pInstance && !SharedUtil::IsReadablePointer(shaderState.pInstance, sizeof(void*)))
-            bHasShaderState = false;
-        if (bHasShaderState && shaderState.pEffectWrap && !SharedUtil::IsReadablePointer(shaderState.pEffectWrap, sizeof(void*)))
-            bHasShaderState = false;
-    }
+    const bool           bHasShaderState = TryResolveShaderState(pShaderItem, shaderState);
 
     ID3DXEffect*      pD3DEffect = bHasShaderState ? shaderState.pEffect : nullptr;
     IDirect3DDevice9* pDevice = g_pGraphics ? g_pGraphics->GetDevice() : nullptr;
@@ -1391,33 +1384,52 @@ void CDirect3DEvents9::CloseActiveShader(bool bDeviceOperational, IDirect3DDevic
 // This function checks the sizes are valid
 //
 /////////////////////////////////////////////////////////////
+bool ShouldUpdateDeviceStateCache();
+
 bool AreVertexStreamsBigEnough(IDirect3DDevice9* pDevice, uint viMinBased, uint viMaxBased)
 {
+    // The proxy mirrors every stream the game sets, so the sizes are known without asking D3D
+    const bool bUseCache = ShouldUpdateDeviceStateCache();
+
     // Check each stream used
     for (uint i = 0; i < NUMELMS(g_pDeviceState->VertexDeclState.bUsesStreamAtIndex); i++)
     {
         if (g_pDeviceState->VertexDeclState.bUsesStreamAtIndex[i])
         {
-            IDirect3DVertexBuffer9* pStreamData = NULL;
-            UINT                    StreamOffset;
-            UINT                    StreamStride;
-            pDevice->GetStreamSource(i, &pStreamData, &StreamOffset, &StreamStride);
+            UINT StreamOffset;
+            UINT StreamStride;
+            UINT StreamSize;
 
-            if (pStreamData)
+            if (bUseCache)
             {
+                const auto& stream = g_pDeviceState->VertexStreams[i];
+                if (!stream.StreamData)
+                    continue;
+                StreamOffset = stream.StreamOffset;
+                StreamStride = stream.StreamStride;
+                StreamSize = stream.StreamSize;
+            }
+            else
+            {
+                IDirect3DVertexBuffer9* pStreamData = NULL;
+                pDevice->GetStreamSource(i, &pStreamData, &StreamOffset, &StreamStride);
+                if (!pStreamData)
+                    continue;
+
                 D3DVERTEXBUFFER_DESC VertexBufferDesc;
                 pStreamData->GetDesc(&VertexBufferDesc);
                 SAFE_RELEASE(pStreamData);
-
-                uint ReadOffsetStart = viMinBased * StreamStride + StreamOffset;
-                uint ReadOffsetSize = (viMaxBased - viMinBased) * StreamStride;
-
-                uint MinSizeVertexBufferShouldBe = ReadOffsetStart + ReadOffsetSize;
-
-                // Check vertex buffer is big enough to do the draw
-                if (VertexBufferDesc.Size < MinSizeVertexBufferShouldBe)
-                    return false;
+                StreamSize = VertexBufferDesc.Size;
             }
+
+            uint ReadOffsetStart = viMinBased * StreamStride + StreamOffset;
+            uint ReadOffsetSize = (viMaxBased - viMinBased) * StreamStride;
+
+            uint MinSizeVertexBufferShouldBe = ReadOffsetStart + ReadOffsetSize;
+
+            // Check vertex buffer is big enough to do the draw
+            if (StreamSize < MinSizeVertexBufferShouldBe)
+                return false;
         }
     }
     return true;

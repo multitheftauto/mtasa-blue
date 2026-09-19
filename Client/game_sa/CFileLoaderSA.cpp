@@ -218,10 +218,12 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     CVisibilityPlugins_SetAtomicRenderCallback(atomic, 0);
 
     RpAtomic* pOldAtomic = reinterpret_cast<RpAtomic*>(pBaseModelInfo->pRwObject);
+    RpAtomic* pOldDamagedAtomic = nullptr;
 
     if (bDamage)
     {
         auto pDamagableModelInfo = reinterpret_cast<CDamagableModelInfo*>(pAtomicModelInfo);
+        pOldDamagedAtomic = static_cast<RpAtomic*>(static_cast<CDamageableModelInfoSAInterface*>(pBaseModelInfo)->m_damagedAtomic);
         pDamagableModelInfo->SetDamagedAtomic(atomic);
     }
     else
@@ -246,6 +248,18 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
         if (pOldFrame)
         {
             RwFrameDestroy(pOldFrame);
+        }
+    }
+
+    // SetDamagedAtomic only overwrites the pointer, so the previous damaged atomic has to be destroyed here
+    if (pOldDamagedAtomic && pRelatedModelInfo->bDeleteOldRwObject)
+    {
+        RwFrame* pOldDamagedFrame = reinterpret_cast<RwFrame*>(pOldDamagedAtomic->object.object.parent);
+        RpAtomicDestroy(pOldDamagedAtomic);
+
+        if (pOldDamagedFrame)
+        {
+            RwFrameDestroy(pOldDamagedFrame);
         }
     }
     return atomic;

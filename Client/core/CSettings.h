@@ -173,6 +173,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxTyreSmokeParticles;
     CGUICheckBox*  m_pCheckBoxHighDetailVehicles;
     CGUICheckBox*  m_pCheckBoxHighDetailPeds;
+    CGUICheckBox*  m_pCheckBoxDualPassAlpha;
     CGUICheckBox*  m_pCheckBoxBlur;
     CGUICheckBox*  m_pCheckBoxCoronaReflections;
     CGUICheckBox*  m_pCheckBoxDynamicPedShadows;

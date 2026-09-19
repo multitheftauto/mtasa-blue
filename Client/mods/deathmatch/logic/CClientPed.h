@@ -542,7 +542,7 @@ public:
     }
     bool                  IsNextAnimationCustom() const noexcept { return m_bisNextAnimationCustom; }
     void                  SetNextAnimationCustom(const std::shared_ptr<CClientIFP>& pIFP, const SString& strAnimationName);
-    void                  SetCurrentAnimationCustom(bool bCustom) noexcept { m_bisCurrentAnimationCustom = bCustom; }
+    void                  SetCurrentAnimationCustom(bool bCustom) noexcept;
     bool                  IsCurrentAnimationCustom() const noexcept { return m_bisCurrentAnimationCustom; }
     CIFPAnimations*       GetIFPAnimationsPointer() noexcept { return m_pIFPAnimations; }
     const CIFPAnimations* GetIFPAnimationsPointer() const noexcept { return m_pIFPAnimations; }
@@ -795,6 +795,7 @@ public:
     // It is set to false when custom animation is played.
     bool                        m_bisNextAnimationCustom;
     bool                        m_bisCurrentAnimationCustom;
+    bool                        m_bCustomAnimBonesPending;
     SString                     m_strCustomIFPBlockName;
     SString                     m_strCustomIFPAnimationName;
     unsigned int                m_u32CustomBlockNameHash;

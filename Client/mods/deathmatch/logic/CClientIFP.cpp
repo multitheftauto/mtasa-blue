@@ -193,9 +193,18 @@ WORD CClientIFP::ReadSequencesVersion1(std::unique_ptr<CAnimBlendHierarchy>& pAn
         InitializeAnimationSequence(pAnimationSequence, Anim.Name, iBoneID);
 
         eFrameType iFrameType = ReadKfrm();
-        if ((ReadSequenceKeyFrames(pAnimationSequence, iFrameType, Anim.Frames)) && (!bUnknownSequence))
+        bool       bKeyFramesRead = ReadSequenceKeyFrames(pAnimationSequence, iFrameType, Anim.Frames);
+        if (bUnknownSequence)
+            continue;
+
+        if (bKeyFramesRead)
+            std::swap(MapOfSequences[iBoneID], pAnimationSequence);
+
+        // Left over: the key frames failed to read, or a repeated bone id displaced this sequence
+        if (pAnimationSequence)
         {
-            MapOfSequences[iBoneID] = std::move(pAnimationSequence);
+            m_pAnimManager->FreeKeyFramesMemory(pAnimationSequence->GetKeyFrames());
+            m_pAnimManager->DeleteCustomAnimSequenceInterface(pAnimationSequence->GetInterface());
         }
     }
     return wUnknownSequences;
@@ -226,9 +235,18 @@ WORD CClientIFP::ReadSequencesVersion2(std::unique_ptr<CAnimBlendHierarchy>& pAn
         InitializeAnimationSequence(pAnimationSequence, ObjectNode.Name, ObjectNode.BoneID);
 
         eFrameType iFrameType = static_cast<eFrameType>(ObjectNode.FrameType);
-        if ((ReadSequenceKeyFrames(pAnimationSequence, iFrameType, ObjectNode.TotalFrames)) && (!bUnknownSequence))
+        bool       bKeyFramesRead = ReadSequenceKeyFrames(pAnimationSequence, iFrameType, ObjectNode.TotalFrames);
+        if (bUnknownSequence)
+            continue;
+
+        if (bKeyFramesRead)
+            std::swap(MapOfSequences[ObjectNode.BoneID], pAnimationSequence);
+
+        // Left over: the key frames failed to read, or a repeated bone id displaced this sequence
+        if (pAnimationSequence)
         {
-            MapOfSequences[ObjectNode.BoneID] = std::move(pAnimationSequence);
+            m_pAnimManager->FreeKeyFramesMemory(pAnimationSequence->GetKeyFrames());
+            m_pAnimManager->DeleteCustomAnimSequenceInterface(pAnimationSequence->GetInterface());
         }
     }
     return wUnknownSequences;
@@ -529,6 +547,7 @@ void CClientIFP::MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& 
             pAnimationSequence->CopySequenceProperties(pMapAnimSequenceInterface);
             // Delete the interface because we are moving, not copying
             m_pAnimManager->DeleteCustomAnimSequenceInterface(pMapAnimSequenceInterface);
+            mapOfSequences.erase(it);
             outAnimatedBonesMask.set(SequenceIndex);
         }
         else
@@ -536,6 +555,14 @@ void CClientIFP::MoveSequencesWithDummies(std::unique_ptr<CAnimBlendHierarchy>& 
             InsertAnimationDummySequence(pAnimationSequence, BoneName, BoneID);
         }
     }
+
+    // Sequences for bones outside the table above never reach the hierarchy
+    for (auto& sequence : mapOfSequences)
+    {
+        m_pAnimManager->FreeKeyFramesMemory(sequence.second->GetKeyFrames());
+        m_pAnimManager->DeleteCustomAnimSequenceInterface(sequence.second->GetInterface());
+    }
+    mapOfSequences.clear();
 }
 
 BYTE* CClientIFP::AllocateSequencesMemory(std::unique_ptr<CAnimBlendHierarchy>& pAnimationHierarchy)

@@ -63,8 +63,9 @@ bool CResourceClientScriptItem::Start()
         unsigned int  originalLength = m_sourceCode.length();
         unsigned long bufferLength =
             m_sourceCode.length() + 12 + (unsigned int)(m_sourceCode.length() * 0.001f);  // Refer to the compress2() function documentation.
-        char* compressedBuffer = new char[bufferLength];
-        if (compress2((Bytef*)compressedBuffer, (uLongf*)&bufferLength, (const Bytef*)m_sourceCode.c_str(), m_sourceCode.length(), Z_BEST_COMPRESSION) != Z_OK)
+        std::vector<char> compressedBuffer(bufferLength);
+        if (compress2((Bytef*)compressedBuffer.data(), (uLongf*)&bufferLength, (const Bytef*)m_sourceCode.c_str(), m_sourceCode.length(), Z_BEST_COMPRESSION) !=
+            Z_OK)
         {
             g_pGame->GetScriptDebugging()->LogWarning(0, "Failed to compress the client-side script '%s' of resource '%s'\n", GetName(),
                                                       m_resource->GetName().c_str());
@@ -76,8 +77,7 @@ bool CResourceClientScriptItem::Start()
         lengthData[2] = (originalLength >> 8) & 0xFF;
         lengthData[3] = originalLength & 0xFF;
         m_sourceCode.assign(lengthData, 4);
-        m_sourceCode.append(compressedBuffer, bufferLength);
-        delete[] compressedBuffer;
+        m_sourceCode.append(compressedBuffer.data(), bufferLength);
     }
 
     return true;
