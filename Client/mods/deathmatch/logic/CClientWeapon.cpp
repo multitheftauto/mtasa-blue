@@ -34,6 +34,9 @@ CClientWeapon::CClientWeapon(CClientManager* pManager, ElementID ID, eWeaponType
 
     SetTypeName("weapon");
 
+    // CClientObject already resolved our range as an object, redo it now that we are a weapon
+    RefreshStreamDistance();
+
     SetFrozen(true);
     Create();
 #ifdef MARKER_DEBUG

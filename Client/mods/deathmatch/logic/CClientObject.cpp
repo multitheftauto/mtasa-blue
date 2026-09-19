@@ -54,6 +54,8 @@ CClientObject::CClientObject(CClientManager* pManager, ElementID ID, unsigned sh
     if (m_bIsLowLod)
         m_pManager->OnLowLODElementCreated();
     m_clientModel = pManager->GetModelManager()->FindModelByID(usModel);
+
+    RefreshStreamDistance();
 }
 
 CClientObject::~CClientObject()
@@ -286,6 +288,7 @@ void CClientObject::SetModel(unsigned short usModel)
             m_clientModel = nullptr;
         m_pModelInfo = g_pGame->GetModelInfo(usModel);
         UpdateSpatialData();
+        RefreshStreamDistance();
 
         // Create the object if we're streamed in
         if (IsStreamedIn())

@@ -16,6 +16,8 @@ CClientSearchLight::CClientSearchLight(CClientManager* pManager, ElementID ID) :
     pManager->GetPointLightsManager()->AddToSearchLightList(this);
 
     SetTypeName("searchlight");
+
+    RefreshStreamDistance();
 }
 
 CClientSearchLight::~CClientSearchLight()
