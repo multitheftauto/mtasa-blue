@@ -279,9 +279,15 @@ public:
     class CPlayer* GetSyncer() { return m_pSyncer; };
     void           SetSyncer(class CPlayer* pPlayer);
 
+    // Set through setElementSyncer, and describes this ped's current syncer only. SetSyncer clears
+    // it, so it can never outlive the assignment it was granted for.
+    bool IsSyncerPersistent() const { return m_bSyncerPersistent; };
+    void SetSyncerPersistent(bool bPersistent) { m_bSyncerPersistent = bPersistent; };
+
     bool     IsSyncable() { return m_bSyncable; };
     void     SetSyncable(bool bSynced) { m_bSyncable = bSynced; };
     CPlayer* m_pSyncer;
+    bool     m_bSyncerPersistent = false;
 
     CVehicle* GetJackingVehicle() { return m_pJackingVehicle; }
     void      SetJackingVehicle(CVehicle* pVehicle);
