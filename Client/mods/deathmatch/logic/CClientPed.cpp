@@ -2961,8 +2961,8 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
         }
 
         // Are we need to update anim speed & progress?
-        // We need to do it here because the anim starts on the next frame after calling RunNamedAnimation
-        if (m_pAnimationBlock && m_AnimationCache.progressWaitForStreamIn && IsAnimationInProgress())
+        // We need to do it here because the anim starts in the next frame after calling RunNamedAnimation
+        if (m_pAnimationBlock && m_AnimationCache.updateInNextFrame && (IsAnimationInProgress() || !std::isnan(m_AnimationCache.progress)))
             UpdateAnimationProgressAndSpeed();
 
         // Same "next frame" issue as above: the gateway swap to our custom hierarchy (see
@@ -5896,18 +5896,45 @@ bool CClientPed::IsRunningAnimation()
 
 bool CClientPed::IsAnimationInProgress()
 {
-    bool constAnim = m_AnimationCache.bLoop || m_AnimationCache.bFreezeLastFrame;
+    // 1. !isLoop && freeze -> plays full length
+    // 2. !isLoop && !freeze -> plays for customTime (if < 0, full length; if == 0, 0)
+    // 3. isLoop && !freeze -> plays for customTime if > 0, otherwise infinite if < 0
+    // 4. isLoop && freeze -> acts like infinite loop without freezing last frame
+
+    bool isLoop = m_AnimationCache.bLoop;
+    bool freeze = m_AnimationCache.bFreezeLastFrame;
+
+    if (freeze)
+        return true;
 
     if (!m_pAnimationBlock)
-        return constAnim;
-
-    float elapsedTime = static_cast<float>(GetTimestamp() - m_AnimationCache.startTime) / 1000.0f;
+        return isLoop;
 
     auto animBlendHierarchy = g_pGame->GetAnimManager()->GetAnimation(m_AnimationCache.strName.c_str(), m_pAnimationBlock);
     if (!animBlendHierarchy)
-        return constAnim;
+        return isLoop;
 
-    return constAnim || elapsedTime < animBlendHierarchy->GetTotalTime();
+    float animLength = animBlendHierarchy->GetTotalTime();
+    float elapsedTime = static_cast<float>(g_pClientGame->GetSyncedTime() - m_AnimationCache.startTime) / 1000.0f;
+    float customTime = (m_AnimationCache.iTime < 0) ? -1.0f : (static_cast<float>(m_AnimationCache.iTime) / 1000.0f);
+    float effectiveDuration = animLength;
+
+    if (!isLoop)
+    {
+        if (customTime == 0.0f)
+            effectiveDuration = 0.0f;
+        else if (customTime > 0.0f)
+            effectiveDuration = std::min(customTime, animLength);
+    }
+    else
+    {
+        if (customTime < 0.0f)
+            return true;
+        else if (customTime > 0.0f)
+            effectiveDuration = customTime;
+    }
+
+    return elapsedTime < effectiveDuration;
 }
 
 void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
@@ -5990,6 +6017,9 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     {
         m_pAnimationBlock = g_pGame->GetAnimManager()->GetAnimBlock(pBlock->GetInterface());
     }
+
+    m_AnimationCache = SAnimationCache{};
+
     m_AnimationCache.strName = szAnimName;
     m_AnimationCache.iTime = iTime;
     m_AnimationCache.iBlend = iBlend;
@@ -6016,7 +6046,7 @@ void CClientPed::KillAnimation()
         }
     }
     m_pAnimationBlock = NULL;
-    m_AnimationCache.strName = "";
+    m_AnimationCache = SAnimationCache{};
     m_bRequestedAnimation = false;
     SetNextAnimationNormal();
 }
@@ -6035,46 +6065,109 @@ void CClientPed::RunAnimationFromCache()
     if (!m_pAnimationBlock)
         return;
 
-    // Copy our name incase it gets deleted
-    std::string animName = m_AnimationCache.strName;
+    // Copy some data in case it gets deleted
+    std::string  animName = m_AnimationCache.strName;
+    std::int64_t startTime = m_AnimationCache.startTime;
+    float        speed = m_AnimationCache.speed;
+    float        progress = m_AnimationCache.progress;
 
     // Run our animation
     RunNamedAnimation(m_pAnimationBlock, animName.c_str(), m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
                       m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptible, m_AnimationCache.bFreezeLastFrame);
 
-    // Set anim progress & speed
-    m_AnimationCache.progressWaitForStreamIn = true;
+    // Restore our startTime, speed and progress
+    m_AnimationCache.startTime = startTime;
+    m_AnimationCache.speed = speed;
+    m_AnimationCache.progress = progress;
+
+    // Let's update animation progress & speed
+    m_AnimationCache.updateInNextFrame = true;
 }
 
 void CClientPed::UpdateAnimationProgressAndSpeed()
 {
-    if (!m_AnimationCache.progressWaitForStreamIn)
-        return;
-
-    // Get current anim
     auto animAssoc = g_pGame->GetAnimManager()->RpAnimBlendClumpGetAssociation(GetClump(), m_AnimationCache.strName.c_str());
     if (!animAssoc)
         return;
 
+    // Default to current progress to preserve state if paused or skipped
     float animLength = animAssoc->GetLength();
-    float progress = 0.0f;
-    float elapsedTime = static_cast<float>(GetTimestamp() - m_AnimationCache.startTime) / 1000.0f;
+    float progress = animAssoc->GetCurrentProgress() / animLength;
 
-    if (m_AnimationCache.bFreezeLastFrame)  // time and loop is ignored if freezeLastFrame is true
-        progress = (elapsedTime / animLength) * m_AnimationCache.speed;
-    else
+    // Process explicit cached progress independently of playback speed
+    if (!std::isnan(m_AnimationCache.progress))
     {
-        if (m_AnimationCache.bLoop)
-            progress = std::fmod(elapsedTime * m_AnimationCache.speed, animLength) / animLength;
+        progress = m_AnimationCache.progress;
+        m_AnimationCache.progress = std::numeric_limits<float>::quiet_NaN();
+    }
+    else if (m_AnimationCache.speed > 0.0f)
+    {
+        // Time-derived progress calculation requires a positive speed
+        float elapsedTime = static_cast<float>(g_pClientGame->GetSyncedTime() - m_AnimationCache.startTime) / 1000.0f;
+        float speed = m_AnimationCache.speed;
+
+        float customTime = static_cast<float>(m_AnimationCache.iTime) / 1000.0f;
+        bool  isLoop = m_AnimationCache.bLoop;
+        bool  freeze = m_AnimationCache.bFreezeLastFrame;
+
+        float effectiveDuration = animLength;
+
+        // Determine the effective duration of the animation based on rules:
+        // 1. !isLoop && freeze -> plays full length
+        // 2. !isLoop && !freeze -> plays for customTime (if < 0, full length; if == 0, 0)
+        // 3. isLoop && !freeze -> plays for customTime if > 0, otherwise infinite if < 0
+        // 4. isLoop && freeze -> acts like infinite loop without freezing last frame
+        if (!isLoop && !freeze)
+        {
+            if (customTime == 0.0f)
+                effectiveDuration = 0.0f;
+            else if (customTime >= 0.0f)
+                effectiveDuration = std::min(customTime, animLength);
+        }
+        else if (isLoop && !freeze)
+        {
+            if (customTime > 0.0f)
+                effectiveDuration = customTime;
+        }
+
+        if (effectiveDuration <= 0.0f)
+        {
+            progress = 0.0f;
+        }
+        else if (!isLoop)
+        {
+            if (freeze)
+                progress = std::min(1.0f, (elapsedTime * speed) / animLength);
+            else
+                progress = std::min(1.0f, (elapsedTime * speed) / effectiveDuration);
+        }
         else
-            // For non-looped animations, limit duration to animLength if time exceeds it
-            progress = (elapsedTime / (m_AnimationCache.iTime <= animLength ? m_AnimationCache.iTime : animLength)) * m_AnimationCache.speed;
+        {
+            if (freeze)
+            {
+                progress = std::fmod(elapsedTime * speed, animLength) / animLength;
+            }
+            else
+            {
+                if (customTime < 0.0f)
+                {
+                    progress = std::fmod(elapsedTime * speed, animLength) / animLength;
+                }
+                else
+                {
+                    if (elapsedTime >= effectiveDuration / speed)
+                        progress = 1.0f;
+                    else
+                        progress = std::fmod(elapsedTime * speed, animLength) / animLength;
+                }
+            }
+        }
     }
 
     animAssoc->SetCurrentProgress(std::clamp(progress, 0.0f, 1.0f));
     animAssoc->SetCurrentSpeed(m_AnimationCache.speed);
 
-    m_AnimationCache.progressWaitForStreamIn = false;
+    m_AnimationCache.updateInNextFrame = false;
 }
 
 void CClientPed::UpdateCustomPartialAnimationBones()

@@ -335,6 +335,7 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     // unsigned short   (2)     - HTTP Download URL Size
     // unsigned char    (X)     - HTTP Download URL
     // unsigned char    (X)     - Server name
+    // int64            (X)     - Server time
 
     // Make sure any existing messageboxes are hided
     g_pCore->RemoveMessageBox();
@@ -467,10 +468,6 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     // Request the on join stuff
     g_pClientGame->GetNetAPI()->RPC(INITIAL_DATA_STREAM);
 
-    // Call the onClientPlayerJoin event for ourselves
-    CLuaArguments Arguments;
-    g_pClientGame->m_pLocalPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
-
     g_pCore->UpdateRecentlyPlayed();
 
     // Update focus state after joining
@@ -479,18 +476,26 @@ void CPacketHandler::Packet_ServerJoined(NetBitStreamInterface& bitStream)
     // and isMTAWindowFocused returns true even when the user is doing anything outside the MTA window.
     g_pClientGame->m_bFocused = g_pCore->IsFocused();
 
+    std::string serverName;
+    bitStream.ReadString(serverName);
+
     auto discord = g_pCore->GetDiscord();
     if (discord && discord->IsDiscordRPCEnabled())
     {
-        std::string serverName;
-        bitStream.ReadString(serverName);
-
         if (serverName.length() > 0)
         {
             g_pCore->SetLastConnectedServerName(serverName);
             discord->SetPresenceDetails(serverName.c_str(), false);
         }
     }
+
+    std::int64_t serverLocalTick{};
+    if (bitStream.ReadInt64(serverLocalTick))
+        g_pClientGame->SetTimeOffsetFromServer(serverLocalTick - GetLocalTick());
+
+    // Call the onClientPlayerJoin event for ourselves
+    CLuaArguments Arguments;
+    g_pClientGame->m_pLocalPlayer->CallEvent("onClientPlayerJoin", Arguments, true);
 }
 
 void CPacketHandler::Packet_ServerDisconnected(NetBitStreamInterface& bitStream)
@@ -1019,11 +1024,12 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
             // Animation
             if (bitStream.ReadBit())
             {
-                std::string blockName, animName;
-                int         time, blendTime;
-                bool        looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
-                float       speed;
-                double      startTime;
+                std::string  blockName, animName;
+                int          time, blendTime;
+                bool         looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
+                float        speed;
+                std::int64_t startTime;
+                float        progress;
 
                 // Read data
                 bitStream.ReadString(blockName);
@@ -1035,15 +1041,24 @@ void CPacketHandler::Packet_PlayerList(NetBitStreamInterface& bitStream)
                 bitStream.ReadBit(freezeLastFrame);
                 bitStream.Read(blendTime);
                 bitStream.ReadBit(taskRestore);
-                bitStream.Read(startTime);
+                bitStream.ReadInt64(startTime);
                 bitStream.Read(speed);
+
+                // speed = 0
+                bool animationIsStopped = bitStream.ReadBit();
 
                 // Run anim
                 CStaticFunctionDefinitions::SetPedAnimation(*pPlayer, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable,
                                                             freezeLastFrame);
-                pPlayer->m_AnimationCache.startTime = static_cast<std::int64_t>(startTime);
+                pPlayer->m_AnimationCache.startTime = startTime;
                 pPlayer->m_AnimationCache.speed = speed;
-                pPlayer->m_AnimationCache.progress = 0.0f;
+                pPlayer->m_AnimationCache.updateInNextFrame = true;
+
+                if (animationIsStopped)
+                {
+                    bitStream.Read(progress);
+                    pPlayer->m_AnimationCache.progress = progress;
+                }
 
                 pPlayer->SetHasSyncedAnim(true);
             }
@@ -3998,11 +4013,12 @@ retry:
                     // Animation
                     if (bitStream.ReadBit())
                     {
-                        std::string blockName, animName;
-                        int         time, blendTime;
-                        bool        looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
-                        float       speed;
-                        float       elapsedTime;
+                        std::string  blockName, animName;
+                        int          time, blendTime;
+                        bool         looped, updatePosition, interruptable, freezeLastFrame, taskRestore;
+                        float        speed;
+                        std::int64_t startTime;
+                        float        progress;
 
                         // Read data
                         bitStream.ReadString(blockName);
@@ -4014,19 +4030,24 @@ retry:
                         bitStream.ReadBit(freezeLastFrame);
                         bitStream.Read(blendTime);
                         bitStream.ReadBit(taskRestore);
-                        bitStream.Read(elapsedTime);
+                        bitStream.ReadInt64(startTime);
                         bitStream.Read(speed);
 
-                        // Server sends elapsed time rather than start time due to bitstream limitations regarding 64 bit integers.
-                        const uint64_t nowTick = GetTickCount64_();
-                        const int64_t  startTime = nowTick - elapsedTime;
+                        // speed = 0
+                        bool animationIsStopped = bitStream.ReadBit();
 
                         // Run anim
                         CStaticFunctionDefinitions::SetPedAnimation(*pPed, blockName, animName.c_str(), time, blendTime, looped, updatePosition, interruptable,
                                                                     freezeLastFrame);
                         pPed->m_AnimationCache.startTime = startTime;
                         pPed->m_AnimationCache.speed = speed;
-                        pPed->m_AnimationCache.progress = 0.0f;
+                        pPed->m_AnimationCache.updateInNextFrame = true;
+
+                        if (animationIsStopped)
+                        {
+                            bitStream.Read(progress);
+                            pPed->m_AnimationCache.progress = progress;
+                        }
 
                         pPed->SetHasSyncedAnim(true);
                     }

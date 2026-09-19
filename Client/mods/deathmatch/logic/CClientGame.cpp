@@ -389,6 +389,9 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
     // Setup builtin Lua events
     SetupGlobalLuaEvents();
 
+    // Init std::chrono::steady_clock
+    GetLocalTick();
+
     // Setup default states for Rich Presence
     g_vehicleTypePrefixes = {
 

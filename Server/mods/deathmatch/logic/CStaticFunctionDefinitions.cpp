@@ -55,6 +55,7 @@
 #include "CUnoccupiedVehicleSync.h"
 #include "Utils.h"
 #include "CameraScriptShared.h"
+#include <CAnimationsData.h>
 #include "lua/CLuaFunctionParseHelpers.h"
 #include "packets/CLuaPacket.h"
 #include "packets/CElementRPCPacket.h"
@@ -79,6 +80,7 @@
     #ifndef MAX_PATH
         #define MAX_PATH PATH_MAX
     #endif
+
 #endif
 
 extern CGame*            g_pGame;
@@ -4643,9 +4645,12 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
                 if (pPed->IsChoking())
                     pPed->SetChoking(false);
 
+                bool isGTAAnim = GetAnimationLength(animName) != -1.0f;
+
                 // Store anim data
+                std::int64_t startTime = GetLocalTick();
                 pPed->SetAnimationData(SPlayerAnimData{blockName, animName, iTime, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame, iBlend,
-                                                       bTaskToBeRestoredOnAnimEnd, GetTickCount64_()});
+                                                       bTaskToBeRestoredOnAnimEnd, startTime});
 
                 BitStream.pBitStream->WriteString<unsigned char>(blockName);
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
@@ -4656,6 +4661,10 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CElement* pElement, const SStri
                 BitStream.pBitStream->WriteBit(bFreezeLastFrame);
                 BitStream.pBitStream->Write(iBlend);
                 BitStream.pBitStream->WriteBit(bTaskToBeRestoredOnAnimEnd);
+                BitStream.pBitStream->WriteBit(isGTAAnim);
+
+                if (isGTAAnim)
+                    BitStream.pBitStream->WriteInt64(startTime);
             }
             else
             {
@@ -4689,7 +4698,38 @@ bool CStaticFunctionDefinitions::SetPedAnimationProgress(CElement* pElement, con
                 BitStream.pBitStream->WriteString<unsigned char>(animName);
                 BitStream.pBitStream->Write(fProgress);
 
-                pPed->SetAnimationProgress(fProgress);
+                SPlayerAnimData data = pPed->GetAnimationData();
+                bool            match = data.IsAnimating() && data.animName == animName;
+                BitStream.pBitStream->WriteBit(match);
+
+                if (match)
+                {
+                    data.progress = fProgress;
+
+                    float length = GetAnimationLength(animName);
+                    if (length > 0.0f && data.speed > 0.0f)
+                    {
+                        float progressDurationMs = length * 1000.0f;
+
+                        if (!data.loop && !data.freezeLastFrame)
+                        {
+                            if (data.time == 0)
+                                progressDurationMs = 0.0f;
+                            else if (data.time > 0)
+                                progressDurationMs = std::min(static_cast<float>(data.time), progressDurationMs);
+                        }
+
+                        if (progressDurationMs > 0.0f)
+                            data.startTime = GetLocalTick() - static_cast<std::int64_t>((progressDurationMs * fProgress) / data.speed);
+                        else
+                            data.startTime = GetLocalTick();
+
+                        data.progress = -1.0f;
+                    }
+
+                    BitStream.pBitStream->WriteInt64(data.startTime);
+                    pPed->SetAnimationData(data);
+                }
             }
             else
             {
@@ -4715,9 +4755,61 @@ bool CStaticFunctionDefinitions::SetPedAnimationSpeed(CElement* pElement, const 
         CPed* pPed = static_cast<CPed*>(pElement);
         if (pPed->IsSpawned() && !animName.empty())
         {
+            SPlayerAnimData data = pPed->GetAnimationData();
+            bool            match = data.IsAnimating() && data.animName == animName;
+
+            if (match)
+            {
+                float length = GetAnimationLength(animName);
+                if (length > 0.0f)
+                {
+                    if (fSpeed == 0.0f && data.speed > 0.0f)
+                    {
+                        float progressDurationMs = length * 1000.0f;
+                        if (!data.loop && !data.freezeLastFrame)
+                        {
+                            if (data.time == 0)
+                                progressDurationMs = 0.0f;
+                            else if (data.time > 0)
+                                progressDurationMs = std::min(static_cast<float>(data.time), progressDurationMs);
+                        }
+
+                        if (progressDurationMs > 0.0f)
+                        {
+                            std::int64_t elapsedTime = GetLocalTick() - data.startTime;
+                            float        currentProgress = (static_cast<float>(elapsedTime) * data.speed) / progressDurationMs;
+                            data.progress = std::clamp(currentProgress, 0.0f, 1.0f);
+                        }
+                    }
+                    else if (fSpeed > 0.0f && data.speed == 0.0f && !std::isnan(data.progress) && data.progress != -1.0f)
+                    {
+                        float progressDurationMs = length * 1000.0f;
+                        if (!data.loop && !data.freezeLastFrame)
+                        {
+                            if (data.time == 0)
+                                progressDurationMs = 0.0f;
+                            else if (data.time > 0)
+                                progressDurationMs = std::min(static_cast<float>(data.time), progressDurationMs);
+                        }
+
+                        if (progressDurationMs > 0.0f)
+                            data.startTime = GetLocalTick() - static_cast<std::int64_t>((progressDurationMs * data.progress) / fSpeed);
+
+                        data.progress = -1.0f;
+                    }
+                }
+
+                data.speed = fSpeed;
+                pPed->SetAnimationData(data);
+            }
+
             CBitStream BitStream;
             BitStream.pBitStream->WriteString<unsigned char>(animName);
             BitStream.pBitStream->Write(fSpeed);
+
+            BitStream.pBitStream->WriteBit(match);
+            if (match)
+                BitStream.pBitStream->WriteInt64(data.startTime);
 
             pPed->SetAnimationSpeed(fSpeed);
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pPed, SET_PED_ANIMATION_SPEED, *BitStream.pBitStream));
