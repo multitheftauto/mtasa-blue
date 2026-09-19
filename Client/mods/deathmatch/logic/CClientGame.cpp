@@ -3943,6 +3943,9 @@ void CClientGame::PreWorldProcessHandler()
 
 void CClientGame::PostWorldProcessHandler()
 {
+    // CWorld::Process has just overwritten ped headings, restore script-set ones before onClientPreRender, sync and rendering read them
+    m_pManager->GetPedManager()->ReapplyScriptRotations();
+
     m_pManager->GetMarkerManager()->DoPulse();
     m_pManager->GetPointLightsManager()->DoPulse();
     m_pManager->GetObjectManager()->DoPulse();
