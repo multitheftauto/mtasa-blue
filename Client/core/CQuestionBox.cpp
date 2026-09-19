@@ -14,6 +14,10 @@
 
 extern CCore* g_pCore;
 
+// Matches CGUIMessageBox_Impl, so a question box carrying an icon lines up with the plain error box
+#define QUESTIONBOX_ICON_SIZE 42.0f
+#define QUESTIONBOX_SPACER    20.0f
+
 CQuestionBox::CQuestionBox()
 {
     m_pWindow = NULL;
@@ -24,6 +28,7 @@ CQuestionBox::CQuestionBox()
     m_uiActiveButtons = 0;
     m_uiActiveEditboxes = 0;
     m_bAutoCloseOnConnect = false;
+    m_bHasIcon = false;
 
     CGUI* pManager = g_pCore->GetGUI();
 
@@ -36,12 +41,20 @@ CQuestionBox::CQuestionBox()
 
     // Message label
     m_pMessage = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(m_pWindow, ""));
+
+    // Optional icon, hidden until a caller asks for one
+    m_pIcon = reinterpret_cast<CGUIStaticImage*>(pManager->CreateStaticImage(m_pWindow));
+    m_pIcon->SetFrameEnabled(false);
+    m_pIcon->SetZOrderingEnabled(false);
+    m_pIcon->SetSize(CVector2D(QUESTIONBOX_ICON_SIZE, QUESTIONBOX_ICON_SIZE));
+    m_pIcon->SetVisible(false);
 }
 
 CQuestionBox::~CQuestionBox()
 {
     for (unsigned int i = 0; i < m_ButtonList.size(); i++)
         delete m_ButtonList[i];
+    delete m_pIcon;
     delete m_pMessage;
     delete m_pWindow;
 }
@@ -60,26 +73,38 @@ void CQuestionBox::Show()
     float fEditHeight = 29.0f;
     float fEditSpacer = 10.0f;
 
+    // An icon takes a column on the left, so the message and the editboxes start after it
+    float fGutter = m_bHasIcon ? QUESTIONBOX_ICON_SIZE + QUESTIONBOX_SPACER * 2 : 0.f;
+
     float fMsgWidth = std::max(400.f, m_pMessage->GetTextExtent() + 50.f);
     float fMsgHeight = std::max<float>(3, uiNumLines) * (m_pMessage->GetFontHeight() + 1);
-    float fWinWidth = std::max(fMsgWidth, m_uiActiveButtons * (112 + 10.f));
+    float fWinWidth = std::max(fMsgWidth + fGutter, m_uiActiveButtons * (112 + 10.f));
     float fWinHeight = 50 + fMsgHeight + 50 + 30 + (m_uiActiveEditboxes * (fEditHeight + 2 * fEditSpacer));
 
     CVector2D resolution = CCore::GetSingleton().GetGUI()->GetResolution();
     m_pWindow->SetPosition(CVector2D(resolution.fX / 2 - fWinWidth / 2, resolution.fY / 2 - fWinHeight / 2), false);
     m_pWindow->SetSize(CVector2D(fWinWidth, fWinHeight + 10), false);
 
-    m_pMessage->SetPosition(CVector2D(fWinWidth / 2 - fMsgWidth / 2, fWinHeight / 2 - fMsgHeight / 2 - 10), false);
+    m_pMessage->SetPosition(CVector2D(fGutter + (fWinWidth - fGutter) / 2 - fMsgWidth / 2, fWinHeight / 2 - fMsgHeight / 2 - 10), false);
     m_pMessage->SetSize(CVector2D(fMsgWidth, fMsgHeight), false);
     m_pMessage->SetHorizontalAlign(CGUI_ALIGN_HORIZONTALCENTER);
+
+    // The message rect is always at least three lines tall and the label aligns to its top, so a
+    // short message sits high in it. An icon has to share a centre line with the text rather than
+    // with the window, or it lands below the message. Without an icon the alignment stays as it was.
+    m_pMessage->SetVerticalAlign(m_bHasIcon ? CGUI_ALIGN_VERTICALCENTER : CGUI_ALIGN_TOP);
+
+    if (m_bHasIcon)
+        m_pIcon->SetPosition(CVector2D(QUESTIONBOX_SPACER, fWinHeight / 2 - 10 - QUESTIONBOX_ICON_SIZE / 2), false);
 
     // One editbox takes the entire width, position them like so
     for (unsigned int i = 0; i < m_EditList.size(); i++)
     {
         if (i < m_uiActiveButtons)
         {
-            m_EditList[i]->SetPosition(CVector2D(0, (fWinHeight / 2 - fMsgHeight / 2 - 10) + fMsgHeight + (i + 1) * fEditSpacer + i * fEditHeight), false);
-            m_EditList[i]->SetSize(CVector2D(fWinWidth - 20, fEditHeight), false);
+            m_EditList[i]->SetPosition(CVector2D(fGutter, (fWinHeight / 2 - fMsgHeight / 2 - 10) + fMsgHeight + (i + 1) * fEditSpacer + i * fEditHeight),
+                                       false);
+            m_EditList[i]->SetSize(CVector2D(fWinWidth - fGutter - 20, fEditHeight), false);
         }
     }
 
@@ -116,6 +141,8 @@ void CQuestionBox::Reset()
     SetCallback(NULL);
     SetCallbackEdit(NULL);
     m_uiActiveButtons = 0;
+    m_bHasIcon = false;
+    m_pIcon->SetVisible(false);
     for (unsigned int i = 0; i < m_ButtonList.size(); i++)
         m_ButtonList[i]->SetVisible(false);
 
@@ -132,6 +159,12 @@ void CQuestionBox::SetMessage(const SString& strMsg)
 {
     m_strMsg = strMsg;
     m_pMessage->SetText(strMsg);
+}
+
+void CQuestionBox::SetIcon(const char* szIconFile)
+{
+    m_bHasIcon = szIconFile && m_pIcon->LoadFromFile(szIconFile);
+    m_pIcon->SetVisible(m_bHasIcon);
 }
 
 void CQuestionBox::AppendMessage(const SString& strMsg)
