@@ -15,6 +15,7 @@
 #include <dinputd.h>
 #include <atomic>
 #include <thread>
+#include <vector>
 
 using std::string;
 
@@ -40,10 +41,83 @@ constexpr uint JOYSTICK_RETRY_DELAY_MS = 3000;
 // interface
 constexpr uint JOYSTICK_DEVICE_CHANGE_SETTLE_MS = 300;
 
+// DirectInput Acquire() can block while Windows is still enumerating USB devices; don't hammer it every frame.
+constexpr uint JOYSTICK_ACQUIRE_RETRY_MS = 500;
+
+// Stick/trigger deadzone is a percentage of throw. Saturation 0-100 keeps the old mapping
+// (100 = linear, lower = reaches max sooner). Values 101-200 multiply beyond linear so a
+// worn stick that never hits the physical extreme can still produce a full GTA axis.
+constexpr int JOYSTICK_DEADZONE_MAX = 49;
+constexpr int JOYSTICK_SATURATION_MAX = 200;
+constexpr int JOYSTICK_DEFAULT_TRIGGER_DEADZONE = 5;
+
 SString GUIDToString(const GUID& g)
 {
     return SString("%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x", g.Data1, g.Data2, g.Data3, g.Data4[0], g.Data4[1], g.Data4[2], g.Data4[3], g.Data4[4],
                    g.Data4[5], g.Data4[6], g.Data4[7]);
+}
+
+bool StringToGUID(const char* szGuid, GUID& g)
+{
+    unsigned int d1 = 0, d2 = 0, d3 = 0, b[8] = {};
+    if (!szGuid ||
+        sscanf(szGuid, "%08x-%04x-%04x-%02x%02x-%02x%02x%02x%02x%02x%02x", &d1, &d2, &d3, &b[0], &b[1], &b[2], &b[3], &b[4], &b[5], &b[6], &b[7]) != 11)
+        return false;
+
+    g.Data1 = d1;
+    g.Data2 = static_cast<WORD>(d2);
+    g.Data3 = static_cast<WORD>(d3);
+    for (int i = 0; i < 8; i++)
+        g.Data4[i] = static_cast<BYTE>(b[i]);
+    return true;
+}
+
+struct SParsedControllerId
+{
+    enum eType
+    {
+        Auto,
+        XInput,
+        DirectInput,
+    } type = Auto;
+    int  iXInputIndex = 0;
+    GUID guidInstance{};
+    bool bHasGuid = false;
+};
+
+SParsedControllerId ParseControllerId(const string& strId)
+{
+    SParsedControllerId parsed;
+    if (strId.empty() || strId == "auto")
+        return parsed;
+
+    if (strId.compare(0, 7, "xinput:") == 0)
+    {
+        parsed.type = SParsedControllerId::XInput;
+        parsed.iXInputIndex = Clamp(0, atoi(strId.c_str() + 7), 3);
+        return parsed;
+    }
+
+    if (strId.compare(0, 7, "dinput:") == 0)
+    {
+        parsed.type = SParsedControllerId::DirectInput;
+        parsed.bHasGuid = StringToGUID(strId.c_str() + 7, parsed.guidInstance);
+        return parsed;
+    }
+
+    return parsed;
+}
+
+SString GetXInputDisplayName(int iIndex, const XINPUT_CAPABILITIES& Capabilities)
+{
+    const char* subTypeNames[] = {"Unknown", "Gamepad", "Wheel", "Arcade stick", "Flight stick", "Dance pad", "Guitar", "Drum kit"};
+    SString     strType;
+    if (Capabilities.SubType < NUMELMS(subTypeNames))
+        strType = subTypeNames[Capabilities.SubType];
+    else
+        strType = SString("Subtype %d", Capabilities.SubType);
+
+    return SString(_("%s (controller %d)"), strType.c_str(), iIndex + 1);
 }
 
 DEFINE_GUID(GUID_Xbox360Controller, 0x028E045E, 0x0000, 0x0000, 0x00, 0x00, 0x50, 0x49, 0x44, 0x56, 0x49, 0x44);
@@ -104,6 +178,8 @@ struct SInputDeviceInfo
     int                   iAxisCount;
     int                   iDeadZone;
     int                   iSaturation;
+    int                   iTriggerDeadZone;
+    int                   iTriggerSaturation;
     GUID                  guidProduct;
     string                strGuid;
     string                strProductName;
@@ -126,10 +202,12 @@ struct SInputDeviceInfo
 //
 struct SJoystickScanResult
 {
-    IDirectInputDevice8A* pDevice = nullptr;
-    int                   iAxisCount = 0;
-    GUID                  guidProduct{};
-    string                strProductName;
+    IDirectInputDevice8A*                pDevice = nullptr;
+    int                                  iAxisCount = 0;
+    GUID                                 guidProduct{};
+    GUID                                 guidInstance{};
+    string                               strProductName;
+    std::vector<std::pair<GUID, string>> listedDevices;
 
     struct
     {
@@ -174,14 +252,24 @@ public:
     virtual void OnPossibleDeviceChange();
 
     // Settings
-    virtual string GetControllerName();
-    virtual int    GetDeadZone();
-    virtual int    GetSaturation();
-    virtual void   SetDeadZone(int iDeadZone);
-    virtual void   SetSaturation(int iSaturation);
-    virtual int    GetSettingsRevision();
-    virtual void   SetDefaults();
-    virtual bool   SaveToXML();
+    virtual string                             GetControllerName();
+    virtual int                                GetDeadZone();
+    virtual int                                GetSaturation();
+    virtual int                                GetTriggerDeadZone();
+    virtual int                                GetTriggerSaturation();
+    virtual void                               SetDeadZone(int iDeadZone);
+    virtual void                               SetSaturation(int iSaturation);
+    virtual void                               SetTriggerDeadZone(int iDeadZone);
+    virtual void                               SetTriggerSaturation(int iSaturation);
+    virtual bool                               GetVibrationEnabled();
+    virtual void                               SetVibrationEnabled(bool bEnabled);
+    virtual string                             GetSelectedControllerId();
+    virtual void                               SetSelectedControllerId(const string& strId);
+    virtual std::vector<SJoystickDeviceChoice> GetAvailableControllers();
+    virtual int                                GetSettingsRevision();
+    virtual int                                GetDeviceListRevision();
+    virtual void                               SetDefaults();
+    virtual bool                               SaveToXML();
 
     // Binding
     virtual int    GetOutputCount();
@@ -199,24 +287,49 @@ private:
     bool      IsJoypadValid();
     void      StartDirectInputScan();
     void      CollectDirectInputScanResult();
+    void      StartDirectInputListRefresh();
+    void      CollectDirectInputListRefresh();
+    void      BumpDeviceListRevision();
     void      ReadCurrentState();
     CXMLNode* GetConfigNode(bool bCreateIfRequired);
     bool      LoadFromXML();
+    bool      IsTriggerSourceAxis(int iAxisIndex) const;
+    void      ApplyAxisResponse(float& fResult, int iSaturation);
+    void      ApplyVibration();
+    void      StopVibration();
+    void      SyncGtaVibrationPref();
+    void      ReleaseDirectInputDevice();
+    void      ApplyControllerSelection(bool bReleaseCurrent);
+    void      RefreshDirectInputDeviceList();
+    int       FindFirstXInputIndex() const;
 
-    bool             m_bDoneInit;
-    int              m_SettingsRevision;
-    SInputDeviceInfo m_DevInfo;
-    SJoystickState   m_JoystickState;
-    SMappingLine     m_currentMapping[10];
-    bool             m_bUseXInput;
-    bool             m_bXInputDeviceAttached;
-    uint             m_uiXInputReattachDelay;
-    CElapsedTime     m_XInputReattachTimer;
-    uint             m_uiDirectInputReattachDelay;
-    CElapsedTime     m_DirectInputReattachTimer;
-    CElapsedTime     m_PollFailTimer;
-    bool             m_bAutoDeadZoneEnabled;
-    int              m_iAutoDeadZoneCounter;
+    bool                                 m_bDoneInit;
+    int                                  m_SettingsRevision;
+    int                                  m_iDeviceListRevision;
+    bool                                 m_bPendingDeviceListRefresh;
+    SInputDeviceInfo                     m_DevInfo;
+    SJoystickState                       m_JoystickState;
+    SMappingLine                         m_currentMapping[10];
+    bool                                 m_bUseXInput;
+    bool                                 m_bXInputDeviceAttached;
+    int                                  m_iXInputUserIndex;
+    uint                                 m_uiXInputReattachDelay;
+    CElapsedTime                         m_XInputReattachTimer;
+    uint                                 m_uiDirectInputReattachDelay;
+    CElapsedTime                         m_DirectInputReattachTimer;
+    CElapsedTime                         m_PollFailTimer;
+    CElapsedTime                         m_AcquireRetryTimer;
+    uint                                 m_uiAcquireRetryDelay;
+    bool                                 m_bAutoDeadZoneEnabled;
+    int                                  m_iAutoDeadZoneCounter;
+    bool                                 m_bLoggedNoJoystick;
+    string                               m_strSelectedControllerId;
+    bool                                 m_bVibrationEnabled;
+    bool                                 m_bVibrationWasActive;
+    CElapsedTime                         m_VibrationTimer;
+    bool                                 m_bPreferredInstanceValid;
+    GUID                                 m_PreferredInstanceGuid;
+    std::vector<std::pair<GUID, string>> m_ListedDInputDevices;
 
     // Used during axis binding
     bool           m_bCaptureAxis;
@@ -230,6 +343,12 @@ private:
     std::atomic<bool>   m_bScanRunning{false};
     std::atomic<bool>   m_bScanReady{false};
     SJoystickScanResult m_ScanResult;
+
+    // Lightweight background refresh of the DirectInput device list for the settings combo.
+    std::thread                          m_ListRefreshThread;
+    std::atomic<bool>                    m_bListRefreshRunning{false};
+    std::atomic<bool>                    m_bListRefreshReady{false};
+    std::vector<std::pair<GUID, string>> m_ListRefreshResult;
 };
 
 ///////////////////////////////////////////////////////////////
@@ -261,30 +380,34 @@ CJoystickManager::CJoystickManager()
 {
     m_iAutoDeadZoneCounter = 20;
     m_bAutoDeadZoneEnabled = true;
+    m_strSelectedControllerId = "auto";
+    m_bVibrationEnabled = true;
+    m_iXInputUserIndex = 0;
+    m_uiAcquireRetryDelay = JOYSTICK_ACQUIRE_RETRY_MS;
 
-    // See if we have a XInput compatible device
-    XINPUT_CAPABILITIES Capabilities;
-    DWORD               dwStatus = XInputGetCapabilities(0, XINPUT_FLAG_GAMEPAD, &Capabilities);
-    if (dwStatus == ERROR_SUCCESS)
+    // CVars may not be loaded yet if this is constructed very early; ApplyControllerSelection
+    // then just auto-picks the first XInput slot like we used to.
+    if (CClientVariables::GetSingletonPtr())
     {
-        WriteDebugEvent(SString("XInput device detected. Type:%d SubType:%d Flags:0x%04x", Capabilities.Type, Capabilities.SubType, Capabilities.Flags));
-        WriteDebugEvent(SString("XInput - wButtons:0x%04x  bLeftTrigger:0x%02x  bRightTrigger:0x%02x", Capabilities.Gamepad.wButtons,
-                                Capabilities.Gamepad.bLeftTrigger, Capabilities.Gamepad.bRightTrigger));
-        WriteDebugEvent(SString("XInput - sThumbLX:0x%04x  sThumbLY:0x%04x  sThumbRX:0x%04x  sThumbRY:0x%04x", Capabilities.Gamepad.sThumbLX,
-                                Capabilities.Gamepad.sThumbLY, Capabilities.Gamepad.sThumbRX, Capabilities.Gamepad.sThumbRY));
-        WriteDebugEvent(SString("XInput - wLeftMotorSpeed:0x%04x  wRightMotorSpeed:0x%04x", Capabilities.Vibration.wLeftMotorSpeed,
-                                Capabilities.Vibration.wRightMotorSpeed));
-        m_bUseXInput = true;
+        std::string strDevice;
+        if (CVARS_GET("controller_device", strDevice) && !strDevice.empty())
+            m_strSelectedControllerId = strDevice;
+        CVARS_GET("controller_vibration", m_bVibrationEnabled);
     }
 
+    ApplyControllerSelection(false);
     SetDefaults();
 }
 
 CJoystickManager::~CJoystickManager()
 {
+    StopVibration();
+
     // Let a scan still in flight finish before the members it writes into go away
     if (m_ScanThread.joinable())
         m_ScanThread.join();
+    if (m_ListRefreshThread.joinable())
+        m_ListRefreshThread.join();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -303,17 +426,23 @@ namespace
 {
     struct SJoystickEnumContext
     {
-        bool                  bPreferredValid = false;
-        GUID                  preferredGuidInstance{};
-        IDirectInputDevice8A* pDevice = nullptr;
+        bool                                 bPreferredValid = false;
+        GUID                                 preferredGuidInstance{};
+        IDirectInputDevice8A*                pDevice = nullptr;
+        std::vector<std::pair<GUID, string>> listedDevices;
     };
 
     BOOL CALLBACK EnumJoysticksCallbackAsync(const DIDEVICEINSTANCE* pdidInstance, VOID* pContext)
     {
         auto* pCtx = static_cast<SJoystickEnumContext*>(pContext);
 
-        // Skip anything other than the perferred Joystick device as defined by the control panel.
-        // Instead you could store all the enumerated Joysticks and let the user pick.
+        pCtx->listedDevices.push_back({pdidInstance->guidInstance, pdidInstance->tszProductName});
+
+        // If the user picked a specific DirectInput pad, skip everything else. Otherwise take
+        // the first device (Windows' preferred joystick when that GUID was supplied).
+        if (pCtx->pDevice)
+            return DIENUM_CONTINUE;
+
         if (pCtx->bPreferredValid && !IsEqualGUID(pdidInstance->guidInstance, pCtx->preferredGuidInstance))
             return DIENUM_CONTINUE;
 
@@ -322,9 +451,14 @@ namespace
         if (FAILED(g_pDirectInput8->CreateDevice(pdidInstance->guidInstance, &pCtx->pDevice, NULL)))
             return DIENUM_CONTINUE;
 
-        // Stop enumeration. Note: we're just taking the first Joystick we get. You
-        // could store all the enumerated Joysticks and let the user pick.
-        return DIENUM_STOP;
+        return DIENUM_CONTINUE;
+    }
+
+    BOOL CALLBACK EnumJoysticksListCallback(const DIDEVICEINSTANCE* pdidInstance, VOID* pContext)
+    {
+        auto* pList = static_cast<std::vector<std::pair<GUID, string>>*>(pContext);
+        pList->push_back({pdidInstance->guidInstance, pdidInstance->tszProductName});
+        return DIENUM_CONTINUE;
     }
 
     // Same axis setup CJoystickManager used to do synchronously the moment a device's first Poll()
@@ -393,25 +527,31 @@ namespace
         return DIENUM_CONTINUE;
     }
 
-    SJoystickScanResult ScanForDirectInputDevice(HWND hWindow)
+    SJoystickScanResult ScanForDirectInputDevice(HWND hWindow, bool bPreferredValid, const GUID& preferredGuidInstance)
     {
         SJoystickScanResult  result;
         SJoystickEnumContext ctx;
+        ctx.bPreferredValid = bPreferredValid;
+        ctx.preferredGuidInstance = preferredGuidInstance;
 
-        IDirectInputJoyConfig8* pJoyConfig = NULL;
-        if (SUCCEEDED(g_pDirectInput8->QueryInterface(IID_IDirectInputJoyConfig8, (void**)&pJoyConfig)))
+        if (!bPreferredValid)
         {
-            DIJOYCONFIG PreferredJoyCfg = {0};
-            PreferredJoyCfg.dwSize = sizeof(PreferredJoyCfg);
-            if (SUCCEEDED(pJoyConfig->GetConfig(0, &PreferredJoyCfg, DIJC_GUIDINSTANCE)))  // Expected to fail if no Joystick is attached
+            IDirectInputJoyConfig8* pJoyConfig = NULL;
+            if (SUCCEEDED(g_pDirectInput8->QueryInterface(IID_IDirectInputJoyConfig8, (void**)&pJoyConfig)))
             {
-                ctx.bPreferredValid = true;
-                ctx.preferredGuidInstance = PreferredJoyCfg.guidInstance;
+                DIJOYCONFIG PreferredJoyCfg = {0};
+                PreferredJoyCfg.dwSize = sizeof(PreferredJoyCfg);
+                if (SUCCEEDED(pJoyConfig->GetConfig(0, &PreferredJoyCfg, DIJC_GUIDINSTANCE)))  // Expected to fail if no Joystick is attached
+                {
+                    ctx.bPreferredValid = true;
+                    ctx.preferredGuidInstance = PreferredJoyCfg.guidInstance;
+                }
+                SAFE_RELEASE(pJoyConfig);
             }
-            SAFE_RELEASE(pJoyConfig);
         }
 
         g_pDirectInput8->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksCallbackAsync, &ctx, DIEDFL_ATTACHEDONLY);
+        result.listedDevices = std::move(ctx.listedDevices);
 
         if (!ctx.pDevice)
             return result;
@@ -440,10 +580,19 @@ namespace
         if (SUCCEEDED(ctx.pDevice->GetDeviceInfo(&didi)))
         {
             result.guidProduct = didi.guidProduct;
+            result.guidInstance = didi.guidInstance;
             result.strProductName = didi.tszProductName;
         }
 
         return result;
+    }
+
+    std::vector<std::pair<GUID, string>> EnumerateDirectInputDeviceList()
+    {
+        std::vector<std::pair<GUID, string>> list;
+        if (g_pDirectInput8)
+            g_pDirectInput8->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksListCallback, &list, DIEDFL_ATTACHEDONLY);
+        return list;
     }
 }  // namespace
 
@@ -476,10 +625,12 @@ void CJoystickManager::StartDirectInputScan()
     m_bScanReady = false;
 
     HWND hWindow = g_pCore->GetHookedWindow();
+    bool bPreferredValid = m_bPreferredInstanceValid;
+    GUID preferredGuid = m_PreferredInstanceGuid;
     m_ScanThread = std::thread(
-        [this, hWindow]()
+        [this, hWindow, bPreferredValid, preferredGuid]()
         {
-            m_ScanResult = ScanForDirectInputDevice(hWindow);
+            m_ScanResult = ScanForDirectInputDevice(hWindow, bPreferredValid, preferredGuid);
             m_bScanReady.store(true, std::memory_order_release);
         });
 }
@@ -503,16 +654,34 @@ void CJoystickManager::CollectDirectInputScanResult()
     m_bScanReady = false;
     m_bScanRunning = false;
 
+    m_ListedDInputDevices = std::move(result.listedDevices);
+    BumpDeviceListRevision();
+
     if (!result.pDevice)
     {
-        WriteDebugEvent("InitDirectInput - No Joystick found");
+        // Retries every few seconds for hotplug; only log the first miss (or after a device was lost)
+        if (!m_bLoggedNoJoystick)
+        {
+            WriteDebugEvent("InitDirectInput - No Joystick found");
+            m_bLoggedNoJoystick = true;
+        }
         return;
     }
+
+    m_bLoggedNoJoystick = false;
 
     if (m_bUseXInput)
     {
         // An XInput pad showed up while this scan was in flight, so it's not needed anymore
         result.pDevice->Release();
+        return;
+    }
+
+    if (m_bPreferredInstanceValid && !IsEqualGUID(result.guidInstance, m_PreferredInstanceGuid))
+    {
+        // User picked a different DirectInput pad while this scan was in flight
+        result.pDevice->Release();
+        StartDirectInputScan();
         return;
     }
 
@@ -542,6 +711,42 @@ void CJoystickManager::CollectDirectInputScanResult()
     m_PollFailTimer.Reset();
 }
 
+void CJoystickManager::BumpDeviceListRevision()
+{
+    m_iDeviceListRevision++;
+}
+
+void CJoystickManager::StartDirectInputListRefresh()
+{
+    if (m_bListRefreshRunning || m_bScanRunning || !g_pDirectInput8)
+        return;
+
+    m_bListRefreshRunning = true;
+    m_bListRefreshReady = false;
+
+    m_ListRefreshThread = std::thread(
+        [this]()
+        {
+            m_ListRefreshResult = EnumerateDirectInputDeviceList();
+            m_bListRefreshReady.store(true, std::memory_order_release);
+        });
+}
+
+void CJoystickManager::CollectDirectInputListRefresh()
+{
+    if (!m_bListRefreshReady.load(std::memory_order_acquire))
+        return;
+
+    if (m_ListRefreshThread.joinable())
+        m_ListRefreshThread.join();
+
+    m_ListedDInputDevices = std::move(m_ListRefreshResult);
+    m_ListRefreshResult.clear();
+    m_bListRefreshReady = false;
+    m_bListRefreshRunning = false;
+    BumpDeviceListRevision();
+}
+
 ///////////////////////////////////////////////////////////////
 //
 // CJoystickManager::DoPulse
@@ -561,17 +766,35 @@ void CJoystickManager::DoPulse()
         m_bDoneInit = true;
         StartDirectInputScan();
     }
-    else if (!m_bUseXInput && !m_DevInfo.pDevice)
+    else
     {
         CollectDirectInputScanResult();
+        CollectDirectInputListRefresh();
 
-        // Not using XInput yet and no DirectInput joystick either, so keep checking both in case
-        // an XInput pad (e.g. an Xbox controller) got connected after startup
-        if (!m_DevInfo.pDevice)
+        // After a USB plug/unplug burst settles, refresh the device list off-thread so the
+        // settings combo can update without blocking gameplay on DirectInput enumeration.
+        if (m_bPendingDeviceListRefresh && m_DirectInputReattachTimer.Get() >= m_uiDirectInputReattachDelay)
         {
-            if (IsXInputDeviceAttached())
-                m_bUseXInput = true;
-            else if (!m_bScanRunning && m_DirectInputReattachTimer.Get() >= m_uiDirectInputReattachDelay)
+            m_bPendingDeviceListRefresh = false;
+            StartDirectInputListRefresh();
+        }
+
+        if (!m_bUseXInput && !m_DevInfo.pDevice)
+        {
+            // Not using XInput yet and no DirectInput joystick either. Auto mode may pick up an
+            // XInput pad that appeared after startup; a user-picked DirectInput device stays put.
+            SParsedControllerId parsed = ParseControllerId(m_strSelectedControllerId);
+            if (parsed.type != SParsedControllerId::DirectInput)
+            {
+                int iXInputIndex = (parsed.type == SParsedControllerId::XInput) ? parsed.iXInputIndex : FindFirstXInputIndex();
+                if (iXInputIndex >= 0)
+                {
+                    m_iXInputUserIndex = iXInputIndex;
+                    m_bUseXInput = true;
+                }
+            }
+
+            if (!m_bUseXInput && !m_bScanRunning && m_DirectInputReattachTimer.Get() >= m_uiDirectInputReattachDelay)
             {
                 StartDirectInputScan();
                 m_DirectInputReattachTimer.Reset();
@@ -582,7 +805,10 @@ void CJoystickManager::DoPulse()
 
     // Stop if no joystick
     if (!IsJoypadConnected())
+    {
+        ApplyVibration();
         return;
+    }
 
     //
     // Try to read current state
@@ -712,6 +938,8 @@ void CJoystickManager::DoPulse()
                 }
         }
     }
+
+    ApplyVibration();
 }
 
 ///////////////////////////////////////////////////////////////
@@ -739,7 +967,8 @@ void CJoystickManager::ReadCurrentState()
         bool    bOutputStatus = (g_pCore->GetDiagnosticDebug() == EDiagnosticDebug::JOYSTICK_0000) && !g_pCore->IsConnected();
         if (bOutputStatus)
         {
-            strStatus += SString("iSaturation:%d iDeadZone:%d\n", m_DevInfo.iSaturation, m_DevInfo.iDeadZone);
+            strStatus += SString("iSaturation:%d iDeadZone:%d iTriggerSaturation:%d iTriggerDeadZone:%d\n", m_DevInfo.iSaturation, m_DevInfo.iDeadZone,
+                                 m_DevInfo.iTriggerSaturation, m_DevInfo.iTriggerDeadZone);
         }
 
         if (m_iAutoDeadZoneCounter)
@@ -758,29 +987,35 @@ void CJoystickManager::ReadCurrentState()
                 // (-min - half(size)) * 2.f / size
                 float fResult = ((&js.lX)[a] - lMin - lSize / 2) * 2.f / lSize;
 
-                // Apply saturation
-                float Saturation = m_DevInfo.iSaturation * (1 / 100.f);
-                fResult += fResult * (1 - Saturation);
+                const bool bTriggerAxis = IsTriggerSourceAxis(a);
+                const int  iSaturation = bTriggerAxis ? m_DevInfo.iTriggerSaturation : m_DevInfo.iSaturation;
+                const int  iDeadZoneSetting = bTriggerAxis ? m_DevInfo.iTriggerDeadZone : m_DevInfo.iDeadZone;
+
+                ApplyAxisResponse(fResult, iSaturation);
 
                 // Handle dead zone
-                float DeadZone = m_DevInfo.iDeadZone * (1 / 100.f);
+                float DeadZone = iDeadZoneSetting * (1 / 100.f);
 
-                // Handle auto dead zone detection
-                if (m_iAutoDeadZoneCounter > 1)
+                // Handle auto dead zone detection (sticks only — trigger rest is 0, not centered)
+                if (!bTriggerAxis)
                 {
-                    // Sample phase - Record lowest axis value
-                    if (abs(fResult) < m_DevInfo.axis[a].fAutoDeadZoneSample || m_DevInfo.axis[a].fAutoDeadZoneSample == 0.f)
-                        m_DevInfo.axis[a].fAutoDeadZoneSample = abs(fResult);
-                }
-                else
-                {
-                    // Use auto dead zone if required
-                    int iAutoDeadZone = m_DevInfo.axis[a].fAutoDeadZoneSample * 110;
-                    if (iAutoDeadZone < 30 && iAutoDeadZone > m_DevInfo.iDeadZone && m_bAutoDeadZoneEnabled)
+                    if (m_iAutoDeadZoneCounter > 1)
                     {
-                        DeadZone = iAutoDeadZone * (1 / 100.f);
-                        if (m_iAutoDeadZoneCounter == 1)
-                            WriteDebugEvent(SString("CJoystickManager - Changing deadzone for axis %d from %d to %d", a, m_DevInfo.iDeadZone, iAutoDeadZone));
+                        // Sample phase - Record lowest axis value
+                        if (abs(fResult) < m_DevInfo.axis[a].fAutoDeadZoneSample || m_DevInfo.axis[a].fAutoDeadZoneSample == 0.f)
+                            m_DevInfo.axis[a].fAutoDeadZoneSample = abs(fResult);
+                    }
+                    else
+                    {
+                        // Use auto dead zone if required
+                        int iAutoDeadZone = m_DevInfo.axis[a].fAutoDeadZoneSample * 110;
+                        if (iAutoDeadZone < 30 && iAutoDeadZone > m_DevInfo.iDeadZone && m_bAutoDeadZoneEnabled)
+                        {
+                            DeadZone = iAutoDeadZone * (1 / 100.f);
+                            if (m_iAutoDeadZoneCounter == 1)
+                                WriteDebugEvent(
+                                    SString("CJoystickManager - Changing deadzone for axis %d from %d to %d", a, m_DevInfo.iDeadZone, iAutoDeadZone));
+                        }
                     }
                 }
 
@@ -888,11 +1123,17 @@ bool CJoystickManager::ReadInputSubsystem(DIJOYSTATE2& js)
                 memset(m_DevInfo.axis, 0, sizeof(m_DevInfo.axis));
                 m_DevInfo.iAxisCount = 0;
             }
-            else
+            else if (m_AcquireRetryTimer.Get() >= m_uiAcquireRetryDelay)
+            {
+                // Acquire() can block while Windows is still enumerating unrelated USB devices,
+                // so retry occasionally instead of hammering it every frame.
                 m_DevInfo.pDevice->Acquire();
+                m_AcquireRetryTimer.Reset();
+            }
             return false;
         }
         m_PollFailTimer.Reset();
+        m_AcquireRetryTimer.Reset();
 
         if (FAILED(m_DevInfo.pDevice->GetDeviceState(sizeof(DIJOYSTATE2), &js)))
             return false;
@@ -976,7 +1217,7 @@ bool CJoystickManager::HandleXInputGetState(XINPUT_STATE& XInputState)
     if (!IsXInputDeviceAttached())
         return false;
 
-    DWORD dwStatus = XInputGetState(0, &XInputState);
+    DWORD dwStatus = XInputGetState(m_iXInputUserIndex, &XInputState);
 
     if (dwStatus == ERROR_DEVICE_NOT_CONNECTED)
     {
@@ -1008,7 +1249,7 @@ bool CJoystickManager::IsXInputDeviceAttached()
         m_uiXInputReattachDelay = JOYSTICK_RETRY_DELAY_MS;
 
         XINPUT_CAPABILITIES Capabilities;
-        DWORD               dwStatus = XInputGetCapabilities(0, XINPUT_FLAG_GAMEPAD, &Capabilities);
+        DWORD               dwStatus = XInputGetCapabilities(m_iXInputUserIndex, XINPUT_FLAG_GAMEPAD, &Capabilities);
         if (dwStatus != ERROR_SUCCESS)
             return false;
 
@@ -1047,18 +1288,16 @@ bool CJoystickManager::IsXInputDeviceAttached()
         m_DevInfo.guidProduct.Data3 = Capabilities.SubType;
 
         // Compose a product name
-        const char* subTypeNames[] = {"Unknown", "Gamepad", "Wheel", "Arcade stick", "Flight stick", "Dance pad", "Guitar", "Drum kit"};
-        if (Capabilities.SubType < NUMELMS(subTypeNames))
-            m_DevInfo.strProductName = subTypeNames[Capabilities.SubType];
-        else
-            m_DevInfo.strProductName = SString("Subtype %d", Capabilities.SubType);
+        m_DevInfo.strProductName = GetXInputDisplayName(m_iXInputUserIndex, Capabilities);
 
-        m_DevInfo.strGuid = GUIDToString(m_DevInfo.guidProduct);
-
-        // Load config for this guid, or set defaults
-        if (!LoadFromXML())
+        // Config is keyed by product GUID, so a brief disconnect/reconnect doesn't need a reload.
+        const string strNewGuid = GUIDToString(m_DevInfo.guidProduct);
+        const bool   bHadConfig = (strNewGuid == m_DevInfo.strGuid);
+        m_DevInfo.strGuid = strNewGuid;
+        if (!bHadConfig)
         {
-            SetDefaults();
+            if (!LoadFromXML())
+                SetDefaults();
         }
     }
 
@@ -1235,6 +1474,7 @@ bool CJoystickManager::IsJoypadConnected()
 ///////////////////////////////////////////////////////////////
 void CJoystickManager::OnPossibleDeviceChange()
 {
+    m_bPendingDeviceListRefresh = true;
     m_uiDirectInputReattachDelay = JOYSTICK_DEVICE_CHANGE_SETTLE_MS;
     m_DirectInputReattachTimer.Reset();
 
@@ -1263,23 +1503,104 @@ int CJoystickManager::GetSaturation()
     return m_DevInfo.iSaturation;
 }
 
+int CJoystickManager::GetTriggerDeadZone()
+{
+    return m_DevInfo.iTriggerDeadZone;
+}
+
+int CJoystickManager::GetTriggerSaturation()
+{
+    return m_DevInfo.iTriggerSaturation;
+}
+
 void CJoystickManager::SetDeadZone(int iDeadZone)
 {
     m_SettingsRevision++;
     if (iDeadZone != m_DevInfo.iDeadZone)
         m_bAutoDeadZoneEnabled = false;  // Disable auto dead zone on change (user edit)
-    m_DevInfo.iDeadZone = Clamp(0, iDeadZone, 49);
+    m_DevInfo.iDeadZone = Clamp(0, iDeadZone, JOYSTICK_DEADZONE_MAX);
 }
 
 void CJoystickManager::SetSaturation(int iSaturation)
 {
     m_SettingsRevision++;
-    m_DevInfo.iSaturation = Clamp(0, iSaturation, 100);
+    m_DevInfo.iSaturation = Clamp(0, iSaturation, JOYSTICK_SATURATION_MAX);
+}
+
+void CJoystickManager::SetTriggerDeadZone(int iDeadZone)
+{
+    m_SettingsRevision++;
+    m_DevInfo.iTriggerDeadZone = Clamp(0, iDeadZone, JOYSTICK_DEADZONE_MAX);
+}
+
+void CJoystickManager::SetTriggerSaturation(int iSaturation)
+{
+    m_SettingsRevision++;
+    m_DevInfo.iTriggerSaturation = Clamp(0, iSaturation, JOYSTICK_SATURATION_MAX);
+}
+
+bool CJoystickManager::GetVibrationEnabled()
+{
+    return m_bVibrationEnabled;
+}
+
+void CJoystickManager::SetVibrationEnabled(bool bEnabled)
+{
+    if (m_bVibrationEnabled == bEnabled)
+        return;
+
+    m_bVibrationEnabled = bEnabled;
+    CVARS_SET("controller_vibration", bEnabled);
+    m_SettingsRevision++;
+    SyncGtaVibrationPref();
+    if (!bEnabled)
+        StopVibration();
+}
+
+string CJoystickManager::GetSelectedControllerId()
+{
+    return m_strSelectedControllerId;
+}
+
+void CJoystickManager::SetSelectedControllerId(const string& strId)
+{
+    string strNew = strId.empty() ? "auto" : strId;
+    if (strNew == m_strSelectedControllerId)
+        return;
+
+    StopVibration();
+    m_strSelectedControllerId = strNew;
+    CVARS_SET("controller_device", m_strSelectedControllerId);
+    m_SettingsRevision++;
+    ApplyControllerSelection(true);
+}
+
+std::vector<SJoystickDeviceChoice> CJoystickManager::GetAvailableControllers()
+{
+    std::vector<SJoystickDeviceChoice> list;
+    list.push_back({"auto", _("Automatic")});
+
+    for (int i = 0; i < 4; i++)
+    {
+        XINPUT_CAPABILITIES Capabilities;
+        if (XInputGetCapabilities(i, XINPUT_FLAG_GAMEPAD, &Capabilities) == ERROR_SUCCESS)
+            list.push_back({SString("xinput:%d", i), GetXInputDisplayName(i, Capabilities)});
+    }
+
+    for (const auto& device : m_ListedDInputDevices)
+        list.push_back({SString("dinput:%s", GUIDToString(device.first).c_str()), device.second});
+
+    return list;
 }
 
 int CJoystickManager::GetSettingsRevision()
 {
     return m_SettingsRevision;
+}
+
+int CJoystickManager::GetDeviceListRevision()
+{
+    return m_iDeviceListRevision;
 }
 
 bool CJoystickManager::IsJoypadValid()
@@ -1404,6 +1725,8 @@ void CJoystickManager::SetDefaults()
 
         m_DevInfo.iDeadZone = 20;
         m_DevInfo.iSaturation = 99;
+        m_DevInfo.iTriggerDeadZone = JOYSTICK_DEFAULT_TRIGGER_DEADZONE;
+        m_DevInfo.iTriggerSaturation = 99;
     }
     else if (m_DevInfo.pDevice && m_DevInfo.iAxisCount == 5 && m_DevInfo.guidProduct == GUID_Xbox360Controller)
     {
@@ -1413,6 +1736,8 @@ void CJoystickManager::SetDefaults()
 
         m_DevInfo.iDeadZone = 18;
         m_DevInfo.iSaturation = 99;
+        m_DevInfo.iTriggerDeadZone = JOYSTICK_DEFAULT_TRIGGER_DEADZONE;
+        m_DevInfo.iTriggerSaturation = 99;
     }
     else
     {
@@ -1422,6 +1747,8 @@ void CJoystickManager::SetDefaults()
 
         m_DevInfo.iDeadZone = 12;
         m_DevInfo.iSaturation = 99;
+        m_DevInfo.iTriggerDeadZone = JOYSTICK_DEFAULT_TRIGGER_DEADZONE;
+        m_DevInfo.iTriggerSaturation = 99;
     }
 }
 
@@ -1455,14 +1782,25 @@ bool CJoystickManager::LoadFromXML()
 
             CXMLAttribute* pA = NULL;
             if (pA = pAttributes->Find("deadzone"))
-                m_DevInfo.iDeadZone = Clamp(0, atoi(pA->GetValue().c_str()), 49);
+                m_DevInfo.iDeadZone = Clamp(0, atoi(pA->GetValue().c_str()), JOYSTICK_DEADZONE_MAX);
             else
                 iErrors++;
 
             if (pA = pAttributes->Find("saturation"))
-                m_DevInfo.iSaturation = Clamp(0, atoi(pA->GetValue().c_str()), 100);
+                m_DevInfo.iSaturation = Clamp(0, atoi(pA->GetValue().c_str()), JOYSTICK_SATURATION_MAX);
             else
                 iErrors++;
+
+            // Missing trigger fields keep the stick values so existing configs don't change feel.
+            if (pA = pAttributes->Find("trigger_deadzone"))
+                m_DevInfo.iTriggerDeadZone = Clamp(0, atoi(pA->GetValue().c_str()), JOYSTICK_DEADZONE_MAX);
+            else
+                m_DevInfo.iTriggerDeadZone = m_DevInfo.iDeadZone;
+
+            if (pA = pAttributes->Find("trigger_saturation"))
+                m_DevInfo.iTriggerSaturation = Clamp(0, atoi(pA->GetValue().c_str()), JOYSTICK_SATURATION_MAX);
+            else
+                m_DevInfo.iTriggerSaturation = m_DevInfo.iSaturation;
         }
         else
             iErrors++;
@@ -1561,6 +1899,12 @@ bool CJoystickManager::SaveToXML()
                 pA = pAttributes->Create("saturation");
                 pA->SetValue(m_DevInfo.iSaturation);
 
+                pA = pAttributes->Create("trigger_deadzone");
+                pA->SetValue(m_DevInfo.iTriggerDeadZone);
+
+                pA = pAttributes->Create("trigger_saturation");
+                pA->SetValue(m_DevInfo.iTriggerSaturation);
+
                 pA = pAttributes->Create("product_name");
                 pA->SetValue(m_DevInfo.strProductName.c_str());
             }
@@ -1602,6 +1946,171 @@ bool CJoystickManager::SaveToXML()
         return true;
     }
     return false;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CJoystickManager::IsTriggerSourceAxis
+//
+// True when this physical axis is mapped to accelerate or brake, so we can apply
+// trigger-specific deadzone/saturation instead of the stick settings.
+//
+///////////////////////////////////////////////////////////////
+bool CJoystickManager::IsTriggerSourceAxis(int iAxisIndex) const
+{
+    for (int i = 0; i < NUMELMS(m_currentMapping); i++)
+    {
+        const SMappingLine& line = m_currentMapping[i];
+        if (line.bEnabled && line.SourceAxisIndex == iAxisIndex && (line.OutputAxisIndex == eAccelerate || line.OutputAxisIndex == eBrake))
+            return true;
+    }
+    return false;
+}
+
+void CJoystickManager::ApplyAxisResponse(float& fResult, int iSaturation)
+{
+    float Saturation = iSaturation * (1 / 100.f);
+    if (Saturation <= 1.f)
+        fResult += fResult * (1 - Saturation);
+    else
+        fResult *= Saturation;
+}
+
+void CJoystickManager::StopVibration()
+{
+    XINPUT_VIBRATION vibration{};
+    XInputSetState(m_iXInputUserIndex, &vibration);
+    m_bVibrationWasActive = false;
+}
+
+void CJoystickManager::SyncGtaVibrationPref()
+{
+    // CPad::StartShake (0x53F920) returns immediately unless this frontend pref is set.
+    // PC SA never exposes it, so our checkbox has to drive it or rumble never starts.
+    if (!g_pCore->GetGame())
+        return;
+
+    *reinterpret_cast<bool*>(0xBA6748 + 0x20) = m_bVibrationEnabled;
+}
+
+void CJoystickManager::ApplyVibration()
+{
+    // Get() is time since the last Reset, not a one-shot delta. Always tick it or a later
+    // XInput switch inherits minutes of idle time and eats the whole ShakeDur in one frame.
+    const int iElapsedMs = static_cast<int>(std::min<unsigned long long>(m_VibrationTimer.Get(), 50));
+    m_VibrationTimer.Reset();
+
+    if (!m_bUseXInput)
+        return;
+
+    XINPUT_VIBRATION vibration{};
+    bool             bShouldRumble = false;
+
+    CGame* pGame = g_pCore->GetGame();
+    if (pGame && pGame->GetSystemState() == SystemState::GS_PLAYING_GAME)
+        SyncGtaVibrationPref();
+
+    if (m_bVibrationEnabled && m_bXInputDeviceAttached && IsJoypadConnected())
+    {
+        if (pGame && pGame->GetSystemState() == SystemState::GS_PLAYING_GAME)
+        {
+            if (CPad* pPad = pGame->GetPad())
+            {
+                short         iShakeDur = pPad->GetShakeDur();
+                unsigned char ucShakeFreq = pPad->GetShakeFreq();
+                if (iShakeDur > 0)
+                {
+                    short iRemaining = static_cast<short>(std::max(0, static_cast<int>(iShakeDur) - std::max(iElapsedMs, 1)));
+                    pPad->SetShakeDur(iRemaining);
+                    if (iRemaining > 0 && ucShakeFreq > 0)
+                    {
+                        WORD wSpeed = static_cast<WORD>(ucShakeFreq * 257);
+                        vibration.wLeftMotorSpeed = wSpeed;
+                        vibration.wRightMotorSpeed = wSpeed;
+                        bShouldRumble = true;
+                    }
+                }
+            }
+        }
+    }
+
+    if (bShouldRumble || m_bVibrationWasActive)
+        XInputSetState(m_iXInputUserIndex, &vibration);
+
+    m_bVibrationWasActive = bShouldRumble;
+}
+
+void CJoystickManager::ReleaseDirectInputDevice()
+{
+    if (m_DevInfo.pDevice)
+    {
+        m_DevInfo.pDevice->Unacquire();
+        m_DevInfo.pDevice->Release();
+        m_DevInfo.pDevice = nullptr;
+    }
+    m_DevInfo.bDoneEnumAxes = false;
+    m_DevInfo.iAxisCount = 0;
+}
+
+int CJoystickManager::FindFirstXInputIndex() const
+{
+    for (int i = 0; i < 4; i++)
+    {
+        XINPUT_CAPABILITIES Capabilities;
+        if (XInputGetCapabilities(i, XINPUT_FLAG_GAMEPAD, &Capabilities) == ERROR_SUCCESS)
+            return i;
+    }
+    return -1;
+}
+
+void CJoystickManager::ApplyControllerSelection(bool bReleaseCurrent)
+{
+    if (bReleaseCurrent)
+        ReleaseDirectInputDevice();
+
+    m_bXInputDeviceAttached = false;
+    m_bUseXInput = false;
+    m_bPreferredInstanceValid = false;
+    m_iXInputUserIndex = 0;
+
+    SParsedControllerId parsed = ParseControllerId(m_strSelectedControllerId);
+
+    if (parsed.type == SParsedControllerId::XInput)
+    {
+        m_bUseXInput = true;
+        m_iXInputUserIndex = parsed.iXInputIndex;
+        return;
+    }
+
+    if (parsed.type == SParsedControllerId::DirectInput && parsed.bHasGuid)
+    {
+        m_bPreferredInstanceValid = true;
+        m_PreferredInstanceGuid = parsed.guidInstance;
+        if (bReleaseCurrent)
+            StartDirectInputScan();
+        return;
+    }
+
+    int iXInputIndex = FindFirstXInputIndex();
+    if (iXInputIndex >= 0)
+    {
+        m_bUseXInput = true;
+        m_iXInputUserIndex = iXInputIndex;
+        return;
+    }
+
+    if (bReleaseCurrent)
+        StartDirectInputScan();
+}
+
+void CJoystickManager::RefreshDirectInputDeviceList()
+{
+    // EnumDevices races the background scan's CreateDevice/EnumDevices on the same IDirectInput8.
+    if (!g_pDirectInput8 || m_bScanRunning)
+        return;
+
+    m_ListedDInputDevices.clear();
+    g_pDirectInput8->EnumDevices(DI8DEVCLASS_GAMECTRL, EnumJoysticksListCallback, &m_ListedDInputDevices, DIEDFL_ATTACHEDONLY);
 }
 
 ///////////////////////////////////////////////////////////////
