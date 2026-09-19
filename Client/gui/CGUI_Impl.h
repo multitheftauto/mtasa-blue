@@ -70,6 +70,7 @@ public:
 
     void SetSkin(const char* szName);
     void SetBidiEnabled(bool bEnabled);
+    SString BidifyText(const char* szText);
 
     void Draw();
     void Invalidate();

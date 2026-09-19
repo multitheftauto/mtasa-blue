@@ -52,6 +52,7 @@ class CGUI
 public:
     virtual void SetSkin(const char* szName) = 0;
     virtual void SetBidiEnabled(bool bEnabled) = 0;
+    virtual SString BidifyText(const char* szText) = 0;
 
     virtual void Draw() = 0;
     virtual void Invalidate() = 0;

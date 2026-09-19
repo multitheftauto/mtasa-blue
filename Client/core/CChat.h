@@ -68,7 +68,7 @@ public:
     void        Draw(const CVector2D& position, unsigned char alpha, bool shadow, bool outline, const CRect2D& renderBounds);
     float       GetWidth() const;
     const char* GetText() { return m_text.c_str(); }
-    void        SetText(const char* text) { m_text = text; }
+    void        SetText(const char* text);
     void        GetColor(CColor& color) { color = m_color; }
     void        SetColor(const CColor& color) { m_color = color; }
     void        InvalidateCache();
@@ -96,6 +96,8 @@ public:
     void          InvalidateCache();
 
 protected:
+    void ApplyBidi();
+
     bool                          m_bActive;
     std::vector<CChatLineSection> m_Sections;
     unsigned long                 m_ulCreationTime;
@@ -188,9 +190,10 @@ public:
     void        SetCommand(const char* szCommand);
     CVector2D   CalcInputSize();
 
-    static float GetFontHeight(float fScale = 1.0f);
-    static float GetTextExtent(const char* szText, float fScale = 1.0f);
-    static void  DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX,
+    static float   GetFontHeight(float fScale = 1.0f);
+    static float   GetTextExtent(const char* szText, float fScale = 1.0f);
+    static SString BidifyText(const char* szText);
+    static void    DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX,
                                 float fScaleY, bool bOutline, const CRect2D& RenderBounds);
 
     void SetColor(const CColor& Color);
