@@ -19,6 +19,7 @@
 #include "CPerfStatManager.h"
 #include "CKeyBinds.h"
 #include "CStaticFunctionDefinitions.h"
+#include "packets/CElementRPCPacket.h"
 #include "net/SyncStructures.h"
 
 CRPCFunctions* g_pRPCFunctions = NULL;
