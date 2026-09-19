@@ -57,7 +57,7 @@ public:
     int8                 m_acWheelDamageState[2];
     int8                 field_65E;
     int8                 field_65F;
-    int8                 m_anWheelColPoint[176];
+    CColPointSAInterface m_anWheelColPoint[4];
     float                m_wheelRatios[4];
     float                m_prevWheelRatios[4];
     int32                field_730[4];
@@ -99,6 +99,7 @@ public:
     int32                m_aiWheelState[2];
 };
 static_assert(sizeof(CBikeSAInterface) == 0x814, "Invalid size for CBikeSAInterface");
+static_assert(sizeof(CBikeSAInterface::m_anWheelColPoint) == 176, "Invalid size for CBikeSAInterface::m_anWheelColPoint");
 
 class CBikeSA : public virtual CBike, public virtual CVehicleSA
 {
