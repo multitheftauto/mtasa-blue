@@ -255,6 +255,7 @@ bool CResource::VerifyPendingClientChecksums()
 
         const SString strName = pDownloadableResource->GetName();
         FileDelete(strName);
+        CChecksum::InvalidateChecksumCacheEntry(strName);
         if (FileExists(strName))
         {
             SString strMessage("Unable to delete old file %s", *ConformResourcePath(strName));
@@ -386,7 +387,10 @@ void CResource::Load()
         {
             if (!pResourceFile->DoesClientAndServerChecksumMatch())
             {
-                HandleDownloadedFileTrouble(pResourceFile, false);
+                // The cached checksum can predate the file finishing on disk, so confirm with a fresh read
+                CChecksum::InvalidateChecksumCacheEntry(pResourceFile->GetName());
+                if (pResourceFile->GenerateClientChecksum() != pResourceFile->GetServerChecksum())
+                    HandleDownloadedFileTrouble(pResourceFile, false);
             }
         }
     }

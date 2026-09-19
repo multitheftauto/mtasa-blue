@@ -16,10 +16,7 @@
 #include "WString.h"
 
 #if defined(_WIN32) && defined(MTA_CLIENT)
-// Workaround to prevent pulling in the fat windows.h header
-// Callers that need WIN32_FILE_ATTRIBUTE_DATA as a value type must include <windows.h> after all.
-struct _WIN32_FILE_ATTRIBUTE_DATA;
-typedef struct _WIN32_FILE_ATTRIBUTE_DATA WIN32_FILE_ATTRIBUTE_DATA;
+    #include <cstdint>
 #endif
 
 namespace SharedUtil
@@ -38,8 +35,17 @@ namespace SharedUtil
     bool FileLoad(std::nothrow_t, const SString& filePath, SString& outBuffer, size_t maxSize = INT_MAX, size_t offset = 0) noexcept;
 
 #if defined(_WIN32) && defined(MTA_CLIENT)
-    bool GetFileAttributesExWithTimeout(const wchar_t* path, WIN32_FILE_ATTRIBUTE_DATA& attr, unsigned long timeoutMs) noexcept;
-    bool FileLoadWithTimeout(const SString& filePath, SString& outBuffer, unsigned long timeoutMs) noexcept;
+    // File identity as reported by an open handle. Sizing a read from directory entry metadata instead
+    // samples the length and the bytes at two different moments, so a file being rewritten underneath
+    // yields an empty or short buffer that still looks like a successful read.
+    struct SFileReadInfo
+    {
+        std::uint64_t size = 0;
+        std::uint64_t mtime = 0;
+    };
+
+    bool GetFileInfoWithTimeout(const SString& filePath, SFileReadInfo& outInfo, unsigned long timeoutMs) noexcept;
+    bool FileLoadWithTimeout(const SString& filePath, SString& outBuffer, unsigned long timeoutMs, SFileReadInfo* pOutInfo = nullptr) noexcept;
 #endif
 
     //

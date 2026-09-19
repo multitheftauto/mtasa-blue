@@ -167,19 +167,6 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
         return false;
     }
 
-    WIN32_FILE_ATTRIBUTE_DATA fileAttributeData;
-
-    if (!GetFileAttributesExW(wideFilePath, GetFileExInfoStandard, &fileAttributeData))
-        return false;
-
-    if (fileAttributeData.nFileSizeHigh > 0 || fileAttributeData.nFileSizeLow > GIBIBYTE)
-        return false;
-
-    DWORD fileSize = fileAttributeData.nFileSizeLow;
-
-    if (fileSize == 0 || fileSize <= static_cast<DWORD>(offset))
-        return true;
-
     constexpr int MAX_RETRY_ATTEMPTS = 20;
     constexpr int RETRY_DELAY_MS = 10;
 
@@ -200,6 +187,24 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
 
     if (handle == INVALID_HANDLE_VALUE)
         return false;
+
+    // The size has to come from the handle. Reading it from the directory entry instead samples the
+    // length before the bytes, so a file being rewritten underneath produces an empty or short buffer
+    LARGE_INTEGER fileSizeResult{};
+
+    if (!GetFileSizeEx(handle, &fileSizeResult) || fileSizeResult.HighPart > 0 || fileSizeResult.LowPart > GIBIBYTE)
+    {
+        CloseHandle(handle);
+        return false;
+    }
+
+    DWORD fileSize = fileSizeResult.LowPart;
+
+    if (fileSize == 0 || fileSize <= static_cast<DWORD>(offset))
+    {
+        CloseHandle(handle);
+        return true;
+    }
 
     if (offset > 0)
     {
@@ -246,35 +251,44 @@ bool SharedUtil::FileLoad(std::nothrow_t, const SString& filePath, SString& outB
     CloseHandle(handle);
     return true;
 #else
+    FILE* handle = fopen(filePath, "rb");
+
+    if (!handle)
+        return false;
+
+    // Size comes from the open descriptor so a concurrent rewrite cannot make us read a stale length
     #ifdef __APPLE__
     struct stat info;
 
-    if (stat(filePath, &info) != 0)
-        return false;
+    if (fstat(fileno(handle), &info) != 0)
     #else
     struct stat64 info;
 
-    if (stat64(filePath, &info) != 0)
-        return false;
+    if (fstat64(fileno(handle), &info) != 0)
     #endif
+    {
+        fclose(handle);
+        return false;
+    }
 
     size_t fileSize = static_cast<size_t>(info.st_size);
 
     if (fileSize > GIBIBYTE)
+    {
+        fclose(handle);
         return false;
+    }
 
-    if (fileSize == 0 || static_cast<size_t>(fileSize) <= offset)
+    if (fileSize == 0 || fileSize <= offset)
+    {
+        fclose(handle);
         return true;
+    }
 
     size_t numBytesToRead = fileSize - offset;
 
     if (numBytesToRead > maxSize)
         numBytesToRead = maxSize;
-
-    FILE* handle = fopen(filePath, "rb");
-
-    if (!handle)
-        return false;
 
     try
     {
@@ -1768,145 +1782,176 @@ std::vector<std::string> SharedUtil::ListDir(const char* szPath) noexcept
 #if defined(_WIN32) && defined(MTA_CLIENT)
 namespace
 {
-    // Helper to call GetFileAttributesExW with timeout to prevent indefinite hangs due to env issues
-    struct GetAttributesParams
+    // NtCreateFile can hang indefinitely on a broken filesystem or an interfering AV, so the whole
+    // open/measure/read sequence runs on a worker thread the caller is able to abandon on timeout.
+    struct FileReadParams
     {
-        wchar_t*                  pathCopy;
-        WIN32_FILE_ATTRIBUTE_DATA attrLocal;
-        BOOL                      result;
-        std::atomic<bool>         abandoned;
+        wchar_t*                  pathCopy = nullptr;
+        bool                      contentWanted = false;
+        SString                   data;
+        SharedUtil::SFileReadInfo info;
+        bool                      result = false;
+        std::atomic<int>          refCount{2};
     };
 
-    DWORD WINAPI GetAttributesThread(LPVOID param)
+    void ReleaseFileReadParams(FileReadParams* p)
     {
-        auto* p = static_cast<GetAttributesParams*>(param);
-        p->result = GetFileAttributesExW(p->pathCopy, GetFileExInfoStandard, &p->attrLocal);
-        if (p->abandoned.load(std::memory_order_acquire))
+        if (p->refCount.fetch_sub(1, std::memory_order_acq_rel) == 1)
         {
             delete[] p->pathCopy;
             delete p;
         }
+    }
+
+    // Size and write time must come from the open handle. Taking them from GetFileAttributesEx first
+    // means the length and the bytes are sampled at two different moments, and a file being rewritten
+    // in between silently yields an empty buffer that still reports success.
+    bool ReadWholeFileFromHandle(HANDLE handle, bool contentWanted, SString& outData, SharedUtil::SFileReadInfo& outInfo)
+    {
+        LARGE_INTEGER fileSize{};
+        if (!GetFileSizeEx(handle, &fileSize) || fileSize.HighPart > 0)
+            return false;
+
+        outInfo.size = static_cast<std::uint64_t>(fileSize.QuadPart);
+
+        FILETIME writeTime{};
+        if (GetFileTime(handle, nullptr, nullptr, &writeTime))
+            outInfo.mtime = (static_cast<std::uint64_t>(writeTime.dwHighDateTime) << 32) | writeTime.dwLowDateTime;
+
+        if (!contentWanted || fileSize.LowPart == 0)
+            return true;
+
+        try
+        {
+            outData.resize(fileSize.LowPart);
+        }
+        catch (...)
+        {
+            return false;
+        }
+
+        DWORD numBytesRead = 0;
+        if (!ReadFile(handle, &outData[0], fileSize.LowPart, &numBytesRead, nullptr) || numBytesRead != fileSize.LowPart)
+        {
+            outData.clear();
+            return false;
+        }
+
+        return true;
+    }
+
+    DWORD WINAPI ReadFileThread(LPVOID param)
+    {
+        auto* p = static_cast<FileReadParams*>(param);
+
+        constexpr int MAX_RETRY_ATTEMPTS = 20;
+        constexpr int RETRY_DELAY_MS = 10;
+
+        HANDLE handle = INVALID_HANDLE_VALUE;
+        for (int attempt = 0; attempt < MAX_RETRY_ATTEMPTS; ++attempt)
+        {
+            handle = CreateFileW(p->pathCopy, GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING,
+                                 FILE_ATTRIBUTE_NORMAL, nullptr);
+            if (handle != INVALID_HANDLE_VALUE)
+                break;
+
+            DWORD errorCode = GetLastError();
+            if (errorCode != ERROR_SHARING_VIOLATION && errorCode != ERROR_LOCK_VIOLATION)
+                break;
+
+            if (attempt + 1 < MAX_RETRY_ATTEMPTS)
+                Sleep(RETRY_DELAY_MS);
+        }
+
+        if (handle != INVALID_HANDLE_VALUE)
+        {
+            p->result = ReadWholeFileFromHandle(handle, p->contentWanted, p->data, p->info);
+            CloseHandle(handle);
+        }
+
+        ReleaseFileReadParams(p);
         return 0;
     }
-}
 
-bool SharedUtil::GetFileAttributesExWithTimeout(const wchar_t* path, WIN32_FILE_ATTRIBUTE_DATA& attr, DWORD timeoutMs) noexcept
-{
-    size_t   pathLen = wcslen(path) + 1;
-    wchar_t* pathCopy = new (std::nothrow) wchar_t[pathLen];
-    if (!pathCopy)
-        return false;
+    bool RunFileReadWithTimeout(const SString& filePath, bool contentWanted, SString* pOutBuffer, SharedUtil::SFileReadInfo* pOutInfo, DWORD timeoutMs) noexcept
+    {
+        if (pOutBuffer)
+            pOutBuffer->clear();
+
+        if (!SharedUtil::File::IsPathSafe(filePath.c_str()))
+            return false;
+
+        WString wideFilePath;
+        try
+        {
+            wideFilePath = SharedUtil::FromUTF8(filePath);
+        }
+        catch (...)
+        {
+            return false;
+        }
+
+        if (wideFilePath.empty())
+            return false;
+
+        size_t   pathLen = wideFilePath.length() + 1;
+        wchar_t* pathCopy = new (std::nothrow) wchar_t[pathLen];
+        if (!pathCopy)
+            return false;
 
     #ifdef _MSC_VER
-    wcscpy_s(pathCopy, pathLen, path);
+        wcscpy_s(pathCopy, pathLen, wideFilePath.c_str());
     #else
-    wcscpy(pathCopy, path);
+        wcscpy(pathCopy, wideFilePath.c_str());
     #endif
 
-    auto* params = new (std::nothrow) GetAttributesParams{pathCopy, {}, FALSE, {false}};
-    if (!params)
-    {
-        delete[] pathCopy;
-        return false;
-    }
+        auto* params = new (std::nothrow) FileReadParams();
+        if (!params)
+        {
+            delete[] pathCopy;
+            return false;
+        }
 
-    DWORD  threadId;
-    HANDLE thread = CreateThread(nullptr, 0, GetAttributesThread, params, 0, &threadId);
-    if (!thread)
-    {
-        delete[] params->pathCopy;
-        delete params;
-        return false;
-    }
+        params->pathCopy = pathCopy;
+        params->contentWanted = contentWanted;
 
-    DWORD waitResult = WaitForSingleObject(thread, timeoutMs);
+        HANDLE thread = CreateThread(nullptr, 0, ReadFileThread, params, 0, nullptr);
+        if (!thread)
+        {
+            // No worker thread to share ownership with
+            delete[] params->pathCopy;
+            delete params;
+            return false;
+        }
 
-    if (waitResult == WAIT_OBJECT_0)
-    {
+        bool timedOut = WaitForSingleObject(thread, timeoutMs) != WAIT_OBJECT_0;
         CloseHandle(thread);
-        attr = params->attrLocal;
-        bool success = params->result != FALSE;
-        delete[] params->pathCopy;
-        delete params;
-        return success;
-    }
 
-    // Timeout - let the worker thread clean up when it finishes
-    params->abandoned.store(true, std::memory_order_release);
-    CloseHandle(thread);
-    return false;
+        bool result = false;
+        if (!timedOut && params->result)
+        {
+            result = true;
+            if (pOutBuffer)
+                *pOutBuffer = params->data;
+            if (pOutInfo)
+                *pOutInfo = params->info;
+        }
+
+        ReleaseFileReadParams(params);
+        return result;
+    }
 }
 
-bool SharedUtil::FileLoadWithTimeout(const SString& filePath, SString& outBuffer, DWORD timeoutMs) noexcept
+bool SharedUtil::GetFileInfoWithTimeout(const SString& filePath, SFileReadInfo& outInfo, DWORD timeoutMs) noexcept
 {
-    outBuffer.clear();
+    outInfo = SFileReadInfo();
+    return RunFileReadWithTimeout(filePath, false, nullptr, &outInfo, timeoutMs);
+}
 
-    if (!File::IsPathSafe(filePath.c_str()))
-        return false;
-
-    WString wideFilePath;
-    try
-    {
-        wideFilePath = FromUTF8(filePath);
-    }
-    catch (...)
-    {
-        return false;
-    }
-
-    if (wideFilePath.empty())
-        return false;
-
-    WIN32_FILE_ATTRIBUTE_DATA attr;
-    if (!GetFileAttributesExWithTimeout(wideFilePath.c_str(), attr, timeoutMs) || attr.nFileSizeHigh > 0)
-        return false;
-
-    DWORD fileSize = attr.nFileSizeLow;
-    if (fileSize == 0)
-        return true;
-
-    HANDLE fh = CreateFileW(wideFilePath.c_str(), GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE | FILE_SHARE_DELETE, nullptr, OPEN_EXISTING,
-                            FILE_ATTRIBUTE_NORMAL | FILE_FLAG_OVERLAPPED, nullptr);
-    if (fh == INVALID_HANDLE_VALUE)
-        return false;
-
-    HANDLE ev = CreateEventW(nullptr, TRUE, FALSE, nullptr);
-    if (!ev)
-    {
-        CloseHandle(fh);
-        return false;
-    }
-
-    bool ok = false;
-    try
-    {
-        outBuffer.resize(fileSize);
-    }
-    catch (...)
-    {
-        goto done;
-    }
-
-    {
-        OVERLAPPED ov{};
-        ov.hEvent = ev;
-        DWORD n = 0;
-        if (!ReadFile(fh, &outBuffer[0], fileSize, &n, &ov) && GetLastError() == ERROR_IO_PENDING)
-        {
-            if (WaitForSingleObject(ev, timeoutMs) != WAIT_OBJECT_0)
-            {
-                CancelIo(fh);
-                GetOverlappedResult(fh, &ov, &n, TRUE);
-                goto done;
-            }
-        }
-        ok = GetOverlappedResult(fh, &ov, &n, FALSE) && n == fileSize;
-    }
-done:
-    CloseHandle(ev);
-    CloseHandle(fh);
-    if (!ok)
-        outBuffer.clear();
-    return ok;
+bool SharedUtil::FileLoadWithTimeout(const SString& filePath, SString& outBuffer, DWORD timeoutMs, SFileReadInfo* pOutInfo) noexcept
+{
+    if (pOutInfo)
+        *pOutInfo = SFileReadInfo();
+    return RunFileReadWithTimeout(filePath, true, &outBuffer, pOutInfo, timeoutMs);
 }
 #endif
