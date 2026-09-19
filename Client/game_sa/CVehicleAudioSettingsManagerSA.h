@@ -35,7 +35,7 @@ public:
     static void StaticSetHooks() noexcept;
 
 private:
-    size_t GetVehicleModelAudioSettingsID(uint32_t modelId) const noexcept { return modelId - 400; };
+    size_t GetVehicleModelAudioSettingsID(uint32_t modelId) const noexcept;
 
 private:
     // Array with the model audio settings entries

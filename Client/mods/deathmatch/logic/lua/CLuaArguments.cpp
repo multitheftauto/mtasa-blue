@@ -188,7 +188,7 @@ void CLuaArguments::PushArguments(lua_State* luaVM) const
     }
 }
 
-void CLuaArguments::PushAsTable(lua_State* luaVM) const
+void CLuaArguments::PushAsTable(lua_State* luaVM, bool isArray) const
 {
     luaL_checkstack(luaVM, 8, "Cannot push Lua table: insufficient stack space");
     lua_newtable(luaVM);
@@ -214,17 +214,32 @@ void CLuaArguments::PushAsTable(lua_State* luaVM) const
     {
         const CLuaArguments* table = pending[next];
         lua_rawgeti(luaVM, cacheIndex, static_cast<int>(next + 1));
-        for (size_t index = 0; index + 1 < table->m_Arguments.size(); index += 2)
+        if (isArray && table == this)
         {
-            for (size_t offset = 0; offset < 2; ++offset)
+            for (size_t index = 0; index < table->m_Arguments.size(); ++index)
             {
-                CLuaArgument* argument = table->m_Arguments[index + offset];
+                CLuaArgument* argument = table->m_Arguments[index];
                 if (argument->m_iType == LUA_TTABLE && argument->m_pTableData)
                     pushTable(argument->m_pTableData);
                 else
                     argument->Push(luaVM);
+                lua_rawseti(luaVM, -2, static_cast<int>(index + 1));
             }
-            lua_rawset(luaVM, -3);
+        }
+        else
+        {
+            for (size_t index = 0; index + 1 < table->m_Arguments.size(); index += 2)
+            {
+                for (size_t offset = 0; offset < 2; ++offset)
+                {
+                    CLuaArgument* argument = table->m_Arguments[index + offset];
+                    if (argument->m_iType == LUA_TTABLE && argument->m_pTableData)
+                        pushTable(argument->m_pTableData);
+                    else
+                        argument->Push(luaVM);
+                }
+                lua_rawset(luaVM, -3);
+            }
         }
         lua_pop(luaVM, 1);
     }
@@ -242,14 +257,26 @@ void CLuaArguments::PushArguments(const CLuaArguments& Arguments)
 bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments* returnValues) const
 {
     assert(pLuaMain);
-    TIMEUS startTime = GetTimeUs();
+    const bool   timingActive = CClientPerfStatLuaTiming::GetSingleton()->IsActive();
+    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
-    // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine();
     assert(luaVM);
-    LUA_CHECKSTACK(luaVM, 2);
+    LUA_CHECKSTACK(luaVM, 1);
     int luaStackPointer = lua_gettop(luaVM);
+
+    // Get the function from the registry
     lua_getref(luaVM, iLuaFunction.ToInt());
+
+    // If that function doesn't exist, return false
+    if (lua_isnil(luaVM, -1))
+    {
+        // cleanup the stack
+        while (lua_gettop(luaVM) - luaStackPointer > 0)
+            lua_pop(luaVM, 1);
+
+        return false;
+    }
 
     // Push our arguments onto the stack
     PushArguments(luaVM);
@@ -292,7 +319,10 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
             lua_pop(luaVM, 1);
     }
 
-    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, pLuaMain->GetFunctionTag(iLuaFunction.ToInt()), GetTimeUs() - startTime);
+    if (timingActive)
+    {
+        CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, pLuaMain->GetFunctionTag(iLuaFunction.ToInt()), GetTimeUs() - startTime);
+    }
     return true;
 }
 
@@ -300,7 +330,8 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
 {
     assert(pLuaMain);
     assert(szFunction);
-    TIMEUS startTime = GetTimeUs();
+    const bool   timingActive = CClientPerfStatLuaTiming::GetSingleton()->IsActive();
+    const TIMEUS startTime = timingActive ? GetTimeUs() : 0;
 
     // Add the function name to the stack and get the event from the table
     lua_State* luaVM = pLuaMain->GetVirtualMachine();
@@ -362,7 +393,10 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
             lua_pop(luaVM, 1);
     }
 
-    CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, szFunction, GetTimeUs() - startTime);
+    if (timingActive)
+    {
+        CClientPerfStatLuaTiming::GetSingleton()->UpdateLuaTiming(pLuaMain, szFunction, GetTimeUs() - startTime);
+    }
     return true;
 }
 

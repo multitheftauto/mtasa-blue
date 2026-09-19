@@ -66,7 +66,7 @@ public:
     bool CallGlobal(class CLuaMain* pLuaMain, const char* szFunction, CLuaArguments* returnValues = NULL) const;
 
     bool ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
-    void PushAsTable(lua_State* luaVM) const;
+    void PushAsTable(lua_State* luaVM, bool isArray = false) const;
 
     CLuaArgument* PushNil();
     CLuaArgument* PushBoolean(bool bBool);
