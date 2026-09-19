@@ -799,6 +799,7 @@ ADD_ENUM(eModelIdeFlag::IS_TAG, "is_tag")
 ADD_ENUM(eModelIdeFlag::DISABLE_BACKFACE_CULLING, "disable_backface_culling")
 ADD_ENUM(eModelIdeFlag::IS_BREAKABLE_STATUE, "is_breakable_statue")
 ADD_ENUM(eModelIdeFlag::IS_CRANE, "is_crane")
+ADD_ENUM(eModelIdeFlag::REALLY_DRAW_LAST, "draw_after_scene")
 IMPLEMENT_ENUM_CLASS_END("model-ide-flag")
 
 // https://learn.microsoft.com/en-us/windows/win32/direct3d9/d3dformat
