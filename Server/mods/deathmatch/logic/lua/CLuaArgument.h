@@ -38,8 +38,8 @@ public:
     bool                operator==(const CLuaArgument& Argument) const;
     bool                operator!=(const CLuaArgument& Argument) const;
 
-    bool Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
-    void Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = NULL) const;
+    bool Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
+    void Push(lua_State* luaVM) const;
 
     void ReadBool(bool bBool);
     void ReadNumber(double dNumber);
@@ -113,6 +113,8 @@ public:
     }
 
 private:
+    friend class CLuaArguments;
+
     void LogUnableToPacketize(const char* szMessage) const;
 
     int            m_iType;

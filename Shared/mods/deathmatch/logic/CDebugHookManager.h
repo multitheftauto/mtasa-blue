@@ -71,7 +71,7 @@ public:
     bool HasPostFunctionHooks() const { return !m_PostFunctionHookList.empty() || m_uiPostFunctionOverride; }
 
 protected:
-    void GetFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, lua_State* luaVM, bool bAllowed);
+    bool GetFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, lua_State* luaVM, bool bAllowed);
     void GetEventFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource,
                                            CPlayer* pCaller, CMapEvent* pMapEvent);
     void GetEventCallHookArguments(CLuaArguments& NewArguments, const SString& strName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller);

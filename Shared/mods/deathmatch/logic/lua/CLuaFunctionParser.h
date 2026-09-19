@@ -726,14 +726,14 @@ struct CLuaFunctionParserBase
         {
             CLuaArgument argument;
             if (!argument.Read(L, index++))
-                strError = SString("Bad argument @ '%s' [Lua table nesting depth exceeds the supported limit]", lua_tostring(L, lua_upvalueindex(1)));
+                strError = SString("Bad argument @ '%s' [Insufficient Lua stack space to read table]", lua_tostring(L, lua_upvalueindex(1)));
             return argument;
         }
         else if constexpr (std::is_same_v<T, CLuaArguments>)
         {
             CLuaArguments argument;
             if (!argument.ReadArguments(L, index))
-                strError = SString("Bad argument @ '%s' [Lua table nesting depth exceeds the supported limit]", lua_tostring(L, lua_upvalueindex(1)));
+                strError = SString("Bad argument @ '%s' [Insufficient Lua stack space to read table]", lua_tostring(L, lua_upvalueindex(1)));
             return argument;
         }
         else if constexpr (std::is_same_v<T, std::monostate>)

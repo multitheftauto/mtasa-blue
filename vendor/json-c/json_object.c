@@ -600,58 +600,128 @@ static void indent(struct printbuf *pb, int level, int flags)
 
 /* json_object_object */
 
-static int json_object_object_to_json_string(struct json_object *jso, struct printbuf *pb,
-                                             int level, int flags)
+/* Keep container traversal on the heap; custom serializers still own their behavior. */
+static int json_object_container_to_json_string(struct json_object *jso, struct printbuf *pb,
+                                               int level, int flags)
 {
-	int had_children = 0;
-	struct json_object_iter iter;
-
-	printbuf_strappend(pb, "{" /*}*/);
-	json_object_object_foreachC(jso, iter)
+	struct container_frame
 	{
-		if (had_children)
+		struct json_object *object;
+		struct lh_entry *entry;
+		size_t next;
+		int level;
+		int is_object;
+		int started;
+	};
+	size_t capacity = 32, count = 1;
+	struct container_frame *frames = calloc(capacity, sizeof(*frames));
+	int result = -1;
+	if (!frames)
+		return -1;
+	frames[0].object = jso;
+	frames[0].level = level;
+	while (count)
+	{
+		struct container_frame *frame = &frames[count - 1];
+		struct json_object *value;
+		const char *key = NULL;
+		if (!frame->started)
 		{
-			printbuf_strappend(pb, ",");
+			/* Release linkers can fold the identical array/object serializer wrappers. */
+			frame->is_object = frame->object->o_type == json_type_object;
+			if (frame->is_object)
+				frame->entry = lh_table_head(JC_OBJECT(frame->object)->c_object);
+			printbuf_memappend(pb, frame->is_object ? "{" : "[", 1);
+			frame->started = 1;
 		}
+		if (frame->is_object ? frame->entry == NULL : frame->next == json_object_array_length(frame->object))
+		{
+			if ((flags & JSON_C_TO_STRING_PRETTY) && frame->next)
+			{
+				printbuf_strappend(pb, "\n");
+				indent(pb, frame->level, flags);
+			}
+			if ((flags & JSON_C_TO_STRING_SPACED) && !(flags & JSON_C_TO_STRING_PRETTY))
+				printbuf_strappend(pb, " ");
+			result = printbuf_memappend(pb, frame->is_object ? "}" : "]", 1);
+			if (result < 0)
+				goto done;
+			--count;
+			continue;
+		}
+		if (frame->is_object)
+		{
+			key = lh_entry_k(frame->entry);
+			value = lh_entry_v(frame->entry);
+			frame->entry = lh_entry_next(frame->entry);
+		}
+		else
+			value = json_object_array_get_idx(frame->object, frame->next);
+		if (frame->next++)
+			printbuf_strappend(pb, ",");
 		if (flags & JSON_C_TO_STRING_PRETTY)
 			printbuf_strappend(pb, "\n");
-		had_children = 1;
-		if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
+		if ((flags & JSON_C_TO_STRING_SPACED) && !(flags & JSON_C_TO_STRING_PRETTY))
 			printbuf_strappend(pb, " ");
-		indent(pb, level + 1, flags);
-		if (flags & JSON_C_TO_STRING_COLOR)
-			printbuf_strappend(pb, ANSI_COLOR_FG_BLUE);
-
-		printbuf_strappend(pb, "\"");
-		json_escape_str(pb, iter.key, strlen(iter.key), flags);
-		printbuf_strappend(pb, "\"");
-
-		if (flags & JSON_C_TO_STRING_COLOR)
-			printbuf_strappend(pb, ANSI_COLOR_RESET);
-
-		if (flags & JSON_C_TO_STRING_SPACED)
-			printbuf_strappend(pb, ": ");
-		else
-			printbuf_strappend(pb, ":");
-
-		if (iter.val == NULL) {
+		indent(pb, frame->level + 1, flags);
+		if (frame->is_object)
+		{
+			if (flags & JSON_C_TO_STRING_COLOR)
+				printbuf_strappend(pb, ANSI_COLOR_FG_BLUE);
+			printbuf_strappend(pb, "\"");
+			json_escape_str(pb, key, strlen(key), flags);
+			printbuf_strappend(pb, "\"");
+			if (flags & JSON_C_TO_STRING_COLOR)
+				printbuf_strappend(pb, ANSI_COLOR_RESET);
+			printbuf_memappend(pb, (flags & JSON_C_TO_STRING_SPACED) ? ": " : ":",
+			                   (flags & JSON_C_TO_STRING_SPACED) ? 2 : 1);
+		}
+		if (!value)
+		{
 			if (flags & JSON_C_TO_STRING_COLOR)
 				printbuf_strappend(pb, ANSI_COLOR_FG_MAGENTA);
 			printbuf_strappend(pb, "null");
 			if (flags & JSON_C_TO_STRING_COLOR)
 				printbuf_strappend(pb, ANSI_COLOR_RESET);
-		} else if (iter.val->_to_json_string(iter.val, pb, level + 1, flags) < 0)
-			return -1;
+		}
+		else if (value->_to_json_string == json_object_object_to_json_string ||
+		         value->_to_json_string == json_object_array_to_json_string)
+		{
+			const int child_level = frame->level + 1;
+			if (count == capacity)
+			{
+				struct container_frame *grown;
+				if (capacity > SIZE_MAX / 2 / sizeof(*frames))
+				{
+					result = -1;
+					goto done;
+				}
+				grown = realloc(frames, capacity * 2 * sizeof(*frames));
+				if (!grown)
+				{
+					result = -1;
+					goto done;
+				}
+				frames = grown;
+				capacity *= 2;
+			}
+			frames[count++] = (struct container_frame){.object = value, .level = child_level};
+		}
+		else if (value->_to_json_string(value, pb, frame->level + 1, flags) < 0)
+		{
+			result = -1;
+			goto done;
+		}
 	}
-	if ((flags & JSON_C_TO_STRING_PRETTY) && had_children)
-	{
-		printbuf_strappend(pb, "\n");
-		indent(pb, level, flags);
-	}
-	if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
-		return printbuf_strappend(pb, /*{*/ " }");
-	else
-		return printbuf_strappend(pb, /*{*/ "}");
+done:
+	free(frames);
+	return result;
+}
+
+static int json_object_object_to_json_string(struct json_object *jso, struct printbuf *pb,
+                                             int level, int flags)
+{
+	return json_object_container_to_json_string(jso, pb, level, flags);
 }
 
 static void json_object_lh_entry_free(struct lh_entry *ent)
@@ -1597,44 +1667,7 @@ int json_object_set_string_len(json_object *jso, const char *s, int len)
 static int json_object_array_to_json_string(struct json_object *jso, struct printbuf *pb, int level,
                                             int flags)
 {
-	int had_children = 0;
-	size_t ii;
-
-	printbuf_strappend(pb, "[");
-	for (ii = 0; ii < json_object_array_length(jso); ii++)
-	{
-		struct json_object *val;
-		if (had_children)
-		{
-			printbuf_strappend(pb, ",");
-		}
-		if (flags & JSON_C_TO_STRING_PRETTY)
-			printbuf_strappend(pb, "\n");
-		had_children = 1;
-		if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
-			printbuf_strappend(pb, " ");
-		indent(pb, level + 1, flags);
-		val = json_object_array_get_idx(jso, ii);
-		if (val == NULL) {
-
-			if (flags & JSON_C_TO_STRING_COLOR)
-				printbuf_strappend(pb, ANSI_COLOR_FG_MAGENTA);
-			printbuf_strappend(pb, "null");
-			if (flags & JSON_C_TO_STRING_COLOR)
-				printbuf_strappend(pb, ANSI_COLOR_RESET);
-
-		} else if (val->_to_json_string(val, pb, level + 1, flags) < 0)
-			return -1;
-	}
-	if ((flags & JSON_C_TO_STRING_PRETTY) && had_children)
-	{
-		printbuf_strappend(pb, "\n");
-		indent(pb, level, flags);
-	}
-
-	if (flags & JSON_C_TO_STRING_SPACED && !(flags & JSON_C_TO_STRING_PRETTY))
-		return printbuf_strappend(pb, " ]");
-	return printbuf_strappend(pb, "]");
+	return json_object_container_to_json_string(jso, pb, level, flags);
 }
 
 static void json_object_array_entry_free(void *data)

@@ -59,7 +59,8 @@ CLuaArgument::CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const v
     // Read the argument out of the lua VM
     m_pTableData = NULL;
     m_iIndex = iArgument;
-    Read(luaVM, iArgument, pKnownTables);
+    if (!Read(luaVM, iArgument, pKnownTables))
+        luaL_error(luaVM, "Cannot read Lua table: insufficient stack space");
 }
 
 CLuaArgument::~CLuaArgument()
@@ -132,7 +133,8 @@ void CLuaArgument::CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLua
 
 const CLuaArgument& CLuaArgument::operator=(const CLuaArgument& Argument)
 {
-    CopyRecursive(Argument);
+    if (this != &Argument)
+        CopyRecursive(Argument);
 
     // Return the given class allowing for chaining
     return Argument;
@@ -205,8 +207,10 @@ bool CLuaArgument::CompareRecursive(const CLuaArgument& Argument, std::set<CLuaA
     return true;
 }
 
-bool CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables, unsigned int uiDepth)
+bool CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables)
 {
+    m_iIndex = iArgument;
+
     // Store debug data for later retrieval
 #ifdef MTA_DEBUG
     m_iLine = 0;
@@ -250,15 +254,9 @@ bool CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
                 }
                 else
                 {
-                    if (uiDepth >= CLuaArguments::MaxLuaTableReadDepth)
-                    {
-                        m_iType = LUA_TNIL;
-                        return false;
-                    }
-
                     m_pTableData = new CLuaArguments();
                     m_bWeakTableRef = false;
-                    if (!m_pTableData->ReadTable(luaVM, iArgument, pKnownTables, uiDepth))
+                    if (!m_pTableData->ReadTable(luaVM, iArgument, pKnownTables))
                     {
                         DeleteTableData();
                         m_iType = LUA_TNIL;
@@ -409,7 +407,7 @@ CClientEntity* CLuaArgument::GetElement() const
     return CElementIDs::GetElement(ID);
 }
 
-void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables) const
+void CLuaArgument::Push(lua_State* luaVM) const
 {
     // Make sure the stack has enough room
     LUA_CHECKSTACK(luaVM, 1);
@@ -450,18 +448,7 @@ void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKn
                 break;
             }
 
-            int* pTableId;
-            if (pKnownTables && (pTableId = MapFind(*pKnownTables, m_pTableData)))
-            {
-                lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
-                lua_pushnumber(luaVM, *pTableId);
-                lua_gettable(luaVM, -2);
-                lua_remove(luaVM, -2);
-            }
-            else
-            {
-                m_pTableData->PushAsTable(luaVM, pKnownTables);
-            }
+            m_pTableData->PushAsTable(luaVM);
             break;
         }
 
@@ -686,7 +673,7 @@ bool CLuaArgument::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashM
                 bitStream.Write(&type);
 
                 // Write the subtable to the bitstream
-                m_pTableData->WriteToBitStream(bitStream, pKnownTables);
+                return m_pTableData->WriteToBitStream(bitStream, pKnownTables);
             }
             break;
         }

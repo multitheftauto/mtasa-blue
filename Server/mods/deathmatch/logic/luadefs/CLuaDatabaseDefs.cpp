@@ -676,7 +676,12 @@ int CLuaDatabaseDefs::ExecuteSQLQuery(lua_State* luaVM)
         CLuaArguments   Args;
         CRegistryResult Result;
 
-        Args.ReadArguments(luaVM, 2);
+        if (!Args.ReadArguments(luaVM, 2))
+        {
+            m_pScriptDebugging->LogError(luaVM, "Cannot read SQL arguments: insufficient Lua stack space");
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
 
         CPerfStatSqliteTiming::GetSingleton()->SetCurrentResource(luaVM);
         if (CStaticFunctionDefinitions::ExecuteSQLQuery(strQuery, &Args, &Result))

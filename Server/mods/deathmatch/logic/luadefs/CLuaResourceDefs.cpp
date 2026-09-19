@@ -1137,7 +1137,12 @@ int CLuaResourceDefs::call(lua_State* luaVM)
 
                 CResource*    resourceThis = pLuaMain->GetResource();
                 CLuaArguments args;
-                args.ReadArguments(luaVM, 3);
+                if (!args.ReadArguments(luaVM, 3))
+                {
+                    m_pScriptDebugging->LogError(luaVM, "Cannot read export arguments: insufficient Lua stack space");
+                    lua_pushboolean(luaVM, false);
+                    return 1;
+                }
                 CLuaArguments returns;
 
                 LUA_CHECKSTACK(targetLuaVM, 1);  // Ensure some room

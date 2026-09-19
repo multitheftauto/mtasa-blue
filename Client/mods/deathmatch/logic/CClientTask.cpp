@@ -167,7 +167,11 @@ bool CClientTask::ReadParameters(lua_State* luaVM, int iTableIndex, bool bClear)
         // Get the key and value
         const char*  szKey = lua_tostring(luaVM, -2);
         CLuaArgument Value;
-        Value.Read(luaVM, -1);
+        if (!Value.Read(luaVM, -1))
+        {
+            lua_pop(luaVM, 2);
+            return false;
+        }
 
         // Got both a key and a value?
         if (szKey)

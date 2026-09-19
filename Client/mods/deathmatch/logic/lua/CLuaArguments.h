@@ -35,8 +35,6 @@ class CLuaArguments
 {
 public:
     static constexpr unsigned int MaxBitStreamTableReadDepth = 64;
-    // Bound recursive copies before they can exhaust the Lua or native stack.
-    static constexpr unsigned int MaxLuaTableReadDepth = 64;
 
     CLuaArguments() {}
     CLuaArguments(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables = NULL);
@@ -55,8 +53,8 @@ public:
     bool Call(class CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, CLuaArguments* returnValues = NULL) const;
     bool CallGlobal(class CLuaMain* pLuaMain, const char* szFunction, CLuaArguments* returnValues = NULL) const;
 
-    bool ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
-    void PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = nullptr) const;
+    bool ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
+    void PushAsTable(lua_State* luaVM) const;
 
     CLuaArgument* PushNil();
     CLuaArgument* PushBoolean(bool bBool);

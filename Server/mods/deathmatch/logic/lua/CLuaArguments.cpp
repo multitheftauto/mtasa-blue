@@ -55,28 +55,34 @@ const CLuaArguments& CLuaArguments::operator=(const CLuaArguments& Arguments)
 
 void CLuaArguments::CopyRecursive(const CLuaArguments& Arguments, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
 {
-    // Clear our previous list if any
+    if (this == &Arguments)
+        return;
     DeleteArguments();
-
-    bool bKnownTablesCreated = false;
+    CFastHashMap<CLuaArguments*, CLuaArguments*> knownTables;
     if (!pKnownTables)
+        pKnownTables = &knownTables;
+    pKnownTables->insert({const_cast<CLuaArguments*>(&Arguments), this});
+    std::vector<std::pair<const CLuaArguments*, CLuaArguments*>> pending{{&Arguments, this}};
+    for (size_t next = 0; next < pending.size(); ++next)
     {
-        pKnownTables = new CFastHashMap<CLuaArguments*, CLuaArguments*>();
-        bKnownTablesCreated = true;
+        const auto [source, destination] = pending[next];
+        for (CLuaArgument* argument : source->m_Arguments)
+        {
+            bool ownsTable = false;
+            if (argument->m_iType == LUA_TTABLE && !MapFindRef(*pKnownTables, argument->m_pTableData))
+            {
+                CLuaArguments* child = new CLuaArguments();
+                pKnownTables->insert({argument->m_pTableData, child});
+                pending.emplace_back(argument->m_pTableData, child);
+                ownsTable = true;
+            }
+            // Every table is registered first, so the argument copy only copies a reference.
+            CLuaArgument* copied = new CLuaArgument(*argument, pKnownTables);
+            if (ownsTable)
+                copied->m_bWeakTableRef = false;
+            destination->m_Arguments.push_back(copied);
+        }
     }
-
-    pKnownTables->insert(std::make_pair((CLuaArguments*)&Arguments, (CLuaArguments*)this));
-
-    // Copy all the arguments
-    std::vector<CLuaArgument*>::const_iterator iter = Arguments.m_Arguments.begin();
-    for (; iter != Arguments.m_Arguments.end(); ++iter)
-    {
-        CLuaArgument* pArgument = new CLuaArgument(**iter, pKnownTables);
-        m_Arguments.push_back(pArgument);
-    }
-
-    if (bKnownTablesCreated)
-        delete pKnownTables;
 }
 
 bool CLuaArguments::ReadArguments(lua_State* luaVM, signed int uiIndexBegin)
@@ -105,68 +111,63 @@ bool CLuaArguments::ReadArguments(lua_State* luaVM, signed int uiIndexBegin)
     return true;
 }
 
-bool CLuaArguments::ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<const void*, CLuaArguments*>* pKnownTables, unsigned int uiDepth)
+bool CLuaArguments::ReadTable(lua_State* luaVM, int iIndexBegin, CFastHashMap<const void*, CLuaArguments*>* pKnownTables)
 {
-    const int iStackTop = lua_gettop(luaVM);
-    if (!LUA_CHECKSTACK(luaVM, 2))
-    {
-        DeleteArguments();
-        return false;
-    }
-
-    bool bKnownTablesCreated = false;
-    if (!pKnownTables)
-    {
-        pKnownTables = new CFastHashMap<const void*, CLuaArguments*>();
-        bKnownTablesCreated = true;
-    }
-
-    const void* pTablePointer = lua_topointer(luaVM, iIndexBegin);
-    pKnownTables->insert(std::make_pair(pTablePointer, this));
-
-    // Delete the previous arguments if any
     DeleteArguments();
+    if (!lua_checkstack(luaVM, 8))
+        return false;
 
-    lua_pushnil(luaVM); /* first key */
-    if (iIndexBegin < 0)
-        iIndexBegin--;
+    const int stackTop = lua_gettop(luaVM);
+    if (iIndexBegin < 0 && iIndexBegin > LUA_REGISTRYINDEX)
+        iIndexBegin += stackTop + 1;
 
-    while (lua_next(luaVM, iIndexBegin) != 0)
+    CFastHashMap<const void*, CLuaArguments*> knownTables;
+    if (!pKnownTables)
+        pKnownTables = &knownTables;
+    pKnownTables->insert({lua_topointer(luaVM, iIndexBegin), this});
+
+    // Anchor pending Lua tables in one table instead of keeping their keys on the Lua stack.
+    lua_newtable(luaVM);
+    const int pendingIndex = lua_gettop(luaVM);
+    lua_pushvalue(luaVM, iIndexBegin);
+    lua_rawseti(luaVM, pendingIndex, 1);
+    std::vector<CLuaArguments*> pending{this};
+    for (size_t next = 0; next < pending.size(); ++next)
     {
-        /* uses 'key' (at index -2) and 'value' (at index -1) */
-        CLuaArgument* pArgument = new CLuaArgument();
-        if (!pArgument->Read(luaVM, -2, pKnownTables, uiDepth + 1))
+        CLuaArguments* table = pending[next];
+        lua_rawgeti(luaVM, pendingIndex, static_cast<int>(next + 1));
+        const int tableIndex = lua_gettop(luaVM);
+        lua_pushnil(luaVM);
+        while (lua_next(luaVM, tableIndex))
         {
-            delete pArgument;
-            lua_settop(luaVM, iStackTop);
-            DeleteArguments();
-            pKnownTables->erase(pTablePointer);
-            if (bKnownTablesCreated)
-                delete pKnownTables;
-            return false;
+            for (int index : {-2, -1})
+            {
+                CLuaArgument* argument = new CLuaArgument();
+                bool          ownsTable = false;
+                if (lua_istable(luaVM, index))
+                {
+                    const void* identity = lua_topointer(luaVM, index);
+                    if (!MapFindRef(*pKnownTables, identity))
+                    {
+                        CLuaArguments* child = new CLuaArguments();
+                        pKnownTables->insert({identity, child});
+                        pending.push_back(child);
+                        lua_pushvalue(luaVM, index);
+                        lua_rawseti(luaVM, pendingIndex, static_cast<int>(pending.size()));
+                        ownsTable = true;
+                    }
+                }
+                // Registered tables are read as references; only their first argument owns them.
+                argument->Read(luaVM, index, pKnownTables);
+                if (ownsTable)
+                    argument->m_bWeakTableRef = false;
+                table->m_Arguments.push_back(argument);
+            }
+            lua_pop(luaVM, 1);
         }
-        m_Arguments.push_back(pArgument);  // push the key first
-
-        pArgument = new CLuaArgument();
-        if (!pArgument->Read(luaVM, -1, pKnownTables, uiDepth + 1))
-        {
-            delete pArgument;
-            lua_settop(luaVM, iStackTop);
-            DeleteArguments();
-            pKnownTables->erase(pTablePointer);
-            if (bKnownTablesCreated)
-                delete pKnownTables;
-            return false;
-        }
-        m_Arguments.push_back(pArgument);  // then the value
-
-        /* removes 'value'; keeps 'key' for next iteration */
         lua_pop(luaVM, 1);
     }
-
-    if (bKnownTablesCreated)
-        delete pKnownTables;
-
+    lua_settop(luaVM, stackTop);
     return true;
 }
 
@@ -192,50 +193,47 @@ void CLuaArguments::PushArguments(lua_State* luaVM) const
     }
 }
 
-void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables) const
+void CLuaArguments::PushAsTable(lua_State* luaVM) const
 {
-    // Ensure there is enough space on the Lua stack
-    LUA_CHECKSTACK(luaVM, 4);
-
-    bool bKnownTablesCreated = false;
-    if (!pKnownTables)
-    {
-        pKnownTables = new CFastHashMap<CLuaArguments*, int>();
-        bKnownTablesCreated = true;
-
-        lua_newtable(luaVM);
-        // using registry to make it fail safe, else we'd have to carry
-        // either lua top or current depth variable between calls
-        lua_setfield(luaVM, LUA_REGISTRYINDEX, "cache");
-    }
-
+    luaL_checkstack(luaVM, 8, "Cannot push Lua table: insufficient stack space");
     lua_newtable(luaVM);
-
-    // push it onto the known tables
-    int size = pKnownTables->size();
-    lua_getfield(luaVM, LUA_REGISTRYINDEX, "cache");
-    lua_pushnumber(luaVM, ++size);
-    lua_pushvalue(luaVM, -3);
-    lua_settable(luaVM, -3);
-    lua_pop(luaVM, 1);
-    pKnownTables->insert(std::make_pair((CLuaArguments*)this, size));
-
-    std::vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
-    for (; iter != m_Arguments.end() && (iter + 1) != m_Arguments.end(); ++iter)
+    const int                               cacheIndex = lua_gettop(luaVM);
+    CFastHashMap<const CLuaArguments*, int> knownTables;
+    std::vector<const CLuaArguments*>       pending;
+    auto                                    pushTable = [&](const CLuaArguments* table)
     {
-        (*iter)->Push(luaVM, pKnownTables);  // index
-        ++iter;
-        (*iter)->Push(luaVM, pKnownTables);  // value
-        lua_settable(luaVM, -3);
-    }
-
-    if (bKnownTablesCreated)
+        if (int* existingId = MapFind(knownTables, table))
+            lua_rawgeti(luaVM, cacheIndex, *existingId);
+        else
+        {
+            pending.push_back(table);
+            const int id = static_cast<int>(pending.size());
+            knownTables.insert({table, id});
+            lua_newtable(luaVM);
+            lua_pushvalue(luaVM, -1);
+            lua_rawseti(luaVM, cacheIndex, id);
+        }
+    };
+    pushTable(this);
+    for (size_t next = 0; next < pending.size(); ++next)
     {
-        // clear the cache
-        lua_pushnil(luaVM);
-        lua_setfield(luaVM, LUA_REGISTRYINDEX, "cache");
-        delete pKnownTables;
+        const CLuaArguments* table = pending[next];
+        lua_rawgeti(luaVM, cacheIndex, static_cast<int>(next + 1));
+        for (size_t index = 0; index + 1 < table->m_Arguments.size(); index += 2)
+        {
+            for (size_t offset = 0; offset < 2; ++offset)
+            {
+                CLuaArgument* argument = table->m_Arguments[index + offset];
+                if (argument->m_iType == LUA_TTABLE && argument->m_pTableData)
+                    pushTable(argument->m_pTableData);
+                else
+                    argument->Push(luaVM);
+            }
+            lua_rawset(luaVM, -3);
+        }
+        lua_pop(luaVM, 1);
     }
+    lua_remove(luaVM, cacheIndex);
 }
 
 void CLuaArguments::PushArguments(const CLuaArguments& Arguments)
@@ -284,7 +282,13 @@ bool CLuaArguments::Call(CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction
         {
             for (int i = -iReturns; i <= -1; i++)
             {
-                returnValues->ReadArgument(luaVM, i);
+                if (!returnValues->ReadArgument(luaVM, i))
+                {
+                    returnValues->DeleteArguments();
+                    lua_settop(luaVM, luaStackPointer);
+                    g_pGame->GetScriptDebugging()->LogError(luaVM, "Cannot read return values: insufficient Lua stack space");
+                    return false;
+                }
             }
         }
 
@@ -348,7 +352,13 @@ bool CLuaArguments::CallGlobal(CLuaMain* pLuaMain, const char* szFunction, CLuaA
         {
             for (int i = -iReturns; i <= -1; i++)
             {
-                returnValues->ReadArgument(luaVM, i);
+                if (!returnValues->ReadArgument(luaVM, i))
+                {
+                    returnValues->DeleteArguments();
+                    lua_settop(luaVM, luaStackPointer);
+                    g_pGame->GetScriptDebugging()->LogError(luaVM, "Cannot read return values: insufficient Lua stack space");
+                    return false;
+                }
             }
         }
 
@@ -513,15 +523,26 @@ CLuaArgument* CLuaArguments::PushDbQuery(CDbJobData* pJobData)
 
 void CLuaArguments::DeleteArguments()
 {
-    // Delete each item
-    vector<CLuaArgument*>::iterator iter = m_Arguments.begin();
-    for (; iter != m_Arguments.end(); ++iter)
+    // Detach owning edges before deleting nodes so argument destructors cannot recurse.
+    std::vector<CLuaArguments*> pending;
+    CLuaArguments*              table = this;
+    for (;;)
     {
-        delete *iter;
+        for (CLuaArgument* argument : table->m_Arguments)
+        {
+            if (argument->m_pTableData && !argument->m_bWeakTableRef)
+                pending.push_back(argument->m_pTableData);
+            argument->m_pTableData = nullptr;
+            delete argument;
+        }
+        table->m_Arguments.clear();
+        if (table != this)
+            delete table;
+        if (pending.empty())
+            break;
+        table = pending.back();
+        pending.pop_back();
     }
-
-    // Clear the vector
-    m_Arguments.clear();
 }
 
 // Gets rid of the last argument in the list
@@ -618,31 +639,43 @@ bool CLuaArguments::ReadFromBitStream(NetBitStreamInterface& bitStream, std::vec
 
 bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables) const
 {
-    bool bKnownTablesCreated = false;
+    CFastHashMap<CLuaArguments*, unsigned long> knownTables;
     if (!pKnownTables)
+        pKnownTables = &knownTables;
+    struct Frame
     {
-        pKnownTables = new CFastHashMap<CLuaArguments*, unsigned long>();
-        bKnownTablesCreated = true;
-    }
-
-    bool bSuccess = true;
-    pKnownTables->insert(make_pair((CLuaArguments*)this, pKnownTables->size()));
-    bitStream.WriteCompressed(static_cast<unsigned int>(m_Arguments.size()));
-
-    vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
-    for (; iter != m_Arguments.end(); ++iter)
+        const CLuaArguments* table;
+        size_t               next = 0;
+    };
+    auto beginTable = [&](const CLuaArguments* table)
     {
-        CLuaArgument* pArgument = *iter;
-        if (!pArgument->WriteToBitStream(bitStream, pKnownTables))
+        pKnownTables->insert({const_cast<CLuaArguments*>(table), static_cast<unsigned long>(pKnownTables->size())});
+        bitStream.WriteCompressed(static_cast<unsigned int>(table->m_Arguments.size()));
+    };
+    bool success = true;
+    beginTable(this);
+    std::vector<Frame> pending{{this}};
+    while (!pending.empty())
+    {
+        Frame& frame = pending.back();
+        if (frame.next == frame.table->m_Arguments.size())
         {
-            bSuccess = false;
+            pending.pop_back();
+            continue;
         }
+        CLuaArgument* argument = frame.table->m_Arguments[frame.next++];
+        if (argument->GetType() == LUA_TTABLE && !MapFind(*pKnownTables, argument->GetTable()))
+        {
+            SLuaTypeSync type;
+            type.data.ucType = LUA_TTABLE;
+            bitStream.Write(&type);
+            beginTable(argument->GetTable());
+            pending.push_back({argument->GetTable()});
+        }
+        else if (!argument->WriteToBitStream(bitStream, pKnownTables))
+            success = false;
     }
-
-    if (bKnownTablesCreated)
-        delete pKnownTables;
-
-    return bSuccess;
+    return success;
 }
 
 bool CLuaArguments::WriteToJSONString(std::string& strJSON, bool bSerialize, int flags)
@@ -650,9 +683,11 @@ bool CLuaArguments::WriteToJSONString(std::string& strJSON, bool bSerialize, int
     json_object* my_array = WriteToJSONArray(bSerialize);
     if (my_array)
     {
-        strJSON = json_object_to_json_string_ext(my_array, flags);
-        json_object_put(my_array);  // dereference - causes a crash, is actually commented out in the example too
-        return true;
+        const char* json = json_object_to_json_string_ext(my_array, flags);
+        if (json)
+            strJSON = json;
+        json_object_put(my_array);
+        return json != nullptr;
     }
     return false;
 }
@@ -679,101 +714,114 @@ json_object* CLuaArguments::WriteToJSONArray(bool bSerialize)
 
 json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap<CLuaArguments*, unsigned long>* pKnownTables)
 {
-    bool bKnownTablesCreated = false;
+    CFastHashMap<CLuaArguments*, unsigned long> knownTables;
     if (!pKnownTables)
-    {
-        pKnownTables = new CFastHashMap<CLuaArguments*, unsigned long>();
-        bKnownTablesCreated = true;
-    }
+        pKnownTables = &knownTables;
 
-    pKnownTables->insert({this, pKnownTables->size()});
-
-    bool                                                 bIsArray = true;
-    std::vector<std::pair<std::uint32_t, CLuaArgument*>> vecSortedArguments;  // lua arrays are not necessarily sorted
-    std::vector<CLuaArgument*>::const_iterator           iter = m_Arguments.begin();
-    for (; iter != m_Arguments.end(); iter += 2)
+    struct Frame
     {
-        CLuaArgument* pArgument = *iter;
-        if (pArgument->GetType() == LUA_TNUMBER)
+        CLuaArguments*                                       table;
+        json_object*                                         object;
+        bool                                                 isArray;
+        std::vector<std::pair<std::uint32_t, CLuaArgument*>> sorted;
+        size_t                                               next = 0;
+    };
+    auto makeFrame = [&](CLuaArguments* table) -> Frame
+    {
+        pKnownTables->insert({table, static_cast<unsigned long>(pKnownTables->size())});
+        bool                                                 bIsArray = true;
+        std::vector<std::pair<std::uint32_t, CLuaArgument*>> vecSortedArguments;  // lua arrays are not necessarily sorted
+        std::vector<CLuaArgument*>::const_iterator           iter = table->m_Arguments.begin();
+        for (; iter != table->m_Arguments.end() && (iter + 1) != table->m_Arguments.end(); iter += 2)
         {
-            double const num = pArgument->GetNumber();
-            auto const   iNum = static_cast<std::uint32_t>(num);
+            CLuaArgument* pArgument = *iter;
+            if (pArgument->GetType() == LUA_TNUMBER)
+            {
+                double const num = pArgument->GetNumber();
+                auto const   iNum = static_cast<std::uint32_t>(num);
 
-            vecSortedArguments.push_back({iNum, *(iter + 1)});
+                vecSortedArguments.push_back({iNum, *(iter + 1)});
+            }
+            else
+            {
+                bIsArray = false;
+                break;
+            }
+        }
+
+        if (bIsArray && !vecSortedArguments.empty())  // the table could possibly be an array
+        {
+            // sort the table based on the keys (already handled correctly by std::pair)
+            std::sort(vecSortedArguments.begin(), vecSortedArguments.end());
+
+            // only the first and last element are checked, everything else is correct by default because the vector was sorted
+            // the last key should match the size of vecSortedArguments to ensure there are no gaps in this array-like table
+            auto const iFirstKey = vecSortedArguments.front().first;
+            auto const iLastKey = vecSortedArguments.back().first;
+
+            auto const iFirstArrayPos = 1U;  // lua arrays are 1 based
+            auto const iLastArrayPos = static_cast<std::uint32_t>(vecSortedArguments.size());
+
+            if (iFirstKey != iFirstArrayPos || iLastKey != iLastArrayPos)
+            {
+                bIsArray = false;
+            }
+        }
+
+        return {table, bIsArray ? json_object_new_array() : json_object_new_object(), bIsArray, std::move(vecSortedArguments)};
+    };
+
+    std::vector<Frame> pending;
+    pending.push_back(makeFrame(this));
+    json_object* result = pending.back().object;
+    // Depth-first order preserves the existing JSON table-reference numbers.
+    while (!pending.empty())
+    {
+        Frame&        frame = pending.back();
+        CLuaArgument* argument;
+        char          key[255] = {};
+        if (frame.isArray)
+        {
+            if (frame.next == frame.sorted.size())
+            {
+                pending.pop_back();
+                continue;
+            }
+            argument = frame.sorted[frame.next++].second;
         }
         else
         {
-            bIsArray = false;
-            break;
-        }
-    }
-
-    if (bIsArray && !vecSortedArguments.empty())  // the table could possibly be an array
-    {
-        // sort the table based on the keys (already handled correctly by std::pair)
-        std::sort(vecSortedArguments.begin(), vecSortedArguments.end());
-
-        // only the first and last element are checked, everything else is correct by default because the vector was sorted
-        // the last key should match the size of vecSortedArguments to ensure there are no gaps in this array-like table
-        auto const iFirstKey = vecSortedArguments.front().first;
-        auto const iLastKey = vecSortedArguments.back().first;
-
-        auto const iFirstArrayPos = 1U;  // lua arrays are 1 based
-        auto const iLastArrayPos = static_cast<std::uint32_t>(vecSortedArguments.size());
-
-        if (iFirstKey != iFirstArrayPos || iLastKey != iLastArrayPos)
-        {
-            bIsArray = false;
-        }
-    }
-
-    if (bIsArray)  // the table is definitely an array
-    {
-        json_object* my_array = json_object_new_array();
-        for (auto const& [iKey, pArgument] : vecSortedArguments)
-        {
-            json_object* object = pArgument->WriteToJSONObject(bSerialize, pKnownTables);
-            if (object)
+            if (frame.next + 1 >= frame.table->m_Arguments.size() || !frame.table->m_Arguments[frame.next]->WriteToString(key, sizeof(key)))
             {
-                json_object_array_add(my_array, object);
+                pending.pop_back();
+                continue;
             }
+            argument = frame.table->m_Arguments[frame.next + 1];
+            frame.next += 2;
+        }
+
+        const bool newTable = argument->GetType() == LUA_TTABLE && !MapFind(*pKnownTables, argument->GetTable());
+        if (newTable)
+        {
+            Frame child = makeFrame(argument->GetTable());
+            if (frame.isArray)
+                json_object_array_add(frame.object, child.object);
             else
-            {
-                break;
-            }
+                json_object_object_add(frame.object, key, child.object);
+            pending.push_back(std::move(child));
         }
-        if (bKnownTablesCreated)
-            delete pKnownTables;
-        return my_array;
-    }
-    else
-    {
-        json_object* my_object = json_object_new_object();
-        iter = m_Arguments.begin();
-        for (; iter != m_Arguments.end(); ++iter)
+        else
         {
-            char szKey[255];
-            szKey[0] = '\0';
-            CLuaArgument* pArgument = *iter;
-            if (!pArgument->WriteToString(szKey, 255))  // index
-                break;
-            ++iter;
-            pArgument = *iter;
-            json_object* object = pArgument->WriteToJSONObject(bSerialize, pKnownTables);  // value
-
-            if (object)
-            {
-                json_object_object_add(my_object, szKey, object);
-            }
+            json_object* object = argument->WriteToJSONObject(bSerialize, pKnownTables);
+            if (!object)
+                pending.pop_back();
+            else if (frame.isArray)
+                json_object_array_add(frame.object, object);
             else
-            {
-                break;
-            }
+                json_object_object_add(frame.object, key, object);
         }
-        if (bKnownTablesCreated)
-            delete pKnownTables;
-        return my_object;
     }
+    return result;
 }
 
 bool CLuaArguments::ReadFromJSONString(const char* szJSON)
@@ -909,17 +957,40 @@ bool CLuaArguments::ReadFromJSONArray(json_object* object, std::vector<CLuaArgum
 
 bool CLuaArguments::IsEqualTo(const CLuaArguments& compareTo, std::set<const CLuaArguments*>* knownTables) const
 {
-    if (m_Arguments.size() != compareTo.m_Arguments.size())
-        return false;
-
-    if (knownTables != nullptr)
+    std::set<const CLuaArguments*> visited;
+    if (!knownTables)
+        knownTables = &visited;
+    struct Frame
     {
-        if (knownTables->find(&compareTo) != knownTables->end())
-            return true;
-
-        knownTables->insert(&compareTo);
+        const CLuaArguments* left;
+        const CLuaArguments* right;
+        size_t               next = 0;
+    };
+    std::vector<Frame> pending{{this, &compareTo}};
+    while (!pending.empty())
+    {
+        Frame& frame = pending.back();
+        if (frame.next == 0)
+        {
+            if (frame.left->m_Arguments.size() != frame.right->m_Arguments.size())
+                return false;
+            if (!knownTables->insert(frame.right).second)
+            {
+                pending.pop_back();
+                continue;
+            }
+        }
+        if (frame.next == frame.left->m_Arguments.size())
+        {
+            pending.pop_back();
+            continue;
+        }
+        const CLuaArgument* left = frame.left->m_Arguments[frame.next];
+        const CLuaArgument* right = frame.right->m_Arguments[frame.next++];
+        if (left->GetType() == LUA_TTABLE && right->GetType() == LUA_TTABLE)
+            pending.push_back({left->GetTable(), right->GetTable()});
+        else if (!left->IsEqualTo(*right, knownTables))
+            return false;
     }
-
-    return std::equal(std::begin(m_Arguments), std::end(m_Arguments), std::begin(compareTo.m_Arguments),
-                      [knownTables](const CLuaArgument* lhs, const CLuaArgument* rhs) { return lhs->IsEqualTo(*rhs, knownTables); });
+    return true;
 }

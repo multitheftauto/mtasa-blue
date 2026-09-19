@@ -452,7 +452,7 @@ int CLuaUtilDefs::toJSON(lua_State* luaVM)
         CLuaArguments JSON;
         if (!JSON.ReadArgument(luaVM, 1))
         {
-            argStream.SetCustomError("Lua table nesting depth exceeds the supported limit");
+            argStream.SetCustomError("Insufficient Lua stack space to read table");
             m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
             lua_pushnil(luaVM);
             return 1;

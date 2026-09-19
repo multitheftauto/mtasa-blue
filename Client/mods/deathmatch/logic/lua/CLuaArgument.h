@@ -38,7 +38,7 @@ public:
     bool                operator==(const CLuaArgument& Argument);
     bool                operator!=(const CLuaArgument& Argument);
 
-    bool Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
+    bool Read(lua_State* luaVM, int iArgument, CFastHashMap<const void*, CLuaArguments*>* pKnownTables = NULL);
     void ReadBool(bool bBool);
     void ReadNumber(double dNumber);
     void ReadString(const std::string& string);
@@ -50,7 +50,7 @@ public:
     void ReadElementID(ElementID ID);
     void ReadTable(class CLuaArguments* table);
 
-    void Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables = NULL) const;
+    void Push(lua_State* luaVM) const;
 
     int GetType() const { return m_iType; };
     int GetIndex() const { return m_iIndex; };
@@ -111,6 +111,8 @@ public:
     }
 
 private:
+    friend class CLuaArguments;
+
     void LogUnableToPacketize(const char* szMessage) const;
 
     int            m_iType;

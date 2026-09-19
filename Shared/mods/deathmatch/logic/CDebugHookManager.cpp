@@ -276,7 +276,8 @@ bool CDebugHookManager::OnPreFunction(lua_CFunction f, lua_State* luaVM, bool bA
         return true;
 
     CLuaArguments NewArguments;
-    GetFunctionCallHookArguments(NewArguments, strName, luaVM, bAllowed);
+    if (!GetFunctionCallHookArguments(NewArguments, strName, luaVM, bAllowed))
+        return false;
 
     return CallHook(strName, m_PreFunctionHookList, NewArguments, bNameMustBeExplicitlyAllowed);
 }
@@ -307,7 +308,8 @@ void CDebugHookManager::OnPostFunction(lua_CFunction f, lua_State* luaVM)
         return;
 
     CLuaArguments NewArguments;
-    GetFunctionCallHookArguments(NewArguments, strName, luaVM, true);
+    if (!GetFunctionCallHookArguments(NewArguments, strName, luaVM, true))
+        return;
 
     CallHook(strName, m_PostFunctionHookList, NewArguments, bNameMustBeExplicitlyAllowed);
 }
@@ -319,7 +321,7 @@ void CDebugHookManager::OnPostFunction(lua_CFunction f, lua_State* luaVM)
 // Get call hook arguments for OnPre/PostFunction
 //
 ///////////////////////////////////////////////////////////////
-void CDebugHookManager::GetFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, lua_State* luaVM, bool bAllowed)
+bool CDebugHookManager::GetFunctionCallHookArguments(CLuaArguments& NewArguments, const SString& strName, lua_State* luaVM, bool bAllowed)
 {
     // Get file/line number
     const char* szFilename = "";
@@ -340,9 +342,14 @@ void CDebugHookManager::GetFunctionCallHookArguments(CLuaArguments& NewArguments
     NewArguments.PushNumber(iLineNumber);
 
     CLuaArguments FunctionArguments;
-    FunctionArguments.ReadArguments(luaVM);
+    if (!FunctionArguments.ReadArguments(luaVM))
+    {
+        g_pGame->GetScriptDebugging()->LogError(luaVM, "Cannot read debug hook arguments: insufficient Lua stack space");
+        return false;
+    }
     MaybeMaskArgumentValues(strName, FunctionArguments);
     NewArguments.PushArguments(FunctionArguments);
+    return true;
 }
 
 ///////////////////////////////////////////////////////////////

@@ -959,7 +959,7 @@ public:
     {
         const int iArgumentCount = lua_gettop(m_luaVM) - m_iIndex + 1;
         if (!outValue.ReadArguments(m_luaVM, m_iIndex))
-            SetCustomError("Lua table nesting depth exceeds the supported limit");
+            SetCustomError("Insufficient Lua stack space to read table");
         m_iIndex += iArgumentCount;
     }
 
@@ -972,7 +972,7 @@ public:
         if (iArgument != LUA_TNONE)
         {
             if (!outValue.Read(m_luaVM, m_iIndex++))
-                SetCustomError("Lua table nesting depth exceeds the supported limit");
+                SetCustomError("Insufficient Lua stack space to read table");
             return;
         }
 
@@ -1029,7 +1029,7 @@ public:
                 {
                     lua_settop(m_luaVM, iStackTop);
                     outLuaArguments.DeleteArguments();
-                    SetCustomError("Lua table nesting depth exceeds the supported limit");
+                    SetCustomError("Insufficient Lua stack space to read table");
                     m_iIndex++;
                     return;
                 }

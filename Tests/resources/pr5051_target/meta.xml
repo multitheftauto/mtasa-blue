@@ -1,0 +1,12 @@
+<meta>
+    <info name="PR 5051 export probe" type="script" />
+    <script src="target.lua" type="shared" cache="false" />
+    <export function="countArgs" type="client" />
+    <export function="countArgs" type="server" />
+    <export function="deepReturn" type="client" />
+    <export function="deepReturn" type="server" />
+    <export function="checkReferences" type="client" />
+    <export function="checkReferences" type="server" />
+    <export function="echo" type="client" />
+    <export function="echo" type="server" />
+</meta>
