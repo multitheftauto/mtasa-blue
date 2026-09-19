@@ -854,6 +854,87 @@ static void __declspec(naked) HOOK_CrashFix_Misc20()
 }
 
 ////////////////////////////////////////////////////////////////////////
+// CMatrix::UpdateRwMatrix
+//
+// Prevent crash 0x59AD76 when an unaligned or invalid RwMatrix* is passed
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_CMatrix__UpdateRwMatrix  0x59AD70
+#define HOOKSIZE_CrashFix_CMatrix__UpdateRwMatrix 6
+static const DWORD            RETURN_CrashFix_CMatrix__UpdateRwMatrix = 0x59AD76;
+static void __declspec(naked) HOOK_CrashFix_CMatrix__UpdateRwMatrix()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+4]    // m (RwMatrix*)
+        test    eax, eax
+        jz      invalid_matrix
+
+        test    al, 3           // RwMatrix must be at least 4-byte aligned (RenderWare matrices are 16-byte aligned)
+        jnz     invalid_matrix
+
+        cmp     eax, 10000h     // Guard against low/unmapped page addresses
+        jb      invalid_matrix
+
+        // Valid pointer: restore overwritten instructions and continue normal path
+        mov     edx, [ecx]      // this->mat.right.x
+        jmp     RETURN_CrashFix_CMatrix__UpdateRwMatrix
+
+    invalid_matrix:
+        push    20
+        call    CrashAverted
+        xor     eax, eax
+        retn    4
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CPlaceable::AllocateMatrix
+//
+// Zero out m_pAttachMatrix and m_bOwnsAttachedMatrix on newly allocated CMatrixLink
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_AllocateMatrix_Init1  0x54F5A6
+#define HOOKSIZE_CrashFix_AllocateMatrix_Init1 8
+static void __declspec(naked) HOOK_CrashFix_AllocateMatrix_Init1()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     [eax+48h], esi              // m_pOwner = this
+        mov     [esi+14h], eax              // this->m_pMatrix = eax
+        mov     dword ptr [eax+40h], 0      // m_pAttachMatrix = nullptr
+        mov     byte ptr [eax+44h], 0       // m_bOwnsAttachedMatrix = false
+        pop     esi
+        retn
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_CrashFix_AllocateMatrix_Init2  0x54F5C5
+#define HOOKSIZE_CrashFix_AllocateMatrix_Init2 8
+static void __declspec(naked) HOOK_CrashFix_AllocateMatrix_Init2()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     [eax+48h], esi              // m_pOwner = this
+        mov     [esi+14h], eax              // this->m_pMatrix = eax
+        mov     dword ptr [eax+40h], 0      // m_pAttachMatrix = nullptr
+        mov     byte ptr [eax+44h], 0       // m_bOwnsAttachedMatrix = false
+        pop     esi
+        retn
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
 // CTaskSimpleCarFallOut::FinishAnimFallOutCB
 //
 // Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
@@ -4094,6 +4175,71 @@ static int _cdecl CFileLoader_LoadVehicleObject_sscanf(const char* s, const char
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// Crash at 0x732B2A in CVisibilityPlugins::GetClumpAlpha
+//
+// Root cause: In GTA:SA, CVisibilityPlugins::GetClumpAlpha (0x732B20) and SetClumpAlpha
+// (0x732B00) read/write directly at [ecx+eax+4] where ecx is ms_clumpPluginOffset (0x34)
+// and eax is RpClump*. When called on an entity with null m_pRwObject (e.g. during vehicle,
+// ped, or object creation, destruction, streaming, or rendering), eax is nullptr, causing
+// an access violation at 0x00000038.
+//
+// Fix: Hook both functions to check for null RpClump*. If null, GetClumpAlpha safely returns
+// 0xFF (255, fully opaque) and SetClumpAlpha returns immediately without memory access.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CVisibilityPlugins_GetClumpAlpha   0x732B20
+#define HOOKSIZE_CVisibilityPlugins_GetClumpAlpha  5
+#define HOOKCHECK_CVisibilityPlugins_GetClumpAlpha 0x8B
+
+static void __declspec(naked) HOOK_CVisibilityPlugins_GetClumpAlpha()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+4]
+        test    eax, eax
+        jz      null_clump
+
+        mov     ecx, ds:[0x8D6094]
+        mov     eax, [ecx+eax+4]
+        retn
+
+    null_clump:
+        mov     eax, 0xFF
+        retn
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_CVisibilityPlugins_SetClumpAlpha   0x732B00
+#define HOOKSIZE_CVisibilityPlugins_SetClumpAlpha  5
+#define HOOKCHECK_CVisibilityPlugins_SetClumpAlpha 0x8B
+
+static void __declspec(naked) HOOK_CVisibilityPlugins_SetClumpAlpha()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     ecx, [esp+4]
+        test    ecx, ecx
+        jz      null_clump
+
+        mov     eax, [esp+8]
+        mov     edx, ds:[0x8D6094]
+        mov     [edx+ecx+4], eax
+
+    null_clump:
+        retn
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 ////////////////////////////////////////////////////////////////////////
@@ -4116,8 +4262,10 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc16);
     // EZHookInstall ( CrashFix_Misc17 );
     EZHookInstall(CrashFix_Misc18);
-    // EZHookInstall ( CrashFix_Misc19 );
     EZHookInstall(CrashFix_Misc20);
+    EZHookInstall(CrashFix_CMatrix__UpdateRwMatrix);
+    EZHookInstall(CrashFix_AllocateMatrix_Init1);
+    EZHookInstall(CrashFix_AllocateMatrix_Init2);
     EZHookInstall(CrashFix_Misc21);
     EZHookInstall(CrashFix_Misc22);
     EZHookInstall(CrashFix_Misc23);
@@ -4180,6 +4328,8 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CStreaming__GetNextFileOnCd_NullTxdDef);
     EZHookInstallChecked(CStreaming__ConvertBufferToObject_NullTxdDef);
     EZHookInstallChecked(CEventScanner__ScanForEvents_ContactEntity);
+    EZHookInstallChecked(CVisibilityPlugins_GetClumpAlpha);
+    EZHookInstallChecked(CVisibilityPlugins_SetClumpAlpha);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
