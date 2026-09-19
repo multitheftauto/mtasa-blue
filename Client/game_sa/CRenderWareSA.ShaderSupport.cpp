@@ -114,6 +114,11 @@ static void __declspec(naked) HOOK_CTxdStore_SetupTxdParent()
 __declspec(noinline) void _cdecl OnStreamingRemoveTxd(DWORD dwTxdId)
 {
     ushort usTxdId = (ushort)dwTxdId - pGame->GetBaseIDforTXD();
+
+    // Fix #4028: Notify the texture replacement subsystem immediately that GTA streaming is destroying this TXD.
+    // This invalidates cached pointers in ms_ModelTexturesInfoMap so subsequent operations do not dereference freed memory.
+    CRenderWareSA::NotifyTxdDestroyed(usTxdId);
+
     // Ensure there are no previous events for this txd
     ms_txdStreamEventList.remove(STxdStreamEvent(true, usTxdId));
     ms_txdStreamEventList.remove(STxdStreamEvent(false, usTxdId));

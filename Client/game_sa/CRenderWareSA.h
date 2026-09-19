@@ -132,6 +132,7 @@ public:
     static bool  RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex);
     static short CTxdStore_GetTxdRefcount(unsigned short usTxdID);
     static bool  StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture*>* pTextureList);
+    static void  NotifyTxdDestroyed(ushort usTxdId);
 
     void      InitTextureWatchHooks();
     void      StreamingAddedTexture(ushort usTxdId, const SString& strTextureName, CD3DDUMMY* pD3DData);

@@ -28,6 +28,27 @@ std::map<ushort, CModelTexturesInfo> ms_ModelTexturesInfoMap;
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::NotifyTxdDestroyed
+//
+// Motivation: Fix #4028 (Hard-hitting crash in RwTexDictionaryRemoveTexture).
+// When a TXD dictionary is destroyed by GTA streaming or TxdForceUnload, RenderWare
+// automatically frees the dictionary and all textures attached to it.
+// We must notify the model texture replacement system so ms_ModelTexturesInfoMap
+// doesn't retain dangling pointers to the deallocated RwTexDictionary or its textures.
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::NotifyTxdDestroyed(ushort usTxdId)
+{
+    CModelTexturesInfo* pInfo = MapFind(ms_ModelTexturesInfoMap, usTxdId);
+    if (pInfo)
+    {
+        pInfo->pTxd = nullptr;
+        pInfo->originalTextures.clear();
+    }
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::GetModelTexturesInfo
 //
 // Find/create texture info for a modelid
@@ -42,7 +63,10 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
     ushort usTxdId = pModelInfo->GetTextureDictionaryID();
 
     CModelTexturesInfo* pInfo = MapFind(ms_ModelTexturesInfoMap, usTxdId);
-    if (!pInfo)
+    // Fix #4028: If pInfo exists but pInfo->pTxd was destroyed/unloaded, we must re-acquire
+    // a valid TXD from CTxdStore or request it from the streaming engine rather than using
+    // a stale nullptr or dangling pointer.
+    if (!pInfo || !pInfo->pTxd)
     {
         // Get txd
         RwTexDictionary* pTxd = CTxdStore_GetTxd(usTxdId);
@@ -68,13 +92,17 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
         if (!pTxd)
             return NULL;
 
-        // Add new info
-        MapSet(ms_ModelTexturesInfoMap, usTxdId, CModelTexturesInfo());
-        pInfo = MapFind(ms_ModelTexturesInfoMap, usTxdId);
+        // Add new info or reuse existing info slot if it was previously invalidated
+        if (!pInfo)
+        {
+            MapSet(ms_ModelTexturesInfoMap, usTxdId, CModelTexturesInfo());
+            pInfo = MapFind(ms_ModelTexturesInfoMap, usTxdId);
+        }
         pInfo->usTxdId = usTxdId;
         pInfo->pTxd = pTxd;
 
         // Save original textures
+        pInfo->originalTextures.clear();
         GetTxdTextures(pInfo->originalTextures, pInfo->pTxd);
     }
 
@@ -222,30 +250,70 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         ushort              usTxdId = perTxdInfo.usTxdId;
         CModelTexturesInfo* pInfo = MapFind(ms_ModelTexturesInfoMap, usTxdId);
 
-        // Validate
-        dassert(MapFind(ms_ModelTexturesInfoMap, usTxdId));
+        // Fix #4028: In release builds, dassert does not halt execution.
+        // If pInfo is null, continuing prevents a crash dereferencing null.
+        if (!pInfo)
+            continue;
+
         dassert(ListContains(pInfo->usedByReplacements, pReplacementTextures));
 
-        // Remove replacement textures
-        for (uint i = 0; i < perTxdInfo.usingTextures.size(); i++)
+        // Fix #4028: Check if the TXD pointer is still valid and loaded in CTxdStore.
+        // If GTA streaming or TxdForceUnload unloaded this TXD, RwTexDictionaryDestroy
+        // was already called by the engine, meaning the dictionary and all textures inside
+        // it have already been deallocated.
+        RwTexDictionary* pCurrentTxd = CTxdStore_GetTxd(usTxdId);
+        bool bTxdValid = (pInfo->pTxd != nullptr) &&
+                         (pCurrentTxd == pInfo->pTxd) &&
+                         SharedUtil::IsReadablePointer(pInfo->pTxd, sizeof(RwTexDictionary));
+
+        // If the dictionary is alive and valid, take a snapshot of its current active textures.
+        std::vector<RwTexture*> liveTextures;
+        if (bTxdValid)
         {
-            RwTexture* pOldTexture = perTxdInfo.usingTextures[i];
-            RwTexDictionaryRemoveTexture(pInfo->pTxd, pOldTexture);
-            dassert(!RwTexDictionaryContainsTexture(pInfo->pTxd, pOldTexture));
-            if (perTxdInfo.bTexturesAreCopies)
-            {
-                // Destroy the copy (but not the raster as that was not copied)
-                pOldTexture->raster = NULL;
-                RwTextureDestroy(pOldTexture);
-            }
+            GetTxdTextures(liveTextures, pInfo->pTxd);
         }
 
-        // Ensure there are original named textures in the txd
-        for (uint i = 0; i < pInfo->originalTextures.size(); i++)
+        // Remove replacement textures
+        for (uint j = 0; j < perTxdInfo.usingTextures.size(); j++)
         {
-            RwTexture* pOriginalTexture = pInfo->originalTextures[i];
-            if (!RwTexDictionaryFindNamedTexture(pInfo->pTxd, pOriginalTexture->name))
-                RwTexDictionaryAddTexture(pInfo->pTxd, pOriginalTexture);
+            RwTexture* pOldTexture = perTxdInfo.usingTextures[j];
+
+            // Fix #4028: Only remove the texture from the dictionary if the dictionary is alive
+            // and the texture actually exists within it. If the TXD was already destroyed, its textures
+            // were already freed, and calling RwTexDictionaryRemoveTexture will crash with an AV (0xC0000005)
+            // when accessing deallocated memory (pTex->txd).
+            if (bTxdValid && pOldTexture && ListContains(liveTextures, pOldTexture))
+            {
+                RwTexDictionaryRemoveTexture(pInfo->pTxd, pOldTexture);
+                dassert(!RwTexDictionaryContainsTexture(pInfo->pTxd, pOldTexture));
+                if (perTxdInfo.bTexturesAreCopies)
+                {
+                    // Destroy the copy (but not the raster as that was not copied)
+                    pOldTexture->raster = NULL;
+                    RwTextureDestroy(pOldTexture);
+                }
+            }
+            else if (perTxdInfo.bTexturesAreCopies && !bTxdValid)
+            {
+                // When the dictionary was destroyed, RenderWare's RwTexDictionaryDestroy iterated
+                // through all textures in the dictionary and called RwTextureDestroy. Therefore,
+                // the copy has already been freed and attempting to destroy it again would cause a crash / double free.
+            }
+        }
+        perTxdInfo.usingTextures.clear();
+
+        // Ensure there are original named textures in the txd (only if TXD is still alive)
+        if (bTxdValid)
+        {
+            for (uint j = 0; j < pInfo->originalTextures.size(); j++)
+            {
+                RwTexture* pOriginalTexture = pInfo->originalTextures[j];
+                if (pOriginalTexture && SharedUtil::IsReadablePointer(pOriginalTexture, sizeof(RwTexture)))
+                {
+                    if (!RwTexDictionaryFindNamedTexture(pInfo->pTxd, pOriginalTexture->name))
+                        RwTexDictionaryAddTexture(pInfo->pTxd, pOriginalTexture);
+                }
+            }
         }
 
         // Remove refs
@@ -254,24 +322,27 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         // If no refs left, check original state and then remove info
         if (pInfo->usedByReplacements.empty())
         {
-            // txd should now contain the same textures as 'originalTextures'
-#ifdef MTA_DEBUG
-            std::vector<RwTexture*> currentTextures;
-            GetTxdTextures(currentTextures, pInfo->pTxd);
-            assert(currentTextures.size() == pInfo->originalTextures.size());
-            for (uint i = 0; i < pInfo->originalTextures.size(); i++)
+            if (bTxdValid)
             {
-                RwTexture* pOriginalTexture = pInfo->originalTextures[i];
-                assert(ListContains(currentTextures, pOriginalTexture));
-                ListRemove(currentTextures, pOriginalTexture);
-            }
-            assert(currentTextures.empty());
+#ifdef MTA_DEBUG
+                std::vector<RwTexture*> currentTextures;
+                GetTxdTextures(currentTextures, pInfo->pTxd);
+                assert(currentTextures.size() == pInfo->originalTextures.size());
+                for (uint j = 0; j < pInfo->originalTextures.size(); j++)
+                {
+                    RwTexture* pOriginalTexture = pInfo->originalTextures[j];
+                    assert(ListContains(currentTextures, pOriginalTexture));
+                    ListRemove(currentTextures, pOriginalTexture);
+                }
+                assert(currentTextures.empty());
 
-            int32_t refsCount = CTxdStore_GetNumRefs(pInfo->usTxdId);
-            assert(refsCount > 0 && "Should have at least one TXD reference here");
+                int32_t refsCount = CTxdStore_GetNumRefs(pInfo->usTxdId);
+                assert(refsCount > 0 && "Should have at least one TXD reference here");
 #endif
-            // Remove info
-            CTxdStore_RemoveRef(pInfo->usTxdId);
+                // Remove ref from CTxdStore only if it's still alive
+                CTxdStore_RemoveRef(pInfo->usTxdId);
+            }
+            // Remove info from map
             MapRemove(ms_ModelTexturesInfoMap, usTxdId);
         }
     }
