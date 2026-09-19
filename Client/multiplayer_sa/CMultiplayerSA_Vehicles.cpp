@@ -64,6 +64,52 @@ static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CVehicleModelInfo::SetEditableMaterials / ResetEditableMaterials
+//
+// Every material repainted for a vehicle is saved in a restore list that is replayed after
+// rendering. GTA's list at 0xB4DBE8 holds 256 entries without a bounds check and is directly
+// followed by ms_lightsOn and ms_currentCol, so vehicle models with enough editable materials
+// overwrote the colour slot indices mid-pass and the remaining materials were painted with
+// random colours. Use a larger list and skip atomics whose materials would no longer fit.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// SetEditableMaterials
+//     0x4C843A | 68 E0 83 4C 00             | push    offset SetEditableMaterialsAtomicCB
+//     0x4C8440 | C7 44 24 0C E8 DB B4 00    | mov     [esp+0Ch], offset gRestoreEntries
+// ResetEditableMaterials
+//     0x4C8460 | 8B 0D E8 DB B4 00          | mov     ecx, [gRestoreEntries]
+//     0x4C8468 | B8 E8 DB B4 00             | mov     eax, offset gRestoreEntries
+#define FUNC_SetEditableMaterialsAtomicCB 0x4C83E0
+
+namespace
+{
+    struct SMaterialRestoreEntry
+    {
+        void* pAddress;
+        DWORD dwValue;
+    };
+
+    // Alpha pass, then either remap texture + colour or lights colour + texture + lighting
+    constexpr std::size_t MAX_RESTORE_ENTRIES_PER_MATERIAL = 4;
+
+    SMaterialRestoreEntry materialRestoreEntries[4096];
+}  // namespace
+
+static RpAtomic* __cdecl SetEditableMaterialsAtomicCB(RpAtomic* atomic, void* data)
+{
+    const SMaterialRestoreEntry* nextEntry = *static_cast<SMaterialRestoreEntry**>(data);
+    const std::size_t            entriesLeft = static_cast<std::size_t>(std::end(materialRestoreEntries) - nextEntry);
+    const RpGeometry*            geometry = atomic->geometry;
+
+    // Keep one entry free for the terminator written by SetEditableMaterials
+    if (!geometry || entriesLeft <= static_cast<std::size_t>(geometry->materials.entries) * MAX_RESTORE_ENTRIES_PER_MATERIAL)
+        return atomic;
+
+    return reinterpret_cast<RpAtomic*(__cdecl*)(RpAtomic*, void*)>(FUNC_SetEditableMaterialsAtomicCB)(atomic, data);
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::InitHooks_Vehicles
 //
 // Setup hooks
@@ -72,4 +118,9 @@ static void __declspec(naked) HOOK_CDamageManager__ProgressDoorDamage()
 void CMultiplayerSA::InitHooks_Vehicles()
 {
     EZHookInstall(CDamageManager__ProgressDoorDamage);
+
+    MemPut<DWORD>(0x4C843A + 1, (DWORD)&SetEditableMaterialsAtomicCB);
+    MemPut<DWORD>(0x4C8440 + 4, (DWORD)materialRestoreEntries);
+    MemPut<DWORD>(0x4C8460 + 2, (DWORD)materialRestoreEntries);
+    MemPut<DWORD>(0x4C8468 + 1, (DWORD)materialRestoreEntries);
 }
