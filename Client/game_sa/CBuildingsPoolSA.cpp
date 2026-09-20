@@ -324,16 +324,27 @@ void CBuildingsPoolSA::PurgeStaleSectorEntries(void* oldPool, int poolSize)
 
 bool CBuildingsPoolSA::Resize(int size)
 {
+    if (size <= 0 || static_cast<size_t>(size) > MAX_CAPACITY)
+        return false;
+
     auto*     pool = (*m_ppBuildingPoolInterface);
     const int currentSize = pool->m_nSize;
 
     const bool skipLinkSweeps = m_bLinkSweepsDone;
     m_bLinkSweepsDone = false;
 
-    // Nothing below may throw or overflow: RemoveGameWorld already ran, and only a plain false
-    // return lets SetBuildingPoolSize put the untouched world back
-    if (size <= 0 || static_cast<size_t>(size) > MAX_CAPACITY)
+    // Allocate before touching the old pool: on failure it stays intact and RestoreBackup puts
+    // every building back at its old address, so nothing that points into it needs fixing
+    CBuildingSAInterface* newObjects = MemSA::malloc_struct<CBuildingSAInterface>(size);
+    if (!newObjects)
         return false;
+
+    tPoolObjectFlags* newBytemap = MemSA::malloc_struct<tPoolObjectFlags>(size);
+    if (!newBytemap)
+    {
+        MemSA::free(newObjects);
+        return false;
+    }
 
     try
     {
@@ -341,18 +352,13 @@ bool CBuildingsPoolSA::Resize(int size)
     }
     catch (const std::bad_alloc&)
     {
+        MemSA::free(newBytemap);
+        MemSA::free(newObjects);
         return false;
     }
-
-    // Allocate before touching the old pool: on failure it stays intact and RestoreBackup puts
-    // every building back at its old address, so nothing that points into it needs fixing
-    CBuildingSAInterface* newObjects = MemSA::malloc_struct<CBuildingSAInterface>(size);
-    if (newObjects == nullptr)
-        return false;
-
-    tPoolObjectFlags* newBytemap = MemSA::malloc_struct<tPoolObjectFlags>(size);
-    if (newBytemap == nullptr)
+    catch (const std::length_error&)
     {
+        MemSA::free(newBytemap);
         MemSA::free(newObjects);
         return false;
     }

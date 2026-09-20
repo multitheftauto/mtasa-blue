@@ -18,7 +18,9 @@
 #include <game/RenderWareD3D.h>
 #include "CColModelSA.h"
 #include "CFileLoaderSA.h"
+#include "CAnimManagerSA.h"
 #include "CGameSA.h"
+#include "CModelInfoSA.h"
 #include "CRenderWareSA.h"
 #include "CRenderWareSA.ShaderMatching.h"
 #include "gamesa_renderware.h"
@@ -420,6 +422,14 @@ bool CRenderWareSA::ReplaceModel(RpClump* pNew, unsigned short usModelID, DWORD 
             CBaseModelInfoSAInterface* pModelInfoInterface = pModelInfo->GetInterface();
             CBaseModelInfo_SetClump(pModelInfoInterface, pNewClone);
             RpClumpDestroy(pOldClump);
+
+            // SetClump took a reference on the TXD and the anim block for the new clump. The old clump took the
+            // same ones when it was set and only DeleteRwObject gives them back, so return them here
+            CTxdStore_RemoveRef(pModelInfoInterface->usTextureDictionary);
+
+            const uint uiAnimFileIndex = static_cast<CModelInfoSA*>(pModelInfo)->GetAnimFileIndex();
+            if (uiAnimFileIndex != 0xffffffff)
+                pGame->GetAnimManager()->RemoveAnimBlockRef(uiAnimFileIndex);
         }
     }
 

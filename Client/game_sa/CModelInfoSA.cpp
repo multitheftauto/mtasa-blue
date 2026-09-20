@@ -1134,7 +1134,7 @@ int CModelInfoSA::GetRefCount()
     return static_cast<int>(m_dwReferences);
 }
 
-void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
+void CModelInfoSA::RemoveRef()
 {
     // Decrement the references
     if (m_dwReferences > 0)
@@ -1144,24 +1144,6 @@ void CModelInfoSA::RemoveRef(bool bRemoveExtraGTARef)
     {
         m_dwPendingInterfaceRef = 0;
         return;
-    }
-
-    // Handle extra ref if requested
-    if (bRemoveExtraGTARef)
-    {
-        // Remove ref added by GTA.
-        if (m_pInterface->usNumberOfRefs > 1)
-        {
-            DWORD                      dwFunction = FUNC_RemoveRef;
-            CBaseModelInfoSAInterface* pInterface = m_pInterface;
-            // clang-format off
-            __asm
-            {
-                mov     ecx, pInterface
-                call    dwFunction
-            }
-            // clang-format on
-        }
     }
 
     // Unload it if 0 references left and we're not CJ model.
