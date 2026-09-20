@@ -23,12 +23,13 @@ private:
     static std::variant<CClientRadarMarker*, bool> CreateBlip(lua_State* luaVM, const CVector vecPosition, std::optional<std::uint8_t> icon,
                                                               std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g,
                                                               std::optional<std::uint8_t> b, std::optional<std::uint8_t> a,
-                                                              std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance);
+                                                              std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance,
+                                                              std::optional<bool> shortRange);
     static std::variant<CClientRadarMarker*, bool> CreateBlipAttachedTo(lua_State* luaVM, CClientEntity* entity, std::optional<std::uint8_t> icon,
                                                                         std::optional<std::uint8_t> size, std::optional<std::uint8_t> r,
                                                                         std::optional<std::uint8_t> g, std::optional<std::uint8_t> b,
                                                                         std::optional<std::uint8_t> a, std::optional<std::int16_t> ordering,
-                                                                        std::optional<std::uint16_t> visibleDistance);
+                                                                        std::optional<std::uint16_t> visibleDistance, std::optional<bool> shortRange);
 
     // Get functions
     static auto GetBlipIcon(CClientRadarMarker* radarMarker) noexcept;
@@ -36,6 +37,7 @@ private:
     static auto GetBlipColor(CClientRadarMarker* radarMarker) noexcept;
     static auto GetBlipOrdering(CClientRadarMarker* radarMarker) noexcept;
     static auto GetBlipVisibleDistance(CClientRadarMarker* radarMarker) noexcept;
+    static auto GetBlipShortRange(CClientRadarMarker* radarMarker) noexcept;
 
     // Set functions
     static bool SetBlipIcon(CClientRadarMarker* radarMarker, std::uint8_t icon);
@@ -43,4 +45,5 @@ private:
     static bool SetBlipColor(CClientRadarMarker* radarMarker, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint8_t a);
     static bool SetBlipOrdering(CClientRadarMarker* radarMarker, std::int16_t ordering);
     static bool SetBlipVisibleDistance(CClientRadarMarker* radarMarker, std::uint16_t visibleDistance);
+    static bool SetBlipShortRange(CClientRadarMarker* radarMarker, bool shortRange);
 };
