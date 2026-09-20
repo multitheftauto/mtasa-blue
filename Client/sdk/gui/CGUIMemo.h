@@ -39,4 +39,7 @@ public:
     virtual void EnsureCaratIsVisible() = 0;
 
     virtual void SetTextChangedHandler(const GUI_CALLBACK& Callback) = 0;
+
+    virtual unsigned int GetUTF8CharacterCount(const char* szText) = 0;
+    virtual float        GetVerticalOffsetForCharacterIndex(unsigned int uiIndex) = 0;
 };
