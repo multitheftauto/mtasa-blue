@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "Graphics/CPixelsManager.h"
 #include <libpng/png.h>
 
 namespace
@@ -17,9 +18,8 @@ namespace
     {
     };
 
-    // libpng is built without setjmp support, so its default fatal error path
-    // aborts the process. Throw a private exception to let malformed input fail
-    // at the PNG decoder boundary instead.
+    // This file is compiled with /EHs so cleanup runs when libpng's C API
+    // propagates this exception to the decoder boundary.
     [[noreturn]] void PngErrorHandler(png_structp, png_const_charp)
     {
         throw PngErrorException{};
@@ -222,13 +222,21 @@ bool PngDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& ui
             return false;
         }
 
+        const uint64_t outputSize = static_cast<uint64_t>(width) * height * 4;
+        // The conversion caller appends a plain-pixel tail with 16-bit dimensions.
+        if (pOutBuffer && (width > 0xFFFF || height > 0xFFFF || outputSize > UINT_MAX - SIZEOF_PLAIN_TAIL))
+        {
+            png_destroy_read_struct(&png_ptr, &info_ptr, NULL);
+            return false;
+        }
+
         ///////////////////////////////////////////////////
         uiOutWidth = width;
         uiOutHeight = height;
 
         if (pOutBuffer)
         {
-            pOutBuffer->SetSize(width * height * 4);
+            pOutBuffer->SetSize(static_cast<uint>(outputSize));
 
             switch (colorType)
             {

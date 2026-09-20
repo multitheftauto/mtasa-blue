@@ -35,6 +35,11 @@ project "Client Core"
 	filter { "files:FastFailCrashHandler/WerCrashHandler.cpp" }
 		flags { "NoPCH" }
 
+	-- PNG error recovery throws through libpng's C API; the PCH uses /EHsc.
+	filter { "files:CFileFormatPng.cpp", "system:windows" }
+		flags { "NoPCH" }
+		buildoptions { "/EHsc-" }
+
 	filter {}
 
 	vpaths {
