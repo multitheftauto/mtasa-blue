@@ -152,7 +152,7 @@ void CClientRadarMarker::SetSprite(unsigned long ulSprite)
 
     if (m_pMarker)
     {
-        m_pMarker->SetSprite(static_cast<MarkerSprite>(ulSprite));
+        m_pMarker->SetSprite(static_cast<MarkerSprite::Enum>(ulSprite));
     }
 }
 
@@ -226,7 +226,7 @@ void CClientRadarMarker::CreateMarker()
                 m_pMarker->SetPosition(&m_vecPosition);
                 m_pMarker->SetScale(m_usScale);
                 m_pMarker->SetColor(color);
-                m_pMarker->SetSprite(static_cast<MarkerSprite>(m_ulSprite));
+                m_pMarker->SetSprite(static_cast<MarkerSprite::Enum>(m_ulSprite));
             }
         }
     }
