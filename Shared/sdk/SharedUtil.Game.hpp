@@ -378,10 +378,4 @@ namespace SharedUtil
                 return std::nullopt;
         }
     }
-
-    bool DoesVehicleModelHaveDefaultSirens(std::uint16_t modelId) noexcept
-    {
-        return GetDefaultVehicleSirens(modelId).has_value();
-    }
-
 }  // namespace SharedUtil

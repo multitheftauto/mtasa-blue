@@ -157,5 +157,4 @@ namespace SharedUtil
 
     // Retrieves the native GTA:SA siren configuration and coordinates for emergency vehicles
     std::optional<SDefaultVehicleSirens> GetDefaultVehicleSirens(std::uint16_t modelId) noexcept;
-    bool                                 DoesVehicleModelHaveDefaultSirens(std::uint16_t modelId) noexcept;
 }  // namespace SharedUtil
