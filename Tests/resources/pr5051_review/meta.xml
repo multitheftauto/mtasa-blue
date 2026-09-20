@@ -1,5 +1,0 @@
-<meta>
-    <info name="PR 5051 manual review" type="script" />
-    <include resource="pr5051_target" />
-    <script src="review.lua" type="shared" cache="false" />
-</meta>
