@@ -1570,7 +1570,7 @@ bool CServerBrowser::OnClick(CGUIElement* pElement)
                 m_pServerPlayerList[Type]->SetItemText(k, m_hPlayerName[Type], _("  ..loading.."));
             }
 
-            SetAddressBarText("mtasa://" + pServer->strEndpoint);
+            SetAddressBarText("mtasa://" + pServer->GetDisplayEndpoint());
             m_pLabelAddressDescription[Type]->SetVisible(false);
         }
 
@@ -1846,7 +1846,7 @@ bool CServerBrowser::OnAddressChanged(CGUIElement* pElement)
         CServerListItem* pServer = *i;
         if (!pServer || !CServerListItem::StaticIsValid(pServer))
             continue;
-        if (pServer->strHost == strHost && pServer->usGamePort == usPort)
+        if ((pServer->strHost == strHost || pServer->strHostName == strHost) && pServer->usGamePort == usPort)
         {
             for (std::size_t iconIndex = 0; iconIndex < std::size(m_pAddressFavoriteIcon); ++iconIndex)
             {
