@@ -764,7 +764,9 @@ ushort CRenderWareSA::GetTXDIDForModelID(ushort usModelID)
         // Get the CModelInfo's TXD ID
 
         // Ensure valid
-        if (usModelID >= pGame->GetBaseIDforTXD() || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID])
+        // Model IDs above GetBaseIDforTXD() (e.g. clothing/CJ item models, which start at 30000) still have a
+        // valid CModelInfo entry as long as they are below the total streaming ID count (see CModelInfoSA::IsValid)
+        if (usModelID >= pGame->GetCountOfAllFileIDs() || !((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID])
             return 0;
 
         return ((CBaseModelInfoSAInterface**)ARRAY_ModelInfo)[usModelID]->usTextureDictionary;
