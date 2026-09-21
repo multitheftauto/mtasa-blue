@@ -286,6 +286,7 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
     pPed->GetPosition(vecPosition);
     CVector vecVelocity;
     pPed->GetMoveSpeed(vecVelocity);
+    const float fHealth = std::clamp(pPed->GetHealth(), 0.0f, pPed->GetMaxHealth());
     const float fArmor = std::clamp(pPed->GetArmor(), 0.0f, 100.0f);
 
     unsigned char ucFlags = 0;
@@ -295,7 +296,7 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
         ucFlags |= 0x02;
     if (vecVelocity != pPed->m_LastSyncedData->vVelocity)
         ucFlags |= 0x04;
-    if (pPed->GetHealth() != pPed->m_LastSyncedData->fHealth)
+    if (fHealth != pPed->m_LastSyncedData->fHealth)
         ucFlags |= 0x08;
     if (fArmor != pPed->m_LastSyncedData->fArmour)
         ucFlags |= 0x10;
@@ -356,12 +357,11 @@ void CPedSync::WritePedInformation(NetBitStreamInterface* pBitStream, CClientPed
         pPed->m_LastSyncedData->vVelocity = vecVelocity;
     }
 
-    // And health. Not clamped here: ped stats are not sent to players who join later, so
-    // GetMaxHealth() can be lower than the server's. The server clamps it on receive.
+    // And health
     if (ucFlags & 0x08)
     {
-        pBitStream->Write(pPed->GetHealth());
-        pPed->m_LastSyncedData->fHealth = pPed->GetHealth();
+        pBitStream->Write(fHealth);
+        pPed->m_LastSyncedData->fHealth = fHealth;
     }
 
     if (ucFlags & 0x10)

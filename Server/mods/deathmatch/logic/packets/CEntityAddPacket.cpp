@@ -871,6 +871,25 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     armor.data.fValue = pPed->GetArmor();
                     BitStream.Write(&armor);
 
+                    // Stats that differ from the defaults, the client needs MAX_HEALTH before it applies the health
+                    if (BitStream.Can(eBitStreamVersion::PedStatsSync))
+                    {
+                        std::vector<std::pair<unsigned short, float>> stats;
+                        for (unsigned short usStat = 0; usStat < NUM_PLAYER_STATS; usStat++)
+                        {
+                            const float fValue = pPed->GetPlayerStat(usStat);
+                            if (fValue != (usStat == 24 /*MAX_HEALTH*/ ? 569.0f : 0.0f))
+                                stats.emplace_back(usStat, fValue);
+                        }
+
+                        BitStream.WriteCompressed(static_cast<unsigned short>(stats.size()));
+                        for (const auto& [usStat, fValue] : stats)
+                        {
+                            BitStream.Write(usStat);
+                            BitStream.Write(fValue);
+                        }
+                    }
+
                     // vehicle
                     CVehicle* pVehicle = pPed->GetOccupiedVehicle();
                     if (pVehicle)
