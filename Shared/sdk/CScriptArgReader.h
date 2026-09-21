@@ -847,21 +847,12 @@ protected:
     template <class T>
     void InternalReadUserData(bool bAllowNilResult, T*& outValue, bool bHasDefaultValue, T* defaultValue = (T*)-2)
     {
-        outValue = NULL;
+        outValue = nullptr;
         int iArgument = lua_type(m_luaVM, m_iIndex);
 
-        if (iArgument == LUA_TLIGHTUSERDATA)
+        if constexpr (is_inline_userdata_type<T>::value)
         {
-            outValue = (T*)UserDataCast((T*)lua_touserdata(m_luaVM, m_iIndex), m_luaVM);
-            if (outValue)
-            {
-                m_iIndex++;
-                return;
-            }
-        }
-        else if (iArgument == LUA_TUSERDATA)
-        {
-            if constexpr (is_inline_userdata_type<T>::value)
+            if (iArgument == LUA_TUSERDATA)
             {
                 if (lua_isclass(m_luaVM, m_iIndex, GetInlineUserdataClassName<T>()))
                 {
@@ -870,7 +861,19 @@ protected:
                     return;
                 }
             }
-            else
+        }
+        else
+        {
+            if (iArgument == LUA_TLIGHTUSERDATA)
+            {
+                outValue = (T*)UserDataCast((T*)lua_touserdata(m_luaVM, m_iIndex), m_luaVM);
+                if (outValue)
+                {
+                    m_iIndex++;
+                    return;
+                }
+            }
+            else if (iArgument == LUA_TUSERDATA)
             {
                 outValue = (T*)UserDataCast(*((T**)lua_touserdata(m_luaVM, m_iIndex)), m_luaVM);
                 if (outValue)
@@ -880,12 +883,13 @@ protected:
                 }
             }
         }
-        else if (iArgument == LUA_TNONE || iArgument == LUA_TNIL)
+
+        if (iArgument == LUA_TNONE || iArgument == LUA_TNIL)
         {
             if (bHasDefaultValue)
                 outValue = defaultValue;
             else
-                outValue = NULL;
+                outValue = nullptr;
 
             if (outValue || bAllowNilResult)
             {
@@ -894,7 +898,7 @@ protected:
             }
         }
 
-        outValue = NULL;
+        outValue = nullptr;
         SetTypeError(GetClassTypeName((T*)0));
         m_iIndex++;
     }
@@ -1008,17 +1012,27 @@ public:
             // int idx = lua_tonumber ( m_luaVM, -2 );
             int iArgumentType = lua_type(m_luaVM, -1);
 
-            T* value = NULL;
-            if (iArgumentType == LUA_TLIGHTUSERDATA)
+            T* value = nullptr;
+            if constexpr (is_inline_userdata_type<T>::value)
             {
-                value = (T*)UserDataCast((T*)lua_touserdata(m_luaVM, -1), m_luaVM);
+                if (iArgumentType == LUA_TUSERDATA && lua_isclass(m_luaVM, -1, GetInlineUserdataClassName<T>()))
+                {
+                    value = static_cast<T*>(lua_touserdata(m_luaVM, -1));
+                }
             }
-            else if (iArgumentType == LUA_TUSERDATA)
+            else
             {
-                value = (T*)UserDataCast(*((T**)lua_touserdata(m_luaVM, -1)), m_luaVM);
+                if (iArgumentType == LUA_TLIGHTUSERDATA)
+                {
+                    value = (T*)UserDataCast((T*)lua_touserdata(m_luaVM, -1), m_luaVM);
+                }
+                else if (iArgumentType == LUA_TUSERDATA)
+                {
+                    value = (T*)UserDataCast(*((T**)lua_touserdata(m_luaVM, -1)), m_luaVM);
+                }
             }
 
-            if (value != NULL)
+            if (value != nullptr)
                 outList.push_back(value);
         }
         m_iIndex++;
@@ -1346,24 +1360,28 @@ public:
     bool NextIsUserDataOfType(int iOffset = 0) const
     {
         int iArgument = lua_type(m_luaVM, m_iIndex + iOffset);
-        if (iArgument == LUA_TLIGHTUSERDATA)
+        if constexpr (is_inline_userdata_type<T>::value)
         {
-            if (UserDataCast((T*)lua_touserdata(m_luaVM, m_iIndex + iOffset), m_luaVM))
-                return true;
-        }
-        else if (iArgument == LUA_TUSERDATA)
-        {
-            if constexpr (is_inline_userdata_type<T>::value)
+            if (iArgument == LUA_TUSERDATA)
             {
                 return lua_isclass(m_luaVM, m_iIndex + iOffset, GetInlineUserdataClassName<T>());
             }
-            else
+            return false;
+        }
+        else
+        {
+            if (iArgument == LUA_TLIGHTUSERDATA)
+            {
+                if (UserDataCast((T*)lua_touserdata(m_luaVM, m_iIndex + iOffset), m_luaVM))
+                    return true;
+            }
+            else if (iArgument == LUA_TUSERDATA)
             {
                 if (UserDataCast(*((T**)lua_touserdata(m_luaVM, m_iIndex + iOffset)), m_luaVM))
                     return true;
             }
+            return false;
         }
-        return false;
     }
 
     bool NextIsVector4D() const
@@ -1381,6 +1399,8 @@ public:
         return (NextCouldBeNumber() && NextCouldBeNumber(1)) || NextIsUserDataOfType<CVector2D>() || NextIsUserDataOfType<CVector>() ||
                NextIsUserDataOfType<CVector4D>();
     }
+
+    bool NextIsMatrix() const { return NextIsUserDataOfType<CMatrix>(); }
 
     //
     // Conditional reads. Default required in case condition is not met.
