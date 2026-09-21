@@ -696,7 +696,7 @@ void CNetAPI::ReadKeysync(CClientPlayer* pPlayer, NetBitStreamInterface& BitStre
         }
 
         // Jax: temp fix for rhino firing, CPlayerInfo::m_LastTimeBigGunFired needs to be context-switched
-        if (static_cast<VehicleType>(pVehicle->GetModel()) == VehicleType::VT_RHINO)
+        if (static_cast<VehicleType::Enum>(pVehicle->GetModel()) == VehicleType::VT_RHINO)
         {
             ControllerState.ButtonCircle = 0;
         }
@@ -1120,8 +1120,13 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     // here to keep the aim sync below consistent with our own pose.
     if (ControllerState.RightShoulder1 || ControllerState.ButtonCircle)
     {
-        CTask* pAttackTask = pPlayerModel->GetTaskManager()->GetTaskSecondary(TASK_SECONDARY_ATTACK);
-        if (!pAttackTask || pAttackTask->GetTaskType() != TASK_SIMPLE_USE_GUN)
+        CWeapon*     pWeapon = pPlayerModel->GetWeapon();
+        CWeaponStat* pWeaponInfo = pWeapon ? g_pGame->GetWeaponStatManager()->GetWeaponStats(pWeapon->GetType()) : nullptr;
+        // Melee uses a fight task, not USE_GUN. Clearing these inputs would alternate
+        // released puresync buttons with held keysync buttons and interrupt remote combat.
+        const bool bMelee = pWeaponInfo && pWeaponInfo->GetFireType() == FIRETYPE_MELEE;
+        CTask*     pAttackTask = pPlayerModel->GetTaskManager()->GetTaskSecondary(TASK_SECONDARY_ATTACK);
+        if (!bMelee && (!pAttackTask || pAttackTask->GetTaskType() != TASK_SIMPLE_USE_GUN))
         {
             ControllerState.RightShoulder1 = 0;
             ControllerState.ButtonCircle = 0;
@@ -1202,12 +1207,12 @@ void CNetAPI::WritePlayerPuresync(CClientPlayer* pPlayerModel, NetBitStreamInter
     // Player health sync (scaled from 0.0f-200.0f to 0-255 to save three bytes).
     // Scale goes up to 200.0f because having max stats gives you the double of health.
     SPlayerHealthSync health;
-    health.data.fValue = pPlayerModel->GetHealth();
+    health.data.fValue = std::clamp(pPlayerModel->GetHealth(), 0.0f, pPlayerModel->GetMaxHealth());
     BitStream.Write(&health);
 
     // Player armor (scaled from 0.0f-100.0f to 0-255 to save three bytes)
     SPlayerArmorSync armor;
-    armor.data.fValue = pPlayerModel->GetArmor();
+    armor.data.fValue = std::clamp(pPlayerModel->GetArmor(), 0.0f, 100.0f);
     BitStream.Write(&armor);
 
     // Write the camera rotation (Determines base for left stick movement)
@@ -1311,7 +1316,7 @@ void CNetAPI::ReadVehiclePuresync(CClientPlayer* pPlayer, CClientVehicle* pVehic
     ReadFullKeysync(ControllerState, BitStream);
 
     // Jax: temp fix for rhino firing, CPlayerInfo::m_LastTimeBigGunFired needs to be context-switched
-    if (static_cast<VehicleType>(pVehicle->GetModel()) == VehicleType::VT_RHINO)
+    if (static_cast<VehicleType::Enum>(pVehicle->GetModel()) == VehicleType::VT_RHINO)
     {
         ControllerState.ButtonCircle = 0;
     }
@@ -1734,12 +1739,12 @@ void CNetAPI::WriteVehiclePuresync(CClientPed* pPlayerModel, CClientVehicle* pVe
     // Player health sync (scaled from 0.0f-200.0f to 0-255 to save three bytes).
     // Scale goes up to 200.0f because having max stats gives you the double of health.
     SPlayerHealthSync health;
-    health.data.fValue = pPlayerModel->GetHealth();
+    health.data.fValue = std::clamp(pPlayerModel->GetHealth(), 0.0f, pPlayerModel->GetMaxHealth());
     BitStream.Write(&health);
 
     // Player armor (scaled from 0.0f-100.0f to 0-255 to save three bytes)
     SPlayerArmorSync armor;
-    armor.data.fValue = pPlayerModel->GetArmor();
+    armor.data.fValue = std::clamp(pPlayerModel->GetArmor(), 0.0f, 100.0f);
     BitStream.Write(&armor);
 
     // Get the player weapon

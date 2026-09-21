@@ -379,6 +379,15 @@ void CClientVehicle::GetPosition(CVector& vecPosition) const
     }
 }
 
+// A ped that is getting out or being dragged out and has physically left the car is owned by his
+// own exit animation; moving him with the vehicle would keep warping him back inside it.
+static bool CanMoveOccupantWithVehicle(CClientPed* pOccupant)
+{
+    const int iState = pOccupant->GetVehicleInOutState();
+
+    return (iState != VEHICLE_INOUT_GETTING_OUT && iState != VEHICLE_INOUT_GETTING_JACKED) || pOccupant->GetRealOccupiedVehicle();
+}
+
 void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpolation, bool bAllowGroundLoadFreeze)
 {
     // Is the local player in the vehicle
@@ -386,6 +395,7 @@ void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpol
     {
         // If move is big enough, do ground checks
         float DistanceMoved = (m_Matrix.vPos - vecPosition).Length();
+
         if (DistanceMoved > 50 && !IsFrozen() && bAllowGroundLoadFreeze)
             SetFrozenWaitingForGroundToLoad(true, true);
     }
@@ -400,6 +410,7 @@ void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpol
         {
             CVector vecMoveSpeed;
             m_pVehicle->GetMoveSpeed(&vecMoveSpeed);
+
             if (vecMoveSpeed.fX == 0.0f && vecMoveSpeed.fY == 0.0f && vecMoveSpeed.fZ == 0.0f)
             {
                 vecMoveSpeed.fZ -= 0.01f;
@@ -407,6 +418,7 @@ void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpol
             }
         }
     }
+
     // Have we moved to a different position?
     if (m_Matrix.vPos != vecPosition)
     {
@@ -419,10 +431,9 @@ void CClientVehicle::SetPosition(const CVector& vecPosition, bool bResetInterpol
     }
 
     // If we have any occupants, update their positions
-    // Make sure we dont update their position if they are getting out and have physically left the car
     for (int i = 0; i <= NUMELMS(m_pPassengers); i++)
         if (CClientPed* pOccupant = GetOccupant(i))
-            if (pOccupant->GetVehicleInOutState() != VEHICLE_INOUT_GETTING_OUT || pOccupant->GetRealOccupiedVehicle())
+            if (CanMoveOccupantWithVehicle(pOccupant))
                 pOccupant->SetPosition(vecPosition);
 
     // Reset interpolation
@@ -455,7 +466,8 @@ void CClientVehicle::UpdatePedPositions(const CVector& vecPosition)
     // If we have any occupants, update their positions
     for (int i = 0; i <= NUMELMS(m_pPassengers); i++)
         if (CClientPed* pOccupant = GetOccupant(i))
-            pOccupant->SetPosition(vecPosition);
+            if (CanMoveOccupantWithVehicle(pOccupant))
+                pOccupant->SetPosition(vecPosition);
 }
 
 void CClientVehicle::GetRotationDegrees(CVector& vecRotation) const
@@ -573,10 +585,9 @@ bool CClientVehicle::SetMatrix(const CMatrix& Matrix)
     m_matFrozen = Matrix;
 
     // If we have any occupants, update their positions
-    // Make sure we dont update their position if they are getting out and have physically left the car
     for (int i = 0; i <= NUMELMS(m_pPassengers); i++)
         if (CClientPed* pOccupant = GetOccupant(i))
-            if (pOccupant->GetVehicleInOutState() != VEHICLE_INOUT_GETTING_OUT || pOccupant->GetRealOccupiedVehicle())
+            if (CanMoveOccupantWithVehicle(pOccupant))
                 pOccupant->SetPosition(m_Matrix.vPos);
 
     return true;
@@ -1371,7 +1382,7 @@ void CClientVehicle::SetLandingGearDown(bool bLandingGearDown)
 // The checks below compare against standard model IDs, so a custom model has to be read as the
 // model it was cloned from. The model info is looked up fresh rather than through m_pModelInfo,
 // since SetModelBlocking calls in here before that pointer has been updated.
-static VehicleType GetVehicleTypeForModel(unsigned short usModel)
+static VehicleType::Enum GetVehicleTypeForModel(unsigned short usModel)
 {
     std::uint16_t ulModel = usModel;
     if (ulModel < 400 || ulModel > 611)
@@ -1380,7 +1391,7 @@ static VehicleType GetVehicleTypeForModel(unsigned short usModel)
             ulModel = pModelInfo->GetParentID();
     }
 
-    return static_cast<VehicleType>(ulModel);
+    return static_cast<VehicleType::Enum>(ulModel);
 }
 
 unsigned short CClientVehicle::GetAdjustablePropertyValue()
@@ -2846,13 +2857,13 @@ void CClientVehicle::Create()
         ResetInterpolation();
         ResetDoorInterpolation();
 
-        for (unsigned char i = 0; i < 6; ++i)
-            SetDoorOpenRatio(i, m_fDoorOpenRatio[i], 0, true);
-
         for (unsigned char i = 0; i < MAX_WINDOWS; ++i)
             SetWindowOpen(i, m_bWindowOpen[i]);
 
-        // Re-apply handling entry
+        // Re-apply handling entry before restoring the door open ratios below; the bonnet and boot
+        // hinge setup a handling change recalculates only takes effect for angles computed after it,
+        // so restoring an open door first would bake in the freshly (re)created vehicle's default
+        // hinge instead of the one this handling actually calls for.
         if (m_HandlingEntry)
         {
             m_pVehicle->SetHandlingData(m_HandlingEntry.get());
@@ -2874,6 +2885,9 @@ void CClientVehicle::Create()
             if (m_bHasCustomHandling)
                 ApplyHandling();
         }
+
+        for (unsigned char i = 0; i < 6; ++i)
+            SetDoorOpenRatio(i, m_fDoorOpenRatio[i], 0, true);
 
         // Applying wheel upgrades can change these values.
         // We should keep track of the original values to restore them
@@ -3012,7 +3026,7 @@ void CClientVehicle::Create()
         {
             for (size_t i = 0; i < static_cast<std::size_t>(VehicleDummies::VEHICLE_DUMMY_COUNT); ++i)
             {
-                m_pVehicle->SetDummyPosition(static_cast<VehicleDummies>(i), m_dummyPositions[i]);
+                m_pVehicle->SetDummyPosition(static_cast<VehicleDummies::Enum>(i), m_dummyPositions[i]);
             }
         }
 
@@ -3431,7 +3445,7 @@ bool CClientVehicle::IsTowableBy(CClientVehicle* towingVehicle)
 
 bool CClientVehicle::SetWinchType(eWinchType winchType)
 {
-    if (static_cast<VehicleType>(GetModel()) == VehicleType::VT_LEVIATHN)  // Leviathan
+    if (static_cast<VehicleType::Enum>(GetModel()) == VehicleType::VT_LEVIATHN)  // Leviathan
     {
         if (m_pVehicle)
         {
@@ -3759,7 +3773,7 @@ void CClientVehicle::Interpolate()
 
 void CClientVehicle::GetInitialDoorStates(SFixedArray<unsigned char, MAX_DOORS>& ucOutDoorStates)
 {
-    switch (static_cast<VehicleType>(m_usModel))
+    switch (static_cast<VehicleType::Enum>(m_usModel))
     {
         case VehicleType::VT_BAGGAGE:
         case VehicleType::VT_BANDITO:
@@ -4078,7 +4092,7 @@ bool CClientVehicle::HasRadio()
 
 bool CClientVehicle::HasPoliceRadio()
 {
-    switch (static_cast<VehicleType>(m_usModel))
+    switch (static_cast<VehicleType::Enum>(m_usModel))
     {
         case VehicleType::VT_COPCARLA:
         case VehicleType::VT_COPCARSF:
@@ -5112,7 +5126,7 @@ CVehicleAudioSettingsEntry& CClientVehicle::GetOrCreateAudioSettings()
     return *m_pSoundSettingsEntry.get();
 }
 
-bool CClientVehicle::GetDummyPosition(VehicleDummies dummy, CVector& position) const
+bool CClientVehicle::GetDummyPosition(VehicleDummies::Enum dummy, CVector& position) const
 {
     if (dummy < VehicleDummies::LIGHT_FRONT_MAIN || dummy >= VehicleDummies::VEHICLE_DUMMY_COUNT)
         return false;
@@ -5131,7 +5145,7 @@ bool CClientVehicle::GetDummyPosition(VehicleDummies dummy, CVector& position) c
     return true;
 }
 
-bool CClientVehicle::SetDummyPosition(VehicleDummies dummy, const CVector& position)
+bool CClientVehicle::SetDummyPosition(VehicleDummies::Enum dummy, const CVector& position)
 {
     if (dummy >= VehicleDummies::LIGHT_FRONT_MAIN && dummy < VehicleDummies::VEHICLE_DUMMY_COUNT)
     {
@@ -5155,7 +5169,7 @@ bool CClientVehicle::ResetDummyPositions()
 
         for (size_t i = 0; i < positions.size(); ++i)
         {
-            SetDummyPosition(static_cast<VehicleDummies>(i), positions[i]);
+            SetDummyPosition(static_cast<VehicleDummies::Enum>(i), positions[i]);
         }
 
         return true;

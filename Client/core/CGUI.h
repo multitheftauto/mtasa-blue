@@ -52,13 +52,10 @@ public:
     void DoPulse();
 
     void Draw();
-    void DrawInternal();
     void Invalidate();
     void Restore();
 
-    // True while a fatal GUI fault dialog is open, so a nested fault during the
-    // dialog's message-loop pump terminates without stacking more dialogs, and
-    // window-rebuild paths (skin and locale changes) do not run inside the pump.
+    // True while a fatal fault dialog (CC51 or CC54) is open; rebuilds wait and nested faults exit.
     static bool IsFaultDialogOpen() noexcept;
     static void SetFaultDialogOpen(bool bOpen) noexcept;
 

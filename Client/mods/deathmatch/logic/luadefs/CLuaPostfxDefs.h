@@ -17,7 +17,7 @@ public:
     static void LoadFunctions();
 
 private:
-    static float GetPostFXValue(PostFXType type);
+    static float GetPostFXValue(PostFXType::Enum type);
     static int   GetPostFXMode();
-    static bool  IsPostFXEnabled(PostFXType type);
+    static bool  IsPostFXEnabled(PostFXType::Enum type);
 };
