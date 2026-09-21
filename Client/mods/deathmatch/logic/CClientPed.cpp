@@ -1776,8 +1776,7 @@ void CClientPed::SetHealth(float fHealth)
     if (m_bHealthLocked)
         return;
 
-    if (fHealth < 0.0f)
-        fHealth = 0.0f;
+    fHealth = std::clamp(fHealth, 0.0f, GetMaxHealth());
 
     InternalSetHealth(fHealth);
     m_fHealth = fHealth;
