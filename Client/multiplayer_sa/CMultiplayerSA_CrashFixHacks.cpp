@@ -4175,6 +4175,40 @@ static int _cdecl CFileLoader_LoadVehicleObject_sscanf(const char* s, const char
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CPathFind's per map area path node loader calls malloc() for m_pPathNodes[area] (offset
+// 0x804) without checking the result, then loops over it using m_dwNumNodes[area] (offset
+// 0xfa4) as the count. If the allocation fails, that loop dereferences a null pointer and
+// crashes.
+//
+// Right where the node count gets loaded for the loop's bound check, this hook also checks
+// whether m_pPathNodes[area] is null, and if so forces the count to 0 so the loop is skipped.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CPathFind_LoadPathNodeCount_Mid  0x0156F966
+#define HOOKSIZE_CPathFind_LoadPathNodeCount_Mid 7
+DWORD                         RETURN_CPathFind_LoadPathNodeCount_Mid = 0x0156F96D;
+static void __declspec(naked) HOOK_CPathFind_LoadPathNodeCount_Mid()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // Replicate the overwritten instruction: EAX = m_dwNumNodes[area]
+        mov     eax, dword ptr [esi + edi*4 + 0x0fa4]
+
+        // If m_pPathNodes[area] failed to allocate, force the node count to 0 for this loop
+        cmp     dword ptr [esi + edi*4 + 0x804], 0
+        jne     nodesOk
+        xor     eax, eax
+        nodesOk:
+        jmp     RETURN_CPathFind_LoadPathNodeCount_Mid
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Crash at 0x732B2A in CVisibilityPlugins::GetClumpAlpha
 //
 // Root cause: In GTA:SA, CVisibilityPlugins::GetClumpAlpha (0x732B20) and SetClumpAlpha
@@ -4341,4 +4375,6 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
 
     // Fix uninitialized wheel scale in CFileLoader::LoadVehicleObject on Win11 24H2
     HookInstallCall(CALL_CFileLoader_LoadVehicleObject_sscanf, (DWORD)CFileLoader_LoadVehicleObject_sscanf);
+
+    EZHookInstall(CPathFind_LoadPathNodeCount_Mid);
 }
