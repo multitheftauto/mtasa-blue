@@ -15,6 +15,10 @@
 #include <game/CHud.h>
 #include <game/CStreaming.h>
 #include <type_traits>
+#include "lua/CLuaVector2.h"
+#include "lua/CLuaVector3.h"
+#include "lua/CLuaVector4.h"
+#include "lua/CLuaMatrix.h"
 
 #include "enums/WeaponProperty.h"
 #include "enums/FxParticleSystems.h"

@@ -15,6 +15,10 @@
 #include "CEasingCurve.h"
 #include "CAccessControlListRight.h"
 #include <type_traits>
+#include "lua/CLuaVector2.h"
+#include "lua/CLuaVector3.h"
+#include "lua/CLuaVector4.h"
+#include "lua/CLuaMatrix.h"
 
 // Forward declare enum reflection stuff
 enum eLuaType
@@ -306,26 +310,6 @@ CTextDisplay* UserDataCast(CTextDisplay* ptr, lua_State* luaState);
 // CBan from userdata
 //
 CBan* UserDataCast(CBan* ptr, lua_State* luaState);
-
-//
-// CLuaVector2D from userdata
-//
-CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState);
-
-//
-// CLuaVector3D from userdata
-//
-CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState);
-
-//
-// CLuaVector4D from userdata
-//
-CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState);
-
-//
-// CLuaMatrix from userdata
-//
-CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState);
 
 //
 // CElement from userdata
