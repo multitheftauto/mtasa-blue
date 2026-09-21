@@ -1225,8 +1225,13 @@ void CMultiplayerSA::InitHooks()
     // Stop CPlayerPed::ProcessControl from calling CVisibilityPlugins::SetClumpAlpha
     MemSet((void*)0x5E8E84, 0x90, 5);
 
-    // Disable CVehicle::UpdateClumpAlpha completely (fades singleplayer traffic, crashes at 0x732B2A when m_pRwObject is nullptr)
-    MemPut<BYTE>(0x6D2980, 0xC3);
+    // Stop vehicle ProcessControl functions from calling CVehicle::UpdateClumpAlpha (singleplayer traffic fading logic)
+    MemSet((void*)0x6B19F2, 0x90, 5);  // CAutomobile::ProcessControl
+    MemSet((void*)0x6B92F5, 0x90, 5);  // CBike::ProcessControl
+    MemSet((void*)0x6F185D, 0x90, 5);  // CBoat::ProcessControl
+
+    // Stop CVehicle::UpdateClumpAlpha from calling CVisibilityPlugins::SetClumpAlpha
+    MemSet((void*)0x6D29CB, 0x90, 5);
 
     // Disable CVehicle::DoDriveByShootings
     MemSet((void*)0x741FD0, 0x90, 3);
