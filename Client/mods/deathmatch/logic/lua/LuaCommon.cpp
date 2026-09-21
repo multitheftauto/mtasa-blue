@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <new>
 
 // Temporary until we change these funcs:
 #include "../luadefs/CLuaDefs.h"
@@ -106,14 +107,6 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushxmlnode(luaVM, pNode);
     else if (CLuaTimer* pTimer = UserDataCast((CLuaTimer*)pData, luaVM))
         return lua_pushtimer(luaVM, pTimer);
-    else if (CLuaVector2D* pVector = UserDataCast((CLuaVector2D*)pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
-    else if (CLuaVector3D* pVector = UserDataCast((CLuaVector3D*)pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
-    else if (CLuaVector4D* pVector = UserDataCast((CLuaVector4D*)pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
-    else if (CLuaMatrix* pMatrix = UserDataCast((CLuaMatrix*)pData, luaVM))
-        return lua_pushmatrix(luaVM, *pMatrix);
 
     lua_pushobject(luaVM, NULL, pData);
 }
@@ -166,32 +159,32 @@ void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool b
 
 void lua_pushvector(lua_State* luaVM, const CVector4D& vector)
 {
-    CVector4D* pVector = static_cast<CVector4D*>(lua_newuserdata(luaVM, sizeof(CVector4D)));
-    *pVector = vector;
+    void* storage = lua_newuserdata(luaVM, sizeof(CVector4D));
+    new (storage) CVector4D(vector);
     lua_getclass(luaVM, "Vector4");
     lua_setmetatable(luaVM, -2);
 }
 
 void lua_pushvector(lua_State* luaVM, const CVector& vector)
 {
-    CVector* pVector = static_cast<CVector*>(lua_newuserdata(luaVM, sizeof(CVector)));
-    *pVector = vector;
+    void* storage = lua_newuserdata(luaVM, sizeof(CVector));
+    new (storage) CVector(vector);
     lua_getclass(luaVM, "Vector3");
     lua_setmetatable(luaVM, -2);
 }
 
 void lua_pushvector(lua_State* luaVM, const CVector2D& vector)
 {
-    CVector2D* pVector = static_cast<CVector2D*>(lua_newuserdata(luaVM, sizeof(CVector2D)));
-    *pVector = vector;
+    void* storage = lua_newuserdata(luaVM, sizeof(CVector2D));
+    new (storage) CVector2D(vector);
     lua_getclass(luaVM, "Vector2");
     lua_setmetatable(luaVM, -2);
 }
 
 void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix)
 {
-    CMatrix* pMatrix = static_cast<CMatrix*>(lua_newuserdata(luaVM, sizeof(CMatrix)));
-    *pMatrix = matrix;
+    void* storage = lua_newuserdata(luaVM, sizeof(CMatrix));
+    new (storage) CMatrix(matrix);
     lua_getclass(luaVM, "Matrix");
     lua_setmetatable(luaVM, -2);
 }

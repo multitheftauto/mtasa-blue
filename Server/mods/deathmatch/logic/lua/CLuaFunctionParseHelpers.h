@@ -16,11 +16,6 @@
 #include "CAccessControlListRight.h"
 #include <type_traits>
 
-class CLuaVector2D;
-class CLuaVector3D;
-class CLuaVector4D;
-class CLuaMatrix;
-
 // Forward declare enum reflection stuff
 enum eLuaType
 {

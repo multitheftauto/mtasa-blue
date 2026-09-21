@@ -13,9 +13,5 @@
 
 #include "CMatrix.h"
 
-class CLuaMatrix : public CMatrix
-{
-public:
-    CLuaMatrix() : CMatrix() {}
-    CLuaMatrix(const CMatrix& matrix) : CMatrix(matrix) {}
-};
+// Alias CLuaMatrix to CMatrix now that script IDs and CIdArray registrations are removed for inline userdata
+using CLuaMatrix = CMatrix;

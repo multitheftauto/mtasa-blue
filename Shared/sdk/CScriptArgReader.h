@@ -156,10 +156,10 @@ public:
         }
         else if (iArgument == LUA_TUSERDATA)
         {
-            if (NextIsUserDataOfType<CLuaVector2D>())
+            if (NextIsUserDataOfType<CVector2D>())
             {
                 // we don't pass around the pointer as it may get destroyed any time
-                CLuaVector2D* pVector = NULL;
+                CVector2D* pVector = nullptr;
                 ReadUserData(pVector);
                 if (pVector)
                 {
@@ -169,10 +169,10 @@ public:
                 outValue = CVector2D();
                 return;  // Error set in ReadUserData
             }
-            else if (NextIsUserDataOfType<CLuaVector3D>())
+            else if (NextIsUserDataOfType<CVector>())
             {
                 // we don't pass around the pointer as it may get destroyed any time
-                CLuaVector3D* pVector = NULL;
+                CVector* pVector = nullptr;
                 ReadUserData(pVector);
                 if (pVector)
                 {
@@ -182,10 +182,10 @@ public:
                 outValue = CVector2D();
                 return;  // Error set in ReadUserData
             }
-            else if (NextIsUserDataOfType<CLuaVector4D>())
+            else if (NextIsUserDataOfType<CVector4D>())
             {
                 // we don't pass around the pointer as it may get destroyed any time
-                CLuaVector4D* pVector = NULL;
+                CVector4D* pVector = nullptr;
                 ReadUserData(pVector);
                 if (pVector)
                 {
@@ -217,10 +217,10 @@ public:
         }
         else if (iArgument == LUA_TUSERDATA)
         {
-            if (NextIsUserDataOfType<CLuaVector2D>())
+            if (NextIsUserDataOfType<CVector2D>())
             {
                 // we don't pass around the pointer as it may get destroyed any time
-                CLuaVector2D* pVector = NULL;
+                CVector2D* pVector = nullptr;
                 ReadUserData(pVector);
                 if (pVector)
                 {
@@ -230,10 +230,10 @@ public:
                 outValue = CVector2D();
                 return;  // Error set in ReadUserData
             }
-            else if (NextIsUserDataOfType<CLuaVector3D>())
+            else if (NextIsUserDataOfType<CVector>())
             {
                 // we don't pass around the pointer as it may get destroyed any time
-                CLuaVector3D* pVector = NULL;
+                CVector* pVector = nullptr;
                 ReadUserData(pVector);
                 if (pVector)
                 {
@@ -243,10 +243,10 @@ public:
                 outValue = CVector2D();
                 return;  // Error set in ReadUserData
             }
-            else if (NextIsUserDataOfType<CLuaVector4D>())
+            else if (NextIsUserDataOfType<CVector4D>())
             {
                 // we don't pass around the pointer as it may get destroyed any time
-                CLuaVector4D* pVector = NULL;
+                CVector4D* pVector = nullptr;
                 ReadUserData(pVector);
                 if (pVector)
                 {
@@ -282,10 +282,10 @@ public:
         }
         else if (iArgument == LUA_TUSERDATA)
         {
-            if (NextIsUserDataOfType<CLuaVector3D>())
+            if (NextIsUserDataOfType<CVector>())
             {
                 // we don't pass around the pointer as it may get destroyed any time
-                CLuaVector3D* pVector = NULL;
+                CVector* pVector = nullptr;
                 ReadUserData(pVector);
                 if (pVector)
                 {
@@ -295,10 +295,10 @@ public:
                 outValue = CVector();
                 return;  // Error set in ReadUserData
             }
-            else if (NextIsUserDataOfType<CLuaVector4D>())
+            else if (NextIsUserDataOfType<CVector4D>())
             {
                 // we don't pass around the pointer as it may get destroyed any time
-                CLuaVector4D* pVector = NULL;
+                CVector4D* pVector = nullptr;
                 ReadUserData(pVector);
                 if (pVector)
                 {
@@ -331,10 +331,10 @@ public:
         }
         else if (iArgument == LUA_TUSERDATA)
         {
-            if (NextIsUserDataOfType<CLuaVector3D>())
+            if (NextIsUserDataOfType<CVector>())
             {
                 // we don't pass around the pointer as it may get destroyed any time
-                CLuaVector3D* pVector = NULL;
+                CVector* pVector = nullptr;
                 ReadUserData(pVector);
                 if (pVector)
                 {
@@ -344,10 +344,10 @@ public:
                 outValue = CVector();
                 return;  // Error set in ReadUserData
             }
-            else if (NextIsUserDataOfType<CLuaVector4D>())
+            else if (NextIsUserDataOfType<CVector4D>())
             {
                 // we don't pass around the pointer as it may get destroyed any time
-                CLuaVector4D* pVector = NULL;
+                CVector4D* pVector = nullptr;
                 ReadUserData(pVector);
                 if (pVector)
                 {
@@ -384,10 +384,10 @@ public:
         }
         else if (iArgument == LUA_TUSERDATA)
         {
-            if (NextIsUserDataOfType<CLuaVector4D>())
+            if (NextIsUserDataOfType<CVector4D>())
             {
                 // we don't pass around the pointer as it may get destroyed any time
-                CLuaVector4D* pVector = NULL;
+                CVector4D* pVector = nullptr;
                 ReadUserData(pVector);
                 if (pVector)
                 {
@@ -421,10 +421,10 @@ public:
         }
         else if (iArgument == LUA_TUSERDATA)
         {
-            if (NextIsUserDataOfType<CLuaVector4D>())
+            if (NextIsUserDataOfType<CVector4D>())
             {
                 // we don't pass around the pointer as it may get destroyed any time
-                CLuaVector4D* pVector = NULL;
+                CVector4D* pVector = nullptr;
                 ReadUserData(pVector);
                 if (pVector)
                 {
@@ -470,7 +470,7 @@ public:
         else if (iArgument == LUA_TUSERDATA)
         {
             // we don't pass around the pointer as it may get destroyed any time
-            CLuaMatrix* pMatrix = NULL;
+            CMatrix* pMatrix = nullptr;
             ReadUserData(pMatrix);
             if (pMatrix)
             {
@@ -1368,19 +1368,18 @@ public:
 
     bool NextIsVector4D() const
     {
-        return (NextCouldBeNumber() && NextCouldBeNumber(1) && NextCouldBeNumber(2) && NextCouldBeNumber(3)) || NextIsUserDataOfType<CLuaVector4D>();
+        return (NextCouldBeNumber() && NextCouldBeNumber(1) && NextCouldBeNumber(2) && NextCouldBeNumber(3)) || NextIsUserDataOfType<CVector4D>();
     }
 
     bool NextIsVector3D() const
     {
-        return (NextCouldBeNumber() && NextCouldBeNumber(1) && NextCouldBeNumber(2)) || NextIsUserDataOfType<CLuaVector3D>() ||
-               NextIsUserDataOfType<CLuaVector4D>();
+        return (NextCouldBeNumber() && NextCouldBeNumber(1) && NextCouldBeNumber(2)) || NextIsUserDataOfType<CVector>() || NextIsUserDataOfType<CVector4D>();
     }
 
     bool NextIsVector2D() const
     {
-        return (NextCouldBeNumber() && NextCouldBeNumber(1)) || NextIsUserDataOfType<CLuaVector2D>() || NextIsUserDataOfType<CLuaVector3D>() ||
-               NextIsUserDataOfType<CLuaVector4D>();
+        return (NextCouldBeNumber() && NextCouldBeNumber(1)) || NextIsUserDataOfType<CVector2D>() || NextIsUserDataOfType<CVector>() ||
+               NextIsUserDataOfType<CVector4D>();
     }
 
     //
@@ -1538,7 +1537,16 @@ public:
             }
             else if (iArgument == LUA_TUSERDATA)
             {
-                m_strErrorGotArgumentType = GetUserDataClassName(*((void**)lua_touserdata(m_luaVM, m_iErrorIndex)), m_luaVM);
+                if (lua_isclass(m_luaVM, m_iErrorIndex, "Vector3"))
+                    m_strErrorGotArgumentType = "vector3";
+                else if (lua_isclass(m_luaVM, m_iErrorIndex, "Vector2"))
+                    m_strErrorGotArgumentType = "vector2";
+                else if (lua_isclass(m_luaVM, m_iErrorIndex, "Vector4"))
+                    m_strErrorGotArgumentType = "vector4";
+                else if (lua_isclass(m_luaVM, m_iErrorIndex, "Matrix"))
+                    m_strErrorGotArgumentType = "matrix";
+                else
+                    m_strErrorGotArgumentType = GetUserDataClassName(*((void**)lua_touserdata(m_luaVM, m_iErrorIndex)), m_luaVM);
                 m_strErrorGotArgumentValue = "";
             }
         }

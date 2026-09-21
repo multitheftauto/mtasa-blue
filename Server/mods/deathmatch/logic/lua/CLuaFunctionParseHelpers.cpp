@@ -390,38 +390,6 @@ CBan* UserDataCast(CBan* ptr, lua_State* luaState)
 }
 
 //
-// CLuaVector2D from userdata
-//
-CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState)
-{
-    return nullptr;
-}
-
-//
-// CLuaVector3D from userdata
-//
-CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState)
-{
-    return nullptr;
-}
-
-//
-// CLuaVector4D from userdata
-//
-CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState)
-{
-    return nullptr;
-}
-
-//
-// CLuaMatrix from userdata
-//
-CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState)
-{
-    return nullptr;
-}
-
-//
 // CElement from userdata
 //
 CElement* UserDataToElementCast(CElement* ptr, eEntityType entityType, lua_State* luaState)
@@ -519,14 +487,6 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
     if (auto* pVar = UserDataCast((CTextItem*)ptr, luaVM))
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast((CTextDisplay*)ptr, luaVM))
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaVector2D*)ptr, luaVM))
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaVector3D*)ptr, luaVM))
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaVector4D*)ptr, luaVM))
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaMatrix*)ptr, luaVM))
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast((CRemoteCall*)ptr, luaVM))
         return GetClassTypeName(pVar);

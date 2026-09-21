@@ -152,7 +152,17 @@ struct CLuaFunctionParserBase
             case LUA_TTHREAD:
                 return "coroutine";
             case LUA_TUSERDATA:
+            {
+                if (lua_isclass(L, index, "Vector3"))
+                    return "vector3";
+                if (lua_isclass(L, index, "Vector2"))
+                    return "vector2";
+                if (lua_isclass(L, index, "Vector4"))
+                    return "vector4";
+                if (lua_isclass(L, index, "Matrix"))
+                    return "matrix";
                 return GetUserDataClassName(*((void**)lua_touserdata(L, index)), L);
+            }
             case LUA_TLIGHTUSERDATA:
                 return GetUserDataClassName(lua_touserdata(L, index), L);
         }
@@ -325,8 +335,7 @@ struct CLuaFunctionParserBase
                 return false;
 
             using class_t = std::remove_pointer_t<T>;
-            if constexpr (std::is_same_v<class_t, CLuaVector2D> || std::is_same_v<class_t, CLuaVector3D> || std::is_same_v<class_t, CLuaVector4D> ||
-                          std::is_same_v<class_t, CLuaMatrix>)
+            if constexpr (is_inline_userdata_type<class_t>::value)
             {
                 return lua_isclass(L, index, GetInlineUserdataClassName<class_t>());
             }
@@ -590,8 +599,7 @@ struct CLuaFunctionParserBase
             auto  cast = [isLightUserData, pValue, L, targetIndex](auto null)
             {
                 using class_type = std::remove_pointer_t<decltype(null)>;
-                if constexpr (std::is_same_v<class_type, CLuaVector2D> || std::is_same_v<class_type, CLuaVector3D> ||
-                              std::is_same_v<class_type, CLuaVector4D> || std::is_same_v<class_type, CLuaMatrix>)
+                if constexpr (is_inline_userdata_type<class_type>::value)
                 {
                     if (lua_isclass(L, targetIndex, GetInlineUserdataClassName<class_type>()))
                         return static_cast<decltype(null)>(pValue);
@@ -604,11 +612,11 @@ struct CLuaFunctionParserBase
                 }
             };
             // A vector2 may also be filled from a vector3/vector4
-            if (CLuaVector2D* pVec2D = cast((CLuaVector2D*)0); pVec2D != nullptr)
+            if (CVector2D* pVec2D = cast((CVector2D*)0); pVec2D != nullptr)
                 return *pVec2D;
-            if (CLuaVector3D* pVec3D = cast((CLuaVector3D*)0); pVec3D != nullptr)
+            if (CVector* pVec3D = cast((CVector*)0); pVec3D != nullptr)
                 return *pVec3D;
-            if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
+            if (CVector4D* pVec4D = cast((CVector4D*)0); pVec4D != nullptr)
                 return *pVec4D;
 
             // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
@@ -633,8 +641,7 @@ struct CLuaFunctionParserBase
             auto  cast = [isLightUserData, pValue, L, targetIndex](auto null)
             {
                 using class_type = std::remove_pointer_t<decltype(null)>;
-                if constexpr (std::is_same_v<class_type, CLuaVector2D> || std::is_same_v<class_type, CLuaVector3D> ||
-                              std::is_same_v<class_type, CLuaVector4D> || std::is_same_v<class_type, CLuaMatrix>)
+                if constexpr (is_inline_userdata_type<class_type>::value)
                 {
                     if (lua_isclass(L, targetIndex, GetInlineUserdataClassName<class_type>()))
                         return static_cast<decltype(null)>(pValue);
@@ -647,9 +654,9 @@ struct CLuaFunctionParserBase
                 }
             };
             // A vector3 may also be filled from a vector4
-            if (CLuaVector3D* pVec3D = cast((CLuaVector3D*)0); pVec3D != nullptr)
+            if (CVector* pVec3D = cast((CVector*)0); pVec3D != nullptr)
                 return *pVec3D;
-            if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
+            if (CVector4D* pVec4D = cast((CVector4D*)0); pVec4D != nullptr)
                 return *pVec4D;
 
             // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
@@ -675,8 +682,7 @@ struct CLuaFunctionParserBase
             auto  cast = [isLightUserData, pValue, L, targetIndex](auto null)
             {
                 using class_type = std::remove_pointer_t<decltype(null)>;
-                if constexpr (std::is_same_v<class_type, CLuaVector2D> || std::is_same_v<class_type, CLuaVector3D> ||
-                              std::is_same_v<class_type, CLuaVector4D> || std::is_same_v<class_type, CLuaMatrix>)
+                if constexpr (is_inline_userdata_type<class_type>::value)
                 {
                     if (lua_isclass(L, targetIndex, GetInlineUserdataClassName<class_type>()))
                         return static_cast<decltype(null)>(pValue);
@@ -689,7 +695,7 @@ struct CLuaFunctionParserBase
                 }
             };
             // A vector3 may also be filled from a vector4
-            if (CLuaVector4D* pVec4D = cast((CLuaVector4D*)0); pVec4D != nullptr)
+            if (CVector4D* pVec4D = cast((CVector4D*)0); pVec4D != nullptr)
                 return *pVec4D;
 
             // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
@@ -739,7 +745,7 @@ struct CLuaFunctionParserBase
             auto  cast = [isLightUserData, pValue, L, targetIndex](auto null)
             {
                 using class_type = std::remove_pointer_t<decltype(null)>;
-                if constexpr (std::is_same_v<class_type, CLuaMatrix>)
+                if constexpr (is_inline_userdata_type<class_type>::value)
                 {
                     if (lua_isclass(L, targetIndex, GetInlineUserdataClassName<class_type>()))
                         return static_cast<decltype(null)>(pValue);
@@ -751,8 +757,8 @@ struct CLuaFunctionParserBase
                                            : UserDataCast(*reinterpret_cast<decltype(null)*>(pValue), L);
                 }
             };
-            // A matrix may also be filled from a CLuaMatrix
-            if (CLuaMatrix* pMatrix = cast((CLuaMatrix*)0); pMatrix != nullptr)
+            // A matrix may also be filled from a CMatrix
+            if (CMatrix* pMatrix = cast((CMatrix*)0); pMatrix != nullptr)
                 return *pMatrix;
 
             // Subtract one from the index, as the call to lua::PopPrimitive above increments the index, even if the
@@ -768,8 +774,7 @@ struct CLuaFunctionParserBase
             int   targetIndex = index;
             void* pValue = lua::PopPrimitive<void*>(L, index);
             using class_t = std::remove_pointer_t<T>;
-            if constexpr (std::is_same_v<class_t, CLuaVector2D> || std::is_same_v<class_t, CLuaVector3D> || std::is_same_v<class_t, CLuaVector4D> ||
-                          std::is_same_v<class_t, CLuaMatrix>)
+            if constexpr (is_inline_userdata_type<class_t>::value)
             {
                 if (lua_isclass(L, targetIndex, GetInlineUserdataClassName<class_t>()))
                     return static_cast<T>(pValue);

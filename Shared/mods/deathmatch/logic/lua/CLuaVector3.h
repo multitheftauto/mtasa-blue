@@ -13,10 +13,5 @@
 
 #include "CVector.h"
 
-class CLuaVector3D : public CVector
-{
-public:
-    CLuaVector3D() : CVector() {}
-    CLuaVector3D(const CVector& vector) : CVector(vector) {}
-    CLuaVector3D(float fX, float fY, float fZ) : CVector(fX, fY, fZ) {}
-};
+// Alias CLuaVector3D to CVector now that script IDs and CIdArray registrations are removed for inline userdata
+using CLuaVector3D = CVector;

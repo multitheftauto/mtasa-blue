@@ -13,10 +13,5 @@
 
 #include "CVector2D.h"
 
-class CLuaVector2D : public CVector2D
-{
-public:
-    CLuaVector2D() : CVector2D() {}
-    CLuaVector2D(const CVector2D& vector) : CVector2D(vector) {}
-    CLuaVector2D(float fX, float fY) : CVector2D(fX, fY) {}
-};
+// Alias CLuaVector2D to CVector2D now that script IDs and CIdArray registrations are removed for inline userdata
+using CLuaVector2D = CVector2D;
