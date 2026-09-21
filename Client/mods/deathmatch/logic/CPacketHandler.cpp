@@ -3853,22 +3853,6 @@ retry:
                     SPlayerArmorSync armor;
                     bitStream.Read(&armor);
 
-                    // Read out the stats that differ from the defaults
-                    std::vector<std::pair<unsigned short, float>> stats;
-                    if (bitStream.Can(eBitStreamVersion::PedStatsSync))
-                    {
-                        unsigned short usNumStats = 0;
-                        bitStream.ReadCompressed(usNumStats);
-                        for (unsigned short i = 0; i < usNumStats; i++)
-                        {
-                            unsigned short usStat = 0;
-                            float          fValue = 0.0f;
-                            bitStream.Read(usStat);
-                            bitStream.Read(fValue);
-                            stats.emplace_back(usStat, fValue);
-                        }
-                    }
-
                     // Read out the vehicle id
                     ElementID       VehicleID = INVALID_ELEMENT_ID;
                     unsigned char   ucSeat = 0xFF;
@@ -3892,10 +3876,6 @@ retry:
 
                     CClientPed* pPed = new CClientPed(g_pClientGame->m_pManager, usModel, EntityID);
                     pEntity = pPed;
-
-                    // Before the health, which is clamped to MAX_HEALTH
-                    for (const auto& [usStat, fValue] : stats)
-                        pPed->SetStat(usStat, fValue);
 
                     pPed->SetPosition(position.data.vecPosition);
                     pPed->SetCurrentRotation(pedRotation.data.fRotation, true);

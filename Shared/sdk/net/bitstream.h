@@ -40,10 +40,6 @@ enum class eBitStreamVersion : unsigned short
     // YYYY-MM-DD
     // Name,
 
-    // Ped stats in the entity add packet
-    // 2026-09-21
-    PedStatsSync,
-
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,
