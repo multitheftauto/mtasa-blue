@@ -255,6 +255,13 @@ bool CPixelsManager::GetSurfacePixels(IDirect3DSurface9* pD3DSurface, CPixels& o
     D3DSURFACE_DESC SurfDesc;
     pD3DSurface->GetDesc(&SurfDesc);
 
+    // Sanity check: reject implausible dimensions (e.g. from a corrupt/uninitialized texture raster)
+    // before doing any size arithmetic, so we fail gracefully instead of attempting a huge allocation
+    constexpr uint MAX_PLAUSIBLE_SURFACE_DIMENSION = 8192;
+    if (SurfDesc.Width == 0 || SurfDesc.Height == 0 || SurfDesc.Width > MAX_PLAUSIBLE_SURFACE_DIMENSION ||
+        SurfDesc.Height > MAX_PLAUSIBLE_SURFACE_DIMENSION)
+        return false;
+
     POINT SurfSize = {static_cast<int>(SurfDesc.Width), static_cast<int>(SurfDesc.Height)};
     RECT  SurfRect = {0, 0, static_cast<int>(SurfDesc.Width), static_cast<int>(SurfDesc.Height)};
     if (pRect)
