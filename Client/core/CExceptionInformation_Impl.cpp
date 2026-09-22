@@ -488,7 +488,8 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
         {
             char mismatchBuffer[DEBUG_BUFFER_SIZE] = {};
             SAFE_DEBUG_PRINT_C(mismatchBuffer, DEBUG_BUFFER_SIZE,
-                               "%.*sSet - Stored enhanced info does not match the current exception (stored: code 0x%08X, address 0x%p; current: code 0x%08X, address 0x%p) - stale data, extracting fresh\n",
+                               "%.*sSet - Stored enhanced info does not match the current exception (stored: code 0x%08X, address 0x%p; current: code 0x%08X, "
+                               "address 0x%p) - stale data, extracting fresh\n",
                                static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), enhancedInfo.exceptionCode,
                                enhancedInfo.exceptionAddress, pException->ExceptionRecord->ExceptionCode, pException->ExceptionRecord->ExceptionAddress);
         }
@@ -657,8 +658,7 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
     else
     {
         char debugBuffer[DEBUG_BUFFER_SIZE] = {};
-        SAFE_DEBUG_PRINT_C(debugBuffer, DEBUG_BUFFER_SIZE,
-                           "%.*sSet - Fallback module path buffer unavailable, selecting first non-system frame directly\n",
+        SAFE_DEBUG_PRINT_C(debugBuffer, DEBUG_BUFFER_SIZE, "%.*sSet - Fallback module path buffer unavailable, selecting first non-system frame directly\n",
                            static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data());
     }
 
