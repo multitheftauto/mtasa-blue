@@ -848,6 +848,12 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
         bLoadedModel = true;
         pGame->GetModelInfo(usModelId)->Request(BLOCKING, "CRenderWareSA::GetModelTextures");
         pTXD = CTxdStore_GetTxd(usTxdId);
+
+        // The load attempt above can still leave us without a TXD (e.g. a model info entry
+        // that exists but was never really streamed with texture data), so bail out here
+        // instead of handing a null dictionary to the texture-reading code below
+        if (!pTXD)
+            return false;
     }
 
     std::vector<RwTexture*> rwTextureList;
@@ -877,7 +883,11 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
         else
             bValidTexture = true;
 
-        if (bValidTexture)
+        // A texture entry can exist in the TXD without ever having had its raster (pixel
+        // data) actually created, e.g. for a model info entry that isn't a genuinely loaded
+        // texture-bearing model; reading through a null raster here is the actual source of
+        // the crash the CPixelsManager guard only catches downstream
+        if (bValidTexture && pTexture->raster)
         {
             RwD3D9Raster* pD3DRaster = (RwD3D9Raster*)(&pTexture->raster->renderResource);
             CPixels       texture;
