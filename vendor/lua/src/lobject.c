@@ -80,6 +80,11 @@ int luaO_rawequalObj (const TValue *t1, const TValue *t2) {
       return bvalue(t1) == bvalue(t2);  /* boolean true must be 1 !! */
     case LUA_TLIGHTUSERDATA:
       return pvalue(t1) == pvalue(t2);
+    case LUA_TVEC: {
+      const float *v1 = vvalue(t1)->vec;
+      const float *v2 = vvalue(t2)->vec;
+      return (v1[0] == v2[0] && v1[1] == v2[1] && v1[2] == v2[2] && v1[3] == v2[3]);
+    }
     default:
       lua_assert(iscollectable(t1));
       return gcvalue(t1) == gcvalue(t2);

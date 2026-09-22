@@ -23,8 +23,8 @@ extern "C"
 class CElement;
 class CLuaArguments;
 
-#define LUA_TTABLEREF    9
-#define LUA_TSTRING_LONG 10
+#define LUA_TTABLEREF    11
+#define LUA_TSTRING_LONG 12
 
 class CLuaArgument
 {
@@ -51,6 +51,7 @@ public:
     void ReadElementID(ElementID ID);
     void ReadScriptID(uint uiScriptID);
     void ReadTable(class CLuaArguments* table);
+    void ReadVector(float x, float y, float z, float w = 0.0f);
 
     int GetType() const { return m_iType; };
 
@@ -60,6 +61,7 @@ public:
     void*              GetUserData() const { return m_pUserData; };
     CLuaArguments*     GetTable() const { return m_pTableData; }
     CElement*          GetElement() const;
+    const float*       GetVector() const { return m_vecData; }
     bool               GetAsString(SString& strBuffer);
 
     bool         ReadFromBitStream(NetBitStreamInterface& bitStream, std::vector<CLuaArguments*>* pKnownTables = NULL, unsigned int uiDepth = 0);
@@ -71,6 +73,7 @@ public:
     bool IsEqualTo(const CLuaArgument& compareTo, std::set<const CLuaArguments*>* knownTables = nullptr) const;
 
     [[nodiscard]] bool IsString() const noexcept { return m_iType == LUA_TSTRING; }
+    [[nodiscard]] bool IsVector() const noexcept { return m_iType == LUA_TVEC; }
 
     [[nodiscard]] bool TryGetString(std::string_view& string) const noexcept
     {
@@ -122,6 +125,7 @@ private:
     void*          m_pUserData;
     CLuaArguments* m_pTableData;
     bool           m_bWeakTableRef;
+    float          m_vecData[4];
 
 #ifdef MTA_DEBUG
     std::string m_strFilename;

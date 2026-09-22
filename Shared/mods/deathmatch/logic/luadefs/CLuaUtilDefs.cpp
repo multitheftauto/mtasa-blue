@@ -255,6 +255,12 @@ int CLuaUtilDefs::GetUserdataType(lua_State* luaVM)
     CScriptArgReader argStream(luaVM);
     int              iArgument = lua_type(luaVM, 1);
 
+    if (iArgument == LUA_TVEC)
+    {
+        lua_pushstring(luaVM, "vector");
+        return 1;
+    }
+
     if (argStream.NextIsUserData())
     {
         SString strType;
