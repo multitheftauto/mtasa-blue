@@ -1662,6 +1662,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         case CElement::DUMMY:
         case CElement::VEHICLE:
         case CElement::OBJECT:
+        case CElement::BUILDING:
         case CElement::MARKER:
         case CElement::BLIP:
         case CElement::PICKUP:
