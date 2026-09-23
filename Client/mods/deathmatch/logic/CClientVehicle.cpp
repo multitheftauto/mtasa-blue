@@ -3199,17 +3199,14 @@ void CClientVehicle::Destroy()
 void CClientVehicle::InvalidateComponentData()
 {
     if (!m_ComponentData.empty())
-        BackupComponentVisibility();
+    {
+        m_ComponentVisibilityBackup.clear();
+
+        for (const auto& pair : m_ComponentData)
+            m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
+    }
 
     m_ComponentData.clear();
-}
-
-void CClientVehicle::BackupComponentVisibility()
-{
-    m_ComponentVisibilityBackup.clear();
-
-    for (const auto& pair : m_ComponentData)
-        m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
 }
 
 void CClientVehicle::ReCreate()

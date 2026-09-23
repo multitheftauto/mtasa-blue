@@ -567,7 +567,6 @@ protected:
 
     void StreamIn(bool bInstantly);
     void StreamOut();
-    void BackupComponentVisibility();
 
     void NotifyCreate();
     void NotifyDestroy();
