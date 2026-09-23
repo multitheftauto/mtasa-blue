@@ -474,6 +474,7 @@ public:
     void Create();
     void Destroy();
     void StreamOutForABit() override;
+    void InvalidateComponentData();
 
     void                                    AddProjectile(CClientProjectile* pProjectile) { m_Projectiles.push_back(pProjectile); }
     void                                    RemoveProjectile(CClientProjectile* pProjectile) { m_Projectiles.remove(pProjectile); }

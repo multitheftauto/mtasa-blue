@@ -791,38 +791,40 @@ void CClientVehicleManager::RestreamVehicles(unsigned short usModel)
 {
     g_pClientGame->GetModelCacheManager()->OnRestreamModel(usModel);
 
-    // This can speed up initial connect
-    if (m_StreamedIn.empty())
-        return;
-
     for (uint i = 0; i < m_List.size(); i++)
     {
         CClientVehicle* pVehicle = m_List[i];
 
-        // Streamed in and same vehicle ID?
-        if (pVehicle->IsStreamedIn() && pVehicle->GetModel() == usModel)
+        // Same vehicle ID?
+        if (pVehicle->GetModel() != usModel)
+            continue;
+
+        if (pVehicle->IsStreamedIn())
         {
             // Stream it out for a while until streamed decides to stream it
             // back in eventually
             pVehicle->StreamOutForABit();
+        }
+        else
+        {
+            pVehicle->InvalidateComponentData();
         }
     }
 }
 
 void CClientVehicleManager::RestreamAllVehicles()
 {
-    // This can speed up initial connect
-    if (m_StreamedIn.empty())
-        return;
-
     for (auto& pVehicle : m_List)
     {
-        // Streamed in and same vehicle ID?
         if (pVehicle->IsStreamedIn())
         {
             // Stream it out for a while until streamed decides to stream it
             // back in eventually
             pVehicle->StreamOutForABit();
+        }
+        else
+        {
+            pVehicle->InvalidateComponentData();
         }
     }
 }

@@ -1155,8 +1155,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         SetSirenOrAlarmActive(false);
 
         // Cache current component visibility and clear data so it can be regenerated.
-        BackupComponentVisibility();
-        m_ComponentData.clear();
+        InvalidateComponentData();
 
         // Reset stored dummy positions
         m_copyDummyPositions = true;
@@ -1183,10 +1182,9 @@ void CClientVehicle::SetVariant(unsigned char ucVariant, unsigned char ucVariant
     m_ucVariation = ucVariant;
     m_ucVariation2 = ucVariant2;
 
-    // Cache visibility so component state survives variant changes
-    BackupComponentVisibility();
-    // Clear component data to regenerate it on next create
-    m_ComponentData.clear();
+    // Cache visibility so component state survives variant changes and clear component data
+    // to regenerate it on next create
+    InvalidateComponentData();
     ReCreate();
 }
 
@@ -3200,10 +3198,15 @@ void CClientVehicle::Destroy()
 
 void CClientVehicle::StreamOutForABit()
 {
-    BackupComponentVisibility();
-    m_ComponentData.clear();
+    InvalidateComponentData();
 
     CClientStreamElement::StreamOutForABit();
+}
+
+void CClientVehicle::InvalidateComponentData()
+{
+    BackupComponentVisibility();
+    m_ComponentData.clear();
 }
 
 void CClientVehicle::BackupComponentVisibility()
