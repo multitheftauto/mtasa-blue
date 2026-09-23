@@ -1234,7 +1234,7 @@ bool CStaticFunctionDefinitions::GetElementRotation(CElement* pElement, CVector&
 
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
             pBuilding->GetRotation(vecRotation);
@@ -1421,7 +1421,7 @@ bool CStaticFunctionDefinitions::SetElementRotation(CElement* pElement, const CV
 
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
             CVector    vecRadians = vecRotation;
@@ -2025,7 +2025,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             }
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
             if (pBuilding->GetModel() == usModel)
