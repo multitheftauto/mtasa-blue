@@ -37,6 +37,7 @@
 #include <net/SimHeaders.h>
 #include <zip.h>
 #include <glob/glob.h>
+#include <cctype>
 #include <unordered_set>
 
 #ifdef WIN32
@@ -54,7 +55,7 @@ namespace
             std::size_t hash = 0;
             for (char c : key)
             {
-                hash = hash * 31 + static_cast<unsigned char>(tolower(c));
+                hash = hash * 31 + std::tolower(static_cast<unsigned char>(c));
             }
             return hash;
         }
