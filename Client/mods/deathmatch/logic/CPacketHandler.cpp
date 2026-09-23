@@ -136,6 +136,10 @@ bool CPacketHandler::ProcessPacket(unsigned char ucPacketID, NetBitStreamInterfa
             Packet_EntityRemove(bitStream);
             return true;
 
+        case PACKET_ID_ENTITY_REMOVE_TREE:
+            Packet_EntityRemoveTree(bitStream);
+            return true;
+
         // Respawns/hides pickups
         case PACKET_ID_PICKUP_HIDESHOW:
             Packet_PickupHideShow(bitStream);
@@ -1850,7 +1854,9 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                                 {
                                     // Desynced? Outside but supposed to be in
                                     // For local player or synced peds this is taken care of in CClientPed::UpdateVehicleInOut()
-                                    if (pJacked->GetOccupiedVehicle() && !pJacked->GetRealOccupiedVehicle())
+                                    // Not while his drag animation still plays; an aborted jack ends with him out anyway,
+                                    // and his own client is about to notify that.
+                                    if (pJacked->GetOccupiedVehicle() && !pJacked->GetRealOccupiedVehicle() && !pJacked->IsGettingJacked())
                                     {
                                         // Warp him back in
                                         pJacked->WarpIntoVehicle(pJacked->GetOccupiedVehicle(), pJacked->GetOccupiedVehicleSeat());
@@ -1918,7 +1924,10 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                             pPed->ResetVehicleInOut();
 
                         // Make sure we're removed from the vehicle
-                        bool bDontWarpIfGettingDraggedOut = pPed->IsLocalPlayer() || pPed->IsSyncing();
+                        // A jack victim also leaves through here when the jacker aborts, and his drag
+                        // animation may still be playing on clients watching it; let it finish.
+                        bool bDontWarpIfGettingDraggedOut = pPed->IsLocalPlayer() || pPed->IsSyncing() || pPed->IsGettingJacked();
+
                         pPed->RemoveFromVehicle(bDontWarpIfGettingDraggedOut);
 
                         if (ucSeat == 0)
@@ -2071,7 +2080,10 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                                 }
 
                                 // Warp him out
-                                bool bDontWarpIfGettingDraggedOut = pOutsidePed->IsLocalPlayer() || pOutsidePed->IsSyncing();
+                                // The confirmation only waits for the jacker's own enter animation, so it can arrive while
+                                // the jacked ped's drag animation still plays on clients watching it; let it finish.
+                                bool bDontWarpIfGettingDraggedOut = pOutsidePed->IsLocalPlayer() || pOutsidePed->IsSyncing() || pOutsidePed->IsGettingJacked();
+
                                 pOutsidePed->RemoveFromVehicle(bDontWarpIfGettingDraggedOut);
 
                                 // Reset interpolation so he won't appear on the roof of the vehicle until next sync
@@ -4385,6 +4397,118 @@ void CPacketHandler::Packet_EntityRemove(NetBitStreamInterface& bitStream)
     }
 }
 
+void CPacketHandler::Packet_EntityRemoveTree(NetBitStreamInterface& bitStream)
+{
+    // unsigned short (2) - number of root elements
+    // ElementID      (2) - root element ids (repeating)
+
+    unsigned short rootElementCount = 0;
+    if (!bitStream.ReadCompressed(rootElementCount))
+        return;
+
+    std::vector<CClientEntity*> rootElements;
+    rootElements.reserve(rootElementCount);
+
+    for (unsigned short i = 0; i < rootElementCount; ++i)
+    {
+        ElementID rootID = INVALID_ELEMENT_ID;
+        if (!bitStream.Read(rootID))
+            return;
+
+        CClientEntity* rootEntity = CElementIDs::GetElement(rootID);
+        if (rootEntity)
+        {
+            if (rootEntity->GetType() == CCLIENTPLAYER)
+            {
+                // Protocol error 72: Entity tree root cannot be a player
+                RaiseProtocolError(72);
+                return;
+            }
+            rootElements.push_back(rootEntity);
+        }
+    }
+
+    for (auto* rootEntity : rootElements)
+    {
+        RemoveEntityTree(rootEntity);
+    }
+}
+
+void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
+{
+    if (!rootEntity || rootEntity->IsSystemEntity())
+        return;
+
+    std::vector<CClientEntity*> entitiesToDelete;
+    CollectEntityTree(rootEntity, entitiesToDelete);
+
+    CMappedList<CClientPed*>* pedList = nullptr;
+    CMappedList<CClientPed*>  listOfPeds;
+
+    auto getPedList = [&]() -> CMappedList<CClientPed*>&
+    {
+        if (!pedList)
+        {
+            listOfPeds = g_pClientGame->GetPedSync()->GetList();
+            listOfPeds.push_front(g_pClientGame->GetLocalPlayer());
+            pedList = &listOfPeds;
+        }
+        return *pedList;
+    };
+
+    for (auto* entity : entitiesToDelete)
+    {
+        if (entity->IsSystemEntity())
+            continue;
+
+        const auto entityType = entity->GetType();
+        if (entityType == CCLIENTVEHICLE)
+        {
+            const ElementID entityID = entity->GetID();
+            for (auto* ped : getPedList())
+            {
+                if (ped->m_VehicleInOutID == entityID)
+                    ped->ResetVehicleInOut();
+
+                if (ped->m_bNoNewVehicleTask && ped->m_NoNewVehicleTaskReasonID == entityID)
+                {
+                    ped->m_bNoNewVehicleTask = false;
+                    ped->m_NoNewVehicleTaskReasonID = INVALID_ELEMENT_ID;
+                }
+            }
+        }
+        else if (entityType == CCLIENTPED)
+        {
+            auto* removedPed = static_cast<CClientPed*>(entity);
+            for (auto* ped : getPedList())
+            {
+                if (ped->m_bIsGettingJacked && ped->m_pGettingJackedBy == removedPed)
+                {
+                    ped->ResetVehicleInOut();
+                    ped->RemoveFromVehicle(false);
+                    ped->SetVehicleInOutState(VEHICLE_INOUT_NONE);
+                }
+            }
+        }
+
+        entity->DeleteClientChildren();
+        g_pClientGame->m_ElementDeleter.Delete(entity);
+    }
+}
+
+void CPacketHandler::CollectEntityTree(CClientEntity* entity, std::vector<CClientEntity*>& entities)
+{
+    if (!entity)
+        return;
+
+    for (auto iter = entity->IterBegin(); iter != entity->IterEnd(); ++iter)
+    {
+        CollectEntityTree(*iter, entities);
+    }
+
+    entities.push_back(entity);
+}
+
 void CPacketHandler::Packet_PickupHideShow(NetBitStreamInterface& bitStream)
 {
     // bool             - show it?
@@ -5387,33 +5511,37 @@ void CPacketHandler::Packet_ResourceClientScripts(NetBitStreamInterface& bitStre
 
                 // Read the script compressed chunk
                 unsigned int len;
-                if (!bitStream.Read(len) || len < 4)
+                if (!bitStream.Read(len) || len < 4 || !bitStream.CanReadNumberOfBytes(len))
                     return;
-                char* data = new char[len];
-                if (!bitStream.Read(data, len))
-                {
-                    memset(data, 0, len);
-                    delete[] data;
+                std::vector<char> data(len);
+                if (!bitStream.Read(data.data(), len))
                     return;
-                }
 
                 // First grab the original length from the data chunk
-                const unsigned char* uData = (const unsigned char*)data;
-                unsigned long        originalLength = uData[0] << 24 | uData[1] << 16 | uData[2] << 8 | uData[3];
-                char*                uncompressedBuffer = new char[originalLength];
-
-                // Uncompress it
-                if (uncompress((Bytef*)uncompressedBuffer, &originalLength, (const Bytef*)&data[4], len - 4) == Z_OK)
+                const auto*         uData = reinterpret_cast<const unsigned char*>(data.data());
+                const unsigned long originalLength = static_cast<unsigned long>(uData[0]) << 24 | static_cast<unsigned long>(uData[1]) << 16 |
+                                                     static_cast<unsigned long>(uData[2]) << 8 | static_cast<unsigned long>(uData[3]);
+                constexpr unsigned long MAX_CLIENT_SCRIPT_SIZE = 50 * 1024 * 1024;
+                if (originalLength == 0 || originalLength > MAX_CLIENT_SCRIPT_SIZE)
                 {
-                    // Load the script!
-                    pResource->LoadNoClientCacheScript(uncompressedBuffer, originalLength, strFilename);
+                    memset(data.data(), 0, data.size());
+                    return;
                 }
 
-                memset(uncompressedBuffer, 0, originalLength);
-                memset(data, 0, len);
+                std::vector<char> uncompressedBuffer(originalLength);
+                unsigned long     uncompressedLength = originalLength;
 
-                delete[] uncompressedBuffer;
-                delete[] data;
+                // Uncompress it
+                if (uncompress(reinterpret_cast<Bytef*>(uncompressedBuffer.data()), &uncompressedLength, reinterpret_cast<const Bytef*>(&data[4]), len - 4) ==
+                        Z_OK &&
+                    uncompressedLength == originalLength)
+                {
+                    // Load the script!
+                    pResource->LoadNoClientCacheScript(uncompressedBuffer.data(), uncompressedLength, strFilename);
+                }
+
+                memset(uncompressedBuffer.data(), 0, uncompressedBuffer.size());
+                memset(data.data(), 0, data.size());
             }
         }
     }

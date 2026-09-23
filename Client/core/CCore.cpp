@@ -1955,8 +1955,10 @@ void CCore::ApplyCoreInitSettings()
 //
 void CCore::OnGameTimerUpdate()
 {
-    // NOTE: (pxd) We are handling the frame limiting updates
-    // earlier in the callpath (CModManager::DoPulsePreFrame, CModManager::DoPulsePostFrame)
+    // GTA samples its clock right after this. Waiting here keeps the frame deltas it
+    // measures exact, whatever runs between Present and the next frame does not leak in
+    if (m_pFPSLimiter)
+        m_pFPSLimiter->OnGameTimerUpdate();
 }
 
 void CCore::OnFPSLimitChange(std::uint16_t fps)
@@ -2100,7 +2102,7 @@ void CCore::CalculateStreamingMemoryRange()
     float fMaxAmount = EvalSamplePosition<float>(maxPoints, NUMELMS(maxPoints), iSystemRamMB);
 
     // Scale max if gta3.img is over 1GB
-    SString strGta3imgFilename = PathJoin(GetLaunchPath(), "models", "gta3.img");
+    SString strGta3imgFilename = PathJoin(UTF8FilePath(g_gtaDirectory), "models", "gta3.img");
     uint    uiFileSizeMB = FileSize(strGta3imgFilename) / 0x100000LL;
     float   fSizeScale = UnlerpClamped(1024, uiFileSizeMB, 2048);
     fMaxAmount += fMaxAmount * fSizeScale;

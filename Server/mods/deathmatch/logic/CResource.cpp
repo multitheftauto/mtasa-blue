@@ -31,6 +31,8 @@
 #include "CHTTPD.h"
 #include "Utils.h"
 #include "packets/CResourceClientScriptsPacket.h"
+#include "packets/CEntityRemoveTreePacket.h"
+#include "CResourceMapItem.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include <net/SimHeaders.h>
 #include <zip.h>
@@ -552,12 +554,10 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
                 return SString();
 
             auto checksumOrError = CChecksum::GenerateChecksumFromFile(strPath);
-            if (std::holds_alternative<std::string>(checksumOrError))
-            {
-                return SString(std::get<std::string>(checksumOrError));
-            }
+            if (!checksumOrError)
+                return SString(checksumOrError.error());
 
-            CChecksum checksum = std::get<CChecksum>(checksumOrError);
+            CChecksum checksum = *checksumOrError;
 
             // Check if file is blocked before persisting the checksum, so that
             // blocked files never have their checksum stored on the CResourceFile.
@@ -1331,6 +1331,26 @@ bool CResource::Stop(bool bManualStop)
 
     m_TemporaryIncludes.clear();
 
+    // Send bulk tree removal packet for the resource element to joined players
+    if (m_pResourceElement)
+    {
+        CEntityRemoveTreePacket removeTreePacket;
+        removeTreePacket.AddRootElement(m_pResourceElement);
+        g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removeTreePacket);
+
+        if (m_pDefaultElementGroup)
+            m_pDefaultElementGroup->SetTreeRoot(m_pResourceElement);
+
+        for (CResourceFile* resourceFile : m_ResourceFiles)
+        {
+            if (auto* mapItem = dynamic_cast<CResourceMapItem*>(resourceFile))
+            {
+                if (mapItem->GetElementGroup())
+                    mapItem->GetElementGroup()->SetTreeRoot(m_pResourceElement);
+            }
+        }
+    }
+
     // Stop all the resource files we have. The files we share with our clients we remove from the resource file list.
     for (CResourceFile* pResourceFile : m_ResourceFiles)
     {
@@ -1360,26 +1380,17 @@ bool CResource::Stop(bool bManualStop)
 
     OnResourceStateChange("loaded");
 
-    // Remove the resource element from the client
-    CEntityRemovePacket removePacket;
-
-    if (m_pResourceElement)
-    {
-        removePacket.Add(m_pResourceElement);
-        g_pGame->GetElementDeleter()->Delete(m_pResourceElement);
-        m_pResourceElement = nullptr;
-    }
-
-    // Remove the dynamic resource element from the client
     if (m_pResourceDynamicElementRoot)
     {
-        removePacket.Add(m_pResourceDynamicElementRoot);
-        g_pGame->GetElementDeleter()->Delete(m_pResourceDynamicElementRoot);
+        g_pGame->GetElementDeleter()->DeleteTree(m_pResourceDynamicElementRoot);
         m_pResourceDynamicElementRoot = nullptr;
     }
 
-    // Broadcast the packet to joined players
-    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
+    if (m_pResourceElement)
+    {
+        g_pGame->GetElementDeleter()->DeleteTree(m_pResourceElement);
+        m_pResourceElement = nullptr;
+    }
 
     // Clear the list of players where this resource is running
     std::exchange(m_isRunningForPlayer, {});

@@ -507,7 +507,7 @@ struct SVelocitySync : public ISyncStructure
                 if (bitStream.ReadNormVector(data.vecVelocity.fX, data.vecVelocity.fY, data.vecVelocity.fZ))
                 {
                     data.vecVelocity = data.vecVelocity * fModule;
-                    return true;
+                    return data.vecVelocity.IsValid();
                 }
             }
         }

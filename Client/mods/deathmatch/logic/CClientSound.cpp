@@ -28,6 +28,7 @@ CClientSound::CClientSound(CClientManager* pManager, ElementID ID) : ClassInit(t
     m_bPan = true;
     m_fPan = 0.0f;
     m_bThrottle = false;
+    m_bStreamFailureWarned = false;
 
     m_uiBufferLength = 0;
     m_uiFrameNumberCreated = g_pClientGame->GetFrameCount();
@@ -597,6 +598,7 @@ float* CClientSound::GetWaveData(int iLength)
     }
     return NULL;
 }
+
 bool CClientSound::SetPanEnabled(bool bPan)
 {
     if (m_b3D)
@@ -737,13 +739,17 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
     {
         // Update our position and velocity if we're attached
         CClientEntity* pAttachedToEntity = GetAttachedTo();
+
         if (pAttachedToEntity)
         {
             GetPosition(m_vecPosition);
             DoAttaching();
+
             CVector vecVelocity;
+
             if (CStaticFunctionDefinitions::GetElementVelocity(*pAttachedToEntity, vecVelocity))
                 SetVelocity(vecVelocity);
+
             // Update our spatial data position
             UpdateSpatialData();
         }
@@ -805,6 +811,16 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
         }
         else if (eventInfo.type == SOUND_EVENT_STREAM_RESULT)
         {
+            if (eventInfo.bBool)
+            {
+                m_bStreamFailureWarned = false;
+            }
+            else if (!m_bStreamFailureWarned)
+            {
+                m_bStreamFailureWarned = true;
+                g_pClientGame->GetScriptDebugging()->LogWarning(m_LuaDebugInfo, SString("Unable to stream sound '%s'", *m_strPath));
+            }
+
             // Call onClientSoundStream Lua event
             CLuaArguments Arguments;
             Arguments.PushBoolean(eventInfo.bBool);

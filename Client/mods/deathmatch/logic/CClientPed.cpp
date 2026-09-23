@@ -741,6 +741,28 @@ void CClientPed::SetCurrentRotationNew(float fRotation)
     SetRotationRadiansNew(CVector(0, 0, fRotation));
 }
 
+void CClientPed::SetScriptRotationOverride(const CVector& vecRotationRadians)
+{
+    // GTA can only overwrite the heading of a streamed in ped
+    if (!m_pPlayerPed)
+        return;
+
+    m_bHasScriptRotationOverride = true;
+    m_vecScriptRotation = vecRotationRadians;
+}
+
+void CClientPed::ReapplyScriptRotationIfNeeded()
+{
+    if (!m_bHasScriptRotationOverride)
+        return;
+
+    // One-shot, a lasting override would stop the ped from ever turning again
+    m_bHasScriptRotationOverride = false;
+
+    if (m_pPlayerPed && !GetRealOccupiedVehicle())
+        SetRotationRadiansNew(m_vecScriptRotation);
+}
+
 void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior)
 {
     // Remove us from our car
@@ -1643,7 +1665,9 @@ CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
                 bSkipWarpIfGettingOut = false;
 
             // Jax: this should be safe, doesn't remove the player if he's getting dragged out already (fix for getting stuck on back after being jacked)
-            if (!bSkipWarpIfGettingOut || (!IsGettingOutOfVehicle()))
+            // IsGettingOutOfVehicle only covers the voluntary leave car task; a jack victim's drag task
+            // got ripped away mid animation here and the warp put him on the vehicle roof for a moment.
+            if (!bSkipWarpIfGettingOut || (!IsGettingOutOfVehicle() && !IsGettingJacked()))
             {
                 // Warp the player out
                 InternalRemoveFromVehicle(pGameVehicle);
@@ -1752,8 +1776,7 @@ void CClientPed::SetHealth(float fHealth)
     if (m_bHealthLocked)
         return;
 
-    if (fHealth < 0.0f)
-        fHealth = 0.0f;
+    fHealth = std::clamp(fHealth, 0.0f, GetMaxHealth());
 
     InternalSetHealth(fHealth);
     m_fHealth = fHealth;
@@ -3163,7 +3186,10 @@ void CClientPed::ApplyControllerStateFixes(CControllerState& Current)
     {
         if (m_ulLastTimeBeganCrouch >= ulNow - 600.0f * fSpeedRatio)
         {
-            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE))
+            // Zero jump/sprint unless fastfire is enabled. Even then, keep them zeroed while the crouch key is held,
+            // otherwise a key bound to both sprint and crouch (e.g. space) wedges the duck animation,
+            // leaving the player crouched and unable to move or fire until performing a melee attack
+            if (!g_pClientGame->IsGlitchEnabled(CClientGame::GLITCH_FASTFIRE) || Current.ShockButtonL != 0)
             {
                 Current.ButtonSquare = 0;
                 Current.ButtonCross = 0;
@@ -3392,6 +3418,9 @@ float CClientPed::GetCurrentRotation()
 
 void CClientPed::SetCurrentRotation(float fRotation, bool bIncludeTarget)
 {
+    // A newer rotation write supersedes a pending script rotation
+    m_bHasScriptRotationOverride = false;
+
     if (m_pPlayerPed)
     {
         m_pPlayerPed->SetCurrentRotation(fRotation);
@@ -4086,9 +4115,9 @@ void CClientPed::_ChangeModel()
                 m_pPlayerPed->RebuildPlayer();
             }
 
-            // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
+            // Remove reference to the old model we used
             if (pLoadedModel)
-                pLoadedModel->RemoveRef(true);
+                pLoadedModel->RemoveRef();
             pLoadedModel = NULL;
 
             // Warp into it again
@@ -4926,35 +4955,16 @@ bool CClientPed::GetShotData(CVector* pvecOrigin, CVector* pvecTarget, CVector* 
                 vecTarget = vecOrigin;
                 vecTarget.fZ += fRange;
             }
-            else if (Controller.RightShoulder1 == 255)  // First-person weapons, crosshair active: sync the crosshair
+            else if (pVehicle)
             {
+                // Align drive-by aiming ray directly with camera sightline matching GTA:SA
                 g_pGame->GetCamera()->Find3rdPersonCamTargetVector(fRange, &vecGunMuzzle, &vecOrigin, &vecTarget);
-                // Apply shoot through walls fix
-                vecOrigin = AdjustShotOriginForWalls(vecOrigin, vecTarget, 0.5f);
             }
-            else if (pVehicle)  // Drive-by/vehicle weapons: camera origin as origin, performing collision tests
+            else if (Controller.RightShoulder1 == 255)
             {
-                CColPoint* pCollision;
-                CMatrix    mat;
-                bool       bCollision;
-
-                g_pGame->GetCamera()->GetMatrix(&mat);
-
-                CVector vecCameraOrigin = mat.vPos;
-                CVector vecTemp = vecCameraOrigin;
-                g_pGame->GetCamera()->Find3rdPersonCamTargetVector(fRange, &vecCameraOrigin, &vecTemp, &vecTarget);
-
-                bCollision = g_pGame->GetWorld()->ProcessLineOfSight(&mat.vPos, &vecTarget, &pCollision, NULL);
-                if (pCollision)
-                {
-                    if (bCollision)
-                    {
-                        CVector vecBullet = pCollision->GetPosition() - vecOrigin;
-                        vecBullet.Normalize();
-                        vecTarget = vecOrigin + (vecBullet * fRange);
-                    }
-                    pCollision->Destroy();
-                }
+                // On-foot crosshair active: sync along sightline and adjust for wall clipping
+                g_pGame->GetCamera()->Find3rdPersonCamTargetVector(fRange, &vecGunMuzzle, &vecOrigin, &vecTarget);
+                vecOrigin = AdjustShotOriginForWalls(vecOrigin, vecTarget, 0.5f);
             }
             else
             {
@@ -5490,15 +5500,19 @@ void CClientPed::SetTargetPosition(const CVector& vecPosition, unsigned long ulD
     if (pTargetOriginSource)
         pTargetOriginSource->GetPosition(vecOrigin);
 
-    UpdateUnderFloorFix(vecPosition, vecOrigin);
+    // This one warps on its own, so it gets the same jack window as UpdateTargetPosition
+    if (!IsGettingJacked())
+        UpdateUnderFloorFix(vecPosition, vecOrigin);
 
     // Update the references to the contact entity
     if (pTargetOriginSource != m_interp.pTargetOriginSource)
     {
         if (m_interp.pTargetOriginSource)
             m_interp.pTargetOriginSource->RemoveOriginSourceUser(this);
+
         if (pTargetOriginSource)
             pTargetOriginSource->AddOriginSourceUser(this);
+
         m_interp.pTargetOriginSource = pTargetOriginSource;
     }
 
@@ -5543,6 +5557,11 @@ void CClientPed::RemoveTargetPosition()
 
 void CClientPed::UpdateTargetPosition()
 {
+    // The jack drag task positions the ped itself for its whole length; synced positions applied
+    // over it fight the animation frame by frame, so let it finish and resume then.
+    if (IsGettingJacked())
+        return;
+
     if (HasTargetPosition())
     {
         unsigned long ulCurrentTime = CClientTime::GetTime();
@@ -6098,7 +6117,7 @@ void CClientPed::UpdateCustomPartialAnimationBones()
 
     // Bones the source IFP animation doesn't define are padded out to a fixed pose (see CClientIFP),
     // so a full mask means there's nothing to restrict and we can skip finding the association at all.
-    std::bitset<32> animatedBonesMask = pIFP->GetAnimatedBonesMask(strCustomAnimName);
+    std::bitset<64> animatedBonesMask = pIFP->GetAnimatedBonesMask(strCustomAnimName);
     if (animatedBonesMask.all())
         return;
 
