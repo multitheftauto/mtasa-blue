@@ -450,7 +450,12 @@ void CWebCore::DoEventQueuePulse()
     // the previous 250ms blocking wait in OnPaint
     for (auto& view : m_WebViews)
     {
-        if (view->IsBeingDestroyed() || view->GetRenderingPaused())
+        if (view->IsBeingDestroyed())
+            continue;
+
+        // Paused browsers still get a frame after a script changed them, so the texture never goes stale
+        const bool bFrameRequested = view->TakeFrameRequest();
+        if (view->GetRenderingPaused() && !bFrameRequested)
             continue;
 
         auto browser = view->GetCefBrowser();
