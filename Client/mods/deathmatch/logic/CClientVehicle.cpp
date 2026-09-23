@@ -724,7 +724,7 @@ void CClientVehicle::SetDoorOpenRatio(unsigned char ucDoor, float fRatio, unsign
                 {
                     const unsigned char seatIndex = ucDoor - 3;
                     // Allow if seat is vacant, or if occupying passenger has finished entering and is seated
-                    bAllow = (m_pOccupyingPassengers[seatIndex] == nullptr) || (m_pOccupyingPassengers[seatIndex] == m_pPassengers[seatIndex]);
+                    bAllow = !m_pOccupyingPassengers[seatIndex] || (m_pOccupyingPassengers[seatIndex] == m_pPassengers[seatIndex]);
                     break;
                 }
             }
