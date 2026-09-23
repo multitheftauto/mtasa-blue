@@ -3196,16 +3196,11 @@ void CClientVehicle::Destroy()
     }
 }
 
-void CClientVehicle::StreamOutForABit()
-{
-    InvalidateComponentData();
-
-    CClientStreamElement::StreamOutForABit();
-}
-
 void CClientVehicle::InvalidateComponentData()
 {
-    BackupComponentVisibility();
+    if (!m_ComponentData.empty())
+        BackupComponentVisibility();
+
     m_ComponentData.clear();
 }
 

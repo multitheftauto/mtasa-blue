@@ -222,7 +222,10 @@ bool CClientIMG::LinkModel(unsigned int uiModelID, size_t uiFileID)
     // Internally stream out the vehicle before calling CStreamingSA::RemoveModel
     // otherwise a crash will occur if the player is inside a vehicle that gets unloaded by the streamer
     if (CClientVehicleManager::IsValidModel(uiModelID))
+    {
+        g_pClientGame->GetVehicleManager()->OnModelReplaced(static_cast<unsigned short>(uiModelID));
         g_pClientGame->GetVehicleManager()->RestreamVehicles(static_cast<unsigned short>(uiModelID));
+    }
 
     // Weapon models already in a ped's hand keep their old RW clump until the weapon slot is
     // re-requested, same as vehicles above (see CClientDFF::ReplaceWeaponModel for the equivalent case)

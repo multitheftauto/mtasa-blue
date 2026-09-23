@@ -473,7 +473,6 @@ public:
     //          error or something if it does return true.
     void Create();
     void Destroy();
-    void StreamOutForABit() override;
     void InvalidateComponentData();
 
     void                                    AddProjectile(CClientProjectile* pProjectile) { m_Projectiles.push_back(pProjectile); }
