@@ -4420,7 +4420,7 @@ void CPacketHandler::Packet_EntityRemoveTree(NetBitStreamInterface& bitStream)
         CClientEntity* rootEntity = CElementIDs::GetElement(rootID);
         if (rootEntity)
         {
-            if (rootEntity->GetType() == CCLIENTPLAYER)
+            if (rootEntity->GetType() == ElementType::PLAYER)
             {
                 // Protocol error 72: Entity tree root cannot be a player
                 RaiseProtocolError(72);
@@ -4464,7 +4464,7 @@ void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
             continue;
 
         const auto entityType = entity->GetType();
-        if (entityType == CCLIENTVEHICLE)
+        if (entityType == ElementType::VEHICLE)
         {
             const ElementID entityID = entity->GetID();
             for (auto* ped : getPedList())
@@ -4479,7 +4479,7 @@ void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
                 }
             }
         }
-        else if (entityType == CCLIENTPED)
+        else if (entityType == ElementType::PLAYER)
         {
             auto* removedPed = static_cast<CClientPed*>(entity);
             for (auto* ped : getPedList())
