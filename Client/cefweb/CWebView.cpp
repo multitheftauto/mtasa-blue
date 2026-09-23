@@ -203,6 +203,7 @@ void CWebView::DetachRenderItem()
         return;
 
     std::scoped_lock lock(m_RenderData.dataMutex);
+    
     if (!m_pWebBrowserRenderItem)
         return;
 
