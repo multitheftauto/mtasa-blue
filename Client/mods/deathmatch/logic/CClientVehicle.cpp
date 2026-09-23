@@ -716,7 +716,7 @@ void CClientVehicle::SetDoorOpenRatio(unsigned char ucDoor, float fRatio, unsign
             {
                 case 2:
                     // Allow if no one is currently entering as driver, or if occupying driver has finished entering and is seated
-                    bAllow = (m_pOccupyingDriver == nullptr) || (m_pOccupyingDriver == m_pDriver);
+                    bAllow = !m_pOccupyingDriver || (m_pOccupyingDriver == m_pDriver);
                     break;
                 case 3:
                 case 4:
