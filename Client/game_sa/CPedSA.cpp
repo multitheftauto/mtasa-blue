@@ -133,6 +133,10 @@ void CPedSA::Init()
 
 void CPedSA::SetModelIndex(std::uint32_t modelIndex)
 {
+    // CPed::SetModelIndex only creates a new RwObject. Destroy the current one first,
+    // otherwise the old clump (and its model and TXD references) is leaked
+    GetPedInterface()->DeleteRwObject();
+
     // char __thiscall CPed::SetModelIndex(void *this, int a2)
     ((char(__thiscall*)(CEntitySAInterface*, int))FUNC_SetModelIndex)(m_pInterface, modelIndex);
 
