@@ -32,6 +32,12 @@ void CClientSearchLight::Render()
 {
     DoAttaching();
 
-    if (IsStreamedIn())
-        g_pGame->GetPointLights()->RenderHeliLight(m_StartPosition, m_EndPosition, m_StartRadius, m_EndRadius, m_bRenderSpot, m_color);
+    if (!IsStreamedIn())
+        return;
+
+    // Tell the texture replacer which element the cone belongs to
+    CRenderWare* pRenderWare = g_pGame->GetRenderWare();
+    pRenderWare->SetRenderingClientEntity(this, 0xFFFF, TYPE_MASK_OTHER);
+    g_pGame->GetPointLights()->RenderHeliLight(m_StartPosition, m_EndPosition, m_StartRadius, m_EndRadius, m_bRenderSpot, m_color);
+    pRenderWare->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
 }

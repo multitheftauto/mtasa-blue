@@ -25,10 +25,12 @@ CClient3DMarker::CClient3DMarker(CClientMarker* pThis)
     m_dwType = static_cast<DWORD>(T3DMarkerType::MARKER3D_CYLINDER2);
     m_pMarker = NULL;
     m_ulIdentifier = (DWORD)this;
+    g_pClientGame->GetManager()->GetMarkerManager()->RegisterIdentifier(m_ulIdentifier, pThis);
 }
 
 CClient3DMarker::~CClient3DMarker()
 {
+    g_pClientGame->GetManager()->GetMarkerManager()->UnregisterIdentifier(m_ulIdentifier);
 }
 
 unsigned long CClient3DMarker::Get3DMarkerType()

@@ -173,6 +173,12 @@ enum RwRasterLockFlags
     RASTER_LOCK_READ = 2,
     RASTER_LOCK_LAST = RW_STRUCT_ALIGN
 };
+enum RwRasterFlags
+{
+    RASTER_TYPE_TEXTURE = 0x04,
+    RASTER_FORMAT_8888 = 0x0500,
+    RASTER_FLAGS_LAST = RW_STRUCT_ALIGN
+};
 enum RwTransformOrder
 {
     TRANSFORM_INITIAL = 0,
