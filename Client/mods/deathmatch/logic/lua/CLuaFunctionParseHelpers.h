@@ -15,6 +15,10 @@
 #include <game/CHud.h>
 #include <game/CStreaming.h>
 #include <type_traits>
+#include "lua/CLuaVector2.h"
+#include "lua/CLuaVector3.h"
+#include "lua/CLuaVector4.h"
+#include "lua/CLuaMatrix.h"
 
 #include "enums/WeaponProperty.h"
 #include "enums/FxParticleSystems.h"
@@ -547,26 +551,6 @@ CXMLNode* UserDataCast(CXMLNode* ptr, lua_State* luaState);
 // CLuaTimer from userdata
 //
 CLuaTimer* UserDataCast(CLuaTimer* ptr, lua_State* luaState);
-
-//
-// CLuaVector2D from userdata
-//
-CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState);
-
-//
-// CLuaVector3D from userdata
-//
-CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState);
-
-//
-// CLuaVector4D from userdata
-//
-CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState);
-
-//
-// CLuaMatrix from userdata
-//
-CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState);
 
 //
 // CClientEntity from userdata
