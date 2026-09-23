@@ -41,7 +41,7 @@ public:
     unsigned short          GetStreamReferences(bool bScript = false);
     unsigned long           GetTotalStreamReferences() { return m_usStreamReferences + m_usStreamReferencesScript; }
     std::uint32_t           GetLastStreamOutTime() const { return m_lastStreamOutTime; }
-    void                    StreamOutForABit();
+    virtual void            StreamOutForABit();
     void                    SetDimension(unsigned short usDimension) override;
     float                   GetExpDistance() { return m_fExpDistance; }
     virtual CSphere         GetWorldBoundingSphere();
