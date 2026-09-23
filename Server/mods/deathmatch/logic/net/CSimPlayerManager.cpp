@@ -137,6 +137,7 @@ void CSimPlayerManager::UpdateSimPlayer(CPlayer* pPlayer)
     pSim->m_PlayerID = pPlayer->GetID();
     pSim->m_usLatency = static_cast<unsigned short>(pPlayer->GetPing());
     pSim->m_ucWeaponType = pPlayer->GetWeaponType();
+    pSim->m_fMaxHealth = pPlayer->GetMaxHealth();
     pSim->m_usVehicleModel = pVehicle ? pVehicle->GetModel() : 0;
     pSim->m_ucSyncTimeContext = pPlayer->GetSyncTimeContext();
     {
@@ -257,9 +258,9 @@ bool CSimPlayerManager::HandlePlayerPureSync(const NetServerPlayerID& Socket, Ne
     if (pSourceSimPlayer && pSourceSimPlayer->IsJoined() && (!pSourceSimPlayer->m_bHasOccupiedVehicle || pSourceSimPlayer->m_bIsExitingVehicle))
     {
         // Read the incoming packet data
-        CSimPlayerPuresyncPacket* pPacket =
-            new CSimPlayerPuresyncPacket(pSourceSimPlayer->m_PlayerID, pSourceSimPlayer->m_usLatency, pSourceSimPlayer->m_ucSyncTimeContext,
-                                         pSourceSimPlayer->m_ucWeaponType, pSourceSimPlayer->m_fWeaponRange, pSourceSimPlayer->m_sharedControllerState);
+        CSimPlayerPuresyncPacket* pPacket = new CSimPlayerPuresyncPacket(
+            pSourceSimPlayer->m_PlayerID, pSourceSimPlayer->m_usLatency, pSourceSimPlayer->m_ucSyncTimeContext, pSourceSimPlayer->m_ucWeaponType,
+            pSourceSimPlayer->m_fWeaponRange, pSourceSimPlayer->m_fMaxHealth, pSourceSimPlayer->m_sharedControllerState);
         if (pPacket->Read(*BitStream))
         {
             // Relay it to nearbyers
@@ -298,7 +299,8 @@ bool CSimPlayerManager::HandleVehiclePureSync(const NetServerPlayerID& Socket, N
         CSimVehiclePuresyncPacket* pPacket = new CSimVehiclePuresyncPacket(
             pSourceSimPlayer->m_PlayerID, pSourceSimPlayer->m_usLatency, pSourceSimPlayer->m_ucSyncTimeContext, pSourceSimPlayer->m_bHasOccupiedVehicle,
             pSourceSimPlayer->m_usVehicleModel, pSourceSimPlayer->m_ucOccupiedVehicleSeat, pSourceSimPlayer->m_ucWeaponType, pSourceSimPlayer->m_fWeaponRange,
-            pSourceSimPlayer->m_sharedControllerState, pSourceSimPlayer->m_uiVehicleDamageInfoSendPhase, pSourceSimPlayer->m_VehicleDamageInfo);
+            pSourceSimPlayer->m_fMaxHealth, pSourceSimPlayer->m_sharedControllerState, pSourceSimPlayer->m_uiVehicleDamageInfoSendPhase,
+            pSourceSimPlayer->m_VehicleDamageInfo);
         if (pPacket->Read(*BitStream))
         {
             // Relay it to nearbyers
