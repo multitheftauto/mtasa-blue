@@ -1077,6 +1077,12 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound()
     __asm
     {
         pushad
+        // Unlike every other siren hook in this file, this one previously never updated
+        // pVehicleWithTheSiren before calling into DisableVehicleSiren(), which reads it. That left
+        // DisableVehicleSiren() checking whichever vehicle a rendering hook had last set the global
+        // to, not the vehicle whose siren sound is actually being processed here (ecx, confirmed to
+        // already be this vehicle's CVehicleSAInterface* by the offset read below).
+        mov pVehicleWithTheSiren, ecx
     }
     // clang-format on
     if (DisableVehicleSiren())
