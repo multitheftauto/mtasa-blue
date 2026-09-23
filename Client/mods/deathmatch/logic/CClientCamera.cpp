@@ -11,7 +11,9 @@
 #include <StdInc.h>
 #include <game/CCam.h>
 #include <array>
+#include <charconv>
 #include <cmath>
+#include <optional>
 #include <utility>
 
 #define PI_2 6.283185307179586476925286766559f
@@ -143,6 +145,70 @@ CClientCamera::CClientCamera(CClientManager* pManager) : ClassInit(this), CClien
     m_hasCenterOfWorld = false;
 }
 
+// GTA only remembers the view modes the change camera key cycles through in its save files, which
+// MTA never uses, so they reset every session; keep them in the client settings instead.
+void CClientCamera::PersistViewModes()
+{
+    if (!m_viewModesRestored)
+    {
+        // The camera is reinitialised while the game world comes up; restoring any earlier would
+        // get overwritten and the change tracker below would persist the defaults back
+        if (!g_pGame || g_pGame->GetSystemState() != SystemState::GS_PLAYING_GAME)
+            return;
+
+        m_viewModesRestored = true;
+
+        // Read as text and validate strictly; the settings file is hand editable, and a lenient
+        // numeric read would turn garbage or an empty value into mode zero
+        const auto GetStoredViewMode = [](const char* name, std::uint8_t minMode, std::uint8_t maxMode) -> std::optional<std::uint8_t>
+        {
+            std::string value;
+            g_pCore->GetCVars()->Get(name, value);
+
+            std::uint8_t parsedMode = 0;
+            const auto [ptr, ec] = std::from_chars(value.data(), value.data() + value.size(), parsedMode);
+            if (ec != std::errc{} || ptr != value.data() + value.size())
+                return std::nullopt;
+
+            return (parsedMode >= minMode && parsedMode <= maxMode) ? std::optional{parsedMode} : std::nullopt;
+        };
+
+        const std::optional<std::uint8_t> vehicleViewMode =
+            GetStoredViewMode("camera_vehicle_view", static_cast<std::uint8_t>(eVehicleCamMode::BUMPER), static_cast<std::uint8_t>(eVehicleCamMode::CINEMATIC));
+        // The native ped view modes run from 1 to 3; ePedCamMode does not match them
+        const std::optional<std::uint8_t> pedViewMode = GetStoredViewMode("camera_ped_view", 1, 3);
+
+        if (vehicleViewMode)
+            SetCameraVehicleViewMode(static_cast<eVehicleCamMode>(*vehicleViewMode));
+        if (pedViewMode)
+            SetCameraPedViewMode(static_cast<ePedCamMode>(*pedViewMode));
+
+        m_lastVehicleViewMode = static_cast<std::uint8_t>(GetCameraVehicleViewMode());
+        m_lastPedViewMode = static_cast<std::uint8_t>(GetCameraPedViewMode());
+
+        // Heal missing or mangled entries and flush right away; waiting for the quit save
+        // would lose them if the game does not close cleanly
+        if (vehicleViewMode != m_lastVehicleViewMode || pedViewMode != m_lastPedViewMode)
+        {
+            g_pCore->GetCVars()->Set("camera_vehicle_view", static_cast<int>(m_lastVehicleViewMode));
+            g_pCore->GetCVars()->Set("camera_ped_view", static_cast<int>(m_lastPedViewMode));
+            g_pCore->SaveConfig();
+        }
+        return;
+    }
+
+    const std::uint8_t vehicleViewMode = static_cast<std::uint8_t>(GetCameraVehicleViewMode());
+    const std::uint8_t pedViewMode = static_cast<std::uint8_t>(GetCameraPedViewMode());
+    if (vehicleViewMode == m_lastVehicleViewMode && pedViewMode == m_lastPedViewMode)
+        return;
+
+    m_lastVehicleViewMode = vehicleViewMode;
+    m_lastPedViewMode = pedViewMode;
+    g_pCore->GetCVars()->Set("camera_vehicle_view", static_cast<int>(vehicleViewMode));
+    g_pCore->GetCVars()->Set("camera_ped_view", static_cast<int>(pedViewMode));
+    g_pCore->SaveConfig();
+}
+
 CClientCamera::~CClientCamera()
 {
     // We need to be ingame
@@ -156,6 +222,8 @@ CClientCamera::~CClientCamera()
 
 void CClientCamera::DoPulse()
 {
+    PersistViewModes();
+
     InvalidateCachedTransforms();
 
     // If we're fixed, force the target vector

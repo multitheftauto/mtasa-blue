@@ -1035,38 +1035,6 @@ CLuaTimer* UserDataCast(CLuaTimer* ptr, lua_State* luaState)
 }
 
 //
-// CLuaVector2D from userdata
-//
-CLuaVector2D* UserDataCast(CLuaVector2D* ptr, lua_State* luaState)
-{
-    return CLuaVector2D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
-}
-
-//
-// CLuaVector3D from userdata
-//
-CLuaVector3D* UserDataCast(CLuaVector3D* ptr, lua_State* luaState)
-{
-    return CLuaVector3D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
-}
-
-//
-// CLuaVector4D from userdata
-//
-CLuaVector4D* UserDataCast(CLuaVector4D* ptr, lua_State* luaState)
-{
-    return CLuaVector4D::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
-}
-
-//
-// CLuaMatrix from userdata
-//
-CLuaMatrix* UserDataCast(CLuaMatrix* ptr, lua_State* luaState)
-{
-    return CLuaMatrix::GetFromScriptID(reinterpret_cast<unsigned int>(ptr));
-}
-
-//
 // CClientEntity from userdata
 //
 CClientEntity* UserDataToElementCast(CClientEntity* ptr, SharedUtil::ClassId classId, lua_State* luaState)
@@ -1113,12 +1081,6 @@ SString GetUserDataClassName(void* ptr, lua_State* luaVM, bool bFindElementType)
     if (auto* pVar = UserDataCast((CXMLNode*)ptr, luaVM))  // Try xml node
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast((CLuaTimer*)ptr, luaVM))  // Try timer
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaVector2D*)ptr, luaVM))  // Try 2D Vector
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaVector3D*)ptr, luaVM))  // Try 3D Vector
-        return GetClassTypeName(pVar);
-    if (auto* pVar = UserDataCast((CLuaVector4D*)ptr, luaVM))
         return GetClassTypeName(pVar);
     if (auto* pVar = UserDataCast((CRemoteCall*)ptr, luaVM))
         return GetClassTypeName(pVar);

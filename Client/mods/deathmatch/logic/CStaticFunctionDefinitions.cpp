@@ -1118,19 +1118,20 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
         case ElementType::PLAYER:
         {
             CClientPed& Ped = static_cast<CClientPed&>(Entity);
-            if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_MINUS_ZYX)
+            CVector     vecUseRotation = vecRotation;
+            if (argumentRotOrder != EULER_DEFAULT && argumentRotOrder != EULER_MINUS_ZYX)
+                vecUseRotation = ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_MINUS_ZYX);
+
+            if (bNewWay)
             {
-                if (bNewWay)
-                    Ped.SetRotationDegreesNew(vecRotation);
-                else
-                    Ped.SetRotationDegrees(vecRotation);
+                Ped.SetRotationDegreesNew(vecUseRotation);
+
+                ConvertDegreesToRadiansNoWrap(vecUseRotation);
+                Ped.SetScriptRotationOverride(vecUseRotation);
             }
             else
             {
-                if (bNewWay)
-                    Ped.SetRotationDegreesNew(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_MINUS_ZYX));
-                else
-                    Ped.SetRotationDegrees(ConvertEulerRotationOrder(vecRotation, argumentRotOrder, EULER_MINUS_ZYX));
+                Ped.SetRotationDegrees(vecUseRotation);
             }
             break;
         }
@@ -1197,6 +1198,9 @@ bool CStaticFunctionDefinitions::SetElementRotation(CClientEntity& Entity, const
 
 bool CStaticFunctionDefinitions::SetElementVelocity(CClientEntity& Entity, const CVector& vecVelocity)
 {
+    if (!vecVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetElementVelocity(**iter, vecVelocity))
 
     int iType = Entity.GetType();
@@ -1244,6 +1248,9 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CClientEntity& Entity, const
 
 bool CStaticFunctionDefinitions::SetElementAngularVelocity(CClientEntity& Entity, const CVector& vecTurnVelocity)
 {
+    if (!vecTurnVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetElementAngularVelocity(**iter, vecTurnVelocity))
 
     int iType = Entity.GetType();
@@ -2289,6 +2296,9 @@ bool CStaticFunctionDefinitions::SetPedRotation(CClientEntity& Entity, float fRo
 
         if (!IS_PLAYER(&Entity))
             Ped.SetCameraRotation(-fRadians);
+
+        if (bNewWay)
+            Ped.SetScriptRotationOverride(CVector(0.0f, 0.0f, fRadians));
         return true;
     }
 
@@ -3148,6 +3158,9 @@ bool CStaticFunctionDefinitions::SetVehicleSirensOn(CClientEntity& Entity, bool 
 
 bool CStaticFunctionDefinitions::SetVehicleTurnVelocity(CClientEntity& Entity, const CVector& vecTurnVelocity)
 {
+    if (!vecTurnVelocity.IsValid())
+        return false;
+
     RUN_CHILDREN(SetVehicleTurnVelocity(**iter, vecTurnVelocity))
 
     if (IS_VEHICLE(&Entity))

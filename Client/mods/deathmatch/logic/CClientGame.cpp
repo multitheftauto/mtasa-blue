@@ -721,8 +721,8 @@ bool CClientGame::StartGame(const char* szNick, const char* szPassword, eServerT
             pBitStream->Write(reinterpret_cast<const char*>(Password.data), sizeof(MD5));
 
             // Append community information (removed, but we keep this to retain protocol compat)
-            std::string strUser;
-            pBitStream->Write(strUser.c_str(), MAX_SERIAL_LENGTH);
+            const std::array<char, MAX_SERIAL_LENGTH> communityData{};
+            pBitStream->Write(communityData.data(), communityData.size());
 
             // Send the packet as joindata
             g_pNet->SendPacket(PACKET_ID_PLAYER_JOINDATA, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
@@ -3943,6 +3943,9 @@ void CClientGame::PreWorldProcessHandler()
 
 void CClientGame::PostWorldProcessHandler()
 {
+    // CWorld::Process has just overwritten ped headings, restore script-set ones before onClientPreRender, sync and rendering read them
+    m_pManager->GetPedManager()->ReapplyScriptRotations();
+
     m_pManager->GetMarkerManager()->DoPulse();
     m_pManager->GetPointLightsManager()->DoPulse();
     m_pManager->GetObjectManager()->DoPulse();
@@ -5031,6 +5034,9 @@ bool CClientGame::VehicleFellThroughMapHandler(CVehicleSAInterface* pVehicleInte
 
 // Called when GTA:SA destroys an entity (e.g., during map streaming).
 // Clear stale pool entries to prevent dangling pointer crashes in GetClientEntity/GetEntity.
+// Note: This may leak the CObjectSA/CVehicleSA/CPedSA wrapper if MTA created it, but we cannot
+// safely delete it here since the game entity is mid-destruction. The leak is acceptable
+// as this is an abnormal code path (GTA destroying MTA-managed entities).
 void CClientGame::GameObjectDestructHandler(CEntitySAInterface* pObject)
 {
     if (auto* pSlot = g_pGame->GetPools()->GetObject(reinterpret_cast<DWORD*>(pObject)))

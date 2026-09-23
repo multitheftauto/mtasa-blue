@@ -94,8 +94,10 @@ void CElementRPCs::SetElementData(CClientEntity* pSource, NetBitStreamInterface&
             CLogger::ErrorPrintf("RPC SetElementData name length > MAX_CUSTOMDATA_NAME_LENGTH");
             return;
         }
+
         SString      strName;
         CLuaArgument Argument;
+
         if (bitStream.ReadStringCharacters(strName, usNameLength) && Argument.ReadFromBitStream(bitStream))
         {
             pSource->SetCustomData(CStringName{strName}, Argument);
@@ -113,6 +115,7 @@ void CElementRPCs::RemoveElementData(CClientEntity* pSource, NetBitStreamInterfa
         SString strName;
 
         // Read out the name plus whether it's recursive or not
+
         if (bitStream.ReadStringCharacters(strName, usNameLength) && bitStream.ReadBit(bRecursive))
         {
             // Remove that name
@@ -175,6 +178,9 @@ void CElementRPCs::SetElementVelocity(CClientEntity* pSource, NetBitStreamInterf
     CVector vecVelocity;
     if (bitStream.Read(vecVelocity.fX) && bitStream.Read(vecVelocity.fY) && bitStream.Read(vecVelocity.fZ))
     {
+        if (!vecVelocity.IsValid())
+            return;
+
         switch (pSource->GetType())
         {
             case ElementType::PED:
@@ -217,6 +223,9 @@ void CElementRPCs::SetElementAngularVelocity(CClientEntity* pSource, NetBitStrea
     CVector vecTurnVelocity;
     if (bitStream.Read(vecTurnVelocity.fX) && bitStream.Read(vecTurnVelocity.fY) && bitStream.Read(vecTurnVelocity.fZ))
     {
+        if (!vecTurnVelocity.IsValid())
+            return;
+
         switch (pSource->GetType())
         {
             case ElementType::PED:

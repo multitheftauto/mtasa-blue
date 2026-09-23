@@ -75,6 +75,7 @@ bool CClientBuildingManager::IsValidModel(uint16_t modelId)
         return false;
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
+
     if (!pModelInfo || !pModelInfo->GetInterface())
         return false;
 
@@ -82,6 +83,7 @@ bool CClientBuildingManager::IsValidModel(uint16_t modelId)
         return false;
 
     eModelInfoType eType = pModelInfo->GetModelType();
+
     return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON || eType == eModelInfoType::TIME);
 }
 
@@ -146,7 +148,8 @@ bool CClientBuildingManager::SetPoolCapacity(size_t newCapacity)
 {
     const int currentUsed = g_pGame->GetPools()->GetNumberOfUsedSpaces(ePools::BUILDING_POOL);
 
-    if (newCapacity - currentUsed < PRESERVED_POOL_SIZE)
+    // Reject invalid capacities before temporarily destroying resource-created buildings.
+    if (newCapacity > static_cast<size_t>(std::numeric_limits<int>::max()) || newCapacity < static_cast<size_t>(currentUsed) + PRESERVED_POOL_SIZE)
         return false;
 
     return DoPoolResize(newCapacity);
