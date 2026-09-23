@@ -97,6 +97,8 @@ bool CClientTXD::Import(unsigned short usModelID)
             if (!FileLoad(std::nothrow, strUseFilename, m_FileData))
                 return false;
         }
+        // The TXD is used as-is (any format/size). The clothes compositing hooks decompress/resize
+        // it as needed at composite time, so no up-front normalization is required.
         m_bUsingFileDataForClothes = true;
         // Note: ClothesAddReplacement uses the pointer from m_FileData, so don't touch m_FileData until matching ClothesRemove call
         g_pGame->GetRenderWare()->ClothesAddReplacement(m_FileData.data(), m_FileData.size(), usModelID - CLOTHES_MODEL_ID_FIRST);
