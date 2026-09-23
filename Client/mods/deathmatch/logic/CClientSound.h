@@ -84,8 +84,8 @@ public:
     bool SetPan(float fPan);
     bool GetPan(float& fPan);
 
-    void                 SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) { m_LuaDebugInfo = luaDebugInfo; }
-    const SLuaDebugInfo& GetLuaDebugInfo() const { return m_LuaDebugInfo; }
+    void                 SetLuaDebugInfo(const SLuaDebugInfo& luaDebugInfo) noexcept { m_LuaDebugInfo = luaDebugInfo; }
+    const SLuaDebugInfo& GetLuaDebugInfo() const noexcept { return m_LuaDebugInfo; }
 
     bool SetFxEffect(uint uiFxEffect, bool bEnable);
     bool IsFxEffectEnabled(uint uiFxEffect);

@@ -103,7 +103,7 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound(lua_State* luaVM, con
     {
         if (!FileExists(filename.c_str()))
         {
-            throw LuaFunctionError(SString("Unable to load sound '%s'.", SanitizeSoundPath(path).c_str()), true);
+            throw LuaFunctionError(SString("Unable to load sound '%s': file not found.", SanitizeSoundPath(path).c_str()), true);
         }
 
         soundPath = filename;
@@ -153,7 +153,7 @@ std::variant<CClientSound*, bool> CLuaAudioDefs::PlaySound3D(lua_State* luaVM, c
     {
         if (!FileExists(filename.c_str()))
         {
-            throw LuaFunctionError(SString("Unable to load sound '%s'.", SanitizeSoundPath(path).c_str()), true);
+            throw LuaFunctionError(SString("Unable to load sound '%s': file not found.", SanitizeSoundPath(path).c_str()), true);
         }
 
         soundPath = filename;

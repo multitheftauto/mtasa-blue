@@ -806,7 +806,11 @@ void CClientSound::Process3D(const CVector& vecPlayerPosition, const CVector& ve
         }
         else if (eventInfo.type == SOUND_EVENT_STREAM_RESULT)
         {
-            if (!eventInfo.bBool && !m_bStreamFailureWarned)
+            if (eventInfo.bBool)
+            {
+                m_bStreamFailureWarned = false;
+            }
+            else if (!m_bStreamFailureWarned)
             {
                 m_bStreamFailureWarned = true;
                 g_pClientGame->GetScriptDebugging()->LogWarning(m_LuaDebugInfo, SString("Unable to stream sound '%s'", *m_strPath));
