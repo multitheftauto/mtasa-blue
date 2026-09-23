@@ -61,56 +61,32 @@ HttpStatusCode CResourceFile::Request(HttpRequest* ipoHttpRequest, HttpResponse*
     // HACK - Use http-client-files if possible as the resources directory may have been changed since the resource was loaded.
     SString strDstFilePath = GetCachedPathFilename();
 
+    // Just checking which of the two candidate paths actually exists/is readable - the file itself
+    // is streamed straight from disk by CHTTPD via SetBodyFile(), not read into memory here. This also
+    // sidesteps the previous ftell()-based size check, which used a 32-bit long and could misbehave
+    // on files over ~2GB.
     FILE* file = File::Fopen(strDstFilePath.c_str(), "rb");
-    if (!file)
-        file = File::Fopen(m_strResourceFileName.c_str(), "rb");
-
-    // its a raw page
     if (file)
     {
-        // Grab the filesize. Don't use the above method because it doesn't account for a changing
-        // filesize incase of for example an included resource (causing bug #2676)
-        fseek(file, 0, SEEK_END);
-        long lBufferLength = ftell(file);
-        rewind(file);
-
-        if (lBufferLength < 0)
-        {
-            fclose(file);
-            ipoHttpResponse->SetBody("Failed to determine file size", strlen("Failed to determine file size"));
-            return HTTP_STATUS_CODE_500_INTERNAL_SERVER_ERROR;
-        }
-
-        // Allocate and read the entire file
-        // TODO: This is inefficient.
-        char* szBuffer = nullptr;
-        try
-        {
-            szBuffer = new char[lBufferLength + 1];
-            size_t bytesRead = fread(szBuffer, 1, lBufferLength, file);
-            fclose(file);
-            file = nullptr;
-
-            ipoHttpResponse->oResponseHeaders["content-type"] = "application/octet-stream";
-            ipoHttpResponse->SetBody(szBuffer, static_cast<int>(bytesRead));
-            delete[] szBuffer;
-            return HTTP_STATUS_CODE_200_OK;
-        }
-        catch (const std::bad_alloc&)
-        {
-            delete[] szBuffer;
-            if (file)
-                fclose(file);
-
-            ipoHttpResponse->SetBody("Server out of memory", strlen("Server out of memory"));
-            return HTTP_STATUS_CODE_500_INTERNAL_SERVER_ERROR;
-        }
+        fclose(file);
     }
     else
+    {
+        strDstFilePath = m_strResourceFileName;
+        file = File::Fopen(strDstFilePath.c_str(), "rb");
+        if (file)
+            fclose(file);
+    }
+
+    if (!file)
     {
         ipoHttpResponse->SetBody("Can't read file!", strlen("Can't read file!"));
         return HTTP_STATUS_CODE_500_INTERNAL_SERVER_ERROR;
     }
+
+    ipoHttpResponse->oResponseHeaders["content-type"] = "application/octet-stream";
+    ipoHttpResponse->SetBodyFile(strDstFilePath);
+    return HTTP_STATUS_CODE_200_OK;
 }
 
 SString CResourceFile::GetCachedPathFilename(bool bForceClientCachePath)

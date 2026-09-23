@@ -247,6 +247,15 @@ public:
     /// Get the response body (for CHTTPD to read back).
     const std::string& GetBody() const { return m_strBody; }
 
+    /// Serve the response body straight from a file on disk instead of buffering it in memory.
+    /// Used for large resource downloads (e.g. .img archives) so CHTTPD can stream/mmap the file
+    /// rather than loading the whole thing into a heap buffer for every request.
+    void SetBodyFile(const std::string& strFilePath) { m_strBodyFilePath = strFilePath; }
+
+    /// Path set via SetBodyFile(), or empty if this response uses an in-memory body instead.
+    const std::string& GetBodyFilePath() const { return m_strBodyFilePath; }
+    bool                HasBodyFile() const { return !m_strBodyFilePath.empty(); }
+
     /// HTTP status code to send back.
     HttpStatusCode m_nResponseCode = HTTP_STATUS_CODE_200_OK;
 
@@ -267,5 +276,6 @@ public:
     int m_nResponseId = 0;
 
 private:
-    std::string m_strBody;  // Internal storage for SetBody
+    std::string m_strBody;          // Internal storage for SetBody
+    std::string m_strBodyFilePath;  // Internal storage for SetBodyFile
 };

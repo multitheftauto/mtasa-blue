@@ -187,8 +187,19 @@ static void ApplyHttpResponse(const HttpResponse& httpRes, httplib::Response& re
         }
     }
 
-    const std::string& body = httpRes.GetBody();
-    res.set_content(body.data(), body.size(), strContentType);
+    // Large downloads (e.g. resource .img archives) are streamed/mmap'd straight from disk via
+    // httplib's own set_file_content rather than being fully buffered in a std::string here - doing
+    // that for a multi-hundred-MB file, on top of the copy already sitting in HttpResponse's body,
+    // could exhaust a 32-bit server process's address space once a few such downloads overlap.
+    if (httpRes.HasBodyFile())
+    {
+        res.set_file_content(httpRes.GetBodyFilePath(), strContentType);
+    }
+    else
+    {
+        const std::string& body = httpRes.GetBody();
+        res.set_content(body.data(), body.size(), strContentType);
+    }
 
     for (const auto& h : httpRes.oResponseHeaders)
     {
@@ -295,8 +306,13 @@ void CHTTPD::SetupHandlers()
         // Translate response back to httplib
         ApplyHttpResponse(httpRes, res);
 
-        // Track bytes sent for stats
-        m_llTotalBytesSent += res.body.size();
+        // Track bytes sent for stats. A file-streamed response leaves res.body empty (the content
+        // provider that actually sends the bytes is only wired up by httplib after this handler
+        // returns), so fall back to the file's on-disk size in that case.
+        if (httpRes.HasBodyFile())
+            m_llTotalBytesSent += static_cast<long long>(FileSize(httpRes.GetBodyFilePath()));
+        else
+            m_llTotalBytesSent += res.body.size();
     };
 
     m_httpServer->Get(".*", handler);
