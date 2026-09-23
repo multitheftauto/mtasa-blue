@@ -258,7 +258,15 @@ int CLuaUtilDefs::GetUserdataType(lua_State* luaVM)
     if (argStream.NextIsUserData())
     {
         SString strType;
-        if (iArgument == LUA_TLIGHTUSERDATA)
+        if (lua_isclass(luaVM, 1, "Vector3"))
+            strType = "vector3";
+        else if (lua_isclass(luaVM, 1, "Vector2"))
+            strType = "vector2";
+        else if (lua_isclass(luaVM, 1, "Vector4"))
+            strType = "vector4";
+        else if (lua_isclass(luaVM, 1, "Matrix"))
+            strType = "matrix";
+        else if (iArgument == LUA_TLIGHTUSERDATA)
             strType = GetUserDataClassName(lua_touserdata(luaVM, 1), luaVM, false);
         else if (iArgument == LUA_TUSERDATA)
             strType = GetUserDataClassName(*((void**)lua_touserdata(luaVM, 1)), luaVM, false);
