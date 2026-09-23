@@ -13,6 +13,8 @@
 #include "StdInc.h"
 #include <lua/CLuaFunctionParser.h>
 #include "CLuaElementDefs.h"
+#include "CClientBuilding.h"
+#include "CClientObject.h"
 using std::list;
 
 void CLuaElementDefs::LoadFunctions()
@@ -28,6 +30,7 @@ void CLuaElementDefs::LoadFunctions()
         {"getElementMatrix", GetElementMatrix},
         {"getElementPosition", GetElementPosition},
         {"getElementRotation", GetElementRotation},
+        {"getElementScale", ArgumentParser<GetElementScale>},
         {"getElementVelocity", GetElementVelocity},
         {"getElementAngularVelocity", GetElementTurnVelocity},
         {"getElementType", GetElementType},
@@ -82,6 +85,7 @@ void CLuaElementDefs::LoadFunctions()
         {"setElementMatrix", SetElementMatrix},
         {"setElementPosition", SetElementPosition},
         {"setElementRotation", SetElementRotation},
+        {"setElementScale", ArgumentParser<SetElementScale>},
         {"setElementVelocity", SetElementVelocity},
         {"setElementAngularVelocity", SetElementAngularVelocity},
         {"setElementInterior", SetElementInterior},
@@ -547,6 +551,24 @@ int CLuaElementDefs::OOP_GetElementRotation(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> CLuaElementDefs::GetElementScale(lua_State* luaVM, CClientEntity* entity)
+{
+    //  float, float, float getElementScale ( element theElement )
+    CVector scale;
+
+    if (entity->GetType() == CCLIENTBUILDING)
+        scale = static_cast<CClientBuilding*>(entity)->GetScale();
+    else if (IS_OBJECT(entity))
+        static_cast<CClientObject*>(entity)->GetScale(scale);
+    else
+        return false;
+
+    if (lua_ncallresult(luaVM) == 3)
+        return CLuaMultiReturn<float, float, float>(scale.fX, scale.fY, scale.fZ);
+
+    return scale;
 }
 
 int CLuaElementDefs::GetElementVelocity(lua_State* luaVM)
@@ -1976,6 +1998,43 @@ int CLuaElementDefs::OOP_SetElementRotation(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+bool CLuaElementDefs::SetElementScale(CClientEntity* entity, std::variant<CVector, float> scale)
+{
+    //  bool setElementScale ( element theElement, float scale )
+    //  bool setElementScale ( element theElement, float x, float y, float z )
+    if (const auto* uniformScale = std::get_if<float>(&scale))
+        return ApplyElementScale(entity, CVector(*uniformScale, *uniformScale, *uniformScale));
+
+    return ApplyElementScale(entity, std::get<CVector>(scale));
+}
+
+bool CLuaElementDefs::ApplyElementScale(CClientEntity* entity, const CVector& vecScale)
+{
+    if (entity->CountChildren() && entity->IsCallPropagationEnabled())
+    {
+        CElementListSnapshotRef pList = entity->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = pList->begin(); iter != pList->end(); iter++)
+        {
+            if (!(*iter)->IsBeingDeleted())
+                ApplyElementScale(*iter, vecScale);
+        }
+    }
+
+    if (IS_OBJECT(entity))
+    {
+        static_cast<CClientObject*>(entity)->SetScale(vecScale);
+        return true;
+    }
+
+    if (entity->GetType() == CCLIENTBUILDING)
+    {
+        static_cast<CClientBuilding*>(entity)->SetScale(vecScale);
+        return true;
+    }
+
+    return false;
 }
 
 int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
