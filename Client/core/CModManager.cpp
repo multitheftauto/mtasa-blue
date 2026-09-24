@@ -162,24 +162,38 @@ bool CModManager::TryStart()
     if (library == nullptr)
     {
         const DWORD errorCode = GetLastError();
-        char*       buffer = nullptr;
+        wchar_t*    buffer = nullptr;
 
-        DWORD size = FormatMessage(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, errorCode,
-                                   MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPSTR>(&buffer), 0, nullptr);
+        DWORD size = FormatMessageW(FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_ALLOCATE_BUFFER | FORMAT_MESSAGE_IGNORE_INSERTS, nullptr, errorCode,
+                                    MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), reinterpret_cast<LPWSTR>(&buffer), 0, nullptr);
+
+        std::string errorTitle = _("Unable to load deathmatch's DLL");
 
         if (buffer != nullptr && size > 0)
         {
-            std::string message{buffer, size};
-            size_t      length = message.find_last_not_of("\t\n\v\f\r ");
+            std::wstring message{buffer, size};
+            size_t       length = message.find_last_not_of(L"\t\n\v\f\r ");
 
             LocalFree(buffer);
 
-            if (length == std::string::npos)
-                return false;
+            if (length != std::string::npos)
+            {
+                message.resize(length + 1);
 
-            message.resize(length + 1);
-            CCore::GetSingleton().GetConsole()->Printf("Unable to load deathmatch's DLL (reason: %s)", message.c_str());
+                const std::string reasonUtf8 = UTF16ToMbUTF8(message);
+
+                try
+                {
+                    errorTitle += " (" + std::vformat(_("Reason: {}"), std::make_format_args(reasonUtf8)) + ")";
+                }
+                catch (const std::format_error&)
+                {
+                    errorTitle += " (" + reasonUtf8 + ")";
+                }
+            }
         }
+
+        CCore::GetSingleton().GetConsole()->Print(errorTitle.c_str());
 
         return false;
     }
@@ -188,7 +202,7 @@ bool CModManager::TryStart()
     InitClientFn initClient = nullptr;
     if (!SharedUtil::TryGetProcAddress(library, "InitClient", initClient))
     {
-        CCore::GetSingleton().GetConsole()->Printf("Unable to initialize deathmatch's DLL (missing init)");
+        CCore::GetSingleton().GetConsole()->Print(_("Unable to initialize deathmatch's DLL (missing init)"));
         FreeLibrary(library);
         return false;
     }
@@ -197,7 +211,7 @@ bool CModManager::TryStart()
 
     if (client == nullptr || client->ClientInitialize(m_arguments.c_str(), CCore::GetSingletonPtr()) != 0)
     {
-        CCore::GetSingleton().GetConsole()->Printf("Unable to initialize deathmatch's DLL (unable to init, bad version?)");
+        CCore::GetSingleton().GetConsole()->Print(_("Unable to initialize deathmatch's DLL (unable to init, bad version?)"));
         FreeLibrary(library);
         return false;
     }
