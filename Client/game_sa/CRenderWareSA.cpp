@@ -697,15 +697,14 @@ void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTextur
     if (!pTex->TXDList.next || !pTex->TXDList.prev)
         return;
 
-    if (!SharedUtil::IsReadablePointer(pTex->TXDList.next, sizeof(RwListEntry)) ||
-        !SharedUtil::IsReadablePointer(pTex->TXDList.prev, sizeof(RwListEntry)))
+    if (!SharedUtil::IsReadablePointer(pTex->TXDList.next, sizeof(RwListEntry)) || !SharedUtil::IsReadablePointer(pTex->TXDList.prev, sizeof(RwListEntry)))
         return;
 
     pTex->TXDList.next->prev = pTex->TXDList.prev;
     pTex->TXDList.prev->next = pTex->TXDList.next;
-    pTex->TXDList.next = NULL;
-    pTex->TXDList.prev = NULL;
-    pTex->txd = NULL;
+    pTex->TXDList.next = nullptr;
+    pTex->TXDList.prev = nullptr;
+    pTex->txd = nullptr;
 }
 
 short CRenderWareSA::CTxdStore_GetTxdRefcount(unsigned short usTxdID)

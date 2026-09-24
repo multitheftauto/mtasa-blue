@@ -22,6 +22,7 @@ public:
     std::vector<SReplacementTextures*> usedByReplacements;
     ushort                             usTxdId;
     RwTexDictionary*                   pTxd;
+    bool                               bHasTxdRef = false;
 };
 
 std::map<ushort, CModelTexturesInfo> ms_ModelTexturesInfoMap;
@@ -44,6 +45,7 @@ void CRenderWareSA::NotifyTxdDestroyed(ushort usTxdId)
     {
         pInfo->pTxd = nullptr;
         pInfo->originalTextures.clear();
+        pInfo->bHasTxdRef = false;
     }
 }
 
@@ -71,16 +73,19 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
         // Get txd
         RwTexDictionary* pTxd = CTxdStore_GetTxd(usTxdId);
 
+        bool bNeedAddRef = !pInfo || !pInfo->bHasTxdRef;
         if (!pTxd)
         {
             pModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTexturesInfo");
-            CTxdStore_AddRef(usTxdId);
+            if (bNeedAddRef)
+                CTxdStore_AddRef(usTxdId);
             ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
             pTxd = CTxdStore_GetTxd(usTxdId);
         }
         else
         {
-            CTxdStore_AddRef(usTxdId);
+            if (bNeedAddRef)
+                CTxdStore_AddRef(usTxdId);
             if (pModelInfo->GetModelType() == eModelInfoType::PED)
             {
                 // Mystery fix for #9336: (MTA sometimes fails at loading custom textures)
@@ -100,6 +105,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
         }
         pInfo->usTxdId = usTxdId;
         pInfo->pTxd = pTxd;
+        pInfo->bHasTxdRef = true;
 
         // Save original textures
         pInfo->originalTextures.clear();
@@ -262,9 +268,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         // was already called by the engine, meaning the dictionary and all textures inside
         // it have already been deallocated.
         RwTexDictionary* pCurrentTxd = CTxdStore_GetTxd(usTxdId);
-        bool bTxdValid = (pInfo->pTxd != nullptr) &&
-                         (pCurrentTxd == pInfo->pTxd) &&
-                         SharedUtil::IsReadablePointer(pInfo->pTxd, sizeof(RwTexDictionary));
+        bool bTxdValid = (pInfo->pTxd != nullptr) && (pCurrentTxd == pInfo->pTxd) && SharedUtil::IsReadablePointer(pInfo->pTxd, sizeof(RwTexDictionary));
 
         // If the dictionary is alive and valid, take a snapshot of its current active textures.
         std::vector<RwTexture*> liveTextures;
@@ -278,26 +282,27 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         {
             RwTexture* pOldTexture = perTxdInfo.usingTextures[j];
 
-            // Fix #4028: Only remove the texture from the dictionary if the dictionary is alive
-            // and the texture actually exists within it. If the TXD was already destroyed, its textures
-            // were already freed, and calling RwTexDictionaryRemoveTexture will crash with an AV (0xC0000005)
-            // when accessing deallocated memory (pTex->txd).
-            if (bTxdValid && pOldTexture && ListContains(liveTextures, pOldTexture))
+            // Fix #4028: If the dictionary is alive, safely handle texture removal and cleanup.
+            // If the dictionary was already destroyed by streaming or TxdForceUnload, RenderWare's
+            // RwTexDictionaryDestroy has already deallocated the dictionary and destroyed all textures
+            // attached to it, so we must not attempt to access or destroy them here.
+            if (bTxdValid && pOldTexture)
             {
-                RwTexDictionaryRemoveTexture(pInfo->pTxd, pOldTexture);
-                dassert(!RwTexDictionaryContainsTexture(pInfo->pTxd, pOldTexture));
+                // Only unlink from the dictionary if it is actually still present in the dictionary.
+                if (ListContains(liveTextures, pOldTexture))
+                {
+                    RwTexDictionaryRemoveTexture(pInfo->pTxd, pOldTexture);
+                    dassert(!RwTexDictionaryContainsTexture(pInfo->pTxd, pOldTexture));
+                }
+
+                // If this texture was a copy created by MTA, destroy it now to avoid leaking memory.
+                // Even if the texture was displaced from liveTextures (e.g. by another resource replacing
+                // the same texture name), the copy was not destroyed by RenderWare since the dictionary is still alive.
                 if (perTxdInfo.bTexturesAreCopies)
                 {
-                    // Destroy the copy (but not the raster as that was not copied)
-                    pOldTexture->raster = NULL;
+                    pOldTexture->raster = nullptr;
                     RwTextureDestroy(pOldTexture);
                 }
-            }
-            else if (perTxdInfo.bTexturesAreCopies && !bTxdValid)
-            {
-                // When the dictionary was destroyed, RenderWare's RwTexDictionaryDestroy iterated
-                // through all textures in the dictionary and called RwTextureDestroy. Therefore,
-                // the copy has already been freed and attempting to destroy it again would cause a crash / double free.
             }
         }
         perTxdInfo.usingTextures.clear();
@@ -322,7 +327,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         // If no refs left, check original state and then remove info
         if (pInfo->usedByReplacements.empty())
         {
-            if (bTxdValid)
+            if (bTxdValid && pInfo->bHasTxdRef)
             {
 #ifdef MTA_DEBUG
                 std::vector<RwTexture*> currentTextures;
@@ -339,8 +344,9 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
                 int32_t refsCount = CTxdStore_GetNumRefs(pInfo->usTxdId);
                 assert(refsCount > 0 && "Should have at least one TXD reference here");
 #endif
-                // Remove ref from CTxdStore only if it's still alive
+                // Remove ref from CTxdStore only if we hold a reference and it's still alive
                 CTxdStore_RemoveRef(pInfo->usTxdId);
+                pInfo->bHasTxdRef = false;
             }
             // Remove info from map
             MapRemove(ms_ModelTexturesInfoMap, usTxdId);
