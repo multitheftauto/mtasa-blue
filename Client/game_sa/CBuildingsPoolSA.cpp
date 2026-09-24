@@ -392,6 +392,12 @@ bool CBuildingsPoolSA::Resize(int size)
     pool->m_nSize = size;
     pool->m_nFirstFree = 0;
 
+    // CIplStore::RemoveIpl walks a 16 bit building range, past that it has to scan the whole pool
+    const bool scanWholePool = size - 1 > std::numeric_limits<std::int16_t>::max();
+    MemCpy((void*)0x404B4A, scanWholePool ? "\x33\xFF\x90\x90" : "\x0F\xBF\x7B\x22", 4);  // xor edi, edi
+    MemCpy((void*)0x404B5D, scanWholePool ? "\x8B\x51\x08\x4A" : "\x0F\xBF\x53\x24", 4);  // mov edx, [ecx+8]; dec edx
+    MemCpy((void*)0x404BA8, scanWholePool ? "\x8B\x51\x08\x4A" : "\x0F\xBF\x53\x24", 4);
+
     for (auto i = 0; i < size; i++)
     {
         newBytemap[i].bEmpty = true;
