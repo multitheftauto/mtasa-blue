@@ -1155,10 +1155,7 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
         SetSirenOrAlarmActive(false);
 
         // Cache current component visibility and clear data so it can be regenerated.
-        m_ComponentVisibilityBackup.clear();
-        for (const auto& pair : m_ComponentData)
-            m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
-        m_ComponentData.clear();
+        InvalidateComponentData();
 
         // Reset stored dummy positions
         m_copyDummyPositions = true;
@@ -1185,12 +1182,9 @@ void CClientVehicle::SetVariant(unsigned char ucVariant, unsigned char ucVariant
     m_ucVariation = ucVariant;
     m_ucVariation2 = ucVariant2;
 
-    // Cache visibility so component state survives variant changes
-    m_ComponentVisibilityBackup.clear();
-    for (const auto& pair : m_ComponentData)
-        m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
-    // Clear component data to regenerate it on next create
-    m_ComponentData.clear();
+    // Cache visibility so component state survives variant changes and clear component data
+    // to regenerate it on next create
+    InvalidateComponentData();
     ReCreate();
 }
 
@@ -3192,12 +3186,6 @@ void CClientVehicle::Destroy()
         g_pGame->GetPools()->RemoveVehicle(m_pVehicle);
         m_pVehicle = NULL;
 
-        // Clear our component data, but backup the visibility states so we can restore them on next create
-        m_ComponentVisibilityBackup.clear();
-        for (const auto& pair : m_ComponentData)
-            m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
-        m_ComponentData.clear();
-
         // Remove reference to its model
         m_pModelInfo->RemoveRef();
 
@@ -3206,6 +3194,19 @@ void CClientVehicle::Destroy()
 
         NotifyDestroy();
     }
+}
+
+void CClientVehicle::InvalidateComponentData()
+{
+    if (!m_ComponentData.empty())
+    {
+        m_ComponentVisibilityBackup.clear();
+
+        for (const auto& pair : m_ComponentData)
+            m_ComponentVisibilityBackup[pair.first] = pair.second.m_bVisible;
+    }
+
+    m_ComponentData.clear();
 }
 
 void CClientVehicle::ReCreate()

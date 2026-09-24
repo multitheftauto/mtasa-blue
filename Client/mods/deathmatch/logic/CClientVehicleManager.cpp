@@ -827,6 +827,15 @@ void CClientVehicleManager::RestreamAllVehicles()
     }
 }
 
+void CClientVehicleManager::OnModelReplaced(unsigned short usModel)
+{
+    for (auto& pVehicle : m_List)
+    {
+        if (pVehicle->GetModel() == usModel)
+            pVehicle->InvalidateComponentData();
+    }
+}
+
 void CClientVehicleManager::RestreamVehicleUpgrades(unsigned short usModel)
 {
     for (uint i = 0; i < m_List.size(); i++)
