@@ -964,15 +964,17 @@ void CRenderWareSA::GetClumpTextures(std::vector<RwTexture*>& outTextureList, Rp
             if (!pAtomic->geometry)
                 return true;
 
-            std::vector<RwTexture*>& textureList = *reinterpret_cast<std::vector<RwTexture*>*>(pData);
-            RpMaterials&             materials = pAtomic->geometry->materials;
+            RpGeometryForAllMaterials(
+                pAtomic->geometry,
+                [](RpMaterial* pMaterial, void* pData)
+                {
+                    std::vector<RwTexture*>& textureList = *reinterpret_cast<std::vector<RwTexture*>*>(pData);
+                    if (pMaterial && pMaterial->texture && !ListContains(textureList, pMaterial->texture))
+                        textureList.push_back(pMaterial->texture);
 
-            for (int i = 0; i < materials.entries; i++)
-            {
-                RpMaterial* pMaterial = materials.materials[i];
-                if (pMaterial && pMaterial->texture && !ListContains(textureList, pMaterial->texture))
-                    textureList.push_back(pMaterial->texture);
-            }
+                    return pMaterial;
+                },
+                pData);
 
             return true;
         },

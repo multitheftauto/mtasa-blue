@@ -893,11 +893,9 @@ static void __declspec(naked) HOOK_RwRasterDestroy_Mid()
     // clang-format off
     __asm
     {
-        pushad
         push    esi
         call    OnMY_RwRasterDestroy_Mid
         add     esp, 4*1
-        popad
 
         push    esi
         push    0x08E2518
