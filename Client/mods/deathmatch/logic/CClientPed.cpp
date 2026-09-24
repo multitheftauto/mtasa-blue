@@ -741,6 +741,28 @@ void CClientPed::SetCurrentRotationNew(float fRotation)
     SetRotationRadiansNew(CVector(0, 0, fRotation));
 }
 
+void CClientPed::SetScriptRotationOverride(const CVector& vecRotationRadians)
+{
+    // GTA can only overwrite the heading of a streamed in ped
+    if (!m_pPlayerPed)
+        return;
+
+    m_bHasScriptRotationOverride = true;
+    m_vecScriptRotation = vecRotationRadians;
+}
+
+void CClientPed::ReapplyScriptRotationIfNeeded()
+{
+    if (!m_bHasScriptRotationOverride)
+        return;
+
+    // One-shot, a lasting override would stop the ped from ever turning again
+    m_bHasScriptRotationOverride = false;
+
+    if (m_pPlayerPed && !GetRealOccupiedVehicle())
+        SetRotationRadiansNew(m_vecScriptRotation);
+}
+
 void CClientPed::Spawn(const CVector& vecPosition, float fRotation, unsigned short usModel, unsigned char ucInterior)
 {
     // Remove us from our car
@@ -1754,8 +1776,7 @@ void CClientPed::SetHealth(float fHealth)
     if (m_bHealthLocked)
         return;
 
-    if (fHealth < 0.0f)
-        fHealth = 0.0f;
+    fHealth = std::clamp(fHealth, 0.0f, GetMaxHealth());
 
     InternalSetHealth(fHealth);
     m_fHealth = fHealth;
@@ -3397,6 +3418,9 @@ float CClientPed::GetCurrentRotation()
 
 void CClientPed::SetCurrentRotation(float fRotation, bool bIncludeTarget)
 {
+    // A newer rotation write supersedes a pending script rotation
+    m_bHasScriptRotationOverride = false;
+
     if (m_pPlayerPed)
     {
         m_pPlayerPed->SetCurrentRotation(fRotation);
@@ -4091,9 +4115,9 @@ void CClientPed::_ChangeModel()
                 m_pPlayerPed->RebuildPlayer();
             }
 
-            // Remove reference to the old model we used (Flag extra GTA reference to be removed as well)
+            // Remove reference to the old model we used
             if (pLoadedModel)
-                pLoadedModel->RemoveRef(true);
+                pLoadedModel->RemoveRef();
             pLoadedModel = NULL;
 
             // Warp into it again
@@ -6093,7 +6117,7 @@ void CClientPed::UpdateCustomPartialAnimationBones()
 
     // Bones the source IFP animation doesn't define are padded out to a fixed pose (see CClientIFP),
     // so a full mask means there's nothing to restrict and we can skip finding the association at all.
-    std::bitset<32> animatedBonesMask = pIFP->GetAnimatedBonesMask(strCustomAnimName);
+    std::bitset<64> animatedBonesMask = pIFP->GetAnimatedBonesMask(strCustomAnimName);
     if (animatedBonesMask.all())
         return;
 
