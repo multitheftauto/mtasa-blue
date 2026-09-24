@@ -40,9 +40,9 @@ private:
     bool GetFilenameToUse(SString& strOutFilename);
 
     SString              m_strFilename;
-    bool                 m_bFilteringEnabled = false;
-    bool                 m_bIsRawData = false;
-    bool                 m_bUsingFileDataForClothes = false;
+    bool                 m_bFilteringEnabled{false};
+    bool                 m_bIsRawData{false};
+    bool                 m_bUsingFileDataForClothes{false};
     SString              m_FileData;
     SReplacementTextures m_ReplacementTextures;
 };
