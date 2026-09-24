@@ -662,8 +662,6 @@ void CClientStreamer::OnEnterSector(CClientStreamSector* pSector)
         }
     }
     m_pSector = pSector;
-    SetExpDistances(&m_ActiveElements);
-    m_ActiveElements.sort(CompareExpDistance);
 }
 
 void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClientStreamSector* pSector)
@@ -701,10 +699,20 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
                 pSector->AddElements(&m_ActiveElements, &m_ActiveElementSet);
                 pSector->SetActivated(true);
             }
-            // If we're in a deactivated sector and streamed in, stream us out
-            else if (pElement->IsStreamedIn())
+            else
             {
-                m_ToStreamOut.push_back(pElement);
+                // We left an activated sector, so we are no longer an active element
+                if (pPreviousSector && pPreviousSector->IsActivated())
+                {
+                    m_ActiveElements.remove(pElement);
+                    m_ActiveElementSet.erase(pElement);
+                }
+
+                // If we're in a deactivated sector and streamed in, stream us out
+                if (pElement->IsStreamedIn())
+                {
+                    m_ToStreamOut.push_back(pElement);
+                }
             }
         }
     }
