@@ -254,7 +254,7 @@ public:
 
     /// Path set via SetBodyFile(), or empty if this response uses an in-memory body instead.
     const std::string& GetBodyFilePath() const { return m_strBodyFilePath; }
-    bool                HasBodyFile() const { return !m_strBodyFilePath.empty(); }
+    bool               HasBodyFile() const { return !m_strBodyFilePath.empty(); }
 
     /// HTTP status code to send back.
     HttpStatusCode m_nResponseCode = HTTP_STATUS_CODE_200_OK;
