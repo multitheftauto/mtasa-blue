@@ -8,13 +8,15 @@
  *
  *****************************************************************************/
 
+#include "enums/ElementType.h"
+
 class CClientTexture : public CClientMaterial
 {
     DECLARE_CLASS(CClientTexture, CClientMaterial)
 public:
     CClientTexture(CClientManager* pManager, ElementID ID, CTextureItem* pTextureItem);
 
-    eClientEntityType GetType() const { return CCLIENTTEXTURE; }
+    ElementType::Enum GetType() const { return ElementType::TEXTURE; }
 
     // CClientTexture methods
     CTextureItem* GetTextureItem() { return (CTextureItem*)m_pRenderItem; }
@@ -29,7 +31,7 @@ public:
     {
     }
 
-    eClientEntityType GetType() const { return CCLIENTRENDERTARGET; }
+    ElementType::Enum GetType() const { return ElementType::RENDERTARGET; }
 
     // CClientRenderTarget methods
     CRenderTargetItem* GetRenderTargetItem() { return (CRenderTargetItem*)m_pRenderItem; }
@@ -44,7 +46,7 @@ public:
     {
     }
 
-    eClientEntityType GetType() const { return CCLIENTSCREENSOURCE; }
+    ElementType::Enum GetType() const { return ElementType::SCREENSOURCE; }
 
     // CClientScreenSource methods
     CScreenSourceItem* GetScreenSourceItem() { return (CScreenSourceItem*)m_pRenderItem; }

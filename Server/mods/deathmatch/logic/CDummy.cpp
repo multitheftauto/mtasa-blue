@@ -17,7 +17,7 @@
 CDummy::CDummy(CGroups* pGroups, CElement* pParent) : CElement(pParent)
 {
     // Init
-    m_iType = CElement::DUMMY;
+    m_iType = ElementType::DUMMY;
     SetTypeName("dummy");
     m_pGroups = pGroups;
 

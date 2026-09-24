@@ -17,6 +17,8 @@ class CClientEntity;
 #include <core/CClientEntityBase.h>
 #include "logic/CClientEntityRefManager.h"
 #include "CStringName.h"
+#include "enums/ElementType.h"
+
 class CLuaFunctionRef;
 
 // Used to check fast version of getElementsByType
@@ -24,64 +26,20 @@ class CLuaFunctionRef;
 
 class CClientManager;
 
-#define IS_PED(entity)           ((entity)->GetType() == CCLIENTPLAYER || (entity)->GetType() == CCLIENTPED)
-#define IS_PLAYER(entity)        ((entity)->GetType() == CCLIENTPLAYER)
+#define IS_PED(entity)           ((entity)->GetType() == ElementType::PLAYER || (entity)->GetType() == ElementType::PED)
+#define IS_PLAYER(entity)        ((entity)->GetType() == ElementType::PLAYER)
 #define IS_REMOTE_PLAYER(player) (IS_PLAYER(player) && !(player)->IsLocalPlayer())
-#define IS_RADARMARKER(entity)   ((entity)->GetType() == CCLIENTRADARMARKER)
-#define IS_VEHICLE(entity)       ((entity)->GetType() == CCLIENTVEHICLE)
-#define IS_OBJECT(entity)        ((entity)->GetType() == CCLIENTOBJECT)
-#define IS_MARKER(entity)        ((entity)->GetType() == CCLIENTMARKER)
-#define IS_PICKUP(entity)        ((entity)->GetType() == CCLIENTPICKUP)
-#define IS_RADAR_AREA(entity)    ((entity)->GetType() == CCLIENTRADARAREA)
-#define IS_COLSHAPE(entity)      ((entity)->GetType() == CCLIENTCOLSHAPE)
-#define IS_PROJECTILE(entity)    ((entity)->GetType() == CCLIENTPROJECTILE)
-#define IS_GUI(entity)           ((entity)->GetType() == CCLIENTGUI)
-#define IS_IFP(entity)           ((entity)->GetType() == CCLIENTIFP)
+#define IS_RADARMARKER(entity)   ((entity)->GetType() == ElementType::BLIP)
+#define IS_VEHICLE(entity)       ((entity)->GetType() == ElementType::VEHICLE)
+#define IS_OBJECT(entity)        ((entity)->GetType() == ElementType::OBJECT)
+#define IS_MARKER(entity)        ((entity)->GetType() == ElementType::MARKER)
+#define IS_PICKUP(entity)        ((entity)->GetType() == ElementType::PICKUP)
+#define IS_RADAR_AREA(entity)    ((entity)->GetType() == ElementType::RADAR_AREA)
+#define IS_COLSHAPE(entity)      ((entity)->GetType() == ElementType::COLSHAPE)
+#define IS_PROJECTILE(entity)    ((entity)->GetType() == ElementType::PROJECTILE)
+#define IS_GUI(entity)           ((entity)->GetType() == ElementType::GUI)
+#define IS_IFP(entity)           ((entity)->GetType() == ElementType::IFP)
 #define CHECK_CGUI(entity, type) (((CClientGUIElement*)entity)->GetCGUIElement()->GetType() == (type))
-
-enum eClientEntityType
-{
-    CCLIENTCAMERA,
-    CCLIENTPLAYER,
-    CCLIENTPLAYERMODEL____,
-    CCLIENTVEHICLE,
-    CCLIENTRADARMARKER,
-    CCLIENTOBJECT,
-    CCLIENTPICKUP,
-    CCLIENTRADARAREA,
-    CCLIENTMARKER,
-    CCLIENTPATHNODE,
-    CCLIENTWORLDMESH,
-    CCLIENTTEAM,
-    CCLIENTPED,
-    CCLIENTPROJECTILE,
-    CCLIENTGUI,
-    CCLIENTSPAWNPOINT_DEPRECATED,
-    CCLIENTCOLSHAPE,
-    CCLIENTDUMMY,  // anything user-defined
-    SCRIPTFILE,
-    CCLIENTDFF,
-    CCLIENTCOL,
-    CCLIENTTXD,
-    CCLIENTSOUND,
-    CCLIENTWATER,
-    CCLIENTDXFONT,
-    CCLIENTGUIFONT,
-    CCLIENTTEXTURE,
-    CCLIENTSHADER,
-    CCLIENTWEAPON,
-    CCLIENTEFFECT,
-    CCLIENTPOINTLIGHTS,
-    CCLIENTSCREENSOURCE,
-    CCLIENTRENDERTARGET,
-    CCLIENTBROWSER,
-    CCLIENTSEARCHLIGHT,
-    CCLIENTIFP,
-    CCLIENTVECTORGRAPHIC,
-    CCLIENTUNKNOWN,
-    CCLIENTIMG,
-    CCLIENTBUILDING,
-};
 
 class CEntity;
 class CClientColShape;
@@ -155,7 +113,7 @@ public:
     CClientEntity(ElementID ID);
     virtual ~CClientEntity();
 
-    virtual eClientEntityType GetType() const = 0;
+    virtual ElementType::Enum GetType() const = 0;
     bool                      IsLocalEntity() { return m_ID >= MAX_SERVER_ELEMENTS; };
     bool                      IsSmartPointer() { return m_bSmartPointer; }
     void                      SetSmartPointer(bool bSmartPointer) { m_bSmartPointer = bSmartPointer; }

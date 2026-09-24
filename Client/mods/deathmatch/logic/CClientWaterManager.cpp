@@ -27,7 +27,7 @@ CClientWater* CClientWaterManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (pEntity && pEntity->GetType() == CCLIENTWATER)
+    if (pEntity && pEntity->GetType() == ElementType::WATER)
     {
         return static_cast<CClientWater*>(pEntity);
     }

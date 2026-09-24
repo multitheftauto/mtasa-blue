@@ -41,7 +41,7 @@ CClientPickup* CClientPickupManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (pEntity && pEntity->GetType() == CCLIENTPICKUP)
+    if (pEntity && pEntity->GetType() == ElementType::PICKUP)
     {
         return static_cast<CClientPickup*>(pEntity);
     }

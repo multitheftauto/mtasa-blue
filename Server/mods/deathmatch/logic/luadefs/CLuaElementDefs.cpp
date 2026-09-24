@@ -1786,7 +1786,7 @@ int CLuaElementDefs::setElementPosition(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pElement);
-    if (!argStream.HasErrors() && pElement->GetType() == CElement::RADAR_AREA)
+    if (!argStream.HasErrors() && pElement->GetType() == ElementType::RADAR_AREA)
     {
         // radar areas only take x and y
         CVector2D vecRadarPos;
@@ -1886,7 +1886,7 @@ int CLuaElementDefs::OOP_setElementRotation(lua_State* luaVM)
         ConvertRadiansToDegrees(vecRotation);
 
         eEulerRotationOrder rotationOrder = EULER_DEFAULT;
-        if (pElement->GetType() == CElement::OBJECT)
+        if (pElement->GetType() == ElementType::OBJECT)
             rotationOrder = EULER_ZYX;
 
         if (CStaticFunctionDefinitions::SetElementRotation(pElement, vecRotation, rotationOrder, true))

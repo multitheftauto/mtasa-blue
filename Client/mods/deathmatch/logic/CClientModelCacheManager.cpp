@@ -177,11 +177,11 @@ void CClientModelCacheManagerImpl::DoPulsePedModels()
     {
         switch ((*iter)->GetType())
         {
-            case CCLIENTPED:
+            case ElementType::PED:
                 pedList.push_back((CClientPed*)*iter);
                 break;
 
-            case CCLIENTPLAYER:
+            case ElementType::PLAYER:
                 playerList.push_back((CClientPlayer*)*iter);
                 break;
         }
@@ -219,7 +219,7 @@ void CClientModelCacheManagerImpl::DoPulseVehicleModels()
     {
         switch ((*iter)->GetType())
         {
-            case CCLIENTVEHICLE:
+            case ElementType::VEHICLE:
                 vehicleList.push_back((CClientVehicle*)*iter);
                 break;
         }

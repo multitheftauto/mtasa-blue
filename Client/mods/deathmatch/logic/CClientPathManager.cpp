@@ -125,7 +125,7 @@ CClientPathNode* CClientPathManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (pEntity && pEntity->GetType() == CCLIENTPATHNODE)
+    if (pEntity && pEntity->GetType() == ElementType::PATH_NODE)
     {
         return static_cast<CClientPathNode*>(pEntity);
     }

@@ -2744,7 +2744,7 @@ void CPacketHandler::Packet_EntityAdd(NetBitStreamInterface& bitStream)
         g_pClientGame->NotifyBigPacketProgress(0, 0);
 
     // This packet contains a list over entities to add to the world.
-    // There's a byte seperating the entities saying what type it is (vehicle spawn,object,weapon pickup)
+    // There's a byte seperating the entities saying what type it is (vehicle,object,weapon etc.)
 
     // Common:
     // ElementID            (2)     - entity id
@@ -2875,14 +2875,14 @@ retry:
 
         // Read out the entity type id and the entity id
         ElementID      EntityID;
-        unsigned char  ucEntityTypeID;
+        unsigned char  entityTypeID;
         ElementID      ParentID;
         unsigned char  ucInterior;
         unsigned short usDimension;
         bool           bCollisonsEnabled;
         bool           bCallPropagationEnabled;
 
-        if (bitStream.Read(EntityID) && bitStream.Read(ucEntityTypeID) && bitStream.Read(ParentID) && bitStream.Read(ucInterior) &&
+        if (bitStream.Read(EntityID) && bitStream.Read(entityTypeID) && bitStream.Read(ParentID) && bitStream.Read(ucInterior) &&
             bitStream.ReadCompressed(usDimension) && bitStream.ReadBit(bIsAttached))
         {
             if (bIsAttached)
@@ -2972,8 +2972,10 @@ retry:
             bitStream.Read(ucSyncTimeContext);
 
             CClientEntity* pEntity = CElementIDs::GetElement(EntityID);
+            auto           elementType = static_cast<ElementType::Enum>(entityTypeID);
+
             // If we already have an entity with that ID (and aslong as this isnt just element-data for an already created player)
-            if (pEntity && pEntity->GetType() != CCLIENTPLAYER && ucEntityTypeID != CClientGame::PLAYER)
+            if (pEntity && pEntity->GetType() != ElementType::PLAYER)
             {
 #ifdef MTA_DEBUG
                 // We shouldn't be replacing elements
@@ -3002,15 +3004,15 @@ retry:
             ElementID LowLodObjectID = INVALID_ELEMENT_ID;
 
             // Handle the rest depending on what entity type it is
-            switch (ucEntityTypeID)
+            switch (elementType)
             {
-                case CClientGame::PLAYER:
+                case ElementType::PLAYER:
                 {
                     // We get entity data for players here, but player data is handled in Packet_PlayerList
                     break;
                 }
-                case CClientGame::OBJECT:
-                case CClientGame::WEAPON:
+                case ElementType::OBJECT:
+                case ElementType::WEAPON:
                 {
                     unsigned short       usObjectID;
                     SEntityAlphaSync     alpha;
@@ -3032,7 +3034,7 @@ retry:
                         bitStream.ReadBit(bIsLowLod);
                         bitStream.Read(LowLodObjectID);
                         CClientObject* pObject = NULL;
-                        if (ucEntityTypeID == CClientGame::OBJECT)
+                        if (elementType == ElementType::OBJECT)
                         {
                             // Create the object and put it at its position
 #ifdef WITH_OBJECT_SYNC
@@ -3042,7 +3044,7 @@ retry:
                             pObject = new CDeathmatchObject(g_pClientGame->m_pManager, g_pClientGame->m_pMovingObjectsManager, EntityID, usObjectID, bIsLowLod);
 #endif
                         }
-                        else if (ucEntityTypeID == CClientGame::WEAPON)
+                        else if (elementType == ElementType::WEAPON)
                         {
                             pObject = new CClientWeapon(g_pClientGame->m_pManager, EntityID, eWeaponType::WEAPONTYPE_AK47);
                         }
@@ -3116,7 +3118,7 @@ retry:
                         pObject->SetRespawnEnabled(bitStream.ReadBit());
 
                         pObject->SetCollisionEnabled(bCollisonsEnabled);
-                        if (ucEntityTypeID == CClientGame::WEAPON)
+                        if (elementType == ElementType::WEAPON)
                         {
                             CClientWeapon* pWeapon = (CClientWeapon*)pObject;
                             unsigned char  ucTargetType = eTargetType::TARGET_TYPE_FIXED;
@@ -3219,7 +3221,7 @@ retry:
                     break;
                 }
 
-                case CClientGame::PICKUP:
+                case ElementType::PICKUP:
                 {
                     // Read out the pickup data
                     unsigned short  usModel;
@@ -3279,7 +3281,7 @@ retry:
                     break;
                 }
 
-                case CClientGame::VEHICLE:
+                case ElementType::VEHICLE:
                 {
                     // Read out the position
                     bitStream.Read(&position);
@@ -3627,7 +3629,7 @@ retry:
                     break;
                 }
 
-                case CClientGame::MARKER:
+                case ElementType::MARKER:
                 {
                     // Read out the common data for all kinds of markers
                     SMarkerTypeSync markerType;
@@ -3701,7 +3703,7 @@ retry:
                     break;
                 }
 
-                case CClientGame::BLIP:
+                case ElementType::BLIP:
                 {
                     // Read out the position
                     bitStream.Read(&position);
@@ -3742,7 +3744,7 @@ retry:
                     break;
                 }
 
-                case CClientGame::RADAR_AREA:
+                case ElementType::RADAR_AREA:
                 {
                     // Read out the radar area id, position, size and color
                     SPosition2DSync position2D(false);
@@ -3774,7 +3776,7 @@ retry:
 
                     break;
                 }
-                case CClientGame::PATH_NODE:
+                case ElementType::PATH_NODE:
                 {
                     int           iTime;
                     unsigned char ucStyle;
@@ -3801,10 +3803,10 @@ retry:
                     break;
                 }
 
-                case CClientGame::WORLD_MESH:
-                    break;
+                    // case CClientGame::WORLD_MESH:
+                    //     break;
 
-                case CClientGame::TEAM:
+                case ElementType::TEAM:
                 {
                     unsigned short usNameLength;
                     bitStream.ReadCompressed(usNameLength);
@@ -3849,7 +3851,7 @@ retry:
                     break;
                 }
 
-                case CClientGame::PED:
+                case ElementType::PED:
                 {
                     // Read out position
                     bitStream.Read(&position);
@@ -4034,7 +4036,7 @@ retry:
                     break;
                 }
 
-                case CClientGame::DUMMY:
+                case ElementType::DUMMY:
                 {
                     // Type Name
                     unsigned short usTypeNameLength;
@@ -4067,7 +4069,7 @@ retry:
                     break;
                 }
 
-                case CClientGame::COLSHAPE:
+                case ElementType::COLSHAPE:
                 {
                     // Type
                     SColshapeTypeSync colType;
@@ -4168,12 +4170,12 @@ retry:
                     break;
                 }
 
-                case CClientGame::SCRIPTFILE:
+                case ElementType::SCRIPTFILE:
                 {
                     break;
                 }
 
-                case CClientGame::WATER:
+                case ElementType::WATER:
                 {
                     BYTE  ucNumVertices;
                     short sX;
@@ -4208,7 +4210,7 @@ retry:
                     break;
                 }
 
-                case CClientGame::BUILDING:
+                case ElementType::BUILDING:
                 {
                     std::uint16_t        modelId;
                     SRotationRadiansSync rotationRadians(false);
@@ -4329,21 +4331,21 @@ void CPacketHandler::Packet_EntityRemove(NetBitStreamInterface& bitStream)
         CClientEntity* pEntity = CElementIDs::GetElement(ID);
         if (pEntity)
         {
-            if (pEntity->GetType() == CCLIENTPLAYER)
+            if (pEntity->GetType() == ElementType::PLAYER)
             {
                 RaiseProtocolError(45);
                 return;
             }
 
             // Is this a vehicle or a ped?
-            if (pEntity->GetType() == CCLIENTVEHICLE || pEntity->GetType() == CCLIENTPED)
+            if (pEntity->GetType() == ElementType::VEHICLE || pEntity->GetType() == ElementType::PED)
             {
                 // Create a list containing local player and peds we sync
                 CMappedList<CClientPed*> listOfPeds(g_pClientGame->GetPedSync()->GetList());
                 listOfPeds.push_front(g_pClientGame->GetLocalPlayer());
 
                 // Is this a vehicle?
-                if (pEntity->GetType() == CCLIENTVEHICLE)
+                if (pEntity->GetType() == ElementType::VEHICLE)
                 {
                     for (auto iter = listOfPeds.begin(); iter != listOfPeds.end(); ++iter)
                     {
@@ -4418,7 +4420,7 @@ void CPacketHandler::Packet_EntityRemoveTree(NetBitStreamInterface& bitStream)
         CClientEntity* rootEntity = CElementIDs::GetElement(rootID);
         if (rootEntity)
         {
-            if (rootEntity->GetType() == CCLIENTPLAYER)
+            if (rootEntity->GetType() == ElementType::PLAYER)
             {
                 // Protocol error 72: Entity tree root cannot be a player
                 RaiseProtocolError(72);
@@ -4462,7 +4464,7 @@ void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
             continue;
 
         const auto entityType = entity->GetType();
-        if (entityType == CCLIENTVEHICLE)
+        if (entityType == ElementType::VEHICLE)
         {
             const ElementID entityID = entity->GetID();
             for (auto* ped : getPedList())
@@ -4477,7 +4479,7 @@ void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
                 }
             }
         }
-        else if (entityType == CCLIENTPED)
+        else if (entityType == ElementType::PED)
         {
             auto* removedPed = static_cast<CClientPed*>(entity);
             for (auto* ped : getPedList())
@@ -4764,7 +4766,7 @@ void CPacketHandler::Packet_ExplosionSync(NetBitStreamInterface& bitStream)
         if (pOrigin)
         {
             // Is the origin a player element?
-            if (pOrigin->GetType() == CCLIENTPLAYER)
+            if (pOrigin->GetType() == ElementType::PLAYER)
             {
                 // Is he in a vehicle?
                 CClientVehicle* pVehicle = static_cast<CClientPlayer*>(pOrigin)->GetOccupiedVehicle();
@@ -4831,7 +4833,7 @@ void CPacketHandler::Packet_ExplosionSync(NetBitStreamInterface& bitStream)
     }
 
     // Is it a vehicle explosion?
-    if (pOrigin && pOrigin->GetType() == CCLIENTVEHICLE)
+    if (pOrigin && pOrigin->GetType() == ElementType::VEHICLE)
     {
         switch (Type)
         {
@@ -5046,7 +5048,7 @@ void CPacketHandler::Packet_ProjectileSync(NetBitStreamInterface& bitStream)
     {
         if (pCreator)
         {
-            if (pCreator->GetType() == CCLIENTPED || pCreator->GetType() == CCLIENTPLAYER)
+            if (pCreator->GetType() == ElementType::PED || pCreator->GetType() == ElementType::PLAYER)
             {
                 CClientVehicle* pVehicle = static_cast<CClientPed*>(pCreator)->GetOccupiedVehicle();
                 if (pVehicle)

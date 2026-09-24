@@ -51,7 +51,7 @@ void CClientPathNode::DoPulse()
     for (; iter != m_List.end(); iter++)
     {
         // TEST!
-        if ((*iter)->GetType() == CCLIENTVEHICLE)
+        if ((*iter)->GetType() == ElementType::VEHICLE)
         {
             CClientVehicle* pVehicle = static_cast<CClientVehicle*>(*iter);
             CVector         vecMoveSpeed;

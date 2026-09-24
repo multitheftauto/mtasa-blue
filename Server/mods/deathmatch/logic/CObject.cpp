@@ -22,7 +22,7 @@ extern CGame* g_pGame;
 CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowLod) : CElement(pParent), m_bIsLowLod(bIsLowLod), m_pLowLodObject(NULL)
 {
     // Init
-    m_iType = CElement::OBJECT;
+    m_iType = ElementType::OBJECT;
     SetTypeName("object");
 
     m_pObjectManager = pObjectManager;
@@ -47,7 +47,7 @@ CObject::CObject(CElement* pParent, CObjectManager* pObjectManager, bool bIsLowL
 CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Copy.m_bIsLowLod), m_pLowLodObject(Copy.m_pLowLodObject)
 {
     // Init
-    m_iType = CElement::OBJECT;
+    m_iType = ElementType::OBJECT;
     SetTypeName("object");
 
     m_pObjectManager = Copy.m_pObjectManager;
@@ -209,7 +209,7 @@ void CObject::GetMatrix(CMatrix& matrix)
             pAttachedToBase = pAttachedToBase->GetAttachedToElement();
 
         // Only change rotation order if base is an object
-        if (pAttachedToBase->GetType() == CElement::OBJECT)
+        if (pAttachedToBase->GetType() == ElementType::OBJECT)
         {
             ConvertRadiansToDegreesNoWrap(vecRotation);
             vecRotation = ConvertEulerRotationOrder(vecRotation, EULER_ZXY, EULER_ZYX);

@@ -100,7 +100,7 @@ void CClientWeapon::DoPulse()
         {
             if (m_pTarget)
             {
-                if (m_pTarget->GetType() == CCLIENTPED || m_pTarget->GetType() == CCLIENTPLAYER)
+                if (m_pTarget->GetType() == ElementType::PED || m_pTarget->GetType() == ElementType::PLAYER)
                 {
                     CClientPed* pPed = (CClientPed*)(CClientEntity*)(m_pTarget);
                     pPed->GetBonePosition(m_targetBone, vecTargetPos);
@@ -245,14 +245,14 @@ void CClientWeapon::Fire(bool bServerFire)
             {
                 if (m_pTarget)
                 {
-                    if (m_pTarget->GetType() == CCLIENTPED || m_pTarget->GetType() == CCLIENTPLAYER)
+                    if (m_pTarget->GetType() == ElementType::PED || m_pTarget->GetType() == ElementType::PLAYER)
                     {
                         CClientPed* pPed = (CClientPed*)(CClientEntity*)m_pTarget;
                         pPed->GetBonePosition(m_targetBone, vecTarget);
                     }
                     else
                     {
-                        if (m_pTarget->GetType() == CCLIENTVEHICLE)
+                        if (m_pTarget->GetType() == ElementType::VEHICLE)
                         {
                             CClientVehicle* pTarget = (CClientVehicle*)(CClientEntity*)m_pTarget;
                             CVehicle*       pGameVehicle = pTarget->GetGameVehicle();
@@ -454,7 +454,7 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
         {
             CClientPed* pPed = m_pOwner;
             CClientPed* pLocalPlayer = g_pClientGame->GetLocalPlayer();
-            if (pPed->GetType() == CCLIENTPLAYER)
+            if (pPed->GetType() == ElementType::PLAYER)
             {
                 // Restore compensated positions
                 if (!pPed->IsLocalPlayer())
@@ -541,14 +541,14 @@ void CClientWeapon::SetWeaponTarget(CClientEntity* pTarget, int subTarget)
 {
     m_pTarget = pTarget;
     m_targetType = TARGET_TYPE_ENTITY;
-    if (pTarget->GetType() == CCLIENTPED)
+    if (pTarget->GetType() == ElementType::PED)
     {
         if (subTarget == 255)
             m_targetBone = eBone::BONE_PELVIS;
         else
             m_targetBone = (eBone)subTarget;
     }
-    if (pTarget->GetType() == CCLIENTVEHICLE)
+    if (pTarget->GetType() == ElementType::VEHICLE)
     {
         m_itargetWheel = subTarget;
     }
