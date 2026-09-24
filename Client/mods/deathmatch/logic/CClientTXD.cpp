@@ -70,7 +70,11 @@ bool CClientTXD::AddClothingTexture(const std::string& modelName)
             return false;
     }
 
-    return g_pGame->GetRenderWare()->ClothesAddFile(m_FileData.data(), m_FileData.size(), modelName.c_str());
+    if (!g_pGame->GetRenderWare()->ClothesAddFile(m_FileData.data(), m_FileData.size(), modelName.c_str()))
+        return false;
+
+    m_bUsingFileDataForClothes = true;
+    return true;
 }
 
 bool CClientTXD::Import(unsigned short usModelID)
