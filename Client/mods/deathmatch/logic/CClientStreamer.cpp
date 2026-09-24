@@ -662,8 +662,6 @@ void CClientStreamer::OnEnterSector(CClientStreamSector* pSector)
         }
     }
     m_pSector = pSector;
-    SetExpDistances(&m_ActiveElements);
-    m_ActiveElements.sort(CompareExpDistance);
 }
 
 void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClientStreamSector* pSector)
