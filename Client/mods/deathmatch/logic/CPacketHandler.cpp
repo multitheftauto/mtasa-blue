@@ -4479,7 +4479,7 @@ void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
                 }
             }
         }
-        else if (entityType == ElementType::PLAYER)
+        else if (entityType == ElementType::PED)
         {
             auto* removedPed = static_cast<CClientPed*>(entity);
             for (auto* ped : getPedList())
