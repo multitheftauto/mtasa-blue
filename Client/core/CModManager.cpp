@@ -176,7 +176,7 @@ bool CModManager::TryStart()
 
             LocalFree(buffer);
 
-            if (length != std::string::npos)
+            if (length != std::wstring::npos)
             {
                 message.resize(length + 1);
 
