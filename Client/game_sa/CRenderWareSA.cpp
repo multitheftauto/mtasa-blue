@@ -201,6 +201,7 @@ CRenderWareSA::CRenderWareSA()
     m_iRenderingEntityType = TYPE_MASK_WORLD;
     m_GTAVertexShadersDisabledTimer.SetMaxIncrement(1000, true);
     m_bGTAVertexShadersEnabled = true;
+    m_uiDffTexInfoId = 0;
 }
 
 CRenderWareSA::~CRenderWareSA()
@@ -319,6 +320,8 @@ RpClump* CRenderWareSA::ReadDFF(const SString& strFilename, const SString& buffe
 
     // close the stream
     RwStreamClose(streamModel, NULL);
+
+    ScriptAddedDff(pClump);
 
     return pClump;
 }
@@ -537,9 +540,11 @@ bool AtomicsReplacer(RpAtomic* pAtomic, void* data)
     relatedModelInfo.bDeleteOldRwObject = true;
     CFileLoader_SetRelatedModelInfoCB(pAtomic, &relatedModelInfo);
 
-    // The above function adds a reference to the model's TXD by either
-    // calling CAtomicModelInfo::SetAtomic or CDamagableModelInfo::SetDamagedAtomic. Remove it again.
-    CTxdStore_RemoveRef(pData->usTxdID);
+    // The above function adds a reference to the model's TXD when it calls
+    // CAtomicModelInfo::SetAtomic or CDamagableModelInfo::SetDamagedAtomic. It calls neither if the
+    // atomic was left with the clump, so only remove the reference when one was taken.
+    if (!relatedModelInfo.bAtomicNotConsumed)
+        CTxdStore_RemoveRef(pData->usTxdID);
     return true;
 }
 
@@ -658,7 +663,10 @@ void CRenderWareSA::ReplaceCollisions(CColModel* pCol, unsigned short usModelID)
 void CRenderWareSA::DestroyDFF(RpClump* pClump)
 {
     if (pClump)
+    {
+        ScriptRemovedDff(pClump);
         RpClumpDestroy(pClump);
+    }
 }
 
 // Destroys a TXD instance
@@ -970,6 +978,42 @@ bool CRenderWareSA::StaticGetTextureCB(RwTexture* texture, std::vector<RwTexture
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::GetClumpTextures
+//
+// Get the distinct textures the materials of a clump are bound to
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::GetClumpTextures(std::vector<RwTexture*>& outTextureList, RpClump* pClump)
+{
+    if (!pClump)
+        return;
+
+    RpClumpForAllAtomics(
+        pClump,
+        [](RpAtomic* pAtomic, void* pData)
+        {
+            if (!pAtomic->geometry)
+                return true;
+
+            RpGeometryForAllMaterials(
+                pAtomic->geometry,
+                [](RpMaterial* pMaterial, void* pData)
+                {
+                    std::vector<RwTexture*>& textureList = *reinterpret_cast<std::vector<RwTexture*>*>(pData);
+                    if (pMaterial && pMaterial->texture && !ListContains(textureList, pMaterial->texture))
+                        textureList.push_back(pMaterial->texture);
+
+                    return pMaterial;
+                },
+                pData);
+
+            return true;
+        },
+        &outTextureList);
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::GetTextureName
 //
 // Only called by CRenderItemManager::GetVisibleTextureNames ?
@@ -980,6 +1024,9 @@ const char* CRenderWareSA::GetTextureName(CD3DDUMMY* pD3DData)
     STexInfo** ppTexInfo = MapFind(m_D3DDataTexInfoMap, pD3DData);
     if (ppTexInfo)
         return (*ppTexInfo)->strTextureName;
+    SDffTexInfo* pDffTexInfo = MapFind(m_DffTexInfoMap, pD3DData);
+    if (pDffTexInfo)
+        return pDffTexInfo->pTexInfo->strTextureName;
     if (!pD3DData)
         return FAKE_NAME_NO_TEXTURE;
     return "";
