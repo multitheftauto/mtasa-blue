@@ -6,6 +6,7 @@ require "install_resources"
 require "install_cef"
 require "install_unifont"
 require "install_discord"
+require "install_libwebp"
 
 -- Set CI Build global
 local ci = os.getenv("CI")
@@ -186,6 +187,7 @@ workspace "MTASA"
 		include "vendor/jpeg-9f"
 		include "vendor/ksignals"
 		include "vendor/libpng"
+		include "vendor/libwebp"
 		include "vendor/tinygettext"
 		include "vendor/pthreads"
 		include "vendor/libspeex"
