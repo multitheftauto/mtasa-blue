@@ -146,6 +146,7 @@ public:
     virtual bool IsOptionalUpdateInfoRequired(const char* szHost) = 0;
     virtual void InitiateDataFilesFix() = 0;
 
+    virtual void                 OnPreWaterRender() = 0;
     virtual void                 OnPreFxRender() = 0;
     virtual void                 OnPreHUDRender() = 0;
     virtual uint                 GetMinStreamingMemory() = 0;
