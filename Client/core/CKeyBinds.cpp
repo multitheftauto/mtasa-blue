@@ -2055,6 +2055,7 @@ void CKeyBinds::DoPostFramePulse()
             cs.RightShoulder2 = (g_bcControls[32].bState || g_bcControls[33].bState) ? 255 : 0;  // Look Right
             // * Look Behind - uses both keys above simultaneously
             // Mouse Look
+            cs.m_bVehicleMouseLook = (g_bcControls[34].bState) ? 255 : 0;
             cs.RightStickX = ((g_bcControls[35].bState && g_bcControls[36].bState) || (!g_bcControls[35].bState && !g_bcControls[36].bState)) ? 0
                              : (g_bcControls[35].bState)                                                                                      ? 128
                                                                                                                                               : -128;
