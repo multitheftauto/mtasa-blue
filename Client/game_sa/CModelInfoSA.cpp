@@ -2349,8 +2349,8 @@ void CModelInfoSA::DestroyOwnedColModel()
 
 namespace
 {
-    constexpr float MAX_VALID_MODEL_COORDINATE = 1000.0f;
-    constexpr float MAX_VALID_SPHERE_RADIUS = 500.0f;
+    constexpr float MAX_VALID_MODEL_COORDINATE = 20000.0f;
+    constexpr float MAX_VALID_SPHERE_RADIUS = 20000.0f;
     constexpr float MIN_VALID_MODEL_RADIUS = 0.1f;
     constexpr float DEFAULT_FALLBACK_MODEL_RADIUS = 0.5f;
 }
