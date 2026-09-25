@@ -1391,6 +1391,10 @@ void CClientPed::GetOutOfVehicle(unsigned char ucDoor, bool forceExit)
 
             if (pGameVehicle)
             {
+                // Peds warped into a vehicle never had bIsStanding flag, which makes jumping out behave differently
+                // than in single player. Setting the flag allows us to hand off the velocity.
+                m_pPlayerPed->SetIsStanding(true);
+
                 CTaskComplexLeaveCar* pOutTask = g_pGame->GetTasks()->CreateTaskComplexLeaveCar(pGameVehicle, m_ucLeavingDoor, 0, !m_forceExit, false);
                 if (pOutTask)
                 {
