@@ -43,6 +43,12 @@ public:
     bool        IsLowLodObjectLimitReached();
     bool        IsHardObjectLimitReached();
 
+    // Configurable object streaming limits (default = stock). Raising them trades FPS for
+    // density (draw-call bound). See engineSetObjectStreamingLimits.
+    bool SetStreamingLimits(uint uiHighDetail, uint uiLowLod);
+    uint GetMaxStreamedInCount() const { return m_uiMaxStreamedInCount; }
+    uint GetMaxLowLodStreamedInCount() const { return m_uiMaxLowLodStreamedInCount; }
+
     void RestreamObjects(unsigned short usModel);
     void RestreamAllObjects();
 
