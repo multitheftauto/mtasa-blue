@@ -53,7 +53,7 @@ namespace
     constexpr int           SERVER_BROWSER_SPEED_FAST = 2;
     constexpr unsigned long SERVER_BROWSER_LAZY_LAYOUT_INTERVAL_DEFAULT = 100UL;  // Minimum ms between GUI ForceUpdate while refreshing
     constexpr unsigned long SERVER_BROWSER_HIDDEN_REFRESH_DELAY = 200UL;          // Delay (ms) before using hidden refresh acceleration
-    constexpr unsigned long SERVER_BROWSER_AUTO_REFRESH_INTERVAL = 5000UL;        // Delay (ms) between automatic re-queries of the visible list
+    constexpr unsigned long SERVER_BROWSER_AUTO_REFRESH_INTERVAL = 10000UL;       // Delay (ms) between automatic re-queries of the visible list
     constexpr unsigned long SERVER_BROWSER_REFRESH_FRAME_BUDGET_MS = 33;          // Time budget per frame for refresh batching (increased for faster filtering)
 }
 
