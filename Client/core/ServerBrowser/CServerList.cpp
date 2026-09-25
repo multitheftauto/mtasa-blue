@@ -210,6 +210,30 @@ void CServerList::Refresh()
     m_iRevision++;
 }
 
+void CServerList::RescanVisibleServers()
+{
+    std::vector<SAddressPort> endpointList;
+    CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser()->GetVisibleEndPointList(endpointList);
+
+    unsigned int uiQueuedServers = 0;
+    for (const SAddressPort& endpoint : endpointList)
+    {
+        CServerListItem* pServer = m_Servers.Find((in_addr&)endpoint.m_ulIp, endpoint.m_usPort);
+        if (pServer)
+        {
+            pServer->ResetForRefresh();
+            uiQueuedServers++;
+        }
+    }
+
+    if (uiQueuedServers > 0 && m_iPass == 0)
+    {
+        m_iPass = 2;
+        m_nScanned = m_Servers.size() - uiQueuedServers;
+        m_nSkipped = 0;
+    }
+}
+
 CServerListInternet::CServerListInternet()
 {
     m_ElapsedTime.SetMaxIncrement(500);

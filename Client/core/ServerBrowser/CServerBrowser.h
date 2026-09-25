@@ -336,6 +336,7 @@ private:
     SListRefreshState m_ListRefreshState[SERVER_BROWSER_TYPE_COUNT];
     unsigned long     m_ulNextListLayoutTime[SERVER_BROWSER_TYPE_COUNT] = {};
     unsigned long     m_ulHiddenRefreshBoostEnableTime = 0;
+    unsigned long     m_ulNextAutoRefreshTime = 0;
     int               m_iIgnoreSortCallbacks = 0;
 
     // Player list retry tracking - retry queries for servers that haven't responded with player data
