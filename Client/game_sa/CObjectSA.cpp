@@ -166,6 +166,27 @@ CObjectSA::~CObjectSA()
     }
 }
 
+void CObjectSA::SetFrozen(bool bFrozen)
+{
+    CObjectSAInterface* pInterface = GetObjectInterface();
+
+    if (bFrozen != m_bFrozen)
+    {
+        if (bFrozen)
+        {
+            m_bCollidableBeforeFreeze = pInterface->bCollidable;
+            pInterface->bCollidable = true;
+        }
+        else
+        {
+            pInterface->bCollidable = m_bCollidableBeforeFreeze;
+        }
+        m_bFrozen = bFrozen;
+    }
+
+    CPhysicalSA::SetFrozen(bFrozen);
+}
+
 void CObjectSA::Explode()
 {
     DWORD dwFunc = FUNC_CObject_Explode;
