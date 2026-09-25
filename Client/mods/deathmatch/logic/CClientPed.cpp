@@ -7092,7 +7092,9 @@ void CClientPed::UpdateVehicleInOut()
             CClientVehicle* realVehicle = GetRealOccupiedVehicle();
             CClientVehicle* networkVehicle = GetOccupiedVehicle();
 
-            if (realVehicle)
+            // Wait until the ped is out and the leave vehicle task has finished.
+            // Same as networked peds.
+            if (realVehicle || IsLeavingVehicle())
                 return;
 
             // Call the onClientVehicleExit event for the ped
