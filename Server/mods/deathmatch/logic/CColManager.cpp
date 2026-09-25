@@ -129,6 +129,9 @@ void CColManager::DoHitDetectionForEntity(const CVector& vecNowPosition, CElemen
 //
 void CColManager::HandleHitDetectionResult(bool bHit, CColShape* pShape, CElement* pEntity)
 {
+    if (bHit && !pShape->IsCollisionAllowed(*pEntity))
+        bHit = false;
+
     bool bShouldTrack = bHit;
     if (bHit)
     {
@@ -153,11 +156,15 @@ void CColManager::HandleHitDetectionResult(bool bHit, CColShape* pShape, CElemen
                 CLuaArguments Arguments;
                 Arguments.PushElement(pEntity);
                 Arguments.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+                Arguments.PushNumber(pEntity->GetDimension());
+                Arguments.PushNumber(pEntity->GetInterior());
                 pShape->CallEvent("onColShapeHit", Arguments);
 
                 CLuaArguments Arguments2;
                 Arguments2.PushElement(pShape);
                 Arguments2.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+                Arguments2.PushNumber(pEntity->GetDimension());
+                Arguments2.PushNumber(pEntity->GetInterior());
                 pEntity->CallEvent("onElementColShapeHit", Arguments2);
             }
 
@@ -178,11 +185,15 @@ void CColManager::HandleHitDetectionResult(bool bHit, CColShape* pShape, CElemen
             CLuaArguments Arguments;
             Arguments.PushElement(pEntity);
             Arguments.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+            Arguments.PushNumber(pEntity->GetDimension());
+            Arguments.PushNumber(pEntity->GetInterior());
             pShape->CallEvent("onColShapeLeave", Arguments);
 
             CLuaArguments Arguments2;
             Arguments2.PushElement(pShape);
             Arguments2.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+            Arguments2.PushNumber(pEntity->GetDimension());
+            Arguments2.PushNumber(pEntity->GetInterior());
             pEntity->CallEvent("onElementColShapeLeave", Arguments2);
         }
 
