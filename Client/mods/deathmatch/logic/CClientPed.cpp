@@ -1371,13 +1371,14 @@ bool CClientPed::GetClosestDoor(CClientVehicle* pVehicle, bool bCheckDriverDoor,
     return false;
 }
 
-void CClientPed::GetOutOfVehicle(unsigned char ucDoor)
+void CClientPed::GetOutOfVehicle(unsigned char ucDoor, bool forceExit)
 {
     if (ucDoor != 0xFF)
         m_ucLeavingDoor = ucDoor + 2;
     else
         m_ucLeavingDoor = 0xFF;
     m_bForceGettingOut = true;
+    m_forceExit = forceExit;
 
     // Get the current vehicle you're in
     CClientVehicle* pVehicle = GetRealOccupiedVehicle();
@@ -1390,7 +1391,7 @@ void CClientPed::GetOutOfVehicle(unsigned char ucDoor)
 
             if (pGameVehicle)
             {
-                CTaskComplexLeaveCar* pOutTask = g_pGame->GetTasks()->CreateTaskComplexLeaveCar(pGameVehicle, m_ucLeavingDoor);
+                CTaskComplexLeaveCar* pOutTask = g_pGame->GetTasks()->CreateTaskComplexLeaveCar(pGameVehicle, m_ucLeavingDoor, 0, !m_forceExit, false);
                 if (pOutTask)
                 {
                     pOutTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY, true);
@@ -1495,6 +1496,7 @@ void CClientPed::WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat)
     m_bForceGettingIn = false;
     m_bForceGettingOut = false;
     m_ucLeavingDoor = 0xFF;
+    m_forceExit = false;
 
     // Store our current seat
     if (m_pPlayerPed)
@@ -1701,6 +1703,7 @@ CClientVehicle* CClientPed::RemoveFromVehicle(bool bSkipWarpIfGettingOut)
     m_bForceGettingIn = false;
     m_bForceGettingOut = false;
     m_ucLeavingDoor = 0xFF;
+    m_forceExit = false;
 
     return pVehicle;
 }
@@ -2925,13 +2928,14 @@ void CClientPed::StreamedInPulse(bool bDoStandardPulses)
                         CTask* pTask = GetCurrentPrimaryTask();
                         if (!pTask || pTask->GetTaskType() != TASK_COMPLEX_LEAVE_CAR)
                         {
-                            GetOutOfVehicle(m_ucLeavingDoor);
+                            GetOutOfVehicle(m_ucLeavingDoor, m_forceExit);
                         }
                     }
                     else
                     {
                         m_bForceGettingOut = false;
                         m_ucLeavingDoor = 0xFF;
+                        m_forceExit = false;
                     }
                 }
 
@@ -6918,7 +6922,7 @@ bool CClientPed::EnterVehicle(CClientVehicle* pVehicle, bool bPassenger, std::op
 // Asks server for permission to start exiting vehicle
 //
 //////////////////////////////////////////////////////////////////
-bool CClientPed::ExitVehicle()
+bool CClientPed::ExitVehicle(bool forceExit)
 {
     // Are we local player or ped we are syncing
     if (!IsSyncing() && !IsLocalPlayer() && !IsLocalEntity())
@@ -6981,7 +6985,7 @@ bool CClientPed::ExitVehicle()
             return false;
 
         // Make ped exit vehicle
-        GetOutOfVehicle(m_ucVehicleInOutSeat);
+        GetOutOfVehicle(m_ucVehicleInOutSeat, forceExit);
 
         // Remember that this ped is working on leaving a vehicle
         SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
@@ -7006,6 +7010,9 @@ bool CClientPed::ExitVehicle()
     pBitStream->Write(pOccupiedVehicle->GetID());
     unsigned char ucAction = static_cast<unsigned char>(CClientGame::VEHICLE_REQUEST_OUT);
     pBitStream->WriteBits(&ucAction, 4);
+
+    if (g_pNet->CanServerBitStream(eBitStreamVersion::PedExitVehicleForce))
+        pBitStream->WriteBit(forceExit);
 
     if (targetDoor >= 2 && targetDoor <= 5)
     {
