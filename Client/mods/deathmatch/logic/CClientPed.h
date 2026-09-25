@@ -753,7 +753,7 @@ public:
     float                                    m_fLighting;
     unsigned char                            m_ucEnteringDoor;
     unsigned char                            m_ucLeavingDoor;
-    bool                                     m_forceExit{false}; // Don't wait for the vehicle to slow down before getting out
+    bool                                     m_forceExit{false};  // Don't wait for the vehicle to slow down before getting out
     bool                                     m_bPendingRebuildPlayer;
     uint                                     m_uiFrameLastRebuildPlayer;
     bool                                     m_bIsSyncing;
