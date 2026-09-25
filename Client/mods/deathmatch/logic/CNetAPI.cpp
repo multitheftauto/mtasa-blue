@@ -978,6 +978,12 @@ void CNetAPI::ReadPlayerPuresync(CClientPlayer* pPlayer, NetBitStreamInterface& 
         pPlayer->SetCurrentWeaponSlot(WEAPONSLOT_TYPE_UNARMED);
     }
 
+    SCameraPitchSync cameraPitch;
+    if (BitStream.Read(&cameraPitch))
+    {
+        pPlayer->SetCameraPitch(cameraPitch.data.fValue);
+    }
+
     // null out the crouch bit or it'll conflict with the crouched syncing
     ControllerState.ShockButtonL = 0;
 
