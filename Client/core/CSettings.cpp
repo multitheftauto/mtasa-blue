@@ -1735,7 +1735,7 @@ void CSettings::CreateGUI()
                5.0f;
 
     vecTemp.fX += 10.0f;
-    fComboWidth = std::clamp(tabPanelSize.fX - vecTemp.fX - fIndentX - 15.0f, 100.0f, 400.0f);
+    fComboWidth = std::clamp(tabPanelSize.fX - vecTemp.fX - fIndentX - 15.0f, 100.0f, 170.0f);
 
     // Fast clothes loading
     m_pFastClothesLabel = reinterpret_cast<CGUILabel*>(pManager->CreateLabel(pTabAdvanced, _("Fast CJ clothes loading:")));
