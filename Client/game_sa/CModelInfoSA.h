@@ -355,6 +355,8 @@ protected:
     static std::map<unsigned short, int>                                              ms_DefaultTxdIDMap;
     SVehicleSupportedUpgrades                                                         m_ModelSupportedUpgrades;
 
+    bool m_renderAfterScene{false};
+
 public:
     CModelInfoSA();
 
@@ -493,6 +495,9 @@ public:
 
     bool IsDynamic() { return m_pInterface ? m_pInterface->usDynamicIndex != MODEL_PROPERTIES_GROUP_STATIC : false; };
     bool IsDamageableAtomic() override;
+
+    bool ShouldRenderAfterScene() const noexcept override { return m_renderAfterScene; }
+    void SetRenderingAfterScene(bool shouldRenderAfterScene) noexcept override { m_renderAfterScene = shouldRenderAfterScene; }
 
     static bool IsVehicleModel(std::uint32_t model) noexcept;
 
