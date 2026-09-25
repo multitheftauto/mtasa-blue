@@ -67,8 +67,6 @@ bool CAccessControlListGroup::FindObjectMatch(const char* szObjectName, CAccessC
     }
 
     // Loop through our list again for wildchar finding
-    char strName[256];
-    strName[255] = '\0';
     ObjectList::iterator iter = m_Objects.begin();
     for (; iter != m_Objects.end(); iter++)
     {
@@ -82,9 +80,7 @@ bool CAccessControlListGroup::FindObjectMatch(const char* szObjectName, CAccessC
             // Long enough string and this is a wildchar entry?
             if (iLen > 0 && szName[iLen - 1] == '*')
             {
-                // Copy the namestring and remove it's wildchar character
-                strncpy(strName, szName, 255);
-                strName[iLen - 1] = '\0';
+                SStringX strName(szName, static_cast<uint>(iLen - 1));
 
                 // Does the st
                 if (StringBeginsWith(szObjectName, strName))
