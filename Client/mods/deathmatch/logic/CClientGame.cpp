@@ -1384,10 +1384,14 @@ void CClientGame::DoPulses()
         // Lost connection?
         if (!g_pNet->IsConnected() && !m_bGracefulDisconnect && !m_bIsPlayingBack)
         {
+            // Local play never went through the connect manager, so the stored host and port still
+            // point at the last remote server - reconnecting there is not what the player asked for
+            const bool bCanRetry = !IsLocalGame();
+
             // See if we can figure out what specifically it was
             if (ucError == 0)
             {
-                g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CD09"), _("Connection with the server was lost"));
+                g_pCore->ShowNetErrorMessageBox(_("Error") + _E("CD09"), _("Connection with the server was lost"), "", false, bCanRetry);
                 g_pCore->GetModManager()->RequestUnload();
                 return;
             }
@@ -1395,6 +1399,11 @@ void CClientGame::DoPulses()
             {
                 SString strError;
                 SString strErrorCode;
+
+                // Only offer a retry where one could actually succeed: a ban, a bad password or a
+                // protocol mismatch would fail again with the same stored credentials
+                bool bAllowReconnect = false;
+
                 switch (ucError)
                 {
                     case RID_RSA_PUBLIC_KEY_MISMATCH:
@@ -1404,10 +1413,12 @@ void CClientGame::DoPulses()
                     case RID_REMOTE_DISCONNECTION_NOTIFICATION:
                         strError = _("Disconnected: disconnected remotely");
                         strErrorCode = _E("CD11");
+                        bAllowReconnect = true;
                         break;
                     case RID_REMOTE_CONNECTION_LOST:
                         strError = _("Disconnected: connection lost remotely");
                         strErrorCode = _E("CD12");
+                        bAllowReconnect = true;
                         break;
                     case RID_CONNECTION_BANNED:
                         strError = _("Disconnected: you are banned from this server");
@@ -1420,10 +1431,12 @@ void CClientGame::DoPulses()
                     case RID_DISCONNECTION_NOTIFICATION:
                         strError = _("Disconnected: disconnected from the server");
                         strErrorCode = _E("CD15");
+                        bAllowReconnect = true;
                         break;
                     case RID_CONNECTION_LOST:
                         strError = _("Disconnected: connection to the server was lost");
                         strErrorCode = _E("CD16");
+                        bAllowReconnect = true;
                         break;
                     case RID_INVALID_PASSWORD:
                         strError = _("Disconnected: invalid password specified");
@@ -1436,7 +1449,7 @@ void CClientGame::DoPulses()
                 }
 
                 // Display an error, reset the error status and exit
-                g_pCore->ShowNetErrorMessageBox(_("Error") + strErrorCode, strError);
+                g_pCore->ShowNetErrorMessageBox(_("Error") + strErrorCode, strError, "", false, bAllowReconnect && bCanRetry);
                 g_pNet->SetConnectionError(0);
                 g_pCore->GetModManager()->RequestUnload();
             }
