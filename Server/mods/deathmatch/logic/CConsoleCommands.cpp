@@ -1920,3 +1920,17 @@ bool CConsoleCommands::DebugUpTime(CConsole* pConsole, const char* szArguments, 
     pEchoClient->SendConsole(SString("TickCount advanced by %d days", iDaysAdd));
     return true;
 }
+
+bool CConsoleCommands::ClearScreen(CConsole* pConsole, const char* szArguments, CClient* pClient, CClient* pEchoClient)
+{
+    if (pClient->GetClientType() == CClient::CLIENT_CONSOLE)
+    {
+        extern CServerInterface* g_pServerInterface;
+        if (g_pServerInterface)
+        {
+            g_pServerInterface->ClearScreen();
+            return true;
+        }
+    }
+    return false;
+}
