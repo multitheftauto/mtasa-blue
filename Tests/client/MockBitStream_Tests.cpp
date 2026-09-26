@@ -173,3 +173,29 @@ TEST(MockBitStream, ISyncStructureDelegation)
     EXPECT_TRUE(bs.Read(&readSync));
     EXPECT_NEAR(100.0f, readSync.data.fValue, 1.5f);
 }
+
+// Verify Int64 round trip with positive, negative, and extreme values.
+TEST(MockBitStream, Int64RoundTrip)
+{
+    const std::int64_t testValues[] = {0LL, 1LL, -1LL, 42LL, -42LL, 0x123456789ABCDEF0LL, -0x123456789ABCDEF0LL, INT64_MAX, INT64_MIN};
+
+    for (std::int64_t input : testValues)
+    {
+        MockBitStream bs;
+        bs.WriteInt64(input);
+
+        std::int64_t output = 0;
+        EXPECT_TRUE(bs.ReadInt64(output));
+        EXPECT_EQ(input, output);
+    }
+}
+
+// Verify that reading an Int64 from an incomplete stream fails gracefully.
+TEST(MockBitStream, Int64ReadIncomplete_ReturnsFalse)
+{
+    MockBitStream bs;
+    bs.Write(static_cast<unsigned int>(0x12345678));
+
+    std::int64_t output = 0;
+    EXPECT_FALSE(bs.ReadInt64(output));
+}

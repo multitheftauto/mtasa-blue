@@ -42,6 +42,7 @@ namespace SharedUtil
     double GetSecondCount();
 
     std::int64_t GetTimestamp();
+    std::int64_t GetLocalTick();
 
     //
     // Get the time as a sortable string.
