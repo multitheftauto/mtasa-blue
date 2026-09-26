@@ -2150,17 +2150,6 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
         if (pPed->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
             pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
-        // Remove him from any occupied vehicle
-        // The client keeps the player paired with the vehicle until he respawns,
-        // so remember it and let the occupied-vehicle getters report it while dead
-        if (pVehicle)
-        {
-            const unsigned int uiOccupiedSeat = pPed->GetOccupiedVehicleSeat();
-            pVehicle->SetOccupant(NULL, uiOccupiedSeat);
-            pPed->SetOccupiedVehicle(NULL, 0);
-            pPed->SetVehicleOccupiedOnDeath(pVehicle, uiOccupiedSeat);
-        }
-
         CElement* pKiller = (Packet.m_Killer != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Killer) : NULL;
 
         // Create a new packet to send to everyone
@@ -2212,18 +2201,6 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
         // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
         if (pPlayer->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
             pPlayer->SetVehicleAction(CPed::VEHICLEACTION_NONE);
-
-        // Remove him from any occupied vehicle
-        // The client keeps the player paired with the vehicle until he respawns,
-        // so remember it and let the occupied-vehicle getters report it while dead
-        CVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
-        if (pVehicle)
-        {
-            const unsigned int uiOccupiedSeat = pPlayer->GetOccupiedVehicleSeat();
-            pVehicle->SetOccupant(NULL, uiOccupiedSeat);
-            pPlayer->SetOccupiedVehicle(NULL, 0);
-            pPlayer->SetVehicleOccupiedOnDeath(pVehicle, uiOccupiedSeat);
-        }
 
         CElement* pKiller = (Packet.m_Killer != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Killer) : NULL;
 

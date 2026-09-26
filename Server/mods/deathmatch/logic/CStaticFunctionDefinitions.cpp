@@ -2461,10 +2461,7 @@ CVehicle* CStaticFunctionDefinitions::GetPedOccupiedVehicle(CPed* pPed)
 {
     assert(pPed);
 
-    if (CVehicle* pVehicle = pPed->GetOccupiedVehicle())
-        return pVehicle;
-
-    return pPed->IsDead() ? pPed->GetVehicleOccupiedOnDeath() : NULL;
+    return pPed->GetOccupiedVehicle();
 }
 
 bool CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat(CPed* pPed, unsigned int& uiSeat)
@@ -2474,12 +2471,6 @@ bool CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat(CPed* pPed, unsigned 
     if (pPed->GetOccupiedVehicle())
     {
         uiSeat = pPed->GetOccupiedVehicleSeat();
-        return true;
-    }
-
-    if (pPed->IsDead() && pPed->GetVehicleOccupiedOnDeath())
-    {
-        uiSeat = pPed->GetVehicleOccupiedSeatOnDeath();
         return true;
     }
 
@@ -3969,18 +3960,6 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
             // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
             if (pPed->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
                 pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
-
-            // Remove him from any occupied vehicle
-            // The client keeps the ped paired with the vehicle until it respawns,
-            // so remember it and let the occupied-vehicle getters report it while dead
-            CVehicle* pVehicle = pPed->GetOccupiedVehicle();
-            if (pVehicle)
-            {
-                const unsigned int uiOccupiedSeat = pPed->GetOccupiedVehicleSeat();
-                pVehicle->SetOccupant(NULL, uiOccupiedSeat);
-                pPed->SetOccupiedVehicle(NULL, 0);
-                pPed->SetVehicleOccupiedOnDeath(pVehicle, uiOccupiedSeat);
-            }
 
             // Update the ped
             pPed->SetSpawned(false);

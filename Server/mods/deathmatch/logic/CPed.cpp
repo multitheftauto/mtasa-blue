@@ -12,7 +12,6 @@
 #include "StdInc.h"
 #include "CPed.h"
 #include "CPedManager.h"
-#include "CElementRefManager.h"
 #include "CLogger.h"
 #include "Utils.h"
 #include "CStaticFunctionDefinitions.h"
@@ -74,11 +73,6 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     m_uiVehicleSeat = INVALID_VEHICLE_SEAT;
     m_uiVehicleAction = CPed::VEHICLEACTION_NONE;
 
-    m_pVehicleOnDeath = NULL;
-    m_uiVehicleSeatOnDeath = INVALID_VEHICLE_SEAT;
-
-    CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CPed"), &m_pVehicleOnDeath, NULL);
-
     m_vecVelocity.fX = m_vecVelocity.fY = m_vecVelocity.fZ = 0.0f;
 
     m_pSyncer = NULL;
@@ -119,8 +113,6 @@ CPed::~CPed()
     {
         m_pVehicle->SetOccupant(NULL, m_uiVehicleSeat);
     }
-
-    CElementRefManager::RemoveElementRefs(ELEMENT_REF_DEBUG(this, "CPed"), &m_pVehicleOnDeath, NULL);
 
     SetSyncer(NULL);
 
@@ -417,9 +409,6 @@ void CPed::SetContactElement(CElement* pElement)
 void CPed::SetIsDead(bool bDead)
 {
     m_bIsDead = bDead;
-
-    if (!bDead)
-        SetVehicleOccupiedOnDeath(NULL, INVALID_VEHICLE_SEAT);
 }
 
 CVehicle* CPed::SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat)
@@ -431,9 +420,6 @@ CVehicle* CPed::SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat)
         m_pVehicle = pVehicle;
         m_uiVehicleSeat = uiSeat;
 
-        if (pVehicle)
-            SetVehicleOccupiedOnDeath(NULL, INVALID_VEHICLE_SEAT);
-
         // Make sure the vehicle knows
         if (m_pVehicle)
         {
@@ -444,12 +430,6 @@ CVehicle* CPed::SetOccupiedVehicle(CVehicle* pVehicle, unsigned int uiSeat)
     }
 
     return m_pVehicle;
-}
-
-void CPed::SetVehicleOccupiedOnDeath(CVehicle* pVehicle, unsigned int uiSeat)
-{
-    m_pVehicleOnDeath = pVehicle;
-    m_uiVehicleSeatOnDeath = pVehicle ? uiSeat : INVALID_VEHICLE_SEAT;
 }
 
 void CPed::SetVehicleAction(unsigned int uiAction)
