@@ -100,7 +100,11 @@ void CClientBuilding::SetInterior(uint8_t ucInterior)
         return;
 
     m_interior = ucInterior;
-    Recreate();
+
+    if (m_pBuilding)
+        Recreate();
+
+    CClientEntity::SetInterior(ucInterior);
 }
 
 void CClientBuilding::SetDimension(unsigned short usDimension)

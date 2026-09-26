@@ -26,11 +26,16 @@ namespace FPSLimiter
     // spinning on systems where the timer already wakes up on time.
     constexpr double INITIAL_TIMER_JITTER_MS = 1.0;        // Starting margin, matches the previous fixed-margin behaviour
     constexpr double MIN_SPIN_MARGIN_MS = 0.05;            // Never spin less than this, in case of a very lucky measurement
-    constexpr double MAX_SPIN_MARGIN_MS = 1.0;             // Never spin more than the old fixed margin
+    constexpr double MAX_SPIN_MARGIN_MS = 2.0;             // Never spin more than this, even if the timer keeps waking up late
     constexpr double SPIN_MARGIN_SAFETY_BUFFER_MS = 0.05;  // Extra headroom on top of the measured peak jitter
     constexpr double TIMER_JITTER_DECAY = 0.98;            // Per-frame decay applied when the timer wakes up on time
     constexpr int    FINAL_SPIN_BATCH_SIZE = 16;           // PAUSE instructions issued between two TSC reads in the final spin
     static_assert(MIN_SPIN_MARGIN_MS <= MAX_SPIN_MARGIN_MS);
+
+    // CreateWaitableTimerEx flags. The high resolution one exists since Windows 10 1803 and is
+    // not in older SDK headers, older systems reject it and we fall back to a regular timer
+    constexpr DWORD WAITABLE_TIMER_MANUAL_RESET = 0x00000001;
+    constexpr DWORD WAITABLE_TIMER_HIGH_RESOLUTION = 0x00000002;
 
     FPSLimiter::FPSLimiter()
 
@@ -44,7 +49,8 @@ namespace FPSLimiter
           m_userDefinedFps{0},
           m_displayRefreshRate{0},
           m_fpsTarget{FPSLimits::FPS_MIN},
-          m_appliedThisFrame{false}
+          m_appliedThisFrame{false},
+          m_waitPending{false}
     {
         QueryPerformanceFrequency(&m_frequency);
         QueryPerformanceCounter(&m_lastFrameTime);
@@ -312,10 +318,13 @@ namespace FPSLimiter
             {
                 ensureTimerResolution();
 
-                // Create timer on first use
+                // Create timer on first use. A high resolution timer wakes up within a fraction
+                // of a millisecond, so far less of the wait has to be spent spinning
                 if (!m_hTimer)
                 {
-                    m_hTimer = CreateWaitableTimer(nullptr, TRUE, nullptr);
+                    m_hTimer = CreateWaitableTimerExW(nullptr, nullptr, WAITABLE_TIMER_MANUAL_RESET | WAITABLE_TIMER_HIGH_RESOLUTION, TIMER_ALL_ACCESS);
+                    if (!m_hTimer)
+                        m_hTimer = CreateWaitableTimer(nullptr, TRUE, nullptr);
                 }
 
                 if (m_hTimer)
@@ -389,7 +398,20 @@ namespace FPSLimiter
 
     void FPSLimiter::OnFrameEnd()
     {
-        // Trigger fps limiting now
+        // The wait belongs in OnGameTimerUpdate so GTA measures exact frame deltas. If the game
+        // timer never ticked since the last frame (minimized, loading) pace here instead
+        if (m_waitPending)
+            SetFrameRateThrottle();
+
+        m_waitPending = true;
+    }
+
+    void FPSLimiter::OnGameTimerUpdate()
+    {
+        if (!m_waitPending)
+            return;
+
+        m_waitPending = false;
         SetFrameRateThrottle();
     }
 
