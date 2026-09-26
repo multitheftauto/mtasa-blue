@@ -19,6 +19,9 @@
 #define VAR_VerticalAimSensitivity     ((float*)(0xB6EC18))
 #define VAR_HorizontalMouseSensitivity 0xB6EC1C
 
+#define VAR_InAirMouseSteeringCar  0x6B4EC0
+#define VAR_InAirMouseSteeringQuad 0x6CE827
+
 static const float VERTICAL_AIM_SENSITIVITY_MIN = 0.000312f;
 static const float VERTICAL_AIM_SENSITIVITY_DEFAULT = 0.0015f;
 static const float VERTICAL_AIM_SENSITIVITY_MAX = VERTICAL_AIM_SENSITIVITY_DEFAULT * 2 - VERTICAL_AIM_SENSITIVITY_MIN;
@@ -30,6 +33,11 @@ CControllerConfigManagerSA::CControllerConfigManagerSA()
     m_bSteerWithMouse = *VAR_FlyWithMouse != 0;
     m_bFlyWithMouse = *VAR_SteerWithMouse != 0;
     MemSet((void*)0x5BC7B4, 0x90, 10);  // Stop vertical aim sensitivity value reset
+
+    MemPut<DWORD>(VAR_InAirMouseSteeringCar, (DWORD)&m_ucInAirMouseSteering);
+    MemPut<DWORD>(VAR_InAirMouseSteeringQuad, (DWORD)&m_ucInAirMouseSteering);
+
+    UpdateInAirMouseSteering();
 }
 
 void CControllerConfigManagerSA::SetControllerKeyAssociatedWithAction(eControllerAction action, int iKey, eControllerType controllerType)
@@ -97,6 +105,7 @@ void CControllerConfigManagerSA::ClearSettingsAssociatedWithAction(eControllerAc
 void CControllerConfigManagerSA::SetClassicControls(bool bClassicControls)
 {
     MemPutFast<unsigned char>(VAR_InputType, bClassicControls ? 0 : 1);
+    UpdateInAirMouseSteering();
 }
 
 void CControllerConfigManagerSA::SetMouseInverted(bool bInverted)
@@ -134,6 +143,13 @@ void CControllerConfigManagerSA::ApplySteerAndFlyWithMouseSettings()
         *VAR_FlyWithMouse = m_bFlyWithMouse;
         *VAR_SteerWithMouse = m_bSteerWithMouse;
     }
+
+    UpdateInAirMouseSteering();
+}
+
+void CControllerConfigManagerSA::UpdateInAirMouseSteering()
+{
+    m_ucInAirMouseSteering = (!m_bSuspendSteerAndFlyWithMouse && *VAR_InputType != 0) ? 1 : 0;
 }
 
 float CControllerConfigManagerSA::GetVerticalAimSensitivity()
