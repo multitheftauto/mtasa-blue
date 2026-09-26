@@ -74,6 +74,12 @@ void CLuaPedDefs::LoadFunctions()
         {"setPedFrozen", SetPedFrozen},
         {"reloadPedWeapon", ArgumentParserWarn<false, ReloadPedWeapon>},
 
+        // Clothes and body functions
+        {"getBodyPartName", ArgumentParserWarn<false, GetBodyPartName>},
+        {"getClothesByTypeIndex", ArgumentParserWarn<false, GetClothesByTypeIndex>},
+        {"getTypeIndexFromClothes", ArgumentParserWarn<false, GetTypeIndexFromClothes>},
+        {"getClothesTypeName", ArgumentParserWarn<false, GetClothesTypeName>},
+
         // Weapon give/take functions
         {"giveWeapon", GiveWeapon},
         {"takeWeapon", TakeWeapon},
@@ -1562,4 +1568,56 @@ int CLuaPedDefs::TakeAllWeapons(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<const char*, bool> CLuaPedDefs::GetBodyPartName(std::uint8_t bodyPartId) noexcept
+{
+    if (bodyPartId >= 10)
+        return false;
+
+    return CPed::GetBodyPartName(bodyPartId);
+}
+
+std::variant<bool, CLuaMultiReturn<const char*, const char*>> CLuaPedDefs::GetClothesByTypeIndex(std::uint8_t clothesType, std::uint8_t clothesIndex)
+{
+    const SPlayerClothing* clothingGroup = CPlayerClothes::GetClothingGroup(clothesType);
+
+    if (!clothingGroup || clothesIndex >= CPlayerClothes::GetClothingGroupMax(clothesType))
+        return false;
+
+    return CLuaMultiReturn<const char*, const char*>{clothingGroup[clothesIndex].szTexture, clothingGroup[clothesIndex].szModel};
+}
+
+std::variant<bool, CLuaMultiReturn<std::uint8_t, std::uint8_t>> CLuaPedDefs::GetTypeIndexFromClothes(std::string                clothesTexture,
+                                                                                                     std::optional<std::string> clothesModel)
+{
+    const bool matchAnyModel = !clothesModel.has_value() || clothesModel->empty();
+
+    for (std::uint8_t clothesType = 0; clothesType < PLAYER_CLOTHING_SLOTS; clothesType++)
+    {
+        const SPlayerClothing* clothingGroup = CPlayerClothes::GetClothingGroup(clothesType);
+        if (!clothingGroup)
+            continue;
+
+        for (std::size_t clothesIndex = 0; clothingGroup[clothesIndex].szTexture != nullptr; clothesIndex++)
+        {
+            if (clothesTexture != clothingGroup[clothesIndex].szTexture)
+                continue;
+
+            if (!matchAnyModel && *clothesModel != clothingGroup[clothesIndex].szModel)
+                continue;
+
+            return CLuaMultiReturn<std::uint8_t, std::uint8_t>{clothesType, static_cast<std::uint8_t>(clothesIndex)};
+        }
+    }
+
+    return false;
+}
+
+std::variant<const char*, bool> CLuaPedDefs::GetClothesTypeName(std::uint8_t clothesType) noexcept
+{
+    if (const char* clothesTypeName = CPlayerClothes::GetClothingName(clothesType))
+        return clothesTypeName;
+
+    return false;
 }
