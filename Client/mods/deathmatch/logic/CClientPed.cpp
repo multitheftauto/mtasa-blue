@@ -595,7 +595,7 @@ void CClientPed::SetInterior(unsigned char ucInterior)
         // If our camera is in the same world as the player, move it
         if (g_pGame->GetWorld()->GetCurrentArea() == m_ucInterior)
         {
-            g_pGame->GetWorld()->SetCurrentArea(ucInterior);
+            m_pManager->GetCamera()->SetInterior(ucInterior);
         }
     }
 
@@ -5442,7 +5442,7 @@ void CClientPed::Respawn(CVector* pvecPosition, bool bRestoreState, bool bCamera
                 SetInterior(ucInterior);
             }
             // Restore the camera's interior whether we're restoring player states or not
-            g_pGame->GetWorld()->SetCurrentArea(ucCameraInterior);
+            m_pManager->GetCamera()->SetInterior(ucCameraInterior);
 
             // Reset goggle effect
             g_pMultiplayer->SetNightVisionEnabled(bOldNightVision, false);

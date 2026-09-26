@@ -5571,7 +5571,7 @@ void CClientGame::ResetMapInfo()
 
     // Camera
     m_pCamera->FadeOut(0.0f, 0, 0, 0);
-    g_pGame->GetWorld()->SetCurrentArea(0);
+    m_pCamera->SetInterior(0);
     m_pCamera->SetFocusToLocalPlayer();
     g_pGame->GetSettings()->ResetFieldOfViewFromScript();
 
