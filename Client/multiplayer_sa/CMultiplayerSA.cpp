@@ -1697,7 +1697,7 @@ void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
 {
     int*  CPostEffects__m_HeatHazeFXIntensity = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXIntensity)>(0x8D50E8);
     int*  CPostEffects__m_HeatHazeFXRandomShift = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRandomShift)>(0xC402C0);
-    int*  CPostEffects__m_HeatHazeFXSpeedMin = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMin)>(0xC402C0);
+    int*  CPostEffects__m_HeatHazeFXSpeedMin = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMin)>(0x8D50EC);
     int*  CPostEffects__m_HeatHazeFXSpeedMax = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMax)>(0x8D50F0);
     int*  CPostEffects__m_HeatHazeFXScanSizeX = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXScanSizeX)>(0xC40304);
     int*  CPostEffects__m_HeatHazeFXScanSizeY = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXScanSizeY)>(0xC40308);
@@ -1709,8 +1709,8 @@ void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
     settings.ucRandomShift = static_cast<uchar>(*CPostEffects__m_HeatHazeFXRandomShift);
     settings.usSpeedMin = static_cast<ushort>(*CPostEffects__m_HeatHazeFXSpeedMin);
     settings.usSpeedMax = static_cast<ushort>(*CPostEffects__m_HeatHazeFXSpeedMax);
-    settings.sScanSizeX = static_cast<short>(*CPostEffects__m_HeatHazeFXScanSizeY);
-    settings.sScanSizeY = static_cast<short>(*CPostEffects__m_HeatHazeFXSpeedMax);
+    settings.sScanSizeX = static_cast<short>(*CPostEffects__m_HeatHazeFXScanSizeX);
+    settings.sScanSizeY = static_cast<short>(*CPostEffects__m_HeatHazeFXScanSizeY);
     settings.usRenderSizeX = static_cast<ushort>(*CPostEffects__m_HeatHazeFXRenderSizeX);
     settings.usRenderSizeY = static_cast<ushort>(*CPostEffects__m_HeatHazeFXRenderSizeY);
     settings.bInsideBuilding = *CPostEffects__m_bHeatHazeFX;
