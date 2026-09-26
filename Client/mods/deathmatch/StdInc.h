@@ -84,6 +84,7 @@
 #include <CClientIMG.h>
 #include <CClientIFP.h>
 #include <CClientWater.h>
+#include <CClientWaterCannon.h>
 #include <CClientWeapon.h>
 #include <CClientRenderElement.h>
 #include <CClientDxFont.h>
@@ -143,6 +144,7 @@
 #include <luadefs/CLuaTeamDefs.h>
 #include <luadefs/CLuaTimerDefs.h>
 #include <luadefs/CLuaVehicleDefs.h>
+#include <luadefs/CLuaWaterCannonDefs.h>
 #include <luadefs/CLuaWaterDefs.h>
 #include <luadefs/CLuaWeaponDefs.h>
 #include <luadefs/CLuaWorldDefs.h>
