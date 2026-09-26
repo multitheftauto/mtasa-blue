@@ -1092,20 +1092,15 @@ int CLuaEngineDefs::EngineGetModelLODDistance(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        uint32_t modelId = CModelNames::ResolveModelID(strModelId);
-        // Ensure we have a good model (GitHub #446)
-        if (modelId < g_pGame->GetBaseIDforTXD())
+        uint32_t    modelId = CModelNames::ResolveModelID(strModelId);
+        CModelInfo* modelInfo = g_pGame->GetModelInfo(modelId);
+        if (modelInfo)
         {
-            CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
-            if (pModelInfo)
-            {
-                lua_pushnumber(luaVM, pModelInfo->GetLODDistance());
-                return 1;
-            }
+            lua_pushnumber(luaVM, modelInfo->GetLODDistance());
+            return 1;
         }
-        else
-            argStream.SetCustomError(
-                SString("Expected a valid model name or ID in range [0-%u] at argument 1, got \"%s\"", g_pGame->GetBaseIDforTXD(), *strModelId));
+
+        argStream.SetCustomError(SString("Expected a valid model name or ID at argument 1, got \"%s\"", *strModelId));
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -1119,30 +1114,30 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
 {
     // bool engineSetModelLODDistance ( int/string modelID, float distance [, bool extendedLod = false ])
     SString          strModelId;
-    float            fDistance;
+    float            distance;
     bool             extendedLod;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strModelId);
-    argStream.ReadNumber(fDistance);
+    argStream.ReadNumber(distance);
     argStream.ReadBool(extendedLod, false);
 
     if (!argStream.HasErrors())
     {
-        uint32_t modelId = CModelNames::ResolveModelID(strModelId);
-        // Ensure we have a good model (GitHub #446)
-        if (modelId < g_pGame->GetBaseIDforTXD())
+        uint32_t    modelId = CModelNames::ResolveModelID(strModelId);
+        CModelInfo* modelInfo = g_pGame->GetModelInfo(modelId);
+        if (modelInfo)
         {
-            CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
-            if (pModelInfo && fDistance > 0.0f)
+            if (distance > 0.0f)
             {
-                pModelInfo->SetLODDistance(fDistance, extendedLod);
+                modelInfo->SetLODDistance(distance, extendedLod);
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
         }
         else
-            argStream.SetCustomError(
-                SString("Expected a valid model name or ID in range [0-%u] at argument 1, got \"%s\"", g_pGame->GetBaseIDforTXD() - 1, *strModelId));
+        {
+            argStream.SetCustomError(SString("Expected a valid model name or ID at argument 1, got \"%s\"", *strModelId));
+        }
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
