@@ -555,16 +555,43 @@ bool CAudioEngineSA::OnWorldSound(CAESound* pAESound)
             pGameEntity = pAESound->pAudioEntity->pEntity;
 
         SWorldSoundEvent event = {
-            pAESound->usGroup,
-            pAESound->usIndex,
-            pGameEntity,
-            pAESound->m_vCurrPosn,
+            pAESound->usGroup, pAESound->usIndex, pGameEntity, pAESound->m_vCurrPosn, pAESound->m_fSoundDistance, pAESound,
         };
 
         return m_pWorldSoundHandler(event);
     }
 
     return true;
+}
+
+void CAudioEngineSA::SetWorldSoundAudibleRange(CAESound* pAESound, float fAudibleRange, float fMinDistance)
+{
+    if (!pAESound || fAudibleRange <= 0.0f)
+        return;
+
+    const float fDistance = pAESound->m_fCurrCamDist;
+    if (fMinDistance > 0.0f && fDistance > 0.0f && fDistance < fMinDistance)
+        pAESound->m_fSoundDistance = fAudibleRange * (fDistance / fMinDistance);
+    else
+        pAESound->m_fSoundDistance = fAudibleRange;
+}
+
+void CAudioEngineSA::UpdateWorldSoundAudibleRange(uint uiGroup, uint uiIndex, float fAudibleRange, float fMinDistance)
+{
+    auto* pSoundManager = reinterpret_cast<CAESoundManagerSAInterface*>(CLASS_CAESoundManager);
+    if (!pSoundManager)
+        return;
+
+    const bool bAnyIndex = uiIndex == static_cast<uint>(-1);
+    for (CAESound& sound : pSoundManager->m_aSound)
+    {
+        if (sound.usGroup != static_cast<ushort>(uiGroup))
+            continue;
+        if (!bAnyIndex && sound.usIndex != static_cast<ushort>(uiIndex))
+            continue;
+
+        SetWorldSoundAudibleRange(&sound, fAudibleRange, fMinDistance);
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////
