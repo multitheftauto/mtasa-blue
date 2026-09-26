@@ -807,8 +807,7 @@ void CServerImpl::HandleInput()
 #ifdef WIN32
             if (bInteractiveConsole)
             {
-                m_uiCursorPos = m_uiInputCount;
-                RefreshInputLine();
+                Printf("\r%s", UTF16ToMbUTF8(m_szInputBuffer).c_str());
             }
 
             // Echo a newline
@@ -1043,34 +1042,40 @@ void CServerImpl::RefreshInputLine()
 {
     m_szInputBuffer[m_uiInputCount] = 0;
 
-    const SString strText = UTF16ToMbUTF8(m_szInputBuffer);
-
 #ifdef WIN32
     if (g_bSilent || !HasConsole())
         return;
 
     CONSOLE_SCREEN_BUFFER_INFO scrnBufferInfo;
-    if (GetConsoleScreenBufferInfo(m_hConsole, &scrnBufferInfo))
-    {
-        COORD lineStart = {0, scrnBufferInfo.dwCursorPosition.Y};
-        DWORD charsWritten;
-        FillConsoleOutputCharacterW(m_hConsole, L' ', scrnBufferInfo.dwSize.X, lineStart, &charsWritten);
-        SetConsoleCursorPosition(m_hConsole, lineStart);
-    }
+    if (!GetConsoleScreenBufferInfo(m_hConsole, &scrnBufferInfo))
+        return;
 
-    Printf("%s", strText.c_str());
+    const int          iWidth = std::max<int>(1, scrnBufferInfo.dwSize.X - 1);
+    const uint         uiOffset = (m_uiCursorPos >= (uint)iWidth) ? m_uiCursorPos - iWidth + 1 : 0;
+    const size_t       uiVisibleLength = std::min<size_t>((size_t)iWidth, m_uiInputCount - uiOffset);
+    const std::wstring wzVisible(m_szInputBuffer + uiOffset, uiVisibleLength);
 
-    if (GetConsoleScreenBufferInfo(m_hConsole, &scrnBufferInfo))
-    {
-        COORD cursorPos = {(SHORT)m_uiCursorPos, scrnBufferInfo.dwCursorPosition.Y};
-        SetConsoleCursorPosition(m_hConsole, cursorPos);
-    }
+    const COORD lineStart = {0, scrnBufferInfo.dwCursorPosition.Y};
+    DWORD       charsWritten;
+    FillConsoleOutputCharacterW(m_hConsole, L' ', scrnBufferInfo.dwSize.X, lineStart, &charsWritten);
+    SetConsoleCursorPosition(m_hConsole, lineStart);
+
+    Printf("%s", UTF16ToMbUTF8(wzVisible).c_str());
+
+    SetConsoleCursorPosition(m_hConsole, {(SHORT)(m_uiCursorPos - uiOffset), lineStart.Y});
 #else
     if (!g_bSilent && !g_bNoCurses)
     {
+        const int          iWidth = getmaxx(m_wndInput);
+        const uint         uiOffset = (iWidth > 0 && m_uiCursorPos >= (uint)iWidth) ? m_uiCursorPos - iWidth + 1 : 0;
+        const size_t       uiVisibleLength = std::min<size_t>((size_t)iWidth, m_uiInputCount - uiOffset);
+        const std::wstring wzVisible(m_szInputBuffer + uiOffset, uiVisibleLength);
+        const std::wstring wzBeforeCursor(m_szInputBuffer + uiOffset, m_uiCursorPos - uiOffset);
+
         wclear(m_wndInput);
-        wprintw(m_wndInput, "%s", strText.c_str());
-        wmove(m_wndInput, 0, m_uiCursorPos);
+        wprintw(m_wndInput, "%s", UTF16ToMbUTF8(wzVisible).c_str());
+
+        wmove(m_wndInput, 0, (int)UTF16ToMbUTF8(wzBeforeCursor).length());
     }
 #endif
 }
