@@ -74,6 +74,7 @@ CServerImpl::CServerImpl()
     memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
     memset(&m_szTag, 0, sizeof(m_szTag) * sizeof(char));
     m_uiInputCount = 0;
+    m_uiCursorPos = 0;
     m_dLastTimeMs = 0;
     m_dPrevOverrun = 0;
 
@@ -790,17 +791,28 @@ void CServerImpl::HandleInput()
     if (iStdIn == 0)
         return;
 
+    const bool bInteractiveConsole =
+#ifdef WIN32
+        HasConsole();
+#else
+        !g_bNoCurses;
+#endif
+
     switch (iStdIn)
     {
         case '\n':  // Newlines and carriage returns
         case '\r':
+            m_szInputBuffer[m_uiInputCount] = 0;
+
 #ifdef WIN32
+            if (bInteractiveConsole)
+            {
+                Printf("\r%s", UTF16ToMbUTF8(m_szInputBuffer).c_str());
+            }
+
             // Echo a newline
             Printf(" \n");
 #else
-            // Set string termination (required for compare/string functions)
-            m_szInputBuffer[m_uiInputCount] = 0;
-
             if (!g_bSilent && !g_bNoCurses)
             {
                 // Clear the input window
@@ -850,23 +862,28 @@ void CServerImpl::HandleInput()
 
             memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
             m_uiInputCount = 0;
+            m_uiCursorPos = 0;
             m_uiSelectedCommandHistoryEntry = 0;
             break;
 
         case KEY_BACKSPACE:  // Backspace
         case 0x7F:
-            if (m_uiInputCount == 0)
+            if (m_uiCursorPos == 0)
                 break;
 
-            // Insert a blank space + backspace
-#ifdef WIN32
-            Printf("%c %c", 0x08, 0x08);
-#else
-            if (!g_bSilent && !g_bNoCurses)
-                wprintw(m_wndInput, "%c %c", 0x08, 0x08);
-#endif
+            wmemmove(&m_szInputBuffer[m_uiCursorPos - 1], &m_szInputBuffer[m_uiCursorPos], m_uiInputCount - m_uiCursorPos);
             m_uiInputCount--;
+            m_uiCursorPos--;
             m_szInputBuffer[m_uiInputCount] = 0;
+
+            if (bInteractiveConsole)
+                RefreshInputLine();
+#ifdef WIN32
+            else
+            {
+                Printf("%c %c", 0x08, 0x08);
+            }
+#endif
             break;
 
 #ifdef WIN32  // WIN32: we have to use a prefix code, this routine opens an extra switch
@@ -882,43 +899,38 @@ void CServerImpl::HandleInput()
 #endif
                 case KEY_LEFT:
                 {
-                    if (m_uiInputCount <= 0)
+                    if (m_uiCursorPos == 0)
                         break;
 
-#ifdef WIN32
-                    wchar_t szBuffer[255];
-                    memset(szBuffer, 0, sizeof(szBuffer));
-
-                    m_uiInputCount--;
-                    wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
-                    szBuffer[m_uiInputCount] = 0;
-
-                    Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
-#else
-            if (!g_bSilent && !g_bNoCurses)
-                wmove(m_wndInput, 0, --m_uiInputCount);
-#endif
+                    m_uiCursorPos--;
+                    RefreshInputLine();
                     break;
                 }
 
                 case KEY_RIGHT:
                 {
-                    if (m_uiInputCount == wcslen(m_szInputBuffer))
+                    if (m_uiCursorPos == m_uiInputCount)
                         break;
 
+                    m_uiCursorPos++;
+                    RefreshInputLine();
+                    break;
+                }
+
 #ifdef WIN32
-                    wchar_t szBuffer[255];
-                    memset(szBuffer, 0, sizeof(szBuffer));
-
-                    m_uiInputCount++;
-                    wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
-                    szBuffer[m_uiInputCount] = 0;
-
-                    Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
+                case KEY_DELETE:
 #else
-            if (!g_bSilent && !g_bNoCurses)
-                wmove(m_wndInput, 0, ++m_uiInputCount);
+        case KEY_DC:
 #endif
+                {
+                    if (m_uiCursorPos == m_uiInputCount)
+                        break;
+
+                    wmemmove(&m_szInputBuffer[m_uiCursorPos], &m_szInputBuffer[m_uiCursorPos + 1], m_uiInputCount - m_uiCursorPos - 1);
+                    m_uiInputCount--;
+                    m_szInputBuffer[m_uiInputCount] = 0;
+
+                    RefreshInputLine();
                     break;
                 }
 
@@ -965,23 +977,27 @@ void CServerImpl::HandleInput()
                 // entered 254 characters, wait for user to confirm/remove
                 break;
 
+            wmemmove(&m_szInputBuffer[m_uiCursorPos + 1], &m_szInputBuffer[m_uiCursorPos], m_uiInputCount - m_uiCursorPos);
+            m_szInputBuffer[m_uiCursorPos] = iStdIn;
+            m_uiInputCount++;
+            m_uiCursorPos++;
+            m_szInputBuffer[m_uiInputCount] = 0;
+
 #ifdef WIN32
             // Color the text
             if (!g_bSilent && HasConsole())
                 SetConsoleTextAttribute(m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED);
-
-            // Echo the input
-            WCHAR wUNICODE[2] = {iStdIn, 0};
-            Printf("%s", UTF16ToMbUTF8(wUNICODE).c_str());
-#else
-            wchar_t wUNICODE[2] = {(wchar_t)iStdIn, 0};
-            if (!g_bSilent && !g_bNoCurses)
-                wprintw(m_wndInput, "%s", UTF16ToMbUTF8(wUNICODE).c_str());
 #endif
 
-            m_szInputBuffer[m_uiInputCount++] = iStdIn;
-
+            if (bInteractiveConsole)
+                RefreshInputLine();
 #ifdef WIN32
+            else
+            {
+                WCHAR wUNICODE[2] = {iStdIn, 0};
+                Printf("%s", UTF16ToMbUTF8(wUNICODE).c_str());
+            }
+
             // Restore the color
             if (!g_bSilent && HasConsole())
                 SetConsoleTextAttribute(m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
@@ -1016,14 +1032,51 @@ void CServerImpl::SelectCommandHistoryEntry(uint uiEntry)
     for (uint i = 0; i < wzInput.length(); i++)
         m_szInputBuffer[i] = wzInput[i];
 
+    m_uiCursorPos = m_uiInputCount;
+
     // Let's print it out
-    wchar_t szBuffer[255] = {};
-    wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
+    RefreshInputLine();
+}
+
+void CServerImpl::RefreshInputLine()
+{
+    m_szInputBuffer[m_uiInputCount] = 0;
+
 #ifdef WIN32
-    Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
+    if (g_bSilent || !HasConsole())
+        return;
+
+    CONSOLE_SCREEN_BUFFER_INFO scrnBufferInfo;
+    if (!GetConsoleScreenBufferInfo(m_hConsole, &scrnBufferInfo))
+        return;
+
+    const int          iWidth = std::max<int>(1, scrnBufferInfo.dwSize.X - 1);
+    const uint         uiOffset = (m_uiCursorPos >= (uint)iWidth) ? m_uiCursorPos - iWidth + 1 : 0;
+    const size_t       uiVisibleLength = std::min<size_t>((size_t)iWidth, m_uiInputCount - uiOffset);
+    const std::wstring wzVisible(m_szInputBuffer + uiOffset, uiVisibleLength);
+
+    const COORD lineStart = {0, scrnBufferInfo.dwCursorPosition.Y};
+    DWORD       charsWritten;
+    FillConsoleOutputCharacterW(m_hConsole, L' ', scrnBufferInfo.dwSize.X, lineStart, &charsWritten);
+    SetConsoleCursorPosition(m_hConsole, lineStart);
+
+    Printf("%s", UTF16ToMbUTF8(wzVisible).c_str());
+
+    SetConsoleCursorPosition(m_hConsole, {(SHORT)(m_uiCursorPos - uiOffset), lineStart.Y});
 #else
     if (!g_bSilent && !g_bNoCurses)
-        wprintw(m_wndInput, "%s", UTF16ToMbUTF8(szBuffer).c_str());
+    {
+        const int          iWidth = getmaxx(m_wndInput);
+        const uint         uiOffset = (iWidth > 0 && m_uiCursorPos >= (uint)iWidth) ? m_uiCursorPos - iWidth + 1 : 0;
+        const size_t       uiVisibleLength = std::min<size_t>((size_t)iWidth, m_uiInputCount - uiOffset);
+        const std::wstring wzVisible(m_szInputBuffer + uiOffset, uiVisibleLength);
+        const std::wstring wzBeforeCursor(m_szInputBuffer + uiOffset, m_uiCursorPos - uiOffset);
+
+        wclear(m_wndInput);
+        wprintw(m_wndInput, "%s", UTF16ToMbUTF8(wzVisible).c_str());
+
+        wmove(m_wndInput, 0, (int)UTF16ToMbUTF8(wzBeforeCursor).length());
+    }
 #endif
 }
 
@@ -1034,17 +1087,22 @@ bool CServerImpl::ClearInput()
         // Clear out old buffer
         memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
 
-        // Couldn't get anything else working, so this is a way to clear the line
-#ifdef WIN32
-        for (uint i = 0; i < 80; i++)
-            Printf("%c %c", 0x08, 0x08);
-#else
-        for (uint i = 0; i < COLS; i++)
-            if (!g_bSilent && !g_bNoCurses)
-                wprintw(m_wndInput, "%c %c", 0x08, 0x08);
-#endif
-        // Reset our input count
         m_uiInputCount = 0;
+        m_uiCursorPos = 0;
+
+#ifdef WIN32
+        if (HasConsole())
+        {
+            RefreshInputLine();
+        }
+        else
+        {
+            for (uint i = 0; i < 80; i++)
+                Printf("%c %c", 0x08, 0x08);
+        }
+#else
+        RefreshInputLine();
+#endif
 
         return true;
     }
