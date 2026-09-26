@@ -4126,6 +4126,44 @@ static void __declspec(naked) HOOK_CPathFind_LoadPathNodeCount_Mid()
     // clang-format on
 }
 
+static CAnimBlendStaticAssociationSAInterface* CAnimManager_GetAnimAssociation(eAnimGroup animGroup, eAnimID animID)
+{
+    auto anim = pGameInterface->GetAnimManager()->GetAnimStaticAssociation(animGroup, animID);
+    if (!anim) [[unlikely]]
+        return nullptr;
+
+    return anim->GetInterface();
+}
+
+#define HOOKPOS_CVehicleAnimGroup_ComputeAnimDoorOffsets  0x6E3D97
+#define HOOKSIZE_CVehicleAnimGroup_ComputeAnimDoorOffsets 0x5
+static constexpr std::uintptr_t CONTINUE_CVehicleAnimGroup_ComputeAnimDoorOffsets = 0x6E3D9C;
+static constexpr std::uintptr_t RETURN_CVehicleAnimGroup_ComputeAnimDoorOffsets = 0x6E3DEA;
+
+static void __declspec(naked) HOOK_CVehicleAnimGroup_ComputeAnimDoorOffsets()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        push esi
+        push eax
+        call CAnimManager_GetAnimAssociation
+
+        add  esp, 0x8
+
+        test eax, eax
+        jz   noAssociation
+        jmp  CONTINUE_CVehicleAnimGroup_ComputeAnimDoorOffsets
+
+        noAssociation:
+        add  esp, 0x8
+        jmp  RETURN_CVehicleAnimGroup_ComputeAnimDoorOffsets
+    }
+    // clang-format on
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for CrashFixHacks
@@ -4214,6 +4252,8 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CStreaming__GetNextFileOnCd_NullTxdDef);
     EZHookInstallChecked(CStreaming__ConvertBufferToObject_NullTxdDef);
     EZHookInstallChecked(CEventScanner__ScanForEvents_ContactEntity);
+
+    EZHookInstall(CVehicleAnimGroup_ComputeAnimDoorOffsets);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
