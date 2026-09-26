@@ -1246,6 +1246,10 @@ void CMultiplayerSA::InitHooks()
     MemPut<DWORD>(0x55E870, 0xC2C03366);
     MemPut<WORD>(0x55E874, 0x0004);
 
+    // Let us also sprint while standing on a static entity (e.g. attached object); the game skips the whole sprint decision while standing on a static,
+    // non-contacted entity (0x6885B0: je 0x688667)
+    MemSet((void*)0x6885B0, 0x90, 6);
+
     // Create pickup objects in interior 0 instead of 13
     MemPut<BYTE>(0x59FAA3, 0x00);
 
