@@ -214,6 +214,9 @@ bool CNetAPI::ProcessPacket(unsigned char bytePacketID, NetBitStreamInterface& B
                 m_bVehicleLastReturn = false;
             }
 
+            if (BitStream.Can(eBitStreamVersion::WaterWaveSync))
+                m_pManager->GetWaterManager()->ReceiveWaveSync(BitStream);
+
             // Remember the last return sync time
             m_ulLastSyncReturnTime = CClientTime::GetTime();
             m_bStoredReturnSync = true;

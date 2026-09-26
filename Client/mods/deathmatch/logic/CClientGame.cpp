@@ -3923,6 +3923,9 @@ void CClientGame::PreRenderSkyHandler()
 
 void CClientGame::PreWeatherUpdateHandler()
 {
+    // Refresh even after a long frame or pause, using the shared real-time phase.
+    m_pManager->GetWaterManager()->UpdateWavePhase();
+
     // Fix #4803: Set MTA's weather types and zero InterpolationValue BEFORE
     // CWeather::Update runs. Zeroing InterpolationValue prevents the wrap branch
     // from ever firing (engine_interp >= 0 is always true), so the engine computes
