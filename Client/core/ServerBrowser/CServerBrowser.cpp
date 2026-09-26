@@ -53,6 +53,7 @@ namespace
     constexpr int           SERVER_BROWSER_SPEED_FAST = 2;
     constexpr unsigned long SERVER_BROWSER_LAZY_LAYOUT_INTERVAL_DEFAULT = 100UL;  // Minimum ms between GUI ForceUpdate while refreshing
     constexpr unsigned long SERVER_BROWSER_HIDDEN_REFRESH_DELAY = 200UL;          // Delay (ms) before using hidden refresh acceleration
+    constexpr unsigned long SERVER_BROWSER_AUTO_REFRESH_INTERVAL = 10000UL;       // Delay (ms) between automatic re-queries of the visible list
     constexpr unsigned long SERVER_BROWSER_REFRESH_FRAME_BUDGET_MS = 33;          // Time budget per frame for refresh batching (increased for faster filtering)
 }
 
@@ -1070,6 +1071,16 @@ void CServerBrowser::Update()
         m_ServersHistory.Pulse();
     }
 
+    if (IsVisible() && CClientTime::GetTime() >= m_ulNextAutoRefreshTime)
+    {
+        bool bAutoRefresh = false;
+        CVARS_GET("auto_refresh_browser", bAutoRefresh);
+        m_ulNextAutoRefreshTime = CClientTime::GetTime() + SERVER_BROWSER_AUTO_REFRESH_INTERVAL;
+
+        if (bAutoRefresh)
+            pList->RescanVisibleServers();
+    }
+
     // If an update is needed, the serverbrowser is visible and it has gone some time since last update
     if (IsVisible() && !IsListRefreshInProgress(Type) && (pList->IsUpdated() || m_PrevServerBrowserType != Type) &&
         m_ulLastUpdateTime < CClientTime::GetTime() - SERVER_BROWSER_UPDATE_INTERVAL)
@@ -1191,6 +1202,7 @@ void CServerBrowser::SetVisible(bool bVisible)
         m_FlashSearchBox[Type].uiNextTime = 0;
 
         m_ulHiddenRefreshBoostEnableTime = CClientTime::GetTime() + SERVER_BROWSER_HIDDEN_REFRESH_DELAY;
+        m_ulNextAutoRefreshTime = CClientTime::GetTime() + SERVER_BROWSER_AUTO_REFRESH_INTERVAL;
     }
     else
     {
