@@ -62,7 +62,10 @@ CWebView::~CWebView()
         }
     }
 
-    if (m_pWebBrowserRenderItem)
+    // Normal destruction detaches this item in CWebCore::DestroyWebView on
+    // the main/render thread. Do not release a D3D resource from CEF's UI
+    // thread if a shutdown path bypassed it.
+    if (m_pWebBrowserRenderItem && IsMainThread())
     {
         m_pWebBrowserRenderItem->Release();
         m_pWebBrowserRenderItem = nullptr;
@@ -77,10 +80,6 @@ CWebView::~CWebView()
     {
         // Stop any loading immediately
         m_pWebView->StopLoad();
-
-        // Navigate to blank page to force V8/DOM cleanup and release video/audio resources
-        // We do this BEFORE hiding to ensure the navigation request is processed
-        m_pWebView->GetMainFrame()->LoadURL("about:blank");
 
         // Notify that the browser is hidden and lost focus to release rendering resources
         m_pWebView->GetHost()->WasHidden(true);
@@ -185,10 +184,6 @@ void CWebView::CloseBrowser()
         // Stop any loading immediately
         m_pWebView->StopLoad();
 
-        // Navigate to blank page to force V8/DOM cleanup and release video/audio resources
-        // We do this BEFORE hiding to ensure the navigation request is processed
-        m_pWebView->GetMainFrame()->LoadURL("about:blank");
-
         // Notify that the browser is hidden and lost focus to release rendering resources
         m_pWebView->GetHost()->WasHidden(true);
         m_pWebView->GetHost()->SetFocus(false);
@@ -196,6 +191,32 @@ void CWebView::CloseBrowser()
         m_pWebView->GetHost()->CloseBrowser(true);
         m_pWebView = nullptr;
     }
+}
+
+void CWebView::DetachRenderItem()
+{
+    // CWebCore::DestroyWebView is called by CClientWebBrowser's destructor on
+    // the game thread. CEF may retain the final CWebView reference and run
+    // ~CWebView on its UI thread, so releasing this D3D item there can block
+    // the device under repeated browser create/destroy cycles.
+    if (!IsMainThread())
+        return;
+
+    std::scoped_lock lock(m_RenderData.dataMutex);
+    
+    if (!m_pWebBrowserRenderItem)
+        return;
+
+    m_pWebBrowserRenderItem->Release();
+    m_pWebBrowserRenderItem = nullptr;
+
+    // No frame can be uploaded after destruction begins; release retained
+    // CPU frame buffers immediately instead of waiting for the CEF callback.
+    m_RenderData.buffer.reset();
+    m_RenderData.popupBuffer.reset();
+    m_RenderData.bufferSize = 0;
+    m_RenderData.changed = false;
+    m_RenderData.popupShown = false;
 }
 
 bool CWebView::LoadURL(const SString& strURL, bool bFilterEnabled, const SString& strPostData, bool bURLEncoded)
@@ -939,6 +960,10 @@ void CWebView::GetViewRect(CefRefPtr<CefBrowser> browser, CefRect& rect)
 {
     rect.x = 0;
     rect.y = 0;
+
+    // This callback runs on CEF's UI thread. Synchronize it with
+    // DetachRenderItem(), which releases the render item on the main thread.
+    const std::scoped_lock lock(m_RenderData.dataMutex);
 
     if (m_bBeingDestroyed || !m_pWebBrowserRenderItem) [[unlikely]]
     {
