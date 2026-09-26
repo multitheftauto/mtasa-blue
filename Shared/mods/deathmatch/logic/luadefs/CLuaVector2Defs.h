@@ -41,6 +41,13 @@ public:
     LUA_DECLARE(GetX);
     LUA_DECLARE(GetY);
 
+    LUA_DECLARE(InPlaceSet);
+    LUA_DECLARE(InPlaceAdd);
+    LUA_DECLARE(InPlaceSub);
+    LUA_DECLARE(InPlaceMul);
+    LUA_DECLARE(InPlaceDiv);
+    LUA_DECLARE(InPlaceAddScaled);
+
     LUA_DECLARE(Add);
     LUA_DECLARE(Sub);
     LUA_DECLARE(Mul);
