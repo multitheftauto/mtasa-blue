@@ -15,7 +15,7 @@ class CTrainTrackManager
 public:
     CTrainTrackManager();
 
-    CTrainTrack* CreateTrainTrack(const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId = 0xFF);
+    CTrainTrack* CreateTrainTrack(const std::vector<STrackNode>& nodes, CElement* pParent, uchar defaultTrackId = 0xFF);
     void         DestroyTrainTrack(CTrainTrack* pTrainTrack);
 
     const std::vector<CTrainTrack*>& GetTracks() { return m_Tracks; }
