@@ -2480,6 +2480,7 @@ bool CStaticFunctionDefinitions::GetPedOccupiedVehicleSeat(CPed* pPed, unsigned 
         uiSeat = pPed->GetOccupiedVehicleSeat();
         return true;
     }
+
     return false;
 }
 
@@ -3966,14 +3967,6 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
             // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
             if (pPed->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
                 pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
-
-            // Remove him from any occupied vehicle
-            CVehicle* pVehicle = pPed->GetOccupiedVehicle();
-            if (pVehicle)
-            {
-                pVehicle->SetOccupant(NULL, pPed->GetOccupiedVehicleSeat());
-                pPed->SetOccupiedVehicle(NULL, 0);
-            }
 
             // Update the ped
             pPed->SetSpawned(false);
