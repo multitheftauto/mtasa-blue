@@ -679,7 +679,10 @@ void CRenderWareSA::DestroyTXD(RwTexDictionary* pTXD)
 // Destroys a texture instance
 void CRenderWareSA::DestroyTexture(RwTexture* pTex)
 {
-    if (pTex)
+    // Fix #4028: Validate that pTex is readable before destroying.
+    // If a TXD was destroyed or unloaded by GTA streaming or TxdForceUnload, textures
+    // may have already been freed by RwTexDictionaryDestroy.
+    if (pTex && SharedUtil::IsReadablePointer(pTex, sizeof(RwTexture)))
     {
         ScriptRemovedTexture(pTex);
         RwTextureDestroy(pTex);
@@ -688,12 +691,28 @@ void CRenderWareSA::DestroyTexture(RwTexture* pTex)
 
 void CRenderWareSA::RwTexDictionaryRemoveTexture(RwTexDictionary* pTXD, RwTexture* pTex)
 {
+    // Fix #4028: Prevent Access Violation (0xC0000005) when pTex or pTXD is invalid or already freed.
+    // When streaming unloads TXDs or resources shut down, pTex can point to deallocated memory.
+    if (!pTXD || !pTex)
+        return;
+
+    if (!SharedUtil::IsReadablePointer(pTex, sizeof(RwTexture)))
+        return;
+
     if (pTex->txd != pTXD)
+        return;
+
+    if (!pTex->TXDList.next || !pTex->TXDList.prev)
+        return;
+
+    if (!SharedUtil::IsReadablePointer(pTex->TXDList.next, sizeof(RwListEntry)) || !SharedUtil::IsReadablePointer(pTex->TXDList.prev, sizeof(RwListEntry)))
         return;
 
     pTex->TXDList.next->prev = pTex->TXDList.prev;
     pTex->TXDList.prev->next = pTex->TXDList.next;
-    pTex->txd = NULL;
+    pTex->TXDList.next = nullptr;
+    pTex->TXDList.prev = nullptr;
+    pTex->txd = nullptr;
 }
 
 short CRenderWareSA::CTxdStore_GetTxdRefcount(unsigned short usTxdID)
@@ -703,6 +722,12 @@ short CRenderWareSA::CTxdStore_GetTxdRefcount(unsigned short usTxdID)
 
 bool CRenderWareSA::RwTexDictionaryContainsTexture(RwTexDictionary* pTXD, RwTexture* pTex)
 {
+    if (!pTXD || !pTex)
+        return false;
+
+    if (!SharedUtil::IsReadablePointer(pTex, sizeof(RwTexture)))
+        return false;
+
     return pTex->txd == pTXD;
 }
 
@@ -751,6 +776,10 @@ void CRenderWareSA::TxdForceUnload(ushort usTxdId, bool bDestroyTextures)
     {
         CTxdStore_RemoveRef(usTxdId);
     }
+
+    // Fix #4028: Notify the texture replacement system that this TXD was destroyed
+    // so any cached references in ms_ModelTexturesInfoMap are cleared.
+    NotifyTxdDestroyed(usTxdId);
 }
 
 ////////////////////////////////////////////////////////////////
