@@ -364,6 +364,12 @@ int CLuaACLDefs::aclSetRight(lua_State* luaVM)
                 CLogger::LogPrintf("ACL: %s: Right '%s' changed to %s in ACL '%s'\n", GetResourceName(luaVM), strRight.c_str(), bAccess ? "ALLOW" : "DISALLOW",
                                    pACL->GetName());
             pACLRight->SetRightAccess(bAccess);
+            if (pACLRight->GetAttributeValue("pending") == "true")
+            {
+                pACLRight->SetAttributeValue("pending", "false");
+                pACLRight->SetAttributeValue("who", GetResourceName(luaVM));
+                pACLRight->SetAttributeValue("date", GetLocalTimeString(true));
+            }
             lua_pushboolean(luaVM, true);
             return 1;
         }
