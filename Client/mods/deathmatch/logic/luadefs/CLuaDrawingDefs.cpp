@@ -1238,11 +1238,8 @@ int CLuaDrawingDefs::DxCreateShader(lua_State* luaVM)
     {
         bIsRawData = strFile.find("\n") != std::string::npos;
 
-        if (!bIsRawData)
-        {
-            bIsRawData = (strFile.find("technique ") != std::string::npos) && (strFile.find("pass ") != std::string::npos) &&
-                         (strFile.find('{') != std::string::npos) && (strFile.find('}') != std::string::npos);
-        }
+        if (!bIsRawData && (!bValidFilePath || !FileExists(strPath)))
+            bIsRawData = strFile.find('{') != std::string::npos && strFile.find('}') != std::string::npos;
     }
 
     SString strRootPath;
