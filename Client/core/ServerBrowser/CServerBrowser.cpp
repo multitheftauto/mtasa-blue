@@ -1071,13 +1071,13 @@ void CServerBrowser::Update()
         m_ServersHistory.Pulse();
     }
 
-    if (IsVisible() && CClientTime::GetTime() >= m_ulNextAutoRefreshTime)
+    if (IsVisible() && CClientTime::GetTime() >= m_NextAutoRefreshTime)
     {
-        bool bAutoRefresh = false;
-        CVARS_GET("auto_refresh_browser", bAutoRefresh);
-        m_ulNextAutoRefreshTime = CClientTime::GetTime() + SERVER_BROWSER_AUTO_REFRESH_INTERVAL;
+        bool autoRefresh = false;
+        CVARS_GET("auto_refresh_browser", autoRefresh);
+        m_NextAutoRefreshTime = CClientTime::GetTime() + SERVER_BROWSER_AUTO_REFRESH_INTERVAL;
 
-        if (bAutoRefresh)
+        if (autoRefresh)
             pList->RescanVisibleServers();
     }
 
@@ -1202,7 +1202,7 @@ void CServerBrowser::SetVisible(bool bVisible)
         m_FlashSearchBox[Type].uiNextTime = 0;
 
         m_ulHiddenRefreshBoostEnableTime = CClientTime::GetTime() + SERVER_BROWSER_HIDDEN_REFRESH_DELAY;
-        m_ulNextAutoRefreshTime = CClientTime::GetTime() + SERVER_BROWSER_AUTO_REFRESH_INTERVAL;
+        m_NextAutoRefreshTime = CClientTime::GetTime() + SERVER_BROWSER_AUTO_REFRESH_INTERVAL;
     }
     else
     {

@@ -215,21 +215,21 @@ void CServerList::RescanVisibleServers()
     std::vector<SAddressPort> endpointList;
     CCore::GetSingleton().GetLocalGUI()->GetMainMenu()->GetServerBrowser()->GetVisibleEndPointList(endpointList);
 
-    unsigned int uiQueuedServers = 0;
+    unsigned int queuedServers = 0;
     for (const SAddressPort& endpoint : endpointList)
     {
-        CServerListItem* pServer = m_Servers.Find((in_addr&)endpoint.m_ulIp, endpoint.m_usPort);
-        if (pServer)
+        CServerListItem* serverItem = m_Servers.Find((in_addr&)endpoint.m_ulIp, endpoint.m_usPort);
+        if (serverItem)
         {
-            pServer->ResetForRefresh();
-            uiQueuedServers++;
+            serverItem->ResetForRefresh();
+            queuedServers++;
         }
     }
 
-    if (uiQueuedServers > 0 && m_iPass == 0)
+    if (queuedServers > 0 && m_iPass == 0)
     {
         m_iPass = 2;
-        m_nScanned = m_Servers.size() - uiQueuedServers;
+        m_nScanned = m_Servers.size() - queuedServers;
         m_nSkipped = 0;
     }
 }
