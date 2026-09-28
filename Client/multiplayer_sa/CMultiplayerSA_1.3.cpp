@@ -46,9 +46,6 @@ DWORD RETURN_CWorld_RemoveFallenCars_Cancel = 0x56609B;
 #define HOOKPOS_CVehicleModelInterface_SetClump 0x4C9606
 DWORD RETURN_CVehicleModelInterface_SetClump = 0x4C9611;
 
-#define HOOKPOS_CBoat_ApplyDamage 0x6F1C32
-DWORD RETURN_CBoat_ApplyDamage = 0x6F1C3E;
-
 #define HOOKPOS_CProjectile_FixTearGasCrash 0x4C0403
 DWORD RETURN_CProjectile_FixTearGasCrash_Fix = 0x4C05B9;
 DWORD RETURN_CProjectile_FixTearGasCrash_Cont = 0x4C0409;
@@ -67,7 +64,6 @@ void          HOOK_CTaskSimpleJetpack_ProcessInputFixFPS2();
 void          HOOK_CWorld_RemoveFallenPeds();
 void          HOOK_CWorld_RemoveFallenCars();
 void          HOOK_CVehicleModelInterface_SetClump();
-void          HOOK_CBoat_ApplyDamage();
 void          HOOK_CProjectile_FixTearGasCrash();
 void          HOOK_CProjectile_FixExplosionLocation();
 void* __cdecl HOOK_CMemoryMgr_MallocAlign(int size, int alignment, int nHint);
@@ -94,8 +90,6 @@ void CMultiplayerSA::InitHooks_13()
     HookInstall(HOOKPOS_CWorld_RemoveFallenCars, (DWORD)HOOK_CWorld_RemoveFallenCars, 5);
 
     HookInstall(HOOKPOS_CVehicleModelInterface_SetClump, (DWORD)HOOK_CVehicleModelInterface_SetClump, 7);
-
-    HookInstall(HOOKPOS_CBoat_ApplyDamage, (DWORD)HOOK_CBoat_ApplyDamage, 12);
 
     HookInstall(HOOKPOS_CProjectile_FixTearGasCrash, (DWORD)HOOK_CProjectile_FixTearGasCrash, 6);
 
@@ -492,32 +486,6 @@ static void __declspec(naked) HOOK_CVehicleModelInterface_SetClump()
         mov ecx, esi
         mov dword ptr [esp+14h], 0FFFFFFFFh
         jmp RETURN_CVehicleModelInterface_SetClump
-    }
-    // clang-format on
-}
-
-static void __declspec(naked) HOOK_CBoat_ApplyDamage()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        push eax
-        // Check if vehicleFlags->bCanBeDamaged is set
-        mov  eax, [esi+42Ah]
-        test eax, 20h
-        jz   boatCanBeDamaged
-        fst  dword ptr [esi+4C0h]
-    }
-    // clang-format on
-
-    boatCanBeDamaged :
-        // clang-format off
-    __asm
-    {
-        pop eax
-        jmp RETURN_CBoat_ApplyDamage
     }
     // clang-format on
 }

@@ -43,10 +43,12 @@ void CClientBuilding::Unlink()
     {
         m_pHighBuilding->SetLowLodBuilding();
     }
+
     if (m_pLowBuilding)
     {
         SetLowLodBuilding();
     }
+
     Destroy();
 }
 
@@ -57,6 +59,7 @@ void CClientBuilding::SetPosition(const CVector& vecPosition)
 
     if (m_vPos == vecPosition)
         return;
+
     m_vPos = vecPosition;
     Recreate();
     UpdateSpatialData();
@@ -66,6 +69,7 @@ void CClientBuilding::SetRotationRadians(const CVector& vecRadians)
 {
     if (m_vRot == vecRadians)
         return;
+
     m_vRot = vecRadians;
     Recreate();
 }
@@ -94,8 +98,13 @@ void CClientBuilding::SetInterior(uint8_t ucInterior)
 {
     if (m_interior == ucInterior)
         return;
+
     m_interior = ucInterior;
-    Recreate();
+
+    if (m_pBuilding)
+        Recreate();
+
+    CClientEntity::SetInterior(ucInterior);
 }
 
 void CClientBuilding::SetDimension(unsigned short usDimension)
@@ -172,8 +181,10 @@ void CClientBuilding::Create()
     {
         m_pBuilding->SetUsesCollision(m_usesCollision);
     }
+
     if (m_ucAlpha != 255)
         m_pBuilding->SetAlpha(m_ucAlpha);
+
     if (m_pHighBuilding)
     {
         m_pHighBuilding->GetBuildingEntity()->SetLod(m_pBuilding);
@@ -189,6 +200,7 @@ void CClientBuilding::Destroy()
     {
         m_pHighBuilding->GetBuildingEntity()->SetLod(nullptr);
     }
+
     g_pGame->GetPools()->GetBuildingsPool().RemoveBuilding(m_pBuilding);
     m_pBuilding = nullptr;
 }
@@ -202,6 +214,7 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
 
         // Unlink old high lod element
         CClientBuilding* pOveridedBuilding = pLod->GetHighLodBuilding();
+
         if (pOveridedBuilding && pOveridedBuilding != this)
         {
             pOveridedBuilding->SetLowLodBuilding();
@@ -220,6 +233,7 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
         {
             m_pLowBuilding->SetHighLodBuilding();
         }
+
         m_pBuilding->SetLod(nullptr);
         m_pLowBuilding = nullptr;
     }

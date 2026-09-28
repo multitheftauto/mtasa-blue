@@ -120,8 +120,8 @@ bool Splash::CreateSplashWindow(HINSTANCE instance)
             return false;
     }
 
-    HWND window = CreateWindow(windowClass.lpszClassName, "Multi Theft Auto Launcher", WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
-                               NULL, NULL, instance, NULL);
+    HWND window = CreateWindowExA(WS_EX_TOPMOST, windowClass.lpszClassName, "Multi Theft Auto Launcher", WS_POPUP, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
+                                  CW_USEDEFAULT, NULL, NULL, instance, NULL);
 
     if (window == nullptr)
     {
@@ -442,7 +442,7 @@ void Splash::BringToFront() const
     if (m_window)
     {
         SetForegroundWindow(m_window);
-        SetWindowPos(m_window, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+        SetWindowPos(m_window, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
     }
 }
 

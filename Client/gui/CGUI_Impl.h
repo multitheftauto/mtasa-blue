@@ -75,6 +75,9 @@ public:
     void Invalidate();
     void Restore();
 
+    void SetFatalFaultDialogOpen(bool bOpen) override;
+    bool IsFatalFaultDialogOpen() const override;
+
     void DrawMouseCursor();
 
     void ProcessMouseInput(CGUIMouseInput eMouseInput, unsigned long ulX = 0, unsigned long ulY = 0, CGUIMouseButton eMouseButton = NoButton);

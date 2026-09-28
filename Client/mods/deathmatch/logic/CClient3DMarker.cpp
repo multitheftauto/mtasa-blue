@@ -33,7 +33,7 @@ CClient3DMarker::~CClient3DMarker()
 
 unsigned long CClient3DMarker::Get3DMarkerType()
 {
-    switch (static_cast<T3DMarkerType>(m_dwType))
+    switch (static_cast<T3DMarkerType::Enum>(m_dwType))
     {
         case T3DMarkerType::MARKER3D_CYLINDER2:
             return CClient3DMarker::TYPE_CYLINDER;
@@ -92,8 +92,8 @@ void CClient3DMarker::DoPulse()
     if (m_bMarkerStreamedIn && m_bVisible && m_pThis->GetInterior() == g_pGame->GetWorld()->GetCurrentArea())
     {
         SColor color = GetColor();
-        m_pMarker = g_pGame->Get3DMarkers()->CreateMarker(m_ulIdentifier, static_cast<T3DMarkerType>(m_dwType), &m_Matrix.vPos, m_fSize, 0.2f, color.R, color.G,
-                                                          color.B, color.A);
+        m_pMarker = g_pGame->Get3DMarkers()->CreateMarker(m_ulIdentifier, static_cast<T3DMarkerType::Enum>(m_dwType), &m_Matrix.vPos, m_fSize, 0.2f, color.R,
+                                                          color.G, color.B, color.A);
         if (m_pMarker)
         {
             // Make sure it doesn't get cleaned up

@@ -2280,16 +2280,17 @@ SString PadLeft(const SString& strText, uint uiNumSpaces, char cCharacter)
 //////////////////////////////////////////////////////////
 BOOL CALLBACK MyEnumWindowsProc(HWND hwnd, LPARAM lParam)
 {
-    WINDOWINFO windowInfo;
+    WINDOWINFO windowInfo{sizeof(WINDOWINFO)};
     if (GetWindowInfo(hwnd, &windowInfo))
     {
-        if (windowInfo.atomWindowType == reinterpret_cast<uint>(WC_DIALOG))
+        if (windowInfo.atomWindowType == static_cast<ATOM>(reinterpret_cast<ULONG_PTR>(WC_DIALOG)))
         {
             DWORD dwWindowProcessId = 0;
             GetWindowThreadProcessId(hwnd, &dwWindowProcessId);
             if (lParam == dwWindowProcessId)
             {
-                SetWindowPos(hwnd, HWND_TOP, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
+                // Match the topmost splash so GTA's device selection remains visible above it.
+                SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOACTIVATE);
                 return false;
             }
         }
@@ -2300,6 +2301,22 @@ BOOL CALLBACK MyEnumWindowsProc(HWND hwnd, LPARAM lParam)
 bool IsDeviceSelectionDialogOpen(DWORD processID)
 {
     return !EnumWindows(MyEnumWindowsProc, processID);
+}
+
+BOOL CALLBACK FindVisibleGameWindow(HWND hwnd, LPARAM lParam)
+{
+    DWORD windowProcessId = 0;
+    GetWindowThreadProcessId(hwnd, &windowProcessId);
+    if (windowProcessId != static_cast<DWORD>(lParam) || !IsWindowVisible(hwnd))
+        return true;
+
+    WINDOWINFO windowInfo{sizeof(WINDOWINFO)};
+    return !GetWindowInfo(hwnd, &windowInfo) || windowInfo.atomWindowType == static_cast<ATOM>(reinterpret_cast<ULONG_PTR>(WC_DIALOG));
+}
+
+bool IsGameWindowOpen(DWORD processID)
+{
+    return !EnumWindows(FindVisibleGameWindow, processID);
 }
 
 //////////////////////////////////////////////////////////

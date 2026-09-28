@@ -9,6 +9,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <algorithm>
+#include <cmath>
 
 static bool         bWouldBeNewFrame = false;
 static unsigned int nLastFrameTime = 0;
@@ -16,6 +18,7 @@ static unsigned int nLastFrameTime = 0;
 constexpr float kOriginalTimeStep = 50.0f / 30.0f;
 
 // Fixes player movement issue while aiming and walking on high FPS.
+// Only rescales the compare threshold; m_MoveCmd's reset is NOPed separately in InitHooks_FrameRateFixes.
 #define HOOKPOS_CTaskSimpleUseGun__SetMoveAnim  0x61E4F2
 #define HOOKSIZE_CTaskSimpleUseGun__SetMoveAnim 0x6
 const unsigned int            RETURN_CTaskSimpleUseGun__SetMoveAnim = 0x61E4F8;
@@ -772,6 +775,77 @@ static void __declspec(naked) HOOK_CTaskSimpleSwim__ProcessSwimmingResistance()
     // clang-format on
 }
 
+// Fixes diving too deep on high FPS (#3344). HOOK_CTaskSimpleSwim__ProcessSwimmingResistance above scales every
+// component of the target velocity by kOriginalTimeStep / timestep, which is right for x and y (per-frame animation
+// shifts) but not for the dive velocity in z, an absolute speed. Scale it the other way here so the two cancel out.
+#define HOOKPOS_CTaskSimpleSwim__ProcessSwimmingResistance_DiveSpeed  0x68A42B
+#define HOOKSIZE_CTaskSimpleSwim__ProcessSwimmingResistance_DiveSpeed 6
+static constexpr std::uintptr_t RETURN_CTaskSimpleSwim__ProcessSwimmingResistance_DiveSpeed = 0x68A431;
+static void __declspec(naked)   HOOK_CTaskSimpleSwim__ProcessSwimmingResistance_DiveSpeed()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fmul    ds:[0x858EF4]           // Original: the dive speed, -0.1f
+        fmul    ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
+        fdiv    kOriginalTimeStep       // 1.666f
+        jmp     RETURN_CTaskSimpleSwim__ProcessSwimmingResistance_DiveSpeed
+    }
+    // clang-format on
+}
+
+// Same for the constant buoyancy of the underwater swim state, which every dive ends in, against the same
+// HOOK_CTaskSimpleSwim__ProcessSwimmingResistance scaling
+#define HOOKPOS_CTaskSimpleSwim__ProcessSwimmingResistance_Buoyancy  0x68A4CA
+#define HOOKSIZE_CTaskSimpleSwim__ProcessSwimmingResistance_Buoyancy 6
+static constexpr std::uintptr_t RETURN_CTaskSimpleSwim__ProcessSwimmingResistance_Buoyancy = 0x68A4D0;
+static void __declspec(naked)   HOOK_CTaskSimpleSwim__ProcessSwimmingResistance_Buoyancy()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fld     ds:[0x8708CC]           // Original: the buoyancy of the underwater state, 0.01f
+        fmul    ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
+        fdiv    kOriginalTimeStep       // 1.666f
+        faddp   st(1), st               // Original: add it to the target velocity
+        jmp     RETURN_CTaskSimpleSwim__ProcessSwimmingResistance_Buoyancy
+    }
+    // clang-format on
+}
+
+// cBuoyancy::CalcBuoyancyForce takes the whole vertical momentum off the upward impulse once the entity rises faster
+// than four times what the impulse gives it. The impulse scales with the timestep, the momentum does not, so on high
+// FPS the damping sets in at a fraction of the 30 FPS rise speed and holds a surfacing ped down. Scale the momentum
+// by the same ratio for peds, which covers every ped in water, not only the swimming local player.
+#define HOOKPOS_cBuoyancy__CalcBuoyancyForce_Damping  0x6C27B7
+#define HOOKSIZE_cBuoyancy__CalcBuoyancyForce_Damping 6
+static constexpr std::uintptr_t RETURN_cBuoyancy__CalcBuoyancyForce_Damping = 0x6C27BD;
+static void __declspec(naked)   HOOK_cBuoyancy__CalcBuoyancyForce_Damping()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fld     dword ptr [eax+8Ch]     // Original: CPhysical::m_fMass, multiplied with the vertical speed next
+        push    edx
+        mov     dl, byte ptr [eax+36h]  // CEntitySAInterface::nType, a 3 bit field
+        and     dl, 7
+        cmp     dl, ENTITY_TYPE_PED
+        pop     edx
+        jne     done
+        fmul    ds:[0xB7CB5C]           // CTimer::ms_fTimeStep
+        fdiv    kOriginalTimeStep       // 1.666f
+    done:
+        jmp     RETURN_cBuoyancy__CalcBuoyancyForce_Damping
+    }
+    // clang-format on
+}
+
 // Fixes invisible weapon particles (extinguisher, spraycan, flamethrower) at high FPS
 #define HOOKPOS_CWeapon_Update  0x73DC3D
 #define HOOKSIZE_CWeapon_Update 5
@@ -817,6 +891,219 @@ static void __declspec(naked)   HOOK_CWeapon_Update()
     // clang-format on
 }
 
+// Governs pedestrian push velocity on unoccupied vehicles during collisions.
+// In GTA:SA, CPhysical::ApplyCollision adds an impulse to velocity on every contact frame.
+// At high framerates, these impulses occur far more frequently than at 30 FPS, overpowering
+// tire friction and causing the vehicle to accelerate unnaturally fast.
+// This caps push velocity using momentum conservation to maintain consistent vehicle weight across framerates.
+static void GovernPedPushVehicleVelocity(CPhysicalSAInterface* vehicle, CPhysicalSAInterface* ped, const CVector& initialLinearVelocity,
+                                         const CVector& initialAngularVelocity, const CVector& pedLinearVelocity, CVector& currentLinearVelocity,
+                                         CVector& currentAngularVelocity)
+{
+    if (!vehicle || !ped)
+        return;
+
+    // Only govern collisions on unoccupied vehicles (no driver present)
+    const auto* vehicleInterface = reinterpret_cast<const CVehicleSAInterface*>(vehicle);
+    if (vehicleInterface->pDriver != nullptr)
+        return;
+
+    // Prevent vehicle tilting or flipping from push contact
+    currentAngularVelocity.fX = initialAngularVelocity.fX;
+    currentAngularVelocity.fY = initialAngularVelocity.fY;
+
+    // Keep vertical velocity unaffected by push contact
+    currentLinearVelocity.fZ = initialLinearVelocity.fZ;
+
+    const CVector deltaVelocity = currentLinearVelocity - initialLinearVelocity;
+    const float   deltaMagnitudeSquared = (deltaVelocity.fX * deltaVelocity.fX) + (deltaVelocity.fY * deltaVelocity.fY);
+    if (deltaMagnitudeSquared <= 0.000001f)
+        return;
+
+    const float deltaMagnitude = std::sqrt(deltaMagnitudeSquared);
+    const float pushDirectionX = deltaVelocity.fX / deltaMagnitude;
+    const float pushDirectionY = deltaVelocity.fY / deltaMagnitude;
+
+    const float pedForwardSpeed = (pedLinearVelocity.fX * pushDirectionX) + (pedLinearVelocity.fY * pushDirectionY);
+    if (pedForwardSpeed <= 0.0f)
+    {
+        currentLinearVelocity = initialLinearVelocity;
+        currentAngularVelocity = initialAngularVelocity;
+        return;
+    }
+
+    const float     timeStep = *reinterpret_cast<const float*>(0xB7CB5C);
+    constexpr float baselineTimeStep = 1.0f;
+    const float     timeStepRatio = std::clamp(timeStep / baselineTimeStep, 0.001f, 1.0f);
+
+    constexpr float playerPushMassMultiplier = 10.0f;
+    const float     effectivePedMass = ped->m_fMass * playerPushMassMultiplier;
+    const float     vehicleMass = vehicle->m_fMass;
+    const float     maximumPushVelocity = pedForwardSpeed * (effectivePedMass / (effectivePedMass + vehicleMass));
+
+    float forwardX = 0.0f;
+    float forwardY = 1.0f;
+    float rightX = 1.0f;
+    float rightY = 0.0f;
+
+    if (vehicle->matrix != nullptr)
+    {
+        forwardX = vehicle->matrix->vFront.fX;
+        forwardY = vehicle->matrix->vFront.fY;
+        rightX = vehicle->matrix->vRight.fX;
+        rightY = vehicle->matrix->vRight.fY;
+    }
+    else
+    {
+        const float heading = vehicle->m_transform.m_heading;
+        forwardX = -std::sin(heading);
+        forwardY = std::cos(heading);
+        rightX = std::cos(heading);
+        rightY = std::sin(heading);
+    }
+
+    const float forwardLen = std::sqrt((forwardX * forwardX) + (forwardY * forwardY));
+    if (forwardLen > 0.0001f)
+    {
+        forwardX /= forwardLen;
+        forwardY /= forwardLen;
+    }
+
+    const float rightLen = std::sqrt((rightX * rightX) + (rightY * rightY));
+    if (rightLen > 0.0001f)
+    {
+        rightX /= rightLen;
+        rightY /= rightLen;
+    }
+
+    const float initialForwardSpeed = (initialLinearVelocity.fX * forwardX) + (initialLinearVelocity.fY * forwardY);
+    const float initialLateralSpeed = (initialLinearVelocity.fX * rightX) + (initialLinearVelocity.fY * rightY);
+
+    float currentForwardSpeed = (currentLinearVelocity.fX * forwardX) + (currentLinearVelocity.fY * forwardY);
+    float currentLateralSpeed = (currentLinearVelocity.fX * rightX) + (currentLinearVelocity.fY * rightY);
+
+    const float deltaForwardSpeed = currentForwardSpeed - initialForwardSpeed;
+    currentForwardSpeed = initialForwardSpeed + (deltaForwardSpeed * timeStepRatio);
+
+    constexpr float wakeUpThreshold = 0.008f;
+    if (std::abs(initialForwardSpeed) < 0.001f && std::abs(currentForwardSpeed) < wakeUpThreshold && std::abs(deltaForwardSpeed) > 0.001f)
+    {
+        currentForwardSpeed = (deltaForwardSpeed > 0.0f) ? wakeUpThreshold : -wakeUpThreshold;
+    }
+
+    const float allowedForwardSpeedMax = std::max(initialForwardSpeed, maximumPushVelocity);
+    const float allowedForwardSpeedMin = std::min(initialForwardSpeed, -maximumPushVelocity);
+    currentForwardSpeed = std::clamp(currentForwardSpeed, allowedForwardSpeedMin, allowedForwardSpeedMax);
+
+    const float deltaLateralSpeed = currentLateralSpeed - initialLateralSpeed;
+    currentLateralSpeed = initialLateralSpeed + (deltaLateralSpeed * timeStepRatio);
+
+    constexpr float lateralScrubRatio = 0.10f;
+    const float     maximumLateralVelocity = maximumPushVelocity * lateralScrubRatio;
+    const float     allowedLateralSpeedMax = std::max(initialLateralSpeed, maximumLateralVelocity);
+    const float     allowedLateralSpeedMin = std::min(initialLateralSpeed, -maximumLateralVelocity);
+    currentLateralSpeed = std::clamp(currentLateralSpeed, allowedLateralSpeedMin, allowedLateralSpeedMax);
+
+    currentLinearVelocity.fX = (currentForwardSpeed * forwardX) + (currentLateralSpeed * rightX);
+    currentLinearVelocity.fY = (currentForwardSpeed * forwardY) + (currentLateralSpeed * rightY);
+
+    // Scale collision yaw impulse so rotational torque delivered per second is invariant across framerates
+    const float deltaAngularZ = currentAngularVelocity.fZ - initialAngularVelocity.fZ;
+    currentAngularVelocity.fZ = initialAngularVelocity.fZ + (deltaAngularZ * timeStepRatio);
+
+    // Physical angular velocity limit derived from conservation of angular momentum at the vehicle corner
+    constexpr float cornerLeverArm = 2.2f;
+    const float     vehicleTurnMass = (vehicle->m_fTurnMass > 0.0f) ? vehicle->m_fTurnMass : (vehicleMass * 2.5f);
+    const float     maximumAngularVelocity =
+        (cornerLeverArm * effectivePedMass * pedForwardSpeed) / (vehicleTurnMass + (effectivePedMass * cornerLeverArm * cornerLeverArm));
+
+    const float allowedYawSpeedMax = std::max(initialAngularVelocity.fZ, maximumAngularVelocity);
+    const float allowedYawSpeedMin = std::min(initialAngularVelocity.fZ, -maximumAngularVelocity);
+    currentAngularVelocity.fZ = std::clamp(currentAngularVelocity.fZ, allowedYawSpeedMin, allowedYawSpeedMax);
+}
+
+#define CALL_CPhysical__ApplyCollision_1    0x54BDB2
+#define CALL_CPhysical__ApplyCollision_2    0x54BF78
+#define CALL_CPhysical__ApplyCollision_3    0x54C23A
+#define CALL_CPhysical__ApplyCollision_4    0x54C435
+#define CALL_CPhysical__ApplyCollision_5    0x54D17E
+#define CALL_CPhysical__ApplyCollision_6    0x54D27E
+#define CALL_CPhysical__ApplyCollision_7    0x54D3FE
+#define CALL_CPhysical__ApplyCollision_8    0x54D4D2
+#define CALL_CPhysical__ApplyCollisionAlt_1 0x54C9FA
+#define CALL_CPhysical__ApplyCollisionAlt_2 0x54CAC2
+
+static bool __fastcall HOOK_CPhysical__ApplyCollision(CPhysicalSAInterface* thisEntity, void* /*edx*/, CEntitySAInterface* collidedEntity,
+                                                      CColPointSAInterface* colPoint, float* thisDamageIntensity, float* collidedDamageIntensity)
+{
+    const CVector initialThisLinearVelocity = thisEntity ? thisEntity->m_vecLinearVelocity : CVector{};
+    const CVector initialThisAngularVelocity = thisEntity ? thisEntity->m_vecAngularVelocity : CVector{};
+
+    auto*   collidedPhysical = reinterpret_cast<CPhysicalSAInterface*>(collidedEntity);
+    CVector initialCollidedLinearVelocity{};
+    CVector initialCollidedAngularVelocity{};
+    if (collidedPhysical)
+    {
+        initialCollidedLinearVelocity = collidedPhysical->m_vecLinearVelocity;
+        initialCollidedAngularVelocity = collidedPhysical->m_vecAngularVelocity;
+    }
+
+    using ApplyCollisionFn = bool(__thiscall*)(CPhysicalSAInterface*, CEntitySAInterface*, CColPointSAInterface*, float*, float*);
+    const auto originalApplyCollision = reinterpret_cast<ApplyCollisionFn>(0x548680);
+
+    const bool result = originalApplyCollision(thisEntity, collidedEntity, colPoint, thisDamageIntensity, collidedDamageIntensity);
+
+    if (result && thisEntity && collidedEntity)
+    {
+        // Entity types: 2 = Vehicle, 3 = Ped (from CEntitySAInterface::nType bitfield)
+        const uint8 thisType = thisEntity->nType;
+        const uint8 collidedType = collidedEntity->nType;
+
+        if (thisType == 2 && collidedType == 3 && collidedPhysical)
+        {
+            GovernPedPushVehicleVelocity(thisEntity, collidedPhysical, initialThisLinearVelocity, initialThisAngularVelocity, initialCollidedLinearVelocity,
+                                         thisEntity->m_vecLinearVelocity, thisEntity->m_vecAngularVelocity);
+        }
+        else if (thisType == 3 && collidedType == 2 && collidedPhysical)
+        {
+            GovernPedPushVehicleVelocity(collidedPhysical, thisEntity, initialCollidedLinearVelocity, initialCollidedAngularVelocity, initialThisLinearVelocity,
+                                         collidedPhysical->m_vecLinearVelocity, collidedPhysical->m_vecAngularVelocity);
+        }
+    }
+
+    return result;
+}
+
+static bool __fastcall HOOK_CPhysical__ApplyCollisionAlt(CPhysicalSAInterface* thisEntity, void* /*edx*/, CPhysicalSAInterface* collidedEntity,
+                                                         CColPointSAInterface* colPoint, float* damageIntensity, CVector* outLinearVelocity,
+                                                         CVector* outAngularVelocity)
+{
+    const CVector initialLinearVelocity = outLinearVelocity ? *outLinearVelocity : CVector{};
+    const CVector initialAngularVelocity = outAngularVelocity ? *outAngularVelocity : CVector{};
+
+    const CVector collidedLinearVelocity = collidedEntity ? collidedEntity->m_vecLinearVelocity : CVector{};
+
+    using ApplyCollisionAltFn = bool(__thiscall*)(CPhysicalSAInterface*, CPhysicalSAInterface*, CColPointSAInterface*, float*, CVector*, CVector*);
+    const auto originalApplyCollisionAlt = reinterpret_cast<ApplyCollisionAltFn>(0x544D50);
+
+    const bool result = originalApplyCollisionAlt(thisEntity, collidedEntity, colPoint, damageIntensity, outLinearVelocity, outAngularVelocity);
+
+    if (result && thisEntity && collidedEntity && outLinearVelocity && outAngularVelocity)
+    {
+        // Entity types: 2 = Vehicle, 3 = Ped
+        const uint8 thisType = thisEntity->nType;
+        const uint8 collidedType = collidedEntity->nType;
+
+        if (thisType == 2 && collidedType == 3)
+        {
+            GovernPedPushVehicleVelocity(thisEntity, collidedEntity, initialLinearVelocity, initialAngularVelocity, collidedLinearVelocity, *outLinearVelocity,
+                                         *outAngularVelocity);
+        }
+    }
+
+    return result;
+}
+
 #define HOOKPOS_CPhysical__ApplyAirResistance  0x544D29
 #define HOOKSIZE_CPhysical__ApplyAirResistance 5
 static const unsigned int     RETURN_CPhysical__ApplyAirResistance = 0x544D4D;
@@ -844,6 +1131,55 @@ static void __declspec(naked) HOOK_CPhysical__ApplyAirResistance()
         fmul [esi+0x58]
         fstp [esi+0x58]
         jmp RETURN_CPhysical__ApplyAirResistance
+    }
+    // clang-format on
+}
+
+// Fixes excessive chassis roll acceleration and violent swaying at high FPS by scaling the lateral impulse by delta time.
+#define HOOKPOS_CDoor__Process_ChassisImpulse  0x6F42D5
+#define HOOKSIZE_CDoor__Process_ChassisImpulse 0xE
+static const unsigned int     RETURN_CDoor__Process_ChassisImpulse = 0x6F42E3;
+static void __declspec(naked) HOOK_CDoor__Process_ChassisImpulse()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fld ds:[0x872328]           // 0.025f (DOOR_APPLY_RATE_CHASSIS)
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 50.0f / 30.0f (1.6666667f)
+        fmul st, st(1)              // * z
+        fadd dword ptr [esi+0x14]   // + m_fAngVel
+        fstp dword ptr [esi+0x14]   // store m_fAngVel
+        jmp RETURN_CDoor__Process_ChassisImpulse
+    }
+    // clang-format on
+}
+
+// Fixes high-frequency chassis oscillation and visual wheel protrusion by integrating angular velocity proportionally to delta time.
+#define HOOKPOS_CDoor__Process_ChassisAngle  0x6F4422
+#define HOOKSIZE_CDoor__Process_ChassisAngle 0x8
+static const unsigned int     RETURN_CDoor__Process_ChassisAngle = 0x6F442A;
+static void __declspec(naked) HOOK_CDoor__Process_ChassisAngle()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fld dword ptr [esi+0x14]    // m_fAngVel
+        mov ecx, ebx                // ecx = m_nDirn
+
+        test bp, bp                 // DOOR_EXTRA_CHASSIS (0x40)
+        jz not_chassis
+
+        fmul ds:[0xB7CB5C]          // CTimer::ms_fTimeStep
+        fdiv kOriginalTimeStep      // 50.0f / 30.0f (1.6666667f)
+
+    not_chassis:
+        fadd dword ptr [esi+0x0C]   // + m_fAngle
+        jmp RETURN_CDoor__Process_ChassisAngle
     }
     // clang-format on
 }
@@ -908,6 +1244,10 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CFallingGlassPane__Update_B);
     EZHookInstall(CFallingGlassPane__Update_C);
 
+    // Fixes camera jitter while aiming and walking at high FPS.
+    // CTaskSimpleUseGun::SetMoveAnim
+    MemSet((void*)0x61E5E4, 0x90, 0x6);
+
     // Fixes slow camera movement towards the back of the vehicle on high FPS.
     // CCam::Process_FollowCar_SA
     MemSet((void*)0x524FD7, 0x90, 0x1B);
@@ -947,6 +1287,22 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CTaskSimpleSwim__ProcessEffects);
     EZHookInstall(CTaskSimpleSwim__ProcessEffectsBubbleFix);
     EZHookInstall(CTaskSimpleSwim__ProcessSwimmingResistance);
+    EZHookInstall(CTaskSimpleSwim__ProcessSwimmingResistance_DiveSpeed);
+    EZHookInstall(CTaskSimpleSwim__ProcessSwimmingResistance_Buoyancy);
+    EZHookInstall(cBuoyancy__CalcBuoyancyForce_Damping);
 
     EZHookInstall(CWeapon_Update);
+    EZHookInstall(CDoor__Process_ChassisImpulse);
+    EZHookInstall(CDoor__Process_ChassisAngle);
+
+    HookInstallCall(CALL_CPhysical__ApplyCollision_1, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_2, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_3, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_4, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_5, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_6, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_7, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollision_8, (DWORD)HOOK_CPhysical__ApplyCollision);
+    HookInstallCall(CALL_CPhysical__ApplyCollisionAlt_1, (DWORD)HOOK_CPhysical__ApplyCollisionAlt);
+    HookInstallCall(CALL_CPhysical__ApplyCollisionAlt_2, (DWORD)HOOK_CPhysical__ApplyCollisionAlt);
 }

@@ -28,8 +28,8 @@ C3DMarkersSA::~C3DMarkersSA()
     }
 }
 
-C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, T3DMarkerType dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g, BYTE b,
-                                      BYTE a)
+C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, T3DMarkerType::Enum dwType, CVector* vecPosition, float fSize, float fPulseFraction, BYTE r, BYTE g,
+                                      BYTE b, BYTE a)
 {
     /*
     static C3dMarker *PlaceMarker(unsigned int nIdentifier, unsigned short nType,
@@ -38,7 +38,7 @@ C3DMarker* C3DMarkersSA::CreateMarker(DWORD Identifier, T3DMarkerType dwType, CV
     float normalY = 0.0f, float normalZ = 0.0f, bool zCheck = FALSE);
     */
     WORD wType = (WORD)dwType;
-    dwType = (T3DMarkerType)wType;
+    dwType = (T3DMarkerType::Enum)wType;
     bool bZCheck = true;
 
     // Pass a copy of the position to PlaceMarker, not the original pointer.
