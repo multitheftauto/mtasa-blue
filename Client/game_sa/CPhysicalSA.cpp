@@ -293,7 +293,7 @@ void CPhysicalSA::AttachEntityToEntity(CPhysical& Entity, const CVector& vecPosi
 
     InternalAttachEntityToEntity(dwEntityInterface, &vecPosition, &vecRotation);
 
-    CPhysicalSAInterface* pInterface = (CPhysicalSAInterface*)GetInterface();
+    CPhysicalSAInterface* pInterface = static_cast<CPhysicalSAInterface*>(GetInterface());
     if (pInterface->nType == ENTITY_TYPE_OBJECT && !pInterface->bCollidable)
         pInterface->bCollidable = true;
 }
