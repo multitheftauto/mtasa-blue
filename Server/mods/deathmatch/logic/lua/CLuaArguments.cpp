@@ -149,16 +149,18 @@ void CLuaArguments::PushArguments(lua_State* luaVM) const
     }
 }
 
-void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables) const
+void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKnownTables, bool isArray) const
 {
     // Ensure there is enough space on the Lua stack
     LUA_CHECKSTACK(luaVM, 4);
 
-    bool bKnownTablesCreated = false;
+    bool                              usedLocalKnownTables = false;
+    CFastHashMap<CLuaArguments*, int> localKnownTables;
+
     if (!pKnownTables)
     {
-        pKnownTables = new CFastHashMap<CLuaArguments*, int>();
-        bKnownTablesCreated = true;
+        pKnownTables = &localKnownTables;
+        usedLocalKnownTables = true;
 
         lua_newtable(luaVM);
         // using registry to make it fail safe, else we'd have to carry
@@ -177,21 +179,33 @@ void CLuaArguments::PushAsTable(lua_State* luaVM, CFastHashMap<CLuaArguments*, i
     lua_pop(luaVM, 1);
     pKnownTables->insert(std::make_pair((CLuaArguments*)this, size));
 
-    std::vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
-    for (; iter != m_Arguments.end() && (iter + 1) != m_Arguments.end(); ++iter)
+    // map
+    if (!isArray)
     {
-        (*iter)->Push(luaVM, pKnownTables);  // index
-        ++iter;
-        (*iter)->Push(luaVM, pKnownTables);  // value
-        lua_settable(luaVM, -3);
+        vector<CLuaArgument*>::const_iterator iter = m_Arguments.begin();
+        for (; iter != m_Arguments.end() && (iter + 1) != m_Arguments.end(); iter++)
+        {
+            (*iter)->Push(luaVM, pKnownTables);  // index
+            iter++;
+            (*iter)->Push(luaVM, pKnownTables);  // value
+            lua_settable(luaVM, -3);
+        }
+    }
+    else  // array
+    {
+        int index = 1;
+        for (auto iter = m_Arguments.begin(); iter != m_Arguments.end(); ++iter)
+        {
+            (*iter)->Push(luaVM, pKnownTables);
+            lua_rawseti(luaVM, -2, index++);
+        }
     }
 
-    if (bKnownTablesCreated)
+    if (usedLocalKnownTables)
     {
         // clear the cache
         lua_pushnil(luaVM);
         lua_setfield(luaVM, LUA_REGISTRYINDEX, "cache");
-        delete pKnownTables;
     }
 }
 

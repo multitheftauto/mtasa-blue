@@ -157,7 +157,7 @@ float CGUILabel_Impl::GetTextExtent()
             }
             return fMax;
         }
-        catch (CEGUI::Exception e)
+        catch (const CEGUI::Exception&)
         {
         }
     }

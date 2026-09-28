@@ -382,16 +382,12 @@ static void __declspec(naked) HOOK_SkipAim()
             // Grab his remote storage
             pTempRemote = CRemoteDataSA::GetRemoteDataStorage(
                 pAPed);  // TODO: Can be optimized further by using the PlayerPed class. Not sure how to convert CPed to CPlayerPed
-            if (pTempRemote)
+            if (pTempRemote && pTempRemote->ProcessPlayerWeapon())
             {
-                if (pTempRemote->ProcessPlayerWeapon())
-                {
-                    // If this is remote player, use the data in his remote storage
-                    *pSkipAim = pTempRemote->m_bAkimboTargetUp;
-                }
+                // Synchronize akimbo arms posture for remote players
+                *pSkipAim = pTempRemote->m_bAkimboTargetUp;
             }
-            else
-                *pSkipAim = false;
+            // Do not force *pSkipAim to false when pTempRemote is nullptr; preserve GTA:SA logic for NPCs
         }
     }
 
@@ -426,7 +422,46 @@ static void __declspec(naked) HOOK_SkipAim()
     }
 }
 
-float* pTargetVector;
+float*                     pTargetVector;
+static CEntitySAInterface* lookAtEntity = nullptr;
+static int                 offsetBoneTag = -1;
+
+static void ProcessAkimboIKHook()
+{
+    // Hip-fire passes ped as lookAtEntity and upper arm bone as offsetBoneTag with a local displacement {0, 2, 0}.
+    // Only overwrite targetVector when free-aiming at a world target without an entity or bone offset.
+    if (pTargetVector == nullptr || lookAtEntity != nullptr || (offsetBoneTag != -1 && offsetBoneTag != 0))
+        return;
+
+    CPed* targetingPed = GetTargetingPed();
+    if (!targetingPed)
+        return;
+
+    // If this is the local player
+    if (IsLocalPlayer(targetingPed))
+    {
+        // Store the position being aimed at in world space
+        pMultiplayer->m_vecAkimboTarget.fX = pTargetVector[0];
+        pMultiplayer->m_vecAkimboTarget.fY = pTargetVector[1];
+        pMultiplayer->m_vecAkimboTarget.fZ = pTargetVector[2];
+    }
+    else
+    {
+        // Grab his remote storage
+        CRemoteDataStorageSA* remoteData = CRemoteDataSA::GetRemoteDataStorage(pAPed);
+        if (remoteData && remoteData->ProcessPlayerWeapon())
+        {
+            const CVector& akimboTarget = remoteData->m_vecAkimboTarget;
+            if (akimboTarget.fX != 0.0f || akimboTarget.fY != 0.0f || akimboTarget.fZ != 0.0f)
+            {
+                // Overwrite aim target with synced coordinates only for valid world-aiming
+                pTargetVector[0] = akimboTarget.fX;
+                pTargetVector[1] = akimboTarget.fY;
+                pTargetVector[2] = akimboTarget.fZ;
+            }
+        }
+    }
+}
 
 static void __declspec(naked) HOOK_IKChainManager_PointArm()
 {
@@ -436,9 +471,13 @@ static void __declspec(naked) HOOK_IKChainManager_PointArm()
     // clang-format off
     __asm
     {
-        // Grab the ped whose aiming the gun and the pointer to the vector we aim at
+        // Grab the ped whose aiming the gun, look-at entity, bone tag, and the pointer to the target vector
         mov         edx, [esp+24]
         mov         pTargetVector, edx
+        mov         edx, [esp+20]
+        mov         offsetBoneTag, edx
+        mov         edx, [esp+16]
+        mov         lookAtEntity, edx
         mov         edx, [esp+12]
         mov         pAPed, edx
 
@@ -447,34 +486,7 @@ static void __declspec(naked) HOOK_IKChainManager_PointArm()
     }
     // clang-format on
 
-    pATargetingPed = GetTargetingPed();
-    if (pATargetingPed)
-    {
-        // If this is the local player
-        if (IsLocalPlayer(pATargetingPed))
-        {
-            // Store the position his aiming at
-            pMultiplayer->m_vecAkimboTarget.fX = pTargetVector[0];
-            pMultiplayer->m_vecAkimboTarget.fY = pTargetVector[1];
-            pMultiplayer->m_vecAkimboTarget.fZ = pTargetVector[2];
-        }
-        else
-        {
-            // Grab his remote storage
-            pTempRemote = CRemoteDataSA::GetRemoteDataStorage(
-                pAPed);  // TODO: Can be optimized further by using the PlayerPed class. Not sure how to convert CPed to CPlayerPed
-            if (pTempRemote)
-            {
-                if (pTempRemote->ProcessPlayerWeapon())
-                {
-                    // If this is remote player, use the data in his remote storage to point his aim position
-                    pTargetVector[0] = pTempRemote->m_vecAkimboTarget.fX;
-                    pTargetVector[1] = pTempRemote->m_vecAkimboTarget.fY;
-                    pTargetVector[2] = pTempRemote->m_vecAkimboTarget.fZ;
-                }
-            }
-        }
-    }
+    ProcessAkimboIKHook();
 
     // clang-format off
     __asm
@@ -502,9 +514,13 @@ static void __declspec(naked) HOOK_IKChainManager_LookAt()
     // clang-format off
     __asm
     {
-        // Grab the player ped and the vector pointer from the stack
+        // Grab the player ped, look-at entity, bone tag, and the vector pointer from the stack
         mov         eax, [esp+24]
         mov         pTargetVector, eax
+        mov         eax, [esp+16]
+        mov         offsetBoneTag, eax
+        mov         eax, [esp+12]
+        mov         lookAtEntity, eax
         mov         eax, [esp+8]
         mov         pAPed, eax
 
@@ -513,38 +529,7 @@ static void __declspec(naked) HOOK_IKChainManager_LookAt()
     }
     // clang-format on
 
-    // Jax: this gets called on vehicle collision and pTargetVector is null
-    if (pTargetVector)
-    {
-        pATargetingPed = GetTargetingPed();
-        if (pATargetingPed)
-        {
-            // If this is the local player
-            if (IsLocalPlayer(pATargetingPed))
-            {
-                // Store the position his aiming at
-                pMultiplayer->m_vecAkimboTarget.fX = pTargetVector[0];
-                pMultiplayer->m_vecAkimboTarget.fY = pTargetVector[1];
-                pMultiplayer->m_vecAkimboTarget.fZ = pTargetVector[2];
-            }
-            else
-            {
-                // Grab his remote storage
-                pTempRemote = CRemoteDataSA::GetRemoteDataStorage(
-                    pAPed);  // TODO: Can be optimized further by using the PlayerPed class. Not sure how to convert CPed to CPlayerPed
-                if (pTempRemote)
-                {
-                    if (pTempRemote->ProcessPlayerWeapon())
-                    {
-                        // If this is remote player, use the data in his remote storage to point his aim position
-                        pTargetVector[0] = pTempRemote->m_vecAkimboTarget.fX;
-                        pTargetVector[1] = pTempRemote->m_vecAkimboTarget.fY;
-                        pTargetVector[2] = pTempRemote->m_vecAkimboTarget.fZ;
-                    }
-                }
-            }
-        }
-    }
+    ProcessAkimboIKHook();
 
     // clang-format off
     __asm
