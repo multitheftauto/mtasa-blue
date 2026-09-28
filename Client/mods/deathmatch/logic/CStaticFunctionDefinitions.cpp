@@ -5257,7 +5257,7 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CClientEntity* pEntity, const C
     }
 
     // Immediately orient the follow camera towards the requested 3D coordinates
-    m_pCamera->SetOrbitTarget(vecTarget, pEntity);
+    m_pCamera->SetOrbitTarget(vecTarget);
     return true;
 }
 

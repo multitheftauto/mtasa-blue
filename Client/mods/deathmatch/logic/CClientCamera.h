@@ -61,7 +61,7 @@ public:
 
         m_fFOV = fFOV;
     }
-    void SetOrbitTarget(const CVector& vecPosition, CClientEntity* targetEntity = nullptr);
+    void SetOrbitTarget(const CVector& vecPosition);
     void AttachTo(CClientEntity* pElement);
 
     void FadeIn(float fTime);
