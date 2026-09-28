@@ -38,6 +38,7 @@ void CClientBuildingManager::RemoveAll()
     }
 
     m_List.clear();
+    m_ScaledBuildings.clear();
 
     // Allow list removal again
     m_bRemoveFromList = true;
@@ -63,6 +64,25 @@ void CClientBuildingManager::RemoveFromList(CClientBuilding* pBuilding)
     {
         m_List.remove(pBuilding);
     }
+
+    RemoveFromScaledList(pBuilding);
+}
+
+void CClientBuildingManager::AddToScaledList(CClientBuilding* building)
+{
+    if (std::find(m_ScaledBuildings.begin(), m_ScaledBuildings.end(), building) == m_ScaledBuildings.end())
+        m_ScaledBuildings.push_back(building);
+}
+
+void CClientBuildingManager::RemoveFromScaledList(CClientBuilding* building)
+{
+    m_ScaledBuildings.remove(building);
+}
+
+void CClientBuildingManager::UpdateScaledBuildings()
+{
+    for (auto* building : m_ScaledBuildings)
+        building->ApplyScale();
 }
 
 bool CClientBuildingManager::IsValidModel(uint16_t modelId)

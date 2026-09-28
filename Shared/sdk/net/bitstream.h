@@ -40,6 +40,10 @@ enum class eBitStreamVersion : unsigned short
     // YYYY-MM-DD
     // Name,
 
+    // Building scale is now included in the entity add packet and can be changed at runtime
+    // with setElementScale, so late-joining clients receive it.
+    BuildingScale,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

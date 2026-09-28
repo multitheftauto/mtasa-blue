@@ -31,6 +31,8 @@ void CLuaBuildingDefs::AddClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classfunction(luaVM, "create", "createBuilding");
+    lua_classfunction(luaVM, "getScale", "getElementScale");
+    lua_classfunction(luaVM, "setScale", "setElementScale");
 
     lua_registerclass(luaVM, "Building", "Element");
 }

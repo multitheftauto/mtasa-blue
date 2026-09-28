@@ -33,6 +33,7 @@ public:
     LUA_DECLARE_OOP(GetElementMatrix);
     LUA_DECLARE_OOP(GetElementPosition);
     LUA_DECLARE_OOP(GetElementRotation);
+    static std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> GetElementScale(lua_State* luaVM, CClientEntity* entity);
     LUA_DECLARE_OOP(GetElementVelocity);
     LUA_DECLARE_OOP(GetElementTurnVelocity);
     LUA_DECLARE(GetElementType);
@@ -82,6 +83,7 @@ public:
     LUA_DECLARE(SetElementMatrix);
     LUA_DECLARE(SetElementPosition);
     LUA_DECLARE_OOP(SetElementRotation);
+    static bool SetElementScale(CClientEntity* entity, std::variant<CVector, float> scale);
     LUA_DECLARE(SetElementVelocity);
     LUA_DECLARE(SetElementAngularVelocity);
     LUA_DECLARE(SetElementParent);
@@ -102,4 +104,7 @@ public:
     LUA_DECLARE(SetElementCallPropagationEnabled);
     static bool SetElementLighting(CClientEntity* entity, float lighting);
     static bool SetElementOnFire(CClientEntity* entity, bool onFire) noexcept;
+
+private:
+    static bool ApplyElementScale(CClientEntity* entity, const CVector& vecScale);
 };

@@ -56,6 +56,10 @@ public:
     unsigned char GetAlpha() const noexcept { return m_ucAlpha; }
     void          SetAlpha(unsigned char ucAlpha);
 
+    const CVector& GetScale() const noexcept { return m_vecScale; }
+    void           SetScale(const CVector& vecScale);
+    void           ApplyScale();
+
     void Create();
     void Destroy();
 
@@ -87,6 +91,7 @@ private:
     uint8_t       m_interior;
     bool          m_usesCollision;
     unsigned char m_ucAlpha;
+    CVector       m_vecScale;
 
     CClientBuilding* m_pHighBuilding;
     CClientBuilding* m_pLowBuilding;

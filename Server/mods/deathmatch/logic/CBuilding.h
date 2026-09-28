@@ -45,6 +45,9 @@ public:
     std::uint16_t GetModel() const noexcept { return m_model; }
     void          SetModel(std::uint16_t model) noexcept { m_model = model; }
 
+    const CVector& GetScale() const noexcept { return m_vecScale; }
+    void           SetScale(const CVector& vecScale) noexcept { m_vecScale = vecScale; }
+
     bool GetCollisionEnabled() const noexcept { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) noexcept { m_bCollisionsEnabled = bCollisionEnabled; }
 
@@ -63,6 +66,7 @@ protected:
 private:
     CBuildingManager* m_pBuildingManager;
     CVector           m_vecRotation;
+    CVector           m_vecScale;
     std::uint16_t     m_model;
 
 protected:
