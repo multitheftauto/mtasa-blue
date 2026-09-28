@@ -804,3 +804,25 @@ bool CCameraSA::IsSphereVisible(CVector* center, float radius) const
 
     return ((bool(__thiscall*)(CCameraSAInterface*, CVector*, float))0x420D40)(cameraInterface, center, radius);
 }
+
+void CCameraSA::ClearCamDirectlyBehind() noexcept
+{
+    // Clear GTA:SA snap-behind/front flags to prevent automatic camera repositioning
+    CCameraSAInterface* cameraInterface = GetInterface();
+    if (!cameraInterface)
+        return;
+
+    cameraInterface->m_bCamDirectlyBehind = false;
+    cameraInterface->m_bCamDirectlyInFront = false;
+    cameraInterface->m_bCameraJustRestored = false;
+    cameraInterface->m_bRestoreByJumpCut = false;
+}
+
+void CCameraSA::SetPedOrientForBehindOrInFront(float angle) noexcept
+{
+    CCameraSAInterface* cameraInterface = GetInterface();
+    if (!cameraInterface)
+        return;
+
+    cameraInterface->m_PedOrientForBehindOrInFront = angle;
+}
