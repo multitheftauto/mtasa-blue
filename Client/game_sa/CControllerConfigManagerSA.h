@@ -48,6 +48,5 @@ protected:
     bool m_bSteerWithMouse;
     bool m_bFlyWithMouse;
     bool m_bSuspendSteerAndFlyWithMouse;
-
-    BYTE m_ucInAirMouseSteering;
+    bool m_bInAirMouseSteering;
 };
