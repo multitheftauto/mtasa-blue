@@ -166,25 +166,25 @@ CObjectSA::~CObjectSA()
     }
 }
 
-void CObjectSA::SetFrozen(bool bFrozen)
+void CObjectSA::SetFrozen(bool frozen)
 {
-    CObjectSAInterface* pInterface = GetObjectInterface();
+    CObjectSAInterface* objectInterface = GetObjectInterface();
 
-    if (bFrozen != m_bFrozen)
+    if (frozen != m_Frozen)
     {
-        if (bFrozen)
+        if (frozen)
         {
-            m_bCollidableBeforeFreeze = pInterface->bCollidable;
-            pInterface->bCollidable = true;
+            m_CollidableBeforeFreeze = objectInterface->bCollidable;
+            objectInterface->bCollidable = true;
         }
         else
         {
-            pInterface->bCollidable = m_bCollidableBeforeFreeze;
+            objectInterface->bCollidable = m_CollidableBeforeFreeze;
         }
-        m_bFrozen = bFrozen;
+        m_Frozen = frozen;
     }
 
-    CPhysicalSA::SetFrozen(bFrozen);
+    CPhysicalSA::SetFrozen(frozen);
 }
 
 void CObjectSA::Explode()

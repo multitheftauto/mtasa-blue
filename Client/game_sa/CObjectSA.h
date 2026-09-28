@@ -125,8 +125,8 @@ private:
     bool          m_bIsAGangTag;
     CVector       m_vecScale;
     bool          m_preRenderRequired = false;
-    bool          m_bFrozen = false;
-    bool          m_bCollidableBeforeFreeze = false;
+    bool          m_Frozen = false;
+    bool          m_CollidableBeforeFreeze = false;
 
 public:
     static void StaticSetHooks();
@@ -137,7 +137,7 @@ public:
 
     CObjectSAInterface* GetObjectInterface() { return (CObjectSAInterface*)GetInterface(); }
 
-    void SetFrozen(bool bFrozen) override;
+    void SetFrozen(bool frozen) override;
 
     void  Explode();
     void  Break();
