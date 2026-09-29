@@ -1652,6 +1652,9 @@ CRemoteDataStorage* CMultiplayerSA::GetRemoteDataStorage(CPlayerPed* pPed)
 void CMultiplayerSA::RemoveRemoteDataStorage(CPlayerPed* pPed)
 {
     CRemoteDataSA::RemoveRemoteDataStorage(pPed);
+
+    if (pContextSwitchedPed == pPed)
+        pContextSwitchedPed = nullptr;
 }
 
 CPed* CMultiplayerSA::GetContextSwitchedPed()
