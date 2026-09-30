@@ -64,6 +64,11 @@ project "Client Deathmatch"
 	filter "system:windows"
 		buildoptions { "-Zm180" }
 
+	-- Keep the serializer independent from the client PCH so the same source
+	-- can be exercised by the standalone client tests.
+	filter "files:logic/CRuntimeColModel.cpp"
+		flags { "NoPCH" }
+
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
