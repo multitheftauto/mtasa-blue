@@ -88,7 +88,7 @@ CElement::~CElement()
     std::list<CPerPlayerEntity*>::const_iterator iter = m_ElementReferenced.begin();
     for (; iter != m_ElementReferenced.end(); iter++)
     {
-        (*iter)->m_ElementReferences.remove(this);
+        (*iter)->m_ElementVisibility.erase(this);
     }
 
     RemoveAllCollisions();
