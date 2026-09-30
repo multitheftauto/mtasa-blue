@@ -225,8 +225,8 @@ CGameSA::CGameSA()
         dassert(m_Pools->GetPoolCapacity(POINTER_SINGLE_LINK_POOL) == MAX_POINTER_SINGLE_LINKS);
 
         // Increase streaming object instances list size
-        MemPut<WORD>(0x05B8E55, MAX_RWOBJECT_INSTANCES * 12);  // Default is 1000 * 12
-        MemPut<WORD>(0x05B8EB0, MAX_RWOBJECT_INSTANCES * 12);  // Default is 1000 * 12
+        MemPut<DWORD>(0x05B8E55, MAX_RWOBJECT_INSTANCES * 12);  // Default is 1000 * 12
+        MemPut<DWORD>(0x05B8EB0, MAX_RWOBJECT_INSTANCES * 12);  // Default is 1000 * 12
 
         // Increase matrix array size
         MemPut<int>(0x054F3A1, MAX_OBJECTS * 3);  // Default is 900
