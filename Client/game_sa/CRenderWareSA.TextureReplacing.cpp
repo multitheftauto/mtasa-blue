@@ -9,6 +9,7 @@
 #include "StdInc.h"
 #include "CGameSA.h"
 #include "gamesa_renderware.h"
+#include <game/CStreaming.h>
 
 extern CGameSA* pGame;
 
@@ -23,9 +24,53 @@ public:
     ushort                             usTxdId;
     RwTexDictionary*                   pTxd;
     bool                               bHasTxdRef = false;
+    bool                               bAddedGameRequiredFlag = false;
 };
 
 std::map<ushort, CModelTexturesInfo> ms_ModelTexturesInfoMap;
+
+// Helper to resolve the CStreamingInfo for a given TXD ID
+static CStreamingInfo* GetTxdStreamingInfo(ushort usTxdId)
+{
+    if (!pGame || !pGame->GetStreaming())
+        return nullptr;
+
+    uint32 dwStreamingId = pGame->GetBaseIDforTXD() + usTxdId;
+    if (dwStreamingId >= pGame->GetCountOfAllFileIDs())
+        return nullptr;
+
+    return pGame->GetStreaming()->GetStreamingInfo(dwStreamingId);
+}
+
+// Mark the TXD as GAME_REQUIRED in GTA SA streaming so CStreaming::RemoveLeastUsedModel
+// does not purge the dictionary while MTA replacements are actively using it.
+static void SetTxdGameRequired(ushort usTxdId, CModelTexturesInfo* pInfo)
+{
+    if (pInfo->bAddedGameRequiredFlag)
+        return;
+
+    CStreamingInfo* pStreamingInfo = GetTxdStreamingInfo(usTxdId);
+    if (pStreamingInfo && !(pStreamingInfo->flg & STREAMING_FLAG_GAME_REQUIRED))
+    {
+        pStreamingInfo->flg |= STREAMING_FLAG_GAME_REQUIRED;
+        pInfo->bAddedGameRequiredFlag = true;
+    }
+}
+
+// Clear the GAME_REQUIRED flag once all replacements are removed, allowing GTA streaming
+// to naturally unload the TXD when it is no longer needed.
+static void ClearTxdGameRequired(ushort usTxdId, CModelTexturesInfo* pInfo)
+{
+    if (!pInfo->bAddedGameRequiredFlag)
+        return;
+
+    CStreamingInfo* pStreamingInfo = GetTxdStreamingInfo(usTxdId);
+    if (pStreamingInfo)
+    {
+        pStreamingInfo->flg &= ~STREAMING_FLAG_GAME_REQUIRED;
+    }
+    pInfo->bAddedGameRequiredFlag = false;
+}
 
 ////////////////////////////////////////////////////////////////
 //
@@ -46,6 +91,7 @@ void CRenderWareSA::NotifyTxdDestroyed(ushort usTxdId)
         pInfo->pTxd = nullptr;
         pInfo->originalTextures.clear();
         pInfo->bHasTxdRef = false;
+        pInfo->bAddedGameRequiredFlag = false;
     }
 }
 
@@ -79,6 +125,13 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
             pModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTexturesInfo");
             if (bNeedAddRef)
                 CTxdStore_AddRef(usTxdId);
+
+            // Pre-protect the TXD in streaming before FUNC_RemoveModel so streaming doesn't
+            // consider the TXD immediately purgeable when the model is removed.
+            CStreamingInfo* pStreamingInfo = GetTxdStreamingInfo(usTxdId);
+            if (pStreamingInfo && !(pStreamingInfo->flg & STREAMING_FLAG_GAME_REQUIRED))
+                pStreamingInfo->flg |= STREAMING_FLAG_GAME_REQUIRED;
+
             ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
             pTxd = CTxdStore_GetTxd(usTxdId);
         }
@@ -111,6 +164,16 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
         pInfo->originalTextures.clear();
         GetTxdTextures(pInfo->originalTextures, pInfo->pTxd);
     }
+
+    // Fix #4028 / Address FileEX review: Prevent GTA SA's streaming engine from purging
+    // this TXD while MTA replacements are active.
+    // Why: GTA SA's CStreaming::RemoveLeastUsedModel only checks CStreamingInfo flags/refs,
+    // completely bypassing CTxdStore's refcount. When all instances of a model stream out,
+    // CStreaming considers the TXD unused and invokes CTxdStore::RemoveTxd -> RwTexDictionaryDestroy,
+    // deallocating the dictionary and textures under MTA's feet.
+    // Marking STREAMING_FLAG_GAME_REQUIRED guarantees GTA streaming will not unload the TXD
+    // while MTA holds active replacements, keeping textures valid and preventing crash on removal.
+    SetTxdGameRequired(usTxdId, pInfo);
 
     return pInfo;
 }
@@ -327,6 +390,10 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
         // If no refs left, check original state and then remove info
         if (pInfo->usedByReplacements.empty())
         {
+            // Release the streaming retention flag so GTA streaming can naturally unload
+            // the TXD when it is no longer needed by any model.
+            ClearTxdGameRequired(usTxdId, pInfo);
+
             if (bTxdValid && pInfo->bHasTxdRef)
             {
 #ifdef MTA_DEBUG
