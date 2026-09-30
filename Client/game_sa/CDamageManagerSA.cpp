@@ -34,54 +34,36 @@ BYTE CDamageManagerSA::GetDoorStatus(eDoors bDoor)
 
 void CDamageManagerSA::SetDoorStatus(eDoors bDoor, BYTE bDoorStatus, bool spawnFlyingComponent)
 {
-    if (bDoor < MAX_DOORS)
+    if (bDoor >= MAX_DOORS)
+        return;
+
+    auto* pAutomobile = reinterpret_cast<CAutomobileSAInterface*>(internalEntityInterface);
+
+    // A boot that can't swing has no state 1, the game would turn it into 2 or 4
+    if (bDoor == BOOT && bDoorStatus == DT_DOOR_SWINGING_FREE && (pAutomobile->pHandlingData->uiModelFlags & MODELFLAGS_NOSWING_BOOT))
+        bDoorStatus = DT_DOOR_INTACT;
+
+    BYTE bOldStatus = internalInterface->Door[bDoor];
+    if (bOldStatus == bDoorStatus)
+        return;
+
+    static const eCarNodes s_doorNodes[MAX_DOORS] = {eCarNodes::BONNET,  eCarNodes::BOOT,    eCarNodes::DOOR_LF,
+                                                     eCarNodes::DOOR_RF, eCarNodes::DOOR_LR, eCarNodes::DOOR_RR};
+
+    // Only FixDoor shows a hidden door again, SetDoorDamage applies the stored state
+    if (bDoorStatus == DT_DOOR_INTACT || bDoorStatus == DT_DOOR_SWINGING_FREE || bOldStatus == DT_DOOR_MISSING)
+        pAutomobile->FixDoor(s_doorNodes[bDoor], bDoor);
+
+    // State 3 only sets the swing flag, the damaged part comes from state 2
+    if (bDoorStatus == DT_DOOR_BASHED_AND_SWINGING_FREE && bOldStatus != DT_DOOR_BASHED)
     {
-        // Different from before?
-        if (internalInterface->Door[bDoor] != bDoorStatus)
-        {
-            // Set it
-            internalInterface->Door[bDoor] = bDoorStatus;
-
-            // Are we making it intact?
-            if (bDoorStatus == DT_DOOR_INTACT || bDoorStatus == DT_DOOR_SWINGING_FREE)
-            {
-                // Grab the car node index for the given door id
-                static int s_iCarNodeIndexes[6] = {0x10, 0x11, 0x0A, 0x08, 0x0B, 0x09};
-
-                // Call CAutomobile::FixDoor to update the model
-                DWORD dwFunc = 0x6A35A0;
-                DWORD dwThis = (DWORD)internalEntityInterface;
-                int   iCarNodeIndex = s_iCarNodeIndexes[bDoor];
-                DWORD dwDoor = (DWORD)bDoor;
-                // clang-format off
-                __asm
-                {
-                    mov     ecx, dwThis
-                    push    dwDoor
-                    push    iCarNodeIndex
-                    call    dwFunc
-                }
-                // clang-format on
-            }
-            else
-            {
-                // Call CAutomobile::SetDoorDamage to update the model
-                DWORD dwFunc = 0x6B1600;
-                DWORD dwThis = (DWORD)internalEntityInterface;
-                DWORD dwDoor = (DWORD)bDoor;
-                bool  bQuiet = !spawnFlyingComponent;
-                // clang-format off
-                __asm
-                {
-                    mov     ecx, dwThis
-                    push    bQuiet
-                    push    dwDoor
-                    call    dwFunc
-                }
-                // clang-format on
-            }
-        }
+        internalInterface->Door[bDoor] = DT_DOOR_BASHED;
+        pAutomobile->SetDoorDamage(bDoor, !spawnFlyingComponent);
     }
+
+    internalInterface->Door[bDoor] = bDoorStatus;
+    if (bDoorStatus != DT_DOOR_INTACT)
+        pAutomobile->SetDoorDamage(bDoor, !spawnFlyingComponent);
 }
 
 BYTE CDamageManagerSA::GetWheelStatus(eWheelPosition bWheel)

@@ -414,6 +414,7 @@ public:
 
     CVector* GetBonePosition(eBone bone, CVector* position) override;
     CVector* GetTransformedBonePosition(eBone bone, CVector* position) override;
+    void     UpdateRpHAnim() override;
 
     bool IsDucking() const override { return GetPedInterface()->pedFlags.bIsDucking; }
     void SetDucking(bool duck) override { GetPedInterface()->pedFlags.bIsDucking = duck; }

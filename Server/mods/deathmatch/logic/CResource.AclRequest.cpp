@@ -359,12 +359,12 @@ bool CResource::FindAclRequest(SAclRequest& result)
     result.strWho = pAclRight->GetAttributeValue("who");
     result.strDate = pAclRight->GetAttributeValue("date");
 
-    // Ensure not pending and allow
+    // If a right was allowed, it is no longer pending
     if (result.bPending && result.bAccess)
     {
-        result.bAccess = false;
+        result.bPending = false;
         CommitAclRequest(result);
     }
 
-    return pAclRight->GetAttributeValue("pending") != "";
+    return true;
 }
