@@ -190,16 +190,16 @@ struct SPlayerArmorSync : public SFloatAsBitsSync<8>
     SPlayerArmorSync() : SFloatAsBitsSync<8>(0.f, 127.5f, true, false) {}
 };
 
-struct SVehicleHealthSync : public SFloatAsBitsSync<12>
+struct SVehicleHealthSync : public SFloatAsBitsSync<15>
 {
-    // 0 - 2000 step 0.5                                2047.5 = ( 2^12 - 1 ) * 0.5
-    SVehicleHealthSync() : SFloatAsBitsSync<12>(0.f, 2047.5f, true, false) {}
+    // 0 - 10000 step 0.5                               16383.5 = ( 2^15 - 1 ) * 0.5
+    SVehicleHealthSync() : SFloatAsBitsSync<15>(0.f, 16383.5f, true, false) {}
 };
 
-struct SLowPrecisionVehicleHealthSync : public SFloatAsBitsSync<8>
+struct SLowPrecisionVehicleHealthSync : public SFloatAsBitsSync<11>
 {
-    // 0 - 2000 step 8                                              2040 = ( 2^8 - 1 ) * 8
-    SLowPrecisionVehicleHealthSync() : SFloatAsBitsSync<8>(0.0f, 2040.0f, true, false) {}
+    // 0 - 10000 step 8                                             16376 = ( 2^11 - 1 ) * 8
+    SLowPrecisionVehicleHealthSync() : SFloatAsBitsSync<11>(0.0f, 16376.0f, true, false) {}
 };
 
 struct SObjectHealthSync : public SFloatAsBitsSync<11>
