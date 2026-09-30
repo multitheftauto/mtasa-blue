@@ -190,52 +190,16 @@ struct SPlayerArmorSync : public SFloatAsBitsSync<8>
     SPlayerArmorSync() : SFloatAsBitsSync<8>(0.f, 127.5f, true, false) {}
 };
 
-// Vehicle health covers MAX_VEHICLE_HEALTH, peers before VehicleHealth_MaxRange keep the old encoding
-template <unsigned int bits, unsigned int legacyBits>
-struct SVehicleHealthSyncBase : public SFloatAsBitsSync<bits>
+struct SVehicleHealthSync : public SFloatAsBitsSync<15>
 {
-    SVehicleHealthSyncBase(float fMax, float fLegacyMax) : SFloatAsBitsSync<bits>(0.f, fMax, true, false), m_fLegacyMax(fLegacyMax) {}
-
-    bool Read(NetBitStreamInterface& bitStream)
-    {
-        if (bitStream.Can(eBitStreamVersion::VehicleHealth_MaxRange))
-            return SFloatAsBitsSync<bits>::Read(bitStream);
-
-        SFloatAsBitsSync<legacyBits> legacy(0.f, m_fLegacyMax, true, false);
-        if (!legacy.Read(bitStream))
-            return false;
-
-        this->data.fValue = legacy.data.fValue;
-        return true;
-    }
-
-    void Write(NetBitStreamInterface& bitStream) const
-    {
-        if (bitStream.Can(eBitStreamVersion::VehicleHealth_MaxRange))
-        {
-            SFloatAsBitsSync<bits>::Write(bitStream);
-            return;
-        }
-
-        SFloatAsBitsSync<legacyBits> legacy(0.f, m_fLegacyMax, true, false);
-        legacy.data.fValue = this->data.fValue;
-        legacy.Write(bitStream);
-    }
-
-private:
-    const float m_fLegacyMax;
+    // 0 - 10000 step 0.5                               16383.5 = ( 2^15 - 1 ) * 0.5
+    SVehicleHealthSync() : SFloatAsBitsSync<15>(0.f, 16383.5f, true, false) {}
 };
 
-struct SVehicleHealthSync : public SVehicleHealthSyncBase<15, 12>
+struct SLowPrecisionVehicleHealthSync : public SFloatAsBitsSync<11>
 {
-    // 0 - 16000 step 0.5                               16383.5 = ( 2^15 - 1 ) * 0.5, older peers 2047.5 = ( 2^12 - 1 ) * 0.5
-    SVehicleHealthSync() : SVehicleHealthSyncBase<15, 12>(16383.5f, 2047.5f) {}
-};
-
-struct SLowPrecisionVehicleHealthSync : public SVehicleHealthSyncBase<11, 8>
-{
-    // 0 - 16000 step 8                                  16376 = ( 2^11 - 1 ) * 8, older peers 2040 = ( 2^8 - 1 ) * 8
-    SLowPrecisionVehicleHealthSync() : SVehicleHealthSyncBase<11, 8>(16376.0f, 2040.0f) {}
+    // 0 - 10000 step 8                                             16376 = ( 2^11 - 1 ) * 8
+    SLowPrecisionVehicleHealthSync() : SFloatAsBitsSync<11>(0.0f, 16376.0f, true, false) {}
 };
 
 struct SObjectHealthSync : public SFloatAsBitsSync<11>

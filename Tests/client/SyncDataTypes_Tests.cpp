@@ -240,20 +240,6 @@ TEST(SVehicleHealthSync, RoundTrip_SmallPositive)
     EXPECT_GT(out.data.fValue, 0.0f);
 }
 
-// Peers before VehicleHealth_MaxRange: 12 bits over [0, 2047.5]. Step = 0.5.
-TEST(SVehicleHealthSync, Clamp_LegacyPeer)
-{
-    MockBitStream      bs(static_cast<unsigned short>(eBitStreamVersion::VehicleHealth_MaxRange) - 1);
-    SVehicleHealthSync sync;
-    sync.data.fValue = 3000.0f;
-    sync.Write(bs);
-    EXPECT_EQ(12, bs.GetNumberOfBitsUsed());
-    bs.ResetReadPointer();
-    SVehicleHealthSync out;
-    EXPECT_TRUE(out.Read(bs));
-    EXPECT_NEAR(2047.5f, out.data.fValue, 0.01f);
-}
-
 // Low-precision vehicle health: 11 bits over [0, 16376]. Step = 8.
 // Used when bandwidth savings outweigh precision.
 TEST(SLowPrecisionVehicleHealthSync, RoundTrip)
@@ -263,20 +249,6 @@ TEST(SLowPrecisionVehicleHealthSync, RoundTrip)
     sync.data.fValue = 1000.0f;
     sync.Write(bs);
     EXPECT_EQ(11, bs.GetNumberOfBitsUsed());
-    bs.ResetReadPointer();
-    SLowPrecisionVehicleHealthSync out;
-    EXPECT_TRUE(out.Read(bs));
-    EXPECT_NEAR(1000.0f, out.data.fValue, 0.01f);
-}
-
-// Peers before VehicleHealth_MaxRange: 8 bits over [0, 2040]. Step = 8.
-TEST(SLowPrecisionVehicleHealthSync, RoundTrip_LegacyPeer)
-{
-    MockBitStream                  bs(static_cast<unsigned short>(eBitStreamVersion::VehicleHealth_MaxRange) - 1);
-    SLowPrecisionVehicleHealthSync sync;
-    sync.data.fValue = 1000.0f;
-    sync.Write(bs);
-    EXPECT_EQ(8, bs.GetNumberOfBitsUsed());
     bs.ResetReadPointer();
     SLowPrecisionVehicleHealthSync out;
     EXPECT_TRUE(out.Read(bs));
