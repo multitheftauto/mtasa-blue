@@ -181,14 +181,6 @@ void CLuaManager::LoadCFunctions()
         {"createTrayNotification", CLuaFunctionDefs::CreateTrayNotification},
         {"isTrayNotificationEnabled", CLuaFunctionDefs::IsTrayNotificationEnabled},
 
-        // Clothes and body functions
-        {"getBodyPartName", CLuaFunctionDefs::GetBodyPartName},
-        {"getClothesByTypeIndex", CLuaFunctionDefs::GetClothesByTypeIndex},
-        {"getTypeIndexFromClothes", CLuaFunctionDefs::GetTypeIndexFromClothes},
-        {"getClothesTypeName", CLuaFunctionDefs::GetClothesTypeName},
-        {"addClothingModel", CLuaFunctionDefs::AddClothingModel},
-        {"removeClothingModel", CLuaFunctionDefs::RemoveClothingModel},
-
         // Cursor funcs
         {"getCursorPosition", CLuaFunctionDefs::GetCursorPosition},
         {"setCursorPosition", CLuaFunctionDefs::SetCursorPosition},

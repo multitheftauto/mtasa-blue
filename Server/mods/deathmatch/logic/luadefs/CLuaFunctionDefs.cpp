@@ -36,12 +36,6 @@ void CLuaFunctionDefs::LoadFunctions()
         // Explosion create funcs
         {"createExplosion", CLuaFunctionDefs::CreateExplosion},
 
-        // Ped body funcs?
-        {"getBodyPartName", CLuaFunctionDefs::GetBodyPartName},
-        {"getClothesByTypeIndex", CLuaFunctionDefs::GetClothesByTypeIndex},
-        {"getTypeIndexFromClothes", CLuaFunctionDefs::GetTypeIndexFromClothes},
-        {"getClothesTypeName", CLuaFunctionDefs::GetClothesTypeName},
-
         // Weapon funcs
         {"getWeaponNameFromID", CLuaFunctionDefs::GetWeaponNameFromID},
         {"getWeaponIDFromName", CLuaFunctionDefs::GetWeaponIDFromName},
