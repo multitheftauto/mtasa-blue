@@ -34,7 +34,7 @@ CSphere CClientColSphere::GetWorldBoundingSphere()
 //
 void CClientColSphere::DebugRender(const CVector& vecPosition, float fDrawRadius)
 {
-    SColorARGB          color(64, 255, 0, 0);
+    SColor              color = GetDebugColor(SColorARGB(64, 255, 0, 0));
     float               fLineWidth = 4.f + pow(m_fRadius, 0.5f);
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
 
