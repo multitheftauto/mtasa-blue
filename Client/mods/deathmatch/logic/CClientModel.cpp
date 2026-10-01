@@ -251,6 +251,22 @@ void CClientModel::RestoreTXD(CModelInfo* pModelInfo)
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID, true);
 
         if (pModelInfo->GetTextureDictionaryID() == uiTextureDictonarySlotID)
+            pModelInfo->ResetTextureDictionaryID();
+    }
+
+    // TXD 0 is a clothes builder slot that GTA unloads regardless of refs
+    for (uint uiModelID = 0; uiModelID < MAX_MODEL_DFF_ID; uiModelID++)
+    {
+        CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID, true);
+
+        if (pModelInfo->GetTextureDictionaryID() != uiTextureDictonarySlotID)
+            continue;
+
+        std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(uiModelID);
+
+        if (pModel && pModel->GetModelType() != eClientModelType::PED)
+            pModelInfo->SetTextureDictionaryID(g_pGame->GetModelInfo(pModelInfo->GetParentID(), true)->GetTextureDictionaryID());
+        else
             pModelInfo->SetTextureDictionaryID(0);
     }
 

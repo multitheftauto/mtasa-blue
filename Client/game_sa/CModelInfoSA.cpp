@@ -872,6 +872,17 @@ void CModelInfoSA::ResetTextureDictionaryID()
     ms_DefaultTxdIDMap.erase(it);  // Only erase after calling the function above [otherwise gets reinserted]
 }
 
+void CModelInfoSA::StaticRemoveDefaultTxdID(unsigned short usTxdId)
+{
+    for (auto it = ms_DefaultTxdIDMap.begin(); it != ms_DefaultTxdIDMap.end();)
+    {
+        if (it->second == usTxdId)
+            it = ms_DefaultTxdIDMap.erase(it);
+        else
+            ++it;
+    }
+}
+
 void CModelInfoSA::StaticResetTextureDictionaries()
 {
     while (!ms_DefaultTxdIDMap.empty())

@@ -405,6 +405,7 @@ public:
     void           SetTextureDictionaryID(unsigned short usID);
     void           ResetTextureDictionaryID();
     static void    StaticResetTextureDictionaries();
+    static void    StaticRemoveDefaultTxdID(unsigned short usTxdId);
     float          GetLODDistance();
     float          GetOriginalLODDistance();
     void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
