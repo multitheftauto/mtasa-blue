@@ -23,6 +23,10 @@ void CLuaColShapeDefs::LoadFunctions()
 
                                                                              {"getColShapeRadius", GetColShapeRadius},
                                                                              {"setColShapeRadius", SetColShapeRadius},
+                                                                             {"getColShapeCheckDimension", ArgumentParser<GetColShapeCheckDimension>},
+                                                                             {"setColShapeCheckDimension", ArgumentParser<SetColShapeCheckDimension>},
+                                                                             {"getColShapeCheckInterior", ArgumentParser<GetColShapeCheckInterior>},
+                                                                             {"setColShapeCheckInterior", ArgumentParser<SetColShapeCheckInterior>},
                                                                              {"getColShapeSize", GetColShapeSize},
                                                                              {"setColShapeSize", SetColShapeSize},
                                                                              {"getColPolygonPoints", GetColPolygonPoints},
@@ -61,6 +65,10 @@ void CLuaColShapeDefs::AddClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "getRadius", GetColShapeRadius);
     lua_classfunction(luaVM, "setRadius", SetColShapeRadius);
+    lua_classfunction(luaVM, "getCheckDimension", ArgumentParser<GetColShapeCheckDimension>);
+    lua_classfunction(luaVM, "setCheckDimension", ArgumentParser<SetColShapeCheckDimension>);
+    lua_classfunction(luaVM, "getCheckInterior", ArgumentParser<GetColShapeCheckInterior>);
+    lua_classfunction(luaVM, "setCheckInterior", ArgumentParser<SetColShapeCheckInterior>);
     lua_classfunction(luaVM, "getSize", OOP_GetColShapeSize);
     lua_classfunction(luaVM, "setSize", SetColShapeSize);
     lua_classfunction(luaVM, "getPoints", OOP_GetColPolygonPoints);
@@ -452,6 +460,30 @@ int CLuaColShapeDefs::SetColShapeRadius(lua_State* luaVM)
 
     argStream.SetCustomError("ColShape must be Circle, Sphere or Tube");
     return luaL_error(luaVM, argStream.GetFullErrorMessage());
+}
+
+bool CLuaColShapeDefs::GetColShapeCheckDimension(CClientColShape* colShape)
+{
+    //  bool getColShapeCheckDimension ( colshape theColShape )
+    return colShape->IsDimensionCheckEnabled();
+}
+
+bool CLuaColShapeDefs::SetColShapeCheckDimension(CClientColShape* colShape, bool enabled)
+{
+    //  bool setColShapeCheckDimension ( colshape theColShape, bool enabled )
+    return CStaticFunctionDefinitions::SetColShapeCheckDimension(colShape, enabled);
+}
+
+bool CLuaColShapeDefs::GetColShapeCheckInterior(CClientColShape* colShape)
+{
+    //  bool getColShapeCheckInterior ( colshape theColShape )
+    return colShape->IsInteriorCheckEnabled();
+}
+
+bool CLuaColShapeDefs::SetColShapeCheckInterior(CClientColShape* colShape, bool enabled)
+{
+    //  bool setColShapeCheckInterior ( colshape theColShape, bool enabled )
+    return CStaticFunctionDefinitions::SetColShapeCheckInterior(colShape, enabled);
 }
 
 int CLuaColShapeDefs::GetColShapeSize(lua_State* luaVM)
