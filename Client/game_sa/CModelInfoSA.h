@@ -340,6 +340,7 @@ protected:
     DWORD                                                                             m_dwParentID;
     DWORD                                                                             m_dwReferences;
     DWORD                                                                             m_dwPendingInterfaceRef;
+    std::int16_t                                                                      m_interfaceRefs = 0;
     CColModel*                                                                        m_pCustomColModel;
     CColModelSAInterface*                                                             m_pOriginalColModelInterface;
     std::uint16_t                                                                     m_originalFlags = 0;

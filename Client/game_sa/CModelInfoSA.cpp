@@ -460,7 +460,10 @@ void CModelInfoSA::Remove()
 
     // Remove our reference
     if (m_pInterface->usNumberOfRefs > 0)
+    {
         m_pInterface->usNumberOfRefs--;
+        m_interfaceRefs--;
+    }
 
     // No references left?
     if (m_pInterface->usNumberOfRefs == 0 && !m_pCustomClump && !m_pCustomColModel)
@@ -489,6 +492,7 @@ bool CModelInfoSA::IsLoaded()
             assert(m_dwReferences > 0);
             m_pInterface = ppModelInfo[m_dwModelID];
             m_pInterface->usNumberOfRefs++;
+            m_interfaceRefs++;
             m_dwPendingInterfaceRef = 0;
         }
         return true;
@@ -834,7 +838,8 @@ void CModelInfoSA::SetTextureDictionaryID(unsigned short usID)
 
     // CBaseModelInfo::AddRef adds references to model and TXD
     // We need transfer added references from old TXD to new TXD
-    size_t referencesCount = m_pInterface->usNumberOfRefs;
+    // Our own model references never added a TXD reference
+    size_t referencesCount = static_cast<std::uint16_t>(m_pInterface->usNumberOfRefs - m_interfaceRefs);
 
     // +1 reference for active rwObject
     // The current textures will be removed in RpAtomicDestroy
@@ -1121,6 +1126,7 @@ void CModelInfoSA::ModelAddRef(EModelRequestType requestType, const char* szTag)
         {
             m_pInterface = ppModelInfo[m_dwModelID];
             m_pInterface->usNumberOfRefs++;
+            m_interfaceRefs++;
         }
         else
             m_dwPendingInterfaceRef = 1;
@@ -1395,6 +1401,7 @@ void CModelInfoSA::SetVehicleDummyPosition(VehicleDummies::Enum eDummy, const CV
         ms_ModelDefaultDummiesPosition.insert({m_dwModelID, std::map<VehicleDummies::Enum, CVector>()});
         // Increment this model references count, so we don't unload it before we have a chance to reset the positions
         m_pInterface->usNumberOfRefs++;
+        m_interfaceRefs++;
     }
 
     auto pVehicleModel = reinterpret_cast<CVehicleModelInfoSAInterface*>(m_pInterface);
@@ -1424,6 +1431,7 @@ void CModelInfoSA::ResetVehicleDummies(bool bRemoveFromDummiesMap)
     }
     // Decrement reference counter, since we reverted all position changes, the model can be safely unloaded
     pVehicleModel->usNumberOfRefs--;
+    m_interfaceRefs--;
 
     if (bRemoveFromDummiesMap)
         ms_ModelDefaultDummiesPosition.erase(m_dwModelID);
@@ -1931,6 +1939,7 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 void CModelInfoSA::DeallocateModel(void)
 {
     Remove();
+    m_interfaceRefs = 0;
 
     // Clean up stored defaults so stale entries don't leak to a model that reuses this ID.
     // Without this, a freed model ID could retain alpha transparency / flag overrides
@@ -2252,6 +2261,7 @@ bool CModelInfoSA::ForceUnload()
     if (pModelInfoSAInterface->usNumberOfRefs == 0 && pModelInfoSAInterface->pRwObject != NULL)
     {
         pModelInfoSAInterface->usNumberOfRefs++;
+        m_interfaceRefs++;
     }
 
     // Keep removing refs from the model until is it gone
