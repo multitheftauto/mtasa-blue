@@ -97,8 +97,8 @@ void CLuaPlayerDefs::LoadFunctions()
         {"toggleAllControls", ToggleAllControls},
 
         // Cursor funcs
-        {"isCursorShowing", IsCursorShowing},
-        {"showCursor", ShowCursor},
+        {"isCursorShowing", ArgumentParserWarn<false, IsCursorShowing>},
+        {"showCursor", ArgumentParserWarn<false, ShowCursor>},
 
         // Chat funcs
         {"showChat", ArgumentParserWarn<false, ShowChat>},
@@ -1969,56 +1969,40 @@ int CLuaPlayerDefs::KickPlayer(lua_State* luaVM)
     return 1;
 }
 
-int CLuaPlayerDefs::IsCursorShowing(lua_State* luaVM)
+bool CLuaPlayerDefs::IsCursorShowing(CPlayer* player) noexcept
 {
-    CPlayer* pPlayer;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
-
-    if (!argStream.HasErrors())
-    {
-        bool bShowing;
-        if (CStaticFunctionDefinitions::IsCursorShowing(pPlayer, bShowing))
-        {
-            lua_pushboolean(luaVM, bShowing);
-            return 1;
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    return player->IsCursorShowing();
 }
 
-int CLuaPlayerDefs::ShowCursor(lua_State* luaVM)
+bool CLuaPlayerDefs::ShowCursor(lua_State* luaVM, CElement* player, bool show, std::optional<bool> toggleControls)
 {
-    CElement* pPlayer;
-    bool      bShow;
-    bool      bToggleControls;
-
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
-    argStream.ReadBool(bShow);
-    argStream.ReadBool(bToggleControls, true);
-
-    if (!argStream.HasErrors())
+    if (player->CountChildren() && player->IsCallPropagationEnabled())
     {
-        LogWarningIfPlayerHasNotJoinedYet(luaVM, pPlayer);
-
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain && CStaticFunctionDefinitions::ShowCursor(pPlayer, pLuaMain, bShow, bToggleControls))
-        {
-            lua_pushboolean(luaVM, true);
-            return 1;
-        }
+        CElementListSnapshotRef children = player->GetChildrenListSnapshot();
+        for (CElementListSnapshot::const_iterator iter = children->begin(); iter != children->end(); iter++)
+            if (!(*iter)->IsBeingDeleted())
+                ShowCursor(luaVM, *iter, show, toggleControls);
     }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    if (!IS_PLAYER(player))
+        return false;
+
+    LogWarningIfPlayerHasNotJoinedYet(luaVM, player);
+
+    CResource* resource = lua_getownercluamain(luaVM).GetResource();
+    if (!resource)
+        return false;
+
+    CPlayer* targetPlayer = static_cast<CPlayer*>(player);
+    targetPlayer->SetCursorShowing(show);
+
+    CBitStream bitStream;
+    bitStream.pBitStream->Write(static_cast<unsigned char>(show ? 1 : 0));
+    bitStream.pBitStream->Write(static_cast<unsigned short>(resource->GetNetID()));
+    bitStream.pBitStream->Write(static_cast<unsigned char>(toggleControls.value_or(true) ? 1 : 0));
+    targetPlayer->Send(CLuaPacket(SHOW_CURSOR, *bitStream.pBitStream));
+
+    return true;
 }
 
 bool CLuaPlayerDefs::ShowChat(CElement* pPlayer, bool bShow, std::optional<bool> optInputBlocked)

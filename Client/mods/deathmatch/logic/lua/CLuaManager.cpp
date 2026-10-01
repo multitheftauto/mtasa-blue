@@ -189,14 +189,6 @@ void CLuaManager::LoadCFunctions()
         {"addClothingModel", CLuaFunctionDefs::AddClothingModel},
         {"removeClothingModel", CLuaFunctionDefs::RemoveClothingModel},
 
-        // Cursor funcs
-        {"getCursorPosition", CLuaFunctionDefs::GetCursorPosition},
-        {"setCursorPosition", CLuaFunctionDefs::SetCursorPosition},
-        {"isCursorShowing", CLuaFunctionDefs::IsCursorShowing},
-        {"showCursor", CLuaFunctionDefs::ShowCursor},
-        {"getCursorAlpha", CLuaFunctionDefs::GetCursorAlpha},
-        {"setCursorAlpha", CLuaFunctionDefs::SetCursorAlpha},
-
         // Util functions
         {"getValidPedModels", CLuaFunctionDefs::GetValidPedModels},
         {"downloadFile", CLuaFunctionDefs::DownloadFile},
