@@ -213,6 +213,14 @@ bool CRenderWareSA::ModelInfoTXDAddTextures(SReplacementTextures* pReplacementTe
 ////////////////////////////////////////////////////////////////
 void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacementTextures)
 {
+    // Force ped models to drop their loaded clump, mirroring the forced unload in GetModelTexturesInfo, so they pick up the restored textures below
+    for (ushort usModelId : pReplacementTextures->usedInModelIds)
+    {
+        CModelInfo* pModelInfo = pGame->GetModelInfo(usModelId);
+        if (pModelInfo && pModelInfo->GetModelType() == eModelInfoType::PED)
+            ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
+    }
+
     // For each using txd
     for (uint i = 0; i < pReplacementTextures->perTxdList.size(); i++)
     {
