@@ -90,15 +90,22 @@ void OnCrashAverted(uint uiId);
 // If request is for a file inside player.img (imgId 5) and uiLoadflag is 0 or 1
 // then force use of our cached player.img data
 //
-bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInfo)
+int _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInfo)
 {
+    const int iFileId = ((char*)pImgGTAInfo - (char*)CStreaming__ms_aInfoForModel) / 20;
+
+    if (pImgGTAInfo->iBlockCount == 0 && static_cast<uint>(iFileId) >= pGameInterface->GetBaseIDforTXD() &&
+        static_cast<uint>(iFileId) < pGameInterface->GetBaseIDforCOL())
+    {
+        pImgGTAInfo->uiUnknown2 &= ~0x10;
+        return 2;
+    }
+
     if (!CMultiplayerSA::ms_PlayerImgCachePtr)
-        return false;
+        return 0;
 
     if (pImgGTAInfo->ucImgId == 5)
     {
-        int iFileId = ((char*)pImgGTAInfo - (char*)CStreaming__ms_aInfoForModel) / 20;
-
         // Track which file we're attempting to cache-load, so ShouldSkipLoadRequestedModels
         // can verify its loadState before deciding to skip
         iLastCacheFileId = iFileId;
@@ -112,7 +119,7 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
             if (bLoadingBigModel)
                 pGameInterface->GetStreaming()->LoadAllRequestedModels(false);
             if (bLoadingBigModel)
-                return false;
+                return 0;
         }
 
         iReturnFileId = iFileId;
@@ -124,10 +131,10 @@ bool _cdecl OnCallCStreamingInfoAddToList(int flags, SImgGTAItemInfo* pImgGTAInf
         // Remove priorty flag, as not counted in ms_numPriorityRequests
         pImgGTAInfo->uiUnknown2 &= ~0x10;
 
-        return true;
+        return 1;
     }
 
-    return false;
+    return 0;
 }
 
 // Hook info
@@ -147,6 +154,8 @@ static void __declspec(naked) HOOK_CallCStreamingInfoAddToList()
         push    ebx
         call    OnCallCStreamingInfoAddToList
         add     esp, 4*2
+        cmp     al, 2
+        je      norequest
         cmp     al, 0
         jnz     skip
 
@@ -174,6 +183,11 @@ skip:
         // to re-queue. Don't touch loadState here -- let its internal cleanup handle state
         // correctly. ShouldSkipLoadRequestedModels verifies loadState before skipping.
 
+        popad
+        add     esp, 4*1
+        jmp     RETURN_CallCStreamingInfoAddToListB
+
+norequest:
         popad
         add     esp, 4*1
         jmp     RETURN_CallCStreamingInfoAddToListB
