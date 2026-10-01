@@ -795,7 +795,11 @@ namespace
         if (std::fabs(vecPosition.fX) > OCCLUDER_MAX_COORD || std::fabs(vecPosition.fY) > OCCLUDER_MAX_COORD || std::fabs(vecPosition.fZ) > OCCLUDER_MAX_COORD)
             return false;
 
-        if (vecSize.fX < OCCLUDER_MIN_SIZE || vecSize.fY < OCCLUDER_MIN_SIZE || vecSize.fZ < OCCLUDER_MIN_SIZE)
+        if (vecSize.fX < 0.0f || vecSize.fY < 0.0f || vecSize.fZ < 0.0f)
+            return false;
+
+        const int iFlatSides = (vecSize.fX < OCCLUDER_MIN_SIZE) + (vecSize.fY < OCCLUDER_MIN_SIZE) + (vecSize.fZ < OCCLUDER_MIN_SIZE);
+        if (iFlatSides > 1)
             return false;
 
         if (vecSize.fX > OCCLUDER_MAX_COORD || vecSize.fY > OCCLUDER_MAX_COORD || vecSize.fZ > OCCLUDER_MAX_COORD)

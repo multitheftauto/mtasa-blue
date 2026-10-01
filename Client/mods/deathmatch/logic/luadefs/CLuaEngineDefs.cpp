@@ -691,9 +691,16 @@ static void ValidateOccluderGeometry(float fX, float fY, float fZ, float fSizeX,
             throw std::invalid_argument(SString("Expected position in range -8000 - 8000 at argument %d, got %g", iFirstArgument + i, fCoords[i]));
 
     const float fSizes[3] = {fSizeX, fSizeY, fSizeZ};
+    int         iFlatSides = 0;
     for (int i = 0; i < 3; ++i)
-        if (fSizes[i] < 1.0f || fSizes[i] > 8000.0f)
-            throw std::invalid_argument(SString("Expected size in range 1 - 8000 at argument %d, got %g", iFirstArgument + 3 + i, fSizes[i]));
+    {
+        if (fSizes[i] < 0.0f || fSizes[i] > 8000.0f)
+            throw std::invalid_argument(SString("Expected size in range 0 - 8000 at argument %d, got %g", iFirstArgument + 3 + i, fSizes[i]));
+        if (fSizes[i] < 1.0f)
+            ++iFlatSides;
+    }
+    if (iFlatSides > 1)
+        throw std::invalid_argument(SString("Expected at most one size below 1 at arguments %d - %d", iFirstArgument + 3, iFirstArgument + 5));
 }
 
 std::variant<std::uint32_t, bool> CLuaEngineDefs::EngineAddOccluder(lua_State* const luaVM, float fX, float fY, float fZ, float fSizeX, float fSizeY,
