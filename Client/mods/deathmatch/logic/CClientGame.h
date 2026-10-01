@@ -50,6 +50,7 @@
 #define INVALID_DOWNLOAD_PRIORITY_GROUP (INT_MIN)
 
 class CClientModelCacheManager;
+class CClientWorldSoundManager;
 class CDebugHookManager;
 class CResourceFileDownloadManager;
 class CServerInfo;
@@ -277,6 +278,7 @@ public:
     // Accessors
 
     CVoiceRecorder*               GetVoiceRecorder() { return m_pVoiceRecorder; };
+    CClientWorldSoundManager*     GetWorldSoundManager() { return m_pWorldSoundManager; };
     CClientManager*               GetManager() { return m_pManager; };
     CClientObjectManager*         GetObjectManager() { return m_pObjectManager; };
     CClientPickupManager*         GetPickupManager() { return m_pPickupManager; };
@@ -732,6 +734,7 @@ private:
     bool m_bFirstPlaybackFrame;
 
     CClientManager*            m_pManager;
+    CClientWorldSoundManager*  m_pWorldSoundManager;
     CClientCamera*             m_pCamera;
     CClientGUIManager*         m_pGUIManager;
     CClientMarkerManager*      m_pMarkerManager;
