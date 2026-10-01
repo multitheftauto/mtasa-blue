@@ -14,6 +14,7 @@
 #include <game/CPlayerInfo.h>
 #include <game/CSettings.h>
 #include <game/CCam.h>
+#include <game/CWeaponInfo.h>
 #include <lua/CLuaFunctionParser.h>
 
 #define MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS "1.5.8-9.20979"
@@ -45,6 +46,14 @@ void CLuaCameraDefs::LoadFunctions()
 
         {"shakeCamera", ArgumentParser<ShakeCamera>},
         {"resetShakeCamera", ArgumentParser<ResetShakeCamera>},
+
+        // Weapon aim camera overrides
+        {"setWeaponAimCameraOffset",   ArgumentParserWarn<false, SetWeaponAimCameraOffset>},
+        {"getWeaponAimCameraOffset",   ArgumentParserWarn<false, GetWeaponAimCameraOffset>},
+        {"resetWeaponAimCameraOffset", ArgumentParserWarn<false, ResetWeaponAimCameraOffset>},
+        {"setWeaponAimCameraZoom",     ArgumentParserWarn<false, SetWeaponAimCameraZoom>},
+        {"getWeaponAimCameraZoom",     ArgumentParserWarn<false, GetWeaponAimCameraZoom>},
+        {"resetWeaponAimCameraZoom",   ArgumentParserWarn<false, ResetWeaponAimCameraZoom>},
     };
 
     // Add functions
@@ -574,5 +583,61 @@ bool CLuaCameraDefs::ShakeCamera(float radius, std::optional<float> x, std::opti
 bool CLuaCameraDefs::ResetShakeCamera() noexcept
 {
     m_pManager->GetCamera()->ResetShakeCamera();
+    return true;
+}
+
+bool CLuaCameraDefs::SetWeaponAimCameraOffset(int weaponType, float fX, float fY, float fZ)
+{
+    if (weaponType <= WEAPONTYPE_UNARMED || weaponType >= WEAPONTYPE_LAST_WEAPONTYPE)
+        throw std::invalid_argument("Invalid weapon type");
+
+    g_pGame->GetCamera()->SetWeaponAimCameraOffset(static_cast<eWeaponType>(weaponType), fX, fY, fZ);
+    return true;
+}
+
+CLuaMultiReturn<float, float, float> CLuaCameraDefs::GetWeaponAimCameraOffset(int weaponType)
+{
+    if (weaponType <= WEAPONTYPE_UNARMED || weaponType >= WEAPONTYPE_LAST_WEAPONTYPE)
+        throw std::invalid_argument("Invalid weapon type");
+
+    float fX, fY, fZ;
+    g_pGame->GetCamera()->GetWeaponAimCameraOffset(static_cast<eWeaponType>(weaponType), fX, fY, fZ);
+    return {fX, fY, fZ};
+}
+
+bool CLuaCameraDefs::SetWeaponAimCameraZoom(int weaponType, float fFOV)
+{
+    if (weaponType <= WEAPONTYPE_UNARMED || weaponType >= WEAPONTYPE_LAST_WEAPONTYPE)
+        throw std::invalid_argument("Invalid weapon type");
+    if (fFOV < 0.0f || fFOV > 179.0f)
+        throw std::invalid_argument("Invalid FOV range (0-179)");
+
+    g_pGame->GetCamera()->SetWeaponAimCameraZoom(static_cast<eWeaponType>(weaponType), fFOV);
+    return true;
+}
+
+float CLuaCameraDefs::GetWeaponAimCameraZoom(int weaponType)
+{
+    if (weaponType <= WEAPONTYPE_UNARMED || weaponType >= WEAPONTYPE_LAST_WEAPONTYPE)
+        throw std::invalid_argument("Invalid weapon type");
+
+    return g_pGame->GetCamera()->GetWeaponAimCameraZoom(static_cast<eWeaponType>(weaponType));
+}
+
+bool CLuaCameraDefs::ResetWeaponAimCameraOffset(int weaponType)
+{
+    if (weaponType <= WEAPONTYPE_UNARMED || weaponType >= WEAPONTYPE_LAST_WEAPONTYPE)
+        throw std::invalid_argument("Invalid weapon type");
+
+    g_pGame->GetCamera()->ResetWeaponAimCameraOffset(static_cast<eWeaponType>(weaponType));
+    return true;
+}
+
+bool CLuaCameraDefs::ResetWeaponAimCameraZoom(int weaponType)
+{
+    if (weaponType <= WEAPONTYPE_UNARMED || weaponType >= WEAPONTYPE_LAST_WEAPONTYPE)
+        throw std::invalid_argument("Invalid weapon type");
+
+    g_pGame->GetCamera()->ResetWeaponAimCameraZoom(static_cast<eWeaponType>(weaponType));
     return true;
 }
