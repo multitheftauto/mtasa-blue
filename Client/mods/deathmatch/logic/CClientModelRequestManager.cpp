@@ -247,6 +247,24 @@ void CClientModelRequestManager::Cancel(CClientEntity* pEntity, bool bAllowQueue
     }
 }
 
+void CClientModelRequestManager::Cancel(CModelInfo* pModelInfo)
+{
+    for (auto iter = m_Requests.begin(); iter != m_Requests.end();)
+    {
+        SClientModelRequest* pEntry = *iter;
+
+        if (pEntry->pModel != pModelInfo)
+        {
+            ++iter;
+            continue;
+        }
+
+        pEntry->pModel->RemoveRef();
+        delete pEntry;
+        iter = m_Requests.erase(iter);
+    }
+}
+
 void CClientModelRequestManager::DoPulse()
 {
     // Any requests?

@@ -227,6 +227,8 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
         }
     }
 
+    g_pClientGame->GetManager()->GetModelRequestManager()->Cancel(pModelInfo);
+
     // Restore DFF/TXD
     g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(static_cast<unsigned short>(m_iModelID));
 }
