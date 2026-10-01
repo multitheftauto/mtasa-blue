@@ -1861,6 +1861,8 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
         case eModelInfoType::TIME:
             reinterpret_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo.m_wOtherTimeModel = -1;
             break;
+        case eModelInfoType::CLUMP:
+            break;
         default:
             m_pInterface->m_nAnimFileIndex = 0xFFFFFFFF;
             break;
