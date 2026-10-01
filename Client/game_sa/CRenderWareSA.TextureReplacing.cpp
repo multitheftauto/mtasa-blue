@@ -284,3 +284,49 @@ void CRenderWareSA::ModelInfoTXDRemoveTextures(SReplacementTextures* pReplacemen
     }
     pReplacementTextures->textures.clear();
 }
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::ModelInfoTXDRemoveTexturesFromTxd
+//
+// Take every replacement out of a txd that is about to be destroyed
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::ModelInfoTXDRemoveTexturesFromTxd(ushort usTxdId)
+{
+    CModelTexturesInfo* pInfo = MapFind(ms_ModelTexturesInfoMap, usTxdId);
+    if (!pInfo)
+        return;
+
+    for (SReplacementTextures* pReplacementTextures : pInfo->usedByReplacements)
+    {
+        for (auto iter = pReplacementTextures->perTxdList.begin(); iter != pReplacementTextures->perTxdList.end(); ++iter)
+        {
+            if (iter->usTxdId != usTxdId)
+                continue;
+
+            for (RwTexture* pOldTexture : iter->usingTextures)
+            {
+                RwTexDictionaryRemoveTexture(pInfo->pTxd, pOldTexture);
+                if (iter->bTexturesAreCopies)
+                {
+                    // Destroy the copy (but not the raster as that was not copied)
+                    pOldTexture->raster = NULL;
+                    RwTextureDestroy(pOldTexture);
+                }
+            }
+            pReplacementTextures->perTxdList.erase(iter);
+            break;
+        }
+        ListRemove(pReplacementTextures->usedInTxdIds, usTxdId);
+    }
+
+    for (RwTexture* pOriginalTexture : pInfo->originalTextures)
+    {
+        if (pOriginalTexture->txd != pInfo->pTxd)
+            RwTexDictionaryAddTexture(pInfo->pTxd, pOriginalTexture);
+    }
+
+    CTxdStore_RemoveRef(usTxdId);
+    MapRemove(ms_ModelTexturesInfoMap, usTxdId);
+}

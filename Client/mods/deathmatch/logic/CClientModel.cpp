@@ -244,6 +244,8 @@ void CClientModel::RestoreTXD(CModelInfo* pModelInfo)
 {
     uint uiTextureDictonarySlotID = pModelInfo->GetModel() - MAX_MODEL_DFF_ID;
 
+    g_pGame->GetRenderWare()->ModelInfoTXDRemoveTexturesFromTxd(uiTextureDictonarySlotID);
+
     for (uint uiModelID = 0; uiModelID < MAX_MODEL_DFF_ID; uiModelID++)
     {
         CModelInfo* pModelInfo = g_pGame->GetModelInfo(uiModelID, true);
