@@ -217,8 +217,8 @@ float CClientStreamElement::GetDistanceToBoundingBoxSquared(const CVector& vecPo
         m_iCachedRadiusCounter = 20 + rand() % 50;
     }
 
-    // Do a simple calculation if the element has a small radius
-    if (m_fCachedRadius < 20)
+    // Do a simple calculation if the element has a small radius, or is streamed out in another dimension and cannot stream in
+    if (m_fCachedRadius < 20 || (!IsStreamedIn() && !IsVisibleInAllDimensions() && GetDimension() != m_pStreamer->GetDimension()))
     {
         return (GetStreamPosition() - vecPosition).LengthSquared();
     }

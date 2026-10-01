@@ -79,9 +79,21 @@ static void __declspec(naked) HOOK_CAutomobile_ProcessControl_VehicleDamage()
     {
         popad
         mov     ecx, pCollisionVehicle
-        mov     esi, pCollisionVehicle
+        test    ecx, ecx
+        jz      skip_automobile_damage
+
+        mov     esi, ecx
         mov     eax, [esi]
+        cmp     eax, 400000h
+        jb      skip_automobile_damage
+        cmp     eax, 900000h
+        ja      skip_automobile_damage
+
         call    dword ptr[eax + 0E0h]
+        jmp     CONTINUE_CAutomobile_ProcessControl_VehicleDamage
+
+    skip_automobile_damage:
+        add     esp, 18h
         jmp     CONTINUE_CAutomobile_ProcessControl_VehicleDamage
     }
     // clang-format on
@@ -118,9 +130,21 @@ static void __declspec(naked) HOOK_CBike_ProcessControl_VehicleDamage()
     {
         popad
         mov     ecx, pCollisionVehicle
-        mov     esi, pCollisionVehicle
+        test    ecx, ecx
+        jz      skip_bike_damage
+
+        mov     esi, ecx
         mov     eax, [esi]
+        cmp     eax, 400000h
+        jb      skip_bike_damage
+        cmp     eax, 900000h
+        ja      skip_bike_damage
+
         call    dword ptr[eax + 0E0h]
+        jmp     CONTINUE_CBike_ProcessControl_VehicleDamage
+
+    skip_bike_damage:
+        add     esp, 18h
         jmp     CONTINUE_CBike_ProcessControl_VehicleDamage
     }
     // clang-format on
@@ -158,8 +182,13 @@ static void __declspec(naked) HOOK_CBoat_ProcessControl_VehicleDamage()
     {
         popad
         mov     ecx, pCollisionVehicle
-        mov     esi, pCollisionVehicle
+        test    ecx, ecx
+        jz      skip_boat_damage
+
+        mov     esi, ecx
         call    FUNC_CVehicle_ProcessCarAlarm
+
+    skip_boat_damage:
         jmp     CONTINUE_CBoat_ProcessControl_VehicleDamage
     }
     // clang-format on

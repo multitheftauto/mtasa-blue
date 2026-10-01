@@ -47,6 +47,10 @@ public:
         return ((CObjectSAInterface * (__thiscall*)(CAutomobileSAInterface*, eCarNodes, eCarComponentCollisionTypes))0x6a8580)(this, nodeId, collType);
     }
 
+    void FixDoor(eCarNodes nodeId, eDoors door) { ((void(__thiscall*)(CAutomobileSAInterface*, eCarNodes, eDoors))0x6A35A0)(this, nodeId, door); }
+
+    void SetDoorDamage(eDoors door, bool quiet) { ((void(__thiscall*)(CAutomobileSAInterface*, eDoors, bool))0x6B1600)(this, door, quiet); }
+
     CDamageManagerSAInterface m_damageManager;
     CDoorSAInterface          m_doors[MAX_DOORS];
     RwFrame*                  m_aCarNodes[static_cast<std::size_t>(eCarNodes::NUM_NODES)];

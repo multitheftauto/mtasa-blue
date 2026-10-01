@@ -26,6 +26,8 @@
 
 extern CGameSA* pGame;
 
+static constexpr unsigned short ATOMIC_IS_UPGRADE = 0x8000;
+
 class CClientEntity;
 
 // GTA SA object pool slot stride (412) differs from sizeof(CObjectSAInterface) (380)
@@ -91,6 +93,10 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
         modelInfo->SetObjectPropertiesGroup(MODEL_PROPERTIES_GROUP_STATIC);
 
+    auto*      modelInfoInterface = modelInfo->GetInterface();
+    const bool isVehicleTuningPart =
+        modelInfoInterface && modelInfo->GetModelType() == eModelInfoType::ATOMIC && (modelInfoInterface->usFlags & ATOMIC_IS_UPGRADE);
+
     // Load building
     SFileObjectInstance instance{};
     instance.modelID = modelId;
@@ -104,6 +110,9 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     // Disable lod and ipl
     pBuilding->m_pLod = nullptr;
     pBuilding->m_iplIndex = 0;
+
+    if (isVehicleTuningPart)
+        pBuilding->bHasPreRenderEffects = false;
 
     // Restore changed properties group
     if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
