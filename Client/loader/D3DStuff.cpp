@@ -273,3 +273,287 @@ void EndD3DStuff()
     SAFE_RELEASE(pD3DDevice9);
     SAFE_RELEASE(pD3D9);
 }
+
+//////////////////////////////////////////////////////////
+//
+// DXVK (D3D9 -> Vulkan) support
+//
+//////////////////////////////////////////////////////////
+
+static const char* const DXVK_LIBRARY_NAMES[] = {"d3d9.dll", "dxgi.dll"};
+
+static SString GetDXVKStageDir()
+{
+    return PathJoin(GetMTASAPath(), "mta", "dxvk");
+}
+
+static SString GetDXVKStageFile(const char* szFileName)
+{
+    return PathJoin(GetDXVKStageDir(), szFileName);
+}
+
+static SString GetDXVKGtaDir()
+{
+    return UTF8FilePath(GetGameLaunchDirectory());
+}
+
+bool IsDXVKBinaryFile(const SString& strFilePath)
+{
+    if (!FileExists(strFilePath))
+        return false;
+
+    const SString strFileMd5 = CMD5Hasher::CalculateHexString(strFilePath);
+    for (const char* szName : DXVK_LIBRARY_NAMES)
+    {
+        const SString strStagePath = GetDXVKStageFile(szName);
+        if (FileExists(strStagePath) && CMD5Hasher::CalculateHexString(strStagePath).CompareI(strFileMd5))
+            return true;
+    }
+    return false;
+}
+
+static void RemovePlacedDXVKFiles()
+{
+    const SString strGtaLaunchDir = GetDXVKGtaDir();
+    for (const char* szName : DXVK_LIBRARY_NAMES)
+    {
+        const SString strPath = PathJoin(strGtaLaunchDir, szName);
+        if (FileExists(strPath))
+        {
+            FileDelete(strPath);
+            WriteDebugEvent(SString("DXVK: removed %s from GTA launch directory", *strPath));
+        }
+    }
+}
+
+static void CopyDXVKFileIfNeeded(const SString& strSrc, const SString& strDst)
+{
+    if (!FileExists(strSrc))
+        return;
+    if (FileExists(strDst) && CMD5Hasher::CalculateHexString(strDst).CompareI(CMD5Hasher::CalculateHexString(strSrc)))
+        return;
+    CopyFileW(FromUTF8(strSrc).c_str(), FromUTF8(strDst).c_str(), FALSE);
+}
+
+static bool ProbeD3D9Create(HMODULE hD3d9)
+{
+    using FnDirect3DCreate9 = IDirect3D9*(__stdcall*)(UINT);
+    FnDirect3DCreate9 pfnDirect3DCreate9 = nullptr;
+    if (!SharedUtil::TryGetProcAddress(hD3d9, "Direct3DCreate9", pfnDirect3DCreate9) || !pfnDirect3DCreate9)
+        return false;
+
+    __try
+    {
+        if (IDirect3D9* pD3D9 = pfnDirect3DCreate9(D3D_SDK_VERSION))
+        {
+            pD3D9->Release();
+            return true;
+        }
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+    }
+    return false;
+}
+
+static constexpr int DXVK_NEGATIVE_PROBE_RECHECK_LAUNCHES = 3;
+
+static SString GetDXVKStageFilesId()
+{
+    SString strId;
+    for (const char* szName : DXVK_LIBRARY_NAMES)
+    {
+        const SString strPath = GetDXVKStageFile(szName);
+
+        WIN32_FILE_ATTRIBUTE_DATA fileInfo = {};
+        if (!GetFileAttributesExW(FromUTF8(strPath).c_str(), GetFileExInfoStandard, &fileInfo))
+            return "";
+
+        strId += SString("%u_%u_%u_%u;", fileInfo.nFileSizeLow, fileInfo.nFileSizeHigh, fileInfo.ftLastWriteTime.dwLowDateTime,
+                         fileInfo.ftLastWriteTime.dwHighDateTime);
+    }
+    return strId;
+}
+
+static bool ProbeVulkanSupport(const SString& strStageDir)
+{
+    const SString strStageD3d9 = PathJoin(strStageDir, "d3d9.dll");
+    if (!FileExists(strStageD3d9))
+        return false;
+
+    const SString strFilesId = GetDXVKStageFilesId();
+    if (strFilesId.empty())
+        return false;
+
+    if (GetApplicationSetting("dxvk", "probe_files_id") == strFilesId)
+    {
+        if (GetApplicationSettingInt("dxvk", "vulkan_supported") == 1)
+            return true;
+
+        const int iLaunchesSinceProbe = GetApplicationSettingInt("dxvk", "probe_launches_since_unsupported");
+        if (iLaunchesSinceProbe < DXVK_NEGATIVE_PROBE_RECHECK_LAUNCHES)
+        {
+            SetApplicationSettingInt("dxvk", "probe_launches_since_unsupported", iLaunchesSinceProbe + 1);
+            return false;
+        }
+    }
+
+    const SString strProbeD3d9 = PathJoin(strStageDir, SString("d3d9_probe_%d.dll", GetCurrentProcessId()));
+    if (!CopyFileW(FromUTF8(strStageD3d9).c_str(), FromUTF8(strProbeD3d9).c_str(), FALSE))
+        return false;
+
+    bool bSupported = false;
+    if (HMODULE hD3d9 = LoadLibraryExW(FromUTF8(strProbeD3d9).c_str(), NULL, LOAD_WITH_ALTERED_SEARCH_PATH))
+    {
+        bSupported = ProbeD3D9Create(hD3d9);
+        FreeLibrary(hD3d9);
+    }
+
+    FileDelete(strProbeD3d9);
+
+    SetApplicationSetting("dxvk", "probe_files_id", strFilesId);
+    SetApplicationSettingInt("dxvk", "probe_launches_since_unsupported", bSupported ? 0 : 1);
+
+    return bSupported;
+}
+
+static SString GetCoreConfigFilename()
+{
+    return CalcMTASAPath(PathJoin("mta", "config", "coreconfig.xml"));
+}
+
+bool GetDXVKEnabledSetting()
+{
+    SString strCoreConfig;
+    FileLoad(GetCoreConfigFilename(), strCoreConfig);
+    return strCoreConfig.SplitRight("<dxvk_enabled>").Left(1) == "1";
+}
+
+void SetDXVKEnabledSetting(bool bEnable)
+{
+    const char* szFrom = bEnable ? "<dxvk_enabled>0" : "<dxvk_enabled>1";
+    const char* szTo = bEnable ? "<dxvk_enabled>1" : "<dxvk_enabled>0";
+
+    SString strCoreConfig;
+    if (!FileLoad(GetCoreConfigFilename(), strCoreConfig) || !strCoreConfig.Contains(szFrom))
+        return;
+
+    strCoreConfig = strCoreConfig.Replace(szFrom, szTo);
+    FileSave(GetCoreConfigFilename(), strCoreConfig);
+    WriteDebugEvent(SString("DXVK: set dxvk_enabled=%d in coreconfig.xml", bEnable ? 1 : 0));
+}
+
+static bool IsValidDXVKBinary(const SString& strPath)
+{
+    const uint64 uiFileSize = FileSize(strPath);
+    if (uiFileSize < 1000000)
+        return false;
+
+    SString strDosHeader;
+    if (!FileLoad(strPath, strDosHeader, 0x40) || strDosHeader.length() < 0x40)
+        return false;
+
+    const unsigned char* pDosHeader = reinterpret_cast<const unsigned char*>(strDosHeader.c_str());
+    if (pDosHeader[0] != 'M' || pDosHeader[1] != 'Z')
+        return false;
+
+    const unsigned int uiPe = pDosHeader[0x3C] | (pDosHeader[0x3D] << 8) | (pDosHeader[0x3E] << 16) | (static_cast<unsigned int>(pDosHeader[0x3F]) << 24);
+    if (uiPe == 0 || uiPe >= uiFileSize)
+        return false;
+
+    SString strPeHeader;
+    if (!FileLoad(strPath, strPeHeader, 0x8, static_cast<int>(uiPe)) || strPeHeader.length() < 6)
+        return false;
+
+    const unsigned char* pPeHeader = reinterpret_cast<const unsigned char*>(strPeHeader.c_str());
+    if (pPeHeader[0] != 'P' || pPeHeader[1] != 'E' || pPeHeader[2] != 0 || pPeHeader[3] != 0)
+        return false;
+
+    const unsigned short usMachine = static_cast<unsigned short>(pPeHeader[4] | (pPeHeader[5] << 8));
+    if (usMachine != 0x014C)
+        return false;
+
+    return true;
+}
+
+static SString VerifyDXVKStageFiles()
+{
+    for (const char* szName : DXVK_LIBRARY_NAMES)
+    {
+        const SString strPath = GetDXVKStageFile(szName);
+        if (!FileExists(strPath))
+            return SString("%s is missing from mta\\dxvk", szName);
+        if (!IsValidDXVKBinary(strPath))
+            return SString("%s is missing, corrupted or not a valid 32-bit binary", szName);
+    }
+    return "";
+}
+
+bool ManageDXVK()
+{
+    const bool    bEnable = GetDXVKEnabledSetting();
+    const SString strGtaLaunchDir = GetDXVKGtaDir();
+
+    const SString strVerifyProblem = VerifyDXVKStageFiles();
+    const bool    bFilesOk = strVerifyProblem.empty();
+
+    const bool bVulkanSupported = bFilesOk && ProbeVulkanSupport(GetDXVKStageDir());
+    SetApplicationSetting("dxvk", "vulkan_supported", bVulkanSupported ? "1" : "0");
+    SetApplicationSetting("dxvk", "files_ok", bFilesOk ? "1" : "0");
+
+    if (!bEnable)
+    {
+        RemovePlacedDXVKFiles();
+        return true;
+    }
+
+    if (!bFilesOk)
+    {
+        RemovePlacedDXVKFiles();
+        WriteDebugEvent(SString("DXVK: %s - Vulkan files not usable", *strVerifyProblem));
+        AddReportLog(7210, SString("DXVK: %s - Vulkan files not usable", *strVerifyProblem));
+
+        SetDXVKEnabledSetting(false);
+        AddReportLog(7215, "DXVK: Vulkan auto-disabled (files missing or damaged)");
+        return true;
+    }
+
+    if (!bVulkanSupported)
+    {
+        RemovePlacedDXVKFiles();
+        WriteDebugEvent("DXVK: Vulkan not supported on this system");
+        AddReportLog(7212, "DXVK: Vulkan not supported");
+
+        SetDXVKEnabledSetting(false);
+        AddReportLog(7213, "DXVK: Vulkan auto-disabled (not supported)");
+        return true;
+    }
+
+    for (const char* szName : DXVK_LIBRARY_NAMES)
+    {
+        const SString strGtaPath = PathJoin(strGtaLaunchDir, szName);
+        if (FileExists(strGtaPath) && !IsDXVKBinaryFile(strGtaPath))
+        {
+            FileDelete(strGtaPath);
+            WriteDebugEvent(SString("DXVK: removed foreign %s from GTA launch directory", szName));
+            AddReportLog(7211, SString("DXVK: removed foreign %s from GTA launch directory", szName));
+        }
+    }
+
+    MakeSureDirExists(strGtaLaunchDir);
+    CopyDXVKFileIfNeeded(GetDXVKStageFile("d3d9.dll"), PathJoin(strGtaLaunchDir, "d3d9.dll"));
+    CopyDXVKFileIfNeeded(GetDXVKStageFile("dxgi.dll"), PathJoin(strGtaLaunchDir, "dxgi.dll"));
+
+    for (const char* szName : DXVK_LIBRARY_NAMES)
+    {
+        const SString strGtaPath = PathJoin(strGtaLaunchDir, szName);
+        if (FileExists(strGtaPath))
+        {
+            SetApplicationSetting("diagnostics", SString("%s-dll-last-hash", szName), CMD5Hasher::CalculateHexString(strGtaPath));
+            SetApplicationSetting("diagnostics", SString("%s-dll-not-again", szName), "yes");
+        }
+    }
+
+    WriteDebugEvent("DXVK: Vulkan supported - D3D9 will be translated to Vulkan");
+    return true;
+}

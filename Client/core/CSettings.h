@@ -176,6 +176,7 @@ protected:
     CGUICheckBox*  m_pCheckBoxBlur;
     CGUICheckBox*  m_pCheckBoxCoronaReflections;
     CGUICheckBox*  m_pCheckBoxDynamicPedShadows;
+    CGUICheckBox*  m_pCheckBoxEnableDXVK;
     CGUILabel*     m_pFieldOfViewLabel;
     CGUIScrollBar* m_pFieldOfView;
     CGUILabel*     m_pFieldOfViewValueLabel;
@@ -451,6 +452,7 @@ protected:
     bool OnWindowedClick(CGUIElement* pElement);
     bool OnDPIAwareClick(CGUIElement* pElement);
     bool OnVSyncClick(CGUIElement* pElement);
+    bool OnEnableVulkanClick(CGUIElement* pElement);
     bool OnShowAdvancedSettingDescription(CGUIElement* pElement);
     bool OnHideAdvancedSettingDescription(CGUIElement* pElement);
     bool OnTabChanged(CGUIElement* pElement);
@@ -485,6 +487,8 @@ private:
     void RefreshBorderlessDisplayCalibration();
     void UpdateBorderlessAdjustmentControls();
     void ResetGuiPointers();
+
+    static void EnableVulkanQuestionCallBack(void* userdata, unsigned int uiButton);
 
     unsigned int m_uiCaptureKey;
     bool         m_bCaptureKey;
