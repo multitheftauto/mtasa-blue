@@ -103,19 +103,8 @@ void CClientBuildingManager::DestroyAllForABit()
 
 void CClientBuildingManager::RestoreDestroyed()
 {
-    bool hasInvalidLods = true;
-    while (hasInvalidLods)
-    {
-        hasInvalidLods = false;
-        for (CClientBuilding* building : GetBuildings())
-        {
-            const CClientBuilding* highLodBuilding = building->GetHighLodBuilding();
-            if (highLodBuilding && !highLodBuilding->IsValid())
-                hasInvalidLods = true;
-            else
-                building->RelateDimension(m_usDimension);
-        }
-    }
+    for (CClientBuilding* building : GetBuildings())
+        building->RelateDimension(m_usDimension);
 }
 
 void CClientBuildingManager::RestoreDestroyedSafe()
