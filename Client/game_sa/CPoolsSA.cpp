@@ -774,9 +774,9 @@ DWORD CPoolsSA::GetObjectPoolIndex(std::uint8_t* pInterface)
 uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
 {
     // Search our pools for a match
-    for (uint i = 0; i < m_pedPool.ulCount; i++)
+    for (const auto& slot : m_pedPool.arrayOfClientEntities)
     {
-        CEntitySA* pEntitySA = m_pedPool.arrayOfClientEntities[i].pEntity;
+        CEntitySA* pEntitySA = slot.pEntity;
         if (pEntitySA)
         {
             if (pEntitySA->GetRpClump() == pRpClump)
@@ -786,9 +786,9 @@ uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
         }
     }
 
-    for (uint i = 0; i < m_vehiclePool.ulCount; i++)
+    for (const auto& slot : m_vehiclePool.arrayOfClientEntities)
     {
-        CEntitySA* pEntitySA = m_vehiclePool.arrayOfClientEntities[i].pEntity;
+        CEntitySA* pEntitySA = slot.pEntity;
         if (pEntitySA)
         {
             if (pEntitySA->GetRpClump() == pRpClump)
@@ -798,9 +798,9 @@ uint CPoolsSA::GetModelIdFromClump(RpClump* pRpClump)
         }
     }
 
-    for (uint i = 0; i < m_objectPool.ulCount; i++)
+    for (const auto& slot : m_objectPool.arrayOfClientEntities)
     {
-        CEntitySA* pEntitySA = m_objectPool.arrayOfClientEntities[i].pEntity;
+        CEntitySA* pEntitySA = slot.pEntity;
         if (pEntitySA)
         {
             if (pEntitySA->GetRpClump() == pRpClump)
