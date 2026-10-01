@@ -807,10 +807,23 @@ void CRenderWareSA::GetModelTextureNames(std::vector<SString>& outNameList, usho
     bool bLoadedModel = false;
     if (!pTXD)
     {
-        // Try model load
-        bLoadedModel = true;
-        pGame->GetModelInfo(usModelId)->Request(BLOCKING, "CRenderWareSA::GetModelTextureNames");
-        pTXD = CTxdStore_GetTxd(usTxdId);
+        CModelInfo* pModelInfo = pGame->GetModelInfo(usModelId);
+        CModelInfo* pTxdModelInfo = pGame->GetModelInfo(pGame->GetBaseIDforTXD() + usTxdId);
+        if (pTxdModelInfo && pTxdModelInfo->IsAllocatedInArchive())
+        {
+            if (pModelInfo->IsLoaded())
+            {
+                // Load only the txd if the model is in use
+                pTxdModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTextureNames");
+            }
+            else
+            {
+                // Try model load
+                bLoadedModel = true;
+                pModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTextureNames");
+            }
+            pTXD = CTxdStore_GetTxd(usTxdId);
+        }
     }
 
     std::vector<RwTexture*> textureList;
@@ -848,10 +861,23 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
     bool bLoadedModel = false;
     if (!pTXD)
     {
-        // Try model load
-        bLoadedModel = true;
-        pGame->GetModelInfo(usModelId)->Request(BLOCKING, "CRenderWareSA::GetModelTextures");
-        pTXD = CTxdStore_GetTxd(usTxdId);
+        CModelInfo* pModelInfo = pGame->GetModelInfo(usModelId);
+        CModelInfo* pTxdModelInfo = pGame->GetModelInfo(pGame->GetBaseIDforTXD() + usTxdId);
+        if (pTxdModelInfo && pTxdModelInfo->IsAllocatedInArchive())
+        {
+            if (pModelInfo->IsLoaded())
+            {
+                // Load only the txd if the model is in use
+                pTxdModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTextures");
+            }
+            else
+            {
+                // Try model load
+                bLoadedModel = true;
+                pModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTextures");
+            }
+            pTXD = CTxdStore_GetTxd(usTxdId);
+        }
     }
 
     std::vector<RwTexture*> rwTextureList;
