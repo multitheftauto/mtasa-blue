@@ -49,6 +49,22 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
 
         if (!pTxd)
         {
+            CModelInfo* pTxdModelInfo = pGame->GetModelInfo(pGame->GetBaseIDforTXD() + usTxdId);
+            if (!pTxdModelInfo || !pTxdModelInfo->IsAllocatedInArchive())
+                return NULL;
+
+            // Load only the txd if the model is in use
+            if (pModelInfo->IsLoaded())
+            {
+                pTxdModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTexturesInfo");
+                pTxd = CTxdStore_GetTxd(usTxdId);
+                if (!pTxd)
+                    return NULL;
+            }
+        }
+
+        if (!pTxd)
+        {
             pModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTexturesInfo");
             CTxdStore_AddRef(usTxdId);
             ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
