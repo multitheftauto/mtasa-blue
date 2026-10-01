@@ -43,7 +43,7 @@ CElement::CElement(CElement* pParent)
     m_pElementGroup = NULL;
     m_bCallPropagationEnabled = true;
 
-    m_iType = CElement::UNKNOWN;
+    m_iType = ElementType::UNKNOWN;
     m_strName = "";
     m_strTypeName = "unknown";
     m_bIsBeingDeleted = false;
@@ -143,15 +143,15 @@ bool CElement::IsCloneable()
     auto iType = GetType();
     switch (iType)
     {
-        case CElement::DUMMY:
-        case CElement::VEHICLE:
-        case CElement::OBJECT:
-        case CElement::MARKER:
-        case CElement::BLIP:
-        case CElement::PICKUP:
-        case CElement::RADAR_AREA:
-        case CElement::PATH_NODE_UNUSED:
-        case CElement::COLSHAPE:
+        case ElementType::DUMMY:
+        case ElementType::VEHICLE:
+        case ElementType::OBJECT:
+        case ElementType::MARKER:
+        case ElementType::BLIP:
+        case ElementType::PICKUP:
+        case ElementType::RADAR_AREA:
+        case ElementType::PATH_NODE:
+        case ElementType::COLSHAPE:
             return true;
         default:
             return false;
@@ -186,7 +186,7 @@ uint CElement::GetTypeHashFromString(const SString& strTypeName)
 
     // Custom types use name hash.  TODO: Make it use a unique index instead
     uint uiTypeHash = HashString(strTypeName);
-    uiTypeHash = (uiTypeHash % 0xFFFFFF00) + CElement::UNKNOWN + 1;
+    uiTypeHash = (uiTypeHash % 0xFFFFFF00) + ElementType::UNKNOWN + 1;
     return uiTypeHash;
 }
 
@@ -1128,13 +1128,13 @@ CClient* CElement::GetClient()
     CClient* pClient = NULL;
     switch (GetType())
     {
-        case CElement::PLAYER:
+        case ElementType::PLAYER:
         {
             CPlayer* pPlayer = static_cast<CPlayer*>(this);
             pClient = static_cast<CClient*>(pPlayer);
             break;
         }
-        case CElement::CONSOLE:
+        case ElementType::CONSOLE:
         {
             CConsoleClient* pConsoleClient = static_cast<CConsoleClient*>(this);
             pClient = static_cast<CClient*>(pConsoleClient);
@@ -1216,14 +1216,14 @@ bool CElement::IsAttachable()
 {
     switch (GetType())
     {
-        case CElement::PED:
-        case CElement::PLAYER:
-        case CElement::BLIP:
-        case CElement::VEHICLE:
-        case CElement::OBJECT:
-        case CElement::MARKER:
-        case CElement::PICKUP:
-        case CElement::COLSHAPE:
+        case ElementType::PED:
+        case ElementType::PLAYER:
+        case ElementType::BLIP:
+        case ElementType::VEHICLE:
+        case ElementType::OBJECT:
+        case ElementType::MARKER:
+        case ElementType::PICKUP:
+        case ElementType::COLSHAPE:
         {
             return true;
             break;
@@ -1238,14 +1238,14 @@ bool CElement::IsAttachToable()
 {
     switch (GetType())
     {
-        case CElement::PED:
-        case CElement::PLAYER:
-        case CElement::BLIP:
-        case CElement::VEHICLE:
-        case CElement::OBJECT:
-        case CElement::MARKER:
-        case CElement::PICKUP:
-        case CElement::COLSHAPE:
+        case ElementType::PED:
+        case ElementType::PLAYER:
+        case ElementType::BLIP:
+        case ElementType::VEHICLE:
+        case ElementType::OBJECT:
+        case ElementType::MARKER:
+        case ElementType::PICKUP:
+        case ElementType::COLSHAPE:
         {
             return true;
             break;
@@ -1345,7 +1345,7 @@ bool CElement::IsFromRoot(CElement* pEntity)
     }
     else
     {
-        if (pEntity->GetType() == CElement::ROOT)
+        if (pEntity->GetType() == ElementType::ROOT)
             return true;
     }
     return CElement::IsFromRoot(pEntity->GetParentEntity());
@@ -1380,7 +1380,7 @@ void CElement::RemoveEntityFromRoot(unsigned int uiTypeHash, CElement* pEntity)
     {
         CFromRootListType& listEntities = find->second;
         listEntities.remove(pEntity);
-        if (uiTypeHash > CElement::UNKNOWN && listEntities.size() == 0)
+        if (uiTypeHash > ElementType::UNKNOWN && listEntities.size() == 0)
             ms_mapEntitiesFromRoot.erase(find);
     }
 

@@ -18,7 +18,7 @@ CWater::CWater(CWaterManager* pWaterManager, CElement* pParent, EWaterType water
 {
     m_pWaterManager = pWaterManager;
 
-    m_iType = CElement::WATER;
+    m_iType = ElementType::WATER;
     SetTypeName("water");
     m_WaterType = waterType;
 

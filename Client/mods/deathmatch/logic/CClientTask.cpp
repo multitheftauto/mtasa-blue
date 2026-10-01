@@ -113,7 +113,7 @@ bool CClientTask::ReadElements(lua_State* luaVM, int iTableIndex, bool bClear)
 
         // Grab the element and check he's a player/ped
         CClientEntity* pEntity = CElementIDs::GetElement(ID);
-        if (pEntity && pEntity->GetType() == CCLIENTPLAYER)
+        if (pEntity && pEntity->GetType() == ElementType::PLAYER)
         {
             // If we cleared, just add it
             if (bClear)

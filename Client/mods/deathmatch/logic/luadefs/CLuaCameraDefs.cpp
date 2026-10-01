@@ -305,7 +305,7 @@ int CLuaCameraDefs::SetCameraTarget(lua_State* luaVM)
         CClientEntity* pTarget;
         argStream.ReadUserData(pTarget);
 
-        if (pTarget->GetType() != CCLIENTPLAYER)
+        if (pTarget->GetType() != ElementType::PLAYER)
             MinClientReqCheck(argStream, MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player");
 
         if (!argStream.HasErrors())

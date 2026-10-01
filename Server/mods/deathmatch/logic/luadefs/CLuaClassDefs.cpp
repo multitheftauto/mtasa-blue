@@ -315,35 +315,35 @@ const char* CLuaClassDefs::GetElementClass(CElement* pElement)
     assert(pElement);
     switch (pElement->GetType())
     {
-        case CElement::PLAYER:
+        case ElementType::PLAYER:
             return "Player";
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
             return "Vehicle";
-        case CElement::BLIP:
+        case ElementType::BLIP:
             return "Blip";
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
             return "Object";
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
             return "Building";
-        case CElement::PICKUP:
+        case ElementType::PICKUP:
             return "Pickup";
-        case CElement::RADAR_AREA:
+        case ElementType::RADAR_AREA:
             return "RadarArea";
-        case CElement::MARKER:
+        case ElementType::MARKER:
             return "Marker";
-        case CElement::TEAM:
+        case ElementType::TEAM:
             return "Team";
-        case CElement::PED:
+        case ElementType::PED:
             return "Ped";
-        case CElement::COLSHAPE:
+        case ElementType::COLSHAPE:
             return "ColShape";
-        case CElement::SCRIPTFILE:
+        case ElementType::SCRIPTFILE:
             return "File";
-        case CElement::WATER:
+        case ElementType::WATER:
             return "Water";
-        case CElement::WEAPON:
+        case ElementType::WEAPON:
             return "Weapon";
-        case CElement::DATABASE_CONNECTION:
+        case ElementType::DATABASE_CONNECTION:
             return "Connection";
         default:
             break;

@@ -671,7 +671,7 @@ void CClientEntity::InternalAttachTo(CClientEntity* pEntity)
         {
             switch (pEntity->GetType())
             {
-                case CCLIENTVEHICLE:
+                case ElementType::VEHICLE:
                 {
                     CVehicle* pGameVehicle = static_cast<CClientVehicle*>(pEntity)->GetGameVehicle();
                     if (pGameVehicle)
@@ -680,8 +680,8 @@ void CClientEntity::InternalAttachTo(CClientEntity* pEntity)
                     }
                     break;
                 }
-                case CCLIENTPED:
-                case CCLIENTPLAYER:
+                case ElementType::PED:
+                case ElementType::PLAYER:
                 {
                     CPlayerPed* pGamePed = static_cast<CClientPed*>(pEntity)->GetGamePlayer();
                     if (pGamePed)
@@ -690,8 +690,8 @@ void CClientEntity::InternalAttachTo(CClientEntity* pEntity)
                     }
                     break;
                 }
-                case CCLIENTOBJECT:
-                case CCLIENTWEAPON:
+                case ElementType::OBJECT:
+                case ElementType::WEAPON:
                 {
                     CObject* pGameObject = static_cast<CClientObject*>(pEntity)->GetGameObject();
                     if (pGameObject)
@@ -700,7 +700,7 @@ void CClientEntity::InternalAttachTo(CClientEntity* pEntity)
                     }
                     break;
                 }
-                case CCLIENTPICKUP:
+                case ElementType::PICKUP:
                 {
                     CObject* pGameObject = static_cast<CClientPickup*>(pEntity)->GetGameObject();
                     if (pGameObject)
@@ -1138,17 +1138,17 @@ bool CClientEntity::IsAttachable()
 {
     switch (GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
-        case CCLIENTRADARMARKER:
-        case CCLIENTVEHICLE:
-        case CCLIENTOBJECT:
-        case CCLIENTMARKER:
-        case CCLIENTPICKUP:
-        case CCLIENTSOUND:
-        case CCLIENTCOLSHAPE:
-        case CCLIENTWEAPON:
-        case CCLIENTPOINTLIGHTS:
+        case ElementType::PED:
+        case ElementType::PLAYER:
+        case ElementType::BLIP:
+        case ElementType::VEHICLE:
+        case ElementType::OBJECT:
+        case ElementType::MARKER:
+        case ElementType::PICKUP:
+        case ElementType::SOUND:
+        case ElementType::COLSHAPE:
+        case ElementType::WEAPON:
+        case ElementType::POINTLIGHTS:
         {
             return true;
             break;
@@ -1163,18 +1163,18 @@ bool CClientEntity::IsAttachToable()
 {
     switch (GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
-        case CCLIENTRADARMARKER:
-        case CCLIENTVEHICLE:
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
-        case CCLIENTMARKER:
-        case CCLIENTPICKUP:
-        case CCLIENTSOUND:
-        case CCLIENTCOLSHAPE:
-        case CCLIENTCAMERA:
-        case CCLIENTPOINTLIGHTS:
+        case ElementType::PED:
+        case ElementType::PLAYER:
+        case ElementType::BLIP:
+        case ElementType::VEHICLE:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
+        case ElementType::MARKER:
+        case ElementType::PICKUP:
+        case ElementType::SOUND:
+        case ElementType::COLSHAPE:
+        case ElementType::CAMERA:
+        case ElementType::POINTLIGHTS:
         {
             return true;
             break;
@@ -1218,33 +1218,33 @@ void CClientEntity::DoAttaching()
 unsigned int CClientEntity::GetTypeID(const char* szTypeName)
 {
     if (strcmp(szTypeName, "dummy") == 0)
-        return CCLIENTDUMMY;
+        return ElementType::DUMMY;
     else if (strcmp(szTypeName, "ped") == 0)
-        return CCLIENTPED;
+        return ElementType::PED;
     else if (strcmp(szTypeName, "player") == 0)
-        return CCLIENTPLAYER;
+        return ElementType::PLAYER;
     else if (strcmp(szTypeName, "projectile") == 0)
-        return CCLIENTPROJECTILE;
+        return ElementType::PROJECTILE;
     else if (strcmp(szTypeName, "vehicle") == 0)
-        return CCLIENTVEHICLE;
+        return ElementType::VEHICLE;
     else if (strcmp(szTypeName, "object") == 0)
-        return CCLIENTOBJECT;
+        return ElementType::OBJECT;
     else if (strcmp(szTypeName, "marker") == 0)
-        return CCLIENTMARKER;
+        return ElementType::MARKER;
     else if (strcmp(szTypeName, "blip") == 0)
-        return CCLIENTRADARMARKER;
+        return ElementType::BLIP;
     else if (strcmp(szTypeName, "pickup") == 0)
-        return CCLIENTPICKUP;
+        return ElementType::PICKUP;
     else if (strcmp(szTypeName, "radararea") == 0)
-        return CCLIENTRADARAREA;
+        return ElementType::RADAR_AREA;
     else if (strcmp(szTypeName, "sound") == 0)
-        return CCLIENTSOUND;
+        return ElementType::SOUND;
     else if (strcmp(szTypeName, "light") == 0)
-        return CCLIENTPOINTLIGHTS;
+        return ElementType::POINTLIGHTS;
     else if (strcmp(szTypeName, "svg") == 0)
-        return CCLIENTVECTORGRAPHIC;
+        return ElementType::VECTORGRAPHIC;
     else
-        return CCLIENTUNKNOWN;
+        return ElementType::UNKNOWN;
 }
 
 void CClientEntity::DeleteClientChildren()
