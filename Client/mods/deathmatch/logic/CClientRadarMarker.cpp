@@ -29,6 +29,9 @@ CClientRadarMarker::CClientRadarMarker(CClientManager* pManager, ElementID ID, s
     m_Color = SColorRGBA(0, 0, 255, 255);
     m_sOrdering = sOrdering;
     m_usVisibleDistance = usVisibleDistance;
+    // Long range (edge-clamped) by default to match previous behaviour;
+    // setBlipShortRange opts a blip into radar-zoom clipping instead.
+    m_bShortRange = false;
 
     // Add us to the radar marker manager list
     m_pRadarMarkerManager->AddToList(this);
@@ -68,8 +71,9 @@ void CClientRadarMarker::DoPulse()
         }
     }
 
-    // Are we in a visible distance?
-    if (IsInVisibleDistance())
+    // Are we in a visible distance? Short-range markers must additionally be inside the
+    // radar's zoom circle, so they are clipped by it instead of being clamped to its edge.
+    if (IsInVisibleDistance() && (!m_bShortRange || IsWithinRadarDrawRange()))
     {
         // Are we not created?
         if (!m_pMarker)
@@ -207,7 +211,7 @@ void CClientRadarMarker::CreateMarker()
     // Not already got a marker?
     if (!m_pMarker)
     {
-        if (IsInVisibleDistance())
+        if (IsInVisibleDistance() && (!m_bShortRange || IsWithinRadarDrawRange()))
         {
             // Create the marker
             m_pMarker = g_pGame->GetRadar()->CreateMarker(&m_vecPosition);
@@ -227,6 +231,7 @@ void CClientRadarMarker::CreateMarker()
                 m_pMarker->SetScale(m_usScale);
                 m_pMarker->SetColor(color);
                 m_pMarker->SetSprite(static_cast<MarkerSprite::Enum>(m_ulSprite));
+                m_pMarker->SetShortRange(m_bShortRange);
             }
         }
     }
@@ -272,8 +277,28 @@ void CClientRadarMarker::SetOrdering(short sOrdering)
     }
 }
 
+void CClientRadarMarker::SetShortRange(bool bShortRange)
+{
+    m_bShortRange = bShortRange;
+    // The game marker may not exist yet (out of visible distance or another
+    // dimension); CreateMarker applies the flag again on creation.
+    if (m_pMarker)
+    {
+        m_pMarker->SetShortRange(bShortRange);
+    }
+}
+
 bool CClientRadarMarker::IsInVisibleDistance()
 {
     float fDistance = DistanceBetweenPoints3D(m_vecPosition, m_pRadarMarkerManager->m_vecCameraPosition);
     return (fDistance <= m_usVisibleDistance);
+}
+
+// The game applies the short-range rule itself when drawing sprite traces, but ignores the flag
+// for square coord blips and always clamps them to the radar's edge. To clip squares as well,
+// the game marker is only kept alive while the blip is inside this region. The full-screen map
+// (CPlayerMap) draws CClientRadarMarker entries directly, so it is unaffected by this gate.
+bool CClientRadarMarker::IsWithinRadarDrawRange() const
+{
+    return g_pGame->GetRadar()->IsPointWithinRadarCircle(&m_vecPosition);
 }

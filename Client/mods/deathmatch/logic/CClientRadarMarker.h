@@ -60,7 +60,13 @@ public:
     unsigned short GetVisibleDistance() const noexcept { return m_usVisibleDistance; }
     void           SetVisibleDistance(unsigned short usVisibleDistance) { m_usVisibleDistance = usVisibleDistance; }
 
+    bool IsShortRange() const noexcept { return m_bShortRange; }
+    void SetShortRange(bool bShortRange);
+
     bool IsInVisibleDistance();
+
+    // Short-range markers must be inside this region for their game marker to exist
+    bool IsWithinRadarDrawRange() const;
 
 private:
     bool Create();
@@ -81,4 +87,5 @@ private:
     bool           m_bIsVisible;
     short          m_sOrdering;
     unsigned short m_usVisibleDistance;
+    bool           m_bShortRange;
 };
