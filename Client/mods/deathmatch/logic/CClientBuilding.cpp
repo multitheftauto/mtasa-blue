@@ -238,6 +238,9 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
         if (m_pLowBuilding)
         {
             m_pLowBuilding->SetHighLodBuilding();
+
+            if (CBuilding* pLodEntity = m_pLowBuilding->GetBuildingEntity())
+                pLodEntity->SetUsesCollision(m_pLowBuilding->GetUsesCollision());
         }
 
         if (m_pBuilding)
