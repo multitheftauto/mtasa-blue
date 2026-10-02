@@ -24,6 +24,7 @@
 #include "../CBuildingManager.h"
 #include "../CPickupManager.h"
 #include "../CPlayerManager.h"
+#include "../CPedManager.h"
 #include "../CRadarAreaManager.h"
 #include "../CRegisteredCommands.h"
 #include "../CResourceManager.h"
@@ -59,6 +60,7 @@ protected:
     static CBuildingManager*          m_pBuildingManager;
     static CPickupManager*            m_pPickupManager;
     static CPlayerManager*            m_pPlayerManager;
+    static CPedManager*               m_pPedManager;
     static CRadarAreaManager*         m_pRadarAreaManager;
     static CRegisteredCommands*       m_pRegisteredCommands;
     static CElement*                  m_pRootElement;
