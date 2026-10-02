@@ -42,6 +42,13 @@ struct SDffTexRef
     uint       uiId;
 };
 
+struct SSearchLightSpotTexture
+{
+    RwTexture*         pTexture;
+    CClientEntityBase* pClientEntity;
+    int                iTypeMask;
+};
+
 class CRenderWareSA : public CRenderWare
 {
 public:
@@ -120,6 +127,9 @@ public:
     static void        GetTxdTextures(std::vector<RwTexture*>& outTextureList, RwTexDictionary* pTXD);
     const char*        GetTextureName(CD3DDUMMY* pD3DData);
     void               SetRenderingClientEntity(CClientEntityBase* pClientEntity, ushort usModelId, int iTypeMask);
+    RwTexture*         GetSearchLightSpotTexture();
+    RwTexture*         GetRenderingSearchLightSpotTexture();
+    bool               SetRenderingSearchLightSpot(RwTexture* pTexture);
     SShaderItemLayers* GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData);
     CD3DDUMMY*         ResolveD3DData(CD3DDUMMY* pD3DData);
     void               AppendAdditiveMatch(CSHADERDUMMY* pShaderData, CClientEntityBase* pClientEntity, const char* strTextureNameMatch, float fShaderPriority,
@@ -194,8 +204,8 @@ public:
     CElapsedTime                                    m_GTAVertexShadersDisabledTimer;
     bool                                            m_bGTAVertexShadersEnabled;
     std::set<RwTexture*>                            m_SpecialTextures;
+    std::vector<SSearchLightSpotTexture>            m_SearchLightSpotTextures;
     static int                                      ms_iRenderingType;
     static CD3DDUMMY*                               ms_pNoTextureD3DData;  // Fake texture used for draws without a texture
     static RwTexture*                               ms_pSearchLightSpotTexture;
-    RwTexture*                                      GetSearchLightSpotTexture();
 };

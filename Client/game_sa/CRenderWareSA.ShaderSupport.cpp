@@ -604,6 +604,77 @@ RwTexture* CRenderWareSA::GetSearchLightSpotTexture()
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::GetRenderingSearchLightSpotTexture
+//
+// Give the spot of the element being rendered a texture of its own if its shaders differ
+//
+////////////////////////////////////////////////////////////////
+RwTexture* CRenderWareSA::GetRenderingSearchLightSpotTexture()
+{
+    RwTexture* pSpotTexture = GetSearchLightSpotTexture();
+    if (!pSpotTexture || !m_pRenderingClientEntity)
+        return pSpotTexture;
+
+    STexInfo* pTexInfo = MapFindRef(m_D3DDataTexInfoMap, reinterpret_cast<CD3DDUMMY*>(pSpotTexture->raster->renderResource));
+    if (!pTexInfo)
+        return pSpotTexture;
+
+    const SShaderItemLayers  anyEntity = m_pMatchChannelManager->GetShaderForTexAndEntity(pTexInfo, nullptr, m_iRenderingEntityType)->output;
+    const SShaderItemLayers& thisEntity = m_pMatchChannelManager->GetShaderForTexAndEntity(pTexInfo, m_pRenderingClientEntity, m_iRenderingEntityType)->output;
+    if (thisEntity.pBase == anyEntity.pBase && thisEntity.layerList == anyEntity.layerList)
+        return pSpotTexture;
+
+    SSearchLightSpotTexture* pSpot = nullptr;
+    for (SSearchLightSpotTexture& spot : m_SearchLightSpotTextures)
+    {
+        if (spot.pClientEntity == m_pRenderingClientEntity)
+        {
+            pSpot = &spot;
+            break;
+        }
+        if (!spot.pClientEntity && !pSpot)
+            pSpot = &spot;
+    }
+
+    if (!pSpot)
+    {
+        // Never destroyed: RwTextureDestroy would also destroy the shared raster
+        RwTexture* pTexture = RwTextureCreate(pSpotTexture->raster);
+        if (!pTexture)
+            return pSpotTexture;
+        strncpy(pTexture->name, FAKE_NAME_SEARCHLIGHT_SPOT, RW_TEXTURE_NAME_LENGTH - 1);
+        pTexture->flags = pSpotTexture->flags;
+        m_SearchLightSpotTextures.push_back({pTexture});
+        pSpot = &m_SearchLightSpotTextures.back();
+    }
+
+    pSpot->pClientEntity = m_pRenderingClientEntity;
+    pSpot->iTypeMask = m_iRenderingEntityType;
+    return pSpot->pTexture;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::SetRenderingSearchLightSpot
+//
+// Tag the element of a searchlight spot while CShadows draws it
+//
+////////////////////////////////////////////////////////////////
+bool CRenderWareSA::SetRenderingSearchLightSpot(RwTexture* pTexture)
+{
+    for (const SSearchLightSpotTexture& spot : m_SearchLightSpotTextures)
+    {
+        if (spot.pTexture == pTexture && spot.pClientEntity)
+        {
+            SetRenderingClientEntity(spot.pClientEntity, 0xFFFF, spot.iTypeMask);
+            return true;
+        }
+    }
+    return false;
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::ResolveD3DData
 //
 // Draws without a texture are keyed by a fake texture ('unnamed', or 'searchlight' for
@@ -733,6 +804,11 @@ void CRenderWareSA::RemoveClientEntityRefs(CClientEntityBase* pClientEntity)
 {
     TIMING_CHECKPOINT("+RemoveEntityRefs");
     m_pMatchChannelManager->RemoveClientEntityRefs(pClientEntity);
+    for (SSearchLightSpotTexture& spot : m_SearchLightSpotTextures)
+    {
+        if (spot.pClientEntity == pClientEntity)
+            spot.pClientEntity = nullptr;
+    }
     TIMING_CHECKPOINT("-RemoveEntityRefs");
 }
 
@@ -1217,6 +1293,71 @@ static void __declspec(naked) HOOK_RwIm2DRenderPrimitive()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CShadows_RenderStoredShadows_Shadow / CShadows_RenderStoredShadows_NextShadow
+//
+// Tag the element of a searchlight spot while CShadows draws it
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static bool bRenderingSearchLightSpot = false;
+
+__declspec(noinline) void OnMY_CShadows_RenderStoredShadows_Shadow(RwTexture* pTexture)
+{
+    bRenderingSearchLightSpot = pGame->GetRenderWareSA()->SetRenderingSearchLightSpot(pTexture);
+}
+
+__declspec(noinline) void OnMY_CShadows_RenderStoredShadows_NextShadow()
+{
+    if (bRenderingSearchLightSpot)
+        pGame->GetRenderWareSA()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
+    bRenderingSearchLightSpot = false;
+}
+
+// Hook info
+#define HOOKPOS_CShadows_RenderStoredShadows_Shadow  0x070AA10
+#define HOOKSIZE_CShadows_RenderStoredShadows_Shadow 6
+DWORD                         RETURN_CShadows_RenderStoredShadows_Shadow = 0x070AA16;
+static void __declspec(naked) HOOK_CShadows_RenderStoredShadows_Shadow()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    dword ptr [ebp+0x0C40454]
+        call    OnMY_CShadows_RenderStoredShadows_Shadow
+        add     esp, 4*1
+        popad
+
+        mov     al, byte ptr [ebp+0x0C40462]
+        jmp     RETURN_CShadows_RenderStoredShadows_Shadow
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_CShadows_RenderStoredShadows_NextShadow  0x070B6BD
+#define HOOKSIZE_CShadows_RenderStoredShadows_NextShadow 11
+DWORD                         RETURN_CShadows_RenderStoredShadows_NextShadow = 0x070B6C8;
+static void __declspec(naked) HOOK_CShadows_RenderStoredShadows_NextShadow()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        call    OnMY_CShadows_RenderStoredShadows_NextShadow
+        popad
+
+        mov     edi, dword ptr [esp+0x64]
+        movzx   ecx, word ptr ds:[0C403DCh]
+        jmp     RETURN_CShadows_RenderStoredShadows_NextShadow
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1229,4 +1370,6 @@ void CRenderWareSA::StaticSetHooks()
     EZHookInstall(RwIm3DRenderPrimitive);
     EZHookInstall(RwIm2DRenderIndexedPrimitive);
     EZHookInstall(RwIm2DRenderPrimitive);
+    EZHookInstall(CShadows_RenderStoredShadows_Shadow);
+    EZHookInstall(CShadows_RenderStoredShadows_NextShadow);
 }

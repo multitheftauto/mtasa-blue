@@ -125,7 +125,7 @@ static void CSearchLight_RenderShadow(char type, void* texture, CVector* pos, fl
 
     // The game draws the spot with the texture of the street lamp light pools, so a shader could not address
     // one without the other. Give the searchlights a texture of their own.
-    if (RwTexture* pSpotTexture = pGame->GetRenderWareSA()->GetSearchLightSpotTexture())
+    if (RwTexture* pSpotTexture = pGame->GetRenderWareSA()->GetRenderingSearchLightSpotTexture())
         texture = pSpotTexture;
 
     // CShadows::StoreShadowToBeRendered
