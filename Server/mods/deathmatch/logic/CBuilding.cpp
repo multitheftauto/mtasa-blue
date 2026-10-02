@@ -202,6 +202,12 @@ bool CBuilding::SetLowLodBuilding(CBuilding* pNewLowLodBuilding) noexcept
     }
     else
     {
+        for (CBuilding* pBuilding = pNewLowLodBuilding; pBuilding; pBuilding = pBuilding->GetLowLodElement())
+        {
+            if (pBuilding == this)
+                return false;
+        }
+
         // Remove any previous link
         SetLowLodBuilding(nullptr);
 
