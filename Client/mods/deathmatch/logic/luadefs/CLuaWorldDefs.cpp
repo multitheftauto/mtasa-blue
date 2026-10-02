@@ -14,6 +14,8 @@
 #include <game/CCoronas.h>
 #include <game/CClock.h>
 #include "lua/CLuaFunctionParser.h"
+#include <game/CPools.h>
+#include <game_sa/CPoolsSA.h>
 
 void CLuaWorldDefs::LoadFunctions()
 {
@@ -23,6 +25,7 @@ void CLuaWorldDefs::LoadFunctions()
         {"getColorFilter", ArgumentParser<GetColorFilter>},
         {"getRoofPosition", GetRoofPosition},
         {"getGroundPosition", GetGroundPosition},
+        {"getStreamedWorldModels", ArgumentParser<GetStreamedWorldModels>},
         {"processLineAgainstMesh", ArgumentParser<ProcessLineAgainstMesh>},
         {"processLineOfSight", ProcessLineOfSight},
         {"getWorldFromScreenPosition", GetWorldFromScreenPosition},
@@ -250,6 +253,136 @@ int CLuaWorldDefs::GetRoofPosition(lua_State* luaVM)
     // Return false
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+namespace
+{
+    constexpr float RADIANS_TO_DEGREES = 180.0f / 3.14159265358979323846f;
+
+    void PushNumberField(CLuaArguments& model, const char* key, double value)
+    {
+        model.PushString(key);
+        model.PushNumber(value);
+    }
+
+    void PushBoolField(CLuaArguments& model, const char* key, bool value)
+    {
+        model.PushString(key);
+        model.PushBoolean(value);
+    }
+
+    void PushStringField(CLuaArguments& model, const char* key, const char* value)
+    {
+        model.PushString(key);
+        model.PushString(value);
+    }
+
+    CVector GetZxyRotation(const CEntitySAInterface& entity)
+    {
+        if (!entity.matrix)
+        {
+            return CVector(0.0f, 0.0f, entity.m_transform.m_heading);
+        }
+
+        CVector right = entity.matrix->vRight;
+        CVector front = entity.matrix->vFront;
+        CVector up = entity.matrix->vUp;
+
+        right.Normalize();
+        front.Normalize();
+        up.Normalize();
+
+        return CVector(std::asin(std::clamp(front.fZ, -1.0f, 1.0f)), std::atan2(-right.fZ, up.fZ), std::atan2(-front.fX, front.fY));
+    }
+
+    template <typename PoolInterface>
+    void AppendPoolModels(CPoolSAInterface<PoolInterface>* pool, const char* typeName, const CVector& referencePosition, float maxDistanceSquared,
+                          std::vector<CLuaArguments>& outModels)
+    {
+        if (!pool || !pool->m_pObjects || !pool->m_byteMap)
+            return;
+
+        auto* pools = g_pGame->GetPools();
+        if (!pools)
+            return;
+
+        for (std::int32_t index = 0; index < pool->m_nSize; index++)
+        {
+            if (pool->IsEmpty(index))
+                continue;
+
+            auto* entity = pool->GetObject(index);
+            if (!entity)
+                continue;
+
+            if (pools->GetClientEntity(reinterpret_cast<DWORD*>(entity)))
+                continue;
+
+            const CVector position = entity->HasMatrix() ? entity->matrix->vPos : entity->m_transform.m_translate;
+
+            const float offsetX = position.fX - referencePosition.fX;
+            const float offsetY = position.fY - referencePosition.fY;
+            const float offsetZ = position.fZ - referencePosition.fZ;
+            if (offsetX * offsetX + offsetY * offsetY + offsetZ * offsetZ > maxDistanceSquared)
+                continue;
+
+            const CVector rotation = GetZxyRotation(*entity);
+
+            outModels.emplace_back();
+            CLuaArguments& model = outModels.back();
+            PushStringField(model, "type", typeName);
+            PushNumberField(model, "model", entity->m_nModelIndex);
+            PushNumberField(model, "x", position.fX);
+            PushNumberField(model, "y", position.fY);
+            PushNumberField(model, "z", position.fZ);
+            PushNumberField(model, "rx", rotation.fX * RADIANS_TO_DEGREES);
+            PushNumberField(model, "ry", rotation.fY * RADIANS_TO_DEGREES);
+            PushNumberField(model, "rz", rotation.fZ * RADIANS_TO_DEGREES);
+            PushNumberField(model, "interior", entity->m_areaCode);
+            PushNumberField(model, "iplIndex", entity->m_iplIndex);
+            PushNumberField(model, "lodModel", entity->m_pLod ? entity->m_pLod->m_nModelIndex : 0);
+            PushBoolField(model, "hasLod", entity->m_pLod != nullptr);
+            PushBoolField(model, "collisions", entity->bUsesCollision);
+            PushBoolField(model, "isStatic", entity->bIsStatic);
+            PushBoolField(model, "visible", entity->bIsVisible);
+
+            if constexpr (std::is_same_v<PoolInterface, CObjectSAInterface>)
+            {
+                const CObjectSAInterface* object = entity;
+                PushNumberField(model, "health", object->fHealth);
+                PushNumberField(model, "scale", object->fScale);
+            }
+        }
+    }
+}
+
+std::vector<CLuaArguments> CLuaWorldDefs::GetStreamedWorldModels(std::optional<float> maxDistance)
+{
+    if (maxDistance.has_value() && *maxDistance < 0.0f)
+        throw LuaFunctionError("The argument maxDistance cannot have a negative value.");
+
+    std::vector<CLuaArguments> models;
+
+    CVector referencePosition;
+    float   maxDistanceSquared = std::numeric_limits<float>::max();
+
+    if (maxDistance.has_value())
+    {
+        const auto* localPlayer = g_pClientGame->GetLocalPlayer();
+        if (!localPlayer)
+            throw LuaFunctionError("The argument maxDistance cannot be used without a local player.");
+
+        localPlayer->GetPosition(referencePosition);
+        maxDistanceSquared = *maxDistance * *maxDistance;
+    }
+
+    auto* buildingPool = *reinterpret_cast<CPoolSAInterface<CBuildingSAInterface>**>(CLASS_CBuildingPool);
+    auto* objectPool = *reinterpret_cast<CPoolSAInterface<CObjectSAInterface>**>(CLASS_CObjectPool);
+
+    AppendPoolModels(buildingPool, "building", referencePosition, maxDistanceSquared, models);
+    AppendPoolModels(objectPool, "object", referencePosition, maxDistanceSquared, models);
+
+    return models;
 }
 
 std::variant<bool, CLuaMultiReturn<bool, float, float, const char*, const char*, float, float, float>> CLuaWorldDefs::ProcessLineAgainstMesh(CClientEntity* e,
