@@ -890,8 +890,11 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.WriteCompressed(static_cast<unsigned short>(stats.size()));
                     for (const auto& [usStat, fValue] : stats)
                     {
-                        BitStream.Write(usStat);
-                        BitStream.Write(fValue);
+                        BitStream.WriteBits(&usStat, 9);  // 9 bits = 512 values, stats go up to 342
+
+                        SPedStatSync stat;
+                        stat.data.fValue = fValue;
+                        BitStream.Write(&stat);
                     }
 
                     // vehicle

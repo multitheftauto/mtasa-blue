@@ -3882,10 +3882,10 @@ retry:
                     for (unsigned short i = 0; i < usNumStats; i++)
                     {
                         unsigned short usStat = 0;
-                        float          fValue = 0.0f;
-                        bitStream.Read(usStat);
-                        bitStream.Read(fValue);
-                        stats.emplace_back(usStat, fValue);
+                        SPedStatSync   stat;
+                        bitStream.ReadBits(&usStat, 9);
+                        bitStream.Read(&stat);
+                        stats.emplace_back(usStat, stat.data.fValue);
                     }
 
                     // Read out the vehicle id
