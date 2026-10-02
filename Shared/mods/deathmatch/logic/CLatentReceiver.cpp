@@ -184,9 +184,20 @@ void CLatentReceiver::OnReceive(NetBitStreamInterface* pBitStream)
             CBufferReadStream stream(activeRx.buffer);
             stream.Read(ucPacketId);
             stream.Read(uiBitStreamBitsUsed);
-            uint uiBitStreamBytesUsed = (uiBitStreamBitsUsed + 7) >> 3;
 
-            if (uiBitStreamBytesUsed != activeRx.buffer.GetSize() - 5)
+            // Buffer is [1 byte packet id][4 byte bit count][body]. Validate the
+            // remote bit count before the (bits + 7) >> 3 rounding below, which
+            // overflows near UINT_MAX and would let a crafted 5-byte transfer pass
+            // the size check, making WriteBits over-read the heap and crash the host.
+            if (activeRx.buffer.GetSize() < 5)
+                return OnReceiveError("Buffer too small");
+
+            const uint uiBodyBytes = activeRx.buffer.GetSize() - 5;
+            if (uiBitStreamBitsUsed > static_cast<unsigned long long>(uiBodyBytes) * 8)
+                return OnReceiveError("Bit count too large");
+
+            const uint uiBitStreamBytesUsed = (uiBitStreamBitsUsed + 7) >> 3;
+            if (uiBitStreamBytesUsed != uiBodyBytes)
                 return OnReceiveError("Buffer size mismatch");
 
             pBitStream->WriteBits(activeRx.buffer.GetData() + 5, uiBitStreamBitsUsed);
