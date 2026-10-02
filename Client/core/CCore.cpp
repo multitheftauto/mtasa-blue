@@ -2233,6 +2233,9 @@ void CCore::HandleIdlePulse()
     {
         DoPreFramePulse();
         DoPostFramePulse();
+
+        // GTA keeps ticking while minimized but renders nothing, so end the frame here for the FPS limiter
+        m_pFPSLimiter->OnFrameEnd();
     }
 
     if (m_pModManager->IsLoaded())
