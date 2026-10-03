@@ -60,7 +60,7 @@ TEST(SMapInfoFlagsSync, RoundTrip)
 // Fun bugs state
 // ============================================================================
 
-// 10 boolean flags controlling GTA:SA gameplay bugs that servers can
+// 11 boolean flags controlling GTA:SA gameplay bugs that servers can
 // individually enable/disable. Verify that setting specific flags doesn't
 // affect unrelated flags.
 TEST(SFunBugsStateSync, RoundTrip)
@@ -71,8 +71,9 @@ TEST(SFunBugsStateSync, RoundTrip)
     sync.data.bCloseRangeDamage = true;
     sync.data.bFastFire = true;
     sync.data.vehicleRapidStop = true;
+    sync.data.bFastWeaponStrafe = true;
     sync.Write(bs);
-    EXPECT_EQ(10, bs.GetNumberOfBitsUsed());
+    EXPECT_EQ(11, bs.GetNumberOfBitsUsed());
     bs.ResetReadPointer();
     SFunBugsStateSync out;
     std::memset(&out.data, 0, sizeof(out.data));
@@ -81,6 +82,7 @@ TEST(SFunBugsStateSync, RoundTrip)
     EXPECT_FALSE(out.data.bQuickReload);
     EXPECT_TRUE(out.data.bFastFire);
     EXPECT_TRUE(out.data.vehicleRapidStop);
+    EXPECT_TRUE(out.data.bFastWeaponStrafe);
 }
 
 // ============================================================================
