@@ -1074,9 +1074,8 @@ HRESULT CProxyDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDes
     HRESULT hr = CDirect3DEvents9::PresentGuarded(m_pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
     TIMING_GRAPH("PostPresent");
 
-    // Apply FPS limiting here, as the last thing before the frame ends, so pacing accounts
-    // for the full frame (GUI draw and the real Present/vsync) instead of just the portion
-    // of the frame that happens before GUI draw.
+    // The frame ends here. The wait itself runs in CCore::OnGameTimerUpdate right before GTA
+    // samples its clock, this only paces frames the game timer never saw
     CCore::GetSingleton().GetFPSLimiter()->OnFrameEnd();
 
     return hr;
