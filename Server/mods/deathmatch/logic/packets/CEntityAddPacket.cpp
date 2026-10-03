@@ -974,14 +974,14 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.WriteBit(animData.freezeLastFrame);
                         BitStream.Write(animData.blendTime);
                         BitStream.WriteBit(animData.taskToBeRestoredOnAnimEnd);
-
-                        // Write elapsed time & speed
-                        const uint64_t nowTick = GetTickCount64_();
-                        const uint64_t elapsedMs =
-                            nowTick >= static_cast<uint64_t>(animData.startTime) ? (nowTick - static_cast<uint64_t>(animData.startTime)) : 0;
-                        const float elapsedTime = static_cast<float>(elapsedMs);
-                        BitStream.Write(elapsedTime);
+                        BitStream.WriteInt64(animData.startTime);
                         BitStream.Write(animData.speed);
+
+                        bool animStopped = animData.speed == 0.0f && animData.progress != -1.0f;
+                        BitStream.WriteBit(animStopped);
+
+                        if (animStopped)
+                            BitStream.Write(animData.progress);
                     }
 
                     break;
