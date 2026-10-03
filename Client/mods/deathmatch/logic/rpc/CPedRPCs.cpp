@@ -262,6 +262,11 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                 {
                     bitStream.Read(iBlend);
                     bitStream.ReadBit(bTaskToBeRestoredOnAnimEnd);
+                    bool isSecondary = false;
+                    if (bitStream.GetNumberOfUnreadBits() > 0)
+                    {
+                        bitStream.ReadBit(isSecondary);
+                    }
                     if (!pPed->IsDucked())
                     {
                         bTaskToBeRestoredOnAnimEnd = false;
@@ -270,7 +275,8 @@ void CPedRPCs::SetPedAnimation(CClientEntity* pSource, NetBitStreamInterface& bi
                     std::unique_ptr<CAnimBlock> pBlock = g_pGame->GetAnimManager()->GetAnimationBlock(blockName.c_str());
                     if (pBlock)
                     {
-                        pPed->RunNamedAnimation(pBlock, animName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame);
+                        pPed->RunNamedAnimation(pBlock, animName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame, false, false,
+                                                false, isSecondary);
                         pPed->SetTaskToBeRestoredOnAnimEnd(bTaskToBeRestoredOnAnimEnd);
                         pPed->SetTaskTypeToBeRestoredOnAnimEnd((eTaskType)TASK_SIMPLE_DUCK);
 
