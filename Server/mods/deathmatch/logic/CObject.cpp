@@ -75,6 +75,9 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     // Add us to the manager's list
     m_pObjectManager->AddToList(this);
     UpdateSpatialData();
+
+    if (m_pLowLodObject)
+        m_pLowLodObject->m_HighLodObjectList.push_back(this);
 }
 
 CObject::~CObject()
