@@ -10,6 +10,7 @@
 
 #include "StdInc.h"
 #include "net/SyncStructures.h"
+#include "LuaCommon.h"
 
 #define ARGUMENT_TYPE_INT   9
 #define ARGUMENT_TYPE_FLOAT 10
@@ -36,12 +37,14 @@ CLuaArgument::CLuaArgument()
     m_pTableData = NULL;
     m_pUserData = NULL;
     m_bWeakTableRef = false;
+    matrixData = nullptr;
 }
 
 CLuaArgument::CLuaArgument(const CLuaArgument& Argument, CFastHashMap<CLuaArguments*, CLuaArguments*>* pKnownTables)
 {
     // Initialize and call our = on the argument
     m_pTableData = NULL;
+    matrixData = nullptr;
     CopyRecursive(Argument, pKnownTables);
 }
 
@@ -51,6 +54,7 @@ CLuaArgument::CLuaArgument(NetBitStreamInterface& bitStream, std::vector<CLuaArg
     m_pTableData = NULL;
     m_pUserData = NULL;
     m_bWeakTableRef = false;
+    matrixData = nullptr;
     ReadFromBitStream(bitStream, pKnownTables);
 }
 
@@ -59,6 +63,7 @@ CLuaArgument::CLuaArgument(lua_State* luaVM, int iArgument, CFastHashMap<const v
     // Read the argument out of the lua VM
     m_pTableData = NULL;
     m_iIndex = iArgument;
+    matrixData = nullptr;
     Read(luaVM, iArgument, pKnownTables);
 }
 
@@ -122,6 +127,21 @@ void CLuaArgument::CopyRecursive(const CLuaArgument& Argument, CFastHashMap<CLua
         case LUA_TSTRING:
         {
             m_strString = Argument.m_strString;
+            break;
+        }
+
+        case LUA_TVECTOR2:
+        case LUA_TVECTOR3:
+        case LUA_TVECTOR4:
+        {
+            vectorData = Argument.vectorData;
+            break;
+        }
+
+        case LUA_TMATRIX:
+        {
+            if (Argument.matrixData)
+                matrixData = new CMatrix(*Argument.matrixData);
             break;
         }
 
@@ -200,6 +220,28 @@ bool CLuaArgument::CompareRecursive(const CLuaArgument& Argument, std::set<CLuaA
         {
             return m_strString == Argument.m_strString;
         }
+        case LUA_TVECTOR2:
+        {
+            return vectorData.fX == Argument.vectorData.fX && vectorData.fY == Argument.vectorData.fY;
+        }
+        case LUA_TVECTOR3:
+        {
+            return vectorData.fX == Argument.vectorData.fX && vectorData.fY == Argument.vectorData.fY && vectorData.fZ == Argument.vectorData.fZ;
+        }
+        case LUA_TVECTOR4:
+        {
+            return vectorData.fX == Argument.vectorData.fX && vectorData.fY == Argument.vectorData.fY && vectorData.fZ == Argument.vectorData.fZ &&
+                   vectorData.fW == Argument.vectorData.fW;
+        }
+        case LUA_TMATRIX:
+        {
+            if (matrixData && Argument.matrixData)
+            {
+                return matrixData->vRight == Argument.matrixData->vRight && matrixData->vFront == Argument.matrixData->vFront &&
+                       matrixData->vUp == Argument.matrixData->vUp && matrixData->vPos == Argument.matrixData->vPos;
+            }
+            return matrixData == Argument.matrixData;
+        }
     }
 
     return true;
@@ -265,7 +307,32 @@ void CLuaArgument::Read(lua_State* luaVM, int iArgument, CFastHashMap<const void
 
             case LUA_TUSERDATA:
             {
-                m_pUserData = *((void**)lua_touserdata(luaVM, iArgument));
+                // Inline vector and matrix userdata are stored directly in the userdata buffer.
+                // Check class metatable to distinguish them from standard MTA userdata pointers.
+                if (lua_isclass(luaVM, iArgument, "Vector3"))
+                {
+                    const auto* vector3 = static_cast<const CVector*>(lua_touserdata(luaVM, iArgument));
+                    ReadVector(*vector3);
+                }
+                else if (lua_isclass(luaVM, iArgument, "Vector2"))
+                {
+                    const auto* vector2 = static_cast<const CVector2D*>(lua_touserdata(luaVM, iArgument));
+                    ReadVector(*vector2);
+                }
+                else if (lua_isclass(luaVM, iArgument, "Vector4"))
+                {
+                    const auto* vector4 = static_cast<const CVector4D*>(lua_touserdata(luaVM, iArgument));
+                    ReadVector(*vector4);
+                }
+                else if (lua_isclass(luaVM, iArgument, "Matrix"))
+                {
+                    const auto* matrix = static_cast<const CMatrix*>(lua_touserdata(luaVM, iArgument));
+                    ReadMatrix(*matrix);
+                }
+                else
+                {
+                    m_pUserData = *((void**)lua_touserdata(luaVM, iArgument));
+                }
                 break;
             }
 
@@ -390,6 +457,44 @@ void CLuaArgument::ReadTable(CLuaArguments* table)
     m_iType = LUA_TTABLE;
 }
 
+void CLuaArgument::ReadVector(const CVector2D& vector)
+{
+    m_strString = "";
+    DeleteTableData();
+    m_iType = LUA_TVECTOR2;
+    vectorData.fX = vector.fX;
+    vectorData.fY = vector.fY;
+    vectorData.fZ = 0.0f;
+    vectorData.fW = 0.0f;
+}
+
+void CLuaArgument::ReadVector(const CVector& vector)
+{
+    m_strString = "";
+    DeleteTableData();
+    m_iType = LUA_TVECTOR3;
+    vectorData.fX = vector.fX;
+    vectorData.fY = vector.fY;
+    vectorData.fZ = vector.fZ;
+    vectorData.fW = 0.0f;
+}
+
+void CLuaArgument::ReadVector(const CVector4D& vector)
+{
+    m_strString = "";
+    DeleteTableData();
+    m_iType = LUA_TVECTOR4;
+    vectorData = vector;
+}
+
+void CLuaArgument::ReadMatrix(const CMatrix& matrix)
+{
+    m_strString = "";
+    DeleteTableData();
+    m_iType = LUA_TMATRIX;
+    matrixData = new CMatrix(matrix);
+}
+
 CClientEntity* CLuaArgument::GetElement() const
 {
     ElementID ID = TO_ELEMENTID(m_pUserData);
@@ -455,6 +560,33 @@ void CLuaArgument::Push(lua_State* luaVM, CFastHashMap<CLuaArguments*, int>* pKn
         case LUA_TSTRING:
         {
             lua_pushlstring(luaVM, m_strString.c_str(), m_strString.length());
+            break;
+        }
+
+        case LUA_TVECTOR2:
+        {
+            lua_pushvector(luaVM, CVector2D(vectorData.fX, vectorData.fY));
+            break;
+        }
+
+        case LUA_TVECTOR3:
+        {
+            lua_pushvector(luaVM, CVector(vectorData.fX, vectorData.fY, vectorData.fZ));
+            break;
+        }
+
+        case LUA_TVECTOR4:
+        {
+            lua_pushvector(luaVM, vectorData);
+            break;
+        }
+
+        case LUA_TMATRIX:
+        {
+            if (matrixData)
+                lua_pushmatrix(luaVM, *matrixData);
+            else
+                lua_pushnil(luaVM);
             break;
         }
 
@@ -825,7 +957,13 @@ void CLuaArgument::DeleteTableData()
     {
         if (!m_bWeakTableRef)
             delete m_pTableData;
-        m_pTableData = NULL;
+        m_pTableData = nullptr;
+    }
+
+    if (matrixData)
+    {
+        delete matrixData;
+        matrixData = nullptr;
     }
 }
 
