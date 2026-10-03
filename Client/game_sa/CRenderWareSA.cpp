@@ -765,6 +765,9 @@ ushort CRenderWareSA::GetTXDIDForModelID(ushort usModelID)
     if (usModelID >= pGame->GetBaseIDforTXD() && usModelID < pGame->GetBaseIDforCOL())
     {
         // Get global TXD ID instead
+        if (!pGame->GetModelInfo(usModelID))
+            return 0;
+
         return usModelID - pGame->GetBaseIDforTXD();
     }
     else
