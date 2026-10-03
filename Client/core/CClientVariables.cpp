@@ -335,6 +335,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("mapalpha", 155);                                               // player map alpha
     DEFAULT("mapimage", 0);                                                 // player map image
     DEFAULT("browser_speed", 1);                                            // Browser speed
+    DEFAULT("auto_refresh_browser", true);                                  // Auto-refresh server browser
     DEFAULT("single_download", 0);                                          // Single connection for downloads
     DEFAULT("packet_tag", 0);                                               // Tag network packets
     DEFAULT("progress_animation", 1);                                       // Progress spinner at the bottom of the screen
