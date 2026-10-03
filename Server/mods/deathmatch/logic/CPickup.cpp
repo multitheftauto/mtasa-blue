@@ -387,7 +387,7 @@ bool CPickup::CanUse(CPlayer& Player, bool bOnfootCheck)
             case CPickup::HEALTH:
                 // Like the original game, leave the pickup alone when there is nothing to heal.
                 // The ceiling comes from the max_health stat, which scripts can raise.
-                return (Player.GetHealth() < Player.GetMaxHealth());
+                return (Player.GetHealth() < Round(Player.GetMaxHealth()));
 
             case CPickup::ARMOR:
                 return (Player.GetArmor() < 100.0f);
