@@ -51,7 +51,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
         {
             CModelInfo* pTxdModelInfo = pGame->GetModelInfo(pGame->GetBaseIDforTXD() + usTxdId);
             if (!pTxdModelInfo || !pTxdModelInfo->IsAllocatedInArchive())
-                return NULL;
+                return nullptr;
 
             // Load only the txd if the model is in use
             if (pModelInfo->IsLoaded())
@@ -59,7 +59,7 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
                 pTxdModelInfo->Request(BLOCKING, "CRenderWareSA::GetModelTexturesInfo");
                 pTxd = CTxdStore_GetTxd(usTxdId);
                 if (!pTxd)
-                    return NULL;
+                    return nullptr;
             }
         }
 
@@ -327,7 +327,7 @@ void CRenderWareSA::ModelInfoTXDRemoveTexturesFromTxd(ushort usTxdId)
                 if (iter->bTexturesAreCopies)
                 {
                     // Destroy the copy (but not the raster as that was not copied)
-                    pOldTexture->raster = NULL;
+                    pOldTexture->raster = nullptr;
                     RwTextureDestroy(pOldTexture);
                 }
             }
