@@ -53,3 +53,13 @@ void CAEAudioHardwareSA::LoadSoundBank(short wSoundBankID, short wSoundBankSlotI
     }
     // clang-format on
 }
+
+void CAEAudioHardwareSA::Terminate()
+{
+    m_pInterface->Terminate();
+}
+
+bool CAEAudioHardwareSA::Initialise()
+{
+    return m_pInterface->Initialise();
+}

@@ -65,4 +65,11 @@ class CAEAudioHardware
 public:
     virtual bool IsSoundBankLoaded(short wSoundBankID, short wSoundBankSlotID) = 0;
     virtual void LoadSoundBank(short wSoundBankID, short wSoundBankSlotID) = 0;
+
+    // Full teardown/rebuild of the native audio device (DirectSound object, all channels, the
+    // streaming and fade threads); used to make it pick up a different output device without
+    // restarting the game. Causes a brief, unavoidable audio hitch while it runs, the same as
+    // the one already happening once at normal game startup.
+    virtual void Terminate() = 0;
+    virtual bool Initialise() = 0;
 };
