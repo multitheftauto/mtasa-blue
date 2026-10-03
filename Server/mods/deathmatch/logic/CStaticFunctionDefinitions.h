@@ -236,6 +236,8 @@ public:
     // Camera set functions
     static bool SetCameraMatrix(CElement* pElement, const CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV);
     static bool SetCameraTarget(CElement* pElement, CElement* pTarget);
+    static bool SetCameraTarget(CElement* pElement, CElement* pTarget, const CVector& targetLookAt);
+    static bool SetCameraTarget(CElement* pElement, CElement* pTarget, CElement* pTargetLookAtElement);
     static bool SetCameraInterior(CElement* pElement, unsigned char ucInterior);
     static bool FadeCamera(CElement* pElement, bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
 

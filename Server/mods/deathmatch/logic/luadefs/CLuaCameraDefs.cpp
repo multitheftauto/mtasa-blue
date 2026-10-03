@@ -190,26 +190,89 @@ int CLuaCameraDefs::setCameraMatrix(lua_State* luaVM)
 
 int CLuaCameraDefs::setCameraTarget(lua_State* luaVM)
 {
-    //  bool setCameraTarget ( player thePlayer [, element target = nil ] )
-    CElement* pPlayer;
-    CElement* pTarget;
+    //  bool setCameraTarget ( player thePlayer [, element target = thePlayer ] )
+    //  bool setCameraTarget ( player thePlayer, float lookAtX, float lookAtY, float lookAtZ )
+    //  bool setCameraTarget ( player thePlayer, Vector3 lookAt )
+    //  bool setCameraTarget ( player thePlayer, element target, float lookAtX, float lookAtY, float lookAtZ )
+    //  bool setCameraTarget ( player thePlayer, element target, Vector3 lookAt )
+    //  bool setCameraTarget ( player thePlayer, element target, element lookAtTarget )
+    CElement* playerElement = nullptr;
 
     CScriptArgReader argStream(luaVM);
-    argStream.ReadUserData(pPlayer);
-    argStream.ReadUserData(pTarget, NULL);
+    argStream.ReadUserData(playerElement);
 
-    if (pTarget && pTarget->GetType() != CElement::PLAYER)
-        MinServerReqCheck(argStream, MIN_SERVER_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player");
-
-    if (!argStream.HasErrors())
+    if (argStream.NextIsUserDataOfType<CElement>())
     {
-        if (CStaticFunctionDefinitions::SetCameraTarget(pPlayer, pTarget))
+        CElement* targetElement = nullptr;
+        argStream.ReadUserData(targetElement);
+
+        if (targetElement && targetElement->GetType() != CElement::PLAYER)
+            MinServerReqCheck(argStream, MIN_SERVER_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player");
+
+        if (argStream.NextIsUserDataOfType<CElement>())
         {
-            lua_pushboolean(luaVM, true);
-            return 1;
+            CElement* lookAtTarget = nullptr;
+            argStream.ReadUserData(lookAtTarget);
+            if (!argStream.HasErrors())
+            {
+                if (CStaticFunctionDefinitions::SetCameraTarget(playerElement, targetElement, lookAtTarget))
+                {
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+        }
+        else if (argStream.NextIsNumber() || argStream.NextIsUserDataOfType<CLuaVector3D>())
+        {
+            CVector targetLookAt;
+            argStream.ReadVector3D(targetLookAt);
+            if (!argStream.HasErrors())
+            {
+                if (CStaticFunctionDefinitions::SetCameraTarget(playerElement, targetElement, targetLookAt))
+                {
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+        }
+        else
+        {
+            if (!argStream.HasErrors())
+            {
+                if (CStaticFunctionDefinitions::SetCameraTarget(playerElement, targetElement))
+                {
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+        }
+    }
+    else if (argStream.NextIsNumber() || argStream.NextIsUserDataOfType<CLuaVector3D>())
+    {
+        CVector targetLookAt;
+        argStream.ReadVector3D(targetLookAt);
+        if (!argStream.HasErrors())
+        {
+            if (CStaticFunctionDefinitions::SetCameraTarget(playerElement, playerElement, targetLookAt))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
         }
     }
     else
+    {
+        if (!argStream.HasErrors())
+        {
+            if (CStaticFunctionDefinitions::SetCameraTarget(playerElement, playerElement))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+    }
+
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);
