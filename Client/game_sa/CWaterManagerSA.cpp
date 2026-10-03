@@ -818,6 +818,12 @@ float CWaterManagerSA::GetWaveLevel()
     return *(float*)VAR_WaveLevel;
 }
 
+void CWaterManagerSA::SetWavePhase(DWORD milliseconds)
+{
+    const DWORD gameTime = *reinterpret_cast<const DWORD*>(0xB7CB84);
+    *reinterpret_cast<DWORD*>(0xC228A4) = gameTime - milliseconds;
+}
+
 void CWaterManagerSA::SetWaveLevel(float fWaveLevel)
 {
     if (fWaveLevel >= 0.0f)

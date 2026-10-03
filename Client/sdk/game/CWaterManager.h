@@ -37,4 +37,5 @@ public:
     virtual void UndoChanges(void* pChangeSource = NULL) = 0;
     virtual void RebuildIndex() = 0;  // Call this after moving a polygon's vertices
     virtual void Reset() = 0;         // Reset all water to SA default
+    virtual void SetWavePhase(DWORD milliseconds) = 0;
 };
