@@ -4436,7 +4436,7 @@ void CPacketHandler::Packet_EntityRemoveTree(NetBitStreamInterface& bitStream)
 
 void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
 {
-    if (!rootEntity || rootEntity->IsSystemEntity())
+    if (!rootEntity || rootEntity->IsSystemEntity() || rootEntity->GetType() == CCLIENTPLAYER)
         return;
 
     std::vector<CClientEntity*> entitiesToDelete;
@@ -4458,7 +4458,7 @@ void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
 
     for (auto* entity : entitiesToDelete)
     {
-        if (entity->IsSystemEntity())
+        if (entity->IsSystemEntity() || entity->GetType() == CCLIENTPLAYER)
             continue;
 
         const auto entityType = entity->GetType();
@@ -4498,12 +4498,23 @@ void CPacketHandler::RemoveEntityTree(CClientEntity* rootEntity)
 
 void CPacketHandler::CollectEntityTree(CClientEntity* entity, std::vector<CClientEntity*>& entities)
 {
-    if (!entity)
+    if (!entity || entity->IsSystemEntity() || entity->GetType() == CCLIENTPLAYER)
         return;
 
-    for (auto iter = entity->IterBegin(); iter != entity->IterEnd(); ++iter)
+    auto iter = entity->IterBegin();
+    while (iter != entity->IterEnd())
     {
-        CollectEntityTree(*iter, entities);
+        CClientEntity* child = *iter;
+        // Players and system entities must never be destroyed via tree removal; preserve them under root
+        if (child->GetType() == CCLIENTPLAYER || child->IsSystemEntity())
+        {
+            child->SetParent(g_pClientGame->GetRootEntity());
+            iter = entity->IterBegin();
+            continue;
+        }
+
+        CollectEntityTree(child, entities);
+        ++iter;
     }
 
     entities.push_back(entity);
