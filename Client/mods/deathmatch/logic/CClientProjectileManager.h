@@ -31,6 +31,8 @@ public:
 
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); }
 
+    const std::list<CClientProjectile*>& GetProjectiles() const noexcept { return m_List; }
+
     // * Game-layer wrapping *
     static bool Hook_StaticProjectileAllow(CEntity* pGameCreator, eWeaponType weaponType, CVector* origin, float fForce, CVector* target,
                                            CEntity* targetEntity);
