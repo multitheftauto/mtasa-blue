@@ -20,6 +20,8 @@
 #include "CMarker.h"
 #include "CBlip.h"
 #include "CGame.h"
+#include "CTrainTrack.h"
+#include "CTrainTrackManager.h"
 #include "CMainConfig.h"
 #include "CResource.h"
 #include "CPerfStatManager.h"
@@ -238,6 +240,15 @@ void CMapManager::SendMapInformation(CPlayer& Player)
     }
 
     marker.Set("Vehicles");
+
+    // Add the custom train tracks to the packet. The 4 built-in ones are skipped here, same as for
+    // every other element type: they have no parent, and Add() only queues parented elements.
+    for (CTrainTrack* pTrainTrack : g_pGame->GetTrainTrackManager()->GetTracks())
+    {
+        EntityPacket.Add(pTrainTrack);
+    }
+
+    marker.Set("TrainTracks");
 
     // Add the teams to the packet
     list<CTeam*>::const_iterator iterTeams = m_pTeamManager->IterBegin();

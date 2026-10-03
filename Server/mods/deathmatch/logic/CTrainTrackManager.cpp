@@ -18,17 +18,17 @@ CTrainTrackManager::CTrainTrackManager()
     // Create default tracks
     for (uchar i = 0; i < 4; ++i)
     {
-        m_DefaultTracks[i] = CreateTrainTrack(OriginalTrackNodes[i], true, nullptr, i);
+        m_DefaultTracks[i] = CreateTrainTrack(OriginalTrackNodes[i], nullptr, i);
     }
 }
 
-CTrainTrack* CTrainTrackManager::CreateTrainTrack(const std::vector<STrackNode>& nodes, bool linkLastNodes, CElement* pParent, uchar defaultTrackId)
+CTrainTrack* CTrainTrackManager::CreateTrainTrack(const std::vector<STrackNode>& nodes, CElement* pParent, uchar defaultTrackId)
 {
     if (m_Tracks.size() >= MaxTracks)
         return nullptr;
 
     // Create new train track
-    auto pTrainTrack = new CTrainTrack(this, nodes, linkLastNodes, pParent, defaultTrackId);
+    auto pTrainTrack = new CTrainTrack(this, nodes, pParent, defaultTrackId);
     m_Tracks.push_back(pTrainTrack);
 
     return pTrainTrack;
