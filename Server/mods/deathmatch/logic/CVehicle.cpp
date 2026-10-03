@@ -512,7 +512,10 @@ void CVehicle::SetModel(unsigned short usModel)
         m_eVehicleType = CVehicleManager::GetVehicleType(m_usModel);
         RandomizeColor();
         ResetDoors();
-        CVehicleManager::GetRandomVariation(m_usModel, m_ucVariant, m_ucVariant2);
+
+        // Keep the variation the script has set, unless the new model cannot use it
+        if (!CVehicleManager::IsVariationValidForModel(m_usModel, m_ucVariant, m_ucVariant2))
+            CVehicleManager::GetRandomVariation(m_usModel, m_ucVariant, m_ucVariant2);
 
         // Generate new handling data to fit the vehicle
         GenerateHandlingData();
