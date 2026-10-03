@@ -65,6 +65,7 @@ public:
     void                  SetWebBrowserEvents(CWebBrowserEventsInterface* pInterface);
     void                  ClearWebBrowserEvents(CWebBrowserEventsInterface* pInterface);
     void                  CloseBrowser();
+    void                  DetachRenderItem();
     bool                  EnsureBrowserCreated();  // Lazy creation: creates browser on first use
     CefRefPtr<CefBrowser> GetCefBrowser() { return m_pWebView; };
 
