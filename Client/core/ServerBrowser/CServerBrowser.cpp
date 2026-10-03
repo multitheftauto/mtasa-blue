@@ -1570,7 +1570,7 @@ bool CServerBrowser::OnClick(CGUIElement* pElement)
                 m_pServerPlayerList[Type]->SetItemText(k, m_hPlayerName[Type], _("  ..loading.."));
             }
 
-            SetAddressBarText("mtasa://" + pServer->strEndpoint);
+            SetAddressBarText("mtasa://" + pServer->GetDisplayEndpoint());
             m_pLabelAddressDescription[Type]->SetVisible(false);
         }
 
@@ -1644,12 +1644,14 @@ bool CServerBrowser::OnConnectClick(CGUIElement* pElement)
     return true;
 }
 
-void CServerBrowser::NotifyServerExists(in_addr Address, ushort usPort)
+void CServerBrowser::NotifyServerExists(in_addr Address, ushort usPort, const SString& strHost)
 {
     // If the connect button was pressed, and the server exists, add it to the history
     CServerList* pHistoryList = GetHistoryList();
     pHistoryList->Remove(Address, usPort);
-    pHistoryList->AddUnique(Address, usPort);
+    CServerListItem* pItem = pHistoryList->AddUnique(Address, usPort);
+    if (pItem && CServerListItem::IsHostName(strHost.c_str()))
+        pItem->strHostName = strHost;
     while (pHistoryList->GetServerCount() > 11)
     {
         CServerListItem* pLast = *pHistoryList->IteratorBegin();
@@ -1785,7 +1787,8 @@ bool CServerBrowser::OnFavouritesClick(CGUIElement* pElement)
     {
         in_addr Address;
 
-        CServerListItem::Parse(strHost.c_str(), Address);
+        if (!CServerListItem::Parse(strHost.c_str(), Address))
+            return true;
 
         // Do we have this entry already?  If so, remove it
         if (m_ServersFavourites.Remove(Address, usPort))
@@ -1799,8 +1802,11 @@ bool CServerBrowser::OnFavouritesClick(CGUIElement* pElement)
             return true;
         }
 
-        if (m_ServersFavourites.AddUnique(Address, usPort))
+        if (CServerListItem* pItem = m_ServersFavourites.AddUnique(Address, usPort))
         {
+            if (CServerListItem::IsHostName(strHost.c_str()))
+                pItem->strHostName = strHost;
+
             SaveFavouritesList();
             RequestFilterRefresh(ServerBrowserTypes::FAVOURITES, true);
             for (std::size_t iconIndex = 0; iconIndex < std::size(m_pAddressFavoriteIcon); ++iconIndex)
@@ -1840,7 +1846,7 @@ bool CServerBrowser::OnAddressChanged(CGUIElement* pElement)
         CServerListItem* pServer = *i;
         if (!pServer || !CServerListItem::StaticIsValid(pServer))
             continue;
-        if (pServer->strHost == strHost && pServer->usGamePort == usPort)
+        if ((pServer->strHost == strHost || pServer->strHostName == strHost) && pServer->usGamePort == usPort)
         {
             for (std::size_t iconIndex = 0; iconIndex < std::size(m_pAddressFavoriteIcon); ++iconIndex)
             {
@@ -2130,12 +2136,25 @@ bool CServerBrowser::LoadServerList(CXMLNode* pNode, const std::string& strTagNa
             CXMLAttribute* pPortAttribute = pSubNode->GetAttributes().Find("port");
             if (pHostAttribute && pPortAttribute)
             {
-                if (CServerListItem::Parse(pHostAttribute->GetValue().c_str(), Address))
+                const std::string strHost = pHostAttribute->GetValue();
+                iPort = atoi(pPortAttribute->GetValue().c_str());
+                if (iPort <= 0 || iPort > 0xFFFF)
+                    continue;
+
+                if (!CServerListItem::Parse(strHost.c_str(), Address))
                 {
-                    iPort = atoi(pPortAttribute->GetValue().c_str());
-                    if (iPort > 0 && iPort <= 0xFFFF)
-                        pList->AddUnique(Address, static_cast<ushort>(iPort));
+                    if (!CServerListItem::IsHostName(strHost.c_str()))
+                        continue;
+
+                    // Hostname failed to resolve, fall back to the last known address so the entry isn't dropped from the config
+                    CXMLAttribute* pIpAttribute = pSubNode->GetAttributes().Find("ip");
+                    if (!pIpAttribute || !CServerListItem::Parse(pIpAttribute->GetValue().c_str(), Address))
+                        Address.S_un.S_addr = 0;
                 }
+
+                CServerListItem* pItem = pList->AddUnique(Address, static_cast<ushort>(iPort));
+                if (pItem && CServerListItem::IsHostName(strHost.c_str()))
+                    pItem->strHostName = strHost;
             }
         }
     }
@@ -2219,6 +2238,12 @@ bool CServerBrowser::SaveServerList(CXMLNode* pNode, const std::string& strTagNa
 
             CXMLAttribute* pPortAttribute = pSubNode->GetAttributes().Create("port");
             pPortAttribute->SetValue(pServer->usGamePort);
+
+            if (!pServer->strHostName.empty() && pServer->Address.S_un.S_addr != 0)
+            {
+                CXMLAttribute* pIpAttribute = pSubNode->GetAttributes().Create("ip");
+                pIpAttribute->SetValue(pServer->strHost.c_str());
+            }
         }
         ++iProcessed;
     }
