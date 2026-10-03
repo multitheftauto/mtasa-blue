@@ -340,6 +340,7 @@ protected:
     DWORD                                                                             m_dwParentID;
     DWORD                                                                             m_dwReferences;
     DWORD                                                                             m_dwPendingInterfaceRef;
+    std::int16_t                                                                      m_interfaceRefs = 0;
     CColModel*                                                                        m_pCustomColModel;
     CColModelSAInterface*                                                             m_pOriginalColModelInterface;
     std::uint16_t                                                                     m_originalFlags = 0;
@@ -404,6 +405,7 @@ public:
     void           SetTextureDictionaryID(unsigned short usID);
     void           ResetTextureDictionaryID();
     static void    StaticResetTextureDictionaries();
+    static void    StaticRemoveDefaultTxdID(unsigned short usTxdId);
     float          GetLODDistance();
     float          GetOriginalLODDistance();
     void           SetLODDistance(float fDistance, bool bOverrideMaxDistance = false);
