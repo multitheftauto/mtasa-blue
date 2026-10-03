@@ -56,7 +56,7 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     m_vecScale = CVector(Copy.m_vecScale.fX, Copy.m_vecScale.fY, Copy.m_vecScale.fZ);
     m_fHealth = Copy.m_fHealth;
     m_bSyncable = Copy.m_bSyncable;
-    m_pSyncer = Copy.m_pSyncer;
+    m_pSyncer = NULL;
     m_bIsFrozen = Copy.m_bIsFrozen;
     m_bDoubleSided = Copy.m_bDoubleSided;
     m_bBreakable = Copy.m_bBreakable;
@@ -75,6 +75,9 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     // Add us to the manager's list
     m_pObjectManager->AddToList(this);
     UpdateSpatialData();
+
+    if (Copy.m_pSyncer)
+        Copy.m_pSyncer->AddSyncingObject(this);
 }
 
 CObject::~CObject()
