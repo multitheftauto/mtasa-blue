@@ -2177,19 +2177,29 @@ void CVehicleSA::SetVehicleFlags(bool bEnable360, bool bEnableRandomiser, bool b
 
 void CVehicleSA::OnChangingPosition(const CVector& vecNewPosition)
 {
-    // Only apply to CAutomobile and down
-    if (GetBaseVehicleType() == 0)
+    CVector vecDelta = vecNewPosition - m_pInterface->matrix->vPos;
+    if (vecDelta.LengthSquared() <= 10 * 10)
+        return;
+
+    switch (GetBaseVehicleType())
     {
-        CVector vecDelta = vecNewPosition - m_pInterface->matrix->vPos;
-        if (vecDelta.LengthSquared() > 10 * 10)
+        case 0:
         {
-            // Reposition colpoints for big moves to avoid random spinning
             auto pInterface = static_cast<CAutomobileSAInterface*>(GetVehicleInterface());
-            pInterface->m_wheelColPoint[FRONT_LEFT_WHEEL].Position += vecDelta;
-            pInterface->m_wheelColPoint[REAR_LEFT_WHEEL].Position += vecDelta;
-            pInterface->m_wheelColPoint[FRONT_RIGHT_WHEEL].Position += vecDelta;
-            pInterface->m_wheelColPoint[REAR_RIGHT_WHEEL].Position += vecDelta;
+            for (auto& wheelColPoint : pInterface->m_wheelColPoint)
+                wheelColPoint.Position += vecDelta;
+            break;
         }
+        case 9:
+        case 10:
+        {
+            auto pInterface = static_cast<CBikeSAInterface*>(GetVehicleInterface());
+            for (auto& wheelColPoint : pInterface->m_anWheelColPoint)
+                wheelColPoint.Position += vecDelta;
+            break;
+        }
+        default:
+            break;
     }
 }
 
