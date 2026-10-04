@@ -51,6 +51,7 @@ public:
     static bool         HasDamageModel(eVehicleType Type);
     static bool         HasDoors(unsigned short usModel);
     static void         GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
+    static bool         IsVariationValidForModel(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
 
     CVehicleColorManager* GetColorManager() { return &m_ColorManager; }
     CVehicleColor         GetRandomColor(unsigned short usModel);
