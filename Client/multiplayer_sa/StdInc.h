@@ -25,5 +25,6 @@
 #include "..\game_sa\CPedSA.h"
 #include "..\game_sa\CProjectileSA.h"
 #include "..\game_sa\TaskAttackSA.h"
+#include "../game_sa/CColModelSA.h"
 
 extern CMultiplayerSA* pMultiplayer;
