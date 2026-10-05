@@ -77,6 +77,7 @@ private:
 
     void ShowInfoTag(char* szTag);
     void HandleInput();
+    void RefreshInputLine();
     void SelectCommandHistoryEntry(uint uiEntry);
     void HandlePulseSleep();
     void ApplyFrameRateLimit(uint uiUseRate);
@@ -97,6 +98,7 @@ private:
 
     wchar_t m_szInputBuffer[255];
     uint    m_uiInputCount;
+    uint    m_uiCursorPos;
 
     char m_szTag[80];
 

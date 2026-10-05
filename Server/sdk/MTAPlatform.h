@@ -64,4 +64,5 @@ typedef int socklen_t;
     #define KEY_RIGHT     0x4D
     #define KEY_UP        0x48
     #define KEY_DOWN      0x50
+    #define KEY_DELETE    0x53
 #endif
