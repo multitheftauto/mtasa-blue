@@ -40,8 +40,8 @@ CElementGroup::~CElementGroup()
 
                 switch (pElement->GetType())
                 {
-                    case CElement::DATABASE_CONNECTION:
-                    case CElement::SCRIPTFILE:
+                    case ElementType::DATABASE_CONNECTION:
+                    case ElementType::SCRIPTFILE:
                         continue;
                     default:
                         break;

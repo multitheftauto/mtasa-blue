@@ -135,7 +135,7 @@ void CPhysicalSA::SetMoveSpeed(const CVector& vecMoveSpeed) noexcept
     // clang-format on
     MemCpyFast((void*)dwReturn, &vecMoveSpeed, sizeof(CVector));
 
-    if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
+    if (GetInterface()->nType == EntityType::OBJECT)
     {
         AddToMovingList();
         SetStatic(false);
@@ -146,7 +146,7 @@ void CPhysicalSA::SetTurnSpeed(CVector* vecTurnSpeed)
 {
     ((CPhysicalSAInterface*)GetInterface())->m_vecAngularVelocity = *vecTurnSpeed;
 
-    if (GetInterface()->nType == ENTITY_TYPE_OBJECT)
+    if (GetInterface()->nType == EntityType::OBJECT)
     {
         AddToMovingList();
         SetStatic(false);

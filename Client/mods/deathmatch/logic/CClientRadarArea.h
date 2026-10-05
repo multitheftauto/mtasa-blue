@@ -26,7 +26,7 @@ public:
 
     void Unlink();
 
-    eClientEntityType GetType() const { return CCLIENTRADARAREA; };
+    ElementType::Enum GetType() const { return ElementType::RADAR_AREA; };
 
     const CVector2D& GetPosition() const { return m_vecPosition; };
     void             GetPosition(CVector2D& vecPosition) const { vecPosition = m_vecPosition; };

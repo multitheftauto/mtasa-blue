@@ -171,7 +171,7 @@ public:
 
     void Unlink() {};
 
-    virtual eClientEntityType GetType() const { return CCLIENTPED; }
+    virtual ElementType::Enum GetType() const { return ElementType::PED; }
 
     CPlayerPed*    GetGamePlayer() noexcept { return m_pPlayerPed; }
     CEntity*       GetGameEntity() noexcept { return m_pPlayerPed; }

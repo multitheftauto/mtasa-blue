@@ -616,7 +616,7 @@ static void ApplyVehicleSpeedCameraClip()
     if (pCamera)
     {
         CEntity* pTargetEntity = pCamera->GetTargetEntity();
-        if (pTargetEntity && pTargetEntity->GetEntityType() == ENTITY_TYPE_VEHICLE)
+        if (pTargetEntity && pTargetEntity->GetEntityType() == EntityType::VEHICLE)
         {
             pVehicle = pTargetEntity->GetInterface();
         }

@@ -35,7 +35,7 @@ public:
 
     void Unlink();
 
-    eClientEntityType GetType() const { return CCLIENTOBJECT; };
+    ElementType::Enum GetType() const { return ElementType::OBJECT; };
 
     CObject*       GetGameObject() { return m_pObject; }
     CEntity*       GetGameEntity() { return m_pObject; }

@@ -183,7 +183,7 @@ bool CWeaponSA::ProcessLineOfSight(const CVector& vecStart, const CVector& vecEn
     }
 
     // Call CWeapon::CheckForShootingVehicleOccupant
-    if (*entity && (*entity)->nType == ENTITY_TYPE_VEHICLE)
+    if (*entity && (*entity)->nType == EntityType::VEHICLE)
         ((bool(__cdecl*)(CEntitySAInterface**, CColPointSAInterface*, eWeaponType, const CVector&,
                          const CVector&))FUNC_CWeapon_CheckForShootingVehicleOccupant)(entity, (*colCollision)->GetInterface(), weaponType, vecStart, vecEnd);
 

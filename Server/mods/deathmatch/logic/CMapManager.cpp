@@ -881,16 +881,16 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
 
     // Handle it based on the tag name
     CElement* pNode = NULL;
-    if (elementType == CElement::VEHICLE)
+    if (elementType == ElementType::VEHICLE)
     {
         pNode = m_pVehicleManager->CreateFromXML(pParent, Node, m_pEvents);
     }
-    else if (elementType == CElement::OBJECT)
+    else if (elementType == ElementType::OBJECT)
     {
         bool bIsLowLod = false;
         pNode = m_pObjectManager->CreateFromXML(pParent, Node, m_pEvents, bIsLowLod);
     }
-    else if (elementType == CElement::BLIP)
+    else if (elementType == ElementType::BLIP)
     {
         CBlip* pBlip = m_pBlipManager->CreateFromXML(pParent, Node, m_pEvents);
         pNode = pBlip;
@@ -899,11 +899,11 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
             pBlip->SetIsSynced ( bIsDuringStart );
         }*/
     }
-    else if (elementType == CElement::PICKUP)
+    else if (elementType == ElementType::PICKUP)
     {
         pNode = m_pPickupManager->CreateFromXML(pParent, Node, m_pEvents);
     }
-    else if (elementType == CElement::MARKER)
+    else if (elementType == ElementType::MARKER)
     {
         CMarker* pMarker = m_pMarkerManager->CreateFromXML(pParent, Node, m_pEvents);
         pNode = pMarker;
@@ -912,7 +912,7 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
             pMarker->SetIsSynced(bIsDuringStart);
         }
     }
-    else if (elementType == CElement::RADAR_AREA)
+    else if (elementType == ElementType::RADAR_AREA)
     {
         CRadarArea* pRadarArea = m_pRadarAreaManager->CreateFromXML(pParent, Node, m_pEvents);
         pNode = pRadarArea;
@@ -921,15 +921,15 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
             pRadarArea->SetIsSynced(bIsDuringStart);
         }
     }
-    else if (elementType == CElement::TEAM)
+    else if (elementType == ElementType::TEAM)
     {
         pNode = m_pTeamManager->CreateFromXML(pParent, Node, m_pEvents);
     }
-    else if (elementType == CElement::PED)
+    else if (elementType == ElementType::PED)
     {
         pNode = m_pPedManager->CreateFromXML(pParent, Node, m_pEvents);
     }
-    else if (elementType == CElement::WATER)
+    else if (elementType == ElementType::WATER)
     {
         pNode = m_pWaterManager->CreateFromXML(pParent, Node, m_pEvents);
     }

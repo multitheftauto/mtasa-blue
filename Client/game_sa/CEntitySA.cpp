@@ -160,7 +160,7 @@ void CEntitySA::SetPosition(float fX, float fY, float fZ)
         }
         // clang-format on
     }
-    if (m_pInterface->nType == ENTITY_TYPE_OBJECT)
+    if (m_pInterface->nType == EntityType::OBJECT)
     {
         ((CObjectSAInterface*)m_pInterface)->bUpdateScale = true;
     }
@@ -232,7 +232,7 @@ void CEntitySA::SetOrientation(float fX, float fY, float fZ)
     }
     // clang-format on
 
-    if (m_pInterface->nType == ENTITY_TYPE_OBJECT)
+    if (m_pInterface->nType == EntityType::OBJECT)
     {
         ((CObjectSAInterface*)m_pInterface)->bUpdateScale = true;
     }
@@ -392,7 +392,7 @@ void CEntitySA::SetMatrix(CMatrix* matrix)
         }
         // clang-format on
 
-        if (m_pInterface->nType == ENTITY_TYPE_OBJECT)
+        if (m_pInterface->nType == EntityType::OBJECT)
         {
             ((CObjectSAInterface*)m_pInterface)->bUpdateScale = true;
         }
@@ -406,9 +406,9 @@ WORD CEntitySA::GetModelIndex()
     return m_pInterface->m_nModelIndex;
 }
 
-eEntityType CEntitySA::GetEntityType()
+EntityType::Enum CEntitySA::GetEntityType()
 {
-    return (eEntityType)m_pInterface->nType;
+    return (EntityType::Enum)m_pInterface->nType;
 }
 
 float CEntitySA::GetDistanceFromCentreOfMassToBaseOfModel()
