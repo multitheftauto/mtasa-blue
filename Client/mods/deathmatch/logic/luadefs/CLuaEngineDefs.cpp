@@ -13,6 +13,9 @@
 #include <game/CColPoint.h>
 #include <game/CObjectGroupPhysicalProperties.h>
 #include <game/CStreaming.h>
+#include <game/CIplStore.h>
+#include <game/CColStore.h>
+#include <game/CRenderer.h>
 #include <game/CPtrNodeSingleLinkPool.h>
 #include <lua/CLuaFunctionParser.h>
 #include "CLuaEngineDefs.h"
@@ -2642,16 +2645,34 @@ eModelLoadState CLuaEngineDefs::EngineStreamingGetModelLoadState(std::uint16_t m
     return g_pGame->GetStreaming()->GetStreamingInfo(modelId)->loadState;
 }
 
-void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option)
+void CLuaEngineDefs::EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option, std::optional<float> heading)
 {
-    if (!option.has_value())
-        option = PreloadAreaOption::ALL;
+    const PreloadAreaOption loadOption = option.value_or(PreloadAreaOption::ALL);
 
-    if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::MODELS)
-        g_pGame->GetStreaming()->LoadScene(&position);
+    // IPLs have to be loaded before the models are requested
+    g_pGame->GetIplStore()->LoadIpls(position);
 
-    if (option == PreloadAreaOption::ALL || option == PreloadAreaOption::COLLISIONS)
-        g_pGame->GetStreaming()->LoadSceneCollision(&position);
+    if (loadOption == PreloadAreaOption::ALL || loadOption == PreloadAreaOption::COLLISIONS)
+        g_pGame->GetCollisionStore()->LoadCollision(position);
+
+    // IPLs and collisions are always marked as priority
+    g_pGame->GetStreaming()->LoadAllRequestedModels(true, "EnginePreloadWorldArea - IPLs / collisions");
+
+    if (loadOption == PreloadAreaOption::ALL || loadOption == PreloadAreaOption::MODELS)
+    {
+        g_pGame->GetStreaming()->RequestBigBuildings(position);
+
+        // Request all models in specified heading (uses current camera FOV, up to 300 units away)
+        if (heading.has_value())
+            g_pGame->GetRenderer()->RequestObjectsInDirection(position, ConvertDegreesToRadiansNoWrap(heading.value()));
+
+        g_pGame->GetStreaming()->AddModelsToRequestList(position, STREAMING_FLAG_LOADING_SCENE);
+        g_pGame->GetStreaming()->LoadAllRequestedModels(false, "EnginePreloadWorldArea - models");
+        g_pGame->GetStreaming()->InstanceLoadedModels(position);
+
+        // Remove the flags we set earlier, so they load normally later on
+        g_pGame->GetStreaming()->ClearFlagForAllModels(STREAMING_FLAG_LOADING_SCENE);
+    }
 }
 
 bool CLuaEngineDefs::EngineRestreamModel(std::uint16_t modelId)
