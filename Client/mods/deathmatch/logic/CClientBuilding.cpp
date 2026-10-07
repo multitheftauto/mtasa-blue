@@ -110,6 +110,10 @@ void CClientBuilding::SetInterior(uint8_t ucInterior)
 void CClientBuilding::SetDimension(unsigned short usDimension)
 {
     CClientEntity::SetDimension(usDimension);
+
+    if (!m_pBuilding && usDimension == m_pBuildingManager->GetDimension())
+        m_pBuildingManager->ResizePoolIfNeeds();
+
     RelateDimension(m_pBuildingManager->GetDimension());
 }
 
