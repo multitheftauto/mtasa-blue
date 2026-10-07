@@ -208,6 +208,10 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
 
             unloadModelsAndCallEventsNonStreamed(buildingsList.begin(), buildingsList.end(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
 
+            const std::list<CClientProjectile*> projectiles = g_pClientGame->GetManager()->GetProjectileManager()->GetProjectiles();
+
+            unloadModelsAndCallEventsNonStreamed(projectiles.begin(), projectiles.end(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
+
             // Restore COL
             g_pClientGame->GetManager()->GetColModelManager()->RestoreModel(static_cast<unsigned short>(m_iModelID));
             break;
@@ -222,6 +226,8 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             break;
         }
     }
+
+    g_pClientGame->GetManager()->GetModelRequestManager()->Cancel(pModelInfo);
 
     // Restore DFF/TXD
     g_pClientGame->GetManager()->GetDFFManager()->RestoreModel(static_cast<unsigned short>(m_iModelID));
