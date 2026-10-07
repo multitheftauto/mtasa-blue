@@ -5522,7 +5522,7 @@ void CPacketHandler::Packet_ResourceClientScripts(NetBitStreamInterface& bitStre
                 const unsigned long originalLength = static_cast<unsigned long>(uData[0]) << 24 | static_cast<unsigned long>(uData[1]) << 16 |
                                                      static_cast<unsigned long>(uData[2]) << 8 | static_cast<unsigned long>(uData[3]);
                 constexpr unsigned long MAX_CLIENT_SCRIPT_SIZE = 50 * 1024 * 1024;
-                if (originalLength == 0 || originalLength > MAX_CLIENT_SCRIPT_SIZE)
+                if (originalLength > MAX_CLIENT_SCRIPT_SIZE)
                 {
                     memset(data.data(), 0, data.size());
                     return;
@@ -5540,7 +5540,8 @@ void CPacketHandler::Packet_ResourceClientScripts(NetBitStreamInterface& bitStre
                     pResource->LoadNoClientCacheScript(uncompressedBuffer.data(), uncompressedLength, strFilename);
                 }
 
-                memset(uncompressedBuffer.data(), 0, uncompressedBuffer.size());
+                if (!uncompressedBuffer.empty())
+                    memset(uncompressedBuffer.data(), 0, uncompressedBuffer.size());
                 memset(data.data(), 0, data.size());
             }
         }
