@@ -88,6 +88,7 @@ public:
     void                InitHooks_DeviceSelection();
     void                InitHooks_Explosions();
     void                InitHooks_Tasks();
+    void                InitHooks_Audio();
     CRemoteDataStorage* CreateRemoteDataStorage();
     void                DestroyRemoteDataStorage(CRemoteDataStorage* pData);
     void                AddRemoteDataStorage(CPlayerPed* pPed, CRemoteDataStorage* pData);
@@ -356,6 +357,9 @@ public:
 
     void SetBoatWaterSplashEnabled(bool bEnabled);
     void SetTyreSmokeEnabled(bool bEnabled);
+
+    void RestartAudioHardware() override;
+    void SetPreferredAudioDeviceName(const std::string& strName) override;
 
     void SetLastStaticAnimationPlayed(eAnimGroup dwGroupID, eAnimID dwAnimID, DWORD dwAnimArrayAddress)
     {

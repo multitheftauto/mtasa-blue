@@ -88,6 +88,12 @@ public:
 
     bool IsActive() { return m_bVoiceActive; }
 
+    void MoveToDevice(DWORD dwDevice)
+    {
+        if (m_pBassPlaybackStream)
+            BASS_ChannelSetDevice(m_pBassPlaybackStream, dwDevice);
+    }
+
 private:
     enum class EVoiceFrameResult
     {

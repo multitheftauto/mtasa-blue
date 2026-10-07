@@ -42,6 +42,8 @@ private:
     POINT        m_MoveOffset;
     HWND         m_MovementDummyWindow;
     HDEVNOTIFY   m_hDeviceNotify;
+    HDEVNOTIFY   m_hAudioRenderDeviceNotify;
+    HDEVNOTIFY   m_hAudioCaptureDeviceNotify;
 
     static WPARAM m_LastVirtualKeyCode;
     static UCHAR  m_LastScanCode;
