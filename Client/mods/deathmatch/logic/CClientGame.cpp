@@ -1715,14 +1715,64 @@ void CClientGame::SetMimic(unsigned int uiMimicCount)
 
 #endif
 
+namespace
+{
+    bool IsBikeOrBmxVehicle(const CClientVehicle* pVehicle)
+    {
+        const eClientVehicleType eType = pVehicle->GetVehicleType();
+        return eType == CLIENTVEHICLE_BIKE || eType == CLIENTVEHICLE_BMX;
+    }
+
+    bool CanPedStepOutOfClientVehicle(CClientVehicle* pVehicle)
+    {
+        if (CVehicle* pGameVehicle = pVehicle->GetGameVehicle())
+            return pGameVehicle->CanPedStepOutCar();
+
+        // Streamed-out fallback matching CVehicle::CanPedStepOutCar (0x6D1F30) when upright:
+        // 2D speed <= 0.01 and |vz| <= 0.05.
+        CVector vecMoveSpeed;
+        pVehicle->GetMoveSpeed(vecMoveSpeed);
+        const float fAbsMoveSpeedZ = vecMoveSpeed.fZ < 0.0f ? -vecMoveSpeed.fZ : vecMoveSpeed.fZ;
+        return (vecMoveSpeed.fX * vecMoveSpeed.fX + vecMoveSpeed.fY * vecMoveSpeed.fY) <= (0.01f * 0.01f) && fAbsMoveSpeedZ <= 0.05f;
+    }
+}
+
 void CClientGame::DoVehicleInKeyCheck()
 {
     // Grab the controller state
     CControllerState cs;
     g_pGame->GetPad()->GetCurrentControllerState(&cs);
     static bool bButtonTriangleWasDown = false;
+    static bool bHoldExitOnBike = false;
+
+    CClientVehicle* pOccupiedVehicle = m_pLocalPlayer->GetOccupiedVehicle();
+    const bool      bOnBikeOrBmx = pOccupiedVehicle && IsBikeOrBmxVehicle(pOccupiedVehicle);
+
     if (cs.ButtonTriangle)
     {
+        // Bikes/BMX: native F is a brake until the bike is slow enough to step off.
+        // Sending VEHICLE_REQUEST_OUT on the key press makes remotes dismount while
+        // the local LeaveCar task is still waiting for a stop (#5153).
+        if (bOnBikeOrBmx && !m_pLocalPlayer->IsGettingOutOfVehicle())
+        {
+            if (!CanPedStepOutOfClientVehicle(pOccupiedVehicle))
+            {
+                bButtonTriangleWasDown = true;
+                bHoldExitOnBike = true;
+                return;
+            }
+
+            if (bHoldExitOnBike || !bButtonTriangleWasDown)
+            {
+                bButtonTriangleWasDown = true;
+                bHoldExitOnBike = false;
+                m_pLocalPlayer->ExitVehicle();
+                return;
+            }
+        }
+
+        bHoldExitOnBike = false;
+
         if (!bButtonTriangleWasDown)
         {
             bButtonTriangleWasDown = true;
@@ -1752,6 +1802,7 @@ void CClientGame::DoVehicleInKeyCheck()
     else
     {
         bButtonTriangleWasDown = false;
+        bHoldExitOnBike = false;
     }
 }
 

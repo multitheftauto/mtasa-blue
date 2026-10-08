@@ -39,6 +39,7 @@ struct RwTexture;
 #define FUNC_CVehicle_IsUpsideDown               0x6D1D90
 #define FUNC_CVehicle_SetEngineOn                0x41BDD0
 #define FUNC_CVehicle_IsPassenger                0x6D1BD0
+#define FUNC_CVehicle_CanPedStepOutCar           0x6D1F30
 #define FUNC_CTrain_FindPositionOnTrackFromCoors 0x6F6CC0
 
 #define FUNC_CVehicle_QueryPickedUpEntityWithWinch   0x6d3cf0
@@ -559,6 +560,7 @@ public:
     bool           IsDrowning() { return GetVehicleInterface()->m_nVehicleFlags.bIsDrowning; };
     bool           IsEngineOn() { return GetVehicleInterface()->m_nVehicleFlags.bEngineOn; };
     bool           IsHandbrakeOn() { return GetVehicleInterface()->m_nVehicleFlags.bIsHandbrakeOn; };
+    bool           CanPedStepOutCar(bool bIgnoreSpeedUpright = false) override;
     bool           IsRCVehicle() { return GetVehicleInterface()->m_nVehicleFlags.bIsRCVehicle; };
     bool           GetAlwaysLeaveSkidMarks() { return GetVehicleInterface()->m_nVehicleFlags.bAlwaysSkidMarks; };
     bool           GetCanBeDamaged() { return GetVehicleInterface()->m_nVehicleFlags.bCanBeDamaged; };
