@@ -11,6 +11,7 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
 
 class CLuaPedDefs : public CLuaDefs
 {
@@ -76,6 +77,7 @@ public:
                                 std::optional<std::variant<std::string, std::monostate, bool>> animName, std::optional<int> time, std::optional<bool> loop,
                                 std::optional<bool> updatePosition, std::optional<bool> interruptable, std::optional<bool> freezeLastFrame,
                                 std::optional<int> blendTime, std::optional<bool> restoreTask);
+    static std::variant<bool, CLuaMultiReturn<std::string, std::string, int, bool, bool, bool, bool, int, bool>> GetPedAnimation(CPed* pPed);
     LUA_DECLARE(SetPedAnimationProgress);
     LUA_DECLARE(SetPedAnimationSpeed);
     LUA_DECLARE(SetPedWeaponSlot);
