@@ -5238,7 +5238,11 @@ bool CStaticFunctionDefinitions::SetCameraInterior(unsigned char ucInterior)
     if (!world)
         return false;
 
-    world->SetCurrentArea(ucInterior);
+    if (m_pCamera)
+        m_pCamera->SetInterior(ucInterior);
+    else
+        world->SetCurrentArea(ucInterior);
+
     return true;
 }
 
