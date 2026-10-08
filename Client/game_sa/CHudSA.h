@@ -16,6 +16,7 @@
 #include <game/RenderWare.h>
 #include "CFontSA.h"
 #include "CRect.h"
+#include "CHudSAPlacement.h"
 
 #define FUNC_Draw 0x58FAE0
 
@@ -47,10 +48,16 @@
 #define FUNC_CStats_GetFatAndMuscleModifier 0x559AF0
 #define FUNC_CSprite2d_DrawBarChart         0x728640
 #define FUNC_CSprite2d_Draw                 0x728350
+#define FUNC_CSprite2d_DrawRect             0x727B60
 #define FUNC_CSprite_RenderOneXLUSprite     0x70D000
 
 #define FUNC_CRadar_DrawRadarMap 0x586880
 #define FUNC_CRadar_DrawBlips    0x588050
+
+#define CALLER_DrawRadar 0x58FC53
+
+#define FUNC_DrawCrossHairs 0x58E020
+#define DRAW_CROSSHAIRS_END 0x58EAF0
 
 #define CODE_ShowMoney          0x58F47D
 #define CODE_ShowRadarAltimeter 0x58A5A6
@@ -170,6 +177,9 @@ struct ComponentProperties
 
     SHudComponentData weaponIcon;
     SHudComponentData wanted;
+
+    SHudComponentData radar;
+    SHudComponentData crosshair;
 };
 
 class CHudSA : public CHud
@@ -270,6 +280,15 @@ public:
 
     static void StaticSetHooks();
 
+    static void BeginRadarTransform() noexcept;
+    static void EndRadarTransform() noexcept;
+    static void RenderRadar();
+
+    static void BeginCrosshairTransform() noexcept;
+    static void EndCrosshairTransform() noexcept;
+
+    static void ApplyHudVertexTransform(void* pVertices, int iNumVertices) noexcept;
+
     static void RenderHealthBar(int x, int y);
     static void RenderBreathBar(int x, int y);
     static void RenderArmorBar(int x, int y);
@@ -280,7 +299,7 @@ private:
     void ResetComponent(SComponentPlacement& placement, bool resetSize) noexcept;
     void ResetComponentFontData(const eHudComponent& component, const eHudComponentProperty& property) noexcept;
 
-    SHudComponentData& GetHudComponentRef(const eHudComponent& component) const noexcept;
+    static SHudComponentData& GetHudComponentRef(const eHudComponent& component) noexcept;
 
     static void RenderText(float x, float y, const char* text, SHudComponentData& properties, bool useSecondColor = false, bool drawFromBottom = false,
                            bool scaleForLanguage = false);
@@ -295,7 +314,18 @@ private:
     static void RenderWeaponIcon_XLU(CVector pos, CVector2D halfSize, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint16_t intensity, float rhw,
                                      std::uint8_t a, std::uint8_t uDir, std::uint8_t vDir);
 
+    static void __fastcall RenderCrosshair_Sprite(void* sprite, void*, CRect* rect, RwColor* color);
+    static void            RenderCrosshair_Rect(CRect* rect, RwColor* color);
+
     static void RenderWanted(bool empty, float x, float y, const char* strLevel);
+
+    static HudPlacement::SRect GetRadarDefaultRect() noexcept;
+    static HudPlacement::SRect GetCrosshairDefaultRect() noexcept;
+
+    static HudPlacement::SVertexPlacement GetCrosshairPlacement() noexcept;
+
+    static void RenderCrosshairSprite(CVector vecPos, CVector2D vecHalfSize, std::uint8_t ucRed, std::uint8_t ucGreen, std::uint8_t ucBlue,
+                                      std::uint16_t usIntensity, float fRhw, std::uint8_t ucAlpha, std::uint8_t ucUDir, std::uint8_t ucVDir);
 
 private:
     std::map<eHudComponent, SHudComponent> m_HudComponentMap;
@@ -310,4 +340,13 @@ private:
     static float calcStreetchX;
     static float calcStreetchY;
     static float blinkingBarHPValue;
+
+    static HudPlacement::SVertexTransform ms_RadarTransform;
+
+    static bool                ms_bRadarCustomColor;
+    static HudPlacement::SRgba ms_RadarTint;
+
+    static HudPlacement::SVertexTransform ms_CrosshairTransform;
+    static bool                           ms_bCrosshairCustomColor;
+    static HudPlacement::SRgba            ms_CrosshairTint;
 };
