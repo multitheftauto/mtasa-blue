@@ -1628,6 +1628,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
             if ((*iter)->IsSpawned())
             {
                 (*iter)->SetDimension(usDimension);
+                RefreshElementCollisions(*iter);
             }
         }
     }
@@ -1671,9 +1672,13 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         case CElement::WATER:
         {
             pElement->SetDimension(usDimension);
+
             CBitStream bitStream;
             bitStream.pBitStream->Write(usDimension);
             m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(pElement, SET_ELEMENT_DIMENSION, *bitStream.pBitStream));
+
+            RefreshElementCollisions(pElement);
+
             return true;
         }
         default:
@@ -10015,6 +10020,32 @@ bool CStaticFunctionDefinitions::SetColShapeRadius(CColShape* pColShape, float f
     return true;
 }
 
+bool CStaticFunctionDefinitions::SetColShapeCheckDimension(CColShape* colShape, bool enabled)
+{
+    colShape->SetDimensionCheckEnabled(enabled);
+
+    RefreshColShapeColliders(colShape);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit(enabled);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(colShape, SET_COLSHAPE_CHECK_DIMENSION, *BitStream.pBitStream));
+
+    return true;
+}
+
+bool CStaticFunctionDefinitions::SetColShapeCheckInterior(CColShape* colShape, bool enabled)
+{
+    colShape->SetInteriorCheckEnabled(enabled);
+
+    RefreshColShapeColliders(colShape);
+
+    CBitStream BitStream;
+    BitStream.pBitStream->WriteBit(enabled);
+    m_pPlayerManager->BroadcastOnlyJoined(CElementRPCPacket(colShape, SET_COLSHAPE_CHECK_INTERIOR, *BitStream.pBitStream));
+
+    return true;
+}
+
 bool CStaticFunctionDefinitions::SetColShapeSize(CColShape* pColShape, CVector& vecSize)
 {
     if (vecSize.fX < 0.0f)
@@ -10145,6 +10176,37 @@ void CStaticFunctionDefinitions::RefreshColShapeColliders(CColShape* pColShape)
 {
     CElement* pRoot = m_pMapManager->GetRootElement();
     m_pColManager->DoHitDetection(pRoot->GetPosition(), pRoot, pColShape, true);
+}
+
+void CStaticFunctionDefinitions::RefreshElementCollisions(CElement* element)
+{
+    switch (element->GetType())
+    {
+        case CElement::PLAYER:
+        case CElement::PED:
+        case CElement::VEHICLE:
+            m_pColManager->DoHitDetection(element->GetPosition(), element);
+            break;
+        case CElement::COLSHAPE:
+            RefreshColShapeColliders(static_cast<CColShape*>(element));
+            break;
+        case CElement::MARKER:
+        {
+            CColShape* colShape = static_cast<CMarker*>(element)->GetColShape();
+            if (colShape)
+                RefreshColShapeColliders(colShape);
+            break;
+        }
+        case CElement::PICKUP:
+        {
+            CColShape* colShape = static_cast<CPickup*>(element)->GetColShape();
+            if (colShape)
+                RefreshColShapeColliders(colShape);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 bool CStaticFunctionDefinitions::GetWeaponNameFromID(unsigned char ucID, char* szName)
