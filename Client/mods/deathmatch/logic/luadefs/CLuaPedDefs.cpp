@@ -1615,25 +1615,50 @@ bool CLuaPedDefs::IsPedBleeding(CClientPed* pPed)
 
 int CLuaPedDefs::GetPedCameraRotation(lua_State* luaVM)
 {
-    // Verify the argument
-    CClientPed*      pPed = NULL;
+    CClientPed* pPed = nullptr;
+    bool        bIncludePitch = false;
+
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPed);
-
-    if (!argStream.HasErrors())
+    argStream.ReadBool(bIncludePitch, false);
+    if (argStream.HasErrors())
     {
-        float fRotation = 0.0f;
-        if (CStaticFunctionDefinitions::GetPedCameraRotation(*pPed, fRotation))
-        {
-            lua_pushnumber(luaVM, fRotation);
-            return 1;
-        }
-    }
-    else
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+    float fYaw = 0.0f;
+    if (!CStaticFunctionDefinitions::GetPedCameraRotation(*pPed, fYaw))
+    {
+        lua_pushboolean(luaVM, false);
+        return 1;
+    }
+
+    if (!bIncludePitch)
+    {
+        lua_pushnumber(luaVM, fYaw);
+        return 1;
+    }
+
+    float fPitch = 0.0f;
+    if (pPed->IsLocalPlayer())
+    {
+        CMatrix cameraMatrix;
+        g_pGame->GetCamera()->GetMatrix(&cameraMatrix);
+
+        const CVector& vecCamFwd = cameraMatrix.vFront;
+        fPitch = atan2(vecCamFwd.fZ, DistanceBetweenPoints2D(CVector(), vecCamFwd)) * (180.0f / PI);
+    }
+    else if (pPed->GetType() == CCLIENTPLAYER)
+    {
+        CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pPed);
+        fPitch = pPlayer->GetCameraPitch();
+    }
+
+    lua_pushnumber(luaVM, fYaw);
+    lua_pushnumber(luaVM, fPitch);
+    return 2;
 }
 
 int CLuaPedDefs::IsPedOnFire(lua_State* luaVM)

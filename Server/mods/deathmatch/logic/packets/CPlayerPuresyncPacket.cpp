@@ -460,6 +460,12 @@ bool CPlayerPuresyncPacket::Write(NetBitStreamInterface& BitStream) const
             }
         }
 
+        const CVector& vecCamFwd = pSourcePlayer->GetCamFwd();
+
+        SCameraPitchSync cameraPitch;
+        cameraPitch.data.fValue = atan2(vecCamFwd.fZ, DistanceBetweenPoints2D(CVector(), vecCamFwd)) * (180.0f / PI);
+        BitStream.Write(&cameraPitch);
+
         // Success
         return true;
     }
