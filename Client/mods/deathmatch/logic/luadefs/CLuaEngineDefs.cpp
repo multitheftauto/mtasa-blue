@@ -58,6 +58,21 @@ size_t EngineStreamingGetMemorySize()
     return g_pCore->GetStreamingMemory();
 }
 
+// Set how many objects can be streamed in at once: high-detail (near) and low-LOD (far).
+// Default is stock (500/500). Raising these lets dense maps load more decoration, but it
+// trades FPS for density (rendering is draw-call bound). Total must fit the object pool.
+bool EngineSetObjectStreamingLimits(unsigned int uiHighDetail, unsigned int uiLowLod)
+{
+    return g_pClientGame->GetObjectManager()->SetStreamingLimits(uiHighDetail, uiLowLod);
+}
+
+// Get the current object streaming limits -> highDetail, lowLod
+CLuaMultiReturn<unsigned int, unsigned int> EngineGetObjectStreamingLimits()
+{
+    CClientObjectManager* pManager = g_pClientGame->GetObjectManager();
+    return {pManager->GetMaxStreamedInCount(), pManager->GetMaxLowLodStreamedInCount()};
+}
+
 // Set streaming buffer size
 bool EngineStreamingSetBufferSize(size_t sizeBytes)
 {
@@ -146,6 +161,8 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineStreamingGetUsedMemory", ArgumentParser<EngineStreamingGetUsedMemory>},
         {"engineStreamingSetMemorySize", ArgumentParser<EngineStreamingSetMemorySize>},
         {"engineStreamingGetMemorySize", ArgumentParser<EngineStreamingGetMemorySize>},
+        {"engineSetObjectStreamingLimits", ArgumentParser<EngineSetObjectStreamingLimits>},
+        {"engineGetObjectStreamingLimits", ArgumentParser<EngineGetObjectStreamingLimits>},
         {"engineStreamingSetModelCacheLimits", ArgumentParser<EngineStreamingSetModelCacheLimits>},
         {"engineStreamingRestoreMemorySize", ArgumentParser<EngineStreamingRestoreMemorySize>},
         {"engineStreamingSetBufferSize", ArgumentParser<EngineStreamingSetBufferSize>},
