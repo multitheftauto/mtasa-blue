@@ -30,32 +30,32 @@ class CRegisteredCommands
 {
     struct SCommand
     {
-        class CLuaMain* pLuaMain;
-        SString         strKey;
-        CLuaFunctionRef iLuaFunction;
-        bool            bRestricted;
-        bool            bCaseSensitive;
+        class CLuaMain* luaMain;
+        SString         commandName;
+        CLuaFunctionRef luaFunction;
+        bool            restricted;
+        bool            caseSensitive;
     };
 
 public:
-    CRegisteredCommands(class CAccessControlListManager* pACLManager);
+    CRegisteredCommands(class CAccessControlListManager* aclManager);
     ~CRegisteredCommands();
 
-    bool AddCommand(class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction, bool bRestricted, bool bCaseSensitive);
-    bool RemoveCommand(class CLuaMain* pLuaMain, const char* szKey, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
+    bool AddCommand(class CLuaMain* luaMain, const char* commandName, const CLuaFunctionRef& luaFunction, bool restricted, bool caseSensitive);
+    bool RemoveCommand(class CLuaMain* luaMain, const char* commandName, const CLuaFunctionRef& luaFunction = CLuaFunctionRef());
     void ClearCommands();
-    void CleanUpForVM(class CLuaMain* pLuaMain);
+    void CleanUpForVM(class CLuaMain* luaMain);
 
-    bool CommandExists(const char* szKey, class CLuaMain* pLuaMain = NULL);
+    bool CommandExists(const char* commandName, class CLuaMain* luaMain = nullptr);
 
     void GetCommands(lua_State* luaVM);
-    void GetCommands(lua_State* luaVM, CLuaMain* pTargetLuaMain);
+    void GetCommands(lua_State* luaVM, CLuaMain* targetLuaMain);
 
-    bool ProcessCommand(const char* szKey, const char* szArguments, class CClient* pClient);
+    bool ProcessCommand(const char* commandName, const char* arguments, class CClient* client);
 
 private:
-    SCommand* GetCommand(const char* szKey, class CLuaMain* pLuaMain = NULL);
-    void CallCommandHandler(class CLuaMain* pLuaMain, const CLuaFunctionRef& iLuaFunction, const char* szKey, const char* szArguments, class CClient* pClient);
+    SCommand* GetCommand(const char* commandName, class CLuaMain* luaMain = nullptr);
+    void CallCommandHandler(class CLuaMain* luaMain, const CLuaFunctionRef& luaFunction, const char* commandName, const char* arguments, class CClient* client);
 
     void TakeOutTheTrash();
 
