@@ -18,6 +18,7 @@ RenderEverythingBarRoadsHandler* pRenderEverythingBarRoadsHandler = nullptr;
 
 #define VAR_CCullZones_NumMirrorAttributeZones 0x0C87AC4  // int
 #define VAR_CMirrors_d3dRestored               0x0C7C729  // uchar
+#define VAR_CRenderer_ms_vecCameraPosition     0x0B76870  // CVector
 
 namespace
 {
@@ -345,11 +346,85 @@ static void __declspec(naked) HOOK_CVisibilityPlugins_RenderWeaponPedsForPC_End(
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// Render lists
+//
+// The game's visible entity and LOD lists hold 1000 entries. They live in larger arrays here,
+// and once one is full the farthest entity in it makes room for a nearer one
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+namespace
+{
+    constexpr std::uint32_t RENDER_LIST_CAPACITY = 8000;
+    constexpr std::uint32_t RENDER_LIST_LAST = RENDER_LIST_CAPACITY - 1;  // The game stores the next entity here before the hook runs, it is never drawn
+    static_assert(RENDER_LIST_CAPACITY <= 0x10000, "Heap slots are std::uint16_t");
+
+    struct SRenderList
+    {
+        CEntitySAInterface* entities[RENDER_LIST_CAPACITY];
+        float               distanceSquared[RENDER_LIST_LAST];
+        std::uint16_t       heap[RENDER_LIST_LAST];  // Slots by distance, farthest on top
+        bool                heapBuilt;
+    };
+
+    SRenderList ms_visibleLods;
+    SRenderList ms_visibleEntities;
+
+    // The game has already stored the entity at count
+    std::uint32_t AddToRenderList(SRenderList& list, std::uint32_t count)
+    {
+        if (count < RENDER_LIST_LAST)
+        {
+            list.heapBuilt = false;
+            return count + 1;
+        }
+
+        // Not the distance the game passes along, ScanSectorList gives peds and vehicles a stale one
+        const auto distanceSquaredToCamera = [](const CEntitySAInterface* entity)
+        {
+            const auto&    camera = *reinterpret_cast<const CVector*>(VAR_CRenderer_ms_vecCameraPosition);
+            const CVector& position = entity->matrix ? entity->matrix->vPos : entity->m_transform.m_translate;
+            const float    distanceSquared = (position - camera).LengthSquared();
+            return distanceSquared <= std::numeric_limits<float>::max() ? distanceSquared : std::numeric_limits<float>::max();
+        };
+        const auto isNearer = [&list](std::uint16_t a, std::uint16_t b) { return list.distanceSquared[a] < list.distanceSquared[b]; };
+
+        if (!list.heapBuilt)
+        {
+            for (std::uint16_t slot = 0; slot < RENDER_LIST_LAST; slot++)
+            {
+                list.distanceSquared[slot] = distanceSquaredToCamera(list.entities[slot]);
+                list.heap[slot] = slot;
+            }
+            std::make_heap(list.heap, list.heap + RENDER_LIST_LAST, isNearer);
+            list.heapBuilt = true;
+        }
+
+        CEntitySAInterface* entity = list.entities[RENDER_LIST_LAST];
+        const float         distanceSquared = distanceSquaredToCamera(entity);
+        if (distanceSquared >= list.distanceSquared[list.heap[0]])
+            return RENDER_LIST_LAST;
+
+        std::pop_heap(list.heap, list.heap + RENDER_LIST_LAST, isNearer);
+        const std::uint16_t farthest = list.heap[RENDER_LIST_LAST - 1];
+        list.entities[farthest] = entity;
+        list.distanceSquared[farthest] = distanceSquared;
+        std::push_heap(list.heap, list.heap + RENDER_LIST_LAST, isNearer);
+        return RENDER_LIST_LAST;
+    }
+}  // namespace
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Check_NoOfVisibleLods
 //
 // Apply render limits
 //
 //////////////////////////////////////////////////////////////////////////////////////////
+std::uint32_t OnMY_Check_NoOfVisibleLods(std::uint32_t count)
+{
+    return AddToRenderList(ms_visibleLods, count);
+}
+
 // Hook info
 #define HOOKPOS_Check_NoOfVisibleLods  0x5534F9
 #define HOOKSIZE_Check_NoOfVisibleLods 6
@@ -361,10 +436,9 @@ static void __declspec(naked) HOOK_Check_NoOfVisibleLods()
     // clang-format off
     __asm
     {
-        cmp     eax, 999            // Array limit is 1000
-        jge     limit
-        inc     eax
-limit:
+        push    eax
+        call    OnMY_Check_NoOfVisibleLods
+        add     esp, 4
         mov     dword ptr ds:[00B76840h],eax        // NoOfVisibleLods
         jmp     RETURN_Check_NoOfVisibleLods
     }
@@ -378,6 +452,11 @@ limit:
 // Apply render limits
 //
 //////////////////////////////////////////////////////////////////////////////////////////
+std::uint32_t OnMY_Check_NoOfVisibleEntities(std::uint32_t count)
+{
+    return AddToRenderList(ms_visibleEntities, count);
+}
+
 // Hook info
 #define HOOKPOS_Check_NoOfVisibleEntities  0x55352D
 #define HOOKSIZE_Check_NoOfVisibleEntities 6
@@ -389,10 +468,9 @@ static void __declspec(naked) HOOK_Check_NoOfVisibleEntities()
     // clang-format off
     __asm
     {
-        cmp     eax, 999        // Array limit is 1000
-        jge     limit
-        inc     eax
-limit:
+        push    eax
+        call    OnMY_Check_NoOfVisibleEntities
+        add     esp, 4
         mov     dword ptr ds:[00B76844h],eax        // NoOfVisibleEntities
         jmp     RETURN_Check_NoOfVisibleEntities
     }
@@ -953,6 +1031,14 @@ void CMultiplayerSA::InitHooks_Rendering()
     EZHookInstall(CVisibilityPlugins_RenderPedCB);
     EZHookInstall(Check_NoOfVisibleLods);
     EZHookInstall(Check_NoOfVisibleEntities);
+
+    // The seven places the game addresses the two lists directly
+    for (DWORD address : {0x5534F5, 0x553923, 0x553CB3})
+        MemPut<DWORD>(address, reinterpret_cast<DWORD>(ms_visibleLods.entities));
+
+    for (DWORD address : {0x553529, 0x553944, 0x553A53, 0x553B03})
+        MemPut<DWORD>(address, reinterpret_cast<DWORD>(ms_visibleEntities.entities));
+
     EZHookInstall(WinLoop);
     EZHookInstall(CTimer_Update);
     EZHookInstall(CTimer_Suspend);
