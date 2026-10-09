@@ -39,17 +39,35 @@ CConsole::~CConsole()
 
 bool CConsole::HandleInput(const char* szCommand, CClient* pClient, CClient* pEchoClient)
 {
-    // Copy it
-    COPY_CSTR_TO_TEMP_BUFFER(szCommandBuffer, szCommand, 256);
-    stripControlCodes(szCommandBuffer);
+    if (!szCommand || !pClient)
+        return false;
 
-    // Split it into two parts: Key and argument
-    char* szKey = strtok(szCommandBuffer, " ");
-    char* szArguments = strtok(NULL, "\0");
+    std::string commandBuffer = szCommand;
+    if (commandBuffer.empty())
+        return false;
+
+    stripControlCodes(&commandBuffer[0]);
+
+    // Split into key and arguments safely without thread-unsafe strtok or fixed buffer truncation
+    std::string  key;
+    const char*  szArguments = nullptr;
+    const size_t spacePos = commandBuffer.find(' ');
+    if (spacePos != std::string::npos)
+    {
+        key = commandBuffer.substr(0, spacePos);
+        if (spacePos + 1 < commandBuffer.length())
+            szArguments = commandBuffer.c_str() + spacePos + 1;
+    }
+    else
+    {
+        key = commandBuffer;
+    }
 
     // Does the key exist?
-    if (szKey && szKey[0] != 0)
+    if (!key.empty())
     {
+        const char* szKey = key.c_str();
+
         if (pClient->GetClientType() == CClient::CLIENT_PLAYER)
         {
             CPlayer* pPlayer = static_cast<CPlayer*>(pClient);
@@ -127,22 +145,30 @@ bool CConsole::HandleInput(const char* szCommand, CClient* pClient, CClient* pEc
 
 void CConsole::AddCommand(FCommandHandler* pHandler, const char* szCommand, bool bRestricted, const char* szConsoleHelpText)
 {
-    // Make a command class and add it to the list
+    if (!szCommand)
+        return;
+
+    // Make a command class and add it to the list and map
     CConsoleCommand* pCommand = new CConsoleCommand(pHandler, szCommand, bRestricted, szConsoleHelpText);
     m_Commands.push_back(pCommand);
+    m_commandMap[szCommand] = pCommand;
 }
 
 void CConsole::DeleteCommand(const char* szCommand)
 {
+    if (!szCommand)
+        return;
+
+    m_commandMap.erase(szCommand);
+
     // Find the command and delete it
-    list<CConsoleCommand*>::const_iterator iter = m_Commands.begin();
-    for (; iter != m_Commands.end(); iter++)
+    for (auto iter = m_Commands.begin(); iter != m_Commands.end(); ++iter)
     {
         // Names match?
         if (strcmp(szCommand, (*iter)->GetCommand()) == 0)
         {
-            // Delete it and return (or we might crash)
             delete *iter;
+            m_Commands.erase(iter);
             return;
         }
     }
@@ -151,29 +177,24 @@ void CConsole::DeleteCommand(const char* szCommand)
 void CConsole::DeleteAllCommands()
 {
     // Delete all the command classes
-    list<CConsoleCommand*>::const_iterator iter = m_Commands.begin();
-    for (; iter != m_Commands.end(); iter++)
+    for (auto* pCommand : m_Commands)
     {
-        delete *iter;
+        delete pCommand;
     }
 
-    // Clear the commandlist
+    // Clear the commandlist and map
     m_Commands.clear();
+    m_commandMap.clear();
 }
 
 CConsoleCommand* CConsole::GetCommand(const char* szKey)
 {
-    // See if we have a command matching the key
-    list<CConsoleCommand*>::const_iterator iter = m_Commands.begin();
-    for (; iter != m_Commands.end(); iter++)
-    {
-        // Names match?
-        if (strcmp(szKey, (*iter)->GetCommand()) == 0)
-        {
-            return *iter;
-        }
-    }
+    if (!szKey)
+        return nullptr;
 
-    // Didn't find one
-    return NULL;
+    const auto iter = m_commandMap.find(szKey);
+    if (iter != m_commandMap.end())
+        return iter->second;
+
+    return nullptr;
 }
