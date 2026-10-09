@@ -170,7 +170,7 @@ public:
     CColStore*                GetCollisionStore() override { return m_collisionStore; }
     CRenderWareSA*            GetRenderWareSA() { return m_pRenderWare; }
     CFxManagerSA*             GetFxManagerSA() { return m_pFxManager; }
-    CIplStore*                GetIplStore() { return m_pIplStore; };
+    CIplStore*                GetIplStore() override { return m_pIplStore; };
     CCoverManagerSA*          GetCoverManager() const noexcept { return m_pCoverManager; };
     CPlantManagerSA*          GetPlantManager() const noexcept { return m_pPlantManager; };
     CBuildingRemoval*         GetBuildingRemoval() { return m_pBuildingRemoval; }
