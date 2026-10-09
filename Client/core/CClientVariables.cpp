@@ -298,6 +298,7 @@ void CClientVariables::LoadDefaults()
     DEFAULT("serverbrowser_size", CVector2D(720.0f, 495.0f));  // serverbrowser size
     DEFAULT("fps_limit", 100);                                 // frame limiter
     DEFAULT("vsync", true);                                    // vsync
+    DEFAULT("dxvk_enabled", 0);                                // vulkan rendering
     DEFAULT("chat_font", 2);                                   // chatbox font type
     DEFAULT("chat_lines", 10);                                 // chatbox lines
     DEFAULT("chat_color", CColor(0, 0, 0, 0));                 // chatbox background color

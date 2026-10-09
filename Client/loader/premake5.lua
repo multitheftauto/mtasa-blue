@@ -48,6 +48,10 @@ project "Loader"
 			"resource/splash.bmp"
 		}
 
+	postbuildcommands {
+		"\"$(SolutionDir)..\\utils\\dxvk-1.10.3\\build-mta.bat\" \"$(SolutionDir)..\\Bin\\mta\\dxvk\"",
+	}
+
 	filter "architecture:not x86"
 		flags { "ExcludeFromBuild" }
 
