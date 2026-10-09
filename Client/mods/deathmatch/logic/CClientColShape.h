@@ -73,6 +73,8 @@ public:
     void SizeChanged();
 
 protected:
+    SColor GetDebugColor(const SColor& baseColor);
+
     CVector          m_vecPosition;
     CClientMarkerPtr m_pOwningMarker;
     CClientPickupPtr m_pOwningPickup;
