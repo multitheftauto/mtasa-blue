@@ -20,6 +20,7 @@
 #include "CColManager.h"
 #include "CSpatialDatabase.h"
 #include "CPlayerCamera.h"
+#include "CAnimationsData.h"
 
 CPedSync::CPedSync(CPlayerManager* pPlayerManager, CPedManager* pPedManager)
 {
@@ -82,7 +83,7 @@ void CPedSync::OverrideSyncer(CPed* pPed, CPlayer* pPlayer, bool bPersist)
 
 void CPedSync::UpdateAllSyncer()
 {
-    auto currentTimestamp = GetTimestamp();
+    auto currentLocalTick = GetLocalTick();
 
     // Update all the ped's sync states
     for (auto iter = m_pPedManager->IterBegin(); iter != m_pPedManager->IterEnd(); iter++)
@@ -91,10 +92,50 @@ void CPedSync::UpdateAllSyncer()
         const SPlayerAnimData& animData = (*iter)->GetAnimationData();
         if (animData.IsAnimating())
         {
-            const std::int64_t elapsedMs = currentTimestamp >= animData.startTime ? (currentTimestamp - animData.startTime) : 0;
-            const float        deltaTime = static_cast<float>(elapsedMs);
-            if (!animData.freezeLastFrame && animData.time > 0 && deltaTime >= animData.time)
-                (*iter)->SetAnimationData({});
+            float animLength = GetAnimationLength(animData.animName);
+
+            // Custom animations (length == -1.0f) do not have a known server-side duration.
+            // They are cleared when the client sends a synchronization packet with flag 0x80 (or explicit stop).
+            if (animLength > 0.0f)
+            {
+                bool isLoop = animData.loop;
+                bool freeze = animData.freezeLastFrame;
+                int  time = animData.time;
+
+                // Determine the effective duration of the animation based on rules:
+                // 1. !isLoop && freeze -> plays full length
+                // 2. !isLoop && !freeze -> plays for customTime (if < 0, full length; if == 0, 0)
+                // 3. isLoop && !freeze -> plays for customTime if > 0, otherwise infinite if < 0
+                // 4. isLoop && freeze -> acts like infinite loop without freezing last frame
+                bool keepsStateForever = freeze || (isLoop && time < 0);
+                if (!keepsStateForever)
+                {
+                    float animLengthMs = animLength * 1000.0f;
+                    float effectiveDurationMs = animLengthMs;
+
+                    if (!isLoop)
+                    {
+                        if (time == 0)
+                            effectiveDurationMs = 0.0f;
+                        else if (time > 0)
+                            effectiveDurationMs = std::min(static_cast<float>(time), animLengthMs);
+                    }
+                    else
+                    {
+                        if (time > 0)
+                            effectiveDurationMs = static_cast<float>(time);
+                    }
+
+                    if (animData.speed > 0.0f)
+                    {
+                        float realDurationMs = effectiveDurationMs / animData.speed;
+
+                        std::int64_t elapsedTime = currentLocalTick - animData.startTime;
+                        if (elapsedTime >= static_cast<std::int64_t>(realDurationMs))
+                            (*iter)->SetAnimationData({});
+                    }
+                }
+            }
         }
 
         // It is a ped, yet not a player
