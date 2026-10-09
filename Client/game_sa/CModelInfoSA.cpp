@@ -20,6 +20,9 @@
 #include "CPoolsSA.h"
 #include "CWorldSA.h"
 #include "gamesa_renderware.h"
+#include <algorithm>
+#include <cmath>
+#include <limits>
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -92,13 +95,15 @@ static void CColAccel_addCacheCol(int idx, const CColModelSAInterface* colModel)
 
 CModelInfoSA::CModelInfoSA()
 {
-    m_pInterface = NULL;
+    m_pInterface = nullptr;
     m_dwModelID = 0xFFFFFFFF;
     m_dwReferences = 0;
     m_dwPendingInterfaceRef = 0;
-    m_pOriginalColModelInterface = NULL;
-    m_pCustomClump = NULL;
-    m_pCustomColModel = NULL;
+    m_dwParentID = 0;
+    m_pOriginalColModelInterface = nullptr;
+    m_pCustomClump = nullptr;
+    m_pCustomColModel = nullptr;
+    ownedColModel = nullptr;
 }
 
 CBaseModelInfoSAInterface* CModelInfoSA::GetInterface()
@@ -1534,6 +1539,10 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
     {
         // Wait for the game to eventually stream-in the model and then try to replace it (via MakeCustomModel).
         m_pCustomClump = pClump;
+        if (m_dwParentID)
+        {
+            UpdateCustomModelBounds(pClump);
+        }
         return true;
     }
 
@@ -1553,6 +1562,7 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
         case eModelInfoType::ATOMIC:
         case eModelInfoType::LOD_ATOMIC:
         case eModelInfoType::TIME:
+        case eModelInfoType::CLUMP:
             success = pGame->GetRenderWare()->ReplaceAllAtomicsInModel(pClump, static_cast<unsigned short>(m_dwModelID));
             break;
         default:
@@ -1560,11 +1570,18 @@ bool CModelInfoSA::SetCustomModel(RpClump* pClump)
     }
 
     m_pCustomClump = success ? pClump : nullptr;
+    if (success && m_dwParentID)
+    {
+        UpdateCustomModelBounds(pClump);
+    }
     return success;
 }
 
 void CModelInfoSA::RestoreOriginalModel()
 {
+    // Reset owned collision model before removing the model so GTA:SA does not attempt to free it
+    DestroyOwnedColModel();
+
     // Are we loaded?
     if (IsLoaded())
     {
@@ -1572,7 +1589,7 @@ void CModelInfoSA::RestoreOriginalModel()
     }
 
     // Reset the stored custom vehicle clump
-    m_pCustomClump = NULL;
+    m_pCustomClump = nullptr;
 }
 
 void CModelInfoSA::SetColModel(CColModel* pColModel)
@@ -1600,22 +1617,42 @@ void CModelInfoSA::SetColModel(CColModel* pColModel)
         // If no collision model has been set before, store the original in case we want to restore it
         if (!m_pOriginalColModelInterface)
         {
-            m_pOriginalColModelInterface = m_pInterface->pColModel;
+            if (ownedColModel && m_dwParentID)
+            {
+                CModelInfo* parentModel = pGame->GetModelInfo(m_dwParentID);
+                m_pOriginalColModelInterface = (parentModel && parentModel->GetInterface()) ? parentModel->GetInterface()->pColModel : nullptr;
+            }
+            else
+            {
+                m_pOriginalColModelInterface = m_pInterface->pColModel;
+            }
             m_originalFlags = GetOriginalFlags();
+        }
+
+        if (ownedColModel)
+        {
+            delete ownedColModel;
+            ownedColModel = nullptr;
         }
 
         // Apply some low-level hacks
         pColModelInterface->m_sphere.m_collisionSlot = 0xA9;
 
         CBaseModelInfo_SetColModel(m_pInterface, pColModelInterface, false);
-        CColAccel_addCacheCol(m_dwModelID, pColModelInterface);
+        if (m_dwModelID < MODELINFO_DFF_MAX)
+        {
+            CColAccel_addCacheCol(m_dwModelID, pColModelInterface);
+        }
 
         // SetColModel sets bDoWeOwnTheColModel if the last parameter is truthy
         m_pInterface->bDoWeOwnTheColModel = false;
         m_pInterface->bIsColLoaded = false;
 
         // Fix random foliage on custom collisions by calling CPlantMgr::SetPlantFriendlyFlagInAtomicMI
-        (reinterpret_cast<void(__cdecl*)(CBaseModelInfoSAInterface*)>(0x5DB650))(m_pInterface);
+        if (GetModelType() == eModelInfoType::ATOMIC || GetModelType() == eModelInfoType::LOD_ATOMIC || GetModelType() == eModelInfoType::TIME)
+        {
+            (reinterpret_cast<void(__cdecl*)(CBaseModelInfoSAInterface*)>(0x5DB650))(m_pInterface);
+        }
 
         // Set some lighting for this collision if not already present
         CColDataSA* pColData = pColModelInterface->m_data;
@@ -1724,6 +1761,11 @@ void CModelInfoSA::RestoreColModel()
     m_pCustomColModel = nullptr;
     m_pOriginalColModelInterface = nullptr;
     m_originalFlags = 0;
+
+    if (m_dwParentID && m_pCustomClump)
+    {
+        UpdateCustomModelBounds(m_pCustomClump);
+    }
 }
 
 void CModelInfoSA::MakeCustomModel()
@@ -1930,6 +1972,7 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
 
 void CModelInfoSA::DeallocateModel(void)
 {
+    DestroyOwnedColModel();
     Remove();
 
     // Clean up stored defaults so stale entries don't leak to a model that reuses this ID.
@@ -2276,4 +2319,188 @@ bool CModelInfoSA::ForceUnload()
 bool CVehicleModelInfoSAInterface::IsComponentDamageable(int componentIndex) const
 {
     return pVisualInfo->m_maskComponentDamagable & (1 << componentIndex);
+}
+
+void CModelInfoSA::DestroyOwnedColModel()
+{
+    // Restore parent collision model interface before deleting owned clone to prevent dangling pointers
+    if (ownedColModel)
+    {
+        if (m_pInterface && m_pInterface->pColModel == ownedColModel)
+        {
+            CColModelSAInterface* originalCol = m_pOriginalColModelInterface;
+            if (!originalCol && m_dwParentID)
+            {
+                CModelInfo* parentModel = pGame->GetModelInfo(m_dwParentID);
+                originalCol = (parentModel && parentModel->GetInterface()) ? parentModel->GetInterface()->pColModel : nullptr;
+            }
+
+            m_pInterface->pColModel = originalCol;
+            if (originalCol && m_dwModelID < MODELINFO_DFF_MAX)
+            {
+                CColAccel_addCacheCol(m_dwModelID, originalCol);
+            }
+            m_pInterface->bDoWeOwnTheColModel = false;
+        }
+        delete ownedColModel;
+        ownedColModel = nullptr;
+    }
+}
+
+namespace
+{
+    constexpr float MAX_VALID_MODEL_COORDINATE = 20000.0f;
+    constexpr float MAX_VALID_SPHERE_RADIUS = 20000.0f;
+    constexpr float MIN_VALID_MODEL_RADIUS = 0.1f;
+    constexpr float DEFAULT_FALLBACK_MODEL_RADIUS = 0.5f;
+}
+
+void CModelInfoSA::UpdateCustomModelBounds(RpClump* clump)
+{
+    // Issue #4925: Strictly targets custom allocated objects that inherit from a parent model
+    if (!clump || !m_dwParentID)
+        return;
+
+    if (GetModelType() != eModelInfoType::ATOMIC && GetModelType() != eModelInfoType::LOD_ATOMIC && GetModelType() != eModelInfoType::TIME)
+        return;
+
+    // Custom collision model (.col) from engineReplaceCOL takes precedence
+    if (m_pCustomColModel)
+        return;
+
+    m_pInterface = ppModelInfo[m_dwModelID];
+    if (!m_pInterface || !m_pInterface->pColModel)
+        return;
+
+    CVector     minBound(std::numeric_limits<float>::max(), std::numeric_limits<float>::max(), std::numeric_limits<float>::max());
+    CVector     maxBound(-std::numeric_limits<float>::max(), -std::numeric_limits<float>::max(), -std::numeric_limits<float>::max());
+    std::size_t vertexCount = 0;
+
+    struct AccumulateContext
+    {
+        CVector*     min;
+        CVector*     max;
+        std::size_t* count;
+    };
+
+    AccumulateContext context{&minBound, &maxBound, &vertexCount};
+
+    auto callback = [](RpAtomic* atomic, void* data) -> bool
+    {
+        if (!atomic)
+            return true;
+
+        auto*           ctx = static_cast<AccumulateContext*>(data);
+        auto*           frame = RpGetFrame(atomic);
+        const RwMatrix* matrix = frame ? reinterpret_cast<RwMatrix*(__cdecl*)(RwFrame*)>(FUNC_RwFrameGetLTM)(frame) : nullptr;
+
+        if (atomic->geometry)
+        {
+            auto* morphTarget = atomic->geometry->morph_target;
+            if (morphTarget && morphTarget->verts && atomic->geometry->vertices_size > 0)
+            {
+                for (int index = 0; index < atomic->geometry->vertices_size; ++index)
+                {
+                    const auto& vertex = morphTarget->verts[index];
+                    CVector     transformed;
+                    if (matrix)
+                    {
+                        transformed.fX = vertex.x * matrix->right.x + vertex.y * matrix->up.x + vertex.z * matrix->at.x + matrix->pos.x;
+                        transformed.fY = vertex.x * matrix->right.y + vertex.y * matrix->up.y + vertex.z * matrix->at.y + matrix->pos.y;
+                        transformed.fZ = vertex.x * matrix->right.z + vertex.y * matrix->up.z + vertex.z * matrix->at.z + matrix->pos.z;
+                    }
+                    else
+                    {
+                        transformed.fX = vertex.x;
+                        transformed.fY = vertex.y;
+                        transformed.fZ = vertex.z;
+                    }
+
+                    if (!std::isfinite(transformed.fX) || !std::isfinite(transformed.fY) || !std::isfinite(transformed.fZ))
+                        continue;
+                    if (std::abs(transformed.fX) > MAX_VALID_MODEL_COORDINATE || std::abs(transformed.fY) > MAX_VALID_MODEL_COORDINATE ||
+                        std::abs(transformed.fZ) > MAX_VALID_MODEL_COORDINATE)
+                        continue;
+
+                    ctx->min->fX = std::min(ctx->min->fX, transformed.fX);
+                    ctx->min->fY = std::min(ctx->min->fY, transformed.fY);
+                    ctx->min->fZ = std::min(ctx->min->fZ, transformed.fZ);
+                    ctx->max->fX = std::max(ctx->max->fX, transformed.fX);
+                    ctx->max->fY = std::max(ctx->max->fY, transformed.fY);
+                    ctx->max->fZ = std::max(ctx->max->fZ, transformed.fZ);
+                    ++(*ctx->count);
+                }
+                return true;
+            }
+        }
+
+        const auto& sphere = atomic->boundingSphere;
+        if (sphere.radius > 0.0f && std::isfinite(sphere.radius) && sphere.radius < MAX_VALID_SPHERE_RADIUS)
+        {
+            CVector center;
+            if (matrix)
+            {
+                center.fX = sphere.position.x * matrix->right.x + sphere.position.y * matrix->up.x + sphere.position.z * matrix->at.x + matrix->pos.x;
+                center.fY = sphere.position.x * matrix->right.y + sphere.position.y * matrix->up.y + sphere.position.z * matrix->at.y + matrix->pos.y;
+                center.fZ = sphere.position.x * matrix->right.z + sphere.position.y * matrix->up.z + sphere.position.z * matrix->at.z + matrix->pos.z;
+            }
+            else
+            {
+                center.fX = sphere.position.x;
+                center.fY = sphere.position.y;
+                center.fZ = sphere.position.z;
+            }
+
+            if (std::isfinite(center.fX) && std::isfinite(center.fY) && std::isfinite(center.fZ) && std::abs(center.fX) < MAX_VALID_MODEL_COORDINATE &&
+                std::abs(center.fY) < MAX_VALID_MODEL_COORDINATE && std::abs(center.fZ) < MAX_VALID_MODEL_COORDINATE)
+            {
+                ctx->min->fX = std::min(ctx->min->fX, center.fX - sphere.radius);
+                ctx->min->fY = std::min(ctx->min->fY, center.fY - sphere.radius);
+                ctx->min->fZ = std::min(ctx->min->fZ, center.fZ - sphere.radius);
+                ctx->max->fX = std::max(ctx->max->fX, center.fX + sphere.radius);
+                ctx->max->fY = std::max(ctx->max->fY, center.fY + sphere.radius);
+                ctx->max->fZ = std::max(ctx->max->fZ, center.fZ + sphere.radius);
+                ++(*ctx->count);
+            }
+        }
+
+        return true;
+    };
+
+    RpClumpForAllAtomics(clump, callback, &context);
+
+    if (vertexCount == 0)
+        return;
+
+    // Cache original collision model interface before overriding
+    if (!m_pOriginalColModelInterface && m_pInterface->pColModel != ownedColModel)
+    {
+        m_pOriginalColModelInterface = m_pInterface->pColModel;
+    }
+
+    // Clone parent collision model interface to safely override bounds without mutating parent
+    if (!ownedColModel)
+    {
+        ownedColModel = new CColModelSAInterface(*m_pInterface->pColModel);
+    }
+
+    CVector center = (minBound + maxBound) * 0.5f;
+    float   radius = (maxBound - center).Length();
+    if (radius < MIN_VALID_MODEL_RADIUS)
+        radius = DEFAULT_FALLBACK_MODEL_RADIUS;
+
+    // In GTA:SA, CBoundingBoxSA (vecBoundMin/vecBoundMax) is defined relative to m_sphere.m_center (vecBoundOffset)
+    ownedColModel->m_bounds.m_vecMin = minBound - center;
+    ownedColModel->m_bounds.m_vecMax = maxBound - center;
+
+    ownedColModel->m_sphere.m_center = center;
+    ownedColModel->m_sphere.m_radius = radius;
+
+    m_pInterface->pColModel = ownedColModel;
+    m_pInterface->bDoWeOwnTheColModel = false;
+
+    if (m_dwModelID < MODELINFO_DFF_MAX)
+    {
+        CColAccel_addCacheCol(m_dwModelID, ownedColModel);
+    }
 }
