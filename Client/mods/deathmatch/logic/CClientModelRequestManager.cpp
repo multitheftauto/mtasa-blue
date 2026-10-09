@@ -48,7 +48,7 @@ bool CClientModelRequestManager::IsRequested(CModelInfo* pModelInfo)
     for (; iter != m_Requests.end(); iter++)
     {
         // Same model as this entry?
-        if ((*iter)->pModel == pModelInfo)
+        if ((*iter)->pModel == pModelInfo && !(*iter)->bCancelled)
         {
             return true;
         }
@@ -67,7 +67,7 @@ bool CClientModelRequestManager::HasRequested(CClientEntity* pRequester)
     for (; iter != m_Requests.end(); iter++)
     {
         // Same requester as we check for? He has requested something.
-        if ((*iter)->pEntity == pRequester)
+        if ((*iter)->pEntity == pRequester && !(*iter)->bCancelled)
         {
             return true;
         }
@@ -86,7 +86,7 @@ CModelInfo* CClientModelRequestManager::GetRequestedModelInfo(CClientEntity* pRe
     for (; iter != m_Requests.end(); iter++)
     {
         // Same requester as we check for? He has requested something.
-        if ((*iter)->pEntity == pRequester)
+        if ((*iter)->pEntity == pRequester && !(*iter)->bCancelled)
         {
             // Return the model info he requested
             return (*iter)->pModel;
@@ -201,49 +201,33 @@ bool CClientModelRequestManager::Request(unsigned short usModelID, CClientEntity
 void CClientModelRequestManager::Cancel(CClientEntity* pEntity, bool bAllowQueue)
 {
     assert(pEntity);
-    // Check to ensure entity has not got its knickers in a twist
-    if (ListContains(m_CancelQueue, pEntity))
-        return;
 
-    // Are we inside a pulse? Add it to a list to delete after or we'll crash.
-    // If not, cancel now.
-    if (m_bDoingPulse)
+    // Anything requested by the given class?
+    for (list<SClientModelRequest*>::iterator iter = m_Requests.begin(); iter != m_Requests.end();)
     {
-        // Check queuing is allowed by the caller
-        assert(bAllowQueue);
-        m_CancelQueue.push_back(pEntity);
-    }
-    else
-    {
-        // Got any items?
-        if (!m_Requests.empty())
+        SClientModelRequest* pEntry = *iter;
+
+        if (pEntry->pEntity != pEntity)
         {
-            // Anything requested by the given class?
-            SClientModelRequest*                 pEntry;
-            list<SClientModelRequest*>::iterator iter;
-            for (iter = m_Requests.begin(); iter != m_Requests.end();)
-            {
-                pEntry = *iter;
-
-                // If the requesting entity matches the given entity, delete and NULL it
-                if (pEntry->pEntity == pEntity)
-                {
-                    // Unreference the reference we added to it.
-                    pEntry->pModel->RemoveRef();
-
-                    // Delete the entry
-                    delete *iter;
-
-                    // Remove from the list
-                    iter = m_Requests.erase(iter);
-                }
-                else
-                {
-                    // Increment iterator otherwize
-                    ++iter;
-                }
-            }
+            ++iter;
+            continue;
         }
+
+        if (m_bDoingPulse)
+        {
+            pEntry->bCancelled = true;
+            ++iter;
+            continue;
+        }
+
+        // Unreference the reference we added to it.
+        pEntry->pModel->RemoveRef();
+
+        // Delete the entry
+        delete pEntry;
+
+        // Remove from the list
+        iter = m_Requests.erase(iter);
     }
 }
 
@@ -261,6 +245,19 @@ void CClientModelRequestManager::DoPulse()
         for (iter = m_Requests.begin(); iter != m_Requests.end();)
         {
             pEntry = *iter;
+
+            if (pEntry->bCancelled)
+            {
+                // Unreference the reference we added to it.
+                pEntry->pModel->RemoveRef();
+
+                // Delete the entry
+                delete pEntry;
+
+                // Remove from the list
+                iter = m_Requests.erase(iter);
+                continue;
+            }
 
             // Is it loaded?
             if (pEntry->pModel->IsLoaded())
@@ -305,20 +302,6 @@ void CClientModelRequestManager::DoPulse()
 
         // No longer doing the pulse
         m_bDoingPulse = false;
-
-        // Cancel what we've scheduled for cancel now if anything
-        if (m_CancelQueue.size() > 0)
-        {
-            // Cancel every entity in our cancel list
-            list<CClientEntity*> cancelQueueCopy = m_CancelQueue;
-            m_CancelQueue.clear();
-
-            list<CClientEntity*>::iterator iter = cancelQueueCopy.begin();
-            for (; iter != cancelQueueCopy.end(); ++iter)
-            {
-                Cancel(*iter, false);
-            }
-        }
     }
 }
 
@@ -329,7 +312,7 @@ bool CClientModelRequestManager::GetRequestEntry(CClientEntity* pRequester, list
     for (; iter != m_Requests.end(); iter++)
     {
         // Same requester as we check for? He has requested something.
-        if ((*iter)->pEntity == pRequester)
+        if ((*iter)->pEntity == pRequester && !(*iter)->bCancelled)
         {
             // Pass out the iterator entry and return true
             iterOut = iter;
