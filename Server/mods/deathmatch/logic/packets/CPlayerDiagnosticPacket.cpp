@@ -14,7 +14,7 @@
 
 namespace
 {
-    constexpr unsigned short MAX_PLAYER_DIAGNOSTIC_PACKET_LENGTH = 1024;
+    constexpr unsigned short     MAX_PLAYER_DIAGNOSTIC_PACKET_LENGTH = 1024;
     constexpr unsigned long long MAX_PLAYER_DIAGNOSTIC_LEVEL_VALUE = 0xFFFFFFFFULL;
 
     bool ParsePlayerDiagnosticLevel(const std::string& strLevel, uint& uiLevel)

@@ -4290,7 +4290,7 @@ namespace
 
     SString SanitizePlayerDiagnosticMessage(const SString& strMessage)
     {
-        SString strResult;
+        SString      strResult;
         const size_t uiCopyLength = Min<size_t>(strMessage.length(), MAX_PLAYER_DIAGNOSTIC_LOG_LENGTH);
 
         for (size_t i = 0; i < uiCopyLength; i++)
@@ -4466,8 +4466,7 @@ void CGame::Packet_PlayerResourceStart(CPlayerResourceStartPacket& Packet)
             return;
 
         // Acks for the current send are expected traffic, not flood traffic.
-        const EPlayerResourceStartAck ackResult =
-            pResource->AddPlayerResourceStart(pPlayer, Packet.GetStartGeneration(), Packet.HasStartGeneration());
+        const EPlayerResourceStartAck ackResult = pResource->AddPlayerResourceStart(pPlayer, Packet.GetStartGeneration(), Packet.HasStartGeneration());
 
         if (ackResult == EPlayerResourceStartAck::Accepted)
         {

@@ -43,8 +43,8 @@ public:
     }
 
     std::list<SString> m_EventQueue;
-    std::mutex m_Mutex;  // Only for m_EventQueue, m_bVoiceActive, m_bStallPending, m_bIgnoreStart, m_ulTimeOfLastFrame,
-                         // m_ulTimeOfLastPacket, m_voiceFramesThisPulse and m_PendingVoiceFrames
+    std::mutex         m_Mutex;  // Only for m_EventQueue, m_bVoiceActive, m_bStallPending, m_bIgnoreStart, m_ulTimeOfLastFrame,
+                                 // m_ulTimeOfLastPacket, m_voiceFramesThisPulse and m_PendingVoiceFrames
 
     void GetTempoValues(float& fSampleRate, float& fTempo, float& fPitch, bool& bReverse)
     {
@@ -91,17 +91,17 @@ public:
 private:
     enum class EVoiceFrameResult
     {
-        Accepted,    // Frame was fed to BASS
-        Deferred,    // BASS refused the frame; retry on a later pulse
-        Suppressed   // Frame dropped on purpose; do not retry
+        Accepted,   // Frame was fed to BASS
+        Deferred,   // BASS refused the frame; retry on a later pulse
+        Suppressed  // Frame dropped on purpose; do not retry
     };
 
-    void Init();
-    void DeInit();
-    void ServiceEventQueue();
+    void              Init();
+    void              DeInit();
+    void              ServiceEventQueue();
     EVoiceFrameResult ProcessFrame(const unsigned char* voiceBuffer, unsigned int voiceBufferLength);
-    void QueueVoiceFrame(const unsigned char* voiceBuffer, unsigned int voiceBufferLength);
-    void ApplyFxEffects();
+    void              QueueVoiceFrame(const unsigned char* voiceBuffer, unsigned int voiceBufferLength);
+    void              ApplyFxEffects();
 
     CClientPlayer*  m_pPlayer;
     CVoiceRecorder* m_pVoiceRecorder;
@@ -128,11 +128,11 @@ private:
     SFixedArray<int, 9> m_EnabledEffects;
     SFixedArray<HFX, 9> m_FxEffects;
 
-    unsigned char m_voiceFramesThisPulse;   // Decodes per frame limit (shared by the packet intake and the pulse drain)
+    unsigned char m_voiceFramesThisPulse;  // Decodes per frame limit (shared by the packet intake and the pulse drain)
 
-    bool          m_bStallPending;                       // Set by the BASS thread when playback underflows
-    unsigned long m_ulTimeOfLastFrame;                   // Time of the last frame accepted into the BASS stream
-    unsigned long m_ulTimeOfLastPacket;                  // Time of the last packet received from the speaker
-    bool          m_bIgnoreStart;                        // Start event canceled; suppress until the burst ends
-    std::deque<std::vector<unsigned char>> m_PendingVoiceFrames;   // Frames waiting for a decode slot
+    bool                                   m_bStallPending;       // Set by the BASS thread when playback underflows
+    unsigned long                          m_ulTimeOfLastFrame;   // Time of the last frame accepted into the BASS stream
+    unsigned long                          m_ulTimeOfLastPacket;  // Time of the last packet received from the speaker
+    bool                                   m_bIgnoreStart;        // Start event canceled; suppress until the burst ends
+    std::deque<std::vector<unsigned char>> m_PendingVoiceFrames;  // Frames waiting for a decode slot
 };
