@@ -138,6 +138,9 @@ namespace
 
         {false, "removeAllGameBuildings", "removeGameWorld"},
         {false, "restoreAllGameBuildings", "restoreGameWorld"},
+
+        {false, "isPedOnGround", "isElementOnGround"},
+        {false, "isVehicleOnGround", "isElementOnGround"},
     };
 
     SDeprecatedItem serverDeprecatedList[] = {
@@ -244,5 +247,9 @@ namespace
 
         // Ped
         {false, "setPedOnFire", "setElementOnFire"},
-        {false, "isPedOnFire", "isElementOnFire"}};
+        {false, "isPedOnFire", "isElementOnFire"},
+        {false, "isPedOnGround", "isElementOnGround"},
+
+        // Vehicle
+        {false, "isVehicleOnGround", "isElementOnGround"}};
 }  // namespace
