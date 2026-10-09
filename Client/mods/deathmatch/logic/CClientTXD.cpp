@@ -148,8 +148,8 @@ bool CClientTXD::Import(unsigned short usModelID)
 bool CClientTXD::IsImportableModel(unsigned short usModelID)
 {
     // Currently we work on vehicles and objects
-    return CClientObjectManager::IsValidModel(usModelID) || CClientVehicleManager::IsValidModel(usModelID) || CClientPlayerManager::IsValidModel(usModelID) ||
-           (usModelID >= CLOTHES_TEX_ID_FIRST && usModelID <= CLOTHES_TEX_ID_LAST);
+    return CClientObjectManager::IsValidModel(usModelID) || CClientVehicleManager::IsValidModel(usModelID) ||
+           (usModelID != 0 && CClientPlayerManager::IsValidModel(usModelID)) || (usModelID >= CLOTHES_TEX_ID_FIRST && usModelID <= CLOTHES_TEX_ID_LAST);
 }
 
 bool CClientTXD::LoadFromFile(SString filePath)
