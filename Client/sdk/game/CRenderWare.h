@@ -39,8 +39,8 @@ struct SReplacementTextures
         bool                    bTexturesAreCopies;
     };
 
-    std::vector<RwTexture*> textures;              // List of textures we want to inject into TXD's
-    std::vector<SPerTxd>    perTxdList;            // TXD's which have been modified
+    std::vector<RwTexture*> textures;    // List of textures we want to inject into TXD's
+    std::vector<SPerTxd>    perTxdList;  // TXD's which have been modified
     std::vector<ushort>     usedInTxdIds;
     std::vector<ushort>     usedInModelIds;
 };
@@ -67,7 +67,7 @@ enum EEntityTypeMask
 
 typedef void (*PFN_WATCH_CALLBACK)(CSHADERDUMMY* pContext, CD3DDUMMY* pD3DDataNew, CD3DDUMMY* pD3DDataOld);
 
-#define MAX_ATOMICS_PER_CLUMP   128
+#define MAX_ATOMICS_PER_CLUMP 128
 
 class CRenderWare
 {

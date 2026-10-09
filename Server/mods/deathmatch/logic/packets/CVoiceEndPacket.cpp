@@ -32,9 +32,9 @@ bool CVoiceEndPacket::Read(NetBitStreamInterface& BitStream)
     if (!pPlayer)
         return false;
 
-    const auto*    mainConfig = g_pGame->GetConfig();
-    const long long now = GetTickCount64_();
-    const bool     newInterval = pPlayer->GetLastVoiceEndTime() == 0 || now - pPlayer->GetLastVoiceEndTime() >= mainConfig->GetVoicePacketsInterval();
+    const auto*         mainConfig = g_pGame->GetConfig();
+    const long long     now = GetTickCount64_();
+    const bool          newInterval = pPlayer->GetLastVoiceEndTime() == 0 || now - pPlayer->GetLastVoiceEndTime() >= mainConfig->GetVoicePacketsInterval();
     const unsigned char packetsInInterval = newInterval ? 0 : pPlayer->GetVoiceEndPacketsInInterval();
 
     if (packetsInInterval >= mainConfig->GetMaxVoicePacketsPerInterval())

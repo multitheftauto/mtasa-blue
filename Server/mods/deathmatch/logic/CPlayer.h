@@ -360,10 +360,10 @@ public:
     SString                m_strD3d9Md5;
     SString                m_strD3d9Sha256;
 
-    CElapsedTime m_ResourceStartPacketTimer;
-    unsigned int m_ResourceStartTokens{50};
+    CElapsedTime       m_ResourceStartPacketTimer;
+    unsigned int       m_ResourceStartTokens{50};
     unsigned long long m_ResourceStartRefillRemainderMs{};
-    unsigned int m_ResourceStartDrops{};
+    unsigned int       m_ResourceStartDrops{};
 
     unsigned int m_uiActiveSatchelCount{};
     CElapsedTime m_DetonateSatchelTimer;
