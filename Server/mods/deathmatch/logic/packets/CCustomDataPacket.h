@@ -23,15 +23,17 @@ public:
     ePacketID     GetPacketID() const { return PACKET_ID_CUSTOM_DATA; };
     unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
 
-    bool Read(NetBitStreamInterface& BitStream);
-    bool Write(NetBitStreamInterface& BitStream) const;
+    bool Read(NetBitStreamInterface& bitStream);
+    bool Write(NetBitStreamInterface& bitStream) const;
 
     ElementID     GetElementID() { return m_ElementID; }
     char*         GetName() { return m_szName; }
     CLuaArgument& GetValue() { return m_Value; }
+    bool          IsDelete() const { return m_isDelete; }
 
 private:
     ElementID    m_ElementID;
     char*        m_szName;
     CLuaArgument m_Value;
+    bool         m_isDelete;
 };
