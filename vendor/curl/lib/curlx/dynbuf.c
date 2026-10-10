@@ -21,14 +21,10 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
+#include "curl_setup.h"
 
-#include "../curl_setup.h"
-#include "dynbuf.h"
-#include "../curl_printf.h"
-#ifdef BUILDING_LIBCURL
-#include "../curl_memory.h"
-#endif
-#include "../memdebug.h"
+#include "curlx/dynbuf.h"
+#include "curl_printf.h"
 
 #define MIN_FIRST_ALLOC 32
 
@@ -61,7 +57,7 @@ void curlx_dyn_free(struct dynbuf *s)
 {
   DEBUGASSERT(s);
   DEBUGASSERT(s->init == DYNINIT);
-  Curl_safefree(s->bufr);
+  curlx_safefree(s->bufr);
   s->leng = s->allc = 0;
 }
 
@@ -71,14 +67,14 @@ void curlx_dyn_free(struct dynbuf *s)
 static CURLcode dyn_nappend(struct dynbuf *s,
                             const unsigned char *mem, size_t len)
 {
-  size_t indx = s->leng;
+  size_t idx = s->leng;
   size_t a = s->allc;
-  size_t fit = len + indx + 1; /* new string + old string + zero byte */
+  size_t fit = len + idx + 1; /* new string + old string + zero byte */
 
   /* try to detect if there is rubbish in the struct */
   DEBUGASSERT(s->init == DYNINIT);
   DEBUGASSERT(s->toobig);
-  DEBUGASSERT(indx < s->toobig);
+  DEBUGASSERT(idx < s->toobig);
   DEBUGASSERT(!s->leng || s->bufr);
   DEBUGASSERT(a <= s->toobig);
   DEBUGASSERT(!len || mem);
@@ -88,7 +84,7 @@ static CURLcode dyn_nappend(struct dynbuf *s,
     return CURLE_TOO_LARGE;
   }
   else if(!a) {
-    DEBUGASSERT(!indx);
+    DEBUGASSERT(!idx);
     /* first invoke */
     if(MIN_FIRST_ALLOC > s->toobig)
       a = s->toobig;
@@ -106,9 +102,7 @@ static CURLcode dyn_nappend(struct dynbuf *s,
   }
 
   if(a != s->allc) {
-    /* this logic is not using Curl_saferealloc() to make the tool not have to
-       include that as well when it uses this code */
-    void *p = realloc(s->bufr, a);
+    void *p = curlx_realloc(s->bufr, a);
     if(!p) {
       curlx_dyn_free(s);
       return CURLE_OUT_OF_MEMORY;
@@ -118,8 +112,8 @@ static CURLcode dyn_nappend(struct dynbuf *s,
   }
 
   if(len)
-    memcpy(&s->bufr[indx], mem, len);
-  s->leng = indx + len;
+    memcpy(&s->bufr[idx], mem, len);
+  s->leng = idx + len;
   s->bufr[s->leng] = 0;
   return CURLE_OK;
 }
@@ -140,7 +134,7 @@ void curlx_dyn_reset(struct dynbuf *s)
 
 /*
  * Specify the size of the tail to keep (number of bytes from the end of the
- * buffer). The rest will be dropped.
+ * buffer). The rest is dropped.
  */
 CURLcode curlx_dyn_tail(struct dynbuf *s, size_t trail)
 {
@@ -160,7 +154,6 @@ CURLcode curlx_dyn_tail(struct dynbuf *s, size_t trail)
     s->bufr[s->leng] = 0;
   }
   return CURLE_OK;
-
 }
 
 /*
@@ -212,7 +205,7 @@ CURLcode curlx_dyn_vaddf(struct dynbuf *s, const char *fmt, va_list ap)
 
   if(str) {
     CURLcode result = dyn_nappend(s, (const unsigned char *)str, strlen(str));
-    free(str);
+    curl_free(str);
     return result;
   }
   /* If we failed, we cleanup the whole buffer and return error */
@@ -231,6 +224,7 @@ CURLcode curlx_dyn_addf(struct dynbuf *s, const char *fmt, ...)
   DEBUGASSERT(s);
   DEBUGASSERT(s->init == DYNINIT);
   DEBUGASSERT(!s->leng || s->bufr);
+  DEBUGASSERT(strcmp(fmt, "%s")); /* use curlx_dyn_add instead */
   va_start(ap, fmt);
   result = curlx_dyn_vaddf(s, fmt, ap);
   va_end(ap);

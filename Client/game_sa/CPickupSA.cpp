@@ -41,12 +41,12 @@ CVector* CPickupSA::GetPosition(CVector* vecPosition)
     return vecPosition;
 }
 
-PickupType CPickupSA::GetType()
+PickupType::Enum CPickupSA::GetType()
 {
-    return (PickupType)GetInterface()->Type;
+    return (PickupType::Enum)GetInterface()->Type;
 }
 
-void CPickupSA::SetType(PickupType type)
+void CPickupSA::SetType(PickupType::Enum type)
 {
     GetInterface()->Type = (BYTE)type;
 }
@@ -86,12 +86,12 @@ void CPickupSA::SetModel(WORD wModelIndex)
     GetInterface()->MI = wModelIndex;
 }
 
-PickupState CPickupSA::GetState()
+PickupState::Enum CPickupSA::GetState()
 {
-    return (PickupState)GetInterface()->State;
+    return (PickupState::Enum)GetInterface()->State;
 }
 
-void CPickupSA::SetState(PickupState bState)
+void CPickupSA::SetState(PickupState::Enum bState)
 {
     GetInterface()->State = (BYTE)bState;
 }

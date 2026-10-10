@@ -402,7 +402,19 @@ bool CClientPlayerClothes::RemoveClothes(unsigned char ucType, bool bRemoveFromM
         // Remove them from the model now?
         if (bRemoveFromModel)
         {
-            InternalAddClothes(NULL, ucType);
+            // For slots 0-3 we apply the bare clothing directly (InternalAddClothes filters
+            // it out); for others we clear the slot. Needed to strip CJ's default clothes.
+            if (m_Clothes[ucType] && m_pPlayerModel)
+            {
+                CPlayerPed* pPlayerPed = m_pPlayerModel->GetGamePlayer();
+                if (pPlayerPed)
+                    pPlayerPed->SetClothesTextureAndModel(m_Clothes[ucType]->texture.c_str(), m_Clothes[ucType]->model.c_str(), ucType);
+                m_GlobalClothes[ucType] = m_Clothes[ucType];
+            }
+            else
+            {
+                InternalAddClothes(NULL, ucType);
+            }
         }
 
         return true;
@@ -419,16 +431,23 @@ void CClientPlayerClothes::AddAllToModel()
         {
             for (unsigned char ucType = 0; ucType < PLAYER_CLOTHING_SLOTS; ucType++)
             {
-                const SPlayerClothing* pPrevious = m_GlobalClothes[ucType];
                 const SPlayerClothing* pCurrent = m_Clothes[ucType];
                 if (pCurrent)
                 {
-                    if (!pPrevious || pPrevious != pCurrent)
+                    // Apply the empty clothing (slot 0-3 bare torso/face/legs/shoes) directly:
+                    // InternalAddClothes filters it out, which would leave the CJ model's default
+                    // clothes visible after removePedClothes.
+                    if (IsEmptyClothing(pCurrent, ucType))
+                    {
+                        pPlayerPed->SetClothesTextureAndModel(pCurrent->texture.c_str(), pCurrent->model.c_str(), ucType);
+                        m_GlobalClothes[ucType] = pCurrent;
+                    }
+                    else
                     {
                         InternalAddClothes(pCurrent, ucType);
                     }
                 }
-                else if (pPrevious)
+                else
                 {
                     InternalAddClothes(NULL, ucType);
                 }

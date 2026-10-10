@@ -126,6 +126,13 @@ namespace SharedUtil
             }
         }
 
+        // This destructor is never called during normal operation because
+        // getDefaultThreadPool() uses a heap-allocated pool that is never
+        // deleted (see getDefaultThreadPool() for rationale). During normal
+        // server shutdown, ~CGame() calls shutdown() explicitly. If this
+        // destructor is ever reached (abnormal shutdown where ~CGame() is
+        // skipped during atexit), it joins all worker threads as a last
+        // resort to prevent crashes during DLL unload.
         ~CThreadPool() noexcept
         {
             try
@@ -142,8 +149,16 @@ namespace SharedUtil
 
         static CThreadPool& getDefaultThreadPool()
         {
-            static CThreadPool DefaultThreadPool(Clamp<int>(2, std::thread::hardware_concurrency(), 16));
-            return DefaultThreadPool;
+            // Heap-allocated to prevent the static-destruction-order hazard:
+            // function-local static objects are destroyed during atexit, and
+            // any code path that reaches SharedUtil::async() after that point
+            // would access a destroyed mutex (undefined behavior). By never
+            // destroying the pool, getDefaultThreadPool() always returns a
+            // valid reference. The enqueue() m_exit guard handles post-shutdown
+            // calls safely. The explicit shutdown() in ~CGame() joins all
+            // threads during normal server shutdown.
+            static CThreadPool* pDefaultThreadPool = new CThreadPool(Clamp<int>(2, std::thread::hardware_concurrency(), 16));
+            return *pDefaultThreadPool;
         }
 
     private:

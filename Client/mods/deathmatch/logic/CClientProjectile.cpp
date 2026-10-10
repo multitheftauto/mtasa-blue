@@ -47,6 +47,8 @@ CClientProjectile::CClientProjectile(class CClientManager* pManager, CProjectile
 
     m_pInitiateData = NULL;
     m_bInitiate = true;
+    m_ucAlpha = 255;
+    m_bFrozen = false;
 
     m_pProjectileManager->AddToList(this);
     m_bLinked = true;
@@ -330,4 +332,31 @@ CClientEntity* CClientProjectile::GetSatchelAttachedTo()
 
     CPools* pPools = g_pGame->GetPools();
     return pPools->GetClientEntity((DWORD*)pAttachedToSA->GetInterface());
+}
+
+unsigned char CClientProjectile::GetAlpha() const
+{
+    return m_pProjectile ? m_pProjectile->GetAlpha() : m_ucAlpha;
+}
+
+void CClientProjectile::SetAlpha(unsigned char ucAlpha)
+{
+    m_ucAlpha = ucAlpha;
+    if (m_pProjectile)
+        m_pProjectile->SetAlpha(ucAlpha);
+}
+
+void CClientProjectile::SetFrozen(bool bFrozen)
+{
+    m_bFrozen = bFrozen;
+    if (!m_pProjectile)
+        return;
+
+    m_pProjectile->SetFrozen(bFrozen);
+    if (bFrozen)
+    {
+        CVector vecZero;
+        m_pProjectile->SetMoveSpeed(vecZero);
+        m_pProjectile->SetTurnSpeed(&vecZero);
+    }
 }

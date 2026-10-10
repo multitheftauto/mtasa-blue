@@ -21,9 +21,7 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
-#include "strparse.h"
-#include "../strcase.h"
+#include "curlx/strparse.h"
 
 void curlx_str_init(struct Curl_str *out)
 {
@@ -37,10 +35,19 @@ void curlx_str_assign(struct Curl_str *out, const char *str, size_t len)
   out->len = len;
 }
 
+/* remove bytes from the end of the string, never remove more bytes than what
+   the string holds! */
+void curlx_str_trim(struct Curl_str *out, size_t len)
+{
+  DEBUGASSERT(out);
+  DEBUGASSERT(out->len >= len);
+  out->len -= len;
+}
+
 /* Get a word until the first DELIM or end of string. At least one byte long.
    return non-zero on error */
 int curlx_str_until(const char **linep, struct Curl_str *out,
-                   const size_t max, char delim)
+                    const size_t max, char delim)
 {
   const char *s = *linep;
   size_t len = 0;
@@ -63,8 +70,7 @@ int curlx_str_until(const char **linep, struct Curl_str *out,
 
 /* Get a word until the first space or end of string. At least one byte long.
    return non-zero on error */
-int curlx_str_word(const char **linep, struct Curl_str *out,
-                  const size_t max)
+int curlx_str_word(const char **linep, struct Curl_str *out, const size_t max)
 {
   return curlx_str_until(linep, out, max, ' ');
 }
@@ -72,7 +78,7 @@ int curlx_str_word(const char **linep, struct Curl_str *out,
 /* Get a word until a newline byte or end of string. At least one byte long.
    return non-zero on error */
 int curlx_str_untilnl(const char **linep, struct Curl_str *out,
-                     const size_t max)
+                      const size_t max)
 {
   const char *s = *linep;
   size_t len = 0;
@@ -92,11 +98,10 @@ int curlx_str_untilnl(const char **linep, struct Curl_str *out,
   return STRE_OK;
 }
 
-
-/* Get a "quoted" word. No escaping possible.
+/* Get a "quoted" word. Escaped quotes are supported.
    return non-zero on error */
 int curlx_str_quotedword(const char **linep, struct Curl_str *out,
-                        const size_t max)
+                         const size_t max)
 {
   const char *s = *linep;
   size_t len = 0;
@@ -107,6 +112,11 @@ int curlx_str_quotedword(const char **linep, struct Curl_str *out,
     return STRE_BEGQUOTE;
   s++;
   while(*s && (*s != '\"')) {
+    if(*s == '\\' && s[1]) {
+      s++;
+      if(++len > max)
+        return STRE_BIG;
+    }
     s++;
     if(++len > max)
       return STRE_BIG;
@@ -138,13 +148,13 @@ int curlx_str_singlespace(const char **linep)
 }
 
 /* given an ASCII character and max ascii, return TRUE if valid */
-#define valid_digit(x,m) \
-  (((x) >= '0') && ((x) <= m) && Curl_hexasciitable[(x)-'0'])
+#define valid_digit(x, m) \
+  (((x) >= '0') && ((x) <= (m)) && curlx_hexasciitable[(x) - '0'])
 
 /* We use 16 for the zero index (and the necessary bitwise AND in the loop)
    to be able to have a non-zero value there to make valid_digit() able to
    use the info */
-const unsigned char Curl_hexasciitable[] = {
+const unsigned char curlx_hexasciitable[] = {
   16, 1, 2, 3, 4, 5, 6, 7, 8, 9, /* 0x30: 0 - 9 */
   0, 0, 0, 0, 0, 0, 0,
   10, 11, 12, 13, 14, 15,        /* 0x41: A - F */
@@ -162,7 +172,7 @@ static int str_num_base(const char **linep, curl_off_t *nump, curl_off_t max,
     (base == 16) ? 'f' : '7';
   DEBUGASSERT(linep && *linep && nump);
   DEBUGASSERT((base == 8) || (base == 10) || (base == 16));
-  DEBUGASSERT(max >= 0); /* mostly to catch SIZE_T_MAX, which is too large */
+  DEBUGASSERT(max >= 0); /* mostly to catch SIZE_MAX, which is too large */
   *nump = 0;
   p = *linep;
   if(!valid_digit(*p, m))
@@ -170,18 +180,18 @@ static int str_num_base(const char **linep, curl_off_t *nump, curl_off_t max,
   if(max < base) {
     /* special-case low max scenario because check needs to be different */
     do {
-      int n = Curl_hexval(*p++);
-      num = num * base + n;
+      int n = curlx_hexval(*p++);
+      num = (num * base) + n;
       if(num > max)
         return STRE_OVERFLOW;
     } while(valid_digit(*p, m));
   }
   else {
     do {
-      int n = Curl_hexval(*p++);
+      int n = curlx_hexval(*p++);
       if(num > ((max - n) / base))
         return STRE_OVERFLOW;
-      num = num * base + n;
+      num = (num * base) + n;
     } while(valid_digit(*p, m));
   }
   *nump = num;
@@ -238,7 +248,7 @@ int curlx_str_newline(const char **linep)
 int curlx_str_casecompare(struct Curl_str *str, const char *check)
 {
   size_t clen = check ? strlen(check) : 0;
-  return ((str->len == clen) && strncasecompare(str->str, check, clen));
+  return ((str->len == clen) && curl_strnequal(str->str, check, clen));
 }
 #endif
 

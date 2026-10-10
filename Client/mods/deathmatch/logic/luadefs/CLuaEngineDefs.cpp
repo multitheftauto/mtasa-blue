@@ -983,6 +983,20 @@ int CLuaEngineDefs::EngineFreeModel(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
+        if (iModelID < 0)
+        {
+            lua_pushboolean(luaVM, false);
+            return 1;
+        }
+
+        // destroyElement() only defers the actual native entity deletion to the next pulse
+        // (see CElementDeleter). If a script destroys an entity using this model and calls
+        // engineFreeModel in the same tick, the entity's native CEntity is still alive and
+        // can still be found by other entities' collision processing the moment this model's
+        // collision data is freed below, crashing the game. Flush pending deletions first so
+        // any such entity is fully gone from the game world before the model is freed.
+        g_pClientGame->GetElementDeleter()->DoDeleteAll();
+
         auto                          modelManager = m_pManager->GetModelManager();
         std::shared_ptr<CClientModel> pModel = modelManager->FindModelByID(iModelID);
         if (pModel && modelManager->Remove(pModel))
@@ -1078,20 +1092,15 @@ int CLuaEngineDefs::EngineGetModelLODDistance(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        uint32_t modelId = CModelNames::ResolveModelID(strModelId);
-        // Ensure we have a good model (GitHub #446)
-        if (modelId < g_pGame->GetBaseIDforTXD())
+        uint32_t    modelId = CModelNames::ResolveModelID(strModelId);
+        CModelInfo* modelInfo = g_pGame->GetModelInfo(modelId);
+        if (modelInfo)
         {
-            CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
-            if (pModelInfo)
-            {
-                lua_pushnumber(luaVM, pModelInfo->GetLODDistance());
-                return 1;
-            }
+            lua_pushnumber(luaVM, modelInfo->GetLODDistance());
+            return 1;
         }
-        else
-            argStream.SetCustomError(
-                SString("Expected a valid model name or ID in range [0-%u] at argument 1, got \"%s\"", g_pGame->GetBaseIDforTXD(), *strModelId));
+
+        argStream.SetCustomError(SString("Expected a valid model name or ID at argument 1, got \"%s\"", *strModelId));
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -1105,30 +1114,30 @@ int CLuaEngineDefs::EngineSetModelLODDistance(lua_State* luaVM)
 {
     // bool engineSetModelLODDistance ( int/string modelID, float distance [, bool extendedLod = false ])
     SString          strModelId;
-    float            fDistance;
+    float            distance;
     bool             extendedLod;
     CScriptArgReader argStream(luaVM);
     argStream.ReadString(strModelId);
-    argStream.ReadNumber(fDistance);
+    argStream.ReadNumber(distance);
     argStream.ReadBool(extendedLod, false);
 
     if (!argStream.HasErrors())
     {
-        uint32_t modelId = CModelNames::ResolveModelID(strModelId);
-        // Ensure we have a good model (GitHub #446)
-        if (modelId < g_pGame->GetBaseIDforTXD())
+        uint32_t    modelId = CModelNames::ResolveModelID(strModelId);
+        CModelInfo* modelInfo = g_pGame->GetModelInfo(modelId);
+        if (modelInfo)
         {
-            CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
-            if (pModelInfo && fDistance > 0.0f)
+            if (distance > 0.0f)
             {
-                pModelInfo->SetLODDistance(fDistance, extendedLod);
+                modelInfo->SetLODDistance(distance, extendedLod);
                 lua_pushboolean(luaVM, true);
                 return 1;
             }
         }
         else
-            argStream.SetCustomError(
-                SString("Expected a valid model name or ID in range [0-%u] at argument 1, got \"%s\"", g_pGame->GetBaseIDforTXD() - 1, *strModelId));
+        {
+            argStream.SetCustomError(SString("Expected a valid model name or ID at argument 1, got \"%s\"", *strModelId));
+        }
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -1361,6 +1370,9 @@ bool CLuaEngineDefs::EngineSetModelTXDID(uint uiModelID, unsigned short usTxdId)
 
     if (uiModelID >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
+
+    if (g_pGame->GetPools()->GetTxdPool().IsFreeTextureDictonarySlot(usTxdId))
+        throw std::invalid_argument("Expected an allocated TXD ID at argument 2");
 
     pModelInfo->SetTextureDictionaryID(usTxdId);
     return true;
@@ -2518,8 +2530,16 @@ uint CLuaEngineDefs::EngineRequestTXD(lua_State* const luaVM, std::string strTxd
 
 bool CLuaEngineDefs::EngineFreeTXD(uint txdID)
 {
-    std::shared_ptr<CClientModel> pModel = m_pManager->GetModelManager()->FindModelByID(MAX_MODEL_DFF_ID + txdID);
-    return pModel && pModel->Deallocate();
+    const std::uint32_t uiBaseIdForCol = g_pGame->GetBaseIDforCOL();
+
+    // Validate before adding the internal TXD offset so oversized script values cannot wrap to a negative model ID.
+    if (uiBaseIdForCol <= MAX_MODEL_DFF_ID || txdID >= uiBaseIdForCol - MAX_MODEL_DFF_ID)
+        return false;
+
+    const int                     iModelID = MAX_MODEL_DFF_ID + static_cast<int>(txdID);
+    auto                          modelManager = m_pManager->GetModelManager();
+    std::shared_ptr<CClientModel> pModel = modelManager->FindModelByID(iModelID);
+    return pModel && modelManager->Remove(pModel);
 }
 
 size_t CLuaEngineDefs::EngineGetPoolCapacity(ePools pool)
@@ -2550,6 +2570,13 @@ bool CLuaEngineDefs::EngineSetPoolCapacity(lua_State* luaVM, ePools pool, size_t
     if (newSize < minSize)
     {
         m_pScriptDebugging->LogWarning(luaVM, "Cannot set the pool capacity to less than the used capacity.");
+        return false;
+    }
+
+    const std::size_t maxSize = g_pGame->GetPools()->GetPoolMaxCapacity(pool);
+    if (newSize > maxSize)
+    {
+        m_pScriptDebugging->LogWarning(luaVM, SString("Cannot set the pool capacity to more than the maximum capacity (%d).", maxSize));
         return false;
     }
 

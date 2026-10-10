@@ -12,10 +12,6 @@ for arg in "$@"; do
 done
 
 case $arch_value in
-    32|x86)
-        prefix=i386-linux-gnu-
-        triplet=x86_64-linux-gnu-
-    ;;
     64|x64)
         prefix=x86_64-linux-gnu-
         triplet=$prefix

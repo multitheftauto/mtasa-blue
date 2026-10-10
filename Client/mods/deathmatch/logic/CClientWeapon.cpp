@@ -83,6 +83,9 @@ CClientWeapon::~CClientWeapon()
 
 void CClientWeapon::DoPulse()
 {
+    // Streamed-out or uninitialized custom weapons lack physical game instances and must not pulse
+    if (!m_pWeapon || !m_pObject)
+        return;
     /*if ( m_bHasTargetDirection )
     {
         CVector vecDirection = m_vecLastDirection;
@@ -159,7 +162,7 @@ void CClientWeapon::DoPulse()
                 m_State = WEAPONSTATE_RELOADING;
                 m_reloadTimer.Reset();
             }
-            else if (m_State == WEAPONSTATE_RELOADING && m_reloadTimer.Get() >= m_pWeapon->GetWeaponReloadTime(m_pWeaponStat))
+            else if (m_State == WEAPONSTATE_RELOADING && m_pWeapon && m_reloadTimer.Get() >= m_pWeapon->GetWeaponReloadTime(m_pWeaponStat))
             {
                 m_State = m_PreviousState;
                 m_nAmmoInClip = m_pWeaponStat->GetMaximumClipAmmo();
@@ -254,13 +257,12 @@ void CClientWeapon::Fire(bool bServerFire)
                     {
                         if (m_pTarget->GetType() == CCLIENTVEHICLE)
                         {
-                            if (m_itargetWheel <= MAX_WHEELS)
-                            {
-                                CClientVehicle* pTarget = (CClientVehicle*)(CClientEntity*)m_pTarget;
-                                vecTarget = pTarget->GetGameVehicle()->GetWheelPosition((eWheelPosition)m_itargetWheel);
-                            }
+                            CClientVehicle* pTarget = (CClientVehicle*)(CClientEntity*)m_pTarget;
+                            CVehicle*       pGameVehicle = pTarget->GetGameVehicle();
+                            if (m_itargetWheel >= 0 && m_itargetWheel < MAX_WHEELS && pGameVehicle)
+                                vecTarget = pGameVehicle->GetWheelPosition((eWheelPosition)m_itargetWheel);
                             else
-                                m_pTarget->GetPosition(vecTarget);
+                                pTarget->GetPosition(vecTarget);
                         }
                         else
                             m_pTarget->GetPosition(vecTarget);
@@ -343,6 +345,8 @@ void CClientWeapon::FireInstantHit(CVector& vecOrigin, CVector& vecTarget, CVect
 void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bServerFire, bool bRemote)
 #endif
 {
+    if (!m_pWeapon || !m_pObject)
+        return;
     CVector vecDirection = vecTarget - vecOrigin;
     vecDirection.Normalize();
     CClientEntity*             pAttachedTo = GetAttachedTo();
@@ -432,6 +436,14 @@ void CClientWeapon::FireInstantHit(CVector vecOrigin, CVector vecTarget, bool bS
         Arguments.PushNumber(pColPoint->GetLightingForTimeOfDay());  // Lighting
         Arguments.PushNumber(pColPoint->GetPieceTypeB());            // Piece
         if (!CallEvent("onClientWeaponFire", Arguments, true))
+        {
+            if (pColPoint)
+                pColPoint->Destroy();
+            return;
+        }
+
+        // Custom weapon entity may have been destroyed during the Lua callback
+        if (!m_pWeapon || !m_pObject)
         {
             if (pColPoint)
                 pColPoint->Destroy();
@@ -631,6 +643,8 @@ bool CClientWeapon::GetFlags(SLineOfSightFlags& flags)
 
 void CClientWeapon::DoGunShells(CVector vecOrigin, CVector vecDirection)
 {
+    if (!m_pWeapon || !m_pObject)
+        return;
     float fShellSize = 0.0f;
 
     switch (m_Type)

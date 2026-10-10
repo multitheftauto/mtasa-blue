@@ -4,7 +4,7 @@
  *
  *   Signed Distance Field support for outline fonts (body).
  *
- * Copyright (C) 2020-2025 by
+ * Copyright (C) 2020-2026 by
  * David Turner, Robert Wilhelm, and Werner Lemberg.
  *
  * Written by Anuj Verma.
@@ -655,12 +655,6 @@
     FT_Memory  memory = shape->memory;
 
 
-    if ( !to || !user )
-    {
-      error = FT_THROW( Invalid_Argument );
-      goto Exit;
-    }
-
     FT_CALL( sdf_contour_new( memory, &contour ) );
 
     contour->last_pos = *to;
@@ -679,21 +673,14 @@
   sdf_line_to( const FT_26D6_Vec*  to,
                void*               user )
   {
-    SDF_Shape*    shape    = ( SDF_Shape* )user;
-    SDF_Edge*     edge     = NULL;
-    SDF_Contour*  contour  = NULL;
+    SDF_Shape*    shape   = ( SDF_Shape* )user;
+    SDF_Edge*     edge    = NULL;
+    SDF_Contour*  contour = shape->contours;
 
-    FT_Error      error    = FT_Err_Ok;
-    FT_Memory     memory   = shape->memory;
+    FT_Error   error  = FT_Err_Ok;
+    FT_Memory  memory = shape->memory;
 
 
-    if ( !to || !user )
-    {
-      error = FT_THROW( Invalid_Argument );
-      goto Exit;
-    }
-
-    contour = shape->contours;
 
     if ( contour->last_pos.x == to->x &&
          contour->last_pos.y == to->y )
@@ -722,21 +709,13 @@
                 const FT_26D6_Vec*  to,
                 void*               user )
   {
-    SDF_Shape*    shape    = ( SDF_Shape* )user;
-    SDF_Edge*     edge     = NULL;
-    SDF_Contour*  contour  = NULL;
+    SDF_Shape*    shape   = ( SDF_Shape* )user;
+    SDF_Edge*     edge    = NULL;
+    SDF_Contour*  contour = shape->contours;
 
     FT_Error   error  = FT_Err_Ok;
     FT_Memory  memory = shape->memory;
 
-
-    if ( !control_1 || !to || !user )
-    {
-      error = FT_THROW( Invalid_Argument );
-      goto Exit;
-    }
-
-    contour = shape->contours;
 
     /* If the control point coincides with any of the end points */
     /* then it is a line and should be treated as one to avoid   */
@@ -778,19 +757,11 @@
   {
     SDF_Shape*    shape   = ( SDF_Shape* )user;
     SDF_Edge*     edge    = NULL;
-    SDF_Contour*  contour = NULL;
+    SDF_Contour*  contour = shape->contours;
 
     FT_Error   error  = FT_Err_Ok;
     FT_Memory  memory = shape->memory;
 
-
-    if ( !control_2 || !control_1 || !to || !user )
-    {
-      error = FT_THROW( Invalid_Argument );
-      goto Exit;
-    }
-
-    contour = shape->contours;
 
     FT_CALL( sdf_edge_new( memory, &edge ) );
 
@@ -3281,8 +3252,12 @@
       goto Exit;
     }
 
-    if ( FT_ALLOC( dists,
-                   bitmap->width * bitmap->rows * sizeof ( *dists ) ) )
+    if ( bitmap->rows > FT_INT_MAX / bitmap->width )
+    {
+      error = FT_THROW( Array_Too_Large );
+      goto Exit;
+    }
+    if ( FT_NEW_ARRAY( dists, bitmap->rows * bitmap->width ) )
       goto Exit;
 
     contours = shape->contours;
@@ -3597,13 +3572,11 @@
     }
 
     /* allocate the bitmaps to generate SDF for separate contours */
-    if ( FT_ALLOC( bitmaps,
-                   (FT_UInt)num_contours * sizeof ( *bitmaps ) ) )
+    if ( FT_NEW_ARRAY( bitmaps, num_contours ) )
       goto Exit;
 
     /* allocate array to hold orientation for all contours */
-    if ( FT_ALLOC( orientations,
-                   (FT_UInt)num_contours * sizeof ( *orientations ) ) )
+    if ( FT_NEW_ARRAY( orientations, num_contours ) )
       goto Exit;
 
     contour = shape->contours;
@@ -3621,8 +3594,7 @@
       bitmaps[i].pixel_mode = bitmap->pixel_mode;
 
       /* allocate memory for the buffer */
-      if ( FT_ALLOC( bitmaps[i].buffer,
-                     bitmap->rows * (FT_UInt)bitmap->pitch ) )
+      if ( FT_ALLOC_MULT( bitmaps[i].buffer, bitmap->rows, bitmap->pitch ) )
         goto Exit;
 
       /* determine the orientation */

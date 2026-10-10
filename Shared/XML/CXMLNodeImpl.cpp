@@ -12,8 +12,9 @@
 #include "StdInc.h"
 #define BLANK_LINE_COMMENT_MAGIC "##BLANK-LINE##"
 using std::list;
+using namespace tinyxml2;
 
-CXMLNodeImpl::CXMLNodeImpl(CXMLFileImpl* pFile, CXMLNodeImpl* pParent, TiXmlElement& Node)
+CXMLNodeImpl::CXMLNodeImpl(CXMLFileImpl* pFile, CXMLNodeImpl* pParent, XMLElement& Node)
     : m_ulID(INVALID_XML_ID),
       m_bUsingIDs((!pFile) || pFile && pFile->IsUsingIDs()),
       m_pNode(&Node),
@@ -46,8 +47,19 @@ CXMLNodeImpl::~CXMLNodeImpl()
     if (m_bUsingIDs)
         CXMLArray::PushUniqueID(this);
 
-    // Delete our children
+    // Delete wrapper children first so each child unlinks its own tinyxml2 node
+    // before this node is removed from the document.
     DeleteAllSubNodes();
+
+    // Keep the underlying document in sync when nodes are destroyed via
+    // xmlDestroyNode. DeleteWrapper nulls m_pNode before delete to avoid
+    // unlinking during full file teardown.
+    if (m_pNode)
+    {
+        if (XMLNode* pXmlParent = m_pNode->Parent())
+            pXmlParent->DeleteChild(m_pNode);
+        m_pNode = nullptr;
+    }
 
     // We need a parent to delete the node
     if (m_pParent)
@@ -63,24 +75,12 @@ CXMLNodeImpl::~CXMLNodeImpl()
             m_pFile->m_pRootNode = NULL;
         }
     }
-
-    // Need to delete the node?
-    if (m_pNode)
-    {
-        // Grab the parent of our node and delete it using that if any to prevent crashing.
-        // Otherwize delete it directly.
-        TiXmlNode* pParent = m_pNode->Parent();
-        if (pParent)
-            pParent->RemoveChild(m_pNode);
-        else
-            delete m_pNode;
-    }
 }
 
 void CXMLNodeImpl::BuildFromDocument()
 {
-    TiXmlNode* xmlChild = nullptr;
-    while (xmlChild = m_pNode->IterateChildren(xmlChild))
+    XMLNode* xmlChild = m_pNode->FirstChild();
+    while (xmlChild)
     {
         auto xmlChildElement = xmlChild->ToElement();
         if (xmlChildElement)
@@ -88,22 +88,23 @@ void CXMLNodeImpl::BuildFromDocument()
             auto xmlChildNode = new CXMLNodeImpl(nullptr, this, *xmlChildElement);
             xmlChildNode->BuildFromDocument();
         }
+        xmlChild = xmlChild->NextSibling();
     }
 }
 
 CXMLNode* CXMLNodeImpl::CreateSubNode(const char* szTagName, CXMLNode* pInsertAfter)
 {
-    TiXmlElement* pNewNode;
+    XMLElement* pNewNode;
     if (pInsertAfter)
     {
         // Insert after supplied node
-        pNewNode = (TiXmlElement*)m_pNode->InsertAfterChild(((CXMLNodeImpl*)pInsertAfter)->GetNode(), TiXmlElement(szTagName));
+        pNewNode = static_cast<XMLElement*>(m_pNode->InsertAfterChild(((CXMLNodeImpl*)pInsertAfter)->GetNode(), m_pNode->GetDocument()->NewElement(szTagName)));
     }
     else
     {
-        // Add to end
-        pNewNode = new TiXmlElement(szTagName);
-        m_pNode->LinkEndChild(pNewNode);
+        // Add to end. NewElement allocates the node; InsertEndChild takes ownership.
+        pNewNode = m_pNode->GetDocument()->NewElement(szTagName);
+        m_pNode->InsertEndChild(pNewNode);
     }
 
     // Create and return the wrapper element
@@ -132,6 +133,7 @@ void CXMLNodeImpl::DeleteAllSubNodes()
     // Clear the list
     m_bCanRemoveFromList = true;
     m_Children.clear();
+    m_bLastFindValid = false;
 }
 
 unsigned int CXMLNodeImpl::GetSubNodeCount()
@@ -159,25 +161,34 @@ CXMLNode* CXMLNodeImpl::GetSubNode(unsigned int uiIndex)
 
 CXMLNode* CXMLNodeImpl::FindSubNode(const char* szTagName, unsigned int uiIndex)
 {
-    std::string TagName(szTagName);
+    list<CXMLNode*>::iterator iter = m_Children.begin();
+    unsigned int              uiFound = 0;
 
-    // Find the item with the given name
-    unsigned int              uiTemp = 0;
-    list<CXMLNode*>::iterator iter;
-    for (iter = m_Children.begin(); iter != m_Children.end(); iter++)
+    // Continue from the previous hit when the caller is walking forward through the same tag
+    if (m_bLastFindValid && uiIndex > m_uiLastFindIndex && m_strLastFindTag == szTagName)
     {
-        if (dynamic_cast<CXMLNodeImpl*>((*iter))->GetNode()->ValueStr() == szTagName)
-        {
-            if (uiTemp == uiIndex)
-            {
-                return *iter;
-            }
-
-            ++uiTemp;
-        }
+        iter = std::next(m_LastFindIter);
+        uiFound = m_uiLastFindIndex + 1;
     }
 
-    // Couldn't find it
+    for (; iter != m_Children.end(); ++iter)
+    {
+        CXMLNodeImpl* pChild = dynamic_cast<CXMLNodeImpl*>(*iter);
+        if (!pChild || !pChild->GetNode() || strcmp(pChild->GetNode()->Value(), szTagName) != 0)
+            continue;
+
+        if (uiFound == uiIndex)
+        {
+            m_strLastFindTag = szTagName;
+            m_uiLastFindIndex = uiIndex;
+            m_LastFindIter = iter;
+            m_bLastFindValid = true;
+            return *iter;
+        }
+
+        ++uiFound;
+    }
+
     return NULL;
 }
 
@@ -193,17 +204,29 @@ CXMLNode* CXMLNodeImpl::GetParent()
 
 int CXMLNodeImpl::GetLine()
 {
-    return m_pNode->Row();
+    return m_pNode ? m_pNode->GetLineNum() : 0;
 }
 
 const std::string& CXMLNodeImpl::GetTagName()
 {
-    return m_pNode->ValueStr();
+    if (!m_pNode)
+    {
+        m_strTagNameCache.clear();
+        return m_strTagNameCache;
+    }
+    const char* szValue = m_pNode->Value();
+    if (szValue)
+        m_strTagNameCache = szValue;
+    else
+        m_strTagNameCache.clear();
+    return m_strTagNameCache;
 }
 
 void CXMLNodeImpl::SetTagName(const std::string& strString)
 {
-    m_pNode->SetValue(strString);
+    if (m_pNode)
+        m_pNode->SetValue(strString.c_str());
+    m_strTagNameCache = strString;
 }
 
 const std::string CXMLNodeImpl::GetTagContent()
@@ -288,11 +311,12 @@ bool CXMLNodeImpl::GetTagContent(float& fContent)
 
 void CXMLNodeImpl::SetTagContent(const char* szText, bool bCDATA)
 {
-    m_pNode->Clear();
-    TiXmlText* pNewNode = new TiXmlText(szText);
-    pNewNode->SetCDATA(bCDATA);
-    m_pNode->LinkEndChild(pNewNode);
+    m_pNode->DeleteChildren();
+    XMLText* pNewNode = m_pNode->GetDocument()->NewText(szText);
+    pNewNode->SetCData(bCDATA);
+    m_pNode->InsertEndChild(pNewNode);
     m_Children.clear();
+    m_bLastFindValid = false;
 }
 
 void CXMLNodeImpl::SetTagContent(bool bContent)
@@ -343,26 +367,29 @@ void CXMLNodeImpl::SetTagContentf(const char* szFormat, ...)
     SetTagContent(szBuffer);
 }
 
-TiXmlElement* CXMLNodeImpl::GetNode()
+XMLElement* CXMLNodeImpl::GetNode()
 {
     return m_pNode;
 }
 
 CXMLNode* CXMLNodeImpl::CopyNode(CXMLNode* pParent)
 {
-    CXMLNodeImpl* pNew = new CXMLNodeImpl(NULL, reinterpret_cast<CXMLNodeImpl*>(pParent), *m_pNode->Clone()->ToElement());
+    // Create a standalone document to own the deep clone.
+    // tinyxml2's DeepClone inserts the clone into the target document, so we
+    // must use a new document; cloning into the source document would result in
+    // a dangling pointer when the source CXMLFile is deleted.
+    auto* newDoc = new tinyxml2::XMLDocument;
+    auto* clone = m_pNode->DeepClone(newDoc)->ToElement();
+    newDoc->InsertEndChild(clone);
 
-    // Copy the list, so we don't end up in an endless loop
-    std::list<CXMLNode*> ChildrenCopy(m_Children);
+    CXMLNodeImpl* pNew = new CXMLNodeImpl(NULL, reinterpret_cast<CXMLNodeImpl*>(pParent), *clone);
+    pNew->m_standaloneDocument.reset(newDoc);
 
-    // Recursively copy each child
-    list<CXMLNode*>::iterator iter;
-    for (iter = ChildrenCopy.begin(); iter != ChildrenCopy.end(); iter++)
-    {
-        (*iter)->CopyNode(pNew);
-    }
+    // DeepClone already recursively cloned all descendant elements into newDoc.
+    // BuildFromDocument creates the CXMLNodeImpl wrapper tree from the XML tree.
+    pNew->BuildFromDocument();
 
-    return dynamic_cast<CXMLNode*>(pNew);
+    return pNew;
 }
 
 bool CXMLNodeImpl::CopyChildrenInto(CXMLNode* pDestination, bool bRecursive)
@@ -443,6 +470,7 @@ void CXMLNodeImpl::DeleteWrapper()
     // Clear the list
     m_bCanRemoveFromList = true;
     m_Children.clear();
+    m_bLastFindValid = false;
 
     // Prevent our destructor from deleting the node
     m_pNode = NULL;
@@ -461,6 +489,7 @@ void CXMLNodeImpl::DeleteWrapper()
 void CXMLNodeImpl::AddToList(CXMLNode* pNode)
 {
     m_Children.push_back(pNode);
+    m_bLastFindValid = false;
 }
 
 void CXMLNodeImpl::RemoveFromList(CXMLNode* pNode)
@@ -469,12 +498,14 @@ void CXMLNodeImpl::RemoveFromList(CXMLNode* pNode)
     {
         if (!m_Children.empty())
             m_Children.remove(pNode);
+        m_bLastFindValid = false;
     }
 }
 
 void CXMLNodeImpl::RemoveAllFromList()
 {
     m_Children.clear();
+    m_bLastFindValid = false;
 }
 
 bool CXMLNodeImpl::StringToLong(const char* szString, long& lValue)
@@ -506,9 +537,9 @@ SString CXMLNodeImpl::GetAttributeValue(const SString& strAttributeName)
 
 SString CXMLNodeImpl::GetCommentText()
 {
-    SString    strComment;
-    TiXmlNode* pCommentNode = m_pNode->PreviousSibling();
-    if (pCommentNode && pCommentNode->Type() == TiXmlNode::COMMENT)
+    SString  strComment;
+    XMLNode* pCommentNode = m_pNode->PreviousSibling();
+    if (pCommentNode && pCommentNode->ToComment())
     {
         strComment = pCommentNode->Value();
         // Remove indents
@@ -526,14 +557,27 @@ SString CXMLNodeImpl::GetCommentText()
 void CXMLNodeImpl::SetCommentText(const char* szCommentText, bool bLeadingBlankLine)
 {
     // If previous sibling is not a comment, then insert one (with blank line if required)
-    TiXmlNode* pCommentNode = m_pNode->PreviousSibling();
-    if (!pCommentNode || pCommentNode->Type() != TiXmlNode::COMMENT)
+    XMLNode* pCommentNode = m_pNode->PreviousSibling();
+    if (!pCommentNode || !pCommentNode->ToComment())
     {
+        XMLDocument* doc = m_pNode->GetDocument();
         if (bLeadingBlankLine)
         {
-            m_pNode->Parent()->InsertBeforeChild(m_pNode, TiXmlComment(BLANK_LINE_COMMENT_MAGIC));
+            XMLComment* pBlank = doc->NewComment(BLANK_LINE_COMMENT_MAGIC);
+            // InsertBeforeChild does not exist in tinyxml2; insert after the
+            // node preceding this element, or as the first child.
+            XMLNode* pPrev = m_pNode->PreviousSibling();
+            if (pPrev)
+                m_pNode->Parent()->InsertAfterChild(pPrev, pBlank);
+            else
+                m_pNode->Parent()->InsertFirstChild(pBlank);
         }
-        pCommentNode = m_pNode->Parent()->InsertBeforeChild(m_pNode, TiXmlComment());
+        pCommentNode = doc->NewComment("");
+        XMLNode* pPrev = m_pNode->PreviousSibling();
+        if (pPrev)
+            m_pNode->Parent()->InsertAfterChild(pPrev, pCommentNode);
+        else
+            m_pNode->Parent()->InsertFirstChild(pCommentNode);
     }
 
     // Calc indent
@@ -554,14 +598,12 @@ void CXMLNodeImpl::SetCommentText(const char* szCommentText, bool bLeadingBlankL
 
     // Compose final comment string
     SString strComment = " " + SString::Join("\n", lineList) + " ";
-    pCommentNode->SetValue(strComment);
+    pCommentNode->SetValue(strComment.c_str());
 }
 
 std::string CXMLNodeImpl::ToString()
 {
-    TiXmlPrinter printer;
-    printer.SetIndent("\t");
-
+    XMLPrinter printer;
     if (m_pNode->Accept(&printer))
         return {printer.CStr()};
 

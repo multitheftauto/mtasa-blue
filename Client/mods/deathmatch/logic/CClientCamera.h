@@ -117,6 +117,8 @@ private:
     void InvalidateEntity(CClientEntity* pEntity);
     void RestoreEntity(CClientEntity* pEntity);
 
+    void PersistViewModes();
+
     CClientPlayerManager* m_pPlayerManager;
 
     CClientPlayerPtr m_pFocusedPlayer;
@@ -138,6 +140,10 @@ private:
     CVector         m_lastCenterOfWorldPos;
     float           m_lastCenterOfWorldRot;
     bool            m_hasCenterOfWorld;
+
+    bool         m_viewModesRestored{false};
+    std::uint8_t m_lastVehicleViewMode{0};
+    std::uint8_t m_lastPedViewMode{0};
 
     CCamera* m_pCamera;
 };

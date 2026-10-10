@@ -23,7 +23,6 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
 #include "curl_setup.h"
 
 #if !defined(CURL_DISABLE_PROXY) && !defined(CURL_DISABLE_HTTP)
@@ -36,9 +35,9 @@ enum Curl_proxy_use {
   HEADER_CONNECT  /* sending CONNECT to a proxy */
 };
 
-CURLcode Curl_http_proxy_get_destination(struct Curl_cfilter *cf,
-                                         const char **phostname,
-                                         int *pport, bool *pipv6_ip);
+void Curl_http_proxy_get_destination(struct Curl_cfilter *cf,
+                                     const char **phostname,
+                                     uint16_t *pport, bool *pipv6_ip);
 
 CURLcode Curl_http_proxy_create_CONNECT(struct httpreq **preq,
                                         struct Curl_cfilter *cf,
@@ -46,20 +45,18 @@ CURLcode Curl_http_proxy_create_CONNECT(struct httpreq **preq,
                                         int http_version_major);
 
 /* Default proxy timeout in milliseconds */
-#define PROXY_TIMEOUT (3600*1000)
+#define PROXY_TIMEOUT (3600 * 1000)
 
-void Curl_cf_http_proxy_get_host(struct Curl_cfilter *cf,
-                                 struct Curl_easy *data,
-                                 const char **phost,
-                                 const char **pdisplay_host,
-                                 int *pport);
+CURLcode Curl_cf_http_proxy_query(struct Curl_cfilter *cf,
+                                  struct Curl_easy *data,
+                                  int query, int *pres1, void *pres2);
 
 CURLcode Curl_cf_http_proxy_insert_after(struct Curl_cfilter *cf_at,
                                          struct Curl_easy *data);
 
 extern struct Curl_cftype Curl_cft_http_proxy;
 
-#endif /* !CURL_DISABLE_PROXY  && !CURL_DISABLE_HTTP */
+#endif /* !CURL_DISABLE_PROXY && !CURL_DISABLE_HTTP */
 
 #define IS_HTTPS_PROXY(t) (((t) == CURLPROXY_HTTPS) ||  \
                            ((t) == CURLPROXY_HTTPS2))

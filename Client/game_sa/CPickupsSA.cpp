@@ -36,7 +36,7 @@ CPickup* CPickupsSA::GetPickup(DWORD ID)
     return (CPickup*)Pickups[ID];
 }
 
-CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, PickupType Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE bPingOutOfPlayer)
+CPickup* CPickupsSA::CreatePickup(CVector* position, DWORD ModelIndex, PickupType::Enum Type, DWORD dwMonetaryValue, DWORD dwMoneyPerDay, BYTE bPingOutOfPlayer)
 {
     DWORD      FreeSlot = 0;
     bool       bFoundFreeSlot = false;

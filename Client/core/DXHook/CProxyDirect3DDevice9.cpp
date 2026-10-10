@@ -1073,6 +1073,11 @@ HRESULT CProxyDirect3DDevice9::Present(CONST RECT* pSourceRect, CONST RECT* pDes
     TIMING_GRAPH("Present");
     HRESULT hr = CDirect3DEvents9::PresentGuarded(m_pDevice, pSourceRect, pDestRect, hDestWindowOverride, pDirtyRegion);
     TIMING_GRAPH("PostPresent");
+
+    // The frame ends here. The wait itself runs in CCore::OnGameTimerUpdate right before GTA
+    // samples its clock, this only paces frames the game timer never saw
+    CCore::GetSingleton().GetFPSLimiter()->OnFrameEnd();
+
     return hr;
 }
 

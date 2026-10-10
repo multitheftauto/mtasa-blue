@@ -43,6 +43,14 @@ void CClientBuildingManager::RemoveAll()
     m_bRemoveFromList = true;
 }
 
+void CClientBuildingManager::SetDimension(unsigned short usDimension)
+{
+    for (CClientBuilding* building : m_List)
+        building->RelateDimension(usDimension);
+
+    m_usDimension = usDimension;
+}
+
 bool CClientBuildingManager::Exists(CClientBuilding* pBuilding)
 {
     return std::find(m_List.begin(), m_List.end(), pBuilding) != m_List.end();
@@ -67,6 +75,7 @@ bool CClientBuildingManager::IsValidModel(uint16_t modelId)
         return false;
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
+
     if (!pModelInfo || !pModelInfo->GetInterface())
         return false;
 
@@ -74,6 +83,7 @@ bool CClientBuildingManager::IsValidModel(uint16_t modelId)
         return false;
 
     eModelInfoType eType = pModelInfo->GetModelType();
+
     return (eType == eModelInfoType::CLUMP || eType == eModelInfoType::ATOMIC || eType == eModelInfoType::WEAPON || eType == eModelInfoType::TIME);
 }
 
@@ -103,7 +113,7 @@ void CClientBuildingManager::RestoreDestroyed()
             if (highLodBuilding && !highLodBuilding->IsValid())
                 hasInvalidLods = true;
             else
-                building->Create();
+                building->RelateDimension(m_usDimension);
         }
     }
 }
@@ -138,7 +148,8 @@ bool CClientBuildingManager::SetPoolCapacity(size_t newCapacity)
 {
     const int currentUsed = g_pGame->GetPools()->GetNumberOfUsedSpaces(ePools::BUILDING_POOL);
 
-    if (newCapacity - currentUsed < PRESERVED_POOL_SIZE)
+    // Reject invalid capacities before temporarily destroying resource-created buildings.
+    if (newCapacity > static_cast<size_t>(std::numeric_limits<int>::max()) || newCapacity < static_cast<size_t>(currentUsed) + PRESERVED_POOL_SIZE)
         return false;
 
     return DoPoolResize(newCapacity);

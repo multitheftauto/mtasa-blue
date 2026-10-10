@@ -12,7 +12,7 @@
 #pragma once
 
 #include "CResourceFile.h"
-#include "ehs/ehs.h"
+#include "httpd/Types.h"
 
 #ifndef MAX_PATH
     #define MAX_PATH 260

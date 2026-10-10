@@ -48,6 +48,9 @@ public:
     bool GetCollisionEnabled() const noexcept { return m_bCollisionsEnabled; }
     void SetCollisionEnabled(bool bCollisionEnabled) noexcept { m_bCollisionsEnabled = bCollisionEnabled; }
 
+    unsigned char GetAlpha() const noexcept { return m_ucAlpha; }
+    void          SetAlpha(unsigned char ucAlpha) noexcept { m_ucAlpha = ucAlpha; }
+
     bool       SetLowLodBuilding(CBuilding* pLowLodBuilding) noexcept;
     CBuilding* GetLowLodElement() const noexcept { return m_pLowLodBuilding; }
 
@@ -63,7 +66,8 @@ private:
     std::uint16_t     m_model;
 
 protected:
-    bool m_bCollisionsEnabled;
+    bool          m_bCollisionsEnabled;
+    unsigned char m_ucAlpha;
 
     CBuilding* m_pLowLodBuilding;
     CBuilding* m_pHighLodBuilding;

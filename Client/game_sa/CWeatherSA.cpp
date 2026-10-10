@@ -27,28 +27,13 @@ void CWeatherSA::Set(unsigned char primary, unsigned char secondary)
 
 void CWeatherSA::ResyncInterpolationWithGameClock(unsigned char primary, unsigned char secondary)
 {
-    // CWeather::InterpolationValue — see plugin_sa CWeather.cpp (0xC8130C)
+    // Set InterpolationValue to 0 so CWeather::Update's wrap branch never fires.
+    // The wrap condition is (engine_computed_interp < stored_InterpolationValue);
+    // since the engine's value is always >= 0, this is always false.
+    // CWeather::Update then computes its own InterpolationValue from the game clock
+    // and uses it consistently for all weather globals (Foggyness, Rain, etc.).
     constexpr DWORD VAR_InterpolationValue = 0xC8130C;
-    constexpr DWORD VAR_TimeMinutes = 0xB70152;
-    constexpr DWORD VAR_TimeSeconds = 0xB70150;
-
-    if (primary == secondary)
-        MemPutFast<float>(VAR_InterpolationValue, 0.0f);
-    else
-    {
-        // Match the value CWeather::Update derives at 0x72B897:
-        //   v0 = ((double)seconds * 0.016666668 + (double)minutes) * 0.016666668
-        // Keep this <= engine v0 to avoid triggering the wrap branch on precision mismatches.
-        const auto   ucMinute = *reinterpret_cast<unsigned char*>(VAR_TimeMinutes);
-        const auto   ucSecond = *reinterpret_cast<unsigned char*>(VAR_TimeSeconds);
-        const double dInterp = std::min(1.0, (static_cast<double>(ucSecond) * 0.016666668 + static_cast<double>(ucMinute)) * 0.016666668);
-        float        fInterp = static_cast<float>(dInterp);
-
-        if (static_cast<double>(fInterp) > dInterp)
-            fInterp = std::nextafterf(fInterp, 0.0f);
-
-        MemPutFast<float>(VAR_InterpolationValue, fInterp);
-    }
+    MemPutFast<float>(VAR_InterpolationValue, 0.0f);
 }
 
 void CWeatherSA::Release()

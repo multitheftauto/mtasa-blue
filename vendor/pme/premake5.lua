@@ -4,7 +4,7 @@ project "pme"
 	targetname "pme"
 	warnings "Off"
 
-	includedirs { "../pcre" }
+	includedirs { "../pcre2" }
 
 	vpaths {
 		["Headers/*"] = "**.h",

@@ -15,6 +15,7 @@
 #define BUGSUTIL_EXPORTS
 #include "StdInc.h"
 #include "CrashHandler.h"
+#include "PdbDirectoryDiscovery.h"
 #include "StackTraceHelpers.h"
 #include "CExceptionInformation_Impl.h"
 #include <SharedUtil.Detours.h>
@@ -31,7 +32,6 @@
 #include <cstring>
 #include <exception>
 #include <errno.h>
-#include <filesystem>
 #include <intrin.h>
 #include <malloc.h>
 #include <mutex>
@@ -43,7 +43,6 @@
 #if defined(_MSC_VER)
     #pragma comment(lib, "Psapi.lib")
 #endif
-#include <set>
 #include <signal.h>
 #include <stdio.h>
 #include <string>
@@ -1231,64 +1230,14 @@ namespace CrashHandler
                                if (processDir.empty()) [[unlikely]]
                                    return;
 
-                               const std::filesystem::path rootPath{FromUTF8(processDir)};
-                               std::error_code             ec{};
+                               const auto directories = CrashHandler::Details::FindPdbDirectories({FromUTF8(processDir)});
+                               pdbDirs.reserve(directories.size());
 
-                               if (!std::filesystem::exists(rootPath, ec) || !std::filesystem::is_directory(rootPath, ec))
-                                   return;
-
-                               std::set<std::string> uniqueDirs;
-
-                               constexpr auto                                options = std::filesystem::directory_options::skip_permission_denied;
-                               std::filesystem::recursive_directory_iterator iter{rootPath, options, ec};
-
-                               if (ec) [[unlikely]]
-                                   return;
-
-                               constexpr auto maxDepth = 256u;
-
-                               for (const auto end = std::filesystem::recursive_directory_iterator{}; iter != end;)
+                               for (const auto& directory : directories)
                                {
-                                   if (iter.depth() > maxDepth) [[unlikely]]
-                                       iter.disable_recursion_pending();
-
-                                   std::error_code entryEc{};
-                                   const bool      isSymlink = iter->is_symlink(entryEc);
-
-                                   if (entryEc || isSymlink) [[unlikely]]
-                                   {
-                                       iter.increment(ec), ec ? ec.clear() : void();
-                                       continue;
-                                   }
-
-                                   const bool isRegularFile = iter->is_regular_file(entryEc);
-
-                                   if (entryEc) [[unlikely]]
-                                   {
-                                       iter.increment(ec), ec ? ec.clear() : void();
-                                       continue;
-                                   }
-
-                                   if (isRegularFile) [[likely]]
-                                   {
-                                       const auto extension = iter->path().extension().wstring();
-
-                                       if (extension.size() == 4 && (extension[0] == L'.') && (extension[1] == L'p' || extension[1] == L'P') &&
-                                           (extension[2] == L'd' || extension[2] == L'D') && (extension[3] == L'b' || extension[3] == L'B')) [[unlikely]]
-                                       {
-                                           const auto parentPath = iter->path().parent_path();
-                                           if (!parentPath.empty())
-                                           {
-                                               const auto parentStr = ToUTF8(parentPath.wstring());
-                                               uniqueDirs.insert(std::string{parentStr.c_str()});
-                                           }
-                                       }
-                                   }
-
-                                   iter.increment(ec), ec ? ec.clear() : void();
+                                   const auto utf8Directory = ToUTF8(directory.wstring());
+                                   pdbDirs.emplace_back(utf8Directory.c_str());
                                }
-
-                               pdbDirs.assign(uniqueDirs.begin(), uniqueDirs.end());
                            }
                            catch (...)
                            {
@@ -1563,7 +1512,7 @@ namespace CrashHandler
     SafeDebugOutput("========================================\n");
 
     // Warm up PDB detection early to avoid filesystem scan during crash handling
-    // This performs the recursive directory search now rather than during exception processing
+    // This checks the bounded client binary directories now rather than during exception processing
     const bool hasSymbols = CrashHandler::ProcessHasLocalDebugSymbols();
 
     SafeDebugOutput("========================================\n");

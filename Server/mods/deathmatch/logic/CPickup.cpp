@@ -385,8 +385,9 @@ bool CPickup::CanUse(CPlayer& Player, bool bOnfootCheck)
         switch (m_ucType)
         {
             case CPickup::HEALTH:
-                // TODO: calc max health from max_health stat
-                return (Player.GetHealth() < 200.0f);
+                // Like the original game, leave the pickup alone when there is nothing to heal.
+                // The ceiling comes from the max_health stat, which scripts can raise.
+                return (Player.GetHealth() < Player.GetMaxHealth());
 
             case CPickup::ARMOR:
                 return (Player.GetArmor() < 100.0f);
@@ -443,10 +444,12 @@ void CPickup::Use(CPlayer& Player)
                 // Health pickup?
                 case CPickup::HEALTH:
                 {
+                    const float fMaxHealth = Player.GetMaxHealth();
+
                     float fHealth = Player.GetHealth();
                     float fNewHealth = fHealth + m_fAmount;
-                    if (fNewHealth > 200.0f)
-                        fNewHealth = 200.0f;
+                    if (fNewHealth > fMaxHealth)
+                        fNewHealth = fMaxHealth;
 
                     CStaticFunctionDefinitions::SetElementHealth(&Player, fNewHealth);
 
@@ -482,42 +485,27 @@ void CPickup::Use(CPlayer& Player)
 
 void CPickup::Callback_OnCollision(CColShape& Shape, CElement& Element)
 {
-    if (IS_PLAYER(&Element))
+    CPlayer& Player = static_cast<CPlayer&>(Element);
+
+    // Call the onPickupHit event
+    CLuaArguments Arguments;
+    Arguments.PushElement(&Player);
+    bool bContinue1 = CallEvent("onPickupHit", Arguments);
+
+    CLuaArguments Arguments2;
+    Arguments2.PushElement(this);  // pickup
+    bool bContinue2 = Element.CallEvent("onPlayerPickupHit", Arguments2);
+
+    if (bContinue1 && bContinue2)
     {
-        CPlayer& Player = static_cast<CPlayer&>(Element);
-
-        // Is he alive?
-        if (!Player.IsDead())
+        // Does it still exist?
+        if (!IsBeingDeleted())
         {
-            // Matching interior
-            if (GetInterior() == Element.GetInterior())
+            // Can we USE the pickup?
+            if (CanUse(Player))
             {
-                // Matching dimension
-                if (GetDimension() == Element.GetDimension())
-                {
-                    // Call the onPickupHit event
-                    CLuaArguments Arguments;
-                    Arguments.PushElement(&Player);
-                    bool bContinue1 = CallEvent("onPickupHit", Arguments);
-
-                    CLuaArguments Arguments2;
-                    Arguments2.PushElement(this);  // pickup
-                    bool bContinue2 = Element.CallEvent("onPlayerPickupHit", Arguments2);
-
-                    if (bContinue1 && bContinue2)
-                    {
-                        // Does it still exist?
-                        if (!IsBeingDeleted())
-                        {
-                            // Can we USE the pickup?
-                            if (CanUse(Player))
-                            {
-                                // USE the pickup
-                                Use(Player);
-                            }
-                        }
-                    }
-                }
+                // USE the pickup
+                Use(Player);
             }
         }
     }
@@ -525,31 +513,29 @@ void CPickup::Callback_OnCollision(CColShape& Shape, CElement& Element)
 
 void CPickup::Callback_OnLeave(CColShape& Shape, CElement& Element)
 {
-    if (IS_PLAYER(&Element))
-    {
-        CPlayer& Player = static_cast<CPlayer&>(Element);
+    CPlayer& Player = static_cast<CPlayer&>(Element);
 
-        // Matching interior
-        if (GetInterior() == Element.GetInterior())
-        {
-            // Matching dimension
-            if (GetDimension() == Element.GetDimension())
-            {
-                // Is he alive?
-                if (!Player.IsDead())
-                {
-                    // Call the onPickupLeave event
-                    CLuaArguments Arguments;
-                    Arguments.PushElement(&Player);
-                    CallEvent("onPickupLeave", Arguments);
+    // Call the onPickupLeave event
+    CLuaArguments Arguments;
+    Arguments.PushElement(&Player);
+    CallEvent("onPickupLeave", Arguments);
 
-                    CLuaArguments Arguments2;
-                    Arguments2.PushElement(this);  // pickup
-                    Element.CallEvent("onPlayerPickupLeave", Arguments2);
-                }
-            }
-        }
-    }
+    CLuaArguments Arguments2;
+    Arguments2.PushElement(this);  // pickup
+    Element.CallEvent("onPlayerPickupLeave", Arguments2);
+}
+
+bool CPickup::ShouldTrackCollision(CColShape& Shape, CElement& Element)
+{
+    if (!IS_PLAYER(&Element))
+        return false;
+
+    CPlayer& Player = static_cast<CPlayer&>(Element);
+
+    if (Player.IsDead())
+        return false;
+
+    return GetInterior() == Element.GetInterior() && GetDimension() == Element.GetDimension();
 }
 
 void CPickup::Callback_OnCollisionDestroy(CColShape* pCollision)

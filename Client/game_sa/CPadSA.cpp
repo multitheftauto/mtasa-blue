@@ -79,3 +79,18 @@ void CPadSA::SetLastTimeTouched(DWORD dwTime)
 {
     internalInterface->LastTimeTouched = dwTime;
 }
+
+short CPadSA::GetShakeDur()
+{
+    return internalInterface->ShakeDur;
+}
+
+unsigned char CPadSA::GetShakeFreq()
+{
+    return internalInterface->ShakeFreq;
+}
+
+void CPadSA::SetShakeDur(short sShakeDur)
+{
+    internalInterface->ShakeDur = sShakeDur;
+}

@@ -23,23 +23,14 @@
  * RFC5802 SCRAM-SHA-1 authentication
  *
  ***************************************************************************/
-
-#include "../curl_setup.h"
+#include "curl_setup.h"
 
 #ifdef USE_GSASL
 
-#include <curl/curl.h>
-
-#include "vauth.h"
-#include "../urldata.h"
-#include "../sendf.h"
+#include "vauth/vauth.h"
+#include "curl_trc.h"
 
 #include <gsasl.h>
-
-/* The last 3 #include files should be in this order */
-#include "../curl_printf.h"
-#include "../curl_memory.h"
-#include "../memdebug.h"
 
 bool Curl_auth_gsasl_is_supported(struct Curl_easy *data,
                                   const char *mech,
@@ -49,7 +40,7 @@ bool Curl_auth_gsasl_is_supported(struct Curl_easy *data,
 
   res = gsasl_init(&gsasl->ctx);
   if(res != GSASL_OK) {
-    failf(data, "gsasl init: %s\n", gsasl_strerror(res));
+    failf(data, "gsasl init: %s", gsasl_strerror(res));
     return FALSE;
   }
 
@@ -74,7 +65,7 @@ CURLcode Curl_auth_gsasl_start(struct Curl_easy *data,
     gsasl_property_set(gsasl->client, GSASL_AUTHID, userp);
 #if GSASL_VERSION_NUMBER >= 0x010b00
   if(res != GSASL_OK) {
-    failf(data, "setting AUTHID failed: %s\n", gsasl_strerror(res));
+    failf(data, "setting AUTHID failed: %s", gsasl_strerror(res));
     return CURLE_OUT_OF_MEMORY;
   }
 #endif
@@ -85,7 +76,7 @@ CURLcode Curl_auth_gsasl_start(struct Curl_easy *data,
     gsasl_property_set(gsasl->client, GSASL_PASSWORD, passwdp);
 #if GSASL_VERSION_NUMBER >= 0x010b00
   if(res != GSASL_OK) {
-    failf(data, "setting PASSWORD failed: %s\n", gsasl_strerror(res));
+    failf(data, "setting PASSWORD failed: %s", gsasl_strerror(res));
     return CURLE_OUT_OF_MEMORY;
   }
 #endif
@@ -104,11 +95,10 @@ CURLcode Curl_auth_gsasl_token(struct Curl_easy *data,
   char *response;
   size_t outlen;
 
-  res = gsasl_step(gsasl->client,
-                   (const char *) Curl_bufref_ptr(chlg), Curl_bufref_len(chlg),
+  res = gsasl_step(gsasl->client, Curl_bufref_ptr(chlg), Curl_bufref_len(chlg),
                    &response, &outlen);
   if(res != GSASL_OK && res != GSASL_NEEDS_MORE) {
-    failf(data, "GSASL step: %s\n", gsasl_strerror(res));
+    failf(data, "GSASL step: %s", gsasl_strerror(res));
     return CURLE_BAD_CONTENT_ENCODING;
   }
 

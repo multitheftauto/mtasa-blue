@@ -12,6 +12,7 @@
 #include <game/CStreaming.h>
 #include <game/CModelInfo.h>
 #include <game/CSettings.h>
+#include <game/CWorld.h>
 #include "CModelCacheManager.h"
 
 namespace
@@ -25,6 +26,13 @@ namespace
         bool       bIsModelCachedHere;
         bool       bIsModelLoadedByGame;
     };
+
+    // When the game itself tracks the model in its loaded ped/vehicle groups, keep our cache ref
+    // until the game has more than this many entries left. These floors mirror what the game's
+    // own cleanup uses when it decides which group models it can unload.
+    constexpr uint PED_STREAMING_FLOOR = 4u;
+    constexpr uint VEHICLE_STREAMING_FLOOR_EXTERIOR = 7u;
+    constexpr uint VEHICLE_STREAMING_FLOOR_INTERIOR = 4u;
 }  // namespace
 
 ///////////////////////////////////////////////////////////////
@@ -59,6 +67,7 @@ public:
     int  GetModelRefCount(ushort usModelId);
     void AddModelRefCount(ushort usModelId);
     void SubModelRefCount(ushort usModelId);
+    bool TryReleaseCachedModel(ushort usModelId, SModelCacheInfo& info, const char* contextTag, uint& uiNumModelsCachedHereOnly);
 
 protected:
     CGame*     m_pGame{};
@@ -358,9 +367,12 @@ void CModelCacheManagerImpl::UpdateModelCaching(const std::map<ushort, float>& n
 
     uint uiNumModelsCachedHereOnly = 0;
 
-    std::map<uint, ushort> maybeUncacheUnneededList;
-    std::map<uint, ushort> maybeUncacheNeededList;
-    std::map<uint, ushort> maybeCacheList;
+    // Multimaps so that models sharing a priority key all stay selectable: with a plain map,
+    // insertion would silently overwrite earlier entries with an equal key, hiding valid
+    // eviction or cache candidates from the loops below.
+    std::multimap<uint, ushort> maybeUncacheUnneededList;
+    std::multimap<uint, ushort> maybeUncacheNeededList;
+    std::multimap<uint, ushort> maybeCacheList;
 
     // Update active
     for (std::map<ushort, SModelCacheInfo>::iterator iter = currentCacheInfoMap.begin(); iter != currentCacheInfoMap.end(); ++iter)
@@ -387,9 +399,9 @@ void CModelCacheManagerImpl::UpdateModelCaching(const std::map<ushort, float>& n
                 // Update cached models that could be uncached
                 uint uiTicksSinceLastNeeded = (m_TickCountNow - info.lastNeeded).ToInt();
                 if (uiTicksSinceLastNeeded > 0)
-                    MapSet(maybeUncacheUnneededList, uiTicksSinceLastNeeded, usModelId);
+                    maybeUncacheUnneededList.emplace(uiTicksSinceLastNeeded, usModelId);
                 else
-                    MapSet(maybeUncacheNeededList, (int)info.fClosestDistSq, usModelId);
+                    maybeUncacheNeededList.emplace((int)info.fClosestDistSq, usModelId);
             }
             else
             {
@@ -397,38 +409,40 @@ void CModelCacheManagerImpl::UpdateModelCaching(const std::map<ushort, float>& n
                 {
                     // Update uncached models that could be cached
                     uint uiTicksSinceFirstNeeded = (m_TickCountNow - info.firstNeeded).ToInt();
-                    MapSet(maybeCacheList, uiTicksSinceFirstNeeded, usModelId);
+                    maybeCacheList.emplace(uiTicksSinceFirstNeeded, usModelId);
                 }
             }
         }
     }
 
-    // If at or above cache limit, try to uncache unneeded first
-    if (uiNumModelsCachedHereOnly >= uiMaxCachedAllowed && !maybeUncacheUnneededList.empty())
+    // If at or above cache limit, try to uncache unneeded first.
+    // A model is only released when TryReleaseCachedModel decides the game no longer depends on it,
+    // and its map entry is kept so its history survives for the next demand.
+    bool bReleasedModel = false;
+    auto AttemptReleaseFromList = [&](const std::multimap<uint, ushort>& candidateList, const char* contextTag) -> bool
     {
-        const ushort     usModelId = maybeUncacheUnneededList.rbegin()->second;
-        SModelCacheInfo* pInfo = MapFind(currentCacheInfoMap, usModelId);
-        assert(pInfo);
-        assert(pInfo->bIsModelCachedHere);
-        SubModelRefCount(usModelId);
-        pInfo->bIsModelCachedHere = false;
-        MapRemove(currentCacheInfoMap, usModelId);
-        OutputDebugLine(SString("[Cache] End caching model %d  (UncacheUnneeded)", usModelId));
-    }
-    else if (uiNumModelsCachedHereOnly > uiMaxCachedAllowed && !maybeUncacheNeededList.empty())
-    {
-        // Only uncache from the needed list if above limit
+        for (auto it = candidateList.rbegin(); it != candidateList.rend(); ++it)
+        {
+            const ushort modelId = it->second;
+            auto         cacheIt = currentCacheInfoMap.find(modelId);
+            if (cacheIt == currentCacheInfoMap.end())
+                continue;
 
-        // Uncache furthest away model
-        const ushort     usModelId = maybeUncacheNeededList.rbegin()->second;
-        SModelCacheInfo* pInfo = MapFind(currentCacheInfoMap, usModelId);
-        assert(pInfo);
-        assert(pInfo->bIsModelCachedHere);
-        SubModelRefCount(usModelId);
-        pInfo->bIsModelCachedHere = false;
-        MapRemove(currentCacheInfoMap, usModelId);
-        OutputDebugLine(SString("[Cache] End caching model %d  (UncacheNeeded)", usModelId));
-    }
+            SModelCacheInfo& candidateInfo = cacheIt->second;
+            assert(candidateInfo.bIsModelCachedHere);
+
+            if (TryReleaseCachedModel(modelId, candidateInfo, contextTag, uiNumModelsCachedHereOnly))
+                return true;
+        }
+        return false;
+    };
+
+    if (uiNumModelsCachedHereOnly >= uiMaxCachedAllowed && !maybeUncacheUnneededList.empty())
+        bReleasedModel = AttemptReleaseFromList(maybeUncacheUnneededList, "UncacheUnneeded");
+
+    // Only uncache from the needed list if above limit, furthest away first
+    if (!bReleasedModel && uiNumModelsCachedHereOnly > uiMaxCachedAllowed && !maybeUncacheNeededList.empty())
+        bReleasedModel = AttemptReleaseFromList(maybeUncacheNeededList, "UncacheNeeded");
 
     // Cache if room
     if (!maybeCacheList.empty() && uiNumModelsCachedHereOnly < uiMaxCachedAllowed)
@@ -515,6 +529,7 @@ bool CModelCacheManagerImpl::UnloadModel(ushort usModelId)
 ///////////////////////////////////////////////////////////////
 void CModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
 {
+    // Keep forced restream untouched: callers expect full removal when restreaming.
     std::map<ushort, SModelCacheInfo>* mapList[] = {&m_PedModelCacheInfoMap, &m_VehicleModelCacheInfoMap};
 
     for (uint i = 0; i < NUMELMS(mapList); i++)
@@ -533,4 +548,72 @@ void CModelCacheManagerImpl::OnRestreamModel(ushort usModelId)
             }
         }
     }
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CModelCacheManagerImpl::TryReleaseCachedModel
+//
+// Drop our cache ref on a model, unless the game still depends on it.
+// Only called when the cache is at or above its limit.
+//
+///////////////////////////////////////////////////////////////
+bool CModelCacheManagerImpl::TryReleaseCachedModel(ushort usModelId, SModelCacheInfo& info, const char* contextTag, uint& uiNumModelsCachedHereOnly)
+{
+    assert(info.bIsModelCachedHere);
+
+    CStreaming* pStreaming = m_pGame->GetStreaming();
+    if (!pStreaming)
+        return false;
+
+    CStreamingInfo* pStreamingInfo = pStreaming->GetStreamingInfo(usModelId);
+    if (!pStreamingInfo)
+        return false;
+
+    // The game marks models that it must keep loaded for missions or its own systems.
+    // Dropping our ref on those would only cause the game to stream them right back in.
+    if (pStreamingInfo->flg & (STREAMING_FLAG_MISSION_REQUIRED | STREAMING_FLAG_GAME_REQUIRED))
+        return false;
+
+    // Someone else still holds a ref, so our release would not free the model anyway.
+    if (GetModelRefCount(usModelId) > 1)
+        return false;
+
+    CModelInfo*          pModelInfo = m_pGame->GetModelInfo(usModelId, true);
+    const eModelInfoType modelType = pModelInfo ? pModelInfo->GetModelType() : eModelInfoType::UNKNOWN;
+
+    // If the game still tracks this model in its loaded ped group, keep it cached while
+    // the group is near empty, so we don't fight the game over which models stay loaded.
+    if (modelType == eModelInfoType::PED && pStreaming->IsModelInLoadedPedGroup(usModelId))
+    {
+        if (pStreaming->GetNumPedsLoaded() <= PED_STREAMING_FLOOR)
+            return false;
+    }
+
+    // Same for the loaded vehicle group, with a smaller floor inside interiors.
+    // CWorld::GetCurrentArea reads the same CGame::currArea that the game's own
+    // vehicle floor logic checks, so one lookup covers both cases.
+    if (modelType == eModelInfoType::VEHICLE && pStreaming->IsModelInLoadedVehicleGroup(usModelId))
+    {
+        const uint vehicleCount = pStreaming->GetNumLoadedVehicles();
+        const bool bIsInterior = m_pGame->GetWorld() && m_pGame->GetWorld()->GetCurrentArea() != 0;
+        const uint minVehicleBudget = bIsInterior ? VEHICLE_STREAMING_FLOOR_INTERIOR : VEHICLE_STREAMING_FLOOR_EXTERIOR;
+        if (vehicleCount <= minVehicleBudget)
+            return false;
+    }
+
+    SubModelRefCount(usModelId);
+    info.bIsModelCachedHere = false;
+    info.lastNeeded = m_TickCountNow;
+    // Also reset the first-needed time. Otherwise a still-needed model would keep its old
+    // firstNeeded and win the recache list on the next pulse, causing a release/cache cycle.
+    info.firstNeeded = m_TickCountNow;
+    info.bIsModelLoadedByGame = false;
+
+    if (uiNumModelsCachedHereOnly > 0)
+        uiNumModelsCachedHereOnly--;
+
+    OutputDebugLine(SString("[Cache] End caching model %d  (%s)", usModelId, contextTag));
+
+    return true;
 }

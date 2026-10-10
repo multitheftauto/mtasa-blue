@@ -854,6 +854,87 @@ static void __declspec(naked) HOOK_CrashFix_Misc20()
 }
 
 ////////////////////////////////////////////////////////////////////////
+// CMatrix::UpdateRwMatrix
+//
+// Prevent crash 0x59AD76 when an unaligned or invalid RwMatrix* is passed
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_CMatrix__UpdateRwMatrix  0x59AD70
+#define HOOKSIZE_CrashFix_CMatrix__UpdateRwMatrix 6
+static const DWORD            RETURN_CrashFix_CMatrix__UpdateRwMatrix = 0x59AD76;
+static void __declspec(naked) HOOK_CrashFix_CMatrix__UpdateRwMatrix()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+4]    // m (RwMatrix*)
+        test    eax, eax
+        jz      invalid_matrix
+
+        test    al, 3           // RwMatrix must be at least 4-byte aligned (RenderWare matrices are 16-byte aligned)
+        jnz     invalid_matrix
+
+        cmp     eax, 10000h     // Guard against low/unmapped page addresses
+        jb      invalid_matrix
+
+        // Valid pointer: restore overwritten instructions and continue normal path
+        mov     edx, [ecx]      // this->mat.right.x
+        jmp     RETURN_CrashFix_CMatrix__UpdateRwMatrix
+
+    invalid_matrix:
+        push    20
+        call    CrashAverted
+        xor     eax, eax
+        retn    4
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
+// CPlaceable::AllocateMatrix
+//
+// Zero out m_pAttachMatrix and m_bOwnsAttachedMatrix on newly allocated CMatrixLink
+////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CrashFix_AllocateMatrix_Init1  0x54F5A6
+#define HOOKSIZE_CrashFix_AllocateMatrix_Init1 8
+static void __declspec(naked) HOOK_CrashFix_AllocateMatrix_Init1()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     [eax+48h], esi              // m_pOwner = this
+        mov     [esi+14h], eax              // this->m_pMatrix = eax
+        mov     dword ptr [eax+40h], 0      // m_pAttachMatrix = nullptr
+        mov     byte ptr [eax+44h], 0       // m_bOwnsAttachedMatrix = false
+        pop     esi
+        retn
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_CrashFix_AllocateMatrix_Init2  0x54F5C5
+#define HOOKSIZE_CrashFix_AllocateMatrix_Init2 8
+static void __declspec(naked) HOOK_CrashFix_AllocateMatrix_Init2()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     [eax+48h], esi              // m_pOwner = this
+        mov     [esi+14h], eax              // this->m_pMatrix = eax
+        mov     dword ptr [eax+40h], 0      // m_pAttachMatrix = nullptr
+        mov     byte ptr [eax+44h], 0       // m_bOwnsAttachedMatrix = false
+        pop     esi
+        retn
+    }
+    // clang-format on
+}
+
+////////////////////////////////////////////////////////////////////////
 // CTaskSimpleCarFallOut::FinishAnimFallOutCB
 //
 // Handle CTaskSimpleCarFallOut::FinishAnimFallOutCB having wrong data
@@ -2832,29 +2913,32 @@ inner:
 ////////////////////////////////////////////////////////////////////////
 // CAnimManager::CreateAnimAssocGroups
 //
-// CModelInfo::ms_modelInfoPtrs at the given index is a null pointer
+// Missing model info or RwObject before the clump is used for associations
 ////////////////////////////////////////////////////////////////////////
-void OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
+bool OnMY_CAnimManager_CreateAnimAssocGroups(uint uiModelId)
 {
     CModelInfo*                pModelInfo = pGameInterface->GetModelInfo(uiModelId);
     CBaseModelInfoSAInterface* pInterface = pModelInfo ? pModelInfo->GetInterface() : nullptr;
-    if (!pInterface || pInterface->pRwObject == nullptr)
+    if (!pInterface || !pInterface->pRwObject)
     {
-        // Crash will occur at offset 00349b7b
+        OnCrashAverted(816);
         LogEvent(816, "Model not loaded", "CAnimManager_CreateAnimAssocGroups", SString("No RwObject for model:%d", uiModelId), 5416);
         CArgMap argMap;
         argMap.Set("id", uiModelId);
         argMap.Set("reason", "createanim");
         SetApplicationSetting("diagnostics", "gta-model-fail", argMap.ToString());
+        return false;
     }
+    return true;
 }
 
 // Hook info
 #define HOOKPOS_CAnimManager_CreateAnimAssocGroups   0x4D3D52
 #define HOOKSIZE_CAnimManager_CreateAnimAssocGroups  5
 #define HOOKCHECK_CAnimManager_CreateAnimAssocGroups 0x8B
-DWORD                         RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
-static void __declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
+DWORD                 RETURN_CAnimManager_CreateAnimAssocGroups = 0x4D3D59;
+DWORD                 RETURN_CAnimManager_CreateAnimAssocGroups_Skip = 0x4D3D71;
+void _declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 
@@ -2865,15 +2949,91 @@ static void __declspec(naked) HOOK_CAnimManager_CreateAnimAssocGroups()
         push    eax
         call    OnMY_CAnimManager_CreateAnimAssocGroups
         add     esp, 4*1
+        test    al, al
         popad
+        jz      skipCreateInstance
 
-             // Replaced code
+        // Replaced code
         push    ecx
         mov     ecx, dword ptr[ARRAY_ModelInfo]
         mov     eax, dword ptr[ecx + eax*4]
         pop     ecx
 
         jmp     RETURN_CAnimManager_CreateAnimAssocGroups
+
+    skipCreateInstance:
+        xor     ebx, ebx
+        jmp     RETURN_CAnimManager_CreateAnimAssocGroups_Skip
+    }
+    // clang-format on
+}
+
+void OnMY_CAnimBlendAssocGroup_CreateAssociations(CBaseModelInfoSAInterface* pModelInfo)
+{
+    OnCrashAverted(816);
+
+    int                         iModelId = -1;
+    CBaseModelInfoSAInterface** ppModelInfo = (CBaseModelInfoSAInterface**)ARRAY_ModelInfo;
+    const int                   maximumModelId = pGameInterface->GetBaseIDforTXD();
+    for (int i = 0; i < maximumModelId; i++)
+    {
+        if (ppModelInfo[i] == pModelInfo)
+        {
+            iModelId = i;
+            break;
+        }
+    }
+
+    LogEvent(816, "Model not loaded", "CAnimBlendAssocGroup_CreateAssociations", SString("No RwObject for model:%d", iModelId), 5416);
+    CArgMap argMap;
+    argMap.Set("id", iModelId);
+    argMap.Set("reason", "createassoc");
+    SetApplicationSetting("diagnostics", "gta-model-fail", argMap.ToString());
+}
+
+#define HOOKPOS_CAnimBlendAssocGroup_CreateAssociations   0x4CE2F7
+#define HOOKSIZE_CAnimBlendAssocGroup_CreateAssociations  7
+#define HOOKCHECK_CAnimBlendAssocGroup_CreateAssociations 0x8B
+DWORD                 RETURN_CAnimBlendAssocGroup_CreateAssociations = 0x4CE2FE;
+DWORD                 RETURN_CAnimBlendAssocGroup_CreateAssociations_Skip = 0x4CE36F;
+void _declspec(naked) HOOK_CAnimBlendAssocGroup_CreateAssociations()
+{
+    // clang-format off
+
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+    __asm
+    {
+        // CModelInfo::GetModelInfoFromHashKey returned the model info for
+        // this animation. SA already skips the entry when it returns null.
+        test    eax, eax
+        jz      skipCreateAssociation
+
+        // CBaseModelInfo::pRwObject is at +0x1C. The original instructions
+        // immediately call CBaseModelInfo::CreateInstance at vtable+0x2C.
+        cmp     dword ptr[eax+1Ch], 0
+        jnz     continueCreateAssociation
+
+        // CreateInstance requires the RenderWare object. Record its absence
+        // and follow SA's existing per-animation skip path.
+        pushad
+        push    eax
+        call    OnMY_CAnimBlendAssocGroup_CreateAssociations
+        add     esp, 4*1
+        popad
+        jmp     skipCreateAssociation
+
+    continueCreateAssociation:
+        // Restore the seven overwritten bytes: load the vtable, pass the
+        // model info as this, then call CreateInstance.
+        mov     edx, [eax]
+        mov     ecx, eax
+        call    dword ptr[edx+2Ch]
+        jmp     RETURN_CAnimBlendAssocGroup_CreateAssociations
+
+    skipCreateAssociation:
+        // 0x4CE36F increments the created-association count and advances
+        // the animation and static-association indices for the next entry.
+        jmp     RETURN_CAnimBlendAssocGroup_CreateAssociations_Skip
     }
     // clang-format on
 }
@@ -4015,6 +4175,105 @@ static int _cdecl CFileLoader_LoadVehicleObject_sscanf(const char* s, const char
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CPathFind's per map area path node loader calls malloc() for m_pPathNodes[area] (offset
+// 0x804) without checking the result, then loops over it using m_dwNumNodes[area] (offset
+// 0xfa4) as the count. If the allocation fails, that loop dereferences a null pointer and
+// crashes.
+//
+// Right where the node count gets loaded for the loop's bound check, this hook also checks
+// whether m_pPathNodes[area] is null, and if so forces the count to 0 so the loop is skipped.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CPathFind_LoadPathNodeCount_Mid  0x0156F966
+#define HOOKSIZE_CPathFind_LoadPathNodeCount_Mid 7
+DWORD                         RETURN_CPathFind_LoadPathNodeCount_Mid = 0x0156F96D;
+static void __declspec(naked) HOOK_CPathFind_LoadPathNodeCount_Mid()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // Replicate the overwritten instruction: EAX = m_dwNumNodes[area]
+        mov     eax, dword ptr [esi + edi*4 + 0x0fa4]
+
+        // If m_pPathNodes[area] failed to allocate, force the node count to 0 for this loop
+        cmp     dword ptr [esi + edi*4 + 0x804], 0
+        jne     nodesOk
+        xor     eax, eax
+        nodesOk:
+        jmp     RETURN_CPathFind_LoadPathNodeCount_Mid
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// Crash at 0x732B2A in CVisibilityPlugins::GetClumpAlpha
+//
+// Root cause: In GTA:SA, CVisibilityPlugins::GetClumpAlpha (0x732B20) and SetClumpAlpha
+// (0x732B00) read/write directly at [ecx+eax+4] where ecx is ms_clumpPluginOffset (0x34)
+// and eax is RpClump*. When called on an entity with null m_pRwObject (e.g. during vehicle,
+// ped, or object creation, destruction, streaming, or rendering), eax is nullptr, causing
+// an access violation at 0x00000038.
+//
+// Fix: Hook both functions to check for null RpClump*. If null, GetClumpAlpha safely returns
+// 0xFF (255, fully opaque) and SetClumpAlpha returns immediately without memory access.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CVisibilityPlugins_GetClumpAlpha   0x732B20
+#define HOOKSIZE_CVisibilityPlugins_GetClumpAlpha  5
+#define HOOKCHECK_CVisibilityPlugins_GetClumpAlpha 0x8B
+
+static void __declspec(naked) HOOK_CVisibilityPlugins_GetClumpAlpha()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     eax, [esp+4]
+        test    eax, eax
+        jz      null_clump
+
+        mov     ecx, ds:[0x8D6094]
+        mov     eax, [ecx+eax+4]
+        retn
+
+    null_clump:
+        mov     eax, 0xFF
+        retn
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_CVisibilityPlugins_SetClumpAlpha   0x732B00
+#define HOOKSIZE_CVisibilityPlugins_SetClumpAlpha  5
+#define HOOKCHECK_CVisibilityPlugins_SetClumpAlpha 0x8B
+
+static void __declspec(naked) HOOK_CVisibilityPlugins_SetClumpAlpha()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     ecx, [esp+4]
+        test    ecx, ecx
+        jz      null_clump
+
+        mov     eax, [esp+8]
+        mov     edx, ds:[0x8D6094]
+        mov     [edx+ecx+4], eax
+
+    null_clump:
+        retn
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks for CrashFixHacks
 //
 ////////////////////////////////////////////////////////////////////////
@@ -4037,8 +4296,10 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstall(CrashFix_Misc16);
     // EZHookInstall ( CrashFix_Misc17 );
     EZHookInstall(CrashFix_Misc18);
-    // EZHookInstall ( CrashFix_Misc19 );
     EZHookInstall(CrashFix_Misc20);
+    EZHookInstall(CrashFix_CMatrix__UpdateRwMatrix);
+    EZHookInstall(CrashFix_AllocateMatrix_Init1);
+    EZHookInstall(CrashFix_AllocateMatrix_Init2);
     EZHookInstall(CrashFix_Misc21);
     EZHookInstall(CrashFix_Misc22);
     EZHookInstall(CrashFix_Misc23);
@@ -4101,6 +4362,8 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
     EZHookInstallChecked(CStreaming__GetNextFileOnCd_NullTxdDef);
     EZHookInstallChecked(CStreaming__ConvertBufferToObject_NullTxdDef);
     EZHookInstallChecked(CEventScanner__ScanForEvents_ContactEntity);
+    EZHookInstallChecked(CVisibilityPlugins_GetClumpAlpha);
+    EZHookInstallChecked(CVisibilityPlugins_SetClumpAlpha);
 
     // Install train crossing crashfix (the temporary variable is required for the template logic)
     void (*temp)() = HOOK_TrainCrossingBarrierCrashFix<RETURN_CObject_Destructor_TrainCrossing_Check, RETURN_CObject_Destructor_TrainCrossing_Invalid>;
@@ -4112,4 +4375,6 @@ void CMultiplayerSA::InitHooks_CrashFixHacks()
 
     // Fix uninitialized wheel scale in CFileLoader::LoadVehicleObject on Win11 24H2
     HookInstallCall(CALL_CFileLoader_LoadVehicleObject_sscanf, (DWORD)CFileLoader_LoadVehicleObject_sscanf);
+
+    EZHookInstall(CPathFind_LoadPathNodeCount_Mid);
 }

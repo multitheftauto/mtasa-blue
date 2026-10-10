@@ -292,6 +292,7 @@ protected:
 
     STexShaderReplacement* UpdateTexShaderReplacement(STexNameInfo* pTexNameInfo, CClientEntityBase* pClientEntity, int iEntityType);
     void                   UpdateTexShaderReplacementNoEntity(STexNameInfo* pTexNameInfo, STexShaderReplacement& texNoEntityShader, int iEntityType);
+    void                   MaybeDeleteTexNameInfo(STexNameInfo* pTexNameInfo);
     void                   FinalizeLayers(SShaderInfoLayers& shaderLayers);
 
     bool                                           m_bChangesPending;

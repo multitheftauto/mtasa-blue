@@ -67,7 +67,7 @@ public:
     void     SetPullTowardsCamera(float fPullTowardsCamera);
     void     SetColor(BYTE Red, BYTE Green, BYTE Blue, BYTE Alpha);
     void     SetTexture(RwTexture* texture);
-    void     SetTexture(CoronaType texture);
+    void     SetTexture(CoronaType::Enum texture);
     BYTE     GetFlareType();
     void     SetFlareType(BYTE fFlareType);
     void     SetReflectionType(BYTE reflectionType);

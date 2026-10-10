@@ -192,7 +192,7 @@ public:
 
     float GetMaxHealth();
     float GetHealth() { return m_fHealth; }
-    void  SetHealth(float fHealth) { m_fHealth = fHealth; }
+    void  SetHealth(float fHealth) noexcept { m_fHealth = std::clamp(fHealth, 0.0f, GetMaxHealth()); }
     float GetArmor() const noexcept { return m_armor; }
     void  SetArmor(float armor) noexcept { m_armor = std::clamp(armor, 0.0f, 100.0f); }
 

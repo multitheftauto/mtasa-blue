@@ -148,6 +148,15 @@ void CClientStreamElement::StreamOutForABit()
 {
     // Remove asap, very messy
     InternalStreamOut();
+
+    // This is a deliberate, temporary stream-out (e.g. engineReplaceModel / model restore
+    // via RestreamObjects/RestreamPeds/etc). Unlike a distance-based stream-out it must be
+    // allowed to stream back in immediately. Otherwise the anti-thrash cooldown added in #4744
+    // (minStreamInDelayAfterOutMs in CClientStreamer::Restream) keeps the element - and its
+    // collision - streamed out for >1s, which makes players fall through restreamed ground/objects.
+    // Clearing the timestamp restores the documented "stream back in next frame" behaviour without
+    // re-introducing the #4744 ping-pong (which only goes through the distance-based InternalStreamOut).
+    m_lastStreamOutTime = 0u;
 }
 
 void CClientStreamElement::SetDimension(unsigned short usDimension)
@@ -208,8 +217,8 @@ float CClientStreamElement::GetDistanceToBoundingBoxSquared(const CVector& vecPo
         m_iCachedRadiusCounter = 20 + rand() % 50;
     }
 
-    // Do a simple calculation if the element has a small radius
-    if (m_fCachedRadius < 20)
+    // Do a simple calculation if the element has a small radius, or is streamed out in another dimension and cannot stream in
+    if (m_fCachedRadius < 20 || (!IsStreamedIn() && !IsVisibleInAllDimensions() && GetDimension() != m_pStreamer->GetDimension()))
     {
         return (GetStreamPosition() - vecPosition).LengthSquared();
     }

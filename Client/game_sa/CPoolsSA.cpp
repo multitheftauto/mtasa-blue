@@ -121,7 +121,7 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
     if (!CModelInfoSA::IsVehicleModel(model))
         return nullptr;
 
-    auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(model)->GetVehicleType());
+    auto vehicleClass = static_cast<VehicleClass::Enum>(pGame->GetModelInfo(model)->GetVehicleType());
 
     std::unique_ptr<CVehicleSA> vehicle = nullptr;
 
@@ -381,6 +381,30 @@ void CPoolsSA::DeleteAllObjects()
     }
 }
 
+//
+// Detached car parts (e.g. doors spawned by CAutomobile::SpawnFlyingComponent) keep the model
+// index of the vehicle they came from, so CObject::Render can repaint them with that vehicle's
+// colours and CObject's destructor can release its model reference. Called when a vehicle model
+// info is deallocated, so the parts can't dereference the freed model info anymore.
+//
+void CPoolsSA::ResetDetachedCarPartsRefModel(std::uint16_t usModelID) noexcept
+{
+    CPoolSAInterface<CObjectSAInterface>* pObjectPool = *m_ppObjectPoolInterface;
+
+    for (int i = 0; i < pObjectPool->m_nSize; i++)
+    {
+        if (pObjectPool->IsEmpty(i))
+            continue;
+
+        CObjectSAInterface* pObject = pObjectPool->GetObject(i);
+        if (pObject->sRefModelIndex == static_cast<short>(usModelID))
+        {
+            pObject->sRefModelIndex = -1;
+            pObject->bChangesVehColor = false;
+        }
+    }
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //                                       PEDS POOL                                      //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -592,6 +616,12 @@ CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)
         if (pThePedEntity)
         {
             return pThePedEntity->pEntity;
+        }
+
+        auto pTheBuildingEntity = m_BuildingsPool.GetBuilding(reinterpret_cast<CBuildingSAInterface*>(pGameInterface));
+        if (pTheBuildingEntity)
+        {
+            return pTheBuildingEntity;
         }
     }
     return NULL;
@@ -842,6 +872,11 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
             return 4096;  // Modded to 16000   @ CGameSA.cpp
     }
     return 0;
+}
+
+int CPoolsSA::GetPoolMaxCapacity(ePools pool) const noexcept
+{
+    return pool == BUILDING_POOL ? static_cast<int>(CBuildingsPoolSA::MAX_CAPACITY) : std::numeric_limits<int>::max();
 }
 
 int CPoolsSA::GetPoolDefaultModdedCapacity(ePools pool)

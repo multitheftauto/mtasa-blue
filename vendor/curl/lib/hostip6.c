@@ -21,7 +21,6 @@
  * SPDX-License-Identifier: curl
  *
  ***************************************************************************/
-
 #include "curl_setup.h"
 
 /***********************************************************************
@@ -44,35 +43,15 @@
 #endif
 
 #include "urldata.h"
-#include "sendf.h"
+#include "cfilters.h"
+#include "curl_addrinfo.h"
+#include "curl_trc.h"
 #include "hostip.h"
-#include "hash.h"
-#include "share.h"
 #include "url.h"
 #include "curlx/inet_pton.h"
 #include "connect.h"
-/* The last 3 #include files should be in this order */
-#include "curl_printf.h"
-#include "curl_memory.h"
-#include "memdebug.h"
 
-#if defined(CURLRES_SYNCH)
-
-#ifdef DEBUG_ADDRINFO
-static void dump_addrinfo(const struct Curl_addrinfo *ai)
-{
-  printf("dump_addrinfo:\n");
-  for(; ai; ai = ai->ai_next) {
-    char buf[INET6_ADDRSTRLEN];
-    printf("    fam %2d, CNAME %s, ",
-           ai->ai_family, ai->ai_canonname ? ai->ai_canonname : "<none>");
-    Curl_printable_address(ai, buf, sizeof(buf));
-    printf("%s\n", buf);
-  }
-}
-#else
-#define dump_addrinfo(x) Curl_nop_stmt
-#endif
+#ifdef CURLRES_SYNCH
 
 /*
  * Curl_sync_getaddrinfo() when built IPv6-enabled (non-threading and
@@ -84,9 +63,10 @@ static void dump_addrinfo(const struct Curl_addrinfo *ai)
  * Curl_freeaddrinfo(), nothing else.
  */
 struct Curl_addrinfo *Curl_sync_getaddrinfo(struct Curl_easy *data,
+                                            uint8_t dns_queries,
                                             const char *hostname,
-                                            int port,
-                                            int ip_version)
+                                            uint16_t port,
+                                            uint8_t transport)
 {
   struct addrinfo hints;
   struct Curl_addrinfo *res;
@@ -98,13 +78,12 @@ struct Curl_addrinfo *Curl_sync_getaddrinfo(struct Curl_easy *data,
 #endif
   int pf = PF_INET;
 
-  if((ip_version != CURL_IPRESOLVE_V4) && Curl_ipv6works(data))
-    /* The stack seems to be IPv6-enabled */
+  if(dns_queries & CURL_DNSQ_AAAA)
     pf = PF_UNSPEC;
 
   memset(&hints, 0, sizeof(hints));
   hints.ai_family = pf;
-  hints.ai_socktype = (data->conn->transport == TRNSPRT_TCP) ?
+  hints.ai_socktype = (transport == TRNSPRT_TCP) ?
     SOCK_STREAM : SOCK_DGRAM;
 
 #ifndef USE_RESOLVE_ON_IPS
@@ -112,15 +91,15 @@ struct Curl_addrinfo *Curl_sync_getaddrinfo(struct Curl_easy *data,
    * The AI_NUMERICHOST must not be set to get synthesized IPv6 address from
    * an IPv4 address on iOS and macOS.
    */
-  if((1 == curlx_inet_pton(AF_INET, hostname, addrbuf)) ||
-     (1 == curlx_inet_pton(AF_INET6, hostname, addrbuf))) {
+  if((curlx_inet_pton(AF_INET, hostname, addrbuf) == 1) ||
+     (curlx_inet_pton(AF_INET6, hostname, addrbuf) == 1)) {
     /* the given address is numerical only, prevent a reverse lookup */
     hints.ai_flags = AI_NUMERICHOST;
   }
 #endif
 
   if(port) {
-    msnprintf(sbuf, sizeof(sbuf), "%d", port);
+    curl_msnprintf(sbuf, sizeof(sbuf), "%d", port);
     sbufptr = sbuf;
   }
 
@@ -133,8 +112,6 @@ struct Curl_addrinfo *Curl_sync_getaddrinfo(struct Curl_easy *data,
   if(port) {
     Curl_addrinfo_set_port(res, port);
   }
-
-  dump_addrinfo(res);
 
   return res;
 }

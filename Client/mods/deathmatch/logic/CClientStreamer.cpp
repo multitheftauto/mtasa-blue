@@ -379,7 +379,7 @@ void CClientStreamer::Restream(bool bMovedFar)
     // Avoid swap ping-pong when two candidates are almost the same distance.
     // Distances are squared, so compare against squared hysteresis too.
     constexpr float         swapHysteresisDistanceSq = 10.0f * 10.0f;
-    constexpr std::uint32_t minStreamInDelayAfterOutMs = 1200u;
+    constexpr std::uint32_t minStreamInDelayAfterOutMs = 100u;
     const std::uint32_t     currentTime = static_cast<std::uint32_t>(CClientTime::GetTime());
 
     // Limit distance stream in/out rate
@@ -662,8 +662,6 @@ void CClientStreamer::OnEnterSector(CClientStreamSector* pSector)
         }
     }
     m_pSector = pSector;
-    SetExpDistances(&m_ActiveElements);
-    m_ActiveElements.sort(CompareExpDistance);
 }
 
 void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClientStreamSector* pSector)
@@ -701,10 +699,20 @@ void CClientStreamer::OnElementEnterSector(CClientStreamElement* pElement, CClie
                 pSector->AddElements(&m_ActiveElements, &m_ActiveElementSet);
                 pSector->SetActivated(true);
             }
-            // If we're in a deactivated sector and streamed in, stream us out
-            else if (pElement->IsStreamedIn())
+            else
             {
-                m_ToStreamOut.push_back(pElement);
+                // We left an activated sector, so we are no longer an active element
+                if (pPreviousSector && pPreviousSector->IsActivated())
+                {
+                    m_ActiveElements.remove(pElement);
+                    m_ActiveElementSet.erase(pElement);
+                }
+
+                // If we're in a deactivated sector and streamed in, stream us out
+                if (pElement->IsStreamedIn())
+                {
+                    m_ToStreamOut.push_back(pElement);
+                }
             }
         }
     }

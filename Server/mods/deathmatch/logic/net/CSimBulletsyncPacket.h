@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "packets/CBulletsyncPacket.h"
+
 class CSimBulletsyncPacket : public CSimPacket
 {
 public:
@@ -25,12 +27,11 @@ public:
 
     struct
     {
-        eWeaponType  weapon = eWeaponType::WEAPONTYPE_UNARMED;
-        CVector      start{};
-        CVector      end{};
-        std::uint8_t order{};
-        float        damage{};
-        uchar        zone{};
-        ElementID    damaged = INVALID_ELEMENT_ID;
+        eWeaponType          weapon{eWeaponType::WEAPONTYPE_UNARMED};
+        SPositionSync        start{};
+        SPositionSync        end{};
+        SFloatAsBitsSync<16> damage{0.0f, CBulletsyncPacket::MAX_DAMAGE, true, false};
+        std::uint8_t         zone{};
+        ElementID            damaged{INVALID_ELEMENT_ID};
     } m_cache;
 };

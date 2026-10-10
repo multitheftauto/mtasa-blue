@@ -13,61 +13,10 @@
 
 namespace
 {
-    struct CTiming
-    {
-        unsigned long calls;
-        TIMEUS        total_us;
-        TIMEUS        max_us;
-
-        CTiming() : calls(0), total_us(0), max_us(0) {}
-        CTiming& operator+=(const CTiming& other)
-        {
-            calls += other.calls;
-            total_us += other.total_us;
-            max_us = std::max(max_us, other.max_us);
-            return *this;
-        }
-    };
-
-    struct CTimingPair
-    {
-        CTiming acc;   // Accumulator for current period
-        CTiming prev;  // Result for previous period
-
-        void Pulse(CTimingPair* above)
-        {
-            if (above)
-                above->acc += prev;
-            prev = acc;
-            acc = CTiming();
-        }
-    };
-
-    class CTimingBlock
-    {
-    public:
-        CTimingPair s5;   // 5 second period
-        CTimingPair s60;  // 60
-        CTimingPair m5;   // 300
-        CTimingPair m60;  // 3600
-
-        void Pulse1s(int flags)
-        {
-            if (flags & 1)
-                s5.Pulse(&s60);
-            if (flags & 2)
-                s60.Pulse(&m5);
-            if (flags & 4)
-                m5.Pulse(&m60);
-            if (flags & 8)
-                m60.Pulse(NULL);
-        }
-    };
-
     //
     // CLuaMainTiming
     //
-    typedef std::map<SString, CTimingBlock> CEventTimingMap;
+    typedef CFastHashMap<SString, CTimingBlock> CEventTimingMap;
     class CLuaMainTiming
     {
     public:
@@ -77,15 +26,14 @@ namespace
         void Pulse1s(int flags)
         {
             ResourceTiming.Pulse1s(flags);
-            for (CEventTimingMap::iterator iter = EventTimingMap.begin(); iter != EventTimingMap.end(); ++iter)
+            for (auto& pair : EventTimingMap)
             {
-                CTimingBlock& EventTiming = iter->second;
-                EventTiming.Pulse1s(flags);
+                pair.second.Pulse1s(flags);
             }
         }
     };
 
-    typedef std::map<CLuaMain*, CLuaMainTiming> CLuaMainTimingMap;
+    typedef CFastHashMap<CLuaMain*, CLuaMainTiming> CLuaMainTimingMap;
     class CAllLuaTiming
     {
     public:
@@ -93,10 +41,9 @@ namespace
 
         void Pulse1s(int flags)
         {
-            for (CLuaMainTimingMap::iterator iter = LuaMainTimingMap.begin(); iter != LuaMainTimingMap.end(); ++iter)
+            for (auto& pair : LuaMainTimingMap)
             {
-                CLuaMainTiming& LuaMainTiming = iter->second;
-                LuaMainTiming.Pulse1s(flags);
+                pair.second.Pulse1s(flags);
             }
         }
     };
@@ -116,24 +63,32 @@ public:
     virtual ~CClientPerfStatLuaTimingImpl();
 
     // CClientPerfStatModule
-    virtual const SString& GetCategoryName();
-    virtual void           DoPulse();
-    virtual void           GetStats(CClientPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter);
+    virtual const SString& GetCategoryName() override;
+    virtual void           DoPulse() override;
+    virtual void           GetStats(CClientPerfStatResult* pOutResult, const std::map<SString, int>& optionMap, const SString& strFilter) override;
 
     // CClientPerfStatLuaTiming
-    virtual void OnLuaMainCreate(CLuaMain* pLuaMain);
-    virtual void OnLuaMainDestroy(CLuaMain* pLuaMain);
-    virtual void UpdateLuaTiming(CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs);
+    virtual void OnLuaMainCreate(CLuaMain* pLuaMain) override;
+    virtual void OnLuaMainDestroy(CLuaMain* pLuaMain) override;
+    virtual void UpdateLuaTiming(CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs) override;
+
+    // Modern High-Performance Profiling API
+    virtual bool          IsActive() const noexcept override;
+    virtual CTimingBlock* GetTimingBlock(CLuaMain* luaMain, const char* eventName, bool createIfNotFound = true) override;
+    virtual CTimingBlock* GetResourceTimingBlock(CLuaMain* luaMain) override;
+    virtual void          UpdateTimingFast(CTimingBlock* eventTiming, CTimingBlock* resourceTiming, TIMEUS timeUs) noexcept override;
 
     // CClientPerfStatLuaTimingImpl functions
     void GetLuaTimingStats(CClientPerfStatResult* pResult, const std::map<SString, int>& strOptionMap, const SString& strFilter);
     void OutputTimingBlock(CClientPerfStatResult* pResult, const CTimingBlock& TimingBlock, int flags, const SString& BlockName, bool bSubBlock);
 
-    SString                  m_strCategoryName;
-    CAllLuaTiming            AllLuaTiming;
-    long long                m_LastTickCount;
-    unsigned long            m_SecondCounter;
-    std::map<CLuaMain*, int> m_LuaMainMap;
+    SString                      m_strCategoryName;
+    CAllLuaTiming                AllLuaTiming;
+    long long                    m_LastTickCount{0};
+    unsigned long                m_SecondCounter{0};
+    CFastHashMap<CLuaMain*, int> m_LuaMainMap;
+    long long                    m_activeUntilTick{0};
+    bool                         m_isActive{false};
 };
 
 ///////////////////////////////////////////////////////////////
@@ -164,6 +119,8 @@ CClientPerfStatLuaTimingImpl::CClientPerfStatLuaTimingImpl()
     m_strCategoryName = "Lua timing";
     m_LastTickCount = 0;
     m_SecondCounter = 0;
+    m_activeUntilTick = 0;
+    m_isActive = false;
 }
 
 ///////////////////////////////////////////////////////////////
@@ -216,6 +173,96 @@ void CClientPerfStatLuaTimingImpl::OnLuaMainDestroy(CLuaMain* pLuaMain)
 
 ///////////////////////////////////////////////////////////////
 //
+// CClientPerfStatLuaTimingImpl::IsActive
+//
+//
+//
+///////////////////////////////////////////////////////////////
+bool CClientPerfStatLuaTimingImpl::IsActive() const noexcept
+{
+    return m_isActive;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CClientPerfStatLuaTimingImpl::GetResourceTimingBlock
+//
+//
+//
+///////////////////////////////////////////////////////////////
+CTimingBlock* CClientPerfStatLuaTimingImpl::GetResourceTimingBlock(CLuaMain* luaMain)
+{
+    if (!luaMain)
+        return nullptr;
+
+    CLuaMainTiming* luaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, luaMain);
+    if (!luaMainTiming)
+    {
+        MapSet(AllLuaTiming.LuaMainTimingMap, luaMain, CLuaMainTiming());
+        luaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, luaMain);
+    }
+    return luaMainTiming ? &luaMainTiming->ResourceTiming : nullptr;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CClientPerfStatLuaTimingImpl::GetTimingBlock
+//
+//
+//
+///////////////////////////////////////////////////////////////
+CTimingBlock* CClientPerfStatLuaTimingImpl::GetTimingBlock(CLuaMain* luaMain, const char* eventName, bool createIfNotFound)
+{
+    if (!luaMain || !eventName)
+        return nullptr;
+
+    CLuaMainTiming* luaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, luaMain);
+    if (!luaMainTiming)
+    {
+        if (!createIfNotFound)
+            return nullptr;
+        MapSet(AllLuaTiming.LuaMainTimingMap, luaMain, CLuaMainTiming());
+        luaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, luaMain);
+    }
+
+    if (!luaMainTiming)
+        return nullptr;
+
+    CTimingBlock* eventTiming = MapFind(luaMainTiming->EventTimingMap, eventName);
+    if (!eventTiming && createIfNotFound)
+    {
+        MapSet(luaMainTiming->EventTimingMap, eventName, CTimingBlock());
+        eventTiming = MapFind(luaMainTiming->EventTimingMap, eventName);
+    }
+    return eventTiming;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CClientPerfStatLuaTimingImpl::UpdateTimingFast
+//
+//
+//
+///////////////////////////////////////////////////////////////
+void CClientPerfStatLuaTimingImpl::UpdateTimingFast(CTimingBlock* eventTiming, CTimingBlock* resourceTiming, TIMEUS timeUs) noexcept
+{
+    if (eventTiming)
+    {
+        CTiming& acc = eventTiming->s5.acc;
+        acc.calls++;
+        acc.total_us += timeUs;
+        acc.max_us = std::max(acc.max_us, timeUs);
+    }
+
+    if (resourceTiming)
+    {
+        CTiming& acc = resourceTiming->s5.acc;
+        acc.total_us += timeUs;
+    }
+}
+
+///////////////////////////////////////////////////////////////
+//
 // CClientPerfStatLuaTimingImpl::UpdateLuaTiming
 //
 //
@@ -223,31 +270,24 @@ void CClientPerfStatLuaTimingImpl::OnLuaMainDestroy(CLuaMain* pLuaMain)
 ///////////////////////////////////////////////////////////////
 void CClientPerfStatLuaTimingImpl::UpdateLuaTiming(CLuaMain* pLuaMain, const char* szEventName, TIMEUS timeUs)
 {
-    CLuaMainTiming* pLuaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, pLuaMain);
-    if (!pLuaMainTiming)
+    CLuaMainTiming* luaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, pLuaMain);
+    if (!luaMainTiming)
     {
         MapSet(AllLuaTiming.LuaMainTimingMap, pLuaMain, CLuaMainTiming());
-        pLuaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, pLuaMain);
+        luaMainTiming = MapFind(AllLuaTiming.LuaMainTimingMap, pLuaMain);
     }
 
+    if (!luaMainTiming)
+        return;
+
+    CTimingBlock* eventTiming = MapFind(luaMainTiming->EventTimingMap, szEventName);
+    if (!eventTiming)
     {
-        CTiming& acc = pLuaMainTiming->ResourceTiming.s5.acc;
-        acc.total_us += timeUs;
+        MapSet(luaMainTiming->EventTimingMap, szEventName, CTimingBlock());
+        eventTiming = MapFind(luaMainTiming->EventTimingMap, szEventName);
     }
 
-    CTimingBlock* pEventTiming = MapFind(pLuaMainTiming->EventTimingMap, szEventName);
-    if (!pEventTiming)
-    {
-        MapSet(pLuaMainTiming->EventTimingMap, szEventName, CTimingBlock());
-        pEventTiming = MapFind(pLuaMainTiming->EventTimingMap, szEventName);
-    }
-
-    {
-        CTiming& acc = pEventTiming->s5.acc;
-        acc.calls++;
-        acc.total_us += timeUs;
-        acc.max_us = std::max(acc.max_us, timeUs);
-    }
+    UpdateTimingFast(eventTiming, &luaMainTiming->ResourceTiming, timeUs);
 }
 
 ///////////////////////////////////////////////////////////////
@@ -260,6 +300,11 @@ void CClientPerfStatLuaTimingImpl::UpdateLuaTiming(CLuaMain* pLuaMain, const cha
 void CClientPerfStatLuaTimingImpl::DoPulse()
 {
     long long llTickCount = GetTickCount64_();
+    if (m_isActive && llTickCount >= m_activeUntilTick)
+    {
+        m_isActive = false;
+    }
+
     long long llDelta = llTickCount - m_LastTickCount;
     if (llDelta >= 1000)
     {
@@ -303,6 +348,10 @@ void CClientPerfStatLuaTimingImpl::GetStats(CClientPerfStatResult* pResult, cons
 ///////////////////////////////////////////////////////////////
 void CClientPerfStatLuaTimingImpl::GetLuaTimingStats(CClientPerfStatResult* pResult, const std::map<SString, int>& strOptionMap, const SString& strFilter)
 {
+    // Activate high-resolution profiling for 10 seconds when stats are actively queried
+    m_isActive = true;
+    m_activeUntilTick = GetTickCount64_() + 10000;
+
     //
     // Set option flags
     //
@@ -361,24 +410,26 @@ void CClientPerfStatLuaTimingImpl::GetLuaTimingStats(CClientPerfStatResult* pRes
     //
     // Set rows
     //
-    for (CLuaMainTimingMap::iterator iter = AllLuaTiming.LuaMainTimingMap.begin(); iter != AllLuaTiming.LuaMainTimingMap.end(); ++iter)
+    for (const auto& [luaMain, luaMainTiming] : AllLuaTiming.LuaMainTimingMap)
     {
-        CLuaMainTiming& LuaMainTiming = iter->second;
-        const SString   strResName = iter->first->GetScriptName();
-
-        // Apply filter
-        if (strFilter != "" && strResName.find(strFilter) == SString::npos)
+        if (!luaMain)
             continue;
 
-        OutputTimingBlock(pResult, LuaMainTiming.ResourceTiming, flags, strResName, false);
+        const SString strResName = luaMain->GetScriptName();
+
+        // Apply filter
+        if (!strFilter.empty() && strResName.find(strFilter) == SString::npos)
+            continue;
+
+        OutputTimingBlock(pResult, luaMainTiming.ResourceTiming, flags, strResName, false);
 
         if (bDetail)
-            for (CEventTimingMap::iterator iter = LuaMainTiming.EventTimingMap.begin(); iter != LuaMainTiming.EventTimingMap.end(); ++iter)
+        {
+            for (const auto& [eventName, timingBlock] : luaMainTiming.EventTimingMap)
             {
-                const SString&      eventname = iter->first;
-                const CTimingBlock& TimingBlock = iter->second;
-                OutputTimingBlock(pResult, TimingBlock, flags, std::string(".") + eventname, true);
+                OutputTimingBlock(pResult, timingBlock, flags, std::string(".") + eventName, true);
             }
+        }
     }
 }
 

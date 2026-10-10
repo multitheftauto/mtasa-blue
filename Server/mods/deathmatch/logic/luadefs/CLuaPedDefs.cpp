@@ -1360,7 +1360,10 @@ int CLuaPedDefs::WarpPedIntoVehicle(lua_State* luaVM)
     {
         LogWarningIfPlayerHasNotJoinedYet(luaVM, pPed);
 
-        if (CStaticFunctionDefinitions::WarpPedIntoVehicle(pPed, pVehicle, uiSeat))
+        CLuaMain*  pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+        CResource* pResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
+
+        if (CStaticFunctionDefinitions::WarpPedIntoVehicle(pPed, pVehicle, uiSeat, pResource))
         {
             lua_pushboolean(luaVM, true);
             return 1;
@@ -1394,7 +1397,10 @@ int CLuaPedDefs::OOP_WarpPedIntoVehicle(lua_State* luaVM)
         {
             LogWarningIfPlayerHasNotJoinedYet(luaVM, pPed);
 
-            if (CStaticFunctionDefinitions::WarpPedIntoVehicle(pPed, pVehicle, uiSeat))
+            CLuaMain*  pLuaMain = g_pGame->GetLuaManager()->GetVirtualMachine(luaVM);
+            CResource* pResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
+
+            if (CStaticFunctionDefinitions::WarpPedIntoVehicle(pPed, pVehicle, uiSeat, pResource))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;

@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <lua/CLuaFunctionParser.h>
 
 void CLuaWaterDefs::LoadFunctions()
 {
@@ -48,7 +49,7 @@ void CLuaWaterDefs::AddClass(lua_State* luaVM)
     // lua_classvariable ( luaVM, "drawnLast", "setWaterDrawnLast", "isWaterDrawnLast" );
 
     lua_classfunction(luaVM, "getLevel", "getWaterLevel");
-    lua_classfunction(luaVM, "getVertexPosition", "getWaterVertexPosition");
+    lua_classfunction(luaVM, "getVertexPosition", ArgumentParserWarn<false, OOP_GetWaterVertexPosition>);
     lua_classfunction(luaVM, "getWaveHeight", "getWaveHeight");
     lua_classfunction(luaVM, "getColor", "getWaterColor");
 
@@ -427,4 +428,18 @@ int CLuaWaterDefs::GetWaterVertexPosition(lua_State* luaVM)
 
     lua_pushboolean(luaVM, false);
     return 1;
+}
+
+std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> CLuaWaterDefs::OOP_GetWaterVertexPosition(lua_State* luaVM, CClientWater* water,
+                                                                                                            int vertexIndex)
+{
+    CVector vecPosition;
+    if (!CStaticFunctionDefinitions::GetWaterVertexPosition(water, vertexIndex, vecPosition))
+        return false;
+
+    // Keep returning three floats when the caller assigns three results
+    if (lua_ncallresult(luaVM) == 3)
+        return CLuaMultiReturn<float, float, float>(vecPosition.fX, vecPosition.fY, vecPosition.fZ);
+
+    return vecPosition;
 }
