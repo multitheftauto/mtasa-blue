@@ -208,6 +208,12 @@ struct SObjectHealthSync : public SFloatAsBitsSync<11>
     SObjectHealthSync() : SFloatAsBitsSync<11>(0.f, 1023.5f, true, false) {}
 };
 
+struct SPedStatSync : public SFloatAsBitsSync<14>
+{
+    // 0 - 1000 step 0.1                               1638.3 = ( 2^14 - 1 ) * 0.1
+    SPedStatSync() : SFloatAsBitsSync<14>(0.f, 1638.3f, false, false) {}
+};
+
 //////////////////////////////////////////
 //                                      //
 //               Position               //
