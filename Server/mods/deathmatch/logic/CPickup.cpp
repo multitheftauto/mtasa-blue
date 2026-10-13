@@ -385,8 +385,9 @@ bool CPickup::CanUse(CPlayer& Player, bool bOnfootCheck)
         switch (m_ucType)
         {
             case CPickup::HEALTH:
-                // TODO: calc max health from max_health stat
-                return (Player.GetHealth() < 200.0f);
+                // Like the original game, leave the pickup alone when there is nothing to heal.
+                // The ceiling comes from the max_health stat, which scripts can raise.
+                return (Player.GetHealth() < Player.GetMaxHealth());
 
             case CPickup::ARMOR:
                 return (Player.GetArmor() < 100.0f);
@@ -443,10 +444,12 @@ void CPickup::Use(CPlayer& Player)
                 // Health pickup?
                 case CPickup::HEALTH:
                 {
+                    const float fMaxHealth = Player.GetMaxHealth();
+
                     float fHealth = Player.GetHealth();
                     float fNewHealth = fHealth + m_fAmount;
-                    if (fNewHealth > 200.0f)
-                        fNewHealth = 200.0f;
+                    if (fNewHealth > fMaxHealth)
+                        fNewHealth = fMaxHealth;
 
                     CStaticFunctionDefinitions::SetElementHealth(&Player, fNewHealth);
 

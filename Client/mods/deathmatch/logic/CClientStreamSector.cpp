@@ -158,11 +158,15 @@ void CClientStreamSector::AddElements(list<CClientStreamElement*>* pList, std::u
 
 void CClientStreamSector::RemoveElements(list<CClientStreamElement*>* pList, std::unordered_set<CClientStreamElement*>* pSet)
 {
-    list<CClientStreamElement*>::iterator iter = m_Elements.begin();
-    for (; iter != m_Elements.end(); iter++)
+    if (m_Elements.empty())
+        return;
+
+    if (pSet)
     {
-        pList->remove(*iter);
-        if (pSet)
-            pSet->erase(*iter);
+        for (CClientStreamElement* pElement : m_Elements)
+            pSet->erase(pElement);
     }
+
+    // list::remove per element walks the whole active list each time, so strip our elements in a single pass
+    pList->remove_if([this](CClientStreamElement* pElement) { return pElement->GetStreamSector() == this; });
 }

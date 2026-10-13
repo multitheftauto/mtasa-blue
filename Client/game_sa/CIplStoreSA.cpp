@@ -42,6 +42,10 @@ void CIplStoreSA::UnloadAndDisableStreaming(int iplId)
 
     typedef void*(__cdecl * Function_EnableStreaming)(int);
     ((Function_EnableStreaming)(0x405890))(iplId);
+
+    // Empty range as in CIplStore::AddIplSlot, the next LoadIpl rebuilds it
+    ipl->minBuildId = 0x7FFF;
+    ipl->maxBuildId = 0x8000;
 }
 
 void CIplStoreSA::EnableStreaming(int iplId)
