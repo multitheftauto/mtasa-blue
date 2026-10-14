@@ -455,8 +455,7 @@ static SString ReadInstallRootRegistryValueView(REGSAM viewFlag)
     result = RegQueryValueExW(hkTemp, wstrValue, NULL, &dwType, reinterpret_cast<LPBYTE>(buffer.data()), &dwSize);
     RegCloseKey(hkTemp);
 
-    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize > kMaxRegistryValueBytes ||
-        (dwSize % sizeof(wchar_t)) != 0)
+    if (result != ERROR_SUCCESS || (dwType != REG_SZ && dwType != REG_EXPAND_SZ) || dwSize > kMaxRegistryValueBytes || (dwSize % sizeof(wchar_t)) != 0)
         return "";
 
     buffer[dwSize / sizeof(wchar_t)] = L'\0';
@@ -548,9 +547,10 @@ SString SharedUtil::GetMTASABaseDir()
                     strInstallRoot = strCandidate;
                     strInstallRootSource = (viewFlags[i] == 0) ? "registry" :
     #if defined(KEY_WOW64_64KEY)
-                                           (viewFlags[i] == KEY_WOW64_64KEY) ? "registry64" :
+                                           (viewFlags[i] == KEY_WOW64_64KEY) ? "registry64"
+                                                                             :
     #endif
-                                                                               "registry32";
+                                                                             "registry32";
                 }
             }
             if (strInstallRoot.empty())
