@@ -136,9 +136,9 @@ enum class EResourceState : unsigned char
 // (resource stopped before ack arrived) from actually duplicate acks.
 enum class EPlayerResourceStartAck : unsigned char
 {
-    Accepted,    // ack is valid for the current start, event should fire
-    RaceMiss,    // resource not running or stale generation - normal race, no token charge
-    Duplicate,   // player already had their ack accepted for this start - genuine duplicate
+    Accepted,   // ack is valid for the current start, event should fire
+    RaceMiss,   // resource not running or stale generation - normal race, no token charge
+    Duplicate,  // player already had their ack accepted for this start - genuine duplicate
 };
 
 // A resource is either a directory with files or a ZIP file which contains the content of such directory.
@@ -410,8 +410,8 @@ private:
     CElementGroup* m_pDefaultElementGroup = nullptr;  // stores elements created by scripts in this resource
     CLuaMain*      m_pVM = nullptr;
 
-    unsigned int                      m_startCounter{};
-    std::unordered_set<CPlayer*>      m_playersStarted;
+    unsigned int                 m_startCounter{};
+    std::unordered_set<CPlayer*> m_playersStarted;
 
     KeyValueMap                    m_Info;
     std::list<CIncludedResources*> m_IncludedResources;  // we store them here temporarily, then read them once all the resources are loaded

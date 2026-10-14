@@ -219,8 +219,7 @@ void CClientPlayerVoice::DecodeAndBuffer(const unsigned char* voiceBuffer, unsig
         m_ulTimeOfLastPacket = CClientTime::GetTime();
 
         // Skip uniform-byte noise before costly Speex decode
-        if (voiceBufferLength >= 4 && voiceBuffer[0] == voiceBuffer[1] &&
-            voiceBuffer[0] == voiceBuffer[2] && voiceBuffer[0] == voiceBuffer[3])
+        if (voiceBufferLength >= 4 && voiceBuffer[0] == voiceBuffer[1] && voiceBuffer[0] == voiceBuffer[2] && voiceBuffer[0] == voiceBuffer[3])
             return;
 
         if (!m_pSpeexDecoderState)
