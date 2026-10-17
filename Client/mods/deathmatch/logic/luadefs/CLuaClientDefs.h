@@ -12,6 +12,7 @@
 #pragma once
 
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
 
 class CLuaClientDefs : public CLuaDefs
 {
@@ -28,4 +29,12 @@ private:
     static bool ClearDebug();
     static bool IsMTAWindowFocused();
     static bool IsCapsLockEnabled();
+
+    // Cursor funcs
+    static std::variant<CLuaMultiReturn<float, float, float, float, float>, bool> GetCursorPosition();
+    static bool                                                                   SetCursorPosition(CVector2D position);
+    static bool                                                                   IsCursorShowing() noexcept;
+    static int                                                                    GetCursorAlpha() noexcept;
+    static bool                                                                   SetCursorAlpha(float alpha);
+    static bool                                                                   ShowCursor(lua_State* luaVM, bool show, std::optional<bool> toggleControls);
 };
