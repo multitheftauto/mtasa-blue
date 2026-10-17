@@ -429,7 +429,7 @@ private:
     bool                             m_bIsDerailable{true};
     unsigned char                    m_ucAlpha{255};
     CVector                          m_vecGravity{0.0f, 0.0f, -1.0f};
-    SharedUtil::SColor               m_HeadLightColor{SharedUtil::SColorRGBA{255, 255, 255, 255}};
+    SharedUtil::SColor               m_headlightColors[2]{SharedUtil::SColorRGBA(255, 255, 255, 255), SharedUtil::SColorRGBA(255, 255, 255, 255)};
     SharedUtil::SColor               m_RGBColors[4];
     SharedUtil::SColor               m_RGBColorsFixed[4];
     CDoorSA                          m_doors[6];
@@ -635,8 +635,20 @@ public:
     void GetGravity(CVector* pvecGravity) const { *pvecGravity = m_vecGravity; }
     void SetGravity(const CVector* pvecGravity);
 
-    SharedUtil::SColor GetHeadLightColor() { return m_HeadLightColor; }
-    void               SetHeadLightColor(const SharedUtil::SColor color) { m_HeadLightColor = color; }
+    SharedUtil::SColor GetHeadLightColor(HeadlightSide side = HeadlightSide::Left) override
+    {
+        if (side == HeadlightSide::Right)
+            return m_headlightColors[1];
+        return m_headlightColors[0];
+    }
+
+    void SetHeadLightColor(const SharedUtil::SColor color, HeadlightSide side = HeadlightSide::Both) override
+    {
+        if (side == HeadlightSide::Left || side == HeadlightSide::Both)
+            m_headlightColors[0] = color;
+        if (side == HeadlightSide::Right || side == HeadlightSide::Both)
+            m_headlightColors[1] = color;
+    }
 
     bool    SpawnFlyingComponent(const eCarNodes& nodeIndex, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime = -1);
     void    SetWheelVisibility(eWheelPosition wheel, bool bVisible);
