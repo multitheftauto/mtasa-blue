@@ -278,6 +278,8 @@ void CClientPad::DoPulse(CClientPed* pPed)
 
                 cs.RightShoulder2 = (m_fStates[32] || m_fStates[33]) ? 255 : 0;  // Look Right
 
+                cs.m_bVehicleMouseLook = (m_fStates[34]) ? 255 : 0;  // Mouse Look
+
                 cs.RightStickX = (short)(((m_fStates[35] && m_fStates[36]) || (!m_fStates[35] && !m_fStates[36])) ? 0
                                          : (m_fStates[35])                                                        ? m_fStates[35] * 128
                                                                                                                   : m_fStates[36] * -128);
@@ -425,7 +427,7 @@ bool CClientPad::GetControlState(const char* szName, CControllerState& State, bo
                 case 33:
                     return State.LeftShoulder2 == 255 && State.RightShoulder2 == 255;  // look behind
                 case 34:
-                    return false;
+                    return State.m_bVehicleMouseLook == 255;
                     break;  // mouse look
                 case 35:
                     return State.RightStickX == 128;
