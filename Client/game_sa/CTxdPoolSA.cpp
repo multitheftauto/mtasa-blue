@@ -40,6 +40,9 @@ void CTxdPoolSA::RemoveTextureDictonarySlot(std::uint32_t uiTxdId)
     if (!(*m_ppTxdPoolInterface)->IsContains(uiTxdId))
         return;
 
+    CModelInfoSA::StaticRemoveDefaultTxdID(static_cast<unsigned short>(uiTxdId));
+    pGame->GetStreaming()->RemoveModel(pGame->GetBaseIDforTXD() + uiTxdId);
+
     typedef std::uint32_t(__cdecl * Function_TxdReleaseSlot)(std::uint32_t uiTxdId);
     ((Function_TxdReleaseSlot)(0x731E90))(uiTxdId);
 
