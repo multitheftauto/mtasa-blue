@@ -717,6 +717,9 @@ public:
     static bool GetWeaponFlags(CClientWeapon* pWeapon, SLineOfSightFlags& flags);
     static bool GetWeaponFlags(CClientWeapon* pWeapon, eWeaponFlags flag, bool& bData);
 
+    // Water cannon funcs
+    static CClientWaterCannon* CreateWaterCannon(CResource& Resource, const CVector& vecPosition);
+
     static bool SetWeaponFiringRate(CClientWeapon* pWeapon, int iFiringRate);
     static bool ResetWeaponFiringRate(CClientWeapon* pWeapon);
     static bool GetWeaponFiringRate(CClientWeapon* pWeapon, int& iFiringRate);
