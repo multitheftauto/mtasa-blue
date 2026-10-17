@@ -107,6 +107,7 @@ public:
     void DisableQuickReload(bool bDisable);
     void DisableCloseRangeDamage(bool bDisable);
     void DisableBadDrivebyHitboxes(bool bDisable) { m_bBadDrivebyHitboxesDisabled = bDisable; }
+    void SetFastWeaponStrafeEnabled(bool enabled) noexcept override;
 
     bool GetExplosionsDisabled();
     void DisableExplosions(bool bDisabled);
