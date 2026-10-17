@@ -39,6 +39,7 @@ public:
     static unsigned char      GetMaxPassengerCount(unsigned long ulModel);
     static unsigned char      ConvertIndexToGameSeat(unsigned long ulModel, unsigned char ucIndex);
     static void               GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
+    static bool               IsVariationValidForModel(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
 
     static bool HasTurret(unsigned long ulModel);
     static bool HasSirens(unsigned long ulModel);
