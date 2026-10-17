@@ -77,7 +77,10 @@ struct RwTexture;
 
 #define MAX_PASSENGERS 8
 
-#define NUM_RAILTRACKS              4
+#define NUM_RAILTRACKS 4
+// These three arrays sit empty: the train code reads relocated copies big enough to hold custom
+// track IDs, so track data has to be read through CTrainTrackManagerSA instead.
+#define ARRAY_RailTrackLengths      0xC37FEC  // NUM_RAILTRACKS floats
 #define ARRAY_NumRailTrackNodes     0xC38014  // NUM_RAILTRACKS dwords
 #define ARRAY_RailTrackNodePointers 0xC38024  // NUM_RAILTRACKS pointers to arrays of SRailNode
 
