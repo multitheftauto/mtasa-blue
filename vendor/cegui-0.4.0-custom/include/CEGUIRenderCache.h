@@ -188,6 +188,7 @@ namespace CEGUI
             Rect customClipper;
             bool usingCustomClipper;
             bool clipToDisplay;
+            bool colorCodesEnabled; // Stores whether inline color codes formatting should be parsed when rendering this text.
         };
 
         typedef std::vector<ImageInfo>  ImageryList;
