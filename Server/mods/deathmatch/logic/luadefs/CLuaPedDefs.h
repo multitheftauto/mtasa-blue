@@ -75,7 +75,7 @@ public:
     static bool SetPedAnimation(CElement* pPed, std::optional<std::variant<std::string, std::monostate, bool>> blockName,
                                 std::optional<std::variant<std::string, std::monostate, bool>> animName, std::optional<int> time, std::optional<bool> loop,
                                 std::optional<bool> updatePosition, std::optional<bool> interruptable, std::optional<bool> freezeLastFrame,
-                                std::optional<int> blendTime, std::optional<bool> restoreTask);
+                                std::optional<int> blendTime, std::optional<bool> restoreTask, std::optional<bool> isSecondary);
     LUA_DECLARE(SetPedAnimationProgress);
     LUA_DECLARE(SetPedAnimationSpeed);
     LUA_DECLARE(SetPedWeaponSlot);
