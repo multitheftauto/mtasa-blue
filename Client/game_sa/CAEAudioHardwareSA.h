@@ -15,11 +15,16 @@
 
 #define FUNC_CAEAudioHardware__IsSoundBankLoaded 0x4D88C0
 #define FUNC_CAEAudioHardware__LoadSoundBank     0x4D88A0
+#define FUNC_CAEAudioHardware__Terminate         0x4D97A0
+#define FUNC_CAEAudioHardware__Initialise        0x4D9930
 
 #define CLASS_CAEAudioHardware 0xB5F8B8
 
 class CAEAudioHardwareSAInterface
 {
+public:
+    void Terminate() { reinterpret_cast<void(__thiscall*)(CAEAudioHardwareSAInterface*)>(FUNC_CAEAudioHardware__Terminate)(this); }
+    bool Initialise() { return reinterpret_cast<bool(__thiscall*)(CAEAudioHardwareSAInterface*)>(FUNC_CAEAudioHardware__Initialise)(this); }
 };
 
 class CAEAudioHardwareSA : public CAEAudioHardware
@@ -28,6 +33,8 @@ public:
     CAEAudioHardwareSA(CAEAudioHardwareSAInterface* pInterface);
     bool IsSoundBankLoaded(short wSoundBankID, short wSoundBankSlotID);
     void LoadSoundBank(short wSoundBankID, short wSoundBankSlotID);
+    void Terminate();
+    bool Initialise();
 
 private:
     CAEAudioHardwareSAInterface* m_pInterface;
