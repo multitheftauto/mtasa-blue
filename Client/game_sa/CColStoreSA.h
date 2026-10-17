@@ -12,6 +12,8 @@
 
 #include <game/CColStore.h>
 
+#define FUNC_CColStore_LoadCollision 0x410860
+
 class CColStoreSA final : public CColStore
 {
 public:
@@ -35,4 +37,5 @@ public:
     void        IncludeModelIndex(CollisionSlot slot, std::uint16_t model) override;
     int         GetFirstModel(CollisionSlot slot) override;
     int         GetLastModel(CollisionSlot slot) override;
+    void        LoadCollision(const CVector& position) override;
 };

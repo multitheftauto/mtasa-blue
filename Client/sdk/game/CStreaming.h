@@ -13,6 +13,8 @@
 
 #include <stdint.h>
 
+class CVector;
+
 #define INVALID_ARCHIVE_ID 0xFF
 #define INVALID_STREAM_ID  0xFF
 
@@ -71,6 +73,9 @@ static_assert(sizeof(CStreamingInfo) == 0x14, "Invalid size for CStreamingInfo")
 constexpr std::uint8_t STREAMING_FLAG_GAME_REQUIRED = 0x2u;
 constexpr std::uint8_t STREAMING_FLAG_MISSION_REQUIRED = 0x4u;
 
+// Models requested with this flag load with full alpha instead of gradually fading in
+constexpr std::uint8_t STREAMING_FLAG_LOADING_SCENE = 0x20u;
+
 class CStreaming
 {
 public:
@@ -89,8 +94,10 @@ public:
     virtual void   MakeSpaceFor(std::uint32_t memoryToCleanInBytes) = 0;
     virtual std::uint32_t GetMemoryUsed() const = 0;
     virtual void          RemoveBigBuildings() = 0;
-    virtual void          LoadScene(const CVector* position) = 0;
-    virtual void          LoadSceneCollision(const CVector* position) = 0;
+    virtual void          RequestBigBuildings(const CVector& position) = 0;
+    virtual void          AddModelsToRequestList(const CVector& position, std::uint8_t flags) = 0;
+    virtual void          InstanceLoadedModels(const CVector& position) = 0;
+    virtual void          ClearFlagForAllModels(std::uint8_t flag) = 0;
     // State of the game's loaded ped/vehicle model groups. Used by the model cache
     // manager to avoid unloading models that the game itself is still tracking.
     virtual std::uint32_t GetNumPedsLoaded() const noexcept = 0;

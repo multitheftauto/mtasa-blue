@@ -89,4 +89,6 @@ public:
 
     // Returns the last model id in the collision pool slot model range
     virtual int GetLastModel(CollisionSlot slot) = 0;
+
+    virtual void LoadCollision(const CVector& position) = 0;
 };
