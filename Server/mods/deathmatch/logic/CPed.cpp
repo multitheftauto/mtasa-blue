@@ -29,7 +29,7 @@ CPed::CPed(CPedManager* pPedManager, CElement* pParent, unsigned short usModel) 
     // Init
     m_pPedManager = pPedManager;
 
-    m_iType = CElement::PED;
+    m_iType = ElementType::PED;
     SetTypeName("ped");
 
     m_usModel = usModel;

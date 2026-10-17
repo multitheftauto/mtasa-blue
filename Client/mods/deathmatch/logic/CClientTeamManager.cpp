@@ -61,7 +61,7 @@ bool CClientTeamManager::Exists(CClientTeam* pTeam)
 CClientTeam* CClientTeamManager::GetTeam(ElementID ID)
 {
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (pEntity && pEntity->GetType() == CCLIENTTEAM)
+    if (pEntity && pEntity->GetType() == ElementType::TEAM)
     {
         return static_cast<CClientTeam*>(pEntity);
     }

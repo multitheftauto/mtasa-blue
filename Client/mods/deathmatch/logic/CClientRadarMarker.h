@@ -32,7 +32,7 @@ public:
 
     void Unlink();
 
-    eClientEntityType GetType() const { return CCLIENTRADARMARKER; };
+    ElementType::Enum GetType() const { return ElementType::BLIP; };
 
     void DoPulse();
 

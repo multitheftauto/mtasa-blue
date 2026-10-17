@@ -328,7 +328,7 @@ void CRPCFunctions::RequestStealthKill(NetBitStreamInterface& bitStream)
     if (pElement)
     {
         int elementType = pElement->GetType();
-        if (elementType == CElement::PLAYER || elementType == CElement::PED)
+        if (elementType == ElementType::PLAYER || elementType == ElementType::PED)
         {
             CPed* pTarget = static_cast<CPed*>(pElement);
 

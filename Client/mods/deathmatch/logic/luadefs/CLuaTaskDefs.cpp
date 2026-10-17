@@ -232,7 +232,7 @@ int CLuaTaskDefs::setPlayerTask(lua_State* luaVM)
         if (pEntity)
         {
             // Player?
-            if (pEntity->GetType() == CCLIENTPLAYER)
+            if (pEntity->GetType() == ElementType::PLAYER)
             {
                 // Grab the player
                 CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pEntity);
