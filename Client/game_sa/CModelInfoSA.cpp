@@ -1853,9 +1853,20 @@ void CModelInfoSA::MakeObjectModel(ushort usBaseID)
     m_pInterface->usNumberOfRefs = 0;
     m_pInterface->pRwObject = nullptr;
     m_pInterface->usUnknown = 65535;
-    m_pInterface->m_nAnimFileIndex = 0xFFFFFFFF;
 
     ppModelInfo[m_dwModelID] = m_pInterface;
+
+    switch (GetModelType())
+    {
+        case eModelInfoType::TIME:
+            reinterpret_cast<CTimeModelInfoSAInterface*>(m_pInterface)->timeInfo.m_wOtherTimeModel = -1;
+            break;
+        case eModelInfoType::CLUMP:
+            break;
+        default:
+            m_pInterface->m_nAnimFileIndex = 0xFFFFFFFF;
+            break;
+    }
 
     m_dwParentID = usBaseID;
     CopyStreamingInfoFromModel(usBaseID);
