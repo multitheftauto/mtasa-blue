@@ -246,6 +246,7 @@ public:
     bool                                WasLaunchedWithConnectURI();
     void                                HandleCrashDumpEncryption();
 
+    void                 OnPreWaterRender();
     void                 OnPreFxRender();
     void                 OnPreHUDRender();
     void                 OnDeviceRestore();
