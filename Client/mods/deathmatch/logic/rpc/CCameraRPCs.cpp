@@ -151,7 +151,10 @@ void CCameraRPCs::SetCameraInterior(NetBitStreamInterface& bitStream)
     // Validate game pointer before use
     if (g_pGame && g_pGame->GetWorld())
     {
-        g_pGame->GetWorld()->SetCurrentArea(ucInterior);
+        if (m_pCamera)
+            m_pCamera->SetInterior(ucInterior);
+        else
+            g_pGame->GetWorld()->SetCurrentArea(ucInterior);
     }
 }
 
