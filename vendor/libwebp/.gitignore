@@ -1,0 +1,7 @@
+# Everything in this folder is downloaded/extracted by
+# utils/buildactions/install_libwebp.lua, EXCEPT for our own scaffolding files
+# listed below.
+*
+!.gitignore
+!premake5.lua
+!README.md
