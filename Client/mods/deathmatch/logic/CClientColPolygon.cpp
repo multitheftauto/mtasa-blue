@@ -180,7 +180,7 @@ void CClientColPolygon::DebugRender(const CVector& vecPosition, float fDrawRadiu
 {
     const uint uiNumPoints = m_Points.size();
 
-    SColorARGB          color(128, 255, 255, 0);
+    SColor              color = GetDebugColor(SColorARGB(128, 255, 255, 0));
     float               fLineWidth = 4.f + pow(m_fRadius, 0.5f);
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
 
