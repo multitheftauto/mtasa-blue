@@ -340,4 +340,7 @@ public:
 
     virtual const CVector* GetDummyPositions() const = 0;
     virtual void           ReinitAudio() = 0;
+
+    virtual void SetModelSpecialAbilityModel(unsigned short model, bool enabled) = 0;
+    virtual unsigned short GetModelSpecialAbilityModel(unsigned short currentModel) const = 0;
 };
