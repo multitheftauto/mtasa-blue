@@ -151,10 +151,11 @@ int CLuaColShapeDefs::CreateColCircle(lua_State* luaVM)
 
 int CLuaColShapeDefs::CreateColCuboid(lua_State* luaVM)
 {
-    CVector          vecPosition, vecSize;
+    CVector          vecPosition, vecSize, vecRotation;
     CScriptArgReader argStream(luaVM);
     argStream.ReadVector3D(vecPosition);
     argStream.ReadVector3D(vecSize);
+    argStream.ReadVector3D(vecRotation, CVector());
 
     if (vecSize.fX < 0.0f)
     {
@@ -174,7 +175,7 @@ int CLuaColShapeDefs::CreateColCuboid(lua_State* luaVM)
             if (pResource)
             {
                 // Create it and return it
-                CClientColCuboid* pShape = CStaticFunctionDefinitions::CreateColCuboid(*pResource, vecPosition, vecSize);
+                CClientColCuboid* pShape = CStaticFunctionDefinitions::CreateColCuboid(*pResource, vecPosition, vecSize, vecRotation);
                 if (pShape)
                 {
                     CElementGroup* pGroup = pResource->GetElementGroup();
