@@ -39,6 +39,7 @@ public:
     ElementID     GetPedIn() { return m_PedIn; };
     ElementID     GetPedOut() { return m_PedOut; };
     unsigned char GetStartedJacking() { return m_ucStartedJacking; };
+    bool          GetForceExit() const noexcept { return m_forceExit; }
 
     void SetPedID(ElementID ID) { m_PedID = ID; };
     void SetVehicleID(ElementID ID) { m_VehicleID = ID; };
@@ -49,6 +50,7 @@ public:
     void SetPedIn(ElementID PedIn) { m_PedIn = PedIn; };
     void SetPedOut(ElementID PedOut) { m_PedOut = PedOut; };
     void SetFailReason(unsigned char ucReason) { m_ucFailReason = ucReason; }
+    void SetForceExit(bool forceExit) noexcept { m_forceExit = forceExit; }
     void SetCorrectVector(const CVector& vector) { m_pCorrectVector = new CVector(vector.fX, vector.fY, vector.fZ); }
 
 private:
@@ -64,4 +66,5 @@ private:
     bool          m_bOnWater;          // Vehicle in water reported by client
     unsigned char m_ucDoor;            // Door ID
     float         m_fDoorAngle;        // Door angle
+    bool          m_forceExit{false};  // Don't wait for the vehicle to slow down before getting out
 };
