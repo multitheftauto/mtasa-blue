@@ -2603,7 +2603,7 @@ bool CLuaEngineDefs::EngineStreamingRequestModel(lua_State* const luaVM, std::ui
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
 
-    if (modelId >= g_pGame->GetBaseIDforCOL() || !pModelInfo)
+    if (modelId >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     // Get the resource we belong to
@@ -2619,7 +2619,7 @@ bool CLuaEngineDefs::EngineStreamingReleaseModel(lua_State* const luaVM, std::ui
 
     CModelInfo* pModelInfo = g_pGame->GetModelInfo(modelId);
 
-    if (modelId >= g_pGame->GetBaseIDforCOL() || !pModelInfo)
+    if (modelId >= g_pGame->GetBaseIDforTXD() || !pModelInfo)
         throw std::invalid_argument("Expected a valid model ID at argument 1");
 
     // Get the resource we belong to
