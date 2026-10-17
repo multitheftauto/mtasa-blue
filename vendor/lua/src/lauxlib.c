@@ -185,6 +185,18 @@ LUALIB_API lua_Number luaL_optnumber (lua_State *L, int narg, lua_Number def) {
   return luaL_opt(L, luaL_checknumber, narg, def);
 }
 
+/* LUA-VEC */
+LUALIB_API const float* luaL_checkvec(lua_State* L, int narg) {
+    const float* v = lua_tovec(L, narg);
+    if (v == 0 && !lua_isvec(L, narg))  /* avoid extra test when d is not 0 */
+        tag_error(L, narg, LUA_TVEC);
+    return v;
+}
+
+/* LUA-VEC */
+LUALIB_API const float* luaL_optvec(lua_State* L, int narg, const float* def) {
+    return luaL_opt(L, luaL_checkvec, narg, def);
+}
 
 LUALIB_API lua_Integer luaL_checkinteger (lua_State *L, int narg) {
   lua_Integer d = lua_tointeger(L, narg);
