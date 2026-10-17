@@ -51,6 +51,8 @@ public:
     LUA_DECLARE(GetPedOccupiedVehicle);
     LUA_DECLARE(GetPedOccupiedVehicleSeat);
     LUA_DECLARE(IsPedInVehicle);
+    static bool IsPedEnteringToVehicle(CPed* const ped) noexcept;
+    static bool IsPedExitingFromVehicle(CPed* const ped) noexcept;
     LUA_DECLARE(GetPedAmmoInClip);
     LUA_DECLARE(GetPedTotalAmmo);
     static bool IsPedReloadingWeapon(CPed* const ped) noexcept;
