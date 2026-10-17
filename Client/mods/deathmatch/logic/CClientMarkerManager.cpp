@@ -49,6 +49,13 @@ void CClientMarkerManager::DeleteAll()
 
     // Clear the list
     m_Markers.clear();
+    m_IdentifierMap.clear();
+}
+
+CClientEntity* CClientMarkerManager::GetEntityByIdentifier(unsigned long ulIdentifier) const
+{
+    auto iter = m_IdentifierMap.find(ulIdentifier);
+    return iter != m_IdentifierMap.end() ? iter->second : nullptr;
 }
 
 void CClientMarkerManager::DoPulse()

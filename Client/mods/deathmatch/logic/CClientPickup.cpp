@@ -188,6 +188,8 @@ bool CClientPickup::Create()
                 return false;
             }
 
+            m_pPickupManager->RegisterGameObject(m_pObject->GetInterface(), this);
+
             // Create our collision sphere
             m_pCollision = new CClientColSphere(g_pClientGame->GetManager(), ElementID(INVALID_ELEMENT_ID), m_vecPosition, 1.0f);
             m_pCollision->m_pOwningPickup = this;
@@ -220,6 +222,9 @@ void CClientPickup::Destroy()
     // Delete the pickup
     if (m_pPickup)
     {
+        if (m_pObject)
+            m_pPickupManager->UnregisterGameObject(m_pObject->GetInterface(), this);
+
         // Clear object reference before Remove() to prevent dangling pointer
         m_pObject = nullptr;
         m_pPickup->Remove();
