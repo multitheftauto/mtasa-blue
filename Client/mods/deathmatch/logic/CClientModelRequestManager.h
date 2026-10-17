@@ -21,6 +21,7 @@ struct SClientModelRequest
     CModelInfo*    pModel;
     CClientEntity* pEntity;
     CElapsedTime   requestTimer;
+    bool           bCancelled = false;
 };
 
 class CClientModelRequestManager
@@ -47,5 +48,4 @@ private:
 
     bool                            m_bDoingPulse;
     std::list<SClientModelRequest*> m_Requests;
-    std::list<CClientEntity*>       m_CancelQueue;
 };
