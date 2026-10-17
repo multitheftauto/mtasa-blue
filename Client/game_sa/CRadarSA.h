@@ -20,6 +20,13 @@
 #define FUNC_DrawAreaOnRadar 0x5853d0
 #define FUNC_SetCoordBlip    0x583820
 
+// CRadar::vec2DRadarOrigin - world position the radar is centred on
+// Address per plugin-sdk (plugin_sa/game_sa/CRadar.cpp)
+#define VAR_CRadar_vec2DRadarOrigin 0xBAA248
+// CRadar::m_radarRange - world radius currently covered by the radar disc
+// Address per plugin-sdk (plugin_sa/game_sa/CRadar.cpp)
+#define VAR_CRadar_m_radarRange 0xBA8314
+
 class CRadarSA : public CRadar
 {
 public:
@@ -28,4 +35,5 @@ public:
     CMarker* CreateMarker(CVector* vecPosition);
     CMarker* GetFreeMarker();
     void     DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SharedUtil::SColor color);
+    bool     IsPointWithinRadarCircle(const CVector* vecPosition);
 };
