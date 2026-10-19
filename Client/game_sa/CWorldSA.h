@@ -32,6 +32,9 @@
 #define ARRAY_StreamSectors         0xB7D0B8
 #define NUM_StreamSectorRows        120
 #define NUM_StreamSectorCols        120
+#define ARRAY_LodPtrLists           0xB99EB8
+#define NUM_LodPtrListRows          30
+#define NUM_LodPtrListCols          30
 #define ARRAY_StreamRepeatSectors   0xB992B8
 #define NUM_StreamRepeatSectorRows  16
 #define NUM_StreamRepeatSectorCols  16

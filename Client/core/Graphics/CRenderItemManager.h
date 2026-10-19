@@ -69,6 +69,7 @@ public:
     void UpdateBackBufferCopySize();
     bool SaveDefaultRenderTarget();
     bool IsUsingDefaultRenderTarget();
+    bool IsCustomRenderTargetActive() const { return m_pDefaultD3DRenderTarget != nullptr; }
     bool ChangeRenderTarget(uint uiSizeX, uint uiSizeY, IDirect3DSurface9* pD3DRenderTarget, IDirect3DSurface9* pD3DZStencilSurface);
     void RemoveShaderItemFromWatchLists(CShaderItem* pShaderItem);
     void UpdateMemoryUsage();

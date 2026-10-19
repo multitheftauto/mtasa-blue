@@ -305,8 +305,8 @@ public:
     virtual std::unique_ptr<CPedIK> GetPedIK() = 0;
 
     virtual CEntitySAInterface* GetTargetedObject() const = 0;
-    virtual PedState            GetPedState() const = 0;
-    virtual void                SetPedState(PedState state) = 0;
+    virtual PedState::Enum      GetPedState() const = 0;
+    virtual void                SetPedState(PedState::Enum state) = 0;
 
     virtual void GetAttachedSatchels(std::vector<SSatchelsData>& satchelsList) const = 0;
 

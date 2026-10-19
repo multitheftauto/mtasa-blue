@@ -194,6 +194,10 @@ void CHudSA::SetComponentVisible(eHudComponent component, bool bVisible)
 //
 bool CHudSA::IsComponentVisible(eHudComponent component)
 {
+    // showhud hides the entire HUD, so no component can be visible
+    if (IsDisabled())
+        return false;
+
     SHudComponent* pComponent = MapFind(m_HudComponentMap, component);
     if (pComponent)
     {

@@ -57,6 +57,7 @@ CClientPlayerVoice::CClientPlayerVoice(CClientPlayer* pPlayer, CVoiceRecorder* p
     m_fPlaybackSpeed = 1.0f;
     Init();
 }
+
 CClientPlayerVoice::~CClientPlayerVoice()
 {
     DeInit();
@@ -430,16 +431,19 @@ void CClientPlayerVoice::ApplyFXModifications(float fSampleRate, float fTempo, f
     m_fSampleRate = fSampleRate;
     m_fTempo = fTempo;
     m_fPitch = fPitch;
+
     if (m_pBassPlaybackStream)
     {
         if (fTempo != m_fTempo)
         {
             m_fTempo = fTempo;
         }
+
         if (fPitch != m_fPitch)
         {
             m_fPitch = fPitch;
         }
+
         if (fSampleRate != m_fSampleRate)
         {
             m_fSampleRate = fSampleRate;
@@ -604,6 +608,7 @@ bool CClientPlayerVoice::SetFxEffectParameters(std::uint32_t uiFxEffect, void* p
 {
     if (IsFxEffectEnabled(uiFxEffect))
         return BASS_FXSetParameters(m_FxEffects[uiFxEffect], params);
+
     return false;
 }
 
@@ -611,6 +616,7 @@ bool CClientPlayerVoice::GetFxEffectParameters(std::uint32_t uiFxEffect, void* p
 {
     if (IsFxEffectEnabled(uiFxEffect))
         return BASS_FXGetParameters(m_FxEffects[uiFxEffect], params);
+
     return false;
 }
 

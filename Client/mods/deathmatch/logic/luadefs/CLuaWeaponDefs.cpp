@@ -207,9 +207,9 @@ int CLuaWeaponDefs::FireWeapon(lua_State* luaVM)
 
 int CLuaWeaponDefs::SetWeaponProperty(lua_State* luaVM)
 {
-    CClientWeapon*   pWeapon;
-    WeaponProperty   weaponProperty;
-    CScriptArgReader argStream(luaVM);
+    CClientWeapon*       pWeapon;
+    WeaponProperty::Enum weaponProperty;
+    CScriptArgReader     argStream(luaVM);
     argStream.ReadUserData(pWeapon);
     argStream.ReadEnumString(weaponProperty);
 
@@ -696,7 +696,7 @@ int CLuaWeaponDefs::SetWeaponClipAmmo(lua_State* luaVM)
 std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponDefs::GetWeaponProperty(lua_State*                                     luaVM,
                                                                                                        std::variant<CClientWeapon*, int, std::string> weapon,
                                                                                                        std::variant<int, std::string> weaponSkill,
-                                                                                                       WeaponProperty                 property)
+                                                                                                       WeaponProperty::Enum           property)
 {
     eWeaponSkill skill = WEAPONSKILL_POOR;
     if (std::holds_alternative<int>(weaponSkill))
@@ -845,7 +845,7 @@ std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponD
 std::variant<float, int, bool, CLuaMultiReturn<float, float, float>> CLuaWeaponDefs::GetOriginalWeaponProperty(lua_State*                     luaVM,
                                                                                                                std::variant<int, std::string> weapon,
                                                                                                                std::variant<int, std::string> weaponSkill,
-                                                                                                               WeaponProperty                 property)
+                                                                                                               WeaponProperty::Enum           property)
 {
     eWeaponType weaponType = eWeaponType::WEAPONTYPE_INVALID;
     if (std::holds_alternative<int>(weapon))

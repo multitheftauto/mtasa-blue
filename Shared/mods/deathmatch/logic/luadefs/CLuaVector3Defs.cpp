@@ -21,7 +21,6 @@ void CLuaVector3Defs::AddClass(lua_State* luaVM)
     lua_newclass(luaVM);
 
     lua_classmetamethod(luaVM, "__tostring", ToString);
-    lua_classmetamethod(luaVM, "__gc", Destroy);
 
     lua_classmetamethod(luaVM, "__add", Add);
     lua_classmetamethod(luaVM, "__sub", Sub);
@@ -55,9 +54,9 @@ void CLuaVector3Defs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "y", SetY, GetY);
     lua_classvariable(luaVM, "z", SetZ, GetZ);
 
-    lua_classvariable(luaVM, "length", NULL, GetLength);
-    lua_classvariable(luaVM, "squaredLength", NULL, GetLengthSquared);
-    lua_classvariable(luaVM, "normalized", NULL, GetNormalized);
+    lua_classvariable(luaVM, "length", nullptr, GetLength);
+    lua_classvariable(luaVM, "squaredLength", nullptr, GetLengthSquared);
+    lua_classvariable(luaVM, "normalized", nullptr, GetNormalized);
 #else
     // Server
     lua_classfunction(luaVM, "create", "", Create);
@@ -81,9 +80,9 @@ void CLuaVector3Defs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "y", "", "", SetY, GetY);
     lua_classvariable(luaVM, "z", "", "", SetZ, GetZ);
 
-    lua_classvariable(luaVM, "length", "", "", NULL, GetLength);
-    lua_classvariable(luaVM, "squaredLength", "", "", NULL, GetLengthSquared);
-    lua_classvariable(luaVM, "normalized", "", "", NULL, GetNormalized);
+    lua_classvariable(luaVM, "length", "", "", nullptr, GetLength);
+    lua_classvariable(luaVM, "squaredLength", "", "", nullptr, GetLengthSquared);
+    lua_classvariable(luaVM, "normalized", "", "", nullptr, GetNormalized);
 #endif
 
     lua_registerclass(luaVM, "Vector3");
@@ -167,15 +166,13 @@ int CLuaVector3Defs::Create(lua_State* luaVM)
 
 int CLuaVector3Defs::Destroy(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
+    CVector* pVector = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
 
     if (!argStream.HasErrors())
     {
-        delete pVector;
-        lua_addtotalbytes(luaVM, -LUA_GC_EXTRA_BYTES);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -190,7 +187,7 @@ int CLuaVector3Defs::Destroy(lua_State* luaVM)
 
 int CLuaVector3Defs::GetLength(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
+    CVector* pVector = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
@@ -211,7 +208,7 @@ int CLuaVector3Defs::GetLength(lua_State* luaVM)
 
 int CLuaVector3Defs::GetLengthSquared(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
+    CVector* pVector = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
@@ -232,7 +229,7 @@ int CLuaVector3Defs::GetLengthSquared(lua_State* luaVM)
 
 int CLuaVector3Defs::GetNormalized(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
+    CVector* pVector = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
@@ -256,7 +253,7 @@ int CLuaVector3Defs::GetNormalized(lua_State* luaVM)
 
 int CLuaVector3Defs::Normalize(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
+    CVector* pVector = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
@@ -278,8 +275,8 @@ int CLuaVector3Defs::Normalize(lua_State* luaVM)
 
 int CLuaVector3Defs::Cross(lua_State* luaVM)
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CVector* pVector1 = nullptr;
+    CVector* pVector2 = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector1);
@@ -304,8 +301,8 @@ int CLuaVector3Defs::Cross(lua_State* luaVM)
 
 int CLuaVector3Defs::Dot(lua_State* luaVM)
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CVector* pVector1 = nullptr;
+    CVector* pVector2 = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector1);
@@ -330,7 +327,7 @@ int CLuaVector3Defs::Dot(lua_State* luaVM)
 
 int CLuaVector3Defs::ToString(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
+    CVector* pVector = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
@@ -352,8 +349,8 @@ int CLuaVector3Defs::ToString(lua_State* luaVM)
 
 int CLuaVector3Defs::SetX(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
-    float         fValue = 0.0f;
+    CVector* pVector = nullptr;
+    float    fValue = 0.0f;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
@@ -377,8 +374,8 @@ int CLuaVector3Defs::SetX(lua_State* luaVM)
 
 int CLuaVector3Defs::SetY(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
-    float         fValue = 0.0f;
+    CVector* pVector = nullptr;
+    float    fValue = 0.0f;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
@@ -402,8 +399,8 @@ int CLuaVector3Defs::SetY(lua_State* luaVM)
 
 int CLuaVector3Defs::SetZ(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
-    float         fValue = 0.0f;
+    CVector* pVector = nullptr;
+    float    fValue = 0.0f;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
@@ -427,7 +424,7 @@ int CLuaVector3Defs::SetZ(lua_State* luaVM)
 
 int CLuaVector3Defs::GetX(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
+    CVector* pVector = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
@@ -448,7 +445,7 @@ int CLuaVector3Defs::GetX(lua_State* luaVM)
 
 int CLuaVector3Defs::GetY(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
+    CVector* pVector = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
@@ -469,7 +466,7 @@ int CLuaVector3Defs::GetY(lua_State* luaVM)
 
 int CLuaVector3Defs::GetZ(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
+    CVector* pVector = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
@@ -498,8 +495,8 @@ std::variant<CVector, bool> CLuaVector3Defs::IntersectsSegmentTriangle(CVector o
 
 int CLuaVector3Defs::Add(lua_State* luaVM)
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CVector* pVector1 = nullptr;
+    CVector* pVector2 = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector1);
@@ -521,8 +518,8 @@ int CLuaVector3Defs::Add(lua_State* luaVM)
 
 int CLuaVector3Defs::Sub(lua_State* luaVM)
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CVector* pVector1 = nullptr;
+    CVector* pVector2 = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector1);
@@ -545,7 +542,7 @@ int CLuaVector3Defs::Sub(lua_State* luaVM)
 int CLuaVector3Defs::Mul(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
-    CLuaVector3D*    pVector1 = NULL;
+    CVector*         pVector1 = nullptr;
 
     if (argStream.NextIsNumber())
     {
@@ -580,7 +577,7 @@ int CLuaVector3Defs::Mul(lua_State* luaVM)
         }
         else
         {
-            CLuaVector3D* pVector2 = NULL;
+            CVector* pVector2 = nullptr;
             argStream.ReadUserData(pVector2);
 
             if (!argStream.HasErrors())
@@ -599,8 +596,8 @@ int CLuaVector3Defs::Mul(lua_State* luaVM)
 
 int CLuaVector3Defs::Div(lua_State* luaVM)
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CVector* pVector1 = nullptr;
+    CVector* pVector2 = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector1);
@@ -634,8 +631,8 @@ int CLuaVector3Defs::Div(lua_State* luaVM)
 
 int CLuaVector3Defs::Pow(lua_State* luaVM)
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CVector* pVector1 = nullptr;
+    CVector* pVector2 = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector1);
@@ -679,7 +676,7 @@ int CLuaVector3Defs::Pow(lua_State* luaVM)
 
 int CLuaVector3Defs::Unm(lua_State* luaVM)
 {
-    CLuaVector3D* pVector = NULL;
+    CVector* pVector = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector);
@@ -700,8 +697,8 @@ int CLuaVector3Defs::Unm(lua_State* luaVM)
 
 int CLuaVector3Defs::Eq(lua_State* luaVM)
 {
-    CLuaVector3D* pVector1 = NULL;
-    CLuaVector3D* pVector2 = NULL;
+    CVector* pVector1 = nullptr;
+    CVector* pVector2 = nullptr;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pVector1);

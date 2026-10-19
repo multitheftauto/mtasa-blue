@@ -284,25 +284,11 @@ const SString& CWebView::GetTitle()
 
 void CWebView::SetRenderingPaused(bool bPaused)
 {
-    // Store pause state even when the host is not created yet so async
-    // browser creation cannot lose the requested visibility state.
     m_bIsRenderingPaused = bPaused;
 
-    if (m_pWebView)
-    {
-        m_pWebView->GetHost()->WasHidden(bPaused);
-
-        if (bPaused)
-        {
-            // Free memory held by render data when paused
-            std::lock_guard<std::mutex> lock{m_RenderData.dataMutex};
-            m_RenderData.changed = false;
-            m_RenderData.popupShown = false;
-            m_RenderData.buffer.reset();
-            m_RenderData.bufferSize = 0;
-            m_RenderData.popupBuffer.reset();
-        }
-    }
+    // Never hide the browser, CEF greets it back with a frame from the past.
+    // Paint whatever the script did right before this call so the texture stays current
+    RequestFrames();
 }
 
 const bool CWebView::GetRenderingPaused() const
@@ -351,6 +337,20 @@ void CWebView::ClearTexture()
         }
         pD3DSurface->UnlockRect();
     }
+}
+
+void CWebView::RestoreTexture()
+{
+    {
+        const std::scoped_lock lock(m_RenderData.dataMutex);
+        if (!m_RenderData.buffer || m_RenderData.bufferSize == 0)
+            return;
+
+        // Reuse the retained CEF frame so screenshot filtering is not visible while an asynchronous repaint is pending.
+        m_RenderData.changed = true;
+    }
+
+    UpdateTexture();
 }
 
 void CWebView::UpdateTexture()
@@ -546,8 +546,11 @@ void CWebView::UpdateTexture()
 
 void CWebView::ExecuteJavascript(const SString& strJavascriptCode)
 {
-    if (m_pWebView)
-        m_pWebView->GetMainFrame()->ExecuteJavaScript(strJavascriptCode, "", 0);
+    if (!m_pWebView)
+        return;
+
+    m_pWebView->GetMainFrame()->ExecuteJavaScript(strJavascriptCode, "", 0);
+    RequestFrames();
 }
 
 bool CWebView::SetProperty(const SString& strKey, const SString& strValue)
@@ -756,7 +759,10 @@ void CWebView::Resize(const CVector2D& size)
 
     // Send resize event to CEF
     if (m_pWebView)
+    {
         m_pWebView->GetHost()->WasResized();
+        RequestFrames();
+    }
 }
 
 CVector2D CWebView::GetSize()
@@ -1116,6 +1122,9 @@ void CWebView::OnLoadEnd(CefRefPtr<CefBrowser> browser, CefRefPtr<CefFrame> fram
     // Set browser volume once again
     SetAudioVolume(m_fVolume);
 
+    // A page that finished loading while paused still gets painted
+    RequestFrames();
+
     if (frame->IsMain())
     {
         SString strURL = UTF16ToMbUTF8(frame->GetURL());
@@ -1346,11 +1355,6 @@ void CWebView::OnAfterCreated(CefRefPtr<CefBrowser> browser)
 
     // Set web view reference
     m_pWebView = browser;
-
-    // Sync host visibility with the stored rendering state. This prevents
-    // newly created browsers from becoming permanently hidden when pause
-    // state changes race against async host creation.
-    m_pWebView->GetHost()->WasHidden(m_bIsRenderingPaused);
 
     // Force an initial repaint to populate the texture even for pages that
     // become visually static immediately after load.

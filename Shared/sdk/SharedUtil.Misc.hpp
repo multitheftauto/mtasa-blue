@@ -593,7 +593,7 @@ bool SharedUtil::IsGTAProcess()
     }
 
     SString strBaseDir = ExtractPath(strLaunchPathFilename);
-    if (FileExists(PathJoin(strBaseDir, "models", "gta3.img")) || FileExists(PathJoin(strBaseDir, "data", "gta3.dat")))
+    if (FileExists(PathJoin(strBaseDir, "models", "gta3.img")) || FileExists(PathJoin(strBaseDir, "data", "gta.dat")))
     {
         iResult = 1;
         return true;

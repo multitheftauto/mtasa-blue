@@ -26,7 +26,7 @@ public:
         // Bit i is set when bone i (see CClientIFP::m_karruBoneIds) is actually driven by this
         // animation's own IFP data, as opposed to being padded out with a fixed pose because the
         // file doesn't define that bone.
-        std::bitset<32> AnimatedBonesMask;
+        std::bitset<64> AnimatedBonesMask;
     };
 
     std::vector<SAnimation> vecAnimations;

@@ -40,6 +40,7 @@ CClientBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::u
 
     // Get the resource we belong to
     CResource* pResource = pLuaMain->GetResource();
+
     if (!pResource)
         return nullptr;
 

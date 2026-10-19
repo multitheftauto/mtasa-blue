@@ -69,5 +69,6 @@ private:
     bool ReadString(std::string& strRead, const char* szBuffer, int& i, int nLength);
 
     SOCKET       m_Socket;
+    sockaddr_in  m_QueryAddress{};
     CElapsedTime m_ElapsedTime;
 };

@@ -317,12 +317,8 @@ void CClientWebBrowser::Events_OnInputFocusChanged(bool bGainedFocus)
 
 bool CClientWebBrowser::Events_OnResourcePathCheck(SString& strURL)
 {
-    if (m_bBeingDestroyed)
+    if (m_bBeingDestroyed || !m_pResource)
         return false;
-
-    // If no resource is set, we are allowed to use the requested file
-    if (!m_pResource)
-        return true;
 
     CResource* pTempResource = m_pResource;  // Make a copy to ignore a changed resource
 
@@ -334,18 +330,30 @@ bool CClientWebBrowser::Events_OnResourcePathCheck(SString& strURL)
 
 bool CClientWebBrowser::Events_OnResourceFileCheck(const SString& strPath, CBuffer& outFileData)
 {
-    if (m_bBeingDestroyed)
+    if (m_bBeingDestroyed || !m_pResource)
         return false;
-
-    // If no resource is set, we do not require to verify the file
-    if (!m_pResource)
-        return true;
 
     auto pFile = g_pClientGame->GetResourceManager()->GetDownloadableResourceFile(strPath.ToLower());
 
-    // If we did not download this file, it has been script or user generated, nothing to verify for us
+    // Allow unlisted or non-downloaded files if they belong to the owning resource
     if (pFile == nullptr)
-        return true;
+    {
+        const std::filesystem::path resourceDir = std::filesystem::path(m_pResource->GetResourceDirectoryPath(ACCESS_PUBLIC, "").c_str()).lexically_normal();
+        const std::filesystem::path targetFilePath = std::filesystem::path(strPath.c_str()).lexically_normal();
+
+        SString localResourceDir = PathConform(resourceDir.string()).Replace("\\", "/");
+        if (!localResourceDir.EndsWith("/"))
+            localResourceDir += "/";
+
+        const SString normalizedPath = PathConform(targetFilePath.string()).Replace("\\", "/");
+        if (!normalizedPath.BeginsWithI(localResourceDir))
+            return false;
+
+        if (!FileExists(strPath))
+            return false;
+
+        return outFileData.LoadFromFile(strPath);
+    }
 
     pFile->GenerateClientChecksum(outFileData);
     return pFile->DoesClientAndServerChecksumMatch();

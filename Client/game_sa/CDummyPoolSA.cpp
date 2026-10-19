@@ -13,6 +13,7 @@
 
 #include "StdInc.h"
 #include "CDummyPoolSA.h"
+#include "CBuildingRemovalSA.h"
 #include "CGameSA.h"
 #include <game/CWorld.h>
 
@@ -57,6 +58,8 @@ void CDummyPoolSA::RestoreBackup()
     if (!m_pOriginalElementsBackup)
         return;
 
+    auto* pBuildingRemoval = static_cast<CBuildingRemovalSA*>(pGame->GetBuildingRemoval());
+
     auto& originalData = *m_pOriginalElementsBackup;
     auto  pDummyPool = (*m_ppDummyPoolInterface);
     for (auto i = 0; i < MAX_DUMMIES_DEFAULT; i++)
@@ -68,21 +71,25 @@ void CDummyPoolSA::RestoreBackup()
             std::memcpy(pDummy, &originalData[i].second, sizeof(CEntitySAInterface));
 
             pGame->GetWorld()->Add(pDummy, CDummyPool_Constructor);
+            pBuildingRemoval->AddDataBuildingAndReapplyRemoval(pDummy);
         }
     }
 
     m_pOriginalElementsBackup = nullptr;
 }
 
-void CDummyPoolSA::UpdateBuildingLods(const std::uint32_t offset)
+void CDummyPoolSA::UpdateBuildingLods(const std::uint32_t offset, const std::uintptr_t oldPoolStart, const std::uintptr_t oldPoolEnd)
 {
     if (m_pOriginalElementsBackup)
-        UpdateBackupLodOffset(offset);
+        UpdateBackupLodOffset(offset, oldPoolStart, oldPoolEnd);
     else
-        UpdateLodsOffestInPool(offset);
+        UpdateLodsOffestInPool(offset, oldPoolStart, oldPoolEnd);
 }
 
-void CDummyPoolSA::UpdateBackupLodOffset(const std::uint32_t offset)
+// A dummy's LOD can point at another dummy just as easily as at a building, so only shift it
+// when it actually falls inside the buildings pool range that just moved; otherwise the pointer
+// is left as is, since it was never invalidated by this resize.
+void CDummyPoolSA::UpdateBackupLodOffset(const std::uint32_t offset, const std::uintptr_t oldPoolStart, const std::uintptr_t oldPoolEnd)
 {
     for (auto& it : *m_pOriginalElementsBackup)
     {
@@ -90,19 +97,21 @@ void CDummyPoolSA::UpdateBackupLodOffset(const std::uint32_t offset)
         {
             CEntitySAInterface* object = reinterpret_cast<CEntitySAInterface*>(&it.second);
             CEntitySAInterface* lod = object->GetLod();
-            if (lod)
-                object->SetLod((CEntitySAInterface*)((std::uint32_t)lod + offset));
+            auto                lodAddress = reinterpret_cast<std::uintptr_t>(lod);
+            if (lodAddress >= oldPoolStart && lodAddress < oldPoolEnd)
+                object->SetLod(reinterpret_cast<CEntitySAInterface*>(lodAddress + offset));
         }
     }
 }
 
-void CDummyPoolSA::UpdateLodsOffestInPool(const std::uint32_t offset)
+void CDummyPoolSA::UpdateLodsOffestInPool(const std::uint32_t offset, const std::uintptr_t oldPoolStart, const std::uintptr_t oldPoolEnd)
 {
     for (auto i = 0; i < (*m_ppDummyPoolInterface)->Size(); i++)
     {
         CEntitySAInterface* object = (*m_ppDummyPoolInterface)->GetObject(i);
         CEntitySAInterface* lod = object->GetLod();
-        if (lod)
-            object->SetLod((CEntitySAInterface*)((std::uint32_t)lod + offset));
+        auto                lodAddress = reinterpret_cast<std::uintptr_t>(lod);
+        if (lodAddress >= oldPoolStart && lodAddress < oldPoolEnd)
+            object->SetLod(reinterpret_cast<CEntitySAInterface*>(lodAddress + offset));
     }
 }

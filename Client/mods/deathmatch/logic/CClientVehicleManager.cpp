@@ -496,7 +496,7 @@ unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
 bool CClientVehicleManager::IsValidSeat(unsigned long ulModel, unsigned char ucSeat)
 {
     // Camper only has 3 seats (0-2)
-    if (static_cast<VehicleType>(ulModel) == VehicleType::VT_CAMPER && ucSeat > 2)
+    if (static_cast<VehicleType::Enum>(ulModel) == VehicleType::VT_CAMPER && ucSeat > 2)
         return false;
 
     // Get the maximum passenger count for the vehicle
@@ -730,7 +730,7 @@ bool CClientVehicleManager::HasDoors(unsigned long ulModel)
                 ulModel = pModelInfo->GetParentID();
         }
 
-        switch (static_cast<VehicleType>(ulModel))
+        switch (static_cast<VehicleType::Enum>(ulModel))
         {
             case VehicleType::VT_BFINJECT:
             case VehicleType::VT_RCBANDIT:

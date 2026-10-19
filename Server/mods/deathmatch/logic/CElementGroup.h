@@ -19,12 +19,14 @@ class CElementGroup
 {
 private:
     CFastList<CElement*> m_elements;
+    CElement*            m_treeRoot = nullptr;
 
 public:
     ~CElementGroup();
     void         Add(CElement* element);
     void         Remove(CElement* element);
     unsigned int GetCount();
+    void         SetTreeRoot(CElement* treeRoot) noexcept { m_treeRoot = treeRoot; }
 
     CFastList<CElement*>::const_iterator IterBegin() { return m_elements.begin(); }
     CFastList<CElement*>::const_iterator IterEnd() { return m_elements.end(); }

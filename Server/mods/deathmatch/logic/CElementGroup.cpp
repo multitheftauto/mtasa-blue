@@ -55,6 +55,10 @@ CElementGroup::~CElementGroup()
                 }
                 else
                 {
+                    // Skip if client already destroys this element as part of a bulk tree removal
+                    if (m_treeRoot && m_treeRoot->IsMyChild(pElement, true))
+                        continue;
+
                     // Tell everyone to destroy it
                     removePacket.Add(pElement);
                 }
@@ -64,11 +68,11 @@ CElementGroup::~CElementGroup()
         }
 
         CElementDeleter* deleter = g_pGame->GetElementDeleter();
-        CElement*        pElement = NULL;
+        CElement*        pElement = nullptr;
         for (CFastList<CElement*>::iterator iter = m_elements.begin(); iter != m_elements.end(); iter++)
         {
             pElement = *iter;
-            pElement->SetElementGroup(NULL);
+            pElement->SetElementGroup(nullptr);
             pElement->DeleteAllEvents();
             deleter->Delete(pElement, true, false);
         }

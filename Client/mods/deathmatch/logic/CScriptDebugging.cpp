@@ -140,7 +140,8 @@ void CScriptDebugging::UpdateLogOutput()
         if (localPlayer)
             clientDebugLevel = localPlayer->GetPlayerScriptDebugLevel();
 
-        bool shouldDisplayInConsole = CheckForSufficientDebugLevel(clientDebugLevel, static_cast<std::uint8_t>(line.uiMinimumDebugLevel));
+        bool shouldDisplayInConsole =
+            (clientDebugLevel == 0) || CheckForSufficientDebugLevel(clientDebugLevel, static_cast<std::uint8_t>(line.uiMinimumDebugLevel));
         if (shouldDisplayInConsole)
             g_pCore->DebugEchoColor(line.strText, line.ucRed, line.ucGreen, line.ucBlue);
     }

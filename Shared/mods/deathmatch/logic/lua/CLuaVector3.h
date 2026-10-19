@@ -11,19 +11,7 @@
 
 #pragma once
 
-class CLuaVector3D : public CVector
-{
-public:
-    CLuaVector3D();
-    CLuaVector3D(const CVector& vector);
-    CLuaVector3D(float fX, float fY, float fZ);
+#include "CVector.h"
 
-    ~CLuaVector3D();
-
-    unsigned int GetScriptID() const { return m_uiScriptID; }
-
-    static CLuaVector3D* GetFromScriptID(unsigned int uiScriptID);
-
-private:
-    unsigned int m_uiScriptID;
-};
+// Alias CLuaVector3D to CVector now that script IDs and CIdArray registrations are removed for inline userdata
+using CLuaVector3D = CVector;

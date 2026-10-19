@@ -149,7 +149,7 @@ void CAnimBlendAssociationSA::RestrictToBonesOf(const CAnimBlendStaticAssociatio
     }
 }
 
-void CAnimBlendAssociationSA::RestrictToBones(std::bitset<32> animatedBonesMask)
+void CAnimBlendAssociationSA::RestrictToBones(std::bitset<64> animatedBonesMask)
 {
     // Same padding problem as RestrictToBonesOf, but for animations played directly from a custom IFP
     // bank rather than replacing a built-in one. There's no built-in association to compare against, so

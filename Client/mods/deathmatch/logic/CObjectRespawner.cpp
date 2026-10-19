@@ -57,6 +57,7 @@ bool CObjectRespawner::IsBeingRespawned(CClientObject* pObject)
 void CObjectRespawner::Unreference(CClientObject* pObject)
 {
     std::vector<CClientObject*>::iterator it = std::find(m_List.begin(), m_List.end(), pObject);
+
     if (it != m_List.end())
         m_List.erase(it);
 }

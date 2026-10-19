@@ -39,7 +39,7 @@ public:
     CRegisteredCorona* CreateCorona(DWORD Identifier, CVector* position);
     CRegisteredCorona* FindFreeCorona();
     CRegisteredCorona* FindCorona(DWORD Identifier);
-    RwTexture*         GetTexture(CoronaType type);
+    RwTexture*         GetTexture(CoronaType::Enum type);
 
     void DisableSunAndMoon(bool bDisabled);
 

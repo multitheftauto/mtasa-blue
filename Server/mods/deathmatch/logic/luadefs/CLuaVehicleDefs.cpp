@@ -650,6 +650,21 @@ int CLuaVehicleDefs::GetVehicleSirenParams(lua_State* luaVM)
     if (argStream.HasErrors() == false)
     {
         tSirenInfo = pVehicle->m_tSirenBeaconInfo;  // Create a new table
+
+        // If custom sirens are not overridden, query native GTA:SA default sirens
+        if (!tSirenInfo.m_bOverrideSirens)
+        {
+            if (const auto defaultSirens = SharedUtil::GetDefaultVehicleSirens(pVehicle->GetModel()); defaultSirens.has_value())
+            {
+                tSirenInfo.m_ucSirenCount = defaultSirens->sirenCount;
+                tSirenInfo.m_ucSirenType = defaultSirens->sirenType;
+                tSirenInfo.m_b360Flag = defaultSirens->flag360;
+                tSirenInfo.m_bDoLOSCheck = defaultSirens->doLOSCheck;
+                tSirenInfo.m_bUseRandomiser = defaultSirens->useRandomiser;
+                tSirenInfo.m_bSirenSilent = defaultSirens->sirenSilent;
+            }
+        }
+
         lua_newtable(luaVM);
 
         lua_pushstring(luaVM, "SirenCount");
@@ -700,6 +715,22 @@ int CLuaVehicleDefs::GetVehicleSirens(lua_State* luaVM)
     if (argStream.HasErrors() == false)
     {
         tSirenInfo = pVehicle->m_tSirenBeaconInfo;  // Create a new table
+
+        // If custom sirens are not overridden, query native GTA:SA default sirens
+        if (!tSirenInfo.m_bOverrideSirens)
+        {
+            if (const auto defaultSirens = SharedUtil::GetDefaultVehicleSirens(pVehicle->GetModel()); defaultSirens.has_value())
+            {
+                tSirenInfo.m_ucSirenCount = defaultSirens->sirenCount;
+                for (std::size_t i = 0; i < defaultSirens->sirenCount; ++i)
+                {
+                    tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions = defaultSirens->beacons[i].position;
+                    tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour = defaultSirens->beacons[i].color;
+                    tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha = defaultSirens->beacons[i].minAlpha;
+                }
+            }
+        }
+
         lua_newtable(luaVM);
 
         for (int i = 0; i < tSirenInfo.m_ucSirenCount; i++)
