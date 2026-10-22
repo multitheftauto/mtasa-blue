@@ -3875,6 +3875,19 @@ retry:
                     SPlayerArmorSync armor;
                     bitStream.Read(&armor);
 
+                    // Read out the stats that differ from the defaults
+                    std::vector<std::pair<unsigned short, float>> stats;
+                    unsigned short                                usNumStats = 0;
+                    bitStream.ReadCompressed(usNumStats);
+                    for (unsigned short i = 0; i < usNumStats; i++)
+                    {
+                        unsigned short usStat = 0;
+                        SPedStatSync   stat;
+                        bitStream.ReadBits(&usStat, 9);
+                        bitStream.Read(&stat);
+                        stats.emplace_back(usStat, stat.data.fValue);
+                    }
+
                     // Read out the vehicle id
                     ElementID       VehicleID = INVALID_ELEMENT_ID;
                     unsigned char   ucSeat = 0xFF;
@@ -3898,6 +3911,10 @@ retry:
 
                     CClientPed* pPed = new CClientPed(g_pClientGame->m_pManager, usModel, EntityID);
                     pEntity = pPed;
+
+                    // Before the rest of the ped state, a ped's health is limited by its MAX_HEALTH
+                    for (const auto& [usStat, fValue] : stats)
+                        pPed->SetStat(usStat, fValue);
 
                     pPed->SetPosition(position.data.vecPosition);
                     pPed->SetCurrentRotation(pedRotation.data.fRotation, true);
@@ -5533,7 +5550,7 @@ void CPacketHandler::Packet_ResourceClientScripts(NetBitStreamInterface& bitStre
                 const unsigned long originalLength = static_cast<unsigned long>(uData[0]) << 24 | static_cast<unsigned long>(uData[1]) << 16 |
                                                      static_cast<unsigned long>(uData[2]) << 8 | static_cast<unsigned long>(uData[3]);
                 constexpr unsigned long MAX_CLIENT_SCRIPT_SIZE = 50 * 1024 * 1024;
-                if (originalLength == 0 || originalLength > MAX_CLIENT_SCRIPT_SIZE)
+                if (originalLength > MAX_CLIENT_SCRIPT_SIZE)
                 {
                     memset(data.data(), 0, data.size());
                     return;
@@ -5551,7 +5568,8 @@ void CPacketHandler::Packet_ResourceClientScripts(NetBitStreamInterface& bitStre
                     pResource->LoadNoClientCacheScript(uncompressedBuffer.data(), uncompressedLength, strFilename);
                 }
 
-                memset(uncompressedBuffer.data(), 0, uncompressedBuffer.size());
+                if (!uncompressedBuffer.empty())
+                    memset(uncompressedBuffer.data(), 0, uncompressedBuffer.size());
                 memset(data.data(), 0, data.size());
             }
         }
