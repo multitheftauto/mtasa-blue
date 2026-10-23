@@ -92,8 +92,8 @@ public:
     static bool PreloadMissionAudio(CPlayer* player, std::uint16_t sound, std::uint16_t slot);
 
     // Cursor funcs
-    LUA_DECLARE(IsCursorShowing);
-    LUA_DECLARE(ShowCursor);
+    static bool IsCursorShowing(CPlayer* player) noexcept;
+    static bool ShowCursor(lua_State* luaVM, CElement* player, bool show, std::optional<bool> toggleControls);
 
     // Chat funcs
     static bool ShowChat(CElement* pPlayer, bool bShow, std::optional<bool> optInputBlocked);
