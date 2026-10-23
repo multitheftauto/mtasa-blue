@@ -20,6 +20,7 @@ CClientCheckpoint::CClientCheckpoint(CClientMarker* pThis)
     // Init
     m_pThis = pThis;
     m_pCheckpoint = NULL;
+    m_dwIdentifier = 0;
     m_bStreamedIn = false;
     m_bVisible = true;
     m_uiIcon = CClientCheckpoint::ICON_NONE;
@@ -37,6 +38,8 @@ CClientCheckpoint::~CClientCheckpoint()
 {
     // Eventually destroy the checkpoint
     Destroy();
+    if (m_dwIdentifier)
+        g_pClientGame->GetManager()->GetMarkerManager()->UnregisterIdentifier(m_dwIdentifier);
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pThis, NULL);
 }
 
@@ -350,12 +353,15 @@ void CClientCheckpoint::Create(unsigned long ulIdentifier)
         if (ulIdentifier == 0)
         {
             s_ulIdentifier++;
+            if (m_dwIdentifier)
+                g_pClientGame->GetManager()->GetMarkerManager()->UnregisterIdentifier(m_dwIdentifier);
             m_dwIdentifier = s_ulIdentifier;
         }
         else
         {
             m_dwIdentifier = ulIdentifier;
         }
+        g_pClientGame->GetManager()->GetMarkerManager()->RegisterIdentifier(m_dwIdentifier, m_pThis);
 
         // Create it
         m_pCheckpoint =
