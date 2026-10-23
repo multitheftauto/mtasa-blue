@@ -301,6 +301,34 @@ static void __declspec(naked) HOOK_CAutomobile_VehicleDamage2()
     // clang-format on
 }
 
+#define HOOKPOS_CAutomobile_VehicleDamage_MeleeMinIntensity   0x06A7682
+#define HOOKSIZE_CAutomobile_VehicleDamage_MeleeMinIntensity  6
+#define HOOKCHECK_CAutomobile_VehicleDamage_MeleeMinIntensity 0x0F
+DWORD                         RETURN_CAutomobile_VehicleDamage_MeleeMinIntensity_A = 0x06A7688;
+DWORD                         RETURN_CAutomobile_VehicleDamage_MeleeMinIntensity_B = 0x06A84A3;
+static void __declspec(naked) HOOK_CAutomobile_VehicleDamage_MeleeMinIntensity()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        je      vehicleNotDamageable
+
+        cmp     dword ptr [esp+7Ch], 10h        // >= WEAPONTYPE_GRENADE, so a melee weapon
+        jae     cont
+
+        mov     dword ptr [esp+8], 0            // Melee: no minimum damage intensity
+
+cont:
+        jmp     RETURN_CAutomobile_VehicleDamage_MeleeMinIntensity_A
+
+vehicleNotDamageable:
+        jmp     RETURN_CAutomobile_VehicleDamage_MeleeMinIntensity_B
+    }
+    // clang-format on
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CPlane::VehicleDamage hook 1
@@ -523,6 +551,7 @@ void CMultiplayerSA::InitHooks_VehicleDamage()
     EZHookInstallChecked(CBike_BurstTyre);
     EZHookInstallChecked(CAutomobile_VehicleDamage1);
     EZHookInstallChecked(CAutomobile_VehicleDamage2);
+    EZHookInstallChecked(CAutomobile_VehicleDamage_MeleeMinIntensity);
     EZHookInstallChecked(CPlane_VehicleDamage1);
     EZHookInstallChecked(CPlane_VehicleDamage2);
     EZHookInstallChecked(CBike_VehicleDamage1);
