@@ -4746,6 +4746,80 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessEntityCollision_ForkliftC
     // clang-format on
 }
 
+// >>> 0x6D0E0F | D8 0D 84 8C 85 00 | fmul dword ptr [00858C84h]  ; *0.5
+// >>> 0x6D0E15 | D9 99 2C 01 00 00 | fstp dword ptr [ecx+12Ch]   ; m_fLighting
+#define HOOKPOS_CMonsterTruck__LightingClamp  0x6D0E0F
+#define HOOKSIZE_CMonsterTruck__LightingClamp 12
+static DWORD CONTINUE_CMonsterTruck__LightingClamp = 0x6D0E1B;
+
+static constexpr float MONSTERTRUCK_MIN_LIGHTING = 0.36f;
+static float           s_CalcLightingTemp;
+
+static bool __fastcall IsMonsterTruckByIdx(CVehicleSAInterface* vehicle)
+{
+    if (!vehicle)
+        return false;
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
+    return modelId == 444 || modelId == 556 || modelId == 557;
+}
+
+static void __declspec(naked) HOOK_CMonsterTruck__LightingClamp()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        fmul    dword ptr ds:[00858C84h]   // original: * 0.5
+
+        push    ecx
+        call    IsMonsterTruckByIdx        // al = true if monster truck
+        test    al, al
+        pop     ecx
+        jz      skipClamp
+
+        fst     dword ptr [s_CalcLightingTemp]
+        fld     dword ptr ds:[MONSTERTRUCK_MIN_LIGHTING]
+        fcomp   dword ptr [s_CalcLightingTemp]   // compare min vs calc, pop min
+        // ST0 = calculated.  Flags: min > calc => CF=1 => ja not taken => clamp
+        fstsw   ax
+        sahf
+        ja      clampIt
+        // calculated >= min
+        jmp     skipClamp
+    clampIt:
+        fstp    st(0)
+        fld     dword ptr ds:[MONSTERTRUCK_MIN_LIGHTING]
+    skipClamp:
+        fstp    dword ptr [ecx + 0x12C]    // original: m_fLighting
+        jmp     CONTINUE_CMonsterTruck__LightingClamp
+    }
+    // clang-format on
+}
+
+// >>> 0x6C8C10 | 88 84 31 74 05 00 00 | mov byte ptr [ecx+esi+574h], al
+#define HOOKPOS_CMonsterTruck__WheelLightingFilter  0x6C8C10
+#define HOOKSIZE_CMonsterTruck__WheelLightingFilter 7
+static DWORD CONTINUE_CMonsterTruck__WheelLightingFilter = 0x6C8C17;
+
+static void __declspec(naked) HOOK_CMonsterTruck__WheelLightingFilter()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        cmp     al, 0xFF
+        je      skipWrite
+        cmp     al, 0x00
+        je      skipWrite
+        mov     byte ptr [ecx + esi + 0x574], al
+    skipWrite:
+        jmp     CONTINUE_CMonsterTruck__WheelLightingFilter
+    }
+    // clang-format on
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_Vehicles
@@ -4904,4 +4978,6 @@ void CMultiplayerSA::InitHooks_Vehicles()
     EZHookInstall(CVehicle__UpdateTrailerLink_TowTruck);
     EZHookInstall(CVehicle__UpdateTractorLink_TowTruck);
     EZHookInstall(CAutomobile__Constructor_TowTruckBouncingPanel);
+    EZHookInstall(CMonsterTruck__LightingClamp);
+    EZHookInstall(CMonsterTruck__WheelLightingFilter);
 }
