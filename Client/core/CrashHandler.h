@@ -198,6 +198,16 @@ struct ENHANCED_EXCEPTION_INFO
 };
 using PENHANCED_EXCEPTION_INFO = ENHANCED_EXCEPTION_INFO*;
 
+// A stored enhanced record belongs to the exception being reported only when
+// both the code and the fault address match the current record. Comparing the
+// code alone can reuse a record left over from an earlier, already handled
+// exception of the same type, which would stamp the old crash's module,
+// offset, and registers onto the new report.
+[[nodiscard]] inline bool IsEnhancedInfoFreshFor(const ENHANCED_EXCEPTION_INFO& info, const EXCEPTION_RECORD& record)
+{
+    return info.exceptionCode == record.ExceptionCode && info.exceptionAddress == record.ExceptionAddress;
+}
+
 extern "C"
 {
 #endif
