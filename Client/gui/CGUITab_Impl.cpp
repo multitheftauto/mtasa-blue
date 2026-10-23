@@ -87,3 +87,23 @@ bool CGUITab_Impl::IsEnabled()
     CEGUI::TabControl* pControl = reinterpret_cast<CEGUI::TabControl*>(((CGUITabPanel_Impl*)pParent)->m_pWindow);
     return !pControl->getButtonForTabContents(m_pWindow)->isDisabled();
 }
+
+void CGUITab_Impl::SetColorCodesEnabled(bool bEnabled)
+{
+    CGUIElement_Impl::SetColorCodesEnabled(bEnabled);
+
+    if (m_pParent && m_pParent->GetType() == CGUI_TABPANEL)
+    {
+        CGUIElement_Impl*  pParent = static_cast<CGUIElement_Impl*>(m_pParent);
+        CEGUI::TabControl* pTabControl = reinterpret_cast<CEGUI::TabControl*>(((CGUITabPanel_Impl*)pParent)->m_pWindow);
+        if (pTabControl)
+        {
+            CEGUI::TabButton* pButton = pTabControl->getButtonForTabContents(m_pWindow);
+            if (pButton)
+            {
+                pButton->setUserString("ColorCodesEnabled", bEnabled ? "True" : "False");
+                pButton->forceRedraw();
+            }
+        }
+    }
+}
