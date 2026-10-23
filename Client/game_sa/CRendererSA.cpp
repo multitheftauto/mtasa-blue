@@ -62,3 +62,9 @@ void CRendererSA::RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, flo
     // Restore ambient light
     SetAmbientColours();
 }
+
+void CRendererSA::RequestObjectsInDirection(const CVector& position, float headingRadians)
+{
+    auto CRenderer_RequestObjectsInDirection = (void(__cdecl*)(const CVector&, float))FUNC_CRenderer_RequestObjectsInDirection;
+    CRenderer_RequestObjectsInDirection(position, headingRadians);
+}

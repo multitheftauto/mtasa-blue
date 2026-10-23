@@ -95,7 +95,7 @@ public:
     static bool EngineStreamingReleaseModel(lua_State* const luaVM, std::uint16_t modelId, std::optional<bool> removeReference);
     static eModelLoadState EngineStreamingGetModelLoadState(std::uint16_t modelId);
 
-    static void EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option);
+    static void EnginePreloadWorldArea(CVector position, std::optional<PreloadAreaOption> option, std::optional<float> heading);
     static bool EngineRestreamModel(std::uint16_t modelId);
     static void EngineRestream(std::optional<RestreamOption> option);
 
