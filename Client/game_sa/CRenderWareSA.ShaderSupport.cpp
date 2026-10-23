@@ -13,6 +13,7 @@
 #include "StdInc.h"
 #include <core/CCoreInterface.h>
 #include "CGameSA.h"
+#include "CHudSA.h"
 #include "CRenderWareSA.ShaderMatching.h"
 #include "CRenderWareSA.ShaderSupport.h"
 
@@ -1081,9 +1082,11 @@ static void __declspec(naked) HOOK_RwIm2DRenderIndexedPrimitive()
 // Note that RwIm2DRenderPrimitive is being called to render something
 //
 //////////////////////////////////////////////////////////////////////////////////////////
-__declspec(noinline) void OnMY_RwIm2DRenderPrimitive_Pre(DWORD dwAddrCalledFrom)
+__declspec(noinline) void OnMY_RwIm2DRenderPrimitive_Pre(DWORD dwAddrCalledFrom, void* pVertices, int iNumVertices)
 {
     CRenderWareSA::ms_iRenderingType = RT_2DNI;
+
+    CHudSA::ApplyHudVertexTransform(pVertices, iNumVertices);
 }
 
 __declspec(noinline) void OnMY_RwIm2DRenderPrimitive_Post(DWORD dwAddrCalledFrom)
@@ -1103,9 +1106,11 @@ static void __declspec(naked) HOOK_RwIm2DRenderPrimitive()
     __asm
     {
         pushad
-        push    [esp+32+4*0]
+        push    [esp+32+4*3]    // numVertices
+        push    [esp+32+4*3]    // vertices
+        push    [esp+32+4*2]    // address called from
         call    OnMY_RwIm2DRenderPrimitive_Pre
-        add     esp, 4*1
+        add     esp, 4*3
         popad
 
         push    [esp+4*3]
