@@ -453,8 +453,8 @@ public:
     void GetGravity(CVector& vecGravity) const { vecGravity = m_vecGravity; }
     void SetGravity(const CVector& vecGravity);
 
-    SColor GetHeadLightColor();
-    void   SetHeadLightColor(const SColor color);
+    SColor GetHeadLightColor(HeadlightSide side = HeadlightSide::Left);
+    void   SetHeadLightColor(const SColor color, HeadlightSide side = HeadlightSide::Both);
 
     int GetCurrentGear();
 
@@ -728,7 +728,7 @@ protected:
     bool m_bNitroActivated;
 
     CVector m_vecGravity;
-    SColor  m_HeadLightColor;
+    SColor  m_headlightColors[2]{SColorRGBA(255, 255, 255, 255), SColorRGBA(255, 255, 255, 255)};
 
     bool m_bHasCustomHandling;
 
