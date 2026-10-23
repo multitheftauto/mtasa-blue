@@ -148,6 +148,7 @@ struct SAnimationCache
     float        speed{1.0f};
     bool         progressWaitForStreamIn{false};
     std::int64_t startTime{0};
+    bool         isSecondary{false};
 };
 
 class CClientObject;
@@ -478,7 +479,7 @@ public:
 
     void RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime = -1, int iBlend = 250, bool bLoop = true,
                            bool bUpdatePosition = true, bool bInterruptible = false, bool bFreezeLastFrame = true, bool bRunInSequence = false,
-                           bool bOffsetPed = false, bool bHoldLastFrame = false);
+                           bool bOffsetPed = false, bool bHoldLastFrame = false, bool isSecondary = false);
     void KillAnimation();
     std::unique_ptr<CAnimBlock> GetAnimationBlock();
     const SAnimationCache&      GetAnimationCache() const noexcept { return m_AnimationCache; }
