@@ -16,8 +16,8 @@
 #include <game/CColPoint.h>
 #include "CCompressedVectorSA.h"
 
-#define FUNC_CColModel_Constructor      0x40FB60
-#define FUNC_CColModel_Destructor       0x40F700
+#define FUNC_CColModel_Constructor 0x40FB60
+#define FUNC_CColModel_Destructor  0x40F700
 
 struct CBoxSA
 {
@@ -97,10 +97,7 @@ struct CColSphereSA : CSphereSA
     std::uint8_t m_light{};
 
     CColSphereSA() = default;
-    CColSphereSA(const CSphereSA& sp) :
-        CSphereSA{ sp }
-    {
-    }
+    CColSphereSA(const CSphereSA& sp) : CSphereSA{sp} {}
 };
 static_assert(sizeof(CColSphereSA) == 0x14, "Invalid size for CColSphereSA");
 

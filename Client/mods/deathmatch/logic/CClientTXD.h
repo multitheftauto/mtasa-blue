@@ -21,9 +21,9 @@ public:
     CClientTXD(class CClientManager* pManager, ElementID ID);
     ~CClientTXD();
 
-    void Unlink(){};
+    void Unlink() {};
     void GetPosition(CVector& vecPosition) const {};
-    void SetPosition(const CVector& vecPosition){};
+    void SetPosition(const CVector& vecPosition) {};
 
     eClientEntityType GetType() const { return CCLIENTTXD; }
     bool              Load(bool isRaw, SString input, bool enableFiltering);
