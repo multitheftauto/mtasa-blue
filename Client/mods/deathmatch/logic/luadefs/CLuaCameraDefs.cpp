@@ -297,20 +297,70 @@ int CLuaCameraDefs::GetCameraFieldOfView(lua_State* luaVM)
 
 int CLuaCameraDefs::SetCameraTarget(lua_State* luaVM)
 {
-    //  bool setCameraTarget ( element target = nil ) or setCameraTarget ( float x, float y, float z )
+    //  bool setCameraTarget ( [ element target = nil ] )
+    //  bool setCameraTarget ( float targetX, float targetY, float targetZ )
+    //  bool setCameraTarget ( Vector3 target )
+    //  bool setCameraTarget ( element target, float lookAtX, float lookAtY, float lookAtZ )
+    //  bool setCameraTarget ( element target, Vector3 lookAt )
+    //  bool setCameraTarget ( element target, element lookAtTarget )
 
     CScriptArgReader argStream(luaVM);
     if (argStream.NextIsUserDataOfType<CClientEntity>())
     {
-        CClientEntity* pTarget;
-        argStream.ReadUserData(pTarget);
+        CClientEntity* targetEntity = nullptr;
+        argStream.ReadUserData(targetEntity);
 
-        if (pTarget->GetType() != CCLIENTPLAYER)
+        if (targetEntity && targetEntity->GetType() != CCLIENTPLAYER)
             MinClientReqCheck(argStream, MIN_CLIENT_REQ_SETCAMERATARGET_USE_ANY_ELEMENTS, "target is not a player");
+
+        if (argStream.NextIsUserDataOfType<CClientEntity>())
+        {
+            CClientEntity* lookAtTarget = nullptr;
+            argStream.ReadUserData(lookAtTarget);
+
+            if (!argStream.HasErrors())
+            {
+                if (CStaticFunctionDefinitions::SetCameraTarget(targetEntity, lookAtTarget))
+                {
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+        }
+        else if (argStream.NextIsNumber() || argStream.NextIsUserDataOfType<CLuaVector3D>())
+        {
+            CVector targetLookAt;
+            argStream.ReadVector3D(targetLookAt);
+
+            if (!argStream.HasErrors())
+            {
+                if (CStaticFunctionDefinitions::SetCameraTarget(targetEntity, targetLookAt))
+                {
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+        }
+        else
+        {
+            if (!argStream.HasErrors())
+            {
+                if (CStaticFunctionDefinitions::SetCameraTarget(targetEntity))
+                {
+                    lua_pushboolean(luaVM, true);
+                    return 1;
+                }
+            }
+        }
+    }
+    else if (argStream.NextIsNumber() || argStream.NextIsUserDataOfType<CLuaVector3D>())
+    {
+        CVector orbitTarget;
+        argStream.ReadVector3D(orbitTarget);
 
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::SetCameraTarget(pTarget))
+            if (CStaticFunctionDefinitions::SetCameraTarget(orbitTarget))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -319,12 +369,12 @@ int CLuaCameraDefs::SetCameraTarget(lua_State* luaVM)
     }
     else
     {
-        CVector vecTarget;
-        argStream.ReadVector3D(vecTarget);
+        CClientEntity* pTarget = nullptr;
+        argStream.ReadUserData(pTarget, nullptr);
 
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::SetCameraTarget(vecTarget))
+            if (CStaticFunctionDefinitions::SetCameraTarget(pTarget))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
