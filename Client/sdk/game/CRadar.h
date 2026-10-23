@@ -22,4 +22,5 @@ public:
     virtual CMarker* CreateMarker(CVector* vecPosition) = 0;
     virtual CMarker* GetFreeMarker() = 0;
     virtual void     DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SharedUtil::SColor color) = 0;
+    virtual bool     IsPointWithinRadarCircle(const CVector* vecPosition) = 0;
 };
