@@ -61,7 +61,7 @@ public:
                       CClientEntity* pTarget, eWeaponType weaponType, CVector* pvecOrigin, CVector* pvecTarget, float fForce, bool bLocal);
     ~CClientProjectile();
 
-    eClientEntityType GetType() const { return CCLIENTPROJECTILE; }
+    ElementType::Enum GetType() const { return ElementType::PROJECTILE; }
     CEntity*          GetGameEntity() { return m_pProjectile; }
     const CEntity*    GetGameEntity() const { return m_pProjectile; }
     void              Unlink();

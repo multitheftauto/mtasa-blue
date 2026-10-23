@@ -148,13 +148,13 @@ CEntity* CProjectileInfoSA::GetTarget()
     {
         switch (pTargetInterface->nType)
         {
-            case ENTITY_TYPE_PED:
+            case EntityType::PED:
             {
                 SClientEntity<CPedSA>* pPedClientEntity = pGame->GetPools()->GetPed((DWORD*)pTargetInterface);
                 pTarget = pPedClientEntity ? pPedClientEntity->pEntity : nullptr;
                 break;
             }
-            case ENTITY_TYPE_VEHICLE:
+            case EntityType::VEHICLE:
             {
                 SClientEntity<CVehicleSA>* pVehicleClientEntity = pGame->GetPools()->GetVehicle((DWORD*)pTargetInterface);
                 pTarget = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;

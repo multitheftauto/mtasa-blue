@@ -335,13 +335,13 @@ bool CStaticFunctionDefinitions::DestroyElement(CElement* pElement)
 
     // We can't destroy the root or a player/remote client/console
     int iType = pElement->GetType();
-    if (pElement == m_pMapManager->GetRootElement() || iType == CElement::PLAYER || iType == CElement::CONSOLE ||
+    if (pElement == m_pMapManager->GetRootElement() || iType == ElementType::PLAYER || iType == ElementType::CONSOLE ||
         g_pGame->GetResourceManager()->IsAResourceElement(pElement))
     {
         return false;
     }
 
-    if (iType == CElement::TEAM)
+    if (iType == ElementType::TEAM)
     {  // Its team trigger onPlayerTeamChange for each player in the team
         CTeam* pTeam = static_cast<CTeam*>(pElement);
 
@@ -594,10 +594,10 @@ CColShape* CStaticFunctionDefinitions::GetElementColShape(CElement* pElement)
     CColShape* pColShape = NULL;
     switch (pElement->GetType())
     {
-        case CElement::MARKER:
+        case ElementType::MARKER:
             pColShape = static_cast<CMarker*>(pElement)->GetColShape();
             break;
-        case CElement::PICKUP:
+        case ElementType::PICKUP:
             pColShape = static_cast<CPickup*>(pElement)->GetColShape();
             break;
         default:
@@ -612,32 +612,32 @@ bool CStaticFunctionDefinitions::GetElementAlpha(CElement* pElement, unsigned ch
 
     switch (pElement->GetType())
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             ucAlpha = pPed->GetAlpha();
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             ucAlpha = pVehicle->GetAlpha();
             break;
         }
-        case CElement::OBJECT:
-        case CElement::WEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             ucAlpha = pObject->GetAlpha();
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             ucAlpha = static_cast<CBuilding*>(pElement)->GetAlpha();
             break;
         }
-        case CElement::MARKER:
+        case ElementType::MARKER:
         {
             CMarker* pMarker = static_cast<CMarker*>(pElement);
             ucAlpha = pMarker->GetColor().A;
@@ -664,20 +664,20 @@ bool CStaticFunctionDefinitions::GetElementHealth(CElement* pElement, float& fHe
 
     switch (pElement->GetType())
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             fHealth = pPed->GetHealth();
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             fHealth = pVehicle->GetHealth();
             break;
         }
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             fHealth = pObject->GetHealth();
@@ -696,32 +696,32 @@ bool CStaticFunctionDefinitions::GetElementModel(CElement* pElement, unsigned sh
 
     switch (pElement->GetType())
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             usModel = pPed->GetModel();
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             usModel = pVehicle->GetModel();
             break;
         }
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             usModel = pObject->GetModel();
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
             usModel = pBuilding->GetModel();
             break;
         }
-        case CElement::PICKUP:
+        case ElementType::PICKUP:
         {
             CPickup* pPickup = static_cast<CPickup*>(pElement);
             usModel = pPickup->GetModel();
@@ -746,19 +746,19 @@ CElement* CStaticFunctionDefinitions::GetElementSyncer(CElement* pElement)
 
     switch (pElement->GetType())
     {
-        case CElement::PED:
+        case ElementType::PED:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             return pPed->IsSyncable() ? static_cast<CElement*>(pPed->GetSyncer()) : NULL;
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             return pVehicle->IsUnoccupiedSyncable() ? static_cast<CElement*>(pVehicle->GetSyncer()) : NULL;
             break;
         }
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             return pObject->IsSyncable() ? static_cast<CElement*>(pObject->GetSyncer()) : NULL;
@@ -777,24 +777,24 @@ bool CStaticFunctionDefinitions::GetElementCollisionsEnabled(CElement* pElement)
 
     switch (pElement->GetType())
     {
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             return pVehicle->GetCollisionEnabled();
         }
-        case CElement::OBJECT:
-        case CElement::WEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             return pObject->GetCollisionEnabled();
         }
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             return pPed->GetCollisionEnabled();
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             return static_cast<CBuilding*>(pElement)->GetCollisionEnabled();
         }
@@ -811,21 +811,21 @@ bool CStaticFunctionDefinitions::IsElementFrozen(CElement* pElement, bool& bFroz
 
     switch (pElement->GetType())
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             bFrozen = pPed->IsFrozen();
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             bFrozen = pVehicle->IsFrozen();
             break;
         }
-        case CElement::OBJECT:
-        case CElement::WEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             bFrozen = pObject->IsFrozen();
@@ -844,21 +844,21 @@ bool CStaticFunctionDefinitions::SetLowLodElement(CElement* pElement, CElement* 
 
     switch (pElement->GetType())
     {
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             CObject* pLowLodObject = NULL;
-            if (pLowLodElement && pLowLodElement->GetType() == CElement::OBJECT)
+            if (pLowLodElement && pLowLodElement->GetType() == ElementType::OBJECT)
                 pLowLodObject = static_cast<CObject*>(pLowLodElement);
             if (!pObject->SetLowLodObject(pLowLodObject))
                 return false;
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
             CBuilding* pLowLodObject = nullptr;
-            if (pLowLodElement && pLowLodElement->GetType() == CElement::BUILDING)
+            if (pLowLodElement && pLowLodElement->GetType() == ElementType::BUILDING)
                 pLowLodObject = static_cast<CBuilding*>(pLowLodElement);
             if (!pBuilding->SetLowLodBuilding(pLowLodObject))
                 return false;
@@ -883,13 +883,13 @@ bool CStaticFunctionDefinitions::GetLowLodElement(CElement* pElement, CElement*&
 
     switch (pElement->GetType())
     {
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pOutLowLodElement = pObject->GetLowLodObject();
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             pOutLowLodElement = static_cast<CBuilding*>(pElement)->GetLowLodElement();
             break;
@@ -907,13 +907,13 @@ bool CStaticFunctionDefinitions::IsElementLowLod(CElement* pElement, bool& bOutI
 
     switch (pElement->GetType())
     {
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             bOutIsLowLod = pObject->IsLowLod();
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             bOutIsLowLod = static_cast<CBuilding*>(pElement)->GetHighLodBuilding() ? true : false;
             break;
@@ -931,8 +931,8 @@ bool CStaticFunctionDefinitions::IsElementInWater(CElement* pElement, bool& bInW
 
     switch (pElement->GetType())
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             if (pPed->GetOccupiedVehicle())
@@ -946,7 +946,7 @@ bool CStaticFunctionDefinitions::IsElementInWater(CElement* pElement, bool& bInW
                 break;
             }
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             bInWater = pVehicle->IsInWater();
@@ -1203,15 +1203,15 @@ bool CStaticFunctionDefinitions::GetElementRotation(CElement* pElement, CVector&
     int iType = pElement->GetType();
     switch (iType)
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             vecRotation.fZ = ConvertRadiansToDegrees(pPed->GetRotation());  // No conversion since only Z is used
 
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             pVehicle->GetRotationDegrees(vecRotation);
@@ -1222,7 +1222,7 @@ bool CStaticFunctionDefinitions::GetElementRotation(CElement* pElement, CVector&
 
             break;
         }
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->GetRotation(vecRotation);
@@ -1234,7 +1234,7 @@ bool CStaticFunctionDefinitions::GetElementRotation(CElement* pElement, CVector&
 
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
             pBuilding->GetRotation(vecRotation);
@@ -1260,15 +1260,15 @@ bool CStaticFunctionDefinitions::GetElementVelocity(CElement* pElement, CVector&
     int iType = pElement->GetType();
     switch (iType)
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             pPed->GetVelocity(vecVelocity);
 
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             vecVelocity = pVehicle->GetVelocity();
@@ -1289,7 +1289,7 @@ bool CStaticFunctionDefinitions::GetElementTurnVelocity(CElement* pElement, CVec
     int iType = pElement->GetType();
     switch (iType)
     {
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             vecTurnVelocity = pVehicle->GetTurnSpeed();
@@ -1319,7 +1319,7 @@ bool CStaticFunctionDefinitions::SetElementMatrix(CElement* pElement, const CMat
     ConvertRadiansToDegrees(vecRotation);
 
     eEulerRotationOrder rotationOrder = EULER_DEFAULT;
-    if (pElement->GetType() == CElement::OBJECT)
+    if (pElement->GetType() == ElementType::OBJECT)
         rotationOrder = EULER_ZYX;
 
     CStaticFunctionDefinitions::SetElementRotation(pElement, vecRotation, rotationOrder, true);
@@ -1341,7 +1341,7 @@ bool CStaticFunctionDefinitions::SetElementPosition(CElement* pElement, const CV
     // Update our position for that entity.
     pElement->SetPosition(vecPosition);
 
-    if (pElement->GetType() != CElement::COLSHAPE)
+    if (pElement->GetType() != ElementType::COLSHAPE)
     {
         // Run colpoint checks
         m_pColManager->DoHitDetection(pElement->GetPosition(), pElement);
@@ -1383,15 +1383,15 @@ bool CStaticFunctionDefinitions::SetElementRotation(CElement* pElement, const CV
     int iType = pElement->GetType();
     switch (iType)
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             SetPedRotation(pPed, vecRotation.fZ, bNewWay);  // No rotation order conversion required since only Z is used
 
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZYX)
@@ -1406,7 +1406,7 @@ bool CStaticFunctionDefinitions::SetElementRotation(CElement* pElement, const CV
 
             break;
         }
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             if (argumentRotOrder == EULER_DEFAULT || argumentRotOrder == EULER_ZXY)
@@ -1421,7 +1421,7 @@ bool CStaticFunctionDefinitions::SetElementRotation(CElement* pElement, const CV
 
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
             CVector    vecRadians = vecRotation;
@@ -1460,23 +1460,23 @@ bool CStaticFunctionDefinitions::SetElementVelocity(CElement* pElement, const CV
     int iType = pElement->GetType();
     switch (iType)
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             pPed->SetVelocity(vecVelocity);
 
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             pVehicle->SetVelocity(vecVelocity);
 
             break;
         }
-        case CElement::OBJECT:
-        case CElement::WEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             // Don't store velocity serverside (requires potentially needless additional sizeof(CVector) bytes per object)
             break;
@@ -1505,21 +1505,21 @@ bool CStaticFunctionDefinitions::SetElementAngularVelocity(CElement* pElement, c
     int iType = pElement->GetType();
     switch (iType)
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             // TODO
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             pVehicle->SetTurnSpeed(vecTurnVelocity);
 
             break;
         }
-        case CElement::OBJECT:
-        case CElement::WEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             // Don't store velocity serverside (requires potentially needless additional sizeof(CVector) bytes per object)
             break;
@@ -1565,12 +1565,12 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
         // Re-evaluate marker/pickup collisions after interior changes
         switch (pElement->GetType())
         {
-            case CElement::PLAYER:
-            case CElement::PED:
-            case CElement::VEHICLE:
+            case ElementType::PLAYER:
+            case ElementType::PED:
+            case ElementType::VEHICLE:
                 m_pColManager->DoHitDetection(pElement->GetPosition(), pElement);
                 break;
-            case CElement::MARKER:
+            case ElementType::MARKER:
             {
                 CMarker*   pMarker = static_cast<CMarker*>(pElement);
                 CColShape* pColShape = pMarker->GetColShape();
@@ -1578,7 +1578,7 @@ bool CStaticFunctionDefinitions::SetElementInterior(CElement* pElement, unsigned
                     RefreshColShapeColliders(pColShape);
                 break;
             }
-            case CElement::PICKUP:
+            case ElementType::PICKUP:
             {
                 CPickup*   pPickup = static_cast<CPickup*>(pElement);
                 CColShape* pColShape = pPickup->GetColShape();
@@ -1619,7 +1619,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
     assert(pElement);
     RUN_CHILDREN(SetElementDimension(*iter, usDimension))
 
-    if (pElement->GetType() == CElement::TEAM)
+    if (pElement->GetType() == ElementType::TEAM)
     {
         CTeam*                         pTeam = static_cast<CTeam*>(pElement);
         list<CPlayer*>::const_iterator iter = pTeam->PlayersBegin();
@@ -1632,7 +1632,7 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
         }
     }
 
-    if (pElement->GetType() == CElement::VEHICLE)
+    if (pElement->GetType() == ElementType::VEHICLE)
     {
         CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
         CPed*     pOccupant;
@@ -1648,8 +1648,8 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
 
     switch (pElement->GetType())
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             if (!pPed->IsSpawned())
@@ -1657,18 +1657,18 @@ bool CStaticFunctionDefinitions::SetElementDimension(CElement* pElement, unsigne
                 return false;
             }
         }
-        case CElement::TEAM:
-        case CElement::COLSHAPE:
-        case CElement::DUMMY:
-        case CElement::VEHICLE:
-        case CElement::OBJECT:
-        case CElement::BUILDING:
-        case CElement::MARKER:
-        case CElement::BLIP:
-        case CElement::PICKUP:
-        case CElement::RADAR_AREA:
-        case CElement::WORLD_MESH_UNUSED:
-        case CElement::WATER:
+        case ElementType::TEAM:
+        case ElementType::COLSHAPE:
+        case ElementType::DUMMY:
+        case ElementType::VEHICLE:
+        case ElementType::OBJECT:
+        case ElementType::MARKER:
+        case ElementType::BUILDING:
+        case ElementType::BLIP:
+        case ElementType::PICKUP:
+        case ElementType::RADAR_AREA:
+        // case CElement::WORLD_MESH_UNUSED:
+        case ElementType::WATER:
         {
             pElement->SetDimension(usDimension);
             CBitStream bitStream;
@@ -1800,32 +1800,32 @@ bool CStaticFunctionDefinitions::SetElementAlpha(CElement* pElement, unsigned ch
 
     switch (pElement->GetType())
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             pPed->SetAlpha(ucAlpha);
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             pVehicle->SetAlpha(ucAlpha);
             break;
         }
-        case CElement::OBJECT:
-        case CElement::WEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->SetAlpha(ucAlpha);
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             static_cast<CBuilding*>(pElement)->SetAlpha(ucAlpha);
             break;
         }
-        case CElement::MARKER:
+        case ElementType::MARKER:
         {
             CMarker* pMarker = static_cast<CMarker*>(pElement);
             SColor   color = pMarker->GetColor();
@@ -1865,8 +1865,8 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
 
     switch (pElement->GetType())
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             if (!pPed->IsSpawned())
@@ -1900,13 +1900,13 @@ bool CStaticFunctionDefinitions::SetElementHealth(CElement* pElement, float fHea
 
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             pVehicle->SetHealth(fHealth);
             break;
         }
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->SetHealth(fHealth);
@@ -1931,8 +1931,8 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
 
     switch (pElement->GetType())
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             if (pPed->GetModel() == usModel)
@@ -1957,7 +1957,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             }
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             if (pVehicle->GetModel() == usModel)
@@ -2000,7 +2000,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
 
             break;
         }
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             if (pObject->GetModel() == usModel)
@@ -2025,7 +2025,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
             }
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             CBuilding* pBuilding = static_cast<CBuilding*>(pElement);
             if (pBuilding->GetModel() == usModel)
@@ -2056,7 +2056,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CElement* pElement, unsigned sh
 
     CBitStream BitStream;
     BitStream.pBitStream->Write(usModel);
-    if (pElement->GetType() == CElement::VEHICLE)
+    if (pElement->GetType() == ElementType::VEHICLE)
     {
         CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
         BitStream.pBitStream->Write(pVehicle->GetVariant());
@@ -2112,7 +2112,7 @@ bool CStaticFunctionDefinitions::SetElementSyncer(CElement* pElement, CPlayer* p
 
     switch (pElement->GetType())
     {
-        case CElement::PED:
+        case ElementType::PED:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             pPed->SetSyncable(bEnable);
@@ -2120,7 +2120,7 @@ bool CStaticFunctionDefinitions::SetElementSyncer(CElement* pElement, CPlayer* p
             return true;
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             pVehicle->SetUnoccupiedSyncable(bEnable);
@@ -2129,7 +2129,7 @@ bool CStaticFunctionDefinitions::SetElementSyncer(CElement* pElement, CPlayer* p
             break;
         }
 #ifdef WITH_OBJECT_SYNC
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->SetSyncable(bEnable);
@@ -2150,27 +2150,27 @@ bool CStaticFunctionDefinitions::SetElementCollisionsEnabled(CElement* pElement,
 
     switch (pElement->GetType())
     {
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             pVehicle->SetCollisionEnabled(bEnable);
             break;
         }
-        case CElement::OBJECT:
-        case CElement::WEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->SetCollisionEnabled(bEnable);
             break;
         }
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             pPed->SetCollisionEnabled(bEnable);
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             static_cast<CBuilding*>(pElement)->SetCollisionEnabled(bEnable);
             break;
@@ -2193,21 +2193,21 @@ bool CStaticFunctionDefinitions::SetElementFrozen(CElement* pElement, bool bFroz
 
     switch (pElement->GetType())
     {
-        case CElement::PED:
-        case CElement::PLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPed* pPed = static_cast<CPed*>(pElement);
             pPed->SetFrozen(bFrozen);
             break;
         }
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* pVehicle = static_cast<CVehicle*>(pElement);
             pVehicle->SetFrozen(bFrozen);
             break;
         }
-        case CElement::OBJECT:
-        case CElement::WEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CObject* pObject = static_cast<CObject*>(pElement);
             pObject->SetFrozen(bFrozen);
@@ -2230,12 +2230,12 @@ bool CStaticFunctionDefinitions::GetPlayerName(CElement* pElement, SString& strO
 
     switch (pElement->GetType())
     {
-        case CElement::PLAYER:
+        case ElementType::PLAYER:
         {
             strOutNick = static_cast<CPlayer*>(pElement)->GetNick();
             break;
         }
-        case CElement::CONSOLE:
+        case ElementType::CONSOLE:
         {
             strOutNick = "Console";
             break;
@@ -2253,12 +2253,12 @@ bool CStaticFunctionDefinitions::GetPlayerIP(CElement* pElement, SString& strOut
 
     switch (pElement->GetType())
     {
-        case CElement::PLAYER:
+        case ElementType::PLAYER:
         {
             strOutIP = static_cast<CPlayer*>(pElement)->GetSourceIP();
             break;
         }
-        case CElement::CONSOLE:
+        case ElementType::CONSOLE:
         {
             strOutIP = "127.0.0.1";
             break;
@@ -4954,9 +4954,9 @@ bool CStaticFunctionDefinitions::SetCameraTarget(CElement* pElement, CElement* p
         // Make sure our target is supported
         switch (pTarget->GetType())
         {
-            case CElement::PLAYER:
-            case CElement::PED:
-            case CElement::VEHICLE:
+            case ElementType::PLAYER:
+            case ElementType::PED:
+            case ElementType::VEHICLE:
             {
                 pCamera->SetMode(CAMERAMODE_PLAYER);
                 pCamera->SetTarget(pTarget);
@@ -9072,7 +9072,7 @@ bool CStaticFunctionDefinitions::SetPickupRespawnInterval(CElement* pElement, un
     assert(pElement);
     RUN_CHILDREN(SetPickupRespawnInterval(*iter, ulInterval))
 
-    if (pElement->GetType() == CElement::PICKUP)
+    if (pElement->GetType() == ElementType::PICKUP)
     {
         CPickup* pPickup = static_cast<CPickup*>(pElement);
         pPickup->SetRespawnIntervals(ulInterval);
@@ -9087,7 +9087,7 @@ bool CStaticFunctionDefinitions::UsePickup(CElement* pElement, CPlayer* pPlayer)
     assert(pPlayer);
     RUN_CHILDREN(UsePickup(*iter, pPlayer))
 
-    if (pElement->GetType() == CElement::PICKUP)
+    if (pElement->GetType() == ElementType::PICKUP)
     {
         CPickup* pPickup = static_cast<CPickup*>(pElement);
         if (pPickup->CanUse(*pPlayer, false))

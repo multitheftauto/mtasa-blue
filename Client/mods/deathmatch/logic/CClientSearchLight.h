@@ -22,7 +22,7 @@ public:
     ~CClientSearchLight();
 
     void              Unlink();
-    eClientEntityType GetType() const { return CCLIENTSEARCHLIGHT; }
+    ElementType::Enum GetType() const { return ElementType::SEARCHLIGHT; }
 
     // CClientEntity methods
     virtual void GetPosition(CVector& vecPosition) const override { vecPosition = m_StartPosition; }  // required for streaming

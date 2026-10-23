@@ -31,7 +31,7 @@ int CLuaFunctionDefs::SetWeaponAmmo(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (pElement->GetType() != CElement::WEAPON)
+        if (pElement->GetType() != ElementType::WEAPON)
         {
             argStream.ReadEnumStringOrNumber(weaponType);
             argStream.ReadNumber(usAmmo);
