@@ -295,5 +295,8 @@ enum eElementRPCFunctions
 
     SET_CUSTOM_WEAPON_WEAPON_RANGE,
 
+    SET_COLSHAPE_CHECK_DIMENSION,
+    SET_COLSHAPE_CHECK_INTERIOR,
+
     NUM_RPC_FUNCS  // Add above this line
 };
