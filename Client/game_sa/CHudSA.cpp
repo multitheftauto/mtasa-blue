@@ -133,6 +133,10 @@ void CHudSA::InitComponentList()
         {1, HUD_RADAR_MAP, 1, FUNC_CRadar_DrawRadarMap, 1, 0xCC, 0xC3},
         {1, HUD_RADAR_BLIPS, 1, FUNC_CRadar_DrawBlips, 1, 0xCC, 0xC3},
         {1, HUD_RADAR_ALTIMETER, 1, CODE_ShowRadarAltimeter, 2, 0xCC, 0xEB30},
+        {1, HUD_RADAR_DISC, 1, CODE_ShowRadarDisc, 5, 0xCC, HudMakeRelativeJump(CODE_ShowRadarDisc, CODE_DrawRadarBlipsPart)},
+        {1, HUD_RADAR_HORIZON, 1, CODE_ShowRadarHorizon, 2, 0xCC, 0xE990, CODE_ShowRadarMapHorizon, 2, 0xCC, 0xE990},
+        {1, HUD_RADAR_AIRSTRIP_BLIP, 1, CODE_ShowRadarAirstripBlip, 2, 0xCC, 0xE990},
+        {1, HUD_SNIPER_BACKGROUND, 1, CODE_ShowSniperBackground, 1, 0xCC, 0xFF},
         {1, HUD_CLOCK, 0, VAR_DisableClock, 1, 1, 0},
         {1, HUD_RADIO, 1, FUNC_DrawRadioName, 1, 0xCC, 0xC3},
         {1, HUD_WANTED, 1, FUNC_DrawWantedLevel, 1, 0xCC, 0xC3},
@@ -172,7 +176,9 @@ void CHudSA::SetComponentVisible(eHudComponent component, bool bVisible)
         // Save original bytes if required
         if (pComponent->bSaveOriginalBytes)
         {
-            pComponent->origData = *(DWORD*)pComponent->uiDataAddr;
+            pComponent->origData = *(std::uint64_t*)pComponent->uiDataAddr;
+            if (pComponent->uiDataSize2 > 0)
+                pComponent->origData2 = *(std::uint64_t*)pComponent->uiDataAddr2;
             pComponent->bSaveOriginalBytes = false;
         }
 
@@ -185,6 +191,14 @@ void CHudSA::SetComponentVisible(eHudComponent component, bool bVisible)
                 MemPut<BYTE>(pDest + i, pSrc[i]);
             else
                 MemPutFast<BYTE>(pDest + i, pSrc[i]);
+        }
+
+        if (pComponent->uiDataSize2 > 0)
+        {
+            uchar* pSrc2 = (uchar*)(bVisible ? &pComponent->origData2 : &pComponent->disabledData2);
+            uchar* pDest2 = (uchar*)(pComponent->uiDataAddr2);
+            for (uint i = 0; i < pComponent->uiDataSize2; i++)
+                MemPut<BYTE>(pDest2 + i, pSrc2[i]);
         }
     }
 }
