@@ -152,6 +152,17 @@ CDatabaseJobQueueImpl::~CDatabaseJobQueueImpl()
 ///////////////////////////////////////////////////////////////
 void CDatabaseJobQueueImpl::StopThread()
 {
+    // Let queued jobs finish first. Async disconnects (IsAsyncDbDisconnect) return before the queries
+    // queued ahead of them have run, so without this, writes a resource made just before the server
+    // shut down (and the disconnect itself) could be dropped. Blocking disconnects already waited.
+    CElapsedTime drainTimer;
+    shared.m_Mutex.Lock();
+    while (!shared.m_CommandQueue.empty() && drainTimer.Get() < 60000)
+        shared.m_Mutex.Wait(100);
+    if (!shared.m_CommandQueue.empty())
+        CLogger::LogPrintf("Notice: Database queue still had %d jobs at shutdown after 60 seconds\n", (int)shared.m_CommandQueue.size());
+    shared.m_Mutex.Unlock();
+
     // Stop the job queue processing thread
     shared.m_Mutex.Lock();
     shared.m_bTerminateThread = true;
