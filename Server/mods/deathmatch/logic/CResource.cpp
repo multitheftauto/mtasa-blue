@@ -4200,6 +4200,14 @@ bool CResource::IsUsingDbConnectMysql()
                     {
                         m_bUsingDbConnectMysql = true;
                     }
+
+                    // PostgreSQL connections also hold a password in the script, so protect them the same way
+                    foundPos = strLuaSource.find("postgresql", curPos);
+
+                    if (foundPos > curPos && foundPos < curPos + 40)
+                    {
+                        m_bUsingDbConnectMysql = true;
+                    }
                 }
             }
         }

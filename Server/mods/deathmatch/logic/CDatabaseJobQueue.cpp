@@ -115,6 +115,10 @@ CDatabaseJobQueueImpl::CDatabaseJobQueueImpl() : m_uiJobCountWarnThresh(200), m_
     CDatabaseType* pDatabaseTypeMySql = NewDatabaseTypeMySql();
     MapSet(m_DatabaseTypeMap, pDatabaseTypeMySql->GetDataSourceTag(), pDatabaseTypeMySql);
 
+    // Add known database types
+    CDatabaseType* pDatabaseTypePostgreSql = NewDatabaseTypePostgreSql();
+    MapSet(m_DatabaseTypeMap, pDatabaseTypePostgreSql->GetDataSourceTag(), pDatabaseTypePostgreSql);
+
     // Start the job queue processing thread
     m_pServiceThreadHandle = new CThreadHandle(CDatabaseJobQueueImpl::StaticThreadProc, this);
 }

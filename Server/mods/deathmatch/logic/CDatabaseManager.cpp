@@ -21,6 +21,8 @@ SString InsertQueryArgumentsSqlite(const SString& strQuery, CLuaArguments* pArgs
 SString InsertQueryArgumentsMySql(const SString& strQuery, CLuaArguments* pArgs);
 SString InsertQueryArgumentsSqlite(const char* szQuery, va_list vl);
 SString InsertQueryArgumentsMySql(const char* szQuery, va_list vl);
+SString InsertQueryArgumentsPostgreSql(const SString& strQuery, CLuaArguments* pArgs);
+SString InsertQueryArgumentsPostgreSql(const char* szQuery, va_list vl);
 
 ///////////////////////////////////////////////////////////////
 //
@@ -591,6 +593,8 @@ SString CDatabaseManagerImpl::InsertQueryArguments(SConnectionHandle hConnection
         return InsertQueryArgumentsSqlite(strQuery, pArgs);
     else if (strType == "mysql")
         return InsertQueryArgumentsMySql(strQuery, pArgs);
+    else if (strType == "postgresql")
+        return InsertQueryArgumentsPostgreSql(strQuery, pArgs);
 
     // 'Helpful' error message
     CLogger::ErrorPrintf("DatabaseManager internal error #1\n");
@@ -614,6 +618,8 @@ SString CDatabaseManagerImpl::InsertQueryArguments(SConnectionHandle hConnection
         return InsertQueryArgumentsSqlite(szQuery, vl);
     else if (strType == "mysql")
         return InsertQueryArgumentsMySql(szQuery, vl);
+    else if (strType == "postgresql")
+        return InsertQueryArgumentsPostgreSql(szQuery, vl);
 
     // 'Helpful' error message
     CLogger::ErrorPrintf("DatabaseManager internal error #2");
