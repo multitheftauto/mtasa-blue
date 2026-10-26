@@ -59,6 +59,7 @@ protected:
     void                 ProcessFlush(CDbJobData* pJobData);
     void                 ProcessSetLogLevel(CDbJobData* pJobData);
     CDatabaseConnection* GetConnectionFromHandle(SConnectionHandle connectionHandle);
+    SString              GetInvalidConnectionReason(SConnectionHandle connectionHandle);
     void                 RemoveHandleForConnection(SConnectionHandle connectionHandle, CDatabaseConnection* pConnection);
     void                 LogResult(CDbJobData* pJobData);
     void                 LogString(const SString& strText);
@@ -87,6 +88,11 @@ protected:
         CJobQueueType                                     m_ResultQueue;
         CComboMutex                                       m_Mutex;
         std::map<SConnectionHandle, CDatabaseConnection*> m_HandleConnectionMap;
+        // Async connects (IsAsyncDbConnect) that aren't connected. The handle is added when the CONNECT
+        // job is queued, so queries can be routed to this queue before the connect has run. The value
+        // is empty while connecting, or the reason it failed (given to every query on that handle).
+        // Removed when connected or disconnected.
+        std::map<SConnectionHandle, SString> m_AsyncConnectMap;
     } shared;
 };
 
@@ -220,6 +226,8 @@ CDbJobData* CDatabaseJobQueueImpl::AddCommand(EJobCommandType jobType, SConnecti
 
     // Add to queue
     shared.m_Mutex.Lock();
+    if (jobType == EJobCommand::CONNECT && IsAsyncDbConnectCommand(strData))
+        MapSet(shared.m_AsyncConnectMap, connectionHandle, SString());
     pJobData->stage = EJobStage::COMMAND_QUEUE;
     shared.m_CommandQueue.push_back(pJobData);
     shared.m_Mutex.Signal();
@@ -531,7 +539,13 @@ void CDatabaseJobQueueImpl::IgnoreJobResults(CDbJobData* pJobData)
 ///////////////////////////////////////////////////////////////
 bool CDatabaseJobQueueImpl::UsesConnection(SConnectionHandle connectionHandle)
 {
-    return GetConnectionFromHandle(connectionHandle) != nullptr;
+    // Both maps under one lock: the worker moves a finished async connect from m_AsyncConnectMap to
+    // m_HandleConnectionMap, and checking them separately could miss it in between.
+    // m_AsyncConnectMap holds async connects still running, or failed but not yet disconnected.
+    shared.m_Mutex.Lock();
+    bool bUsesConnection = MapContains(shared.m_HandleConnectionMap, connectionHandle) || MapContains(shared.m_AsyncConnectMap, connectionHandle);
+    shared.m_Mutex.Unlock();
+    return bUsesConnection;
 }
 
 //
@@ -615,7 +629,18 @@ void* CDatabaseJobQueueImpl::ThreadProc()
 void CDatabaseJobQueueImpl::ProcessCommand(CDbJobData* pJobData)
 {
     if (pJobData->command.type == EJobCommand::CONNECT)
+    {
         ProcessConnect(pJobData);
+
+        // Nobody waits for an async connect's result, so keep the reason it failed for the queries
+        // that follow it on this handle
+        if (pJobData->result.status == EJobResult::FAIL && IsAsyncDbConnectCommand(pJobData->command.strData))
+        {
+            shared.m_Mutex.Lock();
+            MapSet(shared.m_AsyncConnectMap, pJobData->command.connectionHandle, pJobData->result.strReason);
+            shared.m_Mutex.Unlock();
+        }
+    }
     else if (pJobData->command.type == EJobCommand::DISCONNECT)
         ProcessDisconnect(pJobData);
     else if (pJobData->command.type == EJobCommand::QUERY)
@@ -680,8 +705,10 @@ void CDatabaseJobQueueImpl::ProcessConnect(CDbJobData* pJobData)
         pConnection->m_SuppressedErrorCodes.clear();
 
     // Associate handle with CDatabaseConnection*
+    // Both under one lock, so UsesConnection always finds the handle in one map or the other
     shared.m_Mutex.Lock();
     MapSet(shared.m_HandleConnectionMap, pJobData->command.connectionHandle, pConnection);
+    MapRemove(shared.m_AsyncConnectMap, pJobData->command.connectionHandle);
     shared.m_Mutex.Unlock();
 
     // Set result
@@ -697,12 +724,18 @@ void CDatabaseJobQueueImpl::ProcessConnect(CDbJobData* pJobData)
 ///////////////////////////////////////////////////////////////
 void CDatabaseJobQueueImpl::ProcessDisconnect(CDbJobData* pJobData)
 {
+    // Forget a failed async connect. Its handle never had a connection, so there is nothing else to close.
+    shared.m_Mutex.Lock();
+    bool bWasAsyncConnect = MapContains(shared.m_AsyncConnectMap, pJobData->command.connectionHandle);
+    MapRemove(shared.m_AsyncConnectMap, pJobData->command.connectionHandle);
+    shared.m_Mutex.Unlock();
+
     // CDatabaseConnection* from handle
     CDatabaseConnection* pConnection = GetConnectionFromHandle(pJobData->command.connectionHandle);
     if (!pConnection)
     {
-        pJobData->result.status = EJobResult::FAIL;
-        pJobData->result.strReason = "Invalid connection";
+        pJobData->result.status = bWasAsyncConnect ? EJobResult::SUCCESS : EJobResult::FAIL;
+        pJobData->result.strReason = bWasAsyncConnect ? "" : "Invalid connection";
         return;
     }
 
@@ -729,7 +762,7 @@ void CDatabaseJobQueueImpl::ProcessQuery(CDbJobData* pJobData)
     if (!pConnection)
     {
         pJobData->result.status = EJobResult::FAIL;
-        pJobData->result.strReason = "Invalid connection";
+        pJobData->result.strReason = GetInvalidConnectionReason(pJobData->command.connectionHandle);
         return;
     }
 
@@ -763,7 +796,7 @@ void CDatabaseJobQueueImpl::ProcessFlush(CDbJobData* pJobData)
     if (!pConnection)
     {
         pJobData->result.status = EJobResult::FAIL;
-        pJobData->result.strReason = "Invalid connection";
+        pJobData->result.strReason = GetInvalidConnectionReason(pJobData->command.connectionHandle);
         return;
     }
 
@@ -799,6 +832,25 @@ CDatabaseConnection* CDatabaseJobQueueImpl::GetConnectionFromHandle(SConnectionH
     CDatabaseConnection* pConnection = MapFindRef(shared.m_HandleConnectionMap, connectionHandle);
     shared.m_Mutex.Unlock();
     return pConnection;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseJobQueueImpl::GetInvalidConnectionReason
+//
+// Error for a job whose handle has no connection. For a failed async connect, this is the
+// connect error, so scripts see e.g. "password authentication failed" on their first query.
+//
+///////////////////////////////////////////////////////////////
+SString CDatabaseJobQueueImpl::GetInvalidConnectionReason(SConnectionHandle connectionHandle)
+{
+    shared.m_Mutex.Lock();
+    SString* pstrReason = MapFind(shared.m_AsyncConnectMap, connectionHandle);
+    SString  strReason = SStringX("Invalid connection");
+    if (pstrReason && !pstrReason->empty())
+        strReason = SString("Could not connect: %s", **pstrReason);
+    shared.m_Mutex.Unlock();
+    return strReason;
 }
 
 ///////////////////////////////////////////////////////////////

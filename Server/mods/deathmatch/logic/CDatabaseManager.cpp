@@ -26,6 +26,34 @@ SString InsertQueryArgumentsPostgreSql(const char* szQuery, va_list vl);
 
 ///////////////////////////////////////////////////////////////
 //
+// IsAsyncDbDisconnect / IsAsyncDbConnect / IsAsyncDbConnectCommand
+//
+// See CDatabaseManager.h
+//
+///////////////////////////////////////////////////////////////
+bool IsAsyncDbDisconnect(const SString& strType)
+{
+    return strType == "postgresql";
+}
+
+bool IsAsyncDbConnect(const SString& strType, const SString& strOptions)
+{
+    if (strType != "postgresql")
+        return false;
+    bool bAsyncConnect = false;
+    GetOption<CDbOptionsMap>(strOptions, "async_connect", bAsyncConnect, false);
+    return bAsyncConnect;
+}
+
+bool IsAsyncDbConnectCommand(const SString& strCommandData)
+{
+    std::vector<SString> parts;
+    strCommandData.Split("\1", parts);
+    return parts.size() >= 5 && IsAsyncDbConnect(parts[0], parts[4]);
+}
+
+///////////////////////////////////////////////////////////////
+//
 // CDatabaseManagerImpl
 //
 //
@@ -60,11 +88,12 @@ public:
     virtual void              SetLogLevel(EJobLogLevelType logLevel, const SString& strLogFilename);
 
     // CDatabaseManagerImpl
-    SString InsertQueryArguments(SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs);
-    SString InsertQueryArguments(SConnectionHandle hConnection, const char* szQuery, va_list vl);
-    SString HideQuestionMark(const SString& strQuery);
-    SString RestoreQuestionMark(const SString& strQuery);
-    void    ClearLastErrorMessage()
+    SString     InsertQueryArguments(SConnectionHandle hConnection, const SString& strQuery, CLuaArguments* pArgs);
+    SString     InsertQueryArguments(SConnectionHandle hConnection, const char* szQuery, va_list vl);
+    SString     HideQuestionMark(const SString& strQuery);
+    SString     RestoreQuestionMark(const SString& strQuery);
+    static void OnAsyncConnectResult(CDbJobData* pJobData, void* pContext);
+    void        ClearLastErrorMessage()
     {
         m_strLastErrorMessage.clear();
         m_bLastErrorSuppressed = false;
@@ -147,6 +176,18 @@ SConnectionHandle CDatabaseManagerImpl::Connect(const SString& strType, const SS
     // Start connect
     CDbJobData* pJobData = m_JobQueue->AddCommand(EJobCommand::CONNECT, 0, strCombo);
 
+    if (IsAsyncDbConnect(strType, strOptions))
+    {
+        // Don't wait: connecting can take up to connect_timeout, and the queue may be busy with other
+        // queries for the same host. The job queue already routes this handle (see
+        // CDatabaseJobQueueImpl::AddCommand), so queries can be queued behind the connect right away.
+        // The result is thrown away when ready; the callback only logs a failure.
+        pJobData->SetCallback(&CDatabaseManagerImpl::OnAsyncConnectResult, nullptr);
+        m_JobQueue->FreeCommand(pJobData);
+        MapSet(m_ConnectionTypeMap, pJobData->command.connectionHandle, strType);
+        return pJobData->command.connectionHandle;
+    }
+
     // Complete connect
     m_JobQueue->PollCommand(pJobData, -1);
 
@@ -160,6 +201,20 @@ SConnectionHandle CDatabaseManagerImpl::Connect(const SString& strType, const SS
     // Process result
     MapSet(m_ConnectionTypeMap, pJobData->command.connectionHandle, strType);
     return pJobData->command.connectionHandle;
+}
+
+///////////////////////////////////////////////////////////////
+//
+// CDatabaseManagerImpl::OnAsyncConnectResult
+//
+// Runs on the main thread when an async connect (see IsAsyncDbConnect) has finished
+//
+///////////////////////////////////////////////////////////////
+void CDatabaseManagerImpl::OnAsyncConnectResult(CDbJobData* pJobData, void* pContext)
+{
+    if (pJobData->result.status == EJobResult::FAIL)
+        CLogger::ErrorPrintf("dbConnect failed (%s); queries on this connection will fail. [%s]\n", *pJobData->result.strReason,
+                             *pJobData->GetCommandStringForLog());
 }
 
 ///////////////////////////////////////////////////////////////
@@ -187,6 +242,16 @@ bool CDatabaseManagerImpl::Disconnect(uint hConnection)
         SetLastErrorMessage("Invalid connection");
         MapRemove(m_ConnectionTypeMap, hConnection);
         return false;
+    }
+
+    if (IsAsyncDbDisconnect(*MapFind(m_ConnectionTypeMap, hConnection)))
+    {
+        // Don't wait for the queries already queued on this connection. The worker thread runs them
+        // first (jobs run in order), so queued writes are not lost, and their results and callbacks
+        // arrive as usual. Only the disconnect job's own result is thrown away.
+        m_JobQueue->FreeCommand(pJobData);
+        MapRemove(m_ConnectionTypeMap, hConnection);
+        return true;
     }
 
     // Complete disconnect

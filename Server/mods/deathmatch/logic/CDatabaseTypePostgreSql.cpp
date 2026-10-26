@@ -14,6 +14,12 @@
 // connection code lives in a separate library (dbconpg), loaded the first time a script connects,
 // and connections can be shared with the "share" option.
 //
+// Unlike MySQL, the main thread never waits on the database server (see CDatabaseManager.cpp):
+// - destroyElement on a connection returns at once; queued queries still run before it closes.
+// - With the "async_connect=1" option, dbConnect returns at once and connects in the background.
+//   A failed connect is logged, and queries on that connection fail with the connect error.
+// Queries already ran on a worker thread (one per host) for every database type.
+//
 
 #include "StdInc.h"
 #include "CDatabaseType.h"
