@@ -36,6 +36,10 @@ public:
 
     bool GetSFXStatus(eAudioLookupIndex containerIndex);
 
+    bool ValidateSound(const SString& strSound, bool bIsRawData, SString* pOutError = nullptr);
+
+    bool DecodeToPcm(const SString& strSound, bool bIsRawData, uint uiSampleRate, std::vector<char>& outPcm) const;
+
     void AddToList(CClientSound* pSound);
     void RemoveFromList(CClientSound* pSound);
 
