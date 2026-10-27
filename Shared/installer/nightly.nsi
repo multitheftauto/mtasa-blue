@@ -720,8 +720,9 @@ SectionGroup /e "$(INST_SEC_CLIENT)" SECGCLIENT
         !endif
 
         SetOutPath "$INSTDIR\MTA\dxvk"
-        File /nonfatal "${FILES_ROOT}\mta\dxvk\d3d9.dll"
-        File /nonfatal "${FILES_ROOT}\mta\dxvk\dxgi.dll"
+        File "${FILES_ROOT}\mta\dxvk\d3d9.dll"
+        ; dxgi.dll was shipped by early test builds and is not needed
+        Delete "$INSTDIR\MTA\dxvk\dxgi.dll"
 
 
 	# Added as per https://bitbucket.org/chromiumembedded/cef/commits/8424f166ccef

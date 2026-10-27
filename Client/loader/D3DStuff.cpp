@@ -280,7 +280,15 @@ void EndD3DStuff()
 //
 //////////////////////////////////////////////////////////
 
-static const char* const DXVK_LIBRARY_NAMES[] = {"d3d9.dll", "dxgi.dll"};
+// Only d3d9.dll: DXVK's d3d9.dll doesn't import dxgi.dll, and shipping DXVK's dxgi.dll in the
+// launch directory would hand it to anything in the game process that loads DXGI (overlays,
+// recorders), with no working D3D11 behind it.
+static const char* const DXVK_LIBRARY_NAMES[] = {"d3d9.dll"};
+
+// MD5 of the DXVK dxgi.dll that early test builds of this feature placed in the launch directory
+// and staged in MTA\dxvk. It's no longer shipped, so remove it where it was left behind;
+// otherwise MTA's third-party graphics library warning would flag it.
+static const char* const DXVK_OLD_DXGI_MD5 = "80e1d15ea1e49038a695f8083ec05a3b";
 
 static SString GetDXVKStageDir()
 {
@@ -322,6 +330,18 @@ static void RemovePlacedDXVKFiles()
         {
             FileDelete(strPath);
             WriteDebugEvent(SString("DXVK: removed %s from GTA launch directory", *strPath));
+        }
+    }
+}
+
+static void RemoveOldDXVKDxgi()
+{
+    for (const SString& strPath : {PathJoin(GetDXVKGtaDir(), "dxgi.dll"), GetDXVKStageFile("dxgi.dll")})
+    {
+        if (FileExists(strPath) && CMD5Hasher::CalculateHexString(strPath).CompareI(DXVK_OLD_DXGI_MD5))
+        {
+            FileDelete(strPath);
+            WriteDebugEvent(SString("DXVK: removed old %s", *strPath));
         }
     }
 }
@@ -494,6 +514,8 @@ bool ManageDXVK()
     const bool    bEnable = GetDXVKEnabledSetting();
     const SString strGtaLaunchDir = GetDXVKGtaDir();
 
+    RemoveOldDXVKDxgi();
+
     const SString strVerifyProblem = VerifyDXVKStageFiles();
     const bool    bFilesOk = strVerifyProblem.empty();
 
@@ -542,7 +564,6 @@ bool ManageDXVK()
 
     MakeSureDirExists(strGtaLaunchDir);
     CopyDXVKFileIfNeeded(GetDXVKStageFile("d3d9.dll"), PathJoin(strGtaLaunchDir, "d3d9.dll"));
-    CopyDXVKFileIfNeeded(GetDXVKStageFile("dxgi.dll"), PathJoin(strGtaLaunchDir, "dxgi.dll"));
 
     for (const char* szName : DXVK_LIBRARY_NAMES)
     {
