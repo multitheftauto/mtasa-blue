@@ -463,39 +463,9 @@ void SetDXVKEnabledSetting(bool bEnable)
     WriteDebugEvent(SString("DXVK: set dxvk_enabled=%d in coreconfig.xml", bEnable ? 1 : 0));
 }
 
-static bool IsValidDXVKBinary(const SString& strPath)
-{
-    const uint64 uiFileSize = FileSize(strPath);
-    if (uiFileSize < 1000000)
-        return false;
-
-    SString strDosHeader;
-    if (!FileLoad(strPath, strDosHeader, 0x40) || strDosHeader.length() < 0x40)
-        return false;
-
-    const unsigned char* pDosHeader = reinterpret_cast<const unsigned char*>(strDosHeader.c_str());
-    if (pDosHeader[0] != 'M' || pDosHeader[1] != 'Z')
-        return false;
-
-    const unsigned int uiPe = pDosHeader[0x3C] | (pDosHeader[0x3D] << 8) | (pDosHeader[0x3E] << 16) | (static_cast<unsigned int>(pDosHeader[0x3F]) << 24);
-    if (uiPe == 0 || uiPe >= uiFileSize)
-        return false;
-
-    SString strPeHeader;
-    if (!FileLoad(strPath, strPeHeader, 0x8, static_cast<int>(uiPe)) || strPeHeader.length() < 6)
-        return false;
-
-    const unsigned char* pPeHeader = reinterpret_cast<const unsigned char*>(strPeHeader.c_str());
-    if (pPeHeader[0] != 'P' || pPeHeader[1] != 'E' || pPeHeader[2] != 0 || pPeHeader[3] != 0)
-        return false;
-
-    const unsigned short usMachine = static_cast<unsigned short>(pPeHeader[4] | (pPeHeader[5] << 8));
-    if (usMachine != 0x014C)
-        return false;
-
-    return true;
-}
-
+// Only checks that the files are there. Whether they work is decided by actually loading
+// d3d9.dll in ProbeVulkanSupport, and file integrity is covered by the installer and loader
+// checksums, so a hand-written PE header check would only add code that can break.
 static SString VerifyDXVKStageFiles()
 {
     for (const char* szName : DXVK_LIBRARY_NAMES)
@@ -503,8 +473,6 @@ static SString VerifyDXVKStageFiles()
         const SString strPath = GetDXVKStageFile(szName);
         if (!FileExists(strPath))
             return SString("%s is missing from mta\\dxvk", szName);
-        if (!IsValidDXVKBinary(strPath))
-            return SString("%s is missing, corrupted or not a valid 32-bit binary", szName);
     }
     return "";
 }
