@@ -280,7 +280,15 @@ void EndD3DStuff()
 //
 //////////////////////////////////////////////////////////
 
-static const char* const DXVK_LIBRARY_NAMES[] = {"d3d9.dll", "dxgi.dll"};
+// Only d3d9.dll: DXVK's d3d9.dll doesn't import dxgi.dll, and shipping DXVK's dxgi.dll in the
+// launch directory would hand it to anything in the game process that loads DXGI (overlays,
+// recorders), with no working D3D11 behind it.
+static const char* const DXVK_LIBRARY_NAMES[] = {"d3d9.dll"};
+
+// MD5 of the DXVK dxgi.dll that early test builds of this feature placed in the launch directory
+// and staged in MTA\dxvk. It's no longer shipped, so remove it where it was left behind;
+// otherwise MTA's third-party graphics library warning would flag it.
+static const char* const DXVK_OLD_DXGI_MD5 = "80e1d15ea1e49038a695f8083ec05a3b";
 
 static SString GetDXVKStageDir()
 {
@@ -322,6 +330,18 @@ static void RemovePlacedDXVKFiles()
         {
             FileDelete(strPath);
             WriteDebugEvent(SString("DXVK: removed %s from GTA launch directory", *strPath));
+        }
+    }
+}
+
+static void RemoveOldDXVKDxgi()
+{
+    for (const SString& strPath : {PathJoin(GetDXVKGtaDir(), "dxgi.dll"), GetDXVKStageFile("dxgi.dll")})
+    {
+        if (FileExists(strPath) && CMD5Hasher::CalculateHexString(strPath).CompareI(DXVK_OLD_DXGI_MD5))
+        {
+            FileDelete(strPath);
+            WriteDebugEvent(SString("DXVK: removed old %s", *strPath));
         }
     }
 }
@@ -443,39 +463,9 @@ void SetDXVKEnabledSetting(bool bEnable)
     WriteDebugEvent(SString("DXVK: set dxvk_enabled=%d in coreconfig.xml", bEnable ? 1 : 0));
 }
 
-static bool IsValidDXVKBinary(const SString& strPath)
-{
-    const uint64 uiFileSize = FileSize(strPath);
-    if (uiFileSize < 1000000)
-        return false;
-
-    SString strDosHeader;
-    if (!FileLoad(strPath, strDosHeader, 0x40) || strDosHeader.length() < 0x40)
-        return false;
-
-    const unsigned char* pDosHeader = reinterpret_cast<const unsigned char*>(strDosHeader.c_str());
-    if (pDosHeader[0] != 'M' || pDosHeader[1] != 'Z')
-        return false;
-
-    const unsigned int uiPe = pDosHeader[0x3C] | (pDosHeader[0x3D] << 8) | (pDosHeader[0x3E] << 16) | (static_cast<unsigned int>(pDosHeader[0x3F]) << 24);
-    if (uiPe == 0 || uiPe >= uiFileSize)
-        return false;
-
-    SString strPeHeader;
-    if (!FileLoad(strPath, strPeHeader, 0x8, static_cast<int>(uiPe)) || strPeHeader.length() < 6)
-        return false;
-
-    const unsigned char* pPeHeader = reinterpret_cast<const unsigned char*>(strPeHeader.c_str());
-    if (pPeHeader[0] != 'P' || pPeHeader[1] != 'E' || pPeHeader[2] != 0 || pPeHeader[3] != 0)
-        return false;
-
-    const unsigned short usMachine = static_cast<unsigned short>(pPeHeader[4] | (pPeHeader[5] << 8));
-    if (usMachine != 0x014C)
-        return false;
-
-    return true;
-}
-
+// Only checks that the files are there. Whether they work is decided by actually loading
+// d3d9.dll in ProbeVulkanSupport, and file integrity is covered by the installer and loader
+// checksums, so a hand-written PE header check would only add code that can break.
 static SString VerifyDXVKStageFiles()
 {
     for (const char* szName : DXVK_LIBRARY_NAMES)
@@ -483,8 +473,6 @@ static SString VerifyDXVKStageFiles()
         const SString strPath = GetDXVKStageFile(szName);
         if (!FileExists(strPath))
             return SString("%s is missing from mta\\dxvk", szName);
-        if (!IsValidDXVKBinary(strPath))
-            return SString("%s is missing, corrupted or not a valid 32-bit binary", szName);
     }
     return "";
 }
@@ -493,6 +481,8 @@ bool ManageDXVK()
 {
     const bool    bEnable = GetDXVKEnabledSetting();
     const SString strGtaLaunchDir = GetDXVKGtaDir();
+
+    RemoveOldDXVKDxgi();
 
     const SString strVerifyProblem = VerifyDXVKStageFiles();
     const bool    bFilesOk = strVerifyProblem.empty();
@@ -542,7 +532,6 @@ bool ManageDXVK()
 
     MakeSureDirExists(strGtaLaunchDir);
     CopyDXVKFileIfNeeded(GetDXVKStageFile("d3d9.dll"), PathJoin(strGtaLaunchDir, "d3d9.dll"));
-    CopyDXVKFileIfNeeded(GetDXVKStageFile("dxgi.dll"), PathJoin(strGtaLaunchDir, "dxgi.dll"));
 
     for (const char* szName : DXVK_LIBRARY_NAMES)
     {
@@ -553,6 +542,14 @@ bool ManageDXVK()
             SetApplicationSetting("diagnostics", SString("%s-dll-not-again", szName), "yes");
         }
     }
+
+    // DXVK writes gta_sa_d3d9.log and gta_sa.dxvk-cache next to the game's working directory,
+    // which is the player's real GTA install. Point both at the launch directory instead, so the
+    // GTA folder stays untouched. gta_sa.exe is started with the loader's environment, so it
+    // inherits these.
+    const WString wstrLaunchDir = FromUTF8(strGtaLaunchDir);
+    SetEnvironmentVariableW(L"DXVK_LOG_PATH", wstrLaunchDir.c_str());
+    SetEnvironmentVariableW(L"DXVK_STATE_CACHE_PATH", wstrLaunchDir.c_str());
 
     WriteDebugEvent("DXVK: Vulkan supported - D3D9 will be translated to Vulkan");
     return true;
