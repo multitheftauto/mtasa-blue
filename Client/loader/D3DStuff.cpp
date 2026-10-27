@@ -575,6 +575,14 @@ bool ManageDXVK()
         }
     }
 
+    // DXVK writes gta_sa_d3d9.log and gta_sa.dxvk-cache next to the game's working directory,
+    // which is the player's real GTA install. Point both at the launch directory instead, so the
+    // GTA folder stays untouched. gta_sa.exe is started with the loader's environment, so it
+    // inherits these.
+    const WString wstrLaunchDir = FromUTF8(strGtaLaunchDir);
+    SetEnvironmentVariableW(L"DXVK_LOG_PATH", wstrLaunchDir.c_str());
+    SetEnvironmentVariableW(L"DXVK_STATE_CACHE_PATH", wstrLaunchDir.c_str());
+
     WriteDebugEvent("DXVK: Vulkan supported - D3D9 will be translated to Vulkan");
     return true;
 }
