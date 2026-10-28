@@ -30,6 +30,7 @@ void CLuaCameraDefs::LoadFunctions()
         {"getCameraGoggleEffect", ArgumentParserWarn<false, GetCameraGoggleEffect>},
         {"getCameraFieldOfView", GetCameraFieldOfView},
         {"getCameraDrunkLevel", ArgumentParserWarn<false, GetCameraDrunkLevel>},
+        {"getCameraVehicleViewOffset", ArgumentParser<GetCameraVehicleViewOffset>},
 
         // Cam set funcs
         {"setCameraMatrix", SetCameraMatrix},
@@ -40,6 +41,8 @@ void CLuaCameraDefs::LoadFunctions()
         {"setCameraClip", SetCameraClip},
         {"getCameraClip", GetCameraClip},
         {"setCameraViewMode", ArgumentParserWarn<false, SetCameraViewMode>},
+        {"setCameraVehicleViewOffset", ArgumentParser<SetCameraVehicleViewOffset>},
+        {"resetCameraVehicleViewOffset", ArgumentParser<ResetCameraVehicleViewOffset>},
         {"setCameraGoggleEffect", SetCameraGoggleEffect},
         {"setCameraDrunkLevel", ArgumentParserWarn<false, SetCameraDrunkLevel>},
 
@@ -65,6 +68,7 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getTarget", "getCameraTarget");
     lua_classfunction(luaVM, "getInterior", "getCameraInterior");
     lua_classfunction(luaVM, "getViewMode", "getCameraViewMode");
+    lua_classfunction(luaVM, "getVehicleViewOffset", "getCameraVehicleViewOffset");
     lua_classfunction(luaVM, "getMatrix", ArgumentParserWarn<false, OOP_GetCameraMatrix>);
     lua_classfunction(luaVM, "getFieldOfView", "getCameraFieldOfView");
     lua_classfunction(luaVM, "getGoggleEffect", "getCameraGoggleEffect");
@@ -80,6 +84,8 @@ void CLuaCameraDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "setInterior", "setCameraInterior");
     lua_classfunction(luaVM, "setTarget", "setCameraTarget");
     lua_classfunction(luaVM, "setViewMode", "setCameraViewMode");
+    lua_classfunction(luaVM, "setVehicleViewOffset", "setCameraVehicleViewOffset");
+    lua_classfunction(luaVM, "resetVehicleViewOffset", "resetCameraVehicleViewOffset");
     lua_classfunction(luaVM, "setGoggleEffect", "setCameraGoggleEffect");
     lua_classfunction(luaVM, "setClip", "setCameraClip");
     lua_classfunction(luaVM, "setFarClipDistance", "setFarClipDistance");
@@ -426,6 +432,60 @@ bool CLuaCameraDefs::SetCameraViewMode(std::optional<unsigned char> ucVehicleVie
         pCamera->SetCameraPedViewMode((ePedCamMode)ucPedViewMode.value());
 
     return true;
+}
+
+// Offsets for the vehicle follow camera, see CMultiplayer::SetVehicleCameraViewOffset
+static constexpr unsigned char VEHICLE_VIEW_MODE_COUNT = 6;  // see eVehicleCamMode
+static constexpr float         MAX_VEHICLE_VIEW_OFFSET = 20.0f;
+
+bool CLuaCameraDefs::SetCameraVehicleViewOffset(unsigned char ucViewMode, std::optional<float> fOffsetX, std::optional<float> fOffsetY,
+                                                std::optional<float> fOffsetZ)
+{
+    if (ucViewMode >= VEHICLE_VIEW_MODE_COUNT)
+        throw std::invalid_argument("Invalid vehicle camera view mode (0-5)");
+
+    CClientCamera*        pCamera = m_pManager->GetCamera();
+    const eVehicleCamMode eMode = static_cast<eVehicleCamMode>(ucViewMode);
+
+    CVector vecOffset;
+    if (!pCamera->GetVehicleViewOffset(eMode, vecOffset))
+        return false;
+
+    if (fOffsetX)
+        vecOffset.fX = Clamp(-MAX_VEHICLE_VIEW_OFFSET, fOffsetX.value(), MAX_VEHICLE_VIEW_OFFSET);
+    if (fOffsetY)
+        vecOffset.fY = Clamp(-MAX_VEHICLE_VIEW_OFFSET, fOffsetY.value(), MAX_VEHICLE_VIEW_OFFSET);
+    if (fOffsetZ)
+        vecOffset.fZ = Clamp(-MAX_VEHICLE_VIEW_OFFSET, fOffsetZ.value(), MAX_VEHICLE_VIEW_OFFSET);
+
+    return pCamera->SetVehicleViewOffset(eMode, vecOffset);
+}
+
+CLuaMultiReturn<float, float, float> CLuaCameraDefs::GetCameraVehicleViewOffset(unsigned char ucViewMode)
+{
+    if (ucViewMode >= VEHICLE_VIEW_MODE_COUNT)
+        throw std::invalid_argument("Invalid vehicle camera view mode (0-5)");
+
+    CVector vecOffset;
+    m_pManager->GetCamera()->GetVehicleViewOffset(static_cast<eVehicleCamMode>(ucViewMode), vecOffset);
+
+    return {vecOffset.fX, vecOffset.fY, vecOffset.fZ};
+}
+
+bool CLuaCameraDefs::ResetCameraVehicleViewOffset(std::optional<unsigned char> ucViewMode)
+{
+    CClientCamera* pCamera = m_pManager->GetCamera();
+
+    if (!ucViewMode)
+    {
+        pCamera->ResetVehicleViewOffsets();
+        return true;
+    }
+
+    if (ucViewMode.value() >= VEHICLE_VIEW_MODE_COUNT)
+        throw std::invalid_argument("Invalid vehicle camera view mode (0-5)");
+
+    return pCamera->SetVehicleViewOffset(static_cast<eVehicleCamMode>(ucViewMode.value()), CVector());
 }
 
 int CLuaCameraDefs::SetCameraGoggleEffect(lua_State* luaVM)
