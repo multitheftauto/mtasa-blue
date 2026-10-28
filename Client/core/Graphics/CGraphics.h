@@ -195,12 +195,16 @@ public:
     void DrawPostGUIQueue(void);
     void DrawLine3DPreGUIQueue(void);
     void DrawLine3DPostFXQueue(void);
+    void DrawLine3DPreWaterQueue();
     bool HasLine3DPreGUIQueueItems(void);
     bool HasLine3DPostFXQueueItems();
+    bool HasLine3DPreWaterQueueItems();
     void DrawPrimitive3DPostFXQueue(void);
     void DrawPrimitive3DPreGUIQueue(void);
+    void DrawPrimitive3DPreWaterQueue();
     bool HasPrimitive3DPreGUIQueueItems(void);
     bool HasPrimitive3DPostFXQueueItems();
+    bool HasPrimitive3DPreWaterQueueItems();
 
     void DidRenderScene();
     void SetProgressMessage(const SString& strMessage);
@@ -243,17 +247,21 @@ private:
     CLine3DBatcher*              m_pLine3DBatcherPreGUI = nullptr;
     CLine3DBatcher*              m_pLine3DBatcherPostFX = nullptr;
     CLine3DBatcher*              m_pLine3DBatcherPostGUI = nullptr;
+    CLine3DBatcher*              m_pLine3DBatcherPreWater = nullptr;
     CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPreGUI = nullptr;
     CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPostFX = nullptr;
     CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPostGUI = nullptr;
+    CMaterialLine3DBatcher*      m_pMaterialLine3DBatcherPreWater = nullptr;
     CPrimitiveBatcher*           m_pPrimitiveBatcher = nullptr;
     CPrimitiveMaterialBatcher*   m_pPrimitiveMaterialBatcher = nullptr;
     CPrimitive3DBatcher*         m_pPrimitive3DBatcherPreGUI = nullptr;
     CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostFX = nullptr;
     CPrimitive3DBatcher*         m_pPrimitive3DBatcherPostGUI = nullptr;
+    CPrimitive3DBatcher*         m_pPrimitive3DBatcherPreWater = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPreGUI = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostFX = nullptr;
     CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPostGUI = nullptr;
+    CMaterialPrimitive3DBatcher* m_pMaterialPrimitive3DBatcherPreWater = nullptr;
     CAspectRatioConverter*       m_pAspectRatioConverter = nullptr;
     bool                         m_bSkipMTARenderThisFrame = false;
     D3DVIEWPORT9                 m_prevViewportForMTA = {};
