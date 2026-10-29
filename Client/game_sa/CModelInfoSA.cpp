@@ -103,6 +103,9 @@ CModelInfoSA::CModelInfoSA()
 
 CBaseModelInfoSAInterface* CModelInfoSA::GetInterface()
 {
+    if (m_dwModelID >= pGame->GetBaseIDforTXD())
+        return m_pInterface = nullptr;
+
     return m_pInterface = ppModelInfo[m_dwModelID];
 }
 
@@ -472,7 +475,8 @@ void CModelInfoSA::Remove()
 
 bool CModelInfoSA::UnloadUnused()
 {
-    if (m_pInterface->usNumberOfRefs == 0 && !m_pCustomClump && !m_pCustomColModel)
+    CBaseModelInfoSAInterface* pInterface = GetInterface();
+    if (pInterface && pInterface->usNumberOfRefs == 0 && !m_pCustomClump && !m_pCustomColModel)
     {
         pGame->GetStreaming()->RemoveModel(m_dwModelID);
         return true;
@@ -886,7 +890,7 @@ void CModelInfoSA::StaticResetTextureDictionaries()
 
 float CModelInfoSA::GetLODDistance()
 {
-    m_pInterface = ppModelInfo[m_dwModelID];
+    m_pInterface = GetInterface();
     if (m_pInterface)
         return m_pInterface->fLodDistanceUnscaled;
 
@@ -895,7 +899,7 @@ float CModelInfoSA::GetLODDistance()
 
 bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
 {
-    m_pInterface = ppModelInfo[m_dwModelID];
+    m_pInterface = GetInterface();
     if (!m_pInterface)
         return false;
 
@@ -914,7 +918,7 @@ bool CModelInfoSA::SetTime(char cHourOn, char cHourOff)
 
 bool CModelInfoSA::GetTime(char& cHourOn, char& cHourOff)
 {
-    m_pInterface = ppModelInfo[m_dwModelID];
+    m_pInterface = GetInterface();
     if (!m_pInterface)
         return false;
 
@@ -982,7 +986,7 @@ void CModelInfoSA::SetLODDistance(float fDistance, bool bOverrideMaxDistance)
         fDistance = std::min(fDistance, 325.f);
     }
 
-    m_pInterface = ppModelInfo[m_dwModelID];
+    m_pInterface = GetInterface();
     if (m_pInterface)
     {
         // Save default value if not done yet
