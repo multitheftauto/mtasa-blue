@@ -40,6 +40,7 @@ public:
 
     bool Request(unsigned short usModelID, CClientEntity* pRequester);
     void Cancel(CClientEntity* pRequester, bool bAllowQueue);
+    void Cancel(CModelInfo* pModelInfo);
 
 private:
     void DoPulse();
