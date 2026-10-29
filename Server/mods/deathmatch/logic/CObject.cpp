@@ -56,7 +56,7 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     m_vecScale = CVector(Copy.m_vecScale.fX, Copy.m_vecScale.fY, Copy.m_vecScale.fZ);
     m_fHealth = Copy.m_fHealth;
     m_bSyncable = Copy.m_bSyncable;
-    m_pSyncer = NULL;
+    m_pSyncer = nullptr;
     m_bIsFrozen = Copy.m_bIsFrozen;
     m_bDoubleSided = Copy.m_bDoubleSided;
     m_bBreakable = Copy.m_bBreakable;
