@@ -3960,14 +3960,6 @@ bool CStaticFunctionDefinitions::KillPed(CElement* pElement, CElement* pKiller, 
             if (pPed->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
                 pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
-            // Remove him from any occupied vehicle
-            CVehicle* pVehicle = pPed->GetOccupiedVehicle();
-            if (pVehicle)
-            {
-                pVehicle->SetOccupant(NULL, pPed->GetOccupiedVehicleSeat());
-                pPed->SetOccupiedVehicle(NULL, 0);
-            }
-
             // Update the ped
             pPed->SetSpawned(false);
             pPed->SetIsDead(true);
