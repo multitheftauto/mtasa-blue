@@ -60,6 +60,8 @@ public:
     void RestreamAllVehicles();
     void RestreamVehicleUpgrades(unsigned short usModel);
 
+    void OnModelReplaced(unsigned short usModel);
+
     std::vector<CClientVehicle*>::const_iterator IterBegin() { return m_List.begin(); };
     std::vector<CClientVehicle*>::const_iterator IterEnd() { return m_List.end(); };
     std::vector<CClientVehicle*>::const_iterator StreamedBegin() { return m_StreamedIn.begin(); };
