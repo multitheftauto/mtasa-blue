@@ -23,8 +23,14 @@
 #include "CPlayerPedSA.h"
 #include "CPoolsSA.h"
 #include "CWorldSA.h"
+#include "CMatrixLinkSA.h"
 
 extern CGameSA* pGame;
+
+#define VAR_gMatrixList_StaticHead 0xB74330  // CMatrixLink
+#define VAR_gMatrixList_StaticTail 0xB74384  // CMatrixLink
+
+static constexpr unsigned short ATOMIC_IS_UPGRADE = 0x8000;
 
 class CClientEntity;
 
@@ -91,6 +97,10 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
         modelInfo->SetObjectPropertiesGroup(MODEL_PROPERTIES_GROUP_STATIC);
 
+    auto*      modelInfoInterface = modelInfo->GetInterface();
+    const bool isVehicleTuningPart =
+        modelInfoInterface && modelInfo->GetModelType() == eModelInfoType::ATOMIC && (modelInfoInterface->usFlags & ATOMIC_IS_UPGRADE);
+
     // Load building
     SFileObjectInstance instance{};
     instance.modelID = modelId;
@@ -104,6 +114,9 @@ CBuilding* CBuildingsPoolSA::AddBuilding(CClientBuilding* pClientBuilding, uint1
     // Disable lod and ipl
     pBuilding->m_pLod = nullptr;
     pBuilding->m_iplIndex = 0;
+
+    if (isVehicleTuningPart)
+        pBuilding->bHasPreRenderEffects = false;
 
     // Restore changed properties group
     if (prevGroup != MODEL_PROPERTIES_GROUP_STATIC)
@@ -207,6 +220,12 @@ void CBuildingsPoolSA::RemoveAllWithBackup()
     RemoveObjectEntityLinks();
     m_bLinkSweepsDone = true;
 
+    // Only static links survive, the dynamic ones PreRender lends are rebuilt from m_transform
+    std::set<const void*> staticMatrices;
+    const auto*           staticTail = reinterpret_cast<const CMatrixLinkSAInterface*>(VAR_gMatrixList_StaticTail);
+    for (const auto* link = reinterpret_cast<const CMatrixLinkSAInterface*>(VAR_gMatrixList_StaticHead)->m_pNext; link != staticTail; link = link->m_pNext)
+        staticMatrices.insert(link);
+
     for (size_t i = 0; i < poolSize; i++)
     {
         if (pBuildsingsPool->IsContains(i))
@@ -217,8 +236,8 @@ void CBuildingsPoolSA::RemoveAllWithBackup()
 
             if (building->HasMatrix())
             {
-                // Keep original matrix
-                m_buildingMatrix[i] = *building->matrix;
+                if (staticMatrices.contains(building->matrix))
+                    m_buildingMatrix[i] = *building->matrix;
 
                 building->RemoveMatrix();
             }

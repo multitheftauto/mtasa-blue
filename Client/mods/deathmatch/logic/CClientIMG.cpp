@@ -17,6 +17,22 @@ struct tImgHeader
     unsigned int uiFilesCount;
 };
 
+// SetStreamingInfo force-removes the model's RwObject, and the streamer no longer tracks it
+// after the archive change, so entities still using it have to be streamed out first
+static void PrepareModelReplacement(unsigned int uiModelID)
+{
+    if (CClientVehicleManager::IsValidModel(uiModelID))
+    {
+        const auto usModel = static_cast<unsigned short>(uiModelID);
+
+        g_pClientGame->GetVehicleManager()->OnModelReplaced(usModel);
+        g_pClientGame->GetVehicleManager()->RestreamVehicles(usModel);
+    }
+
+    if (CClientPedManager::IsValidWeaponModel(uiModelID))
+        g_pClientGame->GetPedManager()->RestreamWeapon(static_cast<unsigned short>(uiModelID));
+}
+
 CClientIMG::CClientIMG(class CClientManager* pManager, ElementID ID)
     : ClassInit(this), CClientEntity(ID), m_pImgManager(pManager->GetIMGManager()), m_ucArchiveID(INVALID_ARCHIVE_ID), m_LargestFileSizeBlocks(0)
 {
@@ -180,6 +196,7 @@ bool CClientIMG::StreamDisable()
     // Unlink all models
     for (const auto& v : m_restoreInfo)
     {
+        PrepareModelReplacement(v.uiModelID);
         g_pGame->GetStreaming()->SetStreamingInfo(v.uiModelID, v.ucStreamID, v.uiOffset, v.usSize);
     }
     m_restoreInfo.clear();
@@ -219,18 +236,7 @@ bool CClientIMG::LinkModel(unsigned int uiModelID, size_t uiFileID)
 
     m_restoreInfo.emplace_back(uiModelID, pCurrInfo->offsetInBlocks, pCurrInfo->sizeInBlocks, pCurrInfo->archiveId);
 
-    // Internally stream out the vehicle before calling CStreamingSA::RemoveModel
-    // otherwise a crash will occur if the player is inside a vehicle that gets unloaded by the streamer
-    if (CClientVehicleManager::IsValidModel(uiModelID))
-    {
-        g_pClientGame->GetVehicleManager()->OnModelReplaced(static_cast<unsigned short>(uiModelID));
-        g_pClientGame->GetVehicleManager()->RestreamVehicles(static_cast<unsigned short>(uiModelID));
-    }
-
-    // Weapon models already in a ped's hand keep their old RW clump until the weapon slot is
-    // re-requested, same as vehicles above (see CClientDFF::ReplaceWeaponModel for the equivalent case)
-    if (CClientPedManager::IsValidWeaponModel(uiModelID))
-        g_pClientGame->GetPedManager()->RestreamWeapon(static_cast<unsigned short>(uiModelID));
+    PrepareModelReplacement(uiModelID);
 
     g_pGame->GetStreaming()->SetStreamingInfo(uiModelID, m_ucArchiveID, pFileInfo->uiOffset, pFileInfo->usSize);
 
@@ -245,6 +251,7 @@ bool CClientIMG::UnlinkModel(unsigned int uiModelID)
     if (it == m_restoreInfo.end())
         return false;
 
+    PrepareModelReplacement(uiModelID);
     g_pGame->GetStreaming()->SetStreamingInfo(uiModelID, it->ucStreamID, it->uiOffset, it->usSize);
 
     m_restoreInfo.erase(it);

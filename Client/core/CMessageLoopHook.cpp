@@ -177,6 +177,11 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                 {
                     GetVideoModeManager()->OnLoseFocus();
                     g_pCore->GetKeyBinds()->OnLoseFocus();
+                    if (CGUI* pGUI = g_pCore->GetGUI())
+                    {
+                        pGUI->ProcessKeyboardInput(DIK_LCONTROL, false);
+                        pGUI->ProcessKeyboardInput(DIK_LSHIFT, false);
+                    }
                     break;
                 }
             }
