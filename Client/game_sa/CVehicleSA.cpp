@@ -2177,10 +2177,12 @@ void CVehicleSA::SetVehicleFlags(bool bEnable360, bool bEnableRandomiser, bool b
 
 void CVehicleSA::OnChangingPosition(const CVector& vecNewPosition)
 {
+    // Reposition colpoints for big moves to avoid random spinning
     CVector vecDelta = vecNewPosition - m_pInterface->matrix->vPos;
     if (vecDelta.LengthSquared() <= 10 * 10)
         return;
 
+    // 0 = CAutomobile, 9 = CBike, 10 = CBmx
     switch (GetBaseVehicleType())
     {
         case 0:

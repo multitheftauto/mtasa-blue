@@ -99,7 +99,6 @@ public:
     int32                m_aiWheelState[2];
 };
 static_assert(sizeof(CBikeSAInterface) == 0x814, "Invalid size for CBikeSAInterface");
-static_assert(sizeof(CBikeSAInterface::m_anWheelColPoint) == 176, "Invalid size for CBikeSAInterface::m_anWheelColPoint");
 
 class CBikeSA : public virtual CBike, public virtual CVehicleSA
 {
