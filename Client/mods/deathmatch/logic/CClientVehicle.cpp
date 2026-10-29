@@ -1076,9 +1076,6 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
             }
         }
 
-        // Apply variant requirements
-        if (ucVariant == 255 && ucVariant2 == 255)
-            CClientVehicleManager::GetRandomVariation(usModel, ucVariant, ucVariant2);
         m_ucVariation = ucVariant;
         m_ucVariation2 = ucVariant2;
 
