@@ -589,9 +589,8 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
 
         case CCLIENTVEHICLE:
         {
-            uchar      ucVariant = 255, ucVariant2 = 255;
-            const bool hasVariants = bitStream.GetNumberOfUnreadBits() >= sizeof(ucVariant) + sizeof(ucVariant2);
-            if (hasVariants)
+            uchar ucVariant = 255, ucVariant2 = 255;
+            if (bitStream.GetNumberOfUnreadBits() >= sizeof(ucVariant) + sizeof(ucVariant2))
             {
                 bitStream.Read(ucVariant);
                 bitStream.Read(ucVariant2);
@@ -602,7 +601,7 @@ void CElementRPCs::SetElementModel(CClientEntity* pSource, NetBitStreamInterface
 
             if (usCurrentModel != usModel)
             {
-                pVehicle->SetModelBlocking(usModel, ucVariant, ucVariant2, !hasVariants);
+                pVehicle->SetModelBlocking(usModel, ucVariant, ucVariant2);
 
                 CLuaArguments Arguments;
                 Arguments.PushNumber(usCurrentModel);

@@ -1047,7 +1047,7 @@ void CClientVehicle::SetTurretRotation(float fHorizontal, float fVertical)
     m_fTurretVertical = fVertical;
 }
 
-void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2, bool randomizeVariant)
+void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
 {
     // Different vehicle ID than we have now?
     if (m_usModel != usModel)
@@ -1074,9 +1074,6 @@ void CClientVehicle::SetModelBlocking(unsigned short usModel, unsigned char ucVa
             }
         }
 
-        // Apply variant requirements
-        if (randomizeVariant && ucVariant == 255 && ucVariant2 == 255)
-            CClientVehicleManager::GetRandomVariation(usModel, ucVariant, ucVariant2);
         m_ucVariation = ucVariant;
         m_ucVariation2 = ucVariant2;
 

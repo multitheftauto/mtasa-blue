@@ -1653,7 +1653,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             if (!CClientVehicleManager::IsVariationValidForModel(usModel, ucNewVariant, ucNewVariant2))
                 CClientVehicleManager::GetRandomVariation(usModel, ucNewVariant, ucNewVariant2);
 
-            Vehicle.SetModelBlocking(usModel, ucNewVariant, ucNewVariant2, false);
+            Vehicle.SetModelBlocking(usModel, ucNewVariant, ucNewVariant2);
 
             CLuaArguments Arguments;
             Arguments.PushNumber(usCurrentModel);
@@ -1667,7 +1667,7 @@ bool CStaticFunctionDefinitions::SetElementModel(CClientEntity& Entity, unsigned
             if (!bContinue)
             {
                 // Change canceled
-                Vehicle.SetModelBlocking(usCurrentModel, ucVariant, ucVariant2, false);
+                Vehicle.SetModelBlocking(usCurrentModel, ucVariant, ucVariant2);
                 return false;
             }
 
