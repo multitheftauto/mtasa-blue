@@ -170,18 +170,18 @@ void CObjectSA::SetFrozen(bool frozen)
 {
     CObjectSAInterface* objectInterface = GetObjectInterface();
 
-    if (frozen != m_Frozen)
+    if (frozen != m_isFrozen)
     {
         if (frozen)
         {
-            m_CollidableBeforeFreeze = objectInterface->bCollidable;
+            m_collidableBeforeFreeze = objectInterface->bCollidable;
             objectInterface->bCollidable = true;
         }
         else
         {
-            objectInterface->bCollidable = m_CollidableBeforeFreeze;
+            objectInterface->bCollidable = m_collidableBeforeFreeze;
         }
-        m_Frozen = frozen;
+        m_isFrozen = frozen;
     }
 
     CPhysicalSA::SetFrozen(frozen);

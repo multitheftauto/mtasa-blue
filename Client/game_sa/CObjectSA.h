@@ -125,8 +125,8 @@ private:
     bool          m_bIsAGangTag;
     CVector       m_vecScale;
     bool          m_preRenderRequired = false;
-    bool          m_Frozen = false;
-    bool          m_CollidableBeforeFreeze = false;
+    bool          m_isFrozen = false;
+    bool          m_collidableBeforeFreeze = false;
 
 public:
     static void StaticSetHooks();
