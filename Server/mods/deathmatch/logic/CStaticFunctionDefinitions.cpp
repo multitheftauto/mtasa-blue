@@ -2323,7 +2323,8 @@ bool CStaticFunctionDefinitions::SetPlayerName(CElement* pElement, const char* s
                             Arguments.PushString(szNick);
                             Arguments.PushString(szName);
                             Arguments.PushBoolean(false);  // manually changed
-                            pPlayer->CallEvent("onPlayerChangeNick", Arguments);
+                            if (!pPlayer->CallEvent("onPlayerChangeNick", Arguments))
+                                return false;
 
                             // Tell the console
                             CLogger::LogPrintf("NICK: %s is now known as %s\n", szNick, szName);
