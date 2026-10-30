@@ -223,7 +223,6 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     if (bDamage && !pDamagableModelInfo)
     {
         // Returning null would stop RpClumpForAllAtomics, so leave the atomic with the clump
-        pRelatedModelInfo->bAtomicNotConsumed = true;
         return atomic;
     }
 
@@ -238,6 +237,7 @@ RpAtomic* CFileLoader_SetRelatedModelInfoCB(RpAtomic* atomic, SRelatedModelInfo*
     else
     {
         pAtomicModelInfo->SetAtomic(atomic);
+        pRelatedModelInfo->bTxdRefTaken = true;
     }
 
     RpClumpRemoveAtomic(pRelatedModelInfo->pClump, atomic);
