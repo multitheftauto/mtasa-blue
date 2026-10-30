@@ -20,8 +20,9 @@
 #define FUNC_LoadAllRequestedModels              0x40EA10
 #define FUNC_CStreaming__HasVehicleUpgradeLoaded 0x407820
 #define FUNC_CStreaming_RequestSpecialModel      0x409d10
-#define FUNC_CStreaming_LoadScene                0x40EB70
-#define FUNC_CStreaming_LoadSceneCollision       0x40ED80
+#define FUNC_CStreaming_RequestBigBuildings      0x409430
+#define FUNC_CStreaming_AddModelsToRequestList   0x40D3F0
+#define FUNC_CStreaming_InstanceLoadedModels     0x4084F0
 
 #define ARRAY_CStreaming_msPedsLoaded     0x8E4C00
 #define VAR_CStreaming_msNumPedsLoaded    0x8E4BB0
@@ -83,8 +84,10 @@ public:
     void          MakeSpaceFor(std::uint32_t memoryToCleanInBytes) override;
     std::uint32_t GetMemoryUsed() const override;
 
-    void LoadScene(const CVector* position);
-    void LoadSceneCollision(const CVector* position);
+    void RequestBigBuildings(const CVector& position) override;
+    void AddModelsToRequestList(const CVector& position, std::uint8_t flags) override;
+    void InstanceLoadedModels(const CVector& position) override;
+    void ClearFlagForAllModels(std::uint8_t flag) override;
 
     std::uint32_t GetNumPedsLoaded() const noexcept override;
     bool          IsModelInLoadedPedGroup(std::uint16_t modelId) const noexcept override;

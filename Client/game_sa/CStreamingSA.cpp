@@ -535,16 +535,28 @@ void CStreamingSA::RemoveBigBuildings()
     (reinterpret_cast<void(__cdecl*)()>(0x4093B0))();
 }
 
-void CStreamingSA::LoadScene(const CVector* position)
+void CStreamingSA::RequestBigBuildings(const CVector& position)
 {
-    auto CStreaming_LoadScene = (void(__cdecl*)(const CVector*))FUNC_CStreaming_LoadScene;
-    CStreaming_LoadScene(position);
+    auto CStreaming_RequestBigBuildings = (void(__cdecl*)(const CVector&))FUNC_CStreaming_RequestBigBuildings;
+    CStreaming_RequestBigBuildings(position);
 }
 
-void CStreamingSA::LoadSceneCollision(const CVector* position)
+void CStreamingSA::AddModelsToRequestList(const CVector& position, std::uint8_t flags)
 {
-    auto CStreaming_LoadSceneCollision = (void(__cdecl*)(const CVector*))FUNC_CStreaming_LoadSceneCollision;
-    CStreaming_LoadSceneCollision(position);
+    auto CStreaming_AddModelsToRequestList = (void(__cdecl*)(const CVector&, int))FUNC_CStreaming_AddModelsToRequestList;
+    CStreaming_AddModelsToRequestList(position, flags);
+}
+
+void CStreamingSA::InstanceLoadedModels(const CVector& position)
+{
+    auto CStreaming_InstanceLoadedModels = (void(__cdecl*)(const CVector&))FUNC_CStreaming_InstanceLoadedModels;
+    CStreaming_InstanceLoadedModels(position);
+}
+
+void CStreamingSA::ClearFlagForAllModels(std::uint8_t flag)
+{
+    for (CStreamingInfo& info : ms_aInfoForModel)
+        info.flg &= ~flag;
 }
 
 std::uint32_t CStreamingSA::GetNumPedsLoaded() const noexcept
