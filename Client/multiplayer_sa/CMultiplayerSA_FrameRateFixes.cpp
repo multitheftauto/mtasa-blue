@@ -835,7 +835,7 @@ static void __declspec(naked)   HOOK_cBuoyancy__CalcBuoyancyForce_Damping()
         push    edx
         mov     dl, byte ptr [eax+36h]  // CEntitySAInterface::nType, a 3 bit field
         and     dl, 7
-        cmp     dl, ENTITY_TYPE_PED
+        cmp     dl, 3 // EntityType::PED
         pop     edx
         jne     done
         fmul    ds:[0xB7CB5C]           // CTimer::ms_fTimeStep

@@ -41,7 +41,7 @@ void CWeaponRPCs::GiveWeapon(CClientEntity* pSource, NetBitStreamInterface& bitS
             if (pPed)
             {
                 // Don't change remote players weapons (affects sync)
-                if (pPed->GetType() == CCLIENTPED || pPed->GetType() == CCLIENTPLAYER)
+                if (pPed->GetType() == ElementType::PED || pPed->GetType() == ElementType::PLAYER)
                 {
                     // Valid weapon id?
                     if (ucWeaponID == 0 || CClientPickupManager::IsValidWeaponID(ucWeaponID))
@@ -56,7 +56,7 @@ void CWeaponRPCs::GiveWeapon(CClientEntity* pSource, NetBitStreamInterface& bitS
                             pPed->GiveWeapon(static_cast<eWeaponType>(ucWeaponID), usAmmo, bSetAsCurrent);
 
                             // Store the ammo so it's not lost if a ped is streamed out
-                            if (pPed->GetType() == CCLIENTPED)
+                            if (pPed->GetType() == ElementType::PED)
                             {
                                 uchar ucSlot = CWeaponNames::GetSlotFromWeapon(ucWeaponID);
                                 pPed->m_usWeaponAmmo[ucSlot] += usAmmo;
@@ -140,7 +140,7 @@ void CWeaponRPCs::TakeWeapon(CClientEntity* pSource, NetBitStreamInterface& bitS
                     CWeapon* pPlayerWeapon = pPed->GetWeapon((eWeaponType)ucWeaponID);
 
                     // Store the ammo so it's not lost if a ped is streamed out
-                    if (pPed->GetType() == CCLIENTPED)
+                    if (pPed->GetType() == ElementType::PED)
                     {
                         char cSlot = CWeaponNames::GetSlotFromWeapon(ucWeaponID);
                         if (cSlot != -1)
@@ -233,7 +233,7 @@ void CWeaponRPCs::SetWeaponAmmo(CClientEntity* pSource, NetBitStreamInterface& b
                 CWeapon* pPlayerWeapon = pPed->GetWeapon((eWeaponType)ucWeaponID);
 
                 // Store the ammo so it's not lost if a ped is streamed out
-                if (pPed->GetType() == CCLIENTPED)
+                if (pPed->GetType() == ElementType::PED)
                 {
                     char cSlot = CWeaponNames::GetSlotFromWeapon(ucWeaponID);
                     if (cSlot != -1)

@@ -98,7 +98,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
         {
             // Grenade type explosions from vehicles should only be freefall bombs
             // TODO: need a way to check if its a freefall bomb if creator is a ped
-            if (pGameCreator && pGameCreator->GetEntityType() == ENTITY_TYPE_VEHICLE)
+            if (pGameCreator && pGameCreator->GetEntityType() == EntityType::VEHICLE)
                 explosionWeaponType = WEAPONTYPE_FREEFALL_BOMB;
             else
                 explosionWeaponType = WEAPONTYPE_GRENADE;
@@ -132,7 +132,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
         bool allowExplosion = pResponsible->CallEvent("onClientExplosion", arguments, true);
 
         // Check if the exploding entity is a client-only vehicle that exploded
-        if (pGameExplodingEntity != nullptr && pResponsible->GetType() == CCLIENTVEHICLE)
+        if (pGameExplodingEntity != nullptr && pResponsible->GetType() == ElementType::VEHICLE)
         {
             auto vehicle = reinterpret_cast<CClientVehicle*>(pResponsible);
 
@@ -159,7 +159,7 @@ bool CClientExplosionManager::Hook_ExplosionCreation(CEntity* pGameExplodingEnti
     CClientEntity* pOriginSource = nullptr;
 
     // Is this an exploding vehicle?
-    if (pGameExplodingEntity != nullptr && pResponsible->GetType() == CCLIENTVEHICLE)
+    if (pGameExplodingEntity != nullptr && pResponsible->GetType() == ElementType::VEHICLE)
     {
         auto vehicle = reinterpret_cast<CClientVehicle*>(pResponsible);
         pOriginSource = vehicle;

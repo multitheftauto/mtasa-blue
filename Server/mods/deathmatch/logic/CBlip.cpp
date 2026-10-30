@@ -19,7 +19,7 @@
 CBlip::CBlip(CElement* pParent, CBlipManager* pBlipManager) : CPerPlayerEntity(pParent)
 {
     // Init
-    m_iType = CElement::BLIP;
+    m_iType = ElementType::BLIP;
     SetTypeName("blip");
     m_pBlipManager = pBlipManager;
     m_ucSize = 2;

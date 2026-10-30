@@ -57,7 +57,7 @@ CClientEffect* CClientEffectManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (pEntity && pEntity->GetType() == CCLIENTEFFECT)
+    if (pEntity && pEntity->GetType() == ElementType::EFFECT)
     {
         return static_cast<CClientEffect*>(pEntity);
     }
