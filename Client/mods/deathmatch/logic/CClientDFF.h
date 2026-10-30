@@ -73,6 +73,7 @@ private:
     SString                            m_strDffFilename;
     SString                            m_RawDataBuffer;
     bool                               m_bIsRawData = false;
+    bool                               m_bUsingRawDataForClothes{false};
     std::map<ushort, SLoadedClumpInfo> m_LoadedClumpInfoMap;
 
     std::list<unsigned short> m_Replaced;
