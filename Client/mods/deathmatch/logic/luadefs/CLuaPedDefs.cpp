@@ -2585,9 +2585,9 @@ bool CLuaPedDefs::SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehi
     return pPed->EnterVehicle(pVehicle, bPassenger, optSeat);
 }
 
-bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed)
+bool CLuaPedDefs::SetPedExitVehicle(CClientPed* pPed, std::optional<bool> force)
 {
-    return pPed->ExitVehicle();
+    return pPed->ExitVehicle(force.value_or(false));
 }
 
 bool CLuaPedDefs::killPedTask(CClientPed* ped, taskType taskType, std::uint8_t taskNumber, std::optional<bool> gracefully)
