@@ -209,7 +209,7 @@ public:
     bool           GetCustomDataInt(const CStringName& name, int& iOut, bool bInheritData);
     bool           GetCustomDataBool(const CStringName& name, bool& bOut, bool bInheritData);
     void           SetCustomData(const CStringName& name, const CLuaArgument& Variable, bool bSynchronized = true);
-    void           DeleteCustomData(const CStringName& name);
+    bool           DeleteCustomData(const CStringName& name);
 
     virtual bool GetMatrix(CMatrix& matrix) const;
     virtual bool SetMatrix(const CMatrix& matrix);
