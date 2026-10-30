@@ -696,12 +696,22 @@ bool CEntitySA::GetBonePosition(eBone boneId, CVector& position)
     return true;
 }
 
-// NOTE: The position will be reset if UpdateElementRpHAnim is called after this.
+// NOTE: CEntity::UpdateRpHAnim rebuilds the bone matrices from the animation hierarchy and
+// discards the position, so it's skipped for this frame (like the game does for the player)
 bool CEntitySA::SetBonePosition(eBone boneId, const CVector& position)
 {
     RwMatrix* rwBoneMatrix = GetBoneRwMatrix(boneId);
     if (!rwBoneMatrix)
         return false;
+
+    CEntitySAInterface* theInterface = GetInterface();
+    if (theInterface)
+    {
+        if (!theInterface->bDontUpdateHierarchy)
+            UpdateRpHAnim();
+
+        theInterface->bDontUpdateHierarchy = true;
+    }
 
     CMatrixSAInterface boneMatrix(rwBoneMatrix, false);
     boneMatrix.SetTranslateOnly(position);
