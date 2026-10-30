@@ -30,6 +30,7 @@ public:
     void         Reset();
     void         SetTitle(const SString& strTitle);
     void         SetMessage(const SString& strMsg);
+    void         SetIcon(const char* szIconFile);
     void         AppendMessage(const SString& strMsg);
     void         SetButton(unsigned int uiButton, const SString& strText);
     CGUIEdit*    SetEditbox(unsigned int uiEditbox, const SString& strText);
@@ -46,6 +47,7 @@ private:
 
     CGUIWindow*              m_pWindow;
     CGUILabel*               m_pMessage;
+    CGUIStaticImage*         m_pIcon;
     std::vector<CGUIButton*> m_ButtonList;
     std::vector<CGUIEdit*>   m_EditList;
     unsigned int             m_uiLastButton;
@@ -56,4 +58,5 @@ private:
     void*                    m_CallbackParameter;
     SString                  m_strMsg;
     bool                     m_bAutoCloseOnConnect;
+    bool                     m_bHasIcon;
 };
