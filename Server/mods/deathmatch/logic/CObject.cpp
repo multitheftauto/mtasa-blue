@@ -78,6 +78,9 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
 
     if (Copy.m_pSyncer)
         Copy.m_pSyncer->AddSyncingObject(this);
+
+    if (m_pLowLodObject)
+        m_pLowLodObject->m_HighLodObjectList.push_back(this);
 }
 
 CObject::~CObject()

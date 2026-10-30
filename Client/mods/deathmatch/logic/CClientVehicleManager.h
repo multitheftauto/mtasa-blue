@@ -39,6 +39,7 @@ public:
     static unsigned char      GetMaxPassengerCount(unsigned long ulModel);
     static unsigned char      ConvertIndexToGameSeat(unsigned long ulModel, unsigned char ucIndex);
     static void               GetRandomVariation(unsigned short usModel, unsigned char& ucVariant, unsigned char& ucVariant2);
+    static bool               IsVariationValidForModel(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2);
 
     static bool HasTurret(unsigned long ulModel);
     static bool HasSirens(unsigned long ulModel);
@@ -59,6 +60,8 @@ public:
     void RestreamVehicles(unsigned short usModel);
     void RestreamAllVehicles();
     void RestreamVehicleUpgrades(unsigned short usModel);
+
+    void OnModelReplaced(unsigned short usModel);
 
     std::vector<CClientVehicle*>::const_iterator IterBegin() { return m_List.begin(); };
     std::vector<CClientVehicle*>::const_iterator IterEnd() { return m_List.end(); };
