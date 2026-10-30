@@ -57,6 +57,13 @@ CMarker* CRadarSA::GetFreeMarker()
         return Markers[Index];
 }
 
+CMarker* CRadarSA::GetMarker(int iIndex)
+{
+    if (iIndex < 0 || iIndex >= MAX_MARKERS)
+        return nullptr;
+    return Markers[iIndex];
+}
+
 void CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const SharedUtil::SColor color)
 {
     // Convert color to required abgr at the last moment
