@@ -34,25 +34,31 @@ void CBuildingSA::SetLod(CBuilding* pLod)
             SetLod(nullptr);
         }
 
-        CBuildingSAInterface* pLodInterface = dynamic_cast<CBuildingSA*>(pLod)->GetBuildingInterface();
-        assert(pLodInterface);
+        auto* lodBuilding = dynamic_cast<CBuildingSA*>(pLod);
+        if (!lodBuilding)
+            return;
+
+        CBuildingSAInterface* lodInterface = lodBuilding->GetBuildingInterface();
+        if (!lodInterface)
+            return;
 
         // We should recreate buildings...
-        pGame->GetWorld()->Remove(pLodInterface, CBuilding_SetLod);
+        pGame->GetWorld()->Remove(lodInterface, CBuilding_SetLod);
         pGame->GetWorld()->Remove(m_pInterface, CBuilding_SetLod);
 
-        m_pInterface->m_pLod = pLodInterface;
-        pLodInterface->bUsesCollision = 0;
-        pLodInterface->numLodChildren = 1;
+        m_pInterface->m_pLod = lodInterface;
+        lodInterface->bUsesCollision = 0;
+        lodInterface->numLodChildren = 1;
 
-        if (pGame->GetModelInfo(pLodInterface->m_nModelIndex)->GetLODDistance() > 300)
+        auto* modelInfo = pGame->GetModelInfo(lodInterface->m_nModelIndex);
+        if (modelInfo && modelInfo->GetLODDistance() > 300.0f)
         {
-            pLodInterface->bIsBIGBuilding = 1;
+            lodInterface->bIsBIGBuilding = 1;
         }
 
         // Only this specific order works
         pGame->GetWorld()->Add(m_pInterface, CBuilding_SetLod);
-        pGame->GetWorld()->Add(pLodInterface, CBuilding_SetLod);
+        pGame->GetWorld()->Add(lodInterface, CBuilding_SetLod);
     }
     else
     {

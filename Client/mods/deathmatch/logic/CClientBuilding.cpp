@@ -100,12 +100,20 @@ void CClientBuilding::SetInterior(uint8_t ucInterior)
         return;
 
     m_interior = ucInterior;
-    Recreate();
+
+    if (m_pBuilding)
+        Recreate();
+
+    CClientEntity::SetInterior(ucInterior);
 }
 
 void CClientBuilding::SetDimension(unsigned short usDimension)
 {
     CClientEntity::SetDimension(usDimension);
+
+    if (!m_pBuilding && usDimension == m_pBuildingManager->GetDimension())
+        m_pBuildingManager->ResizePoolIfNeeds();
+
     RelateDimension(m_pBuildingManager->GetDimension());
 }
 
@@ -181,10 +189,13 @@ void CClientBuilding::Create()
     if (m_ucAlpha != 255)
         m_pBuilding->SetAlpha(m_ucAlpha);
 
-    if (m_pHighBuilding)
+    if (m_pHighBuilding && m_pHighBuilding->IsValid() && m_pHighBuilding->GetBuildingEntity())
     {
         m_pHighBuilding->GetBuildingEntity()->SetLod(m_pBuilding);
     }
+
+    if (m_pLowBuilding && m_pLowBuilding->IsValid())
+        m_pBuilding->SetLod(m_pLowBuilding->GetBuildingEntity());
 }
 
 void CClientBuilding::Destroy()
@@ -193,9 +204,7 @@ void CClientBuilding::Destroy()
         return;
 
     if (m_pHighBuilding && m_pHighBuilding->IsValid())
-    {
         m_pHighBuilding->GetBuildingEntity()->SetLod(nullptr);
-    }
 
     g_pGame->GetPools()->GetBuildingsPool().RemoveBuilding(m_pBuilding);
     m_pBuilding = nullptr;
@@ -218,7 +227,8 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
 
         // Add new LOD
         m_pLowBuilding = pLod;
-        m_pBuilding->SetLod(pLod->GetBuildingEntity());
+        if (m_pBuilding && pLod->GetBuildingEntity())
+            m_pBuilding->SetLod(pLod->GetBuildingEntity());
 
         pLod->SetHighLodBuilding(this);
     }
@@ -230,7 +240,9 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
             m_pLowBuilding->SetHighLodBuilding();
         }
 
-        m_pBuilding->SetLod(nullptr);
+        if (m_pBuilding)
+            m_pBuilding->SetLod(nullptr);
+
         m_pLowBuilding = nullptr;
     }
     return true;

@@ -1955,8 +1955,10 @@ void CCore::ApplyCoreInitSettings()
 //
 void CCore::OnGameTimerUpdate()
 {
-    // NOTE: (pxd) We are handling the frame limiting updates
-    // earlier in the callpath (CModManager::DoPulsePreFrame, CModManager::DoPulsePostFrame)
+    // GTA samples its clock right after this. Waiting here keeps the frame deltas it
+    // measures exact, whatever runs between Present and the next frame does not leak in
+    if (m_pFPSLimiter)
+        m_pFPSLimiter->OnGameTimerUpdate();
 }
 
 void CCore::OnFPSLimitChange(std::uint16_t fps)
@@ -2231,6 +2233,9 @@ void CCore::HandleIdlePulse()
     {
         DoPreFramePulse();
         DoPostFramePulse();
+
+        // GTA keeps ticking while minimized but renders nothing, so end the frame here for the FPS limiter
+        m_pFPSLimiter->OnFrameEnd();
     }
 
     if (m_pModManager->IsLoaded())

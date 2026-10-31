@@ -71,6 +71,11 @@ CBuilding* CLuaBuildingDefs::CreateBuilding(lua_State* const luaVM, std::uint16_
     pBuilding->SetRotation(rot.value());
     pBuilding->SetModel(modelId);
 
+    if (interior.has_value())
+    {
+        pBuilding->SetInterior(interior.value());
+    }
+
     if (pResource->IsClientSynced())
     {
         CEntityAddPacket Packet;

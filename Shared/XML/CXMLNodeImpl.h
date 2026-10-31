@@ -107,5 +107,11 @@ private:
     std::list<CXMLNode*>                   m_Children;
     bool                                   m_bCanRemoveFromList;
 
+    // Where the previous FindSubNode call stopped, so walking a big node with FindSubNode(tag, i++) stays linear
+    std::string                    m_strLastFindTag;
+    unsigned int                   m_uiLastFindIndex = 0;
+    std::list<CXMLNode*>::iterator m_LastFindIter;
+    bool                           m_bLastFindValid = false;
+
     CXMLAttributesImpl m_Attributes;
 };
