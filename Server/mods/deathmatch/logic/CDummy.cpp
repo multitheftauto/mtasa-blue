@@ -60,3 +60,14 @@ bool CDummy::ReadSpecialData(const int iLine)
 
     return true;
 }
+
+void CDummy::WriteSpecialData(CXMLNode* pNode)
+{
+    CElement::WriteSpecialData(pNode);
+
+    CXMLAttributes& attributes = pNode->GetAttributes();
+
+    attributes.Create("posX")->SetValue(m_vecPosition.fX);
+    attributes.Create("posY")->SetValue(m_vecPosition.fY);
+    attributes.Create("posZ")->SetValue(m_vecPosition.fZ);
+}

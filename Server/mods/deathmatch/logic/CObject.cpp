@@ -198,6 +198,45 @@ bool CObject::ReadSpecialData(const int iLine)
     return true;
 }
 
+void CObject::WriteSpecialData(CXMLNode* pNode)
+{
+    CElement::WriteSpecialData(pNode);
+
+    CXMLAttributes& attributes = pNode->GetAttributes();
+
+    attributes.Create("model")->SetValue(static_cast<int>(m_usModel));
+
+    attributes.Create("posX")->SetValue(m_vecPosition.fX);
+    attributes.Create("posY")->SetValue(m_vecPosition.fY);
+    attributes.Create("posZ")->SetValue(m_vecPosition.fZ);
+
+    CVector vecRotation = m_vecRotation;
+    ConvertRadiansToDegrees(vecRotation);
+    attributes.Create("rotX")->SetValue(vecRotation.fX);
+    attributes.Create("rotY")->SetValue(vecRotation.fY);
+    attributes.Create("rotZ")->SetValue(vecRotation.fZ);
+
+    attributes.Create("interior")->SetValue(static_cast<int>(m_ucInterior));
+    attributes.Create("dimension")->SetValue(m_bVisibleInAllDimensions ? -1 : static_cast<int>(m_usDimension));
+
+    attributes.Create("doublesided")->SetValue(m_bDoubleSided);
+    attributes.Create("collisions")->SetValue(m_bCollisionsEnabled);
+    attributes.Create("frozen")->SetValue(m_bIsFrozen);
+    attributes.Create("breakable")->SetValue(m_bBreakable);
+    attributes.Create("alpha")->SetValue(static_cast<int>(m_ucAlpha));
+
+    if (m_vecScale.fX == m_vecScale.fY && m_vecScale.fY == m_vecScale.fZ)
+    {
+        attributes.Create("scale")->SetValue(m_vecScale.fX);
+    }
+    else
+    {
+        attributes.Create("scaleX")->SetValue(m_vecScale.fX);
+        attributes.Create("scaleY")->SetValue(m_vecScale.fY);
+        attributes.Create("scaleZ")->SetValue(m_vecScale.fZ);
+    }
+}
+
 void CObject::GetMatrix(CMatrix& matrix)
 {
     matrix.vPos = GetPosition();

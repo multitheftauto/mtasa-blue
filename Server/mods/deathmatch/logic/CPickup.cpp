@@ -276,6 +276,47 @@ bool CPickup::ReadSpecialData(const int iLine)
     return true;
 }
 
+void CPickup::WriteSpecialData(CXMLNode* pNode)
+{
+    CElement::WriteSpecialData(pNode);
+
+    CXMLAttributes& attributes = pNode->GetAttributes();
+
+    attributes.Create("posX")->SetValue(m_vecPosition.fX);
+    attributes.Create("posY")->SetValue(m_vecPosition.fY);
+    attributes.Create("posZ")->SetValue(m_vecPosition.fZ);
+
+    if (m_bIsTypeRandom)
+    {
+        attributes.Create("type")->SetValue("random");
+        attributes.Create("amount")->SetValue("random");
+    }
+    else if (m_ucType == WEAPON)
+    {
+        attributes.Create("type")->SetValue(static_cast<int>(m_ucWeaponType));
+        attributes.Create("amount")->SetValue(static_cast<int>(m_usAmmo));
+    }
+    else if (m_ucType == CUSTOM)
+    {
+        attributes.Create("type")->SetValue("custom");
+        attributes.Create("model")->SetValue(static_cast<int>(m_usModel));
+    }
+    else
+    {
+        attributes.Create("type")->SetValue((m_ucType == HEALTH) ? "health" : "armor");
+
+        if (m_bIsHealthRandom)
+            attributes.Create("amount")->SetValue("random");
+        else
+            attributes.Create("amount")->SetValue(static_cast<int>(m_fAmount));
+    }
+
+    attributes.Create("respawn")->SetValue(static_cast<int>(m_ulRespawnIntervals));
+
+    attributes.Create("interior")->SetValue(static_cast<int>(m_ucInterior));
+    attributes.Create("dimension")->SetValue(static_cast<int>(m_usDimension));
+}
+
 void CPickup::SetPosition(const CVector& vecPosition)
 {
     m_vecPosition = vecPosition;

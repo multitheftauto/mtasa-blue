@@ -410,6 +410,7 @@ public:
 
 protected:
     bool ReadSpecialData(const int iLine) override;
+    void WriteSpecialData(CXMLNode* pNode) override;
 
 private:
     class CVehicleManager* m_pVehicleManager;

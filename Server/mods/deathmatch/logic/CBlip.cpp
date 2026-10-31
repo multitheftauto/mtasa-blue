@@ -164,6 +164,25 @@ bool CBlip::ReadSpecialData(const int iLine)
     return true;
 }
 
+void CBlip::WriteSpecialData(CXMLNode* pNode)
+{
+    CElement::WriteSpecialData(pNode);
+
+    CXMLAttributes& attributes = pNode->GetAttributes();
+
+    attributes.Create("posX")->SetValue(m_vecPosition.fX);
+    attributes.Create("posY")->SetValue(m_vecPosition.fY);
+    attributes.Create("posZ")->SetValue(m_vecPosition.fZ);
+
+    attributes.Create("icon")->SetValue(static_cast<int>(m_ucIcon));
+    attributes.Create("size")->SetValue(static_cast<int>(m_ucSize));
+    attributes.Create("color")->SetValue(XMLColorFromInt(m_Color.R, m_Color.G, m_Color.B, m_Color.A).c_str());
+    attributes.Create("ordering")->SetValue(static_cast<int>(m_sOrdering));
+    attributes.Create("visibleDistance")->SetValue(static_cast<int>(m_usVisibleDistance));
+
+    attributes.Create("dimension")->SetValue(static_cast<int>(m_usDimension));
+}
+
 const CVector& CBlip::GetPosition()
 {
     // Are we attached to something?

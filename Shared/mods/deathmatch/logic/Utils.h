@@ -319,6 +319,7 @@ inline bool IsVisibleCharacter(unsigned char c)
 unsigned int HexToInt(const char* szHex);
 bool         XMLColorToInt(const char* szColor, unsigned long& ulColor);
 bool         XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucGreen, unsigned char& ucBlue, unsigned char& ucAlpha);
+SString      XMLColorFromInt(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha = 255);
 
 // Maths utility functions
 CVector ConvertEulerRotationOrder(const CVector& a_vRotation, eEulerRotationOrder a_eSrcOrder, eEulerRotationOrder a_eDstOrder);
