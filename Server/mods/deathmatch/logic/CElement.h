@@ -43,6 +43,7 @@
 #define IS_WEAPON(element)           ((element)->GetType() == CElement::WEAPON)
 
 class CLuaMain;
+class CResource;
 
 typedef CFastList<CElement*> CChildListType;
 typedef CFastList<CElement*> CElementListType;
@@ -132,7 +133,7 @@ public:
 
     bool AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
                   float fPriorityMod);
-    bool CallEvent(const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller = NULL);
+    bool CallEvent(const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller = NULL, CResource* pSourceResource = nullptr);
     bool DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction = CLuaFunctionRef());
     void DeleteEvents(CLuaMain* pLuaMain, bool bRecursive);
     void DeleteAllEvents();
@@ -251,8 +252,9 @@ protected:
     CElement* FindChildByTypeIndex(unsigned int uiTypeHash, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);
     void      FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_State* pLua, unsigned int& uiIndex);
 
-    void CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL);
-    void CallParentEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL);
+    void CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL,
+                           CResource* pSourceResource = nullptr);
+    void CallParentEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller = NULL, CResource* pSourceResource = nullptr);
 
     CMapEventManager* m_pEventManager;
     CCustomData       m_CustomData;

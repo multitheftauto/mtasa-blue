@@ -40,6 +40,10 @@ enum class eBitStreamVersion : unsigned short
     // YYYY-MM-DD
     // Name,
 
+    // Lua events carry the net ID of the resource that triggered them.
+    // 2026-10-31
+    RemoteEventSourceResource,
+
     // This allows us to automatically increment the BitStreamVersion when things are added to this enum.
     // Make sure you only add things above this comment.
     Next,

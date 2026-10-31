@@ -19,6 +19,7 @@ class CStaticFunctionDefinitions;
 #include <optional>
 
 class CVector2D;
+class CResource;
 struct SLineOfSightFlags;
 
 class CStaticFunctionDefinitions
@@ -33,9 +34,10 @@ public:
                                 EEventPriorityType eventPriority, float fPriorityMod);
     static bool RemoveEventHandler(CLuaMain* pLuaMain, const char* szName, CElement* pElement, const CLuaFunctionRef& iLuaFunction);
     static bool TriggerEvent(const char* szName, CElement* pElement, const CLuaArguments& Arguments, bool& bWasCancelled);
-    static bool TriggerClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments);
+    static bool TriggerClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments,
+                                   CResource* pSourceResource);
     static bool TriggerLatentClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement, CLuaArguments& Arguments,
-                                         int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId);
+                                         int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId, CResource* pSourceResource);
 
     static bool        CancelEvent(bool bCancel, const char* szReason);
     static const char* GetCancelReason();

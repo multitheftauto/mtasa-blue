@@ -15,10 +15,12 @@
 CLuaEventPacket::CLuaEventPacket()
 {
     m_ElementID = INVALID_ELEMENT_ID;
+    m_usSourceResourceNetID = INVALID_RESOURCE_NET_ID;
     m_pArguments = &m_ArgumentsStore;
 }
 
-CLuaEventPacket::CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments* pArguments)
+CLuaEventPacket::CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments* pArguments, unsigned short usSourceResourceNetId)
+    : m_usSourceResourceNetID(usSourceResourceNetId)
 {
     m_strName.AssignLeft(szName, MAX_EVENT_NAME_LENGTH);
     m_ElementID = ID;
@@ -32,6 +34,10 @@ bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream)
     {
         if (usNameLength < (MAX_EVENT_NAME_LENGTH - 1) && BitStream.ReadStringCharacters(m_strName, usNameLength) && BitStream.Read(m_ElementID))
         {
+            // The net ID sits before the arguments so the argument block stays last and can be length-checked below
+            if (BitStream.Can(eBitStreamVersion::RemoteEventSourceResource) && !BitStream.ReadCompressed(m_usSourceResourceNetID))
+                return false;
+
             if (BitStream.GetNumberOfUnreadBits() > (MAX_LUA_LATENT_EVENT_ARGUMENTS_SIZE + LUA_EVENT_ENVELOPE_HEADROOM) * 8)
                 return false;
 
@@ -53,6 +59,10 @@ bool CLuaEventPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.WriteCompressed(static_cast<unsigned short>(m_strName.length()));
     BitStream.WriteStringCharacters(m_strName);
     BitStream.Write(m_ElementID);
+
+    if (BitStream.Can(eBitStreamVersion::RemoteEventSourceResource))
+        BitStream.WriteCompressed(m_usSourceResourceNetID);
+
     m_pArguments->WriteToBitStream(BitStream);
 
     return true;

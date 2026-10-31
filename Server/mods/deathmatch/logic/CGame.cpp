@@ -2778,7 +2778,10 @@ void CGame::Packet_LuaEvent(CLuaEventPacket& Packet)
         {
             if (pEvent->bAllowRemoteTrigger)
             {
-                pElement->CallEvent(szName, *pArguments, pCaller);
+                // The client reports which resource fired the event. That claim cannot be verified server-side,
+                // so it is informational only - scripts must not base security decisions on it.
+                CResource* pSourceResource = m_pResourceManager->GetResourceFromNetID(Packet.GetSourceResourceNetID());
+                pElement->CallEvent(szName, *pArguments, pCaller, pSourceResource);
             }
             else
             {

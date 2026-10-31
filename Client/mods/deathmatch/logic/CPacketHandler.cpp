@@ -5178,6 +5178,10 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
             // Null-terminate it
             szName[usNameLength] = 0;
 
+            unsigned short usSourceResourceNetID = INVALID_RESOURCE_NET_ID;
+            if (bitStream.Can(eBitStreamVersion::RemoteEventSourceResource))
+                bitStream.ReadCompressed(usSourceResourceNetID);
+
             // Read out the arguments aswell
             CLuaArguments Arguments;
             if (!Arguments.ReadFromBitStream(bitStream))
@@ -5196,7 +5200,8 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
                         CClientEntity* pEntity = CElementIDs::GetElement(EntityID);
                         if (pEntity)
                         {
-                            pEntity->CallEvent(szName, Arguments, true);
+                            pEntity->CallEvent(szName, Arguments, true, nullptr,
+                                               g_pClientGame->GetResourceManager()->GetResourceFromNetID(usSourceResourceNetID));
                         }
                     }
                     else

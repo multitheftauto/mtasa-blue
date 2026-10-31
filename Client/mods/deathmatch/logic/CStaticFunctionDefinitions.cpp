@@ -173,7 +173,7 @@ bool CStaticFunctionDefinitions::TriggerEvent(const char* szName, CClientEntity&
     return false;
 }
 
-bool CStaticFunctionDefinitions::TriggerServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments)
+bool CStaticFunctionDefinitions::TriggerServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, CResource* pSourceResource)
 {
     assert(szName);
 
@@ -187,6 +187,11 @@ bool CStaticFunctionDefinitions::TriggerServerEvent(const char* szName, CClientE
         pBitStream->WriteCompressed(usNameLength);
         pBitStream->Write(szName, usNameLength);
         pBitStream->Write(CallWithEntity.GetID());
+
+        // Tell the server which resource fired the event, so its handlers can set sourceResource
+        if (pBitStream->Can(eBitStreamVersion::RemoteEventSourceResource))
+            pBitStream->WriteCompressed(static_cast<unsigned short>(pSourceResource ? pSourceResource->GetNetID() : INVALID_RESOURCE_NET_ID));
+
         if (!Arguments.WriteToBitStream(*pBitStream))
         {
             g_pNet->DeallocateNetBitStream(pBitStream);
@@ -202,7 +207,7 @@ bool CStaticFunctionDefinitions::TriggerServerEvent(const char* szName, CClientE
 }
 
 bool CStaticFunctionDefinitions::TriggerLatentServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int iBandwidth,
-                                                          CLuaMain* pLuaMain, ushort usResourceNetId)
+                                                          CLuaMain* pLuaMain, ushort usResourceNetId, CResource* pSourceResource)
 {
     assert(szName);
 
@@ -216,6 +221,11 @@ bool CStaticFunctionDefinitions::TriggerLatentServerEvent(const char* szName, CC
         pBitStream->WriteCompressed(usNameLength);
         pBitStream->Write(szName, usNameLength);
         pBitStream->Write(CallWithEntity.GetID());
+
+        // Tell the server which resource fired the event, so its handlers can set sourceResource
+        if (pBitStream->Can(eBitStreamVersion::RemoteEventSourceResource))
+            pBitStream->WriteCompressed(static_cast<unsigned short>(pSourceResource ? pSourceResource->GetNetID() : INVALID_RESOURCE_NET_ID));
+
         if (!Arguments.WriteToBitStream(*pBitStream))
         {
             g_pNet->DeallocateNetBitStream(pBitStream);
