@@ -42,6 +42,7 @@ static void* ARRAY_ModelInfo = *(void**)(0x403DA4 + 3);
 #define CLASS_CText         0xC1B340
 #define FUNC_CText_Get      0x6A0050
 #define FUNC_GetBoundingBox 0x4082F0
+#define FUNC_RwFrameGetLTM  0x7F0990
 
 #define FUNC_IsBoatModel           0x4c5a70
 #define FUNC_IsCarModel            0x4c5aa0
@@ -344,6 +345,7 @@ protected:
     CColModelSAInterface*                                                             m_pOriginalColModelInterface;
     std::uint16_t                                                                     m_originalFlags = 0;
     RpClump*                                                                          m_pCustomClump;
+    CColModelSAInterface*                                                             ownedColModel = nullptr;
     static std::map<unsigned short, int>                                              ms_RestreamTxdIDMap;
     static std::map<DWORD, float>                                                     ms_ModelDefaultLodDistanceMap;
     static std::map<DWORD, unsigned short>                                            ms_ModelDefaultFlagsMap;
@@ -457,6 +459,8 @@ public:
     void SetColModel(CColModel* pColModel) override;
     void RestoreColModel() override;
     void MakeCustomModel() override;
+    void UpdateCustomModelBounds(RpClump* clump);
+    void DestroyOwnedColModel();
 
     // Increases the collision slot reference counter for the original collision model
     void AddColRef() override;
