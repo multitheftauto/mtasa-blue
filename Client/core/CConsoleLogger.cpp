@@ -19,8 +19,13 @@ CConsoleLogger* CSingleton<CConsoleLogger>::m_pSingleton = NULL;
 
 CConsoleLogger::CConsoleLogger()
 {
-    // Create file name
-    m_strFilename = CalcMTASAPath(MTA_CONSOLE_LOG_PATH);
+    // Create file name - use -cl2 suffix for secondary client
+    SString strLogPath = MTA_CONSOLE_LOG_PATH;
+    if (g_pCore->IsSecondaryClient())
+    {
+        strLogPath.Replace(".log", "-cl2.log");
+    }
+    m_strFilename = CalcMTASAPath(strLogPath);
 
     // Cycle if over size (100KB, 5 backup files)
     CycleFile(m_strFilename, 100, 5);
