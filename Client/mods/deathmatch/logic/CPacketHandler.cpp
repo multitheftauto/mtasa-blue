@@ -5178,10 +5178,6 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
             // Null-terminate it
             szName[usNameLength] = 0;
 
-            unsigned short usSourceResourceNetID = INVALID_RESOURCE_NET_ID;
-            if (bitStream.Can(eBitStreamVersion::RemoteEventSourceResource))
-                bitStream.ReadCompressed(usSourceResourceNetID);
-
             // Read out the arguments aswell
             CLuaArguments Arguments;
             if (!Arguments.ReadFromBitStream(bitStream))
@@ -5190,6 +5186,10 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
             }
             else
             {
+                // Ignored on failure: a sender without the field leaves nothing to read
+                unsigned short usSourceResourceNetID = INVALID_RESOURCE_NET_ID;
+                bitStream.ReadCompressed(usSourceResourceNetID);
+
                 // Grab the event. Does it exist and is it remotely triggerable?
                 SEvent* pEvent = g_pClientGame->m_Events.Get(szName);
                 if (pEvent)
@@ -5201,7 +5201,7 @@ void CPacketHandler::Packet_LuaEvent(NetBitStreamInterface& bitStream)
                         if (pEntity)
                         {
                             pEntity->CallEvent(szName, Arguments, true, nullptr,
-                                               g_pClientGame->GetResourceManager()->GetResourceFromNetID(usSourceResourceNetID));
+                                               g_pClientGame->GetResourceManager()->GetResourceFromNetID(INVALID_RESOURCE_NET_ID));
                         }
                     }
                     else

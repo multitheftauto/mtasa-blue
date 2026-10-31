@@ -188,15 +188,15 @@ bool CStaticFunctionDefinitions::TriggerServerEvent(const char* szName, CClientE
         pBitStream->Write(szName, usNameLength);
         pBitStream->Write(CallWithEntity.GetID());
 
-        // Tell the server which resource fired the event, so its handlers can set sourceResource
-        if (pBitStream->Can(eBitStreamVersion::RemoteEventSourceResource))
-            pBitStream->WriteCompressed(static_cast<unsigned short>(pSourceResource ? pSourceResource->GetNetID() : INVALID_RESOURCE_NET_ID));
-
         if (!Arguments.WriteToBitStream(*pBitStream))
         {
             g_pNet->DeallocateNetBitStream(pBitStream);
             return false;
         }
+
+        // Trailing field so the argument block keeps the layout servers have always parsed
+        pBitStream->WriteCompressed(static_cast<unsigned short>(pSourceResource ? pSourceResource->GetNetID() : INVALID_RESOURCE_NET_ID));
+
         g_pNet->SendPacket(PACKET_ID_LUA_EVENT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
         g_pNet->DeallocateNetBitStream(pBitStream);
 
@@ -222,15 +222,15 @@ bool CStaticFunctionDefinitions::TriggerLatentServerEvent(const char* szName, CC
         pBitStream->Write(szName, usNameLength);
         pBitStream->Write(CallWithEntity.GetID());
 
-        // Tell the server which resource fired the event, so its handlers can set sourceResource
-        if (pBitStream->Can(eBitStreamVersion::RemoteEventSourceResource))
-            pBitStream->WriteCompressed(static_cast<unsigned short>(pSourceResource ? pSourceResource->GetNetID() : INVALID_RESOURCE_NET_ID));
-
         if (!Arguments.WriteToBitStream(*pBitStream))
         {
             g_pNet->DeallocateNetBitStream(pBitStream);
             return false;
         }
+
+        // Trailing field so the argument block keeps the layout servers have always parsed
+        pBitStream->WriteCompressed(static_cast<unsigned short>(pSourceResource ? pSourceResource->GetNetID() : INVALID_RESOURCE_NET_ID));
+
         g_pClientGame->GetLatentTransferManager()->AddSendBatchBegin(PACKET_ID_LUA_EVENT, pBitStream);
         g_pClientGame->GetLatentTransferManager()->AddSend(0, pBitStream->Version(), iBandwidth, pLuaMain, usResourceNetId);
         g_pClientGame->GetLatentTransferManager()->AddSendBatchEnd();
