@@ -938,6 +938,8 @@ void CModelInfoSA::StaticResetModelTimes()
     {
         x.first->m_nTimeOn = x.second->m_nTimeOn;
         x.first->m_nTimeOff = x.second->m_nTimeOff;
+
+        delete x.second;
     }
     ms_ModelDefaultModelTimeInfo.clear();
 }
