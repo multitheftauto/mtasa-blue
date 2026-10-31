@@ -13,7 +13,6 @@
 
 #include "CClientCommon.h"
 #include <CClientManager.h>
-#include <CClientTextDisplay.h>
 #include <gui/CGUI.h>
 
 class CPlayerMap
@@ -68,17 +67,17 @@ public:
     void ZoomIn();
     void ZoomOut();
 
+    void MoveNorth();
+    void MoveSouth();
+    void MoveEast();
+    void MoveWest();
+
     SString GetBoundKeyName(const SString& strCommand);
 
 private:
     bool CalculateEntityOnScreenPosition(class CClientEntity* pEntity, CVector2D& vecLocalPos);
     bool CalculateEntityOnScreenPosition(CVector vecPosition, CVector2D& vecLocalPos);
     void SetupMapVariables();
-
-    void MoveNorth();
-    void MoveSouth();
-    void MoveEast();
-    void MoveWest();
 
 private:
     class CClientManager*            m_pManager;
@@ -89,9 +88,14 @@ private:
 
     std::size_t m_playerMapImageIndex;
 
-    CTextureItem*              m_mapImageTexture;
-    CTextureItem*              m_playerMarkerTexture;
-    std::vector<CTextureItem*> m_markerTextureList;
+    CTextureItem*                  m_mapImageTexture;
+    CTextureItem*                  m_playerMarkerTexture;
+    std::vector<CTextureItem*>     m_markerTextureList;
+    std::array<CTextureItem*, 144> m_radarTileTextures{};
+    bool                           m_radarTilesLoaded = false;
+
+    void LoadRadarTileTextures();
+    void ReleaseRadarTileTextures();
 
     unsigned int m_uiHeight;
     unsigned int m_uiWidth;
@@ -118,14 +122,26 @@ private:
 
     unsigned long m_ulUpdateTime;
 
-    std::vector<std::shared_ptr<CClientTextDisplay>> m_HelpTextList;
-    bool                                             m_bHideHelpText;
+    bool m_bHideHelpText = false;
 
     bool m_bHudVisible;
     bool m_bChatVisible;
     bool m_bChatInputBlocked;
-    bool m_bRadarVisible;
     bool m_bDebugVisible;
-    bool m_bTextVisible;
     bool m_bPendingViewportRefresh = false;
+
+    bool      m_isDragging = false;
+    bool      m_cursorEnabled = false;
+    float     m_savedZoomLevel = 2.0f;
+    CVector2D m_dragStartCursor;
+    int       m_dragStartHorizontal = 0;
+    int       m_dragStartVertical = 0;
+
+    class CClientRadarMarker* m_waypointMarker = nullptr;
+
+public:
+    bool ProcessMessage(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void ZoomAtCursor(float factor, float cursorX, float cursorY);
+    void ToggleWaypoint(float worldX, float worldY);
+    void ClearWaypoint();
 };
