@@ -28,6 +28,15 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
     assert(pLuaMain);
     assert(szKey);
 
+    if (COMMANDENTRY* pCoreCommand = g_pCore->GetCommands()->Get(szKey))
+    {
+        if (!pCoreCommand->bModCommand)
+        {
+            g_pClientGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: '%s' is a built-in command and cannot be replaced", szKey);
+            return false;
+        }
+    }
+
     if (CommandExists(szKey, nullptr))
     {
         const MultiCommandHandlerPolicy allowMultiHandlers = g_pClientGame->GetAllowMultiCommandHandlers();
