@@ -479,7 +479,7 @@ public:
 
     static void GUIScrollPaneSetScrollBars(CClientEntity& Element, bool bH, bool bV);
 
-    static void GUIScrollBarSetScrollPosition(CClientEntity& Element, int iProgress);
+    static void GUIScrollBarSetScrollPosition(CClientEntity& Element, float fProgress);
 
     static void GUIScrollPaneSetHorizontalScrollPosition(CClientEntity& Element, float fProgress);
     static void GUIScrollPaneSetVerticalScrollPosition(CClientEntity& Element, float fProgress);
