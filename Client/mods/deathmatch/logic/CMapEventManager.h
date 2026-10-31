@@ -14,6 +14,8 @@
 #include "CMapEvent.h"
 #include <list>
 
+class CResource;
+
 class CMapEventManager
 {
 public:
@@ -29,7 +31,7 @@ public:
     void GetHandles(CLuaMain* pLuaMain, const char* szName, lua_State* luaVM);
 
     bool Call(const char* szName, const CLuaArguments& Arguments, class CClientEntity* pSource, class CClientEntity* pThis,
-              const char* minClientVersion = nullptr);
+              const char* minClientVersion = nullptr, CResource* pSourceResource = nullptr);
 
 private:
     void TakeOutTheTrash();

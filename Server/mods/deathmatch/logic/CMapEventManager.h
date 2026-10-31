@@ -15,6 +15,8 @@
 #include "CMapEvent.h"
 #include <list>
 
+class CResource;
+
 class CMapEventManager
 {
 public:
@@ -29,7 +31,8 @@ public:
     bool HasEvents() const { return m_bHasEvents; }
     void GetHandles(CLuaMain* pLuaMain, const char* szName, lua_State* luaVM);
 
-    bool Call(const char* szName, const CLuaArguments& Arguments, class CElement* pSource, class CElement* pThis, class CPlayer* pCaller = NULL);
+    bool Call(const char* szName, const CLuaArguments& Arguments, class CElement* pSource, class CElement* pThis, class CPlayer* pCaller = NULL,
+              CResource* pSourceResource = nullptr);
 
 private:
     void TakeOutTheTrash();

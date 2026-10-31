@@ -15,10 +15,12 @@
 CLuaEventPacket::CLuaEventPacket()
 {
     m_ElementID = INVALID_ELEMENT_ID;
+    m_usSourceResourceNetID = INVALID_RESOURCE_NET_ID;
     m_pArguments = &m_ArgumentsStore;
 }
 
-CLuaEventPacket::CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments* pArguments)
+CLuaEventPacket::CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments* pArguments, unsigned short usSourceResourceNetId)
+    : m_usSourceResourceNetID(usSourceResourceNetId)
 {
     m_strName.AssignLeft(szName, MAX_EVENT_NAME_LENGTH);
     m_ElementID = ID;
@@ -41,6 +43,9 @@ bool CLuaEventPacket::Read(NetBitStreamInterface& BitStream)
                 return false;
             m_pArguments = &m_ArgumentsStore;
 
+            // Trailing field, so the argument block keeps its layout. A sender without it leaves nothing to read.
+            BitStream.ReadCompressed(m_usSourceResourceNetID);
+
             return true;
         }
     }
@@ -53,7 +58,9 @@ bool CLuaEventPacket::Write(NetBitStreamInterface& BitStream) const
     BitStream.WriteCompressed(static_cast<unsigned short>(m_strName.length()));
     BitStream.WriteStringCharacters(m_strName);
     BitStream.Write(m_ElementID);
+
     m_pArguments->WriteToBitStream(BitStream);
+    BitStream.WriteCompressed(m_usSourceResourceNetID);
 
     return true;
 }

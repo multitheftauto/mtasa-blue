@@ -173,7 +173,7 @@ bool CStaticFunctionDefinitions::TriggerEvent(const char* szName, CClientEntity&
     return false;
 }
 
-bool CStaticFunctionDefinitions::TriggerServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments)
+bool CStaticFunctionDefinitions::TriggerServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, CResource* pSourceResource)
 {
     assert(szName);
 
@@ -187,11 +187,16 @@ bool CStaticFunctionDefinitions::TriggerServerEvent(const char* szName, CClientE
         pBitStream->WriteCompressed(usNameLength);
         pBitStream->Write(szName, usNameLength);
         pBitStream->Write(CallWithEntity.GetID());
+
         if (!Arguments.WriteToBitStream(*pBitStream))
         {
             g_pNet->DeallocateNetBitStream(pBitStream);
             return false;
         }
+
+        // Trailing field so the argument block keeps the layout servers have always parsed
+        pBitStream->WriteCompressed(static_cast<unsigned short>(pSourceResource ? pSourceResource->GetNetID() : INVALID_RESOURCE_NET_ID));
+
         g_pNet->SendPacket(PACKET_ID_LUA_EVENT, pBitStream, PACKET_PRIORITY_HIGH, PACKET_RELIABILITY_RELIABLE_ORDERED);
         g_pNet->DeallocateNetBitStream(pBitStream);
 
@@ -202,7 +207,7 @@ bool CStaticFunctionDefinitions::TriggerServerEvent(const char* szName, CClientE
 }
 
 bool CStaticFunctionDefinitions::TriggerLatentServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int iBandwidth,
-                                                          CLuaMain* pLuaMain, ushort usResourceNetId)
+                                                          CLuaMain* pLuaMain, ushort usResourceNetId, CResource* pSourceResource)
 {
     assert(szName);
 
@@ -216,11 +221,16 @@ bool CStaticFunctionDefinitions::TriggerLatentServerEvent(const char* szName, CC
         pBitStream->WriteCompressed(usNameLength);
         pBitStream->Write(szName, usNameLength);
         pBitStream->Write(CallWithEntity.GetID());
+
         if (!Arguments.WriteToBitStream(*pBitStream))
         {
             g_pNet->DeallocateNetBitStream(pBitStream);
             return false;
         }
+
+        // Trailing field so the argument block keeps the layout servers have always parsed
+        pBitStream->WriteCompressed(static_cast<unsigned short>(pSourceResource ? pSourceResource->GetNetID() : INVALID_RESOURCE_NET_ID));
+
         g_pClientGame->GetLatentTransferManager()->AddSendBatchBegin(PACKET_ID_LUA_EVENT, pBitStream);
         g_pClientGame->GetLatentTransferManager()->AddSend(0, pBitStream->Version(), iBandwidth, pLuaMain, usResourceNetId);
         g_pClientGame->GetLatentTransferManager()->AddSendBatchEnd();
