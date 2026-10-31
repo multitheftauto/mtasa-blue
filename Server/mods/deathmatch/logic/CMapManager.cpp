@@ -933,6 +933,10 @@ bool CMapManager::HandleNode(CResource& Loader, CXMLNode& Node, CElement* pParen
     {
         pNode = m_pWaterManager->CreateFromXML(pParent, Node, m_pEvents);
     }
+    else if (elementType == CElement::BUILDING)
+    {
+        pNode = g_pGame->GetBuildingManager()->CreateFromXML(pParent, Node, m_pEvents);
+    }
     else if (strBuffer.empty())
     {
         // Comment, return true
