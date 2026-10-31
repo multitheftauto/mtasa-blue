@@ -96,6 +96,13 @@ enum eLights
     MAX_LIGHTS
 };
 
+enum class HeadlightSide : std::uint8_t
+{
+    Left = 0,
+    Right = 1,
+    Both = 2
+};
+
 enum eVehicleType
 {
     VEHICLE_NONE = 0,
@@ -345,8 +352,19 @@ public:
     CTrainTrack* GetTrainTrack() { return m_pTrainTrack; }
     void         SetTrainTrack(CTrainTrack* pTrainTrack) { m_pTrainTrack = pTrainTrack; }
 
-    SColor GetHeadLightColor() { return m_HeadLightColor; }
-    void   SetHeadLightColor(const SColor color) { m_HeadLightColor = color; }
+    SColor GetHeadLightColor(HeadlightSide side = HeadlightSide::Left)
+    {
+        if (side == HeadlightSide::Right)
+            return m_headlightColors[1];
+        return m_headlightColors[0];
+    }
+    void SetHeadLightColor(const SColor color, HeadlightSide side = HeadlightSide::Both)
+    {
+        if (side == HeadlightSide::Left || side == HeadlightSide::Both)
+            m_headlightColors[0] = color;
+        if (side == HeadlightSide::Right || side == HeadlightSide::Both)
+            m_headlightColors[1] = color;
+    }
 
     bool IsHeliSearchLightVisible() { return m_bHeliSearchLightVisible; }
     void SetHeliSearchLightVisible(bool bVisible) { m_bHeliSearchLightVisible = bVisible; }
@@ -459,7 +477,7 @@ private:
     unsigned char         m_ucAlpha;
     bool                  m_bInWater;
     CPed*                 m_pJackingPed;
-    SColor                m_HeadLightColor;
+    SColor                m_headlightColors[2]{SColorRGBA(255, 255, 255, 255), SColorRGBA(255, 255, 255, 255)};
     bool                  m_bHeliSearchLightVisible;
 
     // Train specific data
