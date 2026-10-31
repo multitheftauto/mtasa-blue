@@ -23,6 +23,8 @@
 #include "CGame.h"
 #include "Utils.h"
 #include "lua/CLuaFunctionParseHelpers.h"
+#include "CTrainTrackManager.h"
+#include "CTrainTrack.h"
 
 CUnoccupiedVehicleSync::CUnoccupiedVehicleSync(CPlayerManager* pPlayerManager, CVehicleManager* pVehicleManager)
 {
@@ -448,6 +450,39 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
 
                         // Derailed state
                         pVehicle->SetDerailed(vehicle.data.bDerailed);
+
+                        // The only place an unoccupied train's position and track reach the server;
+                        // the regular vehicle puresync only runs while someone is driving, so
+                        // without this vehicle.trainPosition freezes the moment the last occupant
+                        // leaves (#396)
+                        if (vehicle.data.bSyncTrain && pVehicle->GetVehicleType() == VEHICLE_TRAIN && !vehicle.data.bDerailed)
+                        {
+                            CTrainTrack* pTrainTrack = nullptr;
+                            if (vehicle.data.bTrainHasTrack)
+                            {
+                                if (vehicle.data.bTrainTrackIsDefault)
+                                {
+                                    pTrainTrack = g_pGame->GetTrainTrackManager()->GetDefaultTrackByIndex(vehicle.data.ucTrainDefaultTrackId);
+                                }
+                                else
+                                {
+                                    CElement* pTrackElement = CElementIDs::GetElement(vehicle.data.TrainTrackElementID);
+                                    if (pTrackElement && pTrackElement->GetType() == CElement::TRAIN_TRACK)
+                                        pTrainTrack = static_cast<CTrainTrack*>(pTrackElement);
+                                }
+                            }
+
+                            // Only apply the rail distance once the track it belongs to is known;
+                            // without one, say the custom track it was on is already gone, the
+                            // distance would be measured against a track it isn't on
+                            if (pTrainTrack)
+                            {
+                                pVehicle->SetTrainTrack(pTrainTrack);
+                                pVehicle->SetTrainPosition(vehicle.data.fTrainPosition);
+                                pVehicle->SetTrainDirection(vehicle.data.bTrainDirection);
+                                pVehicle->SetTrainSpeed(vehicle.data.fTrainSpeed);
+                            }
+                        }
 
                         // Set our In Water State
                         pVehicle->SetInWater(vehicle.data.bIsInWater);
