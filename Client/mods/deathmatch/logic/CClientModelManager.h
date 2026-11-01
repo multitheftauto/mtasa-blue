@@ -27,14 +27,14 @@ class CClientModelManager
 
 public:
     CClientModelManager();
-    ~CClientModelManager(void);
+    ~CClientModelManager();
 
-    void RemoveAll(void);
+    void RemoveAll();
 
     void Add(const std::shared_ptr<CClientModel>& pModel);
     bool Remove(const std::shared_ptr<CClientModel>& pModel);
 
-    int GetFirstFreeModelID(void);
+    int GetFirstFreeModelID();
     int GetFreeTxdModelID();
 
     std::shared_ptr<CClientModel> FindModelByID(int iModelID);
