@@ -13,6 +13,8 @@
 #include "CLuaDefs.h"
 #include <lua/CLuaMultiReturn.h>
 
+class CClientColModel;
+
 class CLuaEngineDefs : public CLuaDefs
 {
 public:
@@ -60,6 +62,7 @@ public:
     LUA_DECLARE(EngineRestoreObjectGroupPhysicalProperties)
 
     static bool                                            EngineAddClothingModel(CClientDFF* pDff, std::string strModelName);
+    static bool                                            EngineSetCOLData(lua_State* luaVM, CClientColModel* colModel);
     static bool                                            EngineAddClothingTXD(CClientTXD* pTxd, std::string strModelName);
     static uint                                            EngineGetModelFlags(uint uiModelID);
     static bool                                            EngineSetModelFlags(uint uiModelID, uint uiFlags, std::optional<bool> bIdeFlags);
@@ -100,6 +103,7 @@ public:
     static void EngineRestream(std::optional<RestreamOption> option);
 
 private:
+    static int  EngineLoadCOLFromTable(lua_State* luaVM);
     static void AddEngineColClass(lua_State* luaVM);
     static void AddEngineTxdClass(lua_State* luaVM);
     static void AddEngineDffClass(lua_State* luaVM);
