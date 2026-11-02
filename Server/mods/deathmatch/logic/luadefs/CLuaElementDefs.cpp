@@ -1467,7 +1467,7 @@ int CLuaElementDefs::isElementVisibleTo(lua_State* luaVM)
         if (IS_PERPLAYER_ENTITY(pElement))
         {
             // Return true if we're visible for the given element
-            if (static_cast<CPerPlayerEntity*>(pElement)->IsVisibleToReferenced(pVisibleTo))
+            if (static_cast<CPerPlayerEntity*>(pElement)->IsVisibleToElement(pVisibleTo))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
