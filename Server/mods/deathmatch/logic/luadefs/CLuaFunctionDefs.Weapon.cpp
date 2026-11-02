@@ -693,6 +693,7 @@ int CLuaFunctionDefs::SetWeaponProperty(lua_State* luaVM)
                 case WEAPON_DAMAGE:
                 case WEAPON_MAX_CLIP_AMMO:
                 case WEAPON_FLAGS:
+                case WEAPON_ANIM_GROUP:
                 {
                     int sWeaponInfo = 0;
                     argStream.ReadNumber(sWeaponInfo);
