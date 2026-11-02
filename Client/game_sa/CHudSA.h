@@ -55,9 +55,13 @@
 #define CODE_ShowMoney          0x58F47D
 #define CODE_ShowRadarAltimeter 0x58A5A6
 
-#define VAR_CTheScripts_bDrawCrossHair 0xA44490
-#define VAR_RSGlobal                   0xC17040
-#define VAR_ItemToFlash                0xBAB1DC
+#define VAR_RSGlobal    0xC17040
+#define VAR_ItemToFlash 0xBAB1DC
+
+#define VAR_ChairMultX 0xB6EC14
+#define VAR_ChairMultY 0xB6EC10
+
+#define VAR_CrosshairTexSize 64.0f  // 64x64
 
 struct SHudComponent
 {
@@ -170,6 +174,8 @@ struct ComponentProperties
 
     SHudComponentData weaponIcon;
     SHudComponentData wanted;
+
+    SHudComponentData crosshair;
 };
 
 class CHudSA : public CHud
@@ -296,6 +302,10 @@ private:
                                      std::uint8_t a, std::uint8_t uDir, std::uint8_t vDir);
 
     static void RenderWanted(bool empty, float x, float y, const char* strLevel);
+
+    static void __fastcall RenderCircleCrosshair(void* sprite, void*, CRect* rect, RwColor* color);
+    static void RenderRocketCrosshair(CVector pos, CVector2D halfSize, std::uint8_t r, std::uint8_t g, std::uint8_t b, std::uint16_t intensity, float rhw,
+                                      std::uint8_t a, std::uint8_t uDir, std::uint8_t vDir);
 
 private:
     std::map<eHudComponent, SHudComponent> m_HudComponentMap;
