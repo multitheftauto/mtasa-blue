@@ -23,3 +23,8 @@ bool IsPng(const void* pData, uint uiDataSize);
 bool PngGetDimensions(const void* pData, uint uiDataSize, uint& uiOutWidth, uint& uiOutHeight);
 bool PngEncode(uint uiWidth, uint uiHeight, const void* pData, uint uiDataSize, CBuffer& outBuffer);
 bool PngDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& uiOutWidth, uint& uiOutHeight);
+
+// WebP stuff
+bool IsWebP(const void* pData, uint uiDataSize);
+bool WebPGetDimensions(const void* pData, uint uiDataSize, uint& uiOutWidth, uint& uiOutHeight);
+bool WebPDecode(const void* pData, uint uiDataSize, CBuffer* pOutBuffer, uint& uiOutWidth, uint& uiOutHeight);
