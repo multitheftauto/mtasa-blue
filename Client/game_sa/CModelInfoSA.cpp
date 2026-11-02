@@ -680,6 +680,9 @@ void CModelInfoSA::SetIdeFlag(eModelIdeFlag eIdeFlag, bool bState)
         case eModelIdeFlag::DISABLE_BACKFACE_CULLING:
             m_pInterface->bIsBackfaceCulled = !bState;
             break;
+        case eModelIdeFlag::REALLY_DRAW_LAST:
+            SetRenderingAfterScene(bState);
+            break;
         default:
             break;
     }
@@ -727,6 +730,8 @@ bool CModelInfoSA::GetIdeFlag(eModelIdeFlag eIdeFlag)
             return m_pInterface->bDontCollideWithFlyer;
         case eModelIdeFlag::DISABLE_BACKFACE_CULLING:
             return !m_pInterface->bIsBackfaceCulled;
+        case eModelIdeFlag::REALLY_DRAW_LAST:
+            return ShouldRenderAfterScene();
         default:
             return false;
     }
