@@ -588,6 +588,8 @@ protected:
     void Interpolate();
     void UpdateKeysync(bool bCleanup = false);
 
+    void SetCurrentRotationInternal(float fRotation, bool bIncludeTarget, bool bUpdateCachedMatrices);
+
     // Used to destroy the current game ped and create a new one in the same state.
     void ReCreateModel();
     void ReCreateGameEntity();
