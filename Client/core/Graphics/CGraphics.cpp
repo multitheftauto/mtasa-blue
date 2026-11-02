@@ -460,6 +460,19 @@ void CGraphics::SetBlendModeRenderStates(EBlendModeType blendMode)
 
             m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
             m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+
+            // When drawing into a render target, use separate alpha blend to prevent double-premultiplication.
+            // Color blend stays SRC_ALPHA/INV_SRC_ALPHA; alpha channel uses ONE/INV_SRC_ALPHA so coverage accumulates correctly.
+            if (m_pRenderItemManager && m_pRenderItemManager->IsCustomRenderTargetActive())
+            {
+                m_pDevice->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, TRUE);
+                m_pDevice->SetRenderState(D3DRS_SRCBLENDALPHA, D3DBLEND_ONE);
+                m_pDevice->SetRenderState(D3DRS_DESTBLENDALPHA, D3DBLEND_INVSRCALPHA);
+            }
+            else
+            {
+                m_pDevice->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, FALSE);
+            }
         }
         break;
 
@@ -530,6 +543,34 @@ void CGraphics::SetBlendModeRenderStates(EBlendModeType blendMode)
             m_pDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
             m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, FALSE);
             m_pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, FALSE);
+            m_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+            m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
+            m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG1, D3DTA_TEXTURE);
+            m_pDevice->SetTextureStageState(0, D3DTSS_COLORARG2, D3DTA_DIFFUSE);
+            m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAOP, D3DTOP_MODULATE);
+            m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE);
+            m_pDevice->SetTextureStageState(0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE);
+
+            m_pDevice->SetTextureStageState(1, D3DTSS_COLOROP, D3DTOP_DISABLE);
+            m_pDevice->SetTextureStageState(1, D3DTSS_ALPHAOP, D3DTOP_DISABLE);
+        }
+        break;
+
+        case EBlendMode::RT_TEXTURE:
+        {
+            // Draw a render target texture to screen. The RT stores premultiplied-alpha RGB, so use ONE/INV_SRC_ALPHA
+            // to avoid applying alpha a second time (which would cause double-premultiplication).
+            m_pDevice->SetRenderState(D3DRS_ZENABLE, D3DZB_FALSE);
+            m_pDevice->SetRenderState(D3DRS_CULLMODE, D3DCULL_NONE);
+            m_pDevice->SetRenderState(D3DRS_SHADEMODE, D3DSHADE_GOURAUD);
+            m_pDevice->SetRenderState(D3DRS_ALPHABLENDENABLE, TRUE);
+            m_pDevice->SetRenderState(D3DRS_SRCBLEND, D3DBLEND_ONE);
+            m_pDevice->SetRenderState(D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA);
+            m_pDevice->SetRenderState(D3DRS_SEPARATEALPHABLENDENABLE, FALSE);
+            m_pDevice->SetRenderState(D3DRS_ALPHATESTENABLE, TRUE);
+            m_pDevice->SetRenderState(D3DRS_ALPHAREF, 0x01);
+            m_pDevice->SetRenderState(D3DRS_ALPHAFUNC, D3DCMP_GREATEREQUAL);
             m_pDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
 
             m_pDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_MODULATE);
@@ -1982,7 +2023,11 @@ void CGraphics::DrawQueueItem(const sDrawQueueItem& Item)
                 const D3DXVECTOR2* pRotationCenter = Item.Texture.fRotation ? &rotationCenter : NULL;
                 D3DXMATRIX         matrix;
                 D3DXMatrixTransformation2D(&matrix, NULL, 0.0f, &scaling, pRotationCenter, DegreesToRadians(Item.Texture.fRotation), &position);
-                CheckModes(EDrawMode::DX_SPRITE, Item.blendMode);
+                // Render target textures store premultiplied-alpha RGB; use RT_TEXTURE blend to avoid double-premultiplication.
+                EBlendModeType effectiveBlend = Item.blendMode;
+                if (effectiveBlend == EBlendMode::BLEND && DynamicCast<CRenderTargetItem>(pTexture) != nullptr)
+                    effectiveBlend = EBlendMode::RT_TEXTURE;
+                CheckModes(EDrawMode::DX_SPRITE, effectiveBlend);
                 m_pDXSprite->SetTransform(&matrix);
                 m_pDXSprite->Draw((IDirect3DTexture9*)pTexture->m_pD3DTexture, &cutImagePos, NULL, NULL,
                                   /*ModifyColorForBlendMode (*/ Item.Texture.ulColor /*, Item.blendMode )*/);

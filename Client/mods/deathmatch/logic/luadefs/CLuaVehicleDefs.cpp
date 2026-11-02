@@ -2552,7 +2552,7 @@ int CLuaVehicleDefs::SetVehicleHandling(lua_State* luaVM)
             SString strProperty;
             argStream.ReadString(strProperty);
 
-            HandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
+            HandlingProperty::Enum eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
             if (eProperty > HandlingProperty::HANDLING_NONE)
             {
                 if (argStream.NextIsNil())
@@ -2720,8 +2720,8 @@ int CLuaVehicleDefs::GetVehicleHandling(lua_State* luaVM)
             SString strProperty;
             argStream.ReadString(strProperty);
 
-            bool             bResult = true;
-            HandlingProperty eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
+            bool                   bResult = true;
+            HandlingProperty::Enum eProperty = g_pGame->GetHandlingManager()->GetPropertyEnumFromName(strProperty);
             if (eProperty != HandlingProperty::HANDLING_MAX)
             {
                 float         fValue = 0.0f;
@@ -3098,13 +3098,27 @@ int CLuaVehicleDefs::GetVehicleSirenParams(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CClientVehicle*  pVehicle = NULL;
-    unsigned char    ucSirenID = 0;
     SSirenInfo       tSirenInfo;
 
     argStream.ReadUserData(pVehicle);
     if (!argStream.HasErrors())
     {
         tSirenInfo = pVehicle->m_tSirenBeaconInfo;  // Grab the siren structure data
+
+        // If custom sirens are not overridden, query native GTA:SA default sirens
+        if (!tSirenInfo.m_bOverrideSirens)
+        {
+            if (const auto defaultSirens = SharedUtil::GetDefaultVehicleSirens(pVehicle->GetModel()); defaultSirens.has_value())
+            {
+                tSirenInfo.m_ucSirenCount = defaultSirens->sirenCount;
+                tSirenInfo.m_ucSirenType = defaultSirens->sirenType;
+                tSirenInfo.m_b360Flag = defaultSirens->flag360;
+                tSirenInfo.m_bDoLOSCheck = defaultSirens->doLOSCheck;
+                tSirenInfo.m_bUseRandomiser = defaultSirens->useRandomiser;
+                tSirenInfo.m_bSirenSilent = defaultSirens->sirenSilent;
+            }
+        }
+
         lua_newtable(luaVM);
 
         lua_pushstring(luaVM, "SirenCount");
@@ -3149,13 +3163,28 @@ int CLuaVehicleDefs::GetVehicleSirens(lua_State* luaVM)
 {
     CScriptArgReader argStream(luaVM);
     CClientVehicle*  pVehicle = NULL;
-    unsigned char    ucSirenID = 0;
     SSirenInfo       tSirenInfo;
 
     argStream.ReadUserData(pVehicle);
     if (!argStream.HasErrors())
     {
         tSirenInfo = pVehicle->m_tSirenBeaconInfo;  // Grab the siren structure data
+
+        // If custom sirens are not overridden, query native GTA:SA default sirens
+        if (!tSirenInfo.m_bOverrideSirens)
+        {
+            if (const auto defaultSirens = SharedUtil::GetDefaultVehicleSirens(pVehicle->GetModel()); defaultSirens.has_value())
+            {
+                tSirenInfo.m_ucSirenCount = defaultSirens->sirenCount;
+                for (std::size_t i = 0; i < defaultSirens->sirenCount; ++i)
+                {
+                    tSirenInfo.m_tSirenInfo[i].m_vecSirenPositions = defaultSirens->beacons[i].position;
+                    tSirenInfo.m_tSirenInfo[i].m_RGBBeaconColour = defaultSirens->beacons[i].color;
+                    tSirenInfo.m_tSirenInfo[i].m_dwMinSirenAlpha = defaultSirens->beacons[i].minAlpha;
+                }
+            }
+        }
+
         lua_newtable(luaVM);
 
         for (int i = 0; i < tSirenInfo.m_ucSirenCount; i++)
@@ -4006,9 +4035,9 @@ int CLuaVehicleDefs::IsVehicleWindowOpen(lua_State* luaVM)
 int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // bool setVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy, float x, float y, float z )
-    unsigned short usModel;
-    VehicleDummies eDummy;
-    CVector        vecPosition;
+    unsigned short       usModel;
+    VehicleDummies::Enum eDummy;
+    CVector              vecPosition;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -4033,8 +4062,8 @@ int CLuaVehicleDefs::SetVehicleModelDummyPosition(lua_State* luaVM)
 int CLuaVehicleDefs::GetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy )
-    unsigned short usModel;
-    VehicleDummies eDummy;
+    unsigned short       usModel;
+    VehicleDummies::Enum eDummy;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -4062,8 +4091,8 @@ int CLuaVehicleDefs::GetVehicleModelDummyPosition(lua_State* luaVM)
 int CLuaVehicleDefs::OOP_GetVehicleModelDummyPosition(lua_State* luaVM)
 {
     // float, float, float getVehicleModelDummyPosition ( int modelID, vehicle-dummy dummy )
-    unsigned short usModel;
-    VehicleDummies eDummy;
+    unsigned short       usModel;
+    VehicleDummies::Enum eDummy;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadNumber(usModel);
@@ -4191,7 +4220,7 @@ bool CLuaVehicleDefs::SetVehicleWheelScale(CClientVehicle* const pVehicle, const
 }
 
 std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::GetVehicleModelWheelSize(
-    const unsigned short usModel, const std::optional<ResizableVehicleWheelGroup> eWheelGroup)
+    const unsigned short usModel, const std::optional<ResizableVehicleWheelGroup::Enum> eWheelGroup)
 {
     CModelInfo* pModelInfo = nullptr;
     if (CClientVehicleManager::IsValidModel(usModel))
@@ -4200,7 +4229,7 @@ std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::Get
     if (!pModelInfo)
         throw std::invalid_argument("Invalid model ID");
 
-    ResizableVehicleWheelGroup eActualWheelGroup = eWheelGroup.value_or(ResizableVehicleWheelGroup::ALL_WHEELS);
+    ResizableVehicleWheelGroup::Enum eActualWheelGroup = eWheelGroup.value_or(ResizableVehicleWheelGroup::ALL_WHEELS);
     if (eActualWheelGroup == ResizableVehicleWheelGroup::ALL_WHEELS)
     {
         // Return a table like { ["front_axle"] = 0.7, ["rear_axle"] = 0.8 }
@@ -4212,7 +4241,7 @@ std::variant<float, std::unordered_map<std::string, float>> CLuaVehicleDefs::Get
     return pModelInfo->GetVehicleWheelSize(eActualWheelGroup);
 }
 
-bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, const ResizableVehicleWheelGroup eWheelGroup, const float fWheelSize)
+bool CLuaVehicleDefs::SetVehicleModelWheelSize(const unsigned short usModel, const ResizableVehicleWheelGroup::Enum eWheelGroup, const float fWheelSize)
 {
     CModelInfo* pModelInfo = nullptr;
 
@@ -4248,7 +4277,8 @@ int CLuaVehicleDefs::GetVehicleWheelFrictionState(CClientVehicle* pVehicle, unsi
     throw std::invalid_argument("Invalid vehicle type");
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, VehicleDummies dummy)
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleModelDummyDefaultPosition(unsigned short       vehicleModel,
+                                                                                                              VehicleDummies::Enum dummy)
 {
     CVector position;
 
@@ -4258,7 +4288,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVeh
     return std::tuple(position.fX, position.fY, position.fZ);
 }
 
-std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, VehicleDummies dummy)
+std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleModelDummyDefaultPosition(unsigned short vehicleModel, VehicleDummies::Enum dummy)
 {
     CVector position;
 
@@ -4268,12 +4298,12 @@ std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleModelDummyDefaultPosi
     return position;
 }
 
-bool CLuaVehicleDefs::SetVehicleDummyPosition(CClientVehicle* vehicle, VehicleDummies dummy, CVector position)
+bool CLuaVehicleDefs::SetVehicleDummyPosition(CClientVehicle* vehicle, VehicleDummies::Enum dummy, CVector position)
 {
     return vehicle->SetDummyPosition(dummy, position);
 }
 
-std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleDummyPosition(CClientVehicle* vehicle, VehicleDummies dummy)
+std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVehicleDummyPosition(CClientVehicle* vehicle, VehicleDummies::Enum dummy)
 {
     CVector position;
 
@@ -4283,7 +4313,7 @@ std::variant<bool, CLuaMultiReturn<float, float, float>> CLuaVehicleDefs::GetVeh
     return std::tuple(position.fX, position.fY, position.fZ);
 }
 
-std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, VehicleDummies dummy)
+std::variant<bool, CVector> CLuaVehicleDefs::OOP_GetVehicleDummyPosition(CClientVehicle* vehicle, VehicleDummies::Enum dummy)
 {
     CVector position;
 
@@ -4456,7 +4486,7 @@ bool CLuaVehicleDefs::GetVehicleRotorState(CClientVehicle* vehicle) noexcept
     return vehicle->GetVehicleRotorState();
 }
 
-bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const VehicleAudioSettingProperty eProperty, float varValue)
+bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const VehicleAudioSettingProperty::Enum eProperty, float varValue)
 {
     if (!CClientVehicleManager::IsStandardModel(uiModel))
         throw std::invalid_argument("Cannot change audio setting for allocated vechiles");
@@ -4539,7 +4569,7 @@ bool CLuaVehicleDefs::SetVehicleModelAudioSetting(const uint32_t uiModel, const 
             if (!((iValue >= 0 && iValue <= 5) || (iValue >= 8 && iValue <= 10)))
                 throw std::invalid_argument("Invalid sound-type value");
 
-            pModelSettings.SetSoundType(static_cast<VehicleSoundType>(iValue));
+            pModelSettings.SetSoundType(static_cast<VehicleSoundType::Enum>(iValue));
             break;
         }
         case VehicleAudioSettingProperty::BASS_SETTING:
@@ -4599,7 +4629,7 @@ bool CLuaVehicleDefs::ResetVehicleModelAudioSettings(const uint32_t uiModel)
     return true;
 }
 
-bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const VehicleAudioSettingProperty eProperty, float varValue)
+bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const VehicleAudioSettingProperty::Enum eProperty, float varValue)
 {
     CVehicleAudioSettingsEntry& pModelSettings = pVehicle->GetOrCreateAudioSettings();
 
@@ -4679,7 +4709,7 @@ bool CLuaVehicleDefs::SetVehicleAudioSetting(CClientVehicle* pVehicle, const Veh
             if (!((iValue >= 0 && iValue <= 5) || (iValue >= 8 && iValue <= 10)))
                 throw std::invalid_argument("Invalid sound-type value");
 
-            pModelSettings.SetSoundType(static_cast<VehicleSoundType>(iValue));
+            pModelSettings.SetSoundType(static_cast<VehicleSoundType::Enum>(iValue));
             break;
         }
         case VehicleAudioSettingProperty::BASS_SETTING:

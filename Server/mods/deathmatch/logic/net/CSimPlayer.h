@@ -50,6 +50,7 @@ public:
     ushort    m_usLatency;
     uchar     m_ucSyncTimeContext;
     uchar     m_ucWeaponType;
+    float     m_fMaxHealth;
 
     // Used in CSimVehiclePuresyncPacket
     ushort                m_usVehicleModel;

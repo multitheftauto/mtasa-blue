@@ -91,6 +91,8 @@ typedef int(__cdecl* RwStreamSkip_t)(RwStream* stream, uint size);
 typedef int(__cdecl* RpClumpDestroy_t)(RpClump* clump);
 using RpClumpForAllAtomicsCB_t = bool(__cdecl*)(RpAtomic*, void*);
 typedef RpClump*(__cdecl* RpClumpForAllAtomics_t)(RpClump* clump, RpClumpForAllAtomicsCB_t callback, void* pData);
+using RpGeometryForAllMaterialsCB_t = RpMaterial*(__cdecl*)(RpMaterial*, void*);
+typedef RpGeometry*(__cdecl* RpGeometryForAllMaterials_t)(RpGeometry* geometry, RpGeometryForAllMaterialsCB_t callback, void* pData);
 typedef RwTexDictionary*(__cdecl* RwTexDictionaryStreamRead_t)(RwStream* stream);
 typedef RwTexDictionary*(__cdecl* RwTexDictionaryGtaStreamRead_t)(RwStream* stream);
 typedef int(__cdecl* RwTexDictionaryStreamWrite_t)(RwTexDictionary* txd, RwStream* stream);
@@ -129,6 +131,7 @@ RWFUNC(RpClumpGetNumAtomics_t RpClumpGetNumAtomics, (RpClumpGetNumAtomics_t)0xDE
 RWFUNC(RwFrameTranslate_t RwFrameTranslate, (RwFrameTranslate_t)0xDEAD)
 RWFUNC(RwFrameTransform_t RwFrameTransform, (RwFrameTransform_t)0xDEAD)
 RWFUNC(RpClumpForAllAtomics_t RpClumpForAllAtomics, (RpClumpForAllAtomics_t)0xDEAD)
+RWFUNC(RpGeometryForAllMaterials_t RpGeometryForAllMaterials, (RpGeometryForAllMaterials_t)0xDEAD)
 RWFUNC(RwFrameAddChild_t RwFrameAddChild, (RwFrameAddChild_t)0xDEAD)
 RWFUNC(RpClumpAddAtomic_t RpClumpAddAtomic, (RpClumpAddAtomic_t)0xDEAD)
 RWFUNC(RpAtomicSetFrame_t RpAtomicSetFrame, (RpAtomicSetFrame_t)0xDEAD)

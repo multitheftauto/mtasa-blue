@@ -131,7 +131,10 @@ void CVehicleRPCs::SetVehicleTurnSpeed(CClientEntity* pSource, NetBitStreamInter
         CVector vecTurnSpeed;
         if (bitStream.Read(vecTurnSpeed.fX) && bitStream.Read(vecTurnSpeed.fY) && bitStream.Read(vecTurnSpeed.fZ))
         {
-            // Set the new movespeed
+            if (!vecTurnSpeed.IsValid())
+                return;
+
+            // Set the new turn speed
             pVehicle->SetTurnSpeed(vecTurnSpeed);
         }
     }

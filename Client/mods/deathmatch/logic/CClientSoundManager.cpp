@@ -128,6 +128,7 @@ void CClientSoundManager::DoPulse()
             g_pClientGame->GetElementDeleter()->Delete(pSound);
         }
     }
+
     UpdateDistanceStreaming(vecCameraPosition);
     ProcessStopQueues();
 }
@@ -149,9 +150,12 @@ CClientSound* CClientSoundManager::PlaySound2D(const SString& strSound, bool bIs
     {
         size_t size = strSound.size();
         void*  pMemory = new char[size];
+
         memcpy(pMemory, strSound.data(), size);
+
         if (pSound->Play((void*)pMemory, size, bLoop))
             return pSound;
+
         // Note: pMemory is already owned by pSound via AdoptBuffer, don't delete it here
     }
     else if (pSound->Play(strSound, bLoop))
@@ -186,12 +190,15 @@ CClientSound* CClientSoundManager::PlaySound3D(const SString& strSound, bool bIs
     {
         size_t size = strSound.size();
         void*  pMemory = new char[size];
+
         memcpy(pMemory, strSound.data(), size);
+
         if (pSound->Play3D((void*)pMemory, size, bLoop))
         {
             pSound->SetPosition(vecPosition);
             return pSound;
         }
+
         // Note: pMemory is already owned by pSound via AdoptBuffer, don't delete it here
     }
     else if (pSound->Play3D(strSound, bLoop))
@@ -238,11 +245,13 @@ CClientSound* CClientSoundManager::PlayGTASFX(eAudioLookupIndex containerIndex, 
     }
 
     CClientSound* pSound = PlaySound2D(pAudioData, uiAudioLength, bLoop);
+
     if (pSound)
     {
         CGameSettings* gameSettings = g_pGame->GetSettings();
         pSound->SetVolume(gameSettings->GetSFXVolume() / 255.0f);
     }
+
     return pSound;
 }
 
@@ -266,11 +275,13 @@ CClientSound* CClientSoundManager::PlayGTASFX3D(eAudioLookupIndex containerIndex
     }
 
     CClientSound* pSound = PlaySound3D(pAudioData, uiAudioLength, vecPosition, bLoop);
+
     if (pSound)
     {
         CGameSettings* gameSettings = g_pGame->GetSettings();
         pSound->SetVolume(gameSettings->GetSFXVolume() / 255.0f);
     }
+
     return pSound;
 }
 
@@ -288,6 +299,7 @@ int CClientSoundManager::GetFxEffectFromName(const std::string& strEffectName)
     {
         return it->second;
     }
+
     return -1;
 }
 
@@ -408,6 +420,7 @@ void CClientSoundManager::QueueChannelStop(DWORD pSound)
 {
     // Always not main thread
     dassert(!IsMainThread());
+
     m_CS.Lock();
     m_ChannelStopQueue.push_back(pSound);
     m_CS.Unlock();
@@ -434,6 +447,7 @@ void CClientSoundManager::ProcessStopQueues(bool bFlush)
         std::vector<DWORD> channelStopList = m_ChannelStopQueue;
         m_ChannelStopQueue.clear();
         m_CS.Unlock();
+
         for (unsigned int i = 0; i < channelStopList.size(); i++)
         {
             BASS_ChannelStop(channelStopList[i]);

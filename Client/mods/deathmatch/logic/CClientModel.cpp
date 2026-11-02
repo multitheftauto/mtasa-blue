@@ -55,6 +55,7 @@ bool CClientModel::Allocate(ushort usParentID)
         {
             bool isValidModel = g_pClientGame->GetObjectManager()->IsValidModel(usParentID);
             bool isDamagable = pParentModelInfo->IsDamageableAtomic();
+
             if (isValidModel && isDamagable)
             {
                 pModelInfo->MakeObjectDamageableModel(usParentID);
@@ -204,6 +205,7 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
             // Restore buildings
             CClientBuildingManager* pBuildingsManager = g_pClientGame->GetManager()->GetBuildingManager();
             auto&                   buildingsList = pBuildingsManager->GetBuildings();
+
             unloadModelsAndCallEventsNonStreamed(buildingsList.begin(), buildingsList.end(), usParentID, [=](auto& element) { element.SetModel(usParentID); });
 
             // Restore COL
@@ -228,11 +230,13 @@ void CClientModel::RestoreDFF(CModelInfo* pModelInfo)
 bool CClientModel::AllocateTXD(std::string& strTxdName)
 {
     std::uint32_t uiSlotID = g_pGame->GetPools()->GetTxdPool().AllocateTextureDictonarySlot(m_iModelID - MAX_MODEL_DFF_ID, strTxdName);
+
     if (uiSlotID != -1)
     {
         m_bAllocatedByUs = true;
         return true;
     }
+
     return false;
 }
 
