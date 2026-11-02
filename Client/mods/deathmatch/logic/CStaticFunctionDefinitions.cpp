@@ -4801,7 +4801,7 @@ bool CStaticFunctionDefinitions::GetSFXStatus(eAudioLookupIndex containerIndex, 
 }
 
 CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip(CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize,
-                                                           const SColor color, short sOrdering, unsigned short usVisibleDistance)
+                                                           const SColor color, short sOrdering, unsigned short usVisibleDistance, bool bShortRange)
 {
     // Valid icon and size?
     if (CClientRadarMarkerManager::IsValidIcon(ucIcon) && ucSize <= 25)
@@ -4813,6 +4813,7 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip(CResource& Resource, 
         pBlip->SetSprite(ucIcon);
         pBlip->SetScale(ucSize);
         pBlip->SetColor(color);
+        pBlip->SetShortRange(bShortRange);
 
         return pBlip;
     }
@@ -4821,7 +4822,7 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlip(CResource& Resource, 
 }
 
 CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo(CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize,
-                                                                     const SColor color, short sOrdering, unsigned short usVisibleDistance)
+                                                                     const SColor color, short sOrdering, unsigned short usVisibleDistance, bool bShortRange)
 {
     assert(&Entity);
     // Valid icon and size?
@@ -4834,6 +4835,7 @@ CClientRadarMarker* CStaticFunctionDefinitions::CreateBlipAttachedTo(CResource& 
         pBlip->SetSprite(ucIcon);
         pBlip->SetScale(ucSize);
         pBlip->SetColor(color);
+        pBlip->SetShortRange(bShortRange);
 
         return pBlip;
     }
@@ -4916,6 +4918,21 @@ bool CStaticFunctionDefinitions::SetBlipVisibleDistance(CClientEntity& Entity, u
         CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
 
         Marker.SetVisibleDistance(usVisibleDistance);
+        return true;
+    }
+
+    return false;
+}
+
+bool CStaticFunctionDefinitions::SetBlipShortRange(CClientEntity& Entity, bool bShortRange)
+{
+    RUN_CHILDREN(SetBlipShortRange(**iter, bShortRange))
+
+    if (IS_RADARMARKER(&Entity))
+    {
+        CClientRadarMarker& Marker = static_cast<CClientRadarMarker&>(Entity);
+
+        Marker.SetShortRange(bShortRange);
         return true;
     }
 

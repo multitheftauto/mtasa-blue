@@ -121,3 +121,19 @@ CVector* CMarkerSA::GetPosition()
 {
     return &internalInterface->position;
 }
+
+/**
+ * Set whether this is a short-range trace. Short-range traces are clipped by
+ * the radar's zoom circle instead of being clamped to its edge (SA-MP-style
+ * blip behaviour). The game default (long range, edge-clamped) is preserved.
+ * @param bShortRange true for short-range, false for long-range.
+ */
+void CMarkerSA::SetShortRange(bool bShortRange)
+{
+    internalInterface->bShortRange = bShortRange;
+}
+
+bool CMarkerSA::IsShortRange()
+{
+    return internalInterface->bShortRange;
+}
