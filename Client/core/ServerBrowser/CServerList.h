@@ -386,6 +386,7 @@ public:
     void         SortByASEVersion();
     void         Sort(unsigned int uiColumn, int direction);
     void         RetryNonRespondingServers();  // Reset no-reply counters for cached servers
+    void         RescanVisibleServers();
 
 protected:
     bool                m_bUpdated;
