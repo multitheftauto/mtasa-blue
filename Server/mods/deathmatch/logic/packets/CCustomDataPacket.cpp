@@ -16,6 +16,7 @@
 CCustomDataPacket::CCustomDataPacket()
 {
     m_szName = NULL;
+    m_isDelete = false;
 }
 
 CCustomDataPacket::~CCustomDataPacket()
@@ -24,26 +25,28 @@ CCustomDataPacket::~CCustomDataPacket()
     m_szName = NULL;
 }
 
-bool CCustomDataPacket::Read(NetBitStreamInterface& BitStream)
+bool CCustomDataPacket::Read(NetBitStreamInterface& bitStream)
 {
-    unsigned short usNameLength;
-    if (BitStream.Read(m_ElementID) && BitStream.ReadCompressed(usNameLength) && usNameLength > 0 && usNameLength <= MAX_CUSTOMDATA_NAME_LENGTH)
+    std::uint16_t nameLength;
+    if (bitStream.Read(m_ElementID) && bitStream.ReadCompressed(nameLength) && nameLength > 0 && nameLength <= MAX_CUSTOMDATA_NAME_LENGTH)
     {
-        m_szName = new char[usNameLength + 1];
-        if (BitStream.Read(m_szName, usNameLength))
+        m_szName = new char[nameLength + 1];
+        if (bitStream.Read(m_szName, nameLength))
         {
-            m_szName[usNameLength] = 0;
-            if (m_Value.ReadFromBitStream(BitStream))
-            {
+            m_szName[nameLength] = 0;
+            if (m_Value.ReadFromBitStream(bitStream))
                 return true;
-            }
+
+            // Clients leave out the value when requesting deletion, so the existing custom-data packet can also serve as RemoveElementData.
+            m_isDelete = true;
+            return true;
         }
     }
 
     return false;
 }
 
-bool CCustomDataPacket::Write(NetBitStreamInterface& BitStream) const
+bool CCustomDataPacket::Write(NetBitStreamInterface& bitStream) const
 {
     return true;
 }
