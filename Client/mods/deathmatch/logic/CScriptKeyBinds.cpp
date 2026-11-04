@@ -336,6 +336,9 @@ bool CScriptKeyBinds::AddKeyFunction(const char* szKey, bool bHitState, CLuaMain
     const SScriptBindableKey* pKey = GetBindableFromKey(szKey);
     if (pKey)
     {
+        if (KeyFunctionExists(pKey, pLuaMain, true, bHitState, iLuaFunction))
+            return false;
+
         CScriptKeyFunctionBind* pBind = new CScriptKeyFunctionBind;
         pBind->boundKey = pKey;
         pBind->bHitState = bHitState;
@@ -355,6 +358,9 @@ bool CScriptKeyBinds::AddKeyFunction(const SScriptBindableKey* pKey, bool bHitSt
 {
     if (pKey)
     {
+        if (KeyFunctionExists(pKey, pLuaMain, true, bHitState, iLuaFunction))
+            return false;
+
         CScriptKeyFunctionBind* pBind = new CScriptKeyFunctionBind;
         pBind->boundKey = pKey;
         pBind->bHitState = bHitState;
@@ -492,6 +498,9 @@ bool CScriptKeyBinds::AddControlFunction(const char* szControl, bool bHitState, 
     const SScriptBindableGTAControl* pControl = GetBindableFromControl(szControl);
     if (pControl)
     {
+        if (ControlFunctionExists(pControl, pLuaMain, true, bHitState, iLuaFunction))
+            return false;
+
         CScriptControlFunctionBind* pBind = new CScriptControlFunctionBind;
         pBind->boundKey = NULL;
         pBind->boundControl = pControl;
@@ -512,6 +521,9 @@ bool CScriptKeyBinds::AddControlFunction(const SScriptBindableGTAControl* pContr
 {
     if (pControl)
     {
+        if (ControlFunctionExists(pControl, pLuaMain, true, bHitState, iLuaFunction))
+            return false;
+
         CScriptControlFunctionBind* pBind = new CScriptControlFunctionBind;
         pBind->boundKey = NULL;
         pBind->boundControl = pControl;
