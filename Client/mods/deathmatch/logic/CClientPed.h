@@ -265,7 +265,7 @@ public:
                                    CVector* pClosestDoorPosition = NULL);
 
     void GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat = 0, unsigned char ucDoor = 0);
-    void GetOutOfVehicle(unsigned char ucDoor);
+    void GetOutOfVehicle(unsigned char ucDoor, bool forceExit = false);
 
     void            WarpIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat = 0);
     CClientVehicle* RemoveFromVehicle(bool bIgnoreIfGettingOut = false);
@@ -616,7 +616,7 @@ public:
     void _GetIntoVehicle(CClientVehicle* pVehicle, unsigned int uiSeat, unsigned char ucDoor);
     // Used to control and sync entering/exiting
     bool EnterVehicle(CClientVehicle* pVehicle, bool bPassenger, std::optional<unsigned int> optSeat = std::nullopt);
-    bool ExitVehicle();
+    bool ExitVehicle(bool forceExit = false);
     void ResetVehicleInOut();
     void UpdateVehicleInOut();
 
@@ -753,6 +753,7 @@ public:
     float                                    m_fLighting;
     unsigned char                            m_ucEnteringDoor;
     unsigned char                            m_ucLeavingDoor;
+    bool                                     m_forceExit{false};  // Don't wait for the vehicle to slow down before getting out
     bool                                     m_bPendingRebuildPlayer;
     uint                                     m_uiFrameLastRebuildPlayer;
     bool                                     m_bIsSyncing;
