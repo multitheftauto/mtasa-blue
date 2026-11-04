@@ -246,6 +246,7 @@ public:
 protected:
     CElement*    GetRootElement();
     virtual bool ReadSpecialData(const int iLine) = 0;
+    virtual void WriteSpecialData(CXMLNode* pNode);
 
     CElement* FindChildIndex(const char* szName, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);
     CElement* FindChildByTypeIndex(unsigned int uiTypeHash, unsigned int uiIndex, unsigned int& uiCurrentIndex, bool bRecursive);

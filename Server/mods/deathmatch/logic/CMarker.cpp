@@ -156,6 +156,27 @@ bool CMarker::ReadSpecialData(const int iLine)
     return true;
 }
 
+void CMarker::WriteSpecialData(CXMLNode* pNode)
+{
+    CElement::WriteSpecialData(pNode);
+
+    CXMLAttributes& attributes = pNode->GetAttributes();
+
+    attributes.Create("posX")->SetValue(m_vecPosition.fX);
+    attributes.Create("posY")->SetValue(m_vecPosition.fY);
+    attributes.Create("posZ")->SetValue(m_vecPosition.fZ);
+
+    char szType[64];
+    if (CMarkerManager::TypeToString(m_ucType, szType))
+        attributes.Create("type")->SetValue(szType);
+
+    attributes.Create("color")->SetValue(XMLColorFromInt(m_Color.R, m_Color.G, m_Color.B, m_Color.A).c_str());
+    attributes.Create("size")->SetValue(m_fSize);
+
+    attributes.Create("interior")->SetValue(static_cast<int>(m_ucInterior));
+    attributes.Create("dimension")->SetValue(static_cast<int>(m_usDimension));
+}
+
 void CMarker::SetPosition(const CVector& vecPosition)
 {
     // Different from our current position?
