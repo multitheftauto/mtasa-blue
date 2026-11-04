@@ -34,7 +34,7 @@ public:
     static bool IsValidModel(uint16_t modelId);
     static bool IsValidPosition(const CVector& pos) noexcept;
 
-    void ResizePoolIfNeeds();
+    void ResizePoolIfNeeds(std::size_t pendingBuildings = 0);
     bool SetPoolCapacity(size_t newCapacity);
 
     void DestroyAllForABit();
