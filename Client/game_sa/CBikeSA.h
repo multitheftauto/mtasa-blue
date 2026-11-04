@@ -57,7 +57,7 @@ public:
     int8                 m_acWheelDamageState[2];
     int8                 field_65E;
     int8                 field_65F;
-    int8                 m_anWheelColPoint[176];
+    CColPointSAInterface m_anWheelColPoint[4];
     float                m_wheelRatios[4];
     float                m_prevWheelRatios[4];
     int32                field_730[4];

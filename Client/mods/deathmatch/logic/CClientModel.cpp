@@ -71,7 +71,7 @@ bool CClientModel::Allocate(ushort usParentID)
             }
             break;
         case eClientModelType::TIMED_OBJECT:
-            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID))
+            if (g_pClientGame->GetObjectManager()->IsValidModel(usParentID) && pParentModelInfo->GetModelType() == eModelInfoType::TIME)
             {
                 pModelInfo->MakeTimedObjectModel(usParentID);
                 return true;
