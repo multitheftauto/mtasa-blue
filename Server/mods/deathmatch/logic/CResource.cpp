@@ -636,14 +636,6 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
                 case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
                 case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
                 {
-                    // Files marked download="false" are not served via HTTP cache, so skip copying and redundant hashing
-                    if (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE)
-                    {
-                        auto* pClientFile = static_cast<CResourceClientFileItem*>(pResourceFile);
-                        if (!pClientFile->IsAutoDownload())
-                            break;
-                    }
-
                     SString strCachedFilePath = pResourceFile->GetCachedPathFilename();
 
                     if (!g_pRealNetServer->ValidateHttpCacheFileName(strCachedFilePath))
@@ -814,13 +806,6 @@ bool CResource::HasResourceChanged()
             case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG:
             case CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE:
             {
-                if (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE)
-                {
-                    auto* pClientFile = static_cast<CResourceClientFileItem*>(pResourceFile);
-                    if (!pClientFile->IsAutoDownload())
-                        break;
-                }
-
                 string    strCachedFilePath = pResourceFile->GetCachedPathFilename();
                 CChecksum cachedChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strCachedFilePath);
 
