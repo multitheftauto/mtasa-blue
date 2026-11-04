@@ -6175,20 +6175,20 @@ void CStaticFunctionDefinitions::GUIProgressBarSetProgress(CClientEntity& Entity
     }
 }
 
-void CStaticFunctionDefinitions::GUIScrollBarSetScrollPosition(CClientEntity& Entity, int iProgress)
+void CStaticFunctionDefinitions::GUIScrollBarSetScrollPosition(CClientEntity& Entity, float fProgress)
 {
-    RUN_CHILDREN(GUIScrollBarSetScrollPosition(**iter, iProgress))
+    RUN_CHILDREN(GUIScrollBarSetScrollPosition(**iter, fProgress))
 
     // Are we a CGUI element?
     if (IS_GUI(&Entity))
     {
         CClientGUIElement& GUIElement = static_cast<CClientGUIElement&>(Entity);
 
-        // Are we a progressbar?
+        // Are we a scrollbar?
         if (IS_CGUIELEMENT_SCROLLBAR(&GUIElement))
         {
-            // Set the progress
-            static_cast<CGUIScrollBar*>(GUIElement.GetCGUIElement())->SetScrollPosition((float)(iProgress / 100.0f));
+            // Set the position
+            static_cast<CGUIScrollBar*>(GUIElement.GetCGUIElement())->SetScrollPosition(fProgress / 100.0f);
         }
     }
 }
