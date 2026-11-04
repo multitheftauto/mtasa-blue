@@ -41,12 +41,6 @@ public:
     // Fire funcs
     LUA_DECLARE(CreateFire);
 
-    // Ped body funcs?
-    LUA_DECLARE(GetBodyPartName);
-    LUA_DECLARE(GetClothesByTypeIndex);
-    LUA_DECLARE(GetTypeIndexFromClothes);
-    LUA_DECLARE(GetClothesTypeName);
-
     // Weapon funcs
     LUA_DECLARE(GetWeaponProperty);
     LUA_DECLARE(GetOriginalWeaponProperty);

@@ -43,7 +43,10 @@ public:
     void ApplySteerAndFlyWithMouseSettings();
 
 protected:
+    void UpdateInAirMouseSteering();
+
     bool m_bSteerWithMouse;
     bool m_bFlyWithMouse;
     bool m_bSuspendSteerAndFlyWithMouse;
+    bool m_bInAirMouseSteering;
 };
