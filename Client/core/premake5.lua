@@ -22,6 +22,7 @@ project "Client Core"
 			"../../vendor/cegui-0.4.0-custom/include",
 			"../../vendor/tinygettext",
 			"../../vendor/zlib",
+			"../../vendor/zip",
 			"../../vendor/jpeg-9f",
 			"../../vendor/pthreads/include",
 			"../../vendor/sparsehash/src/",
@@ -58,7 +59,7 @@ project "Client Core"
 	links {
 		"ws2_32", "d3dx9", "Userenv", "DbgHelp", "xinput", "Imagehlp", "dxguid", "dinput8",
 		"strmiids",	"odbc32", "odbccp32", "shlwapi", "winmm", "gdi32", "Imm32", "Psapi", "dwmapi",
-		"pthread", "libpng", "jpeg", "zlib", "tinygettext", "discord-rpc", "wintrust", "crypt32",
+		"pthread", "libpng", "jpeg", "zlib", "zip", "tinygettext", "discord-rpc", "wintrust", "crypt32",
 		"bcrypt",
 	}
 
