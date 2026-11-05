@@ -26,7 +26,7 @@ void CLuaPostfxDefs::LoadFunctions()
         CLuaCFunctions::AddFunction(name, func);
 }
 
-float CLuaPostfxDefs::GetPostFXValue(PostFXType type)
+float CLuaPostfxDefs::GetPostFXValue(PostFXType::Enum type)
 {
     switch (type)
     {
@@ -51,7 +51,7 @@ int CLuaPostfxDefs::GetPostFXMode()
                                                                                      : 0;
 }
 
-bool CLuaPostfxDefs::IsPostFXEnabled(PostFXType type)
+bool CLuaPostfxDefs::IsPostFXEnabled(PostFXType::Enum type)
 {
     switch (type)
     {

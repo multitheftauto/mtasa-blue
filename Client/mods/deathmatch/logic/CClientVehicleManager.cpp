@@ -496,7 +496,7 @@ unsigned char CClientVehicleManager::GetMaxPassengerCount(unsigned long ulModel)
 bool CClientVehicleManager::IsValidSeat(unsigned long ulModel, unsigned char ucSeat)
 {
     // Camper only has 3 seats (0-2)
-    if (static_cast<VehicleType>(ulModel) == VehicleType::VT_CAMPER && ucSeat > 2)
+    if (static_cast<VehicleType::Enum>(ulModel) == VehicleType::VT_CAMPER && ucSeat > 2)
         return false;
 
     // Get the maximum passenger count for the vehicle
@@ -557,6 +557,23 @@ void CClientVehicleManager::GetRandomVariation(unsigned short usModel, unsigned 
         // Can generate 0 then minus 1 = -1 (255) (default model with nothing)
         ucVariant = (rand() % (g_ucVariants[usModel - 400] + 2)) - 1;
     }
+}
+
+bool CClientVehicleManager::IsVariationValidForModel(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
+{
+    if (!IsStandardModel(usModel) || g_ucVariants[usModel - 400] == 255)
+        return true;
+
+    if (usModel == 457 || usModel == 512)
+        return (ucVariant == 255 || ucVariant <= 2) && ucVariant2 >= 3 && ucVariant2 <= 5;
+
+    if (usModel == 535)
+        return ucVariant <= g_ucVariants[usModel - 400];
+
+    if (usModel == 522 || usModel == 581)
+        return (ucVariant == 255 || ucVariant <= 2) && ucVariant2 >= 3 && ucVariant2 <= 4;
+
+    return ucVariant == 255 || ucVariant <= g_ucVariants[usModel - 400];
 }
 
 unsigned char CClientVehicleManager::ConvertIndexToGameSeat(unsigned long ulModel, unsigned char ucIndex)
@@ -730,7 +747,7 @@ bool CClientVehicleManager::HasDoors(unsigned long ulModel)
                 ulModel = pModelInfo->GetParentID();
         }
 
-        switch (static_cast<VehicleType>(ulModel))
+        switch (static_cast<VehicleType::Enum>(ulModel))
         {
             case VehicleType::VT_BFINJECT:
             case VehicleType::VT_RCBANDIT:
@@ -824,6 +841,15 @@ void CClientVehicleManager::RestreamAllVehicles()
             // back in eventually
             pVehicle->StreamOutForABit();
         }
+    }
+}
+
+void CClientVehicleManager::OnModelReplaced(unsigned short usModel)
+{
+    for (auto& pVehicle : m_List)
+    {
+        if (pVehicle->GetModel() == usModel)
+            pVehicle->InvalidateComponentData();
     }
 }
 

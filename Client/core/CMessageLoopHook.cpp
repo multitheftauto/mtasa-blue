@@ -177,6 +177,11 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                 {
                     GetVideoModeManager()->OnLoseFocus();
                     g_pCore->GetKeyBinds()->OnLoseFocus();
+                    if (CGUI* pGUI = g_pCore->GetGUI())
+                    {
+                        pGUI->ProcessKeyboardInput(DIK_LCONTROL, false);
+                        pGUI->ProcessKeyboardInput(DIK_LSHIFT, false);
+                    }
                     break;
                 }
             }
@@ -381,7 +386,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     // If CTRL and Tab are pressed, Trigger a skip
                     if ((uMsg == WM_KEYDOWN && wParam == VK_TAB))
                     {
-                        SystemState systemState = g_pCore->GetGame()->GetSystemState();
+                        SystemState::Enum systemState = g_pCore->GetGame()->GetSystemState();
                         if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_INIT_PLAYING_GAME ||
                             systemState == SystemState::GS_PLAYING_GAME)
                         {
@@ -405,7 +410,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     }
                     if ((uMsg == WM_KEYDOWN && (wParam >= VK_1 && wParam <= VK_9)))
                     {
-                        SystemState systemState = g_pCore->GetGame()->GetSystemState();
+                        SystemState::Enum systemState = g_pCore->GetGame()->GetSystemState();
                         if (systemState == SystemState::GS_FRONTEND || systemState == SystemState::GS_INIT_PLAYING_GAME ||
                             systemState == SystemState::GS_PLAYING_GAME)
                         {
@@ -430,7 +435,7 @@ LRESULT CALLBACK CMessageLoopHook::ProcessMessage(HWND hwnd, UINT uMsg, WPARAM w
                     // If F8 is pressed, we show/hide the console
                     if ((uMsg == WM_KEYDOWN && wParam == VK_F8) || (uMsg == WM_CHAR && wParam == '`'))
                     {
-                        SystemState systemState = g_pCore->GetGame()->GetSystemState();
+                        SystemState::Enum systemState = g_pCore->GetGame()->GetSystemState();
                         if (CLocalGUI::GetSingleton().IsConsoleVisible() || systemState == SystemState::GS_FRONTEND ||
                             systemState == SystemState::GS_INIT_PLAYING_GAME || systemState == SystemState::GS_PLAYING_GAME)
                         {

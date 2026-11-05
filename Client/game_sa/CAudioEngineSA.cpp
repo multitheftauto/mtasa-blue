@@ -51,6 +51,12 @@ void  HOOK_CAEAmbienceTrackManager_CheckForPause();
 DWORD RETURN_CAESoundManager_RequestNewSound = 0x4EFB15;
 void  HOOK_CAESoundManager_RequestNewSound();
 
+#define HOOKPOS_CAESound_GetSlowMoFrequencyScalingFactor1 0x4F0718
+#define HOOKPOS_CAESound_GetSlowMoFrequencyScalingFactor2 0x4F0973
+#define HOOKSIZE_CAESound_GetSlowMoFrequencyScalingFactor 6
+void HOOK_CAESound_GetSlowMoFrequencyScalingFactor1();
+void HOOK_CAESound_GetSlowMoFrequencyScalingFactor2();
+
 CAudioEngineSA*           g_pAudioSA = NULL;
 extern CAESoundManagerSA* g_pAESoundManagerSA;
 
@@ -77,6 +83,10 @@ CAudioEngineSA::CAudioEngineSA(CAudioEngineSAInterface* pInterface)
     MemPut<BYTE>(0x4EFB15 + 5, 0x74);
     MemPut<BYTE>(0x4EFB29, 0xEB);  // Move jump forward one byte
     HookInstall(HOOKPOS_CAESoundManager_RequestNewSound, (DWORD)HOOK_CAESoundManager_RequestNewSound, 5);
+    HookInstall(HOOKPOS_CAESound_GetSlowMoFrequencyScalingFactor1, (DWORD)HOOK_CAESound_GetSlowMoFrequencyScalingFactor1,
+                HOOKSIZE_CAESound_GetSlowMoFrequencyScalingFactor);
+    HookInstall(HOOKPOS_CAESound_GetSlowMoFrequencyScalingFactor2, (DWORD)HOOK_CAESound_GetSlowMoFrequencyScalingFactor2,
+                HOOKSIZE_CAESound_GetSlowMoFrequencyScalingFactor);
 }
 
 void CAudioEngineSA::StopRadio()
@@ -601,6 +611,56 @@ static void __declspec(naked) HOOK_CAESoundManager_RequestNewSound()
         push    edi
         xor     esi, esi
         jmp     RETURN_CAESoundManager_RequestNewSound
+    }
+    // clang-format on
+}
+
+float fWorldSoundFrequencyScalingFactor = 1.0f;
+
+static void _cdecl ComputeWorldSoundFrequencyScalingFactor(const unsigned short* pEnvironmentFlags)
+{
+    constexpr unsigned short SOUND_FLAG_IS_PAUSABLE = 0x10;
+
+    const float fGameSpeed = *(float*)0xB7CB64;  // CTimer::ms_fTimeScale
+
+    if (fGameSpeed > 1.0f && !(*pEnvironmentFlags & SOUND_FLAG_IS_PAUSABLE))
+        fWorldSoundFrequencyScalingFactor = fGameSpeed;
+    else
+        fWorldSoundFrequencyScalingFactor = 1.0f;
+}
+
+void __declspec(naked) HOOK_CAESound_GetSlowMoFrequencyScalingFactor1()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        lea     eax, [edi+56h]      // CAESound::m_wEnvironmentFlags
+        push    eax
+        call    ComputeWorldSoundFrequencyScalingFactor
+        add     esp, 4
+        fld     fWorldSoundFrequencyScalingFactor
+        mov     eax, 0x4F071E        // fmuls 0x18(%esp)
+        jmp     eax
+    }
+    // clang-format on
+}
+
+void __declspec(naked) HOOK_CAESound_GetSlowMoFrequencyScalingFactor2()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        lea     eax, [edi+5Ah]      // CAESound::m_wEnvironmentFlags
+        push    eax
+        call    ComputeWorldSoundFrequencyScalingFactor
+        add     esp, 4
+        fld     fWorldSoundFrequencyScalingFactor
+        mov     eax, 0x4F0979        // fmuls 0x18(%esp)
+        jmp     eax
     }
     // clang-format on
 }

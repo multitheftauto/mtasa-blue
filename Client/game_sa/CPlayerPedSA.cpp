@@ -78,6 +78,9 @@ CPlayerPedSA::CPlayerPedSA(unsigned int nModelIndex)
     m_pData->m_bRenderWeapon = true;
     m_pData->m_Wanted = pLocalWanted;
     m_pData->m_fTimeCanRun = 1000.0f;
+    // The drunk camera is driven by every player ped's level, not only the local player's
+    m_pData->m_nDrunkenness = 0;
+    m_pData->m_bFadeDrunkenness = false;
 
     // Give each remote ped its own clothes descriptor. Sharing a single
     // descriptor between peds caused script-driven changes on one player

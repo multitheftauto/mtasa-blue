@@ -66,15 +66,15 @@ static void __cdecl ApplyExhaustParticlesPosition(CVehicleSAInterface* vehicleIn
         bool    applyNegativeMainPosition = false;
         int16_t extras = vehicleInterface->m_upgrades[0];
 
-        if (static_cast<VehicleType>(vehicleInterface->m_nModelIndex) == VehicleType::VT_NRG500)
+        if (static_cast<VehicleType::Enum>(vehicleInterface->m_nModelIndex) == VehicleType::VT_NRG500)
         {
             applyNegativeMainPosition = extras != 0 && extras != 1;
         }
-        else if (static_cast<VehicleType>(vehicleInterface->m_nModelIndex) == VehicleType::VT_BF400)
+        else if (static_cast<VehicleType::Enum>(vehicleInterface->m_nModelIndex) == VehicleType::VT_BF400)
         {
             applyNegativeMainPosition = extras != 2;
         }
-        else if (static_cast<VehicleType>(vehicleInterface->m_nModelIndex) == VehicleType::VT_FCR900)
+        else if (static_cast<VehicleType::Enum>(vehicleInterface->m_nModelIndex) == VehicleType::VT_FCR900)
         {
             applyNegativeMainPosition = extras != 1;
         }

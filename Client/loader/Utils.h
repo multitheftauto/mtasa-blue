@@ -127,6 +127,7 @@ bool               VerifyEmbeddedSignature(const SString& strFilename);
 void               LogSettings();
 SString            PadLeft(const SString& strText, uint uiNumSpaces, char cCharacter);
 bool               IsDeviceSelectionDialogOpen(DWORD processID);
+bool               IsGameWindowOpen(DWORD processID);
 std::vector<DWORD> MyEnumProcesses(bool bInclude64bit = false, bool bIncludeCurrent = false);
 SString            GetProcessPathFilename(DWORD processID);
 SString            GetProcessFilename(DWORD processID);

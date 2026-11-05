@@ -80,6 +80,7 @@
 #include "net/SimHeaders.h"
 #include <signal.h>
 #include <regex>
+#include <filesystem>
 
 #define MAX_BULLETSYNC_DISTANCE      400.0f
 #define MAX_EXPLOSION_SYNC_DISTANCE  400.0f
@@ -1131,7 +1132,7 @@ bool CGame::StaticProcessNetworkPacket(unsigned char ucPacketID, const NetServer
 {
     if (ucPacketID == PACKET_ID_LUA_EVENT)
     {
-        if (pBitStream->GetNumberOfUnreadBits() > CLuaEventPacket::MAX_LUA_EVENT_ARGUMENTS_SIZE * 8)
+        if (pBitStream->GetNumberOfUnreadBits() > (CLuaEventPacket::MAX_LUA_EVENT_ARGUMENTS_SIZE + CLuaEventPacket::LUA_EVENT_ENVELOPE_HEADROOM) * 8)
             return false;
     }
 
@@ -4356,6 +4357,7 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
         {
             // Get in-progress info
             SScreenShotInfo& info = pPlayer->GetScreenShotInfo();
+            constexpr uint   MAX_SCREENSHOT_SIZE = 50 * 1024 * 1024;
 
             // Validate
             if (!info.bInProgress || info.usNextPartNumber != Packet.m_usPartNumber || info.usScreenShotId != Packet.m_usScreenShotId)
@@ -4368,6 +4370,12 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
                 {
                     if (!info.bRequested)
                         return;
+
+                    if (Packet.m_usTotalParts == 0 || Packet.m_uiTotalBytes == 0 || Packet.m_uiTotalBytes > MAX_SCREENSHOT_SIZE)
+                    {
+                        info.bRequested = false;
+                        return;
+                    }
 
                     info.bInProgress = true;
                     info.usNextPartNumber = 0;
@@ -4385,9 +4393,7 @@ void CGame::Packet_PlayerScreenShot(CPlayerScreenShotPacket& Packet)
             // Add data if valid
             if (info.bInProgress)
             {
-                // Reject if accumulated data exceeds 50MB
-                constexpr uint MAX_SCREENSHOT_SIZE = 50 * 1024 * 1024;
-                if (info.buffer.GetSize() + Packet.m_buffer.GetSize() > MAX_SCREENSHOT_SIZE)
+                if (info.buffer.GetSize() + Packet.m_buffer.GetSize() > info.uiTotalBytes)
                 {
                     info.bInProgress = false;
                     info.bRequested = false;
@@ -4932,8 +4938,6 @@ void CGame::HandleBackup()
             return;  // No backup required
     }
 
-    m_pMainConfig->NotifyDidBackup();
-
     // Make target file name
     tm*  tmp = gmtime(&secondsNow);
     char outstr[200] = {0};
@@ -4956,27 +4960,46 @@ void CGame::HandleBackup()
 
     CLogger::LogPrintfNoStamp("Please wait...\n");
 
+    bool bInsertedAll = true;
+    auto InsertBackup = [&](const SString& strSource, const SString& strDestination, bool bDirectory = false)
+    {
+        SString         strPath = PathConform(strSource);
+        std::error_code error;
+        // Some inputs, such as editor configuration and unused databases, need not exist.
+        bool bExists = std::filesystem::exists(std::filesystem::u8path(strPath.begin(), strPath.end()), error);
+        if (error || (bExists && !(bDirectory ? zipMaker.InsertDirectoryTree(strPath, strDestination) : zipMaker.InsertFile(strPath, strDestination))))
+        {
+            bInsertedAll = false;
+            CLogger::ErrorPrintf("Backup failed to add '%s'\n", strSource.c_str());
+        }
+    };
+
     // Backup config files
-    zipMaker.InsertFile(pModManager->GetAbsolutePath("mtaserver.conf"), PathJoin("config", "mtaserver.conf"));
-    zipMaker.InsertFile(m_pMainConfig->GetAccessControlListFile(), PathJoin("config", "acl.xml"));
-    zipMaker.InsertFile(pModManager->GetAbsolutePath(FILENAME_BANLIST), PathJoin("config", "banlist.xml"));
-    zipMaker.InsertFile(pModManager->GetAbsolutePath("editor.conf"), PathJoin("config", "editor.conf"));
-    zipMaker.InsertFile(pModManager->GetAbsolutePath("editor_acl.xml"), PathJoin("config", "editor_acl.xml"));
-    zipMaker.InsertFile(pModManager->GetAbsolutePath("local.conf"), PathJoin("config", "local.conf"));
-    zipMaker.InsertFile(m_pMainConfig->GetIdFile(), PathJoin("config", "server-id.keys"));
-    zipMaker.InsertFile(pModManager->GetAbsolutePath(FILENAME_SETTINGS), PathJoin("config", "settings.xml"));
-    zipMaker.InsertFile(pModManager->GetAbsolutePath("vehiclecolors.conf"), PathJoin("config", "vehiclecolors.conf"));
+    InsertBackup(pModManager->GetAbsolutePath("mtaserver.conf"), PathJoin("config", "mtaserver.conf"));
+    InsertBackup(m_pMainConfig->GetAccessControlListFile(), PathJoin("config", "acl.xml"));
+    InsertBackup(pModManager->GetAbsolutePath(FILENAME_BANLIST), PathJoin("config", "banlist.xml"));
+    InsertBackup(pModManager->GetAbsolutePath("editor.conf"), PathJoin("config", "editor.conf"));
+    InsertBackup(pModManager->GetAbsolutePath("editor_acl.xml"), PathJoin("config", "editor_acl.xml"));
+    InsertBackup(pModManager->GetAbsolutePath("local.conf"), PathJoin("config", "local.conf"));
+    InsertBackup(m_pMainConfig->GetIdFile(), PathJoin("config", "server-id.keys"));
+    InsertBackup(pModManager->GetAbsolutePath(FILENAME_SETTINGS), PathJoin("config", "settings.xml"));
+    InsertBackup(pModManager->GetAbsolutePath("vehiclecolors.conf"), PathJoin("config", "vehiclecolors.conf"));
 
     // Backup database files
-    zipMaker.InsertDirectoryTree(m_pMainConfig->GetGlobalDatabasesPath(), PathJoin("databases", "global"));
-    zipMaker.InsertDirectoryTree(m_pMainConfig->GetSystemDatabasesPath(), PathJoin("databases", "system"));
-    zipMaker.InsertFile(pModManager->GetAbsolutePath("internal.db"), PathJoin("databases", "other", "internal.db"));
-    zipMaker.InsertFile(pModManager->GetAbsolutePath("registry.db"), PathJoin("databases", "other", "registry.db"));
+    InsertBackup(m_pMainConfig->GetGlobalDatabasesPath(), PathJoin("databases", "global"), true);
+    InsertBackup(m_pMainConfig->GetSystemDatabasesPath(), PathJoin("databases", "system"), true);
+    InsertBackup(pModManager->GetAbsolutePath("internal.db"), PathJoin("databases", "other", "internal.db"));
+    InsertBackup(pModManager->GetAbsolutePath("registry.db"), PathJoin("databases", "other", "registry.db"));
 
-    zipMaker.Close();
+    // Finalize the new backup before marking it complete or pruning older copies
+    bool bClosed = zipMaker.Close();
+    if (!bInsertedAll || !bClosed || !FileRename(strTempZip, strBackupZip))
+    {
+        FileDelete(strTempZip);
+        return;
+    }
 
-    // Rename temp file to final name
-    FileRename(strTempZip, strBackupZip);
+    m_pMainConfig->NotifyDidBackup();
 
     // Remove backups over min required
     while (fileList.size() >= uiBackupAmount)
