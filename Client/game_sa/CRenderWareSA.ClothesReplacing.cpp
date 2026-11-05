@@ -345,4 +345,5 @@ static void __declspec(naked) HOOK_CStreaming_RequestModel_Mid()
 void CRenderWareSA::StaticSetClothesReplacingHooks()
 {
     EZHookInstall(CStreaming_RequestModel_Mid);
+    StaticSetClothesTexturesHooks();
 }
