@@ -53,6 +53,13 @@ bool CReturnSyncPacket::Write(NetBitStreamInterface& BitStream) const
             BitStream.Write(&position);
         }
 
+        if (BitStream.Can(eBitStreamVersion::WaterWaveSync))
+        {
+            const auto now = static_cast<std::uint64_t>(GetTickCount64_());
+            BitStream.Write(static_cast<unsigned int>(now));
+            BitStream.Write(static_cast<unsigned int>(now >> 32));
+        }
+
         return true;
     }
 
