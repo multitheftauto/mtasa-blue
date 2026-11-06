@@ -334,6 +334,11 @@ void CWebCore::DestroyWebView(CWebViewInterface* pWebViewInterface)
         RemoveWebViewEvents(pWebView.get());
         RemoveWebViewTasks(pWebView.get());
 
+        // CEF closes asynchronously and may destroy CWebView on its UI
+        // thread. D3D resources must instead be released here, on the MTA
+        // render thread, before the final CEF reference can disappear.
+        pWebView->DetachRenderItem();
+
         // Remove from list before closing to break reference cycles early
         m_WebViews.remove(pWebView);
 
