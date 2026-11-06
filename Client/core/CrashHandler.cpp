@@ -2488,7 +2488,18 @@ static void ReportCurrentCppException()
     if (!g_lastExceptionInfo)
         return FALSE;
 
-    *pExceptionInfo = *g_lastExceptionInfo;
+    // The copy allocates storage for its string members and can fail under
+    // memory pressure. Crash paths cannot let an exception unwind through
+    // them, so report no data and let the caller fall back.
+    try
+    {
+        *pExceptionInfo = *g_lastExceptionInfo;
+    }
+    catch (...)
+    {
+        return FALSE;
+    }
+
     return TRUE;
 }
 
@@ -2501,6 +2512,12 @@ static void ReportCurrentCppException()
         {
             return FALSE;
         }
+
+        // Keep a record that already identifies an exception. This capture
+        // has no code or address, so overwriting it would make every
+        // freshness check reject the stored crash data.
+        if (g_lastExceptionInfo && g_lastExceptionInfo->exceptionCode != 0)
+            return FALSE;
 
         ENHANCED_EXCEPTION_INFO info = {};
         info.capturedException = std::current_exception();
@@ -2961,6 +2978,20 @@ namespace
         std::vector<std::string> stackTraceVec{};
         const auto               stackCaptured = CaptureUnifiedStackTrace(&exceptionPointers, 32, &stackTraceVec);
 
+        // Snapshot the return address for the EIP=0 case while the thread is
+        // still suspended, before resume makes the stack live again.
+        void* watchdogEip0ReturnAddress{nullptr};
+        if (context.Eip == 0)
+        {
+            const auto espAddr{static_cast<uintptr_t>(context.Esp)};
+            const auto pReturnAddress{reinterpret_cast<void* const*>(espAddr)};
+
+            if (SharedUtil::IsReadablePointer(pReturnAddress, sizeof(void*)))
+            {
+                watchdogEip0ReturnAddress = *pReturnAddress;
+            }
+        }
+
         // Now we can safely resume the thread - we have everything we need
         if (ResumeThread(targetThread) == static_cast<DWORD>(-1))
         {
@@ -3009,6 +3040,67 @@ namespace
                     info.gs = s_capturedContext.SegGs;
                     info.eflags = s_capturedContext.EFlags;
 
+                    // Resolve the module containing the frozen instruction so the
+                    // watchdog report carries the same module identity the SEH path
+                    // provides. A frozen thread can sit at EIP=0 (jump to null), so
+                    // fall back to the return address captured from [ESP] before
+                    // the thread resumed, like the SEH path does.
+                    CExceptionInformation_Impl moduleHelper;
+                    std::array<char, 512>      moduleBuffer{};
+                    void*                      moduleBase{nullptr};
+                    void*                      addressToResolve{exceptionRecord.ExceptionAddress};
+
+                    if (addressToResolve == nullptr)
+                    {
+                        addressToResolve = watchdogEip0ReturnAddress;
+                    }
+
+                    try
+                    {
+                        if (moduleHelper.GetModule(addressToResolve, moduleBuffer.data(), static_cast<int>(moduleBuffer.size()), &moduleBase))
+                        {
+                            info.modulePathName = std::string{moduleBuffer.data()};
+
+                            const std::string_view moduleView{moduleBuffer.data()};
+                            if (const auto pos = moduleView.rfind('\\'); pos != std::string_view::npos)
+                            {
+                                info.moduleName = std::string{moduleView.substr(pos + 1)};
+                                info.moduleBaseName = info.moduleName;
+                            }
+                            else
+                            {
+                                info.moduleName = std::string{moduleView};
+                                info.moduleBaseName = info.moduleName;
+                            }
+
+                            if (moduleBase != nullptr)
+                            {
+                                const uintptr_t resolvedAddr{reinterpret_cast<uintptr_t>(addressToResolve)};
+                                const uintptr_t baseAddr{reinterpret_cast<uintptr_t>(moduleBase)};
+
+                                if (resolvedAddr >= baseAddr && resolvedAddr - baseAddr <= UINT_MAX)
+                                {
+                                    info.moduleOffset = static_cast<uint>(resolvedAddr - baseAddr);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            // Match the SEH path: label an unresolved module
+                            // instead of leaving the fields empty, so the report
+                            // never prints a null module name.
+                            info.moduleName = "Unknown";
+                            info.moduleBaseName = "Unknown";
+                            info.modulePathName = "Unknown";
+                        }
+                    }
+                    catch (...)
+                    {
+                        // Module info is optional: an allocation failure here must
+                        // not discard the rest of the watchdog record, so keep
+                        // whatever fields were set before it.
+                    }
+
                     // Use the stack trace we captured while thread was suspended
                     if (stackCaptured != FALSE && !stackTraceVec.empty())
                     {
@@ -3052,6 +3144,25 @@ namespace
                 }
 
                 delete pExInfo;
+            }
+            else
+            {
+                // The dump is this path's whole purpose; keep a signal on the
+                // skip so it is not read as a successful dump.
+                AddReportLog(9330, "Watchdog: failed to allocate dump-only report info");
+            }
+
+            // The process keeps running after a dump-only report, so the
+            // stored record must not survive into a later exception's dump
+            // where it could be mistaken for a fresh capture. Only retire a
+            // record that still belongs to this watchdog event; a concurrent
+            // thread's newer capture must be left in place.
+            if (std::unique_lock lock{g_exceptionInfoMutex, std::try_to_lock}; lock.owns_lock())
+            {
+                if (g_lastExceptionInfo && IsEnhancedInfoFreshFor(*g_lastExceptionInfo, exceptionRecord))
+                {
+                    g_lastExceptionInfo = std::nullopt;
+                }
             }
             return true;
         }
@@ -3152,7 +3263,20 @@ namespace
                     AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u, debugger attached)",
                                                static_cast<long long>(elapsed.count()), timeoutSecs));
 
-                    TriggerWatchdogException(targetThread.get(), targetThreadId, true);
+                    // Keep the monitoring loop alive even if the dump-only
+                    // report fails; the heartbeat reset below must still run.
+                    try
+                    {
+                        const bool dumpTriggered = TriggerWatchdogException(targetThread.get(), targetThreadId, true);
+                        if (!dumpTriggered)
+                        {
+                            AddReportLog(9312, SString("Watchdog trigger failed for thread %u", targetThreadId));
+                        }
+                    }
+                    catch (...)
+                    {
+                        AddReportLog(9323, "Watchdog: dump-only report failed with an exception");
+                    }
 
                     g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
                     if (waitOrStop())

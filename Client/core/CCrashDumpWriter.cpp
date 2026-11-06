@@ -1873,6 +1873,15 @@ void CCrashDumpWriter::DumpCoreLog(_EXCEPTION_POINTERS* pException, CExceptionIn
         hasEnhancedInfo = false;
     }
 
+    // A record left over from an earlier exception has no place in this
+    // crash's report. Only accept data captured for the same fault.
+    if (hasEnhancedInfo &&
+        (pException == nullptr || pException->ExceptionRecord == nullptr || !IsEnhancedInfoFreshFor(enhancedInfo, *pException->ExceptionRecord)))
+    {
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter::DumpCoreLog - Enhanced info does not match the current exception (stale), ignoring\n");
+        hasEnhancedInfo = false;
+    }
+
     CExceptionInformation_Impl* pImpl = dynamic_cast<CExceptionInformation_Impl*>(pExceptionInformation);
 
     if (hasEnhancedInfo)
@@ -2281,7 +2290,16 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
                 const std::string       telemetryNote = CrashTelemetry::BuildAllocationTelemetryNote();
                 std::string             basicSummary;
                 ENHANCED_EXCEPTION_INFO enhancedInfo{};
-                const bool              hasEnhancedInfo = (GetEnhancedExceptionInfo(&enhancedInfo) != FALSE);
+                bool                    hasEnhancedInfo = (GetEnhancedExceptionInfo(&enhancedInfo) != FALSE);
+
+                // Only embed data captured for the exception this dump
+                // belongs to; a leftover record from an earlier exception
+                // would attach the wrong registers, trace, and offset.
+                if (hasEnhancedInfo &&
+                    (pException == nullptr || pException->ExceptionRecord == nullptr || !IsEnhancedInfoFreshFor(enhancedInfo, *pException->ExceptionRecord)))
+                {
+                    hasEnhancedInfo = false;
+                }
 
                 if (hasEnhancedInfo)
                 {
