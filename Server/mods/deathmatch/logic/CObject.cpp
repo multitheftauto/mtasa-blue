@@ -68,6 +68,10 @@ CObject::CObject(const CObject& Copy) : CElement(Copy.m_pParent), m_bIsLowLod(Co
     if (Copy.m_pMoveAnimation != NULL)
     {
         m_pMoveAnimation = new CPositionRotationAnimation(*Copy.m_pMoveAnimation);
+
+        // Register as moving object
+        if (m_pObjectManager)
+            m_pObjectManager->RegisterMovingObject(this);
     }
 
     m_bCollisionsEnabled = Copy.m_bCollisionsEnabled;
@@ -87,6 +91,10 @@ CObject::~CObject()
         delete m_pMoveAnimation;
         m_pMoveAnimation = NULL;
     }
+
+    // Unregister as moving object
+    if (m_pObjectManager)
+        m_pObjectManager->UnregisterMovingObject(this);
 
     // Remove syncer
     SetSyncer(NULL);
@@ -359,6 +367,10 @@ void CObject::Move(const CPositionRotationAnimation& a_rMoveAnimation)
         SetPosition(positionRotation.m_vecPosition);
         SetRotation(positionRotation.m_vecRotation);
     }
+
+    // Register object as moving
+    if (m_pObjectManager)
+        m_pObjectManager->RegisterMovingObject(this);
 }
 
 void CObject::StopMoving()
@@ -372,6 +384,10 @@ void CObject::StopMoving()
 
         delete m_pMoveAnimation;
         m_pMoveAnimation = nullptr;
+
+        // Unregister object as moving
+        if (m_pObjectManager)
+            m_pObjectManager->UnregisterMovingObject(this);
 
         UpdateSpatialData();
         NotifyMovementComplete();
