@@ -44,6 +44,7 @@ class CClientManager;
 #include "CClientModelManager.h"
 #include "CClientIMGManager.h"
 #include "CClientBuildingManager.h"
+#include "CClientWaterCannonManager.h"
 
 class CClientProjectileManager;
 class CClientExplosionManager;
@@ -96,6 +97,7 @@ public:
     CClientWeaponManager*        GetWeaponManager() { return m_pWeaponManager; }
     CClientEffectManager*        GetEffectManager() { return m_pEffectManager; }
     CClientPointLightsManager*   GetPointLightsManager() { return m_pPointLightsManager; }
+    CClientWaterCannonManager*   GetWaterCannonManager() { return m_pWaterCannonManager; }
     CClientIMGManager*           GetIMGManager() { return m_pImgManager; }
     CClientBuildingManager*      GetBuildingManager() const noexcept { return m_pBuildingManager; }
 
@@ -150,6 +152,7 @@ private:
     CClientWeaponManager*        m_pWeaponManager;
     CClientEffectManager*        m_pEffectManager;
     CClientPointLightsManager*   m_pPointLightsManager;
+    CClientWaterCannonManager*   m_pWaterCannonManager;
     CClientModelManager*         m_pModelManager;
     CClientIMGManager*           m_pImgManager;
     CClientPacketRecorder*       m_pPacketRecorder;
