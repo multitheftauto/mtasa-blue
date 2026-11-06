@@ -496,7 +496,7 @@ bool CClientSound::SetLooped(bool bLoop)
     return true;
 }
 
-bool CClientSound::IsLooped(void) const
+bool CClientSound::IsLooped() const
 {
     return m_bLoop;
 }

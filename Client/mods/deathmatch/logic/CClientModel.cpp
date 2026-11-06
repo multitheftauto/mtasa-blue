@@ -18,7 +18,7 @@ CClientModel::CClientModel(CClientManager* pManager, int iModelID, eClientModelT
     m_eModelType = eModelType;
 }
 
-CClientModel::~CClientModel(void)
+CClientModel::~CClientModel()
 {
     Deallocate();
 }
