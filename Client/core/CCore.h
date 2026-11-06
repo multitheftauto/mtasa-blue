@@ -169,8 +169,10 @@ public:
     void        ShowMessageBox(const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK* ResponseHandler = NULL);
     void        RemoveMessageBox(bool bNextFrame = false);
     void        ShowErrorMessageBox(const SString& strTitle, SString strMessage, const SString& strTroubleLink = "");
-    void        ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink = "", bool bLinkRequiresErrorCode = false);
+    void        ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink = "", bool bLinkRequiresErrorCode = false,
+                                       bool bAllowReconnect = false);
     static void ErrorMessageBoxCallBack(void* pData, uint uiButton);
+    static void ReconnectMessageBoxCallBack(void* pData, uint uiButton);
     bool        IsOfflineMod() { return m_bIsOfflineMod; }
     const char* GetModInstallRoot(const char* szModName);
     bool        CheckDiskSpace(uint uiResourcesPathMinMB = 10, uint uiDataPathMinMB = 10);
