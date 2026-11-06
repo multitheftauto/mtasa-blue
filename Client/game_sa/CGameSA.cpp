@@ -49,6 +49,7 @@
 #include "CStatsSA.h"
 #include "CTaskManagementSystemSA.h"
 #include "CTasksSA.h"
+#include "CTrainTrackManagerSA.h"
 #include "CVisibilityPluginsSA.h"
 #include "CWaterManagerSA.h"
 #include "CWeaponInfoSA.h"
@@ -108,6 +109,7 @@ CGameSA::CGameSA()
         m_pAudioContainer = new CAudioContainerSA();
         m_pWorld = new CWorldSA();
         m_Pools = std::make_unique<CPoolsSA>();
+        m_pTrainTrackManager = std::make_unique<CTrainTrackManagerSA>();
         m_pClock = new CClockSA();
         m_pRadar = new CRadarSA();
         m_pCamera = new CCameraSA((CCameraSAInterface*)CLASS_CCamera);

@@ -67,6 +67,7 @@ class CWeaponStat;
 class CWeaponStatManager;
 class CWeather;
 class CWorld;
+class CTrainTrackManager;
 class CIplStore;
 class CBuildingRemoval;
 class CRenderer;
@@ -124,6 +125,7 @@ public:
     virtual CHud*                     GetHud() = 0;
     virtual CWeather*                 GetWeather() = 0;
     virtual CWorld*                   GetWorld() = 0;
+    virtual CTrainTrackManager*       GetTrainTrackManager() const noexcept = 0;
     virtual CCamera*                  GetCamera() = 0;
     virtual CPickups*                 GetPickups() = 0;
     virtual C3DMarkers*               Get3DMarkers() = 0;
