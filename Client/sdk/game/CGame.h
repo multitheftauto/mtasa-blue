@@ -287,4 +287,6 @@ public:
     virtual void RestoreGameWorld() = 0;
 
     virtual bool SetBuildingPoolSize(size_t size) = 0;
+
+    virtual CIplStore* GetIplStore() = 0;
 };

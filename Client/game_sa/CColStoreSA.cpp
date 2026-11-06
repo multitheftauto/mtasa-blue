@@ -181,3 +181,9 @@ int CColStoreSA::GetLastModel(CollisionSlot slot)
     const auto function = reinterpret_cast<Signature>(0x537AB0);
     return function(static_cast<int>(slot));
 }
+
+void CColStoreSA::LoadCollision(const CVector& position)
+{
+    auto CColStore_LoadCollision = (void(__cdecl*)(CVector, bool))FUNC_CColStore_LoadCollision;
+    CColStore_LoadCollision(position, true);
+}

@@ -154,3 +154,9 @@ void CIplStoreSA::SetDynamicIplStreamingEnabled(bool state, std::function<bool(C
 
     m_isStreamingEnabled = state;
 }
+
+void CIplStoreSA::LoadIpls(const CVector& position)
+{
+    auto CIplStore_LoadIpls = (void(__cdecl*)(CVector, bool))FUNC_CIplStore_LoadIpls;
+    CIplStore_LoadIpls(position, true);
+}
