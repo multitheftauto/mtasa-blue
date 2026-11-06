@@ -65,6 +65,22 @@ bool CClientColShape::IsAttachable()
     return (!m_pOwningPickup && !m_pOwningMarker);
 }
 
+//
+// Get the color to debug render this collision shape with
+//
+SColor CClientColShape::GetDebugColor(const SColor& baseColor)
+{
+    // Serverside shapes use the plain color of their shape type
+    if (!IsLocalEntity())
+        return baseColor;
+
+    // Clientside shapes use a lighter shade of it, so both kinds can be told apart at a glance
+    constexpr float fClientTint = 0.4f;
+    auto            Lighten = [](uchar ucValue) { return static_cast<uchar>(ucValue + (255 - ucValue) * fClientTint); };
+
+    return SColorARGB(baseColor.A, Lighten(baseColor.R), Lighten(baseColor.G), Lighten(baseColor.B));
+}
+
 void CClientColShape::SetPosition(const CVector& vecPosition)
 {
     if (vecPosition != m_vecPosition)

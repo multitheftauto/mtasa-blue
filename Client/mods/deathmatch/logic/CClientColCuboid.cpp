@@ -47,7 +47,7 @@ void CClientColCuboid::DebugRender(const CVector& vecPosition, float fDrawRadius
     CVector vecOrigin = m_vecPosition + m_vecSize * 0.5f;
     CVector vecSize = m_vecSize;
 
-    SColorARGB          color(128, 0, 255, 0);
+    SColor              color = GetDebugColor(SColorARGB(128, 0, 255, 0));
     float               fLineWidth = 4.f + pow(std::max(std::max(m_vecSize.fX, m_vecSize.fY), m_vecSize.fZ) * 0.5f, 0.5f);
     CGraphicsInterface* pGraphics = g_pCore->GetGraphics();
 
