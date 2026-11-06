@@ -105,15 +105,15 @@ void CNametags::DoPulse()
             if (pClientEntity)
             {
                 // Is it a vehicle? Is it a ped?
-                eClientEntityType EntityType = pClientEntity->GetType();
+                ElementType::Enum EntityType = pClientEntity->GetType();
                 switch (EntityType)
                 {
-                    case CCLIENTVEHICLE:
+                    case ElementType::VEHICLE:
                     {
                         pSniperTargetedVehicle = static_cast<CClientVehicle*>(pClientEntity);
                         break;
                     }
-                    case CCLIENTPLAYER:
+                    case ElementType::PLAYER:
                     {
                         pSniperTargetedPlayer = static_cast<CClientPlayer*>(pClientEntity);
                         break;
@@ -154,7 +154,7 @@ void CNametags::DoPulse()
         pElement = *iter;
         if (!pElement->IsStreamedIn())
             continue;
-        if (pElement->GetType() != CCLIENTPLAYER)
+        if (pElement->GetType() != ElementType::PLAYER)
             continue;
         pPlayer = static_cast<CClientPlayer*>(pElement);
         if (pPlayer->IsLocalPlayer() && !bRenderOwn)

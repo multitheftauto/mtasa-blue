@@ -280,29 +280,29 @@ const char* CLuaClassDefs::GetEntityClass(CClientEntity* pEntity)
     assert(pEntity);
     switch (pEntity->GetType())
     {
-        case CCLIENTCAMERA:
+        case ElementType::CAMERA:
             return "Camera";
-        case CCLIENTPLAYER:
+        case ElementType::PLAYER:
             return "Player";
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
             return "Vehicle";
-        case CCLIENTRADARMARKER:
+        case ElementType::BLIP:
             return "Blip";
-        case CCLIENTOBJECT:
+        case ElementType::OBJECT:
             return "Object";
-        case CCLIENTPICKUP:
+        case ElementType::PICKUP:
             return "Pickup";
-        case CCLIENTRADARAREA:
+        case ElementType::RADAR_AREA:
             return "RadarArea";
-        case CCLIENTMARKER:
+        case ElementType::MARKER:
             return "Marker";
-        case CCLIENTTEAM:
+        case ElementType::TEAM:
             return "Team";
-        case CCLIENTPED:
+        case ElementType::PED:
             return "Ped";
-        case CCLIENTPROJECTILE:
+        case ElementType::PROJECTILE:
             return "Projectile";
-        case CCLIENTGUI:
+        case ElementType::GUI:
         {
             CClientGUIElement* pGUIElement = reinterpret_cast<CClientGUIElement*>(pEntity);
             if (pGUIElement)
@@ -346,43 +346,43 @@ const char* CLuaClassDefs::GetEntityClass(CClientEntity* pEntity)
             }
             break;
         }
-        case CCLIENTCOLSHAPE:
+        case ElementType::COLSHAPE:
             return "ColShape";
-        case SCRIPTFILE:
+        case ElementType::SCRIPTFILE:
             return "File";
-        case CCLIENTDFF:
+        case ElementType::DFF:
             return "EngineDFF";
-        case CCLIENTCOL:
+        case ElementType::COL:
             return "EngineCOL";
-        case CCLIENTTXD:
+        case ElementType::TXD:
             return "EngineTXD";
-        case CCLIENTIMG:
+        case ElementType::IMG:
             return "EngineIMG";
-        case CCLIENTSOUND:
+        case ElementType::SOUND:
             return static_cast<CClientSound*>(pEntity)->IsSound3D() ? "Sound3D" : "Sound";
-        case CCLIENTWATER:
+        case ElementType::WATER:
             return "Water";
-        case CCLIENTDXFONT:
+        case ElementType::DXFONT:
             return "DxFont";
-        case CCLIENTGUIFONT:
+        case ElementType::GUIFONT:
             return "GuiFont";
-        case CCLIENTTEXTURE:
+        case ElementType::TEXTURE:
             return "DxTexture";
-        case CCLIENTSHADER:
+        case ElementType::SHADER:
             return "DxShader";
-        case CCLIENTWEAPON:
+        case ElementType::WEAPON:
             return "Weapon";
-        case CCLIENTEFFECT:
+        case ElementType::EFFECT:
             return "Effect";
-        case CCLIENTPOINTLIGHTS:
+        case ElementType::POINTLIGHTS:
             return "Light";
-        case CCLIENTSEARCHLIGHT:
+        case ElementType::SEARCHLIGHT:
             return "SearchLight";
-        case CCLIENTSCREENSOURCE:
+        case ElementType::SCREENSOURCE:
             return "DxScreenSource";
-        case CCLIENTRENDERTARGET:
+        case ElementType::RENDERTARGET:
             return "DxRenderTarget";
-        case CCLIENTBROWSER:
+        case ElementType::BROWSER:
             return "Browser";
     }
     return "Element";

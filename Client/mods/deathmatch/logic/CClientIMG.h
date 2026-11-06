@@ -54,7 +54,7 @@ public:
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition) {};
 
-    eClientEntityType GetType() const { return CCLIENTIMG; }
+    ElementType::Enum GetType() const { return ElementType::IMG; }
     unsigned char     GetArchiveID() const { return m_ucArchiveID; }
     unsigned int      GetFilesCount() const { return m_fileInfos.size(); }
     const auto&       GetFileInfos() const noexcept { return m_fileInfos; }

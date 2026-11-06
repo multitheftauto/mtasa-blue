@@ -12,6 +12,7 @@
 #pragma once
 
 #include "Common.h"
+#include "enums/EntityType.h"
 
 class CEntitySAInterface;
 class CMatrix;
@@ -20,17 +21,6 @@ enum eBone;
 struct RpClump;
 struct RwFrame;
 struct RwMatrix;
-
-enum eEntityType
-{
-    ENTITY_TYPE_NOTHING,
-    ENTITY_TYPE_BUILDING,
-    ENTITY_TYPE_VEHICLE,
-    ENTITY_TYPE_PED,
-    ENTITY_TYPE_OBJECT,
-    ENTITY_TYPE_DUMMY,
-    ENTITY_TYPE_NOTINPOOLS
-};
 
 enum eEntityStatus
 {
@@ -71,7 +61,7 @@ public:
     virtual CMatrix*                  GetMatrix(CMatrix* matrix) = 0;
     virtual void                      SetMatrix(CMatrix* matrix) = 0;
     virtual WORD                      GetModelIndex() = 0;
-    virtual eEntityType               GetEntityType() = 0;
+    virtual EntityType::Enum          GetEntityType() = 0;
     virtual float                     GetDistanceFromCentreOfMassToBaseOfModel() = 0;
     virtual void                      SetEntityStatus(eEntityStatus bStatus) = 0;
     virtual eEntityStatus             GetEntityStatus() = 0;

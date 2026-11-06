@@ -21,7 +21,7 @@
 CRadarArea::CRadarArea(CRadarAreaManager* pRadarAreaManager, CElement* pParent) : CPerPlayerEntity(pParent)
 {
     // Init
-    m_iType = CElement::RADAR_AREA;
+    m_iType = ElementType::RADAR_AREA;
     SetTypeName("radararea");
     m_pRadarAreaManager = pRadarAreaManager;
     m_Color = SColorRGBA(255, 255, 255, 255);

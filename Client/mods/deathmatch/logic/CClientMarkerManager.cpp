@@ -27,7 +27,7 @@ CClientMarker* CClientMarkerManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (pEntity && pEntity->GetType() == CCLIENTMARKER)
+    if (pEntity && pEntity->GetType() == ElementType::MARKER)
     {
         return static_cast<CClientMarker*>(pEntity);
     }

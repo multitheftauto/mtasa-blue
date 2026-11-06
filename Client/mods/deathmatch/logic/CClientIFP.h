@@ -238,7 +238,7 @@ public:
     };
 
     CClientIFP(class CClientManager* pManager, ElementID ID);
-    virtual eClientEntityType GetType() const { return CCLIENTIFP; }
+    virtual ElementType::Enum GetType() const { return ElementType::IFP; }
 
     void MarkAsUnloading() { m_bUnloading = true; }
     bool IsUnloading() { return m_bUnloading; }

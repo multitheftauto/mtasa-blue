@@ -19,7 +19,7 @@
 CConsoleClient::CConsoleClient(CConsole* pConsole) : CElement(pConsole->GetMapManager()->GetRootElement()), CClient(false)
 {
     m_pAccount = g_pGame->GetAccountManager()->AddConsoleAccount(CONSOLE_ACCOUNT_NAME);
-    m_iType = CElement::CONSOLE;
+    m_iType = ElementType::CONSOLE;
     SetTypeName("console");
     m_strNick = "Console";
     m_pConsole = pConsole;

@@ -156,14 +156,14 @@ CClientProjectile* CClientProjectileManager::Create(CClientEntity* pCreator, eWe
     if (pGameCreator)
     {
         // Peds and players
-        if (pCreator->GetType() == CCLIENTPED || pCreator->GetType() == CCLIENTPLAYER)
+        if (pCreator->GetType() == ElementType::PED || pCreator->GetType() == ElementType::PLAYER)
         {
             CPed* pPed = dynamic_cast<CPed*>(pGameCreator);
             if (pPed)
                 pPed->AddProjectile(eWeapon, vecOrigin, fForce, target, pGameTargetEntity);
         }
         // Vehicles
-        else if (pCreator->GetType() == CCLIENTVEHICLE)
+        else if (pCreator->GetType() == ElementType::VEHICLE)
         {
             CVehicle* pVehicle = dynamic_cast<CVehicle*>(pGameCreator);
             if (pVehicle)

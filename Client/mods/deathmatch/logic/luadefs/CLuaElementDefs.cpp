@@ -1335,23 +1335,23 @@ std::variant<bool, float> CLuaElementDefs::GetElementLighting(CClientEntity* ent
 {
     switch (entity->GetType())
     {
-        case CCLIENTPED:
-        case CCLIENTPLAYER:
+        case ElementType::PED:
+        case ElementType::PLAYER:
         {
             CPlayerPed* ped = static_cast<CClientPed*>(entity)->GetGamePlayer();
             if (ped)
                 return ped->GetLighting();
             break;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             CVehicle* vehicle = static_cast<CClientVehicle*>(entity)->GetGameVehicle();
             if (vehicle)
                 return vehicle->GetLighting();
             break;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             CObject* object = static_cast<CClientObject*>(entity)->GetGameObject();
             if (object)
@@ -1366,7 +1366,7 @@ std::variant<bool, float> CLuaElementDefs::GetElementLighting(CClientEntity* ent
 
 bool CLuaElementDefs::IsElementOnScreen(CClientEntity* entity)
 {
-    if (entity->GetType() == CCLIENTMARKER)
+    if (entity->GetType() == ElementType::MARKER)
         return static_cast<CClientMarker*>(entity)->IsOnScreen();
 
     return entity->IsOnScreen();
@@ -1608,7 +1608,7 @@ int CLuaElementDefs::IsElementStreamedIn(lua_State* luaVM)
             lua_pushboolean(luaVM, pStreamElement->IsStreamedIn());
             return 1;
         }
-        else if (pEntity->GetType() == CCLIENTSOUND)
+        else if (pEntity->GetType() == ElementType::SOUND)
         {
             CClientSound* pSound = static_cast<CClientSound*>(pEntity);
             lua_pushboolean(luaVM, pSound->IsSoundStopped() ? false : true);
@@ -1962,7 +1962,7 @@ int CLuaElementDefs::OOP_SetElementRotation(lua_State* luaVM)
         ConvertRadiansToDegrees(vecRotation);
 
         eEulerRotationOrder rotationOrder = EULER_DEFAULT;
-        if (pEntity->GetType() == CCLIENTOBJECT)
+        if (pEntity->GetType() == ElementType::OBJECT)
             rotationOrder = EULER_ZYX;
 
         if (CStaticFunctionDefinitions::SetElementRotation(*pEntity, vecRotation, rotationOrder, true))
@@ -1987,7 +1987,7 @@ int CLuaElementDefs::SetElementVelocity(lua_State* luaVM)
     argStream.ReadUserData(pEntity);
     argStream.ReadVector3D(vecVelocity);
     // previous code did this for some reason.
-    if (pEntity && pEntity->GetType() == CCLIENTRADARAREA)
+    if (pEntity && pEntity->GetType() == ElementType::RADAR_AREA)
         vecVelocity.fZ = 0.0f;
 
     // Verify the arguments
@@ -2621,8 +2621,8 @@ bool CLuaElementDefs::SetElementLighting(CClientEntity* entity, float lighting)
 {
     switch (entity->GetType())
     {
-        case CCLIENTPLAYER:
-        case CCLIENTPED:
+        case ElementType::PLAYER:
+        case ElementType::PED:
         {
             auto* ped = static_cast<CClientPed*>(entity)->GetGamePlayer();
             if (!ped)
@@ -2631,7 +2631,7 @@ bool CLuaElementDefs::SetElementLighting(CClientEntity* entity, float lighting)
             ped->SetLighting(lighting);
             return true;
         }
-        case CCLIENTVEHICLE:
+        case ElementType::VEHICLE:
         {
             auto* vehicle = static_cast<CClientVehicle*>(entity)->GetGameVehicle();
             if (!vehicle)
@@ -2640,8 +2640,8 @@ bool CLuaElementDefs::SetElementLighting(CClientEntity* entity, float lighting)
             vehicle->SetLighting(lighting);
             return true;
         }
-        case CCLIENTOBJECT:
-        case CCLIENTWEAPON:
+        case ElementType::OBJECT:
+        case ElementType::WEAPON:
         {
             auto* object = static_cast<CClientObject*>(entity)->GetGameObject();
             if (!object)

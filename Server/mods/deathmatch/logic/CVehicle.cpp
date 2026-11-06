@@ -31,7 +31,7 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
     m_usModel = usModel;
     m_pUpgrades = new CVehicleUpgrades(this);
 
-    m_iType = CElement::VEHICLE;
+    m_iType = ElementType::VEHICLE;
     SetTypeName("vehicle");
     m_eVehicleType = CVehicleManager::GetVehicleType(m_usModel);
     m_fHealth = DEFAULT_VEHICLE_HEALTH;

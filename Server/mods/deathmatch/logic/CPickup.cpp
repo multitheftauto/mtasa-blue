@@ -34,7 +34,7 @@ CPickup::CPickup(CElement* pParent, CPickupManager* pPickupManager, CColManager*
     pPickupManager->AddToList(this);
 
     // Initialize our stuff to defaults
-    m_iType = CElement::PICKUP;
+    m_iType = ElementType::PICKUP;
     SetTypeName("pickup");
     m_ucType = CPickup::WEAPON;
     m_ucWeaponType = CPickup::WEAPON_BRASSKNUCKLE;

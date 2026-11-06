@@ -33,7 +33,7 @@ public:
 
     void DoPulse();
 
-    eClientEntityType GetType() const { return CCLIENTPATHNODE; }
+    ElementType::Enum GetType() const { return ElementType::PATH_NODE; }
 
     void             GetPosition(CVector& vecPosition) const { vecPosition = m_vecPosition; }
     void             SetPosition(const CVector& vecPosition) { m_vecPosition = vecPosition; }

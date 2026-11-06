@@ -189,7 +189,7 @@ class CDatabaseConnectionElement final : public CElement
 public:
     CDatabaseConnectionElement(CElement* pParent, SConnectionHandle connection) : CElement(pParent), m_Connection(connection)
     {
-        m_iType = CElement::DATABASE_CONNECTION;
+        m_iType = ElementType::DATABASE_CONNECTION;
         SetTypeName("db-connection");
     }
 

@@ -67,7 +67,7 @@ CClientPointLights* CClientPointLightsManager::Get(ElementID ID)
 {
     // Grab the element with the given id. Check its type.
     CClientEntity* pEntity = CElementIDs::GetElement(ID);
-    if (pEntity && pEntity->GetType() == CCLIENTPOINTLIGHTS)
+    if (pEntity && pEntity->GetType() == ElementType::POINTLIGHTS)
     {
         return static_cast<CClientPointLights*>(pEntity);
     }
