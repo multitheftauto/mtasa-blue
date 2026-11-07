@@ -66,7 +66,10 @@ CModelTexturesInfo* CRenderWareSA::GetModelTexturesInfo(ushort usModelId)
         }
 
         if (!pTxd)
+        {
+            CTxdStore_RemoveRef(usTxdId);
             return NULL;
+        }
 
         // Add new info
         MapSet(ms_ModelTexturesInfoMap, usTxdId, CModelTexturesInfo());
