@@ -20,6 +20,8 @@ class CStaticFunctionDefinitions;
 #include "enums/WeaponProperty.h"
 #include "enums/ObjectProperty.h"
 
+class CResource;
+
 class CStaticFunctionDefinitions
 {
 public:
@@ -34,9 +36,9 @@ public:
                                 EEventPriorityType eventPriority, float fPriorityMod);
     static bool RemoveEventHandler(CLuaMain& LuaMain, const char* szName, CClientEntity& Entity, const CLuaFunctionRef& iLuaFunction);
     static bool TriggerEvent(const char* szName, CClientEntity& Entity, const CLuaArguments& Arguments, bool& bWasCancelled);
-    static bool TriggerServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments);
+    static bool TriggerServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, CResource* pSourceResource);
     static bool TriggerLatentServerEvent(const char* szName, CClientEntity& CallWithEntity, CLuaArguments& Arguments, int bandwidth, CLuaMain* pLuaMain,
-                                         ushort usResourceNetId);
+                                         ushort usResourceNetId, CResource* pSourceResource);
     static bool CancelEvent(bool bCancel);
     static bool WasEventCancelled();
 

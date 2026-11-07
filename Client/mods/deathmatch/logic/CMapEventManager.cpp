@@ -121,7 +121,7 @@ void CMapEventManager::DeleteAll()
 }
 
 bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, class CClientEntity* pSource, class CClientEntity* pThis,
-                            const char* minClientVersion)
+                            const char* minClientVersion, CResource* pSourceResource)
 {
     // Check if no events
     if (!m_bHasEvents)
@@ -229,14 +229,21 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     lua_pushelement(pState, pThis);
                     lua_setglobal(pState, "this");
 
-                    CLuaMain*  pLuaMain = g_pClientGame->GetScriptDebugging()->GetTopLuaMain();
-                    CResource* pSourceResource = pLuaMain ? pLuaMain->GetResource() : NULL;
-                    if (pSourceResource)
+                    // Prefer the resource the caller passed in. Remotely triggered events have no Lua call in
+                    // progress, so GetTopLuaMain() would report no resource at all for them.
+                    CResource* pOriginResource = pSourceResource;
+                    if (!pOriginResource)
                     {
-                        lua_pushresource(pState, pSourceResource);
+                        CLuaMain* pLuaMain = g_pClientGame->GetScriptDebugging()->GetTopLuaMain();
+                        pOriginResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
+                    }
+
+                    if (pOriginResource)
+                    {
+                        lua_pushresource(pState, pOriginResource);
                         lua_setglobal(pState, "sourceResource");
 
-                        lua_pushelement(pState, pSourceResource->GetResourceEntity());
+                        lua_pushelement(pState, pOriginResource->GetResourceEntity());
                         lua_setglobal(pState, "sourceResourceRoot");
                     }
                     else

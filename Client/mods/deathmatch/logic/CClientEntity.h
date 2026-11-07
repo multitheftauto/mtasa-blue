@@ -18,6 +18,7 @@ class CClientEntity;
 #include "logic/CClientEntityRefManager.h"
 #include "CStringName.h"
 class CLuaFunctionRef;
+class CResource;
 
 // Used to check fast version of getElementsByType
 // #define CHECK_ENTITIES_FROM_ROOT  MTA_DEBUG
@@ -249,9 +250,12 @@ public:
 
     bool AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction, bool bPropagated, EEventPriorityType eventPriority,
                   float fPriorityMod);
-    bool CallEvent(const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren, const char* minClientVersion = nullptr);
-    void CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource, const char* minClientVersion = nullptr);
-    void CallParentEvent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource, const char* minClientVersion = nullptr);
+    bool CallEvent(const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren, const char* minClientVersion = nullptr,
+                   CResource* pSourceResource = nullptr);
+    void CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource, const char* minClientVersion = nullptr,
+                           CResource* pSourceResource = nullptr);
+    void CallParentEvent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource, const char* minClientVersion = nullptr,
+                         CResource* pSourceResource = nullptr);
     bool DeleteEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFunctionRef& iLuaFunction);
     void DeleteEvents(CLuaMain* pLuaMain, bool bRecursive);
     void DeleteAllEvents();

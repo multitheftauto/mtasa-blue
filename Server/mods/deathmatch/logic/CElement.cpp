@@ -433,7 +433,7 @@ bool CElement::AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaFuncti
     return m_pEventManager->Add(pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod);
 }
 
-bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller)
+bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPlayer* pCaller, CResource* pSourceResource)
 {
     CDebugHookManager* debugHookManager = g_pGame->GetDebugHookManager();
     if (debugHookManager->HasPreEventHooks())
@@ -448,10 +448,10 @@ bool CElement::CallEvent(const char* szName, const CLuaArguments& Arguments, CPl
     pEvents->PreEventPulse();
 
     // Call the event on our parents/us first
-    CallParentEvent(szName, Arguments, this, pCaller);
+    CallParentEvent(szName, Arguments, this, pCaller, pSourceResource);
 
     // Call it on all our children
-    CallEventNoParent(szName, Arguments, this, pCaller);
+    CallEventNoParent(szName, Arguments, this, pCaller, pSourceResource);
 
     // Tell the event manager that we're done calling the event
     pEvents->PostEventPulse();
@@ -1033,12 +1033,12 @@ void CElement::FindAllChildrenByTypeIndex(unsigned int uiTypeHash, lua_State* pL
     }
 }
 
-void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
+void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CResource* pSourceResource)
 {
     // Call it on us if this isn't the same class it was raised on
     if (pSource != this && m_pEventManager->HasEvents())
     {
-        m_pEventManager->Call(szName, Arguments, pSource, this, pCaller);
+        m_pEventManager->Call(szName, Arguments, pSource, this, pCaller, pSourceResource);
     }
 
     // Call it on all our children
@@ -1049,7 +1049,7 @@ void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Argume
         {
             if (!pElement->m_pEventManager || pElement->m_pEventManager->HasEvents() || !pElement->m_Children.empty())
             {
-                pElement->CallEventNoParent(szName, Arguments, pSource, pCaller);
+                pElement->CallEventNoParent(szName, Arguments, pSource, pCaller, pSourceResource);
                 if (m_bIsBeingDeleted)
                     break;
             }
@@ -1057,18 +1057,18 @@ void CElement::CallEventNoParent(const char* szName, const CLuaArguments& Argume
     }
 }
 
-void CElement::CallParentEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller)
+void CElement::CallParentEvent(const char* szName, const CLuaArguments& Arguments, CElement* pSource, CPlayer* pCaller, CResource* pSourceResource)
 {
     // Call the event on us
     if (m_pEventManager->HasEvents())
     {
-        m_pEventManager->Call(szName, Arguments, pSource, this, pCaller);
+        m_pEventManager->Call(szName, Arguments, pSource, this, pCaller, pSourceResource);
     }
 
     // Call parent's handler
     if (m_pParent)
     {
-        m_pParent->CallParentEvent(szName, Arguments, pSource, pCaller);
+        m_pParent->CallParentEvent(szName, Arguments, pSource, pCaller, pSourceResource);
     }
 }
 
