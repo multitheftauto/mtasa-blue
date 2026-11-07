@@ -589,13 +589,26 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     BitStream.Write(&alpha);
 
                     // Write headlight color
-                    SColor color = pVehicle->GetHeadLightColor();
-                    if (color.R != 255 || color.G != 255 || color.B != 255)
+                    SColor leftColor = pVehicle->GetHeadLightColor(HeadlightSide::Left);
+                    SColor rightColor = pVehicle->GetHeadLightColor(HeadlightSide::Right);
+                    bool   hasCustomLeft = (leftColor.R != 255 || leftColor.G != 255 || leftColor.B != 255);
+                    bool   hasCustomRight = (rightColor.R != 255 || rightColor.G != 255 || rightColor.B != 255);
+
+                    if (hasCustomLeft || hasCustomRight)
                     {
                         BitStream.WriteBit(true);
-                        BitStream.Write(color.R);
-                        BitStream.Write(color.G);
-                        BitStream.Write(color.B);
+                        BitStream.Write(leftColor.R);
+                        BitStream.Write(leftColor.G);
+                        BitStream.Write(leftColor.B);
+
+                        bool hasDifferentRight = (leftColor != rightColor);
+                        BitStream.WriteBit(hasDifferentRight);
+                        if (hasDifferentRight)
+                        {
+                            BitStream.Write(rightColor.R);
+                            BitStream.Write(rightColor.G);
+                            BitStream.Write(rightColor.B);
+                        }
                     }
                     else
                         BitStream.WriteBit(false);
