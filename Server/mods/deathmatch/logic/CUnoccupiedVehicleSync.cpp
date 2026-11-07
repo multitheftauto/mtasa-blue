@@ -291,39 +291,41 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(CUnoccupiedVehicleSync
                         // Apply the data to the vehicle
                         if (vehicle.data.bSyncPosition)
                         {
+                            const CVector  vecPosition(vehicle.data.vecPosition.fX, vehicle.data.vecPosition.fY, vehicle.data.vecPosition.fZ);
                             const CVector& vecLastPosition = pVehicle->GetPosition();
-                            if (fabs(vecLastPosition.fX - vehicle.data.vecPosition.fX) <= FLOAT_EPSILON &&
-                                fabs(vecLastPosition.fY - vehicle.data.vecPosition.fY) <= FLOAT_EPSILON &&
-                                fabs(vecLastPosition.fZ - vehicle.data.vecPosition.fZ) <= 0.1f)
+                            if (fabs(vecLastPosition.fX - vecPosition.fX) <= FLOAT_EPSILON && fabs(vecLastPosition.fY - vecPosition.fY) <= FLOAT_EPSILON &&
+                                fabs(vecLastPosition.fZ - vecPosition.fZ) <= 0.1f)
                             {
                                 vehicle.data.bSyncPosition = false;
                             }
-                            pVehicle->SetPosition(vehicle.data.vecPosition);
+                            pVehicle->SetPosition(vecPosition);
                         }
                         if (vehicle.data.bSyncRotation)
                         {
-                            CVector vecLastRotation;
+                            const CVector vecRotation(vehicle.data.vecRotation.fX, vehicle.data.vecRotation.fY, vehicle.data.vecRotation.fZ);
+                            CVector       vecLastRotation;
                             pVehicle->GetRotation(vecLastRotation);
-                            if (GetSmallestWrapUnsigned(vecLastRotation.fX - vehicle.data.vecRotation.fX, 360) <= MIN_ROTATION_DIFF &&
-                                GetSmallestWrapUnsigned(vecLastRotation.fY - vehicle.data.vecRotation.fY, 360) <= MIN_ROTATION_DIFF &&
-                                GetSmallestWrapUnsigned(vecLastRotation.fZ - vehicle.data.vecRotation.fZ, 360) <= MIN_ROTATION_DIFF)
+                            if (GetSmallestWrapUnsigned(vecLastRotation.fX - vecRotation.fX, 360) <= MIN_ROTATION_DIFF &&
+                                GetSmallestWrapUnsigned(vecLastRotation.fY - vecRotation.fY, 360) <= MIN_ROTATION_DIFF &&
+                                GetSmallestWrapUnsigned(vecLastRotation.fZ - vecRotation.fZ, 360) <= MIN_ROTATION_DIFF)
                             {
                                 vehicle.data.bSyncRotation = false;
                             }
-                            pVehicle->SetRotationDegrees(vehicle.data.vecRotation);
+                            pVehicle->SetRotationDegrees(vecRotation);
                         }
                         if (vehicle.data.bSyncVelocity)
                         {
-                            if (fabs(vehicle.data.vecVelocity.fX) <= FLOAT_EPSILON && fabs(vehicle.data.vecVelocity.fY) <= FLOAT_EPSILON &&
-                                fabs(vehicle.data.vecVelocity.fZ) <= 0.1f)
+                            const CVector vecVelocity(vehicle.data.vecVelocity.fX, vehicle.data.vecVelocity.fY, vehicle.data.vecVelocity.fZ);
+                            if (fabs(vecVelocity.fX) <= FLOAT_EPSILON && fabs(vecVelocity.fY) <= FLOAT_EPSILON && fabs(vecVelocity.fZ) <= 0.1f)
                             {
                                 vehicle.data.bSyncVelocity = false;
                             }
-                            pVehicle->SetVelocity(vehicle.data.vecVelocity);
+                            pVehicle->SetVelocity(vecVelocity);
                         }
                         if (vehicle.data.bSyncTurnVelocity)
                         {
-                            pVehicle->SetTurnSpeed(vehicle.data.vecTurnVelocity);
+                            const CVector vecTurnVelocity(vehicle.data.vecTurnVelocity.fX, vehicle.data.vecTurnVelocity.fY, vehicle.data.vecTurnVelocity.fZ);
+                            pVehicle->SetTurnSpeed(vecTurnVelocity);
                         }
 
                         // Less health than last time?
