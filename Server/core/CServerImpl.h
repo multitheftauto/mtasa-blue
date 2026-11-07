@@ -59,6 +59,8 @@ public:
     bool ClearInput();
     // Prints current input buffer on a new line, clears the input buffer and resets history selection
     bool ResetInput();
+    // Clears console screen viewport
+    void ClearScreen() override;
 
     int Run(int iArgumentCount, char* szArguments[]);
 #ifndef WIN32
@@ -81,6 +83,22 @@ private:
     void HandlePulseSleep();
     void ApplyFrameRateLimit(uint uiUseRate);
 
+    void                InsertCharacter(wchar_t ch);
+    void                InsertString(const std::wstring& text);
+    void                HandleBackspace(bool word = false);
+    void                HandleDelete(bool word = false);
+    void                HandleLeftArrow(bool word = false);
+    void                HandleRightArrow(bool word = false);
+    void                HandleHome();
+    void                HandleEnd();
+    void                HandleTabCompletion();
+    void                HandleClipboardPaste();
+    void                RedrawInputLine();
+    void                ExecuteCurrentCommand();
+    void                LoadCommandHistory();
+    void                SaveCommandHistory();
+    static std::wstring CleanCommandHistoryLine(const std::wstring& line);
+
     void DestroyWindow();
 
     CDynamicLibrary  m_NetworkLibrary;
@@ -95,10 +113,13 @@ private:
     bool m_bRequestedQuit;
     bool m_bRequestedReset;
 
-    wchar_t m_szInputBuffer[255];
-    uint    m_uiInputCount;
+    std::wstring m_inputBuffer;
+    size_t       m_cursorPos = 0;
+    bool         m_insertMode = true;
+    size_t       m_renderedLength = 0;
+    bool         m_bPendingPromptRedraw = false;
 
-    char m_szTag[80];
+    char m_szTag[128];
 
     double m_dLastTimeMs;
     double m_dPrevOverrun;

@@ -241,18 +241,44 @@ void CLogger::HandleLogPrint(bool bTimeStamp, const char* szPrePend, const char*
     if (m_bPrintingDots && (bTimeStamp || strlen(szPrePend) != 0 || strlen(szMessage) > 1 || szMessage[0] != '.'))
         ProgressDotsEnd();
 
-    // Put the timestamp at the beginning of the string
-    std::string strOutputShort;
-    std::string strOutputLong;
+    // Build output strings with exact pre-allocated capacity to eliminate heap thrashing
+    std::string  strOutputShort;
+    std::string  strOutputLong;
+    const size_t prePendLen = szPrePend ? strlen(szPrePend) : 0;
+    const size_t messageLen = szMessage ? strlen(szMessage) : 0;
+
     if (bTimeStamp)
     {
-        strOutputShort = SString("[%s] ", *GetLocalTimeString());
-        strOutputLong = SString("[%s] ", *GetLocalTimeString(true));
+        const SString timeShort = GetLocalTimeString();
+        const SString timeLong = GetLocalTimeString(true);
+
+        strOutputShort.reserve(timeShort.length() + 3 + prePendLen + messageLen);
+        strOutputShort += '[';
+        strOutputShort += timeShort;
+        strOutputShort += "] ";
+
+        strOutputLong.reserve(timeLong.length() + 3 + prePendLen + messageLen);
+        strOutputLong += '[';
+        strOutputLong += timeLong;
+        strOutputLong += "] ";
+    }
+    else
+    {
+        strOutputShort.reserve(prePendLen + messageLen);
+        strOutputLong.reserve(prePendLen + messageLen);
     }
 
-    // Build the final string
-    strOutputShort = strOutputShort + szPrePend + szMessage;
-    strOutputLong = strOutputLong + szPrePend + szMessage;
+    if (szPrePend && prePendLen > 0)
+    {
+        strOutputShort.append(szPrePend, prePendLen);
+        strOutputLong.append(szPrePend, prePendLen);
+    }
+
+    if (szMessage && messageLen > 0)
+    {
+        strOutputShort.append(szMessage, messageLen);
+        strOutputLong.append(szMessage, messageLen);
+    }
 
     // Maybe print it in the console
     if (bToConsole)

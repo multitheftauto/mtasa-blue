@@ -13,6 +13,8 @@
 
 #include "CConsoleCommand.h"
 #include <list>
+#include <string>
+#include <unordered_map>
 
 class CConsole
 {
@@ -48,5 +50,6 @@ private:
     class CBanManager*               m_pBanManager;
     class CAccessControlListManager* m_pACLManager;
 
-    std::list<CConsoleCommand*> m_Commands;
+    std::list<CConsoleCommand*>                       m_Commands;
+    std::unordered_map<std::string, CConsoleCommand*> m_commandMap;
 };

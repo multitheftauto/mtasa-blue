@@ -32,4 +32,6 @@ public:
     virtual bool ClearInput() = 0;
     // Prints current input buffer on a new line, clears the input buffer and resets history selection
     virtual bool ResetInput() = 0;
+    // Clears console screen viewport
+    virtual void ClearScreen() = 0;
 };
