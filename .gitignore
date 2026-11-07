@@ -410,3 +410,7 @@ utils/DXFiles/
 !*.exe
 utils/vswhere.exe
 *.generated.h
+
+# DXVK, downloaded by install_dxvk
+vendor/dxvk/
+Shared/data/MTA San Andreas/MTA/dxvk/

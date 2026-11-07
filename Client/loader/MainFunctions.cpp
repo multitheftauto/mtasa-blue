@@ -729,6 +729,23 @@ void HandleNotUsedMainMenu()
         }
     }
 
+    if (GetDXVKEnabledSetting())
+    {
+        SString strMessage = _("Are you having problems running MTA:SA?.\n\nDo you want to change the following setting?");
+        strMessage += "\n" + _("Vulkan") + " -> " + _("Disabled");
+        HideSplash();
+        int iResponse = MessageBoxUTF8(NULL, strMessage, "MTA: San Andreas", MB_YESNO | MB_ICONQUESTION | MB_TOPMOST);
+        if (iResponse == IDYES)
+        {
+            SetDXVKEnabledSetting(false);
+            AddReportLog(9316, "Loader - HandleNotUsedMainMenu - User change to Vulkan disabled");
+        }
+        else
+        {
+            AddReportLog(9317, "Loader - HandleNotUsedMainMenu - User said no to Vulkan disable");
+        }
+    }
+
     // Check for problem processes
     struct
     {
@@ -1460,6 +1477,11 @@ void CheckDataFiles()
         ExitProcess(EXIT_ERROR);
     }
 
+    if (!ManageDXVK())
+    {
+        ExitProcess(EXIT_ERROR);
+    }
+
     // No-op known incompatible/broken d3d9.dll versions from the launch directory
     // By using file version we account for variants as well. The array is extendable, but primarily for D3D9.dll 6.3.9600.17415 (MTA top 5 crash)
     {
@@ -1718,6 +1740,9 @@ void CheckDataFiles()
                 if (library.absoluteFilePath.length() > MAX_PATH)
                     continue;
                 if (!FileExists(library.absoluteFilePath))
+                    continue;
+
+                if (IsDXVKBinaryFile(library.absoluteFilePath))
                     continue;
 
                 library.appLastHash = SString("%s%s-dll-last-hash", directory.first, library.stem.c_str());
@@ -2081,6 +2106,7 @@ int LaunchGame(SString strCmdLine)
 
     AddReportLog(7104, "Loader - Finishing");
     WriteDebugEvent("Loader - Finishing");
+
     EndD3DStuff();
 
     const DWORD rawExitCode = dwExitCode;
