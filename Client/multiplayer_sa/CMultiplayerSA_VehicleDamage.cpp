@@ -245,7 +245,7 @@ static void __declspec(naked) HOOK_CAutomobile_VehicleDamage1()
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CVehicle::VehicleDamage hook 2
-//      (Used for CAutomobile, CBike and CPlane hooks)
+//      (Used for CAutomobile, CBike, CPlane and CBoat hooks)
 //
 // Trigger event
 //
@@ -451,6 +451,54 @@ static void __declspec(naked) HOOK_CBike_VehicleDamage2()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CBoat::ProcessControl hook
+//
+// Trigger event
+//
+// CBoat has no VehicleDamage override, its collision damage is applied inline in
+// ProcessControl. The health store that follows the subtraction is part of the same hook,
+// because a damage proof boat has to keep the value out of its health, which is what the
+// separate CBoat_ApplyDamage hook did before.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+// Hook info
+#define HOOKPOS_CBoat_VehicleDamage2   0x06F1C2C
+#define HOOKSIZE_CBoat_VehicleDamage2  18
+#define HOOKCHECK_CBoat_VehicleDamage2 0xD8
+DWORD                         RETURN_CBoat_VehicleDamage2 = 0x06F1C3E;
+static void __declspec(naked) HOOK_CBoat_VehicleDamage2()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // vehicleFlags->bCanBeDamaged, damage proof boats stay silent like cars
+        test    byte ptr [esi+42Ah], 20h
+        jz      damageProof
+
+        sub     esp, 4
+        fstp    dword ptr [esp] // Pop loss into the second argument
+        push    esi
+        call    OnMY_CVehicle_VehicleDamage2
+        add     esp, 4*2
+        // Loss is on fp stack (from function return)
+
+        // Continue replaced code
+        fsubr   dword ptr [esi+4C0h]
+        fst     dword ptr [esi+4C0h]
+        jmp     RETURN_CBoat_VehicleDamage2
+
+damageProof:
+        // The same without the health store
+        fsubr   dword ptr [esi+4C0h]
+        jmp     RETURN_CBoat_VehicleDamage2
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CMultiplayerSA::SetVehicleDamageHandler
 //
 // Set handler for functions in this file
@@ -479,4 +527,5 @@ void CMultiplayerSA::InitHooks_VehicleDamage()
     EZHookInstallChecked(CPlane_VehicleDamage2);
     EZHookInstallChecked(CBike_VehicleDamage1);
     EZHookInstallChecked(CBike_VehicleDamage2);
+    EZHookInstallChecked(CBoat_VehicleDamage2);
 }

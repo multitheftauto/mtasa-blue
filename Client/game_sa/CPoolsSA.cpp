@@ -121,7 +121,7 @@ CVehicle* CPoolsSA::AddVehicle(CClientVehicle* pClientVehicle, std::uint16_t mod
     if (!CModelInfoSA::IsVehicleModel(model))
         return nullptr;
 
-    auto vehicleClass = static_cast<VehicleClass>(pGame->GetModelInfo(model)->GetVehicleType());
+    auto vehicleClass = static_cast<VehicleClass::Enum>(pGame->GetModelInfo(model)->GetVehicleType());
 
     std::unique_ptr<CVehicleSA> vehicle = nullptr;
 
@@ -617,6 +617,12 @@ CEntity* CPoolsSA::GetEntity(DWORD* pGameInterface)
         {
             return pThePedEntity->pEntity;
         }
+
+        auto pTheBuildingEntity = m_BuildingsPool.GetBuilding(reinterpret_cast<CBuildingSAInterface*>(pGameInterface));
+        if (pTheBuildingEntity)
+        {
+            return pTheBuildingEntity;
+        }
     }
     return NULL;
 }
@@ -866,6 +872,11 @@ int CPoolsSA::GetPoolDefaultCapacity(ePools pool)
             return 4096;  // Modded to 16000   @ CGameSA.cpp
     }
     return 0;
+}
+
+int CPoolsSA::GetPoolMaxCapacity(ePools pool) const noexcept
+{
+    return pool == BUILDING_POOL ? static_cast<int>(CBuildingsPoolSA::MAX_CAPACITY) : std::numeric_limits<int>::max();
 }
 
 int CPoolsSA::GetPoolDefaultModdedCapacity(ePools pool)

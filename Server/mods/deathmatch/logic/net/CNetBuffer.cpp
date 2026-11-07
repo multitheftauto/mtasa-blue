@@ -11,9 +11,48 @@
 #include "SimHeaders.h"
 #include "CGame.h"
 #include "packets/CPlayerDisconnectedPacket.h"
+#ifndef WIN32
+    #include <dlfcn.h>
+#endif
 
 SThreadCPUTimesStore g_SyncThreadCPUTimes;
 uint                 g_uiNetSentByteCounter = 0;
+
+namespace
+{
+    using PFN_NotifyHqReachable = void (*)(int);
+    PFN_NotifyHqReachable ms_pfnNotifyHqReachable = nullptr;
+
+    void ResolveNotifyHqReachable()
+    {
+        if (ms_pfnNotifyHqReachable)
+            return;
+#ifdef WIN32
+        HMODULE hNetMod = GetModuleHandleA("net.dll");
+        if (!hNetMod)
+            hNetMod = GetModuleHandleA("net_d.dll");
+        if (hNetMod)
+            ms_pfnNotifyHqReachable = reinterpret_cast<PFN_NotifyHqReachable>(GetProcAddress(hNetMod, "NetServer_NotifyHqReachable"));
+#else
+        // Core loads net.so without RTLD_GLOBAL, so RTLD_DEFAULT cannot see its symbols.
+        // RTLD_NOLOAD returns a handle to the already-loaded module without reloading it.
+        void* hNetMod = dlopen("net.so", RTLD_NOW | RTLD_NOLOAD);
+        if (!hNetMod)
+            hNetMod = dlopen("net_d.so", RTLD_NOW | RTLD_NOLOAD);
+        if (hNetMod)
+        {
+            ms_pfnNotifyHqReachable = reinterpret_cast<PFN_NotifyHqReachable>(dlsym(hNetMod, "NetServer_NotifyHqReachable"));
+            dlclose(hNetMod);
+        }
+#endif
+    }
+}
+
+void NetServer_NotifyHqReachable(bool bReachable)
+{
+    if (ms_pfnNotifyHqReachable)
+        ms_pfnNotifyHqReachable(bReachable ? 1 : 0);
+}
 
 namespace
 {
@@ -116,6 +155,8 @@ CNetServerBuffer::CNetServerBuffer(CSimPlayerManager* pSimPlayerManager)
     m_pSimPlayerManager = pSimPlayerManager;
     ms_pNetServerBuffer = this;
     m_pRealNetServer = g_pRealNetServer;
+
+    ResolveNotifyHqReachable();
 
     // Begin the watchdog
     shared.m_pWatchDog = new CNetBufferWatchDog(this, false);

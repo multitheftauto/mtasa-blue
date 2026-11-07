@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include <StdInc.h>
+#include <new>
 
 // Temporary until we change these funcs:
 #include "../luadefs/CLuaDefs.h"
@@ -106,14 +107,6 @@ void lua_pushuserdata(lua_State* luaVM, void* pData)
         return lua_pushxmlnode(luaVM, pNode);
     else if (CLuaTimer* pTimer = UserDataCast((CLuaTimer*)pData, luaVM))
         return lua_pushtimer(luaVM, pTimer);
-    else if (CLuaVector2D* pVector = UserDataCast((CLuaVector2D*)pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
-    else if (CLuaVector3D* pVector = UserDataCast((CLuaVector3D*)pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
-    else if (CLuaVector4D* pVector = UserDataCast((CLuaVector4D*)pData, luaVM))
-        return lua_pushvector(luaVM, *pVector);
-    else if (CLuaMatrix* pMatrix = UserDataCast((CLuaMatrix*)pData, luaVM))
-        return lua_pushmatrix(luaVM, *pMatrix);
 
     lua_pushobject(luaVM, NULL, pData);
 }
@@ -166,30 +159,34 @@ void lua_pushobject(lua_State* luaVM, const char* szClass, void* pObject, bool b
 
 void lua_pushvector(lua_State* luaVM, const CVector4D& vector)
 {
-    CLuaVector4D* pVector = new CLuaVector4D(vector);
-    lua_pushobject(luaVM, "Vector4", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
-    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
+    void* storage = lua_newuserdata(luaVM, sizeof(CVector4D));
+    new (storage) CVector4D(vector);
+    lua_getclass(luaVM, "Vector4");
+    lua_setmetatable(luaVM, -2);
 }
 
 void lua_pushvector(lua_State* luaVM, const CVector& vector)
 {
-    CLuaVector3D* pVector = new CLuaVector3D(vector);
-    lua_pushobject(luaVM, "Vector3", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
-    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
+    void* storage = lua_newuserdata(luaVM, sizeof(CVector));
+    new (storage) CVector(vector);
+    lua_getclass(luaVM, "Vector3");
+    lua_setmetatable(luaVM, -2);
 }
 
 void lua_pushvector(lua_State* luaVM, const CVector2D& vector)
 {
-    CLuaVector2D* pVector = new CLuaVector2D(vector);
-    lua_pushobject(luaVM, "Vector2", (void*)reinterpret_cast<unsigned int*>(pVector->GetScriptID()), true);
-    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
+    void* storage = lua_newuserdata(luaVM, sizeof(CVector2D));
+    new (storage) CVector2D(vector);
+    lua_getclass(luaVM, "Vector2");
+    lua_setmetatable(luaVM, -2);
 }
 
 void lua_pushmatrix(lua_State* luaVM, const CMatrix& matrix)
 {
-    CLuaMatrix* pMatrix = new CLuaMatrix(matrix);
-    lua_pushobject(luaVM, "Matrix", (void*)reinterpret_cast<unsigned int*>(pMatrix->GetScriptID()), true);
-    lua_addtotalbytes(luaVM, LUA_GC_EXTRA_BYTES);
+    void* storage = lua_newuserdata(luaVM, sizeof(CMatrix));
+    new (storage) CMatrix(matrix);
+    lua_getclass(luaVM, "Matrix");
+    lua_setmetatable(luaVM, -2);
 }
 
 CLuaMain& lua_getownercluamain(lua_State* L)
@@ -262,6 +259,18 @@ void lua_getclass(lua_State* luaVM, const char* szName)
     lua_rawget(luaVM, -2);          // mt, class
 
     lua_remove(luaVM, -2);  // class
+}
+
+bool lua_isclass(lua_State* luaVM, int index, const char* szName)
+{
+    if (lua_type(luaVM, index) != LUA_TUSERDATA)
+        return false;
+    if (!lua_getmetatable(luaVM, index))
+        return false;
+    lua_getclass(luaVM, szName);
+    bool bEqual = (lua_rawequal(luaVM, -1, -2) != 0);
+    lua_pop(luaVM, 2);
+    return bEqual;
 }
 
 void lua_registerclass(lua_State* luaVM, const char* szName, const char* szParent)

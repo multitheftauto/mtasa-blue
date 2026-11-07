@@ -16,7 +16,7 @@
 #define INVALID_ARCHIVE_ID 0xFF
 #define INVALID_STREAM_ID  0xFF
 
-enum class eModelLoadState : std::uint32_t
+enum class eModelLoadState : std::uint8_t
 {
     // Model isn't loaded
     LOADSTATE_NOT_LOADED = 0,
@@ -62,8 +62,14 @@ struct CStreamingInfo
     uint32_t        offsetInBlocks = 0u;
     uint32_t        sizeInBlocks = 0u;
     eModelLoadState loadState = eModelLoadState::LOADSTATE_NOT_LOADED;
+    uint8_t         padding[3]{};
 };
 static_assert(sizeof(CStreamingInfo) == 0x14, "Invalid size for CStreamingInfo");
+
+// Values of CStreamingInfo::flg. These mark models that the game must keep loaded,
+// so higher layers can avoid dropping their own refs on such models.
+constexpr std::uint8_t STREAMING_FLAG_GAME_REQUIRED = 0x2u;
+constexpr std::uint8_t STREAMING_FLAG_MISSION_REQUIRED = 0x4u;
 
 class CStreaming
 {
@@ -85,4 +91,10 @@ public:
     virtual void          RemoveBigBuildings() = 0;
     virtual void          LoadScene(const CVector* position) = 0;
     virtual void          LoadSceneCollision(const CVector* position) = 0;
+    // State of the game's loaded ped/vehicle model groups. Used by the model cache
+    // manager to avoid unloading models that the game itself is still tracking.
+    virtual std::uint32_t GetNumPedsLoaded() const noexcept = 0;
+    virtual bool          IsModelInLoadedPedGroup(std::uint16_t modelId) const noexcept = 0;
+    virtual std::uint32_t GetNumLoadedVehicles() const noexcept = 0;
+    virtual bool          IsModelInLoadedVehicleGroup(std::uint16_t modelId) const noexcept = 0;
 };

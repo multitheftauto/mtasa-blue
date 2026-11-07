@@ -31,17 +31,43 @@
 #include "CHTTPD.h"
 #include "Utils.h"
 #include "packets/CResourceClientScriptsPacket.h"
+#include "packets/CEntityRemoveTreePacket.h"
+#include "CResourceMapItem.h"
 #include "lua/CLuaFunctionParseHelpers.h"
 #include <net/SimHeaders.h>
 #include <zip.h>
 #include <glob/glob.h>
-#include "CStaticFunctionDefinitions.h"
+#include <cctype>
+#include <unordered_set>
 
 #ifdef WIN32
     #include <zip/iowin32.h>
 #else
     #include <utime.h>
 #endif
+
+namespace
+{
+    struct CaseInsensitiveStringHasher
+    {
+        std::size_t operator()(const std::string& key) const noexcept
+        {
+            std::size_t hash = 0;
+            for (char c : key)
+            {
+                hash = hash * 31 + std::tolower(static_cast<unsigned char>(c));
+            }
+            return hash;
+        }
+    };
+
+    struct CaseInsensitiveStringEqual
+    {
+        bool operator()(const std::string& a, const std::string& b) const noexcept { return stricmp(a.c_str(), b.c_str()) == 0; }
+    };
+
+    using CaseInsensitiveStringSet = std::unordered_set<std::string, CaseInsensitiveStringHasher, CaseInsensitiveStringEqual>;
+}
 
 #ifndef MAX_PATH
     #define MAX_PATH 260
@@ -96,6 +122,7 @@ bool CResource::Load()
 
     m_strCircularInclude = "";
     m_metaChecksum = CChecksum();
+    m_strFailureReason = "";
     m_bIsPersistent = false;
     m_bLinked = false;
     m_pResourceElement = nullptr;
@@ -272,6 +299,9 @@ bool CResource::Load()
             if (!ReadIncludedResources(pRoot) || !ReadIncludedMaps(pRoot) || !ReadIncludedFiles(pRoot) || !ReadIncludedScripts(pRoot) ||
                 !ReadIncludedHTML(pRoot) || !ReadIncludedExports(pRoot) || !ReadIncludedConfigs(pRoot))
             {
+                if (m_strFailureReason.empty())
+                    m_strFailureReason = SString("Couldn't process includes in meta file for resource '%s'\n", m_strResourceName.c_str());
+                CLogger::LogPrintf("%s", m_strFailureReason.c_str());
                 delete pMetaFile;
                 g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
                 return false;
@@ -303,7 +333,10 @@ bool CResource::Load()
 
     // Generate a CRC for this resource
     if (!GenerateChecksums())
+    {
+        g_pGame->GetHTTPD()->UnregisterResource(m_strResourceName.c_str());
         return false;
+    }
 
     m_eState = EResourceState::Loaded;
     m_bDoneUpgradeWarnings = false;
@@ -361,16 +394,32 @@ void CResource::Reload()
     Load();
 }
 
-bool CResource::CanPlayerTriggerResourceStart(CPlayer* player, unsigned int playerStartCounter)
+EPlayerResourceStartAck CResource::CanPlayerTriggerResourceStart(CPlayer* player, unsigned int playerStartCounter)
 {
-    if (playerStartCounter != m_startCounter || m_eState != EResourceState::Running)
-        return false;
+    // A player who is mid-quit or not yet fully joined cannot legitimately ack a resource
+    // start. Treat it as a race so the caller doesn't charge a token.
+    if (!player || !player->IsJoined() || player->IsLeavingServer())
+        return EPlayerResourceStartAck::RaceMiss;
 
-    if (m_isRunningForPlayer.contains(player))
-        return false;
+    // If the resource was never started (counter still zero) or is no longer running, the ack
+    // can't possibly be valid. This is a normal race during start/stop churn.
+    if (!m_startCounter || m_eState != EResourceState::Running)
+        return EPlayerResourceStartAck::RaceMiss;
 
-    m_isRunningForPlayer.insert(player);
-    return true;
+    // First valid ack from this player for the current resource incarnation always wins.
+    // A generation mismatch here means the player's ack was in flight when a server-side
+    // restart bumped the counter; rejecting it leaves the join loading gate closed until
+    // the second cycle's ack arrives seconds later.
+    auto [it, inserted] = m_isRunningForPlayer.insert(player);
+    if (inserted)
+        return EPlayerResourceStartAck::Accepted;
+
+    // Player already had their ack accepted for this start cycle. Distinguish a stale-
+    // generation ack (race) from a true duplicate so the caller only rate-limits the latter.
+    if (playerStartCounter != m_startCounter)
+        return EPlayerResourceStartAck::RaceMiss;
+
+    return EPlayerResourceStartAck::Duplicate;
 }
 
 void CResource::OnPlayerQuit(CPlayer& Player)
@@ -529,22 +578,55 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
                 return SString();
 
             auto checksumOrError = CChecksum::GenerateChecksumFromFile(strPath);
-            if (std::holds_alternative<std::string>(checksumOrError))
-            {
-                return SString(std::get<std::string>(checksumOrError));
-            }
+            if (!checksumOrError)
+                return SString(checksumOrError.error());
 
-            pResourceFile->SetLastChecksum(std::get<CChecksum>(checksumOrError));
-            pResourceFile->SetLastFileSizeHint(static_cast<uint>(FileSize(strPath)));
+            CChecksum checksum = *checksumOrError;
 
-            // Check if file is blocked
+            // Check if file is blocked before persisting the checksum, so that
+            // blocked files never have their checksum stored on the CResourceFile.
             char szHashResult[33];
-            CMD5Hasher::ConvertToHex(pResourceFile->GetLastChecksum().md5, szHashResult);
+            CMD5Hasher::ConvertToHex(checksum.md5, szHashResult);
             SString strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
 
             if (!strBlockReason.empty())
             {
                 return SString("file '%s' is blocked (%s)", pResourceFile->GetName(), *strBlockReason);
+            }
+
+            pResourceFile->SetLastChecksum(checksum);
+            pResourceFile->SetLastFileSizeHint(FileSize(strPath));
+
+#ifdef WIN32
+            const std::filesystem::path filePath(SharedUtil::FromUTF8(strPath).c_str());
+#else
+            const std::filesystem::path filePath(strPath.c_str());
+#endif
+
+            std::error_code writeTimeError;
+            const auto      lastWriteTime = std::filesystem::last_write_time(filePath, writeTimeError);
+
+            std::error_code fileSizeError;
+            const auto      lastFileSize = std::filesystem::file_size(filePath, fileSizeError);
+
+            if (!writeTimeError && !fileSizeError)
+            {
+                pResourceFile->SetLastWriteTime(lastWriteTime);
+                pResourceFile->SetLastFileSize(lastFileSize);
+                pResourceFile->SetHasFileMetadata(true);
+            }
+            else
+            {
+                if (writeTimeError)
+                {
+                    CLogger::LogPrintf("WARNING: Failed to get last write time for '%s' in resource '%s': %s\n", pResourceFile->GetName(),
+                                       m_strResourceName.c_str(), writeTimeError.message().c_str());
+                }
+                if (fileSizeError)
+                {
+                    CLogger::LogPrintf("WARNING: Failed to get file size for '%s' in resource '%s': %s\n", pResourceFile->GetName(), m_strResourceName.c_str(),
+                                       fileSizeError.message().c_str());
+                }
             }
 
             // Copy file to http holding directory
@@ -566,6 +648,15 @@ std::future<SString> CResource::GenerateChecksumForFile(CResourceFile* pResource
 
                     if (pResourceFile->GetLastChecksum() != cachedChecksum)
                     {
+                        // Verify the source file has not changed since it was checksummed.
+                        // Using the unsafe variant here because a failed read returns a zero
+                        // checksum, which will fail the comparison and safely prevent the copy.
+                        CChecksum recheckChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
+                        if (pResourceFile->GetLastChecksum() != recheckChecksum)
+                        {
+                            return SString("file '%s' was modified during checksum processing", pResourceFile->GetName());
+                        }
+
                         if (!FileCopy(strPath, strCachedFilePath))
                         {
                             return SString("Could not copy '%s' to '%s'\n", *strPath, *strCachedFilePath);
@@ -606,7 +697,7 @@ bool CResource::GenerateChecksums()
             if (!result.empty())
             {
                 m_strFailureReason = result;
-                CLogger::LogPrintf(result);
+                CLogger::LogPrintf("%s", result.c_str());
                 bOk = false;
             }
         }
@@ -614,14 +705,20 @@ bool CResource::GenerateChecksums()
         {
             // Became invalid (e.g., during shutdown)
             m_strFailureReason = SString("Checksum task failed: %s", e.what());
-            CLogger::LogPrintf(m_strFailureReason);
+            CLogger::LogPrintf("%s", m_strFailureReason.c_str());
             bOk = false;
         }
         catch (const std::exception& e)
         {
             // Task threw
             m_strFailureReason = SString("Checksum error: %s", e.what());
-            CLogger::LogPrintf(m_strFailureReason);
+            CLogger::LogPrintf("%s", m_strFailureReason.c_str());
+            bOk = false;
+        }
+        catch (...)
+        {
+            m_strFailureReason = "Unknown checksum error";
+            CLogger::LogPrintf("%s", m_strFailureReason.c_str());
             bOk = false;
         }
     }
@@ -656,10 +753,51 @@ bool CResource::HasResourceChanged()
         if (!GetFilePath(pResourceFile->GetName(), strPath))
             return true;
 
-        CChecksum checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
+        bool needsChecksumCheck = true;
+        if (pResourceFile->HasFileMetadata())
+        {
+#ifdef WIN32
+            const std::filesystem::path filePath(SharedUtil::FromUTF8(strPath).c_str());
+#else
+            const std::filesystem::path filePath(strPath.c_str());
+#endif
 
-        if (pResourceFile->GetLastChecksum() != checksum)
-            return true;
+            std::error_code writeTimeError;
+            const auto      currentWriteTime = std::filesystem::last_write_time(filePath, writeTimeError);
+
+            std::error_code fileSizeError;
+            const auto      currentFileSize = std::filesystem::file_size(filePath, fileSizeError);
+
+            if (!writeTimeError && !fileSizeError)
+            {
+                if (currentWriteTime == pResourceFile->GetLastWriteTime() && currentFileSize == pResourceFile->GetLastFileSize())
+                {
+                    needsChecksumCheck = false;
+                }
+            }
+            else
+            {
+                if (writeTimeError)
+                {
+                    CLogger::LogPrintf("WARNING: Failed to get last write time for '%s' in resource '%s': %s\n", pResourceFile->GetName(),
+                                       m_strResourceName.c_str(), writeTimeError.message().c_str());
+                }
+                if (fileSizeError)
+                {
+                    CLogger::LogPrintf("WARNING: Failed to get file size for '%s' in resource '%s': %s\n", pResourceFile->GetName(), m_strResourceName.c_str(),
+                                       fileSizeError.message().c_str());
+                }
+            }
+        }
+
+        CChecksum checksum = pResourceFile->GetLastChecksum();
+        if (needsChecksumCheck)
+        {
+            checksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
+
+            if (pResourceFile->GetLastChecksum() != checksum)
+                return true;
+        }
 
         // Also check if file in http cache has been externally altered
         switch (pResourceFile->GetType())
@@ -800,6 +938,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     if (m_bDestroyed)
         return false;
 
+    m_strFailureReason = "";
+
     OnResourceStateChange("starting");
 
     m_eState = EResourceState::Starting;
@@ -811,6 +951,7 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     {
         // Start cancelled by another resource
         m_strFailureReason = "Start cancelled by script\n";
+        m_timeStarted = 0;
         m_eState = EResourceState::Loaded;
         return false;
     }
@@ -829,7 +970,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     if (!GetCompatibilityStatus(strStatus))
     {
         m_strFailureReason = SString("Not starting resource %s as %s\n", m_strResourceName.c_str(), strStatus.c_str());
-        CLogger::LogPrint(m_strFailureReason);
+        CLogger::LogPrintf("%s", m_strFailureReason.c_str());
+        m_timeStarted = 0;
         m_eState = EResourceState::Loaded;
         return false;
     }
@@ -845,6 +987,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     {
         if (!LinkToIncludedResources())
         {
+            CLogger::LogPrintf("Failed to start resource '%s' - %s\n", GetName().c_str(), m_strFailureReason.c_str());
+            m_timeStarted = 0;
             m_eState = EResourceState::Loaded;
             return false;
         }
@@ -873,6 +1017,11 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     // Verify resource element id and dynamic element root id
     if (m_pResourceElement->GetID() == INVALID_ELEMENT_ID || m_pResourceDynamicElementRoot->GetID() == INVALID_ELEMENT_ID)
     {
+        m_strFailureReason = SString("Start up of resource %s cancelled by element id starvation", m_strResourceName.c_str());
+        CLogger::LogPrintf("%s\n", m_strFailureReason.c_str());
+
+        OnResourceStateChange("loaded");
+
         // Destroy the dynamic element root
         g_pGame->GetElementDeleter()->Delete(m_pResourceDynamicElementRoot);
         m_pResourceDynamicElementRoot = nullptr;
@@ -891,12 +1040,12 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
         m_pRootElement = nullptr;
 
         // Destroy the element group attached directly to this resource
-        delete m_pDefaultElementGroup;
+        if (m_pDefaultElementGroup)
+            delete m_pDefaultElementGroup;
         m_pDefaultElementGroup = nullptr;
 
+        m_timeStarted = 0;
         m_eState = EResourceState::Loaded;
-        m_strFailureReason = SString("Start up of resource %s cancelled by element id starvation", m_strResourceName.c_str());
-        CLogger::LogPrintf("%s\n", m_strFailureReason.c_str());
         return false;
     }
 
@@ -904,7 +1053,47 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     m_pResourceElement->SetName(m_strResourceName.c_str());
 
     // Create the virtual machine for this resource
-    CreateVM(m_bOOPEnabledInMetaXml);
+    if (!CreateVM(m_bOOPEnabledInMetaXml))
+    {
+        // CreateVM may have set a specific failure reason in its catch handler
+        // (e.g. exception details). Only use the generic message when no
+        // specific reason was set (e.g. CreateVirtualMachine returned null).
+        if (m_strFailureReason.empty())
+            m_strFailureReason = SString("Failed to create VM for resource '%s'\n", m_strResourceName.c_str());
+        CLogger::LogPrintf("%s", m_strFailureReason.c_str());
+
+        OnResourceStateChange("loaded");
+
+        // Make sure we remove the resource elements from the players that have joined
+        CEntityRemovePacket removePacket;
+        if (m_pResourceElement)
+        {
+            removePacket.Add(m_pResourceElement);
+            g_pGame->GetElementDeleter()->Delete(m_pResourceElement);
+            m_pResourceElement = nullptr;
+        }
+        if (m_pResourceDynamicElementRoot)
+        {
+            removePacket.Add(m_pResourceDynamicElementRoot);
+            g_pGame->GetElementDeleter()->Delete(m_pResourceDynamicElementRoot);
+            m_pResourceDynamicElementRoot = nullptr;
+        }
+        g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
+
+        if (m_pNodeStorage)
+        {
+            delete m_pNodeStorage;
+            m_pNodeStorage = nullptr;
+        }
+
+        m_pRootElement = nullptr;
+        if (m_pDefaultElementGroup)
+            delete m_pDefaultElementGroup;
+        m_pDefaultElementGroup = nullptr;
+        m_timeStarted = 0;
+        m_eState = EResourceState::Loaded;
+        return false;
+    }
 
     // We're now active
     CLogger::LogPrintf(LOGLEVEL_LOW, "Starting %s\n", m_strResourceName.c_str());
@@ -920,9 +1109,17 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
     {
         bool bAbortStart = false;
 
-        // Check if file is blocked
+        // Check if file is blocked -- recompute checksum from the current
+        // file on disk so the check sees the file as it is now, not as it
+        // was at Load().
         char szHashResult[33];
-        CMD5Hasher::ConvertToHex(pResourceFile->GetLastChecksum().md5, szHashResult);
+        {
+            std::string strPath;
+            CChecksum   currentChecksum = pResourceFile->GetLastChecksum();
+            if (GetFilePath(pResourceFile->GetName(), strPath))
+                currentChecksum = CChecksum::GenerateChecksumFromFileUnsafe(strPath);
+            CMD5Hasher::ConvertToHex(currentChecksum.md5, szHashResult);
+        }
         SString strBlockReason = m_pResourceManager->GetBlockedFileReason(szHashResult);
 
         if (!strBlockReason.empty())
@@ -931,13 +1128,12 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
             CLogger::LogPrintf("Failed to start resource '%s' - %s\n", GetName().c_str(), m_strFailureReason.c_str());
             bAbortStart = true;
         }
-
-        // Start if applicable
-        if ((pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_MAP && StartOptions.bMaps) ||
-            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG && StartOptions.bConfigs) ||
-            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT && StartOptions.bScripts) ||
-            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && StartOptions.bClientScripts) ||
-            (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML && StartOptions.bHTML))
+        // Start if applicable (skipped when file is already blocked)
+        else if ((pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_MAP && StartOptions.bMaps) ||
+                 (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CONFIG && StartOptions.bConfigs) ||
+                 (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_SCRIPT && StartOptions.bScripts) ||
+                 (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT && StartOptions.bClientScripts) ||
+                 (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_HTML && StartOptions.bHTML))
         {
             // Start. Failed?
             if (!pResourceFile->Start())
@@ -955,6 +1151,11 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
             // Stop all the resource items without any warnings
             for (CResourceFile* pResourceFile : m_ResourceFiles)
                 pResourceFile->Stop();
+
+            OnResourceStateChange("loaded");
+
+            if (m_bSyncMapElementDataDefined)
+                m_pResourceManager->RemoveSyncMapElementDataOption(this);
 
             DestroyVM();
 
@@ -989,6 +1190,8 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
             }
 
             g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
+            m_pRootElement = nullptr;
+            m_timeStarted = 0;
             m_eState = EResourceState::Loaded;
             return false;
         }
@@ -1013,7 +1216,60 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
                     // Reload it if it's not already started
                     if (!pIncluded->IsActive())
                     {
-                        m_pResourceManager->Reload(pIncluded);
+                        if (!m_pResourceManager->Reload(pIncluded))
+                        {
+                            SString strChildReason = pIncluded->GetFailureReason();
+                            if (!strChildReason.empty())
+                                m_strFailureReason = SString("Failed to reload included resource '%s' (%s)\n", pIncluded->GetName().c_str(), *strChildReason);
+                            else
+                                m_strFailureReason = SString("Failed to reload included resource '%s'\n", pIncluded->GetName().c_str());
+                            CLogger::LogPrintf("Failed to start resource '%s' - %s\n", GetName().c_str(), m_strFailureReason.c_str());
+
+                            // Clean up: stop resource items, destroy VM, release elements.
+                            for (CResourceFile* pResourceFile : m_ResourceFiles)
+                                pResourceFile->Stop();
+
+                            OnResourceStateChange("loaded");
+
+                            if (m_bSyncMapElementDataDefined)
+                                m_pResourceManager->RemoveSyncMapElementDataOption(this);
+
+                            DestroyVM();
+
+                            if (m_pNodeStorage)
+                            {
+                                delete m_pNodeStorage;
+                                m_pNodeStorage = nullptr;
+                            }
+
+                            if (m_pDefaultElementGroup)
+                                delete m_pDefaultElementGroup;
+                            m_pDefaultElementGroup = nullptr;
+
+                            // Make sure we remove the resource elements from the players that have joined
+                            CEntityRemovePacket removePacket;
+
+                            if (m_pResourceElement)
+                            {
+                                removePacket.Add(m_pResourceElement);
+                                g_pGame->GetElementDeleter()->Delete(m_pResourceElement);
+                                m_pResourceElement = nullptr;
+                            }
+
+                            if (m_pResourceDynamicElementRoot)
+                            {
+                                removePacket.Add(m_pResourceDynamicElementRoot);
+                                g_pGame->GetElementDeleter()->Delete(m_pResourceDynamicElementRoot);
+                                m_pResourceDynamicElementRoot = nullptr;
+                            }
+
+                            g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
+
+                            m_pRootElement = nullptr;
+                            m_timeStarted = 0;
+                            m_eState = EResourceState::Loaded;
+                            return false;
+                        }
                     }
                     else
                     {
@@ -1039,6 +1295,11 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
 
     m_eState = EResourceState::Running;
 
+    // Bump the generation counter before any handler can observe the resource as running.
+    // The CResourceStartPacket broadcast below carries this value, and onResourceStart
+    // handlers must see the same value clients will be told to ack against.
+    m_startCounter = std::max<unsigned int>(m_startCounter + 1, 1);  // We consider zero to be an invalid start counter.
+
     // Call the onResourceStart event. If it returns false, cancel this script again
     CLuaArguments Arguments;
     Arguments.PushResource(this);
@@ -1049,10 +1310,10 @@ bool CResource::Start(std::list<CResource*>* pDependents, bool bManualStart, con
         CLogger::LogPrintf("Start up of resource %s cancelled by script\n", m_strResourceName.c_str());
         m_strFailureReason = "Start up of resource cancelled by script\n";
         Stop(true);
+        m_timeStarted = 0;
         return false;
     }
 
-    m_startCounter = std::max<unsigned int>(m_startCounter + 1, 1);  // We consider zero to be an invalid start counter.
     m_bStartedManually = bManualStart;
 
     // Remember the client files state
@@ -1144,6 +1405,7 @@ bool CResource::Stop(bool bManualStop)
     // Tell all the players that have joined that this resource is stopped
     g_pGame->GetPlayerManager()->BroadcastOnlyJoined(CResourceStopPacket(m_usNetID));
     m_bClientSync = false;
+    m_isRunningForPlayer.clear();
 
     // Call the onResourceStop event on this resource element
     CLuaArguments Arguments;
@@ -1165,6 +1427,26 @@ bool CResource::Stop(bool bManualStop)
         pResource->RemoveDependent(this);
 
     m_TemporaryIncludes.clear();
+
+    // Send bulk tree removal packet for the resource element to joined players
+    if (m_pResourceElement)
+    {
+        CEntityRemoveTreePacket removeTreePacket;
+        removeTreePacket.AddRootElement(m_pResourceElement);
+        g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removeTreePacket);
+
+        if (m_pDefaultElementGroup)
+            m_pDefaultElementGroup->SetTreeRoot(m_pResourceElement);
+
+        for (CResourceFile* resourceFile : m_ResourceFiles)
+        {
+            if (auto* mapItem = dynamic_cast<CResourceMapItem*>(resourceFile))
+            {
+                if (mapItem->GetElementGroup())
+                    mapItem->GetElementGroup()->SetTreeRoot(m_pResourceElement);
+            }
+        }
+    }
 
     // Stop all the resource files we have. The files we share with our clients we remove from the resource file list.
     for (CResourceFile* pResourceFile : m_ResourceFiles)
@@ -1193,31 +1475,23 @@ bool CResource::Stop(bool bManualStop)
     // Destroy the virtual machine for this resource
     DestroyVM();
 
-    // Remove the resource element from the client
-    CEntityRemovePacket removePacket;
+    OnResourceStateChange("loaded");
 
-    if (m_pResourceElement)
-    {
-        removePacket.Add(m_pResourceElement);
-        g_pGame->GetElementDeleter()->Delete(m_pResourceElement);
-        m_pResourceElement = nullptr;
-    }
-
-    // Remove the dynamic resource element from the client
     if (m_pResourceDynamicElementRoot)
     {
-        removePacket.Add(m_pResourceDynamicElementRoot);
-        g_pGame->GetElementDeleter()->Delete(m_pResourceDynamicElementRoot);
+        g_pGame->GetElementDeleter()->DeleteTree(m_pResourceDynamicElementRoot);
         m_pResourceDynamicElementRoot = nullptr;
     }
 
-    // Broadcast the packet to joined players
-    g_pGame->GetPlayerManager()->BroadcastOnlyJoined(removePacket);
+    if (m_pResourceElement)
+    {
+        g_pGame->GetElementDeleter()->DeleteTree(m_pResourceElement);
+        m_pResourceElement = nullptr;
+    }
 
     // Clear the list of players where this resource is running
     std::exchange(m_isRunningForPlayer, {});
 
-    OnResourceStateChange("loaded");
     m_eState = EResourceState::Loaded;
     return true;
 }
@@ -1227,20 +1501,40 @@ bool CResource::CreateVM(bool bEnableOOP)
     if (!m_pVM)
     {
         m_pVM = g_pGame->GetLuaManager()->CreateVirtualMachine(this, bEnableOOP);
-        m_pResourceManager->NotifyResourceVMOpen(this, m_pVM);
+        if (m_pVM)
+            m_pResourceManager->NotifyResourceVMOpen(this, m_pVM);
     }
 
     if (!m_pVM)
         return false;
 
-    m_pVM->SetScriptName(m_strResourceName.c_str());
-    m_pVM->LoadEmbeddedScripts();
-    m_pVM->RegisterModuleFunctions();
+    try
+    {
+        m_pVM->SetScriptName(m_strResourceName.c_str());
+        m_pVM->LoadEmbeddedScripts();
+        m_pVM->RegisterModuleFunctions();
+    }
+    catch (const std::exception& e)
+    {
+        m_strFailureReason = SString("Failed to initialize VM for resource '%s': %s\n", m_strResourceName.c_str(), e.what());
+        DestroyVM();
+        return false;
+    }
+    catch (...)
+    {
+        m_strFailureReason = SString("Failed to initialize VM for resource '%s' (unknown error)\n", m_strResourceName.c_str());
+        DestroyVM();
+        return false;
+    }
+
     return true;
 }
 
 bool CResource::DestroyVM()
 {
+    if (!m_pVM)
+        return false;
+
     // Remove all player keybinds on this VM
     list<CPlayer*>::const_iterator iter = g_pGame->GetPlayerManager()->IterBegin();
 
@@ -1668,6 +1962,16 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
 {
     int i = 0;
 
+    CaseInsensitiveStringSet existingClientFiles;
+    for (CResourceFile* pResourceFile : m_ResourceFiles)
+    {
+        bool isClientFile = (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT ||
+                             pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
+                             pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE);
+        if (isClientFile)
+            existingClientFiles.insert(pResourceFile->GetName());
+    }
+
     // Loop through the included files
     for (CXMLNode* pFile = pRoot->FindSubNode("file", i); pFile != nullptr; pFile = pRoot->FindSubNode("file", ++i))
     {
@@ -1722,7 +2026,7 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
                 {
                     std::string strFullFilename;
 
-                    if (IsFilenameUsed(strFilePath, true))
+                    if (existingClientFiles.find(strFilePath) != existingClientFiles.end())
                     {
                         CLogger::LogPrintf("WARNING: Ignoring duplicate client file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilePath.c_str());
                         continue;
@@ -1731,6 +2035,7 @@ bool CResource::ReadIncludedFiles(CXMLNode* pRoot)
                     if (GetFilePath(strFilePath.c_str(), strFullFilename))
                     {
                         m_ResourceFiles.push_back(new CResourceClientFileItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes, bDownload));
+                        existingClientFiles.insert(strFilePath);
                     }
                 }
 
@@ -1874,10 +2179,22 @@ bool CResource::ReadIncludedExports(CXMLNode* pRoot)
 
     return true;
 }
-
 bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
 {
     int i = 0;
+
+    CaseInsensitiveStringSet existingClientFiles;
+    CaseInsensitiveStringSet existingServerFiles;
+    for (CResourceFile* pResourceFile : m_ResourceFiles)
+    {
+        bool isClientFile = (pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_SCRIPT ||
+                             pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_CONFIG ||
+                             pResourceFile->GetType() == CResourceFile::RESOURCE_FILE_TYPE_CLIENT_FILE);
+        if (isClientFile)
+            existingClientFiles.insert(pResourceFile->GetName());
+        else
+            existingServerFiles.insert(pResourceFile->GetName());
+    }
 
     // Loop through all script nodes under the root
     for (CXMLNode* pScript = pRoot->FindSubNode("script", i); pScript != nullptr; pScript = pRoot->FindSubNode("script", ++i))
@@ -1949,14 +2266,14 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
                     {
                         // Check if the filename is already used by this resource
 
-                        if (bClient && IsFilenameUsed(strFilePath, true))
+                        if (bClient && existingClientFiles.find(strFilePath) != existingClientFiles.end())
                         {
                             CLogger::LogPrintf("WARNING: Ignoring duplicate client script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
                                                strFilePath.c_str());
                             bLoadClient = false;
                         }
 
-                        if (bServer && IsFilenameUsed(strFilePath, false))
+                        if (bServer && existingServerFiles.find(strFilePath) != existingServerFiles.end())
                         {
                             CLogger::LogPrintf("WARNING: Ignoring duplicate script file in resource '%s': '%s'\n", m_strResourceName.c_str(),
                                                strFilePath.c_str());
@@ -1967,10 +2284,16 @@ bool CResource::ReadIncludedScripts(CXMLNode* pRoot)
                         // Create it depending on the type (client or server or shared) and add it to the list of resource files
 
                         if (bLoadServer)
+                        {
                             m_ResourceFiles.push_back(new CResourceScriptItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes));
+                            existingServerFiles.insert(strFilePath);
+                        }
 
                         if (bLoadClient)
+                        {
                             m_ResourceFiles.push_back(new CResourceClientScriptItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes));
+                            existingClientFiles.insert(strFilePath);
+                        }
                     }
                 }
 
@@ -2021,24 +2344,43 @@ bool CResource::ReadIncludedMaps(CXMLNode* pRoot)
 
             if (!strFilename.empty())
             {
-                std::string strFullFilename;
                 ReplaceSlashes(strFilename);
 
-                if (IsFilenameUsed(strFilename, false))
-                {
-                    CLogger::LogPrintf("WARNING: Duplicate map file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilename.c_str());
-                }
-
-                // Grab the file (evt extract it). Make a map item resource and put it into the resourcefiles list
-                if (IsValidFilePath(strFilename.c_str()) && GetFilePath(strFilename.c_str(), strFullFilename))
-                {
-                    m_ResourceFiles.push_back(new CResourceMapItem(this, strFilename.c_str(), strFullFilename.c_str(), &Attributes, iDimension));
-                }
-                else
+                if (!IsValidFilePath(strFilename.c_str()))
                 {
                     m_strFailureReason = SString("Couldn't find map %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
                     CLogger::ErrorPrintf(m_strFailureReason);
                     return false;
+                }
+
+                std::vector<std::string> vecFiles = GetFilePaths(strFilename.c_str());
+
+                if (glob::has_magic(strFilename))
+                    m_ResourceFilesCountPerDir[strFilename] = vecFiles.size();
+
+                if (vecFiles.empty())
+                {
+                    if (glob::has_magic(strFilename))
+                        continue;
+
+                    m_strFailureReason = SString("Couldn't find map %s for resource %s\n", strFilename.c_str(), m_strResourceName.c_str());
+                    CLogger::ErrorPrintf(m_strFailureReason);
+                    return false;
+                }
+
+                for (const std::string& strFilePath : vecFiles)
+                {
+                    std::string strFullFilename;
+
+                    if (IsFilenameUsed(strFilePath, false))
+                    {
+                        CLogger::LogPrintf("WARNING: Duplicate map file in resource '%s': '%s'\n", m_strResourceName.c_str(), strFilePath.c_str());
+                    }
+
+                    if (GetFilePath(strFilePath.c_str(), strFullFilename))
+                    {
+                        m_ResourceFiles.push_back(new CResourceMapItem(this, strFilePath.c_str(), strFullFilename.c_str(), &Attributes, iDimension));
+                    }
                 }
             }
             else

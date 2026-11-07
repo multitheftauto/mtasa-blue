@@ -133,6 +133,7 @@ void CXMLNodeImpl::DeleteAllSubNodes()
     // Clear the list
     m_bCanRemoveFromList = true;
     m_Children.clear();
+    m_bLastFindValid = false;
 }
 
 unsigned int CXMLNodeImpl::GetSubNodeCount()
@@ -160,26 +161,34 @@ CXMLNode* CXMLNodeImpl::GetSubNode(unsigned int uiIndex)
 
 CXMLNode* CXMLNodeImpl::FindSubNode(const char* szTagName, unsigned int uiIndex)
 {
-    std::string TagName(szTagName);
+    list<CXMLNode*>::iterator iter = m_Children.begin();
+    unsigned int              uiFound = 0;
 
-    // Find the item with the given name
-    unsigned int              uiTemp = 0;
-    list<CXMLNode*>::iterator iter;
-    for (iter = m_Children.begin(); iter != m_Children.end(); iter++)
+    // Continue from the previous hit when the caller is walking forward through the same tag
+    if (m_bLastFindValid && uiIndex > m_uiLastFindIndex && m_strLastFindTag == szTagName)
     {
-        CXMLNodeImpl* pChild = dynamic_cast<CXMLNodeImpl*>(*iter);
-        if (pChild && pChild->GetNode() && (pChild->GetNode()->Value() == TagName))
-        {
-            if (uiTemp == uiIndex)
-            {
-                return *iter;
-            }
-
-            ++uiTemp;
-        }
+        iter = std::next(m_LastFindIter);
+        uiFound = m_uiLastFindIndex + 1;
     }
 
-    // Couldn't find it
+    for (; iter != m_Children.end(); ++iter)
+    {
+        CXMLNodeImpl* pChild = dynamic_cast<CXMLNodeImpl*>(*iter);
+        if (!pChild || !pChild->GetNode() || strcmp(pChild->GetNode()->Value(), szTagName) != 0)
+            continue;
+
+        if (uiFound == uiIndex)
+        {
+            m_strLastFindTag = szTagName;
+            m_uiLastFindIndex = uiIndex;
+            m_LastFindIter = iter;
+            m_bLastFindValid = true;
+            return *iter;
+        }
+
+        ++uiFound;
+    }
+
     return NULL;
 }
 
@@ -307,6 +316,7 @@ void CXMLNodeImpl::SetTagContent(const char* szText, bool bCDATA)
     pNewNode->SetCData(bCDATA);
     m_pNode->InsertEndChild(pNewNode);
     m_Children.clear();
+    m_bLastFindValid = false;
 }
 
 void CXMLNodeImpl::SetTagContent(bool bContent)
@@ -460,6 +470,7 @@ void CXMLNodeImpl::DeleteWrapper()
     // Clear the list
     m_bCanRemoveFromList = true;
     m_Children.clear();
+    m_bLastFindValid = false;
 
     // Prevent our destructor from deleting the node
     m_pNode = NULL;
@@ -478,6 +489,7 @@ void CXMLNodeImpl::DeleteWrapper()
 void CXMLNodeImpl::AddToList(CXMLNode* pNode)
 {
     m_Children.push_back(pNode);
+    m_bLastFindValid = false;
 }
 
 void CXMLNodeImpl::RemoveFromList(CXMLNode* pNode)
@@ -486,12 +498,14 @@ void CXMLNodeImpl::RemoveFromList(CXMLNode* pNode)
     {
         if (!m_Children.empty())
             m_Children.remove(pNode);
+        m_bLastFindValid = false;
     }
 }
 
 void CXMLNodeImpl::RemoveAllFromList()
 {
     m_Children.clear();
+    m_bLastFindValid = false;
 }
 
 bool CXMLNodeImpl::StringToLong(const char* szString, long& lValue)

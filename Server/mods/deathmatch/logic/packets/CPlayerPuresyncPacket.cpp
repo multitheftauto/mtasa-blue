@@ -185,14 +185,14 @@ bool CPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
         SPlayerHealthSync health;
         if (!BitStream.Read(&health))
             return false;
-        float fHealth = health.data.fValue;
+        float fHealth = std::clamp(health.data.fValue, 0.0f, pSourcePlayer->GetMaxHealth());
 
         // Armor
         SPlayerArmorSync armor;
         if (!BitStream.Read(&armor))
             return false;
 
-        float fArmor = armor.data.fValue;
+        float fArmor = std::clamp(armor.data.fValue, 0.0f, 100.0f);
         float fOldArmor = pSourcePlayer->GetArmor();
         float fArmorLoss = fOldArmor - fArmor;
 

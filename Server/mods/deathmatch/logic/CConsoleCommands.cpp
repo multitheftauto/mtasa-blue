@@ -86,8 +86,7 @@ bool CConsoleCommands::StartResource(CConsole* pConsole, const char* szArguments
 
         if (!resource->IsLoaded())
         {
-            pEchoClient->SendConsole(
-                SString("start: Resource '%s' is loaded, but has errors (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
+            pEchoClient->SendConsole(SString("start: Resource '%s' is not loaded (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
             continue;
         }
 
@@ -136,8 +135,7 @@ bool CConsoleCommands::RestartResource(CConsole* pConsole, const char* szArgumen
 
         if (!resource->IsLoaded())
         {
-            pEchoClient->SendConsole(
-                SString("restart: Resource '%s' is loaded, but has errors (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
+            pEchoClient->SendConsole(SString("restart: Resource '%s' is not loaded (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
             continue;
         }
 
@@ -240,7 +238,7 @@ bool CConsoleCommands::StopResource(CConsole* pConsole, const char* szArguments,
 
         if (!resource->IsLoaded())
         {
-            pEchoClient->SendConsole(SString("stop: Resource '%s' is loaded, but has errors (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
+            pEchoClient->SendConsole(SString("stop: Resource '%s' is not loaded (%s)", resourceName.c_str(), resource->GetFailureReason().c_str()));
             continue;
         }
 

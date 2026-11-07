@@ -20,6 +20,7 @@
 class CGUITexture;
 class CGUITexture_Impl;
 class CGUI_Impl;
+class CGUIWebBrowserTexture;
 class CWebViewInterface;
 
 class CGUIWebBrowser_Impl : public CGUIWebBrowser, public CGUIElement_Impl
@@ -57,6 +58,7 @@ private:
     CEGUI::ImagesetManager* m_pImagesetManager;
     CEGUI::Imageset*        m_pImageset;
     CEGUI::Image*           m_pImage;
+    CGUIWebBrowserTexture*  m_pTexture;
 
     CWebViewInterface* m_pWebView;
 

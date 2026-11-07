@@ -252,6 +252,15 @@ bool CResourceManager::Refresh(bool bRefreshAll, const SString strJustThisResour
     {
         CResource* pResource = m_resourcesToStartAfterRefresh.front();
         m_resourcesToStartAfterRefresh.pop_front();
+        if (pResource->HasResourceChanged())
+        {
+            // Files changed since Load(); reload to refresh checksums
+            if (!Reload(pResource))
+            {
+                CLogger::LogPrintf("Resource '%s' has changed but reload failed; skipping start\n", pResource->GetName().c_str());
+                continue;
+            }
+        }
         pResource->Start();
     }
 
@@ -427,7 +436,7 @@ CResource* CResourceManager::Load(bool bIsZipped, const char* szAbsPath, const c
     CResource* pResource = GetResource(szResourceName);
     if (pResource)
     {
-        if (!pResource->HasResourceChanged())
+        if (pResource->IsLoaded() && !pResource->HasResourceChanged())
         {
             // Already loaded and no reload required
             return pResource;
@@ -1220,7 +1229,7 @@ bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& 
     ReplaceOccurrencesInString(strInput, "\\", "/");
 
     // Disallow file paths with a directory separator at the end
-    if (strInput.back() == '/')
+    if (strInput.empty() || strInput.back() == '/')
         return false;
 
     std::string strMetaPath;
@@ -1230,12 +1239,14 @@ bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& 
         // This isn't relevant on the server because all files are private
         // But let's skip the symbol anyway
         strInput = strInput.substr(1);
+        if (strInput.empty())
+            return false;
     }
 
     if (strInput[0] == ':')
     {
-        unsigned int iEnd = strInput.find_first_of("/");
-        if (iEnd)
+        const std::size_t iEnd = strInput.find_first_of("/");
+        if (iEnd != std::string::npos && iEnd > 1 && iEnd + 1 < strInput.size())
         {
             std::string strResourceName = strInput.substr(1, iEnd - 1);
             pResource = g_pGame->GetResourceManager()->GetResource(strResourceName.c_str());

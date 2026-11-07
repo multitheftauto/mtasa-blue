@@ -261,6 +261,8 @@ void CClientDFF::InternalRestoreModel(unsigned short usModel)
     // Is this a vehicle ID?
     if (CClientVehicleManager::IsValidModel(usModel))
     {
+        m_pManager->GetVehicleManager()->OnModelReplaced(usModel);
+
         // Stream the vehicles of that model out so we have no
         // loaded when we do the restore. The streamer will
         // eventually stream them back in with async loading.
@@ -426,6 +428,8 @@ bool CClientDFF::ReplaceVehicleModel(RpClump* pClump, ushort usModel, bool bAlph
 
     // Remember that we've replaced that vehicle model
     m_Replaced.push_back(usModel);
+
+    m_pManager->GetVehicleManager()->OnModelReplaced(usModel);
 
     // Stream out all the vehicle models with matching ID.
     // Streamer will stream them back in async after a frame

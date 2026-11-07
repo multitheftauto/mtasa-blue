@@ -12,11 +12,13 @@
 #include "StdInc.h"
 #include "CGameSA.h"
 #include "CPedSA.h"
+#include "CVisibilityPluginsSA.h"
 #include "CPedModelInfoSA.h"
 #include "CPlayerInfoSA.h"
 #include "CStatsSA.h"
 #include "CTaskManagerSA.h"
 #include "CTasksSA.h"
+#include "TaskJumpFallSA.h"
 #include "CProjectileInfoSA.h"
 #include "CWeaponStatManagerSA.h"
 #include "CFireManagerSA.h"
@@ -25,6 +27,75 @@
 extern CGameSA* pGame;
 
 static bool g_onlyUpdateRotations = false;
+
+namespace
+{
+    constexpr std::uint8_t PED_NODE_HEAD = 2;
+
+    constexpr std::uintptr_t FUNC_CRealTimeShadowManager_ReturnRealTimeShadow = 0x705B30;
+    constexpr std::uintptr_t CLASS_CRealTimeShadowManager = 0xC40350;
+    constexpr std::uintptr_t FUNC_CShadows_StoreShadowForPedObject = 0x707B40;
+    constexpr std::uintptr_t CALL_CPed_PreRenderAfterTest_StoreShadowForPedObject = 0x5E6900;
+
+    void __cdecl StoreShadowForPedObject(CPedSAInterface* ped, float displacementX, float displacementY, float frontX, float frontY, float sideX, float sideY)
+    {
+        if (CVisibilityPluginsSA::GetClumpAlpha(ped->m_pRwObject) == 0)
+            return;
+
+        using StoreShadow = void(__cdecl*)(CPedSAInterface*, float, float, float, float, float, float);
+        reinterpret_cast<StoreShadow>(FUNC_CShadows_StoreShadowForPedObject)(ped, displacementX, displacementY, frontX, frontY, sideX, sideY);
+    }
+
+    constexpr std::uintptr_t FUNC_CTaskSimpleJetPack_RenderJetPack = 0x67F6A0;
+    constexpr std::uintptr_t CALL_CPed_Render_RenderJetPack = 0x5E793E;
+    constexpr std::uintptr_t FUNC_CVisibilityPlugins_RenderPedCB = 0x7335B0;
+    constexpr std::uintptr_t FUNC_FxSystem_c_ForAllParticles = 0x4AA930;
+
+    bool RenderJetPackAtomicAsPed(RpAtomic* atomic, void*)
+    {
+        atomic->renderCallback = reinterpret_cast<RpAtomicCallback>(FUNC_CVisibilityPlugins_RenderPedCB);
+        return true;
+    }
+
+    // Every flame particle carries its own colour multiplier (FxEmitterPrt_c, alpha at 0x2F),
+    // the renderer multiplies the keyframed alpha by it
+    void __cdecl SetParticleAlpha(void* particle, int, void** alpha)
+    {
+        *(static_cast<unsigned char*>(particle) + 0x2F) = static_cast<unsigned char>(reinterpret_cast<std::uintptr_t>(*alpha));
+    }
+
+    void SetFxSystemAlpha(FxSystem_c* fx, int alpha)
+    {
+        if (!fx)
+            return;
+
+        using ForAllParticles = int(__thiscall*)(FxSystem_c*, void(__cdecl*)(void*, int, void**), void*);
+        reinterpret_cast<ForAllParticles>(FUNC_FxSystem_c_ForAllParticles)(fx, SetParticleAlpha, reinterpret_cast<void*>(static_cast<std::uintptr_t>(alpha)));
+    }
+
+    // The jetpack is its own clump drawn with the default atomic renderer, so it ignores the alpha
+    // MTA puts on the ped clump. Give it the ped renderer and the ped's alpha right before it is drawn,
+    // and fade the thruster flames the same way
+    void __fastcall RenderJetPack(CTaskSimpleJetPackSAInterface* task, void*, CPedSAInterface* ped)
+    {
+        if (ped->m_pRwObject)
+        {
+            const int alpha = CVisibilityPluginsSA::GetClumpAlpha(ped->m_pRwObject);
+
+            if (task->m_pJetPackClump)
+            {
+                pGame->GetVisibilityPlugins()->SetClumpAlpha(task->m_pJetPackClump, alpha);
+                RpClumpForAllAtomics(task->m_pJetPackClump, RenderJetPackAtomicAsPed, nullptr);
+            }
+
+            SetFxSystemAlpha(task->m_pFxSysL, alpha);
+            SetFxSystemAlpha(task->m_pFxSysR, alpha);
+        }
+
+        using Render = void(__thiscall*)(CTaskSimpleJetPackSAInterface*, CPedSAInterface*);
+        reinterpret_cast<Render>(FUNC_CTaskSimpleJetPack_RenderJetPack)(task, ped);
+    }
+}
 
 CPedSA::~CPedSA()
 {
@@ -64,6 +135,10 @@ void CPedSA::Init()
 
 void CPedSA::SetModelIndex(std::uint32_t modelIndex)
 {
+    // CPed::SetModelIndex only creates a new RwObject. Destroy the current one first,
+    // otherwise the old clump (and its model and TXD references) is leaked
+    GetPedInterface()->DeleteRwObject();
+
     // char __thiscall CPed::SetModelIndex(void *this, int a2)
     ((char(__thiscall*)(CEntitySAInterface*, int))FUNC_SetModelIndex)(m_pInterface, modelIndex);
 
@@ -78,6 +153,20 @@ void CPedSA::SetModelIndex(std::uint32_t modelIndex)
 
     std::uint32_t type = modelInfo->pedType;
     GetPedInterface()->pedSound.m_bIsFemale = type == 5 || type == 22;
+}
+
+void CPedSA::SetVisible(bool visible)
+{
+    CEntitySA::SetVisible(visible);
+
+    CShadowDataSA* shadow = GetPedInterface()->m_pShadowData;
+    if (visible || !shadow)
+        return;
+
+    // Real-time shadows are owned separately from the ped. Return an existing
+    // shadow immediately so an invisible ped cannot leave it fading in-world.
+    using ReturnRealTimeShadow = void(__thiscall*)(void*, CShadowDataSA*);
+    reinterpret_cast<ReturnRealTimeShadow>(FUNC_CRealTimeShadowManager_ReturnRealTimeShadow)(reinterpret_cast<void*>(CLASS_CRealTimeShadowManager), shadow);
 }
 
 bool CPedSA::AddProjectile(eWeaponType weaponType, CVector origin, float force, CVector* target, CEntity* targetEntity)
@@ -319,6 +408,32 @@ CVector* CPedSA::GetTransformedBonePosition(eBone bone, CVector* position)
         *position = *GetPosition();
 
     return position;
+}
+
+void CPedSA::UpdateRpHAnim()
+{
+    CEntitySA::UpdateRpHAnim();
+
+    const auto* pedInterface = GetPedInterface();
+    if (!pedInterface->pedFlags.bRemoveHead || pedInterface->bodyPartToRemove != PED_NODE_HEAD)
+        return;
+
+    RpClump*          clump = GetRpClump();
+    RpHAnimHierarchy* animHierarchy = clump ? GetAnimHierarchyFromSkinClump(clump) : nullptr;
+    if (!animHierarchy)
+        return;
+
+    constexpr eBone removedBones[] = {BONE_NECK, BONE_HEAD2, BONE_HEAD1, BONE_HEAD};
+    constexpr RwV3d hiddenScale{0.0f, 0.0f, 0.0f};
+
+    RwMatrix* boneMatrices = RpHAnimHierarchyGetMatrixArray(animHierarchy);
+
+    for (const auto boneId : removedBones)
+    {
+        const int matrixIndex = RpHAnimIDGetIndex(animHierarchy, boneId);
+        if (matrixIndex != -1)
+            RwMatrixScale(&boneMatrices[matrixIndex], &hiddenScale, TRANSFORM_BEFORE);
+    }
 }
 
 //
@@ -753,6 +868,11 @@ void CPedSA::StaticSetHooks()
 {
     EZHookInstall(CPed_PreRenderAfterTest);
     EZHookInstall(CPed_PreRenderAfterTest_Mid);
+
+    // GTA's player-specific blob-shadow path assumes that the local player is
+    // always opaque. Do not enqueue it when MTA has made the clump invisible.
+    HookInstallCall(CALL_CPed_PreRenderAfterTest_StoreShadowForPedObject, reinterpret_cast<DWORD>(StoreShadowForPedObject));
+    HookInstallCall(CALL_CPed_Render_RenderJetPack, reinterpret_cast<DWORD>(RenderJetPack));
 
     HookInstallCall(0x68025A, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleJetPack::ProcessPed
     HookInstallCall(0x64DB4D, (DWORD)CPedSA::RemoveWeaponWhenEnteringVehicle);  // CTaskSimpleCarGetIn::ProcessPed

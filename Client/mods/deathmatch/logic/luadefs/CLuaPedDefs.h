@@ -35,6 +35,7 @@ public:
     LUA_DECLARE(GetPedAmmoInClip);
     LUA_DECLARE(GetPedTotalAmmo);
     LUA_DECLARE(GetPedWeaponMuzzlePosition);
+    static std::variant<CLuaMultiReturn<float, float, float>, CVector, bool> OOP_GetPedWeaponMuzzlePosition(lua_State* luaVM, CClientPed* ped);
     LUA_DECLARE(GetPedStat);
     LUA_DECLARE(GetPedOccupiedVehicle);
     LUA_DECLARE(GetPedOccupiedVehicleSeat);

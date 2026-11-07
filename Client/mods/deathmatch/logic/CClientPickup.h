@@ -118,6 +118,7 @@ public:
 
     void Callback_OnCollision(CClientColShape& Shape, CClientEntity& Entity);
     void Callback_OnLeave(CClientColShape& Shape, CClientEntity& Entity);
+    bool ShouldTrackCollision(CClientColShape& Shape, CClientEntity& Entity);
 
 protected:
     void StreamIn(bool bInstantly);

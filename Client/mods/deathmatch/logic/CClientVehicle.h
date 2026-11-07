@@ -473,6 +473,7 @@ public:
     //          error or something if it does return true.
     void Create();
     void Destroy();
+    void InvalidateComponentData();
 
     void                                    AddProjectile(CClientProjectile* pProjectile) { m_Projectiles.push_back(pProjectile); }
     void                                    RemoveProjectile(CClientProjectile* pProjectile) { m_Projectiles.remove(pProjectile); }
@@ -546,8 +547,8 @@ public:
     void ApplyAudioSettings();
     void ResetAudioSettings();
 
-    bool GetDummyPosition(VehicleDummies dummy, CVector& position) const;
-    bool SetDummyPosition(VehicleDummies dummy, const CVector& position);
+    bool GetDummyPosition(VehicleDummies::Enum dummy, CVector& position) const;
+    bool SetDummyPosition(VehicleDummies::Enum dummy, const CVector& position);
     bool ResetDummyPositions();
 
     bool SpawnFlyingComponent(const eCarNodes& nodeID, const eCarComponentCollisionTypes& collisionType, std::int32_t removalTime);

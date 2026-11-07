@@ -579,6 +579,7 @@ void CDirect3DEvents9::OnRestore(IDirect3DDevice9* pDevice)
 
 void CDirect3DEvents9::OnPresent(IDirect3DDevice9* pDevice, IDirect3DDevice9* pStateDevice)
 {
+    // CEGUI faults are caught in CGUI_Impl::Draw; anything else goes to the crash handler.
     TIMING_CHECKPOINT("+OnPresent1");
     CGraphics::GetSingleton().SetSkipMTARenderThisFrame(false);
     // Start a new scene. This isn't ideal and is not really recommended by MSDN.
@@ -1452,7 +1453,7 @@ int               FilterException(uint exceptionCode)
         WriteDebugEvent("FilterException: caught in-page error");
         return EXCEPTION_EXECUTE_HANDLER;
     }
-    if (exceptionCode == 0xE06D7363)
+    if (exceptionCode == CPP_EXCEPTION_CODE)
     {
         WriteDebugEvent("FilterException: caught Microsoft C++ exception");
         return EXCEPTION_EXECUTE_HANDLER;

@@ -30,6 +30,7 @@ public:
 
     bool HasMatrix() const noexcept { return matrix != nullptr; }
     void AllocateMatrix() { ((void(__thiscall*)(void*))0x54F560)(this); }
+    void AllocateStaticMatrix() { ((void(__thiscall*)(void*))0x54F4C0)(this); }
     void RemoveMatrix() { ((void(__thiscall*)(void*))0x54F3B0)(this); }
 
     void SetOrientation(float x, float y, float z) { ((void(__thiscall*)(CPlaceableSAInterface * pEntity, float, float, float))0x439A80)(this, x, y, z); }

@@ -12,6 +12,8 @@
 #include "StdInc.h"
 #include "CVoiceEndPacket.h"
 #include "CPlayer.h"
+#include "CGame.h"
+#include "CMainConfig.h"
 
 CVoiceEndPacket::CVoiceEndPacket(CPlayer* pPlayer)
 {
@@ -26,6 +28,25 @@ CVoiceEndPacket::~CVoiceEndPacket()
 
 bool CVoiceEndPacket::Read(NetBitStreamInterface& BitStream)
 {
+    CPlayer* pPlayer = GetSourcePlayer();
+    if (!pPlayer)
+        return false;
+
+    const auto*         mainConfig = g_pGame->GetConfig();
+    const long long     now = GetTickCount64_();
+    const bool          newInterval = pPlayer->GetLastVoiceEndTime() == 0 || now - pPlayer->GetLastVoiceEndTime() >= mainConfig->GetVoicePacketsInterval();
+    const unsigned char packetsInInterval = newInterval ? 0 : pPlayer->GetVoiceEndPacketsInInterval();
+
+    if (packetsInInterval >= mainConfig->GetMaxVoicePacketsPerInterval())
+        return false;
+
+    if (newInterval)
+    {
+        pPlayer->SetLastVoiceEndTime(now);
+        pPlayer->SetVoiceEndPacketsInInterval(1);
+    }
+    else
+        pPlayer->IncrementVoiceEndPacketsInInterval();
     return true;
 }
 

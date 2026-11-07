@@ -38,14 +38,18 @@ void CClientWeaponManager::RemoveFromList(CClientWeapon* pWeapon)
 
 void CClientWeaponManager::DoPulse()
 {
-    list<CClientWeapon*>::iterator iter = m_Weapons.begin();
-    for (; iter != m_Weapons.end(); iter++)
+    // Snapshot the list to prevent iterator invalidation if a weapon is destroyed during pulse
+    const std::vector<CClientWeapon*> weapons(m_Weapons.begin(), m_Weapons.end());
+    for (CClientWeapon* weapon : weapons)
     {
-        (*iter)->DoPulse();
+        if (ListContains(m_Weapons, weapon))
+        {
+            weapon->DoPulse();
+        }
     }
 }
 
-bool CClientWeaponManager::HasWeaponBulletSync(std::uint32_t weaponID) noexcept
+bool CClientWeaponManager::HasWeaponBulletSync(std::uint8_t weaponID) noexcept
 {
     return weaponID >= 22 && weaponID <= 34;
 }

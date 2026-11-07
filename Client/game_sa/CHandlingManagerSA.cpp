@@ -43,7 +43,7 @@ static std::unique_ptr<CBoatHandlingEntrySA> m_OriginalBoatEntries[12];
 static tBikeHandlingDataSA                   m_OriginalBikeHandlingData[14];
 static std::unique_ptr<CBikeHandlingEntrySA> m_OriginalBikeEntries[14];
 
-static std::map<std::string, HandlingProperty> m_HandlingNames;
+static std::map<std::string, HandlingProperty::Enum> m_HandlingNames;
 
 // TODO We need install a hook in 0x6F52D0 to make some stuff work corrently
 
@@ -197,7 +197,7 @@ CHandlingManagerSA::~CHandlingManagerSA()
 {
 }
 
-HandlingProperty CHandlingManagerSA::GetPropertyEnumFromName(const std::string& name) const noexcept
+HandlingProperty::Enum CHandlingManagerSA::GetPropertyEnumFromName(const std::string& name) const noexcept
 {
     const auto it = m_HandlingNames.find(name);
     return it != m_HandlingNames.end() ? it->second : HandlingProperty::HANDLING_MAX;
@@ -230,7 +230,7 @@ const CHandlingEntry* CHandlingManagerSA::GetOriginalHandlingData(std::uint32_t 
         return nullptr;
 
     // Get our Handling ID, the default value will be HT_LANDSTAL
-    const HandlingType eHandling = GetHandlingID(model);
+    const HandlingType::Enum eHandling = GetHandlingID(model);
     // Return it
     return m_OriginalEntries[(std::size_t)eHandling].get();
 }
@@ -242,7 +242,7 @@ const CFlyingHandlingEntry* CHandlingManagerSA::GetOriginalFlyingHandlingData(st
         return nullptr;
 
     // Get our Handling ID, the default value will be HT_LANDSTAL
-    const HandlingType eHandling = GetHandlingID(model);
+    const HandlingType::Enum eHandling = GetHandlingID(model);
     // Original GTA:SA behavior
     if (eHandling < HandlingType::HT_SEAPLANE || eHandling > HandlingType::HT_RCRAIDER)
         return m_OriginalFlyingEntries[0].get();
@@ -257,7 +257,7 @@ const CBoatHandlingEntry* CHandlingManagerSA::GetOriginalBoatHandlingData(std::u
         return nullptr;
 
     // Get our Handling ID, the default value will be HT_LANDSTAL
-    const HandlingType eHandling = GetHandlingID(model);
+    const HandlingType::Enum eHandling = GetHandlingID(model);
     // Original GTA:SA behavior
     if (eHandling < HandlingType::HT_PREDATOR || eHandling > HandlingType::HT_SEAPLANE)
         return m_OriginalBoatEntries[0].get();
@@ -272,7 +272,7 @@ const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(std::u
         return nullptr;
 
     // Get our Handling ID, the default value will be HT_LANDSTAL
-    const HandlingType eHandling = GetHandlingID(model);
+    const HandlingType::Enum eHandling = GetHandlingID(model);
     if (eHandling >= HandlingType::HT_BIKE && eHandling <= HandlingType::HT_FREEWAY)
         return m_OriginalBikeEntries[static_cast<std::size_t>(eHandling) - static_cast<std::size_t>(HandlingType::HT_BIKE)].get();
     else if (eHandling == HandlingType::HT_FAGGIO)
@@ -282,9 +282,9 @@ const CBikeHandlingEntry* CHandlingManagerSA::GetOriginalBikeHandlingData(std::u
 }
 
 // Return the handling manager id
-HandlingType CHandlingManagerSA::GetHandlingID(std::uint32_t model) noexcept
+HandlingType::Enum CHandlingManagerSA::GetHandlingID(std::uint32_t model) noexcept
 {
-    switch (static_cast<VehicleType>(model))
+    switch (static_cast<VehicleType::Enum>(model))
     {
         case VehicleType::VT_LANDSTAL:
             return HandlingType::HT_LANDSTAL;
@@ -9135,7 +9135,7 @@ void CHandlingManagerSA::CheckSuspensionChanges(const CHandlingEntry* const entr
         return;
 
     // Get handling type
-    const HandlingType handlingType = static_cast<HandlingType>(entry->GetVehicleID());
+    const HandlingType::Enum handlingType = static_cast<HandlingType::Enum>(entry->GetVehicleID());
     if (handlingType >= HandlingType::HT_MAX)
         return;
 

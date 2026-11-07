@@ -300,7 +300,13 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     if (ucEntityTypeID == CElement::WEAPON)
                     {
                         CCustomWeapon* pWeapon = static_cast<CCustomWeapon*>(pElement);
+                        CElement*      pTarget = pWeapon->GetElementTarget();
                         unsigned char  targetType = pWeapon->GetTargetType();
+
+                        // The targeted element may have been destroyed since it was set
+                        if (targetType == TARGET_TYPE_ENTITY && !pTarget)
+                            targetType = TARGET_TYPE_FIXED;
+
                         BitStream.WriteBits(&targetType, 3);  // 3 bits = 4 possible values.
 
                         switch (targetType)
@@ -311,7 +317,6 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                             }
                             case TARGET_TYPE_ENTITY:
                             {
-                                CElement* pTarget = pWeapon->GetElementTarget();
                                 ElementID targetID = pTarget->GetID();
 
                                 BitStream.Write(targetID);
@@ -654,6 +659,8 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                         BitStream.WriteBit(false);
 
                     unsigned char ucSirenCount = pVehicle->m_tSirenBeaconInfo.m_ucSirenCount;
+                    if (ucSirenCount > SIREN_COUNT_MAX)
+                        ucSirenCount = SIREN_COUNT_MAX;
                     unsigned char ucSirenType = pVehicle->m_tSirenBeaconInfo.m_ucSirenType;
                     bool          bSync = pVehicle->m_tSirenBeaconInfo.m_bOverrideSirens;
                     BitStream.WriteBit(bSync);
@@ -870,6 +877,25 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     SPlayerArmorSync armor;
                     armor.data.fValue = pPed->GetArmor();
                     BitStream.Write(&armor);
+
+                    // Stats that differ from the defaults
+                    std::vector<std::pair<unsigned short, float>> stats;
+                    for (unsigned short usStat = 0; usStat < NUM_PLAYER_STATS; usStat++)
+                    {
+                        const float fValue = pPed->GetPlayerStat(usStat);
+                        if (fValue != (usStat == 24 /*MAX_HEALTH*/ ? 569.0f : 0.0f))
+                            stats.emplace_back(usStat, fValue);
+                    }
+
+                    BitStream.WriteCompressed(static_cast<unsigned short>(stats.size()));
+                    for (const auto& [usStat, fValue] : stats)
+                    {
+                        BitStream.WriteBits(&usStat, 9);  // 9 bits = 512 values, stats go up to 342
+
+                        SPedStatSync stat;
+                        stat.data.fValue = fValue;
+                        BitStream.Write(&stat);
+                    }
 
                     // vehicle
                     CVehicle* pVehicle = pPed->GetOccupiedVehicle();

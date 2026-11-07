@@ -239,16 +239,25 @@ void CNewsBrowser::AddNewsTab(const SNewsItem& newsItem)
     // Switch cwd
     pManager->PushGuiWorkingDirectory(newsItem.strContentFullDir);
 
-    // Load files
-    CGUIWindow* pWindow = LoadLayoutAndImages(m_pScrollPane, newsItem);
-    m_TabContentList.push_back(pWindow);
-
-    // Set tab name from content window title
-    if (pWindow)
+    try
     {
-        SString strTitle = pWindow->GetText();
-        if (!strTitle.empty())
-            pTab->SetText(strTitle);
+        // Load files
+        CGUIWindow* pWindow = LoadLayoutAndImages(m_pScrollPane, newsItem);
+        m_TabContentList.push_back(pWindow);
+
+        // Set tab name from content window title
+        if (pWindow)
+        {
+            SString strTitle = pWindow->GetText();
+            if (!strTitle.empty())
+                pTab->SetText(strTitle);
+        }
+    }
+    catch (...)
+    {
+        // Pop before rethrowing, or later asset loads resolve inside the failed dir and healthy installs look broken.
+        pManager->PopGuiWorkingDirectory(newsItem.strContentFullDir);
+        throw;
     }
 
     // Restore cwd

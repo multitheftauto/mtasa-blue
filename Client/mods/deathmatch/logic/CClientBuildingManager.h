@@ -28,10 +28,13 @@ public:
 
     const std::list<CClientBuilding*>& GetBuildings() { return m_List; };
 
+    unsigned short GetDimension() const noexcept { return m_usDimension; };
+    void           SetDimension(unsigned short usDimension);
+
     static bool IsValidModel(uint16_t modelId);
     static bool IsValidPosition(const CVector& pos) noexcept;
 
-    void ResizePoolIfNeeds();
+    void ResizePoolIfNeeds(std::size_t pendingBuildings = 0);
     bool SetPoolCapacity(size_t newCapacity);
 
     void DestroyAllForABit();
@@ -49,4 +52,5 @@ private:
 
     std::list<CClientBuilding*> m_List;
     bool                        m_bRemoveFromList;
+    unsigned short              m_usDimension{0};
 };

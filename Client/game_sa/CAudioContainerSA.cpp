@@ -112,26 +112,28 @@ bool CAudioContainerSA::GetRawAudioData(eAudioLookupIndex lookupIndex, int bankI
     if (!archive.read(reinterpret_cast<char*>(&bankHeader), sizeof(SAudioBankHeaderSA)))
         return false;
 
-    // Get offsets to calculate the length
-    SAudioEntrySA* audioEntry = &bankHeader.sounds[audioIndex];
-    if (!audioEntry)
+    // The archive controls numSounds, so validate it and the requested index before indexing the fixed-size table.
+    if (bankHeader.numSounds < 0 || bankHeader.numSounds > static_cast<int>(std::size(bankHeader.sounds)) || audioIndex < 0 ||
+        audioIndex >= bankHeader.numSounds)
+        return false;
+
+    const SAudioEntrySA& audioEntry = bankHeader.sounds[audioIndex];
+    if (audioEntry.offset > lookupEntry->length)
         return false;
 
     unsigned int rawLength;
-    if (audioIndex + 1 < bankHeader.numSounds)  // hacky fix: audioIndex starts at 0
+    if (audioIndex + 1 < bankHeader.numSounds)
     {
-        SAudioEntrySA* nextAudioEntry = &bankHeader.sounds[audioIndex + 1];
-        if (!nextAudioEntry)
+        const SAudioEntrySA& nextAudioEntry = bankHeader.sounds[audioIndex + 1];
+        if (nextAudioEntry.offset < audioEntry.offset || nextAudioEntry.offset > lookupEntry->length)
             return false;
 
-        rawLength = nextAudioEntry->offset - audioEntry->offset;
-    }
-    else if (audioIndex + 1 == bankHeader.numSounds)
-    {
-        rawLength = lookupEntry->length - audioEntry->offset;
+        rawLength = nextAudioEntry.offset - audioEntry.offset;
     }
     else
-        return false;
+    {
+        rawLength = lookupEntry->length - audioEntry.offset;
+    }
 
     // 2MB check in case of user modification errors (Max length of standard audio files is 560KB)
     if (rawLength > 2 * 1024 * 1024)
@@ -142,10 +144,10 @@ bool CAudioContainerSA::GetRawAudioData(eAudioLookupIndex lookupIndex, int bankI
 
     dataOut = buffer;
     lengthOut = rawLength;
-    iSampleRateOut = audioEntry->sampleRate;
+    iSampleRateOut = audioEntry.sampleRate;
 
     // Seek to the correct offset and read
-    archive.seekg(lookupEntry->offset + sizeof(SAudioBankHeaderSA) + audioEntry->offset);  // Or just archive.seekg ( archive.tellg() + audioEntry->offset )
+    archive.seekg(lookupEntry->offset + sizeof(SAudioBankHeaderSA) + audioEntry.offset);  // Or just archive.seekg ( archive.tellg() + audioEntry.offset )
     archive.read(reinterpret_cast<char*>(buffer), rawLength);
 
     return !archive.fail();

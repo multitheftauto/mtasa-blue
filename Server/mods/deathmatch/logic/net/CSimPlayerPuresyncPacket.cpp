@@ -13,13 +13,14 @@
 #include "CWeaponNames.h"
 
 CSimPlayerPuresyncPacket::CSimPlayerPuresyncPacket(ElementID PlayerID, ushort PlayerLatency, uchar PlayerSyncTimeContext, uchar PlayerGotWeaponType,
-                                                   float WeaponRange, CControllerState& sharedControllerState)
+                                                   float WeaponRange, float PlayerMaxHealth, CControllerState& sharedControllerState)
 
     : m_PlayerID(PlayerID),
       m_PlayerLatency(PlayerLatency),
       m_PlayerSyncTimeContext(PlayerSyncTimeContext),
       m_PlayerGotWeaponType(PlayerGotWeaponType),
       m_WeaponRange(WeaponRange),
+      m_PlayerMaxHealth(PlayerMaxHealth),
       m_sharedControllerState(sharedControllerState)
 {
 }
@@ -83,14 +84,14 @@ bool CSimPlayerPuresyncPacket::Read(NetBitStreamInterface& BitStream)
     SPlayerHealthSync health;
     if (!BitStream.Read(&health))
         return false;
-    m_Cache.fHealth = health.data.fValue;
+    m_Cache.fHealth = std::clamp(health.data.fValue, 0.0f, m_PlayerMaxHealth);
 
     // Armor
     SPlayerArmorSync armor;
     if (!BitStream.Read(&armor))
         return false;
 
-    m_Cache.fArmor = armor.data.fValue;
+    m_Cache.fArmor = std::clamp(armor.data.fValue, 0.0f, 100.0f);
 
     // Read out the camera rotation
     SCameraRotationSync camRotation;

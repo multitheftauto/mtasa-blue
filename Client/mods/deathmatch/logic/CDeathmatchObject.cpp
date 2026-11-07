@@ -69,6 +69,7 @@ void CDeathmatchObject::StartMovement(const CPositionRotationAnimation& a_rMoveA
         a_rMoveAnimation.GetFinalValue(positionRotation);
         SetOrientation(positionRotation.m_vecPosition, positionRotation.m_vecRotation);
     }
+
     CLuaArguments Arguments;
     this->CallEvent("onClientObjectMoveStart", Arguments, true);
 }
@@ -88,6 +89,7 @@ void CDeathmatchObject::_StopMovement(bool a_bUnregister)
         }
         delete m_pMoveAnimation;
         m_pMoveAnimation = NULL;
+
         CLuaArguments Arguments;
         this->CallEvent("onClientObjectMoveStop", Arguments, true);
     }
@@ -210,6 +212,7 @@ void CDeathmatchObject::UpdateContacting(const CVector& vecCenterOfRotation, con
         if (vecFrameRotation.fZ != 0)
         {
             float fRotationZ = pPed->GetCurrentRotation();
+
             pPed->SetCurrentRotation(fRotationZ + vecFrameRotation.fZ);
         }
     }
@@ -218,6 +221,7 @@ void CDeathmatchObject::UpdateContacting(const CVector& vecCenterOfRotation, con
     for (uint i = 0; i < m_AttachedEntities.size(); ++i)
     {
         CClientEntity* pEntity = m_AttachedEntities[i];
+
         if (IS_OBJECT(pEntity))
         {
             CDeathmatchObject* pObject = static_cast<CDeathmatchObject*>(pEntity);

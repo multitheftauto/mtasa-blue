@@ -169,7 +169,7 @@ bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& 
     ReplaceOccurrencesInString(strInput, "\\", "/");
 
     // Disallow file paths with a directory separator at the end
-    if (strInput.back() == '/')
+    if (strInput.empty() || strInput.back() == '/')
         return false;
 
     eAccessType accessType = ACCESS_PUBLIC;
@@ -179,12 +179,14 @@ bool CResourceManager::ParseResourcePathInput(std::string strInput, CResource*& 
     {
         accessType = ACCESS_PRIVATE;
         strInput = strInput.substr(1);
+        if (strInput.empty())
+            return false;
     }
 
     if (strInput[0] == ':')
     {
-        unsigned int iEnd = strInput.find_first_of("/");
-        if (iEnd)
+        const std::size_t iEnd = strInput.find_first_of("/");
+        if (iEnd != std::string::npos && iEnd > 1 && iEnd + 1 < strInput.size())
         {
             std::string strResourceName = strInput.substr(1, iEnd - 1);
             pResource = g_pClientGame->GetResourceManager()->GetResource(strResourceName.c_str());
