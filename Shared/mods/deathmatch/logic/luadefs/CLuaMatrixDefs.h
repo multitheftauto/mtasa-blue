@@ -45,6 +45,14 @@ public:
     LUA_DECLARE(SetRight);
     LUA_DECLARE(SetUp);
 
+    LUA_DECLARE(InPlaceSet);
+    LUA_DECLARE(InPlaceSetIdentity);
+    LUA_DECLARE(InPlaceSetZero);
+    LUA_DECLARE(InPlaceAdd);
+    LUA_DECLARE(InPlaceSub);
+    LUA_DECLARE(InPlaceMul);
+    LUA_DECLARE(InPlaceInvert);
+
     LUA_DECLARE(Add);
     LUA_DECLARE(Sub);
     LUA_DECLARE(Mul);
