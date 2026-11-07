@@ -11,6 +11,7 @@
 #include "StdInc.h"
 #include <algorithm>
 #include <cmath>
+#include <unordered_map>
 
 static bool         bWouldBeNewFrame = false;
 static unsigned int nLastFrameTime = 0;
@@ -992,6 +993,100 @@ static void __declspec(naked) HOOK_CBike__ProcessControl_SleepClamp()
     // clang-format on
 }
 
+// Fixes bikes swinging left and right while standing still on high FPS (#4658).
+// CBike::ProcessControl leans the bike and rider by their sideways acceleration: the sideways speed change between the
+// start of the frame and this point of CBike::ProcessControl, divided by (GRAVITY * time step). While an idle bike rocks
+// slightly, the tyres holding the wheels in place give it a sideways push that depends on the roll speed and not on the
+// time step. Dividing that push by the much smaller time step of a high frame rate turns the tiny rocking into a visible
+// side to side lean. With frames shorter than at 30 FPS, measure the acceleration from the bike's speed at the start of
+// each frame across one 30 FPS frame instead, which only sees the real change in speed.
+struct SBikeLeanState
+{
+    CVector startSpeed;
+    float   time = 0.0f;
+    float   acceleration = 0.0f;
+    bool    hasStart = false;
+};
+
+// Keyed by bike; bounded by the vehicle pool size. A reused pool slot only carries an old start speed into one 30 FPS
+// frame, which the lean smoothing hides.
+static std::unordered_map<const void*, SBikeLeanState> bikeLeanStates;
+
+static float __cdecl GetBikeLeanAcceleration(const void* bike, const CVector* frameStartSpeed, float sidewaysSpeedChange)
+{
+    constexpr float kGravity = 0.008f;
+    constexpr float kMinTimeStep = 0.01f;  // The original guard against dividing by a zero time step
+
+    const float timeStep = *reinterpret_cast<const float*>(0xB7CB5C);  // CTimer::ms_fTimeStep
+    const float original = sidewaysSpeedChange / (kGravity * std::max(timeStep, kMinTimeStep));
+
+    // Only the normal case of a bike standing or riding on its wheels. The game uses other sources when the bike is
+    // attached to something, in the air or tracks its speed differently; keep those as they are.
+    const char* const p = static_cast<const char*>(bike);
+    const bool        attached = *reinterpret_cast<void* const*>(p + 0xFC) != nullptr;
+    const bool        onWheels = *reinterpret_cast<const uint8*>(p + 0x804) != 0;
+    const bool        otherSpeedSource = (*reinterpret_cast<const uint32*>(p + 0x40) & 4) != 0;
+    SBikeLeanState&   state = bikeLeanStates[bike];
+
+    if (attached || !onWheels || otherSpeedSource)
+    {
+        state.hasStart = false;
+        return original;
+    }
+
+    const CVector& surfaceRight = *reinterpret_cast<const CVector*>(p + 0x624);  // set just before by CBike::ProcessControl
+    if (!state.hasStart)
+    {
+        state.startSpeed = *frameStartSpeed;
+        state.time = 0.0f;
+        state.acceleration = original;
+        state.hasStart = true;
+    }
+    else if (bWouldBeNewFrame)
+    {
+        const CVector speedChange = *frameStartSpeed - state.startSpeed;
+        state.acceleration = speedChange.DotProduct(&surfaceRight) / (kGravity * std::max(state.time, kMinTimeStep));
+        state.startSpeed = *frameStartSpeed;
+        state.time = 0.0f;
+    }
+    state.time += timeStep;
+
+    // Keep the original at 30 FPS or less and move to the 30 FPS measurement by 60 FPS. Blending by the frame time
+    // instead of switching avoids jumping between the two every frame where 30 FPS frames hold one or two frames.
+    const float blend = std::clamp(kOriginalTimeStep / std::max(timeStep, kMinTimeStep) - 1.0f, 0.0f, 1.0f);
+    return original + (state.acceleration - original) * blend;
+}
+
+// CBike::ProcessControl
+#define HOOKPOS_CBike__ProcessControl_LeanAcceleration  0x6BBAD6
+#define HOOKSIZE_CBike__ProcessControl_LeanAcceleration 0x3D
+static const unsigned int     RETURN_CBike__ProcessControl_LeanAcceleration = 0x6BBB13;
+static void __declspec(naked) HOOK_CBike__ProcessControl_LeanAcceleration()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        // st(0) holds the sideways speed change; it is the only value on the FPU stack here
+        sub esp, 4
+        fstp dword ptr [esp]
+        lea eax, [esp+0x54]             // speed at the start of the frame, saved by CBike::ProcessControl at [esp+0x50]
+        push eax
+        push esi                        // CBike*
+        call GetBikeLeanAcceleration
+        add esp, 0xC
+        fstp dword ptr [esp+0x14]       // lean
+
+        // Restore what the replaced code left for the wheel burst check after it
+        mov al, byte ptr [esi+0x65C]    // front wheel status
+        mov ecx, dword ptr [esi+0x63C]  // bike handling data
+        cmp al, 1                       // WHEEL_STATUS_BURST
+        jmp RETURN_CBike__ProcessControl_LeanAcceleration
+    }
+    // clang-format on
+}
+
 // Governs pedestrian push velocity on unoccupied vehicles during collisions.
 // In GTA:SA, CPhysical::ApplyCollision adds an impulse to velocity on every contact frame.
 // At high framerates, these impulses occur far more frequently than at 30 FPS, overpowering
@@ -1399,6 +1494,7 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     EZHookInstall(CAutomobile__ProcessControl_SleepThreshold);
     EZHookInstall(CBike__ProcessControl_SleepThreshold);
     EZHookInstall(CBike__ProcessControl_SleepClamp);
+    EZHookInstall(CBike__ProcessControl_LeanAcceleration);
 
     // Prevent unoccupied vehicles from instantly sleeping on frame 1 via the idle bypass flag,
     // which froze vehicle suspension stretched at spawn before gravity could settle the chassis.
