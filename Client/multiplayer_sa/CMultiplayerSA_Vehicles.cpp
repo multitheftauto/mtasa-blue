@@ -11,6 +11,7 @@
 #include "StdInc.h"
 #include <algorithm>
 #include <cmath>
+#include <cstddef>
 #include <numbers>
 #include <enums/VehicleType.h>
 
@@ -4746,6 +4747,90 @@ static void __declspec(naked) HOOK_CAutomobile__ProcessEntityCollision_ForkliftC
     // clang-format on
 }
 
+static bool IsMonsterTruckModel(std::uint32_t modelId)
+{
+    return modelId == static_cast<std::uint32_t>(VehicleType::VT_MONSTER) || modelId == static_cast<std::uint32_t>(VehicleType::VT_MONSTERA) ||
+           modelId == static_cast<std::uint32_t>(VehicleType::VT_MONSTERB);
+}
+
+static bool __fastcall IsMonsterTruckOrClone(CVehicleSAInterface* vehicle)
+{
+    const std::uint32_t modelId = static_cast<std::uint32_t>(vehicle->m_nModelIndex);
+    if (IsMonsterTruckModel(modelId))
+        return true;
+
+    CModelInfo* modelInfo = pGameInterface->GetModelInfo(modelId);
+    return modelInfo && IsMonsterTruckModel(modelInfo->GetParentID());
+}
+
+#define FUNC_CEntity__SampleLighting 0x59FD00
+
+// SampleLighting only reads the matrix pointer at +0x14 and writes its result byte at +0x149, so a
+// stack copy of the entity is enough to collect the result without touching the vehicle itself
+struct SMonsterTruckLightingProbe
+{
+    std::uint8_t pad0[0x14];
+    void*        matrix;
+    std::uint8_t pad1[0x149 - 0x18];
+    std::uint8_t lighting;
+};
+static_assert(offsetof(SMonsterTruckLightingProbe, lighting) == 0x149, "Invalid probe layout");
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
+// CMonsterTruck body lighting
+//
+// Built from the four wheel lighting bytes at +0x574..+0x577, which are written from the
+// collided surface colour and ignore the time of day. Sample the ambient light with the
+// engine's own CEntity::SampleLighting and feed that to the wheels instead.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static void __fastcall ApplyMonsterTruckLighting(CVehicleSAInterface* vehicle)
+{
+    if (!IsMonsterTruckOrClone(vehicle))
+        return;
+
+    auto* pBase = reinterpret_cast<std::uint8_t*>(vehicle);
+
+    auto matrix = *reinterpret_cast<void**>(pBase + 0x14);
+    if (!matrix)
+        return;
+
+    SMonsterTruckLightingProbe probe;
+    probe.matrix = matrix;
+    probe.lighting = 0;
+
+    if (!((bool(__thiscall*)(void*))FUNC_CEntity__SampleLighting)(&probe))
+        return;
+
+    pBase[0x574] = probe.lighting;
+    pBase[0x575] = probe.lighting;
+    pBase[0x576] = probe.lighting;
+    pBase[0x577] = probe.lighting;
+}
+
+// >>> 0x6D0CF1 | 8A 81 74 05 00 00 | mov al, byte ptr [ecx+574h]  ; first read of the wheel lighting
+#define HOOKPOS_CMonsterTruck__WheelLighting  0x6D0CF1
+#define HOOKSIZE_CMonsterTruck__WheelLighting 6
+static DWORD CONTINUE_CMonsterTruck__WheelLighting = 0x6D0CF7;
+
+static void __declspec(naked) HOOK_CMonsterTruck__WheelLighting()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        call    ApplyMonsterTruckLighting
+        popad
+
+        mov     al, byte ptr [ecx + 0x574]
+        jmp     CONTINUE_CMonsterTruck__WheelLighting
+    }
+    // clang-format on
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_Vehicles
@@ -4904,4 +4989,5 @@ void CMultiplayerSA::InitHooks_Vehicles()
     EZHookInstall(CVehicle__UpdateTrailerLink_TowTruck);
     EZHookInstall(CVehicle__UpdateTractorLink_TowTruck);
     EZHookInstall(CAutomobile__Constructor_TowTruckBouncingPanel);
+    EZHookInstall(CMonsterTruck__WheelLighting);
 }
