@@ -107,6 +107,9 @@ private:
     void        SetGtaMatrix(const CMatrix& matInNew, CCam* pCam = NULL) const;
 
     void           SetFocusToLocalPlayerImpl();
+    CPed*          GetNativeFollowTarget(CClientEntity* entity, eCamMode mode) const;
+    void           StopNativeSpectating();
+    void           RestoreSpectatedPedVisibility();
     void           InvalidateCachedTransforms() const;
     void           SetCenterOfWorldCached(const CVector* pPosition, float fRotationRadians);
     void           UpdateCenterOfWorldFromFixedMatrix();
@@ -125,6 +128,7 @@ private:
     CClientEntityPtr m_pFocusedEntity;
     CEntity*         m_pFocusedGameEntity;
     bool             m_bInvalidated;
+    bool             m_nativeSpectating = false;  // The game's camera follows the focused ped (CCamera::SetSpectatedPed)
 
     bool                 m_bFixed;
     EFixedCameraModeType m_FixedCameraMode;

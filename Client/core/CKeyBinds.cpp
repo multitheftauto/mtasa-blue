@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/CCamera.h>
 #include <game/CGame.h>
 #include <game/CPed.h>
 #include <game/CPedIntelligence.h>
@@ -1981,6 +1982,10 @@ void CKeyBinds::DoPostFramePulse()
     if (pTask && pTask->GetTaskType() == TASK_SIMPLE_USE_GUN)
         bAimingWeapon = g_bcControls[39].bState;
 
+    // The camera follows a ped inside a vehicle while the local player is on foot
+    CCamera* const camera = m_pCore->GetGame()->GetCamera();
+    const bool     spectatingVehicleOccupant = !bInVehicle && camera && camera->IsSpectatedPedInVehicle();
+
     if (bInVehicle != m_bInVehicle)
     {
         m_bInVehicle = bInVehicle;
@@ -2001,6 +2006,12 @@ void CKeyBinds::DoPostFramePulse()
             {
                 cs.RightShoulder2 = g_bcControls[8].bState ? 255 : 0;  // Zoom Out
                 cs.LeftShoulder2 = g_bcControls[7].bState ? 255 : 0;   // Zoom In
+            }
+            else if (spectatingVehicleOccupant)
+            {
+                // Q and E cycle the weapon on foot and cancel each other; the camera needs the vehicle look buttons
+                cs.LeftShoulder2 = (g_bcControls[31].bState || g_bcControls[33].bState) ? 255 : 0;   // Look Left
+                cs.RightShoulder2 = (g_bcControls[32].bState || g_bcControls[33].bState) ? 255 : 0;  // Look Right
             }
             else
             {
