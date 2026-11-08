@@ -35,7 +35,7 @@ CBuilding::CBuilding(CElement* pParent, CBuildingManager* pBuildingManager) : CE
     pBuildingManager->AddToList(this);
 }
 
-CBuilding::CBuilding(const CBuilding& Copy) : CElement(Copy.m_pParent), m_pLowLodBuilding(Copy.m_pLowLodBuilding)
+CBuilding::CBuilding(const CBuilding& Copy) : CElement(Copy.m_pParent), m_pLowLodBuilding(nullptr)
 {
     // Init
     m_iType = CElement::BUILDING;
@@ -204,6 +204,10 @@ bool CBuilding::SetLowLodBuilding(CBuilding* pNewLowLodBuilding) noexcept
     {
         // Remove any previous link
         SetLowLodBuilding(nullptr);
+
+        // Unlink old high lod element
+        if (CBuilding* pOldHighLodBuilding = pNewLowLodBuilding->GetHighLodBuilding())
+            pOldHighLodBuilding->SetLowLodBuilding(nullptr);
 
         // Make new link
         m_pLowLodBuilding = pNewLowLodBuilding;

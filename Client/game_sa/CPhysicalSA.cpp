@@ -292,6 +292,14 @@ void CPhysicalSA::AttachEntityToEntity(CPhysical& Entity, const CVector& vecPosi
     DWORD        dwEntityInterface = (DWORD)EntitySA.GetInterface();
 
     InternalAttachEntityToEntity(dwEntityInterface, &vecPosition, &vecRotation);
+
+    CEntitySAInterface* pEntity = GetInterface();
+    if (pEntity->nType != ENTITY_TYPE_OBJECT)
+        return;
+
+    auto* pPhysical = static_cast<CPhysicalSAInterface*>(pEntity);
+    if (!pPhysical->bCollidable)
+        pPhysical->bCollidable = true;
 }
 
 void CPhysicalSA::DetachEntityFromEntity(float fUnkX, float fUnkY, float fUnkZ, bool bUnk)

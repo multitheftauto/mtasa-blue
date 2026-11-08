@@ -399,7 +399,7 @@ namespace FPSLimiter
     void FPSLimiter::OnFrameEnd()
     {
         // The wait belongs in OnGameTimerUpdate so GTA measures exact frame deltas. If the game
-        // timer never ticked since the last frame (minimized, loading) pace here instead
+        // timer never ticked since the last frame (loading) pace here instead
         if (m_waitPending)
             SetFrameRateThrottle();
 

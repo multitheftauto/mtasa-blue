@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CElementDeleter.h"
 #include "CGame.h"
+#include "CMapManager.h"
 
 extern CGame* g_pGame;
 
@@ -63,7 +64,7 @@ bool CElementDeleter::IsBeingDeleted(CElement* element) const
 
 void CElementDeleter::DeleteTree(CElement* rootElement, bool unlink, bool updatePerPlayerEntities)
 {
-    if (!rootElement || IsBeingDeleted(rootElement))
+    if (!rootElement || IsBeingDeleted(rootElement) || rootElement->GetType() == CElement::PLAYER || rootElement->GetType() == CElement::CONSOLE)
         return;
 
     std::vector<CElement*> elementsToDelete;
@@ -71,7 +72,7 @@ void CElementDeleter::DeleteTree(CElement* rootElement, bool unlink, bool update
 
     for (auto* element : elementsToDelete)
     {
-        if (IsBeingDeleted(element))
+        if (IsBeingDeleted(element) || element->GetType() == CElement::PLAYER || element->GetType() == CElement::CONSOLE)
             continue;
 
         CLuaArguments arguments;
@@ -86,6 +87,7 @@ void CElementDeleter::DeleteTree(CElement* rootElement, bool unlink, bool update
 
     for (auto* element : elementsToDelete)
     {
+        element->ClearChildren();
         element->SetParentObject(nullptr, false);
 
         if (unlink)
@@ -98,12 +100,23 @@ void CElementDeleter::DeleteTree(CElement* rootElement, bool unlink, bool update
 
 void CElementDeleter::CollectTreeElements(CElement* element, std::vector<CElement*>& elements)
 {
-    if (!element || IsBeingDeleted(element))
+    if (!element || IsBeingDeleted(element) || element->GetType() == CElement::PLAYER || element->GetType() == CElement::CONSOLE)
         return;
 
-    for (auto iter = element->IterBegin(); iter != element->IterEnd(); ++iter)
+    auto iter = element->IterBegin();
+    while (iter != element->IterEnd())
     {
-        CollectTreeElements(*iter, elements);
+        CElement* child = *iter;
+        // Players and system consoles must never be deleted via tree removal; preserve them under root
+        if (child->GetType() == CElement::PLAYER || child->GetType() == CElement::CONSOLE)
+        {
+            child->SetParentObject(g_pGame->GetMapManager()->GetRootElement(), false);
+            iter = element->IterBegin();
+            continue;
+        }
+
+        CollectTreeElements(child, elements);
+        ++iter;
     }
 
     elements.push_back(element);
