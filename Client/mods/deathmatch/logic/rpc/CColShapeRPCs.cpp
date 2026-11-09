@@ -12,7 +12,7 @@
 #include <StdInc.h>
 #include "CColShapeRPCs.h"
 
-void CColShapeRPCs::LoadFunctions(void)
+void CColShapeRPCs::LoadFunctions()
 {
     AddHandler(SET_COLSHAPE_RADIUS, SetColShapeRadius, "SetColShapeRadius");
     AddHandler(SET_COLSHAPE_SIZE, SetColShapeSize, "SetColShapeSize");

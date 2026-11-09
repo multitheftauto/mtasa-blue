@@ -191,15 +191,15 @@ public:
     bool CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuffer);
 
     // To draw queued up drawings
-    void DrawPreGUIQueue(void);
-    void DrawPostGUIQueue(void);
-    void DrawLine3DPreGUIQueue(void);
-    void DrawLine3DPostFXQueue(void);
-    bool HasLine3DPreGUIQueueItems(void);
+    void DrawPreGUIQueue();
+    void DrawPostGUIQueue();
+    void DrawLine3DPreGUIQueue();
+    void DrawLine3DPostFXQueue();
+    bool HasLine3DPreGUIQueueItems();
     bool HasLine3DPostFXQueueItems();
-    void DrawPrimitive3DPostFXQueue(void);
-    void DrawPrimitive3DPreGUIQueue(void);
-    bool HasPrimitive3DPreGUIQueueItems(void);
+    void DrawPrimitive3DPostFXQueue();
+    void DrawPrimitive3DPreGUIQueue();
+    bool HasPrimitive3DPreGUIQueueItems();
     bool HasPrimitive3DPostFXQueueItems();
 
     void DidRenderScene();

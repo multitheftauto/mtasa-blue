@@ -286,7 +286,7 @@ void* LoadFunction(const char* libraryName, const char* functionName);
 
 #define _DEFFUNCTION(lib, name) \
     using FUNC_##name = decltype(&name); \
-    inline FUNC_##name __##name(void) \
+    inline FUNC_##name __##name() \
     { \
         static FUNC_##name pfn = NULL; \
         if (!pfn) \

@@ -18,12 +18,12 @@ CClientModelManager::CClientModelManager() : m_Models(std::make_unique<std::shar
     }
 }
 
-CClientModelManager::~CClientModelManager(void)
+CClientModelManager::~CClientModelManager()
 {
     RemoveAll();
 }
 
-void CClientModelManager::RemoveAll(void)
+void CClientModelManager::RemoveAll()
 {
     const unsigned int uiMaxModelID = g_pGame->GetBaseIDforCOL();
     for (unsigned int i = 0; i < uiMaxModelID; i++)
@@ -64,7 +64,7 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
     return false;
 }
 
-int CClientModelManager::GetFirstFreeModelID(void)
+int CClientModelManager::GetFirstFreeModelID()
 {
     const unsigned int uiMaxModelID = MAX_MODEL_DFF_ID;
     for (unsigned int i = 0; i < uiMaxModelID; i++)

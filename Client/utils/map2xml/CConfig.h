@@ -18,12 +18,12 @@ class CConfig
 {
 public:
     CConfig(const char* szFileName);
-    ~CConfig(void);
+    ~CConfig();
 
     bool GetEntry(char* szEntry, char* szReturnText, int iInstance);
     void GetPreviousEntry(char* szEntry, char* szReturnTest, int iInstance);
-    int  GetNumberOfLines(void);
-    int  GetNumberOfEntries(void);
+    int  GetNumberOfLines();
+    int  GetNumberOfEntries();
     int  GetNumberOfSpecificEntries(char* szEntry);
     int  GetNumberOfEntryProperties(char* szEntry, int iInstance);
 
@@ -33,7 +33,7 @@ public:
 
     void SetFileName(char* szFileName);
     void GetFileName(char* szFileName);
-    bool DoesFileExist(void);
+    bool DoesFileExist();
 
 private:
     char* m_szFileName;
