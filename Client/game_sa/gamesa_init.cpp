@@ -33,8 +33,8 @@ MTAEXPORT CGame* GetGameInterface(CCoreInterface* pCore)
 
     SetMemoryAllocationFailureHandler();
 
-    pGame = new CGameSA;
     g_pCore = pCore;
+    pGame = new CGameSA;
 
     return (CGame*)pGame;
 }
