@@ -140,7 +140,7 @@ void CClientProjectile::DoPulse()
                 SetRotationRadians(*m_pInitiateData->pvecRotation);
             if (m_pInitiateData->pvecVelocity)
                 SetVelocity(*m_pInitiateData->pvecVelocity);
-            if (m_pInitiateData->usModel)
+            if (m_pInitiateData->usModel && CClientObjectManager::IsValidModel(m_pInitiateData->usModel))
                 SetModel(m_pInitiateData->usModel);
         }
 
