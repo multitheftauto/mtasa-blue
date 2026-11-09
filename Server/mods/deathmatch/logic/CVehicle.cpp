@@ -435,6 +435,100 @@ bool CVehicle::ReadSpecialData(const int iLine)
     return true;
 }
 
+void CVehicle::WriteSpecialData(CXMLNode* pNode)
+{
+    CElement::WriteSpecialData(pNode);
+
+    CXMLAttributes& attributes = pNode->GetAttributes();
+
+    attributes.Create("model")->SetValue(static_cast<int>(m_usModel));
+
+    attributes.Create("posX")->SetValue(m_vecPosition.fX);
+    attributes.Create("posY")->SetValue(m_vecPosition.fY);
+    attributes.Create("posZ")->SetValue(m_vecPosition.fZ);
+
+    attributes.Create("rotX")->SetValue(m_vecRotationDegrees.fX);
+    attributes.Create("rotY")->SetValue(m_vecRotationDegrees.fY);
+    attributes.Create("rotZ")->SetValue(m_vecRotationDegrees.fZ);
+
+    attributes.Create("variant1")->SetValue(static_cast<int>(GetVariant()));
+    attributes.Create("variant2")->SetValue(static_cast<int>(GetVariant2()));
+
+    attributes.Create("turretX")->SetValue(ConvertRadiansToDegrees(GetTurretPositionX()));
+    attributes.Create("turretY")->SetValue(ConvertRadiansToDegrees(GetTurretPositionY()));
+
+    attributes.Create("health")->SetValue(GetHealth());
+    attributes.Create("sirens")->SetValue(IsSirenActive());
+    attributes.Create("landingGearDown")->SetValue(IsLandingGearDown());
+    attributes.Create("locked")->SetValue(IsLocked());
+    attributes.Create("specialState")->SetValue(static_cast<int>(GetAdjustableProperty()));
+
+    SString strColor;
+    for (uint i = 0; i < 4; i++)
+    {
+        SColor color = GetColor().GetRGBColor(i);
+        if (i > 0)
+            strColor += ",";
+        strColor += SString("%d,%d,%d", color.R, color.G, color.B);
+    }
+    attributes.Create("color")->SetValue(strColor.c_str());
+
+    SColor headLightColor = GetHeadLightColor();
+    attributes.Create("headLightColor")->SetValue(XMLColorFromInt(headLightColor.R, headLightColor.G, headLightColor.B, headLightColor.A).c_str());
+
+    attributes.Create("paintjob")->SetValue(static_cast<int>(GetPaintjob()));
+
+    if (CVehicleUpgrades* pUpgrades = GetUpgrades())
+    {
+        SString strUpgrades;
+        for (unsigned char ucSlot = 0; ucSlot < VEHICLE_UPGRADE_SLOTS; ucSlot++)
+        {
+            unsigned short usUpgrade = pUpgrades->GetSlotState(ucSlot);
+            if (!usUpgrade)
+                continue;
+
+            if (!strUpgrades.empty())
+                strUpgrades += ",";
+            strUpgrades += SString("%d", usUpgrade);
+        }
+
+        if (!strUpgrades.empty())
+            attributes.Create("upgrades")->SetValue(strUpgrades.c_str());
+    }
+
+    const char* szPlate = GetRegPlate();
+    if (szPlate && szPlate[0])
+        attributes.Create("plate")->SetValue(szPlate);
+
+    attributes.Create("interior")->SetValue(static_cast<int>(m_ucInterior));
+    attributes.Create("dimension")->SetValue(static_cast<int>(m_usDimension));
+
+    attributes.Create("collisions")->SetValue(GetCollisionEnabled());
+    attributes.Create("alpha")->SetValue(static_cast<int>(GetAlpha()));
+    attributes.Create("frozen")->SetValue(IsFrozen());
+
+    attributes.Create("taxiLightOn")->SetValue(IsTaxiLightOn());
+    attributes.Create("engineOn")->SetValue(IsEngineOn());
+    attributes.Create("damageProof")->SetValue(IsDamageProof());
+    attributes.Create("explodableFuelTank")->SetValue(IsFuelTankExplodable());
+
+    if (GetOverrideLights() != 0)
+        attributes.Create("lightsOn")->SetValue(GetOverrideLights() == 2);
+
+    attributes.Create("toggleRespawn")->SetValue(GetRespawnEnabled());
+    attributes.Create("respawnDelay")->SetValue(static_cast<int>(GetIdleRespawnInterval()));
+
+    const CVector& vecRespawnPosition = GetRespawnPosition();
+    attributes.Create("respawnPosX")->SetValue(vecRespawnPosition.fX);
+    attributes.Create("respawnPosY")->SetValue(vecRespawnPosition.fY);
+    attributes.Create("respawnPosZ")->SetValue(vecRespawnPosition.fZ);
+
+    const CVector& vecRespawnRotation = GetRespawnRotationDegrees();
+    attributes.Create("respawnRotX")->SetValue(vecRespawnRotation.fX);
+    attributes.Create("respawnRotY")->SetValue(vecRespawnRotation.fY);
+    attributes.Create("respawnRotZ")->SetValue(vecRespawnRotation.fZ);
+}
+
 void CVehicle::GetMatrix(CMatrix& matrix)
 {
     CVector vecRotation;

@@ -137,6 +137,28 @@ bool CBuilding::ReadSpecialData(const int iLine)
     return true;
 }
 
+void CBuilding::WriteSpecialData(CXMLNode* pNode)
+{
+    CElement::WriteSpecialData(pNode);
+
+    CXMLAttributes& attributes = pNode->GetAttributes();
+
+    attributes.Create("model")->SetValue(static_cast<int>(m_model));
+
+    attributes.Create("posX")->SetValue(m_vecPosition.fX);
+    attributes.Create("posY")->SetValue(m_vecPosition.fY);
+    attributes.Create("posZ")->SetValue(m_vecPosition.fZ);
+
+    CVector vecRotation = m_vecRotation;
+    ConvertRadiansToDegrees(vecRotation);
+    attributes.Create("rotX")->SetValue(vecRotation.fX);
+    attributes.Create("rotY")->SetValue(vecRotation.fY);
+    attributes.Create("rotZ")->SetValue(vecRotation.fZ);
+
+    attributes.Create("interior")->SetValue(static_cast<int>(m_ucInterior));
+    attributes.Create("collisions")->SetValue(m_bCollisionsEnabled);
+}
+
 void CBuilding::GetMatrix(CMatrix& matrix)
 {
     matrix.vPos = GetPosition();
