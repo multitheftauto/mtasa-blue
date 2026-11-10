@@ -173,8 +173,7 @@ void CLuaPedDefs::AddClass(lua_State* luaVM)
     lua_classvariable(luaVM, "jetpack", "setPedWearingJetpack", "isPedWearingJetpack");  // introduced in 1.5.5-9.13846
     lua_classvariable(luaVM, "reloadingWeapon", nullptr, "isPedReloadingWeapon");
 
-    // TODO(qaisjp): setting this to any value will kill the ped. add OOP_KillPed that only allows `true`.
-    lua_classvariable(luaVM, "dead", "killPed", "isPedDead");
+    lua_classvariable(luaVM, "dead", "killPed", "isPedDead", OOP_KillPed, IsPedDead);
 
     lua_registerclass(luaVM, "Ped", "Element");
 }
@@ -1038,6 +1037,40 @@ int CLuaPedDefs::KillPed(lua_State* luaVM)
         {
             lua_pushboolean(luaVM, true);
             return 1;
+        }
+    }
+    else
+        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+
+    lua_pushboolean(luaVM, false);
+    return 1;
+}
+
+int CLuaPedDefs::OOP_KillPed(lua_State* luaVM)
+{
+    //  ped.dead = bool
+    CElement* pElement = nullptr;
+    bool      bDead = false;
+
+    CScriptArgReader argStream(luaVM);
+    argStream.ReadUserData(pElement);
+    argStream.ReadBool(bDead);
+
+    if (!argStream.HasErrors())
+    {
+        LogWarningIfPlayerHasNotJoinedYet(luaVM, pElement);
+
+        if (bDead)
+        {
+            if (CStaticFunctionDefinitions::KillPed(pElement))
+            {
+                lua_pushboolean(luaVM, true);
+                return 1;
+            }
+        }
+        else
+        {
+            m_pScriptDebugging->LogWarning(luaVM, "Cannot set 'dead' property to false");
         }
     }
     else
