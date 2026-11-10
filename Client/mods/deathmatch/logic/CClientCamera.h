@@ -80,9 +80,14 @@ public:
     void            SetCameraPedViewMode(ePedCamMode eMode);
     eVehicleCamMode GetCameraVehicleViewMode();
     ePedCamMode     GetCameraPedViewMode();
-    void            SetCameraClip(bool bObjects, bool bVehicles);
-    void            ResetCameraClip();
-    void            GetCameraClip(bool& bObjects, bool& bVehicles);
+
+    bool SetVehicleViewOffset(eVehicleCamMode eMode, const CVector& vecOffset);
+    bool GetVehicleViewOffset(eVehicleCamMode eMode, CVector& vecOffset);
+    void ResetVehicleViewOffsets();
+
+    void SetCameraClip(bool bObjects, bool bVehicles);
+    void ResetCameraClip();
+    void GetCameraClip(bool& bObjects, bool& bVehicles);
 
     bool IsInFixedMode() { return m_bFixed; }
     void ToggleCameraFixedMode(bool bEnabled);
