@@ -61,6 +61,7 @@ public:
     auto              GetLargestFileSizeBlocks() const { return m_LargestFileSizeBlocks; }
 
     bool Load(fs::path filePath);
+    bool LoadFolder(fs::path folderPath, fs::path tempDirPath = {});
     void Unload();
 
     tImgFileInfo*         GetFileInfo(size_t fileID);
@@ -70,11 +71,14 @@ public:
     bool StreamEnable();
     bool StreamDisable();
     bool IsStreamed();
+    bool IsFolderMode() const noexcept { return m_bFolderMode; }
 
     bool LinkModel(unsigned int usModelID, size_t fileID);
     bool UnlinkModel(unsigned int usModelID);
 
 private:
+    bool BuildTempIMG();
+
     class CClientIMGManager* m_pImgManager;
 
     std::ifstream             m_ifs;
@@ -82,6 +86,12 @@ private:
     unsigned char             m_ucArchiveID;
     std::vector<tImgFileInfo> m_fileInfos;
     size_t                    m_LargestFileSizeBlocks;  // The size of the largest file [in streaming blocks/sectors]
+
+    bool                  m_bFolderMode;
+    bool                  m_bTempImgCreated;
+    fs::path              m_tempImgPath;
+    fs::path              m_tempImgDirPath;
+    std::vector<fs::path> m_folderFilePaths;
 
     std::vector<tLinkedModelRestoreInfo> m_restoreInfo;
 };
