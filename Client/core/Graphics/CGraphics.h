@@ -186,7 +186,7 @@ public:
 
     // Texture data manipulation
     bool ResizeTextureData(const void* pData, uint uiDataPitch, uint uiWidth, uint uiHeight, uint d3dFormat, uint uiNewWidth, uint uiNewHeight,
-                           CBuffer& outBuffer);
+                           CBuffer& outBuffer, uint d3dNewFormat = 0);
     bool CopyDataToSurface(IDirect3DSurface9* pSurface, const uchar* pPixelsData, uint uiDataPitch);
     bool CopyDataFromSurface(IDirect3DSurface9* pSurface, CBuffer& outBuffer);
 
