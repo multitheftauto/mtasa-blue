@@ -35,6 +35,7 @@ public:
 
 protected:
     bool ReadSpecialData(const int iLine) override;
+    void WriteSpecialData(CXMLNode* pNode) override;
 
 private:
     CRadarArea(class CRadarAreaManager* pRadarAreaManager, CElement* pParent);

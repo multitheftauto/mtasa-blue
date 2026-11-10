@@ -150,11 +150,13 @@ void CEvents::PostEventPulse()
 void CEvents::CancelEvent(bool bCancelled)
 {
     m_bEventCancelled = bCancelled;
+    m_bWasEventCancelled = bCancelled;
 }
 
 void CEvents::CancelEvent(bool bCancelled, const char* szReason)
 {
     m_bEventCancelled = bCancelled;
+    m_bWasEventCancelled = bCancelled;
     m_strLastError = SStringX(szReason);
 }
 

@@ -687,6 +687,11 @@ bool XMLColorToInt(const char* szColor, unsigned char& ucRed, unsigned char& ucG
     return true;
 }
 
+SString XMLColorFromInt(unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue, unsigned char ucAlpha)
+{
+    return SString("#%02X%02X%02X%02X", ucRed, ucGreen, ucBlue, ucAlpha);
+}
+
 #ifdef MTA_CLIENT
 //
 // Safely read a ushort sized string from a NetBitStreamInterface
