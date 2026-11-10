@@ -101,9 +101,17 @@ void CClientIFP::ReadIFPVersion1()
     SInfo Info;
     ReadHeaderVersion1(Info);
 
-    m_pVecAnimations->resize(Info.Entries);
-    for (auto& Animation : m_pIFPAnimations->vecAnimations)
+    if (Info.Entries <= 0)
+        return;
+
+    m_pVecAnimations->clear();
+    m_pVecAnimations->reserve(Info.Entries);
+    for (std::int32_t i = 0; i < Info.Entries; ++i)
     {
+        if (GetRemainingBytesCount() < sizeof(SName) + sizeof(SDgan))
+            break;
+
+        SAnimation Animation;
         ReadAnimationNameVersion1(Animation);
 
         SDgan Dgan;
@@ -116,6 +124,17 @@ void CClientIFP::ReadIFPVersion1()
 
         *(DWORD*)Animation.pSequencesMemory = ReadSequencesWithDummies(Animation.pHierarchy, Animation.AnimatedBonesMask);
         PreProcessAnimationHierarchy(Animation.pHierarchy);
+
+        m_pVecAnimations->push_back(std::move(Animation));
+    }
+
+    if (m_pVecAnimations->size() < static_cast<size_t>(Info.Entries))
+    {
+        if (g_pClientGame && g_pClientGame->GetScriptDebugging())
+        {
+            g_pClientGame->GetScriptDebugging()->LogWarning(nullptr, "engineLoadIFP: IFP '%s' has corrupt or truncated animation data (expected %d, loaded %u)",
+                                                            *m_strBlockName, Info.Entries, static_cast<unsigned int>(m_pVecAnimations->size()));
+        }
     }
 }
 
@@ -124,12 +143,20 @@ void CClientIFP::ReadIFPVersion2(bool bAnp3)
     SIFPHeaderV2 Header;
     ReadBuffer<SIFPHeaderV2>(&Header);
 
-    m_pVecAnimations->resize(Header.TotalAnimations);
-    for (auto& Animation : m_pIFPAnimations->vecAnimations)
+    if (Header.TotalAnimations <= 0)
+        return;
+
+    m_pVecAnimations->clear();
+    m_pVecAnimations->reserve(Header.TotalAnimations);
+    for (std::int32_t i = 0; i < Header.TotalAnimations; ++i)
     {
+        if (GetRemainingBytesCount() < sizeof(SAnimationHeaderV2))
+            break;
+
         SAnimationHeaderV2 AnimationNode;
         ReadAnimationHeaderVersion2(AnimationNode, bAnp3);
 
+        SAnimation Animation;
         Animation.Name = AnimationNode.Name;
         Animation.uiNameHash = HashString(Animation.Name.ToLower());
         Animation.pHierarchy = m_pAnimManager->GetCustomAnimBlendHierarchy();
@@ -140,6 +167,17 @@ void CClientIFP::ReadIFPVersion2(bool bAnp3)
 
         *(DWORD*)Animation.pSequencesMemory = ReadSequencesWithDummies(Animation.pHierarchy, Animation.AnimatedBonesMask);
         PreProcessAnimationHierarchy(Animation.pHierarchy);
+
+        m_pVecAnimations->push_back(std::move(Animation));
+    }
+
+    if (m_pVecAnimations->size() < static_cast<size_t>(Header.TotalAnimations))
+    {
+        if (g_pClientGame && g_pClientGame->GetScriptDebugging())
+        {
+            g_pClientGame->GetScriptDebugging()->LogWarning(nullptr, "engineLoadIFP: IFP '%s' has corrupt or truncated animation data (expected %d, loaded %u)",
+                                                            *m_strBlockName, Header.TotalAnimations, static_cast<unsigned int>(m_pVecAnimations->size()));
+        }
     }
 }
 
@@ -1374,7 +1412,7 @@ CAnimBlendHierarchySAInterface* CClientIFP::GetAnimationHierarchy(const SString&
     const unsigned int uiAnimationNameHash = HashString(strAnimationName.ToLower());
     auto               it = std::find_if(m_pVecAnimations->begin(), m_pVecAnimations->end(),
                                          [&uiAnimationNameHash](SAnimation const& Animation) { return Animation.uiNameHash == uiAnimationNameHash; });
-    if (it != m_pVecAnimations->end())
+    if (it != m_pVecAnimations->end() && it->pHierarchy)
     {
         return it->pHierarchy->GetInterface();
     }

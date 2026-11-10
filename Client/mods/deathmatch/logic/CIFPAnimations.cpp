@@ -23,10 +23,16 @@ void CIFPAnimations::DeleteAnimations()
     CAnimManager* pAnimManager = g_pGame->GetAnimManager();
     for (auto& Animation : vecAnimations)
     {
+        if (!Animation.pHierarchy)
+            continue;
+
         for (unsigned short SequenceIndex = 0; SequenceIndex < Animation.pHierarchy->GetNumSequences(); SequenceIndex++)
         {
             pAnimManager->RemoveFromUncompressedCache(Animation.pHierarchy->GetInterface());
-            auto  pAnimationSequence = pAnimManager->GetCustomAnimBlendSequence(Animation.pHierarchy->GetSequence(SequenceIndex));
+            auto pAnimationSequence = pAnimManager->GetCustomAnimBlendSequence(Animation.pHierarchy->GetSequence(SequenceIndex));
+            if (!pAnimationSequence)
+                continue;
+
             void* pKeyFrames = pAnimationSequence->GetKeyFrames();
             if (!pAnimationSequence->IsBigChunkForAllSequences())
             {
@@ -44,6 +50,7 @@ void CIFPAnimations::DeleteAnimations()
             }
         }
         delete Animation.pSequencesMemory;
+        Animation.pSequencesMemory = nullptr;
         pAnimManager->DeleteCustomAnimHierarchyInterface(Animation.pHierarchy->GetInterface());
     }
 }

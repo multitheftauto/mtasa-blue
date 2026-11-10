@@ -19,9 +19,9 @@ public:
     struct SAnimation
     {
         SString                              Name;
-        unsigned int                         uiNameHash;
+        unsigned int                         uiNameHash = 0;
         std::unique_ptr<CAnimBlendHierarchy> pHierarchy;
-        BYTE*                                pSequencesMemory;
+        BYTE*                                pSequencesMemory = nullptr;
 
         // Bit i is set when bone i (see CClientIFP::m_karruBoneIds) is actually driven by this
         // animation's own IFP data, as opposed to being padded out with a fixed pose because the
