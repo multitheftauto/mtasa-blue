@@ -50,7 +50,8 @@ public:
     int8                 pad0[3];  // Maybe prev value is int32
     int8                 m_mLeanMatrix[72];
     int8                 m_cDamageFlags;
-    int8                 pad1[27];
+    int8                 pad1[15];
+    CVector              m_vecGroundRight;  // 0x624, right vector of the surface under the wheels, set by CBike::ProcessControl
     CVector              m_vecUnknowVector;
     tBikeHandlingDataSA* m_pBikeHandlingData;
     sRideAnimData        m_sRideData;
@@ -99,6 +100,8 @@ public:
     int32                m_aiWheelState[2];
 };
 static_assert(sizeof(CBikeSAInterface) == 0x814, "Invalid size for CBikeSAInterface");
+static_assert(offsetof(CBikeSAInterface, m_vecGroundRight) == 0x624, "Invalid offset for CBikeSAInterface::m_vecGroundRight");
+static_assert(offsetof(CBikeSAInterface, m_cNumContactWheels) == 0x804, "Invalid offset for CBikeSAInterface::m_cNumContactWheels");
 
 class CBikeSA : public virtual CBike, public virtual CVehicleSA
 {

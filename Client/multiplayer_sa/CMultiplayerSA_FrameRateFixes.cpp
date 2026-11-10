@@ -9,6 +9,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include "../game_sa/CBikeSA.h"
 #include <algorithm>
 #include <cmath>
 #include <unordered_map>
@@ -1010,9 +1011,9 @@ struct SBikeLeanState
 
 // Keyed by bike; bounded by the vehicle pool size. A reused pool slot only carries an old start speed into one 30 FPS
 // frame, which the lean smoothing hides.
-static std::unordered_map<const void*, SBikeLeanState> bikeLeanStates;
+static std::unordered_map<const CBikeSAInterface*, SBikeLeanState> bikeLeanStates;
 
-static float __cdecl GetBikeLeanAcceleration(const void* bike, const CVector* frameStartSpeed, float sidewaysSpeedChange)
+static float __cdecl GetBikeLeanAcceleration(const CBikeSAInterface* bike, const CVector* frameStartSpeed, float sidewaysSpeedChange)
 {
     constexpr float kGravity = 0.008f;
     constexpr float kMinTimeStep = 0.01f;  // The original guard against dividing by a zero time step
@@ -1022,11 +1023,10 @@ static float __cdecl GetBikeLeanAcceleration(const void* bike, const CVector* fr
 
     // Only the normal case of a bike standing or riding on its wheels. The game uses other sources when the bike is
     // attached to something, in the air or tracks its speed differently; keep those as they are.
-    const char* const p = static_cast<const char*>(bike);
-    const bool        attached = *reinterpret_cast<void* const*>(p + 0xFC) != nullptr;
-    const bool        onWheels = *reinterpret_cast<const uint8*>(p + 0x804) != 0;
-    const bool        otherSpeedSource = (*reinterpret_cast<const uint32*>(p + 0x40) & 4) != 0;
-    SBikeLeanState&   state = bikeLeanStates[bike];
+    const bool      attached = bike->m_pAttachedEntity != nullptr;
+    const bool      onWheels = bike->m_cNumContactWheels != 0;
+    const bool      otherSpeedSource = bike->bDisableFriction;  // physical flags bit 0x4
+    SBikeLeanState& state = bikeLeanStates[bike];
 
     if (attached || !onWheels || otherSpeedSource)
     {
@@ -1034,7 +1034,7 @@ static float __cdecl GetBikeLeanAcceleration(const void* bike, const CVector* fr
         return original;
     }
 
-    const CVector& surfaceRight = *reinterpret_cast<const CVector*>(p + 0x624);  // set just before by CBike::ProcessControl
+    const CVector& surfaceRight = bike->m_vecGroundRight;  // set just before by CBike::ProcessControl
     if (!state.hasStart)
     {
         state.startSpeed = *frameStartSpeed;
@@ -1073,14 +1073,14 @@ static void __declspec(naked) HOOK_CBike__ProcessControl_LeanAcceleration()
         fstp dword ptr [esp]
         lea eax, [esp+0x54]             // speed at the start of the frame, saved by CBike::ProcessControl at [esp+0x50]
         push eax
-        push esi                        // CBike*
+        push esi                        // CBikeSAInterface*
         call GetBikeLeanAcceleration
         add esp, 0xC
         fstp dword ptr [esp+0x14]       // lean
 
         // Restore what the replaced code left for the wheel burst check after it
-        mov al, byte ptr [esi+0x65C]    // front wheel status
-        mov ecx, dword ptr [esi+0x63C]  // bike handling data
+        mov al, byte ptr [esi+0x65C]    // CBikeSAInterface::m_acWheelDamageState[0] (front wheel)
+        mov ecx, dword ptr [esi+0x63C]  // CBikeSAInterface::m_pBikeHandlingData
         cmp al, 1                       // WHEEL_STATUS_BURST
         jmp RETURN_CBike__ProcessControl_LeanAcceleration
     }
