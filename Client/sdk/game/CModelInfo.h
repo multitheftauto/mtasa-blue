@@ -53,6 +53,9 @@ enum class eModelIdeFlag
     DISABLE_BACKFACE_CULLING,
     IS_BREAKABLE_STATUE,
     IS_CRANE,
+
+    // Our custom flag
+    REALLY_DRAW_LAST,
 };
 
 enum class eModelInfoType : unsigned char
@@ -256,4 +259,7 @@ public:
     virtual unsigned int GetParentID() = 0;
     virtual bool         IsDynamic() = 0;
     virtual bool         IsDamageableAtomic() = 0;
+
+    virtual bool ShouldRenderAfterScene() const noexcept = 0;
+    virtual void SetRenderingAfterScene(bool shouldRenderAfterScene) noexcept = 0;
 };
