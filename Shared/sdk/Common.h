@@ -25,6 +25,9 @@
 #define RESERVED_ELEMENT_ID 0xFFFFFFFE
 #define INVALID_ELEMENT_ID  0xFFFFFFFF
 
+// Resource net ID meaning "no resource", for places where a resource net ID is optional on the wire.
+#define INVALID_RESOURCE_NET_ID 0xFFFF
+
 // Element name characteristics
 #define MAX_TYPENAME_LENGTH     32
 #define MAX_ELEMENT_NAME_LENGTH 64

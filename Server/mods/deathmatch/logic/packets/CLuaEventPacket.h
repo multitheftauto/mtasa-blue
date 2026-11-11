@@ -24,7 +24,7 @@ public:
     static constexpr int MAX_LUA_LATENT_EVENT_ARGUMENTS_SIZE = 10 * 1024 * 1024;
 
     CLuaEventPacket();
-    CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments* pArguments);
+    CLuaEventPacket(const char* szName, ElementID ID, CLuaArguments* pArguments, unsigned short usSourceResourceNetId = INVALID_RESOURCE_NET_ID);
 
     ePacketID     GetPacketID() const { return PACKET_ID_LUA_EVENT; };
     unsigned long GetFlags() const { return PACKET_HIGH_PRIORITY | PACKET_RELIABLE | PACKET_SEQUENCED; };
@@ -35,10 +35,12 @@ public:
     const char*    GetName() { return m_strName; }
     ElementID      GetElementID() { return m_ElementID; }
     CLuaArguments* GetArguments() { return m_pArguments; }
+    unsigned short GetSourceResourceNetID() const noexcept { return m_usSourceResourceNetID; }
 
 private:
     SString        m_strName;
     ElementID      m_ElementID;
+    unsigned short m_usSourceResourceNetID;
     CLuaArguments  m_ArgumentsStore;
     CLuaArguments* m_pArguments;
 };
