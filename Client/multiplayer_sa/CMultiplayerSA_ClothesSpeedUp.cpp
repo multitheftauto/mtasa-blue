@@ -183,10 +183,6 @@ skip:
         // to re-queue. Don't touch loadState here -- let its internal cleanup handle state
         // correctly. ShouldSkipLoadRequestedModels verifies loadState before skipping.
 
-        popad
-        add     esp, 4*1
-        jmp     RETURN_CallCStreamingInfoAddToListB
-
 norequest:
         popad
         add     esp, 4*1
