@@ -15,6 +15,7 @@
 #include "CGameSA.h"
 #include "CRenderWareSA.ShaderMatching.h"
 #include "CRenderWareSA.ShaderSupport.h"
+#include "gamesa_renderware.h"
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -25,6 +26,8 @@ extern CGameSA*        pGame;
 #define ADDR_CClothesBuilder_ConstructTextures_End                   0x05A6520
 #define ADDR_CVehicle_DoHeadLightBeam_RenderPrimitive                0x06E13CD
 #define ADDR_CHeli_SearchLightCone_RenderPrimitive                   0x06C62AD
+#define VAR_CShadows_gpShadowExplosionTex                            0x0C403F4
+#define FAKE_NAME_SEARCHLIGHT_SPOT                                   "shad_searchlight"
 #define ADDR_CWaterCannon_Render_RenderPrimitive                     0x072956B
 
 enum
@@ -36,7 +39,9 @@ enum
     RT_3DNI,
 };
 
-int CRenderWareSA::ms_iRenderingType = 0;
+int        CRenderWareSA::ms_iRenderingType = 0;
+CD3DDUMMY* CRenderWareSA::ms_pNoTextureD3DData = FAKE_D3DTEXTURE_NO_TEXTURE;
+RwTexture* CRenderWareSA::ms_pSearchLightSpotTexture = nullptr;
 
 ////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////
@@ -538,6 +543,153 @@ void CRenderWareSA::SetRenderingClientEntity(CClientEntityBase* pClientEntity, u
 
 ////////////////////////////////////////////////////////////////
 //
+// CRenderWareSA::GetSearchLightSpotTexture
+//
+// The ground spot of a searchlight is drawn by CShadows with the same texture as the
+// light pools of street lamps. Give the searchlights a copy of that texture under a
+// name of their own, so a shader can address the spots without touching the lamps
+// while the spots look exactly as they do in the game.
+//
+////////////////////////////////////////////////////////////////
+RwTexture* CRenderWareSA::GetSearchLightSpotTexture()
+{
+    if (ms_pSearchLightSpotTexture)
+        return ms_pSearchLightSpotTexture;
+
+    RwTexture* pSource = *reinterpret_cast<RwTexture**>(VAR_CShadows_gpShadowExplosionTex);
+    if (!pSource || !pSource->raster || !pSource->raster->renderResource)
+        return nullptr;
+
+    // Read the game texture as plain BGRA rows (the pixels manager also decompresses DXT)
+    CPixelsManagerInterface* pPixelsManager = g_pCore->GetGraphics()->GetPixelsManager();
+    CPixels                  sourcePixels;
+    uint                     uiWidth = 0, uiHeight = 0;
+    if (!pPixelsManager->GetTexturePixels(reinterpret_cast<IDirect3DBaseTexture9*>(pSource->raster->renderResource), sourcePixels) ||
+        !pPixelsManager->GetPixelsSize(sourcePixels, uiWidth, uiHeight) || uiWidth == 0 || uiHeight == 0)
+        return nullptr;
+
+    RwRaster* pRaster = RwRasterCreate(uiWidth, uiHeight, 32, RASTER_TYPE_TEXTURE | RASTER_FORMAT_8888);
+    if (!pRaster)
+        return nullptr;
+
+    if (!RwRasterLock(pRaster, 0, RASTER_LOCK_WRITE) || !pRaster->pixels)
+    {
+        RwRasterDestroy(pRaster);
+        return nullptr;
+    }
+
+    // The sdk struct calls it numLevels, but RenderWare keeps the row stride of the locked raster there
+    const uint uiSourcePitch = uiWidth * sizeof(DWORD);
+    int        iStride = pRaster->numLevels;
+    if (iStride <= 0)
+        iStride = uiSourcePitch;
+    for (uint y = 0; y < uiHeight; y++)
+        memcpy(pRaster->pixels + y * iStride, sourcePixels.GetData() + y * uiSourcePitch, uiSourcePitch);
+    RwRasterUnlock(pRaster);
+
+    RwTexture* pTexture = RwTextureCreate(pRaster);
+    if (!pTexture)
+    {
+        RwRasterDestroy(pRaster);
+        return nullptr;
+    }
+    strncpy(pTexture->name, FAKE_NAME_SEARCHLIGHT_SPOT, RW_TEXTURE_NAME_LENGTH - 1);
+    pTexture->flags = pSource->flags;
+    ms_pSearchLightSpotTexture = pTexture;
+
+    // Make it known to the texture replacer under its own name
+    OnTextureStreamIn(CreateTexInfo(pTexture, FAKE_NAME_SEARCHLIGHT_SPOT, reinterpret_cast<CD3DDUMMY*>(pRaster->renderResource)));
+    return pTexture;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetRenderingSearchLightSpotTexture
+//
+// Give the spot of the element being rendered a texture of its own if its shaders differ
+//
+////////////////////////////////////////////////////////////////
+RwTexture* CRenderWareSA::GetRenderingSearchLightSpotTexture()
+{
+    RwTexture* pSpotTexture = GetSearchLightSpotTexture();
+    if (!pSpotTexture || !m_pRenderingClientEntity)
+        return pSpotTexture;
+
+    STexInfo* pTexInfo = MapFindRef(m_D3DDataTexInfoMap, reinterpret_cast<CD3DDUMMY*>(pSpotTexture->raster->renderResource));
+    if (!pTexInfo)
+        return pSpotTexture;
+
+    const SShaderItemLayers  anyEntity = m_pMatchChannelManager->GetShaderForTexAndEntity(pTexInfo, nullptr, m_iRenderingEntityType)->output;
+    const SShaderItemLayers& thisEntity = m_pMatchChannelManager->GetShaderForTexAndEntity(pTexInfo, m_pRenderingClientEntity, m_iRenderingEntityType)->output;
+    if (thisEntity.pBase == anyEntity.pBase && thisEntity.layerList == anyEntity.layerList)
+        return pSpotTexture;
+
+    SSearchLightSpotTexture* pSpot = nullptr;
+    for (SSearchLightSpotTexture& spot : m_SearchLightSpotTextures)
+    {
+        if (spot.pClientEntity == m_pRenderingClientEntity)
+        {
+            pSpot = &spot;
+            break;
+        }
+        if (!spot.pClientEntity && !pSpot)
+            pSpot = &spot;
+    }
+
+    if (!pSpot)
+    {
+        // Never destroyed: RwTextureDestroy would also destroy the shared raster
+        RwTexture* pTexture = RwTextureCreate(pSpotTexture->raster);
+        if (!pTexture)
+            return pSpotTexture;
+        strncpy(pTexture->name, FAKE_NAME_SEARCHLIGHT_SPOT, RW_TEXTURE_NAME_LENGTH - 1);
+        pTexture->flags = pSpotTexture->flags;
+        m_SearchLightSpotTextures.push_back({pTexture});
+        pSpot = &m_SearchLightSpotTextures.back();
+    }
+
+    pSpot->pClientEntity = m_pRenderingClientEntity;
+    pSpot->iTypeMask = m_iRenderingEntityType;
+    return pSpot->pTexture;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::SetRenderingSearchLightSpot
+//
+// Tag the element of a searchlight spot while CShadows draws it
+//
+////////////////////////////////////////////////////////////////
+bool CRenderWareSA::SetRenderingSearchLightSpot(RwTexture* pTexture)
+{
+    for (const SSearchLightSpotTexture& spot : m_SearchLightSpotTextures)
+    {
+        if (spot.pTexture == pTexture && spot.pClientEntity)
+        {
+            SetRenderingClientEntity(spot.pClientEntity, 0xFFFF, spot.iTypeMask);
+            return true;
+        }
+    }
+    return false;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::ResolveD3DData
+//
+// Draws without a texture are keyed by a fake texture ('unnamed', or 'searchlight' for
+// the helicopter searchlight cones) when doing a 3d model like render
+//
+////////////////////////////////////////////////////////////////
+CD3DDUMMY* CRenderWareSA::ResolveD3DData(CD3DDUMMY* pD3DData)
+{
+    if (pD3DData == nullptr && CRenderWareSA::ms_iRenderingType == RT_NONE)
+        return CRenderWareSA::ms_pNoTextureD3DData;
+    return pD3DData;
+}
+
+////////////////////////////////////////////////////////////////
+//
 // CRenderWareSA::GetAppliedShaderForD3DData
 //
 //
@@ -547,11 +699,7 @@ SShaderItemLayers* CRenderWareSA::GetAppliedShaderForD3DData(CD3DDUMMY* pD3DData
 {
     m_uiReplacementRequestCounter++;
 
-    // If rendering with no texture, and doing an 3d model like render, use the 'unnamed' texinfo
-    if (pD3DData == NULL && CRenderWareSA::ms_iRenderingType == RT_NONE)
-        pD3DData = FAKE_D3DTEXTURE_NO_TEXTURE;
-
-    STexInfo* pTexInfo = MapFindRef(m_D3DDataTexInfoMap, pD3DData);
+    STexInfo* pTexInfo = MapFindRef(m_D3DDataTexInfoMap, ResolveD3DData(pD3DData));
 
     if (!pTexInfo)
     {
@@ -656,6 +804,11 @@ void CRenderWareSA::RemoveClientEntityRefs(CClientEntityBase* pClientEntity)
 {
     TIMING_CHECKPOINT("+RemoveEntityRefs");
     m_pMatchChannelManager->RemoveClientEntityRefs(pClientEntity);
+    for (SSearchLightSpotTexture& spot : m_SearchLightSpotTextures)
+    {
+        if (spot.pClientEntity == pClientEntity)
+            spot.pClientEntity = nullptr;
+    }
     TIMING_CHECKPOINT("-RemoveEntityRefs");
 }
 
@@ -714,6 +867,12 @@ void CRenderWareSA::Initialize()
     {
         // Make a fake texinfo to handle all non-textures
         STexInfo* pTexInfo = CreateTexInfo(FAKE_RWTEXTURE_NO_TEXTURE, FAKE_NAME_NO_TEXTURE, FAKE_D3DTEXTURE_NO_TEXTURE);
+        OnTextureStreamIn(pTexInfo);
+    }
+    if (!MapContains(m_D3DDataTexInfoMap, FAKE_D3DTEXTURE_SEARCHLIGHT))
+    {
+        // Helicopter searchlight cones draw without a texture too, give them a name of their own
+        STexInfo* pTexInfo = CreateTexInfo(FAKE_RWTEXTURE_SEARCHLIGHT, FAKE_NAME_SEARCHLIGHT, FAKE_D3DTEXTURE_SEARCHLIGHT);
         OnTextureStreamIn(pTexInfo);
     }
 }
@@ -916,6 +1075,9 @@ __declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Pre(DWORD dwAddrCall
         dwAddrCalledFrom == ADDR_CWaterCannon_Render_RenderPrimitive)
     {
         CRenderWareSA::ms_iRenderingType = RT_NONE;  // Treat these items like world models
+        // The searchlight cones get a texture name of their own, so a shader can target them without every other untextured draw
+        if (dwAddrCalledFrom == ADDR_CHeli_SearchLightCone_RenderPrimitive)
+            CRenderWareSA::ms_pNoTextureD3DData = FAKE_D3DTEXTURE_SEARCHLIGHT;
     }
     else
     {
@@ -926,6 +1088,7 @@ __declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Pre(DWORD dwAddrCall
 __declspec(noinline) void OnMY_RwIm3DRenderIndexedPrimitive_Post(DWORD dwAddrCalledFrom)
 {
     CRenderWareSA::ms_iRenderingType = RT_NONE;
+    CRenderWareSA::ms_pNoTextureD3DData = FAKE_D3DTEXTURE_NO_TEXTURE;
 }
 
 // Hook info
@@ -1130,6 +1293,71 @@ static void __declspec(naked) HOOK_RwIm2DRenderPrimitive()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CShadows_RenderStoredShadows_Shadow / CShadows_RenderStoredShadows_NextShadow
+//
+// Tag the element of a searchlight spot while CShadows draws it
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+static bool bRenderingSearchLightSpot = false;
+
+__declspec(noinline) void OnMY_CShadows_RenderStoredShadows_Shadow(RwTexture* pTexture)
+{
+    bRenderingSearchLightSpot = pGame->GetRenderWareSA()->SetRenderingSearchLightSpot(pTexture);
+}
+
+__declspec(noinline) void OnMY_CShadows_RenderStoredShadows_NextShadow()
+{
+    if (bRenderingSearchLightSpot)
+        pGame->GetRenderWareSA()->SetRenderingClientEntity(nullptr, 0xFFFF, TYPE_MASK_WORLD);
+    bRenderingSearchLightSpot = false;
+}
+
+// Hook info
+#define HOOKPOS_CShadows_RenderStoredShadows_Shadow  0x070AA10
+#define HOOKSIZE_CShadows_RenderStoredShadows_Shadow 6
+DWORD                         RETURN_CShadows_RenderStoredShadows_Shadow = 0x070AA16;
+static void __declspec(naked) HOOK_CShadows_RenderStoredShadows_Shadow()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        push    dword ptr [ebp+0x0C40454]
+        call    OnMY_CShadows_RenderStoredShadows_Shadow
+        add     esp, 4*1
+        popad
+
+        mov     al, byte ptr [ebp+0x0C40462]
+        jmp     RETURN_CShadows_RenderStoredShadows_Shadow
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_CShadows_RenderStoredShadows_NextShadow  0x070B6BD
+#define HOOKSIZE_CShadows_RenderStoredShadows_NextShadow 11
+DWORD                         RETURN_CShadows_RenderStoredShadows_NextShadow = 0x070B6C8;
+static void __declspec(naked) HOOK_CShadows_RenderStoredShadows_NextShadow()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        call    OnMY_CShadows_RenderStoredShadows_NextShadow
+        popad
+
+        mov     edi, dword ptr [esp+0x64]
+        movzx   ecx, word ptr ds:[0C403DCh]
+        jmp     RETURN_CShadows_RenderStoredShadows_NextShadow
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // Setup hooks
 //
 //////////////////////////////////////////////////////////////////////////////////////////
@@ -1142,4 +1370,6 @@ void CRenderWareSA::StaticSetHooks()
     EZHookInstall(RwIm3DRenderPrimitive);
     EZHookInstall(RwIm2DRenderIndexedPrimitive);
     EZHookInstall(RwIm2DRenderPrimitive);
+    EZHookInstall(CShadows_RenderStoredShadows_Shadow);
+    EZHookInstall(CShadows_RenderStoredShadows_NextShadow);
 }

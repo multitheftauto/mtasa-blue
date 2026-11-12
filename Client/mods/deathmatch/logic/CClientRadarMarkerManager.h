@@ -14,6 +14,9 @@ class CClientRadarMarkerManager;
 
 #include "CClientRadarMarker.h"
 #include <list>
+#include <unordered_map>
+
+class CMarker;
 
 class CClientRadarMarkerManager
 {
@@ -38,9 +41,13 @@ public:
     bool        Exists(CClientRadarMarker* pMarker);
     static bool IsValidIcon(unsigned long ulIcon) noexcept { return ulIcon <= RADAR_MARKER_LIMIT; }
 
+    CClientRadarMarker* GetMarkerByGameMarker(const CMarker* pGameMarker) const;
+
 private:
     void AddToList(CClientRadarMarker* pMarker) { m_Markers.push_back(pMarker); };
     void RemoveFromList(CClientRadarMarker* pMarker);
+    void RegisterGameMarker(const CMarker* pGameMarker, CClientRadarMarker* pMarker) { m_GameMarkerMap[pGameMarker] = pMarker; }
+    void UnregisterGameMarker(const CMarker* pGameMarker) { m_GameMarkerMap.erase(pGameMarker); }
 
     void        OrderMarkers();
     static bool CompareOrderingIndex(CClientRadarMarker* p1, CClientRadarMarker* p2);
@@ -48,6 +55,8 @@ private:
     class CClientManager*          m_pManager;
     bool                           m_bCanRemoveFromList;
     std::list<CClientRadarMarker*> m_Markers;
+
+    std::unordered_map<const CMarker*, CClientRadarMarker*> m_GameMarkerMap;
 
     unsigned short m_usDimension;
     bool           m_bOrderOnPulse;
