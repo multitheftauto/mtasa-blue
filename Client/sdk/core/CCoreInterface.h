@@ -126,7 +126,8 @@ public:
     virtual void ShowMessageBox(const char* szTitle, const char* szText, unsigned int uiFlags, GUI_CALLBACK* ResponseHandler = NULL) = 0;
     virtual void RemoveMessageBox(bool bNextFrame = false) = 0;
     virtual void ShowErrorMessageBox(const SString& strTitle, SString strMessage, const SString& strTroubleLink = "") = 0;
-    virtual void ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink = "", bool bLinkRequiresErrorCode = false) = 0;
+    virtual void ShowNetErrorMessageBox(const SString& strTitle, SString strMessage, SString strTroubleLink = "", bool bLinkRequiresErrorCode = false,
+                                        bool bAllowReconnect = false) = 0;
     virtual void HideMainMenu() = 0;
     virtual HWND GetHookedWindow() = 0;
     virtual bool IsFocused() = 0;
