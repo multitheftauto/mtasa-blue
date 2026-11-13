@@ -5890,21 +5890,23 @@ void CClientPed::SetDoingGangDriveby(bool bDriveby)
 
 bool CClientPed::GetRunningAnimationName(SString& strBlockName, SString& strAnimName)
 {
-    if (IsRunningAnimation())
+    if (!IsRunningAnimation())
+        return false;
+
+    if (m_bisCurrentAnimationCustom)
     {
-        if (IsCustomAnimationPlaying())
-        {
-            strBlockName = GetNextAnimationCustomBlockName();
-            strAnimName = GetNextAnimationCustomName();
-        }
-        else
-        {
-            strBlockName = GetAnimationBlock()->GetName();
-            strAnimName = m_AnimationCache.strName;
-        }
+        strBlockName = GetNextAnimationCustomBlockName();
+        strAnimName = GetNextAnimationCustomName();
         return true;
     }
-    return false;
+
+    auto pBlock = GetAnimationBlock();
+    if (!pBlock)
+        return false;
+
+    strBlockName = pBlock->GetName();
+    strAnimName = m_AnimationCache.strName;
+    return true;
 }
 
 bool CClientPed::IsRunningAnimation()
