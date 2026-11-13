@@ -115,7 +115,7 @@ public:
     LUA_DECLARE(SetPedStat);
     static bool SetPedEnterVehicle(CClientPed* pPed, std::optional<CClientVehicle*> pOptVehicle,
                                    std::optional<std::variant<bool, unsigned int>> seatOrPassenger);
-    static bool SetPedExitVehicle(CClientPed* pPed);
+    static bool SetPedExitVehicle(CClientPed* pPed, std::optional<bool> force);
     static bool IsPedBleeding(CClientPed* ped);
     static bool SetPedBleeding(CClientPed* ped, bool bleeding);
 

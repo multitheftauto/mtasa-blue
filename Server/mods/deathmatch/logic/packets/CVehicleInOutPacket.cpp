@@ -124,6 +124,9 @@ bool CVehicleInOutPacket::Read(NetBitStreamInterface& BitStream)
     }
     else if (m_ucAction == CGame::VEHICLE_REQUEST_OUT)
     {
+        if (BitStream.Can(eBitStreamVersion::PedExitVehicleForce))
+            BitStream.ReadBit(m_forceExit);
+
         m_ucDoor = 0;
         if (!BitStream.ReadBits(&m_ucDoor, 2))
             m_ucDoor = 0xFF;
@@ -172,6 +175,9 @@ bool CVehicleInOutPacket::Write(NetBitStreamInterface& BitStream) const
 
         if (m_ucAction == CGame::VEHICLE_REQUEST_OUT_CONFIRMED)
         {
+            if (BitStream.Can(eBitStreamVersion::PedExitVehicleForce))
+                BitStream.WriteBit(m_forceExit);
+
             if (m_ucDoor < 4)
                 BitStream.WriteBits(&m_ucDoor, 2);
         }
