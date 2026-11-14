@@ -383,6 +383,49 @@ static std::atomic<uint>                                   ms_uiInvalidParameter
 static std::atomic<bool>                                   ms_bInvalidParameterWarningStored{false};
 static std::atomic<bool>                                   ms_bFallbackStackLogged{false};
 static HANDLE                                              ms_hCrashDialogProcess = nullptr;
+static DWORD                                               ms_crashDialogProcessId = 0;
+
+namespace
+{
+    struct ProcessWindowSearchContext
+    {
+        DWORD targetPid{0};
+        HWND  foundWindow{nullptr};
+    };
+
+    static BOOL CALLBACK EnumWindowsForProcess(HWND hwnd, LPARAM lParam)
+    {
+        auto* context = reinterpret_cast<ProcessWindowSearchContext*>(lParam);
+        if (!context)
+            return FALSE;
+
+        DWORD windowPid = 0;
+        GetWindowThreadProcessId(hwnd, &windowPid);
+        if (windowPid == context->targetPid && IsWindowVisible(hwnd))
+        {
+            if (GetAncestor(hwnd, GA_ROOT) == hwnd)
+            {
+                context->foundWindow = hwnd;
+                return FALSE;
+            }
+        }
+        return TRUE;
+    }
+
+    // Locate crash dialog by process ID to prevent localization mismatches on non-English locales
+    [[nodiscard]] static HWND FindCrashDialogWindow(DWORD processId = 0)
+    {
+        if (processId != 0)
+        {
+            ProcessWindowSearchContext context{processId, nullptr};
+            EnumWindows(EnumWindowsForProcess, reinterpret_cast<LPARAM>(&context));
+            if (context.foundWindow != nullptr && IsWindow(context.foundWindow))
+                return context.foundWindow;
+        }
+
+        return FindWindowW(nullptr, L"MTA: San Andreas has encountered a problem");
+    }
+}  // namespace
 
 [[nodiscard]] static std::array<SString, 2> BuildCrashDialogCandidates()
 {
@@ -1110,14 +1153,36 @@ namespace
     }
 }  // namespace
 
+using DumpSectionCallback = void (*)(CBuffer&);
+
+static bool SafeInvokeSectionGenerator(DumpSectionCallback generator, CBuffer& buffer)
+{
+    // Wrap diagnostic generator in SEH to prevent secondary memory faults from aborting crash handling
+    __try
+    {
+        generator(buffer);
+        return true;
+    }
+    __except (EXCEPTION_EXECUTE_HANDLER)
+    {
+        return false;
+    }
+}
+
 template <typename SectionGenerator>
 void AppendDumpSection(const SString& targetPath, const char* tryLabel, const char* successLabel, DWORD tagBegin, DWORD tagEnd, SectionGenerator&& generator)
 {
     SetApplicationSetting("diagnostics", "last-dump-extra", tryLabel);
     CBuffer buffer;
-    std::forward<SectionGenerator>(generator)(buffer);
-    CCrashDumpWriter::AppendToDumpFile(targetPath, buffer, tagBegin, tagEnd);
-    SetApplicationSetting("diagnostics", "last-dump-extra", successLabel);
+    if (SafeInvokeSectionGenerator(generator, buffer))
+    {
+        CCrashDumpWriter::AppendToDumpFile(targetPath, buffer, tagBegin, tagEnd);
+        SetApplicationSetting("diagnostics", "last-dump-extra", successLabel);
+    }
+    else
+    {
+        SetApplicationSetting("diagnostics", "last-dump-extra", "generator-faulted");
+    }
 }
 
 using MINIDUMPWRITEDUMP = BOOL(WINAPI*)(HANDLE hProcess, DWORD dwPid, HANDLE hFile, MINIDUMP_TYPE DumpType,
@@ -1635,7 +1700,7 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         HWND hDialogWindow = nullptr;
         for (std::size_t attempts = 0; attempts < MAX_WINDOW_POLL_ATTEMPTS && hDialogWindow == nullptr; ++attempts)
         {
-            hDialogWindow = FindWindowW(nullptr, L"MTA: San Andreas has encountered a problem");
+            hDialogWindow = FindCrashDialogWindow(ms_crashDialogProcessId);
             if (hDialogWindow == nullptr)
                 Sleep(Milliseconds(WINDOW_POLL_TIMEOUT));
         }
@@ -1661,8 +1726,17 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
     }
     else if (!crashDialogShown)
     {
-        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Crash dialog was not shown; skipping dialog wait\n");
+        SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Crash dialog was not shown; displaying emergency notice\n");
         Sleep(Milliseconds(PROCESS_WAIT_TIMEOUT));
+
+        const wchar_t* emergencyMessage =
+            L"MTA: San Andreas has encountered an unhandled error.\n\n"
+            L"The crash report dialog could not be launched.\n"
+            L"Diagnostic details have been saved to:\n"
+            L"MTA San Andreas\\mta\\core.log\n\n"
+            L"The game will now close.";
+
+        MessageBoxW(nullptr, emergencyMessage, L"MTA: San Andreas - Fatal Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_SETFOREGROUND | MB_TOPMOST);
     }
     else if (!crashArtifactsGenerated)
     {
@@ -2813,7 +2887,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
             HWND hDialogWindow = nullptr;
             for (std::size_t attempts = 0; attempts < MAX_WINDOW_POLL_ATTEMPTS && hDialogWindow == nullptr; ++attempts)
             {
-                hDialogWindow = FindWindowW(nullptr, L"MTA: San Andreas has encountered a problem");
+                hDialogWindow = FindCrashDialogWindow(processInfo.dwProcessId);
                 if (hDialogWindow == nullptr)
                     Sleep(Milliseconds(WINDOW_POLL_TIMEOUT));
             }
@@ -2888,6 +2962,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
             if (windowFound)
             {
                 ms_hCrashDialogProcess = processHandle.release();
+                ms_crashDialogProcessId = processInfo.dwProcessId;
                 threadHandle.reset();
                 dialogLaunched = true;
                 break;
@@ -2916,7 +2991,7 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
             HWND hDialogWindow = nullptr;
             for (std::size_t attempts = 0; attempts < SHELL_EXEC_POLL_ATTEMPTS && hDialogWindow == nullptr; attempts++)
             {
-                hDialogWindow = FindWindowW(nullptr, L"MTA: San Andreas has encountered a problem");
+                hDialogWindow = FindCrashDialogWindow();
                 if (hDialogWindow == nullptr)
                     Sleep(Milliseconds(WINDOW_POLL_TIMEOUT));
             }
@@ -3086,11 +3161,18 @@ namespace
                 iPtr = 0x5DA106;
                 break;
         }
-        if (iPtr != 0)
-            return *reinterpret_cast<int*>(iPtr);
+        __try
+        {
+            if (iPtr != 0)
+                return *reinterpret_cast<int*>(iPtr);
 
-        if (cPtr != 0)
-            return *reinterpret_cast<char*>(cPtr);
+            if (cPtr != 0)
+                return *reinterpret_cast<char*>(cPtr);
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            return 0;
+        }
 
         return 0;
     }
@@ -3173,21 +3255,28 @@ namespace
                 return -1;
         }
 
-        int iOut = -2;
-        if (*(DWORD*)dwThis != 0)
+        int output = -2;
+        __try
         {
-            // clang-format off
-            _asm
+            if (*reinterpret_cast<DWORD*>(dwThis) != 0)
             {
-                mov     ecx, dwThis
-                mov     ecx, [ecx]
-                call    dwFunc
-                mov     iOut, eax
+                // clang-format off
+                _asm
+                {
+                    mov     ecx, dwThis
+                    mov     ecx, [ecx]
+                    call    dwFunc
+                    mov     output, eax
+                }
+                // clang-format on
             }
-            // clang-format on
+        }
+        __except (EXCEPTION_EXECUTE_HANDLER)
+        {
+            output = -3;
         }
 
-        return iOut;
+        return output;
     }
 }  // namespace
 
