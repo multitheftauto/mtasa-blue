@@ -1361,7 +1361,6 @@ void CMultiplayerSA::InitHooks_FrameRateFixes()
     // GitHub Issue #602
     MemPut(0x6811E9, &kOriginalTimeStep);
     MemPut(0x68128A, &kOriginalTimeStep);
-    MemPut(0x68131B, &kOriginalTimeStep);
 
     // CTimer::m_FrameCounter fixes
     EZHookInstall(CTimer__Update);
