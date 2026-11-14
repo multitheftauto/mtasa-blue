@@ -1920,7 +1920,7 @@ struct SFunBugsStateSync : public ISyncStructure
 {
     enum
     {
-        BITCOUNT = 10
+        BITCOUNT = 11
     };
 
     bool Read(NetBitStreamInterface& bitStream)
@@ -1957,6 +1957,7 @@ struct SFunBugsStateSync : public ISyncStructure
         bool bBadDrivebyHitboxes : 1;
         bool bQuickStand : 1;
         bool vehicleRapidStop : 1;
+        bool bFastWeaponStrafe : 1;
     } data;
 
     // Add new ones in separate structs
