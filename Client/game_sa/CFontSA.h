@@ -105,4 +105,7 @@ public:
     static float GetDropdownShadow() { return static_cast<float>(*reinterpret_cast<std::uint8_t*>(VAR_CFont_Shadow)); }
 
     static bool GetProportional() { return *reinterpret_cast<bool*>(VAR_CFont_Proportional); }
+
+    static void StaticSetHooks();
+    static void ApplyHDTextureFiltering();
 };
