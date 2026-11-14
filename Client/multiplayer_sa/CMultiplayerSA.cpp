@@ -2940,6 +2940,13 @@ static void __declspec(naked) HOOK_CStreaming_Update_Caller()
     // clang-format on
 }
 
+// Separate function; the naked hook below has no room for the local variable
+static void DrawCrossHairsOfFollowedPed()
+{
+    if (CCamera* const camera = pGameInterface->GetCamera())
+        camera->DrawSpectatedPedCrossHairs();
+}
+
 static void __declspec(naked) HOOK_CHud_Draw_Caller()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
@@ -2994,6 +3001,9 @@ static void __declspec(naked) HOOK_CHud_Draw_Caller()
             }
             // clang-format on
         }
+
+        // CHud::Draw is not called here, which drops the crosshair of the followed ped
+        DrawCrossHairsOfFollowedPed();
 
         /*if ( activeEntityForStreaming )
         {
