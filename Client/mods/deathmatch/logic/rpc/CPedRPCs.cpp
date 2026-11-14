@@ -310,8 +310,8 @@ void CPedRPCs::SetPedAnimationProgress(CClientEntity* pSource, NetBitStreamInter
                     if (pAnimAssociation)
                     {
                         pAnimAssociation->SetCurrentProgress(fProgress);
-                        pPed->m_AnimationCache.progress = fProgress;
                     }
+                    pPed->m_AnimationCache.progress = fProgress;
                 }
             }
             else
@@ -338,8 +338,8 @@ void CPedRPCs::SetPedAnimationSpeed(CClientEntity* pSource, NetBitStreamInterfac
                 if (pAnimAssociation)
                 {
                     pAnimAssociation->SetCurrentSpeed(fSpeed);
-                    pPed->m_AnimationCache.speed = fSpeed;
                 }
+                pPed->m_AnimationCache.speed = fSpeed;
             }
         }
     }
