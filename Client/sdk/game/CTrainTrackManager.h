@@ -1,0 +1,32 @@
+/*****************************************************************************
+ *
+ *  PROJECT:     Multi Theft Auto
+ *  LICENSE:     See LICENSE in the top level directory
+ *  FILE:        sdk/game/CTrainTrackManager.h
+ *  PURPOSE:     Train track manager interface
+ *
+ *  Multi Theft Auto is available from https://www.multitheftauto.com/
+ *
+ *****************************************************************************/
+
+#pragma once
+
+#include "CTrainTrack.h"
+
+class CTrainTrackManager
+{
+public:
+    // Track IDs below this are the game's own 4 built-in tracks (0-3); 255 means "no track"
+    static constexpr std::uint8_t FIRST_CUSTOM_TRACK_ID = 4;
+
+    virtual ~CTrainTrackManager() = default;
+
+    // Returns nullptr if there are no free track ID slots left. Every track is a loop, because the
+    // train code wraps a train's rail distance at the track length rather than stopping it.
+    virtual CTrainTrack* CreateTrainTrack(const std::vector<CVector>& nodePositions) = 0;
+    virtual void         DestroyTrainTrack(std::uint8_t trackID) = 0;
+
+    // Length of any track, built-in or custom, read from the arrays the game's train code uses.
+    // Returns 0 for a track ID that isn't in use, including the 0xFF "no track" value.
+    virtual float GetTrackLength(std::uint8_t trackID) const noexcept = 0;
+};

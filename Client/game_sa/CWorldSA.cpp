@@ -16,6 +16,7 @@
 #include "CGameSA.h"
 #include "CPoolsSA.h"
 #include "CWorldSA.h"
+#include "CTrainTrackManagerSA.h"
 #include "CColModelSA.h"
 #include "gamesa_renderware.h"
 #include "CCollisionSA.h"
@@ -772,22 +773,24 @@ void CWorldSA::FindWorldPositionForRailTrackPosition(float fRailTrackPosition, i
 int CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutTrackId, float& fOutRailDistance)
 {
     // Original function @ 0x6F7550
-    int           iNodeId = -1;
-    float         fMinDistance = 99999.898f;
-    int*          aNumTrackNodes = (int*)ARRAY_NumRailTrackNodes;
-    SRailNodeSA** aTrackNodes = (SRailNodeSA**)ARRAY_RailTrackNodePointers;
-    uchar         ucDesiredTrackId = ucOutTrackId;
+    int   iNodeId = -1;
+    float fMinDistance = 99999.898f;
+    // 0xFF asks for whichever track is closest; anything else pins the search to that one track
+    const uchar ucDesiredTrackId = ucOutTrackId;
 
-    if (ucDesiredTrackId >= NUM_RAILTRACKS)
-        ucDesiredTrackId = 0xFF;
-
-    for (uchar ucTrackId = 0; ucTrackId < NUM_RAILTRACKS; ++ucTrackId)
+    // Custom tracks are searched alongside the built-in ones, so a train spawned next to one lands
+    // on it instead of being dragged off to the nearest default track
+    for (uchar ucTrackId = 0; ucTrackId < CTrainTrackManagerSA::MAX_TRACKS; ++ucTrackId)
     {
-        if ((ucDesiredTrackId == 0xFF || ucTrackId == ucDesiredTrackId) && aNumTrackNodes[ucTrackId] > 0)
+        // Node data lives in the relocated arrays, not the game's own (see CTrainTrackManagerSA)
+        const std::int32_t iNumTrackNodes = CTrainTrackManagerSA::GetTrackNodeCount(ucTrackId);
+        const SRailNodeSA* pTrackNodes = CTrainTrackManagerSA::GetTrackNodes(ucTrackId);
+
+        if ((ucDesiredTrackId == 0xFF || ucTrackId == ucDesiredTrackId) && pTrackNodes && iNumTrackNodes > 0)
         {
-            for (int i = 0; i < aNumTrackNodes[ucTrackId]; ++i)
+            for (int i = 0; i < iNumTrackNodes; ++i)
             {
-                SRailNodeSA& railNode = aTrackNodes[ucTrackId][i];
+                const SRailNodeSA& railNode = pTrackNodes[i];
 
                 float fDistance = sqrtf(powf(vecPosition.fZ - railNode.sZ * 0.125f, 2) + powf(vecPosition.fY - railNode.sY * 0.125f, 2) +
                                         powf(vecPosition.fX - railNode.sX * 0.125f, 2));
@@ -804,7 +807,8 @@ int CWorldSA::FindClosestRailTrackNode(const CVector& vecPosition, uchar& ucOutT
     // Read rail distance
     if (iNodeId != -1)
     {
-        fOutRailDistance = aTrackNodes[ucOutTrackId][iNodeId].sRailDistance * 3.33333334f;
+        if (const SRailNodeSA* pTrackNodes = CTrainTrackManagerSA::GetTrackNodes(ucOutTrackId))
+            fOutRailDistance = pTrackNodes[iNodeId].sRailDistance * 3.33333334f;
     }
 
     return iNodeId;
