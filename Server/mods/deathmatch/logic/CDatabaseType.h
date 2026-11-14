@@ -76,3 +76,10 @@ CDatabaseConnection* NewDatabaseConnectionSqlite(CDatabaseType* pManager, const 
 CDatabaseType* NewDatabaseTypeMySql();
 typedef CDatabaseConnection*(NewDatabaseConnectionMySql_t)(CDatabaseType * pManager, const SString& strHost, const SString& strUsername,
                                                            const SString& strPassword, const SString& strOptions);
+
+//
+// Create interfaces for postgresql (connection code is in the dbconpg library)
+//
+CDatabaseType* NewDatabaseTypePostgreSql();
+typedef CDatabaseConnection*(NewDatabaseConnectionPostgreSql_t)(CDatabaseType * pManager, const SString& strHost, const SString& strUsername,
+                                                                const SString& strPassword, const SString& strOptions);

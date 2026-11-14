@@ -205,6 +205,25 @@ workspace "MTASA"
 		group "Server"
 		include "Server/core"
 		include "Server/dbconmy"
+
+		-- PostgreSQL support (dbConnect "postgresql"). Windows uses the libpq in vendor/libpq.
+		-- Elsewhere it needs the system libpq headers (libpq-dev / brew install libpq), so it is
+		-- skipped where they are missing instead of breaking the whole build.
+		if os.target() == "windows" then
+			include "Server/dbconpg"
+		else
+			DBCONPG_LIBPQ_INCLUDE_DIR = os.findheader("libpq-fe.h", {
+				"/usr/include/postgresql",
+				"/usr/local/include",
+				"/usr/local/opt/libpq/include",
+				"/opt/homebrew/opt/libpq/include",
+			})
+			if DBCONPG_LIBPQ_INCLUDE_DIR then
+				include "Server/dbconpg"
+			else
+				print("libpq-fe.h not found: building without PostgreSQL support (Server/dbconpg)")
+			end
+		end
 		include "Server/launcher"
 		include "Server/mods/deathmatch"
 		include "Server/sdk"

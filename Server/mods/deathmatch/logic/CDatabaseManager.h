@@ -19,6 +19,15 @@
 #define DB_SQLITE_QUEUE_NAME_INTERNAL "sqlite internal"
 #define DB_SQLITE_QUEUE_NAME_DEFAULT  "sqlite"  // Note: MySql default queue name is the host string
 
+// Network connections where dbConnect and destroyElement don't wait on the main thread.
+// PostgreSQL only for now; the other types keep their long-standing blocking behaviour.
+bool IsAsyncDbDisconnect(const SString& strType);
+// dbConnect(..., "async_connect=1"): return the connection element at once and connect in the
+// background. A failed connect is logged, and every query on it fails with the connect error.
+bool IsAsyncDbConnect(const SString& strType, const SString& strOptions);
+// Same, from a CONNECT job's data ("type\1host\1user\1pass\1options")
+bool IsAsyncDbConnectCommand(const SString& strCommandData);
+
 class CDatabaseJobQueue;
 typedef uint            SDbConnectionId;
 typedef intptr_t        SDbJobId;
