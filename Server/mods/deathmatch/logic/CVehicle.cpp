@@ -80,7 +80,8 @@ CVehicle::CVehicle(CVehicleManager* pVehicleManager, CElement* pParent, unsigned
     m_fTrainPosition = 0.0f;
     m_bTaxiLightState = false;
     m_bTrainDirection = false;
-    m_HeadLightColor = SColorRGBA(255, 255, 255, 255);
+    m_headlightColors[0] = SColorRGBA(255, 255, 255, 255);
+    m_headlightColors[1] = SColorRGBA(255, 255, 255, 255);
     m_bHeliSearchLightVisible = false;
     m_bCollisionsEnabled = true;
     m_bHandlingChanged = false;
@@ -342,11 +343,12 @@ bool CVehicle::ReadSpecialData(const int iLine)
     if (GetCustomDataString("headLightColor", szTemp, 64, true))
     {
         // Convert it to RGBA
-        if (!XMLColorToInt(szTemp, m_HeadLightColor.R, m_HeadLightColor.G, m_HeadLightColor.B, m_HeadLightColor.A))
+        if (!XMLColorToInt(szTemp, m_headlightColors[0].R, m_headlightColors[0].G, m_headlightColors[0].B, m_headlightColors[0].A))
         {
             CLogger::ErrorPrintf("Bad 'headLightColor' value specified in <vehicle> (line %u)\n", iLine);
             return false;
         }
+        m_headlightColors[1] = m_headlightColors[0];
     }
 
     // Grab the "paintjob" data
