@@ -44,6 +44,14 @@ public:
     LUA_DECLARE(GetY);
     LUA_DECLARE(GetZ);
 
+    LUA_DECLARE(InPlaceSet);
+    LUA_DECLARE(InPlaceAdd);
+    LUA_DECLARE(InPlaceSub);
+    LUA_DECLARE(InPlaceMul);
+    LUA_DECLARE(InPlaceDiv);
+    LUA_DECLARE(InPlaceAddScaled);
+    LUA_DECLARE(InPlaceSetCross);
+
     static std::variant<CVector, bool> IntersectsSegmentTriangle(CVector origin, CVector segmentDir, CVector triVert0, CVector triVert1, CVector triVert2);
 
     LUA_DECLARE(Add);
