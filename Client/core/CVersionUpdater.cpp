@@ -15,6 +15,7 @@
 #include "CNewsBrowser.h"
 #include "CFilePathTranslator.h"
 #include "SharedUtil.Thread.h"
+#include "../loader/Main.h"
 #include <charconv>
 
 ///////////////////////////////////////////////////////////////
@@ -564,6 +565,21 @@ void CVersionUpdater::DoPulse()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::InitiateUpdate(const SString& strType, const SString& strData, const SString& strHost)
 {
+    // Disable server-initiated updates for secondary client
+    // TODO: or when secondary client is running
+    if (g_pCore->IsSecondaryClient())
+        return;
+
+#ifdef MTA_CL2
+    // Don't allow update if CL2 is running
+    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, MTA_GUID_CL2);
+    if (hCL2Mutex)
+    {
+        CloseHandle(hCL2Mutex);
+        return;
+    }
+#endif
+
     if (strType == "Mandatory")
     {
         CCore::GetSingleton().RemoveMessageBox();
@@ -615,6 +631,24 @@ void CVersionUpdater::InitiateDataFilesFix()
 ///////////////////////////////////////////////////////////////
 void CVersionUpdater::InitiateManualCheck()
 {
+    // Disable update checking for secondary client
+    if (CCore::GetSingleton().IsSecondaryClient())
+    {
+        CCore::GetSingleton().ShowMessageBox(_("Information"), _("Update checking is disabled in secondary client"), MB_BUTTON_OK | MB_ICON_INFO);
+        return;
+    }
+
+#ifdef MTA_CL2
+    // Don't allow update if CL2 is running
+    HANDLE hCL2Mutex = OpenMutexA(SYNCHRONIZE, FALSE, MTA_GUID_CL2);
+    if (hCL2Mutex)
+    {
+        CloseHandle(hCL2Mutex);
+        CCore::GetSingleton().ShowMessageBox(_("Information"), _("Can't check for updates while secondary client is running"), MB_BUTTON_OK | MB_ICON_INFO);
+        return;
+    }
+#endif
+
     if (GetQuestionBox().IsVisible())
     {
         // Bring to the front
