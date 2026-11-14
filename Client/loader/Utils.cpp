@@ -25,6 +25,7 @@
 #include <wintrust.h>
 #include <version.h>
 #include <windows.h>
+#include <restartmanager.h>
 #pragma comment(lib, "wintrust")
 
 namespace fs = std::filesystem;
@@ -1365,24 +1366,27 @@ void UpdateMTAVersionApplicationSetting(bool bQuiet)
     HMODULE hModule = NULL;
     bool    bFreeModule = false;
 
-    const SString strInstallPath = GetInstallPathForLauncher();
-    if (SharedUtil::IsUsableMtasaInstallRoot(strInstallPath))
+    if (!SharedUtil::IsTemporaryUpdateLaunchPath(GetLaunchPath()))
     {
-        hModule = LoadVersionModule(strInstallPath, dwLastError);
-        bFreeModule = hModule != NULL;
-    }
-
-    // GetInstallPathForLauncher returns empty when running from a temp update directory and no
-    // usable non-temp install root could be resolved. GetMTASAPath consults SetMTASABaseDirOverride
-    // (which the install manager populates from the sequencer-carried INSTALL_ROOT in the far branch),
-    // so this attempt covers the recovered far-update case before falling back to the launch dir.
-    if (!hModule)
-    {
-        const SString strBaseDirPath = GetMTASAPath();
-        if (SharedUtil::IsUsableMtasaInstallRoot(strBaseDirPath) && !strBaseDirPath.CompareI(strInstallPath))
+        const SString strInstallPath = GetInstallPathForLauncher();
+        if (SharedUtil::IsUsableMtasaInstallRoot(strInstallPath))
         {
-            hModule = LoadVersionModule(strBaseDirPath, dwLastError);
+            hModule = LoadVersionModule(strInstallPath, dwLastError);
             bFreeModule = hModule != NULL;
+        }
+
+        // GetInstallPathForLauncher returns empty when running from a temp update directory and no
+        // usable non-temp install root could be resolved. GetMTASAPath consults SetMTASABaseDirOverride
+        // (which the install manager populates from the sequencer-carried INSTALL_ROOT in the far branch),
+        // so this attempt covers the recovered far-update case before falling back to the launch dir.
+        if (!hModule)
+        {
+            const SString strBaseDirPath = GetMTASAPath();
+            if (SharedUtil::IsUsableMtasaInstallRoot(strBaseDirPath) && !strBaseDirPath.CompareI(strInstallPath))
+            {
+                hModule = LoadVersionModule(strBaseDirPath, dwLastError);
+                bFreeModule = hModule != NULL;
+            }
         }
     }
 
@@ -1503,29 +1507,24 @@ bool Is32bitProcess(DWORD processID)
 ///////////////////////////////////////////////////////////////////////////
 bool TerminateProcess(DWORD dwProcessID, uint uiExitCode)
 {
-    bool success = false;
+    if (dwProcessID == 0 || dwProcessID == GetCurrentProcessId())
+        return false;
 
-    if (HMODULE handle = GetLibraryHandle("kernel32.dll"); handle)
+    bool   success = false;
+    HANDLE processHandle = OpenProcess(PROCESS_TERMINATE, FALSE, dwProcessID);
+    if (processHandle)
     {
-        using Signature = bool (*)(DWORD, UINT);
-        static auto NtTerminateProcess_ = reinterpret_cast<Signature>(static_cast<void*>(GetProcAddress(handle, "NtTerminateProcess")));
-
-        if (NtTerminateProcess_)
-        {
-            success = NtTerminateProcess_(dwProcessID, uiExitCode);
-            AddReportLog(8070, SString("TerminateProcess %d result: %d", dwProcessID, success));
-        }
+        success = ::TerminateProcess(processHandle, uiExitCode) != FALSE;
+        CloseHandle(processHandle);
     }
 
+    // Elevated target processes reject PROCESS_TERMINATE from unelevated callers.
     if (!success)
     {
-        if (HANDLE handle = OpenProcess(PROCESS_TERMINATE, 0, dwProcessID); handle)
-        {
-            success = TerminateProcess(handle, uiExitCode);
-            CloseHandle(handle);
-        }
+        success = SharedUtil::ShellExecuteBlocking("runas", "taskkill.exe", SString("/F /PID %lu", dwProcessID), "", SW_HIDE);
     }
 
+    AddReportLog(8070, SString("TerminateProcess %lu result: %d", dwProcessID, success));
     return success;
 }
 
@@ -2388,6 +2387,16 @@ bool WriteCompatibilityEntries(const WString& strProgName, const WString& strSub
     return bResult;
 }
 
+#define _RmStartSession      __RmStartSession()
+#define _RmRegisterResources __RmRegisterResources()
+#define _RmGetList           __RmGetList()
+#define _RmEndSession        __RmEndSession()
+
+DEFFUNCTION("rstrtmgr", RmStartSession)
+DEFFUNCTION("rstrtmgr", RmRegisterResources)
+DEFFUNCTION("rstrtmgr", RmGetList)
+DEFFUNCTION("rstrtmgr", RmEndSession)
+
 //////////////////////////////////////////////////////////
 //
 // GetProcessListUsingFile
@@ -2397,6 +2406,68 @@ bool WriteCompatibilityEntries(const WString& strProgName, const WString& strSub
 //////////////////////////////////////////////////////////
 std::vector<DWORD> GetProcessListUsingFile(const WString& filePath)
 {
+    if (_RmStartSession && _RmRegisterResources && _RmGetList && _RmEndSession)
+    {
+        DWORD sessionHandle = 0;
+        WCHAR sessionKey[CCH_RM_SESSION_KEY + 1] = {0};
+
+        if (_RmStartSession(&sessionHandle, 0, sessionKey) == ERROR_SUCCESS)
+        {
+            LPCWSTR resourceList[] = {filePath.c_str()};
+            if (_RmRegisterResources(sessionHandle, 1, resourceList, 0, nullptr, 0, nullptr) == ERROR_SUCCESS)
+            {
+                std::vector<RM_PROCESS_INFO> processInfoList;
+                bool                         querySucceeded = false;
+
+                for (;;)
+                {
+                    DWORD rebootReasons = 0;
+                    UINT  procInfoNeeded = 0;
+                    auto  procInfoSize = static_cast<UINT>(processInfoList.size());
+
+                    DWORD status =
+                        _RmGetList(sessionHandle, &procInfoNeeded, &procInfoSize, processInfoList.empty() ? nullptr : processInfoList.data(), &rebootReasons);
+
+                    if (status == ERROR_MORE_DATA)
+                    {
+                        processInfoList.resize(procInfoNeeded);
+                    }
+                    else if (status == ERROR_SUCCESS)
+                    {
+                        processInfoList.resize(procInfoSize);
+                        querySucceeded = true;
+                        break;
+                    }
+                    else
+                    {
+                        break;
+                    }
+                }
+
+                _RmEndSession(sessionHandle);
+
+                if (querySucceeded)
+                {
+                    std::vector<DWORD> result;
+                    result.reserve(processInfoList.size());
+
+                    for (const auto& procInfo : processInfoList)
+                    {
+                        DWORD processId = procInfo.Process.dwProcessId;
+                        if (processId && std::find(result.begin(), result.end(), processId) == result.end())
+                            result.push_back(processId);
+                    }
+
+                    return result;
+                }
+            }
+            else
+            {
+                _RmEndSession(sessionHandle);
+            }
+        }
+    }
+
     if (!_NtQueryInformationFile)
         return {};
 
@@ -2463,7 +2534,7 @@ std::vector<DWORD> GetProcessListUsingFile(const WString& filePath)
         {
             auto processId = static_cast<DWORD>(fileInfo->ProcessIdList[i]);
 
-            if (processId)
+            if (processId && std::find(result.begin(), result.end(), processId) == result.end())
                 result.emplace_back(processId);
         }
     }
