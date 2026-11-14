@@ -476,6 +476,28 @@ void CGameSA::Reset()
         // Reset building pool to default capacity if a server enlarged it
         if (m_Pools->GetBuildingsPool().GetSize() != MAX_BUILDINGS)
             SetBuildingPoolSize(MAX_BUILDINGS);
+
+        RemoveGameWorld();
+        ReleaseStreamedModels();
+    }
+}
+
+void CGameSA::ReleaseStreamedModels()
+{
+    const std::uint32_t modelCount = std::min<std::uint32_t>(GetCountOfAllFileIDs(), MODELINFO_DFF_MAX);
+
+    for (std::uint32_t modelId = 0; modelId < modelCount; modelId++)
+    {
+        CStreamingInfo* pStreamingInfo = m_pStreaming->GetStreamingInfo(modelId);
+        if (!pStreamingInfo || pStreamingInfo->loadState != eModelLoadState::LOADSTATE_LOADED)
+            continue;
+
+        if (pStreamingInfo->flg & (STREAMING_FLAG_GAME_REQUIRED | STREAMING_FLAG_MISSION_REQUIRED))
+            continue;
+
+        CModelInfo* pModelInfo = GetModelInfo(modelId);
+        if (pModelInfo)
+            pModelInfo->UnloadUnused();
     }
 }
 

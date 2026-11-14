@@ -86,6 +86,8 @@ CClientGame::CClientGame(bool bLocalPlay) : m_ServerInfo(new CServerInfo())
 
     CStaticFunctionDefinitions::PreInitialize(g_pCore, g_pGame, this, &m_Events);
 
+    g_pGame->RestoreGameWorld();
+
     // Packet handler
     m_pPacketHandler = new CPacketHandler();
 
