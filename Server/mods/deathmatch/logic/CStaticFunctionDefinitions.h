@@ -217,7 +217,7 @@ public:
     static bool RemovePedFromVehicle(CElement* pElement);
     static bool SetPedDoingGangDriveby(CElement* pElement, bool bGangDriveby);
     static bool SetPedAnimation(CElement* pElement, const SString& blockName, const SString& animName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
-                                bool bInterruptible, bool bFreezeLastFrame, bool bTaskToBeRestoredOnAnimEnd);
+                                bool bInterruptible, bool bFreezeLastFrame, bool bTaskToBeRestoredOnAnimEnd, bool isSecondary = false);
     static bool SetPedAnimationProgress(CElement* pElement, const SString& animName, float fProgress);
     static bool SetPedAnimationSpeed(CElement* pElement, const SString& animName, float fSpeed);
     static bool SetPedOnFire(CElement* pElement, bool bIsOnFire);

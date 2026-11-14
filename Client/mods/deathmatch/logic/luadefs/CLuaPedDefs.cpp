@@ -2277,6 +2277,7 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     bool           bInterruptible = true;
     bool           bFreezeLastFrame = true;
     bool           bTaskToBeRestoredOnAnimEnd = false;
+    bool           isSecondary = false;
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pEntity);
@@ -2294,12 +2295,13 @@ int CLuaPedDefs::SetPedAnimation(lua_State* luaVM)
     argStream.ReadBool(bFreezeLastFrame, true);
     argStream.ReadNumber(iBlend, 250);
     argStream.ReadBool(bTaskToBeRestoredOnAnimEnd, false);
+    argStream.ReadBool(isSecondary, false);
 
     if (!argStream.HasErrors())
     {
         if (CStaticFunctionDefinitions::SetPedAnimation(*pEntity, strBlockName == "" ? NULL : strBlockName.c_str(),
                                                         strAnimName == "" ? NULL : strAnimName.c_str(), iTime, iBlend, bLoop, bUpdatePosition, bInterruptible,
-                                                        bFreezeLastFrame))
+                                                        bFreezeLastFrame, isSecondary))
         {
             CClientPed* pPed = static_cast<CClientPed*>(pEntity);
             if (pPed->IsDucked())
