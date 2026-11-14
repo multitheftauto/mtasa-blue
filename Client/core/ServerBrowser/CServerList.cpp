@@ -180,12 +180,12 @@ void CServerList::Pulse()
 }
 
 // Return true if did add
-bool CServerList::AddUnique(in_addr Address, ushort usGamePort, bool addAtFront)
+CServerListItem* CServerList::AddUnique(in_addr Address, ushort usGamePort, bool addAtFront)
 {
     if (m_Servers.Find(Address, usGamePort))
-        return false;
-    m_Servers.AddUnique(Address, usGamePort, addAtFront);
-    return true;
+        return nullptr;
+
+    return m_Servers.AddUnique(Address, usGamePort, addAtFront);
 }
 
 bool CServerList::Remove(in_addr Address, ushort usGamePort)
