@@ -1055,11 +1055,14 @@ static void __declspec(naked) HOOK_CVehicle_ProcessStuff_TestCameraPosition()
         // clang-format on
     }
 }
-bool DisableVehicleSiren()
+// Takes the vehicle the native code is about to read bSirenOrAlarm from, rather than
+// pVehicleWithTheSiren: only the render hooks write that global, so on the audio path it names
+// whichever vehicle was drawn last instead of the one whose siren is being processed.
+bool __fastcall DisableVehicleSiren(CVehicleSAInterface* vehicleInterface)
 {
-    if (pVehicleWithTheSiren && pVehicleWithTheSiren->HasVTBL())
+    if (vehicleInterface && vehicleInterface->HasVTBL())
     {
-        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)pVehicleWithTheSiren);
+        SClientEntity<CVehicleSA>* pVehicleClientEntity = pGameInterface->GetPools()->GetVehicle((DWORD*)vehicleInterface);
         CVehicle*                  pVehicle = pVehicleClientEntity ? pVehicleClientEntity->pEntity : nullptr;
         if (pVehicle && (pVehicle->IsSirenSilentEffectEnabled() || pVehicle->GetModelIndex() == 420 || pVehicle->GetModelIndex() == 438))
         {
@@ -1077,30 +1080,22 @@ static void __declspec(naked) HOOK_CVehicleAudio_ProcessSirenSound()
     __asm
     {
         pushad
+        // ecx (vehicle interface) is already in place as the __fastcall argument
+        call DisableVehicleSiren
+        test al, al
+        // popad leaves the flags from the test above untouched
+        popad
+        jnz  silentSiren
+
+        // Replaced code
+        mov dl, [ecx+42Dh]
+        jmp RETN_CVehicleAudio_GetVehicleSirenType
+
+    silentSiren:
+        mov dl, 0
+        jmp RETN_CVehicleAudio_GetVehicleSirenType
     }
     // clang-format on
-    if (DisableVehicleSiren())
-    {
-        // clang-format off
-        __asm
-        {
-            popad
-            mov dl, 0
-            jmp RETN_CVehicleAudio_GetVehicleSirenType
-        }
-        // clang-format on
-    }
-    else
-    {
-        // clang-format off
-        __asm
-        {
-            popad
-            mov dl, [ecx+42Dh]
-            jmp RETN_CVehicleAudio_GetVehicleSirenType
-        }
-        // clang-format on
-    }
 }
 
 // CAEVehicleAudioEntity::ProcessVehicle only calls ProcessVehicleSirenAlarmHorn for the car/bike/bmx

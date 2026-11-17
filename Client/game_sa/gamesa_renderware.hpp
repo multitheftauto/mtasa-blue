@@ -23,6 +23,7 @@ void InitRwFunctions()
     RwFrameTransform = (RwFrameTransform_t)0x007F0F70;
     RwFrameTranslate = (RwFrameTranslate_t)0x007F0E30;
     RpClumpForAllAtomics = (RpClumpForAllAtomics_t)0x00749B70;
+    RpGeometryForAllMaterials = (RpGeometryForAllMaterials_t)0x0074C790;
     RwFrameAddChild = (RwFrameAddChild_t)0x007F0B00;
     RpClumpAddAtomic = (RpClumpAddAtomic_t)0x0074A490;
     RpAtomicSetFrame = (RpAtomicSetFrame_t)0x0074BF20;

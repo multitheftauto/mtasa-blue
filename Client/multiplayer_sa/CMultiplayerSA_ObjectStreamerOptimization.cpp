@@ -70,7 +70,7 @@ static void __declspec(naked) HOOK_CEntryInfoList__Flush()
 }
 
 #define HOOKPOS_CPtrNodeDoubleLinkPool__New  0x55233E
-#define HOOKSIZE_CPtrNodeDoubleLinkPool__New 0x6
+#define HOOKSIZE_CPtrNodeDoubleLinkPool__New 0x5
 static void __declspec(naked) HOOK_CPtrNodeDoubleLinkPool__New()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;

@@ -43,6 +43,7 @@ namespace FPSLimiter
         void OnFPSLimitChange() override;  // Event handler called when the active frame rate limit changes
         void OnFrameStart() override;      // Event handler called at the start of each frame
         void OnFrameEnd() override;        // Event handler called at the end of each frame
+        void OnGameTimerUpdate();          // Called right before GTA samples its clock, the wait for the frame happens here
 
     private:
         // Internal
@@ -64,5 +65,6 @@ namespace FPSLimiter
         std::uint16_t m_displayRefreshRate;  // Refresh rate of the display aka VSync (see `vsync` cvar)
         std::uint16_t m_fpsTarget;           // Currently target FPS limit (0 = no limit)
         bool          m_appliedThisFrame;    // Whether the FPS limit was applied in the current frame
+        bool          m_waitPending;         // A frame ended and the next game timer update still has to pace it
     };
 }  // namespace FPSLimiter

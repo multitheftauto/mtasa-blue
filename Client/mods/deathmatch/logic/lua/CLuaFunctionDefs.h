@@ -56,14 +56,6 @@ public:
     LUA_DECLARE(CreateTrayNotification);
     LUA_DECLARE(IsTrayNotificationEnabled);
 
-    // Clothes and body functions
-    LUA_DECLARE(GetBodyPartName);
-    LUA_DECLARE(GetClothesByTypeIndex);
-    LUA_DECLARE(GetTypeIndexFromClothes);
-    LUA_DECLARE(GetClothesTypeName);
-    LUA_DECLARE(AddClothingModel);
-    LUA_DECLARE(RemoveClothingModel);
-
     // Cursor funcs
     LUA_DECLARE(GetCursorPosition);
     LUA_DECLARE(SetCursorPosition);

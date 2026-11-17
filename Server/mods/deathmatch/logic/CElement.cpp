@@ -816,6 +816,8 @@ CXMLNode* CElement::OutputToXML(CXMLNode* pNodeParent)
     // Output the custom data values to it as arguments
     m_CustomData.OutputToXML(pNode);
 
+    WriteSpecialData(pNode);
+
     // Go through each child element and call this function on it
     CChildListType ::const_iterator iter = m_Children.begin();
     for (; iter != m_Children.end(); iter++)
@@ -824,6 +826,26 @@ CXMLNode* CElement::OutputToXML(CXMLNode* pNodeParent)
     }
 
     return pNode;
+}
+
+void CElement::WriteSpecialData(CXMLNode* pNode)
+{
+    CXMLAttributes& attributes = pNode->GetAttributes();
+
+    if (!m_strName.empty())
+        attributes.Create("id")->SetValue(m_strName.c_str());
+
+    if (!m_pAttachedTo)
+        return;
+
+    const std::string& strAttachToName = m_pAttachedTo->GetName();
+    if (strAttachToName.empty())
+        return;
+
+    attributes.Create("attachTo")->SetValue(strAttachToName.c_str());
+    attributes.Create("attachX")->SetValue(m_vecAttachedPosition.fX);
+    attributes.Create("attachY")->SetValue(m_vecAttachedPosition.fY);
+    attributes.Create("attachZ")->SetValue(m_vecAttachedPosition.fZ);
 }
 
 void CElement::CleanUpForVM(CLuaMain* pLuaMain, bool bRecursive)

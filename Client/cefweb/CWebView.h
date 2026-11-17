@@ -91,6 +91,17 @@ public:
 
     void ExecuteJavascript(const SString& strJavascriptCode);
 
+    // A paused browser only gets frames when a script changed something.
+    // Two frames, the change may land in CEF after the first one
+    void RequestFrames() { m_uiFramesRequested.store(2, std::memory_order_relaxed); }
+    bool TakeFrameRequest()
+    {
+        if (m_uiFramesRequested.load(std::memory_order_relaxed) == 0)
+            return false;
+        m_uiFramesRequested.fetch_sub(1, std::memory_order_relaxed);
+        return true;
+    }
+
     bool SetProperty(const SString& strKey, const SString& strValue);
     bool GetProperty(const SString& strKey, SString& outProperty);
 
@@ -266,6 +277,7 @@ private:
     CWebBrowserItem*      m_pWebBrowserRenderItem;
 
     std::atomic_bool                      m_bBeingDestroyed;
+    std::atomic<unsigned int>             m_uiFramesRequested{0};
     bool                                  m_bIsLocal;
     bool                                  m_bIsRenderingPaused;
     bool                                  m_bIsTransparent;

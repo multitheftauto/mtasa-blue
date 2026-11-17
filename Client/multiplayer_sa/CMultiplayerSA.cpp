@@ -1225,6 +1225,11 @@ void CMultiplayerSA::InitHooks()
     // Stop CPlayerPed::ProcessControl from calling CVisibilityPlugins::SetClumpAlpha
     MemSet((void*)0x5E8E84, 0x90, 5);
 
+    // Stop vehicle ProcessControl functions from calling CVehicle::UpdateClumpAlpha (singleplayer traffic fading logic)
+    MemSet((void*)0x6B19F2, 0x90, 5);  // CAutomobile::ProcessControl
+    MemSet((void*)0x6B92F5, 0x90, 5);  // CBike::ProcessControl
+    MemSet((void*)0x6F185D, 0x90, 5);  // CBoat::ProcessControl
+
     // Stop CVehicle::UpdateClumpAlpha from calling CVisibilityPlugins::SetClumpAlpha
     MemSet((void*)0x6D29CB, 0x90, 5);
 
@@ -1652,6 +1657,9 @@ CRemoteDataStorage* CMultiplayerSA::GetRemoteDataStorage(CPlayerPed* pPed)
 void CMultiplayerSA::RemoveRemoteDataStorage(CPlayerPed* pPed)
 {
     CRemoteDataSA::RemoveRemoteDataStorage(pPed);
+
+    if (pContextSwitchedPed == pPed)
+        pContextSwitchedPed = nullptr;
 }
 
 CPed* CMultiplayerSA::GetContextSwitchedPed()
@@ -1697,7 +1705,7 @@ void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
 {
     int*  CPostEffects__m_HeatHazeFXIntensity = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXIntensity)>(0x8D50E8);
     int*  CPostEffects__m_HeatHazeFXRandomShift = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXRandomShift)>(0xC402C0);
-    int*  CPostEffects__m_HeatHazeFXSpeedMin = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMin)>(0xC402C0);
+    int*  CPostEffects__m_HeatHazeFXSpeedMin = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMin)>(0x8D50EC);
     int*  CPostEffects__m_HeatHazeFXSpeedMax = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXSpeedMax)>(0x8D50F0);
     int*  CPostEffects__m_HeatHazeFXScanSizeX = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXScanSizeX)>(0xC40304);
     int*  CPostEffects__m_HeatHazeFXScanSizeY = reinterpret_cast<decltype(CPostEffects__m_HeatHazeFXScanSizeY)>(0xC40308);
@@ -1709,8 +1717,8 @@ void CMultiplayerSA::GetHeatHaze(SHeatHazeSettings& settings)
     settings.ucRandomShift = static_cast<uchar>(*CPostEffects__m_HeatHazeFXRandomShift);
     settings.usSpeedMin = static_cast<ushort>(*CPostEffects__m_HeatHazeFXSpeedMin);
     settings.usSpeedMax = static_cast<ushort>(*CPostEffects__m_HeatHazeFXSpeedMax);
-    settings.sScanSizeX = static_cast<short>(*CPostEffects__m_HeatHazeFXScanSizeY);
-    settings.sScanSizeY = static_cast<short>(*CPostEffects__m_HeatHazeFXSpeedMax);
+    settings.sScanSizeX = static_cast<short>(*CPostEffects__m_HeatHazeFXScanSizeX);
+    settings.sScanSizeY = static_cast<short>(*CPostEffects__m_HeatHazeFXScanSizeY);
     settings.usRenderSizeX = static_cast<ushort>(*CPostEffects__m_HeatHazeFXRenderSizeX);
     settings.usRenderSizeY = static_cast<ushort>(*CPostEffects__m_HeatHazeFXRenderSizeY);
     settings.bInsideBuilding = *CPostEffects__m_bHeatHazeFX;

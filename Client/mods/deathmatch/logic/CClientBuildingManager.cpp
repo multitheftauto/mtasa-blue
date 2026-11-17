@@ -45,10 +45,20 @@ void CClientBuildingManager::RemoveAll()
 
 void CClientBuildingManager::SetDimension(unsigned short usDimension)
 {
+    m_usDimension = usDimension;
+
+    std::size_t pendingBuildings = 0;
+    for (CClientBuilding* building : m_List)
+    {
+        if (!building->IsValid() && building->GetDimension() == usDimension)
+            ++pendingBuildings;
+    }
+
+    if (pendingBuildings > 0)
+        ResizePoolIfNeeds(pendingBuildings);
+
     for (CClientBuilding* building : m_List)
         building->RelateDimension(usDimension);
-
-    m_usDimension = usDimension;
 }
 
 bool CClientBuildingManager::Exists(CClientBuilding* pBuilding)
@@ -103,19 +113,8 @@ void CClientBuildingManager::DestroyAllForABit()
 
 void CClientBuildingManager::RestoreDestroyed()
 {
-    bool hasInvalidLods = true;
-    while (hasInvalidLods)
-    {
-        hasInvalidLods = false;
-        for (CClientBuilding* building : GetBuildings())
-        {
-            const CClientBuilding* highLodBuilding = building->GetHighLodBuilding();
-            if (highLodBuilding && !highLodBuilding->IsValid())
-                hasInvalidLods = true;
-            else
-                building->RelateDimension(m_usDimension);
-        }
-    }
+    for (CClientBuilding* building : GetBuildings())
+        building->RelateDimension(m_usDimension);
 }
 
 void CClientBuildingManager::RestoreDestroyedSafe()
@@ -133,15 +132,14 @@ void CClientBuildingManager::RestoreDestroyedSafe()
     RestoreDestroyed();
 }
 
-void CClientBuildingManager::ResizePoolIfNeeds()
+void CClientBuildingManager::ResizePoolIfNeeds(std::size_t pendingBuildings)
 {
-    const int currentUsed = g_pGame->GetPools()->GetNumberOfUsedSpaces(ePools::BUILDING_POOL);
-    const int currentCapacity = g_pGame->GetPools()->GetPoolCapacity(ePools::BUILDING_POOL);
+    const std::size_t currentUsed = g_pGame->GetPools()->GetNumberOfUsedSpaces(ePools::BUILDING_POOL);
+    const std::size_t currentCapacity = g_pGame->GetPools()->GetPoolCapacity(ePools::BUILDING_POOL);
+    const std::size_t neededCapacity = currentUsed + pendingBuildings + PRESERVED_POOL_SIZE;
 
-    if (currentCapacity - currentUsed < PRESERVED_POOL_SIZE)
-    {
-        DoPoolResize(currentCapacity + RESIZE_POOL_STEP);
-    }
+    if (currentCapacity < neededCapacity)
+        DoPoolResize(std::max(currentCapacity + RESIZE_POOL_STEP, neededCapacity));
 }
 
 bool CClientBuildingManager::SetPoolCapacity(size_t newCapacity)

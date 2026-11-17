@@ -117,6 +117,7 @@
 #include <luadefs/CLuaAudioDefs.h>
 #include <luadefs/CLuaBitDefs.h>
 #include <luadefs/CLuaBlipDefs.h>
+#include <luadefs/CLuaBodyClothesDefs.h>
 #include <luadefs/CLuaBrowserDefs.h>
 #include <luadefs/CLuaClassDefs.h>
 #include <luadefs/CLuaCameraDefs.h>

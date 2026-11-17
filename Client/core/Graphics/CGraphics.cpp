@@ -1840,19 +1840,19 @@ void CGraphics::DrawLine3DPreGUIQueue()
     m_pMaterialLine3DBatcherPreGUI->Flush();
 }
 
-void CGraphics::DrawLine3DPostFXQueue(void)
+void CGraphics::DrawLine3DPostFXQueue()
 {
     m_pLine3DBatcherPostFX->Flush();
     m_pMaterialLine3DBatcherPostFX->Flush();
 }
 
-void CGraphics::DrawPrimitive3DPreGUIQueue(void)
+void CGraphics::DrawPrimitive3DPreGUIQueue()
 {
     m_pPrimitive3DBatcherPreGUI->Flush();
     m_pMaterialPrimitive3DBatcherPreGUI->Flush();
 }
 
-bool CGraphics::HasLine3DPreGUIQueueItems(void)
+bool CGraphics::HasLine3DPreGUIQueueItems()
 {
     return m_pLine3DBatcherPreGUI->HasItems() || m_pMaterialLine3DBatcherPreGUI->HasItems();
 }
@@ -1862,13 +1862,13 @@ bool CGraphics::HasLine3DPostFXQueueItems()
     return m_pLine3DBatcherPostFX->HasItems() || m_pMaterialLine3DBatcherPostFX->HasItems();
 }
 
-void CGraphics::DrawPrimitive3DPostFXQueue(void)
+void CGraphics::DrawPrimitive3DPostFXQueue()
 {
     m_pPrimitive3DBatcherPostFX->Flush();
     m_pMaterialPrimitive3DBatcherPostFX->Flush();
 }
 
-bool CGraphics::HasPrimitive3DPreGUIQueueItems(void)
+bool CGraphics::HasPrimitive3DPreGUIQueueItems()
 {
     return m_pMaterialPrimitive3DBatcherPreGUI->HasItems() || m_pPrimitive3DBatcherPreGUI->HasItems();
 }

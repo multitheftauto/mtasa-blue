@@ -147,6 +147,7 @@ public:
 
 protected:
     bool ReadSpecialData(const int iLine) override;
+    void WriteSpecialData(CXMLNode* pNode) override;
 
 private:
     void Callback_OnCollision(CColShape& Shape, CElement& Element);

@@ -497,6 +497,23 @@ void CVehicleManager::GetRandomVariation(unsigned short usModel, unsigned char& 
     }
 }
 
+bool CVehicleManager::IsVariationValidForModel(unsigned short usModel, unsigned char ucVariant, unsigned char ucVariant2)
+{
+    if (!IsValidModel(usModel) || g_ucVariants[usModel - 400] == 255)
+        return true;
+
+    if (usModel == 457 || usModel == 512)
+        return (ucVariant == 255 || ucVariant <= 2) && ucVariant2 >= 3 && ucVariant2 <= 5;
+
+    if (usModel == 535)
+        return ucVariant <= g_ucVariants[usModel - 400];
+
+    if (usModel == 522 || usModel == 581)
+        return (ucVariant == 255 || ucVariant <= 2) && ucVariant2 >= 3 && ucVariant2 <= 4;
+
+    return ucVariant == 255 || ucVariant <= g_ucVariants[usModel - 400];
+}
+
 bool CVehicleManager::HasTurret(unsigned int uiModel)
 {
     return (IsValidModel(uiModel) && (g_ulVehicleAttributes[uiModel - 400] & VEHICLE_HAS_TURRENT));

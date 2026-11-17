@@ -86,9 +86,40 @@ void CGUIElement_Impl::DestroyElement()
     m_pManager = NULL;
 }
 
+// CEGUI routes captured mouse input straight to the capture window, skipping the
+// checks the normal hit-test path applies, and nothing drops the capture when a
+// window stops being eligible for input.
+static void ReleaseCaptureWithin(CEGUI::Window* pWindow)
+{
+    if (!pWindow)
+        return;
+
+    // A RestoreOldCapture window hands capture to another window instead of
+    // clearing it, and that window can be in this same subtree. Bounded so a
+    // restore chain cannot spin.
+    for (int i = 0; i < 8; ++i)
+    {
+        CEGUI::Window* pCapture = CEGUI::Window::getCaptureWindow();
+        if (!pCapture)
+            return;
+
+        // isAncestor recurses, isChild would only match a direct child.
+        if (pCapture != pWindow && !pCapture->isAncestor(pWindow))
+            return;
+
+        pCapture->releaseInput();
+    }
+}
+
 void CGUIElement_Impl::SetVisible(bool bVisible)
 {
+    const bool bWasVisible = m_pWindow->isVisible(true);
+
     m_pWindow->setVisible(bVisible);
+
+    // After the state change, so onCaptureLost's synthetic mouse move sees it.
+    if (!bVisible && bWasVisible)
+        ReleaseCaptureWithin(m_pWindow);
 }
 
 bool CGUIElement_Impl::IsVisible()
@@ -98,8 +129,13 @@ bool CGUIElement_Impl::IsVisible()
 
 void CGUIElement_Impl::SetEnabled(bool bEnabled)
 {
+    const bool bWasEnabled = !m_pWindow->isDisabled(true);
+
     m_pWindow->setEnabled(bEnabled);
     // m_pWindow->setZOrderingEnabled ( bEnabled );
+
+    if (!bEnabled && bWasEnabled)
+        ReleaseCaptureWithin(m_pWindow);
 }
 
 bool CGUIElement_Impl::IsEnabled()
