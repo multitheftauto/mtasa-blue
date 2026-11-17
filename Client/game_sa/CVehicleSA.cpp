@@ -59,7 +59,7 @@ static void __fastcall RehideRhinoMiddleWheels(CAutomobileSAInterface* vehicle)
     }
 }
 
-static void __declspec(naked) HOOK_Vehicle_PreRender(void)
+static void __declspec(naked) HOOK_Vehicle_PreRender()
 {
     MTA_VERIFY_HOOK_LOCAL_SIZE;
 

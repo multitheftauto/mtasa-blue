@@ -603,17 +603,17 @@ int CLuaVehicleDefs::GetVehicleMaxPassengers(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        if (CClientVehicleManager::IsValidModel(usModel))
+        if (!CClientVehicleManager::IsValidModel(usModel))
+            argStream.SetCustomError("Invalid model id");
+        else
         {
-            unsigned int uiMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
-            if (uiMaxPassengers != 0xFF)
-            {
-                lua_pushnumber(luaVM, uiMaxPassengers);
-                return 1;
-            }
+            const unsigned int uiMaxPassengers = CClientVehicleManager::GetMaxPassengerCount(usModel);
+            lua_pushnumber(luaVM, uiMaxPassengers == 0xFF ? 0 : uiMaxPassengers);
+            return 1;
         }
     }
-    else
+
+    if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
 
     lua_pushboolean(luaVM, false);

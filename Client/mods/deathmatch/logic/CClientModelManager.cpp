@@ -18,12 +18,12 @@ CClientModelManager::CClientModelManager() : m_Models(std::make_unique<std::shar
     }
 }
 
-CClientModelManager::~CClientModelManager(void)
+CClientModelManager::~CClientModelManager()
 {
     RemoveAll();
 }
 
-void CClientModelManager::RemoveAll(void)
+void CClientModelManager::RemoveAll()
 {
     const unsigned int uiMaxModelID = g_pGame->GetBaseIDforCOL();
     for (unsigned int i = 0; i < uiMaxModelID; i++)
@@ -50,10 +50,11 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
 
     if (m_Models[modelId] != nullptr)
     {
-        CResource* parentResource = m_Models[modelId]->GetParentResource();
-
-        if (parentResource)
-            parentResource->GetResourceModelStreamer()->FullyReleaseModel(static_cast<std::uint16_t>(modelId));
+        if (CResourceManager* pResourceManager = g_pClientGame->GetManager()->GetResourceManager())
+        {
+            for (auto iter = pResourceManager->IterBegin(); iter != pResourceManager->IterEnd(); ++iter)
+                (*iter)->GetResourceModelStreamer()->FullyReleaseModel(static_cast<std::uint16_t>(modelId));
+        }
 
         m_Models[modelId]->RestoreEntitiesUsingThisModel();
         m_Models[modelId] = nullptr;
@@ -64,7 +65,7 @@ bool CClientModelManager::Remove(const std::shared_ptr<CClientModel>& pModel)
     return false;
 }
 
-int CClientModelManager::GetFirstFreeModelID(void)
+int CClientModelManager::GetFirstFreeModelID()
 {
     const unsigned int uiMaxModelID = MAX_MODEL_DFF_ID;
     for (unsigned int i = 0; i < uiMaxModelID; i++)

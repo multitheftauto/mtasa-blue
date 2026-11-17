@@ -314,6 +314,7 @@ public:
 
 protected:
     bool ReadSpecialData(const int iLine) override;
+    void WriteSpecialData(CXMLNode* pNode) override;
 
 protected:
     unsigned short                       m_usModel;

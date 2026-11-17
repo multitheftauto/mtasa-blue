@@ -214,6 +214,12 @@ bool CClientBuilding::SetLowLodBuilding(CClientBuilding* pLod)
 {
     if (pLod)
     {
+        for (CClientBuilding* pBuilding = pLod; pBuilding; pBuilding = pBuilding->GetLowLodBuilding())
+        {
+            if (pBuilding == this)
+                return false;
+        }
+
         // Remove prev LOD
         SetLowLodBuilding();
 

@@ -475,7 +475,7 @@ public:
     void         MakeVehicleAutomobile(ushort usBaseModelID);
     void         MakeTimedObjectModel(ushort usBaseModelID);
     void         MakeClumpModel(ushort usBaseModelID);
-    void         DeallocateModel(void);
+    void         DeallocateModel();
     unsigned int GetParentID() { return m_dwParentID; };
 
     SVehicleSupportedUpgrades GetVehicleSupportedUpgrades() { return m_ModelSupportedUpgrades; }

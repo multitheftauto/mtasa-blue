@@ -85,6 +85,19 @@ bool CTeam::ReadSpecialData(const int iLine)
     return true;
 }
 
+void CTeam::WriteSpecialData(CXMLNode* pNode)
+{
+    CElement::WriteSpecialData(pNode);
+
+    CXMLAttributes& attributes = pNode->GetAttributes();
+
+    attributes.Create("name")->SetValue(m_strTeamName.c_str());
+    attributes.Create("color")->SetValue(XMLColorFromInt(m_ucRed, m_ucGreen, m_ucBlue).c_str());
+    attributes.Create("friendlyfire")->SetValue(m_bFriendlyFire);
+
+    attributes.Create("dimension")->SetValue(static_cast<int>(m_usDimension));
+}
+
 void CTeam::SetTeamName(const char* szName)
 {
     if (szName)

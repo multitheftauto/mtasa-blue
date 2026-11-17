@@ -46,6 +46,6 @@ int WINAPI DllMain(HINSTANCE hModule, DWORD dwReason, PVOID pvNothing)
 
 #else
 
-void __attribute__((destructor)) ReleaseXMLInterface(void);
+void __attribute__((destructor)) ReleaseXMLInterface();
 
 #endif

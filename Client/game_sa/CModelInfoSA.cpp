@@ -1943,7 +1943,7 @@ void CModelInfoSA::MakeVehicleAutomobile(ushort usBaseID)
     CopyStreamingInfoFromModel(usBaseID);
 }
 
-void CModelInfoSA::DeallocateModel(void)
+void CModelInfoSA::DeallocateModel()
 {
     Remove();
 
