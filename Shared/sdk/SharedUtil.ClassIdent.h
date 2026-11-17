@@ -22,7 +22,7 @@ namespace SharedUtil
 
 #define DECLARE_BASE_CLASS(cls) \
 public: \
-    static ClassId GetClassId(void) \
+    static ClassId GetClassId() \
     { \
         return CLASS_##cls; \
     } \
@@ -30,17 +30,17 @@ public: \
     { \
         return (ClassHierarchyBits & (1ULL << classId)) ? true : false; \
     } \
-    const char* GetClassName(void) \
+    const char* GetClassName() \
     { \
         return ClassName; \
     } \
 \
 protected: \
-    static const char* StaticGetClassName(void) \
+    static const char* StaticGetClassName() \
     { \
         return #cls; \
     } \
-    static ClassBits CalcClassHierarchyBits(void) \
+    static ClassBits CalcClassHierarchyBits() \
     { \
         return (1ULL << GetClassId()); \
     } \
@@ -64,17 +64,17 @@ public: \
 
 #define DECLARE_CLASS(cls, super) \
 public: \
-    static ClassId GetClassId(void) \
+    static ClassId GetClassId() \
     { \
         return CLASS_##cls; \
     } \
 \
 protected: \
-    static const char* StaticGetClassName(void) \
+    static const char* StaticGetClassName() \
     { \
         return #cls; \
     } \
-    static ClassBits CalcClassHierarchyBits(void) \
+    static ClassBits CalcClassHierarchyBits() \
     { \
         return (1ULL << GetClassId()) | super::CalcClassHierarchyBits(); \
     } \

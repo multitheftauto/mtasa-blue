@@ -112,6 +112,23 @@ bool CRadarArea::ReadSpecialData(const int iLine)
     return true;
 }
 
+void CRadarArea::WriteSpecialData(CXMLNode* pNode)
+{
+    CElement::WriteSpecialData(pNode);
+
+    CXMLAttributes& attributes = pNode->GetAttributes();
+
+    attributes.Create("posX")->SetValue(m_vecPosition.fX);
+    attributes.Create("posY")->SetValue(m_vecPosition.fY);
+
+    attributes.Create("sizeX")->SetValue(m_vecSize.fX);
+    attributes.Create("sizeY")->SetValue(m_vecSize.fY);
+
+    attributes.Create("color")->SetValue(XMLColorFromInt(m_Color.R, m_Color.G, m_Color.B, m_Color.A).c_str());
+
+    attributes.Create("dimension")->SetValue(static_cast<int>(m_usDimension));
+}
+
 void CRadarArea::SetPosition(const CVector& vecPosition)
 {
     // Different from our current position?
