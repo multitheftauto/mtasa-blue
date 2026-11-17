@@ -29,14 +29,15 @@ public:
     static std::variant<CClientEntity*, bool>                                      GetCameraTarget();
     static unsigned char                                                           GetCameraInterior();
     static std::string                                                             GetCameraGoggleEffect();
-    LUA_DECLARE(GetCameraFieldOfView);
+    static std::variant<float, bool>                                               GetCameraFieldOfView(eFieldOfViewMode mode);
     static unsigned char GetCameraDrunkLevel();
 
     // Cam set funcs
     LUA_DECLARE(SetCameraMatrix);
     LUA_DECLARE(SetCameraTarget);
     LUA_DECLARE(SetCameraInterior);
-    LUA_DECLARE(SetCameraFieldOfView);
+    static bool SetCameraFieldOfView(eFieldOfViewMode mode, float fov, std::optional<bool> instant);
+    static void ResetCameraFieldOfView(eFieldOfViewMode mode);
     LUA_DECLARE(FadeCamera);
     LUA_DECLARE(SetCameraClip);
     LUA_DECLARE(GetCameraClip);
