@@ -186,6 +186,10 @@ struct ENHANCED_EXCEPTION_INFO
     int                                     uncaughtExceptionCount{};
     std::string                             exceptionDescription{};
     bool                                    hasDetailedStackTrace{};
+    // Set only by a producer that captured a real thread context. A record stored
+    // before enhanced logging ran carries no registers, module or stack trace, so
+    // a consumer shouldnt treat it as this exception's capture.
+    bool hasContext{};
 
     DWORD eax{}, ebx{}, ecx{}, edx{}, esi{}, edi{}, ebp{}, esp{}, eip{}, eflags{};
     WORD  cs{}, ds{}, ss{}, es{}, fs{}, gs{};
@@ -198,14 +202,15 @@ struct ENHANCED_EXCEPTION_INFO
 };
 using PENHANCED_EXCEPTION_INFO = ENHANCED_EXCEPTION_INFO*;
 
-// A stored enhanced record belongs to the exception being reported only when
-// both the code and the fault address match the current record. Comparing the
-// code alone can reuse a record left over from an earlier, already handled
-// exception of the same type, which would stamp the old crash's module,
-// offset, and registers onto the new report.
+// A stored enhanced record describes the exception being reported only when it
+// was captured from a thread context and both the code and the fault address
+// match the current record. Comparing the code alone can reuse a record left
+// over from an earlier, already handled exception of the same type, and a record
+// without a context has no registers, module or stack trace to contribute, so
+// accepting either stamps the wrong data onto the new report.
 [[nodiscard]] inline bool IsEnhancedInfoFreshFor(const ENHANCED_EXCEPTION_INFO& info, const EXCEPTION_RECORD& record)
 {
-    return info.exceptionCode == record.ExceptionCode && info.exceptionAddress == record.ExceptionAddress;
+    return info.hasContext && info.exceptionCode == record.ExceptionCode && info.exceptionAddress == record.ExceptionAddress;
 }
 
 extern "C"

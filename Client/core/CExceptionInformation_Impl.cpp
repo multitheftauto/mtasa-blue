@@ -501,65 +501,62 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
 
     if (hasEnhancedInfo)
     {
-        // Applying the stored record can allocate a module path and copy the
-        // stack trace. Contain a failure here and fall through to the manual
-        // extraction below so the crash report is still built.
-        try
+        // Nothing here can throw: the path buffer uses nothrow allocation, the
+        // trace is moved rather than copied, and both helpers contain their own
+        // failures. Anything added here that can throw needs containment of its
+        // own, because Set has no handler around this branch.
+        m_uiAddressModuleOffset = enhancedInfo.moduleOffset;
+        m_timestamp = enhancedInfo.timestamp;
+        m_threadId = enhancedInfo.threadId;
+        m_processId = enhancedInfo.processId;
+        m_uncaughtExceptionCount = enhancedInfo.uncaughtExceptionCount;
+        m_capturedException = enhancedInfo.capturedException.value_or(nullptr);
+
+        if (!enhancedInfo.modulePathName.empty())
         {
-            m_uiAddressModuleOffset = enhancedInfo.moduleOffset;
-            m_timestamp = enhancedInfo.timestamp;
-            m_threadId = enhancedInfo.threadId;
-            m_processId = enhancedInfo.processId;
-            m_uncaughtExceptionCount = enhancedInfo.uncaughtExceptionCount;
-            m_capturedException = enhancedInfo.capturedException.value_or(nullptr);
-
-            if (!enhancedInfo.modulePathName.empty())
+            const std::size_t       pathLen = enhancedInfo.modulePathName.length() + 1U;
+            std::unique_ptr<char[]> enhancedPathBuffer(new (std::nothrow) char[pathLen]);
+            if (!enhancedPathBuffer)
             {
-                const std::size_t       pathLen = enhancedInfo.modulePathName.length() + 1U;
-                std::unique_ptr<char[]> enhancedPathBuffer(new (std::nothrow) char[pathLen]);
-                if (!enhancedPathBuffer)
-                {
-                    DebugPrintExceptionInfo("Set - Failed to allocate enhanced module path buffer\n");
-                }
-                else
-                {
-                    memcpy(enhancedPathBuffer.get(), enhancedInfo.modulePathName.c_str(), pathLen);
-                    m_szModulePathName = std::move(enhancedPathBuffer);
-                    UpdateModuleBaseNameFromCurrentPath();
-                }
+                DebugPrintExceptionInfo("Set - Failed to allocate enhanced module path buffer\n");
             }
-
-            m_ulEAX = enhancedInfo.eax;
-            m_ulEBX = enhancedInfo.ebx;
-            m_ulECX = enhancedInfo.ecx;
-            m_ulEDX = enhancedInfo.edx;
-            m_ulESI = enhancedInfo.esi;
-            m_ulEDI = enhancedInfo.edi;
-            m_ulEBP = enhancedInfo.ebp;
-            m_ulESP = enhancedInfo.esp;
-            m_ulEIP = enhancedInfo.eip;
-            m_ulCS = enhancedInfo.cs;
-            m_ulDS = enhancedInfo.ds;
-            m_ulES = enhancedInfo.es;
-            m_ulFS = enhancedInfo.fs;
-            m_ulGS = enhancedInfo.gs;
-            m_ulSS = enhancedInfo.ss;
-            m_ulEFlags = enhancedInfo.eflags;
-
-            if (auto trace = enhancedInfo.stackTrace)
+            else
             {
-                m_stackTrace = *trace;
-                m_hasDetailedStackTrace = true;
+                memcpy(enhancedPathBuffer.get(), enhancedInfo.modulePathName.c_str(), pathLen);
+                m_szModulePathName = std::move(enhancedPathBuffer);
+                UpdateModuleBaseNameFromCurrentPath();
             }
-
-            OutputDebugStringA(">>> Set: Enhanced path - calling ResolveModuleFromRegistrySafe <<<\n");
-            ResolveModuleFromRegistrySafe(pException);
-            return;
         }
-        catch (...)
+
+        m_ulEAX = enhancedInfo.eax;
+        m_ulEBX = enhancedInfo.ebx;
+        m_ulECX = enhancedInfo.ecx;
+        m_ulEDX = enhancedInfo.edx;
+        m_ulESI = enhancedInfo.esi;
+        m_ulEDI = enhancedInfo.edi;
+        m_ulEBP = enhancedInfo.ebp;
+        m_ulESP = enhancedInfo.esp;
+        m_ulEIP = enhancedInfo.eip;
+        m_ulCS = enhancedInfo.cs;
+        m_ulDS = enhancedInfo.ds;
+        m_ulES = enhancedInfo.es;
+        m_ulFS = enhancedInfo.fs;
+        m_ulGS = enhancedInfo.gs;
+        m_ulSS = enhancedInfo.ss;
+        m_ulEFlags = enhancedInfo.eflags;
+
+        // enhancedInfo is a local copy, so taking the trace from it moves the
+        // storage instead of duplicating a vector of strings under memory
+        // pressure - the condition this path has to survive.
+        if (enhancedInfo.stackTrace)
         {
-            DebugPrintExceptionInfo("Set - Enhanced info application failed, extracting manually\n");
+            m_stackTrace = std::move(*enhancedInfo.stackTrace);
+            m_hasDetailedStackTrace = true;
         }
+
+        OutputDebugStringA(">>> Set: Enhanced path - calling ResolveModuleFromRegistrySafe <<<\n");
+        ResolveModuleFromRegistrySafe(pException);
+        return;
     }
 
     try
@@ -749,25 +746,11 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
             // Values picked up later from the stack can be saved registers
             // or data pointers instead of code frames; require an
             // executable page for those and remember the first one as a
-            // fallback in case no real frame is found.
-            if (i == 0 || IsExecutableAddress(pQueryAddress))
+            // fallback in case no real frame is found. Without fallback
+            // storage there is nowhere to hold a candidate, so the first one
+            // is taken instead.
+            if (i == 0 || !fallbackModulePathBuffer || IsExecutableAddress(pQueryAddress))
             {
-                const bool copied =
-                    CopyModulePathToBuffer(tempModulePathBuffer.get(), modulePathNameBuffer.get(), MAX_MODULE_PATH, "Set - Selected module path copy");
-                if (!copied)
-                {
-                    DebugPrintExceptionInfo("Set - Selected module path copy failed\n");
-                }
-                pModuleBaseAddress = pModuleBaseAddressTemp;
-                pExceptionAddress = pQueryAddress;
-                bSelectedExecutableFrame = true;
-                break;
-            }
-
-            if (!fallbackModulePathBuffer)
-            {
-                // No fallback storage available: accept this candidate as the
-                // reported frame instead of continuing the walk.
                 const bool copied =
                     CopyModulePathToBuffer(tempModulePathBuffer.get(), modulePathNameBuffer.get(), MAX_MODULE_PATH, "Set - Selected module path copy");
                 if (!copied)
