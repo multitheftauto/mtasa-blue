@@ -130,8 +130,8 @@ void CCrashHandler::Init(const SString& strInServerPath)
 inline __attribute__((always_inline)) static void SaveBacktraceSummary()
 {
     // Collect backtrace information
-    void* buffer[100];
-    int   iAmount = backtrace(buffer, NUMELMS(buffer));
+    void*  buffer[100];
+    int    iAmount = backtrace(buffer, NUMELMS(buffer));
     char** symbols = backtrace_symbols(buffer, iAmount);
 
     // Generate a .log file
@@ -229,8 +229,6 @@ void CCrashHandler::HandleExceptionGlobal(int iSig)
 
 long WINAPI CCrashHandler::HandleExceptionGlobal(_EXCEPTION_POINTERS* pException)
 {
-    // Allocate on the stack rather than the heap, as the process heap may be
-    // corrupted at the time of the crash.
     CExceptionInformation_Impl exceptionInformation;
     exceptionInformation.Set(pException->ExceptionRecord->ExceptionCode, pException);
 
