@@ -376,6 +376,93 @@ static void StoreBasicExceptionInfo(_EXCEPTION_POINTERS* pException)
     }
 }
 
+// Fills the module identity fields of a record from the address that faulted.
+// Shared by the SEH path and the watchdog so both report the same module
+// identity, and so the two cant drift apart. Returns false when no module
+// could be resolved, leaving the caller free to decide whether to report it.
+// Failure is never allowed to reach the caller as an exception and never leaves
+// a blank module name, because module info is optional and the rest of the
+// record is what the report is for.
+static bool FillModuleInfo(ENHANCED_EXCEPTION_INFO& info, void* addressToResolve)
+{
+    std::array<char, 512> moduleBuffer{};
+    void*                 moduleBase{nullptr};
+
+    // Every statement that can throw lives inside this one block. The string
+    // assignments below allocate, and the callers cannot survive an escape:
+    // both keep a partially filled record only because nothing is thrown.
+    try
+    {
+        // Seed the fields with a label so a failure partway still leaves the
+        // record readable; each field that resolves overwrites its label.
+        info.moduleName = "Unknown";
+        info.moduleBaseName = "Unknown";
+        info.modulePathName = "Unknown";
+        info.moduleOffset = 0;
+
+        if (!CExceptionInformation_Impl::GetModule(addressToResolve, moduleBuffer.data(), static_cast<int>(moduleBuffer.size()), &moduleBase))
+        {
+            return false;
+        }
+
+        info.modulePathName = std::string{moduleBuffer.data()};
+
+        const std::string_view moduleView{moduleBuffer.data()};
+        if (const auto pos = moduleView.rfind('\\'); pos != std::string_view::npos)
+        {
+            info.moduleName = std::string{moduleView.substr(pos + 1)};
+            info.moduleBaseName = info.moduleName;
+        }
+        else
+        {
+            info.moduleName = std::string{moduleView};
+            info.moduleBaseName = info.moduleName;
+        }
+
+        // The offset is measured from addressToResolve, which is the return address
+        // rather than the fault address when the fault address was null.
+        if (moduleBase != nullptr)
+        {
+            const uintptr_t resolvedAddr{reinterpret_cast<uintptr_t>(addressToResolve)};
+            const uintptr_t baseAddr{reinterpret_cast<uintptr_t>(moduleBase)};
+
+            if (resolvedAddr >= baseAddr)
+            {
+                const uintptr_t offset{resolvedAddr - baseAddr};
+
+                if (offset <= UINT_MAX)
+                {
+                    info.moduleOffset = static_cast<uint>(offset);
+                }
+                else
+                {
+                    info.moduleOffset = 0;
+                    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "FillModuleInfo - Module offset exceeds UINT_MAX\n");
+                }
+            }
+            else
+            {
+                info.moduleOffset = 0;
+                SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "FillModuleInfo - Exception address before module base\n");
+            }
+        }
+        else
+        {
+            info.moduleOffset = 0;
+        }
+
+        return true;
+    }
+    catch (...)
+    {
+        // Module info is optional: an allocation failure partway shouldnt discard
+        // the rest of the record. Fields that resolved keep their real values and
+        // the ones the failure never reached keep the labels seeded above, so no
+        // assignment happens here that could throw a second time.
+        return false;
+    }
+}
+
 static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException)
 {
     if (pException == nullptr || pException->ExceptionRecord == nullptr)
@@ -425,9 +512,11 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException)
         info.ss = pException->ContextRecord->SegSs;
         info.eflags = pException->ContextRecord->EFlags;
 
-        CExceptionInformation_Impl moduleHelper;
-        std::array<char, 512>      moduleBuffer{};
-        void*                      moduleBase{nullptr};
+        // Consumers read this to decide whether a stored record came from a real
+        // thread context. The context record was checked above, so it did. It says
+        // nothing about the module fields or the trace, which are filled below and
+        // may legitimately stay unset.
+        info.hasContext = true;
 
         // For EIP=0 crashes, resolve module from return address at [ESP] instead of EIP
         void*          addressToResolve{info.exceptionAddress};
@@ -458,60 +547,9 @@ static void LogEnhancedExceptionInfo(_EXCEPTION_POINTERS* pException)
             }
         }
 
-        if (moduleHelper.GetModule(addressToResolve, moduleBuffer.data(), static_cast<int>(moduleBuffer.size()), &moduleBase))
-        {
-            info.modulePathName = std::string{moduleBuffer.data()};
-
-            const std::string_view moduleView{moduleBuffer.data()};
-            if (const auto pos = moduleView.rfind('\\'); pos != std::string_view::npos)
-            {
-                info.moduleName = std::string{moduleView.substr(pos + 1)};
-                info.moduleBaseName = info.moduleName;
-            }
-            else
-            {
-                info.moduleName = std::string{moduleView};
-                info.moduleBaseName = info.moduleName;
-            }
-
-            if (moduleBase != nullptr)
-            {
-                // Use addressToResolve for offset calculation (handles EIP=0 return address case)
-                const uintptr_t resolvedAddr{reinterpret_cast<uintptr_t>(addressToResolve)};
-                const uintptr_t baseAddr{reinterpret_cast<uintptr_t>(moduleBase)};
-
-                if (resolvedAddr >= baseAddr)
-                {
-                    const uintptr_t offset{resolvedAddr - baseAddr};
-
-                    if (offset <= UINT_MAX)
-                    {
-                        info.moduleOffset = static_cast<uint>(offset);
-                    }
-                    else
-                    {
-                        info.moduleOffset = 0;
-                        SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Module offset exceeds UINT_MAX\n");
-                    }
-                }
-                else
-                {
-                    info.moduleOffset = 0;
-                    SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Exception address before module base\n");
-                }
-            }
-            else
-            {
-                info.moduleOffset = 0;
-            }
-        }
-        else
+        if (!FillModuleInfo(info, addressToResolve))
         {
             SafeDebugPrintPrefixed(DEBUG_PREFIX_CRASH, "LogEnhancedExceptionInfo - Failed to get module info\n");
-            info.moduleName = "Unknown";
-            info.moduleBaseName = "Unknown";
-            info.modulePathName = "Unknown";
-            info.moduleOffset = 0;
         }
 
         std::vector<std::string> stackTraceVec;
@@ -2488,7 +2526,18 @@ static void ReportCurrentCppException()
     if (!g_lastExceptionInfo)
         return FALSE;
 
-    *pExceptionInfo = *g_lastExceptionInfo;
+    // The copy allocates storage for its string members and can fail under
+    // memory pressure. Crash paths cannot let an exception unwind through
+    // them, so report no data and let the caller fall back.
+    try
+    {
+        *pExceptionInfo = *g_lastExceptionInfo;
+    }
+    catch (...)
+    {
+        return FALSE;
+    }
+
     return TRUE;
 }
 
@@ -2501,6 +2550,12 @@ static void ReportCurrentCppException()
         {
             return FALSE;
         }
+
+        // Keep a record that already identifies an exception. This capture
+        // has no code or address, so overwriting it would make every
+        // freshness check reject the stored crash data.
+        if (g_lastExceptionInfo && g_lastExceptionInfo->exceptionCode != 0)
+            return FALSE;
 
         ENHANCED_EXCEPTION_INFO info = {};
         info.capturedException = std::current_exception();
@@ -2961,6 +3016,20 @@ namespace
         std::vector<std::string> stackTraceVec{};
         const auto               stackCaptured = CaptureUnifiedStackTrace(&exceptionPointers, 32, &stackTraceVec);
 
+        // Snapshot the return address for the EIP=0 case while the thread is
+        // still suspended, before resume makes the stack live again.
+        void* watchdogEip0ReturnAddress{nullptr};
+        if (context.Eip == 0)
+        {
+            const auto espAddr{static_cast<uintptr_t>(context.Esp)};
+            const auto pReturnAddress{reinterpret_cast<void* const*>(espAddr)};
+
+            if (SharedUtil::IsReadablePointer(pReturnAddress, sizeof(void*)))
+            {
+                watchdogEip0ReturnAddress = *pReturnAddress;
+            }
+        }
+
         // Now we can safely resume the thread - we have everything we need
         if (ResumeThread(targetThread) == static_cast<DWORD>(-1))
         {
@@ -3009,6 +3078,29 @@ namespace
                     info.gs = s_capturedContext.SegGs;
                     info.eflags = s_capturedContext.EFlags;
 
+                    // Consumers read this to decide whether a stored record came from
+                    // a real thread context. The context was captured from the live
+                    // thread above, so it did. It says nothing about the module fields
+                    // or the trace, which are filled below and may stay unset.
+                    info.hasContext = true;
+
+                    // Resolve the module containing the frozen instruction so the
+                    // watchdog report carries the same module identity the SEH path
+                    // provides. A frozen thread can sit at EIP=0 (jump to null), so
+                    // fall back to the return address captured from [ESP] before
+                    // the thread resumed, like the SEH path does.
+                    void* addressToResolve{exceptionRecord.ExceptionAddress};
+
+                    if (addressToResolve == nullptr)
+                    {
+                        addressToResolve = watchdogEip0ReturnAddress;
+                    }
+
+                    // Module identity is optional metadata for a freeze report, so a
+                    // resolution miss is not reported from here; the record is still
+                    // worth storing for the registers and the stack trace above.
+                    FillModuleInfo(info, addressToResolve);
+
                     // Use the stack trace we captured while thread was suspended
                     if (stackCaptured != FALSE && !stackTraceVec.empty())
                     {
@@ -3052,6 +3144,25 @@ namespace
                 }
 
                 delete pExInfo;
+            }
+            else
+            {
+                // The dump is this path's whole purpose; keep a signal on the
+                // skip so it is not read as a successful dump.
+                AddReportLog(9330, "Watchdog: failed to allocate dump-only report info");
+            }
+
+            // The process keeps running after a dump-only report, so the
+            // stored record must not survive into a later exception's dump
+            // where it could be mistaken for a fresh capture. Only retire a
+            // record that still belongs to this watchdog event; a concurrent
+            // thread's newer capture must be left in place.
+            if (std::unique_lock lock{g_exceptionInfoMutex, std::try_to_lock}; lock.owns_lock())
+            {
+                if (g_lastExceptionInfo && IsEnhancedInfoFreshFor(*g_lastExceptionInfo, exceptionRecord))
+                {
+                    g_lastExceptionInfo = std::nullopt;
+                }
             }
             return true;
         }
@@ -3152,7 +3263,20 @@ namespace
                     AddReportLog(9311, SString("Watchdog detected freeze after %lld seconds (threshold %u, debugger attached)",
                                                static_cast<long long>(elapsed.count()), timeoutSecs));
 
-                    TriggerWatchdogException(targetThread.get(), targetThreadId, true);
+                    // Keep the monitoring loop alive even if the dump-only
+                    // report fails; the heartbeat reset below must still run.
+                    try
+                    {
+                        const bool dumpTriggered = TriggerWatchdogException(targetThread.get(), targetThreadId, true);
+                        if (!dumpTriggered)
+                        {
+                            AddReportLog(9312, SString("Watchdog trigger failed for thread %u", targetThreadId));
+                        }
+                    }
+                    catch (...)
+                    {
+                        AddReportLog(9323, "Watchdog: dump-only report failed with an exception");
+                    }
 
                     g_watchdogState.lastHeartbeat.store(std::chrono::steady_clock::now(), std::memory_order_release);
                     if (waitOrStop())
