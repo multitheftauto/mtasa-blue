@@ -728,7 +728,7 @@ struct SDrivebyDirectionSync : public ISyncStructure
 //////////////////////////////////////////
 struct SUnoccupiedVehicleSync : public ISyncStructure
 {
-    SUnoccupiedVehicleSync() { *((char*)&data) = 0; }
+    SUnoccupiedVehicleSync() : data{} {}
 
     bool Read(NetBitStreamInterface& bitStream)
     {
@@ -737,41 +737,47 @@ struct SUnoccupiedVehicleSync : public ISyncStructure
             if (data.bSyncPosition)
             {
                 SPositionSync pos;
-                bitStream.Read(&pos);
+                if (!bitStream.Read(&pos))
+                    return false;
                 data.vecPosition = pos.data.vecPosition;
             }
 
             if (data.bSyncRotation)
             {
                 SRotationDegreesSync rot;
-                bitStream.Read(&rot);
+                if (!bitStream.Read(&rot))
+                    return false;
                 data.vecRotation = rot.data.vecRotation;
             }
 
             if (data.bSyncVelocity)
             {
                 SVelocitySync velocity;
-                bitStream.Read(&velocity);
+                if (!bitStream.Read(&velocity))
+                    return false;
                 data.vecVelocity = velocity.data.vecVelocity;
             }
 
             if (data.bSyncTurnVelocity)
             {
                 SVelocitySync turnVelocity;
-                bitStream.Read(&turnVelocity);
+                if (!bitStream.Read(&turnVelocity))
+                    return false;
                 data.vecTurnVelocity = turnVelocity.data.vecVelocity;
             }
 
             if (data.bSyncHealth)
             {
                 SVehicleHealthSync health;
-                bitStream.Read(&health);
+                if (!bitStream.Read(&health))
+                    return false;
                 data.fHealth = health.data.fValue;
             }
 
             if (data.bSyncTrailer)
             {
-                bitStream.Read(data.trailer);
+                if (!bitStream.Read(data.trailer))
+                    return false;
             }
 
             return true;
