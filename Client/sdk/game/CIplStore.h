@@ -11,9 +11,14 @@
 
 #pragma once
 
+class CVector;
+class CIplSAInterface;
+
 class CIplStore
 {
 public:
     virtual void SetDynamicIplStreamingEnabled(bool state) = 0;
     virtual void SetDynamicIplStreamingEnabled(bool state, std::function<bool(CIplSAInterface* ipl)> filter) = 0;
+
+    virtual void LoadIpls(const CVector& position) = 0;
 };

@@ -16,6 +16,8 @@
 #include <game/CIplStore.h>
 #include <functional>
 
+#define FUNC_CIplStore_LoadIpls 0x405170
+
 class CIplStoreSA : public CIplStore
 {
 public:
@@ -24,6 +26,8 @@ public:
 
     void SetDynamicIplStreamingEnabled(bool state);
     void SetDynamicIplStreamingEnabled(bool state, std::function<bool(CIplSAInterface* ipl)> filter);
+
+    void LoadIpls(const CVector& position) override;
 
 private:
     void UnloadAndDisableStreaming(int iplId);

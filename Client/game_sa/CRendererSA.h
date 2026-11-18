@@ -13,6 +13,8 @@
 
 #include <game/CRenderer.h>
 
+#define FUNC_CRenderer_RequestObjectsInDirection 0x555CB0
+
 class CRendererSA : public CRenderer
 {
 public:
@@ -20,4 +22,5 @@ public:
     ~CRendererSA();
 
     void RenderModel(CModelInfo* pModelInfo, const CMatrix& matrix, float lighting) override;
+    void RequestObjectsInDirection(const CVector& position, float headingRadians) override;
 };
