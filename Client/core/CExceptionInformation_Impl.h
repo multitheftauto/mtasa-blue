@@ -27,9 +27,11 @@ public:
     CExceptionInformation_Impl();
     ~CExceptionInformation_Impl();
 
-    unsigned int       GetCode() { return m_uiCode; }
-    void*              GetAddress() { return m_pAddress; }
-    [[nodiscard]] bool GetModule(void* pQueryAddress, char* szModuleName, int nOutputNameLength, void** ppModuleBaseAddress);
+    unsigned int GetCode() { return m_uiCode; }
+    void*        GetAddress() { return m_pAddress; }
+    // Resolves the module holding pQueryAddress. Reads no instance state, so it is
+    // static and callers dont need to construct a report object to use it.
+    [[nodiscard]] static bool GetModule(void* pQueryAddress, char* szModuleName, int nOutputNameLength, void** ppModuleBaseAddress);
 
     virtual const char* GetModulePathName() override { return m_szModulePathName.get(); }
     virtual const char* GetModuleBaseName() override { return m_szModuleBaseName; }

@@ -331,7 +331,19 @@ void CExceptionInformation_Impl::ResolveModuleFromRegistrySafe(_EXCEPTION_POINTE
 
     ResolutionDiagnostics diag = {};
 
-    if (ResolveModuleFromRegistrySafe_SEH(pException, m_pAddress, m_resolvedModuleInfo, m_resolvedModuleNameStorage, diag))
+    // The inner resolver builds strings and can fail on allocation; treat
+    // that like any other resolution miss instead of letting it escape.
+    bool resolved = false;
+    try
+    {
+        resolved = ResolveModuleFromRegistrySafe_SEH(pException, m_pAddress, m_resolvedModuleInfo, m_resolvedModuleNameStorage, diag);
+    }
+    catch (...)
+    {
+        resolved = false;
+    }
+
+    if (resolved)
     {
         char buf[256];
         sprintf_s(buf, sizeof(buf), "ResolveModule: OK EIP=0x%08X Base=0x%08X RVA=0x%08X IDA=0x%08X Chunks=%d Mods=%d\n", diag.eipUsed,
@@ -389,6 +401,17 @@ CExceptionInformation_Impl::~CExceptionInformation_Impl()
 {
 }
 
+// True when the address lies on a page the OS marks executable. Stack walks
+// in crash paths can pick up saved registers and data pointers, which are
+// not code and would report a misleading module offset.
+static bool IsExecutableAddress(const void* address)
+{
+    MEMORY_BASIC_INFORMATION memoryInfo{};
+    if (VirtualQuery(address, &memoryInfo, sizeof(memoryInfo)) == 0)
+        return false;
+    return (memoryInfo.Protect & (PAGE_EXECUTE | PAGE_EXECUTE_READ | PAGE_EXECUTE_READWRITE | PAGE_EXECUTE_WRITECOPY)) != 0;
+}
+
 void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* pException)
 {
     OutputDebugStringA(">>> CExceptionInformation_Impl::Set ENTRY <<<\n");
@@ -418,6 +441,15 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
         return;
     }
 
+    // ValidateExceptionContext already rejects a null record, but the
+    // dereference below is this function's first direct use; keep a local
+    // check so it stays safe if that contract changes.
+    if (pException->ExceptionRecord == nullptr)
+    {
+        DebugPrintExceptionInfo("Set - Null exception record\n");
+        return;
+    }
+
     m_uiCode = iCode;
     m_pAddress = pException->ExceptionRecord->ExceptionAddress;
     ClearModulePathState();
@@ -438,31 +470,41 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
         }
     }
 
-    if (hasEnhancedInfo && enhancedInfo.exceptionCode == iCode)
+    if (hasEnhancedInfo)
     {
-        DebugPrintExceptionInfo("Set - Using enhanced exception info from CrashHandler (FRESH)\n");
+        hasEnhancedInfo = IsEnhancedInfoFreshFor(enhancedInfo, *pException->ExceptionRecord);
 
-        // Additional note for callback exceptions even when we have enhanced info
-        if (iCode == 0xC000041D)
+        if (hasEnhancedInfo)
         {
-            DebugPrintExceptionInfo("Set - Callback exception: enhanced info available but stack/module may be incomplete\n");
+            DebugPrintExceptionInfo("Set - Using enhanced exception info from CrashHandler (FRESH)\n");
+
+            // Additional note for callback exceptions even when we have enhanced info
+            if (iCode == 0xC000041D)
+            {
+                DebugPrintExceptionInfo("Set - Callback exception: enhanced info available but stack/module may be incomplete\n");
+            }
+        }
+        else
+        {
+            char mismatchBuffer[DEBUG_BUFFER_SIZE] = {};
+            SAFE_DEBUG_PRINT_C(mismatchBuffer, DEBUG_BUFFER_SIZE,
+                               "%.*sSet - Stored enhanced info does not match the current exception (stored: code 0x%08X, address 0x%p; current: code 0x%08X, "
+                               "address 0x%p) - stale data, extracting fresh\n",
+                               static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), enhancedInfo.exceptionCode,
+                               enhancedInfo.exceptionAddress, pException->ExceptionRecord->ExceptionCode, pException->ExceptionRecord->ExceptionAddress);
         }
     }
-    else if (hasEnhancedInfo && enhancedInfo.exceptionCode != iCode)
-    {
-        char mismatchBuffer[DEBUG_BUFFER_SIZE] = {};
-        SAFE_DEBUG_PRINT_C(mismatchBuffer, DEBUG_BUFFER_SIZE,
-                           "%.*sSet - Exception code mismatch (stored: 0x%08X, current: 0x%08X) - STALE DATA, extracting fresh\n",
-                           static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data(), enhancedInfo.exceptionCode, iCode);
-        hasEnhancedInfo = false;
-    }
-    else if (!hasEnhancedInfo)
+    else
     {
         DebugPrintExceptionInfo("Set - No enhanced info available, extracting manually\n");
     }
 
     if (hasEnhancedInfo)
     {
+        // Nothing here can throw: the path buffer uses nothrow allocation, the
+        // trace is moved rather than copied, and both helpers contain their own
+        // failures. Anything added here that can throw needs containment of its
+        // own, because Set has no handler around this branch.
         m_uiAddressModuleOffset = enhancedInfo.moduleOffset;
         m_timestamp = enhancedInfo.timestamp;
         m_threadId = enhancedInfo.threadId;
@@ -503,9 +545,12 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
         m_ulSS = enhancedInfo.ss;
         m_ulEFlags = enhancedInfo.eflags;
 
-        if (auto trace = enhancedInfo.stackTrace)
+        // enhancedInfo is a local copy, so taking the trace from it moves the
+        // storage instead of duplicating a vector of strings under memory
+        // pressure - the condition this path has to survive.
+        if (enhancedInfo.stackTrace)
         {
-            m_stackTrace = *trace;
+            m_stackTrace = std::move(*enhancedInfo.stackTrace);
             m_hasDetailedStackTrace = true;
         }
 
@@ -599,9 +644,27 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
     modulePathNameBuffer[0] = '\0';
     tempModulePathBuffer[0] = '\0';
 
+    // The fallback copy is optional: when it cannot be allocated the walk
+    // selects the first non-system candidate directly and never returns early.
+    std::unique_ptr<char[]> fallbackModulePathBuffer(new (std::nothrow) char[MAX_MODULE_PATH]);
+
+    if (fallbackModulePathBuffer)
+    {
+        fallbackModulePathBuffer[0] = '\0';
+    }
+    else
+    {
+        char debugBuffer[DEBUG_BUFFER_SIZE] = {};
+        SAFE_DEBUG_PRINT_C(debugBuffer, DEBUG_BUFFER_SIZE, "%.*sSet - Fallback module path buffer unavailable, selecting first non-system frame directly\n",
+                           static_cast<int>(DEBUG_PREFIX_EXCEPTION_INFO.size()), DEBUG_PREFIX_EXCEPTION_INFO.data());
+    }
+
     void* pModuleBaseAddress = nullptr;
     void* pExceptionAddress = m_pAddress;
     void* pQueryAddress = m_pAddress;
+    void* pFallbackModuleBaseAddress = nullptr;
+    void* pFallbackAddress = nullptr;
+    bool  bSelectedExecutableFrame = false;
 
     // Special handling for EIP=0: Start from return address at [ESP] instead
     constexpr auto kNullAddress = uintptr_t{0};
@@ -676,15 +739,41 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
         if (::_strnicmp(szModuleBaseNameTemp, "ntdll", 5) != 0 && ::_strnicmp(szModuleBaseNameTemp, "kernel", 6) != 0 &&
             ::_strnicmp(szModuleBaseNameTemp, "msvc", 4) != 0 && ::_stricmp(szModuleBaseNameTemp, "") != 0)
         {
-            const bool copied =
-                CopyModulePathToBuffer(tempModulePathBuffer.get(), modulePathNameBuffer.get(), MAX_MODULE_PATH, "Set - Selected module path copy");
-            if (!copied)
+            // The first candidate is the fault address recorded by the
+            // exception. Accept it as-is so the walk keeps reporting the
+            // established result for addresses that resolve to a non-system
+            // module, even when the fault address is data rather than code.
+            // Values picked up later from the stack can be saved registers
+            // or data pointers instead of code frames; require an
+            // executable page for those and remember the first one as a
+            // fallback in case no real frame is found. Without fallback
+            // storage there is nowhere to hold a candidate, so the first one
+            // is taken instead.
+            if (i == 0 || !fallbackModulePathBuffer || IsExecutableAddress(pQueryAddress))
             {
-                DebugPrintExceptionInfo("Set - Selected module path copy failed\n");
+                const bool copied =
+                    CopyModulePathToBuffer(tempModulePathBuffer.get(), modulePathNameBuffer.get(), MAX_MODULE_PATH, "Set - Selected module path copy");
+                if (!copied)
+                {
+                    DebugPrintExceptionInfo("Set - Selected module path copy failed\n");
+                }
+                pModuleBaseAddress = pModuleBaseAddressTemp;
+                pExceptionAddress = pQueryAddress;
+                bSelectedExecutableFrame = true;
+                break;
             }
-            pModuleBaseAddress = pModuleBaseAddressTemp;
-            pExceptionAddress = pQueryAddress;
-            break;
+
+            if (pFallbackModuleBaseAddress == nullptr)
+            {
+                pFallbackModuleBaseAddress = pModuleBaseAddressTemp;
+                pFallbackAddress = pQueryAddress;
+                const bool copied =
+                    CopyModulePathToBuffer(tempModulePathBuffer.get(), fallbackModulePathBuffer.get(), MAX_MODULE_PATH, "Set - Fallback module path copy");
+                if (!copied)
+                {
+                    DebugPrintExceptionInfo("Set - Fallback module path copy failed\n");
+                }
+            }
         }
 
         const uintptr_t espAddr = static_cast<uintptr_t>(m_ulESP);
@@ -718,6 +807,20 @@ void CExceptionInformation_Impl::Set(std::uint32_t iCode, _EXCEPTION_POINTERS* p
         }
 
         pQueryAddress = stackValue;
+    }
+
+    // Nothing executable was found on the stack: keep the first non-system
+    // candidate so the walk still reports a module for data-only stack content.
+    if (!bSelectedExecutableFrame && pFallbackModuleBaseAddress != nullptr)
+    {
+        pModuleBaseAddress = pFallbackModuleBaseAddress;
+        pExceptionAddress = pFallbackAddress;
+        const bool copied =
+            CopyModulePathToBuffer(fallbackModulePathBuffer.get(), modulePathNameBuffer.get(), MAX_MODULE_PATH, "Set - Fallback module path restore");
+        if (!copied)
+        {
+            DebugPrintExceptionInfo("Set - Fallback module path restore failed\n");
+        }
     }
 
     m_szModulePathName = std::move(modulePathNameBuffer);
@@ -992,8 +1095,17 @@ void CExceptionInformation_Impl::UpdateModuleBaseNameFromCurrentPath()
     if (baseView.empty())
         return;
 
-    m_moduleBaseNameStorage.assign(baseView.begin(), baseView.end());
-    m_szModuleBaseName = m_moduleBaseNameStorage.c_str();
+    // The copy below can allocate; keep this helper non-throwing so crash
+    // callers can always fall back to the buffer's full path.
+    try
+    {
+        m_moduleBaseNameStorage.assign(baseView.begin(), baseView.end());
+        m_szModuleBaseName = m_moduleBaseNameStorage.c_str();
+    }
+    catch (...)
+    {
+        DebugPrintExceptionInfo("UpdateModuleBaseNameFromCurrentPath - Failed to store base name\n");
+    }
 }
 
 void CExceptionInformation_Impl::ClearModulePathState()
