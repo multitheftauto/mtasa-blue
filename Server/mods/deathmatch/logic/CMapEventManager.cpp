@@ -128,7 +128,8 @@ void CMapEventManager::DeleteAll()
     m_bHasEvents = !m_EventsMap.empty();
 }
 
-bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, class CElement* pSource, class CElement* pThis, CPlayer* pCaller)
+bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, class CElement* pSource, class CElement* pThis, CPlayer* pCaller,
+                            CResource* pSourceResource)
 {
     // Check if no events
     if (!m_bHasEvents)
@@ -214,14 +215,21 @@ bool CMapEventManager::Call(const char* szName, const CLuaArguments& Arguments, 
                     lua_pushelement(pState, pThis);
                     lua_setglobal(pState, "this");
 
-                    CLuaMain*  pLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
-                    CResource* pSourceResource = pLuaMain ? pLuaMain->GetResource() : NULL;
-                    if (pSourceResource)
+                    // Prefer the resource the caller passed in. Remotely triggered events have no Lua call in
+                    // progress, so GetTopLuaMain() would report no resource at all for them.
+                    CResource* pOriginResource = pSourceResource;
+                    if (!pOriginResource)
                     {
-                        lua_pushresource(pState, pSourceResource);
+                        CLuaMain* pLuaMain = g_pGame->GetScriptDebugging()->GetTopLuaMain();
+                        pOriginResource = pLuaMain ? pLuaMain->GetResource() : nullptr;
+                    }
+
+                    if (pOriginResource)
+                    {
+                        lua_pushresource(pState, pOriginResource);
                         lua_setglobal(pState, "sourceResource");
 
-                        lua_pushelement(pState, pSourceResource->GetResourceRootElement());
+                        lua_pushelement(pState, pOriginResource->GetResourceRootElement());
                         lua_setglobal(pState, "sourceResourceRoot");
                     }
                     else

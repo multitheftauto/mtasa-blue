@@ -214,13 +214,14 @@ bool CStaticFunctionDefinitions::TriggerEvent(const char* szName, CElement* pEle
 }
 
 bool CStaticFunctionDefinitions::TriggerClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement,
-                                                    CLuaArguments& Arguments)
+                                                    CLuaArguments& Arguments, CResource* pSourceResource)
 {
     assert(szName);
     assert(pCallWithElement);
 
     // Make packet
-    CLuaEventPacket Packet(szName, pCallWithElement->GetID(), &Arguments);
+    CLuaEventPacket Packet(szName, pCallWithElement->GetID(), &Arguments,
+                           static_cast<unsigned short>(pSourceResource ? pSourceResource->GetNetID() : INVALID_RESOURCE_NET_ID));
 
     // Send packet to players
     CPlayerManager::Broadcast(Packet, sendList);
@@ -231,13 +232,15 @@ bool CStaticFunctionDefinitions::TriggerClientEvent(const std::vector<CPlayer*>&
 }
 
 bool CStaticFunctionDefinitions::TriggerLatentClientEvent(const std::vector<CPlayer*>& sendList, const char* szName, CElement* pCallWithElement,
-                                                          CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId)
+                                                          CLuaArguments& Arguments, int iBandwidth, CLuaMain* pLuaMain, ushort usResourceNetId,
+                                                          CResource* pSourceResource)
 {
     assert(szName);
     assert(pCallWithElement);
 
     // Make packet
-    CLuaEventPacket Packet(szName, pCallWithElement->GetID(), &Arguments);
+    CLuaEventPacket Packet(szName, pCallWithElement->GetID(), &Arguments,
+                           static_cast<unsigned short>(pSourceResource ? pSourceResource->GetNetID() : INVALID_RESOURCE_NET_ID));
 
     markerLatentEvent.Set("Make packet");
 

@@ -741,7 +741,8 @@ bool CClientEntity::AddEvent(CLuaMain* pLuaMain, const char* szName, const CLuaF
     return m_pEventManager->Add(pLuaMain, szName, iLuaFunction, bPropagated, eventPriority, fPriorityMod);
 }
 
-bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren, const char* minClientVersion)
+bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments, bool bCallOnChildren, const char* minClientVersion,
+                              CResource* pSourceResource)
 {
     CDebugHookManager* debugHookManager = g_pClientGame->GetDebugHookManager();
     if (debugHookManager->HasPreEventHooks())
@@ -758,12 +759,12 @@ bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments
     pEvents->PreEventPulse();
 
     // Call the event on our parents/us first
-    CallParentEvent(szName, Arguments, this, minClientVersion);
+    CallParentEvent(szName, Arguments, this, minClientVersion, pSourceResource);
 
     if (bCallOnChildren)
     {
         // Call it on all our children
-        CallEventNoParent(szName, Arguments, this, minClientVersion);
+        CallEventNoParent(szName, Arguments, this, minClientVersion, pSourceResource);
     }
 
     // Tell the event manager that we're done calling the event
@@ -783,13 +784,14 @@ bool CClientEntity::CallEvent(const char* szName, const CLuaArguments& Arguments
     return (!pEvents->WasEventCancelled());
 }
 
-void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource, const char* minClientVersion)
+void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource, const char* minClientVersion,
+                                      CResource* pSourceResource)
 {
     // Call it on us if this isn't the same class it was raised on
     // TODO not sure why the null check is necessary (eAi)
     if (pSource != this && m_pEventManager != NULL && m_pEventManager->HasEvents())
     {
-        m_pEventManager->Call(szName, Arguments, pSource, this, minClientVersion);
+        m_pEventManager->Call(szName, Arguments, pSource, this, minClientVersion, pSourceResource);
     }
 
     // Call it on all our children
@@ -802,7 +804,7 @@ void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& A
             {
                 if (!pEntity->m_pEventManager || pEntity->m_pEventManager->HasEvents() || !pEntity->m_Children.empty())
                 {
-                    pEntity->CallEventNoParent(szName, Arguments, pSource, minClientVersion);
+                    pEntity->CallEventNoParent(szName, Arguments, pSource, minClientVersion, pSourceResource);
                     if (m_bBeingDeleted)
                         break;
                 }
@@ -811,18 +813,19 @@ void CClientEntity::CallEventNoParent(const char* szName, const CLuaArguments& A
     }
 }
 
-void CClientEntity::CallParentEvent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource, const char* minClientVersion)
+void CClientEntity::CallParentEvent(const char* szName, const CLuaArguments& Arguments, CClientEntity* pSource, const char* minClientVersion,
+                                    CResource* pSourceResource)
 {
     // Call the event on us
     if (m_pEventManager && m_pEventManager->HasEvents())
     {
-        m_pEventManager->Call(szName, Arguments, pSource, this, minClientVersion);
+        m_pEventManager->Call(szName, Arguments, pSource, this, minClientVersion, pSourceResource);
     }
 
     // Call parent's handler
     if (m_pParent)
     {
-        m_pParent->CallParentEvent(szName, Arguments, pSource, minClientVersion);
+        m_pParent->CallParentEvent(szName, Arguments, pSource, minClientVersion, pSourceResource);
     }
 }
 
