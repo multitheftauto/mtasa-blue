@@ -246,13 +246,17 @@ void CPedSync::Packet_PedSync(CPedSyncPacket& Packet)
         // Apply the data to the ped
         if (Data.ucFlags & 0x01)
         {
-            pPed->SetPosition(Data.position.data.vecPosition);
+            const CVector vecPosition(Data.position.data.vecPosition.fX, Data.position.data.vecPosition.fY, Data.position.data.vecPosition.fZ);
+            pPed->SetPosition(vecPosition);
             g_pGame->GetColManager()->DoHitDetection(pPed->GetPosition(), pPed);
         }
         if (Data.ucFlags & 0x02)
             pPed->SetRotation(Data.rotation.data.fRotation);
         if (Data.ucFlags & 0x04)
-            pPed->SetVelocity(Data.velocity.data.vecVelocity);
+        {
+            const CVector vecVelocity(Data.velocity.data.vecVelocity.fX, Data.velocity.data.vecVelocity.fY, Data.velocity.data.vecVelocity.fZ);
+            pPed->SetVelocity(vecVelocity);
+        }
 
         // Clamp in place, the same data is relayed to the other players below
         if (Data.ucFlags & 0x08)
