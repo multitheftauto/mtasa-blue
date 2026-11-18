@@ -103,8 +103,8 @@ public:
     bool  IsAspectRatioAdjustmentEnabled();
     float GetAspectRatioAdjustmentSourceRatio();
     void  SetAspectRatioAdjustmentSuspended(bool bSuspended);
-    float ConvertPositionForAspectRatio(float fY);
-    void  ConvertSideForAspectRatio(float* pfY, float* pfHeight);
+    float ConvertPositionForAspectRatio(float x);
+    void  ConvertSideForAspectRatio(float* x, float* width);
 
     // DirectX font functions
     ID3DXFont* GetFont(eFontType fontType = FONT_DEFAULT, float* pfOutScaleUsed = NULL, float fRequestedScale = 1, const char* szCustomScaleUser = NULL);
