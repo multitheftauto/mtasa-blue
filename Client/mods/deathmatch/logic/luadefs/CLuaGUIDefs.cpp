@@ -1570,7 +1570,7 @@ int CLuaGUIDefs::GUIScrollBarSetScrollPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        CStaticFunctionDefinitions::GUIScrollBarSetScrollPosition(*theScrollBar, static_cast<int>(amount));
+        CStaticFunctionDefinitions::GUIScrollBarSetScrollPosition(*theScrollBar, amount);
         lua_pushboolean(luaVM, true);
         return 1;
     }
@@ -1706,8 +1706,8 @@ int CLuaGUIDefs::GUIScrollBarGetScrollPosition(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        int iPos = (int)(static_cast<CGUIScrollBar*>(theScrollBar->GetCGUIElement())->GetScrollPosition() * 100.0f);
-        lua_pushnumber(luaVM, iPos);
+        float fPos = static_cast<CGUIScrollBar*>(theScrollBar->GetCGUIElement())->GetScrollPosition() * 100.0f;
+        lua_pushnumber(luaVM, fPos);
         return 1;
     }
     else
