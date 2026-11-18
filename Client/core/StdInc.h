@@ -20,6 +20,7 @@
 #include <windowsx.h>
 #include <time.h>
 #include <shlwapi.h>
+#include <shlobj.h>
 #include <winsock.h>
 #include <conio.h>
 
