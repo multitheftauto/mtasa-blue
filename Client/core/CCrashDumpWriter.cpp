@@ -383,7 +383,6 @@ static std::atomic<uint>                                   ms_uiInvalidParameter
 static std::atomic<bool>                                   ms_bInvalidParameterWarningStored{false};
 static std::atomic<bool>                                   ms_bFallbackStackLogged{false};
 static HANDLE                                              ms_hCrashDialogProcess = nullptr;
-static DWORD                                               ms_crashDialogProcessId = 0;
 
 namespace
 {
@@ -412,15 +411,14 @@ namespace
         return TRUE;
     }
 
-    // Locate crash dialog by process ID to prevent localization mismatches on non-English locales
+    // Search strictly by PID when available so localized window titles or other crash dialogs never mismatch
     [[nodiscard]] static HWND FindCrashDialogWindow(DWORD processId = 0)
     {
         if (processId != 0)
         {
             ProcessWindowSearchContext context{processId, nullptr};
             EnumWindows(EnumWindowsForProcess, reinterpret_cast<LPARAM>(&context));
-            if (context.foundWindow != nullptr && IsWindow(context.foundWindow))
-                return context.foundWindow;
+            return (context.foundWindow && IsWindow(context.foundWindow)) ? context.foundWindow : nullptr;
         }
 
         return FindWindowW(nullptr, L"MTA: San Andreas has encountered a problem");
@@ -1698,14 +1696,14 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: No process handle (likely ShellExecute path), polling for dialog window...\n");
 
         HWND hDialogWindow = nullptr;
-        for (std::size_t attempts = 0; attempts < MAX_WINDOW_POLL_ATTEMPTS && hDialogWindow == nullptr; ++attempts)
+        for (std::size_t attempts = 0; attempts < MAX_WINDOW_POLL_ATTEMPTS && !hDialogWindow; ++attempts)
         {
-            hDialogWindow = FindCrashDialogWindow(ms_crashDialogProcessId);
-            if (hDialogWindow == nullptr)
+            hDialogWindow = FindCrashDialogWindow();
+            if (!hDialogWindow)
                 Sleep(Milliseconds(WINDOW_POLL_TIMEOUT));
         }
 
-        if (hDialogWindow != nullptr && IsWindow(hDialogWindow))
+        if (hDialogWindow && IsWindow(hDialogWindow))
         {
             SAFE_DEBUG_OUTPUT(SString("CCrashDumpWriter: Found dialog window %p, waiting for it to close...\n", hDialogWindow).c_str());
 
@@ -1729,13 +1727,21 @@ long WINAPI CCrashDumpWriter::HandleExceptionGlobal(_EXCEPTION_POINTERS* pExcept
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter: Crash dialog was not shown; displaying emergency notice\n");
         Sleep(Milliseconds(PROCESS_WAIT_TIMEOUT));
 
-        const wchar_t* emergencyMessage =
-            L"MTA: San Andreas has encountered an unhandled error.\n\n"
-            L"The crash report dialog could not be launched.\n"
+        // Use static literals (no heap allocation under OOM) and reflect actual core.log write status
+        static constexpr wchar_t kEmergencyMessageWithLog[] =
+            L"MTA: San Andreas has crashed.\n\n"
+            L"The usual crash dialog could not be launched.\n\n"
             L"Diagnostic details have been saved to:\n"
             L"MTA San Andreas\\mta\\core.log\n\n"
+            L"Contact support on the MTA discord: https://discord.gg/RygaCSD.\n\n"
+            L"The game will now close.";
+        static constexpr wchar_t kEmergencyMessageWithoutLog[] =
+            L"MTA: San Andreas has crashed.\n\n"
+            L"The usual crash dialog could not be launched, and diagnostic details could not be saved.\n\n"
+            L"Contact support on the MTA discord: https://discord.gg/RygaCSD.\n\n"
             L"The game will now close.";
 
+        const wchar_t* emergencyMessage = coreLogSucceeded ? kEmergencyMessageWithLog : kEmergencyMessageWithoutLog;
         MessageBoxW(nullptr, emergencyMessage, L"MTA: San Andreas - Fatal Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_SETFOREGROUND | MB_TOPMOST);
     }
     else if (!crashArtifactsGenerated)
@@ -2974,13 +2980,12 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
             }
             else
             {
-                AddReportLog(3132, SString("RunErrorTool could not find crash dialog window by title after CreateProcess (%s)", candidate.c_str()));
+                AddReportLog(3132, SString("RunErrorTool could not find crash dialog window after CreateProcess (%s)", candidate.c_str()));
             }
 
             if (windowFound)
             {
                 ms_hCrashDialogProcess = processHandle.release();
-                ms_crashDialogProcessId = processInfo.dwProcessId;
                 threadHandle.reset();
                 dialogLaunched = true;
                 break;
@@ -2999,35 +3004,44 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
             continue;
         }
 
-        const auto shellExecuteResult = ShellExecuteW(nullptr, L"open", candidateWide.c_str(), crashArgsWide.c_str(), candidateDirWidePtr, SW_SHOW);
-        const auto shellExecuteCode = reinterpret_cast<ULONG_PTR>(shellExecuteResult);
-        if (shellExecuteCode > 32u)
+        SHELLEXECUTEINFOW shellExecuteInfo{};
+        shellExecuteInfo.cbSize = sizeof(shellExecuteInfo);
+        shellExecuteInfo.fMask = SEE_MASK_NOCLOSEPROCESS | SEE_MASK_FLAG_NO_UI;
+        shellExecuteInfo.lpVerb = L"open";
+        shellExecuteInfo.lpFile = candidateWide.c_str();
+        shellExecuteInfo.lpParameters = crashArgsWide.c_str();
+        shellExecuteInfo.lpDirectory = candidateDirWidePtr;
+        shellExecuteInfo.nShow = SW_SHOW;
+
+        if (ShellExecuteExW(&shellExecuteInfo))
         {
-            AddReportLog(3124, SString("RunErrorTool launched crash dialog via ShellExecute (%s)", candidate.c_str()));
+            UniqueHandle shellProcessHandle{shellExecuteInfo.hProcess};
+            const DWORD  shellProcessId = shellProcessHandle ? GetProcessId(shellProcessHandle.get()) : 0;
+            AddReportLog(3124, SString("RunErrorTool launched crash dialog via ShellExecuteEx (%s)", candidate.c_str()));
             Sleep(1000);
 
             HWND hDialogWindow = nullptr;
-            for (std::size_t attempts = 0; attempts < SHELL_EXEC_POLL_ATTEMPTS && hDialogWindow == nullptr; attempts++)
+            for (std::size_t attempts = 0; attempts < SHELL_EXEC_POLL_ATTEMPTS && !hDialogWindow; ++attempts)
             {
-                hDialogWindow = FindCrashDialogWindow();
-                if (hDialogWindow == nullptr)
+                hDialogWindow = FindCrashDialogWindow(shellProcessId);
+                if (!hDialogWindow)
                     Sleep(Milliseconds(WINDOW_POLL_TIMEOUT));
             }
 
-            if (hDialogWindow != nullptr && IsWindow(hDialogWindow))
+            if (hDialogWindow && IsWindow(hDialogWindow))
             {
                 SetWindowPos(hDialogWindow, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW);
                 SetForegroundWindow(hDialogWindow);
+                ms_hCrashDialogProcess = shellProcessHandle.release();
                 dialogLaunched = true;
                 break;
             }
 
-            AddReportLog(3132, SString("RunErrorTool could not find crash dialog window by title after ShellExecute (%s)", candidate.c_str()));
+            AddReportLog(3132, SString("RunErrorTool could not find crash dialog window after ShellExecuteEx (%s)", candidate.c_str()));
         }
         else
         {
-            AddReportLog(
-                3122, SString("RunErrorTool ShellExecute fallback failed with code %u for %s", static_cast<unsigned int>(shellExecuteCode), candidate.c_str()));
+            AddReportLog(3122, SString("RunErrorTool ShellExecuteEx fallback failed with error %u for %s", GetLastError(), candidate.c_str()));
         }
 
         RestoreBaseDirectories();
@@ -3040,16 +3054,6 @@ void CCrashDumpWriter::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionI
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - FAILED to launch crash dialog with any candidate!\n");
         SAFE_DEBUG_OUTPUT("CCrashDumpWriter::RunErrorTool - User will not see crash report dialog!\n");
         AddReportLog(3129, "RunErrorTool completely failed to launch crash dialog");
-
-        const wchar_t* emergencyMessage =
-            L"MTA: San Andreas has crashed.\n\n"
-            L"The usual crash dialog has also failed, with this as fallback.\n\n"
-            L"Crash information has been saved to:\n"
-            L"MTA San Andreas\\mta\\core.log\n\n"
-            L"Contact support on the MTA discord: https://discord.gg/RygaCSD.\n\n"
-            L"The game will now close.";
-
-        MessageBoxW(nullptr, emergencyMessage, L"MTA: San Andreas - Fatal Error", MB_OK | MB_ICONERROR | MB_SYSTEMMODAL | MB_SETFOREGROUND | MB_TOPMOST);
     }
 
     return dialogLaunched;

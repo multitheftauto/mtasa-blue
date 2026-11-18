@@ -2202,10 +2202,13 @@ static bool InstallSehHandler()
     using SetProcessUserModeExceptionPolicyFn = BOOL(WINAPI*)(DWORD);
     if (HMODULE kernel32Module = GetModuleHandleW(L"kernel32.dll"))
     {
-        if (auto setPolicy = reinterpret_cast<SetProcessUserModeExceptionPolicyFn>(GetProcAddress(kernel32Module, "SetProcessUserModeExceptionPolicy")))
+        SetProcessUserModeExceptionPolicyFn setPolicy = nullptr;
+        if (SharedUtil::TryGetProcAddress(kernel32Module, "SetProcessUserModeExceptionPolicy", setPolicy))
         {
-            setPolicy(0);
-            SafeDebugOutput("CrashHandler: User-mode callback exception policy configured to propagate exceptions\n");
+            if (setPolicy(0))
+                SafeDebugOutput("CrashHandler: User-mode callback exception policy configured to propagate exceptions\n");
+            else
+                SafeDebugOutput("CrashHandler: WARNING - Failed to configure user-mode callback exception policy\n");
         }
     }
 
