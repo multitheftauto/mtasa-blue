@@ -282,7 +282,11 @@ int CLuaDatabaseDefs::DbConnect(lua_State* luaVM)
 
             if (!argStream.HasErrors())
             {
-                if (strType == "mysql")
+                // Network databases. Their scripts hold a password, and their queries can wait on the network.
+                const bool bIsServerDatabase = (strType == "mysql" || strType == "postgresql");
+
+                // Stops other resources reading this resource's scripts, which contain the database password
+                if (bIsServerDatabase)
                     pThisResource->SetUsingDbConnectMysql(true);
 
                 // Add logging options
@@ -292,7 +296,9 @@ int CLuaDatabaseDefs::DbConnect(lua_State* luaVM)
                 // Set default values if required
                 GetOption<CDbOptionsMap>(strOptions, "log", bLoggingEnabled, 1);
                 GetOption<CDbOptionsMap>(strOptions, "tag", strLogTag, "script");
-                GetOption<CDbOptionsMap>(strOptions, "queue", strQueueName, (strType == "mysql") ? strHost : SStringX(DB_SQLITE_QUEUE_NAME_DEFAULT));
+                // One queue (worker thread) per host, so a slow database server doesn't hold up the
+                // shared SQLite queue or other hosts
+                GetOption<CDbOptionsMap>(strOptions, "queue", strQueueName, bIsServerDatabase ? strHost : SStringX(DB_SQLITE_QUEUE_NAME_DEFAULT));
                 SetOption<CDbOptionsMap>(strOptions, "log", bLoggingEnabled);
                 SetOption<CDbOptionsMap>(strOptions, "tag", strLogTag);
                 SetOption<CDbOptionsMap>(strOptions, "queue", strQueueName);
