@@ -51,6 +51,8 @@ namespace
     constexpr std::uintptr_t VAR_CDraw_AspectRatio = 0xC3EFA4;
     constexpr float          NATIVE_ASPECT_RATIO = 4.0f / 3.0f;
     constexpr float          DEFAULT_BASE_FOV = 70.0f;
+    constexpr float          MIN_FOV = 1e-3f;
+    constexpr float          MAX_FOV = 179.99f;
     constexpr float          DEFAULT_SKY_POLY_HALF_WIDTH = 1.4f;
     constexpr float          DEG_TO_RAD = 3.14159265358979323846f / 180.0f;
     constexpr float          RAD_TO_DEG = 180.0f / 3.14159265358979323846f;
@@ -110,7 +112,7 @@ namespace
 // view stays consistent across widescreen and ultrawide aspect ratios.
 __declspec(noinline) static float __cdecl CalculateHorPlusFOV(float fov) noexcept
 {
-    const float clampedFOV = Clamp(1.0f, fov, 179.0f);
+    const float clampedFOV = Clamp(MIN_FOV, fov, MAX_FOV);
     const float aspectRatio = *reinterpret_cast<const float*>(VAR_CDraw_AspectRatio);
     if (aspectRatio <= 0.1f || std::fabs(aspectRatio - NATIVE_ASPECT_RATIO) < 1e-4f)
         return clampedFOV;
@@ -122,7 +124,7 @@ __declspec(noinline) static float __cdecl CalculateHorPlusFOV(float fov) noexcep
 
 static void UpdateFOVAndWidescreenScales(float fov) noexcept
 {
-    baseCameraFOV = Clamp(1.0f, fov, 179.0f);
+    baseCameraFOV = Clamp(MIN_FOV, fov, MAX_FOV);
     const float aspectRatio = *reinterpret_cast<const float*>(VAR_CDraw_AspectRatio);
     const float safeAspect = (aspectRatio > 0.1f) ? aspectRatio : NATIVE_ASPECT_RATIO;
     const float horPlusFOV = CalculateHorPlusFOV(baseCameraFOV);
