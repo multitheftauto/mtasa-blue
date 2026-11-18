@@ -683,6 +683,8 @@ bool CMainConfig::LoadExtended()
     uiCurrentIndex = 0;
     bool bFoundDefault = false;
 
+    RegisterCommands();
+
     CLogger::SetMinLogLevel(LOGLEVEL_MEDIUM);
     CLogger::LogPrint("Starting resources...");
     CLogger::ProgressDotsBegin();
@@ -768,7 +770,11 @@ bool CMainConfig::LoadExtended()
     CLogger::ProgressDotsEnd();
     CLogger::SetMinLogLevel(LOGLEVEL_LOW);
 
-    // Register the commands
+    return true;
+}
+
+void CMainConfig::RegisterCommands()
+{
     RegisterCommand("start", CConsoleCommands::StartResource, false, "Usage: start <resource1> <resource2> ...\nStart a loaded resource eg: start admin");
     RegisterCommand("stop", CConsoleCommands::StopResource, false, "Usage: stop <resource1> <resource2> ...\nStop a resource eg: stop admin");
     RegisterCommand("stopall", CConsoleCommands::StopAllResources, false, "Stop all running resources");
@@ -838,7 +844,6 @@ bool CMainConfig::LoadExtended()
     RegisterCommand("sfakelag", CConsoleCommands::FakeLag, false,
                     "Usage: sfakelag <packet loss> <extra ping> <ping variance> [<KBPS limit>]\nOnly available if enabled in the mtaserver.conf file.\nAdds "
                     "artificial packet loss, ping, jitter and bandwidth limits to the server-client connections.");
-    return true;
 }
 
 bool CMainConfig::Save()
