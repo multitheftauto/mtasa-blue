@@ -217,6 +217,9 @@ CClientCamera::~CClientCamera()
         // Restore the camera to the local player
         SetFocusToLocalPlayerImpl();
     }
+    // game_sa keeps the followed ped past our lifetime
+    StopNativeSpectating();
+
     CClientEntityRefManager::RemoveEntityRefs(0, &m_pFocusedPlayer, &m_pFocusedEntity, NULL);
 }
 
@@ -237,7 +240,8 @@ void CClientCamera::DoPulse()
         if (!m_bInvalidated)
         {
             // If we got the camera behind a player but no focused entity
-            if (m_pFocusedPlayer)
+            // (the game's camera already follows a player in and out of vehicles)
+            if (m_pFocusedPlayer && !m_nativeSpectating)
             {
                 if (m_pFocusedEntity)
                 {
@@ -562,19 +566,34 @@ void CClientCamera::SetFocus(CClientEntity* pEntity, eCamMode eMode, bool bSmoot
         CEntity* pGameEntity = pEntity->GetGameEntity();
         if (pGameEntity)
         {
-            // Set the switch style
-            int iSwitchStyle = 2;
-            if (bSmoothTransition)
+            if (CPed* const followedPed = GetNativeFollowTarget(pEntity, eMode))
             {
-                iSwitchStyle = 1;
+                // The previously followed ped is no longer ours to show or hide
+                RestoreSpectatedPedVisibility();
+
+                // TakeControl only offers the zoom levels, not the bumper and cinematic cameras
+                m_pCamera->SetSpectatedPed(followedPed, bSmoothTransition);
+                m_nativeSpectating = true;
             }
+            else
+            {
+                // May still follow a ped from an earlier call
+                StopNativeSpectating();
 
-            // Hacky, used to follow peds
-            if (eMode == MODE_CAM_ON_A_STRING && (eType == CCLIENTPED || eType == CCLIENTPLAYER))
-                eMode = MODE_FOLLOWPED;
+                // Set the switch style
+                int iSwitchStyle = 2;
+                if (bSmoothTransition)
+                {
+                    iSwitchStyle = 1;
+                }
 
-            // Do it
-            m_pCamera->TakeControl(pGameEntity, eMode, iSwitchStyle);
+                // Hacky, used to follow peds
+                if (eMode == MODE_CAM_ON_A_STRING && (eType == CCLIENTPED || eType == CCLIENTPLAYER))
+                    eMode = MODE_FOLLOWPED;
+
+                // Do it
+                m_pCamera->TakeControl(pGameEntity, eMode, iSwitchStyle);
+            }
 
             // Store
             m_pFocusedEntity = pEntity;
@@ -608,9 +627,10 @@ void CClientCamera::SetFocus(CClientPlayer* pPlayer, eCamMode eMode, bool bSmoot
             return;
         }
 
-        // Attach the camera to the player vehicle if in a vehicle. To the player model otherwise
+        // Attach the camera to the player vehicle if in a vehicle. To the player model otherwise.
+        // The game's camera follows the player into vehicles by itself
         CClientVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
-        if (pVehicle)
+        if (pVehicle && !GetNativeFollowTarget(pPlayer, eMode))
         {
             SetFocus(pVehicle, eMode, bSmoothTransition);
         }
@@ -647,6 +667,9 @@ void CClientCamera::SetFocus(CVector* vecTarget, bool bSmoothTransition)
         return;
 
     *vecTarget = sanitizedTarget;
+
+    // A fixed position ends the native follow
+    StopNativeSpectating();
 
     if (m_pFocusedEntity && m_pFocusedEntity->IsStreamingCompatibleClass())
         static_cast<CClientStreamElement*>((CClientEntity*)m_pFocusedEntity)->RemoveStreamReference();
@@ -693,9 +716,66 @@ void CClientCamera::SetFocusToLocalPlayerImpl()
     // Restore the camera
     if (!m_pCamera)
         return;
-    m_pCamera->RestoreWithJumpCut();
+
+    if (m_nativeSpectating)
+    {
+        RestoreSpectatedPedVisibility();
+
+        // Back to the local player
+        m_pCamera->SetSpectatedPed(nullptr, false);
+        m_nativeSpectating = false;
+    }
+    else
+    {
+        m_pCamera->RestoreWithJumpCut();
+    }
+
     SetCenterOfWorldCached(NULL, 0.0f);
     InvalidateCachedTransforms();
+}
+
+// The game's camera follows another ped when it takes the local player's slot (see SpectatedPedScope)
+CPed* CClientCamera::GetNativeFollowTarget(CClientEntity* entity, eCamMode mode) const
+{
+    if (mode != MODE_CAM_ON_A_STRING)
+        return nullptr;
+
+    const eClientEntityType type = entity->GetType();
+    if (type != CCLIENTPLAYER && type != CCLIENTPED)
+        return nullptr;
+
+    // The local player already is the camera's target; every game ped MTA creates is a CPlayerPed
+    auto* const ped = static_cast<CClientPed*>(entity);
+    return ped->IsLocalPlayer() ? nullptr : ped->GetGamePlayer();
+}
+
+void CClientCamera::StopNativeSpectating()
+{
+    if (!m_nativeSpectating)
+        return;
+
+    RestoreSpectatedPedVisibility();
+
+    if (m_pCamera)
+        m_pCamera->ForgetSpectatedPed();
+
+    m_nativeSpectating = false;
+}
+
+// The game's camera toggles the visibility flag of the followed ped; reapply the alpha MTA keeps for it
+void CClientCamera::RestoreSpectatedPedVisibility()
+{
+    // Do not touch a ped being deleted
+    if (!m_nativeSpectating || !m_pFocusedEntity || m_pFocusedEntity->IsBeingDeleted())
+        return;
+
+    const eClientEntityType type = m_pFocusedEntity->GetType();
+    if (type != CCLIENTPED && type != CCLIENTPLAYER)
+        return;
+
+    CClientEntity* entity = m_pFocusedEntity;
+    auto* const    ped = static_cast<CClientPed*>(entity);
+    ped->SetAlpha(ped->GetAlpha());
 }
 
 void CClientCamera::UnreferenceEntity(CClientEntity* pEntity)

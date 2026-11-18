@@ -419,6 +419,10 @@ public:
     float        GetTransitionFOV() const override;
     bool         GetTransitionMatrix(CMatrix& matrix) const override;
     bool         IsSphereVisible(CVector* center, float radius) const override;
+    void         SetSpectatedPed(CPed* ped, bool smoothTransition) override;
+    void         ForgetSpectatedPed() noexcept override;
+    void         DrawSpectatedPedCrossHairs() override;
+    bool         IsSpectatedPedInVehicle() const noexcept override;
 
     // Additional overload not in base interface
     virtual CCam* GetCam(CCamSAInterface* camInterface);

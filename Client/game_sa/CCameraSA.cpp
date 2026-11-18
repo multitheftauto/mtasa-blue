@@ -12,6 +12,7 @@
 #include "StdInc.h"
 #include "CCameraSA.h"
 #include "CGameSA.h"
+#include <array>
 #include <atomic>
 #include <cmath>
 #include <cstdint>
@@ -57,6 +58,86 @@ static std::atomic<uint8_t> s_cameraClipMask{static_cast<uint8_t>(CameraClipFlag
 DWORD RETURN_Camera_CollisionDetection = 0x520195;
 void  HOOK_Camera_CollisionDetection();
 
+// The camera finds its target through CWorld::Players[PlayerInFocus] (FindPlayerPed, FindPlayerVehicle, FindPlayerCoors
+// and FindPlayerSpeed derive from it); swapping that ped makes every camera mode work for the spectated ped
+#define VAR_PlayerInFocus    0xB7CD74
+#define ARRAY_PlayerInfo     0xB7CD98  // CWorld::Players; the first field of an entry is its ped
+#define SIZE_PlayerInfo      0x190
+#define FUNC_CCamera_Process 0x52B730
+
+// Direct calls to CCamera::Process
+#define CALL_CCamera_Process_InProcedure53BC80 0x53BCD3
+#define CALL_CCamera_Process_InProcedure53BCF0 0x53BE97
+#define CALL_CCamera_Process_InProcedure53BEE0 0x53C104
+#define CALL_CCamera_Process_InProcedure570AAB 0x570B5D
+
+// Called in sequence from Idle
+#define FUNC_CRenderer_ConstructRenderList        0x5556E0
+#define FUNC_CRenderer_PreRender                  0x553910
+#define CALL_CRenderer_ConstructRenderList_InIdle 0x53E9F9
+#define CALL_CRenderer_PreRender_InIdle           0x53E9FE
+
+// CHud::DrawCrossHairs and the frame variables it checks first
+#define FUNC_CHud_DrawCrossHairs          0x58E020
+#define FUNC_RwRenderStateSet             0x7FC2D0
+#define VAR_CTimer_FrameCounter           0xB7CB4C
+#define VAR_CinematicCameraProcessedFrame 0xB6EC40
+
+namespace
+{
+    CPedSAInterface* s_spectatedPed = nullptr;
+
+    // Holds the spectated ped in the player slot for its lifetime
+    class SpectatedPedScope
+    {
+    public:
+        SpectatedPedScope() noexcept
+        {
+            if (!s_spectatedPed)
+                return;
+
+            const std::uint8_t playerInFocus = *reinterpret_cast<std::uint8_t*>(VAR_PlayerInFocus);
+            m_slot = reinterpret_cast<CPedSAInterface**>(ARRAY_PlayerInfo + playerInFocus * SIZE_PlayerInfo);
+            m_localPlayerPed = *m_slot;
+            *m_slot = s_spectatedPed;
+        }
+
+        ~SpectatedPedScope() noexcept
+        {
+            if (m_slot)
+                *m_slot = m_localPlayerPed;
+        }
+
+        SpectatedPedScope(const SpectatedPedScope&) = delete;
+        SpectatedPedScope& operator=(const SpectatedPedScope&) = delete;
+
+    private:
+        CPedSAInterface** m_slot = nullptr;
+        CPedSAInterface*  m_localPlayerPed = nullptr;
+    };
+
+    // Replaces the CCamera::Process calls (thiscall; ecx arrives as the first fastcall argument)
+    void __fastcall ProcessCameraAsSpectator(CCameraSAInterface* camera, void*) noexcept
+    {
+        const SpectatedPedScope spectatedPed;
+        reinterpret_cast<void(__thiscall*)(CCameraSAInterface*)>(FUNC_CCamera_Process)(camera);
+    }
+
+    // Same swap for the steps that also depend on the player: the bumper camera vehicle pass (SetupEntityVisibility),
+    // level of detail and mirrors (ConstructRenderList), shadow and headlight coronas (vehicle PreRender)
+    void __cdecl ConstructRenderListAsSpectator() noexcept
+    {
+        const SpectatedPedScope spectatedPed;
+        reinterpret_cast<void(__cdecl*)()>(FUNC_CRenderer_ConstructRenderList)();
+    }
+
+    void __cdecl PreRenderAsSpectator() noexcept
+    {
+        const SpectatedPedScope spectatedPed;
+        reinterpret_cast<void(__cdecl*)()>(FUNC_CRenderer_PreRender)();
+    }
+}  // namespace
+
 CCameraSA::CCameraSA(CCameraSAInterface* cameraInterface)
 {
     if (!cameraInterface)
@@ -92,6 +173,14 @@ CCameraSA::CCameraSA(CCameraSAInterface* cameraInterface)
     s_cameraClipMask.store(static_cast<uint8_t>(CameraClipFlags::Objects) | static_cast<uint8_t>(CameraClipFlags::Vehicles), std::memory_order_relaxed);
 
     HookInstall(HOOKPOS_Camera_CollisionDetection, (DWORD)HOOK_Camera_CollisionDetection, 5);
+
+    constexpr std::array<std::uint32_t, 4> processCallSites{CALL_CCamera_Process_InProcedure53BC80, CALL_CCamera_Process_InProcedure53BCF0,
+                                                            CALL_CCamera_Process_InProcedure53BEE0, CALL_CCamera_Process_InProcedure570AAB};
+    for (const std::uint32_t callSite : processCallSites)
+        HookInstallCall(callSite, reinterpret_cast<DWORD>(&ProcessCameraAsSpectator));
+
+    HookInstallCall(CALL_CRenderer_ConstructRenderList_InIdle, reinterpret_cast<DWORD>(&ConstructRenderListAsSpectator));
+    HookInstallCall(CALL_CRenderer_PreRender_InIdle, reinterpret_cast<DWORD>(&PreRenderAsSpectator));
 }
 
 CCameraSA::~CCameraSA()
@@ -703,6 +792,68 @@ void CCameraSA::SetCameraVehicleViewMode(BYTE dwCamMode)
 void CCameraSA::SetCameraPedViewMode(BYTE dwCamMode)
 {
     MemPutFast<BYTE>(VAR_PedCameraView, dwCamMode);
+}
+
+// The game's camera follows the ped like the local player (see SpectatedPedScope); null restores the local player.
+// Always restores, since TakeControl turns the view mode cycling and the cinematic camera off
+void CCameraSA::SetSpectatedPed(CPed* ped, bool smoothTransition)
+{
+    if (!GetInterface())
+        return;
+
+    auto* const pedSA = dynamic_cast<CPedSA*>(ped);
+    s_spectatedPed = pedSA ? pedSA->GetPedInterface() : nullptr;
+
+    // Restore picks its target through FindPlayerPed and FindPlayerVehicle, so the slot must hold the ped
+    const SpectatedPedScope spectatedPed;
+    if (smoothTransition)
+        Restore();
+    else
+        RestoreWithJumpCut();
+}
+
+// The slot must not keep a ped that is about to be destroyed
+void CCameraSA::ForgetSpectatedPed() noexcept
+{
+    s_spectatedPed = nullptr;
+}
+
+bool CCameraSA::IsSpectatedPedInVehicle() const noexcept
+{
+    return s_spectatedPed && s_spectatedPed->pedFlags.bInVehicle && s_spectatedPed->pVehicle;
+}
+
+// MTA skips CHud::Draw while following another entity, which drops the crosshair; draws it as the spectated ped
+// under the conditions of CHud::Draw (no widescreen, no cinematic camera this frame)
+void CCameraSA::DrawSpectatedPedCrossHairs()
+{
+    const CCameraSAInterface* const cameraInterface = GetInterface();
+    if (!cameraInterface || !s_spectatedPed || cameraInterface->m_WideScreenOn)
+        return;
+
+    if (*reinterpret_cast<std::uint32_t*>(VAR_CinematicCameraProcessedFrame) == *reinterpret_cast<std::uint32_t*>(VAR_CTimer_FrameCounter))
+        return;
+
+    // RenderWare render states and values in the order CHud::Draw sets them (0x58FB1E)
+    const auto              setRenderState = reinterpret_cast<int(__cdecl*)(std::uint32_t, std::uint32_t)>(FUNC_RwRenderStateSet);
+    constexpr std::uint32_t textureRaster = 1, textureAddress = 2, shadeMode = 7, textureFilter = 9, srcBlend = 10, destBlend = 11, vertexAlphaEnable = 12,
+                            fogEnable = 14, alphaTestFunction = 29, alphaTestFunctionRef = 30;
+    constexpr std::uint32_t filterNearest = 1, filterLinear = 2, blendSrcAlpha = 5, blendInvSrcAlpha = 6, addressClamp = 3, shadeFlat = 1, alphaTestGreater = 5;
+    setRenderState(textureFilter, filterNearest);
+    setRenderState(vertexAlphaEnable, 0);
+    setRenderState(fogEnable, 0);
+    setRenderState(srcBlend, blendSrcAlpha);
+    setRenderState(destBlend, blendInvSrcAlpha);
+    setRenderState(vertexAlphaEnable, 1);
+    setRenderState(textureFilter, filterLinear);
+    setRenderState(textureAddress, addressClamp);
+    setRenderState(textureRaster, 0);
+    setRenderState(shadeMode, shadeFlat);
+    setRenderState(alphaTestFunction, alphaTestGreater);
+    setRenderState(alphaTestFunctionRef, 0);
+
+    const SpectatedPedScope spectatedPed;
+    reinterpret_cast<void(__cdecl*)()>(FUNC_CHud_DrawCrossHairs)();
 }
 
 void CCameraSA::SetShakeForce(float fShakeForce)
