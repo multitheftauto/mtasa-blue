@@ -168,6 +168,12 @@ public:
         return true;
     }
 
+    void ReleaseUnusedParts()
+    {
+        while (!m_poolParts.empty() && m_poolParts.back().GetUsedSize() == 0)
+            m_poolParts.pop_back();
+    }
+
 private:
     CDynamicPoolPart<PoolObjT>& AllocateNewPart()
     {
