@@ -120,7 +120,7 @@ public:
     void SetKeyDownHandler(const GUI_CALLBACK_KEY& Callback);
     void SetEnterKeyHandler(GUI_CALLBACK Callback);
 
-    bool Event_OnClick(const CEGUI::EventArgs& e);
+    bool Event_OnClick(const CGUIMouseEventArgs& args);
     bool Event_OnDoubleClick();
     bool Event_OnMouseEnter();
     bool Event_OnMouseLeave();

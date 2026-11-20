@@ -297,9 +297,9 @@ void SetEnterKeyHandler(GUI_CALLBACK Callback)
     CGUIElement_Impl::SetEnterKeyHandler(Callback);
 };
 
-bool Event_OnClick(const CEGUI::EventArgs& e)
+bool Event_OnClick(const CGUIMouseEventArgs& args)
 {
-    return CGUIElement_Impl::Event_OnClick(e);
+    return CGUIElement_Impl::Event_OnClick(args);
 };
 bool Event_OnDoubleClick()
 {
