@@ -2198,6 +2198,20 @@ static bool InstallSehHandler()
     LPTOP_LEVEL_EXCEPTION_FILTER previousFilter = SetUnhandledExceptionFilter(CrashHandlerExceptionFilter);
     g_pfnOrigFilt.store(previousFilter, std::memory_order_release);
 
+    // Disable WOW64 user-mode callback exception swallowing so window procedure exceptions reach SetUnhandledExceptionFilter
+    using SetProcessUserModeExceptionPolicyFn = BOOL(WINAPI*)(DWORD);
+    if (HMODULE kernel32Module = GetModuleHandleW(L"kernel32.dll"))
+    {
+        SetProcessUserModeExceptionPolicyFn setPolicy = nullptr;
+        if (SharedUtil::TryGetProcAddress(kernel32Module, "SetProcessUserModeExceptionPolicy", setPolicy))
+        {
+            if (setPolicy(0))
+                SafeDebugOutput("CrashHandler: User-mode callback exception policy configured to propagate exceptions\n");
+            else
+                SafeDebugOutput("CrashHandler: WARNING - Failed to configure user-mode callback exception policy\n");
+        }
+    }
+
     bool success{true};
 
     std::array<char, DEBUG_BUFFER_SIZE> szDebug{};
