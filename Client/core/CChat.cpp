@@ -1112,6 +1112,20 @@ float CChat::GetTextExtent(const char* szText, float fScale)
     return g_pCore->GetGraphics()->GetDXTextExtent(szText, fScale, g_pChat->m_pDXFont);
 }
 
+static bool HasRtlCharacters(const char* szText)
+{
+    if (!szText)
+        return false;
+
+    for (const wchar_t character : MbUTF8ToUTF16(szText))
+    {
+        if ((character >= 0x0590 && character <= 0x08FF) || (character >= 0xFB1D && character <= 0xFDFF) || (character >= 0xFE70 && character <= 0xFEFF))
+            return true;
+    }
+
+    return false;
+}
+
 void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect2D ClipRect, unsigned long ulFormat, unsigned long ulColor, float fScaleX,
                            float fScaleY, bool bOutline, const CRect2D& RenderBounds)
 {
@@ -1128,25 +1142,31 @@ void CChat::DrawTextString(const char* szText, CRect2D DrawArea, float fZ, CRect
         fScaleX *= g_pChat->m_fRcpUsingDxFontScale;
         fScaleY *= g_pChat->m_fRcpUsingDxFontScale;
 
+        const bool          bRtlText = HasRtlCharacters(szText);
+        const unsigned long ulTextDirection = bRtlText ? (DT_RTLREADING | DT_RIGHT) : 0;
+        const int           iTextWidth = bRtlText ? static_cast<int>(std::ceil(CChat::GetTextExtent(szText, g_pChat->m_vecScale.fX))) : 0;
+        const int           iLeftX = static_cast<int>(DrawArea.fX1);
+        const int           iRightX = bRtlText ? iLeftX + iTextWidth + 1 : static_cast<int>(DrawArea.fX2);
+
         if (DrawArea.fY1 <= RenderBounds.fY1)
         {
             // Clip text at the top
             if (DrawArea.fY1 + fLineHeight - RenderBounds.fY1 > 1)
-                g_pCore->GetGraphics()->DrawString((int)DrawArea.fX1, (int)RenderBounds.fY1, (int)DrawArea.fX2, (int)DrawArea.fY1 + fLineHeight, ulColor,
-                                                   szText, fScaleX, fScaleY, DT_LEFT | DT_BOTTOM | DT_SINGLELINE, g_pChat->m_pDXFont, bOutline);
+                g_pCore->GetGraphics()->DrawString(iLeftX, (int)RenderBounds.fY1, iRightX, (int)DrawArea.fY1 + fLineHeight, ulColor, szText, fScaleX, fScaleY,
+                                                   DT_LEFT | DT_BOTTOM | DT_SINGLELINE | ulTextDirection, g_pChat->m_pDXFont, bOutline);
         }
         else if (DrawArea.fY1 + fLineHeight >= RenderBounds.fY2)
         {
             // Clip text at the bottom
             if (RenderBounds.fY2 - DrawArea.fY1 > 1)
-                g_pCore->GetGraphics()->DrawString((int)DrawArea.fX1, (int)DrawArea.fY1, (int)DrawArea.fX2, (int)RenderBounds.fY2, ulColor, szText, fScaleX,
-                                                   fScaleY, DT_LEFT | DT_TOP | DT_SINGLELINE, g_pChat->m_pDXFont, bOutline);
+                g_pCore->GetGraphics()->DrawString(iLeftX, (int)DrawArea.fY1, iRightX, (int)RenderBounds.fY2, ulColor, szText, fScaleX, fScaleY,
+                                                   DT_LEFT | DT_TOP | DT_SINGLELINE | ulTextDirection, g_pChat->m_pDXFont, bOutline);
         }
         else
         {
             // Text not clipped
-            g_pCore->GetGraphics()->DrawString((int)DrawArea.fX1, (int)DrawArea.fY1, (int)DrawArea.fX1, (int)DrawArea.fY1, ulColor, szText, fScaleX, fScaleY,
-                                               DT_LEFT | DT_TOP | DT_NOCLIP, g_pChat->m_pDXFont, bOutline);
+            g_pCore->GetGraphics()->DrawString(iLeftX, (int)DrawArea.fY1, bRtlText ? iRightX : iLeftX, (int)DrawArea.fY1, ulColor, szText, fScaleX, fScaleY,
+                                               DT_LEFT | DT_TOP | DT_NOCLIP | ulTextDirection, g_pChat->m_pDXFont, bOutline);
         }
     }
 }
