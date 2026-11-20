@@ -144,6 +144,7 @@ public:
     virtual bool ResetDynamicPedShadows() noexcept = 0;
 
     virtual float        GetAspectRatioValue() = 0;
+    virtual float        GetBaseFieldOfView() const = 0;
     virtual eAspectRatio GetAspectRatio() = 0;
     virtual void         SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabled = true) = 0;
 

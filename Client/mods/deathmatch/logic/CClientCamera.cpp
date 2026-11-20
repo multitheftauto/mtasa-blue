@@ -10,6 +10,7 @@
 
 #include <StdInc.h>
 #include <game/CCam.h>
+#include <game/CSettings.h>
 #include <array>
 #include <charconv>
 #include <cmath>
@@ -1088,6 +1089,13 @@ float CClientCamera::GetAccurateFOV() const
 
     if (IsInCameraTransition())
         return m_pCamera->GetTransitionFOV();
+
+    // Return pre-Hor+ base FOV so getCameraMatrix/setCameraMatrix round-trips do not compound Hor+ widening.
+    if (g_pGame)
+    {
+        if (const CGameSettings* settings = g_pGame->GetSettings())
+            return settings->GetBaseFieldOfView();
+    }
 
     return *(float*)VAR_CurrentCameraFOV;
 }

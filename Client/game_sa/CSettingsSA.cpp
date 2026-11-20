@@ -19,6 +19,8 @@
 #include "CCameraSA.h"
 #include "CCamSA.h"
 #include "CVehicleSA.h"
+#include <algorithm>
+#include <cmath>
 
 extern CCoreInterface* g_pCore;
 extern CGameSA*        pGame;
@@ -44,6 +46,23 @@ namespace
     constexpr std::uintptr_t CALL_CShadows_RenderExtraPlayerShadows_FindPlayerVehicle = 0x707FB6;
     constexpr std::uintptr_t FUNC_CStencilShadows_RenderForVehicle = 0x70FAE0;
     constexpr std::uintptr_t CALL_CStencilShadows_Process_RenderForVehicle = 0x711E26;
+
+    constexpr std::uintptr_t VAR_CDraw_FOV = 0x8D5038;
+    constexpr std::uintptr_t VAR_CDraw_AspectRatio = 0xC3EFA4;
+    constexpr float          NATIVE_ASPECT_RATIO = 4.0f / 3.0f;
+    constexpr float          DEFAULT_BASE_FOV = 70.0f;
+    constexpr float          MIN_FOV = 1e-3f;
+    constexpr float          MAX_FOV = 179.99f;
+    constexpr float          DEFAULT_SKY_POLY_HALF_WIDTH = 1.4f;
+    constexpr float          DEG_TO_RAD = 3.14159265358979323846f / 180.0f;
+    constexpr float          RAD_TO_DEG = 180.0f / 3.14159265358979323846f;
+
+    // Pre-Hor+ FOV preserves expected LOD distances, sprite sizes, and script
+    // getCameraMatrix() values while CDraw::ms_fFOV holds the widened Hor+ FOV.
+    float baseCameraFOV = DEFAULT_BASE_FOV;
+    float spriteWidthDivisor = DEFAULT_BASE_FOV;
+    float skyPolyHalfWidth = DEFAULT_SKY_POLY_HALF_WIDTH;
+
     struct VehicleStencilShadow
     {
         CVehicleSAInterface*  owner;
@@ -87,6 +106,36 @@ namespace
         using RenderForVehicle = void(__cdecl*)(VehicleStencilShadow*, CVector*);
         reinterpret_cast<RenderForVehicle>(FUNC_CStencilShadows_RenderForVehicle)(shadow, cameraPosition);
     }
+}
+
+// Convert vertical/4:3-calibrated input FOV into horizontal Hor+ FOV so vertical
+// view stays consistent across widescreen and ultrawide aspect ratios.
+__declspec(noinline) static float __cdecl CalculateHorPlusFOV(float fov) noexcept
+{
+    const float clampedFOV = Clamp(MIN_FOV, fov, MAX_FOV);
+    const float aspectRatio = *reinterpret_cast<const float*>(VAR_CDraw_AspectRatio);
+    if (aspectRatio <= 0.1f || std::fabs(aspectRatio - NATIVE_ASPECT_RATIO) < 1e-4f)
+        return clampedFOV;
+
+    const float halfRadians = clampedFOV * 0.5f * DEG_TO_RAD;
+    const float scaledTangent = std::tan(halfRadians) * (aspectRatio / NATIVE_ASPECT_RATIO);
+    return 2.0f * std::atan(scaledTangent) * RAD_TO_DEG;
+}
+
+static void UpdateFOVAndWidescreenScales(float fov) noexcept
+{
+    baseCameraFOV = Clamp(MIN_FOV, fov, MAX_FOV);
+    const float aspectRatio = *reinterpret_cast<const float*>(VAR_CDraw_AspectRatio);
+    const float safeAspect = (aspectRatio > 0.1f) ? aspectRatio : NATIVE_ASPECT_RATIO;
+    const float horPlusFOV = CalculateHorPlusFOV(baseCameraFOV);
+
+    spriteWidthDivisor = baseCameraFOV * (safeAspect / NATIVE_ASPECT_RATIO);
+
+    const float defaultHalfFOVTan = std::tan(DEFAULT_BASE_FOV * 0.5f * DEG_TO_RAD);
+    const float horPlusHalfTan = std::tan(horPlusFOV * 0.5f * DEG_TO_RAD);
+    skyPolyHalfWidth = (std::max)(DEFAULT_SKY_POLY_HALF_WIDTH, DEFAULT_SKY_POLY_HALF_WIDTH * (horPlusHalfTan / defaultHalfFOVTan));
+
+    MemPutFast<float>(VAR_CDraw_FOV, horPlusFOV);
 }
 
 float ms_fVehicleLODDistance, ms_fTrainPlaneLODDistance, ms_fPedsLODDistance;
@@ -496,6 +545,11 @@ float CSettingsSA::GetAspectRatioValue()
     return *(float*)0xC3EFA4;
 }
 
+float CSettingsSA::GetBaseFieldOfView() const
+{
+    return baseCameraFOV;
+}
+
 void CSettingsSA::SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabled)
 {
     // Process change
@@ -522,6 +576,7 @@ void CSettingsSA::SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabl
     }
 
     MemPutFast<float>(0xC3EFA4, fValue);
+    UpdateFOVAndWidescreenScales(baseCameraFOV);
 
     // Adjust position and size of our HUD components
     if (bAdjustmentEnabled)
@@ -1074,6 +1129,123 @@ static void __declspec(naked) HOOK_SelectDevice()
     // clang-format on
 }
 
+#define HOOKPOS_CDraw_SetFOV 0x6FF410
+static void __cdecl OnCDrawSetFOV(float fov)
+{
+    UpdateFOVAndWidescreenScales(fov);
+}
+
+// CCam::m_fFOV stays pre-Hor+, so third-person aiming reads must evaluate Hor+(FOV) to match the rendered frustum.
+#define HOOKPOS_Find3rdPersonQuickAimPitch_FOV  0x50AD4A
+#define HOOKSIZE_Find3rdPersonQuickAimPitch_FOV 7
+static const DWORD            RETURN_Find3rdPersonQuickAimPitch_FOV = 0x50AD51;
+static void __declspec(naked) HOOK_Find3rdPersonQuickAimPitch_FOV()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushfd
+        pushad
+        push    dword ptr [eax+ecx+0x228]
+        call    CalculateHorPlusFOV
+        add     esp, 4
+        popad
+        popfd
+        jmp     RETURN_Find3rdPersonQuickAimPitch_FOV
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_Find3rdPersonCamTargetVector_FOV  0x51497D
+#define HOOKSIZE_Find3rdPersonCamTargetVector_FOV 7
+static const DWORD            RETURN_Find3rdPersonCamTargetVector_FOV = 0x514984;
+static void __declspec(naked) HOOK_Find3rdPersonCamTargetVector_FOV()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushfd
+        pushad
+        push    dword ptr [eax+ecx+0x228]
+        call    CalculateHorPlusFOV
+        add     esp, 4
+        popad
+        popfd
+        jmp     RETURN_Find3rdPersonCamTargetVector_FOV
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_ProcessAimWeapon_FOV  0x52198E
+#define HOOKSIZE_ProcessAimWeapon_FOV 6
+static const DWORD            RETURN_ProcessAimWeapon_FOV = 0x521994;
+static void __declspec(naked) HOOK_ProcessAimWeapon_FOV()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushfd
+        pushad
+        push    dword ptr [esi+0xB4]
+        call    CalculateHorPlusFOV
+        add     esp, 4
+        popad
+        popfd
+        jmp     RETURN_ProcessAimWeapon_FOV
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_GetTwoPlayerAimVector_FOV  0x513F28
+#define HOOKSIZE_GetTwoPlayerAimVector_FOV 6
+static const DWORD            RETURN_GetTwoPlayerAimVector_FOV = 0x513F2E;
+static void __declspec(naked) HOOK_GetTwoPlayerAimVector_FOV()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushfd
+        pushad
+        push    dword ptr [esi+0xB4]
+        call    CalculateHorPlusFOV
+        add     esp, 4
+        popad
+        popfd
+        jmp     RETURN_GetTwoPlayerAimVector_FOV
+    }
+    // clang-format on
+}
+
+#define HOOKPOS_ProcessTwoPlayerInCarAim_FOV  0x51A224
+#define HOOKSIZE_ProcessTwoPlayerInCarAim_FOV 6
+static const DWORD            RETURN_ProcessTwoPlayerInCarAim_FOV = 0x51A22A;
+static void __declspec(naked) HOOK_ProcessTwoPlayerInCarAim_FOV()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushfd
+        pushad
+        push    dword ptr [esi+0xB4]
+        call    CalculateHorPlusFOV
+        add     esp, 4
+        popad
+        popfd
+        jmp     RETURN_ProcessTwoPlayerInCarAim_FOV
+    }
+    // clang-format on
+}
+
 ////////////////////////////////////////////////
 //
 // Setup hooks
@@ -1082,4 +1254,23 @@ static void __declspec(naked) HOOK_SelectDevice()
 void CSettingsSA::StaticSetHooks()
 {
     EZHookInstall(SelectDevice);
+    HookInstall(HOOKPOS_CDraw_SetFOV, reinterpret_cast<DWORD>(OnCDrawSetFOV), 5);
+    EZHookInstall(Find3rdPersonQuickAimPitch_FOV);
+    EZHookInstall(Find3rdPersonCamTargetVector_FOV);
+    EZHookInstall(ProcessAimWeapon_FOV);
+    EZHookInstall(GetTwoPlayerAimVector_FOV);
+    EZHookInstall(ProcessTwoPlayerInCarAim_FOV);
+
+    // Keep LOD distance multiplier tied to the pre-Hor+ FOV so wider screens do not pull LOD closer.
+    MemPut<const float*>(0x52C9E1, &baseCameraFOV);
+
+    // Preserve 4:3 proportions and scale for 3D sprites, coronas, and clouds across aspect ratios.
+    MemPut<const float*>(0x70CEF2, &spriteWidthDivisor);
+    MemPut<const float*>(0x70CF04, &baseCameraFOV);
+    MemPut<const float*>(0x71DA87, &spriteWidthDivisor);
+    MemPut<const float*>(0x71DA99, &baseCameraFOV);
+
+    // Widen sky backdrop quads to span the full Hor+ horizontal frustum without edge gaps.
+    MemPut<const float*>(0x714843, &skyPolyHalfWidth);
+    MemPut<const float*>(0x714860, &skyPolyHalfWidth);
 }
