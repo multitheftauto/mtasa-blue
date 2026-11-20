@@ -14,12 +14,15 @@
 
 bool CPlayerModInfoPacket::Read(NetBitStreamInterface& BitStream)
 {
+    m_strInfoType.clear();
+    m_ModInfoItemList.clear();
+
     // Read type
     if (!BitStream.ReadString(m_strInfoType))
         return false;
 
     // Read amount of items
-    uint uiCount;
+    uint uiCount = 0;
     if (!BitStream.Read(uiCount))
         return false;
 
@@ -35,36 +38,24 @@ bool CPlayerModInfoPacket::Read(NetBitStreamInterface& BitStream)
     for (uint i = 0; i < uiCount; i++)
     {
         SModInfoItem item;
+        int          iHasSize = 0;
+        int          iHashInfo = 0;
 
-        BitStream.Read(item.usId);
-        BitStream.Read(item.uiHash);
-        BitStream.ReadString(item.strName);
+        if (!BitStream.Read(item.usId) || !BitStream.Read(item.uiHash) || !BitStream.ReadString(item.strName) || !BitStream.Read(iHasSize) ||
+            !BitStream.Read(item.vecSize.fX) || !BitStream.Read(item.vecSize.fY) || !BitStream.Read(item.vecSize.fZ) ||
+            !BitStream.Read(item.vecOriginalSize.fX) || !BitStream.Read(item.vecOriginalSize.fY) || !BitStream.Read(item.vecOriginalSize.fZ) ||
+            !BitStream.Read(iHashInfo) || !BitStream.Read(item.uiShortBytes) || !BitStream.ReadString(item.strShortMd5) ||
+            !BitStream.ReadString(item.strShortSha256) || !BitStream.Read(item.uiLongBytes) || !BitStream.ReadString(item.strLongMd5) ||
+            !BitStream.ReadString(item.strLongSha256))
+        {
+            m_ModInfoItemList.clear();
+            return false;
+        }
 
-        int iHasSize;
-        BitStream.Read(iHasSize);
         item.bHasSize = iHasSize != 0;
-
-        BitStream.Read(item.vecSize.fX);
-        BitStream.Read(item.vecSize.fY);
-        BitStream.Read(item.vecSize.fZ);
-
-        BitStream.Read(item.vecOriginalSize.fX);
-        BitStream.Read(item.vecOriginalSize.fY);
-        BitStream.Read(item.vecOriginalSize.fZ);
-
-        int iHashInfo;
-        BitStream.Read(iHashInfo);
         item.bHasHashInfo = iHashInfo != 0;
 
-        BitStream.Read(item.uiShortBytes);
-        BitStream.ReadString(item.strShortMd5);
-        BitStream.ReadString(item.strShortSha256);
-        BitStream.Read(item.uiLongBytes);
-        BitStream.ReadString(item.strLongMd5);
-        if (!BitStream.ReadString(item.strLongSha256))
-            return false;
-
-        m_ModInfoItemList.push_back(item);
+        m_ModInfoItemList.push_back(std::move(item));
     }
 
     return true;
