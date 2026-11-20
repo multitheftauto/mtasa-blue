@@ -824,6 +824,8 @@ bool CMainConfig::LoadExtended()
 
     RegisterCommand("debugdb", CConsoleCommands::SetDbLogLevel, false,
                     "Usage: debugdb <0-2>\nSet logging level for database functions. [0-Off  1-Errors only  2-All]");
+    RegisterCommand("cls", CConsoleCommands::ClearScreen, false, "Clear the console screen");
+    RegisterCommand("clear", CConsoleCommands::ClearScreen, false, "Clear the console screen");
 
     RegisterCommand("reloadbans", CConsoleCommands::ReloadBans, false, "Reloads all the bans from banlist.xml.");
 

@@ -17,7 +17,10 @@
 #include "ErrorCodes.h"
 #include <clocale>
 #include <cstdio>
+#include <cwctype>
+#include <fstream>
 #include <signal.h>
+
 #ifdef WIN32
     #include <Mmsystem.h>
     #include <io.h>
@@ -67,13 +70,15 @@ CServerImpl::CServerImpl()
 #endif
 
     // Init
-    m_pNetwork = NULL;
+    m_pNetwork = nullptr;
     m_bRequestedQuit = false;
     m_bRequestedReset = false;
     m_exitCode = ERROR_NO_ERROR;
-    memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
+    m_inputBuffer.clear();
+    m_cursorPos = 0;
+    m_insertMode = true;
+    m_renderedLength = 0;
     memset(&m_szTag, 0, sizeof(m_szTag) * sizeof(char));
-    m_uiInputCount = 0;
     m_dLastTimeMs = 0;
     m_dPrevOverrun = 0;
 
@@ -83,6 +88,7 @@ CServerImpl::CServerImpl()
 
 CServerImpl::~CServerImpl()
 {
+    SaveCommandHistory();
     // Destroy our stuff
     delete m_pModManager;
 }
@@ -115,8 +121,76 @@ void CServerImpl::Printf(const char* szFormat, ...)
     if (!g_bSilent)
     {
 #ifdef WIN32
-        vprintf(szFormat, ap);
+        if (HasConsole())
+        {
+            char    stackBuffer[2048];
+            va_list apCopy;
+            va_copy(apCopy, ap);
+            const int formattedLength = vsnprintf(stackBuffer, sizeof(stackBuffer), szFormat, apCopy);
+            va_end(apCopy);
+
+            std::wstring wideMessage;
+            if (formattedLength > 0 && formattedLength < static_cast<int>(sizeof(stackBuffer)))
+            {
+                wideMessage = MbUTF8ToUTF16(stackBuffer);
+            }
+            else if (formattedLength >= static_cast<int>(sizeof(stackBuffer)))
+            {
+                std::vector<char> dynamicBuffer(formattedLength + 1);
+                va_list           apRetry;
+                va_copy(apRetry, ap);
+                vsnprintf(dynamicBuffer.data(), dynamicBuffer.size(), szFormat, apRetry);
+                va_end(apRetry);
+                wideMessage = MbUTF8ToUTF16(dynamicBuffer.data());
+            }
+
+            if (!wideMessage.empty())
+            {
+                CONSOLE_CURSOR_INFO cursorInfo;
+                const bool          cursorOk = GetConsoleCursorInfo(m_hConsole, &cursorInfo);
+                if (cursorOk && cursorInfo.bVisible)
+                {
+                    CONSOLE_CURSOR_INFO hiddenCursor = cursorInfo;
+                    hiddenCursor.bVisible = FALSE;
+                    SetConsoleCursorInfo(m_hConsole, &hiddenCursor);
+                }
+
+                // If user has an active prompt drawn, erase it first
+                if (m_renderedLength > 0)
+                {
+                    std::wstring clearStr(m_renderedLength + 2, L' ');
+                    WriteConsoleW(m_hConsole, L"\r", 1, nullptr, nullptr);
+                    WriteConsoleW(m_hConsole, clearStr.c_str(), static_cast<DWORD>(clearStr.length()), nullptr, nullptr);
+                    WriteConsoleW(m_hConsole, L"\r", 1, nullptr, nullptr);
+                    m_renderedLength = 0;
+                    m_bPendingPromptRedraw = true;
+                }
+
+                // Output log message text
+                SetConsoleTextAttribute(m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+                WriteConsoleW(m_hConsole, wideMessage.c_str(), static_cast<DWORD>(wideMessage.length()), nullptr, nullptr);
+
+                // Only redraw the input prompt when the log line completes (ends with \n or \r\n)
+                const bool hasNewline = (wideMessage.back() == L'\n' || wideMessage.back() == L'\r');
+                if (hasNewline && m_bPendingPromptRedraw && !m_inputBuffer.empty())
+                {
+                    m_bPendingPromptRedraw = false;
+                    RedrawInputLine();
+                }
+
+                if (cursorOk && cursorInfo.bVisible)
+                {
+                    SetConsoleCursorInfo(m_hConsole, &cursorInfo);
+                }
+            }
+        }
+        else
+        {
+            vprintf(szFormat, ap);
+            fflush(stdout);
+        }
 #else
+
         if (IsCursesActive())
             vwprintw(stdscr, szFormat, ap);
         else
@@ -197,12 +271,25 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 
         if (!g_isChildProcess && HasConsole())
         {
-            // Disable QuickEdit mode to prevent text selection causing server freeze
+            // Disable QuickEdit mode to prevent text selection causing server freeze,
+            // and disable Mouse Input to let Windows Console Host handle mouse wheel scrolling naturally
             DWORD dwConInMode;
-            GetConsoleMode(m_hConsoleInput, &dwConInMode);
-            SetConsoleMode(m_hConsoleInput, dwConInMode & ~ENABLE_QUICK_EDIT_MODE);
+            if (GetConsoleMode(m_hConsoleInput, &dwConInMode))
+            {
+    #ifndef ENABLE_EXTENDED_FLAGS
+        #define ENABLE_EXTENDED_FLAGS 0x0080
+    #endif
+    #ifndef ENABLE_QUICK_EDIT_MODE
+        #define ENABLE_QUICK_EDIT_MODE 0x0040
+    #endif
+    #ifndef ENABLE_MOUSE_INPUT
+        #define ENABLE_MOUSE_INPUT 0x0010
+    #endif
+                SetConsoleMode(m_hConsoleInput, ENABLE_EXTENDED_FLAGS | (dwConInMode & ~ENABLE_QUICK_EDIT_MODE & ~ENABLE_MOUSE_INPUT));
+            }
 
             // Enable the default grey color with a black background
+
             SetConsoleTextAttribute(m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
 
             // Get the console's width
@@ -216,14 +303,25 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
                 return ERROR_OTHER;
             }
 
-            // Adjust the console's screenbuffer so we can disable a bar at the top
-            if (!g_bNoTopBar)
-                ScrnBufferInfo.dwSize.Y = ScrnBufferInfo.srWindow.Bottom + 1;
+            // Adjust the console's screenbuffer to provide a generous scrollback buffer
+            if (ScrnBufferInfo.dwSize.Y < 5000)
+                ScrnBufferInfo.dwSize.Y = 5000;
 
-            SetConsoleWindowInfo(m_hConsole, TRUE, &ScrnBufferInfo.srWindow);
             SetConsoleScreenBufferSize(m_hConsole, ScrnBufferInfo.dwSize);
+            SetConsoleWindowInfo(m_hConsole, TRUE, &ScrnBufferInfo.srWindow);
             SetConsoleOutputCP(CP_UTF8);
+
+    #ifndef ENABLE_VIRTUAL_TERMINAL_PROCESSING
+        #define ENABLE_VIRTUAL_TERMINAL_PROCESSING 0x0004
+    #endif
+            // Enable virtual terminal processing for ANSI escape sequences if available
+            DWORD dwConOutMode = 0;
+            if (GetConsoleMode(m_hConsole, &dwConOutMode))
+            {
+                SetConsoleMode(m_hConsole, dwConOutMode | ENABLE_VIRTUAL_TERMINAL_PROCESSING | ENABLE_PROCESSED_OUTPUT);
+            }
         }
+
         else if (GetFileType(m_hConsoleInput) == FILE_TYPE_PIPE)
         {
             // Enable non-blocking read mode
@@ -324,7 +422,11 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
     // Set the mod path
     m_strServerModPath = m_strServerPath + "/mods/deathmatch";
 
+    // Load persistent console command history
+    LoadCommandHistory();
+
     // Tell the mod manager the server path
+
     m_pModManager->SetServerPath(m_strServerPath);
 
     // Welcome text
@@ -389,15 +491,19 @@ int CServerImpl::Run(int iArgumentCount, char* szArguments[])
 
                 if (m_pNetwork && m_pXML)
                 {
-                    // Make the modmanager load our mod
                     if (m_pModManager->Load("deathmatch", iArgumentCount, szArguments))  // Hardcoded for now
                     {
+                        LoadCommandHistory();
+
                         // Enter our mainloop
                         MainLoop();
+
+                        SaveCommandHistory();
 
                         if (pfnReleaseNetServerInterface)
                             pfnReleaseNetServerInterface();
                     }
+
                     else
                     {
                         // Quit during startup?
@@ -491,9 +597,8 @@ void CServerImpl::MainLoop()
 #endif
         if (!g_bSilent && !g_bNoTopBar && !g_bNoCurses)
         {
-            // Show the info tag, 80 is a fixed length
-            char szInfoTag[80] = {'\0'};
-            m_pModManager->GetTag(&szInfoTag[0], 80);
+            char szInfoTag[128] = {'\0'};
+            m_pModManager->GetTag(&szInfoTag[0], sizeof(szInfoTag));
             ShowInfoTag(szInfoTag);
         }
 
@@ -627,87 +732,28 @@ void CServerImpl::ShowInfoTag(char* szTag)
     if (g_bSilent || g_bNoTopBar || g_bNoCurses)
         return;
 #ifdef WIN32
-    // Windows console code
-    // Get the console's width
-    CONSOLE_SCREEN_BUFFER_INFO ScrnBufferInfo;
-
-    if (!GetConsoleScreenBufferInfo(m_hConsole, &ScrnBufferInfo))
-        return;
-
-    ScrnBufferInfo.dwSize.X = std::min(ScrnBufferInfo.dwSize.X, SCREEN_BUFFER_SIZE);
-
-    // If the screenbuffer doesn't exist yet, or if the tag is changed
-    if (m_ScrnBuffer == NULL || strcmp(szTag, m_szTag))
+    // On Windows, dynamically update the Console Window Title with clean live server statistics.
+    // This provides a continuous status header in the title bar without overwriting rows in the scrollback buffer.
+    if (strcmp(szTag, m_szTag) != 0)
     {
-        int ScrnBufferCount = 0;
         strcpy(m_szTag, szTag);
 
-        // Construct the screenbuffer
-        for (int i = 0; i < ScrnBufferInfo.dwSize.X; i++)
+        std::wstring cleanTitle;
+        for (int i = 0; szTag[i] != '\0'; ++i)
         {
-            if (szTag[i] == NULL)
-            {
-                // No more tag data, so fill it up with spaces and break the loop
-                for (int j = ScrnBufferCount; j < ScrnBufferInfo.dwSize.X; j++)
-                {
-                    m_ScrnBuffer[j].Char.UnicodeChar = L' ';
-                    m_ScrnBuffer[j].Attributes = BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE;
-                }
-                break;
-            }
-            else
-            {
-                // The color interpreter
-                switch ((unsigned char)(szTag[i]))
-                {
-                    case 128:
-                        m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_INTENSITY | FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-                        break;
-                    case 129:
-                        m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE;
-                        break;
-                    case 130:
-                        m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_RED;
-                        break;
-                    case 131:
-                        m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_GREEN;
-                        break;
-                    case 132:
-                        m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_BLUE;
-                        break;
-                    case 133:
-                        m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_INTENSITY | FOREGROUND_RED;
-                        break;
-                    case 134:
-                        m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_INTENSITY | FOREGROUND_GREEN;
-                        break;
-                    case 135:
-                        m_ScrnBuffer[ScrnBufferCount].Attributes = FOREGROUND_INTENSITY | FOREGROUND_BLUE;
-                        break;
-                    default:
-                        m_ScrnBuffer[ScrnBufferCount].Attributes = 0;
-                        break;
-                }
+            if (static_cast<unsigned char>(szTag[i]) > 127)
+                continue;
 
-                if ((unsigned char)szTag[i] > 127)
-                {
-                    // If this is a color code, skip to the next character, so we can color that one
-                    i++;
-                }
-                m_ScrnBuffer[ScrnBufferCount].Char.UnicodeChar = szTag[i];
+            cleanTitle += static_cast<wchar_t>(szTag[i]);
+        }
 
-                // Enable a grey background
-                m_ScrnBuffer[ScrnBufferCount++].Attributes |= (BACKGROUND_RED | BACKGROUND_GREEN | BACKGROUND_BLUE);
-            }
+        if (!cleanTitle.empty())
+        {
+            SetConsoleTitleW(cleanTitle.c_str());
         }
     }
-
-    COORD      BufferSize = {ScrnBufferInfo.dwSize.X, 1};
-    COORD      TopLeft = {0, ScrnBufferInfo.srWindow.Top};
-    SMALL_RECT Region = {0, ScrnBufferInfo.srWindow.Top, ScrnBufferInfo.dwSize.X, 1};
-
-    WriteConsoleOutputW(m_hConsole, m_ScrnBuffer, BufferSize, TopLeft, &Region);
 #else
+
     // Linux curses variant, so much easier :)
     int iAttr = COLOR_PAIR(1);
 
@@ -756,296 +802,647 @@ void CServerImpl::ShowInfoTag(char* szTag)
 #endif
 }
 
+void CServerImpl::RedrawInputLine()
+{
+#ifdef WIN32
+    if (!HasConsole() || g_bSilent)
+        return;
+
+    // Temporarily hide the hardware caret during redraw to eliminate cursor flicker at column 0
+    CONSOLE_CURSOR_INFO cursorInfo;
+    const bool          cursorInfoRetrieved = GetConsoleCursorInfo(m_hConsole, &cursorInfo);
+    if (cursorInfoRetrieved && cursorInfo.bVisible)
+    {
+        CONSOLE_CURSOR_INFO hiddenCursor = cursorInfo;
+        hiddenCursor.bVisible = FALSE;
+        SetConsoleCursorInfo(m_hConsole, &hiddenCursor);
+    }
+
+    const size_t previousRenderedLength = m_renderedLength;
+    const size_t currentLength = m_inputBuffer.length();
+
+    // Move to start of line
+    WriteConsoleW(m_hConsole, L"\r", 1, nullptr, nullptr);
+
+    // Render active input line with distinct bright yellow text color
+    SetConsoleTextAttribute(m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+    if (!m_inputBuffer.empty())
+    {
+        WriteConsoleW(m_hConsole, m_inputBuffer.c_str(), static_cast<DWORD>(m_inputBuffer.length()), nullptr, nullptr);
+    }
+
+    // Overwrite trailing characters with spaces if line got shorter
+    if (previousRenderedLength > currentLength)
+    {
+        std::wstring padding(previousRenderedLength - currentLength, L' ');
+        WriteConsoleW(m_hConsole, padding.c_str(), static_cast<DWORD>(padding.length()), nullptr, nullptr);
+    }
+
+    m_renderedLength = currentLength;
+
+    // Restore standard console color
+    SetConsoleTextAttribute(m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+
+    // Reposition cursor at active insertion point
+    CONSOLE_SCREEN_BUFFER_INFO screenBufferInfo;
+    if (GetConsoleScreenBufferInfo(m_hConsole, &screenBufferInfo) && screenBufferInfo.dwSize.X > 0)
+    {
+        COORD       targetPosition = screenBufferInfo.dwCursorPosition;
+        const SHORT consoleWidth = screenBufferInfo.dwSize.X;
+        targetPosition.X = static_cast<SHORT>(m_cursorPos < static_cast<size_t>(consoleWidth) ? m_cursorPos : consoleWidth - 1);
+        SetConsoleCursorPosition(m_hConsole, targetPosition);
+    }
+
+    // Restore visible hardware caret at the final insertion coordinate
+    if (cursorInfoRetrieved && cursorInfo.bVisible)
+    {
+        SetConsoleCursorInfo(m_hConsole, &cursorInfo);
+    }
+#else
+
+    if (!g_bSilent && !g_bNoCurses && m_wndInput)
+    {
+        wclear(m_wndInput);
+        if (!m_inputBuffer.empty())
+            wprintw(m_wndInput, "%s", UTF16ToMbUTF8(m_inputBuffer).c_str());
+        wmove(m_wndInput, 0, static_cast<int>(m_cursorPos));
+        wnoutrefresh(m_wndInput);
+    }
+#endif
+}
+
+void CServerImpl::InsertCharacter(wchar_t ch)
+{
+    if (m_cursorPos == m_inputBuffer.length())
+    {
+        m_inputBuffer.push_back(ch);
+        m_cursorPos++;
+        m_renderedLength = m_inputBuffer.length();
+
+#ifdef WIN32
+        if (HasConsole() && !g_bSilent)
+        {
+            SetConsoleTextAttribute(m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_INTENSITY);
+            WriteConsoleW(m_hConsole, &ch, 1, nullptr, nullptr);
+            SetConsoleTextAttribute(m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
+        }
+#else
+        if (!g_bSilent && !g_bNoCurses && m_wndInput)
+        {
+            waddch(m_wndInput, ch);
+            wnoutrefresh(m_wndInput);
+        }
+#endif
+    }
+    else
+    {
+        if (m_insertMode)
+        {
+            m_inputBuffer.insert(m_cursorPos, 1, ch);
+        }
+        else
+        {
+            m_inputBuffer[m_cursorPos] = ch;
+        }
+        m_cursorPos++;
+        RedrawInputLine();
+    }
+}
+
+void CServerImpl::InsertString(const std::wstring& text)
+{
+    if (text.empty())
+        return;
+
+    m_inputBuffer.insert(m_cursorPos, text);
+    m_cursorPos += text.length();
+    RedrawInputLine();
+}
+
+void CServerImpl::HandleBackspace(bool word)
+{
+    if (m_cursorPos == 0 || m_inputBuffer.empty())
+        return;
+
+    if (!word)
+    {
+        m_inputBuffer.erase(m_cursorPos - 1, 1);
+        m_cursorPos--;
+    }
+    else
+    {
+        size_t eraseStart = m_cursorPos;
+        while (eraseStart > 0 && iswspace(m_inputBuffer[eraseStart - 1]))
+            eraseStart--;
+        while (eraseStart > 0 && !iswspace(m_inputBuffer[eraseStart - 1]))
+            eraseStart--;
+
+        m_inputBuffer.erase(eraseStart, m_cursorPos - eraseStart);
+        m_cursorPos = eraseStart;
+    }
+    RedrawInputLine();
+}
+
+void CServerImpl::HandleDelete(bool word)
+{
+    if (m_cursorPos >= m_inputBuffer.length())
+        return;
+
+    if (!word)
+    {
+        m_inputBuffer.erase(m_cursorPos, 1);
+    }
+    else
+    {
+        size_t eraseEnd = m_cursorPos;
+        while (eraseEnd < m_inputBuffer.length() && iswspace(m_inputBuffer[eraseEnd]))
+            eraseEnd++;
+        while (eraseEnd < m_inputBuffer.length() && !iswspace(m_inputBuffer[eraseEnd]))
+            eraseEnd++;
+
+        m_inputBuffer.erase(m_cursorPos, eraseEnd - m_cursorPos);
+    }
+    RedrawInputLine();
+}
+
+void CServerImpl::HandleLeftArrow(bool word)
+{
+    if (m_cursorPos == 0)
+        return;
+
+    if (!word)
+    {
+        m_cursorPos--;
+    }
+    else
+    {
+        while (m_cursorPos > 0 && iswspace(m_inputBuffer[m_cursorPos - 1]))
+            m_cursorPos--;
+        while (m_cursorPos > 0 && !iswspace(m_inputBuffer[m_cursorPos - 1]))
+            m_cursorPos--;
+    }
+    RedrawInputLine();
+}
+
+void CServerImpl::HandleRightArrow(bool word)
+{
+    if (m_cursorPos >= m_inputBuffer.length())
+        return;
+
+    if (!word)
+    {
+        m_cursorPos++;
+    }
+    else
+    {
+        while (m_cursorPos < m_inputBuffer.length() && iswspace(m_inputBuffer[m_cursorPos]))
+            m_cursorPos++;
+        while (m_cursorPos < m_inputBuffer.length() && !iswspace(m_inputBuffer[m_cursorPos]))
+            m_cursorPos++;
+    }
+    RedrawInputLine();
+}
+
+void CServerImpl::HandleHome()
+{
+    if (m_cursorPos == 0)
+        return;
+    m_cursorPos = 0;
+    RedrawInputLine();
+}
+
+void CServerImpl::HandleEnd()
+{
+    if (m_cursorPos == m_inputBuffer.length())
+        return;
+    m_cursorPos = m_inputBuffer.length();
+    RedrawInputLine();
+}
+
+void CServerImpl::HandleTabCompletion()
+{
+    if (m_inputBuffer.empty())
+        return;
+
+    // List of standard console commands for first-token completion
+    static const std::vector<std::wstring> knownCommands = {
+        L"start",     L"stop",   L"restart",       L"refresh",       L"refreshall", L"list",         L"info",
+        L"upgrade",   L"check",  L"say",           L"teamsay",       L"msg",        L"me",           L"nick",
+        L"login",     L"logout", L"chgmypass",     L"addaccount",    L"delaccount", L"chgpass",      L"shutdown",
+        L"aexec",     L"whois",  L"debugscript",   L"help",          L"loadmodule", L"unloadmodule", L"reloadmodule",
+        L"ver",       L"ase",    L"openportstest", L"setdbloglevel", L"reloadbans", L"aclrequest",   L"authserial",
+        L"reloadacl", L"cls",    L"clear",         L"quit",          L"exit",       L"reset"};
+
+    // Find token boundary before cursor
+    size_t             tokenStart = m_inputBuffer.rfind(L' ', m_cursorPos > 0 ? m_cursorPos - 1 : 0);
+    const bool         isFirstToken = (tokenStart == std::wstring::npos);
+    const size_t       wordStart = isFirstToken ? 0 : tokenStart + 1;
+    const std::wstring prefix = m_inputBuffer.substr(wordStart, m_cursorPos - wordStart);
+
+    if (prefix.empty())
+        return;
+
+    if (isFirstToken)
+    {
+        for (const auto& cmd : knownCommands)
+        {
+            if (cmd.length() > prefix.length() && cmd.compare(0, prefix.length(), prefix) == 0)
+            {
+                std::wstring suffix = cmd.substr(prefix.length()) + L" ";
+                InsertString(suffix);
+                return;
+            }
+        }
+    }
+}
+
+void CServerImpl::HandleClipboardPaste()
+{
+#ifdef WIN32
+    if (!OpenClipboard(nullptr))
+        return;
+
+    HANDLE clipboardDataHandle = GetClipboardData(CF_UNICODETEXT);
+    if (clipboardDataHandle)
+    {
+        if (const auto* clipboardText = static_cast<const wchar_t*>(GlobalLock(clipboardDataHandle)))
+        {
+            std::wstring sanitizedText;
+            for (const wchar_t* p = clipboardText; *p != L'\0'; ++p)
+            {
+                if (*p != L'\r' && *p != L'\n')
+                    sanitizedText += *p;
+                else
+                    sanitizedText += L' ';
+            }
+            GlobalUnlock(clipboardDataHandle);
+
+            if (!sanitizedText.empty())
+            {
+                InsertString(sanitizedText);
+            }
+        }
+    }
+    CloseClipboard();
+#endif
+}
+
+void CServerImpl::ClearScreen()
+{
+#ifdef WIN32
+    if (!HasConsole() || g_bSilent)
+        return;
+
+    CONSOLE_SCREEN_BUFFER_INFO screenBufferInfo;
+    if (!GetConsoleScreenBufferInfo(m_hConsole, &screenBufferInfo))
+        return;
+
+    const DWORD totalCells = screenBufferInfo.dwSize.X * screenBufferInfo.dwSize.Y;
+    DWORD       cellsWritten = 0;
+    const COORD homeCoordinates = {0, 0};
+
+    FillConsoleOutputCharacterW(m_hConsole, L' ', totalCells, homeCoordinates, &cellsWritten);
+    FillConsoleOutputAttribute(m_hConsole, screenBufferInfo.wAttributes, totalCells, homeCoordinates, &cellsWritten);
+    SetConsoleCursorPosition(m_hConsole, homeCoordinates);
+
+    m_renderedLength = 0;
+    RedrawInputLine();
+#else
+    if (!g_bSilent && !g_bNoCurses && m_wndInput)
+    {
+        clear();
+        refresh();
+        RedrawInputLine();
+    }
+#endif
+}
+
+void CServerImpl::ExecuteCurrentCommand()
+
+{
+    if (m_inputBuffer.empty())
+        return;
+
+    // Deduplicate and record non-empty unique command in history (limit to 128 items)
+    const std::wstring cleanHistoryLine = CleanCommandHistoryLine(m_inputBuffer);
+    if (!cleanHistoryLine.empty())
+    {
+        for (auto it = m_vecCommandHistory.begin() + 1; it != m_vecCommandHistory.end(); ++it)
+        {
+            if ((*it)[0] == cleanHistoryLine)
+            {
+                m_vecCommandHistory.erase(it);
+                break;
+            }
+        }
+
+        m_vecCommandHistory.push_back({cleanHistoryLine, cleanHistoryLine});
+
+        constexpr size_t maxHistoryCount = 128;
+        while (m_vecCommandHistory.size() > maxHistoryCount + 1)
+        {
+            m_vecCommandHistory.erase(m_vecCommandHistory.begin() + 1);
+        }
+
+        SaveCommandHistory();
+    }
+
+    const std::wstring fullCommand = m_inputBuffer;
+    ClearInput();
+
+    const auto EqualsIgnoreCase = [](const std::wstring& str, const wchar_t* target)
+    {
+        size_t len = str.length();
+        size_t i = 0;
+        while (i < len && target[i] != L'\0')
+        {
+            if (towlower(str[i]) != towlower(target[i]))
+                return false;
+            i++;
+        }
+        return i == len && target[i] == L'\0';
+    };
+
+    // Check for hardcoded core commands
+    if (EqualsIgnoreCase(fullCommand, L"quit") || EqualsIgnoreCase(fullCommand, L"exit"))
+    {
+        m_bRequestedQuit = true;
+        return;
+    }
+    if (EqualsIgnoreCase(fullCommand, L"reset"))
+    {
+        m_bRequestedReset = true;
+        m_bRequestedQuit = true;
+        return;
+    }
+    if (EqualsIgnoreCase(fullCommand, L"cls") || EqualsIgnoreCase(fullCommand, L"clear"))
+    {
+        ClearScreen();
+        return;
+    }
+
+    // Split unquoted semicolons (;) for command chaining
+    std::vector<std::wstring> commandList;
+    std::wstring              currentCommand;
+    bool                      insideQuotes = false;
+
+    for (wchar_t ch : fullCommand)
+    {
+        if (ch == L'"')
+            insideQuotes = !insideQuotes;
+
+        if (ch == L';' && !insideQuotes)
+        {
+            if (!currentCommand.empty())
+            {
+                commandList.push_back(currentCommand);
+                currentCommand.clear();
+            }
+        }
+        else
+        {
+            currentCommand += ch;
+        }
+    }
+    if (!currentCommand.empty())
+        commandList.push_back(currentCommand);
+
+    // Execute each command sequentially
+    for (const auto& singleCommand : commandList)
+    {
+        const size_t start = singleCommand.find_first_not_of(L" \t");
+        const size_t end = singleCommand.find_last_not_of(L" \t");
+        if (start != std::wstring::npos && end != std::wstring::npos)
+        {
+            const std::wstring trimmedCommand = singleCommand.substr(start, end - start + 1);
+            if (!trimmedCommand.empty())
+            {
+                m_pModManager->HandleInput(UTF16ToMbUTF8(trimmedCommand).c_str());
+            }
+        }
+    }
+}
+
 void CServerImpl::HandleInput()
 {
-    wint_t iStdIn = 0;
+    wint_t inputCharacter = 0;
 
     // Get the STDIN input
 #ifdef WIN32
     if (!HasConsole())
     {
         // Read from pipe instead of tty
-        // however, the encoding is dependent on the writer
-        // so just accept ASCII here by convention
-        DWORD read;
-        if (!ReadFile(m_hConsoleInput, &iStdIn, 1, &read, nullptr) || read == 0)
-            iStdIn = 0;
+        DWORD bytesRead = 0;
+        if (!ReadFile(m_hConsoleInput, &inputCharacter, 1, &bytesRead, nullptr) || bytesRead == 0)
+            inputCharacter = 0;
     }
     else if (kbhit())
-        iStdIn = _getwch();
+    {
+        inputCharacter = _getwch();
+    }
 #else
     if (!g_bNoCurses)
     {
-        if (get_wch(&iStdIn) == ERR)
-            iStdIn = 0;
+        if (get_wch(&inputCharacter) == ERR)
+            inputCharacter = 0;
     }
     else
     {
-        iStdIn = getwchar();
-        if (iStdIn == WEOF)
-            iStdIn = 0;
+        inputCharacter = getwchar();
+        if (inputCharacter == WEOF)
+            inputCharacter = 0;
     }
 #endif
 
-    if (iStdIn == 0)
+    if (inputCharacter == 0)
         return;
 
-    switch (iStdIn)
+    switch (inputCharacter)
     {
-        case '\n':  // Newlines and carriage returns
+        case '\n':
         case '\r':
 #ifdef WIN32
-            // Echo a newline
             Printf(" \n");
 #else
-            // Set string termination (required for compare/string functions)
-            m_szInputBuffer[m_uiInputCount] = 0;
-
             if (!g_bSilent && !g_bNoCurses)
             {
-                // Clear the input window
                 wclear(m_wndInput);
-                printw("%s\n", UTF16ToMbUTF8(m_szInputBuffer).c_str());
+                printw("%s\n", UTF16ToMbUTF8(m_inputBuffer).c_str());
             }
 #endif
-
-            if (m_uiInputCount > 0)
-            {
-                // Check for the most important command: quit
-#ifdef WIN32
-                if (!_wcsicmp(m_szInputBuffer, L"quit") || !_wcsicmp(m_szInputBuffer, L"exit"))
-#else
-                if (!wcscasecmp(m_szInputBuffer, L"quit") || !wcscasecmp(m_szInputBuffer, L"exit"))
-#endif
-                {
-                    m_bRequestedQuit = true;
-                }
-#ifdef WIN32
-                else if (!_wcsicmp(m_szInputBuffer, L"reset"))
-#else
-                else if (!wcscasecmp(m_szInputBuffer, L"reset"))
-#endif
-                {
-                    m_bRequestedReset = true;
-                    m_bRequestedQuit = true;
-                }
-                else
-                {
-                    // Otherwise, pass the command to the mod's input handler
-                    m_pModManager->HandleInput(UTF16ToMbUTF8(m_szInputBuffer).c_str());
-
-                    // If the command is not empty and it isn't identical to the previous entry in history, add it to the history
-                    // The first string is the original command, the second string is for storing the edited command
-                    if (const std::wstring wzCommand = m_szInputBuffer;
-                        !wzCommand.empty() && (m_vecCommandHistory.empty() || m_vecCommandHistory.back()[0] != wzCommand))
-                    {
-                        m_vecCommandHistory.push_back({wzCommand, wzCommand});
-                    }
-                }
-            }
-
-            // Reset command history edits to their original commands
-            for (auto& i : m_vecCommandHistory)
-                i[1] = i[0];
-
-            memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
-            m_uiInputCount = 0;
-            m_uiSelectedCommandHistoryEntry = 0;
+            ExecuteCurrentCommand();
             break;
 
-        case KEY_BACKSPACE:  // Backspace
-        case 0x7F:
-            if (m_uiInputCount == 0)
-                break;
-
-            // Insert a blank space + backspace
-#ifdef WIN32
-            Printf("%c %c", 0x08, 0x08);
-#else
-            if (!g_bSilent && !g_bNoCurses)
-                wprintw(m_wndInput, "%c %c", 0x08, 0x08);
-#endif
-            m_uiInputCount--;
-            m_szInputBuffer[m_uiInputCount] = 0;
+        case KEY_BACKSPACE:
+            HandleBackspace(false);
             break;
 
-#ifdef WIN32  // WIN32: we have to use a prefix code, this routine opens an extra switch
+        case 0x7F:  // Ctrl+Backspace or Unix delete
+            HandleBackspace(true);
+            break;
+
+        case 0x1B:  // Esc: clear line
+            ClearInput();
+            break;
+
+        case 0x0C:  // Ctrl+L: clear screen
+            ClearScreen();
+            break;
+
+        case 0x16:  // Ctrl+V: paste from clipboard
+            HandleClipboardPaste();
+            break;
+
+        case 0x09:  // Tab: auto-completion
+            HandleTabCompletion();
+            break;
+
+        case 0x01:  // Ctrl+A: jump to start
+            HandleHome();
+            break;
+
+        case 0x05:  // Ctrl+E: jump to end
+            HandleEnd();
+            break;
+
+#ifdef WIN32
+        case 0x00:
         case KEY_EXTENDED:
-            // Color the text
-            if (!g_bSilent && HasConsole())
-                SetConsoleTextAttribute(m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED);
-
-            iStdIn = _getwch();
-
-            switch (iStdIn)
+        {
+            const wint_t extendedKey = _getwch();
+            switch (extendedKey)
             {
-#endif
                 case KEY_LEFT:
-                {
-                    if (m_uiInputCount <= 0)
-                        break;
-
-#ifdef WIN32
-                    wchar_t szBuffer[255];
-                    memset(szBuffer, 0, sizeof(szBuffer));
-
-                    m_uiInputCount--;
-                    wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
-                    szBuffer[m_uiInputCount] = 0;
-
-                    Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
-#else
-            if (!g_bSilent && !g_bNoCurses)
-                wmove(m_wndInput, 0, --m_uiInputCount);
-#endif
+                    HandleLeftArrow(false);
                     break;
-                }
 
                 case KEY_RIGHT:
-                {
-                    if (m_uiInputCount == wcslen(m_szInputBuffer))
-                        break;
-
-#ifdef WIN32
-                    wchar_t szBuffer[255];
-                    memset(szBuffer, 0, sizeof(szBuffer));
-
-                    m_uiInputCount++;
-                    wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
-                    szBuffer[m_uiInputCount] = 0;
-
-                    Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
-#else
-            if (!g_bSilent && !g_bNoCurses)
-                wmove(m_wndInput, 0, ++m_uiInputCount);
-#endif
+                    HandleRightArrow(false);
                     break;
-                }
 
-                case KEY_UP:  // Up-arrow cursor
+                case KEY_CTRL_LEFT:
+                    HandleLeftArrow(true);
+                    break;
+
+                case KEY_CTRL_RIGHT:
+                    HandleRightArrow(true);
+                    break;
+
+                case KEY_HOME:
+                    HandleHome();
+                    break;
+
+                case KEY_END:
+                    HandleEnd();
+                    break;
+
+                case KEY_DELETE:
+                    HandleDelete(false);
+                    break;
+
+                case 0x93:  // Ctrl+Delete
+                    HandleDelete(true);
+                    break;
+
+                case KEY_INSERT:
+                    m_insertMode = !m_insertMode;
+                    break;
+
+                case KEY_UP:
                 {
-                    // If there's nothing to select, break here
                     if (m_vecCommandHistory.size() <= 1 || m_uiSelectedCommandHistoryEntry == 1)
                         break;
 
-                    // Select the previous command
-                    int iEntry = m_uiSelectedCommandHistoryEntry;
-                    if (iEntry == 0)
-                        iEntry = m_vecCommandHistory.size() - 1;
+                    int selectedEntry = m_uiSelectedCommandHistoryEntry;
+                    if (selectedEntry == 0)
+                        selectedEntry = static_cast<int>(m_vecCommandHistory.size() - 1);
                     else
-                        iEntry--;
+                        selectedEntry--;
 
-                    // Select the previous command
-                    SelectCommandHistoryEntry(iEntry);
-
+                    SelectCommandHistoryEntry(selectedEntry);
                     break;
                 }
-                case KEY_DOWN:  // Down-arrow cursor
+
+                case KEY_DOWN:
                 {
-                    // If there's nothing to select, break here
                     if (m_vecCommandHistory.size() <= 1 || m_uiSelectedCommandHistoryEntry == 0)
                         break;
 
-                    // Select the next command
                     SelectCommandHistoryEntry(m_uiSelectedCommandHistoryEntry + 1);
-
                     break;
                 }
-#ifdef WIN32  // WIN32: Close the switch again
             }
-            // Restore the color
-            if (!g_bSilent && HasConsole())
-                SetConsoleTextAttribute(m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-
-            break;  // KEY_EXTENDED
+            break;
+        }
 #endif
 
         default:
-            if (m_uiInputCount == sizeof(m_szInputBuffer) / sizeof(wchar_t) - 1)
-                // entered 254 characters, wait for user to confirm/remove
-                break;
-
-#ifdef WIN32
-            // Color the text
-            if (!g_bSilent && HasConsole())
-                SetConsoleTextAttribute(m_hConsole, FOREGROUND_GREEN | FOREGROUND_RED);
-
-            // Echo the input
-            WCHAR wUNICODE[2] = {iStdIn, 0};
-            Printf("%s", UTF16ToMbUTF8(wUNICODE).c_str());
-#else
-            wchar_t wUNICODE[2] = {(wchar_t)iStdIn, 0};
-            if (!g_bSilent && !g_bNoCurses)
-                wprintw(m_wndInput, "%s", UTF16ToMbUTF8(wUNICODE).c_str());
-#endif
-
-            m_szInputBuffer[m_uiInputCount++] = iStdIn;
-
-#ifdef WIN32
-            // Restore the color
-            if (!g_bSilent && HasConsole())
-                SetConsoleTextAttribute(m_hConsole, FOREGROUND_RED | FOREGROUND_GREEN | FOREGROUND_BLUE);
-#endif
+            if (iswprint(inputCharacter))
+            {
+                InsertCharacter(static_cast<wchar_t>(inputCharacter));
+            }
             break;
     }
 }
 
 void CServerImpl::SelectCommandHistoryEntry(uint uiEntry)
 {
-    uint uiPreviouslySelectedCommandHistoryEntry = m_uiSelectedCommandHistoryEntry;
+    const uint previouslySelectedEntry = m_uiSelectedCommandHistoryEntry;
 
-    // Check if we're in bounds, otherwise clear selection
     if (!m_vecCommandHistory.empty() && uiEntry > 0 && uiEntry < m_vecCommandHistory.size())
         m_uiSelectedCommandHistoryEntry = uiEntry;
     else
         m_uiSelectedCommandHistoryEntry = 0;
 
-    // Save current input buffer to the command history entry as the second element
-    m_vecCommandHistory[uiPreviouslySelectedCommandHistoryEntry][1] = std::wstring(m_szInputBuffer);
+    m_vecCommandHistory[previouslySelectedEntry][1] = m_inputBuffer;
 
-    // Clear input
     ClearInput();
 
-    // If the selected command is empty, let's just stop here
-    const auto wzInput = m_vecCommandHistory[m_uiSelectedCommandHistoryEntry][1];
-    if (wzInput.empty())
+    const auto& selectedInput = m_vecCommandHistory[m_uiSelectedCommandHistoryEntry][1];
+    if (selectedInput.empty())
         return;
 
-    // Fill the input buffer
-    m_uiInputCount = wzInput.length();
-    for (uint i = 0; i < wzInput.length(); i++)
-        m_szInputBuffer[i] = wzInput[i];
-
-    // Let's print it out
-    wchar_t szBuffer[255] = {};
-    wcsncpy(&szBuffer[0], &m_szInputBuffer[0], m_uiInputCount);
-#ifdef WIN32
-    Printf("\r%s", UTF16ToMbUTF8(szBuffer).c_str());
-#else
-    if (!g_bSilent && !g_bNoCurses)
-        wprintw(m_wndInput, "%s", UTF16ToMbUTF8(szBuffer).c_str());
-#endif
+    m_inputBuffer = selectedInput;
+    m_cursorPos = m_inputBuffer.length();
+    RedrawInputLine();
 }
 
 bool CServerImpl::ClearInput()
 {
-    if (m_uiInputCount > 0)
+    if (!m_inputBuffer.empty() || m_renderedLength > 0)
     {
-        // Clear out old buffer
-        memset(&m_szInputBuffer, 0, sizeof(m_szInputBuffer));
-
-        // Couldn't get anything else working, so this is a way to clear the line
 #ifdef WIN32
-        for (uint i = 0; i < 80; i++)
-            Printf("%c %c", 0x08, 0x08);
-#else
-        for (uint i = 0; i < COLS; i++)
-            if (!g_bSilent && !g_bNoCurses)
-                wprintw(m_wndInput, "%c %c", 0x08, 0x08);
-#endif
-        // Reset our input count
-        m_uiInputCount = 0;
+        if (HasConsole() && !g_bSilent && m_renderedLength > 0)
+        {
+            CONSOLE_CURSOR_INFO cursorInfo;
+            const bool          cursorInfoRetrieved = GetConsoleCursorInfo(m_hConsole, &cursorInfo);
+            if (cursorInfoRetrieved && cursorInfo.bVisible)
+            {
+                CONSOLE_CURSOR_INFO hiddenCursor = cursorInfo;
+                hiddenCursor.bVisible = FALSE;
+                SetConsoleCursorInfo(m_hConsole, &hiddenCursor);
+            }
 
+            std::wstring spaces(m_renderedLength + 2, L' ');
+            WriteConsoleW(m_hConsole, L"\r", 1, nullptr, nullptr);
+            WriteConsoleW(m_hConsole, spaces.c_str(), static_cast<DWORD>(spaces.length()), nullptr, nullptr);
+            WriteConsoleW(m_hConsole, L"\r", 1, nullptr, nullptr);
+
+            if (cursorInfoRetrieved && cursorInfo.bVisible)
+            {
+                SetConsoleCursorInfo(m_hConsole, &cursorInfo);
+            }
+        }
+#else
+        if (!g_bSilent && !g_bNoCurses && m_wndInput)
+        {
+            wclear(m_wndInput);
+            wnoutrefresh(m_wndInput);
+        }
+#endif
+        m_inputBuffer.clear();
+        m_cursorPos = 0;
+        m_renderedLength = 0;
         return true;
     }
     return false;
@@ -1053,30 +1450,19 @@ bool CServerImpl::ClearInput()
 
 bool CServerImpl::ResetInput()
 {
-    if (m_uiInputCount > 0)
+    if (!m_inputBuffer.empty())
     {
-        // Let's print our current input buffer
 #ifdef WIN32
-        // Echo a newline
         Printf(" \n");
 #else
-        // Set string termination (required for compare/string functions)
-        m_szInputBuffer[m_uiInputCount] = 0;
-
-        if (!g_bSilent && !g_bNoCurses)
+        if (!g_bSilent && !g_bNoCurses && m_wndInput)
         {
-            // Clear the input window
             wclear(m_wndInput);
-            printw("%s\n", UTF16ToMbUTF8(m_szInputBuffer).c_str());
+            printw("%s\n", UTF16ToMbUTF8(m_inputBuffer).c_str());
         }
 #endif
-
-        // Clear our input buffer
         ClearInput();
-
-        // Reset our command history entry
         m_uiSelectedCommandHistoryEntry = 0;
-
         return true;
     }
     return false;
@@ -1182,7 +1568,159 @@ bool IsKeyPressed(int iKey)
     return false;
 }
 
+std::wstring CServerImpl::CleanCommandHistoryLine(const std::wstring& line)
+{
+    std::wstring lower = line;
+    std::transform(lower.begin(), lower.end(), lower.begin(), ::towlower);
+
+    struct SensitiveWord
+    {
+        std::wstring prefix;
+        int          keepWords;  // number of initial words to keep
+    };
+
+    static const SensitiveWord sensitivePatterns[] = {
+        {L"login", 1},  // login <user> [pass] -> keeps "login"
+
+        {L"register", 1},     // register <user> [pass] -> keeps "register"
+        {L"addaccount", 1},   // addaccount <user> [pass] -> keeps "addaccount"
+        {L"chgpass", 1},      // chgpass <user> [pass] -> keeps "chgpass"
+        {L"chgmypass", 1},    // chgmypass [old] [new] -> keeps "chgmypass"
+        {L"password", 1},     // password [pass] -> keeps "password"
+        {L"setpassword", 1},  // setpassword [pass] -> keeps "setpassword"
+    };
+
+    for (const auto& entry : sensitivePatterns)
+    {
+        if (lower.rfind(entry.prefix, 0) == 0)
+        {
+            if (lower.length() == entry.prefix.length() || iswspace(lower[entry.prefix.length()]))
+            {
+                size_t pos = 0;
+                int    wordsFound = 0;
+                size_t keepEnd = 0;
+                while (pos < line.length() && wordsFound < entry.keepWords)
+                {
+                    while (pos < line.length() && iswspace(line[pos]))
+                        pos++;
+                    if (pos >= line.length())
+                        break;
+                    while (pos < line.length() && !iswspace(line[pos]))
+                        pos++;
+                    wordsFound++;
+                    keepEnd = pos;
+                }
+                return line.substr(0, keepEnd);
+            }
+        }
+    }
+    return line;
+}
+
+void CServerImpl::LoadCommandHistory()
+{
+    m_vecCommandHistory = {{L"", L""}};
+    m_uiSelectedCommandHistoryEntry = 0;
+
+    std::vector<std::string> candidatePaths = {
+        PathJoin(m_strServerModPath, "priv/history.txt"),
+        PathJoin(m_strServerModPath, "history.txt"),
+    };
+
+    std::ifstream inFile;
+    for (const auto& path : candidatePaths)
+    {
+#ifdef WIN32
+        inFile.open(FromUTF8(path));
+#else
+        inFile.open(path);
+#endif
+        if (inFile.is_open())
+            break;
+    }
+
+    if (!inFile.is_open())
+        return;
+
+    std::string line;
+    while (std::getline(inFile, line))
+    {
+        if (!line.empty() && line.back() == '\r')
+            line.pop_back();
+
+        if (line.empty())
+            continue;
+
+        std::wstring wLine = MbUTF8ToUTF16(line);
+        std::wstring cleanLine = CleanCommandHistoryLine(wLine);
+        if (!cleanLine.empty())
+        {
+            bool exists = false;
+            for (const auto& entry : m_vecCommandHistory)
+            {
+                if (entry[0] == cleanLine)
+                {
+                    exists = true;
+                    break;
+                }
+            }
+            if (!exists)
+            {
+                m_vecCommandHistory.push_back({cleanLine, cleanLine});
+            }
+        }
+    }
+    inFile.close();
+
+    constexpr size_t maxHistoryCount = 128;
+    while (m_vecCommandHistory.size() > maxHistoryCount + 1)
+    {
+        m_vecCommandHistory.erase(m_vecCommandHistory.begin() + 1);
+    }
+}
+
+void CServerImpl::SaveCommandHistory()
+{
+    if (m_strServerModPath.empty())
+        return;
+
+    std::string privDir = PathJoin(m_strServerModPath, "priv");
+    MakeSureDirExists(privDir.c_str());
+
+    std::string historyPath = PathJoin(privDir, "history.txt");
+#ifdef WIN32
+    std::ofstream outFile(FromUTF8(historyPath), std::ios::trunc);
+#else
+    std::ofstream outFile(historyPath, std::ios::trunc);
+#endif
+    if (!outFile.is_open())
+    {
+        historyPath = PathJoin(m_strServerModPath, "history.txt");
+#ifdef WIN32
+        outFile.open(FromUTF8(historyPath), std::ios::trunc);
+#else
+        outFile.open(historyPath, std::ios::trunc);
+#endif
+    }
+
+    if (!outFile.is_open())
+        return;
+
+    for (size_t i = 1; i < m_vecCommandHistory.size(); ++i)
+    {
+        const std::wstring& cmd = m_vecCommandHistory[i][0];
+        std::wstring        cleanCmd = CleanCommandHistoryLine(cmd);
+        if (!cleanCmd.empty())
+        {
+            std::string mb = UTF16ToMbUTF8(cleanCmd);
+            outFile << mb << "\n";
+        }
+    }
+    outFile.close();
+}
+
 void CServerImpl::DestroyWindow()
+
 {
 #ifndef WIN32
     if (!g_bSilent && !g_bNoCurses && m_wndInput)
