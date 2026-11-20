@@ -104,41 +104,50 @@ void CCameraRPCs::SetCameraTarget(NetBitStreamInterface& bitStream)
     if (!m_pCamera)
         return;
 
-    CClientEntity* pEntity = CElementIDs::GetElement(targetID);
-    if (!pEntity)
+    CClientEntity* targetEntity = CElementIDs::GetElement(targetID);
+    if (!targetEntity)
         return;
 
     // Check if entity is being deleted - critical memory safety check
-    if (pEntity->IsBeingDeleted())
+    if (targetEntity->IsBeingDeleted())
         return;
 
-    switch (pEntity->GetType())
+    // Check if optional look-at information is present (backward compatible: legacy packets have 0 unread bits)
+    if (bitStream.GetNumberOfUnreadBits() >= 8)
     {
-        case CCLIENTPLAYER:
+        unsigned char ucLookAtType = 0;
+        if (bitStream.Read(ucLookAtType))
         {
-            CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pEntity);
-            if (pPlayer->IsLocalPlayer())
+            if (ucLookAtType == 1)  // Look-at 3D coordinates
             {
-                // Return the focus to the local player
-                m_pCamera->SetFocusToLocalPlayer();
+                CVector lookAtPosition;
+                if (bitStream.Read(lookAtPosition.fX) && bitStream.Read(lookAtPosition.fY) && bitStream.Read(lookAtPosition.fZ))
+                {
+                    if (std::isfinite(lookAtPosition.fX) && std::isfinite(lookAtPosition.fY) && std::isfinite(lookAtPosition.fZ))
+                    {
+                        CStaticFunctionDefinitions::SetCameraTarget(targetEntity, lookAtPosition);
+                        return;
+                    }
+                }
             }
-            else
+            else if (ucLookAtType == 2)  // Look-at target element
             {
-                // Put the focus on that player
-                m_pCamera->SetFocus(pPlayer, MODE_CAM_ON_A_STRING, false);
+                ElementID lookAtID;
+                if (bitStream.Read(lookAtID))
+                {
+                    CClientEntity* lookAtEntity = CElementIDs::GetElement(lookAtID);
+                    if (lookAtEntity)
+                    {
+                        CStaticFunctionDefinitions::SetCameraTarget(targetEntity, lookAtEntity);
+                        return;
+                    }
+                }
             }
-            break;
         }
-        case CCLIENTPED:
-        case CCLIENTVEHICLE:
-        {
-            m_pCamera->SetFocus(pEntity, MODE_CAM_ON_A_STRING, false);
-            break;
-        }
-        default:
-            // Invalid entity type for camera target
-            return;
     }
+
+    // Default targeting without specific look-at direction
+    CStaticFunctionDefinitions::SetCameraTarget(targetEntity);
 }
 
 void CCameraRPCs::SetCameraInterior(NetBitStreamInterface& bitStream)
