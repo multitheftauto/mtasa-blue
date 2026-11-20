@@ -59,6 +59,14 @@ namespace
 
         // Enable external begin frame scheduling for MTA-controlled rendering
         commandLine->AppendSwitch("enable-begin-frame-scheduling");
+        // Keep CEF from downgrading renderers to best-effort priority. On
+        // Windows 11 22H2+ that path calls SetProcessInformation with
+        // ProcessPowerThrottling to enable EcoQoS, which can hold the game
+        // thread for a long time when the first browser is opened. Chromium
+        // 144 applies EcoQoS from SetPriority() without a feature gate, and
+        // this switch is the only one that prevents the downgrade, so do not
+        // replace it with a disable-features entry.
+        commandLine->AppendSwitch("disable-renderer-backgrounding");
         // Explicitly block account sign-in to avoid crashes when Google API keys are registered on the system
         commandLine->AppendSwitchWithValue("allow-browser-signin", "false");
 
