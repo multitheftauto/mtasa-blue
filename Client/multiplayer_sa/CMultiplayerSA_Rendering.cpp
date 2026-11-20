@@ -927,6 +927,84 @@ static void __declspec(naked) HOOK_CRenderer_EverythingBarRoads()
     // clang-format on
 }
 
+struct AlphaObjectInfo
+{
+    void* atomic;
+    void* callback;
+    float distance;
+};
+
+static bool InsertEntityIntoSortedList(CEntitySAInterface* entity, float distance)
+{
+    if (auto* modelInfo = pGameInterface->GetModelInfo(entity->m_nModelIndex); modelInfo && modelInfo->ShouldRenderAfterScene())
+    {
+        CBaseModelInfoSAInterface* baseModelInfo = modelInfo->GetInterface();
+        CColModelSAInterface*      col = baseModelInfo ? baseModelInfo->pColModel : nullptr;
+
+        if (col)
+        {
+            auto           boundBox = col->m_bounds;
+            const CVector& camPos = *(CVector*)0xB76870;
+            CVector        closestPoint;
+
+            closestPoint.fX = std::max(boundBox.m_vecMin.fX, std::min(camPos.fX, boundBox.m_vecMax.fX));
+            closestPoint.fY = std::max(boundBox.m_vecMin.fY, std::min(camPos.fY, boundBox.m_vecMax.fY));
+            closestPoint.fZ = std::max(boundBox.m_vecMin.fZ, std::min(camPos.fZ, boundBox.m_vecMax.fZ));
+
+            distance = (camPos - closestPoint).Length();
+        }
+
+        // CVisibilityPlugins::RenderEntity as callback
+        AlphaObjectInfo inf = {entity, (void*)0x732B40, distance};
+
+        // Call CLinkList::InsertSorted for m_alphaReallyDrawLastList
+        return ((bool(__thiscall*)(void*, AlphaObjectInfo*))0x733910)((void*)0xC881D0, &inf);
+    }
+
+    // Call CVisibilityPlugins::InsertEntityIntoSortedList
+    // Insert into m_alphaList
+    return ((bool(__cdecl*)(CEntitySAInterface*, float))0x00734570)(entity, distance);
+}
+
+static void RenderEntityAfterScene(CEntitySAInterface* entity, CBaseModelInfoSAInterface* modelInfoInterface)
+{
+    if (!modelInfoInterface) [[unlikely]]
+        return;
+
+    // RwEngineInstance->dOpenDevice.fpRenderStateGet/fpRenderStateSet
+    DWORD engine = *(DWORD*)0xC97B24;
+    auto  fpSet = reinterpret_cast<BOOL(__cdecl*)(DWORD, void*)>(*(DWORD*)(engine + 0x20));
+
+    entity->bImBeingRendered = true;
+
+    if (!entity->bBackfaceCulled)
+        fpSet(0x14 /*rwRENDERSTATECULLMODE*/, (void*)1 /*rwCULLMODECULLNONE*/);
+
+    bool resetColours = entity->SetupLighting();
+    entity->Render();
+    entity->RemoveLighting(resetColours);
+
+    if (!entity->bBackfaceCulled)
+        fpSet(0x14 /*rwRENDERSTATECULLMODE*/, (void*)2 /*rwCULLMODECULLBACK*/);
+
+    entity->bImBeingRendered = false;
+}
+
+static void TryRenderOneNonRoad(CEntitySAInterface* entity)
+{
+    if (entity && (entity->nType == ENTITY_TYPE_OBJECT || entity->nType == ENTITY_TYPE_BUILDING) && entity->m_pRwObject)
+    {
+        if (auto* modelInfo = pGameInterface->GetModelInfo(entity->m_nModelIndex); modelInfo && modelInfo->ShouldRenderAfterScene())
+        {
+            RenderEntityAfterScene(entity, modelInfo->GetInterface());
+            return;
+        }
+    }
+
+    // Call CRenderer::RenderOneNonRoad
+    ((void(__cdecl*)(CEntitySAInterface*))0x553260)(entity);
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CMultiplayerSA::InitHooks_Rendering
@@ -944,6 +1022,16 @@ void CMultiplayerSA::InitHooks_Rendering()
     MemPut<BYTE>(0x5D9A88, VEHICLE_SPECULAR_LIGHT_SLOT);  // RwD3D9SetLight
     MemPut<BYTE>(0x5D9A91, VEHICLE_SPECULAR_LIGHT_SLOT);  // RwD3D9EnableLight(TRUE)
     MemPut<BYTE>(0x5D9F1F, VEHICLE_SPECULAR_LIGHT_SLOT);  // RwD3D9EnableLight(FALSE)
+
+    HookInstallCall(0x5534D1, (DWORD)InsertEntityIntoSortedList);  // CRenderer::AddEntityToRenderList
+    HookInstallCall(0x55350C, (DWORD)InsertEntityIntoSortedList);  // CRenderer::AddEntityToRenderList
+    HookInstallCall(0x553C45, (DWORD)InsertEntityIntoSortedList);  // CRenderer::RenderEverythingBarRoads
+    HookInstallCall(0x55455A, (DWORD)InsertEntityIntoSortedList);  // CRenderer::SetupEntityVisibility
+    HookInstallCall(0x732C48, (DWORD)TryRenderOneNonRoad);         // CVisibilityPlugins::RenderEntity
+
+    // TODO fix entity brightness flickering when entering fade out phase
+    // HookInstallCall(0x732BD7, (DWORD)RenderFadingAtomic); // CVisibilityPlugins::RenderEntity
+    // HookInstallCall(0x732BDE, (DWORD)RenderFadingClump);  // CVisibilityPlugins::RenderEntity
 
     EZHookInstall(CallIdle);
     EZHookInstall(CEntity_Render);
