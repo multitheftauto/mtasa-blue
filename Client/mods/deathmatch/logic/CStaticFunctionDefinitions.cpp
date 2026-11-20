@@ -2332,9 +2332,9 @@ bool CStaticFunctionDefinitions::SetPedCanBeKnockedOffBike(CClientEntity& Entity
 }
 
 bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SString& strBlockName, const char* szAnimName, int iTime, int iBlend, bool bLoop,
-                                                 bool bUpdatePosition, bool bInterruptible, bool bFreezeLastFrame)
+                                                 bool bUpdatePosition, bool bInterruptible, bool bFreezeLastFrame, bool isSecondary)
 {
-    RUN_CHILDREN(SetPedAnimation(**iter, strBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame))
+    RUN_CHILDREN(SetPedAnimation(**iter, strBlockName, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame, isSecondary))
 
     if (IS_PED(&Entity))
     {
@@ -2346,7 +2346,8 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
             {
                 Ped.SetCurrentAnimationCustom(false);
                 Ped.SetNextAnimationNormal();
-                Ped.RunNamedAnimation(pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame);
+                Ped.RunNamedAnimation(pBlock, szAnimName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame, false, false, false,
+                                      isSecondary);
                 return true;
             }
             else
@@ -2365,7 +2366,8 @@ bool CStaticFunctionDefinitions::SetPedAnimation(CClientEntity& Entity, const SS
                         Ped.SetNextAnimationCustom(pIFP, szAnimName);
 
                         const char* szGateWayAnimationName = g_pGame->GetAnimManager()->GetGateWayAnimationName();
-                        Ped.RunNamedAnimation(pBlock, szGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame);
+                        Ped.RunNamedAnimation(pBlock, szGateWayAnimationName, iTime, iBlend, bLoop, bUpdatePosition, bInterruptible, bFreezeLastFrame, false,
+                                              false, false, isSecondary);
                         return true;
                     }
                 }
