@@ -469,4 +469,6 @@ public:
 
     virtual unsigned int EntryInfoNodePool_NoOfUsedSpaces() const noexcept = 0;
     virtual unsigned int PtrNodeDoubleLinkPool_NoOfUsedSpaces() const noexcept = 0;
+
+    virtual void SetFastWeaponStrafeEnabled(bool enabled) noexcept = 0;
 };
