@@ -83,7 +83,10 @@ namespace
     // Ensure report log stuff has correct tags
     void UpdateSettingsForReportLog()
     {
-        UpdateMTAVersionApplicationSetting();
+        // Prevent mapping target binaries into address space before replacement.
+        if (!SharedUtil::IsTemporaryUpdateLaunchPath(GetLaunchPath()))
+            UpdateMTAVersionApplicationSetting();
+
         SetApplicationSetting("os-version", SString("%d.%d", GetOSVersion().dwMajor, GetOSVersion().dwMinor));
         SetApplicationSetting("real-os-version", SString("%d.%d", GetRealOSVersion().dwMajor, GetRealOSVersion().dwMinor));
         SetApplicationSetting("is-admin", IsUserAdmin() ? "1" : "0");
@@ -1182,6 +1185,9 @@ SString CInstallManager::_ShowCopyFailDialog()
                                    MB_RETRYCANCEL | MB_ICONERROR | MB_TOPMOST);
     if (iResponse == IDRETRY)
         return "retry";
+
+    // Clear sequencer state to prevent restart loops on cancellation or conflict.
+    SetApplicationSetting("admin2user_comms", "");
     return "ok";
 }
 
