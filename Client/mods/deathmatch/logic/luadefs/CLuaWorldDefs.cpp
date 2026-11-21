@@ -8,6 +8,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <cmath>
+#include <limits>
 #include <game/CSettings.h>
 #include <game/CWeather.h>
 #include <game/CColPoint.h>
@@ -2171,6 +2173,19 @@ std::variant<bool, float, CLuaMultiReturn<float, float, float>> CLuaWorldDefs::G
     return false;
 }
 
+static constexpr float WORLD_PROPERTY_MIN = 0.0f;
+static constexpr float WORLD_PROPERTY_MAX_ALPHA = 1.0f;
+static constexpr float WORLD_PROPERTY_MAX_CLOUDS_ALPHA = 255.0f;
+static constexpr float WORLD_PROPERTY_MAX_SHADOW_STRENGTH = 32767.0f;
+
+static float ClampWorldProperty(float value, float maxValue = std::numeric_limits<float>::max())
+{
+    if (!std::isfinite(value))
+        throw std::invalid_argument("Expected a finite world property value");
+
+    return Clamp(WORLD_PROPERTY_MIN, value, maxValue);
+}
+
 bool CLuaWorldDefs::SetWorldProperty(WorldProperty::Enum property, float arg1, std::optional<float> arg2, std::optional<float> arg3)
 {
     if (arg2.has_value() && arg3.has_value())
@@ -2203,35 +2218,35 @@ bool CLuaWorldDefs::SetWorldProperty(WorldProperty::Enum property, float arg1, s
     switch (property)
     {
         case WorldProperty::SPRITE_SIZE:
-            return g_pMultiplayer->SetSpriteSize(arg1);
+            return g_pMultiplayer->SetSpriteSize(ClampWorldProperty(arg1));
         case WorldProperty::SPRITE_BRIGHTNESS:
-            return g_pMultiplayer->SetSpriteBrightness(arg1);
+            return g_pMultiplayer->SetSpriteBrightness(ClampWorldProperty(arg1));
         case WorldProperty::POLE_SHADOW_STRENGTH:
-            return g_pMultiplayer->SetPoleShadowStrength(static_cast<int16>(arg1));
+            return g_pMultiplayer->SetPoleShadowStrength(static_cast<int16>(ClampWorldProperty(arg1, WORLD_PROPERTY_MAX_SHADOW_STRENGTH)));
         case WorldProperty::SHADOW_STRENGTH:
-            return g_pMultiplayer->SetShadowStrength(static_cast<int16>(arg1));
+            return g_pMultiplayer->SetShadowStrength(static_cast<int16>(ClampWorldProperty(arg1, WORLD_PROPERTY_MAX_SHADOW_STRENGTH)));
         case WorldProperty::SHADOWS_OFFSET:
-            return g_pMultiplayer->SetShadowsOffset(arg1);
+            return g_pMultiplayer->SetShadowsOffset(ClampWorldProperty(arg1));
         case WorldProperty::LIGHTS_ON_GROUND:
-            return g_pMultiplayer->SetLightsOnGroundBrightness(arg1);
+            return g_pMultiplayer->SetLightsOnGroundBrightness(ClampWorldProperty(arg1));
         case WorldProperty::CLOUDS_ALPHA1:
-            return g_pMultiplayer->SetCloudsAlpha1(arg1);
+            return g_pMultiplayer->SetCloudsAlpha1(ClampWorldProperty(arg1, WORLD_PROPERTY_MAX_CLOUDS_ALPHA));
         case WorldProperty::ILLUMINATION:
-            return g_pMultiplayer->SetIllumination(arg1);
+            return g_pMultiplayer->SetIllumination(ClampWorldProperty(arg1));
         case WorldProperty::WEATHER_WET_ROADS:
-            return g_pGame->GetWeather()->SetWetRoads(arg1);
+            return g_pGame->GetWeather()->SetWetRoads(ClampWorldProperty(arg1, WORLD_PROPERTY_MAX_ALPHA));
         case WorldProperty::WEATHER_FOGGYNESS:
-            return g_pGame->GetWeather()->SetFoggyness(arg1);
+            return g_pGame->GetWeather()->SetFoggyness(ClampWorldProperty(arg1, WORLD_PROPERTY_MAX_ALPHA));
         case WorldProperty::WEATHER_FOG:
-            return g_pGame->GetWeather()->SetFog(arg1);
+            return g_pGame->GetWeather()->SetFog(ClampWorldProperty(arg1, WORLD_PROPERTY_MAX_ALPHA));
         case WorldProperty::WEATHER_RAIN_FOG:
-            return g_pGame->GetWeather()->SetRainFog(arg1);
+            return g_pGame->GetWeather()->SetRainFog(ClampWorldProperty(arg1, WORLD_PROPERTY_MAX_ALPHA));
         case WorldProperty::WEATHER_WATER_FOG:
-            return g_pGame->GetWeather()->SetWaterFog(arg1);
+            return g_pGame->GetWeather()->SetWaterFog(ClampWorldProperty(arg1, WORLD_PROPERTY_MAX_ALPHA));
         case WorldProperty::WEATHER_SANDSTORM:
-            return g_pGame->GetWeather()->SetSandstorm(arg1);
+            return g_pGame->GetWeather()->SetSandstorm(ClampWorldProperty(arg1, WORLD_PROPERTY_MAX_ALPHA));
         case WorldProperty::WEATHER_RAINBOW:
-            return g_pGame->GetWeather()->SetRainbow(arg1);
+            return g_pGame->GetWeather()->SetRainbow(ClampWorldProperty(arg1, WORLD_PROPERTY_MAX_ALPHA));
     }
     return false;
 }
