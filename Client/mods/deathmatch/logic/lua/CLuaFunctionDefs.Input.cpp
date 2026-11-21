@@ -147,9 +147,22 @@ int CLuaFunctionDefs::ShowCursor(lua_State* luaVM)
 
 int CLuaFunctionDefs::BindKey(lua_State* luaVM)
 {
-    SString          strKey = "", strHitState = "", strCommand = "", strArguments = "";
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strKey);
+    // The first argument can be either a single key (string) or a table of keys.
+    // This allows binding the same key state to multiple keys at once, e.g.
+    // bindKey ( {"F1", "F2", "F3"}, "down", handlerFunction )
+    std::vector<SString> keys;
+    SString              strHitState = "", strCommand = "", strArguments = "";
+    CScriptArgReader     argStream(luaVM);
+
+    if (argStream.NextIsTable())
+        argStream.ReadStringTable(keys);
+    else
+    {
+        SString strKey = "";
+        argStream.ReadString(strKey);
+        keys.push_back(strKey);
+    }
+
     argStream.ReadString(strHitState);
 
     if (!argStream.HasErrors())
@@ -165,7 +178,15 @@ int CLuaFunctionDefs::BindKey(lua_State* luaVM)
                 argStream.ReadString(strArguments, "");
                 if (!argStream.HasErrors())
                 {
-                    if (CStaticFunctionDefinitions::BindKey(strKey, strHitState, strCommand, strArguments, strResource))
+                    // Bind the key state to every key in the list. All keys have to bind
+                    // successfully for the whole call to be considered a success.
+                    bool bAllSuccess = !keys.empty();
+                    for (const SString& strKey : keys)
+                    {
+                        if (!CStaticFunctionDefinitions::BindKey(strKey, strHitState, strCommand, strArguments, strResource))
+                            bAllSuccess = false;
+                    }
+                    if (bAllSuccess)
                     {
                         lua_pushboolean(luaVM, true);
                         return 1;
@@ -182,7 +203,15 @@ int CLuaFunctionDefs::BindKey(lua_State* luaVM)
                 argStream.ReadFunctionComplete();
                 if (!argStream.HasErrors())
                 {
-                    if (CStaticFunctionDefinitions::BindKey(strKey, strHitState, pLuaMain, iLuaFunction, Arguments))
+                    // Argument list is copied by every key bind, so reusing the same
+                    // CLuaArguments for each key is safe.
+                    bool bAllSuccess = !keys.empty();
+                    for (const SString& strKey : keys)
+                    {
+                        if (!CStaticFunctionDefinitions::BindKey(strKey, strHitState, pLuaMain, iLuaFunction, Arguments))
+                            bAllSuccess = false;
+                    }
+                    if (bAllSuccess)
                     {
                         lua_pushboolean(luaVM, true);
                         return 1;
