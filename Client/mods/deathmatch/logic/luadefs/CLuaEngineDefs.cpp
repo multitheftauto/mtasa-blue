@@ -1441,6 +1441,37 @@ int CLuaEngineDefs::EngineGetModelIDFromName(lua_State* luaVM)
     return 1;
 }
 
+namespace
+{
+    // The clothing items of CJ are files of player.img, not models of the model info array. MTA gives them IDs above the real
+    // model IDs (see CModelNames.h) and the game keeps their TXDs loaded only while it builds the textures of a ped.
+    bool IsClothesModelID(uint32_t modelId)
+    {
+        return modelId >= CLOTHES_MODEL_ID_FIRST && modelId <= CLOTHES_MODEL_ID_LAST;
+    }
+
+    bool IsClothesTexID(uint32_t modelId)
+    {
+        return modelId >= CLOTHES_TEX_ID_FIRST && modelId <= CLOTHES_TEX_ID_LAST;
+    }
+
+    // Like CModelNames::ResolveModelID, but also accepts the name of a clothing item.
+    // The clothes texture goes before the clothes model because these functions are about textures,
+    // and some names (afro, hands, head...) are both a clothes model and a clothes texture.
+    uint32_t ResolveModelOrClothesID(const SString& strName)
+    {
+        uint32_t modelId = CModelNames::ResolveModelID(strName);
+        if (modelId != INVALID_MODEL_ID)
+            return modelId;
+
+        modelId = CModelNames::GetClothesTexID(strName);
+        if (modelId != INVALID_MODEL_ID)
+            return modelId;
+
+        return CModelNames::GetClothesModelID(strName);
+    }
+}  // namespace
+
 // Only works if the model is loaded. EngineGetVisibleTextureNames should be used instead
 int CLuaEngineDefs::EngineGetModelTextureNames(lua_State* luaVM)
 {
@@ -1452,22 +1483,32 @@ int CLuaEngineDefs::EngineGetModelTextureNames(lua_State* luaVM)
 
     if (!argStream.HasErrors())
     {
-        uint32_t modelId = CModelNames::ResolveModelID(strModelName);
+        uint32_t modelId = ResolveModelOrClothesID(strModelName);
         if (modelId != INVALID_MODEL_ID)
         {
             std::vector<SString> nameList;
-            g_pGame->GetRenderWare()->GetModelTextureNames(nameList, static_cast<ushort>(modelId));
+            bool                 bSuccess = true;
 
-            lua_newtable(luaVM);
-            for (uint i = 0; i < nameList.size(); i++)
+            if (IsClothesTexID(modelId))
+                bSuccess = g_pGame->GetRenderWare()->GetClothesTextureNames(nameList, static_cast<ushort>(modelId - CLOTHES_MODEL_ID_FIRST));
+            else if (!IsClothesModelID(modelId))  // A clothes model has no textures of its own, its textures come from the clothes TXDs
+                g_pGame->GetRenderWare()->GetModelTextureNames(nameList, static_cast<ushort>(modelId));
+
+            if (bSuccess)
             {
-                lua_pushnumber(luaVM, i + 1);
-                lua_pushstring(luaVM, nameList[i]);
-                lua_settable(luaVM, -3);
+                lua_newtable(luaVM);
+                for (uint i = 0; i < nameList.size(); i++)
+                {
+                    lua_pushnumber(luaVM, i + 1);
+                    lua_pushstring(luaVM, nameList[i]);
+                    lua_settable(luaVM, -3);
+                }
+                return 1;
             }
-            return 1;
+            argStream.SetCustomError("Unable to read the clothes file from player.img");
         }
-        argStream.SetCustomError("Expected valid model ID or name at argument 1");
+        else
+            argStream.SetCustomError("Expected valid model ID or name at argument 1");
     }
     if (argStream.HasErrors())
         m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
@@ -1567,9 +1608,20 @@ int CLuaEngineDefs::EngineGetModelTextures(lua_State* luaVM)
     else if (argStream.NextIsTable())
         argStream.ReadStringTable(vTextureNames);
 
-    uint32_t modelId = CModelNames::ResolveModelID(strModelName);
+    uint32_t modelId = ResolveModelOrClothesID(strModelName);
 
-    if (modelId == INVALID_MODEL_ID || !g_pGame->GetRenderWare()->GetModelTextures(textureList, static_cast<ushort>(modelId), vTextureNames))
+    bool bSuccess = false;
+    if (modelId != INVALID_MODEL_ID)
+    {
+        if (IsClothesTexID(modelId))
+            bSuccess = g_pGame->GetRenderWare()->GetClothesTextures(textureList, static_cast<ushort>(modelId - CLOTHES_MODEL_ID_FIRST), vTextureNames);
+        else if (IsClothesModelID(modelId))
+            bSuccess = true;  // A clothes model has no textures of its own, its textures come from the clothes TXDs
+        else
+            bSuccess = g_pGame->GetRenderWare()->GetModelTextures(textureList, static_cast<ushort>(modelId), vTextureNames);
+    }
+
+    if (!bSuccess)
     {
         argStream.SetCustomError("Invalid model ID");
         lua_pushboolean(luaVM, false);

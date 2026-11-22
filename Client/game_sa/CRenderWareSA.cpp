@@ -862,13 +862,29 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
     std::vector<RwTexture*> rwTextureList;
     GetTxdTextures(rwTextureList, pTXD);
 
-    // If any texture names specified in vTextureNames, we should only return these
-    bool bExcludeTextures = false;
+    CollectTexturePixels(outTextureList, rwTextureList, vTextureNames);
 
-    if (vTextureNames.size() > 0)
-        bExcludeTextures = true;
+    if (bLoadedModel)
+        ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
 
-    for (RwTexture* pTexture : rwTextureList)
+    return true;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::CollectTexturePixels
+//
+// Copy the pixels of the textures into outTextureList.
+// If any texture names are specified in vTextureNames, only the textures matching one of them are copied.
+// Shared by the model and the clothes lookups.
+//
+////////////////////////////////////////////////////////////////
+void CRenderWareSA::CollectTexturePixels(std::vector<std::tuple<std::string, CPixels>>& outTextureList, const std::vector<RwTexture*>& textureList,
+                                         const std::vector<SString>& vTextureNames)
+{
+    const bool bExcludeTextures = !vTextureNames.empty();
+
+    for (RwTexture* pTexture : textureList)
     {
         SString strTextureName = pTexture->name;
         bool    bValidTexture = false;
@@ -894,11 +910,6 @@ bool CRenderWareSA::GetModelTextures(std::vector<std::tuple<std::string, CPixels
             outTextureList.emplace_back(strTextureName, std::move(texture));
         }
     }
-
-    if (bLoadedModel)
-        ((void(__cdecl*)(unsigned short))FUNC_RemoveModel)(usModelId);
-
-    return true;
 }
 
 ////////////////////////////////////////////////////////////////

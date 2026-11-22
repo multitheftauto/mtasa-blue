@@ -7,6 +7,8 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <core/CCoreInterface.h>
+#include <fstream>
 #include "CGameSA.h"
 #include "CDirectorySA.h"
 #include "gamesa_renderware.h"
@@ -209,6 +211,162 @@ bool CRenderWareSA::ClothesRemoveFile(char* fileData)
 bool CRenderWareSA::HasClothesFile(const char* fileName) const noexcept
 {
     return fileName && MapFind(ms_ClothesFileDataMap, fileName);
+}
+
+namespace
+{
+    // player.img is an IMG archive (version 2): the "VER2" magic and the number of entries, followed by one entry per file.
+    // Offsets and sizes are counted in blocks, and the file id MTA uses for clothes is the index of the entry.
+    constexpr std::size_t IMG_BLOCK_SIZE = 2048;
+    constexpr std::size_t IMG_HEADER_SIZE = 8;  // "VER2" + std::uint32_t entry count
+    constexpr std::size_t IMG_ENTRY_SIZE = 32;  // std::uint32_t offset, std::uint16_t streaming size, std::uint16_t size in archive, char name[24]
+
+    constexpr std::uint32_t RW_ID_TEXDICTIONARY = 0x16;
+    constexpr std::size_t   RW_CHUNK_HEADER_SIZE = 12;  // chunk type, chunk size (without this header), library version
+
+    // The size of the whole RenderWare chunk that starts with this header
+    std::size_t GetChunkTotalSize(const char* chunkHeader)
+    {
+        std::uint32_t chunkSize = 0;
+        std::memcpy(&chunkSize, chunkHeader + sizeof(std::uint32_t), sizeof(chunkSize));
+        return static_cast<std::size_t>(chunkSize) + RW_CHUNK_HEADER_SIZE;
+    }
+
+    // Get the bytes of a clothes TXD, the same ones the game would load for this file.
+    // A replacement added by a script wins, otherwise the original file is read straight from player.img.
+    // The game only keeps these files around while it builds the textures of a ped, so there is no TXD to look them up in.
+    bool ReadClothesTxdFile(ushort usFileId, std::string& outData)
+    {
+        if (const char* replacementFileData = MapFindRef(ms_ReplacementClothesFileDataMap, usFileId))
+        {
+            // The replacement is a full TXD file. The streaming size of the file is rounded up to blocks, so the chunk header gives the exact size
+            const std::size_t maxSize = g_clothesDirectory->GetModelStreamingSize(usFileId) * IMG_BLOCK_SIZE;
+            if (maxSize < RW_CHUNK_HEADER_SIZE)
+                return false;
+
+            outData.assign(replacementFileData, std::min(GetChunkTotalSize(replacementFileData), maxSize));
+            return true;
+        }
+
+        // The game opens the archive with this same relative path
+        std::ifstream file("models\\player.img", std::ios::binary);
+
+        char archiveHeader[IMG_HEADER_SIZE];
+        if (!file.read(archiveHeader, sizeof(archiveHeader)) || std::memcmp(archiveHeader, "VER2", 4) != 0)
+            return false;
+
+        std::uint32_t entryCount = 0;
+        std::memcpy(&entryCount, archiveHeader + 4, sizeof(entryCount));
+        if (usFileId >= entryCount)
+            return false;
+
+        char entry[IMG_ENTRY_SIZE];
+        file.seekg(IMG_HEADER_SIZE + static_cast<std::size_t>(usFileId) * IMG_ENTRY_SIZE);
+        if (!file.read(entry, sizeof(entry)))
+            return false;
+
+        std::uint32_t offsetInBlocks = 0;
+        std::uint16_t streamingSizeInBlocks = 0;
+        std::uint16_t sizeInArchiveInBlocks = 0;
+        std::memcpy(&offsetInBlocks, entry, sizeof(offsetInBlocks));
+        std::memcpy(&streamingSizeInBlocks, entry + 4, sizeof(streamingSizeInBlocks));
+        std::memcpy(&sizeInArchiveInBlocks, entry + 6, sizeof(sizeInArchiveInBlocks));
+
+        const std::size_t maxSize = std::max(streamingSizeInBlocks, sizeInArchiveInBlocks) * IMG_BLOCK_SIZE;
+        if (maxSize < RW_CHUNK_HEADER_SIZE)
+            return false;
+
+        char chunkHeader[RW_CHUNK_HEADER_SIZE];
+        file.seekg(static_cast<std::uint64_t>(offsetInBlocks) * IMG_BLOCK_SIZE);
+        if (!file.read(chunkHeader, sizeof(chunkHeader)))
+            return false;
+
+        std::uint32_t chunkType = 0;
+        std::memcpy(&chunkType, chunkHeader, sizeof(chunkType));
+        if (chunkType != RW_ID_TEXDICTIONARY)
+            return false;
+
+        const std::size_t totalSize = std::min(GetChunkTotalSize(chunkHeader), maxSize);
+        outData.resize(totalSize);
+        std::memcpy(outData.data(), chunkHeader, sizeof(chunkHeader));
+        return totalSize == RW_CHUNK_HEADER_SIZE || static_cast<bool>(file.read(outData.data() + RW_CHUNK_HEADER_SIZE, totalSize - RW_CHUNK_HEADER_SIZE));
+    }
+
+    // Read a clothes TXD into a texture dictionary that the caller has to destroy
+    RwTexDictionary* ReadClothesTxd(ushort usFileId)
+    {
+        std::string fileData;
+        if (!ReadClothesTxdFile(usFileId, fileData))
+            return nullptr;
+
+        RwBuffer streamBuffer;
+        streamBuffer.ptr = fileData.data();
+        streamBuffer.size = fileData.size();
+        RwStream* stream = RwStreamOpen(STREAM_TYPE_BUFFER, STREAM_MODE_READ, &streamBuffer);
+        if (!stream)
+            return nullptr;
+
+        // Unlike CRenderWareSA::ReadTXD this dictionary is only used here, so it does not have to be registered as a script added TXD
+        RwTexDictionary* pTxd = nullptr;
+        if (RwStreamFindChunk(stream, RW_ID_TEXDICTIONARY, nullptr, nullptr))
+            pTxd = RwTexDictionaryGtaStreamRead(stream);
+
+        RwStreamClose(stream, nullptr);
+        return pTxd;
+    }
+}  // namespace
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetClothesTextureNames
+//
+// Get the names of the textures in a clothes TXD of player.img
+// Returns false if usFileId is not a TXD of player.img
+//
+////////////////////////////////////////////////////////////////
+bool CRenderWareSA::GetClothesTextureNames(std::vector<SString>& outNameList, ushort usFileId)
+{
+    outNameList.clear();
+
+    RwTexDictionary* pTxd = ReadClothesTxd(usFileId);
+    if (!pTxd)
+        return false;
+
+    std::vector<RwTexture*> textureList;
+    GetTxdTextures(textureList, pTxd);
+
+    for (const RwTexture* pTexture : textureList)
+        outNameList.push_back(pTexture->name);
+
+    RwTexDictionaryDestroy(pTxd);
+    return true;
+}
+
+////////////////////////////////////////////////////////////////
+//
+// CRenderWareSA::GetClothesTextures
+//
+// Get the textures of a clothes TXD of player.img
+// If any texture names are specified in vTextureNames, only the textures matching one of them are returned
+// Returns false if usFileId is not a TXD of player.img
+//
+////////////////////////////////////////////////////////////////
+bool CRenderWareSA::GetClothesTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usFileId,
+                                       const std::vector<SString>& vTextureNames)
+{
+    outTextureList.clear();
+
+    RwTexDictionary* pTxd = ReadClothesTxd(usFileId);
+    if (!pTxd)
+        return false;
+
+    std::vector<RwTexture*> textureList;
+    GetTxdTextures(textureList, pTxd);
+
+    CollectTexturePixels(outTextureList, textureList, vTextureNames);
+
+    RwTexDictionaryDestroy(pTxd);
+    return true;
 }
 
 ////////////////////////////////////////////////////////////////

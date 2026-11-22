@@ -58,6 +58,10 @@ public:
     bool ClothesAddFile(const char* fileData, std::size_t fileSize, const char* fileName) override;
     bool ClothesRemoveFile(char* fileData) override;
     bool HasClothesFile(const char* fileName) const noexcept override;
+    bool GetClothesTextureNames(std::vector<SString>& outNameList, ushort usFileId) override;
+    bool GetClothesTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usFileId, const std::vector<SString>& vTextureNames) override;
+    static void CollectTexturePixels(std::vector<std::tuple<std::string, CPixels>>& outTextureList, const std::vector<RwTexture*>& textureList,
+                                     const std::vector<SString>& vTextureNames);
 
     // Reads and parses a TXD file specified by a path (szTXD)
     RwTexDictionary* ReadTXD(const SString& strFilename, const SString& buffer);
