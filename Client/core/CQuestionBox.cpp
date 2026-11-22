@@ -162,7 +162,7 @@ CGUIEdit* CQuestionBox::SetEditbox(unsigned int uiEditbox, const SString& strTex
     while (m_EditList.size() < m_uiActiveEditboxes)
     {
         CGUIEdit* pEdit = reinterpret_cast<CGUIEdit*>(g_pCore->GetGUI()->CreateEdit(m_pWindow));
-        pEdit->SetTextAcceptedHandler(GUI_CALLBACK(&CQuestionBox::OnButtonClick, this));
+        pEdit->SetTextAcceptedHandler(GUI_CALLBACK(&CQuestionBox::OnEditAccepted, this));
         pEdit->SetUserData(reinterpret_cast<void*>(m_EditList.size()));
         pEdit->SetVisible(false);
         m_EditList.push_back(pEdit);
@@ -219,6 +219,14 @@ bool CQuestionBox::OnButtonClick(CGUIElement* pElement)
 
     if (m_CallbackEdit && !m_EditList.empty())  // Just grab the first editbox for now
         m_CallbackEdit(m_CallbackParameter, m_uiLastButton, m_EditList[0]->GetText());
+    return true;
+}
+
+bool CQuestionBox::OnEditAccepted(CGUIElement* pElement)
+{
+    // Enter should confirm the input, not use the edit box index as the Cancel button index.
+    if (m_uiActiveButtons > 1)
+        return OnButtonClick(m_ButtonList[1]);
     return true;
 }
 
