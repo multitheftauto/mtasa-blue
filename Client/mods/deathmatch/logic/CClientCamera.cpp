@@ -139,7 +139,6 @@ CClientCamera::CClientCamera(CClientManager* pManager) : ClassInit(this), CClien
 
     m_FixedCameraMode = EFixedCameraMode::ROTATION;
     m_hasCachedPulseMatrix = false;
-    m_hasCachedPulseEuler = false;
     m_lastCenterOfWorldPos = CVector();
     m_lastCenterOfWorldRot = 0.0f;
     m_hasCenterOfWorld = false;
@@ -300,7 +299,8 @@ bool CClientCamera::GetMatrix(CMatrix& Matrix) const
     if (m_bFixed)
         Matrix = m_matFixedMatrix;
     else
-        Matrix = AcquirePulseMatrix();
+        // GTA may update the camera after the pulse cache was populated.
+        Matrix = GetGtaMatrix();
     return true;
 }
 
@@ -355,8 +355,13 @@ void CClientCamera::GetRotationDegrees(CVector& vecRotation) const
     }
     else
     {
-        const CMatrix& matrix = AcquirePulseMatrix();
-        eulerRadians = AcquirePulseEuler(matrix);
+        // Rotation must reflect the same live camera as GetMatrix.
+        if (g_pMultiplayer)
+        {
+            CMatrix matrix = GetGtaMatrix();
+            EnsureOrthonormal(matrix);
+            g_pMultiplayer->ConvertMatrixToEulerAngles(matrix, eulerRadians.fX, eulerRadians.fY, eulerRadians.fZ);
+        }
     }
 
     vecRotation = CVector(PI_2, PI_2, PI_2) - eulerRadians;
@@ -974,7 +979,6 @@ void CClientCamera::SetGtaMatrix(const CMatrix& matInNew, CCam* pCam) const
 void CClientCamera::InvalidateCachedTransforms() const
 {
     m_hasCachedPulseMatrix = false;
-    m_hasCachedPulseEuler = false;
 }
 
 void CClientCamera::SetCenterOfWorldCached(const CVector* pPosition, float fRotationRadians)
@@ -1033,24 +1037,6 @@ const CMatrix& CClientCamera::AcquirePulseMatrix() const
         m_hasCachedPulseMatrix = true;
     }
     return m_cachedPulseMatrix;
-}
-
-const CVector& CClientCamera::AcquirePulseEuler(const CMatrix& matrix) const
-{
-    if (!m_hasCachedPulseEuler)
-    {
-        if (!g_pMultiplayer)
-        {
-            m_cachedPulseEuler = CVector();
-            m_hasCachedPulseEuler = true;
-            return m_cachedPulseEuler;
-        }
-        CMatrix temp = matrix;
-        EnsureOrthonormal(temp);
-        g_pMultiplayer->ConvertMatrixToEulerAngles(temp, m_cachedPulseEuler.fX, m_cachedPulseEuler.fY, m_cachedPulseEuler.fZ);
-        m_hasCachedPulseEuler = true;
-    }
-    return m_cachedPulseEuler;
 }
 
 void CClientCamera::ShakeCamera(float radius, float x, float y, float z) noexcept
