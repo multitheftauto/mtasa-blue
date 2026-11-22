@@ -2597,7 +2597,9 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(eWeaponProperty eProperty, eW
     CBitStream BitStream;
     BitStream.pBitStream->Write(static_cast<unsigned char>(eWeapon));
     BitStream.pBitStream->Write(static_cast<unsigned char>(eProperty));
-    BitStream.pBitStream->Write(static_cast<unsigned char>(eSkillLevel));
+    // Send the skill of the stats that were modified rather than the requested one. They differ for weapons without
+    // skill variants (e.g. "pro" for a grenade), and clients only have the single set of stats for those weapons.
+    BitStream.pBitStream->Write(static_cast<unsigned char>(pWeaponInfo->GetWeaponSkillLevel()));
     BitStream.pBitStream->Write(fData);
     m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_WEAPON_PROPERTY, *BitStream.pBitStream));
 
@@ -2648,7 +2650,9 @@ bool CStaticFunctionDefinitions::SetWeaponProperty(eWeaponProperty eProperty, eW
     CBitStream BitStream;
     BitStream.pBitStream->Write(static_cast<unsigned char>(eWeapon));
     BitStream.pBitStream->Write(static_cast<unsigned char>(eProperty));
-    BitStream.pBitStream->Write(static_cast<unsigned char>(eSkillLevel));
+    // Send the skill of the stats that were modified rather than the requested one. They differ for weapons without
+    // skill variants (e.g. "pro" for a grenade), and clients only have the single set of stats for those weapons.
+    BitStream.pBitStream->Write(static_cast<unsigned char>(pWeaponInfo->GetWeaponSkillLevel()));
     if (eProperty == WEAPON_FLAGS)
         BitStream.pBitStream->Write(sData);  // Backward compat because sent little end first
     else
@@ -2684,7 +2688,9 @@ bool CStaticFunctionDefinitions::SetWeaponPropertyFlag(eWeaponProperty eProperty
     CBitStream BitStream;
     BitStream.pBitStream->Write(static_cast<unsigned char>(eWeapon));
     BitStream.pBitStream->Write(static_cast<unsigned char>(eProperty));
-    BitStream.pBitStream->Write(static_cast<unsigned char>(eSkillLevel));
+    // Send the skill of the stats that were modified rather than the requested one. They differ for weapons without
+    // skill variants (e.g. "pro" for a grenade), and clients only have the single set of stats for those weapons.
+    BitStream.pBitStream->Write(static_cast<unsigned char>(pWeaponInfo->GetWeaponSkillLevel()));
     BitStream.pBitStream->WriteBit(bEnable);
     m_pPlayerManager->BroadcastOnlyJoined(CLuaPacket(SET_WEAPON_PROPERTY, *BitStream.pBitStream));
 

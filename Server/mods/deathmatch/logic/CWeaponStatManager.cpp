@@ -15,10 +15,46 @@
 SFixedArray<sWeaponInfo, WEAPONTYPE_MAX + 1> CWeaponStatManager::OriginalPoorWeaponData;
 SFixedArray<sWeaponInfo, WEAPONTYPE_MAX + 1> CWeaponStatManager::OriginalNormalWeaponData;
 SFixedArray<sWeaponInfo, WEAPONTYPE_MAX + 1> CWeaponStatManager::OriginalHitmanWeaponData;
+
+namespace
+{
+    // Only the weapons from the pistol to the Tec-9 have separate poor/std/pro stats. Every other weapon type has a
+    // single set of stats, so a lookup for it must not depend on the requested skill (e.g. "pro" for a grenade).
+    bool HasSkillVariants(eWeaponType type)
+    {
+        return type >= WEAPONTYPE_PISTOL && type <= WEAPONTYPE_TEC9;
+    }
+
+    // Weapon types that have default stats in the tables filled by CWeaponStatManager::Init: the thrown projectiles
+    // (grenade, teargas, molotov) and the weapons from the pistol to the fire extinguisher. The rockets and the
+    // freefall bomb between them have no table entry, so they must stay excluded.
+    bool HasDefaultStats(int weaponType)
+    {
+        return (weaponType >= WEAPONTYPE_GRENADE && weaponType <= WEAPONTYPE_MOLOTOV) || (weaponType >= WEAPONTYPE_PISTOL && weaponType <= WEAPONTYPE_MAX);
+    }
+}
+
 CWeaponStatManager::CWeaponStatManager()
 {
     Init();
     CWeaponStat* pWeaponStat = NULL;
+
+    // The thrown projectiles are not skill weapons and come before the pistol in the weapon type list, so they have
+    // to be added on their own. Without them getWeaponProperty/setWeaponProperty fail for these weapons.
+    for (int weaponTypeId = WEAPONTYPE_GRENADE; weaponTypeId <= WEAPONTYPE_MOLOTOV; weaponTypeId++)
+    {
+        eWeaponType weaponType = (eWeaponType)weaponTypeId;
+        // Storage for Original weapon data ( for resetting )
+        pWeaponStat = new CWeaponStat(weaponType, WEAPONSKILL_STD);
+        m_OriginalWeaponData.push_back(pWeaponStat);
+        LoadDefault(pWeaponStat, weaponType);
+
+        // Storage for new weapon data ( for script use )
+        pWeaponStat = new CWeaponStat(weaponType, WEAPONSKILL_STD);
+        m_WeaponData.push_back(pWeaponStat);
+        LoadDefault(pWeaponStat, weaponType);
+    }
+
     // Make our list nicer by starting at the non-skill weapons so we don't have duplicates of STD weapon skill
     for (int i = 0; i <= WEAPONTYPE_EXTINGUISHER; i++)
     {
@@ -76,7 +112,7 @@ CWeaponStat* CWeaponStatManager::GetWeaponStats(eWeaponType type, eWeaponSkill s
 {
     for (std::list<CWeaponStat*>::iterator iter = m_WeaponData.begin(); iter != m_WeaponData.end(); ++iter)
     {
-        if (((*iter)->GetWeaponSkillLevel() == skill || type > WEAPONTYPE_TEC9) && (*iter)->GetWeaponType() == type)
+        if (((*iter)->GetWeaponSkillLevel() == skill || !HasSkillVariants(type)) && (*iter)->GetWeaponType() == type)
         {
             return (*iter);
         }
@@ -110,7 +146,7 @@ CWeaponStat* CWeaponStatManager::GetOriginalWeaponStats(eWeaponType type, eWeapo
 {
     for (std::list<CWeaponStat*>::iterator iter = m_OriginalWeaponData.begin(); iter != m_OriginalWeaponData.end(); ++iter)
     {
-        if (((*iter)->GetWeaponSkillLevel() == skill || type > WEAPONTYPE_TEC9) && (*iter)->GetWeaponType() == type)
+        if (((*iter)->GetWeaponSkillLevel() == skill || !HasSkillVariants(type)) && (*iter)->GetWeaponType() == type)
         {
             return (*iter);
         }
@@ -122,6 +158,97 @@ void CWeaponStatManager::Init()
     // Load SA Defaults
     // Script used to dump data: https://wiki.multitheftauto.com/wiki/Code_snippet_for_extracting_weapon_stats
 
+    // Thrown projectile weapons. They have a single (STD) entry and no skill variants.
+    // 16 - Grenade
+    OriginalNormalWeaponData[16].weapon_range = 40.0f;
+    OriginalNormalWeaponData[16].target_range = 30.0f;
+    OriginalNormalWeaponData[16].accuracy = 1.0f;
+    OriginalNormalWeaponData[16].damage = 75;
+    OriginalNormalWeaponData[16].life_span = 800.0f;
+    OriginalNormalWeaponData[16].firing_speed = 0.25f;
+    OriginalNormalWeaponData[16].spread = 1.0f;
+    OriginalNormalWeaponData[16].maximum_clip_ammo = 1;
+    OriginalNormalWeaponData[16].move_speed = 1.0f;
+    OriginalNormalWeaponData[16].flags = 256;
+    OriginalNormalWeaponData[16].anim_group = 28;
+    OriginalNormalWeaponData[16].fire_type = (eFireType)2;
+    OriginalNormalWeaponData[16].model = 342;
+    OriginalNormalWeaponData[16].model2 = -1;
+    OriginalNormalWeaponData[16].weapon_slot = (eWeaponSlot)8;
+    OriginalNormalWeaponData[16].fire_offset = CVector(0.0f, 0.0f, 0.0f);
+    OriginalNormalWeaponData[16].skill_level = (eWeaponSkill)1;
+    OriginalNormalWeaponData[16].required_skill_level = 0;
+    OriginalNormalWeaponData[16].anim_loop_start = 0.0f;
+    OriginalNormalWeaponData[16].anim_loop_stop = 3.29399991f;
+    OriginalNormalWeaponData[16].anim_loop_bullet_fire = 0.200000018f;
+    OriginalNormalWeaponData[16].anim2_loop_start = 0.0f;
+    OriginalNormalWeaponData[16].anim2_loop_stop = 3.29399991f;
+    OriginalNormalWeaponData[16].anim2_loop_bullet_fire = 0.266666681f;
+    OriginalNormalWeaponData[16].anim_breakout_time = 3.30000019f;
+    OriginalNormalWeaponData[16].radius = -1.0f;
+    OriginalNormalWeaponData[16].aim_offset = 17;
+    OriginalNormalWeaponData[16].default_combo = 4;
+    OriginalNormalWeaponData[16].combos_available = 1;
+    // 17 - Teargas
+    OriginalNormalWeaponData[17].weapon_range = 40.0f;
+    OriginalNormalWeaponData[17].target_range = 30.0f;
+    OriginalNormalWeaponData[17].accuracy = 1.0f;
+    OriginalNormalWeaponData[17].damage = 75;
+    OriginalNormalWeaponData[17].life_span = 800.0f;
+    OriginalNormalWeaponData[17].firing_speed = 0.25f;
+    OriginalNormalWeaponData[17].spread = 1.0f;
+    OriginalNormalWeaponData[17].maximum_clip_ammo = 1;
+    OriginalNormalWeaponData[17].move_speed = 1.0f;
+    OriginalNormalWeaponData[17].flags = 256;
+    OriginalNormalWeaponData[17].anim_group = 28;
+    OriginalNormalWeaponData[17].fire_type = (eFireType)2;
+    OriginalNormalWeaponData[17].model = 343;
+    OriginalNormalWeaponData[17].model2 = -1;
+    OriginalNormalWeaponData[17].weapon_slot = (eWeaponSlot)8;
+    OriginalNormalWeaponData[17].fire_offset = CVector(0.0f, 0.0f, 0.0f);
+    OriginalNormalWeaponData[17].skill_level = (eWeaponSkill)1;
+    OriginalNormalWeaponData[17].required_skill_level = 0;
+    OriginalNormalWeaponData[17].anim_loop_start = 0.0f;
+    OriginalNormalWeaponData[17].anim_loop_stop = 3.29399991f;
+    OriginalNormalWeaponData[17].anim_loop_bullet_fire = 0.200000018f;
+    OriginalNormalWeaponData[17].anim2_loop_start = 0.0f;
+    OriginalNormalWeaponData[17].anim2_loop_stop = 3.29399991f;
+    OriginalNormalWeaponData[17].anim2_loop_bullet_fire = 0.333333343f;
+    OriginalNormalWeaponData[17].anim_breakout_time = 3.30000019f;
+    OriginalNormalWeaponData[17].radius = -1.0f;
+    OriginalNormalWeaponData[17].aim_offset = 17;
+    OriginalNormalWeaponData[17].default_combo = 4;
+    OriginalNormalWeaponData[17].combos_available = 1;
+    // 18 - Molotov
+    OriginalNormalWeaponData[18].weapon_range = 40.0f;
+    OriginalNormalWeaponData[18].target_range = 30.0f;
+    OriginalNormalWeaponData[18].accuracy = 1.0f;
+    OriginalNormalWeaponData[18].damage = 75;
+    OriginalNormalWeaponData[18].life_span = 2000.0f;
+    OriginalNormalWeaponData[18].firing_speed = 0.25f;
+    OriginalNormalWeaponData[18].spread = 5.0f;
+    OriginalNormalWeaponData[18].maximum_clip_ammo = 1;
+    OriginalNormalWeaponData[18].move_speed = 1.0f;
+    OriginalNormalWeaponData[18].flags = 256;
+    OriginalNormalWeaponData[18].anim_group = 28;
+    OriginalNormalWeaponData[18].fire_type = (eFireType)2;
+    OriginalNormalWeaponData[18].model = 344;
+    OriginalNormalWeaponData[18].model2 = -1;
+    OriginalNormalWeaponData[18].weapon_slot = (eWeaponSlot)8;
+    OriginalNormalWeaponData[18].fire_offset = CVector(0.0f, 0.0f, 0.0f);
+    OriginalNormalWeaponData[18].skill_level = (eWeaponSkill)1;
+    OriginalNormalWeaponData[18].required_skill_level = 0;
+    OriginalNormalWeaponData[18].anim_loop_start = 0.0f;
+    OriginalNormalWeaponData[18].anim_loop_stop = 3.29399991f;
+    OriginalNormalWeaponData[18].anim_loop_bullet_fire = 0.200000018f;
+    OriginalNormalWeaponData[18].anim2_loop_start = 0.0f;
+    OriginalNormalWeaponData[18].anim2_loop_stop = 3.29399991f;
+    OriginalNormalWeaponData[18].anim2_loop_bullet_fire = 0.266666681f;
+    OriginalNormalWeaponData[18].anim_breakout_time = 3.30000019f;
+    OriginalNormalWeaponData[18].radius = -1.0f;
+    OriginalNormalWeaponData[18].aim_offset = 17;
+    OriginalNormalWeaponData[18].default_combo = 4;
+    OriginalNormalWeaponData[18].combos_available = 1;
     // 22 - Colt 45
     OriginalNormalWeaponData[22].weapon_range = 35.0f;
     OriginalNormalWeaponData[22].target_range = 30.0f;
@@ -1483,7 +1610,7 @@ bool CWeaponStatManager::LoadDefault(CWeaponStat* pDest, eWeaponType weaponType,
     if (pDest)
     {
         int iVal = (int)weaponType;
-        if (iVal >= 22 && iVal <= 42)
+        if (HasDefaultStats(iVal))
         {
             switch (weaponSkill)
             {
