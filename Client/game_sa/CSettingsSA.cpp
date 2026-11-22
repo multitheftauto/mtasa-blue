@@ -999,6 +999,250 @@ void CSettingsSA::SetValidVideoMode()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// Device selection dialog preselection
+//
+// GTA's device selection dialog always opens on its built-in defaults (first monitor, default resolution) and knows
+// nothing about what the player picked last time, so it has to be configured again on every launch. That is especially
+// painful when debugging. The dialog is owned by GTA, so instead of relying on GTA's internals we wait for it to
+// appear and select the saved monitor and resolution in its combo boxes, the same way a click would.
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+namespace
+{
+    // The dialog is created on this thread right after the hook returns, so the first poll normally finds it. The poll
+    // limit only exists so that an unrecognised dialog never leaves a timer running for the rest of the session.
+    constexpr UINT DEVICE_DIALOG_POLL_INTERVAL_MS = 15;
+    constexpr int  DEVICE_DIALOG_MAX_POLLS = 200;
+
+    // Smallest width/height accepted when reading a combo box item as a resolution. This is what tells the resolution
+    // list apart from the monitor list, whose names may contain digits (e.g. "DISPLAY2") but no real resolution.
+    constexpr int DEVICE_DIALOG_MIN_RESOLUTION_SIZE = 200;
+
+    struct SDeviceDialogSelection
+    {
+        int      width = 0;
+        int      height = 0;
+        int      colorBits = 0;
+        int      adapterIndex = 0;
+        int      pollCount = 0;
+        UINT_PTR timerId = 0;
+    };
+
+    SDeviceDialogSelection g_deviceDialogSelection;
+
+    bool HasWindowClass(HWND hwnd, const char* expectedClassName)
+    {
+        char className[32] = {};
+        if (GetClassNameA(hwnd, className, sizeof(className)) == 0)
+            return false;
+
+        return _stricmp(className, expectedClassName) == 0;
+    }
+
+    // Reads up to three numbers out of text such as "1920 x 1080 x 32" and returns how many were found
+    int ParseNumbers(const std::string& text, int (&numbers)[3])
+    {
+        int count = 0;
+        for (size_t i = 0; i < text.size() && count < 3;)
+        {
+            if (text[i] < '0' || text[i] > '9')
+            {
+                i++;
+                continue;
+            }
+
+            int value = 0;
+            for (; i < text.size() && text[i] >= '0' && text[i] <= '9'; i++)
+                value = std::min(value * 10 + (text[i] - '0'), 100000);  // Clamped so a very long number can't overflow
+
+            numbers[count++] = value;
+        }
+
+        return count;
+    }
+
+    // colorBits is 0 when the item text doesn't state a bit depth
+    bool ParseResolution(const std::string& text, int& width, int& height, int& colorBits)
+    {
+        int       numbers[3] = {};
+        const int count = ParseNumbers(text, numbers);
+        if (count < 2 || numbers[0] < DEVICE_DIALOG_MIN_RESOLUTION_SIZE || numbers[1] < DEVICE_DIALOG_MIN_RESOLUTION_SIZE)
+            return false;
+
+        width = numbers[0];
+        height = numbers[1];
+        colorBits = count > 2 ? numbers[2] : 0;
+        return true;
+    }
+
+    std::string GetComboBoxItemText(HWND comboBox, int index)
+    {
+        const LRESULT length = SendMessageA(comboBox, CB_GETLBTEXTLEN, static_cast<WPARAM>(index), 0);
+        if (length == CB_ERR || length <= 0)
+            return {};
+
+        // CB_GETLBTEXT also writes the terminating null, so the buffer needs one extra character
+        std::string text(static_cast<size_t>(length) + 1, '\0');
+        if (SendMessageA(comboBox, CB_GETLBTEXT, static_cast<WPARAM>(index), reinterpret_cast<LPARAM>(text.data())) == CB_ERR)
+            return {};
+
+        text.resize(static_cast<size_t>(length));
+        return text;
+    }
+
+    // Returns false if the combo box is empty or any of its items is not a resolution (i.e. it is the monitor list).
+    // Otherwise outIndex is the item that best matches the wanted resolution, or -1 if the list doesn't contain it.
+    bool FindResolutionItem(HWND comboBox, const SDeviceDialogSelection& selection, int& outIndex)
+    {
+        outIndex = -1;
+
+        const LRESULT itemCount = SendMessageA(comboBox, CB_GETCOUNT, 0, 0);
+        if (itemCount == CB_ERR || itemCount <= 0)
+            return false;
+
+        int sizeMatchIndex = -1;
+        int depthMatchIndex = -1;
+        for (int i = 0; i < itemCount; i++)
+        {
+            int width = 0;
+            int height = 0;
+            int colorBits = 0;
+            if (!ParseResolution(GetComboBoxItemText(comboBox, i), width, height, colorBits))
+                return false;
+
+            if (width != selection.width || height != selection.height)
+                continue;
+
+            if (sizeMatchIndex < 0)
+                sizeMatchIndex = i;
+
+            if (depthMatchIndex < 0 && colorBits == selection.colorBits)
+                depthMatchIndex = i;
+        }
+
+        // Prefer the matching bit depth, but accept the same size when the item text doesn't state one
+        outIndex = depthMatchIndex >= 0 ? depthMatchIndex : sizeMatchIndex;
+        return true;
+    }
+
+    BOOL CALLBACK CollectComboBoxesProc(HWND hwnd, LPARAM lParam)
+    {
+        if (HasWindowClass(hwnd, "ComboBox"))
+            reinterpret_cast<std::vector<HWND>*>(lParam)->push_back(hwnd);
+
+        return TRUE;
+    }
+
+    // Tells the dialog about a selection we made ourselves. Changing a combo box from code doesn't notify its parent, so
+    // without this the dialog wouldn't refresh the resolution list for a new monitor, or remember the new selection.
+    void NotifySelectionChanged(HWND dialog, HWND comboBox)
+    {
+        SendMessageA(dialog, WM_COMMAND, MAKEWPARAM(GetDlgCtrlID(comboBox), CBN_SELCHANGE), reinterpret_cast<LPARAM>(comboBox));
+    }
+
+    // Returns false if this window is not (yet) the device selection dialog
+    bool ApplyDeviceDialogSelection(HWND dialog, const SDeviceDialogSelection& selection)
+    {
+        std::vector<HWND> comboBoxes;
+        EnumChildWindows(dialog, CollectComboBoxesProc, reinterpret_cast<LPARAM>(&comboBoxes));
+
+        // The dialog has a resolution combo box and a monitor combo box. Tell them apart by what they contain.
+        HWND resolutionComboBox = nullptr;
+        HWND monitorComboBox = nullptr;
+        for (HWND comboBox : comboBoxes)
+        {
+            int resolutionIndex = -1;
+            if (!resolutionComboBox && FindResolutionItem(comboBox, selection, resolutionIndex))
+                resolutionComboBox = comboBox;
+            else if (!monitorComboBox)
+                monitorComboBox = comboBox;
+        }
+
+        // Either not populated yet, or a different dialog
+        if (!resolutionComboBox)
+            return false;
+
+        // Monitor first: GTA rebuilds the resolution list for the newly selected monitor
+        if (monitorComboBox)
+        {
+            const LRESULT monitorCount = SendMessageA(monitorComboBox, CB_GETCOUNT, 0, 0);
+            const LRESULT currentMonitor = SendMessageA(monitorComboBox, CB_GETCURSEL, 0, 0);
+            if (selection.adapterIndex < monitorCount && currentMonitor != selection.adapterIndex)
+            {
+                SendMessageA(monitorComboBox, CB_SETCURSEL, static_cast<WPARAM>(selection.adapterIndex), 0);
+                NotifySelectionChanged(dialog, monitorComboBox);
+            }
+        }
+
+        // Look the resolution up only now, because the list may have just been rebuilt
+        int resolutionIndex = -1;
+        FindResolutionItem(resolutionComboBox, selection, resolutionIndex);
+        if (resolutionIndex >= 0 && SendMessageA(resolutionComboBox, CB_GETCURSEL, 0, 0) != resolutionIndex)
+        {
+            SendMessageA(resolutionComboBox, CB_SETCURSEL, static_cast<WPARAM>(resolutionIndex), 0);
+            NotifySelectionChanged(dialog, resolutionComboBox);
+        }
+
+        return true;
+    }
+
+    BOOL CALLBACK TryApplyToDialogProc(HWND hwnd, LPARAM lParam)
+    {
+        if (!IsWindowVisible(hwnd) || !HasWindowClass(hwnd, "#32770"))
+            return TRUE;
+
+        bool* applied = reinterpret_cast<bool*>(lParam);
+        *applied = ApplyDeviceDialogSelection(hwnd, g_deviceDialogSelection);
+
+        // Stop enumerating once the dialog was found
+        return !*applied;
+    }
+
+    void CALLBACK DeviceDialogTimerProc(HWND, UINT, UINT_PTR timerId, DWORD)
+    {
+        bool applied = false;
+        EnumThreadWindows(GetCurrentThreadId(), TryApplyToDialogProc, reinterpret_cast<LPARAM>(&applied));
+
+        const bool gaveUp = !applied && ++g_deviceDialogSelection.pollCount >= DEVICE_DIALOG_MAX_POLLS;
+        if (gaveUp)
+            OutputDebugStringA("MTA: Could not preselect the device selection dialog (dialog or its combo boxes not recognized)\n");
+
+        if (applied || gaveUp)
+        {
+            KillTimer(nullptr, timerId);
+            g_deviceDialogSelection.timerId = 0;
+        }
+    }
+
+    // Starts looking for the dialog that is about to be shown, so the last used monitor and resolution can be selected in it
+    void RequestDeviceDialogPreselection()
+    {
+        int  width = 0;
+        int  height = 0;
+        int  colorBits = 0;
+        int  adapterIndex = 0;
+        bool allowUnsafeResolutions = false;
+
+        // This is the monitor and resolution saved from the previous run. Nothing to do on the very first run.
+        if (!g_pCore->GetRequiredDisplayResolution(width, height, colorBits, adapterIndex, allowUnsafeResolutions))
+            return;
+
+        if (g_deviceDialogSelection.timerId != 0)
+            KillTimer(nullptr, g_deviceDialogSelection.timerId);
+
+        g_deviceDialogSelection = SDeviceDialogSelection{};
+        g_deviceDialogSelection.width = width;
+        g_deviceDialogSelection.height = height;
+        g_deviceDialogSelection.colorBits = colorBits;
+        g_deviceDialogSelection.adapterIndex = adapterIndex;
+
+        // A thread timer is dispatched by the dialog's own message loop, which is what lets us act once it is on screen
+        g_deviceDialogSelection.timerId = SetTimer(nullptr, 0, DEVICE_DIALOG_POLL_INTERVAL_MS, DeviceDialogTimerProc);
+    }
+}  // namespace
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CSettingsSA::OnSelectDevice
 //
 // return 0 for single adapter
@@ -1010,7 +1254,8 @@ int CSettingsSA::OnSelectDevice()
 {
     if (GetNumAdapters() > 1 && g_pCore->GetDeviceSelectionEnabled())
     {
-        // Show device selection
+        // Show device selection, opened on the monitor and resolution used last time
+        RequestDeviceDialogPreselection();
         return 1;
     }
 
