@@ -55,6 +55,7 @@ CClientManager::CClientManager()
     m_pPacketRecorder = new CClientPacketRecorder(this);
     m_pImgManager = new CClientIMGManager(this);
     m_pBuildingManager = new CClientBuildingManager(this);
+    m_pWaterCannonManager = new CClientWaterCannonManager(this);
 
     m_bBeingDeleted = false;
     m_bGameUnloadedFlag = false;
@@ -181,6 +182,9 @@ CClientManager::~CClientManager()
 
     delete m_pBuildingManager;
     m_pBuildingManager = nullptr;
+
+    delete m_pWaterCannonManager;
+    m_pWaterCannonManager = nullptr;
 }
 
 //
@@ -218,6 +222,7 @@ void CClientManager::DoPulse(bool bDoStandardPulses, bool bDoVehicleManagerPulse
             m_pColManager->DoPulse();
             m_pGUIManager->DoPulse();
             m_pWeaponManager->DoPulse();
+            m_pWaterCannonManager->DoPulse();
         }
         else
         {
