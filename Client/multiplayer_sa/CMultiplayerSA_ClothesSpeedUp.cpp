@@ -83,8 +83,6 @@ namespace
     int   iLastCacheFileId = -1;
 }  // namespace
 
-void OnCrashAverted(uint uiId);
-
 ////////////////////////////////////////////////////////////////////////////////////////////////
 //
 // If request is for a file inside player.img (imgId 5) and uiLoadflag is 0 or 1
@@ -317,59 +315,16 @@ bool SetClothingDirectorySize(int directorySize)
     return true;
 }
 
-////////////////////////////////////////////////////////////////////////////////////////////////
-//
-// CClothesBuilder::CopyTexture null-check hook
-// SA CopyTexture at 0x5A5730 derefs the texture parameter without a null
-// check. With MTA's fast clothes caching, a cache load failure can leave a TXD dictionary
-// invalid. Misc33's hook on RwTexDictionaryFindNamedTexture converts the resulting invalid-
-// dictionary crash into a NULL return, which then reaches CopyTexture as a NULL parameter.
-// This hook catches that NULL, reports CrashAverted(43), and returns NULL.
-// Note: callers of CopyTexture do not null-check the return value, so a crash may still
-// occur at a different address. The primary prevention is the loadState verification in
-// ShouldSkipLoadRequestedModels; this hook is a last-resort diagnostic.
-//
-// Original bytes at 0x5A5730 (5 bytes):
-//   8B 44 24 04    mov eax, [esp+4]    ; get texture param
-//   53             push ebx            ; save ebx
-//   (then 8B 18    mov ebx, [eax]      ; CRASH when eax=NULL)
-//
-#define HOOKPOS_CClothesBuilder_CopyTexture  0x5A5730
-#define HOOKSIZE_CClothesBuilder_CopyTexture 5
-static constexpr DWORD RETURN_CClothesBuilder_CopyTexture = 0x5A5735;
-
-static void _declspec(naked) HOOK_CClothesBuilder_CopyTexture()
-{
-    MTA_VERIFY_HOOK_LOCAL_SIZE;
-
-    // clang-format off
-    __asm
-    {
-        mov     eax, [esp+4]            // texture parameter
-        test    eax, eax
-        jz      copytex_null
-
-        // Replicate overwritten instructions and continue
-        push    ebx
-        jmp     RETURN_CClothesBuilder_CopyTexture
-
-    copytex_null:
-        pushad
-        push    43
-        call    OnCrashAverted
-        add     esp, 4
-        popad
-        xor     eax, eax                // return NULL
-        ret
-    }
-    // clang-format on
-}
-
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // Setup hooks for ClothesSpeedUp
 //
 //////////////////////////////////////////////////////////////////////////////////////////
+// Note: the CClothesBuilder::CopyTexture (0x5A5730) null-check that used to live here has
+// been removed. game_sa now fully reimplements CopyTexture (and the texture compositing
+// primitives) in CRenderWareSA.ClothesTextures.cpp to lift the clothes size limit; that
+// replacement includes the same NULL guard, so a second hook at the same address here would
+// conflict.
 void CMultiplayerSA::InitHooks_ClothesSpeedUp()
 {
     SetClothingDirectorySize(2050);
@@ -377,5 +332,4 @@ void CMultiplayerSA::InitHooks_ClothesSpeedUp()
     EZHookInstall(CStreamingLoadRequestedModels);
     EZHookInstall(LoadingPlayerImgDir);
     EZHookInstall(CallCStreamingInfoAddToList);
-    EZHookInstall(CClothesBuilder_CopyTexture);
 }
