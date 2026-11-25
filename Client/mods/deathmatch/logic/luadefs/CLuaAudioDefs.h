@@ -13,6 +13,7 @@
 #include "CLuaDefs.h"
 #include <game/CAudioContainer.h>
 #include <game/CAudioEngine.h>
+#include <lua/CLuaMultiReturn.h>
 
 class CLuaAudioDefs : public CLuaDefs
 {
@@ -28,6 +29,12 @@ public:
     static bool SetWorldSoundEnabled(int group, std::variant<int, bool> indexOrEnabled, std::optional<bool> enabled, std::optional<bool> immediate);
     static bool IsWorldSoundEnabled(int group, std::optional<int> index);
     static bool ResetWorldSounds();
+    static bool ReplaceWorldSound(lua_State* luaVM, const std::string path, int group, std::optional<int> index, std::optional<float> minDistance,
+                                  std::optional<float> maxDistance);
+    static bool RestoreWorldSound(int group, std::optional<int> index);
+    static bool RestoreAllWorldSounds();
+    static bool IsWorldSoundReplaced(int group, std::optional<int> index);
+    static std::variant<bool, CLuaMultiReturn<std::uint32_t, std::uint32_t>> GetWorldSoundBankSlotInfo(int group, int index);
     static std::variant<CClientSound*, bool> PlaySFX(lua_State* luaVM, eAudioLookupIndex containerIndex, std::variant<int, eRadioStreamIndex> bank,
                                                      int audioIndex, std::optional<bool> loop);
     static std::variant<CClientSound*, bool> PlaySFX3D(lua_State* luaVM, eAudioLookupIndex containerIndex, std::variant<int, eRadioStreamIndex> bank,

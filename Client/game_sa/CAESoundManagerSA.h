@@ -17,6 +17,7 @@
 
 class CAESoundManagerSAInterface
 {
+public:
     int16_t  m_wNumAvailableChannels;       // + 0x0000 // = CAEAudioHardware::GetNumAvailableChannels(...), [10, 300]
     int16_t  m_wChannel;                    // + 0x0002 // = CAEAudioHardware::AllocateChannels(...), could be -1
     CAESound m_aSound[300];                 // + 0x0004
