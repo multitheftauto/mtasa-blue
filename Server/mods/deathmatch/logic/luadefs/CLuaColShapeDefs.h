@@ -11,8 +11,18 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
+#include <variant>
 
+class CColCircle;
+class CColCuboid;
 class CColPolygon;
+class CColRectangle;
+class CColShape;
+class CColSphere;
+class CColTube;
+
+class CResource;
 
 class CLuaColShapeDefs : public CLuaDefs
 {
@@ -20,27 +30,36 @@ public:
     static void LoadFunctions();
     static void AddClass(lua_State* luaVM);
 
-    // Shape create funcs
-    LUA_DECLARE(CreateColCircle);
-    LUA_DECLARE(CreateColCuboid);
-    LUA_DECLARE(CreateColSphere);
-    LUA_DECLARE(CreateColRectangle);
-    LUA_DECLARE(CreateColPolygon);
-    LUA_DECLARE(CreateColTube);
+    static std::variant<CColCircle*, bool>    CreateColCircle(lua_State* luaVM, CVector2D position, float radius);
+    static std::variant<CColCuboid*, bool>    CreateColCuboid(lua_State* luaVM, CVector position, CVector size);
+    static std::variant<CColSphere*, bool>    CreateColSphere(lua_State* luaVM, CVector position, float radius);
+    static std::variant<CColRectangle*, bool> CreateColRectangle(lua_State* luaVM, CVector2D position, CVector2D size);
+    static std::variant<CColPolygon*, bool>   CreateColPolygon(lua_State* luaVM, CVector2D center, CVector2D pointA, CVector2D pointB, CVector2D pointC,
+                                                               LuaVarArgs extraPoints);
+    static std::variant<CColTube*, bool>      CreateColTube(lua_State* luaVM, CVector position, float radius, float height);
 
-    LUA_DECLARE(GetColShapeRadius);
-    LUA_DECLARE(SetColShapeRadius);
-    LUA_DECLARE_OOP(GetColShapeSize);
-    LUA_DECLARE(SetColShapeSize);
-    LUA_DECLARE_OOP(GetColPolygonPoints);
-    LUA_DECLARE_OOP(GetColPolygonPointPosition);
-    LUA_DECLARE(SetColPolygonPointPosition);
-    LUA_DECLARE(AddColPolygonPoint);
-    LUA_DECLARE(RemoveColPolygonPoint);
+    static int                                                                                      GetColShapeType(CColShape* shape) noexcept;
+    static float                                                                                    GetColShapeRadius(CColShape* shape);
+    static bool                                                                                     SetColShapeRadius(CColShape* shape, float radius);
+    static std::variant<CLuaMultiReturn<float, float>, CLuaMultiReturn<float, float, float>, float> GetColShapeSize(CColShape* shape);
+    static std::variant<CVector2D, CVector, float>                                                  OOP_GetColShapeSize(CColShape* shape);
+    static bool                                              SetColShapeSize(CColShape* shape, std::variant<CVector, CVector2D, float> size);
+    static std::vector<std::tuple<float, float>>             GetColPolygonPoints(CColShape* shape);
+    static std::vector<CVector2D>                            OOP_GetColPolygonPoints(CColShape* shape);
+    static std::variant<CLuaMultiReturn<float, float>, bool> GetColPolygonPointPosition(lua_State* luaVM, CColShape* shape, int pointIndex);
+    static std::variant<CVector2D, bool>                     OOP_GetColPolygonPointPosition(lua_State* luaVM, CColShape* shape, int pointIndex);
+    static bool                                              SetColPolygonPointPosition(lua_State* luaVM, CColShape* shape, int pointIndex, CVector2D point);
+    static bool AddColPolygonPoint(lua_State* luaVM, CColShape* shape, CVector2D point, std::optional<int> pointIndex);
+    static bool RemoveColPolygonPoint(lua_State* luaVM, CColShape* shape, int pointIndex);
+    static bool SetColPolygonHeight(CColShape* shape, std::variant<bool, float> floor, std::variant<bool, float> ceil);
 
-    LUA_DECLARE(IsInsideColShape);
-    LUA_DECLARE(GetColShapeType);
+    static bool IsInsideColShape(CColShape* shape, CVector position);
 
     static CLuaMultiReturn<float, float> GetColPolygonHeight(CColShape* shape);
-    static bool                          SetColPolygonHeight(CColShape* shape, std::variant<bool, float> floor, std::variant<bool, float> ceil);
+
+private:
+    template <typename T, typename... Args>
+    static T* CreateColShape(CResource& resource, Args&&... args);
+
+    static void RefreshColliders(CColShape* shape);
 };
