@@ -418,6 +418,10 @@ public:
     virtual bool IsCustomCameraRotationEnabled() = 0;
     virtual void SetCustomCameraRotationEnabled(bool bEnabled) = 0;
 
+    virtual bool SetVehicleCameraViewOffset(unsigned char ucViewMode, const CVector& vecOffset) = 0;
+    virtual bool GetVehicleCameraViewOffset(unsigned char ucViewMode, CVector& vecOffset) = 0;
+    virtual void ResetVehicleCameraViewOffsets() = 0;
+
     virtual void SetDebugVars(float f1, float f2, float f3) = 0;
 
     virtual CVector& GetAkimboTarget() = 0;
