@@ -55,6 +55,14 @@
 #define CODE_ShowMoney          0x58F47D
 #define CODE_ShowRadarAltimeter 0x58A5A6
 
+#define CODE_ShowRadarHorizon      0x58A3C5
+#define CODE_ShowRadarMapHorizon   0x5869D2
+#define CODE_ShowRadarDisc         0x58A782
+#define CODE_DrawRadarBlipsPart    0x58AA2A
+#define CODE_ShowRadarAirstripBlip 0x587D35
+
+#define CODE_ShowSniperBackground 0x53E31D
+
 #define VAR_CTheScripts_bDrawCrossHair 0xA44490
 #define VAR_RSGlobal                   0xC17040
 #define VAR_ItemToFlash                0xBAB1DC
@@ -66,9 +74,22 @@ struct SHudComponent
     bool          bSaveOriginalBytes;
     DWORD         uiDataAddr;
     DWORD         uiDataSize;
-    DWORD         origData;
-    DWORD         disabledData;
+    std::uint64_t origData;
+    std::uint64_t disabledData;
+
+    // Second patch location, only used if uiDataSize2 > 0
+    DWORD         uiDataAddr2{0};
+    DWORD         uiDataSize2{0};
+    std::uint64_t origData2{0};
+    std::uint64_t disabledData2{0};
 };
+
+constexpr std::uint64_t HudMakeRelativeJump(std::uint32_t uiFrom, std::uint32_t uiTo)
+{
+    constexpr std::uint32_t uiJumpInstructionSize = 5;
+    const std::uint32_t     uiRelativeOffset = uiTo - (uiFrom + uiJumpInstructionSize);
+    return 0xE9 | (static_cast<std::uint64_t>(uiRelativeOffset) << 8);
+}
 
 enum class eHudColour
 {
