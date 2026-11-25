@@ -20,6 +20,8 @@ CClientColShape::CClientColShape(CClientManager* pManager, ElementID ID) : Class
     m_pManager = pManager;
     m_bIsEnabled = true;
     m_bAutoCallEvent = true;
+    m_checkDimension = false;
+    m_checkInterior = false;
     m_pCallback = NULL;
     m_pOwningMarker = NULL;
     m_pOwningPickup = NULL;
@@ -103,6 +105,17 @@ void CClientColShape::CallLeaveCallback(CClientEntity& Entity)
     {
         m_pCallback->Callback_OnLeave(*this, Entity);
     }
+}
+
+bool CClientColShape::IsCollisionAllowed(CClientEntity& entity)
+{
+    if (m_checkDimension && GetDimension() != entity.GetDimension())
+        return false;
+
+    if (m_checkInterior && GetInterior() != entity.GetInterior())
+        return false;
+
+    return true;
 }
 
 bool CClientColShape::ColliderExists(CClientEntity* pEntity)

@@ -1065,6 +1065,9 @@ bool CEntityAddPacket::Write(NetBitStreamInterface& BitStream) const
                     // Auto Call Event
                     BitStream.WriteBit(pColShape->GetAutoCallEvent());
 
+                    BitStream.WriteBit(pColShape->IsDimensionCheckEnabled());
+                    BitStream.WriteBit(pColShape->IsInteriorCheckEnabled());
+
                     switch (pColShape->GetShapeType())
                     {
                         case COLSHAPE_CIRCLE:

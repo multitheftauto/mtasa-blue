@@ -477,6 +477,7 @@ public:
     static class CColTube*      CreateColTube(CResource* pResource, const CVector& vecPosition, float fRadius, float fHeight);
     static bool                 IsInsideColShape(CColShape* pColShape, const CVector& vecPosition, bool& inside);
     static void                 RefreshColShapeColliders(CColShape* pColShape);
+    static void                 RefreshElementCollisions(CElement* element);
 
     // Shape get functions
     static bool GetColShapeRadius(CColShape* pColShape, float& fRadius);
@@ -485,6 +486,8 @@ public:
     // Shape set functions
     static bool SetColShapeRadius(CColShape* pColShape, float fRadius);
     static bool SetColShapeSize(CColShape* pColShape, CVector& vecSize);
+    static bool SetColShapeCheckDimension(CColShape* colShape, bool enabled);
+    static bool SetColShapeCheckInterior(CColShape* colShape, bool enabled);
     static bool SetColPolygonPointPosition(CColPolygon* pColPolygon, uint uiPointIndex, const CVector2D& vecPoint);
 
     static bool AddColPolygonPoint(CColPolygon* pColPolygon, const CVector2D& vecPoint);

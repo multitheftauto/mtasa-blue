@@ -2782,10 +2782,10 @@ void CClientGame::AddBuiltInEvents()
     m_Events.AddEvent("onClientPickupLeave", "entity, matchingDimension", NULL, false);
 
     // Col-shape events
-    m_Events.AddEvent("onClientColShapeHit", "entity, matchingDimension", NULL, false);
-    m_Events.AddEvent("onClientColShapeLeave", "entity, matchingDimension", NULL, false);
-    m_Events.AddEvent("onClientElementColShapeHit", "colShape, matchingDimension", NULL, false);
-    m_Events.AddEvent("onClientElementColShapeLeave", "colShape, matchingDimension", NULL, false);
+    m_Events.AddEvent("onClientColShapeHit", "entity, matchingDimension, dimension, interior", NULL, false);
+    m_Events.AddEvent("onClientColShapeLeave", "entity, matchingDimension, dimension, interior", NULL, false);
+    m_Events.AddEvent("onClientElementColShapeHit", "colShape, matchingDimension, dimension, interior", NULL, false);
+    m_Events.AddEvent("onClientElementColShapeLeave", "colShape, matchingDimension, dimension, interior", NULL, false);
 
     // Explosion events
     m_Events.AddEvent("onClientExplosion", "x, y, z, type", NULL, false);

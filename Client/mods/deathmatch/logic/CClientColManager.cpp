@@ -138,6 +138,9 @@ void CClientColManager::DoHitDetectionForEntity(const CVector& vecNowPosition, f
 //
 void CClientColManager::HandleHitDetectionResult(bool bHit, CClientColShape* pShape, CClientEntity* pEntity)
 {
+    if (bHit && !pShape->IsCollisionAllowed(*pEntity))
+        bHit = false;
+
     bool bShouldTrack = bHit;
     if (bHit)
     {
@@ -162,11 +165,15 @@ void CClientColManager::HandleHitDetectionResult(bool bHit, CClientColShape* pSh
                 CLuaArguments Arguments;
                 Arguments.PushElement(pEntity);
                 Arguments.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+                Arguments.PushNumber(pEntity->GetDimension());
+                Arguments.PushNumber(pEntity->GetInterior());
                 pShape->CallEvent("onClientColShapeHit", Arguments, true);
 
                 CLuaArguments Arguments2;
                 Arguments2.PushElement(pShape);
                 Arguments2.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+                Arguments2.PushNumber(pEntity->GetDimension());
+                Arguments2.PushNumber(pEntity->GetInterior());
                 pEntity->CallEvent("onClientElementColShapeHit", Arguments2, true);
             }
 
@@ -187,11 +194,15 @@ void CClientColManager::HandleHitDetectionResult(bool bHit, CClientColShape* pSh
             CLuaArguments Arguments;
             Arguments.PushElement(pEntity);
             Arguments.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+            Arguments.PushNumber(pEntity->GetDimension());
+            Arguments.PushNumber(pEntity->GetInterior());
             pShape->CallEvent("onClientColShapeLeave", Arguments, true);
 
             CLuaArguments Arguments2;
             Arguments2.PushElement(pShape);
             Arguments2.PushBoolean((pShape->GetDimension() == pEntity->GetDimension()));
+            Arguments2.PushNumber(pEntity->GetDimension());
+            Arguments2.PushNumber(pEntity->GetInterior());
             pEntity->CallEvent("onClientElementColShapeLeave", Arguments2, true);
         }
 
