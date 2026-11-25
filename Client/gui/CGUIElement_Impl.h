@@ -100,6 +100,9 @@ public:
 
     void ForceRedraw();
 
+    void SetColorCodesEnabled(bool bEnabled);
+    bool GetColorCodesEnabled();
+
     void  SetUserData(void* pData) { m_pData = pData; }
     void* GetUserData() { return m_pData; }
 

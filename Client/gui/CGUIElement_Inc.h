@@ -194,6 +194,19 @@ void ForceRedraw()
 {
     CGUIElement_Impl::ForceRedraw();
 };
+
+// Forwarding methods to the base CGUIElement_Impl implementation to resolve
+// diamond multiple-inheritance issues so subclasses aren't treated as abstract.
+#ifndef SETCOLORCODESENABLED_HACK
+void SetColorCodesEnabled(bool bEnabled)
+{
+    CGUIElement_Impl::SetColorCodesEnabled(bEnabled);
+};
+#endif
+bool GetColorCodesEnabled()
+{
+    return CGUIElement_Impl::GetColorCodesEnabled();
+};
 void SetAlwaysOnTop(bool bAlwaysOnTop)
 {
     CGUIElement_Impl::SetAlwaysOnTop(bAlwaysOnTop);

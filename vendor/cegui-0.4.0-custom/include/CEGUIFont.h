@@ -107,6 +107,11 @@ public:
 	*************************************************************************/
 	static const argb_t		DefaultColour;			//!< Colour value used whenever a colour is not specified.
 
+	// When true, drawTextLine/drawTextLineJustified parse inline #RRGGBB color codes.
+	// CEGUIWindow::drawSelf() sets this per-window before populateRenderCache() and
+	// resets it to false afterwards, giving per-element opt-in behaviour.
+	static bool s_colorCodesEnabled;
+
 
 	/*************************************************************************
 		Text drawing methods

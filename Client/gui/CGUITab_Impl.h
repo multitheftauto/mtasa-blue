@@ -26,7 +26,9 @@ public:
 
 #define SETVISIBLE_HACK
 #define SETENABLED_HACK
+#define SETCOLORCODESENABLED_HACK
 #include "CGUIElement_Inc.h"
+#undef SETCOLORCODESENABLED_HACK
 #undef SETENABLED_HACK
 #undef SETVISIBLE_HACK
 
@@ -34,4 +36,6 @@ public:
     bool IsVisible();
     void SetEnabled(bool bEnabled);
     bool IsEnabled();
+    
+    void SetColorCodesEnabled(bool bEnabled);
 };
