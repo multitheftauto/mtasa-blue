@@ -642,6 +642,10 @@ bool CPixelsManager::GetPixelsSize(const CPixels& pixels, uint& uiOutWidth, uint
             g_pCore->DebugEchoColor(("JPEG error: " + strError).c_str(), 255, 0, 0);
         return false;
     }
+    else if (format == EPixelsFormat::WEBP)
+    {
+        return WebPGetDimensions(pixels.GetData(), pixels.GetSize(), uiOutWidth, uiOutHeight);
+    }
 
     return false;
 }
@@ -650,7 +654,7 @@ bool CPixelsManager::GetPixelsSize(const CPixels& pixels, uint& uiOutWidth, uint
 //
 // CPixelsManager::GetPixelsFormat
 //
-// Auto detect PNG, JPEG, DDS or PLAIN
+// Auto detect PNG, JPEG, DDS, WEBP or PLAIN
 //
 ////////////////////////////////////////////////////////////////
 EPixelsFormatType CPixelsManager::GetPixelsFormat(const CPixels& pixels)
@@ -670,6 +674,10 @@ EPixelsFormatType CPixelsManager::GetPixelsFormat(const CPixels& pixels)
     static byte ddsHeader[] = {0x44, 0x44, 0x53, 0x20};
     if (uiDataSize >= sizeof(ddsHeader) && memcmp(pData, ddsHeader, sizeof(ddsHeader)) == 0)
         return EPixelsFormat::DDS;
+
+    // Check if webp
+    if (IsWebP(pData, uiDataSize))
+        return EPixelsFormat::WEBP;
 
     // Check if plain
     if (uiDataSize >= 8)
@@ -752,7 +760,8 @@ bool CPixelsManager::GetPlainDimensions(const CPixels& pixels, uint& uiOutWidth,
 //
 // CPixelsManager::ChangePixelsFormat
 //
-// JPEG <-> PNG <-> PLAIN
+// JPEG <-> PNG <-> WEBP <-> PLAIN
+// Note: WEBP is not supported for encoding, only decoding
 //
 ////////////////////////////////////////////////////////////////
 bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPixels, EPixelsFormatType newFormat, int uiQuality)
@@ -809,6 +818,15 @@ bool CPixelsManager::ChangePixelsFormat(const CPixels& oldPixels, CPixels& newPi
         {
             uint uiWidth, uiHeight;
             if (PngDecode(oldPixels.GetData(), oldPixels.GetSize(), &newPixels.buffer, uiWidth, uiHeight))
+            {
+                newPixels.buffer.SetSize(uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL);
+                return SetPlainDimensions(newPixels, uiWidth, uiHeight);
+            }
+        }
+        else if (oldFormat == EPixelsFormat::WEBP)
+        {
+            uint uiWidth, uiHeight;
+            if (WebPDecode(oldPixels.GetData(), oldPixels.GetSize(), &newPixels.buffer, uiWidth, uiHeight))
             {
                 newPixels.buffer.SetSize(uiWidth * uiHeight * 4 + SIZEOF_PLAIN_TAIL);
                 return SetPlainDimensions(newPixels, uiWidth, uiHeight);
