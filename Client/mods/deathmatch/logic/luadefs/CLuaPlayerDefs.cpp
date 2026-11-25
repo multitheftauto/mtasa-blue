@@ -652,11 +652,32 @@ bool CLuaPlayerDefs::IsPlayerCrosshairVisible()
     return g_pGame->GetHud()->IsCrosshairVisible();
 }
 
+static bool IsGameDrawnComponent(eHudComponent component) noexcept
+{
+    return component == HUD_RADAR || component == HUD_CROSSHAIR;
+}
+
+static bool IsRadarPart(eHudComponent component) noexcept
+{
+    return component == HUD_RADAR_MAP || component == HUD_RADAR_BLIPS || component == HUD_RADAR_ALTIMETER;
+}
+
+static bool IsSupportedGameDrawnProperty(eHudComponent component, eHudComponentProperty property) noexcept
+{
+    if (property == eHudComponentProperty::POSITION || property == eHudComponentProperty::SIZE)
+        return true;
+
+    return (component == HUD_RADAR || component == HUD_CROSSHAIR) &&
+           (property == eHudComponentProperty::FILL_COLOR || property == eHudComponentProperty::CUSTOM_ALPHA);
+}
+
 bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property,
                                                    std::variant<CVector2D, float, bool, std::string> value)
 {
-    if (component == HUD_ALL || component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR ||
-        component == HUD_RADAR_MAP || component == HUD_RADAR_BLIPS || component == HUD_RADAR_ALTIMETER)
+    if (component == HUD_ALL || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || IsRadarPart(component))
+        return false;
+
+    if (IsGameDrawnComponent(component) && !IsSupportedGameDrawnProperty(component, property))
         return false;
 
     CHud* hud = g_pGame->GetHud();
@@ -676,13 +697,18 @@ bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHud
             if (!std::holds_alternative<CVector2D>(value))
                 return false;
 
-            hud->SetComponentSize(component, std::get<CVector2D>(value));
+            const CVector2D& size = std::get<CVector2D>(value);
+            if (IsGameDrawnComponent(component) && (size.fX <= 0.0f || size.fY <= 0.0f))
+                return false;
+
+            hud->SetComponentSize(component, size);
             return true;
         }
         case eHudComponentProperty::FILL_COLOR:
         case eHudComponentProperty::FILL_COLOR_SECONDARY:
         {
-            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON)
+            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON && component != HUD_RADAR &&
+                component != HUD_CROSSHAIR)
                 return false;
 
             if (!std::holds_alternative<float>(value))
@@ -815,21 +841,23 @@ bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHud
 
 bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property) noexcept
 {
-    if (component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR)
+    if (component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || IsRadarPart(component))
+        return false;
+
+    if (IsGameDrawnComponent(component) && property != eHudComponentProperty::ALL_PROPERTIES && !IsSupportedGameDrawnProperty(component, property))
         return false;
 
     CHud* hud = g_pGame->GetHud();
 
     if (component == HUD_ALL)
     {
-        for (std::size_t iComp = 0; iComp < static_cast<std::size_t>(HUD_HELP_TEXT); iComp++)
-        {
-            eHudComponent comp = static_cast<eHudComponent>(iComp);
-            if (comp == HUD_ALL)
-                continue;
+        static constexpr eHudComponent resettableComponents[] = {
+            HUD_AMMO,  HUD_WEAPON, HUD_HEALTH, HUD_BREATH, HUD_ARMOUR,    HUD_MONEY,       HUD_VEHICLE_NAME, HUD_AREA_NAME,
+            HUD_RADAR, HUD_CLOCK,  HUD_RADIO,  HUD_WANTED, HUD_CROSSHAIR, HUD_VITAL_STATS, HUD_HELP_TEXT,
+        };
 
+        for (eHudComponent comp : resettableComponents)
             ResetPlayerHudComponentProperty(comp, property);
-        }
 
         return true;
     }
@@ -852,7 +880,8 @@ bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eH
         case eHudComponentProperty::FILL_COLOR:
         case eHudComponentProperty::FILL_COLOR_SECONDARY:
         {
-            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON)
+            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON && component != HUD_RADAR &&
+                component != HUD_CROSSHAIR)
                 return false;
 
             bool second = property == eHudComponentProperty::FILL_COLOR_SECONDARY;
@@ -945,7 +974,10 @@ bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eH
 std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>>
 CLuaPlayerDefs::GetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property)
 {
-    if (component == HUD_ALL || component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR)
+    if (component == HUD_ALL || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || IsRadarPart(component))
+        return false;
+
+    if (IsGameDrawnComponent(component) && !IsSupportedGameDrawnProperty(component, property))
         return false;
 
     CHud* hud = g_pGame->GetHud();
@@ -964,7 +996,8 @@ CLuaPlayerDefs::GetPlayerHudComponentProperty(eHudComponent component, eHudCompo
         }
         case eHudComponentProperty::FILL_COLOR:
         {
-            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON)
+            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON && component != HUD_RADAR &&
+                component != HUD_CROSSHAIR)
                 return false;
 
             SColor color = hud->GetComponentColor(component);
