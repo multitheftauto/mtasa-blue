@@ -11,6 +11,10 @@
 
 #pragma once
 #include "CLuaDefs.h"
+#include <lua/CLuaMultiReturn.h>
+#include <cstdint>
+#include <optional>
+#include <variant>
 
 class CLuaCameraDefs : public CLuaDefs
 {
@@ -18,13 +22,15 @@ public:
     static void LoadFunctions();
 
     // Get functions
-    LUA_DECLARE_OOP(getCameraMatrix);
-    LUA_DECLARE(getCameraTarget);
-    LUA_DECLARE(getCameraInterior);
+    static std::variant<CLuaMultiReturn<float, float, float, float, float, float, float, float>, bool> GetCameraMatrix(CPlayer* player);
+    static std::variant<CElement*, bool>                                                               GetCameraTarget(CPlayer* player);
+    static std::variant<std::uint8_t, bool>                                                            GetCameraInterior(CPlayer* player);
 
     // Set functions
-    LUA_DECLARE(setCameraMatrix);
-    LUA_DECLARE(setCameraTarget);
-    LUA_DECLARE(setCameraInterior);
-    LUA_DECLARE(fadeCamera);
+    static bool SetCameraMatrix(CElement* element, std::variant<CLuaMatrix*, CVector> matrixOrPosition, std::optional<CVector> lookAt,
+                                std::optional<float> roll, std::optional<float> fov);
+    static bool SetCameraTarget(lua_State* luaVM, CElement* element, std::optional<CElement*> target);
+    static bool SetCameraInterior(CElement* element, std::uint8_t interior);
+    static bool FadeCamera(CElement* element, bool fadeIn, std::optional<float> fadeTime, std::optional<std::uint8_t> red, std::optional<std::uint8_t> green,
+                           std::optional<std::uint8_t> blue);
 };
