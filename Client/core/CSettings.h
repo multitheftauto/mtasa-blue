@@ -91,6 +91,8 @@ public:
 
     void SetVisible(bool bVisible);
     bool IsVisible();
+    bool IsChatTabVisible();
+    void GetWindowRect(CRect2D& outRect);
 
     void SetIsModLoaded(bool bLoaded);
 
@@ -352,6 +354,33 @@ protected:
     CGUICheckBox* m_pChatTextBlackOutline;
     CGUIEdit*     m_pChatLineLife;
     CGUIEdit*     m_pChatLineFadeout;
+
+    SString m_strOldChatColor;
+    SString m_strOldChatTextColor;
+    SString m_strOldChatInputColor;
+    SString m_strOldChatInputTextColor;
+    SString m_strOldChatFont;
+    SString m_strOldChatLines;
+    SString m_strOldChatScale;
+    SString m_strOldChatWidth;
+    SString m_strOldChatCssStyleText;
+    SString m_strOldChatCssStyleBackground;
+    SString m_strOldChatNickCompletion;
+    SString m_strOldChatTextOutline;
+    SString m_strOldChatLineLife;
+    SString m_strOldChatLineFadeOut;
+    SString m_strOldChatPositionHorizontal;
+    SString m_strOldChatPositionVertical;
+    SString m_strOldChatTextAlignment;
+    SString m_strOldChatPositionOffsetX;
+    SString m_strOldChatPositionOffsetY;
+
+    int m_iChatHorizontalValue = -1;
+    int m_iChatVerticalValue = -1;
+    int m_iChatTextAlignValue = -1;
+
+    SString m_strChatSettingsSignature;
+
     CGUICheckBox* m_pFlashWindow;
     CGUICheckBox* m_pTrayBalloon;
 
@@ -419,6 +448,9 @@ protected:
     bool OnChatGreenChanged(CGUIElement* pElement);
     bool OnChatBlueChanged(CGUIElement* pElement);
     bool OnChatAlphaChanged(CGUIElement* pElement);
+    bool OnChatHorizontalComboChanged(CGUIElement* pElement);
+    bool OnChatVerticalComboChanged(CGUIElement* pElement);
+    bool OnChatTextAlignComboChanged(CGUIElement* pElement);
     bool OnUpdateButtonClick(CGUIElement* pElement);
     bool OnCachePathShowButtonClick(CGUIElement* pElement);
     bool OnMouseSensitivityChanged(CGUIElement* pElement);
@@ -469,15 +501,20 @@ private:
 
     void LoadSkins();
 
-    void   LoadChatPresets();
-    void   CreateChatColorTab(eChatColorType eType, const char* szName, CGUITabPanel* pParent);
-    void   LoadChatColorFromCVar(eChatColorType eType, const char* szCVar);
-    void   LoadChatColorFromString(eChatColorType eType, const std::string& strColor);
-    void   SaveChatColor(eChatColorType eType, const char* szCVar);
-    CColor GetChatColorValues(eChatColorType eType);
-    void   SetChatColorValues(eChatColorType eType, CColor pColor);
-    int    GetMilliseconds(CGUIEdit* pEdit);
-    void   SetMilliseconds(CGUIEdit* pEdit, int milliseconds);
+    void    LoadChatPresets();
+    void    CreateChatColorTab(eChatColorType eType, const char* szName, CGUITabPanel* pParent);
+    void    LoadChatColorFromCVar(eChatColorType eType, const char* szCVar);
+    void    LoadChatColorFromString(eChatColorType eType, const std::string& strColor);
+    void    SaveChatColor(eChatColorType eType, const char* szCVar);
+    CColor  GetChatColorValues(eChatColorType eType);
+    void    SetChatColorValues(eChatColorType eType, CColor pColor);
+    void    SaveChatSettings();
+    SString GetChatSettingsSignature();
+    void    LiveUpdateChatSettings();
+    void    SnapshotChatSettings();
+    void    RestoreChatSettings();
+    int     GetMilliseconds(CGUIEdit* pEdit);
+    void    SetMilliseconds(CGUIEdit* pEdit, int milliseconds);
 
     void ResetGTAVolume();
     void SetRadioVolume(float fVolume);
