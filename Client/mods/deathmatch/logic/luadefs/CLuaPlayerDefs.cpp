@@ -655,11 +655,15 @@ bool CLuaPlayerDefs::IsPlayerCrosshairVisible()
 bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property,
                                                    std::variant<CVector2D, float, bool, std::string> value)
 {
-    if (component == HUD_ALL || component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR ||
-        component == HUD_RADAR_MAP || component == HUD_RADAR_BLIPS || component == HUD_RADAR_ALTIMETER)
+    if (component == HUD_ALL || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR || component == HUD_RADAR_MAP ||
+        component == HUD_RADAR_BLIPS || component == HUD_RADAR_ALTIMETER)
         return false;
 
     CHud* hud = g_pGame->GetHud();
+    assert(hud);
+
+    if (!hud)
+        return false;
 
     switch (property)
     {
@@ -682,13 +686,17 @@ bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHud
         case eHudComponentProperty::FILL_COLOR:
         case eHudComponentProperty::FILL_COLOR_SECONDARY:
         {
-            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON)
+            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON && component != HUD_CROSSHAIR)
                 return false;
 
             if (!std::holds_alternative<float>(value))
                 return false;
 
-            hud->SetComponentColor(component, static_cast<std::uint32_t>(std::get<float>(value)), property == eHudComponentProperty::FILL_COLOR_SECONDARY);
+            bool second = property == eHudComponentProperty::FILL_COLOR_SECONDARY;
+            if (second && (component != HUD_RADIO && component != HUD_MONEY && component != HUD_WANTED && component != HUD_WEAPON))
+                return false;
+
+            hud->SetComponentColor(component, static_cast<std::uint32_t>(std::get<float>(value)), second);
             return true;
         }
         case eHudComponentProperty::DRAW_BLACK_BORDER:
@@ -769,8 +777,7 @@ bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHud
             if (!StringToEnum(std::get<std::string>(value), val))
                 return false;
 
-            // I don't know why, but calling StringToEnum causes the "hud" pointer to become invalid, leading to a crash
-            g_pGame->GetHud()->SetComponentFontStyle(component, val);
+            hud->SetComponentFontStyle(component, val);
             return true;
         }
         case eHudComponentProperty::TEXT_ALIGNMENT:
@@ -785,8 +792,7 @@ bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHud
             if (!StringToEnum(std::get<std::string>(value), val))
                 return false;
 
-            // I don't know why, but calling StringToEnum causes the "hud" pointer to become invalid, leading to a crash
-            g_pGame->GetHud()->SetComponentFontAlignment(component, val);
+            hud->SetComponentFontAlignment(component, val);
             return true;
         }
         case eHudComponentProperty::TEXT_PROPORTIONAL:
@@ -808,6 +814,8 @@ bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHud
             hud->SetComponentUseCustomAlpha(component, std::get<bool>(value));
             return true;
         }
+        default:
+            break;
     }
 
     return false;
@@ -815,10 +823,15 @@ bool CLuaPlayerDefs::SetPlayerHudComponentProperty(eHudComponent component, eHud
 
 bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property) noexcept
 {
-    if (component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR)
+    if (component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR || component == HUD_RADAR_MAP || component == HUD_RADAR_BLIPS ||
+        component == HUD_RADAR_ALTIMETER)
         return false;
 
     CHud* hud = g_pGame->GetHud();
+    assert(hud);
+
+    if (!hud)
+        return false;
 
     if (component == HUD_ALL)
     {
@@ -852,7 +865,7 @@ bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eH
         case eHudComponentProperty::FILL_COLOR:
         case eHudComponentProperty::FILL_COLOR_SECONDARY:
         {
-            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON)
+            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON && component != HUD_CROSSHAIR)
                 return false;
 
             bool second = property == eHudComponentProperty::FILL_COLOR_SECONDARY;
@@ -937,6 +950,8 @@ bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eH
         case eHudComponentProperty::CUSTOM_ALPHA:
             hud->SetComponentUseCustomAlpha(component, false);
             return true;
+        default:
+            break;
     }
 
     return false;
@@ -945,10 +960,18 @@ bool CLuaPlayerDefs::ResetPlayerHudComponentProperty(eHudComponent component, eH
 std::variant<float, bool, std::string, CLuaMultiReturn<float, float>, CLuaMultiReturn<std::uint8_t, std::uint8_t, std::uint8_t, std::uint8_t>>
 CLuaPlayerDefs::GetPlayerHudComponentProperty(eHudComponent component, eHudComponentProperty property)
 {
-    if (component == HUD_ALL || component == HUD_CROSSHAIR || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR)
+    if (component == HUD_ALL || component == HUD_VITAL_STATS || component == HUD_HELP_TEXT || component == HUD_RADAR || component == HUD_RADAR_MAP ||
+        component == HUD_RADAR_BLIPS || component == HUD_RADAR_ALTIMETER)
         return false;
 
     CHud* hud = g_pGame->GetHud();
+    assert(hud);
+
+    if (!hud)
+        return false;
+
+    if (component == eHudComponent::HUD_CROSSHAIR && !hud->IsCrosshairVisible())
+        return false;
 
     switch (property)
     {
@@ -964,7 +987,7 @@ CLuaPlayerDefs::GetPlayerHudComponentProperty(eHudComponent component, eHudCompo
         }
         case eHudComponentProperty::FILL_COLOR:
         {
-            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON)
+            if (!hud->IsComponentBar(component) && !hud->IsComponentText(component) && component != HUD_WEAPON && component != HUD_CROSSHAIR)
                 return false;
 
             SColor color = hud->GetComponentColor(component);
@@ -1048,9 +1071,14 @@ CLuaPlayerDefs::GetPlayerHudComponentProperty(eHudComponent component, eHudCompo
         }
         case eHudComponentProperty::TEXT_SIZE:
         {
+            if (!hud->IsComponentText(component))
+                return false;
+
             CVector2D size = hud->GetComponentTextSize(component);
             return CLuaMultiReturn<float, float>{size.fX, size.fY};
         }
+        default:
+            break;
     }
 
     return false;
