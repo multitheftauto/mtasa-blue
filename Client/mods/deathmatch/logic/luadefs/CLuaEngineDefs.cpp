@@ -89,6 +89,7 @@ void CLuaEngineDefs::LoadFunctions()
         {"engineFreeModel", EngineFreeModel},
         {"engineLoadTXD", EngineLoadTXD},
         {"engineLoadCOL", EngineLoadCOL},
+        {"engineSetCOLData", ArgumentParser<EngineSetCOLData>},
         {"engineLoadDFF", EngineLoadDFF},
         {"engineLoadIFP", EngineLoadIFP},
         {"engineImportTXD", EngineImportTXD},
@@ -245,6 +246,7 @@ void CLuaEngineDefs::AddEngineColClass(lua_State* luaVM)
 
     lua_classfunction(luaVM, "create", "engineLoadCOL");
     lua_classfunction(luaVM, "replace", "engineReplaceCOL");
+    lua_classfunction(luaVM, "setData", "engineSetCOLData");
 
     lua_registerclass(luaVM, "EngineCOL", "Element");
 }
@@ -291,6 +293,9 @@ void CLuaEngineDefs::AddEngineDffClass(lua_State* luaVM)
 
 int CLuaEngineDefs::EngineLoadCOL(lua_State* luaVM)
 {
+    if (lua_istable(luaVM, 1))
+        return EngineLoadCOLFromTable(luaVM);
+
     SString          input;
     CScriptArgReader argStream(luaVM);
     // Grab the COL filename or data

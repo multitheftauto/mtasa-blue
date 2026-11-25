@@ -51,6 +51,39 @@ bool CClientColModel::Load(bool isRaw, SString input)
     }
 }
 
+bool CClientColModel::LoadFromGeneratedData(SString buffer)
+{
+    if (m_pColModel)
+        return false;
+
+    m_pColModel = g_pGame->GetRenderWare()->ReadCOL(std::move(buffer));
+    return m_pColModel != nullptr;
+}
+
+bool CClientColModel::SetGeneratedData(SString buffer)
+{
+    if (!m_pColModel)
+        return false;
+
+    CColModel* newColModel = g_pGame->GetRenderWare()->ReadCOL(std::move(buffer));
+    if (!newColModel)
+        return false;
+
+    // Repoint every replaced GTA model before destroying the old collision so
+    // no model info can retain a dangling collision pointer.
+    for (unsigned short modelId : m_Replaced)
+    {
+        CModelInfo* modelInfo = g_pGame->GetModelInfo(modelId);
+        if (modelInfo)
+            modelInfo->SetColModel(newColModel);
+    }
+
+    CColModel* oldColModel = m_pColModel;
+    m_pColModel = newColModel;
+    oldColModel->Destroy();
+    return true;
+}
+
 bool CClientColModel::LoadFromFile(SString filePath)
 {
     SString buffer;
