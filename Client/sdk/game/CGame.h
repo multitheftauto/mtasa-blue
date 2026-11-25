@@ -71,7 +71,6 @@ class CIplStore;
 class CBuildingRemoval;
 class CRenderer;
 class CVehicleAudioSettingsManager;
-enum eEntityType;
 enum ePedPieceTypes;
 
 typedef bool(PreWeaponFireHandler)(class CPlayerPed* pPlayer, bool bStopIfUsingBulletSync);

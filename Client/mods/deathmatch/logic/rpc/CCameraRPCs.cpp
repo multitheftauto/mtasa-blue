@@ -114,7 +114,7 @@ void CCameraRPCs::SetCameraTarget(NetBitStreamInterface& bitStream)
 
     switch (pEntity->GetType())
     {
-        case CCLIENTPLAYER:
+        case ElementType::PLAYER:
         {
             CClientPlayer* pPlayer = static_cast<CClientPlayer*>(pEntity);
             if (pPlayer->IsLocalPlayer())
@@ -129,8 +129,8 @@ void CCameraRPCs::SetCameraTarget(NetBitStreamInterface& bitStream)
             }
             break;
         }
-        case CCLIENTPED:
-        case CCLIENTVEHICLE:
+        case ElementType::PED:
+        case ElementType::VEHICLE:
         {
             m_pCamera->SetFocus(pEntity, MODE_CAM_ON_A_STRING, false);
             break;

@@ -167,7 +167,7 @@ public:
 
     void Unlink();
 
-    eClientEntityType GetType() const { return CCLIENTVEHICLE; };
+    ElementType::Enum GetType() const { return ElementType::VEHICLE; };
 
     const char*        GetNamePointer() { return m_pModelInfo->GetNameIfVehicle(); };
     eClientVehicleType GetVehicleType() { return m_eVehicleType; };

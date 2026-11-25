@@ -25,7 +25,7 @@ public:
     void GetPosition(CVector& vecPosition) const {};
     void SetPosition(const CVector& vecPosition) {};
 
-    eClientEntityType GetType() const { return CCLIENTTXD; }
+    ElementType::Enum GetType() const { return ElementType::TXD; }
     bool              Load(bool isRaw, SString input, bool enableFiltering);
     bool              AddClothingTexture(const std::string& modelName);
     bool              Import(unsigned short usModelID);

@@ -145,52 +145,52 @@ void CResourceMapItem::HandleNode(CXMLNode& Node, CElement* pParent)
 
     switch (elementType)
     {
-        case CElement::VEHICLE:
+        case ElementType::VEHICLE:
         {
             pNode = m_pVehicleManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }
-        case CElement::OBJECT:
+        case ElementType::OBJECT:
         {
             pNode = m_pObjectManager->CreateFromXML(pParent, Node, m_pEvents, false);
             break;
         }
-        case CElement::BLIP:
+        case ElementType::BLIP:
         {
             pNode = m_pBlipManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }
-        case CElement::PICKUP:
+        case ElementType::PICKUP:
         {
             pNode = m_pPickupManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }
-        case CElement::MARKER:
+        case ElementType::MARKER:
         {
             pNode = m_pMarkerManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }
-        case CElement::RADAR_AREA:
+        case ElementType::RADAR_AREA:
         {
             pNode = m_pRadarAreaManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }
-        case CElement::TEAM:
+        case ElementType::TEAM:
         {
             pNode = m_pTeamManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }
-        case CElement::PED:
+        case ElementType::PED:
         {
             pNode = m_pPedManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }
-        case CElement::WATER:
+        case ElementType::WATER:
         {
             pNode = m_pWaterManager->CreateFromXML(pParent, Node, m_pEvents);
             break;
         }
-        case CElement::BUILDING:
+        case ElementType::BUILDING:
         {
             pNode = m_pBuildingManager->CreateFromXML(pParent, Node, m_pEvents);
             break;

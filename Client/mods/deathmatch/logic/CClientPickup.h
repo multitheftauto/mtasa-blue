@@ -96,7 +96,7 @@ public:
 
     void Unlink();
 
-    eClientEntityType GetType() const { return CCLIENTPICKUP; };
+    ElementType::Enum GetType() const { return ElementType::PICKUP; };
 
     unsigned short GetModel() { return m_usModel; };
 

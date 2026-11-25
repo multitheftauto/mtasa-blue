@@ -36,7 +36,7 @@ void CObjectRPCs::SetObjectRotation(CClientEntity* pSource, NetBitStreamInterfac
     // Read out the new rotation
     CVector vecRotation;
 
-    if (pSource->GetType() == CCLIENTBUILDING)
+    if (pSource->GetType() == ElementType::BUILDING)
     {
         if (bitStream.Read(vecRotation.fX) && bitStream.Read(vecRotation.fY) && bitStream.Read(vecRotation.fZ))
             static_cast<CClientBuilding*>(pSource)->SetRotationRadians(vecRotation);

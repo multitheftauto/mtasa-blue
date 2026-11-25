@@ -234,7 +234,7 @@ int CLuaFunctionDefs::TriggerClientEvent(lua_State* luaVM)
         CElement* pElement;
         argStream.ReadIfNextIsUserData(pElement, CStaticFunctionDefinitions::GetRootElement());
         if (!argStream.HasErrors())
-            pElement->GetDescendantsByType(sendList, CElement::PLAYER);
+            pElement->GetDescendantsByType(sendList, ElementType::PLAYER);
     }
     argStream.ReadString(strName);
     argStream.ReadUserData(pCallWithElement);
@@ -280,7 +280,7 @@ int CLuaFunctionDefs::TriggerLatentClientEvent(lua_State* luaVM)
         CElement* pElement;
         argStream.ReadIfNextIsUserData(pElement, CStaticFunctionDefinitions::GetRootElement());
         if (!argStream.HasErrors())
-            pElement->GetDescendantsByType(sendList, CElement::PLAYER);
+            pElement->GetDescendantsByType(sendList, ElementType::PLAYER);
         markerLatentEvent.Set("GetDescendantsByType");
     }
     argStream.ReadString(strName);

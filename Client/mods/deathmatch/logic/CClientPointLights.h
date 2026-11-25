@@ -25,7 +25,7 @@ public:
 
     void Unlink();
 
-    eClientEntityType GetType() const { return CCLIENTPOINTLIGHTS; };
+    ElementType::Enum GetType() const { return ElementType::POINTLIGHTS; };
 
     int  GetMode() { return m_iMode; };
     void SetMode(int iMode) { m_iMode = iMode; };

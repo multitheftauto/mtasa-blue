@@ -30,7 +30,7 @@ public:
 
     bool LoadFromString(std::string strData);
 
-    eClientEntityType   GetType() const { return CCLIENTVECTORGRAPHIC; }
+    ElementType::Enum   GetType() const { return ElementType::VECTORGRAPHIC; }
     CVectorGraphicItem* GetRenderItem() const { return static_cast<CVectorGraphicItem*>(m_pRenderItem); }
 
     lunasvg::Document* GetSVGDocument() const { return m_pSVGDocument.get(); }

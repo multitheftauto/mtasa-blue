@@ -40,7 +40,7 @@ public:
 
     void Unlink();
 
-    eClientEntityType GetType() const { return CCLIENTPLAYER; }
+    ElementType::Enum GetType() const { return ElementType::PLAYER; }
 
     const char* GetNick() const { return m_strNick; }
     void        SetNick(const char* szNick);

@@ -957,7 +957,7 @@ static CEntity* GetProjectileOwner(CPools* pPools)
     {
         switch (pProjectileOwner->nType)
         {
-            case ENTITY_TYPE_VEHICLE:
+            case EntityType::VEHICLE:
             {
                 SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)pProjectileOwner);
                 if (pVehicleClientEntity)
@@ -966,7 +966,7 @@ static CEntity* GetProjectileOwner(CPools* pPools)
                 }
                 break;
             }
-            case ENTITY_TYPE_PED:
+            case EntityType::PED:
             {
                 SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)pProjectileOwner);
                 if (pPedClientEntity)
@@ -988,7 +988,7 @@ static void GetProjectileTarget(CPools* pPools)
     {
         switch (projectileTargetEntityInterface->nType)
         {
-            case ENTITY_TYPE_VEHICLE:
+            case EntityType::VEHICLE:
             {
                 SClientEntity<CVehicleSA>* pVehicleClientEntity = pPools->GetVehicle((DWORD*)projectileTargetEntityInterface);
                 if (pVehicleClientEntity)
@@ -997,7 +997,7 @@ static void GetProjectileTarget(CPools* pPools)
                 }
                 break;
             }
-            case ENTITY_TYPE_PED:
+            case EntityType::PED:
             {
                 SClientEntity<CPedSA>* pPedClientEntity = pPools->GetPed((DWORD*)projectileTargetEntityInterface);
                 if (pPedClientEntity)
@@ -1132,7 +1132,7 @@ static void CheckInVehicleDamage()
     if (pPed && !IsLocalPlayer(pPed))
     {
         // Did he hit a vehicle?
-        if (*ppInstantHitEntity && (*ppInstantHitEntity)->nType == ENTITY_TYPE_VEHICLE)
+        if (*ppInstantHitEntity && (*ppInstantHitEntity)->nType == EntityType::VEHICLE)
         {
             // Lets do a windscreen shooting check
             CWeapon* pWeapon = pPed->GetWeapon(pPed->GetCurrentWeaponSlot());

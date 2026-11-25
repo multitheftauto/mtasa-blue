@@ -8,13 +8,15 @@
  *
  *****************************************************************************/
 
+#include "enums/ElementType.h"
+
 class CClientDxFont : public CClientRenderElement
 {
     DECLARE_CLASS(CClientDxFont, CClientRenderElement)
 public:
     CClientDxFont(CClientManager* pManager, ElementID ID, CDxFontItem* pFontItem);
 
-    eClientEntityType GetType() const { return CCLIENTDXFONT; }
+    ElementType::Enum GetType() const { return ElementType::DXFONT; }
 
     // CClientDxFont methods
     CDxFontItem* GetDxFontItem() { return (CDxFontItem*)m_pRenderItem; }

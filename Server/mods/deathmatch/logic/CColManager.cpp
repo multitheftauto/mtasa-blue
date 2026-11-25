@@ -57,13 +57,13 @@ void CColManager::DoHitDetectionForColShape(CColShape* pShape)
         CElement* pEntity = *it;
         switch (pEntity->GetType())
         {
-            case CElement::COLSHAPE:
-            case CElement::SCRIPTFILE:
-            case CElement::RADAR_AREA:
-            case CElement::CONSOLE:
-            case CElement::TEAM:
-            case CElement::BLIP:
-            case CElement::DUMMY:
+            case ElementType::COLSHAPE:
+            case ElementType::SCRIPTFILE:
+            case ElementType::RADAR_AREA:
+            case ElementType::CONSOLE:
+            case ElementType::TEAM:
+            case ElementType::BLIP:
+            case ElementType::DUMMY:
                 break;
             default:
                 if (pEntity->GetParentEntity())
@@ -102,7 +102,7 @@ void CColManager::DoHitDetectionForEntity(const CVector& vecNowPosition, CElemen
 
     // Extract colshapes
     for (CElementResult ::const_iterator it = queryResult.begin(); it != queryResult.end(); ++it)
-        if ((*it)->GetType() == CElement::COLSHAPE)
+        if ((*it)->GetType() == ElementType::COLSHAPE)
             shortList[(CColShape*)*it] = 1;
 
     // Add existing collisions, so they can be disconnected if required

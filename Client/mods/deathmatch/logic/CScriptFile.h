@@ -35,7 +35,7 @@ public:
     void SetPosition(const CVector& vecPosition) {};
 
     // Functions required by CClientEntity
-    eClientEntityType GetType() const { return SCRIPTFILE; };
+    ElementType::Enum GetType() const { return ElementType::SCRIPTFILE; };
     void              Unlink() {};
 
     // Load and unload routines

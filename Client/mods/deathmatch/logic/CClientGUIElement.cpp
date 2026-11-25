@@ -186,7 +186,7 @@ void CClientGUIElement::SetCallPropagationEnabled(bool bEnabled)
 
     for (CFastList<CClientEntity*>::iterator iter = m_Children.begin(); iter != m_Children.end(); ++iter)
     {
-        if ((*iter)->GetType() == CCLIENTGUI)
+        if ((*iter)->GetType() == ElementType::GUI)
         {
             CClientGUIElement* pGUIElement = static_cast<CClientGUIElement*>(*iter);
             pGUIElement->GetCGUIElement()->SetInheritsAlpha(bEnabled);

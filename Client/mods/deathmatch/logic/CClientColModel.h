@@ -22,7 +22,7 @@ public:
     CClientColModel(class CClientManager* pManager, ElementID ID);
     ~CClientColModel();
 
-    eClientEntityType GetType() const { return CCLIENTCOL; }
+    ElementType::Enum GetType() const { return ElementType::COL; }
 
     bool Load(bool isRaw, SString input);
 

@@ -24,7 +24,7 @@ CCustomWeapon::CCustomWeapon(CElement* pParent, CObjectManager* pObjectManager, 
     CElementRefManager::AddElementRefs(ELEMENT_REF_DEBUG(this, "CCustomWeapon"), &m_pTarget, &m_pOwner, NULL);
 
     // Init
-    m_iType = CElement::WEAPON;
+    m_iType = ElementType::WEAPON;
     SetTypeName("weapon");
 
     m_Type = weaponType;
