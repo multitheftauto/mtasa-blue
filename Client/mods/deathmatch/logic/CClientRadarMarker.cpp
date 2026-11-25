@@ -227,6 +227,7 @@ void CClientRadarMarker::CreateMarker()
                 m_pMarker->SetScale(m_usScale);
                 m_pMarker->SetColor(color);
                 m_pMarker->SetSprite(static_cast<MarkerSprite::Enum>(m_ulSprite));
+                m_pRadarMarkerManager->RegisterGameMarker(m_pMarker, this);
             }
         }
     }
@@ -236,6 +237,7 @@ void CClientRadarMarker::DestroyMarker()
 {
     if (m_pMarker)
     {
+        m_pRadarMarkerManager->UnregisterGameMarker(m_pMarker);
         m_pMarker->Remove();
         m_pMarker = NULL;
     }
