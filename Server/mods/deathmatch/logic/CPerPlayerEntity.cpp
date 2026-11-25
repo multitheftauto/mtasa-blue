@@ -26,14 +26,10 @@ CPerPlayerEntity::CPerPlayerEntity(CElement* pParent) : CElement(pParent)
 
 CPerPlayerEntity::~CPerPlayerEntity()
 {
-    // Unsync us from everyone
-    // Sync ( false );
-
     // Unreference us from what we're referencing
-    list<CElement*>::const_iterator iter = m_ElementReferences.begin();
-    for (; iter != m_ElementReferences.end(); iter++)
+    for (std::map<CElement*, bool>::const_iterator iter = m_ElementVisibility.begin(); iter != m_ElementVisibility.end(); iter++)
     {
-        (*iter)->m_ElementReferenced.remove(this);
+        iter->first->m_ElementReferenced.remove(this);
     }
     MapRemove(ms_AllPerPlayerEntityMap, this);
 }
@@ -64,7 +60,7 @@ void CPerPlayerEntity::OnReferencedSubtreeAdd(CElement* pElement)
     assert(pElement);
 
     // Add all players below that item to our list
-    AddPlayersBelow(pElement, m_PlayersAdded);
+    UpdatePlayersBelow(pElement);
 }
 
 void CPerPlayerEntity::OnReferencedSubtreeRemove(CElement* pElement)
@@ -72,7 +68,7 @@ void CPerPlayerEntity::OnReferencedSubtreeRemove(CElement* pElement)
     assert(pElement);
 
     // Remove all players below that item from our list
-    RemovePlayersBelow(pElement, m_PlayersRemoved);
+    HidePlayersBelow(pElement);
 }
 
 void CPerPlayerEntity::UpdatePerPlayer()
@@ -104,74 +100,69 @@ void CPerPlayerEntity::UpdatePerPlayer()
 
 bool CPerPlayerEntity::AddVisibleToReference(CElement* pElement)
 {
-    // If he isn't already referencing this element
-    if (!IsVisibleToReferenced(pElement))
-    {
-        // Add him to our list and add us to his list
-        m_ElementReferences.push_back(pElement);
-        pElement->m_ElementReferenced.push_back(this);
-
-        // Add the reference to it and update the players
-        OnReferencedSubtreeAdd(pElement);
-        UpdatePerPlayerEntities();
-
-        return true;
-    }
-
-    return false;
+    return SetElementVisibility(pElement, true);
 }
 
 bool CPerPlayerEntity::RemoveVisibleToReference(CElement* pElement)
 {
-    // We reference this element?
-    if (IsVisibleToReferenced(pElement))
+    return SetElementVisibility(pElement, false);
+}
+
+bool CPerPlayerEntity::SetElementVisibility(CElement* element, bool visible)
+{
+    assert(element);
+
+    std::map<CElement*, bool>::iterator iter = m_ElementVisibility.find(element);
+    if (iter != m_ElementVisibility.end())
     {
-        // Remove him from our list and unreference us from his list
-        m_ElementReferences.remove(pElement);
-        pElement->m_ElementReferenced.remove(this);
+        // Nothing to do if the value is already what we were asked to set
+        if (iter->second == visible)
+            return false;
 
-        // Update the players
-        OnReferencedSubtreeRemove(pElement);
-        UpdatePerPlayerEntities();
+        iter->second = visible;
+    }
+    else
+    {
+        m_ElementVisibility[element] = visible;
 
-        return true;
+        element->m_ElementReferenced.push_back(this);
     }
 
-    return false;
+    UpdatePlayersBelow(element);
+    UpdatePerPlayerEntities();
+
+    return true;
 }
 
 void CPerPlayerEntity::ClearVisibleToReferences()
 {
-    // For each reference in our list
-    bool                            bCleared = false;
-    list<CElement*>::const_iterator iter = m_ElementReferences.begin();
-    for (; iter != m_ElementReferences.end(); iter++)
-    {
-        // Unreference us from it
-        (*iter)->m_ElementReferenced.remove(this);
+    CElement* rootElement = g_pGame->GetMapManager()->GetRootElement();
+    assert(rootElement);
 
-        // Notify our inherits that he was removed
-        OnReferencedSubtreeRemove(*iter);
-        bCleared = true;
+    for (std::map<CElement*, bool>::iterator iter = m_ElementVisibility.begin(); iter != m_ElementVisibility.end(); iter++)
+    {
+        iter->first->m_ElementReferenced.remove(this);
     }
+    m_ElementVisibility.clear();
 
-    // Clear the list and update the players
-    if (bCleared)
+    // Restore the default visibility, which is being visible to everyone
+    if (rootElement)
     {
-        m_ElementReferences.clear();
+        m_ElementVisibility[rootElement] = true;
+        rootElement->m_ElementReferenced.push_back(this);
+
+        UpdatePlayersBelow(rootElement);
         UpdatePerPlayerEntities();
     }
 }
 
-bool CPerPlayerEntity::IsVisibleToReferenced(CElement* pElement)
+bool CPerPlayerEntity::IsVisibleToElement(CElement* element)
 {
-    list<CElement*>::const_iterator iter = m_ElementReferences.begin();
-    for (; iter != m_ElementReferences.end(); iter++)
+    for (CElement* current = element; current; current = current->GetParentEntity())
     {
-        if (*iter == pElement)
-        {
-            return true;
-        }
+        std::map<CElement*, bool>::const_iterator iter = m_ElementVisibility.find(current);
+        if (iter != m_ElementVisibility.end())
+            return iter->second;
     }
 
     return false;
@@ -287,59 +278,67 @@ void CPerPlayerEntity::RemoveIdenticalEntries(std::set<CPlayer*>& List1, std::se
     }
 }
 
-void CPerPlayerEntity::AddPlayersBelow(CElement* pElement, std::set<CPlayer*>& Added)
+void CPerPlayerEntity::UpdatePlayersBelow(CElement* element)
 {
-    assert(pElement);
+    assert(element);
 
     // Is this a player?
-    if (IS_PLAYER(pElement))
+    if (IS_PLAYER(element))
     {
-        // Are we not already visible to that player? Add it to the list
-        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-        if (!IsVisibleToPlayer(*pPlayer))
-        {
-            MapInsert(Added, pPlayer);
-        }
-
-        // Add it to our reference list
-        AddPlayerReference(pPlayer);
+        SyncPlayerVisibility(static_cast<CPlayer*>(element));
     }
 
     // Call ourself on all its children elements
-    CChildListType ::const_iterator iterChildren = pElement->IterBegin();
-    for (; iterChildren != pElement->IterEnd(); iterChildren++)
+    CChildListType ::const_iterator iterChildren = element->IterBegin();
+    for (; iterChildren != element->IterEnd(); iterChildren++)
     {
-        CElement* pElement = *iterChildren;
-        if (pElement->CountChildren() || IS_PLAYER(pElement))  // This check reduces cpu usage when loading large maps (due to recursion)
-            AddPlayersBelow(pElement, Added);
+        CElement* child = *iterChildren;
+        if (child->CountChildren() || IS_PLAYER(child))  // This check reduces cpu usage when loading large maps (due to recursion)
+            UpdatePlayersBelow(child);
     }
 }
 
-void CPerPlayerEntity::RemovePlayersBelow(CElement* pElement, std::set<CPlayer*>& Removed)
+void CPerPlayerEntity::HidePlayersBelow(CElement* element)
 {
-    assert(pElement);
+    assert(element);
 
     // Is this a player?
-    if (IS_PLAYER(pElement))
+    if (IS_PLAYER(element))
     {
-        // Remove the reference
-        CPlayer* pPlayer = static_cast<CPlayer*>(pElement);
-        RemovePlayerReference(pPlayer);
-
-        // Did we just loose the last reference to that player? Add him to the list over removed players.
-        if (!IsVisibleToPlayer(*pPlayer))
+        CPlayer* player = static_cast<CPlayer*>(element);
+        if (IsVisibleToPlayer(*player))
         {
-            MapInsert(Removed, pPlayer);
+            RemovePlayerReference(player);
+            MapInsert(m_PlayersRemoved, player);
         }
     }
 
     // Call ourself on all our children
-    CChildListType ::const_iterator iterChildren = pElement->IterBegin();
-    for (; iterChildren != pElement->IterEnd(); iterChildren++)
+    CChildListType ::const_iterator iterChildren = element->IterBegin();
+    for (; iterChildren != element->IterEnd(); iterChildren++)
     {
-        CElement* pElement = *iterChildren;
-        if (pElement->CountChildren() || IS_PLAYER(pElement))  // This check reduces cpu usage when unloading large maps (due to recursion)
-            RemovePlayersBelow(pElement, Removed);
+        CElement* child = *iterChildren;
+        if (child->CountChildren() || IS_PLAYER(child))  // This check reduces cpu usage when loading large maps (due to recursion)
+            HidePlayersBelow(child);
+    }
+}
+
+void CPerPlayerEntity::SyncPlayerVisibility(CPlayer* player)
+{
+    const bool visible = IsVisibleToElement(player);
+
+    if (visible == IsVisibleToPlayer(*player))
+        return;
+
+    if (visible)
+    {
+        AddPlayerReference(player);
+        MapInsert(m_PlayersAdded, player);
+    }
+    else
+    {
+        RemovePlayerReference(player);
+        MapInsert(m_PlayersRemoved, player);
     }
 }
 
