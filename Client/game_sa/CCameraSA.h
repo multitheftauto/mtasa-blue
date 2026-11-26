@@ -419,6 +419,8 @@ public:
     float        GetTransitionFOV() const override;
     bool         GetTransitionMatrix(CMatrix& matrix) const override;
     bool         IsSphereVisible(CVector* center, float radius) const override;
+    void         ClearCamDirectlyBehind() noexcept override;
+    void         SetPedOrientForBehindOrInFront(float angle) noexcept override;
 
     // Additional overload not in base interface
     virtual CCam* GetCam(CCamSAInterface* camInterface);
