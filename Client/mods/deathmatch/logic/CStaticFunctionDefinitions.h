@@ -396,6 +396,8 @@ public:
     // Camera set funcs
     static bool SetCameraMatrix(const CVector& vecPosition, CVector* pvecLookAt, float fRoll, float fFOV);
     static bool SetCameraTarget(CClientEntity* pEntity);
+    static bool SetCameraTarget(CClientEntity* pEntity, const CVector& vecTarget);
+    static bool SetCameraTarget(CClientEntity* pEntity, CClientEntity* pTargetLookAtEntity);
     static bool SetCameraTarget(const CVector& vecTarget);
     static bool SetCameraInterior(unsigned char ucInterior);
     static bool FadeCamera(bool bFadeIn, float fFadeTime, unsigned char ucRed, unsigned char ucGreen, unsigned char ucBlue);
