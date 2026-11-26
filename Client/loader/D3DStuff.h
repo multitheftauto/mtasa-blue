@@ -15,3 +15,10 @@
 void BeginD3DStuff();
 void EndD3DStuff();
 void LoaderResolveCrashHandlerExports(HMODULE coreModule) noexcept;
+
+bool ManageDXVK();
+
+bool IsDXVKBinaryFile(const SString& strFilePath);
+
+bool GetDXVKEnabledSetting();
+void SetDXVKEnabledSetting(bool bEnable);

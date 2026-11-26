@@ -15,6 +15,9 @@ utils\premake5.exe %PREMAKE5_FLAGS% install_cef
 rem Update Unifont
 utils\premake5.exe %PREMAKE5_FLAGS% install_unifont
 
+rem Update DXVK
+utils\premake5.exe %PREMAKE5_FLAGS% install_dxvk
+
 rem Update discord-rpc
 utils\premake5.exe %PREMAKE5_FLAGS% install_discord
 
