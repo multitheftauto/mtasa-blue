@@ -111,7 +111,6 @@ private:
     void           SetCenterOfWorldCached(const CVector* pPosition, float fRotationRadians);
     void           UpdateCenterOfWorldFromFixedMatrix();
     const CMatrix& AcquirePulseMatrix() const;
-    const CVector& AcquirePulseEuler(const CMatrix& matrix) const;
 
     void UnreferenceEntity(CClientEntity* pEntity);
     void InvalidateEntity(CClientEntity* pEntity);
@@ -134,9 +133,7 @@ private:
     CMatrix              m_matFixedMatrix;
 
     mutable CMatrix m_cachedPulseMatrix;
-    mutable CVector m_cachedPulseEuler;
     mutable bool    m_hasCachedPulseMatrix;
-    mutable bool    m_hasCachedPulseEuler;
     CVector         m_lastCenterOfWorldPos;
     float           m_lastCenterOfWorldRot;
     bool            m_hasCenterOfWorld;
