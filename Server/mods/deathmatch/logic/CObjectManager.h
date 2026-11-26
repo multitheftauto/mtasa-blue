@@ -30,6 +30,9 @@ public:
     CObject* Create(CElement* pParent, bool bIsLowLod);
     CObject* CreateFromXML(CElement* pParent, CXMLNode& Node, CEvents* pEvents, bool bIsLowLod);
     void     DeleteAll();
+    void     DoPulse();
+    void     RegisterMovingObject(CObject* pObject);
+    void     UnregisterMovingObject(CObject* pObject);
 
     unsigned int Count() { return static_cast<unsigned int>(m_List.size()); };
     bool         Exists(CObject* pObject);
@@ -45,4 +48,5 @@ private:
     void RemoveFromList(CObject* pObject);
 
     CObjectListType m_List;
+    CObjectListType m_MovingList;
 };
