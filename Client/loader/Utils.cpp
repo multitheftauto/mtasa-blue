@@ -2289,8 +2289,9 @@ BOOL CALLBACK MyEnumWindowsProc(HWND hwnd, LPARAM lParam)
             GetWindowThreadProcessId(hwnd, &dwWindowProcessId);
             if (lParam == dwWindowProcessId)
             {
-                // Match the topmost splash so GTA's device selection remains visible above it.
-                SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOACTIVATE);
+                // Promote only once: repeatedly raising the dialog covers its open combo box lists.
+                if (!(windowInfo.dwExStyle & WS_EX_TOPMOST))
+                    SetWindowPos(hwnd, HWND_TOPMOST, 0, 0, 0, 0, SWP_NOMOVE | SWP_NOSIZE | SWP_SHOWWINDOW | SWP_NOACTIVATE);
                 return false;
             }
         }
