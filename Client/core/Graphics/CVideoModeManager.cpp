@@ -497,7 +497,16 @@ void CVideoModeManager::LoadCVars()
     VideoMode info;
     if (m_pGameSettings->GetVideoModeInfo(&info, m_iCurrentVideoMode))
     {
-        CVARS_SET("display_resolution", MakeResolutionString(info.width, info.height, info.depth, m_iCurrentAdapter));
+        SString strResolution = MakeResolutionString(info.width, info.height, info.depth, m_iCurrentAdapter);
+
+        SString strSavedResolution;
+        CVARS_GET("display_resolution", strSavedResolution);
+        CVARS_SET("display_resolution", strResolution);
+
+        // Persist right away when the resolution or monitor changed. The config is otherwise only written on a clean
+        // shutdown, so stopping the game from a debugger would discard the choice and the next launch would use the old one.
+        if (strResolution != strSavedResolution)
+            CCore::GetSingleton().SaveConfig();
     }
 
     m_hCurrentMonitor = CProxyDirect3D9::StaticGetAdapterMonitor(m_iCurrentAdapter);
