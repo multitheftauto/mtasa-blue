@@ -24,112 +24,97 @@
 #define MIN_SERVER_REQ_CALLREMOTE_OPTIONS_TABLE       "1.5.4-9.11342"
 #define MIN_SERVER_REQ_CALLREMOTE_OPTIONS_FORMFIELDS  "1.5.4-9.11413"
 
-int CLuaFunctionDefs::AddCommandHandler(lua_State* luaVM)
+bool CLuaFunctionDefs::AddCommandHandler(lua_State* luaVM, std::variant<std::string, std::vector<std::string>> commandNames, CLuaFunctionRef handlerFunction,
+                                         std::optional<bool> maybeRestricted, std::optional<bool> maybeCaseSensitive)
 {
-    //  bool addCommandHandler ( string commandName, function handlerFunction, [bool restricted = false, bool caseSensitive = true] )
-    SString         strKey;
-    CLuaFunctionRef iLuaFunction;
-    bool            bRestricted;
-    bool            bCaseSensitive;
+    // bool addCommandHandler ( string / table commandNames, function handlerFunction, [bool restricted = false, bool caseSensitive = true] )
+    CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!luaMain)
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strKey);
-    argStream.ReadFunction(iLuaFunction);
-    argStream.ReadBool(bRestricted, false);
-    argStream.ReadBool(bCaseSensitive, true);
-    argStream.ReadFunctionComplete();
+    const bool restricted = maybeRestricted.value_or(false);
+    const bool caseSensitive = maybeCaseSensitive.value_or(true);
 
-    if (!argStream.HasErrors())
+    if (std::holds_alternative<std::string>(commandNames))
     {
-        // Grab our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            // Add them to our list over command handlers
-            if (m_pRegisteredCommands->AddCommand(pLuaMain, strKey, iLuaFunction, bRestricted, bCaseSensitive))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        const std::string& commandName = std::get<std::string>(commandNames);
+        if (commandName.empty())
+            return false;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+        return m_pRegisteredCommands->AddCommand(luaMain, commandName.c_str(), handlerFunction, restricted, caseSensitive);
+    }
+
+    const auto& nameList = std::get<std::vector<std::string>>(commandNames);
+    if (nameList.empty())
+        return false;
+
+    std::unordered_set<std::string> uniqueCommands;
+    bool                            success = false;
+
+    for (const std::string& commandName : nameList)
+    {
+        if (commandName.empty())
+            continue;
+
+        // Skip duplicates within the same array registration
+        if (!uniqueCommands.insert(commandName).second)
+            continue;
+
+        if (m_pRegisteredCommands->AddCommand(luaMain, commandName.c_str(), handlerFunction, restricted, caseSensitive))
+            success = true;
+    }
+
+    return success;
 }
 
-int CLuaFunctionDefs::RemoveCommandHandler(lua_State* luaVM)
+bool CLuaFunctionDefs::RemoveCommandHandler(lua_State* luaVM, std::variant<std::string, std::vector<std::string>> commandNames,
+                                            std::optional<CLuaFunctionRef> maybeHandlerFunction)
 {
-    //  bool removeCommandHandler ( string commandName [, function handler] )
-    SString         strKey;
-    CLuaFunctionRef iLuaFunction;
+    // bool removeCommandHandler ( string / table commandNames [, function handler] )
+    CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!luaMain)
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strKey);
-    argStream.ReadFunction(iLuaFunction, LUA_REFNIL);
-    argStream.ReadFunctionComplete();
+    const CLuaFunctionRef handlerFunction = maybeHandlerFunction.value_or(CLuaFunctionRef());
 
-    if (!argStream.HasErrors())
+    if (std::holds_alternative<std::string>(commandNames))
     {
-        // Grab our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            // Remove it from our list
-            if (m_pRegisteredCommands->RemoveCommand(pLuaMain, strKey, iLuaFunction))
-            {
-                lua_pushboolean(luaVM, true);
-                return 1;
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
+        const std::string& commandName = std::get<std::string>(commandNames);
+        if (commandName.empty())
+            return false;
 
-    lua_pushboolean(luaVM, false);
-    return 1;
+        return m_pRegisteredCommands->RemoveCommand(luaMain, commandName.c_str(), handlerFunction);
+    }
+
+    const auto& nameList = std::get<std::vector<std::string>>(commandNames);
+    if (nameList.empty())
+        return false;
+
+    bool success = false;
+    for (const std::string& commandName : nameList)
+    {
+        if (commandName.empty())
+            continue;
+
+        if (m_pRegisteredCommands->RemoveCommand(luaMain, commandName.c_str(), handlerFunction))
+            success = true;
+    }
+
+    return success;
 }
 
-int CLuaFunctionDefs::ExecuteCommandHandler(lua_State* luaVM)
+bool CLuaFunctionDefs::ExecuteCommandHandler(lua_State* luaVM, std::string commandName, CPlayer* player, std::optional<std::string> maybeArgs)
 {
-    //  bool executeCommandHandler ( string commandName, player thePlayer, [ string args ] )
-    SString   strKey;
-    CElement* pElement;
-    SString   strArgs;
+    // bool executeCommandHandler ( string commandName, player thePlayer, [ string args ] )
+    if (commandName.empty() || !player)
+        return false;
 
-    CScriptArgReader argStream(luaVM);
-    argStream.ReadString(strKey);
-    argStream.ReadUserData(pElement);
-    argStream.ReadString(strArgs, "");
+    CLuaMain* luaMain = m_pLuaManager->GetVirtualMachine(luaVM);
+    if (!luaMain)
+        return false;
 
-    if (!argStream.HasErrors())
-    {
-        // Grab our VM
-        CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
-        if (pLuaMain)
-        {
-            CClient* pClient = NULL;
-            if (pElement->GetType() == CElement::PLAYER)
-                pClient = static_cast<CClient*>(static_cast<CPlayer*>(pElement));
-
-            if (pClient)
-            {
-                // Call it
-                if (m_pRegisteredCommands->ProcessCommand(strKey, strArgs, pClient))
-                {
-                    lua_pushboolean(luaVM, true);
-                    return 1;
-                }
-            }
-        }
-    }
-    else
-        m_pScriptDebugging->LogCustom(luaVM, argStream.GetFullErrorMessage());
-
-    lua_pushboolean(luaVM, false);
-    return 1;
+    const std::string args = maybeArgs.value_or("");
+    return m_pRegisteredCommands->ProcessCommand(commandName.c_str(), args.c_str(), player);
 }
 
 int CLuaFunctionDefs::GetCommandHandlers(lua_State* luaVM)

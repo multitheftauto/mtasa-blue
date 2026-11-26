@@ -70,7 +70,7 @@ public:
     static CClientIMGManager*         m_pImgManager;
     static CClientBuildingManager*    m_pBuildingManager;
 
-protected:
+public:
     // Old style: Only warn on failure. This should
     // not be used for new functions. ReturnOnError
     // must be a value to use as result on invalid argument
