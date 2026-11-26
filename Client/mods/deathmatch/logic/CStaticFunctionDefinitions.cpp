@@ -6003,9 +6003,9 @@ void CStaticFunctionDefinitions::GUISetPosition(CClientEntity& Entity, const CVe
         {
             CVector2D vecNewPosition = GUIElement.GetCGUIElement()->GetPosition(false);
             CVector2D vecSize = GUIElement.GetCGUIElement()->GetSize(false);
-            float     fY = vecNewPosition.fY + vecSize.fY * 0.5f;
-            fY = g_pCore->GetGraphics()->ConvertPositionForAspectRatio(fY);
-            vecNewPosition.fY = fY - vecSize.fY * 0.5f;
+            float     centerX = vecNewPosition.fX + vecSize.fX * 0.5f;
+            centerX = g_pCore->GetGraphics()->ConvertPositionForAspectRatio(centerX);
+            vecNewPosition.fX = centerX - vecSize.fX * 0.5f;
             GUIElement.GetCGUIElement()->SetPosition(vecNewPosition, false);
         }
     }

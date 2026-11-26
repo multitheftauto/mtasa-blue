@@ -15,6 +15,7 @@
 
 #include <SharedUtil.SysInfo.h>
 #include <SharedUtil.SysInfo.hpp>
+#include <cmath>
 
 #define MIN_CLIENT_REQ_DXSETRENDERTARGET_CALL_RESTRICTIONS "1.3.0-9.04431"
 extern bool g_bAllowAspectRatioAdjustment;
@@ -2146,6 +2147,8 @@ int CLuaDrawingDefs::DxSetAspectRatioAdjustmentEnabled(lua_State* luaVM)
 
     if (!g_bAllowAspectRatioAdjustment)
         argStream.SetCustomError("Function can only be used inside certain events");
+    else if (bEnabled && (!std::isfinite(fSourceRatio) || fSourceRatio <= 0.0f))
+        argStream.SetCustomError("Invalid source ratio (must be > 0)");
 
     if (!argStream.HasErrors())
     {

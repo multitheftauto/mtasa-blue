@@ -8,86 +8,83 @@
  *
  *****************************************************************************/
 
+#pragma once
+
 //
-// Convert positions of items that align with GTA Hud elements
+// Convert horizontal positions of DX/GUI items designed for one aspect ratio
+// to align with GTA HUD elements scaled to another aspect ratio.
 //
 class CAspectRatioConverter
 {
 public:
     ZERO_ON_NEW
 
-    // Call once
-    void Init(float ViewportHeight)
+    // Call whenever viewport width changes
+    void Init(float viewportWidth)
     {
-        m_fToRelMul = 2 / ViewportHeight;
-        m_fFromRelMul = ViewportHeight / 2.f;
+        m_viewportWidth = viewportWidth;
+        m_halfViewportWidth = viewportWidth * 0.5f;
+        UpdateConversion();
     }
 
-    // Call once a frame to update Target Ratio Value
-    void Pulse(float fTargetRatioValue)
+    // Call once per frame to update target HUD aspect ratio
+    void Pulse(float targetRatioValue)
     {
-        m_fTargetRatioValue = fTargetRatioValue;
-        m_fTargetBase = 1 - 0.36 * fTargetRatioValue;
-        m_bValidRatios = (m_fSourceRatioValue != 0) && (m_fTargetRatioValue != 0);
+        m_targetRatioValue = targetRatioValue;
+        UpdateConversion();
     }
 
-    // Call when Source Ratio Value changes
-    void SetSourceRatioValue(float fSourceRatioValue)
+    // Call when source aspect ratio changes (0 disables conversion)
+    void SetSourceRatioValue(float sourceRatioValue)
     {
-        m_fSourceRatioValue = fSourceRatioValue;
-        m_bValidRatios = (m_fSourceRatioValue != 0) && (m_fTargetRatioValue != 0);
-        if (m_bValidRatios)
-        {
-            m_fSourceBase = 1 - 0.36 * m_fSourceRatioValue;
-            m_fConvertScale = m_fTargetRatioValue / m_fSourceRatioValue;
-        }
+        m_sourceRatioValue = sourceRatioValue;
+        UpdateConversion();
     }
 
-    float GetSourceRatioValue() const { return m_fSourceRatioValue; }
+    float GetSourceRatioValue() const { return m_sourceRatioValue; }
 
-    // Temp suspend conversion. i.e. When F11 map is displayed
-    void SetSuspended(bool bSuspended) { m_bSuspended = bSuspended; }
+    // Temp suspend conversion (e.g. when F11 map is displayed)
+    void SetSuspended(bool suspended) { m_suspended = suspended; }
 
-    bool IsEnabled() const { return (m_bValidRatios && !m_bSuspended); }
+    bool IsEnabled() const { return m_validRatios && !m_suspended; }
 
-    // Convert a y screen position
-    float ConvertPositionForAspectRatio(const float fY) const
+    // Keep exact screen center fixed; scale other X coordinates relative to nearest horizontal edge
+    float ConvertPositionForAspectRatio(const float x) const
     {
-        if (!IsEnabled())
-            return fY;
+        if (!IsEnabled() || x == m_halfViewportWidth)
+            return x;
 
-        // To screen center relative
-        float fRelY = 1 - fY * m_fToRelMul;
+        if (x < m_halfViewportWidth)
+            return x * m_convertScale;
 
-        // From source ratio to target ratio
-        float fNewRelY = (abs(fRelY) - m_fSourceBase) * m_fConvertScale + m_fTargetBase;
-        fNewRelY *= fRelY < 0 ? -1 : 1;
-
-        // From screen center relative
-        float fNewY = (1 - fNewRelY) * m_fFromRelMul;
-        return fNewY;
+        return m_viewportWidth - (m_viewportWidth - x) * m_convertScale;
     }
 
-    // Convert a y screen position and length (In-place)
-    void ConvertSideForAspectRatio(float* pfY, float* pfHeight) const
+    // Convert a horizontal screen position and width (in-place)
+    void ConvertSideForAspectRatio(float* x, float* width) const
     {
         if (!IsEnabled())
             return;
 
-        float fNewY = ConvertPositionForAspectRatio(*pfY);
-        float fNewBottom = ConvertPositionForAspectRatio(*pfY + *pfHeight);
-        *pfHeight = fNewBottom - fNewY;
-        *pfY = fNewY;
+        // Anchor via rect center so elements straddling screen midpoint do not invert
+        const float center = *x + (*width) * 0.5f;
+        const float newCenter = ConvertPositionForAspectRatio(center);
+        *width *= m_convertScale;
+        *x = newCenter - (*width) * 0.5f;
     }
 
 protected:
-    bool  m_bValidRatios;
-    bool  m_bSuspended;
-    float m_fSourceRatioValue;
-    float m_fTargetRatioValue;
-    float m_fToRelMul;
-    float m_fFromRelMul;
-    float m_fTargetBase;
-    float m_fSourceBase;
-    float m_fConvertScale;
+    void UpdateConversion()
+    {
+        m_validRatios = (m_sourceRatioValue > 0.0f) && (m_targetRatioValue > 0.0f) && (m_viewportWidth > 0.0f);
+        m_convertScale = m_validRatios ? (m_sourceRatioValue / m_targetRatioValue) : 1.0f;
+    }
+
+    bool  m_validRatios = false;
+    bool  m_suspended = false;
+    float m_sourceRatioValue = 0.0f;
+    float m_targetRatioValue = 0.0f;
+    float m_viewportWidth = 0.0f;
+    float m_halfViewportWidth = 0.0f;
+    float m_convertScale = 1.0f;
 };

@@ -31,7 +31,14 @@ float CHudSA::calcStreetchX = 0.0f;
 float CHudSA::calcStreetchY = 0.0f;
 float CHudSA::blinkingBarHPValue = 10.0f;
 
-constexpr RwColor COLOR_BLACK = RwColor{0, 0, 0, 255};
+constexpr RwColor        COLOR_BLACK = RwColor{0, 0, 0, 255};
+constexpr float          DEFAULT_ASPECT_RATIO = 4.0f / 3.0f;
+constexpr float          DEFAULT_ASPECT_RATIO_MULT_X = 1.0f / 640.0f;
+constexpr float          DEFAULT_ASPECT_RATIO_MULT_Y = 0.002232143f;
+constexpr float          DEFAULT_WEAPON_ICON_OFFSET_X = 0.17343046f;
+constexpr float          DEFAULT_CENTER_TEXT_OFFSET_X = 320.0f;
+constexpr std::uintptr_t VAR_WeaponIconOffsetX = 0x866C84;
+constexpr std::uintptr_t VAR_CenterTextOffsetX = 0x85953C;
 
 // CSprite2d::DrawBarChart
 using DrawBarChartFunc = void(__cdecl*)(float, float, std::uint16_t, std::uint32_t, float, bool, bool, bool, RwColor, RwColor);
@@ -64,23 +71,13 @@ CHudSA::CHudSA()
 {
     InitComponentList();
 
-    // Set the default values
-    m_fSniperCrosshairScale = 210.0f;
-
-    m_pfCameraCrosshairScale = (float*)VAR_CameraCrosshairScale;
-    MemPut<float>(m_pfCameraCrosshairScale, 192.0f);
-    m_pfAspectRatioMultiplicator = (float*)VAR_AspectRatioMult;
-    MemPut<float>(m_pfAspectRatioMultiplicator, 0.002232143f);
+    // Set default 4:3 HUD scaling multipliers
+    m_aspectRatioMultX = reinterpret_cast<float*>(VAR_AspectRatioMultX);
+    m_aspectRatioMultY = reinterpret_cast<float*>(VAR_AspectRatioMult);
+    MemPut<float>(m_aspectRatioMultX, DEFAULT_ASPECT_RATIO_MULT_X);
+    MemPut<float>(m_aspectRatioMultY, DEFAULT_ASPECT_RATIO_MULT_Y);
 
     UpdateStreetchCalculations();
-
-    // Patch xrefs to 0x863B34, because this variable seems to be shared (2 other functions without any context access to it; probably a compiler optimization)
-    MemPut<DWORD>(0x58E7D4 + 2, (DWORD)&m_fSniperCrosshairScale);
-    MemPut<DWORD>(0x58E7EA + 2, (DWORD)&m_fSniperCrosshairScale);
-    MemPut<DWORD>(0x53E3ED + 2, (DWORD)&m_fSniperCrosshairScale);
-    MemPut<DWORD>(0x53E41A + 2, (DWORD)&m_fSniperCrosshairScale);
-    MemPut<DWORD>(0x53E488 + 2, (DWORD)&m_fSniperCrosshairScale);
-    MemPut<DWORD>(0x53E4BF + 2, (DWORD)&m_fSniperCrosshairScale);
 
     // Initialize default data
     componentProperties.hpBar = MapGet(defaultComponentProperties, HUD_HEALTH);
@@ -213,8 +210,8 @@ bool CHudSA::IsComponentVisible(eHudComponent component)
 
 void CHudSA::UpdateStreetchCalculations()
 {
-    calcStreetchX = rsGlobal->maximumWidth * (*reinterpret_cast<float*>(VAR_AspectRatioMultX));
-    calcStreetchY = rsGlobal->maximumHeight * (*m_pfAspectRatioMultiplicator);
+    calcStreetchX = rsGlobal->maximumWidth * (*m_aspectRatioMultX);
+    calcStreetchY = rsGlobal->maximumHeight * (*m_aspectRatioMultY);
 
     SComponentPlacement& hpPlacement = componentProperties.hpBar.placement;
     hpPlacement.height = calcStreetchY * 9.0f;
@@ -277,16 +274,19 @@ void CHudSA::UpdateStreetchCalculations()
 //
 void CHudSA::AdjustComponents(float fAspectRatio)
 {
-    // Fix for #7400 (HUD elements do not scale correctly for widescreen)
-    // 0x859524: GTA multiplies all HUD and menu transformation variables by this floating point value. It is equal to 1/448, so just translate it to 16/10 /
-    // 16/9
-    MemPut<float>(m_pfAspectRatioMultiplicator, 0.002232143f / (4.0f / 3.0f) * fAspectRatio);
+    if (fAspectRatio <= 0.0f)
+        return;
 
-    // Set the sniper crosshair scale (fix for #7659)
-    m_fSniperCrosshairScale = 210.0f * (4.0f / 3.0f) / fAspectRatio;
+    // Scale horizontal HUD inversely with aspect ratio and keep vertical scaling at 1/448
+    // so proportions stay 4:3 without inflating vertically on widescreen displays
+    const float scaleX = DEFAULT_ASPECT_RATIO / fAspectRatio;
 
-    // Set the camera crosshair scale (same display flaw as in #7659)
-    MemPut<float>(m_pfCameraCrosshairScale, 192.0f * (4.0f / 3.0f) / fAspectRatio);
+    MemPut<float>(m_aspectRatioMultX, DEFAULT_ASPECT_RATIO_MULT_X * scaleX);
+    MemPut<float>(m_aspectRatioMultY, DEFAULT_ASPECT_RATIO_MULT_Y);
+
+    // Sync pre-divided weapon icon offset (111/640) and centered text offset (320.0f) with MultX
+    MemPut<float>(VAR_WeaponIconOffsetX, DEFAULT_WEAPON_ICON_OFFSET_X * scaleX);
+    MemPut<float>(VAR_CenterTextOffsetX, DEFAULT_CENTER_TEXT_OFFSET_X / scaleX);
 
     UpdateStreetchCalculations();
 }
@@ -297,9 +297,10 @@ void CHudSA::AdjustComponents(float fAspectRatio)
 void CHudSA::ResetComponentAdjustment()
 {
     // Restore default values (4:3 aspect ratio)
-    MemPut<float>(m_pfAspectRatioMultiplicator, 0.002232143f);
-    MemPut<float>(m_pfCameraCrosshairScale, 192.0f);
-    m_fSniperCrosshairScale = 210.0f;
+    MemPut<float>(m_aspectRatioMultX, DEFAULT_ASPECT_RATIO_MULT_X);
+    MemPut<float>(m_aspectRatioMultY, DEFAULT_ASPECT_RATIO_MULT_Y);
+    MemPut<float>(VAR_WeaponIconOffsetX, DEFAULT_WEAPON_ICON_OFFSET_X);
+    MemPut<float>(VAR_CenterTextOffsetX, DEFAULT_CENTER_TEXT_OFFSET_X);
 
     UpdateStreetchCalculations();
 }

@@ -506,7 +506,7 @@ void CSettingsSA::SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabl
     {
         VideoMode modeInfo;
         pGame->GetSettings()->GetVideoModeInfo(&modeInfo, pGame->GetSettings()->GetCurrentVideoMode());
-        fValue = modeInfo.width / (float)modeInfo.height;
+        fValue = modeInfo.height > 0 ? (modeInfo.width / static_cast<float>(modeInfo.height)) : (4.0f / 3.0f);
     }
     else if (m_AspectRatio == ASPECT_RATIO_4_3)
     {

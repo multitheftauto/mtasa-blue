@@ -392,14 +392,14 @@ void CGraphics::SetAspectRatioAdjustmentSuspended(bool bSuspended)
     m_pAspectRatioConverter->SetSuspended(bSuspended);
 }
 
-float CGraphics::ConvertPositionForAspectRatio(float fY)
+float CGraphics::ConvertPositionForAspectRatio(float x)
 {
-    return m_pAspectRatioConverter->ConvertPositionForAspectRatio(fY);
+    return m_pAspectRatioConverter->ConvertPositionForAspectRatio(x);
 }
 
-void CGraphics::ConvertSideForAspectRatio(float* pfY, float* pfHeight)
+void CGraphics::ConvertSideForAspectRatio(float* x, float* width)
 {
-    m_pAspectRatioConverter->ConvertSideForAspectRatio(pfY, pfHeight);
+    m_pAspectRatioConverter->ConvertSideForAspectRatio(x, width);
 }
 
 //
@@ -955,8 +955,8 @@ void CGraphics::SetCursorPosition(int iX, int iY, DWORD Flags)
 
 void CGraphics::DrawLineQueued(float fX1, float fY1, float fX2, float fY2, float fWidth, unsigned long ulColor, bool bPostGUI)
 {
-    fY1 = m_pAspectRatioConverter->ConvertPositionForAspectRatio(fY1);
-    fY2 = m_pAspectRatioConverter->ConvertPositionForAspectRatio(fY2);
+    fX1 = m_pAspectRatioConverter->ConvertPositionForAspectRatio(fX1);
+    fX2 = m_pAspectRatioConverter->ConvertPositionForAspectRatio(fX2);
 
     // Set up a queue item
     sDrawQueueItem Item;
@@ -1014,7 +1014,7 @@ void CGraphics::DrawMaterialLine3DQueued(const CVector& vecBegin, const CVector&
 
 void CGraphics::DrawRectQueued(float fX, float fY, float fWidth, float fHeight, unsigned long ulColor, bool bPostGUI, bool bSubPixelPositioning)
 {
-    m_pAspectRatioConverter->ConvertSideForAspectRatio(&fY, &fHeight);
+    m_pAspectRatioConverter->ConvertSideForAspectRatio(&fX, &fWidth);
 
     // Set up a queue item
     sDrawQueueItem Item;
@@ -1074,7 +1074,7 @@ void CGraphics::DrawPrimitiveQueued(std::vector<PrimitiveVertice>* pVecVertices,
 
     for (auto& vert : *pVecVertices)
     {
-        vert.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio(vert.fY);
+        vert.fX = m_pAspectRatioConverter->ConvertPositionForAspectRatio(vert.fX);
     }
 
     // Set up a queue item
@@ -1142,7 +1142,7 @@ void CGraphics::DrawMaterialPrimitiveQueued(std::vector<PrimitiveMaterialVertice
 
     for (auto& vert : *pVecVertices)
     {
-        vert.fY = m_pAspectRatioConverter->ConvertPositionForAspectRatio(vert.fY);
+        vert.fX = m_pAspectRatioConverter->ConvertPositionForAspectRatio(vert.fX);
     }
 
     if (CShaderItem* pShaderItem = DynamicCast<CShaderItem>(pMaterial))
@@ -1213,7 +1213,7 @@ bool CGraphics::IsValidPrimitiveSize(int iNumVertives, D3DPRIMITIVETYPE eType)
 void CGraphics::DrawTextureQueued(float fX, float fY, float fWidth, float fHeight, float fU, float fV, float fSizeU, float fSizeV, bool bRelativeUV,
                                   CMaterialItem* pMaterial, float fRotation, float fRotCenOffX, float fRotCenOffY, unsigned long ulColor, bool bPostGUI)
 {
-    m_pAspectRatioConverter->ConvertSideForAspectRatio(&fY, &fHeight);
+    m_pAspectRatioConverter->ConvertSideForAspectRatio(&fX, &fWidth);
 
     // Set up a queue item
     sDrawQueueItem Item;
@@ -1283,8 +1283,8 @@ void CGraphics::DrawStringQueued(float fLeft, float fTop, float fRight, float fB
     if (!pDXFont)
         return;
 
-    fTop = m_pAspectRatioConverter->ConvertPositionForAspectRatio(fTop);
-    fBottom = m_pAspectRatioConverter->ConvertPositionForAspectRatio(fBottom);
+    fLeft = m_pAspectRatioConverter->ConvertPositionForAspectRatio(fLeft);
+    fRight = m_pAspectRatioConverter->ConvertPositionForAspectRatio(fRight);
 
     if (!bColorCoded)
     {
@@ -1739,7 +1739,7 @@ void CGraphics::OnDeviceCreate(IDirect3DDevice9* pDevice)
         GetRenderItemManager()->CreateTexture(CalcMTASAPath("MTA\\cgui\\images\\busy_spinner.png"), NULL, false, -1, -1, RFORMAT_DXT3, TADDRESS_CLAMP);
     CPixels rectEdge = {CBuffer(g_rectEdgePixelsData, sizeof(g_rectEdgePixelsData))};
     m_RectangleEdgeTexture = GetRenderItemManager()->CreateTexture(nullptr, &rectEdge, false, 8, 8, RFORMAT_ARGB, TADDRESS_CLAMP);
-    m_pAspectRatioConverter->Init(GetViewportHeight());
+    m_pAspectRatioConverter->Init(GetViewportWidth());
 }
 
 void CGraphics::OnDeviceInvalidate(IDirect3DDevice9* pDevice)
@@ -1804,7 +1804,7 @@ void CGraphics::OnDeviceRestore(IDirect3DDevice9* pDevice)
     {
         m_pRenderItemManager->OnViewportSizeChanged(uiViewportWidth, uiViewportHeight);
         UpdateRenderTargetMatrices(uiViewportWidth, uiViewportHeight);
-        m_pAspectRatioConverter->Init(uiViewportHeight);
+        m_pAspectRatioConverter->Init(uiViewportWidth);
     }
     else
     {
@@ -2261,7 +2261,7 @@ void CGraphics::RefreshViewportIfNeeded()
     CDirect3DData::GetSingleton().StoreViewport(viewport.X, viewport.Y, targetWidth, targetHeight);
     m_pRenderItemManager->OnViewportSizeChanged(targetWidth, targetHeight);
     UpdateRenderTargetMatrices(targetWidth, targetHeight);
-    m_pAspectRatioConverter->Init(targetHeight);
+    m_pAspectRatioConverter->Init(targetWidth);
     m_bPendingViewportRefresh = false;
     m_uiPendingViewportRefreshTries = 0;
     m_uiViewportLastAppliedSerial = m_uiViewportRefreshSerial;
@@ -2502,10 +2502,11 @@ void CGraphics::DidRenderScene()
     SAFE_RELEASE(m_pSavedFrontBufferData);
     SAFE_RELEASE(m_pTempBackBufferData);
     m_LastRenderedSceneTimer.Reset();
-    float fTargetAspectRatioValue = 0;
+    // Convert non-4:3 scripts against 4:3 when hud_match_aspect_ratio is off (GTA HUD stays 4:3)
+    float targetAspectRatioValue = 4.0f / 3.0f;
     if (CVARS_GET_VALUE<bool>("hud_match_aspect_ratio"))
-        fTargetAspectRatioValue = CCore::GetSingleton().GetGame()->GetSettings()->GetAspectRatioValue();
-    m_pAspectRatioConverter->Pulse(fTargetAspectRatioValue);
+        targetAspectRatioValue = CCore::GetSingleton().GetGame()->GetSettings()->GetAspectRatioValue();
+    m_pAspectRatioConverter->Pulse(targetAspectRatioValue);
 }
 
 ////////////////////////////////////////////////////////////////

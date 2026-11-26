@@ -123,8 +123,8 @@ public:
     virtual bool  IsAspectRatioAdjustmentEnabled() = 0;
     virtual float GetAspectRatioAdjustmentSourceRatio() = 0;
     virtual void  SetAspectRatioAdjustmentSuspended(bool bSuspended) = 0;
-    virtual float ConvertPositionForAspectRatio(float fY) = 0;
-    virtual void  ConvertSideForAspectRatio(float* pfY, float* pfHeight) = 0;
+    virtual float ConvertPositionForAspectRatio(float x) = 0;
+    virtual void  ConvertSideForAspectRatio(float* x, float* width) = 0;
 
     virtual float GetDXFontHeight(float fScale = 1.0f, ID3DXFont* pDXFont = NULL) = 0;
     virtual float GetDXCharacterWidth(char c, float fScale = 1.0f, ID3DXFont* pDXFont = NULL) = 0;
