@@ -29281,6 +29281,18 @@ uint32 CModelNames::GetModelID(const SString& strName)
 }
 
 //
+// Get a clothes model ID from its name (case insensitive)
+//
+uint32 CModelNames::GetClothesModelID(const SString& strName)
+{
+    InitializeMaps();
+    uint32* pusModelID = MapFind(ms_NameClothesModelIDMap, strName.ToLower());
+    if (pusModelID)
+        return *pusModelID;
+    return INVALID_MODEL_ID;
+}
+
+//
 // Get a clothes texture ID from its name (case insensitive)
 //
 uint32 CModelNames::GetClothesTexID(const SString& strName)

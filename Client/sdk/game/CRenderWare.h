@@ -124,4 +124,9 @@ public:
     virtual void RwMatrixSetPosition(RwMatrix& rwInOutMatrix, const CVector& vecPosition) = 0;
     virtual void RwMatrixGetScale(const RwMatrix& rwMatrix, CVector& vecOutScale) = 0;
     virtual void RwMatrixSetScale(RwMatrix& rwInOutMatrix, const CVector& vecScale) = 0;
+
+    // Clothing items are files in player.img (usFileId is the index of the file in the archive), not entries of the model info array
+    virtual bool GetClothesTextureNames(std::vector<SString>& outNameList, ushort usFileId) = 0;
+    virtual bool GetClothesTextures(std::vector<std::tuple<std::string, CPixels>>& outTextureList, ushort usFileId,
+                                    const std::vector<SString>& vTextureNames) = 0;
 };

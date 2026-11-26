@@ -18,6 +18,7 @@ class CModelNames
 {
 public:
     static uint32      GetModelID(const SString& strName);
+    static uint32      GetClothesModelID(const SString& strName);
     static uint32      GetClothesTexID(const SString& strName);
     static const char* GetModelName(uint32 usModelID);
     static uint32      ResolveModelID(const SString& strModelNameOrNumber);
