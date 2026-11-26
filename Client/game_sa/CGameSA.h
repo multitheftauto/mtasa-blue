@@ -317,6 +317,8 @@ public:
     void RemoveGameWorld();
     void RestoreGameWorld();
 
+    void ReleaseStreamedModels();
+
     bool SetBuildingPoolSize(size_t size);
 
 private:

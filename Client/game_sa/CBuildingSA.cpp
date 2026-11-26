@@ -113,7 +113,7 @@ void CBuildingSA::RemoveAllocatedMatrix()
         return;
 
     g_matrixPool.RemoveItem(reinterpret_cast<CMatrixLinkSAInterface*>(m_pInterface->matrix));
-    g_matrixPool.SetCapacity(0);
+    g_matrixPool.ReleaseUnusedParts();
 
     m_pInterface->matrix = nullptr;
 }
