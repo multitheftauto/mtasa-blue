@@ -41,4 +41,6 @@ public:
     static bool FxCreateParticle(FxParticleSystems::Enum eParticleSystem, CVector vecPosition, CVector vecDirection, float fR, float fG, float fB, float fA,
                                  std::optional<bool> bRandomizeColors, std::optional<std::uint32_t> iCount, std::optional<float> fBrightness,
                                  std::optional<float> fSize, std::optional<bool> bRandomizeSizes, std::optional<float> fLife);
+    static bool FxAddShadow(std::variant<eShadowTextureType, CClientTexture*> texture, CVector vecPosition, CVector2D vecOffset1, CVector2D vecOffset2,
+                            SColor color, eShadowType shadowType, float zDistance, bool bDrawOnWater, bool bDrawOnBuildings);
 };

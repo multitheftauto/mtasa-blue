@@ -10,6 +10,10 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <game/RenderWare.h>
+#include <game/RenderWareD3D.h>
+#include "gamesa_renderware.h"
+#include "CVector2D.h"
 #include "CFxSA.h"
 #include "CEntitySA.h"
 
@@ -358,4 +362,108 @@ void CFxSA::AddParticle(FxParticleSystems::Enum eFxParticle, const CVector& vecP
         ((int(__thiscall*)(FxSystem_c*, const CVector*, const CVector*, float, FxPrtMult_c*, float, float, float, int))FUNC_FXSystem_c_AddParticle)(
             fxParticleSystem, &vecPosition, &newDirection, 0, &fxPrt, -1.0f, fBrightness, 0, 0);
     }
+}
+
+namespace
+{
+    constexpr unsigned int MAX_SCRIPT_SHADOWS = 48;
+    RwTexture*             customShadowTextures[MAX_SCRIPT_SHADOWS] = {};
+
+    void DestroyCustomShadowTexture(RwTexture* texture)
+    {
+        if (!texture)
+            return;
+        auto native = reinterpret_cast<RwD3D9Raster*>(&texture->raster->renderResource);
+        if (native->texture)
+            native->texture->Release();
+        native->texture = nullptr;
+        RwTextureDestroy(texture);
+    }
+
+    unsigned short& StoredShadowCount()
+    {
+        return *reinterpret_cast<unsigned short*>(VAR_FXSystem_StoreShadows);
+    }
+}
+
+CFxSA::~CFxSA()
+{
+    ClearCustomShadows(true);
+}
+
+void CFxSA::ClearCustomShadows(bool force)
+{
+    // GTA consumes the queue before the pre-FX callback. Keep textures alive if
+    // rendering was skipped; device invalidation instead discards the queue.
+    if (force)
+        StoredShadowCount() = 0;
+    else if (StoredShadowCount() != 0)
+        return;
+
+    for (auto& texture : customShadowTextures)
+    {
+        DestroyCustomShadowTexture(texture);
+        texture = nullptr;
+    }
+}
+
+bool CFxSA::IsShadowsLimitReached()
+{
+    return StoredShadowCount() >= MAX_SCRIPT_SHADOWS;
+}
+
+bool CFxSA::AddShadow(eShadowTextureType shadowTextureType, const CVector& vecPosition, const CVector2D& vecOffset1, const CVector2D& vecOffset2, SColor color,
+                      eShadowType shadowType, float fZDistance, bool bDrawOnWater, bool bDrawOnBuildings, IDirect3DBaseTexture9* customTexture)
+{
+    if (IsShadowsLimitReached() || shadowTextureType < eShadowTextureType::CAR || shadowTextureType >= eShadowTextureType::COUNT)
+        return false;
+
+    const auto index = StoredShadowCount();
+    RwTexture* texture = reinterpret_cast<RwTexture**>(TEXTURE_FXSystem_Shadow)[static_cast<unsigned int>(shadowTextureType)];
+    if (customTexture)
+    {
+        if (customTexture->GetType() != D3DRTYPE_TEXTURE)
+            return false;
+        D3DSURFACE_DESC desc;
+        auto            d3dTexture = static_cast<IDirect3DTexture9*>(customTexture);
+        if (FAILED(d3dTexture->GetLevelDesc(0, &desc)))
+            return false;
+
+        // A real RW raster without pixel allocation. The queue holds its own
+        // COM reference, so destroying the Lua element cannot invalidate it.
+        RwRaster* raster = RwRasterCreate(desc.Width, desc.Height, 32, 0x0500 | 0x04 | 0x80);  // 8888 | TEXTURE | DONTALLOCATE
+        if (!raster)
+            return false;
+        texture = RwTextureCreate(raster);
+        if (!texture)
+        {
+            reinterpret_cast<int(__cdecl*)(RwRaster*)>(0x7FB020)(raster);  // RwRasterDestroy
+            return false;
+        }
+        raster->width = desc.Width;
+        raster->height = desc.Height;
+        raster->depth = 32;
+        raster->format = 0x05;  // 8888
+        auto native = reinterpret_cast<RwD3D9Raster*>(&raster->renderResource);
+        d3dTexture->AddRef();
+        native->texture = d3dTexture;
+        native->alpha = true;
+        native->format = desc.Format;
+        if (desc.Format >= D3DFMT_DXT1 && desc.Format <= D3DFMT_DXT5)
+            native->textureFlags |= 0x10;
+        texture->flags = 0x3302;  // linear filtering, clamp U/V
+
+        // A reused queue index can only refer to an already consumed frame.
+        DestroyCustomShadowTexture(customShadowTextures[index]);
+        customShadowTextures[index] = texture;
+    }
+    if (!texture || !texture->raster)
+        return false;
+
+    using StoreShadow = void(__cdecl*)(unsigned char, RwTexture*, const CVector*, float, float, float, float, short, unsigned char, unsigned char,
+                                       unsigned char, float, bool, float, void*, bool);
+    reinterpret_cast<StoreShadow>(FUNC_FXSystem_StoreShadows)(static_cast<unsigned char>(shadowType), texture, &vecPosition, vecOffset1.fX, vecOffset1.fY,
+                                                              vecOffset2.fX, vecOffset2.fY, color.A, color.R, color.G, color.B, fZDistance, bDrawOnWater, 1.0f,
+                                                              nullptr, bDrawOnBuildings);
+    return StoredShadowCount() > index;
 }
