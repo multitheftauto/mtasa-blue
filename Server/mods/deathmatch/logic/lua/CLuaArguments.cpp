@@ -10,6 +10,7 @@
  *****************************************************************************/
 
 #include "StdInc.h"
+#include <unordered_set>
 #include "CLuaArguments.h"
 #include "CLuaMain.h"
 #include "CGame.h"
@@ -624,8 +625,56 @@ bool CLuaArguments::WriteToBitStream(NetBitStreamInterface& bitStream, CFastHash
     return bSuccess;
 }
 
+namespace
+{
+    // Expanding shared tables can turn a small Lua graph into a huge JSON tree.
+    constexpr std::size_t MAX_JSON_EXPANDED_BYTES = 16 * 1024 * 1024;
+    constexpr std::size_t MAX_JSON_TABLE_DEPTH = 64;
+    constexpr std::size_t JSON_VALUE_OVERHEAD = 64;
+
+    bool CanExpandJSON(const CLuaArguments& arguments, std::unordered_set<const CLuaArguments*>& activeTables, std::size_t& remainingBytes, std::size_t depth)
+    {
+        for (auto* argument : arguments)
+        {
+            if (remainingBytes < JSON_VALUE_OVERHEAD)
+                return false;
+
+            remainingBytes -= JSON_VALUE_OVERHEAD;
+            if (argument->GetType() == LUA_TSTRING)
+            {
+                // JSON escaping can use up to six bytes per input byte.
+                const auto length = argument->GetString().length();
+                if (length > remainingBytes / 6)
+                    return false;
+
+                remainingBytes -= length * 6;
+            }
+            else if (argument->GetType() == LUA_TTABLE)
+            {
+                auto* table = argument->GetTable();
+                if (depth >= MAX_JSON_TABLE_DEPTH || !activeTables.insert(table).second)
+                    return false;
+
+                const bool valid = CanExpandJSON(*table, activeTables, remainingBytes, depth + 1);
+                activeTables.erase(table);
+                if (!valid)
+                    return false;
+            }
+        }
+        return true;
+    }
+}
+
 bool CLuaArguments::WriteToJSONString(std::string& strJSON, bool bSerialize, int flags)
 {
+    if (!bSerialize)
+    {
+        std::unordered_set<const CLuaArguments*> activeTables;
+        std::size_t                              remainingBytes = MAX_JSON_EXPANDED_BYTES;
+        if (!CanExpandJSON(*this, activeTables, remainingBytes, 0))
+            return false;
+    }
+
     json_object* my_array = WriteToJSONArray(bSerialize);
     if (my_array)
     {
@@ -721,6 +770,10 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
                 break;
             }
         }
+        // Only the internal serialization format preserves table identity.
+        if (!bSerialize)
+            pKnownTables->erase(this);
+
         if (bKnownTablesCreated)
             delete pKnownTables;
         return my_array;
@@ -749,6 +802,10 @@ json_object* CLuaArguments::WriteTableToJSONObject(bool bSerialize, CFastHashMap
                 break;
             }
         }
+        // Only the internal serialization format preserves table identity.
+        if (!bSerialize)
+            pKnownTables->erase(this);
+
         if (bKnownTablesCreated)
             delete pKnownTables;
         return my_object;

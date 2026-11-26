@@ -188,9 +188,8 @@ int CLuaFunctionDefs::Set(lua_State* luaVM)
         {
             std::string strResourceName = pResource->GetName();
             std::string strJSON;
-            Args.WriteToJSONString(strJSON);
-
-            if (g_pGame->GetSettings()->Set(strResourceName.c_str(), strSetting.c_str(), strJSON.c_str()))
+            // Do not overwrite a setting when its JSON representation cannot be produced.
+            if (Args.WriteToJSONString(strJSON) && g_pGame->GetSettings()->Set(strResourceName.c_str(), strSetting.c_str(), strJSON.c_str()))
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
