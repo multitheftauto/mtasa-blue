@@ -151,6 +151,7 @@ public:
     bool ResetDynamicPedShadows() noexcept;
 
     float        GetAspectRatioValue();
+    float        GetBaseFieldOfView() const override;
     eAspectRatio GetAspectRatio();
     void         SetAspectRatio(eAspectRatio aspectRatio, bool bAdjustmentEnabled = true);
 
