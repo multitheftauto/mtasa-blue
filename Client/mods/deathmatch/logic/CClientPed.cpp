@@ -5938,7 +5938,7 @@ bool CClientPed::IsAnimationInProgress()
 }
 
 void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const char* szAnimName, int iTime, int iBlend, bool bLoop, bool bUpdatePosition,
-                                   bool bInterruptible, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame)
+                                   bool bInterruptible, bool bFreezeLastFrame, bool bRunInSequence, bool bOffsetPed, bool bHoldLastFrame, bool isSecondary)
 {
     /* lil_Toady: this seems to break things
     // Kill any current animation that might be running
@@ -5995,10 +5995,19 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
                                                                              bRunInSequence, bOffsetPed, bHoldLastFrame);
             if (pTask)
             {
-                pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
-                KillTaskSecondary(TASK_SECONDARY_ATTACK);
-                KillTaskSecondary(TASK_SECONDARY_IK);
-                g_pClientGame->InsertRunNamedAnimTaskToMap(reinterpret_cast<CTaskSimpleRunNamedAnimSAInterface*>(pTask->GetInterface()), this);
+                if (isSecondary)
+                {
+                    KillTaskSecondary(TASK_SECONDARY_PARTIAL_ANIM);
+                    pTask->SetAsSecondaryPedTask(m_pPlayerPed, TASK_SECONDARY_PARTIAL_ANIM);
+                    g_pClientGame->InsertRunNamedAnimTaskToMap(reinterpret_cast<CTaskSimpleRunNamedAnimSAInterface*>(pTask->GetInterface()), this);
+                }
+                else
+                {
+                    pTask->SetAsPedTask(m_pPlayerPed, TASK_PRIORITY_PRIMARY);
+                    KillTaskSecondary(TASK_SECONDARY_ATTACK);
+                    KillTaskSecondary(TASK_SECONDARY_IK);
+                    g_pClientGame->InsertRunNamedAnimTaskToMap(reinterpret_cast<CTaskSimpleRunNamedAnimSAInterface*>(pTask->GetInterface()), this);
+                }
             }
         }
         else
@@ -6024,6 +6033,7 @@ void CClientPed::RunNamedAnimation(std::unique_ptr<CAnimBlock>& pBlock, const ch
     m_AnimationCache.bUpdatePosition = bUpdatePosition;
     m_AnimationCache.bInterruptible = bInterruptible;
     m_AnimationCache.bFreezeLastFrame = bFreezeLastFrame;
+    m_AnimationCache.isSecondary = isSecondary;
 }
 
 void CClientPed::KillAnimation()
@@ -6036,14 +6046,16 @@ void CClientPed::KillAnimation()
             int iTaskType = pTask->GetTaskType();
             if (iTaskType == TASK_SIMPLE_NAMED_ANIM || iTaskType == TASK_SIMPLE_ANIM)
             {
-                pTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_IMMEDIATE, NULL);
+                pTask->MakeAbortable(m_pPlayerPed, ABORT_PRIORITY_IMMEDIATE, nullptr);
                 pTask->Destroy();
                 m_pTaskManager->RemoveTask(TASK_PRIORITY_PRIMARY);
             }
         }
+        KillTaskSecondary(TASK_SECONDARY_PARTIAL_ANIM);
     }
-    m_pAnimationBlock = NULL;
+    m_pAnimationBlock = nullptr;
     m_AnimationCache.strName = "";
+    m_AnimationCache.isSecondary = false;
     m_bRequestedAnimation = false;
     SetNextAnimationNormal();
 }
@@ -6067,7 +6079,8 @@ void CClientPed::RunAnimationFromCache()
 
     // Run our animation
     RunNamedAnimation(m_pAnimationBlock, animName.c_str(), m_AnimationCache.iTime, m_AnimationCache.iBlend, m_AnimationCache.bLoop,
-                      m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptible, m_AnimationCache.bFreezeLastFrame);
+                      m_AnimationCache.bUpdatePosition, m_AnimationCache.bInterruptible, m_AnimationCache.bFreezeLastFrame, false, false, false,
+                      m_AnimationCache.isSecondary);
 
     // Set anim progress & speed
     m_AnimationCache.progressWaitForStreamIn = true;

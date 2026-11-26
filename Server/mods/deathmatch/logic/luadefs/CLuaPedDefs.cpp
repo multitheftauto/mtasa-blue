@@ -398,7 +398,7 @@ int CLuaPedDefs::IsPedFrozen(lua_State* luaVM)
 bool CLuaPedDefs::SetPedAnimation(CElement* pPed, std::optional<std::variant<std::string, std::monostate, bool>> blockName,
                                   std::optional<std::variant<std::string, std::monostate, bool>> animName, std::optional<int> time, std::optional<bool> loop,
                                   std::optional<bool> updatePosition, std::optional<bool> interruptable, std::optional<bool> freezeLastFrame,
-                                  std::optional<int> blendTime, std::optional<bool> restoreTask)
+                                  std::optional<int> blendTime, std::optional<bool> restoreTask, std::optional<bool> isSecondary)
 {
     std::string animBlockName;
     std::string animationName;
@@ -423,7 +423,7 @@ bool CLuaPedDefs::SetPedAnimation(CElement* pPed, std::optional<std::variant<std
 
     return CStaticFunctionDefinitions::SetPedAnimation(pPed, animBlockName, animationName, time.value_or(-1), blendTime.value_or(250), loop.value_or(true),
                                                        updatePosition.value_or(true), interruptable.value_or(true), freezeLastFrame.value_or(true),
-                                                       restoreTask.value_or(false));
+                                                       restoreTask.value_or(false), isSecondary.value_or(false));
 }
 
 int CLuaPedDefs::SetPedAnimationProgress(lua_State* luaVM)
