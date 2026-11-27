@@ -59,6 +59,40 @@ static void __declspec(naked) HOOK_CPed_DoFootLanded()
 
 //////////////////////////////////////////////////////////////////////////////////////////
 //
+// CPed::ProcessEntityCollision
+//
+// Skip the landing damage of the fall animation while the ped is climbing
+//
+//////////////////////////////////////////////////////////////////////////////////////////
+#define HOOKPOS_CPed_ProcessEntityCollision  0x5E2FF0
+#define HOOKSIZE_CPed_ProcessEntityCollision 5
+static const DWORD CONTINUE_CPed_ProcessEntityCollision = 0x5E2FF5;
+static const DWORD SKIP_CPed_ProcessEntityCollision = 0x5E3099;
+static const DWORD FUNC_CPedIntelligence_GetTaskClimb = 0x601180;
+
+static void __declspec(naked) HOOK_CPed_ProcessEntityCollision()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        mov     ecx, [esi+47Ch]     // CPed::m_pIntelligence
+        call    FUNC_CPedIntelligence_GetTaskClimb
+        test    eax, eax
+        jnz     skip
+
+        mov     eax, ds:[0B7CB84h]  // CTimer::m_snTimeInMilliseconds
+        jmp     CONTINUE_CPed_ProcessEntityCollision
+
+    skip:
+        jmp     SKIP_CPed_ProcessEntityCollision
+    }
+    // clang-format on
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+//
 // CTaskSimpleJetPack::RenderJetPack / CAEPedAudioEntity::UpdateJetPack
 //
 // Hide and mute a ped's jetpack whenever the ped itself is hidden due to being in a different
@@ -213,6 +247,7 @@ static void __declspec(naked) HOOK_CAEPedAudioEntity_UpdateJetPack()
 void CMultiplayerSA::InitHooks_Peds()
 {
     EZHookInstall(CPed_DoFootLanded);
+    EZHookInstall(CPed_ProcessEntityCollision);
 
     HookInstall(HOOKPOS_CTaskSimpleJetPack_RenderJetPack, (DWORD)HOOK_CTaskSimpleJetPack_RenderJetPack, 12);
     HookInstall(HOOKPOS_CAEPedAudioEntity_UpdateJetPack, (DWORD)HOOK_CAEPedAudioEntity_UpdateJetPack, 6);
