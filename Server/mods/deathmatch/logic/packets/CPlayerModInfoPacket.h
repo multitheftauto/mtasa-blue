@@ -15,17 +15,17 @@
 
 struct SModInfoItem
 {
-    ushort  usId;
-    uint    uiHash;
+    ushort  usId = 0;
+    uint    uiHash = 0;
     SString strName;
-    bool    bHasSize;
+    bool    bHasSize = false;
     CVector vecSize;
     CVector vecOriginalSize;
-    bool    bHasHashInfo;
-    uint    uiShortBytes;
+    bool    bHasHashInfo = false;
+    uint    uiShortBytes = 0;
     SString strShortMd5;
     SString strShortSha256;
-    uint    uiLongBytes;
+    uint    uiLongBytes = 0;
     SString strLongMd5;
     SString strLongSha256;
 };
