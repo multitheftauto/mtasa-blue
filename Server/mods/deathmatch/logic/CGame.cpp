@@ -3596,6 +3596,7 @@ void CGame::Packet_Vehicle_InOut(CVehicleInOutPacket& Packet)
                                             // Tell everyone he can start exiting the vehicle
                                             CVehicleInOutPacket Reply(PedID, VehicleID, static_cast<unsigned char>(occupiedSeat), VEHICLE_REQUEST_OUT_CONFIRMED,
                                                                       Packet.GetDoor());
+                                            Reply.SetForceExit(Packet.GetForceExit());
                                             m_pPlayerManager->BroadcastOnlyJoined(Reply);
                                         }
                                         else

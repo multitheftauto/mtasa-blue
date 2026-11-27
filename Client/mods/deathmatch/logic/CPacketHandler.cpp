@@ -1891,6 +1891,10 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
 
                     case CClientGame::VEHICLE_REQUEST_OUT_CONFIRMED:
                     {
+                        bool forceExit = false;
+                        if (bitStream.Can(eBitStreamVersion::PedExitVehicleForce))
+                            bitStream.ReadBit(forceExit);
+
                         unsigned char ucDoor = 0;
 
                         if (!bitStream.ReadBits(&ucDoor, 2))
@@ -1904,7 +1908,7 @@ void CPacketHandler::Packet_Vehicle_InOut(NetBitStreamInterface& bitStream)
                             pPed->m_ucVehicleInOutSeat = ucSeat;
                         }
 
-                        pPed->GetOutOfVehicle(ucDoor);
+                        pPed->GetOutOfVehicle(ucDoor, forceExit);
 
                         // Remember that this ped is working on leaving a vehicle
                         pPed->SetVehicleInOutState(VEHICLE_INOUT_GETTING_OUT);
