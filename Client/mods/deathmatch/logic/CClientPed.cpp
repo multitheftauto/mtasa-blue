@@ -731,7 +731,7 @@ void CClientPed::SetRotationRadiansNew(const CVector& vecRotation)
     SetMatrix(matTemp);
 
     // For on ground
-    SetCurrentRotation(vecRotation.fZ);
+    SetCurrentRotationInternal(vecRotation.fZ, true, false);
     if (!IS_PLAYER(this))
         SetCameraRotation(-vecRotation.fZ);
 }
@@ -3418,6 +3418,11 @@ float CClientPed::GetCurrentRotation()
 
 void CClientPed::SetCurrentRotation(float fRotation, bool bIncludeTarget)
 {
+    SetCurrentRotationInternal(fRotation, bIncludeTarget, true);
+}
+
+void CClientPed::SetCurrentRotationInternal(float fRotation, bool bIncludeTarget, bool bUpdateCachedMatrices)
+{
     // A newer rotation write supersedes a pending script rotation
     m_bHasScriptRotationOverride = false;
 
@@ -3439,10 +3444,16 @@ void CClientPed::SetCurrentRotation(float fRotation, bool bIncludeTarget)
             m_fTargetRotation = fRotation;
     }
 
+    if (!bUpdateCachedMatrices)
+        return;
+
     // Always update m_Matrix rotation so m_matFrozen gets correct value in SetFrozen
     CVector vecRotation = m_Matrix.GetRotation();
     vecRotation.fZ = fRotation;
     m_Matrix.SetRotation(vecRotation);
+
+    if (IsFrozen())
+        m_matFrozen.SetRotation(vecRotation);
 }
 
 void CClientPed::SetTargetRotation(float fRotation)
