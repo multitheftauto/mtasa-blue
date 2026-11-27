@@ -14,6 +14,8 @@
 #include <gtest/gtest.h>
 #include "MockBitStream.h"
 #include <net/SyncStructures.h>
+#include <limits>
+#include <new>
 
 // ============================================================================
 // Vehicle turret
@@ -365,6 +367,139 @@ TEST(SUnoccupiedVehicleSync, RoundTrip_WithVelocity)
     EXPECT_NEAR(10.0f, out.data.vecVelocity.fY, 0.05f);
     EXPECT_NEAR(-2.0f, out.data.vecVelocity.fZ, 0.05f);
     EXPECT_NEAR(800.0f, out.data.fHealth, 0.6f);
+}
+
+TEST(SUnoccupiedVehicleSync, DefaultConstructorInitializesAllFields)
+{
+    alignas(SUnoccupiedVehicleSync) unsigned char raw[sizeof(SUnoccupiedVehicleSync)];
+    std::memset(raw, 0xAA, sizeof(raw));
+
+    auto* sync = new (raw) SUnoccupiedVehicleSync();
+    EXPECT_FALSE(sync->data.bSyncPosition);
+    EXPECT_FALSE(sync->data.bSyncRotation);
+    EXPECT_FALSE(sync->data.bSyncVelocity);
+    EXPECT_FALSE(sync->data.bSyncTurnVelocity);
+    EXPECT_FALSE(sync->data.bSyncHealth);
+    EXPECT_FALSE(sync->data.bSyncTrailer);
+    EXPECT_FALSE(sync->data.bEngineOn);
+    EXPECT_FALSE(sync->data.bDerailed);
+    EXPECT_FALSE(sync->data.bIsInWater);
+    EXPECT_FLOAT_EQ(0.0f, sync->data.fHealth);
+    EXPECT_EQ(ElementID(INVALID_ELEMENT_ID), sync->data.trailer);
+    EXPECT_EQ(ElementID(INVALID_ELEMENT_ID), sync->data.vehicleID);
+    EXPECT_EQ(0, sync->data.ucTimeContext);
+    sync->~SUnoccupiedVehicleSync();
+}
+
+TEST(SUnoccupiedVehicleSync, RoundTrip_AllFields)
+{
+    MockBitStream          bs;
+    SUnoccupiedVehicleSync sync;
+    sync.data.vehicleID = ElementID(321);
+    sync.data.ucTimeContext = 15;
+    sync.data.bSyncPosition = true;
+    sync.data.bSyncRotation = true;
+    sync.data.bSyncVelocity = true;
+    sync.data.bSyncTurnVelocity = true;
+    sync.data.bSyncHealth = true;
+    sync.data.bSyncTrailer = true;
+    sync.data.bEngineOn = true;
+    sync.data.bDerailed = true;
+    sync.data.bIsInWater = true;
+    sync.data.vecPosition = CVector(120.0f, -450.0f, 18.5f);
+    sync.data.vecRotation = CVector(10.0f, 20.0f, 180.0f);
+    sync.data.vecVelocity = CVector(2.0f, -4.0f, 1.0f);
+    sync.data.vecTurnVelocity = CVector(0.1f, -0.2f, 0.3f);
+    sync.data.fHealth = 950.0f;
+    sync.data.trailer = ElementID(654);
+
+    sync.Write(bs);
+    bs.ResetReadPointer();
+
+    SUnoccupiedVehicleSync out;
+    EXPECT_TRUE(out.Read(bs));
+    EXPECT_EQ(ElementID(321), out.data.vehicleID);
+    EXPECT_EQ(15, out.data.ucTimeContext);
+    EXPECT_TRUE(out.data.bEngineOn);
+    EXPECT_TRUE(out.data.bDerailed);
+    EXPECT_TRUE(out.data.bIsInWater);
+    EXPECT_NEAR(120.0f, out.data.vecPosition.fX, 0.01f);
+    EXPECT_NEAR(180.0f, out.data.vecRotation.fZ, 0.1f);
+    EXPECT_NEAR(0.3f, out.data.vecTurnVelocity.fZ, 0.05f);
+    EXPECT_NEAR(950.0f, out.data.fHealth, 0.6f);
+    EXPECT_EQ(ElementID(654), out.data.trailer);
+}
+
+static void WriteUnoccupiedVehicleHeader(NetBitStreamInterface& wire, const SUnoccupiedVehicleSync& header)
+{
+    wire.Write(header.data.vehicleID);
+    wire.Write(header.data.ucTimeContext);
+    wire.WriteBits(reinterpret_cast<const char*>(&header.data), 9);
+}
+
+TEST(SUnoccupiedVehicleSync, RejectsOutOfBoundsPosition)
+{
+    MockBitStream          bs;
+    SUnoccupiedVehicleSync header;
+    header.data.vehicleID = ElementID(10);
+    header.data.ucTimeContext = 1;
+    header.data.bSyncPosition = true;
+
+    WriteUnoccupiedVehicleHeader(bs, header);
+
+    // SPositionSync clamps on Write(), so craft out-of-bounds Z directly.
+    SFloatSync<14, 10> coord;
+    coord.data.fValue = 0.0f;
+    bs.Write(&coord);
+    bs.Write(&coord);
+    bs.Write(SYNC_POSITION_LIMIT + 100.0f);
+
+    bs.ResetReadPointer();
+    SUnoccupiedVehicleSync out;
+    EXPECT_FALSE(out.Read(bs));
+}
+
+TEST(SUnoccupiedVehicleSync, RejectsNonFiniteVelocity)
+{
+    MockBitStream          bs;
+    SUnoccupiedVehicleSync header;
+    header.data.vehicleID = ElementID(11);
+    header.data.ucTimeContext = 2;
+    header.data.bSyncVelocity = true;
+
+    WriteUnoccupiedVehicleHeader(bs, header);
+
+    bs.WriteBit(true);
+    bs.Write(std::numeric_limits<float>::quiet_NaN());
+    bs.WriteNormVector(1.0f, 0.0f, 0.0f);
+
+    bs.ResetReadPointer();
+    SUnoccupiedVehicleSync out;
+    EXPECT_FALSE(out.Read(bs));
+}
+
+TEST(SUnoccupiedVehicleSync, RejectsTruncatedFields)
+{
+    MockBitStream          fullBs;
+    SUnoccupiedVehicleSync sync;
+    sync.data.vehicleID = ElementID(55);
+    sync.data.ucTimeContext = 3;
+    sync.data.bSyncPosition = true;
+    sync.data.bSyncTrailer = true;
+    sync.data.vecPosition = CVector(10.0f, 20.0f, 30.0f);
+    sync.data.trailer = ElementID(77);
+    sync.Write(fullBs);
+
+    // Drop the trailing trailer ID bytes so Read(data.trailer) fails.
+    const int fullBytes = fullBs.GetNumberOfBytesUsed();
+    ASSERT_GT(fullBytes, 2);
+
+    MockBitStream truncatedBs;
+    truncatedBs.Write(reinterpret_cast<const char*>(fullBs.GetData()), fullBytes - 2);
+    truncatedBs.ResetReadPointer();
+
+    SUnoccupiedVehicleSync out;
+    EXPECT_FALSE(out.Read(truncatedBs));
 }
 
 // ============================================================================

@@ -21,6 +21,8 @@ CUnoccupiedVehicleSyncPacket::~CUnoccupiedVehicleSyncPacket()
 
 bool CUnoccupiedVehicleSyncPacket::Read(NetBitStreamInterface& BitStream)
 {
+    m_Syncs.clear();
+
     uint uiMaxCount = static_cast<uint>(g_pGame->GetVehicleManager()->GetVehicleCount()) * 2u + 10u;
     // While we're not out of bytes
     for (uint i = 0; BitStream.GetNumberOfUnreadBits() >= 8; i++)
@@ -36,15 +38,18 @@ bool CUnoccupiedVehicleSyncPacket::Read(NetBitStreamInterface& BitStream)
         data.bSend = false;
 
         SUnoccupiedVehicleSync vehicle;
-        if (BitStream.Read(&vehicle))
+        if (!BitStream.Read(&vehicle))
         {
-            data.syncStructure = vehicle;
-
-            // Add it to our list. We no longer check if it's valid here
-            // because CUnoccupiedVehicleSync does and it won't write bad ID's
-            // back to clients.
-            m_Syncs.push_back(data);
+            m_Syncs.clear();
+            return false;
         }
+
+        data.syncStructure = vehicle;
+
+        // Add it to our list. We no longer check if it's valid here
+        // because CUnoccupiedVehicleSync does and it won't write bad ID's
+        // back to clients.
+        m_Syncs.push_back(data);
     }
 
     return m_Syncs.size() > 0;
