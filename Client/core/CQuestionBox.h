@@ -10,9 +10,9 @@
  *
  *****************************************************************************/
 
-class CQuestionBox;
-
 #pragma once
+
+class CQuestionBox;
 
 #include "CMainMenu.h"
 
@@ -43,6 +43,7 @@ public:
 
 private:
     bool OnButtonClick(CGUIElement* pElement);
+    bool OnEditAccepted(CGUIElement* pElement);
 
     CGUIWindow*              m_pWindow;
     CGUILabel*               m_pMessage;
