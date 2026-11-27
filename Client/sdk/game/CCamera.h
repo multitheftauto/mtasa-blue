@@ -15,6 +15,7 @@
 
 class CMatrix;
 class CCam;
+class CPed;
 struct RwMatrix;
 
 // Camera constants
@@ -157,4 +158,13 @@ public:
     virtual bool         GetTransitionMatrix(CMatrix& matrix) const = 0;
 
     virtual bool IsSphereVisible(CVector* center, float radius) const = 0;
+
+    // The game's camera follows the ped as if it were the local player; null gives it back to the local player
+    virtual void SetSpectatedPed(CPed* ped, bool smoothTransition) = 0;
+    // Drops the followed ped without touching the camera (the ped is about to be destroyed)
+    virtual void ForgetSpectatedPed() noexcept = 0;
+    // Draws the crosshair of the followed ped (CHud::Draw is not called while spectating); does nothing without a ped
+    virtual void DrawSpectatedPedCrossHairs() = 0;
+    // Whether the followed ped is inside a vehicle
+    virtual bool IsSpectatedPedInVehicle() const noexcept = 0;
 };
