@@ -2151,13 +2151,6 @@ void CGame::Packet_PedWasted(CPedWastedPacket& Packet)
         if (pPed->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
             pPed->SetVehicleAction(CPed::VEHICLEACTION_NONE);
 
-        // Remove him from any occupied vehicle
-        if (pVehicle)
-        {
-            pVehicle->SetOccupant(NULL, pPed->GetOccupiedVehicleSeat());
-            pPed->SetOccupiedVehicle(NULL, 0);
-        }
-
         CElement* pKiller = (Packet.m_Killer != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Killer) : NULL;
 
         // Create a new packet to send to everyone
@@ -2209,14 +2202,6 @@ void CGame::Packet_PlayerWasted(CPlayerWastedPacket& Packet)
         // We don't know if he actually jacked the person at this point, and we need to set the jacked person correctly (fix for #908)
         if (pPlayer->GetVehicleAction() != CPed::VEHICLEACTION_JACKING)
             pPlayer->SetVehicleAction(CPed::VEHICLEACTION_NONE);
-
-        // Remove him from any occupied vehicle
-        CVehicle* pVehicle = pPlayer->GetOccupiedVehicle();
-        if (pVehicle)
-        {
-            pVehicle->SetOccupant(NULL, pPlayer->GetOccupiedVehicleSeat());
-            pPlayer->SetOccupiedVehicle(NULL, 0);
-        }
 
         CElement* pKiller = (Packet.m_Killer != INVALID_ELEMENT_ID) ? CElementIDs::GetElement(Packet.m_Killer) : NULL;
 
