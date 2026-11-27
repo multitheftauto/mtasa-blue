@@ -17,8 +17,29 @@
 
 #include "CLuaPathDefs.h"
 #include "CScriptFile.h"
+#include "CResource.h"
 #include "CScriptArgReader.h"
 #include <lua/CLuaFunctionParser.h>
+
+namespace
+{
+    std::string GetDirectoryPath([[maybe_unused]] CResource* pResource, const std::string& strAbsPath, [[maybe_unused]] const std::string& strMetaPath)
+    {
+        if (DirectoryExists(strAbsPath.c_str()))
+            return strAbsPath;
+
+#ifndef MTA_CLIENT
+        if (pResource->IsResourceZip())
+        {
+            std::string strCachePath = pResource->GetResourceCacheDirectoryPath() + strMetaPath;
+            if (DirectoryExists(strCachePath.c_str()))
+                return strCachePath;
+        }
+#endif
+
+        return strAbsPath;
+    }
+}  // namespace
 
 void CLuaPathDefs::LoadFunctions()
 {
@@ -51,13 +72,16 @@ std::optional<std::vector<std::string>> CLuaPathDefs::pathListDir(lua_State* lua
         return std::nullopt;
 
     std::string strAbsPath;
+    std::string strMetaPath;
 
     CResource* pResource = pLuaMain->GetResource();
-    if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath))
+    if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath, &strMetaPath))
     {
         m_pScriptDebugging->LogWarning(luaVM, "Cannot parse provided path: \"%s\"", path.c_str());
         return std::nullopt;
     }
+
+    strAbsPath = GetDirectoryPath(pResource, strAbsPath, strMetaPath);
 
     if (!DirectoryExists(strAbsPath))
     {
@@ -93,13 +117,16 @@ bool CLuaPathDefs::pathIsDirectory(lua_State* luaVM, std::string path)
         return false;
 
     std::string strAbsPath;
+    std::string strMetaPath;
 
     CResource* pResource = pLuaMain->GetResource();
-    if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath))
+    if (!CResourceManager::ParseResourcePathInput(path, pResource, &strAbsPath, &strMetaPath))
     {
         m_pScriptDebugging->LogWarning(luaVM, "Cannot parse provided path: \"%s\"", path.c_str());
         return false;
     }
+
+    strAbsPath = GetDirectoryPath(pResource, strAbsPath, strMetaPath);
 
     return SharedUtil::DirectoryExists(strAbsPath.c_str());
 }
