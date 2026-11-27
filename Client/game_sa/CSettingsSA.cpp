@@ -865,35 +865,48 @@ uint CSettingsSA::FindVideoMode(int iResX, int iResY, int iColorBits)
         if (vidModeInfo.width < 640 || vidModeInfo.height < 480)
             continue;
 
-        if (vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE)
+        // Rate my res
+        int iScore = abs(iResX - vidModeInfo.width) + abs(iResY - vidModeInfo.height);
+
+        // Penalize matches with wrong bit depth
+        if (vidModeInfo.depth != iColorBits)
         {
-            // Rate my res
-            int iScore = abs(iResX - vidModeInfo.width) + abs(iResY - vidModeInfo.height);
+            iScore += 100000;
+        }
 
-            // Penalize matches with wrong bit depth
-            if (vidModeInfo.depth != iColorBits)
-            {
-                iScore += 100000;
-            }
+        // Penalize matches with higher than requested resolution
+        if (vidModeInfo.width > iResX || vidModeInfo.height > iResY)
+        {
+            iScore += 200000;
+        }
 
-            // Penalize matches with higher than requested resolution
-            if (vidModeInfo.width > iResX || vidModeInfo.height > iResY)
-            {
-                iScore += 200000;
-            }
+        // Penalize modes which are not fullscreen exclusive, but keep them as a last resort: some display drivers report no exclusive modes at all, and the
+        // game can still be played in a windowed mode (see #3755)
+        if (!(vidModeInfo.flags & rwVIDEOMODEEXCLUSIVE))
+        {
+            iScore += 500000;
+        }
 
-            if (iScore < iBestScore || iBestScore == -1)
-            {
-                // Found a better match
-                iBestScore = iScore;
-                iBestMode = vidMode;
-            }
+        if (iScore < iBestScore || iBestScore == -1)
+        {
+            // Found a better match
+            iBestScore = iScore;
+            iBestMode = vidMode;
         }
     }
 
     if (iBestScore != -1)
+    {
+        VideoMode bestModeInfo;
+        if (GetVideoModeInfo(&bestModeInfo, iBestMode) && !(bestModeInfo.flags & rwVIDEOMODEEXCLUSIVE))
+        {
+            AddReportLog(7342, SString("Using windowed video mode %d %dx%dx%d (of %d modes)", iBestMode, bestModeInfo.width, bestModeInfo.height,
+                                       bestModeInfo.depth, numVidModes));
+        }
         return iBestMode;
+    }
 
+    AddReportLog(7343, SString("No usable video mode found (of %d modes) for %dx%dx%d", numVidModes, iResX, iResY, iColorBits));
     BrowseToSolution("no-find-res", EXIT_GAME_FIRST | ASK_GO_ONLINE, _("Can't find valid screen resolution."));
     return 1;
 }
