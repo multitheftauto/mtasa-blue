@@ -363,15 +363,16 @@ public:
 
     // Blip funcs
     static CClientRadarMarker* CreateBlip(CResource& Resource, const CVector& vecPosition, unsigned char ucIcon, unsigned char ucSize, const SColor color,
-                                          short sOrdering, unsigned short usVisibleDistance);
+                                          short sOrdering, unsigned short usVisibleDistance, bool bShortRange);
     static CClientRadarMarker* CreateBlipAttachedTo(CResource& Resource, CClientEntity& Entity, unsigned char ucIcon, unsigned char ucSize, const SColor color,
-                                                    short sOrdering, unsigned short usVisibleDistance);
+                                                    short sOrdering, unsigned short usVisibleDistance, bool bShortRange);
 
     static bool SetBlipIcon(CClientEntity& Entity, unsigned char ucIcon);
     static bool SetBlipSize(CClientEntity& Entity, unsigned char ucSize);
     static bool SetBlipColor(CClientEntity& Entity, const SColor color);
     static bool SetBlipOrdering(CClientEntity& Entity, short sOrdering);
     static bool SetBlipVisibleDistance(CClientEntity& Entity, unsigned short usVisibleDistance);
+    static bool SetBlipShortRange(CClientEntity& Entity, bool bShortRange);
 
     // Marker create/destroy funcs
     static CClientMarker* CreateMarker(CResource& Resource, const CVector& vecPosition, const char* szType, float fSize, const SColor color,

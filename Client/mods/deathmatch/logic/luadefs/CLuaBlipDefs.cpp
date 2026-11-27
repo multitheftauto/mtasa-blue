@@ -17,7 +17,8 @@ static constexpr std::uint8_t MAX_BLIP_SIZE = 25;
 std::variant<CClientRadarMarker*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaVM, const CVector vecPosition, std::optional<std::uint8_t> icon,
                                                                  std::optional<std::uint8_t> size, std::optional<std::uint8_t> r, std::optional<std::uint8_t> g,
                                                                  std::optional<std::uint8_t> b, std::optional<std::uint8_t> a,
-                                                                 std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance)
+                                                                 std::optional<std::int16_t> ordering, std::optional<std::uint16_t> visibleDistance,
+                                                                 std::optional<bool> shortRange)
 {
     if (icon.has_value() && !CClientRadarMarkerManager::IsValidIcon(icon.value()))
         throw std::invalid_argument("Invalid icon");
@@ -32,7 +33,7 @@ std::variant<CClientRadarMarker*, bool> CLuaBlipDefs::CreateBlip(lua_State* luaV
     CResource&          resource = lua_getownerresource(luaVM);
     CClientRadarMarker* radarMarker = CStaticFunctionDefinitions::CreateBlip(resource, vecPosition, icon.value_or(0), size.value_or(2),
                                                                              SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)),
-                                                                             ordering.value_or(0), visibleDistance.value_or(16383));
+                                                                             ordering.value_or(0), visibleDistance.value_or(16383), shortRange.value_or(false));
 
     if (!radarMarker)
         return false;
@@ -47,7 +48,7 @@ std::variant<CClientRadarMarker*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_S
                                                                            std::optional<std::uint8_t> size, std::optional<std::uint8_t> r,
                                                                            std::optional<std::uint8_t> g, std::optional<std::uint8_t> b,
                                                                            std::optional<std::uint8_t> a, std::optional<std::int16_t> ordering,
-                                                                           std::optional<std::uint16_t> visibleDistance)
+                                                                           std::optional<std::uint16_t> visibleDistance, std::optional<bool> shortRange)
 {
     if (icon.has_value() && !CClientRadarMarkerManager::IsValidIcon(icon.value()))
         throw std::invalid_argument("Invalid icon");
@@ -62,7 +63,7 @@ std::variant<CClientRadarMarker*, bool> CLuaBlipDefs::CreateBlipAttachedTo(lua_S
     CResource&          resource = lua_getownerresource(luaVM);
     CClientRadarMarker* radarMarker = CStaticFunctionDefinitions::CreateBlipAttachedTo(
         resource, *entity, icon.value_or(0), size.value_or(2), SColorRGBA(r.value_or(255), g.value_or(0), b.value_or(0), a.value_or(255)), ordering.value_or(0),
-        visibleDistance.value_or(16383));
+        visibleDistance.value_or(16383), shortRange.value_or(false));
 
     if (!radarMarker)
         return false;
@@ -97,6 +98,11 @@ auto CLuaBlipDefs::GetBlipOrdering(CClientRadarMarker* radarMarker) noexcept
 auto CLuaBlipDefs::GetBlipVisibleDistance(CClientRadarMarker* radarMarker) noexcept
 {
     return radarMarker->GetVisibleDistance();
+}
+
+auto CLuaBlipDefs::GetBlipShortRange(CClientRadarMarker* radarMarker) noexcept
+{
+    return radarMarker->IsShortRange();
 }
 
 bool CLuaBlipDefs::SetBlipIcon(CClientRadarMarker* radarMarker, std::uint8_t icon)
@@ -134,6 +140,11 @@ bool CLuaBlipDefs::SetBlipVisibleDistance(CClientRadarMarker* radarMarker, std::
     return CStaticFunctionDefinitions::SetBlipVisibleDistance(*radarMarker, visibleDistance);
 }
 
+bool CLuaBlipDefs::SetBlipShortRange(CClientRadarMarker* radarMarker, bool shortRange)
+{
+    return CStaticFunctionDefinitions::SetBlipShortRange(*radarMarker, shortRange);
+}
+
 void CLuaBlipDefs::LoadFunctions()
 {
     constexpr static const std::pair<const char*, lua_CFunction> functions[]{
@@ -147,6 +158,7 @@ void CLuaBlipDefs::LoadFunctions()
         {"getBlipColor", ArgumentParserWarn<false, GetBlipColor>},
         {"getBlipOrdering", ArgumentParserWarn<false, GetBlipOrdering>},
         {"getBlipVisibleDistance", ArgumentParserWarn<false, GetBlipVisibleDistance>},
+        {"getBlipShortRange", ArgumentParser<GetBlipShortRange>},
 
         // Set functions
         {"setBlipIcon", ArgumentParserWarn<false, SetBlipIcon>},
@@ -154,6 +166,7 @@ void CLuaBlipDefs::LoadFunctions()
         {"setBlipColor", ArgumentParserWarn<false, SetBlipColor>},
         {"setBlipOrdering", ArgumentParserWarn<false, SetBlipOrdering>},
         {"setBlipVisibleDistance", ArgumentParserWarn<false, SetBlipVisibleDistance>},
+        {"setBlipShortRange", ArgumentParser<SetBlipShortRange>},
     };
 
     // Add functions
@@ -173,17 +186,20 @@ void CLuaBlipDefs::AddClass(lua_State* luaVM)
     lua_classfunction(luaVM, "getOrdering", "getBlipOrdering");
     lua_classfunction(luaVM, "getSize", "getBlipSize");
     lua_classfunction(luaVM, "getIcon", "getBlipIcon");
+    lua_classfunction(luaVM, "getShortRange", "getBlipShortRange");
 
     lua_classfunction(luaVM, "setColor", "setBlipColor");
     lua_classfunction(luaVM, "setVisibleDistance", "setBlipVisibleDistance");
     lua_classfunction(luaVM, "setOrdering", "setBlipOrdering");
     lua_classfunction(luaVM, "setSize", "setBlipSize");
     lua_classfunction(luaVM, "setIcon", "setBlipIcon");
+    lua_classfunction(luaVM, "setShortRange", "setBlipShortRange");
 
     lua_classvariable(luaVM, "icon", "setBlipIcon", "getBlipIcon");
     lua_classvariable(luaVM, "size", "setBlipSize", "getBlipSize");
     lua_classvariable(luaVM, "ordering", "setBlipOrdering", "getBlipOrdering");
     lua_classvariable(luaVM, "visibleDistance", "setBlipVisibleDistance", "getBlipVisibleDistance");
+    lua_classvariable(luaVM, "shortRange", "setBlipShortRange", "getBlipShortRange");
     // TODO add oop color variable
 
     lua_registerclass(luaVM, "Blip", "Element");

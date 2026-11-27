@@ -61,6 +61,8 @@ public:
     bool                IsActive();
     void                SetPosition(CVector* vecPosition);
     CVector*            GetPosition();
+    void                SetShortRange(bool bShortRange);
+    bool                IsShortRange();
     CMarkerSAInterface* GetInterface() { return internalInterface; };
 
 private:

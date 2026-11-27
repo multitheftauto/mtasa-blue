@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include <CRect.h>
+#include <CVector2D.h>
 #include "CRadarSA.h"
 
 CMarkerSA* Markers[MAX_MARKERS];
@@ -79,4 +80,20 @@ void CRadarSA::DrawAreaOnRadar(float fX1, float fY1, float fX2, float fY2, const
         pop     eax
     }
     // clang-format on
+}
+
+bool CRadarSA::IsPointWithinRadarCircle(const CVector* vecPosition)
+{
+    // The game transforms world positions into radar space by rotating them around the radar origin
+    // and scaling by the current radar range, so the radar disc is the unit circle there. Rotation
+    // preserves the magnitude, so the planar distance to the radar origin compared against the range
+    // is the same test the game applies to short-range sprite traces (radar point magnitude <= 1.0f).
+    // The game also hides short-range traces while a script radar zoom is active
+    // (CTheScripts::RadarZoomValue), which cannot happen under MTA as single-player scripts do not
+    // run, so that part of the rule is not replicated here.
+    const CVector2D& vecRadarOrigin = *reinterpret_cast<const CVector2D*>(VAR_CRadar_vec2DRadarOrigin);
+    const float      fRadarRange = *reinterpret_cast<const float*>(VAR_CRadar_m_radarRange);
+
+    const CVector2D vecDelta(vecPosition->fX - vecRadarOrigin.fX, vecPosition->fY - vecRadarOrigin.fY);
+    return vecDelta.LengthSquared() <= fRadarRange * fRadarRange;
 }

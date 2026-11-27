@@ -38,4 +38,8 @@ public:
     virtual bool     IsActive() = 0;
     virtual void     SetPosition(CVector* vecPosition) = 0;
     virtual CVector* GetPosition() = 0;
+    // Short-range traces are clipped by the radar's zoom circle instead of
+    // being clamped to its edge (SA-MP-style blip behaviour).
+    virtual void SetShortRange(bool bShortRange) = 0;
+    virtual bool IsShortRange() = 0;
 };
