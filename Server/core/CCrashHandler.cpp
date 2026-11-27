@@ -48,7 +48,6 @@ static SString ms_strDumpPath;
 #ifdef WIN32
     #include <cstring>
     #include <ctime>
-    #include <new>
     #include <tchar.h>
     #include <dbghelp.h>
 
@@ -100,9 +99,11 @@ void CCrashHandler::Init(const SString& strInServerPath)
 #else
 
     // Prepare initial dumpfile name
-    time_t     pTime = time(NULL);
-    struct tm* tm = localtime(&pTime);
-    SString strFilename("server_%s_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+    time_t    pTime = time(NULL);
+    struct tm tmLocal = {};
+    localtime_r(&pTime, &tmLocal);
+    SString strFilename("server_%s_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, tmLocal.tm_year + 1900, tmLocal.tm_mon + 1, tmLocal.tm_mday,
+                        tmLocal.tm_hour, tmLocal.tm_min);
     ms_strDumpPathFilename = PathJoin(ms_strDumpPath, strFilename);
     MakeSureDirExists(ms_strDumpPathFilename);
 
@@ -129,21 +130,22 @@ void CCrashHandler::Init(const SString& strInServerPath)
 inline __attribute__((always_inline)) static void SaveBacktraceSummary()
 {
     // Collect backtrace information
-    void* buffer[100];
-    int   iAmount = backtrace(buffer, sizeof buffer);
-    iAmount = std::min<int>(iAmount, NUMELMS(buffer));
+    void*  buffer[100];
+    int    iAmount = backtrace(buffer, NUMELMS(buffer));
     char** symbols = backtrace_symbols(buffer, iAmount);
 
     // Generate a .log file
-    time_t     pTime = time(NULL);
-    struct tm* tm = localtime(&pTime);
+    time_t    pTime = time(NULL);
+    struct tm tmLocal = {};
+    localtime_r(&pTime, &tmLocal);
 
     SString sFileName;
-    sFileName.Format("server_%s_%04d%02d%02d_%02d%02d.log", MTA_DM_BUILDTYPE, tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+    sFileName.Format("server_%s_%04d%02d%02d_%02d%02d.log", MTA_DM_BUILDTYPE, tmLocal.tm_year + 1900, tmLocal.tm_mon + 1, tmLocal.tm_mday, tmLocal.tm_hour,
+                     tmLocal.tm_min);
 
     SString sContent;
     sContent += SString("MTA:SA Server v%s-r%d-%s crash report.\n", MTA_DM_VERSIONSTRING, MTASA_VERSION_BUILD, MTA_DM_BUILDTYPE);
-    sContent += SString("%04d-%02d-%02d %02d:%02d\n", tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour, tm->tm_min);
+    sContent += SString("%04d-%02d-%02d %02d:%02d\n", tmLocal.tm_year + 1900, tmLocal.tm_mon + 1, tmLocal.tm_mday, tmLocal.tm_hour, tmLocal.tm_min);
     sContent += SString("Caught %d addresses ...\n\n", iAmount);
     sContent += "Backtrace:\n";
 
@@ -195,14 +197,15 @@ bool DumpCallback(const google_breakpad::MinidumpDescriptor& descriptor, void* c
 
     if (succeeded)
     {
-        // Set inital dump file name (Safeish)
+        // Set initial dump file name (Safeish)
         File::Rename(path, ms_strDumpPathFilename);
 
         // Set final dump file name (Not so safe)
-        time_t     pTime = time(NULL);
-        struct tm* tm = localtime(&pTime);
-        SString    strFilename("server_%s_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, tm->tm_year + 1900, tm->tm_mon + 1, tm->tm_mday, tm->tm_hour,
-                               tm->tm_min);
+        time_t    pTime = time(NULL);
+        struct tm tmLocal = {};
+        localtime_r(&pTime, &tmLocal);
+        SString strFilename("server_%s_%04d%02d%02d_%02d%02d.dmp", MTA_DM_BUILDTAG_LONG, tmLocal.tm_year + 1900, tmLocal.tm_mon + 1, tmLocal.tm_mday,
+                            tmLocal.tm_hour, tmLocal.tm_min);
         strFinalDumpPathFilename = PathJoin(ms_strDumpPath, strFilename);
         File::Rename(ms_strDumpPathFilename, strFinalDumpPathFilename);
     }
@@ -226,17 +229,11 @@ void CCrashHandler::HandleExceptionGlobal(int iSig)
 
 long WINAPI CCrashHandler::HandleExceptionGlobal(_EXCEPTION_POINTERS* pException)
 {
-    // Create the exception information class
-    CExceptionInformation_Impl* pExceptionInformation = new (std::nothrow) CExceptionInformation_Impl;
-    if (!pExceptionInformation)
-    {
-        TerminateProcess(GetCurrentProcess(), 1);
-        return EXCEPTION_CONTINUE_SEARCH;
-    }
-    pExceptionInformation->Set(pException->ExceptionRecord->ExceptionCode, pException);
+    CExceptionInformation_Impl exceptionInformation;
+    exceptionInformation.Set(pException->ExceptionRecord->ExceptionCode, pException);
 
     // Write the dump
-    DumpMiniDump(pException, pExceptionInformation);
+    DumpMiniDump(pException, &exceptionInformation);
     RunErrorTool();
     TerminateProcess(GetCurrentProcess(), 1);
     return EXCEPTION_CONTINUE_SEARCH;
@@ -390,6 +387,8 @@ void CCrashHandler::DumpMiniDump(_EXCEPTION_POINTERS* pException, CExceptionInfo
 
             if (bDumpWritten)
                 FileSave(PathJoin(ms_strDumpPath, "server_pending_upload_filename"), strFinalDumpPathFilename);
+            else
+                DeleteFileA(strFinalDumpPathFilename);
         }
     }
 }
