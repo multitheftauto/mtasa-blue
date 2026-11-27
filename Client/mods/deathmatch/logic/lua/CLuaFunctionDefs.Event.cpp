@@ -10,6 +10,17 @@
 
 #include "StdInc.h"
 
+namespace
+{
+    // The resource that owns the currently running script. Null when the call came from a context without one,
+    // in which case the receiving side gets no sourceResource.
+    CResource* GetCallingResource(CLuaManager* pLuaManager, lua_State* luaVM)
+    {
+        CLuaMain* pLuaMain = pLuaManager->GetVirtualMachine(luaVM);
+        return pLuaMain ? pLuaMain->GetResource() : nullptr;
+    }
+}  // namespace
+
 int CLuaFunctionDefs::AddEvent(lua_State* luaVM)
 {
     //  bool addEvent ( string eventName [, bool allowRemoteTrigger = false ] )
@@ -217,7 +228,7 @@ int CLuaFunctionDefs::TriggerServerEvent(lua_State* luaVM)
     {
         if (!pCallWithEntity->IsLocalEntity())
         {
-            if (CStaticFunctionDefinitions::TriggerServerEvent(strName, *pCallWithEntity, Arguments))
+            if (CStaticFunctionDefinitions::TriggerServerEvent(strName, *pCallWithEntity, Arguments, GetCallingResource(m_pLuaManager, luaVM)))
             {
                 lua_pushboolean(luaVM, true);
             }
@@ -323,7 +334,8 @@ int CLuaFunctionDefs::TriggerLatentServerEvent(lua_State* luaVM)
         }
 
         // Trigger it
-        if (CStaticFunctionDefinitions::TriggerLatentServerEvent(strName, *pCallWithEntity, Arguments, iBandwidth, pLuaMain, usResourceNetId))
+        if (CStaticFunctionDefinitions::TriggerLatentServerEvent(strName, *pCallWithEntity, Arguments, iBandwidth, pLuaMain, usResourceNetId,
+                                                                 GetCallingResource(m_pLuaManager, luaVM)))
         {
             lua_pushboolean(luaVM, true);
             return 1;
