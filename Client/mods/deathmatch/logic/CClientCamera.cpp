@@ -222,6 +222,8 @@ CClientCamera::~CClientCamera()
 
 void CClientCamera::DoPulse()
 {
+    UpdateInterior();
+
     PersistViewModes();
 
     InvalidateCachedTransforms();
@@ -293,6 +295,26 @@ void CClientCamera::DoPulse()
         // Save this so position or rotation is preserved when changing to fixed mode
         m_matFixedMatrix = AcquirePulseMatrix();
     }
+}
+
+void CClientCamera::SetInterior(unsigned char ucInterior)
+{
+    auto pWorld = g_pGame ? g_pGame->GetWorld() : nullptr;
+    if (pWorld)
+        pWorld->SetCurrentArea(ucInterior);
+
+    CClientEntity::SetInterior(ucInterior);
+}
+
+void CClientCamera::UpdateInterior()
+{
+    auto pWorld = g_pGame ? g_pGame->GetWorld() : nullptr;
+    if (!pWorld)
+        return;
+
+    const unsigned char ucInterior = static_cast<unsigned char>(pWorld->GetCurrentArea());
+    if (ucInterior != CClientEntity::GetInterior())
+        CClientEntity::SetInterior(ucInterior);
 }
 
 bool CClientCamera::GetMatrix(CMatrix& Matrix) const

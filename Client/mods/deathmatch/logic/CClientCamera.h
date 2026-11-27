@@ -49,6 +49,7 @@ public:
     void  SetPosition(const CVector& vecPosition);
     void  GetRotationDegrees(CVector& vecRotation) const;
     void  SetRotationRadians(const CVector& vecRotation);
+    void  SetInterior(unsigned char ucInterior) override;
     void  GetFixedTarget(CVector& vecTarget, float* pfRoll = NULL) const;
     void  SetFixedTarget(const CVector& vecPosition, float fRoll = 0);
     float GetFOV() { return m_fFOV; }
@@ -118,6 +119,8 @@ private:
     void RestoreEntity(CClientEntity* pEntity);
 
     void PersistViewModes();
+
+    void UpdateInterior();
 
     CClientPlayerManager* m_pPlayerManager;
 
