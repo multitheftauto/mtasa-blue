@@ -1465,10 +1465,13 @@ unsigned int CLuaPlayerDefs::GetPlayerScriptDebugLevel(CPlayer* const player)
 int CLuaPlayerDefs::BindKey(lua_State* luaVM)
 {
     CPlayer* pPlayer;
-    SString  strKey;
-    SString  strHitState;
-    SString  strCommand;
-    SString  strArguments;
+    // The key argument can be either a single key (string) or a table of keys.
+    // This allows binding the same key state to multiple keys at once, e.g.
+    // bindKey ( player, {"F1", "F2", "F3"}, "down", handlerFunction )
+    std::vector<SString> keys;
+    SString              strHitState;
+    SString              strCommand;
+    SString              strArguments;
 
     CLuaMain* pLuaMain = m_pLuaManager->GetVirtualMachine(luaVM);
     if (!pLuaMain)
@@ -1479,7 +1482,16 @@ int CLuaPlayerDefs::BindKey(lua_State* luaVM)
 
     CScriptArgReader argStream(luaVM);
     argStream.ReadUserData(pPlayer);
-    argStream.ReadString(strKey);
+
+    if (argStream.NextIsTable())
+        argStream.ReadStringTable(keys);
+    else
+    {
+        SString strKey;
+        argStream.ReadString(strKey);
+        keys.push_back(strKey);
+    }
+
     argStream.ReadString(strHitState);
 
     if (argStream.NextIsString())
@@ -1489,7 +1501,15 @@ int CLuaPlayerDefs::BindKey(lua_State* luaVM)
         argStream.ReadString(strArguments, "");
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::BindKey(pPlayer, strKey, strHitState, strCommand, strArguments, pLuaMain->GetResource()->GetName().c_str()))
+            // Bind the key state to every key in the list. All keys have to bind
+            // successfully for the whole call to be considered a success.
+            bool bAllSuccess = !keys.empty();
+            for (const SString& strKey : keys)
+            {
+                if (!CStaticFunctionDefinitions::BindKey(pPlayer, strKey, strHitState, strCommand, strArguments, pLuaMain->GetResource()->GetName().c_str()))
+                    bAllSuccess = false;
+            }
+            if (bAllSuccess)
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
@@ -1506,7 +1526,15 @@ int CLuaPlayerDefs::BindKey(lua_State* luaVM)
         argStream.ReadFunctionComplete();
         if (!argStream.HasErrors())
         {
-            if (CStaticFunctionDefinitions::BindKey(pPlayer, strKey, strHitState, pLuaMain, iLuaFunction, Arguments))
+            // Argument list is copied by every key bind, so reusing the same
+            // CLuaArguments for each key is safe.
+            bool bAllSuccess = !keys.empty();
+            for (const SString& strKey : keys)
+            {
+                if (!CStaticFunctionDefinitions::BindKey(pPlayer, strKey, strHitState, pLuaMain, iLuaFunction, Arguments))
+                    bAllSuccess = false;
+            }
+            if (bAllSuccess)
             {
                 lua_pushboolean(luaVM, true);
                 return 1;
