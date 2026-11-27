@@ -19,6 +19,7 @@
 #include "CConsoleClient.h"
 #include "CPlayer.h"
 #include "CGame.h"
+#include "CConsole.h"
 #include "CScriptDebugging.h"
 #include "CMainConfig.h"
 
@@ -37,6 +38,12 @@ bool CRegisteredCommands::AddCommand(CLuaMain* pLuaMain, const char* szKey, cons
 {
     assert(pLuaMain);
     assert(szKey);
+
+    if (g_pGame->GetConsole()->GetCommand(szKey))
+    {
+        g_pGame->GetScriptDebugging()->LogWarning(pLuaMain->GetVM(), "addCommandHandler: '%s' is a built-in command and cannot be replaced", szKey);
+        return false;
+    }
 
     if (CommandExists(szKey, nullptr))
     {

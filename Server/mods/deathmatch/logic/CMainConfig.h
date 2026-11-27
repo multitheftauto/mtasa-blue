@@ -47,6 +47,7 @@ public:
 
     bool Load();
     bool LoadExtended();
+    void RegisterCommands();
     bool Save();
 
     const std::string& GetServerName() { return m_strServerName; };
