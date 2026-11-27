@@ -901,10 +901,16 @@ SectionGroup /e "$(INST_SEC_SERVER)" SECGSERVER
         File "${SERVER_FILES_ROOT}\x64\lua5.1.dll"
         File "${SERVER_FILES_ROOT}\x64\pcre2.dll"
         File "${SERVER_FILES_ROOT}\x64\dbconmy.dll"
+        File "${SERVER_FILES_ROOT}\x64\dbconpg.dll"
         !ifndef LIGHTBUILD
             File "${SERVER_FILES_ROOT}\x64\libmysql.dll"
             File "${SERVER_FILES_ROOT}\x64\libcrypto-3-x64.dll"
             File "${SERVER_FILES_ROOT}\x64\libssl-3-x64.dll"
+            ; PostgreSQL client (dbconpg) and its dependencies, see vendor/libpq/README.md
+            File "${SERVER_FILES_ROOT}\x64\libpq.dll"
+            File "${SERVER_FILES_ROOT}\x64\libintl-9.dll"
+            File "${SERVER_FILES_ROOT}\x64\libiconv-2.dll"
+            File "${SERVER_FILES_ROOT}\x64\libwinpthread-1.dll"
         !endif
 
         ; Config files are architecture-independent, install under server\mods\deathmatch
