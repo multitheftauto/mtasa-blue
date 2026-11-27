@@ -57,7 +57,7 @@ public:
 
     // Ped set functions
     static bool SetPedArmor(CPed* const ped, const float armor);
-    LUA_DECLARE(KillPed);
+    LUA_DECLARE_OOP(KillPed);
     LUA_DECLARE(SetPedRotation);
     LUA_DECLARE(SetPedStat);
     LUA_DECLARE(AddPedClothes);
