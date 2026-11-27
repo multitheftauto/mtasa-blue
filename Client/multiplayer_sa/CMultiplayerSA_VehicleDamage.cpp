@@ -301,6 +301,44 @@ static void __declspec(naked) HOOK_CAutomobile_VehicleDamage2()
     // clang-format on
 }
 
+#define CHAINSAW_DAMAGE_MULTIPLIER    0.00075f
+#define CHAINSAW_MIN_DAMAGE_INTENSITY 25.0f
+#define CHAINSAW_MIN_INTENSITY_MARGIN 1.0f
+
+float OnMY_CTaskSimpleFight_ChainsawDamageIntensity(float fMassHitValue)
+{
+    const float fIntensity = fMassHitValue * CHAINSAW_DAMAGE_MULTIPLIER;
+
+    if (fIntensity <= 0.0f || fIntensity > CHAINSAW_MIN_DAMAGE_INTENSITY)
+        return fIntensity;
+
+    return CHAINSAW_MIN_DAMAGE_INTENSITY + CHAINSAW_MIN_INTENSITY_MARGIN;
+}
+
+#define HOOKPOS_CTaskSimpleFight_ChainsawDamageIntensity   0x061D1D4
+#define HOOKSIZE_CTaskSimpleFight_ChainsawDamageIntensity  6
+#define HOOKCHECK_CTaskSimpleFight_ChainsawDamageIntensity 0xD8
+DWORD                         RETURN_CTaskSimpleFight_ChainsawDamageIntensity = 0x061D1DA;
+static void __declspec(naked) HOOK_CTaskSimpleFight_ChainsawDamageIntensity()
+{
+    MTA_VERIFY_HOOK_LOCAL_SIZE;
+
+    // clang-format off
+    __asm
+    {
+        pushad
+        sub     esp, 4
+        fstp    dword ptr [esp]
+        push    dword ptr [esp]
+        call    OnMY_CTaskSimpleFight_ChainsawDamageIntensity
+        add     esp, 8
+        popad
+
+        jmp     RETURN_CTaskSimpleFight_ChainsawDamageIntensity
+    }
+    // clang-format on
+}
+
 //////////////////////////////////////////////////////////////////////////////////////////
 //
 // CPlane::VehicleDamage hook 1
@@ -523,6 +561,7 @@ void CMultiplayerSA::InitHooks_VehicleDamage()
     EZHookInstallChecked(CBike_BurstTyre);
     EZHookInstallChecked(CAutomobile_VehicleDamage1);
     EZHookInstallChecked(CAutomobile_VehicleDamage2);
+    EZHookInstallChecked(CTaskSimpleFight_ChainsawDamageIntensity);
     EZHookInstallChecked(CPlane_VehicleDamage1);
     EZHookInstallChecked(CPlane_VehicleDamage2);
     EZHookInstallChecked(CBike_VehicleDamage1);
