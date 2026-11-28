@@ -66,6 +66,8 @@ struct SPEFileOffsets
 
 void TerminateGTAIfRunning();
 bool IsGTARunning();
+bool IsSecondaryClient();
+bool IsSecondaryClientRunning();
 void TerminateOtherMTAIfRunning();
 bool IsOtherMTARunning();
 
