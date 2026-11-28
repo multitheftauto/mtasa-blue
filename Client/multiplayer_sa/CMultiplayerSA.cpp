@@ -16,6 +16,7 @@
 #include <game/CPedDamageResponse.h>
 #include <game/CEventList.h>
 #include <game/CEventDamage.h>
+#include "../game_sa/CColModelSA.h"
 
 class CEventDamageSAInterface;
 
@@ -6806,10 +6807,68 @@ static void __declspec(naked) HOOK_ProcessVehicleCollision()
     }
 }
 
+// CRenderer::PreRender calls entity PreRender through the vtable at each of these sites.
+// Wrapping the complete call keeps the per-model pointer restored on every normal return.
+static void __fastcall PreRenderWithPrivateSuspension(CEntitySAInterface* entity)
+{
+    if (entity->nType != ENTITY_TYPE_VEHICLE)
+    {
+        entity->PreRender();
+        return;
+    }
+
+    auto*       vehicleInterface = static_cast<CVehicleSAInterface*>(entity);
+    CVehicle*   vehicle = vehicleInterface->m_pVehicle;
+    CModelInfo* modelInfo = vehicle ? pGameInterface->GetModelInfo(vehicle->GetModelIndex()) : nullptr;
+    if (!modelInfo || (!modelInfo->IsCar() && !modelInfo->IsMonsterTruck()))
+    {
+        entity->PreRender();
+        return;
+    }
+
+    // SetVehicleSuspensionData dereferences the model's collision data without checks. Unlike the collision
+    // hook, this runs for every visible vehicle every frame, including while streaming may have unloaded
+    // the collision, so only swap when the shared lines actually exist.
+    CBaseModelInfoSAInterface* baseInterface = modelInfo->GetInterface();
+    CColModelSAInterface*      colModel = baseInterface ? baseInterface->pColModel : nullptr;
+    CColDataSA*                colData = colModel ? colModel->m_data : nullptr;
+    if (!colData || !colData->m_suspensionLines)
+    {
+        entity->PreRender();
+        return;
+    }
+
+    // Physics already uses the per-vehicle copy; the wheel visuals need the same data. Without this, the
+    // wheels are positioned using whichever vehicle of the same model last rewrote the shared lines (#5007).
+    void* previousLines = modelInfo->SetVehicleSuspensionData(vehicle->GetPrivateSuspensionLines());
+    entity->PreRender();
+    modelInfo->SetVehicleSuspensionData(previousLines);
+}
+
+static void InstallVehiclePreRenderHooks()
+{
+    // Each site is exactly a two-byte vtable load and a three-byte indirect call.
+    constexpr DWORD         sites[] = {0x553927, 0x553948, 0x553969, 0x55398A, 0x5539BD, 0x5539EC};
+    constexpr unsigned char eaxCall[] = {0x8B, 0x01, 0xFF, 0x50, 0x44};
+    constexpr unsigned char edxCall[] = {0x8B, 0x11, 0xFF, 0x52, 0x44};
+
+    // Refuse to patch an unexpected executable or an already modified call site.
+    for (const DWORD site : sites)
+    {
+        const auto* bytes = reinterpret_cast<const unsigned char*>(site);
+        if (memcmp(bytes, eaxCall, sizeof(eaxCall)) != 0 && memcmp(bytes, edxCall, sizeof(edxCall)) != 0)
+            return;
+    }
+
+    for (const DWORD site : sites)
+        HookInstallCall(site, reinterpret_cast<DWORD>(PreRenderWithPrivateSuspension));
+}
+
 void CMultiplayerSA::UpdateVehicleSuspension() const noexcept
 {
     HookInstallCall(CALL_CAutomobile_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
     HookInstallCall(CALL_CMonsterTruck_ProcessEntityCollision, reinterpret_cast<DWORD>(HOOK_ProcessVehicleCollision));
+    InstallVehiclePreRenderHooks();
 }
 
 // Variables
