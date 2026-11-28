@@ -168,6 +168,7 @@ bool CMapInfoPacket::Write(NetBitStreamInterface& BitStream) const
     funBugs.data.bBadDrivebyHitboxes = g_pGame->IsGlitchEnabled(CGame::GLITCH_BADDRIVEBYHITBOX);
     funBugs.data.bQuickStand = g_pGame->IsGlitchEnabled(CGame::GLITCH_QUICKSTAND);
     funBugs.data.vehicleRapidStop = g_pGame->IsGlitchEnabled(CGame::GLITCH_VEHICLE_RAPID_STOP);
+    funBugs.data.bFastWeaponStrafe = g_pGame->IsGlitchEnabled(CGame::GLITCH_FASTWEAPONSTRAFE);
     BitStream.Write(&funBugs);
 
     // Write world special properties states
