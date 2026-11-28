@@ -166,6 +166,7 @@ public:
 
     float GetWaveLevel();
     void  SetWaveLevel(float fWaveLevel);
+    void  SetWavePhase(DWORD milliseconds) override;
     void  SetWaterDrawnLast(bool bEnable);
     bool  IsWaterDrawnLast();
 
