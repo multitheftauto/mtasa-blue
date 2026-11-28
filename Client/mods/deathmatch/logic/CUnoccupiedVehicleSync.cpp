@@ -11,6 +11,7 @@
 
 #include "StdInc.h"
 #include "net/SyncStructures.h"
+#include <game/CTrainTrackManager.h>
 
 using std::list;
 
@@ -186,10 +187,56 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(NetBitStreamInterface&
             CClientVehicle* pVehicle = m_pVehicleManager->Get(vehicle.data.vehicleID);
             if (pVehicle && pVehicle->CanUpdateSync(vehicle.data.ucTimeContext))
             {
+                // Work out first whether this one is placed by its distance along a rail; a train
+                // placed that way must not also get an interpolated world position, or the two pull
+                // it to different places every frame and it visibly jumps off the track and back.
+                // CNetAPI::ReadVehiclePuresync splits it the same way for a train with a driver
+                bool          bRailDriven = false;
+                unsigned char ucRailTrack = 0;
+
+                if (pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN)
+                {
+                    pVehicle->SetDerailed(vehicle.data.bDerailed);
+
+                    // A derailed train is loose from its track and goes back to being placed by
+                    // position and rotation like any other vehicle
+                    if (vehicle.data.bSyncTrain && !vehicle.data.bDerailed && vehicle.data.bTrainHasTrack)
+                    {
+                        if (vehicle.data.bTrainTrackIsDefault)
+                        {
+                            ucRailTrack = vehicle.data.ucTrainDefaultTrackId;
+                            bRailDriven = true;
+                        }
+                        else
+                        {
+                            CClientTrainTrack* pTrainTrack = g_pClientGame->GetManager()->GetTrainTrackManager()->Get(vehicle.data.TrainTrackElementID);
+
+                            // Left false the train stays on whatever it is running on now; better
+                            // than moving it along a track we can't resolve
+                            if (pTrainTrack && pTrainTrack->GetGameTrackID() != 0xFF)
+                            {
+                                ucRailTrack = pTrainTrack->GetGameTrackID();
+                                bRailDriven = true;
+                            }
+                        }
+                    }
+                }
+
                 if (vehicle.data.bSyncPosition)
-                    pVehicle->SetTargetPosition(vehicle.data.vecPosition, UNOCCUPIED_VEHICLE_SYNC_RATE, vehicle.data.bSyncVelocity,
-                                                vehicle.data.vecVelocity.fZ);
-                if (vehicle.data.bSyncRotation)
+                {
+                    if (bRailDriven)
+                    {
+                        // The rail distance below places it; this only keeps the streaming position
+                        // and anyone sitting in it up to date
+                        pVehicle->UpdatePedPositions(vehicle.data.vecPosition);
+                    }
+                    else
+                    {
+                        pVehicle->SetTargetPosition(vehicle.data.vecPosition, UNOCCUPIED_VEHICLE_SYNC_RATE, vehicle.data.bSyncVelocity,
+                                                    vehicle.data.vecVelocity.fZ);
+                    }
+                }
+                if (vehicle.data.bSyncRotation && !bRailDriven)
                     pVehicle->SetTargetRotation(vehicle.data.vecRotation, UNOCCUPIED_VEHICLE_SYNC_RATE);
                 if (vehicle.data.bSyncVelocity)
                     pVehicle->SetMoveSpeed(vehicle.data.vecVelocity);
@@ -198,8 +245,16 @@ void CUnoccupiedVehicleSync::Packet_UnoccupiedVehicleSync(NetBitStreamInterface&
                 if (vehicle.data.bSyncHealth)
                     pVehicle->SetHealth(vehicle.data.fHealth);
                 pVehicle->SetEngineOn(vehicle.data.bEngineOn);
-                if (pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN)
-                    pVehicle->SetDerailed(vehicle.data.bDerailed);
+
+                if (bRailDriven)
+                {
+                    // Track first; switching it recalculates the rail distance from the train's
+                    // current coordinates, so the synced one goes in after
+                    pVehicle->SetTrainTrack(ucRailTrack);
+                    pVehicle->SetTrainPosition(vehicle.data.fTrainPosition, false);
+                    pVehicle->SetTrainDirection(vehicle.data.bTrainDirection);
+                    pVehicle->SetTrainSpeed(vehicle.data.fTrainSpeed);
+                }
 #ifdef MTA_DEBUG
                 pVehicle->m_pLastSyncer = NULL;
                 pVehicle->m_ulLastSyncTime = GetTickCount32();
@@ -229,15 +284,21 @@ void CUnoccupiedVehicleSync::UpdateDamageModels()
 void CUnoccupiedVehicleSync::UpdateStates()
 {
     CClientPlayer*      pPlayer = g_pClientGame->GetLocalPlayer();
-    CDeathmatchVehicle* pVehicle = nullptr;
+    CDeathmatchVehicle* pTemporarilyAdded = nullptr;
     // Are we leaving a vehicle as driver and physically out of it
     if (pPlayer && pPlayer->GetVehicleInOutState() == VEHICLE_INOUT_GETTING_OUT && pPlayer->GetOccupiedVehicle() && pPlayer->GetOccupiedVehicleSeat() == 0 &&
         !pPlayer->GetRealOccupiedVehicle())
     {
-        // Make sure it's valid and add it to our list temporarily
-        pVehicle = dynamic_cast<CDeathmatchVehicle*>(pPlayer->GetOccupiedVehicle());
-        if (pVehicle)
-            m_List.push_front(pVehicle);
+        // Make sure it's valid and add it to our list temporarily. The server gives the driver of a
+        // vehicle the sync of it, so by now it is usually in the list already; the removal below
+        // takes out every copy, so a second one would drop the vehicle for good and we would
+        // silently stop syncing it
+        CDeathmatchVehicle* pVehicle = dynamic_cast<CDeathmatchVehicle*>(pPlayer->GetOccupiedVehicle());
+        if (pVehicle && !m_List.Contains(pVehicle))
+        {
+            pTemporarilyAdded = pVehicle;
+            m_List.push_front(pTemporarilyAdded);
+        }
     }
 
     // Got any items?
@@ -264,8 +325,8 @@ void CUnoccupiedVehicleSync::UpdateStates()
     }
 
     // Remove our vehicle again
-    if (pVehicle)
-        m_List.remove(pVehicle);
+    if (pTemporarilyAdded)
+        m_List.remove(pTemporarilyAdded);
 }
 
 bool CUnoccupiedVehicleSync::WriteVehicleInformation(NetBitStreamInterface* pBitStream, CDeathmatchVehicle* pVehicle)
@@ -384,6 +445,55 @@ bool CUnoccupiedVehicleSync::WriteVehicleInformation(NetBitStreamInterface* pBit
         pVehicle->m_LastSyncedData->bIsInWater = pVehicle->IsInWater();
     }
     vehicle.data.bIsInWater = pVehicle->IsInWater();
+
+    // Trains have no driver here, so this is the only way vehicle.trainPosition and the rest ever
+    // reach the server once the last occupant leaves (#396). Only a streamed in train has anything
+    // to report; the others still hold the placeholders they were built with, no track and a
+    // distance of -1, which would count as changed every tick and be sent anyway
+    if (pVehicle->GetVehicleType() == CLIENTVEHICLE_TRAIN && pVehicle->GetGameVehicle())
+    {
+        float         fTrainPosition = pVehicle->GetTrainPosition();
+        bool          bTrainDirection = pVehicle->GetTrainDirection();
+        float         fTrainSpeed = pVehicle->GetTrainSpeed();
+        unsigned char ucTrainTrack = pVehicle->GetTrainTrack();
+
+        if (fabs(pVehicle->m_LastSyncedData->fTrainPosition - fTrainPosition) > FLOAT_EPSILON ||
+            pVehicle->m_LastSyncedData->bTrainDirection != bTrainDirection || fabs(pVehicle->m_LastSyncedData->fTrainSpeed - fTrainSpeed) > FLOAT_EPSILON ||
+            pVehicle->m_LastSyncedData->ucTrainTrack != ucTrainTrack)
+        {
+            bSyncVehicle = true;
+            vehicle.data.bSyncTrain = true;
+            vehicle.data.fTrainPosition = fTrainPosition;
+            vehicle.data.bTrainDirection = bTrainDirection;
+            vehicle.data.fTrainSpeed = fTrainSpeed;
+
+            // A train can be on no track (nil), one of the 4 default tracks, or a custom track
+            // element, so the reader needs to know which case this is; same encoding the occupied
+            // vehicle puresync writes in CNetAPI::WritePuresync
+            if (CClientTrainTrack* pCustomTrack = g_pClientGame->GetManager()->GetTrainTrackManager()->GetByGameTrackID(ucTrainTrack))
+            {
+                vehicle.data.bTrainHasTrack = true;
+                vehicle.data.bTrainTrackIsDefault = false;
+                vehicle.data.TrainTrackElementID = pCustomTrack->GetID();
+            }
+            else if (ucTrainTrack < CTrainTrackManager::FIRST_CUSTOM_TRACK_ID)
+            {
+                vehicle.data.bTrainHasTrack = true;
+                vehicle.data.bTrainTrackIsDefault = true;
+                vehicle.data.ucTrainDefaultTrackId = ucTrainTrack;
+            }
+            else
+            {
+                // Either derailed, or on a custom track that's already gone
+                vehicle.data.bTrainHasTrack = false;
+            }
+
+            pVehicle->m_LastSyncedData->fTrainPosition = fTrainPosition;
+            pVehicle->m_LastSyncedData->bTrainDirection = bTrainDirection;
+            pVehicle->m_LastSyncedData->fTrainSpeed = fTrainSpeed;
+            pVehicle->m_LastSyncedData->ucTrainTrack = ucTrainTrack;
+        }
+    }
 
     // If nothing has changed we dont sync the vehicle
     if (!bSyncVehicle)

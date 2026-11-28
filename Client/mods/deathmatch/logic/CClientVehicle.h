@@ -125,6 +125,12 @@ struct SLastSyncedVehData
     bool      bEngineOn;
     bool      bDerailed;
     bool      bIsInWater;
+
+    // Trains only; used to spot changes worth sending in the unoccupied vehicle sync
+    float         fTrainPosition;
+    bool          bTrainDirection;
+    float         fTrainSpeed;
+    unsigned char ucTrainTrack;
 };
 struct SVehicleComponentData
 {
